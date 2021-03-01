@@ -1,0 +1,38 @@
+version: 2.1
+
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - build:
+          context: npm
+      - publish:
+          requires:
+            - build
+          context:
+            - npm
+            - github
+          filters:
+            branches:
+              only:
+                - main
+
+jobs:
+  build:
+    docker:
+      - image: circleci/node:erbium
+    steps:
+      - checkout
+      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test
+  publish:
+    docker:
+      - image: circleci/node:erbium
+    steps:
+      - checkout
+      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
+      - run: npm ci
+      - run: npm run build
+      - run: npx semantic-release
