@@ -1,8 +1,15 @@
 {
+  "name": "@homebound/beam",
   "version": "0.1.0",
+  "author": "Homebound",
   "license": "MIT",
   "main": "dist/index.js",
+  "module": "dist/beam.esm.js",
   "typings": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/homebound-team/beam"
+  },
   "files": [
     "dist",
     "src"
@@ -18,13 +25,9 @@
     "prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "start-storybook -s ./.storybook/static -p 9000",
     "build:storybook": "build-storybook",
     "build:truss": "cd ./truss && npm i && npm run generate"
-  },
-  "peerDependencies": {
-    "@emotion/react": ">=11",
-    "react": ">=16"
   },
   "husky": {
     "hooks": {
@@ -37,9 +40,6 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "@homebound/beam",
-  "author": "Homebound",
-  "module": "dist/beam.esm.js",
   "size-limit": [
     {
       "path": "dist/beam.cjs.production.min.js",
