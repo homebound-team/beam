@@ -4,9 +4,10 @@ import { Fragment } from 'react';
 import { Css, Margin, Palette, Position, Xss } from './Css';
 
 export type IconXss = Xss<Margin | Position | 'cursor' | 'height' | 'width'>;
+export type IconKey = keyof typeof Icons;
 export interface IconProps {
   color?: string;
-  icon: keyof typeof Icons;
+  icon: IconKey;
   secondaryColor?: string;
   tabIndex?: number;
   testId?: string;
@@ -34,7 +35,7 @@ export function Icon({
         '#stroke': { stroke: color },
         '#primary': { fill: color },
         '#secondary': { fill: secondaryColor },
-        '&:focus': Css.outline0.bw1.bsDashed.bMidGray.$,
+        '&:focus': Css.outline0.bw1.bsDashed.bGrayMid.$,
         ...xss,
       }}
       width="24"

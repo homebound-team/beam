@@ -28,21 +28,27 @@ methods['type-scale'] = Object.entries(fonts).map(([abbr, { px, lh, ls }]) =>
   makeRule(abbr, { fontSize: `${px}px`, lineHeight: `${lh}px`, letterSpacing: `${ls}px` })
 );
 
-// TODO: It would be nice to bring this into the TRUSS lib
-methods['borderRadiusRules'] = makeRules('borderRadius', {
-  br0: 0,
-  br3: '3px',
-  br5: '5px',
-  br16: '16px',
-  br100: '100%',
-  brPill: '9999px',
-});
+methods['borderRadiusRules'] = [
+  ...methods['borderRadiusRules'],
+  ...makeRules('borderRadius', { br5: '5px', br16: '16px' }),
+];
 
 methods['boxShadowRules'] = [
   ...methods['boxShadowRules'],
   ...makeRules('boxShadow', {
-    shadowBasic: `0px 4px 8px ${palette.TransparentGray}, 0px 2px 16px rgba(53, 53, 53, 0.03)`,
-    shadowHover: `0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px ${palette.TransparentGray}`,
+    shadowBasic: `0px 4px 8px ${palette.GrayDarkTransparent}, 0px 2px 16px rgba(53, 53, 53, 0.03)`,
+    shadowHover: `0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px ${palette.GrayDarkTransparent}`,
+  }),
+];
+
+methods['fontFamilyRules'] = makeRules('fontFamily', {
+  sansSerif: "'Good Sans', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'",
+});
+
+methods['cursorRules'] = [
+  ...methods['cursorRules'],
+  ...makeRules('cursor', {
+    cursorNotAllowed: 'not-allowed',
   }),
 ];
 
