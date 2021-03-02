@@ -30,41 +30,53 @@ class CssBuilder<T extends Properties1> {
   get bBlackFaded() { return this.add("borderColor", "rgba(53, 53, 53, 0.8)"); }
   get bBlue() { return this.add("borderColor", "#526675"); }
   get bBlueBright() { return this.add("borderColor", "#3a759d"); }
+  get bBlueBrightFaded() { return this.add("borderColor", "rgba(58, 117, 157, 0.1)"); }
   get bBlueFaded() { return this.add("borderColor", "rgba(82, 102, 117, 0.3)"); }
   get bBlueLight() { return this.add("borderColor", "#d2d7dd"); }
   get bBlueTransparent() { return this.add("borderColor", "rgba(82, 102, 117, 0.85)"); }
-  get bBrightGreen() { return this.add("borderColor", "#aeb564"); }
+  get bCream() { return this.add("borderColor", "#FCFFF5"); }
+  get bGray() { return this.add("borderColor", "#D1D2CD"); }
+  get bGray08() { return this.add("borderColor", "rgba(53, 53, 53, 0.08)"); }
+  get bGrayDarkTransparent() { return this.add("borderColor", "rgba(53, 53, 53, 0.16)"); }
+  get bGrayLight() { return this.add("borderColor", "#cecece"); }
+  get bGrayLight04() { return this.add("borderColor", "rgba(53, 53, 53, 0.04)"); }
+  get bGrayLight25() { return this.add("borderColor", "rgba(206, 206, 206, .25)"); }
+  get bGrayLight9() { return this.add("borderColor", "rgba(206, 206, 206, .09)"); }
+  get bGrayMid() { return this.add("borderColor", "#888888"); }
+  get bGrayVeryLight() { return this.add("borderColor", "#e1e4e8"); }
+  get bGreenBright() { return this.add("borderColor", "#aeb564"); }
   get bGreenMoss() { return this.add("borderColor", "#b2b18c"); }
   get bGreenSaturated() { return this.add("borderColor", "#657839"); }
-  get bStone() { return this.add("borderColor", "#a29983"); }
-  get bDarkTransparentGray() { return this.add("borderColor", "rgba(53, 53, 53, 0.16)"); }
   get bHollow() { return this.add("borderColor", "rgba(0, 0, 0, 0)"); }
-  get bLightGray() { return this.add("borderColor", "#cecece"); }
-  get bLightTransparentGray() { return this.add("borderColor", "rgba(53, 53, 53, 0.04)"); }
-  get bMidGray() { return this.add("borderColor", "#888888"); }
   get bOrange() { return this.add("borderColor", "#d17520"); }
+  get bPeach() { return this.add("borderColor", "#F7E9D5"); }
+  get bPrimary() { return this.add("borderColor", "#0067c5"); }
   get bRed() { return this.add("borderColor", "#c86251"); }
   get bRedDark() { return this.add("borderColor", "#8b514e"); }
   get bRedFaded() { return this.add("borderColor", "rgba(200, 98, 81, 0.8)"); }
   get bRedFadedTransparent() { return this.add("borderColor", "rgba(200, 98, 81, 0.05)"); }
+  get bRedLight() { return this.add("borderColor", "#e57373"); }
+  get bStone() { return this.add("borderColor", "#a29983"); }
   get bTaupe() { return this.add("borderColor", "#ebeae4"); }
   get bToast() { return this.add("borderColor", "#cd9772"); }
   get bTransparent() { return this.add("borderColor", "rgba(0, 0, 0, 0)"); }
-  get bTransparentGray() { return this.add("borderColor", "rgba(53, 53, 53, 0.08)"); }
-  get bVeryLightGray() { return this.add("borderColor", "#e1e4e8"); }
   get bWhite() { return this.add("borderColor", "#fcfcfa"); }
+  get bWhiteFaded() { return this.add("borderColor", "rgba(252, 252, 250, 0.6)"); }
   get bWhitePure() { return this.add("borderColor", "#ffffff"); }
   get bYellow() { return this.add("borderColor", "#f6b14e"); }
-  get bYellowTransparent1() { return this.add("borderColor", "rgba(246, 177, 78, 0.1)"); }
-  get bYellowTransparent3() { return this.add("borderColor", "rgba(246, 177, 78, 0.3)"); }
+  get bYellow1() { return this.add("borderColor", "rgba(246, 177, 78, 0.1)"); }
+  get bYellow3() { return this.add("borderColor", "rgba(246, 177, 78, 0.3)"); }
 
   // borderRadiusRules
-  get br0() { return this.add("borderRadius", 0); }
-  get br3() { return this.add("borderRadius", "3px"); }
-  get br5() { return this.add("borderRadius", "5px"); }
-  get br16() { return this.add("borderRadius", "16px"); }
+  get br0() { return this.add("borderRadius", "0"); }
+  get br1() { return this.add("borderRadius", ".125rem"); }
+  get br2() { return this.add("borderRadius", ".25rem"); }
+  get br3() { return this.add("borderRadius", ".5rem"); }
+  get br4() { return this.add("borderRadius", "1rem"); }
   get br100() { return this.add("borderRadius", "100%"); }
   get brPill() { return this.add("borderRadius", "9999px"); }
+  get br5() { return this.add("borderRadius", "5px"); }
+  get br16() { return this.add("borderRadius", "16px"); }
 
   // borderRules
   get ba() { return this.add("borderStyle", "solid").add("borderWidth", "1px"); }
@@ -87,8 +99,8 @@ class CssBuilder<T extends Properties1> {
 
   // boxShadowRules
   get shadowNone() { return this.add("boxShadow", "none"); }
-  get shadowBasic() { return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.08), 0px 2px 16px rgba(53, 53, 53, 0.03)"); }
-  get shadowHover() { return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08)"); }
+  get shadowBasic() { return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.16), 0px 2px 16px rgba(53, 53, 53, 0.03)"); }
+  get shadowHover() { return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.16)"); }
 
   // coordinateRules
   get top0() { return this.top(0); }
@@ -130,6 +142,7 @@ class CssBuilder<T extends Properties1> {
 
   // cursorRules
   get cursorPointer() { return this.add("cursor", "pointer"); }
+  get cursorNotAllowed() { return this.add("cursor", "not-allowed"); }
 
   // displayRules
   get dn() { return this.add("display", "none"); }
@@ -282,65 +295,83 @@ class CssBuilder<T extends Properties1> {
   get blackFaded() { return this.add("color", "rgba(53, 53, 53, 0.8)"); }
   get blue() { return this.add("color", "#526675"); }
   get blueBright() { return this.add("color", "#3a759d"); }
+  get blueBrightFaded() { return this.add("color", "rgba(58, 117, 157, 0.1)"); }
   get blueFaded() { return this.add("color", "rgba(82, 102, 117, 0.3)"); }
   get blueLight() { return this.add("color", "#d2d7dd"); }
   get blueTransparent() { return this.add("color", "rgba(82, 102, 117, 0.85)"); }
-  get brightGreen() { return this.add("color", "#aeb564"); }
+  get cream() { return this.add("color", "#FCFFF5"); }
+  get gray() { return this.add("color", "#D1D2CD"); }
+  get gray08() { return this.add("color", "rgba(53, 53, 53, 0.08)"); }
+  get grayDarkTransparent() { return this.add("color", "rgba(53, 53, 53, 0.16)"); }
+  get grayLight() { return this.add("color", "#cecece"); }
+  get grayLight04() { return this.add("color", "rgba(53, 53, 53, 0.04)"); }
+  get grayLight25() { return this.add("color", "rgba(206, 206, 206, .25)"); }
+  get grayLight9() { return this.add("color", "rgba(206, 206, 206, .09)"); }
+  get grayMid() { return this.add("color", "#888888"); }
+  get grayVeryLight() { return this.add("color", "#e1e4e8"); }
+  get greenBright() { return this.add("color", "#aeb564"); }
   get greenMoss() { return this.add("color", "#b2b18c"); }
   get greenSaturated() { return this.add("color", "#657839"); }
-  get stone() { return this.add("color", "#a29983"); }
-  get darkTransparentGray() { return this.add("color", "rgba(53, 53, 53, 0.16)"); }
   get hollow() { return this.add("color", "rgba(0, 0, 0, 0)"); }
-  get lightGray() { return this.add("color", "#cecece"); }
-  get lightTransparentGray() { return this.add("color", "rgba(53, 53, 53, 0.04)"); }
-  get midGray() { return this.add("color", "#888888"); }
   get orange() { return this.add("color", "#d17520"); }
+  get peach() { return this.add("color", "#F7E9D5"); }
+  get primary() { return this.add("color", "#0067c5"); }
   get red() { return this.add("color", "#c86251"); }
   get redDark() { return this.add("color", "#8b514e"); }
   get redFaded() { return this.add("color", "rgba(200, 98, 81, 0.8)"); }
   get redFadedTransparent() { return this.add("color", "rgba(200, 98, 81, 0.05)"); }
+  get redLight() { return this.add("color", "#e57373"); }
+  get stone() { return this.add("color", "#a29983"); }
   get taupe() { return this.add("color", "#ebeae4"); }
   get toast() { return this.add("color", "#cd9772"); }
   get transparent() { return this.add("color", "rgba(0, 0, 0, 0)"); }
-  get transparentGray() { return this.add("color", "rgba(53, 53, 53, 0.08)"); }
-  get veryLightGray() { return this.add("color", "#e1e4e8"); }
   get white() { return this.add("color", "#fcfcfa"); }
+  get whiteFaded() { return this.add("color", "rgba(252, 252, 250, 0.6)"); }
   get whitePure() { return this.add("color", "#ffffff"); }
   get yellow() { return this.add("color", "#f6b14e"); }
-  get yellowTransparent1() { return this.add("color", "rgba(246, 177, 78, 0.1)"); }
-  get yellowTransparent3() { return this.add("color", "rgba(246, 177, 78, 0.3)"); }
+  get yellow1() { return this.add("color", "rgba(246, 177, 78, 0.1)"); }
+  get yellow3() { return this.add("color", "rgba(246, 177, 78, 0.3)"); }
   color(value: string) { return this.add("color", value); }
   get bgBlack() { return this.add("backgroundColor", "#353535"); }
   get bgBlackFaded() { return this.add("backgroundColor", "rgba(53, 53, 53, 0.8)"); }
   get bgBlue() { return this.add("backgroundColor", "#526675"); }
   get bgBlueBright() { return this.add("backgroundColor", "#3a759d"); }
+  get bgBlueBrightFaded() { return this.add("backgroundColor", "rgba(58, 117, 157, 0.1)"); }
   get bgBlueFaded() { return this.add("backgroundColor", "rgba(82, 102, 117, 0.3)"); }
   get bgBlueLight() { return this.add("backgroundColor", "#d2d7dd"); }
   get bgBlueTransparent() { return this.add("backgroundColor", "rgba(82, 102, 117, 0.85)"); }
-  get bgBrightGreen() { return this.add("backgroundColor", "#aeb564"); }
+  get bgCream() { return this.add("backgroundColor", "#FCFFF5"); }
+  get bgGray() { return this.add("backgroundColor", "#D1D2CD"); }
+  get bgGray08() { return this.add("backgroundColor", "rgba(53, 53, 53, 0.08)"); }
+  get bgGrayDarkTransparent() { return this.add("backgroundColor", "rgba(53, 53, 53, 0.16)"); }
+  get bgGrayLight() { return this.add("backgroundColor", "#cecece"); }
+  get bgGrayLight04() { return this.add("backgroundColor", "rgba(53, 53, 53, 0.04)"); }
+  get bgGrayLight25() { return this.add("backgroundColor", "rgba(206, 206, 206, .25)"); }
+  get bgGrayLight9() { return this.add("backgroundColor", "rgba(206, 206, 206, .09)"); }
+  get bgGrayMid() { return this.add("backgroundColor", "#888888"); }
+  get bgGrayVeryLight() { return this.add("backgroundColor", "#e1e4e8"); }
+  get bgGreenBright() { return this.add("backgroundColor", "#aeb564"); }
   get bgGreenMoss() { return this.add("backgroundColor", "#b2b18c"); }
   get bgGreenSaturated() { return this.add("backgroundColor", "#657839"); }
-  get bgStone() { return this.add("backgroundColor", "#a29983"); }
-  get bgDarkTransparentGray() { return this.add("backgroundColor", "rgba(53, 53, 53, 0.16)"); }
   get bgHollow() { return this.add("backgroundColor", "rgba(0, 0, 0, 0)"); }
-  get bgLightGray() { return this.add("backgroundColor", "#cecece"); }
-  get bgLightTransparentGray() { return this.add("backgroundColor", "rgba(53, 53, 53, 0.04)"); }
-  get bgMidGray() { return this.add("backgroundColor", "#888888"); }
   get bgOrange() { return this.add("backgroundColor", "#d17520"); }
+  get bgPeach() { return this.add("backgroundColor", "#F7E9D5"); }
+  get bgPrimary() { return this.add("backgroundColor", "#0067c5"); }
   get bgRed() { return this.add("backgroundColor", "#c86251"); }
   get bgRedDark() { return this.add("backgroundColor", "#8b514e"); }
   get bgRedFaded() { return this.add("backgroundColor", "rgba(200, 98, 81, 0.8)"); }
   get bgRedFadedTransparent() { return this.add("backgroundColor", "rgba(200, 98, 81, 0.05)"); }
+  get bgRedLight() { return this.add("backgroundColor", "#e57373"); }
+  get bgStone() { return this.add("backgroundColor", "#a29983"); }
   get bgTaupe() { return this.add("backgroundColor", "#ebeae4"); }
   get bgToast() { return this.add("backgroundColor", "#cd9772"); }
   get bgTransparent() { return this.add("backgroundColor", "rgba(0, 0, 0, 0)"); }
-  get bgTransparentGray() { return this.add("backgroundColor", "rgba(53, 53, 53, 0.08)"); }
-  get bgVeryLightGray() { return this.add("backgroundColor", "#e1e4e8"); }
   get bgWhite() { return this.add("backgroundColor", "#fcfcfa"); }
+  get bgWhiteFaded() { return this.add("backgroundColor", "rgba(252, 252, 250, 0.6)"); }
   get bgWhitePure() { return this.add("backgroundColor", "#ffffff"); }
   get bgYellow() { return this.add("backgroundColor", "#f6b14e"); }
-  get bgYellowTransparent1() { return this.add("backgroundColor", "rgba(246, 177, 78, 0.1)"); }
-  get bgYellowTransparent3() { return this.add("backgroundColor", "rgba(246, 177, 78, 0.3)"); }
+  get bgYellow1() { return this.add("backgroundColor", "rgba(246, 177, 78, 0.1)"); }
+  get bgYellow3() { return this.add("backgroundColor", "rgba(246, 177, 78, 0.3)"); }
   bgColor(value: string) { return this.add("backgroundColor", value); }
   fill(value: string) { return this.add("fill", value); }
 
@@ -574,6 +605,9 @@ class CssBuilder<T extends Properties1> {
   get f12() { return this.add("fontSize", "12px").add("lineHeight", "17px").add("letterSpacing", "-0.8px"); }
   get f10() { return this.add("fontSize", "10px").add("lineHeight", "12px").add("letterSpacing", "-0.8px"); }
 
+  // fontFamilyRules
+  get sansSerif() { return this.add("fontFamily", "'Good Sans', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'"); }
+
   // aliases
   get bodyText() { return this.f14.black; }
   get t10() { return this.f10.black; }
@@ -666,33 +700,42 @@ export const Palette = {
   BlackFaded: 'rgba(53, 53, 53, 0.8)',
   Blue: '#526675',
   BlueBright: '#3a759d',
+  BlueBrightFaded: 'rgba(58, 117, 157, 0.1)',
   BlueFaded: 'rgba(82, 102, 117, 0.3)',
   BlueLight: '#d2d7dd',
   BlueTransparent: 'rgba(82, 102, 117, 0.85)',
-  BrightGreen: '#aeb564',
+  Cream: '#FCFFF5',
+  Gray: '#D1D2CD',
+  Gray08: 'rgba(53, 53, 53, 0.08)',
+  GrayDarkTransparent: 'rgba(53, 53, 53, 0.16)',
+  GrayLight: '#cecece',
+  GrayLight04: 'rgba(53, 53, 53, 0.04)',
+  GrayLight25: 'rgba(206, 206, 206, .25)',
+  GrayLight9: 'rgba(206, 206, 206, .09)',
+  GrayMid: '#888888',
+  GrayVeryLight: '#e1e4e8',
+  GreenBright: '#aeb564',
   GreenMoss: '#b2b18c',
   GreenSaturated: '#657839',
-  Stone: '#a29983',
-  DarkTransparentGray: 'rgba(53, 53, 53, 0.16)',
   Hollow: 'rgba(0, 0, 0, 0)',
-  LightGray: '#cecece',
-  LightTransparentGray: 'rgba(53, 53, 53, 0.04)',
-  MidGray: '#888888',
   Orange: '#d17520',
+  Peach: '#F7E9D5',
+  Primary: '#0067c5',
   Red: '#c86251',
   RedDark: '#8b514e',
   RedFaded: 'rgba(200, 98, 81, 0.8)',
   RedFadedTransparent: 'rgba(200, 98, 81, 0.05)',
+  RedLight: '#e57373',
+  Stone: '#a29983',
   Taupe: '#ebeae4',
   Toast: '#cd9772',
   Transparent: 'rgba(0, 0, 0, 0)',
-  TransparentGray: 'rgba(53, 53, 53, 0.08)',
-  VeryLightGray: '#e1e4e8',
   White: '#fcfcfa',
+  WhiteFaded: 'rgba(252, 252, 250, 0.6)',
   WhitePure: '#ffffff',
   Yellow: '#f6b14e',
-  YellowTransparent1: 'rgba(246, 177, 78, 0.1)',
-  YellowTransparent3: 'rgba(246, 177, 78, 0.3)',
+  Yellow1: 'rgba(246, 177, 78, 0.1)',
+  Yellow3: 'rgba(246, 177, 78, 0.3)',
 };
 
 /** A shortcut for defining Xss types. */
