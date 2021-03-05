@@ -3,6 +3,7 @@ import { Global, css } from '@emotion/react';
 import { muiTheme, globalStyles } from '../';
 import { StylesProvider, ThemeProvider as MuiThemeProvider } from '@material-ui/styles';
 import { CssBaseline } from '@material-ui/core';
+import '../src/tailwind/tailwind.css';
 
 // https://storybook.js.org/docs/react/writing-stories/parameters#global-parameters
 export const parameters = {
