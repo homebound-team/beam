@@ -2,75 +2,47 @@ import { generate, GenerateOpts, generateRules, makeRule, makeRules } from '@hom
 import { palette } from './palette';
 
 const increment = 8;
-const numberOfIncrements = 7;
-
-// Abbr, pixels, line height, letter spacing.
-// Line-height is generally `px * 1.1` except for the smaller sizes which have nudged-up heights.
-const fonts: Record<string, { px: number; lh: number; ls: number }> = {
-  f108: { px: 108, lh: 118, ls: -1.6 },
-  f96: { px: 96, lh: 105, ls: -1.6 },
-  f72: { px: 72, lh: 79, ls: -1.6 },
-  f48: { px: 48, lh: 52, ls: -1.6 },
-  f32: { px: 32, lh: 35, ls: -1.6 },
-  f24: { px: 24, lh: 26, ls: -1.6 },
-  f18: { px: 18, lh: 20, ls: -0.8 },
-  f16: { px: 16, lh: 18, ls: -0.8 },
-  f14: { px: 14, lh: 16, ls: -0.8 },
-  f12: { px: 12, lh: 17, ls: -0.8 },
-  f10: { px: 10, lh: 12, ls: -0.8 },
+const numberOfIncrements = 8;
+// prettier-ignore
+const fonts: Record<string, { fontWeight: 400 | 500 | 600, fontSize: string; lineHeight: string }> = {
+  tiny:   { fontWeight: 400, fontSize: "10px", lineHeight: "14px" },
+  // Em denotes Emphasized
+  tinyEm: { fontWeight: 600, fontSize: "10px", lineHeight: "14px" },
+  xs:     { fontWeight: 400, fontSize: "12px", lineHeight: "16px" },
+  xsEm:   { fontWeight: 500, fontSize: "12px", lineHeight: "16px" },
+  sm:     { fontWeight: 400, fontSize: "14px", lineHeight: "20px" },
+  smEm:   { fontWeight: 500, fontSize: "14px", lineHeight: "20px" },
+  base:   { fontWeight: 400, fontSize: "16px", lineHeight: "24px" },
+  baseEm: { fontWeight: 500, fontSize: "16px", lineHeight: "24px" },
+  lg:     { fontWeight: 400, fontSize: "18px", lineHeight: "28px" },
+  lgEm:   { fontWeight: 600, fontSize: "18px", lineHeight: "28px" },
+  xl:     { fontWeight: 400, fontSize: "20px", lineHeight: "28px" },
+  xlEm:   { fontWeight: 600, fontSize: "20px", lineHeight: "28px" },
+  // Using xl2 vs 2xl so that we can use it via Css.xl2 vs Css['2xl']
+  xl2:    { fontWeight: 400, fontSize: "24px", lineHeight: "32px" },
+  xl2Em:  { fontWeight: 600, fontSize: "24px", lineHeight: "32px" },
+  xl3:    { fontWeight: 400, fontSize: "30px", lineHeight: "36px" },
+  xl3Em:  { fontWeight: 600, fontSize: "30px", lineHeight: "36px" },
+  xl4:    { fontWeight: 400, fontSize: "36px", lineHeight: "40px" },
+  xl4Em:  { fontWeight: 600, fontSize: "36px", lineHeight: "40px" },
+  xl5:    { fontWeight: 400, fontSize: "48px", lineHeight: "48px" },
+  xl5Em:  { fontWeight: 600, fontSize: "48px", lineHeight: "48px" },
 };
 
 // Pass fonts: {} b/c we create our own font rules
 const methods = generateRules({ palette, fonts: {}, numberOfIncrements });
 
-// Customize type-scale with per-fontSize letterSpacing and lineHeight
-methods['type-scale'] = Object.entries(fonts).map(([abbr, { px, lh, ls }]) =>
-  makeRule(abbr, { fontSize: `${px}px`, lineHeight: `${lh}px`, letterSpacing: `${ls}px` })
-);
-
-methods['borderRadiusRules'] = [
-  ...methods['borderRadiusRules'],
-  ...makeRules('borderRadius', { br5: '5px', br16: '16px' }),
-];
-
-methods['boxShadowRules'] = [
-  ...methods['boxShadowRules'],
-  ...makeRules('boxShadow', {
-    shadowBasic: `0px 4px 8px ${palette.GrayDarkTransparent}, 0px 2px 16px rgba(53, 53, 53, 0.03)`,
-    shadowHover: `0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px ${palette.GrayDarkTransparent}`,
-  }),
-];
-
+// Customize type-scale with per-fontWeight, fontSize and lineHeight
+methods['type-scale'] = Object.entries(fonts).map(([abbr, defs]) => makeRule(abbr, { ...defs }));
 methods['fontFamilyRules'] = makeRules('fontFamily', {
-  sansSerif: "'Good Sans', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'",
+  sansSerif: "'Inter', sans-serif",
 });
 
-methods['cursorRules'] = [
-  ...methods['cursorRules'],
-  ...makeRules('cursor', {
-    cursorNotAllowed: 'not-allowed',
-  }),
-];
+const aliases: Record<string, string[]> = {};
 
-const aliases: Record<string, string[]> = {
-  bodyText: ['f14', 'black'],
-  t10: ['f10', 'black'],
-  t12: ['f12', 'black'],
-  t12up: ['f12', 'black', 'ttu'],
-  t14: ['f14', 'black'],
-  t14up: ['f14', 'black', 'ttu'],
-  t16: ['f16', 'black'],
-  t18: ['f18', 'black'],
-  t24: ['f24', 'black'],
-  t32: ['f32', 'black'],
-};
+const typeAliases: GenerateOpts['typeAliases'] = {};
 
-const typeAliases: GenerateOpts['typeAliases'] = {
-  Position: ['top', 'right', 'bottom', 'left', 'position', 'zIndex'],
-};
-
-// Optionally configure breakpoints to sm/md/mdAndUp/mdOrLg/etc. media query consts
-const breakpoints = { xs: 0, sm: 600, md: 960, lg: 1280, xl: 1920 };
+const breakpoints = {};
 
 generate({
   outputPath: '../src/Css.ts',
@@ -80,7 +52,6 @@ generate({
   aliases,
   typeAliases,
   breakpoints,
-}).then(
-  () => console.log('done'),
-  (err) => console.error(err)
-);
+})
+  .then(() => console.log('🚀 TRUSS styles generation complete'))
+  .catch(console.error);
