@@ -1,8 +1,10 @@
 // prettier-ignore
 export const palette = {
+  // Primary Palette
   Black:        'rgba(17,24,39,1)',
   White:        'rgba(255,255,255,1)',
 
+  // Neutrals
   CoolGray50:   'rgba(249,250,251,1)',
   CoolGray100:  'rgba(243,244,246,1)',
   CoolGray200:  'rgba(229,231,235,1)',
@@ -14,6 +16,7 @@ export const palette = {
   CoolGray800:  'rgba(31,41,55,1)',
   CoolGray900:  'rgba(17,24,39,1)',
 
+  // Extended Palette
   Coral50:      'rgba(255,234,227,1)',
   Coral100:     'rgba(255,223,212,1)',
   Coral200:    'rgba(255,194,174,1)',
@@ -68,4 +71,18 @@ export const palette = {
   Violet700:     'rgba(109,40,217,1)',
   Violet800:     'rgba(91,33,182,1)',
   Violet900:     'rgba(76,29,149,1)',
+
+  // Chart Palette
+  Cool50:      'rgba(239,246,247,1)',
+  Cool100:     'rgba(216,235,238,1)',
+  Cool200:     'rgba(177,219,225,1)',
+  Cool300:     'rgba(128,200,214,1)',
+  Cool400:     'rgba(124,170,211,1)',
+  Cool500:     'rgba(116,139,218,1)',
+  Cool600:     'rgba(115,103,241,1)',
+  Cool700:     'rgba(97,85,216,1)',
+  Cool800:     'rgba(77,72,186,1)',
+  Cool900:     'rgba(59,60,160,1)',
+  Cool1000:    'rgba(42,47,135,1)',
+  Cool1100:    'rgba(16,27,100,1)',
 };

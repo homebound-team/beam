@@ -88,6 +88,18 @@ class CssBuilder<T extends Properties1> {
   get bViolet700() { return this.add("borderColor", "rgba(109,40,217,1)"); }
   get bViolet800() { return this.add("borderColor", "rgba(91,33,182,1)"); }
   get bViolet900() { return this.add("borderColor", "rgba(76,29,149,1)"); }
+  get bCool50() { return this.add("borderColor", "rgba(239,246,247,1)"); }
+  get bCool100() { return this.add("borderColor", "rgba(216,235,238,1)"); }
+  get bCool200() { return this.add("borderColor", "rgba(177,219,225,1)"); }
+  get bCool300() { return this.add("borderColor", "rgba(128,200,214,1)"); }
+  get bCool400() { return this.add("borderColor", "rgba(124,170,211,1)"); }
+  get bCool500() { return this.add("borderColor", "rgba(116,139,218,1)"); }
+  get bCool600() { return this.add("borderColor", "rgba(115,103,241,1)"); }
+  get bCool700() { return this.add("borderColor", "rgba(97,85,216,1)"); }
+  get bCool800() { return this.add("borderColor", "rgba(77,72,186,1)"); }
+  get bCool900() { return this.add("borderColor", "rgba(59,60,160,1)"); }
+  get bCool1000() { return this.add("borderColor", "rgba(42,47,135,1)"); }
+  get bCool1100() { return this.add("borderColor", "rgba(16,27,100,1)"); }
 
   // borderRadiusRules
   get br0() { return this.add("borderRadius", "0"); }
@@ -375,6 +387,18 @@ class CssBuilder<T extends Properties1> {
   get violet700() { return this.add("color", "rgba(109,40,217,1)"); }
   get violet800() { return this.add("color", "rgba(91,33,182,1)"); }
   get violet900() { return this.add("color", "rgba(76,29,149,1)"); }
+  get cool50() { return this.add("color", "rgba(239,246,247,1)"); }
+  get cool100() { return this.add("color", "rgba(216,235,238,1)"); }
+  get cool200() { return this.add("color", "rgba(177,219,225,1)"); }
+  get cool300() { return this.add("color", "rgba(128,200,214,1)"); }
+  get cool400() { return this.add("color", "rgba(124,170,211,1)"); }
+  get cool500() { return this.add("color", "rgba(116,139,218,1)"); }
+  get cool600() { return this.add("color", "rgba(115,103,241,1)"); }
+  get cool700() { return this.add("color", "rgba(97,85,216,1)"); }
+  get cool800() { return this.add("color", "rgba(77,72,186,1)"); }
+  get cool900() { return this.add("color", "rgba(59,60,160,1)"); }
+  get cool1000() { return this.add("color", "rgba(42,47,135,1)"); }
+  get cool1100() { return this.add("color", "rgba(16,27,100,1)"); }
   color(value: string) { return this.add("color", value); }
   get bgBlack() { return this.add("backgroundColor", "rgba(17,24,39,1)"); }
   get bgWhite() { return this.add("backgroundColor", "rgba(255,255,255,1)"); }
@@ -438,6 +462,18 @@ class CssBuilder<T extends Properties1> {
   get bgViolet700() { return this.add("backgroundColor", "rgba(109,40,217,1)"); }
   get bgViolet800() { return this.add("backgroundColor", "rgba(91,33,182,1)"); }
   get bgViolet900() { return this.add("backgroundColor", "rgba(76,29,149,1)"); }
+  get bgCool50() { return this.add("backgroundColor", "rgba(239,246,247,1)"); }
+  get bgCool100() { return this.add("backgroundColor", "rgba(216,235,238,1)"); }
+  get bgCool200() { return this.add("backgroundColor", "rgba(177,219,225,1)"); }
+  get bgCool300() { return this.add("backgroundColor", "rgba(128,200,214,1)"); }
+  get bgCool400() { return this.add("backgroundColor", "rgba(124,170,211,1)"); }
+  get bgCool500() { return this.add("backgroundColor", "rgba(116,139,218,1)"); }
+  get bgCool600() { return this.add("backgroundColor", "rgba(115,103,241,1)"); }
+  get bgCool700() { return this.add("backgroundColor", "rgba(97,85,216,1)"); }
+  get bgCool800() { return this.add("backgroundColor", "rgba(77,72,186,1)"); }
+  get bgCool900() { return this.add("backgroundColor", "rgba(59,60,160,1)"); }
+  get bgCool1000() { return this.add("backgroundColor", "rgba(42,47,135,1)"); }
+  get bgCool1100() { return this.add("backgroundColor", "rgba(16,27,100,1)"); }
   bgColor(value: string) { return this.add("backgroundColor", value); }
   fill(value: string) { return this.add("fill", value); }
 
@@ -838,6 +874,18 @@ export const Palette = {
   Violet700: 'rgba(109,40,217,1)',
   Violet800: 'rgba(91,33,182,1)',
   Violet900: 'rgba(76,29,149,1)',
+  Cool50: 'rgba(239,246,247,1)',
+  Cool100: 'rgba(216,235,238,1)',
+  Cool200: 'rgba(177,219,225,1)',
+  Cool300: 'rgba(128,200,214,1)',
+  Cool400: 'rgba(124,170,211,1)',
+  Cool500: 'rgba(116,139,218,1)',
+  Cool600: 'rgba(115,103,241,1)',
+  Cool700: 'rgba(97,85,216,1)',
+  Cool800: 'rgba(77,72,186,1)',
+  Cool900: 'rgba(59,60,160,1)',
+  Cool1000: 'rgba(42,47,135,1)',
+  Cool1100: 'rgba(16,27,100,1)',
 };
 
 /** A shortcut for defining Xss types. */

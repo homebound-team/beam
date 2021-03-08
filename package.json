@@ -18,8 +18,8 @@
     "node": "14.8.0"
   },
   "scripts": {
-    "start": "concurrently -c green 'npm:watch' 'npm:storybook'",
-    "watch": "concurrently -c blue, magenta 'npm:watch:beam' 'npm:watch:truss'",
+    "start": "concurrently -c green,blue,magenta 'npm:watch:beam' 'npm:watch:truss' 'npm:storybook'",
+    "watch": "concurrently -c blue,magenta 'npm:watch:beam' 'npm:watch:truss'",
     "watch:beam": "tsdx watch --format esm",
     "watch:truss": "cd ./truss && watch 'npm run generate' ./",
     "build": "tsdx build --format esm",
