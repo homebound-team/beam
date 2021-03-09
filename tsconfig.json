@@ -24,7 +24,7 @@
     "noUnusedParameters": true,
     // use Node's module resolution algorithm, instead of the legacy TS one
     "moduleResolution": "node",
-    // leave JSX as-is for babel/emotion to handle
+    // Use React 17 _jsx / automatic runtime support for nice emotion integration
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
     // interop between ESM and CJS modules. Recommended by TS
