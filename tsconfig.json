@@ -25,7 +25,8 @@
     // use Node's module resolution algorithm, instead of the legacy TS one
     "moduleResolution": "node",
     // leave JSX as-is for babel/emotion to handle
-    "jsx": "preserve",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
     // interop between ESM and CJS modules. Recommended by TS
     "esModuleInterop": true,
     // significant perf increase by skipping checking .d.ts files, particularly those in node_modules. Recommended by TS
