@@ -48,9 +48,9 @@ jobs:
     steps:
       - checkout
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
-      - run: npm ci
-      - run: npm run build
-      - run: npm run test
+      - run: yarn install
+      - run: yarn build
+      - run: yarn test
 
   publish:
     docker:
@@ -58,8 +58,8 @@ jobs:
     steps:
       - checkout
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
-      - run: npm ci
-      - run: npm run build
+      - run: yarn install
+      - run: yarn build
       - run: npx semantic-release
 
   chromatic:
@@ -74,5 +74,5 @@ jobs:
     steps:
       - checkout
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
-      - run: npm ci
-      - run: npm run chromatic -- << parameters.flags >>
+      - run: yarn install
+      - run: yarn chromatic -- << parameters.flags >>
