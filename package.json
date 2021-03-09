@@ -29,7 +29,7 @@
     "lint": "tsdx lint --write-file",
     "prepare": "yarn run build",
     "storybook": "start-storybook -p 9000",
-    "chromatic": "chromatic --project-token 074248da7284 --exit-once-uploaded"
+    "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded"
   },
   "husky": {
     "hooks": {

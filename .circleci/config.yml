@@ -39,7 +39,8 @@ workflows:
           context:
             - dockerhub
           filters:
-            <<: *only-run-on-branches
+            <<: *only-run-on-main
+          flags: "--auto-accept-changes"
 
 jobs:
   build:
