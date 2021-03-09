@@ -1,9 +1,9 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 import { Fragment } from 'react';
-import { Css, Margin, Palette, Position, Xss } from './Css';
+import { Css, Margin, Palette, Xss } from './Css';
 
-export type IconXss = Xss<Margin | Position | 'cursor' | 'height' | 'width'>;
+export type IconXss = Xss<Margin | 'cursor' | 'height' | 'width'>;
 export type IconKey = keyof typeof Icons;
 export interface IconProps {
   color?: string;
@@ -35,7 +35,7 @@ export function Icon({
         '#stroke': { stroke: color },
         '#primary': { fill: color },
         '#secondary': { fill: secondaryColor },
-        '&:focus': Css.outline0.bw1.bsDashed.bGrayMid.$,
+        '&:focus': Css.outline0.bw1.bsDashed.bCoolGray900.$,
         ...xss,
       }}
       width="24"

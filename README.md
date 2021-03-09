@@ -1,34 +1,47 @@
 # 🪵 Beam Design System
 
+Homebound's React component design system.
+
+_To see the latest designs, check out the [Figma](https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System-Refresh?node-id=0%3A1) file._
+
+## Getting Started
+
+There are a few ways to run the application each with its own advantage.
+
+```bash
+# Only when running for the first time to install dependencies for Beam & Truss
+> npm i && cd ./truss && npm i
+
+# Easiest way to start.
+# This runs Storybook and Truss/Beam automatic build process
+> npm start
+
+# Alternatively Beam/Truss automatic build process can be started independently from storybook by using two terminals.
+> npm run watch
+> npm run storybook
+
+# Lastly, the following three commands can be used to achieve the same result.
+# This makes the console output easier to read
+> npm run watch:beam
+> npm run watch:truss # Only required if any ./truss/*.ts files will be altered
+> npm run storybook
+```
+
 ## Commands
 
-TSDX scaffolds your new library inside `/src`, and also sets up a [Parcel-based](https://parceljs.org) playground for it inside `/example`.
+### `> npm run watch:beam`
 
-The recommended workflow is to run TSDX in one terminal:
+Builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
 
-```bash
-npm start # or yarn start
-```
-
-This builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
-
-Then run either Storybook or the example playground:
-
-### Storybook
-
-Run inside another terminal:
-
-```bash
-npm run storybook
-```
+### `> npm run storybook`
 
 This loads the stories from `./stories`.
 
 > NOTE: Stories should reference the components as if using the library, similar to the example playground. This means importing from the root project directory. This has been aliased in the tsconfig and the storybook webpack config as a helper.
 
-### Example
+## Example Application
 
-Then run the example inside another:
+Then run the example application:
 
 ```bash
 cd example
@@ -49,10 +62,6 @@ Code quality is set up for you with `prettier`, `husky`, and `lint-staged`. Adju
 ### Jest
 
 Jest tests are set up to run with `npm test` or `yarn test`.
-
-### Bundle analysis
-
-Calculates the real cost of your library using [size-limit](https://github.com/ai/size-limit) with `npm run size` and visulize it with `npm run analyze`.
 
 #### Setup Files
 
@@ -92,13 +101,6 @@ TSDX uses [Rollup](https://rollupjs.org) as a bundler and generates multiple rol
 `tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
 
 ## Continuous Integration
-
-### GitHub Actions
-
-Two actions are added by default:
-
-- `main` which installs deps w/ cache, lints, tests, and builds on all pushes against a Node and OS matrix
-- `size` which comments cost comparison of your library on every pull request using [size-limit](https://github.com/ai/size-limit)
 
 ## Optimizations
 

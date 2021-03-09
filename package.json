@@ -18,16 +18,17 @@
     "node": "14.8.0"
   },
   "scripts": {
-    "start": "tsdx watch --format esm",
+    "start": "concurrently -c green,blue,magenta 'npm:watch:beam' 'npm:watch:truss' 'npm:storybook'",
+    "watch": "concurrently -c blue,magenta 'npm:watch:beam' 'npm:watch:truss'",
+    "watch:beam": "tsdx watch --format esm",
+    "watch:truss": "cd ./truss && watch 'npm run generate' ./",
     "build": "tsdx build --format esm",
+    "build:truss": "cd ./truss && npm run generate",
+    "build:storybook": "build-storybook",
     "test": "tsdx test --passWithNoTests",
     "lint": "tsdx lint --write-file",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why",
-    "storybook": "start-storybook -s ./.storybook/static -p 9000",
-    "build:storybook": "build-storybook",
-    "build:truss": "cd ./truss && npm i && npm run generate"
+    "prepare": "npm run build",
+    "storybook": "start-storybook -p 9000"
   },
   "husky": {
     "hooks": {
@@ -40,25 +41,15 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "size-limit": [
-    {
-      "path": "dist/beam.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/beam.esm.js",
-      "limit": "10 KB"
-    }
-  ],
   "peerDependencies": {
     "react": ">=16"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.13.1",
     "@emotion/babel-plugin": "^11.2.0",
-    "@emotion/react": "^11.1.5",
-    "@material-ui/core": "^4.11.3",
-    "@size-limit/preset-small-lib": "^4.9.2",
     "@storybook/addon-essentials": "^6.1.20",
     "@storybook/addon-info": "^5.3.21",
     "@storybook/addon-links": "^6.1.20",
@@ -68,16 +59,17 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
     "babel-loader": "^8.2.2",
+    "concurrently": "^6.0.0",
     "conventional-changelog-conventionalcommits": "^4.5.0",
     "husky": "^5.1.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-is": "^17.0.1",
     "semantic-release": "^17.4.0",
-    "size-limit": "^4.9.2",
     "ts-node": "^9.1.1",
     "tsdx": "^0.14.1",
     "tslib": "^2.1.0",
-    "typescript": "^4.2.2"
+    "typescript": "^4.2.2",
+    "watch": "^1.0.2"
   }
 }
