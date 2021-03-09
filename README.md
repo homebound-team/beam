@@ -9,8 +9,8 @@ _To see the latest designs, check out the [Figma](https://www.figma.com/file/aWU
 There are a few ways to run the application each with its own advantage.
 
 ```bash
-# Only when running for the first time
-> npm i
+# Only when running for the first time to install dependencies for Beam & Truss
+> npm i && cd ./truss && npm i
 
 # Easiest way to start.
 # This runs Storybook and Truss/Beam automatic build process
