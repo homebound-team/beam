@@ -1,6 +1,5 @@
-import React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Icon } from '../src';
+import { Icon } from './';
 
 describe('Icon', () => {
   it('renders without crashing', () => {

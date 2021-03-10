@@ -1,5 +1,3 @@
-/** @jsx jsx */
-import { jsx } from '@emotion/react';
 import { Fragment } from 'react';
 import { Css, Margin, Palette, Xss } from './Css';
 

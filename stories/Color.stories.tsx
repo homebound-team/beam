@@ -1,5 +1,3 @@
-/** @jsxImportSource @emotion/react */
-import React from 'react';
 import { Meta } from '@storybook/react';
 import { Css, Palette, px } from '../';
 
@@ -49,7 +47,7 @@ function ListColors({ palette }: { palette: string[][] }) {
   );
 }
 
-function ColorSquare({ name, color }) {
+function ColorSquare({ name, color }: any) {
   const size = 80;
   return (
     <li css={Css.xsEm.$}>

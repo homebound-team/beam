@@ -1,5 +1,21 @@
 version: 2.1
 
+only-run-on-branches: &only-run-on-branches
+  branches:
+    ignore:
+      - main
+
+only-run-on-main: &only-run-on-main
+  branches:
+    only:
+      - main
+
+node-image: &node-image
+  image: circleci/node:14.8.0
+  auth:
+    username: $DOCKERHUB_USERNAME
+    password: $DOCKERHUB_ACCESS_TOKEN
+
 workflows:
   version: 2
   workflow:
@@ -13,26 +29,51 @@ workflows:
             - npm
             - github
           filters:
-            branches:
-              only:
-                - main
+            <<: *only-run-on-main
+      - chromatic:
+          context:
+            - dockerhub
+          filters:
+            <<: *only-run-on-branches
+      - chromatic:
+          context:
+            - dockerhub
+          filters:
+            <<: *only-run-on-main
+          flags: "--auto-accept-changes"
 
 jobs:
   build:
     docker:
-      - image: circleci/node:erbium
+      - <<: *node-image
     steps:
       - checkout
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
-      - run: npm ci
-      - run: npm run build
-      - run: npm run test
+      - run: yarn install
+      - run: yarn build
+      - run: yarn test
+
   publish:
     docker:
-      - image: circleci/node:erbium
+      - <<: *node-image
     steps:
       - checkout
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
-      - run: npm ci
-      - run: npm run build
-      - run: npx semantic-release
+      - run: yarn install
+      - run: yarn build
+      - run: yarn semantic-release
+
+  chromatic:
+    resource_class: "xlarge"
+    parameters:
+      flags:
+        type: string
+        default: ""
+    docker:
+      - <<: *node-image
+    working_directory: ~/project
+    steps:
+      - checkout
+      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
+      - run: yarn install
+      - run: yarn chromatic -- << parameters.flags >>
