@@ -1,39 +1,17 @@
 {
-  // see https://www.typescriptlang.org/tsconfig to better understand tsconfig
-  "include": ["src", "types"],
+  "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
-    // Supports the `css` prop
-    "types": ["@emotion/core", "jest"],
     "target": "esnext",
     "module": "esnext",
-    "lib": ["dom", "esnext", "DOM.Iterable"],
-    "importHelpers": true,
-    // output .d.ts declaration files for consumers
-    "declaration": true,
-    // output .js.map sourcemap files for consumers
-    "sourceMap": true,
-    // match output dir to input dir. e.g. dist/index instead of dist/src/index
-    "rootDir": "./src",
-    // stricter type-checking for stronger correctness. Recommended by TS
-    "strict": true,
-    // linter checks for common issues
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    // noUnused* overlap with @typescript-eslint/no-unused-vars, can disable if duplicative
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    // use Node's module resolution algorithm, instead of the legacy TS one
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
+    "lib": ["esnext", "dom"],
+    // Supports the `css` prop
+    "types": ["@emotion/core", "jest"],
     // Use React 17 _jsx / automatic runtime support for nice emotion integration
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
-    // interop between ESM and CJS modules. Recommended by TS
-    "esModuleInterop": true,
-    // significant perf increase by skipping checking .d.ts files, particularly those in node_modules. Recommended by TS
-    "skipLibCheck": true,
-    // error out if import and file system have a casing mismatch. Recommended by TS
-    "forceConsistentCasingInFileNames": true,
-    // `tsdx build` ignores this option, but it is commonly used when type-checking separately with `tsc`
-    "noEmit": true
-  }
+    "baseUrl": ".",
+    "outDir": "dist"
+  },
+  "include": ["src"]
 }

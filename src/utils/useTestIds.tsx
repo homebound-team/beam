@@ -1,6 +1,6 @@
-import React, { useMemo, PropsWithChildren } from 'react';
+import React, { useMemo, PropsWithChildren } from "react";
 
-const Context = React.createContext<string>('');
+const Context = React.createContext<string>("");
 const { Provider } = Context;
 
 interface TestIdProps {
@@ -20,7 +20,7 @@ export function useTestIds(names: string[]): object[];
 export function useTestIds(idOrNames: string | string[], maybeRest?: string[]): object[] {
   const namespace = React.useContext(Context);
   return useMemo(() => {
-    if (typeof idOrNames === 'string') {
+    if (typeof idOrNames === "string") {
       const id = idOrNames as string;
       const names = maybeRest || [];
       const idNamespace = prefixUnlessTopLevel(namespace, id);
@@ -34,13 +34,13 @@ export function useTestIds(idOrNames: string | string[], maybeRest?: string[]): 
 }
 
 function literalWithDataTestId(namespace: string, name: string): object {
-  return { 'data-testid': prefixUnlessTopLevel(namespace, name) };
+  return { "data-testid": prefixUnlessTopLevel(namespace, name) };
 }
 
 function prefixUnlessTopLevel(namespace: string, name: string): string {
-  return namespace === '' ? name : `${namespace}_${name}`;
+  return namespace === "" ? name : `${namespace}_${name}`;
 }
 
 export function maybeTestId(props: any): string | undefined {
-  return props['data-testid'];
+  return props["data-testid"];
 }

@@ -1,11 +1,8 @@
 module.exports = {
-  extends: ['react-app', 'prettier/@typescript-eslint', 'plugin:prettier/recommended'],
-  settings: {
-    react: {
-      version: 'detect',
-    },
-  },
-  rules: {
-    'react/react-in-jsx-scope': 'off',
-  },
+  root: true,
+  parser: "@typescript-eslint/parser",
+  plugins: ["@typescript-eslint"],
+  extends: ["eslint:recommended"],
+  // Maybe eventually put this back, it's pretty strict on any/object/return types
+  // , "plugin:@typescript-eslint/recommended"],
 };
