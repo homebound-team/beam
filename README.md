@@ -10,7 +10,8 @@ There are a few ways to run the application each with its own advantage.
 
 ```bash
 # Only when running for the first time to install dependencies for Beam & Truss
-> yarn i && cd ./truss && npm i
+> yarn
+> cd ./truss && npm i # Note that this will change director to /truss
 
 # Easiest way to start.
 # This runs Storybook and Truss/Beam automatic build process
@@ -101,4 +102,3 @@ if (__DEV__) {
 ```
 
 You can also choose to install and use [invariant](https://github.com/palmerhq/tsdx#invariant) and [warning](https://github.com/palmerhq/tsdx#warning) functions.
-
