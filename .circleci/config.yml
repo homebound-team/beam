@@ -76,4 +76,4 @@ jobs:
       - checkout
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
       - run: yarn install
-      - run: yarn chromatic -- << parameters.flags >>
+      - run: yarn chromatic << parameters.flags >>

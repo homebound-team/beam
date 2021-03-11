@@ -20,10 +20,10 @@
     "watch:truss": "cd ./truss && watch 'npm run generate' ./",
     "build": "tsc",
     "build:truss": "cd ./truss && npm run generate",
+    "build:storybook": "build-storybook",
     "test": "jest",
     "posttest": "npm run format",
-    "lint": "eslint --ext js,ts,tsx src",
-    "lint:fix": "eslint --ext js,ts,tsx --fix src",
+    "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
     "storybook": "start-storybook -p 9000",
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded",
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\""
