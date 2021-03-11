@@ -14,6 +14,7 @@ export const parameters: Parameters = {
   // https://storybook.js.org/docs/react/essentials/backgrounds
   backgrounds: {
     values: [{ name: 'light', value: '#F8F8F8' }],
+    // Defaulting to an off white to better see the color palette
     default: 'light',
   },
 };
