@@ -2,7 +2,7 @@ import { Meta } from '@storybook/react';
 import { Css, Palette, px } from '../';
 
 export default {
-  title: 'Color',
+  title: 'Foundations/Color',
 } as Meta;
 
 export const Color = () => {
@@ -51,7 +51,13 @@ function ColorSquare({ name, color }: any) {
   const size = 80;
   return (
     <li css={Css.xsEm.$}>
-      <div css={Css.h(px(size)).w(px(size)).bgColor(color).$} />
+      <div
+        css={
+          Css.h(px(size))
+            .w(px(size))
+            .bgColor(color).$
+        }
+      />
       {name}
     </li>
   );

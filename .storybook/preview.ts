@@ -8,12 +8,13 @@ export const parameters: Parameters = {
     // https://storybook.js.org/docs/react/writing-stories/naming-components-and-hierarchy#sorting-stories
     storySort: {
       method: 'alphabetical',
-      /**
-       * TODO: Order stories via some sort of hierarchy (`atoms`, `molecules`, `organism`)
-       * https://atomicdesign.bradfrost.com/chapter-2/
-       */
-      // order: []
+      order: ["Foundations", "Components"]
     },
+  },
+  // https://storybook.js.org/docs/react/essentials/backgrounds
+  backgrounds: {
+    values: [{ name: 'light', value: '#F8F8F8' }],
+    default: 'light',
   },
 };
 
