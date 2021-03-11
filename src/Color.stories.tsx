@@ -12,8 +12,6 @@ export const Color = () => {
   const extendedPalette = paletteEntries.filter(([name]) => !name.includes("Cool"));
   const chartPalette = paletteEntries.filter(([name]) => name.match(/Cool\d+/));
 
-  console.log("CSS HERE", Css.$);
-
   return (
     <div css={{ h1: Css.xl2Em.$, h2: Css.baseEm.$ }}>
       <h1>Primary Palette</h1>
