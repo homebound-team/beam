@@ -5,10 +5,6 @@ import { Css, Icon as IconComponent, IconProps } from '../../';
 export default {
   title: 'Components/Icon',
   component: IconComponent,
-  argTypes: {
-    color: { control: { type: 'color' } },
-    xss: { control: { type: 'object' } },
-  },
 } as Meta<IconProps>;
 
 export const Icon = () => {
