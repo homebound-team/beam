@@ -16,12 +16,10 @@
     "node": "14.8.0"
   },
   "scripts": {
-    "start": "concurrently -c green,blue,magenta 'yarn:watch:beam' 'yarn:watch:truss' 'yarn:storybook'",
-    "watch": "concurrently -c blue,magenta 'yarn:watch:beam' 'yarn:watch:truss'",
+    "start": "storybook",
     "watch:truss": "cd ./truss && watch 'npm run generate' ./",
     "build": "tsc",
     "build:truss": "cd ./truss && npm run generate",
-    "build:storybook": "build-storybook",
     "test": "jest",
     "posttest": "npm run format",
     "lint": "eslint --ext js,ts,tsx src",
