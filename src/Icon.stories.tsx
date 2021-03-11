@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { Icon as IconComponent, IconProps, Icons } from "./";
+import { Icon as IconComponent, IconProps, Icons } from "src/";
 
 export default {
   title: "Components/Icon",
