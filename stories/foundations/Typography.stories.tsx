@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/react';
-import { Css } from '../';
+import { Css } from '../../';
 
 export default {
   title: 'Foundations/Typography',

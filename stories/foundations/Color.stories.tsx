@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/react';
-import { Css, Palette, px } from '../';
+import { Css, Palette, px } from '../../';
 
 export default {
   title: 'Foundations/Color',
