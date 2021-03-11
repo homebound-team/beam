@@ -2,7 +2,7 @@
 export const palette = {
   // Primary Palette
   Black:        'rgba(17,24,39,1)',
-  White:        'rgba(255,255,255,1)',
+  White:        'rgba(254,254,254,1)',
 
   // Neutrals
   CoolGray50:   'rgba(249,250,251,1)',
@@ -19,7 +19,7 @@ export const palette = {
   // Extended Palette
   Coral50:      'rgba(255,234,227,1)',
   Coral100:     'rgba(255,223,212,1)',
-  Coral200:    'rgba(255,194,174,1)',
+  Coral200:     'rgba(255,194,174,1)',
   Coral300:     'rgba(255,165,136,1)',
   Coral400:     'rgba(255,123,82,1)',
   Coral500:     'rgba(255,87,34,1)',
