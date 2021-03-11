@@ -11,7 +11,7 @@ export default {
   },
 } as Meta<IconProps>;
 
-export const Icon = (args: IconProps) => {
+export const Icon = () => {
   const actionIcons: IconProps['icon'][] = [
     'x',
     'loader',
@@ -51,7 +51,7 @@ export const Icon = (args: IconProps) => {
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(5, 1fr)', ...Css.dg.p0.$ }}>
         {actionIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent {...args} icon={icon} data-testid={icon} id={icon} key={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
             {icon}
           </li>
         ))}
@@ -60,7 +60,7 @@ export const Icon = (args: IconProps) => {
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(5, 1fr)', ...Css.dg.p0.$ }}>
         {alertIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent {...args} icon={icon} data-testid={icon} id={icon} key={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
             {icon}
           </li>
         ))}
@@ -69,7 +69,7 @@ export const Icon = (args: IconProps) => {
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(4, 1fr)', ...Css.dg.p0.$ }}>
         {arrowIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent {...args} icon={icon} data-testid={icon} id={icon} key={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
             {icon}
           </li>
         ))}
@@ -78,7 +78,7 @@ export const Icon = (args: IconProps) => {
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(4, 1fr)', ...Css.dg.p0.$ }}>
         {mediaIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent {...args} icon={icon} data-testid={icon} id={icon} key={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
             {icon}
           </li>
         ))}
@@ -87,7 +87,7 @@ export const Icon = (args: IconProps) => {
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(4, 1fr)', ...Css.dg.p0.$ }}>
         {miscIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent {...args} icon={icon} data-testid={icon} id={icon} key={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
             {icon}
           </li>
         ))}
@@ -96,7 +96,7 @@ export const Icon = (args: IconProps) => {
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(4, 1fr)', ...Css.dg.p0.$ }}>
         {navigationIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent {...args} icon={icon} data-testid={icon} id={icon} key={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
             {icon}
           </li>
         ))}
