@@ -37,7 +37,7 @@ export const Icon = () => {
     "arrowBack",
   ];
   const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images"];
-  const miscIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images"];
+  const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar"];
   const navigationIcons: IconProps["icon"][] = ["projects", "tasks", "finances", "templates", "tradePartners"];
 
   return (
