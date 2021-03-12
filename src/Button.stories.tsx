@@ -1,4 +1,4 @@
-import {Button, Css, px} from "../";
+import {Button, Css } from "src/";
 import {Meta} from "@storybook/react";
 
 export default {
@@ -24,7 +24,7 @@ export function Buttons() {
           <Button size="lg" isDisabled>Disabled</Button>
         </div>
         <div>
-          <Button autoFocus icon="reset">Primary Button</Button>
+          <Button icon="reset">Primary Button</Button>
           <Button isDisabled icon="reset">Disabled</Button>
         </div>
         <div>
