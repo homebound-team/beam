@@ -1,5 +1,5 @@
-import { generate, GenerateOpts, generateRules, makeRules } from '@homebound/truss';
-import { palette } from './palette';
+import { generate, GenerateOpts, generateRules, makeRules } from "@homebound/truss";
+import { palette } from "./palette";
 
 const increment = 8;
 const numberOfIncrements = 8;
@@ -29,12 +29,17 @@ const fonts: Record<string, { fontWeight: 400 | 500 | 600, fontSize: string; lin
   xl5Em:  { fontWeight: 600, fontSize: "48px", lineHeight: "48px" },
 };
 
-// Pass fonts: {} b/c we create our own font rules
 const methods = generateRules({ palette, fonts, numberOfIncrements });
 
 // Custom rules
-methods['fontFamilyRules'] = makeRules('fontFamily', {
+methods["fontFamilyRules"] = makeRules("fontFamily", {
   sansSerif: "'Inter', sans-serif",
+});
+
+methods["borderRadiusRules"] = makeRules("borderRadius", {
+  br4: "4px",
+  br8: "8px",
+  br16: "16px",
 });
 
 const aliases: Record<string, string[]> = {};
