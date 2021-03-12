@@ -1,5 +1,5 @@
-import { generate, GenerateOpts, generateRules, makeRule, makeRules } from '@homebound/truss';
-import { palette } from './palette';
+import { generate, GenerateOpts, generateRules, makeRule, makeRules } from "@homebound/truss";
+import { palette } from "./palette";
 
 const increment = 8;
 const numberOfIncrements = 8;
@@ -33,19 +33,19 @@ const fonts: Record<string, { fontWeight: 400 | 500 | 600, fontSize: string; lin
 const methods = generateRules({ palette, fonts: {}, numberOfIncrements });
 
 // Customize type-scale with per-fontWeight, fontSize and lineHeight
-methods['type-scale'] = Object.entries(fonts).map(([abbr, defs]) => makeRule(abbr, { ...defs }));
-methods['fontFamilyRules'] = makeRules('fontFamily', {
+methods["type-scale"] = Object.entries(fonts).map(([abbr, defs]) => makeRule(abbr, { ...defs }));
+methods["fontFamilyRules"] = makeRules("fontFamily", {
   sansSerif: "'Inter', sans-serif",
 });
 
 const aliases: Record<string, string[]> = {};
 
-const typeAliases: GenerateOpts['typeAliases'] = {};
+const typeAliases: GenerateOpts["typeAliases"] = {};
 
 const breakpoints = {};
 
 generate({
-  outputPath: '../src/Css.ts',
+  outputPath: "../src/Css.ts",
   methods,
   palette,
   increment,
@@ -53,5 +53,5 @@ generate({
   typeAliases,
   breakpoints,
 })
-  .then(() => console.log('🚀 TRUSS styles generation complete'))
+  .then(() => console.log("🚀 TRUSS styles generation complete"))
   .catch(console.error);

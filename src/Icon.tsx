@@ -1,7 +1,7 @@
-import { Fragment } from 'react';
-import { Css, Margin, Palette, Xss } from './Css';
+import { Fragment } from "react";
+import { Css, Margin, Palette, Xss } from "./Css";
 
-export type IconXss = Xss<Margin | 'cursor' | 'height' | 'width'>;
+export type IconXss = Xss<Margin | "cursor" | "height" | "width">;
 export type IconKey = keyof typeof Icons;
 export interface IconProps {
   color?: string;
@@ -30,10 +30,10 @@ export function Icon({
       tabIndex={tabIndex}
       data-testid={testId || icon}
       css={{
-        '#stroke': { stroke: color },
-        '#primary': { fill: color },
-        '#secondary': { fill: secondaryColor },
-        '&:focus': Css.outline0.bw1.bsDashed.bCoolGray900.$,
+        "#stroke": { stroke: color },
+        "#primary": { fill: color },
+        "#secondary": { fill: secondaryColor },
+        "&:focus": Css.outline0.bw1.bsDashed.bCoolGray900.$,
         ...xss,
       }}
       width="24"

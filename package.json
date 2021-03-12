@@ -4,43 +4,28 @@
   "author": "Homebound",
   "license": "MIT",
   "main": "dist/index.js",
-  "module": "dist/beam.esm.js",
   "typings": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/homebound-team/beam"
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "engines": {
     "node": "14.8.0"
   },
   "scripts": {
-    "start": "concurrently -c green,blue,magenta 'yarn:watch:beam' 'yarn:watch:truss' 'yarn:storybook'",
-    "watch": "concurrently -c blue,magenta 'yarn:watch:beam' 'yarn:watch:truss'",
-    "watch:beam": "tsdx watch --format esm",
-    "watch:truss": "cd ./truss && watch 'npm run generate' ./",
-    "build": "tsdx build --format esm",
+    "start": "storybook",
+    "build": "tsc",
     "build:truss": "cd ./truss && npm run generate",
+    "watch:truss": "cd ./truss && watch 'npm run generate' ./",
     "build:storybook": "build-storybook",
-    "test": "tsdx test --passWithNoTests",
-    "lint": "tsdx lint --write-file",
-    "prepare": "yarn run build",
+    "test": "jest",
+    "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
     "storybook": "start-storybook -p 9000",
-    "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
-  "prettier": {
-    "printWidth": 120,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
+    "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded",
+    "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\""
   },
   "peerDependencies": {
     "react": ">=16"
@@ -56,30 +41,34 @@
     "@storybook/addon-links": "^6.1.20",
     "@storybook/addons": "^6.1.20",
     "@storybook/react": "^6.1.20",
+    "@tsconfig/recommended": "^1.0.1",
     "@types/jest": "^26.0.20",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.1",
+    "@types/react": "^16.14.5",
+    "@types/react-dom": "^16.9.11",
+    "@typescript-eslint/eslint-plugin": "^4.17.0",
+    "@typescript-eslint/parser": "^4.17.0",
+    "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "chromatic": "^5.6.3",
-    "concurrently": "^6.0.0",
     "conventional-changelog-conventionalcommits": "^4.5.0",
+    "eslint": "^7.21.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-plugin-flowtype": "^5.3.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^5.1.1",
     "jest": "^26.6.3",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-is": "^17.0.1",
+    "prettier": "^2.2.1",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "semantic-release": "^17.4.0",
+    "ts-jest": "^26.5.3",
     "ts-node": "^9.1.1",
-    "tsdx": "^0.14.1",
     "tslib": "^2.1.0",
-    "typescript": "^4.2.2",
+    "typescript": "^4.2.3",
     "watch": "^1.0.2"
-  },
-  "resolutions": {
-    "**/@typescript-eslint/eslint-plugin": "^4.11.1",
-    "**/@typescript-eslint/parser": "^4.11.1",
-    "**/jest": "^26.6.3",
-    "**/ts-jest": "^26.4.4",
-    "**/typescript": "^4.2.2"
   }
 }

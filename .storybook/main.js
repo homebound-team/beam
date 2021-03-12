@@ -1,8 +1,13 @@
 module.exports = {
-  stories: ['../stories/**/*.stories.@(tsx)'],
-  addons: ['@storybook/addon-links', '@storybook/addon-essentials'],
+  stories: ["../src/**/*.stories.tsx"],
+  addons: ["@storybook/addon-links", "@storybook/addon-essentials"],
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: {
-    check: true, // type-check stories during Storybook build
+    check: false,
+  },
+  webpackFinal: async (config) => {
+    // Make our `src/...` imports work
+    config.resolve.modules.push(__dirname, "./");
+    return config;
   },
 };
