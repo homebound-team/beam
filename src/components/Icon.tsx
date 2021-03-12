@@ -1,6 +1,6 @@
 import { DOMProps } from '@react-types/shared';
 import { AriaAttributes } from 'react';
-import { Css, Margin, Palette, Xss } from './../Css';
+import { Css, Margin, Palette, Xss } from 'src/';
 
 export interface IconProps extends AriaAttributes, DOMProps {
   // The name of an icon

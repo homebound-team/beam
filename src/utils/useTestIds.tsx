@@ -1,6 +1,6 @@
-import React, { useMemo, PropsWithChildren } from "react";
+import { createContext, useContext , useMemo, PropsWithChildren } from "react";
 
-const Context = React.createContext<string>("");
+const Context = createContext<string>("");
 const { Provider } = Context;
 
 interface TestIdProps {
@@ -10,7 +10,7 @@ interface TestIdProps {
 
 export function TestId(props: PropsWithChildren<TestIdProps>) {
   const { name, children } = props;
-  const namespace = React.useContext(Context);
+  const namespace = useContext(Context);
   return <Provider value={prefixUnlessTopLevel(namespace, name)}>{children}</Provider>;
 }
 
@@ -18,7 +18,7 @@ export function TestId(props: PropsWithChildren<TestIdProps>) {
 export function useTestIds(id: string, names?: string[]): object[];
 export function useTestIds(names: string[]): object[];
 export function useTestIds(idOrNames: string | string[], maybeRest?: string[]): object[] {
-  const namespace = React.useContext(Context);
+  const namespace = useContext(Context);
   return useMemo(() => {
     if (typeof idOrNames === "string") {
       const id = idOrNames as string;

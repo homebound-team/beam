@@ -1,8 +1,8 @@
-import { Meta } from '@storybook/react';
-import { Css } from '../../';
+import { Meta } from "@storybook/react";
+import { Css } from "src/";
 
 export default {
-  title: 'Foundations/Typography',
+  title: "Foundations/Typography",
 } as Meta;
 
 export const Typography = () => (

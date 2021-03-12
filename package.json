@@ -16,7 +16,7 @@
     "node": "14.8.0"
   },
   "scripts": {
-    "start": "storybook",
+    "start": "yarn storybook",
     "build": "tsc",
     "build:truss": "cd ./truss && npm run generate",
     "watch:truss": "cd ./truss && watch 'npm run generate' ./",
