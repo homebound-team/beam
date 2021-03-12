@@ -143,6 +143,7 @@ class CssBuilder<T extends Properties1> {
   get top7() { return this.top(7); }
   get top8() { return this.top(8); }
   top(inc: number | string) { return this.add("top", maybeInc(inc)); }
+  topPx(px: number) { return this.add("top", `${px}px`); }
   get right0() { return this.right(0); }
   get right1() { return this.right(1); }
   get right2() { return this.right(2); }
@@ -153,6 +154,7 @@ class CssBuilder<T extends Properties1> {
   get right7() { return this.right(7); }
   get right8() { return this.right(8); }
   right(inc: number | string) { return this.add("right", maybeInc(inc)); }
+  rightPx(px: number) { return this.add("right", `${px}px`); }
   get bottom0() { return this.bottom(0); }
   get bottom1() { return this.bottom(1); }
   get bottom2() { return this.bottom(2); }
@@ -163,6 +165,7 @@ class CssBuilder<T extends Properties1> {
   get bottom7() { return this.bottom(7); }
   get bottom8() { return this.bottom(8); }
   bottom(inc: number | string) { return this.add("bottom", maybeInc(inc)); }
+  bottomPx(px: number) { return this.add("bottom", `${px}px`); }
   get left0() { return this.left(0); }
   get left1() { return this.left(1); }
   get left2() { return this.left(2); }
@@ -173,6 +176,7 @@ class CssBuilder<T extends Properties1> {
   get left7() { return this.left(7); }
   get left8() { return this.left(8); }
   left(inc: number | string) { return this.add("left", maybeInc(inc)); }
+  leftPx(px: number) { return this.add("left", `${px}px`); }
 
   // cursorRules
   get cursorPointer() { return this.add("cursor", "pointer"); }
@@ -265,6 +269,7 @@ class CssBuilder<T extends Properties1> {
   get h7() { return this.h(7); }
   get h8() { return this.h(8); }
   h(inc: number | string) { return this.add("height", maybeInc(inc)); }
+  hPx(px: number) { return this.add("height", `${px}px`); }
   get h25() { return this.add("height", "25%"); }
   get h50() { return this.add("height", "50%"); }
   get h75() { return this.add("height", "75%"); }
@@ -488,6 +493,7 @@ class CssBuilder<T extends Properties1> {
   get mt7() { return this.mt(7); }
   get mt8() { return this.mt(8); }
   mt(inc: number | string) { return this.add("marginTop", maybeInc(inc)); }
+  mtPx(px: number) { return this.add("marginTop", `${px}px`); }
   get mr0() { return this.mr(0); }
   get mr1() { return this.mr(1); }
   get mr2() { return this.mr(2); }
@@ -498,6 +504,7 @@ class CssBuilder<T extends Properties1> {
   get mr7() { return this.mr(7); }
   get mr8() { return this.mr(8); }
   mr(inc: number | string) { return this.add("marginRight", maybeInc(inc)); }
+  mrPx(px: number) { return this.add("marginRight", `${px}px`); }
   get mb0() { return this.mb(0); }
   get mb1() { return this.mb(1); }
   get mb2() { return this.mb(2); }
@@ -508,6 +515,7 @@ class CssBuilder<T extends Properties1> {
   get mb7() { return this.mb(7); }
   get mb8() { return this.mb(8); }
   mb(inc: number | string) { return this.add("marginBottom", maybeInc(inc)); }
+  mbPx(px: number) { return this.add("marginBottom", `${px}px`); }
   get ml0() { return this.ml(0); }
   get ml1() { return this.ml(1); }
   get ml2() { return this.ml(2); }
@@ -518,6 +526,7 @@ class CssBuilder<T extends Properties1> {
   get ml7() { return this.ml(7); }
   get ml8() { return this.ml(8); }
   ml(inc: number | string) { return this.add("marginLeft", maybeInc(inc)); }
+  mlPx(px: number) { return this.add("marginLeft", `${px}px`); }
   get mx0() { return this.mx(0); }
   get mx1() { return this.mx(1); }
   get mx2() { return this.mx(2); }
@@ -528,6 +537,7 @@ class CssBuilder<T extends Properties1> {
   get mx7() { return this.mx(7); }
   get mx8() { return this.mx(8); }
   mx(inc: number | string) { return this.ml(inc).mr(inc); }
+  mxPx(px: number) { return this.mlPx(px).mrPx(px); }
   get my0() { return this.my(0); }
   get my1() { return this.my(1); }
   get my2() { return this.my(2); }
@@ -538,6 +548,7 @@ class CssBuilder<T extends Properties1> {
   get my7() { return this.my(7); }
   get my8() { return this.my(8); }
   my(inc: number | string) { return this.mt(inc).mb(inc); }
+  myPx(px: number) { return this.mtPx(px).mbPx(px); }
   get m0() { return this.m(0); }
   get m1() { return this.m(1); }
   get m2() { return this.m(2); }
@@ -548,6 +559,7 @@ class CssBuilder<T extends Properties1> {
   get m7() { return this.m(7); }
   get m8() { return this.m(8); }
   m(inc: number | string) { return this.mt(inc).mb(inc).mr(inc).ml(inc); }
+  mPx(px: number) { return this.mtPx(px).mbPx(px).mrPx(px).mlPx(px); }
   get pt0() { return this.pt(0); }
   get pt1() { return this.pt(1); }
   get pt2() { return this.pt(2); }
@@ -558,6 +570,7 @@ class CssBuilder<T extends Properties1> {
   get pt7() { return this.pt(7); }
   get pt8() { return this.pt(8); }
   pt(inc: number | string) { return this.add("paddingTop", maybeInc(inc)); }
+  ptPx(px: number) { return this.add("paddingTop", `${px}px`); }
   get pr0() { return this.pr(0); }
   get pr1() { return this.pr(1); }
   get pr2() { return this.pr(2); }
@@ -568,6 +581,7 @@ class CssBuilder<T extends Properties1> {
   get pr7() { return this.pr(7); }
   get pr8() { return this.pr(8); }
   pr(inc: number | string) { return this.add("paddingRight", maybeInc(inc)); }
+  prPx(px: number) { return this.add("paddingRight", `${px}px`); }
   get pb0() { return this.pb(0); }
   get pb1() { return this.pb(1); }
   get pb2() { return this.pb(2); }
@@ -578,6 +592,7 @@ class CssBuilder<T extends Properties1> {
   get pb7() { return this.pb(7); }
   get pb8() { return this.pb(8); }
   pb(inc: number | string) { return this.add("paddingBottom", maybeInc(inc)); }
+  pbPx(px: number) { return this.add("paddingBottom", `${px}px`); }
   get pl0() { return this.pl(0); }
   get pl1() { return this.pl(1); }
   get pl2() { return this.pl(2); }
@@ -588,6 +603,7 @@ class CssBuilder<T extends Properties1> {
   get pl7() { return this.pl(7); }
   get pl8() { return this.pl(8); }
   pl(inc: number | string) { return this.add("paddingLeft", maybeInc(inc)); }
+  plPx(px: number) { return this.add("paddingLeft", `${px}px`); }
   get px0() { return this.px(0); }
   get px1() { return this.px(1); }
   get px2() { return this.px(2); }
@@ -598,6 +614,7 @@ class CssBuilder<T extends Properties1> {
   get px7() { return this.px(7); }
   get px8() { return this.px(8); }
   px(inc: number | string) { return this.pl(inc).pr(inc); }
+  pxPx(px: number) { return this.plPx(px).prPx(px); }
   get py0() { return this.py(0); }
   get py1() { return this.py(1); }
   get py2() { return this.py(2); }
@@ -608,6 +625,7 @@ class CssBuilder<T extends Properties1> {
   get py7() { return this.py(7); }
   get py8() { return this.py(8); }
   py(inc: number | string) { return this.pt(inc).pb(inc); }
+  pyPx(px: number) { return this.ptPx(px).pbPx(px); }
   get p0() { return this.p(0); }
   get p1() { return this.p(1); }
   get p2() { return this.p(2); }
@@ -618,6 +636,7 @@ class CssBuilder<T extends Properties1> {
   get p7() { return this.p(7); }
   get p8() { return this.p(8); }
   p(inc: number | string) { return this.pt(inc).pb(inc).pr(inc).pl(inc); }
+  pPx(px: number) { return this.ptPx(px).pbPx(px).prPx(px).plPx(px); }
 
   // textAlignRules
   get tl() { return this.add("textAlign", "left"); }
@@ -637,6 +656,26 @@ class CssBuilder<T extends Properties1> {
   get ttn() { return this.add("textTransform", "none"); }
 
   // typeScaleRules
+  get tiny() { return this.add("fontWeight", 400).add("fontSize", "10px").add("lineHeight", "14px"); }
+  get tinyEm() { return this.add("fontWeight", 600).add("fontSize", "10px").add("lineHeight", "14px"); }
+  get xs() { return this.add("fontWeight", 400).add("fontSize", "12px").add("lineHeight", "16px"); }
+  get xsEm() { return this.add("fontWeight", 500).add("fontSize", "12px").add("lineHeight", "16px"); }
+  get sm() { return this.add("fontWeight", 400).add("fontSize", "14px").add("lineHeight", "20px"); }
+  get smEm() { return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px"); }
+  get base() { return this.add("fontWeight", 400).add("fontSize", "16px").add("lineHeight", "24px"); }
+  get baseEm() { return this.add("fontWeight", 500).add("fontSize", "16px").add("lineHeight", "24px"); }
+  get lg() { return this.add("fontWeight", 400).add("fontSize", "18px").add("lineHeight", "28px"); }
+  get lgEm() { return this.add("fontWeight", 600).add("fontSize", "18px").add("lineHeight", "28px"); }
+  get xl() { return this.add("fontWeight", 400).add("fontSize", "20px").add("lineHeight", "28px"); }
+  get xlEm() { return this.add("fontWeight", 600).add("fontSize", "20px").add("lineHeight", "28px"); }
+  get xl2() { return this.add("fontWeight", 400).add("fontSize", "24px").add("lineHeight", "32px"); }
+  get xl2Em() { return this.add("fontWeight", 600).add("fontSize", "24px").add("lineHeight", "32px"); }
+  get xl3() { return this.add("fontWeight", 400).add("fontSize", "30px").add("lineHeight", "36px"); }
+  get xl3Em() { return this.add("fontWeight", 600).add("fontSize", "30px").add("lineHeight", "36px"); }
+  get xl4() { return this.add("fontWeight", 400).add("fontSize", "36px").add("lineHeight", "40px"); }
+  get xl4Em() { return this.add("fontWeight", 600).add("fontSize", "36px").add("lineHeight", "40px"); }
+  get xl5() { return this.add("fontWeight", 400).add("fontSize", "48px").add("lineHeight", "48px"); }
+  get xl5Em() { return this.add("fontWeight", 600).add("fontSize", "48px").add("lineHeight", "48px"); }
 
   // typographyRules
   get measure() { return this.add("maxWidth", "30em"); }
@@ -694,6 +733,7 @@ class CssBuilder<T extends Properties1> {
   get w7() { return this.w(7); }
   get w8() { return this.w(8); }
   w(inc: number | string) { return this.add("width", maybeInc(inc)); }
+  wPx(px: number) { return this.add("width", `${px}px`); }
 
   // zIndexRules
   get z0() { return this.add("zIndex", 0); }
@@ -708,28 +748,6 @@ class CssBuilder<T extends Properties1> {
   get zInitial() { return this.add("zIndex", "initial"); }
   get zUnset() { return this.add("zIndex", "unset"); }
   z(value: Properties["zIndex"]) { return this.add("zIndex", value); }
-
-  // type-scale
-  get tiny() { return this.add("fontWeight", 400).add("fontSize", "10px").add("lineHeight", "14px"); }
-  get tinyEm() { return this.add("fontWeight", 600).add("fontSize", "10px").add("lineHeight", "14px"); }
-  get xs() { return this.add("fontWeight", 400).add("fontSize", "12px").add("lineHeight", "16px"); }
-  get xsEm() { return this.add("fontWeight", 500).add("fontSize", "12px").add("lineHeight", "16px"); }
-  get sm() { return this.add("fontWeight", 400).add("fontSize", "14px").add("lineHeight", "20px"); }
-  get smEm() { return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px"); }
-  get base() { return this.add("fontWeight", 400).add("fontSize", "16px").add("lineHeight", "24px"); }
-  get baseEm() { return this.add("fontWeight", 500).add("fontSize", "16px").add("lineHeight", "24px"); }
-  get lg() { return this.add("fontWeight", 400).add("fontSize", "18px").add("lineHeight", "28px"); }
-  get lgEm() { return this.add("fontWeight", 600).add("fontSize", "18px").add("lineHeight", "28px"); }
-  get xl() { return this.add("fontWeight", 400).add("fontSize", "20px").add("lineHeight", "28px"); }
-  get xlEm() { return this.add("fontWeight", 600).add("fontSize", "20px").add("lineHeight", "28px"); }
-  get xl2() { return this.add("fontWeight", 400).add("fontSize", "24px").add("lineHeight", "32px"); }
-  get xl2Em() { return this.add("fontWeight", 600).add("fontSize", "24px").add("lineHeight", "32px"); }
-  get xl3() { return this.add("fontWeight", 400).add("fontSize", "30px").add("lineHeight", "36px"); }
-  get xl3Em() { return this.add("fontWeight", 600).add("fontSize", "30px").add("lineHeight", "36px"); }
-  get xl4() { return this.add("fontWeight", 400).add("fontSize", "36px").add("lineHeight", "40px"); }
-  get xl4Em() { return this.add("fontWeight", 600).add("fontSize", "36px").add("lineHeight", "40px"); }
-  get xl5() { return this.add("fontWeight", 400).add("fontSize", "48px").add("lineHeight", "48px"); }
-  get xl5Em() { return this.add("fontWeight", 600).add("fontSize", "48px").add("lineHeight", "48px"); }
 
   // fontFamilyRules
   get sansSerif() { return this.add("fontFamily", "'Inter', sans-serif"); }
@@ -811,82 +829,82 @@ export function px(pixels: number): string {
   return `${pixels}px`;
 }
 
-export const Palette = {
-  Black: "rgba(17,24,39,1)",
-  White: "rgba(254,254,254,1)",
-  CoolGray50: "rgba(249,250,251,1)",
-  CoolGray100: "rgba(243,244,246,1)",
-  CoolGray200: "rgba(229,231,235,1)",
-  CoolGray300: "rgba(209,213,219,1)",
-  CoolGray400: "rgba(156,163,175,1)",
-  CoolGray500: "rgba(107,114,128,1)",
-  CoolGray600: "rgba(75,85,99,1)",
-  CoolGray700: "rgba(55,65,81,1)",
-  CoolGray800: "rgba(31,41,55,1)",
-  CoolGray900: "rgba(17,24,39,1)",
-  Coral50: "rgba(255,234,227,1)",
-  Coral100: "rgba(255,223,212,1)",
-  Coral200: "rgba(255,194,174,1)",
-  Coral300: "rgba(255,165,136,1)",
-  Coral400: "rgba(255,123,82,1)",
-  Coral500: "rgba(255,87,34,1)",
-  Coral600: "rgba(222,53,11,1)",
-  Coral700: "rgba(182,58,19,1)",
-  Coral800: "rgba(143,45,14,1)",
-  Coral900: "rgba(115,40,16,1)",
-  Amber50: "rgba(255,251,235,1)",
-  Amber100: "rgba(254,243,199,1)",
-  Amber200: "rgba(253,230,138,1)",
-  Amber300: "rgba(252,211,77,1)",
-  Amber400: "rgba(251,191,36,1)",
-  Amber500: "rgba(245,158,11,1)",
-  Amber600: "rgba(217,119,6,1)",
-  Amber700: "rgba(180,83,9,1)",
-  Amber800: "rgba(146,64,14,1)",
-  Amber900: "rgba(120,53,15,1)",
-  Emerald50: "rgba(236,253,245,1)",
-  Emerald100: "rgba(209,250,229,1)",
-  Emerald200: "rgba(167,243,208,1)",
-  Emerald300: "rgba(110,231,183,1)",
-  Emerald400: "rgba(52,211,153,1)",
-  Emerald500: "rgba(16,185,129,1)",
-  Emerald600: "rgba(5,150,105,1)",
-  Emerald700: "rgba(4,120,87,1)",
-  Emerald800: "rgba(6,95,70,1)",
-  Emerald900: "rgba(6,78,59,1)",
-  Sky50: "rgba(239,244,255,1)",
-  Sky100: "rgba(219,227,254,1)",
-  Sky200: "rgba(191,209,254,1)",
-  Sky300: "rgba(147,170,253,1)",
-  Sky400: "rgba(109,131,246,1)",
-  Sky500: "rgba(71,101,255,1)",
-  Sky600: "rgba(37,45,235,1)",
-  Sky700: "rgba(29,48,216,1)",
-  Sky800: "rgba(30,53,175,1)",
-  Sky900: "rgba(30,41,138,1)",
-  Violet50: "rgba(245,243,255,1)",
-  Violet100: "rgba(237,233,254,1)",
-  Violet200: "rgba(221,214,254,1)",
-  Violet300: "rgba(196,181,253,1)",
-  Violet400: "rgba(167,139,250,1)",
-  Violet500: "rgba(139,92,246,1)",
-  Violet600: "rgba(124,58,237,1)",
-  Violet700: "rgba(109,40,217,1)",
-  Violet800: "rgba(91,33,182,1)",
-  Violet900: "rgba(76,29,149,1)",
-  Cool50: "rgba(239,246,247,1)",
-  Cool100: "rgba(216,235,238,1)",
-  Cool200: "rgba(177,219,225,1)",
-  Cool300: "rgba(128,200,214,1)",
-  Cool400: "rgba(124,170,211,1)",
-  Cool500: "rgba(116,139,218,1)",
-  Cool600: "rgba(115,103,241,1)",
-  Cool700: "rgba(97,85,216,1)",
-  Cool800: "rgba(77,72,186,1)",
-  Cool900: "rgba(59,60,160,1)",
-  Cool1000: "rgba(42,47,135,1)",
-  Cool1100: "rgba(16,27,100,1)",
-};
+export enum Palette {
+  Black = "rgba(17,24,39,1)",
+  White = "rgba(254,254,254,1)",
+  CoolGray50 = "rgba(249,250,251,1)",
+  CoolGray100 = "rgba(243,244,246,1)",
+  CoolGray200 = "rgba(229,231,235,1)",
+  CoolGray300 = "rgba(209,213,219,1)",
+  CoolGray400 = "rgba(156,163,175,1)",
+  CoolGray500 = "rgba(107,114,128,1)",
+  CoolGray600 = "rgba(75,85,99,1)",
+  CoolGray700 = "rgba(55,65,81,1)",
+  CoolGray800 = "rgba(31,41,55,1)",
+  CoolGray900 = "rgba(17,24,39,1)",
+  Coral50 = "rgba(255,234,227,1)",
+  Coral100 = "rgba(255,223,212,1)",
+  Coral200 = "rgba(255,194,174,1)",
+  Coral300 = "rgba(255,165,136,1)",
+  Coral400 = "rgba(255,123,82,1)",
+  Coral500 = "rgba(255,87,34,1)",
+  Coral600 = "rgba(222,53,11,1)",
+  Coral700 = "rgba(182,58,19,1)",
+  Coral800 = "rgba(143,45,14,1)",
+  Coral900 = "rgba(115,40,16,1)",
+  Amber50 = "rgba(255,251,235,1)",
+  Amber100 = "rgba(254,243,199,1)",
+  Amber200 = "rgba(253,230,138,1)",
+  Amber300 = "rgba(252,211,77,1)",
+  Amber400 = "rgba(251,191,36,1)",
+  Amber500 = "rgba(245,158,11,1)",
+  Amber600 = "rgba(217,119,6,1)",
+  Amber700 = "rgba(180,83,9,1)",
+  Amber800 = "rgba(146,64,14,1)",
+  Amber900 = "rgba(120,53,15,1)",
+  Emerald50 = "rgba(236,253,245,1)",
+  Emerald100 = "rgba(209,250,229,1)",
+  Emerald200 = "rgba(167,243,208,1)",
+  Emerald300 = "rgba(110,231,183,1)",
+  Emerald400 = "rgba(52,211,153,1)",
+  Emerald500 = "rgba(16,185,129,1)",
+  Emerald600 = "rgba(5,150,105,1)",
+  Emerald700 = "rgba(4,120,87,1)",
+  Emerald800 = "rgba(6,95,70,1)",
+  Emerald900 = "rgba(6,78,59,1)",
+  Sky50 = "rgba(239,244,255,1)",
+  Sky100 = "rgba(219,227,254,1)",
+  Sky200 = "rgba(191,209,254,1)",
+  Sky300 = "rgba(147,170,253,1)",
+  Sky400 = "rgba(109,131,246,1)",
+  Sky500 = "rgba(71,101,255,1)",
+  Sky600 = "rgba(37,45,235,1)",
+  Sky700 = "rgba(29,48,216,1)",
+  Sky800 = "rgba(30,53,175,1)",
+  Sky900 = "rgba(30,41,138,1)",
+  Violet50 = "rgba(245,243,255,1)",
+  Violet100 = "rgba(237,233,254,1)",
+  Violet200 = "rgba(221,214,254,1)",
+  Violet300 = "rgba(196,181,253,1)",
+  Violet400 = "rgba(167,139,250,1)",
+  Violet500 = "rgba(139,92,246,1)",
+  Violet600 = "rgba(124,58,237,1)",
+  Violet700 = "rgba(109,40,217,1)",
+  Violet800 = "rgba(91,33,182,1)",
+  Violet900 = "rgba(76,29,149,1)",
+  Cool50 = "rgba(239,246,247,1)",
+  Cool100 = "rgba(216,235,238,1)",
+  Cool200 = "rgba(177,219,225,1)",
+  Cool300 = "rgba(128,200,214,1)",
+  Cool400 = "rgba(124,170,211,1)",
+  Cool500 = "rgba(116,139,218,1)",
+  Cool600 = "rgba(115,103,241,1)",
+  Cool700 = "rgba(97,85,216,1)",
+  Cool800 = "rgba(77,72,186,1)",
+  Cool900 = "rgba(59,60,160,1)",
+  Cool1000 = "rgba(42,47,135,1)",
+  Cool1100 = "rgba(16,27,100,1)",
+}
 
 /** A shortcut for defining Xss types. */
 export type Xss<P extends keyof Properties> = Pick<Properties, P>;
