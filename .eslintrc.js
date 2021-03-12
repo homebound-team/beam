@@ -1,4 +1,6 @@
 module.exports = {
   extends: ["react-app", "prettier"],
-  rules: {},
+  rules: {
+    "react/jsx-fragments": ["error", "element"],
+  },
 };
