@@ -46,8 +46,8 @@ export const Icon = () => {
       <h1 css={Css.xl2Em.$}>Actions</h1>
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(5, 1fr)', ...Css.dg.p0.$ }}>
         {actionIcons.map((icon, i) => (
-          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
+          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }} key={icon}>
+            <IconComponent icon={icon} data-testid={icon} id={icon} color="inherit" />
             {icon}
           </li>
         ))}
@@ -55,8 +55,8 @@ export const Icon = () => {
       <h1 css={Css.xl2Em.$}>Alerts</h1>
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(5, 1fr)', ...Css.dg.p0.$ }}>
         {alertIcons.map((icon, i) => (
-          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
+          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }} key={icon}>
+            <IconComponent icon={icon} data-testid={icon} id={icon} />
             {icon}
           </li>
         ))}
@@ -64,8 +64,8 @@ export const Icon = () => {
       <h1 css={Css.xl2Em.$}>Arrows</h1>
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(4, 1fr)', ...Css.dg.p0.$ }}>
         {arrowIcons.map((icon, i) => (
-          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
+          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }} key={icon}>
+            <IconComponent icon={icon} data-testid={icon} id={icon} />
             {icon}
           </li>
         ))}
@@ -73,8 +73,8 @@ export const Icon = () => {
       <h1 css={Css.xl2Em.$}>Media</h1>
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(4, 1fr)', ...Css.dg.p0.$ }}>
         {mediaIcons.map((icon, i) => (
-          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
+          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }} key={icon}>
+            <IconComponent icon={icon} data-testid={icon} id={icon} />
             {icon}
           </li>
         ))}
@@ -82,8 +82,8 @@ export const Icon = () => {
       <h1 css={Css.xl2Em.$}>Misc</h1>
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(4, 1fr)', ...Css.dg.p0.$ }}>
         {miscIcons.map((icon, i) => (
-          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
+          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }} key={icon}>
+            <IconComponent icon={icon} data-testid={icon} id={icon} />
             {icon}
           </li>
         ))}
@@ -91,8 +91,8 @@ export const Icon = () => {
       <h1 css={Css.xl2Em.$}>Navigation</h1>
       <ul css={{ gap: 24, listStyle: 'none', gridTemplateColumns: 'repeat(4, 1fr)', ...Css.dg.p0.$ }}>
         {navigationIcons.map((icon, i) => (
-          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} key={icon} />
+          <li css={{ gap: 8, ...Css.xsEm.df.itemsCenter.flexColumn.$ }} key={icon}>
+            <IconComponent icon={icon} data-testid={icon} id={icon} />
             {icon}
           </li>
         ))}

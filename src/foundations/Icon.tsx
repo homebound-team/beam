@@ -6,7 +6,7 @@ export interface IconProps extends AriaAttributes, DOMProps {
   // The name of an icon
   icon: keyof typeof Icons;
   // Defaults to Palette.CoolGray900
-  color?: string;
+  color?: Palette | 'inherit';
   // Styles overrides
   xss?: Xss<Margin>;
 }
@@ -19,7 +19,6 @@ export function Icon(props: IconProps) {
       width="24"
       height="24"
       viewBox="0 0 24 24"
-      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       css={{ path: Css.add('fill', color).$, ...xss }}
       {...other}

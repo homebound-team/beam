@@ -1,2 +1,2 @@
 export * from './Css';
-export * from './icon';
+export * from './foundations';
