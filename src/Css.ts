@@ -656,6 +656,26 @@ class CssBuilder<T extends Properties1> {
   get ttn() { return this.add("textTransform", "none"); }
 
   // typeScaleRules
+  get tiny() { return this.add("fontWeight", 400).add("fontSize", "10px").add("lineHeight", "14px"); }
+  get tinyEm() { return this.add("fontWeight", 600).add("fontSize", "10px").add("lineHeight", "14px"); }
+  get xs() { return this.add("fontWeight", 400).add("fontSize", "12px").add("lineHeight", "16px"); }
+  get xsEm() { return this.add("fontWeight", 500).add("fontSize", "12px").add("lineHeight", "16px"); }
+  get sm() { return this.add("fontWeight", 400).add("fontSize", "14px").add("lineHeight", "20px"); }
+  get smEm() { return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px"); }
+  get base() { return this.add("fontWeight", 400).add("fontSize", "16px").add("lineHeight", "24px"); }
+  get baseEm() { return this.add("fontWeight", 500).add("fontSize", "16px").add("lineHeight", "24px"); }
+  get lg() { return this.add("fontWeight", 400).add("fontSize", "18px").add("lineHeight", "28px"); }
+  get lgEm() { return this.add("fontWeight", 600).add("fontSize", "18px").add("lineHeight", "28px"); }
+  get xl() { return this.add("fontWeight", 400).add("fontSize", "20px").add("lineHeight", "28px"); }
+  get xlEm() { return this.add("fontWeight", 600).add("fontSize", "20px").add("lineHeight", "28px"); }
+  get xl2() { return this.add("fontWeight", 400).add("fontSize", "24px").add("lineHeight", "32px"); }
+  get xl2Em() { return this.add("fontWeight", 600).add("fontSize", "24px").add("lineHeight", "32px"); }
+  get xl3() { return this.add("fontWeight", 400).add("fontSize", "30px").add("lineHeight", "36px"); }
+  get xl3Em() { return this.add("fontWeight", 600).add("fontSize", "30px").add("lineHeight", "36px"); }
+  get xl4() { return this.add("fontWeight", 400).add("fontSize", "36px").add("lineHeight", "40px"); }
+  get xl4Em() { return this.add("fontWeight", 600).add("fontSize", "36px").add("lineHeight", "40px"); }
+  get xl5() { return this.add("fontWeight", 400).add("fontSize", "48px").add("lineHeight", "48px"); }
+  get xl5Em() { return this.add("fontWeight", 600).add("fontSize", "48px").add("lineHeight", "48px"); }
 
   // typographyRules
   get measure() { return this.add("maxWidth", "30em"); }
@@ -728,28 +748,6 @@ class CssBuilder<T extends Properties1> {
   get zInitial() { return this.add("zIndex", "initial"); }
   get zUnset() { return this.add("zIndex", "unset"); }
   z(value: Properties["zIndex"]) { return this.add("zIndex", value); }
-
-  // type-scale
-  get tiny() { return this.add("fontWeight", 400).add("fontSize", "10px").add("lineHeight", "14px"); }
-  get tinyEm() { return this.add("fontWeight", 600).add("fontSize", "10px").add("lineHeight", "14px"); }
-  get xs() { return this.add("fontWeight", 400).add("fontSize", "12px").add("lineHeight", "16px"); }
-  get xsEm() { return this.add("fontWeight", 500).add("fontSize", "12px").add("lineHeight", "16px"); }
-  get sm() { return this.add("fontWeight", 400).add("fontSize", "14px").add("lineHeight", "20px"); }
-  get smEm() { return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px"); }
-  get base() { return this.add("fontWeight", 400).add("fontSize", "16px").add("lineHeight", "24px"); }
-  get baseEm() { return this.add("fontWeight", 500).add("fontSize", "16px").add("lineHeight", "24px"); }
-  get lg() { return this.add("fontWeight", 400).add("fontSize", "18px").add("lineHeight", "28px"); }
-  get lgEm() { return this.add("fontWeight", 600).add("fontSize", "18px").add("lineHeight", "28px"); }
-  get xl() { return this.add("fontWeight", 400).add("fontSize", "20px").add("lineHeight", "28px"); }
-  get xlEm() { return this.add("fontWeight", 600).add("fontSize", "20px").add("lineHeight", "28px"); }
-  get xl2() { return this.add("fontWeight", 400).add("fontSize", "24px").add("lineHeight", "32px"); }
-  get xl2Em() { return this.add("fontWeight", 600).add("fontSize", "24px").add("lineHeight", "32px"); }
-  get xl3() { return this.add("fontWeight", 400).add("fontSize", "30px").add("lineHeight", "36px"); }
-  get xl3Em() { return this.add("fontWeight", 600).add("fontSize", "30px").add("lineHeight", "36px"); }
-  get xl4() { return this.add("fontWeight", 400).add("fontSize", "36px").add("lineHeight", "40px"); }
-  get xl4Em() { return this.add("fontWeight", 600).add("fontSize", "36px").add("lineHeight", "40px"); }
-  get xl5() { return this.add("fontWeight", 400).add("fontSize", "48px").add("lineHeight", "48px"); }
-  get xl5Em() { return this.add("fontWeight", 600).add("fontSize", "48px").add("lineHeight", "48px"); }
 
   // fontFamilyRules
   get sansSerif() { return this.add("fontFamily", "'Inter', sans-serif"); }
