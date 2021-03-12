@@ -23,6 +23,18 @@ export function Buttons() {
           <Button size="lg">Primary Button</Button>
           <Button size="lg" isDisabled>Disabled</Button>
         </div>
+        <div>
+          <Button autoFocus icon="reset">Primary Button</Button>
+          <Button isDisabled icon="reset">Disabled</Button>
+        </div>
+        <div>
+          <Button size="md" icon="reset">Primary Button</Button>
+          <Button size="md" isDisabled icon="reset">Disabled</Button>
+        </div>
+        <div>
+          <Button size="lg" icon="reset">Primary Button</Button>
+          <Button size="lg" isDisabled icon="reset">Disabled</Button>
+        </div>
       </div>
 
       <div>
@@ -39,6 +51,18 @@ export function Buttons() {
           <Button size="lg" variant="secondary">Secondary Button</Button>
           <Button size="lg" variant="secondary" isDisabled>Disabled</Button>
         </div>
+        <div>
+          <Button icon="home" variant="secondary">Secondary Button</Button>
+          <Button icon="home" variant="secondary" isDisabled>Disabled</Button>
+        </div>
+        <div>
+          <Button icon="home" size="md" variant="secondary">Secondary Button</Button>
+          <Button icon="home" size="md" variant="secondary" isDisabled>Disabled</Button>
+        </div>
+        <div>
+          <Button icon="home" size="lg" variant="secondary">Secondary Button</Button>
+          <Button icon="home" size="lg" variant="secondary" isDisabled>Disabled</Button>
+        </div>
       </div>
 
       <div>
@@ -46,6 +70,10 @@ export function Buttons() {
         <div>
           <Button variant="tertiary">Tertiary Button</Button>
           <Button variant="tertiary" isDisabled>Disabled</Button>
+        </div>
+        <div>
+          <Button icon="bell" variant="tertiary">Tertiary Button</Button>
+          <Button icon="bell" variant="tertiary" isDisabled>Disabled</Button>
         </div>
       </div>
 
@@ -62,6 +90,18 @@ export function Buttons() {
         <div>
           <Button size="lg" variant="danger">Danger Button</Button>
           <Button size="lg" variant="danger" isDisabled>Disabled</Button>
+        </div>
+        <div>
+          <Button icon="close" variant="danger">Danger Button</Button>
+          <Button icon="close" variant="danger" isDisabled>Disabled</Button>
+        </div>
+        <div>
+          <Button icon="close" size="md" variant="danger">Danger Button</Button>
+          <Button icon="close" size="md" variant="danger" isDisabled>Disabled</Button>
+        </div>
+        <div>
+          <Button icon="close" size="lg" variant="danger">Danger Button</Button>
+          <Button icon="close" size="lg" variant="danger" isDisabled>Disabled</Button>
         </div>
       </div>
     </div>

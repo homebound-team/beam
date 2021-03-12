@@ -1,77 +1,102 @@
 import { useButton, FocusRing } from "react-aria"
 import type { AriaButtonProps } from "@react-types/button";
-import { useRef } from "react";
+import {useMemo, useRef} from "react";
 import { Css, Palette, px } from "./Css";
+import {Icon, IconKey, IconXss} from "./Icon";
 
 interface ButtonProps extends AriaButtonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
-};
+  icon?: IconKey
+}
 
 export function Button(props: ButtonProps) {
+  const { children, icon, variant = "primary", size = "sm" } = props;
   const ref = useRef(null);
   const { buttonProps } = useButton(props, ref);
-
-  const { children, variant = "primary", size = "sm" } = props;
+  const buttonStyles = useMemo(() => getButtonStyles(variant, size), [variant, size])
 
   return (
     <FocusRing focusRingClass="focusRing">
-      <button ref={ref} {...buttonProps} css={{...buttonReset, ...variantStyles[variant], ...sizeStyles[size]}}>
+      <button ref={ref} {...buttonProps} css={{...buttonReset, ...buttonStyles}}>
+        {icon && (
+          <Icon xss={iconStyles[size]} color="inherit" icon={icon} />
+        )}
         {children}
       </button>
     </FocusRing>
   );
 }
 
-const buttonReset = Css.p0.bsNone.cursorPointer.smEm.m(px(4))
+const buttonReset = Css.p0.bsNone.cursorPointer.smEm.m(px(4)).dif.itemsCenter
   .add("font", "inherit")
   .add("boxSizing", "border-box")
   .add("outline", "inherit")
   .add("borderRadius", px(4)).$;
-
 const disabledStyles = Css.add("cursor", "not-allowed").$;
 const focusRingStyles = Css.add("boxShadow", `0px 0px 0px 2px ${Palette.White}, 0 0 0 4px ${Palette.Sky500}`).$;
 const dangerFocusRingStyles = Css.add("boxShadow", `0px 0px 0px 2px ${Palette.White}, 0 0 0 4px ${Palette.Coral600}`).$;
 
 const variantStyles: Record<ButtonVariant, {}> = {
   primary: {
-    ...Css.bgSky500.white.$,
-    "&:hover": Css.bgSky700.$,
+    ...Css.bgSky500.white.add("fill", Palette.White).$,
+    "&:hover:not(:disabled)": Css.bgSky700.$,
     "&:disabled": {...disabledStyles, ...Css.bgSky200.$},
-    "&.focusRing": focusRingStyles,
-    "&:active": {...focusRingStyles, ...Css.bgSky700.$},
+    "&.focusRing:not(:disabled)": focusRingStyles,
+    "&:active:not(:disabled)": Css.bgSky900.$,
   },
 
   secondary: {
-    ...Css.bgWhite.coolGray900.bCoolGray300.bw1.ba.$,
-    "&:hover": Css.bgCoolGray50.$,
-    "&:disabled": {...disabledStyles, ...Css.bgWhite.coolGray300.$},
-    "&.focusRing": focusRingStyles,
-    "&:active": {...focusRingStyles, ...Css.bgCoolGray50.$},
+    ...Css.bgWhite.bCoolGray300.bw1.ba.coolGray900.add("fill", Palette.CoolGray900).$,
+    "&:hover:not(:disabled)": Css.bgCoolGray50.$,
+    "&:disabled": {...disabledStyles, ...Css.bgWhite.coolGray300.add("fill", Palette.CoolGray300).$},
+    "&.focusRing:not(:disabled)": focusRingStyles,
+    "&:active:not(:disabled)": Css.bgCoolGray200.$,
   },
 
   tertiary: {
-    ...Css.add("background", "none").sky500.$,
-    "&:hover": Css.bgCoolGray100.$,
-    "&:disabled": { ...disabledStyles, ...Css.add("background", "none").coolGray300.$ },
-    "&.focusRing": focusRingStyles,
-    "&:active": {...focusRingStyles, ...Css.bgCoolGray100.$},
+    ...Css.add("background", "none").sky500.add("fill", Palette.Sky500).$,
+    "&:hover:not(:disabled)": Css.bgCoolGray100.$,
+    "&:disabled": {...disabledStyles, ...Css.coolGray300.add("fill", Palette.CoolGray300).$},
+    "&.focusRing:not(:disabled)": focusRingStyles,
+    "&:active:not(:disabled)": Css.sky900.add("fill", Palette.Sky900).$,
   },
 
   danger: {
-    ...Css.bgCoral600.white.$,
-    "&:hover": Css.bgCoral500.$,
+    ...Css.bgCoral600.white.add("fill", Palette.White).$,
+    "&:hover:not(:disabled)": Css.bgCoral500.$,
     "&:disabled": {...disabledStyles, ...Css.bgCoral200.$},
-    "&.focusRing": dangerFocusRingStyles,
-    "&:active": {...dangerFocusRingStyles, ...Css.bgCoral500.$},
+    "&.focusRing:not(:disabled)": dangerFocusRingStyles,
+    "&:active:not(:disabled)": Css.bgCoral700.$,
   }
 }
 
 const sizeStyles: Record<ButtonSize, {}> = {
-  sm: Css.h(px(32)).px(px(12)).add("lineHeight", px(32)).$,
-  md: Css.h(px(40)).px2.add("lineHeight", px(40)).$,
-  lg: Css.h(px(48)).px3.add("lineHeight", px(48)).$,
+  sm: Css.h(px(32)).px(px(12)).$,
+  md: Css.h(px(40)).px2.$,
+  lg: Css.h(px(48)).px3.$,
 };
+
+const iconStyles: Record<ButtonSize, IconXss> = {
+  sm: Css.mr(px(4)).$,
+  md: Css.mr1.$,
+  lg: Css.mr(px(10)).$,
+};
+
+function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {
+  // Handling tertiary separately as it only supports a single size button. The size it supports does not match styles of other buttons.
+  if (variant === "tertiary") {
+    return {
+      ...Css.h(px(40)).px1.$,
+      ...variantStyles.tertiary,
+    };
+  }
+
+  return {
+    ...sizeStyles[size],
+    ...variantStyles[variant],
+  }
+}
 
 type ButtonSize = "sm" | "md" | "lg";
 type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger"
