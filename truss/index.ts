@@ -1,8 +1,9 @@
-import { generate, GenerateOpts, generateRules, makeRules } from "@homebound/truss";
+import { generate, newMethodsForProp, Sections } from "@homebound/truss";
 import { palette } from "./palette";
 
 const increment = 8;
 const numberOfIncrements = 8;
+
 // prettier-ignore
 const fonts: Record<string, { fontWeight: 400 | 500 | 600, fontSize: string; lineHeight: string }> = {
   tiny:   { fontWeight: 400, fontSize: "10px", lineHeight: "14px" },
@@ -29,33 +30,36 @@ const fonts: Record<string, { fontWeight: 400 | 500 | 600, fontSize: string; lin
   xl5Em:  { fontWeight: 600, fontSize: "48px", lineHeight: "48px" },
 };
 
-const methods = generateRules({ palette, fonts, numberOfIncrements });
-
 // Custom rules
-methods["fontFamilyRules"] = makeRules("fontFamily", {
-  sansSerif: "'Inter', sans-serif",
-});
-
-methods["borderRadiusRules"] = makeRules("borderRadius", {
-  br4: "4px",
-  br8: "8px",
-  br16: "16px",
-});
+const sections: Sections = {
+  fontFamily: () =>
+    newMethodsForProp("fontFamily", {
+      sansSerif: "'Inter', sans-serif",
+    }),
+  borderRadius: () =>
+    newMethodsForProp("borderRadius", {
+      br4: "4px",
+      br8: "8px",
+      br16: "16px",
+    }),
+};
 
 const aliases: Record<string, string[]> = {};
 
-const typeAliases: GenerateOpts["typeAliases"] = {};
+const typeAliases = {};
 
 const breakpoints = {};
 
 generate({
   outputPath: "../src/Css.ts",
-  methods,
   palette,
+  fonts,
   increment,
+  numberOfIncrements,
   aliases,
   typeAliases,
   breakpoints,
+  sections,
 })
-  .then(() => console.log("🚀 TRUSS styles generation complete"))
+  .then(() => console.log("🚀 Truss styles generation complete"))
   .catch(console.error);

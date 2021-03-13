@@ -3,7 +3,7 @@
     "generate": "ts-node ./index.ts"
   },
   "dependencies": {
-    "@homebound/truss": "^1.78.0",
+    "@homebound/truss": "^1.84.0",
     "@types/node": "^14.0.14",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.6"
