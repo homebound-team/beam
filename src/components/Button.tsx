@@ -44,28 +44,28 @@ const dangerFocusRingStyles = Css.add("boxShadow", `0px 0px 0px 2px ${Palette.Wh
 
 const variantStyles: Record<ButtonVariant, {}> = {
   primary: {
-    ...Css.bgSky500.white.add("fill", Palette.White).$,
+    ...Css.bgSky500.white.fill(Palette.White).$,
     "&:hover:not(:disabled)": Css.bgSky700.$,
     "&:disabled": { ...disabledStyles, ...Css.bgSky200.$ },
     "&:active:not(:disabled)": Css.bgSky900.$,
   },
 
   secondary: {
-    ...Css.bgWhite.bCoolGray300.bw1.ba.coolGray900.add("fill", Palette.CoolGray900).$,
+    ...Css.bgWhite.bCoolGray300.bw1.ba.coolGray900.fill(Palette.CoolGray900).$,
     "&:hover:not(:disabled):not(:active)": Css.bgCoolGray50.$,
-    "&:disabled": { ...disabledStyles, ...Css.bgWhite.coolGray300.add("fill", Palette.CoolGray300).$ },
+    "&:disabled": { ...disabledStyles, ...Css.bgWhite.coolGray300.fill(Palette.CoolGray300).$ },
     "&:active:not(:disabled)": Css.bgCoolGray200.$,
   },
 
   tertiary: {
-    ...Css.add("background", "none").sky500.add("fill", Palette.Sky500).$,
+    ...Css.add("background", "none").sky500.fill(Palette.Sky500).$,
     "&:hover:not(:disabled)": Css.bgCoolGray100.$,
-    "&:disabled": { ...disabledStyles, ...Css.coolGray300.add("fill", Palette.CoolGray300).$ },
-    "&:active:not(:disabled)": Css.sky900.add("fill", Palette.Sky900).$,
+    "&:disabled": { ...disabledStyles, ...Css.coolGray300.fill(Palette.CoolGray300).$ },
+    "&:active:not(:disabled)": Css.sky900.fill(Palette.Sky900).$,
   },
 
   danger: {
-    ...Css.bgCoral600.white.add("fill", Palette.White).$,
+    ...Css.bgCoral600.white.fill(Palette.White).$,
     "&:hover:not(:disabled)": Css.bgCoral500.$,
     "&:disabled": { ...disabledStyles, ...Css.bgCoral200.$ },
     "&:active:not(:disabled)": Css.bgCoral700.$,
