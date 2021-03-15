@@ -102,13 +102,9 @@ class CssBuilder<T extends Properties1> {
   get bCool1100() { return this.add("borderColor", "rgba(16,27,100,1)"); }
 
   // borderRadiusRules
-  get br0() { return this.add("borderRadius", "0"); }
-  get br1() { return this.add("borderRadius", ".125rem"); }
-  get br2() { return this.add("borderRadius", ".25rem"); }
-  get br3() { return this.add("borderRadius", ".5rem"); }
-  get br4() { return this.add("borderRadius", "1rem"); }
-  get br100() { return this.add("borderRadius", "100%"); }
-  get brPill() { return this.add("borderRadius", "9999px"); }
+  get br4() { return this.add("borderRadius", "4px"); }
+  get br8() { return this.add("borderRadius", "8px"); }
+  get br16() { return this.add("borderRadius", "16px"); }
 
   // borderRules
   get ba() { return this.add("borderStyle", "solid").add("borderWidth", "1px"); }
