@@ -5,11 +5,15 @@ describe("Icon", () => {
   it("renders without crashing", async () => {
     const r = await render(<Icon icon="x" />);
     expect(r.baseElement).toMatchInlineSnapshot(`
+      .emotion-0 path {
+        fill: rgba(17,24,39,1);
+      }
+
       <body>
         <div>
           <svg
             aria-hidden="true"
-            class="css-1gnw1gl-Icon"
+            class="emotion-0"
             height="24"
             viewBox="0 0 24 24"
             width="24"
