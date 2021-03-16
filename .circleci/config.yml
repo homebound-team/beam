@@ -33,11 +33,13 @@ workflows:
       - chromatic:
           context:
             - dockerhub
+            - npm
           filters:
             <<: *only-run-on-branches
       - chromatic:
           context:
             - dockerhub
+            - npm
           filters:
             <<: *only-run-on-main
           flags: "--auto-accept-changes"
