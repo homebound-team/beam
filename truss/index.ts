@@ -41,6 +41,7 @@ const sections: Sections = {
       br4: "4px",
       br8: "8px",
       br16: "16px",
+      br100: "100%",
     }),
 };
 
