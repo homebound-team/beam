@@ -26,8 +26,8 @@ interface ButtonGroupButtonProps extends AriaButtonProps {
 export function ButtonGroupButton(props: ButtonGroupButtonProps) {
   const { icon, text } = props;
   const ref = useRef(null);
-  const {buttonProps} = useButton(props, ref);
-  const {isFocusVisible, focusProps} = useFocusRing(props);
+  const { buttonProps, isPressed } = useButton(props, ref);
+  const { isFocusVisible, focusProps } = useFocusRing(props);
   const buttonStyles = getButtonStyles();
   const focusRingStyles = defaultFocusRingStyles;
 
@@ -36,7 +36,12 @@ export function ButtonGroupButton(props: ButtonGroupButtonProps) {
       ref={ref}
       {...buttonProps}
       {...focusProps}
-      css={{...buttonReset, ...buttonStyles, ...(isFocusVisible ? focusRingStyles : {})}}
+      css={{
+        ...buttonReset,
+        ...buttonStyles,
+        ...(isFocusVisible ? focusRingStyles : {}),
+        ...(isPressed ? activeStyles : {}),
+      }}
     >
       {icon && <Icon color="inherit" icon={icon}/>}
       {text}
@@ -48,18 +53,16 @@ const buttonReset = Css.p0.bsNone.cursorPointer.smEm.dif.itemsCenter
   .add("font", "inherit")
   .add("boxSizing", "border-box")
   .add("outline", "inherit").$;
-const disabledStyles = Css.add("cursor", "not-allowed").$;
-const defaultFocusRingStyles = Css.add("boxShadow", `0px 0px 0px 2px ${Palette.White}, 0 0 0 4px ${Palette.Sky500}`).$;
+const activeStyles = Css.bgCoolGray200.important.$;
+const defaultFocusRingStyles = Css.relative.z2.add("boxShadow", `0px 0px 0px 2px ${Palette.White}, 0 0 0 4px ${Palette.Sky500}`).$;
 
 function getButtonStyles() {
   return {
-    ...Css.hPx(40).px2.$,
-    ...Css.bgWhite.bCoolGray300.bw1.ba.coolGray900.fill(Palette.CoolGray900).$,
+    ...Css.z1.hPx(40).px2.bgWhite.bCoolGray300.bw1.coolGray900.ba.fill(Palette.CoolGray900).$,
     "&:hover:not(:disabled):not(:active)": Css.bgCoolGray50.$,
-    "&:disabled": {...disabledStyles, ...Css.bgWhite.coolGray300.fill(Palette.CoolGray300).$},
-    "&:active:not(:disabled)": Css.bgCoolGray200.$,
-    "&:first-of-type": Css.add("borderRadius", "4px 0 0 4px").add("borderRight", "none").$,
+    "&:disabled": Css.bgWhite.coolGray300.fill(Palette.CoolGray300).add("cursor", "not-allowed").$,
+    "&:first-of-type": Css.add("borderRadius", "4px 0 0 4px").$,
     "&:last-of-type": Css.add("borderRadius", "0 4px 4px 0").$,
-    "&:not(:first-of-type):not(:last-of-type)": Css.add("borderRight", "none").$,
+    "&:not(:first-of-type)": Css.mlPx(-1).$,
   };
 }
