@@ -6,16 +6,14 @@ import { AriaCheckboxProps } from "@react-types/checkbox";
 import { useRef } from "react";
 import { Css, Palette } from "src/Css";
 
-export interface CheckboxProps extends AriaCheckboxProps {}
-
-export function Checkbox(props: CheckboxProps) {
+export function Checkbox(props: AriaCheckboxProps) {
   const { children, isIndeterminate = false, isDisabled = false } = props;
   const ref = useRef(null);
   const state = useToggleState(props);
   const { isSelected } = state;
   const { inputProps } = useCheckbox(props, state, ref);
   const { isFocusVisible, focusProps } = useFocusRing(props);
-  const markIcon = isIndeterminate ? smallDash : isSelected ? SmallCheckmark : "";
+  const markIcon = isIndeterminate ? DashSmall : isSelected ? CheckmarkSmall : "";
 
   return (
     <label css={Css.df.itemsCenter.$}>
@@ -54,7 +52,7 @@ function labelStyles(isDisabled: boolean) {
   return Css.pl1.sm.if(isDisabled).coolGray300.$;
 }
 
-export const SmallCheckmark = (
+export const CheckmarkSmall = (
   <svg width="16" height="16">
     <path
       d="M6.66669 10.3907L4.47135 8.19533L3.52869 9.138L6.66669 12.276L13.138 5.80467L12.1954 4.862L6.66669 10.3907Z"
@@ -63,7 +61,7 @@ export const SmallCheckmark = (
   </svg>
 );
 
-const smallDash = (
+const DashSmall = (
   <svg width="16" height="16">
     <rect x="4" y="7.5" width="8" height="1.35" fill={Palette.White} />
   </svg>
