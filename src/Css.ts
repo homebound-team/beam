@@ -847,7 +847,7 @@ class CssBuilder<T extends Properties1> {
   get sansSerif() { return this.add("fontFamily", "'Inter', sans-serif"); }
 
   // animation
-  get transition() { return this.add("animation", "all 200ms"); }
+  get transition() { return this.add("transition", "all 200ms"); }
 
   // aliases
   
