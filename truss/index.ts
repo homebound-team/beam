@@ -44,6 +44,16 @@ const sections: Sections = {
       br16: "16px",
       br100: "100%",
     }),
+  animation: () =>
+    newMethodsForProp("transition", {
+      transition: "all 200ms",
+    }),
+  boxShadow: () =>
+    newMethodsForProp("boxShadow", {
+      bsh0: "none",
+      bshFocus: `0px 0px 0px 2px ${palette.White}, 0 0 0 4px ${palette.Sky500}`,
+      bshDanger: `0px 0px 0px 2px ${palette.White}, 0 0 0 4px ${palette.Coral600}`,
+    }),
 };
 
 const aliases: Record<string, string[]> = {};

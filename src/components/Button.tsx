@@ -33,14 +33,13 @@ export function Button(props: ButtonProps) {
   );
 }
 
-const buttonReset = Css.p0.bsNone.cursorPointer.smEm.br4.dif.itemsCenter
+const buttonReset = Css.p0.bsNone.cursorPointer.smEm.br4.dif.itemsCenter.outline0
   .mPx(4)
   .add("font", "inherit")
-  .add("boxSizing", "border-box")
-  .add("outline", "inherit").$;
+  .add("boxSizing", "border-box").$;
 const disabledStyles = Css.add("cursor", "not-allowed").$;
-const defaultFocusRingStyles = Css.add("boxShadow", `0px 0px 0px 2px ${Palette.White}, 0 0 0 4px ${Palette.Sky500}`).$;
-const dangerFocusRingStyles = Css.add("boxShadow", `0px 0px 0px 2px ${Palette.White}, 0 0 0 4px ${Palette.Coral600}`).$;
+const defaultFocusRingStyles = Css.bshFocus.$;
+const dangerFocusRingStyles = Css.bshDanger.$;
 
 const variantStyles: Record<ButtonVariant, {}> = {
   primary: {

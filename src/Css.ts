@@ -129,7 +129,9 @@ class CssBuilder<T extends Properties1> {
   bw(value: Properties["borderWidth"]) { return this.add("borderWidth", value); }
 
   // boxShadow
-  get shadowNone() { return this.add("boxShadow", "none"); }
+  get bsh0() { return this.add("boxShadow", "none"); }
+  get bshFocus() { return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0 0 0 4px rgba(71,101,255,1)"); }
+  get bshDanger() { return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0 0 0 4px rgba(222,53,11,1)"); }
 
   // coordinates
   get top0() { return this.top(0); }
@@ -843,6 +845,9 @@ class CssBuilder<T extends Properties1> {
 
   // fontFamily
   get sansSerif() { return this.add("fontFamily", "'Inter', sans-serif"); }
+
+  // animation
+  get transition() { return this.add("animation", "all 200ms"); }
 
   // aliases
   

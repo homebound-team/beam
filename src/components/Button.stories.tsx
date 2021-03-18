@@ -1,12 +1,11 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { Button, ButtonProps, Css } from "src";
+import { Button, ButtonProps, Css } from "src/index";
 
 export default {
   title: "Components/Buttons",
   component: Button,
   args: {
-    // Handles click and keyboard press
     onPress: action("onPress"),
   },
 } as Meta<ButtonProps>;
