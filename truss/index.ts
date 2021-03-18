@@ -38,6 +38,7 @@ const sections: Sections = {
     }),
   borderRadius: () =>
     newMethodsForProp("borderRadius", {
+      br0: "0",
       br4: "4px",
       br8: "8px",
       br16: "16px",

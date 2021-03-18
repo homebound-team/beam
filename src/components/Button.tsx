@@ -4,7 +4,7 @@ import { useButton, useFocusRing } from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
 
-interface ButtonProps extends AriaButtonProps {
+export interface ButtonProps extends AriaButtonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: IconProps["icon"];

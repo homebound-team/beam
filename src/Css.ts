@@ -36,6 +36,7 @@ class CssBuilder<T extends Properties1> {
   // borderColor
   get bBlack() { return this.add("borderColor", "rgba(17,24,39,1)"); }
   get bWhite() { return this.add("borderColor", "rgba(254,254,254,1)"); }
+  get bTransparent() { return this.add("borderColor", "rgba(0,0,0,0)"); }
   get bCoolGray50() { return this.add("borderColor", "rgba(249,250,251,1)"); }
   get bCoolGray100() { return this.add("borderColor", "rgba(243,244,246,1)"); }
   get bCoolGray200() { return this.add("borderColor", "rgba(229,231,235,1)"); }
@@ -110,6 +111,7 @@ class CssBuilder<T extends Properties1> {
   get bCool1100() { return this.add("borderColor", "rgba(16,27,100,1)"); }
 
   // borderRadius
+  get br0() { return this.add("borderRadius", "0"); }
   get br4() { return this.add("borderRadius", "4px"); }
   get br8() { return this.add("borderRadius", "8px"); }
   get br16() { return this.add("borderRadius", "16px"); }
@@ -346,6 +348,7 @@ class CssBuilder<T extends Properties1> {
   // skins
   get black() { return this.add("color", "rgba(17,24,39,1)"); }
   get white() { return this.add("color", "rgba(254,254,254,1)"); }
+  get transparent() { return this.add("color", "rgba(0,0,0,0)"); }
   get coolGray50() { return this.add("color", "rgba(249,250,251,1)"); }
   get coolGray100() { return this.add("color", "rgba(243,244,246,1)"); }
   get coolGray200() { return this.add("color", "rgba(229,231,235,1)"); }
@@ -421,6 +424,7 @@ class CssBuilder<T extends Properties1> {
   color(value: string) { return this.add("color", value); }
   get bgBlack() { return this.add("backgroundColor", "rgba(17,24,39,1)"); }
   get bgWhite() { return this.add("backgroundColor", "rgba(254,254,254,1)"); }
+  get bgTransparent() { return this.add("backgroundColor", "rgba(0,0,0,0)"); }
   get bgCoolGray50() { return this.add("backgroundColor", "rgba(249,250,251,1)"); }
   get bgCoolGray100() { return this.add("backgroundColor", "rgba(243,244,246,1)"); }
   get bgCoolGray200() { return this.add("backgroundColor", "rgba(229,231,235,1)"); }
@@ -920,6 +924,7 @@ export function px(pixels: number): string {
 export enum Palette {
   Black = "rgba(17,24,39,1)",
   White = "rgba(254,254,254,1)",
+  Transparent = "rgba(0,0,0,0)",
   CoolGray50 = "rgba(249,250,251,1)",
   CoolGray100 = "rgba(243,244,246,1)",
   CoolGray200 = "rgba(229,231,235,1)",
