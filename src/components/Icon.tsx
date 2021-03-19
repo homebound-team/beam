@@ -5,13 +5,13 @@ import { Css, Margin, Palette, Xss } from "src/";
 export interface IconProps extends AriaAttributes, DOMProps {
   /** The name of an icon */
   icon: keyof typeof Icons;
-  /** Defaults to Palette.CoolGray900 */
-  color?: Palette | "inherit";
+  /** Defaults to currentColor */
+  color?: Palette | "inherit" | "currentColor";
   /** Styles overrides */
   xss?: Xss<Margin>;
 }
 
-export function Icon({ icon, color = Palette.CoolGray900, xss, ...other }: IconProps) {
+export function Icon({ icon, color = "currentColor", xss, ...other }: IconProps) {
   return (
     <svg
       aria-hidden={true}
