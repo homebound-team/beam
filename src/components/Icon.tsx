@@ -6,7 +6,7 @@ export interface IconProps extends AriaAttributes, DOMProps {
   /** The name of an icon */
   icon: keyof typeof Icons;
   /** Defaults to Palette.CoolGray900 */
-  color?: Palette | "inherit";
+  color?: Palette | "inherit" | "currentColor";
   /** Styles overrides */
   xss?: Xss<Margin>;
 }
