@@ -98,7 +98,7 @@ function Radio<K extends string>(props: { parentId: string; option: RadioFieldOp
           ...radioReset,
           ...(!disabled && state.selectedValue === value ? radioChecked : radioUnchecked),
           ...(disabled ? radioDisabled : {}),
-          // Sometimes we use useFocusRing, but here we want both to focus to drive
+          // Sometimes we use useFocusRing, but here we want both mouse & keyboard to drive focus
           ...{ "&:focus": radioFocus },
           // Nudge down so the center of the circle lines up with the label text
           ...Css.mtPx(2).mr1.$,
