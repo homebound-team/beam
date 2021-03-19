@@ -27,7 +27,7 @@ export function Button(props: ButtonProps) {
       {...focusProps}
       css={{ ...buttonReset, ...buttonStyles, ...(isFocusVisible ? focusRingStyles : {}) }}
     >
-      {icon && <Icon xss={iconStyles[size]} color="currentColor" icon={icon} />}
+      {icon && <Icon xss={iconStyles[size]} icon={icon} />}
       {children}
     </button>
   );

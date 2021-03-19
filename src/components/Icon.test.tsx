@@ -6,7 +6,7 @@ describe("Icon", () => {
     const r = await render(<Icon icon="x" />);
     expect(r.baseElement).toMatchInlineSnapshot(`
       .emotion-0 path {
-        fill: rgba(17,24,39,1);
+        fill: currentColor;
       }
 
       <body>
