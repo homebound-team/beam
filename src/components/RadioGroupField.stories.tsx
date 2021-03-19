@@ -1,6 +1,13 @@
 import { Meta } from "@storybook/react";
 import { ReactNode, useState } from "react";
-import { radioChecked, radioFocus, RadioGroupField, radioReset, radioUnchecked } from "src/components/RadioGroupField";
+import {
+  radioChecked,
+  radioDisabled,
+  radioFocus,
+  RadioGroupField,
+  radioReset,
+  radioUnchecked,
+} from "src/components/RadioGroupField";
 import { Css } from "src/Css";
 import { withReset } from "src/utils";
 
@@ -16,6 +23,7 @@ export function BaseStates() {
     ["Checked", <input type="radio" css={{ ...radioReset, ...radioChecked }} />],
     ["Unchecked/Focus", <input type="radio" css={{ ...radioReset, ...radioUnchecked, ...radioFocus }} />],
     ["Checked/Focus", <input type="radio" css={{ ...radioReset, ...radioChecked, ...radioFocus }} />],
+    ["Disabled", <input type="radio" disabled css={{ ...radioReset, ...radioUnchecked, ...radioDisabled }} />],
   ];
   return (
     <div>
@@ -44,7 +52,7 @@ export function OnlyLabels() {
       options={[
         { label: "Asiago", value: "a" },
         { label: "Burratta", value: "b" },
-        { label: "Camembert", value: "a" },
+        { label: "Camembert", value: "c" },
         { label: "Roquefort", value: "d" },
       ]}
     />
@@ -79,6 +87,28 @@ export function LabelsAndDescriptions() {
           label: "Roquefort",
           description:
             "Roquefort is a sheep milk cheese from Southern France, and is one of the world's best known blue cheeses.",
+        },
+      ]}
+    />
+  );
+}
+
+export function Disabled() {
+  return (
+    <RadioGroupField
+      label={"Favorite cheese"}
+      value={"a"}
+      onChange={() => {}}
+      disabled={true}
+      options={[
+        { label: "Asiago", value: "a" },
+        { label: "Burratta", value: "b" },
+        { label: "Camembert", value: "c" },
+        {
+          label: "Roquefort",
+          description:
+            "Roquefort is a sheep milk cheese from Southern France, and is one of the world's best known blue cheeses.",
+          value: "d",
         },
       ]}
     />

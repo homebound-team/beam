@@ -23,6 +23,7 @@ interface RadioGroupFieldProps<K extends string> {
   onChange: (value: K) => void;
   /** The list of options. */
   options: RadioFieldOption<K>[];
+  disabled?: boolean;
 }
 
 /**
@@ -31,7 +32,7 @@ interface RadioGroupFieldProps<K extends string> {
  * This is generally meant to be used in a form vs. being raw radio buttons.
  */
 export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>) {
-  const { label, value, onChange, options } = props;
+  const { label, value, onChange, options, disabled = false } = props;
 
   // Assume this is unique enough and more deterministic for tests than random ids
   const name = idize(label);
@@ -41,7 +42,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   const [lastFocusedValue, setLastFocusedValue] = useState<string | null>(null);
   const state: RadioGroupState = {
     name,
-    isDisabled: false,
+    isDisabled: disabled,
     isReadOnly: false,
     selectedValue: value || null,
     setSelectedValue: onChange,
@@ -53,7 +54,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   // TOOD: Pass read only, required, disabled, error message to useRadioGroup
   const { radioGroupProps } = useRadioGroup(
     // Tell useRadioGroup to not generate unique ids for these
-    { id: name, name, "aria-labelledby": labelId },
+    { id: name, name, "aria-labelledby": labelId, isDisabled: disabled },
     state,
   );
 
@@ -81,6 +82,7 @@ function Radio<K extends string>(props: { parentId: string; option: RadioFieldOp
     option: { description, label, value },
     state,
   } = props;
+  const disabled = state.isDisabled;
 
   const labelId = `${parentId}-${value}-label`;
   const descriptionId = `${parentId}-${value}-description`;
@@ -88,27 +90,33 @@ function Radio<K extends string>(props: { parentId: string; option: RadioFieldOp
   const { inputProps } = useRadio({ value, "aria-labelledby": labelId }, state, ref);
 
   return (
-    <label css={Css.df.cursorPointer.mb1.$}>
+    <label css={Css.df.cursorPointer.mb1.if(disabled).add("cursor", "initial").$}>
       <input
         type="radio"
         ref={ref}
         css={{
           ...radioReset,
-          ...(state.selectedValue === value ? radioChecked : radioUnchecked),
+          ...(!disabled && state.selectedValue === value ? radioChecked : radioUnchecked),
+          ...(disabled ? radioDisabled : {}),
           // Sometimes we use useFocusRing, but here we want both to focus to drive
           ...{ "&:focus": radioFocus },
           // Nudge down so the center of the circle lines up with the label text
           ...Css.mtPx(2).mr1.$,
         }}
+        disabled={disabled}
         {...inputProps}
         aria-labelledby={labelId}
       />
       <div>
-        <div id={labelId} css={Css.smEm.coolGray700.$} {...(description ? { "aria-describedby": descriptionId } : {})}>
+        <div
+          id={labelId}
+          css={Css.smEm.coolGray700.if(disabled).coolGray300.$}
+          {...(description ? { "aria-describedby": descriptionId } : {})}
+        >
           {label}
         </div>
         {description && (
-          <div id={descriptionId} css={Css.sm.coolGray500.$}>
+          <div id={descriptionId} css={Css.sm.coolGray500.if(disabled).coolGray300.$}>
             {description}
           </div>
         )}
@@ -155,6 +163,14 @@ export const radioFocus = {
   ...Css.add("outline", "2px solid transparent").add("outlineOffset", "2px").$,
   // Draw 1st box shadow of white/outline, 2nd box current (blue) of another outline
   ...Css.add("boxShadow", `${Palette.White} 0px 0px 0px 2px, currentColor 0px 0px 0px 4px`).$,
+};
+
+export const radioDisabled = {
+  ...Css.cursorNotAllowed.coolGray100.$,
+  ...Css.add("backgroundColor", "currentColor")
+    .add("backgroundSize", "100% 100%")
+    .add("backgroundPosition", "center")
+    .add("backgroundRepeat", "no-repeat").$,
 };
 
 /**
