@@ -53,8 +53,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   );
 }
 
-// Not really meant to be a standalone radio, but its own component so that we can
-// use the useRadio hooks
+// Not meant to be standalone, but its own component so it can use hooks
 function Radio<K extends string>(props: { option: RadioFieldOption<K>; state: RadioGroupState }) {
   const { option, state } = props;
   const ref = useRef<HTMLInputElement>(null);
@@ -101,9 +100,10 @@ const whiteCircle =
 
 export const radioReset = {
   ...Css.add("appearance", "none").p0.dib.vMid.add("userSelect", "none").fs0.h2.w2.br100.$,
+  ...Css.add("outline", "0px solid transparent").$,
   // By default we're white with a blue border
   ...Css.bgWhite.bSky500.ba.$,
-  // Set a color that will be by the background=currentColor + box shadow, but is initially ignored
+  // Set a color that will be used by background=currentColor + box shadow, but is initially ignored
   ...Css.sky500.$,
 };
 
@@ -125,8 +125,7 @@ export const radioChecked = {
 
 // When active draw another circle via boxShadow
 export const radioFocus = {
-  // Undo the native outline (which is 1px solid black in chrome), the box shadows
-  // end up drawing over this anyway, so it mostly functions as a reset.
+  // The box shadow ends up drawing over this afaict?
   ...Css.add("outline", "2px solid transparent").add("outlineOffset", "2px").$,
   // Draw 1st box shadow of white/outline, 2nd box current (blue) of another outline
   ...Css.add("boxShadow", `${Palette.White} 0px 0px 0px 2px, currentColor 0px 0px 0px 4px`).$,
