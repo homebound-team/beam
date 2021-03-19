@@ -44,7 +44,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
       <div {...labelProps} css={Css.sm.coolGray500.my1.$}>
         {label}
       </div>
-      <div {...radioGroupProps} css={Css.dig.gtc("2em auto").itemsStart.$}>
+      <div {...radioGroupProps}>
         {options.map((option) => (
           <Radio option={option} state={state} />
         ))}
@@ -58,27 +58,37 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
 function Radio<K extends string>(props: { option: RadioFieldOption<K>; state: RadioGroupState }) {
   const { option, state } = props;
   const ref = useRef<HTMLInputElement>(null);
-  const { inputProps } = useRadio({ value: option.value }, state, ref);
+  const { inputProps } = useRadio(
+    {
+      value: option.value,
+      // We wrap option.label+description in a `label` element but only want the
+      // shorter option.label value to be the aria-label text.
+      "aria-label": option.label,
+    },
+    state,
+    ref,
+  );
+
   return (
-    <>
+    <label key={option.value} css={Css.df.cursorPointer.mb1.$}>
       <input
         type="radio"
         ref={ref}
         css={{
           ...radioReset,
           ...(state.selectedValue === option.value ? radioChecked : radioUnchecked),
-          // Sometimes we use useFocusRing, but here we want mouse focus to drive
+          // Sometimes we use useFocusRing, but here we want both to focus to drive
           ...{ "&:focus": radioFocus },
           // Nudge down so the center of the circle lines up with the label text
-          ...Css.mtPx(2).$,
+          ...Css.mtPx(2).mr1.$,
         }}
         {...inputProps}
       />
-      <div css={Css.mb1.$}>
+      <div>
         <div css={Css.smEm.coolGray700.$}>{option.label}</div>
         <div css={Css.sm.coolGray500.$}>{option.description}</div>
       </div>
-    </>
+    </label>
   );
 }
 
