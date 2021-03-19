@@ -43,11 +43,11 @@ function checkboxStyles({ isDisabled, isSelected, isIndeterminate }: ICheckboxSt
   return Css.add("boxSizing", "border-box")
     .hPx(16)
     .wPx(16)
-    .ba.bCoolGray300.br4.bgWhite.if(isSelected || isIndeterminate)
-    .bSky500.bgSky500.if(isDisabled).bCoolGray300.bgCoolGray100.$;
+    .cursorPointer.ba.bCoolGray300.br4.bgWhite.if(isSelected || isIndeterminate)
+    .bSky500.bgSky500.if(isDisabled).bCoolGray300.bgCoolGray100.cursorNotAllowed.$;
 }
-const focusRingStyles = Css.add("boxShadow", `0px 0px 0px 2px ${Palette.White}, 0 0 0 4px ${Palette.Sky500}`).$;
-const markStyles = { ...Css.relative.$, "& svg": Css.absolute.topPx(-8).rightPx(0).$ };
+const focusRingStyles = Css.bshFocus.$;
+const markStyles = { ...Css.relative.cursorPointer.$, "& svg": Css.absolute.topPx(-8).rightPx(0).$ };
 function labelStyles(isDisabled: boolean) {
   return Css.pl1.sm.if(isDisabled).coolGray300.$;
 }
