@@ -1,4 +1,5 @@
 import { Parameters } from "@storybook/addons";
+import { withReset } from "src/utils/storybookDecorators";
 
 // https://storybook.js.org/docs/react/writing-stories/parameters#global-parameters
 export const parameters: Parameters = {
@@ -20,4 +21,4 @@ export const parameters: Parameters = {
 };
 
 // https://storybook.js.org/docs/react/writing-stories/decorators#global-decorators
-export const decorators = [];
+export const decorators = [withReset];

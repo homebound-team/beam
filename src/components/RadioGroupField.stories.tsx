@@ -9,12 +9,10 @@ import {
   radioUnchecked,
 } from "src/components/RadioGroupField";
 import { Css } from "src/Css";
-import { withReset } from "src/utils";
 
 export default {
   component: RadioGroupField,
   title: "Components/Radio Group",
-  decorators: [withReset],
 } as Meta;
 
 export function BaseStates() {
