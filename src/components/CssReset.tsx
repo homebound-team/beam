@@ -336,7 +336,7 @@ const tailwindPreflightReset = css`
  *    to override it to ensure consistency even when using the default theme.
  */
   html {
-    font-family: Inter var, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
       "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
       "Noto Color Emoji"; /* 1 */
     line-height: 1.5; /* 2 */
