@@ -10,9 +10,17 @@
     // Use React 17 _jsx / automatic runtime support for nice emotion integration
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
+    "declaration": true,
+    "outDir": "./dist",
     "baseUrl": ".",
-    "outDir": "dist",
-    "declaration": true
+    "paths": {
+      "src/*": ["src/*"]
+    },
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+    ]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

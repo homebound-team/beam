@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { Button, Css } from "src/index";
+import { Button, Css } from "src";
 
 export default {
   component: Button,

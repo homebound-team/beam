@@ -1,5 +1,5 @@
 import { render } from "@homebound/rtl-utils";
-import { Icon } from "src/";
+import { Icon } from "src";
 
 describe("Icon", () => {
   it("renders without crashing", async () => {
