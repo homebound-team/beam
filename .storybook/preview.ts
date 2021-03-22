@@ -22,6 +22,11 @@ export const parameters: Parameters = {
     // Defaulting to an off white to better see the color palette
     default: "light",
   },
+  chromatic: {
+    // Delaying Chromatic to allow animations to run
+    // https://www.chromatic.com/docs/delay#delay-a-story
+    delay: 300,
+  },
 };
 
 // https://storybook.js.org/docs/react/writing-stories/decorators#global-decorators
