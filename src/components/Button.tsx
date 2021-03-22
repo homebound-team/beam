@@ -1,20 +1,21 @@
-import type { AriaButtonProps } from "@react-types/button";
 import { useMemo, useRef } from "react";
 import { useButton, useFocusRing } from "react-aria";
-import { Icon, IconProps } from "src/components/Icon";
-import { Css, Palette } from "src/Css";
+import { Icon, IconProps } from "src";
+import { Css } from "src/Css";
+import { BeamButtonWithChildrenProps, BeamFocusableProps } from "src/interfaces";
 
-interface ButtonProps extends AriaButtonProps {
+export interface ButtonProps extends BeamButtonWithChildrenProps, BeamFocusableProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: IconProps["icon"];
 }
 
-export function Button(props: ButtonProps) {
-  const { children, icon, variant = "primary", size = "sm" } = props;
+export function Button({ onClick: onPress, disabled: isDisabled, ...otherProps }: ButtonProps) {
+  const ariaProps = { onPress, isDisabled, ...otherProps };
+  const { children, icon, variant = "primary", size = "sm" } = ariaProps;
   const ref = useRef(null);
-  const { buttonProps } = useButton(props, ref);
-  const { isFocusVisible, focusProps } = useFocusRing(props);
+  const { buttonProps } = useButton(ariaProps, ref);
+  const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const buttonStyles = useMemo(() => getButtonStyles(variant, size), [variant, size]);
   const focusRingStyles = useMemo(() => (variant === "danger" ? dangerFocusRingStyles : defaultFocusRingStyles), [
     variant,
@@ -33,14 +34,13 @@ export function Button(props: ButtonProps) {
   );
 }
 
-const buttonReset = Css.p0.bsNone.cursorPointer.smEm.br4.dif.itemsCenter
+const buttonReset = Css.p0.bsNone.cursorPointer.smEm.br4.dif.itemsCenter.outline0.transition
   .mPx(4)
   .add("font", "inherit")
-  .add("boxSizing", "border-box")
-  .add("outline", "inherit").$;
+  .add("boxSizing", "border-box").$;
 const disabledStyles = Css.add("cursor", "not-allowed").$;
-const defaultFocusRingStyles = Css.add("boxShadow", `0px 0px 0px 2px ${Palette.White}, 0 0 0 4px ${Palette.Sky500}`).$;
-const dangerFocusRingStyles = Css.add("boxShadow", `0px 0px 0px 2px ${Palette.White}, 0 0 0 4px ${Palette.Coral600}`).$;
+const defaultFocusRingStyles = Css.bshFocus.$;
+const dangerFocusRingStyles = Css.bshDanger.$;
 
 const variantStyles: Record<ButtonVariant, {}> = {
   primary: {

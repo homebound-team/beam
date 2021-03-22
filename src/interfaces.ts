@@ -1,0 +1,19 @@
+import type { PressEvent } from "@react-types/shared";
+import { ReactNode } from "react";
+
+export interface BeamFocusableProps {
+  /** Whether the element should receive focus on render. */
+  autoFocus?: boolean;
+}
+
+export interface BeamButtonProps {
+  /** Whether the button is disabled. */
+  disabled?: boolean;
+  /** Handler that is called when the press is released over the target. */
+  onClick?: (e: PressEvent) => void;
+}
+
+export interface BeamButtonWithChildrenProps extends BeamButtonProps {
+  /** The content to display in the button. */
+  children?: ReactNode;
+}

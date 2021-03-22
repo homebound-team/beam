@@ -3,6 +3,7 @@ export const palette = {
   // Primary Palette
   Black:        'rgba(17,24,39,1)',
   White:        'rgba(254,254,254,1)',
+  Transparent:  'rgba(0,0,0,0)',
 
   // Neutrals
   CoolGray50:   'rgba(249,250,251,1)',

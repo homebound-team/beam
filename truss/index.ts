@@ -38,10 +38,21 @@ const sections: Sections = {
     }),
   borderRadius: () =>
     newMethodsForProp("borderRadius", {
+      br0: "0",
       br4: "4px",
       br8: "8px",
       br16: "16px",
       br100: "100%",
+    }),
+  animation: () =>
+    newMethodsForProp("transition", {
+      transition: "all 200ms",
+    }),
+  boxShadow: () =>
+    newMethodsForProp("boxShadow", {
+      bsh0: "none",
+      bshFocus: `0px 0px 0px 2px ${palette.White}, 0 0 0 4px ${palette.Sky500}`,
+      bshDanger: `0px 0px 0px 2px ${palette.White}, 0 0 0 4px ${palette.Coral600}`,
     }),
 };
 
