@@ -10,11 +10,12 @@ export interface ButtonProps extends BeamButtonWithChildrenProps, BeamFocusableP
   icon?: IconProps["icon"];
 }
 
-export function Button(props: ButtonProps) {
-  const { children, icon, variant = "primary", size = "sm" } = props;
+export function Button({ onClick: onPress, disabled: isDisabled, ...otherProps }: ButtonProps) {
+  const ariaProps = { onPress, isDisabled, ...otherProps };
+  const { children, icon, variant = "primary", size = "sm" } = ariaProps;
   const ref = useRef(null);
-  const { buttonProps } = useButton(props, ref);
-  const { isFocusVisible, focusProps } = useFocusRing(props);
+  const { buttonProps } = useButton(ariaProps, ref);
+  const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const buttonStyles = useMemo(() => getButtonStyles(variant, size), [variant, size]);
   const focusRingStyles = useMemo(() => (variant === "danger" ? dangerFocusRingStyles : defaultFocusRingStyles), [
     variant,
@@ -33,7 +34,7 @@ export function Button(props: ButtonProps) {
   );
 }
 
-const buttonReset = Css.p0.bsNone.cursorPointer.smEm.br4.dif.itemsCenter.outline0
+const buttonReset = Css.p0.bsNone.cursorPointer.smEm.br4.dif.itemsCenter.outline0.transition
   .mPx(4)
   .add("font", "inherit")
   .add("boxSizing", "border-box").$;

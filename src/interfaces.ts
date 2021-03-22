@@ -8,9 +8,9 @@ export interface BeamFocusableProps {
 
 export interface BeamButtonProps {
   /** Whether the button is disabled. */
-  isDisabled?: boolean;
+  disabled?: boolean;
   /** Handler that is called when the press is released over the target. */
-  onPress?: (e: PressEvent) => void;
+  onClick?: (e: PressEvent) => void;
 }
 
 export interface BeamButtonWithChildrenProps extends BeamButtonProps {

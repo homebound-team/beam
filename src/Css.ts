@@ -502,6 +502,7 @@ class CssBuilder<T extends Properties1> {
   bgColor(value: string) { return this.add("backgroundColor", value); }
   get fBlack() { return this.add("fill", "rgba(17,24,39,1)"); }
   get fWhite() { return this.add("fill", "rgba(254,254,254,1)"); }
+  get fTransparent() { return this.add("fill", "rgba(0,0,0,0)"); }
   get fCoolGray50() { return this.add("fill", "rgba(249,250,251,1)"); }
   get fCoolGray100() { return this.add("fill", "rgba(243,244,246,1)"); }
   get fCoolGray200() { return this.add("fill", "rgba(229,231,235,1)"); }

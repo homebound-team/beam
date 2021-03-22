@@ -10,12 +10,13 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   icon: IconProps["icon"];
 }
 
-export function IconButton(props: IconButtonProps) {
+export function IconButton({ onClick: onPress, disabled: isDisabled, ...otherProps }: IconButtonProps) {
+  const ariaProps = { onPress, isDisabled, ...otherProps };
+  const { icon } = ariaProps;
   const ref = useRef(null);
-  const { buttonProps } = useButton(props, ref);
-  const { focusProps, isFocusVisible } = useFocusRing(props);
-  const { hoverProps, isHovered } = useHover(props);
-  const { icon, isDisabled } = props;
+  const { buttonProps } = useButton(ariaProps, ref);
+  const { focusProps, isFocusVisible } = useFocusRing(ariaProps);
+  const { hoverProps, isHovered } = useHover(ariaProps);
 
   const styles = useMemo(
     () => ({
@@ -26,17 +27,15 @@ export function IconButton(props: IconButtonProps) {
     }),
     [isHovered, isFocusVisible, isDisabled],
   );
-  const iconColor = useMemo(() => (isDisabled ? Palette.CoolGray300 : undefined), [isDisabled]);
 
   return (
     <button {...buttonProps} {...focusProps} {...hoverProps} ref={ref} css={styles}>
-      <Icon icon={icon} color={iconColor} />
+      <Icon icon={icon} color={isDisabled ? Palette.CoolGray300 : undefined} />
     </button>
   );
 }
 
-// TODO: @KoltonG Remove p0 when CSSReset is included
-const iconButtonStylesReset = Css.hPx(28).wPx(28).p0.br8.bTransparent.bw2.bgTransparent.cursorPointer.outline0.df
+const iconButtonStylesReset = Css.hPx(28).wPx(28).br8.bTransparent.bw2.bgTransparent.cursorPointer.outline0.df
   .itemsCenter.justifyCenter.transition.$;
 export const iconButtonStylesHover = Css.bgCoolGray100.$;
 const iconButtonStylesFocus = Css.bSky500.$;

@@ -8,21 +8,15 @@ export default {
   component: IconButtonComponent,
   args: {
     icon: "arrowBack",
-    onPress: action("onPress"),
+    onClick: action("onPress"),
   },
   argTypes: {
-    icon: {
-      control: {
-        type: "select",
-        options: Object.keys(Icons),
-      },
-    },
+    icon: { control: { type: "select", options: Object.keys(Icons) } },
+    autoFocus: { control: false },
   },
   parameters: {
     // To better view the icon hover state
-    backgrounds: {
-      default: "white",
-    },
+    backgrounds: { default: "white" },
   },
 } as Meta<IconButtonProps>;
 
@@ -40,11 +34,11 @@ export const IconButton = (args: IconButtonProps) => (
       </div>
       <div>
         <h2>Focused</h2>
-        <IconButtonComponent autoFocus {...args} />
+        <IconButtonComponent {...args} autoFocus />
       </div>
       <div>
         <h2>Disabled</h2>
-        <IconButtonComponent {...args} isDisabled />
+        <IconButtonComponent {...args} disabled />
       </div>
     </div>
   </div>

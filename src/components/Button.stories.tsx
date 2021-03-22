@@ -6,9 +6,7 @@ import { Css } from "src/Css";
 export default {
   title: "Components/Buttons",
   component: Button,
-  args: {
-    onPress: action("onPress"),
-  },
+  args: { onClick: action("onPress") },
   argTypes: {
     autoFocus: { control: false },
     variant: { control: false },
