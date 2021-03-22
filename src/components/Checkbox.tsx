@@ -4,10 +4,14 @@ import { VisuallyHidden } from "@react-aria/visually-hidden";
 import { useToggleState } from "@react-stately/toggle";
 import { AriaCheckboxProps } from "@react-types/checkbox";
 import { useRef } from "react";
-import { Css, Palette } from "src/Css";
+import { Css, Palette, px } from "src/Css";
 
-export function Checkbox(props: AriaCheckboxProps) {
-  const { children, isIndeterminate = false, isDisabled = false } = props;
+interface CheckboxProps extends AriaCheckboxProps {
+  description?: string;
+}
+
+export function Checkbox(props: CheckboxProps) {
+  const { children, isIndeterminate = false, isDisabled = false, description } = props;
   const ref = useRef(null);
   const state = useToggleState(props);
   const { isSelected } = state;
@@ -16,20 +20,23 @@ export function Checkbox(props: AriaCheckboxProps) {
   const markIcon = isIndeterminate ? DashSmall : isSelected ? CheckmarkSmall : "";
 
   return (
-    <label css={Css.df.itemsCenter.$}>
-      <VisuallyHidden>
-        <input ref={ref} {...inputProps} {...focusProps} />
-      </VisuallyHidden>
-      <span
-        css={{
-          ...checkboxStyles({ isDisabled, isSelected, isIndeterminate }),
-          ...(isFocusVisible && focusRingStyles),
-        }}
-        aria-hidden="true"
-      ></span>
-      <span css={markStyles}>{markIcon}</span>
-      {children && <span css={labelStyles(isDisabled)}>{children}</span>}
-    </label>
+    <div>
+      <label css={Css.df.itemsCenter.$}>
+        <VisuallyHidden>
+          <input ref={ref} {...inputProps} {...focusProps} />
+        </VisuallyHidden>
+        <span
+          css={{
+            ...checkboxStyles({ isDisabled, isSelected, isIndeterminate }),
+            ...(isFocusVisible && focusRingStyles),
+          }}
+          aria-hidden="true"
+        ></span>
+        <span css={markStyles}>{markIcon}</span>
+        {children && <div css={labelStyles(isDisabled)}>{children}</div>}
+      </label>
+      {description && <div css={descStyles}>{description}</div>}
+    </div>
   );
 }
 
@@ -51,6 +58,7 @@ const markStyles = { ...Css.relative.cursorPointer.$, "& svg": Css.absolute.topP
 function labelStyles(isDisabled: boolean) {
   return Css.pl1.sm.if(isDisabled).coolGray300.$;
 }
+const descStyles = Css.pl3.sm.coolGray500.maxw(px(312)).$;
 
 export const CheckmarkSmall = (
   <svg width="16" height="16">

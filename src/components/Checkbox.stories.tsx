@@ -11,20 +11,30 @@ export function Checkboxes() {
   return (
     <div css={Css.df.flexColumn.$}>
       <div>
-        <h2>No Label</h2>
-        <div css={Css.df.wPx(120).justifyBetween.pb1.$}>
-          <Checkbox aria-label="default" autoFocus onChange={() => {}}></Checkbox>
-          <Checkbox aria-label="selected" isSelected></Checkbox>
-          <Checkbox aria-label="indeterminate" isIndeterminate></Checkbox>
-          <Checkbox aria-label="disabled" isDisabled></Checkbox>
+        <h2>Basic Checkboxes</h2>
+        <div css={Css.dg.gap2.$}>
+          <Checkbox aria-label="default" onChange={() => {}}>
+            Default
+          </Checkbox>
+          <Checkbox aria-label="selected" isSelected onChange={() => {}}>
+            Selected
+          </Checkbox>
+          <Checkbox aria-label="selected" autoFocus isSelected>
+            Selected/Focused
+          </Checkbox>
+          <Checkbox aria-label="indeterminate" isIndeterminate>
+            Indeterminate
+          </Checkbox>
+          <Checkbox aria-label="disabled" isDisabled>
+            Disabled
+          </Checkbox>
         </div>
       </div>
-      <h2>With Label</h2>
-      <div css={Css.df.wPx(300).justifyBetween.pb1.$}>
-        <Checkbox onChange={() => {}}>Label</Checkbox>
-        <Checkbox isSelected>Label</Checkbox>
-        <Checkbox isIndeterminate>Label</Checkbox>
-        <Checkbox isDisabled>Label</Checkbox>
+      <h2>Checkbox with Label and Description</h2>
+      <div css={Css.gap2.dg.$}>
+        <Checkbox onChange={() => {}} description="Get notified when someone posts a comment on a posting">
+          Comments
+        </Checkbox>
       </div>
     </div>
   );
