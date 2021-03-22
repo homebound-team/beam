@@ -1,7 +1,8 @@
 {
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
-    "target": "esnext",
+    // Not esnext b/c storybook doesn't like `??`
+    "target": "ES2018",
     "module": "esnext",
     "moduleResolution": "Node",
     "lib": ["esnext", "dom"],

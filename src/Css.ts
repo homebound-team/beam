@@ -25,6 +25,14 @@ class CssBuilder<T extends Properties1> {
     return new CssBuilder({ ...this.opts, ...opts });
   }
 
+  // border
+  get ba() { return this.add("borderStyle", "solid").add("borderWidth", "1px"); }
+  get bt() { return this.add("borderTopStyle", "solid").add("borderTopWidth", "1px"); }
+  get br() { return this.add("borderRightStyle", "solid").add("borderRightWidth", "1px"); }
+  get bb() { return this.add("borderBottomStyle", "solid").add("borderBottomWidth", "1px"); }
+  get bl() { return this.add("borderLeftStyle", "solid").add("borderLeftWidth", "1px"); }
+  get bn() { return this.add("borderStyle", "none").add("borderWidth", "0"); }
+
   // borderColor
   get bBlack() { return this.add("borderColor", "rgba(17,24,39,1)"); }
   get bWhite() { return this.add("borderColor", "rgba(254,254,254,1)"); }
@@ -105,14 +113,7 @@ class CssBuilder<T extends Properties1> {
   get br4() { return this.add("borderRadius", "4px"); }
   get br8() { return this.add("borderRadius", "8px"); }
   get br16() { return this.add("borderRadius", "16px"); }
-
-  // border
-  get ba() { return this.add("borderStyle", "solid").add("borderWidth", "1px"); }
-  get bt() { return this.add("borderTopStyle", "solid").add("borderTopWidth", "1px"); }
-  get br() { return this.add("borderRightStyle", "solid").add("borderRightWidth", "1px"); }
-  get bb() { return this.add("borderBottomStyle", "solid").add("borderBottomWidth", "1px"); }
-  get bl() { return this.add("borderLeftStyle", "solid").add("borderLeftWidth", "1px"); }
-  get bn() { return this.add("borderStyle", "none").add("borderWidth", "0"); }
+  get br100() { return this.add("borderRadius", "100%"); }
 
   // borderStyle
   get bsDashed() { return this.add("borderStyle", "dashed"); }
@@ -176,6 +177,7 @@ class CssBuilder<T extends Properties1> {
 
   // cursor
   get cursorPointer() { return this.add("cursor", "pointer"); }
+  get cursorNotAllowed() { return this.add("cursor", "not-allowed"); }
 
   // display
   get dn() { return this.add("display", "none"); }
@@ -188,6 +190,7 @@ class CssBuilder<T extends Properties1> {
   get dtColumn() { return this.add("display", "table-column"); }
   get dtColumnGroup() { return this.add("display", "table-column-group"); }
   get dg() { return this.add("display", "grid"); }
+  get dig() { return this.add("display", "inline-grid"); }
   get df() { return this.add("display", "flex"); }
   get dif() { return this.add("display", "inline-flex"); }
   display(value: Properties["display"]) { return this.add("display", value); }
@@ -254,6 +257,21 @@ class CssBuilder<T extends Properties1> {
   get fw8() { return this.add("fontWeight", 800); }
   get fw9() { return this.add("fontWeight", 900); }
 
+  // grid
+  gtc(value: Properties["gridTemplateColumns"]) { return this.add("gridTemplateColumns", value); }
+  gtr(value: Properties["gridTemplateRows"]) { return this.add("gridTemplateRows", value); }
+  get gap0() { return this.gap(0); }
+  get gap1() { return this.gap(1); }
+  get gap2() { return this.gap(2); }
+  get gap3() { return this.gap(3); }
+  get gap4() { return this.gap(4); }
+  get gap5() { return this.gap(5); }
+  get gap6() { return this.gap(6); }
+  get gap7() { return this.gap(7); }
+  get gap8() { return this.gap(8); }
+  gap(inc: number | string) { return this.add("gap", maybeInc(inc)); }
+  gapPx(px: number) { return this.add("gap", `${px}px`); }
+
   // height
   get h0() { return this.h(0); }
   get h1() { return this.h(1); }
@@ -288,11 +306,6 @@ class CssBuilder<T extends Properties1> {
   get maxh100() { return this.add("maxHeight", "100%"); }
   maxh(value: Properties["maxHeight"]) { return this.add("maxHeight", value); }
 
-  // outline
-  get outline() { return this.add("outline", "1px solid"); }
-  get outlineTransparent() { return this.add("outline", "1px solid transparent"); }
-  get outline0() { return this.add("outline", "0"); }
-
   // objectFit
   get objectContain() { return this.add("objectFit", "contain"); }
   get objectCover() { return this.add("objectFit", "cover"); }
@@ -300,6 +313,11 @@ class CssBuilder<T extends Properties1> {
   get objectNone() { return this.add("objectFit", "none"); }
   get objectScaleDown() { return this.add("objectFit", "scale-down"); }
   objectFit(value: Properties["objectFit"]) { return this.add("objectFit", value); }
+
+  // outline
+  get outline() { return this.add("outline", "1px solid"); }
+  get outlineTransparent() { return this.add("outline", "1px solid transparent"); }
+  get outline0() { return this.add("outline", "0"); }
 
   // overflow
   get overflowVisible() { return this.add("overflow", "visible"); }
@@ -476,6 +494,80 @@ class CssBuilder<T extends Properties1> {
   get bgCool1000() { return this.add("backgroundColor", "rgba(42,47,135,1)"); }
   get bgCool1100() { return this.add("backgroundColor", "rgba(16,27,100,1)"); }
   bgColor(value: string) { return this.add("backgroundColor", value); }
+  get fBlack() { return this.add("fill", "rgba(17,24,39,1)"); }
+  get fWhite() { return this.add("fill", "rgba(254,254,254,1)"); }
+  get fCoolGray50() { return this.add("fill", "rgba(249,250,251,1)"); }
+  get fCoolGray100() { return this.add("fill", "rgba(243,244,246,1)"); }
+  get fCoolGray200() { return this.add("fill", "rgba(229,231,235,1)"); }
+  get fCoolGray300() { return this.add("fill", "rgba(209,213,219,1)"); }
+  get fCoolGray400() { return this.add("fill", "rgba(156,163,175,1)"); }
+  get fCoolGray500() { return this.add("fill", "rgba(107,114,128,1)"); }
+  get fCoolGray600() { return this.add("fill", "rgba(75,85,99,1)"); }
+  get fCoolGray700() { return this.add("fill", "rgba(55,65,81,1)"); }
+  get fCoolGray800() { return this.add("fill", "rgba(31,41,55,1)"); }
+  get fCoolGray900() { return this.add("fill", "rgba(17,24,39,1)"); }
+  get fCoral50() { return this.add("fill", "rgba(255,234,227,1)"); }
+  get fCoral100() { return this.add("fill", "rgba(255,223,212,1)"); }
+  get fCoral200() { return this.add("fill", "rgba(255,194,174,1)"); }
+  get fCoral300() { return this.add("fill", "rgba(255,165,136,1)"); }
+  get fCoral400() { return this.add("fill", "rgba(255,123,82,1)"); }
+  get fCoral500() { return this.add("fill", "rgba(255,87,34,1)"); }
+  get fCoral600() { return this.add("fill", "rgba(222,53,11,1)"); }
+  get fCoral700() { return this.add("fill", "rgba(182,58,19,1)"); }
+  get fCoral800() { return this.add("fill", "rgba(143,45,14,1)"); }
+  get fCoral900() { return this.add("fill", "rgba(115,40,16,1)"); }
+  get fAmber50() { return this.add("fill", "rgba(255,251,235,1)"); }
+  get fAmber100() { return this.add("fill", "rgba(254,243,199,1)"); }
+  get fAmber200() { return this.add("fill", "rgba(253,230,138,1)"); }
+  get fAmber300() { return this.add("fill", "rgba(252,211,77,1)"); }
+  get fAmber400() { return this.add("fill", "rgba(251,191,36,1)"); }
+  get fAmber500() { return this.add("fill", "rgba(245,158,11,1)"); }
+  get fAmber600() { return this.add("fill", "rgba(217,119,6,1)"); }
+  get fAmber700() { return this.add("fill", "rgba(180,83,9,1)"); }
+  get fAmber800() { return this.add("fill", "rgba(146,64,14,1)"); }
+  get fAmber900() { return this.add("fill", "rgba(120,53,15,1)"); }
+  get fEmerald50() { return this.add("fill", "rgba(236,253,245,1)"); }
+  get fEmerald100() { return this.add("fill", "rgba(209,250,229,1)"); }
+  get fEmerald200() { return this.add("fill", "rgba(167,243,208,1)"); }
+  get fEmerald300() { return this.add("fill", "rgba(110,231,183,1)"); }
+  get fEmerald400() { return this.add("fill", "rgba(52,211,153,1)"); }
+  get fEmerald500() { return this.add("fill", "rgba(16,185,129,1)"); }
+  get fEmerald600() { return this.add("fill", "rgba(5,150,105,1)"); }
+  get fEmerald700() { return this.add("fill", "rgba(4,120,87,1)"); }
+  get fEmerald800() { return this.add("fill", "rgba(6,95,70,1)"); }
+  get fEmerald900() { return this.add("fill", "rgba(6,78,59,1)"); }
+  get fSky50() { return this.add("fill", "rgba(239,244,255,1)"); }
+  get fSky100() { return this.add("fill", "rgba(219,227,254,1)"); }
+  get fSky200() { return this.add("fill", "rgba(191,209,254,1)"); }
+  get fSky300() { return this.add("fill", "rgba(147,170,253,1)"); }
+  get fSky400() { return this.add("fill", "rgba(109,131,246,1)"); }
+  get fSky500() { return this.add("fill", "rgba(71,101,255,1)"); }
+  get fSky600() { return this.add("fill", "rgba(37,45,235,1)"); }
+  get fSky700() { return this.add("fill", "rgba(29,48,216,1)"); }
+  get fSky800() { return this.add("fill", "rgba(30,53,175,1)"); }
+  get fSky900() { return this.add("fill", "rgba(30,41,138,1)"); }
+  get fViolet50() { return this.add("fill", "rgba(245,243,255,1)"); }
+  get fViolet100() { return this.add("fill", "rgba(237,233,254,1)"); }
+  get fViolet200() { return this.add("fill", "rgba(221,214,254,1)"); }
+  get fViolet300() { return this.add("fill", "rgba(196,181,253,1)"); }
+  get fViolet400() { return this.add("fill", "rgba(167,139,250,1)"); }
+  get fViolet500() { return this.add("fill", "rgba(139,92,246,1)"); }
+  get fViolet600() { return this.add("fill", "rgba(124,58,237,1)"); }
+  get fViolet700() { return this.add("fill", "rgba(109,40,217,1)"); }
+  get fViolet800() { return this.add("fill", "rgba(91,33,182,1)"); }
+  get fViolet900() { return this.add("fill", "rgba(76,29,149,1)"); }
+  get fCool50() { return this.add("fill", "rgba(239,246,247,1)"); }
+  get fCool100() { return this.add("fill", "rgba(216,235,238,1)"); }
+  get fCool200() { return this.add("fill", "rgba(177,219,225,1)"); }
+  get fCool300() { return this.add("fill", "rgba(128,200,214,1)"); }
+  get fCool400() { return this.add("fill", "rgba(124,170,211,1)"); }
+  get fCool500() { return this.add("fill", "rgba(116,139,218,1)"); }
+  get fCool600() { return this.add("fill", "rgba(115,103,241,1)"); }
+  get fCool700() { return this.add("fill", "rgba(97,85,216,1)"); }
+  get fCool800() { return this.add("fill", "rgba(77,72,186,1)"); }
+  get fCool900() { return this.add("fill", "rgba(59,60,160,1)"); }
+  get fCool1000() { return this.add("fill", "rgba(42,47,135,1)"); }
+  get fCool1100() { return this.add("fill", "rgba(16,27,100,1)"); }
   fill(value: string) { return this.add("fill", value); }
 
   // spacing
