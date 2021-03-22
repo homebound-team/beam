@@ -1,6 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { Button, ButtonProps, Css } from "src/index";
+import { Button, ButtonProps } from "src";
+import { Css } from "src/Css";
 
 export default {
   title: "Components/Buttons",

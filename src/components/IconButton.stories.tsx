@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
+import { IconButton as IconButtonComponent, IconButtonProps, iconButtonStylesHover, Icons } from "src";
 import { Css, px } from "src/Css";
-import { IconButton as IconButtonComponent, IconButtonProps, Icons, iconButtonStylesHover } from "src/index";
 
 export default {
   title: "Components/Icon Button",
