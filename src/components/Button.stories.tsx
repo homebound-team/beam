@@ -9,6 +9,13 @@ export default {
   args: {
     onPress: action("onPress"),
   },
+  argTypes: {
+    autoFocus: { control: false },
+    variant: { control: false },
+    icon: { control: false },
+    size: { control: false },
+    children: { control: false },
+  },
 } as Meta<ButtonProps>;
 
 export function Buttons(args: ButtonProps) {
@@ -17,50 +24,50 @@ export function Buttons(args: ButtonProps) {
       <div>
         <h2>Primary</h2>
         <div>
-          <Button autoFocus {...args}>
+          <Button {...args} autoFocus>
             Primary Button
           </Button>
-          <Button isDisabled {...args}>
+          <Button {...args} isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button size="md" {...args}>
+          <Button {...args} size="md">
             Primary Button
           </Button>
-          <Button size="md" isDisabled {...args}>
+          <Button {...args} size="md" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button size="lg" {...args}>
+          <Button {...args} size="lg">
             Primary Button
           </Button>
-          <Button size="lg" isDisabled {...args}>
+          <Button {...args} size="lg" isDisabled {...args}>
             Disabled
           </Button>
         </div>
         <div>
-          <Button icon="plus" {...args}>
+          <Button {...args} icon="plus">
             Primary Button
           </Button>
-          <Button isDisabled icon="plus" {...args}>
+          <Button {...args} isDisabled icon="plus">
             Disabled
           </Button>
         </div>
         <div>
-          <Button size="md" icon="plus" {...args}>
+          <Button {...args} size="md" icon="plus">
             Primary Button
           </Button>
-          <Button size="md" isDisabled icon="plus" {...args}>
+          <Button {...args} size="md" isDisabled icon="plus">
             Disabled
           </Button>
         </div>
         <div>
-          <Button size="lg" icon="plus" {...args}>
+          <Button {...args} size="lg" icon="plus">
             Primary Button
           </Button>
-          <Button size="lg" isDisabled icon="plus" {...args}>
+          <Button {...args} size="lg" isDisabled icon="plus">
             Disabled
           </Button>
         </div>
@@ -69,50 +76,50 @@ export function Buttons(args: ButtonProps) {
       <div>
         <h2>Secondary</h2>
         <div>
-          <Button variant="secondary" {...args}>
+          <Button {...args} variant="secondary">
             Secondary Button
           </Button>
-          <Button variant="secondary" isDisabled {...args}>
+          <Button {...args} variant="secondary" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button size="md" variant="secondary" {...args}>
+          <Button {...args} size="md" variant="secondary">
             Secondary Button
           </Button>
-          <Button size="md" variant="secondary" isDisabled {...args}>
+          <Button {...args} size="md" variant="secondary" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button size="lg" variant="secondary" {...args}>
+          <Button {...args} size="lg" variant="secondary">
             Secondary Button
           </Button>
-          <Button size="lg" variant="secondary" isDisabled {...args}>
+          <Button {...args} size="lg" variant="secondary" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button icon="plus" variant="secondary" {...args}>
+          <Button {...args} icon="plus" variant="secondary">
             Secondary Button
           </Button>
-          <Button icon="plus" variant="secondary" isDisabled {...args}>
+          <Button {...args} icon="plus" variant="secondary" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button icon="plus" size="md" variant="secondary" {...args}>
+          <Button {...args} icon="plus" size="md" variant="secondary">
             Secondary Button
           </Button>
-          <Button icon="plus" size="md" variant="secondary" isDisabled {...args}>
+          <Button {...args} icon="plus" size="md" variant="secondary" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button icon="plus" size="lg" variant="secondary" {...args}>
+          <Button {...args} icon="plus" size="lg" variant="secondary">
             Secondary Button
           </Button>
-          <Button icon="plus" size="lg" variant="secondary" isDisabled {...args}>
+          <Button {...args} icon="plus" size="lg" variant="secondary" isDisabled>
             Disabled
           </Button>
         </div>
@@ -121,18 +128,18 @@ export function Buttons(args: ButtonProps) {
       <div>
         <h2>Tertiary</h2>
         <div>
-          <Button variant="tertiary" {...args}>
+          <Button {...args} variant="tertiary">
             Tertiary Button
           </Button>
-          <Button variant="tertiary" isDisabled {...args}>
+          <Button {...args} variant="tertiary" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button icon="plus" variant="tertiary" {...args}>
+          <Button {...args} icon="plus" variant="tertiary">
             Tertiary Button
           </Button>
-          <Button icon="plus" variant="tertiary" isDisabled {...args}>
+          <Button {...args} icon="plus" variant="tertiary" isDisabled>
             Disabled
           </Button>
         </div>
@@ -141,50 +148,50 @@ export function Buttons(args: ButtonProps) {
       <div>
         <h2>Danger!</h2>
         <div>
-          <Button variant="danger" {...args}>
+          <Button {...args} variant="danger">
             Danger Button
           </Button>
-          <Button variant="danger" isDisabled {...args}>
+          <Button {...args} variant="danger" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button size="md" variant="danger" {...args}>
+          <Button {...args} size="md" variant="danger">
             Danger Button
           </Button>
-          <Button size="md" variant="danger" isDisabled {...args}>
+          <Button {...args} size="md" variant="danger" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button size="lg" variant="danger" {...args}>
+          <Button {...args} size="lg" variant="danger">
             Danger Button
           </Button>
-          <Button size="lg" variant="danger" isDisabled {...args}>
+          <Button {...args} size="lg" variant="danger" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button icon="trash" variant="danger" {...args}>
+          <Button {...args} icon="trash" variant="danger">
             Danger Button
           </Button>
-          <Button icon="trash" variant="danger" isDisabled {...args}>
+          <Button {...args} icon="trash" variant="danger" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button icon="trash" size="md" variant="danger" {...args}>
+          <Button {...args} icon="trash" size="md" variant="danger">
             Danger Button
           </Button>
-          <Button icon="trash" size="md" variant="danger" isDisabled {...args}>
+          <Button {...args} icon="trash" size="md" variant="danger" isDisabled>
             Disabled
           </Button>
         </div>
         <div>
-          <Button icon="trash" size="lg" variant="danger" {...args}>
+          <Button {...args} icon="trash" size="lg" variant="danger">
             Danger Button
           </Button>
-          <Button icon="trash" size="lg" variant="danger" isDisabled {...args}>
+          <Button {...args} icon="trash" size="lg" variant="danger" isDisabled>
             Disabled
           </Button>
         </div>

@@ -1,10 +1,10 @@
-import type { AriaButtonProps } from "@react-types/button";
 import { useMemo, useRef } from "react";
 import { useButton, useFocusRing } from "react-aria";
 import { Icon, IconProps } from "src";
 import { Css } from "src/Css";
+import { BeamButtonWithChildrenProps, BeamFocusableProps } from "src/interfaces";
 
-export interface ButtonProps extends AriaButtonProps {
+export interface ButtonProps extends BeamButtonWithChildrenProps, BeamFocusableProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: IconProps["icon"];
