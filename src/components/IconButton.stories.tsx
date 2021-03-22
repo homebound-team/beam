@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { Css, px } from "src/Css";
-import { IconButton as IconButtonComponent, IconButtonProps, Icons, stylesHover } from "src/index";
+import { IconButton as IconButtonComponent, IconButtonProps, Icons, iconButtonStylesHover } from "src/index";
 
 export default {
   title: "Components/Icon Button",
@@ -16,6 +16,12 @@ export default {
         type: "select",
         options: Object.keys(Icons),
       },
+    },
+  },
+  parameters: {
+    // To better view the icon hover state
+    backgrounds: {
+      default: "white",
     },
   },
 } as Meta<IconButtonProps>;
@@ -47,7 +53,7 @@ export const IconButton = (args: IconButtonProps) => (
 /** Hover styled version of the IconButton */
 function HoveredIconButton(args: IconButtonProps) {
   return (
-    <div css={{ button: stylesHover }}>
+    <div css={{ button: iconButtonStylesHover }}>
       <IconButtonComponent {...args} />
     </div>
   );

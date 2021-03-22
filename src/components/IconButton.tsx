@@ -1,11 +1,11 @@
 import { useButton } from "@react-aria/button";
-import type { AriaButtonProps } from "@react-types/button";
+import type { AriaButtonProps, LinkButtonProps } from "@react-types/button";
 import { useMemo, useRef } from "react";
 import { useFocusRing, useHover } from "react-aria";
 import { Css, Palette } from "src/Css";
 import { Icon, IconProps } from "./Icon";
 
-export interface IconButtonProps extends Omit<AriaButtonProps, "children"> {
+export interface IconButtonProps extends Omit<AriaButtonProps, "children" | keyof LinkButtonProps> {
   // The icon to use within the button
   icon: IconProps["icon"];
 }
@@ -19,10 +19,10 @@ export function IconButton(props: IconButtonProps) {
 
   const styles = useMemo(
     () => ({
-      ...stylesReset,
-      ...(isHovered && stylesHover),
-      ...(isFocusVisible && stylesFocus),
-      ...(isDisabled && stylesDisabled),
+      ...iconButtonStylesReset,
+      ...(isHovered && iconButtonStylesHover),
+      ...(isFocusVisible && iconButtonStylesFocus),
+      ...(isDisabled && iconButtonStylesDisabled),
     }),
     [isHovered, isFocusVisible, isDisabled],
   );
@@ -35,7 +35,8 @@ export function IconButton(props: IconButtonProps) {
   );
 }
 
-const stylesReset = Css.hPx(28).wPx(28).p0.br8.bTransparent.bw2.bgTransparent.cursorPointer.outline0.transition.$;
-export const stylesHover = Css.bgCoolGray100.$;
-const stylesFocus = Css.bSky500.$;
-const stylesDisabled = Css.cursorNotAllowed.$;
+const iconButtonStylesReset = Css.hPx(28).wPx(28).p0.br8.bTransparent.bw2.bgTransparent.cursorPointer.outline0
+  .transition.$;
+export const iconButtonStylesHover = Css.bgCoolGray100.$;
+const iconButtonStylesFocus = Css.bSky500.$;
+const iconButtonStylesDisabled = Css.cursorNotAllowed.$;
