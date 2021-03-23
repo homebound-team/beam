@@ -22,7 +22,6 @@ export interface BeamTextFieldProps {
   label?: string;
   onChange?: (value: string) => void;
   value?: string;
-  defaultValue?: string;
   autoFocus?: boolean;
   disabled?: boolean;
   readOnly?: boolean;

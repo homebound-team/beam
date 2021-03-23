@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { TextField } from "src/components/TextField";
+import { TextField, TextFieldProps } from "src/components/TextField";
 import { Css } from "src/Css";
 
 export default {
@@ -13,29 +13,43 @@ export function TextFields() {
     <div css={Css.df.justifyAround.$}>
       <div>
         <h1 css={Css.lg.mb2.$}>Regular</h1>
-        <TextField />
+        <StatefulTextField />
         <br />
-        <TextField label="Name" />
+        <StatefulTextField label="Name" />
         <br />
-        <TextField label="Name" defaultValue="Brandon" autoFocus />
+        <StatefulTextField label="Name" value="Brandon" autoFocus />
         <br />
-        <TextField label="Name" defaultValue="Brandon" disabled />
+        <StatefulTextField label="Name" value="Brandon" disabled />
         <br />
         <ValidationTextField value="not a valid email" />
       </div>
       <div>
         <h1 css={Css.lg.mb2.$}>Small</h1>
-        <TextField compact />
+        <StatefulTextField compact />
         <br />
-        <TextField compact label="Name" />
+        <StatefulTextField compact label="Name" />
         <br />
-        <TextField compact label="Name" defaultValue="Brandon" />
+        <StatefulTextField compact label="Name" value="Brandon" />
         <br />
-        <TextField compact label="Name" defaultValue="Brandon" disabled />
+        <StatefulTextField compact label="Name" value="Brandon" disabled />
         <br />
         <ValidationTextField value="not a valid email" />
       </div>
     </div>
+  );
+}
+
+function StatefulTextField(props: TextFieldProps) {
+  const { value, disabled, compact, label } = props;
+  const [internalValue, setValue] = useState(value);
+  return (
+    <TextField
+      compact={compact}
+      label={label}
+      disabled={disabled}
+      value={internalValue}
+      onChange={(val) => setValue(val)}
+    />
   );
 }
 

@@ -16,13 +16,9 @@ export function TextAreas() {
         <br />
         <StatefulTextArea label="Description" />
         <br />
-        <StatefulTextArea label="Description" defaultValue="An example description text." autoFocus />
+        <StatefulTextArea label="Description" value="An example description text." autoFocus />
         <br />
-        <StatefulTextArea
-          label="Description"
-          defaultValue="This is a description that can no longer be edited."
-          disabled
-        />
+        <StatefulTextArea label="Description" value="This is a description that can no longer be edited." disabled />
         <br />
         <ValidationTextArea value="Not enough characters" />
       </div>
@@ -31,12 +27,12 @@ export function TextAreas() {
         <br />
         <StatefulTextArea wide label="Description" />
         <br />
-        <StatefulTextArea wide label="Description" defaultValue="An example description text." />
+        <StatefulTextArea wide label="Description" value="An example description text." />
         <br />
         <StatefulTextArea
           wide
           label="Description"
-          defaultValue="This is a description that can no longer be edited."
+          value="This is a description that can no longer be edited."
           disabled
         />
         <br />
@@ -47,8 +43,17 @@ export function TextAreas() {
 }
 
 function StatefulTextArea(props: TextAreaProps) {
-  const [value, setValue] = useState(props.defaultValue);
-  return <TextAreaField wide={props.wide} label={props.label} value={value} onChange={(val) => setValue(val)} />;
+  const { value, disabled, wide, label } = props;
+  const [internalValue, setValue] = useState(value);
+  return (
+    <TextAreaField
+      wide={wide}
+      label={label}
+      disabled={disabled}
+      value={internalValue}
+      onChange={(val) => setValue(val)}
+    />
+  );
 }
 
 function ValidationTextArea({ wide, value }: { wide?: boolean; value: string }) {

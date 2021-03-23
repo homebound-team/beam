@@ -3,7 +3,8 @@ import React, { useRef } from "react";
 import { TextFieldBase } from "src/components/TextFieldBase";
 import { BeamTextFieldProps } from "src/interfaces";
 
-interface TextFieldProps extends BeamTextFieldProps {
+// exported for testing purposes
+export interface TextFieldProps extends BeamTextFieldProps {
   compact?: boolean;
 }
 
