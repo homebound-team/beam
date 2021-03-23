@@ -1,10 +1,11 @@
 import { useMemo, useRef } from "react";
-import { useButton, useFocusRing } from "react-aria";
+import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src";
 import { Css } from "src/Css";
-import { BeamButtonWithChildrenProps, BeamFocusableProps } from "src/interfaces";
+import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 
-export interface ButtonProps extends BeamButtonWithChildrenProps, BeamFocusableProps {
+export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
+  label: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: IconProps["icon"];
@@ -12,63 +13,85 @@ export interface ButtonProps extends BeamButtonWithChildrenProps, BeamFocusableP
 
 export function Button({ onClick: onPress, disabled: isDisabled, ...otherProps }: ButtonProps) {
   const ariaProps = { onPress, isDisabled, ...otherProps };
-  const { children, icon, variant = "primary", size = "sm" } = ariaProps;
+  const { label, icon, variant = "primary", size = "sm" } = ariaProps;
   const ref = useRef(null);
-  const { buttonProps } = useButton(ariaProps, ref);
+  const { buttonProps, isPressed } = useButton(ariaProps, ref);
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
-  const buttonStyles = useMemo(() => getButtonStyles(variant, size), [variant, size]);
-  const focusRingStyles = useMemo(() => (variant === "danger" ? dangerFocusRingStyles : defaultFocusRingStyles), [
+  const { hoverProps, isHovered } = useHover(ariaProps);
+  const { baseStyles, hoverStyles, disabledStyles, pressedStyles } = useMemo(() => getButtonStyles(variant, size), [
     variant,
+    size,
   ]);
+  const focusRingStyles = useMemo(() => (variant === "danger" ? Css.bshDanger.$ : Css.bshFocus.$), [variant]);
 
   return (
     <button
       ref={ref}
       {...buttonProps}
       {...focusProps}
-      css={{ ...buttonReset, ...buttonStyles, ...(isFocusVisible ? focusRingStyles : {}) }}
+      {...hoverProps}
+      css={{
+        ...buttonReset,
+        ...baseStyles,
+        ...(isHovered && !isPressed ? hoverStyles : {}),
+        ...(isPressed ? pressedStyles : {}),
+        ...(isDisabled ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
+        ...(isFocusVisible ? focusRingStyles : {}),
+      }}
     >
       {icon && <Icon xss={iconStyles[size]} icon={icon} />}
-      {children}
+      {label}
     </button>
   );
 }
 
-const buttonReset = Css.p0.bsNone.cursorPointer.smEm.br4.dif.itemsCenter.outline0.transition
-  .mPx(4)
-  .add("font", "inherit")
-  .add("boxSizing", "border-box").$;
-const disabledStyles = Css.add("cursor", "not-allowed").$;
-const defaultFocusRingStyles = Css.bshFocus.$;
-const dangerFocusRingStyles = Css.bshDanger.$;
+function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {
+  // Handling tertiary separately as it only supports a single size button. The size it supports does not match styles of other buttons.
+  if (variant === "tertiary") {
+    return {
+      ...variantStyles.tertiary,
+      baseStyles: { ...variantStyles.tertiary.baseStyles, ...Css.hPx(40).px1.$ },
+    };
+  }
 
-const variantStyles: Record<ButtonVariant, {}> = {
+  return {
+    ...variantStyles[variant],
+    baseStyles: { ...variantStyles[variant].baseStyles, ...sizeStyles[size] },
+  };
+}
+
+const buttonReset = Css.smEm.br4.dif.itemsCenter.outline0.transition.mPx(4).$;
+
+const variantStyles: Record<
+  ButtonVariant,
+  { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; pressedStyles: {} }
+> = {
   primary: {
-    ...Css.bgSky500.white.$,
-    "&:hover:not(:disabled)": Css.bgSky700.$,
-    "&:disabled": { ...disabledStyles, ...Css.bgSky200.$ },
-    "&:active:not(:disabled)": Css.bgSky900.$,
+    baseStyles: Css.bgSky500.white.$,
+    hoverStyles: Css.bgSky700.$,
+    disabledStyles: Css.bgSky200.$,
+    pressedStyles: Css.bgSky900.$,
   },
 
   secondary: {
-    ...Css.bgWhite.bCoolGray300.bw1.ba.coolGray900.$,
-    "&:hover:not(:disabled):not(:active)": Css.bgCoolGray50.$,
-    "&:disabled": { ...disabledStyles, ...Css.bgWhite.coolGray300.$ },
-    "&:active:not(:disabled)": Css.bgCoolGray200.$,
+    baseStyles: Css.bgWhite.bCoolGray300.bw1.ba.coolGray900.$,
+    hoverStyles: Css.bgCoolGray50.$,
+    disabledStyles: Css.bgWhite.coolGray300.$,
+    pressedStyles: Css.bgCoolGray200.$,
   },
 
   tertiary: {
-    ...Css.add("background", "none").sky500.$,
-    "&:hover:not(:disabled)": Css.bgCoolGray100.$,
-    "&:disabled": { ...disabledStyles, ...Css.coolGray300.$ },
-    "&:active:not(:disabled)": Css.sky900.$,
+    baseStyles: Css.add("background", "none").sky500.$,
+    hoverStyles: Css.bgCoolGray100.$,
+    disabledStyles: Css.coolGray300.$,
+    pressedStyles: Css.sky900.bgCoolGray100.$,
   },
 
   danger: {
-    ...Css.bgCoral600.white.$,
-    "&:hover:not(:disabled)": Css.bgCoral500.$,
-    "&:disabled": { ...disabledStyles, ...Css.bgCoral200.$ },
-    "&:active:not(:disabled)": Css.bgCoral700.$,
+    baseStyles: Css.bgCoral600.white.$,
+    hoverStyles: Css.bgCoral500.$,
+    disabledStyles: Css.bgCoral200.$,
+    pressedStyles: Css.bgCoral700.$,
   },
 };
 
@@ -83,21 +106,6 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
   md: Css.mr1.$,
   lg: Css.mrPx(10).$,
 };
-
-function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {
-  // Handling tertiary separately as it only supports a single size button. The size it supports does not match styles of other buttons.
-  if (variant === "tertiary") {
-    return {
-      ...Css.hPx(40).px1.$,
-      ...variantStyles.tertiary,
-    };
-  }
-
-  return {
-    ...sizeStyles[size],
-    ...variantStyles[variant],
-  };
-}
 
 type ButtonSize = "sm" | "md" | "lg";
 type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger";
