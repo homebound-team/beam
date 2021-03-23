@@ -1,7 +1,9 @@
-import { ReactNode, useRef, useState } from "react";
+import { ReactNode, useMemo, useRef } from "react";
 import { useRadio, useRadioGroup } from "react-aria";
-import { RadioGroupState } from "react-stately";
+import { RadioGroupState, useRadioGroupState } from "react-stately";
 import { Css, Palette } from "src/Css";
+
+let nextNameId = 0;
 
 export interface RadioFieldOption<K extends string> {
   // testId?: string;
@@ -34,41 +36,31 @@ interface RadioGroupFieldProps<K extends string> {
 export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>) {
   const { label, value, onChange, options, disabled = false } = props;
 
-  // Assume this is unique enough and more deterministic for tests than random ids
-  const name = idize(label);
-  const labelId = `${name}-label`;
-
-  // Instead of calling useRadioState, adapt our props to it, so we can still use useRadioGroup
-  const [lastFocusedValue, setLastFocusedValue] = useState<string | null>(null);
-  const state: RadioGroupState = {
+  // useRadioGroupState uses a random group name, so use our name
+  const name = useMemo(() => `radio-group-${++nextNameId}`, []);
+  const state = useRadioGroupState({
     name,
+    value,
+    onChange: (value) => onChange(value as K),
     isDisabled: disabled,
     isReadOnly: false,
-    selectedValue: value || null,
-    setSelectedValue: onChange,
-    lastFocusedValue,
-    setLastFocusedValue,
-  };
+  });
 
   // We use useRadioGroup b/c it does neat keyboard up/down stuff
-  // TOOD: Pass read only, required, disabled, error message to useRadioGroup
-  const { radioGroupProps } = useRadioGroup(
-    // Tell useRadioGroup to not generate unique ids for these
-    { id: name, name, "aria-labelledby": labelId, isDisabled: disabled },
-    state,
-  );
+  // TOOD: Pass read only, required, error message to useRadioGroup
+  const { labelProps, radioGroupProps } = useRadioGroup({ label, isDisabled: disabled }, state);
 
   // max-width is dependent on having descriptions
   const anyDescriptions = options.some((o) => !!o.description);
 
   return (
     <div css={Css.maxw(anyDescriptions ? "344px" : "320px").$}>
-      <div id={labelId} css={Css.sm.coolGray500.my1.$}>
+      <div css={Css.sm.coolGray500.my1.$} {...labelProps}>
         {label}
       </div>
       <div {...radioGroupProps}>
         {options.map((option) => (
-          <Radio key={option.value} parentId={name} option={option} state={state} />
+          <Radio key={option.value} parentId={state.name} option={option} state={state} />
         ))}
       </div>
     </div>
@@ -172,14 +164,3 @@ export const radioDisabled = {
     .add("backgroundPosition", "center")
     .add("backgroundRepeat", "no-repeat").$,
 };
-
-/**
- * Given a label, makes a "probably good/unique" DOM id.
- *
- * The gist is to provide a better developer UX than always repeating
- * `<Component id=foo label=Foo />` when ~90% of the time we can guess
- * the id.
- */
-function idize(label: string): string {
-  return label.replace(/[^a-zA-Z0-9]/, "").toLowerCase();
-}

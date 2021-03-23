@@ -118,24 +118,24 @@ exports[`RadioGroupField renders with just labels 1`] = `
     >
       <div
         class="emotion-1"
-        id="favoritecheese-label"
+        id="react-aria-2"
       >
         Favorite cheese
       </div>
       <div
-        aria-labelledby="favoritecheese-label"
+        aria-labelledby="react-aria-2"
         aria-orientation="vertical"
-        id="favoritecheese"
+        id="react-aria-1"
         role="radiogroup"
       >
         <label
           class="emotion-2"
         >
           <input
-            aria-labelledby="favoritecheese-a-label"
+            aria-labelledby="radio-group-1-a-label"
             checked=""
             class="emotion-3"
-            name="favoritecheese"
+            name="react-aria-3"
             tabindex="0"
             type="radio"
             value="a"
@@ -143,7 +143,7 @@ exports[`RadioGroupField renders with just labels 1`] = `
           <div>
             <div
               class="emotion-4"
-              id="favoritecheese-a-label"
+              id="radio-group-1-a-label"
             >
               Asiago
             </div>
@@ -153,9 +153,9 @@ exports[`RadioGroupField renders with just labels 1`] = `
           class="emotion-2"
         >
           <input
-            aria-labelledby="favoritecheese-b-label"
+            aria-labelledby="radio-group-1-b-label"
             class="emotion-6"
-            name="favoritecheese"
+            name="react-aria-3"
             tabindex="0"
             type="radio"
             value="b"
@@ -163,7 +163,7 @@ exports[`RadioGroupField renders with just labels 1`] = `
           <div>
             <div
               class="emotion-4"
-              id="favoritecheese-b-label"
+              id="radio-group-1-b-label"
             >
               Burratta
             </div>
@@ -300,24 +300,24 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
     >
       <div
         class="emotion-1"
-        id="favoritecheese-label"
+        id="react-aria-5"
       >
         Favorite cheese
       </div>
       <div
-        aria-labelledby="favoritecheese-label"
+        aria-labelledby="react-aria-5"
         aria-orientation="vertical"
-        id="favoritecheese"
+        id="react-aria-4"
         role="radiogroup"
       >
         <label
           class="emotion-2"
         >
           <input
-            aria-labelledby="favoritecheese-a-label"
+            aria-labelledby="radio-group-2-a-label"
             checked=""
             class="emotion-3"
-            name="favoritecheese"
+            name="react-aria-6"
             tabindex="0"
             type="radio"
             value="a"
@@ -325,7 +325,7 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
           <div>
             <div
               class="emotion-4"
-              id="favoritecheese-a-label"
+              id="radio-group-2-a-label"
             >
               Asiago
             </div>
@@ -335,24 +335,24 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
           class="emotion-2"
         >
           <input
-            aria-labelledby="favoritecheese-b-label"
+            aria-labelledby="radio-group-2-b-label"
             class="emotion-6"
-            name="favoritecheese"
+            name="react-aria-6"
             tabindex="0"
             type="radio"
             value="b"
           />
           <div>
             <div
-              aria-describedby="favoritecheese-b-description"
+              aria-describedby="radio-group-2-b-description"
               class="emotion-4"
-              id="favoritecheese-b-label"
+              id="radio-group-2-b-label"
             >
               Burratta
             </div>
             <div
               class="emotion-8"
-              id="favoritecheese-b-description"
+              id="radio-group-2-b-description"
             >
               Burrata is an Italian cow milk cheese made from mozzarella and cream.
             </div>
