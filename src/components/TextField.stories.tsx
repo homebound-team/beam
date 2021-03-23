@@ -24,7 +24,7 @@ export function TextFields() {
         <ValidationTextField value="not a valid email" />
       </div>
       <div>
-        <h1 css={Css.lg.mb2.$}>Small</h1>
+        <h1 css={Css.lg.mb2.$}>Compact</h1>
         <StatefulTextField compact />
         <br />
         <StatefulTextField compact label="Name" />
@@ -33,7 +33,7 @@ export function TextFields() {
         <br />
         <StatefulTextField compact label="Name" value="Brandon" disabled />
         <br />
-        <ValidationTextField value="not a valid email" />
+        <ValidationTextField compact value="not a valid email" />
       </div>
     </div>
   );

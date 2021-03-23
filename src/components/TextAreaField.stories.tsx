@@ -23,7 +23,7 @@ export function TextAreas() {
         <ValidationTextArea value="Not enough characters" />
       </div>
       <div>
-        <StatefulTextArea />
+        <StatefulTextArea wide />
         <br />
         <StatefulTextArea wide label="Description" />
         <br />
