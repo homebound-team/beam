@@ -9,24 +9,26 @@ export default {
 
 export function Checkboxes() {
   return (
-    <div css={Css.df.flexColumn.$}>
+    <div css={Css.dg.gap2.$}>
       <div>
-        <h2>Basic Checkboxes</h2>
-        <div css={Css.dg.gap2.$}>
+        <h2 css={Css.mb1.$}>Basic Checkboxes</h2>
+        <div css={Css.dg.gap1.$}>
           <Checkbox aria-label="default" onChange={() => {}} label="Default" />
-          <Checkbox aria-label="selected" isSelected onChange={() => {}} label="Selected" />
-          <Checkbox aria-label="selected" autoFocus isSelected label="Selected/Focused" />
-          <Checkbox aria-label="indeterminate" isIndeterminate label="Indeterminate" />
-          <Checkbox aria-label="disabled" isDisabled label="Disabled" />
+          <Checkbox aria-label="selected" selected onChange={() => {}} label="Selected" />
+          <Checkbox aria-label="selected" autoFocus selected label="Selected/Focused" />
+          <Checkbox aria-label="indeterminate" indeterminate label="Indeterminate" />
+          <Checkbox aria-label="disabled" disabled label="Disabled" />
         </div>
       </div>
-      <h2>Checkbox with Label and Description</h2>
-      <div css={Css.gap2.dg.$}>
-        <Checkbox
-          onChange={() => {}}
-          description="Get notified when someone posts a comment on a posting"
-          label="Comments"
-        />
+      <div>
+        <h2 css={Css.mb1.$}>Checkbox with Label and Description</h2>
+        <div>
+          <Checkbox
+            onChange={() => {}}
+            description="Get notified when someone posts a comment on a posting"
+            label="Comments"
+          />
+        </div>
       </div>
     </div>
   );

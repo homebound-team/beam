@@ -9,27 +9,30 @@ import { BeamFocusableProps } from "src/interfaces";
 interface CheckboxProps extends BeamFocusableProps {
   /** Additional text displayed below label */
   description?: string;
-  isDisabled?: boolean;
+  disabled?: boolean;
   /**
    * Indeterminism is presentational only.
    * The indeterminate visual representation remains regardless of user interaction.
    */
-  isIndeterminate?: boolean;
-  isSelected?: boolean;
+  indeterminate?: boolean;
+  selected?: boolean;
   label?: string;
   /** Handler that is called when the element's selection state changes. */
-  onChange?: (isSelected: boolean) => void;
+  onChange?: (selected: boolean) => void;
   value?: string;
 }
 
 export function Checkbox(props: CheckboxProps) {
-  const { label, isIndeterminate = false, isDisabled = false, description } = props;
+  const { label, indeterminate = false, disabled = false, description } = props;
   const ref = useRef(null);
-  const state = useToggleState(props);
-  const { isSelected } = state;
+
+  // useToggleState requires variable name `isSelected`
+  const state = useToggleState({ ...props, isSelected: props.selected });
+  const selected = state.isSelected;
+
   const { inputProps } = useCheckbox(props, state, ref);
   const { isFocusVisible, focusProps } = useFocusRing(props);
-  const markIcon = isIndeterminate ? dashSmall : isSelected ? checkmarkSmall : "";
+  const markIcon = indeterminate ? dashSmall : selected ? checkmarkSmall : "";
 
   return (
     <div>
@@ -39,13 +42,13 @@ export function Checkbox(props: CheckboxProps) {
         </VisuallyHidden>
         <span
           css={{
-            ...checkboxStyles({ isDisabled, isSelected, isIndeterminate }),
+            ...checkboxStyles({ disabled, selected, indeterminate }),
             ...(isFocusVisible && focusRingStyles),
           }}
           aria-hidden="true"
         ></span>
         <span css={markStyles}>{markIcon}</span>
-        {label && <div css={labelStyles(isDisabled)}>{label}</div>}
+        {label && <div css={labelStyles(disabled)}>{label}</div>}
       </label>
       {description && <div css={descStyles}>{description}</div>}
     </div>
@@ -53,22 +56,22 @@ export function Checkbox(props: CheckboxProps) {
 }
 
 interface ICheckboxStyles {
-  isDisabled: boolean;
-  isSelected: boolean;
-  isIndeterminate: boolean;
+  disabled: boolean;
+  selected: boolean;
+  indeterminate: boolean;
 }
 
-function checkboxStyles({ isDisabled, isSelected, isIndeterminate }: ICheckboxStyles) {
+function checkboxStyles({ disabled, selected, indeterminate }: ICheckboxStyles) {
   return Css.add("boxSizing", "border-box")
     .hPx(16)
     .wPx(16)
-    .cursorPointer.ba.bCoolGray300.br4.bgWhite.if(isSelected || isIndeterminate)
-    .bSky500.bgSky500.if(isDisabled).bCoolGray300.bgCoolGray100.cursorNotAllowed.$;
+    .cursorPointer.ba.bCoolGray300.br4.bgWhite.if(selected || indeterminate)
+    .bSky500.bgSky500.if(disabled).bCoolGray300.bgCoolGray100.cursorNotAllowed.$;
 }
 const focusRingStyles = Css.bshFocus.$;
 const markStyles = { ...Css.relative.cursorPointer.$, "& svg": Css.absolute.topPx(-8).rightPx(0).$ };
-function labelStyles(isDisabled: boolean) {
-  return Css.pl1.sm.if(isDisabled).coolGray300.$;
+function labelStyles(disabled: boolean) {
+  return Css.pl1.sm.if(disabled).coolGray300.$;
 }
 const descStyles = Css.pl3.sm.coolGray500.maxw(px(312)).$;
 
