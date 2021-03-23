@@ -1,35 +1,39 @@
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { Textarea } from "src/components/Textarea";
+import { TextAreaField } from "src/components/TextAreaField";
 import { Css } from "src/Css";
 
 export default {
-  component: Textarea,
-  title: "Components/Textareas",
+  component: TextAreaField,
+  title: "Components/Text Areas",
 } as Meta;
 
-export function Textareas() {
+export function TextAreas() {
   return (
     <div css={Css.df.justifyAround.$}>
       <div>
-        <Textarea />
+        <TextAreaField />
         <br />
-        <Textarea label="Description" />
+        <TextAreaField label="Description" />
         <br />
-        <Textarea label="Description" defaultValue="An example description text." autoFocus />
+        <TextAreaField label="Description" defaultValue="An example description text." autoFocus />
         <br />
-        <Textarea label="Description" defaultValue="This is a description that can no longer be edited." disabled />
+        <TextAreaField
+          label="Description"
+          defaultValue="This is a description that can no longer be edited."
+          disabled
+        />
         <br />
         <ValidationTextarea value="Not enough characters" />
       </div>
       <div>
-        <Textarea />
+        <TextAreaField />
         <br />
-        <Textarea wide label="Description" />
+        <TextAreaField wide label="Description" />
         <br />
-        <Textarea wide label="Description" defaultValue="An example description text." />
+        <TextAreaField wide label="Description" defaultValue="An example description text." />
         <br />
-        <Textarea
+        <TextAreaField
           wide
           label="Description"
           defaultValue="This is a description that can no longer be edited."
@@ -47,7 +51,7 @@ function ValidationTextarea({ wide, value }: { wide?: boolean; value: string }) 
   const isValid = useMemo(() => internalValue.length >= 50, [internalValue]);
 
   return (
-    <Textarea
+    <TextAreaField
       wide={wide}
       label="Description"
       value={internalValue}

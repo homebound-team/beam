@@ -8,7 +8,8 @@ interface TextareaProps extends BeamTextFieldProps {
   wide?: boolean;
 }
 
-export function Textarea(props: TextareaProps) {
+/** Returns a <textarea /> element that auto-adjusts height based on the field's value */
+export function TextAreaField(props: TextareaProps) {
   const { onChange, disabled: isDisabled = false, readOnly: isReadOnly = false, ...otherProps } = props;
   const textFieldProps = { ...otherProps, isDisabled, isReadOnly };
   const [inputValue, setInputValue] = useState(props.value || props.defaultValue);

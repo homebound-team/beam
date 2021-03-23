@@ -1,11 +1,5 @@
 import { mergeProps } from "@react-aria/utils";
-import React, {
-  InputHTMLAttributes,
-  LabelHTMLAttributes,
-  MutableRefObject,
-  TextareaHTMLAttributes,
-  useMemo,
-} from "react";
+import React, { InputHTMLAttributes, LabelHTMLAttributes, MutableRefObject, TextareaHTMLAttributes } from "react";
 import { Icon } from "src/components/Icon";
 import { Css, Palette, px } from "src/Css";
 import { BeamTextFieldProps } from "src/interfaces";
@@ -15,16 +9,16 @@ interface TextFieldBaseProps extends Pick<BeamTextFieldProps, "label" | "errorMs
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
   inputRef?: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>;
   multiline?: boolean;
-  isSmall?: boolean;
+  compact?: boolean;
   wide?: boolean;
 }
 
 export function TextFieldBase(props: TextFieldBaseProps) {
-  const { label, labelProps, inputProps, inputRef, isSmall = false, errorMsg, multiline = false, wide = false } = props;
+  const { label, labelProps, inputProps, inputRef, compact = false, errorMsg, multiline = false, wide = false } = props;
   const errorMessageId = `${inputProps.id}-error`;
 
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
-  const width = useMemo(() => (wide ? 550 : 320), [wide]);
+  const width = wide ? 550 : 320;
 
   return (
     <div css={Css.df.flexColumn.wPx(width).$}>
@@ -40,7 +34,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
           ...Css.add("resize", "none")
             .wPx(width)
             .sm.px1.pyPx(10)
-            .coolGray900.br4.outline0.ba.bCoolGray300.if(isSmall)
+            .coolGray900.br4.outline0.ba.bCoolGray300.if(compact)
             .pyPx(6).$,
           ...Css.if(multiline).mh(px(120)).$,
           "&:focus": Css.bSky500.$,

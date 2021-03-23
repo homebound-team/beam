@@ -4,7 +4,7 @@ import { TextFieldBase } from "src/components/TextFieldBase";
 import { BeamTextFieldProps } from "src/interfaces";
 
 interface TextFieldProps extends BeamTextFieldProps {
-  isSmall?: boolean;
+  compact?: boolean;
 }
 
 export function TextField(props: TextFieldProps) {

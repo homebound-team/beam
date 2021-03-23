@@ -25,13 +25,13 @@ export function TextFields() {
       </div>
       <div>
         <h1 css={Css.lg.mb2.$}>Small</h1>
-        <TextField isSmall />
+        <TextField compact />
         <br />
-        <TextField isSmall label="Name" />
+        <TextField compact label="Name" />
         <br />
-        <TextField isSmall label="Name" defaultValue="Brandon" />
+        <TextField compact label="Name" defaultValue="Brandon" />
         <br />
-        <TextField isSmall label="Name" defaultValue="Brandon" disabled />
+        <TextField compact label="Name" defaultValue="Brandon" disabled />
         <br />
         <ValidationTextField value="not a valid email" />
       </div>
@@ -39,13 +39,13 @@ export function TextFields() {
   );
 }
 
-function ValidationTextField({ isSmall, value }: { isSmall?: boolean; value: string }) {
+function ValidationTextField({ compact, value }: { compact?: boolean; value: string }) {
   const [internalValue, setValue] = useState(value);
   const isValid = useMemo(() => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(internalValue), [internalValue]);
 
   return (
     <TextField
-      isSmall={isSmall}
+      compact={compact}
       label="Email"
       value={internalValue}
       onChange={(val) => setValue(val)}
