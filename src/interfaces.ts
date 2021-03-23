@@ -1,4 +1,5 @@
 import type { PressEvent } from "@react-types/shared";
+import { IconProps } from "src/components/Icon";
 
 export interface BeamFocusableProps {
   /** Whether the element should receive focus on render. */
@@ -20,4 +21,14 @@ export interface BeamTextFieldProps {
   disabled?: boolean;
   readOnly?: boolean;
   errorMsg?: string;
+}
+
+export interface BeamButtonGroupProps {
+  disabled?: boolean;
+  buttons: BeamButtonGroupButtonProps[];
+}
+
+export interface BeamButtonGroupButtonProps extends BeamButtonProps, BeamFocusableProps {
+  text?: string;
+  icon?: IconProps["icon"];
 }

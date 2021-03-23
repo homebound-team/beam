@@ -24,7 +24,7 @@ export function ButtonGroups() {
         ]}/>
       </div>
       <div>
-        <ButtonGroup isDisabled buttons={[
+        <ButtonGroup disabled buttons={[
           {text: "Leading"},
           {text: "Middle"},
           {text: "Trailing"},

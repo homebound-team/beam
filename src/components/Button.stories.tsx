@@ -18,7 +18,7 @@ export default {
 
 export function Buttons(args: ButtonProps) {
   return (
-    <div css={Css.dg.gtc("repeat(4, auto)").$}>
+    <div css={Css.dg.$}>
       <div>
         <h2>Primary</h2>
         <div>

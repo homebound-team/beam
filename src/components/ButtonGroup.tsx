@@ -1,35 +1,25 @@
 import React, { useRef } from "react";
-import { AriaButtonProps } from "@react-types/button";
-import { Css, Palette } from "src/Css";
+import { Css } from "src/Css";
 import { useButton, useFocusRing } from "react-aria";
-import { Icon, IconProps } from "src/components/Icon";
+import { Icon } from "src/components/Icon";
+import { BeamButtonGroupProps, BeamButtonGroupButtonProps } from "src/interfaces"
 
-interface ButtonGroupProps extends AriaButtonProps {
-  isDisabled?: boolean;
-  buttons: ButtonGroupButtonProps[];
-}
-
-export function ButtonGroup(props: ButtonGroupProps) {
-  const { buttons, isDisabled = false } = props;
+export function ButtonGroup(props: BeamButtonGroupProps) {
+  const { buttons, disabled = false } = props;
   return (
     <div css={Css.mPx(4).$}>
-      { buttons.map((b) => <ButtonGroupButton {...{...b, isDisabled} } />) }
+      { buttons.map((b, i) => <ButtonGroupButton key={i} {...{...b, disabled} } />) }
     </div>
   );
 }
 
-interface ButtonGroupButtonProps extends AriaButtonProps {
-  text?: string;
-  icon?: IconProps["icon"];
-}
-
-export function ButtonGroupButton(props: ButtonGroupButtonProps) {
-  const { icon, text } = props;
+export function ButtonGroupButton(props: BeamButtonGroupButtonProps) {
+  const { icon, text, onClick: onPress, disabled, ...otherProps } = props;
+  const ariaProps = { onPress, isDisabled: disabled, ...otherProps };
   const ref = useRef(null);
-  const { buttonProps, isPressed } = useButton(props, ref);
-  const { isFocusVisible, focusProps } = useFocusRing(props);
+  const { buttonProps, isPressed } = useButton(ariaProps, ref);
+  const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const buttonStyles = getButtonStyles();
-  const focusRingStyles = defaultFocusRingStyles;
 
   return (
     <button
@@ -39,28 +29,29 @@ export function ButtonGroupButton(props: ButtonGroupButtonProps) {
       css={{
         ...buttonReset,
         ...buttonStyles,
-        ...(isFocusVisible ? focusRingStyles : {}),
+        ...(isFocusVisible ? defaultFocusRingStyles : {}),
         ...(isPressed ? activeStyles : {}),
+        ...(icon ? iconStyles : {})
       }}
     >
-      {icon && <Icon color="inherit" icon={icon}/>}
+      {icon && <Icon icon={icon}/>}
       {text}
     </button>
   );
 }
 
-const buttonReset = Css.p0.bsNone.cursorPointer.smEm.dif.itemsCenter
+const buttonReset = Css.p0.bsNone.cursorPointer.smEm.dif.itemsCenter.outline0.transition
   .add("font", "inherit")
-  .add("boxSizing", "border-box")
-  .add("outline", "inherit").$;
+  .add("boxSizing", "border-box").$;
 const activeStyles = Css.bgCoolGray200.important.$;
-const defaultFocusRingStyles = Css.relative.z2.add("boxShadow", `0px 0px 0px 2px ${Palette.White}, 0 0 0 4px ${Palette.Sky500}`).$;
+const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
+const iconStyles = Css.px1.$;
 
 function getButtonStyles() {
   return {
-    ...Css.z1.hPx(40).px2.bgWhite.bCoolGray300.bw1.coolGray900.ba.fill(Palette.CoolGray900).$,
+    ...Css.z1.hPx(40).px2.bgWhite.bCoolGray300.bw1.ba.coolGray900.$,
     "&:hover:not(:disabled):not(:active)": Css.bgCoolGray50.$,
-    "&:disabled": Css.bgWhite.coolGray300.fill(Palette.CoolGray300).add("cursor", "not-allowed").$,
+    "&:disabled": Css.coolGray200.cursorNotAllowed.bCoolGray200.$,
     "&:first-of-type": Css.add("borderRadius", "4px 0 0 4px").$,
     "&:last-of-type": Css.add("borderRadius", "0 4px 4px 0").$,
     "&:not(:first-of-type)": Css.mlPx(-1).$,
