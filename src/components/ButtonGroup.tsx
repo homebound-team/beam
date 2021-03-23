@@ -1,10 +1,20 @@
 import React, { useRef } from "react";
 import { Css } from "src/Css";
 import { useButton, useFocusRing } from "react-aria";
-import { Icon } from "src/components/Icon";
-import { BeamButtonGroupProps, BeamButtonGroupButtonProps } from "src/interfaces"
+import { Icon, IconProps } from "src/components/Icon";
+import { BeamButtonProps, BeamFocusableProps } from "src/interfaces"
 
-export function ButtonGroup(props: BeamButtonGroupProps) {
+interface ButtonGroupProps {
+  disabled?: boolean;
+  buttons: ButtonGroupButtonProps[];
+}
+
+interface ButtonGroupButtonProps extends BeamButtonProps, BeamFocusableProps {
+  text?: string;
+  icon?: IconProps["icon"];
+}
+
+export function ButtonGroup(props: ButtonGroupProps) {
   const { buttons, disabled = false } = props;
   return (
     <div css={Css.mPx(4).$}>
@@ -13,7 +23,7 @@ export function ButtonGroup(props: BeamButtonGroupProps) {
   );
 }
 
-export function ButtonGroupButton(props: BeamButtonGroupButtonProps) {
+export function ButtonGroupButton(props: ButtonGroupButtonProps) {
   const { icon, text, onClick: onPress, disabled, ...otherProps } = props;
   const ariaProps = { onPress, isDisabled: disabled, ...otherProps };
   const ref = useRef(null);
