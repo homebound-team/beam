@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { TextAreaField } from "src/components/TextAreaField";
+import { TextAreaField, TextAreaProps } from "src/components/TextAreaField";
 import { Css } from "src/Css";
 
 export default {
@@ -12,41 +12,51 @@ export function TextAreas() {
   return (
     <div css={Css.df.justifyAround.$}>
       <div>
-        <TextAreaField />
+        <StatefulTextArea />
         <br />
-        <TextAreaField label="Description" />
+        <StatefulTextArea label="Description" />
         <br />
-        <TextAreaField label="Description" defaultValue="An example description text." autoFocus />
+        <StatefulTextArea label="Description" value="An example description text." autoFocus />
         <br />
-        <TextAreaField
-          label="Description"
-          defaultValue="This is a description that can no longer be edited."
-          disabled
-        />
+        <StatefulTextArea label="Description" value="This is a description that can no longer be edited." disabled />
         <br />
-        <ValidationTextarea value="Not enough characters" />
+        <ValidationTextArea value="Not enough characters" />
       </div>
       <div>
-        <TextAreaField />
+        <StatefulTextArea />
         <br />
-        <TextAreaField wide label="Description" />
+        <StatefulTextArea wide label="Description" />
         <br />
-        <TextAreaField wide label="Description" defaultValue="An example description text." />
+        <StatefulTextArea wide label="Description" value="An example description text." />
         <br />
-        <TextAreaField
+        <StatefulTextArea
           wide
           label="Description"
-          defaultValue="This is a description that can no longer be edited."
+          value="This is a description that can no longer be edited."
           disabled
         />
         <br />
-        <ValidationTextarea wide value="Not enough characters" />
+        <ValidationTextArea wide value="Not enough characters" />
       </div>
     </div>
   );
 }
 
-function ValidationTextarea({ wide, value }: { wide?: boolean; value: string }) {
+function StatefulTextArea(props: TextAreaProps) {
+  const { value, disabled, wide, label } = props;
+  const [internalValue, setValue] = useState(value);
+  return (
+    <TextAreaField
+      wide={wide}
+      label={label}
+      disabled={disabled}
+      value={internalValue}
+      onChange={(val) => setValue(val)}
+    />
+  );
+}
+
+function ValidationTextArea({ wide, value }: { wide?: boolean; value: string }) {
   const [internalValue, setValue] = useState(value);
   const isValid = useMemo(() => internalValue.length >= 50, [internalValue]);
 
