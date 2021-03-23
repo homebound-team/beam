@@ -2,22 +2,34 @@ import { useCheckbox } from "@react-aria/checkbox";
 import { useFocusRing } from "@react-aria/focus";
 import { VisuallyHidden } from "@react-aria/visually-hidden";
 import { useToggleState } from "@react-stately/toggle";
-import { AriaCheckboxProps } from "@react-types/checkbox";
 import { useRef } from "react";
 import { Css, Palette, px } from "src/Css";
+import { BeamFocusableProps } from "src/interfaces";
 
-interface CheckboxProps extends AriaCheckboxProps {
+interface CheckboxProps extends BeamFocusableProps {
+  /** Additional text displayed below label */
   description?: string;
+  isDisabled?: boolean;
+  /**
+   * Indeterminism is presentational only.
+   * The indeterminate visual representation remains regardless of user interaction.
+   */
+  isIndeterminate?: boolean;
+  isSelected?: boolean;
+  label?: string;
+  /** Handler that is called when the element's selection state changes. */
+  onChange?: (isSelected: boolean) => void;
+  value?: string;
 }
 
 export function Checkbox(props: CheckboxProps) {
-  const { children, isIndeterminate = false, isDisabled = false, description } = props;
+  const { label, isIndeterminate = false, isDisabled = false, description } = props;
   const ref = useRef(null);
   const state = useToggleState(props);
   const { isSelected } = state;
   const { inputProps } = useCheckbox(props, state, ref);
   const { isFocusVisible, focusProps } = useFocusRing(props);
-  const markIcon = isIndeterminate ? DashSmall : isSelected ? CheckmarkSmall : "";
+  const markIcon = isIndeterminate ? dashSmall : isSelected ? checkmarkSmall : "";
 
   return (
     <div>
@@ -33,7 +45,7 @@ export function Checkbox(props: CheckboxProps) {
           aria-hidden="true"
         ></span>
         <span css={markStyles}>{markIcon}</span>
-        {children && <div css={labelStyles(isDisabled)}>{children}</div>}
+        {label && <div css={labelStyles(isDisabled)}>{label}</div>}
       </label>
       {description && <div css={descStyles}>{description}</div>}
     </div>
@@ -60,7 +72,7 @@ function labelStyles(isDisabled: boolean) {
 }
 const descStyles = Css.pl3.sm.coolGray500.maxw(px(312)).$;
 
-export const CheckmarkSmall = (
+export const checkmarkSmall = (
   <svg width="16" height="16">
     <path
       d="M6.66669 10.3907L4.47135 8.19533L3.52869 9.138L6.66669 12.276L13.138 5.80467L12.1954 4.862L6.66669 10.3907Z"
@@ -69,7 +81,7 @@ export const CheckmarkSmall = (
   </svg>
 );
 
-const DashSmall = (
+const dashSmall = (
   <svg width="16" height="16">
     <rect x="4" y="7.5" width="8" height="1.35" fill={Palette.White} />
   </svg>
