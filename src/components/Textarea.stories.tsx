@@ -18,7 +18,7 @@ export function Textareas() {
         <br />
         <Textarea label="Description" defaultValue="An example description text." autoFocus />
         <br />
-        <Textarea label="Description" defaultValue="This is a description that can no longer be edited." isDisabled />
+        <Textarea label="Description" defaultValue="This is a description that can no longer be edited." disabled />
         <br />
         <ValidationTextarea value="Not enough characters" />
       </div>
@@ -33,7 +33,7 @@ export function Textareas() {
           wide
           label="Description"
           defaultValue="This is a description that can no longer be edited."
-          isDisabled
+          disabled
         />
         <br />
         <ValidationTextarea wide value="Not enough characters" />

@@ -19,7 +19,7 @@ export function TextFields() {
         <br />
         <TextField label="Name" defaultValue="Brandon" autoFocus />
         <br />
-        <TextField label="Name" defaultValue="Brandon" isDisabled />
+        <TextField label="Name" defaultValue="Brandon" disabled />
         <br />
         <ValidationTextField value="not a valid email" />
       </div>
@@ -31,7 +31,7 @@ export function TextFields() {
         <br />
         <TextField isSmall label="Name" defaultValue="Brandon" />
         <br />
-        <TextField isSmall label="Name" defaultValue="Brandon" isDisabled />
+        <TextField isSmall label="Name" defaultValue="Brandon" disabled />
         <br />
         <ValidationTextField value="not a valid email" />
       </div>

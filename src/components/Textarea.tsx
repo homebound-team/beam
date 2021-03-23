@@ -1,19 +1,16 @@
-import { AriaTextFieldOptions, useTextField } from "@react-aria/textfield";
+import { useTextField } from "@react-aria/textfield";
 import { chain, useLayoutEffect } from "@react-aria/utils";
 import React, { useCallback, useRef, useState } from "react";
 import { TextFieldBase } from "src/components/TextFieldBase";
+import { BeamTextFieldProps } from "src/interfaces";
 
-interface TextareaProps
-  extends Pick<
-    AriaTextFieldOptions,
-    "label" | "onChange" | "value" | "defaultValue" | "autoFocus" | "isDisabled" | "isReadOnly"
-  > {
+interface TextareaProps extends BeamTextFieldProps {
   wide?: boolean;
-  errorMsg?: string;
 }
 
 export function Textarea(props: TextareaProps) {
-  const { onChange, ...otherProps } = props;
+  const { onChange, disabled: isDisabled = false, readOnly: isReadOnly = false, ...otherProps } = props;
+  const textFieldProps = { ...otherProps, isDisabled, isReadOnly };
   const [inputValue, setInputValue] = useState(props.value || props.defaultValue);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   // not in stately because this is so we know when to re-measure, which is a spectrum design
@@ -37,7 +34,7 @@ export function Textarea(props: TextareaProps) {
   }, [onHeightChange, inputValue, inputRef]);
 
   const { labelProps, inputProps } = useTextField(
-    { ...props, inputElementType: "textarea", onChange: chain(onChange, setInputValue) },
+    { ...textFieldProps, inputElementType: "textarea", onChange: chain(onChange, setInputValue) },
     inputRef,
   );
 

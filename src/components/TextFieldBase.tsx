@@ -1,4 +1,3 @@
-import { AriaTextFieldOptions } from "@react-aria/textfield";
 import { mergeProps } from "@react-aria/utils";
 import React, {
   InputHTMLAttributes,
@@ -9,20 +8,19 @@ import React, {
 } from "react";
 import { Icon } from "src/components/Icon";
 import { Css, Palette, px } from "src/Css";
+import { BeamTextFieldProps } from "src/interfaces";
 
-interface TextFieldBaseProps extends Pick<AriaTextFieldOptions, "label"> {
+interface TextFieldBaseProps extends Pick<BeamTextFieldProps, "label" | "errorMsg"> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
   inputRef?: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>;
   multiline?: boolean;
   isSmall?: boolean;
-  errorMsg?: string;
   wide?: boolean;
 }
 
 export function TextFieldBase(props: TextFieldBaseProps) {
   const { label, labelProps, inputProps, inputRef, isSmall = false, errorMsg, multiline = false, wide = false } = props;
-  const focusStyles = Css.bSky500.$;
   const errorMessageId = `${inputProps.id}-error`;
 
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
@@ -40,14 +38,13 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         rows={multiline ? 1 : undefined}
         css={{
           ...Css.add("resize", "none")
-            .add("boxSizing", "border-box")
             .wPx(width)
             .sm.px1.pyPx(10)
             .coolGray900.br4.outline0.ba.bCoolGray300.if(isSmall)
             .pyPx(6).$,
           ...Css.if(multiline).mh(px(120)).$,
-          "&:focus": focusStyles,
-          "&:disabled": Css.coolGray400.bgCoolGray100.add("cursor", "not-allowed").$,
+          "&:focus": Css.bSky500.$,
+          "&:disabled": Css.coolGray400.bgCoolGray100.cursorNotAllowed.$,
           ...(errorMsg ? Css.bCoral500.$ : {}),
         }}
       />

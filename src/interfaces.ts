@@ -17,3 +17,14 @@ export interface BeamButtonWithChildrenProps extends BeamButtonProps {
   /** The content to display in the button. */
   children?: ReactNode;
 }
+
+export interface BeamTextFieldProps {
+  label?: string;
+  onChange?: (value: string) => void;
+  value?: string;
+  defaultValue?: string;
+  autoFocus?: boolean;
+  disabled?: boolean;
+  readOnly?: boolean;
+  errorMsg?: string;
+}
