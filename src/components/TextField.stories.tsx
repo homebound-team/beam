@@ -12,7 +12,7 @@ export function TextFields() {
   return (
     <div css={Css.df.justifyAround.$}>
       <div>
-        <h1>Regular</h1>
+        <h1 css={Css.lg.mb2.$}>Regular</h1>
         <TextField />
         <br />
         <TextField label="Name" />
@@ -24,7 +24,7 @@ export function TextFields() {
         <ValidationTextField value="not a valid email" />
       </div>
       <div>
-        <h1>Small</h1>
+        <h1 css={Css.lg.mb2.$}>Small</h1>
         <TextField isSmall />
         <br />
         <TextField isSmall label="Name" />
