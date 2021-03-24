@@ -1,8 +1,6 @@
-import { useCheckbox } from "@react-aria/checkbox";
-import { useFocusRing } from "@react-aria/focus";
-import { VisuallyHidden } from "@react-aria/visually-hidden";
 import { useToggleState } from "@react-stately/toggle";
 import { useRef } from "react";
+import { useCheckbox, useFocusRing, useHover, VisuallyHidden } from "react-aria";
 import { Css, Palette, px } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 
@@ -23,16 +21,22 @@ interface CheckboxProps extends BeamFocusableProps {
 }
 
 export function Checkbox(props: CheckboxProps) {
-  const { label, indeterminate = false, disabled = false, description } = props;
+  const {
+    label,
+    indeterminate: isIndeterminate = false,
+    disabled: isDisabled = false,
+    description,
+    selected,
+    ...otherProps
+  } = props;
+  const ariaProps = { isSelected: selected, isDisabled, isIndeterminate, ...otherProps };
   const ref = useRef(null);
-
-  // useToggleState requires variable name `isSelected`
-  const state = useToggleState({ ...props, isSelected: props.selected });
-  const selected = state.isSelected;
-
-  const { inputProps } = useCheckbox({ ...props, "aria-label": label }, state, ref);
-  const { isFocusVisible, focusProps } = useFocusRing(props);
-  const markIcon = indeterminate ? dashSmall : selected ? checkmarkSmall : "";
+  const state = useToggleState(ariaProps);
+  const isSelected = state.isSelected;
+  const { inputProps } = useCheckbox({ ...ariaProps, "aria-label": label }, state, ref);
+  const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
+  const { hoverProps, isHovered } = useHover({ isDisabled });
+  const markIcon = isIndeterminate ? dashSmall : isSelected ? checkmarkSmall : "";
 
   return (
     <div>
@@ -41,14 +45,16 @@ export function Checkbox(props: CheckboxProps) {
           <input ref={ref} {...inputProps} {...focusProps} />
         </VisuallyHidden>
         <span
+          {...hoverProps}
           css={{
-            ...checkboxStyles({ disabled, selected, indeterminate }),
+            ...checkboxStyles({ isDisabled, isSelected, isIndeterminate }),
             ...(isFocusVisible && focusRingStyles),
+            ...(isHovered && hoverStyles),
           }}
           aria-hidden="true"
         ></span>
         <span css={markStyles}>{markIcon}</span>
-        {label && <div css={labelStyles(disabled)}>{label}</div>}
+        {label && <div css={labelStyles(isDisabled)}>{label}</div>}
       </label>
       {description && <div css={descStyles}>{description}</div>}
     </div>
@@ -56,25 +62,26 @@ export function Checkbox(props: CheckboxProps) {
 }
 
 interface ICheckboxStyles {
-  disabled: boolean;
-  selected: boolean;
-  indeterminate: boolean;
+  isDisabled: boolean;
+  isSelected: boolean;
+  isIndeterminate: boolean;
 }
 
-function checkboxStyles({ disabled, selected, indeterminate }: ICheckboxStyles) {
+function checkboxStyles({ isDisabled, isSelected, isIndeterminate }: ICheckboxStyles) {
   return Css.hPx(16)
     .wPx(16)
-    .cursorPointer.ba.bCoolGray300.br4.bgWhite.if(selected || indeterminate)
-    .bSky500.bgSky500.if(disabled).bCoolGray300.bgCoolGray100.cursorNotAllowed.$;
+    .cursorPointer.ba.bCoolGray300.br4.bgWhite.if(isSelected || isIndeterminate)
+    .bSky500.bgSky500.if(isDisabled).bCoolGray300.bgCoolGray100.cursorNotAllowed.$;
 }
 const focusRingStyles = Css.bshFocus.$;
+const hoverStyles = Css.bSky700.$;
 const markStyles = { ...Css.relative.cursorPointer.$, "& svg": Css.absolute.topPx(-8).rightPx(0).$ };
-function labelStyles(disabled: boolean) {
-  return Css.pl1.sm.if(disabled).coolGray300.$;
+function labelStyles(isDisabled: boolean) {
+  return Css.pl1.sm.if(isDisabled).coolGray300.$;
 }
 const descStyles = Css.pl3.sm.coolGray500.maxw(px(312)).$;
 
-export const checkmarkSmall = (
+const checkmarkSmall = (
   <svg width="16" height="16">
     <path
       d="M6.66669 10.3907L4.47135 8.19533L3.52869 9.138L6.66669 12.276L13.138 5.80467L12.1954 4.862L6.66669 10.3907Z"
