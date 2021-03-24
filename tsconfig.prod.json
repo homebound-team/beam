@@ -1,0 +1,26 @@
+{
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "Node",
+    "lib": ["esnext", "dom"],
+    // Supports the `css` prop
+    "types": ["@emotion/core", "jest"],
+    // Use React 17 _jsx / automatic runtime support for nice emotion integration
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "declaration": true,
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/*"]
+    },
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+    ]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "src/**/*.stories.tsx", "src/**/*.test.tsx"]
+}

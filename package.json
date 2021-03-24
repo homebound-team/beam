@@ -17,7 +17,7 @@
   },
   "scripts": {
     "start": "yarn storybook",
-    "build": "ttsc",
+    "build": "ttsc -p ./tsconfig.prod.json",
     "build:truss": "cd ./truss && npm run generate",
     "watch:truss": "cd ./truss && watch 'npm run generate' ./",
     "build:storybook": "build-storybook",

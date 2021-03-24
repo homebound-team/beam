@@ -1,5 +1,5 @@
-import { Parameters } from "@storybook/addons";
-import { withReset } from "src/utils/storybookDecorators";
+import { Parameters, StoryFn } from "@storybook/addons";
+import { CssReset } from "../src";
 
 // https://storybook.js.org/docs/react/writing-stories/parameters#global-parameters
 export const parameters: Parameters = {
@@ -31,3 +31,12 @@ export const parameters: Parameters = {
 
 // https://storybook.js.org/docs/react/writing-stories/decorators#global-decorators
 export const decorators = [withReset];
+
+function withReset(storyFn: StoryFn) {
+  return (
+    <>
+      <CssReset />
+      {storyFn()}
+    </>
+  );
+}
