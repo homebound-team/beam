@@ -30,7 +30,7 @@ export function Checkbox(props: CheckboxProps) {
   const state = useToggleState({ ...props, isSelected: props.selected });
   const selected = state.isSelected;
 
-  const { inputProps } = useCheckbox(props, state, ref);
+  const { inputProps } = useCheckbox({ ...props, "aria-label": label }, state, ref);
   const { isFocusVisible, focusProps } = useFocusRing(props);
   const markIcon = indeterminate ? dashSmall : selected ? checkmarkSmall : "";
 
@@ -62,8 +62,7 @@ interface ICheckboxStyles {
 }
 
 function checkboxStyles({ disabled, selected, indeterminate }: ICheckboxStyles) {
-  return Css.add("boxSizing", "border-box")
-    .hPx(16)
+  return Css.hPx(16)
     .wPx(16)
     .cursorPointer.ba.bCoolGray300.br4.bgWhite.if(selected || indeterminate)
     .bSky500.bgSky500.if(disabled).bCoolGray300.bgCoolGray100.cursorNotAllowed.$;
