@@ -13,11 +13,11 @@ export function Checkboxes() {
       <div>
         <h2 css={Css.mb1.$}>Basic Checkboxes</h2>
         <div css={Css.dg.gap1.$}>
-          <Checkbox aria-label="default" onChange={() => {}} label="Default" />
-          <Checkbox aria-label="selected" selected label="Selected" />
-          <Checkbox aria-label="selected" autoFocus selected label="Selected/Focused" />
-          <Checkbox aria-label="indeterminate" indeterminate label="Indeterminate" />
-          <Checkbox aria-label="disabled" disabled label="Disabled" />
+          <Checkbox onChange={() => {}} label="Default" />
+          <Checkbox onChange={() => {}} selected label="Selected" />
+          <Checkbox onChange={() => {}} autoFocus selected label="Selected/Focused" />
+          <Checkbox onChange={() => {}} indeterminate label="Indeterminate" />
+          <Checkbox onChange={() => {}} disabled label="Disabled" />
         </div>
       </div>
       <div>
