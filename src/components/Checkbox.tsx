@@ -45,13 +45,15 @@ export function Checkbox(props: CheckboxProps) {
           <input ref={ref} {...inputProps} {...focusProps} />
         </VisuallyHidden>
         <span
-          {...hoverProps}
           css={{
-            ...checkboxStyles({ isDisabled, isSelected, isIndeterminate }),
+            ...baseStyles,
+            ...((isSelected || isIndeterminate) && selectedStyles),
+            ...(isDisabled && disabledStyles),
             ...(isFocusVisible && focusRingStyles),
             ...(isHovered && hoverStyles),
           }}
           aria-hidden="true"
+          {...hoverProps}
         ></span>
         <span css={markStyles}>{markIcon}</span>
         {label && <div css={labelStyles(isDisabled)}>{label}</div>}
@@ -61,18 +63,9 @@ export function Checkbox(props: CheckboxProps) {
   );
 }
 
-interface ICheckboxStyles {
-  isDisabled: boolean;
-  isSelected: boolean;
-  isIndeterminate: boolean;
-}
-
-function checkboxStyles({ isDisabled, isSelected, isIndeterminate }: ICheckboxStyles) {
-  return Css.hPx(16)
-    .wPx(16)
-    .cursorPointer.ba.bCoolGray300.br4.bgWhite.if(isSelected || isIndeterminate)
-    .bSky500.bgSky500.if(isDisabled).bCoolGray300.bgCoolGray100.cursorNotAllowed.$;
-}
+const baseStyles = Css.hPx(16).wPx(16).cursorPointer.ba.bCoolGray300.br4.bgWhite.$;
+const disabledStyles = Css.bCoolGray300.bgCoolGray100.cursorNotAllowed.$;
+const selectedStyles = Css.bSky500.bgSky500.$;
 const focusRingStyles = Css.bshFocus.$;
 const hoverStyles = Css.bSky700.$;
 const markStyles = { ...Css.relative.cursorPointer.$, "& svg": Css.absolute.topPx(-8).rightPx(0).$ };

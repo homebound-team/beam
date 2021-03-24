@@ -9,12 +9,12 @@ export default {
 
 export function Checkboxes() {
   return (
-    <div css={Css.dg.gap2.$}>
+    <div css={Css.dg.gap2.p1.$}>
       <div>
         <h2 css={Css.mb1.$}>Basic Checkboxes</h2>
         <div css={Css.dg.gap1.$}>
           <Checkbox aria-label="default" onChange={() => {}} label="Default" />
-          <Checkbox aria-label="selected" selected onChange={() => {}} label="Selected" />
+          <Checkbox aria-label="selected" selected label="Selected" />
           <Checkbox aria-label="selected" autoFocus selected label="Selected/Focused" />
           <Checkbox aria-label="indeterminate" indeterminate label="Indeterminate" />
           <Checkbox aria-label="disabled" disabled label="Disabled" />
