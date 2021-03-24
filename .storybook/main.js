@@ -1,6 +1,6 @@
 module.exports = {
   stories: ["../src/**/*.stories.tsx"],
-  addons: ["@storybook/addon-links", "@storybook/addon-essentials"],
+  addons: ["@storybook/addon-links", "@storybook/addon-essentials", "storybook-contrast"],
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: { check: false },
   webpackFinal: async (config) => {

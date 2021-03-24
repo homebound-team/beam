@@ -15,7 +15,7 @@ export const Color = () => {
   return (
     <div css={{ h1: Css.xl2Em.$, h2: Css.baseEm.$ }}>
       <h1>Primary Palette</h1>
-      <ListColors palette={primaryPalette} />
+      <ListColors palette={primaryPalette} xss={Css.br8.$} />
       <h1>Neutrals</h1>
       <h2>CoolGray</h2>
       <ListColors palette={neutralPalette} />
@@ -37,21 +37,21 @@ export const Color = () => {
   );
 };
 
-function ListColors({ palette }: { palette: string[][] }) {
+function ListColors({ palette, xss }: { palette: string[][]; xss?: any }) {
   return (
     <ul css={{ listStyle: "none", ...Css.df.tc.$ }}>
       {palette.map(([name, color]) => (
-        <ColorSquare {...{ name, color }} key={name} />
+        <ColorSquare {...{ name, color }} key={name} xss={xss} />
       ))}
     </ul>
   );
 }
 
-function ColorSquare({ name, color }: any) {
-  const size = 80;
+function ColorSquare({ name, color, xss }: any) {
+  const size = 100;
   return (
     <li css={Css.xsEm.$}>
-      <div css={Css.h(px(size)).w(px(size)).bgColor(color).$} />
+      <div css={{ ...Css.h(px(size)).w(px(size)).bgColor(color).$, ...xss }} />
       {name}
     </li>
   );

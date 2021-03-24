@@ -6,11 +6,11 @@ export default {
 } as Meta;
 
 export const Typography = () => (
-  <div css={{ p: Css.m0.$ }}>
+  <div css={{ p: Css.m0.coolGray900.$ }}>
     <h1 css={Css.xl2Em.$}>Typography</h1>
     <br />
-    <p css={Css.tiny.$}>tiny</p>
-    <p css={Css.tinyEm.$}>tinyEm</p>
+    <p css={Css.tiny.$}>tiny / default</p>
+    <p css={Css.tinyEm.$}>tiny / emphasized</p>
     <br />
     <p css={Css.xs.$}>xs</p>
     <p css={Css.xsEm.$}>xsEm</p>
