@@ -10,7 +10,9 @@
     "url": "https://github.com/homebound-team/beam"
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.{stories,test}.*",
+    "!dist/setupTests.*"
   ],
   "engines": {
     "node": "14.8.0"
