@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { Css } from "src/Css";
-import { useButton, useFocusRing } from "react-aria";
+import {useButton, useFocusRing, useHover} from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces"
 
@@ -29,6 +29,7 @@ export function ButtonGroupButton(props: ButtonGroupButtonProps) {
   const ref = useRef(null);
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
+  const { hoverProps, isHovered } = useHover(ariaProps);
   const buttonStyles = getButtonStyles();
 
   return (
@@ -36,11 +37,12 @@ export function ButtonGroupButton(props: ButtonGroupButtonProps) {
       ref={ref}
       {...buttonProps}
       {...focusProps}
+      {...hoverProps}
       css={{
         ...buttonReset,
         ...buttonStyles,
         ...(isFocusVisible ? defaultFocusRingStyles : {}),
-        ...(isPressed ? activeStyles : {}),
+        ...(isPressed ? activeStyles : isHovered ? hoverStyles : {}),
         ...(icon ? iconStyles : {})
       }}
     >
@@ -50,20 +52,21 @@ export function ButtonGroupButton(props: ButtonGroupButtonProps) {
   );
 }
 
-const buttonReset = Css.p0.bsNone.cursorPointer.smEm.dif.itemsCenter.outline0.transition
-  .add("font", "inherit")
-  .add("boxSizing", "border-box").$;
+const buttonReset = Css.smEm.br4.dif.itemsCenter.outline0.transition.mPx(4).$;
 const activeStyles = Css.bgCoolGray200.important.$;
+const hoverStyles = Css.bgCoolGray50.$;
 const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 const iconStyles = Css.px1.$;
 
 function getButtonStyles() {
   return {
-    ...Css.z1.hPx(40).px2.bgWhite.bCoolGray300.bw1.ba.coolGray900.$,
-    "&:hover:not(:disabled):not(:active)": Css.bgCoolGray50.$,
+    ...Css.z1.hPx(40).px2.bgWhite.bCoolGray300.bw1.ba.coolGray900.m0.br0.$,
     "&:disabled": Css.coolGray200.cursorNotAllowed.bCoolGray200.$,
+    // Our first button should have a rounded left border
     "&:first-of-type": Css.add("borderRadius", "4px 0 0 4px").$,
+    // Our last button should have a rounded right border
     "&:last-of-type": Css.add("borderRadius", "0 4px 4px 0").$,
+    // Nudge buttons one pixel to the left so they visually share a border
     "&:not(:first-of-type)": Css.mlPx(-1).$,
   };
 }
