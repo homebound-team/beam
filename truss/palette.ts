@@ -1,11 +1,80 @@
 // prettier-ignore
 export const palette = {
   // Primary Palette
-  Black:        'rgba(17,24,39,1)',
   White:        'rgba(254,254,254,1)',
   Transparent:  'rgba(0,0,0,0)',
 
-  // Neutrals
+  // Extended Palette
+  Gray50:   'rgba(255,253,253,1)',
+  Gray100:  'rgba(247,245,245,1)',
+  Gray200:  'rgba(236,235,235,1)',
+  Gray300:  'rgba(221,220,220,1)',
+  Gray400:  'rgba(201,201,201,1)',
+  Gray500:  'rgba(175,175,175,1)',
+  Gray600:  'rgba(141,141,141,1)',
+  Gray700:  'rgba(100,100,100,1)',
+  Gray800:  'rgba(53,53,53,1)',
+  Gray900:  'rgba(36,36,36,1)',
+
+  LightBlue50:   'rgba(240,249,255,1)',
+  LightBlue100:  'rgba(224,242,254,1)',
+  LightBlue200:  'rgba(186,230,253,1)',
+  LightBlue300:  'rgba(125,211,252,1)',
+  LightBlue400:  'rgba(56,189,248,1)',
+  LightBlue500:  'rgba(14,165,233,1)',
+  LightBlue600:  'rgba(2,143,199,1)',
+  LightBlue700:  'rgba(3,105,161,1)',
+  LightBlue800:  'rgba(7,89,133,1)',
+  LightBlue900:  'rgba(12,74,110,1)',
+
+  Red50:   'rgba(255,242,242,1)',
+  Red100:  'rgba(253,210,209,1)',
+  Red200:  'rgba(249,181,177,1)',
+  Red300:  'rgba(242,155,148,1)',
+  Red400:  'rgba(232,133,122,1)',
+  Red500:  'rgba(218,114,100,1)',
+  Red600:  'rgba(200,98,81,1)',
+  Red700:  'rgba(176,83,73,1)',
+  Red800:  'rgba(149,68,64,1)',
+  Red900:  'rgba(120,54,54,1)',
+
+  Yellow50:   'rgba(255,254,242,1)',
+  Yellow100:  'rgba(255,254,212,1)',
+  Yellow200:  'rgba(255,250,180,1)',
+  Yellow300:  'rgba(255,240,150,1)',
+  Yellow400:  'rgba(255,225,123,1)',
+  Yellow500:  'rgba(255,204,99,1)',
+  Yellow600:  'rgba(246,177,78,1)',
+  Yellow700:  'rgba(207,150,73,1)',
+  Yellow800:  'rgba(164,120,66,1)',
+  Yellow900:  'rgba(120,89,54,1)',
+
+  Green50:   'rgba(250,255,250,1)',
+  Green100:  'rgba(223,248,216,1)',
+  Green200:  'rgba(199,239,183,1)',
+  Green300:  'rgba(179,226,153,1)',
+  Green400:  'rgba(163,208,126,1)',
+  Green500:  'rgba(146,185,101,1)',
+  Green600:  'rgba(126,156,79,1)',
+  Green700:  'rgba(101,120,57,1)',
+  Green800:  'rgba(64,93,44,1)',
+  Green900:  'rgba(34,64,31,1)',
+
+  Violet50:     'rgba(245,243,255,1)',
+  Violet100:    'rgba(238,234,253,1)',
+  Violet200:    'rgba(232,225,252,1)',
+  Violet300:    'rgba(218,205,246,1)',
+  Violet400:    'rgba(204,186,236,1)',
+  Violet500:    'rgba(190,167,223,1)',
+  Violet600:    'rgba(173,147,205,1)',
+  Violet700:    'rgba(153,126,181,1)',
+  Violet800:    'rgba(128,103,151,1)',
+  Violet900:    'rgba(100,78,116,1)',
+
+  // FIXME: Deprecated Primary Palette
+  Black:        'rgba(17,24,39,1)',
+
+  // FIXME: Deprecated: Neutrals
   CoolGray50:   'rgba(249,250,251,1)',
   CoolGray100:  'rgba(243,244,246,1)',
   CoolGray200:  'rgba(229,231,235,1)',
@@ -17,7 +86,7 @@ export const palette = {
   CoolGray800:  'rgba(31,41,55,1)',
   CoolGray900:  'rgba(17,24,39,1)',
 
-  // Extended Palette
+  // FIXME: Deprecated: Extended Palette
   Coral50:      'rgba(255,234,227,1)',
   Coral100:     'rgba(255,223,212,1)',
   Coral200:     'rgba(255,194,174,1)',
@@ -61,17 +130,6 @@ export const palette = {
   Sky700:       'rgba(29,48,216,1)',
   Sky800:       'rgba(30,53,175,1)',
   Sky900:       'rgba(30,41,138,1)',
-
-  Violet50:     'rgba(245,243,255,1)',
-  Violet100:    'rgba(237,233,254,1)',
-  Violet200:    'rgba(221,214,254,1)',
-  Violet300:    'rgba(196,181,253,1)',
-  Violet400:    'rgba(167,139,250,1)',
-  Violet500:    'rgba(139,92,246,1)',
-  Violet600:    'rgba(124,58,237,1)',
-  Violet700:    'rgba(109,40,217,1)',
-  Violet800:    'rgba(91,33,182,1)',
-  Violet900:    'rgba(76,29,149,1)',
 
   // Chart Palette
   Cool50:       'rgba(239,246,247,1)',

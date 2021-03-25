@@ -34,9 +34,69 @@ class CssBuilder<T extends Properties1> {
   get bn() { return this.add("borderStyle", "none").add("borderWidth", "0"); }
 
   // borderColor
-  get bBlack() { return this.add("borderColor", "rgba(17,24,39,1)"); }
   get bWhite() { return this.add("borderColor", "rgba(254,254,254,1)"); }
   get bTransparent() { return this.add("borderColor", "rgba(0,0,0,0)"); }
+  get bGray50() { return this.add("borderColor", "rgba(255,253,253,1)"); }
+  get bGray100() { return this.add("borderColor", "rgba(247,245,245,1)"); }
+  get bGray200() { return this.add("borderColor", "rgba(236,235,235,1)"); }
+  get bGray300() { return this.add("borderColor", "rgba(221,220,220,1)"); }
+  get bGray400() { return this.add("borderColor", "rgba(201,201,201,1)"); }
+  get bGray500() { return this.add("borderColor", "rgba(175,175,175,1)"); }
+  get bGray600() { return this.add("borderColor", "rgba(141,141,141,1)"); }
+  get bGray700() { return this.add("borderColor", "rgba(100,100,100,1)"); }
+  get bGray800() { return this.add("borderColor", "rgba(53,53,53,1)"); }
+  get bGray900() { return this.add("borderColor", "rgba(36,36,36,1)"); }
+  get bLightBlue50() { return this.add("borderColor", "rgba(240,249,255,1)"); }
+  get bLightBlue100() { return this.add("borderColor", "rgba(224,242,254,1)"); }
+  get bLightBlue200() { return this.add("borderColor", "rgba(186,230,253,1)"); }
+  get bLightBlue300() { return this.add("borderColor", "rgba(125,211,252,1)"); }
+  get bLightBlue400() { return this.add("borderColor", "rgba(56,189,248,1)"); }
+  get bLightBlue500() { return this.add("borderColor", "rgba(14,165,233,1)"); }
+  get bLightBlue600() { return this.add("borderColor", "rgba(2,143,199,1)"); }
+  get bLightBlue700() { return this.add("borderColor", "rgba(3,105,161,1)"); }
+  get bLightBlue800() { return this.add("borderColor", "rgba(7,89,133,1)"); }
+  get bLightBlue900() { return this.add("borderColor", "rgba(12,74,110,1)"); }
+  get bRed50() { return this.add("borderColor", "rgba(255,242,242,1)"); }
+  get bRed100() { return this.add("borderColor", "rgba(253,210,209,1)"); }
+  get bRed200() { return this.add("borderColor", "rgba(249,181,177,1)"); }
+  get bRed300() { return this.add("borderColor", "rgba(242,155,148,1)"); }
+  get bRed400() { return this.add("borderColor", "rgba(232,133,122,1)"); }
+  get bRed500() { return this.add("borderColor", "rgba(218,114,100,1)"); }
+  get bRed600() { return this.add("borderColor", "rgba(200,98,81,1)"); }
+  get bRed700() { return this.add("borderColor", "rgba(176,83,73,1)"); }
+  get bRed800() { return this.add("borderColor", "rgba(149,68,64,1)"); }
+  get bRed900() { return this.add("borderColor", "rgba(120,54,54,1)"); }
+  get bYellow50() { return this.add("borderColor", "rgba(255,254,242,1)"); }
+  get bYellow100() { return this.add("borderColor", "rgba(255,254,212,1)"); }
+  get bYellow200() { return this.add("borderColor", "rgba(255,250,180,1)"); }
+  get bYellow300() { return this.add("borderColor", "rgba(255,240,150,1)"); }
+  get bYellow400() { return this.add("borderColor", "rgba(255,225,123,1)"); }
+  get bYellow500() { return this.add("borderColor", "rgba(255,204,99,1)"); }
+  get bYellow600() { return this.add("borderColor", "rgba(246,177,78,1)"); }
+  get bYellow700() { return this.add("borderColor", "rgba(207,150,73,1)"); }
+  get bYellow800() { return this.add("borderColor", "rgba(164,120,66,1)"); }
+  get bYellow900() { return this.add("borderColor", "rgba(120,89,54,1)"); }
+  get bGreen50() { return this.add("borderColor", "rgba(250,255,250,1)"); }
+  get bGreen100() { return this.add("borderColor", "rgba(223,248,216,1)"); }
+  get bGreen200() { return this.add("borderColor", "rgba(199,239,183,1)"); }
+  get bGreen300() { return this.add("borderColor", "rgba(179,226,153,1)"); }
+  get bGreen400() { return this.add("borderColor", "rgba(163,208,126,1)"); }
+  get bGreen500() { return this.add("borderColor", "rgba(146,185,101,1)"); }
+  get bGreen600() { return this.add("borderColor", "rgba(126,156,79,1)"); }
+  get bGreen700() { return this.add("borderColor", "rgba(101,120,57,1)"); }
+  get bGreen800() { return this.add("borderColor", "rgba(64,93,44,1)"); }
+  get bGreen900() { return this.add("borderColor", "rgba(34,64,31,1)"); }
+  get bViolet50() { return this.add("borderColor", "rgba(245,243,255,1)"); }
+  get bViolet100() { return this.add("borderColor", "rgba(238,234,253,1)"); }
+  get bViolet200() { return this.add("borderColor", "rgba(232,225,252,1)"); }
+  get bViolet300() { return this.add("borderColor", "rgba(218,205,246,1)"); }
+  get bViolet400() { return this.add("borderColor", "rgba(204,186,236,1)"); }
+  get bViolet500() { return this.add("borderColor", "rgba(190,167,223,1)"); }
+  get bViolet600() { return this.add("borderColor", "rgba(173,147,205,1)"); }
+  get bViolet700() { return this.add("borderColor", "rgba(153,126,181,1)"); }
+  get bViolet800() { return this.add("borderColor", "rgba(128,103,151,1)"); }
+  get bViolet900() { return this.add("borderColor", "rgba(100,78,116,1)"); }
+  get bBlack() { return this.add("borderColor", "rgba(17,24,39,1)"); }
   get bCoolGray50() { return this.add("borderColor", "rgba(249,250,251,1)"); }
   get bCoolGray100() { return this.add("borderColor", "rgba(243,244,246,1)"); }
   get bCoolGray200() { return this.add("borderColor", "rgba(229,231,235,1)"); }
@@ -87,16 +147,6 @@ class CssBuilder<T extends Properties1> {
   get bSky700() { return this.add("borderColor", "rgba(29,48,216,1)"); }
   get bSky800() { return this.add("borderColor", "rgba(30,53,175,1)"); }
   get bSky900() { return this.add("borderColor", "rgba(30,41,138,1)"); }
-  get bViolet50() { return this.add("borderColor", "rgba(245,243,255,1)"); }
-  get bViolet100() { return this.add("borderColor", "rgba(237,233,254,1)"); }
-  get bViolet200() { return this.add("borderColor", "rgba(221,214,254,1)"); }
-  get bViolet300() { return this.add("borderColor", "rgba(196,181,253,1)"); }
-  get bViolet400() { return this.add("borderColor", "rgba(167,139,250,1)"); }
-  get bViolet500() { return this.add("borderColor", "rgba(139,92,246,1)"); }
-  get bViolet600() { return this.add("borderColor", "rgba(124,58,237,1)"); }
-  get bViolet700() { return this.add("borderColor", "rgba(109,40,217,1)"); }
-  get bViolet800() { return this.add("borderColor", "rgba(91,33,182,1)"); }
-  get bViolet900() { return this.add("borderColor", "rgba(76,29,149,1)"); }
   get bCool50() { return this.add("borderColor", "rgba(239,246,247,1)"); }
   get bCool100() { return this.add("borderColor", "rgba(216,235,238,1)"); }
   get bCool200() { return this.add("borderColor", "rgba(177,219,225,1)"); }
@@ -348,9 +398,69 @@ class CssBuilder<T extends Properties1> {
   get sticky() { return this.add("position", "sticky"); }
 
   // skins
-  get black() { return this.add("color", "rgba(17,24,39,1)"); }
   get white() { return this.add("color", "rgba(254,254,254,1)"); }
   get transparent() { return this.add("color", "rgba(0,0,0,0)"); }
+  get gray50() { return this.add("color", "rgba(255,253,253,1)"); }
+  get gray100() { return this.add("color", "rgba(247,245,245,1)"); }
+  get gray200() { return this.add("color", "rgba(236,235,235,1)"); }
+  get gray300() { return this.add("color", "rgba(221,220,220,1)"); }
+  get gray400() { return this.add("color", "rgba(201,201,201,1)"); }
+  get gray500() { return this.add("color", "rgba(175,175,175,1)"); }
+  get gray600() { return this.add("color", "rgba(141,141,141,1)"); }
+  get gray700() { return this.add("color", "rgba(100,100,100,1)"); }
+  get gray800() { return this.add("color", "rgba(53,53,53,1)"); }
+  get gray900() { return this.add("color", "rgba(36,36,36,1)"); }
+  get lightBlue50() { return this.add("color", "rgba(240,249,255,1)"); }
+  get lightBlue100() { return this.add("color", "rgba(224,242,254,1)"); }
+  get lightBlue200() { return this.add("color", "rgba(186,230,253,1)"); }
+  get lightBlue300() { return this.add("color", "rgba(125,211,252,1)"); }
+  get lightBlue400() { return this.add("color", "rgba(56,189,248,1)"); }
+  get lightBlue500() { return this.add("color", "rgba(14,165,233,1)"); }
+  get lightBlue600() { return this.add("color", "rgba(2,143,199,1)"); }
+  get lightBlue700() { return this.add("color", "rgba(3,105,161,1)"); }
+  get lightBlue800() { return this.add("color", "rgba(7,89,133,1)"); }
+  get lightBlue900() { return this.add("color", "rgba(12,74,110,1)"); }
+  get red50() { return this.add("color", "rgba(255,242,242,1)"); }
+  get red100() { return this.add("color", "rgba(253,210,209,1)"); }
+  get red200() { return this.add("color", "rgba(249,181,177,1)"); }
+  get red300() { return this.add("color", "rgba(242,155,148,1)"); }
+  get red400() { return this.add("color", "rgba(232,133,122,1)"); }
+  get red500() { return this.add("color", "rgba(218,114,100,1)"); }
+  get red600() { return this.add("color", "rgba(200,98,81,1)"); }
+  get red700() { return this.add("color", "rgba(176,83,73,1)"); }
+  get red800() { return this.add("color", "rgba(149,68,64,1)"); }
+  get red900() { return this.add("color", "rgba(120,54,54,1)"); }
+  get yellow50() { return this.add("color", "rgba(255,254,242,1)"); }
+  get yellow100() { return this.add("color", "rgba(255,254,212,1)"); }
+  get yellow200() { return this.add("color", "rgba(255,250,180,1)"); }
+  get yellow300() { return this.add("color", "rgba(255,240,150,1)"); }
+  get yellow400() { return this.add("color", "rgba(255,225,123,1)"); }
+  get yellow500() { return this.add("color", "rgba(255,204,99,1)"); }
+  get yellow600() { return this.add("color", "rgba(246,177,78,1)"); }
+  get yellow700() { return this.add("color", "rgba(207,150,73,1)"); }
+  get yellow800() { return this.add("color", "rgba(164,120,66,1)"); }
+  get yellow900() { return this.add("color", "rgba(120,89,54,1)"); }
+  get green50() { return this.add("color", "rgba(250,255,250,1)"); }
+  get green100() { return this.add("color", "rgba(223,248,216,1)"); }
+  get green200() { return this.add("color", "rgba(199,239,183,1)"); }
+  get green300() { return this.add("color", "rgba(179,226,153,1)"); }
+  get green400() { return this.add("color", "rgba(163,208,126,1)"); }
+  get green500() { return this.add("color", "rgba(146,185,101,1)"); }
+  get green600() { return this.add("color", "rgba(126,156,79,1)"); }
+  get green700() { return this.add("color", "rgba(101,120,57,1)"); }
+  get green800() { return this.add("color", "rgba(64,93,44,1)"); }
+  get green900() { return this.add("color", "rgba(34,64,31,1)"); }
+  get violet50() { return this.add("color", "rgba(245,243,255,1)"); }
+  get violet100() { return this.add("color", "rgba(238,234,253,1)"); }
+  get violet200() { return this.add("color", "rgba(232,225,252,1)"); }
+  get violet300() { return this.add("color", "rgba(218,205,246,1)"); }
+  get violet400() { return this.add("color", "rgba(204,186,236,1)"); }
+  get violet500() { return this.add("color", "rgba(190,167,223,1)"); }
+  get violet600() { return this.add("color", "rgba(173,147,205,1)"); }
+  get violet700() { return this.add("color", "rgba(153,126,181,1)"); }
+  get violet800() { return this.add("color", "rgba(128,103,151,1)"); }
+  get violet900() { return this.add("color", "rgba(100,78,116,1)"); }
+  get black() { return this.add("color", "rgba(17,24,39,1)"); }
   get coolGray50() { return this.add("color", "rgba(249,250,251,1)"); }
   get coolGray100() { return this.add("color", "rgba(243,244,246,1)"); }
   get coolGray200() { return this.add("color", "rgba(229,231,235,1)"); }
@@ -401,16 +511,6 @@ class CssBuilder<T extends Properties1> {
   get sky700() { return this.add("color", "rgba(29,48,216,1)"); }
   get sky800() { return this.add("color", "rgba(30,53,175,1)"); }
   get sky900() { return this.add("color", "rgba(30,41,138,1)"); }
-  get violet50() { return this.add("color", "rgba(245,243,255,1)"); }
-  get violet100() { return this.add("color", "rgba(237,233,254,1)"); }
-  get violet200() { return this.add("color", "rgba(221,214,254,1)"); }
-  get violet300() { return this.add("color", "rgba(196,181,253,1)"); }
-  get violet400() { return this.add("color", "rgba(167,139,250,1)"); }
-  get violet500() { return this.add("color", "rgba(139,92,246,1)"); }
-  get violet600() { return this.add("color", "rgba(124,58,237,1)"); }
-  get violet700() { return this.add("color", "rgba(109,40,217,1)"); }
-  get violet800() { return this.add("color", "rgba(91,33,182,1)"); }
-  get violet900() { return this.add("color", "rgba(76,29,149,1)"); }
   get cool50() { return this.add("color", "rgba(239,246,247,1)"); }
   get cool100() { return this.add("color", "rgba(216,235,238,1)"); }
   get cool200() { return this.add("color", "rgba(177,219,225,1)"); }
@@ -424,9 +524,69 @@ class CssBuilder<T extends Properties1> {
   get cool1000() { return this.add("color", "rgba(42,47,135,1)"); }
   get cool1100() { return this.add("color", "rgba(16,27,100,1)"); }
   color(value: string) { return this.add("color", value); }
-  get bgBlack() { return this.add("backgroundColor", "rgba(17,24,39,1)"); }
   get bgWhite() { return this.add("backgroundColor", "rgba(254,254,254,1)"); }
   get bgTransparent() { return this.add("backgroundColor", "rgba(0,0,0,0)"); }
+  get bgGray50() { return this.add("backgroundColor", "rgba(255,253,253,1)"); }
+  get bgGray100() { return this.add("backgroundColor", "rgba(247,245,245,1)"); }
+  get bgGray200() { return this.add("backgroundColor", "rgba(236,235,235,1)"); }
+  get bgGray300() { return this.add("backgroundColor", "rgba(221,220,220,1)"); }
+  get bgGray400() { return this.add("backgroundColor", "rgba(201,201,201,1)"); }
+  get bgGray500() { return this.add("backgroundColor", "rgba(175,175,175,1)"); }
+  get bgGray600() { return this.add("backgroundColor", "rgba(141,141,141,1)"); }
+  get bgGray700() { return this.add("backgroundColor", "rgba(100,100,100,1)"); }
+  get bgGray800() { return this.add("backgroundColor", "rgba(53,53,53,1)"); }
+  get bgGray900() { return this.add("backgroundColor", "rgba(36,36,36,1)"); }
+  get bgLightBlue50() { return this.add("backgroundColor", "rgba(240,249,255,1)"); }
+  get bgLightBlue100() { return this.add("backgroundColor", "rgba(224,242,254,1)"); }
+  get bgLightBlue200() { return this.add("backgroundColor", "rgba(186,230,253,1)"); }
+  get bgLightBlue300() { return this.add("backgroundColor", "rgba(125,211,252,1)"); }
+  get bgLightBlue400() { return this.add("backgroundColor", "rgba(56,189,248,1)"); }
+  get bgLightBlue500() { return this.add("backgroundColor", "rgba(14,165,233,1)"); }
+  get bgLightBlue600() { return this.add("backgroundColor", "rgba(2,143,199,1)"); }
+  get bgLightBlue700() { return this.add("backgroundColor", "rgba(3,105,161,1)"); }
+  get bgLightBlue800() { return this.add("backgroundColor", "rgba(7,89,133,1)"); }
+  get bgLightBlue900() { return this.add("backgroundColor", "rgba(12,74,110,1)"); }
+  get bgRed50() { return this.add("backgroundColor", "rgba(255,242,242,1)"); }
+  get bgRed100() { return this.add("backgroundColor", "rgba(253,210,209,1)"); }
+  get bgRed200() { return this.add("backgroundColor", "rgba(249,181,177,1)"); }
+  get bgRed300() { return this.add("backgroundColor", "rgba(242,155,148,1)"); }
+  get bgRed400() { return this.add("backgroundColor", "rgba(232,133,122,1)"); }
+  get bgRed500() { return this.add("backgroundColor", "rgba(218,114,100,1)"); }
+  get bgRed600() { return this.add("backgroundColor", "rgba(200,98,81,1)"); }
+  get bgRed700() { return this.add("backgroundColor", "rgba(176,83,73,1)"); }
+  get bgRed800() { return this.add("backgroundColor", "rgba(149,68,64,1)"); }
+  get bgRed900() { return this.add("backgroundColor", "rgba(120,54,54,1)"); }
+  get bgYellow50() { return this.add("backgroundColor", "rgba(255,254,242,1)"); }
+  get bgYellow100() { return this.add("backgroundColor", "rgba(255,254,212,1)"); }
+  get bgYellow200() { return this.add("backgroundColor", "rgba(255,250,180,1)"); }
+  get bgYellow300() { return this.add("backgroundColor", "rgba(255,240,150,1)"); }
+  get bgYellow400() { return this.add("backgroundColor", "rgba(255,225,123,1)"); }
+  get bgYellow500() { return this.add("backgroundColor", "rgba(255,204,99,1)"); }
+  get bgYellow600() { return this.add("backgroundColor", "rgba(246,177,78,1)"); }
+  get bgYellow700() { return this.add("backgroundColor", "rgba(207,150,73,1)"); }
+  get bgYellow800() { return this.add("backgroundColor", "rgba(164,120,66,1)"); }
+  get bgYellow900() { return this.add("backgroundColor", "rgba(120,89,54,1)"); }
+  get bgGreen50() { return this.add("backgroundColor", "rgba(250,255,250,1)"); }
+  get bgGreen100() { return this.add("backgroundColor", "rgba(223,248,216,1)"); }
+  get bgGreen200() { return this.add("backgroundColor", "rgba(199,239,183,1)"); }
+  get bgGreen300() { return this.add("backgroundColor", "rgba(179,226,153,1)"); }
+  get bgGreen400() { return this.add("backgroundColor", "rgba(163,208,126,1)"); }
+  get bgGreen500() { return this.add("backgroundColor", "rgba(146,185,101,1)"); }
+  get bgGreen600() { return this.add("backgroundColor", "rgba(126,156,79,1)"); }
+  get bgGreen700() { return this.add("backgroundColor", "rgba(101,120,57,1)"); }
+  get bgGreen800() { return this.add("backgroundColor", "rgba(64,93,44,1)"); }
+  get bgGreen900() { return this.add("backgroundColor", "rgba(34,64,31,1)"); }
+  get bgViolet50() { return this.add("backgroundColor", "rgba(245,243,255,1)"); }
+  get bgViolet100() { return this.add("backgroundColor", "rgba(238,234,253,1)"); }
+  get bgViolet200() { return this.add("backgroundColor", "rgba(232,225,252,1)"); }
+  get bgViolet300() { return this.add("backgroundColor", "rgba(218,205,246,1)"); }
+  get bgViolet400() { return this.add("backgroundColor", "rgba(204,186,236,1)"); }
+  get bgViolet500() { return this.add("backgroundColor", "rgba(190,167,223,1)"); }
+  get bgViolet600() { return this.add("backgroundColor", "rgba(173,147,205,1)"); }
+  get bgViolet700() { return this.add("backgroundColor", "rgba(153,126,181,1)"); }
+  get bgViolet800() { return this.add("backgroundColor", "rgba(128,103,151,1)"); }
+  get bgViolet900() { return this.add("backgroundColor", "rgba(100,78,116,1)"); }
+  get bgBlack() { return this.add("backgroundColor", "rgba(17,24,39,1)"); }
   get bgCoolGray50() { return this.add("backgroundColor", "rgba(249,250,251,1)"); }
   get bgCoolGray100() { return this.add("backgroundColor", "rgba(243,244,246,1)"); }
   get bgCoolGray200() { return this.add("backgroundColor", "rgba(229,231,235,1)"); }
@@ -477,16 +637,6 @@ class CssBuilder<T extends Properties1> {
   get bgSky700() { return this.add("backgroundColor", "rgba(29,48,216,1)"); }
   get bgSky800() { return this.add("backgroundColor", "rgba(30,53,175,1)"); }
   get bgSky900() { return this.add("backgroundColor", "rgba(30,41,138,1)"); }
-  get bgViolet50() { return this.add("backgroundColor", "rgba(245,243,255,1)"); }
-  get bgViolet100() { return this.add("backgroundColor", "rgba(237,233,254,1)"); }
-  get bgViolet200() { return this.add("backgroundColor", "rgba(221,214,254,1)"); }
-  get bgViolet300() { return this.add("backgroundColor", "rgba(196,181,253,1)"); }
-  get bgViolet400() { return this.add("backgroundColor", "rgba(167,139,250,1)"); }
-  get bgViolet500() { return this.add("backgroundColor", "rgba(139,92,246,1)"); }
-  get bgViolet600() { return this.add("backgroundColor", "rgba(124,58,237,1)"); }
-  get bgViolet700() { return this.add("backgroundColor", "rgba(109,40,217,1)"); }
-  get bgViolet800() { return this.add("backgroundColor", "rgba(91,33,182,1)"); }
-  get bgViolet900() { return this.add("backgroundColor", "rgba(76,29,149,1)"); }
   get bgCool50() { return this.add("backgroundColor", "rgba(239,246,247,1)"); }
   get bgCool100() { return this.add("backgroundColor", "rgba(216,235,238,1)"); }
   get bgCool200() { return this.add("backgroundColor", "rgba(177,219,225,1)"); }
@@ -500,9 +650,69 @@ class CssBuilder<T extends Properties1> {
   get bgCool1000() { return this.add("backgroundColor", "rgba(42,47,135,1)"); }
   get bgCool1100() { return this.add("backgroundColor", "rgba(16,27,100,1)"); }
   bgColor(value: string) { return this.add("backgroundColor", value); }
-  get fBlack() { return this.add("fill", "rgba(17,24,39,1)"); }
   get fWhite() { return this.add("fill", "rgba(254,254,254,1)"); }
   get fTransparent() { return this.add("fill", "rgba(0,0,0,0)"); }
+  get fGray50() { return this.add("fill", "rgba(255,253,253,1)"); }
+  get fGray100() { return this.add("fill", "rgba(247,245,245,1)"); }
+  get fGray200() { return this.add("fill", "rgba(236,235,235,1)"); }
+  get fGray300() { return this.add("fill", "rgba(221,220,220,1)"); }
+  get fGray400() { return this.add("fill", "rgba(201,201,201,1)"); }
+  get fGray500() { return this.add("fill", "rgba(175,175,175,1)"); }
+  get fGray600() { return this.add("fill", "rgba(141,141,141,1)"); }
+  get fGray700() { return this.add("fill", "rgba(100,100,100,1)"); }
+  get fGray800() { return this.add("fill", "rgba(53,53,53,1)"); }
+  get fGray900() { return this.add("fill", "rgba(36,36,36,1)"); }
+  get fLightBlue50() { return this.add("fill", "rgba(240,249,255,1)"); }
+  get fLightBlue100() { return this.add("fill", "rgba(224,242,254,1)"); }
+  get fLightBlue200() { return this.add("fill", "rgba(186,230,253,1)"); }
+  get fLightBlue300() { return this.add("fill", "rgba(125,211,252,1)"); }
+  get fLightBlue400() { return this.add("fill", "rgba(56,189,248,1)"); }
+  get fLightBlue500() { return this.add("fill", "rgba(14,165,233,1)"); }
+  get fLightBlue600() { return this.add("fill", "rgba(2,143,199,1)"); }
+  get fLightBlue700() { return this.add("fill", "rgba(3,105,161,1)"); }
+  get fLightBlue800() { return this.add("fill", "rgba(7,89,133,1)"); }
+  get fLightBlue900() { return this.add("fill", "rgba(12,74,110,1)"); }
+  get fRed50() { return this.add("fill", "rgba(255,242,242,1)"); }
+  get fRed100() { return this.add("fill", "rgba(253,210,209,1)"); }
+  get fRed200() { return this.add("fill", "rgba(249,181,177,1)"); }
+  get fRed300() { return this.add("fill", "rgba(242,155,148,1)"); }
+  get fRed400() { return this.add("fill", "rgba(232,133,122,1)"); }
+  get fRed500() { return this.add("fill", "rgba(218,114,100,1)"); }
+  get fRed600() { return this.add("fill", "rgba(200,98,81,1)"); }
+  get fRed700() { return this.add("fill", "rgba(176,83,73,1)"); }
+  get fRed800() { return this.add("fill", "rgba(149,68,64,1)"); }
+  get fRed900() { return this.add("fill", "rgba(120,54,54,1)"); }
+  get fYellow50() { return this.add("fill", "rgba(255,254,242,1)"); }
+  get fYellow100() { return this.add("fill", "rgba(255,254,212,1)"); }
+  get fYellow200() { return this.add("fill", "rgba(255,250,180,1)"); }
+  get fYellow300() { return this.add("fill", "rgba(255,240,150,1)"); }
+  get fYellow400() { return this.add("fill", "rgba(255,225,123,1)"); }
+  get fYellow500() { return this.add("fill", "rgba(255,204,99,1)"); }
+  get fYellow600() { return this.add("fill", "rgba(246,177,78,1)"); }
+  get fYellow700() { return this.add("fill", "rgba(207,150,73,1)"); }
+  get fYellow800() { return this.add("fill", "rgba(164,120,66,1)"); }
+  get fYellow900() { return this.add("fill", "rgba(120,89,54,1)"); }
+  get fGreen50() { return this.add("fill", "rgba(250,255,250,1)"); }
+  get fGreen100() { return this.add("fill", "rgba(223,248,216,1)"); }
+  get fGreen200() { return this.add("fill", "rgba(199,239,183,1)"); }
+  get fGreen300() { return this.add("fill", "rgba(179,226,153,1)"); }
+  get fGreen400() { return this.add("fill", "rgba(163,208,126,1)"); }
+  get fGreen500() { return this.add("fill", "rgba(146,185,101,1)"); }
+  get fGreen600() { return this.add("fill", "rgba(126,156,79,1)"); }
+  get fGreen700() { return this.add("fill", "rgba(101,120,57,1)"); }
+  get fGreen800() { return this.add("fill", "rgba(64,93,44,1)"); }
+  get fGreen900() { return this.add("fill", "rgba(34,64,31,1)"); }
+  get fViolet50() { return this.add("fill", "rgba(245,243,255,1)"); }
+  get fViolet100() { return this.add("fill", "rgba(238,234,253,1)"); }
+  get fViolet200() { return this.add("fill", "rgba(232,225,252,1)"); }
+  get fViolet300() { return this.add("fill", "rgba(218,205,246,1)"); }
+  get fViolet400() { return this.add("fill", "rgba(204,186,236,1)"); }
+  get fViolet500() { return this.add("fill", "rgba(190,167,223,1)"); }
+  get fViolet600() { return this.add("fill", "rgba(173,147,205,1)"); }
+  get fViolet700() { return this.add("fill", "rgba(153,126,181,1)"); }
+  get fViolet800() { return this.add("fill", "rgba(128,103,151,1)"); }
+  get fViolet900() { return this.add("fill", "rgba(100,78,116,1)"); }
+  get fBlack() { return this.add("fill", "rgba(17,24,39,1)"); }
   get fCoolGray50() { return this.add("fill", "rgba(249,250,251,1)"); }
   get fCoolGray100() { return this.add("fill", "rgba(243,244,246,1)"); }
   get fCoolGray200() { return this.add("fill", "rgba(229,231,235,1)"); }
@@ -553,16 +763,6 @@ class CssBuilder<T extends Properties1> {
   get fSky700() { return this.add("fill", "rgba(29,48,216,1)"); }
   get fSky800() { return this.add("fill", "rgba(30,53,175,1)"); }
   get fSky900() { return this.add("fill", "rgba(30,41,138,1)"); }
-  get fViolet50() { return this.add("fill", "rgba(245,243,255,1)"); }
-  get fViolet100() { return this.add("fill", "rgba(237,233,254,1)"); }
-  get fViolet200() { return this.add("fill", "rgba(221,214,254,1)"); }
-  get fViolet300() { return this.add("fill", "rgba(196,181,253,1)"); }
-  get fViolet400() { return this.add("fill", "rgba(167,139,250,1)"); }
-  get fViolet500() { return this.add("fill", "rgba(139,92,246,1)"); }
-  get fViolet600() { return this.add("fill", "rgba(124,58,237,1)"); }
-  get fViolet700() { return this.add("fill", "rgba(109,40,217,1)"); }
-  get fViolet800() { return this.add("fill", "rgba(91,33,182,1)"); }
-  get fViolet900() { return this.add("fill", "rgba(76,29,149,1)"); }
   get fCool50() { return this.add("fill", "rgba(239,246,247,1)"); }
   get fCool100() { return this.add("fill", "rgba(216,235,238,1)"); }
   get fCool200() { return this.add("fill", "rgba(177,219,225,1)"); }
@@ -928,9 +1128,69 @@ export function px(pixels: number): string {
 }
 
 export enum Palette {
-  Black = "rgba(17,24,39,1)",
   White = "rgba(254,254,254,1)",
   Transparent = "rgba(0,0,0,0)",
+  Gray50 = "rgba(255,253,253,1)",
+  Gray100 = "rgba(247,245,245,1)",
+  Gray200 = "rgba(236,235,235,1)",
+  Gray300 = "rgba(221,220,220,1)",
+  Gray400 = "rgba(201,201,201,1)",
+  Gray500 = "rgba(175,175,175,1)",
+  Gray600 = "rgba(141,141,141,1)",
+  Gray700 = "rgba(100,100,100,1)",
+  Gray800 = "rgba(53,53,53,1)",
+  Gray900 = "rgba(36,36,36,1)",
+  LightBlue50 = "rgba(240,249,255,1)",
+  LightBlue100 = "rgba(224,242,254,1)",
+  LightBlue200 = "rgba(186,230,253,1)",
+  LightBlue300 = "rgba(125,211,252,1)",
+  LightBlue400 = "rgba(56,189,248,1)",
+  LightBlue500 = "rgba(14,165,233,1)",
+  LightBlue600 = "rgba(2,143,199,1)",
+  LightBlue700 = "rgba(3,105,161,1)",
+  LightBlue800 = "rgba(7,89,133,1)",
+  LightBlue900 = "rgba(12,74,110,1)",
+  Red50 = "rgba(255,242,242,1)",
+  Red100 = "rgba(253,210,209,1)",
+  Red200 = "rgba(249,181,177,1)",
+  Red300 = "rgba(242,155,148,1)",
+  Red400 = "rgba(232,133,122,1)",
+  Red500 = "rgba(218,114,100,1)",
+  Red600 = "rgba(200,98,81,1)",
+  Red700 = "rgba(176,83,73,1)",
+  Red800 = "rgba(149,68,64,1)",
+  Red900 = "rgba(120,54,54,1)",
+  Yellow50 = "rgba(255,254,242,1)",
+  Yellow100 = "rgba(255,254,212,1)",
+  Yellow200 = "rgba(255,250,180,1)",
+  Yellow300 = "rgba(255,240,150,1)",
+  Yellow400 = "rgba(255,225,123,1)",
+  Yellow500 = "rgba(255,204,99,1)",
+  Yellow600 = "rgba(246,177,78,1)",
+  Yellow700 = "rgba(207,150,73,1)",
+  Yellow800 = "rgba(164,120,66,1)",
+  Yellow900 = "rgba(120,89,54,1)",
+  Green50 = "rgba(250,255,250,1)",
+  Green100 = "rgba(223,248,216,1)",
+  Green200 = "rgba(199,239,183,1)",
+  Green300 = "rgba(179,226,153,1)",
+  Green400 = "rgba(163,208,126,1)",
+  Green500 = "rgba(146,185,101,1)",
+  Green600 = "rgba(126,156,79,1)",
+  Green700 = "rgba(101,120,57,1)",
+  Green800 = "rgba(64,93,44,1)",
+  Green900 = "rgba(34,64,31,1)",
+  Violet50 = "rgba(245,243,255,1)",
+  Violet100 = "rgba(238,234,253,1)",
+  Violet200 = "rgba(232,225,252,1)",
+  Violet300 = "rgba(218,205,246,1)",
+  Violet400 = "rgba(204,186,236,1)",
+  Violet500 = "rgba(190,167,223,1)",
+  Violet600 = "rgba(173,147,205,1)",
+  Violet700 = "rgba(153,126,181,1)",
+  Violet800 = "rgba(128,103,151,1)",
+  Violet900 = "rgba(100,78,116,1)",
+  Black = "rgba(17,24,39,1)",
   CoolGray50 = "rgba(249,250,251,1)",
   CoolGray100 = "rgba(243,244,246,1)",
   CoolGray200 = "rgba(229,231,235,1)",
@@ -981,16 +1241,6 @@ export enum Palette {
   Sky700 = "rgba(29,48,216,1)",
   Sky800 = "rgba(30,53,175,1)",
   Sky900 = "rgba(30,41,138,1)",
-  Violet50 = "rgba(245,243,255,1)",
-  Violet100 = "rgba(237,233,254,1)",
-  Violet200 = "rgba(221,214,254,1)",
-  Violet300 = "rgba(196,181,253,1)",
-  Violet400 = "rgba(167,139,250,1)",
-  Violet500 = "rgba(139,92,246,1)",
-  Violet600 = "rgba(124,58,237,1)",
-  Violet700 = "rgba(109,40,217,1)",
-  Violet800 = "rgba(91,33,182,1)",
-  Violet900 = "rgba(76,29,149,1)",
   Cool50 = "rgba(239,246,247,1)",
   Cool100 = "rgba(216,235,238,1)",
   Cool200 = "rgba(177,219,225,1)",
