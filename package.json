@@ -10,14 +10,16 @@
     "url": "https://github.com/homebound-team/beam"
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.{stories,test}.*",
+    "!dist/setupTests.*"
   ],
   "engines": {
     "node": "14.8.0"
   },
   "scripts": {
     "start": "yarn storybook",
-    "build": "ttsc -p ./tsconfig.prod.json",
+    "build": "ttsc",
     "build:truss": "cd ./truss && npm run generate",
     "watch:truss": "cd ./truss && watch 'npm run generate' ./",
     "build:storybook": "build-storybook",
