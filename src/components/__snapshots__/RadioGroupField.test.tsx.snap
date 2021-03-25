@@ -6,7 +6,7 @@ exports[`RadioGroupField renders with just labels 1`] = `
 }
 
 .emotion-1 {
-  color: rgba(107,114,128,1);
+  color: rgba(53,53,53,1);
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
@@ -46,10 +46,10 @@ exports[`RadioGroupField renders with just labels 1`] = `
   width: 16px;
   outline: 0px solid transparent;
   background-color: currentColor;
-  border-color: transparent;
+  border-color: rgba(0,0,0,0);
   border-style: solid;
   border-width: 1px;
-  color: rgba(71,101,255,1);
+  color: rgba(3,105,161,1);
   -webkit-background-position: center;
   background-position: center;
   background-repeat: no-repeat;
@@ -63,11 +63,11 @@ exports[`RadioGroupField renders with just labels 1`] = `
 .emotion-3:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
-  box-shadow: rgba(254,254,254,1) 0px 0px 0px 2px,currentColor 0px 0px 0px 4px;
+  box-shadow: 0px 0px 0px 2px rgba(254,254,254,1),0px 0px 0px 4px rgba(3,105,161,1);
 }
 
 .emotion-4 {
-  color: rgba(55,65,81,1);
+  color: rgba(53,53,53,1);
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
@@ -96,10 +96,10 @@ exports[`RadioGroupField renders with just labels 1`] = `
   width: 16px;
   outline: 0px solid transparent;
   background-color: rgba(254,254,254,1);
-  border-color: rgba(209,213,219,1);
+  border-color: rgba(221,220,220,1);
   border-style: solid;
   border-width: 1px;
-  color: rgba(71,101,255,1);
+  color: rgba(3,105,161,1);
   cursor: pointer;
   margin-right: 8px;
   margin-top: 2px;
@@ -108,7 +108,7 @@ exports[`RadioGroupField renders with just labels 1`] = `
 .emotion-6:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
-  box-shadow: rgba(254,254,254,1) 0px 0px 0px 2px,currentColor 0px 0px 0px 4px;
+  box-shadow: 0px 0px 0px 2px rgba(254,254,254,1),0px 0px 0px 4px rgba(3,105,161,1);
 }
 
 <body>
@@ -181,7 +181,7 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
 }
 
 .emotion-1 {
-  color: rgba(107,114,128,1);
+  color: rgba(53,53,53,1);
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
@@ -221,10 +221,10 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
   width: 16px;
   outline: 0px solid transparent;
   background-color: currentColor;
-  border-color: transparent;
+  border-color: rgba(0,0,0,0);
   border-style: solid;
   border-width: 1px;
-  color: rgba(71,101,255,1);
+  color: rgba(3,105,161,1);
   -webkit-background-position: center;
   background-position: center;
   background-repeat: no-repeat;
@@ -238,11 +238,11 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
 .emotion-3:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
-  box-shadow: rgba(254,254,254,1) 0px 0px 0px 2px,currentColor 0px 0px 0px 4px;
+  box-shadow: 0px 0px 0px 2px rgba(254,254,254,1),0px 0px 0px 4px rgba(3,105,161,1);
 }
 
 .emotion-4 {
-  color: rgba(55,65,81,1);
+  color: rgba(53,53,53,1);
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
@@ -271,10 +271,10 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
   width: 16px;
   outline: 0px solid transparent;
   background-color: rgba(254,254,254,1);
-  border-color: rgba(209,213,219,1);
+  border-color: rgba(221,220,220,1);
   border-style: solid;
   border-width: 1px;
-  color: rgba(71,101,255,1);
+  color: rgba(3,105,161,1);
   cursor: pointer;
   margin-right: 8px;
   margin-top: 2px;
@@ -283,11 +283,11 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
 .emotion-6:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
-  box-shadow: rgba(254,254,254,1) 0px 0px 0px 2px,currentColor 0px 0px 0px 4px;
+  box-shadow: 0px 0px 0px 2px rgba(254,254,254,1),0px 0px 0px 4px rgba(3,105,161,1);
 }
 
 .emotion-8 {
-  color: rgba(107,114,128,1);
+  color: rgba(100,100,100,1);
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
