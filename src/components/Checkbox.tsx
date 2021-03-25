@@ -4,7 +4,7 @@ import { useCheckbox, useFocusRing, useHover, VisuallyHidden } from "react-aria"
 import { Css, Palette, px } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 
-interface CheckboxProps extends BeamFocusableProps {
+export interface CheckboxProps extends BeamFocusableProps {
   /** Additional text displayed below label */
   description?: string;
   disabled?: boolean;
@@ -17,6 +17,8 @@ interface CheckboxProps extends BeamFocusableProps {
   label: string;
   /** Handler that is called when the element's selection state changes. */
   onChange: (selected: boolean) => void;
+  /** Required for Checkbox Groups */
+  value?: string;
 }
 
 export function Checkbox(props: CheckboxProps) {
