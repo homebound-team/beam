@@ -69,6 +69,13 @@ export function Checkboxes() {
               description:
                 "When Florence Knoll challenged Eero Saarinen to create a chair that she could curl up in, she found the right candidate for the task.",
             },
+            {
+              value: "disabled",
+              onChange: () => {},
+              label: "Disabled Option",
+              disabled: true,
+              description: "This chair cannot be selected.",
+            },
           ]}
         />
       </div>

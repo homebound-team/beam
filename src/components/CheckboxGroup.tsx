@@ -1,6 +1,6 @@
 import { useCheckboxGroup } from "@react-aria/checkbox";
 import { useCheckboxGroupState } from "@react-stately/checkbox";
-import { CheckboxGroupItem, CheckboxProps } from "src/components";
+import { Checkbox, CheckboxProps } from "src/components";
 import { Css } from "src/Css";
 
 export interface CheckboxGroupItemOption extends CheckboxProps {
@@ -34,12 +34,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
       </div>
       <div css={Css.dg.gap2.$}>
         {options.map((option) => (
-          <CheckboxGroupItem
-            key={option.value}
-            {...option}
-            state={state}
-            selected={state.value.includes(option.value)}
-          />
+          <Checkbox key={option.value} {...option} groupState={state} selected={state.value.includes(option.value)} />
         ))}
       </div>
     </div>
