@@ -46,23 +46,17 @@ const sections: Sections = {
     }),
   animation: () =>
     newMethodsForProp("transition", {
-      transition: "all 200ms",
+      transition: ["background-color", "border-color", "box-shadow"]
+        .reduce((acc, property, i) => acc + `${property} 200ms, `, "")
+        .slice(0, -2),
     }),
   boxShadow: () =>
     newMethodsForProp("boxShadow", {
       bsh0: "none",
-      bshFocus: `0px 0px 0px 2px ${palette.White}, 0 0 0 4px ${palette.Sky500}`,
-      bshDanger: `0px 0px 0px 2px ${palette.White}, 0 0 0 4px ${palette.Coral600}`,
-    }),
-  animation: () =>
-    newMethodsForProp("transition", {
-      transition: "all 200ms",
-    }),
-  boxShadow: () =>
-    newMethodsForProp("boxShadow", {
-      bsh0: "none",
-      bshFocus: `0px 0px 0px 2px ${palette.White}, 0 0 0 4px ${palette.Sky500}`,
-      bshDanger: `0px 0px 0px 2px ${palette.White}, 0 0 0 4px ${palette.Coral600}`,
+      bshBasic: "0px 2px 16px 0px rgba(17,24,39,0.03), 0px 4px 8px 0px rgba(17,24,39,0.08)",
+      bshHover: "0px 2px 24px 0px rgba(17,24,39,0.08), 0px 4px 8px 0px rgba(17,24,39,0.1)",
+      bshFocus: `0px 0px 0px 2px ${palette.White}, 0px 0px 0px 4px ${palette.LightBlue700}`,
+      bshDanger: `0px 0px 0px 2px ${palette.White}, 0px 0px 0px 4px ${palette.Red800}`,
     }),
 };
 

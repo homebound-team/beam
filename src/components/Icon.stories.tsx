@@ -42,7 +42,7 @@ export const Icon = () => {
   const navigationIcons: IconProps["icon"][] = ["projects", "tasks", "finances", "templates", "tradePartners"];
 
   return (
-    <div css={Css.coolGray900.$}>
+    <div css={Css.gray900.$}>
       <h1 css={Css.xl2Em.$}>Actions</h1>
       <ul css={{ gap: 24, listStyle: "none", gridTemplateColumns: "repeat(5, 1fr)", ...Css.dg.p0.$ }}>
         {actionIcons.map((icon, i) => (

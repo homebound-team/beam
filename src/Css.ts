@@ -96,69 +96,6 @@ class CssBuilder<T extends Properties1> {
   get bViolet700() { return this.add("borderColor", "rgba(153,126,181,1)"); }
   get bViolet800() { return this.add("borderColor", "rgba(128,103,151,1)"); }
   get bViolet900() { return this.add("borderColor", "rgba(100,78,116,1)"); }
-  get bBlack() { return this.add("borderColor", "rgba(17,24,39,1)"); }
-  get bCoolGray50() { return this.add("borderColor", "rgba(249,250,251,1)"); }
-  get bCoolGray100() { return this.add("borderColor", "rgba(243,244,246,1)"); }
-  get bCoolGray200() { return this.add("borderColor", "rgba(229,231,235,1)"); }
-  get bCoolGray300() { return this.add("borderColor", "rgba(209,213,219,1)"); }
-  get bCoolGray400() { return this.add("borderColor", "rgba(156,163,175,1)"); }
-  get bCoolGray500() { return this.add("borderColor", "rgba(107,114,128,1)"); }
-  get bCoolGray600() { return this.add("borderColor", "rgba(75,85,99,1)"); }
-  get bCoolGray700() { return this.add("borderColor", "rgba(55,65,81,1)"); }
-  get bCoolGray800() { return this.add("borderColor", "rgba(31,41,55,1)"); }
-  get bCoolGray900() { return this.add("borderColor", "rgba(17,24,39,1)"); }
-  get bCoral50() { return this.add("borderColor", "rgba(255,234,227,1)"); }
-  get bCoral100() { return this.add("borderColor", "rgba(255,223,212,1)"); }
-  get bCoral200() { return this.add("borderColor", "rgba(255,194,174,1)"); }
-  get bCoral300() { return this.add("borderColor", "rgba(255,165,136,1)"); }
-  get bCoral400() { return this.add("borderColor", "rgba(255,123,82,1)"); }
-  get bCoral500() { return this.add("borderColor", "rgba(255,87,34,1)"); }
-  get bCoral600() { return this.add("borderColor", "rgba(222,53,11,1)"); }
-  get bCoral700() { return this.add("borderColor", "rgba(182,58,19,1)"); }
-  get bCoral800() { return this.add("borderColor", "rgba(143,45,14,1)"); }
-  get bCoral900() { return this.add("borderColor", "rgba(115,40,16,1)"); }
-  get bAmber50() { return this.add("borderColor", "rgba(255,251,235,1)"); }
-  get bAmber100() { return this.add("borderColor", "rgba(254,243,199,1)"); }
-  get bAmber200() { return this.add("borderColor", "rgba(253,230,138,1)"); }
-  get bAmber300() { return this.add("borderColor", "rgba(252,211,77,1)"); }
-  get bAmber400() { return this.add("borderColor", "rgba(251,191,36,1)"); }
-  get bAmber500() { return this.add("borderColor", "rgba(245,158,11,1)"); }
-  get bAmber600() { return this.add("borderColor", "rgba(217,119,6,1)"); }
-  get bAmber700() { return this.add("borderColor", "rgba(180,83,9,1)"); }
-  get bAmber800() { return this.add("borderColor", "rgba(146,64,14,1)"); }
-  get bAmber900() { return this.add("borderColor", "rgba(120,53,15,1)"); }
-  get bEmerald50() { return this.add("borderColor", "rgba(236,253,245,1)"); }
-  get bEmerald100() { return this.add("borderColor", "rgba(209,250,229,1)"); }
-  get bEmerald200() { return this.add("borderColor", "rgba(167,243,208,1)"); }
-  get bEmerald300() { return this.add("borderColor", "rgba(110,231,183,1)"); }
-  get bEmerald400() { return this.add("borderColor", "rgba(52,211,153,1)"); }
-  get bEmerald500() { return this.add("borderColor", "rgba(16,185,129,1)"); }
-  get bEmerald600() { return this.add("borderColor", "rgba(5,150,105,1)"); }
-  get bEmerald700() { return this.add("borderColor", "rgba(4,120,87,1)"); }
-  get bEmerald800() { return this.add("borderColor", "rgba(6,95,70,1)"); }
-  get bEmerald900() { return this.add("borderColor", "rgba(6,78,59,1)"); }
-  get bSky50() { return this.add("borderColor", "rgba(239,244,255,1)"); }
-  get bSky100() { return this.add("borderColor", "rgba(219,227,254,1)"); }
-  get bSky200() { return this.add("borderColor", "rgba(191,209,254,1)"); }
-  get bSky300() { return this.add("borderColor", "rgba(147,170,253,1)"); }
-  get bSky400() { return this.add("borderColor", "rgba(109,131,246,1)"); }
-  get bSky500() { return this.add("borderColor", "rgba(71,101,255,1)"); }
-  get bSky600() { return this.add("borderColor", "rgba(37,45,235,1)"); }
-  get bSky700() { return this.add("borderColor", "rgba(29,48,216,1)"); }
-  get bSky800() { return this.add("borderColor", "rgba(30,53,175,1)"); }
-  get bSky900() { return this.add("borderColor", "rgba(30,41,138,1)"); }
-  get bCool50() { return this.add("borderColor", "rgba(239,246,247,1)"); }
-  get bCool100() { return this.add("borderColor", "rgba(216,235,238,1)"); }
-  get bCool200() { return this.add("borderColor", "rgba(177,219,225,1)"); }
-  get bCool300() { return this.add("borderColor", "rgba(128,200,214,1)"); }
-  get bCool400() { return this.add("borderColor", "rgba(124,170,211,1)"); }
-  get bCool500() { return this.add("borderColor", "rgba(116,139,218,1)"); }
-  get bCool600() { return this.add("borderColor", "rgba(115,103,241,1)"); }
-  get bCool700() { return this.add("borderColor", "rgba(97,85,216,1)"); }
-  get bCool800() { return this.add("borderColor", "rgba(77,72,186,1)"); }
-  get bCool900() { return this.add("borderColor", "rgba(59,60,160,1)"); }
-  get bCool1000() { return this.add("borderColor", "rgba(42,47,135,1)"); }
-  get bCool1100() { return this.add("borderColor", "rgba(16,27,100,1)"); }
 
   // borderRadius
   get br0() { return this.add("borderRadius", "0"); }
@@ -180,8 +117,10 @@ class CssBuilder<T extends Properties1> {
 
   // boxShadow
   get bsh0() { return this.add("boxShadow", "none"); }
-  get bshFocus() { return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0 0 0 4px rgba(71,101,255,1)"); }
-  get bshDanger() { return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0 0 0 4px rgba(222,53,11,1)"); }
+  get bshBasic() { return this.add("boxShadow", "0px 2px 16px 0px rgba(17,24,39,0.03), 0px 4px 8px 0px rgba(17,24,39,0.08)"); }
+  get bshHover() { return this.add("boxShadow", "0px 2px 24px 0px rgba(17,24,39,0.08), 0px 4px 8px 0px rgba(17,24,39,0.1)"); }
+  get bshFocus() { return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px rgba(3,105,161,1)"); }
+  get bshDanger() { return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px rgba(149,68,64,1)"); }
 
   // coordinates
   get top0() { return this.top(0); }
@@ -460,69 +399,6 @@ class CssBuilder<T extends Properties1> {
   get violet700() { return this.add("color", "rgba(153,126,181,1)"); }
   get violet800() { return this.add("color", "rgba(128,103,151,1)"); }
   get violet900() { return this.add("color", "rgba(100,78,116,1)"); }
-  get black() { return this.add("color", "rgba(17,24,39,1)"); }
-  get coolGray50() { return this.add("color", "rgba(249,250,251,1)"); }
-  get coolGray100() { return this.add("color", "rgba(243,244,246,1)"); }
-  get coolGray200() { return this.add("color", "rgba(229,231,235,1)"); }
-  get coolGray300() { return this.add("color", "rgba(209,213,219,1)"); }
-  get coolGray400() { return this.add("color", "rgba(156,163,175,1)"); }
-  get coolGray500() { return this.add("color", "rgba(107,114,128,1)"); }
-  get coolGray600() { return this.add("color", "rgba(75,85,99,1)"); }
-  get coolGray700() { return this.add("color", "rgba(55,65,81,1)"); }
-  get coolGray800() { return this.add("color", "rgba(31,41,55,1)"); }
-  get coolGray900() { return this.add("color", "rgba(17,24,39,1)"); }
-  get coral50() { return this.add("color", "rgba(255,234,227,1)"); }
-  get coral100() { return this.add("color", "rgba(255,223,212,1)"); }
-  get coral200() { return this.add("color", "rgba(255,194,174,1)"); }
-  get coral300() { return this.add("color", "rgba(255,165,136,1)"); }
-  get coral400() { return this.add("color", "rgba(255,123,82,1)"); }
-  get coral500() { return this.add("color", "rgba(255,87,34,1)"); }
-  get coral600() { return this.add("color", "rgba(222,53,11,1)"); }
-  get coral700() { return this.add("color", "rgba(182,58,19,1)"); }
-  get coral800() { return this.add("color", "rgba(143,45,14,1)"); }
-  get coral900() { return this.add("color", "rgba(115,40,16,1)"); }
-  get amber50() { return this.add("color", "rgba(255,251,235,1)"); }
-  get amber100() { return this.add("color", "rgba(254,243,199,1)"); }
-  get amber200() { return this.add("color", "rgba(253,230,138,1)"); }
-  get amber300() { return this.add("color", "rgba(252,211,77,1)"); }
-  get amber400() { return this.add("color", "rgba(251,191,36,1)"); }
-  get amber500() { return this.add("color", "rgba(245,158,11,1)"); }
-  get amber600() { return this.add("color", "rgba(217,119,6,1)"); }
-  get amber700() { return this.add("color", "rgba(180,83,9,1)"); }
-  get amber800() { return this.add("color", "rgba(146,64,14,1)"); }
-  get amber900() { return this.add("color", "rgba(120,53,15,1)"); }
-  get emerald50() { return this.add("color", "rgba(236,253,245,1)"); }
-  get emerald100() { return this.add("color", "rgba(209,250,229,1)"); }
-  get emerald200() { return this.add("color", "rgba(167,243,208,1)"); }
-  get emerald300() { return this.add("color", "rgba(110,231,183,1)"); }
-  get emerald400() { return this.add("color", "rgba(52,211,153,1)"); }
-  get emerald500() { return this.add("color", "rgba(16,185,129,1)"); }
-  get emerald600() { return this.add("color", "rgba(5,150,105,1)"); }
-  get emerald700() { return this.add("color", "rgba(4,120,87,1)"); }
-  get emerald800() { return this.add("color", "rgba(6,95,70,1)"); }
-  get emerald900() { return this.add("color", "rgba(6,78,59,1)"); }
-  get sky50() { return this.add("color", "rgba(239,244,255,1)"); }
-  get sky100() { return this.add("color", "rgba(219,227,254,1)"); }
-  get sky200() { return this.add("color", "rgba(191,209,254,1)"); }
-  get sky300() { return this.add("color", "rgba(147,170,253,1)"); }
-  get sky400() { return this.add("color", "rgba(109,131,246,1)"); }
-  get sky500() { return this.add("color", "rgba(71,101,255,1)"); }
-  get sky600() { return this.add("color", "rgba(37,45,235,1)"); }
-  get sky700() { return this.add("color", "rgba(29,48,216,1)"); }
-  get sky800() { return this.add("color", "rgba(30,53,175,1)"); }
-  get sky900() { return this.add("color", "rgba(30,41,138,1)"); }
-  get cool50() { return this.add("color", "rgba(239,246,247,1)"); }
-  get cool100() { return this.add("color", "rgba(216,235,238,1)"); }
-  get cool200() { return this.add("color", "rgba(177,219,225,1)"); }
-  get cool300() { return this.add("color", "rgba(128,200,214,1)"); }
-  get cool400() { return this.add("color", "rgba(124,170,211,1)"); }
-  get cool500() { return this.add("color", "rgba(116,139,218,1)"); }
-  get cool600() { return this.add("color", "rgba(115,103,241,1)"); }
-  get cool700() { return this.add("color", "rgba(97,85,216,1)"); }
-  get cool800() { return this.add("color", "rgba(77,72,186,1)"); }
-  get cool900() { return this.add("color", "rgba(59,60,160,1)"); }
-  get cool1000() { return this.add("color", "rgba(42,47,135,1)"); }
-  get cool1100() { return this.add("color", "rgba(16,27,100,1)"); }
   color(value: string) { return this.add("color", value); }
   get bgWhite() { return this.add("backgroundColor", "rgba(254,254,254,1)"); }
   get bgTransparent() { return this.add("backgroundColor", "rgba(0,0,0,0)"); }
@@ -586,69 +462,6 @@ class CssBuilder<T extends Properties1> {
   get bgViolet700() { return this.add("backgroundColor", "rgba(153,126,181,1)"); }
   get bgViolet800() { return this.add("backgroundColor", "rgba(128,103,151,1)"); }
   get bgViolet900() { return this.add("backgroundColor", "rgba(100,78,116,1)"); }
-  get bgBlack() { return this.add("backgroundColor", "rgba(17,24,39,1)"); }
-  get bgCoolGray50() { return this.add("backgroundColor", "rgba(249,250,251,1)"); }
-  get bgCoolGray100() { return this.add("backgroundColor", "rgba(243,244,246,1)"); }
-  get bgCoolGray200() { return this.add("backgroundColor", "rgba(229,231,235,1)"); }
-  get bgCoolGray300() { return this.add("backgroundColor", "rgba(209,213,219,1)"); }
-  get bgCoolGray400() { return this.add("backgroundColor", "rgba(156,163,175,1)"); }
-  get bgCoolGray500() { return this.add("backgroundColor", "rgba(107,114,128,1)"); }
-  get bgCoolGray600() { return this.add("backgroundColor", "rgba(75,85,99,1)"); }
-  get bgCoolGray700() { return this.add("backgroundColor", "rgba(55,65,81,1)"); }
-  get bgCoolGray800() { return this.add("backgroundColor", "rgba(31,41,55,1)"); }
-  get bgCoolGray900() { return this.add("backgroundColor", "rgba(17,24,39,1)"); }
-  get bgCoral50() { return this.add("backgroundColor", "rgba(255,234,227,1)"); }
-  get bgCoral100() { return this.add("backgroundColor", "rgba(255,223,212,1)"); }
-  get bgCoral200() { return this.add("backgroundColor", "rgba(255,194,174,1)"); }
-  get bgCoral300() { return this.add("backgroundColor", "rgba(255,165,136,1)"); }
-  get bgCoral400() { return this.add("backgroundColor", "rgba(255,123,82,1)"); }
-  get bgCoral500() { return this.add("backgroundColor", "rgba(255,87,34,1)"); }
-  get bgCoral600() { return this.add("backgroundColor", "rgba(222,53,11,1)"); }
-  get bgCoral700() { return this.add("backgroundColor", "rgba(182,58,19,1)"); }
-  get bgCoral800() { return this.add("backgroundColor", "rgba(143,45,14,1)"); }
-  get bgCoral900() { return this.add("backgroundColor", "rgba(115,40,16,1)"); }
-  get bgAmber50() { return this.add("backgroundColor", "rgba(255,251,235,1)"); }
-  get bgAmber100() { return this.add("backgroundColor", "rgba(254,243,199,1)"); }
-  get bgAmber200() { return this.add("backgroundColor", "rgba(253,230,138,1)"); }
-  get bgAmber300() { return this.add("backgroundColor", "rgba(252,211,77,1)"); }
-  get bgAmber400() { return this.add("backgroundColor", "rgba(251,191,36,1)"); }
-  get bgAmber500() { return this.add("backgroundColor", "rgba(245,158,11,1)"); }
-  get bgAmber600() { return this.add("backgroundColor", "rgba(217,119,6,1)"); }
-  get bgAmber700() { return this.add("backgroundColor", "rgba(180,83,9,1)"); }
-  get bgAmber800() { return this.add("backgroundColor", "rgba(146,64,14,1)"); }
-  get bgAmber900() { return this.add("backgroundColor", "rgba(120,53,15,1)"); }
-  get bgEmerald50() { return this.add("backgroundColor", "rgba(236,253,245,1)"); }
-  get bgEmerald100() { return this.add("backgroundColor", "rgba(209,250,229,1)"); }
-  get bgEmerald200() { return this.add("backgroundColor", "rgba(167,243,208,1)"); }
-  get bgEmerald300() { return this.add("backgroundColor", "rgba(110,231,183,1)"); }
-  get bgEmerald400() { return this.add("backgroundColor", "rgba(52,211,153,1)"); }
-  get bgEmerald500() { return this.add("backgroundColor", "rgba(16,185,129,1)"); }
-  get bgEmerald600() { return this.add("backgroundColor", "rgba(5,150,105,1)"); }
-  get bgEmerald700() { return this.add("backgroundColor", "rgba(4,120,87,1)"); }
-  get bgEmerald800() { return this.add("backgroundColor", "rgba(6,95,70,1)"); }
-  get bgEmerald900() { return this.add("backgroundColor", "rgba(6,78,59,1)"); }
-  get bgSky50() { return this.add("backgroundColor", "rgba(239,244,255,1)"); }
-  get bgSky100() { return this.add("backgroundColor", "rgba(219,227,254,1)"); }
-  get bgSky200() { return this.add("backgroundColor", "rgba(191,209,254,1)"); }
-  get bgSky300() { return this.add("backgroundColor", "rgba(147,170,253,1)"); }
-  get bgSky400() { return this.add("backgroundColor", "rgba(109,131,246,1)"); }
-  get bgSky500() { return this.add("backgroundColor", "rgba(71,101,255,1)"); }
-  get bgSky600() { return this.add("backgroundColor", "rgba(37,45,235,1)"); }
-  get bgSky700() { return this.add("backgroundColor", "rgba(29,48,216,1)"); }
-  get bgSky800() { return this.add("backgroundColor", "rgba(30,53,175,1)"); }
-  get bgSky900() { return this.add("backgroundColor", "rgba(30,41,138,1)"); }
-  get bgCool50() { return this.add("backgroundColor", "rgba(239,246,247,1)"); }
-  get bgCool100() { return this.add("backgroundColor", "rgba(216,235,238,1)"); }
-  get bgCool200() { return this.add("backgroundColor", "rgba(177,219,225,1)"); }
-  get bgCool300() { return this.add("backgroundColor", "rgba(128,200,214,1)"); }
-  get bgCool400() { return this.add("backgroundColor", "rgba(124,170,211,1)"); }
-  get bgCool500() { return this.add("backgroundColor", "rgba(116,139,218,1)"); }
-  get bgCool600() { return this.add("backgroundColor", "rgba(115,103,241,1)"); }
-  get bgCool700() { return this.add("backgroundColor", "rgba(97,85,216,1)"); }
-  get bgCool800() { return this.add("backgroundColor", "rgba(77,72,186,1)"); }
-  get bgCool900() { return this.add("backgroundColor", "rgba(59,60,160,1)"); }
-  get bgCool1000() { return this.add("backgroundColor", "rgba(42,47,135,1)"); }
-  get bgCool1100() { return this.add("backgroundColor", "rgba(16,27,100,1)"); }
   bgColor(value: string) { return this.add("backgroundColor", value); }
   get fWhite() { return this.add("fill", "rgba(254,254,254,1)"); }
   get fTransparent() { return this.add("fill", "rgba(0,0,0,0)"); }
@@ -712,69 +525,6 @@ class CssBuilder<T extends Properties1> {
   get fViolet700() { return this.add("fill", "rgba(153,126,181,1)"); }
   get fViolet800() { return this.add("fill", "rgba(128,103,151,1)"); }
   get fViolet900() { return this.add("fill", "rgba(100,78,116,1)"); }
-  get fBlack() { return this.add("fill", "rgba(17,24,39,1)"); }
-  get fCoolGray50() { return this.add("fill", "rgba(249,250,251,1)"); }
-  get fCoolGray100() { return this.add("fill", "rgba(243,244,246,1)"); }
-  get fCoolGray200() { return this.add("fill", "rgba(229,231,235,1)"); }
-  get fCoolGray300() { return this.add("fill", "rgba(209,213,219,1)"); }
-  get fCoolGray400() { return this.add("fill", "rgba(156,163,175,1)"); }
-  get fCoolGray500() { return this.add("fill", "rgba(107,114,128,1)"); }
-  get fCoolGray600() { return this.add("fill", "rgba(75,85,99,1)"); }
-  get fCoolGray700() { return this.add("fill", "rgba(55,65,81,1)"); }
-  get fCoolGray800() { return this.add("fill", "rgba(31,41,55,1)"); }
-  get fCoolGray900() { return this.add("fill", "rgba(17,24,39,1)"); }
-  get fCoral50() { return this.add("fill", "rgba(255,234,227,1)"); }
-  get fCoral100() { return this.add("fill", "rgba(255,223,212,1)"); }
-  get fCoral200() { return this.add("fill", "rgba(255,194,174,1)"); }
-  get fCoral300() { return this.add("fill", "rgba(255,165,136,1)"); }
-  get fCoral400() { return this.add("fill", "rgba(255,123,82,1)"); }
-  get fCoral500() { return this.add("fill", "rgba(255,87,34,1)"); }
-  get fCoral600() { return this.add("fill", "rgba(222,53,11,1)"); }
-  get fCoral700() { return this.add("fill", "rgba(182,58,19,1)"); }
-  get fCoral800() { return this.add("fill", "rgba(143,45,14,1)"); }
-  get fCoral900() { return this.add("fill", "rgba(115,40,16,1)"); }
-  get fAmber50() { return this.add("fill", "rgba(255,251,235,1)"); }
-  get fAmber100() { return this.add("fill", "rgba(254,243,199,1)"); }
-  get fAmber200() { return this.add("fill", "rgba(253,230,138,1)"); }
-  get fAmber300() { return this.add("fill", "rgba(252,211,77,1)"); }
-  get fAmber400() { return this.add("fill", "rgba(251,191,36,1)"); }
-  get fAmber500() { return this.add("fill", "rgba(245,158,11,1)"); }
-  get fAmber600() { return this.add("fill", "rgba(217,119,6,1)"); }
-  get fAmber700() { return this.add("fill", "rgba(180,83,9,1)"); }
-  get fAmber800() { return this.add("fill", "rgba(146,64,14,1)"); }
-  get fAmber900() { return this.add("fill", "rgba(120,53,15,1)"); }
-  get fEmerald50() { return this.add("fill", "rgba(236,253,245,1)"); }
-  get fEmerald100() { return this.add("fill", "rgba(209,250,229,1)"); }
-  get fEmerald200() { return this.add("fill", "rgba(167,243,208,1)"); }
-  get fEmerald300() { return this.add("fill", "rgba(110,231,183,1)"); }
-  get fEmerald400() { return this.add("fill", "rgba(52,211,153,1)"); }
-  get fEmerald500() { return this.add("fill", "rgba(16,185,129,1)"); }
-  get fEmerald600() { return this.add("fill", "rgba(5,150,105,1)"); }
-  get fEmerald700() { return this.add("fill", "rgba(4,120,87,1)"); }
-  get fEmerald800() { return this.add("fill", "rgba(6,95,70,1)"); }
-  get fEmerald900() { return this.add("fill", "rgba(6,78,59,1)"); }
-  get fSky50() { return this.add("fill", "rgba(239,244,255,1)"); }
-  get fSky100() { return this.add("fill", "rgba(219,227,254,1)"); }
-  get fSky200() { return this.add("fill", "rgba(191,209,254,1)"); }
-  get fSky300() { return this.add("fill", "rgba(147,170,253,1)"); }
-  get fSky400() { return this.add("fill", "rgba(109,131,246,1)"); }
-  get fSky500() { return this.add("fill", "rgba(71,101,255,1)"); }
-  get fSky600() { return this.add("fill", "rgba(37,45,235,1)"); }
-  get fSky700() { return this.add("fill", "rgba(29,48,216,1)"); }
-  get fSky800() { return this.add("fill", "rgba(30,53,175,1)"); }
-  get fSky900() { return this.add("fill", "rgba(30,41,138,1)"); }
-  get fCool50() { return this.add("fill", "rgba(239,246,247,1)"); }
-  get fCool100() { return this.add("fill", "rgba(216,235,238,1)"); }
-  get fCool200() { return this.add("fill", "rgba(177,219,225,1)"); }
-  get fCool300() { return this.add("fill", "rgba(128,200,214,1)"); }
-  get fCool400() { return this.add("fill", "rgba(124,170,211,1)"); }
-  get fCool500() { return this.add("fill", "rgba(116,139,218,1)"); }
-  get fCool600() { return this.add("fill", "rgba(115,103,241,1)"); }
-  get fCool700() { return this.add("fill", "rgba(97,85,216,1)"); }
-  get fCool800() { return this.add("fill", "rgba(77,72,186,1)"); }
-  get fCool900() { return this.add("fill", "rgba(59,60,160,1)"); }
-  get fCool1000() { return this.add("fill", "rgba(42,47,135,1)"); }
-  get fCool1100() { return this.add("fill", "rgba(16,27,100,1)"); }
   fill(value: string) { return this.add("fill", value); }
 
   // spacing
@@ -1048,7 +798,7 @@ class CssBuilder<T extends Properties1> {
   get sansSerif() { return this.add("fontFamily", "'Inter', sans-serif"); }
 
   // animation
-  get transition() { return this.add("transition", "all 200ms"); }
+  get transition() { return this.add("transition", "background-color 200ms, border-color 200ms, box-shadow 200ms"); }
 
   // aliases
   
@@ -1190,69 +940,6 @@ export enum Palette {
   Violet700 = "rgba(153,126,181,1)",
   Violet800 = "rgba(128,103,151,1)",
   Violet900 = "rgba(100,78,116,1)",
-  Black = "rgba(17,24,39,1)",
-  CoolGray50 = "rgba(249,250,251,1)",
-  CoolGray100 = "rgba(243,244,246,1)",
-  CoolGray200 = "rgba(229,231,235,1)",
-  CoolGray300 = "rgba(209,213,219,1)",
-  CoolGray400 = "rgba(156,163,175,1)",
-  CoolGray500 = "rgba(107,114,128,1)",
-  CoolGray600 = "rgba(75,85,99,1)",
-  CoolGray700 = "rgba(55,65,81,1)",
-  CoolGray800 = "rgba(31,41,55,1)",
-  CoolGray900 = "rgba(17,24,39,1)",
-  Coral50 = "rgba(255,234,227,1)",
-  Coral100 = "rgba(255,223,212,1)",
-  Coral200 = "rgba(255,194,174,1)",
-  Coral300 = "rgba(255,165,136,1)",
-  Coral400 = "rgba(255,123,82,1)",
-  Coral500 = "rgba(255,87,34,1)",
-  Coral600 = "rgba(222,53,11,1)",
-  Coral700 = "rgba(182,58,19,1)",
-  Coral800 = "rgba(143,45,14,1)",
-  Coral900 = "rgba(115,40,16,1)",
-  Amber50 = "rgba(255,251,235,1)",
-  Amber100 = "rgba(254,243,199,1)",
-  Amber200 = "rgba(253,230,138,1)",
-  Amber300 = "rgba(252,211,77,1)",
-  Amber400 = "rgba(251,191,36,1)",
-  Amber500 = "rgba(245,158,11,1)",
-  Amber600 = "rgba(217,119,6,1)",
-  Amber700 = "rgba(180,83,9,1)",
-  Amber800 = "rgba(146,64,14,1)",
-  Amber900 = "rgba(120,53,15,1)",
-  Emerald50 = "rgba(236,253,245,1)",
-  Emerald100 = "rgba(209,250,229,1)",
-  Emerald200 = "rgba(167,243,208,1)",
-  Emerald300 = "rgba(110,231,183,1)",
-  Emerald400 = "rgba(52,211,153,1)",
-  Emerald500 = "rgba(16,185,129,1)",
-  Emerald600 = "rgba(5,150,105,1)",
-  Emerald700 = "rgba(4,120,87,1)",
-  Emerald800 = "rgba(6,95,70,1)",
-  Emerald900 = "rgba(6,78,59,1)",
-  Sky50 = "rgba(239,244,255,1)",
-  Sky100 = "rgba(219,227,254,1)",
-  Sky200 = "rgba(191,209,254,1)",
-  Sky300 = "rgba(147,170,253,1)",
-  Sky400 = "rgba(109,131,246,1)",
-  Sky500 = "rgba(71,101,255,1)",
-  Sky600 = "rgba(37,45,235,1)",
-  Sky700 = "rgba(29,48,216,1)",
-  Sky800 = "rgba(30,53,175,1)",
-  Sky900 = "rgba(30,41,138,1)",
-  Cool50 = "rgba(239,246,247,1)",
-  Cool100 = "rgba(216,235,238,1)",
-  Cool200 = "rgba(177,219,225,1)",
-  Cool300 = "rgba(128,200,214,1)",
-  Cool400 = "rgba(124,170,211,1)",
-  Cool500 = "rgba(116,139,218,1)",
-  Cool600 = "rgba(115,103,241,1)",
-  Cool700 = "rgba(97,85,216,1)",
-  Cool800 = "rgba(77,72,186,1)",
-  Cool900 = "rgba(59,60,160,1)",
-  Cool1000 = "rgba(42,47,135,1)",
-  Cool1100 = "rgba(16,27,100,1)",
 }
 
 /** A shortcut for defining Xss types. */

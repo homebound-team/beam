@@ -22,7 +22,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
 
   return (
     <div css={Css.df.flexColumn.wPx(width).$}>
-      <label {...labelProps} css={Css.sm.coolGray500.mbPx(4).$}>
+      <label {...labelProps} css={Css.sm.gray700.mbPx(4).$}>
         {label}
       </label>
       <ElementType
@@ -31,21 +31,18 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         ref={inputRef as any}
         rows={multiline ? 1 : undefined}
         css={{
-          ...Css.add("resize", "none")
-            .wPx(width)
-            .sm.px1.pyPx(10)
-            .coolGray900.br4.outline0.ba.bCoolGray300.if(compact)
-            .pyPx(6).$,
+          ...Css.add("resize", "none").wPx(width).sm.px1.pyPx(10).gray800.br4.outline0.ba.bGray300.if(compact).pyPx(6)
+            .$,
           ...Css.if(multiline).mh(px(120)).$,
-          "&:focus": Css.bSky500.$,
-          "&:disabled": Css.coolGray400.bgCoolGray100.cursorNotAllowed.$,
-          ...(errorMsg ? Css.bCoral500.$ : {}),
+          "&:focus": Css.bLightBlue700.$,
+          "&:disabled": Css.gray400.bgGray100.cursorNotAllowed.$,
+          ...(errorMsg ? Css.bRed500.$ : {}),
         }}
       />
       {errorMsg && (
-        <div id={errorMessageId} css={Css.coral600.sm.df.mtPx(4).$}>
+        <div id={errorMessageId} css={Css.red600.sm.df.mtPx(4).$}>
           <span css={Css.fs0.$}>
-            <Icon icon="error" color={Palette.Coral500} />
+            <Icon icon="error" color={Palette.Red500} />
           </span>
           <span css={Css.ml1.mtPx(2).$}>{errorMsg}</span>
         </div>
