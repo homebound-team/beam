@@ -35,7 +35,7 @@ export function Checkboxes() {
       </div>
       <div css={Css.dg.gap1.$}>
         <h2>Checkbox Group</h2>
-        <div css={Css.sm.coolGray500.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
+        <div css={Css.sm.lightBlue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
         <CheckboxGroup
           label="Favorite Chairs"
           onChange={(values) => setSelectedValues(values)}

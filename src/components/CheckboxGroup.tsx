@@ -29,7 +29,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
 
   return (
     <div {...groupProps}>
-      <div {...labelProps} css={Css.coolGray500.pbPx(4).sm.$}>
+      <div {...labelProps} css={Css.gray700.pbPx(4).sm.$}>
         {label}
       </div>
       <div css={Css.dg.gap2.$}>

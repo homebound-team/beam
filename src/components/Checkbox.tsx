@@ -36,21 +36,22 @@ export function Checkbox(props: CheckboxProps) {
     ...otherProps
   } = props;
   const ariaProps = { isSelected: selected, isDisabled, isIndeterminate, value, ...otherProps };
+  const checkboxProps = { ...ariaProps, "aria-label": label };
   const ref = useRef(null);
-  const state = useToggleState(ariaProps);
-  const isSelected = state.isSelected;
+  const toggleState = useToggleState(ariaProps);
+  const isSelected = toggleState.isSelected;
+  const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
+  const { hoverProps, isHovered } = useHover({ isDisabled });
+  const markIcon = isIndeterminate ? dashSmall : isSelected ? checkmarkSmall : "";
 
   // Swap hooks depending on whether this checkbox is inside a CheckboxGroup.
   // This is a bit unorthodox. Typically, hooks cannot be called in a conditional,
   // but since the checkbox won't move in and out of a group, it should be safe.
   const { inputProps } = groupState
     ? // eslint-disable-next-line react-hooks/rules-of-hooks
-      useCheckboxGroupItem({ ...ariaProps, "aria-label": label }, groupState, ref)
+      useCheckboxGroupItem(checkboxProps, groupState, ref)
     : // eslint-disable-next-line react-hooks/rules-of-hooks
-      useCheckbox({ ...ariaProps, "aria-label": label }, state, ref);
-  const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
-  const { hoverProps, isHovered } = useHover({ isDisabled });
-  const markIcon = isIndeterminate ? dashSmall : isSelected ? checkmarkSmall : "";
+      useCheckbox(checkboxProps, toggleState, ref);
 
   return (
     <div>
@@ -62,35 +63,35 @@ export function Checkbox(props: CheckboxProps) {
           {...hoverProps}
           css={{
             ...baseStyles,
-            ...((isSelected || isIndeterminate) && selectedStyles(isHovered)),
-            ...(isDisabled && disabledStyles),
+            ...((isSelected || isIndeterminate) && filledBoxStyles),
+            ...((isSelected || isIndeterminate) && isHovered && filledBoxHoverStyles),
+            ...(isDisabled && disabledBoxStyles),
             ...(isFocusVisible && focusRingStyles),
-            ...(isHovered && hoverStyles),
+            ...(isHovered && hoverBorderStyles),
             ...markStyles,
           }}
           aria-hidden="true"
         >
           {markIcon}
         </span>
-        {label && <div css={labelStyles(isDisabled)}>{label}</div>}
+
+        {label && <div css={{ ...labelStyles, ...(isDisabled && disabledFont) }}>{label}</div>}
       </label>
-      {description && <div css={descStyles(isDisabled)}>{description}</div>}
+      {description && <div css={{ ...descStyles, ...(isDisabled && disabledFont) }}>{description}</div>}
     </div>
   );
 }
 
 const baseStyles = Css.hPx(16).wPx(16).relative.cursorPointer.ba.bGray300.br4.bgWhite.transition.$;
-const disabledStyles = Css.bGray400.bGray100.cursorNotAllowed.$;
-const selectedStyles = (isHovered: boolean) => Css.bLightBlue700.if(!isHovered).bgLightBlue700.else.bgLightBlue900.$;
+const filledBoxStyles = Css.bLightBlue700.bgLightBlue700.$;
+const filledBoxHoverStyles = Css.bgLightBlue900.$;
+const disabledBoxStyles = Css.bGray400.bGray100.cursorNotAllowed.$;
+const disabledFont = Css.gray300.$;
 const focusRingStyles = Css.bshFocus.$;
-const hoverStyles = Css.bLightBlue900.$;
+const hoverBorderStyles = Css.bLightBlue900.$;
 const markStyles = { svg: Css.absolute.topPx(-1).leftPx(-1).$ };
-function labelStyles(isDisabled: boolean) {
-  return Css.pl1.smEm.if(isDisabled).gray800.$;
-}
-function descStyles(isDisabled: boolean) {
-  return Css.pl3.sm.gray700.maxw(px(312)).if(isDisabled).gray300.$;
-}
+const labelStyles = Css.pl1.smEm.$;
+const descStyles = Css.pl3.sm.gray700.maxw(px(312)).$;
 
 const checkmarkSmall = (
   <svg width="16" height="16">
