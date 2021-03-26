@@ -46,9 +46,7 @@ const sections: Sections = {
     }),
   animation: () =>
     newMethodsForProp("transition", {
-      transition: ["background-color", "border-color", "box-shadow"]
-        .reduce((acc, property, i) => acc + `${property} 200ms, `, "")
-        .slice(0, -2),
+      transition: ["background-color", "border-color", "box-shadow"].map((property) => `${property} 200ms`).join(", "),
     }),
   boxShadow: () =>
     newMethodsForProp("boxShadow", {
