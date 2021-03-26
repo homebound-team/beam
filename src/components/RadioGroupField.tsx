@@ -1,7 +1,7 @@
 import { ReactNode, useMemo, useRef } from "react";
 import { useRadio, useRadioGroup } from "react-aria";
 import { RadioGroupState, useRadioGroupState } from "react-stately";
-import { Css, Palette } from "src/Css";
+import { Css } from "src/Css";
 
 let nextNameId = 0;
 
@@ -32,6 +32,8 @@ interface RadioGroupFieldProps<K extends string> {
  * Provides a radio group with label.
  *
  * This is generally meant to be used in a form vs. being raw radio buttons.
+ *
+ * TODO: Add hover (non selected and selected) styles
  */
 export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>) {
   const { label, value, onChange, options, disabled = false } = props;
@@ -55,7 +57,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
 
   return (
     <div css={Css.maxw(anyDescriptions ? "344px" : "320px").$}>
-      <div css={Css.sm.coolGray500.my1.$} {...labelProps}>
+      <div css={Css.sm.gray800.my1.$} {...labelProps}>
         {label}
       </div>
       <div {...radioGroupProps}>
@@ -102,13 +104,13 @@ function Radio<K extends string>(props: { parentId: string; option: RadioFieldOp
       <div>
         <div
           id={labelId}
-          css={Css.smEm.coolGray700.if(disabled).coolGray300.$}
+          css={Css.smEm.gray800.if(disabled).gray400.$}
           {...(description ? { "aria-describedby": descriptionId } : {})}
         >
           {label}
         </div>
         {description && (
-          <div id={descriptionId} css={Css.sm.coolGray500.if(disabled).coolGray300.$}>
+          <div id={descriptionId} css={Css.sm.gray700.if(disabled).gray400.$}>
             {description}
           </div>
         )}
@@ -128,18 +130,18 @@ export const radioReset = {
   ...Css.add("appearance", "none").p0.dib.vMid.add("userSelect", "none").fs0.h2.w2.br100.$,
   ...Css.add("outline", "0px solid transparent").$,
   // By default we're white with a blue border
-  ...Css.bgWhite.bSky500.ba.$,
+  ...Css.bgWhite.bLightBlue900.ba.$,
   // Set a color that will be used by background=currentColor + box shadow, but is initially ignored
-  ...Css.sky500.$,
+  ...Css.lightBlue700.$,
 };
 
 // Unchecked means a gray border
-export const radioUnchecked = Css.cursorPointer.bCoolGray300.$;
+export const radioUnchecked = Css.cursorPointer.bGray300.$;
 
 // Checked means a blue circle (achieved by a blue background + white dot background image)
 export const radioChecked = {
   // When checked, make a circle by having the border blend into the background
-  ...Css.add("borderColor", "transparent").$,
+  ...Css.bTransparent.$,
   // And make the background become the current (blue) color
   ...Css.add("backgroundColor", "currentColor")
     .add("backgroundSize", "100% 100%")
@@ -154,11 +156,11 @@ export const radioFocus = {
   // The box shadow ends up drawing over this afaict?
   ...Css.add("outline", "2px solid transparent").add("outlineOffset", "2px").$,
   // Draw 1st box shadow of white/outline, 2nd box current (blue) of another outline
-  ...Css.add("boxShadow", `${Palette.White} 0px 0px 0px 2px, currentColor 0px 0px 0px 4px`).$,
+  ...Css.bshFocus.$,
 };
 
 export const radioDisabled = {
-  ...Css.cursorNotAllowed.coolGray100.$,
+  ...Css.cursorNotAllowed.gray100.$,
   ...Css.add("backgroundColor", "currentColor")
     .add("backgroundSize", "100% 100%")
     .add("backgroundPosition", "center")

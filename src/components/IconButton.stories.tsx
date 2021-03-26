@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { IconButton as IconButtonComponent, IconButtonProps, iconButtonStylesHover, Icons } from "src";
-import { Css, px } from "src/Css";
+import { Css } from "src/Css";
 
 export default {
   title: "Components/Icon Button",
@@ -23,7 +23,7 @@ export default {
 export const IconButton = (args: IconButtonProps) => (
   <div css={{ h1: Css.xl2Em.mbPx(30).$, h2: Css.smEm.$ }}>
     <h1>Icon Only Button</h1>
-    <div css={Css.df.gap(px(90)).$}>
+    <div css={Css.df.gapPx(90).$}>
       <div>
         <h2>Default</h2>
         <IconButtonComponent {...args} />

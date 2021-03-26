@@ -7,32 +7,21 @@ export default {
 
 export const Color = () => {
   const paletteEntries = Object.entries(Palette);
-  const primaryPalette = paletteEntries.slice(0, 2);
-  const neutralPalette = paletteEntries.filter(([name]) => name.includes("CoolGray"));
-  const extendedPalette = paletteEntries.filter(([name]) => !name.includes("Cool"));
-  const chartPalette = paletteEntries.filter(([name]) => name.match(/Cool\d+/));
-
   return (
-    <div css={{ h1: Css.xl2Em.$, h2: Css.baseEm.$ }}>
-      <h1>Primary Palette</h1>
-      <ListColors palette={primaryPalette} />
-      <h1>Neutrals</h1>
-      <h2>CoolGray</h2>
-      <ListColors palette={neutralPalette} />
+    <div css={{ h1: Css.xl4Em.mb4.$, h2: Css.xl2Em.mb4.$ }}>
       <h1>Extended Palette</h1>
-      <h2>Coral</h2>
-      <ListColors palette={extendedPalette.filter(([name]) => name.includes("Coral"))} />
-      <h2>Amber</h2>
-      <ListColors palette={extendedPalette.filter(([name]) => name.includes("Amber"))} />
-      <h2>Emerald</h2>
-      <ListColors palette={extendedPalette.filter(([name]) => name.includes("Emerald"))} />
-      <h2>Sky</h2>
-      <ListColors palette={extendedPalette.filter(([name]) => name.includes("Sky"))} />
+      <h2>Gray</h2>
+      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Gray"))} />
+      <h2>Light blue</h2>
+      <ListColors palette={paletteEntries.filter(([name]) => name.includes("LightBlue"))} />
+      <h2>Red</h2>
+      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Red"))} />
+      <h2>Yellow</h2>
+      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Yellow"))} />
+      <h2>Green</h2>
+      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Green"))} />
       <h2>Violet</h2>
-      <ListColors palette={extendedPalette.filter(([name]) => name.includes("Violet"))} />
-      <h1>Chart Palette</h1>
-      <h2>Cool</h2>
-      <ListColors palette={chartPalette} />
+      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Violet"))} />
     </div>
   );
 };
@@ -48,11 +37,11 @@ function ListColors({ palette }: { palette: string[][] }) {
 }
 
 function ColorSquare({ name, color }: any) {
-  const size = 80;
+  const size = 100;
   return (
-    <li css={Css.xsEm.$}>
+    <li css={Css.sm.mb5.tl.$}>
       <div css={Css.h(px(size)).w(px(size)).bgColor(color).$} />
-      {name}
+      <em>{name}</em>
     </li>
   );
 }

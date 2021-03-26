@@ -30,13 +30,13 @@ export function IconButton({ onClick: onPress, disabled: isDisabled, ...otherPro
 
   return (
     <button {...buttonProps} {...focusProps} {...hoverProps} ref={ref} css={styles}>
-      <Icon icon={icon} color={isDisabled ? Palette.CoolGray300 : undefined} />
+      <Icon icon={icon} color={isDisabled ? Palette.Gray400 : undefined} />
     </button>
   );
 }
 
 const iconButtonStylesReset = Css.hPx(28).wPx(28).br8.bTransparent.bw2.bgTransparent.cursorPointer.outline0.df
   .itemsCenter.justifyCenter.transition.$;
-export const iconButtonStylesHover = Css.bgCoolGray100.$;
-const iconButtonStylesFocus = Css.bSky500.$;
+export const iconButtonStylesHover = Css.bgGray100.$;
+const iconButtonStylesFocus = Css.bLightBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;

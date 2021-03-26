@@ -67,31 +67,31 @@ const variantStyles: Record<
   { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; pressedStyles: {} }
 > = {
   primary: {
-    baseStyles: Css.bgSky500.white.$,
-    hoverStyles: Css.bgSky700.$,
-    disabledStyles: Css.bgSky200.$,
-    pressedStyles: Css.bgSky900.$,
+    baseStyles: Css.bgLightBlue700.white.$,
+    hoverStyles: Css.bgLightBlue900.$,
+    pressedStyles: Css.bgLightBlue500.$,
+    disabledStyles: Css.bgLightBlue200.$,
   },
 
   secondary: {
-    baseStyles: Css.bgWhite.bCoolGray300.bw1.ba.coolGray900.$,
-    hoverStyles: Css.bgCoolGray50.$,
-    disabledStyles: Css.bgWhite.coolGray300.$,
-    pressedStyles: Css.bgCoolGray200.$,
+    baseStyles: Css.bgWhite.bGray300.bw1.ba.gray800.$,
+    hoverStyles: Css.bgGray100.$,
+    pressedStyles: Css.bgGray200.$,
+    disabledStyles: Css.bgWhite.gray400.$,
   },
 
   tertiary: {
-    baseStyles: Css.add("background", "none").sky500.$,
-    hoverStyles: Css.bgCoolGray100.$,
-    disabledStyles: Css.coolGray300.$,
-    pressedStyles: Css.sky900.bgCoolGray100.$,
+    baseStyles: Css.bgTransparent.lightBlue700.$,
+    hoverStyles: Css.bgGray100.$,
+    pressedStyles: Css.lightBlue900.$,
+    disabledStyles: Css.gray400.$,
   },
 
   danger: {
-    baseStyles: Css.bgCoral600.white.$,
-    hoverStyles: Css.bgCoral500.$,
-    disabledStyles: Css.bgCoral200.$,
-    pressedStyles: Css.bgCoral700.$,
+    baseStyles: Css.bgRed900.white.$,
+    hoverStyles: Css.bgRed500.$,
+    pressedStyles: Css.bgRed900.$,
+    disabledStyles: Css.bgRed200.$,
   },
 };
 

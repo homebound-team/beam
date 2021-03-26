@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
-import { Css } from "src/Css";
-import {useButton, useFocusRing, useHover} from "react-aria";
+import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
-import { BeamButtonProps, BeamFocusableProps } from "src/interfaces"
+import { Css } from "src/Css";
+import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 
 interface ButtonGroupProps {
   disabled?: boolean;
@@ -18,7 +18,9 @@ export function ButtonGroup(props: ButtonGroupProps) {
   const { buttons, disabled = false } = props;
   return (
     <div css={Css.mPx(4).$}>
-      { buttons.map((b, i) => <ButtonGroupButton key={i} {...{...b, disabled} } />) }
+      {buttons.map((b, i) => (
+        <ButtonGroupButton key={i} {...{ ...b, disabled }} />
+      ))}
     </div>
   );
 }
@@ -43,25 +45,25 @@ export function ButtonGroupButton(props: ButtonGroupButtonProps) {
         ...buttonStyles,
         ...(isFocusVisible ? defaultFocusRingStyles : {}),
         ...(isPressed ? activeStyles : isHovered ? hoverStyles : {}),
-        ...(icon ? iconStyles : {})
+        ...(icon ? iconStyles : {}),
       }}
     >
-      {icon && <Icon icon={icon}/>}
+      {icon && <Icon icon={icon} />}
       {text}
     </button>
   );
 }
 
 const buttonReset = Css.smEm.br4.dif.itemsCenter.outline0.transition.mPx(4).$;
-const activeStyles = Css.bgCoolGray200.important.$;
-const hoverStyles = Css.bgCoolGray50.$;
+const activeStyles = Css.bgGray200.important.$;
+const hoverStyles = Css.bgGray100.$;
 const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 const iconStyles = Css.px1.$;
 
 function getButtonStyles() {
   return {
-    ...Css.z1.hPx(40).px2.bgWhite.bCoolGray300.bw1.ba.coolGray900.m0.br0.$,
-    "&:disabled": Css.coolGray200.cursorNotAllowed.bCoolGray200.$,
+    ...Css.z1.hPx(40).px2.bgWhite.bGray300.bw1.ba.gray800.m0.br0.$,
+    "&:disabled": Css.gray400.cursorNotAllowed.bGray300.$,
     // Our first button should have a rounded left border
     "&:first-of-type": Css.add("borderRadius", "4px 0 0 4px").$,
     // Our last button should have a rounded right border
