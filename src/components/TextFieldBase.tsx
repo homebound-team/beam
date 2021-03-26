@@ -1,6 +1,7 @@
 import { mergeProps } from "@react-aria/utils";
 import React, { InputHTMLAttributes, LabelHTMLAttributes, MutableRefObject, TextareaHTMLAttributes } from "react";
 import { Icon } from "src/components/Icon";
+import { Label } from "src/components/Label";
 import { Css, Palette, px } from "src/Css";
 import { BeamTextFieldProps } from "src/interfaces";
 
@@ -25,9 +26,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
 
   return (
     <div css={Css.df.flexColumn.wPx(width).$}>
-      <label {...labelProps} css={Css.sm.gray700.mbPx(4).$}>
-        {label}
-      </label>
+      {label && <Label labelProps={labelProps} label={label} />}
       <ElementType
         {...mergeProps(inputProps, { "aria-invalid": Boolean(errorMsg) })}
         {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
