@@ -54,44 +54,43 @@ export function Checkbox(props: CheckboxProps) {
       useCheckbox(checkboxProps, toggleState, ref);
 
   return (
-    <div>
-      <label css={Css.df.itemsCenter.$}>
-        <VisuallyHidden>
-          <input ref={ref} {...inputProps} {...focusProps} />
-        </VisuallyHidden>
-        <span
-          {...hoverProps}
-          css={{
-            ...baseStyles,
-            ...((isSelected || isIndeterminate) && filledBoxStyles),
-            ...((isSelected || isIndeterminate) && isHovered && filledBoxHoverStyles),
-            ...(isDisabled && disabledBoxStyles),
-            ...(isFocusVisible && focusRingStyles),
-            ...(isHovered && hoverBorderStyles),
-            ...markStyles,
-          }}
-          aria-hidden="true"
-        >
-          {markIcon}
-        </span>
-
+    <label css={Css.df.cursorPointer.if(isDisabled).cursorNotAllowed.$}>
+      <VisuallyHidden>
+        <input ref={ref} {...inputProps} {...focusProps} />
+      </VisuallyHidden>
+      <span
+        {...hoverProps}
+        css={{
+          ...baseStyles,
+          ...((isSelected || isIndeterminate) && filledBoxStyles),
+          ...((isSelected || isIndeterminate) && isHovered && filledBoxHoverStyles),
+          ...(isDisabled && disabledBoxStyles),
+          ...(isFocusVisible && focusRingStyles),
+          ...(isHovered && hoverBorderStyles),
+          ...markStyles,
+        }}
+        aria-hidden="true"
+      >
+        {markIcon}
+      </span>
+      <div css={Css.ml1.$}>
         {label && <div css={{ ...labelStyles, ...(isDisabled && disabledFont) }}>{label}</div>}
-      </label>
-      {description && <div css={{ ...descStyles, ...(isDisabled && disabledFont) }}>{description}</div>}
-    </div>
+        {description && <div css={{ ...descStyles, ...(isDisabled && disabledFont) }}>{description}</div>}
+      </div>
+    </label>
   );
 }
 
-const baseStyles = Css.hPx(16).wPx(16).relative.cursorPointer.ba.bGray300.br4.bgWhite.transition.$;
+const baseStyles = Css.hPx(16).wPx(16).relative.ba.bGray300.br4.bgWhite.transition.topPx(2).$;
 const filledBoxStyles = Css.bLightBlue700.bgLightBlue700.$;
 const filledBoxHoverStyles = Css.bgLightBlue900.$;
-const disabledBoxStyles = Css.bGray400.bGray100.cursorNotAllowed.$;
+const disabledBoxStyles = Css.bGray400.bGray100.$;
 const disabledFont = Css.gray300.$;
 const focusRingStyles = Css.bshFocus.$;
 const hoverBorderStyles = Css.bLightBlue900.$;
 const markStyles = { svg: Css.absolute.topPx(-1).leftPx(-1).$ };
-const labelStyles = Css.pl1.smEm.$;
-const descStyles = Css.pl3.sm.gray700.maxw(px(312)).$;
+const labelStyles = Css.smEm.$;
+const descStyles = Css.sm.gray700.maxw(px(312)).$;
 
 const checkmarkSmall = (
   <svg width="16" height="16">
