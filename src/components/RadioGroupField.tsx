@@ -83,7 +83,7 @@ function Radio<K extends string>(props: { parentId: string; option: RadioFieldOp
   const ref = useRef<HTMLInputElement>(null);
   const { inputProps } = useRadio({ value, "aria-labelledby": labelId }, state, ref);
   const { focusProps, isFocusVisible } = useFocusRing();
-  const { hoverProps, isHovered } = useHover({});
+  const { hoverProps, isHovered } = useHover({ isDisabled: disabled });
 
   return (
     <label css={Css.df.cursorPointer.mb1.if(disabled).add("cursor", "initial").$} {...hoverProps}>
