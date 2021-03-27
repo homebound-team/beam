@@ -1,5 +1,5 @@
 import { ReactNode, useMemo, useRef } from "react";
-import { useRadio, useRadioGroup } from "react-aria";
+import { useFocusRing, useHover, useRadio, useRadioGroup } from "react-aria";
 import { RadioGroupState, useRadioGroupState } from "react-stately";
 import { Css } from "src/Css";
 
@@ -82,24 +82,28 @@ function Radio<K extends string>(props: { parentId: string; option: RadioFieldOp
   const descriptionId = `${parentId}-${value}-description`;
   const ref = useRef<HTMLInputElement>(null);
   const { inputProps } = useRadio({ value, "aria-labelledby": labelId }, state, ref);
+  const { focusProps, isFocusVisible } = useFocusRing();
+  const { hoverProps, isHovered } = useHover({});
 
   return (
-    <label css={Css.df.cursorPointer.mb1.if(disabled).add("cursor", "initial").$}>
+    <label css={Css.df.cursorPointer.mb1.if(disabled).add("cursor", "initial").$} {...hoverProps}>
       <input
         type="radio"
         ref={ref}
         css={{
           ...radioReset,
+          ...radioDefault,
           ...(!disabled && state.selectedValue === value ? radioChecked : radioUnchecked),
           ...(disabled ? radioDisabled : {}),
-          // Sometimes we use useFocusRing, but here we want both mouse & keyboard to drive focus
-          ...{ "&:focus": radioFocus },
+          ...(isHovered ? radioHover : {}),
+          ...(isFocusVisible ? radioFocus : {}),
           // Nudge down so the center of the circle lines up with the label text
           ...Css.mtPx(2).mr1.$,
         }}
         disabled={disabled}
-        {...inputProps}
         aria-labelledby={labelId}
+        {...inputProps}
+        {...focusProps}
       />
       <div>
         <div
@@ -129,10 +133,15 @@ const whiteCircle =
 export const radioReset = {
   ...Css.add("appearance", "none").p0.dib.vMid.add("userSelect", "none").fs0.h2.w2.br100.$,
   ...Css.add("outline", "0px solid transparent").$,
-  // By default we're white with a blue border
-  ...Css.bgWhite.bLightBlue900.ba.$,
-  // Set a color that will be used by background=currentColor + box shadow, but is initially ignored
+};
+
+export const radioDefault = {
+  // By default we're a white circle with a gray border
+  ...Css.bgWhite.bGray300.ba.$,
+  // Set the "selected" color that will be used by background=currentColor + box shadow, but is initially ignored
   ...Css.lightBlue700.$,
+  // Apply our default transitions
+  ...Css.transition.$,
 };
 
 // Unchecked means a gray border
@@ -140,15 +149,15 @@ export const radioUnchecked = Css.cursorPointer.bGray300.$;
 
 // Checked means a blue circle (achieved by a blue background + white dot background image)
 export const radioChecked = {
-  // When checked, make a circle by having the border blend into the background
-  ...Css.bTransparent.$,
-  // And make the background become the current (blue) color
+  // Make the background become the current (blue) color
   ...Css.add("backgroundColor", "currentColor")
     .add("backgroundSize", "100% 100%")
     .add("backgroundPosition", "center")
     .add("backgroundRepeat", "no-repeat").$,
   // And use backgroundImage to draw a white dot in the middle of the background
   ...Css.add("backgroundImage", `url("${whiteCircle}")`).$,
+  // Make our border the same color as the dot
+  ...Css.add("borderColor", "currentColor").$,
 };
 
 // When active draw another circle via boxShadow
@@ -157,6 +166,11 @@ export const radioFocus = {
   ...Css.add("outline", "2px solid transparent").add("outlineOffset", "2px").$,
   // Draw 1st box shadow of white/outline, 2nd box current (blue) of another outline
   ...Css.bshFocus.$,
+};
+
+export const radioHover = {
+  // Change both the dot and the border to a darker blue
+  ...Css.lightBlue900.bLightBlue900.$,
 };
 
 export const radioDisabled = {
