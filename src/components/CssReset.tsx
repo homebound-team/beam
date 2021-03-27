@@ -8,8 +8,9 @@ export function CssReset() {
   return <Global styles={[modernNormalizeReset, tailwindPreflightReset, ourReset]} />;
 }
 
-// Certain `a` tags in the app we want to opt-out of the `a:visited` behavior
-// and always be the same non-visited blue.
+// Certain `a` tags in the app we want to opt-out of the default `a` / `a:visited` look
+// & feel and always be the same non-visited blue (or whatever color they want).
+// The is primarily for navigation, like breadcrumb links or tab links.
 export const navLink = "navLink";
 
 const ourReset = css`
