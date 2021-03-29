@@ -1,15 +1,5 @@
 version: 2.1
 
-only-run-on-branches: &only-run-on-branches
-  branches:
-    ignore:
-      - main
-
-only-run-on-main: &only-run-on-main
-  branches:
-    only:
-      - main
-
 node-image: &node-image
   image: circleci/node:14.8.0
   auth:
@@ -21,28 +11,13 @@ workflows:
   workflow:
     jobs:
       - build:
-          context: npm
-      - publish:
-          requires:
-            - build
           context:
             - npm
             - github
-          filters:
-            <<: *only-run-on-main
       - chromatic:
           context:
             - dockerhub
             - npm
-          filters:
-            <<: *only-run-on-branches
-      - chromatic:
-          context:
-            - dockerhub
-            - npm
-          filters:
-            <<: *only-run-on-main
-          flags: "--auto-accept-changes"
 
 jobs:
   build:
@@ -54,16 +29,11 @@ jobs:
       - run: yarn install
       - run: yarn build
       - run: yarn test
-
-  publish:
-    docker:
-      - <<: *node-image
-    steps:
-      - checkout
-      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
-      - run: yarn install
-      - run: yarn build
-      - run: yarn semantic-release
+      - when:
+          condition:
+            equal: [main, <<pipeline.git.branch>>]
+          steps:
+            - run: yarn semantic-release
 
   chromatic:
     resource_class: "xlarge"
@@ -78,4 +48,14 @@ jobs:
       - checkout
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
       - run: yarn install
-      - run: yarn chromatic << parameters.flags >>
+      - when:
+          condition:
+            equal: [main, <<pipeline.git.branch>>]
+          steps:
+            - run: yarn chromatic --auto-accept-changes
+      - when:
+          condition:
+            not:
+              equal: [main, <<pipeline.git.branch>>]
+          steps:
+            - run: yarn chromatic
