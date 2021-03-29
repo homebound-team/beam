@@ -43,35 +43,30 @@ export function Checkboxes() {
           options={[
             {
               value: "lounge",
-              onChange: () => {},
               label: "Lounge Chair by Eames",
               description:
                 "Their iconic Eames Lounge Chair and Ottoman (1956) began with a desire to create a chair with “the warm, receptive look of a well-used first baseman’s mitt.",
             },
             {
               value: "pelican",
-              onChange: () => {},
               label: "Pelican Chair by Finn Juhl",
               description:
                 "It’s shocking to think of Finn Juhl designing this sculptural chair more than 80 years ago, and the Pelican Chair (1940) is still “out there” by today’s standards.",
             },
             {
               value: "shell",
-              onChange: () => {},
               label: "Shell Chair by Hans Wegner",
               description:
                 "Sometimes called the “smiling chair,” Hans Wegner’s Shell Chair (1963) achieves a floating lightness with its wing-like seat and arching curved legs.",
             },
             {
               value: "womb",
-              onChange: () => {},
               label: "Womb Chair by Eero Saarinen",
               description:
                 "When Florence Knoll challenged Eero Saarinen to create a chair that she could curl up in, she found the right candidate for the task.",
             },
             {
               value: "disabled",
-              onChange: () => {},
               label: "Disabled Option",
               disabled: true,
               description: "This chair cannot be selected.",

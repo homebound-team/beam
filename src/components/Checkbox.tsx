@@ -17,7 +17,7 @@ export interface CheckboxProps extends BeamFocusableProps {
   selected?: boolean;
   label: string;
   /** Handler that is called when the element's selection state changes. */
-  onChange: (selected: boolean) => void;
+  onChange?: (selected: boolean) => void;
   /** Required for CheckboxGroup option */
   value?: string;
   /** Required for CheckboxGroup option */
