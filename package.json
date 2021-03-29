@@ -43,6 +43,7 @@
     "@emotion/babel-preset-css-prop": "^11.2.0",
     "@emotion/jest": "^11.2.1",
     "@homebound/rtl-utils": "^1.39.0",
+    "@homebound/tsconfig": "^1.0.2",
     "@storybook/addon-essentials": "^6.1.20",
     "@storybook/addon-info": "^5.3.21",
     "@storybook/addon-links": "^6.1.20",
