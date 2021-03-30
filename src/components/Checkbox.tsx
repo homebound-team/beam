@@ -54,7 +54,15 @@ export function Checkbox(props: CheckboxProps) {
       useCheckbox(checkboxProps, toggleState, ref);
 
   return (
-    <label css={Css.df.cursorPointer.if(isDisabled).cursorNotAllowed.$}>
+    <label
+      css={
+        Css.df.cursorPointer
+          .maxw(px(320))
+          .if(description !== undefined)
+          .maxw(px(344))
+          .if(isDisabled).cursorNotAllowed.$
+      }
+    >
       <VisuallyHidden>
         <input ref={ref} {...inputProps} {...focusProps} />
       </VisuallyHidden>
@@ -81,7 +89,7 @@ export function Checkbox(props: CheckboxProps) {
   );
 }
 
-const baseStyles = Css.hPx(16).wPx(16).relative.ba.bGray300.br4.bgWhite.transition.topPx(2).$;
+const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bGray300.br4.bgWhite.transition.topPx(2).$;
 const filledBoxStyles = Css.bLightBlue700.bgLightBlue700.$;
 const filledBoxHoverStyles = Css.bgLightBlue900.$;
 const disabledBoxStyles = Css.bGray400.bGray100.$;
@@ -90,7 +98,7 @@ const focusRingStyles = Css.bshFocus.$;
 const hoverBorderStyles = Css.bLightBlue900.$;
 const markStyles = { svg: Css.absolute.topPx(-1).leftPx(-1).$ };
 const labelStyles = Css.smEm.$;
-const descStyles = Css.sm.gray700.maxw(px(312)).$;
+const descStyles = Css.sm.gray700.$;
 
 const checkmarkSmall = (
   <svg width="16" height="16">
