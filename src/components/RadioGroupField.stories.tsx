@@ -2,9 +2,11 @@ import { Meta } from "@storybook/react";
 import { ReactNode, useState } from "react";
 import {
   radioChecked,
+  radioDefault,
   radioDisabled,
   radioFocus,
   RadioGroupField,
+  radioHover,
   radioReset,
   radioUnchecked,
 } from "src/components/RadioGroupField";
@@ -17,11 +19,89 @@ export default {
 
 export function BaseStates() {
   const examples: [string, ReactNode][] = [
-    ["Unchecked", <input type="radio" css={{ ...radioReset, ...radioUnchecked }} />],
-    ["Checked", <input type="radio" css={{ ...radioReset, ...radioChecked }} />],
-    ["Unchecked/Focus", <input type="radio" css={{ ...radioReset, ...radioUnchecked, ...radioFocus }} />],
-    ["Checked/Focus", <input type="radio" css={{ ...radioReset, ...radioChecked, ...radioFocus }} />],
-    ["Disabled", <input type="radio" disabled css={{ ...radioReset, ...radioUnchecked, ...radioDisabled }} />],
+    [
+      "Unchecked",
+      <input
+        type="radio"
+        css={{
+          ...radioReset,
+          ...radioDefault,
+          ...radioUnchecked,
+        }}
+      />,
+    ],
+    [
+      "Checked",
+      <input
+        type="radio"
+        css={{
+          ...radioReset,
+          ...radioDefault,
+          ...radioChecked,
+        }}
+      />,
+    ],
+    [
+      "Unchecked/Focus",
+      <input
+        type="radio"
+        css={{
+          ...radioReset,
+          ...radioDefault,
+          ...radioUnchecked,
+          ...radioFocus,
+        }}
+      />,
+    ],
+    [
+      "Checked/Focus",
+      <input
+        type="radio"
+        css={{
+          ...radioReset,
+          ...radioDefault,
+          ...radioChecked,
+          ...radioFocus,
+        }}
+      />,
+    ],
+    [
+      "Unchecked/Hover",
+      <input
+        type="radio"
+        css={{
+          ...radioReset,
+          ...radioDefault,
+          ...radioHover,
+          ...radioUnchecked,
+        }}
+      />,
+    ],
+    [
+      "Checked/Hover",
+      <input
+        type="radio"
+        css={{
+          ...radioReset,
+          ...radioDefault,
+          ...radioHover,
+          ...radioChecked,
+        }}
+      />,
+    ],
+    [
+      "Disabled",
+      <input
+        type="radio"
+        disabled
+        css={{
+          ...radioReset,
+          ...radioDefault,
+          ...radioUnchecked,
+          ...radioDisabled,
+        }}
+      />,
+    ],
   ];
   return (
     <div>

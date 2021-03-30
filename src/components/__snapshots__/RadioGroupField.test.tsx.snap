@@ -46,10 +46,12 @@ exports[`RadioGroupField renders with just labels 1`] = `
   width: 16px;
   outline: 0px solid transparent;
   background-color: currentColor;
-  border-color: rgba(0,0,0,0);
+  border-color: currentColor;
   border-style: solid;
   border-width: 1px;
   color: rgba(3,105,161,1);
+  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
+  transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
   -webkit-background-position: center;
   background-position: center;
   background-repeat: no-repeat;
@@ -58,12 +60,6 @@ exports[`RadioGroupField renders with just labels 1`] = `
   background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='4'/%3e%3c/svg%3e");
   margin-right: 8px;
   margin-top: 2px;
-}
-
-.emotion-3:focus {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  box-shadow: 0px 0px 0px 2px rgba(254,254,254,1),0px 0px 0px 4px rgba(3,105,161,1);
 }
 
 .emotion-4 {
@@ -100,15 +96,11 @@ exports[`RadioGroupField renders with just labels 1`] = `
   border-style: solid;
   border-width: 1px;
   color: rgba(3,105,161,1);
+  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
+  transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
   cursor: pointer;
   margin-right: 8px;
   margin-top: 2px;
-}
-
-.emotion-6:focus {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  box-shadow: 0px 0px 0px 2px rgba(254,254,254,1),0px 0px 0px 4px rgba(3,105,161,1);
 }
 
 <body>
@@ -221,10 +213,12 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
   width: 16px;
   outline: 0px solid transparent;
   background-color: currentColor;
-  border-color: rgba(0,0,0,0);
+  border-color: currentColor;
   border-style: solid;
   border-width: 1px;
   color: rgba(3,105,161,1);
+  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
+  transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
   -webkit-background-position: center;
   background-position: center;
   background-repeat: no-repeat;
@@ -233,12 +227,6 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
   background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='4'/%3e%3c/svg%3e");
   margin-right: 8px;
   margin-top: 2px;
-}
-
-.emotion-3:focus {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  box-shadow: 0px 0px 0px 2px rgba(254,254,254,1),0px 0px 0px 4px rgba(3,105,161,1);
 }
 
 .emotion-4 {
@@ -275,15 +263,11 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
   border-style: solid;
   border-width: 1px;
   color: rgba(3,105,161,1);
+  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
+  transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
   cursor: pointer;
   margin-right: 8px;
   margin-top: 2px;
-}
-
-.emotion-6:focus {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  box-shadow: 0px 0px 0px 2px rgba(254,254,254,1),0px 0px 0px 4px rgba(3,105,161,1);
 }
 
 .emotion-8 {
