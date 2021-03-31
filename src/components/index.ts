@@ -3,7 +3,6 @@ export * from "./ButtonGroup";
 export * from "./Checkbox";
 export * from "./CheckboxBase";
 export * from "./CheckboxGroup";
-export * from "./CheckboxGroupItem";
 export * from "./CssReset";
 export * from "./Icon";
 export * from "./IconButton";
