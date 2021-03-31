@@ -18,6 +18,12 @@ interface CheckboxGroupItemProps {
   groupState: CheckboxGroupState;
 }
 
+/**
+ * A CheckboxGroupItem is only used within the CheckboxGroup component
+ * It should not be used for standalone checkboxes.
+ * For those cases use the regular Checkbox component.
+ */
+
 export function CheckboxGroupItem(props: CheckboxGroupItemProps) {
   const {
     label,
