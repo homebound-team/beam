@@ -9,7 +9,7 @@ export default {
 } as Meta;
 
 export function Checkboxes() {
-  const [selectedValues, setSelectedValues] = useState<string[] | []>([]);
+  const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
   return (
     <div css={Css.dg.gap3.p1.$}>

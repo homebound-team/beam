@@ -82,8 +82,8 @@ export function Checkbox(props: CheckboxProps) {
         {markIcon}
       </span>
       <div css={Css.ml1.$}>
-        {label && <div css={{ ...labelStyles, ...(isDisabled && disabledFont) }}>{label}</div>}
-        {description && <div css={{ ...descStyles, ...(isDisabled && disabledFont) }}>{description}</div>}
+        {label && <div css={{ ...labelStyles, ...(isDisabled && disabledColor) }}>{label}</div>}
+        {description && <div css={{ ...descStyles, ...(isDisabled && disabledColor) }}>{description}</div>}
       </div>
     </label>
   );
@@ -93,7 +93,7 @@ const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bGray300.br4.bgWhite.trans
 const filledBoxStyles = Css.bLightBlue700.bgLightBlue700.$;
 const filledBoxHoverStyles = Css.bgLightBlue900.$;
 const disabledBoxStyles = Css.bGray400.bGray100.$;
-const disabledFont = Css.gray300.$;
+const disabledColor = Css.gray300.$;
 const focusRingStyles = Css.bshFocus.$;
 const hoverBorderStyles = Css.bLightBlue900.$;
 const markStyles = { svg: Css.absolute.topPx(-1).leftPx(-1).$ };

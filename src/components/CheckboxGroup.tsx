@@ -10,14 +10,12 @@ export interface CheckboxGroupItemOption extends CheckboxProps {
 
 interface CheckboxGroupProps {
   label: string;
-  /** The name of the CheckboxGroup, used when submitting an HTML form. */
-  name?: string;
   /** Called when a checkbox is selected or deselected */
   onChange: (values: string[]) => void;
   /** Options for the checkboxes contained within the CheckboxGroup. */
   options: CheckboxGroupItemOption[];
   /** The values currently selected. */
-  values?: string[];
+  values: string[];
 }
 
 export function CheckboxGroup(props: CheckboxGroupProps) {
