@@ -1,10 +1,10 @@
-import { useToggleState } from "@react-stately/toggle";
+import { CheckboxGroupState } from "@react-stately/checkbox";
 import { useRef } from "react";
-import { useCheckbox, useFocusRing, useHover, VisuallyHidden } from "react-aria";
+import { useCheckboxGroupItem, useFocusRing, useHover, VisuallyHidden } from "react-aria";
 import { Css, Palette, px } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 
-interface CheckboxProps extends BeamFocusableProps {
+interface CheckboxGroupItemProps extends BeamFocusableProps {
   /** Additional text displayed below label */
   description?: string;
   disabled?: boolean;
@@ -13,31 +13,30 @@ interface CheckboxProps extends BeamFocusableProps {
    * The indeterminate visual representation remains regardless of user interaction.
    */
   indeterminate?: boolean;
-  selected?: boolean;
+  selected: boolean;
   label: string;
-  /** Handler that is called when the element's selection state changes. */
-  onChange: (selected: boolean) => void;
+  value: string;
+  groupState: CheckboxGroupState;
 }
 
-export function Checkbox(props: CheckboxProps) {
+export function CheckboxGroupItem(props: CheckboxGroupItemProps) {
   const {
     label,
     indeterminate: isIndeterminate = false,
     disabled: isDisabled = false,
     description,
-    selected,
+    selected: isSelected,
+    groupState,
+    value = "",
     ...otherProps
   } = props;
-  const ariaProps = { isSelected: selected, isDisabled, isIndeterminate, ...otherProps };
+  const ariaProps = { isSelected, isDisabled, isIndeterminate, value, ...otherProps };
   const checkboxProps = { ...ariaProps, "aria-label": label };
   const ref = useRef(null);
-  const toggleState = useToggleState(ariaProps);
-  const isSelected = toggleState.isSelected;
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover({ isDisabled });
+  const { inputProps } = useCheckboxGroupItem(checkboxProps, groupState, ref);
   const markIcon = isIndeterminate ? dashSmall : isSelected ? checkmarkSmall : "";
-
-  const { inputProps } = useCheckbox(checkboxProps, toggleState, ref);
 
   return (
     <label

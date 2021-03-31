@@ -1,9 +1,13 @@
 import { useCheckboxGroup } from "@react-aria/checkbox";
 import { useCheckboxGroupState } from "@react-stately/checkbox";
-import { Checkbox, CheckboxProps } from "src/components";
+import { CheckboxGroupItem } from "src/components";
 import { Css } from "src/Css";
 
-export interface CheckboxGroupItemOption extends CheckboxProps {
+interface CheckboxGroupItemOption {
+  /** Additional text displayed below label */
+  description?: string;
+  disabled?: boolean;
+  label: string;
   /** The value of the CheckboxGroup item, stored in value array in state. */
   value: string;
 }
@@ -19,9 +23,9 @@ interface CheckboxGroupProps {
 }
 
 export function CheckboxGroup(props: CheckboxGroupProps) {
-  const { options, label } = props;
+  const { options, label, values } = props;
 
-  const state = useCheckboxGroupState({ ...props, value: props.values });
+  const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
 
   return (
@@ -31,7 +35,12 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
       </div>
       <div css={Css.dg.gap2.$}>
         {options.map((option) => (
-          <Checkbox key={option.value} {...option} groupState={state} selected={state.value.includes(option.value)} />
+          <CheckboxGroupItem
+            key={option.value}
+            {...option}
+            groupState={state}
+            selected={state.value.includes(option.value)}
+          />
         ))}
       </div>
     </div>
