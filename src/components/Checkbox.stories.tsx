@@ -18,7 +18,6 @@ export function Checkboxes() {
         <div css={Css.dg.gap1.$}>
           <Checkbox onChange={() => {}} label="Default" />
           <Checkbox onChange={() => {}} selected label="Selected" />
-          <Checkbox onChange={() => {}} autoFocus selected label="Selected/Focused" />
           <Checkbox onChange={() => {}} indeterminate label="Indeterminate" />
           <Checkbox onChange={() => {}} disabled label="Disabled" />
         </div>
