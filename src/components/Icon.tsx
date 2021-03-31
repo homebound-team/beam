@@ -19,7 +19,7 @@ export function Icon({ icon, color = "currentColor", xss, ...other }: IconProps)
       height="24"
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
-      css={{ path: Css.add("fill", color).$, ...xss }}
+      css={{ path: Css.fill(color).$, ...xss }}
       {...other}
     >
       {Icons[icon]}

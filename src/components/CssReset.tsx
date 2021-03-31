@@ -1,11 +1,22 @@
 import { css, Global } from "@emotion/react";
+import { Palette } from "src/Css";
 
 /**
  * Applies a CSS Reset that is based on modern-normalize + TW customizations.
  */
 export function CssReset() {
-  return <Global styles={[modernNormalizeReset, tailwindPreflightReset]} />;
+  return <Global styles={[modernNormalizeReset, tailwindPreflightReset, ourReset]} />;
 }
+
+// Certain `a` tags in the app we want to opt-out of the default `a` / `a:visited` look
+// & feel and always be the same non-visited blue (or whatever color they want).
+// The is primarily for navigation, like breadcrumb links or tab links.
+export const navLink = "navLink";
+
+const ourReset = css`
+  a:not(.${navLink}) { color: ${Palette.LightBlue700} },
+  a:visited:not(.${navLink}) { color: ${Palette.LightBlue500} },
+`;
 
 // Copy/pasted from TW which uses this as their base reset.
 const modernNormalizeReset = css`
