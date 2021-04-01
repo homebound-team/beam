@@ -28,9 +28,10 @@ export function NavLink(props: NavLinkProps) {
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
 
-  const { baseStyles, activeStyles, focusStyles, hoverStyles, disabledStyles } = useMemo(() => getStyles(variant), [
-    variant,
-  ]);
+  const { baseStyles, activeStyles, focusStyles, hoverStyles, disabledStyles } = useMemo(
+    () => getNavLinkStyles(variant),
+    [variant],
+  );
 
   const target = external ? "_blank" : undefined;
   const rel = external ? "noopener noreferrer" : undefined;
@@ -61,13 +62,13 @@ export function NavLink(props: NavLinkProps) {
   );
 }
 
-function getStyles(variant: NavLinkVariant) {
+export function getNavLinkStyles(variant: NavLinkVariant) {
   return navLinkVariantStyles[variant];
 }
 
-const baseStyles = Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.$;
+const baseStyles = Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.outline0.$;
 
-export const navLinkVariantStyles: Record<
+const navLinkVariantStyles: Record<
   NavLinkVariant,
   { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; focusStyles: {}; activeStyles: {}; pressedStyles: {} }
 > = {
@@ -75,7 +76,7 @@ export const navLinkVariantStyles: Record<
     baseStyles: { ...baseStyles, ...Css.wPx(184).gray700.$ },
     activeStyles: Css.lightBlue700.bgLightBlue50.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
-    focusStyles: Css.bgLightBlue50.bshFocus.outline0.$,
+    focusStyles: Css.bgLightBlue50.bshFocus.$,
     hoverStyles: Css.gray700.bgGray100.$,
     pressedStyles: Css.gray700.bgGray200.$,
   },
@@ -86,7 +87,7 @@ export const navLinkVariantStyles: Record<
     focusStyles: Css.gray500.bgGray900.add(
       "boxShadow",
       `0px 1px 2px rgba(0, 0, 0, 0.05), 0px 0px 0px 2px #242424, 0px 0px 0px 4px #0EA5E9`,
-    ).outline0.$,
+    ).$,
     hoverStyles: Css.gray500.bgGray900.$,
     pressedStyles: Css.gray500.bgGray700.$,
   },
