@@ -6,3 +6,4 @@ export * from "./CheckboxGroup";
 export * from "./CssReset";
 export * from "./Icon";
 export * from "./IconButton";
+export * from "./NavLink";
