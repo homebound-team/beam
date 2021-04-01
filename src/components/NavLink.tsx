@@ -1,6 +1,5 @@
-import { useLink } from "@react-aria/link";
 import { RefObject, useMemo, useRef } from "react";
-import { useFocusRing, useHover } from "react-aria";
+import { useButton, useFocusRing, useHover } from "react-aria";
 import { navLink } from "src/components";
 import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
@@ -24,11 +23,11 @@ export function NavLink(props: NavLinkProps) {
   const ariaProps = { children: label, isDisabled, ...otherProps };
   const { href, active = false, icon = false, variant } = ariaProps;
   const ref = useRef() as RefObject<HTMLAnchorElement>;
-  const { linkProps } = useLink(ariaProps, ref);
+  const { buttonProps, isPressed } = useButton({ ...ariaProps, elementType: "a" }, ref);
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
 
-  const { baseStyles, activeStyles, focusStyles, hoverStyles, disabledStyles } = useMemo(
+  const { baseStyles, activeStyles, focusStyles, hoverStyles, disabledStyles, pressedStyles } = useMemo(
     () => getNavLinkStyles(variant),
     [variant],
   );
@@ -38,7 +37,7 @@ export function NavLink(props: NavLinkProps) {
 
   return (
     <a
-      {...linkProps}
+      {...buttonProps}
       {...focusProps}
       {...hoverProps}
       className={navLink}
@@ -54,6 +53,7 @@ export function NavLink(props: NavLinkProps) {
         ...(isDisabled && disabledStyles),
         ...(isFocusVisible && focusStyles),
         ...(isHovered && hoverStyles),
+        ...(isPressed && pressedStyles),
       }}
     >
       <span css={Css.mr1.$}>{label}</span>
