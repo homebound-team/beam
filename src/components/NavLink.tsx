@@ -13,12 +13,14 @@ export interface NavLinkProps extends BeamFocusableProps {
   label: string;
   icon?: keyof typeof Icons;
   variant: NavLinkVariant;
+  /** Target and rel attributes are added for external links */
+  external?: boolean;
 }
 
 type NavLinkVariant = "side" | "global";
 
 export function NavLink(props: NavLinkProps) {
-  const { disabled: isDisabled, label, ...otherProps } = props;
+  const { disabled: isDisabled, label, external, ...otherProps } = props;
   const ariaProps = { children: label, isDisabled, ...otherProps };
   const { href, active = false, icon = false, variant } = ariaProps;
   const ref = useRef() as RefObject<HTMLAnchorElement>;
@@ -30,21 +32,28 @@ export function NavLink(props: NavLinkProps) {
     variant,
   ]);
 
+  const target = external ? "_blank" : undefined;
+  const rel = external ? "noopener noreferrer" : undefined;
+
   return (
     <a
       {...linkProps}
       {...focusProps}
       {...hoverProps}
-      ref={ref}
+      className={navLink}
       href={href}
+      ref={ref}
+      rel={rel}
+      // does not focus if disabled
+      tabIndex={isDisabled ? -1 : 0}
+      target={target}
       css={{
         ...baseStyles,
         ...(active && activeStyles),
         ...(isDisabled && disabledStyles),
-        ...(isHovered && hoverStyles),
         ...(isFocusVisible && focusStyles),
+        ...(isHovered && hoverStyles),
       }}
-      className={navLink}
     >
       <span css={Css.mr1.$}>{label}</span>
       {icon && <Icon icon={icon} />}
@@ -53,30 +62,32 @@ export function NavLink(props: NavLinkProps) {
 }
 
 function getStyles(variant: NavLinkVariant) {
-  return variantStyles[variant];
+  return navLinkVariantStyles[variant];
 }
 
 const baseStyles = Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.$;
 
-const variantStyles: Record<
+export const navLinkVariantStyles: Record<
   NavLinkVariant,
-  { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; focusStyles: {}; activeStyles: {} }
+  { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; focusStyles: {}; activeStyles: {}; pressedStyles: {} }
 > = {
   side: {
     baseStyles: { ...baseStyles, ...Css.wPx(184).gray700.$ },
-    hoverStyles: Css.gray700.bgGray100.$,
-    focusStyles: Css.bgLightBlue50.bshFocus.outline0.$,
     activeStyles: Css.lightBlue700.bgLightBlue50.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
+    focusStyles: Css.bgLightBlue50.bshFocus.outline0.$,
+    hoverStyles: Css.gray700.bgGray100.$,
+    pressedStyles: Css.gray700.bgGray200.$,
   },
   global: {
-    baseStyles: { ...baseStyles, ...Css.add("width", "fit-content").gray500.$ },
-    hoverStyles: Css.gray500.bgGray900.$,
+    baseStyles: { ...baseStyles, ...Css.add("width", "max-content").gray500.$ },
+    activeStyles: Css.white.bgGray900.$,
+    disabledStyles: Css.gray400.cursorNotAllowed.$,
     focusStyles: Css.gray500.bgGray900.add(
       "boxShadow",
       `0px 1px 2px rgba(0, 0, 0, 0.05), 0px 0px 0px 2px #242424, 0px 0px 0px 4px #0EA5E9`,
     ).outline0.$,
-    activeStyles: Css.white.bgGray900.$,
-    disabledStyles: Css.gray400.cursorNotAllowed.$,
+    hoverStyles: Css.gray500.bgGray900.$,
+    pressedStyles: Css.gray500.bgGray700.$,
   },
 };
