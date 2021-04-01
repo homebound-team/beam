@@ -101,6 +101,7 @@ class CssBuilder<T extends Properties1> {
   get br0() { return this.add("borderRadius", "0"); }
   get br4() { return this.add("borderRadius", "4px"); }
   get br8() { return this.add("borderRadius", "8px"); }
+  get br12() { return this.add("borderRadius", "12px"); }
   get br16() { return this.add("borderRadius", "16px"); }
   get br100() { return this.add("borderRadius", "100%"); }
 
@@ -798,7 +799,7 @@ class CssBuilder<T extends Properties1> {
   get sansSerif() { return this.add("fontFamily", "'Inter', sans-serif"); }
 
   // animation
-  get transition() { return this.add("transition", "background-color 200ms, border-color 200ms, box-shadow 200ms"); }
+  get transition() { return this.add("transition", "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms"); }
 
   // aliases
   
