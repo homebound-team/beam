@@ -13,6 +13,7 @@ export interface BeamDisabledProps {
 
 export interface BeamButtonProps extends BeamDisabledProps {
   /** Handler that is called when the press is released over the target. */
+  // TODO: @KoltonG it would be nice to merge onChange and onClick into the same handler name...
   onClick?: (e: PressEvent) => void;
 }
 
@@ -21,11 +22,19 @@ export interface BeamOnChangeProps<T> {
   onChange?: (value: T) => void;
 }
 
-export interface BeamTextFieldProps extends BeamOnChangeProps<string> {
+// TODO: Maybe label, value, onChange/onClick should be together since they are
+// all related to inputs... I guess same for disabled...
+export interface BeamLabelProps {
+  /** Input label */
   label?: string;
+}
+
+export interface BeamTextFieldProps
+  extends BeamOnChangeProps<string>,
+    BeamLabelProps,
+    BeamDisabledProps,
+    BeamFocusableProps {
   value?: string;
-  autoFocus?: boolean;
-  disabled?: boolean;
   readOnly?: boolean;
   errorMsg?: string;
 }

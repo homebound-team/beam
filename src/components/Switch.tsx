@@ -3,9 +3,9 @@ import { useRef } from "react";
 import { useFocusRing, useHover, useSwitch, VisuallyHidden } from "react-aria";
 import { Palette } from "../Css";
 import { Css, Icon } from "../index";
-import type { BeamDisabledProps, BeamFocusableProps, BeamOnChangeProps } from "../interfaces";
+import type { BeamDisabledProps, BeamFocusableProps, BeamLabelProps, BeamOnChangeProps } from "../interfaces";
 
-export interface SwitchProps extends BeamFocusableProps, BeamDisabledProps, BeamOnChangeProps<boolean> {
+export interface SwitchProps extends BeamFocusableProps, BeamDisabledProps, BeamOnChangeProps<boolean>, BeamLabelProps {
   /** Whether the switch is selected */
   selected?: boolean;
   /** Whether to include icons like the check mark */
@@ -17,7 +17,7 @@ export interface SwitchProps extends BeamFocusableProps, BeamDisabledProps, Beam
 export function Switch(props: SwitchProps) {
   const { selected: isSelected = false, disabled: isDisabled = false, ...otherProps } = props;
   const ariaProps = { isSelected, isDisabled, ...otherProps };
-  const { onChange, withIcon, compact } = ariaProps;
+  const { onChange, withIcon, compact, label } = ariaProps;
 
   // Custom state to push changes to parent
   const state: ToggleState = { isSelected, setSelected: onChange, toggle: () => onChange(!isSelected) };
@@ -32,6 +32,7 @@ export function Switch(props: SwitchProps) {
       {...hoverProps}
       css={{
         ...switchLabelDefaultStyles,
+        ...(isDisabled && switchLabelDisabledStyles),
       }}
     >
       <VisuallyHidden>
@@ -63,6 +64,7 @@ export function Switch(props: SwitchProps) {
           )}
         </div>
       </div>
+      {label}
     </label>
   );
 }
@@ -74,14 +76,16 @@ const toggleWidth = (isCompact: boolean) => (isCompact ? 44 : 40);
 const circleDiameter = (isCompact: boolean) => (isCompact ? 14 : 20);
 
 // Label styles
-const switchLabelDefaultStyles = Css.cursorPointer.$;
+// TODO: @KoltonG Truss could use this
+const switchLabelDefaultStyles = Css.cursorPointer.df.itemsCenter.gap2.w("max-content").smEm.$;
+const switchLabelDisabledStyles = Css.cursorNotAllowed.gray400.$;
 
 // Switcher/Toggle element styles
 const switchDefaultStyles = (isCompact: boolean) =>
   Css.wPx(toggleWidth(isCompact)).hPx(toggleHeight(isCompact)).bgGray200.br12.relative.transition.$;
 export const switchHoverStyles = Css.bgGray400.$;
 export const switchFocusStyles = Css.bshFocus.$;
-const switchDisabledStyles = Css.bgGray300.cursorNotAllowed.$;
+const switchDisabledStyles = Css.bgGray300.$;
 const switchSelectedStyles = Css.bgLightBlue700.$;
 export const switchSelectedHoverStyles = Css.bgLightBlue900.$;
 
