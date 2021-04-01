@@ -13,6 +13,7 @@ export interface BeamButtonProps {
 
 export interface BeamButtonProps extends BeamDisabledProps {
   /** Handler that is called when the press is released over the target. */
+  // TODO: @KoltonG it would be nice to merge onChange and onClick into the same handler name...
   onClick?: (e: PressEvent) => void;
 }
 
