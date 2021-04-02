@@ -12,6 +12,12 @@ export interface SwitchProps extends BeamFocusableProps, BeamDisabledProps, Beam
   withIcon?: boolean;
   /** Whether to render a compact version of Switch */
   compact?: boolean;
+  /**
+   * The value of the input element
+   * TODO: @KoltonG match the pattern of when these are needed to be used. This
+   * should not be on it's own. Any input needs a value for its group version.
+   */
+  value?: string;
 }
 
 export function Switch(props: SwitchProps) {
@@ -19,9 +25,7 @@ export function Switch(props: SwitchProps) {
   const ariaProps = { isSelected, isDisabled, ...otherProps };
   const { onChange, withIcon, compact, label } = ariaProps;
 
-  // Custom state to push changes to parent
-  const state: ToggleState = { isSelected, setSelected: onChange, toggle: () => onChange(!isSelected) };
-
+  const state = useStatelessToggleState(isSelected, onChange);
   const ref = useRef(null);
   const { inputProps } = useSwitch(ariaProps, state, ref);
   const { isFocusVisible: isKeyboardFocus, focusProps } = useFocusRing(otherProps);
@@ -91,8 +95,10 @@ export const switchSelectedHoverStyles = Css.bgLightBlue900.$;
 
 // Circle inside Switcher/Toggle element styles
 const switchCircleDefaultStyles = (isCompact: boolean) => ({
-  ...Css.wPx(circleDiameter(isCompact)).hPx(circleDiameter(isCompact)).$,
-  ...Css.br100.bgWhite.bshBasic.absolute.leftPx(2).topPx(isCompact ? 1 : 2).transition.df.itemsCenter.justifyCenter.$,
+  ...Css.wPx(circleDiameter(isCompact))
+    .hPx(circleDiameter(isCompact))
+    .br100.bgWhite.bshBasic.absolute.leftPx(2)
+    .topPx(isCompact ? 1 : 2).transition.df.itemsCenter.justifyCenter.$,
   svg: Css.hPx(toggleHeight(isCompact) / 2).wPx(toggleHeight(isCompact) / 2).$,
 });
 const switchCircleDisabledStyles = Css.bgGray100.$;
@@ -107,3 +113,12 @@ const switchCircleDisabledStyles = Css.bgGray100.$;
  */
 const switchCircleSelectedStyles = (isCompact: boolean) =>
   Css.left(`calc(100% - ${circleDiameter(isCompact)}px - 2px);`).$;
+
+/** Stateless useToggleState */
+function useStatelessToggleState(isSelected: boolean, onChange: (value: boolean) => void): ToggleState {
+  return {
+    isSelected,
+    setSelected: onChange,
+    toggle: () => onChange(!isSelected),
+  };
+}
