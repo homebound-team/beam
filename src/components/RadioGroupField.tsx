@@ -49,7 +49,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   });
 
   // We use useRadioGroup b/c it does neat keyboard up/down stuff
-  // TOOD: Pass read only, required, error message to useRadioGroup
+  // TODO: Pass read only, required, error message to useRadioGroup
   const { labelProps, radioGroupProps } = useRadioGroup({ label, isDisabled: disabled }, state);
 
   // max-width is dependent on having descriptions
