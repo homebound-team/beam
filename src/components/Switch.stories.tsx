@@ -8,13 +8,15 @@ import {
   SwitchProps,
   switchSelectedHoverStyles,
 } from "./Switch";
+import { SwitchGroup } from "./SwitchGroup";
 
 export default {
   component: SwitchComponent,
   title: "Components/Switch",
 } as Meta<SwitchProps>;
 
-// TODO: Args is causing the inner state to not update
+// TODO: @KoltonG Args is causing the inner state to not update
+// TODO: @KoltonG Use value to show actions onChange events
 export const Switch = (args: SwitchProps) => {
   return (
     <div css={{ h1: Css.xl4Em.mb4.$, h2: Css.xl2Em.$ }}>
@@ -22,7 +24,7 @@ export const Switch = (args: SwitchProps) => {
       <div css={Css.df.gap4.flexColumn.$}>
         <h2>Switch Buttons</h2>
         <div
-          css={Css.dg.gapPx(64).gtc("repeat(auto-fit, 115px)").$}
+          css={Css.dg.gapPx(48).gtc("repeat(auto-fit, 115px)").$}
           // style={{
           //   // TODO: @KoltonG potentially add this to Truss too
           //   // TODO: .add is not handling these nicely, must be the name parsing
@@ -70,15 +72,7 @@ export const Switch = (args: SwitchProps) => {
           </div>
         </div>
         <h2>Switch</h2>
-        <div
-          css={Css.dg.gapPx(64).gtc("repeat(auto-fit, 400px)").$}
-          // style={{
-          //   // TODO: @KoltonG potentially add this to Truss too
-          //   // TODO: .add is not handling these nicely, must be the name parsing
-          //   gridAutoFlow: "column",
-          //   gridAutoColumns: "max-content",
-          // }}
-        >
+        <div css={Css.dg.gapPx(48).gtc("repeat(auto-fit, 365px)").$}>
           <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>
             <SwitchWrapper label="Remember me?" />
             <SwitchWrapper label="Remember me?" selected />
@@ -116,6 +110,12 @@ export const Switch = (args: SwitchProps) => {
             <SwitchWrapper label="Remember me?" withIcon compact disabled />
           </div>
         </div>
+        <h2>Switch Group</h2>
+        <div css={Css.dg.gapPx(64).gtc("repeat(auto-fit, 200px)").$}>
+          <div css={Css.dg.gtc("max-content").gap("16px 32px").$}>
+            <SwitchGroupWrapper />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -141,5 +141,21 @@ function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchProps & StorySt
     >
       <SwitchComponent {...props} selected={selected} onChange={setSelected} />
     </div>
+  );
+}
+
+function SwitchGroupWrapper() {
+  const [selected, setSelected] = useState<string[]>([]);
+
+  return (
+    <SwitchGroup
+      label="Notifications"
+      options={[
+        { label: "Weekly emails", value: "weekly" },
+        { label: "Daily emails", value: "daily" },
+      ]}
+      values={selected}
+      onChange={setSelected}
+    />
   );
 }
