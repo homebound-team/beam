@@ -15,7 +15,7 @@
     "!dist/setupTests.*"
   ],
   "engines": {
-    "node": "14.8.0"
+    "node": ">=14.8.0"
   },
   "scripts": {
     "start": "yarn storybook",
