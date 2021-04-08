@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { IconButton as IconButtonComponent, IconButtonProps, iconButtonStylesHover, Icons } from "src";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 
 export default {
   title: "Components/Icon Button",
@@ -39,6 +39,10 @@ export const IconButton = (args: IconButtonProps) => (
       <div>
         <h2>Disabled</h2>
         <IconButtonComponent {...args} disabled />
+      </div>
+      <div>
+        <h2>Colored</h2>
+        <IconButtonComponent {...args} color={Palette.Red700} />
       </div>
     </div>
   </div>

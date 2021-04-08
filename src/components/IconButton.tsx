@@ -8,9 +8,10 @@ import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   // The icon to use within the button
   icon: IconProps["icon"];
+  color?: Palette;
 }
 
-export function IconButton({ onClick: onPress, disabled: isDisabled, ...otherProps }: IconButtonProps) {
+export function IconButton({ onClick: onPress, disabled: isDisabled, color, ...otherProps }: IconButtonProps) {
   const ariaProps = { onPress, isDisabled, ...otherProps };
   const { icon } = ariaProps;
   const ref = useRef(null);
@@ -30,7 +31,7 @@ export function IconButton({ onClick: onPress, disabled: isDisabled, ...otherPro
 
   return (
     <button {...buttonProps} {...focusProps} {...hoverProps} ref={ref} css={styles}>
-      <Icon icon={icon} color={isDisabled ? Palette.Gray400 : undefined} />
+      <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : undefined)} />
     </button>
   );
 }
