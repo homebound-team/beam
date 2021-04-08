@@ -1,3 +1,4 @@
+import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
 import { Css } from "../Css";
@@ -8,32 +9,20 @@ import {
   SwitchProps,
   switchSelectedHoverStyles,
 } from "./Switch";
-import { SwitchGroup } from "./SwitchGroup";
+import { SwitchGroup, SwitchGroupProps } from "./SwitchGroup";
 
 export default {
   component: SwitchComponent,
   title: "Components/Switch",
 } as Meta<SwitchProps>;
 
-// TODO: @KoltonG Args is causing the inner state to not update
-// TODO: @KoltonG Use value to show actions onChange events
-export const Switch = (args: SwitchProps) => {
+export const Switch = () => {
   return (
     <div css={{ h1: Css.xl4Em.mb4.$, h2: Css.xl2Em.$ }}>
       <h1>Switch</h1>
       <div css={Css.df.gap4.flexColumn.$}>
         <h2>Switch Buttons</h2>
-        <div
-          css={Css.dg.gapPx(48).gtc("repeat(auto-fit, 115px)").$}
-          // style={{
-          //   // TODO: @KoltonG potentially add this to Truss too
-          //   // TODO: .add is not handling these nicely, must be the name parsing
-          //   gridAutoFlow: "column",
-          //   gridAutoColumns: "max-content",
-          // }}
-        >
-          {/* TODO: @KoltonG Add gapX and gapY to Truss */}
-          {/* TODO: @KoltonG Story builder would be useful here */}
+        <div css={Css.dg.gapPx(48).gtc("repeat(auto-fit, 115px)").$}>
           <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>
             <SwitchWrapper />
             <SwitchWrapper selected />
@@ -111,9 +100,18 @@ export const Switch = (args: SwitchProps) => {
           </div>
         </div>
         <h2>Switch Group</h2>
-        <div css={Css.dg.gapPx(64).gtc("repeat(auto-fit, 200px)").$}>
-          <div css={Css.dg.gtc("max-content").gap("16px 32px").$}>
+        <div css={Css.dg.gapPx(64).$}>
+          <div css={Css.df.gap("16px 32px").$}>
+            <SwitchGroupWrapper label="Notifications" />
+            <SwitchGroupWrapper label="Notifications" withIcon />
             <SwitchGroupWrapper />
+            <SwitchGroupWrapper withIcon />
+          </div>
+          <div css={Css.df.gap("16px 32px").$}>
+            <SwitchGroupWrapper compact label="Notifications" />
+            <SwitchGroupWrapper compact label="Notifications" withIcon />
+            <SwitchGroupWrapper compact />
+            <SwitchGroupWrapper compact withIcon />
           </div>
         </div>
       </div>
@@ -156,23 +154,35 @@ function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchWrapperProps) {
         },
       }}
     >
-      <SwitchComponent {...props} selected={selected} onChange={setSelected} />
+      <SwitchComponent
+        {...props}
+        selected={selected}
+        onChange={(value) => {
+          action("onChange")(value);
+          setSelected(value);
+        }}
+      />
     </div>
   );
 }
 
-function SwitchGroupWrapper() {
+function SwitchGroupWrapper({ compact, label, withIcon }: Pick<SwitchGroupProps, "label" | "compact" | "withIcon">) {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
     <SwitchGroup
-      label="Notifications"
+      compact={compact}
+      label={label}
+      onChange={(value) => {
+        action("onChange")(value);
+        setSelected(value);
+      }}
       options={[
         { label: "Weekly emails", value: "weekly" },
         { label: "Daily emails", value: "daily" },
       ]}
       values={selected}
-      onChange={setSelected}
+      withIcon={withIcon}
     />
   );
 }

@@ -1,4 +1,5 @@
 import { useCheckboxGroup } from "@react-aria/checkbox";
+import { useId } from "react-aria";
 import { Css } from "../Css";
 import { toGroupState } from "../utils";
 import { Switch } from "./Switch";
@@ -9,6 +10,8 @@ type GroupItem = {
 };
 
 export interface SwitchGroupProps {
+  /** Whether to render a compact version of SwitchGroup */
+  compact?: boolean;
   /** Group label */
   label?: string;
   /** Handler when a child Switch component is toggled. */
@@ -17,6 +20,8 @@ export interface SwitchGroupProps {
   options: GroupItem[];
   /** Currently selected values. */
   values: string[];
+  /** Whether to render the icon version of SwitchGroup */
+  withIcon?: boolean;
 }
 
 /**
@@ -28,9 +33,10 @@ export interface SwitchGroupProps {
  * This is a great example on doing that https://react-spectrum.adobe.com/react-aria/FocusScope.html#usefocusmanager-example so lets make a wrapper to make it easier for others!
  */
 export function SwitchGroup(props: SwitchGroupProps) {
-  const { label, options, values, onChange } = props;
+  const { compact, label, onChange, options, values, withIcon } = props;
+  const labelId = useId(); // Fallback id when none is given
   const groupState = toGroupState<string>(values, onChange);
-  const { groupProps, labelProps } = useCheckboxGroup(props, groupState);
+  const { groupProps, labelProps } = useCheckboxGroup({ ...props, "aria-label": label || labelId }, groupState);
   const { isSelected, addValue, removeValue } = groupState;
 
   return (
@@ -42,10 +48,12 @@ export function SwitchGroup(props: SwitchGroupProps) {
       <div css={Css.df.flexColumn.gap2.$}>
         {options.map(({ label, value }) => (
           <Switch
+            compact={compact}
             key={value}
             label={label}
-            selected={isSelected(value)}
             onChange={(isSelected) => (isSelected ? addValue(value) : removeValue(value))}
+            selected={isSelected(value)}
+            withIcon={withIcon}
           />
         ))}
       </div>

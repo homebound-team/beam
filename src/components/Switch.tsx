@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { useFocusRing, useHover, useSwitch, VisuallyHidden } from "react-aria";
+import { useFocusRing, useHover, useId, useSwitch, VisuallyHidden } from "react-aria";
 import { Palette } from "../Css";
 import { Css, Icon } from "../index";
 import { toToggleState } from "../utils";
@@ -32,10 +32,10 @@ export function Switch(props: SwitchProps) {
     ...otherProps
   } = props;
   const ariaProps = { isSelected, isDisabled, ...otherProps };
-
+  const labelId = useId(); // Fallback id when none is given
   const state = toToggleState(isSelected, onChange);
   const ref = useRef(null);
-  const { inputProps } = useSwitch(ariaProps, state, ref);
+  const { inputProps } = useSwitch({ ...ariaProps, "aria-label": label || labelId }, state, ref);
   const { isFocusVisible: isKeyboardFocus, focusProps } = useFocusRing(otherProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
 
