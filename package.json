@@ -24,16 +24,17 @@
     "watch:truss": "cd ./truss && watch 'npm run generate' ./",
     "build:storybook": "build-storybook",
     "test": "jest",
+    "test:watch": "jest --watch",
     "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
     "storybook": "start-storybook -p 9000",
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded",
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\""
   },
   "peerDependencies": {
+    "@emotion/react": "^11.1.5",
     "react": ">=16"
   },
   "dependencies": {
-    "@emotion/react": "^11.1.5",
     "@react-types/shared": "^3.4.0",
     "react-aria": "^3.4.0",
     "react-stately": "^3.3.0"
@@ -42,6 +43,7 @@
     "@babel/core": "^7.13.1",
     "@emotion/babel-preset-css-prop": "^11.2.0",
     "@emotion/jest": "^11.2.1",
+    "@emotion/react": "^11.1.5",
     "@homebound/rtl-utils": "^1.39.0",
     "@homebound/tsconfig": "^1.0.2",
     "@storybook/addon-essentials": "^6.1.20",
