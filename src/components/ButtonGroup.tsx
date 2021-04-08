@@ -41,7 +41,7 @@ export function ButtonGroupButton({icon, text, active, onClick: onPress, disable
       {...focusProps}
       {...hoverProps}
       css={{
-        ...buttonReset,
+        ...Css.buttonReset.$,
         ...buttonStyles,
         ...(isFocusVisible ? defaultFocusRingStyles : {}),
         ...(active ? activeStyles : {}),
@@ -55,7 +55,6 @@ export function ButtonGroupButton({icon, text, active, onClick: onPress, disable
   );
 }
 
-const buttonReset = Css.smEm.br4.dif.itemsCenter.outline0.transition.mPx(4).$;
 const pressedStyles = Css.bgGray200.important.$;
 const activeStyles = Css.bgGray300.$;
 const hoverStyles = Css.bgGray100.$;
