@@ -68,8 +68,8 @@ const sections: Sections = {
     return this.addIn("& > * + *", Css.add(p, maybeInc(inc)).important.$);
   }`,
   ],
-  buttonReset: () => [
-    newMethod("buttonReset", {
+  buttonBase: () => [
+    newMethod("buttonBase", {
       ...fonts.smEm,
       outline: 0,
       borderRadius: "4px",

@@ -12,6 +12,7 @@ interface ButtonGroupProps {
 interface ButtonGroupButtonProps extends BeamButtonProps, BeamFocusableProps {
   text?: string;
   icon?: IconProps["icon"];
+  // Active is used to indicate the active/selected button, as in a tab or toggle.
   active?: boolean;
 }
 
@@ -41,7 +42,7 @@ export function ButtonGroupButton({icon, text, active, onClick: onPress, disable
       {...focusProps}
       {...hoverProps}
       css={{
-        ...Css.buttonReset.$,
+        ...Css.buttonBase.$,
         ...buttonStyles,
         ...(isFocusVisible ? defaultFocusRingStyles : {}),
         ...(active ? activeStyles : {}),
@@ -55,7 +56,7 @@ export function ButtonGroupButton({icon, text, active, onClick: onPress, disable
   );
 }
 
-const pressedStyles = Css.bgGray200.important.$;
+const pressedStyles = Css.bgGray200.$;
 const activeStyles = Css.bgGray300.$;
 const hoverStyles = Css.bgGray100.$;
 const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;

@@ -31,7 +31,7 @@ export function Button({ onClick: onPress, disabled: isDisabled, ...otherProps }
       {...focusProps}
       {...hoverProps}
       css={{
-        ...Css.buttonReset.$,
+        ...Css.buttonBase.$,
         ...baseStyles,
         ...(isHovered && !isPressed ? hoverStyles : {}),
         ...(isPressed ? pressedStyles : {}),
