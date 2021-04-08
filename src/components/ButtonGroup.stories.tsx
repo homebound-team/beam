@@ -10,6 +10,7 @@ export function ButtonGroups() {
   return (
     <div>
       <div>
+        <h2>Icon Only</h2>
         <ButtonGroup buttons={[
           {icon: "chevronLeft"},
           {icon: "plus"},
@@ -17,6 +18,7 @@ export function ButtonGroups() {
           ]}/>
       </div>
       <div>
+        <h2>Basic</h2>
         <ButtonGroup buttons={[
           {text: "Leading"},
           {text: "Middle"},
@@ -24,17 +26,17 @@ export function ButtonGroups() {
         ]}/>
       </div>
       <div>
+        <h2>Active</h2>
+        <ButtonGroup buttons={[
+          {text: "Leading", active: true },
+          {text: "Middle"},
+          {text: "Trailing"},
+        ]}/>
+      </div>
+      <div>
+        <h2>Disabled</h2>
         <ButtonGroup disabled buttons={[
           {text: "Leading"},
-          {text: "Middle"},
-          {text: "Trailing"},
-        ]}/>
-      </div>
-      <div>
-        <ButtonGroup buttons={[
-          {text: "Leading"},
-          {text: "Middle"},
-          {text: "Middle"},
           {text: "Middle"},
           {text: "Trailing"},
         ]}/>

@@ -12,6 +12,7 @@ interface ButtonGroupProps {
 interface ButtonGroupButtonProps extends BeamButtonProps, BeamFocusableProps {
   text?: string;
   icon?: IconProps["icon"];
+  active?: boolean;
 }
 
 export function ButtonGroup(props: ButtonGroupProps) {
@@ -25,8 +26,7 @@ export function ButtonGroup(props: ButtonGroupProps) {
   );
 }
 
-export function ButtonGroupButton(props: ButtonGroupButtonProps) {
-  const { icon, text, onClick: onPress, disabled, ...otherProps } = props;
+export function ButtonGroupButton({icon, text, active, onClick: onPress, disabled, ...otherProps}: ButtonGroupButtonProps) {
   const ariaProps = { onPress, isDisabled: disabled, ...otherProps };
   const ref = useRef(null);
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
@@ -44,7 +44,8 @@ export function ButtonGroupButton(props: ButtonGroupButtonProps) {
         ...buttonReset,
         ...buttonStyles,
         ...(isFocusVisible ? defaultFocusRingStyles : {}),
-        ...(isPressed ? activeStyles : isHovered ? hoverStyles : {}),
+        ...(active ? activeStyles : {}),
+        ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
         ...(icon ? iconStyles : {}),
       }}
     >
@@ -55,7 +56,8 @@ export function ButtonGroupButton(props: ButtonGroupButtonProps) {
 }
 
 const buttonReset = Css.smEm.br4.dif.itemsCenter.outline0.transition.mPx(4).$;
-const activeStyles = Css.bgGray200.important.$;
+const pressedStyles = Css.bgGray200.important.$;
+const activeStyles = Css.bgGray300.$;
 const hoverStyles = Css.bgGray100.$;
 const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 const iconStyles = Css.px1.$;
