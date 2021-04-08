@@ -14,20 +14,20 @@ export interface SwitchProps {
   /** Input label */
   label?: string;
   /** Handler when the interactive element state changes. */
-  onChange?: (value: boolean) => void;
+  onChange: (value: boolean) => void;
   /** Whether the switch is selected */
-  selected?: boolean;
+  selected: boolean;
   /** Whether to include icons like the check mark */
   withIcon?: boolean;
 }
 
 export function Switch(props: SwitchProps) {
   const {
-    selected: isSelected = false,
+    selected: isSelected,
     disabled: isDisabled = false,
     onChange,
     withIcon,
-    compact,
+    compact = false,
     label,
     ...otherProps
   } = props;

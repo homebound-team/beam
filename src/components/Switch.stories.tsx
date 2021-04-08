@@ -126,8 +126,25 @@ type StoryStates = {
   isFocused?: boolean;
 };
 
-function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchProps & StoryStates) {
-  const [selected, setSelected] = useState<boolean>(props.selected);
+type SwitchWrapperProps = {
+  /** Whether the element should receive focus on render. */
+  autoFocus?: boolean;
+  /** Whether to render a compact version of Switch */
+  compact?: boolean;
+  /** Whether the interactive element is disabled. */
+  disabled?: boolean;
+  /** Input label */
+  label?: string;
+  /** Handler when the interactive element state changes. */
+  onChange?: (value: boolean) => void;
+  /** Whether the switch is selected */
+  selected?: boolean;
+  /** Whether to include icons like the check mark */
+  withIcon?: boolean;
+} & StoryStates;
+
+function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchWrapperProps) {
+  const [selected, setSelected] = useState<boolean>(props.selected || false);
 
   return (
     <div

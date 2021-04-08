@@ -12,7 +12,7 @@ export interface SwitchGroupProps {
   /** Group label */
   label?: string;
   /** Handler when a child Switch component is toggled. */
-  onChange?: (value: string[]) => void;
+  onChange: (value: string[]) => void;
   /** List of switch options */
   options: GroupItem[];
   /** Currently selected values. */
