@@ -1,23 +1,22 @@
 import { useCheckboxGroup } from "@react-aria/checkbox";
-import { CheckboxGroupState } from "@react-stately/checkbox";
 import { Css } from "../Css";
-import { BeamLabelProps, BeamOnChangeProps } from "../interfaces";
+import { toGroupState } from "../utils";
 import { Switch } from "./Switch";
 
-// TODO: @KoltonG Could we use props from the interface?
 type GroupItem = {
   label: string;
   value: string;
 };
 
-export interface SwitchGroupProps extends BeamLabelProps, BeamOnChangeProps<string[]> {
-  /**
-   * Current selected values.
-   * TODO: @Kolton Is there opportunity for shareable interface?
-   */
-  values: string[];
+export interface SwitchGroupProps {
+  /** Group label */
+  label?: string;
+  /** Handler when a child Switch component is toggled. */
+  onChange?: (value: string[]) => void;
   /** List of switch options */
   options: GroupItem[];
+  /** Currently selected values. */
+  values: string[];
 }
 
 /**
@@ -30,7 +29,7 @@ export interface SwitchGroupProps extends BeamLabelProps, BeamOnChangeProps<stri
  */
 export function SwitchGroup(props: SwitchGroupProps) {
   const { label, options, values, onChange } = props;
-  const groupState = useStatelessGroupState<string>(values, onChange);
+  const groupState = toGroupState<string>(values, onChange);
   const { groupProps, labelProps } = useCheckboxGroup(props, groupState);
   const { isSelected, addValue, removeValue } = groupState;
 
@@ -45,7 +44,6 @@ export function SwitchGroup(props: SwitchGroupProps) {
           <Switch
             key={value}
             label={label}
-            value={value}
             selected={isSelected(value)}
             onChange={(isSelected) => (isSelected ? addValue(value) : removeValue(value))}
           />
@@ -53,21 +51,4 @@ export function SwitchGroup(props: SwitchGroupProps) {
       </div>
     </fieldset>
   );
-}
-
-/** Generic stateless group state hook (no useState inside) */
-function useStatelessGroupState<T extends string>(values: T[], onChange: (value: T[]) => void): CheckboxGroupState {
-  const addValue = (value: T) => onChange([...values, value]);
-  const removeValue = (value: T) => onChange(values.filter((_value) => _value !== value));
-
-  return {
-    value: values,
-    setValue: onChange,
-    isSelected: (value: T) => values.includes(value),
-    addValue,
-    removeValue,
-    toggleValue: (value: T) => (values.includes(value) ? addValue(value) : removeValue(value)),
-    isDisabled: false,
-    isReadOnly: false,
-  };
 }
