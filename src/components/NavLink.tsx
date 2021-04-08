@@ -47,9 +47,11 @@ export function NavLink(props: NavLinkProps) {
       href={href}
       ref={ref}
       rel={rel}
-      // does not focus if disabled
+      /** does not focus if disabled */
       tabIndex={isDisabled ? -1 : 0}
       target={target}
+      /** aria-current represents the current page within a set of pages */
+      aria-current={active && `page`}
       css={{
         ...baseStyles,
         ...(active && activeStyles),
@@ -59,8 +61,12 @@ export function NavLink(props: NavLinkProps) {
         ...(isPressed && pressedStyles),
       }}
     >
-      <span css={Css.mr1.$}>{label}</span>
-      {icon && <Icon icon={icon} />}
+      {label}
+      {icon && (
+        <span css={Css.ml1.$}>
+          <Icon icon={icon} />
+        </span>
+      )}
     </a>
   );
 }
@@ -69,7 +75,7 @@ export function getNavLinkStyles(variant: NavLinkVariant) {
   return navLinkVariantStyles[variant];
 }
 
-const baseStyles = Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.outline0.$;
+const baseStyles = Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.outline0.noUnderline.$;
 
 const navLinkVariantStyles: Record<
   NavLinkVariant,
