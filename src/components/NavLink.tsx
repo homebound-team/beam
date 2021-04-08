@@ -6,13 +6,16 @@ import { BeamFocusableProps } from "src/interfaces";
 import { Icon, Icons } from "./Icon";
 
 export interface NavLinkProps extends BeamFocusableProps {
+  /** active indicates the user is on the current page */
   active?: boolean;
   disabled?: boolean;
   href: string;
   label: string;
   icon?: keyof typeof Icons;
   variant: NavLinkVariant;
-  /** Target and rel attributes are added for external links */
+  /**
+   * Target and rel attributes are added for external links
+   * TODO: maybe infer this property based on the href */
   external?: boolean;
 }
 
