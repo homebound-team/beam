@@ -2819,7 +2819,7 @@
     ts-dedent "^2.0.0"
     util-deprecate "^1.0.2"
 
-"@storybook/addon-essentials@^6.1.20":
+"@storybook/addon-essentials@^6.2.5":
   version "6.2.5"
   resolved "https://registry.yarnpkg.com/@storybook/addon-essentials/-/addon-essentials-6.2.5.tgz#22217e278bd2437e440f61375073b4f34ab3ac9d"
   integrity sha512-Yqe467GgNxqgRdHcZyWTuzKnbc0KxVb/Jfpt+dOwS9cZAUBGdTr7RBAS98ZIRZfelvqBytPkEewlmb/J5mVnbA==
@@ -2858,7 +2858,7 @@
     react-lifecycles-compat "^3.0.4"
     util-deprecate "^1.0.2"
 
-"@storybook/addon-links@^6.1.20":
+"@storybook/addon-links@^6.2.5":
   version "6.2.5"
   resolved "https://registry.yarnpkg.com/@storybook/addon-links/-/addon-links-6.2.5.tgz#8149862dbb391df49161a1eb9973bc4ce99bc0e4"
   integrity sha512-kRehv1VnuzSeeIzuvSbWqmZE1fkL8I/tvvscEYeku1Xwhq7Pbp31K3ZWMPPFj28z1zTWYyWn+6HTscYPpdREQw==
@@ -2917,7 +2917,7 @@
     global "^4.3.2"
     util-deprecate "^1.0.2"
 
-"@storybook/addons@6.2.5", "@storybook/addons@^6.1.20":
+"@storybook/addons@6.2.5", "@storybook/addons@^6.2.5":
   version "6.2.5"
   resolved "https://registry.yarnpkg.com/@storybook/addons/-/addons-6.2.5.tgz#28370a547b8d2f69a34c29520aa841961bac6b27"
   integrity sha512-tRZYTxJ6FlOCoWG7mVJAzH4BIBPWyvryGprawdkWHUaVYQRMH58pU3ma7gxdYdgvV80eZe2BfEOLzvZJeV/GgA==
@@ -3367,7 +3367,7 @@
   dependencies:
     core-js "^3.8.2"
 
-"@storybook/react@^6.1.20":
+"@storybook/react@^6.2.5":
   version "6.2.5"
   resolved "https://registry.yarnpkg.com/@storybook/react/-/react-6.2.5.tgz#118423f99bf6f80634315efc2b81e48683fa2550"
   integrity sha512-o3hptOgmiG48mmAjqLGeuWhHFNeNNIqBgBapvoVDbt0s7dgEJ/GsF0d6H0pAXee2/NsCf8/ZBLP4NmUWuAcVjQ==
