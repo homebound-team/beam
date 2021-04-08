@@ -35,7 +35,7 @@ export function IconButton({ onClick: onPress, disabled: isDisabled, ...otherPro
   );
 }
 
-const iconButtonStylesReset = Css.hPx(28).wPx(28).br8.bTransparent.bw2.bgTransparent.cursorPointer.outline0.df
+const iconButtonStylesReset = Css.hPx(28).wPx(28).br8.bTransparent.bw2.bgTransparent.cursorPointer.outline0.p0.df
   .itemsCenter.justifyCenter.transition.$;
 export const iconButtonStylesHover = Css.bgGray100.$;
 const iconButtonStylesFocus = Css.bLightBlue700.$;
