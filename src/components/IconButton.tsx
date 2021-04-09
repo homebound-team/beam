@@ -19,7 +19,7 @@ export function IconButton(props: IconButtonProps) {
   const { buttonProps } = useButton(ariaProps, ref);
   const { focusProps, isFocusVisible } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
-  const testIds = useTestIds(others);
+  const testIds = useTestIds(others, icon);
 
   const styles = useMemo(
     () => ({
