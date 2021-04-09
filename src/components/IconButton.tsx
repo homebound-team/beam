@@ -32,7 +32,7 @@ export function IconButton(props: IconButtonProps) {
   );
 
   return (
-    <button {...testIds} {...buttonProps} {...focusProps} {...hoverProps} ref={ref} css={styles} {...others}>
+    <button {...testIds} {...buttonProps} {...focusProps} {...hoverProps} ref={ref} css={styles}>
       <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : undefined)} />
     </button>
   );
