@@ -4,6 +4,7 @@ import { useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src";
 import { Css, Palette } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
+import { useTestIds } from "src/utils/useTestIds";
 
 export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   // The icon to use within the button
@@ -11,13 +12,14 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   color?: Palette;
 }
 
-export function IconButton({ onClick: onPress, disabled: isDisabled, color, ...otherProps }: IconButtonProps) {
-  const ariaProps = { onPress, isDisabled, ...otherProps };
-  const { icon } = ariaProps;
+export function IconButton(props: IconButtonProps) {
+  const { onClick: onPress, disabled: isDisabled, color, icon, autoFocus, ...others } = props;
+  const ariaProps = { onPress, isDisabled, autoFocus };
   const ref = useRef(null);
   const { buttonProps } = useButton(ariaProps, ref);
   const { focusProps, isFocusVisible } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
+  const testIds = useTestIds(others);
 
   const styles = useMemo(
     () => ({
@@ -30,7 +32,7 @@ export function IconButton({ onClick: onPress, disabled: isDisabled, color, ...o
   );
 
   return (
-    <button {...buttonProps} {...focusProps} {...hoverProps} ref={ref} css={styles}>
+    <button {...testIds} {...buttonProps} {...focusProps} {...hoverProps} ref={ref} css={styles} {...others}>
       <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : undefined)} />
     </button>
   );
