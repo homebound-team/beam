@@ -46,9 +46,6 @@ export function Switch(props: SwitchProps) {
         ...(isDisabled && switchLabelDisabledStyles),
       }}
     >
-      <VisuallyHidden>
-        <input ref={ref} {...inputProps} {...focusProps} />
-      </VisuallyHidden>
       {/* Background */}
       <div
         aria-hidden="true"
@@ -75,7 +72,12 @@ export function Switch(props: SwitchProps) {
           )}
         </div>
       </div>
-      {label}
+      {/* Since we are using childGap, we must wrap the label in an element and
+      match the height of the icon for horizontal alignment */}
+      <span css={switchTextStyles(compact)}>{label}</span>
+      <VisuallyHidden>
+        <input ref={ref} {...inputProps} {...focusProps} />
+      </VisuallyHidden>
     </label>
   );
 }
@@ -87,7 +89,7 @@ const toggleWidth = (isCompact: boolean) => (isCompact ? 44 : 40);
 const circleDiameter = (isCompact: boolean) => (isCompact ? 14 : 20);
 
 // Label styles
-const switchLabelDefaultStyles = Css.cursorPointer.df.itemsCenter.gap2.w("max-content").smEm.selectNone.$;
+const switchLabelDefaultStyles = Css.cursorPointer.df.itemsCenter.childGap2.w("max-content").smEm.selectNone.$;
 const switchLabelDisabledStyles = Css.cursorNotAllowed.gray400.$;
 
 // Switcher/Toggle element styles
@@ -120,3 +122,7 @@ const switchCircleDisabledStyles = Css.bgGray100.$;
  */
 const switchCircleSelectedStyles = (isCompact: boolean) =>
   Css.left(`calc(100% - ${circleDiameter(isCompact)}px - 2px);`).$;
+
+const switchTextStyles = (isCompact: boolean) =>
+  // LineHeight is conditionally applied to handle compact version text alignment
+  Css.hPx(toggleHeight(isCompact)).if(isCompact).add("lineHeight", "1").$;

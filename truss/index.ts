@@ -1,4 +1,4 @@
-import { generate, newMethodsForProp, Sections } from "@homebound/truss";
+import { generate, newIncrementDelegateMethods, newMethodsForProp, Sections } from "@homebound/truss";
 import { palette } from "./palette";
 
 const increment = 8;
@@ -59,6 +59,15 @@ const sections: Sections = {
       bshFocus: `0px 0px 0px 2px ${palette.White}, 0px 0px 0px 4px ${palette.LightBlue700}`,
       bshDanger: `0px 0px 0px 2px ${palette.White}, 0px 0px 0px 4px ${palette.Red800}`,
     }),
+  // Due to Safari's limited support of the `gap` property, `childGap` will be
+  // its replacement until full browser support https://caniuse.com/?search=gap
+  childGap: (config) => [
+    ...newIncrementDelegateMethods("childGap", config.numberOfIncrements),
+    `childGap(inc: number | string) {
+    const p = this.opts.rules["flexDirection"] === "column" ? "marginTop" : "marginLeft";
+    return this.addIn("& > * + *", Css.add(p, maybeInc(inc)).important.$);
+  }`,
+  ],
 };
 
 const aliases: Record<string, string[]> = {};
