@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { useFocusRing, useHover, useId, useSwitch, VisuallyHidden } from "react-aria";
+import { useFocusRing, useHover, useSwitch, VisuallyHidden } from "react-aria";
 import { Palette } from "../Css";
 import { Css, Icon } from "../index";
 import { toToggleState } from "../utils";
