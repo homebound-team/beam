@@ -12,7 +12,7 @@
  * return <Foo {...testIds.foo />;
  * ```
  */
-export function useTestIds(props: object, defaultPrefix?: string): Record<string, object> {
+export function useTestIds<T = Record<string, object>>(props: object, defaultPrefix?: string): T {
   const prefix: string | undefined = (props as any)["data-testid"] || defaultPrefix;
   const rootId = { "data-testid": prefix };
   return newMethodMissingProxy(rootId, (key) => {
