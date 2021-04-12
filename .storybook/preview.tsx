@@ -27,6 +27,11 @@ export const parameters: Parameters = {
     // https://www.chromatic.com/docs/delay#delay-a-story
     delay: 300,
   },
+  controls: {
+    // Hide NoControls warning
+    // https://storybook.js.org/docs/react/essentials/controls#hide-nocontrols-warning
+    hideNoControlsWarning: true,
+  },
 };
 
 // https://storybook.js.org/docs/react/writing-stories/decorators#global-decorators

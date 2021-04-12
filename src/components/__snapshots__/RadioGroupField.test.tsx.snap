@@ -50,8 +50,8 @@ exports[`RadioGroupField renders with just labels 1`] = `
   border-style: solid;
   border-width: 1px;
   color: rgba(3,105,161,1);
-  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
-  transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
+  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms,left 200ms,right 200ms;
+  transition: background-color 200ms,border-color 200ms,box-shadow 200ms,left 200ms,right 200ms;
   -webkit-background-position: center;
   background-position: center;
   background-repeat: no-repeat;
@@ -96,8 +96,8 @@ exports[`RadioGroupField renders with just labels 1`] = `
   border-style: solid;
   border-width: 1px;
   color: rgba(3,105,161,1);
-  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
-  transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
+  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms,left 200ms,right 200ms;
+  transition: background-color 200ms,border-color 200ms,box-shadow 200ms,left 200ms,right 200ms;
   cursor: pointer;
   margin-right: 8px;
   margin-top: 2px;
@@ -217,8 +217,8 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
   border-style: solid;
   border-width: 1px;
   color: rgba(3,105,161,1);
-  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
-  transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
+  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms,left 200ms,right 200ms;
+  transition: background-color 200ms,border-color 200ms,box-shadow 200ms,left 200ms,right 200ms;
   -webkit-background-position: center;
   background-position: center;
   background-repeat: no-repeat;
@@ -263,8 +263,8 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
   border-style: solid;
   border-width: 1px;
   color: rgba(3,105,161,1);
-  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
-  transition: background-color 200ms,border-color 200ms,box-shadow 200ms;
+  -webkit-transition: background-color 200ms,border-color 200ms,box-shadow 200ms,left 200ms,right 200ms;
+  transition: background-color 200ms,border-color 200ms,box-shadow 200ms,left 200ms,right 200ms;
   cursor: pointer;
   margin-right: 8px;
   margin-top: 2px;
