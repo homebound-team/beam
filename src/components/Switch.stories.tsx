@@ -21,45 +21,6 @@ export const Switch = () => {
     <div css={{ h1: Css.xl4Em.mb4.$, h2: Css.xl2Em.$ }}>
       <h1>Switch</h1>
       <div css={Css.df.gap4.flexColumn.$}>
-        <h2>Switch Buttons</h2>
-        <div css={Css.dg.gapPx(48).gtc("repeat(auto-fit, 115px)").$}>
-          <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>
-            <SwitchWrapper />
-            <SwitchWrapper selected />
-            <SwitchWrapper isHovered />
-            <SwitchWrapper isHovered selected />
-            <SwitchWrapper isFocused />
-            <SwitchWrapper isFocused selected />
-            <SwitchWrapper disabled />
-          </div>
-          <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>
-            <SwitchWrapper withIcon />
-            <SwitchWrapper withIcon selected />
-            <SwitchWrapper withIcon isHovered />
-            <SwitchWrapper withIcon isHovered selected />
-            <SwitchWrapper withIcon isFocused />
-            <SwitchWrapper withIcon isFocused selected />
-            <SwitchWrapper withIcon disabled />
-          </div>
-          <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>
-            <SwitchWrapper compact />
-            <SwitchWrapper compact selected />
-            <SwitchWrapper compact isHovered />
-            <SwitchWrapper compact isHovered selected />
-            <SwitchWrapper compact isFocused />
-            <SwitchWrapper compact isFocused selected />
-            <SwitchWrapper compact disabled />
-          </div>
-          <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>
-            <SwitchWrapper withIcon compact />
-            <SwitchWrapper withIcon compact selected />
-            <SwitchWrapper withIcon compact isHovered />
-            <SwitchWrapper withIcon compact isHovered selected />
-            <SwitchWrapper withIcon compact isFocused />
-            <SwitchWrapper withIcon compact isFocused selected />
-            <SwitchWrapper withIcon compact disabled />
-          </div>
-        </div>
         <h2>Switch</h2>
         <div css={Css.dg.gapPx(48).gtc("repeat(auto-fit, 365px)").$}>
           <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>
@@ -100,18 +61,14 @@ export const Switch = () => {
           </div>
         </div>
         <h2>Switch Group</h2>
-        <div css={Css.dg.gapPx(64).$}>
+        <div css={Css.dg.gapPx(48).$}>
           <div css={Css.df.gap("16px 32px").$}>
             <SwitchGroupWrapper label="Notifications" />
             <SwitchGroupWrapper label="Notifications" withIcon />
-            <SwitchGroupWrapper />
-            <SwitchGroupWrapper withIcon />
           </div>
           <div css={Css.df.gap("16px 32px").$}>
             <SwitchGroupWrapper compact label="Notifications" />
             <SwitchGroupWrapper compact label="Notifications" withIcon />
-            <SwitchGroupWrapper compact />
-            <SwitchGroupWrapper compact withIcon />
           </div>
         </div>
       </div>
@@ -132,7 +89,7 @@ type SwitchWrapperProps = {
   /** Whether the interactive element is disabled. */
   disabled?: boolean;
   /** Input label */
-  label?: string;
+  label: string;
   /** Handler when the interactive element state changes. */
   onChange?: (value: boolean) => void;
   /** Whether the switch is selected */

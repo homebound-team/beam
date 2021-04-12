@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { useFocusRing, useHover, useId, useSwitch, VisuallyHidden } from "react-aria";
+import { useFocusRing, useHover, useSwitch, VisuallyHidden } from "react-aria";
 import { Palette } from "../Css";
 import { Css, Icon } from "../index";
 import { toToggleState } from "../utils";
@@ -12,7 +12,7 @@ export interface SwitchProps {
   /** Whether the interactive element is disabled. */
   disabled?: boolean;
   /** Input label */
-  label?: string;
+  label: string;
   /** Handler when the interactive element state changes. */
   onChange: (value: boolean) => void;
   /** Whether the switch is selected */
@@ -32,10 +32,9 @@ export function Switch(props: SwitchProps) {
     ...otherProps
   } = props;
   const ariaProps = { isSelected, isDisabled, ...otherProps };
-  const labelId = useId(); // Fallback id when none is given
   const state = toToggleState(isSelected, onChange);
   const ref = useRef(null);
-  const { inputProps } = useSwitch({ ...ariaProps, "aria-label": label || labelId }, state, ref);
+  const { inputProps } = useSwitch({ ...ariaProps, "aria-label": label }, state, ref);
   const { isFocusVisible: isKeyboardFocus, focusProps } = useFocusRing(otherProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
 
@@ -88,7 +87,7 @@ const toggleWidth = (isCompact: boolean) => (isCompact ? 44 : 40);
 const circleDiameter = (isCompact: boolean) => (isCompact ? 14 : 20);
 
 // Label styles
-const switchLabelDefaultStyles = Css.cursorPointer.df.itemsCenter.gap2.w("max-content").smEm.$;
+const switchLabelDefaultStyles = Css.cursorPointer.df.itemsCenter.gap2.w("max-content").smEm.selectNone.$;
 const switchLabelDisabledStyles = Css.cursorNotAllowed.gray400.$;
 
 // Switcher/Toggle element styles

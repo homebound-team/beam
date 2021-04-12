@@ -1,5 +1,4 @@
 import { useCheckboxGroup } from "@react-aria/checkbox";
-import { useId } from "react-aria";
 import { Css } from "../Css";
 import { toGroupState } from "../utils";
 import { Switch } from "./Switch";
@@ -13,7 +12,7 @@ export interface SwitchGroupProps {
   /** Whether to render a compact version of SwitchGroup */
   compact?: boolean;
   /** Group label */
-  label?: string;
+  label: string;
   /** Handler when a child Switch component is toggled. */
   onChange: (value: string[]) => void;
   /** List of switch options */
@@ -24,7 +23,7 @@ export interface SwitchGroupProps {
   withIcon?: boolean;
 }
 
-/**
+/*
  * FIXME: @KoltonG keyboard arrow navigation is not working. May need to implement
  * FocusScope due to lack of handling in useCheckboxGroup vs useRadioButtonGroup
  * Actually, maybe I am not crazy... useRadioButtonGroup has actual code to
@@ -34,9 +33,8 @@ export interface SwitchGroupProps {
  */
 export function SwitchGroup(props: SwitchGroupProps) {
   const { compact, label, onChange, options, values, withIcon } = props;
-  const labelId = useId(); // Fallback id when none is given
   const groupState = toGroupState<string>(values, onChange);
-  const { groupProps, labelProps } = useCheckboxGroup({ ...props, "aria-label": label || labelId }, groupState);
+  const { groupProps, labelProps } = useCheckboxGroup({ ...props, "aria-label": label }, groupState);
   const { isSelected, addValue, removeValue } = groupState;
 
   return (
