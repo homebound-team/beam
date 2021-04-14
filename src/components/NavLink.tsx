@@ -26,7 +26,9 @@ export function NavLink(props: NavLinkProps) {
   const ariaProps = { children: label, isDisabled, ...otherProps };
   const { href, active = false, icon = false, variant } = ariaProps;
   const ref = useRef() as RefObject<HTMLAnchorElement>;
-  const { isPressed } = useButton({ ...ariaProps, elementType: "a" }, ref);
+  const { buttonProps, isPressed } = useButton({ ...ariaProps, elementType: "a" }, ref);
+  // remove `type=button` from being passed into the component, as it causes style issues in Safari.
+  const { type, ...otherButtonProps } = buttonProps;
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
 
@@ -40,6 +42,7 @@ export function NavLink(props: NavLinkProps) {
 
   return (
     <a
+      {...otherButtonProps}
       {...focusProps}
       {...hoverProps}
       className={navLink}
