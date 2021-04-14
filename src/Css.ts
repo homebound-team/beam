@@ -816,6 +816,9 @@ class CssBuilder<T extends Properties1> {
     return this.addIn("& > * + *", Css.add(p, maybeInc(inc)).important.$);
   }
 
+  // buttonBase
+  get buttonBase() { return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px").add("outline", 0).add("borderRadius", "4px").add("display", "inline-flex").add("margin", "4px").add("alignItems", "center").add("transition", "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms"); }
+
   // aliases
   
   get $(): T { return maybeImportant(sortObject(this.rules), this.opts.important); }

@@ -31,7 +31,7 @@ export function Button({ onClick: onPress, disabled: isDisabled, ...otherProps }
       {...focusProps}
       {...hoverProps}
       css={{
-        ...buttonReset,
+        ...Css.buttonBase.$,
         ...baseStyles,
         ...(isHovered && !isPressed ? hoverStyles : {}),
         ...(isPressed ? pressedStyles : {}),
@@ -59,8 +59,6 @@ function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {
     baseStyles: { ...variantStyles[variant].baseStyles, ...sizeStyles[size] },
   };
 }
-
-const buttonReset = Css.smEm.br4.dif.itemsCenter.outline0.transition.mPx(4).$;
 
 const variantStyles: Record<
   ButtonVariant,

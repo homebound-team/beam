@@ -1,4 +1,4 @@
-import { generate, newIncrementDelegateMethods, newMethodsForProp, Sections } from "@homebound/truss";
+import { generate, newMethod, newIncrementDelegateMethods, newMethodsForProp, Sections } from "@homebound/truss";
 import { palette } from "./palette";
 
 const increment = 8;
@@ -30,6 +30,8 @@ const fonts: Record<string, { fontWeight: 400 | 500 | 600, fontSize: string; lin
   xl5Em:  { fontWeight: 600, fontSize: "48px", lineHeight: "48px" },
 };
 
+const transition: string = ["background-color", "border-color", "box-shadow", "left", "right"].map((property) => `${property} 200ms`).join(", ");
+
 // Custom rules
 const sections: Sections = {
   fontFamily: () =>
@@ -47,9 +49,7 @@ const sections: Sections = {
     }),
   animation: () =>
     newMethodsForProp("transition", {
-      transition: ["background-color", "border-color", "box-shadow", "left", "right"]
-        .map((property) => `${property} 200ms`)
-        .join(", "),
+      transition,
     }),
   boxShadow: () =>
     newMethodsForProp("boxShadow", {
@@ -67,6 +67,17 @@ const sections: Sections = {
     const p = this.opts.rules["flexDirection"] === "column" ? "marginTop" : "marginLeft";
     return this.addIn("& > * + *", Css.add(p, maybeInc(inc)).important.$);
   }`,
+  ],
+  buttonBase: () => [
+    newMethod("buttonBase", {
+      ...fonts.smEm,
+      outline: 0,
+      borderRadius: "4px",
+      display: "inline-flex",
+      margin: "4px",
+      alignItems: "center",
+      transition,
+    }),
   ],
 };
 
