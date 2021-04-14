@@ -38,8 +38,8 @@ export function IconButton(props: IconButtonProps) {
   );
 }
 
-const iconButtonStylesReset = Css.hPx(28).wPx(28).br8.bTransparent.bw2.bgTransparent.cursorPointer.outline0.p0.df
-  .itemsCenter.justifyCenter.transition.$;
+const iconButtonStylesReset = Css.hPx(28).wPx(28).br8.bTransparent.bsSolid.bw2.bgTransparent.cursorPointer.outline0.p0
+  .df.itemsCenter.justifyCenter.transition.$;
 export const iconButtonStylesHover = Css.bgGray100.$;
 const iconButtonStylesFocus = Css.bLightBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;

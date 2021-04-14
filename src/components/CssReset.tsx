@@ -366,12 +366,16 @@ const tailwindPreflightReset = css`
  *    is wrapped by a div with box-sizing set to content-box.
  *
  *    https://github.com/mozdevs/cssremedy/issues/4
+ * 
+ * 2. Setting border width to 0 removes the default border from elements
+ *    like the button and fieldset
  */
 
   *,
   ::before,
   ::after {
     box-sizing: border-box; /* 1 */
+    border-width: 0; /* 2 */
   }
 
   /*
