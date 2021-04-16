@@ -36,6 +36,8 @@ export const Icon = () => {
     "chevronLeft",
     "chevronRight",
     "arrowBack",
+    "menuClose",
+    "menuOpen",
   ];
   const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images"];
   const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar"];
