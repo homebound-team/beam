@@ -14,11 +14,15 @@ export default {
     size: { control: false },
     children: { control: false },
   },
+  parameters: {
+    // To better view the hover state
+    backgrounds: { default: "white" },
+  },
 } as Meta<ButtonProps>;
 
 export function Buttons(args: ButtonProps) {
   return (
-    <div css={Css.dg.$}>
+    <div css={Css.dg.flexColumn.childGap2.$}>
       <div>
         <h2>Primary</h2>
         <div>
@@ -82,8 +86,16 @@ export function Buttons(args: ButtonProps) {
           <Button {...args} variant="tertiary" disabled label="Disabled" />
         </div>
         <div>
+          <Button {...args} size="md" variant="tertiary" label="Tertiary Button" />
+          <Button {...args} size="md" variant="tertiary" disabled label="Disabled" />
+        </div>
+        <div>
           <Button {...args} icon="plus" variant="tertiary" label="Tertiary Button" />
           <Button {...args} icon="plus" variant="tertiary" disabled label="Disabled" />
+        </div>
+        <div>
+          <Button {...args} icon="plus" size="md" variant="tertiary" label="Tertiary Button" />
+          <Button {...args} icon="plus" size="md" variant="tertiary" disabled label="Disabled" />
         </div>
       </div>
 
