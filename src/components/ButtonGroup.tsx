@@ -6,7 +6,7 @@ import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 
 interface ButtonGroupProps {
   disabled?: boolean;
-  buttons: ButtonGroupButtonProps[];
+  buttons: Omit<ButtonGroupButtonProps, "size">[];
   size?: ButtonGroupSize;
 }
 
@@ -15,11 +15,11 @@ interface ButtonGroupButtonProps extends BeamButtonProps, BeamFocusableProps {
   icon?: IconProps["icon"];
   // Active is used to indicate the active/selected button, as in a tab or toggle.
   active?: boolean;
-  size?: ButtonGroupSize;
+  size: ButtonGroupSize;
 }
 
 export function ButtonGroup(props: ButtonGroupProps) {
-  const { buttons, disabled = false, size } = props;
+  const { buttons, disabled = false, size = "sm" } = props;
   return (
     <div css={Css.mPx(4).$}>
       {buttons.map((b, i) => (
@@ -35,7 +35,7 @@ export function ButtonGroupButton({
   active,
   onClick: onPress,
   disabled,
-  size = "sm",
+  size,
   ...otherProps
 }: ButtonGroupButtonProps) {
   const ariaProps = { onPress, isDisabled: disabled, ...otherProps };
