@@ -15,7 +15,7 @@ export default {
     autoFocus: { control: false },
   },
   parameters: {
-    // To better view the icon hover state
+    // To better view the hover state
     backgrounds: { default: "white" },
   },
 } as Meta<IconButtonProps>;
