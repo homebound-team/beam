@@ -24,8 +24,19 @@ export const Icon = () => {
     "cloudUpload",
     "toggleOn",
     "trash",
+    "refresh",
+    "eyeball",
+    "thumbsUp",
+    "verticalDots",
   ];
-  const alertIcons: IconProps["icon"][] = ["errorCircle", "checkCircle", "infoCircle", "helpCircle", "error"];
+  const alertIcons: IconProps["icon"][] = [
+    "errorCircle",
+    "checkCircle",
+    "infoCircle",
+    "helpCircle",
+    "error",
+    "xCircle",
+  ];
   const arrowIcons: IconProps["icon"][] = [
     "chevronsDown",
     "chevronsRight",
@@ -39,7 +50,7 @@ export const Icon = () => {
     "menuClose",
     "menuOpen",
   ];
-  const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images"];
+  const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images", "openBook"];
   const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar"];
   const navigationIcons: IconProps["icon"][] = ["projects", "tasks", "finances", "templates", "tradePartners"];
 
