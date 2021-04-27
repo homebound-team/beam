@@ -36,8 +36,8 @@
   },
   "dependencies": {
     "@react-types/shared": "^3.4.0",
-    "react-aria": "^3.4.0",
-    "react-stately": "^3.3.0"
+    "react-aria": "^3.5.0",
+    "react-stately": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.13.1",
