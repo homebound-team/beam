@@ -12370,7 +12370,7 @@ react-addons-create-fragment@^15.6.2:
     loose-envify "^1.3.1"
     object-assign "^4.1.0"
 
-react-aria@^3.4.0:
+react-aria@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/react-aria/-/react-aria-3.5.0.tgz#52ba11feac30578c6c61a08137958fa2d32b8215"
   integrity sha512-V/qPcflOHTdt30BW9BV90nLwB9GsL6mbaMj2VORHUdJFw1VpqLUx91Cx4KDYmaWk5I+j5pjM1rO79VwTIJ3KHA==
@@ -12625,7 +12625,7 @@ react-sizeme@^3.0.1:
     shallowequal "^1.1.0"
     throttle-debounce "^3.0.1"
 
-react-stately@^3.3.0:
+react-stately@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/react-stately/-/react-stately-3.4.0.tgz#8a596e0544ae708be96614c1fd3e10f259cc6a95"
   integrity sha512-mlewf8B5xJbxCkjlJtLct1nLmsxTnXSSGFn1gFI46e9rTgmq2AzVQg7gWk4iGT9+QhN+8i/nWEqXXqNJ1pqJGA==

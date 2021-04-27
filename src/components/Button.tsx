@@ -46,14 +46,6 @@ export function Button({ onClick: onPress, disabled: isDisabled, ...otherProps }
 }
 
 function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {
-  // Handling tertiary separately as it only supports a single size button. The size it supports does not match styles of other buttons.
-  if (variant === "tertiary") {
-    return {
-      ...variantStyles.tertiary,
-      baseStyles: { ...variantStyles.tertiary.baseStyles, ...Css.hPx(40).px1.$ },
-    };
-  }
-
   return {
     ...variantStyles[variant],
     baseStyles: { ...variantStyles[variant].baseStyles, ...sizeStyles[size] },
