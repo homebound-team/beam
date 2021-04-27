@@ -24,7 +24,7 @@ const options: TestOption[] = [
 export function SelectFields() {
   return (
     <div css={Css.df.justifyAround.$}>
-      <div css={Css.df.flexColumn.gap3.$}>
+      <div css={Css.df.flexColumn.childGap3.$}>
         <h1 css={Css.lg.mb2.$}>Regular</h1>
         <TestSelectField
           label="Favorite Icon"
@@ -84,7 +84,7 @@ export function SelectFields() {
         />
       </div>
 
-      <div css={Css.df.flexColumn.gap3.$}>
+      <div css={Css.df.flexColumn.childGap3.$}>
         <h1 css={Css.lg.mb2.$}>Compact</h1>
         <TestSelectField
           compact
