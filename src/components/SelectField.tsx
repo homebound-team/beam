@@ -221,10 +221,11 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
   const { hoverProps, isHovered } = useHover({});
   const fieldDecorationWidth = 32;
   const fieldWidth = getFieldWidth(compact);
-  const hoverStyles = isHovered && !isFocused ? Css.bgGray100.$ : {};
-  const focusStyles = isFocused ? Css.bLightBlue500.$ : {};
+  const hoverStyles = isHovered && !isReadOnly && !isFocused ? Css.bgGray100.$ : {};
+  const focusStyles = isFocused && !isReadOnly ? Css.bLightBlue500.$ : {};
   const errorStyles = errorMsg ? Css.bRed500.$ : {};
   const disabledStyles = isDisabled ? Css.gray400.bgGray100.cursorNotAllowed.$ : {};
+  const readOnlyStyles = isReadOnly ? Css.bn.pl0.add("backgroundColor", "unset").$ : {};
 
   return (
     <Fragment>
@@ -235,6 +236,7 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
           ...errorStyles,
           ...focusStyles,
           ...disabledStyles,
+          ...readOnlyStyles,
         }}
         {...hoverProps}
         ref={inputWrapRef as any}
@@ -256,9 +258,10 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
           {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
           ref={inputRef as any}
           css={{
-            ...Css.sm.mw0.fg1.px1.bgWhite.br4.pyPx(10).gray800.outline0.if(compact).pyPx(6).$,
+            ...Css.smEm.mw0.fg1.px1.bgWhite.br4.pyPx(10).gray900.outline0.if(compact).pyPx(6).$,
             ...hoverStyles,
             ...disabledStyles,
+            ...readOnlyStyles,
           }}
         />
         {!isReadOnly && (
@@ -359,7 +362,7 @@ function Option<T extends object>({ item, state }: { item: Node<T>; state: Combo
       {...hoverProps}
       ref={ref as any}
       css={{
-        ...Css.df.itemsCenter.justifyBetween.pxPx(12).py1.mh("42px").cursorPointer.gray800.smEm.$,
+        ...Css.df.itemsCenter.justifyBetween.pxPx(12).py1.mh("42px").cursorPointer.gray900.smEm.$,
         ...(isHovered ? Css.bgGray100.$ : {}),
         ...(isFocused ? Css.add("boxShadow", `0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
       }}
