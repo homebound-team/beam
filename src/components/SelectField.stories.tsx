@@ -26,7 +26,7 @@ export function SelectFields() {
     <div css={Css.df.justifyAround.$}>
       <div css={Css.df.flexColumn.gap3.$}>
         <h1 css={Css.lg.mb2.$}>Regular</h1>
-        <StatefulSelectField
+        <TestSelectField
           label="Favorite Icon"
           selectedOption={options[2]}
           options={options}
@@ -43,7 +43,7 @@ export function SelectFields() {
             </div>
           )}
         />
-        <StatefulSelectField
+        <TestSelectField
           label="Favorite Icon - with field decoration"
           options={options}
           getOptionValue={(o) => o.id}
@@ -61,14 +61,14 @@ export function SelectFields() {
             </div>
           )}
         />
-        <StatefulSelectField
+        <TestSelectField
           label="Favorite Icon - Disabled"
           options={options}
           getOptionValue={(o) => o.id}
           getOptionLabel={(o) => o.name}
           disabled
         />
-        <StatefulSelectField
+        <TestSelectField
           label="Favorite Icon - Read Only"
           options={options}
           getOptionValue={(o) => o.id}
@@ -76,7 +76,7 @@ export function SelectFields() {
           selectedOption={options[2]}
           readOnly
         />
-        <StatefulSelectField
+        <TestSelectField
           label="Favorite Icon"
           options={options}
           getOptionValue={(o) => o.id}
@@ -86,7 +86,7 @@ export function SelectFields() {
 
       <div css={Css.df.flexColumn.gap3.$}>
         <h1 css={Css.lg.mb2.$}>Compact</h1>
-        <StatefulSelectField
+        <TestSelectField
           compact
           label="Favorite Icon"
           selectedOption={options[2]}
@@ -104,7 +104,7 @@ export function SelectFields() {
             </div>
           )}
         />
-        <StatefulSelectField
+        <TestSelectField
           compact
           label="Favorite Icon - with field decoration"
           options={options}
@@ -123,7 +123,7 @@ export function SelectFields() {
             </div>
           )}
         />
-        <StatefulSelectField
+        <TestSelectField
           compact
           label="Favorite Icon - Disabled"
           options={options}
@@ -131,7 +131,7 @@ export function SelectFields() {
           getOptionLabel={(o) => o.name}
           disabled
         />
-        <StatefulSelectField
+        <TestSelectField
           compact
           label="Favorite Icon - Read Only"
           options={options}
@@ -140,7 +140,7 @@ export function SelectFields() {
           selectedOption={options[2]}
           readOnly
         />
-        <StatefulSelectField
+        <TestSelectField
           compact
           label="Favorite Icon"
           options={options}
@@ -152,7 +152,9 @@ export function SelectFields() {
   );
 }
 
-function StatefulSelectField<T extends object>(props: SelectFieldProps<T>) {
+function TestSelectField<T extends object>(
+  props: Partial<SelectFieldProps<T>> & Pick<SelectFieldProps<T>, "getOptionLabel" | "getOptionValue" | "options">,
+) {
   const [selectedOption, setSelectedOption] = useState<T | undefined>(props.selectedOption);
   return (
     <SelectField

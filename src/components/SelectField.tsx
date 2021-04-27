@@ -24,9 +24,9 @@ export interface SelectFieldProps<T extends object> extends BeamSelectFieldBaseP
   getOptionLabel: (opt: T) => string;
   getOptionMenuLabel?: (opt: T) => string | ReactNode;
   getOptionValue: (opt: T) => Key;
-  onSelect?: (opt: T | undefined) => void;
+  onSelect: (opt: T | undefined) => void;
   options: T[];
-  selectedOption?: T;
+  selectedOption: T | undefined;
 }
 
 export function SelectField<T extends object>(props: SelectFieldProps<T>) {
@@ -46,18 +46,18 @@ export function SelectField<T extends object>(props: SelectFieldProps<T>) {
     isOpen: boolean;
     selectedKey: Key | undefined;
     inputValue: string;
-    items: T[];
+    filteredOptions: T[];
   }>({
     isOpen: false,
     selectedKey: selectedOption && getOptionValue(selectedOption),
     inputValue: selectedOption ? getOptionLabel(selectedOption) : "",
-    items: options,
+    filteredOptions: options,
   });
 
   return (
     <ComboBox<T>
       {...beamSelectFieldProps}
-      items={fieldState.items}
+      filteredOptions={fieldState.filteredOptions}
       inputValue={fieldState.inputValue}
       selectedKey={fieldState.selectedKey}
       onSelectionChange={(key) => {
@@ -66,7 +66,7 @@ export function SelectField<T extends object>(props: SelectFieldProps<T>) {
           isOpen: false,
           inputValue: selectedItem ? getOptionLabel(selectedItem) : "",
           selectedKey: key,
-          items: options,
+          filteredOptions: options,
         });
         onSelect && onSelect(selectedItem);
       }}
@@ -75,7 +75,7 @@ export function SelectField<T extends object>(props: SelectFieldProps<T>) {
           isOpen: true,
           inputValue: value,
           selectedKey: prevState.selectedKey,
-          items: options.filter((o) => contains(getOptionLabel(o), value)),
+          filteredOptions: options.filter((o) => contains(getOptionLabel(o), value)),
         }));
       }}
       onOpenChange={(isOpen) => {
@@ -83,7 +83,7 @@ export function SelectField<T extends object>(props: SelectFieldProps<T>) {
           isOpen,
           inputValue: prevState.inputValue,
           selectedKey: prevState.selectedKey,
-          items: prevState.items,
+          filteredOptions: prevState.filteredOptions,
         }));
       }}
     >
@@ -98,7 +98,7 @@ export function SelectField<T extends object>(props: SelectFieldProps<T>) {
 
 interface ComboBoxProps<T extends object> extends BeamSelectFieldBaseProps<T> {
   children: CollectionChildren<T>;
-  items?: T[];
+  filteredOptions?: T[];
   inputValue?: string | undefined;
   selectedKey?: Key;
   onSelectionChange: (key: Key) => any;
@@ -116,9 +116,10 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
     onSelectionChange,
     readOnly: isReadOnly = false,
     fieldDecoration,
+    filteredOptions: items,
     ...otherProps
   } = props;
-  const comboBoxProps = { ...otherProps, isDisabled, isReadOnly, label, onInputChange };
+  const comboBoxProps = { ...otherProps, items, isDisabled, isReadOnly, label, onInputChange };
   const state = useComboBoxState({ ...comboBoxProps, onSelectionChange });
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -329,7 +330,7 @@ function ListBoxPopup<T extends object>(props: ListBoxPopupProps<T>) {
 }
 
 function Option<T extends object>({ item, state }: { item: Node<T>; state: ComboBoxState<T> }) {
-  const ref = React.useRef<HTMLLIElement>(null);
+  const ref = useRef<HTMLLIElement>(null);
   const isDisabled = state.disabledKeys.has(item.key);
   const isSelected = state.selectionManager.isSelected(item.key);
   // Track focus via focusedKey state instead of with focus event listeners
