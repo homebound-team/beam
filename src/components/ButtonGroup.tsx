@@ -6,7 +6,7 @@ import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 
 interface ButtonGroupProps {
   disabled?: boolean;
-  buttons: Omit<ButtonGroupButtonProps, "size">[];
+  buttons: Pick<ButtonGroupButtonProps, "text" | "icon" | "active">[];
   size?: ButtonGroupSize;
 }
 
@@ -43,9 +43,6 @@ export function ButtonGroupButton({
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
-  const baseButtonStyles = getButtonStyles();
-  const sizeStyles = getSizeStyles[size];
-  const iconStyles = getIconStyles[size];
 
   return (
     <button
@@ -55,12 +52,12 @@ export function ButtonGroupButton({
       {...hoverProps}
       css={{
         ...Css.buttonBase.$,
-        ...baseButtonStyles,
-        ...sizeStyles,
+        ...getButtonStyles(),
+        ...sizeStyles[size],
         ...(isFocusVisible ? defaultFocusRingStyles : {}),
         ...(active ? activeStyles : {}),
         ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
-        ...(icon ? iconStyles : {}),
+        ...(icon ? iconStyles[size] : {}),
       }}
     >
       {icon && <Icon icon={icon} />}
@@ -87,12 +84,12 @@ function getButtonStyles() {
   };
 }
 
-const getSizeStyles: Record<ButtonGroupSize, {}> = {
+const sizeStyles: Record<ButtonGroupSize, {}> = {
   sm: Css.hPx(32).$,
   md: Css.hPx(40).$,
 };
 
-const getIconStyles: Record<ButtonGroupSize, {}> = {
+const iconStyles: Record<ButtonGroupSize, {}> = {
   sm: Css.pxPx(4).$,
   md: Css.px1.$,
 };
