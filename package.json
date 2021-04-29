@@ -43,6 +43,8 @@
     "react-day-picker": "^7.4.10",
     "react-stately": "^3.5.0"
     "framer-motion": "^4.1.11",
+    "react-aria": "^3.5.0",
+    "react-stately": "^3.4.0"
   },
   "peerDependencies": {
     "@emotion/react": ">=11",
