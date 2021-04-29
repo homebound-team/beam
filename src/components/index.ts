@@ -13,3 +13,4 @@ export * from "./SelectField";
 export { TabsWithContent } from "./Tabs";
 export * from "./TextAreaField";
 export * from "./TextField";
+export * from "./SuperDrawer";
