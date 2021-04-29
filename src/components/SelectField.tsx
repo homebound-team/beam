@@ -119,7 +119,11 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
     filteredOptions: items,
     ...otherProps
   } = props;
-  const comboBoxProps = { ...otherProps, items, isDisabled, isReadOnly, label, onInputChange };
+
+  type MenuTriggerAction = "focus" | "input" | "manual";
+  const menuTrigger: MenuTriggerAction = "focus";
+
+  const comboBoxProps = { ...otherProps, items, isDisabled, isReadOnly, label, onInputChange, menuTrigger };
   const state = useComboBoxState({ ...comboBoxProps, onSelectionChange });
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -136,7 +140,6 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
       buttonRef: triggerRef,
       listBoxRef,
       popoverRef,
-      menuTrigger: "focus",
     },
     state,
   );
