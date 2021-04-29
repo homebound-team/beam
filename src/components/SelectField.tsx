@@ -266,6 +266,11 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
             ...disabledStyles,
             ...readOnlyStyles,
           }}
+          onFocus={(e) => {
+            if (isReadOnly) return;
+            e.target.select();
+            state.open();
+          }}
         />
         {!isReadOnly && (
           <button
@@ -373,7 +378,7 @@ function Option<T extends object>({ item, state }: { item: Node<T>; state: Combo
       {item.rendered}
       {isSelected && (
         <span css={Css.fs0.$}>
-          <Icon icon="check" color={Palette.LightBlue500} />
+          <Icon icon="check" color={Palette.LightBlue700} />
         </span>
       )}
     </li>
