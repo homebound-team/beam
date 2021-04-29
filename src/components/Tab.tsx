@@ -1,4 +1,3 @@
-import { useTab } from "@react-aria/tabs";
 import { Key, useMemo, useRef } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { Css } from "src/Css";
@@ -22,29 +21,17 @@ type LocalTabsProps = {
 
 export function LocalTabs(props: LocalTabsProps) {
   const { ariaLabel, onChange, selected, tabs, id = "tabs" } = props;
-  // const state = useTabListState({ ...props, children: tabs });
-
-  // const [tabsTestId, tabTestId] = useTestIds(id, ["tab"]);
   return (
     <div css={Css.dif.$} aria-label={ariaLabel}>
       {tabs.map((tab, n) => {
         const { name, value, icon, disabled = false } = tab;
-        return (
-          <Tab label={name} key={value} active={selected === value} icon={icon} />
-          // <Item title={name} key={value}>
-          //   <Icon icon={icon} />
-          // </Item>
-          // <button key={n} onClick={() => onChange(value)} disabled={disabled}>
-          //   <span>{name}</span>
-          //   {icon && <Icon icon={icon} />}
-          // </button>
-        );
+        return <Tab label={name} key={value} active={selected === value} icon={icon} />;
       })}
     </div>
   );
 }
 
-export interface TabsProps<T> extends BeamFocusableProps {
+export interface TabsProps extends BeamFocusableProps {
   /** active indicates the user is on the current tab */
   active?: boolean;
   disabled?: boolean;
@@ -53,16 +40,13 @@ export interface TabsProps<T> extends BeamFocusableProps {
   key: Key;
 }
 
-export function Tab<T>(props: TabsProps<T>) {
+export function Tab(props: TabsProps) {
   const { disabled: isDisabled, label, key, ...otherProps } = props;
   const ariaProps = { children: label, isDisabled, ...otherProps };
   const { active = false, icon = false } = ariaProps;
   const ref = useRef<HTMLDivElement>();
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
-
-  const state = { selectedKey: active, setSelectedKey: () => {} };
-  const { tabProps } = useTab({ key, isDisabled }, state, ref);
 
   const { baseStyles, activeStyles, focusStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
     () => getTabsStyles(),
