@@ -33,9 +33,9 @@ export function SelectFields() {
           getOptionValue={(o) => o.id}
           getOptionLabel={(o) => o.name}
           getOptionMenuLabel={(o) => (
-            <div css={Css.df.$}>
+            <div css={Css.df.itemsCenter.$}>
               {o.icon && (
-                <span css={Css.fs0.mr1.$}>
+                <span css={Css.fs0.mr2.$}>
                   <Icon icon={o.icon} />
                 </span>
               )}
@@ -51,9 +51,9 @@ export function SelectFields() {
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
           selectedOption={options[1]}
           getOptionMenuLabel={(o) => (
-            <div css={Css.df.$}>
+            <div css={Css.df.itemsCenter.$}>
               {o.icon && (
-                <span css={Css.fs0.mr1.$}>
+                <span css={Css.fs0.mr2.$}>
                   <Icon icon={o.icon} />
                 </span>
               )}
@@ -94,9 +94,9 @@ export function SelectFields() {
           getOptionValue={(o) => o.id}
           getOptionLabel={(o) => o.name}
           getOptionMenuLabel={(o) => (
-            <div css={Css.df.$}>
+            <div css={Css.df.itemsCenter.$}>
               {o.icon && (
-                <span css={Css.fs0.mr1.$}>
+                <span css={Css.fs0.mr2.$}>
                   <Icon icon={o.icon} />
                 </span>
               )}
@@ -113,9 +113,9 @@ export function SelectFields() {
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
           selectedOption={options[1]}
           getOptionMenuLabel={(o) => (
-            <div css={Css.df.$}>
+            <div css={Css.df.itemsCenter.$}>
               {o.icon && (
-                <span css={Css.fs0.mr1.$}>
+                <span css={Css.fs0.mr2.$}>
                   <Icon icon={o.icon} />
                 </span>
               )}

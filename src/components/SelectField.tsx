@@ -225,7 +225,7 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
   const focusStyles = isFocused && !isReadOnly ? Css.bLightBlue500.$ : {};
   const errorStyles = errorMsg ? Css.bRed500.$ : {};
   const disabledStyles = isDisabled ? Css.gray400.bgGray100.cursorNotAllowed.$ : {};
-  const readOnlyStyles = isReadOnly ? Css.bn.pl0.add("backgroundColor", "unset").$ : {};
+  const readOnlyStyles = isReadOnly ? Css.bn.pl0.pt0.add("backgroundColor", "unset").$ : {};
 
   return (
     <Fragment>
@@ -274,7 +274,7 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
               ...disabledStyles,
             }}
           >
-            <Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} />
+            <Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} color={Palette.Gray700} />
           </button>
         )}
       </div>
@@ -362,7 +362,7 @@ function Option<T extends object>({ item, state }: { item: Node<T>; state: Combo
       {...hoverProps}
       ref={ref as any}
       css={{
-        ...Css.df.itemsCenter.justifyBetween.pxPx(12).py1.mh("42px").cursorPointer.gray900.smEm.$,
+        ...Css.df.itemsCenter.justifyBetween.py1.px2.mh("42px").cursorPointer.gray900.sm.$,
         ...(isHovered ? Css.bgGray100.$ : {}),
         ...(isFocused ? Css.add("boxShadow", `0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
       }}
