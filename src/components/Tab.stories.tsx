@@ -1,13 +1,12 @@
 import { Meta } from "@storybook/react";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { Css } from "src/Css";
-import { getTabsStyles, Tab, TabsProps } from "src/index";
+import { getTabsStyles, Tab as TabComponent, TabList as TabListComponent, TabsProps } from "src/index";
 import { Icon, Icons } from "./Icon";
-import { LocalTabs } from "./Tab";
 
 export default {
   title: "Components/Tab",
-  component: Tab,
+  component: TabComponent,
   args: {
     label: "Tab",
   },
@@ -44,35 +43,38 @@ function getChildren(label: string) {
   );
 }
 
-export const TabComponent = (args: TabsProps) => {
+export const Tab = (args: TabsProps) => {
   return (
     <div css={Css.df.childGap2.$}>
       <div css={Css.df.flexColumn.childGap2.$}>
         <h2>Tab</h2>
-        <Tab {...args} icon={undefined} />
-        <Tab {...args} icon={undefined} active />
-        <Tab {...args} icon={undefined} disabled />
+        <TabComponent {...args} icon={undefined} />
+        <TabComponent {...args} icon={undefined} active />
+        <TabComponent {...args} icon={undefined} disabled />
       </div>
       <div css={Css.df.flexColumn.childGap2.$}>
         <h2>Tab with icon</h2>
-        <Tab icon="checkCircle" {...args} />
-        <Tab icon="checkCircle" {...args} active />
-        <Tab icon="checkCircle" {...args} disabled />
+        <TabComponent icon="checkCircle" {...args} />
+        <TabComponent icon="checkCircle" {...args} active />
+        <TabComponent icon="checkCircle" {...args} disabled />
       </div>
     </div>
   );
 };
 
-export const TabGroup = () => {
+export const TabList = () => {
+  const [activeTab, setActiveTab] = useState("tab2");
+
   return (
-    <LocalTabs
+    <TabListComponent
       tabs={[
-        { name: "Active Tab", value: "tab1", icon: "camera" },
+        { name: "Tab 1", value: "tab1", icon: "camera" },
         { name: "Tab 2", value: "tab2", icon: "dollar" },
         { name: "Tab 3", value: "tab3", icon: "check" },
+        { name: "Tab 4", value: "tab4", icon: "plus" },
       ]}
-      onChange={() => {}}
-      selected="tab1"
+      onChange={setActiveTab}
+      selected={activeTab}
     />
   );
 };
