@@ -1,5 +1,5 @@
 import { RefObject, useMemo, useRef } from "react";
-import { useButton, useFocusRing, useHover } from "react-aria";
+import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
 import { navLink } from "src/components";
 import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
@@ -42,9 +42,7 @@ export function NavLink(props: NavLinkProps) {
 
   return (
     <a
-      {...otherButtonProps}
-      {...focusProps}
-      {...hoverProps}
+      {...mergeProps(otherButtonProps, focusProps, hoverProps)}
       className={navLink}
       href={href}
       ref={ref}
