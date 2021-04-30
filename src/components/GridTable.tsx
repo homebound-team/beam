@@ -52,7 +52,7 @@ interface GridStyle {
 }
 
 /** Our original table look & feel/style. */
-export const defaultStyle: GridStyle = {
+export let defaultStyle: GridStyle = {
   rootCss: {},
   betweenRowsCss: Css.bt.bGray400.$,
   cellCss: Css.py2.px3.$,
@@ -69,17 +69,24 @@ export const condensedStyle: GridStyle = {
   rootCss: Css.xs.$,
 };
 
+/** Configures the default/app-wide GridStyle. */
+export function setDefaultStyle(style: GridStyle): void {
+  defaultStyle = style;
+}
+
 type TableAs = "div" | "table";
 
 export interface GridTableProps<R extends Kinded, S, X> {
   id?: string;
   /**
-   * The HTML used to create the table. By default a `div` will be used,
-   * however, `table` tag can be used with limited functionality.
+   * The HTML used to create the table.
    *
-   * Currently being used to enable multi page printing page break support.
+   * By default a `div` will be used with CSS grid styles, but `table` tag can be used
+   * with limited functionality but better multi-page printing/page break support.
    *
-   * Custom header width and alignment is supported using px values.
+   * When using `table`, the column width and alignment is only supported using
+   * px values.
+   *
    * @example
    *  { header: "Name", data: ({ name }) => name, w: "75px", align: "right" }
    */
