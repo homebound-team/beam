@@ -5,7 +5,6 @@ import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
 import { Css, Margin, Only, Palette, Properties, px, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
-import { zIndexes } from "src/zIndexes";
 import tinycolor from "tinycolor2";
 
 /** A helper for making `Row` type aliases of simple/flat tables that are just header + data. */
@@ -57,7 +56,7 @@ export let defaultStyle: GridStyle = {
   betweenRowsCss: Css.bt.bGray400.$,
   cellCss: Css.py2.px3.$,
   // Use h100 so that all cells are the same height when scrolled; set bgWhite for when we're laid over other rows.
-  headerCellCss: Css.selfEnd.nowrap.py1.px3.bgGray200.h100.itemsEnd.$,
+  headerCellCss: Css.selfEnd.nowrap.py1.bgGray200.h100.itemsEnd.$,
   firstRowMessageCss: Css.px1.py2.$,
   rowHoverColor: Palette.Gray200,
 };
@@ -456,7 +455,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>) {
           ...(isHeader && style.headerCellCss),
           ...getJustification(column, maybeContent, isHeader, idx, as),
           ...(idx === 0 && getIndentationCss(rowStyle)),
-          ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).add("zIndex", zIndexes.frozenHeader).$),
+          ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).$),
           ...rowStyleCellCss,
         };
 

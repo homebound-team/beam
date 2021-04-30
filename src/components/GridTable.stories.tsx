@@ -201,6 +201,37 @@ export function ObservableRows() {
   );
 }
 
+export function StickyHeader() {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const actionColumn: GridColumn<Row> = {
+    header: () => (
+      <div>
+        Actions <br /> 2nd line
+      </div>
+    ),
+    data: () => <div>Actions</div>,
+    sort: false,
+  };
+  return (
+    <div>
+      some other top of page content
+      <GridTable
+        columns={[nameColumn, valueColumn, actionColumn]}
+        stickyHeader={true}
+        rows={[
+          { kind: "header", id: "header" },
+          ...zeroTo(20).map((i) => ({ kind: "data" as const, id: "1", name: "c", value: 1 })),
+        ]}
+      />
+    </div>
+  );
+}
+
+export function zeroTo(n: number): number[] {
+  return [...Array(n).keys()];
+}
+
 export const Condensed = newStory(() => {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
