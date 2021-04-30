@@ -3,7 +3,7 @@ import React, { Fragment, ReactNode, useCallback, useContext, useEffect, useMemo
 import { Link } from "react-router-dom";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
-import { Css, Margin, Only, Palette, Properties, px } from "src/Css";
+import { Css, Margin, Only, Palette, Properties, px, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndexes } from "src/zIndexes";
 import tinycolor from "tinycolor2";
@@ -31,7 +31,7 @@ type SortFlags<S> = [S, Direction];
 
 export type Kinded = { kind: string };
 
-export type GridTableXss = Pick<Properties, Margin>;
+export type GridTableXss = Xss<Margin>;
 
 export type Direction = "ASC" | "DESC";
 
@@ -47,16 +47,19 @@ interface GridStyle {
   headerCellCss: Properties;
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss: Properties;
+  /** Applied on hover if a row has a rowLink/onClick set. */
+  rowHoverColor: string;
 }
 
 /** Our original table look & feel/style. */
 export const defaultStyle: GridStyle = {
   rootCss: {},
-  betweenRowsCss: Css.bt.$,
+  betweenRowsCss: Css.bt.bGray400.$,
   cellCss: Css.py2.px3.$,
   // Use h100 so that all cells are the same height when scrolled; set bgWhite for when we're laid over other rows.
   headerCellCss: Css.selfEnd.nowrap.py1.px3.bgGray200.h100.itemsEnd.$,
   firstRowMessageCss: Css.px1.py2.$,
+  rowHoverColor: Palette.Gray200,
 };
 
 /** Tightens up the padding of rows, great for rows that have form elements in them. */
@@ -413,7 +416,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>) {
     ...(as === "div" ? Css.display("contents").$ : {}),
     ...((rowStyle?.rowLink || rowStyle?.onClick) && {
       // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
-      "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, Palette.Gray200)).$,
+      "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
     }),
     ...maybeApplyFunction(row, rowStyle?.rowCss),
   };
@@ -755,7 +758,7 @@ export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter:
 }
 
 function maybeDarken(color: string | undefined, defaultColor: string): string {
-  return color ? tinycolor(color).darken(3).toString() : defaultColor;
+  return color ? tinycolor(color).darken(4).toString() : defaultColor;
 }
 
 // Get the rows that are already in the toggled state, so we can keep them toggled

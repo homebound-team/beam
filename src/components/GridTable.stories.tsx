@@ -62,7 +62,10 @@ export const Hovering = newStory(
     const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
     const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
     const rowStyles: GridRowStyles<Row> = {
-      data: { rowLink: () => "http://homebound.com" },
+      data: {
+        cellCss: (row) => (row.value === 3 ? Css.bgRed300.$ : {}),
+        rowLink: () => "http://homebound.com",
+      },
       header: {},
     };
     return (
