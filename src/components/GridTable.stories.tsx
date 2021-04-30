@@ -8,6 +8,7 @@ import {
   GridDataRow,
   GridRowStyles,
   GridTable,
+  IconButton,
   observableColumns,
   SimpleHeaderAndDataOf,
 } from "src/components/index";
@@ -96,7 +97,7 @@ export function Filtering() {
   const [filter, setFilter] = useState<string | undefined>();
   return (
     <div>
-      <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.br8.$} />
+      <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
       <GridTable
         columns={[nameColumn, valueColumn, actionColumn]}
         sorting={"client-side"}
@@ -184,15 +185,13 @@ export function ObservableRows() {
 
   return (
     <div>
-      <button onClick={() => (o.a = o.a + 1)} css={Css.ba.bGray900.br1.px1.bgGray100.$}>
-        +
-      </button>
+      <IconButton onClick={() => (o.a = o.a + 1)} icon="plus" />
       <GridTable
         columns={observableColumns([nameColumn])}
         rows={[
           { kind: "header", id: "header" },
-          { kind: "data", id: "1", name: "b", value: 1 },
-          { kind: "data", id: "2", name: "c", value: 2 },
+          { kind: "data", id: "1", name: "a", value: 1 },
+          { kind: "data", id: "2", name: "b", value: 2 },
         ]}
       />
     </div>
