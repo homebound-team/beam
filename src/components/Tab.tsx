@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { HTMLAttributes, useMemo, useRef } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
@@ -21,8 +21,10 @@ type TabListProps = {
 
 export function TabList(props: TabListProps) {
   const { ariaLabel, onChange, selected, tabs, id = "tabs" } = props;
+  const { isFocusVisible, focusProps } = useFocusRing();
 
   function handleArrowKeys(e: any) {
+    // TODO: skip tab if disabled
     if (e.key === "ArrowLeft") {
       const selectedIndex = tabs.findIndex((tab) => tab.value === selected);
       const prevIndex = selectedIndex === 0 ? tabs.length - 1 : selectedIndex - 1;
@@ -41,6 +43,8 @@ export function TabList(props: TabListProps) {
         const { name, value, icon, disabled = false } = tab;
         return (
           <Tab
+            focusProps={focusProps}
+            isFocusVisible={isFocusVisible}
             key={value}
             label={name}
             value={value}
@@ -65,13 +69,24 @@ export interface TabProps extends BeamFocusableProps {
   value: string;
   onChange: (value: string) => void;
   handleKeyDown: (e: any) => void;
+  focusProps: HTMLAttributes<HTMLElement>;
+  isFocusVisible?: boolean;
 }
 
 export function Tab(props: TabProps) {
-  const { disabled: isDisabled, label, value, onChange, active = false, icon = false, handleKeyDown } = props;
+  const {
+    disabled: isDisabled,
+    label,
+    value,
+    onChange,
+    active = false,
+    icon = false,
+    handleKeyDown,
+    focusProps,
+    isFocusVisible = false,
+  } = props;
   const ref = useRef<HTMLButtonElement | null>(null);
   const { hoverProps, isHovered } = useHover({ isDisabled });
-  const { isFocusVisible, focusProps } = useFocusRing();
   const { baseStyles, activeStyles, focusStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
     () => getTabsStyles(),
     [],
@@ -91,9 +106,9 @@ export function Tab(props: TabProps) {
         ...baseStyles,
         ...(active && activeStyles),
         ...(isDisabled && disabledStyles),
-        ...(isFocusVisible && active && focusStyles),
         ...(isHovered && hoverStyles),
         ...(isHovered && active && activeHoverStyles),
+        ...(isFocusVisible && active && focusStyles),
       }}
     >
       {label}
