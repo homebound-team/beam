@@ -1,16 +1,31 @@
 /**
  * Provides a way to easily generate `data-testid`s.
  *
- * The caller gives us the `...others` from their props, which we'll use to
- * look for an incoming `data-testid` to become the prefix the `data-testid`s
- * that we generate for the caller.
+ * The test ids are made of a `prefix` + `_` + `key`, where:
+ *
+ * - The prefix is the component name, like "profile", and
+ * - The key is the specific DOM element that's being tagged, like "firstName"
+ *
+ * To determine the prefix, the component passes us their props, which we'll use
+ * to look for an incoming `data-testid` to become the prefix the `data-testid`s
+ * that we create. I.e.:
  *
  * ```tsx
- * const { a, b, ...others } = props;
+ * const { a, b } = props;
  * const testIds = useTestIds(props);
  *
  * return <Foo {...testIds.foo />;
  * ```
+ *
+ * This allows components that embed the component to customize the prefix, i.e.
+ * `<TextField data-testid="firstName" />` and `<TextField data-testid="lastName" />`
+ * would produce, within `TextField` itself, ids like:
+ *
+ * - `firstName_input`
+ * - `firstName_errors`
+ * - `lastName_input`
+ * - `lastName_errors`
+ * - etc
  */
 export function useTestIds(props: object, defaultPrefix?: string): Record<string, object> {
   const prefix: string | undefined = (props as any)["data-testid"] || defaultPrefix;
