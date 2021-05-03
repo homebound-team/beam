@@ -4,9 +4,9 @@ import { Icon, IconProps } from "src/components/Icon";
 import { Css } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "..";
 
-interface ButtonGroupProps {
+export interface ButtonGroupProps {
   disabled?: boolean;
-  buttons: Pick<ButtonGroupButtonProps, "text" | "icon" | "active">[];
+  buttons: Pick<ButtonGroupButtonProps, "text" | "icon" | "active" | "onClick">[];
   size?: ButtonGroupSize;
 }
 

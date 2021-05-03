@@ -1,44 +1,62 @@
-import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { Css } from "..";
-import { Button } from "./Button";
-import { SuperDrawer as SuperDrawerComponent } from "./SuperDrawer";
+import { Button, Css } from "..";
+import { SuperDrawer as SuperDrawerComponent, SuperDrawerProps } from "./SuperDrawer";
 
 export default {
   title: "Components / Super Drawer",
   component: SuperDrawerComponent,
-} as Meta;
+  args: {
+    open: true,
+    title: "Title",
+  },
+  argTypes: {
+    childContent: { table: { disable: true } },
+    children: { table: { disable: true } },
+  },
+  parameters: {
+    controls: { expanded: true },
+    actions: { argTypesRegex: "^on.*" },
+  },
+} as Meta<SuperDrawerProps>;
 
-export function SuperDrawer() {
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [showChildContent, setShowChildContent] = useState(true);
+export function WithChildContent(args: SuperDrawerProps) {
+  const [showChildContent, setShowChildContent] = useState(false);
+
   return (
     <div>
-      <Button label="Open Drawer" onClick={() => setOpenDrawer(true)} />
       <SuperDrawerComponent
-        open={openDrawer}
-        title="Title"
-        onLeftClick={action("onLeftClick")}
-        onRightClick={action("onRightClick")}
-        onCloseClick={() => setOpenDrawer(false)}
-        onCancelClick={() => setShowChildContent(true)}
-        onSubmitClick={action("onSubmitClick")}
-        secondaryLabel="Show Child"
-        primaryDisabled={true}
+        {...args}
         childContent={
           showChildContent && (
-            <div>
-              <h1>This is rendered as a child</h1>
+            <div css={Css.hPx(500).bgGray100.df.itemsCenter.justifyCenter.$}>
+              <h1 css={Css.lg.$}>Child Content</h1>
             </div>
           )
         }
         onChildContentBackClick={() => setShowChildContent(false)}
       >
-        <div css={Css.hPx(1000).bgGray100.df.itemsCenter.justifyCenter.$}>
-          <h1>Single Column</h1>
+        <div css={Css.hPx(500).bgGray100.df.itemsCenter.justifyCenter.$}>
+          <div css={Css.df.flexColumn.itemsCenter.$}>
+            <h1 css={Css.lg.$}>Children</h1>
+            <Button onClick={() => setShowChildContent(true)} label="Show Child Content"></Button>
+          </div>
         </div>
       </SuperDrawerComponent>
     </div>
   );
 }
+
+export function NoNavigation(args: SuperDrawerProps) {
+  return (
+    <SuperDrawerComponent {...args} onPrevClick={undefined} onNextClick={undefined}>
+      <Children />
+    </SuperDrawerComponent>
+  );
+}
+
+const Children = () => (
+  <div css={Css.hPx(500).bgGray100.df.itemsCenter.justifyCenter.$}>
+    <h1 css={Css.lg.$}>Children</h1>
+  </div>
+);
