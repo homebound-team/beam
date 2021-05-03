@@ -1,4 +1,4 @@
-import { HTMLAttributes, useMemo, useRef } from "react";
+import { HTMLAttributes, KeyboardEvent, useMemo, useRef } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
@@ -20,20 +20,20 @@ type TabListProps = {
 };
 
 export function TabList(props: TabListProps) {
-  const { ariaLabel, onChange, selected, tabs, id = "tabs" } = props;
+  const { ariaLabel, onChange, selected, tabs } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
 
-  function handleArrowKeys(e: any) {
+  function handleKeyDown(e: KeyboardEvent) {
     // TODO: skip tab if disabled
-    if (e.key === "ArrowLeft") {
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       const selectedIndex = tabs.findIndex((tab) => tab.value === selected);
-      const prevIndex = selectedIndex === 0 ? tabs.length - 1 : selectedIndex - 1;
-      onChange(tabs[prevIndex].value);
-    }
-    if (e.key === "ArrowRight") {
-      const selectedIndex = tabs.findIndex((tab) => tab.value === selected);
-      const nextIndex = selectedIndex === tabs.length - 1 ? 0 : selectedIndex + 1;
-      onChange(tabs[nextIndex].value);
+      let newIndex: number;
+      if (e.key === "ArrowLeft") {
+        newIndex = selectedIndex === 0 ? tabs.length - 1 : selectedIndex - 1;
+      } else if (e.key === "ArrowRight") {
+        newIndex = selectedIndex === tabs.length - 1 ? 0 : selectedIndex + 1;
+      }
+      onChange(tabs[newIndex!].value);
     }
   }
 
@@ -52,7 +52,7 @@ export function TabList(props: TabListProps) {
             icon={icon}
             disabled={disabled}
             onChange={onChange}
-            handleKeyDown={handleArrowKeys}
+            onKeyDown={handleKeyDown}
           />
         );
       })}
@@ -68,7 +68,7 @@ export interface TabProps extends BeamFocusableProps {
   icon?: keyof typeof Icons;
   value: string;
   onChange: (value: string) => void;
-  handleKeyDown: (e: any) => void;
+  onKeyDown: (e: KeyboardEvent) => void;
   focusProps: HTMLAttributes<HTMLElement>;
   isFocusVisible?: boolean;
 }
@@ -81,14 +81,14 @@ export function Tab(props: TabProps) {
     onChange,
     active = false,
     icon = false,
-    handleKeyDown,
+    onKeyDown,
     focusProps,
     isFocusVisible = false,
   } = props;
   const ref = useRef<HTMLButtonElement | null>(null);
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { baseStyles, activeStyles, focusStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
-    () => getTabsStyles(),
+    () => getTabStyles(),
     [],
   );
 
@@ -101,7 +101,7 @@ export function Tab(props: TabProps) {
       tabIndex={active ? 0 : -1}
       ref={ref}
       onClick={() => onChange(value)}
-      onKeyDown={handleKeyDown}
+      onKeyDown={onKeyDown}
       css={{
         ...baseStyles,
         ...(active && activeStyles),
@@ -121,7 +121,7 @@ export function Tab(props: TabProps) {
   );
 }
 
-export function getTabsStyles() {
+export function getTabStyles() {
   return {
     baseStyles: Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.outline0.gray700.add("width", "fit-content").$,
     activeStyles: Css.lightBlue700.bgLightBlue50.$,

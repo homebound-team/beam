@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react";
 import { Fragment, useState } from "react";
 import { Css } from "src/Css";
-import { getTabsStyles, Tab as TabComponent, TabList as TabListComponent, TabsProps } from "src/index";
+import { getTabStyles, Tab as TabComponent, TabList as TabListComponent, TabProps } from "src/index";
 import { Icon, Icons } from "./Icon";
 
 export default {
@@ -20,7 +20,7 @@ export default {
 } as Meta;
 
 export function BaseStates() {
-  const styles = getTabsStyles("side");
+  const styles = getTabStyles();
 
   return (
     <div css={Css.df.flexColumn.childGap2.$}>
@@ -43,7 +43,7 @@ function getChildren(label: string) {
   );
 }
 
-export const Tab = (args: TabsProps) => {
+export const Tab = (args: TabProps) => {
   return (
     <div css={Css.df.childGap2.$}>
       <div css={Css.df.flexColumn.childGap2.$}>
