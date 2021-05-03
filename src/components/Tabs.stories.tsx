@@ -1,14 +1,14 @@
 import { Meta } from "@storybook/react";
 import { Fragment, useState } from "react";
 import { Css } from "src/Css";
-import { getTabStyles, Tab as TabComponent, TabList as TabListComponent, TabProps } from "src/index";
+import { getTabStyles, Tab as TabComponent, TabList as TabListComponent } from "src/index";
 import { Icon, Icons } from "./Icon";
 
 export default {
-  title: "Components/Tab",
+  title: "Components/Tabs",
   component: TabComponent,
   args: {
-    label: "Tab",
+    label: "Tabs",
   },
   argTypes: {
     icon: { control: { type: "select", options: Object.keys(Icons) } },
@@ -19,7 +19,7 @@ export default {
   },
 } as Meta;
 
-export function BaseStates() {
+export function TabBaseStates() {
   const styles = getTabStyles();
 
   return (
@@ -42,25 +42,6 @@ function getChildren(label: string) {
     </Fragment>
   );
 }
-
-export const Tab = (args: TabProps) => {
-  return (
-    <div css={Css.df.childGap2.$}>
-      <div css={Css.df.flexColumn.childGap2.$}>
-        <h2>Tab</h2>
-        <TabComponent {...args} icon={undefined} />
-        <TabComponent {...args} icon={undefined} active />
-        <TabComponent {...args} icon={undefined} disabled />
-      </div>
-      <div css={Css.df.flexColumn.childGap2.$}>
-        <h2>Tab with icon</h2>
-        <TabComponent icon="checkCircle" {...args} />
-        <TabComponent icon="checkCircle" {...args} active />
-        <TabComponent icon="checkCircle" {...args} disabled />
-      </div>
-    </div>
-  );
-};
 
 export const TabList = () => {
   const [activeTab, setActiveTab] = useState("tab2");

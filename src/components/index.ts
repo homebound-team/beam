@@ -8,6 +8,6 @@ export * from "./Icon";
 export * from "./IconButton";
 export * from "./NavLink";
 export * from "./SelectField";
-export * from "./Tab";
+export * from "./Tabs";
 export * from "./TextAreaField";
 export * from "./TextField";
