@@ -8,9 +8,9 @@ exports[`GridTable renders 1`] = `
 
 .emotion-0>div+div>*,
 .emotion-0>tbody>tr {
+  border-color: rgba(201,201,201,1);
   border-top-style: solid;
   border-top-width: 1px;
-  color: rgba(201,201,201,1);
 }
 
 .emotion-0>div:nth-of-type(2)>*,
@@ -48,13 +48,6 @@ exports[`GridTable renders 1`] = `
 }
 
 .emotion-3 {
-  color: rgba(175,175,175,1);
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 16px;
-}
-
-.emotion-4 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -79,7 +72,7 @@ exports[`GridTable renders 1`] = `
   justify-content: center;
 }
 
-.emotion-7 {
+.emotion-5 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -94,7 +87,7 @@ exports[`GridTable renders 1`] = `
   justify-content: flex-start;
 }
 
-.emotion-8 {
+.emotion-6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -121,18 +114,14 @@ exports[`GridTable renders 1`] = `
         <div
           class="emotion-2"
         >
-          <div
-            class="emotion-3"
-          >
+          <div>
             Name
           </div>
         </div>
         <div
-          class="emotion-4"
+          class="emotion-3"
         >
-          <div
-            class="emotion-3"
-          >
+          <div>
             Value
           </div>
         </div>
@@ -141,12 +130,12 @@ exports[`GridTable renders 1`] = `
         class="emotion-1"
       >
         <div
-          class="emotion-7"
+          class="emotion-5"
         >
           foo
         </div>
         <div
-          class="emotion-8"
+          class="emotion-6"
         >
           1
         </div>
@@ -155,12 +144,12 @@ exports[`GridTable renders 1`] = `
         class="emotion-1"
       >
         <div
-          class="emotion-7"
+          class="emotion-5"
         >
           bar
         </div>
         <div
-          class="emotion-8"
+          class="emotion-6"
         >
           2
         </div>
