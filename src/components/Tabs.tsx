@@ -4,42 +4,36 @@ import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { Icon, Icons } from "./Icon";
 
-export type TabType = {
+interface TabType {
   name: string;
   value: string;
   icon?: keyof typeof Icons;
   disabled?: boolean;
-};
+}
 
-type LocalTabsProps = {
+interface LocalTabsProps {
   selected: string;
   onChange: (value: string) => void;
   ariaLabel?: string;
   tabs: TabType[];
   id?: string;
-};
+}
 
 export function LocalTabs(props: LocalTabsProps) {
   const { ariaLabel, onChange, selected, tabs } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
 
   function handleKeyDown(e: KeyboardEvent) {
-    // TODO: skip tab if disabled
+    // switches tabs on left and right arrow key down events
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-      const selectedIndex = tabs.findIndex((tab) => tab.value === selected);
-      let newIndex: number;
-      if (e.key === "ArrowLeft") {
-        newIndex = selectedIndex === 0 ? tabs.length - 1 : selectedIndex - 1;
-      } else if (e.key === "ArrowRight") {
-        newIndex = selectedIndex === tabs.length - 1 ? 0 : selectedIndex + 1;
-      }
-      onChange(tabs[newIndex!].value);
+      const nextTabValue = getNextTabValue(selected, e.key, tabs);
+      onChange(nextTabValue);
     }
   }
 
   return (
     <div css={Css.dif.$} aria-label={ariaLabel} role="tablist">
-      {tabs.map((tab, n) => {
+      {tabs.map((tab) => {
         const { name, value, icon, disabled = false } = tab;
         return (
           <Tab
@@ -60,7 +54,7 @@ export function LocalTabs(props: LocalTabsProps) {
   );
 }
 
-export interface TabProps extends BeamFocusableProps {
+interface TabProps extends BeamFocusableProps {
   /** active indicates the user is on the current tab */
   active?: boolean;
   disabled?: boolean;
@@ -130,4 +124,26 @@ export function getTabStyles() {
     hoverStyles: Css.gray700.bgGray100.$,
     activeHoverStyles: Css.bgLightBlue200.lightBlue700.$,
   };
+}
+
+function getNextTabValue(selected: string, key: string, tabs: TabType[]) {
+  let newIndex: number;
+  let selectedIndex = tabs.findIndex((tab) => tab.value === selected);
+
+  for (let i = 0; i < tabs.length; i++) {
+    if (key === "ArrowLeft") {
+      newIndex = selectedIndex === 0 ? tabs.length - 1 : selectedIndex - 1;
+      selectedIndex--;
+    } else if (key === "ArrowRight") {
+      newIndex = selectedIndex === tabs.length - 1 ? 0 : selectedIndex + 1;
+      selectedIndex++;
+    }
+    // skips to another tab if the new tab is disabled
+    if (tabs[newIndex!].disabled) {
+      continue;
+    } else {
+      break;
+    }
+  }
+  return tabs[newIndex!].value;
 }
