@@ -11,7 +11,7 @@ export type TabType = {
   disabled?: boolean;
 };
 
-type TabListProps = {
+type LocalTabsProps = {
   selected: string;
   onChange: (value: string) => void;
   ariaLabel?: string;
@@ -19,7 +19,7 @@ type TabListProps = {
   id?: string;
 };
 
-export function TabList(props: TabListProps) {
+export function LocalTabs(props: LocalTabsProps) {
   const { ariaLabel, onChange, selected, tabs } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
 

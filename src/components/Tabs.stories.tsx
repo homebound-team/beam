@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react";
 import { Fragment, useState } from "react";
 import { Css } from "src/Css";
-import { getTabStyles, Tab as TabComponent, TabList as TabListComponent } from "src/index";
+import { getTabStyles, LocalTabs as LocalTabsComponent, Tab as TabComponent } from "src/index";
 import { Icon, Icons } from "./Icon";
 
 export default {
@@ -43,11 +43,11 @@ function getChildren(label: string) {
   );
 }
 
-export const TabList = () => {
+export const LocalTabs = () => {
   const [activeTab, setActiveTab] = useState("tab2");
 
   return (
-    <TabListComponent
+    <LocalTabsComponent
       tabs={[
         { name: "Tab 1", value: "tab1", icon: "camera" },
         { name: "Tab 2", value: "tab2", icon: "dollar" },
