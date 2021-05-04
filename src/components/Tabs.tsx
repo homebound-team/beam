@@ -2,6 +2,7 @@ import { HTMLAttributes, KeyboardEvent, useMemo, useRef } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
+import { useTestIds } from "src/utils";
 import { Icon, Icons } from "./Icon";
 
 interface TabType {
@@ -20,8 +21,9 @@ interface LocalTabsProps {
 }
 
 export function LocalTabs(props: LocalTabsProps) {
-  const { ariaLabel, onChange, selected, tabs } = props;
+  const { ariaLabel, onChange, selected, tabs, id = "tabs", ...others } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
+  const testIds = useTestIds(others, id);
 
   function handleKeyDown(e: KeyboardEvent) {
     // switches tabs on left and right arrow key down events
@@ -32,9 +34,11 @@ export function LocalTabs(props: LocalTabsProps) {
   }
 
   return (
-    <div css={Css.dif.$} aria-label={ariaLabel} role="tablist">
-      {tabs.map((tab) => {
+    <div css={Css.dif.$} aria-label={ariaLabel} role="tablist" {...testIds}>
+      {tabs.map((tab, i) => {
         const { name, value, icon, disabled = false } = tab;
+        const testId = testIds[i];
+
         return (
           <Tab
             focusProps={focusProps}
@@ -47,6 +51,7 @@ export function LocalTabs(props: LocalTabsProps) {
             disabled={disabled}
             onChange={onChange}
             onKeyDown={handleKeyDown}
+            {...testId}
           />
         );
       })}
@@ -78,6 +83,7 @@ export function Tab(props: TabProps) {
     onKeyDown,
     focusProps,
     isFocusVisible = false,
+    ...others
   } = props;
   const ref = useRef<HTMLButtonElement | null>(null);
   const { hoverProps, isHovered } = useHover({ isDisabled });
@@ -89,6 +95,7 @@ export function Tab(props: TabProps) {
   return (
     <button
       {...mergeProps(focusProps, hoverProps)}
+      {...others}
       role="tab"
       aria-selected={active}
       aria-disabled={isDisabled || undefined}
