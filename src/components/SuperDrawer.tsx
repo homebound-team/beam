@@ -7,8 +7,8 @@ import { IconButton } from "./IconButton";
 
 export interface SuperDrawerProps {
   /**
-   * Component to render as an overlay child to the current sidebar content.
-   * This should be used to present hierarchy in the sidebar content.
+   * Component to render as an overlay child to the current drawer content.
+   * This should be used to present hierarchy in the drawer content.
    */
   childContent?: ReactNode;
   /** Component to render between the header and footer */
