@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
 import { Css } from "src/Css";
-import { BeamButtonProps, BeamFocusableProps } from "..";
+import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 
 export interface ButtonGroupProps {
   disabled?: boolean;

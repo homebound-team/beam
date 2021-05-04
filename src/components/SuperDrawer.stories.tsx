@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { Button, Css } from "..";
+import { Button, Css } from "src";
 import { SuperDrawer as SuperDrawerComponent, SuperDrawerProps } from "./SuperDrawer";
 
 export default {

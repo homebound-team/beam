@@ -2,8 +2,8 @@ import { useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components";
 import { Css, Palette } from "src/Css";
+import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils/useTestIds";
-import { BeamButtonProps, BeamFocusableProps } from "..";
 
 export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   // The icon to use within the button

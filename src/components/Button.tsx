@@ -2,7 +2,7 @@ import { useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src";
 import { Css } from "src/Css";
-import { BeamButtonProps, BeamFocusableProps } from "..";
+import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 
 export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   label: string;
