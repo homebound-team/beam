@@ -13,6 +13,7 @@ export default {
   argTypes: {
     childContent: { table: { disable: true } },
     children: { table: { disable: true } },
+    errorContent: { table: { disable: true } },
   },
   parameters: {
     controls: { expanded: true },
