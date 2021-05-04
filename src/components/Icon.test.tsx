@@ -14,6 +14,7 @@ describe("Icon", () => {
           <svg
             aria-hidden="true"
             class="emotion-0"
+            data-icon="x"
             height="24"
             viewBox="0 0 24 24"
             width="24"
