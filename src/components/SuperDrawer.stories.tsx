@@ -47,9 +47,17 @@ export function WithChildContent(args: SuperDrawerProps) {
   );
 }
 
-export function NoNavigation(args: SuperDrawerProps) {
+export function WithNoNavigation(args: SuperDrawerProps) {
   return (
     <SuperDrawerComponent {...args} onPrevClick={undefined} onNextClick={undefined}>
+      <Children />
+    </SuperDrawerComponent>
+  );
+}
+
+export function WithErrorContent(args: SuperDrawerProps) {
+  return (
+    <SuperDrawerComponent {...args} onPrevClick={undefined} onNextClick={undefined} errorContent={<ErrorContent />}>
       <Children />
     </SuperDrawerComponent>
   );
@@ -58,5 +66,14 @@ export function NoNavigation(args: SuperDrawerProps) {
 const Children = () => (
   <div css={Css.hPx(500).bgGray100.df.itemsCenter.justifyCenter.$}>
     <h1 css={Css.lg.$}>Children</h1>
+  </div>
+);
+
+const ErrorContent = () => (
+  <div css={Css.wPx(400).df.flexColumn.justifyCenter.itemsCenter.tc.$}>
+    <p css={Css.lgEm.$}>Are you sure you want to cancel without saving your changes?</p>
+    <p css={Css.base.mb1.$}>Any changes you've made so far will be lost.</p>
+    <Button label="Continue Editing" />
+    <Button variant="tertiary" label="Cancel" />
   </div>
 );
