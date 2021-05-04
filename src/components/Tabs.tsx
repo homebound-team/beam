@@ -87,7 +87,7 @@ export function Tab(props: TabProps) {
   } = props;
   const ref = useRef<HTMLButtonElement | null>(null);
   const { hoverProps, isHovered } = useHover({ isDisabled });
-  const { baseStyles, activeStyles, focusStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
+  const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
     () => getTabStyles(),
     [],
   );
@@ -109,7 +109,7 @@ export function Tab(props: TabProps) {
         ...(isDisabled && disabledStyles),
         ...(isHovered && hoverStyles),
         ...(isHovered && active && activeHoverStyles),
-        ...(isFocusVisible && active && focusStyles),
+        ...(isFocusVisible && active && focusRingStyles),
       }}
     >
       {label}
@@ -127,7 +127,7 @@ export function getTabStyles() {
     baseStyles: Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.outline0.gray700.add("width", "fit-content").$,
     activeStyles: Css.lightBlue700.bgLightBlue50.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
-    focusStyles: Css.bgLightBlue50.bshFocus.$,
+    focusRingStyles: Css.bgLightBlue50.bshFocus.$,
     hoverStyles: Css.gray700.bgGray100.$,
     activeHoverStyles: Css.bgLightBlue200.lightBlue700.$,
   };

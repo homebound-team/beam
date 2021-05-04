@@ -42,8 +42,8 @@ export function BaseStates() {
         <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.activeStyles }}>
           {getChildren("Side nav active")}
         </a>
-        <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.focusStyles }}>
-          {getChildren("Side nav focused")}
+        <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.focusRingStyles }}>
+          {getChildren("Side nav focus ring")}
         </a>
         <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.disabledStyles }}>
           {getChildren("Side nav disabled")}
@@ -62,8 +62,8 @@ export function BaseStates() {
         <a {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.activeStyles }}>
           {getChildren("Global nav active")}
         </a>
-        <a {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.focusStyles }}>
-          {getChildren("Global nav focused")}
+        <a {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.focusRingStyles }}>
+          {getChildren("Global nav focus ring")}
         </a>
         <a {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.disabledStyles }}>
           {getChildren("Global nav disabled")}

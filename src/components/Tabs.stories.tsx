@@ -25,7 +25,7 @@ export function TabBaseStates() {
   return (
     <div css={Css.df.flexColumn.childGap2.$}>
       <div css={{ ...styles.baseStyles, ...styles.activeStyles }}>{getChildren("active")}</div>
-      <div css={{ ...styles.baseStyles, ...styles.focusStyles }}>{getChildren("focused")}</div>
+      <div css={{ ...styles.baseStyles, ...styles.focusRingStyles }}>{getChildren("focus ring")}</div>
       <div css={styles.baseStyles}>{getChildren("default")}</div>
       <div css={{ ...styles.baseStyles, ...styles.disabledStyles }}>{getChildren("disabled")}</div>
       <div css={{ ...styles.baseStyles, ...styles.hoverStyles }}>{getChildren("hovered")}</div>
