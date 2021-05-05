@@ -1377,6 +1377,11 @@
     react "^16.12.0"
     react-dom "^16.12.0"
 
+"@homebound/form-state@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@homebound/form-state/-/form-state-1.0.2.tgz#da581bf9951a7d6ce9036133246d17a367488a99"
+  integrity sha512-1PfejczCNuENqAaM6m60k9CspmdXqXyhErakuSPPMUJi751++ss9V0ZTIhZ1faSrL/I7LUVvOSG36CMLb0lv2w==
+
 "@homebound/rtl-utils@^1.39.0":
   version "1.39.0"
   resolved "https://registry.yarnpkg.com/@homebound/rtl-utils/-/rtl-utils-1.39.0.tgz#5774d941cc2830dc474641167995e90f8c83f43c"

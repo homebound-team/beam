@@ -14,10 +14,23 @@ interface TextFieldBaseProps extends Pick<BeamTextFieldProps, "label" | "errorMs
   compact?: boolean;
   /** TextArea specific */
   wide?: boolean;
+  /** Called when the component loses focus, mostly for BoundTextField to use. */
+  onBlur?: () => void;
 }
 
+// Used by both TextField and TextArea
 export function TextFieldBase(props: TextFieldBaseProps) {
-  const { label, labelProps, inputProps, inputRef, compact = false, errorMsg, multiline = false, wide = false } = props;
+  const {
+    label,
+    labelProps,
+    inputProps,
+    inputRef,
+    compact = false,
+    errorMsg,
+    multiline = false,
+    wide = false,
+    onBlur,
+  } = props;
   const errorMessageId = `${inputProps.id}-error`;
 
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
@@ -28,7 +41,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     <div css={Css.df.flexColumn.wPx(width).$}>
       {label && <Label labelProps={labelProps} label={label} />}
       <ElementType
-        {...mergeProps(inputProps, { "aria-invalid": Boolean(errorMsg) })}
+        {...mergeProps(inputProps, { onBlur }, { "aria-invalid": Boolean(errorMsg) })}
         {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
         ref={inputRef as any}
         rows={multiline ? 1 : undefined}

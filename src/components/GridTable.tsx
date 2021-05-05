@@ -8,16 +8,18 @@ import { useTestIds } from "src/utils/useTestIds";
 import tinycolor from "tinycolor2";
 
 /** A helper for making `Row` type aliases of simple/flat tables that are just header + data. */
-export type SimpleHeaderAndDataOf<T> = { kind: "header" } | ({ kind: "data" } & T);
+// Note that we keep `data: T` so that rows like proxies can be passed as-is and not
+// object spread with a `kind: data` (this is a breaking change from internal-frontend).
+export type SimpleHeaderAndDataOf<T> = { kind: "header" } | { kind: "data"; data: T };
 
 /** A const for a marker header row. */
 export const simpleHeader = { kind: "header" as const, id: "header" };
 
 export function simpleRows<T extends { id: string }, R extends { kind: "header" | "data" }>(
-  data: T[],
+  data: readonly T[],
 ): GridDataRow<R>[] {
   // @ts-ignore Not sure why this doesn't type-check, something esoteric with the DiscriminateUnion type
-  return [simpleHeader, ...data.map((c) => ({ kind: "data" as const, ...c }))];
+  return [simpleHeader, ...data.map((data) => ({ kind: "data" as const, data }))];
 }
 
 // function createSimpleHeaderAndRows<D extends { id: string }>(

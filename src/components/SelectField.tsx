@@ -20,30 +20,21 @@ import { Label } from "src/components/Label";
 import { Css, Palette, px } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 
-interface SelectFieldPropsBase<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
+export interface SelectFieldProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
+  getOptionValue: (opt: O) => V;
+  getOptionLabel: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   value: V | undefined;
   onSelect: (value: V, opt: O) => void;
   options: O[];
+  // Should go in BeamFocusableProps?
+  onBlur?: () => void;
 }
 
-type HasId<V> = { id: V };
-type HasName = { name: string };
-
-type MaybeOptionValue<O extends object, V extends Key> = O extends HasId<V>
-  ? { getOptionValue?: (opt: O) => V }
-  : { getOptionValue: (opt: O) => V };
-
-type MaybeOptionLabel<O extends object> = O extends HasName
-  ? { getOptionLabel?: (opt: O) => string }
-  : { getOptionLabel: (opt: O) => string };
-
-// We use mapped types to conditionally require getOptionLabel, getOptionValue
-export type SelectFieldProps<O extends object, V extends Key> = SelectFieldPropsBase<O, V> &
-  MaybeOptionValue<O, V> &
-  MaybeOptionLabel<O>;
+export type HasIdAndName<V> = { id: V; name: string };
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 
 /**
  * Provides a non-native select/dropdown widget.
@@ -54,11 +45,17 @@ export type SelectFieldProps<O extends object, V extends Key> = SelectFieldProps
  * Note that the `O extends object` and `V extends Key` constraints come from react-aria,
  * and so we cannot easily change them.
  */
-export function SelectField<O extends object, V extends Key>(props: SelectFieldProps<O, V>): JSX.Element {
+export function SelectField<O extends object, V extends Key>(props: SelectFieldProps<O, V>): JSX.Element;
+export function SelectField<O extends HasIdAndName<V>, V extends Key>(
+  props: Optional<SelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
+): JSX.Element;
+export function SelectField<O extends object, V extends Key>(
+  props: Optional<SelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,
+): JSX.Element {
   const {
-    getOptionLabel = (opt: O) => (opt as HasName).name, // if unset, assume O implements HasName
+    getOptionValue = (opt: O) => (opt as any).id, // if unset, assume O implements HasId
+    getOptionLabel = (opt: O) => (opt as any).name, // if unset, assume O implements HasName
     getOptionMenuLabel = getOptionLabel,
-    getOptionValue = (opt: O) => (opt as HasId<V>).id, // if unset, assume O implements HasId
     onSelect,
     options,
     value,
