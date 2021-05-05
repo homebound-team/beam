@@ -5,7 +5,7 @@ import { Label } from "src/components/Label";
 import { Css, Palette, px } from "src/Css";
 import { BeamTextFieldProps } from "src/interfaces";
 
-interface TextFieldBaseProps extends Pick<BeamTextFieldProps, "label" | "errorMsg"> {
+interface TextFieldBaseProps extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur"> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
   inputRef?: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>;
@@ -14,8 +14,6 @@ interface TextFieldBaseProps extends Pick<BeamTextFieldProps, "label" | "errorMs
   compact?: boolean;
   /** TextArea specific */
   wide?: boolean;
-  /** Called when the component loses focus, mostly for BoundTextField to use. */
-  onBlur?: () => void;
 }
 
 // Used by both TextField and TextArea

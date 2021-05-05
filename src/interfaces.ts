@@ -21,6 +21,8 @@ export interface BeamTextFieldProps extends BeamFocusableProps {
   label?: string;
   /** Handler called when the interactive element state changes. */
   onChange?: (value: string) => void;
+  /** Called when the component loses focus, mostly for BoundTextField to use. */
+  onBlur?: () => void;
   readOnly?: boolean;
   value?: string;
 }
