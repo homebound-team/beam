@@ -5,7 +5,7 @@ import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
 import { Icon, Icons } from "./Icon";
 
-interface Tab {
+export interface Tab {
   name: string;
   value: string;
   icon?: keyof typeof Icons;
@@ -132,24 +132,10 @@ export function getTabStyles() {
   };
 }
 
-function getNextTabValue(selected: string, key: string, tabs: Tab[]) {
-  let newIndex: number;
-  let selectedIndex = tabs.findIndex((tab) => tab.value === selected);
-
-  for (let i = 0; i < tabs.length; i++) {
-    if (key === "ArrowLeft") {
-      newIndex = selectedIndex === 0 ? tabs.length - 1 : selectedIndex - 1;
-      selectedIndex--;
-    } else if (key === "ArrowRight") {
-      newIndex = selectedIndex === tabs.length - 1 ? 0 : selectedIndex + 1;
-      selectedIndex++;
-    }
-    // skips to another tab if the new tab is disabled
-    if (tabs[newIndex!].disabled) {
-      continue;
-    } else {
-      break;
-    }
-  }
-  return tabs[newIndex!].value;
+export function getNextTabValue(selected: string, key: "ArrowLeft" | "ArrowRight", tabs: Tab[]) {
+  const enabledTabs = tabs.filter((tab) => tab.disabled !== true);
+  const tabsToScan = key === "ArrowRight" ? enabledTabs : enabledTabs.reverse();
+  const currentIndex = tabsToScan.findIndex((tab) => tab.value === selected);
+  const nextIndex = currentIndex === tabsToScan.length - 1 ? 0 : currentIndex + 1;
+  return tabsToScan[nextIndex].value;
 }

@@ -3,6 +3,7 @@ import { Fragment, useState } from "react";
 import { Css } from "src/Css";
 import { Icon, Icons } from "./Icon";
 import { getTabStyles, Tabs as TabsComponent } from "./Tabs";
+import { testTabs } from "./testData";
 
 export default {
   title: "Components/Tabs",
@@ -46,16 +47,5 @@ function getChildren(label: string) {
 export const Tabs = () => {
   const [activeTab, setActiveTab] = useState("tab2");
 
-  return (
-    <TabsComponent
-      tabs={[
-        { name: "Tab 1", value: "tab1", icon: "camera" },
-        { name: "Tab 2", value: "tab2", icon: "dollar" },
-        { name: "Tab 3", value: "tab3", icon: "check", disabled: true },
-        { name: "Tab 4", value: "tab4", icon: "plus" },
-      ]}
-      onChange={setActiveTab}
-      selected={activeTab}
-    />
-  );
+  return <TabsComponent tabs={testTabs} onChange={setActiveTab} selected={activeTab} />;
 };
