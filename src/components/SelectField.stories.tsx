@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { Key, useState } from "react";
-import { Icon, Icons, SelectField, SelectFieldProps } from "src/components";
+import { HasIdAndName, Icon, Icons, Optional, SelectField, SelectFieldProps } from "src/components";
 import { Css } from "src/Css";
 
 export default {
@@ -105,7 +105,13 @@ export function SelectFields() {
   );
 }
 
-function TestSelectField<T extends object, V extends Key>(props: Omit<SelectFieldProps<T, V>, "onSelect">) {
+function TestSelectField<T extends object, V extends Key>(props: Omit<SelectFieldProps<T, V>, "onSelect">): JSX.Element;
+function TestSelectField<O extends HasIdAndName<V>, V extends Key>(
+  props: Optional<Omit<SelectFieldProps<O, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
+): JSX.Element;
+function TestSelectField<T extends object, V extends Key>(
+  props: Optional<Omit<SelectFieldProps<T, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
+): JSX.Element {
   const [selectedOption, setSelectedOption] = useState<V | undefined>(props.value);
   return (
     <SelectField<T, V>
