@@ -20,55 +20,83 @@ import { Label } from "src/components/Label";
 import { Css, Palette, px } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 
-export interface SelectFieldProps<T extends object> extends BeamSelectFieldBaseProps<T> {
-  getOptionLabel: (opt: T) => string;
-  getOptionMenuLabel?: (opt: T) => string | ReactNode;
-  getOptionValue: (opt: T) => Key;
-  onSelect: (opt: T | undefined) => void;
-  options: T[];
-  selectedOption: T | undefined;
+interface SelectFieldPropsBase<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
+  /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
+  getOptionMenuLabel?: (opt: O) => string | ReactNode;
+  /** The current value; it can be `undefined`, even if `V` cannot be. */
+  value: V | undefined;
+  onSelect: (value: V, opt: O) => void;
+  options: O[];
 }
 
-export function SelectField<T extends object>(props: SelectFieldProps<T>) {
+type HasId<V> = { id: V };
+type HasName = { name: string };
+
+type MaybeOptionValue<O extends object, V extends Key> = O extends HasId<V>
+  ? { getOptionValue?: (opt: O) => V }
+  : { getOptionValue: (opt: O) => V };
+
+type MaybeOptionLabel<O extends object> = O extends HasName
+  ? { getOptionLabel?: (opt: O) => string }
+  : { getOptionLabel: (opt: O) => string };
+
+// We use mapped types to conditionally require getOptionLabel, getOptionValue
+export type SelectFieldProps<O extends object, V extends Key> = SelectFieldPropsBase<O, V> &
+  MaybeOptionValue<O, V> &
+  MaybeOptionLabel<O>;
+
+/**
+ * Provides a non-native select/dropdown widget.
+ *
+ * The `O` type is a list of options to show, the `V` is the primitive value of a
+ * given `O` (i.e. it's id) that you want to use as the current/selected value.
+ *
+ * Note that the `O extends object` and `V extends Key` constraints come from react-aria,
+ * and so we cannot easily change them.
+ */
+export function SelectField<O extends object, V extends Key>(props: SelectFieldProps<O, V>): JSX.Element {
   const {
-    getOptionLabel,
+    getOptionLabel = (opt: O) => (opt as HasName).name, // if unset, assume O implements HasName
     getOptionMenuLabel = getOptionLabel,
-    getOptionValue,
+    getOptionValue = (opt: O) => (opt as HasId<V>).id, // if unset, assume O implements HasId
     onSelect,
     options,
-    selectedOption,
+    value,
     ...beamSelectFieldProps
   } = props;
 
   const { contains } = useFilter({ sensitivity: "base" });
 
+  // Use the current value to find the option
+  const selectedOption = options.find((opt) => getOptionValue(opt) === value);
+
   const [fieldState, setFieldState] = useState<{
     isOpen: boolean;
-    selectedKey: Key | undefined;
+    selectedKey: V | undefined;
     inputValue: string;
-    filteredOptions: T[];
+    filteredOptions: O[];
   }>({
     isOpen: false,
-    selectedKey: selectedOption && getOptionValue(selectedOption),
+    selectedKey: value,
     inputValue: selectedOption ? getOptionLabel(selectedOption) : "",
     filteredOptions: options,
   });
 
   return (
-    <ComboBox<T>
+    <ComboBox<O>
       {...beamSelectFieldProps}
       filteredOptions={fieldState.filteredOptions}
       inputValue={fieldState.inputValue}
       selectedKey={fieldState.selectedKey}
       onSelectionChange={(key) => {
-        const selectedItem = options.find((o) => getOptionValue(o) === key);
+        const newOption = options.find((o) => getOptionValue(o) === key);
         setFieldState({
           isOpen: false,
-          inputValue: selectedItem ? getOptionLabel(selectedItem) : "",
-          selectedKey: key,
+          inputValue: newOption ? getOptionLabel(newOption) : "",
+          selectedKey: key as V,
           filteredOptions: options,
         });
-        onSelect && onSelect(selectedItem);
+        onSelect && newOption && onSelect(getOptionValue(newOption), newOption);
       }}
       onInputChange={(value) => {
         setFieldState((prevState) => ({
@@ -387,11 +415,13 @@ function Option<T extends object>({ item, state }: { item: Node<T>; state: Combo
 
 const getFieldWidth = (compact: boolean) => (compact ? 248 : 320);
 
-interface BeamSelectFieldBaseProps<T extends object> extends BeamFocusableProps {
+interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
   compact?: boolean;
   disabled?: boolean;
   errorMsg?: string;
+  /** Allow placing an icon/decoration within the input field. */
   fieldDecoration?: (opt: T) => ReactNode;
+  /** Sets the form field label. */
   label?: string;
   readOnly?: boolean;
 }
