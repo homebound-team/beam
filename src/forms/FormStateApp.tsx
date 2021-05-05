@@ -111,7 +111,7 @@ type FormValue = ObjectState<AuthorInput>;
 const formConfig: ObjectConfig<AuthorInput> = {
   firstName: { type: "value", rules: [required] },
   lastName: { type: "value", rules: [required] },
-  favoriteSport: { type: "value" },
+  favoriteSport: { type: "value", rules: [required] },
   books: {
     type: "list",
     rules: [(list) => ((list || []).length === 0 ? "Empty" : undefined)],
