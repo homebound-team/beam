@@ -2,8 +2,8 @@ import { Meta } from "@storybook/react";
 import { Fragment } from "react";
 import { navLink } from "src/components";
 import { Css } from "src/Css";
-import { getNavLinkStyles, NavLink, NavLinkProps } from "src/index";
 import { Icon, Icons } from "./Icon";
+import { getNavLinkStyles, NavLink, NavLinkProps } from "./NavLink";
 
 export default {
   title: "Components/NavLinks",

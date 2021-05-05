@@ -29,7 +29,7 @@ export function ButtonGroup(props: ButtonGroupProps) {
   );
 }
 
-export function ButtonGroupButton({
+function ButtonGroupButton({
   icon,
   text,
   active,

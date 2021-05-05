@@ -1,12 +1,12 @@
 import { Meta } from "@storybook/react";
 import { Fragment, useState } from "react";
 import { Css } from "src/Css";
-import { getTabStyles, LocalTabs as LocalTabsComponent, Tab as TabComponent } from "src/index";
 import { Icon, Icons } from "./Icon";
+import { getTabStyles, Tabs as TabsComponent } from "./Tabs";
 
 export default {
   title: "Components/Tabs",
-  component: TabComponent,
+  component: TabsComponent,
   args: {
     label: "Tabs",
   },
@@ -43,11 +43,11 @@ function getChildren(label: string) {
   );
 }
 
-export const LocalTabs = () => {
+export const Tabs = () => {
   const [activeTab, setActiveTab] = useState("tab2");
 
   return (
-    <LocalTabsComponent
+    <TabsComponent
       tabs={[
         { name: "Tab 1", value: "tab1", icon: "camera" },
         { name: "Tab 2", value: "tab2", icon: "dollar" },

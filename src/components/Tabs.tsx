@@ -5,25 +5,24 @@ import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
 import { Icon, Icons } from "./Icon";
 
-interface TabType {
+interface Tab {
   name: string;
   value: string;
   icon?: keyof typeof Icons;
   disabled?: boolean;
 }
 
-interface LocalTabsProps {
+interface TabsProps {
   selected: string;
   onChange: (value: string) => void;
   ariaLabel?: string;
-  tabs: TabType[];
-  id?: string;
+  tabs: Tab[];
 }
 
-export function LocalTabs(props: LocalTabsProps) {
-  const { ariaLabel, onChange, selected, tabs, id = "tabs", ...others } = props;
+export function Tabs(props: TabsProps) {
+  const { ariaLabel, onChange, selected, tabs, ...others } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
-  const testIds = useTestIds(others, id);
+  const testIds = useTestIds(others, "tabs");
 
   function handleKeyDown(e: KeyboardEvent) {
     // switches tabs on left and right arrow key down events
@@ -40,7 +39,7 @@ export function LocalTabs(props: LocalTabsProps) {
         const testId = testIds[i];
 
         return (
-          <Tab
+          <TabImpl
             focusProps={focusProps}
             isFocusVisible={isFocusVisible}
             key={value}
@@ -61,18 +60,18 @@ export function LocalTabs(props: LocalTabsProps) {
 
 interface TabProps extends BeamFocusableProps {
   /** active indicates the user is on the current tab */
-  active?: boolean;
-  disabled?: boolean;
+  active: boolean;
+  disabled: boolean;
   label: string;
   icon?: keyof typeof Icons;
   value: string;
   onChange: (value: string) => void;
   onKeyDown: (e: KeyboardEvent) => void;
   focusProps: HTMLAttributes<HTMLElement>;
-  isFocusVisible?: boolean;
+  isFocusVisible: boolean;
 }
 
-export function Tab(props: TabProps) {
+function TabImpl(props: TabProps) {
   const {
     disabled: isDisabled,
     label,
@@ -133,7 +132,7 @@ export function getTabStyles() {
   };
 }
 
-function getNextTabValue(selected: string, key: string, tabs: TabType[]) {
+function getNextTabValue(selected: string, key: string, tabs: Tab[]) {
   let newIndex: number;
   let selectedIndex = tabs.findIndex((tab) => tab.value === selected);
 
