@@ -39,8 +39,8 @@ type Row = SimpleHeaderAndDataOf<Data>;
 // f1 (total-total)
 
 export function Sorting() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ data: { name } }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ data: { value } }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, sort: false };
   return (
     <GridTable
@@ -48,9 +48,9 @@ export function Sorting() {
       sorting={"client-side"}
       rows={[
         { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
       ]}
     />
   );
@@ -58,12 +58,12 @@ export function Sorting() {
 
 export const Hovering = newStory(
   () => {
-    const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-    const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+    const nameColumn: GridColumn<Row> = { header: "Name", data: ({ data: { name } }) => name };
+    const valueColumn: GridColumn<Row> = { header: "Value", data: ({ data: { value } }) => value };
     const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
     const rowStyles: GridRowStyles<Row> = {
       data: {
-        cellCss: (row) => (row.value === 3 ? Css.bgRed300.$ : {}),
+        cellCss: (row) => (row.data.value === 3 ? Css.bgRed300.$ : {}),
         rowLink: () => "http://homebound.com",
       },
       header: {},
@@ -74,9 +74,9 @@ export const Hovering = newStory(
         rowStyles={rowStyles}
         rows={[
           { kind: "header", id: "header" },
-          { kind: "data", id: "1", name: "c", value: 1 },
-          { kind: "data", id: "2", name: "b", value: 2 },
-          { kind: "data", id: "3", name: "a", value: 3 },
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "b", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
         ]}
       />
     );
@@ -85,15 +85,15 @@ export const Hovering = newStory(
 );
 
 export function Filtering() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ data: { name } }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ data: { value } }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, sort: false };
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
       { kind: "header", id: "header" },
-      { kind: "data", id: "1", name: "c", value: 1 },
-      { kind: "data", id: "2", name: "b", value: 2 },
-      { kind: "data", id: "3", name: "a", value: 3 },
+      { kind: "data", id: "1", data: { name: "c", value: 1 } },
+      { kind: "data", id: "2", data: { name: "b", value: 2 } },
+      { kind: "data", id: "3", data: { name: "a", value: 3 } },
     ],
     [],
   );
@@ -112,8 +112,8 @@ export function Filtering() {
 }
 
 export function NoRowsFallback() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ data: { name } }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ data: { value } }) => value };
   return (
     <GridTable
       columns={[nameColumn, valueColumn]}
@@ -179,7 +179,7 @@ export function ObservableRows() {
   const o = useMemo(() => observable({ a: 1 }), []);
   const nameColumn: GridColumn<Row> = {
     header: "Name",
-    data: ({ name }) => (
+    data: ({ data: { name } }) => (
       <div>
         {name} {o.a}
       </div>
@@ -193,8 +193,8 @@ export function ObservableRows() {
         columns={observableColumns([nameColumn])}
         rows={[
           { kind: "header", id: "header" },
-          { kind: "data", id: "1", name: "a", value: 1 },
-          { kind: "data", id: "2", name: "b", value: 2 },
+          { kind: "data", id: "1", data: { name: "a", value: 1 } },
+          { kind: "data", id: "2", data: { name: "b", value: 2 } },
         ]}
       />
     </div>
@@ -202,8 +202,8 @@ export function ObservableRows() {
 }
 
 export function StickyHeader() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ data: { name } }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ data: { value } }) => value };
   const actionColumn: GridColumn<Row> = {
     header: () => (
       <div>
@@ -221,7 +221,7 @@ export function StickyHeader() {
         stickyHeader={true}
         rows={[
           { kind: "header", id: "header" },
-          ...zeroTo(20).map((i) => ({ kind: "data" as const, id: "1", name: "c", value: 1 })),
+          ...zeroTo(20).map((i) => ({ kind: "data" as const, id: "1", data: { name: "c", value: 1 } })),
         ]}
       />
     </div>
@@ -233,8 +233,8 @@ export function zeroTo(n: number): number[] {
 }
 
 export const Condensed = newStory(() => {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ data: { name } }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ data: { value } }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
   return (
     <GridTable<Row>
@@ -242,17 +242,17 @@ export const Condensed = newStory(() => {
       style={condensedStyle}
       rows={[
         { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
       ]}
     />
   );
 }, {});
 
 export function AsTable() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ data: { name } }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ data: { value } }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
 
   return (
@@ -261,17 +261,17 @@ export function AsTable() {
       columns={[nameColumn, valueColumn, actionColumn]}
       rows={[
         { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
       ]}
     />
   );
 }
 
 export function AsTableWithCustomStyles() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "75px", align: "right" };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ data: { name } }) => name, w: "75px", align: "right" };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ data: { value } }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
 
   return (
@@ -280,9 +280,9 @@ export function AsTableWithCustomStyles() {
       columns={[nameColumn, valueColumn, actionColumn]}
       rows={[
         { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
       ]}
       rowStyles={{
         header: { cellCss: Css.p1.$ },
@@ -294,8 +294,8 @@ export function AsTableWithCustomStyles() {
 
 export const AsTableWithRowLink = newStory(
   () => {
-    const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-    const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+    const nameColumn: GridColumn<Row> = { header: "Name", data: ({ data: { name } }) => name };
+    const valueColumn: GridColumn<Row> = { header: "Value", data: ({ data: { value } }) => value };
     const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
     const rowStyles: GridRowStyles<Row> = {
       data: { indent: "2", rowLink: () => "http://homebound.com" },
@@ -308,9 +308,9 @@ export const AsTableWithRowLink = newStory(
         rowStyles={rowStyles}
         rows={[
           { kind: "header", id: "header" },
-          { kind: "data", id: "1", name: "c", value: 1 },
-          { kind: "data", id: "2", name: "b", value: 2 },
-          { kind: "data", id: "3", name: "a", value: 3 },
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "b", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
         ]}
       />
     );
