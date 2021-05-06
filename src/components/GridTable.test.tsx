@@ -8,6 +8,7 @@ import {
   matchesFilter,
   simpleHeader,
   SimpleHeaderAndDataOf,
+  SimpleHeaderAndDataWith,
 } from "src/components/GridTable";
 import { Css, Palette } from "src/Css";
 import { cell, click, render, row } from "src/utils/rtl";
@@ -16,14 +17,14 @@ import { cell, click, render, row } from "src/utils/rtl";
 type Data = { name: string; value: number | undefined };
 type Row = SimpleHeaderAndDataOf<Data>;
 
-const nameColumn: GridColumn<Row> = { header: () => "Name", data: ({ data: { name } }) => name };
-const valueColumn: GridColumn<Row> = { header: () => "Value", data: ({ data: { value } }) => value };
+const nameColumn: GridColumn<Row> = { header: () => "Name", data: ({ name }) => name };
+const valueColumn: GridColumn<Row> = { header: () => "Value", data: ({ value }) => value };
 const columns = [nameColumn, valueColumn];
 
 const rows: GridDataRow<Row>[] = [
   { kind: "header", id: "header" },
-  { kind: "data", id: "1", data: { name: "foo", value: 1 } },
-  { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+  { kind: "data", id: "1", name: "foo", value: 1 },
+  { kind: "data", id: "2", name: "bar", value: 2 },
 ];
 
 // Make a `NestedRow` ADT for a table with a header + 3 levels of nesting
@@ -60,7 +61,7 @@ describe("GridTable", () => {
     // Given a column that aligns center
     const valueColumn: GridColumn<Row> = {
       header: () => ({ content: "Value", alignment: "center" }),
-      data: (row) => ({ content: row.data.value, alignment: "center" }),
+      data: (row) => ({ content: row.value, alignment: "center" }),
     };
     const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} />);
     // Then we add the center class
@@ -75,13 +76,32 @@ describe("GridTable", () => {
       align: "right",
       header: () => "Value",
       // But we can also override it if needed
-      data: (row) => ({ content: row.data.value, alignment: "center" }),
+      data: (row) => ({ content: row.value, alignment: "center" }),
     };
     const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} />);
     // Then we applied the default of right aligned
     expect(cell(r, 0, 1)).toHaveStyleRule("justify-content", "flex-end");
     // And also the override of center aligned
     expect(cell(r, 1, 1)).toHaveStyleRule("justify-content", "center");
+  });
+
+  it("unwraps rows with a data key", async () => {
+    // Given a column using the `With` type
+    type Row = SimpleHeaderAndDataWith<Data>;
+    const valueColumn: GridColumn<Row> = {
+      header: "Value",
+      // Then we can destructure directly against data
+      data: ({ value }) => value,
+    };
+    const rows: GridDataRow<Row>[] = [
+      { kind: "header", id: "header" },
+      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+    ];
+    // And it's rendered correctly
+    const r = await render(<GridTable columns={[valueColumn]} rows={rows} />);
+    expect(cell(r, 1, 0)).toHaveTextContent("1");
+    expect(cell(r, 2, 0)).toHaveTextContent("2");
   });
 
   it("can have per-row styles", async () => {
@@ -109,8 +129,8 @@ describe("GridTable", () => {
     const rowStyles: GridRowStyles<Row> = {
       header: {},
       data: {
-        rowCss: (row) => (row.data.value === 1 ? Css.bgRed500.$ : Css.bgGreen500.$),
-        cellCss: (row) => (row.data.value === 1 ? Css.green500.$ : Css.red500.$),
+        rowCss: (row) => (row.value === 1 ? Css.bgRed500.$ : Css.bgGreen500.$),
+        cellCss: (row) => (row.value === 1 ? Css.green500.$ : Css.red500.$),
       },
     };
     const r = await render(<GridTable {...{ columns, rows, rowStyles }} />);
@@ -144,9 +164,9 @@ describe("GridTable", () => {
         rows={[
           simpleHeader,
           // And the data is initially unsorted
-          { kind: "data", id: "2", data: { name: "b", value: 2 } },
-          { kind: "data", id: "1", data: { name: "a", value: 3 } },
-          { kind: "data", id: "3", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", name: "b", value: 2 },
+          { kind: "data", id: "1", name: "a", value: 3 },
+          { kind: "data", id: "3", name: "c", value: 1 },
         ]}
       />,
     );
@@ -170,17 +190,14 @@ describe("GridTable", () => {
     const r = await render(
       <GridTable<Row>
         // And the value column returns a JSX.Element and a value
-        columns={[
-          nameColumn,
-          { header: () => "Value", data: ({ data: { value } }) => ({ value, content: <div>{value}</div> }) },
-        ]}
+        columns={[nameColumn, { header: () => "Value", data: ({ value }) => ({ value, content: <div>{value}</div> }) }]}
         sorting="client-side"
         rows={[
           simpleHeader,
           // And the data is initially unsorted
-          { kind: "data", id: "2", data: { name: "b", value: 2 } },
-          { kind: "data", id: "1", data: { name: "a", value: 3 } },
-          { kind: "data", id: "3", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", name: "b", value: 2 },
+          { kind: "data", id: "1", name: "a", value: 3 },
+          { kind: "data", id: "3", name: "c", value: 1 },
         ]}
       />,
     );
@@ -195,18 +212,15 @@ describe("GridTable", () => {
     // Given the table is using client-side sorting
     const r = await render(
       <GridTable<Row>
-        columns={[
-          nameColumn,
-          { header: () => "Value", data: ({ data: { value } }) => ({ value, content: <div>{value}</div> }) },
-        ]}
+        columns={[nameColumn, { header: () => "Value", data: ({ value }) => ({ value, content: <div>{value}</div> }) }]}
         sorting="client-side"
         rows={[
           simpleHeader,
           // And the 2nd row's value is undefined
-          { kind: "data", id: "2", data: { name: "b", value: 2 } },
-          { kind: "data", id: "1", data: { name: "a", value: undefined } },
-          { kind: "data", id: "3", data: { name: "c", value: 1 } },
-          { kind: "data", id: "4", data: { name: "d", value: undefined } },
+          { kind: "data", id: "2", name: "b", value: 2 },
+          { kind: "data", id: "1", name: "a", value: undefined },
+          { kind: "data", id: "3", name: "c", value: 1 },
+          { kind: "data", id: "4", name: "d", value: undefined },
         ]}
       />,
     );
@@ -227,7 +241,7 @@ describe("GridTable", () => {
         // And the 2nd column has sorting disabled
         columns={[nameColumn, { ...valueColumn, sort: false }]}
         sorting="client-side"
-        rows={[simpleHeader, { kind: "data", id: "2", data: { name: "b", value: 2 } }]}
+        rows={[simpleHeader, { kind: "data", id: "2", name: "b", value: 2 }]}
       />,
     );
     const { sortHeader_0, sortHeader_1 } = r;
@@ -354,8 +368,8 @@ describe("GridTable", () => {
   it("can filter by string values", async () => {
     const rows: GridDataRow<Row>[] = [
       { kind: "header", id: "header" },
-      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
-      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+      { kind: "data", id: "1", name: "foo", value: 1 },
+      { kind: "data", id: "2", name: "bar", value: 2 },
     ];
     const r = await render(<GridTable filter={"bar"} {...{ columns, rows }} />);
     expect(cell(r, 0, 0)).toHaveTextContent("Name");
@@ -366,8 +380,8 @@ describe("GridTable", () => {
   it("can filter by numeric values", async () => {
     const rows: GridDataRow<Row>[] = [
       { kind: "header", id: "header" },
-      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
-      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+      { kind: "data", id: "1", name: "foo", value: 1 },
+      { kind: "data", id: "2", name: "bar", value: 2 },
     ];
     const r = await render(<GridTable filter={"2"} {...{ columns, rows }} />);
     expect(cell(r, 0, 0)).toHaveTextContent("Name");
@@ -378,8 +392,8 @@ describe("GridTable", () => {
   it("can filter and treat space as 'and'", async () => {
     const rows: GridDataRow<Row>[] = [
       { kind: "header", id: "header" },
-      { kind: "data", id: "1", data: { name: "foo", value: 2 } },
-      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+      { kind: "data", id: "1", name: "foo", value: 2 },
+      { kind: "data", id: "2", name: "bar", value: 2 },
     ];
     const r = await render(<GridTable filter={"bar 2"} {...{ columns, rows }} />);
     expect(cell(r, 0, 0)).toHaveTextContent("Name");
@@ -390,8 +404,8 @@ describe("GridTable", () => {
   it("treats filtering by empty string as no filter", async () => {
     const rows: GridDataRow<Row>[] = [
       { kind: "header", id: "header" },
-      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
-      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+      { kind: "data", id: "1", name: "foo", value: 1 },
+      { kind: "data", id: "2", name: "bar", value: 2 },
     ];
     const r = await render(<GridTable filter={""} {...{ columns, rows }} />);
     expect(cell(r, 0, 0)).toHaveTextContent("Name");
@@ -402,8 +416,8 @@ describe("GridTable", () => {
   it("can filter by GridCellContent values", async () => {
     const rows: GridDataRow<Row>[] = [
       { kind: "header", id: "header" },
-      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
-      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+      { kind: "data", id: "1", name: "foo", value: 1 },
+      { kind: "data", id: "2", name: "bar", value: 2 },
     ];
     const r = await render(
       <GridTable<Row>
@@ -412,7 +426,7 @@ describe("GridTable", () => {
           columns: [
             {
               header: "Name",
-              data: ({ data: { name } }) => ({ content: <div>{name}</div>, value: name }),
+              data: ({ name }) => ({ content: <div>{name}</div>, value: name }),
             },
           ],
           rows,

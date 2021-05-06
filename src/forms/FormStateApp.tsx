@@ -8,7 +8,7 @@ import {
   GridTable,
   IconButton,
   simpleHeader,
-  SimpleHeaderAndDataOf,
+  SimpleHeaderAndDataWith,
 } from "src/components";
 import { BoundSelectField, BoundTextField } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
@@ -85,21 +85,21 @@ export function FormStateApp() {
   );
 }
 
-type Row = SimpleHeaderAndDataOf<FormValue["books"]["rows"][number]>;
+type Row = SimpleHeaderAndDataWith<FormValue["books"]["rows"][number]>;
 
 function createColumns(formState: FormValue): GridColumn<Row>[] {
   return [
-    { header: "#", data: ({ data }) => <span>{data.id.value}</span> },
+    { header: "#", data: ({ id }) => <span>{id.value}</span> },
     {
       header: "Title",
-      data: ({ data }) => {
-        return <BoundTextField field={data.title} />;
+      data: ({ title }) => {
+        return <BoundTextField field={title} />;
       },
     },
     {
       header: "Actions",
-      data: ({ data }) => {
-        return <IconButton icon="x" onClick={() => formState.books.remove(data.value)} />;
+      data: ({ value }) => {
+        return <IconButton icon="x" onClick={() => formState.books.remove(value)} />;
       },
     },
   ];
