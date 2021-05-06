@@ -1,6 +1,6 @@
 import { useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { Icon, IconProps } from "src";
+import { Icon, IconProps } from "src/components";
 import { Css, Palette } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils/useTestIds";
