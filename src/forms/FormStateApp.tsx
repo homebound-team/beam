@@ -92,15 +92,11 @@ function createColumns(formState: FormValue): GridColumn<Row>[] {
     { header: "#", data: ({ id }) => <span>{id.value}</span> },
     {
       header: "Title",
-      data: ({ title }) => {
-        return <BoundTextField field={title} />;
-      },
+      data: ({ title }) => <BoundTextField field={title} />,
     },
     {
       header: "Actions",
-      data: ({ value }) => {
-        return <IconButton icon="x" onClick={() => formState.books.remove(value)} />;
-      },
+      data: (row) => <IconButton icon="x" onClick={() => formState.books.remove(row.value)} />,
     },
   ];
 }
