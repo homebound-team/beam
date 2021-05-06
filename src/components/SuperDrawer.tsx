@@ -20,8 +20,11 @@ export interface SuperDrawerProps {
    * @defaultValue `onCloseClick`
    */
   onCancelClick?: () => void;
-  /** Handler when clicking on the "back" button when showing the childContent */
-  onChildContentBackClick: () => void;
+  /**
+   * Handler when clicking on the "back" button when showing the childContent
+   * Optional, however, required when using childContent
+   * */
+  onChildContentBackClick?: () => void;
   /**
    * Handler when clicking on the overlay
    * @defaultValue `onCloseClick`
@@ -138,7 +141,15 @@ function SuperDrawerBase({
         </motion.div>
       ) : (
         <motion.div css={Css.p3.fg1.$} animate={{ overflow: "auto" }} transition={{ overflow: { delay: 0.3 } }}>
-          <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={onChildContentBackClick} />
+          <Button
+            label="Back"
+            icon="chevronLeft"
+            variant="tertiary"
+            onClick={
+              onChildContentBackClick ||
+              (() => console.warn("Missing SuperDrawer `onChildContentBackClick` prop when using `childContent` prop"))
+            }
+          />
           <motion.div
             key="childContent"
             initial={{ x: 1040, opacity: 0 }}
