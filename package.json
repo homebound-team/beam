@@ -1,6 +1,6 @@
 {
   "name": "@homebound/beam",
-  "version": "0.1.0",
+  "version": "1.19.1",
   "author": "Homebound",
   "license": "MIT",
   "main": "dist/index.js",
@@ -30,10 +30,6 @@
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded",
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\""
   },
-  "peerDependencies": {
-    "@emotion/react": "^11.1.5",
-    "react": ">=16"
-  },
   "dependencies": {
     "@react-types/shared": "^3.4.0",
     "react-aria": "^3.5.0",
@@ -41,13 +37,32 @@
     "react-stately": "^3.4.0",
     "@react-stately/combobox": "^3.0.0-beta.0"
   },
+  "peerDependencies": {
+    "@emotion/react": ">=11",
+    "mobx-react": ">=7",
+    "react": ">=16",
+    "react-router-dom": ">=5.2",
+    "tinycolor2": ">=1.4"
+  },
+  "peerDependenciesMeta": {
+    "mobx-react": {
+      "optional": true
+    },
+    "react-router-dom": {
+      "optional": true
+    },
+    "tinycolor2": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@babel/core": "^7.13.1",
     "@emotion/babel-preset-css-prop": "^11.2.0",
-    "@emotion/jest": "^11.2.1",
+    "@emotion/jest": "^11.3.0",
     "@emotion/react": "^11.1.5",
     "@homebound/rtl-utils": "^1.39.0",
     "@homebound/tsconfig": "^1.0.2",
+    "@semantic-release/git": "^9.0.0",
     "@storybook/addon-essentials": "^6.2.5",
     "@storybook/addon-info": "^5.3.21",
     "@storybook/addon-links": "^6.2.5",
@@ -56,8 +71,10 @@
     "@testing-library/jest-dom": "^5.11.9",
     "@tsconfig/recommended": "^1.0.1",
     "@types/jest": "^26.0.20",
-    "@types/react": "^16.14.5",
+    "@types/react": "^17.0.5",
     "@types/react-dom": "^16.9.11",
+    "@types/react-router-dom": "^5.1.7",
+    "@types/tinycolor2": "^1.4.2",
     "@typescript-eslint/eslint-plugin": "^4.17.0",
     "@typescript-eslint/parser": "^4.17.0",
     "babel-eslint": "^10.1.0",
@@ -74,16 +91,20 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^5.1.1",
     "jest": "^26.6.3",
+    "mobx": "^6.3.0",
+    "mobx-react": "^7.1.0",
+    "react-router-dom": "^5.2.0",
     "prettier": "^2.2.1",
     "prettier-plugin-organize-imports": "^1.1.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "semantic-release": "^17.4.0",
+    "tinycolor2": "^1.4.1",
     "ts-jest": "^26.5.3",
     "ts-node": "^9.1.1",
     "tslib": "^2.1.0",
     "ttypescript": "^1.5.12",
-    "typescript": "^4.2.3",
+    "typescript": "^4.2.4",
     "typescript-transform-paths": "^2.0.1",
     "watch": "^1.0.2"
   }

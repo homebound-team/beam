@@ -1,0 +1,160 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GridTable renders 1`] = `
+.emotion-0 {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.emotion-0>div+div>*,
+.emotion-0>tbody>tr {
+  border-color: rgba(201,201,201,1);
+  border-top-style: solid;
+  border-top-width: 1px;
+}
+
+.emotion-0>div:nth-of-type(2)>*,
+.emotion-0>tbody>tr:first-of-type {
+  border-top-style: none;
+}
+
+.emotion-1 {
+  display: contents;
+}
+
+.emotion-2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  padding-bottom: 8px;
+  padding-left: 8px;
+  padding-right: 24px;
+  padding-top: 8px;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+  -webkit-align-self: flex-end;
+  -ms-flex-item-align: flex-end;
+  align-self: flex-end;
+  background-color: rgba(236,235,235,1);
+  height: 100%;
+  white-space: nowrap;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+}
+
+.emotion-3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  padding-bottom: 8px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 8px;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+  -webkit-align-self: flex-end;
+  -ms-flex-item-align: flex-end;
+  align-self: flex-end;
+  background-color: rgba(236,235,235,1);
+  height: 100%;
+  white-space: nowrap;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+.emotion-5 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  padding-bottom: 16px;
+  padding-left: 8px;
+  padding-right: 24px;
+  padding-top: 16px;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+}
+
+.emotion-6 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  padding-bottom: 16px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 16px;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+}
+
+<body>
+  <div>
+    <div
+      class="emotion-0"
+      data-testid="grid-table"
+    >
+      <div
+        class="emotion-1"
+      >
+        <div
+          class="emotion-2"
+        >
+          <div>
+            Name
+          </div>
+        </div>
+        <div
+          class="emotion-3"
+        >
+          <div>
+            Value
+          </div>
+        </div>
+      </div>
+      <div
+        class="emotion-1"
+      >
+        <div
+          class="emotion-5"
+        >
+          foo
+        </div>
+        <div
+          class="emotion-6"
+        >
+          1
+        </div>
+      </div>
+      <div
+        class="emotion-1"
+      >
+        <div
+          class="emotion-5"
+        >
+          bar
+        </div>
+        <div
+          class="emotion-6"
+        >
+          2
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

@@ -1,5 +1,5 @@
 import { matchers } from "@emotion/jest";
-import "@testing-library/jest-dom/extend-expect";
+import "@testing-library/jest-dom";
 
 beforeEach(() => jest.useFakeTimers("modern"));
 afterEach(() => jest.useRealTimers());

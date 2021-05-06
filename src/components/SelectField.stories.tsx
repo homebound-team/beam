@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { useState } from "react";
+import { Key, useState } from "react";
 import { Icon, Icons, SelectField, SelectFieldProps } from "src/components";
 import { Css } from "src/Css";
 
@@ -28,10 +28,8 @@ export function SelectFields() {
         <h1 css={Css.lg.mb2.$}>Regular</h1>
         <TestSelectField
           label="Favorite Icon"
-          selectedOption={options[2]}
+          value={options[2].id}
           options={options}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
           getOptionMenuLabel={(o) => (
             <div css={Css.df.itemsCenter.$}>
               {o.icon && (
@@ -46,10 +44,8 @@ export function SelectFields() {
         <TestSelectField
           label="Favorite Icon - with field decoration"
           options={options}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
-          selectedOption={options[1]}
+          value={options[1].id}
           getOptionMenuLabel={(o) => (
             <div css={Css.df.itemsCenter.$}>
               {o.icon && (
@@ -61,27 +57,9 @@ export function SelectFields() {
             </div>
           )}
         />
-        <TestSelectField
-          label="Favorite Icon - Disabled"
-          options={options}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
-          disabled
-        />
-        <TestSelectField
-          label="Favorite Icon - Read Only"
-          options={options}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
-          selectedOption={options[2]}
-          readOnly
-        />
-        <TestSelectField
-          label="Favorite Icon"
-          options={options}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
-        />
+        <TestSelectField label="Favorite Icon - Disabled" value={undefined} options={options} disabled />
+        <TestSelectField label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
+        <TestSelectField label="Favorite Icon" value={undefined} options={options} />
       </div>
 
       <div css={Css.df.flexColumn.childGap3.$}>
@@ -89,10 +67,8 @@ export function SelectFields() {
         <TestSelectField
           compact
           label="Favorite Icon"
-          selectedOption={options[2]}
+          value={options[2].id}
           options={options}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
           getOptionMenuLabel={(o) => (
             <div css={Css.df.itemsCenter.$}>
               {o.icon && (
@@ -108,10 +84,8 @@ export function SelectFields() {
           compact
           label="Favorite Icon - with field decoration"
           options={options}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
-          selectedOption={options[1]}
+          value={options[1].id}
           getOptionMenuLabel={(o) => (
             <div css={Css.df.itemsCenter.$}>
               {o.icon && (
@@ -123,44 +97,23 @@ export function SelectFields() {
             </div>
           )}
         />
-        <TestSelectField
-          compact
-          label="Favorite Icon - Disabled"
-          options={options}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
-          disabled
-        />
-        <TestSelectField
-          compact
-          label="Favorite Icon - Read Only"
-          options={options}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
-          selectedOption={options[2]}
-          readOnly
-        />
-        <TestSelectField
-          compact
-          label="Favorite Icon"
-          options={options}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
-        />
+        <TestSelectField compact label="Favorite Icon - Disabled" value={undefined} options={options} disabled />
+        <TestSelectField compact label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
+        <TestSelectField compact label="Favorite Icon" options={options} value={undefined} />
       </div>
     </div>
   );
 }
 
-function TestSelectField<T extends object>(
-  props: Partial<SelectFieldProps<T>> & Pick<SelectFieldProps<T>, "getOptionLabel" | "getOptionValue" | "options">,
-) {
-  const [selectedOption, setSelectedOption] = useState<T | undefined>(props.selectedOption);
+function TestSelectField<T extends object, V extends Key>(props: Omit<SelectFieldProps<T, V>, "onSelect">) {
+  const [selectedOption, setSelectedOption] = useState<V | undefined>(props.value);
   return (
-    <SelectField
-      {...props}
-      selectedOption={selectedOption}
-      onSelect={(o) => setSelectedOption(o)}
+    <SelectField<T, V>
+      // The `as any` is due to something related to https://github.com/emotion-js/emotion/issues/2169
+      // We may have to redo the conditional getOptionValue/getOptionLabel
+      {...(props as any)}
+      value={selectedOption}
+      onSelect={(v) => setSelectedOption(v)}
       errorMsg={selectedOption || props.disabled ? "" : "Select an option. Plus more error text to force it to wrap."}
     />
   );

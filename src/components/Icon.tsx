@@ -1,25 +1,30 @@
 import { DOMProps } from "@react-types/shared";
 import { AriaAttributes } from "react";
-import { Css, Margin, Palette, Xss } from "src/Css";
+import { Css, increment, Margin, Palette, Xss } from "src/Css";
 
 export interface IconProps extends AriaAttributes, DOMProps {
   /** The name of an icon */
   icon: keyof typeof Icons;
   /** Defaults to currentColor */
   color?: Palette | "inherit" | "currentColor";
+  /** The size of the icon in increments, i.e. 1 == 8px, default is 3 == 24px. */
+  inc?: number;
   /** Styles overrides */
   xss?: Xss<Margin>;
 }
 
-export function Icon({ icon, color = "currentColor", xss, ...other }: IconProps) {
+export function Icon(props: IconProps) {
+  const { icon, inc = 3, color = "currentColor", xss, ...other } = props;
+  const size = increment(inc);
   return (
     <svg
       aria-hidden={true}
-      width="24"
-      height="24"
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
       css={{ path: Css.fill(color).$, ...xss }}
+      data-icon={icon}
       {...other}
     >
       {Icons[icon]}
@@ -242,12 +247,8 @@ export const Icons = {
   ),
   userCircle: (
     <>
-      <path
-        d="M12 2C6.579 2 2 6.579 2 12C2 15.189 3.592 18.078 6 19.924V20H6.102C7.77 21.245 9.813 22 12 22C14.187 22 16.23 21.245 17.898 20H18V19.924C20.408 18.078 22 15.19 22 12C22 6.579 17.421 2 12 2ZM8.074 18.927C8.371 17.582 9.568 16.573 11 16.573H13C14.432 16.573 15.629 17.583 15.926 18.927C14.758 19.604 13.416 20 12 20C10.584 20 9.242 19.604 8.074 18.927ZM17.61 17.641C16.853 15.841 15.072 14.573 13 14.573H11C8.928 14.573 7.146 15.842 6.39 17.641C4.923 16.182 4 14.176 4 12C4 7.663 7.663 4 12 4C16.337 4 20 7.663 20 12C20 14.176 19.077 16.182 17.61 17.641Z"
-      />
-      <path
-        d="M12 6C9.72 6 8 7.72 8 10C8 12.28 9.72 14 12 14C14.28 14 16 12.28 16 10C16 7.72 14.28 6 12 6ZM12 12C10.822 12 10 11.178 10 10C10 8.822 10.822 8 12 8C13.178 8 14 8.822 14 10C14 11.178 13.178 12 12 12Z"
-      />
+      <path d="M12 2C6.579 2 2 6.579 2 12C2 15.189 3.592 18.078 6 19.924V20H6.102C7.77 21.245 9.813 22 12 22C14.187 22 16.23 21.245 17.898 20H18V19.924C20.408 18.078 22 15.19 22 12C22 6.579 17.421 2 12 2ZM8.074 18.927C8.371 17.582 9.568 16.573 11 16.573H13C14.432 16.573 15.629 17.583 15.926 18.927C14.758 19.604 13.416 20 12 20C10.584 20 9.242 19.604 8.074 18.927ZM17.61 17.641C16.853 15.841 15.072 14.573 13 14.573H11C8.928 14.573 7.146 15.842 6.39 17.641C4.923 16.182 4 14.176 4 12C4 7.663 7.663 4 12 4C16.337 4 20 7.663 20 12C20 14.176 19.077 16.182 17.61 17.641Z" />
+      <path d="M12 6C9.72 6 8 7.72 8 10C8 12.28 9.72 14 12 14C14.28 14 16 12.28 16 10C16 7.72 14.28 6 12 6ZM12 12C10.822 12 10 11.178 10 10C10 8.822 10.822 8 12 8C13.178 8 14 8.822 14 10C14 11.178 13.178 12 12 12Z" />
     </>
   ),
   calendar: (
