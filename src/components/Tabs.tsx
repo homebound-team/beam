@@ -33,7 +33,7 @@ export function Tabs(props: TabsProps) {
   }
 
   return (
-    <div css={Css.dif.$} aria-label={ariaLabel} role="tablist" {...testIds}>
+    <div css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...testIds}>
       {tabs.map((tab, i) => {
         const { name, value, icon, disabled = false } = tab;
         const testId = testIds[i];
