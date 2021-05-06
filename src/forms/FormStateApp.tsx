@@ -92,7 +92,7 @@ function createColumns(formState: FormValue): GridColumn<Row>[] {
     { header: "#", data: ({ id }) => <span>{id.value}</span> },
     {
       header: "Title",
-      data: ({ title }) => <BoundTextField field={title} />,
+      data: ({ title }) => <BoundTextField label="" compact field={title} />,
     },
     {
       header: "Actions",
