@@ -5,7 +5,7 @@ import { useCheckboxGroupItem } from "react-aria";
 import { CheckboxBase } from "src/components";
 import { Css } from "src/Css";
 
-interface CheckboxGroupItemOption {
+export interface CheckboxGroupItemOption {
   /** Additional text displayed below label */
   description?: string;
   disabled?: boolean;
@@ -14,7 +14,7 @@ interface CheckboxGroupItemOption {
   value: string;
 }
 
-interface CheckboxGroupProps {
+export interface CheckboxGroupProps {
   label: string;
   /** Called when a checkbox is selected or deselected */
   onChange: (values: string[]) => void;

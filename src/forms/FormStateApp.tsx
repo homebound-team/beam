@@ -3,6 +3,7 @@ import { Observer } from "mobx-react";
 import { useMemo } from "react";
 import {
   Button,
+  CheckboxGroupItemOption,
   GridColumn,
   GridDataRow,
   GridTable,
@@ -11,6 +12,7 @@ import {
   SimpleHeaderAndDataWith,
 } from "src/components";
 import { BoundSelectField, BoundTextField } from "src/forms";
+import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
 
@@ -44,6 +46,12 @@ export function FormStateApp() {
     { id: "s:2", name: "Soccer" },
   ];
 
+  const colors: CheckboxGroupItemOption[] = [
+    { value: "c:1", label: "Blue" },
+    { value: "c:2", label: "Red" },
+    { value: "c:3", label: "Green" },
+  ];
+
   return (
     <Observer>
       {() => (
@@ -54,6 +62,7 @@ export function FormStateApp() {
               <BoundTextField field={formState.firstName} />
               <BoundTextField field={formState.lastName} />
               <BoundSelectField field={formState.favoriteSport} options={sports} />
+              <BoundCheckboxGroupField field={formState.favoriteColors} options={colors} />
             </div>
 
             <div>
@@ -108,6 +117,7 @@ const formConfig: ObjectConfig<AuthorInput> = {
   firstName: { type: "value", rules: [required] },
   lastName: { type: "value", rules: [required] },
   favoriteSport: { type: "value", rules: [required] },
+  favoriteColors: { type: "value", rules: [required] },
   books: {
     type: "list",
     rules: [(list) => ((list || []).length === 0 ? "Empty" : undefined)],

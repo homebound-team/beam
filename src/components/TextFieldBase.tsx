@@ -4,6 +4,7 @@ import { Icon } from "src/components/Icon";
 import { Label } from "src/components/Label";
 import { Css, Palette, px } from "src/Css";
 import { BeamTextFieldProps } from "src/interfaces";
+import { useTestIds } from "src/utils/useTestIds";
 
 interface TextFieldBaseProps extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur"> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
@@ -34,6 +35,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
   // Default the widths, though eventually these should be responsive. Note: there is no "compact" view for "wide" fields at the moment
   const width = wide ? 550 : compact ? 248 : 320;
+  const tid = useTestIds(props, "textField");
 
   return (
     <div css={Css.df.flexColumn.wPx(width).$}>
@@ -54,13 +56,16 @@ export function TextFieldBase(props: TextFieldBaseProps) {
           "&:disabled": Css.gray400.bgGray100.cursorNotAllowed.$,
           ...(errorMsg ? Css.bRed600.$ : {}),
         }}
+        {...tid}
       />
       {errorMsg && (
         <div id={errorMessageId} css={Css.red600.sm.df.mtPx(4).$}>
           <span css={Css.fs0.$}>
             <Icon icon="error" color={Palette.Red600} />
           </span>
-          <span css={Css.ml1.mtPx(2).$}>{errorMsg}</span>
+          <span css={Css.ml1.mtPx(2).$} {...tid.errorMsg}>
+            {errorMsg}
+          </span>
         </div>
       )}
     </div>

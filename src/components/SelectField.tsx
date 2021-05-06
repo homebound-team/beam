@@ -19,6 +19,7 @@ import { Icon } from "src/components/Icon";
 import { Label } from "src/components/Label";
 import { Css, Palette, px } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
+import { useTestIds } from "src/utils/useTestIds";
 
 export interface SelectFieldProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
@@ -254,6 +255,7 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
   const errorStyles = errorMsg ? Css.bRed500.$ : {};
   const disabledStyles = isDisabled ? Css.gray400.bgGray100.cursorNotAllowed.$ : {};
   const readOnlyStyles = isReadOnly ? Css.bn.pl0.pt0.add("backgroundColor", "unset").$ : {};
+  const tid = useTestIds(inputProps); // data-testid comes in through here
 
   return (
     <Fragment>
@@ -317,7 +319,9 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
           <span css={Css.fs0.$}>
             <Icon icon="error" color={Palette.Red600} />
           </span>
-          <span css={Css.ml1.mtPx(2).$}>{errorMsg}</span>
+          <span css={Css.ml1.mtPx(2).$} {...tid.errorMsg}>
+            {errorMsg}
+          </span>
         </div>
       )}
     </Fragment>
