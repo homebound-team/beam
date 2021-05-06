@@ -2,6 +2,7 @@ import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { CheckboxGroup, CheckboxGroupProps } from "src/components";
 import { useTestIds } from "src/utils";
+import { defaultLabel } from "src/utils/defaultLabel";
 
 export type BoundCheckboxGroupFieldProps = Omit<CheckboxGroupProps, "values" | "onChange" | "label"> & {
   field: FieldState<string[] | null | undefined>;
@@ -12,7 +13,7 @@ export type BoundCheckboxGroupFieldProps = Omit<CheckboxGroupProps, "values" | "
 
 /** Wraps `TextField` and binds it to a form field. */
 export function BoundCheckboxGroupField(props: BoundCheckboxGroupFieldProps) {
-  const { field, onChange = (value) => field.set(value), label = field.key, ...others } = props;
+  const { field, onChange = (value) => field.set(value), label = defaultLabel(field.key), ...others } = props;
   const testId = useTestIds(props, field.key);
   return (
     <Observer>
