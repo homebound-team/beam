@@ -31,11 +31,12 @@
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\""
   },
   "dependencies": {
-    "@react-types/shared": "^3.4.0",
-    "react-aria": "^3.5.0",
     "@react-aria/combobox": "3.0.0-beta.0",
-    "react-stately": "^3.4.0",
-    "@react-stately/combobox": "^3.0.0-beta.0"
+    "@react-types/shared": "^3.4.0",
+    "@react-stately/combobox": "^3.0.0-beta.0",
+    "change-case": "^4.1.2",
+    "react-aria": "^3.5.0",
+    "react-stately": "^3.4.0"
   },
   "peerDependencies": {
     "@emotion/react": ">=11",

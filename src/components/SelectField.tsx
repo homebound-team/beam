@@ -172,6 +172,7 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
 
   const { buttonProps } = useButton({ ...triggerProps, isDisabled: isDisabled || isReadOnly }, triggerRef);
   const { isFocused, focusProps } = useFocusRing({ ...props, within: true });
+  const tid = useTestIds(props);
 
   // useOverlayPosition moves the overlay to the top of the DOM to avoid any z-index issues. Uses the `targetRef` to DOM placement
   const { overlayProps: positionProps } = useOverlayPosition({
@@ -185,7 +186,7 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
 
   return (
     <div css={Css.dif.flexColumn.$}>
-      {label && <Label labelProps={labelProps} label={label} />}
+      {label && <Label labelProps={labelProps} label={label} {...tid.label} />}
       <div css={Css.dib.$} {...focusProps}>
         <ComboBoxInput
           buttonProps={buttonProps}

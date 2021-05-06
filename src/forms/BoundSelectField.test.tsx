@@ -21,6 +21,12 @@ describe("BoundSelectField", () => {
     const { favoriteSport_errorMsg } = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
     expect(favoriteSport_errorMsg()).toHaveTextContent("Required");
   });
+
+  it("shows the label", async () => {
+    const author = createObjectState(formConfig, { favoriteSport: "s:1" });
+    const { favoriteSport_label } = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
+    expect(favoriteSport_label()).toHaveTextContent("Favorite Sport");
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {

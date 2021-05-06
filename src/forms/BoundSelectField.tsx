@@ -2,6 +2,7 @@ import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import React, { Key } from "react";
 import { HasIdAndName, Optional, SelectField, SelectFieldProps } from "src/components";
+import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type BoundSelectFieldProps<T extends object, V extends Key> = Omit<
@@ -38,7 +39,7 @@ export function BoundSelectField<T extends object, V extends Key>(
     getOptionLabel = (opt: T) => (opt as any).name, // if unset, assume O implements HasName
     onBlur = () => field.blur(),
     onSelect = (value) => field.set(value),
-    label = field.key,
+    label = defaultLabel(field.key),
     ...others
   } = props;
   const testId = useTestIds(props, field.key);
