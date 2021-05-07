@@ -67,6 +67,9 @@ export function SuperDrawer({
   onClickOutside,
   onCloseClick,
   open,
+  onPrevClick,
+  onNextClick,
+  title,
   ...baseProps
 }: SuperDrawerProps) {
   return (
@@ -74,7 +77,7 @@ export function SuperDrawer({
       {open && (
         <motion.div
           key="superDrawer"
-          css={Css.fixed.left0.top0.right0.bottom0.df.justifyEnd.add("backgroundColor", "rgba(36,36,36,0.2)").$}
+          css={Css.fixed.df.justifyEnd.add("backgroundColor", "rgba(36,36,36,0.2)").add("inset", 0).$}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { delay: 0.2 } }}
@@ -91,10 +94,28 @@ export function SuperDrawer({
               x: 1040,
             }}
           >
-            {!errorContent ? (
-              <SuperDrawerBase {...{ ...baseProps, onCloseClick }}>{children}</SuperDrawerBase>
-            ) : (
+            <header css={Css.df.p3.bb.bGray200.df.itemsCenter.justifyBetween.$}>
+              {/* Left */}
+              <div css={Css.xl2Em.gray900.$}>{title}</div>
+              {/* Right */}
+              {!errorContent && (
+                <div css={Css.df.gap3.itemsCenter.$}>
+                  <ButtonGroup
+                    buttons={
+                      [
+                        ...(onPrevClick ? [{ icon: "chevronLeft", onClick: () => onPrevClick() }] : []),
+                        ...(onNextClick ? [{ icon: "chevronRight", onClick: () => onNextClick() }] : []),
+                      ] as ButtonGroupProps["buttons"]
+                    }
+                  />
+                  <IconButton icon="x" onClick={onCloseClick} />
+                </div>
+              )}
+            </header>
+            {errorContent ? (
               <div css={Css.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn.$}>{errorContent}</div>
+            ) : (
+              <SuperDrawerBase {...{ ...baseProps, onCloseClick }}>{children}</SuperDrawerBase>
             )}
           </motion.div>
         </motion.div>
@@ -104,9 +125,6 @@ export function SuperDrawer({
 }
 
 function SuperDrawerBase({
-  title,
-  onPrevClick,
-  onNextClick,
   onCloseClick,
   childContent,
   children,
@@ -116,31 +134,11 @@ function SuperDrawerBase({
   primaryDisabled,
   primaryLabel,
   onSubmitClick,
-}: Omit<SuperDrawerProps, "onClickOutside" | "open" | "errorContent">) {
+}: Omit<SuperDrawerProps, "onClickOutside" | "open" | "errorContent" | "onPrevClick" | "onNextClick" | "title">) {
   return (
     <>
-      <header css={Css.df.p3.bb.bGray200.df.itemsCenter.justifyBetween.$}>
-        {/* Left */}
-        <div css={Css.xl2Em.gray900.$}>{title}</div>
-        {/* Right */}
-        <div css={Css.df.gap4.itemsCenter.$}>
-          <ButtonGroup
-            buttons={
-              [
-                ...(onPrevClick ? [{ icon: "chevronLeft", onClick: () => onPrevClick() }] : []),
-                ...(onNextClick ? [{ icon: "chevronRight", onClick: () => onNextClick() }] : []),
-              ] as ButtonGroupProps["buttons"]
-            }
-          />
-          <IconButton icon="x" onClick={onCloseClick} />
-        </div>
-      </header>
-      {!childContent ? (
-        <motion.div css={Css.p3.fg1.$} style={{ overflow: "auto" }}>
-          {children}
-        </motion.div>
-      ) : (
-        <motion.div css={Css.p3.fg1.$} animate={{ overflow: "auto" }} transition={{ overflow: { delay: 0.3 } }}>
+      {childContent ? (
+        <motion.div css={Css.p3.pt2.fg1.$} animate={{ overflow: "auto" }} transition={{ overflow: { delay: 0.3 } }}>
           <Button
             label="Back"
             icon="chevronLeft"
@@ -162,9 +160,14 @@ function SuperDrawerBase({
               },
             }}
             exit={{ x: 1040, opacity: 0 }}
+            css={Css.pt2.$}
           >
             {childContent}
           </motion.div>
+        </motion.div>
+      ) : (
+        <motion.div css={Css.p3.fg1.$} style={{ overflow: "auto" }}>
+          {children}
         </motion.div>
       )}
 

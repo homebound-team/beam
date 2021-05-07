@@ -38,7 +38,7 @@ export function WithChildContent(args: SuperDrawerProps) {
         }
         onChildContentBackClick={() => setShowChildContent(false)}
       >
-        <SuperDrawerContent />
+        <SuperDrawerContent onClick={() => setShowChildContent(true)} />
       </SuperDrawerComponent>
     </div>
   );
