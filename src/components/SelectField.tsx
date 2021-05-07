@@ -15,6 +15,7 @@ import {
   useOverlay,
   useOverlayPosition,
 } from "react-aria";
+import { ErrorMessage } from "src/components/ErrorMessage";
 import { Icon } from "src/components/Icon";
 import { Label } from "src/components/Label";
 import { Css, Palette, px } from "src/Css";
@@ -315,16 +316,7 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
         )}
       </div>
 
-      {errorMsg && (
-        <div id={errorMessageId} css={Css.red600.sm.df.w(px(fieldWidth)).mtPx(4).$}>
-          <span css={Css.fs0.$}>
-            <Icon icon="error" color={Palette.Red600} />
-          </span>
-          <span css={Css.ml1.mtPx(2).$} {...tid.errorMsg}>
-            {errorMsg}
-          </span>
-        </div>
-      )}
+      <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />
     </Fragment>
   );
 }

@@ -8,4 +8,5 @@ module.exports = {
     config.resolve.modules.push(__dirname, "./");
     return config;
   },
+  reactOptions: { fastRefresh: true, strictMode: true },
 };

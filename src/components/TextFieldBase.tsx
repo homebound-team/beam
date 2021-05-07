@@ -1,8 +1,8 @@
 import { mergeProps } from "@react-aria/utils";
 import React, { InputHTMLAttributes, LabelHTMLAttributes, MutableRefObject, TextareaHTMLAttributes } from "react";
-import { Icon } from "src/components/Icon";
+import { ErrorMessage } from "src/components/ErrorMessage";
 import { Label } from "src/components/Label";
-import { Css, Palette, px } from "src/Css";
+import { Css, px } from "src/Css";
 import { BeamTextFieldProps } from "src/interfaces";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -58,16 +58,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         }}
         {...tid}
       />
-      {errorMsg && (
-        <div id={errorMessageId} css={Css.red600.sm.df.mtPx(4).$}>
-          <span css={Css.fs0.$}>
-            <Icon icon="error" color={Palette.Red600} />
-          </span>
-          <span css={Css.ml1.mtPx(2).$} {...tid.errorMsg}>
-            {errorMsg}
-          </span>
-        </div>
-      )}
+      <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />
     </div>
   );
 }
