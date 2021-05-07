@@ -1,8 +1,12 @@
 import { matchers } from "@emotion/jest";
 import "@testing-library/jest-dom";
+import { configure } from "mobx";
 
 beforeEach(() => jest.useFakeTimers("modern"));
 afterEach(() => jest.useRealTimers());
+
+// formState doesn't use actions
+configure({ enforceActions: "never" });
 
 // Use deterministic ids. Note that `@react-aria/utils` / `useId` goes through this useSSRSafeId.
 jest.mock("@react-aria/ssr", () => {

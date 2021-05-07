@@ -4,8 +4,9 @@ import { useRef } from "react";
 import { useCheckboxGroupItem } from "react-aria";
 import { CheckboxBase } from "src/components";
 import { Css } from "src/Css";
+import { useTestIds } from "src/utils/useTestIds";
 
-interface CheckboxGroupItemOption {
+export interface CheckboxGroupItemOption {
   /** Additional text displayed below label */
   description?: string;
   disabled?: boolean;
@@ -14,7 +15,7 @@ interface CheckboxGroupItemOption {
   value: string;
 }
 
-interface CheckboxGroupProps {
+export interface CheckboxGroupProps {
   label: string;
   /** Called when a checkbox is selected or deselected */
   onChange: (values: string[]) => void;
@@ -29,10 +30,11 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
 
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
+  const tid = useTestIds(props);
 
   return (
-    <div {...groupProps}>
-      <div {...labelProps} css={Css.gray700.pbPx(4).sm.$}>
+    <div {...groupProps} {...tid}>
+      <div {...labelProps} css={Css.gray700.pbPx(4).sm.$} {...tid.label}>
         {label}
       </div>
       <div css={Css.dg.gap2.$}>

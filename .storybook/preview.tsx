@@ -1,5 +1,9 @@
 import { Parameters, StoryFn } from "@storybook/addons";
+import { configure } from "mobx";
 import { CssReset } from "../src";
+
+// formState doesn't use actions
+configure({ enforceActions: "never" });
 
 // https://storybook.js.org/docs/react/writing-stories/parameters#global-parameters
 export const parameters: Parameters = {

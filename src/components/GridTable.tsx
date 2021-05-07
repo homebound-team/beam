@@ -10,6 +10,20 @@ import tinycolor from "tinycolor2";
 /** A helper for making `Row` type aliases of simple/flat tables that are just header + data. */
 export type SimpleHeaderAndDataOf<T> = { kind: "header" } | ({ kind: "data" } & T);
 
+/**
+ * A helper for making `Row` type aliases of simple/flat tables that are just header + data.
+ *
+ * Unlike `SimpleHeaderAndDataOf`, we keep `T` in a separate `data`, which is useful
+ * when rows are mobx proxies and we need proxy accesses to happen within the column
+ * rendering.
+ */
+export type SimpleHeaderAndDataWith<T> =
+  | { kind: "header" }
+  // We put `id` here so that GridColumn can match against `extends { data, id }`,
+  // kinda looks like we should combine Row and GridDataRow, i.e. Rows always have ids,
+  // they already have kinds, and need to have ids when passed to rows anyway...
+  | { kind: "data"; data: T; id: string };
+
 /** A const for a marker header row. */
 export const simpleHeader = { kind: "header" as const, id: "header" };
 
@@ -18,6 +32,14 @@ export function simpleRows<T extends { id: string }, R extends { kind: "header" 
 ): GridDataRow<R>[] {
   // @ts-ignore Not sure why this doesn't type-check, something esoteric with the DiscriminateUnion type
   return [simpleHeader, ...data.map((c) => ({ kind: "data" as const, ...c }))];
+}
+
+/** Like `simpleRows` but for `SimpleHeaderAndDataWith`. */
+export function simpleDataRows<T extends { id: string }, R extends { kind: "header" | "data" }>(
+  data: T[],
+): GridDataRow<R>[] {
+  // @ts-ignore Not sure why this doesn't type-check, something esoteric with the DiscriminateUnion type
+  return [simpleHeader, ...data.map((data) => ({ kind: "data" as const, data }))];
 }
 
 // function createSimpleHeaderAndRows<D extends { id: string }>(
@@ -309,7 +331,11 @@ type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<
 
 /** Defines how a single column will render each given row `kind` in `R`. */
 export type GridColumn<R extends Kinded, S = {}> = {
-  [P in R["kind"]]: string | ((row: DiscriminateUnion<R, "kind", P>) => ReactNode | GridCellContent);
+  [P in R["kind"]]:
+    | string
+    | (DiscriminateUnion<R, "kind", P> extends { data: infer D; id: infer I }
+        ? (data: D, id: I) => ReactNode | GridCellContent
+        : (row: DiscriminateUnion<R, "kind", P>) => ReactNode | GridCellContent);
 } & {
   /** The column's grid column width, defaults to `auto`. */
   w?: number | string;
@@ -517,7 +543,16 @@ function isContentAndSettings(content: ReactNode | GridCellContent): content is 
 function applyRowFn<R extends Kinded>(column: GridColumn<R>, row: GridDataRow<R>): ReactNode | GridCellContent {
   // Usually this is a function to apply against the row, but sometimes it's a hard-coded value, i.e. for headers
   const maybeContent = column[row.kind];
-  return typeof maybeContent === "function" ? (maybeContent as Function)(row) : maybeContent;
+  if (typeof maybeContent === "function") {
+    if ("data" in row && "id" in row) {
+      // Auto-destructure data
+      return (maybeContent as Function)((row as any)["data"], (row as any)["id"]);
+    } else {
+      return (maybeContent as Function)(row);
+    }
+  } else {
+    return maybeContent;
+  }
 }
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */

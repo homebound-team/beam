@@ -5,9 +5,9 @@ interface LabelProps {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   label: string;
 }
-export function Label({ labelProps, label }: LabelProps) {
+export function Label({ labelProps, label, ...others }: LabelProps) {
   return (
-    <label {...labelProps} css={Css.sm.gray700.mbPx(4).$}>
+    <label {...labelProps} {...others} css={Css.sm.gray700.mbPx(4).$}>
       {label}
     </label>
   );

@@ -8,6 +8,7 @@ import {
   matchesFilter,
   simpleHeader,
   SimpleHeaderAndDataOf,
+  SimpleHeaderAndDataWith,
 } from "src/components/GridTable";
 import { Css, Palette } from "src/Css";
 import { cell, click, render, row } from "src/utils/rtl";
@@ -82,6 +83,25 @@ describe("GridTable", () => {
     expect(cell(r, 0, 1)).toHaveStyleRule("justify-content", "flex-end");
     // And also the override of center aligned
     expect(cell(r, 1, 1)).toHaveStyleRule("justify-content", "center");
+  });
+
+  it("unwraps rows with a data key", async () => {
+    // Given a column using the `With` type
+    type Row = SimpleHeaderAndDataWith<Data>;
+    const valueColumn: GridColumn<Row> = {
+      header: "Value",
+      // Then we can destructure directly against data
+      data: ({ value }) => value,
+    };
+    const rows: GridDataRow<Row>[] = [
+      { kind: "header", id: "header" },
+      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+    ];
+    // And it's rendered correctly
+    const r = await render(<GridTable columns={[valueColumn]} rows={rows} />);
+    expect(cell(r, 1, 0)).toHaveTextContent("1");
+    expect(cell(r, 2, 0)).toHaveTextContent("2");
   });
 
   it("can have per-row styles", async () => {
