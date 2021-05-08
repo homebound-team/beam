@@ -11,7 +11,7 @@ import { useTestIds } from "src/utils/useTestIds";
 // exported for testing purposes
 export interface NumberFieldProps {
   label?: string;
-  type?: "cents" | "percent";
+  type?: "cents" | "percent" | "basisPoints";
   value: number;
   onChange: (value: number) => void;
   compact?: boolean;
@@ -34,11 +34,15 @@ export function NumberField(props: NumberFieldProps) {
     onChange,
   } = props;
 
+  const factor = type === "percent" || type === "cents" ? 100 : type === "basisPoints" ? 10_000 : 1;
+
   // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
   // see: https://github.com/adobe/react-spectrum/issues/1893.
   const formatOptions: Intl.NumberFormatOptions | undefined = useMemo(() => {
     return type === "percent"
       ? { style: "percent" }
+      : type === "basisPoints"
+      ? { style: "percent", minimumFractionDigits: 2 }
       : type === "cents"
       ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
       : undefined;
@@ -49,11 +53,9 @@ export function NumberField(props: NumberFieldProps) {
   const useProps: NumberFieldStateProps = {
     locale,
     // We want percents && cents to be integers, useNumberFieldState excepts them as decimals
-    value: type === "percent" || type === "cents" ? value / 100 : value,
-    onChange: (value: number) => {
-      // Reverse the integer/decimal conversion
-      onChange(type === "percent" || type === "cents" ? Math.round(value * 100) : value);
-    },
+    value: value / factor,
+    // Reverse the integer/decimal conversion
+    onChange: (value) => onChange(factor !== 1 ? Math.round(value * factor) : value),
     validationState: errorMsg !== undefined ? "invalid" : "valid",
     label: label ?? "number",
     formatOptions,

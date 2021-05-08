@@ -22,6 +22,15 @@ describe("NumberFieldTest", () => {
     expect(lastSet).toEqual(14);
   });
 
+  it("can set a basis points value", async () => {
+    const r = await render(<TestNumberField label="Margin" type="basisPoints" value={1234} />);
+    expect(r.margin()).toHaveValue("12.34%");
+    type(r.margin, "23.45");
+    fireEvent.blur(r.margin());
+    expect(r.margin()).toHaveValue("23.45%");
+    expect(lastSet).toEqual(2345);
+  });
+
   it("can set cents as dollars", async () => {
     const r = await render(<TestNumberField label="Cost" type="cents" value={1200} />);
     expect(r.cost()).toHaveValue("$12.00");
