@@ -39,9 +39,7 @@ export function TextFields() {
         <br />
         <TestNumberField label="Cents" type="cents" value={1000} />
         <br />
-        <TestNumberField label="Age" value={1000} disabled />
-        <br />
-        <ValidationNumberField value={-1} />
+        <TestNumberField label="Margin" type="basisPoints" value={1275} />
       </div>
     </div>
   );
