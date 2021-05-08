@@ -1,7 +1,7 @@
 import { useNumberField } from "@react-aria/numberfield";
 import { mergeProps } from "@react-aria/utils";
 import { NumberFieldStateProps, useNumberFieldState } from "@react-stately/numberfield";
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import { useLocale } from "react-aria";
 import { ErrorMessage } from "src/components/ErrorMessage";
 import { Label } from "src/components/Label";
@@ -34,19 +34,26 @@ export function NumberField(props: NumberFieldProps) {
     onChange,
   } = props;
 
-  const formatOptions: Intl.NumberFormatOptions | undefined =
-    type === "percent"
+  // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
+  // see: https://github.com/adobe/react-spectrum/issues/1893.
+  const formatOptions: Intl.NumberFormatOptions | undefined = useMemo(() => {
+    return type === "percent"
       ? { style: "percent" }
       : type === "cents"
       ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
       : undefined;
+  }, [type]);
 
   const { locale } = useLocale();
   // We can use this for both useNumberFieldState + useNumberField
   const useProps: NumberFieldStateProps = {
     locale,
-    value,
-    onChange,
+    // We want percents && cents to be integers, useNumberFieldState excepts them as decimals
+    value: type === "percent" || type === "cents" ? value / 100 : value,
+    onChange: (value: number) => {
+      // Reverse the integer/decimal conversion
+      onChange(type === "percent" || type === "cents" ? Math.round(value * 100) : value);
+    },
     validationState: errorMsg !== undefined ? "invalid" : "valid",
     label: label ?? "number",
     formatOptions,
@@ -64,7 +71,7 @@ export function NumberField(props: NumberFieldProps) {
     <div css={Css.df.flexColumn.wPx(width).$} {...groupProps}>
       {label && <Label labelProps={labelProps} label={label} />}
       <input
-        {...mergeProps(inputProps)}
+        {...mergeProps(inputProps, { onBlur })}
         {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
         ref={inputRef}
         css={{
