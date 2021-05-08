@@ -27,8 +27,13 @@
  * - `lastName_errors`
  * - etc
  */
+import { defaultTestId } from "src/utils/defaultTestId";
+
 export function useTestIds(props: object, defaultPrefix?: string): Record<string, object> {
-  const prefix: string | undefined = (props as any)["data-testid"] || defaultPrefix;
+  const prefix: string | undefined =
+    (props as any)["data-testid"] ||
+    // Pass defaultPrefix through defaultTestId to allow `useTestIds(..., label)` usage
+    (defaultPrefix ? defaultTestId(defaultPrefix) : undefined);
   const rootId = { "data-testid": prefix };
   return newMethodMissingProxy(rootId, (key) => {
     return { "data-testid": prefix ? `${prefix}_${key}` : key };
