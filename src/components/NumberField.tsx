@@ -65,7 +65,7 @@ export function NumberField(props: NumberFieldProps) {
   const errorMessageId = `${inputProps.id}-error`;
   const tid = useTestIds(props, label);
 
-  const width = 320;
+  const width = compact ? 248 : 320;
 
   return (
     <div css={Css.df.flexColumn.wPx(width).$} {...groupProps}>
@@ -76,7 +76,7 @@ export function NumberField(props: NumberFieldProps) {
         ref={inputRef}
         css={{
           ...Css.add("resize", "none")
-            .bgWhite.wPx(width)
+            .tr.bgWhite.wPx(width)
             .sm.px1.hPx(40)
             .gray900.br4.outline0.ba.bGray300.if(compact)
             .hPx(32).$,
