@@ -14,9 +14,9 @@ import { Css, Palette } from "src/Css";
 const format = "MM/dd/yy";
 
 export interface DatePickerProps {
+  value: Date;
+  onChange: (value: Date) => void;
   label?: string;
-  value?: Date;
-  onChange?: (value: Date) => void;
   /** Called when the component loses focus, mostly for BoundDatePicker to use. */
   onBlur?: () => void;
   disabled?: boolean;
