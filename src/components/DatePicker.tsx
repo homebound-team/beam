@@ -49,13 +49,19 @@ export function DatePicker(props: DatePickerProps) {
         },
         // Highlight on focus
         "& .DayPickerInput input:focus-within": Css.bLightBlue700.$,
-        // Make the boxes smaller, this ends up being 32x32 which makes figma
-        "& .DayPicker-Day": Css.pPx(8).xs.$,
-        "& .DayPicker-Day:hover": Css.bgColor("inherit").important.$,
         // The S / M / T / W ... heading
         "& .DayPicker-Weekday": Css.pPx(8).xs.gray400.important.$,
-        "& .DayPickerInput .DayPicker-Day--selected": Css.color("inherit").bgGray200.br4.important.$,
-        // Render over the calendar icon
+        // Un-collapse the borders so we can hover each cell
+        "& .DayPicker-Month": Css.add({ borderCollapse: "separate" }).$,
+        // Make the boxes smaller, this ends up being 32x32 which matches figma
+        "& .DayPicker-Day": Css.pPx(8).xs.ba.bWhite.$,
+        // Instead of a blue circle, use a border
+        "& .DayPicker-Day:hover": Css.ba.bLightBlue700.br4.$,
+        // For selected, use a background
+        "& .DayPicker-Day--selected": Css.bgGray200.br4.$,
+        // For today, use a background
+        "& .DayPicker-Day--today": Css.bgGray100.br4.$,
+        // Render over our calendar icon decoration in InputElement
         "& .DayPickerInput-Overlay": Css.z2.$,
       }}
     >

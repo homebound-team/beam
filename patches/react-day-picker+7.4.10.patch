@@ -1,0 +1,39 @@
+diff --git a/node_modules/react-day-picker/lib/style.css b/node_modules/react-day-picker/lib/style.css
+index 48e205b..2a5ea92 100644
+--- a/node_modules/react-day-picker/lib/style.css
++++ b/node_modules/react-day-picker/lib/style.css
+@@ -162,11 +162,6 @@
+ 
+ /* Default modifiers */
+ 
+-.DayPicker-Day--today {
+-  color: #D0021B;
+-  font-weight: 700;
+-}
+-
+ .DayPicker-Day--outside {
+   color: #8B9898;
+   cursor: default;
+@@ -188,22 +183,6 @@
+   color: #DCE0E0;
+ }
+ 
+-.DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside) {
+-  position: relative;
+-
+-  background-color: #4A90E2;
+-  color: #F0F8FF;
+-}
+-
+-.DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside):hover {
+-  background-color: #51A0FA;
+-}
+-
+-.DayPicker:not(.DayPicker--interactionDisabled)
+-  .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--selected):not(.DayPicker-Day--outside):hover {
+-  background-color: #F0F8FF;
+-}
+-
+ /* DayPickerInput */
+ 
+ .DayPickerInput {

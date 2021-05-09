@@ -28,7 +28,8 @@
     "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
     "storybook": "start-storybook -p 9000",
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded",
-    "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\""
+    "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\"",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@react-aria/combobox": "3.0.0-beta.1",
