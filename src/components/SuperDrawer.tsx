@@ -24,20 +24,20 @@ interface SuperDrawerHeaderProps {
   onClose?: () => void;
 }
 
-interface SuperDrawerContentProps extends SuperDrawerHeaderProps {
+interface SuperDrawerSetContentProps extends SuperDrawerHeaderProps {
   content: ReactNode;
 }
 // When adding childContent, a new title can be chosen
-interface SuperDrawerChildContentProps extends Pick<SuperDrawerHeaderProps, "title"> {
+interface SuperDrawerAddChildContentProps extends Pick<SuperDrawerHeaderProps, "title"> {
   content: ReactNode;
 }
 
 // Actions that can be performed to SuperDrawer
 interface SuperDrawerContextActions {
-  setContent: (content: SuperDrawerContentProps) => void;
+  setContent: (content: SuperDrawerSetContentProps) => void;
   // TODO: Potential alternative name could be `closeSuperDrawer`
   removeContent: () => void;
-  addChildContent: (childContent: SuperDrawerChildContentProps) => void;
+  addChildContent: (childContent: SuperDrawerAddChildContentProps) => void;
   removeChildContent: () => void;
 }
 
@@ -99,6 +99,7 @@ export function SuperDrawerProvider({ children }: SuperDrawerProviderProps) {
 
         setTitleStack([]);
         setContent(null);
+        setChildContentStack([]);
       },
       // Add child content of the SuperDrawer
       addChildContent: ({ title: newTitle, content: childContent }) => {
@@ -148,15 +149,14 @@ interface SuperDrawerContentProps {
  */
 export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProps) => (
   <>
-    {/* TODO: Maybe we should include a header  */}
     <motion.div css={Css.p3.fg1.$} style={{ overflow: "auto" }}>
       {children}
     </motion.div>
     {/* Render footer section with row of given footer buttons */}
     <footer css={Css.bt.bGray200.p3.df.itemsCenter.justifyEnd.$}>
       <div css={Css.df.gap1.$}>
-        {actions.map((buttonProps) => (
-          <Button {...buttonProps} />
+        {actions.map((buttonProps, i) => (
+          <Button key={i} {...buttonProps} />
         ))}
       </div>
     </footer>
@@ -181,7 +181,7 @@ export function SuperDrawer() {
 
   function handleOnClose() {
     if (onClose) return onClose();
-    return removeContent;
+    return removeContent();
   }
 
   return (
@@ -203,7 +203,7 @@ export function SuperDrawer() {
         >
           <motion.div
             key="superDrawerContainer"
-            css={Css.bgWhite.h100.maxw(px(1040)).df.flexColumn.$}
+            css={Css.bgWhite.h100.maxw(px(1040)).w100.df.flexColumn.$}
             // Keeping initial x to 1040 as this will still work if the container is smaller
             initial={{ x: 1040 }}
             animate={{ x: 0 }}
@@ -233,7 +233,10 @@ export function SuperDrawer() {
               <div css={Css.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn.$}>{errorContent}</div>
             ) : childContent ? (
               <>
-                <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={() => removeChildContent()} />
+                {/* Negative margin is used to bring the childContent closer to the button to match design */}
+                <div css={Css.px3.pt2.mbPx(-8).$}>
+                  <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={() => removeChildContent()} />
+                </div>
                 {childContent}
               </>
             ) : (
