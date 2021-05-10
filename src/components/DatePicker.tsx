@@ -56,7 +56,7 @@ export function DatePicker(props: DatePickerProps) {
         // Make the boxes smaller, this ends up being 32x32 which matches figma
         "& .DayPicker-Day": Css.pPx(8).xs.ba.bWhite.$,
         // Instead of a blue circle, use a border
-        "& .DayPicker-Day:hover": Css.ba.bLightBlue700.br4.$,
+        "& .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside):hover": Css.ba.bLightBlue700.br4.$,
         // For selected, use a background
         "& .DayPicker-Day--selected": Css.bgGray200.br4.$,
         // For today, use a background
