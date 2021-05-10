@@ -19,6 +19,11 @@ export default {
   title: "Components / Super Drawer",
   component: SuperDrawerComponent,
   decorators: [withSuperDrawer],
+  parameters: {
+    chromatic: {
+      delay: 1000,
+    },
+  },
 } as Meta;
 
 export function Open() {
