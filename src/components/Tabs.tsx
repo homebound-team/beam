@@ -1,4 +1,4 @@
-import { HTMLAttributes, KeyboardEvent, ReactNode, useMemo, useRef } from "react";
+import { HTMLAttributes, KeyboardEvent, ReactNode, useMemo, useRef, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
@@ -14,23 +14,37 @@ export interface Tab {
 }
 
 interface TabsProps {
-  selected: string;
-  onChange: (value: string) => void;
   ariaLabel?: string;
+  // the selected tab is connected to the contents displayed
+  selected: string;
   tabs: Tab[];
+  onChange: (value: string) => void;
 }
 
-export function Tabs(props: TabsProps) {
+function Tabs(props: TabsProps) {
   const { ariaLabel, onChange, selected, tabs, ...others } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
   const testIds = useTestIds(others, "tabs");
+  const [active, setActive] = useState(selected);
 
+  // the active tab is highlighted, but not necessarily "selected"
+  // the selected tab dictates what is displayed in the content panel
   function handleKeyUp(e: KeyboardEvent) {
-    // switches tabs on left and right arrow key down events
+    // left and right arrow keys update the active tab
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-      const nextTabValue = getNextTabValue(selected, e.key, tabs);
-      onChange(nextTabValue);
+      const nextTabValue = getNextTabValue(active, e.key, tabs);
+      setActive(nextTabValue);
     }
+    // hitting enter will select the active tab and display the related contents
+    if (e.key === "Enter") {
+      onChange(active);
+    }
+  }
+
+  // clicking on a tab sets it to selected and active
+  function handleOnClick(value: string) {
+    onChange(value);
+    setActive(value);
   }
 
   return (
@@ -41,14 +55,14 @@ export function Tabs(props: TabsProps) {
 
         return (
           <SingleTab
-            active={selected === value}
-            isFocusVisible={isFocusVisible}
+            active={active === value}
             disabled={disabled}
             focusProps={focusProps}
             icon={icon}
+            isFocusVisible={isFocusVisible}
             key={value}
             label={name}
-            onChange={onChange}
+            onClick={handleOnClick}
             onKeyUp={handleKeyUp}
             value={value}
             {...testId}
@@ -80,13 +94,13 @@ export function TabsWithContent(props: TabsProps) {
 }
 
 interface TabProps extends BeamFocusableProps {
-  /** active indicates the user is on the current tab */
+  /** active indicates the current tab is highlighted */
   active: boolean;
   disabled: boolean;
   label: string;
   icon?: keyof typeof Icons;
   value: string;
-  onChange: (value: string) => void;
+  onClick: (value: string) => void;
   onKeyUp: (e: KeyboardEvent) => void;
   focusProps: HTMLAttributes<HTMLElement>;
   isFocusVisible: boolean;
@@ -97,7 +111,7 @@ function SingleTab(props: TabProps) {
     disabled: isDisabled,
     label,
     value,
-    onChange,
+    onClick,
     active = false,
     icon = false,
     onKeyUp,
@@ -118,7 +132,7 @@ function SingleTab(props: TabProps) {
       aria-selected={active}
       aria-disabled={isDisabled || undefined}
       id={`${value}-tab`}
-      onClick={() => onChange(value)}
+      onClick={() => onClick(value)}
       onKeyUp={onKeyUp}
       ref={ref}
       role="tab"

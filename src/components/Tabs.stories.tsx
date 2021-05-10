@@ -39,21 +39,21 @@ function getChildren(label: string) {
 }
 
 export const Tabs = () => {
-  const [activeTab1, setActiveTab1] = useState("tab1");
-  const [activeTab2, setActiveTab2] = useState("tab1");
+  const [selectedTab1, setSelectedTab1] = useState("tab1");
+  const [selectedTab2, setSelectedTab2] = useState("tab1");
 
   return (
     <div css={Css.df.flexColumn.childGap3.$}>
       <div css={Css.df.flexColumn.childGap1.$}>
         <h3>Tabs</h3>
-        <TabsWithContent tabs={testTabs} onChange={setActiveTab1} selected={activeTab1} ariaLabel="Sample Tabs" />
+        <TabsWithContent tabs={testTabs} onChange={setSelectedTab1} selected={selectedTab1} ariaLabel="Sample Tabs" />
       </div>
       <div css={Css.df.flexColumn.childGap1.$}>
         <h3>Tabs with icons</h3>
         <TabsWithContent
           tabs={tabsWithIconsAndContent}
-          onChange={setActiveTab2}
-          selected={activeTab2}
+          onChange={setSelectedTab2}
+          selected={selectedTab2}
           ariaLabel="Sample Tabs With Content"
         />
       </div>
