@@ -219,7 +219,7 @@ export const SuperDrawerContent = ({ children, actions, type = "content" }: Supe
       <ContentWrapper>{children}</ContentWrapper>
       {/* Render footer section with row of given footer buttons */}
       <footer css={Css.bt.bGray200.p3.df.itemsCenter.justifyEnd.$}>
-        <div css={Css.df.gap1.$}>
+        <div css={Css.df.childGap1.$}>
           {actions.map((buttonProps, i) => (
             <Button key={i} {...buttonProps} />
           ))}
@@ -283,7 +283,7 @@ export function SuperDrawer() {
               {/* Right */}
               {!errorContent && (
                 // Forcing height to 32px to match title height
-                <div css={Css.df.gap3.itemsCenter.hPx(32).$}>
+                <div css={Css.df.childGap3.itemsCenter.hPx(32).$}>
                   {/* Disable buttons is handlers are not given or if childContent is shown */}
                   <ButtonGroup
                     buttons={[
