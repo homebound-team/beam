@@ -25,7 +25,7 @@ export default {
  * render of the SuperDrawer with a chosen component (so it can give it the
  * appropriate props) and the unmount can be controlled via the chosen component.
  */
-export function Open() {
+export function Basic() {
   const { setContent } = useSuperDrawer();
 
   return (
@@ -36,7 +36,6 @@ export function Open() {
         onClick={() =>
           setContent({
             title: "Content Title",
-            // TODO: Here we can pass props!
             content: <SuperDrawerExampleContent />,
           })
         }
@@ -44,6 +43,72 @@ export function Open() {
     </>
   );
 }
+
+// type Data = { title: string; titleDescription: string; author: string; authorDescription: string };
+// type Row = SimpleHeaderAndDataOf<Data>;
+
+// // Faux DB
+// const Books = [
+//   {
+//     title: "Atomic Habits",
+//     titleDescription:
+//       "A revolutionary system to get 1 per cent better every day. People think when you want to change your life, you need to think big. But world-renowned habits expert James Clear has discovered another way. He knows that real change comes from the compound effect of hundreds of small decisions - doing two push-ups a day, waking up five minutes earlier, or reading just one more page. He calls them atomic habits.",
+//     author: "James Clear",
+//     authorDescription:
+//       "James Clear's work has appeared in the New York Times, Time, and Entrepreneur, and on CBS This Morning, and is taught in colleges around the world. His website, jamesclear.com, receives millions of visitors each month, and hundreds of thousands subscribe to his email newsletter. He is the creator of The Habits Academy, the premier training platform for organizations and individuals that are interested in building better habits in life and work. ",
+//   },
+//   {
+//     title: "Show Your Work!",
+//     titleDescription:
+//       "In his New York Times bestseller Steal Like an Artist, Austin Kleon showed readers how to unlock their creativity by “stealing” from the community of other movers and shakers. Now, in an even more forward-thinking and necessary book, he shows how to take that critical next step on a creative journey—getting known. Show Your Work! is about why generosity trumps genius. It’s about getting findable, about using the network instead of wasting time “networking.” It’s not self-promotion, it’s self-discovery—let others into your process, then let them steal from you. Filled with illustrations, quotes, stories, and examples, Show Your Work! offers ten transformative rules for being open, generous, brave, productive.",
+//     author: "Austin Kleon",
+//     authorDescription:
+//       "Austin Kleon is a writer who draws. He is the author of the New York Times bestsellers Steal Like an Artist and Show Your Work! His work has been featured on NPR’s Morning Edition, PBS Newshour, and in the New York Times and Wall Street Journal. He also speaks frequently about creativity in the digital age for such organizations as Pixar, Google, SXSW, TEDx, and The Economist. He lives in Austin, Texas, and online at austinkleon.com.",
+//   },
+//   {
+//     title: "The First Cell",
+//     titleDescription:
+//       "In The First Cell, Azra Raza offers a searing account of how both medicine and our society (mis)treats cancer, how we can do better, and why we must. A lyrical journey from hope to despair and back again, The First Cell explores cancer from every angle: medical, scientific, cultural, and personal. Indeed, Raza describes how she bore the terrible burden of being her own husband's oncologist as he succumbed to leukemia. Like When Breath Becomes Air, The First Cell is no ordinary book of medicine, but a book of wisdom and grace by an author who has devoted her life to making the unbearable easier to bear.",
+//     author: "Azra Raza",
+//     authorDescription:
+//       "Azra Raza is the Chan Soon-Shiong professor of medicine and the director of the MDS Center at Columbia University. In addition to publishing widely in basic and clinical cancer research, Raza is also the coeditor of the highly acclaimed website 3QuarksDaily.com. She lives in New York City.",
+//   },
+// ];
+
+// export function WithTable() {
+//   const { setContent } = useSuperDrawer();
+
+//   // GridTable setup
+//   const titleColumn: GridColumn<Row> = { header: "Title", data: ({ title }) => title };
+//   const authorColumn: GridColumn<Row> = { header: "Author", data: ({ author }) => author };
+//   const rowStyles: GridRowStyles<Row> = {
+//     // Example of triggering the drawer when clicking on a row
+//     data: {
+//       indent: "2",
+//       onClick: (row) => setContent(<SuperDrawerExampleContent />),
+//     },
+//     header: {},
+//   };
+
+//   return (
+//     <div>
+//       <h1 css={Css.xl3Em.mb5.$}>Books</h1>
+//       <p css={Css.base.mb3.$}>List of books from various authors</p>
+//       <GridTable<Row> as="table" columns={[titleColumn, authorColumn]} rowStyles={rowStyles} rows={Books} />
+//       <SuperDrawerComponent
+//         open={!!DrawerContent}
+//         title="Table Item Header"
+//         onCloseClick={handleClose}
+//         onSubmitClick={handleSubmit}
+//         onChildContentBackClick={() => setChildDrawerContent(null)}
+//         childContent={ChildDrawerContent}
+//         errorContent={ErrorDrawerContent}
+//       >
+//         {/* {DrawerContent} */}
+//       </SuperDrawerComponent>
+//     </div>
+//   );
+// }
 
 // export function WithChildContent(args: SuperDrawerProps) {
 //   const [showChildContent, setShowChildContent] = useState(false);
@@ -207,9 +272,10 @@ function SuperDrawerExampleChildContent() {
   return (
     <SuperDrawerContent
       actions={[
-        { label: "Cancel", onClick: handleCancel, variant: "tertiary" },
-        { label: "Submit", onClick: handleSubmit },
+        { label: "Child Cancel", onClick: handleCancel, variant: "tertiary" },
+        { label: "Child Submit", onClick: handleSubmit },
       ]}
+      type="childContent"
     >
       <div css={Css.hPx(500).bgGray100.df.itemsCenter.justifyCenter.$}>
         <p>This is child content insider the SuperDrawer</p>
@@ -218,28 +284,19 @@ function SuperDrawerExampleChildContent() {
   );
 }
 
-// const SuperDrawerContent = ({ onClick }: { onClick?: () => void }) => (
+/** Example component to render as a child of the SuperDrawer content  */
+// const SuperDrawerChildContent = () => (
 //   <div css={Css.hPx(500).bgGray100.df.itemsCenter.justifyCenter.$}>
-//     <div css={Css.df.flexColumn.itemsCenter.$}>
-//       <h1 css={Css.lg.$}>Children</h1>
-//       <Button onClick={onClick} label="Show Child Content"></Button>
-//     </div>
+//     <h1 css={Css.lg.$}>Children</h1>
 //   </div>
 // );
 
-/** Example component to render as a child of the SuperDrawer content  */
-const SuperDrawerChildContent = () => (
-  <div css={Css.hPx(500).bgGray100.df.itemsCenter.justifyCenter.$}>
-    <h1 css={Css.lg.$}>Children</h1>
-  </div>
-);
-
-/** Example component to render as a error/confirmation component of the SuperDrawer content */
-const SuperDrawerErrorContent = ({ onConfirm, onCancel }: { onConfirm?: () => void; onCancel?: () => void }) => (
-  <div css={Css.wPx(400).df.flexColumn.justifyCenter.itemsCenter.tc.$}>
-    <p css={Css.lgEm.$}>Are you sure you want to cancel without saving your changes?</p>
-    <p css={Css.base.mb1.$}>Any changes you've made so far will be lost.</p>
-    <Button label="Continue" onClick={onConfirm} />
-    <Button variant="tertiary" label="Cancel" onClick={onCancel} />
-  </div>
-);
+// /** Example component to render as a error/confirmation component of the SuperDrawer content */
+// const SuperDrawerErrorContent = ({ onConfirm, onCancel }: { onConfirm?: () => void; onCancel?: () => void }) => (
+//   <div css={Css.wPx(400).df.flexColumn.justifyCenter.itemsCenter.tc.$}>
+//     <p css={Css.lgEm.$}>Are you sure you want to cancel without saving your changes?</p>
+//     <p css={Css.base.mb1.$}>Any changes you've made so far will be lost.</p>
+//     <Button label="Continue" onClick={onConfirm} />
+//     <Button variant="tertiary" label="Cancel" onClick={onCancel} />
+//   </div>
+// );
