@@ -117,6 +117,7 @@ export function SuperDrawerProvider({ children }: SuperDrawerProviderProps) {
         setTitleStack([]);
         setContent(null);
         setChildContentStack([]);
+        setErrorContent(null);
       },
       /** Add a child component to the SuperDrawer childContentStack */
       addChildContent: ({ title: newTitle, content: childContent }) => {

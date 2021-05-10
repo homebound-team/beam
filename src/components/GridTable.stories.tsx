@@ -20,8 +20,8 @@ export default {
   title: "Components/GridTable",
 } as Meta;
 
-export type Data = { name: string; value: number };
-export type Row = SimpleHeaderAndDataOf<Data>;
+type Data = { name: string; value: number };
+type Row = SimpleHeaderAndDataOf<Data>;
 
 // Test case
 // Potential algorithm: see k1, scan until the next k1
