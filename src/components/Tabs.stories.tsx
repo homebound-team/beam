@@ -1,19 +1,13 @@
 import { Meta } from "@storybook/react";
 import { Fragment, useState } from "react";
 import { Css } from "src/Css";
-import { Icon, Icons } from "./Icon";
-import { getTabStyles, Tab, Tabs as TabsComponent, TabsWithContent } from "./Tabs";
+import { Icon } from "./Icon";
+import { getTabStyles, Tab, TabsWithContent } from "./Tabs";
 import { TabContent, testTabs } from "./testData";
 
 export default {
   title: "Components/Tabs",
-  component: TabsComponent,
-  args: {
-    label: "Tabs",
-  },
-  argTypes: {
-    icon: { control: { type: "select", options: Object.keys(Icons) } },
-  },
+  component: TabsWithContent,
   parameters: {
     // To better view the icon hover state
     backgrounds: { default: "white" },

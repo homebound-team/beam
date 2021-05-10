@@ -25,7 +25,7 @@ export function Tabs(props: TabsProps) {
   const { isFocusVisible, focusProps } = useFocusRing();
   const testIds = useTestIds(others, "tabs");
 
-  function handleKeyDown(e: KeyboardEvent) {
+  function handleKeyUp(e: KeyboardEvent) {
     // switches tabs on left and right arrow key down events
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       const nextTabValue = getNextTabValue(selected, e.key, tabs);
@@ -49,7 +49,7 @@ export function Tabs(props: TabsProps) {
             key={value}
             label={name}
             onChange={onChange}
-            onKeyDown={handleKeyDown}
+            onKeyUp={handleKeyUp}
             value={value}
             {...testId}
           />
@@ -87,7 +87,7 @@ interface TabProps extends BeamFocusableProps {
   icon?: keyof typeof Icons;
   value: string;
   onChange: (value: string) => void;
-  onKeyDown: (e: KeyboardEvent) => void;
+  onKeyUp: (e: KeyboardEvent) => void;
   focusProps: HTMLAttributes<HTMLElement>;
   isFocusVisible: boolean;
 }
@@ -100,12 +100,12 @@ function SingleTab(props: TabProps) {
     onChange,
     active = false,
     icon = false,
-    onKeyDown,
+    onKeyUp,
     focusProps,
     isFocusVisible = false,
     ...others
   } = props;
-  const ref = useRef<HTMLButtonElement | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
     () => getTabStyles(),
@@ -113,13 +113,13 @@ function SingleTab(props: TabProps) {
   );
 
   return (
-    <button
+    <div
       aria-controls={`${value}-tabPanel`}
       aria-selected={active}
       aria-disabled={isDisabled || undefined}
       id={`${value}-tab`}
       onClick={() => onChange(value)}
-      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
       ref={ref}
       role="tab"
       tabIndex={active ? 0 : -1}
@@ -140,7 +140,7 @@ function SingleTab(props: TabProps) {
           <Icon icon={icon} />
         </span>
       )}
-    </button>
+    </div>
   );
 }
 
