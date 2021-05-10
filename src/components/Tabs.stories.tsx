@@ -2,8 +2,8 @@ import { Meta } from "@storybook/react";
 import { Fragment, useState } from "react";
 import { Css } from "src/Css";
 import { Icon, Icons } from "./Icon";
-import { getTabStyles, Tabs as TabsComponent } from "./Tabs";
-import { testTabs, testTabsWithIcons } from "./testData";
+import { getTabStyles, Tab, Tabs as TabsComponent, TabsWithContent } from "./Tabs";
+import { TabContent, testTabs } from "./testData";
 
 export default {
   title: "Components/Tabs",
@@ -52,12 +52,24 @@ export const Tabs = () => {
     <div css={Css.df.flexColumn.childGap3.$}>
       <div css={Css.df.flexColumn.childGap1.$}>
         <h3>Tabs</h3>
-        <TabsComponent tabs={testTabs} onChange={setActiveTab1} selected={activeTab1} />
+        <TabsWithContent tabs={testTabs} onChange={setActiveTab1} selected={activeTab1} ariaLabel="Sample Tabs" />
       </div>
       <div css={Css.df.flexColumn.childGap1.$}>
         <h3>Tabs with icons</h3>
-        <TabsComponent tabs={testTabsWithIcons} onChange={setActiveTab2} selected={activeTab2} />
+        <TabsWithContent
+          tabs={tabsWithIconsAndContent}
+          onChange={setActiveTab2}
+          selected={activeTab2}
+          ariaLabel="Sample Tabs With Content"
+        />
       </div>
     </div>
   );
 };
+
+const tabsWithIconsAndContent: Tab[] = [
+  { name: "Tab 1", value: "tab1", icon: "camera", render: () => <TabContent title="Tab 1 Content" /> },
+  { name: "Tab 2", value: "tab2", icon: "dollar", render: () => <TabContent title="Tab 2 Content" /> },
+  { name: "Tab 3", value: "tab3", icon: "check", render: () => <TabContent title="Tab 3 Content" /> },
+  { name: "Tab 4", value: "tab4", icon: "plus", render: () => <TabContent title="Tab 4 Content" /> },
+];

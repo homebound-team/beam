@@ -1,4 +1,4 @@
-import { HTMLAttributes, KeyboardEvent, useMemo, useRef } from "react";
+import { HTMLAttributes, KeyboardEvent, ReactNode, useMemo, useRef } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
@@ -10,6 +10,7 @@ export interface Tab {
   value: string;
   icon?: keyof typeof Icons;
   disabled?: boolean;
+  render: () => ReactNode;
 }
 
 interface TabsProps {
@@ -39,22 +40,42 @@ export function Tabs(props: TabsProps) {
         const testId = testIds[i];
 
         return (
-          <TabImpl
-            focusProps={focusProps}
+          <SingleTab
+            active={selected === value}
             isFocusVisible={isFocusVisible}
+            disabled={disabled}
+            focusProps={focusProps}
+            icon={icon}
             key={value}
             label={name}
-            value={value}
-            active={selected === value}
-            icon={icon}
-            disabled={disabled}
             onChange={onChange}
             onKeyDown={handleKeyDown}
+            value={value}
             {...testId}
           />
         );
       })}
     </div>
+  );
+}
+
+export function TabsWithContent(props: TabsProps) {
+  const { selected, tabs } = props;
+  const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
+
+  return (
+    <>
+      <Tabs {...props} />
+      <div
+        aria-labelledby={`${selectedTab.value}-tab`}
+        data-testid={`${selectedTab.value}-tabContent`}
+        id={`${selectedTab.value}-tabPanel`}
+        role="tabpanel"
+        tabIndex={0}
+      >
+        {selectedTab.render()}
+      </div>
+    </>
   );
 }
 
@@ -71,7 +92,7 @@ interface TabProps extends BeamFocusableProps {
   isFocusVisible: boolean;
 }
 
-function TabImpl(props: TabProps) {
+function SingleTab(props: TabProps) {
   const {
     disabled: isDisabled,
     label,
@@ -93,15 +114,17 @@ function TabImpl(props: TabProps) {
 
   return (
     <button
-      {...mergeProps(focusProps, hoverProps)}
-      {...others}
-      role="tab"
+      aria-controls={`${value}-tabPanel`}
       aria-selected={active}
       aria-disabled={isDisabled || undefined}
-      tabIndex={active ? 0 : -1}
-      ref={ref}
+      id={`${value}-tab`}
       onClick={() => onChange(value)}
       onKeyDown={onKeyDown}
+      ref={ref}
+      role="tab"
+      tabIndex={active ? 0 : -1}
+      {...mergeProps(focusProps, hoverProps)}
+      {...others}
       css={{
         ...baseStyles,
         ...(active && activeStyles),
