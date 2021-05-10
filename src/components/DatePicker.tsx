@@ -54,15 +54,17 @@ export function DatePicker(props: DatePickerProps) {
         // Un-collapse the borders so we can hover each cell
         "& .DayPicker-Month": Css.add({ borderCollapse: "separate" }).$,
         // Make the boxes smaller, this ends up being 32x32 which matches figma
-        "& .DayPicker-Day": Css.pPx(8).xs.ba.bWhite.$,
-        // Instead of a blue circle, use a border
-        "& .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside):hover": Css.ba.bLightBlue700.br4.$,
-        // For selected, use a background
-        "& .DayPicker-Day--selected": Css.bgGray200.br4.$,
+        "& .DayPicker-Day": Css.pPx(8).xs.ba.bWhite.br4.$,
         // For today, use a background
-        "& .DayPicker-Day--today": Css.bgGray100.br4.$,
+        "& .DayPicker-Day--today": Css.bgGray100.$,
+        // For selected, use a background
+        "& .DayPicker-Day--selected": Css.bgLightBlue700.white.$,
+        // For pressed
+        "& .DayPicker-Day:active": Css.bgGray400.$,
         // Render over our calendar icon decoration in InputElement
-        "& .DayPickerInput-Overlay": Css.z2.$,
+        "& .DayPickerInput-Overlay": Css.br4.z2.topPx(4).$,
+        // Make the month title, i.e. "May 2021", match figma; pyPx nudge matches the NavbarElement nudging
+        "& .DayPicker-Caption > div": Css.base.pyPx(2).$,
       }}
     >
       {label && <Label labelProps={labelProps} label={label} />}
@@ -133,7 +135,7 @@ const InputElement = React.forwardRef((props: any, ref: any) => {
         }}
         onClick={props["onClick"]}
       >
-        <Icon icon="calendar" />
+        <Icon color={Palette.Gray700} icon="calendar" />
       </span>
       <input ref={ref} {...props} />
     </>
