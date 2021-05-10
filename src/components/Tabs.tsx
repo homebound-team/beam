@@ -21,6 +21,26 @@ interface TabsProps {
   onChange: (value: string) => void;
 }
 
+export function TabsWithContent(props: TabsProps) {
+  const { selected, tabs } = props;
+  const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
+
+  return (
+    <>
+      <Tabs {...props} />
+      <div
+        aria-labelledby={`${selectedTab.value}-tab`}
+        data-testid={`${selectedTab.value}-tabContent`}
+        id={`${selectedTab.value}-tabPanel`}
+        role="tabpanel"
+        tabIndex={0}
+      >
+        {selectedTab.render()}
+      </div>
+    </>
+  );
+}
+
 function Tabs(props: TabsProps) {
   const { ariaLabel, onChange, selected, tabs, ...others } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
@@ -70,26 +90,6 @@ function Tabs(props: TabsProps) {
         );
       })}
     </div>
-  );
-}
-
-export function TabsWithContent(props: TabsProps) {
-  const { selected, tabs } = props;
-  const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
-
-  return (
-    <>
-      <Tabs {...props} />
-      <div
-        aria-labelledby={`${selectedTab.value}-tab`}
-        data-testid={`${selectedTab.value}-tabContent`}
-        id={`${selectedTab.value}-tabPanel`}
-        role="tabpanel"
-        tabIndex={0}
-      >
-        {selectedTab.render()}
-      </div>
-    </>
   );
 }
 

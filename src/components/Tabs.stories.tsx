@@ -2,12 +2,12 @@ import { Meta } from "@storybook/react";
 import { Fragment, useState } from "react";
 import { Css } from "src/Css";
 import { Icon } from "./Icon";
-import { getTabStyles, Tab, TabsWithContent } from "./Tabs";
+import { getTabStyles, Tab, TabsWithContent as TabsWithContentComponent } from "./Tabs";
 import { TabContent, testTabs } from "./testData";
 
 export default {
   title: "Components/Tabs",
-  component: TabsWithContent,
+  component: TabsWithContentComponent,
   parameters: {
     // To better view the icon hover state
     backgrounds: { default: "white" },
@@ -38,7 +38,7 @@ function getChildren(label: string) {
   );
 }
 
-export const Tabs = () => {
+export const TabsWithContent = () => {
   const [selectedTab1, setSelectedTab1] = useState("tab1");
   const [selectedTab2, setSelectedTab2] = useState("tab1");
 
@@ -46,11 +46,16 @@ export const Tabs = () => {
     <div css={Css.df.flexColumn.childGap3.$}>
       <div css={Css.df.flexColumn.childGap1.$}>
         <h3>Tabs</h3>
-        <TabsWithContent tabs={testTabs} onChange={setSelectedTab1} selected={selectedTab1} ariaLabel="Sample Tabs" />
+        <TabsWithContentComponent
+          tabs={testTabs}
+          onChange={setSelectedTab1}
+          selected={selectedTab1}
+          ariaLabel="Sample Tabs"
+        />
       </div>
       <div css={Css.df.flexColumn.childGap1.$}>
         <h3>Tabs with icons</h3>
-        <TabsWithContent
+        <TabsWithContentComponent
           tabs={tabsWithIconsAndContent}
           onChange={setSelectedTab2}
           selected={selectedTab2}
