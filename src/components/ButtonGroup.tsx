@@ -5,8 +5,12 @@ import { Css } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 
 export interface ButtonGroupProps {
-  /** Disables all buttons in buttonGroup */
+  /** Disables all buttons in ButtonGroup */
   disabled?: boolean;
+  /**
+   * ButtonGroupButtonProps in an internal API.
+   * This is only exposing props that will be publicly accessible.
+   */
   buttons: Pick<ButtonGroupButtonProps, "text" | "icon" | "active" | "onClick" | "disabled">[];
   size?: ButtonGroupSize;
 }

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { createContext, ReactChild, ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
+import { createContext, ReactChild, ReactNode, useCallback, useContext, useMemo, useState } from "react";
 import { Css, px } from "src";
 import { Button, ButtonProps } from "./Button";
 import { ButtonGroup } from "./ButtonGroup";
@@ -19,43 +19,56 @@ interface SuperDrawerHeaderProps {
    * - `X` icon
    * - Background overlay
    *
-   * @default Closes the SuperDrawer by calling `removeContent()`
+   * @default Closes the SuperDrawer by calling `closeDrawer()`
    */
   onClose?: () => void;
 }
 
-interface SuperDrawerSetContentProps extends SuperDrawerHeaderProps {
+// When adding a new element to the stack
+interface SuperDrawerNewOpenInDrawerProps extends SuperDrawerHeaderProps {
   content: ReactNode;
+  mode?: "new";
 }
-// When adding childContent, a new title can be chosen
-interface SuperDrawerAddChildContentProps extends Partial<Pick<SuperDrawerHeaderProps, "title">> {
+// When adding a detail element to the stack
+interface SuperDrawerDetailOpenInDrawerProps extends Partial<Pick<SuperDrawerHeaderProps, "title">> {
   content: ReactNode;
+  mode: "detail";
+}
+
+type SuperDrawerOpenInDrawerProps = SuperDrawerNewOpenInDrawerProps | SuperDrawerDetailOpenInDrawerProps;
+
+// Values used by SuperDrawer for rendering including `SuperDrawerHeaderProps`
+interface SuperDrawerContextValues {
+  contentStack: SuperDrawerOpenInDrawerProps[];
+  modalContent?: ReactNode;
 }
 
 // Actions that can be performed to SuperDrawer
 interface SuperDrawerContextActions {
-  /** Opens and sets the SuperDrawer content and footer component. */
-  setContent: (content: SuperDrawerSetContentProps) => void;
-  /** Closes and reset SuperDrawer state. */
-  removeContent: () => void;
-  /** Add a child component to the SuperDrawer childContentStack */
-  addChildContent: (childContent: SuperDrawerAddChildContentProps) => void;
   /**
-   * Removes a child component to the SuperDrawer childContentStack. When no
-   * more child contents are left in the stack the main content will be shown.
+   * Adds a new element to the SuperDrawer content stack which can be of two types.
+   *
+   * These types are controlled by the `mode` key defined by `SuperDrawerOpenInDrawerProps`:
+   * - "new": represents a new element that will erase all other element on the contentStack
+   * - "detail": represents a detail element that will be pushed onto contentStack
+   *
+   * The only difference between `new` and `detail` mode are the visual states that SuperDrawer
+   * adds to help with navigation. For example, when adding a `detail` element, a "back" button
+   * will be injected into the content area to help users navigate back to the `new` (can also be called "main") content.
+   *
    */
-  removeChildContent: () => void;
-  /** Shows the errorComponent */
-  setErrorContent: (content: Omit<SuperDrawerAddChildContentProps, "title">) => void;
-  /** Removes the errorComponent */
-  removeErrorContent: () => void;
-}
-
-// Values used by SuperDrawer for rendering including `SuperDrawerHeaderProps`
-interface SuperDrawerContextValues extends SuperDrawerHeaderProps {
-  content: ReactNode;
-  childContent: ReactNode;
-  errorContent: ReactNode;
+  openInDrawer: (content: SuperDrawerOpenInDrawerProps) => void;
+  /**
+   * Pops and element from the SuperDrawer content stack. If the resulting pop
+   * causes the stack to have no more elements, the SuperDrawer will close.
+   */
+  closeInDrawer: () => void;
+  /** Clears the SuperDrawer content stack and closes the drawer */
+  closeDrawer: () => void;
+  /** Shows the given component as the SuperDrawer modal */
+  setModalContent: (content: ReactNode) => void;
+  /** Closes the modal */
+  closeModal: () => void;
 }
 
 interface SuperDrawerContextProps extends SuperDrawerContextActions, SuperDrawerContextValues {}
@@ -63,90 +76,51 @@ const SuperDrawerContext = createContext<SuperDrawerContextProps>({} as SuperDra
 
 export const useSuperDrawer = () => useContext(SuperDrawerContext);
 
-interface SuperDrawerProviderProps {
-  children: ReactChild;
-}
-
-export function SuperDrawerProvider({ children }: SuperDrawerProviderProps) {
-  // Main content, childContent and errorContent
-  const [content, setContent] = useState<ReactNode>(null);
-  const [childContentStack, setChildContentStack] = useState<ReactNode[]>([]);
-  const [errorContent, setErrorContent] = useState<ReactNode>(null);
-  // Saving title into a stack since children can change the title
-  const [titleStack, setTitleStack] = useState<string[]>([]);
-  const onPrevClick = useRef<SuperDrawerContextProps["onPrevClick"]>();
-  const onNextClick = useRef<SuperDrawerContextProps["onNextClick"]>();
-  const onClose = useRef<SuperDrawerContextProps["onClose"]>();
-  // Computed values
-  const childContent = useMemo(() => childContentStack?.[childContentStack.length - 1], [childContentStack]);
-  const title = useMemo(() => titleStack?.[titleStack.length - 1], [titleStack]);
+export function SuperDrawerProvider({ children }: { children: ReactChild }) {
+  const [contentStack, setContentStack] = useState<SuperDrawerOpenInDrawerProps[]>([]);
+  const [modalContent, setModalContent] = useState<ReactNode>();
 
   // Building context object
-  const values: SuperDrawerContextValues = {
-    title,
-    onPrevClick: onPrevClick.current,
-    onNextClick: onNextClick.current,
-    onClose: onClose.current,
-    content,
-    childContent,
-    errorContent,
-  };
+  const values: SuperDrawerContextValues = { contentStack, modalContent };
   const actions: SuperDrawerContextActions = useMemo(
     () => ({
-      /** Opens and sets the SuperDrawer content and footer component. */
-      setContent: ({
-        title: newTitle,
-        onPrevClick: newOnPrevClick,
-        onNextClick: newOnNextClick,
-        onClose: newOnClose,
-        content,
-      }) => {
-        onPrevClick.current = newOnPrevClick;
-        onNextClick.current = newOnNextClick;
-        onClose.current = newOnClose;
+      openInDrawer: (content) => {
+        const { mode = "new", title } = content;
 
-        setTitleStack((prev) => [...prev, newTitle]);
-        setContent(content);
-      },
-      /** Closes and reset SuperDrawer state. */
-      removeContent: () => {
-        onPrevClick.current = undefined;
-        onNextClick.current = undefined;
-        onClose.current = undefined;
+        // When mode is not given, or "new", reset the contentStack
+        if (mode === "new") {
+          setContentStack([{ ...content, mode } as SuperDrawerNewOpenInDrawerProps]);
+        }
+        // Otherwise push the element onto the stack
+        else {
+          setContentStack((prev) => {
+            if (prev.length === 0) {
+              console.error("SuperDrawer must have at least one `new` element before adding a `detail` element.");
+              return prev;
+            }
 
-        setTitleStack([]);
-        setContent(null);
-        setChildContentStack([]);
-        setErrorContent(null);
+            return [
+              ...prev,
+              {
+                ...content,
+                // Defaulting optional title to previous elements title
+                title: title ?? prev[prev.length - 1].title,
+              } as SuperDrawerDetailOpenInDrawerProps,
+            ];
+          });
+        }
       },
-      /** Add a child component to the SuperDrawer childContentStack */
-      addChildContent: ({ title: newTitle, content: childContent }) => {
-        // Add newTitle, otherwise add existing title
-        setTitleStack((prev) => [...prev, newTitle || title]);
-        setChildContentStack((prev) => [...prev, childContent]);
+      closeInDrawer: () => setContentStack((prev) => prev.slice(0, -1)),
+      closeDrawer: () => {
+        setContentStack([]);
+        setModalContent(undefined);
       },
-      /**
-       * Removes a child component to the SuperDrawer childContentStack. When no
-       * more child contents are left in the stack the main content will be shown.
-       */
-      removeChildContent: () => {
-        // Remove current title
-        setTitleStack((prev) => prev.slice(0, -1));
-        setChildContentStack((prev) => prev.slice(0, -1));
-      },
-      /** Shows the errorComponent */
-      setErrorContent: ({ content }) => {
-        setErrorContent(content);
-      },
-      /** Removes the errorComponent */
-      removeErrorContent: () => {
-        setErrorContent(null);
-      },
+      setModalContent: (content) => setModalContent(content),
+      closeModal: () => setModalContent(null),
     }),
-    [title],
+    [],
   );
 
-  // TODO: Validate re-render issue?
   const superDrawerContext: SuperDrawerContextProps = { ...values, ...actions };
 
   return (
@@ -167,23 +141,24 @@ interface SuperDrawerContentProps {
    * Ex: A `cancel` and `submit` button
    * */
   actions: ButtonProps[];
-  type?: "content" | "childContent";
 }
 
 /**
  * Helper component to place the given children and actions into the appropriate
  * DOM format to render inside the SuperDrawer.
  *
- * NOTE: This does not include the header props since the caller will
- * most likely be the one that knows how to handle the title, prev/next link
- * and onClose handler.
+ * NOTE: This does not include the header props since the caller will be the one
+ * that knows how to handle the title, prev/next link and the onClose handler.
  */
-export const SuperDrawerContent = ({ children, actions, type = "content" }: SuperDrawerContentProps) => {
-  const { removeChildContent } = useSuperDrawer();
+export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProps) => {
+  const { contentStack, closeInDrawer } = useSuperDrawer();
+
+  // Determine if the current element is a new content element or an detail element
+  const { mode } = contentStack[contentStack.length - 1] ?? {};
 
   const ContentWrapper = useCallback(
     ({ children }: { children: ReactNode }) =>
-      type === "content" ? (
+      mode === "new" ? (
         <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }}>
           {children}
         </motion.div>
@@ -193,7 +168,7 @@ export const SuperDrawerContent = ({ children, actions, type = "content" }: Supe
           animate={{ overflow: "auto" }}
           transition={{ overflow: { delay: 0.3 } }}
         >
-          <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={() => removeChildContent()} />
+          <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={() => closeInDrawer()} />
           <motion.div
             initial={{ x: 1040, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -211,7 +186,7 @@ export const SuperDrawerContent = ({ children, actions, type = "content" }: Supe
           </motion.div>
         </motion.div>
       ),
-    [type, removeChildContent],
+    [mode, closeInDrawer],
   );
 
   return (
@@ -231,20 +206,16 @@ export const SuperDrawerContent = ({ children, actions, type = "content" }: Supe
 
 /** Right side drawer component */
 export function SuperDrawer() {
-  const {
-    title,
-    onPrevClick,
-    onNextClick,
-    onClose,
-    content,
-    childContent,
-    errorContent,
-    removeContent,
-  } = useSuperDrawer();
+  const { contentStack, modalContent, closeDrawer } = useSuperDrawer();
+
+  // Get the latest element on the stack
+  const { title, content, mode, ...other } = contentStack[contentStack.length - 1] ?? {};
+  // Narrowing the union in a sense
+  const { onPrevClick, onNextClick, onClose } = other as SuperDrawerNewOpenInDrawerProps;
 
   function handleOnClose() {
     if (onClose) return onClose();
-    return removeContent();
+    return closeDrawer();
   }
 
   return (
@@ -281,7 +252,7 @@ export function SuperDrawer() {
               {/* Left */}
               <div css={Css.xl2Em.gray900.$}>{title}</div>
               {/* Right */}
-              {!errorContent && (
+              {!modalContent && (
                 // Forcing height to 32px to match title height
                 <div css={Css.df.childGap3.itemsCenter.hPx(32).$}>
                   {/* Disable buttons is handlers are not given or if childContent is shown */}
@@ -290,12 +261,12 @@ export function SuperDrawer() {
                       {
                         icon: "chevronLeft",
                         onClick: () => onPrevClick && onPrevClick(),
-                        disabled: !onPrevClick || !!childContent,
+                        disabled: !onPrevClick || mode === "detail",
                       },
                       {
                         icon: "chevronRight",
                         onClick: () => onNextClick && onNextClick(),
-                        disabled: !onNextClick || !!childContent,
+                        disabled: !onNextClick || mode === "detail",
                       },
                     ]}
                   />
@@ -303,11 +274,9 @@ export function SuperDrawer() {
                 </div>
               )}
             </header>
-            {errorContent ? (
-              // Forcing some design constraints on the error component
-              <div css={Css.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn.$}>{errorContent}</div>
-            ) : childContent ? (
-              childContent
+            {modalContent ? (
+              // Forcing some design constraints on the modal component
+              <div css={Css.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn.$}>{modalContent}</div>
             ) : (
               content
             )}
