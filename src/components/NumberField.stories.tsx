@@ -52,8 +52,8 @@ function TestNumberField(props: Omit<NumberFieldProps, "onChange">) {
 }
 
 function ValidationNumberField({ label, compact, value }: { label: string; compact?: boolean; value: number }) {
-  const [internalValue, setValue] = useState(value);
-  const isValid = useMemo(() => internalValue > 0, [internalValue]);
+  const [internalValue, setValue] = useState<number | undefined>(value);
+  const isValid = useMemo(() => internalValue && internalValue > 0, [internalValue]);
   return (
     <NumberField
       label={label}

@@ -12,7 +12,7 @@ export default {
 
 export function DateFields() {
   return samples(
-    ["TextField for comparison", <TextField label="First Name" />],
+    ["TextField for comparison", <TextField label="First Name" value="Foo" />],
     ["With Label", <TestDateField label="Start Date" />],
     ["Without Label", <TestDateField />],
     ["Disabled", <TestDateField disabled />],
