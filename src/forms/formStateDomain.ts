@@ -13,6 +13,7 @@ export interface AuthorInput {
   lastName?: string | null;
   birthday?: Date | null;
   heightInInches?: number | null;
+  royaltiesInCents?: number | null;
   books?: BookInput[] | null;
   address?: AuthorAddress | null;
   favoriteSport?: string | null;

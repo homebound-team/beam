@@ -16,8 +16,17 @@ describe("BoundNumberField", () => {
     const { heightInInches_errorMsg } = await render(<BoundNumberField field={author.heightInInches} />);
     expect(heightInInches_errorMsg()).toHaveTextContent("Required");
   });
+
+  it("drops the 'in cents' suffix from labels", async () => {
+    const author = createObjectState(formConfig, { royaltiesInCents: 1_00 });
+    const r = await render(<BoundNumberField field={author.royaltiesInCents} />);
+    expect(r.royaltiesInCents_label()).toHaveTextContent("Royalties");
+    expect(r.royaltiesInCents_label()).not.toHaveTextContent("Cents");
+    expect(r.royaltiesInCents()).toHaveValue("$1.00");
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {
   heightInInches: { type: "value", rules: [required] },
+  royaltiesInCents: { type: "value" },
 };
