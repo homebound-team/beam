@@ -4,6 +4,7 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/src/setupTests.tsx"],
   moduleNameMapper: {
     "^src(.*)": "<rootDir>/src$1",
+    "\\.(css|less|scss)$": "identity-obj-proxy",
   },
   snapshotSerializers: ["@emotion/jest/serializer"],
 };
