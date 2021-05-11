@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "yarn storybook",
-    "build": "ttsc",
+    "build": "ttsc && yarn copy",
     "build:truss": "cd ./truss && npm run generate",
     "watch:truss": "cd ./truss && watch 'npm run generate' ./",
     "build:storybook": "build-storybook",
@@ -28,6 +28,7 @@
     "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
     "storybook": "start-storybook -p 9000",
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded",
+    "copy": "npx copyfiles -u 1 \"./src/**/*.css\" \"./dist/\"",
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\""
   },
   "dependencies": {
