@@ -37,11 +37,11 @@ describe("TabsWithContent", () => {
   it("should display content of selected tab", async () => {
     const r = await render(<TestTabs />);
     // tab panel should initially display Tab 1 Content
-    expect(r.getByRole("tabpanel")).toHaveTextContent("Tab 1 Content");
+    expect(r.tab_panel()).toHaveTextContent("Tab 1 Content");
     // when we click on tab index 2
     click(r.getByTestId("tabs_2"));
     // then expect to see the content for tab index 2 ("Tab 3 Content")
-    expect(r.getByRole("tabpanel")).toHaveTextContent("Tab 3 Content");
+    expect(r.tab_panel()).toHaveTextContent("Tab 3 Content");
   });
 });
 

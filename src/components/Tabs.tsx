@@ -1,4 +1,4 @@
-import { HTMLAttributes, KeyboardEvent, ReactNode, useMemo, useRef, useState } from "react";
+import { HTMLAttributes, KeyboardEvent, ReactNode, useMemo, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
@@ -22,18 +22,19 @@ interface TabsProps {
 }
 
 export function TabsWithContent(props: TabsProps) {
-  const { selected, tabs } = props;
+  const { selected, tabs, ...others } = props;
   const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
+  const tid = useTestIds(others, "tab");
 
   return (
     <>
       <Tabs {...props} />
       <div
         aria-labelledby={`${selectedTab.value}-tab`}
-        data-testid={`${selectedTab.value}-tabContent`}
         id={`${selectedTab.value}-tabPanel`}
         role="tabpanel"
         tabIndex={0}
+        {...tid.panel}
       >
         {selectedTab.render()}
       </div>
@@ -44,7 +45,7 @@ export function TabsWithContent(props: TabsProps) {
 function Tabs(props: TabsProps) {
   const { ariaLabel, onChange, selected, tabs, ...others } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
-  const testIds = useTestIds(others, "tabs");
+  const tid = useTestIds(others, "tabs");
   const [active, setActive] = useState(selected);
 
   // the active tab is highlighted, but not necessarily "selected"
@@ -68,10 +69,10 @@ function Tabs(props: TabsProps) {
   }
 
   return (
-    <div css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...testIds}>
+    <div css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...tid}>
       {tabs.map((tab, i) => {
         const { name, value, icon, disabled = false } = tab;
-        const testId = testIds[i];
+        const testId = tid[i];
 
         return (
           <SingleTab
@@ -119,7 +120,6 @@ function SingleTab(props: TabProps) {
     isFocusVisible = false,
     ...others
   } = props;
-  const ref = useRef<HTMLDivElement | null>(null);
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
     () => getTabStyles(),
@@ -134,7 +134,6 @@ function SingleTab(props: TabProps) {
       id={`${value}-tab`}
       onClick={() => onClick(value)}
       onKeyUp={onKeyUp}
-      ref={ref}
       role="tab"
       tabIndex={active ? 0 : -1}
       {...mergeProps(focusProps, hoverProps)}
