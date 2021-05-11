@@ -9,8 +9,8 @@ export interface TextFieldProps extends BeamTextFieldProps {
 }
 
 export function TextField(props: TextFieldProps) {
-  const { disabled: isDisabled = false, readOnly: isReadOnly = false, ...otherProps } = props;
-  const textFieldProps = { ...otherProps, isDisabled, isReadOnly };
+  const { disabled: isDisabled = false, readOnly: isReadOnly = false, value = "", ...otherProps } = props;
+  const textFieldProps = { ...otherProps, isDisabled, isReadOnly, value };
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { labelProps, inputProps } = useTextField(textFieldProps, inputRef);
   return <TextFieldBase {...textFieldProps} labelProps={labelProps} inputProps={inputProps} inputRef={inputRef} />;

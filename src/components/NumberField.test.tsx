@@ -48,6 +48,15 @@ describe("NumberFieldTest", () => {
     expect(r.cost()).toHaveValue("$0.14");
     expect(lastSet).toEqual(14);
   });
+
+  it("can set to undefined", async () => {
+    const r = await render(<TestNumberField label="Cost" type="cents" value={1200} />);
+    expect(r.cost()).toHaveValue("$12.00");
+    type(r.cost, "");
+    fireEvent.blur(r.cost());
+    expect(r.cost()).toHaveValue("");
+    expect(lastSet).toBeUndefined();
+  });
 });
 
 function TestNumberField(props: Omit<NumberFieldProps, "onChange">) {

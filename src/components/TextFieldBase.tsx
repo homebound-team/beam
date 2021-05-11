@@ -4,9 +4,10 @@ import { ErrorMessage } from "src/components/ErrorMessage";
 import { Label } from "src/components/Label";
 import { Css, px } from "src/Css";
 import { BeamTextFieldProps } from "src/interfaces";
+import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
-interface TextFieldBaseProps extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur"> {
+interface TextFieldBaseProps extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur" | "onChange"> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
   inputRef?: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>;
@@ -27,6 +28,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     compact = false,
     errorMsg,
     multiline = false,
+    onChange,
     wide = false,
     onBlur,
   } = props;
@@ -35,7 +37,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
   // Default the widths, though eventually these should be responsive. Note: there is no "compact" view for "wide" fields at the moment
   const width = wide ? 550 : compact ? 248 : 320;
-  const tid = useTestIds(props, "textField");
+  const tid = useTestIds(props, defaultTestId(label || "textField"));
 
   return (
     <div css={Css.df.flexColumn.wPx(width).$}>
@@ -45,6 +47,10 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
         ref={inputRef as any}
         rows={multiline ? 1 : undefined}
+        onChange={(e: any) => {
+          const string = (e.target.value as string).trim();
+          onChange(string === "" ? undefined : string);
+        }}
         css={{
           ...Css.add("resize", "none")
             .bgWhite.wPx(width)

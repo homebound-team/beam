@@ -12,8 +12,8 @@ import { useTestIds } from "src/utils/useTestIds";
 export interface NumberFieldProps {
   label?: string;
   type?: "cents" | "percent" | "basisPoints";
-  value: number;
-  onChange: (value: number) => void;
+  value: number | undefined;
+  onChange: (value: number | undefined) => void;
   compact?: boolean;
   disabled?: boolean;
   errorMsg?: string;
@@ -53,9 +53,11 @@ export function NumberField(props: NumberFieldProps) {
   const useProps: NumberFieldStateProps = {
     locale,
     // We want percents && cents to be integers, useNumberFieldState excepts them as decimals
-    value: value / factor,
+    value: value === undefined ? Number.NaN : value / factor,
     // Reverse the integer/decimal conversion
-    onChange: (value) => onChange(factor !== 1 ? Math.round(value * factor) : value),
+    onChange: (value) => {
+      onChange(Number.isNaN(value) ? undefined : factor !== 1 ? Math.round(value * factor) : value);
+    },
     validationState: errorMsg !== undefined ? "invalid" : "valid",
     label: label ?? "number",
     isDisabled,
