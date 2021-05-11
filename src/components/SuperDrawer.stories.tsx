@@ -10,9 +10,11 @@ import {
 
 /** Wraps SuperDrawer story with the SuperDrawer context provider */
 const withSuperDrawer = (Story: () => JSX.Element) => (
-  <SuperDrawerProvider>
-    <Story />
-  </SuperDrawerProvider>
+  <div style={{ width: 1200, height: 800 }}>
+    <SuperDrawerProvider>
+      <Story />
+    </SuperDrawerProvider>
+  </div>
 );
 
 export default {
