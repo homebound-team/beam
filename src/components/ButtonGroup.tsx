@@ -32,6 +32,8 @@ export function ButtonGroup(props: ButtonGroupProps) {
           key={i}
           {...buttonProps}
           {...{
+            // Disable the button if the ButtonGroup is disabled or if the current
+            // button is disabled.
             disabled: disabled || buttonDisabled,
             size,
           }}

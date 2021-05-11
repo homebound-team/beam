@@ -1,31 +1,15 @@
 import { Meta } from "@storybook/react";
 import { useEffect } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf } from "src";
-import {
-  SuperDrawer as SuperDrawerComponent,
-  SuperDrawerContent,
-  SuperDrawerProvider,
-  useSuperDrawer,
-} from "./SuperDrawer";
-
-/** Wraps SuperDrawer story with the SuperDrawer context provider */
-const withSuperDrawer = (Story: () => JSX.Element) => (
-  <div style={{ width: 1200, height: 800 }}>
-    <SuperDrawerProvider>
-      <Story />
-    </SuperDrawerProvider>
-  </div>
-);
+import { SuperDrawer as SuperDrawerComponent, SuperDrawerContent } from "./SuperDrawer";
+import { useSuperDrawer } from "./SuperDrawerContext";
+import { withSuperDrawer } from "./SuperDrawerUtils";
 
 export default {
   title: "Components / Super Drawer",
   component: SuperDrawerComponent,
   decorators: [withSuperDrawer],
-  parameters: {
-    chromatic: {
-      delay: 1000,
-    },
-  },
+  parameters: { chromatic: { delay: 1000 } },
 } as Meta;
 
 export function Open() {
