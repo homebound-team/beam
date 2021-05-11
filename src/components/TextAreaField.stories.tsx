@@ -12,29 +12,24 @@ export function TextAreas() {
   return (
     <div css={Css.df.justifyAround.$}>
       <div>
-        <StatefulTextArea />
+        <TestTextArea />
         <br />
-        <StatefulTextArea label="Description" />
+        <TestTextArea label="Description" />
         <br />
-        <StatefulTextArea label="Description" value="An example description text." autoFocus />
+        <TestTextArea label="Description" value="An example description text." autoFocus />
         <br />
-        <StatefulTextArea label="Description" value="This is a description that can no longer be edited." disabled />
+        <TestTextArea label="Description" value="This is a description that can no longer be edited." disabled />
         <br />
         <ValidationTextArea value="Not enough characters" />
       </div>
       <div>
-        <StatefulTextArea wide />
+        <TestTextArea wide />
         <br />
-        <StatefulTextArea wide label="Description" />
+        <TestTextArea wide label="Description" />
         <br />
-        <StatefulTextArea wide label="Description" value="An example description text." />
+        <TestTextArea wide label="Description" value="An example description text." />
         <br />
-        <StatefulTextArea
-          wide
-          label="Description"
-          value="This is a description that can no longer be edited."
-          disabled
-        />
+        <TestTextArea wide label="Description" value="This is a description that can no longer be edited." disabled />
         <br />
         <ValidationTextArea wide value="Not enough characters" />
       </div>
@@ -42,7 +37,7 @@ export function TextAreas() {
   );
 }
 
-function StatefulTextArea(props: TextAreaProps) {
+function TestTextArea(props: TextAreaProps) {
   const { value, disabled, wide, label } = props;
   const [internalValue, setValue] = useState(value);
   return (

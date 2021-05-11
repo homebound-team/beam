@@ -13,25 +13,25 @@ export function TextFields() {
     <div css={Css.df.justifyAround.$}>
       <div>
         <h1 css={Css.lg.mb2.$}>Regular</h1>
-        <StatefulTextField />
+        <TestTextField />
         <br />
-        <StatefulTextField label="Name" />
+        <TestTextField label="Name" />
         <br />
-        <StatefulTextField label="Name" value="Brandon" autoFocus />
+        <TestTextField label="Name" value="Brandon" autoFocus />
         <br />
-        <StatefulTextField label="Name" value="Brandon" disabled />
+        <TestTextField label="Name" value="Brandon" disabled />
         <br />
         <ValidationTextField value="not a valid email" />
       </div>
       <div>
         <h1 css={Css.lg.mb2.$}>Compact</h1>
-        <StatefulTextField compact />
+        <TestTextField compact />
         <br />
-        <StatefulTextField compact label="Name" />
+        <TestTextField compact label="Name" />
         <br />
-        <StatefulTextField compact label="Name" value="Brandon" />
+        <TestTextField compact label="Name" value="Brandon" />
         <br />
-        <StatefulTextField compact label="Name" value="Brandon" disabled />
+        <TestTextField compact label="Name" value="Brandon" disabled />
         <br />
         <ValidationTextField compact value="not a valid email" />
       </div>
@@ -39,30 +39,21 @@ export function TextFields() {
   );
 }
 
-function StatefulTextField(props: TextFieldProps) {
-  const { value, disabled, compact, label } = props;
+function TestTextField(props: TextFieldProps) {
+  const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
-  return (
-    <TextField
-      compact={compact}
-      label={label}
-      disabled={disabled}
-      value={internalValue}
-      onChange={(val) => setValue(val)}
-    />
-  );
+  return <TextField value={internalValue} onChange={setValue} {...otherProps} />;
 }
 
 function ValidationTextField({ compact, value }: { compact?: boolean; value: string }) {
   const [internalValue, setValue] = useState(value);
   const isValid = useMemo(() => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(internalValue), [internalValue]);
-
   return (
     <TextField
       compact={compact}
       label="Email"
       value={internalValue}
-      onChange={(val) => setValue(val)}
+      onChange={setValue}
       errorMsg={!isValid ? "The email address entered is invalid. Please provide a valid email address." : undefined}
     />
   );
