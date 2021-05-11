@@ -4,11 +4,11 @@ import dateFnsParse from "date-fns/parse";
 import React, { useRef } from "react";
 import { DateUtils, NavbarElementProps, WeekdayElementProps } from "react-day-picker";
 import DayPickerInput from "react-day-picker/DayPickerInput";
-import "react-day-picker/lib/style.css";
 import { Icon, IconButton } from "src/components";
 import { ErrorMessage } from "src/components/ErrorMessage";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
+import "./DateField.css";
 
 const format = "MM/dd/yy";
 
