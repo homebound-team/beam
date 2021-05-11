@@ -68,13 +68,14 @@ export function DateField(props: DateFieldProps) {
     >
       {label && <Label labelProps={labelProps} label={label} />}
       <DayPickerInput
-        // disabled={disabled}
         onDayChange={onChange as any}
         dayPickerProps={{
           navbarElement: NavbarElement,
           weekdayElement: Weekday,
         }}
         component={InputElement}
+        // inputProps comes from react-aria and is how end up getting things like
+        // disabled=true passes through to our InputElement
         inputProps={inputProps}
         value={value}
         placeholder=""
@@ -124,6 +125,8 @@ function Weekday({ weekday, className, localeUtils, locale }: WeekdayElementProp
 
 /** Positions the calendar decoration within our text field. */
 const InputElement = React.forwardRef((props: any, ref: any) => {
+  // This is not explicitly in the react-day-picker's props, but gets passed to via
+  // via the inputProps populated by react-aria's useTextField
   const disabled = props["disabled"];
   return (
     <>
