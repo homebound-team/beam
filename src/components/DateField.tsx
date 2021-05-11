@@ -5,25 +5,24 @@ import React, { useRef } from "react";
 import { DateUtils, NavbarElementProps, WeekdayElementProps } from "react-day-picker";
 import DayPickerInput from "react-day-picker/DayPickerInput";
 import "react-day-picker/lib/style.css";
+import { Icon, IconButton } from "src/components";
 import { ErrorMessage } from "src/components/ErrorMessage";
-import { Icon } from "src/components/Icon";
-import { IconButton } from "src/components/IconButton";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
 
 const format = "MM/dd/yy";
 
-export interface DatePickerProps {
+export interface DateFieldProps {
   value: Date;
   onChange: (value: Date) => void;
   label?: string;
-  /** Called when the component loses focus, mostly for BoundDatePicker to use. */
+  /** Called when the component loses focus, mostly for BoundDateField to use. */
   onBlur?: () => void;
   disabled?: boolean;
   errorMsg?: string;
 }
 
-export function DatePicker(props: DatePickerProps) {
+export function DateField(props: DateFieldProps) {
   const { label, disabled, value, onChange, errorMsg } = props;
 
   const { ...otherProps } = {};
