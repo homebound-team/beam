@@ -21,6 +21,7 @@ workflows:
 
 jobs:
   build:
+    resource_class: "xlarge"
     docker:
       - <<: *node-image
     steps:
