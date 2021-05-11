@@ -17,9 +17,11 @@ export function TextFields() {
         <br />
         <TestNumberField label="Age" value={1000} />
         <br />
-        <TestNumberField label="Age" value={1000} disabled />
+        <TestNumberField label="Age Disabled" value={1000} disabled />
         <br />
-        <ValidationNumberField value={-1} />
+        <TestNumberField label="Age Read Only" value={1000} readOnly />
+        <br />
+        <ValidationNumberField label="Age Validated" value={-1} />
       </div>
       <div>
         <h1 css={Css.lg.mb2.$}>Compact</h1>
@@ -29,9 +31,9 @@ export function TextFields() {
         <br />
         <TestNumberField compact label="Age" value={1000} />
         <br />
-        <TestNumberField compact label="Age" value={1000} disabled />
+        <TestNumberField compact label="Age Disabled" value={1000} disabled />
         <br />
-        <ValidationNumberField compact value={-1} />
+        <ValidationNumberField label="Age Validated" compact value={-1} />
       </div>
       <div>
         <h1 css={Css.lg.mb2.$}>Styles</h1>
@@ -51,12 +53,12 @@ function TestNumberField(props: Omit<NumberFieldProps, "onChange">) {
   return <NumberField value={internalValue} onChange={setValue} {...otherProps} />;
 }
 
-function ValidationNumberField({ compact, value }: { compact?: boolean; value: number }) {
+function ValidationNumberField({ label, compact, value }: { label: string; compact?: boolean; value: number }) {
   const [internalValue, setValue] = useState(value);
-  const isValid = useMemo(() => internalValue < 0, [internalValue]);
+  const isValid = useMemo(() => internalValue > 0, [internalValue]);
   return (
     <NumberField
-      label="Age"
+      label={label}
       compact={compact}
       value={internalValue}
       onChange={setValue}

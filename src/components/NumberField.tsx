@@ -58,6 +58,8 @@ export function NumberField(props: NumberFieldProps) {
     onChange: (value) => onChange(factor !== 1 ? Math.round(value * factor) : value),
     validationState: errorMsg !== undefined ? "invalid" : "valid",
     label: label ?? "number",
+    isDisabled,
+    isReadOnly,
     formatOptions,
   };
 
