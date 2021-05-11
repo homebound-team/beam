@@ -14,11 +14,11 @@ describe("NumberFieldTest", () => {
   });
 
   it("can set a percentage value", async () => {
-    const r = await render(<TestNumberField type="percent" value={12} />);
-    expect(r.age()).toHaveValue("12%");
-    type(r.age, "14");
-    fireEvent.blur(r.age());
-    expect(r.age()).toHaveValue("14%");
+    const r = await render(<TestNumberField label="Complete" type="percent" value={12} />);
+    expect(r.complete()).toHaveValue("12%");
+    type(r.complete, "14");
+    fireEvent.blur(r.complete());
+    expect(r.complete()).toHaveValue("14%");
     expect(lastSet).toEqual(14);
   });
 
