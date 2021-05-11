@@ -78,7 +78,7 @@ export const useSuperDrawer = () => useContext(SuperDrawerContext);
 
 export function SuperDrawerProvider({ children }: { children: ReactChild }) {
   const [contentStack, setContentStack] = useState<SuperDrawerOpenInDrawerProps[]>([]);
-  const [modalContent, setModalContent] = useState<ReactNode>();
+  const [modalContent, setModalContent] = useState<ReactNode>(null);
 
   // Building context object
   const values: SuperDrawerContextValues = { contentStack, modalContent };
@@ -113,7 +113,7 @@ export function SuperDrawerProvider({ children }: { children: ReactChild }) {
       closeInDrawer: () => setContentStack((prev) => prev.slice(0, -1)),
       closeDrawer: () => {
         setContentStack([]);
-        setModalContent(undefined);
+        setModalContent(null);
       },
       setModalContent: (content) => setModalContent(content),
       closeModal: () => setModalContent(null),

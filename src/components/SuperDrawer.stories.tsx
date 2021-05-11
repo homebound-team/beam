@@ -207,7 +207,7 @@ export function WithTable() {
 
 /** Example component to render inside the SuperDrawer */
 function SuperDrawerExampleContent({ book }: { book: Book }) {
-  const { openInDrawer, closeInDrawer, setModalContent } = useSuperDrawer();
+  const { openInDrawer, closeDrawer, setModalContent } = useSuperDrawer();
 
   function handleBookPurchase() {
     // Process payment...
@@ -219,7 +219,7 @@ function SuperDrawerExampleContent({ book }: { book: Book }) {
   }
 
   function handleClose() {
-    closeInDrawer();
+    closeDrawer();
   }
 
   return (
