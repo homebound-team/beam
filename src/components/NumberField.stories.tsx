@@ -29,14 +29,12 @@ export function TextFields() {
         <br />
         <TestNumberField compact label="Age" value={1000} />
         <br />
-        <TestNumberField compact label="Age" value={1000} />
-        <br />
         <TestNumberField compact label="Age Disabled" value={1000} disabled />
         <br />
         <ValidationNumberField label="Age Validated" compact value={-1} />
       </div>
       <div>
-        <h1 css={Css.lg.mb2.$}>Styles</h1>
+        <h1 css={Css.lg.mb2.$}>Unit Types</h1>
         <TestNumberField label="Percent" type="percent" value={12} />
         <br />
         <TestNumberField label="Cents" type="cents" value={1000} />
