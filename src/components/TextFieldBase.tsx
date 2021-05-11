@@ -48,8 +48,14 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         ref={inputRef as any}
         rows={multiline ? 1 : undefined}
         onChange={(e: any) => {
-          const string = (e.target.value as string).trim();
-          onChange(string === "" ? undefined : string);
+          let value: string | undefined = e.target.value as string;
+          if (!multiline) {
+            value = value.trim();
+          }
+          if (value === "") {
+            value = undefined;
+          }
+          onChange(value);
         }}
         css={{
           ...Css.add("resize", "none")
