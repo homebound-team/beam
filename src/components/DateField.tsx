@@ -13,7 +13,7 @@ import { Css, Palette } from "src/Css";
 const format = "MM/dd/yy";
 
 export interface DateFieldProps {
-  value: Date;
+  value: Date | undefined;
   onChange: (value: Date) => void;
   label?: string;
   /** Called when the component loses focus, mostly for BoundDateField to use. */
