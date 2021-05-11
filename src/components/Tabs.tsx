@@ -1,4 +1,4 @@
-import { HTMLAttributes, KeyboardEvent, useMemo, useRef } from "react";
+import { HTMLAttributes, KeyboardEvent, ReactNode, useMemo, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
@@ -10,46 +10,82 @@ export interface Tab {
   value: string;
   icon?: keyof typeof Icons;
   disabled?: boolean;
+  render: () => ReactNode;
 }
 
 interface TabsProps {
-  selected: string;
-  onChange: (value: string) => void;
   ariaLabel?: string;
+  // the selected tab is connected to the contents displayed
+  selected: string;
   tabs: Tab[];
+  onChange: (value: string) => void;
 }
 
-export function Tabs(props: TabsProps) {
+export function TabsWithContent(props: TabsProps) {
+  const { selected, tabs, ...others } = props;
+  const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
+  const tid = useTestIds(others, "tab");
+
+  return (
+    <>
+      <Tabs {...props} />
+      <div
+        aria-labelledby={`${selectedTab.value}-tab`}
+        id={`${selectedTab.value}-tabPanel`}
+        role="tabpanel"
+        tabIndex={0}
+        {...tid.panel}
+      >
+        {selectedTab.render()}
+      </div>
+    </>
+  );
+}
+
+function Tabs(props: TabsProps) {
   const { ariaLabel, onChange, selected, tabs, ...others } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
-  const testIds = useTestIds(others, "tabs");
+  const tid = useTestIds(others, "tabs");
+  const [active, setActive] = useState(selected);
 
-  function handleKeyDown(e: KeyboardEvent) {
-    // switches tabs on left and right arrow key down events
+  // the active tab is highlighted, but not necessarily "selected"
+  // the selected tab dictates what is displayed in the content panel
+  function handleKeyUp(e: KeyboardEvent) {
+    // left and right arrow keys update the active tab
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-      const nextTabValue = getNextTabValue(selected, e.key, tabs);
-      onChange(nextTabValue);
+      const nextTabValue = getNextTabValue(active, e.key, tabs);
+      setActive(nextTabValue);
+    }
+    // hitting enter will select the active tab and display the related contents
+    if (e.key === "Enter") {
+      onChange(active);
     }
   }
 
+  // clicking on a tab sets it to selected and active
+  function handleOnClick(value: string) {
+    onChange(value);
+    setActive(value);
+  }
+
   return (
-    <div css={Css.dif.$} aria-label={ariaLabel} role="tablist" {...testIds}>
+    <div css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...tid}>
       {tabs.map((tab, i) => {
         const { name, value, icon, disabled = false } = tab;
-        const testId = testIds[i];
+        const testId = tid[i];
 
         return (
-          <TabImpl
+          <SingleTab
+            active={active === value}
+            disabled={disabled}
             focusProps={focusProps}
+            icon={icon}
             isFocusVisible={isFocusVisible}
             key={value}
             label={name}
+            onClick={handleOnClick}
+            onKeyUp={handleKeyUp}
             value={value}
-            active={selected === value}
-            icon={icon}
-            disabled={disabled}
-            onChange={onChange}
-            onKeyDown={handleKeyDown}
             {...testId}
           />
         );
@@ -59,32 +95,31 @@ export function Tabs(props: TabsProps) {
 }
 
 interface TabProps extends BeamFocusableProps {
-  /** active indicates the user is on the current tab */
+  /** active indicates the current tab is highlighted */
   active: boolean;
   disabled: boolean;
   label: string;
   icon?: keyof typeof Icons;
   value: string;
-  onChange: (value: string) => void;
-  onKeyDown: (e: KeyboardEvent) => void;
+  onClick: (value: string) => void;
+  onKeyUp: (e: KeyboardEvent) => void;
   focusProps: HTMLAttributes<HTMLElement>;
   isFocusVisible: boolean;
 }
 
-function TabImpl(props: TabProps) {
+function SingleTab(props: TabProps) {
   const {
     disabled: isDisabled,
     label,
     value,
-    onChange,
+    onClick,
     active = false,
     icon = false,
-    onKeyDown,
+    onKeyUp,
     focusProps,
     isFocusVisible = false,
     ...others
   } = props;
-  const ref = useRef<HTMLButtonElement | null>(null);
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
     () => getTabStyles(),
@@ -92,16 +127,17 @@ function TabImpl(props: TabProps) {
   );
 
   return (
-    <button
-      {...mergeProps(focusProps, hoverProps)}
-      {...others}
-      role="tab"
+    <div
+      aria-controls={`${value}-tabPanel`}
       aria-selected={active}
       aria-disabled={isDisabled || undefined}
+      id={`${value}-tab`}
+      onClick={() => onClick(value)}
+      onKeyUp={onKeyUp}
+      role="tab"
       tabIndex={active ? 0 : -1}
-      ref={ref}
-      onClick={() => onChange(value)}
-      onKeyDown={onKeyDown}
+      {...mergeProps(focusProps, hoverProps)}
+      {...others}
       css={{
         ...baseStyles,
         ...(active && activeStyles),
@@ -117,7 +153,7 @@ function TabImpl(props: TabProps) {
           <Icon icon={icon} />
         </span>
       )}
-    </button>
+    </div>
   );
 }
 
