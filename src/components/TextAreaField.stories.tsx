@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { TextAreaField, TextAreaProps } from "src/components/TextAreaField";
+import { TextAreaField, TextAreaFieldProps } from "src/components/TextAreaField";
 import { Css } from "src/Css";
 
 export default {
@@ -37,7 +37,7 @@ export function TextAreas() {
   );
 }
 
-function TestTextArea(props: TextAreaProps) {
+function TestTextArea(props: TextAreaFieldProps) {
   const { value, disabled, wide, label } = props;
   const [internalValue, setValue] = useState(value);
   return (
