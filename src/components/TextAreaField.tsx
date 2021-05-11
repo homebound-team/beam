@@ -5,13 +5,13 @@ import { TextFieldBase } from "src/components/TextFieldBase";
 import { BeamTextFieldProps } from "src/interfaces";
 
 // exported for test purposes
-export interface TextAreaProps extends BeamTextFieldProps {
+export interface TextAreaFieldProps extends BeamTextFieldProps {
   wide?: boolean;
 }
 
 /** Returns a <textarea /> element that auto-adjusts height based on the field's value */
-export function TextAreaField(props: TextAreaProps) {
-  const { value, disabled: isDisabled = false, readOnly: isReadOnly = false, ...otherProps } = props;
+export function TextAreaField(props: TextAreaFieldProps) {
+  const { value = "", disabled: isDisabled = false, readOnly: isReadOnly = false, ...otherProps } = props;
   const textFieldProps = { ...otherProps, value, isDisabled, isReadOnly };
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   // not in stately because this is so we know when to re-measure, which is a spectrum design

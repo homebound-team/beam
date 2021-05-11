@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { TextAreaField, TextAreaProps } from "src/components/TextAreaField";
+import { TextAreaField, TextAreaFieldProps } from "src/components/TextAreaField";
 import { Css } from "src/Css";
 
 export default {
@@ -12,9 +12,9 @@ export function TextAreas() {
   return (
     <div css={Css.df.justifyAround.$}>
       <div>
-        <TestTextArea />
+        <TestTextArea value="" />
         <br />
-        <TestTextArea label="Description" />
+        <TestTextArea label="Description" value="" />
         <br />
         <TestTextArea label="Description" value="An example description text." autoFocus />
         <br />
@@ -23,9 +23,9 @@ export function TextAreas() {
         <ValidationTextArea value="Not enough characters" />
       </div>
       <div>
-        <TestTextArea wide />
+        <TestTextArea wide value="" />
         <br />
-        <TestTextArea wide label="Description" />
+        <TestTextArea wide label="Description" value="" />
         <br />
         <TestTextArea wide label="Description" value="An example description text." />
         <br />
@@ -37,7 +37,7 @@ export function TextAreas() {
   );
 }
 
-function TestTextArea(props: TextAreaProps) {
+function TestTextArea(props: Omit<TextAreaFieldProps, "onChange">) {
   const { value, disabled, wide, label } = props;
   const [internalValue, setValue] = useState(value);
   return (
@@ -52,8 +52,8 @@ function TestTextArea(props: TextAreaProps) {
 }
 
 function ValidationTextArea({ wide, value }: { wide?: boolean; value: string }) {
-  const [internalValue, setValue] = useState(value);
-  const isValid = useMemo(() => internalValue.length >= 50, [internalValue]);
+  const [internalValue, setValue] = useState<string | undefined>(value);
+  const isValid = useMemo(() => internalValue && internalValue.length >= 50, [internalValue]);
 
   return (
     <TextAreaField

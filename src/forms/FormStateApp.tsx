@@ -11,7 +11,7 @@ import {
   simpleHeader,
   SimpleHeaderAndDataWith,
 } from "src/components";
-import { BoundDateField, BoundSelectField, BoundTextField } from "src/forms";
+import { BoundDateField, BoundNumberField, BoundSelectField, BoundTextField } from "src/forms";
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
@@ -62,6 +62,7 @@ export function FormStateApp() {
               <BoundTextField field={formState.firstName} />
               <BoundTextField field={formState.lastName} />
               <BoundDateField field={formState.birthday} />
+              <BoundNumberField field={formState.heightInInches} />
               <BoundSelectField field={formState.favoriteSport} options={sports} />
               <BoundCheckboxGroupField field={formState.favoriteColors} options={colors} />
             </div>
@@ -118,6 +119,7 @@ const formConfig: ObjectConfig<AuthorInput> = {
   firstName: { type: "value", rules: [required] },
   lastName: { type: "value", rules: [required] },
   birthday: { type: "value", rules: [required] },
+  heightInInches: { type: "value", rules: [required] },
   favoriteSport: { type: "value", rules: [required] },
   favoriteColors: { type: "value", rules: [required] },
   books: {
