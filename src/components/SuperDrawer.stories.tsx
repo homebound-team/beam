@@ -1,14 +1,14 @@
 import { Meta } from "@storybook/react";
 import { useEffect } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf } from "src";
+import { withDecoratorSuperDrawer } from "../utils/SuperDrawer";
 import { SuperDrawer as SuperDrawerComponent, SuperDrawerContent } from "./SuperDrawer";
 import { useSuperDrawer } from "./SuperDrawerContext";
-import { withSuperDrawer } from "./SuperDrawerUtils";
 
 export default {
   title: "Components / Super Drawer",
   component: SuperDrawerComponent,
-  decorators: [withSuperDrawer],
+  decorators: [withDecoratorSuperDrawer],
   parameters: { chromatic: { delay: 1000 } },
 } as Meta;
 
@@ -53,7 +53,7 @@ export function OpenWithChild() {
     });
     openInDrawer({
       content: <SuperDrawerExampleChildContent book={Books[0]} />,
-      mode: "detail",
+      type: "detail",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -91,7 +91,7 @@ export function OpenOnlyDetails() {
     openInDrawer({
       title: "This should not render",
       content: <SuperDrawerExampleChildContent book={Books[0]} />,
-      mode: "detail",
+      type: "detail",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -232,7 +232,7 @@ function SuperDrawerExampleContent({ book }: { book: Book }) {
               title: book.authorName,
               content: <SuperDrawerExampleChildContent book={book} onPurchase={handlePurchase} />,
               // Specifically marking this element as a detail element
-              mode: "detail",
+              type: "detail",
             })
           }
         />

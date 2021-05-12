@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode, useCallback } from "react";
 import { Css, px } from "src";
+import { useTestIds } from "src/utils";
 import { Button, ButtonProps } from "./Button";
 import { ButtonGroup } from "./ButtonGroup";
 import { IconButton } from "./IconButton";
@@ -9,9 +10,10 @@ import { SuperDrawerNewOpenInDrawerProps, useSuperDrawer } from "./SuperDrawerCo
 /** Right side drawer component */
 export function SuperDrawer() {
   const { contentStack, modalContent, closeDrawer } = useSuperDrawer();
+  const testId = useTestIds({ "data-testid": "superDrawer" });
 
   // Get the latest element on the stack
-  const { title, content, mode, ...other } = contentStack[contentStack.length - 1] ?? {};
+  const { title, content, type, ...other } = contentStack[contentStack.length - 1] ?? {};
   // Narrowing the union in a sense
   const { onPrevClick, onNextClick, onClose } = other as SuperDrawerNewOpenInDrawerProps;
 
@@ -25,6 +27,7 @@ export function SuperDrawer() {
       {content && (
         // Overlay
         <motion.div
+          {...testId}
           // Key is required for framer-motion animations
           key="superDrawer"
           // TODO: Should this color be part of the Palette?
@@ -52,7 +55,9 @@ export function SuperDrawer() {
           >
             <header css={Css.df.p3.bb.bGray200.df.itemsCenter.justifyBetween.$}>
               {/* Left */}
-              <div css={Css.xl2Em.gray900.$}>{title}</div>
+              <div css={Css.xl2Em.gray900.$} {...testId.title}>
+                {title}
+              </div>
               {/* Right */}
               {!modalContent && (
                 // Forcing height to 32px to match title height
@@ -63,12 +68,12 @@ export function SuperDrawer() {
                       {
                         icon: "chevronLeft",
                         onClick: () => onPrevClick && onPrevClick(),
-                        disabled: !onPrevClick || mode === "detail",
+                        disabled: !onPrevClick || type === "detail",
                       },
                       {
                         icon: "chevronRight",
                         onClick: () => onNextClick && onNextClick(),
-                        disabled: !onNextClick || mode === "detail",
+                        disabled: !onNextClick || type === "detail",
                       },
                     ]}
                   />
@@ -111,11 +116,11 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
   const { contentStack, closeInDrawer } = useSuperDrawer();
 
   // Determine if the current element is a new content element or an detail element
-  const { mode } = contentStack[contentStack.length - 1] ?? {};
+  const { type } = contentStack[contentStack.length - 1] ?? {};
 
   const ContentWrapper = useCallback(
     ({ children }: { children: ReactNode }) =>
-      mode === "new" ? (
+      type === "new" ? (
         <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }}>
           {children}
         </motion.div>
@@ -143,7 +148,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
           </motion.div>
         </motion.div>
       ),
-    [mode, closeInDrawer],
+    [type, closeInDrawer],
   );
 
   return (

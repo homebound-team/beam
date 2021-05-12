@@ -23,13 +23,13 @@ interface SuperDrawerHeaderProps {
 // When adding a new element to the stack
 export interface SuperDrawerNewOpenInDrawerProps extends SuperDrawerHeaderProps {
   content: ReactNode;
-  mode?: "new";
+  type?: "new";
 }
 
 // When adding a detail element to the stack
 interface SuperDrawerDetailOpenInDrawerProps extends Partial<Pick<SuperDrawerHeaderProps, "title">> {
   content: ReactNode;
-  mode: "detail";
+  type: "detail";
 }
 
 type SuperDrawerOpenInDrawerProps = SuperDrawerNewOpenInDrawerProps | SuperDrawerDetailOpenInDrawerProps;
@@ -41,17 +41,17 @@ interface SuperDrawerContextValues {
 }
 
 // Actions that can be performed to SuperDrawer
-interface SuperDrawerContextActions {
+export interface SuperDrawerContextActions {
   /**
    * Adds a new element to the SuperDrawer content stack which can be of two types.
    *
-   * These types are controlled by the `mode` key defined by `SuperDrawerOpenInDrawerProps`:
+   * These types are controlled by the `type` key defined by `SuperDrawerOpenInDrawerProps`:
    * - "new": represents a new element that will erase all other element on the contentStack
    * - "detail": represents a detail element that will be pushed onto contentStack
    *
-   * The only difference between `new` and `detail` mode are the visual states that SuperDrawer
+   * The only difference between `new` and `detail` type are the visual states that SuperDrawer
    * adds to help with navigation. For example, when adding a `detail` element, a "back" button
-   * will be injected into the content area to help users navigate back to the `new` (can also be called "main") content.
+   * will be injected into the content area to help users navigate back to the `new` content.
    *
    */
   openInDrawer: (content: SuperDrawerOpenInDrawerProps) => void;
@@ -83,17 +83,19 @@ export function SuperDrawerProvider({ children }: { children: ReactChild }) {
   const actions: SuperDrawerContextActions = useMemo(
     () => ({
       openInDrawer: (content) => {
-        const { mode = "new", title } = content;
+        const { type = "new", title } = content;
 
-        // When mode is not given, or "new", reset the contentStack
-        if (mode === "new") {
-          setContentStack([{ ...content, mode } as SuperDrawerNewOpenInDrawerProps]);
+        // When type is not given, or "new", reset the contentStack
+        if (type === "new") {
+          setContentStack([{ ...content, type } as SuperDrawerNewOpenInDrawerProps]);
         }
         // Otherwise push the element onto the stack
         else {
           setContentStack((prev) => {
             if (prev.length === 0) {
-              console.error("SuperDrawer must have at least one `new` element before adding a `detail` element.");
+              console.error(
+                "SuperDrawer must have at least one `new` element before adding a `detail` element. Adding `type` of `new` to `openInDrawer` should resolve the issue.",
+              );
               return prev;
             }
 
