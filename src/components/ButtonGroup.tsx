@@ -4,9 +4,14 @@ import { Icon, IconProps } from "src/components/Icon";
 import { Css } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 
-interface ButtonGroupProps {
+export interface ButtonGroupProps {
+  /** Disables all buttons in ButtonGroup */
   disabled?: boolean;
-  buttons: Pick<ButtonGroupButtonProps, "text" | "icon" | "active">[];
+  /**
+   * ButtonGroupButtonProps in an internal API.
+   * This is only exposing props that will be publicly accessible.
+   */
+  buttons: Pick<ButtonGroupButtonProps, "text" | "icon" | "active" | "onClick" | "disabled">[];
   size?: ButtonGroupSize;
 }
 
@@ -22,8 +27,17 @@ export function ButtonGroup(props: ButtonGroupProps) {
   const { buttons, disabled = false, size = "sm" } = props;
   return (
     <div css={Css.mPx(4).$}>
-      {buttons.map((b, i) => (
-        <ButtonGroupButton key={i} {...{ ...b, disabled, size }} />
+      {buttons.map(({ disabled: buttonDisabled, ...buttonProps }, i) => (
+        <ButtonGroupButton
+          key={i}
+          {...buttonProps}
+          {...{
+            // Disable the button if the ButtonGroup is disabled or if the current
+            // button is disabled.
+            disabled: disabled || buttonDisabled,
+            size,
+          }}
+        />
       ))}
     </div>
   );

@@ -1,5 +1,6 @@
-import { RenderResult } from "@homebound/rtl-utils";
+import { RenderResult, Wrapper } from "@homebound/rtl-utils";
 import { prettyDOM } from "@testing-library/react";
+import { SuperDrawerProvider } from "src";
 export * from "@homebound/rtl-utils";
 
 export function cell(r: RenderResult, row: number, column: number): HTMLElement {
@@ -25,3 +26,8 @@ export function rowAnd(r: RenderResult, row: number, testId: string): HTMLElemen
   const e = r.getByTestId("grid-table").childNodes[row] as HTMLElement;
   return e.querySelector(`[data-testid="${testId}"]`) || fail(`Element not found ${prettyDOM(e)}`);
 }
+
+/** RTL wrapper for SuperDrawer context */
+export const withSuperDrawer: Wrapper = {
+  wrap: (c) => <SuperDrawerProvider>{c}</SuperDrawerProvider>,
+};

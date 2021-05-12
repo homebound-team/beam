@@ -10,6 +10,7 @@ export * from "./Icon";
 export * from "./IconButton";
 export { NavLink } from "./NavLink";
 export * from "./SelectField";
+export * from "./SuperDrawer";
 export { TabsWithContent } from "./Tabs";
 export * from "./TextAreaField";
 export * from "./TextField";
