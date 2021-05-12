@@ -88,7 +88,8 @@ export function SelectField<O extends object, V extends Key>(
       inputValue={fieldState.inputValue}
       selectedKey={fieldState.selectedKey}
       onSelectionChange={(key) => {
-        const newOption = options.find((o) => getOptionValue(o) === key);
+        // Even though the key is number|string, this will always be a string
+        const newOption = options.find((o) => String(getOptionValue(o)) === key);
         setFieldState({
           isOpen: false,
           inputValue: newOption ? getOptionLabel(newOption) : "",

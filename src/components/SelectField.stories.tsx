@@ -9,9 +9,9 @@ export default {
 } as Meta;
 
 type TestOption = {
-  id: string;
+  id: Key;
   name: string;
-  icon: keyof typeof Icons;
+  icon?: keyof typeof Icons;
 };
 
 const options: TestOption[] = [
@@ -19,6 +19,13 @@ const options: TestOption[] = [
   { id: "2", name: "Camera", icon: "camera" },
   { id: "3", name: "Info Circle", icon: "infoCircle" },
   { id: "4", name: "Calendar", icon: "calendar" },
+];
+
+const optionsWithNumericIds: TestOption[] = [
+  { id: 1, name: "One" },
+  { id: 2, name: "Two" },
+  { id: 3, name: "Three" },
+  { id: 4, name: "Four" },
 ];
 
 export function SelectFields() {
@@ -59,7 +66,15 @@ export function SelectFields() {
         />
         <TestSelectField label="Favorite Icon - Disabled" value={undefined} options={options} disabled />
         <TestSelectField label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
-        <TestSelectField label="Favorite Icon" value={undefined} options={options} />
+        <TestSelectField label="Favorite Icon - Invalid" value={undefined} options={options} />
+
+        <TestSelectField
+          label="Favorite Number - Numeric"
+          value={1}
+          options={optionsWithNumericIds}
+          getOptionValue={(o) => o.id}
+          getOptionLabel={(o) => o.name}
+        />
       </div>
 
       <div css={Css.df.flexColumn.childGap3.$}>
