@@ -52,7 +52,6 @@ export interface SuperDrawerContextActions {
    * The only difference between `new` and `detail` type are the visual states that SuperDrawer
    * adds to help with navigation. For example, when adding a `detail` element, a "back" button
    * will be injected into the content area to help users navigate back to the `new` content.
-   *
    */
   openInDrawer: (content: SuperDrawerOpenInDrawerProps) => void;
   /**
