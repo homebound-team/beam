@@ -1,6 +1,7 @@
 import { StoryFn } from "@storybook/addons";
 import { DecoratorFn } from "@storybook/react";
 import { ReactElement, ReactNode } from "react";
+import { SuperDrawerProvider } from "src";
 import { Css } from "src/Css";
 import { withRouter as rtlWithRouter } from "src/utils/rtl";
 
@@ -34,3 +35,10 @@ export function samples(...samples: [string, ReactNode][]): JSX.Element[] {
     );
   });
 }
+
+/** Storybook decorator utility to wrap a story with a SuperDrawer context */
+export const withSuperDrawer = (Story: () => JSX.Element) => (
+  <SuperDrawerProvider>
+    <Story />
+  </SuperDrawerProvider>
+);

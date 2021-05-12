@@ -1,16 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode, useCallback } from "react";
-import { Css, px } from "src";
+import { Button, ButtonGroup, ButtonProps, Css, IconButton, px } from "src";
 import { useTestIds } from "src/utils";
-import { Button, ButtonProps } from "./Button";
-import { ButtonGroup } from "./ButtonGroup";
-import { IconButton } from "./IconButton";
-import { SuperDrawerNewOpenInDrawerProps, useSuperDrawer } from "./SuperDrawerContext";
+import { SuperDrawerNewOpenInDrawerProps, useSuperDrawer } from "./index";
 
 /** Right side drawer component */
 export function SuperDrawer() {
   const { contentStack, modalContent, closeDrawer } = useSuperDrawer();
-  const testId = useTestIds({ "data-testid": "superDrawer" });
+  const testId = useTestIds({}, "superDrawer");
 
   // Get the latest element on the stack
   const { title, content, type, ...other } = contentStack[contentStack.length - 1] ?? {};
