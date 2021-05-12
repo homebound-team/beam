@@ -75,7 +75,7 @@ export function NumberField(props: NumberFieldProps) {
 
   return (
     <div css={Css.df.flexColumn.wPx(width).$} {...groupProps}>
-      {label && <Label labelProps={labelProps} label={label} />}
+      {label && <Label labelProps={labelProps} label={label} {...tid.label} />}
       <input
         {...mergeProps(inputProps, { onBlur })}
         {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}

@@ -12,7 +12,14 @@ export type BoundNumberFieldProps = Omit<NumberFieldProps, "value" | "onChange">
 
 /** Wraps `NumberField` and binds it to a form field. */
 export function BoundNumberField(props: BoundNumberFieldProps) {
-  const { field, readOnly, onChange = (value) => field.set(value), label = defaultLabel(field.key), ...others } = props;
+  const {
+    field,
+    readOnly,
+    onChange = (value) => field.set(value),
+    label = defaultLabel(field.key.replace(/InCents$/, "")),
+    type = field.key.endsWith("InCents") ? "cents" : undefined,
+    ...others
+  } = props;
   const testId = useTestIds(props, field.key);
   return (
     <Observer>
@@ -21,6 +28,7 @@ export function BoundNumberField(props: BoundNumberFieldProps) {
           label={label}
           value={field.value || undefined}
           onChange={onChange}
+          type={type}
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           onBlur={() => field.blur()}
