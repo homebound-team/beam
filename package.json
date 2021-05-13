@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "yarn storybook",
-    "build": "ttsc && yarn copy",
+    "build": "yarn copy && ttsc",
     "build:truss": "cd ./truss && npm run generate",
     "watch:truss": "cd ./truss && watch 'npm run generate' ./",
     "build:storybook": "build-storybook",
