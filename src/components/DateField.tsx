@@ -1,6 +1,5 @@
 import { useTextField } from "@react-aria/textfield";
-import dateFnsFormat from "date-fns/format";
-import dateFnsParse from "date-fns/parse";
+import { format as dateFnsFormat, parse as dateFnsParse } from "date-fns";
 import React, { useRef } from "react";
 import { DateUtils, NavbarElementProps, WeekdayElementProps } from "react-day-picker";
 import DayPickerInput from "react-day-picker/DayPickerInput";
