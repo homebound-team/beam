@@ -5,7 +5,26 @@ import { Button, ButtonGroup, ButtonProps, Css, IconButton, px } from "src";
 import { useTestIds } from "src/utils";
 import { SuperDrawerNewOpenInDrawerProps, useSuperDrawer } from "./index";
 
-/** Right side drawer component */
+/**
+ * Global drawer component.
+ *
+ * The aim of this drawer is to give extra details regarding a page content
+ * without the need to change pages.
+ *
+ * NOTE: Since this component is a global component, meaning there is only one
+ * per application shared between all children components of the application, we
+ * needed to be strategic in its DOM placement and zIndex. That is why we are
+ * using React.createPortal to append this component to the body so that
+ * it can be nested at the highest level of the application and share the stacking
+ * context with the application and any other global components. Having the
+ * application set its zIndex at the body level will guarantee that no children
+ * can ever "break out" of the stacking order and overlap global components.
+ *
+ * TLDR: Long term plan is to have all applications using Beam set their zIndex
+ * to 0 and have SuperDrawer zIndex be 3 to give space to place other global
+ * components (most likely Modal) between the application and SuperDrawer or
+ * above the SuperDrawer.
+ */
 export function SuperDrawer(): ReactPortal {
   const { contentStack, modalContent, closeDrawer } = useSuperDrawer();
   const testId = useTestIds({}, "superDrawer");
