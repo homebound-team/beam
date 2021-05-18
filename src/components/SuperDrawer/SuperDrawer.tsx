@@ -1,11 +1,31 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactNode, useCallback } from "react";
+import { ReactNode, ReactPortal, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { Button, ButtonGroup, ButtonProps, Css, IconButton, px } from "src";
 import { useTestIds } from "src/utils";
 import { SuperDrawerNewOpenInDrawerProps, useSuperDrawer } from "./index";
 
-/** Right side drawer component */
-export function SuperDrawer() {
+/**
+ * Global drawer component.
+ *
+ * The aim of this drawer is to give extra details regarding a page content
+ * without the need to change pages.
+ *
+ * NOTE: Since this component is a global component, meaning there is only one
+ * per application shared between all children components of the application, we
+ * needed to be strategic in its DOM placement and zIndex. That is why we are
+ * using React.createPortal to append this component to the body so that
+ * it can be nested at the highest level of the application and share the stacking
+ * context with the application and any other global components. Having the
+ * application set its zIndex at the body level will guarantee that no children
+ * can ever "break out" of the stacking order and overlap global components.
+ *
+ * TLDR: Long term plan is to have all applications using Beam set their zIndex
+ * to 0 and have SuperDrawer zIndex be 3 to give space to place other global
+ * components (most likely Modal) between the application and SuperDrawer or
+ * above the SuperDrawer.
+ */
+export function SuperDrawer(): ReactPortal {
   const { contentStack, modalContent, closeDrawer } = useSuperDrawer();
   const testId = useTestIds({}, "superDrawer");
 
@@ -19,7 +39,7 @@ export function SuperDrawer() {
     return closeDrawer();
   }
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {content && (
         // Overlay
@@ -28,7 +48,8 @@ export function SuperDrawer() {
           // Key is required for framer-motion animations
           key="superDrawer"
           // TODO: Should this color be part of the Palette?
-          css={Css.fixed.df.justifyEnd.add("backgroundColor", "rgba(36,36,36,0.2)").add("inset", 0).$}
+          // z-index of 3 is used to give flexibility for future overlapping content
+          css={Css.fixed.df.justifyEnd.add("backgroundColor", "rgba(36,36,36,0.2)").add("inset", 0).z3.$}
           // Initial styles (acts similar to `from` in keyframe animations)
           initial={{ opacity: 0 }}
           // Rendered styles (acts similar to `to` in keyframe animations)
@@ -87,7 +108,8 @@ export function SuperDrawer() {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
 
