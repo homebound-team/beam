@@ -90,7 +90,7 @@ export function SuperDrawer(): ReactPortal {
         </motion.div>
       )}
     </AnimatePresence>,
-    document.querySelector("body")!,
+    document.body,
   );
 }
 
