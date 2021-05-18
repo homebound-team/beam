@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { Button, ButtonGroup, ButtonProps, Css, IconButton, px } from "src";
 import { useTestIds } from "src/utils";
 import { SuperDrawerNewOpenInDrawerProps, useSuperDrawer } from "./index";
@@ -19,7 +20,7 @@ export function SuperDrawer() {
     return closeDrawer();
   }
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {content && (
         // Overlay
@@ -88,7 +89,8 @@ export function SuperDrawer() {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.querySelector("body")!,
   );
 }
 
