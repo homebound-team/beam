@@ -28,7 +28,8 @@ export function SuperDrawer() {
           // Key is required for framer-motion animations
           key="superDrawer"
           // TODO: Should this color be part of the Palette?
-          css={Css.fixed.df.justifyEnd.add("backgroundColor", "rgba(36,36,36,0.2)").add("inset", 0).$}
+          // z-index of 3 is used to give flexibility for future overlapping content
+          css={Css.fixed.df.justifyEnd.add("backgroundColor", "rgba(36,36,36,0.2)").add("inset", 0).z3.$}
           // Initial styles (acts similar to `from` in keyframe animations)
           initial={{ opacity: 0 }}
           // Rendered styles (acts similar to `to` in keyframe animations)
