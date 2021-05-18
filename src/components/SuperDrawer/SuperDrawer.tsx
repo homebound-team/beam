@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactNode, useCallback } from "react";
+import { ReactNode, ReactPortal, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Button, ButtonGroup, ButtonProps, Css, IconButton, px } from "src";
 import { useTestIds } from "src/utils";
 import { SuperDrawerNewOpenInDrawerProps, useSuperDrawer } from "./index";
 
 /** Right side drawer component */
-export function SuperDrawer() {
+export function SuperDrawer(): ReactPortal {
   const { contentStack, modalContent, closeDrawer } = useSuperDrawer();
   const testId = useTestIds({}, "superDrawer");
 
