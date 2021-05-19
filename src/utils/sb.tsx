@@ -42,3 +42,15 @@ export const withSuperDrawer = (Story: () => JSX.Element) => (
     <Story />
   </SuperDrawerProvider>
 );
+
+/**
+ * Decorator to set explicit width and height dimensions for a story.
+ * Used to help Chromatic properly render positioned `fixed` components.
+ */
+export const withDimensions = (width: number | string = "1200px", height: number | string = "800px", xss?: {}) => (
+  Story: () => JSX.Element,
+) => (
+  <div css={{ ...Css.w(width).h(height).$, ...xss }}>
+    <Story />
+  </div>
+);
