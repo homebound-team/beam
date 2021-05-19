@@ -1,13 +1,15 @@
 import { mergeProps } from "@react-aria/utils";
 import React, { InputHTMLAttributes, LabelHTMLAttributes, MutableRefObject, TextareaHTMLAttributes } from "react";
 import { ErrorMessage } from "src/components/ErrorMessage";
+import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, px } from "src/Css";
 import { BeamTextFieldProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
-interface TextFieldBaseProps extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur" | "onChange"> {
+interface TextFieldBaseProps
+  extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur" | "onChange" | "helperText"> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
   inputRef?: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>;
@@ -27,6 +29,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     inputRef,
     compact = false,
     errorMsg,
+    helperText,
     multiline = false,
     onChange,
     wide = false,
@@ -70,7 +73,8 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         }}
         {...tid}
       />
-      <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />
+      {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}
+      {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
     </div>
   );
 }

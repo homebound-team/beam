@@ -12,6 +12,7 @@ export function TextAreas() {
   return (
     <div css={Css.df.justifyAround.$}>
       <div>
+        <h1 css={Css.lg.mb2.$}>Regular</h1>
         <TestTextArea value="" />
         <br />
         <TestTextArea label="Description" value="" />
@@ -20,9 +21,16 @@ export function TextAreas() {
         <br />
         <TestTextArea label="Description" value="This is a description that can no longer be edited." disabled />
         <br />
+        <TestTextArea
+          label="Description"
+          value="See helper text."
+          helperText="Some really long helper text that we expect to wrap."
+        />
+        <br />
         <ValidationTextArea value="Not enough characters" />
       </div>
       <div>
+        <h1 css={Css.lg.mb2.$}>Wide</h1>
         <TestTextArea wide value="" />
         <br />
         <TestTextArea wide label="Description" value="" />
@@ -38,17 +46,9 @@ export function TextAreas() {
 }
 
 function TestTextArea(props: Omit<TextAreaFieldProps, "onChange">) {
-  const { value, disabled, wide, label } = props;
+  const { value, ...others } = props;
   const [internalValue, setValue] = useState(value);
-  return (
-    <TextAreaField
-      wide={wide}
-      label={label}
-      disabled={disabled}
-      value={internalValue}
-      onChange={(val) => setValue(val)}
-    />
-  );
+  return <TextAreaField value={internalValue} onChange={(val) => setValue(val)} {...others} />;
 }
 
 function ValidationTextArea({ wide, value }: { wide?: boolean; value: string }) {

@@ -1,10 +1,11 @@
 import { useTextField } from "@react-aria/textfield";
 import { format as dateFnsFormat, parse as dateFnsParse } from "date-fns";
-import React, { useRef } from "react";
+import React, { ReactNode, useRef } from "react";
 import { DateUtils, NavbarElementProps, WeekdayElementProps } from "react-day-picker";
 import DayPickerInput from "react-day-picker/DayPickerInput";
 import { Icon, IconButton } from "src/components";
 import { ErrorMessage } from "src/components/ErrorMessage";
+import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
 import "./DateField.css";
@@ -19,10 +20,11 @@ export interface DateFieldProps {
   onBlur?: () => void;
   disabled?: boolean;
   errorMsg?: string;
+  helperText?: string | ReactNode;
 }
 
 export function DateField(props: DateFieldProps) {
-  const { label, disabled, value, onChange, errorMsg } = props;
+  const { label, disabled, value, onChange, errorMsg, helperText } = props;
 
   const { ...otherProps } = {};
   // We don't really use the inputRef, but `useTextField` needs it. We probably shouldn't
@@ -82,7 +84,8 @@ export function DateField(props: DateFieldProps) {
         parseDate={parseDate}
         format={format}
       />
-      <ErrorMessage errorMsg={errorMsg} />
+      {errorMsg && <ErrorMessage errorMsg={errorMsg} />}
+      {helperText && <HelperText helperText={helperText} />}
     </div>
   );
 }

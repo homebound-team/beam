@@ -1,9 +1,10 @@
 import { useNumberField } from "@react-aria/numberfield";
 import { mergeProps } from "@react-aria/utils";
 import { NumberFieldStateProps, useNumberFieldState } from "@react-stately/numberfield";
-import React, { useMemo, useRef } from "react";
+import React, { ReactNode, useMemo, useRef } from "react";
 import { useLocale } from "react-aria";
 import { ErrorMessage } from "src/components/ErrorMessage";
+import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
@@ -17,6 +18,7 @@ export interface NumberFieldProps {
   compact?: boolean;
   disabled?: boolean;
   errorMsg?: string;
+  helperText?: string | ReactNode;
   onBlur?: () => void;
   readOnly?: boolean;
 }
@@ -29,6 +31,7 @@ export function NumberField(props: NumberFieldProps) {
     label,
     onBlur,
     errorMsg,
+    helperText,
     compact = false,
     value,
     onChange,
@@ -92,7 +95,8 @@ export function NumberField(props: NumberFieldProps) {
         }}
         {...tid}
       />
-      <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />
+      {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}
+      {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
     </div>
   );
 }

@@ -192,3 +192,33 @@ export function Disabled() {
     />
   );
 }
+
+export function ErrorMessage() {
+  return (
+    <RadioGroupField
+      label={"Favorite cheese"}
+      value={"a"}
+      onChange={() => {}}
+      errorMsg="Required"
+      options={[
+        { label: "Asiago", value: "a" },
+        { label: "Burratta", value: "b" },
+      ]}
+    />
+  );
+}
+
+export function HelperText() {
+  return (
+    <RadioGroupField
+      label={"Favorite cheese"}
+      value={"a"}
+      onChange={() => {}}
+      options={[
+        { label: "Asiago", value: "a" },
+        { label: "Burratta", value: "b" },
+      ]}
+      helperText="Some really long helper text that we expect to wrap."
+    />
+  );
+}

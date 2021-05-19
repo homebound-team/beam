@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react";
 import { Key, useState } from "react";
 import { HasIdAndName, Icon, Icons, Optional, SelectField, SelectFieldProps } from "src/components";
+import { zeroTo } from "src/components/GridTable.stories";
 import { Css } from "src/Css";
 
 export default {
@@ -27,6 +28,12 @@ const optionsWithNumericIds: TestOption[] = [
   { id: 3, name: "Three" },
   { id: 4, name: "Four" },
 ];
+
+export function LotsOfOptions() {
+  const options: TestOption[] = zeroTo(1000).map((i) => ({ id: i, name: `Project ${i}` }));
+
+  return <TestSelectField label="Project" value={options[2].id} options={options} />;
+}
 
 export function SelectFields() {
   return (
@@ -67,7 +74,12 @@ export function SelectFields() {
         <TestSelectField label="Favorite Icon - Disabled" value={undefined} options={options} disabled />
         <TestSelectField label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
         <TestSelectField label="Favorite Icon - Invalid" value={undefined} options={options} />
-
+        <TestSelectField
+          label="Favorite Icon - Helper Text"
+          value={options[0].id}
+          options={options}
+          helperText="Some really long helper text that we expect to wrap."
+        />
         <TestSelectField
           label="Favorite Number - Numeric"
           value={1}
@@ -114,12 +126,14 @@ export function SelectFields() {
         />
         <TestSelectField compact label="Favorite Icon - Disabled" value={undefined} options={options} disabled />
         <TestSelectField compact label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
-        <TestSelectField compact label="Favorite Icon" options={options} value={undefined} />
+        <TestSelectField compact label="Favorite Icon - Invalid" options={options} value={undefined} />
       </div>
     </div>
   );
 }
 
+// Kind of annoying but to get type inference for HasIdAndName working, we
+// have to re-copy/paste the overload here.
 function TestSelectField<T extends object, V extends Key>(props: Omit<SelectFieldProps<T, V>, "onSelect">): JSX.Element;
 function TestSelectField<O extends HasIdAndName<V>, V extends Key>(
   props: Optional<Omit<SelectFieldProps<O, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
@@ -134,7 +148,7 @@ function TestSelectField<T extends object, V extends Key>(
       // We may have to redo the conditional getOptionValue/getOptionLabel
       {...(props as any)}
       value={selectedOption}
-      onSelect={(v) => setSelectedOption(v)}
+      onSelect={setSelectedOption}
       errorMsg={selectedOption || props.disabled ? "" : "Select an option. Plus more error text to force it to wrap."}
     />
   );
