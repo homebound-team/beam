@@ -25,7 +25,7 @@ export function Open() {
 
   return (
     <>
-      <h1>SuperDrawer Open</h1>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open</h1>
       <Button
         label="Show SuperDrawer"
         onClick={() =>
@@ -39,7 +39,7 @@ export function Open() {
   );
 }
 
-export function OpenWithChild() {
+export function OpenAtDetail() {
   const { openInDrawer } = useSuperDrawer();
 
   // Open the SuperDrawer to a details component
@@ -59,7 +59,7 @@ export function OpenWithChild() {
 
   return (
     <>
-      <h1>SuperDrawer Open</h1>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Detail</h1>
       <Button
         label="Show SuperDrawer"
         onClick={() =>
@@ -97,8 +97,12 @@ export function OpenOnlyDetails() {
 
   return (
     <>
-      <h1>SuperDrawer</h1>
-      <p>Attempting to open a `details` element before a `new` element is included</p>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Should Not Render</h1>
+      <p>
+        When attempting to open a `details` element before a `new` element is included, a console error will be logged
+        and the SuperDrawer will not open.
+      </p>
+      <p>See console via DevTools for a detailed error message.</p>
     </>
   );
 }
@@ -139,7 +143,7 @@ const Books: Book[] = [
  * render of the SuperDrawer with a chosen component (so it can give it the
  * appropriate props) and the unmount can be controlled via the chosen component.
  */
-export function WithTable() {
+export function Example() {
   const { openInDrawer } = useSuperDrawer();
 
   // Creates a setContent with prev/next handles to move up or down the table
