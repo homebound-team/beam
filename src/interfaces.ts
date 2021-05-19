@@ -1,4 +1,5 @@
 import type { PressEvent } from "@react-types/shared";
+import { ReactNode } from "react";
 
 /** Base Interfaced */
 export interface BeamFocusableProps {
@@ -17,6 +18,7 @@ export interface BeamTextFieldProps extends BeamFocusableProps {
   /** Whether the interactive element is disabled. */
   disabled?: boolean;
   errorMsg?: string;
+  helperText?: string | ReactNode;
   /** Input label */
   label?: string;
   value: string | undefined;

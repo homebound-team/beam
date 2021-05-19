@@ -1,8 +1,11 @@
 import { useCheckboxGroup } from "@react-aria/checkbox";
 import { CheckboxGroupState, useCheckboxGroupState } from "@react-stately/checkbox";
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { useCheckboxGroupItem } from "react-aria";
 import { CheckboxBase } from "src/components";
+import { ErrorMessage } from "src/components/ErrorMessage";
+import { HelperText } from "src/components/HelperText";
+import { Label } from "src/components/Label";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -23,10 +26,12 @@ export interface CheckboxGroupProps {
   options: CheckboxGroupItemOption[];
   /** The values currently selected. */
   values: string[];
+  errorMsg?: string;
+  helperText?: string | ReactNode;
 }
 
 export function CheckboxGroup(props: CheckboxGroupProps) {
-  const { options, label, values } = props;
+  const { options, label, values, errorMsg, helperText } = props;
 
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
@@ -34,9 +39,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
 
   return (
     <div {...groupProps} {...tid}>
-      <div {...labelProps} css={Css.gray700.pbPx(4).sm.$} {...tid.label}>
-        {label}
-      </div>
+      <Label label={label} {...labelProps} {...tid.label} />
       <div css={Css.dg.gap2.$}>
         {options.map((option) => (
           <CheckboxGroupItem
@@ -47,6 +50,8 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
           />
         ))}
       </div>
+      {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
+      {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
     </div>
   );
 }

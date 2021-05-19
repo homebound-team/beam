@@ -16,6 +16,7 @@ import {
   useOverlayPosition,
 } from "react-aria";
 import { ErrorMessage } from "src/components/ErrorMessage";
+import { HelperText } from "src/components/HelperText";
 import { Icon } from "src/components/Icon";
 import { Label } from "src/components/Label";
 import { Css, Palette, px } from "src/Css";
@@ -134,11 +135,13 @@ interface ComboBoxProps<T extends object> extends BeamSelectFieldBaseProps<T> {
   onInputChange: (value: string) => void;
 }
 
+/** Ties together ComboBoxInput (text field) and the ListBoxPopup (drop down). */
 function ComboBox<T extends object>(props: ComboBoxProps<T>) {
   const {
     compact = false,
     disabled: isDisabled = false,
     errorMsg,
+    helperText,
     label,
     onInputChange,
     onSelectionChange,
@@ -195,6 +198,7 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
           buttonRef={triggerRef}
           compact={compact}
           errorMsg={errorMsg}
+          helperText={helperText}
           fieldDecoration={fieldDecoration}
           inputProps={inputProps}
           inputRef={inputRef}
@@ -232,6 +236,7 @@ interface ComboBoxInputProps<T extends object> {
   isReadOnly: boolean;
   fieldDecoration?: (opt: T) => ReactNode;
   errorMsg?: string;
+  helperText?: string | ReactNode;
 }
 
 function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
@@ -243,6 +248,7 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
     buttonRef,
     compact = false,
     errorMsg,
+    helperText,
     state,
     isFocused,
     fieldDecoration,
@@ -317,7 +323,8 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
         )}
       </div>
 
-      <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />
+      {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}
+      {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
     </Fragment>
   );
 }
@@ -414,6 +421,7 @@ interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
   compact?: boolean;
   disabled?: boolean;
   errorMsg?: string;
+  helperText?: string | ReactNode;
   /** Allow placing an icon/decoration within the input field. */
   fieldDecoration?: (opt: T) => ReactNode;
   /** Sets the form field label. */

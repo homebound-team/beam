@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
 import { Css } from "src/Css";
-import { Checkbox, CheckboxGroup } from "src/index";
+import { Checkbox, CheckboxGroup, CheckboxGroupProps } from "src/index";
 
 export default {
   component: Checkbox,
@@ -9,8 +9,6 @@ export default {
 } as Meta;
 
 export function Checkboxes() {
-  const [selectedValues, setSelectedValues] = useState<string[]>([]);
-
   return (
     <div css={Css.dg.gap3.p1.$}>
       <div>
@@ -32,6 +30,14 @@ export function Checkboxes() {
           />
         </div>
       </div>
+    </div>
+  );
+}
+
+export function CheckboxGroups() {
+  const [selectedValues, setSelectedValues] = useState<string[]>([]);
+  return (
+    <div>
       <div css={Css.dg.gap1.$}>
         <h2>Checkbox Group</h2>
         <div css={Css.sm.lightBlue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
@@ -73,6 +79,38 @@ export function Checkboxes() {
           ]}
         />
       </div>
+
+      <div css={Css.dg.gap1.mt2.$}>
+        <h2>Error Message</h2>
+        <TestCheckboxGroup
+          label="Favorite Chairs"
+          values={["a"]}
+          options={[
+            { value: "a", label: "Lounge Chair" },
+            { value: "b", label: "Kitchen Chair" },
+          ]}
+          errorMsg="Required"
+        />
+      </div>
+
+      <div css={Css.dg.gap1.mt2.$}>
+        <h2>Helper Text</h2>
+        <TestCheckboxGroup
+          label="Favorite Chairs"
+          values={["a"]}
+          options={[
+            { value: "a", label: "Lounge Chair" },
+            { value: "b", label: "Kitchen Chair" },
+          ]}
+          helperText="Some really long helper text that we expect to wrap."
+        />
+      </div>
     </div>
   );
+}
+
+function TestCheckboxGroup(props: Omit<CheckboxGroupProps, "onChange">) {
+  const { values, ...others } = props;
+  const [selectedValues, setSelectedValues] = useState<string[]>(values);
+  return <CheckboxGroup values={selectedValues} onChange={(values) => setSelectedValues(values)} {...others} />;
 }

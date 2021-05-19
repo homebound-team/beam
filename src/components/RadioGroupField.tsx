@@ -1,7 +1,11 @@
-import { ReactNode, useMemo, useRef } from "react";
+import React, { ReactNode, useMemo, useRef } from "react";
 import { useFocusRing, useHover, useRadio, useRadioGroup } from "react-aria";
 import { RadioGroupState, useRadioGroupState } from "react-stately";
+import { ErrorMessage } from "src/components/ErrorMessage";
+import { HelperText } from "src/components/HelperText";
+import { Label } from "src/components/Label";
 import { Css } from "src/Css";
+import { useTestIds } from "src/utils/useTestIds";
 
 let nextNameId = 0;
 
@@ -15,8 +19,7 @@ export interface RadioFieldOption<K extends string> {
   value: K;
 }
 
-interface RadioGroupFieldProps<K extends string> {
-  // id?: string;
+export interface RadioGroupFieldProps<K extends string> {
   /** The label for the choice itself, i.e. "Favorite Cheese". */
   label: string;
   /** The currently selected option value (i.e. an id). */
@@ -26,6 +29,8 @@ interface RadioGroupFieldProps<K extends string> {
   /** The list of options. */
   options: RadioFieldOption<K>[];
   disabled?: boolean;
+  errorMsg?: string;
+  helperText?: string | ReactNode;
 }
 
 /**
@@ -36,7 +41,7 @@ interface RadioGroupFieldProps<K extends string> {
  * TODO: Add hover (non selected and selected) styles
  */
 export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>) {
-  const { label, value, onChange, options, disabled = false } = props;
+  const { label, value, onChange, options, disabled = false, errorMsg, helperText } = props;
 
   // useRadioGroupState uses a random group name, so use our name
   const name = useMemo(() => `radio-group-${++nextNameId}`, []);
@@ -47,6 +52,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
     isDisabled: disabled,
     isReadOnly: false,
   });
+  const tid = useTestIds(props, "radio");
 
   // We use useRadioGroup b/c it does neat keyboard up/down stuff
   // TODO: Pass read only, required, error message to useRadioGroup
@@ -57,14 +63,14 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
 
   return (
     <div css={Css.maxw(anyDescriptions ? "344px" : "320px").$}>
-      <div css={Css.sm.gray800.my1.$} {...labelProps}>
-        {label}
-      </div>
+      <Label label={label} {...labelProps} {...tid.label} />
       <div {...radioGroupProps}>
         {options.map((option) => (
           <Radio key={option.value} parentId={state.name} option={option} state={state} />
         ))}
       </div>
+      {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
+      {helperText && <HelperText helperText={helperText} />}
     </div>
   );
 }

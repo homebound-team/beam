@@ -17,6 +17,7 @@ export function DateFields() {
     ["Without Label", <TestDateField />],
     ["Disabled", <TestDateField disabled />],
     ["Error Message", <TestDateField errorMsg="Required" />],
+    ["Helper Text", <TestDateField helperText="Some really long helper text that we expect to wrap." />],
   );
 }
 

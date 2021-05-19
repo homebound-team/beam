@@ -21,6 +21,12 @@ export function TextFields() {
         <br />
         <TestNumberField label="Age Read Only" value={1000} readOnly />
         <br />
+        <TestNumberField
+          label="Age Read Helper Text"
+          value={1000}
+          helperText="Some really long helper text that we expect to wrap."
+        />
+        <br />
         <ValidationNumberField label="Age Validated" value={-1} />
       </div>
       <div>
