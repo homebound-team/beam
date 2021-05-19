@@ -109,7 +109,7 @@ exports[`RadioGroupField renders with just labels 1`] = `
     >
       <label
         class="emotion-1"
-        data-testid="radio_label"
+        data-testid="favoriteCheese_label"
         id="react-aria-2"
       >
         Favorite cheese
@@ -127,6 +127,7 @@ exports[`RadioGroupField renders with just labels 1`] = `
             aria-labelledby="radio-group-1-a-label"
             checked=""
             class="emotion-3"
+            data-testid="favoriteCheese_a"
             name="react-aria-3"
             tabindex="0"
             type="radio"
@@ -147,6 +148,7 @@ exports[`RadioGroupField renders with just labels 1`] = `
           <input
             aria-labelledby="radio-group-1-b-label"
             class="emotion-6"
+            data-testid="favoriteCheese_b"
             name="react-aria-3"
             tabindex="0"
             type="radio"
@@ -283,7 +285,7 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
     >
       <label
         class="emotion-1"
-        data-testid="radio_label"
+        data-testid="favoriteCheese_label"
         id="react-aria-5"
       >
         Favorite cheese
@@ -301,6 +303,7 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
             aria-labelledby="radio-group-2-a-label"
             checked=""
             class="emotion-3"
+            data-testid="favoriteCheese_a"
             name="react-aria-6"
             tabindex="0"
             type="radio"
@@ -321,6 +324,7 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
           <input
             aria-labelledby="radio-group-2-b-label"
             class="emotion-6"
+            data-testid="favoriteCheese_b"
             name="react-aria-6"
             tabindex="0"
             type="radio"
