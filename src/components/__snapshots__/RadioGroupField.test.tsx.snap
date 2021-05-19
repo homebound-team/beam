@@ -6,12 +6,11 @@ exports[`RadioGroupField renders with just labels 1`] = `
 }
 
 .emotion-1 {
-  color: rgba(53,53,53,1);
+  color: rgba(100,100,100,1);
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
-  margin-bottom: 8px;
-  margin-top: 8px;
+  margin-bottom: 4px;
 }
 
 .emotion-2 {
@@ -108,12 +107,13 @@ exports[`RadioGroupField renders with just labels 1`] = `
     <div
       class="emotion-0"
     >
-      <div
+      <label
         class="emotion-1"
+        data-testid="radio_label"
         id="react-aria-2"
       >
         Favorite cheese
-      </div>
+      </label>
       <div
         aria-labelledby="react-aria-2"
         aria-orientation="vertical"
@@ -173,12 +173,11 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
 }
 
 .emotion-1 {
-  color: rgba(53,53,53,1);
+  color: rgba(100,100,100,1);
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
-  margin-bottom: 8px;
-  margin-top: 8px;
+  margin-bottom: 4px;
 }
 
 .emotion-2 {
@@ -282,12 +281,13 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
     <div
       class="emotion-0"
     >
-      <div
+      <label
         class="emotion-1"
+        data-testid="radio_label"
         id="react-aria-5"
       >
         Favorite cheese
-      </div>
+      </label>
       <div
         aria-labelledby="react-aria-5"
         aria-orientation="vertical"
