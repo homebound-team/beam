@@ -1,7 +1,6 @@
 import { Meta } from "@storybook/react";
 import { Key, useState } from "react";
 import { HasIdAndName, Icon, Icons, Optional, SelectField, SelectFieldProps } from "src/components";
-import { zeroTo } from "src/components/GridTable.stories";
 import { Css } from "src/Css";
 
 export default {
@@ -29,11 +28,10 @@ const optionsWithNumericIds: TestOption[] = [
   { id: 4, name: "Four" },
 ];
 
-export function LotsOfOptions() {
-  const options: TestOption[] = zeroTo(1000).map((i) => ({ id: i, name: `Project ${i}` }));
-
-  return <TestSelectField label="Project" value={options[2].id} options={options} />;
-}
+// export function LotsOfOptions() {
+//   const options: TestOption[] = zeroTo(1000).map((i) => ({ id: i, name: `Project ${i}` }));
+//   return <TestSelectField label="Project" value={options[2].id} options={options} />;
+// }
 
 export function SelectFields() {
   return (
