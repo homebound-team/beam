@@ -5,6 +5,7 @@ import { ErrorMessage } from "src/components/ErrorMessage";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css } from "src/Css";
+import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
 let nextNameId = 0;
@@ -52,7 +53,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
     isDisabled: disabled,
     isReadOnly: false,
   });
-  const tid = useTestIds(props, "radio");
+  const tid = useTestIds(props, defaultTestId(label));
 
   // We use useRadioGroup b/c it does neat keyboard up/down stuff
   // TODO: Pass read only, required, error message to useRadioGroup
@@ -66,7 +67,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
       <Label label={label} {...labelProps} {...tid.label} />
       <div {...radioGroupProps}>
         {options.map((option) => (
-          <Radio key={option.value} parentId={state.name} option={option} state={state} />
+          <Radio key={option.value} parentId={state.name} option={option} state={state} {...tid[option.value]} />
         ))}
       </div>
       {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
@@ -81,6 +82,7 @@ function Radio<K extends string>(props: { parentId: string; option: RadioFieldOp
     parentId,
     option: { description, label, value },
     state,
+    ...others
   } = props;
   const disabled = state.isDisabled;
 
@@ -110,6 +112,8 @@ function Radio<K extends string>(props: { parentId: string; option: RadioFieldOp
         aria-labelledby={labelId}
         {...inputProps}
         {...focusProps}
+        // Put others here b/c it has the data-testid in it.
+        {...others}
       />
       <div>
         <div
