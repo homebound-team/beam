@@ -49,7 +49,8 @@ export function SuperDrawer(): ReactPortal {
           key="superDrawer"
           // TODO: Should this color be part of the Palette?
           // z-index of 3 is used to give flexibility for future overlapping content
-          css={Css.fixed.df.justifyEnd.add("backgroundColor", "rgba(36,36,36,0.2)").add("inset", 0).z3.$}
+          // Not using `inset` due to Safari 14.0.x not supporting this CSS property.
+          css={Css.fixed.df.justifyEnd.add("backgroundColor", "rgba(36,36,36,0.2)").top0.right0.bottom0.left0.z3.$}
           // Initial styles (acts similar to `from` in keyframe animations)
           initial={{ opacity: 0 }}
           // Rendered styles (acts similar to `to` in keyframe animations)
