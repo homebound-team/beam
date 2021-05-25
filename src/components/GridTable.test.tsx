@@ -1,8 +1,9 @@
-import React, { useContext } from "react";
+import React, { MutableRefObject, useContext } from "react";
 import {
   GridCollapseContext,
   GridColumn,
   GridDataRow,
+  GridRowLookup,
   GridRowStyles,
   GridTable,
   matchesFilter,
@@ -555,6 +556,22 @@ describe("GridTable", () => {
       expect(baseElement.querySelector("tr")).toBeTruthy();
       expect(baseElement.querySelector("td")).toBeTruthy();
     });
+  });
+
+  it("can look up row locations", async () => {
+    // Given three throws
+    const r1 = { kind: "data", id: "r:1", name: "one", value: 1 } as const;
+    const r2 = { kind: "data", id: "r:2", name: "two", value: 2 } as const;
+    const r3 = { kind: "data", id: "r:3", name: "thr", value: 3 } as const;
+    const rows: GridDataRow<Row>[] = [r1, r2, r3];
+    // A pretend MutableRefObject
+    const rowLookup: MutableRefObject<GridRowLookup<Row> | undefined> = {
+      current: undefined,
+    };
+    const r = await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
+    expect(rowLookup.current!.lookup(r1)).toMatchObject({ prev: undefined, next: r2 });
+    expect(rowLookup.current!.lookup(r2)).toMatchObject({ prev: r1, next: r3 });
+    expect(rowLookup.current!.lookup(r3)).toMatchObject({ prev: r2, next: undefined });
   });
 });
 

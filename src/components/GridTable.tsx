@@ -1,5 +1,15 @@
 import { Observer } from "mobx-react";
-import React, { Fragment, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  Fragment,
+  MutableRefObject,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
@@ -118,6 +128,8 @@ export interface GridTableProps<R extends Kinded, S, X> {
   rows: GridDataRow<R>[];
   /** Optional row-kind-level styling / behavior like onClick/rowLinks. */
   rowStyles?: GridRowStyles<R>;
+  /** Allow looking up prev/next of a row i.e. for SuperDrawer navigation. */
+  rowLookup?: MutableRefObject<GridRowLookup<R> | undefined>;
   /** Whether the header row should be sticky. */
   stickyHeader?: boolean;
   stickyOffset?: string;
@@ -209,7 +221,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const noData = !rows.some((row) => row.kind !== "header");
 
   // For each row, keep it's ReactNode (React.memo'd) + its filter values, so we can re-filter w/o re-evaluating this useMemo.
-  const allRows: [R["kind"], string, string[], ReactNode, Array<ReactNode | GridCellContent>][] = useMemo(() => {
+  type RowTuple = [GridDataRow<R>, string[], ReactNode, Array<ReactNode | GridCellContent>];
+  const allRows: RowTuple[] = useMemo(() => {
     return maybeSorted.map((row) => {
       // We only pass sortProps to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
@@ -238,7 +251,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         />
       );
       const filterValues = columns.map((c) => applyRowFn(c, row));
-      return [row.kind, row.id, row.parentIds || [], rowElement, filterValues];
+      return [row, row.parentIds || [], rowElement, filterValues];
     });
   }, [
     as,
@@ -258,12 +271,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   ]);
 
   // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
-  const headerRows = allRows.filter(([kind]) => kind === "header");
+  const headerRows = allRows.filter(([row]) => row.kind === "header");
 
   // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
   const filters = (filter && filter.split(/ +/)) || [];
-  let filteredRows = allRows.filter(([kind, , parentIds, , rowValues]) => {
-    const notHeader = kind !== "header";
+  let filteredRows = allRows.filter(([row, parentIds, , rowValues]) => {
+    const notHeader = row.kind !== "header";
     const passesCollapsed = !parentIds.some((id) => collapsedIds.includes(id));
     const passesFilter =
       filters.length === 0 ||
@@ -276,6 +289,25 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     tooManyClientSideRows = true;
     filteredRows = filteredRows.slice(0, filterMaxRows);
   }
+
+  // Create a ref to hold the latest state so that rowLookup can access it
+  const filterRowsRef = useRef<RowTuple[]>([]);
+  filterRowsRef.current = filteredRows;
+
+  // Push back to the caller a way to ask us where a row is.
+  const { rowLookup } = props;
+  useEffect(() => {
+    if (rowLookup) {
+      rowLookup.current = {
+        lookup(row) {
+          const rows = filterRowsRef.current!.map((r) => r[0]);
+          // We can't use `indexOf` b/c the caller might pass us a `row` from a previous/non-memoized list
+          const i = rows.findIndex((o) => o.kind === row.kind && o.id === row.id);
+          return { prev: rows[i - 1], next: rows[i + 1] };
+        },
+      };
+    }
+  }, [rowLookup]);
 
   useEffect(() => {
     setRowCount && filteredRows?.length !== undefined && setRowCount(filteredRows.length);
@@ -305,7 +337,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       data-testid={id}
     >
       {maybeWrapWith(
-        headerRows.map(([, , , node]) => node),
+        headerRows.map(([, , node]) => node),
         as,
         "thead",
       )}
@@ -313,7 +345,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         <Fragment>
           {/* Show an all-column-span info message if it's set. */}
           {firstRowMessage && renderFirstRowMessage(columns.length, firstRowMessage, style.firstRowMessageCss, as)}
-          {filteredRows.map(([, , , node]) => node)}
+          {filteredRows.map(([, , node]) => node)}
         </Fragment>,
         as,
         "tbody",
@@ -348,7 +380,7 @@ export type GridColumn<R extends Kinded, S = {}> = {
 };
 
 /** Allows rendering a specific cell. */
-type RenderCellFn<R> = (
+type RenderCellFn<R extends Kinded> = (
   idx: number,
   css: Properties,
   content: ReactNode,
@@ -361,7 +393,7 @@ export type GridRowStyles<R extends Kinded> = {
   [P in R["kind"]]: RowStyle<DiscriminateUnion<R, "kind", P>>;
 };
 
-export interface RowStyle<R> {
+export interface RowStyle<R extends Kinded> {
   /** Applies this css to the wrapper row, i.e. for row-level hovers. */
   rowCss?: Properties | ((row: R) => Properties);
   /** Applies this css to each cell in the row. */
@@ -373,10 +405,20 @@ export interface RowStyle<R> {
   /** Whether the row should be a link. */
   rowLink?: (row: R) => string;
   /** Fired when the row is clicked, similar to rowLink but for actions that aren't 'go to this link'. */
-  onClick?: (row: R) => void;
+  onClick?: (row: GridDataRow<R>) => void;
 }
 
-function getIndentationCss<R>(rowStyle: RowStyle<R> | undefined): Properties {
+/** Allows a caller to ask for next/prev information for a given row, given the current sorting/filtering. */
+export interface GridRowLookup<R extends Kinded> {
+  lookup(
+    row: GridDataRow<R>,
+  ): {
+    next: GridDataRow<R> | undefined;
+    prev: GridDataRow<R> | undefined;
+  };
+}
+
+function getIndentationCss<R extends Kinded>(rowStyle: RowStyle<R> | undefined): Properties {
   const indent = rowStyle?.indent;
   return Css.pl(indent === "2" ? 7 : indent === "1" ? 4 : 1).$;
 }
