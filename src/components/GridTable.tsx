@@ -7,7 +7,6 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { Link } from "react-router-dom";
@@ -290,24 +289,19 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     filteredRows = filteredRows.slice(0, filterMaxRows);
   }
 
-  // Create a ref to hold the latest state so that rowLookup can access it
-  const filterRowsRef = useRef<RowTuple[]>([]);
-  filterRowsRef.current = filteredRows;
-
   // Push back to the caller a way to ask us where a row is.
   const { rowLookup } = props;
-  useEffect(() => {
-    if (rowLookup) {
-      rowLookup.current = {
-        lookup(row) {
-          const rows = filterRowsRef.current!.map((r) => r[0]);
-          // We can't use `indexOf` b/c the caller might pass us a `row` from a previous/non-memoized list
-          const i = rows.findIndex((o) => o.kind === row.kind && o.id === row.id);
-          return { prev: rows[i - 1], next: rows[i + 1] };
-        },
-      };
-    }
-  }, [rowLookup]);
+  if (rowLookup) {
+    // Refs are cheap to assign to, so we don't bother doing this in a useEffect
+    rowLookup.current = {
+      lookup(row) {
+        const rows = filteredRows.map((r) => r[0]);
+        // We can't use `indexOf` b/c the caller might pass us a `row` from a previous/non-memoized list
+        const i = rows.findIndex((o) => o.kind === row.kind && o.id === row.id);
+        return { prev: rows[i - 1], next: rows[i + 1] };
+      },
+    };
+  }
 
   useEffect(() => {
     setRowCount && filteredRows?.length !== undefined && setRowCount(filteredRows.length);
