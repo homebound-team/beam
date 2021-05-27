@@ -321,9 +321,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           }
         }
         return result;
-        // We can't use `indexOf` b/c the caller might pass us a `row` from a previous/non-memoized list
-        // const i = rows.findIndex((o) => o.kind === row.kind && o.id === row.id);
-        // return { prev: rows[i - 1], next: rows[i + 1] };
       },
     };
   }
