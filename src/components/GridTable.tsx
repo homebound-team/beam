@@ -294,11 +294,33 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   if (rowLookup) {
     // Refs are cheap to assign to, so we don't bother doing this in a useEffect
     rowLookup.current = {
+      currentList() {
+        return filteredRows.map((r) => r[0]);
+      },
       lookup(row) {
         const rows = filteredRows.map((r) => r[0]);
-        // We can't use `indexOf` b/c the caller might pass us a `row` from a previous/non-memoized list
-        const i = rows.findIndex((o) => o.kind === row.kind && o.id === row.id);
-        return { prev: rows[i - 1], next: rows[i + 1] };
+        const result: any = {};
+        // This is an admittedly cute/fancy scan, instead of just `rows.findIndex`, but
+        // we do it this way so that we can do kind-aware prev/next detection.
+        let key: "prev" | "next" = "prev";
+        for (let i = 0; i < rows.length; i++) {
+          const each = rows[i];
+          // Flip from prev to next when we find it
+          if (each.kind === row.kind && each.id === row.id) {
+            key = "next";
+          } else {
+            if (key === "prev") {
+              // prev always overwrites what was there before
+              result[key] = each;
+              (result[each.kind] ??= {} as any)[key] = each;
+            } else {
+              // next only writes first seen
+              result[key] ??= each;
+              (result[each.kind] ??= {} as any)[key] ??= each;
+            }
+          }
+        }
+        return result;
       },
     };
   }
@@ -402,14 +424,23 @@ export interface RowStyle<R extends Kinded> {
   onClick?: (row: GridDataRow<R>) => void;
 }
 
-/** Allows a caller to ask for next/prev information for a given row, given the current sorting/filtering. */
+/** Allows a caller to ask for the currently shown rows, given the current sorting/filtering. */
 export interface GridRowLookup<R extends Kinded> {
+  /** Returns both the immediate next/prev rows, as well as `[kind].next/prev` values, ignoring headers. */
   lookup(
     row: GridDataRow<R>,
-  ): {
-    next: GridDataRow<R> | undefined;
-    prev: GridDataRow<R> | undefined;
-  };
+  ): NextPrev<R> &
+    {
+      [P in R["kind"]]: NextPrev<DiscriminateUnion<R, "kind", P>>;
+    };
+
+  /** Returns the list of currently filtered/sorted rows, without headers. */
+  currentList(): readonly GridDataRow<R>[];
+}
+
+interface NextPrev<R extends Kinded> {
+  next: GridDataRow<R> | undefined;
+  prev: GridDataRow<R> | undefined;
 }
 
 function getIndentationCss<R extends Kinded>(rowStyle: RowStyle<R> | undefined): Properties {

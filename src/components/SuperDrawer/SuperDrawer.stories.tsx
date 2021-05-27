@@ -150,8 +150,8 @@ export function Example() {
 
   // Creates a setContent with prev/next handles to move up or down the table
   function openRow(row: GridDataRow<Row>) {
-    const { prev, next } = rowLookup.current!.lookup(row);
     if (row.kind === "data") {
+      const { prev, next } = rowLookup.current!.lookup(row)["data"];
       openInDrawer({
         title: row.bookTitle,
         onPrevClick: prev && (() => openRow(prev)),

@@ -569,9 +569,45 @@ describe("GridTable", () => {
       current: undefined,
     };
     const r = await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
-    expect(rowLookup.current!.lookup(r1)).toMatchObject({ prev: undefined, next: r2 });
-    expect(rowLookup.current!.lookup(r2)).toMatchObject({ prev: r1, next: r3 });
-    expect(rowLookup.current!.lookup(r3)).toMatchObject({ prev: r2, next: undefined });
+    expect(rowLookup.current!.lookup(r1)).toMatchObject({ next: r2, data: { next: r2 } });
+    expect(rowLookup.current!.lookup(r2)).toMatchObject({ prev: r1, next: r3, data: { prev: r1, next: r3 } });
+    expect(rowLookup.current!.lookup(r3)).toMatchObject({ prev: r2, data: { prev: r2 } });
+  });
+
+  it("can look up row locations and be kind-aware", async () => {
+    const header = { kind: "header" as const, id: "header" };
+    const p1 = { kind: "parent" as const, id: "p1", name: "parent 1" };
+    const p1c1 = { kind: "child" as const, id: "p1c1", parentIds: ["p1"], name: "child p1c1" };
+    const p2 = { kind: "parent" as const, id: "p2", name: "parent 2" };
+    const p2c1 = { kind: "child" as const, id: "p2c1", parentIds: ["p2"], name: "child p2c1" };
+    const rows: GridDataRow<NestedRow>[] = [header, p1, p1c1, p2, p2c1];
+
+    // A pretend MutableRefObject
+    const rowLookup: MutableRefObject<GridRowLookup<NestedRow> | undefined> = {
+      current: undefined,
+    };
+    const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} rowLookup={rowLookup} />);
+    expect(rowLookup.current!.lookup(p1)).toMatchObject({
+      next: p1c1,
+      child: { next: p1c1 },
+      parent: { next: p2 },
+    });
+    expect(rowLookup.current!.lookup(p1c1)).toMatchObject({
+      next: p2,
+      prev: p1,
+      child: { next: p2c1 },
+      parent: { prev: p1, next: p2 },
+    });
+    expect(rowLookup.current!.lookup(p2)).toMatchObject({
+      next: p2c1,
+      child: { prev: p1c1 },
+      parent: { prev: p1 },
+    });
+    expect(rowLookup.current!.lookup(p2c1)).toMatchObject({
+      prev: p2,
+      child: { prev: p1c1 },
+      parent: { prev: p2 },
+    });
   });
 });
 
