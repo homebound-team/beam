@@ -159,7 +159,7 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
   const state = useComboBoxState({ ...comboBoxProps, onSelectionChange });
 
   // Used to calculate the rendered width of the combo box (input + button)
-  const comboBoxRef = useRef<HTMLDivElement>(null);
+  const comboBoxRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
@@ -333,7 +333,7 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
 }
 
 interface ListBoxPopupProps<T> {
-  comboBoxRef: MutableRefObject<HTMLDivElement> | null;
+  comboBoxRef: MutableRefObject<HTMLDivElement | null>;
   compact: boolean;
   listBoxRef: MutableRefObject<HTMLUListElement | null>;
   popoverRef: MutableRefObject<HTMLDivElement | null>;
@@ -351,7 +351,7 @@ function ListBoxPopup<T extends object>(props: ListBoxPopupProps<T>) {
 
   positionProps.style = {
     ...positionProps.style,
-    width: comboBoxRef?.current.clientWidth,
+    width: comboBoxRef?.current?.clientWidth,
   };
 
   return (
