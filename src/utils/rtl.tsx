@@ -28,6 +28,6 @@ export function rowAnd(r: RenderResult, row: number, testId: string): HTMLElemen
 }
 
 /** RTL wrapper for SuperDrawer context */
-export const withSuperDrawer: Wrapper = {
+export const withSuperDrawerRTL: Wrapper = {
   wrap: (c) => <SuperDrawerProvider>{c}</SuperDrawerProvider>,
 };

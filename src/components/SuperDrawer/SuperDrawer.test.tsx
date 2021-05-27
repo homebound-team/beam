@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { render, withSuperDrawer } from "src/utils/rtl";
+import { render, withSuperDrawerRTL } from "src/utils/rtl";
 import { useSuperDrawer } from "./index";
 
 describe("SuperDrawer", () => {
@@ -10,12 +10,12 @@ describe("SuperDrawer", () => {
   });
 
   it("should allow `new` element to be added", async () => {
-    const { superDrawerContent } = await render(<TestDrawerContent openInDrawer />, withSuperDrawer);
+    const { superDrawerContent } = await render(<TestDrawerContent openInDrawer />, withSuperDrawerRTL);
     expect(superDrawerContent()).toBeTruthy();
   });
 
   it("should not allow `detail` element to be added", async () => {
-    const { queryByTestId } = await render(<TestDrawerContent openInDrawerDetail />, withSuperDrawer);
+    const { queryByTestId } = await render(<TestDrawerContent openInDrawerDetail />, withSuperDrawerRTL);
     expect(queryByTestId("superDrawerContent")).toBeFalsy();
     expect(queryByTestId("superDrawerDetailContent")).toBeFalsy();
     expect(consoleErrorMock).toHaveBeenCalledTimes(1);
@@ -24,20 +24,23 @@ describe("SuperDrawer", () => {
   it("should allow `detail` element to be added when as least one `new` element is present", async () => {
     const { superDrawerDetailContent } = await render(
       <TestDrawerContent openInDrawer openInDrawerDetail />,
-      withSuperDrawer,
+      withSuperDrawerRTL,
     );
     expect(superDrawerDetailContent()).toBeTruthy();
   });
 
   it("should default `detail` element title to previous elements title", async () => {
-    const { superDrawer_title } = await render(<TestDrawerContent openInDrawer openInDrawerDetail />, withSuperDrawer);
+    const { superDrawer_title } = await render(
+      <TestDrawerContent openInDrawer openInDrawerDetail />,
+      withSuperDrawerRTL,
+    );
     expect(superDrawer_title()).toHaveTextContent("title");
   });
 
   it("should show `new` element after calling `closeInDrawer()`", async () => {
     const { superDrawerContent } = await render(
       <TestDrawerContent openInDrawer openInDrawerDetail closeInDrawer />,
-      withSuperDrawer,
+      withSuperDrawerRTL,
     );
     expect(superDrawerContent()).toBeTruthy();
   });
@@ -45,7 +48,7 @@ describe("SuperDrawer", () => {
   it("should reset state when calling `closeDrawer()`", async () => {
     const { queryByTestId } = await render(
       <TestDrawerContent openInDrawer openInDrawerDetail closeDrawer />,
-      withSuperDrawer,
+      withSuperDrawerRTL,
     );
     expect(queryByTestId("superDrawer")).toBeFalsy();
   });

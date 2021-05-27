@@ -2,14 +2,13 @@ import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf } from "src";
 import { GridDataRow, GridRowLookup } from "src/components/GridTable";
-import { withDimensions, withSuperDrawer } from "src/utils/sb";
+import { withDimensions, withSuperDrawerDecorator } from "src/utils/sb";
 import { SuperDrawer as SuperDrawerComponent, SuperDrawerContent, useSuperDrawer } from "./index";
 
 export default {
   title: "Components/Super Drawer",
   component: SuperDrawerComponent,
-  decorators: [withSuperDrawer, withDimensions("100vw", "100vh")],
-  parameters: { chromatic: { delay: 1000 } },
+  decorators: [withSuperDrawerDecorator, withDimensions()],
 } as Meta;
 
 export function Open() {
