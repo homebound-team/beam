@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf } from "src";
+import { GridDataRow, GridRowLookup } from "src/components/GridTable";
 import { withDimensions, withSuperDrawer } from "src/utils/sb";
 import { SuperDrawer as SuperDrawerComponent, SuperDrawerContent, useSuperDrawer } from "./index";
 
@@ -145,36 +146,28 @@ const Books: Book[] = [
  */
 export function Example() {
   const { openInDrawer } = useSuperDrawer();
+  const rowLookup = useRef<GridRowLookup<Row>>();
 
   // Creates a setContent with prev/next handles to move up or down the table
-  function handleRoute(currentBook: Book, type: "prev" | "next") {
-    let index = Books.findIndex((_book) => _book.bookTitle === currentBook.bookTitle);
-    const book = type === "prev" ? Books[(--index + Books.length) % Books.length] : Books[++index % Books.length];
-
-    openInDrawer({
-      title: book.bookTitle,
-      onPrevClick: () => handleRoute(book, "prev"),
-      onNextClick: () => handleRoute(book, "next"),
-      content: <SuperDrawerExampleContent book={book} />,
-    });
+  function openRow(row: GridDataRow<Row>) {
+    const { prev, next } = rowLookup.current!.lookup(row);
+    if (row.kind === "data") {
+      openInDrawer({
+        title: row.bookTitle,
+        onPrevClick: prev && (() => openRow(prev)),
+        onNextClick: next && (() => openRow(next)),
+        content: <SuperDrawerExampleContent book={row} />,
+      });
+    }
   }
 
   // GridTable setup
   const titleColumn: GridColumn<Row> = { header: "Title", data: ({ bookTitle }) => bookTitle };
   const authorColumn: GridColumn<Row> = { header: "Author", data: ({ authorName }) => authorName };
+  // Example of triggering the drawer when clicking on a row
   const rowStyles: GridRowStyles<Row> = {
-    // Example of triggering the drawer when clicking on a row
-    data: {
-      indent: "2",
-      onClick: ({ kind, ...book }) =>
-        openInDrawer({
-          title: book.bookTitle,
-          onPrevClick: () => handleRoute(book, "prev"),
-          onNextClick: () => handleRoute(book, "next"),
-          content: <SuperDrawerExampleContent book={book} />,
-        }),
-    },
     header: {},
+    data: { indent: "2", onClick: openRow },
   };
 
   return (
@@ -185,6 +178,7 @@ export function Example() {
         as="table"
         columns={[titleColumn, authorColumn]}
         rowStyles={rowStyles}
+        rowLookup={rowLookup}
         rows={[
           { kind: "header", id: "header" },
           ...Books.map((book, i) => ({ kind: "data" as const, id: `${i}`, ...book })),
