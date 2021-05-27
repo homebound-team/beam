@@ -426,7 +426,7 @@ export interface RowStyle<R extends Kinded> {
 
 /** Allows a caller to ask for the currently shown rows, given the current sorting/filtering. */
 export interface GridRowLookup<R extends Kinded> {
-  /** Returns both the immediate next/prev rows, as well as `[kind].next/prev` values. */
+  /** Returns both the immediate next/prev rows, as well as `[kind].next/prev` values, ignoring headers. */
   lookup(
     row: GridDataRow<R>,
   ): NextPrev<R> &
@@ -434,7 +434,7 @@ export interface GridRowLookup<R extends Kinded> {
       [P in R["kind"]]: NextPrev<DiscriminateUnion<R, "kind", P>>;
     };
 
-  /** Returns the list of currently filtered/sorted rows. */
+  /** Returns the list of currently filtered/sorted rows, without headers. */
   currentList(): readonly GridDataRow<R>[];
 }
 
