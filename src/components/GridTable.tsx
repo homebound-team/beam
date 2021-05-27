@@ -424,8 +424,9 @@ export interface RowStyle<R extends Kinded> {
   onClick?: (row: GridDataRow<R>) => void;
 }
 
-/** Allows a caller to ask for next/prev information for a given row, given the current sorting/filtering. */
+/** Allows a caller to ask for the currently shown rows, given the current sorting/filtering. */
 export interface GridRowLookup<R extends Kinded> {
+  /** Returns both the immediate next/prev rows, as well as `[kind].next/prev` values. */
   lookup(
     row: GridDataRow<R>,
   ): NextPrev<R> &
