@@ -13,7 +13,7 @@ import { SwitchGroup, SwitchGroupProps } from "./SwitchGroup";
 
 export default {
   component: SwitchComponent,
-  title: "Components/Switch",
+  title: "Inputs / Switch",
 } as Meta<SwitchProps>;
 
 export const Switch = () => {

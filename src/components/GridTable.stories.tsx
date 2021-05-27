@@ -13,7 +13,7 @@ import {
   SimpleHeaderAndDataOf,
 } from "src/components/index";
 import { Css } from "src/Css";
-import { newStory, withRouter } from "src/utils/sb";
+import { newStory, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
   component: GridTable,
@@ -226,10 +226,6 @@ export function StickyHeader() {
       />
     </div>
   );
-}
-
-export function zeroTo(n: number): number[] {
-  return [...Array(n).keys()];
 }
 
 export const Condensed = newStory(() => {

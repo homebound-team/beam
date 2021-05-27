@@ -16,8 +16,6 @@ interface TextFieldBaseProps
   multiline?: boolean;
   /** TextField specific */
   compact?: boolean;
-  /** TextArea specific */
-  wide?: boolean;
 }
 
 // Used by both TextField and TextArea
@@ -32,18 +30,15 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     helperText,
     multiline = false,
     onChange,
-    wide = false,
     onBlur,
   } = props;
   const errorMessageId = `${inputProps.id}-error`;
 
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
-  // Default the widths, though eventually these should be responsive. Note: there is no "compact" view for "wide" fields at the moment
-  const width = wide ? 550 : compact ? 248 : 320;
   const tid = useTestIds(props, defaultTestId(label || "textField"));
 
   return (
-    <div css={Css.df.flexColumn.wPx(width).$}>
+    <div css={Css.df.flexColumn.maxw(px(550)).$}>
       {label && <Label labelProps={labelProps} label={label} />}
       <ElementType
         {...mergeProps(inputProps, { onBlur }, { "aria-invalid": Boolean(errorMsg) })}
@@ -61,11 +56,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
           onChange(value);
         }}
         css={{
-          ...Css.add("resize", "none")
-            .bgWhite.wPx(width)
-            .sm.px1.hPx(40)
-            .gray900.br4.outline0.ba.bGray300.if(compact)
-            .hPx(32).$,
+          ...Css.add("resize", "none").bgWhite.sm.px1.hPx(40).gray900.br4.outline0.ba.bGray300.if(compact).hPx(32).$,
           ...Css.if(multiline).mh(px(96)).py1.px2.$,
           "&:focus": Css.bLightBlue700.$,
           "&:disabled": Css.gray400.bgGray100.cursorNotAllowed.$,

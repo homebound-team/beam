@@ -1,3 +1,4 @@
+import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
 import { Css } from "src/Css";
@@ -5,7 +6,7 @@ import { Checkbox, CheckboxGroup, CheckboxGroupProps } from "src/index";
 
 export default {
   component: Checkbox,
-  title: "Components/Checkboxes",
+  title: "Inputs / Checkboxes",
 } as Meta;
 
 export function Checkboxes() {
@@ -14,17 +15,17 @@ export function Checkboxes() {
       <div>
         <h2 css={Css.mb1.$}>Basic Checkboxes</h2>
         <div css={Css.dg.gap1.$}>
-          <Checkbox onChange={() => {}} label="Default" />
-          <Checkbox onChange={() => {}} selected label="Selected" />
-          <Checkbox onChange={() => {}} indeterminate label="Indeterminate" />
-          <Checkbox onChange={() => {}} disabled label="Disabled" />
+          <Checkbox onChange={action("onChange")} label="Default" />
+          <Checkbox onChange={action("onChange")} selected label="Selected" />
+          <Checkbox onChange={action("onChange")} indeterminate label="Indeterminate" />
+          <Checkbox onChange={action("onChange")} disabled label="Disabled" />
         </div>
       </div>
       <div>
         <h2 css={Css.mb1.$}>Checkbox with Label and Description</h2>
         <div>
           <Checkbox
-            onChange={() => {}}
+            onChange={action("onChange")}
             description="Get notified when someone posts a comment on a posting"
             label="Comments"
           />

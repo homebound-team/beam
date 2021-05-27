@@ -36,6 +36,10 @@ export function samples(...samples: [string, ReactNode][]): JSX.Element[] {
   });
 }
 
+export function zeroTo(n: number): number[] {
+  return [...Array(n).keys()];
+}
+
 /** Storybook decorator utility to wrap a story with a SuperDrawer context */
 export const withSuperDrawer = (Story: () => JSX.Element) => (
   <SuperDrawerProvider>

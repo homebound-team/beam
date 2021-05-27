@@ -14,7 +14,7 @@ import { Css } from "src/Css";
 
 export default {
   component: RadioGroupField,
-  title: "Components/Radio Group",
+  title: "Inputs / Radio Group",
 } as Meta;
 
 export function BaseStates() {

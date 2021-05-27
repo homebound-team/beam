@@ -5,7 +5,7 @@ import { Css } from "src/Css";
 
 export default {
   component: TextAreaField,
-  title: "Components/Text Areas",
+  title: "Inputs / Text Areas",
 } as Meta;
 
 export function TextAreas() {
@@ -29,18 +29,6 @@ export function TextAreas() {
         <br />
         <ValidationTextArea value="Not enough characters" />
       </div>
-      <div>
-        <h1 css={Css.lg.mb2.$}>Wide</h1>
-        <TestTextArea wide value="" />
-        <br />
-        <TestTextArea wide label="Description" value="" />
-        <br />
-        <TestTextArea wide label="Description" value="An example description text." />
-        <br />
-        <TestTextArea wide label="Description" value="This is a description that can no longer be edited." disabled />
-        <br />
-        <ValidationTextArea wide value="Not enough characters" />
-      </div>
     </div>
   );
 }
@@ -51,13 +39,12 @@ function TestTextArea(props: Omit<TextAreaFieldProps, "onChange">) {
   return <TextAreaField value={internalValue} onChange={(val) => setValue(val)} {...others} />;
 }
 
-function ValidationTextArea({ wide, value }: { wide?: boolean; value: string }) {
+function ValidationTextArea({ value }: { value: string }) {
   const [internalValue, setValue] = useState<string | undefined>(value);
   const isValid = useMemo(() => internalValue && internalValue.length >= 50, [internalValue]);
 
   return (
     <TextAreaField
-      wide={wide}
       label="Description"
       value={internalValue}
       onChange={(val) => setValue(val)}

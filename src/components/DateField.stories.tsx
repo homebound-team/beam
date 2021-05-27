@@ -1,14 +1,12 @@
-import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button, DateField, DateFieldProps, TextField } from "src/components";
 import { samples } from "src/utils/sb";
 
 export default {
-  title: "Components/Date Field",
+  title: "Inputs / Date Field",
   component: Button,
-  args: { onClick: action("onPress") },
-} as Meta<any>;
+} as Meta;
 
 export function DateFields() {
   return samples(

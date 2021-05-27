@@ -5,12 +5,12 @@ import { Css } from "src/Css";
 
 export default {
   component: TextField,
-  title: "Components/Text Fields",
+  title: "Inputs / Text Fields",
 } as Meta;
 
 export function TextFields() {
   return (
-    <div css={Css.df.justifyAround.$}>
+    <div css={Css.df.justifyAround.childGap(4).$}>
       <div>
         <h1 css={Css.lg.mb2.$}>Regular</h1>
         <TestTextField value="" />

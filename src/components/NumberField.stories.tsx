@@ -1,16 +1,16 @@
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { NumberField, NumberFieldProps } from "src/components/NumberField";
+import { NumberField as NumberFieldComponent, NumberFieldProps } from "src/components/NumberField";
 import { Css } from "src/Css";
 
 export default {
-  component: NumberField,
-  title: "Components/Number Fields",
+  title: "Inputs / Number Fields",
+  component: NumberFieldComponent,
 } as Meta;
 
-export function TextFields() {
+export function NumberFields() {
   return (
-    <div css={Css.df.justifyAround.$}>
+    <div css={Css.df.justifyAround.childGap(4).$}>
       <div>
         <h1 css={Css.lg.mb2.$}>Regular</h1>
         <TestNumberField value={0} />
@@ -54,14 +54,14 @@ export function TextFields() {
 function TestNumberField(props: Omit<NumberFieldProps, "onChange">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
-  return <NumberField value={internalValue} onChange={setValue} {...otherProps} />;
+  return <NumberFieldComponent value={internalValue} onChange={setValue} {...otherProps} />;
 }
 
 function ValidationNumberField({ label, compact, value }: { label: string; compact?: boolean; value: number }) {
   const [internalValue, setValue] = useState<number | undefined>(value);
   const isValid = useMemo(() => internalValue && internalValue > 0, [internalValue]);
   return (
-    <NumberField
+    <NumberFieldComponent
       label={label}
       compact={compact}
       value={internalValue}

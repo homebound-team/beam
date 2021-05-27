@@ -6,7 +6,7 @@ import { useLocale } from "react-aria";
 import { ErrorMessage } from "src/components/ErrorMessage";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
-import { Css } from "src/Css";
+import { Css, px } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
 // exported for testing purposes
@@ -74,21 +74,15 @@ export function NumberField(props: NumberFieldProps) {
   const errorMessageId = `${inputProps.id}-error`;
   const tid = useTestIds(props, label);
 
-  const width = compact ? 248 : 320;
-
   return (
-    <div css={Css.df.flexColumn.wPx(width).$} {...groupProps}>
+    <div css={Css.df.flexColumn.maxw(px(550)).$} {...groupProps}>
       {label && <Label labelProps={labelProps} label={label} {...tid.label} />}
       <input
         {...mergeProps(inputProps, { onBlur })}
         {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
         ref={inputRef}
         css={{
-          ...Css.add("resize", "none")
-            .tr.bgWhite.wPx(width)
-            .sm.px1.hPx(40)
-            .gray900.br4.outline0.ba.bGray300.if(compact)
-            .hPx(32).$,
+          ...Css.add("resize", "none").tr.bgWhite.sm.px1.hPx(40).gray900.br4.outline0.ba.bGray300.if(compact).hPx(32).$,
           "&:focus": Css.bLightBlue700.$,
           "&:disabled": Css.gray400.bgGray100.cursorNotAllowed.$,
           ...(errorMsg ? Css.bRed600.$ : {}),

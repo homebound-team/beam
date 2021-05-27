@@ -6,6 +6,7 @@ import { ComboBoxState, useComboBoxState } from "@react-stately/combobox";
 import { CollectionChildren, Node } from "@react-types/shared";
 import React, { Fragment, InputHTMLAttributes, Key, MutableRefObject, ReactNode, useRef, useState } from "react";
 import {
+  DismissButton,
   OverlayContainer,
   useButton,
   useFocusRing,
@@ -157,6 +158,8 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
   const comboBoxProps = { ...otherProps, items, isDisabled, isReadOnly, label, onInputChange, menuTrigger };
   const state = useComboBoxState({ ...comboBoxProps, onSelectionChange });
 
+  // Used to calculate the rendered width of the combo box (input + button)
+  const comboBoxRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
@@ -190,7 +193,7 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
   });
 
   return (
-    <div css={Css.dif.flexColumn.$}>
+    <div css={Css.dif.flexColumn.maxw(px(550)).$} ref={comboBoxRef}>
       {label && <Label labelProps={labelProps} label={label} {...tid.label} />}
       <div css={Css.dib.$} {...focusProps}>
         <ComboBoxInput
@@ -216,6 +219,7 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
             popoverRef={popoverRef}
             listBoxRef={listBoxRef}
             positionProps={positionProps}
+            comboBoxRef={comboBoxRef}
           />
         )}
       </div>
@@ -258,7 +262,6 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
   const errorMessageId = `${inputProps.id}-error`;
   const { hoverProps, isHovered } = useHover({});
   const fieldDecorationWidth = 32;
-  const fieldWidth = getFieldWidth(compact);
   const hoverStyles = isHovered && !isReadOnly && !isFocused ? Css.bgGray100.$ : {};
   const focusStyles = isFocused && !isReadOnly ? Css.bLightBlue500.$ : {};
   const errorStyles = errorMsg ? Css.bRed500.$ : {};
@@ -270,7 +273,7 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
     <Fragment>
       <div
         css={{
-          ...Css.df.ba.bGray300.br4.bgWhite.w(px(fieldWidth)).$,
+          ...Css.df.ba.bGray300.br4.bgWhite.$,
           ...hoverStyles,
           ...errorStyles,
           ...focusStyles,
@@ -330,15 +333,16 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
 }
 
 interface ListBoxPopupProps<T> {
-  state: ComboBoxState<T>;
+  comboBoxRef: MutableRefObject<HTMLDivElement> | null;
   compact: boolean;
   listBoxRef: MutableRefObject<HTMLUListElement | null>;
   popoverRef: MutableRefObject<HTMLDivElement | null>;
   positionProps: React.HTMLAttributes<Element>;
+  state: ComboBoxState<T>;
 }
 
 function ListBoxPopup<T extends object>(props: ListBoxPopupProps<T>) {
-  const { state, compact, popoverRef, listBoxRef, positionProps, ...otherProps } = props;
+  const { state, compact, popoverRef, listBoxRef, positionProps, comboBoxRef, ...otherProps } = props;
   const { overlayProps } = useOverlay(
     { onClose: () => state.close(), shouldCloseOnBlur: true, isOpen: state.isOpen, isDismissable: true },
     popoverRef,
@@ -347,7 +351,7 @@ function ListBoxPopup<T extends object>(props: ListBoxPopupProps<T>) {
 
   positionProps.style = {
     ...positionProps.style,
-    width: getFieldWidth(compact),
+    width: comboBoxRef?.current.clientWidth,
   };
 
   return (
@@ -365,6 +369,7 @@ function ListBoxPopup<T extends object>(props: ListBoxPopupProps<T>) {
             <Option key={item.key} item={item} state={state} />
           ))}
         </ul>
+        <DismissButton onDismiss={() => state.close()} />
       </div>
     </OverlayContainer>
   );
@@ -414,8 +419,6 @@ function Option<T extends object>({ item, state }: { item: Node<T>; state: Combo
     </li>
   );
 }
-
-const getFieldWidth = (compact: boolean) => (compact ? 248 : 320);
 
 interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
   compact?: boolean;
