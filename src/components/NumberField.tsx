@@ -75,7 +75,7 @@ export function NumberField(props: NumberFieldProps) {
   const tid = useTestIds(props, label);
 
   return (
-    <div css={Css.df.flexColumn.maxw(px(550)).$} {...groupProps}>
+    <div css={Css.df.flexColumn.w100.maxw(px(550)).$} {...groupProps}>
       {label && <Label labelProps={labelProps} label={label} {...tid.label} />}
       <input
         {...mergeProps(inputProps, { onBlur })}

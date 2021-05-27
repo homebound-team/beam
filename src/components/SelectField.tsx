@@ -193,7 +193,7 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
   });
 
   return (
-    <div css={Css.dif.flexColumn.maxw(px(550)).$} ref={comboBoxRef}>
+    <div css={Css.dif.flexColumn.w100.maxw(px(550)).$} ref={comboBoxRef}>
       {label && <Label labelProps={labelProps} label={label} {...tid.label} />}
       <div css={Css.dib.$} {...focusProps}>
         <ComboBoxInput

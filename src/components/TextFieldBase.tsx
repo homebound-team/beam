@@ -38,7 +38,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
   const tid = useTestIds(props, defaultTestId(label || "textField"));
 
   return (
-    <div css={Css.df.flexColumn.maxw(px(550)).$}>
+    <div css={Css.df.flexColumn.w100.maxw(px(550)).$}>
       {label && <Label labelProps={labelProps} label={label} />}
       <ElementType
         {...mergeProps(inputProps, { onBlur }, { "aria-invalid": Boolean(errorMsg) })}
