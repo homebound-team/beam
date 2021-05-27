@@ -4,7 +4,16 @@ import { mergeProps } from "@react-aria/utils";
 import { Item } from "@react-stately/collections";
 import { ComboBoxState, useComboBoxState } from "@react-stately/combobox";
 import { CollectionChildren, Node } from "@react-types/shared";
-import React, { Fragment, InputHTMLAttributes, Key, MutableRefObject, ReactNode, useRef, useState } from "react";
+import React, {
+  CSSProperties,
+  Fragment,
+  InputHTMLAttributes,
+  Key,
+  MutableRefObject,
+  ReactNode,
+  useRef,
+  useState,
+} from "react";
 import {
   OverlayContainer,
   useButton,
@@ -15,6 +24,7 @@ import {
   useOverlay,
   useOverlayPosition,
 } from "react-aria";
+import { VariableSizeList } from "react-window";
 import { ErrorMessage } from "src/components/ErrorMessage";
 import { HelperText } from "src/components/HelperText";
 import { Icon } from "src/components/Icon";
@@ -350,27 +360,46 @@ function ListBoxPopup<T extends object>(props: ListBoxPopupProps<T>) {
     width: getFieldWidth(compact),
   };
 
+  const Row = ({ data, index, style }: any) => {
+    const item = data.items[index];
+    return <Option item={item} state={state} style={style} key={item.key} />;
+  };
+
   return (
     <OverlayContainer>
       <div {...{ ...overlayProps, ...positionProps }} ref={popoverRef}>
         <ul
           css={{
-            ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.$,
+            ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.overflowAuto.maxh("400px").$,
             "&:hover": Css.bshHover.$,
           }}
           ref={listBoxRef}
           {...listBoxProps}
         >
-          {[...state.collection].map((item) => (
-            <Option key={item.key} item={item} state={state} />
-          ))}
+          <VariableSizeList
+            itemData={{ items: [...state.collection], state }}
+            itemSize={() => 42}
+            height={Math.min(42 * state.collection.size, 400)}
+            itemCount={state.collection.size}
+            width={getFieldWidth(compact)}
+          >
+            {Row}
+          </VariableSizeList>
         </ul>
       </div>
     </OverlayContainer>
   );
 }
 
-function Option<T extends object>({ item, state }: { item: Node<T>; state: ComboBoxState<T> }) {
+function Option<T extends object>({
+  item,
+  state,
+  style,
+}: {
+  item: Node<T>;
+  state: ComboBoxState<T>;
+  style: CSSProperties;
+}) {
   const ref = useRef<HTMLLIElement>(null);
   const isDisabled = state.disabledKeys.has(item.key);
   const isSelected = state.selectionManager.isSelected(item.key);
@@ -399,10 +428,11 @@ function Option<T extends object>({ item, state }: { item: Node<T>; state: Combo
       {...optionProps}
       {...hoverProps}
       ref={ref as any}
+      style={style}
       css={{
         ...Css.df.itemsCenter.justifyBetween.py1.px2.mh("42px").cursorPointer.gray900.sm.$,
         ...(isHovered ? Css.bgGray100.$ : {}),
-        ...(isFocused ? Css.add("boxShadow", `0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
+        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
       }}
     >
       {item.rendered}
