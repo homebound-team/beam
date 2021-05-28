@@ -25,10 +25,8 @@ export interface RichTextEditorProps {
   placeholder?: string;
 }
 
-// trix + react-trix do not appear to have any typings, so roll with editor: any for now.
+// There aren't types for trix, so add our own. For now `loadHTML` is all we call anyway.
 type Editor = {
-  expandSelectionInDirection?: (direction: "forward" | "backward") => void;
-  insertString(s: string): void;
   loadHTML(html: string): void;
 };
 
@@ -121,7 +119,7 @@ export function RichTextEditor(props: RichTextEditorProps) {
           ...(autoFocus ? { autoFocus } : {}),
           ...(placeholder ? { placeholder } : {}),
         })}
-        <input type="hidden" ref={inputRef} id={`input-${id}`} value={value} />
+        <input type="hidden" ref={inputRef} id={`input-${id}`} value={value} {...inputProps} />
       </div>
       <Global styles={[tributeOverrides]} />
     </div>
