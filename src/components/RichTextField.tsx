@@ -29,10 +29,12 @@ type Editor = {
 };
 
 /**
- * Glues together trix and tributejs to provide a simple rich text editor.
+ * Provides a simple rich text editor based on trix.
  *
- * See [trix]{@link https://github.com/basecamp/trix} and [tributejs]{@link https://github.com/zurb/tribute}.
- * */
+ * See [trix]{@link https://github.com/basecamp/trix}.
+ *
+ * We also integrate [tributejs]{@link https://github.com/zurb/tribute} for @ mentions.
+ */
 export function RichTextField(props: RichTextFieldProps) {
   const { mergeTags, label, value, onChange } = props;
   const id = useId();
