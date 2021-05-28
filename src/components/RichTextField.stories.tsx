@@ -13,10 +13,20 @@ export function RichTextField() {
 
 function TestField() {
   const [value, setValue] = useState<string | undefined>();
+  const [tags, setTags] = useState<string[]>([]);
   return (
     <>
-      <RichTextFieldComponent label="Comment" value={value} onChange={setValue} mergeTags={["foo", "bar", "zaz"]} />
-      value: {value === undefined ? "undefined" : value}
+      <RichTextFieldComponent
+        label="Comment"
+        value={value}
+        onChange={(html, text, tags) => {
+          setValue(html);
+          setTags(tags);
+        }}
+        mergeTags={["foo", "bar", "zaz"]}
+      />
+      <div>value: {value === undefined ? "undefined" : value}</div>
+      <div>tags: {tags.join(", ")}</div>
     </>
   );
 }

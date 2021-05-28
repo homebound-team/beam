@@ -11,7 +11,7 @@ import "trix/dist/trix.css";
 export interface RichTextFieldProps {
   /** The initial html value to show in the trix editor. */
   value: string | undefined;
-  onChange: (html: string | undefined, text: string | undefined) => void;
+  onChange: (html: string | undefined, text: string | undefined, mergeTags: string[]) => void;
   /**
    * A list of tags/names to show in a popup when the user `@`-s.
    *
@@ -78,10 +78,11 @@ export function RichTextField(props: RichTextFieldProps) {
         // If the user only types whitespace, treat that as undefined
         if ((textContent || "").trim() === "") {
           currentHtml.current = undefined;
-          onChange && onChange(undefined, undefined);
+          onChange && onChange(undefined, undefined, []);
         } else {
           currentHtml.current = innerHTML;
-          onChange && onChange(innerHTML, textContent || undefined);
+          const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
+          onChange && onChange(innerHTML, textContent || undefined, mentions);
         }
       }
 
@@ -168,3 +169,7 @@ const tributeOverrides = {
   ".tribute-container": Css.add({ minWidth: "300px" }).$,
   ".tribute-container > ul": Css.sm.bgWhite.ba.br4.bLightBlue700.overflowHidden.$,
 };
+
+function extractIdsFromMentions(mergeTags: string[], content: string): string[] {
+  return mergeTags.filter((tag) => content.includes(`@${tag}`));
+}
