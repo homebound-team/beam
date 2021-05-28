@@ -1,4 +1,4 @@
-import { generate, newMethod, newIncrementDelegateMethods, newMethodsForProp, Sections } from "@homebound/truss";
+import { generate, newIncrementDelegateMethods, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
 import { palette } from "./palette";
 
 const increment = 8;
@@ -30,7 +30,9 @@ const fonts: Record<string, { fontWeight: 400 | 500 | 600, fontSize: string; lin
   xl5Em:  { fontWeight: 600, fontSize: "48px", lineHeight: "48px" },
 };
 
-const transition: string = ["background-color", "border-color", "box-shadow", "left", "right"].map((property) => `${property} 200ms`).join(", ");
+const transition: string = ["background-color", "border-color", "box-shadow", "left", "right"]
+  .map((property) => `${property} 200ms`)
+  .join(", ");
 
 // Custom rules
 const sections: Sections = {
@@ -64,7 +66,8 @@ const sections: Sections = {
   childGap: (config) => [
     ...newIncrementDelegateMethods("childGap", config.numberOfIncrements),
     `childGap(inc: number | string) {
-    const p = this.opts.rules["flexDirection"] === "column" ? "marginTop" : "marginLeft";
+    const direction = this.opts.rules["flexDirection"];
+    const p = direction === "column" ? "marginTop" : direction === "column-reverse" ? "marginBottom" : "marginLeft";
     return this.addIn("& > * + *", Css.add(p, maybeInc(inc)).important.$);
   }`,
   ],

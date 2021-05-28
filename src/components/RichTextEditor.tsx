@@ -1,0 +1,158 @@
+import { Global } from "@emotion/react";
+import { useTextField } from "@react-aria/textfield";
+import * as React from "react";
+import { ChangeEvent, useEffect, useRef } from "react";
+import { useId } from "react-aria";
+import { Label } from "src/components/Label";
+import { Css, Palette } from "src/Css";
+import Tribute from "tributejs";
+import "tributejs/dist/tribute.css";
+import "trix/dist/trix";
+import "trix/dist/trix.css";
+
+export interface RichTextEditorProps {
+  /** The initial html value to show in the trix editor. */
+  value: string;
+  onChange: (html: string, text: string) => void;
+  /**
+   * A list of tags/names to show in a popup when the user `@`-s.
+   *
+   * Currently we don't support mergeTags being updated.
+   */
+  mergeTags?: string[];
+  label?: string;
+  autoFocus?: boolean;
+  placeholder?: string;
+}
+
+// trix + react-trix do not appear to have any typings, so roll with editor: any for now.
+type Editor = {
+  expandSelectionInDirection?: (direction: "forward" | "backward") => void;
+  insertString(s: string): void;
+  loadHTML(html: string): void;
+};
+
+function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
+  const values = mergeTags.map((value) => ({ value }));
+  const tribute = new Tribute({
+    trigger: "@",
+    lookup: "value",
+    allowSpaces: true,
+    /** {@link https://github.com/zurb/tribute#hide-menu-when-no-match-is-returned} */
+    noMatchTemplate: () => `<span style:"visibility: hidden;"></span>`,
+    selectTemplate: ({ original: { value } }) => `<span style="color: ${Palette.LightBlue700};">@${value}</span>`,
+    values,
+  });
+  // In dev mode, this fails because jsdom doesn't support contentEditable. Note that
+  // before create-react-app 4.x / a newer jsdom, the trix-initialize event wasn't
+  // even fired during unit tests anyway.
+  try {
+    tribute.attach(editorElement!);
+  } catch {}
+}
+
+/**
+ * Glues together trix and tributejs to provide a simple rich text editor.
+ *
+ * See [trix]{@link https://github.com/basecamp/trix} and [tributejs]{@link https://github.com/zurb/tribute}.
+ * */
+export function RichTextEditor(props: RichTextEditorProps) {
+  const { mergeTags, label, value, onChange } = props;
+  const id = useId();
+
+  // We get a reference to the Editor instance after trix-init fires
+  const editor = useRef<Editor | undefined>(undefined);
+
+  // Disclaimer I'm kinda guessing at whether this aria setup is right
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const { labelProps, inputProps } = useTextField({ label }, inputRef);
+
+  // Keep track of what we pass to onChange, so that we can make ourselves keep looking
+  // like a controlled input, i.e. by only calling loadHTML if a new incoming `value` !== `currentHtml`,
+  // otherwise we'll constantly call loadHTML and reset the user's cursor location.
+  const currentHtml = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    const editorElement = document.getElementById(`editor-${id}`);
+    if (!editorElement) {
+      throw new Error("editorElement not found");
+    }
+
+    editor.current = (editorElement as any).editor;
+    if (!editor.current) {
+      throw new Error("editor not found");
+    }
+    if (mergeTags !== undefined) {
+      attachTributeJs(mergeTags, editorElement!);
+    }
+    // We have a 2nd useEffect to call loadHTML when value changes, but
+    // we do this here b/c we assume the 2nd useEffect's initial evaluation
+    // "missed" having editor.current set b/c trix-initialize hadn't fired.
+    editor.current.loadHTML(value);
+
+    function trixChange(e: ChangeEvent) {
+      const { textContent, innerHTML } = e.target;
+      currentHtml.current = innerHTML;
+      onChange && onChange(innerHTML, textContent || "");
+    }
+
+    editorElement.addEventListener("trix-change", trixChange as any, false);
+    return () => {
+      editorElement.removeEventListener("trix-change", trixChange as any);
+    };
+  }, []);
+
+  useEffect(() => {
+    // If our value prop changes (without the change coming from us), reload it
+    if (editor.current && value !== currentHtml.current) {
+      editor.current.loadHTML(value);
+    }
+  }, [value]);
+
+  const { placeholder, autoFocus } = props;
+
+  return (
+    <div css={Css.w100.maxw("550px").$}>
+      {label && <Label labelProps={labelProps} label={label} />}
+      <div css={trixCssOverrides}>
+        {React.createElement("trix-editor", {
+          id: `editor-${id}`,
+          input: `input-${id}`,
+          ...(autoFocus ? { autoFocus } : {}),
+          ...(placeholder ? { placeholder } : {}),
+        })}
+        <input type="hidden" ref={inputRef} id={`input-${id}`} value={value} />
+      </div>
+      <Global styles={[tributeOverrides]} />
+    </div>
+  );
+}
+
+const trixCssOverrides = {
+  ...Css.relative.add({ wordBreak: "break-word" }).$,
+  // Put the toolbar on the bottom
+  ...Css.df.flexColumnReverse.childGap1.$,
+  // Some basic copy/paste from TextFieldBase
+  "& trix-editor": Css.bgWhite.sm.gray900.br4.bGray300.$,
+  "& trix-editor:focus": Css.bLightBlue700.$,
+  // Make the buttons closer to ours
+  "& .trix-button": Css.bgWhite.sm.$,
+  // We don't support file attachment yet, so hide that control for now.
+  "& .trix-button-group--file-tools": Css.dn.$,
+  // Other things that are unused and we want to hide
+  "& .trix-button--icon-heading-1": Css.dn.$,
+  "& .trix-button--icon-code": Css.dn.$,
+  "& .trix-button--icon-quote": Css.dn.$,
+  "& .trix-button--icon-increase-nesting-level": Css.dn.$,
+  "& .trix-button--icon-decrease-nesting-level": Css.dn.$,
+  "& .trix-button-group--history-tools": Css.dn.$,
+  // Put back list styles that CssReset is probably too aggressive with
+  "& ul": Css.ml2.add("listStyleType", "disc").$,
+  "& ol": Css.ml2.add("listStyleType", "decimal").$,
+};
+
+// Style the @ mention box
+const tributeOverrides = {
+  ".tribute-container": Css.add({ minWidth: "300px" }).$,
+  ".tribute-container > ul": Css.sm.bgWhite.ba.br4.bLightBlue700.overflowHidden.$,
+};
