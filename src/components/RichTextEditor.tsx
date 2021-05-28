@@ -1,6 +1,5 @@
 import { Global } from "@emotion/react";
-import * as React from "react";
-import { ChangeEvent, useEffect, useRef } from "react";
+import { ChangeEvent, createElement, useEffect, useRef } from "react";
 import { useId } from "react-aria";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
@@ -90,7 +89,7 @@ export function RichTextEditor(props: RichTextEditorProps) {
       {/* TODO: Not sure what to pass to labelProps. */}
       {label && <Label labelProps={{}} label={label} />}
       <div css={trixCssOverrides}>
-        {React.createElement("trix-editor", {
+        {createElement("trix-editor", {
           id: `editor-${id}`,
           input: `input-${id}`,
           ...(autoFocus ? { autoFocus } : {}),
