@@ -47,43 +47,52 @@ export function RichTextField(props: RichTextFieldProps) {
   // otherwise we'll constantly call loadHTML and reset the user's cursor location.
   const currentHtml = useRef<string | undefined>(undefined);
 
-  useEffect(() => {
-    const editorElement = document.getElementById(`editor-${id}`);
-    if (!editorElement) {
-      throw new Error("editorElement not found");
-    }
+  // Use a ref for onChange b/c so trixChange always has the latest
+  const onChangeRef = useRef<RichTextFieldProps["onChange"]>(onChange);
+  onChangeRef.current = onChange;
 
-    editor.current = (editorElement as any).editor;
-    if (!editor.current) {
-      throw new Error("editor not found");
-    }
-    if (mergeTags !== undefined) {
-      attachTributeJs(mergeTags, editorElement!);
-    }
-
-    // We have a 2nd useEffect to call loadHTML when value changes, but
-    // we do this here b/c we assume the 2nd useEffect's initial evaluation
-    // "missed" having editor.current set b/c trix-initialize hadn't fired.
-    currentHtml.current = value;
-    editor.current.loadHTML(value || "");
-
-    function trixChange(e: ChangeEvent) {
-      const { textContent, innerHTML } = e.target;
-      // If the user only types whitespace, treat that as undefined
-      if ((textContent || "").trim() === "") {
-        currentHtml.current = undefined;
-        onChange && onChange(undefined, undefined);
-      } else {
-        currentHtml.current = innerHTML;
-        onChange && onChange(innerHTML, textContent || undefined);
+  useEffect(
+    () => {
+      const editorElement = document.getElementById(`editor-${id}`);
+      if (!editorElement) {
+        throw new Error("editorElement not found");
       }
-    }
 
-    editorElement.addEventListener("trix-change", trixChange as any, false);
-    return () => {
-      editorElement.removeEventListener("trix-change", trixChange as any);
-    };
-  }, []);
+      editor.current = (editorElement as any).editor;
+      if (!editor.current) {
+        throw new Error("editor not found");
+      }
+      if (mergeTags !== undefined) {
+        attachTributeJs(mergeTags, editorElement!);
+      }
+
+      // We have a 2nd useEffect to call loadHTML when value changes, but
+      // we do this here b/c we assume the 2nd useEffect's initial evaluation
+      // "missed" having editor.current set b/c trix-initialize hadn't fired.
+      currentHtml.current = value;
+      editor.current.loadHTML(value || "");
+
+      function trixChange(e: ChangeEvent) {
+        const { textContent, innerHTML } = e.target;
+        const onChange = onChangeRef.current;
+        // If the user only types whitespace, treat that as undefined
+        if ((textContent || "").trim() === "") {
+          currentHtml.current = undefined;
+          onChange && onChange(undefined, undefined);
+        } else {
+          currentHtml.current = innerHTML;
+          onChange && onChange(innerHTML, textContent || undefined);
+        }
+      }
+
+      editorElement.addEventListener("trix-change", trixChange as any, false);
+      return () => {
+        editorElement.removeEventListener("trix-change", trixChange as any);
+      };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   useEffect(() => {
     // If our value prop changes (without the change coming from us), reload it
