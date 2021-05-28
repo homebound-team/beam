@@ -10,7 +10,7 @@ export type BoundRichTextFieldProps = Omit<RichTextFieldProps, "value" | "onChan
   onChange?: (value: string | undefined) => void;
 };
 
-/** Wraps `TextField` and binds it to a form field. */
+/** Wraps `RichTextField` and binds it to a form field. */
 export function BoundRichTextField(props: BoundRichTextFieldProps) {
   const { field, onChange = (value) => field.set(value), label = defaultLabel(field.key), ...others } = props;
   const testId = useTestIds(props, field.key);
