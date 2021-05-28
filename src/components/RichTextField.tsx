@@ -8,10 +8,10 @@ import "tributejs/dist/tribute.css";
 import "trix/dist/trix";
 import "trix/dist/trix.css";
 
-export interface RichTextEditorProps {
+export interface RichTextFieldProps {
   /** The initial html value to show in the trix editor. */
-  value: string;
-  onChange: (html: string, text: string) => void;
+  value: string | undefined;
+  onChange: (html: string | undefined, text: string | undefined) => void;
   /**
    * A list of tags/names to show in a popup when the user `@`-s.
    *
@@ -33,7 +33,7 @@ type Editor = {
  *
  * See [trix]{@link https://github.com/basecamp/trix} and [tributejs]{@link https://github.com/zurb/tribute}.
  * */
-export function RichTextEditor(props: RichTextEditorProps) {
+export function RichTextField(props: RichTextFieldProps) {
   const { mergeTags, label, value, onChange } = props;
   const id = useId();
 
@@ -58,15 +58,23 @@ export function RichTextEditor(props: RichTextEditorProps) {
     if (mergeTags !== undefined) {
       attachTributeJs(mergeTags, editorElement!);
     }
+
     // We have a 2nd useEffect to call loadHTML when value changes, but
     // we do this here b/c we assume the 2nd useEffect's initial evaluation
     // "missed" having editor.current set b/c trix-initialize hadn't fired.
-    editor.current.loadHTML(value);
+    currentHtml.current = value;
+    editor.current.loadHTML(value || "");
 
     function trixChange(e: ChangeEvent) {
       const { textContent, innerHTML } = e.target;
-      currentHtml.current = innerHTML;
-      onChange && onChange(innerHTML, textContent || "");
+      // If the user only types whitespace, treat that as undefined
+      if ((textContent || "").trim() === "") {
+        currentHtml.current = undefined;
+        onChange && onChange(undefined, undefined);
+      } else {
+        currentHtml.current = innerHTML;
+        onChange && onChange(innerHTML, textContent || undefined);
+      }
     }
 
     editorElement.addEventListener("trix-change", trixChange as any, false);
@@ -78,7 +86,7 @@ export function RichTextEditor(props: RichTextEditorProps) {
   useEffect(() => {
     // If our value prop changes (without the change coming from us), reload it
     if (editor.current && value !== currentHtml.current) {
-      editor.current.loadHTML(value);
+      editor.current.loadHTML(value || "");
     }
   }, [value]);
 
