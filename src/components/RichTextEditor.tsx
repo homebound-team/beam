@@ -1,5 +1,4 @@
 import { Global } from "@emotion/react";
-import { useTextField } from "@react-aria/textfield";
 import * as React from "react";
 import { ChangeEvent, useEffect, useRef } from "react";
 import { useId } from "react-aria";
@@ -30,25 +29,6 @@ type Editor = {
   loadHTML(html: string): void;
 };
 
-function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
-  const values = mergeTags.map((value) => ({ value }));
-  const tribute = new Tribute({
-    trigger: "@",
-    lookup: "value",
-    allowSpaces: true,
-    /** {@link https://github.com/zurb/tribute#hide-menu-when-no-match-is-returned} */
-    noMatchTemplate: () => `<span style:"visibility: hidden;"></span>`,
-    selectTemplate: ({ original: { value } }) => `<span style="color: ${Palette.LightBlue700};">@${value}</span>`,
-    values,
-  });
-  // In dev mode, this fails because jsdom doesn't support contentEditable. Note that
-  // before create-react-app 4.x / a newer jsdom, the trix-initialize event wasn't
-  // even fired during unit tests anyway.
-  try {
-    tribute.attach(editorElement!);
-  } catch {}
-}
-
 /**
  * Glues together trix and tributejs to provide a simple rich text editor.
  *
@@ -60,10 +40,6 @@ export function RichTextEditor(props: RichTextEditorProps) {
 
   // We get a reference to the Editor instance after trix-init fires
   const editor = useRef<Editor | undefined>(undefined);
-
-  // Disclaimer I'm kinda guessing at whether this aria setup is right
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const { labelProps, inputProps } = useTextField({ label }, inputRef);
 
   // Keep track of what we pass to onChange, so that we can make ourselves keep looking
   // like a controlled input, i.e. by only calling loadHTML if a new incoming `value` !== `currentHtml`,
@@ -111,7 +87,8 @@ export function RichTextEditor(props: RichTextEditorProps) {
 
   return (
     <div css={Css.w100.maxw("550px").$}>
-      {label && <Label labelProps={labelProps} label={label} />}
+      {/* TODO: Not sure what to pass to labelProps. */}
+      {label && <Label labelProps={{}} label={label} />}
       <div css={trixCssOverrides}>
         {React.createElement("trix-editor", {
           id: `editor-${id}`,
@@ -119,11 +96,30 @@ export function RichTextEditor(props: RichTextEditorProps) {
           ...(autoFocus ? { autoFocus } : {}),
           ...(placeholder ? { placeholder } : {}),
         })}
-        <input type="hidden" ref={inputRef} id={`input-${id}`} value={value} {...inputProps} />
+        <input type="hidden" id={`input-${id}`} value={value} />
       </div>
       <Global styles={[tributeOverrides]} />
     </div>
   );
+}
+
+function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
+  const values = mergeTags.map((value) => ({ value }));
+  const tribute = new Tribute({
+    trigger: "@",
+    lookup: "value",
+    allowSpaces: true,
+    /** {@link https://github.com/zurb/tribute#hide-menu-when-no-match-is-returned} */
+    noMatchTemplate: () => `<span style:"visibility: hidden;"></span>`,
+    selectTemplate: ({ original: { value } }) => `<span style="color: ${Palette.LightBlue700};">@${value}</span>`,
+    values,
+  });
+  // In dev mode, this fails because jsdom doesn't support contentEditable. Note that
+  // before create-react-app 4.x / a newer jsdom, the trix-initialize event wasn't
+  // even fired during unit tests anyway.
+  try {
+    tribute.attach(editorElement!);
+  } catch {}
 }
 
 const trixCssOverrides = {
