@@ -609,6 +609,21 @@ describe("GridTable", () => {
       parent: { prev: p2 },
     });
   });
+
+  it("can look up row locations when only one row", async () => {
+    // Given just one row
+    const r1 = { kind: "data", id: "r:1", name: "one", value: 1 } as const;
+    const rows: GridDataRow<Row>[] = [r1];
+    // When we look it up
+    const rowLookup: MutableRefObject<GridRowLookup<Row> | undefined> = { current: undefined };
+    await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
+    // Then we get nothing back
+    expect(rowLookup.current!.lookup(r1)).toMatchObject({
+      prev: undefined,
+      next: undefined,
+      data: { prev: undefined, next: undefined },
+    });
+  });
 });
 
 function Collapse() {
