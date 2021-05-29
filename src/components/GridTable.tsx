@@ -299,19 +299,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       },
       lookup(row) {
         const rows = filteredRows.map((r) => r[0]);
-
-        // Use the 1st column to get the runtime list of kinds
-        const nonKindKeys = ["w", "sort", "sortValue", "align"];
-        const result: any = {
-          ...Object.fromEntries(
-            Object.keys(columns[0] || {})
-              .filter((key) => !nonKindKeys.includes(key))
-              .map((key) => [key, { prev: undefined, next: undefined }]),
-          ),
-          prev: undefined,
-          next: undefined,
-        };
-
+        // Ensure we have `result.kind = {}` for each kind
+        const result: any = Object.fromEntries(getKinds(columns).map((kind) => [kind, {}]));
         // This is an admittedly cute/fancy scan, instead of just `rows.findIndex`, but
         // we do it this way so that we can do kind-aware prev/next detection.
         let key: "prev" | "next" = "prev";
@@ -980,6 +969,12 @@ export function observableColumns<T extends Kinded>(cols: GridColumn<T>[]): Grid
 /** GridTable as Table utility to wrap table header or body with thead or tbody */
 function maybeWrapWith(children: ReactNode, as: TableAs, Node: "thead" | "tbody") {
   return as === "div" ? children : <Node>{children}</Node>;
+}
+
+function getKinds<R extends Kinded>(columns: GridColumn<R>[]): R[] {
+  // Use the 1st column to get the runtime list of kinds
+  const nonKindKeys = ["w", "sort", "sortValue", "align"];
+  return Object.keys(columns[0] || {}).filter((key) => !nonKindKeys.includes(key)) as any;
 }
 
 /** GridTable as Table utility to apply <tr> element override styles */

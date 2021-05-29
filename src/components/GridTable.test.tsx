@@ -618,11 +618,7 @@ describe("GridTable", () => {
     const rowLookup: MutableRefObject<GridRowLookup<Row> | undefined> = { current: undefined };
     await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
     // Then we get nothing back
-    expect(rowLookup.current!.lookup(r1)).toMatchObject({
-      prev: undefined,
-      next: undefined,
-      data: { prev: undefined, next: undefined },
-    });
+    expect(rowLookup.current!.lookup(r1)).toMatchObject({ data: {} });
   });
 });
 
