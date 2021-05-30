@@ -106,8 +106,15 @@ export function Filtering() {
       <div>
         <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
       </div>
-      <div css={Css.fg1.bgGreen300.$}>
-        <GridTable columns={columns} sorting={"client-side"} filter={filter} stickyHeader={true} rows={rows} />
+      <div css={Css.fg1.$}>
+        <GridTable
+          as="virtual"
+          columns={columns}
+          sorting={"client-side"}
+          filter={filter}
+          stickyHeader={true}
+          rows={rows}
+        />
       </div>
     </div>
   );
