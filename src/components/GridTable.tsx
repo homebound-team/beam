@@ -338,7 +338,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     virtual: renderVirtual,
   };
   const render = renders[as];
-  return render(style, id, columns, headerRows, filteredRows, firstRowMessage, xss);
+  return render(style, id, columns, headerRows, filteredRows, firstRowMessage, stickyHeader, xss);
 }
 
 function renderCssGrid<R extends Kinded>(
@@ -348,6 +348,7 @@ function renderCssGrid<R extends Kinded>(
   headerRows: RowTuple<R>[],
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
+  stickyHeader: boolean,
   xss: any,
 ): ReactElement {
   const gridTemplateColumns = columns
@@ -389,6 +390,7 @@ function renderTable<R extends Kinded>(
   headerRows: RowTuple<R>[],
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
+  stickyHeader: boolean,
   xss: any,
 ): ReactElement {
   return (
@@ -426,6 +428,7 @@ function renderVirtual<R extends Kinded>(
   headerRows: RowTuple<R>[],
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
+  stickyHeader: boolean,
   xss: any,
 ): ReactElement {
   const gridTemplateColumns = columns
@@ -435,11 +438,16 @@ function renderVirtual<R extends Kinded>(
 
   return (
     <Virtuoso
-      components={{ List: List(style, gridTemplateColumns, id, xss) }}
-      // We use display:contents to promote is itemContent out of virtuoso's
-      // div wrapper (b/c our GridRow already has it), but that breaks the
-      // auto height detection
+      components={{ List: VirtualRoot(style, gridTemplateColumns, id, xss) }}
+      // We use display:contents to promote the itemContent out of virtuoso's
+      // Item/div wrapper (b/c our GridRow already has it), but that breaks the
+      // auto height detection.
+      //
+      // I've tried to provide a custom Item component, but since it needs to accept
+      // a custom ref and `data-*` props, and b/c RowTuple has already invoked
+      // the GridRow function, we can't easily combine the two.
       fixedItemHeight={56}
+      topItemCount={stickyHeader ? 1 : 0}
       itemContent={(index) => {
         let i = index;
         if (i < headerRows.length) {
@@ -459,33 +467,39 @@ function renderVirtual<R extends Kinded>(
   );
 }
 
-const List = memoizeOne<(gs: GridStyle, gridTemplateColumns: string, id: string, xss: any) => Components["List"]>(
-  (gs, gridTemplateColumns, id, xss) =>
-    React.forwardRef(({ style, children }, ref) => {
-      // This re-renders each time we have new children in the view port
-      return (
-        <div
-          ref={ref}
-          style={style}
-          css={{
-            ...Css.dg.add({ gridTemplateColumns }).$,
-            ...Css
-              // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
-              // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
-              // The `div + div` is also the "owl operator", i.e. don't apply to the 1st row.
-              .addIn("& > div + div > div > *", gs.betweenRowsCss)
-              // Flatten out the Item
-              .addIn("& > div", Css.display("contents").$).$,
-            ...gs.rootCss,
-            ...xss,
-          }}
-          data-testid={id}
-        >
-          {children}
-        </div>
-      );
-    }),
-);
+// Use memoize to create a single component type for a given set of props. I'm not
+// entirely sure this is necessary, but [1] made it seem so. Also xss will probably
+// not be memoized.
+//
+// [1]: https://codesandbox.io/s/github/bvaughn/react-window/tree/master/website/sandboxes/memoized-list-items?file=/index.js
+const VirtualRoot = memoizeOne<
+  (gs: GridStyle, gridTemplateColumns: string, id: string, xss: any) => Components["List"]
+>((gs, gridTemplateColumns, id, xss) => {
+  return React.forwardRef(({ style, children }, ref) => {
+    // This re-renders each time we have new children in the view port
+    return (
+      <div
+        ref={ref}
+        style={style}
+        css={{
+          ...Css.dg.add({ gridTemplateColumns }).$,
+          ...Css
+            // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
+            // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
+            // The `div + div` is also the "owl operator", i.e. don't apply to the 1st row.
+            .addIn("& > div + div > div > *", gs.betweenRowsCss)
+            // Flatten out the Item
+            .addIn("& > div", Css.display("contents").$).$,
+          ...gs.rootCss,
+          ...xss,
+        }}
+        data-testid={id}
+      >
+        {children}
+      </div>
+    );
+  });
+});
 
 /**
  * Given an ADT of type T, performs a look up and returns the type of kind K.

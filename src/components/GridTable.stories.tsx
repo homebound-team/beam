@@ -106,6 +106,7 @@ export function Filtering() {
           columns={[nameColumn, valueColumn, actionColumn]}
           sorting={"client-side"}
           filter={filter}
+          stickyHeader={true}
           rows={rows}
           as="virtual"
         />
