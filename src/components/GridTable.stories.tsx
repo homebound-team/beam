@@ -85,13 +85,18 @@ export const Hovering = newStory(
 );
 
 export function Filtering() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, sort: false };
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
       { kind: "header", id: "header" },
-      ...zeroTo(1_000).map((i) => ({ kind: "data" as const, id: String(i), name: `c ${i}`, value: i })),
+      ...zeroTo(100).map((i) => ({ kind: "data" as const, id: String(i), name: `ccc ${i}`, value: i })),
+    ],
+    [],
+  );
+  const columns: GridColumn<Row>[] = useMemo(
+    () => [
+      { header: "Name", data: ({ name }) => name },
+      { header: "Value", data: ({ value }) => value },
+      { header: "Action", data: () => <div>Actions</div>, sort: false },
     ],
     [],
   );
@@ -102,14 +107,7 @@ export function Filtering() {
         <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
       </div>
       <div css={Css.fg1.bgGreen300.$}>
-        <GridTable
-          columns={[nameColumn, valueColumn, actionColumn]}
-          sorting={"client-side"}
-          filter={filter}
-          stickyHeader={true}
-          rows={rows}
-          as="virtual"
-        />
+        <GridTable columns={columns} sorting={"client-side"} filter={filter} stickyHeader={true} rows={rows} />
       </div>
     </div>
   );
