@@ -11,7 +11,6 @@ import React, {
   useState,
 } from "react";
 import { Link } from "react-router-dom";
-import AutoSizer from "react-virtualized-auto-sizer";
 import { Components, Virtuoso } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
@@ -432,33 +431,28 @@ function renderVirtual<R extends Kinded>(
     .join(" ");
 
   return (
-    <AutoSizer>
-      {({ height, width }) => (
-        <Virtuoso
-          style={{ height: `${height}px`, width: `${width}px` }}
-          components={{ List: List(style, gridTemplateColumns, id, xss) }}
-          // We use display:contents to promote is itemContent out of virtuoso's
-          // div wrapper (b/c our GridRow already has it), but that breaks the
-          // auto height detection
-          fixedItemHeight={56}
-          itemContent={(index) => {
-            let i = index;
-            if (i < headerRows.length) {
-              return headerRows[i][2];
-            }
-            i -= headerRows.length;
-            if (firstRowMessage) {
-              if (i === 0) {
-                return firstRowMessage;
-              }
-              i -= 1;
-            }
-            return filteredRows[i][2];
-          }}
-          totalCount={headerRows.length + (firstRowMessage ? 1 : 0) + filteredRows.length}
-        />
-      )}
-    </AutoSizer>
+    <Virtuoso
+      components={{ List: List(style, gridTemplateColumns, id, xss) }}
+      // We use display:contents to promote is itemContent out of virtuoso's
+      // div wrapper (b/c our GridRow already has it), but that breaks the
+      // auto height detection
+      fixedItemHeight={56}
+      itemContent={(index) => {
+        let i = index;
+        if (i < headerRows.length) {
+          return headerRows[i][2];
+        }
+        i -= headerRows.length;
+        if (firstRowMessage) {
+          if (i === 0) {
+            return firstRowMessage;
+          }
+          i -= 1;
+        }
+        return filteredRows[i][2];
+      }}
+      totalCount={headerRows.length + (firstRowMessage ? 1 : 0) + filteredRows.length}
+    />
   );
 }
 
