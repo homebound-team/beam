@@ -331,15 +331,15 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
-  // Determine which HTML element to use to build the GridTable
-  const renders: Record<RenderAs, typeof renderTable> = {
-    table: renderTable,
-    div: renderCssGrid,
-    virtual: renderVirtual,
-  };
-  const render = renders[as];
-  return render(style, id, columns, headerRows, filteredRows, firstRowMessage, stickyHeader, xss);
+  return renders[as](style, id, columns, headerRows, filteredRows, firstRowMessage, stickyHeader, xss);
 }
+
+// Determine which HTML element to use to build the GridTable
+const renders: Record<RenderAs, typeof renderTable> = {
+  table: renderTable,
+  div: renderCssGrid,
+  virtual: renderVirtual,
+};
 
 function renderCssGrid<R extends Kinded>(
   style: GridStyle,
