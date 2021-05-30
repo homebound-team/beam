@@ -91,25 +91,30 @@ export function Filtering() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
       { kind: "header", id: "header" },
-      { kind: "data", id: "1", name: "c", value: 1 },
-      { kind: "data", id: "2", name: "b", value: 2 },
-      { kind: "data", id: "3", name: "a", value: 3 },
+      ...zeroTo(1_000).map((i) => ({ kind: "data" as const, id: String(i), name: `c ${i}`, value: i })),
     ],
     [],
   );
   const [filter, setFilter] = useState<string | undefined>();
   return (
-    <div>
-      <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
-      <GridTable
-        columns={[nameColumn, valueColumn, actionColumn]}
-        sorting={"client-side"}
-        filter={filter}
-        rows={rows}
-      />
+    <div css={Css.df.flexColumn.add({ height: heightWithoutStorybookPadding }).$}>
+      <div>
+        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
+      </div>
+      <div css={Css.fg1.bgGreen300.$}>
+        <GridTable
+          columns={[nameColumn, valueColumn, actionColumn]}
+          sorting={"client-side"}
+          filter={filter}
+          rows={rows}
+        />
+      </div>
     </div>
   );
 }
+
+// .sb-main-padded adds 1rem on top/bottom
+const heightWithoutStorybookPadding = "calc(100vh - 2rem)";
 
 export function NoRowsFallback() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
@@ -214,14 +219,14 @@ export function StickyHeader() {
     sort: false,
   };
   return (
-    <div>
+    <div style={{ height: "100vh" }}>
       some other top of page content
       <GridTable
         columns={[nameColumn, valueColumn, actionColumn]}
         stickyHeader={true}
         rows={[
           { kind: "header", id: "header" },
-          ...zeroTo(20).map((i) => ({ kind: "data" as const, id: "1", name: "c", value: 1 })),
+          ...zeroTo(2_000).map((i) => ({ kind: "data" as const, id: "1", name: "c", value: 1 })),
         ]}
       />
     </div>
