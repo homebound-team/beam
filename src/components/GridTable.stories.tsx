@@ -107,6 +107,7 @@ export function Filtering() {
           sorting={"client-side"}
           filter={filter}
           rows={rows}
+          as="virtual"
         />
       </div>
     </div>

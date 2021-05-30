@@ -106,7 +106,7 @@ export function setDefaultStyle(style: GridStyle): void {
   defaultStyle = style;
 }
 
-type TableAs = "div" | "table";
+type RenderAs = "div" | "table" | "virtual";
 
 type RowTuple<R extends Kinded> = [GridDataRow<R>, string[], ReactElement, Array<ReactNode | GridCellContent>];
 
@@ -124,7 +124,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
    * @example
    *  { header: "Name", data: ({ name }) => name, w: "75px", align: "right" }
    */
-  as?: TableAs;
+  as?: RenderAs;
   /** The column definitions i.e. how each column should render each row kind. */
   columns: GridColumn<R, S>[];
   /** The rows of data (including any header/footer rows), to be rendered by the column definitions. */
@@ -332,9 +332,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
   // Determine which HTML element to use to build the GridTable
-  const render = renderVirtual;
-  // const TableOrDiv = as;
-
+  const renders: Record<RenderAs, typeof renderTable> = {
+    table: renderTable,
+    div: renderCssGrid,
+    virtual: renderVirtual,
+  };
+  const render = renders[as];
   return render(style, id, columns, headerRows, filteredRows, firstRowMessage, xss);
 }
 
@@ -584,7 +587,7 @@ export type GridDataRow<R extends Kinded> = {
 } & DiscriminateUnion<R, "kind", R["kind"]>;
 
 interface GridRowProps<R extends Kinded, S> {
-  as: TableAs;
+  as: RenderAs;
   columns: GridColumn<R>[];
   row: GridDataRow<R>;
   style: GridStyle;
@@ -626,7 +629,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>) {
     // root-element > row-element > cell-elements, so that we can have a hook for
     // hovers and styling. In theory this would change with subgrids.
     // Only enable when using div as elements
-    ...(as === "div" ? Css.display("contents").$ : {}),
+    ...(as === "table" ? {} : Css.display("contents").$),
     ...((rowStyle?.rowLink || rowStyle?.onClick) && {
       // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
       "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
@@ -634,10 +637,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>) {
     ...maybeApplyFunction(row, rowStyle?.rowCss),
   };
 
-  const TableRow = as === "div" ? "div" : "tr";
+  const Row = as === "table" ? "tr" : "div";
 
   const div = (
-    <TableRow css={rowCss}>
+    <Row css={rowCss}>
       {columns.map((column, idx) => {
         const maybeContent = applyRowFn(column, row);
 
@@ -677,7 +680,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>) {
 
         return renderFn(idx, cellCss, content, row, rowStyle);
       })}
-    </TableRow>
+    </Row>
   );
 
   // Because of useToggleIds, this provider should basically never trigger a re-render, which is
@@ -737,8 +740,8 @@ function applyRowFn<R extends Kinded>(column: GridColumn<R>, row: GridDataRow<R>
 }
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
-const defaultRenderFn: (as: TableAs) => RenderCellFn<any> = (as: TableAs) => (key, css, content) => {
-  const Row = as === "div" ? "div" : "td";
+const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (key, css, content) => {
+  const Row = as === "table" ? "td" : "div";
   return (
     <Row key={key} css={{ ...css, ...tableRowStyles(as) }}>
       {content}
@@ -780,7 +783,7 @@ const headerRenderFn: (
   column: GridColumn<any>,
   sortFlags: SortFlags<any> | undefined,
   setSortValue: Function | undefined,
-  as: TableAs,
+  as: RenderAs,
 ) => RenderCellFn<any> = (columns, column, sortFlags, setSortValue, as) => (key, css, content) => {
   const [currentValue, direction] = sortFlags || [];
   const newValue = column.sortValue || columns.indexOf(column);
@@ -788,8 +791,7 @@ const headerRenderFn: (
     sorted: newValue === currentValue ? direction : undefined,
     toggleSort: () => setSortValue!(newValue),
   };
-  const Row = as === "div" ? "div" : "th";
-
+  const Row = as === "table" ? "th" : "div";
   return (
     <GridSortContext.Provider key={key} value={context}>
       <Row css={{ ...css, ...tableRowStyles(as, column) }}>{content}</Row>
@@ -798,27 +800,27 @@ const headerRenderFn: (
 };
 
 /** Renders a cell element when a row link is in play. */
-const rowLinkRenderFn: (as: TableAs) => RenderCellFn<any> = (as: TableAs) => (key, css, content, row, rowStyle) => {
+const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (key, css, content, row, rowStyle) => {
   const to = rowStyle!.rowLink!(row);
-  if (as === "div") {
+  if (as === "table") {
     return (
-      <Link key={key} to={to} css={{ ...Css.noUnderline.color("unset").$, ...css }} className={navLink}>
-        {content}
-      </Link>
+      <td key={key} css={{ ...css, ...tableRowStyles(as) }}>
+        <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
+          {content}
+        </Link>
+      </td>
     );
   }
   return (
-    <td key={key} css={{ ...css, ...tableRowStyles(as) }}>
-      <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
-        {content}
-      </Link>
-    </td>
+    <Link key={key} to={to} css={{ ...Css.noUnderline.color("unset").$, ...css }} className={navLink}>
+      {content}
+    </Link>
   );
 };
 
 /** Renders a cell that will fire the RowStyle.onClick. */
-const rowClickRenderFn: (as: TableAs) => RenderCellFn<any> = (as: TableAs) => (key, css, content, row, rowStyle) => {
-  const Row = as === "div" ? "div" : "tr";
+const rowClickRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (key, css, content, row, rowStyle) => {
+  const Row = as === "table" ? "tr" : "div";
   return (
     <Row {...{ key }} css={{ ...css, ...tableRowStyles(as) }} onClick={() => rowStyle!.onClick!(row)}>
       {content}
@@ -837,12 +839,13 @@ const alignmentToTextAlign: Record<GridCellAlignment, Properties["textAlign"]> =
   right: "right",
 };
 
-function getJustification(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent, as: TableAs) {
+// For alignment, use: 1) user-specified, else 2) center if non-1st header, else 3) left.
+function getJustification(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent, as: RenderAs) {
   const alignment = (isContentAndSettings(maybeContent) && maybeContent.alignment) || column.align || "left";
-  if (as === "div") {
-    return Css.justify(alignmentToJustify[alignment]).$;
+  if (as === "table") {
+    return Css.add("textAlign", alignmentToTextAlign[alignment]).$;
   }
-  return Css.add("textAlign", alignmentToTextAlign[alignment]).$;
+  return Css.justify(alignmentToJustify[alignment]).$;
 }
 
 // TODO This is very WIP / proof-of-concept and needs flushed out a lot more to handle nested batches.
@@ -1068,11 +1071,6 @@ export function observableColumns<T extends Kinded>(cols: GridColumn<T>[]): Grid
   }) as any;
 }
 
-/** GridTable as Table utility to wrap table header or body with thead or tbody */
-function maybeWrapWith(children: ReactNode, as: TableAs, Node: "thead" | "tbody") {
-  return as === "div" ? children : <Node>{children}</Node>;
-}
-
 function getKinds<R extends Kinded>(columns: GridColumn<R>[]): R[] {
   // Use the 1st column to get the runtime list of kinds
   const nonKindKeys = ["w", "sort", "sortValue", "align"];
@@ -1080,12 +1078,12 @@ function getKinds<R extends Kinded>(columns: GridColumn<R>[]): R[] {
 }
 
 /** GridTable as Table utility to apply <tr> element override styles */
-const tableRowStyles = (as: TableAs, column?: GridColumn<any>) => {
+const tableRowStyles = (as: RenderAs, column?: GridColumn<any>) => {
   const thWidth = column?.w;
-  return as === "div"
-    ? {}
-    : {
+  return as === "table"
+    ? {
         ...Css.dtc.$,
         ...(thWidth ? Css.w(thWidth).$ : {}),
-      };
+      }
+    : {};
 };
