@@ -654,8 +654,6 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     ...others
   } = props;
 
-  console.log("GridRow rendering", row.id);
-
   // We treat the "header" kind as special for "good defaults" styling
   const isHeader = row.kind === "header";
   const rowStyle = rowStyles?.[row.kind];
