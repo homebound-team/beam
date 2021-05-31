@@ -226,14 +226,14 @@ export function StickyHeader() {
     sort: false,
   };
   return (
-    <div style={{ height: "100vh" }}>
+    <div style={{ height: heightWithoutStorybookPadding }}>
       some other top of page content
       <GridTable
         columns={[nameColumn, valueColumn, actionColumn]}
         stickyHeader={true}
         rows={[
           { kind: "header", id: "header" },
-          ...zeroTo(2_000).map((i) => ({ kind: "data" as const, id: "1", name: "c", value: 1 })),
+          ...zeroTo(200).map((i) => ({ kind: "data" as const, id: `${i}`, name: `row ${i}`, value: i })),
         ]}
       />
     </div>
