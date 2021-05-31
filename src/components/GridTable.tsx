@@ -1,3 +1,4 @@
+import { Components, Virtuoso } from "@homebound/react-virtuoso";
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
 import React, {
@@ -11,7 +12,6 @@ import React, {
   useState,
 } from "react";
 import { Link } from "react-router-dom";
-import { Components, Virtuoso } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
 import { Css, Margin, Only, Palette, Properties, px, Xss } from "src/Css";
