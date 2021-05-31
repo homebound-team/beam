@@ -70,6 +70,7 @@ const sections: Sections = {
     const p = direction === "column" ? "marginTop" : direction === "column-reverse" ? "marginBottom" : "marginLeft";
     return this.addIn("& > * + *", Css.add(p, maybeInc(inc)).important.$);
   }`,
+    `childGapPx(px: number) { return this.childGap(\`\${px}px\`); }`,
   ],
   buttonBase: () => [
     newMethod("buttonBase", {
