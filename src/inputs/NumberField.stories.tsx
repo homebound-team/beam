@@ -1,11 +1,11 @@
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
 import { Css } from "src/Css";
-import { NumberField as NumberFieldComponent, NumberFieldProps } from "src/inputs";
+import { NumberField, NumberFieldProps } from "src/inputs";
 
 export default {
   title: "Inputs/Number Fields",
-  component: NumberFieldComponent,
+  component: NumberField,
 } as Meta;
 
 export function NumberFields() {
@@ -54,14 +54,14 @@ export function NumberFields() {
 function TestNumberField(props: Omit<NumberFieldProps, "onChange">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
-  return <NumberFieldComponent value={internalValue} onChange={setValue} {...otherProps} />;
+  return <NumberField value={internalValue} onChange={setValue} {...otherProps} />;
 }
 
 function ValidationNumberField({ label, compact, value }: { label: string; compact?: boolean; value: number }) {
   const [internalValue, setValue] = useState<number | undefined>(value);
   const isValid = useMemo(() => internalValue && internalValue > 0, [internalValue]);
   return (
-    <NumberFieldComponent
+    <NumberField
       label={label}
       compact={compact}
       value={internalValue}
