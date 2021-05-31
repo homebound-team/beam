@@ -109,12 +109,7 @@ export function setDefaultStyle(style: GridStyle): void {
 
 type RenderAs = "div" | "table" | "virtual";
 
-type RowTuple<R extends Kinded> = [
-  GridDataRow<R>,
-  string[],
-  (others?: object) => ReactElement,
-  Array<ReactNode | GridCellContent>,
-];
+type RowTuple<R extends Kinded> = [GridDataRow<R>, string[], ReactElement, Array<ReactNode | GridCellContent>];
 
 export interface GridTableProps<R extends Kinded, S, X> {
   id?: string;
@@ -235,7 +230,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       // Note that we do memoized on toggleCollapsedId, but it's stable thanks to useToggleIds.
       const isCollapsed = collapsedIds.includes(row.id);
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
-      const rowElement = (others?: object) => (
+      const rowElement = (
         <RowComponent
           key={`${row.kind}-${row.id}`}
           {...{
@@ -249,7 +244,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             isCollapsed,
             toggleCollapsedId,
             ...sortProps,
-            ...others,
           }}
         />
       );
@@ -381,14 +375,14 @@ function renderCssGrid<R extends Kinded>(
       }}
       data-testid={id}
     >
-      {headerRows.map(([, , nodeFn]) => nodeFn())}
+      {headerRows.map(([, , node]) => node)}
       {/* Show an all-column-span info message if it's set. */}
       {firstRowMessage && (
         <div css={Css.add("gridColumn", `${columns.length} span`).$}>
           <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
         </div>
       )}
-      {filteredRows.map(([, , nodeFn]) => nodeFn())}
+      {filteredRows.map(([, , node]) => node)}
     </div>
   );
 }
@@ -416,7 +410,7 @@ function renderTable<R extends Kinded>(
       }}
       data-testid={id}
     >
-      <thead>{headerRows.map(([, , nodeFn]) => nodeFn())}</thead>
+      <thead>{headerRows.map(([, , node]) => node)}</thead>
       <tbody>
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
@@ -426,7 +420,7 @@ function renderTable<R extends Kinded>(
             </td>
           </tr>
         )}
-        {filteredRows.map(([, , nodeFn]) => nodeFn())}
+        {filteredRows.map(([, , node]) => node)}
       </tbody>
     </table>
   );
@@ -475,7 +469,7 @@ function renderVirtual<R extends Kinded>(
         // so we pick the right header / first row message / actual row.
         let i = index;
         if (i < headerRows.length) {
-          return headerRows[i][2]();
+          return headerRows[i][2];
         }
         i -= headerRows.length;
         if (firstRowMessage) {
@@ -489,7 +483,7 @@ function renderVirtual<R extends Kinded>(
           i -= 1;
         }
         // We pass in others, which has data-index, data-known-size, etc.
-        return filteredRows[i][2]();
+        return filteredRows[i][2];
       }}
       totalCount={(headerRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)}
     />

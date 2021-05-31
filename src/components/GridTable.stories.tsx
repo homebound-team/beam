@@ -88,7 +88,7 @@ export function Filtering() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
       { kind: "header", id: "header" },
-      ...zeroTo(100).map((i) => ({ kind: "data" as const, id: String(i), name: `ccc ${i}`, value: i })),
+      ...zeroTo(1_000).map((i) => ({ kind: "data" as const, id: String(i), name: `ccc ${i}`, value: i })),
     ],
     [],
   );
