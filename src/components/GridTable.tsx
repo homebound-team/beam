@@ -8,7 +8,6 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { Link } from "react-router-dom";
@@ -329,11 +328,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
-
-  const headerRowsRef = useRef<RowTuple<R>[]>([]);
-  headerRowsRef.current = headerRows;
-  const filteredRowsRef = useRef<RowTuple<R>[]>([]);
-  filteredRowsRef.current = filteredRows;
 
   return renders[as](style, id, columns, headerRows, filteredRows, firstRowMessage, stickyHeader, xss);
 }
