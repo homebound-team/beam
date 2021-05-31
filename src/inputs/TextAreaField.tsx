@@ -1,7 +1,7 @@
 import { useTextField } from "@react-aria/textfield";
 import { useLayoutEffect } from "@react-aria/utils";
 import React, { useCallback, useRef } from "react";
-import { TextFieldBase } from "src/components/TextFieldBase";
+import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps } from "src/interfaces";
 
 // Exported for test purposes

@@ -1,11 +1,12 @@
 import { Meta } from "@storybook/react";
 import { Key, useState } from "react";
-import { HasIdAndName, Icon, Icons, Optional, SelectField, SelectFieldProps } from "src/components";
+import { Icon, Icons } from "src/components";
 import { Css } from "src/Css";
+import { HasIdAndName, Optional, SelectField, SelectFieldProps } from "src/inputs";
 
 export default {
   component: SelectField,
-  title: "Inputs / Select Fields",
+  title: "Inputs/Select Fields",
 } as Meta;
 
 type TestOption = {

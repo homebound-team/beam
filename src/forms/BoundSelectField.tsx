@@ -1,7 +1,7 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import React, { Key } from "react";
-import { HasIdAndName, Optional, SelectField, SelectFieldProps } from "src/components";
+import { Key } from "react";
+import { HasIdAndName, Optional, SelectField, SelectFieldProps } from "src/inputs";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
 

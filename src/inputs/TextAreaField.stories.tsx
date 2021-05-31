@@ -1,11 +1,11 @@
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { TextAreaField, TextAreaFieldProps } from "src/components/TextAreaField";
 import { Css } from "src/Css";
+import { TextAreaField, TextAreaFieldProps } from "src/inputs";
 
 export default {
   component: TextAreaField,
-  title: "Inputs / Text Areas",
+  title: "Inputs/Text Areas",
 } as Meta;
 
 export function TextAreas() {

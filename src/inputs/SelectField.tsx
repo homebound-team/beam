@@ -16,11 +16,11 @@ import {
   useOverlay,
   useOverlayPosition,
 } from "react-aria";
-import { ErrorMessage } from "src/components/ErrorMessage";
 import { HelperText } from "src/components/HelperText";
 import { Icon } from "src/components/Icon";
 import { Label } from "src/components/Label";
 import { Css, Palette, px } from "src/Css";
+import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils/useTestIds";
 

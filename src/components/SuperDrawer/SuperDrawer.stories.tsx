@@ -6,7 +6,7 @@ import { withDimensions, withSuperDrawer } from "src/utils/sb";
 import { SuperDrawer as SuperDrawerComponent, SuperDrawerContent, useSuperDrawer } from "./index";
 
 export default {
-  title: "Components / Super Drawer",
+  title: "Components/Super Drawer",
   component: SuperDrawerComponent,
   decorators: [withSuperDrawer, withDimensions("100vw", "100vh")],
   parameters: { chromatic: { delay: 1000 } },

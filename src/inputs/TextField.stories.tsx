@@ -1,11 +1,11 @@
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { TextField, TextFieldProps } from "src/components/TextField";
 import { Css } from "src/Css";
+import { TextField, TextFieldProps } from "src/inputs";
 
 export default {
   component: TextField,
-  title: "Inputs / Text Fields",
+  title: "Inputs/Text Fields",
 } as Meta;
 
 export function TextFields() {

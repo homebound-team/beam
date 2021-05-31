@@ -1,10 +1,11 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { Button, DateField, DateFieldProps, TextField } from "src/components";
+import { Button } from "src/components";
+import { DateField, DateFieldProps, TextField } from "src/inputs";
 import { samples } from "src/utils/sb";
 
 export default {
-  title: "Inputs / Date Field",
+  title: "Inputs/Date Field",
   component: Button,
 } as Meta;
 

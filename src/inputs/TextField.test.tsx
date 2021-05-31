@@ -1,7 +1,7 @@
 import { render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { TextField, TextFieldProps } from "src/components/TextField";
+import { TextField, TextFieldProps } from "src/inputs";
 
 let lastSet: any = undefined;
 

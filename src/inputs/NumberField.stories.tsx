@@ -1,10 +1,10 @@
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { NumberField as NumberFieldComponent, NumberFieldProps } from "src/components/NumberField";
 import { Css } from "src/Css";
+import { NumberField as NumberFieldComponent, NumberFieldProps } from "src/inputs";
 
 export default {
-  title: "Inputs / Number Fields",
+  title: "Inputs/Number Fields",
   component: NumberFieldComponent,
 } as Meta;
 

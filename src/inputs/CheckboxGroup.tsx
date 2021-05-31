@@ -2,12 +2,12 @@ import { useCheckboxGroup } from "@react-aria/checkbox";
 import { CheckboxGroupState, useCheckboxGroupState } from "@react-stately/checkbox";
 import { ReactNode, useRef } from "react";
 import { useCheckboxGroupItem } from "react-aria";
-import { CheckboxBase } from "src/components";
-import { ErrorMessage } from "src/components/ErrorMessage";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils/useTestIds";
+import { CheckboxBase } from "src/inputs/CheckboxBase";
+import { ErrorMessage } from "src/inputs/ErrorMessage";
+import { useTestIds } from "src/utils";
 
 export interface CheckboxGroupItemOption {
   /** Additional text displayed below label */

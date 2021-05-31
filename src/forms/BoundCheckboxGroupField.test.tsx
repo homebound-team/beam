@@ -1,8 +1,8 @@
 import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { CheckboxGroupItemOption } from "src/components/CheckboxGroup";
-import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
+import { BoundCheckboxGroupField } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
+import { CheckboxGroupItemOption } from "src/inputs";
 
 const colors: CheckboxGroupItemOption[] = [
   { value: "c:1", label: "Blue" },

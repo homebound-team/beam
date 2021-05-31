@@ -1,9 +1,9 @@
 import { mergeProps } from "@react-aria/utils";
 import React, { InputHTMLAttributes, LabelHTMLAttributes, MutableRefObject, TextareaHTMLAttributes } from "react";
-import { ErrorMessage } from "src/components/ErrorMessage";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, px } from "src/Css";
+import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamTextFieldProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";

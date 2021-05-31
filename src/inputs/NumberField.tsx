@@ -1,12 +1,12 @@
 import { useNumberField } from "@react-aria/numberfield";
 import { mergeProps } from "@react-aria/utils";
 import { NumberFieldStateProps, useNumberFieldState } from "@react-stately/numberfield";
-import React, { ReactNode, useMemo, useRef } from "react";
+import { ReactNode, useMemo, useRef } from "react";
 import { useLocale } from "react-aria";
-import { ErrorMessage } from "src/components/ErrorMessage";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, px } from "src/Css";
+import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { useTestIds } from "src/utils/useTestIds";
 
 // exported for testing purposes
