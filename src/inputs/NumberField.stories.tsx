@@ -10,41 +10,33 @@ export default {
 
 export function NumberFields() {
   return (
-    <div css={Css.df.justifyAround.childGap(4).$}>
-      <div>
-        <h1 css={Css.lg.mb2.$}>Regular</h1>
+    <div css={Css.df.flexColumn.childGap5.$}>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Regular</h1>
         <TestNumberField value={0} />
-        <br />
         <TestNumberField label="Age" value={1000} />
-        <br />
         <TestNumberField label="Age Disabled" value={1000} disabled />
-        <br />
         <TestNumberField label="Age Read Only" value={1000} readOnly />
-        <br />
         <TestNumberField
           label="Age Read Helper Text"
           value={1000}
           helperText="Some really long helper text that we expect to wrap."
         />
-        <br />
         <ValidationNumberField label="Age Validated" value={-1} />
       </div>
-      <div>
-        <h1 css={Css.lg.mb2.$}>Compact</h1>
+
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Compact</h1>
         <TestNumberField compact value={0} />
-        <br />
         <TestNumberField compact label="Age" value={1000} />
-        <br />
         <TestNumberField compact label="Age Disabled" value={1000} disabled />
-        <br />
         <ValidationNumberField label="Age Validated" compact value={-1} />
       </div>
-      <div>
-        <h1 css={Css.lg.mb2.$}>Unit Types</h1>
+
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Unit Types</h1>
         <TestNumberField label="Percent" type="percent" value={12} />
-        <br />
         <TestNumberField label="Cents" type="cents" value={1000} />
-        <br />
         <TestNumberField label="Margin" type="basisPoints" value={1275} />
       </div>
     </div>

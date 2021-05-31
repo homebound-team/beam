@@ -31,9 +31,9 @@ const optionsWithNumericIds: TestOption[] = [
 
 export function SelectFields() {
   return (
-    <div css={Css.df.justifyAround.childGap(4).$}>
-      <div css={Css.df.flexColumn.childGap3.$}>
-        <h1 css={Css.lg.mb2.$}>Regular</h1>
+    <div css={Css.df.flexColumn.childGap5.$}>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Regular</h1>
         <TestSelectField
           label="Favorite Icon"
           value={options[2].id}
@@ -83,8 +83,8 @@ export function SelectFields() {
         />
       </div>
 
-      <div css={Css.df.flexColumn.childGap3.$}>
-        <h1 css={Css.lg.mb2.$}>Compact</h1>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Compact</h1>
         <TestSelectField
           compact
           label="Favorite Icon"

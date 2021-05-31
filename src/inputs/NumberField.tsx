@@ -1,13 +1,8 @@
 import { useNumberField } from "@react-aria/numberfield";
-import { mergeProps } from "@react-aria/utils";
 import { NumberFieldStateProps, useNumberFieldState } from "@react-stately/numberfield";
 import { ReactNode, useMemo, useRef } from "react";
 import { useLocale } from "react-aria";
-import { HelperText } from "src/components/HelperText";
-import { Label } from "src/components/Label";
-import { Css, px } from "src/Css";
-import { ErrorMessage } from "src/inputs/ErrorMessage";
-import { useTestIds } from "src/utils/useTestIds";
+import { TextFieldBase } from "./TextFieldBase";
 
 // exported for testing purposes
 export interface NumberFieldProps {
@@ -71,26 +66,18 @@ export function NumberField(props: NumberFieldProps) {
   const state = useNumberFieldState(useProps);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { labelProps, inputProps, groupProps } = useNumberField(useProps, state, inputRef);
-  const errorMessageId = `${inputProps.id}-error`;
-  const tid = useTestIds(props, label);
 
   return (
-    <div css={Css.df.flexColumn.w100.maxw(px(550)).$} {...groupProps}>
-      {label && <Label labelProps={labelProps} label={label} {...tid.label} />}
-      <input
-        {...mergeProps(inputProps, { onBlur })}
-        {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
-        ref={inputRef}
-        css={{
-          ...Css.add("resize", "none").tr.bgWhite.sm.px1.hPx(40).gray900.br4.outline0.ba.bGray300.if(compact).hPx(32).$,
-          "&:focus": Css.bLightBlue700.$,
-          "&:disabled": Css.gray400.bgGray100.cursorNotAllowed.$,
-          ...(errorMsg ? Css.bRed600.$ : {}),
-        }}
-        {...tid}
-      />
-      {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}
-      {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
-    </div>
+    <TextFieldBase
+      groupProps={groupProps}
+      labelProps={labelProps}
+      label={label}
+      inputProps={inputProps}
+      inputRef={inputRef}
+      onBlur={onBlur}
+      errorMsg={errorMsg}
+      helperText={helperText}
+      compact={compact}
+    />
   );
 }

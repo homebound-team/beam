@@ -10,23 +10,18 @@ export default {
 
 export function TextAreas() {
   return (
-    <div css={Css.df.justifyAround.$}>
-      <div>
-        <h1 css={Css.lg.mb2.$}>Regular</h1>
+    <div css={Css.df.flexColumn.childGap5.$}>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Regular</h1>
         <TestTextArea value="" />
-        <br />
         <TestTextArea label="Description" value="" />
-        <br />
         <TestTextArea label="Description" value="An example description text." autoFocus />
-        <br />
         <TestTextArea label="Description" value="This is a description that can no longer be edited." disabled />
-        <br />
         <TestTextArea
           label="Description"
           value="See helper text."
           helperText="Some really long helper text that we expect to wrap."
         />
-        <br />
         <ValidationTextArea value="Not enough characters" />
       </div>
     </div>
