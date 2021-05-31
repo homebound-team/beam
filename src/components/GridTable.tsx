@@ -4,7 +4,6 @@ import React, {
   MutableRefObject,
   ReactElement,
   ReactNode,
-  RefObject,
   useCallback,
   useContext,
   useEffect,
@@ -342,7 +341,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const filteredRowsRef = useRef<RowTuple<R>[]>([]);
   filteredRowsRef.current = filteredRows;
 
-  return renders[as](style, id, columns, headerRowsRef, filteredRowsRef, firstRowMessage, stickyHeader, xss);
+  return renders[as](style, id, columns, headerRows, filteredRows, firstRowMessage, stickyHeader, xss);
 }
 
 // Determine which HTML element to use to build the GridTable
@@ -356,8 +355,8 @@ function renderCssGrid<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumn<R>[],
-  headerRows: RefObject<RowTuple<R>[]>,
-  filteredRows: RefObject<RowTuple<R>[]>,
+  headerRows: RowTuple<R>[],
+  filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
@@ -382,14 +381,14 @@ function renderCssGrid<R extends Kinded>(
       }}
       data-testid={id}
     >
-      {headerRows.current!.map(([, , nodeFn]) => nodeFn())}
+      {headerRows.map(([, , nodeFn]) => nodeFn())}
       {/* Show an all-column-span info message if it's set. */}
       {firstRowMessage && (
         <div css={Css.add("gridColumn", `${columns.length} span`).$}>
           <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
         </div>
       )}
-      {filteredRows.current!.map(([, , nodeFn]) => nodeFn())}
+      {filteredRows.map(([, , nodeFn]) => nodeFn())}
     </div>
   );
 }
@@ -398,8 +397,8 @@ function renderTable<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumn<R>[],
-  headerRows: RefObject<RowTuple<R>[]>,
-  filteredRows: RefObject<RowTuple<R>[]>,
+  headerRows: RowTuple<R>[],
+  filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
@@ -416,7 +415,7 @@ function renderTable<R extends Kinded>(
       }}
       data-testid={id}
     >
-      <thead>{headerRows.current!.map(([, , nodeFn]) => nodeFn())}</thead>
+      <thead>{headerRows.map(([, , nodeFn]) => nodeFn())}</thead>
       <tbody>
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
@@ -426,7 +425,7 @@ function renderTable<R extends Kinded>(
             </td>
           </tr>
         )}
-        {filteredRows.current!.map(([, , nodeFn]) => nodeFn())}
+        {filteredRows.map(([, , nodeFn]) => nodeFn())}
       </tbody>
     </table>
   );
@@ -436,73 +435,41 @@ function renderVirtual<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumn<R>[],
-  headerRows: RefObject<RowTuple<R>[]>,
-  filteredRows: RefObject<RowTuple<R>[]>,
+  headerRows: RowTuple<R>[],
+  filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
 ): ReactElement {
   return (
     <Virtuoso
-      components={{
-        List: VirtualRoot(style, columns, id, xss),
-        Item: VirtualItem(style, columns, headerRows, filteredRows, firstRowMessage),
+      components={{ List: VirtualRoot(style, columns, id, xss) }}
+      topItemCount={stickyHeader ? headerRows.length : 0}
+      itemContent={(index) => {
+        // We keep header and filter rows separate, but react-virtuoso is a flat list,
+        // so we pick the right header / first row message / actual row.
+        let i = index;
+        if (i < headerRows.length) {
+          return headerRows[i][2]();
+        }
+        i -= headerRows.length;
+        if (firstRowMessage) {
+          if (i === 0) {
+            return (
+              <div css={Css.add("gridColumn", `${columns.length} span`).$}>
+                <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
+              </div>
+            );
+          }
+          i -= 1;
+        }
+        // We pass in others, which has data-index, data-known-size, etc.
+        return filteredRows[i][2]();
       }}
-      // We use display:contents to promote the itemContent out of virtuoso's
-      // Item/div wrapper (b/c our GridRow already has it), but that breaks the
-      // auto height detection.
-      //
-      // I've tried to provide a custom Item component, but since it needs to accept
-      // a custom ref and `data-*` props, and b/c RowTuple has already invoked
-      // the GridRow function, we can't easily combine the two.
-      topItemCount={stickyHeader ? headerRows.current!.length : 0}
-      itemContent={() => null}
-      totalCount={(headerRows.current?.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.current?.length || 0)}
+      totalCount={(headerRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)}
     />
   );
 }
-
-const VirtualItem = memoizeOne<
-  (
-    style: GridStyle,
-    columns: GridColumn<any>[],
-    headerRowsRef: RefObject<RowTuple<any>[]>,
-    filteredRows: RefObject<RowTuple<any>[]>,
-    firstRowMessage: string | undefined,
-  ) => Components["Item"]
->((style, columns, headerRowsRef, filteredRowsRef, firstRowMessage) =>
-  React.memo((props) => {
-    // We purposefully ignore children that comes from the `itemContent` (which we don't
-    // even implement) because we want to purposefully "squish" our content up into
-    // react-virtuoso's Item location in the DOM.
-    const { children, ...others } = props;
-
-    const headerRows = headerRowsRef.current || [];
-    const filteredRows = filteredRowsRef.current || [];
-
-    // We keep header and filter rows separate, but react-virtuoso is a flat list,
-    // so we pick the right header / first row message / actual row.
-    let i = Number(props["data-index"]);
-    if (i < headerRows.length) {
-      return headerRows[i][2](others);
-    }
-    i -= headerRows.length;
-
-    if (firstRowMessage) {
-      if (i === 0) {
-        return (
-          <div css={Css.add("gridColumn", `${columns.length} span`).$}>
-            <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
-          </div>
-        );
-      }
-      i -= 1;
-    }
-
-    // We pass in others, which has data-index, data-known-size, etc.
-    return filteredRows[i][2](others);
-  }),
-);
 
 // Use memoize to create a single component type for a given set of props.
 const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: string, xss: any) => Components["List"]>(
@@ -519,7 +486,8 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
           style={style}
           css={{
             ...Css.dg.add({ gridTemplateColumns }).$,
-            ...Css.addIn("& > div + div > *", gs.betweenRowsCss).$,
+            ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss).$,
+            ...Css.addIn("& > div", Css.display("contents").$).$,
             ...gs.rootCss,
             ...xss,
           }}
