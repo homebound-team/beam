@@ -393,6 +393,7 @@ function renderCssGrid<R extends Kinded>(
   );
 }
 
+/** Renders as a table, primarily/solely for good print support. */
 function renderTable<R extends Kinded>(
   style: GridStyle,
   id: string,
@@ -431,6 +432,30 @@ function renderTable<R extends Kinded>(
   );
 }
 
+/**
+ * Uses react-virtuoso to render rows virtually.
+ *
+ * It seems like react-virtuoso is the only one that can do _measured_ variable
+ * sizes. I.e. react-window's variable list let's you provide a size, but it's
+ * a size you lookup, not one that is measured from the DOM, see [1].
+ *
+ * I also tried react-virtual, which is headless and really small, but a) the
+ * `measureRef` approach seems buggy [2] and b) rows were getting re-rendered
+ * maybe due to [3] and they have no examples showing memoization, which is
+ * concerning.
+ *
+ * Note that technically I had to patch react-virtuoso, see [4], to support our
+ * usage of `display: contents` but hopefully it'll get patched soon.
+ *
+ * react-virtuoso also seems like the most maintained (react-window is no
+ * longer being actively worked on) and featureful library (like sticky headers),
+ * so going with that for now.
+ *
+ * [1]: https://github.com/bvaughn/react-window/issues/6
+ * [2]: https://github.com/tannerlinsley/react-virtual/issues/85
+ * [3]: https://github.com/tannerlinsley/react-virtual/issues/108
+ * [4]: https://github.com/petyosi/react-virtuoso/issues/375
+ */
 function renderVirtual<R extends Kinded>(
   style: GridStyle,
   id: string,
@@ -486,7 +511,9 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
           style={style}
           css={{
             ...Css.dg.add({ gridTemplateColumns }).$,
+            // Add an extra `> div` due to Item + itemContent both having divs
             ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss).$,
+            // Add `display:contents` to Item to flatten it like we do GridRow
             ...Css.addIn("& > div", Css.display("contents").$).$,
             ...gs.rootCss,
             ...xss,
