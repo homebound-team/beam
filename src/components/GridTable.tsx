@@ -339,6 +339,7 @@ const renders: Record<RenderAs, typeof renderTable> = {
   virtual: renderVirtual,
 };
 
+/** Renders as a CSS Grid, which is the default / most well-supported rendered. */
 function renderCssGrid<R extends Kinded>(
   style: GridStyle,
   id: string,
@@ -484,7 +485,13 @@ function renderVirtual<R extends Kinded>(
   );
 }
 
-// Use memoize to create a single component type for a given set of props.
+/**
+ * Customizes the `List` element that react-virtuoso renders, to have our css grid logic.
+ *
+ * We wrap this in memoizeOne so that React.createElement sees a consistent/stable component
+ * identity, even though technically we have a different "component" per the given set of props
+ * (solely to capture as params that we can't pass through react-virtuoso's API as props).
+ */
 const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: string, xss: any) => Components["List"]>(
   (gs, columns, id, xss) => {
     return React.forwardRef(({ style, children }, ref) => {
