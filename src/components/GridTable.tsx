@@ -350,10 +350,7 @@ function renderCssGrid<R extends Kinded>(
   stickyHeader: boolean,
   xss: any,
 ): ReactElement {
-  const gridTemplateColumns = columns
-    // Default to auto, but use `c.w` as a fr if numeric or else `c.w` as-if if a string
-    .map((c) => (typeof c.w === "string" ? c.w : c.w !== undefined ? `${c.w}fr` : "auto"))
-    .join(" ");
+  const gridTemplateColumns = calcGridColumns(columns);
   return (
     <div
       css={{
@@ -495,10 +492,7 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
   (gs, columns, id, xss) => {
     return React.forwardRef(({ style, children }, ref) => {
       // This re-renders each time we have new children in the view port
-      const gridTemplateColumns = columns
-        // Default to auto, but use `c.w` as a fr if numeric or else `c.w` as-if if a string
-        .map((c) => (typeof c.w === "string" ? c.w : c.w !== undefined ? `${c.w}fr` : "auto"))
-        .join(" ");
+      const gridTemplateColumns = calcGridColumns(columns);
       return (
         <div
           ref={ref}
@@ -520,6 +514,15 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
     });
   },
 );
+
+function calcGridColumns(columns: GridColumn<any>[]): string {
+  return (
+    columns
+      // Default to auto, but use `c.w` as a fr if numeric or else `c.w` as-if if a string
+      .map((c) => (typeof c.w === "string" ? c.w : c.w !== undefined ? `${c.w}fr` : "auto"))
+      .join(" ")
+  );
+}
 
 /**
  * Given an ADT of type T, performs a look up and returns the type of kind K.
