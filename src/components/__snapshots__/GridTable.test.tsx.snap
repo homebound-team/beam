@@ -66,10 +66,10 @@ exports[`GridTable renders 1`] = `
   background-color: rgba(236,235,235,1);
   height: 100%;
   white-space: nowrap;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
 }
 
 .emotion-5 {

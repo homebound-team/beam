@@ -546,7 +546,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>) {
           // Apply any static/all-cell styling
           ...style.cellCss,
           ...(isHeader && style.headerCellCss),
-          ...getJustification(column, maybeContent, isHeader, idx, as),
+          ...getJustification(column, maybeContent, as),
           ...(idx === 0 && getIndentationCss(rowStyle)),
           ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).$),
           ...rowStyleCellCss,
@@ -723,19 +723,8 @@ const alignmentToTextAlign: Record<GridCellAlignment, Properties["textAlign"]> =
   right: "right",
 };
 
-// For alignment, use: 1) user-specified, else 2) center if non-1st header, else 3) left.
-function getJustification(
-  column: GridColumn<any>,
-  maybeContent: ReactNode | GridCellContent,
-  isHeader: boolean,
-  idx: number,
-  as: TableAs,
-) {
-  const alignment =
-    (isContentAndSettings(maybeContent) && maybeContent.alignment) ||
-    column.align ||
-    // When beam-ified, we'll probably remove this `isHeader` logic and make headers/content always line up.
-    (isHeader && idx > 0 ? "center" : "left");
+function getJustification(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent, as: TableAs) {
+  const alignment = (isContentAndSettings(maybeContent) && maybeContent.alignment) || column.align || "left";
   if (as === "div") {
     return Css.justify(alignmentToJustify[alignment]).$;
   }
