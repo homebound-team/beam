@@ -1,4 +1,3 @@
-import { Components, Virtuoso } from "@homebound/react-virtuoso";
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
 import React, {
@@ -12,6 +11,7 @@ import React, {
   useState,
 } from "react";
 import { Link } from "react-router-dom";
+import { Components, Virtuoso } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
 import { Css, Margin, Only, Palette, Properties, px, Xss } from "src/Css";
@@ -459,6 +459,9 @@ function renderVirtual<R extends Kinded>(
     <Virtuoso
       components={{ List: VirtualRoot(style, columns, id, xss) }}
       topItemCount={stickyHeader ? headerRows.length : 0}
+      // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
+      // so instead drill into the 1st real content cell.
+      itemSize={(el) => (el.firstElementChild!.firstElementChild! as HTMLElement).offsetHeight}
       itemContent={(index) => {
         // We keep header and filter rows separate, but react-virtuoso is a flat list,
         // so we pick the right header / first row message / actual row.
