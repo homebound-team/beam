@@ -47,7 +47,7 @@ But for Beam, and Homebound, we specifically _want_ a component that behaves in 
 
 As we open source Beam, this vision of "as few props as possible", "components must look _the same_ in every app" doesn't seem like something that other companies/projects would adopt (i.e. surely they want different colors, slightly different behavior to suit their user base, etc.).
 
-Our proposal for solving this tension is to adopt a radically different model than "pull in the Beam npm library" (although you're free to do that too): it's forking.
+Our proposal for solving this tension is to adopt a radically different model than "pull in the Beam npm library into your app and just use it as-is" (although you're free to do that too): it's forking.
 
 "Adopters" of Beam should of course contribute back bug fixes and feature improvements; but they should also feel free (and encouraged) to run their own company-specific forks, and "customize by changing the source".
 
