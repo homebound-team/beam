@@ -1,13 +1,11 @@
 import { useTextField } from "@react-aria/textfield";
 import { useLayoutEffect } from "@react-aria/utils";
 import React, { useCallback, useRef } from "react";
-import { TextFieldBase } from "src/components/TextFieldBase";
+import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps } from "src/interfaces";
 
-// exported for test purposes
-export interface TextAreaFieldProps extends BeamTextFieldProps {
-  wide?: boolean;
-}
+// Exported for test purposes
+export interface TextAreaFieldProps extends BeamTextFieldProps {}
 
 /** Returns a <textarea /> element that auto-adjusts height based on the field's value */
 export function TextAreaField(props: TextAreaFieldProps) {

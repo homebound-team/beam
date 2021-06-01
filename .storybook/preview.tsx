@@ -11,10 +11,7 @@ export const parameters: Parameters = {
   actions: { argTypesRegex: "^on.*" },
   options: {
     // https://storybook.js.org/docs/react/writing-stories/naming-components-and-hierarchy#sorting-stories
-    storySort: {
-      method: "alphabetical",
-      order: ["Foundations", "Components"],
-    },
+    storySort: { order: ["Foundations", "Components", "Inputs", "Forms"] },
   },
   // https://storybook.js.org/docs/react/essentials/backgrounds
   backgrounds: {

@@ -1,32 +1,27 @@
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { TextField, TextFieldProps } from "src/components/TextField";
 import { Css } from "src/Css";
+import { TextField, TextFieldProps } from "src/inputs";
 
 export default {
   component: TextField,
-  title: "Components/Text Fields",
+  title: "Inputs/Text Fields",
 } as Meta;
 
 export function TextFields() {
   return (
-    <div css={Css.df.justifyAround.$}>
-      <div>
-        <h1 css={Css.lg.mb2.$}>Regular</h1>
+    <div css={Css.df.flexColumn.childGap5.$}>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Regular</h1>
         <TestTextField value="" />
-        <br />
         <TestTextField label="Name" value="" />
-        <br />
         <TestTextField label="Name Focused" value="Brandon" autoFocus />
-        <br />
         <TestTextField label="Name Disabled" value="Brandon" disabled />
-        <br />
         <TestTextField
           label="Name Helper Text"
           value="Brandon"
           helperText="Some really long helper text that we expect to wrap."
         />
-        <br />
         <TestTextField
           label="Name Helper Paragraph"
           value="Brandon"
@@ -36,32 +31,26 @@ export function TextFields() {
             </div>
           }
         />
-        <br />
         <ValidationTextField value="not a valid email" />
-        <br />
         <ValidationTextField
           label="Name"
           value="Brandon"
           helperText="Some really long helper text that we expect to wrap."
         />
       </div>
-      <div>
-        <h1 css={Css.lg.mb2.$}>Compact</h1>
+
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Compact</h1>
         <TestTextField compact value="" />
-        <br />
         <TestTextField compact label="Name" value="" />
-        <br />
         <TestTextField compact label="Name" value="Brandon" />
-        <br />
         <TestTextField compact label="Name" value="Brandon" disabled />
-        <br />
         <TestTextField
           compact
           label="Name"
           value="Brandon"
           helperText="Some really long helper text that we expect to wrap."
         />
-        <br />
         <ValidationTextField compact value="not a valid email" />
       </div>
     </div>

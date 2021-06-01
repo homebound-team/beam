@@ -816,6 +816,7 @@ class CssBuilder<T extends Properties1> {
     const p = direction === "column" ? "marginTop" : direction === "column-reverse" ? "marginBottom" : "marginLeft";
     return this.addIn("& > * + *", Css.add(p, maybeInc(inc)).important.$);
   }
+  childGapPx(px: number) { return this.childGap(`${px}px`); }
 
   // buttonBase
   get buttonBase() { return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px").add("outline", 0).add("borderRadius", "4px").add("display", "inline-flex").add("margin", "4px").add("alignItems", "center").add("transition", "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms"); }

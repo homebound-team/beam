@@ -4,10 +4,10 @@ import React, { ReactNode, useRef } from "react";
 import { DateUtils, NavbarElementProps, WeekdayElementProps } from "react-day-picker";
 import DayPickerInput from "react-day-picker/DayPickerInput";
 import { Icon, IconButton } from "src/components";
-import { ErrorMessage } from "src/components/ErrorMessage";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
+import { ErrorMessage } from "src/inputs/ErrorMessage";
 import "./DateField.css";
 
 const format = "MM/dd/yy";

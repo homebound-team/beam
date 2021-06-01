@@ -3,7 +3,6 @@ import { Observer } from "mobx-react";
 import { useMemo } from "react";
 import {
   Button,
-  CheckboxGroupItemOption,
   GridColumn,
   GridDataRow,
   GridTable,
@@ -15,6 +14,7 @@ import { BoundDateField, BoundNumberField, BoundSelectField, BoundTextField } fr
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
+import { CheckboxGroupItemOption } from "src/inputs";
 
 export function FormStateApp() {
   // Simulate getting the initial form state back from a server call

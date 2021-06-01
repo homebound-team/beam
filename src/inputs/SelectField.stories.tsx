@@ -1,11 +1,12 @@
 import { Meta } from "@storybook/react";
 import { Key, useState } from "react";
-import { HasIdAndName, Icon, Icons, Optional, SelectField, SelectFieldProps } from "src/components";
+import { Icon, Icons } from "src/components";
 import { Css } from "src/Css";
+import { HasIdAndName, Optional, SelectField, SelectFieldProps } from "src/inputs";
 
 export default {
   component: SelectField,
-  title: "Components/Select Fields",
+  title: "Inputs/Select Fields",
 } as Meta;
 
 type TestOption = {
@@ -28,16 +29,11 @@ const optionsWithNumericIds: TestOption[] = [
   { id: 4, name: "Four" },
 ];
 
-// export function LotsOfOptions() {
-//   const options: TestOption[] = zeroTo(1000).map((i) => ({ id: i, name: `Project ${i}` }));
-//   return <TestSelectField label="Project" value={options[2].id} options={options} />;
-// }
-
 export function SelectFields() {
   return (
-    <div css={Css.df.justifyAround.$}>
-      <div css={Css.df.flexColumn.childGap3.$}>
-        <h1 css={Css.lg.mb2.$}>Regular</h1>
+    <div css={Css.df.flexColumn.childGap5.$}>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Regular</h1>
         <TestSelectField
           label="Favorite Icon"
           value={options[2].id}
@@ -87,8 +83,8 @@ export function SelectFields() {
         />
       </div>
 
-      <div css={Css.df.flexColumn.childGap3.$}>
-        <h1 css={Css.lg.mb2.$}>Compact</h1>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Compact</h1>
         <TestSelectField
           compact
           label="Favorite Icon"

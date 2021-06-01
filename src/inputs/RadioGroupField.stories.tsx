@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react";
 import { ReactNode, useState } from "react";
+import { Css } from "src/Css";
 import {
   radioChecked,
   radioDefault,
@@ -9,12 +10,11 @@ import {
   radioHover,
   radioReset,
   radioUnchecked,
-} from "src/components/RadioGroupField";
-import { Css } from "src/Css";
+} from "src/inputs/RadioGroupField";
 
 export default {
   component: RadioGroupField,
-  title: "Components/Radio Group",
+  title: "Inputs/Radio Group",
 } as Meta;
 
 export function BaseStates() {

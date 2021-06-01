@@ -1,6 +1,6 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { TextAreaField, TextAreaFieldProps } from "src/components";
+import { TextAreaField, TextAreaFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 

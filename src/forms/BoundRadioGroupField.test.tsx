@@ -1,8 +1,8 @@
 import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { RadioFieldOption } from "src/components/RadioGroupField";
 import { BoundRadioGroupField } from "src/forms/BoundRadioGroupField";
 import { AuthorInput } from "src/forms/formStateDomain";
+import { RadioFieldOption } from "src/inputs";
 
 const colors: RadioFieldOption<string>[] = [
   { value: "c:1", label: "Blue" },

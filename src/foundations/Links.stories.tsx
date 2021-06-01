@@ -3,7 +3,7 @@ import { navLink } from "src/components";
 
 export default {
   title: "Foundations/Links",
-} as Meta<any>;
+} as Meta;
 
 export const Links = () => {
   return (

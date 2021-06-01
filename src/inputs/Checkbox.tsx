@@ -1,7 +1,7 @@
 import { useToggleState } from "@react-stately/toggle";
 import { useRef } from "react";
 import { useCheckbox } from "react-aria";
-import { CheckboxBase } from "src/components";
+import { CheckboxBase } from "src/inputs/CheckboxBase";
 
 interface CheckboxProps {
   /** Additional text displayed below label */

@@ -1,10 +1,10 @@
 import React, { ReactNode, useMemo, useRef } from "react";
 import { useFocusRing, useHover, useRadio, useRadioGroup } from "react-aria";
 import { RadioGroupState, useRadioGroupState } from "react-stately";
-import { ErrorMessage } from "src/components/ErrorMessage";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css } from "src/Css";
+import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
