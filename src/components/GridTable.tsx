@@ -433,9 +433,6 @@ function renderTable<R extends Kinded>(
  * maybe due to [3] and they have no examples showing memoization, which is
  * concerning.
  *
- * Note that technically I had to patch react-virtuoso, see [4], to support our
- * usage of `display: contents` but hopefully it'll get patched soon.
- *
  * react-virtuoso also seems like the most maintained (react-window is no
  * longer being actively worked on) and featureful library (like sticky headers),
  * so going with that for now.
@@ -443,7 +440,6 @@ function renderTable<R extends Kinded>(
  * [1]: https://github.com/bvaughn/react-window/issues/6
  * [2]: https://github.com/tannerlinsley/react-virtual/issues/85
  * [3]: https://github.com/tannerlinsley/react-virtual/issues/108
- * [4]: https://github.com/petyosi/react-virtuoso/issues/375
  */
 function renderVirtual<R extends Kinded>(
   style: GridStyle,
