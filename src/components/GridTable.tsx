@@ -480,7 +480,6 @@ function renderVirtual<R extends Kinded>(
           }
           i -= 1;
         }
-        // We pass in others, which has data-index, data-known-size, etc.
         return filteredRows[i][2];
       }}
       totalCount={(headerRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)}
