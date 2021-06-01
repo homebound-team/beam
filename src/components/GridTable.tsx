@@ -458,7 +458,8 @@ function renderVirtual<R extends Kinded>(
   return (
     <Virtuoso
       components={{ List: VirtualRoot(style, columns, id, xss) }}
-      topItemCount={stickyHeader ? headerRows.length : 0}
+      // Pin/sticky both the header row(s) + firstRowMessage to the top
+      topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
       // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
       // so instead drill into the 1st real content cell.
       itemSize={(el) => (el.firstElementChild!.firstElementChild! as HTMLElement).offsetHeight}
