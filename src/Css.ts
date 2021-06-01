@@ -812,7 +812,8 @@ class CssBuilder<T extends Properties1> {
   get childGap7() { return this.childGap(7); }
   get childGap8() { return this.childGap(8); }
   childGap(inc: number | string) {
-    const p = this.opts.rules["flexDirection"] === "column" ? "marginTop" : "marginLeft";
+    const direction = this.opts.rules["flexDirection"];
+    const p = direction === "column" ? "marginTop" : direction === "column-reverse" ? "marginBottom" : "marginLeft";
     return this.addIn("& > * + *", Css.add(p, maybeInc(inc)).important.$);
   }
 
