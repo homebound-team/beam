@@ -350,11 +350,10 @@ function renderCssGrid<R extends Kinded>(
   stickyHeader: boolean,
   xss: any,
 ): ReactElement {
-  const gridTemplateColumns = calcGridColumns(columns);
   return (
     <div
       css={{
-        ...Css.dg.add({ gridTemplateColumns }).$,
+        ...Css.dg.gtc(calcGridColumns(columns)).$,
         ...Css
           // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
           // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
@@ -492,13 +491,12 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
   (gs, columns, id, xss) => {
     return React.forwardRef(({ style, children }, ref) => {
       // This re-renders each time we have new children in the view port
-      const gridTemplateColumns = calcGridColumns(columns);
       return (
         <div
           ref={ref}
           style={style}
           css={{
-            ...Css.dg.add({ gridTemplateColumns }).$,
+            ...Css.dg.gtc(calcGridColumns(columns)).$,
             // Add an extra `> div` due to Item + itemContent both having divs
             ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss).$,
             // Add `display:contents` to Item to flatten it like we do GridRow
