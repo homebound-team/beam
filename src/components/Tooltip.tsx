@@ -1,12 +1,16 @@
-import { mergeProps } from "@react-aria/utils";
 import { useTooltipTriggerState } from "@react-stately/tooltip";
 import React, { ReactElement, ReactNode, useRef, useState } from "react";
-import { useTooltip, useTooltipTrigger } from "react-aria";
+import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
 import { usePopper } from "react-popper";
+import { Css } from "src/Css";
+
+// We combine react-popper and aria-tooltip to makeup the tooltip component for the following reasons:
+// Aria can handle all aspects of the tooltip accessibility and rendering it except handling the dynamic positioning aspect
+// Popper provides the functionlity for positioning the tooltip wrt the trigger element
 
 interface TooltipProps {
-  /** the content that shows up when hovered */
-  tooltip: ReactNode;
+  /** The content that shows up when hovered */
+  title: string;
   children: ReactElement;
   placement?: Placement;
   delay?: number;
@@ -14,10 +18,9 @@ interface TooltipProps {
 }
 
 export function Tooltip(props: TooltipProps) {
-  const state = useTooltipTriggerState(props);
+  const state = useTooltipTriggerState({ delay: 0, ...props });
   const triggerRef = React.useRef(null);
-  const { placement, children, tooltip } = props;
-
+  const { placement, children, title } = props;
   const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger(props, state, triggerRef);
   const { tooltipProps } = useTooltip(_tooltipProps, state);
 
@@ -28,7 +31,7 @@ export function Tooltip(props: TooltipProps) {
         <Popper
           {...mergeProps(_tooltipProps, tooltipProps)}
           triggerRef={triggerRef}
-          content={tooltip}
+          content={title}
           placement={placement}
         />
       )}
@@ -37,7 +40,8 @@ export function Tooltip(props: TooltipProps) {
 }
 
 // The Placement type is not exported from the react-popper library, the values were taken out from there to create the type here
-export type Placement = "top" | "bottom" | "left" | "right";
+// As necessary, more values can be pulled in from the ones available in the library
+export type Placement = "top" | "bottom" | "left" | "right" | "auto";
 
 interface PopperProps {
   triggerRef: React.MutableRefObject<null>;
@@ -45,7 +49,7 @@ interface PopperProps {
   placement?: Placement;
 }
 
-export function Popper({ triggerRef, content, placement = "bottom" }: PopperProps) {
+export function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
   const popperRef = useRef(null);
   const [arrowRef, setArrowRef] = useState<HTMLDivElement | null>(null);
 
@@ -58,7 +62,7 @@ export function Popper({ triggerRef, content, placement = "bottom" }: PopperProp
   });
 
   return (
-    <div ref={popperRef} style={styles.popper} {...attributes.popper}>
+    <div ref={popperRef} style={styles.popper} {...attributes.popper} css={Css.bgGray900.white.px1.py("4px").br4.xs.$}>
       <div ref={setArrowRef} style={{ ...styles.arrow }} id="arrow" />
       {content}
     </div>
