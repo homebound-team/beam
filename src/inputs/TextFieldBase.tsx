@@ -52,9 +52,6 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         {...(onChange && {
           onChange: (e: any) => {
             let value: string | undefined = e.target.value as string;
-            if (!multiline) {
-              value = value.trim();
-            }
             if (value === "") {
               value = undefined;
             }
