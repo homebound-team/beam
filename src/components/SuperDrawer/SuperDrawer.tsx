@@ -1,3 +1,4 @@
+import { Global } from "@emotion/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode, ReactPortal, useCallback } from "react";
 import { createPortal } from "react-dom";
@@ -42,72 +43,76 @@ export function SuperDrawer(): ReactPortal {
   return createPortal(
     <AnimatePresence>
       {content && (
-        // Overlay
-        <motion.div
-          {...testId}
-          // Key is required for framer-motion animations
-          key="superDrawer"
-          // TODO: Should this color be part of the Palette?
-          // z-index of 3 is used to give flexibility for future overlapping content
-          // Not using `inset` due to Safari 14.0.x not supporting this CSS property.
-          css={Css.fixed.df.justifyEnd.add("backgroundColor", "rgba(36,36,36,0.2)").top0.right0.bottom0.left0.z3.$}
-          // Initial styles (acts similar to `from` in keyframe animations)
-          initial={{ opacity: 0 }}
-          // Rendered styles (acts similar to `to` in keyframe animations)
-          animate={{ opacity: 1 }}
-          // Unmount styles
-          exit={{ opacity: 0, transition: { delay: 0.2 } }}
-          onClick={handleOnClose}
-        >
-          {/* Content container */}
+        <>
+          {/* Prevent scrolling when the SuperDrawer opens */}
+          <Global styles={{ body: Css.overflowHidden.$ }} />
+          {/* Overlay */}
           <motion.div
-            key="superDrawerContainer"
-            css={Css.bgWhite.h100.maxw(px(1040)).w100.df.flexColumn.$}
-            // Keeping initial x to 1040 as this will still work if the container is smaller
-            initial={{ x: 1040 }}
-            animate={{ x: 0 }}
-            // Custom transitions settings for the translateX animation
-            transition={{ ease: "linear", duration: 0.2, delay: 0.2 }}
-            exit={{ transition: { ease: "linear", duration: 0.2 }, x: 1040 }}
-            // Preventing clicks from triggering parent onClick
-            onClick={(e) => e.stopPropagation()}
+            {...testId}
+            // Key is required for framer-motion animations
+            key="superDrawer"
+            // TODO: Should this color be part of the Palette?
+            // z-index of 3 is used to give flexibility for future overlapping content
+            // Not using `inset` due to Safari 14.0.x not supporting this CSS property.
+            css={Css.fixed.df.justifyEnd.add("backgroundColor", "rgba(36,36,36,0.2)").top0.right0.bottom0.left0.z3.$}
+            // Initial styles (acts similar to `from` in keyframe animations)
+            initial={{ opacity: 0 }}
+            // Rendered styles (acts similar to `to` in keyframe animations)
+            animate={{ opacity: 1 }}
+            // Unmount styles
+            exit={{ opacity: 0, transition: { delay: 0.2 } }}
+            onClick={handleOnClose}
           >
-            <header css={Css.df.p3.bb.bGray200.df.itemsCenter.justifyBetween.$}>
-              {/* Left */}
-              <div css={Css.xl2Em.gray900.$} {...testId.title}>
-                {title}
-              </div>
-              {/* Right */}
-              {!modalContent && (
-                // Forcing height to 32px to match title height
-                <div css={Css.df.childGap3.itemsCenter.hPx(32).$}>
-                  {/* Disable buttons is handlers are not given or if childContent is shown */}
-                  <ButtonGroup
-                    buttons={[
-                      {
-                        icon: "chevronLeft",
-                        onClick: () => onPrevClick && onPrevClick(),
-                        disabled: !onPrevClick || type === "detail",
-                      },
-                      {
-                        icon: "chevronRight",
-                        onClick: () => onNextClick && onNextClick(),
-                        disabled: !onNextClick || type === "detail",
-                      },
-                    ]}
-                  />
-                  <IconButton icon="x" onClick={handleOnClose} />
+            {/* Content container */}
+            <motion.aside
+              key="superDrawerContainer"
+              css={Css.bgWhite.h100.maxw(px(1040)).w100.df.flexColumn.$}
+              // Keeping initial x to 1040 as this will still work if the container is smaller
+              initial={{ x: 1040 }}
+              animate={{ x: 0 }}
+              // Custom transitions settings for the translateX animation
+              transition={{ ease: "linear", duration: 0.2, delay: 0.2 }}
+              exit={{ transition: { ease: "linear", duration: 0.2 }, x: 1040 }}
+              // Preventing clicks from triggering parent onClick
+              onClick={(e) => e.stopPropagation()}
+            >
+              <header css={Css.df.p3.bb.bGray200.df.itemsCenter.justifyBetween.$}>
+                {/* Left */}
+                <div css={Css.xl2Em.gray900.$} {...testId.title}>
+                  {title}
                 </div>
+                {/* Right */}
+                {!modalContent && (
+                  // Forcing height to 32px to match title height
+                  <div css={Css.df.childGap3.itemsCenter.hPx(32).$}>
+                    {/* Disable buttons is handlers are not given or if childContent is shown */}
+                    <ButtonGroup
+                      buttons={[
+                        {
+                          icon: "chevronLeft",
+                          onClick: () => onPrevClick && onPrevClick(),
+                          disabled: !onPrevClick || type === "detail",
+                        },
+                        {
+                          icon: "chevronRight",
+                          onClick: () => onNextClick && onNextClick(),
+                          disabled: !onNextClick || type === "detail",
+                        },
+                      ]}
+                    />
+                    <IconButton icon="x" onClick={handleOnClose} />
+                  </div>
+                )}
+              </header>
+              {modalContent ? (
+                // Forcing some design constraints on the modal component
+                <div css={Css.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn.$}>{modalContent}</div>
+              ) : (
+                content
               )}
-            </header>
-            {modalContent ? (
-              // Forcing some design constraints on the modal component
-              <div css={Css.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn.$}>{modalContent}</div>
-            ) : (
-              content
-            )}
+            </motion.aside>
           </motion.div>
-        </motion.div>
+        </>
       )}
     </AnimatePresence>,
     document.body,
@@ -122,7 +127,7 @@ interface SuperDrawerContentProps {
    *
    * Ex: A `cancel` and `submit` button
    * */
-  actions: ButtonProps[];
+  actions?: ButtonProps[];
 }
 
 /**
@@ -139,49 +144,59 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
   const { type } = contentStack[contentStack.length - 1] ?? {};
 
   const ContentWrapper = useCallback(
-    ({ children }: { children: ReactNode }) =>
-      type === "new" ? (
-        <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }}>
-          {children}
-        </motion.div>
-      ) : (
-        <motion.div
-          css={Css.px3.pt2.pb3.fg1.$}
-          animate={{ overflow: "auto" }}
-          transition={{ overflow: { delay: 0.3 } }}
-        >
-          <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={() => closeInDrawer()} />
-          <motion.div
-            initial={{ x: 1040, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{
-              ease: "linear",
-              duration: 0.3,
-              opacity: {
-                delay: 0.15,
-              },
-            }}
-            exit={{ x: 1040, opacity: 0 }}
-            css={Css.pt2.$}
-          >
+    ({ children }: { children: ReactNode }) => {
+      if (type === "new") {
+        return (
+          <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }}>
             {children}
           </motion.div>
-        </motion.div>
-      ),
+        );
+      } else if (type === "detail") {
+        return (
+          <motion.div
+            css={Css.px3.pt2.pb3.fg1.$}
+            animate={{ overflow: "auto" }}
+            transition={{ overflow: { delay: 0.3 } }}
+          >
+            <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={() => closeInDrawer()} />
+            <motion.div
+              initial={{ x: 1040, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{
+                ease: "linear",
+                duration: 0.3,
+                opacity: { delay: 0.15 },
+              }}
+              exit={{ x: 1040, opacity: 0 }}
+              css={Css.pt2.$}
+            >
+              {children}
+            </motion.div>
+          </motion.div>
+        );
+      }
+
+      // Hides content changes when closing the drawer
+      // TODO: Potentially use a boolean to trigger close action so content does
+      // not need to disappear during exit.
+      return <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }}></motion.div>;
+    },
     [type, closeInDrawer],
   );
 
   return (
     <>
       <ContentWrapper>{children}</ContentWrapper>
-      {/* Render footer section with row of given footer buttons */}
-      <footer css={Css.bt.bGray200.p3.df.itemsCenter.justifyEnd.$}>
-        <div css={Css.df.childGap1.$}>
-          {actions.map((buttonProps, i) => (
-            <Button key={i} {...buttonProps} />
-          ))}
-        </div>
-      </footer>
+      {/* Optionally render footer section with row of given footer buttons */}
+      {actions && (
+        <footer css={Css.bt.bGray200.p3.df.itemsCenter.justifyEnd.$}>
+          <div css={Css.df.childGap1.$}>
+            {actions.map((buttonProps, i) => (
+              <Button key={i} {...buttonProps} />
+            ))}
+          </div>
+        </footer>
+      )}
     </>
   );
 };

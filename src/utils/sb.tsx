@@ -41,7 +41,7 @@ export function zeroTo(n: number): number[] {
 }
 
 /** Storybook decorator utility to wrap a story with a SuperDrawer context */
-export const withSuperDrawer = (Story: () => JSX.Element) => (
+export const withSuperDrawerDecorator = (Story: () => JSX.Element) => (
   <SuperDrawerProvider>
     <Story />
   </SuperDrawerProvider>
@@ -51,7 +51,7 @@ export const withSuperDrawer = (Story: () => JSX.Element) => (
  * Decorator to set explicit width and height dimensions for a story.
  * Used to help Chromatic properly render positioned `fixed` components.
  */
-export const withDimensions = (width: number | string = "1200px", height: number | string = "800px", xss?: {}) => (
+export const withDimensions = (width: number | string = "100vw", height: number | string = "100vh", xss?: {}) => (
   Story: () => JSX.Element,
 ) => (
   <div css={{ ...Css.w(width).h(height).$, ...xss }}>

@@ -2,14 +2,13 @@ import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf } from "src";
 import { GridDataRow, GridRowLookup } from "src/components/GridTable";
-import { withDimensions, withSuperDrawer } from "src/utils/sb";
+import { withDimensions, withSuperDrawerDecorator } from "src/utils/sb";
 import { SuperDrawer as SuperDrawerComponent, SuperDrawerContent, useSuperDrawer } from "./index";
 
 export default {
   title: "Components/Super Drawer",
   component: SuperDrawerComponent,
-  decorators: [withSuperDrawer, withDimensions("100vw", "100vh")],
-  parameters: { chromatic: { delay: 1000 } },
+  decorators: [withSuperDrawerDecorator, withDimensions()],
 } as Meta;
 
 export function Open() {
@@ -25,7 +24,8 @@ export function Open() {
   }, []);
 
   return (
-    <>
+    // Purposely set height to validate no scrolling behaviour
+    <div css={Css.hPx(5000).$}>
       <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open</h1>
       <Button
         label="Show SuperDrawer"
@@ -33,6 +33,34 @@ export function Open() {
           openInDrawer({
             title: "Content Title",
             content: <SuperDrawerExampleContent book={Books[0]} />,
+          })
+        }
+      />
+    </div>
+  );
+}
+
+export function OpenWithNoActions() {
+  const { openInDrawer } = useSuperDrawer();
+
+  // Open the SuperDrawer on render
+  useEffect(() => {
+    openInDrawer({
+      title: "Content Title",
+      content: <SuperDrawerExampleContent book={Books[0]} hasActions={false} />,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open</h1>
+      <Button
+        label="Show SuperDrawer"
+        onClick={() =>
+          openInDrawer({
+            title: "Content Title",
+            content: <SuperDrawerExampleContent book={Books[0]} hasActions={false} />,
           })
         }
       />
@@ -188,8 +216,13 @@ export function Example() {
   );
 }
 
+interface SuperDrawerExampleContentProps {
+  book: Book;
+  hasActions?: boolean;
+}
+
 /** Example component to render inside the SuperDrawer */
-function SuperDrawerExampleContent({ book }: { book: Book }) {
+function SuperDrawerExampleContent({ book, hasActions = true }: SuperDrawerExampleContentProps) {
   const { openInDrawer, closeDrawer, setModalContent } = useSuperDrawer();
 
   function handleBookPurchase() {
@@ -207,10 +240,14 @@ function SuperDrawerExampleContent({ book }: { book: Book }) {
 
   return (
     <SuperDrawerContent
-      actions={[
-        { label: "Close", onClick: handleClose, variant: "tertiary" },
-        { label: `Purchase "${book.bookTitle}"`, onClick: handlePurchase },
-      ]}
+      actions={
+        hasActions
+          ? [
+              { label: "Close", onClick: handleClose, variant: "tertiary" },
+              { label: `Purchase "${book.bookTitle}"`, onClick: handlePurchase },
+            ]
+          : undefined
+      }
     >
       <h2 css={Css.xlEm.mb1.$}>{book.bookTitle}</h2>
       <p css={Css.base.$}>
