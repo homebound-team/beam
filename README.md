@@ -39,9 +39,9 @@ Fewer props generally means:
 
 All of these points are generally in stark contrast to traditional, "big" UI toolkits like Material UI, Carbon from IBM, Spectrum from Adobe, etc., where they have to be "everything for everyone", and have the large API surface areas and complexity that comes with it.
 
-For them, that makes sense, a MUI application in Company A shouldn't have to look & behave exactly like a MUI application in Company B.
+For them, a MUI application in Company A shouldn't have to look & behave exactly like a MUI application in Company B. Which makes sense.
 
-But for Beam, and Homebound, we specifically _want_ a component that behaves in our App A to look & behave the same as it does in our App B.
+But for Beam at Homebound, we specifically _want_ a component that behaves in our App A to look & behave the same as it does in our App B.
 
 ## Beam and Open Source
 
