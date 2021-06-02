@@ -14,14 +14,18 @@ interface TooltipProps {
   children: ReactElement;
   placement?: Placement;
   delay?: number;
-  isDisabled?: boolean;
+  disabled?: boolean;
 }
 
 export function Tooltip(props: TooltipProps) {
   const state = useTooltipTriggerState({ delay: 0, ...props });
   const triggerRef = React.useRef(null);
-  const { placement, children, title } = props;
-  const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger(props, state, triggerRef);
+  const { placement, children, title, disabled } = props;
+  const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger(
+    { ...props, isDisabled: disabled },
+    state,
+    triggerRef,
+  );
   const { tooltipProps } = useTooltip(_tooltipProps, state);
 
   return (
