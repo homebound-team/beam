@@ -3,14 +3,14 @@ import { Meta } from "@storybook/react";
 import { useEffect } from "react";
 import { SuperDrawerContent, useSuperDrawer } from "src/components";
 import { Css } from "src/Css";
-import { withSuperDrawer } from "src/utils/sb";
+import { withSuperDrawerDecorator } from "src/utils/sb";
 import { SelectField } from "./SelectField";
 import { TextAreaField } from "./TextAreaField";
 import { TextField } from "./TextField";
 
 export default {
   title: "Inputs/Examples",
-  decorators: [withSuperDrawer],
+  decorators: [withSuperDrawerDecorator],
 } as Meta;
 
 export function SuperDrawerWithForm() {
