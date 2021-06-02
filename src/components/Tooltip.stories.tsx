@@ -1,42 +1,22 @@
 import { Meta } from "@storybook/react";
 import { Css } from "src/Css";
-import { Placement, Tooltip } from "./Tooltip";
+import { Placement, Tooltip as TooltipComponent } from "./Tooltip";
 
 export default {
-  component: Tooltip,
+  component: TooltipComponent,
   title: "Components/Tooltip",
 } as Meta;
 
-export function Tootlips() {
-  const placements: Placement[] = [
-    "auto",
-    "auto-start",
-    "auto-end",
-    "bottom",
-    "bottom-start",
-    "bottom-end",
-    "left",
-    "left-start",
-    "left-end",
-    "right",
-    "right-start",
-    "right-end",
-    "top",
-    "top-start",
-    "top-end",
-  ];
+export function Tooltip() {
+  const placements: Placement[] = ["bottom", "left", "right", "top"];
   return (
-    <div>
+    <div css={Css.w25.ml("25%").$}>
       {placements.map((placement, i) => (
-        <div key={i}>
-          <Tooltip
-            tooltipinfo="Tooltip Info"
-            placement={placement}
-            css={Css.ml8.my3.bgGray900.white.br4.px1.py("20px").$}
-          >
+        <TooltipComponent tooltip="Tooltip Info" placement={placement} key={i} delay={0}>
+          <span css={Css.db.tc.my3.bgGray900.white.br4.px1.$}>
             This tooltip is positioned at: <span css={Css.b.$}>{placement}</span>
-          </Tooltip>
-        </div>
+          </span>
+        </TooltipComponent>
       ))}
     </div>
   );
