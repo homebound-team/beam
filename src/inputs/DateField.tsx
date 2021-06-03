@@ -15,10 +15,11 @@ const format = "MM/dd/yy";
 
 export interface DateFieldProps {
   value: Date | undefined;
-  onChange: (value: Date) => void;
   label?: string;
+  onChange: (value: Date) => void;
   /** Called when the component loses focus, mostly for BoundDateField to use. */
   onBlur?: () => void;
+  /** Called when the component is in focus, mostly for BoundDateField to use. */
   onFocus?: () => void;
   disabled?: boolean;
   errorMsg?: string;
