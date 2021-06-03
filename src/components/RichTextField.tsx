@@ -21,6 +21,8 @@ export interface RichTextFieldProps {
   label?: string;
   autoFocus?: boolean;
   placeholder?: string;
+  onBlur: () => void;
+  onFocus: () => void;
 }
 
 // There aren't types for trix, so add our own. For now `loadHTML` is all we call anyway.
@@ -36,7 +38,7 @@ type Editor = {
  * We also integrate [tributejs]{@link https://github.com/zurb/tribute} for @ mentions.
  */
 export function RichTextField(props: RichTextFieldProps) {
-  const { mergeTags, label, value, onChange } = props;
+  const { mergeTags, label, value = "", onChange, onBlur, onFocus } = props;
   const id = useId();
 
   // We get a reference to the Editor instance after trix-init fires
@@ -86,9 +88,16 @@ export function RichTextField(props: RichTextFieldProps) {
         }
       }
 
+      const trixBlur = () => onBlur && onBlur();
+      const trixFocus = () => onFocus && onFocus();
+
       editorElement.addEventListener("trix-change", trixChange as any, false);
+      editorElement.addEventListener("trix-blur", trixBlur as any, false);
+      editorElement.addEventListener("trix-focus", trixFocus as any, false);
       return () => {
         editorElement.removeEventListener("trix-change", trixChange as any);
+        editorElement.removeEventListener("trix-blur", trixBlur as any);
+        editorElement.removeEventListener("trix-focus", trixFocus as any);
       };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,7 +121,8 @@ export function RichTextField(props: RichTextFieldProps) {
         {createElement("trix-editor", {
           id: `editor-${id}`,
           input: `input-${id}`,
-          ...(autoFocus ? { autoFocus } : {}),
+          // Autofocus attribute is case sensitive since this is standard HTML
+          ...(autoFocus ? { autofocus: true } : {}),
           ...(placeholder ? { placeholder } : {}),
         })}
         <input type="hidden" id={`input-${id}`} value={value} />
