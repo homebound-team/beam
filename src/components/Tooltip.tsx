@@ -1,5 +1,5 @@
 import { useTooltipTriggerState } from "@react-stately/tooltip";
-import React, { ReactElement, ReactNode, useRef, useState } from "react";
+import React, {ReactElement, ReactNode, useContext, useRef, useState} from "react";
 import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
 import { usePopper } from "react-popper";
 import { Css } from "src/Css";
@@ -18,7 +18,7 @@ interface TooltipProps {
 }
 
 export function Tooltip(props: TooltipProps) {
-  const state = useTooltipTriggerState({ delay: 0.5, ...props });
+  const state = useTooltipTriggerState({ delay: 0.75, ...props });
   const triggerRef = React.useRef(null);
   const { placement, children, title, disabled } = props;
   const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger(
@@ -27,11 +27,13 @@ export function Tooltip(props: TooltipProps) {
     triggerRef,
   );
   const { tooltipProps } = useTooltip(_tooltipProps, state);
+  // Used for storybook testing
+  const forceOpen = useContext(ForceTooltipsActiveContext)
 
   return (
     <>
       {React.cloneElement(children, { ref: triggerRef, ...triggerProps })}
-      {state.isOpen && (
+      {forceOpen || state.isOpen && (
         <Popper
           {...mergeProps(_tooltipProps, tooltipProps)}
           triggerRef={triggerRef}
@@ -72,3 +74,5 @@ export function Popper({ triggerRef, content, placement = "auto" }: PopperProps)
     </div>
   );
 }
+
+export const ForceTooltipsActiveContext = React.createContext(false);
