@@ -1377,10 +1377,10 @@
     react "^16.12.0"
     react-dom "^16.12.0"
 
-"@homebound/form-state@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@homebound/form-state/-/form-state-1.8.0.tgz#a76dad9a6f872e00ec6c50f9f42b41b33a342ebc"
-  integrity sha512-OV3q4ftA2Tfe3pvcvGJtCXnXKgxpfDLCLBgdYvBc5dEuMgyuwvrZN7Z8j9q+UPJ3ahVsSi3c+nDnec3hX8nYFw==
+"@homebound/form-state@^1.8.1":
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/@homebound/form-state/-/form-state-1.8.1.tgz#1f56449c6c1ea59cb112ff0c5c5665f3a8e2814e"
+  integrity sha512-SCMo64fTrnmnmdqO4aDuGdbOEB6DI2PtmuCXoG0PnBcZEwnynJql7fhoPjvnJk09aLQSbUDs14QCPNONHsN7JQ==
 
 "@homebound/rtl-utils@^1.39.0":
   version "1.39.0"
