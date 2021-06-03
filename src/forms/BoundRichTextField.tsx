@@ -4,7 +4,7 @@ import { RichTextField, RichTextFieldProps } from "src/components/RichTextField"
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundRichTextFieldProps = Omit<RichTextFieldProps, "value" | "onChange"> & {
+export type BoundRichTextFieldProps = Omit<RichTextFieldProps, "value" | "onChange" | "onBlur" | "onFocus"> & {
   field: FieldState<string | null | undefined>;
   // Optional in case the page wants extra behavior
   onChange?: (value: string | undefined) => void;
@@ -21,8 +21,10 @@ export function BoundRichTextField(props: BoundRichTextFieldProps) {
           label={label}
           value={field.value || undefined}
           onChange={onChange}
+          // TODO: Potentially support this in the future?
           // errorMsg={field.touched ? field.errors.join(" ") : undefined}
-          // onBlur={() => field.blur()}
+          onBlur={() => field.blur()}
+          onFocus={() => field.blur()}
           {...testId}
           {...others}
         />
