@@ -1,3 +1,4 @@
+import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
 import { Css } from "src/Css";
@@ -60,13 +61,21 @@ export function TextFields() {
 function TestTextField(props: Omit<TextFieldProps, "onChange">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
-  return <TextField value={internalValue} onChange={setValue} {...otherProps} />;
+  return (
+    <TextField
+      value={internalValue}
+      onChange={setValue}
+      {...otherProps}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
+    />
+  );
 }
 
 function ValidationTextField(props: Omit<TextFieldProps, "onChange">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState<string | undefined>(value);
-  const isValid = useMemo(() => internalValue && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(internalValue), [
+  const isValid = useMemo(() => internalValue && /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(internalValue), [
     internalValue,
   ]);
   return (
@@ -76,6 +85,8 @@ function ValidationTextField(props: Omit<TextFieldProps, "onChange">) {
       value={internalValue}
       onChange={setValue}
       errorMsg={!isValid ? "The email address entered is invalid. Please provide a valid email address." : undefined}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
     />
   );
 }
