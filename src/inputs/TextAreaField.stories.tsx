@@ -1,3 +1,4 @@
+import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
 import { Css } from "src/Css";
@@ -31,7 +32,15 @@ export function TextAreas() {
 function TestTextArea(props: Omit<TextAreaFieldProps, "onChange">) {
   const { value, ...others } = props;
   const [internalValue, setValue] = useState(value);
-  return <TextAreaField value={internalValue} onChange={(val) => setValue(val)} {...others} />;
+  return (
+    <TextAreaField
+      value={internalValue}
+      onChange={(val) => setValue(val)}
+      {...others}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
+    />
+  );
 }
 
 function ValidationTextArea({ value }: { value: string }) {
@@ -46,6 +55,8 @@ function ValidationTextArea({ value }: { value: string }) {
       errorMsg={
         !isValid ? "Please enter at least 50 characters. We should probably provide a character counter." : undefined
       }
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
     />
   );
 }
