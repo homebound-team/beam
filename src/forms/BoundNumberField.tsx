@@ -4,7 +4,7 @@ import { NumberField, NumberFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundNumberFieldProps = Omit<NumberFieldProps, "value" | "onChange"> & {
+export type BoundNumberFieldProps = Omit<NumberFieldProps, "value" | "onChange" | "onBlur" | "onFocus"> & {
   field: FieldState<number | null | undefined>;
   // Optional in case the page wants extra behavior
   onChange?: (value: number | undefined) => void;
