@@ -78,6 +78,8 @@ export function CheckboxGroups() {
               description: "This chair cannot be selected.",
             },
           ]}
+          onBlur={action("onBlur")}
+          onFocus={action("onFocus")}
         />
       </div>
 

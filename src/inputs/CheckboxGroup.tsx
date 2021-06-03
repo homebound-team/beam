@@ -28,17 +28,21 @@ export interface CheckboxGroupProps {
   values: string[];
   errorMsg?: string;
   helperText?: string | ReactNode;
+  /** Called when the component loses focus, mostly for BoundDateField to use. */
+  onBlur?: () => void;
+  /** Called when the component is in focus, mostly for BoundDateField to use. */
+  onFocus?: () => void;
 }
 
 export function CheckboxGroup(props: CheckboxGroupProps) {
-  const { options, label, values, errorMsg, helperText } = props;
+  const { options, label, values, errorMsg, helperText, onBlur, onFocus } = props;
 
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
   const tid = useTestIds(props);
 
   return (
-    <div {...groupProps} {...tid}>
+    <div {...groupProps} onBlur={onBlur} onFocus={onFocus} {...tid}>
       <Label label={label} {...labelProps} {...tid.label} />
       <div css={Css.dg.gap2.$}>
         {options.map((option) => (
