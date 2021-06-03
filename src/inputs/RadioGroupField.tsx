@@ -32,6 +32,8 @@ export interface RadioGroupFieldProps<K extends string> {
   disabled?: boolean;
   errorMsg?: string;
   helperText?: string | ReactNode;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }
 
 /**
@@ -42,7 +44,7 @@ export interface RadioGroupFieldProps<K extends string> {
  * TODO: Add hover (non selected and selected) styles
  */
 export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>) {
-  const { label, value, onChange, options, disabled = false, errorMsg, helperText } = props;
+  const { label, value, onChange, options, disabled = false, errorMsg, helperText, ...otherProps } = props;
 
   // useRadioGroupState uses a random group name, so use our name
   const name = useMemo(() => `radio-group-${++nextNameId}`, []);
@@ -63,11 +65,19 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   const anyDescriptions = options.some((o) => !!o.description);
 
   return (
-    <div css={Css.maxw(anyDescriptions ? "344px" : "320px").$}>
+    // width of `max-content` is used to limit invisible label clicking
+    <div css={Css.w("max-content").maxw(anyDescriptions ? "344px" : "320px").$}>
       <Label label={label} {...labelProps} {...tid.label} />
       <div {...radioGroupProps}>
         {options.map((option) => (
-          <Radio key={option.value} parentId={state.name} option={option} state={state} {...tid[option.value]} />
+          <Radio
+            key={option.value}
+            parentId={name}
+            option={option}
+            state={state}
+            {...otherProps}
+            {...tid[option.value]}
+          />
         ))}
       </div>
       {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
@@ -77,7 +87,13 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
 }
 
 // Not meant to be standalone, but its own component so it can use hooks
-function Radio<K extends string>(props: { parentId: string; option: RadioFieldOption<K>; state: RadioGroupState }) {
+function Radio<K extends string>(props: {
+  parentId: string;
+  option: RadioFieldOption<K>;
+  state: RadioGroupState;
+  onBlur?: () => void;
+  onFocus?: () => void;
+}) {
   const {
     parentId,
     option: { description, label, value },
@@ -112,7 +128,7 @@ function Radio<K extends string>(props: { parentId: string; option: RadioFieldOp
         aria-labelledby={labelId}
         {...inputProps}
         {...focusProps}
-        // Put others here b/c it has the data-testid in it.
+        // Put others here b/c it could have data-testid in it or onX events.
         {...others}
       />
       <div>

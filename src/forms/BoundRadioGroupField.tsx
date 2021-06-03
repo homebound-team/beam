@@ -6,7 +6,7 @@ import { defaultLabel } from "src/utils/defaultLabel";
 
 export type BoundRadioGroupFieldProps<K extends string> = Omit<
   RadioGroupFieldProps<K>,
-  "value" | "onChange" | "label"
+  "value" | "onChange" | "label" | "onBlur" | "onFocus"
 > & {
   field: FieldState<K | null | undefined>;
   /** Make optional so that callers can override if they want to. */
@@ -25,8 +25,9 @@ export function BoundRadioGroupField<K extends string>(props: BoundRadioGroupFie
           label={label}
           value={field.value || undefined}
           onChange={onChange}
-          // errorMsg={field.touched ? field.errors.join(" ") : undefined}
-          // onBlur={() => field.blur()}
+          errorMsg={field.touched ? field.errors.join(" ") : undefined}
+          onBlur={() => field.blur()}
+          onFocus={() => field.focus()}
           {...testId}
           {...others}
         />
