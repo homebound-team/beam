@@ -31,6 +31,7 @@ export function BoundNumberField(props: BoundNumberFieldProps) {
           type={type}
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
+          onFocus={() => field.focus()}
           onBlur={() => field.blur()}
           {...testId}
           {...others}
