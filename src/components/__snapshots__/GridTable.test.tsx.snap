@@ -6,15 +6,13 @@ exports[`GridTable renders 1`] = `
   grid-template-columns: auto auto;
 }
 
-.emotion-0>div+div>*,
-.emotion-0>tbody>tr {
+.emotion-0>div+div>* {
   border-color: rgba(201,201,201,1);
   border-top-style: solid;
   border-top-width: 1px;
 }
 
-.emotion-0>div:nth-of-type(2)>*,
-.emotion-0>tbody>tr:first-of-type {
+.emotion-0>div:nth-of-type(2)>* {
   border-top-style: none;
 }
 

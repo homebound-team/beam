@@ -1,7 +1,8 @@
+import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
 import React, {
-  Fragment,
   MutableRefObject,
+  ReactElement,
   ReactNode,
   useCallback,
   useContext,
@@ -10,6 +11,7 @@ import React, {
   useState,
 } from "react";
 import { Link } from "react-router-dom";
+import { Components, Virtuoso } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
 import { Css, Margin, Only, Palette, Properties, px, Xss } from "src/Css";
@@ -104,7 +106,9 @@ export function setDefaultStyle(style: GridStyle): void {
   defaultStyle = style;
 }
 
-type TableAs = "div" | "table";
+type RenderAs = "div" | "table" | "virtual";
+
+type RowTuple<R extends Kinded> = [GridDataRow<R>, string[], ReactElement, Array<ReactNode | GridCellContent>];
 
 export interface GridTableProps<R extends Kinded, S, X> {
   id?: string;
@@ -120,7 +124,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
    * @example
    *  { header: "Name", data: ({ name }) => name, w: "75px", align: "right" }
    */
-  as?: TableAs;
+  as?: RenderAs;
   /** The column definitions i.e. how each column should render each row kind. */
   columns: GridColumn<R, S>[];
   /** The rows of data (including any header/footer rows), to be rendered by the column definitions. */
@@ -151,7 +155,6 @@ export interface GridTableProps<R extends Kinded, S, X> {
   observeRows?: boolean;
   /** A combination of CSS settings to set the static look & feel (vs. rowStyles which is per-row styling). */
   style?: GridStyle;
-  xss?: X;
   /**
    * If provided, collapsed rows on the table persists when the page is reloaded.
    *
@@ -159,6 +162,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
    *  be the collapsed state for project `p:1`'s precon stage specs & selections table.
    */
   persistCollapse?: string;
+  xss?: X;
 }
 
 /**
@@ -204,11 +208,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
   const [collapsedIds, toggleCollapsedId] = useToggleIds(rows, persistCollapse);
 
-  const gridTemplateColumns = columns
-    // Default to auto, but use `c.w` as a fr if numeric or else `c.w` as-if if a string
-    .map((c) => (typeof c.w === "string" ? c.w : c.w !== undefined ? `${c.w}fr` : "auto"))
-    .join(" ");
-
   const [sortFlags, setSortValue] = useSortFlags<R, S>(columns, sort, onSort);
   const maybeSorted = useMemo(() => {
     if (sorting === "client-side" && sortFlags) {
@@ -219,9 +218,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   }, [columns, rows, sorting, sortFlags]);
   const noData = !rows.some((row) => row.kind !== "header");
 
-  // For each row, keep it's ReactNode (React.memo'd) + its filter values, so we can re-filter w/o re-evaluating this useMemo.
-  type RowTuple = [GridDataRow<R>, string[], ReactNode, Array<ReactNode | GridCellContent>];
-  const allRows: RowTuple[] = useMemo(() => {
+  // For each row, keep it's ReactElement (React.memo'd) + its filter values, so we can re-filter w/o re-evaluating this useMemo.
+  const allRows: RowTuple<R>[] = useMemo(() => {
     return maybeSorted.map((row) => {
       // We only pass sortProps to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
@@ -232,7 +230,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const isCollapsed = collapsedIds.includes(row.id);
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
       const rowElement = (
-        <RowComponent<R, S>
+        <RowComponent
           key={`${row.kind}-${row.id}`}
           {...{
             as,
@@ -245,7 +243,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             isCollapsed,
             toggleCollapsedId,
             ...sortProps,
-            persistCollapse,
           }}
         />
       );
@@ -266,7 +263,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     collapsedIds,
     toggleCollapsedId,
     observeRows,
-    persistCollapse,
   ]);
 
   // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
@@ -333,41 +329,196 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
-  // Determine which HTML element to use to build the GridTable
-  const Table = as;
+  return renders[as](style, id, columns, headerRows, filteredRows, firstRowMessage, stickyHeader, xss);
+}
 
+// Determine which HTML element to use to build the GridTable
+const renders: Record<RenderAs, typeof renderTable> = {
+  table: renderTable,
+  div: renderCssGrid,
+  virtual: renderVirtual,
+};
+
+/** Renders as a CSS Grid, which is the default / most well-supported rendered. */
+function renderCssGrid<R extends Kinded>(
+  style: GridStyle,
+  id: string,
+  columns: GridColumn<R>[],
+  headerRows: RowTuple<R>[],
+  filteredRows: RowTuple<R>[],
+  firstRowMessage: string | undefined,
+  stickyHeader: boolean,
+  xss: any,
+): ReactElement {
   return (
-    <Table
+    <div
       css={{
-        // Conditionally render div or table element styles
-        ...(as === "div" ? Css.dg.add({ gridTemplateColumns }).$ : Css.w100.add("borderCollapse", "collapse").$),
+        ...Css.dg.gtc(calcGridColumns(columns)).$,
         ...Css
           // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
           // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
           // The `div + div` is also the "owl operator", i.e. don't apply to the 1st row.
-          .addIn("& > div + div > *, & > tbody > tr ", style.betweenRowsCss)
+          .addIn("& > div + div > *", style.betweenRowsCss)
           // removes border between header and second row
-          .addIn("& > div:nth-of-type(2) > *, & > tbody > tr:first-of-type", Css.add("borderTopStyle", "none").$).$,
+          .addIn("& > div:nth-of-type(2) > *", Css.add({ borderTopStyle: "none" }).$).$,
         ...style.rootCss,
         ...xss,
       }}
       data-testid={id}
     >
-      {maybeWrapWith(
-        headerRows.map(([, , node]) => node),
-        as,
-        "thead",
+      {headerRows.map(([, , node]) => node)}
+      {/* Show an all-column-span info message if it's set. */}
+      {firstRowMessage && (
+        <div css={Css.add("gridColumn", `${columns.length} span`).$}>
+          <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
+        </div>
       )}
-      {maybeWrapWith(
-        <Fragment>
-          {/* Show an all-column-span info message if it's set. */}
-          {firstRowMessage && renderFirstRowMessage(columns.length, firstRowMessage, style.firstRowMessageCss, as)}
-          {filteredRows.map(([, , node]) => node)}
-        </Fragment>,
-        as,
-        "tbody",
-      )}
-    </Table>
+      {filteredRows.map(([, , node]) => node)}
+    </div>
+  );
+}
+
+/** Renders as a table, primarily/solely for good print support. */
+function renderTable<R extends Kinded>(
+  style: GridStyle,
+  id: string,
+  columns: GridColumn<R>[],
+  headerRows: RowTuple<R>[],
+  filteredRows: RowTuple<R>[],
+  firstRowMessage: string | undefined,
+  stickyHeader: boolean,
+  xss: any,
+): ReactElement {
+  return (
+    <table
+      css={{
+        ...Css.w100.add("borderCollapse", "collapse").$,
+        ...Css.addIn("& > tbody > tr ", style.betweenRowsCss)
+          // removes border between header and second row
+          .addIn("& > tbody > tr:first-of-type", Css.add({ borderTopStyle: "none" }).$).$,
+        ...style.rootCss,
+        ...xss,
+      }}
+      data-testid={id}
+    >
+      <thead>{headerRows.map(([, , node]) => node)}</thead>
+      <tbody>
+        {/* Show an all-column-span info message if it's set. */}
+        {firstRowMessage && (
+          <tr>
+            <td colSpan={columns.length} css={{ ...style.firstRowMessageCss }}>
+              {firstRowMessage}
+            </td>
+          </tr>
+        )}
+        {filteredRows.map(([, , node]) => node)}
+      </tbody>
+    </table>
+  );
+}
+
+/**
+ * Uses react-virtuoso to render rows virtually.
+ *
+ * It seems like react-virtuoso is the only one that can do _measured_ variable
+ * sizes. I.e. react-window's variable list let's you provide a size, but it's
+ * a size you lookup, not one that is measured from the DOM, see [1].
+ *
+ * I also tried react-virtual, which is headless and really small, but a) the
+ * `measureRef` approach seems buggy [2] and b) rows were getting re-rendered
+ * maybe due to [3] and they have no examples showing memoization, which is
+ * concerning.
+ *
+ * react-virtuoso also seems like the most maintained (react-window is no
+ * longer being actively worked on) and featureful library (like sticky headers),
+ * so going with that for now.
+ *
+ * [1]: https://github.com/bvaughn/react-window/issues/6
+ * [2]: https://github.com/tannerlinsley/react-virtual/issues/85
+ * [3]: https://github.com/tannerlinsley/react-virtual/issues/108
+ */
+function renderVirtual<R extends Kinded>(
+  style: GridStyle,
+  id: string,
+  columns: GridColumn<R>[],
+  headerRows: RowTuple<R>[],
+  filteredRows: RowTuple<R>[],
+  firstRowMessage: string | undefined,
+  stickyHeader: boolean,
+  xss: any,
+): ReactElement {
+  return (
+    <Virtuoso
+      components={{ List: VirtualRoot(style, columns, id, xss) }}
+      // Pin/sticky both the header row(s) + firstRowMessage to the top
+      topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
+      // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
+      // so instead drill into the 1st real content cell.
+      itemSize={(el) => (el.firstElementChild!.firstElementChild! as HTMLElement).offsetHeight}
+      itemContent={(index) => {
+        // We keep header and filter rows separate, but react-virtuoso is a flat list,
+        // so we pick the right header / first row message / actual row.
+        let i = index;
+        if (i < headerRows.length) {
+          return headerRows[i][2];
+        }
+        i -= headerRows.length;
+        if (firstRowMessage) {
+          if (i === 0) {
+            return (
+              <div css={Css.add("gridColumn", `${columns.length} span`).$}>
+                <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
+              </div>
+            );
+          }
+          i -= 1;
+        }
+        return filteredRows[i][2];
+      }}
+      totalCount={(headerRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)}
+    />
+  );
+}
+
+/**
+ * Customizes the `List` element that react-virtuoso renders, to have our css grid logic.
+ *
+ * We wrap this in memoizeOne so that React.createElement sees a consistent/stable component
+ * identity, even though technically we have a different "component" per the given set of props
+ * (solely to capture as params that we can't pass through react-virtuoso's API as props).
+ */
+const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: string, xss: any) => Components["List"]>(
+  (gs, columns, id, xss) => {
+    return React.forwardRef(({ style, children }, ref) => {
+      // This re-renders each time we have new children in the view port
+      return (
+        <div
+          ref={ref}
+          style={style}
+          css={{
+            ...Css.dg.gtc(calcGridColumns(columns)).$,
+            // Add an extra `> div` due to Item + itemContent both having divs
+            ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss).$,
+            // Add `display:contents` to Item to flatten it like we do GridRow
+            ...Css.addIn("& > div", Css.display("contents").$).$,
+            ...gs.rootCss,
+            ...xss,
+          }}
+          data-testid={id}
+        >
+          {children}
+        </div>
+      );
+    });
+  },
+);
+
+function calcGridColumns(columns: GridColumn<any>[]): string {
+  return (
+    columns
+      // Default to auto, but use `c.w` as a fr if numeric or else `c.w` as-if if a string
+      .map((c) => (typeof c.w === "string" ? c.w : c.w !== undefined ? `${c.w}fr` : "auto"))
+      .join(" ")
   );
 }
 
@@ -471,7 +622,7 @@ export type GridDataRow<R extends Kinded> = {
 } & DiscriminateUnion<R, "kind", R["kind"]>;
 
 interface GridRowProps<R extends Kinded, S> {
-  as: TableAs;
+  as: RenderAs;
   columns: GridColumn<R>[];
   row: GridDataRow<R>;
   style: GridStyle;
@@ -486,7 +637,7 @@ interface GridRowProps<R extends Kinded, S> {
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
-function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>) {
+function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const {
     as,
     columns,
@@ -500,6 +651,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>) {
     setSortValue,
     isCollapsed,
     toggleCollapsedId,
+    ...others
   } = props;
 
   // We treat the "header" kind as special for "good defaults" styling
@@ -513,7 +665,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>) {
     // root-element > row-element > cell-elements, so that we can have a hook for
     // hovers and styling. In theory this would change with subgrids.
     // Only enable when using div as elements
-    ...(as === "div" ? Css.display("contents").$ : {}),
+    ...(as === "table" ? {} : Css.display("contents").$),
     ...((rowStyle?.rowLink || rowStyle?.onClick) && {
       // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
       "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
@@ -521,10 +673,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>) {
     ...maybeApplyFunction(row, rowStyle?.rowCss),
   };
 
-  const TableRow = as === "div" ? "div" : "tr";
+  const Row = as === "table" ? "tr" : "div";
 
   const div = (
-    <TableRow css={rowCss}>
+    <Row css={rowCss} {...others}>
       {columns.map((column, idx) => {
         const maybeContent = applyRowFn(column, row);
 
@@ -564,7 +716,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>) {
 
         return renderFn(idx, cellCss, content, row, rowStyle);
       })}
-    </TableRow>
+    </Row>
   );
 
   // Because of useToggleIds, this provider should basically never trigger a re-render, which is
@@ -592,7 +744,6 @@ const ObservedGridRow = React.memo((props: GridRowProps<any, any>) => (
     }}
   </Observer>
 ));
-
 /** If a column def return just string text for a given row, apply some default styling. */
 function maybeAddHeaderStyling(content: ReactNode | GridCellContent, isHeader: boolean, sorting: boolean): ReactNode {
   if (typeof content === "string" && isHeader) {
@@ -624,8 +775,8 @@ function applyRowFn<R extends Kinded>(column: GridColumn<R>, row: GridDataRow<R>
 }
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
-const defaultRenderFn: (as: TableAs) => RenderCellFn<any> = (as: TableAs) => (key, css, content) => {
-  const Row = as === "div" ? "div" : "td";
+const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (key, css, content) => {
+  const Row = as === "table" ? "td" : "div";
   return (
     <Row key={key} css={{ ...css, ...tableRowStyles(as) }}>
       {content}
@@ -667,7 +818,7 @@ const headerRenderFn: (
   column: GridColumn<any>,
   sortFlags: SortFlags<any> | undefined,
   setSortValue: Function | undefined,
-  as: TableAs,
+  as: RenderAs,
 ) => RenderCellFn<any> = (columns, column, sortFlags, setSortValue, as) => (key, css, content) => {
   const [currentValue, direction] = sortFlags || [];
   const newValue = column.sortValue || columns.indexOf(column);
@@ -675,8 +826,7 @@ const headerRenderFn: (
     sorted: newValue === currentValue ? direction : undefined,
     toggleSort: () => setSortValue!(newValue),
   };
-  const Row = as === "div" ? "div" : "th";
-
+  const Row = as === "table" ? "th" : "div";
   return (
     <GridSortContext.Provider key={key} value={context}>
       <Row css={{ ...css, ...tableRowStyles(as, column) }}>{content}</Row>
@@ -685,27 +835,27 @@ const headerRenderFn: (
 };
 
 /** Renders a cell element when a row link is in play. */
-const rowLinkRenderFn: (as: TableAs) => RenderCellFn<any> = (as: TableAs) => (key, css, content, row, rowStyle) => {
+const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (key, css, content, row, rowStyle) => {
   const to = rowStyle!.rowLink!(row);
-  if (as === "div") {
+  if (as === "table") {
     return (
-      <Link key={key} to={to} css={{ ...Css.noUnderline.color("unset").$, ...css }} className={navLink}>
-        {content}
-      </Link>
+      <td key={key} css={{ ...css, ...tableRowStyles(as) }}>
+        <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
+          {content}
+        </Link>
+      </td>
     );
   }
   return (
-    <td key={key} css={{ ...css, ...tableRowStyles(as) }}>
-      <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
-        {content}
-      </Link>
-    </td>
+    <Link key={key} to={to} css={{ ...Css.noUnderline.color("unset").$, ...css }} className={navLink}>
+      {content}
+    </Link>
   );
 };
 
 /** Renders a cell that will fire the RowStyle.onClick. */
-const rowClickRenderFn: (as: TableAs) => RenderCellFn<any> = (as: TableAs) => (key, css, content, row, rowStyle) => {
-  const Row = as === "div" ? "div" : "tr";
+const rowClickRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (key, css, content, row, rowStyle) => {
+  const Row = as === "table" ? "tr" : "div";
   return (
     <Row {...{ key }} css={{ ...css, ...tableRowStyles(as) }} onClick={() => rowStyle!.onClick!(row)}>
       {content}
@@ -724,12 +874,13 @@ const alignmentToTextAlign: Record<GridCellAlignment, Properties["textAlign"]> =
   right: "right",
 };
 
-function getJustification(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent, as: TableAs) {
+// For alignment, use: 1) user-specified, else 2) center if non-1st header, else 3) left.
+function getJustification(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent, as: RenderAs) {
   const alignment = (isContentAndSettings(maybeContent) && maybeContent.alignment) || column.align || "left";
-  if (as === "div") {
-    return Css.justify(alignmentToJustify[alignment]).$;
+  if (as === "table") {
+    return Css.add("textAlign", alignmentToTextAlign[alignment]).$;
   }
-  return Css.add("textAlign", alignmentToTextAlign[alignment]).$;
+  return Css.justify(alignmentToJustify[alignment]).$;
 }
 
 // TODO This is very WIP / proof-of-concept and needs flushed out a lot more to handle nested batches.
@@ -955,11 +1106,6 @@ export function observableColumns<T extends Kinded>(cols: GridColumn<T>[]): Grid
   }) as any;
 }
 
-/** GridTable as Table utility to wrap table header or body with thead or tbody */
-function maybeWrapWith(children: ReactNode, as: TableAs, Node: "thead" | "tbody") {
-  return as === "div" ? children : <Node>{children}</Node>;
-}
-
 function getKinds<R extends Kinded>(columns: GridColumn<R>[]): R[] {
   // Use the 1st column to get the runtime list of kinds
   const nonKindKeys = ["w", "sort", "sortValue", "align"];
@@ -967,37 +1113,12 @@ function getKinds<R extends Kinded>(columns: GridColumn<R>[]): R[] {
 }
 
 /** GridTable as Table utility to apply <tr> element override styles */
-const tableRowStyles = (as: TableAs, column?: GridColumn<any>) => {
+const tableRowStyles = (as: RenderAs, column?: GridColumn<any>) => {
   const thWidth = column?.w;
-
-  return as === "div"
-    ? {}
-    : {
+  return as === "table"
+    ? {
         ...Css.dtc.$,
         ...(thWidth ? Css.w(thWidth).$ : {}),
-      };
-};
-
-/** GridTable as Table utility to handle rendering a full spanning first row */
-const renderFirstRowMessage = (
-  spanWidth: number,
-  firstRowMessage: string,
-  firstRowMessageCss: Properties,
-  as: TableAs,
-) => {
-  if (as === "div") {
-    return (
-      <div css={Css.add("gridColumn", `${spanWidth} span`).$}>
-        <div css={{ ...firstRowMessageCss }}>{firstRowMessage}</div>
-      </div>
-    );
-  }
-
-  return (
-    <tr>
-      <td colSpan={spanWidth} css={{ ...firstRowMessageCss }}>
-        {firstRowMessage}
-      </td>
-    </tr>
-  );
+      }
+    : {};
 };
