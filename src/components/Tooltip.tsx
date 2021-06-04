@@ -18,7 +18,7 @@ interface TooltipProps {
 }
 
 export function Tooltip(props: TooltipProps) {
-  const state = useTooltipTriggerState({ delay: 0.5, ...props });
+  const state = useTooltipTriggerState({ delay: 500, ...props });
   const triggerRef = React.useRef(null);
   const { placement, children, title, disabled } = props;
   const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger(
