@@ -26,5 +26,6 @@ export interface BeamTextFieldProps extends BeamFocusableProps {
   onChange: (value: string | undefined) => void;
   /** Called when the component loses focus, mostly for BoundTextField to use. */
   onBlur?: () => void;
+  onFocus?: () => void;
   readOnly?: boolean;
 }

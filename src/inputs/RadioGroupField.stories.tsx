@@ -1,3 +1,4 @@
+import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { ReactNode, useState } from "react";
 import { Css } from "src/Css";
@@ -133,6 +134,8 @@ export function OnlyLabels() {
         { label: "Camembert", value: "c" },
         { label: "Roquefort", value: "d" },
       ]}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
     />
   );
 }
@@ -167,6 +170,8 @@ export function LabelsAndDescriptions() {
             "Roquefort is a sheep milk cheese from Southern France, and is one of the world's best known blue cheeses.",
         },
       ]}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
     />
   );
 }
@@ -189,6 +194,8 @@ export function Disabled() {
           value: "d",
         },
       ]}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
     />
   );
 }
@@ -204,6 +211,8 @@ export function ErrorMessage() {
         { label: "Asiago", value: "a" },
         { label: "Burratta", value: "b" },
       ]}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
     />
   );
 }
@@ -219,6 +228,8 @@ export function HelperText() {
         { label: "Burratta", value: "b" },
       ]}
       helperText="Some really long helper text that we expect to wrap."
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
     />
   );
 }

@@ -10,7 +10,7 @@ import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
 interface TextFieldBaseProps
-  extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur" | "helperText">,
+  extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur" | "onFocus" | "helperText">,
     Partial<Pick<BeamTextFieldProps, "onChange">> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
@@ -35,6 +35,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     multiline = false,
     onChange,
     onBlur,
+    onFocus,
   } = props;
   const errorMessageId = `${inputProps.id}-error`;
 
@@ -45,7 +46,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     <div css={Css.df.flexColumn.w100.maxw(px(550)).$} {...groupProps}>
       {label && <Label labelProps={labelProps} label={label} {...tid.label} />}
       <ElementType
-        {...mergeProps(inputProps, { onBlur }, { "aria-invalid": Boolean(errorMsg) })}
+        {...mergeProps(inputProps, { onBlur, onFocus }, { "aria-invalid": Boolean(errorMsg) })}
         {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
         ref={inputRef as any}
         rows={multiline ? 1 : undefined}

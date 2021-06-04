@@ -1,3 +1,4 @@
+import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
 import { Css } from "src/Css";
@@ -43,10 +44,18 @@ export function NumberFields() {
   );
 }
 
-function TestNumberField(props: Omit<NumberFieldProps, "onChange">) {
+function TestNumberField(props: Omit<NumberFieldProps, "onChange" | "onBlur" | "onFocus">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
-  return <NumberField value={internalValue} onChange={setValue} {...otherProps} />;
+  return (
+    <NumberField
+      value={internalValue}
+      onChange={setValue}
+      {...otherProps}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
+    />
+  );
 }
 
 function ValidationNumberField({ label, compact, value }: { label: string; compact?: boolean; value: number }) {

@@ -124,7 +124,7 @@ const formConfig: ObjectConfig<AuthorInput> = {
   favoriteColors: { type: "value", rules: [required] },
   books: {
     type: "list",
-    rules: [(list) => ((list || []).length === 0 ? "Empty" : undefined)],
+    rules: [({ value }) => ((value || []).length === 0 ? "Empty" : undefined)],
     config: {
       id: { type: "value" },
       title: { type: "value", rules: [required] },

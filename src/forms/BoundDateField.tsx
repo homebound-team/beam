@@ -4,7 +4,7 @@ import { DateField, DateFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundDateFieldProps = Omit<DateFieldProps, "value" | "onChange"> & {
+export type BoundDateFieldProps = Omit<DateFieldProps, "value" | "onChange" | "onBlur" | "onFocus"> & {
   field: FieldState<Date | null | undefined>;
   // Optional in case the page wants extra behavior
   onChange?: (value: Date) => void;
@@ -23,6 +23,7 @@ export function BoundDateField(props: BoundDateFieldProps) {
           onChange={onChange}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           onBlur={() => field.blur()}
+          onFocus={() => field.focus()}
           {...testId}
           {...others}
         />

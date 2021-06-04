@@ -1,4 +1,4 @@
-import { FieldState } from "@homebound/form-state";
+import { FieldState } from "@homebound/form-state/dist/formState";
 import { Observer } from "mobx-react";
 import { Key } from "react";
 import { HasIdAndName, Optional, SelectField, SelectFieldProps } from "src/inputs";
@@ -7,7 +7,7 @@ import { useTestIds } from "src/utils/useTestIds";
 
 export type BoundSelectFieldProps<T extends object, V extends Key> = Omit<
   SelectFieldProps<T, V>,
-  "value" | "onSelect"
+  "value" | "onSelect" | "onBlur" | "onFocus"
 > & {
   // Allow `onSelect` to be overridden to do more than just `field.set`.
   onSelect?: (option: V | undefined) => void;
@@ -37,7 +37,6 @@ export function BoundSelectField<T extends object, V extends Key>(
     readOnly,
     getOptionValue = (opt: T) => (opt as any).id, // if unset, assume O implements HasId
     getOptionLabel = (opt: T) => (opt as any).name, // if unset, assume O implements HasName
-    onBlur = () => field.blur(),
     onSelect = (value) => field.set(value),
     label = defaultLabel(field.key),
     ...others
@@ -55,7 +54,8 @@ export function BoundSelectField<T extends object, V extends Key>(
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           getOptionLabel={getOptionLabel}
           getOptionValue={getOptionValue}
-          onBlur={onBlur}
+          onBlur={() => field.blur()}
+          onFocus={() => field.focus()}
           {...others}
           {...testId}
         />
