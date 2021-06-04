@@ -75,6 +75,7 @@ function TestTextField(props: Omit<TextFieldProps, "onChange">) {
 function ValidationTextField(props: Omit<TextFieldProps, "onChange">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState<string | undefined>(value);
+  // Validates that the input's value is a properly formatted email address.
   const isValid = useMemo(() => internalValue && /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(internalValue), [
     internalValue,
   ]);

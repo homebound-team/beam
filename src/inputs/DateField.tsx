@@ -17,9 +17,9 @@ export interface DateFieldProps {
   value: Date | undefined;
   label?: string;
   onChange: (value: Date) => void;
-  /** Called when the component loses focus, mostly for BoundDateField to use. */
+  /** Called when the component loses focus */
   onBlur?: () => void;
-  /** Called when the component is in focus, mostly for BoundDateField to use. */
+  /** Called when the component is in focus. */
   onFocus?: () => void;
   disabled?: boolean;
   errorMsg?: string;

@@ -3,6 +3,7 @@ import { ChangeEvent, createElement, useEffect, useRef } from "react";
 import { useId } from "react-aria";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
+import { maybeCall } from "src/utils";
 import Tribute from "tributejs";
 import "tributejs/dist/tribute.css";
 import "trix/dist/trix";
@@ -21,7 +22,9 @@ export interface RichTextFieldProps {
   label?: string;
   autoFocus?: boolean;
   placeholder?: string;
+  /** Called when the component loses focus */
   onBlur: () => void;
+  /** Called when the component is in focus. */
   onFocus: () => void;
 }
 
@@ -88,8 +91,8 @@ export function RichTextField(props: RichTextFieldProps) {
         }
       }
 
-      const trixBlur = () => onBlur && onBlur();
-      const trixFocus = () => onFocus && onFocus();
+      const trixBlur = () => maybeCall(onBlur);
+      const trixFocus = () => maybeCall(onFocus);
 
       editorElement.addEventListener("trix-change", trixChange as any, false);
       editorElement.addEventListener("trix-blur", trixBlur as any, false);

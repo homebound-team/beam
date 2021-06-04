@@ -28,9 +28,9 @@ export interface CheckboxGroupProps {
   values: string[];
   errorMsg?: string;
   helperText?: string | ReactNode;
-  /** Called when the component loses focus, mostly for BoundDateField to use. */
+  /** Called when the component loses focus */
   onBlur?: () => void;
-  /** Called when the component is in focus, mostly for BoundDateField to use. */
+  /** Called when the component is in focus */
   onFocus?: () => void;
 }
 
