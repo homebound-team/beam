@@ -32,6 +32,7 @@ export function NumberField(props: NumberFieldProps) {
     compact = false,
     value,
     onChange,
+    ...otherProps
   } = props;
 
   const factor = type === "percent" || type === "cents" ? 100 : type === "basisPoints" ? 10_000 : 1;
@@ -81,6 +82,7 @@ export function NumberField(props: NumberFieldProps) {
       errorMsg={errorMsg}
       helperText={helperText}
       compact={compact}
+      {...otherProps}
     />
   );
 }

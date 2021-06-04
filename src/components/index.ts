@@ -7,3 +7,4 @@ export * from "./IconButton";
 export { NavLink } from "./NavLink";
 export * from "./SuperDrawer";
 export { TabsWithContent } from "./Tabs";
+export * from "./Tooltip";
