@@ -33,8 +33,6 @@ export interface SelectFieldProps<O extends object, V extends Key> extends BeamS
   value: V | undefined;
   onSelect: (value: V, opt: O) => void;
   options: O[];
-  // Should go in BeamFocusableProps?
-  onBlur?: () => void;
 }
 
 export type HasIdAndName<V> = { id: V; name: string };
@@ -149,6 +147,8 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
     readOnly: isReadOnly = false,
     fieldDecoration,
     filteredOptions: items,
+    onBlur,
+    onFocus,
     ...otherProps
   } = props;
 
@@ -210,6 +210,8 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
           isFocused={isFocused}
           isReadOnly={isReadOnly}
           state={state}
+          onBlur={onBlur}
+          onFocus={onFocus}
         />
         {state.isOpen && (
           <ListBoxPopup
@@ -241,6 +243,8 @@ interface ComboBoxInputProps<T extends object> {
   fieldDecoration?: (opt: T) => ReactNode;
   errorMsg?: string;
   helperText?: string | ReactNode;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }
 
 function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
@@ -258,6 +262,8 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
     fieldDecoration,
     isDisabled,
     isReadOnly,
+    onBlur,
+    onFocus,
   } = props;
   const errorMessageId = `${inputProps.id}-error`;
   const { hoverProps, isHovered } = useHover({});
@@ -305,7 +311,9 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
             ...disabledStyles,
             ...readOnlyStyles,
           }}
+          onBlur={onBlur}
           onFocus={(e) => {
+            onFocus && onFocus();
             if (isReadOnly) return;
             e.target.select();
             state.open();
@@ -430,4 +438,6 @@ interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
   /** Sets the form field label. */
   label?: string;
   readOnly?: boolean;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }

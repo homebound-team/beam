@@ -4,7 +4,7 @@ import { TextField, TextFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundTextFieldProps = Omit<TextFieldProps, "value" | "onChange"> & {
+export type BoundTextFieldProps = Omit<TextFieldProps, "value" | "onChange" | "onBlur" | "onFocus"> & {
   field: FieldState<string | null | undefined>;
   // Optional in case the page wants extra behavior
   onChange?: (value: string | undefined) => void;
@@ -24,6 +24,7 @@ export function BoundTextField(props: BoundTextFieldProps) {
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           onBlur={() => field.blur()}
+          onFocus={() => field.focus()}
           {...testId}
           {...others}
         />

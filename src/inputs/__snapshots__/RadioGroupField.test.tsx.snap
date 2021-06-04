@@ -3,6 +3,9 @@
 exports[`RadioGroupField renders with just labels 1`] = `
 .emotion-0 {
   max-width: 320px;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
 }
 
 .emotion-1 {
@@ -172,6 +175,9 @@ exports[`RadioGroupField renders with just labels 1`] = `
 exports[`RadioGroupField renders with just labels and description 1`] = `
 .emotion-0 {
   max-width: 344px;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
 }
 
 .emotion-1 {

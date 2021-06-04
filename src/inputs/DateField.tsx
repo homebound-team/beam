@@ -1,6 +1,7 @@
 import { useTextField } from "@react-aria/textfield";
 import { format as dateFnsFormat, parse as dateFnsParse } from "date-fns";
 import React, { ReactNode, useRef } from "react";
+import { mergeProps } from "react-aria";
 import { DateUtils, NavbarElementProps, WeekdayElementProps } from "react-day-picker";
 import DayPickerInput from "react-day-picker/DayPickerInput";
 import { Icon, IconButton } from "src/components";
@@ -14,17 +15,19 @@ const format = "MM/dd/yy";
 
 export interface DateFieldProps {
   value: Date | undefined;
-  onChange: (value: Date) => void;
   label?: string;
-  /** Called when the component loses focus, mostly for BoundDateField to use. */
+  onChange: (value: Date) => void;
+  /** Called when the component loses focus */
   onBlur?: () => void;
+  /** Called when the component is in focus. */
+  onFocus?: () => void;
   disabled?: boolean;
   errorMsg?: string;
   helperText?: string | ReactNode;
 }
 
 export function DateField(props: DateFieldProps) {
-  const { label, disabled, value, onChange, errorMsg, helperText } = props;
+  const { label, disabled, value, onChange, onFocus, onBlur, errorMsg, helperText } = props;
 
   const { ...otherProps } = {};
   // We don't really use the inputRef, but `useTextField` needs it. We probably shouldn't
@@ -77,7 +80,7 @@ export function DateField(props: DateFieldProps) {
         component={InputElement}
         // inputProps comes from react-aria and is how end up getting things like
         // disabled=true passes through to our InputElement
-        inputProps={inputProps}
+        inputProps={mergeProps(inputProps, { onFocus, onBlur })}
         value={value}
         placeholder=""
         formatDate={formatDate}

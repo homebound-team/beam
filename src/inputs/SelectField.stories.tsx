@@ -1,3 +1,4 @@
+import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { Key, useState } from "react";
 import { Icon, Icons } from "src/components";
@@ -144,6 +145,8 @@ function TestSelectField<T extends object, V extends Key>(
       value={selectedOption}
       onSelect={setSelectedOption}
       errorMsg={selectedOption || props.disabled ? "" : "Select an option. Plus more error text to force it to wrap."}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
     />
   );
 }

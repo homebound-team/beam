@@ -15,6 +15,7 @@ export interface NumberFieldProps {
   errorMsg?: string;
   helperText?: string | ReactNode;
   onBlur?: () => void;
+  onFocus?: () => void;
   readOnly?: boolean;
 }
 
@@ -25,6 +26,7 @@ export function NumberField(props: NumberFieldProps) {
     type,
     label,
     onBlur,
+    onFocus,
     errorMsg,
     helperText,
     compact = false,
@@ -75,6 +77,7 @@ export function NumberField(props: NumberFieldProps) {
       inputProps={inputProps}
       inputRef={inputRef}
       onBlur={onBlur}
+      onFocus={onFocus}
       errorMsg={errorMsg}
       helperText={helperText}
       compact={compact}
