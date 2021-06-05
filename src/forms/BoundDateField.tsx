@@ -5,7 +5,7 @@ import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
 export type BoundDateFieldProps = Omit<DateFieldProps, "value" | "onChange" | "onBlur" | "onFocus"> & {
-  field: FieldState<Date | null | undefined>;
+  field: FieldState<any, Date | null | undefined>;
   // Optional in case the page wants extra behavior
   onChange?: (value: Date) => void;
 };
