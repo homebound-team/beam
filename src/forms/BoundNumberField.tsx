@@ -20,7 +20,7 @@ export function BoundNumberField(props: BoundNumberFieldProps) {
     type = field.key.endsWith("InCents") ? "cents" : undefined,
     ...others
   } = props;
-  const testId = useTestIds(props, field.key);
+  const testId = useTestIds(props, (label || field.key));
   return (
     <Observer>
       {() => (

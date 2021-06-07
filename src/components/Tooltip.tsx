@@ -53,7 +53,7 @@ interface PopperProps {
   placement?: Placement;
 }
 
-export function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
+function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
   const popperRef = useRef(null);
   const [arrowRef, setArrowRef] = useState<HTMLDivElement | null>(null);
 
