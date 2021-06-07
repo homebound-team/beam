@@ -1,6 +1,7 @@
 export * from "./Button";
 export * from "./ButtonGroup";
 export * from "./CssReset";
+export * from "./Filters";
 export * from "./GridTable";
 export * from "./Icon";
 export * from "./IconButton";
