@@ -68,7 +68,7 @@ export type GridTableXss = Xss<Margin>;
 export type Direction = "ASC" | "DESC";
 
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
-interface GridStyle {
+export interface GridStyle {
   /** Applied to the base div element. */
   rootCss: Properties;
   /** Applied with the owl operator between rows for rendering border lines. */
