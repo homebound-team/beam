@@ -13,7 +13,7 @@ export interface Tab {
   render: () => ReactNode;
 }
 
-interface TabsProps {
+export interface TabsProps {
   ariaLabel?: string;
   // the selected tab is connected to the contents displayed
   selected: string;
@@ -21,6 +21,12 @@ interface TabsProps {
   onChange: (value: string) => void;
 }
 
+/**
+ * Provides a list of tabs and their content.
+ *
+ * The caller is responsible for using `selected` / `onChange` to control
+ * the current tab.
+ */
 export function TabsWithContent(props: TabsProps) {
   const { selected, tabs, ...others } = props;
   const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
@@ -42,6 +48,7 @@ export function TabsWithContent(props: TabsProps) {
   );
 }
 
+/** The top list of tabs. */
 function Tabs(props: TabsProps) {
   const { ariaLabel, onChange, selected, tabs, ...others } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
@@ -159,7 +166,8 @@ function SingleTab(props: TabProps) {
 
 export function getTabStyles() {
   return {
-    baseStyles: Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.outline0.gray700.add("width", "fit-content").$,
+    baseStyles: Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.outline0.gray700.add("width", "fit-content")
+      .cursorPointer.$,
     activeStyles: Css.lightBlue700.bgLightBlue50.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
     focusRingStyles: Css.bgLightBlue50.bshFocus.$,
