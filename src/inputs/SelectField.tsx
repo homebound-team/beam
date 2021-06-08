@@ -16,6 +16,7 @@ import {
   useOverlay,
   useOverlayPosition,
 } from "react-aria";
+import { Virtuoso } from "react-virtuoso";
 import { HelperText } from "src/components/HelperText";
 import { Icon } from "src/components/Icon";
 import { Label } from "src/components/Label";
@@ -301,8 +302,9 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
             {fieldDecoration(state.selectedItem.value)}
           </span>
         )}
+        {/* Add `onInput` event handler to trigger menu to be open when the user types. */}
         <input
-          {...mergeProps(inputProps, { "aria-invalid": Boolean(errorMsg) })}
+          {...mergeProps(inputProps, { "aria-invalid": Boolean(errorMsg), onInput: () => state.open() })}
           {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
           ref={inputRef as any}
           css={{
@@ -367,15 +369,29 @@ function ListBoxPopup<T extends object>(props: ListBoxPopupProps<T>) {
       <div {...{ ...overlayProps, ...positionProps }} ref={popoverRef}>
         <ul
           css={{
-            ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.$,
+            // We need to define a height of the container because of the virtualization.
+            // Choosing `273` as a defined height, as `42px` is the min-height of each option
+            // This allows 6.5 options in view at a time (doing `.5` so the user can easily tell if there are more).
+            // One downside is that it'll force the height to always be 273px, even if the user has filtered down to only one option.
+            // We could potentially set the height depending on the number of elements in the list, but that would
+            // require each <Option> to have a fixed height, which it currently does not. (Will follow up with design if we can fix these heights)
+            ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.hPx(273).$,
             "&:hover": Css.bshHover.$,
           }}
           ref={listBoxRef}
           {...listBoxProps}
         >
-          {[...state.collection].map((item) => (
-            <Option key={item.key} item={item} state={state} />
-          ))}
+          <Virtuoso
+            totalCount={state.collection.size}
+            itemContent={(idx) => {
+              // MapIterator doesn't have at/index lookup so make a copy
+              const keys = [...state.collection.getKeys()];
+              const item = state.collection.getItem(keys[idx]);
+              if (item) {
+                return <Option key={item.key} item={item} state={state} />;
+              }
+            }}
+          />
         </ul>
         <DismissButton onDismiss={() => state.close()} />
       </div>
@@ -415,7 +431,7 @@ function Option<T extends object>({ item, state }: { item: Node<T>; state: Combo
       css={{
         ...Css.df.itemsCenter.justifyBetween.py1.px2.mh("42px").cursorPointer.gray900.sm.$,
         ...(isHovered ? Css.bgGray100.$ : {}),
-        ...(isFocused ? Css.add("boxShadow", `0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
+        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
       }}
     >
       {item.rendered}
