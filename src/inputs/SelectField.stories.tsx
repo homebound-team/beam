@@ -4,6 +4,7 @@ import { Key, useState } from "react";
 import { Icon, Icons } from "src/components";
 import { Css } from "src/Css";
 import { HasIdAndName, Optional, SelectField, SelectFieldProps } from "src/inputs";
+import { zeroTo } from "src/utils/sb";
 
 export default {
   component: SelectField,
@@ -29,6 +30,11 @@ const optionsWithNumericIds: TestOption[] = [
   { id: 3, name: "Three" },
   { id: 4, name: "Four" },
 ];
+
+export function StressTest() {
+  const options: TestOption[] = zeroTo(1000).map((i) => ({ id: i, name: `Project ${i}` }));
+  return <TestSelectField label="Project" value={options[2].id} options={options} />;
+}
 
 export function SelectFields() {
   return (
