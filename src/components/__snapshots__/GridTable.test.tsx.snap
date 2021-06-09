@@ -4,6 +4,7 @@ exports[`GridTable renders 1`] = `
 .emotion-0 {
   display: grid;
   grid-template-columns: auto auto;
+  color: rgba(100,100,100,1);
 }
 
 .emotion-0>div+div>* {
