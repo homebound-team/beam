@@ -10,8 +10,16 @@ interface LabelProps {
 /** An internal helper component for rendering form labels. */
 export function Label({ labelProps, label, ...others }: LabelProps) {
   return (
-    <label {...labelProps} {...others} css={Css.sm.gray700.mbPx(4).$}>
+    <label {...labelProps} {...others} css={Css.dib.sm.gray700.mbPx(4).$}>
       {label}
+    </label>
+  );
+}
+
+export function InlineLabel({ labelProps, label, ...others }: LabelProps) {
+  return (
+    <label {...labelProps} {...others} css={Css.smEm.gray900.prPx(4).$}>
+      {label}:
     </label>
   );
 }
