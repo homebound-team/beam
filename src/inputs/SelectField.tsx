@@ -364,24 +364,26 @@ function ListBoxPopup<T extends object>(props: ListBoxPopupProps<T>) {
     width: comboBoxRef?.current?.clientWidth,
   };
 
+  // Choosing `273` as a defined max-height. `42px` is the min-height of each option, so this allows
+  // 6.5 options in view at a time (doing `.5` so the user can easily tell if there are more).
+  const maxListHeight = 273;
+  const [listHeight, setListHeight] = useState(maxListHeight);
+
   return (
     <OverlayContainer>
       <div {...{ ...overlayProps, ...positionProps }} ref={popoverRef}>
+        {/* Setting the dynamic height as an inline style attribute instead of via TRUSS to avoid generating a new CSS class for each possible height change */}
         <ul
           css={{
-            // We need to define a height of the container because of the virtualization.
-            // Choosing `273` as a defined height, as `42px` is the min-height of each option
-            // This allows 6.5 options in view at a time (doing `.5` so the user can easily tell if there are more).
-            // One downside is that it'll force the height to always be 273px, even if the user has filtered down to only one option.
-            // We could potentially set the height depending on the number of elements in the list, but that would
-            // require each <Option> to have a fixed height, which it currently does not. (Will follow up with design if we can fix these heights)
-            ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.hPx(273).$,
+            ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.$,
             "&:hover": Css.bshHover.$,
           }}
+          style={{ height: Math.min(maxListHeight, listHeight) }}
           ref={listBoxRef}
           {...listBoxProps}
         >
           <Virtuoso
+            totalListHeightChanged={setListHeight}
             totalCount={state.collection.size}
             itemContent={(idx) => {
               // MapIterator doesn't have at/index lookup so make a copy
