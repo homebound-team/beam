@@ -383,7 +383,7 @@ function ListBoxPopup<T extends object>(props: ListBoxPopupProps<T>) {
           {...listBoxProps}
         >
           <Virtuoso
-            totalListHeightChanged={(height) => setListHeight(height)}
+            totalListHeightChanged={setListHeight}
             totalCount={state.collection.size}
             itemContent={(idx) => {
               // MapIterator doesn't have at/index lookup so make a copy
