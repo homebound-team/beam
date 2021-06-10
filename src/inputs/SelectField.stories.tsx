@@ -3,7 +3,8 @@ import { Meta } from "@storybook/react";
 import { Key, useState } from "react";
 import { Icon, Icons } from "src/components";
 import { Css } from "src/Css";
-import { HasIdAndName, Optional, SelectField, SelectFieldProps } from "src/inputs";
+import { SelectField, SelectFieldProps } from "src/inputs";
+import { HasIdAndName, Optional } from "src/types";
 import { zeroTo } from "src/utils/sb";
 
 export default {

@@ -2,14 +2,14 @@ import React, { Key, ReactNode } from "react";
 import { BeamSelectFieldBaseProps, SelectFieldBase } from "src/inputs/SelectFieldBase";
 import { HasIdAndName, Optional } from "src/types";
 
-export interface SelectFieldProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
+export interface MultiSelectFieldProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
-  value: V | undefined;
-  onSelect: (value: V, opt: O) => void;
+  values: V[];
+  onSelect?: (values: V[], opts: O[]) => void;
   options: O[];
 }
 
@@ -22,34 +22,42 @@ export interface SelectFieldProps<O extends object, V extends Key> extends BeamS
  * Note that the `O extends object` and `V extends Key` constraints come from react-aria,
  * and so we cannot easily change them.
  */
-export function SelectField<O extends object, V extends Key>(props: SelectFieldProps<O, V>): JSX.Element;
-export function SelectField<O extends HasIdAndName<V>, V extends Key>(
-  props: Optional<SelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
+export function MultiSelectField<O extends object, V extends Key>(props: MultiSelectFieldProps<O, V>): JSX.Element;
+export function MultiSelectField<O extends HasIdAndName<V>, V extends Key>(
+  props: Optional<MultiSelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element;
-export function SelectField<O extends object, V extends Key>(
-  props: Optional<SelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,
+export function MultiSelectField<O extends object, V extends Key>(
+  props: Optional<MultiSelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,
 ): JSX.Element {
   const {
     getOptionValue = (opt: O) => (opt as any).id, // if unset, assume O implements HasId
     getOptionLabel = (opt: O) => (opt as any).name, // if unset, assume O implements HasName
     options,
     onSelect,
-    value,
+    values,
     ...otherProps
   } = props;
 
   return (
     <SelectFieldBase
+      multiselect
       {...otherProps}
       options={options}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
-      values={value ? [String(value)] : []}
+      values={values.map((v) => String(v))}
       onSelect={(keys) => {
-        if (keys.length > 0) {
-          const selectedOption = options.find((o) => String(getOptionValue(o)) === keys[0]);
-          onSelect && selectedOption && onSelect(getOptionValue(selectedOption), selectedOption);
-        }
+        const [selectedValues, selectedOptions] = options
+          .filter((o) => keys.includes(String(getOptionValue(o))))
+          .reduce(
+            (acc, o) => {
+              acc[0].push(getOptionValue(o));
+              acc[1].push(o);
+              return acc;
+            },
+            [[] as V[], [] as O[]],
+          );
+        onSelect && onSelect(selectedValues, selectedOptions);
       }}
     />
   );
