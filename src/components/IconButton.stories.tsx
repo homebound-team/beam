@@ -44,6 +44,10 @@ export const IconButton = (args: IconButtonProps) => (
         <h2>Colored</h2>
         <IconButtonComponent {...args} color={Palette.Red700} />
       </div>
+      <div>
+        <h2>Smaller</h2>
+        <IconButtonComponent {...args} inc={2} />
+      </div>
     </div>
   </div>
 );
