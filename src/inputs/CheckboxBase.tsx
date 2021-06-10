@@ -1,7 +1,10 @@
-import { InputHTMLAttributes, useRef } from "react";
+import { InputHTMLAttributes, ReactNode, useRef } from "react";
 import { useFocusRing, useHover, VisuallyHidden } from "react-aria";
+import { HelperText } from "src/components/HelperText";
 import { Css, Palette, px } from "src/Css";
+import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamFocusableProps } from "src/interfaces";
+import { useTestIds } from "src/utils";
 
 interface CheckboxAriaProps {
   description?: string | undefined;
@@ -19,13 +22,26 @@ export interface CheckboxBaseProps extends BeamFocusableProps {
   inputProps: InputHTMLAttributes<HTMLInputElement>;
   isSelected?: boolean;
   label: string;
+  errorMsg?: string;
+  helperText?: string | ReactNode;
 }
 
 export function CheckboxBase(props: CheckboxBaseProps) {
-  const { ariaProps, description, isDisabled = false, isIndeterminate = false, isSelected, inputProps, label } = props;
+  const {
+    ariaProps,
+    description,
+    isDisabled = false,
+    isIndeterminate = false,
+    isSelected,
+    inputProps,
+    label,
+    errorMsg,
+    helperText,
+  } = props;
   const ref = useRef(null);
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover({ isDisabled });
+  const tid = useTestIds(props);
 
   const markIcon = isIndeterminate ? dashSmall : isSelected ? checkmarkSmall : "";
 
@@ -41,6 +57,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
           .maxw(px(344))
           .if(isDisabled).cursorNotAllowed.$
       }
+      {...tid}
     >
       <VisuallyHidden>
         <input ref={ref} {...inputProps} {...focusProps} />
@@ -63,6 +80,8 @@ export function CheckboxBase(props: CheckboxBaseProps) {
       <div css={Css.ml1.$}>
         {label && <div css={{ ...labelStyles, ...(isDisabled && disabledColor) }}>{label}</div>}
         {description && <div css={{ ...descStyles, ...(isDisabled && disabledColor) }}>{description}</div>}
+        {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
+        {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
       </div>
     </label>
   );

@@ -1,3 +1,4 @@
+export * from "./BoundCheckboxField";
 export * from "./BoundCheckboxGroupField";
 export * from "./BoundDateField";
 export * from "./BoundNumberField";
