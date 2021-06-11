@@ -1,9 +1,12 @@
 import { useToggleState } from "@react-stately/toggle";
-import { useRef } from "react";
+import React, { ReactNode, useRef } from "react";
 import { useCheckbox } from "react-aria";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
 
-interface CheckboxProps {
+export interface CheckboxProps {
+  label: string;
+  /** Handler that is called when the element's selection state changes. */
+  onChange: (selected: boolean) => void;
   /** Additional text displayed below label */
   description?: string;
   disabled?: boolean;
@@ -13,9 +16,8 @@ interface CheckboxProps {
    */
   indeterminate?: boolean;
   selected?: boolean;
-  label: string;
-  /** Handler that is called when the element's selection state changes. */
-  onChange: (selected: boolean) => void;
+  errorMsg?: string;
+  helperText?: string | ReactNode;
 }
 
 export function Checkbox(props: CheckboxProps) {

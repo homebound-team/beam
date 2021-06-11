@@ -31,6 +31,19 @@ export function Checkboxes() {
           />
         </div>
       </div>
+      <div>
+        <h2 css={Css.mb1.$}>Checkbox with error message and helper text</h2>
+        <div>
+          <Checkbox
+            onChange={action("onChange")}
+            description="Get notified when someone posts a comment on a posting"
+            label="Comments"
+            errorMsg="An error has occurred"
+            helperText="This is helper text"
+            data-testid="checkbox"
+          />
+        </div>
+      </div>
     </div>
   );
 }
