@@ -68,7 +68,7 @@ export type GridTableXss = Xss<Margin>;
 export type Direction = "ASC" | "DESC";
 
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
-interface GridStyle {
+export interface GridStyle {
   /** Applied to the base div element. */
   rootCss: Properties;
   /** Applied with the owl operator between rows for rendering border lines. */
@@ -85,7 +85,7 @@ interface GridStyle {
 
 /** Our original table look & feel/style. */
 export let defaultStyle: GridStyle = {
-  rootCss: {},
+  rootCss: Css.gray700.$,
   betweenRowsCss: Css.bt.bGray400.$,
   cellCss: Css.py2.px3.$,
   // Use h100 so that all cells are the same height when scrolled; set bgWhite for when we're laid over other rows.
@@ -98,7 +98,7 @@ export let defaultStyle: GridStyle = {
 export const condensedStyle: GridStyle = {
   ...defaultStyle,
   cellCss: Css.itemsCenter.p(px(6)).$,
-  rootCss: Css.xs.$,
+  rootCss: Css.gray700.xs.$,
 };
 
 /** Configures the default/app-wide GridStyle. */

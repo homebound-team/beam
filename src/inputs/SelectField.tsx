@@ -4,7 +4,16 @@ import { mergeProps } from "@react-aria/utils";
 import { Item } from "@react-stately/collections";
 import { ComboBoxState, useComboBoxState } from "@react-stately/combobox";
 import { CollectionChildren, Node } from "@react-types/shared";
-import React, { Fragment, InputHTMLAttributes, Key, MutableRefObject, ReactNode, useRef, useState } from "react";
+import React, {
+  Fragment,
+  InputHTMLAttributes,
+  Key,
+  LabelHTMLAttributes,
+  MutableRefObject,
+  ReactNode,
+  useRef,
+  useState,
+} from "react";
 import {
   DismissButton,
   OverlayContainer,
@@ -16,9 +25,10 @@ import {
   useOverlay,
   useOverlayPosition,
 } from "react-aria";
+import { Virtuoso } from "react-virtuoso";
 import { HelperText } from "src/components/HelperText";
 import { Icon } from "src/components/Icon";
-import { Label } from "src/components/Label";
+import { InlineLabel, Label } from "src/components/Label";
 import { Css, Palette, px } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamFocusableProps } from "src/interfaces";
@@ -149,6 +159,7 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
     filteredOptions: items,
     onBlur,
     onFocus,
+    inlineLabel,
     ...otherProps
   } = props;
 
@@ -180,7 +191,6 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
 
   const { buttonProps } = useButton({ ...triggerProps, isDisabled: isDisabled || isReadOnly }, triggerRef);
   const { isFocused, focusProps } = useFocusRing({ ...props, within: true });
-  const tid = useTestIds(props);
 
   // useOverlayPosition moves the overlay to the top of the DOM to avoid any z-index issues. Uses the `targetRef` to DOM placement
   const { overlayProps: positionProps } = useOverlayPosition({
@@ -193,38 +203,38 @@ function ComboBox<T extends object>(props: ComboBoxProps<T>) {
   });
 
   return (
-    <div css={Css.dif.flexColumn.w100.maxw(px(550)).$} ref={comboBoxRef}>
-      {label && <Label labelProps={labelProps} label={label} {...tid.label} />}
-      <div css={Css.dib.$} {...focusProps}>
-        <ComboBoxInput
-          buttonProps={buttonProps}
-          buttonRef={triggerRef}
-          compact={compact}
-          errorMsg={errorMsg}
-          helperText={helperText}
-          fieldDecoration={fieldDecoration}
-          inputProps={inputProps}
-          inputRef={inputRef}
-          inputWrapRef={inputWrapRef}
-          isDisabled={isDisabled}
-          isFocused={isFocused}
-          isReadOnly={isReadOnly}
+    <div css={Css.dif.flexColumn.w100.maxw(px(550)).$} ref={comboBoxRef} {...focusProps}>
+      <ComboBoxInput
+        buttonProps={buttonProps}
+        buttonRef={triggerRef}
+        compact={compact}
+        errorMsg={errorMsg}
+        helperText={helperText}
+        fieldDecoration={fieldDecoration}
+        inputProps={inputProps}
+        inputRef={inputRef}
+        inputWrapRef={inputWrapRef}
+        isDisabled={isDisabled}
+        isFocused={isFocused}
+        isReadOnly={isReadOnly}
+        state={state}
+        onBlur={onBlur}
+        onFocus={onFocus}
+        inlineLabel={inlineLabel}
+        label={label}
+        labelProps={labelProps}
+      />
+      {state.isOpen && (
+        <ListBoxPopup
+          {...listBoxProps}
           state={state}
-          onBlur={onBlur}
-          onFocus={onFocus}
+          compact={compact}
+          popoverRef={popoverRef}
+          listBoxRef={listBoxRef}
+          positionProps={positionProps}
+          comboBoxRef={comboBoxRef}
         />
-        {state.isOpen && (
-          <ListBoxPopup
-            {...listBoxProps}
-            state={state}
-            compact={compact}
-            popoverRef={popoverRef}
-            listBoxRef={listBoxRef}
-            positionProps={positionProps}
-            comboBoxRef={comboBoxRef}
-          />
-        )}
-      </div>
+      )}
     </div>
   );
 }
@@ -245,6 +255,9 @@ interface ComboBoxInputProps<T extends object> {
   helperText?: string | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
+  inlineLabel?: boolean;
+  labelProps: LabelHTMLAttributes<HTMLLabelElement>;
+  label?: string;
 }
 
 function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
@@ -264,10 +277,12 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
     isReadOnly,
     onBlur,
     onFocus,
+    inlineLabel,
+    label,
+    labelProps,
   } = props;
   const errorMessageId = `${inputProps.id}-error`;
   const { hoverProps, isHovered } = useHover({});
-  const fieldDecorationWidth = 32;
   const hoverStyles = isHovered && !isReadOnly && !isFocused ? Css.bgGray100.$ : {};
   const focusStyles = isFocused && !isReadOnly ? Css.bLightBlue500.$ : {};
   const errorStyles = errorMsg ? Css.bRed500.$ : {};
@@ -277,9 +292,10 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
 
   return (
     <Fragment>
+      {!inlineLabel && label && <Label labelProps={labelProps} label={label} {...tid.label} />}
       <div
         css={{
-          ...Css.df.ba.bGray300.br4.bgWhite.$,
+          ...Css.df.ba.bGray300.br4.px1.itemsCenter.bgWhite.$,
           ...hoverStyles,
           ...errorStyles,
           ...focusStyles,
@@ -289,10 +305,11 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
         {...hoverProps}
         ref={inputWrapRef as any}
       >
+        {inlineLabel && label && <InlineLabel labelProps={labelProps} label={label} {...tid.label} />}
         {fieldDecoration && state.selectedItem && (
           <span
             css={{
-              ...Css.df.itemsCenter.br4.pl1.wPx(fieldDecorationWidth).fs0.$,
+              ...Css.itemsCenter.br4.fs0.pr1.$,
               ...errorStyles,
               ...hoverStyles,
               ...focusStyles,
@@ -301,12 +318,13 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
             {fieldDecoration(state.selectedItem.value)}
           </span>
         )}
+        {/* Add `onInput` event handler to trigger menu to be open when the user types. */}
         <input
-          {...mergeProps(inputProps, { "aria-invalid": Boolean(errorMsg) })}
+          {...mergeProps(inputProps, { "aria-invalid": Boolean(errorMsg), onInput: () => state.open() })}
           {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
           ref={inputRef as any}
           css={{
-            ...Css.smEm.mw0.fg1.px1.bgWhite.br4.pyPx(10).gray900.outline0.if(compact).pyPx(6).$,
+            ...Css.sm.mw0.fg1.pr1.bgWhite.br4.pyPx(10).gray900.outline0.if(compact).pyPx(6).$,
             ...hoverStyles,
             ...disabledStyles,
             ...readOnlyStyles,
@@ -325,7 +343,7 @@ function ComboBoxInput<T extends object>(props: ComboBoxInputProps<T>) {
             disabled={isDisabled}
             ref={buttonRef}
             css={{
-              ...Css.dif.br4.outline0.itemsCenter.pr1.$,
+              ...Css.br4.outline0.$,
               ...disabledStyles,
             }}
           >
@@ -362,20 +380,36 @@ function ListBoxPopup<T extends object>(props: ListBoxPopupProps<T>) {
     width: comboBoxRef?.current?.clientWidth,
   };
 
+  // Choosing `273` as a defined max-height. `42px` is the min-height of each option, so this allows
+  // 6.5 options in view at a time (doing `.5` so the user can easily tell if there are more).
+  const maxListHeight = 273;
+  const [listHeight, setListHeight] = useState(maxListHeight);
+
   return (
     <OverlayContainer>
       <div {...{ ...overlayProps, ...positionProps }} ref={popoverRef}>
+        {/* Setting the dynamic height as an inline style attribute instead of via TRUSS to avoid generating a new CSS class for each possible height change */}
         <ul
           css={{
             ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.$,
             "&:hover": Css.bshHover.$,
           }}
+          style={{ height: Math.min(maxListHeight, listHeight) }}
           ref={listBoxRef}
           {...listBoxProps}
         >
-          {[...state.collection].map((item) => (
-            <Option key={item.key} item={item} state={state} />
-          ))}
+          <Virtuoso
+            totalListHeightChanged={setListHeight}
+            totalCount={state.collection.size}
+            itemContent={(idx) => {
+              // MapIterator doesn't have at/index lookup so make a copy
+              const keys = [...state.collection.getKeys()];
+              const item = state.collection.getItem(keys[idx]);
+              if (item) {
+                return <Option key={item.key} item={item} state={state} />;
+              }
+            }}
+          />
         </ul>
         <DismissButton onDismiss={() => state.close()} />
       </div>
@@ -415,7 +449,7 @@ function Option<T extends object>({ item, state }: { item: Node<T>; state: Combo
       css={{
         ...Css.df.itemsCenter.justifyBetween.py1.px2.mh("42px").cursorPointer.gray900.sm.$,
         ...(isHovered ? Css.bgGray100.$ : {}),
-        ...(isFocused ? Css.add("boxShadow", `0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
+        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
       }}
     >
       {item.rendered}
@@ -437,6 +471,7 @@ interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
   fieldDecoration?: (opt: T) => ReactNode;
   /** Sets the form field label. */
   label?: string;
+  inlineLabel?: boolean;
   readOnly?: boolean;
   onBlur?: () => void;
   onFocus?: () => void;

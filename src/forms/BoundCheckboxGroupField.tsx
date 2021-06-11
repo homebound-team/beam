@@ -8,7 +8,7 @@ export type BoundCheckboxGroupFieldProps = Omit<
   CheckboxGroupProps,
   "values" | "onChange" | "label" | "onBlur" | "onFocus"
 > & {
-  field: FieldState<string[] | null | undefined>;
+  field: FieldState<any, string[] | null | undefined>;
   /** Make optional so that callers can override if they want to. */
   onChange?: (values: string[]) => void;
   label?: string;

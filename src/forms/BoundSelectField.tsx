@@ -11,7 +11,7 @@ export type BoundSelectFieldProps<T extends object, V extends Key> = Omit<
 > & {
   // Allow `onSelect` to be overridden to do more than just `field.set`.
   onSelect?: (option: V | undefined) => void;
-  field: FieldState<V | null | undefined>;
+  field: FieldState<any, V | null | undefined>;
 };
 
 /**

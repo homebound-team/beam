@@ -60,6 +60,7 @@ export const TabsWithContent = () => {
           onChange={setSelectedTab2}
           selected={selectedTab2}
           ariaLabel="Sample Tabs With Content"
+          contentXss={Css.m3.$}
         />
       </div>
     </div>

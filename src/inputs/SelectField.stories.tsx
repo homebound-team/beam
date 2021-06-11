@@ -4,6 +4,7 @@ import { Key, useState } from "react";
 import { Icon, Icons } from "src/components";
 import { Css } from "src/Css";
 import { HasIdAndName, Optional, SelectField, SelectFieldProps } from "src/inputs";
+import { zeroTo } from "src/utils/sb";
 
 export default {
   component: SelectField,
@@ -21,6 +22,7 @@ const options: TestOption[] = [
   { id: "2", name: "Camera", icon: "camera" },
   { id: "3", name: "Info Circle", icon: "infoCircle" },
   { id: "4", name: "Calendar", icon: "calendar" },
+  { id: "5", name: "Dollar dollar bill, ya'll! ".repeat(5), icon: "dollar" },
 ];
 
 const optionsWithNumericIds: TestOption[] = [
@@ -29,6 +31,11 @@ const optionsWithNumericIds: TestOption[] = [
   { id: 3, name: "Three" },
   { id: 4, name: "Four" },
 ];
+
+export function StressTest() {
+  const options: TestOption[] = zeroTo(1000).map((i) => ({ id: i, name: `Project ${i}` }));
+  return <TestSelectField label="Project" value={options[2].id} options={options} />;
+}
 
 export function SelectFields() {
   return (
@@ -122,6 +129,28 @@ export function SelectFields() {
         <TestSelectField compact label="Favorite Icon - Disabled" value={undefined} options={options} disabled />
         <TestSelectField compact label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
         <TestSelectField compact label="Favorite Icon - Invalid" options={options} value={undefined} />
+      </div>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Inline Label</h1>
+        <TestSelectField inlineLabel label="Favorite Icon" value={options[2].id} options={options} />
+        <TestSelectField inlineLabel compact label="Favorite Icon" value={options[2].id} options={options} />
+        <TestSelectField
+          label="Favorite Icon"
+          inlineLabel
+          options={options}
+          fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
+          value={options[4].id}
+          getOptionMenuLabel={(o) => (
+            <div css={Css.df.itemsCenter.$}>
+              {o.icon && (
+                <span css={Css.fs0.mr2.$}>
+                  <Icon icon={o.icon} />
+                </span>
+              )}
+              {o.name}
+            </div>
+          )}
+        />
       </div>
     </div>
   );

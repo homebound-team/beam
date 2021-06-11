@@ -1,6 +1,6 @@
 import { HTMLAttributes, KeyboardEvent, ReactNode, useMemo, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
-import { Css } from "src/Css";
+import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
 import { Icon, Icons } from "./Icon";
@@ -13,21 +13,30 @@ export interface Tab {
   render: () => ReactNode;
 }
 
-interface TabsProps {
+type TabsContentXss = Xss<Margin>;
+
+export interface TabsProps<X extends Properties> {
   ariaLabel?: string;
   // the selected tab is connected to the contents displayed
   selected: string;
   tabs: Tab[];
   onChange: (value: string) => void;
+  contentXss?: X;
 }
 
-export function TabsWithContent(props: TabsProps) {
-  const { selected, tabs, ...others } = props;
+/**
+ * Provides a list of tabs and their content.
+ *
+ * The caller is responsible for using `selected` / `onChange` to control
+ * the current tab.
+ */
+export function TabsWithContent<X extends Only<TabsContentXss, X>>(props: TabsProps<X>) {
+  const { selected, tabs, contentXss = {}, ...others } = props;
   const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
   const tid = useTestIds(others, "tab");
 
   return (
-    <>
+    <div>
       <Tabs {...props} />
       <div
         aria-labelledby={`${selectedTab.value}-tab`}
@@ -35,14 +44,19 @@ export function TabsWithContent(props: TabsProps) {
         role="tabpanel"
         tabIndex={0}
         {...tid.panel}
+        css={{
+          ...Css.mt2.$,
+          ...contentXss,
+        }}
       >
         {selectedTab.render()}
       </div>
-    </>
+    </div>
   );
 }
 
-function Tabs(props: TabsProps) {
+/** The top list of tabs. */
+function Tabs(props: TabsProps<{}>) {
   const { ariaLabel, onChange, selected, tabs, ...others } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
   const tid = useTestIds(others, "tabs");
@@ -159,7 +173,8 @@ function SingleTab(props: TabProps) {
 
 export function getTabStyles() {
   return {
-    baseStyles: Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.outline0.gray700.add("width", "fit-content").$,
+    baseStyles: Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.outline0.gray700.add("width", "fit-content")
+      .cursorPointer.$,
     activeStyles: Css.lightBlue700.bgLightBlue50.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
     focusRingStyles: Css.bgLightBlue50.bshFocus.$,
