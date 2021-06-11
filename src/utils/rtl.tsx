@@ -1,6 +1,7 @@
 import { RenderResult, Wrapper } from "@homebound/rtl-utils";
 import { prettyDOM } from "@testing-library/react";
 import { SuperDrawerProvider } from "src";
+export * from "@homebound/rtl-react-router-utils";
 export * from "@homebound/rtl-utils";
 
 export function cell(r: RenderResult, row: number, column: number): HTMLElement {
