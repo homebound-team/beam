@@ -57,7 +57,6 @@ export function CheckboxBase(props: CheckboxBaseProps) {
           .maxw(px(344))
           .if(isDisabled).cursorNotAllowed.$
       }
-      {...tid}
     >
       <VisuallyHidden>
         <input ref={ref} {...inputProps} {...focusProps} />
