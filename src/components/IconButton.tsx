@@ -6,13 +6,15 @@ import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils/useTestIds";
 
 export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
-  // The icon to use within the button
+  /** The icon to use within the button. */
   icon: IconProps["icon"];
   color?: Palette;
+  /** The size of the icon, in increments, defaults to 3 which is 24px. */
+  inc?: number;
 }
 
 export function IconButton(props: IconButtonProps) {
-  const { onClick: onPress, disabled: isDisabled, color, icon, autoFocus } = props;
+  const { onClick: onPress, disabled: isDisabled, color, icon, autoFocus, inc } = props;
   const ariaProps = { onPress, isDisabled, autoFocus };
   const ref = useRef(null);
   const { buttonProps } = useButton(ariaProps, ref);
@@ -32,7 +34,7 @@ export function IconButton(props: IconButtonProps) {
 
   return (
     <button {...testIds} {...buttonProps} {...focusProps} {...hoverProps} ref={ref} css={styles}>
-      <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : Palette.Gray900)} />
+      <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : Palette.Gray900)} inc={inc} />
     </button>
   );
 }
