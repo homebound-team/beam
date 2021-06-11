@@ -49,15 +49,37 @@ export function NumberField(props: NumberFieldProps) {
       : undefined;
   }, [type]);
 
+  // Keep a ref the last "before WIP" value that we passed into react-aria.
+  //
+  // This is b/c NumberFieldStateProps.onChange only actually calls during
+  // `onBlur`, with the committed value. But we want our FieldStates to have
+  // the latest WIP value, i.e. so that validation rules can be reacting
+  // real time.
+  //
+  // However, if we treat useNumberField as "too controlled" and keep passing
+  // in the latest WIP value, they'll see it as a state change and reset the
+  // user's cursor.
+  //
+  // So just keep them out of the loop on `value` changes while that is happening.
+  type ValueRef = { wip: true; value: number | undefined } | { wip: false };
+  const valueRef = useRef<ValueRef>({ wip: false });
+
   const { locale } = useLocale();
   // We can use this for both useNumberFieldState + useNumberField
   const useProps: NumberFieldStateProps = {
     locale,
     // We want percents && cents to be integers, useNumberFieldState excepts them as decimals
-    value: value === undefined ? Number.NaN : value / factor,
-    // Reverse the integer/decimal conversion
+    value: valueRef.current.wip ? valueRef.current.value : value === undefined ? Number.NaN : value / factor,
+    // This is called on blur with the final/committed value.
     onChange: (value) => {
+      // Reverse the integer/decimal conversion
       onChange(Number.isNaN(value) ? undefined : factor !== 1 ? Math.round(value * factor) : value);
+    },
+    onFocus: () => {
+      valueRef.current = { wip: true, value };
+    },
+    onBlur: () => {
+      valueRef.current = { wip: false };
     },
     validationState: errorMsg !== undefined ? "invalid" : "valid",
     label: label ?? "number",
@@ -76,6 +98,14 @@ export function NumberField(props: NumberFieldProps) {
       labelProps={labelProps}
       label={label}
       inputProps={inputProps}
+      // This is called on each DOM change, to push the latest value into the field
+      onChange={(value) => {
+        // If the wip value is invalid, i.e. it's `10b`, don't push that back into the field state
+        const wip = Number((value || "").replace(/[^0-9]/g, ""));
+        if (!Number.isNaN(wip)) {
+          onChange(factor !== 1 ? Math.round(wip * factor) : wip);
+        }
+      }}
       inputRef={inputRef}
       onBlur={onBlur}
       onFocus={onFocus}
