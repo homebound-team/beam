@@ -22,8 +22,7 @@ export function BoundCheckboxField(props: BoundCheckboxFieldProps) {
           label={label}
           selected={field.value ?? false}
           onChange={(selected) => {
-            // We are ignoring focus and blur for checkbox fields due to its transactional nature
-            field.focus();
+            // We are triggering blur manually for checkbox fields due to its transactional nature
             onChange(selected);
             field.blur();
           }}
