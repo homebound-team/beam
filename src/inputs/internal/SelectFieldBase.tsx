@@ -6,10 +6,9 @@ import { CollectionChildren, Selection } from "@react-types/shared";
 import React, { Key, ReactNode, useRef, useState } from "react";
 import { useButton, useFocusRing, useOverlayPosition } from "react-aria";
 import { useMultipleSelectionState } from "react-stately";
-import { ListBox } from "src/components/ListBox";
-import { Popover } from "src/components/Popover";
+import { ListBox, Popover } from "src/components/internal";
 import { Css, px } from "src/Css";
-import { ComboBoxInput } from "src/inputs/ComboBoxInput";
+import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
 import { BeamFocusableProps } from "src/interfaces";
 
 export interface SelectFieldBaseProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
@@ -48,7 +47,7 @@ export function SelectFieldBase<O extends object, V extends Key>(props: SelectFi
   const { contains } = useFilter({ sensitivity: "base" });
 
   // Use the current value to find the option
-  const selectedKeys: V[] = values ? values : [];
+  const selectedKeys: V[] = values ?? [];
   // @ts-ignore, we need to coerce this to be a string,...
   const selectedOptions = options.filter((o) => selectedKeys.includes(String(getOptionValue(o))));
 
@@ -62,7 +61,11 @@ export function SelectFieldBase<O extends object, V extends Key>(props: SelectFi
     isOpen: false,
     selectedKeys: selectedKeys,
     inputValue:
-      selectedOptions.length === 1 ? getOptionLabel(selectedOptions[0]) : selectedOptions.length > 0 ? "..." : "All",
+      selectedOptions.length === 1
+        ? getOptionLabel(selectedOptions[0])
+        : multiselect && selectedOptions.length === 0
+        ? "All"
+        : "",
     filteredOptions: options,
     selectedOptions: selectedOptions,
   });
@@ -84,7 +87,7 @@ export function SelectFieldBase<O extends object, V extends Key>(props: SelectFi
           return;
         }
 
-        if (keys.size === 0) {
+        if (multiselect && keys.size === 0) {
           // "All" happens if we selected everything or nothing.
           setFieldState({
             ...fieldState,
@@ -124,20 +127,16 @@ export function SelectFieldBase<O extends object, V extends Key>(props: SelectFi
       }}
       onInputChange={(value) => {
         setFieldState((prevState) => ({
+          ...prevState,
           isOpen: true,
           inputValue: value,
-          selectedKeys: prevState.selectedKeys,
           filteredOptions: options.filter((o) => contains(getOptionLabel(o), value)),
-          selectedOptions: prevState.selectedOptions,
         }));
       }}
       onOpenChange={(isOpen) => {
         setFieldState((prevState) => ({
+          ...prevState,
           isOpen,
-          inputValue: prevState.inputValue,
-          selectedKeys: prevState.selectedKeys,
-          filteredOptions: prevState.filteredOptions,
-          selectedOptions: prevState.selectedOptions,
         }));
       }}
     >
@@ -164,7 +163,7 @@ interface ComboBoxProps<O extends object, V extends Key> extends BeamSelectField
   getOptionValue: (opt: O) => V;
 }
 
-/** Ties together ComboBoxInput (text field) and the ListBoxPopup (drop down). */
+/** Ties together SelectFieldInput (text field) and the ListBox (drop down). */
 function ComboBox<O extends object, V extends Key>(props: ComboBoxProps<O, V>) {
   const {
     compact = false,
@@ -199,7 +198,8 @@ function ComboBox<O extends object, V extends Key>(props: ComboBoxProps<O, V>) {
       // ignore undefined/null keys - `null` can happen if input field's value is completely deleted after having a value assigned.
       if (key) {
         const selectedKeys = multipleSelectionState.selectedKeys;
-        const newSelection: Set<Key> = new Set(selectedKeys !== "all" ? [...selectedKeys, key] : [key]);
+        // Create the `newSelection` Set depending on the value type of SelectField.
+        const newSelection: Set<Key> = new Set(!multiselect ? [key] : [...selectedKeys, key]);
         // Use only the `multipleSelectionState` to manage selected keys
         multipleSelectionState.setSelectedKeys(newSelection);
       }
@@ -208,8 +208,16 @@ function ComboBox<O extends object, V extends Key>(props: ComboBoxProps<O, V>) {
 
   const multipleSelectionState = useMultipleSelectionState({
     selectionMode: multiselect ? "multiple" : "single",
+    // Do not allow an empty selection if single select mode
+    disallowEmptySelection: !multiselect,
     selectedKeys,
-    onSelectionChange,
+    onSelectionChange: (keys) => {
+      // Close menu upon selection change only for Single selection mode
+      if (!multiselect) {
+        state.close();
+      }
+      onSelectionChange(keys);
+    },
   });
 
   //@ts-ignore - `selectionManager.state` exists, but not according to the types
@@ -255,7 +263,7 @@ function ComboBox<O extends object, V extends Key>(props: ComboBoxProps<O, V>) {
 
   return (
     <div css={Css.dif.flexColumn.w100.maxw(px(550)).$} ref={comboBoxRef} {...focusProps}>
-      <ComboBoxInput
+      <SelectFieldInput
         buttonProps={buttonProps}
         buttonRef={triggerRef}
         compact={compact}
@@ -274,6 +282,8 @@ function ComboBox<O extends object, V extends Key>(props: ComboBoxProps<O, V>) {
         inlineLabel={inlineLabel}
         label={label}
         labelProps={labelProps}
+        selectedOptions={selectedOptions}
+        getOptionValue={getOptionValue}
       />
       {state.isOpen && (
         <Popover

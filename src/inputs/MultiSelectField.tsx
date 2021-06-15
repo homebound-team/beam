@@ -1,5 +1,5 @@
 import React, { Key, ReactNode } from "react";
-import { BeamSelectFieldBaseProps, SelectFieldBase } from "src/inputs/SelectFieldBase";
+import { BeamSelectFieldBaseProps, SelectFieldBase } from "src/inputs/internal/SelectFieldBase";
 import { HasIdAndName, Optional } from "src/types";
 
 export interface MultiSelectFieldProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
@@ -7,7 +7,6 @@ export interface MultiSelectFieldProps<O extends object, V extends Key> extends 
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
-  /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[];
   onSelect?: (values: V[], opts: O[]) => void;
   options: O[];

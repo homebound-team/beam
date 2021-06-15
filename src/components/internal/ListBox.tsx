@@ -3,7 +3,7 @@ import React, { Key, MutableRefObject, useState } from "react";
 import { DismissButton, useListBox } from "react-aria";
 import { Virtuoso } from "react-virtuoso";
 import { Icon } from "src/components/Icon";
-import { Option } from "src/components/Option";
+import { Option } from "src/components/internal";
 import { Css } from "src/Css";
 
 interface ListBoxProps<O extends object, V extends Key> {
@@ -16,6 +16,7 @@ interface ListBoxProps<O extends object, V extends Key> {
   getOptionValue: (opt: O) => V;
 }
 
+/** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
 export function ListBox<O extends object, V extends Key>(props: ListBoxProps<O, V>) {
   const {
     state,
@@ -80,6 +81,7 @@ interface ListBoxChipProps<O extends object, V extends Key> {
   getOptionValue: (opt: O) => V;
 }
 
+/** Chip used to display selections within ListBox when using the MultiSelectField */
 function ListBoxChip<O extends object, V extends Key>(props: ListBoxChipProps<O, V>) {
   const { state, option, getOptionLabel, getOptionValue } = props;
   return (
@@ -94,7 +96,7 @@ function ListBoxChip<O extends object, V extends Key>(props: ListBoxChipProps<O,
           state.selectionManager.toggleSelection(String(getOptionValue(option)));
         }}
       >
-        <span css={Css.prPx(6).$}>{getOptionLabel(option)}</span>
+        <span css={Css.prPx(6).tl.$}>{getOptionLabel(option)}</span>
         <span css={Css.fs0.br16.bgGray400.mrPx(2).$}>
           <Icon icon="x" />
         </span>

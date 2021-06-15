@@ -1,5 +1,5 @@
 import React, { Key, ReactNode } from "react";
-import { BeamSelectFieldBaseProps, SelectFieldBase } from "src/inputs/SelectFieldBase";
+import { BeamSelectFieldBaseProps, SelectFieldBase } from "src/inputs/internal/SelectFieldBase";
 import { HasIdAndName, Optional } from "src/types";
 
 export interface SelectFieldProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {

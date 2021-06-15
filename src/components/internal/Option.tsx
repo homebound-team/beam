@@ -5,6 +5,7 @@ import { ListState, TreeState } from "react-stately";
 import { Icon } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
 
+/** Represents a single option within a ListBox - used by SelectField and MultiSelectField */
 export function Option<T extends object>({ item, state }: { item: Node<T>; state: ListState<T> | TreeState<T> }) {
   const ref = useRef<HTMLLIElement>(null);
   const isDisabled = state.disabledKeys.has(item.key);

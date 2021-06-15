@@ -33,12 +33,9 @@ const optionsWithNumericIds: TestOption[] = [
   { id: 4, name: "Four" },
 ];
 
-export function StressTest() {
-  const options: TestOption[] = zeroTo(1000).map((i) => ({ id: i, name: `Project ${i}` }));
-  return <TestSelectField label="Project" value={options[2].id} options={options} />;
-}
-
 export function SelectFields() {
+  const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: i, name: `Project ${i}` }));
+
   return (
     <div css={Css.df.flexColumn.childGap5.$}>
       <div css={Css.df.flexColumn.childGap2.$}>
@@ -153,6 +150,10 @@ export function SelectFields() {
           )}
         />
       </div>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Load test, 1000 Options</h1>
+        <TestSelectField label="Project" value={loadTestOptions[2].id} options={loadTestOptions} />;
+      </div>
     </div>
   );
 }
@@ -167,6 +168,7 @@ function TestSelectField<T extends object, V extends Key>(
   props: Optional<Omit<SelectFieldProps<T, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element {
   const [selectedOption, setSelectedOption] = useState<V | undefined>(props.value);
+
   return (
     <SelectField<T, V>
       // The `as any` is due to something related to https://github.com/emotion-js/emotion/issues/2169
