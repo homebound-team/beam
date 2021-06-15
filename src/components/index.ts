@@ -5,6 +5,7 @@ export * from "./GridTable";
 export * from "./Icon";
 export * from "./IconButton";
 export { NavLink } from "./NavLink";
+export * from "./RichTextField";
 export * from "./SuperDrawer";
 export { TabsWithContent } from "./Tabs";
 export * from "./Tooltip";
