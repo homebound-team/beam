@@ -152,7 +152,7 @@ export function SelectFields() {
       </div>
       <div css={Css.df.flexColumn.childGap2.$}>
         <h1 css={Css.lg.$}>Load test, 1000 Options</h1>
-        <TestSelectField label="Project" value={loadTestOptions[2].id} options={loadTestOptions} />;
+        <TestSelectField label="Project" value={loadTestOptions[2].id} options={loadTestOptions} />
       </div>
     </div>
   );

@@ -25,13 +25,6 @@ const options: TestOption[] = [
   { id: "5", name: "Dollar dollar bill, ya'll! ".repeat(5), icon: "dollar" },
 ];
 
-const optionsWithNumericIds: TestOption[] = [
-  { id: 1, name: "One" },
-  { id: 2, name: "Two" },
-  { id: 3, name: "Three" },
-  { id: 4, name: "Four" },
-];
-
 export function MultiSelectFields() {
   return (
     <div css={Css.df.flexColumn.childGap5.$}>
