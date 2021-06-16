@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
-import { Css, px } from "src/Css";
+import { Css, px, Xss } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamTextFieldProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -25,6 +25,8 @@ interface TextFieldBaseProps
   groupProps?: NumberFieldAria["groupProps"];
   /** TextField specific */
   compact?: boolean;
+  /** Styles overrides */
+  xss?: Xss<"textAlign">;
 }
 
 // Used by both TextField and TextArea
@@ -42,6 +44,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     onChange,
     onBlur,
     onFocus,
+    xss,
   } = props;
   const errorMessageId = `${inputProps.id}-error`;
 
@@ -69,6 +72,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         rows={multiline ? 1 : undefined}
         css={{
           ...Css.add("resize", "none").bgWhite.sm.px1.hPx(40).gray900.br4.outline0.ba.bGray300.if(compact).hPx(32).$,
+          ...xss,
           ...Css.if(multiline).mh(px(96)).py1.px2.$,
           "&:focus": Css.bLightBlue700.$,
           "&:disabled": Css.gray400.bgGray100.cursorNotAllowed.$,
