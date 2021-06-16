@@ -32,12 +32,12 @@ function DrawerWithInputs() {
         <fieldset>
           <legend>Details</legend>
           <TextField label="Item Name" value="Counters" onChange={action("TextField - onChange")} />
-          <SelectField
+          <SelectField<Options, number>
             label="Locations"
             value={1}
             options={[
               { id: 1, name: "Kitchen" },
-              { id: 1, name: "Bathroom" },
+              { id: 2, name: "Bathroom" },
             ]}
             onSelect={action("SelectField - onSelect")}
           />
@@ -65,3 +65,8 @@ function DrawerWithInputs() {
     </SuperDrawerContent>
   );
 }
+
+type Options = {
+  id: number;
+  name: string;
+};
