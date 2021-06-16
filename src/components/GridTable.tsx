@@ -712,7 +712,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...(isHeader && style.headerCellCss),
           ...getJustification(column, maybeContent, as),
           ...(idx === 0 && getIndentationCss(rowStyle)),
-          ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).$),
+          ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
           ...rowStyleCellCss,
         };
 
