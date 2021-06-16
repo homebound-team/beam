@@ -602,7 +602,18 @@ function getIndentationCss<R extends Kinded>(rowStyle: RowStyle<R> | undefined):
 
 export type GridCellAlignment = "left" | "right" | "center";
 
-export type GridCellContent = { content: ReactNode; alignment?: GridCellAlignment; value?: number | string | Date };
+/**
+ * Allows a cell to be more than just a RectNode, i.e. declare its alignment or
+ * primitive value for filtering and sorting.
+ */
+export type GridCellContent = {
+  content: ReactNode;
+  alignment?: GridCellAlignment;
+  /** Allow value to be a function in case it's a dynamic value i.e. reading from an inline-edited proxy. */
+  value?: MaybeFn<number | string | Date>;
+};
+
+type MaybeFn<T> = T | (() => T);
 
 /**
  * The data for any row in the table, marked by `kind` so that each column knows how to render it.
@@ -940,7 +951,12 @@ function sortBatch<R extends Kinded>(
 }
 
 function maybeValue(value: ReactNode | GridCellContent): any {
-  return value && typeof value === "object" && "value" in value ? value.value : value;
+  const maybeFn = value && typeof value === "object" && "value" in value ? value.value : value;
+  // Watch for functions that need to read from a potentially-changing proxy
+  if (maybeFn instanceof Function) {
+    return maybeFn();
+  }
+  return maybeFn;
 }
 
 /** Small custom hook that wraps the "setSortColumn inverts the current sort" logic. */
