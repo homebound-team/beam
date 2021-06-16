@@ -120,7 +120,7 @@ export function RichTextField(props: RichTextFieldProps) {
     <div css={Css.w100.maxw("550px").$}>
       {/* TODO: Not sure what to pass to labelProps. */}
       {label && <Label labelProps={{}} label={label} />}
-      <div css={trixCssOverrides}>
+      <div css={{...Css.br4.bgWhite.$, ...trixCssOverrides}}>
         {createElement("trix-editor", {
           id: `editor-${id}`,
           input: `input-${id}`,
@@ -159,10 +159,18 @@ const trixCssOverrides = {
   // Put the toolbar on the bottom
   ...Css.df.flexColumnReverse.childGap1.$,
   // Some basic copy/paste from TextFieldBase
-  "& trix-editor": Css.bgWhite.sm.gray900.br4.bGray300.$,
-  "& trix-editor:focus": Css.bLightBlue700.$,
+  "& trix-editor": Css.bgWhite.sm.gray900.br4.bGray300.bn.p2.$,
+  "& trix-toolbar": Css.m1.$,
   // Make the buttons closer to ours
+  "& .trix-button:not(:first-child)": Css.bn.$,
+  "& .trix-button-group": Css.bn.m0.$,
   "& .trix-button": Css.bgWhite.sm.$,
+  // Height is hard-coded to 1.6 in trix, and the default width is wider than we want
+  "& .trix-button--icon": Css.w("1.6em").p0.mxPx(4).bn.$,
+  // icons are hard-coded svg's, so this is a simpler way to get lighter gray for now
+  "& .trix-button--icon::before": Css.add("opacity", "0.3").$,
+  // trix defaults to is active = blue bg - turn that off + make icon darker
+  "& .trix-button.trix-active": Css.bgWhite.add("opacity", "0.7").$,
   // We don't support file attachment yet, so hide that control for now.
   "& .trix-button-group--file-tools": Css.dn.$,
   // Other things that are unused and we want to hide
