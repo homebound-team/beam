@@ -41,7 +41,7 @@ All of these points are generally in stark contrast to traditional, "big" UI too
 
 For them, a MUI application in Company A shouldn't have to look & behave exactly like a MUI application in Company B. Which makes sense.
 
-But for Beam at Homebound, we specifically _want_ a component that behaves in our App A to look & behave the same as it does in our App B.
+But for Beam at Homebound, we specifically *want* a component that behaves in our App A to look & behave the same as it does in our App B.
 
 ## Beam and Open Source
 
