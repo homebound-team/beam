@@ -209,6 +209,38 @@ describe("GridTable", () => {
     expect(cell(r, 1, 0)).toHaveTextContent("c");
   });
 
+  it("can sort by value functions", async () => {
+    // Given the table is using client-side sorting
+    const r = await render(
+      <GridTable<Row>
+        // And the value column returns a JSX.Element and a value function (i.e. from a proxy)
+        columns={[
+          nameColumn,
+          {
+            header: () => "Value",
+            data: ({ value }) => ({
+              value: () => value,
+              content: <div>{value}</div>,
+            }),
+          },
+        ]}
+        sorting="client-side"
+        rows={[
+          simpleHeader,
+          // And the data is initially unsorted
+          { kind: "data", id: "2", name: "b", value: 2 },
+          { kind: "data", id: "1", name: "a", value: 3 },
+          { kind: "data", id: "3", name: "c", value: 1 },
+        ]}
+      />,
+    );
+    // Then when sorted by the 2nd column
+    const { sortHeader_1 } = r;
+    click(sortHeader_1);
+    // Then the `value: 1` row is first
+    expect(cell(r, 1, 0)).toHaveTextContent("c");
+  });
+
   it("can sort undefined values", async () => {
     // Given the table is using client-side sorting
     const r = await render(

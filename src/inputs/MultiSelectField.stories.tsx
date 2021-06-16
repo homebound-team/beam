@@ -3,13 +3,12 @@ import { Meta } from "@storybook/react";
 import { Key, useState } from "react";
 import { Icon, Icons } from "src/components";
 import { Css } from "src/Css";
-import { SelectField, SelectFieldProps } from "src/inputs";
+import { MultiSelectField, MultiSelectFieldProps } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
-import { zeroTo } from "src/utils/sb";
 
 export default {
-  component: SelectField,
-  title: "Inputs/Select Fields",
+  component: MultiSelectField,
+  title: "Inputs/Multi Select Fields",
 } as Meta;
 
 type TestOption = {
@@ -26,23 +25,14 @@ const options: TestOption[] = [
   { id: "5", name: "Dollar dollar bill, ya'll! ".repeat(5), icon: "dollar" },
 ];
 
-const optionsWithNumericIds: TestOption[] = [
-  { id: 1, name: "One" },
-  { id: 2, name: "Two" },
-  { id: 3, name: "Three" },
-  { id: 4, name: "Four" },
-];
-
-export function SelectFields() {
-  const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: i, name: `Project ${i}` }));
-
+export function MultiSelectFields() {
   return (
     <div css={Css.df.flexColumn.childGap5.$}>
       <div css={Css.df.flexColumn.childGap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
-        <TestSelectField
-          label="Favorite Icon"
-          value={options[2].id}
+        <TestMultiSelectField
+          label="Favorite Icons"
+          values={[options[2].id]}
           options={options}
           getOptionMenuLabel={(o) => (
             <div css={Css.df.itemsCenter.$}>
@@ -55,11 +45,11 @@ export function SelectFields() {
             </div>
           )}
         />
-        <TestSelectField
+        <TestMultiSelectField
           label="Favorite Icon - with field decoration"
           options={options}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
-          value={options[1].id}
+          values={[options[1].id]}
           getOptionMenuLabel={(o) => (
             <div css={Css.df.itemsCenter.$}>
               {o.icon && (
@@ -71,30 +61,26 @@ export function SelectFields() {
             </div>
           )}
         />
-        <TestSelectField label="Favorite Icon - Disabled" value={undefined} options={options} disabled />
-        <TestSelectField label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
-        <TestSelectField label="Favorite Icon - Invalid" value={undefined} options={options} />
-        <TestSelectField
-          label="Favorite Icon - Helper Text"
-          value={options[0].id}
+        <TestMultiSelectField
+          label="Icons - Multiple selected"
           options={options}
-          helperText="Some really long helper text that we expect to wrap."
+          fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
+          values={[options[1].id, options[2].id]}
         />
-        <TestSelectField
-          label="Favorite Number - Numeric"
-          value={1}
-          options={optionsWithNumericIds}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
+        <TestMultiSelectField
+          label="Icons - none selected (All case)"
+          options={options}
+          fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
+          values={[] as Key[]}
         />
       </div>
 
       <div css={Css.df.flexColumn.childGap2.$}>
         <h1 css={Css.lg.$}>Compact</h1>
-        <TestSelectField
+        <TestMultiSelectField
           compact
-          label="Favorite Icon"
-          value={options[2].id}
+          label="Favorite Icons"
+          values={[options[2].id]}
           options={options}
           getOptionMenuLabel={(o) => (
             <div css={Css.df.itemsCenter.$}>
@@ -107,12 +93,12 @@ export function SelectFields() {
             </div>
           )}
         />
-        <TestSelectField
+        <TestMultiSelectField
           compact
           label="Favorite Icon - with field decoration"
           options={options}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
-          value={options[1].id}
+          values={[options[1].id]}
           getOptionMenuLabel={(o) => (
             <div css={Css.df.itemsCenter.$}>
               {o.icon && (
@@ -124,20 +110,31 @@ export function SelectFields() {
             </div>
           )}
         />
-        <TestSelectField compact label="Favorite Icon - Disabled" value={undefined} options={options} disabled />
-        <TestSelectField compact label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
-        <TestSelectField compact label="Favorite Icon - Invalid" options={options} value={undefined} />
+        <TestMultiSelectField
+          compact
+          label="Icons - Multiple selected"
+          options={options}
+          fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
+          values={[options[1].id, options[2].id]}
+        />
+        <TestMultiSelectField
+          compact
+          label="Icons - none selected (All case)"
+          options={options}
+          fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
+          values={[] as Key[]}
+        />
       </div>
       <div css={Css.df.flexColumn.childGap2.$}>
         <h1 css={Css.lg.$}>Inline Label</h1>
-        <TestSelectField inlineLabel label="Favorite Icon" value={options[2].id} options={options} />
-        <TestSelectField inlineLabel compact label="Favorite Icon" value={options[2].id} options={options} />
-        <TestSelectField
+        <TestMultiSelectField inlineLabel label="Favorite Icon" values={[options[2].id]} options={options} />
+        <TestMultiSelectField inlineLabel compact label="Favorite Icon" values={[options[2].id]} options={options} />
+        <TestMultiSelectField
           label="Favorite Icon"
           inlineLabel
           options={options}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
-          value={options[4].id}
+          values={[options[4].id]}
           getOptionMenuLabel={(o) => (
             <div css={Css.df.itemsCenter.$}>
               {o.icon && (
@@ -149,10 +146,6 @@ export function SelectFields() {
             </div>
           )}
         />
-      </div>
-      <div css={Css.df.flexColumn.childGap2.$}>
-        <h1 css={Css.lg.$}>Load test, 1000 Options</h1>
-        <TestSelectField label="Project" value={loadTestOptions[2].id} options={loadTestOptions} />
       </div>
     </div>
   );
@@ -160,23 +153,24 @@ export function SelectFields() {
 
 // Kind of annoying but to get type inference for HasIdAndName working, we
 // have to re-copy/paste the overload here.
-function TestSelectField<T extends object, V extends Key>(props: Omit<SelectFieldProps<T, V>, "onSelect">): JSX.Element;
-function TestSelectField<O extends HasIdAndName<V>, V extends Key>(
-  props: Optional<Omit<SelectFieldProps<O, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
+function TestMultiSelectField<T extends object, V extends Key>(
+  props: Omit<MultiSelectFieldProps<T, V>, "onSelect">,
 ): JSX.Element;
-function TestSelectField<T extends object, V extends Key>(
-  props: Optional<Omit<SelectFieldProps<T, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
+function TestMultiSelectField<O extends HasIdAndName<V>, V extends Key>(
+  props: Optional<Omit<MultiSelectFieldProps<O, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
+): JSX.Element;
+function TestMultiSelectField<T extends object, V extends Key>(
+  props: Optional<Omit<MultiSelectFieldProps<T, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element {
-  const [selectedOption, setSelectedOption] = useState<V | undefined>(props.value);
+  const [selectedOptions, setSelectedOptions] = useState<V[]>(props.values);
 
   return (
-    <SelectField<T, V>
+    <MultiSelectField<T, V>
       // The `as any` is due to something related to https://github.com/emotion-js/emotion/issues/2169
       // We may have to redo the conditional getOptionValue/getOptionLabel
       {...(props as any)}
-      value={selectedOption}
-      onSelect={setSelectedOption}
-      errorMsg={selectedOption || props.disabled ? "" : "Select an option. Plus more error text to force it to wrap."}
+      values={selectedOptions}
+      onSelect={setSelectedOptions}
       onBlur={action("onBlur")}
       onFocus={action("onFocus")}
     />

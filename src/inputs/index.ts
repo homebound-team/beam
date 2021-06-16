@@ -1,6 +1,7 @@
 export * from "./Checkbox";
 export * from "./CheckboxGroup";
 export * from "./DateField";
+export * from "./MultiSelectField";
 export * from "./NumberField";
 export { RadioFieldOption, RadioGroupField, RadioGroupFieldProps } from "./RadioGroupField";
 export * from "./SelectField";

@@ -2,6 +2,7 @@ import { useNumberField } from "@react-aria/numberfield";
 import { NumberFieldStateProps, useNumberFieldState } from "@react-stately/numberfield";
 import { ReactNode, useMemo, useRef } from "react";
 import { useLocale } from "react-aria";
+import { Css, Xss } from "src/Css";
 import { TextFieldBase } from "./TextFieldBase";
 
 // exported for testing purposes
@@ -17,6 +18,8 @@ export interface NumberFieldProps {
   onBlur?: () => void;
   onFocus?: () => void;
   readOnly?: boolean;
+  /** Styles overrides */
+  xss?: Xss<"textAlign">;
 }
 
 export function NumberField(props: NumberFieldProps) {
@@ -32,6 +35,7 @@ export function NumberField(props: NumberFieldProps) {
     compact = false,
     value,
     onChange,
+    xss,
     ...otherProps
   } = props;
 
@@ -94,6 +98,7 @@ export function NumberField(props: NumberFieldProps) {
 
   return (
     <TextFieldBase
+      xss={{ ...Css.tr.$, ...xss }}
       groupProps={groupProps}
       labelProps={labelProps}
       label={label}
