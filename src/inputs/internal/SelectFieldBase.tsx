@@ -66,7 +66,8 @@ export function SelectFieldBase<O extends object, V extends Key>(props: SelectFi
         : multiselect && selectedOptions.length === 0
         ? "All"
         : "",
-    filteredOptions: options,
+    // @ts-ignore, we need to coerce this to be a string
+    filteredOptions: options.filter((o) => !selectedKeys.includes(String(getOptionValue(o)))),
     selectedOptions: selectedOptions,
   });
 
@@ -107,11 +108,11 @@ export function SelectFieldBase<O extends object, V extends Key>(props: SelectFi
 
         if (multiselect) {
           setFieldState({
-            ...fieldState,
             isOpen: true,
             inputValue: keysArray.length === 1 ? getOptionLabel(firstSelectedOption!) : "",
             selectedKeys: keysArray as V[],
             selectedOptions: options.filter((o) => keysArray.includes(String(getOptionValue(o)))),
+            filteredOptions: options.filter((o) => !keysArray.includes(String(getOptionValue(o)))),
           });
         } else {
           setFieldState({

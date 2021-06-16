@@ -19,7 +19,7 @@ export function Label({ labelProps, label, ...others }: LabelProps) {
 /** Used for showing labels within text fields. */
 export function InlineLabel({ labelProps, label, ...others }: LabelProps) {
   return (
-    <label {...labelProps} {...others} css={Css.smEm.gray900.prPx(4).$}>
+    <label {...labelProps} {...others} css={Css.smEm.nowrap.gray900.prPx(4).$}>
       {label}:
     </label>
   );
