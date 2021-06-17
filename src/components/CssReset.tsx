@@ -319,13 +319,6 @@ Add the correct display in Chrome and Safari.
     margin: 0;
     padding: 0;
   }
-
-  ol,
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
 `;
 
 // See https://tailwindcss.com/docs/preflight
@@ -366,7 +359,7 @@ const tailwindPreflightReset = css`
  *    is wrapped by a div with box-sizing set to content-box.
  *
  *    https://github.com/mozdevs/cssremedy/issues/4
- * 
+ *
  * 2. Setting border width to 0 removes the default border from elements
  *    like the button and fieldset
  */

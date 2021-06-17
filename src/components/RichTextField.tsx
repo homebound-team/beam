@@ -187,9 +187,6 @@ const trixCssOverrides = {
   "& .trix-button--icon-increase-nesting-level": Css.dn.$,
   "& .trix-button--icon-decrease-nesting-level": Css.dn.$,
   "& .trix-button-group--history-tools": Css.dn.$,
-  // Put back list styles that CssReset is probably too aggressive with
-  "& ul": Css.ml2.add("listStyleType", "disc").$,
-  "& ol": Css.ml2.add("listStyleType", "decimal").$,
 };
 
 // Style the @ mention box
