@@ -91,16 +91,23 @@ export function RichTextField(props: RichTextFieldProps) {
         }
       }
 
+      // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
+      // https://github.com/basecamp/trix#storing-attached-files
+      const preventDefault = (e: any) => e.preventDefault();
+      window.addEventListener("trix-file-accept", preventDefault);
+
       const trixBlur = () => maybeCall(onBlur);
       const trixFocus = () => maybeCall(onFocus);
 
       editorElement.addEventListener("trix-change", trixChange as any, false);
       editorElement.addEventListener("trix-blur", trixBlur as any, false);
       editorElement.addEventListener("trix-focus", trixFocus as any, false);
+
       return () => {
         editorElement.removeEventListener("trix-change", trixChange as any);
         editorElement.removeEventListener("trix-blur", trixBlur as any);
         editorElement.removeEventListener("trix-focus", trixFocus as any);
+        window.removeEventListener("trix-file-accept", preventDefault);
       };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
