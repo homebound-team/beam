@@ -118,9 +118,9 @@ export function SelectFieldBase<O extends object, V extends Key>(props: SelectFi
           setFieldState({
             ...fieldState,
             isOpen: false,
-            inputValue: getOptionLabel(firstSelectedOption!),
+            inputValue: firstSelectedOption ? getOptionLabel(firstSelectedOption) : "",
             selectedKeys: [firstKey] as V[],
-            selectedOptions: [firstSelectedOption!],
+            selectedOptions: firstSelectedOption ? [firstSelectedOption] : [],
           });
         }
 
