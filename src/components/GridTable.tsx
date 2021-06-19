@@ -73,12 +73,16 @@ export interface GridStyle {
   rootCss: Properties;
   /** Applied with the owl operator between rows for rendering border lines. */
   betweenRowsCss: Properties;
+  /** Applied to the first non-header row, i.e. if you want to cancel out `betweenRowsCss`. */
+  firstNonHeaderRowCss: Properties;
   /** Applied to all cell divs (via a selector off the base div). */
   cellCss: Properties;
   /** Applied to the header (really first) row div. */
   headerCellCss: Properties;
-  /** Applied to the first cell of all rows, i.e. for table-wide padding. */
+  /** Applied to the first cell of all rows, i.e. for table-wide padding or left-side borders. */
   firstCellCss: Properties;
+  /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
+  lastCellCss: Properties;
   /** Applied to a cell div when `indent: 1` is used. */
   indentOneCss: Properties;
   /** Applied to a cell div when `indent: 2` is used. */
@@ -93,8 +97,10 @@ export interface GridStyle {
 export let defaultStyle: GridStyle = {
   rootCss: Css.gray700.$,
   betweenRowsCss: Css.bt.bGray400.$,
+  firstNonHeaderRowCss: Css.add({ borderTopStyle: "none" }).$,
   cellCss: Css.py2.px3.$,
   firstCellCss: Css.pl1.$,
+  lastCellCss: Css.$,
   indentOneCss: Css.pl4.$,
   indentTwoCss: Css.pl7.$,
   // Use h100 so that all cells are the same height when scrolled; set bgWhite for when we're laid over other rows.
@@ -108,6 +114,21 @@ export const condensedStyle: GridStyle = {
   ...defaultStyle,
   cellCss: Css.itemsCenter.p(px(6)).$,
   rootCss: Css.dig.gray700.xs.$,
+};
+
+/** Renders each row as a card. */
+export const cardStyle: GridStyle = {
+  ...defaultStyle,
+  firstNonHeaderRowCss: Css.$,
+  cellCss: Css.p2.my1.bt.bb.bGray400.$,
+  firstCellCss: Css.bl.add({ borderTopLeftRadius: "4px", borderBottomLeftRadius: "4px" }).$,
+  lastCellCss: Css.br.add({ borderTopRightRadius: "4px", borderBottomRightRadius: "4px" }).$,
+  rootCss: Css.dig.$,
+  // Undo the card look & feel for the header
+  headerCellCss: {
+    ...defaultStyle.headerCellCss,
+    ...Css.add({ border: "none", borderRadius: "unset" }).p1.m0.mb1.xsEm.gray700.$,
+  },
 };
 
 /** Configures the default/app-wide GridStyle. */
@@ -369,7 +390,7 @@ function renderCssGrid<R extends Kinded>(
           // The `div + div` is also the "owl operator", i.e. don't apply to the 1st row.
           .addIn("& > div + div > *", style.betweenRowsCss)
           // removes border between header and second row
-          .addIn("& > div:nth-of-type(2) > *", Css.add({ borderTopStyle: "none" }).$).$,
+          .addIn("& > div:nth-of-type(2) > *", style.firstNonHeaderRowCss).$,
         ...style.rootCss,
         ...xss,
       }}
@@ -404,7 +425,7 @@ function renderTable<R extends Kinded>(
         ...Css.w100.add("borderCollapse", "collapse").$,
         ...Css.addIn("& > tbody > tr ", style.betweenRowsCss)
           // removes border between header and second row
-          .addIn("& > tbody > tr:first-of-type", Css.add({ borderTopStyle: "none" }).$).$,
+          .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss).$,
         ...style.rootCss,
         ...xss,
       }}
@@ -608,6 +629,7 @@ function getIndentationCss<R extends Kinded>(
   style: GridStyle,
   rowStyle: RowStyle<R> | undefined,
   columnIndex: number,
+  isLastColumn: boolean,
   maybeContent: ReactNode | GridCellContent,
 ): Properties {
   // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
@@ -618,6 +640,8 @@ function getIndentationCss<R extends Kinded>(
   // Otherwise if the first column use is table-wide padding
   if (columnIndex === 0) {
     return style.firstCellCss;
+  } else if (isLastColumn) {
+    return style.lastCellCss;
   }
   return {};
 }
@@ -733,9 +757,9 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...Css.df.$,
           // Apply any static/all-cell styling
           ...style.cellCss,
-          ...(isHeader && style.headerCellCss),
           ...getJustification(column, maybeContent, as),
-          ...getIndentationCss(style, rowStyle, idx, maybeContent),
+          ...getIndentationCss(style, rowStyle, idx, idx === columns.length - 1, maybeContent),
+          ...(isHeader && style.headerCellCss),
           ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
           ...rowStyleCellCss,
         };
