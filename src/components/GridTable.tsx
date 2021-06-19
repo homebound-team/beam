@@ -641,12 +641,10 @@ function getFirstOrLastCellCss<R extends Kinded>(
   columnIndex: number,
   columns: GridColumn<R>[],
 ): Properties {
-  if (columnIndex === 0) {
-    return style.firstCellCss;
-  } else if (columnIndex === columns.length - 1) {
-    return style.lastCellCss;
-  }
-  return {};
+  return {
+    ...(columnIndex === 0 ? style.firstCellCss : {}),
+    ...(columnIndex === columns.length - 1 ? style.lastCellCss : {}),
+  };
 }
 
 export type GridCellAlignment = "left" | "right" | "center";
