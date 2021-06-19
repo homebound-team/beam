@@ -147,7 +147,7 @@ describe("GridTable", () => {
     // Given the data row is indented
     const rowStyles: GridRowStyles<Row> = {
       header: {},
-      data: { indent: "1" },
+      data: { indent: 1 },
     };
     const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} rowStyles={rowStyles} />);
     // Then the data row has the style added
