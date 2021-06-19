@@ -77,11 +77,11 @@ export interface GridStyle {
   cellCss: Properties;
   /** Applied to the header (really first) row div. */
   headerCellCss: Properties;
-  /** Applied to the first cell of all rows, i.e. for padding. */
+  /** Applied to the first cell of all rows, i.e. for table-wide padding. */
   firstCellCss: Properties;
   /** Applied to a cell div when `indent: 1` is used. */
   indentOneCss: Properties;
-  /** Applied to a cell div when `indent: 1` is used. */
+  /** Applied to a cell div when `indent: 2` is used. */
   indentTwoCss: Properties;
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss: Properties;
