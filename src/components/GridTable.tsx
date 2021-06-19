@@ -633,10 +633,7 @@ function getIndentationCss<R extends Kinded>(
 ): Properties {
   // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
   const indent = (isContentAndSettings(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
-  if (indent) {
-    return indent === 1 ? style.indentOneCss : indent === 2 ? style.indentTwoCss : {};
-  }
-  return {};
+  return indent === 1 ? style.indentOneCss : indent === 2 ? style.indentTwoCss : {};
 }
 
 function getFirstOrLastCellCss<R extends Kinded>(
