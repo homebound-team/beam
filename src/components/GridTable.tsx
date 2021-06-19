@@ -629,7 +629,6 @@ function getIndentationCss<R extends Kinded>(
   style: GridStyle,
   rowStyle: RowStyle<R> | undefined,
   columnIndex: number,
-  isLastColumn: boolean,
   maybeContent: ReactNode | GridCellContent,
 ): Properties {
   // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
@@ -637,10 +636,17 @@ function getIndentationCss<R extends Kinded>(
   if (indent) {
     return indent === 1 ? style.indentOneCss : indent === 2 ? style.indentTwoCss : {};
   }
-  // Otherwise if the first column use is table-wide padding
+  return {};
+}
+
+function getFirstOrLastCellCss<R extends Kinded>(
+  style: GridStyle,
+  columnIndex: number,
+  columns: GridColumn<R>[],
+): Properties {
   if (columnIndex === 0) {
     return style.firstCellCss;
-  } else if (isLastColumn) {
+  } else if (columnIndex === columns.length - 1) {
     return style.lastCellCss;
   }
   return {};
@@ -757,8 +763,11 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...Css.df.$,
           // Apply any static/all-cell styling
           ...style.cellCss,
+          // Then override with first/last cell styling
+          ...getFirstOrLastCellCss(style, idx, columns),
+          // Then override with per-cell/per-row justification/identation
           ...getJustification(column, maybeContent, as),
-          ...getIndentationCss(style, rowStyle, idx, idx === columns.length - 1, maybeContent),
+          ...getIndentationCss(style, rowStyle, idx, maybeContent),
           ...(isHeader && style.headerCellCss),
           ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
           ...rowStyleCellCss,
