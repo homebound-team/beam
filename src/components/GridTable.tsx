@@ -77,6 +77,12 @@ export interface GridStyle {
   cellCss: Properties;
   /** Applied to the header (really first) row div. */
   headerCellCss: Properties;
+  /** Applied to the first cell of all rows, i.e. for padding. */
+  firstCellCss: Properties;
+  /** Applied to a cell div when `indent: 1` is used. */
+  indentOneCss: Properties;
+  /** Applied to a cell div when `indent: 1` is used. */
+  indentTwoCss: Properties;
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
@@ -88,6 +94,9 @@ export let defaultStyle: GridStyle = {
   rootCss: Css.gray700.$,
   betweenRowsCss: Css.bt.bGray400.$,
   cellCss: Css.py2.px3.$,
+  firstCellCss: Css.pl1.$,
+  indentOneCss: Css.pl4.$,
+  indentTwoCss: Css.pl7.$,
   // Use h100 so that all cells are the same height when scrolled; set bgWhite for when we're laid over other rows.
   headerCellCss: Css.selfEnd.nowrap.py1.bgGray200.h100.itemsEnd.$,
   firstRowMessageCss: Css.px1.py2.$,
@@ -98,7 +107,7 @@ export let defaultStyle: GridStyle = {
 export const condensedStyle: GridStyle = {
   ...defaultStyle,
   cellCss: Css.itemsCenter.p(px(6)).$,
-  rootCss: Css.gray700.xs.$,
+  rootCss: Css.dig.gray700.xs.$,
 };
 
 /** Configures the default/app-wide GridStyle. */
@@ -569,7 +578,7 @@ export interface RowStyle<R extends Kinded> {
   /** Renders the cell element, i.e. a link to get whole-row links. */
   renderCell?: RenderCellFn<R>;
   /** Whether the row should be indented (via a style applied to the 1st cell). */
-  indent?: "1" | "2";
+  indent?: 1 | 2;
   /** Whether the row should be a link. */
   rowLink?: (row: R) => string;
   /** Fired when the row is clicked, similar to rowLink but for actions that aren't 'go to this link'. */
@@ -595,9 +604,22 @@ interface NextPrev<R extends Kinded> {
   prev: GridDataRow<R> | undefined;
 }
 
-function getIndentationCss<R extends Kinded>(rowStyle: RowStyle<R> | undefined): Properties {
-  const indent = rowStyle?.indent;
-  return Css.pl(indent === "2" ? 7 : indent === "1" ? 4 : 1).$;
+function getIndentationCss<R extends Kinded>(
+  style: GridStyle,
+  rowStyle: RowStyle<R> | undefined,
+  columnIndex: number,
+  maybeContent: ReactNode | GridCellContent,
+): Properties {
+  // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
+  const indent = (isContentAndSettings(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
+  if (indent) {
+    return indent === 1 ? style.indentOneCss : indent === 2 ? style.indentTwoCss : {};
+  }
+  // Otherwise if the first column use is table-wide padding
+  if (columnIndex === 0) {
+    return style.firstCellCss;
+  }
+  return {};
 }
 
 export type GridCellAlignment = "left" | "right" | "center";
@@ -611,6 +633,8 @@ export type GridCellContent = {
   alignment?: GridCellAlignment;
   /** Allow value to be a function in case it's a dynamic value i.e. reading from an inline-edited proxy. */
   value?: MaybeFn<number | string | Date>;
+  /** Whether to indent the cell. */
+  indent?: 1 | 2;
 };
 
 type MaybeFn<T> = T | (() => T);
@@ -711,7 +735,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...style.cellCss,
           ...(isHeader && style.headerCellCss),
           ...getJustification(column, maybeContent, as),
-          ...(idx === 0 && getIndentationCss(rowStyle)),
+          ...getIndentationCss(style, rowStyle, idx, maybeContent),
           ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
           ...rowStyleCellCss,
         };
