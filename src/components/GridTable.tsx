@@ -765,11 +765,13 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...style.cellCss,
           // Then override with first/last cell styling
           ...getFirstOrLastCellCss(style, idx, columns),
-          // Then override with per-cell/per-row justification/identation
+          // Then override with per-cell/per-row justification/indentation
           ...getJustification(column, maybeContent, as),
           ...getIndentationCss(style, rowStyle, idx, maybeContent),
+          // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
           ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
+          // And finally the specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
         };
 
