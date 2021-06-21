@@ -1,3 +1,3 @@
 export * from "./useComputed";
-export * from "./useFilter";
+export * from "./usePersistedFilter";
 export * from "./useSessionStorage";

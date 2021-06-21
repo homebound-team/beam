@@ -3,7 +3,7 @@ import { useFilter } from "@react-aria/i18n";
 import { Item } from "@react-stately/collections";
 import { useComboBoxState } from "@react-stately/combobox";
 import { CollectionChildren, Selection } from "@react-types/shared";
-import React, { Key, ReactNode, useRef, useState } from "react";
+import React, { Key, ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useFocusRing, useOverlayPosition } from "react-aria";
 import { useMultipleSelectionState } from "react-stately";
 import { ListBox, Popover } from "src/components/internal";
@@ -51,13 +51,7 @@ export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O,
   // @ts-ignore, we need to coerce this to be a string,...
   const selectedOptions = options.filter((o) => selectedKeys.includes(String(getOptionValue(o))));
 
-  const [fieldState, setFieldState] = useState<{
-    isOpen: boolean;
-    selectedKeys: V[];
-    inputValue: string;
-    filteredOptions: O[];
-    selectedOptions: O[];
-  }>({
+  const initFieldState = {
     isOpen: false,
     selectedKeys: selectedKeys,
     inputValue:
@@ -68,7 +62,21 @@ export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O,
         : "",
     filteredOptions: options,
     selectedOptions: selectedOptions,
-  });
+  };
+
+  const [fieldState, setFieldState] = useState<{
+    isOpen: boolean;
+    selectedKeys: V[];
+    inputValue: string;
+    filteredOptions: O[];
+    selectedOptions: O[];
+  }>(initFieldState);
+
+  // Ensure we reset if the field's values change
+  useEffect(() => {
+    console.log("values changed...", beamSelectFieldBaseProps.label, values);
+    setFieldState(initFieldState);
+  }, [values]);
 
   return (
     <ComboBox<O, V>
