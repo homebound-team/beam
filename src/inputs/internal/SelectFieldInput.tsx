@@ -58,7 +58,7 @@ export function SelectFieldInput<O extends object, V extends Key>(props: SelectF
   const errorMessageId = `${inputProps.id}-error`;
   const { hoverProps, isHovered } = useHover({});
   const hoverStyles = isHovered && !isReadOnly && !isFocused ? Css.bgGray100.$ : {};
-  const focusStyles = isFocused && !isReadOnly ? Css.bLightBlue500.$ : {};
+  const focusStyles = isFocused && !isReadOnly ? Css.bLightBlue700.$ : {};
   const errorStyles = errorMsg ? Css.bRed500.$ : {};
   const disabledStyles = isDisabled ? Css.gray400.bgGray100.cursorNotAllowed.$ : {};
   const readOnlyStyles = isReadOnly ? Css.bn.pl0.pt0.add("backgroundColor", "unset").$ : {};
