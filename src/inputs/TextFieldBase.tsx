@@ -8,12 +8,12 @@ import React, {
   MutableRefObject,
   TextareaHTMLAttributes,
 } from "react";
+import { chain } from "react-aria";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, px, Xss } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamTextFieldProps } from "src/interfaces";
-import { maybeCall } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -64,15 +64,21 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     }
   }
 
+  const onFocusChained = chain(
+    inputProps.onFocus,
+    (e: FocusEvent<HTMLInputElement> | FocusEvent<HTMLTextAreaElement>) => e.target.select(),
+    onFocus,
+  );
+
   return (
     <div css={Css.df.flexColumn.w100.maxw(px(550)).$} {...groupProps}>
       {label && <Label labelProps={labelProps} label={label} {...tid.label} />}
       <ElementType
-        onFocus={(e: FocusEvent<HTMLInputElement> | FocusEvent<HTMLTextAreaElement>) => {
-          e.target.select();
-          maybeCall(onFocus);
-        }}
-        {...mergeProps(inputProps, { onBlur, onChange: onDomChange }, { "aria-invalid": Boolean(errorMsg) })}
+        {...mergeProps(
+          inputProps,
+          { onBlur, onFocus: onFocusChained, onChange: onDomChange },
+          { "aria-invalid": Boolean(errorMsg) },
+        )}
         {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
         ref={inputRef as any}
         rows={multiline ? 1 : undefined}
