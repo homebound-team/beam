@@ -6,7 +6,7 @@ import { Icon } from "src/components/Icon";
 import { Option } from "src/components/internal";
 import { Css } from "src/Css";
 
-interface ListBoxProps<O extends object, V extends Key> {
+interface ListBoxProps<O, V extends Key> {
   compact: boolean;
   listBoxRef: MutableRefObject<HTMLUListElement | null>;
   state: SelectState<O>;
@@ -17,7 +17,7 @@ interface ListBoxProps<O extends object, V extends Key> {
 }
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
-export function ListBox<O extends object, V extends Key>(props: ListBoxProps<O, V>) {
+export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
   const {
     state,
     compact,
@@ -74,7 +74,7 @@ export function ListBox<O extends object, V extends Key>(props: ListBoxProps<O, 
   );
 }
 
-interface ListBoxChipProps<O extends object, V extends Key> {
+interface ListBoxChipProps<O, V extends Key> {
   state: SelectState<O>;
   option: O;
   getOptionLabel: (opt: O) => string;
@@ -82,7 +82,7 @@ interface ListBoxChipProps<O extends object, V extends Key> {
 }
 
 /** Chip used to display selections within ListBox when using the MultiSelectField */
-function ListBoxChip<O extends object, V extends Key>(props: ListBoxChipProps<O, V>) {
+function ListBoxChip<O, V extends Key>(props: ListBoxChipProps<O, V>) {
   const { state, option, getOptionLabel, getOptionValue } = props;
   return (
     <li css={Css.mr1.mb1.$}>

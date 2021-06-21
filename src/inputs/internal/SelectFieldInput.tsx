@@ -9,7 +9,7 @@ import { Css, Palette } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { useTestIds } from "src/utils";
 
-interface SelectFieldInputProps<O extends object, V extends Key> {
+interface SelectFieldInputProps<O, V extends Key> {
   buttonProps: any;
   buttonRef: MutableRefObject<HTMLButtonElement | null>;
   inputProps: InputHTMLAttributes<HTMLInputElement>;
@@ -32,7 +32,7 @@ interface SelectFieldInputProps<O extends object, V extends Key> {
   getOptionValue: (opt: O) => V;
 }
 
-export function SelectFieldInput<O extends object, V extends Key>(props: SelectFieldInputProps<O, V>) {
+export function SelectFieldInput<O, V extends Key>(props: SelectFieldInputProps<O, V>) {
   const {
     inputProps,
     inputRef,

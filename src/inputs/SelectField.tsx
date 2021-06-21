@@ -2,7 +2,7 @@ import React, { Key, ReactNode } from "react";
 import { BeamSelectFieldBaseProps, SelectFieldBase } from "src/inputs/internal/SelectFieldBase";
 import { HasIdAndName, Optional } from "src/types";
 
-export interface SelectFieldProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
+export interface SelectFieldProps<O, V extends Key> extends BeamSelectFieldBaseProps<O> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
@@ -22,11 +22,11 @@ export interface SelectFieldProps<O extends object, V extends Key> extends BeamS
  * Note that the `O extends object` and `V extends Key` constraints come from react-aria,
  * and so we cannot easily change them.
  */
-export function SelectField<O extends object, V extends Key>(props: SelectFieldProps<O, V>): JSX.Element;
+export function SelectField<O, V extends Key>(props: SelectFieldProps<O, V>): JSX.Element;
 export function SelectField<O extends HasIdAndName<V>, V extends Key>(
   props: Optional<SelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element;
-export function SelectField<O extends object, V extends Key>(
+export function SelectField<O, V extends Key>(
   props: Optional<SelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,
 ): JSX.Element {
   const {

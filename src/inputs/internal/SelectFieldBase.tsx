@@ -11,7 +11,7 @@ import { Css, px } from "src/Css";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
 import { BeamFocusableProps } from "src/interfaces";
 
-export interface SelectFieldBaseProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
+export interface SelectFieldBaseProps<O, V extends Key> extends BeamSelectFieldBaseProps<O> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
@@ -32,7 +32,7 @@ export interface SelectFieldBaseProps<O extends object, V extends Key> extends B
  * Note that the `O extends object` and `V extends Key` constraints come from react-aria,
  * and so we cannot easily change them.
  */
-export function SelectFieldBase<O extends object, V extends Key>(props: SelectFieldBaseProps<O, V>): JSX.Element {
+export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O, V>): JSX.Element {
   const {
     getOptionValue,
     getOptionLabel,
@@ -149,7 +149,7 @@ export function SelectFieldBase<O extends object, V extends Key>(props: SelectFi
   );
 }
 
-interface ComboBoxProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
+interface ComboBoxProps<O, V extends Key> extends BeamSelectFieldBaseProps<O> {
   children: CollectionChildren<O>;
   filteredOptions?: O[];
   inputValue?: string | undefined;
@@ -164,7 +164,7 @@ interface ComboBoxProps<O extends object, V extends Key> extends BeamSelectField
 }
 
 /** Ties together SelectFieldInput (text field) and the ListBox (drop down). */
-function ComboBox<O extends object, V extends Key>(props: ComboBoxProps<O, V>) {
+function ComboBox<O, V extends Key>(props: ComboBoxProps<O, V>) {
   const {
     compact = false,
     disabled: isDisabled = false,
@@ -191,7 +191,7 @@ function ComboBox<O extends object, V extends Key>(props: ComboBoxProps<O, V>) {
   const menuTrigger: MenuTriggerAction = "focus";
 
   const comboBoxProps = { ...otherProps, items, isDisabled, isReadOnly, label, onInputChange, menuTrigger };
-  const state = useComboBoxState({
+  const state = useComboBoxState<any>({
     ...comboBoxProps,
     // useComboBoxState.onSelectionChange will be executed if a keyboard interaction (Enter key) is used to select an item
     onSelectionChange: (key) => {
