@@ -113,7 +113,7 @@ export let defaultStyle: GridStyle = {
 export const condensedStyle: GridStyle = {
   ...defaultStyle,
   cellCss: Css.itemsCenter.p(px(6)).$,
-  rootCss: Css.dig.gray700.xs.$,
+  rootCss: Css.dg.gray700.xs.$,
 };
 
 /** Renders each row as a card. */
