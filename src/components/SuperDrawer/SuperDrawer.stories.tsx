@@ -195,7 +195,7 @@ export function Example() {
   // Example of triggering the drawer when clicking on a row
   const rowStyles: GridRowStyles<Row> = {
     header: {},
-    data: { indent: "2", onClick: openRow },
+    data: { indent: 2, onClick: openRow },
   };
 
   return (

@@ -30,6 +30,10 @@ exports[`GridTable renders 1`] = `
   padding-left: 8px;
   padding-right: 24px;
   padding-top: 8px;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
   -webkit-align-items: flex-end;
   -webkit-box-align: flex-end;
   -ms-flex-align: flex-end;
@@ -40,10 +44,6 @@ exports[`GridTable renders 1`] = `
   background-color: rgba(236,235,235,1);
   height: 100%;
   white-space: nowrap;
-  -webkit-box-pack: start;
-  -ms-flex-pack: start;
-  -webkit-justify-content: flex-start;
-  justify-content: flex-start;
 }
 
 .emotion-3 {
@@ -55,6 +55,10 @@ exports[`GridTable renders 1`] = `
   padding-left: 24px;
   padding-right: 24px;
   padding-top: 8px;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
   -webkit-align-items: flex-end;
   -webkit-box-align: flex-end;
   -ms-flex-align: flex-end;
@@ -65,10 +69,6 @@ exports[`GridTable renders 1`] = `
   background-color: rgba(236,235,235,1);
   height: 100%;
   white-space: nowrap;
-  -webkit-box-pack: start;
-  -ms-flex-pack: start;
-  -webkit-justify-content: flex-start;
-  justify-content: flex-start;
 }
 
 .emotion-5 {

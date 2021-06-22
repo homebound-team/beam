@@ -2,6 +2,7 @@ import { Meta } from "@storybook/react";
 import { observable } from "mobx";
 import { useContext, useMemo, useState } from "react";
 import {
+  cardStyle,
   condensedStyle,
   GridCollapseContext,
   GridColumn,
@@ -258,6 +259,65 @@ export const Condensed = newStory(() => {
   );
 }, {});
 
+export const NoLeftPadding = newStory(() => {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
+  // Use a green background to show the 1st column is flush left
+  return (
+    <div css={Css.bgGreen100.$}>
+      <GridTable<Row>
+        columns={[nameColumn, valueColumn, actionColumn]}
+        style={{
+          ...condensedStyle,
+          headerCellCss: Css.smEm.$,
+          firstCellCss: Css.pl0.$,
+        }}
+        rows={[
+          { kind: "header", id: "header" },
+          { kind: "data", id: "1", name: "c", value: 1 },
+          { kind: "data", id: "2", name: "b", value: 2 },
+          { kind: "data", id: "3", name: "a", value: 3 },
+        ]}
+      />
+    </div>
+  );
+}, {});
+
+export const Cards = newStory(() => {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
+  return (
+    <GridTable<Row>
+      columns={[nameColumn, valueColumn, actionColumn]}
+      style={cardStyle}
+      rows={[
+        { kind: "header", id: "header" },
+        { kind: "data", id: "1", name: "c", value: 1 },
+        { kind: "data", id: "2", name: "b", value: 2 },
+        { kind: "data", id: "3", name: "a", value: 3 },
+      ]}
+    />
+  );
+}, {});
+
+export const SingleColumnCard = newStory(() => {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  return (
+    <GridTable<Row>
+      columns={[nameColumn]}
+      style={cardStyle}
+      rows={[
+        { kind: "header", id: "header" },
+        { kind: "data", id: "1", name: "c", value: 1 },
+        { kind: "data", id: "2", name: "b", value: 2 },
+        { kind: "data", id: "3", name: "a", value: 3 },
+      ]}
+    />
+  );
+}, {});
+
 export function AsTable() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
@@ -306,7 +366,7 @@ export const AsTableWithRowLink = newStory(
     const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
     const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
     const rowStyles: GridRowStyles<Row> = {
-      data: { indent: "2", rowLink: () => "http://homebound.com" },
+      data: { indent: 2, rowLink: () => "http://homebound.com" },
       header: {},
     };
     return (
