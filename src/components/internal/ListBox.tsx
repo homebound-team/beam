@@ -43,7 +43,7 @@ export function ListBox<O extends object, V extends Key>(props: ListBoxProps<O, 
       }}
     >
       {isMultiSelect && state.selectionManager.selectedKeys.size > 0 && (
-        <ul css={Css.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").$}>
+        <ul css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").$}>
           {selectedOptions.map((o) => (
             <ListBoxChip
               key={getOptionValue(o)}
@@ -55,7 +55,7 @@ export function ListBox<O extends object, V extends Key>(props: ListBoxProps<O, 
           ))}
         </ul>
       )}
-      <ul style={{ height: Math.min(maxListHeight, listHeight) }} ref={listBoxRef} {...listBoxProps}>
+      <ul css={Css.listReset.hPx(Math.min(maxListHeight, listHeight)).$} ref={listBoxRef} {...listBoxProps}>
         <Virtuoso
           totalListHeightChanged={setListHeight}
           totalCount={state.collection.size}
