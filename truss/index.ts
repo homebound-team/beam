@@ -83,6 +83,7 @@ const sections: Sections = {
       transition,
     }),
   ],
+  listReset: () => [newMethod("listReset", { padding: 0, margin: 0, listStyle: "none" })],
 };
 
 const aliases: Record<string, string[]> = {};
