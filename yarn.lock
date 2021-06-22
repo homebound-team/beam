@@ -1343,10 +1343,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@homebound/form-state@^1.8.3":
-  version "1.8.3"
-  resolved "https://registry.yarnpkg.com/@homebound/form-state/-/form-state-1.8.3.tgz#9ce6ce821a3517bf9a85dc1798729d1a1cf5360a"
-  integrity sha512-10oq7Z8GpgnDuhpNnj0I471a/smL+/t+whOfg7HTzEs6/4LlsGsPxKvY4g8MdZTkqhCRWnOsxMTJKIa0yRVb7Q==
+"@homebound/form-state@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@homebound/form-state/-/form-state-2.0.0.tgz#cf0ebcce599f281b58753b2cfa9f3d92315de566"
+  integrity sha512-8TQsaLHSGbedFKUoNbIyYOdcteRzc+086rv+AGsGoKtKmVULE9tfpLp+TZUBK2LCdH2bGqI0hrsOevyhT7h0IA==
 
 "@homebound/rtl-react-router-utils@^1.0.3":
   version "1.0.3"

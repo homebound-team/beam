@@ -27,7 +27,9 @@ export function FormStateApp() {
     })),
   };
 
-  const formState = useFormState(formConfig, undefined, () => queryResponse, {
+  const formState = useFormState({
+    config: formConfig,
+    init: queryResponse,
     addRules(state) {
       state.lastName.rules.push(() => {
         return state.firstName.value === state.lastName.value ? "Last name cannot equal first name" : undefined;
