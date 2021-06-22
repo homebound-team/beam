@@ -48,7 +48,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
   return (
     <label
       css={
-        Css.df.cursorPointer
+        Css.df.cursorPointer.relative
           // Prevents accidental checkbox clicks due to label width being longer
           // than the content.
           .w("max-content")
