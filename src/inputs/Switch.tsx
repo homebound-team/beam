@@ -89,7 +89,7 @@ const toggleWidth = (isCompact: boolean) => (isCompact ? 44 : 40);
 const circleDiameter = (isCompact: boolean) => (isCompact ? 14 : 20);
 
 // Label styles
-const switchLabelDefaultStyles = Css.cursorPointer.df.itemsCenter.childGap2.w("max-content").smEm.selectNone.$;
+const switchLabelDefaultStyles = Css.relative.cursorPointer.df.itemsCenter.childGap2.w("max-content").smEm.selectNone.$;
 const switchLabelDisabledStyles = Css.cursorNotAllowed.gray400.$;
 
 // Switcher/Toggle element styles
