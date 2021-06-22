@@ -1,4 +1,4 @@
-import { Key, useEffect } from "react";
+import { useEffect } from "react";
 import { FilterDef } from "src/components";
 import { useSessionStorage } from "src/hooks";
 import { safeKeys } from "src/utils";
@@ -7,7 +7,7 @@ import { JsonParam, useQueryParams } from "use-query-params";
 interface UsePersistedFilterProps<F> {
   defaultFilter: F;
   storageKey: string;
-  filterDefs: { [K in keyof F]: FilterDef<Key> };
+  filterDefs: { [K in keyof F]: FilterDef<F[K]> };
 }
 
 /** Persists filter details in both browser storage and query parameters.

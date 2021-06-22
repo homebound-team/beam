@@ -6,7 +6,7 @@ import { MultiSelectField, MultiSelectFieldProps, SelectField, SelectFieldProps 
 interface FilterProps<T> {
   filter: T;
   /** List of filters */
-  filterDefs: { [K in keyof T]: FilterDef<Key> };
+  filterDefs: { [K in keyof T]: FilterDef<T[K]> };
   /** Optional callback to execute when the filter fields have been changed */
   onApply?: (f: T) => void;
 }
@@ -93,6 +93,7 @@ export function singleFilter<O, V extends Key>(props: SingleFilterProps<O, V>) {
 }
 
 type MultiFilterProps<O, V extends Key> = Omit<MultiSelectFieldProps<O, V>, "values" | "onSelect">;
+
 export function multiFilter<O, V extends Key>(props: MultiFilterProps<O, V>) {
   return { kind: "multi" as const, ...props };
 }
@@ -108,19 +109,33 @@ interface BooleanFilterProps {
   options?: BooleanOption2[];
   label: string;
 }
-export function booleanFilter({ options = defaultBooleanOptions, label }: BooleanFilterProps) {
+
+export function booleanFilter({
+  options = defaultBooleanOptions,
+  label,
+}: BooleanFilterProps): { kind: "single" } & SingleFilterProps<BooleanOption2, string> {
   return {
     kind: "single" as const,
-    options: options.map(([value, label]) => ({ value: String(value), label })),
+    options,
     label,
-    getOptionValue: (o: any) => o.value,
-    getOptionLabel: (o: any) => o.label,
+    getOptionValue: (o) => String(o[0]),
+    getOptionLabel: (o) => o[1],
   };
 }
 
-export type FilterDef<V extends Key> =
-  | ({ kind: "single" } & SingleFilterProps<any, V>)
-  | ({ kind: "multi" } & MultiFilterProps<any, V>);
+// What is V?
+// - V might be `string[]` and could be used for a multiselect that getOptionValue returned strings
+// - V might be `number[]` and could be used for a multiselect that getOptionValue returned numbers
+// - V might be `boolean` and could be used for ...boolFilter...
+export type FilterDef<V> = V extends Array<infer U>
+  ? U extends Key
+    ? { kind: "multi" } & MultiFilterProps<any, U>
+    : never
+  : V extends boolean | undefined
+  ? { kind: "single" } & SingleFilterProps<BooleanOption2, string>
+  : V extends Key
+  ? { kind: "single" } & SingleFilterProps<any, V>
+  : never;
 
 function parseKeyValue(value: Key): boolean | undefined | Key {
   return value === "undefined" ? undefined : value === "true" ? true : value === "false" ? false : value;

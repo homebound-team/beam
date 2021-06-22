@@ -9,6 +9,7 @@ import {
   multiFilter,
   simpleHeader,
   SimpleHeaderAndDataOf,
+  singleFilter,
 } from "src/components";
 import { Css } from "src/Css";
 import { usePersistedFilter } from "src/hooks";
@@ -26,14 +27,14 @@ export function Filter() {
   const marketId = multiFilter({
     options: markets,
     label: "Market",
-    getOptionValue: (o: any) => o.code,
-    getOptionLabel: (o: any) => o.name,
+    getOptionValue: (o) => o.code,
+    getOptionLabel: (o) => o.name,
   });
-  const internalUserId = multiFilter({
+  const internalUserId = singleFilter({
     options: internalUsers,
     label: "Project Manager",
-    getOptionValue: (o: any) => o.id,
-    getOptionLabel: (o: any) => o.name,
+    getOptionValue: (o) => o.id,
+    getOptionLabel: (o) => o.name,
   });
   const favorite = booleanFilter({
     options: [
@@ -44,7 +45,7 @@ export function Filter() {
     label: "Favorite Status",
   });
 
-  const filterDefs: { [K in keyof ProjectFilter]: FilterDef<any> } = {
+  const filterDefs: { [K in keyof ProjectFilter]: FilterDef<ProjectFilter[K]> } = {
     marketId,
     internalUserId,
     favorite,
@@ -119,7 +120,11 @@ type InternalUser = {
   id: string;
 };
 
-type ProjectFilter = { marketId?: string[]; internalUserId?: string[]; favorite?: boolean };
+type ProjectFilter = {
+  marketId?: string[] | null;
+  internalUserId?: string | null;
+  favorite?: boolean | null;
+};
 
 type Project = {
   id: string;
