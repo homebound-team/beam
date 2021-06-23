@@ -3,7 +3,7 @@ import { useFilter } from "@react-aria/i18n";
 import { Item } from "@react-stately/collections";
 import { useComboBoxState } from "@react-stately/combobox";
 import { CollectionChildren, Selection } from "@react-types/shared";
-import React, { Key, ReactNode, useRef, useState } from "react";
+import React, { Key, ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useFocusRing, useOverlayPosition } from "react-aria";
 import { useMultipleSelectionState } from "react-stately";
 import { ListBox, Popover } from "src/components/internal";
@@ -11,7 +11,7 @@ import { Css, px } from "src/Css";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
 import { BeamFocusableProps } from "src/interfaces";
 
-export interface SelectFieldBaseProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
+export interface SelectFieldBaseProps<O, V extends Key> extends BeamSelectFieldBaseProps<O> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
@@ -29,10 +29,10 @@ export interface SelectFieldBaseProps<O extends object, V extends Key> extends B
  * The `O` type is a list of options to show, the `V` is the primitive value of a
  * given `O` (i.e. it's id) that you want to use as the current/selected value.
  *
- * Note that the `O extends object` and `V extends Key` constraints come from react-aria,
+ * Note that the `V extends Key` constraint come from react-aria,
  * and so we cannot easily change them.
  */
-export function SelectFieldBase<O extends object, V extends Key>(props: SelectFieldBaseProps<O, V>): JSX.Element {
+export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O, V>): JSX.Element {
   const {
     getOptionValue,
     getOptionLabel,
@@ -51,13 +51,7 @@ export function SelectFieldBase<O extends object, V extends Key>(props: SelectFi
   // @ts-ignore, we need to coerce this to be a string,...
   const selectedOptions = options.filter((o) => selectedKeys.includes(String(getOptionValue(o))));
 
-  const [fieldState, setFieldState] = useState<{
-    isOpen: boolean;
-    selectedKeys: V[];
-    inputValue: string;
-    filteredOptions: O[];
-    selectedOptions: O[];
-  }>({
+  const initFieldState = {
     isOpen: false,
     selectedKeys: selectedKeys,
     inputValue:
@@ -68,7 +62,18 @@ export function SelectFieldBase<O extends object, V extends Key>(props: SelectFi
         : "",
     filteredOptions: options,
     selectedOptions: selectedOptions,
-  });
+  };
+
+  const [fieldState, setFieldState] = useState<{
+    isOpen: boolean;
+    selectedKeys: V[];
+    inputValue: string;
+    filteredOptions: O[];
+    selectedOptions: O[];
+  }>(initFieldState);
+
+  // Ensure we reset if the field's values change
+  useEffect(() => setFieldState(initFieldState), [values]);
 
   return (
     <ComboBox<O, V>
@@ -149,7 +154,7 @@ export function SelectFieldBase<O extends object, V extends Key>(props: SelectFi
   );
 }
 
-interface ComboBoxProps<O extends object, V extends Key> extends BeamSelectFieldBaseProps<O> {
+interface ComboBoxProps<O, V extends Key> extends BeamSelectFieldBaseProps<O> {
   children: CollectionChildren<O>;
   filteredOptions?: O[];
   inputValue?: string | undefined;
@@ -164,7 +169,7 @@ interface ComboBoxProps<O extends object, V extends Key> extends BeamSelectField
 }
 
 /** Ties together SelectFieldInput (text field) and the ListBox (drop down). */
-function ComboBox<O extends object, V extends Key>(props: ComboBoxProps<O, V>) {
+function ComboBox<O, V extends Key>(props: ComboBoxProps<O, V>) {
   const {
     compact = false,
     disabled: isDisabled = false,
@@ -191,7 +196,7 @@ function ComboBox<O extends object, V extends Key>(props: ComboBoxProps<O, V>) {
   const menuTrigger: MenuTriggerAction = "focus";
 
   const comboBoxProps = { ...otherProps, items, isDisabled, isReadOnly, label, onInputChange, menuTrigger };
-  const state = useComboBoxState({
+  const state = useComboBoxState<any>({
     ...comboBoxProps,
     // useComboBoxState.onSelectionChange will be executed if a keyboard interaction (Enter key) is used to select an item
     onSelectionChange: (key) => {
@@ -228,7 +233,7 @@ function ComboBox<O extends object, V extends Key>(props: ComboBoxProps<O, V>) {
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
-  const listBoxRef = useRef<HTMLUListElement | null>(null);
+  const listBoxRef = useRef<HTMLDivElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.

@@ -39,3 +39,11 @@ export function maybeCall(callback: Function | undefined, ...args: any[]) {
 }
 
 export * from "./useTestIds";
+
+/** Casts `Object.keys` to "what it should be", as long as your instance doesn't have keys it shouldn't. */
+export function safeKeys<T>(instance: T): (keyof T)[] {
+  return Object.getOwnPropertyNames(instance) as any;
+}
+
+// Returns object with specified key removed
+export const omitKey = <T, K extends keyof T>(key: K, { [key]: _, ...obj }: T) => obj as T;
