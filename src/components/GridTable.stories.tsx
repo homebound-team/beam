@@ -1,12 +1,14 @@
 import { Meta } from "@storybook/react";
 import { observable } from "mobx";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
 import {
+  Button,
   cardStyle,
   condensedStyle,
   GridCollapseContext,
   GridColumn,
   GridDataRow,
+  GridRowLookup,
   GridRowStyles,
   GridTable,
   IconButton,
@@ -85,7 +87,7 @@ export const Hovering = newStory(
   { decorators: [withRouter()] },
 );
 
-export function Filtering() {
+export function VirtualFiltering() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
       { kind: "header", id: "header" },
@@ -101,11 +103,13 @@ export function Filtering() {
     ],
     [],
   );
+  const rowLookup = useRef<GridRowLookup<Row> | undefined>();
   const [filter, setFilter] = useState<string | undefined>();
   return (
     <div css={Css.df.flexColumn.add({ height: heightWithoutStorybookPadding }).$}>
       <div>
         <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
+        <Button label="goto 500" onClick={() => rowLookup.current!.scrollTo("data", "500")} />
       </div>
       <div css={Css.fg1.$}>
         <GridTable
@@ -115,6 +119,7 @@ export function Filtering() {
           filter={filter}
           stickyHeader={true}
           rows={rows}
+          rowLookup={rowLookup}
         />
       </div>
     </div>
