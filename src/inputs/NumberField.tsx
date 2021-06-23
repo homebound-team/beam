@@ -80,10 +80,7 @@ export function NumberField(props: NumberFieldProps) {
       onChange(Number.isNaN(value) ? undefined : factor !== 1 ? Math.round(value * factor) : value);
     },
     onFocus: () => {
-      valueRef.current = {
-        wip: true,
-        value: valueRef.current.wip ? valueRef.current.value : value === undefined ? Number.NaN : value / factor,
-      };
+      valueRef.current = { wip: true, value: value === undefined ? Number.NaN : value / factor };
     },
     onBlur: () => {
       valueRef.current = { wip: false };
