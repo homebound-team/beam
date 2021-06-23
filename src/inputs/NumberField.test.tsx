@@ -57,6 +57,13 @@ describe("NumberFieldTest", () => {
     expect(r.cost()).toHaveValue("");
     expect(lastSet).toBeUndefined();
   });
+
+  it("retains correct value on focus", async () => {
+    const r = await render(<TestNumberField label="Cost" type="cents" value={1200} />);
+    expect(r.cost()).toHaveValue("$12.00");
+    fireEvent.focus(r.cost());
+    expect(r.cost()).toHaveValue("$12.00");
+  });
 });
 
 function TestNumberField(props: Omit<NumberFieldProps, "onChange">) {
