@@ -103,6 +103,7 @@ class CssBuilder<T extends Properties1> {
   get br8() { return this.add("borderRadius", "8px"); }
   get br12() { return this.add("borderRadius", "12px"); }
   get br16() { return this.add("borderRadius", "16px"); }
+  get br24() { return this.add("borderRadius", "24px"); }
   get br100() { return this.add("borderRadius", "100%"); }
 
   // borderStyle
@@ -122,6 +123,7 @@ class CssBuilder<T extends Properties1> {
   get bshHover() { return this.add("boxShadow", "0px 2px 24px 0px rgba(17,24,39,0.08), 0px 4px 8px 0px rgba(17,24,39,0.1)"); }
   get bshFocus() { return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px rgba(3,105,161,1)"); }
   get bshDanger() { return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px rgba(149,68,64,1)"); }
+  get bshModal() { return this.add("boxShadow", "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)"); }
 
   // coordinates
   get top0() { return this.top(0); }
@@ -823,6 +825,9 @@ class CssBuilder<T extends Properties1> {
 
   // listReset
   get listReset() { return this.add("padding", 0).add("margin", 0).add("listStyle", "none"); }
+
+  // underlay
+  get underlay() { return this.add("position", "fixed").add("top", 0).add("bottom", 0).add("left", 0).add("right", 0).add("display", "flex").add("alignItems", "center").add("justifyContent", "center").add("zIndex", 4).add("backgroundColor", "rgba(36,36,36,0.2)"); }
 
   // aliases
   

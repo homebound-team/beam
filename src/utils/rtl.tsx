@@ -1,6 +1,6 @@
 import { RenderResult, Wrapper } from "@homebound/rtl-utils";
 import { prettyDOM } from "@testing-library/react";
-import { SuperDrawerProvider } from "src";
+import { ModalProvider, SuperDrawerProvider } from "src";
 export * from "@homebound/rtl-react-router-utils";
 export * from "@homebound/rtl-utils";
 
@@ -31,4 +31,9 @@ export function rowAnd(r: RenderResult, row: number, testId: string): HTMLElemen
 /** RTL wrapper for SuperDrawer context */
 export const withSuperDrawerRTL: Wrapper = {
   wrap: (c) => <SuperDrawerProvider>{c}</SuperDrawerProvider>,
+};
+
+/** RTL wrapper for Modal context */
+export const withModalRTL: Wrapper = {
+  wrap: (c) => <ModalProvider>{c}</ModalProvider>,
 };

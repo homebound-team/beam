@@ -47,6 +47,7 @@ const sections: Sections = {
       br8: "8px",
       br12: "12px",
       br16: "16px",
+      br24: "24px",
       br100: "100%",
     }),
   animation: () =>
@@ -60,6 +61,7 @@ const sections: Sections = {
       bshHover: "0px 2px 24px 0px rgba(17,24,39,0.08), 0px 4px 8px 0px rgba(17,24,39,0.1)",
       bshFocus: `0px 0px 0px 2px ${palette.White}, 0px 0px 0px 4px ${palette.LightBlue700}`,
       bshDanger: `0px 0px 0px 2px ${palette.White}, 0px 0px 0px 4px ${palette.Red800}`,
+      bshModal: "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)",
     }),
   // Due to Safari's limited support of the `gap` property, `childGap` will be
   // its replacement until full browser support https://caniuse.com/?search=gap
@@ -83,6 +85,20 @@ const sections: Sections = {
     }),
   ],
   listReset: () => [newMethod("listReset", { padding: 0, margin: 0, listStyle: "none" })],
+  underlay: () => [
+    newMethod("underlay", {
+      position: "fixed",
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 4,
+      backgroundColor: "rgba(36,36,36,0.2)",
+    }),
+  ],
 };
 
 const aliases: Record<string, string[]> = {};
