@@ -1,13 +1,21 @@
 import { mergeProps } from "@react-aria/utils";
 import { ComboBoxState } from "@react-stately/combobox";
-import React, { Fragment, InputHTMLAttributes, Key, LabelHTMLAttributes, MutableRefObject, ReactNode } from "react";
+import React, {
+  Fragment,
+  InputHTMLAttributes,
+  Key,
+  LabelHTMLAttributes,
+  MutableRefObject,
+  ReactNode,
+  useState,
+} from "react";
 import { useHover } from "react-aria";
 import { Icon } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
-import { useTestIds } from "src/utils";
+import { maybeCall, useTestIds } from "src/utils";
 
 interface SelectFieldInputProps<O, V extends Key> {
   buttonProps: any;
@@ -64,6 +72,7 @@ export function SelectFieldInput<O, V extends Key>(props: SelectFieldInputProps<
   const readOnlyStyles = isReadOnly ? Css.bn.pl0.pt0.add("backgroundColor", "unset").$ : {};
   const tid = useTestIds(inputProps); // data-testid comes in through here
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
+  const [isSizeBasedOnContent, setIsSizeBasedOnContent] = useState(true);
 
   return (
     <Fragment>
@@ -145,13 +154,19 @@ export function SelectFieldInput<O, V extends Key>(props: SelectFieldInputProps<
 
             inputProps.onKeyDown && inputProps.onKeyDown(e);
           }}
-          onBlur={onBlur}
+          onBlur={(e) => {
+            maybeCall(onBlur);
+            setIsSizeBasedOnContent(true);
+            state.close();
+          }}
           onFocus={(e) => {
-            onFocus && onFocus();
+            setIsSizeBasedOnContent(false);
+            maybeCall(onFocus);
             if (isReadOnly) return;
             e.target.select();
             state.open();
           }}
+          size={isSizeBasedOnContent ? inputRef?.current?.value.length || 1 : 20}
         />
         {!isReadOnly && (
           <button

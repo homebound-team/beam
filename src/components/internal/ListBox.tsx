@@ -8,7 +8,7 @@ import { Css } from "src/Css";
 
 interface ListBoxProps<O, V extends Key> {
   compact: boolean;
-  listBoxRef: MutableRefObject<HTMLUListElement | null>;
+  listBoxRef: MutableRefObject<HTMLDivElement | null>;
   state: SelectState<O>;
   maxListHeight?: number;
   selectedOptions: O[];
@@ -41,6 +41,8 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
         ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.$,
         "&:hover": Css.bshHover.$,
       }}
+      ref={listBoxRef}
+      {...listBoxProps}
     >
       {isMultiSelect && state.selectionManager.selectedKeys.size > 0 && (
         <ul css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").$}>
@@ -55,7 +57,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
           ))}
         </ul>
       )}
-      <ul css={Css.listReset.hPx(Math.min(maxListHeight, listHeight)).$} ref={listBoxRef} {...listBoxProps}>
+      <ul css={Css.listReset.hPx(Math.min(maxListHeight, listHeight)).$}>
         <Virtuoso
           totalListHeightChanged={setListHeight}
           totalCount={state.collection.size}

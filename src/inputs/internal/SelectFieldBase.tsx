@@ -29,7 +29,7 @@ export interface SelectFieldBaseProps<O, V extends Key> extends BeamSelectFieldB
  * The `O` type is a list of options to show, the `V` is the primitive value of a
  * given `O` (i.e. it's id) that you want to use as the current/selected value.
  *
- * Note that the `O extends object` and `V extends Key` constraints come from react-aria,
+ * Note that the `V extends Key` constraint come from react-aria,
  * and so we cannot easily change them.
  */
 export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O, V>): JSX.Element {
@@ -73,10 +73,7 @@ export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O,
   }>(initFieldState);
 
   // Ensure we reset if the field's values change
-  useEffect(() => {
-    console.log("values changed...", beamSelectFieldBaseProps.label, values);
-    setFieldState(initFieldState);
-  }, [values]);
+  useEffect(() => setFieldState(initFieldState), [values]);
 
   return (
     <ComboBox<O, V>
@@ -236,7 +233,7 @@ function ComboBox<O, V extends Key>(props: ComboBoxProps<O, V>) {
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
-  const listBoxRef = useRef<HTMLUListElement | null>(null);
+  const listBoxRef = useRef<HTMLDivElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.

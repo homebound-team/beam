@@ -10,8 +10,9 @@ interface UsePersistedFilterProps<F> {
   filterDefs: { [K in keyof F]: FilterDef<F[K]> };
 }
 
-/** Persists filter details in both browser storage and query parameters.
- * If a valid filter is preset in the query params, then that will be used.
+/**
+ * Persists filter details in both browser storage and query parameters.
+ * If a valid filter is present in the query params, then that will be used.
  * Otherwise it looks at browser storage, and finally the defaultFilter prop.
  */
 export function usePersistedFilter<F>({ defaultFilter, storageKey, filterDefs }: UsePersistedFilterProps<F>) {
@@ -24,7 +25,6 @@ export function usePersistedFilter<F>({ defaultFilter, storageKey, filterDefs }:
   const setFilter = (filter: F) => setQueryParams({ filter });
 
   useEffect(() => {
-    console.log("what changed?", storedFilter, queryParamsFilter);
     if (queryParamsFilter === undefined) {
       // if there is no filter in the query params, use stored filter
       // "replaceIn" replaces the url in history instead of creating a new history item

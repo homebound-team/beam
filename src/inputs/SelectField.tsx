@@ -19,7 +19,7 @@ export interface SelectFieldProps<O, V extends Key> extends BeamSelectFieldBaseP
  * The `O` type is a list of options to show, the `V` is the primitive value of a
  * given `O` (i.e. it's id) that you want to use as the current/selected value.
  *
- * Note that the `O extends object` and `V extends Key` constraints come from react-aria,
+ * Note that the `V extends Key` constraint come from react-aria,
  * and so we cannot easily change them.
  */
 export function SelectField<O, V extends Key>(props: SelectFieldProps<O, V>): JSX.Element;

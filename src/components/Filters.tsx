@@ -7,8 +7,8 @@ interface FilterProps<T> {
   filter: T;
   /** List of filters */
   filterDefs: { [K in keyof T]: FilterDef<T[K]> };
-  /** Optional callback to execute when the filter fields have been changed */
-  onApply?: (f: T) => void;
+  /** Callback to execute when the filter fields have been changed */
+  onApply: (f: T) => void;
 }
 
 function Filters<T>(props: FilterProps<T>) {
@@ -82,8 +82,6 @@ function Filters<T>(props: FilterProps<T>) {
 const _Filters = memo(Filters) as typeof Filters;
 export { _Filters as Filters };
 
-// Filter helper methods below
-
 // Returns object with specified key removed
 const omitKey = <T, K extends keyof T>(key: K, { [key]: _, ...obj }: T) => obj as T;
 
@@ -98,22 +96,22 @@ export function multiFilter<O, V extends Key>(props: MultiFilterProps<O, V>) {
   return { kind: "multi" as const, ...props };
 }
 
-type BooleanOption2 = [boolean | undefined, string];
-const defaultBooleanOptions: BooleanOption2[] = [
+type BooleanOption = [boolean | undefined, string];
+const defaultBooleanOptions: BooleanOption[] = [
   [undefined, "Any"],
   [true, "Yes"],
   [false, "No"],
 ];
 
 interface BooleanFilterProps {
-  options?: BooleanOption2[];
+  options?: BooleanOption[];
   label: string;
 }
 
 export function booleanFilter({
   options = defaultBooleanOptions,
   label,
-}: BooleanFilterProps): { kind: "single" } & SingleFilterProps<BooleanOption2, string> {
+}: BooleanFilterProps): { kind: "single" } & SingleFilterProps<BooleanOption, string> {
   return {
     kind: "single" as const,
     options,
@@ -132,7 +130,7 @@ export type FilterDef<V> = V extends Array<infer U>
     ? { kind: "multi" } & MultiFilterProps<any, U>
     : never
   : V extends boolean | undefined
-  ? { kind: "single" } & SingleFilterProps<BooleanOption2, string>
+  ? { kind: "single" } & SingleFilterProps<BooleanOption, string>
   : V extends Key
   ? { kind: "single" } & SingleFilterProps<any, V>
   : never;
