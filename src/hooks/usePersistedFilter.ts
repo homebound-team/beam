@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import { FilterDef } from "src/components";
+import { FilterDefs } from "src/components";
 import { useSessionStorage } from "src/hooks";
 import { safeKeys } from "src/utils";
 import { JsonParam, useQueryParams } from "use-query-params";
 
 interface UsePersistedFilterProps<F> {
-  defaultFilter: F;
+  defaultFilter?: F;
   storageKey: string;
-  filterDefs: { [K in keyof F]: FilterDef<F[K]> };
+  filterDefs: FilterDefs<F>;
 }
 
 /**
@@ -15,7 +15,7 @@ interface UsePersistedFilterProps<F> {
  * If a valid filter is present in the query params, then that will be used.
  * Otherwise it looks at browser storage, and finally the defaultFilter prop.
  */
-export function usePersistedFilter<F>({ defaultFilter, storageKey, filterDefs }: UsePersistedFilterProps<F>) {
+export function usePersistedFilter<F>({ defaultFilter = {} as F, storageKey, filterDefs }: UsePersistedFilterProps<F>) {
   const filterKeys = Object.keys(filterDefs);
   const [{ filter: queryParamsFilter }, setQueryParams] = useQueryParams({ filter: JsonParam });
   const [storedFilter, setStoredFilter] = useSessionStorage<F>(storageKey, queryParamsFilter ?? defaultFilter);

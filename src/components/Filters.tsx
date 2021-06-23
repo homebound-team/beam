@@ -2,76 +2,79 @@ import { Key, memo, useCallback, useMemo } from "react";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
 import { MultiSelectField, MultiSelectFieldProps, SelectField, SelectFieldProps } from "src/inputs";
+import { omitKey } from "src/utils";
 
-interface FilterProps<T> {
-  filter: T;
+interface FilterProps<F> {
+  filter: F;
   /** List of filters */
-  filterDefs: { [K in keyof T]: FilterDef<T[K]> };
+  filterDefs: FilterDefs<F>;
   /** Callback to execute when the filter fields have been changed */
-  onApply: (f: T) => void;
+  onChange: (f: F) => void;
 }
 
 function Filters<T>(props: FilterProps<T>) {
-  const { filter, onApply, filterDefs } = props;
+  const { filter, onChange, filterDefs } = props;
   const filterKeys = useMemo(() => Object.keys(filterDefs) as (keyof T)[], [filterDefs]);
 
-  const updateFilter = useCallback((key: keyof T, value: Key[] | Key, currentFilter: T) => {
-    const parsedValue = Array.isArray(value) ? value : parseKeyValue(value);
-
-    // if the changedFilter's value an empty array, then remove the property all together.
-    const newFilter =
-      (Array.isArray(value) && value.length === 0) || parsedValue === undefined
-        ? omitKey(key, currentFilter)
-        : { ...currentFilter, [key]: parsedValue };
-
-    onApply && onApply(newFilter);
+  const updateFilter = useCallback((currentFilter: T, key: keyof T, value: any | undefined) => {
+    if (value === undefined || (Array.isArray(value) && value.length === 0)) {
+      onChange(omitKey(key, currentFilter));
+    } else {
+      onChange({ ...currentFilter, [key]: value });
+    }
   }, []);
 
-  const memoComponents = useMemo(
-    () =>
-      filterKeys.map((key) => {
-        const filterDef = filterDefs[key] as any;
+  const filterComponents = filterKeys.map((key) => {
+    const filterDef = filterDefs[key] as any;
 
-        if (filterDef.kind === "single") {
-          return (
-            <SelectField
-              {...filterDef}
-              value={
-                typeof filter[key] === "string" || typeof filter[key] === "number" ? filter[key] : String(filter[key])
-              }
-              inlineLabel
-              onSelect={(value) => updateFilter(key, value, filter)}
-            />
-          );
-        }
+    if (filterDef.kind === "boolean") {
+      return (
+        <SelectField
+          {...filterDef}
+          value={String(filter[key])}
+          inlineLabel
+          onSelect={(value) => {
+            const parsedValue = value === "undefined" ? undefined : value === "true" ? true : false;
+            updateFilter(filter, key, parsedValue);
+          }}
+        />
+      );
+    }
 
-        if (filterDef.kind === "multi") {
-          return (
-            <MultiSelectField
-              {...filterDef}
-              values={filter[key] || []}
-              inlineLabel
-              onSelect={(values) => updateFilter(key, values, filter)}
-            />
-          );
-        }
-      }),
-    [filterKeys, filter],
-  );
+    if (filterDef.kind === "single") {
+      return (
+        <SelectField
+          {...filterDef}
+          value={filter[key]}
+          inlineLabel
+          onSelect={(value) => updateFilter(filter, key, value)}
+        />
+      );
+    }
+
+    if (filterDef.kind === "multi") {
+      return (
+        <MultiSelectField
+          {...filterDef}
+          values={filter[key] || []}
+          inlineLabel
+          onSelect={(values) => updateFilter(filter, key, values)}
+        />
+      );
+    }
+  });
 
   // Return list of filter components. `onSelect` should update the `filter`
   return (
     <div css={Css.df.childGap1.$}>
-      {memoComponents.map((c, idx) => (
+      {filterComponents.map((c, idx) => (
         <div key={idx}>{c}</div>
       ))}
       <Button
         label="Clear"
         variant="tertiary"
         disabled={Object.keys(filter).length === 0}
-        onClick={() => {
-          onApply && onApply({} as T);
-        }}
+        onClick={() => onChange({} as T)}
       />
     </div>
   );
@@ -82,16 +85,12 @@ function Filters<T>(props: FilterProps<T>) {
 const _Filters = memo(Filters) as typeof Filters;
 export { _Filters as Filters };
 
-// Returns object with specified key removed
-const omitKey = <T, K extends keyof T>(key: K, { [key]: _, ...obj }: T) => obj as T;
-
 type SingleFilterProps<O, V extends Key> = Omit<SelectFieldProps<O, V>, "value" | "onSelect">;
 export function singleFilter<O, V extends Key>(props: SingleFilterProps<O, V>) {
   return { kind: "single" as const, ...props };
 }
 
 type MultiFilterProps<O, V extends Key> = Omit<MultiSelectFieldProps<O, V>, "values" | "onSelect">;
-
 export function multiFilter<O, V extends Key>(props: MultiFilterProps<O, V>) {
   return { kind: "multi" as const, ...props };
 }
@@ -107,19 +106,20 @@ interface BooleanFilterProps {
   options?: BooleanOption[];
   label: string;
 }
-
 export function booleanFilter({
   options = defaultBooleanOptions,
   label,
-}: BooleanFilterProps): { kind: "single" } & SingleFilterProps<BooleanOption, string> {
+}: BooleanFilterProps): { kind: "boolean" } & SingleFilterProps<BooleanOption, string> {
   return {
-    kind: "single" as const,
+    kind: "boolean" as const,
     options,
     label,
     getOptionValue: (o) => String(o[0]),
     getOptionLabel: (o) => o[1],
   };
 }
+
+export type FilterDefs<F> = { [K in keyof F]: FilterDef<F[K]> };
 
 // What is V?
 // - V might be `string[]` and could be used for a multiselect that getOptionValue returned strings
@@ -130,11 +130,7 @@ export type FilterDef<V> = V extends Array<infer U>
     ? { kind: "multi" } & MultiFilterProps<any, U>
     : never
   : V extends boolean | undefined
-  ? { kind: "single" } & SingleFilterProps<BooleanOption, string>
+  ? { kind: "boolean" } & SingleFilterProps<BooleanOption, string>
   : V extends Key
   ? { kind: "single" } & SingleFilterProps<any, V>
   : never;
-
-function parseKeyValue(value: Key): boolean | undefined | Key {
-  return value === "undefined" ? undefined : value === "true" ? true : value === "false" ? false : value;
-}

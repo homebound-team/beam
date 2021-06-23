@@ -1,7 +1,8 @@
 import { Meta } from "@storybook/react";
+import { useMemo } from "react";
 import {
   booleanFilter,
-  FilterDef,
+  FilterDefs,
   Filters,
   GridColumn,
   GridDataRow,
@@ -44,12 +45,14 @@ export function Filter() {
     ],
     label: "Favorite Status",
   });
-
-  const filterDefs: { [K in keyof ProjectFilter]: FilterDef<ProjectFilter[K]> } = {
-    marketId,
-    internalUserId,
-    favorite,
-  };
+  const filterDefs: FilterDefs<ProjectFilter> = useMemo(
+    () => ({
+      marketId,
+      internalUserId,
+      favorite,
+    }),
+    [marketId, internalUserId, favorite],
+  );
   const { setFilter, filter } = usePersistedFilter<ProjectFilter>({
     defaultFilter,
     storageKey: "storybookFilter",
@@ -60,7 +63,7 @@ export function Filter() {
     <div css={Css.df.flexColumn.childGap5.$}>
       <div css={Css.df.flexColumn.childGap2.$}>
         <h1 css={Css.lg.$}>Filters</h1>
-        <Filters<ProjectFilter> filter={filter} onApply={setFilter} filterDefs={filterDefs} />
+        <Filters<ProjectFilter> filter={filter} onChange={setFilter} filterDefs={filterDefs} />
       </div>
       <GridTable columns={columns} rows={filterRows(tableData, filter)} />
     </div>

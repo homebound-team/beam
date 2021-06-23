@@ -44,3 +44,6 @@ export * from "./useTestIds";
 export function safeKeys<T>(instance: T): (keyof T)[] {
   return Object.getOwnPropertyNames(instance) as any;
 }
+
+// Returns object with specified key removed
+export const omitKey = <T, K extends keyof T>(key: K, { [key]: _, ...obj }: T) => obj as T;
