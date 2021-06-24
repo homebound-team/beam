@@ -8,10 +8,11 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { Link } from "react-router-dom";
-import { Components, Virtuoso } from "react-virtuoso";
+import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
 import { Css, Margin, Only, Palette, Properties, px, Xss } from "src/Css";
@@ -237,6 +238,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   } = props;
 
   const [collapsedIds, toggleCollapsedId] = useToggleIds(rows, persistCollapse);
+  // We only use this in as=virtual mode, but keep this here for rowLookup to use
+  const virtuosoRef = useRef<VirtuosoHandle | null>(null);
 
   const [sortFlags, setSortValue] = useSortFlags<R, S>(columns, sort, onSort);
   const maybeSorted = useMemo(() => {
@@ -320,6 +323,15 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   if (rowLookup) {
     // Refs are cheap to assign to, so we don't bother doing this in a useEffect
     rowLookup.current = {
+      scrollTo(kind, id) {
+        if (virtuosoRef.current === null) {
+          // In theory we could support as=div and as=table by finding the DOM
+          // element and calling .scrollIntoView, just not doing that yet.
+          throw new Error("scrollTo is only supported for as=virtual");
+        }
+        const index = filteredRows.findIndex(([r]) => r.kind === kind && r.id === id);
+        virtuosoRef.current.scrollToIndex({ index, behavior: "smooth" });
+      },
       currentList() {
         return filteredRows.map((r) => r[0]);
       },
@@ -359,7 +371,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
-  return renders[as](style, id, columns, headerRows, filteredRows, firstRowMessage, stickyHeader, xss);
+  return renders[as](style, id, columns, headerRows, filteredRows, firstRowMessage, stickyHeader, xss, virtuosoRef);
 }
 
 // Determine which HTML element to use to build the GridTable
@@ -379,6 +391,7 @@ function renderCssGrid<R extends Kinded>(
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
+  virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
   return (
     <div
@@ -418,6 +431,7 @@ function renderTable<R extends Kinded>(
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
+  virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
   return (
     <table
@@ -476,9 +490,11 @@ function renderVirtual<R extends Kinded>(
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
+  virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
   return (
     <Virtuoso
+      ref={virtuosoRef}
       components={{ List: VirtualRoot(style, columns, id, xss) }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
@@ -618,6 +634,9 @@ export interface GridRowLookup<R extends Kinded> {
 
   /** Returns the list of currently filtered/sorted rows, without headers. */
   currentList(): readonly GridDataRow<R>[];
+
+  /** Scroll's to the row with the given kind + id. Requires using `as=virtual`. */
+  scrollTo(kind: R["kind"], id: string): void;
 }
 
 interface NextPrev<R extends Kinded> {
