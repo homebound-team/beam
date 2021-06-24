@@ -325,10 +325,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     rowLookup.current = {
       scrollTo(kind, id) {
         if (virtuosoRef.current === null) {
+          // In theory we could support as=div and as=table by finding the DOM
+          // element and calling .scrollIntoView, just not doing that yet.
           throw new Error("scrollTo is only supported for as=virtual");
         }
-        const i = filteredRows.findIndex(([r]) => r.kind === kind && r.id === id);
-        virtuosoRef.current.scrollToIndex(i);
+        const index = filteredRows.findIndex(([r]) => r.kind === kind && r.id === id);
+        virtuosoRef.current.scrollToIndex({ index, behavior: "smooth" });
       },
       currentList() {
         return filteredRows.map((r) => r[0]);
@@ -633,7 +635,7 @@ export interface GridRowLookup<R extends Kinded> {
   /** Returns the list of currently filtered/sorted rows, without headers. */
   currentList(): readonly GridDataRow<R>[];
 
-  /** Scroll's to the row with the given kind + id. */
+  /** Scroll's to the row with the given kind + id. Requires using `as=virtual`. */
   scrollTo(kind: R["kind"], id: string): void;
 }
 
