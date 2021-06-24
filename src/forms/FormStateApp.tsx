@@ -10,6 +10,7 @@ import {
   simpleHeader,
   SimpleHeaderAndDataWith,
 } from "src/components";
+import { Css } from "src/Css";
 import { BoundDateField, BoundNumberField, BoundSelectField, BoundTextField } from "src/forms";
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
 import { AuthorInput } from "src/forms/formStateDomain";
@@ -80,7 +81,7 @@ export function FormStateApp() {
               <GridTable<Row> columns={columns} rows={rows} observeRows={true} />
             </div>
 
-            <div>
+            <div css={Css.df.childGap1.$}>
               <Button onClick={() => formState.reset()} label="Cancel" />
               <Button
                 onClick={() => {
