@@ -20,13 +20,13 @@ export function BoundNumberField(props: BoundNumberFieldProps) {
     type = field.key.endsWith("InCents") ? "cents" : undefined,
     ...others
   } = props;
-  const testId = useTestIds(props, (label || field.key));
+  const testId = useTestIds(props, label || field.key);
   return (
     <Observer>
       {() => (
         <NumberField
           label={label}
-          value={field.value || undefined}
+          value={typeof field.value === "number" ? field.value : undefined}
           onChange={onChange}
           type={type}
           readOnly={readOnly ?? field.readOnly}
