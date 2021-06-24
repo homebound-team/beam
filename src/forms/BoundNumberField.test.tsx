@@ -58,6 +58,14 @@ describe("BoundNumberField", () => {
     expect(r.royalties_label()).not.toHaveTextContent("Cents");
     expect(r.royalties()).toHaveValue("$1.00");
   });
+
+  it("retains 0 value", async () => {
+    const author = createObjectState(formConfig, { royaltiesInCents: 1_00 });
+    const { royalties } = await render(<BoundNumberField field={author.royaltiesInCents} />);
+    fireEvent.input(royalties(), { target: { value: "0" } });
+    fireEvent.blur(royalties());
+    expect(royalties()).toHaveValue("$0.00");
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {
