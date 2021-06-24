@@ -92,13 +92,13 @@ export function SuperDrawer(): ReactPortal {
                           icon: "chevronLeft",
                           onClick: () => onPrevClick && onPrevClick(),
                           disabled: !onPrevClick || type === "detail",
-                          "data-testid": "superDrawer_prev",
+                          ...testId.prev,
                         },
                         {
                           icon: "chevronRight",
                           onClick: () => onNextClick && onNextClick(),
                           disabled: !onNextClick || type === "detail",
-                          "data-testid": "superDrawer_next",
+                          ...testId.next,
                         },
                       ]}
                     />
