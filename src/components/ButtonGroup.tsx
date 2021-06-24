@@ -11,7 +11,7 @@ export interface ButtonGroupProps {
    * ButtonGroupButtonProps in an internal API.
    * This is only exposing props that will be publicly accessible.
    */
-  buttons: Pick<ButtonGroupButtonProps, "text" | "icon" | "active" | "onClick" | "disabled">[];
+  buttons: Pick<ButtonGroupButtonProps, "text" | "icon" | "active" | "onClick" | "disabled" | "data-testid">[];
   size?: ButtonGroupSize;
 }
 
@@ -21,6 +21,7 @@ interface ButtonGroupButtonProps extends BeamButtonProps, BeamFocusableProps {
   // Active is used to indicate the active/selected button, as in a tab or toggle.
   active?: boolean;
   size: ButtonGroupSize;
+  "data-testid"?: string;
 }
 
 export function ButtonGroup(props: ButtonGroupProps) {
