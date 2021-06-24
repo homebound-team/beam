@@ -87,7 +87,7 @@ const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 
 function getButtonStyles() {
   return {
-    ...Css.z1.px2.bgWhite.bGray300.bw1.ba.gray900.m0.br0.$,
+    ...Css.z1.px2.bgWhite.bGray300.bw1.ba.gray900.br0.$,
     "&:disabled": Css.gray400.cursorNotAllowed.bGray300.$,
     // Our first button should have a rounded left border
     "&:first-of-type": Css.add("borderRadius", "4px 0 0 4px").$,

@@ -78,7 +78,6 @@ const sections: Sections = {
       outline: 0,
       borderRadius: "4px",
       display: "inline-flex",
-      margin: "4px",
       alignItems: "center",
       transition,
     }),
