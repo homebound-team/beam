@@ -1,5 +1,6 @@
 import { createContext, ReactChild, ReactNode, useContext, useMemo, useState } from "react";
 import { SuperDrawer } from "./SuperDrawer";
+import { contentStackSymbol } from "./symbols";
 
 interface SuperDrawerHeaderProps {
   /** Title of the SuperDrawer */
@@ -36,7 +37,12 @@ type SuperDrawerOpenInDrawerProps = SuperDrawerNewOpenInDrawerProps | SuperDrawe
 
 // Values used by SuperDrawer for rendering including `SuperDrawerHeaderProps`
 interface SuperDrawerContextValues {
-  contentStack: SuperDrawerOpenInDrawerProps[];
+  /**
+   * Key to access the SuperDrawer content stack
+   * @private
+   */
+  [contentStackSymbol]: SuperDrawerOpenInDrawerProps[];
+  isDrawerOpen: boolean;
   modalContent?: ReactNode;
 }
 
@@ -78,7 +84,11 @@ export function SuperDrawerProvider({ children }: { children: ReactChild }) {
   const [modalContent, setModalContent] = useState<ReactNode>(null);
 
   // Building context object
-  const values: SuperDrawerContextValues = { contentStack, modalContent };
+  const values: SuperDrawerContextValues = {
+    [contentStackSymbol]: contentStack,
+    modalContent,
+    isDrawerOpen: contentStack.length > 0,
+  };
   const actions: SuperDrawerContextActions = useMemo(
     () => ({
       openInDrawer: (content) => {

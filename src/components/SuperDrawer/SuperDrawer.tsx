@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { Button, ButtonGroup, ButtonProps, Css, IconButton, px } from "src";
 import { useTestIds } from "src/utils";
 import { SuperDrawerNewOpenInDrawerProps, useSuperDrawer } from "./index";
+import { contentStackSymbol } from "./symbols";
 
 /**
  * Global drawer component.
@@ -27,7 +28,9 @@ import { SuperDrawerNewOpenInDrawerProps, useSuperDrawer } from "./index";
  * above the SuperDrawer.
  */
 export function SuperDrawer(): ReactPortal {
-  const { contentStack, modalContent, closeDrawer } = useSuperDrawer();
+  const superDrawerContext = useSuperDrawer();
+  const contentStack = superDrawerContext[contentStackSymbol];
+  const { modalContent, closeDrawer } = superDrawerContext;
   const testId = useTestIds({}, "superDrawer");
 
   // Get the latest element on the stack
@@ -140,7 +143,9 @@ interface SuperDrawerContentProps {
  * that knows how to handle the title, prev/next link and the onClose handler.
  */
 export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProps) => {
-  const { contentStack, closeInDrawer } = useSuperDrawer();
+  const superDrawerContext = useSuperDrawer();
+  const contentStack = superDrawerContext[contentStackSymbol];
+  const { closeInDrawer } = superDrawerContext;
 
   // Determine if the current element is a new content element or an detail element
   const { type } = contentStack[contentStack.length - 1] ?? {};
