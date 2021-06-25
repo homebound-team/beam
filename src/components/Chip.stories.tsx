@@ -1,6 +1,5 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { Css } from "src/Css";
 import { Chip as ChipComponent } from "src/index";
 
 export default {
@@ -10,7 +9,7 @@ export default {
 
 export function Chip() {
   return (
-    <div css={Css.df.flexColumn.childGap2.$}>
+    <div>
       <ChipComponent text={"First Last"} onClick={action("click")} />
     </div>
   );

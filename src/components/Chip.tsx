@@ -13,7 +13,7 @@ export function Chip(props: ChipProps) {
     <button
       type="button"
       css={{
-        ...Css.df.itemsCenter.br16.sm.pl1.pyPx(2).bgGray200.$,
+        ...Css.dif.itemsCenter.br16.sm.pl1.pyPx(2).bgGray200.$,
         ":hover": Css.bgGray300.$,
       }}
       onClick={onClick}
