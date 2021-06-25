@@ -1,6 +1,7 @@
 export * from "./BoundCheckboxField";
 export * from "./BoundCheckboxGroupField";
 export * from "./BoundDateField";
+export * from "./BoundMultiSelectField";
 export * from "./BoundNumberField";
 export * from "./BoundRadioGroupField";
 export * from "./BoundSelectField";
