@@ -18,6 +18,7 @@ export interface AuthorInput {
   address?: AuthorAddress | null;
   favoriteSport?: string | null;
   favoriteColors?: string[] | null;
+  favoriteShapes?: string[] | null;
   isAvailable?: boolean | null;
 }
 
