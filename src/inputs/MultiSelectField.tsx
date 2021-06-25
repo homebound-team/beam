@@ -8,7 +8,7 @@ export interface MultiSelectFieldProps<O, V extends Key> extends BeamSelectField
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
   values: V[];
-  onSelect?: (values: V[], opts: O[]) => void;
+  onSelect: (values: V[], opts: O[]) => void;
   options: O[];
 }
 

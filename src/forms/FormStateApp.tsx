@@ -11,7 +11,7 @@ import {
   SimpleHeaderAndDataWith,
 } from "src/components";
 import { Css } from "src/Css";
-import { BoundDateField, BoundNumberField, BoundSelectField, BoundTextField } from "src/forms";
+import { BoundDateField, BoundMultiSelectField, BoundNumberField, BoundSelectField, BoundTextField } from "src/forms";
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
@@ -55,6 +55,12 @@ export function FormStateApp() {
     { value: "c:3", label: "Green" },
   ];
 
+  const shapes = [
+    { id: "sh:1", name: "Triangle" },
+    { id: "sh:2", name: "Square" },
+    { id: "sh:3", name: "Circle" },
+  ];
+
   return (
     <Observer>
       {() => (
@@ -67,6 +73,8 @@ export function FormStateApp() {
               <BoundDateField field={formState.birthday} />
               <BoundNumberField field={formState.heightInInches} />
               <BoundSelectField field={formState.favoriteSport} options={sports} />
+              <br />
+              <BoundMultiSelectField field={formState.favoriteShapes} options={shapes} />
               <BoundCheckboxGroupField field={formState.favoriteColors} options={colors} />
             </div>
 
@@ -125,6 +133,7 @@ const formConfig: ObjectConfig<AuthorInput> = {
   heightInInches: { type: "value", rules: [required] },
   favoriteSport: { type: "value", rules: [required] },
   favoriteColors: { type: "value", rules: [required] },
+  favoriteShapes: { type: "value", rules: [required] },
   books: {
     type: "list",
     rules: [({ value }) => ((value || []).length === 0 ? "Empty" : undefined)],
