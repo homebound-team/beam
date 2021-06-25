@@ -2,7 +2,7 @@ import { SelectState } from "@react-stately/select";
 import React, { Key, MutableRefObject, useState } from "react";
 import { DismissButton, useListBox } from "react-aria";
 import { Virtuoso } from "react-virtuoso";
-import { Icon } from "src/components/Icon";
+import { Chip } from "src/components/Chip";
 import { Option } from "src/components/internal";
 import { Css } from "src/Css";
 
@@ -88,21 +88,12 @@ function ListBoxChip<O, V extends Key>(props: ListBoxChipProps<O, V>) {
   const { state, option, getOptionLabel, getOptionValue } = props;
   return (
     <li css={Css.mr1.mb1.$}>
-      <button
-        type="button"
-        css={{
-          ...Css.df.itemsCenter.br16.sm.pl1.pyPx(2).bgGray200.$,
-          ":hover": Css.bgGray300.$,
-        }}
+      <Chip
+        text={getOptionLabel(option)}
         onClick={() => {
           state.selectionManager.toggleSelection(String(getOptionValue(option)));
         }}
-      >
-        <span css={Css.prPx(6).tl.$}>{getOptionLabel(option)}</span>
-        <span css={Css.fs0.br16.bgGray400.mrPx(2).$}>
-          <Icon icon="x" />
-        </span>
-      </button>
+      />
     </li>
   );
 }
