@@ -1,3 +1,4 @@
+import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf } from "src";
@@ -12,7 +13,8 @@ export default {
 } as Meta;
 
 export function Open() {
-  const { openInDrawer } = useSuperDrawer();
+  const { openInDrawer, isDrawerOpen } = useSuperDrawer();
+  action("isDrawerOpen")(isDrawerOpen);
 
   // Open the SuperDrawer on render
   useEffect(() => {
@@ -28,7 +30,7 @@ export function Open() {
     <div css={Css.hPx(5000).$}>
       <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open</h1>
       <Button
-        label="Show SuperDrawer"
+        label={isDrawerOpen ? "SuperDrawer is open" : "Show SuperDrawer"}
         onClick={() =>
           openInDrawer({
             title: "Content Title",
