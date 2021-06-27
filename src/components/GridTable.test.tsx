@@ -654,7 +654,7 @@ describe("GridTable", () => {
     expect(rowLookup.current!.lookup(r1)).toMatchObject({ data: {} });
   });
 
-  it("renders as=div while tests", async () => {
+  it("supports as=virtual in tests", async () => {
     // Given an application would call this in their setupTests/beforeEach
     setRunningInJest();
     // When the GridTable is rendered as=virtual
