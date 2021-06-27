@@ -68,6 +68,13 @@ export type GridTableXss = Xss<Margin>;
 
 export type Direction = "ASC" | "DESC";
 
+let runningInJest = false;
+
+/** Tells GridTable we're running in Jest, which forces as=virtual to be as=div, to work in jsdom. */
+export function setRunningInJest() {
+  runningInJest = true;
+}
+
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
 export interface GridStyle {
   /** Applied to the base div element. */
@@ -371,7 +378,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
-  return renders[as](style, id, columns, headerRows, filteredRows, firstRowMessage, stickyHeader, xss, virtuosoRef);
+  // If we're running in Jest, force using `as=div` b/c jsdom doesn't support react-virtuoso.
+  // This enables still putting the application's business/rendering logic under test, and letting it
+  // just trust the GridTable impl that, at runtime, `as=virtual` will (other than being virtualized)
+  // behave semantically the same as `as=div` did for its tests.
+  const _as = as === "virtual" && runningInJest ? "div" : as;
+  return renders[_as](style, id, columns, headerRows, filteredRows, firstRowMessage, stickyHeader, xss, virtuosoRef);
 }
 
 // Determine which HTML element to use to build the GridTable
