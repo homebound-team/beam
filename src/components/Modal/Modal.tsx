@@ -31,7 +31,7 @@ export function Modal(props: ModalProps) {
 
   return (
     <OverlayContainer>
-      <div css={Css.underlay.$} {...underlayProps} {...testId.underlay}>
+      <div css={Css.underlay.z4.$} {...underlayProps} {...testId.underlay}>
         <FocusScope contain restoreFocus autoFocus>
           <div
             css={Css.br24.bgWhite.bshModal.maxh("90vh").df.flexColumn.wPx(width).$}
@@ -41,14 +41,14 @@ export function Modal(props: ModalProps) {
             {...modalProps}
             {...testId}
           >
-            <div css={Css.df.p3.$}>
+            <header css={Css.df.p3.$}>
               <h1 css={Css.fg1.xl2Em.gray900.$} {...titleProps} {...testId.title}>
                 {title}
               </h1>
               <span css={Css.fs0.pl1.$}>
                 <IconButton icon="x" onClick={onClose} {...testId.titleClose} />
               </span>
-            </div>
+            </header>
             <>{content}</>
           </div>
         </FocusScope>

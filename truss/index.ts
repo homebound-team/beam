@@ -95,7 +95,6 @@ const sections: Sections = {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      zIndex: 4,
       backgroundColor: "rgba(36,36,36,0.2)",
     }),
   ],

@@ -827,7 +827,7 @@ class CssBuilder<T extends Properties1> {
   get listReset() { return this.add("padding", 0).add("margin", 0).add("listStyle", "none"); }
 
   // underlay
-  get underlay() { return this.add("position", "fixed").add("top", 0).add("bottom", 0).add("left", 0).add("right", 0).add("display", "flex").add("alignItems", "center").add("justifyContent", "center").add("zIndex", 4).add("backgroundColor", "rgba(36,36,36,0.2)"); }
+  get underlay() { return this.add("position", "fixed").add("top", 0).add("bottom", 0).add("left", 0).add("right", 0).add("display", "flex").add("alignItems", "center").add("justifyContent", "center").add("backgroundColor", "rgba(36,36,36,0.2)"); }
 
   // aliases
   
