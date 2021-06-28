@@ -79,7 +79,7 @@ export function SelectFieldInput<O, V extends Key>(props: SelectFieldInputProps<
       {!inlineLabel && label && <Label labelProps={labelProps} label={label} {...tid.label} />}
       <div
         css={{
-          ...Css.df.ba.bGray300.br4.px1.itemsCenter.bgWhite.$,
+          ...Css.df.ba.bGray300.br4.px1.itemsCenter.bgWhite.hPx(40).if(compact).hPx(32).$,
           ...hoverStyles,
           ...errorStyles,
           ...focusStyles,
@@ -113,7 +113,7 @@ export function SelectFieldInput<O, V extends Key>(props: SelectFieldInputProps<
           {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
           ref={inputRef as any}
           css={{
-            ...Css.sm.mw0.fg1.pr1.bgWhite.br4.pyPx(10).gray900.outline0.if(compact).pyPx(6).$,
+            ...Css.sm.mw0.fg1.pr1.bgWhite.br4.gray900.outline0.$,
             ...hoverStyles,
             ...disabledStyles,
             ...readOnlyStyles,
