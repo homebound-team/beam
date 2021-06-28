@@ -342,8 +342,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       currentList() {
         return filteredRows.map((r) => r[0]);
       },
-      lookup(row) {
-        const rows = filteredRows.map((r) => r[0]);
+      lookup(row, additionalFilter = () => true) {
+        const rows = filteredRows.map((r) => r[0]).filter(additionalFilter);
         // Ensure we have `result.kind = {}` for each kind
         const result: any = Object.fromEntries(getKinds(columns).map((kind) => [kind, {}]));
         // This is an admittedly cute/fancy scan, instead of just `rows.findIndex`, but
@@ -639,6 +639,7 @@ export interface GridRowLookup<R extends Kinded> {
   /** Returns both the immediate next/prev rows, as well as `[kind].next/prev` values, ignoring headers. */
   lookup(
     row: GridDataRow<R>,
+    additionalFilter?: (row: GridDataRow<R>) => boolean,
   ): NextPrev<R> &
     {
       [P in R["kind"]]: NextPrev<DiscriminateUnion<R, "kind", P>>;
