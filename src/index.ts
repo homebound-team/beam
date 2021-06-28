@@ -4,6 +4,6 @@ export * from "./forms";
 export * from "./hooks";
 export * from "./inputs";
 export * from "./interfaces";
-export { withSuperDrawerRTL } from "./utils/rtl";
+export { withModalRTL, withSuperDrawerRTL } from "./utils/rtl";
 export { withSuperDrawerDecorator } from "./utils/sb";
 export * from "./utils/useTestIds";

@@ -6,6 +6,8 @@ export * from "./Filters";
 export * from "./GridTable";
 export * from "./Icon";
 export * from "./IconButton";
+export * from "./Modal/Modal";
+export * from "./Modal/ModalContext";
 export { NavLink } from "./NavLink";
 export * from "./RichTextField";
 export * from "./SuperDrawer";

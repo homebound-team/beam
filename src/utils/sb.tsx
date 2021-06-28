@@ -2,6 +2,7 @@ import { StoryFn } from "@storybook/addons";
 import { DecoratorFn } from "@storybook/react";
 import { ReactElement, ReactNode } from "react";
 import { SuperDrawerProvider } from "src";
+import { ModalProvider } from "src/components";
 import { Css } from "src/Css";
 import { withRouter as rtlWithRouter } from "src/utils/rtl";
 
@@ -45,6 +46,13 @@ export const withSuperDrawerDecorator = (Story: () => JSX.Element) => (
   <SuperDrawerProvider>
     <Story />
   </SuperDrawerProvider>
+);
+
+/** Storybook decorator utility to wrap a story with a Modal context */
+export const withModalDecorator = (Story: () => JSX.Element) => (
+  <ModalProvider>
+    <Story />
+  </ModalProvider>
 );
 
 /**
