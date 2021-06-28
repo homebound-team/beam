@@ -7,6 +7,7 @@ import {
   GridRowStyles,
   GridTable,
   matchesFilter,
+  setRunningInJest,
   simpleHeader,
   SimpleHeaderAndDataOf,
   SimpleHeaderAndDataWith,
@@ -651,6 +652,16 @@ describe("GridTable", () => {
     await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
     // Then we get nothing back
     expect(rowLookup.current!.lookup(r1)).toMatchObject({ data: {} });
+  });
+
+  it("supports as=virtual in tests", async () => {
+    // Given an application would call this in their setupTests/beforeEach
+    setRunningInJest();
+    // When the GridTable is rendered as=virtual
+    const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} as="virtual" />);
+    // Then we can still assert against the content
+    expect(cell(r, 1, 0)).toHaveTextContent("foo");
+    expect(cell(r, 2, 0)).toHaveTextContent("bar");
   });
 });
 
