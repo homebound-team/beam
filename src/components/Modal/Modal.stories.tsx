@@ -3,13 +3,13 @@ import { Meta } from "@storybook/react";
 import { useEffect, useState } from "react";
 import { Button, Modal, ModalBody, ModalFooter, ModalProps, useModalContext } from "src/components/index";
 import { Css } from "src/Css";
-import { withModalDecorator } from "src/utils/sb";
+import { withDimensions, withModalDecorator } from "src/utils/sb";
 import { withPerformance } from "storybook-addon-performance";
 
 export default {
   component: Modal,
   title: "Components/Modal",
-  decorators: [withPerformance, withModalDecorator],
+  decorators: [withPerformance, withModalDecorator, withDimensions()],
 } as Meta;
 
 export const Small = () => <ModalExample size="sm" />;
