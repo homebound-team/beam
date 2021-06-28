@@ -1,117 +1,71 @@
 import { fireEvent } from "@testing-library/react";
-import { ReactNode, useEffect } from "react";
-import { ModalContent, ModalContentProps, ModalProps, useModalContext } from "src/components/Modal";
+import { useEffect } from "react";
+import { ModalBody, ModalFooter, ModalProps, useModalContext } from "src/components/Modal";
 import { noop } from "src/utils";
 import { click, render, withModalRTL } from "src/utils/rtl";
 
 describe("Modal", () => {
   it("renders", async () => {
-    // Given modal props
-    const contentProps = { primaryAction: { label: "Primary", onClick: noop } };
     // When rendered
-    const r = await render(<TestModalApp modalProps={{}} contentProps={contentProps} />, withModalRTL);
+    const r = await render(
+      <TestModalApp title="Title" onClose={noop} content={<TestModalComponent />} />,
+      withModalRTL,
+    );
 
     // Then expect the content to match
-    expect(r.modal_title().textContent).toBe("Test title");
-    expect(r.modal_content().textContent).toBe("Modal Content");
-    expect(r.modal_primaryAction().textContent).toBe("Primary");
-    expect(r.modal_secondaryAction().textContent).toBe("Cancel");
+    expect(r.modal_title().textContent).toBe("Title");
+    expect(r.modal_titleClose()).toBeTruthy();
+    expect(r.modal_content()).toBeTruthy();
   });
 
-  it("invokes actions", async () => {
+  it("invokes onClose", async () => {
     // Given mocked actions
     const onClose = jest.fn();
-    const onPrimaryAction = jest.fn();
-    const onLeftAction = jest.fn();
-    const contentProps = {
-      primaryAction: { label: "Primary", onClick: onPrimaryAction },
-      leftAction: { label: "Left", onClick: onLeftAction },
-    };
+    const r = await render(
+      <TestModalApp title="Title" onClose={onClose} content={<TestModalComponent />} />,
+      withModalRTL,
+    );
 
-    const r = await render(<TestModalApp modalProps={{ onClose }} contentProps={contentProps} />, withModalRTL);
-
-    // When clicking the actions
-    click(r.modal_primaryAction);
-    // Expect them to be call
-    expect(onPrimaryAction).toBeCalledTimes(1);
-    click(r.modal_leftAction);
-    expect(onLeftAction).toBeCalledTimes(1);
-
-    click(r.modal_secondaryAction);
-    expect(onClose).toBeCalledTimes(1);
+    // When invoking the `onClose` in various interactions
     click(r.modal_titleClose);
-    expect(onClose).toBeCalledTimes(2);
+    expect(onClose).toBeCalledTimes(1);
     fireEvent.keyDown(r.modal(), { key: "Escape", code: "Escape" });
-    expect(onClose).toBeCalledTimes(3);
+    expect(onClose).toBeCalledTimes(2);
   });
 
-  it("can override secondary actions", async () => {
-    // Given a custom Secondary Action
-    const onClose = jest.fn();
-    const onSecondaryAction = jest.fn();
-    const contentProps = {
-      primaryAction: { label: "Primary", onClick: noop },
-      secondaryAction: { label: "Secondary", onClick: onSecondaryAction },
-    };
-
-    // When rendered
-    const r = await render(<TestModalApp modalProps={{ onClose }} contentProps={contentProps} />, withModalRTL);
-
-    // Then the secondary action's text should match the override
-    expect(r.modal_secondaryAction().textContent).toBe("Secondary");
-
-    // And when clicking the action
-    click(r.modal_secondaryAction);
-    // Then the override action should be invoked
-    expect(onSecondaryAction).toBeCalledTimes(1);
-    // And `onClose` is not invoked
-    expect(onClose).not.toBeCalled();
+  describe("ModalBody", () => {
+    it("renders", async () => {
+      // When rendered
+      const { modal_content } = await render(<ModalBody>Test Content</ModalBody>);
+      // Then expect the content to be displayed
+      expect(modal_content().textContent).toBe("Test Content");
+    });
   });
 
-  it("can set the primary and left actions as disabled", async () => {
-    // Given the primary and left actions defined as disabled
-    const contentProps = {
-      primaryAction: { label: "Primary", onClick: noop, disabled: true },
-      leftAction: { label: "Left", onClick: noop, disabled: true },
-    };
-
-    // When rendered
-    const r = await render(<TestModalApp modalProps={{}} contentProps={contentProps} />, withModalRTL);
-
-    // Then expect both buttons to be disabled
-    expect(r.modal_primaryAction()).toBeDisabled();
-    expect(r.modal_leftAction()).toBeDisabled();
-  });
-
-  it("can show the primary button only", async () => {
-    // Given the primary only option as true
-    const contentProps = {
-      primaryAction: { label: "Primary", onClick: noop },
-      primaryOnly: true,
-    };
-
-    // When rendered
-    const r = await render(<TestModalApp modalProps={{}} contentProps={contentProps} />, withModalRTL);
-
-    // Then expect only the secondary button is now displayed
-    expect(r.queryByTestId("modal_secondaryAction")).toBeFalsy();
+  describe("ModalFooter", () => {
+    it("renders", async () => {
+      // When rendered
+      const { modal_footer } = await render(<ModalFooter>Test Footer</ModalFooter>);
+      // Then expect the footer content to be displayed
+      expect(modal_footer().textContent).toBe("Test Footer");
+    });
   });
 });
 
-function TestModalApp({
-  modalProps,
-  contentProps,
-}: {
-  modalProps: Omit<ModalProps, "content" | "title"> & { title?: string };
-  contentProps: Omit<ModalContentProps, "children"> & { children?: ReactNode };
-}) {
+function TestModalApp(modalProps: ModalProps) {
   const { openModal } = useModalContext();
   useEffect(() => {
-    openModal({
-      ...{ title: "Test title", ...modalProps },
-      content: <ModalContent children="Modal Content" {...contentProps} />,
-    });
+    openModal(modalProps);
   }, []);
 
   return <h1>Page title</h1>;
+}
+
+function TestModalComponent() {
+  return (
+    <>
+      <ModalBody>Modal Body</ModalBody>
+      <ModalFooter>Modal Footer</ModalFooter>
+    </>
+  );
 }

@@ -2,10 +2,8 @@ import { act } from "@testing-library/react";
 import { useEffect } from "react";
 import { ModalProps } from "src/components/Modal/Modal";
 import { ModalContextProps, useModalContext } from "src/components/Modal/ModalContext";
-import { Noop } from "src/types";
+import { Callback } from "src/types";
 import { click, render, withModalRTL } from "src/utils/rtl";
-
-class noop {}
 
 describe("ModalContext", () => {
   it("can open and close the modal", async () => {
@@ -45,7 +43,7 @@ describe("ModalContext", () => {
     }
 
     // Given a modal that sets a custom `onClose` method
-    function TestModalContent({ onClose }: { onClose: Noop }) {
+    function TestModalContent({ onClose }: { onClose: Callback }) {
       const { setOnClose } = useModalContext();
       useEffect(() => {
         setOnClose(onClose);

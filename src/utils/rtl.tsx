@@ -1,6 +1,7 @@
 import { RenderResult, Wrapper } from "@homebound/rtl-utils";
 import { prettyDOM } from "@testing-library/react";
-import { ModalProvider, SuperDrawerProvider } from "src";
+import { SuperDrawerProvider } from "src";
+import { ModalProvider } from "src/components";
 export * from "@homebound/rtl-react-router-utils";
 export * from "@homebound/rtl-utils";
 

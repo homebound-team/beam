@@ -1,13 +1,13 @@
 import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 import { OverlayProvider } from "react-aria";
-import { Noop } from "src/types";
+import { Callback } from "src/types";
 import { Modal, ModalProps } from "./Modal";
 
 export interface ModalContextProps {
   openModal: (props: ModalProps) => void;
-  closeModal: Noop;
-  onClose: Noop;
-  setOnClose: (onClose: Noop) => void;
+  closeModal: Callback;
+  onClose: Callback;
+  setOnClose: (onClose: Callback) => void;
 }
 
 export const ModalContext = createContext<ModalContextProps>({} as ModalContextProps);
@@ -29,7 +29,7 @@ export function ModalProvider({ children }: { children: ReactNode }) {
         }
         setModalState({} as ModalProps);
       },
-      setOnClose: (onClose: Noop) => setModalState({ ...modalState, onClose }),
+      setOnClose: (onClose: Callback) => setModalState({ ...modalState, onClose }),
     }),
     [modalState],
   );
