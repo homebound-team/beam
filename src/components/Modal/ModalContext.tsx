@@ -10,7 +10,17 @@ export interface ModalContextProps {
   setOnClose: (onClose: Callback) => void;
 }
 
-export const ModalContext = createContext<ModalContextProps>({} as ModalContextProps);
+const notImplementedError = () => {
+  throw new Error("Modal context is not set up. Please ensure your app is wrapped in ModalProvider.");
+};
+
+export const ModalContext = createContext<ModalContextProps>({
+  openModal: notImplementedError,
+  closeModal: notImplementedError,
+  setOnClose: notImplementedError,
+  onClose: notImplementedError,
+} as ModalContextProps);
+
 export const useModalContext = () => useContext(ModalContext);
 
 export function ModalProvider({ children }: { children: ReactNode }) {

@@ -61,7 +61,7 @@ function ComponentForModalExample({
           <p>{"The body content of the modal. This content can be anything!".repeat(numSentences)}</p>
         </div>
       </ModalBody>
-      <ModalFooter xss={showLeftAction ? Css.justifyBetween.$ : {}}>
+      <ModalFooter xss={showLeftAction ? Css.justifyBetween.$ : undefined}>
         {showLeftAction && (
           <div>
             <Button label="Clear" onClick={action("Clear Action")} variant="tertiary" disabled={leftActionDisabled} />

@@ -3,7 +3,7 @@ import { ReactNode, useRef, useState } from "react";
 import { FocusScope, OverlayContainer, useDialog, useModal, useOverlay, usePreventScroll } from "react-aria";
 import { IconButton } from "src/components/IconButton";
 import { useModalContext } from "src/components/Modal/ModalContext";
-import { Css, Xss } from "src/Css";
+import { Css, Only, Xss } from "src/Css";
 import { Callback } from "src/types";
 import { useTestIds } from "src/utils";
 
@@ -75,8 +75,9 @@ export function ModalBody({ children }: { children: ReactNode }) {
   );
 }
 
+type ModalFooterXss = Xss<"justifyContent" | "alignItems">;
 // Component to supply consistent styling for Modal Footer - Typically where the Modal actions are placed.
-export function ModalFooter({ children, xss }: { children: ReactNode; xss?: Xss<"justifyContent" | "alignItems"> }) {
+export function ModalFooter<X extends Only<ModalFooterXss, X>>({ children, xss }: { children: ReactNode; xss?: X }) {
   const testId = useTestIds({}, testIdPrefix);
   return (
     <div css={{ ...Css.p3.df.itemsCenter.justifyEnd.$, ...xss }} {...testId.footer}>
