@@ -51,7 +51,7 @@ export function simpleDataRows<T extends { id: string }, R extends { kind: "head
   data: T[],
 ): GridDataRow<R>[] {
   // @ts-ignore Not sure why this doesn't type-check, something esoteric with the DiscriminateUnion type
-  return [simpleHeader, ...data.map((data) => ({ kind: "data" as const, data }))];
+  return [simpleHeader, ...data.map((data) => ({ kind: "data" as const, data, id: data.id }))];
 }
 
 // function createSimpleHeaderAndRows<D extends { id: string }>(

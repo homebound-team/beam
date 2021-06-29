@@ -8,6 +8,7 @@ import {
   GridTable,
   matchesFilter,
   setRunningInJest,
+  simpleDataRows,
   simpleHeader,
   SimpleHeaderAndDataOf,
   SimpleHeaderAndDataWith,
@@ -675,6 +676,24 @@ describe("GridTable", () => {
     // Then we can still assert against the content
     expect(cell(r, 1, 0)).toHaveTextContent("foo");
     expect(cell(r, 2, 0)).toHaveTextContent("bar");
+  });
+
+  it("provides simpleDataRows", async () => {
+    // Given a row that uses SimpleHeaderAndDataWith
+    type Row = SimpleHeaderAndDataWith<{ value: number }>;
+    // And also uses the simpleDataRows factory method
+    const rows: GridDataRow<Row>[] = simpleDataRows([
+      { id: "a:1", value: 1 },
+      { id: "a:2", value: 2 },
+    ]);
+    const valueColumn: GridColumn<Row> = {
+      header: "",
+      // Then the column can accept both the value (not the GriDataRow) directly and the row id
+      data: (v, id) => `id=${id} value=${v.value}`,
+    };
+    const r = await render(<GridTable columns={[valueColumn]} rows={rows} />);
+    expect(cell(r, 1, 0)).toHaveTextContent("id=a:1 value=1");
+    expect(cell(r, 2, 0)).toHaveTextContent("id=a:2 value=2");
   });
 });
 
