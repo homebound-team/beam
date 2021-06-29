@@ -5,9 +5,9 @@ import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
 import { Icon, Icons } from "./Icon";
 
-export interface Tab {
+export interface Tab<T extends string = string> {
   name: string;
-  value: string;
+  value: T;
   icon?: keyof typeof Icons;
   disabled?: boolean;
   render: () => ReactNode;
@@ -15,12 +15,12 @@ export interface Tab {
 
 type TabsContentXss = Xss<Margin>;
 
-export interface TabsProps<X extends Properties> {
+export interface TabsProps<T extends string, X extends Properties> {
   ariaLabel?: string;
   // the selected tab is connected to the contents displayed
-  selected: string;
-  tabs: Tab[];
-  onChange: (value: string) => void;
+  selected: T;
+  tabs: Tab<T>[];
+  onChange: (value: T) => void;
   contentXss?: X;
 }
 
@@ -30,7 +30,7 @@ export interface TabsProps<X extends Properties> {
  * The caller is responsible for using `selected` / `onChange` to control
  * the current tab.
  */
-export function TabsWithContent<X extends Only<TabsContentXss, X>>(props: TabsProps<X>) {
+export function TabsWithContent<T extends string, X extends Only<TabsContentXss, X>>(props: TabsProps<T, X>) {
   const { selected, tabs, contentXss = {}, ...others } = props;
   const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
   const tid = useTestIds(others, "tab");
@@ -56,7 +56,7 @@ export function TabsWithContent<X extends Only<TabsContentXss, X>>(props: TabsPr
 }
 
 /** The top list of tabs. */
-function Tabs(props: TabsProps<{}>) {
+function Tabs<T extends string>(props: TabsProps<T, {}>) {
   const { ariaLabel, onChange, selected, tabs, ...others } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
   const tid = useTestIds(others, "tabs");
@@ -77,7 +77,7 @@ function Tabs(props: TabsProps<{}>) {
   }
 
   // clicking on a tab sets it to selected and active
-  function handleOnClick(value: string) {
+  function handleOnClick(value: T) {
     onChange(value);
     setActive(value);
   }
@@ -108,20 +108,20 @@ function Tabs(props: TabsProps<{}>) {
   );
 }
 
-interface TabProps extends BeamFocusableProps {
+interface TabProps<T extends string> extends BeamFocusableProps {
   /** active indicates the current tab is highlighted */
   active: boolean;
   disabled: boolean;
   label: string;
   icon?: keyof typeof Icons;
-  value: string;
-  onClick: (value: string) => void;
+  value: T;
+  onClick: (value: T) => void;
   onKeyUp: (e: KeyboardEvent) => void;
   focusProps: HTMLAttributes<HTMLElement>;
   isFocusVisible: boolean;
 }
 
-function SingleTab(props: TabProps) {
+function SingleTab<T extends string>(props: TabProps<T>) {
   const {
     disabled: isDisabled,
     label,
@@ -183,7 +183,7 @@ export function getTabStyles() {
   };
 }
 
-export function getNextTabValue(selected: string, key: "ArrowLeft" | "ArrowRight", tabs: Tab[]) {
+export function getNextTabValue<T extends string>(selected: T, key: "ArrowLeft" | "ArrowRight", tabs: Tab<T>[]): T {
   const enabledTabs = tabs.filter((tab) => tab.disabled !== true);
   const tabsToScan = key === "ArrowRight" ? enabledTabs : enabledTabs.reverse();
   const currentIndex = tabsToScan.findIndex((tab) => tab.value === selected);

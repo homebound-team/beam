@@ -3,7 +3,7 @@ import { Fragment, useState } from "react";
 import { Css } from "src/Css";
 import { Icon } from "./Icon";
 import { getTabStyles, Tab, TabsWithContent as TabsWithContentComponent } from "./Tabs";
-import { TabContent, testTabs } from "./testData";
+import { TabContent, TabValue, testTabs } from "./testData";
 
 export default {
   title: "Components/Tabs",
@@ -39,8 +39,8 @@ function getChildren(label: string) {
 }
 
 export const TabsWithContent = () => {
-  const [selectedTab1, setSelectedTab1] = useState("tab1");
-  const [selectedTab2, setSelectedTab2] = useState("tab1");
+  const [selectedTab1, setSelectedTab1] = useState<TabValue>("tab1");
+  const [selectedTab2, setSelectedTab2] = useState<TabValue>("tab1");
 
   return (
     <div css={Css.df.flexColumn.childGap3.$}>
@@ -67,7 +67,7 @@ export const TabsWithContent = () => {
   );
 };
 
-const tabsWithIconsAndContent: Tab[] = [
+const tabsWithIconsAndContent: Tab<TabValue>[] = [
   { name: "Tab 1", value: "tab1", icon: "camera", render: () => <TabContent title="Tab 1 Content" /> },
   { name: "Tab 2", value: "tab2", icon: "dollar", render: () => <TabContent title="Tab 2 Content" /> },
   { name: "Tab 3", value: "tab3", icon: "check", render: () => <TabContent title="Tab 3 Content" /> },
