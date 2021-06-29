@@ -591,8 +591,8 @@ type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<
 export type GridColumn<R extends Kinded, S = {}> = {
   [P in R["kind"]]:
     | string
-    | (DiscriminateUnion<R, "kind", P> extends { data: infer D; id: infer I }
-        ? (data: D, id: I) => ReactNode | GridCellContent
+    | (DiscriminateUnion<R, "kind", P> extends { data: infer D }
+        ? (data: D, id: string) => ReactNode | GridCellContent
         : (row: DiscriminateUnion<R, "kind", P>) => ReactNode | GridCellContent);
 } & {
   /** The column's grid column width, defaults to `auto`. */
