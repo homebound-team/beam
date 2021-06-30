@@ -13,7 +13,7 @@ interface FilterModalProps<F> {
 
 export function FilterModal<F>(props: FilterModalProps<F>) {
   const { filter, filterDefs, onApply } = props;
-  const { onClose, closeModal } = useModalContext();
+  const { onClose } = useModalContext();
   // Local copy of the filter that we'll use to manage the modal's state separate from the rest of the Filter
   const [modalFilter, setModalFilter] = useState<F>(filter);
 
@@ -57,7 +57,7 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
             label="Apply"
             onClick={() => {
               onApply(modalFilter);
-              closeModal();
+              onClose();
             }}
           />
         </div>

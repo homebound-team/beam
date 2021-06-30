@@ -40,7 +40,7 @@ function Filters<F>(props: FilterProps<F>) {
 
   const numModalFilters = safeKeys(modalFilterDefs).filter((fk) => filter[fk] !== undefined).length;
 
-  const filterComponents = getFilterComponents<F>({
+  const pageFilters = getFilterComponents<F>({
     filter,
     filterDefs: pageFilterDefs,
     updateFilter,
@@ -49,7 +49,7 @@ function Filters<F>(props: FilterProps<F>) {
   // Return list of filter components. `onSelect` should update the `filter`
   return (
     <div css={Css.df.itemsCenter.childGap1.$}>
-      {filterComponents.map((c, idx) => (
+      {pageFilters.map((c, idx) => (
         <div key={idx}>{c}</div>
       ))}
       {Object.keys(modalFilterDefs).length > 0 && (
