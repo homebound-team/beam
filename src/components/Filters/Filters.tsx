@@ -3,7 +3,7 @@ import { Button } from "src/components/Button";
 import { FilterDefs, FilterModal, getFilterComponents } from "src/components/Filters";
 import { useModalContext } from "src/components/Modal";
 import { Css } from "src/Css";
-import { omitKey } from "src/utils";
+import { omitKey, safeEntries, safeKeys } from "src/utils";
 
 interface FilterProps<F> {
   filter: F;
@@ -16,15 +16,18 @@ interface FilterProps<F> {
 function Filters<F>(props: FilterProps<F>) {
   const { filter, onChange, filterDefs } = props;
   const { openModal } = useModalContext();
-  const [pageFilterKeys, modalFilterKeys] = useMemo(() => {
-    const filterKeys = Object.keys(filterDefs) as (keyof F)[];
+  const [pageFilterDefs, modalFilterDefs] = useMemo(() => {
+    const filterEntries = safeEntries(filterDefs);
     // If we have more than 4 filters,
-    if (filterKeys.length > 4) {
+    if (filterEntries.length > 4) {
       // Then return the first three to show on the page, and the remainder for the modal.
-      return [filterKeys.slice(0, 3), filterKeys.slice(3)];
+      return [
+        Object.fromEntries(filterEntries.slice(0, 3)) as FilterDefs<F>,
+        Object.fromEntries(filterEntries.slice(3)) as FilterDefs<F>,
+      ];
     }
     // Otherwise, we don't have enough to show the modal, so only use page filter keys
-    return [filterKeys, []];
+    return [filterDefs, {} as FilterDefs<F>];
   }, [filterDefs]);
 
   const updateFilter = useCallback((currentFilter: F, key: keyof F, value: any | undefined) => {
@@ -35,13 +38,12 @@ function Filters<F>(props: FilterProps<F>) {
     }
   }, []);
 
-  const numModalFilters = modalFilterKeys.filter((fk) => filter[fk] !== undefined).length;
+  const numModalFilters = safeKeys(modalFilterDefs).filter((fk) => filter[fk] !== undefined).length;
 
   const filterComponents = getFilterComponents<F>({
     filter,
-    filterDefs,
+    filterDefs: pageFilterDefs,
     updateFilter,
-    filterKeys: pageFilterKeys,
   });
 
   // Return list of filter components. `onSelect` should update the `filter`
@@ -50,12 +52,12 @@ function Filters<F>(props: FilterProps<F>) {
       {filterComponents.map((c, idx) => (
         <div key={idx}>{c}</div>
       ))}
-      {modalFilterKeys.length > 0 && (
+      {Object.keys(modalFilterDefs).length > 0 && (
         <Button
           label="More Filters"
           endAdornment={
             numModalFilters > 0 && (
-              <span css={Css.wPx(16).hPx(16).ml1.fs0.br100.bgLightBlue700.white.tinyEm.df.itemsCenter.justifyCenter.$}>
+              <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinyEm.df.itemsCenter.justifyCenter.$}>
                 {numModalFilters}
               </span>
             )
@@ -64,14 +66,7 @@ function Filters<F>(props: FilterProps<F>) {
           onClick={() =>
             openModal({
               title: "More Filters",
-              content: (
-                <FilterModal
-                  onApply={onChange}
-                  filterDefs={filterDefs}
-                  filter={filter}
-                  modalFilterKeys={modalFilterKeys}
-                />
-              ),
+              content: <FilterModal onApply={onChange} filterDefs={modalFilterDefs} filter={filter} />,
             })
           }
         />

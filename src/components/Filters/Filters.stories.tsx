@@ -25,49 +25,50 @@ export default {
 
 export function Filter() {
   const defaultFilter: ProjectFilter = {};
-  const marketId = multiFilter({
-    options: markets,
-    label: "Market",
-    getOptionValue: (o) => o.code,
-    getOptionLabel: (o) => o.name,
-  });
-  const internalUserId = singleFilter({
-    options: internalUsers,
-    label: "Project Manager",
-    getOptionValue: (o) => o.id,
-    getOptionLabel: (o) => o.name,
-  });
-  const favorite = booleanFilter({
-    options: [
-      [undefined, "All"],
-      [true, "Favorited"],
-      [false, "Not favorited"],
-    ],
-    label: "Favorite Status",
-  });
-  const stage = multiFilter({
-    options: stages,
-    label: "Stage",
-    getOptionValue: (o) => o.code,
-    getOptionLabel: (o) => o.name,
-  });
-  const status = multiFilter({
-    options: statuses,
-    label: "Status",
-    getOptionValue: (o) => o.code,
-    getOptionLabel: (o) => o.name,
-  });
 
-  const filterDefs: FilterDefs<ProjectFilter> = useMemo(
-    () => ({
+  const filterDefs: FilterDefs<ProjectFilter> = useMemo(() => {
+    const marketId = multiFilter({
+      options: markets,
+      label: "Market",
+      getOptionValue: (o) => o.code,
+      getOptionLabel: (o) => o.name,
+    });
+    const internalUserId = singleFilter({
+      options: internalUsers,
+      label: "Project Manager",
+      getOptionValue: (o) => o.id,
+      getOptionLabel: (o) => o.name,
+    });
+    const favorite = booleanFilter({
+      options: [
+        [undefined, "All"],
+        [true, "Favorited"],
+        [false, "Not favorited"],
+      ],
+      label: "Favorite Status",
+    });
+    const stage = multiFilter({
+      options: stages,
+      label: "Stage",
+      getOptionValue: (o) => o.code,
+      getOptionLabel: (o) => o.name,
+    });
+    const status = multiFilter({
+      options: statuses,
+      label: "Status",
+      getOptionValue: (o) => o.code,
+      getOptionLabel: (o) => o.name,
+    });
+
+    return {
       marketId,
       internalUserId,
       favorite,
       stage,
       status,
-    }),
-    [marketId, internalUserId, favorite, stages, status],
-  );
+    };
+  }, []);
+
   const { setFilter, filter } = usePersistedFilter<ProjectFilter>({
     defaultFilter,
     storageKey: "storybookFilter",

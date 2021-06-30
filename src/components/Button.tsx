@@ -42,7 +42,7 @@ export function Button({ onClick: onPress, disabled: isDisabled, endAdornment, .
     >
       {icon && <Icon xss={iconStyles[size]} icon={icon} />}
       {label}
-      {endAdornment && <span>{endAdornment}</span>}
+      {endAdornment && <span css={Css.ml1.$}>{endAdornment}</span>}
     </button>
   );
 }

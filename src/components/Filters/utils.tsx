@@ -7,78 +7,69 @@ import {
   SingleFilterProps,
 } from "src/components/Filters";
 import { MultiSelectField, SelectField } from "src/inputs";
+import { safeEntries } from "src/utils";
 
-interface GetFilterComponentsProps<F> {
-  filterKeys: (keyof F)[];
+interface GetFilterComponentsOpts<F> {
   filterDefs: FilterDefs<F>;
   filter: F;
   updateFilter: (f: F, k: keyof F, v: any | undefined) => void;
   inModal?: boolean;
 }
 
-export function getFilterComponents<F>(props: GetFilterComponentsProps<F>) {
-  const { filterKeys, filterDefs, filter, updateFilter, inModal } = props;
+export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
+  const { filterDefs, filter, updateFilter, inModal } = props;
 
-  return filterKeys.map((key) => {
-    const filterDef = filterDefs[key] as any;
-
+  // Need to set `filterDef` as `any` - not sure exactly why yet... but it breaks things.
+  return safeEntries(filterDefs).map(([key, filterDef]: [keyof F, any]) => {
     if (filterDef.kind === "boolean") {
-      return (
-        <WrapIfModal label={filterDef.label} inModal={inModal}>
-          <SelectField
-            {...filterDef}
-            compact
-            value={String(filter[key])}
-            inlineLabel
-            onSelect={(value) => {
-              const parsedValue = value === "undefined" ? undefined : value === "true" ? true : false;
-              updateFilter(filter, key, parsedValue);
-            }}
-          />
-        </WrapIfModal>
+      return wrapIfModal(
+        <SelectField
+          {...filterDef}
+          compact
+          value={String(filter[key])}
+          inlineLabel
+          onSelect={(value) => {
+            const parsedValue = value === "undefined" ? undefined : value === "true" ? true : false;
+            updateFilter(filter, key, parsedValue);
+          }}
+        />,
+        inModal,
+        filterDef.label,
       );
     }
 
     if (filterDef.kind === "single") {
-      return (
-        <WrapIfModal label={filterDef.label} inModal={inModal}>
-          <SelectField
-            {...filterDef}
-            compact
-            value={filter[key]}
-            inlineLabel
-            onSelect={(value) => updateFilter(filter, key, value)}
-          />
-        </WrapIfModal>
+      return wrapIfModal(
+        <SelectField
+          {...filterDef}
+          compact
+          value={filter[key]}
+          inlineLabel
+          onSelect={(value) => updateFilter(filter, key, value)}
+        />,
+        inModal,
+        filterDef.label,
       );
     }
 
     if (filterDef.kind === "multi") {
-      return (
-        <WrapIfModal label={filterDef.label} inModal={inModal}>
-          <MultiSelectField
-            {...filterDef}
-            compact
-            values={filter[key] || []}
-            inlineLabel
-            onSelect={(values) => updateFilter(filter, key, values)}
-          />
-        </WrapIfModal>
+      return wrapIfModal(
+        <MultiSelectField
+          {...filterDef}
+          compact
+          values={filter[key] || []}
+          inlineLabel
+          onSelect={(values) => updateFilter(filter, key, values)}
+        />,
+        inModal,
+        filterDef.label,
       );
     }
   });
 }
 
-function WrapIfModal({
-  inModal,
-  label,
-  children,
-}: {
-  inModal?: boolean;
-  label?: string;
-  children: JSX.Element;
-}): JSX.Element {
-  return inModal ? <ModalFilterItem label={label}>{children}</ModalFilterItem> : children;
+function wrapIfModal(filterField: JSX.Element, inModal?: boolean, label?: string) {
+  return inModal ? <ModalFilterItem label={label}>{filterField}</ModalFilterItem> : filterField;
 }
 
 export function singleFilter<O, V extends Key>(props: SingleFilterProps<O, V>) {

@@ -3,18 +3,17 @@ import { Button } from "src/components/Button";
 import { FilterDefs, getFilterComponents } from "src/components/Filters";
 import { ModalBody, ModalFooter, useModalContext } from "src/components/Modal";
 import { Css } from "src/Css";
-import { omitKey } from "src/utils";
+import { omitKey, safeKeys } from "src/utils";
 
 interface FilterModalProps<F> {
   filter: F;
   filterDefs: FilterDefs<F>;
-  modalFilterKeys: (keyof F)[];
   onApply: (f: F) => void;
 }
 
 export function FilterModal<F>(props: FilterModalProps<F>) {
-  const { filter, filterDefs, onApply, modalFilterKeys } = props;
-  const { onClose } = useModalContext();
+  const { filter, filterDefs, onApply } = props;
+  const { onClose, closeModal } = useModalContext();
   // Local copy of the filter that we'll use to manage the modal's state separate from the rest of the Filter
   const [modalFilter, setModalFilter] = useState<F>(filter);
 
@@ -30,7 +29,6 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
     filter: modalFilter,
     filterDefs,
     updateFilter,
-    filterKeys: modalFilterKeys,
     inModal: true,
   });
 
@@ -47,10 +45,10 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
         <Button
           label="Clear"
           variant="tertiary"
-          disabled={modalFilterKeys.filter((fk) => modalFilter[fk] !== undefined).length === 0}
+          disabled={safeKeys(filterDefs).filter((fk) => modalFilter[fk] !== undefined).length === 0}
           onClick={() =>
             // Only remove the filters keys that exist in the modal.
-            setModalFilter(modalFilterKeys.reduce((acc, fk) => omitKey(fk, acc), modalFilter))
+            setModalFilter(safeKeys(filterDefs).reduce((acc, fk) => omitKey(fk, acc), modalFilter))
           }
         />
         <div css={Css.df.childGap1.$}>
@@ -59,7 +57,7 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
             label="Apply"
             onClick={() => {
               onApply(modalFilter);
-              onClose();
+              closeModal();
             }}
           />
         </div>
