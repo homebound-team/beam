@@ -52,17 +52,13 @@ function Filters<F>(props: FilterProps<F>) {
       ))}
       {modalFilterKeys.length > 0 && (
         <Button
-          label={
-            <span css={Css.df.itemsCenter.$}>
-              More Filters
-              {numModalFilters > 0 && (
-                <span
-                  css={Css.wPx(16).hPx(16).ml1.fs0.br100.bgLightBlue700.white.tinyEm.df.itemsCenter.justifyCenter.$}
-                >
-                  {numModalFilters}
-                </span>
-              )}
-            </span>
+          label="More Filters"
+          endAdornment={
+            numModalFilters > 0 && (
+              <span css={Css.wPx(16).hPx(16).ml1.fs0.br100.bgLightBlue700.white.tinyEm.df.itemsCenter.justifyCenter.$}>
+                {numModalFilters}
+              </span>
+            )
           }
           variant="secondary"
           onClick={() =>

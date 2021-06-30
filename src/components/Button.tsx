@@ -5,13 +5,14 @@ import { Css } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 
 export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
-  label: string | ReactNode;
+  label: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: IconProps["icon"];
+  endAdornment?: ReactNode;
 }
 
-export function Button({ onClick: onPress, disabled: isDisabled, ...otherProps }: ButtonProps) {
+export function Button({ onClick: onPress, disabled: isDisabled, endAdornment, ...otherProps }: ButtonProps) {
   const ariaProps = { onPress, isDisabled, ...otherProps };
   const { label, icon, variant = "primary", size = "sm" } = ariaProps;
   const ref = useRef(null);
@@ -41,6 +42,7 @@ export function Button({ onClick: onPress, disabled: isDisabled, ...otherProps }
     >
       {icon && <Icon xss={iconStyles[size]} icon={icon} />}
       {label}
+      {endAdornment && <span>{endAdornment}</span>}
     </button>
   );
 }
