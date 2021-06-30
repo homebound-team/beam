@@ -6,6 +6,7 @@ interface LabelProps {
   // We don't usually have `fooProps`-style props, but this is for/from react-aria
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   label: string;
+  // If set, it is recommended to wrap in an element with `position: relative;` set, as the label will have an absolute position.
   hidden?: boolean;
 }
 
