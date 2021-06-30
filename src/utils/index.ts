@@ -49,3 +49,11 @@ export function safeKeys<T>(instance: T): (keyof T)[] {
 export const omitKey = <T, K extends keyof T>(key: K, { [key]: _, ...obj }: T) => obj as T;
 
 export const noop = () => {};
+
+type Entries<T> = {
+  [K in keyof T]: [K, T[K]];
+}[keyof T][];
+
+export function safeEntries<T>(obj: T): Entries<T> {
+  return Object.entries(obj) as any;
+}

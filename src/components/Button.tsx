@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { ReactNode, useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src";
 import { Css } from "src/Css";
@@ -9,9 +9,10 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: IconProps["icon"];
+  endAdornment?: ReactNode;
 }
 
-export function Button({ onClick: onPress, disabled: isDisabled, ...otherProps }: ButtonProps) {
+export function Button({ onClick: onPress, disabled: isDisabled, endAdornment, ...otherProps }: ButtonProps) {
   const ariaProps = { onPress, isDisabled, ...otherProps };
   const { label, icon, variant = "primary", size = "sm" } = ariaProps;
   const ref = useRef(null);
@@ -41,6 +42,7 @@ export function Button({ onClick: onPress, disabled: isDisabled, ...otherProps }
     >
       {icon && <Icon xss={iconStyles[size]} icon={icon} />}
       {label}
+      {endAdornment && <span css={Css.ml1.$}>{endAdornment}</span>}
     </button>
   );
 }
