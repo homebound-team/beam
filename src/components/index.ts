@@ -9,6 +9,7 @@ export * from "./IconButton";
 export * from "./Modal/Modal";
 export * from "./Modal/ModalContext";
 export { NavLink } from "./NavLink";
+export * from "./Pill";
 export * from "./RichTextField";
 export * from "./SuperDrawer";
 export { TabsWithContent } from "./Tabs";
