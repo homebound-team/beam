@@ -1,16 +1,21 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { Chip as ChipComponent } from "src/index";
+import { Chip, Css } from "src/index";
 
 export default {
-  component: ChipComponent,
+  component: Chip,
   title: "Components/Chip",
 } as Meta;
 
-export function Chip() {
+export function DefaultChip() {
   return (
     <div>
-      <ChipComponent text={"First Last"} onClick={action("click")} />
+      <div>
+        <Chip text="First Last" onClick={action("click")} />
+      </div>
+      <div css={Css.wPx(300).$}>
+        <Chip text={"First Last ".repeat(10)} onClick={action("click")} />
+      </div>
     </div>
   );
 }
