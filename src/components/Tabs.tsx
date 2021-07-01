@@ -1,4 +1,4 @@
-import { HTMLAttributes, KeyboardEvent, ReactNode, useMemo, useState } from "react";
+import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
@@ -62,6 +62,9 @@ function Tabs<V extends string>(props: TabsProps<V, {}>) {
   const tid = useTestIds(others, "tabs");
   const [active, setActive] = useState(selected);
 
+  // Whenever selected changes, reset active
+  useEffect(() => setActive(selected), [selected]);
+
   // the active tab is highlighted, but not necessarily "selected"
   // the selected tab dictates what is displayed in the content panel
   function handleKeyUp(e: KeyboardEvent) {
@@ -82,6 +85,11 @@ function Tabs<V extends string>(props: TabsProps<V, {}>) {
     setActive(value);
   }
 
+  // bluring out resets active to whatever selected is
+  function handleBlur() {
+    setActive(selected);
+  }
+
   return (
     <div css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...tid}>
       {tabs.map((tab, i) => {
@@ -97,8 +105,9 @@ function Tabs<V extends string>(props: TabsProps<V, {}>) {
             isFocusVisible={isFocusVisible}
             key={value}
             label={name}
-            onClick={handleOnClick}
+            onClick={disabled ? () => {} : handleOnClick}
             onKeyUp={handleKeyUp}
+            onBlur={handleBlur}
             value={value}
             {...testId}
           />
@@ -117,6 +126,7 @@ interface TabProps<V extends string> extends BeamFocusableProps {
   value: V;
   onClick: (value: V) => void;
   onKeyUp: (e: KeyboardEvent) => void;
+  onBlur: () => void;
   focusProps: HTMLAttributes<HTMLElement>;
   isFocusVisible: boolean;
 }
@@ -127,9 +137,10 @@ function SingleTab<V extends string>(props: TabProps<V>) {
     label,
     value,
     onClick,
-    active = false,
+    active,
     icon = false,
     onKeyUp,
+    onBlur,
     focusProps,
     isFocusVisible = false,
     ...others
@@ -146,11 +157,9 @@ function SingleTab<V extends string>(props: TabProps<V>) {
       aria-selected={active}
       aria-disabled={isDisabled || undefined}
       id={`${value}-tab`}
-      onClick={() => onClick(value)}
-      onKeyUp={onKeyUp}
       role="tab"
       tabIndex={active ? 0 : -1}
-      {...mergeProps(focusProps, hoverProps)}
+      {...mergeProps(focusProps, hoverProps, { onKeyUp, onBlur, onClick: () => onClick(value) })}
       {...others}
       css={{
         ...baseStyles,
