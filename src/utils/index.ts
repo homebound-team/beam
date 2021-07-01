@@ -67,3 +67,5 @@ export class EmptyRef<T> implements MutableRefObject<T> {
     throw new Error("BeamProvider is missing");
   }
 }
+
+export const isAbsoluteUrl = (url: string) => /^(http(s?)):\/\//i.test(url);

@@ -2714,6 +2714,16 @@
     "@react-stately/utils" "^3.2.1"
     "@react-types/shared" "^3.7.0"
 
+"@react-stately/selection@^3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@react-stately/selection/-/selection-3.6.1.tgz#3f5880e634ba02964a9b416d7c847c6b73e53130"
+  integrity sha512-epM9tFyWfYvcxnCInouLJzskyWBQETRT2G9YrUZz1X1Ajp1I+HPT9IiPnCmroZoMjSj7rpG5BR4lU3KZ74tw1g==
+  dependencies:
+    "@babel/runtime" "^7.6.2"
+    "@react-stately/collections" "^3.3.2"
+    "@react-stately/utils" "^3.2.1"
+    "@react-types/shared" "^3.7.0"
+
 "@react-stately/slider@^3.0.2":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@react-stately/slider/-/slider-3.0.2.tgz#11be662c71cf82ad5727b188ea51d16e67a874c9"
@@ -2941,6 +2951,11 @@
   version "3.7.0"
   resolved "https://registry.yarnpkg.com/@react-types/shared/-/shared-3.7.0.tgz#0d96cc96a38786ec46417a53c354cc0ed4a5efd9"
   integrity sha512-ivToQQayVIzBX3oqqNwUEtEA81YULnixCuXgzCYNyUthd+YnnBLsg2zMC9nXLGW3qHy8f6JHtD+pel7C3rrVgA==
+
+"@react-types/shared@^3.7.1":
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/@react-types/shared/-/shared-3.7.1.tgz#6aadddab0c7911a97a97a4c48723eb15a34b5fad"
+  integrity sha512-VNKlqh37UjB3Hd7gb5Hgsum/2x5mhd7vuBBGPEFevhkOMBW8KlqrU75yaKUe3rEFbky7H6+A8Dzoj4r68OS14w==
 
 "@react-types/slider@^3.0.1":
   version "3.0.1"
@@ -12915,10 +12930,10 @@ react-app-polyfill@^1.0.6:
     regenerator-runtime "^0.13.3"
     whatwg-fetch "^3.0.0"
 
-react-aria@^3.7.0:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/react-aria/-/react-aria-3.7.0.tgz#2576cafc01e8c7a48e1fc563c8b784be07adc949"
-  integrity sha512-XvtW+WdlzMxVLDXRH6ru00hF63SWR3opp7/XiZCv/mmnDPAmbZcmO6fLIMtpsTFoI4q+tat/LMH8n6XDyv9rQQ==
+react-aria@^3.7.1:
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/react-aria/-/react-aria-3.7.1.tgz#fbf6c98d1daba44dd1c3ca4a7d28cf4eeb83f834"
+  integrity sha512-17+Cc5N87D8ofWhfV/5rTUIOzjZGMHnTg9DHrdlo1U2LrLMLn88+UnAysN4PL5hJAyEDmge6ZxZjfF1gPsD0/g==
   dependencies:
     "@react-aria/breadcrumbs" "^3.1.4"
     "@react-aria/button" "^3.3.2"
@@ -13166,7 +13181,7 @@ react-router-dom@^5.2.0:
     tiny-invariant "^1.0.2"
     tiny-warning "^1.0.0"
 
-react-router@5.2.0, react-router@^5.1.2:
+react-router@5.2.0, react-router@^5.1.2, react-router@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/react-router/-/react-router-5.2.0.tgz#424e75641ca8747fbf76e5ecca69781aa37ea293"
   integrity sha512-smz1DUuFHRKdcJC0jobGo8cVbhO3x50tCL4icacOlcwDOEQPq4TMqwx3sY1TP+DvtTgz4nm3thuo7A+BK2U0Dw==
@@ -13192,10 +13207,10 @@ react-sizeme@^3.0.1:
     shallowequal "^1.1.0"
     throttle-debounce "^3.0.1"
 
-react-stately@^3.6.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/react-stately/-/react-stately-3.6.0.tgz#28616713b436224da9ac6796228ede48bee60cd1"
-  integrity sha512-+DmL4YsGj/FgIlc2SW/nxfZ+4z7bW/QuUnMmoRDss/txD5xlUgMxEHpdvFVjc2D4aMy0MSSzLdvn/652AT960Q==
+react-stately@^3.6.1:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/react-stately/-/react-stately-3.6.1.tgz#71db6acd3726e56245e922730fe06a375be911be"
+  integrity sha512-CN+rIlUaRyPEQG5SxHVkeEkwO9QPqwUFcNan2iAo/SpTneobj4cc+XXwfVrcQNCv3Elu3RBib8k2w3Ahmq1D3Q==
   dependencies:
     "@react-stately/checkbox" "^3.0.2"
     "@react-stately/collections" "^3.3.2"
@@ -13207,7 +13222,7 @@ react-stately@^3.6.0:
     "@react-stately/radio" "^3.3.1"
     "@react-stately/searchfield" "^3.1.2"
     "@react-stately/select" "^3.1.2"
-    "@react-stately/selection" "^3.6.0"
+    "@react-stately/selection" "^3.6.1"
     "@react-stately/slider" "^3.0.2"
     "@react-stately/tabs" "^3.0.0"
     "@react-stately/toggle" "^3.2.2"

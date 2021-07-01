@@ -37,15 +37,17 @@
     "@react-hook/resize-observer": "^1.2.2",
     "@react-stately/combobox": "^3.0.0-rc.0",
     "@react-stately/numberfield": "^3.0.1",
-    "@react-types/shared": "^3.7.0",
+    "@react-types/shared": "^3.7.1",
     "change-case": "^4.1.2",
     "date-fns": "^2.21.3",
     "framer-motion": "^4.1.11",
     "memoize-one": "^5.2.1",
-    "react-aria": "^3.7.0",
+    "react-aria": "^3.7.1",
     "react-day-picker": "^7.4.10",
     "react-popper": "^2.2.5",
-    "react-stately": "^3.6.0",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
+    "react-stately": "^3.6.1",
     "react-virtuoso": "^1.9.0",
     "tributejs": "^5.1.3",
     "trix": "^1.3.1",
@@ -63,7 +65,7 @@
       "optional": true
     },
     "react-router-dom": {
-      "optional": true
+      "optional": false
     },
     "tinycolor2": {
       "optional": true
@@ -114,7 +116,6 @@
     "prettier-plugin-organize-imports": "^1.1.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
-    "react-router-dom": "^5.2.0",
     "semantic-release": "^17.4.0",
     "storybook-addon-performance": "^0.15.2",
     "tinycolor2": "^1.4.1",

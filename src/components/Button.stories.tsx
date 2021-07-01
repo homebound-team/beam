@@ -36,7 +36,7 @@ export function Buttons(args: ButtonProps) {
         </div>
         <div css={buttonRowStyles}>
           <Button {...args} size="lg" label="Primary Button" />
-          <Button {...args} size="lg" disabled {...args} label="Disabled" />
+          <Button {...args} size="lg" disabled label="Disabled" />
         </div>
         <div css={buttonRowStyles}>
           <Button {...args} icon="plus" label="Primary Button" />
