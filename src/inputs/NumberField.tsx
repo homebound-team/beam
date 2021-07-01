@@ -76,6 +76,7 @@ export function NumberField(props: NumberFieldProps) {
     value: valueRef.current.wip ? valueRef.current.value : value === undefined ? Number.NaN : value / factor,
     // This is called on blur with the final/committed value.
     onChange: (value) => {
+      // `value` for percentage style inputs will be in a number format, i.e. if input value is 4%, the `value` param will equal `.04`
       // Reverse the integer/decimal conversion
       onChange(Number.isNaN(value) ? undefined : factor !== 1 ? Math.round(value * factor) : value);
     },
@@ -106,9 +107,13 @@ export function NumberField(props: NumberFieldProps) {
       // This is called on each DOM change, to push the latest value into the field
       onChange={(value) => {
         // If the wip value is invalid, i.e. it's `10b`, don't push that back into the field state
-        const wip = Number((value || "").replace(/[^0-9]/g, ""));
+        const wip = Number((value || "").replace(/[^0-9\.]/g, ""));
         if (!Number.isNaN(wip)) {
-          onChange(factor !== 1 ? Math.round(wip * factor) : wip);
+          // For percentage values we need to initially divide by 100 in order to get their "number value" ("4%" = .04) for the factor multiplier to be accurate.
+          // For example, if the using basisPoints and the user enters "4.31%", then we would expect the response to be 431 basisPoints. If only basing off the `factor` value, then 4.31 * 10000 = 43100, which would not be correct.
+          const formattedValue = type === "percent" || type === "basisPoints" ? wip / 100 : wip;
+          // Since the values returned is exactly what is in the field
+          onChange(factor !== 1 ? Math.round(formattedValue * factor) : formattedValue);
         }
       }}
       inputRef={inputRef}

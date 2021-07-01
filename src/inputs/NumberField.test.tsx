@@ -1,4 +1,4 @@
-import { render, type } from "@homebound/rtl-utils";
+import { change, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { NumberField, NumberFieldProps } from "src/inputs";
@@ -17,34 +17,54 @@ describe("NumberFieldTest", () => {
     const r = await render(<TestNumberField label="Complete" type="percent" value={12} />);
     expect(r.complete()).toHaveValue("12%");
     type(r.complete, "14");
-    fireEvent.blur(r.complete());
     expect(r.complete()).toHaveValue("14%");
     expect(lastSet).toEqual(14);
+  });
+
+  it("calls onChange with expected value for percentage", async () => {
+    const onChange = jest.fn();
+    const r = await render(<NumberField label="Complete" type="percent" value={12} onChange={onChange} />);
+    change(r.complete, "15");
+    expect(onChange).toBeCalledWith(15);
+    expect(onChange).toBeCalledTimes(1);
   });
 
   it("can set a basis points value", async () => {
     const r = await render(<TestNumberField label="Margin" type="basisPoints" value={1234} />);
     expect(r.margin()).toHaveValue("12.34%");
     type(r.margin, "23.45");
-    fireEvent.blur(r.margin());
     expect(r.margin()).toHaveValue("23.45%");
     expect(lastSet).toEqual(2345);
+  });
+
+  it("calls onChange with expected value for basisPoints", async () => {
+    const onChange = jest.fn();
+    const r = await render(<NumberField label="Margin" type="basisPoints" value={1234} onChange={onChange} />);
+    change(r.margin, "23.45");
+    expect(onChange).toBeCalledWith(2345);
+    expect(onChange).toBeCalledTimes(1);
   });
 
   it("can set cents as dollars", async () => {
     const r = await render(<TestNumberField label="Cost" type="cents" value={1200} />);
     expect(r.cost()).toHaveValue("$12.00");
     type(r.cost, "14");
-    fireEvent.blur(r.cost());
     expect(r.cost()).toHaveValue("$14.00");
     expect(lastSet).toEqual(1400);
+  });
+
+  it("calls onChange with expected value for cents", async () => {
+    const onChange = jest.fn();
+    const r = await render(<NumberField label="Cost" type="cents" value={1234} onChange={onChange} />);
+    change(r.cost, "23.45");
+    expect(onChange).toBeCalledWith(2345);
+    expect(onChange).toBeCalledTimes(1);
   });
 
   it("can set cents as cents", async () => {
     const r = await render(<TestNumberField label="Cost" type="cents" value={1200} />);
     expect(r.cost()).toHaveValue("$12.00");
     type(r.cost, ".14");
-    fireEvent.blur(r.cost());
     expect(r.cost()).toHaveValue("$0.14");
     expect(lastSet).toEqual(14);
   });
@@ -53,7 +73,6 @@ describe("NumberFieldTest", () => {
     const r = await render(<TestNumberField label="Cost" type="cents" value={1200} />);
     expect(r.cost()).toHaveValue("$12.00");
     type(r.cost, "");
-    fireEvent.blur(r.cost());
     expect(r.cost()).toHaveValue("");
     expect(lastSet).toBeUndefined();
   });
