@@ -10,10 +10,10 @@ describe("TabsWithContent", () => {
     const r = await render(<TestTabs />);
     // tab panel should initially display Tab 1 Content
     expect(r.tab_panel()).toHaveTextContent("Tab 1 Content");
-    // when we click on tab index 2
-    click(r.getByTestId("tabs_2"));
-    // then expect to see the content for tab index 2 ("Tab 3 Content")
-    expect(r.tab_panel()).toHaveTextContent("Tab 3 Content");
+    // when we click on the 4th tab (index 3)
+    click(r.getByTestId("tabs_3"));
+    // then expect to see the 4th tab's content
+    expect(r.tab_panel()).toHaveTextContent("Tab 4 Content");
   });
 
   it("should update the active tab", async () => {
@@ -36,6 +36,16 @@ describe("TabsWithContent", () => {
     // When we blur away
     fireEvent.blur(r.getByTestId("tabs_1"));
     // Then the 1st tab goes back to highlighted
+  });
+
+  it("cannot click on disabled tabs", async () => {
+    // Given we start out on tab1
+    const r = await render(<TestTabs />);
+    expect(r.getByTestId("tabs_0")).toHaveStyleRule("color", Palette.LightBlue700);
+    // And we try to click on the 3rd disabled tab
+    click(r.getByTestId("tabs_2"));
+    // Then nothing happens
+    expect(r.getByTestId("tabs_0")).toHaveStyleRule("color", Palette.LightBlue700);
   });
 
   describe("getNextTabValue function", () => {

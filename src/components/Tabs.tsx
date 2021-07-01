@@ -105,7 +105,7 @@ function Tabs<V extends string>(props: TabsProps<V, {}>) {
             isFocusVisible={isFocusVisible}
             key={value}
             label={name}
-            onClick={handleOnClick}
+            onClick={disabled ? () => {} : handleOnClick}
             onKeyUp={handleKeyUp}
             onBlur={handleBlur}
             value={value}
