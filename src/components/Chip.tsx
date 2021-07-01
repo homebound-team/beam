@@ -16,10 +16,10 @@ export function Chip(props: ChipProps) {
       type="button"
       css={{
         ...Css.dif.itemsCenter.br16.sm.pl1
-          // The `X` icon handles the right padding
+          // Use a lower right-padding to get closer to the `X` circle
           .prPx(4)
           .pyPx(2)
-          .hPx(24).gray900.bgGray200.$,
+          .hPx(28).gray900.bgGray200.$,
         ":hover": Css.bgGray300.$,
       }}
       onClick={onClick}
@@ -27,7 +27,7 @@ export function Chip(props: ChipProps) {
     >
       <span css={Css.prPx(6).tl.$}>{text}</span>
       <span css={Css.fs0.br16.bgGray400.$}>
-        <Icon icon="x" inc={2} color={Palette.Gray700} />
+        <Icon icon="x" color={Palette.Gray700} />
       </span>
     </button>
   );
