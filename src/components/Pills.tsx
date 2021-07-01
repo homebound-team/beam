@@ -7,7 +7,7 @@ export interface PillsProps {
   values: string[];
 }
 
-/** Kinda like a chip, but read-only, so no `onClick` or `hover`. */
+/** Renders a list of `Pill`s, with wrapping & appropriate margin between each `Pill`. */
 export function Pills(props: PillsProps) {
   const { values } = props;
   const tid = useTestIds(props, "pills");

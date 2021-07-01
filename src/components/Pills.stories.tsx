@@ -7,7 +7,7 @@ export default {
   title: "Components/Pills",
 } as Meta;
 
-export function DefaultPill() {
+export function DefaultPills() {
   return (
     <div css={Css.wPx(300).ba.$}>
       <Pills values={["First Last", "Second Last", "Third Last", "Fourth Last"]} />
