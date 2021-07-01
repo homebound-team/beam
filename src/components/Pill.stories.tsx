@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react";
 import { Pill } from "src/components/Pill";
+import { Css } from "src/Css";
 
 export default {
   component: Pill,
@@ -9,7 +10,12 @@ export default {
 export function DefaultPill() {
   return (
     <div>
-      <Pill text="First Last" />
+      <div>
+        <Pill text="First Last" />
+      </div>
+      <div css={Css.wPx(300).$}>
+        <Pill text={"First Last ".repeat(10)} />
+      </div>
     </div>
   );
 }

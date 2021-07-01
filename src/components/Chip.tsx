@@ -18,8 +18,7 @@ export function Chip(props: ChipProps) {
         ...Css.dif.itemsCenter.br16.sm.pl1
           // Use a lower right-padding to get closer to the `X` circle
           .prPx(4)
-          .pyPx(2)
-          .hPx(28).gray900.bgGray200.$,
+          .pyPx(2).gray900.bgGray200.$,
         ":hover": Css.bgGray300.$,
       }}
       onClick={onClick}

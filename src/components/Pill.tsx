@@ -14,7 +14,7 @@ export function Pill<X extends Only<Xss<Margin>, X>>(props: PillProps<X>) {
   return (
     <span
       css={{
-        ...Css.dif.itemsCenter.br16.sm.pl1.px1.pyPx(2).hPx(24).gray900.bgGray200.$,
+        ...Css.dif.itemsCenter.br16.sm.pl1.px1.pyPx(2).gray900.bgGray200.$,
         ...xss,
       }}
       {...tid}
