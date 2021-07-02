@@ -14,7 +14,7 @@ export function TextAreas() {
     <div css={Css.df.flexColumn.childGap5.$}>
       <div css={Css.df.flexColumn.childGap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
-        <TestTextArea value="" />
+        <TestTextArea value="" label="Description" hideLabel />
         <TestTextArea label="Description" value="" />
         <TestTextArea label="Description" value="An example description text." autoFocus />
         <TestTextArea label="Description" value="This is a description that can no longer be edited." disabled />

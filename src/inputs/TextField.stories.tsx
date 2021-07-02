@@ -14,7 +14,7 @@ export function TextFields() {
     <div css={Css.df.flexColumn.childGap5.$}>
       <div css={Css.df.flexColumn.childGap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
-        <TestTextField value="" />
+        <TestTextField value="" label="Name" hideLabel />
         <TestTextField label="Name" value="" />
         <TestTextField label="Name Focused" value="Brandon" autoFocus />
         <TestTextField label="Name Disabled" value="Brandon" disabled />
@@ -32,7 +32,7 @@ export function TextFields() {
             </div>
           }
         />
-        <ValidationTextField value="not a valid email" />
+        <ValidationTextField value="not a valid email" label="Email" />
         <ValidationTextField
           label="Name"
           value="Brandon"
@@ -42,7 +42,7 @@ export function TextFields() {
 
       <div css={Css.df.flexColumn.childGap2.$}>
         <h1 css={Css.lg.$}>Compact</h1>
-        <TestTextField compact value="" />
+        <TestTextField compact value="" label="Name" hideLabel />
         <TestTextField compact label="Name" value="" />
         <TestTextField compact label="Name" value="Brandon" />
         <TestTextField compact label="Name" value="Brandon" disabled />
@@ -52,7 +52,7 @@ export function TextFields() {
           value="Brandon"
           helperText="Some really long helper text that we expect to wrap."
         />
-        <ValidationTextField compact value="not a valid email" />
+        <ValidationTextField compact value="not a valid email" label="Email" />
       </div>
     </div>
   );
@@ -81,7 +81,6 @@ function ValidationTextField(props: Omit<TextFieldProps, "onChange">) {
   ]);
   return (
     <TextField
-      label="Email"
       {...otherProps}
       value={internalValue}
       onChange={setValue}

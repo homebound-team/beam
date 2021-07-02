@@ -7,7 +7,9 @@ import { TextFieldBase } from "./TextFieldBase";
 
 // exported for testing purposes
 export interface NumberFieldProps {
-  label?: string;
+  label: string;
+  /** If set, the label will be defined as 'aria-label` on the input element */
+  hideLabel?: boolean;
   type?: "cents" | "percent" | "basisPoints";
   value: number | undefined;
   onChange: (value: number | undefined) => void;
@@ -87,7 +89,7 @@ export function NumberField(props: NumberFieldProps) {
       valueRef.current = { wip: false };
     },
     validationState: errorMsg !== undefined ? "invalid" : "valid",
-    label: label ?? "number",
+    label: label,
     isDisabled,
     isReadOnly,
     formatOptions,

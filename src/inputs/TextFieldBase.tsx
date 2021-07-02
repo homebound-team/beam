@@ -18,7 +18,7 @@ import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
 interface TextFieldBaseProps
-  extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur" | "onFocus" | "helperText">,
+  extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur" | "onFocus" | "helperText" | "hideLabel">,
     Partial<Pick<BeamTextFieldProps, "onChange">> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
@@ -36,6 +36,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
   const {
     label,
     labelProps,
+    hideLabel,
     inputProps,
     inputRef,
     groupProps,
@@ -72,12 +73,12 @@ export function TextFieldBase(props: TextFieldBaseProps) {
 
   return (
     <div css={Css.df.flexColumn.w100.maxw(px(550)).$} {...groupProps}>
-      {label && <Label labelProps={labelProps} label={label} {...tid.label} />}
+      {label && !hideLabel && <Label labelProps={labelProps} label={label} {...tid.label} />}
       <ElementType
         {...mergeProps(
           inputProps,
           { onBlur, onFocus: onFocusChained, onChange: onDomChange },
-          { "aria-invalid": Boolean(errorMsg) },
+          { "aria-invalid": Boolean(errorMsg), ...(hideLabel ? { "aria-label": label } : {}) },
         )}
         {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
         ref={inputRef as any}
