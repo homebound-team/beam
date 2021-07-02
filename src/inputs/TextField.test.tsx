@@ -22,12 +22,12 @@ describe("TextFieldTest", () => {
   });
 });
 
-function TestTextField(props: Omit<TextFieldProps, "onChange">) {
-  const { value, label = "Name", ...otherProps } = props;
+function TestTextField(props: Omit<TextFieldProps, "onChange" | "label">) {
+  const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
   return (
     <TextField
-      label={label}
+      label="Name"
       value={internalValue}
       onChange={(v) => {
         lastSet = v;

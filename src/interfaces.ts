@@ -20,7 +20,9 @@ export interface BeamTextFieldProps extends BeamFocusableProps {
   errorMsg?: string;
   helperText?: string | ReactNode;
   /** Input label */
-  label?: string;
+  label: string;
+  /** If set, label will be placed as `aria-label` on input element */
+  hideLabel?: boolean;
   value: string | undefined;
   /** Handler called when the interactive element state changes. */
   onChange: (value: string | undefined) => void;

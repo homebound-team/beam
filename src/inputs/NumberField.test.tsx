@@ -7,7 +7,7 @@ let lastSet: any = undefined;
 
 describe("NumberFieldTest", () => {
   it("can set a value", async () => {
-    const r = await render(<TestNumberField value={1} />);
+    const r = await render(<TestNumberField label="Age" value={1} />);
     expect(r.age()).toHaveValue("1");
     type(r.age, "2");
     expect(r.age()).toHaveValue("2");
@@ -86,7 +86,7 @@ describe("NumberFieldTest", () => {
 });
 
 function TestNumberField(props: Omit<NumberFieldProps, "onChange">) {
-  const { value, label = "Age", ...otherProps } = props;
+  const { value, label, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
   return (
     <NumberField

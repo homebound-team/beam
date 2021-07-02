@@ -4,7 +4,12 @@ import { TextAreaField, TextAreaFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundTextAreaFieldProps = Omit<TextAreaFieldProps, "value" | "onChange" | "onBlur" | "onFocus"> & {
+export type BoundTextAreaFieldProps = Omit<
+  TextAreaFieldProps,
+  "value" | "onChange" | "onBlur" | "onFocus" | "label"
+> & {
+  // Make optional as it'll create a label from the field's key if not present
+  label?: string;
   field: FieldState<any, string | null | undefined>;
   // Optional in case the page wants extra behavior
   onChange?: (value: string | undefined) => void;
