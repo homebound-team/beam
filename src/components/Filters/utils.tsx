@@ -55,15 +55,16 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
 
     if (filterDef.kind === "multi") {
       if (inModal && filterDef.options.length <= 8) {
+        debugger;
         return wrapIfModal(
           <ToggleChipGroup
-            {...filterDef}
+            label={filterDef.label}
             options={filterDef.options.map((o: any) => ({
               label: filterDef.getOptionLabel(o),
               value: filterDef.getOptionValue(o),
             }))}
             onChange={(values) => updateFilter(filter, key, values)}
-            values={filter[key] || []}
+            values={(filter[key] || []) as string[]}
             hideLabel={true}
           />,
           inModal,
