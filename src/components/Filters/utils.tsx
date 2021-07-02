@@ -7,6 +7,7 @@ import {
   SingleFilterProps,
 } from "src/components/Filters";
 import { MultiSelectField, SelectField } from "src/inputs";
+import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 import { safeEntries } from "src/utils";
 
 interface GetFilterComponentsOpts<F> {
@@ -53,6 +54,24 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
     }
 
     if (filterDef.kind === "multi") {
+      if (inModal && filterDef.options.length <= 8) {
+        debugger;
+        return wrapIfModal(
+          <ToggleChipGroup
+            label={filterDef.label}
+            options={filterDef.options.map((o: any) => ({
+              label: filterDef.getOptionLabel(o),
+              value: filterDef.getOptionValue(o),
+            }))}
+            onChange={(values) => updateFilter(filter, key, values)}
+            values={(filter[key] || []) as string[]}
+            hideLabel={true}
+          />,
+          inModal,
+          filterDef.label,
+        );
+      }
+
       return wrapIfModal(
         <MultiSelectField
           {...filterDef}
