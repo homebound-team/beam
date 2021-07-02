@@ -13,6 +13,7 @@ export { NavLink } from "./NavLink";
 export * from "./Pill";
 export * from "./Pills";
 export * from "./RichTextField";
+export * from "./Stepper";
 export * from "./SuperDrawer";
 export { TabsWithContent } from "./Tabs";
 export * from "./Tooltip";
