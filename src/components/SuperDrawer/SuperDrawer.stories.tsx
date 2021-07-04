@@ -105,39 +105,6 @@ export function OpenAtDetail() {
   );
 }
 
-/**
- * This story is an example of an incorrect usage of openInDrawer. In the useEffect
- * the component is adding a element of mode `detail` before there is a base element, or
- * element of mode `new` already in the SuperDrawer.
- *
- * When using SuperDrawer, a detail element can only be added when there is a new
- * element in the contentStack.
- */
-export function OpenOnlyDetails() {
-  const { openDrawerDetail } = useSuperDrawer();
-
-  // Open the SuperDrawer to a details component
-  useEffect(() => {
-    // Not a recommended pattern in production code
-    openDrawerDetail({
-      title: "This should not render",
-      content: <TestDetailContent book={Books[0]} />,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return (
-    <>
-      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Should Not Render</h1>
-      <p>
-        When attempting to open a `details` element before a `new` element is included, a console error will be logged
-        and the SuperDrawer will not open.
-      </p>
-      <p>See console via DevTools for a detailed error message.</p>
-    </>
-  );
-}
-
 type Book = { bookTitle: string; bookDescription: string; authorName: string; authorDescription: string };
 type Row = SimpleHeaderAndDataOf<Book>;
 
