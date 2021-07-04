@@ -1,15 +1,16 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useEffect, useState } from "react";
-import { Button, Modal, ModalBody, ModalFooter, ModalProps, useModalContext } from "src/components/index";
+import { Button, ModalBody, ModalFooter, ModalProps, useModal } from "src/components/index";
+import { Modal } from "src/components/Modal/Modal";
 import { Css } from "src/Css";
-import { withDimensions, withModalDecorator } from "src/utils/sb";
+import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { withPerformance } from "storybook-addon-performance";
 
 export default {
   component: Modal,
   title: "Components/Modal",
-  decorators: [withPerformance, withModalDecorator, withDimensions()],
+  decorators: [withPerformance, withBeamDecorator, withDimensions()],
 } as Meta;
 
 export const Small = () => <ModalExample size="sm" />;
@@ -24,7 +25,7 @@ interface ModalExampleProps extends Pick<ModalProps, "size"> {
 }
 
 function ModalExample({ size, showLeftAction, initNumSentences = 1 }: ModalExampleProps) {
-  const { openModal } = useModalContext();
+  const { openModal } = useModal();
 
   const modalProps = {
     size,

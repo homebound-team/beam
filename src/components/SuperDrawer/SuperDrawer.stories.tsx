@@ -3,13 +3,15 @@ import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf } from "src";
 import { GridDataRow, GridRowLookup } from "src/components/GridTable";
-import { withDimensions, withSuperDrawerDecorator } from "src/utils/sb";
-import { SuperDrawer as SuperDrawerComponent, SuperDrawerContent, useSuperDrawer } from "./index";
+import { useModal } from "src/components/Modal/useModal";
+import { withBeamDecorator, withDimensions } from "src/utils/sb";
+import { SuperDrawerContent, useSuperDrawer } from "./index";
+import { SuperDrawer as SuperDrawerComponent } from "./SuperDrawer";
 
 export default {
   title: "Components/Super Drawer",
   component: SuperDrawerComponent,
-  decorators: [withSuperDrawerDecorator, withDimensions()],
+  decorators: [withBeamDecorator, withDimensions()],
 } as Meta;
 
 export function Open() {
@@ -71,7 +73,7 @@ export function OpenWithNoActions() {
 }
 
 export function OpenAtDetail() {
-  const { openInDrawer } = useSuperDrawer();
+  const { openInDrawer, openDrawerDetail } = useSuperDrawer();
 
   // Open the SuperDrawer to a details component
   useEffect(() => {
@@ -81,9 +83,8 @@ export function OpenAtDetail() {
       title: "Child Content Title",
       content: <SuperDrawerExampleContent book={Books[0]} />,
     });
-    openInDrawer({
-      content: <SuperDrawerExampleChildContent book={Books[0]} />,
-      type: "detail",
+    openDrawerDetail({
+      content: <TestDetailContent book={Books[0]} />,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -113,15 +114,14 @@ export function OpenAtDetail() {
  * element in the contentStack.
  */
 export function OpenOnlyDetails() {
-  const { openInDrawer } = useSuperDrawer();
+  const { openDrawerDetail } = useSuperDrawer();
 
   // Open the SuperDrawer to a details component
   useEffect(() => {
     // Not a recommended pattern in production code
-    openInDrawer({
+    openDrawerDetail({
       title: "This should not render",
-      content: <SuperDrawerExampleChildContent book={Books[0]} />,
-      type: "detail",
+      content: <TestDetailContent book={Books[0]} />,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -225,7 +225,8 @@ interface SuperDrawerExampleContentProps {
 
 /** Example component to render inside the SuperDrawer */
 function SuperDrawerExampleContent({ book, hasActions = true }: SuperDrawerExampleContentProps) {
-  const { openInDrawer, closeDrawer, setModalContent } = useSuperDrawer();
+  const { openDrawerDetail, closeDrawer } = useSuperDrawer();
+  const { openModal } = useModal();
 
   function handleBookPurchase() {
     // Process payment...
@@ -233,7 +234,10 @@ function SuperDrawerExampleContent({ book, hasActions = true }: SuperDrawerExamp
   }
 
   function handlePurchase() {
-    setModalContent(<SuperDrawerExampleModalContent book={book} onPrimaryClick={handleBookPurchase} />);
+    openModal({
+      title: "asdf",
+      content: <TestModalContent book={book} onPrimaryClick={handleBookPurchase} />,
+    });
   }
 
   function handleClose() {
@@ -264,11 +268,9 @@ function SuperDrawerExampleContent({ book, hasActions = true }: SuperDrawerExamp
           variant="tertiary"
           label={`Learn more about ${book.authorName.split(" ")[0]}`}
           onClick={() =>
-            openInDrawer({
+            openDrawerDetail({
               title: book.authorName,
-              content: <SuperDrawerExampleChildContent book={book} onPurchase={handlePurchase} />,
-              // Specifically marking this element as a detail element
-              type: "detail",
+              content: <TestDetailContent book={book} onPurchase={handlePurchase} />,
             })
           }
         />
@@ -278,17 +280,12 @@ function SuperDrawerExampleContent({ book, hasActions = true }: SuperDrawerExamp
 }
 
 /** Example component to render inside the SuperDrawer */
-function SuperDrawerExampleChildContent({ book, onPurchase }: { book: Book; onPurchase?: () => void }) {
-  const { closeInDrawer } = useSuperDrawer();
-
-  function handleCancel() {
-    closeInDrawer();
-  }
-
+function TestDetailContent({ book, onPurchase }: { book: Book; onPurchase?: () => void }) {
+  const { closeDrawerDetail } = useSuperDrawer();
   return (
     <SuperDrawerContent
       actions={[
-        { label: `Back to "${book.bookTitle}"`, onClick: handleCancel, variant: "tertiary" },
+        { label: `Back to "${book.bookTitle}"`, onClick: closeDrawerDetail, variant: "tertiary" },
         { label: `Purchase "${book.bookTitle}"`, onClick: onPurchase, disabled: !onPurchase },
       ]}
     >
@@ -301,9 +298,8 @@ function SuperDrawerExampleChildContent({ book, onPurchase }: { book: Book; onPu
 }
 
 /** Example component to render as a error/confirmation component of the SuperDrawer content */
-const SuperDrawerExampleModalContent = ({ book, onPrimaryClick }: { book: Book; onPrimaryClick: () => void }) => {
-  const { closeModal } = useSuperDrawer();
-
+function TestModalContent({ book, onPrimaryClick }: { book: Book; onPrimaryClick: () => void }) {
+  const { closeModal } = useModal();
   return (
     <div css={Css.wPx(500).df.flexColumn.justifyCenter.itemsCenter.tc.$}>
       <p css={Css.lgEm.$}>Are you sure you want to purchase {book.bookTitle} ?</p>
@@ -313,4 +309,4 @@ const SuperDrawerExampleModalContent = ({ book, onPrimaryClick }: { book: Book; 
       </div>
     </div>
   );
-};
+}

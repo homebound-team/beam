@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo } from "react";
 import { Button } from "src/components/Button";
 import { FilterDefs, FilterModal, getFilterComponents } from "src/components/Filters";
-import { useModalContext } from "src/components/Modal";
+import { useModal } from "src/components/Modal";
 import { Css } from "src/Css";
 import { omitKey, safeEntries, safeKeys } from "src/utils";
 
@@ -15,7 +15,7 @@ interface FilterProps<F> {
 
 function Filters<F>(props: FilterProps<F>) {
   const { filter, onChange, filterDefs } = props;
-  const { openModal } = useModalContext();
+  const { openModal } = useModal();
   const [pageFilterDefs, modalFilterDefs] = useMemo(() => {
     const filterEntries = safeEntries(filterDefs);
     // If we have more than 4 filters,

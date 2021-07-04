@@ -1,23 +1,23 @@
 import { act } from "@testing-library/react";
 import { useEffect } from "react";
 import { ModalProps } from "src/components/Modal/Modal";
-import { ModalContextProps, useModalContext } from "src/components/Modal/ModalContext";
+import { useModal, UseModalHook } from "src/components/Modal/useModal";
 import { Callback } from "src/types";
-import { click, render, withModalRTL } from "src/utils/rtl";
+import { click, render, withBeamRTL } from "src/utils/rtl";
 
-describe("ModalContext", () => {
+describe("useModal", () => {
   it("can open and close the modal", async () => {
     // Given a ModalContext
-    let context: ModalContextProps;
+    let context: UseModalHook;
     const modalProps = { title: "Test", content: <div>Test</div> };
 
     function TestApp() {
-      context = useModalContext();
+      context = useModal();
       return <div />;
     }
 
     // When rendering a component without a modal defined
-    const r = await render(<TestApp />, withModalRTL);
+    const r = await render(<TestApp />, withBeamRTL);
 
     // Then expect no modal to exist
     expect(r.queryByTestId("modal")).toBeFalsy();
@@ -35,25 +35,25 @@ describe("ModalContext", () => {
 
   it("can provide a custom onClose method", async () => {
     function TestApp(modalProps: ModalProps) {
-      const { openModal } = useModalContext();
+      const { openModal } = useModal();
       useEffect(() => {
         openModal(modalProps);
-      }, []);
+      }, [openModal]);
       return <div>App</div>;
     }
 
     // Given a modal that sets a custom `onClose` method
     function TestModalContent({ onClose }: { onClose: Callback }) {
-      const { setOnClose } = useModalContext();
+      const { setOnClose } = useModal();
       useEffect(() => {
         setOnClose(onClose);
-      }, []);
+      }, [setOnClose]);
       return <div>Content</div>;
     }
     const onClose = jest.fn();
     const modalProps = { title: "Test", content: <TestModalContent onClose={onClose} /> };
 
-    const r = await render(<TestApp {...modalProps} />, withModalRTL);
+    const r = await render(<TestApp {...modalProps} />, withBeamRTL);
 
     // When clicking the close button
     click(r.modal_titleClose);

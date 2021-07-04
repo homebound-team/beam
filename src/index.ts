@@ -4,6 +4,6 @@ export * from "./forms";
 export * from "./hooks";
 export * from "./inputs";
 export * from "./interfaces";
-export { withModalRTL, withSuperDrawerRTL } from "./utils/rtl";
-export { withSuperDrawerDecorator } from "./utils/sb";
+export { withBeamRTL } from "./utils/rtl";
+export { withBeamDecorator } from "./utils/sb";
 export * from "./utils/useTestIds";
