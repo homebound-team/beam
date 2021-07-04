@@ -2,7 +2,8 @@ import { Global } from "@emotion/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactPortal, useContext } from "react";
 import { createPortal } from "react-dom";
-import { BeamContext, ButtonGroup, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
+import { ButtonGroup, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
+import { BeamContext } from "src/components/BeamContext";
 import { Css, px } from "src/Css";
 import { useTestIds } from "src/utils";
 

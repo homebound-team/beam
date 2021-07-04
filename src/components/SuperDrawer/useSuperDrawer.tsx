@@ -1,5 +1,5 @@
 import { ReactNode, useContext, useMemo } from "react";
-import { BeamContext } from "src/components";
+import { BeamContext } from "src/components/BeamContext";
 
 export interface OpenInDrawerOpts {
   /** Title of the SuperDrawer */
