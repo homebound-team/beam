@@ -8,7 +8,9 @@ import { useTestIds } from "src/utils";
 
 export interface ModalProps {
   title: string;
+  /** The modal size, defaults to `md`. */
   size?: "sm" | "md" | "lg";
+  /** The content of the modal; for consistent styling use a fragment with `<ModalBody />` and `<ModalFooter />`. */
   content: ReactNode;
 }
 
@@ -16,8 +18,6 @@ export interface ModalProps {
  * Internal component for displaying a Modal; see `useModal` for the public API.
  *
  * Provides underlay, modal container, and header. Will disable scrolling of page under the modal.
- *
- * For consistent styling and behaviors between Modals, use `<ModalBody />` and `<ModalFooter>` within `ModalProps.content`.
  */
 export function Modal(props: ModalProps) {
   const { title, size = "md", content } = props;
