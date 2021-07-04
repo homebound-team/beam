@@ -1,3 +1,4 @@
+import { MutableRefObject } from "react";
 import type { CheckboxGroupState, ToggleState } from "react-stately";
 
 /** Adapts our state to what useToggleState returns in a stateless manner. */
@@ -56,4 +57,13 @@ type Entries<T> = {
 
 export function safeEntries<T>(obj: T): Entries<T> {
   return Object.entries(obj) as any;
+}
+
+export class EmptyRef<T> implements MutableRefObject<T> {
+  get current(): T {
+    throw new Error("BeamProvider is missing");
+  }
+  set current(value) {
+    throw new Error("BeamProvider is missing");
+  }
 }

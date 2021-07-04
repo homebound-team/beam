@@ -1,4 +1,4 @@
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useRef } from "react";
 import { BeamContext } from "src/components/BeamContext";
 import { Callback } from "src/types";
 import { ModalProps } from "./Modal";
@@ -6,12 +6,12 @@ import { ModalProps } from "./Modal";
 export interface UseModalHook {
   openModal: (props: ModalProps) => void;
   closeModal: Callback;
-  onClose: Callback;
-  setOnClose: (onClose: Callback) => void;
+  addCanClose: (canClose: () => boolean) => void;
 }
 
 export function useModal(): UseModalHook {
-  const { modalState } = useContext(BeamContext);
+  const { modalState, canCloseChecks } = useContext(BeamContext);
+  const lastCanClose = useRef<undefined | (() => boolean)>();
   return useMemo(
     () => ({
       openModal(props) {
@@ -20,13 +20,21 @@ export function useModal(): UseModalHook {
         modalState.current = props;
       },
       closeModal() {
-        // TODO Check can leave?
+        for (const canClose of canCloseChecks.current) {
+          if (!canClose()) {
+            return;
+          }
+        }
         modalState.current = undefined;
       },
-      onClose() {
-        modalState.current = undefined;
+      addCanClose(canClose) {
+        canCloseChecks.current = [
+          // Only allow one canClose per component at a time; this lets the caller avoid useMemo'ing their lambda
+          ...canCloseChecks.current.filter((c) => c !== lastCanClose.current),
+          canClose,
+        ];
+        lastCanClose.current = canClose;
       },
-      setOnClose(onClose) {},
     }),
     [modalState],
   );

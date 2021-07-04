@@ -3,31 +3,20 @@ import { OverlayProvider } from "react-aria";
 import { Modal, ModalProps } from "src/components/Modal/Modal";
 import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
+import { EmptyRef } from "src/utils/index";
 
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */
 export interface BeamContextState {
   contentStack: MutableRefObject<ContentStack[]>;
   modalState: MutableRefObject<ModalProps | undefined>;
+  canCloseChecks: MutableRefObject<Array<() => boolean>>;
 }
 
 /** This is only exported internally, for useModal and useSuperDrawer, it's not a public API. */
 export const BeamContext = createContext<BeamContextState>({
-  contentStack: {
-    get current(): ContentStack[] {
-      throw new Error("BeamProvider is missing");
-    },
-    set current(value) {
-      throw new Error("BeamProvider is missing");
-    },
-  },
-  modalState: {
-    get current(): ModalProps | undefined {
-      throw new Error("BeamProvider is missing");
-    },
-    set current(value) {
-      throw new Error("BeamProvider is missing");
-    },
-  },
+  contentStack: new EmptyRef(),
+  modalState: new EmptyRef(),
+  canCloseChecks: new EmptyRef(),
 });
 
 export function BeamProvider({ children }: { children: ReactNode }) {
@@ -38,6 +27,7 @@ export function BeamProvider({ children }: { children: ReactNode }) {
   const [, tick] = useReducer((prev) => prev + 1, 0);
   const modalRef = useRef<ModalProps | undefined>();
   const contentStackRef = useRef<ContentStack[]>([]);
+  const canCloseChecksRef = useRef<Array<() => boolean>>([]);
 
   // We essentially expose the refs, but with our own getters/setters so that we can
   // have the setters call `tick` to re-render this Provider
@@ -61,6 +51,8 @@ export function BeamProvider({ children }: { children: ReactNode }) {
           tick();
         },
       },
+      // We don't need to rerender when this is mutated, so just expose as-is
+      canCloseChecks: canCloseChecksRef,
     };
   }, []);
 

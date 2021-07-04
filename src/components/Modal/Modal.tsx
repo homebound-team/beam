@@ -4,14 +4,12 @@ import { FocusScope, OverlayContainer, useDialog, useModal, useOverlay, usePreve
 import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
-import { Callback } from "src/types";
 import { useTestIds } from "src/utils";
 
 export interface ModalProps {
   title: string;
   size?: "sm" | "md" | "lg";
   content: ReactNode;
-  onClose?: Callback;
 }
 
 /**
@@ -25,8 +23,11 @@ export function Modal(props: ModalProps) {
   const { title, size = "md", content } = props;
   const width = size === "sm" ? 320 : size === "md" ? 480 : 640;
   const ref = useRef(null);
-  const { onClose } = ourUseModal();
-  const { overlayProps, underlayProps } = useOverlay({ ...props, isOpen: true, onClose, isDismissable: true }, ref);
+  const { closeModal } = ourUseModal();
+  const { overlayProps, underlayProps } = useOverlay(
+    { ...props, isOpen: true, onClose: closeModal, isDismissable: true },
+    ref,
+  );
   const { modalProps } = useModal();
   const { dialogProps, titleProps } = useDialog({ role: "dialog" }, ref);
   const testId = useTestIds({}, testIdPrefix);
@@ -49,7 +50,7 @@ export function Modal(props: ModalProps) {
                 {title}
               </h1>
               <span css={Css.fs0.pl1.$}>
-                <IconButton icon="x" onClick={onClose} {...testId.titleClose} />
+                <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
               </span>
             </header>
             <>{content}</>

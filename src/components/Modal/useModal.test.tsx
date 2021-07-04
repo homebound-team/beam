@@ -2,7 +2,6 @@ import { act } from "@testing-library/react";
 import { useEffect } from "react";
 import { ModalProps } from "src/components/Modal/Modal";
 import { useModal, UseModalHook } from "src/components/Modal/useModal";
-import { Callback } from "src/types";
 import { click, render, withBeamRTL } from "src/utils/rtl";
 
 describe("useModal", () => {
@@ -34,31 +33,27 @@ describe("useModal", () => {
   });
 
   it("can provide a custom onClose method", async () => {
-    function TestApp(modalProps: ModalProps) {
+    function TestApp(props: ModalProps) {
       const { openModal } = useModal();
-      useEffect(() => {
-        openModal(modalProps);
-      }, [openModal]);
+      useEffect(() => openModal(props), []);
       return <div>App</div>;
     }
 
     // Given a modal that sets a custom `onClose` method
-    function TestModalContent({ onClose }: { onClose: Callback }) {
-      const { setOnClose } = useModal();
-      useEffect(() => {
-        setOnClose(onClose);
-      }, [setOnClose]);
+    function TestModalContent({ canClose }: { canClose: () => boolean }) {
+      const { addCanClose } = useModal();
+      addCanClose(canClose);
       return <div>Content</div>;
     }
-    const onClose = jest.fn();
-    const modalProps = { title: "Test", content: <TestModalContent onClose={onClose} /> };
+    const canClose = jest.fn().mockReturnValue(false);
+    const modalProps = { title: "Test", content: <TestModalContent canClose={canClose} /> };
 
     const r = await render(<TestApp {...modalProps} />, withBeamRTL);
 
     // When clicking the close button
     click(r.modal_titleClose);
     // Then expect the custom method to be called.
-    expect(onClose).toBeCalled();
+    expect(canClose).toBeCalled();
     // And the modal should not have closed since the custom method didn't not invoke the ModalContext.closeModal method.
     expect(r.modal()).toBeTruthy();
   });
