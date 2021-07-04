@@ -33,24 +33,8 @@ export function BeamProvider({ children }: { children: ReactNode }) {
   // have the setters call `tick` to re-render this Provider
   const context = useMemo<BeamContextState>(() => {
     return {
-      modalState: {
-        get current() {
-          return modalRef.current;
-        },
-        set current(value) {
-          modalRef.current = value;
-          tick();
-        },
-      },
-      contentStack: {
-        get current() {
-          return contentStackRef.current;
-        },
-        set current(value) {
-          contentStackRef.current = value;
-          tick();
-        },
-      },
+      modalState: new PretendRefThatTicks(modalRef, tick),
+      contentStack: new PretendRefThatTicks(contentStackRef, tick),
       // We don't need to rerender when this is mutated, so just expose as-is
       canCloseChecks: canCloseChecksRef,
     };
@@ -67,4 +51,16 @@ export function BeamProvider({ children }: { children: ReactNode }) {
       <SuperDrawer />
     </BeamContext.Provider>
   );
+}
+
+/** Looks like a ref, but invokes a re-render on set (w/o changing the setter identity). */
+class PretendRefThatTicks<T> implements MutableRefObject<T> {
+  constructor(private ref: MutableRefObject<T>, private tick: () => void) {}
+  get current(): T {
+    return this.ref.current;
+  }
+  set current(value) {
+    this.ref.current = value;
+    this.tick();
+  }
 }
