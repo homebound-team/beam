@@ -66,6 +66,6 @@ function TestDrawerContent(props: {
     if (props.closeDrawer) {
       context.closeDrawer();
     }
-  }, [context]);
+  }, []);
   return <h1>Page Content</h1>;
 }
