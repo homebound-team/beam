@@ -135,6 +135,24 @@ export function OpenWithModal() {
   );
 }
 
+export function OpenWithTitleRightContent() {
+  const { openInDrawer } = useSuperDrawer();
+  function open() {
+    openInDrawer({
+      title: "Title",
+      content: <TestDrawerContent book={Books[0]} />,
+      titleRightContent: <Button label="Manage RFP" onClick={() => {}} />,
+    });
+  }
+  useEffect(() => open(), []);
+  return (
+    <>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Modal</h1>
+      <Button label="Show SuperDrawer" onClick={open} />
+    </>
+  );
+}
+
 type Book = { bookTitle: string; bookDescription: string; authorName: string; authorDescription: string };
 type Row = SimpleHeaderAndDataOf<Book>;
 

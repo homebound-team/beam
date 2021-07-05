@@ -4,6 +4,8 @@ import { BeamContext } from "src/components/BeamContext";
 export interface OpenInDrawerOpts {
   /** Title of the SuperDrawer */
   title: string;
+  /** Optional content to place next to the prev/next buttons. */
+  titleRightContent?: ReactNode;
   /** Invokes left, disabled if undefined. */
   onPrevClick?: () => void;
   /** Invokes right, disabled if undefined. */

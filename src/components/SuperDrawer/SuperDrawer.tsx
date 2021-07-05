@@ -42,9 +42,9 @@ export function SuperDrawer(): ReactPortal | null {
 
   // Also get the first / non-detail element on the stack
   const firstContent = contentStack.current[0].opts as OpenInDrawerOpts;
-  const { onPrevClick, onNextClick, onClose } = firstContent;
+  const { onPrevClick, onNextClick, onClose, titleRightContent = null } = firstContent;
 
-  const isDetail = contentStack.current.length > 1;
+  const isDetail = currentContent !== firstContent;
   const title = currentContent.title || firstContent.title;
 
   function handleOnClose() {
@@ -97,6 +97,7 @@ export function SuperDrawer(): ReactPortal | null {
                 {!modalState.current && (
                   // Forcing height to 32px to match title height
                   <div css={Css.df.childGap3.itemsCenter.hPx(32).$}>
+                    {titleRightContent}
                     {/* Disable buttons is handlers are not given or if childContent is shown */}
                     <ButtonGroup
                       buttons={[
