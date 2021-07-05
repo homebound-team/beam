@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ReactNode, useCallback, useContext } from "react";
+import { ReactNode, useContext } from "react";
 import { BeamContext } from "src/components/BeamContext";
 import { Button, ButtonProps } from "src/components/Button";
 import { useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
@@ -30,50 +30,44 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
   // Determine if the current element is a new content element or an detail element
   const { kind } = contentStack.current[contentStack.current.length - 1];
 
-  const ContentWrapper = useCallback(
-    ({ children }: { children: ReactNode }) => {
-      if (kind === "open") {
-        return (
-          <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }}>
+  function wrapWithMotionAndMaybeBack(children: ReactNode): ReactNode {
+    if (kind === "open") {
+      return (
+        <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }}>
+          {children}
+        </motion.div>
+      );
+    } else if (kind === "detail") {
+      return (
+        <motion.div
+          key="content"
+          css={Css.px3.pt2.pb3.fg1.$}
+          animate={{ overflow: "auto" }}
+          transition={{ overflow: { delay: 0.3 } }}
+        >
+          <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={closeDrawerDetail} />
+          <motion.div
+            initial={{ x: 1040, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ ease: "linear", duration: 0.3, opacity: { delay: 0.15 } }}
+            exit={{ x: 1040, opacity: 0 }}
+            css={Css.pt2.$}
+          >
             {children}
           </motion.div>
-        );
-      } else if (kind === "detail") {
-        return (
-          <motion.div
-            css={Css.px3.pt2.pb3.fg1.$}
-            animate={{ overflow: "auto" }}
-            transition={{ overflow: { delay: 0.3 } }}
-          >
-            <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={closeDrawerDetail} />
-            <motion.div
-              initial={{ x: 1040, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{
-                ease: "linear",
-                duration: 0.3,
-                opacity: { delay: 0.15 },
-              }}
-              exit={{ x: 1040, opacity: 0 }}
-              css={Css.pt2.$}
-            >
-              {children}
-            </motion.div>
-          </motion.div>
-        );
-      }
-
+        </motion.div>
+      );
+    } else {
       // Hides content changes when closing the drawer
       // TODO: Potentially use a boolean to trigger close action so content does
       // not need to disappear during exit.
-      return <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }}></motion.div>;
-    },
-    [kind, closeDrawerDetail],
-  );
+      return <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }} />;
+    }
+  }
 
   return (
     <>
-      <ContentWrapper>{children}</ContentWrapper>
+      {wrapWithMotionAndMaybeBack(children)}
       {/* Optionally render footer section with row of given footer buttons */}
       {actions && (
         <footer css={Css.bt.bGray200.p3.df.itemsCenter.justifyEnd.$}>
