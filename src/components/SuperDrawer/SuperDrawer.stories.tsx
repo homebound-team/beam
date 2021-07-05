@@ -3,6 +3,7 @@ import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf } from "src";
 import { GridDataRow, GridRowLookup } from "src/components/GridTable";
+import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { SuperDrawerContent, useSuperDrawer } from "./index";
@@ -22,10 +23,9 @@ export function Open() {
   useEffect(() => {
     openInDrawer({
       title: "Content Title",
-      content: <SuperDrawerExampleContent book={Books[0]} />,
+      content: <TestDrawerContent book={Books[0]} />,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [openInDrawer]);
 
   return (
     // Purposely set height to validate no scrolling behaviour
@@ -36,7 +36,7 @@ export function Open() {
         onClick={() =>
           openInDrawer({
             title: "Content Title",
-            content: <SuperDrawerExampleContent book={Books[0]} />,
+            content: <TestDrawerContent book={Books[0]} />,
           })
         }
       />
@@ -51,10 +51,9 @@ export function OpenWithNoActions() {
   useEffect(() => {
     openInDrawer({
       title: "Content Title",
-      content: <SuperDrawerExampleContent book={Books[0]} hasActions={false} />,
+      content: <TestDrawerContent book={Books[0]} hasActions={false} />,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [openInDrawer]);
 
   return (
     <>
@@ -64,7 +63,7 @@ export function OpenWithNoActions() {
         onClick={() =>
           openInDrawer({
             title: "Content Title",
-            content: <SuperDrawerExampleContent book={Books[0]} hasActions={false} />,
+            content: <TestDrawerContent book={Books[0]} hasActions={false} />,
           })
         }
       />
@@ -81,13 +80,12 @@ export function OpenAtDetail() {
     openInDrawer({
       // Testing detail content defaulting to previous element
       title: "Child Content Title",
-      content: <SuperDrawerExampleContent book={Books[0]} />,
+      content: <TestDrawerContent book={Books[0]} />,
     });
     openDrawerDetail({
       content: <TestDetailContent book={Books[0]} />,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [openInDrawer, openDrawerDetail]);
 
   return (
     <>
@@ -97,7 +95,39 @@ export function OpenAtDetail() {
         onClick={() =>
           openInDrawer({
             title: "Content Title",
-            content: <SuperDrawerExampleContent book={Books[0]} />,
+            content: <TestDrawerContent book={Books[0]} />,
+          })
+        }
+      />
+    </>
+  );
+}
+
+export function OpenWithModal() {
+  const { openInDrawer } = useSuperDrawer();
+  const { openModal } = useModal();
+
+  // Open the SuperDrawer to a details component
+  useEffect(() => {
+    openInDrawer({
+      title: "Child Content Title",
+      content: <TestDrawerContent book={Books[0]} />,
+    });
+    openModal({
+      title: "Modal Title",
+      content: <TestModalContent />,
+    });
+  }, [openInDrawer, openModal]);
+
+  return (
+    <>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Modal</h1>
+      <Button
+        label="Show SuperDrawer"
+        onClick={() =>
+          openInDrawer({
+            title: "Content Title",
+            content: <TestDrawerContent book={Books[0]} />,
           })
         }
       />
@@ -141,7 +171,7 @@ const Books: Book[] = [
  * render of the SuperDrawer with a chosen component (so it can give it the
  * appropriate props) and the unmount can be controlled via the chosen component.
  */
-export function Example() {
+export function TableWithPrevNext() {
   const { openInDrawer } = useSuperDrawer();
   const rowLookup = useRef<GridRowLookup<Row>>();
 
@@ -153,7 +183,7 @@ export function Example() {
         title: row.bookTitle,
         onPrevClick: prev && (() => openRow(prev)),
         onNextClick: next && (() => openRow(next)),
-        content: <SuperDrawerExampleContent book={row} />,
+        content: <TestDrawerContent book={row} />,
       });
     }
   }
@@ -185,30 +215,21 @@ export function Example() {
   );
 }
 
-interface SuperDrawerExampleContentProps {
+interface TestDrawerContentProps {
   book: Book;
   hasActions?: boolean;
 }
 
 /** Example component to render inside the SuperDrawer */
-function SuperDrawerExampleContent({ book, hasActions = true }: SuperDrawerExampleContentProps) {
+function TestDrawerContent({ book, hasActions = true }: TestDrawerContentProps) {
   const { openDrawerDetail, closeDrawer } = useSuperDrawer();
   const { openModal } = useModal();
-
-  function handleBookPurchase() {
-    // Process payment...
-    handleClose();
-  }
 
   function handlePurchase() {
     openModal({
       title: "asdf",
-      content: <TestModalContent book={book} onPrimaryClick={handleBookPurchase} />,
+      content: <TestSimpleModalContent book={book} onPrimaryClick={closeDrawer} />,
     });
-  }
-
-  function handleClose() {
-    closeDrawer();
   }
 
   return (
@@ -216,7 +237,7 @@ function SuperDrawerExampleContent({ book, hasActions = true }: SuperDrawerExamp
       actions={
         hasActions
           ? [
-              { label: "Close", onClick: handleClose, variant: "tertiary" },
+              { label: "Close", onClick: closeDrawer, variant: "tertiary" },
               { label: `Purchase "${book.bookTitle}"`, onClick: handlePurchase },
             ]
           : undefined
@@ -265,7 +286,7 @@ function TestDetailContent({ book, onPurchase }: { book: Book; onPurchase?: () =
 }
 
 /** Example component to render as a error/confirmation component of the SuperDrawer content */
-function TestModalContent({ book, onPrimaryClick }: { book: Book; onPrimaryClick: () => void }) {
+function TestSimpleModalContent({ book, onPrimaryClick }: { book: Book; onPrimaryClick: () => void }) {
   const { closeModal } = useModal();
   return (
     <div css={Css.wPx(500).df.flexColumn.justifyCenter.itemsCenter.tc.$}>
