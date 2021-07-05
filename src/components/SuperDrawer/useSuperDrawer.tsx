@@ -4,8 +4,10 @@ import { BeamContext } from "src/components/BeamContext";
 export interface OpenInDrawerOpts {
   /** Title of the SuperDrawer */
   title: string;
-  /** Optional content to place next to the prev/next buttons. */
+  /** Optional content to place left of the prev/next buttons, i.e. a "Manage" link. */
   titleRightContent?: ReactNode;
+  /** Optional content to place right of the title, i.e. a status badge. */
+  titleLeftContent?: ReactNode;
   /** Invokes left, disabled if undefined. */
   onPrevClick?: () => void;
   /** Invokes right, disabled if undefined. */

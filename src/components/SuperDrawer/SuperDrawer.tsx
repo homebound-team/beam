@@ -42,7 +42,7 @@ export function SuperDrawer(): ReactPortal | null {
 
   // Also get the first / non-detail element on the stack
   const firstContent = contentStack.current[0].opts as OpenInDrawerOpts;
-  const { onPrevClick, onNextClick, onClose, titleRightContent = null } = firstContent;
+  const { onPrevClick, onNextClick, onClose, titleRightContent, titleLeftContent } = firstContent;
 
   const isDetail = currentContent !== firstContent;
   const title = currentContent.title || firstContent.title;
@@ -90,14 +90,17 @@ export function SuperDrawer(): ReactPortal | null {
             >
               <header css={Css.df.p3.bb.bGray200.df.itemsCenter.justifyBetween.$}>
                 {/* Left */}
-                <div css={Css.xl2Em.gray900.$} {...testId.title}>
-                  {title}
+                <div css={Css.df.itemsCenter.$}>
+                  <div css={Css.xl2Em.gray900.mr2.$} {...testId.title}>
+                    {title}
+                  </div>
+                  {titleLeftContent || null}
                 </div>
                 {/* Right */}
                 {!modalState.current && (
                   // Forcing height to 32px to match title height
                   <div css={Css.df.childGap3.itemsCenter.hPx(32).$}>
-                    {titleRightContent}
+                    {titleRightContent || null}
                     {/* Disable buttons is handlers are not given or if childContent is shown */}
                     <ButtonGroup
                       buttons={[

@@ -86,6 +86,7 @@ export function OpenWithTitleRightContent() {
     openInDrawer({
       title: "Title",
       content: <TestDrawerContent book={Books[0]} />,
+      titleLeftContent: "ASSIGNED",
       titleRightContent: <Button label="Manage RFP" onClick={() => {}} />,
     });
   }
