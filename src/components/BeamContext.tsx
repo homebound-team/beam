@@ -41,7 +41,7 @@ export function BeamProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <BeamContext.Provider value={context}>
+    <BeamContext.Provider value={{ ...context }}>
       {/* OverlayProvider is required for Modals generated via React-Aria */}
       <OverlayProvider>
         {children}

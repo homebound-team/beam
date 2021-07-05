@@ -75,6 +75,6 @@ export function useSuperDrawer(): SuperDrawerHook {
 
   return {
     ...actions,
-    isDrawerOpen: contentStack.current.length >= 0,
+    isDrawerOpen: contentStack.current.length > 0,
   };
 }
