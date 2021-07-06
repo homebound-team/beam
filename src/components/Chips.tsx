@@ -12,7 +12,7 @@ export interface ChipsProps<T, X> {
   xss?: X;
 }
 
-/** Renders a list of `Chip`s, with wrapping & appropriate margin between each `Pill`. */
+/** Renders a list of `Chip`s, with wrapping & appropriate margin between each `Chip`. */
 export function Chips<T, X extends Only<ChipXss, X>>(props: ChipsProps<T, X>) {
   const { values, getLabel, onRemove, xss } = props;
   const tid = useTestIds(props, "chip");
