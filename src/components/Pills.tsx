@@ -12,7 +12,7 @@ export function Pills(props: PillsProps) {
   const { values } = props;
   const tid = useTestIds(props, "pills");
   return (
-    <div css={Css.df.add({ flexWrap: "wrap" }).$}>
+    <div css={Css.df.add({ flexWrap: "wrap" }).my1.$}>
       {values.map((value, i) => (
         <Pill key={i} text={value} xss={Css.mr1.mb1.$} />
       ))}
