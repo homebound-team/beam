@@ -1,15 +1,18 @@
 import React from "react";
 import { Icon } from "src/components/Icon";
-import { Css, Palette } from "src/Css";
+import { Css, Margin, Only, Palette, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
-export interface ChipProps {
+type ChipXss = Xss<Margin>;
+
+export interface ChipProps<X> {
   text: string;
   onClick: () => void;
+  xss?: X;
 }
 
-export function Chip(props: ChipProps) {
-  const { text, onClick } = props;
+export function Chip<X extends Only<ChipXss, X>>(props: ChipProps<X>) {
+  const { text, onClick, xss = {} } = props;
   const tid = useTestIds(props, "chip");
   return (
     <button
@@ -20,6 +23,7 @@ export function Chip(props: ChipProps) {
           .prPx(4)
           .pyPx(2).gray900.bgGray200.$,
         ":hover": Css.bgGray300.$,
+        ...xss,
       }}
       onClick={onClick}
       {...tid}

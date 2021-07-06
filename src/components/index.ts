@@ -2,6 +2,7 @@ export { BeamProvider } from "./BeamContext";
 export * from "./Button";
 export * from "./ButtonGroup";
 export * from "./Chip";
+export * from "./Chips";
 export * from "./CssReset";
 export * from "./Filters";
 export * from "./GridTable";
