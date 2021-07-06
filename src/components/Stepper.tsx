@@ -8,35 +8,37 @@ export interface Step {
   label: string;
   state: "incomplete" | "complete" | "error";
   disabled?: boolean;
+  value: string;
 }
 
 interface StepperBarProps {
   steps: Step[];
-  // The 0 based index number of which step is active.
-  activeStepIndex: number;
-  onChange: (idx: number) => void;
+  // The 'value' of the Step that should be displayed
+  currentStep: Step["value"];
+  onChange: (stepValue: string) => void;
 }
 
-export function Stepper({ steps, activeStepIndex, onChange }: StepperBarProps) {
+export function Stepper({ steps, currentStep, onChange }: StepperBarProps) {
   if (steps.length === 0) {
     throw new Error("Stepper must be initialized with at least one step");
   }
 
   const [progressBarStep, setProgressBarStep] = useState(0);
   useEffect(() => {
-    if (activeStepIndex > progressBarStep) {
-      setProgressBarStep(activeStepIndex);
+    const currentStepIndex = steps.findIndex((s: Step) => s.value === currentStep) || 0;
+    if (currentStepIndex > progressBarStep) {
+      setProgressBarStep(currentStepIndex);
     }
-  }, [activeStepIndex]);
+  }, [currentStep]);
 
   return (
     <nav aria-label="steps" css={Css.df.flexColumn.$}>
       <ol css={Css.listReset.df.$}>
-        {steps.map((step, idx) => {
-          const isActive = activeStepIndex === idx;
+        {steps.map((step) => {
+          const isCurrent = currentStep === step.value;
           return (
-            <li css={Css.df.flexColumn.wPx(200).$} key={step.label} aria-current={isActive}>
-              <StepButton {...step} onClick={() => onChange(idx)} isActive={isActive} />
+            <li css={Css.df.flexColumn.wPx(200).$} key={step.label} aria-current={isCurrent}>
+              <StepButton {...step} onClick={() => onChange(step.value)} isCurrent={isCurrent} />
             </li>
           );
         })}
@@ -56,11 +58,11 @@ export function Stepper({ steps, activeStepIndex, onChange }: StepperBarProps) {
 
 interface StepButtonProps extends Step {
   onClick: Callback;
-  isActive: boolean;
+  isCurrent: boolean;
 }
 
-function StepButton({ label, disabled: isDisabled, state, isActive, onClick: onPress }: StepButtonProps) {
-  const ariaProps = { onPress, isDisabled };
+function StepButton({ label, disabled, state, isCurrent, onClick }: StepButtonProps) {
+  const ariaProps = { onPress: onClick, isDisabled: disabled };
   const ref = useRef(null);
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
   const { isFocusVisible, focusProps } = useFocusRing();
@@ -76,15 +78,15 @@ function StepButton({ label, disabled: isDisabled, state, isActive, onClick: onP
       css={{
         ...Css.buttonBase.$,
         ...Css.tl.w100.h100.sm.gray700.if(state === "error").red600.$,
-        ...(isActive ? Css.lightBlue700.if(state === "error").red800.$ : {}),
+        ...(isCurrent ? Css.lightBlue700.if(state === "error").red800.$ : {}),
         ...(isHovered && !isPressed ? Css.lightBlue800.if(state === "error").red500.$ : {}),
         ...(isPressed ? Css.lightBlue500.if(state === "error").red900.$ : {}),
-        ...(isDisabled ? Css.gray400.cursorNotAllowed.if(state === "error").red200.$ : {}),
+        ...(disabled ? Css.gray400.cursorNotAllowed.if(state === "error").red200.$ : {}),
         ...(isFocusVisible ? focusRingStyles : {}),
       }}
     >
       <span css={Css.fs0.mrPx(4).$}>
-        <StepIcon state={state} isHovered={isHovered} isPressed={isPressed} isActive={isActive} />
+        <StepIcon state={state} isHovered={isHovered} isPressed={isPressed} isCurrent={isCurrent} />
       </span>
       {label}
     </button>
@@ -95,10 +97,10 @@ interface StepIconProps {
   state: StepButtonProps["state"];
   isHovered?: boolean;
   isPressed?: boolean;
-  isActive?: boolean;
+  isCurrent?: boolean;
 }
 
-function StepIcon({ state, isHovered = false, isPressed = false, isActive = false }: StepIconProps) {
+function StepIcon({ state, isHovered = false, isPressed = false, isCurrent = false }: StepIconProps) {
   if (state === "error") {
     return <Icon icon="errorCircle" />;
   }
@@ -115,7 +117,7 @@ function StepIcon({ state, isHovered = false, isPressed = false, isActive = fals
           Css.wPx(10)
             .hPx(10)
             .ba.bw2.br100.add("color", "currentColor")
-            .if(isHovered || isPressed || isActive)
+            .if(isHovered || isPressed || isCurrent)
             .add("backgroundColor", "currentColor").$
         }
       />
