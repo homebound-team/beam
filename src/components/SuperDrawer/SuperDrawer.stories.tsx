@@ -1,4 +1,3 @@
-import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf } from "src";
@@ -17,88 +16,50 @@ export default {
 
 export function Open() {
   const { openInDrawer, isDrawerOpen } = useSuperDrawer();
-  action("isDrawerOpen")(isDrawerOpen);
-
-  // Open the SuperDrawer on render
-  useEffect(() => {
+  function open() {
     openInDrawer({
-      title: "Content Title",
+      title: "Drawer Title",
       content: <TestDrawerContent book={Books[0]} />,
     });
-  }, [openInDrawer]);
-
+  }
+  useEffect(open, [openInDrawer]);
   return (
     // Purposely set height to validate no scrolling behaviour
     <div css={Css.hPx(5000).$}>
       <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open</h1>
-      <Button
-        label={isDrawerOpen ? "SuperDrawer is open" : "Show SuperDrawer"}
-        onClick={() =>
-          openInDrawer({
-            title: "Content Title",
-            content: <TestDrawerContent book={Books[0]} />,
-          })
-        }
-      />
+      <Button label={isDrawerOpen ? "SuperDrawer is open" : "Show SuperDrawer"} onClick={open} />
     </div>
   );
 }
 
 export function OpenWithNoActions() {
   const { openInDrawer } = useSuperDrawer();
-
-  // Open the SuperDrawer on render
-  useEffect(() => {
+  function open() {
     openInDrawer({
-      title: "Content Title",
+      title: "Drawer Title",
       content: <TestDrawerContent book={Books[0]} hasActions={false} />,
     });
-  }, [openInDrawer]);
-
+  }
+  useEffect(open, [openInDrawer]);
   return (
     <>
       <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open</h1>
-      <Button
-        label="Show SuperDrawer"
-        onClick={() =>
-          openInDrawer({
-            title: "Content Title",
-            content: <TestDrawerContent book={Books[0]} hasActions={false} />,
-          })
-        }
-      />
+      <Button label="Show SuperDrawer" onClick={open} />
     </>
   );
 }
 
 export function OpenAtDetail() {
   const { openInDrawer, openDrawerDetail } = useSuperDrawer();
-
-  // Open the SuperDrawer to a details component
-  useEffect(() => {
-    // Not a recommended pattern in production code
-    openInDrawer({
-      // Testing detail content defaulting to previous element
-      title: "Child Content Title",
-      content: <TestDrawerContent book={Books[0]} />,
-    });
-    openDrawerDetail({
-      content: <TestDetailContent book={Books[0]} />,
-    });
-  }, [openInDrawer, openDrawerDetail]);
-
+  function open() {
+    openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
+    openDrawerDetail({ content: <TestDetailContent book={Books[0]} /> });
+  }
+  useEffect(open, [openInDrawer, openDrawerDetail]);
   return (
     <>
       <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Detail</h1>
-      <Button
-        label="Show SuperDrawer"
-        onClick={() =>
-          openInDrawer({
-            title: "Content Title",
-            content: <TestDrawerContent book={Books[0]} />,
-          })
-        }
-      />
+      <Button label="Show SuperDrawer" onClick={open} />
     </>
   );
 }
@@ -106,31 +67,34 @@ export function OpenAtDetail() {
 export function OpenWithModal() {
   const { openInDrawer } = useSuperDrawer();
   const { openModal } = useModal();
-
-  // Open the SuperDrawer to a details component
-  useEffect(() => {
-    openInDrawer({
-      title: "Child Content Title",
-      content: <TestDrawerContent book={Books[0]} />,
-    });
-    openModal({
-      title: "Modal Title",
-      content: <TestModalContent />,
-    });
-  }, [openInDrawer, openModal]);
-
+  function open() {
+    openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
+    openModal({ title: "Modal Title", content: <TestModalContent /> });
+  }
+  useEffect(open, [openInDrawer, openModal]);
   return (
     <>
       <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Modal</h1>
-      <Button
-        label="Show SuperDrawer"
-        onClick={() =>
-          openInDrawer({
-            title: "Content Title",
-            content: <TestDrawerContent book={Books[0]} />,
-          })
-        }
-      />
+      <Button label="Show SuperDrawer" onClick={open} />
+    </>
+  );
+}
+
+export function OpenWithTitleRightContent() {
+  const { openInDrawer } = useSuperDrawer();
+  function open() {
+    openInDrawer({
+      title: "Title",
+      content: <TestDrawerContent book={Books[0]} />,
+      titleLeftContent: "ASSIGNED",
+      titleRightContent: <Button label="Manage RFP" onClick={() => {}} />,
+    });
+  }
+  useEffect(open, [openInDrawer]);
+  return (
+    <>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Modal</h1>
+      <Button label="Show SuperDrawer" onClick={open} />
     </>
   );
 }
