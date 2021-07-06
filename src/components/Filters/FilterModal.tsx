@@ -1,7 +1,7 @@
 import { ReactNode, useCallback, useState } from "react";
 import { Button } from "src/components/Button";
 import { FilterDefs, getFilterComponents } from "src/components/Filters";
-import { ModalBody, ModalFooter, useModalContext } from "src/components/Modal";
+import { ModalBody, ModalFooter, useModal } from "src/components/Modal";
 import { Css } from "src/Css";
 import { omitKey, safeKeys } from "src/utils";
 
@@ -13,7 +13,7 @@ interface FilterModalProps<F> {
 
 export function FilterModal<F>(props: FilterModalProps<F>) {
   const { filter, filterDefs, onApply } = props;
-  const { onClose } = useModalContext();
+  const { closeModal } = useModal();
   // Local copy of the filter that we'll use to manage the modal's state separate from the rest of the Filter
   const [modalFilter, setModalFilter] = useState<F>(filter);
 
@@ -52,12 +52,12 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
           }
         />
         <div css={Css.df.childGap1.$}>
-          <Button label="Cancel" variant="tertiary" onClick={onClose} />
+          <Button label="Cancel" variant="tertiary" onClick={closeModal} />
           <Button
             label="Apply"
             onClick={() => {
               onApply(modalFilter);
-              onClose();
+              closeModal();
             }}
           />
         </div>

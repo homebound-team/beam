@@ -7,7 +7,6 @@ import {
   GridColumn,
   GridDataRow,
   GridTable,
-  ModalProvider,
   multiFilter,
   simpleHeader,
   SimpleHeaderAndDataOf,
@@ -15,12 +14,12 @@ import {
 } from "src/components/index";
 import { Css } from "src/Css";
 import { usePersistedFilter } from "src/hooks";
-import { withDimensions, withRouter, zeroTo } from "src/utils/sb";
+import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
   component: Filters,
   title: "Components/Filters",
-  decorators: [withDimensions(), withRouter()],
+  decorators: [withDimensions(), withRouter(), withBeamDecorator],
 } as Meta;
 
 export function Filter() {
@@ -76,15 +75,13 @@ export function Filter() {
   });
 
   return (
-    <ModalProvider>
-      <div css={Css.df.flexColumn.childGap5.$}>
-        <div css={Css.df.flexColumn.childGap2.$}>
-          <h1 css={Css.lg.$}>Filters</h1>
-          <Filters<ProjectFilter> filter={filter} onChange={setFilter} filterDefs={filterDefs} />
-        </div>
-        <GridTable columns={columns} rows={filterRows(tableData, filter)} />
+    <div css={Css.df.flexColumn.childGap5.$}>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Filters</h1>
+        <Filters<ProjectFilter> filter={filter} onChange={setFilter} filterDefs={filterDefs} />
       </div>
-    </ModalProvider>
+      <GridTable columns={columns} rows={filterRows(tableData, filter)} />
+    </div>
   );
 }
 

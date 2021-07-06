@@ -1,3 +1,4 @@
+export { BeamProvider } from "./BeamContext";
 export * from "./Button";
 export * from "./ButtonGroup";
 export * from "./Chip";
@@ -6,8 +7,8 @@ export * from "./Filters";
 export * from "./GridTable";
 export * from "./Icon";
 export * from "./IconButton";
-export * from "./Modal/Modal";
-export * from "./Modal/ModalContext";
+export * from "./Modal";
+export * from "./Modal/useModal";
 export { NavLink } from "./NavLink";
 export * from "./Pill";
 export * from "./Pills";

@@ -1,11 +1,11 @@
 import { Global } from "@emotion/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactNode, ReactPortal, useCallback } from "react";
+import { ReactPortal, useContext } from "react";
 import { createPortal } from "react-dom";
-import { Button, ButtonGroup, ButtonProps, Css, IconButton, px } from "src";
+import { ButtonGroup, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
+import { BeamContext } from "src/components/BeamContext";
+import { Css, px } from "src/Css";
 import { useTestIds } from "src/utils";
-import { SuperDrawerNewOpenInDrawerProps, useSuperDrawer } from "./index";
-import { contentStackSymbol } from "./symbols";
 
 /**
  * Global drawer component.
@@ -27,16 +27,25 @@ import { contentStackSymbol } from "./symbols";
  * components (most likely Modal) between the application and SuperDrawer or
  * above the SuperDrawer.
  */
-export function SuperDrawer(): ReactPortal {
-  const superDrawerContext = useSuperDrawer();
-  const contentStack = superDrawerContext[contentStackSymbol];
-  const { modalContent, closeDrawer } = superDrawerContext;
+export function SuperDrawer(): ReactPortal | null {
+  const { contentStack, modalState } = useContext(BeamContext);
+  const { closeDrawer } = useSuperDrawer();
   const testId = useTestIds({}, "superDrawer");
 
+  if (contentStack.current.length === 0) {
+    return null;
+  }
+
   // Get the latest element on the stack
-  const { title, content, type, ...other } = contentStack[contentStack.length - 1] ?? {};
-  // Narrowing the union in a sense
-  const { onPrevClick, onNextClick, onClose } = other as SuperDrawerNewOpenInDrawerProps;
+  const currentContent = contentStack.current[contentStack.current.length - 1].opts;
+  const { content } = currentContent;
+
+  // Also get the first / non-detail element on the stack
+  const firstContent = contentStack.current[0].opts as OpenInDrawerOpts;
+  const { onPrevClick, onNextClick, onClose } = firstContent;
+
+  const isDetail = contentStack.current.length > 1;
+  const title = currentContent.title || firstContent.title;
 
   function handleOnClose() {
     if (onClose) return onClose();
@@ -85,7 +94,7 @@ export function SuperDrawer(): ReactPortal {
                   {title}
                 </div>
                 {/* Right */}
-                {!modalContent && (
+                {!modalState.current && (
                   // Forcing height to 32px to match title height
                   <div css={Css.df.childGap3.itemsCenter.hPx(32).$}>
                     {/* Disable buttons is handlers are not given or if childContent is shown */}
@@ -94,13 +103,13 @@ export function SuperDrawer(): ReactPortal {
                         {
                           icon: "chevronLeft",
                           onClick: () => onPrevClick && onPrevClick(),
-                          disabled: !onPrevClick || type === "detail",
+                          disabled: !onPrevClick || isDetail,
                           ...testId.prev,
                         },
                         {
                           icon: "chevronRight",
                           onClick: () => onNextClick && onNextClick(),
-                          disabled: !onNextClick || type === "detail",
+                          disabled: !onNextClick || isDetail,
                           ...testId.next,
                         },
                       ]}
@@ -109,9 +118,9 @@ export function SuperDrawer(): ReactPortal {
                   </div>
                 )}
               </header>
-              {modalContent ? (
+              {modalState.current ? (
                 // Forcing some design constraints on the modal component
-                <div css={Css.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn.$}>{modalContent}</div>
+                <div css={Css.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn.$}>{modalState.current.content}</div>
               ) : (
                 content
               )}
@@ -123,87 +132,3 @@ export function SuperDrawer(): ReactPortal {
     document.body,
   );
 }
-
-interface SuperDrawerContentProps {
-  children: ReactNode;
-  /**
-   * Actions represents an array of button props with represents that different
-   * actions that can be conducted in the SuperDrawer page.
-   *
-   * Ex: A `cancel` and `submit` button
-   * */
-  actions?: ButtonProps[];
-}
-
-/**
- * Helper component to place the given children and actions into the appropriate
- * DOM format to render inside the SuperDrawer.
- *
- * NOTE: This does not include the header props since the caller will be the one
- * that knows how to handle the title, prev/next link and the onClose handler.
- */
-export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProps) => {
-  const superDrawerContext = useSuperDrawer();
-  const contentStack = superDrawerContext[contentStackSymbol];
-  const { closeInDrawer } = superDrawerContext;
-
-  // Determine if the current element is a new content element or an detail element
-  const { type } = contentStack[contentStack.length - 1] ?? {};
-
-  const ContentWrapper = useCallback(
-    ({ children }: { children: ReactNode }) => {
-      if (type === "new") {
-        return (
-          <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }}>
-            {children}
-          </motion.div>
-        );
-      } else if (type === "detail") {
-        return (
-          <motion.div
-            css={Css.px3.pt2.pb3.fg1.$}
-            animate={{ overflow: "auto" }}
-            transition={{ overflow: { delay: 0.3 } }}
-          >
-            <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={() => closeInDrawer()} />
-            <motion.div
-              initial={{ x: 1040, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{
-                ease: "linear",
-                duration: 0.3,
-                opacity: { delay: 0.15 },
-              }}
-              exit={{ x: 1040, opacity: 0 }}
-              css={Css.pt2.$}
-            >
-              {children}
-            </motion.div>
-          </motion.div>
-        );
-      }
-
-      // Hides content changes when closing the drawer
-      // TODO: Potentially use a boolean to trigger close action so content does
-      // not need to disappear during exit.
-      return <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }}></motion.div>;
-    },
-    [type, closeInDrawer],
-  );
-
-  return (
-    <>
-      <ContentWrapper>{children}</ContentWrapper>
-      {/* Optionally render footer section with row of given footer buttons */}
-      {actions && (
-        <footer css={Css.bt.bGray200.p3.df.itemsCenter.justifyEnd.$}>
-          <div css={Css.df.childGap1.$}>
-            {actions.map((buttonProps, i) => (
-              <Button key={i} {...buttonProps} />
-            ))}
-          </div>
-        </footer>
-      )}
-    </>
-  );
-};

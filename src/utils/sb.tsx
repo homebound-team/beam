@@ -1,8 +1,7 @@
 import { StoryFn } from "@storybook/addons";
 import { DecoratorFn } from "@storybook/react";
 import { ReactElement, ReactNode } from "react";
-import { SuperDrawerProvider } from "src";
-import { ModalProvider } from "src/components";
+import { BeamProvider } from "src/components";
 import { Css } from "src/Css";
 import { withRouter as rtlWithRouter } from "src/utils/rtl";
 
@@ -42,17 +41,10 @@ export function zeroTo(n: number): number[] {
 }
 
 /** Storybook decorator utility to wrap a story with a SuperDrawer context */
-export const withSuperDrawerDecorator = (Story: () => JSX.Element) => (
-  <SuperDrawerProvider>
+export const withBeamDecorator = (Story: () => JSX.Element) => (
+  <BeamProvider>
     <Story />
-  </SuperDrawerProvider>
-);
-
-/** Storybook decorator utility to wrap a story with a Modal context */
-export const withModalDecorator = (Story: () => JSX.Element) => (
-  <ModalProvider>
-    <Story />
-  </ModalProvider>
+  </BeamProvider>
 );
 
 /**

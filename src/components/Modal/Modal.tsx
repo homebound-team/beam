@@ -2,28 +2,32 @@ import useResizeObserver from "@react-hook/resize-observer";
 import { ReactNode, useRef, useState } from "react";
 import { FocusScope, OverlayContainer, useDialog, useModal, useOverlay, usePreventScroll } from "react-aria";
 import { IconButton } from "src/components/IconButton";
-import { useModalContext } from "src/components/Modal/ModalContext";
+import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
-import { Callback } from "src/types";
 import { useTestIds } from "src/utils";
 
 export interface ModalProps {
   title: string;
+  /** The modal size, defaults to `md`. */
   size?: "sm" | "md" | "lg";
+  /** The content of the modal; for consistent styling use a fragment with `<ModalBody />` and `<ModalFooter />`. */
   content: ReactNode;
-  onClose?: Callback;
 }
 
 /**
- * Wrapping component for displaying a Modal. Provides underlay, modal container, and header. Will disable scrolling of page under the modal.
- * For consistent styling and behaviors between Modals, use `<ModalBody />` and `<ModalFooter>` within `ModalProps.content`.
+ * Internal component for displaying a Modal; see `useModal` for the public API.
+ *
+ * Provides underlay, modal container, and header. Will disable scrolling of page under the modal.
  */
 export function Modal(props: ModalProps) {
   const { title, size = "md", content } = props;
   const width = size === "sm" ? 320 : size === "md" ? 480 : 640;
   const ref = useRef(null);
-  const { onClose } = useModalContext();
-  const { overlayProps, underlayProps } = useOverlay({ ...props, isOpen: true, onClose, isDismissable: true }, ref);
+  const { closeModal } = ourUseModal();
+  const { overlayProps, underlayProps } = useOverlay(
+    { ...props, isOpen: true, onClose: closeModal, isDismissable: true },
+    ref,
+  );
   const { modalProps } = useModal();
   const { dialogProps, titleProps } = useDialog({ role: "dialog" }, ref);
   const testId = useTestIds({}, testIdPrefix);
@@ -46,7 +50,7 @@ export function Modal(props: ModalProps) {
                 {title}
               </h1>
               <span css={Css.fs0.pl1.$}>
-                <IconButton icon="x" onClick={onClose} {...testId.titleClose} />
+                <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
               </span>
             </header>
             <>{content}</>

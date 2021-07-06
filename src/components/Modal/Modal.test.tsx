@@ -1,16 +1,12 @@
 import { fireEvent } from "@testing-library/react";
 import { useEffect } from "react";
-import { ModalBody, ModalFooter, ModalProps, useModalContext } from "src/components/Modal";
-import { noop } from "src/utils";
-import { click, render, withModalRTL } from "src/utils/rtl";
+import { ModalBody, ModalFooter, ModalProps, useModal } from "src/components/Modal";
+import { click, render, withBeamRTL } from "src/utils/rtl";
 
 describe("Modal", () => {
   it("renders", async () => {
     // When rendered
-    const r = await render(
-      <TestModalApp title="Title" onClose={noop} content={<TestModalComponent />} />,
-      withModalRTL,
-    );
+    const r = await render(<TestModalApp title="Title" content={<TestModalComponent />} />, withBeamRTL);
 
     // Then expect the content to match
     expect(r.modal_title().textContent).toBe("Title");
@@ -18,19 +14,19 @@ describe("Modal", () => {
     expect(r.modal_content()).toBeTruthy();
   });
 
-  it("invokes onClose", async () => {
+  it("invokes canClose", async () => {
     // Given mocked actions
-    const onClose = jest.fn();
+    const canClose = jest.fn().mockReturnValue(false);
     const r = await render(
-      <TestModalApp title="Title" onClose={onClose} content={<TestModalComponent />} />,
-      withModalRTL,
+      <TestModalApp canClose={canClose} title="Title" content={<TestModalComponent />} />,
+      withBeamRTL,
     );
 
     // When invoking the `onClose` in various interactions
     click(r.modal_titleClose);
-    expect(onClose).toBeCalledTimes(1);
+    expect(canClose).toBeCalledTimes(1);
     fireEvent.keyDown(r.modal(), { key: "Escape", code: "Escape" });
-    expect(onClose).toBeCalledTimes(2);
+    expect(canClose).toBeCalledTimes(2);
   });
 
   describe("ModalBody", () => {
@@ -52,12 +48,12 @@ describe("Modal", () => {
   });
 });
 
-function TestModalApp(modalProps: ModalProps) {
-  const { openModal } = useModalContext();
-  useEffect(() => {
-    openModal(modalProps);
-  }, []);
-
+function TestModalApp(props: ModalProps & { canClose?: () => boolean }) {
+  const { openModal, addCanClose } = useModal();
+  useEffect(() => openModal(props), []);
+  if (props.canClose) {
+    addCanClose(props.canClose);
+  }
   return <h1>Page title</h1>;
 }
 
