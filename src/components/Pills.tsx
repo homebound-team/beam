@@ -1,14 +1,17 @@
 import React from "react";
 import { Pill } from "src/components/Pill";
-import { Css } from "src/Css";
+import { Css, Margin, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
-export interface PillsProps {
+type PillsXss = Xss<Margin>;
+
+export interface PillsProps<X> {
   values: string[];
+  xss: X;
 }
 
 /** Renders a list of `Pill`s, with wrapping & appropriate margin between each `Pill`. */
-export function Pills(props: PillsProps) {
+export function Pills<X extends Only<PillsXss, X>>(props: PillsProps<X>) {
   const { values } = props;
   const tid = useTestIds(props, "pills");
   return (
