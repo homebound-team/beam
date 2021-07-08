@@ -14,6 +14,10 @@ export interface BeamContextState {
   /** The div for ModalFooter to portal into. */
   modalFooterDiv: HTMLDivElement;
   canCloseChecks: MutableRefObject<Array<() => boolean>>;
+  /** Checks when closing SuperDrawer */
+  canCloseDrawerChecks: MutableRefObject<Array<() => boolean>>;
+  /** Checks when closing SuperDrawer Details */
+  canCloseDrawerDetailsChecks: MutableRefObject<Array<Array<() => boolean>>>;
 }
 
 /** This is only exported internally, for useModal and useSuperDrawer, it's not a public API. */
@@ -23,6 +27,8 @@ export const BeamContext = createContext<BeamContextState>({
   modalBodyDiv: undefined!,
   modalFooterDiv: undefined!,
   canCloseChecks: new EmptyRef(),
+  canCloseDrawerChecks: new EmptyRef(),
+  canCloseDrawerDetailsChecks: new EmptyRef(),
 });
 
 export function BeamProvider({ children }: { children: ReactNode }) {
@@ -36,6 +42,8 @@ export function BeamProvider({ children }: { children: ReactNode }) {
   const modalFooterDiv = useMemo(() => document.createElement("div"), []);
   const contentStackRef = useRef<ContentStack[]>([]);
   const canCloseChecksRef = useRef<Array<() => boolean>>([]);
+  const canCloseDrawerChecksRef = useRef<Array<() => boolean>>([]);
+  const canCloseDrawerDetailsChecksRef = useRef<Array<Array<() => boolean>>>([]);
 
   // We essentially expose the refs, but with our own getters/setters so that we can
   // have the setters call `tick` to re-render this Provider
@@ -47,6 +55,8 @@ export function BeamProvider({ children }: { children: ReactNode }) {
       canCloseChecks: canCloseChecksRef,
       modalBodyDiv,
       modalFooterDiv,
+      canCloseDrawerChecks: canCloseDrawerChecksRef,
+      canCloseDrawerDetailsChecks: canCloseDrawerDetailsChecksRef,
     };
   }, [modalBodyDiv, modalFooterDiv]);
 

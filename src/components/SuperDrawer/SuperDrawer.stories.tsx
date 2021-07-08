@@ -49,6 +49,35 @@ export function OpenWithNoActions() {
   );
 }
 
+/** Example showing how to add a canClose check after the SuperDrawer is shown */
+export function OpenWithCanCloseDrawerChecks() {
+  const { openInDrawer, addCanCloseDrawer } = useSuperDrawer();
+
+  useEffect(() => {
+    debugger;
+    // Opening the SuperDrawer
+    open();
+    // Add a canClose check
+    addCanCloseDrawer(() => true);
+    addCanCloseDrawer(() => false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function open() {
+    openInDrawer({
+      title: "Drawer Title",
+      content: <TestDrawerContent book={Books[0]} hasActions={false} />,
+    });
+  }
+
+  return (
+    <>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open With CanClose Checks</h1>
+      <Button label="Show SuperDrawer" onClick={open} />
+    </>
+  );
+}
+
 export function OpenAtDetail() {
   const { openInDrawer, openDrawerDetail } = useSuperDrawer();
   function open() {
@@ -56,6 +85,36 @@ export function OpenAtDetail() {
     openDrawerDetail({ content: <TestDetailContent book={Books[0]} /> });
   }
   useEffect(open, [openInDrawer, openDrawerDetail]);
+  return (
+    <>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Detail</h1>
+      <Button label="Show SuperDrawer" onClick={open} />
+    </>
+  );
+}
+
+/**
+ * Example showing how to add a canClose check for SuperDrawer details. When
+ * attempting to close the details page, this actions should trigger a fail
+ * canClose check and when trying to close the SuperDrawer this will also
+ * trigger a failing check.
+ * */
+export function OpenAtDetailsWithCanCloseDrawerDetailsChecks() {
+  const { openInDrawer, openDrawerDetail, addCanCloseDrawer, addCanCloseDrawerDetails } = useSuperDrawer();
+
+  useEffect(() => {
+    // Opening the SuperDrawer
+    open();
+    // Add failing checks for both drawer and drawer details
+    addCanCloseDrawer(() => false);
+    addCanCloseDrawerDetails(() => false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function open() {
+    openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
+    openDrawerDetail({ content: <TestDetailContent book={Books[0]} /> });
+  }
   return (
     <>
       <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Detail</h1>
@@ -201,7 +260,7 @@ function TestDrawerContent({ book, hasActions = true }: TestDrawerContentProps) 
       actions={
         hasActions
           ? [
-              { label: "Close", onClick: closeDrawer, variant: "tertiary" },
+              { label: "Close", onClick: () => closeDrawer(), variant: "tertiary" },
               { label: `Purchase "${book.bookTitle}"`, onClick: handlePurchase },
             ]
           : undefined
