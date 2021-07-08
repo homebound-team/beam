@@ -9,11 +9,11 @@ import { EmptyRef } from "src/utils/index";
 export interface BeamContextState {
   contentStack: MutableRefObject<ContentStack[]>;
   modalState: MutableRefObject<ModalProps | undefined>;
+  canCloseModalChecks: MutableRefObject<Array<() => boolean>>;
   /** The div for ModalBody to portal into; note this can't be a ref b/c Modal hasn't set the ref at the time ModalBody renders. */
   modalBodyDiv: HTMLDivElement;
   /** The div for ModalFooter to portal into. */
   modalFooterDiv: HTMLDivElement;
-  canCloseChecks: MutableRefObject<Array<() => boolean>>;
   /** Checks when closing SuperDrawer */
   canCloseDrawerChecks: MutableRefObject<Array<() => boolean>>;
   /** Checks when closing SuperDrawer Details */
@@ -24,9 +24,9 @@ export interface BeamContextState {
 export const BeamContext = createContext<BeamContextState>({
   contentStack: new EmptyRef(),
   modalState: new EmptyRef(),
+  canCloseModalChecks: new EmptyRef(),
   modalBodyDiv: undefined!,
   modalFooterDiv: undefined!,
-  canCloseChecks: new EmptyRef(),
   canCloseDrawerChecks: new EmptyRef(),
   canCloseDrawerDetailsChecks: new EmptyRef(),
 });
@@ -52,9 +52,9 @@ export function BeamProvider({ children }: { children: ReactNode }) {
       modalState: new PretendRefThatTicks(modalRef, tick),
       contentStack: new PretendRefThatTicks(contentStackRef, tick),
       // We don't need to rerender when this is mutated, so just expose as-is
-      canCloseChecks: canCloseChecksRef,
       modalBodyDiv,
       modalFooterDiv,
+      canCloseModalChecks: canCloseChecksRef,
       canCloseDrawerChecks: canCloseDrawerChecksRef,
       canCloseDrawerDetailsChecks: canCloseDrawerDetailsChecksRef,
     };
