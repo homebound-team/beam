@@ -11,9 +11,9 @@ export interface PillsProps<X> {
 
 /** Renders a list of `Pill`s, with wrapping & appropriate margin between each `Pill`. */
 export function Pills<X extends Only<PillsXss, X>>(props: PillsProps<X>) {
-  const { values } = props;
+  const { values, xss = {} } = props;
   return (
-    <div css={Css.df.add({ flexWrap: "wrap" }).my1.$}>
+    <div css={{ ...Css.df.add({ flexWrap: "wrap" }).my1.$, ...xss }}>
       {values.map((value, i) => (
         <Pill key={i} text={value} xss={Css.mr1.mb1.$} />
       ))}
