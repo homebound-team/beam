@@ -189,6 +189,7 @@ function ComboBox<O, V extends Key>(props: ComboBoxProps<O, V>) {
     multiselect,
     getOptionLabel,
     getOptionValue,
+    sizeToContent = false,
     ...otherProps
   } = props;
 
@@ -289,6 +290,7 @@ function ComboBox<O, V extends Key>(props: ComboBoxProps<O, V>) {
         labelProps={labelProps}
         selectedOptions={selectedOptions}
         getOptionValue={getOptionValue}
+        sizeToContent={sizeToContent}
       />
       {state.isOpen && (
         <Popover
@@ -325,4 +327,5 @@ export interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
   readOnly?: boolean;
   onBlur?: () => void;
   onFocus?: () => void;
+  sizeToContent?: boolean;
 }
