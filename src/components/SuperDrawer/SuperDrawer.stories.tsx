@@ -75,6 +75,7 @@ export function OpenWithCanCloseDrawerChecks() {
 
 export function OpenAtDetail() {
   const { openInDrawer, openDrawerDetail } = useSuperDrawer();
+
   function open() {
     openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
     openDrawerDetail({ content: <TestDetailContent book={Books[0]} /> });
