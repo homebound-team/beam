@@ -28,6 +28,7 @@ export const Icon = () => {
     "eyeball",
     "thumbsUp",
     "verticalDots",
+    "star",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
