@@ -127,7 +127,7 @@ export function RichTextField(props: RichTextFieldProps) {
     <div css={Css.w100.maxw("550px").$}>
       {/* TODO: Not sure what to pass to labelProps. */}
       {label && <Label labelProps={{}} label={label} />}
-      <div css={{...Css.br4.bgWhite.$, ...trixCssOverrides}}>
+      <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }}>
         {createElement("trix-editor", {
           id: `editor-${id}`,
           input: `input-${id}`,

@@ -1,10 +1,11 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { Key, useState } from "react";
-import { Icon, Icons } from "src/components";
+import { GridColumn, GridTable, Icon, Icons, simpleHeader, SimpleHeaderAndDataOf } from "src/components";
 import { Css } from "src/Css";
 import { SelectField, SelectFieldProps } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
+import { noop } from "src/utils";
 import { zeroTo } from "src/utils/sb";
 
 export default {
@@ -157,6 +158,44 @@ export function SelectFields() {
     </div>
   );
 }
+
+export function InTable() {
+  return (
+    <GridTable columns={columns} rows={[simpleHeader, ...rowData.map((r) => ({ kind: "data" as const, ...r }))]} />
+  );
+}
+const people: InternalUser[] = zeroTo(10).map((i) => ({
+  id: `iu:${i + 1}`,
+  name: `Test user ${i + 1}`.repeat((i % 2) + 1),
+}));
+const rowData: Request[] = zeroTo(10).map((i) => ({
+  id: `r:${i + 1}`,
+  user: people[i],
+  address: "1234 Address Lane",
+  market: "SO Cal",
+  homeowner: "John Doe",
+}));
+const columns: GridColumn<Row>[] = [
+  { header: "ID", data: (data) => data.id },
+  { header: "Homeowner", data: (data) => data.homeowner },
+  { header: "Address", data: (data) => data.address },
+  {
+    header: "Contact",
+    data: (data) => (
+      <SelectField
+        getOptionValue={(iu) => iu.id}
+        getOptionLabel={(iu) => iu.name}
+        value={data.user.id}
+        onSelect={noop}
+        options={people}
+      />
+    ),
+  },
+  { header: "Market", data: (data) => data.market },
+];
+type Row = SimpleHeaderAndDataOf<Request>;
+type InternalUser = { name: string; id: string };
+type Request = { id: string; user: InternalUser; address: string; homeowner: string; market: string };
 
 // Kind of annoying but to get type inference for HasIdAndName working, we
 // have to re-copy/paste the overload here.

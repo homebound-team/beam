@@ -29,6 +29,7 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
           compact
           value={String(filter[key])}
           inlineLabel
+          sizeToContent={!inModal}
           onSelect={(value) => {
             const parsedValue = value === "undefined" ? undefined : value === "true" ? true : false;
             updateFilter(filter, key, parsedValue);
@@ -46,6 +47,7 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
           compact
           value={filter[key]}
           inlineLabel
+          sizeToContent={!inModal}
           onSelect={(value) => updateFilter(filter, key, value)}
         />,
         inModal,
@@ -78,6 +80,7 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
           compact
           values={filter[key] || []}
           inlineLabel
+          sizeToContent={!inModal}
           onSelect={(values) => updateFilter(filter, key, values)}
         />,
         inModal,

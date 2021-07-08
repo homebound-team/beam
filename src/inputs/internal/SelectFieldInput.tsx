@@ -38,6 +38,7 @@ interface SelectFieldInputProps<O, V extends Key> {
   label?: string;
   selectedOptions: O[];
   getOptionValue: (opt: O) => V;
+  sizeToContent: boolean;
 }
 
 export function SelectFieldInput<O, V extends Key>(props: SelectFieldInputProps<O, V>) {
@@ -62,6 +63,7 @@ export function SelectFieldInput<O, V extends Key>(props: SelectFieldInputProps<
     labelProps,
     selectedOptions,
     getOptionValue,
+    sizeToContent,
   } = props;
   const errorMessageId = `${inputProps.id}-error`;
   const { hoverProps, isHovered } = useHover({});
@@ -72,7 +74,7 @@ export function SelectFieldInput<O, V extends Key>(props: SelectFieldInputProps<
   const readOnlyStyles = isReadOnly ? Css.bn.pl0.pt0.add("backgroundColor", "unset").$ : {};
   const tid = useTestIds(inputProps); // data-testid comes in through here
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
-  const [isSizeBasedOnContent, setIsSizeBasedOnContent] = useState(true);
+  const [isSizeCurrentlyBasedOnContent, setIsSizeBasedOnContent] = useState(true);
 
   return (
     <Fragment>
@@ -166,7 +168,13 @@ export function SelectFieldInput<O, V extends Key>(props: SelectFieldInputProps<
             e.target.select();
             state.open();
           }}
-          size={isSizeBasedOnContent ? inputRef?.current?.value.length || 1 : 20}
+          size={
+            sizeToContent
+              ? isSizeCurrentlyBasedOnContent
+                ? String(inputProps.value || "").length || 1
+                : Math.max(String(inputProps.value || "").length, 20)
+              : undefined
+          }
         />
         {!isReadOnly && (
           <button
