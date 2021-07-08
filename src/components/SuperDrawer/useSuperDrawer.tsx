@@ -73,7 +73,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
           const contentStackLength = contentStack.current.length;
           // Attempt to close each drawer details
           for (let i = contentStackLength - 2; i >= 0; i--) {
-            for (const canCloseDrawerDetail of canCloseDrawerDetailsChecks.current[i]) {
+            for (const canCloseDrawerDetail of canCloseDrawerDetailsChecks.current[i] ?? []) {
               if (!canCloseDrawerDetail()) {
                 openModal({
                   title: "Error",
@@ -96,9 +96,10 @@ export function useSuperDrawer(): UseSuperDrawerHook {
           }
         }
 
-        // Reset the contentStack and canCloseDrawerChecks
+        // Reset the contentStack and canCloseDrawerChecks (with details)
         contentStack.current = [];
         canCloseDrawerChecks.current = [];
+        canCloseDrawerDetailsChecks.current = [];
         // Reset Modal state
         modalState.current = undefined;
         return true;
@@ -107,7 +108,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         if (!(contentStack.current.length > 1)) return;
 
         // Attempt to close the current drawer details
-        for (const canCloseDrawerDetail of canCloseDrawerDetailsChecks.current[contentStack.current.length - 2]) {
+        for (const canCloseDrawerDetail of (canCloseDrawerDetailsChecks.current[contentStack.current.length - 2] ?? [])) {
           if (!canCloseDrawerDetail()) {
             openModal({
               title: "Error",

@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
-import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf } from "src";
+import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf, Tag } from "src";
 import { GridDataRow, GridRowLookup } from "src/components/GridTable";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
@@ -54,12 +54,8 @@ export function OpenWithCanCloseDrawerChecks() {
   const { openInDrawer, addCanCloseDrawer } = useSuperDrawer();
 
   useEffect(() => {
-    debugger;
     // Opening the SuperDrawer
     open();
-    // Add a canClose check
-    addCanCloseDrawer(() => true);
-    addCanCloseDrawer(() => false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -68,6 +64,9 @@ export function OpenWithCanCloseDrawerChecks() {
       title: "Drawer Title",
       content: <TestDrawerContent book={Books[0]} hasActions={false} />,
     });
+    // Add a canClose check
+    addCanCloseDrawer(() => true);
+    addCanCloseDrawer(() => false);
   }
 
   return (
@@ -105,15 +104,15 @@ export function OpenAtDetailsWithCanCloseDrawerDetailsChecks() {
   useEffect(() => {
     // Opening the SuperDrawer
     open();
-    // Add failing checks for both drawer and drawer details
-    addCanCloseDrawer(() => false);
-    addCanCloseDrawerDetails(() => false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function open() {
     openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
     openDrawerDetail({ content: <TestDetailContent book={Books[0]} /> });
+    // Add failing checks for both drawer and drawer details
+    addCanCloseDrawer(() => false);
+    addCanCloseDrawerDetails(() => false);
   }
   return (
     <>
@@ -145,7 +144,7 @@ export function OpenWithTitleRightContent() {
     openInDrawer({
       title: "Title",
       content: <TestDrawerContent book={Books[0]} />,
-      titleLeftContent: "ASSIGNED",
+      titleLeftContent: <Tag text={"ASSIGNED"} type={"success"}  />,
       titleRightContent: <Button label="Manage RFP" onClick={() => {}} />,
     });
   }
