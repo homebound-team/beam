@@ -53,12 +53,6 @@ export function OpenWithNoActions() {
 export function OpenWithCanCloseDrawerChecks() {
   const { openInDrawer, addCanCloseDrawer } = useSuperDrawer();
 
-  useEffect(() => {
-    // Opening the SuperDrawer
-    open();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   function open() {
     openInDrawer({
       title: "Drawer Title",
@@ -68,6 +62,8 @@ export function OpenWithCanCloseDrawerChecks() {
     addCanCloseDrawer(() => true);
     addCanCloseDrawer(() => false);
   }
+
+  useEffect(open, [openInDrawer, addCanCloseDrawer]);
 
   return (
     <>
@@ -101,12 +97,6 @@ export function OpenAtDetail() {
 export function OpenAtDetailsWithCanCloseDrawerDetailsChecks() {
   const { openInDrawer, openDrawerDetail, addCanCloseDrawer, addCanCloseDrawerDetails } = useSuperDrawer();
 
-  useEffect(() => {
-    // Opening the SuperDrawer
-    open();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   function open() {
     openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
     openDrawerDetail({ content: <TestDetailContent book={Books[0]} /> });
@@ -114,6 +104,9 @@ export function OpenAtDetailsWithCanCloseDrawerDetailsChecks() {
     addCanCloseDrawer(() => false);
     addCanCloseDrawerDetails(() => false);
   }
+
+  useEffect(open, [openInDrawer, openDrawerDetail, addCanCloseDrawer, addCanCloseDrawerDetails]);
+
   return (
     <>
       <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Detail</h1>
@@ -144,7 +137,7 @@ export function OpenWithTitleRightContent() {
     openInDrawer({
       title: "Title",
       content: <TestDrawerContent book={Books[0]} />,
-      titleLeftContent: <Tag text={"ASSIGNED"} type={"success"}  />,
+      titleLeftContent: <Tag text={"ASSIGNED"} type={"success"} />,
       titleRightContent: <Button label="Manage RFP" onClick={() => {}} />,
     });
   }
@@ -249,7 +242,7 @@ function TestDrawerContent({ book, hasActions = true }: TestDrawerContentProps) 
 
   function handlePurchase() {
     openModal({
-      title: "asdf",
+      title: "Confirm",
       content: <TestSimpleModalContent book={book} onPrimaryClick={closeDrawer} />,
     });
   }

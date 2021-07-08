@@ -108,7 +108,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         if (!(contentStack.current.length > 1)) return;
 
         // Attempt to close the current drawer details
-        for (const canCloseDrawerDetail of (canCloseDrawerDetailsChecks.current[contentStack.current.length - 2] ?? [])) {
+        for (const canCloseDrawerDetail of canCloseDrawerDetailsChecks.current[contentStack.current.length - 2] ?? []) {
           if (!canCloseDrawerDetail()) {
             openModal({
               title: "Error",
@@ -134,6 +134,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
   // useMemo the actions separately from the dynamic isDrawerOpen value
   const actions = useMemo(() => {
     return {
+      // TODO: Maybe we should rename to openDrawer as a breaking change (to match openDrawerDetail)
       openInDrawer(opts: OpenInDrawerOpts) {
         // When opening a new SuperDrawer, check if we can close the previous
         // SuperDrawer content. Bail if it fails
