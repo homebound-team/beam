@@ -4,7 +4,7 @@ import { CollectionChildren, Node } from "@react-types/shared";
 import React, { HTMLAttributes, useRef } from "react";
 import { DismissButton, useMenuItem, useMenuTrigger, useOverlayPosition } from "react-aria";
 import { useHistory } from "react-router";
-import { TreeState, useCollection, useMenuTriggerState, useTreeState } from "react-stately";
+import { TreeState, useMenuTriggerState, useTreeState } from "react-stately";
 import { Button, ButtonProps } from "src/components/Button";
 import { Icon } from "src/components/Icon";
 import { IconButton, IconButtonProps } from "src/components/IconButton";
@@ -31,7 +31,6 @@ interface ButtonMenuProps {
 }
 
 export function ButtonMenu({ triggerProps, menuProps }: ButtonMenuProps) {
-  const collection = useCollection();
   const state = useMenuTriggerState({});
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef(null);

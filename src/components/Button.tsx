@@ -25,7 +25,7 @@ export function Button({
 }: ButtonProps) {
   const ariaProps = { onPress, isDisabled, ...otherProps, ...menuTriggerProps };
   const { label, icon, variant = "primary", size = "sm", buttonRef } = ariaProps;
-  const ref = useRef(null);
+  const ref = buttonRef || useRef(null);
   const { buttonProps, isPressed } = useButton(ariaProps, ref as RefObject<HTMLButtonElement>);
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
@@ -37,7 +37,7 @@ export function Button({
 
   return (
     <button
-      ref={buttonRef ?? ref}
+      ref={ref}
       {...buttonProps}
       {...focusProps}
       {...hoverProps}

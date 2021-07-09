@@ -20,7 +20,7 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
 export function IconButton(props: IconButtonProps) {
   const { onClick: onPress, disabled: isDisabled, color, icon, autoFocus, inc, buttonRef, menuTriggerProps } = props;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
-  const ref = useRef(null);
+  const ref = buttonRef || useRef(null);
   const { buttonProps } = useButton(ariaProps, ref);
   const { focusProps, isFocusVisible } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
@@ -37,7 +37,7 @@ export function IconButton(props: IconButtonProps) {
   );
 
   return (
-    <button {...testIds} {...buttonProps} {...focusProps} {...hoverProps} ref={buttonRef ?? ref} css={styles}>
+    <button {...testIds} {...buttonProps} {...focusProps} {...hoverProps} ref={ref} css={styles}>
       <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : Palette.Gray900)} inc={inc} />
     </button>
   );
