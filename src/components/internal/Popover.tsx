@@ -12,7 +12,15 @@ interface PopoverProps extends React.PropsWithChildren<any> {
 /** Popover is used for generating menus and list-boxes */
 export function Popover(props: PopoverProps) {
   const { popoverRef, positionProps, width, children, onClose, isOpen } = props;
-  const { overlayProps } = useOverlay({ onClose, shouldCloseOnBlur: true, isOpen, isDismissable: true }, popoverRef);
+  const { overlayProps } = useOverlay(
+    {
+      onClose,
+      shouldCloseOnBlur: false,
+      isOpen,
+      isDismissable: true,
+    },
+    popoverRef,
+  );
 
   if (width) {
     positionProps.style = {

@@ -3,11 +3,11 @@ import { Css } from "src/Css";
 import { Tag } from "./Tag";
 
 export default {
-  title: "Components/Tag",
+  title: "Components/Tags",
   component: Tag,
 } as Meta;
 
-export function TabBaseStates() {
+export function Tags() {
   return (
     <div css={Css.df.flexColumn.itemsStart.childGap1.$}>
       <Tag text="Neutral" />

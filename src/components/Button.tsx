@@ -1,4 +1,5 @@
-import { ReactNode, useMemo, useRef } from "react";
+import { AriaButtonProps } from "@react-types/button";
+import { ReactNode, RefObject, useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src";
 import { Css } from "src/Css";
@@ -10,13 +11,22 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   size?: ButtonSize;
   icon?: IconProps["icon"];
   endAdornment?: ReactNode;
+  /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
+  menuTriggerProps?: AriaButtonProps;
+  buttonRef?: RefObject<HTMLButtonElement>;
 }
 
-export function Button({ onClick: onPress, disabled: isDisabled, endAdornment, ...otherProps }: ButtonProps) {
-  const ariaProps = { onPress, isDisabled, ...otherProps };
-  const { label, icon, variant = "primary", size = "sm" } = ariaProps;
-  const ref = useRef(null);
-  const { buttonProps, isPressed } = useButton(ariaProps, ref);
+export function Button({
+  onClick: onPress,
+  disabled: isDisabled,
+  endAdornment,
+  menuTriggerProps,
+  ...otherProps
+}: ButtonProps) {
+  const ariaProps = { onPress, isDisabled, ...otherProps, ...menuTriggerProps };
+  const { label, icon, variant = "primary", size = "sm", buttonRef } = ariaProps;
+  const ref = buttonRef || useRef(null);
+  const { buttonProps, isPressed } = useButton(ariaProps, ref as RefObject<HTMLButtonElement>);
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
   const { baseStyles, hoverStyles, disabledStyles, pressedStyles } = useMemo(() => getButtonStyles(variant, size), [

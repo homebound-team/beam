@@ -1,4 +1,5 @@
-import { useMemo, useRef } from "react";
+import { AriaButtonProps } from "@react-types/button";
+import { RefObject, useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components";
 import { Css, Palette } from "src/Css";
@@ -11,12 +12,15 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   color?: Palette;
   /** The size of the icon, in increments, defaults to 3 which is 24px. */
   inc?: number;
+  /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
+  menuTriggerProps?: AriaButtonProps;
+  buttonRef?: RefObject<HTMLButtonElement>;
 }
 
 export function IconButton(props: IconButtonProps) {
-  const { onClick: onPress, disabled: isDisabled, color, icon, autoFocus, inc } = props;
-  const ariaProps = { onPress, isDisabled, autoFocus };
-  const ref = useRef(null);
+  const { onClick: onPress, disabled: isDisabled, color, icon, autoFocus, inc, buttonRef, menuTriggerProps } = props;
+  const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
+  const ref = buttonRef || useRef(null);
   const { buttonProps } = useButton(ariaProps, ref);
   const { focusProps, isFocusVisible } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
