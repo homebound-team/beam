@@ -2,10 +2,12 @@ import { Meta } from "@storybook/react";
 import { ButtonMenu } from "src/components/ButtonMenu";
 import { Menu } from "src/components/internal/Menu";
 import { noop } from "src/utils";
+import { withDimensions } from "src/utils/sb";
 
 export default {
   component: Menu,
   title: "Components/Menu",
+  decorators: [withDimensions()],
 } as Meta;
 
 export function BasicMenuItems() {
