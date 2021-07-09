@@ -18,7 +18,7 @@
     "node": ">=14.8.0"
   },
   "scripts": {
-    "start": "yarn storybook",
+    "start": "yarn storybook -s ./testAssets",
     "build": "yarn copy && ttsc",
     "build:truss": "cd ./truss && npm run generate",
     "watch:truss": "cd ./truss && watch 'npm run generate' ./",

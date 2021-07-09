@@ -1,6 +1,7 @@
 export { BeamProvider } from "./BeamContext";
 export * from "./Button";
 export * from "./ButtonGroup";
+export * from "./ButtonMenu";
 export * from "./Chip";
 export * from "./Chips";
 export * from "./CssReset";
