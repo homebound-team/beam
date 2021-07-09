@@ -41,13 +41,7 @@ export function MenuItemImpl(props: MenuItemProps) {
         }
         onClick && onClick();
       },
-      onClose: () => {
-        // TODO: Should we close when clicking a persistent action?
-        // if (item.parentKey === "persistent") {
-        //   return;
-        // }
-        onClose();
-      },
+      onClose,
     },
     state,
     ref,

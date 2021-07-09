@@ -16,14 +16,14 @@ interface IconButtonTriggerProps extends Pick<IconButtonProps, "icon" | "color">
 interface ButtonMenuProps {
   trigger: TextButtonTriggerProps | IconButtonTriggerProps;
   items: MenuItem[];
+  persistentItems?: MenuItem[];
   // Defaults to "bottom start"
   placement?: "bottom left" | "bottom right" | "top left" | "top right";
-  persistentActions?: MenuItem[];
   // for storybook purposes
   defaultOpen?: boolean;
 }
 
-export function ButtonMenu({ trigger, items, placement, persistentActions, defaultOpen }: ButtonMenuProps) {
+export function ButtonMenu({ trigger, items, placement, persistentItems, defaultOpen }: ButtonMenuProps) {
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef(null);
@@ -40,7 +40,7 @@ export function ButtonMenu({ trigger, items, placement, persistentActions, defau
   // Build out the Menu's Tree data to include the Persistent Action, if any. This is a collection of Nodes that is used
   // by React-Aria to keep track of item states such as focus, and provide hooks for calling those actions.
   const tree = useTreeData({
-    initialItems: [items, persistentActions ? persistentActions : []].flatMap((i, idx) =>
+    initialItems: [items, persistentItems ? persistentItems : []].flatMap((i, idx) =>
       i.length > 0 ? ([{ label: idx === 0 ? "items" : "persistent", items: i }] as MenuSection[]) : ([] as MenuItem[]),
     ),
     getKey: (item) => item.label.replace(/\"/g, ""),
@@ -101,4 +101,5 @@ export type ImageMenuItemType = MenuItemBase & {
 };
 
 export type MenuItem = MenuItemBase | IconMenuItemType | ImageMenuItemType;
+// This is done just to adapt to the React-Aria API for generating Sectioned lists of Menu Items.
 export type MenuSection = MenuItem & { items?: MenuItem[] };

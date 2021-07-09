@@ -10,7 +10,7 @@ export default {
   decorators: [withRouter()],
 } as Meta;
 
-export function ButtonMenus() {
+export function MenuOpen() {
   const menuItems: MenuItem[] = [
     { label: "Page action", onClick: action("Test item clicked") },
     { label: "Internal Link", onClick: "/fakeRoute" },
@@ -23,7 +23,7 @@ export function ButtonMenus() {
       <ButtonMenu
         trigger={{ label: "Menu trigger" }}
         items={menuItems}
-        persistentActions={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+        persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
         defaultOpen
       />
 
@@ -33,7 +33,7 @@ export function ButtonMenus() {
           <ButtonMenu
             trigger={{ label: "Menu trigger" }}
             items={menuItems}
-            persistentActions={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+            persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
             defaultOpen
             placement="bottom right"
           />
@@ -46,7 +46,7 @@ export function ButtonMenus() {
           <ButtonMenu
             trigger={{ label: "Menu trigger" }}
             items={menuItems}
-            persistentActions={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+            persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
             defaultOpen
             placement="top left"
           />
@@ -59,7 +59,7 @@ export function ButtonMenus() {
           <ButtonMenu
             trigger={{ label: "Menu trigger" }}
             items={menuItems}
-            persistentActions={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+            persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
             defaultOpen
             placement="top right"
           />
@@ -80,7 +80,7 @@ export function InteractiveMenu() {
     <ButtonMenu
       trigger={{ label: "Menu trigger" }}
       items={menuItems}
-      persistentActions={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+      persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
     />
   );
 }

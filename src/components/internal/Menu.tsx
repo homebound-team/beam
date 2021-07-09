@@ -31,6 +31,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
         {...menuProps}
         ref={menuRef}
       >
+        {/* It is possible to have, at most, 2 sections: One for items, and one for persisted items */}
         {[...state.collection].map((item) => (
           <MenuSectionImpl key={item.key} section={item} state={state} onClose={props.onClose} />
         ))}
