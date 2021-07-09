@@ -162,11 +162,13 @@ function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
 }
 
 const trixCssOverrides = {
-  ...Css.relative.add({ wordBreak: "break-word" }).$,
+  ...Css.relative.add({ wordBreak: "break-word" }).br4.bGray300.ba.$,
   // Put the toolbar on the bottom
   ...Css.df.flexColumnReverse.childGap1.$,
   // Some basic copy/paste from TextFieldBase
-  "& trix-editor": Css.bgWhite.sm.gray900.br4.bGray300.bn.p2.$,
+  "& trix-editor": Css.bgWhite.sm.gray900.bn.p1.$,
+  // Highlight on focus
+  "&:focus-within": Css.bLightBlue700.$,
   "& trix-toolbar": Css.m1.$,
   // Make the buttons closer to ours
   "& .trix-button:not(:first-child)": Css.bn.$,
