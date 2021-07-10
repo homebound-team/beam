@@ -1,4 +1,5 @@
 import { Item, Section } from "@react-stately/collections";
+import { Placement } from "@react-types/overlays";
 import React, { useRef } from "react";
 import { DismissButton, useMenuTrigger, useOverlayPosition } from "react-aria";
 import { useMenuTriggerState, useTreeData } from "react-stately";
@@ -17,8 +18,8 @@ interface ButtonMenuProps {
   trigger: TextButtonTriggerProps | IconButtonTriggerProps;
   items: MenuItem[];
   persistentItems?: MenuItem[];
-  // Defaults to "bottom start"
-  placement?: "bottom left" | "bottom right" | "top left" | "top right";
+  // Defaults to "left"
+  placement?: "left" | "right";
   // for storybook purposes
   defaultOpen?: boolean;
 }
@@ -34,7 +35,7 @@ export function ButtonMenu({ trigger, items, placement, persistentItems, default
     shouldFlip: true,
     isOpen: state.isOpen,
     onClose: state.close,
-    placement: placement || "bottom left",
+    placement: (placement ? `bottom ${placement}` : "bottom left") as Placement,
   });
 
   // Build out the Menu's Tree data to include the Persistent Action, if any. This is a collection of Nodes that is used
