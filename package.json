@@ -18,15 +18,15 @@
     "node": ">=14.8.0"
   },
   "scripts": {
-    "start": "yarn storybook -s ./testAssets",
+    "start": "yarn storybook",
     "build": "yarn copy && ttsc",
     "build:truss": "cd ./truss && npm run generate",
     "watch:truss": "cd ./truss && watch 'npm run generate' ./",
-    "build:storybook": "build-storybook",
+    "build:storybook": "build-storybook -s ./testAssets",
     "test": "jest --maxWorkers 4",
     "test:watch": "jest --watch",
     "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
-    "storybook": "start-storybook -p 9000",
+    "storybook": "start-storybook -p 9000 -s ./testAssets",
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded",
     "copy": "npx copyfiles -u 1 \"./src/**/*.css\" \"./dist/\"",
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\""
