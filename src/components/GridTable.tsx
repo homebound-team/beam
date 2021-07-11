@@ -639,7 +639,7 @@ export type GridColumn<R extends Kinded, S = {}> = {
   w?: number | string;
   /** The column's default alignment for each cell. */
   align?: GridCellAlignment;
-  /** Whether the column can be sorted (if client-side sorting). */
+  /** Whether the column can be sorted (if client-side sorting). Defaults to true if sorting client-side. */
   clientSideSort?: boolean;
   /** This column's sort by value (if server-side sorting). */
   serverSideSortKey?: S;
@@ -930,7 +930,10 @@ const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (
  * so that we can have sort changes only re-render the header row, and not trigger a re-render
  * of every row in the table.
  */
-type GridSortContextProps = { sorted: "ASC" | "DESC" | undefined; toggleSort(): void };
+type GridSortContextProps = {
+  sorted: "ASC" | "DESC" | undefined;
+  toggleSort(): void;
+};
 
 export const GridSortContext = React.createContext<GridSortContextProps>({
   sorted: undefined,
@@ -1126,6 +1129,17 @@ function useSortState<R extends Kinded, S>(
   return [sortState, setSortKey];
 }
 
+/**
+ * Wraps column header names with up/down sorting icons.
+ *
+ * GridTable will use this automatically if the header content is just a text string.
+ *
+ * Alternatively, callers can also:
+ *
+ * - Instantiate this SortHeader directly with some customizations in `xss`, or
+ * - Write their own component that uses `GridSortContext` to access the column's
+ *   current sort state + `toggleSort` function
+ */
 export function SortHeader(props: { content: string; xss?: Properties }) {
   const { content, xss } = props;
   const { sorted, toggleSort } = useContext(GridSortContext);
