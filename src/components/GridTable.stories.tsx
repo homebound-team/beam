@@ -41,14 +41,14 @@ type Row = SimpleHeaderAndDataOf<Data>;
 //   k4 (division-total)
 // f1 (total-total)
 
-export function Sorting() {
+export function ClientSideSorting() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, sort: false };
+  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, clientSideSort: false };
   return (
     <GridTable
       columns={[nameColumn, valueColumn, actionColumn]}
-      sorting={"client-side"}
+      sorting={{ on: "client", initial: [valueColumn, "ASC"] }}
       rows={[
         { kind: "header", id: "header" },
         { kind: "data", id: "1", name: "c", value: 1 },
@@ -115,7 +115,7 @@ export function VirtualFiltering() {
         <GridTable
           as="virtual"
           columns={columns}
-          sorting={"client-side"}
+          sorting={{ on: "client" }}
           filter={filter}
           stickyHeader={true}
           rows={rows}
@@ -166,7 +166,7 @@ const rows: GridDataRow<NestedRow>[] = [
   { kind: "parent", id: "p3", name: "parent 3" },
 ];
 
-export function Collapsing() {
+export function NestedRows() {
   const arrowColumn: GridColumn<NestedRow> = {
     header: () => <Collapse />,
     parent: () => <Collapse />,
@@ -229,7 +229,6 @@ export function StickyHeader() {
       </div>
     ),
     data: () => <div>Actions</div>,
-    sort: false,
   };
   return (
     <div style={{ height: heightWithoutStorybookPadding }}>
@@ -246,7 +245,7 @@ export function StickyHeader() {
   );
 }
 
-export const Condensed = newStory(() => {
+export const StyleCondensed = newStory(() => {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
@@ -264,7 +263,7 @@ export const Condensed = newStory(() => {
   );
 }, {});
 
-export const NoLeftPadding = newStory(() => {
+export const StyleCondensedWithNoPadding = newStory(() => {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
@@ -289,7 +288,7 @@ export const NoLeftPadding = newStory(() => {
   );
 }, {});
 
-export const Cards = newStory(() => {
+export const StyleCard = newStory(() => {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
@@ -307,7 +306,7 @@ export const Cards = newStory(() => {
   );
 }, {});
 
-export const SingleColumnCard = newStory(() => {
+export const StyleCardWithOneColumn = newStory(() => {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   return (
     <GridTable<Row>
