@@ -158,131 +158,181 @@ describe("GridTable", () => {
     expect(cell(r, 0, 0)).toHaveStyleRule("padding-left", "8px");
   });
 
-  it("can sort", async () => {
-    // Given the table is using client-side sorting
-    const r = await render(
-      <GridTable
-        columns={[nameColumn, valueColumn]}
-        sorting="client-side"
-        rows={[
-          simpleHeader,
-          // And the data is initially unsorted
-          { kind: "data", id: "2", name: "b", value: 2 },
-          { kind: "data", id: "1", name: "a", value: 3 },
-          { kind: "data", id: "3", name: "c", value: 1 },
-        ]}
-      />,
-    );
-    // Then the data is initially render un-sorted
-    expect(cell(r, 1, 0)).toHaveTextContent("b");
+  describe("client-side sorting", () => {
+    it("can sort", async () => {
+      // Given the table is using client-side sorting
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          sorting={{ on: "client" }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // Then the data is initially render un-sorted
+      expect(cell(r, 1, 0)).toHaveTextContent("b");
 
-    // And when sorted by column 1
-    const { sortHeader_0, sortHeader_1 } = r;
-    click(sortHeader_0);
-    // Then 'name: a' row is first
-    expect(cell(r, 1, 0)).toHaveTextContent("a");
+      // And when sorted by column 1
+      const { sortHeader_0, sortHeader_1 } = r;
+      click(sortHeader_0);
+      // Then 'name: a' row is first
+      expect(cell(r, 1, 0)).toHaveTextContent("a");
 
-    // And when sorted by column 2
-    click(sortHeader_1);
-    // Then the `value: 1` row is first
-    expect(cell(r, 1, 0)).toHaveTextContent("c");
-  });
+      // And when sorted by column 2
+      click(sortHeader_1);
+      // Then the `value: 1` row is first
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
+    });
 
-  it("can sort by other value", async () => {
-    // Given the table is using client-side sorting
-    const r = await render(
-      <GridTable<Row>
-        // And the value column returns a JSX.Element and a value
-        columns={[nameColumn, { header: () => "Value", data: ({ value }) => ({ value, content: <div>{value}</div> }) }]}
-        sorting="client-side"
-        rows={[
-          simpleHeader,
-          // And the data is initially unsorted
-          { kind: "data", id: "2", name: "b", value: 2 },
-          { kind: "data", id: "1", name: "a", value: 3 },
-          { kind: "data", id: "3", name: "c", value: 1 },
-        ]}
-      />,
-    );
-    // Then when sorted by the 2nd column
-    const { sortHeader_1 } = r;
-    click(sortHeader_1);
-    // Then the `value: 1` row is first
-    expect(cell(r, 1, 0)).toHaveTextContent("c");
-  });
+    it("can sort by other value", async () => {
+      // Given the table is using client-side sorting
+      const r = await render(
+        <GridTable<Row>
+          // And the value column returns a JSX.Element and a value
+          columns={[
+            nameColumn,
+            { header: () => "Value", data: ({ value }) => ({ value, content: <div>{value}</div> }) },
+          ]}
+          sorting={{ on: "client" }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // Then when sorted by the 2nd column
+      const { sortHeader_1 } = r;
+      click(sortHeader_1);
+      // Then the `value: 1` row is first
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
+    });
 
-  it("can sort by value functions", async () => {
-    // Given the table is using client-side sorting
-    const r = await render(
-      <GridTable<Row>
-        // And the value column returns a JSX.Element and a value function (i.e. from a proxy)
-        columns={[
-          nameColumn,
-          {
-            header: () => "Value",
-            data: ({ value }) => ({
-              value: () => value,
-              content: <div>{value}</div>,
-            }),
-          },
-        ]}
-        sorting="client-side"
-        rows={[
-          simpleHeader,
-          // And the data is initially unsorted
-          { kind: "data", id: "2", name: "b", value: 2 },
-          { kind: "data", id: "1", name: "a", value: 3 },
-          { kind: "data", id: "3", name: "c", value: 1 },
-        ]}
-      />,
-    );
-    // Then when sorted by the 2nd column
-    const { sortHeader_1 } = r;
-    click(sortHeader_1);
-    // Then the `value: 1` row is first
-    expect(cell(r, 1, 0)).toHaveTextContent("c");
-  });
+    it("can sort by value functions", async () => {
+      // Given the table is using client-side sorting
+      const r = await render(
+        <GridTable<Row>
+          // And the value column returns a JSX.Element and a value function (i.e. from a proxy)
+          columns={[
+            nameColumn,
+            {
+              header: () => "Value",
+              data: ({ value }) => ({
+                value: () => value,
+                content: <div>{value}</div>,
+              }),
+            },
+          ]}
+          sorting={{ on: "client" }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // Then when sorted by the 2nd column
+      const { sortHeader_1 } = r;
+      click(sortHeader_1);
+      // Then the `value: 1` row is first
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
+    });
 
-  it("can sort undefined values", async () => {
-    // Given the table is using client-side sorting
-    const r = await render(
-      <GridTable<Row>
-        columns={[nameColumn, { header: () => "Value", data: ({ value }) => ({ value, content: <div>{value}</div> }) }]}
-        sorting="client-side"
-        rows={[
-          simpleHeader,
-          // And the 2nd row's value is undefined
-          { kind: "data", id: "2", name: "b", value: 2 },
-          { kind: "data", id: "1", name: "a", value: undefined },
-          { kind: "data", id: "3", name: "c", value: 1 },
-          { kind: "data", id: "4", name: "d", value: undefined },
-        ]}
-      />,
-    );
-    // Then when sorted by the 2nd column
-    const { sortHeader_1 } = r;
-    click(sortHeader_1);
-    // Then the `value: undefined` row is first
-    expect(cell(r, 1, 0)).toHaveTextContent("a");
-    expect(cell(r, 2, 0)).toHaveTextContent("d");
-    expect(cell(r, 3, 0)).toHaveTextContent("c");
-    expect(cell(r, 4, 0)).toHaveTextContent("b");
-  });
+    it("can sort undefined values", async () => {
+      // Given the table is using client-side sorting
+      const r = await render(
+        <GridTable<Row>
+          columns={[
+            nameColumn,
+            { header: () => "Value", data: ({ value }) => ({ value, content: <div>{value}</div> }) },
+          ]}
+          sorting={{ on: "client" }}
+          rows={[
+            simpleHeader,
+            // And the 2nd row's value is undefined
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: undefined },
+            { kind: "data", id: "3", name: "c", value: 1 },
+            { kind: "data", id: "4", name: "d", value: undefined },
+          ]}
+        />,
+      );
+      // Then when sorted by the 2nd column
+      const { sortHeader_1 } = r;
+      click(sortHeader_1);
+      // Then the `value: undefined` row is first
+      expect(cell(r, 1, 0)).toHaveTextContent("a");
+      expect(cell(r, 2, 0)).toHaveTextContent("d");
+      expect(cell(r, 3, 0)).toHaveTextContent("c");
+      expect(cell(r, 4, 0)).toHaveTextContent("b");
+    });
 
-  it("can have only a single column sortable", async () => {
-    // Given the table is using client-side sorting
-    const r = await render(
-      <GridTable
-        // And the 2nd column has sorting disabled
-        columns={[nameColumn, { ...valueColumn, sort: false }]}
-        sorting="client-side"
-        rows={[simpleHeader, { kind: "data", id: "2", name: "b", value: 2 }]}
-      />,
-    );
-    const { sortHeader_0, sortHeader_1 } = r;
-    // Then we have only a single sort header in the dom
-    expect(sortHeader_0()).toBeDefined();
-    expect(sortHeader_1()).toBeUndefined();
+    it("can have only a single column sortable", async () => {
+      // Given the table is using client-side sorting
+      const r = await render(
+        <GridTable
+          // And the 2nd column has sorting disabled
+          columns={[nameColumn, { ...valueColumn, clientSideSort: false }]}
+          sorting={{ on: "client" }}
+          rows={[simpleHeader, { kind: "data", id: "2", name: "b", value: 2 }]}
+        />,
+      );
+      const { sortHeader_0, sortHeader_1 } = r;
+      // Then we have only a single sort header in the dom
+      expect(sortHeader_0()).toBeDefined();
+      expect(sortHeader_1()).toBeUndefined();
+    });
+
+    it("can be initially sorted by a column index", async () => {
+      // Given a table
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          // And it wants to be initially sorted by column 1/asc
+          sorting={{ on: "client", initial: [1, "ASC"] }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // Then the data is sorted by value
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
+      expect(cell(r, 2, 0)).toHaveTextContent("b");
+    });
+
+    it("can be initially sorted by a column reference", async () => {
+      // Given a table
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          // And it wants to be initially sorted by value column/asc
+          sorting={{ on: "client", initial: [valueColumn, "ASC"] }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // Then the data is sorted by value
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
+      expect(cell(r, 2, 0)).toHaveTextContent("b");
+    });
   });
 
   describe("server-side sorting", () => {
@@ -292,9 +342,8 @@ describe("GridTable", () => {
       const r = await render(
         <GridTable
           // And the 1st column has a sortValue callback
-          columns={[{ ...nameColumn, sortValue: "name" }, valueColumn]}
-          sorting="server-side"
-          onSort={onSort}
+          columns={[{ ...nameColumn, serverSideSortKey: "name" }, valueColumn]}
+          sorting={{ on: "server", value: undefined, onSort }}
           rows={rows}
         />,
       );
@@ -324,10 +373,12 @@ describe("GridTable", () => {
       const onSort = jest.fn();
       const r = await render(
         <GridTable
-          // And the 2nd column does not have a sortValue
-          columns={[{ ...nameColumn, sortValue: "name" }, valueColumn]}
-          sorting="server-side"
-          onSort={onSort}
+          columns={[
+            { ...nameColumn, serverSideSortKey: "name" },
+            // And the 2nd column does not have a sortValue
+            valueColumn,
+          ]}
+          sorting={{ on: "server", value: undefined, onSort }}
           rows={rows}
         />,
       );
@@ -342,12 +393,14 @@ describe("GridTable", () => {
       const onSort = jest.fn();
       const { sortHeader_icon_0 } = await render(
         <GridTable
-          // And the 1st column has a sortValue
-          columns={[{ ...nameColumn, sortValue: "name" }, valueColumn]}
-          sorting="server-side"
-          onSort={onSort}
-          // And the dataset already came back as sorted by [name, asc]
-          sort={["name", "ASC"]}
+          // And the 1st column has a sort key
+          columns={[{ ...nameColumn, serverSideSortKey: "name" }, valueColumn]}
+          sorting={{
+            on: "server",
+            // And the dataset already came back as sorted by [name, asc]
+            value: ["name", "ASC"],
+            onSort,
+          }}
           rows={rows}
         />,
       );
@@ -360,12 +413,14 @@ describe("GridTable", () => {
       const onSort = jest.fn();
       const { sortHeader_icon_0 } = await render(
         <GridTable
-          // And the 1st column has a sortValue
-          columns={[{ ...nameColumn, sortValue: "name" }, valueColumn]}
-          sorting="server-side"
-          onSort={onSort}
-          // And the dataset already came back as sorted by [name, desc]
-          sort={["name", "DESC"]}
+          // And the 1st column has a sort key
+          columns={[{ ...nameColumn, serverSideSortKey: "name" }, valueColumn]}
+          sorting={{
+            on: "server",
+            // And the dataset already came back as sorted by [name, desc]
+            value: ["name", "DESC"],
+            onSort,
+          }}
           rows={rows}
         />,
       );
@@ -600,7 +655,7 @@ describe("GridTable", () => {
     const rows: GridDataRow<Row>[] = [r1, r2, r3];
     // A pretend MutableRefObject
     const rowLookup: MutableRefObject<GridRowLookup<Row> | undefined> = { current: undefined };
-    const r = await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
+    await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
     expect(rowLookup.current!.lookup(r1)).toMatchObject({ next: r2, data: { next: r2 } });
     expect(rowLookup.current!.lookup(r2)).toMatchObject({ prev: r1, next: r3, data: { prev: r1, next: r3 } });
     expect(rowLookup.current!.lookup(r3)).toMatchObject({ prev: r2, data: { prev: r2 } });
@@ -616,7 +671,7 @@ describe("GridTable", () => {
     const rows: GridDataRow<Row>[] = [r1, r2, r3, r4, r5];
     // A pretend MutableRefObject
     const rowLookup: MutableRefObject<GridRowLookup<Row> | undefined> = { current: undefined };
-    const r = await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
+    await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
     // When the page does a lookup for only "small value" rows
     const result = rowLookup.current!.lookup(r3, (r) => r.kind === "data" && !!r.value && r.value < 10);
     // Then we ignored r2 and r4
@@ -633,7 +688,7 @@ describe("GridTable", () => {
 
     // A pretend MutableRefObject
     const rowLookup: MutableRefObject<GridRowLookup<NestedRow> | undefined> = { current: undefined };
-    const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} rowLookup={rowLookup} />);
+    await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} rowLookup={rowLookup} />);
     expect(rowLookup.current!.lookup(p1)).toMatchObject({
       next: p1c1,
       child: { next: p1c1 },
