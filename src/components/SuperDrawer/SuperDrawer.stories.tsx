@@ -50,20 +50,20 @@ export function OpenWithNoActions() {
 }
 
 /** Example showing how to add a canClose check after the SuperDrawer is shown */
-export function OpenWithCanCloseDrawerChecks() {
-  const { openInDrawer, addCanCloseDrawer } = useSuperDrawer();
+export function CanCloseDrawerChecks() {
+  const { openInDrawer, addCanCloseDrawerCheck } = useSuperDrawer();
 
   function open() {
     openInDrawer({
       title: "Drawer Title",
       content: <TestDrawerContent book={Books[0]} hasActions={false} />,
     });
-    // Add a canClose check
-    addCanCloseDrawer(() => true);
-    addCanCloseDrawer(() => false);
+    // Add two canClose check to show that all checks are ran
+    addCanCloseDrawerCheck(() => true);
+    addCanCloseDrawerCheck(() => false);
   }
 
-  useEffect(open, [openInDrawer, addCanCloseDrawer]);
+  useEffect(open, [openInDrawer, addCanCloseDrawerCheck]);
 
   return (
     <>
@@ -95,18 +95,18 @@ export function OpenAtDetail() {
  * canClose check and when trying to close the SuperDrawer this will also
  * trigger a failing check.
  * */
-export function OpenAtDetailsWithCanCloseDrawerDetailsChecks() {
-  const { openInDrawer, openDrawerDetail, addCanCloseDrawer, addCanCloseDrawerDetails } = useSuperDrawer();
+export function CanCloseDrawerDetailsChecks() {
+  const { openInDrawer, openDrawerDetail, addCanCloseDrawerCheck, addCanCloseDrawerDetailCheck } = useSuperDrawer();
 
   function open() {
     openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
     openDrawerDetail({ content: <TestDetailContent book={Books[0]} /> });
     // Add failing checks for both drawer and drawer details
-    addCanCloseDrawer(() => false);
-    addCanCloseDrawerDetails(() => false);
+    addCanCloseDrawerCheck(() => false);
+    addCanCloseDrawerDetailCheck(() => false);
   }
 
-  useEffect(open, [openInDrawer, openDrawerDetail, addCanCloseDrawer, addCanCloseDrawerDetails]);
+  useEffect(open, [openInDrawer, openDrawerDetail, addCanCloseDrawerCheck, addCanCloseDrawerDetailCheck]);
 
   return (
     <>

@@ -47,17 +47,19 @@ export interface UseSuperDrawerHook {
   /** Returns whether the drawer is currently open. */
   isDrawerOpen: boolean;
   /**
-   * Anytime the SuperDrawer is being closed (clicking on the overlay or the
-   * "X" icon), run this check. If the return value is false, show a
-   * SuperDrawer Modal error message, otherwise close the drawer.
+   * Adds a check when attempting to close the SuperDrawer by clicking on the
+   * overlay, the "X" button or calling `closeDrawer()`. If any checks returns
+   * false, a confirmation modal will appear allowing the user to confirm
+   * the action.
    */
-  addCanCloseDrawer: (canClose: () => boolean) => void;
+  addCanCloseDrawerCheck: (canCloseCheck: () => boolean) => void;
   /**
-   * Anytime the SuperDrawer details is being closed (clicking "back" or
-   * "cancel"), run this check. If any function returns false, show a
-   * SuperDrawer Modal error message, otherwise close the drawer details.
+   * Adds a check when attempting to close a SuperDrawer detail by clicking the
+   * "back" button or calling `closeDrawerDetail()`. If any checks returns
+   * false, a confirmation modal will appear allowing the user to confirm
+   * the action.
    */
-  addCanCloseDrawerDetails: (canClose: () => boolean) => void;
+  addCanCloseDrawerDetailCheck: (canCloseCheck: () => boolean) => void;
 }
 
 export function useSuperDrawer(): UseSuperDrawerHook {
@@ -154,24 +156,21 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         if (!contentStack.current.length) {
           throw new Error("openInDrawer was not called before openDrawerDetail");
         }
-        contentStack.current = [...contentStack.current, { kind: "detail", opts }];
+        contentStack.current.push({ kind: "detail", opts });
       },
-      /** Add a new canClose check to the SuperDrawer */
-      addCanCloseDrawer(canClose: () => boolean) {
-        canCloseDrawerChecks.current.push(canClose);
+      /** Add a new close check to SuperDrawer */
+      addCanCloseDrawerCheck(canCloseCheck: () => boolean) {
+        canCloseDrawerChecks.current.push(canCloseCheck);
       },
-      /** Add a new canClose check for the current SuperDrawer Details content */
-      addCanCloseDrawerDetails(canClose: () => boolean) {
+      /** Add a new close check to the current SuperDrawer detail */
+      addCanCloseDrawerDetailCheck(canCloseCheck: () => boolean) {
         // Check if we can add a canCloseDrawerDetails check
         const stackLength = contentStack.current.length;
         if (stackLength <= 1) {
           console.error("Cannot add canCloseDrawerDetails checks when no details drawer are open");
         }
         // Add canCloseDetails check to the current details content
-        canCloseDrawerDetailsChecks.current[stackLength - 2] = [
-          ...(canCloseDrawerDetailsChecks.current[stackLength - 2] ?? []),
-          canClose,
-        ];
+        canCloseDrawerDetailsChecks.current[stackLength - 2].push(canCloseCheck);
       },
     };
   }, [canCloseDrawerChecks, canCloseDrawerDetailsChecks, closeActions, contentStack]);
