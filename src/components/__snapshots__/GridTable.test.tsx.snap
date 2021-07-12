@@ -104,49 +104,53 @@ exports[`GridTable renders 1`] = `
 <body>
   <div>
     <div
-      class="emotion-0"
-      data-testid="grid-table"
+      data-overlay-container="true"
     >
       <div
-        class="emotion-1"
+        class="emotion-0"
+        data-testid="grid-table"
       >
         <div
-          class="emotion-2"
+          class="emotion-1"
         >
-          Name
+          <div
+            class="emotion-2"
+          >
+            Name
+          </div>
+          <div
+            class="emotion-3"
+          >
+            Value
+          </div>
         </div>
         <div
-          class="emotion-3"
+          class="emotion-1"
         >
-          Value
-        </div>
-      </div>
-      <div
-        class="emotion-1"
-      >
-        <div
-          class="emotion-5"
-        >
-          foo
-        </div>
-        <div
-          class="emotion-6"
-        >
-          1
-        </div>
-      </div>
-      <div
-        class="emotion-1"
-      >
-        <div
-          class="emotion-5"
-        >
-          bar
+          <div
+            class="emotion-5"
+          >
+            foo
+          </div>
+          <div
+            class="emotion-6"
+          >
+            1
+          </div>
         </div>
         <div
-          class="emotion-6"
+          class="emotion-1"
         >
-          2
+          <div
+            class="emotion-5"
+          >
+            bar
+          </div>
+          <div
+            class="emotion-6"
+          >
+            2
+          </div>
         </div>
       </div>
     </div>
