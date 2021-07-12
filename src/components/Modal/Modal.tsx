@@ -31,7 +31,7 @@ export interface ModalProps {
 export function Modal(props: ModalProps) {
   const { title, size = "md", content } = props;
   const ref = useRef(null);
-  const { modalBodyDiv, modalFooterDiv } = useContext(BeamContext);
+  const { modalBodyDiv, modalFooterDiv, contentStack } = useContext(BeamContext);
   const { closeModal } = ourUseModal();
   const { overlayProps, underlayProps } = useOverlay(
     { ...props, isOpen: true, onClose: closeModal, isDismissable: true },
@@ -56,6 +56,10 @@ export function Modal(props: ModalProps) {
   // Even though we use raw-divs for the createPortal calls, we do actually need to
   // use refs + useEffect to stitch those raw divs back into the React component tree.
   useEffect(() => {
+    // If the superdrawer is open, let it own the modal content
+    if (contentStack.current.length > 0) {
+      return;
+    }
     modalBodyRef.current!.appendChild(modalBodyDiv);
     modalFooterRef.current!.appendChild(modalFooterDiv);
   }, [modalBodyRef, modalFooterRef]);

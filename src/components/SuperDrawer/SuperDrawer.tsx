@@ -1,6 +1,6 @@
 import { Global } from "@emotion/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactPortal, useContext } from "react";
+import { ReactPortal, useContext, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { ButtonGroup, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
 import { BeamContext } from "src/components/BeamContext";
@@ -28,9 +28,19 @@ import { useTestIds } from "src/utils";
  * above the SuperDrawer.
  */
 export function SuperDrawer(): ReactPortal | null {
-  const { contentStack, modalState } = useContext(BeamContext);
+  const { contentStack, modalState, modalBodyDiv, modalFooterDiv } = useContext(BeamContext);
   const { closeDrawer } = useSuperDrawer();
+  const modalBodyRef = useRef<HTMLDivElement | null>(null);
+  const modalFooterRef = useRef<HTMLDivElement | null>(null);
   const testId = useTestIds({}, "superDrawer");
+
+  // Steal the modal body/footer portals from Modal, if we're open
+  useEffect(() => {
+    if (modalBodyRef.current && modalFooterRef.current && modalState.current) {
+      modalBodyRef.current.appendChild(modalBodyDiv);
+      modalFooterRef.current.appendChild(modalFooterDiv);
+    }
+  }, [modalBodyRef.current, modalFooterRef.current, modalState.current]);
 
   if (contentStack.current.length === 0) {
     return null;
@@ -124,7 +134,13 @@ export function SuperDrawer(): ReactPortal | null {
               </header>
               {modalState.current ? (
                 // Forcing some design constraints on the modal component
-                <div css={Css.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn.$}>{modalState.current.content}</div>
+                <div css={Css.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn.$}>
+                  {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
+                  {modalState.current.content}
+                  {/* TODO Work in some notion of the modal size + width/height + scrolling?*/}
+                  <div ref={modalBodyRef} />
+                  <div ref={modalFooterRef} />
+                </div>
               ) : (
                 content
               )}
