@@ -113,16 +113,12 @@ exports[`GridTable renders 1`] = `
         <div
           class="emotion-2"
         >
-          <div>
-            Name
-          </div>
+          Name
         </div>
         <div
           class="emotion-3"
         >
-          <div>
-            Value
-          </div>
+          Value
         </div>
       </div>
       <div
