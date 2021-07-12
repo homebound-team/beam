@@ -2,7 +2,7 @@ import { act } from "@testing-library/react";
 import { useEffect } from "react";
 import { ModalProps } from "src/components/Modal/Modal";
 import { useModal, UseModalHook } from "src/components/Modal/useModal";
-import { click, render, withBeamRTL } from "src/utils/rtl";
+import { click, render } from "src/utils/rtl";
 
 describe("useModal", () => {
   it("can open and close the modal", async () => {
@@ -16,7 +16,7 @@ describe("useModal", () => {
     }
 
     // When rendering a component without a modal defined
-    const r = await render(<TestApp />, withBeamRTL);
+    const r = await render(<TestApp />);
 
     // Then expect no modal to exist
     expect(r.queryByTestId("modal")).toBeFalsy();
@@ -48,7 +48,7 @@ describe("useModal", () => {
     const canClose = jest.fn().mockReturnValue(false);
     const modalProps = { title: "Test", content: <TestModalContent canClose={canClose} /> };
 
-    const r = await render(<TestApp {...modalProps} />, withBeamRTL);
+    const r = await render(<TestApp {...modalProps} />);
 
     // When clicking the close button
     click(r.modal_titleClose);

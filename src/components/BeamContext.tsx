@@ -9,6 +9,10 @@ import { EmptyRef } from "src/utils/index";
 export interface BeamContextState {
   contentStack: MutableRefObject<ContentStack[]>;
   modalState: MutableRefObject<ModalProps | undefined>;
+  /** The div for ModalBody to portal into; note this can't be a ref b/c Modal hasn't set the ref at the time ModalBody renders. */
+  modalBodyDiv: HTMLDivElement;
+  /** The div for ModalFooter to portal into. */
+  modalFooterDiv: HTMLDivElement;
   canCloseChecks: MutableRefObject<Array<() => boolean>>;
 }
 
@@ -16,6 +20,8 @@ export interface BeamContextState {
 export const BeamContext = createContext<BeamContextState>({
   contentStack: new EmptyRef(),
   modalState: new EmptyRef(),
+  modalBodyDiv: undefined!,
+  modalFooterDiv: undefined!,
   canCloseChecks: new EmptyRef(),
 });
 
@@ -26,6 +32,8 @@ export function BeamProvider({ children }: { children: ReactNode }) {
   // So we use refs + a tick.
   const [, tick] = useReducer((prev) => prev + 1, 0);
   const modalRef = useRef<ModalProps | undefined>();
+  const modalBodyDiv = useMemo(() => document.createElement("div"), []);
+  const modalFooterDiv = useMemo(() => document.createElement("div"), []);
   const contentStackRef = useRef<ContentStack[]>([]);
   const canCloseChecksRef = useRef<Array<() => boolean>>([]);
 
@@ -37,8 +45,10 @@ export function BeamProvider({ children }: { children: ReactNode }) {
       contentStack: new PretendRefThatTicks(contentStackRef, tick),
       // We don't need to rerender when this is mutated, so just expose as-is
       canCloseChecks: canCloseChecksRef,
+      modalBodyDiv,
+      modalFooterDiv,
     };
-  }, []);
+  }, [modalBodyDiv, modalFooterDiv]);
 
   return (
     <BeamContext.Provider value={{ ...context }}>

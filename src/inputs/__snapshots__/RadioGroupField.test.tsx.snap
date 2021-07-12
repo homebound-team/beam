@@ -109,64 +109,68 @@ exports[`RadioGroupField renders with just labels 1`] = `
 <body>
   <div>
     <div
-      class="emotion-0"
+      data-overlay-container="true"
     >
-      <label
-        class="emotion-1"
-        data-testid="favoriteCheese_label"
-        id="react-aria-2"
-      >
-        Favorite cheese
-      </label>
       <div
-        aria-labelledby="react-aria-2"
-        aria-orientation="vertical"
-        id="react-aria-1"
-        role="radiogroup"
+        class="emotion-0"
       >
         <label
-          class="emotion-2"
+          class="emotion-1"
+          data-testid="favoriteCheese_label"
+          id="react-aria-2"
         >
-          <input
-            aria-labelledby="radio-group-1-a-label"
-            checked=""
-            class="emotion-3"
-            data-testid="favoriteCheese_a"
-            name="react-aria-3"
-            tabindex="0"
-            type="radio"
-            value="a"
-          />
-          <div>
-            <div
-              class="emotion-4"
-              id="radio-group-1-a-label"
-            >
-              Asiago
-            </div>
-          </div>
+          Favorite cheese
         </label>
-        <label
-          class="emotion-2"
+        <div
+          aria-labelledby="react-aria-2"
+          aria-orientation="vertical"
+          id="react-aria-1"
+          role="radiogroup"
         >
-          <input
-            aria-labelledby="radio-group-1-b-label"
-            class="emotion-6"
-            data-testid="favoriteCheese_b"
-            name="react-aria-3"
-            tabindex="0"
-            type="radio"
-            value="b"
-          />
-          <div>
-            <div
-              class="emotion-4"
-              id="radio-group-1-b-label"
-            >
-              Burratta
+          <label
+            class="emotion-2"
+          >
+            <input
+              aria-labelledby="radio-group-1-a-label"
+              checked=""
+              class="emotion-3"
+              data-testid="favoriteCheese_a"
+              name="react-aria-3"
+              tabindex="0"
+              type="radio"
+              value="a"
+            />
+            <div>
+              <div
+                class="emotion-4"
+                id="radio-group-1-a-label"
+              >
+                Asiago
+              </div>
             </div>
-          </div>
-        </label>
+          </label>
+          <label
+            class="emotion-2"
+          >
+            <input
+              aria-labelledby="radio-group-1-b-label"
+              class="emotion-6"
+              data-testid="favoriteCheese_b"
+              name="react-aria-3"
+              tabindex="0"
+              type="radio"
+              value="b"
+            />
+            <div>
+              <div
+                class="emotion-4"
+                id="radio-group-1-b-label"
+              >
+                Burratta
+              </div>
+            </div>
+          </label>
+        </div>
       </div>
     </div>
   </div>
@@ -289,71 +293,75 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
 <body>
   <div>
     <div
-      class="emotion-0"
+      data-overlay-container="true"
     >
-      <label
-        class="emotion-1"
-        data-testid="favoriteCheese_label"
-        id="react-aria-5"
-      >
-        Favorite cheese
-      </label>
       <div
-        aria-labelledby="react-aria-5"
-        aria-orientation="vertical"
-        id="react-aria-4"
-        role="radiogroup"
+        class="emotion-0"
       >
         <label
-          class="emotion-2"
+          class="emotion-1"
+          data-testid="favoriteCheese_label"
+          id="react-aria-5"
         >
-          <input
-            aria-labelledby="radio-group-2-a-label"
-            checked=""
-            class="emotion-3"
-            data-testid="favoriteCheese_a"
-            name="react-aria-6"
-            tabindex="0"
-            type="radio"
-            value="a"
-          />
-          <div>
-            <div
-              class="emotion-4"
-              id="radio-group-2-a-label"
-            >
-              Asiago
-            </div>
-          </div>
+          Favorite cheese
         </label>
-        <label
-          class="emotion-2"
+        <div
+          aria-labelledby="react-aria-5"
+          aria-orientation="vertical"
+          id="react-aria-4"
+          role="radiogroup"
         >
-          <input
-            aria-labelledby="radio-group-2-b-label"
-            class="emotion-6"
-            data-testid="favoriteCheese_b"
-            name="react-aria-6"
-            tabindex="0"
-            type="radio"
-            value="b"
-          />
-          <div>
-            <div
-              aria-describedby="radio-group-2-b-description"
-              class="emotion-4"
-              id="radio-group-2-b-label"
-            >
-              Burratta
+          <label
+            class="emotion-2"
+          >
+            <input
+              aria-labelledby="radio-group-2-a-label"
+              checked=""
+              class="emotion-3"
+              data-testid="favoriteCheese_a"
+              name="react-aria-6"
+              tabindex="0"
+              type="radio"
+              value="a"
+            />
+            <div>
+              <div
+                class="emotion-4"
+                id="radio-group-2-a-label"
+              >
+                Asiago
+              </div>
             </div>
-            <div
-              class="emotion-8"
-              id="radio-group-2-b-description"
-            >
-              Burrata is an Italian cow milk cheese made from mozzarella and cream.
+          </label>
+          <label
+            class="emotion-2"
+          >
+            <input
+              aria-labelledby="radio-group-2-b-label"
+              class="emotion-6"
+              data-testid="favoriteCheese_b"
+              name="react-aria-6"
+              tabindex="0"
+              type="radio"
+              value="b"
+            />
+            <div>
+              <div
+                aria-describedby="radio-group-2-b-description"
+                class="emotion-4"
+                id="radio-group-2-b-label"
+              >
+                Burratta
+              </div>
+              <div
+                class="emotion-8"
+                id="radio-group-2-b-description"
+              >
+                Burrata is an Italian cow milk cheese made from mozzarella and cream.
+              </div>
             </div>
-          </div>
-        </label>
+          </label>
+        </div>
       </div>
     </div>
   </div>

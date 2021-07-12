@@ -1,12 +1,12 @@
 import { fireEvent } from "@testing-library/react";
 import { useEffect } from "react";
 import { ModalBody, ModalFooter, ModalProps, useModal } from "src/components/Modal";
-import { click, render, withBeamRTL } from "src/utils/rtl";
+import { click, render } from "src/utils/rtl";
 
 describe("Modal", () => {
   it("renders", async () => {
     // When rendered
-    const r = await render(<TestModalApp title="Title" content={<TestModalComponent />} />, withBeamRTL);
+    const r = await render(<TestModalApp title="Title" content={<TestModalComponent />} />);
 
     // Then expect the content to match
     expect(r.modal_title().textContent).toBe("Title");
@@ -17,10 +17,7 @@ describe("Modal", () => {
   it("invokes canClose", async () => {
     // Given mocked actions
     const canClose = jest.fn().mockReturnValue(false);
-    const r = await render(
-      <TestModalApp canClose={canClose} title="Title" content={<TestModalComponent />} />,
-      withBeamRTL,
-    );
+    const r = await render(<TestModalApp canClose={canClose} title="Title" content={<TestModalComponent />} />);
 
     // When invoking the `onClose` in various interactions
     click(r.modal_titleClose);
@@ -32,25 +29,25 @@ describe("Modal", () => {
   describe("ModalBody", () => {
     it("renders", async () => {
       // When rendered
-      const { modal_content } = await render(<ModalBody>Test Content</ModalBody>);
+      const r = await render(<TestModalApp title="Title" content={<TestModalComponent />} />);
       // Then expect the content to be displayed
-      expect(modal_content().textContent).toBe("Test Content");
+      expect(r.modal_content().textContent).toBe("Modal Body");
     });
   });
 
   describe("ModalFooter", () => {
     it("renders", async () => {
       // When rendered
-      const { modal_footer } = await render(<ModalFooter>Test Footer</ModalFooter>);
+      const r = await render(<TestModalApp title="Title" content={<TestModalComponent />} />);
       // Then expect the footer content to be displayed
-      expect(modal_footer().textContent).toBe("Test Footer");
+      expect(r.modal_footer().textContent).toBe("Modal Footer");
     });
   });
 });
 
 function TestModalApp(props: ModalProps & { canClose?: () => boolean }) {
   const { openModal, addCanClose } = useModal();
-  useEffect(() => openModal(props), []);
+  useEffect(() => openModal(props), [openModal]);
   if (props.canClose) {
     addCanClose(props.canClose);
   }

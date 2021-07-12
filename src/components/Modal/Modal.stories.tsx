@@ -15,6 +15,7 @@ export default {
 export const Small = () => <ModalExample size="sm" />;
 export const Medium = () => <ModalExample />;
 export const Large = () => <ModalExample size="lg" />;
+export const LargeFixedHeight = () => <ModalExample size={{ width: "lg", height: 300 }} />;
 export const WithScroll = () => <ModalExample initNumSentences={50} />;
 export const LeftAction = () => <ModalExample showLeftAction />;
 
@@ -23,7 +24,8 @@ interface ModalExampleProps extends Pick<ModalProps, "size"> {
   showLeftAction?: boolean;
 }
 
-function ModalExample({ size, showLeftAction, initNumSentences = 1 }: ModalExampleProps) {
+function ModalExample(props: ModalExampleProps) {
+  const { size, showLeftAction, initNumSentences = 1 } = props;
   const { openModal } = useModal();
 
   const modalProps = {
@@ -33,7 +35,8 @@ function ModalExample({ size, showLeftAction, initNumSentences = 1 }: ModalExamp
   };
 
   // Immediately open the modal for Chromatic snapshots
-  useEffect(() => openModal(modalProps), []);
+  const open = () => openModal(modalProps);
+  useEffect(open, [openModal]);
 
-  return <Button label="Open" onClick={() => openModal(modalProps)} />;
+  return <Button label="Open" onClick={open} />;
 }

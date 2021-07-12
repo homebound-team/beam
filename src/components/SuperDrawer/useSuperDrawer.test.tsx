@@ -1,42 +1,36 @@
 import { useEffect } from "react";
-import { render, withBeamRTL } from "src/utils/rtl";
+import { render } from "src/utils/rtl";
 import { useSuperDrawer } from "./index";
 
 describe("useSuperDrawer", () => {
   it("should allow `new` element to be added", async () => {
-    const { superDrawerContent } = await render(<TestDrawerContent openInDrawer />, withBeamRTL);
+    const { superDrawerContent } = await render(<TestDrawerContent openInDrawer />);
     expect(superDrawerContent()).toBeTruthy();
   });
 
   it("should not allow `detail` element to be added", async () => {
-    await expect(render(<TestDrawerContent openDrawerDetail />, withBeamRTL)).rejects.toThrow(
+    await expect(render(<TestDrawerContent openDrawerDetail />)).rejects.toThrow(
       "openInDrawer was not called before openDrawerDetail",
     );
   });
 
   it("should allow `detail` element to be added when as least one `new` element is present", async () => {
-    const { superDrawerDetailContent } = await render(<TestDrawerContent openInDrawer openDrawerDetail />, withBeamRTL);
+    const { superDrawerDetailContent } = await render(<TestDrawerContent openInDrawer openDrawerDetail />);
     expect(superDrawerDetailContent()).toBeTruthy();
   });
 
   it("should default `detail` element title to previous elements title", async () => {
-    const { superDrawer_title } = await render(<TestDrawerContent openInDrawer openDrawerDetail />, withBeamRTL);
+    const { superDrawer_title } = await render(<TestDrawerContent openInDrawer openDrawerDetail />);
     expect(superDrawer_title()).toHaveTextContent("title");
   });
 
   it("should show `new` element after calling `closeDrawerDetail()`", async () => {
-    const { superDrawerContent } = await render(
-      <TestDrawerContent openInDrawer openDrawerDetail closeDrawerDetail />,
-      withBeamRTL,
-    );
+    const { superDrawerContent } = await render(<TestDrawerContent openInDrawer openDrawerDetail closeDrawerDetail />);
     expect(superDrawerContent()).toBeTruthy();
   });
 
   it("should reset state when calling `closeDrawer()`", async () => {
-    const { queryByTestId } = await render(
-      <TestDrawerContent openInDrawer openDrawerDetail closeDrawer />,
-      withBeamRTL,
-    );
+    const { queryByTestId } = await render(<TestDrawerContent openInDrawer openDrawerDetail closeDrawer />);
     expect(queryByTestId("superDrawer")).toBeFalsy();
   });
 });
