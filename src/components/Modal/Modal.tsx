@@ -15,8 +15,8 @@ export interface ModalProps {
   /**
    * The modal size, defaults to `md`.
    *
-   * If setting just `size: sm`, we'll default a height. If a designer request a specific
-   * height to pixel-perfect match teh content, then use `size: { width: ..., height: pixels }`.
+   * If setting just `size: sm`, we'll use default a height. If the designer requests a specific
+   * height, i.e. to pixel-perfect match the content, then use `size: { width: ..., height: pixels }`.
    */
   size?: ModalSize | { width: ModalSize; height: number };
   /** The content of the modal; for consistent styling use a fragment with `<ModalBody />` and `<ModalFooter />`. */
