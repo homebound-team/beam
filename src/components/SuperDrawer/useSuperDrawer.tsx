@@ -75,7 +75,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
           for (const canCloseDrawerDetail of canCloseDrawerDetailsChecks.current[i] ?? []) {
             if (!canCloseDrawerDetail()) {
               openModal({
-                title: "Error",
+                title: "Confirm",
                 content: <ConfirmCloseModal onClose={onClose} />,
               });
               return false;
@@ -87,7 +87,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         for (const canCloseDrawer of canCloseDrawerChecks.current) {
           if (!canCloseDrawer()) {
             openModal({
-              title: "Error",
+              title: "Confirm",
               content: <ConfirmCloseModal onClose={onClose} />,
             });
             return false;
@@ -113,7 +113,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         for (const canCloseDrawerDetail of canCloseDrawerDetailsChecks.current[contentStack.current.length - 2] ?? []) {
           if (!canCloseDrawerDetail()) {
             openModal({
-              title: "Error",
+              title: "Confirm",
               content: <ConfirmCloseModal onClose={onClose} />,
             });
             return;
