@@ -27,8 +27,27 @@ describe("BoundSelectField", () => {
     const { favoriteSport_label } = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
     expect(favoriteSport_label()).toHaveTextContent("Favorite Sport");
   });
+
+  it("can bind against boolean fields", async () => {
+    const author = createObjectState(formConfig, { isAvailable: undefined });
+    const options = [
+      { label: "Yes", value: true },
+      { label: "No", value: false },
+      { label: "", value: undefined },
+    ];
+    const r = await render(
+      <BoundSelectField
+        field={author.isAvailable}
+        options={options}
+        getOptionLabel={(o) => o.label}
+        getOptionValue={(o) => o.value}
+      />,
+    );
+    expect(r.isAvailable()).toHaveValue("");
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {
   favoriteSport: { type: "value", rules: [required] },
+  isAvailable: { type: "value" },
 };

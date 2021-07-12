@@ -1,12 +1,11 @@
 import { FieldState } from "@homebound/form-state/dist/formState";
 import { Observer } from "mobx-react";
-import { Key } from "react";
-import { MultiSelectField, MultiSelectFieldProps } from "src/inputs";
+import { MultiSelectField, MultiSelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
 
-export type BoundMultiSelectFieldProps<O, V extends Key> = Omit<
+export type BoundMultiSelectFieldProps<O, V extends Value> = Omit<
   MultiSelectFieldProps<O, V>,
   "values" | "onSelect" | "onBlur" | "onFocus"
 > & {
@@ -25,11 +24,11 @@ export type BoundMultiSelectFieldProps<O, V extends Key> = Omit<
  * The caller has to tell us how to turn `T` into `V`, which is usually a
  * lambda like `t => t.id`.
  */
-export function BoundMultiSelectField<O, V extends Key>(props: BoundMultiSelectFieldProps<O, V>): JSX.Element;
-export function BoundMultiSelectField<O extends HasIdAndName<V>, V extends Key>(
+export function BoundMultiSelectField<O, V extends Value>(props: BoundMultiSelectFieldProps<O, V>): JSX.Element;
+export function BoundMultiSelectField<O extends HasIdAndName<V>, V extends Value>(
   props: Optional<BoundMultiSelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,
 ): JSX.Element;
-export function BoundMultiSelectField<O, V extends Key>(
+export function BoundMultiSelectField<O, V extends Value>(
   props: Optional<BoundMultiSelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element {
   const {

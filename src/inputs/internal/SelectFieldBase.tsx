@@ -5,9 +5,10 @@ import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately
 import { ListBox, Popover } from "src/components/internal";
 import { Css, px } from "src/Css";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
+import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 
-export interface SelectFieldBaseProps<O, V extends Key> extends BeamSelectFieldBaseProps<O> {
+export interface SelectFieldBaseProps<O, V extends Value> extends BeamSelectFieldBaseProps<O> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
@@ -28,7 +29,7 @@ export interface SelectFieldBaseProps<O, V extends Key> extends BeamSelectFieldB
  * Note that the `V extends Key` constraint come from react-aria,
  * and so we cannot easily change them.
  */
-export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O, V>): JSX.Element {
+export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<O, V>): JSX.Element {
   const {
     getOptionValue,
     getOptionLabel,
@@ -49,7 +50,7 @@ export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O,
 
   const initFieldState = {
     isOpen: false,
-    selectedKeys: selectedKeys,
+    selectedKeys: selectedKeys.map(valueToKey),
     inputValue:
       selectedOptions.length === 1
         ? getOptionLabel(selectedOptions[0])
@@ -62,7 +63,7 @@ export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O,
 
   const [fieldState, setFieldState] = useState<{
     isOpen: boolean;
-    selectedKeys: V[];
+    selectedKeys: Key[];
     inputValue: string;
     filteredOptions: O[];
     selectedOptions: O[];
@@ -72,7 +73,7 @@ export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O,
   useEffect(() => setFieldState(initFieldState), [values]);
 
   return (
-    <ComboBox<O, V>
+    <ComboBox<O, Key>
       {...beamSelectFieldBaseProps}
       multiselect={multiselect}
       filteredOptions={fieldState.filteredOptions}
@@ -80,7 +81,7 @@ export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O,
       selectedKeys={fieldState.selectedKeys}
       selectedOptions={fieldState.selectedOptions}
       getOptionLabel={getOptionLabel}
-      getOptionValue={getOptionValue}
+      getOptionValue={(o) => valueToKey(getOptionValue(o))}
       onSelectionChange={(keys) => {
         const fieldState = { filteredOptions: options };
 
@@ -104,27 +105,27 @@ export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O,
         const keysArray = [...keys.values()];
         const firstKey = keysArray[0];
         // Even though the key is number|string, this will always be a string
-        const firstSelectedOption = options.find((o) => String(getOptionValue(o)) === firstKey);
+        const firstSelectedOption = options.find((o) => valueToKey(getOptionValue(o)) === firstKey);
 
         if (multiselect) {
           setFieldState({
             ...fieldState,
             isOpen: true,
             inputValue: keysArray.length === 1 ? getOptionLabel(firstSelectedOption!) : "",
-            selectedKeys: keysArray as V[],
-            selectedOptions: options.filter((o) => keysArray.includes(String(getOptionValue(o)))),
+            selectedKeys: keysArray as Key[],
+            selectedOptions: options.filter((o) => keysArray.includes(valueToKey(getOptionValue(o)))),
           });
         } else {
           setFieldState({
             ...fieldState,
             isOpen: false,
             inputValue: firstSelectedOption ? getOptionLabel(firstSelectedOption) : "",
-            selectedKeys: [firstKey] as V[],
+            selectedKeys: [firstKey] as Key[],
             selectedOptions: firstSelectedOption ? [firstSelectedOption] : [],
           });
         }
 
-        onSelect && onSelect([...keys.values()] as V[]);
+        onSelect && onSelect(([...keys.values()] as Key[]).map(keyToValue) as V[]);
       }}
       onInputChange={(value) => {
         setFieldState((prevState) => ({
@@ -142,7 +143,7 @@ export function SelectFieldBase<O, V extends Key>(props: SelectFieldBaseProps<O,
       }}
     >
       {(item) => (
-        <Item key={getOptionValue(item)} textValue={getOptionLabel(item)}>
+        <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
           {getOptionMenuLabel(item)}
         </Item>
       )}

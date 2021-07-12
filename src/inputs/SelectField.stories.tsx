@@ -1,9 +1,9 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { Key, useState } from "react";
+import { useState } from "react";
 import { GridColumn, GridTable, Icon, Icons, simpleHeader, SimpleHeaderAndDataOf } from "src/components";
 import { Css } from "src/Css";
-import { SelectField, SelectFieldProps } from "src/inputs";
+import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { noop } from "src/utils";
 import { zeroTo } from "src/utils/sb";
@@ -14,7 +14,7 @@ export default {
 } as Meta;
 
 type TestOption = {
-  id: Key;
+  id: string;
   name: string;
   icon?: keyof typeof Icons;
 };
@@ -27,15 +27,21 @@ const options: TestOption[] = [
   { id: "5", name: "Dollar dollar bill, ya'll! ".repeat(5), icon: "dollar" },
 ];
 
-const optionsWithNumericIds: TestOption[] = [
+const optionsWithNumericIds: { id: number; name: string }[] = [
   { id: 1, name: "One" },
   { id: 2, name: "Two" },
   { id: 3, name: "Three" },
   { id: 4, name: "Four" },
 ];
 
+const booleanOptions = [
+  { label: "Yes", value: true },
+  { label: "No", value: false },
+  { label: "Unset", value: undefined },
+];
+
 export function SelectFields() {
-  const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: i, name: `Project ${i}` }));
+  const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
 
   return (
     <div css={Css.df.flexColumn.childGap5.$}>
@@ -72,9 +78,14 @@ export function SelectFields() {
             </div>
           )}
         />
-        <TestSelectField label="Favorite Icon - Disabled" value={undefined} options={options} disabled />
+        <TestSelectField<TestOption, string>
+          label="Favorite Icon - Disabled"
+          value={undefined}
+          options={options}
+          disabled
+        />
         <TestSelectField label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
-        <TestSelectField label="Favorite Icon - Invalid" value={undefined} options={options} />
+        <TestSelectField<TestOption, string> label="Favorite Icon - Invalid" value={undefined} options={options} />
         <TestSelectField
           label="Favorite Icon - Helper Text"
           value={options[0].id}
@@ -87,6 +98,13 @@ export function SelectFields() {
           options={optionsWithNumericIds}
           getOptionValue={(o) => o.id}
           getOptionLabel={(o) => o.name}
+        />
+        <TestSelectField
+          label="Is Available - Boolean"
+          value={false}
+          options={booleanOptions}
+          getOptionValue={(o) => o.value}
+          getOptionLabel={(o) => o.label}
         />
       </div>
 
@@ -125,9 +143,20 @@ export function SelectFields() {
             </div>
           )}
         />
-        <TestSelectField compact label="Favorite Icon - Disabled" value={undefined} options={options} disabled />
+        <TestSelectField<TestOption, string>
+          compact
+          label="Favorite Icon - Disabled"
+          value={undefined}
+          options={options}
+          disabled
+        />
         <TestSelectField compact label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
-        <TestSelectField compact label="Favorite Icon - Invalid" options={options} value={undefined} />
+        <TestSelectField<TestOption, string>
+          compact
+          label="Favorite Icon - Invalid"
+          options={options}
+          value={undefined}
+        />
       </div>
       <div css={Css.df.flexColumn.childGap2.$}>
         <h1 css={Css.lg.$}>Inline Label</h1>
@@ -199,11 +228,13 @@ type Request = { id: string; user: InternalUser; address: string; homeowner: str
 
 // Kind of annoying but to get type inference for HasIdAndName working, we
 // have to re-copy/paste the overload here.
-function TestSelectField<T extends object, V extends Key>(props: Omit<SelectFieldProps<T, V>, "onSelect">): JSX.Element;
-function TestSelectField<O extends HasIdAndName<V>, V extends Key>(
+function TestSelectField<T extends object, V extends Value>(
+  props: Omit<SelectFieldProps<T, V>, "onSelect">,
+): JSX.Element;
+function TestSelectField<O extends HasIdAndName<V>, V extends Value>(
   props: Optional<Omit<SelectFieldProps<O, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element;
-function TestSelectField<T extends object, V extends Key>(
+function TestSelectField<T extends object, V extends Value>(
   props: Optional<Omit<SelectFieldProps<T, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element {
   const [selectedOption, setSelectedOption] = useState<V | undefined>(props.value);
@@ -215,7 +246,11 @@ function TestSelectField<T extends object, V extends Key>(
       {...(props as any)}
       value={selectedOption}
       onSelect={setSelectedOption}
-      errorMsg={selectedOption || props.disabled ? "" : "Select an option. Plus more error text to force it to wrap."}
+      errorMsg={
+        selectedOption !== undefined || props.disabled
+          ? ""
+          : "Select an option. Plus more error text to force it to wrap."
+      }
       onBlur={action("onBlur")}
       onFocus={action("onFocus")}
     />
