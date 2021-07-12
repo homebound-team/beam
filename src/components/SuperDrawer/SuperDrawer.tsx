@@ -2,7 +2,7 @@ import { Global } from "@emotion/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactPortal, useContext, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Button, ButtonGroup, IconButton, OpenInDrawerOpts, useModal, useSuperDrawer } from "src/components";
+import { ButtonGroup, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
 import { BeamContext } from "src/components/BeamContext";
 import { Css, px } from "src/Css";
 import { useTestIds } from "src/utils";
@@ -150,25 +150,5 @@ export function SuperDrawer(): ReactPortal | null {
       )}
     </AnimatePresence>,
     document.body,
-  );
-}
-
-interface SuperDrawerErrorContentProps {
-  // Custom onClose handler
-  onClose: () => void;
-}
-
-export function SuperDrawerErrorContent({ onClose }: SuperDrawerErrorContentProps) {
-  const { closeModal } = useModal();
-
-  return (
-    <div css={Css.wPx(400).df.flexColumn.justifyCenter.itemsCenter.tc.$}>
-      <p css={Css.lgEm.gray900.mb2.$}>Are you sure you want to cancel without saving your changes?</p>
-      <p css={Css.base.gray700.$}>Any changes you've made so far will be lost.</p>
-      <div css={Css.mt4.gap1.$}>
-        <Button variant="tertiary" label="Cancel" onClick={() => closeModal()} />
-        <Button label="Close" onClick={onClose} />
-      </div>
-    </div>
   );
 }

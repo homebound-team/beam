@@ -20,6 +20,7 @@ export function useModal(): UseModalHook {
         modalState.current = props;
       },
       closeModal() {
+        // TODO: Should remove checks
         for (const canCloseModal of canCloseModalChecks.current) {
           if (!canCloseModal()) {
             return;
