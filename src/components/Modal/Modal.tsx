@@ -8,7 +8,7 @@ import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
-export type ModalSize = "sm" | "md" | "lg";
+export type ModalSize = "sm" | "md" | "lg" | "xl";
 
 export interface ModalProps {
   title: string;
@@ -134,9 +134,17 @@ export function ModalFooter<X extends Only<ModalFooterXss, X>>({
 
 const testIdPrefix = "modal";
 
+const widths: Record<ModalSize, number> = {
+  sm: 320,
+  md: 480,
+  lg: 640,
+  xl: 800,
+};
+
 function getSize(size: ModalSize | { width: ModalSize; height: number }): [number, number] {
-  const widthAbbr: ModalSize = typeof size === "string" ? size : size.width;
-  const width = widthAbbr === "sm" ? 320 : widthAbbr === "md" ? 480 : 640;
-  const height = typeof size === "string" ? width * 1.1 : size.height;
-  return [width, height];
+  if (typeof size === "string") {
+    return [widths[size], widths[size] * 1.1];
+  } else {
+    return [widths[size.width], size.height];
+  }
 }
