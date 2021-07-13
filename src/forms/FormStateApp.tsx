@@ -126,7 +126,7 @@ function createColumns(formState: FormValue): GridColumn<Row>[] {
 type FormValue = ObjectState<AuthorInput>;
 
 // Configure the fields/behavior for AuthorInput's fields
-const formConfig: ObjectConfig<AuthorInput> = {
+export const formConfig: ObjectConfig<AuthorInput> = {
   firstName: { type: "value", rules: [required] },
   lastName: { type: "value", rules: [required] },
   birthday: { type: "value", rules: [required] },
