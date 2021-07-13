@@ -156,7 +156,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         if (!contentStack.current.length) {
           throw new Error("openInDrawer was not called before openDrawerDetail");
         }
-        contentStack.current.push({ kind: "detail", opts });
+        contentStack.current = [...contentStack.current, { kind: "detail", opts }];
       },
       /** Add a new close check to SuperDrawer */
       addCanCloseDrawerCheck(canCloseCheck: () => boolean) {
@@ -167,7 +167,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
           return;
         }
 
-        canCloseDrawerChecks.current.push(canCloseCheck);
+        canCloseDrawerChecks.current = [...canCloseDrawerChecks.current, canCloseCheck];
       },
       /** Add a new close check to the current SuperDrawer detail */
       addCanCloseDrawerDetailCheck(canCloseCheck: () => boolean) {
