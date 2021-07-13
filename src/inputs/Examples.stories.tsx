@@ -33,7 +33,7 @@ function DrawerWithInputs() {
           <legend>Details</legend>
           <TextField label="Item Name" value="Counters" onChange={action("TextField - onChange")} />
           <SelectField<Options, number>
-            label="Locations"
+            label="Location"
             value={1}
             options={[
               { id: 1, name: "Kitchen" },

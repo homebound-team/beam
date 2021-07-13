@@ -17,6 +17,8 @@ export type Value = string | number | null | undefined | boolean;
 
 export function keyToValue<V extends Value>(key: Key): V {
   if (typeof key === "number") {
+    // react-aria's selection manager always returns strings, so we probably
+    // won't actually hit this line, but just in case.
     return key as V;
   } else if (typeof key === "string") {
     if (key === "__VALUE:null") {
@@ -25,6 +27,8 @@ export function keyToValue<V extends Value>(key: Key): V {
       return undefined as V;
     } else if (key.startsWith("__VALUE:boolean:")) {
       return (key.split(":")[2] === "true" ? true : false) as V;
+    } else if (key.startsWith("__VALUE:number")) {
+      return Number(key.split(":")[2]) as V;
     } else {
       return key as V;
     }
@@ -37,7 +41,9 @@ export function valueToKey(value: Value): Key {
   if (typeof value === "string") {
     return value;
   } else if (typeof value === "number") {
-    return value;
+    // Despite using the Key type, react-aria's select manager always returns strings,
+    // so tag this value as really being a number.
+    return `__VALUE:number:${value}`;
   } else if (typeof value === "boolean") {
     return `__VALUE:boolean:${value};`;
   } else if (value === null) {

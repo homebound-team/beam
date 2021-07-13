@@ -43,31 +43,33 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
 
   const { contains } = useFilter({ sensitivity: "base" });
 
-  // Use the current value to find the option
-  const selectedKeys: V[] = values ?? [];
-  // @ts-ignore, we need to coerce this to be a string,...
-  const selectedOptions = options.filter((o) => selectedKeys.includes(String(getOptionValue(o))));
-
-  const initFieldState = {
-    isOpen: false,
-    selectedKeys: selectedKeys.map(valueToKey),
-    inputValue:
-      selectedOptions.length === 1
-        ? getOptionLabel(selectedOptions[0])
-        : multiselect && selectedOptions.length === 0
-        ? "All"
-        : "",
-    filteredOptions: options,
-    selectedOptions: selectedOptions,
-  };
-
-  const [fieldState, setFieldState] = useState<{
+  type FieldState = {
     isOpen: boolean;
     selectedKeys: Key[];
     inputValue: string;
     filteredOptions: O[];
     selectedOptions: O[];
-  }>(initFieldState);
+  };
+
+  function initFieldState(): FieldState {
+    // Use the current value to find the option
+    const selectedKeys: V[] = values ?? [];
+    const selectedOptions = options.filter((o) => selectedKeys.includes(getOptionValue(o)));
+    return {
+      isOpen: false,
+      selectedKeys: selectedKeys.map(valueToKey),
+      inputValue:
+        selectedOptions.length === 1
+          ? getOptionLabel(selectedOptions[0])
+          : multiselect && selectedOptions.length === 0
+          ? "All"
+          : "",
+      filteredOptions: options,
+      selectedOptions: selectedOptions,
+    };
+  }
+
+  const [fieldState, setFieldState] = useState<FieldState>(initFieldState);
 
   // Ensure we reset if the field's values change
   useEffect(() => setFieldState(initFieldState), [values]);
