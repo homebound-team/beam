@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { Button, Css } from "src";
 import { BeamContext } from "../BeamContext";
+
 interface ConfirmCloseModalProps {
   onClose: () => void;
 }

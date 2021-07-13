@@ -38,7 +38,7 @@ export type ContentStack = { kind: "open"; opts: OpenInDrawerOpts } | { kind: "d
 export interface UseSuperDrawerHook {
   /** Opens a new drawer, throwing away the current drawer is one exists. */
   openInDrawer: (opts: OpenInDrawerOpts) => void;
-  /** Closes the entire drawer. Can forcefully close if needed */
+  /** Closes the entire drawer. */
   closeDrawer: () => boolean;
   /** Opens a detail view in the current drawer. */
   openDrawerDetail: (opts: OpenDetailOpts) => void;
@@ -160,17 +160,29 @@ export function useSuperDrawer(): UseSuperDrawerHook {
       },
       /** Add a new close check to SuperDrawer */
       addCanCloseDrawerCheck(canCloseCheck: () => boolean) {
+        // Check if we can add a canCloseDrawer check
+        const stackLength = contentStack.current.length;
+        if (!stackLength) {
+          console.error("Cannot add canCloseDrawerCheck when the SuperDrawer is not open");
+          return;
+        }
+
         canCloseDrawerChecks.current.push(canCloseCheck);
       },
       /** Add a new close check to the current SuperDrawer detail */
       addCanCloseDrawerDetailCheck(canCloseCheck: () => boolean) {
-        // Check if we can add a canCloseDrawerDetails check
+        // Check if we can add a canCloseDrawerDetailCheck
         const stackLength = contentStack.current.length;
         if (stackLength <= 1) {
-          console.error("Cannot add canCloseDrawerDetails checks when no details drawer are open");
+          console.error("Cannot add canCloseDrawerDetailCheck when no SuperDrawer details drawer is open");
+          return;
         }
+
         // Add canCloseDetails check to the current details content
-        canCloseDrawerDetailsChecks.current[stackLength - 2].push(canCloseCheck);
+        canCloseDrawerDetailsChecks.current[stackLength - 2] = [
+          ...(canCloseDrawerDetailsChecks.current[stackLength - 2] ?? []),
+          canCloseCheck,
+        ];
       },
     };
   }, [canCloseDrawerChecks, canCloseDrawerDetailsChecks, closeActions, contentStack]);
