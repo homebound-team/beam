@@ -40,7 +40,8 @@ export function SuperDrawer(): ReactPortal | null {
       modalBodyRef.current.appendChild(modalBodyDiv);
       modalFooterRef.current.appendChild(modalFooterDiv);
     }
-  }, [modalBodyDiv, modalFooterDiv, modalState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modalBodyRef.current, modalFooterRef.current, modalState.current]);
 
   if (contentStack.current.length === 0) {
     return null;
