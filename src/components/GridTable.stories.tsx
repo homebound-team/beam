@@ -11,6 +11,7 @@ import {
   GridRowLookup,
   GridRowStyles,
   GridTable,
+  Icon,
   IconButton,
   observableColumns,
   SimpleHeaderAndDataOf,
@@ -289,20 +290,22 @@ export const StyleCondensedWithNoPadding = newStory(() => {
 }, {});
 
 export const StyleCard = newStory(() => {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: 1 };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: 1 };
+  const actionColumn: GridColumn<Row> = { header: "", data: () => <Icon icon="star" />, w: "56px" };
   return (
-    <GridTable<Row>
-      columns={[nameColumn, valueColumn, actionColumn]}
-      style={cardStyle}
-      rows={[
-        { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
-      ]}
-    />
+    <div css={Css.wPx(550).$}>
+      <GridTable<Row>
+        columns={[nameColumn, valueColumn, actionColumn]}
+        style={cardStyle}
+        rows={[
+          { kind: "header", id: "header" },
+          { kind: "data", id: "1", name: "c", value: 1 },
+          { kind: "data", id: "2", name: "b", value: 2 },
+          { kind: "data", id: "3", name: "a", value: 3 },
+        ]}
+      />
+    </div>
   );
 }, {});
 
