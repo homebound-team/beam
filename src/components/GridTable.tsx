@@ -137,15 +137,17 @@ export const condensedStyle: GridStyle = {
 /** Renders each row as a card. */
 export const cardStyle: GridStyle = {
   ...defaultStyle,
-  firstNonHeaderRowCss: Css.$,
+  firstNonHeaderRowCss: Css.mt2.$,
   cellCss: Css.p2.my1.bt.bb.bGray400.$,
   firstCellCss: Css.bl.add({ borderTopLeftRadius: "4px", borderBottomLeftRadius: "4px" }).$,
   lastCellCss: Css.br.add({ borderTopRightRadius: "4px", borderBottomRightRadius: "4px" }).$,
-  rootCss: Css.dig.$,
   // Undo the card look & feel for the header
   headerCellCss: {
     ...defaultStyle.headerCellCss,
-    ...Css.add({ border: "none", borderRadius: "unset" }).p1.m0.mb1.xsEm.gray700.$,
+    ...Css.add({
+      border: "none",
+      borderRadius: "unset",
+    }).p1.m0.xsEm.gray700.$,
   },
 };
 
