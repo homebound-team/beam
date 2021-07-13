@@ -1,6 +1,5 @@
-import { NumberFieldAria } from "@react-aria/numberfield";
-import { mergeProps } from "@react-aria/utils";
-import React, {
+import type { NumberFieldAria } from "@react-aria/numberfield";
+import {
   ChangeEvent,
   FocusEvent,
   InputHTMLAttributes,
@@ -8,7 +7,7 @@ import React, {
   MutableRefObject,
   TextareaHTMLAttributes,
 } from "react";
-import { chain } from "react-aria";
+import { chain, mergeProps } from "react-aria";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, px, Xss } from "src/Css";

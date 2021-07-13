@@ -1,6 +1,6 @@
-import { useToggleState } from "@react-stately/toggle";
 import React, { ReactNode, useRef } from "react";
 import { useCheckbox } from "react-aria";
+import { useToggleState } from "react-stately";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
 
 export interface CheckboxProps {

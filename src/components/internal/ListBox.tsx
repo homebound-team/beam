@@ -1,6 +1,6 @@
-import { SelectState } from "@react-stately/select";
-import React, { Key, MutableRefObject, useState } from "react";
+import { Key, MutableRefObject, useState } from "react";
 import { DismissButton, useListBox } from "react-aria";
+import { SelectState } from "react-stately";
 import { Virtuoso } from "react-virtuoso";
 import { Chip } from "src/components/Chip";
 import { Option } from "src/components/internal";

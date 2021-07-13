@@ -1,7 +1,6 @@
-import { useCheckboxGroup } from "@react-aria/checkbox";
-import { CheckboxGroupState, useCheckboxGroupState } from "@react-stately/checkbox";
 import { ReactNode, useRef } from "react";
-import { useCheckboxGroupItem } from "react-aria";
+import { useCheckboxGroup, useCheckboxGroupItem } from "react-aria";
+import { CheckboxGroupState, useCheckboxGroupState } from "react-stately";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css } from "src/Css";

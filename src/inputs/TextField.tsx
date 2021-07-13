@@ -1,6 +1,5 @@
-import { useTextField } from "@react-aria/textfield";
-import { mergeProps } from "@react-aria/utils";
 import { useRef } from "react";
+import { mergeProps, useTextField } from "react-aria";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps } from "src/interfaces";
 

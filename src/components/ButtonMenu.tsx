@@ -1,8 +1,7 @@
-import { Item, Section } from "@react-stately/collections";
-import { Placement } from "@react-types/overlays";
-import React, { useRef } from "react";
+import type { Placement } from "@react-types/overlays";
+import { useRef } from "react";
 import { DismissButton, useMenuTrigger, useOverlayPosition } from "react-aria";
-import { useMenuTriggerState, useTreeData } from "react-stately";
+import { Item, Section, useMenuTriggerState, useTreeData } from "react-stately";
 import { Button, ButtonProps } from "src/components/Button";
 import { Icon, IconProps } from "src/components/Icon";
 import { IconButton, IconButtonProps } from "src/components/IconButton";

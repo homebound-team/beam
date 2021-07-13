@@ -1,4 +1,4 @@
-import { useCheckboxGroup } from "@react-aria/checkbox";
+import { useCheckboxGroup } from "react-aria";
 import { Css } from "../Css";
 import { toGroupState } from "../utils";
 import { Switch } from "./Switch";

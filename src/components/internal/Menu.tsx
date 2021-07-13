@@ -1,6 +1,6 @@
-import { TreeNode } from "@react-stately/data";
-import { CollectionChildren } from "@react-types/shared";
-import React, { HTMLAttributes, PropsWithChildren, useRef } from "react";
+import type { TreeNode } from "@react-stately/data";
+import type { CollectionChildren } from "@react-types/shared";
+import { HTMLAttributes, PropsWithChildren, useRef } from "react";
 import { FocusScope, useMenu } from "react-aria";
 import { useTreeState } from "react-stately";
 import { MenuItem, MenuSection } from "src/components";
