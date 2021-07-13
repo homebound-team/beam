@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
-import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf } from "src";
+import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf, Tag } from "src";
 import { GridDataRow, GridRowLookup } from "src/components/GridTable";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
@@ -49,13 +49,65 @@ export function OpenWithNoActions() {
   );
 }
 
+/** Example showing how to add a canClose check after the SuperDrawer is shown */
+export function CanCloseDrawerChecks() {
+  const { openInDrawer, addCanCloseDrawerCheck } = useSuperDrawer();
+
+  function open() {
+    openInDrawer({
+      title: "Drawer Title",
+      content: <TestDrawerContent book={Books[0]} hasActions={false} />,
+    });
+    // Add two canClose check to show that all checks are ran
+    addCanCloseDrawerCheck(() => true);
+    addCanCloseDrawerCheck(() => false);
+  }
+
+  useEffect(open, [openInDrawer, addCanCloseDrawerCheck]);
+
+  return (
+    <>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open With CanClose Checks</h1>
+      <Button label="Show SuperDrawer" onClick={open} />
+    </>
+  );
+}
+
 export function OpenAtDetail() {
   const { openInDrawer, openDrawerDetail } = useSuperDrawer();
+
   function open() {
     openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
     openDrawerDetail({ content: <TestDetailContent book={Books[0]} /> });
   }
   useEffect(open, [openInDrawer, openDrawerDetail]);
+  return (
+    <>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Detail</h1>
+      <Button label="Show SuperDrawer" onClick={open} />
+    </>
+  );
+}
+
+/**
+ * Example showing how to add a canClose check for SuperDrawer details. When
+ * attempting to close the details page, this actions should trigger a fail
+ * canClose check and when trying to close the SuperDrawer this will also
+ * trigger a failing check.
+ * */
+export function CanCloseDrawerDetailsChecks() {
+  const { openInDrawer, openDrawerDetail, addCanCloseDrawerCheck, addCanCloseDrawerDetailCheck } = useSuperDrawer();
+
+  function open() {
+    openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
+    openDrawerDetail({ content: <TestDetailContent book={Books[0]} /> });
+    // Add failing checks for both drawer and drawer details
+    addCanCloseDrawerCheck(() => false);
+    addCanCloseDrawerDetailCheck(() => false);
+  }
+
+  useEffect(open, [openInDrawer, openDrawerDetail, addCanCloseDrawerCheck, addCanCloseDrawerDetailCheck]);
+
   return (
     <>
       <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Detail</h1>
@@ -86,7 +138,7 @@ export function OpenWithTitleRightContent() {
     openInDrawer({
       title: "Title",
       content: <TestDrawerContent book={Books[0]} />,
-      titleLeftContent: "ASSIGNED",
+      titleLeftContent: <Tag text={"ASSIGNED"} type={"success"} />,
       titleRightContent: <Button label="Manage RFP" onClick={() => {}} />,
     });
   }
@@ -191,7 +243,7 @@ function TestDrawerContent({ book, hasActions = true }: TestDrawerContentProps) 
 
   function handlePurchase() {
     openModal({
-      title: "asdf",
+      title: "Confirm",
       content: <TestSimpleModalContent book={book} onPrimaryClick={closeDrawer} />,
     });
   }
@@ -201,7 +253,7 @@ function TestDrawerContent({ book, hasActions = true }: TestDrawerContentProps) 
       actions={
         hasActions
           ? [
-              { label: "Close", onClick: closeDrawer, variant: "tertiary" },
+              { label: "Close", onClick: () => closeDrawer(), variant: "tertiary" },
               { label: `Purchase "${book.bookTitle}"`, onClick: handlePurchase },
             ]
           : undefined

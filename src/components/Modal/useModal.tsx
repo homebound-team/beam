@@ -10,7 +10,7 @@ export interface UseModalHook {
 }
 
 export function useModal(): UseModalHook {
-  const { modalState, canCloseChecks } = useContext(BeamContext);
+  const { modalState, canCloseModalChecks } = useContext(BeamContext);
   const lastCanClose = useRef<undefined | (() => boolean)>();
   return useMemo(
     () => ({
@@ -20,22 +20,24 @@ export function useModal(): UseModalHook {
         modalState.current = props;
       },
       closeModal() {
-        for (const canClose of canCloseChecks.current) {
-          if (!canClose()) {
+        // TODO: Should remove checks
+        for (const canCloseModal of canCloseModalChecks.current) {
+          if (!canCloseModal()) {
             return;
           }
         }
         modalState.current = undefined;
       },
+      // TODO: Rename as a breaking change
       addCanClose(canClose) {
-        canCloseChecks.current = [
+        canCloseModalChecks.current = [
           // Only allow one canClose per component at a time; this lets the caller avoid useMemo'ing their lambda
-          ...canCloseChecks.current.filter((c) => c !== lastCanClose.current),
+          ...canCloseModalChecks.current.filter((c) => c !== lastCanClose.current),
           canClose,
         ];
         lastCanClose.current = canClose;
       },
     }),
-    [modalState],
+    [modalState, canCloseModalChecks],
   );
 }
