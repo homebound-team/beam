@@ -1,4 +1,11 @@
-import { Fragment, InputHTMLAttributes, Key, LabelHTMLAttributes, MutableRefObject, ReactNode, useState } from "react";
+import React, {
+  Fragment,
+  InputHTMLAttributes,
+  LabelHTMLAttributes,
+  MutableRefObject,
+  ReactNode,
+  useState,
+} from "react";
 import { mergeProps, useHover } from "react-aria";
 import { ComboBoxState } from "react-stately";
 import { Icon } from "src/components";
@@ -6,9 +13,10 @@ import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
+import { Value, valueToKey } from "src/inputs/Value";
 import { maybeCall, useTestIds } from "src/utils";
 
-interface SelectFieldInputProps<O, V extends Key> {
+interface SelectFieldInputProps<O, V extends Value> {
   buttonProps: any;
   buttonRef: MutableRefObject<HTMLButtonElement | null>;
   inputProps: InputHTMLAttributes<HTMLInputElement>;
@@ -32,7 +40,7 @@ interface SelectFieldInputProps<O, V extends Key> {
   sizeToContent: boolean;
 }
 
-export function SelectFieldInput<O, V extends Key>(props: SelectFieldInputProps<O, V>) {
+export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
   const {
     inputProps,
     inputRef,
@@ -140,14 +148,14 @@ export function SelectFieldInput<O, V extends Key>(props: SelectFieldInputProps<
             if (e.key === "Escape") {
               // Triggering `Escape` is basically like re-selecting currently selected option, so do that if there is one.
               state.selectionManager.setSelectedKeys(
-                selectedOptions.length > 0 ? [getOptionValue(selectedOptions[0])] : [],
+                selectedOptions.length > 0 ? [valueToKey(getOptionValue(selectedOptions[0]))] : [],
               );
               return;
             }
 
             inputProps.onKeyDown && inputProps.onKeyDown(e);
           }}
-          onBlur={(e) => {
+          onBlur={() => {
             maybeCall(onBlur);
             setIsSizeBasedOnContent(true);
             state.close();

@@ -1,9 +1,9 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { Key, useState } from "react";
+import { useState } from "react";
 import { Icon, Icons } from "src/components";
 import { Css } from "src/Css";
-import { MultiSelectField, MultiSelectFieldProps } from "src/inputs";
+import { MultiSelectField, MultiSelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 
 export default {
@@ -12,7 +12,7 @@ export default {
 } as Meta;
 
 type TestOption = {
-  id: Key;
+  id: Value;
   name: string;
   icon?: keyof typeof Icons;
 };
@@ -71,7 +71,7 @@ export function MultiSelectFields() {
           label="Icons - none selected (All case)"
           options={options}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
-          values={[] as Key[]}
+          values={[] as Value[]}
         />
       </div>
 
@@ -122,7 +122,7 @@ export function MultiSelectFields() {
           label="Icons - none selected (All case)"
           options={options}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
-          values={[] as Key[]}
+          values={[] as Value[]}
         />
       </div>
       <div css={Css.df.flexColumn.childGap2.$}>
@@ -153,13 +153,13 @@ export function MultiSelectFields() {
 
 // Kind of annoying but to get type inference for HasIdAndName working, we
 // have to re-copy/paste the overload here.
-function TestMultiSelectField<T extends object, V extends Key>(
+function TestMultiSelectField<T extends object, V extends Value>(
   props: Omit<MultiSelectFieldProps<T, V>, "onSelect">,
 ): JSX.Element;
-function TestMultiSelectField<O extends HasIdAndName<V>, V extends Key>(
+function TestMultiSelectField<O extends HasIdAndName<V>, V extends Value>(
   props: Optional<Omit<MultiSelectFieldProps<O, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element;
-function TestMultiSelectField<T extends object, V extends Key>(
+function TestMultiSelectField<T extends object, V extends Value>(
   props: Optional<Omit<MultiSelectFieldProps<T, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element {
   const [selectedOptions, setSelectedOptions] = useState<V[]>(props.values);

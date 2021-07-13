@@ -1,12 +1,11 @@
 import { FieldState } from "@homebound/form-state/dist/formState";
 import { Observer } from "mobx-react";
-import { Key } from "react";
-import { SelectField, SelectFieldProps } from "src/inputs";
+import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
 
-export type BoundSelectFieldProps<T extends object, V extends Key> = Omit<
+export type BoundSelectFieldProps<T, V extends Value> = Omit<
   SelectFieldProps<T, V>,
   "value" | "onSelect" | "onBlur" | "onFocus"
 > & {
@@ -25,11 +24,11 @@ export type BoundSelectFieldProps<T extends object, V extends Key> = Omit<
  * The caller has to tell us how to turn `T` into `V`, which is usually a
  * lambda like `t => t.id`.
  */
-export function BoundSelectField<T extends object, V extends Key>(props: BoundSelectFieldProps<T, V>): JSX.Element;
-export function BoundSelectField<T extends HasIdAndName<V>, V extends Key>(
+export function BoundSelectField<T, V extends Value>(props: BoundSelectFieldProps<T, V>): JSX.Element;
+export function BoundSelectField<T extends HasIdAndName<V>, V extends Value>(
   props: Optional<BoundSelectFieldProps<T, V>, "getOptionLabel" | "getOptionValue">,
 ): JSX.Element;
-export function BoundSelectField<T extends object, V extends Key>(
+export function BoundSelectField<T extends object, V extends Value>(
   props: Optional<BoundSelectFieldProps<T, V>, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element {
   const {

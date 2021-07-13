@@ -7,3 +7,4 @@ export { RadioFieldOption, RadioGroupField, RadioGroupFieldProps } from "./Radio
 export * from "./SelectField";
 export * from "./TextAreaField";
 export * from "./TextField";
+export type { Value } from "./Value";

@@ -1,8 +1,9 @@
-import React, { Key, ReactNode } from "react";
+import React, { ReactNode } from "react";
+import { Value } from "src/inputs";
 import { BeamSelectFieldBaseProps, SelectFieldBase } from "src/inputs/internal/SelectFieldBase";
 import { HasIdAndName, Optional } from "src/types";
 
-export interface MultiSelectFieldProps<O, V extends Key> extends BeamSelectFieldBaseProps<O> {
+export interface MultiSelectFieldProps<O, V extends Value> extends BeamSelectFieldBaseProps<O> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
@@ -17,15 +18,12 @@ export interface MultiSelectFieldProps<O, V extends Key> extends BeamSelectField
  *
  * The `O` type is a list of options to show, the `V` is the primitive value of a
  * given `O` (i.e. it's id) that you want to use as the current/selected value.
- *
- * Note that the `V extends Key` constraint come from react-aria,
- * and so we cannot easily change them.
  */
-export function MultiSelectField<O, V extends Key>(props: MultiSelectFieldProps<O, V>): JSX.Element;
-export function MultiSelectField<O extends HasIdAndName<V>, V extends Key>(
+export function MultiSelectField<O, V extends Value>(props: MultiSelectFieldProps<O, V>): JSX.Element;
+export function MultiSelectField<O extends HasIdAndName<V>, V extends Value>(
   props: Optional<MultiSelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element;
-export function MultiSelectField<O, V extends Key>(
+export function MultiSelectField<O, V extends Value>(
   props: Optional<MultiSelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,
 ): JSX.Element {
   const {
