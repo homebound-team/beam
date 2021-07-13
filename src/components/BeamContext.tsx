@@ -41,7 +41,7 @@ export function BeamProvider({ children }: { children: ReactNode }) {
   const modalBodyDiv = useMemo(() => document.createElement("div"), []);
   const modalFooterDiv = useMemo(() => document.createElement("div"), []);
   const contentStackRef = useRef<ContentStack[]>([]);
-  const canCloseChecksRef = useRef<Array<() => boolean>>([]);
+  const canCloseModalChecksRef = useRef<Array<() => boolean>>([]);
   const canCloseDrawerChecksRef = useRef<Array<() => boolean>>([]);
   const canCloseDrawerDetailsChecksRef = useRef<Array<Array<() => boolean>>>([]);
 
@@ -54,7 +54,7 @@ export function BeamProvider({ children }: { children: ReactNode }) {
       // We don't need to rerender when this is mutated, so just expose as-is
       modalBodyDiv,
       modalFooterDiv,
-      canCloseModalChecks: canCloseChecksRef,
+      canCloseModalChecks: canCloseModalChecksRef,
       canCloseDrawerChecks: canCloseDrawerChecksRef,
       canCloseDrawerDetailsChecks: canCloseDrawerDetailsChecksRef,
     };
