@@ -1,13 +1,13 @@
 import { fireEvent } from "@testing-library/react";
 import { useEffect } from "react";
 import { ModalBody, ModalFooter, ModalProps, useModal } from "src/components/Modal";
+import { OpenModal } from "src/components/Modal/OpenModal";
 import { click, render } from "src/utils/rtl";
 
 describe("Modal", () => {
   it("renders", async () => {
     // When rendered
     const r = await render(<TestModalApp title="Title" content={<TestModalComponent />} />);
-
     // Then expect the content to match
     expect(r.modal_title().textContent).toBe("Title");
     expect(r.modal_titleClose()).toBeTruthy();
@@ -18,7 +18,6 @@ describe("Modal", () => {
     // Given mocked actions
     const canClose = jest.fn().mockReturnValue(false);
     const r = await render(<TestModalApp canClose={canClose} title="Title" content={<TestModalComponent />} />);
-
     // When invoking the `onClose` in various interactions
     click(r.modal_titleClose);
     expect(canClose).toBeCalledTimes(1);
@@ -42,6 +41,18 @@ describe("Modal", () => {
       // Then expect the footer content to be displayed
       expect(r.modal_footer().textContent).toBe("Modal Footer");
     });
+  });
+
+  it("supports testing modal components on their own", async () => {
+    // Given a test wants to directly render a modal component
+    const r = await render(
+      // And it wraps it in the OpenModal helper component
+      <OpenModal>
+        <TestModalComponent />
+      </OpenModal>,
+    );
+    // Then we can assert against it
+    expect(r.modal_footer().textContent).toBe("Modal Footer");
   });
 });
 

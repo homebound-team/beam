@@ -8,7 +8,7 @@ import { EmptyRef } from "src/utils/index";
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */
 export interface BeamContextState {
   // SuperDrawer contentStack
-  contentStack: MutableRefObject<ContentStack[]>;
+  contentStack: MutableRefObject<readonly ContentStack[]>;
   modalState: MutableRefObject<ModalProps | undefined>;
   canCloseModalChecks: MutableRefObject<Array<() => boolean>>;
   /** The div for ModalBody to portal into; note this can't be a ref b/c Modal hasn't set the ref at the time ModalBody renders. */
@@ -52,7 +52,7 @@ export function BeamProvider({ children }: { children: ReactNode }) {
     return {
       modalState: new PretendRefThatTicks(modalRef, tick),
       contentStack: new PretendRefThatTicks(contentStackRef, tick),
-      // We don't need to rerender when this is mutated, so just expose as-is
+      // We don't need to rerender when these are mutated, so just expose as-is
       modalBodyDiv,
       modalFooterDiv,
       canCloseModalChecks: canCloseModalChecksRef,
