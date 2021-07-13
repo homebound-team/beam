@@ -15,7 +15,7 @@ export interface SelectFieldBaseProps<O, V extends Value> extends BeamSelectFiel
   getOptionLabel: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
-  onSelect: (keys: V[]) => void;
+  onSelect: (values: V[]) => void;
   options: O[];
   multiselect?: boolean;
 }

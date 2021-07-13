@@ -240,19 +240,22 @@ function TestSelectField<T extends object, V extends Value>(
   const [selectedOption, setSelectedOption] = useState<V | undefined>(props.value);
 
   return (
-    <SelectField<T, V>
-      // The `as any` is due to something related to https://github.com/emotion-js/emotion/issues/2169
-      // We may have to redo the conditional getOptionValue/getOptionLabel
-      {...(props as any)}
-      value={selectedOption}
-      onSelect={setSelectedOption}
-      errorMsg={
-        selectedOption !== undefined || props.disabled
-          ? ""
-          : "Select an option. Plus more error text to force it to wrap."
-      }
-      onBlur={action("onBlur")}
-      onFocus={action("onFocus")}
-    />
+    <div css={Css.df.$}>
+      <SelectField<T, V>
+        // The `as any` is due to something related to https://github.com/emotion-js/emotion/issues/2169
+        // We may have to redo the conditional getOptionValue/getOptionLabel
+        {...(props as any)}
+        value={selectedOption}
+        onSelect={setSelectedOption}
+        errorMsg={
+          selectedOption !== undefined || props.disabled
+            ? ""
+            : "Select an option. Plus more error text to force it to wrap."
+        }
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+      <div css={Css.m3.$}>value={selectedOption}</div>
+    </div>
   );
 }

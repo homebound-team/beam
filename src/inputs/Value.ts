@@ -9,6 +9,9 @@ import { Key } from "react";
  *
  * This is pretty constricting, so we loosen this to be a few more primitives
  * that we can deterministically convert back/forth.
+ *
+ * TODO: ...could we just use the option index value as the key, and call that
+ * good? I.e. selection state would just be "these indexes are currently selected".
  */
 export type Value = string | number | null | undefined | boolean;
 
