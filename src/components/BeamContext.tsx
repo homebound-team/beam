@@ -7,6 +7,7 @@ import { EmptyRef } from "src/utils/index";
 
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */
 export interface BeamContextState {
+  // SuperDrawer contentStack
   contentStack: MutableRefObject<ContentStack[]>;
   modalState: MutableRefObject<ModalProps | undefined>;
   canCloseModalChecks: MutableRefObject<Array<() => boolean>>;
