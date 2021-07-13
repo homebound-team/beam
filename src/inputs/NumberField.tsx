@@ -1,7 +1,7 @@
-import { useNumberField } from "@react-aria/numberfield";
-import { NumberFieldStateProps, useNumberFieldState } from "@react-stately/numberfield";
+import type { NumberFieldStateProps } from "@react-stately/numberfield";
 import { ReactNode, useMemo, useRef } from "react";
-import { useLocale } from "react-aria";
+import { useLocale, useNumberField } from "react-aria";
+import { useNumberFieldState } from "react-stately";
 import { Css, Xss } from "src/Css";
 import { TextFieldBase } from "./TextFieldBase";
 

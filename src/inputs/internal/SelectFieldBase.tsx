@@ -1,11 +1,7 @@
-import { useComboBox } from "@react-aria/combobox";
-import { useFilter } from "@react-aria/i18n";
-import { Item } from "@react-stately/collections";
-import { useComboBoxState } from "@react-stately/combobox";
 import { CollectionChildren, Selection } from "@react-types/shared";
-import React, { Key, ReactNode, useEffect, useRef, useState } from "react";
-import { useButton, useFocusRing, useOverlayPosition } from "react-aria";
-import { useMultipleSelectionState } from "react-stately";
+import { Key, ReactNode, useEffect, useRef, useState } from "react";
+import { useButton, useComboBox, useFilter, useFocusRing, useOverlayPosition } from "react-aria";
+import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
 import { ListBox, Popover } from "src/components/internal";
 import { Css, px } from "src/Css";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";

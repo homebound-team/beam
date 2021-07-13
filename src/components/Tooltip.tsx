@@ -1,7 +1,7 @@
-import { useTooltipTriggerState } from "@react-stately/tooltip";
 import React, { ReactElement, ReactNode, useRef, useState } from "react";
 import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
 import { usePopper } from "react-popper";
+import { useTooltipTriggerState } from "react-stately";
 import { Css } from "src/Css";
 
 // We combine react-popper and aria-tooltip to makeup the tooltip component for the following reasons:

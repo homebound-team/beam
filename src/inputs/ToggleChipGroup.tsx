@@ -1,7 +1,6 @@
-import { useCheckboxGroup } from "@react-aria/checkbox";
-import { CheckboxGroupState, useCheckboxGroupState } from "@react-stately/checkbox";
 import { useRef } from "react";
-import { useCheckboxGroupItem, useFocusRing, VisuallyHidden } from "react-aria";
+import { useCheckboxGroup, useCheckboxGroupItem, useFocusRing, VisuallyHidden } from "react-aria";
+import { CheckboxGroupState, useCheckboxGroupState } from "react-stately";
 import { Label } from "src/components/Label";
 import { Css } from "src/Css";
 
