@@ -40,6 +40,7 @@ export function SuperDrawer(): ReactPortal | null {
       modalBodyRef.current.appendChild(modalBodyDiv);
       modalFooterRef.current.appendChild(modalFooterDiv);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modalBodyRef.current, modalFooterRef.current, modalState.current]);
 
   if (contentStack.current.length === 0) {
@@ -88,7 +89,7 @@ export function SuperDrawer(): ReactPortal | null {
             {/* Content container */}
             <motion.aside
               key="superDrawerContainer"
-              css={Css.bgWhite.h100.maxw(px(1040)).w100.df.flexColumn.$}
+              css={Css.bgWhite.h100.maxw(px(1040)).w100.df.flexColumn.relative.$}
               // Keeping initial x to 1040 as this will still work if the container is smaller
               initial={{ x: 1040 }}
               animate={{ x: 0 }}
@@ -102,9 +103,9 @@ export function SuperDrawer(): ReactPortal | null {
                 {/* Left */}
                 <div css={Css.df.itemsCenter.$}>
                   <div css={Css.xl2Em.gray900.mr2.$} {...testId.title}>
-                    {title}
+                    {modalState.current?.title || title}
                   </div>
-                  {titleLeftContent || null}
+                  {!modalState.current && (titleLeftContent || null)}
                 </div>
                 {/* Right */}
                 {!modalState.current && (
@@ -132,17 +133,22 @@ export function SuperDrawer(): ReactPortal | null {
                   </div>
                 )}
               </header>
-              {modalState.current ? (
+              {content}
+              {modalState.current && (
                 // Forcing some design constraints on the modal component
-                <div css={Css.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn.$}>
+                <div
+                  css={
+                    // topPX(81) is the offset from the header
+                    Css.fg1.topPx(81).left0.right0.bottom0.absolute.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn
+                      .z5.$
+                  }
+                >
                   {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
                   {modalState.current.content}
-                  {/* TODO Work in some notion of the modal size + width/height + scrolling?*/}
+                  {/* TODO: Work in some notion of the modal size + width/height + scrolling?*/}
                   <div ref={modalBodyRef} />
                   <div ref={modalFooterRef} />
                 </div>
-              ) : (
-                content
               )}
             </motion.aside>
           </motion.div>
