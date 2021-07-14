@@ -25,8 +25,7 @@ export default { title: "Forms/Super Drawer App", decorators: [withBeamDecorator
 export function SuperDrawerApp() {
   const { openInDrawer } = useSuperDrawer();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(openSuperDrawer, []);
+  useEffect(openSuperDrawer, [openInDrawer]);
 
   function openSuperDrawer() {
     openInDrawer({

@@ -138,13 +138,14 @@ export function SuperDrawer(): ReactPortal | null {
                 // Forcing some design constraints on the modal component
                 <div
                   css={
+                    // topPX(81) is the offset from the header
                     Css.fg1.topPx(81).left0.right0.bottom0.absolute.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn
                       .z5.$
                   }
                 >
                   {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
                   {modalState.current.content}
-                  {/* TODO Work in some notion of the modal size + width/height + scrolling?*/}
+                  {/* TODO: Work in some notion of the modal size + width/height + scrolling?*/}
                   <div ref={modalBodyRef} />
                   <div ref={modalFooterRef} />
                 </div>
