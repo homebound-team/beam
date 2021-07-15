@@ -8,3 +8,4 @@ export * from "./BoundRichTextField";
 export * from "./BoundSelectField";
 export * from "./BoundTextAreaField";
 export * from "./BoundTextField";
+export * from "./BoundToggleChipGroupField";

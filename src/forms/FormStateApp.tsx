@@ -11,7 +11,7 @@ import {
   SimpleHeaderAndDataWith,
 } from "src/components";
 import { Css } from "src/Css";
-import { BoundDateField, BoundMultiSelectField, BoundNumberField, BoundSelectField, BoundTextField } from "src/forms";
+import { BoundDateField, BoundMultiSelectField, BoundNumberField, BoundSelectField, BoundTextField, BoundToggleChipGroupField } from "src/forms";
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
@@ -61,6 +61,14 @@ export function FormStateApp() {
     { id: "sh:3", name: "Circle" },
   ];
 
+  const animals = [
+    { value:"a:1", label: "Cat" },
+    { value:"a:2", label: "Dog" },
+    { value:"a:3", label: "Fish" },
+    { value:"a:4", label: "Iguana" },
+    { value:"a:5", label: "Turtle" },
+  ]
+
   return (
     <Observer>
       {() => (
@@ -76,6 +84,7 @@ export function FormStateApp() {
               <br />
               <BoundMultiSelectField field={formState.favoriteShapes} options={shapes} />
               <BoundCheckboxGroupField field={formState.favoriteColors} options={colors} />
+              <BoundToggleChipGroupField field={formState.animals} options={animals} />
             </div>
 
             <div>
@@ -142,4 +151,5 @@ export const formConfig: ObjectConfig<AuthorInput> = {
       title: { type: "value", rules: [required] },
     },
   },
+  animals: { type: "value", rules: [required] },
 };

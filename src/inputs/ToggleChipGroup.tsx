@@ -9,7 +9,7 @@ type ToggleChipItemProps = {
   value: string;
 };
 
-interface ToggleChipGroupProps {
+export interface ToggleChipGroupProps {
   label: string;
   options: ToggleChipItemProps[];
   values: string[];

@@ -20,6 +20,7 @@ export interface AuthorInput {
   favoriteColors?: string[] | null;
   favoriteShapes?: string[] | null;
   isAvailable?: boolean | null;
+  animals?: string[] | null;
 }
 
 export interface AuthorAddress {
