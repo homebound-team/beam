@@ -14,7 +14,7 @@ export default {
 export function DateFields() {
   return samples(
     ["TextField for comparison", <TextField label="First Name" value="Foo" onChange={() => {}} />],
-    ["With Label", <TestDateField label="Start Date" />],
+    ["With Label", <TestDateField label="Projected Client Presentation Date" />],
     ["Without Label", <TestDateField />],
     ["Disabled", <TestDateField disabled />],
     ["Error Message", <TestDateField errorMsg="Required" />],
