@@ -16,11 +16,14 @@ export function TestModalContent(props: { initNumSentences?: number; showLeftAct
     <>
       <ModalBody>
         <div css={Css.df.gap1.flexColumn.itemsStart.$}>
-          <Button label="Add more text" onClick={() => setNumSentences(numSentences + 2)} />
-          <Button label="Toggle Primary Disabled" onClick={() => setPrimaryDisabled(!primaryDisabled)} />
-          {showLeftAction && (
-            <Button label="Toggle Left Action Disabled" onClick={() => setLeftActionDisabled(!leftActionDisabled)} />
-          )}
+          <div css={Css.df.childGap1.$}>
+            <Button label="More" onClick={() => setNumSentences(numSentences + 2)} />
+            <Button label="Clear" onClick={() => setNumSentences(0)} />
+            <Button label="Primary" onClick={() => setPrimaryDisabled(!primaryDisabled)} />
+            {showLeftAction && (
+              <Button label="Left Action" onClick={() => setLeftActionDisabled(!leftActionDisabled)} />
+            )}
+          </div>
           <p>{"The body content of the modal. This content can be anything!".repeat(numSentences)}</p>
         </div>
       </ModalBody>

@@ -21,6 +21,8 @@ export interface ModalProps {
   size?: ModalSize | { width: ModalSize; height: number };
   /** The content of the modal; for consistent styling use a fragment with `<ModalBody />` and `<ModalFooter />`. */
   content: ReactNode;
+  /** Force scrolling i.e. to avoid content jumping left/right as scroll bar goes away/comes back. */
+  forceScrolling?: boolean;
 }
 
 /**
@@ -29,7 +31,7 @@ export interface ModalProps {
  * Provides underlay, modal container, and header. Will disable scrolling of page under the modal.
  */
 export function Modal(props: ModalProps) {
-  const { title, size = "md", content } = props;
+  const { title, size = "md", content, forceScrolling } = props;
   const ref = useRef(null);
   const { modalBodyDiv, modalFooterDiv, contentStack } = useContext(BeamContext);
   const { closeModal } = ourUseModal();
@@ -46,11 +48,13 @@ export function Modal(props: ModalProps) {
   const testId = useTestIds({}, testIdPrefix);
   usePreventScroll();
 
-  const [hasScroll, setHasScroll] = useState(false);
+  const [hasScroll, setHasScroll] = useState(forceScrolling ?? false);
   // This would be great to have work, but seems like the contentRef cannot be added/removed from the DOM or it breaks.
   // Still trying to work on it, though... must be another way around it.
   useResizeObserver(contentRef, ({ target }) => {
-    setHasScroll(target.scrollHeight > target.clientHeight);
+    if (forceScrolling === undefined) {
+      setHasScroll(target.scrollHeight > target.clientHeight);
+    }
   });
 
   // Even though we use raw-divs for the createPortal calls, we do actually need to
@@ -85,7 +89,10 @@ export function Modal(props: ModalProps) {
                 <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
               </span>
             </header>
-            <div ref={contentRef} css={Css.fg1.overflowYAuto.if(hasScroll).bb.bGray200.$}>
+            <div
+              ref={contentRef}
+              css={Css.fg1.overflowYAuto.if(hasScroll).bb.bGray200.if(!!forceScrolling).overflowYScroll.$}
+            >
               {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
               {content}
               <div ref={modalBodyRef} />
