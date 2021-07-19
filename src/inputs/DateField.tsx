@@ -35,16 +35,14 @@ export function DateField(props: DateFieldProps) {
   const textFieldProps = { ...otherProps, label: label ?? "date", isDisabled: disabled, isReadOnly: false };
   const { labelProps, inputProps } = useTextField(textFieldProps, inputRef);
 
-  const width = 128;
-
   return (
     <div
       css={{
-        ...Css.df.flexColumn.wPx(width).$,
+        ...Css.df.flexColumn.w100.maxw("550px").$,
         "& .DayPickerInput": Css.relative.$,
         // Copy/pasted from TextFieldBase to soften the border, fix our border/padding/height
         "& .DayPickerInput input": {
-          ...Css.add("resize", "none").bgWhite.wPx(width).sm.px1.hPx(40).gray900.br4.outline0.ba.bGray300.$,
+          ...Css.add("resize", "none").bgWhite.w100.sm.px1.hPx(40).gray900.br4.outline0.ba.bGray300.$,
           // Turn gray when disabled
           ...(disabled ? Css.gray400.bgGray100.cursorNotAllowed.$ : {}),
           ...(errorMsg ? Css.bRed600.$ : {}),
