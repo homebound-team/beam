@@ -1,4 +1,4 @@
-import { CollectionChildren, Selection } from "@react-types/shared";
+import { Selection } from "@react-types/shared";
 import { Key, ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useFocusRing, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
@@ -7,6 +7,14 @@ import { Css, px } from "src/Css";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
+
+type FieldState<O> = {
+  isOpen: boolean;
+  selectedKeys: Key[];
+  inputValue: string;
+  filteredOptions: O[];
+  selectedOptions: O[];
+};
 
 export interface SelectFieldBaseProps<O, V extends Value> extends BeamSelectFieldBaseProps<O> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
@@ -31,27 +39,87 @@ export interface SelectFieldBaseProps<O, V extends Value> extends BeamSelectFiel
  */
 export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<O, V>): JSX.Element {
   const {
-    getOptionValue,
-    getOptionLabel,
-    getOptionMenuLabel = getOptionLabel,
+    compact = false,
+    disabled: isDisabled = false,
+    errorMsg,
+    helperText,
+    label,
+    readOnly: isReadOnly = false,
     onSelect,
+    fieldDecoration,
     options,
-    values,
+    onBlur,
+    onFocus,
+    inlineLabel,
     multiselect = false,
-    ...beamSelectFieldBaseProps
+    getOptionLabel,
+    getOptionValue,
+    getOptionMenuLabel = getOptionLabel,
+    sizeToContent = false,
+    values,
+    ...otherProps
   } = props;
+
+  function onSelectionChange(keys: Selection): void {
+    // Close menu upon selection change only for Single selection mode
+    if (!multiselect) {
+      state.close();
+    }
+    if (keys === "all") {
+      return;
+    }
+    if (multiselect && keys.size === 0) {
+      // "All" happens if we selected everything or nothing.
+      setFieldState({
+        ...fieldState,
+        isOpen: true,
+        inputValue: "All",
+        selectedKeys: [],
+        selectedOptions: [],
+      });
+      onSelect && onSelect([]);
+      return;
+    }
+    const keysArray = [...keys.values()];
+    const firstKey = keysArray[0];
+    // Even though the key is number|string, this will always be a string
+    const firstSelectedOption = options.find((o) => valueToKey(getOptionValue(o)) === firstKey);
+    if (multiselect) {
+      setFieldState({
+        ...fieldState,
+        isOpen: true,
+        inputValue: keysArray.length === 1 ? getOptionLabel(firstSelectedOption!) : "",
+        selectedKeys: keysArray as Key[],
+        selectedOptions: options.filter((o) => keysArray.includes(valueToKey(getOptionValue(o)))),
+      });
+    } else {
+      setFieldState({
+        ...fieldState,
+        isOpen: false,
+        inputValue: firstSelectedOption ? getOptionLabel(firstSelectedOption) : "",
+        selectedKeys: [firstKey] as Key[],
+        selectedOptions: firstSelectedOption ? [firstSelectedOption] : [],
+      });
+    }
+    onSelect && onSelect(([...keys.values()] as Key[]).map(keyToValue) as V[]);
+  }
+
+  function onInputChange(value: string) {
+    setFieldState((prevState) => ({
+      ...prevState,
+      isOpen: true,
+      inputValue: value,
+      filteredOptions: options.filter((o) => contains(getOptionLabel(o), value)),
+    }));
+  }
+
+  function onOpenChange(isOpen: boolean) {
+    setFieldState((prevState) => ({ ...prevState, isOpen }));
+  }
 
   const { contains } = useFilter({ sensitivity: "base" });
 
-  type FieldState = {
-    isOpen: boolean;
-    selectedKeys: Key[];
-    inputValue: string;
-    filteredOptions: O[];
-    selectedOptions: O[];
-  };
-
-  function initFieldState(): FieldState {
+  function initFieldState(): FieldState<O> {
     // Use the current value to find the option
     const selectedKeys: V[] = values ?? [];
     const selectedOptions = options.filter((o) => selectedKeys.includes(getOptionValue(o)));
@@ -69,133 +137,28 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     };
   }
 
-  const [fieldState, setFieldState] = useState<FieldState>(initFieldState);
+  const [fieldState, setFieldState] = useState<FieldState<O>>(initFieldState);
 
   // Ensure we reset if the field's values change
   useEffect(() => setFieldState(initFieldState), [values]);
 
-  return (
-    <ComboBox<O, Key>
-      {...beamSelectFieldBaseProps}
-      multiselect={multiselect}
-      filteredOptions={fieldState.filteredOptions}
-      inputValue={fieldState.inputValue}
-      selectedKeys={fieldState.selectedKeys}
-      selectedOptions={fieldState.selectedOptions}
-      getOptionLabel={getOptionLabel}
-      getOptionValue={(o) => valueToKey(getOptionValue(o))}
-      onSelectionChange={(keys) => {
-        const fieldState = { filteredOptions: options };
-
-        if (keys === "all") {
-          return;
-        }
-
-        if (multiselect && keys.size === 0) {
-          // "All" happens if we selected everything or nothing.
-          setFieldState({
-            ...fieldState,
-            isOpen: true,
-            inputValue: "All",
-            selectedKeys: [],
-            selectedOptions: [],
-          });
-          onSelect && onSelect([]);
-          return;
-        }
-
-        const keysArray = [...keys.values()];
-        const firstKey = keysArray[0];
-        // Even though the key is number|string, this will always be a string
-        const firstSelectedOption = options.find((o) => valueToKey(getOptionValue(o)) === firstKey);
-
-        if (multiselect) {
-          setFieldState({
-            ...fieldState,
-            isOpen: true,
-            inputValue: keysArray.length === 1 ? getOptionLabel(firstSelectedOption!) : "",
-            selectedKeys: keysArray as Key[],
-            selectedOptions: options.filter((o) => keysArray.includes(valueToKey(getOptionValue(o)))),
-          });
-        } else {
-          setFieldState({
-            ...fieldState,
-            isOpen: false,
-            inputValue: firstSelectedOption ? getOptionLabel(firstSelectedOption) : "",
-            selectedKeys: [firstKey] as Key[],
-            selectedOptions: firstSelectedOption ? [firstSelectedOption] : [],
-          });
-        }
-
-        onSelect && onSelect(([...keys.values()] as Key[]).map(keyToValue) as V[]);
-      }}
-      onInputChange={(value) => {
-        setFieldState((prevState) => ({
-          ...prevState,
-          isOpen: true,
-          inputValue: value,
-          filteredOptions: options.filter((o) => contains(getOptionLabel(o), value)),
-        }));
-      }}
-      onOpenChange={(isOpen) => {
-        setFieldState((prevState) => ({
-          ...prevState,
-          isOpen,
-        }));
-      }}
-    >
-      {(item) => (
-        <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
-          {getOptionMenuLabel(item)}
-        </Item>
-      )}
-    </ComboBox>
-  );
-}
-
-interface ComboBoxProps<O, V extends Key> extends BeamSelectFieldBaseProps<O> {
-  children: CollectionChildren<O>;
-  filteredOptions?: O[];
-  inputValue?: string | undefined;
-  selectedKeys?: Key[];
-  onSelectionChange: (keys: Selection) => any;
-  onOpenChange: (isOpen: boolean) => void;
-  onInputChange: (value: string) => void;
-  selectedOptions: O[];
-  multiselect: boolean;
-  getOptionLabel: (opt: O) => string;
-  getOptionValue: (opt: O) => V;
-}
-
-/** Ties together SelectFieldInput (text field) and the ListBox (drop down). */
-function ComboBox<O, V extends Key>(props: ComboBoxProps<O, V>) {
-  const {
-    compact = false,
-    disabled: isDisabled = false,
-    errorMsg,
-    helperText,
+  const comboBoxProps = {
+    ...otherProps,
+    inputValue: fieldState.inputValue,
+    items: fieldState.filteredOptions,
+    isDisabled,
+    isReadOnly,
     label,
     onInputChange,
-    onSelectionChange,
-    readOnly: isReadOnly = false,
-    fieldDecoration,
-    filteredOptions: items,
-    onBlur,
-    onFocus,
-    inlineLabel,
-    selectedKeys,
-    selectedOptions,
-    multiselect,
-    getOptionLabel,
-    getOptionValue,
-    sizeToContent = false,
-    ...otherProps
-  } = props;
+    onOpenChange,
+    menuTrigger: "focus" as const,
+    children: (item: any) => (
+      <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
+        {getOptionMenuLabel(item)}
+      </Item>
+    ),
+  };
 
-  type MenuTriggerAction = "focus" | "input" | "manual";
-  const menuTrigger: MenuTriggerAction = "focus";
-
-  const comboBoxProps = { ...otherProps, items, isDisabled, isReadOnly, label, onInputChange, menuTrigger };
   const state = useComboBoxState<any>({
     ...comboBoxProps,
     // useComboBoxState.onSelectionChange will be executed if a keyboard interaction (Enter key) is used to select an item
@@ -215,14 +178,8 @@ function ComboBox<O, V extends Key>(props: ComboBoxProps<O, V>) {
     selectionMode: multiselect ? "multiple" : "single",
     // Do not allow an empty selection if single select mode
     disallowEmptySelection: !multiselect,
-    selectedKeys,
-    onSelectionChange: (keys) => {
-      // Close menu upon selection change only for Single selection mode
-      if (!multiselect) {
-        state.close();
-      }
-      onSelectionChange(keys);
-    },
+    selectedKeys: fieldState.selectedKeys,
+    onSelectionChange,
   });
 
   //@ts-ignore - `selectionManager.state` exists, but not according to the types
@@ -287,7 +244,7 @@ function ComboBox<O, V extends Key>(props: ComboBoxProps<O, V>) {
         inlineLabel={inlineLabel}
         label={label}
         labelProps={labelProps}
-        selectedOptions={selectedOptions}
+        selectedOptions={fieldState.selectedOptions}
         getOptionValue={getOptionValue}
         sizeToContent={sizeToContent}
       />
@@ -303,9 +260,9 @@ function ComboBox<O, V extends Key>(props: ComboBoxProps<O, V>) {
             state={state}
             compact={compact}
             listBoxRef={listBoxRef}
-            selectedOptions={selectedOptions}
+            selectedOptions={fieldState.selectedOptions}
             getOptionLabel={getOptionLabel}
-            getOptionValue={getOptionValue}
+            getOptionValue={(o) => valueToKey(getOptionValue(o))}
           />
         </Popover>
       )}
