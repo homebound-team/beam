@@ -2,7 +2,7 @@ import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
 import { Css } from "src/Css";
-import { TextAreaField, TextAreaFieldProps } from "src/inputs";
+import { TextAreaField, TextAreaFieldProps, TextField } from "src/inputs";
 
 export default {
   component: TextAreaField,
@@ -24,6 +24,7 @@ export function TextAreas() {
           helperText="Some really long helper text that we expect to wrap."
         />
         <ValidationTextArea value="Not enough characters" />
+        <TextField label="Regular Field For Reference" value="value" onChange={() => {}} />
       </div>
     </div>
   );
