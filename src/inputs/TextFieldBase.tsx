@@ -85,7 +85,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         css={{
           ...Css.add("resize", "none").bgWhite.sm.px1.hPx(40).gray900.br4.outline0.ba.bGray300.if(compact).hPx(32).$,
           ...xss,
-          ...Css.if(multiline).mh(px(96)).py1.px2.$,
+          ...Css.if(multiline).mh(px(96)).py1.$,
           "&:focus": Css.bLightBlue700.$,
           "&:disabled": Css.gray400.bgGray100.cursorNotAllowed.$,
           ...(errorMsg ? Css.bRed600.$ : {}),
