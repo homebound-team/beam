@@ -20,6 +20,7 @@ export function DefaultAlert() {
         <div css={Css.b.$}>Holy Smokes!</div>
         <div>Something seriously bad happened.</div>
       </Alert>
+      <Alert onClose={action("close")}>Something seriously bad happened.</Alert>
     </div>
   );
 }
