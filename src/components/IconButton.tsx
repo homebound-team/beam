@@ -20,6 +20,7 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
 export function IconButton(props: IconButtonProps) {
   const { onClick: onPress, disabled: isDisabled, color, icon, autoFocus, inc, buttonRef, menuTriggerProps } = props;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const ref = buttonRef || useRef(null);
   const { buttonProps } = useButton(ariaProps, ref);
   const { focusProps, isFocusVisible } = useFocusRing(ariaProps);
