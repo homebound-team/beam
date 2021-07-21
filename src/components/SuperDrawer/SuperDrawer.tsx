@@ -28,7 +28,7 @@ import { useTestIds } from "src/utils";
  * above the SuperDrawer.
  */
 export function SuperDrawer(): ReactPortal | null {
-  const { contentStack, modalState, modalBodyDiv, modalFooterDiv } = useContext(BeamContext);
+  const { drawerContentStack: contentStack, modalState, modalBodyDiv, modalFooterDiv } = useContext(BeamContext);
   const { closeDrawer } = useSuperDrawer();
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
   const modalFooterRef = useRef<HTMLDivElement | null>(null);

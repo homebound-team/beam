@@ -33,7 +33,7 @@ export interface ModalProps {
 export function Modal(props: ModalProps) {
   const { title, size = "md", content, forceScrolling } = props;
   const ref = useRef(null);
-  const { modalBodyDiv, modalFooterDiv, contentStack } = useContext(BeamContext);
+  const { modalBodyDiv, modalFooterDiv, drawerContentStack } = useContext(BeamContext);
   const { closeModal } = ourUseModal();
   const { overlayProps, underlayProps } = useOverlay(
     { ...props, isOpen: true, onClose: closeModal, isDismissable: true },
@@ -61,7 +61,7 @@ export function Modal(props: ModalProps) {
   // use refs + useEffect to stitch those raw divs back into the React component tree.
   useEffect(() => {
     // If the superdrawer is open, let it own the modal content
-    if (contentStack.current.length > 0) {
+    if (drawerContentStack.current.length > 0) {
       return;
     }
     modalBodyRef.current!.appendChild(modalBodyDiv);
