@@ -1,3 +1,4 @@
+export * from "./Alert";
 export { BeamProvider } from "./BeamContext";
 export * from "./Button";
 export * from "./ButtonGroup";
