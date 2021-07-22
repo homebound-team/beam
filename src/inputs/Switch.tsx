@@ -114,7 +114,7 @@ const switchCircleDefaultStyles = (isCompact: boolean) => ({
   ...Css.wPx(circleDiameter(isCompact))
     .hPx(circleDiameter(isCompact))
     .br100.bgWhite.bshBasic.absolute.leftPx(2)
-    .topPx(isCompact ? 1 : 2).transition.$,
+    .topPx(isCompact ? 1 : 2).transition.df.itemsCenter.justifyCenter.$,
   svg: Css.hPx(toggleHeight(isCompact) / 2).wPx(toggleHeight(isCompact) / 2).$,
 });
 
