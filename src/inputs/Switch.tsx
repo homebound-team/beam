@@ -31,8 +31,8 @@ export function Switch(props: SwitchProps) {
     onChange,
     withIcon,
     compact = false,
-    label = "inline",
-    labelStyle,
+    label,
+    labelStyle = "inline",
     ...otherProps
   } = props;
   const ariaProps = { isSelected, isDisabled, ...otherProps };
@@ -81,7 +81,7 @@ export function Switch(props: SwitchProps) {
       </div>
       {/* Since we are using childGap, we must wrap the label in an element and
       match the height of the icon for horizontal alignment */}
-      {label === "inline" && (
+      {labelStyle === "inline" && (
         <span
           css={{
             // LineHeight is conditionally applied to handle compact version text alignment
