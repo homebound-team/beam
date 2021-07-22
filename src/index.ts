@@ -6,6 +6,6 @@ export * from "./forms";
 export * from "./hooks";
 export * from "./inputs";
 export * from "./interfaces";
-export * as BeamMocks from "./mocks";
+export * as BeamMocks from "./mocks"; // BeamMocks used to avoid naming collisions for exports
 export * from "./utils/defaultTestId";
 export * from "./utils/useTestIds";
