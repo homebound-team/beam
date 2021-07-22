@@ -3,7 +3,7 @@ import { DismissButton, useListBox } from "react-aria";
 import { SelectState } from "react-stately";
 import { Virtuoso } from "react-virtuoso";
 import { Chip } from "src/components/Chip";
-import { Option } from "src/components/internal";
+import { Option } from "src/components/internal/index";
 import { Css } from "src/Css";
 
 interface ListBoxProps<O, V extends Key> {
@@ -61,6 +61,10 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
         <Virtuoso
           totalListHeightChanged={setListHeight}
           totalCount={state.collection.size}
+          // We don't really need to set this, but it's handy for tests, which would
+          // otherwise render just 1 row. A better way to do this would be to jest.mock
+          // out Virtuoso with an impl that just rendered everything, but doing this for now.
+          initialItemCount={3}
           itemContent={(idx) => {
             // MapIterator doesn't have at/index lookup so make a copy
             const keys = [...state.collection.getKeys()];

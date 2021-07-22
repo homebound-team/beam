@@ -1,11 +1,4 @@
-import React, {
-  Fragment,
-  InputHTMLAttributes,
-  LabelHTMLAttributes,
-  MutableRefObject,
-  ReactNode,
-  useState,
-} from "react";
+import React, { Fragment, InputHTMLAttributes, LabelHTMLAttributes, MutableRefObject, ReactNode } from "react";
 import { mergeProps, useHover } from "react-aria";
 import { ComboBoxState } from "react-stately";
 import { Icon } from "src/components";
@@ -73,7 +66,6 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
   const readOnlyStyles = isReadOnly ? Css.bn.pl0.pt0.add("backgroundColor", "unset").$ : {};
   const tid = useTestIds(inputProps); // data-testid comes in through here
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
-  const [isSizeCurrentlyBasedOnContent, setIsSizeBasedOnContent] = useState(true);
 
   return (
     <Fragment>
@@ -156,12 +148,16 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             inputProps.onKeyDown && inputProps.onKeyDown(e);
           }}
           onBlur={() => {
+            // We purposefully override onBlur here instead of using mergeProps, b/c inputProps.onBlur
+            // goes into useComboBox's onBlur, which calls setFocused(false), which in useComboBoxState
+            // detects a) there is no props.selectedKey (b/c we don't pass it), and b) there is an
+            // `inputValue`, so it thinks it needs to call `resetInputValue()`.
+            //
+            // I assume we don't pass `selectedKey` b/c we support multiple keys.
             maybeCall(onBlur);
-            setIsSizeBasedOnContent(true);
             state.close();
           }}
           onFocus={(e) => {
-            setIsSizeBasedOnContent(false);
             maybeCall(onFocus);
             if (isReadOnly) return;
             e.target.select();
@@ -169,9 +165,9 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
           }}
           size={
             sizeToContent
-              ? isSizeCurrentlyBasedOnContent
-                ? String(inputProps.value || "").length || 1
-                : Math.max(String(inputProps.value || "").length, 20)
+              ? isFocused
+                ? Math.max(String(inputProps.value || "").length, 20)
+                : String(inputProps.value || "").length || 1
               : undefined
           }
         />

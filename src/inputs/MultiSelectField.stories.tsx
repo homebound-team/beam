@@ -163,7 +163,6 @@ function TestMultiSelectField<T extends object, V extends Value>(
   props: Optional<Omit<MultiSelectFieldProps<T, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element {
   const [selectedOptions, setSelectedOptions] = useState<V[]>(props.values);
-
   return (
     <MultiSelectField<T, V>
       // The `as any` is due to something related to https://github.com/emotion-js/emotion/issues/2169
