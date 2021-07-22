@@ -2,8 +2,9 @@ import { Selection } from "@react-types/shared";
 import { Key, ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useFocusRing, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
-import { ListBox, Popover } from "src/components/internal";
+import { Popover } from "src/components/internal";
 import { Css, px } from "src/Css";
+import { ListBox } from "src/inputs/internal/ListBox";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
@@ -60,6 +61,8 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     ...otherProps
   } = props;
 
+  const { contains } = useFilter({ sensitivity: "base" });
+
   function onSelectionChange(keys: Selection): void {
     // Close menu upon selection change only for Single selection mode
     if (!multiselect) {
@@ -101,7 +104,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         selectedOptions: firstSelectedOption ? [firstSelectedOption] : [],
       });
     }
-    onSelect && onSelect(([...keys.values()] as Key[]).map(keyToValue) as V[]);
+    onSelect(([...keys.values()] as Key[]).map(keyToValue) as V[]);
   }
 
   function onInputChange(value: string) {
@@ -116,8 +119,6 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   function onOpenChange(isOpen: boolean) {
     setFieldState((prevState) => ({ ...prevState, isOpen }));
   }
-
-  const { contains } = useFilter({ sensitivity: "base" });
 
   function initFieldState(): FieldState<O> {
     // Use the current value to find the option

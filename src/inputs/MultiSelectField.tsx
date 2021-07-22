@@ -42,10 +42,10 @@ export function MultiSelectField<O, V extends Value>(
       options={options}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
-      values={values.map((v) => String(v))}
-      onSelect={(keys) => {
+      values={values}
+      onSelect={(values) => {
         const [selectedValues, selectedOptions] = options
-          .filter((o) => keys.includes(String(getOptionValue(o))))
+          .filter((o) => values.includes(getOptionValue(o)))
           .reduce(
             (acc, o) => {
               acc[0].push(getOptionValue(o));
@@ -54,7 +54,7 @@ export function MultiSelectField<O, V extends Value>(
             },
             [[] as V[], [] as O[]],
           );
-        onSelect && onSelect(selectedValues, selectedOptions);
+        onSelect(selectedValues, selectedOptions);
       }}
     />
   );
