@@ -58,6 +58,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     getOptionMenuLabel = getOptionLabel,
     sizeToContent = false,
     values,
+    nothingSelectedText = "",
     ...otherProps
   } = props;
 
@@ -76,7 +77,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
       setFieldState({
         ...fieldState,
         isOpen: true,
-        inputValue: "All",
+        inputValue: nothingSelectedText,
         selectedKeys: [],
         selectedOptions: [],
       });
@@ -131,7 +132,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         selectedOptions.length === 1
           ? getOptionLabel(selectedOptions[0])
           : multiselect && selectedOptions.length === 0
-          ? "All"
+          ? nothingSelectedText
           : "",
       filteredOptions: options,
       selectedOptions: selectedOptions,
@@ -285,4 +286,6 @@ export interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
   onBlur?: () => void;
   onFocus?: () => void;
   sizeToContent?: boolean;
+  /** The text to show when nothing is selected, i.e. could be "All" for filters. */
+  nothingSelectedText?: string;
 }

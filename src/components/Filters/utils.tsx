@@ -82,6 +82,7 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
           inlineLabel
           sizeToContent={!inModal}
           onSelect={(values) => updateFilter(filter, key, values)}
+          nothingSelectedText="All"
         />,
         inModal,
         filterDef.label,
