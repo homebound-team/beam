@@ -6,6 +6,6 @@ export * from "./forms";
 export * from "./hooks";
 export * from "./inputs";
 export * from "./interfaces";
-export * from "./mocks";
+export * as BeamMocks from "./mocks";
 export * from "./utils/defaultTestId";
 export * from "./utils/useTestIds";
