@@ -1,3 +1,3 @@
-export * as DateField from "./MockDateField";
-export * as SelectField from "./MockSelectField";
-export * as TextField from "./MockTextField";
+export * from "./MockDateField";
+export * from "./MockSelectField";
+export * from "./MockTextField";
