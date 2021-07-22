@@ -65,7 +65,7 @@ describe("useSuperDrawer", () => {
     act(() => superDrawerHook.addCanCloseDrawerCheck(() => true));
 
     // Then expect no canCloseDrawerCheck to be added
-    expect(beamHook.canCloseDrawerChecks.current).toHaveLength(0);
+    expect(beamHook.drawerCanCloseChecks.current).toHaveLength(0);
   });
 
   it("should add canCloseDrawerCheckDetail when SuperDrawer details is opened", () => {
@@ -102,7 +102,7 @@ describe("useSuperDrawer", () => {
     act(() => superDrawerHook.addCanCloseDrawerDetailCheck(() => true));
 
     // Then expect the canCloseDrawerDetailChecks to be empty
-    expect(beamHook.canCloseDrawerDetailsChecks.current).toHaveLength(0);
+    expect(beamHook.drawerCanCloseDetailsChecks.current).toHaveLength(0);
   });
 
   it("should show ConfirmCloseModal when a canCloseDrawerCheck fails", async () => {
@@ -132,6 +132,22 @@ describe("useSuperDrawer", () => {
 
     // Then expect the drawer to not close.
     expect(hook.closeDrawer()).toBeFalsy();
+  });
+
+  it("calls onClose when closed", () => {
+    const onClose = jest.fn();
+
+    // Given the useSuperDrawer hook
+    const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
+
+    // When the drawer is opened and closed
+    act(() => hook.openInDrawer({ title: "title", content: "content", onClose }));
+    act(() => {
+      hook.closeDrawer();
+    });
+
+    // Then we called the callback
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
 

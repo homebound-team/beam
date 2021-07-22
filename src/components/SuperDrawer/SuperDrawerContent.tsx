@@ -25,7 +25,7 @@ interface SuperDrawerContentProps {
  */
 export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProps) => {
   const { closeDrawerDetail } = useSuperDrawer();
-  const { contentStack } = useContext(BeamContext);
+  const { drawerContentStack: contentStack } = useContext(BeamContext);
 
   // Determine if the current element is a new content element or an detail element
   const { kind } = contentStack.current[contentStack.current.length - 1];

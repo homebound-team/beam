@@ -14,16 +14,9 @@ export interface OpenInDrawerOpts {
   onPrevClick?: () => void;
   /** Invokes right, disabled if undefined. */
   onNextClick?: () => void;
-  content: ReactNode;
-  /**
-   * Handler when clicking on the following elements:
-   * - `X` icon
-   * - Background overlay
-   *
-   * @default Closes the SuperDrawer by calling `closeDrawer()`
-   * @deprecated use `addCanCloseDrawer`
-   */
+  /** Adds a callback that is called _after_ close has definitely happened. */
   onClose?: () => void;
+  content: ReactNode;
 }
 
 export interface OpenDetailOpts {
@@ -38,7 +31,7 @@ export type ContentStack = { kind: "open"; opts: OpenInDrawerOpts } | { kind: "d
 export interface UseSuperDrawerHook {
   /** Opens a new drawer, throwing away the current drawer is one exists. */
   openInDrawer: (opts: OpenInDrawerOpts) => void;
-  /** Closes the entire drawer. */
+  /** Closes the entire drawer, returns false is the previous drawer can't be closed. */
   closeDrawer: () => boolean;
   /** Opens a detail view in the current drawer. */
   openDrawerDetail: (opts: OpenDetailOpts) => void;
@@ -63,7 +56,12 @@ export interface UseSuperDrawerHook {
 }
 
 export function useSuperDrawer(): UseSuperDrawerHook {
-  const { contentStack, modalState, canCloseDrawerChecks, canCloseDrawerDetailsChecks } = useContext(BeamContext);
+  const {
+    drawerContentStack: contentStack,
+    modalState,
+    drawerCanCloseChecks: canCloseChecks,
+    drawerCanCloseDetailsChecks: canCloseDetailsChecks,
+  } = useContext(BeamContext);
   const { openModal } = useModal();
 
   // Separate close actions to reference then in actions
@@ -72,9 +70,13 @@ export function useSuperDrawer(): UseSuperDrawerHook {
       /** Attempts to close the drawer. If any checks fail, a error modal will appear */
       closeDrawer() {
         const contentStackLength = contentStack.current.length;
+        if (contentStackLength === 0) {
+          return true;
+        }
+
         // Attempt to close each drawer details
         for (let i = contentStackLength - 2; i >= 0; i--) {
-          for (const canCloseDrawerDetail of canCloseDrawerDetailsChecks.current[i] ?? []) {
+          for (const canCloseDrawerDetail of canCloseDetailsChecks.current[i] ?? []) {
             if (!canCloseDrawerDetail()) {
               openModal({
                 title: "Confirm",
@@ -86,7 +88,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         }
 
         // Attempt to close the drawer
-        for (const canCloseDrawer of canCloseDrawerChecks.current) {
+        for (const canCloseDrawer of canCloseChecks.current) {
           if (!canCloseDrawer()) {
             openModal({
               title: "Confirm",
@@ -98,9 +100,13 @@ export function useSuperDrawer(): UseSuperDrawerHook {
 
         /** Reset the contentStack, all checks and modalState */
         function onClose() {
+          const first = contentStack.current[0];
+          if (first.kind === "open" && first.opts.onClose) {
+            first.opts.onClose();
+          }
           contentStack.current = [];
-          canCloseDrawerChecks.current = [];
-          canCloseDrawerDetailsChecks.current = [];
+          canCloseChecks.current = [];
+          canCloseDetailsChecks.current = [];
           // Reset Modal state
           modalState.current = undefined;
         }
@@ -108,12 +114,13 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         onClose();
         return true;
       },
+
       closeDrawerDetail() {
         if (!(contentStack.current.length > 1)) return;
 
         // Attempt to close the current drawer details
-        for (const canCloseDrawerDetail of canCloseDrawerDetailsChecks.current[contentStack.current.length - 2] ?? []) {
-          if (!canCloseDrawerDetail()) {
+        for (const check of canCloseDetailsChecks.current[contentStack.current.length - 2] ?? []) {
+          if (!check()) {
             openModal({
               title: "Confirm",
               content: <ConfirmCloseModal onClose={onClose} />,
@@ -126,7 +133,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         function onClose() {
           // Pop contentStack and the current canCloseDrawerDetailsCheck
           contentStack.current = contentStack.current.slice(0, -1);
-          canCloseDrawerDetailsChecks.current = canCloseDrawerDetailsChecks.current.slice(0, -1);
+          canCloseDetailsChecks.current = canCloseDetailsChecks.current.slice(0, -1);
           // Reset Modal state
           modalState.current = undefined;
         }
@@ -134,7 +141,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         onClose();
       },
     };
-  }, [canCloseDrawerChecks, canCloseDrawerDetailsChecks, contentStack, modalState, openModal]);
+  }, [canCloseChecks, canCloseDetailsChecks, contentStack, modalState, openModal]);
 
   // useMemo the actions separately from the dynamic isDrawerOpen value
   const actions = useMemo(() => {
@@ -167,7 +174,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
           return;
         }
 
-        canCloseDrawerChecks.current = [...canCloseDrawerChecks.current, canCloseCheck];
+        canCloseChecks.current = [...canCloseChecks.current, canCloseCheck];
       },
       /** Add a new close check to the current SuperDrawer detail */
       addCanCloseDrawerDetailCheck(canCloseCheck: () => boolean) {
@@ -179,13 +186,13 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         }
 
         // Add canCloseDetails check to the current details content
-        canCloseDrawerDetailsChecks.current[stackLength - 2] = [
-          ...(canCloseDrawerDetailsChecks.current[stackLength - 2] ?? []),
+        canCloseDetailsChecks.current[stackLength - 2] = [
+          ...(canCloseDetailsChecks.current[stackLength - 2] ?? []),
           canCloseCheck,
         ];
       },
     };
-  }, [canCloseDrawerChecks, canCloseDrawerDetailsChecks, closeActions, contentStack]);
+  }, [canCloseChecks, canCloseDetailsChecks, closeActions, contentStack]);
 
   return {
     ...actions,

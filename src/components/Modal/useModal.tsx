@@ -1,17 +1,17 @@
 import { useContext, useMemo, useRef } from "react";
 import { BeamContext } from "src/components/BeamContext";
-import { Callback } from "src/types";
+import { Callback, CheckFn } from "src/types";
 import { ModalProps } from "./Modal";
 
 export interface UseModalHook {
   openModal: (props: ModalProps) => void;
   closeModal: Callback;
-  addCanClose: (canClose: () => boolean) => void;
+  addCanClose: (canClose: CheckFn) => void;
 }
 
 export function useModal(): UseModalHook {
-  const { modalState, canCloseModalChecks } = useContext(BeamContext);
-  const lastCanClose = useRef<undefined | (() => boolean)>();
+  const { modalState, modalCanCloseChecks } = useContext(BeamContext);
+  const lastCanClose = useRef<CheckFn | undefined>();
   return useMemo(
     () => ({
       openModal(props) {
@@ -21,7 +21,7 @@ export function useModal(): UseModalHook {
       },
       closeModal() {
         // TODO: Should remove checks
-        for (const canCloseModal of canCloseModalChecks.current) {
+        for (const canCloseModal of modalCanCloseChecks.current) {
           if (!canCloseModal()) {
             return;
           }
@@ -30,14 +30,14 @@ export function useModal(): UseModalHook {
       },
       // TODO: Rename as a breaking change
       addCanClose(canClose) {
-        canCloseModalChecks.current = [
+        modalCanCloseChecks.current = [
           // Only allow one canClose per component at a time; this lets the caller avoid useMemo'ing their lambda
-          ...canCloseModalChecks.current.filter((c) => c !== lastCanClose.current),
+          ...modalCanCloseChecks.current.filter((c) => c !== lastCanClose.current),
           canClose,
         ];
         lastCanClose.current = canClose;
       },
     }),
-    [modalState, canCloseModalChecks],
+    [modalState, modalCanCloseChecks],
   );
 }
