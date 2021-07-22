@@ -22,7 +22,11 @@ export function Option<T>({ item, state }: { item: Node<T>; state: ListState<T> 
       key: item.key,
       isDisabled,
       isSelected,
-      shouldSelectOnPressUp: true,
+      // If this is true, then a user can: 1) press down to open the select menu,
+      // 2) have the menu drawn under their mouse cursor, 3) release their press
+      // and useSelectableItem will fire onPress/select and cause the
+      // accidentally-selected item to be added to the list.
+      shouldSelectOnPressUp: false,
       shouldFocusOnHover: true,
       shouldUseVirtualFocus: true,
     },
