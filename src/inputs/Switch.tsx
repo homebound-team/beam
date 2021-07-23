@@ -1,7 +1,8 @@
 import { useRef } from "react";
 import { useFocusRing, useHover, useSwitch, VisuallyHidden } from "react-aria";
-import { Palette } from "../Css";
-import { Css, Icon } from "../index";
+import { Label } from "src/components/Label";
+import { Css, Palette } from "src/Css";
+import { Icon } from "../components/Icon";
 import { toToggleState } from "../utils";
 
 export interface SwitchProps {
@@ -13,6 +14,8 @@ export interface SwitchProps {
   disabled?: boolean;
   /** Input label */
   label: string;
+  /** Where to put the label. */
+  labelStyle?: "form" | "inline";
   /** Handler when the interactive element state changes. */
   onChange: (value: boolean) => void;
   /** Whether the switch is selected */
@@ -29,6 +32,7 @@ export function Switch(props: SwitchProps) {
     withIcon,
     compact = false,
     label,
+    labelStyle = "inline",
     ...otherProps
   } = props;
   const ariaProps = { isSelected, isDisabled, ...otherProps };
@@ -42,19 +46,22 @@ export function Switch(props: SwitchProps) {
     <label
       {...hoverProps}
       css={{
-        ...switchLabelDefaultStyles,
-        ...(isDisabled && switchLabelDisabledStyles),
+        ...Css.relative.cursorPointer.df.w("max-content").smEm.selectNone.$,
+        ...(labelStyle === "form" && Css.flexColumn.$),
+        ...(labelStyle === "inline" && Css.childGap2.itemsCenter.$),
+        ...(isDisabled && Css.cursorNotAllowed.gray400.$),
       }}
     >
+      {labelStyle === "form" && <Label label={label} />}
       {/* Background */}
       <div
         aria-hidden="true"
         css={{
-          ...switchDefaultStyles(compact),
+          ...Css.wPx(toggleWidth(compact)).hPx(toggleHeight(compact)).bgGray200.br12.relative.transition.$,
           ...(isHovered && switchHoverStyles),
           ...(isKeyboardFocus && switchFocusStyles),
-          ...(isDisabled && switchDisabledStyles),
-          ...(isSelected && switchSelectedStyles),
+          ...(isDisabled && Css.bgGray300.$),
+          ...(isSelected && Css.bgLightBlue700.$),
           ...(isSelected && isHovered && switchSelectedHoverStyles),
         }}
       >
@@ -62,7 +69,7 @@ export function Switch(props: SwitchProps) {
         <div
           css={{
             ...switchCircleDefaultStyles(compact),
-            ...(isDisabled && switchCircleDisabledStyles),
+            ...(isDisabled && Css.bgGray100.$),
             ...(isSelected && switchCircleSelectedStyles(compact)),
           }}
         >
@@ -74,7 +81,16 @@ export function Switch(props: SwitchProps) {
       </div>
       {/* Since we are using childGap, we must wrap the label in an element and
       match the height of the icon for horizontal alignment */}
-      <span css={switchTextStyles(compact)}>{label}</span>
+      {labelStyle === "inline" && (
+        <span
+          css={{
+            // LineHeight is conditionally applied to handle compact version text alignment
+            ...Css.hPx(toggleHeight(compact)).if(compact).add("lineHeight", "1").$,
+          }}
+        >
+          {label}
+        </span>
+      )}
       <VisuallyHidden>
         <input ref={ref} {...inputProps} {...focusProps} />
       </VisuallyHidden>
@@ -88,17 +104,9 @@ const toggleHeight = (isCompact: boolean) => (isCompact ? 16 : 24);
 const toggleWidth = (isCompact: boolean) => (isCompact ? 44 : 40);
 const circleDiameter = (isCompact: boolean) => (isCompact ? 14 : 20);
 
-// Label styles
-const switchLabelDefaultStyles = Css.relative.cursorPointer.df.itemsCenter.childGap2.w("max-content").smEm.selectNone.$;
-const switchLabelDisabledStyles = Css.cursorNotAllowed.gray400.$;
-
 // Switcher/Toggle element styles
-const switchDefaultStyles = (isCompact: boolean) =>
-  Css.wPx(toggleWidth(isCompact)).hPx(toggleHeight(isCompact)).bgGray200.br12.relative.transition.$;
 export const switchHoverStyles = Css.bgGray400.$;
 export const switchFocusStyles = Css.bshFocus.$;
-const switchDisabledStyles = Css.bgGray300.$;
-const switchSelectedStyles = Css.bgLightBlue700.$;
 export const switchSelectedHoverStyles = Css.bgLightBlue900.$;
 
 // Circle inside Switcher/Toggle element styles
@@ -109,7 +117,6 @@ const switchCircleDefaultStyles = (isCompact: boolean) => ({
     .topPx(isCompact ? 1 : 2).transition.df.itemsCenter.justifyCenter.$,
   svg: Css.hPx(toggleHeight(isCompact) / 2).wPx(toggleHeight(isCompact) / 2).$,
 });
-const switchCircleDisabledStyles = Css.bgGray100.$;
 
 /**
  * Affecting the `left` property due to transitions only working when there is
@@ -122,7 +129,3 @@ const switchCircleDisabledStyles = Css.bgGray100.$;
  */
 const switchCircleSelectedStyles = (isCompact: boolean) =>
   Css.left(`calc(100% - ${circleDiameter(isCompact)}px - 2px);`).$;
-
-const switchTextStyles = (isCompact: boolean) =>
-  // LineHeight is conditionally applied to handle compact version text alignment
-  Css.hPx(toggleHeight(isCompact)).if(isCompact).add("lineHeight", "1").$;

@@ -11,8 +11,17 @@ import {
   SimpleHeaderAndDataWith,
 } from "src/components";
 import { Css } from "src/Css";
-import { BoundDateField, BoundMultiSelectField, BoundNumberField, BoundSelectField, BoundTextField, BoundToggleChipGroupField } from "src/forms";
+import {
+  BoundDateField,
+  BoundMultiSelectField,
+  BoundNumberField,
+  BoundSelectField,
+  BoundSwitchField,
+  BoundTextField,
+  BoundToggleChipGroupField,
+} from "src/forms";
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
+import { FormLines } from "src/forms/FormLines";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
 import { CheckboxGroupItemOption } from "src/inputs";
@@ -62,19 +71,19 @@ export function FormStateApp() {
   ];
 
   const animals = [
-    { value:"a:1", label: "Cat" },
-    { value:"a:2", label: "Dog" },
-    { value:"a:3", label: "Fish" },
-    { value:"a:4", label: "Iguana" },
-    { value:"a:5", label: "Turtle" },
-  ]
+    { value: "a:1", label: "Cat" },
+    { value: "a:2", label: "Dog" },
+    { value: "a:3", label: "Fish" },
+    { value: "a:4", label: "Iguana" },
+    { value: "a:5", label: "Turtle" },
+  ];
 
   return (
     <Observer>
       {() => (
         <div>
           <header>
-            <div>
+            <FormLines>
               <b>Author</b>
               <BoundTextField field={formState.firstName} />
               <BoundTextField field={formState.lastName} />
@@ -85,7 +94,8 @@ export function FormStateApp() {
               <BoundMultiSelectField field={formState.favoriteShapes} options={shapes} />
               <BoundCheckboxGroupField field={formState.favoriteColors} options={colors} />
               <BoundToggleChipGroupField field={formState.animals} options={animals} />
-            </div>
+              <BoundSwitchField field={formState.isAvailable} />
+            </FormLines>
 
             <div>
               <strong>
@@ -152,4 +162,5 @@ export const formConfig: ObjectConfig<AuthorInput> = {
     },
   },
   animals: { type: "value", rules: [required] },
+  isAvailable: { type: "value" },
 };

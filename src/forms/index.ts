@@ -6,6 +6,7 @@ export * from "./BoundNumberField";
 export * from "./BoundRadioGroupField";
 export * from "./BoundRichTextField";
 export * from "./BoundSelectField";
+export * from "./BoundSwitchField";
 export * from "./BoundTextAreaField";
 export * from "./BoundTextField";
 export * from "./BoundToggleChipGroupField";
