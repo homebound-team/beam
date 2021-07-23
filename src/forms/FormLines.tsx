@@ -1,7 +1,7 @@
 import { Css } from "src/Css";
 
 export interface FormLinesProps {
-  /** Let the user inter-leave group-less lines and grouped lines. */
+  /** Let the user interleave group-less lines and grouped lines. */
   children: JSX.Element[];
   width?: "md" | "sm";
 }
@@ -9,10 +9,8 @@ export interface FormLinesProps {
 /**
  * Applies standard Form layout/size/spacing between lines.
  *
- * Lines can either be individual form fields, or a group of form
- * fields, where they will be laid out side-by-side.
- *
- * TODO: Promote this to Beam?
+ * Lines can either be individual form fields, or a group of form fields
+ * (see the `FieldGroup` component), where they will be laid out side-by-side.
  */
 export function FormLines(props: FormLinesProps) {
   const { children, width = "md" } = props;
@@ -35,6 +33,7 @@ export function FieldGroup(props: {
   title?: string;
   children: JSX.Element[];
 }) {
+  // TODO Actually use title
   const { title, children } = props;
   return <div css={Css.df.childGap2.$}>{children}</div>;
 }
