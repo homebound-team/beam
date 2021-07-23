@@ -26,9 +26,67 @@ export function SmallFlatList() {
   );
 }
 
-export function SideBySide() {
+export function SideBySideMedium() {
   return (
     <FormLines>
+      <FieldGroup>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
+      </FieldGroup>
+      <TextField label="Address" value="123 Main" onChange={() => {}} />
+      <FieldGroup>
+        <Switch label="Primary" labelStyle="form" selected={false} onChange={() => {}} />
+        <Switch label="Signatory" labelStyle="form" selected={true} onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="Title" value="Engineer" onChange={() => {}} />
+        <span />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup basis={["100%", "30%", "100%"]}>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="M" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
+      </FieldGroup>
+    </FormLines>
+  );
+}
+export function SideBySideLarge() {
+  return (
+    <FormLines width="lg">
+      <FieldGroup>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
+      </FieldGroup>
+      <TextField label="Address" value="123 Main" onChange={() => {}} />
+      <FieldGroup>
+        <Switch label="Primary" labelStyle="form" selected={false} onChange={() => {}} />
+        <Switch label="Signatory" labelStyle="form" selected={true} onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="Title" value="Engineer" onChange={() => {}} />
+        <span />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup basis={["100%", "30%", "100%"]}>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="M" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
+      </FieldGroup>
+    </FormLines>
+  );
+}
+export function SideBySideSmall() {
+  return (
+    <FormLines width="sm">
       <FieldGroup>
         <TextField label="First" value="first" onChange={() => {}} />
         <TextField label="Middle" value="middle" onChange={() => {}} />

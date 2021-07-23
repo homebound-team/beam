@@ -1,9 +1,11 @@
 import { Css, Properties } from "src/Css";
 
+export type FormWidth = "sm" | "md" | "lg";
+
 export interface FormLinesProps {
   /** Let the user interleave group-less lines and grouped lines. */
   children: JSX.Element[];
-  width?: "md" | "sm";
+  width?: FormWidth;
 }
 
 /**
@@ -47,7 +49,8 @@ export function FieldGroup(props: {
   );
 }
 
-const sizes: Record<"md" | "sm", number> = {
+const sizes: Record<FormWidth, number> = {
+  lg: 550, // works well for side-by-side
   md: 480, // normal full-page size
   sm: 320, // works well in a modal
 };
