@@ -1,4 +1,4 @@
-import { Css } from "src/Css";
+import { Css, Properties } from "src/Css";
 
 export interface FormLinesProps {
   /** Let the user interleave group-less lines and grouped lines. */
@@ -32,10 +32,19 @@ export function FieldGroup(props: {
   /** The legend/title for this group. */
   title?: string;
   children: JSX.Element[];
+  basis?: Properties["flexBasis"][];
 }) {
   // TODO Actually use title
-  const { title, children } = props;
-  return <div css={Css.df.childGap2.$}>{children}</div>;
+  const { title, children, basis = [] } = props;
+  return (
+    <div css={Css.df.childGap2.$}>
+      {children.map((child, i) => (
+        <div key={i} css={Css.fg1.fb(String(basis[i] || "100%")).$}>
+          {child}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 const sizes: Record<"md" | "sm", number> = {
