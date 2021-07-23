@@ -1,27 +1,10 @@
-import { Fragment } from "react";
 import { Css } from "src/Css";
-
-type Field = JSX.Element;
-
-/** Either a field all by itself or multiple fields on a line. */
-type FormLine = Field | Field[];
-
-export interface FieldGroup {
-  /** The legend/title for this group. */
-  title: string;
-  lines: FormLine[];
-}
 
 export interface FormLinesProps {
   /** Let the user inter-leave group-less lines and grouped lines. */
-  children: Array<FormLine | FieldGroup>;
+  children: JSX.Element[];
   width?: "md" | "sm";
 }
-
-const sizes: Record<"md" | "sm", number> = {
-  md: 480, // normal full-page size
-  sm: 320, // works well in a modal
-};
 
 /**
  * Applies standard Form layout/size/spacing between lines.
@@ -41,23 +24,22 @@ export function FormLines(props: FormLinesProps) {
         "& > *": Css.mb3.$,
       }}
     >
-      {children.map((field, i) => {
-        if (field instanceof Array) {
-          // This is an array of form lines, split evenly, i.e. as 50/50, 33/33/34, etc.
-          return (
-            <div key={i} css={Css.df.childGap2.$}>
-              {field.map((f, i) => (
-                <div key={i} css={Css.fb1.$}>
-                  {f}
-                </div>
-              ))}
-            </div>
-          );
-        } else {
-          // This is a form line by itself
-          return <Fragment key={i}>{field}</Fragment>;
-        }
-      })}
+      {children}
     </div>
   );
 }
+
+/** Groups multiple fields side-by-side. */
+export function FieldGroup(props: {
+  /** The legend/title for this group. */
+  title?: string;
+  children: JSX.Element[];
+}) {
+  const { title, children } = props;
+  return <div css={Css.df.childGap2.$}>{children}</div>;
+}
+
+const sizes: Record<"md" | "sm", number> = {
+  md: 480, // normal full-page size
+  sm: 320, // works well in a modal
+};

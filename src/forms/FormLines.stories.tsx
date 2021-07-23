@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { FormLines } from "src/forms/FormLines";
+import { FieldGroup, FormLines } from "src/forms/FormLines";
 import { TextField } from "src/inputs/TextField";
 
 export default {
@@ -28,17 +28,17 @@ export function SmallFlatList() {
 export function SideBySide() {
   return (
     <FormLines>
-      {[
-        <TextField key="a" label={"First"} value={"first"} onChange={() => {}} />,
-        <TextField key="b" label={"Middle"} value={"middle"} onChange={() => {}} />,
-      ]}
+      <FieldGroup>
+        <TextField label={"First"} value={"first"} onChange={() => {}} />
+        <TextField label={"Middle"} value={"middle"} onChange={() => {}} />
+      </FieldGroup>
       <TextField label="Address" value="123 Main" onChange={() => {}} />
       {/* Having three is too wide, so not supported.*/}
-      {[
-        <TextField key="a" label={"First"} value={"first"} onChange={() => {}} />,
-        <TextField key="b" label={"Middle"} value={"middle"} onChange={() => {}} />,
-        <TextField key="c" label={"Last"} value={"last"} onChange={() => {}} />,
-      ]}
+      <FieldGroup>
+        <TextField label={"First"} value={"first"} onChange={() => {}} />
+        <TextField label={"Middle"} value={"middle"} onChange={() => {}} />
+        <TextField label={"Last"} value={"last"} onChange={() => {}} />
+      </FieldGroup>
     </FormLines>
   );
 }
