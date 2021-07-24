@@ -47,7 +47,7 @@ export function SideBySideMedium() {
         <TextField label="Middle" value="middle" onChange={() => {}} />
         <TextField label="Last" value="last" onChange={() => {}} />
       </FieldGroup>
-      <FieldGroup basis={["100%", "30%", "100%"]}>
+      <FieldGroup widths={[2, 1, 2]}>
         <TextField label="First" value="first" onChange={() => {}} />
         <TextField label="Middle" value="M" onChange={() => {}} />
         <TextField label="Last" value="last" onChange={() => {}} />
@@ -76,7 +76,7 @@ export function SideBySideLarge() {
         <TextField label="Middle" value="middle" onChange={() => {}} />
         <TextField label="Last" value="last" onChange={() => {}} />
       </FieldGroup>
-      <FieldGroup basis={["100%", "30%", "100%"]}>
+      <FieldGroup widths={[2, 1, 2]}>
         <TextField label="First" value="first" onChange={() => {}} />
         <TextField label="Middle" value="M" onChange={() => {}} />
         <TextField label="Last" value="last" onChange={() => {}} />
@@ -105,7 +105,7 @@ export function SideBySideSmall() {
         <TextField label="Middle" value="middle" onChange={() => {}} />
         <TextField label="Last" value="last" onChange={() => {}} />
       </FieldGroup>
-      <FieldGroup basis={["100%", "30%", "100%"]}>
+      <FieldGroup widths={[2, 1, 2]}>
         <TextField label="First" value="first" onChange={() => {}} />
         <TextField label="Middle" value="M" onChange={() => {}} />
         <TextField label="Last" value="last" onChange={() => {}} />

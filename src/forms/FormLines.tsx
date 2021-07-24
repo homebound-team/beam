@@ -1,4 +1,4 @@
-import { Css, Properties } from "src/Css";
+import { Css } from "src/Css";
 
 export type FormWidth = "sm" | "md" | "lg";
 
@@ -34,17 +34,22 @@ export function FieldGroup(props: {
   /** The legend/title for this group. */
   title?: string;
   children: JSX.Element[];
-  basis?: Properties["flexBasis"][];
+  /** An array of widths for each child, if a number we use `fr` units. */
+  widths?: Array<number | string>;
 }) {
   // TODO Actually use title
-  const { title, children, basis = [] } = props;
+  const { title, children, widths = [] } = props;
+  const gtc = children
+    .map((_, i) => {
+      const width = widths[i] || 1;
+      return typeof width === `number` ? `${width}fr` : width;
+    })
+    .join(" ");
   return (
-    <div css={Css.df.childGap2.$}>
-      {children.map((child, i) => (
-        <div key={i} css={Css.fg1.fb(String(basis[i] || "100%")).$}>
-          {child}
-        </div>
-      ))}
+    <div css={Css.dg.gap2.gtc(gtc).$}>
+      {children.map((child) => {
+        return child;
+      })}
     </div>
   );
 }
