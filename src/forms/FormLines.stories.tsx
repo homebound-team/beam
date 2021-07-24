@@ -1,7 +1,8 @@
 import { Meta } from "@storybook/react";
-import { FieldGroup, FormLines } from "src/forms/FormLines";
+import { FieldGroup, FormDivider, FormLines } from "src/forms/FormLines";
 import { Switch } from "src/inputs/Switch";
 import { TextField } from "src/inputs/TextField";
+import { noop } from "src/utils/index";
 
 export default {
   component: FormLines,
@@ -80,6 +81,16 @@ export function SideBySideLarge() {
         <TextField label="First" value="first" onChange={() => {}} />
         <TextField label="Middle" value="M" onChange={() => {}} />
         <TextField label="Last" value="last" onChange={() => {}} />
+      </FieldGroup>
+      <FormDivider />
+      <FieldGroup widths={[3, 1]}>
+        <TextField label="Street" value="" onChange={noop} />
+        <div />
+      </FieldGroup>
+      <FieldGroup widths={[2, 1, 1]}>
+        <TextField label="City" value="" onChange={noop} />
+        <TextField label="State" value="" onChange={noop} />
+        <TextField label="Postal Code" value="" onChange={noop} />
       </FieldGroup>
     </FormLines>
   );

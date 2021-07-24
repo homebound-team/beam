@@ -29,6 +29,11 @@ export function FormLines(props: FormLinesProps) {
   );
 }
 
+/** Draws a line between form lines. */
+export function FormDivider() {
+  return <div css={Css.hPx(1).my2.bgGray200.$} />;
+}
+
 /** Groups multiple fields side-by-side. */
 export function FieldGroup(props: {
   /** The legend/title for this group. */
