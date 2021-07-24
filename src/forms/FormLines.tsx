@@ -1,7 +1,13 @@
 import { Css } from "src/Css";
 import { FormContext, LabelSuffixStyle } from "src/forms/FormContext";
 
-export type FormWidth = "sm" | "md" | "lg";
+export type FormWidth =
+  /** 320px, works well in a modal. */
+  | "sm"
+  /** 480px, works well in a small, single-stack form. */
+  | "md"
+  /** 550px, works well for showing side-by-side/double-stack fields. */
+  | "lg";
 
 export interface FormLinesProps {
   /** Let the user interleave group-less lines and grouped lines. */
@@ -64,7 +70,7 @@ export function FieldGroup(props: {
 }
 
 const sizes: Record<FormWidth, number> = {
-  lg: 550, // works well for side-by-side
-  md: 480, // normal full-page size
-  sm: 320, // works well in a modal
+  lg: 550,
+  md: 480,
+  sm: 320,
 };
