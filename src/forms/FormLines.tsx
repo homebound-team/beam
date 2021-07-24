@@ -1,10 +1,12 @@
 import { Css } from "src/Css";
+import { FormContext, LabelSuffixStyle } from "src/forms/FormContext";
 
 export type FormWidth = "sm" | "md" | "lg";
 
 export interface FormLinesProps {
   /** Let the user interleave group-less lines and grouped lines. */
   children: JSX.Element[];
+  labelSuffix?: LabelSuffixStyle;
   width?: FormWidth;
 }
 
@@ -15,17 +17,19 @@ export interface FormLinesProps {
  * (see the `FieldGroup` component), where they will be laid out side-by-side.
  */
 export function FormLines(props: FormLinesProps) {
-  const { children, width = "md" } = props;
+  const { children, width = "md", labelSuffix = "none" } = props;
   return (
-    <div
-      css={{
-        ...Css.df.flexColumn.wPx(sizes[width]).$,
-        // Purposefully use this instead of childGap3 to put margin-bottom on the last line
-        "& > *": Css.mb3.$,
-      }}
-    >
-      {children}
-    </div>
+    <FormContext.Provider value={{ labelSuffix }}>
+      <div
+        css={{
+          ...Css.df.flexColumn.wPx(sizes[width]).$,
+          // Purposefully use this instead of childGap3 to put margin-bottom on the last line
+          "& > *": Css.mb3.$,
+        }}
+      >
+        {children}
+      </div>
+    </FormContext.Provider>
   );
 }
 

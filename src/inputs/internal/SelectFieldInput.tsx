@@ -28,6 +28,7 @@ interface SelectFieldInputProps<O, V extends Value> {
   inlineLabel?: boolean;
   labelProps: LabelHTMLAttributes<HTMLLabelElement>;
   label?: string;
+  labelSuffix?: string;
   selectedOptions: O[];
   getOptionValue: (opt: O) => V;
   sizeToContent: boolean;
@@ -52,6 +53,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
     onFocus,
     inlineLabel,
     label,
+    labelSuffix,
     labelProps,
     selectedOptions,
     getOptionValue,
@@ -69,7 +71,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
 
   return (
     <Fragment>
-      {!inlineLabel && label && <Label labelProps={labelProps} label={label} {...tid.label} />}
+      {!inlineLabel && label && <Label labelProps={labelProps} label={label} suffix={labelSuffix} {...tid.label} />}
       <div
         css={{
           ...Css.df.ba.bGray300.br4.px1.itemsCenter.bgWhite.hPx(40).if(compact).hPx(32).$,

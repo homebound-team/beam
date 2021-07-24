@@ -15,6 +15,8 @@ const format = "MM/dd/yy";
 export interface DateFieldProps {
   value: Date | undefined;
   label?: string;
+  /** An optional suffix for the label, i.e. `(Required)` or `(Optional). */
+  labelSuffix?: string;
   onChange: (value: Date) => void;
   /** Called when the component loses focus */
   onBlur?: () => void;
@@ -26,7 +28,7 @@ export interface DateFieldProps {
 }
 
 export function DateField(props: DateFieldProps) {
-  const { label, disabled, value, onChange, onFocus, onBlur, errorMsg, helperText } = props;
+  const { label, labelSuffix, disabled, value, onChange, onFocus, onBlur, errorMsg, helperText } = props;
 
   const { ...otherProps } = {};
   // We don't really use the inputRef, but `useTextField` needs it. We probably shouldn't
@@ -67,7 +69,7 @@ export function DateField(props: DateFieldProps) {
         "& .DayPicker-Caption > div": Css.base.pyPx(2).$,
       }}
     >
-      {label && <Label labelProps={labelProps} label={label} />}
+      {label && <Label labelProps={labelProps} label={label} suffix={labelSuffix} />}
       <DayPickerInput
         onDayChange={onChange as any}
         dayPickerProps={{

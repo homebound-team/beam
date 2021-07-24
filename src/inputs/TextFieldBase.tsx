@@ -17,7 +17,10 @@ import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
 interface TextFieldBaseProps
-  extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur" | "onFocus" | "helperText" | "hideLabel">,
+  extends Pick<
+      BeamTextFieldProps,
+      "label" | "labelSuffix" | "errorMsg" | "onBlur" | "onFocus" | "helperText" | "hideLabel"
+    >,
     Partial<Pick<BeamTextFieldProps, "onChange">> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
@@ -34,6 +37,7 @@ interface TextFieldBaseProps
 export function TextFieldBase(props: TextFieldBaseProps) {
   const {
     label,
+    labelSuffix,
     labelProps,
     hideLabel,
     inputProps,
@@ -72,7 +76,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
 
   return (
     <div css={Css.df.flexColumn.w100.maxw(px(550)).$} {...groupProps}>
-      {label && !hideLabel && <Label labelProps={labelProps} label={label} {...tid.label} />}
+      {label && !hideLabel && <Label labelProps={labelProps} label={label} suffix={labelSuffix} {...tid.label} />}
       <ElementType
         {...mergeProps(
           inputProps,

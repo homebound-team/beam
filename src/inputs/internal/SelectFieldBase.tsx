@@ -45,13 +45,14 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     errorMsg,
     helperText,
     label,
+    labelSuffix,
+    inlineLabel,
     readOnly: isReadOnly = false,
     onSelect,
     fieldDecoration,
     options,
     onBlur,
     onFocus,
-    inlineLabel,
     multiselect = false,
     getOptionLabel,
     getOptionValue,
@@ -245,6 +246,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         onFocus={onFocus}
         inlineLabel={inlineLabel}
         label={label}
+        labelSuffix={labelSuffix}
         labelProps={labelProps}
         selectedOptions={fieldState.selectedOptions}
         getOptionValue={getOptionValue}
@@ -281,6 +283,9 @@ export interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
   fieldDecoration?: (opt: T) => ReactNode;
   /** Sets the form field label. */
   label?: string;
+  /** An optional suffix for the label, i.e. `(Required)` or `(Optional). */
+  labelSuffix?: string;
+  /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
   readOnly?: boolean;
   onBlur?: () => void;

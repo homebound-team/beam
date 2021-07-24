@@ -19,6 +19,7 @@ import {
   BoundSwitchField,
   BoundTextField,
   BoundToggleChipGroupField,
+  FormDivider,
 } from "src/forms";
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
 import { FormLines } from "src/forms/FormLines";
@@ -83,17 +84,18 @@ export function FormStateApp() {
       {() => (
         <div>
           <header>
-            <FormLines>
+            <FormLines labelSuffix="both">
               <b>Author</b>
               <BoundTextField field={formState.firstName} />
               <BoundTextField field={formState.lastName} />
               <BoundDateField field={formState.birthday} />
               <BoundNumberField field={formState.heightInInches} />
+              <FormDivider />
               <BoundSelectField field={formState.favoriteSport} options={sports} />
-              <br />
               <BoundMultiSelectField field={formState.favoriteShapes} options={shapes} />
               <BoundCheckboxGroupField field={formState.favoriteColors} options={colors} />
               <BoundToggleChipGroupField field={formState.animals} options={animals} />
+              <FormDivider />
               <BoundSwitchField field={formState.isAvailable} />
             </FormLines>
 

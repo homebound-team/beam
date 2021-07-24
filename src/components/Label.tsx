@@ -6,15 +6,18 @@ interface LabelProps {
   // We don't usually have `fooProps`-style props, but this is for/from react-aria
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   label: string;
+  suffix?: string;
   // If set, it is recommended to wrap in an element with `position: relative;` set, as the label will have an absolute position.
   hidden?: boolean;
 }
 
 /** An internal helper component for rendering form labels. */
-export function Label({ labelProps, label, hidden, ...others }: LabelProps) {
+export function Label(props: LabelProps) {
+  const { labelProps, label, hidden, suffix, ...others } = props;
   const labelEl = (
     <label {...labelProps} {...others} css={Css.dib.sm.gray700.mbPx(4).$}>
       {label}
+      {suffix && ` ${suffix}`}
     </label>
   );
   return hidden ? <VisuallyHidden>{labelEl}</VisuallyHidden> : labelEl;

@@ -10,6 +10,8 @@ export interface NumberFieldProps {
   label: string;
   /** If set, the label will be defined as 'aria-label` on the input element */
   hideLabel?: boolean;
+  /** An optional suffix for the label, i.e. `(Required)` or `(Optional). */
+  labelSuffix?: string;
   type?: "cents" | "percent" | "basisPoints";
   value: number | undefined;
   onChange: (value: number | undefined) => void;
@@ -30,6 +32,7 @@ export function NumberField(props: NumberFieldProps) {
     readOnly: isReadOnly = false,
     type,
     label,
+    labelSuffix,
     onBlur,
     onFocus,
     errorMsg,
@@ -105,6 +108,7 @@ export function NumberField(props: NumberFieldProps) {
       groupProps={groupProps}
       labelProps={labelProps}
       label={label}
+      labelSuffix={labelSuffix}
       inputProps={inputProps}
       // This is called on each DOM change, to push the latest value into the field
       onChange={(rawInputValue) => {

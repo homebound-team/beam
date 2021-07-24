@@ -1,5 +1,8 @@
 import { FieldState } from "@homebound/form-state/dist/formState";
 import { Observer } from "mobx-react";
+import { useContext } from "react";
+import { FormContext } from "src/forms/FormContext";
+import { getLabelSuffix } from "src/forms/labelUtils";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { defaultLabel } from "src/utils/defaultLabel";
@@ -41,12 +44,14 @@ export function BoundSelectField<T extends object, V extends Value>(
     label = defaultLabel(field.key),
     ...others
   } = props;
+  const settings = useContext(FormContext);
   const testId = useTestIds(props, field.key);
   return (
     <Observer>
       {() => (
         <SelectField<T, V>
           label={label}
+          labelSuffix={getLabelSuffix(settings, field)}
           value={field.value ?? undefined}
           onSelect={onSelect}
           options={options}
