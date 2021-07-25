@@ -12,7 +12,7 @@ export function TextField(props: TextFieldProps) {
   const {
     disabled: isDisabled = false,
     readOnly: isReadOnly = false,
-    required: isRequired,
+    required,
     errorMsg,
     value = "",
     onBlur,
@@ -23,7 +23,7 @@ export function TextField(props: TextFieldProps) {
     ...otherProps,
     isDisabled,
     isReadOnly,
-    isRequired,
+    isRequired: required,
     validationState: errorMsg ? ("invalid" as const) : ("valid" as const),
     value,
   };
@@ -33,6 +33,7 @@ export function TextField(props: TextFieldProps) {
     <TextFieldBase
       {...mergeProps(textFieldProps, { onBlur, onFocus })}
       errorMsg={errorMsg}
+      required={required}
       labelProps={labelProps}
       inputProps={inputProps}
       inputRef={inputRef}
