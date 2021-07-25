@@ -84,9 +84,10 @@ export function FormStateApp() {
       {() => (
         <div>
           <header>
-            <FormLines labelSuffix={{ required: "Req", optional: "Opt" }}>
+            <FormLines>
               <b>Author</b>
               <BoundTextField field={formState.firstName} />
+              <BoundTextField field={formState.middleInitial} />
               <BoundTextField field={formState.lastName} />
               <BoundDateField field={formState.birthday} />
               <BoundNumberField field={formState.heightInInches} />
@@ -149,6 +150,7 @@ type FormValue = ObjectState<AuthorInput>;
 // Configure the fields/behavior for AuthorInput's fields
 export const formConfig: ObjectConfig<AuthorInput> = {
   firstName: { type: "value", rules: [required] },
+  middleInitial: { type: "value" },
   lastName: { type: "value", rules: [required] },
   birthday: { type: "value", rules: [required] },
   heightInInches: { type: "value", rules: [required] },

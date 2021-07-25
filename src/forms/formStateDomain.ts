@@ -10,6 +10,7 @@ export const dd200: DeweyDecimalClassification = { number: "200", category: "Rel
 export interface AuthorInput {
   id?: string | null;
   firstName?: string | null;
+  middleInitial?: string | null;
   lastName?: string | null;
   birthday?: Date | null;
   heightInInches?: number | null;
