@@ -12,17 +12,27 @@ export function TextField(props: TextFieldProps) {
   const {
     disabled: isDisabled = false,
     readOnly: isReadOnly = false,
+    required: isRequired,
+    errorMsg,
     value = "",
     onBlur,
     onFocus,
     ...otherProps
   } = props;
-  const textFieldProps = { ...otherProps, isDisabled, isReadOnly, value };
+  const textFieldProps = {
+    ...otherProps,
+    isDisabled,
+    isReadOnly,
+    isRequired,
+    validationState: errorMsg ? ("invalid" as const) : ("valid" as const),
+    value,
+  };
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { labelProps, inputProps } = useTextField(textFieldProps, inputRef);
   return (
     <TextFieldBase
       {...mergeProps(textFieldProps, { onBlur, onFocus })}
+      errorMsg={errorMsg}
       labelProps={labelProps}
       inputProps={inputProps}
       inputRef={inputRef}
