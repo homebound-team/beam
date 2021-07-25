@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { Css } from "src/Css";
 import { FormContext, LabelSuffixStyle } from "src/forms/FormContext";
 
@@ -23,7 +24,8 @@ export interface FormLinesProps {
  * (see the `FieldGroup` component), where they will be laid out side-by-side.
  */
 export function FormLines(props: FormLinesProps) {
-  const { children, width = "md", labelSuffix = {} } = props;
+  const settings = useContext(FormContext);
+  const { children, width = "md", labelSuffix = settings.labelSuffix } = props;
   return (
     <FormContext.Provider value={{ labelSuffix }}>
       <div
