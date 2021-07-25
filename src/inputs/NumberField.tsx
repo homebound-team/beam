@@ -3,6 +3,7 @@ import { ReactNode, useMemo, useRef } from "react";
 import { useLocale, useNumberField } from "react-aria";
 import { useNumberFieldState } from "react-stately";
 import { Css, Xss } from "src/Css";
+import { getLabelSuffix } from "src/forms/labelUtils";
 import { TextFieldBase } from "./TextFieldBase";
 
 // exported for testing purposes
@@ -10,13 +11,12 @@ export interface NumberFieldProps {
   label: string;
   /** If set, the label will be defined as 'aria-label` on the input element */
   hideLabel?: boolean;
-  /** An optional suffix for the label, i.e. `(Required)` or `(Optional). */
-  labelSuffix?: string;
   type?: "cents" | "percent" | "basisPoints";
   value: number | undefined;
   onChange: (value: number | undefined) => void;
   compact?: boolean;
   disabled?: boolean;
+  required?: boolean;
   errorMsg?: string;
   helperText?: string | ReactNode;
   onBlur?: () => void;
@@ -29,10 +29,10 @@ export interface NumberFieldProps {
 export function NumberField(props: NumberFieldProps) {
   const {
     disabled: isDisabled = false,
+    required,
     readOnly: isReadOnly = false,
     type,
     label,
-    labelSuffix,
     onBlur,
     onFocus,
     errorMsg,
@@ -45,6 +45,7 @@ export function NumberField(props: NumberFieldProps) {
   } = props;
 
   const factor = type === "percent" || type === "cents" ? 100 : type === "basisPoints" ? 10_000 : 1;
+  const labelSuffix = getLabelSuffix(required);
 
   // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
   // see: https://github.com/adobe/react-spectrum/issues/1893.
@@ -108,7 +109,7 @@ export function NumberField(props: NumberFieldProps) {
       groupProps={groupProps}
       labelProps={labelProps}
       label={label}
-      labelSuffix={labelSuffix}
+      required={required}
       inputProps={inputProps}
       // This is called on each DOM change, to push the latest value into the field
       onChange={(rawInputValue) => {

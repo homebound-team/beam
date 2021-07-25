@@ -11,6 +11,7 @@ import { chain, mergeProps } from "react-aria";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, px, Xss } from "src/Css";
+import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamTextFieldProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -19,7 +20,7 @@ import { useTestIds } from "src/utils/useTestIds";
 interface TextFieldBaseProps
   extends Pick<
       BeamTextFieldProps,
-      "label" | "labelSuffix" | "errorMsg" | "onBlur" | "onFocus" | "helperText" | "hideLabel"
+      "label" | "required" | "errorMsg" | "onBlur" | "onFocus" | "helperText" | "hideLabel"
     >,
     Partial<Pick<BeamTextFieldProps, "onChange">> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
@@ -37,7 +38,7 @@ interface TextFieldBaseProps
 export function TextFieldBase(props: TextFieldBaseProps) {
   const {
     label,
-    labelSuffix,
+    required,
     labelProps,
     hideLabel,
     inputProps,
@@ -53,6 +54,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     xss,
   } = props;
   const errorMessageId = `${inputProps.id}-error`;
+  const labelSuffix = getLabelSuffix(required);
 
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
   const tid = useTestIds(props, defaultTestId(label || "textField"));

@@ -1,8 +1,5 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { useContext } from "react";
-import { FormContext } from "src/forms/FormContext";
-import { getLabelSuffix } from "src/forms/labelUtils";
 import { DateField, DateFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
@@ -16,17 +13,16 @@ export type BoundDateFieldProps = Omit<DateFieldProps, "value" | "onChange" | "o
 /** Wraps `TextField` and binds it to a form field. */
 export function BoundDateField(props: BoundDateFieldProps) {
   const { field, onChange = (value) => field.set(value), label = defaultLabel(field.key), ...others } = props;
-  const settings = useContext(FormContext);
   const testId = useTestIds(props, field.key);
   return (
     <Observer>
       {() => (
         <DateField
           label={label}
-          labelSuffix={getLabelSuffix(settings, field)}
           value={field.value || undefined}
           onChange={onChange}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
+          required={field.required}
           onBlur={() => field.blur()}
           onFocus={() => field.focus()}
           {...testId}

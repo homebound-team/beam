@@ -1,8 +1,5 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { useContext } from "react";
-import { FormContext } from "src/forms/FormContext";
-import { getLabelSuffix } from "src/forms/labelUtils";
 import { NumberField, NumberFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
@@ -25,19 +22,18 @@ export function BoundNumberField(props: BoundNumberFieldProps) {
     type = field.key.endsWith("InCents") ? "cents" : undefined,
     ...others
   } = props;
-  const settings = useContext(FormContext);
   const testId = useTestIds(props, label || field.key);
   return (
     <Observer>
       {() => (
         <NumberField
           label={label}
-          labelSuffix={getLabelSuffix(settings, field)}
           value={typeof field.value === "number" ? field.value : undefined}
           onChange={onChange}
           type={type}
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
+          required={field.required}
           onFocus={() => field.focus()}
           onBlur={() => field.blur()}
           {...testId}

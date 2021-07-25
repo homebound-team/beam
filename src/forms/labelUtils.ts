@@ -1,16 +1,15 @@
-import { FieldState } from "@homebound/form-state";
-import { FormSettings } from "src/forms/FormContext";
+import { useContext } from "react";
+import { FormContext } from "src/forms/FormContext";
 
-export function getLabelSuffix(settings: FormSettings, field: FieldState<any, any>): string {
-  switch (settings.labelSuffix) {
-    case "required":
-      return field.required ? "(Required)" : "";
-    case "optional":
-      return field.required ? "" : "(Optional)";
-    case "none":
-      return "";
-    case "both":
-      return field.required ? "(Req)" : "(Opt)";
+export function getLabelSuffix(required: boolean | undefined): string | undefined {
+  // We promise to always call `getLabelSuffix` deterministically
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const settings = useContext(FormContext);
+  if (required === true) {
+    return settings.labelSuffix.required;
+  } else if (required === false) {
+    return settings.labelSuffix.optional;
+  } else {
+    return undefined;
   }
-  return "";
 }

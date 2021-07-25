@@ -7,6 +7,7 @@ import { Icon, IconButton } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
+import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import "./DateField.css";
 
@@ -15,8 +16,6 @@ const format = "MM/dd/yy";
 export interface DateFieldProps {
   value: Date | undefined;
   label?: string;
-  /** An optional suffix for the label, i.e. `(Required)` or `(Optional). */
-  labelSuffix?: string;
   onChange: (value: Date) => void;
   /** Called when the component loses focus */
   onBlur?: () => void;
@@ -24,11 +23,13 @@ export interface DateFieldProps {
   onFocus?: () => void;
   disabled?: boolean;
   errorMsg?: string;
+  required?: boolean;
   helperText?: string | ReactNode;
 }
 
 export function DateField(props: DateFieldProps) {
-  const { label, labelSuffix, disabled, value, onChange, onFocus, onBlur, errorMsg, helperText } = props;
+  const { label, disabled, required, value, onChange, onFocus, onBlur, errorMsg, helperText } = props;
+  const labelSuffix = getLabelSuffix(required);
 
   const { ...otherProps } = {};
   // We don't really use the inputRef, but `useTextField` needs it. We probably shouldn't

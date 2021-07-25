@@ -23,7 +23,7 @@ export interface FormLinesProps {
  * (see the `FieldGroup` component), where they will be laid out side-by-side.
  */
 export function FormLines(props: FormLinesProps) {
-  const { children, width = "md", labelSuffix = "none" } = props;
+  const { children, width = "md", labelSuffix = {} } = props;
   return (
     <FormContext.Provider value={{ labelSuffix }}>
       <div

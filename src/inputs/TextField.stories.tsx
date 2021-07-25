@@ -16,7 +16,7 @@ export function TextFields() {
         <h1 css={Css.lg.$}>Regular</h1>
         <TestTextField value="" label="Name" hideLabel />
         <TestTextField label="Name" value="" />
-        <TestTextField label="Name" labelSuffix="(Required)" value="" />
+        <TestTextField label="Name" required value="" />
         <TestTextField label="Name Focused" value="Brandon" autoFocus />
         <TestTextField label="Name Disabled" value="Brandon" disabled />
         <TestTextField

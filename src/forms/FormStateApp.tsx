@@ -84,7 +84,7 @@ export function FormStateApp() {
       {() => (
         <div>
           <header>
-            <FormLines labelSuffix="both">
+            <FormLines labelSuffix={{ required: "Req", optional: "Opt" }}>
               <b>Author</b>
               <BoundTextField field={formState.firstName} />
               <BoundTextField field={formState.lastName} />
