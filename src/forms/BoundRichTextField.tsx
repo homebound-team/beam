@@ -24,7 +24,7 @@ export function BoundRichTextField(props: BoundRichTextFieldProps) {
           // TODO: Potentially support this in the future?
           // errorMsg={field.touched ? field.errors.join(" ") : undefined}
           onBlur={() => field.blur()}
-          onFocus={() => field.blur()}
+          onFocus={() => field.focus()}
           {...testId}
           {...others}
         />
