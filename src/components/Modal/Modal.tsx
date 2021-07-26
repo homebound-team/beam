@@ -7,7 +7,7 @@ import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
-import {Callback} from "src/types";
+import { Callback } from "src/types";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl";
 
