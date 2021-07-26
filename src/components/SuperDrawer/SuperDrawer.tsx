@@ -53,15 +53,10 @@ export function SuperDrawer(): ReactPortal | null {
 
   // Also get the first / non-detail element on the stack
   const firstContent = contentStack.current[0].opts as OpenInDrawerOpts;
-  const { onPrevClick, onNextClick, onClose, titleRightContent, titleLeftContent } = firstContent;
+  const { onPrevClick, onNextClick, titleRightContent, titleLeftContent } = firstContent;
 
   const isDetail = currentContent !== firstContent;
   const title = currentContent.title || firstContent.title;
-
-  function handleOnClose() {
-    if (onClose) return onClose();
-    return closeDrawer();
-  }
 
   return createPortal(
     <AnimatePresence>
@@ -84,7 +79,7 @@ export function SuperDrawer(): ReactPortal | null {
             animate={{ opacity: 1 }}
             // Unmount styles
             exit={{ opacity: 0, transition: { delay: 0.2 } }}
-            onClick={handleOnClose}
+            onClick={closeDrawer}
           >
             {/* Content container */}
             <motion.aside
@@ -129,7 +124,7 @@ export function SuperDrawer(): ReactPortal | null {
                         },
                       ]}
                     />
-                    <IconButton icon="x" onClick={handleOnClose} {...testId.close} />
+                    <IconButton icon="x" onClick={closeDrawer} {...testId.close} />
                   </div>
                 )}
               </header>
