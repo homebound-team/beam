@@ -27,5 +27,5 @@ export type LabelSuffixStyle = {
  * as well, and also override on individual fields as needed.
  */
 export const FormContext = createContext<FormSettings>({
-  labelSuffix: { required: "*", optional: "(Optional)" },
+  labelSuffix: { required: undefined, optional: undefined },
 });
