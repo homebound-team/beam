@@ -4,12 +4,11 @@ import { Button, ModalProps, useModal } from "src/components/index";
 import { Modal } from "src/components/Modal/Modal";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
-import { withPerformance } from "storybook-addon-performance";
 
 export default {
   component: Modal,
   title: "Components/Modal",
-  decorators: [withPerformance, withBeamDecorator, withDimensions()],
+  decorators: [withBeamDecorator, withDimensions()],
 } as Meta;
 
 export const Small = () => <ModalExample size="sm" />;
