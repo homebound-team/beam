@@ -112,7 +112,6 @@
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "semantic-release": "^17.4.0",
-    "storybook-addon-performance": "^0.16.0",
     "tinycolor2": "^1.4.1",
     "ts-jest": "^26.5.3",
     "ts-node": "^9.1.1",
