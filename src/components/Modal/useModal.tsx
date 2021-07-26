@@ -2,6 +2,7 @@ import { useContext, useMemo, useRef } from "react";
 import { BeamContext } from "src/components/BeamContext";
 import { Callback, CheckFn } from "src/types";
 import { ModalProps } from "./Modal";
+import {maybeCall} from "src/utils";
 
 export interface UseModalHook {
   openModal: (props: ModalProps) => void;
@@ -26,6 +27,7 @@ export function useModal(): UseModalHook {
             return;
           }
         }
+        maybeCall(modalState.current?.onClose);
         modalState.current = undefined;
       },
       // TODO: Rename as a breaking change

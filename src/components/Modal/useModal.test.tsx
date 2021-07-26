@@ -32,14 +32,14 @@ describe("useModal", () => {
     expect(r.queryByTestId("modal")).toBeFalsy();
   });
 
-  it("can provide a custom onClose method", async () => {
+  it("can provide a custom canClose method", async () => {
     function TestApp(props: ModalProps) {
       const { openModal } = useModal();
       useEffect(() => openModal(props), []);
       return <div>App</div>;
     }
 
-    // Given a modal that sets a custom `onClose` method
+    // Given a modal that sets a custom `canClose` method
     function TestModalContent({ canClose }: { canClose: () => boolean }) {
       const { addCanClose } = useModal();
       addCanClose(canClose);
@@ -54,7 +54,35 @@ describe("useModal", () => {
     click(r.modal_titleClose);
     // Then expect the custom method to be called.
     expect(canClose).toBeCalled();
-    // And the modal should not have closed since the custom method didn't not invoke the ModalContext.closeModal method.
+    // And the modal should not have closed since the canClose check is false.
     expect(r.modal()).toBeTruthy();
+  });
+
+  it("can close modal when checks pass", async () => {
+    function TestApp(props: ModalProps) {
+      const { openModal } = useModal();
+      useEffect(() => openModal(props), []);
+      return <div>App</div>;
+    }
+
+    // Given a modal that sets a custom `canClose` method
+    function TestModalContent({ canClose }: { canClose: () => boolean }) {
+      const { addCanClose } = useModal();
+      addCanClose(canClose);
+      return <div>Content</div>;
+    }
+    const canClose = jest.fn().mockReturnValue(true);
+    const onClose = jest.fn();
+    const modalProps = { title: "Test", content: <TestModalContent canClose={canClose} />, onClose };
+
+    const r = await render(<TestApp {...modalProps} />);
+
+    // When clicking the close button
+    click(r.modal_titleClose);
+    // Then expect the custom method to be called.
+    expect(canClose).toBeCalled();
+    // And the modal should have closed since the canClose check is true.
+    expect(onClose).toBeCalledTimes(1);
+    expect(r.queryByTestId("modal")).toBeFalsy();
   });
 });

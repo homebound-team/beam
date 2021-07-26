@@ -7,6 +7,7 @@ import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
+import { Callback } from "src/types";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl";
 
@@ -23,6 +24,8 @@ export interface ModalProps {
   content: ReactNode;
   /** Force scrolling i.e. to avoid content jumping left/right as scroll bar goes away/comes back. */
   forceScrolling?: boolean;
+  /** Adds a callback that is called _after_ close has definitely happened. */
+  onClose?: Callback;
 }
 
 /**
