@@ -20,6 +20,21 @@ describe("TextFieldTest", () => {
     expect(r.name()).toHaveValue("");
     expect(lastSet).toBeUndefined();
   });
+
+  it("sets aria-required if required", async () => {
+    const r = await render(<TestTextField value="foo" required={true} />);
+    expect(r.name()).toHaveAttribute("aria-required", "true");
+  });
+
+  it("doesn't set aria-required if not required", async () => {
+    const r = await render(<TestTextField value="foo" required={false} />);
+    expect(r.name()).not.toHaveAttribute("aria-required");
+  });
+
+  it("sets aria-validation if invalid", async () => {
+    const r = await render(<TestTextField value="foo" errorMsg="Required" />);
+    expect(r.name()).toHaveAttribute("aria-invalid", "true");
+  });
 });
 
 function TestTextField(props: Omit<TextFieldProps, "onChange" | "label">) {

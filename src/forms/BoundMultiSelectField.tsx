@@ -52,6 +52,7 @@ export function BoundMultiSelectField<O, V extends Value>(
           options={options}
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
+          required={field.required}
           getOptionLabel={getOptionLabel}
           getOptionValue={getOptionValue}
           onBlur={() => field.blur()}

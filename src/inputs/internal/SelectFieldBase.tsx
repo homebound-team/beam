@@ -45,13 +45,14 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     errorMsg,
     helperText,
     label,
+    required,
+    inlineLabel,
     readOnly: isReadOnly = false,
     onSelect,
     fieldDecoration,
     options,
     onBlur,
     onFocus,
-    inlineLabel,
     multiselect = false,
     getOptionLabel,
     getOptionValue,
@@ -238,6 +239,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         inputRef={inputRef}
         inputWrapRef={inputWrapRef}
         isDisabled={isDisabled}
+        required={required}
         isFocused={isFocused}
         isReadOnly={isReadOnly}
         state={state}
@@ -275,12 +277,14 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
 export interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
   compact?: boolean;
   disabled?: boolean;
+  required?: boolean;
   errorMsg?: string;
   helperText?: string | ReactNode;
   /** Allow placing an icon/decoration within the input field. */
   fieldDecoration?: (opt: T) => ReactNode;
   /** Sets the form field label. */
   label?: string;
+  /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
   readOnly?: boolean;
   onBlur?: () => void;

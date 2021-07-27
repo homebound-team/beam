@@ -1,9 +1,20 @@
+import { useContext } from "react";
 import { Css } from "src/Css";
+import { FormContext, LabelSuffixStyle } from "src/forms/FormContext";
+
+export type FormWidth =
+  /** 320px, works well in a modal. */
+  | "sm"
+  /** 480px, works well in a small, single-stack form. */
+  | "md"
+  /** 550px, works well for showing side-by-side/double-stack fields. */
+  | "lg";
 
 export interface FormLinesProps {
   /** Let the user interleave group-less lines and grouped lines. */
   children: JSX.Element[];
-  width?: "md" | "sm";
+  labelSuffix?: LabelSuffixStyle;
+  width?: FormWidth;
 }
 
 /**
@@ -13,18 +24,26 @@ export interface FormLinesProps {
  * (see the `FieldGroup` component), where they will be laid out side-by-side.
  */
 export function FormLines(props: FormLinesProps) {
-  const { children, width = "md" } = props;
+  const settings = useContext(FormContext);
+  const { children, width = "md", labelSuffix = settings.labelSuffix } = props;
   return (
-    <div
-      css={{
-        ...Css.df.flexColumn.wPx(sizes[width]).$,
-        // Purposefully use this instead of childGap3 to put margin-bottom on the last line
-        "& > *": Css.mb3.$,
-      }}
-    >
-      {children}
-    </div>
+    <FormContext.Provider value={{ labelSuffix }}>
+      <div
+        css={{
+          ...Css.df.flexColumn.wPx(sizes[width]).$,
+          // Purposefully use this instead of childGap3 to put margin-bottom on the last line
+          "& > *": Css.mb3.$,
+        }}
+      >
+        {children}
+      </div>
+    </FormContext.Provider>
   );
+}
+
+/** Draws a line between form lines. */
+export function FormDivider() {
+  return <div css={Css.hPx(1).my2.bgGray200.$} />;
 }
 
 /** Groups multiple fields side-by-side. */
@@ -32,13 +51,28 @@ export function FieldGroup(props: {
   /** The legend/title for this group. */
   title?: string;
   children: JSX.Element[];
+  /** An array of widths for each child, if a number we use `fr` units. */
+  widths?: Array<number | string>;
 }) {
   // TODO Actually use title
-  const { title, children } = props;
-  return <div css={Css.df.childGap2.$}>{children}</div>;
+  const { title, children, widths = [] } = props;
+  const gtc = children
+    .map((_, i) => {
+      const width = widths[i] || 1;
+      return typeof width === `number` ? `${width}fr` : width;
+    })
+    .join(" ");
+  return (
+    <div css={Css.dg.gap2.gtc(gtc).$}>
+      {children.map((child) => {
+        return child;
+      })}
+    </div>
+  );
 }
 
-const sizes: Record<"md" | "sm", number> = {
-  md: 480, // normal full-page size
-  sm: 320, // works well in a modal
+const sizes: Record<FormWidth, number> = {
+  lg: 550,
+  md: 480,
+  sm: 320,
 };

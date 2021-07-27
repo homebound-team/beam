@@ -5,6 +5,7 @@ import { Icon } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
+import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { Value, valueToKey } from "src/inputs/Value";
 import { maybeCall, useTestIds } from "src/utils";
@@ -22,6 +23,7 @@ interface SelectFieldInputProps<O, V extends Value> {
   isReadOnly: boolean;
   fieldDecoration?: (opt: O) => ReactNode;
   errorMsg?: string;
+  required?: boolean;
   helperText?: string | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
@@ -42,6 +44,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
     buttonRef,
     compact = false,
     errorMsg,
+    required,
     helperText,
     state,
     isFocused,
@@ -66,10 +69,11 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
   const readOnlyStyles = isReadOnly ? Css.bn.pl0.pt0.add("backgroundColor", "unset").$ : {};
   const tid = useTestIds(inputProps); // data-testid comes in through here
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
+  const labelSuffix = getLabelSuffix(required);
 
   return (
     <Fragment>
-      {!inlineLabel && label && <Label labelProps={labelProps} label={label} {...tid.label} />}
+      {!inlineLabel && label && <Label labelProps={labelProps} label={label} suffix={labelSuffix} {...tid.label} />}
       <div
         css={{
           ...Css.df.ba.bGray300.br4.px1.itemsCenter.bgWhite.hPx(40).if(compact).hPx(32).$,

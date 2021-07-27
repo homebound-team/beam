@@ -21,6 +21,8 @@ export interface BeamTextFieldProps extends BeamFocusableProps {
   helperText?: string | ReactNode;
   /** Input label */
   label: string;
+  /** Marks the field as required or optional, the default is assumed ambiguous/unknown. */
+  required?: boolean;
   /** If set, label will be placed as `aria-label` on input element */
   hideLabel?: boolean;
   value: string | undefined;

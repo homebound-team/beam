@@ -1,6 +1,8 @@
 import { Meta } from "@storybook/react";
-import { FieldGroup, FormLines } from "src/forms/FormLines";
+import { FieldGroup, FormDivider, FormLines } from "src/forms/FormLines";
+import { Switch } from "src/inputs/Switch";
 import { TextField } from "src/inputs/TextField";
+import { noop } from "src/utils/index";
 
 export default {
   component: FormLines,
@@ -10,8 +12,8 @@ export default {
 export function FlatList() {
   return (
     <FormLines>
-      <TextField label={"First"} value={"first"} onChange={() => {}} />
-      <TextField label={"Last"} value={"last"} onChange={() => {}} />
+      <TextField label="First" value="first" onChange={() => {}} />
+      <TextField label="Last" value="last" onChange={() => {}} />
     </FormLines>
   );
 }
@@ -19,25 +21,105 @@ export function FlatList() {
 export function SmallFlatList() {
   return (
     <FormLines width="sm">
-      <TextField label={"First"} value={"first"} onChange={() => {}} />
-      <TextField label={"Last"} value={"last"} onChange={() => {}} />
+      <TextField label="First" value="first" onChange={() => {}} />
+      <TextField label="Last" value="last" onChange={() => {}} />
     </FormLines>
   );
 }
 
-export function SideBySide() {
+export function SideBySideMedium() {
   return (
     <FormLines>
       <FieldGroup>
-        <TextField label={"First"} value={"first"} onChange={() => {}} />
-        <TextField label={"Middle"} value={"middle"} onChange={() => {}} />
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
       </FieldGroup>
       <TextField label="Address" value="123 Main" onChange={() => {}} />
-      {/* Having three is too wide, so not supported.*/}
       <FieldGroup>
-        <TextField label={"First"} value={"first"} onChange={() => {}} />
-        <TextField label={"Middle"} value={"middle"} onChange={() => {}} />
-        <TextField label={"Last"} value={"last"} onChange={() => {}} />
+        <Switch label="Primary" labelStyle="form" selected={false} onChange={() => {}} />
+        <Switch label="Signatory" labelStyle="form" selected={true} onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="Title" value="Engineer" onChange={() => {}} />
+        <span />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup widths={[2, 1, 2]}>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="M" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
+      </FieldGroup>
+    </FormLines>
+  );
+}
+export function SideBySideLarge() {
+  return (
+    <FormLines width="lg">
+      <FieldGroup>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
+      </FieldGroup>
+      <TextField label="Address" value="123 Main" onChange={() => {}} />
+      <FieldGroup>
+        <Switch label="Primary" labelStyle="form" selected={false} onChange={() => {}} />
+        <Switch label="Signatory" labelStyle="form" selected={true} onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="Title" value="Engineer" onChange={() => {}} />
+        <span />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup widths={[2, 1, 2]}>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="M" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
+      </FieldGroup>
+      <FormDivider />
+      <FieldGroup widths={[3, 1]}>
+        <TextField label="Street" value="" onChange={noop} />
+        <div />
+      </FieldGroup>
+      <FieldGroup widths={[2, 1, 1]}>
+        <TextField label="City" value="" onChange={noop} />
+        <TextField label="State" value="" onChange={noop} />
+        <TextField label="Postal Code" value="" onChange={noop} />
+      </FieldGroup>
+    </FormLines>
+  );
+}
+export function SideBySideSmall() {
+  return (
+    <FormLines width="sm">
+      <FieldGroup>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
+      </FieldGroup>
+      <TextField label="Address" value="123 Main" onChange={() => {}} />
+      <FieldGroup>
+        <Switch label="Primary" labelStyle="form" selected={false} onChange={() => {}} />
+        <Switch label="Signatory" labelStyle="form" selected={true} onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="Title" value="Engineer" onChange={() => {}} />
+        <span />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup widths={[2, 1, 2]}>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="M" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
       </FieldGroup>
     </FormLines>
   );

@@ -7,6 +7,7 @@ import { Icon, IconButton } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
+import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import "./DateField.css";
 
@@ -22,11 +23,13 @@ export interface DateFieldProps {
   onFocus?: () => void;
   disabled?: boolean;
   errorMsg?: string;
+  required?: boolean;
   helperText?: string | ReactNode;
 }
 
 export function DateField(props: DateFieldProps) {
-  const { label, disabled, value, onChange, onFocus, onBlur, errorMsg, helperText } = props;
+  const { label, disabled, required, value, onChange, onFocus, onBlur, errorMsg, helperText } = props;
+  const labelSuffix = getLabelSuffix(required);
 
   const { ...otherProps } = {};
   // We don't really use the inputRef, but `useTextField` needs it. We probably shouldn't
@@ -67,7 +70,7 @@ export function DateField(props: DateFieldProps) {
         "& .DayPicker-Caption > div": Css.base.pyPx(2).$,
       }}
     >
-      {label && <Label labelProps={labelProps} label={label} />}
+      {label && <Label labelProps={labelProps} label={label} suffix={labelSuffix} />}
       <DayPickerInput
         onDayChange={onChange as any}
         dayPickerProps={{

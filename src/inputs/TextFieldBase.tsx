@@ -11,13 +11,17 @@ import { chain, mergeProps } from "react-aria";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, px, Xss } from "src/Css";
+import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamTextFieldProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
 interface TextFieldBaseProps
-  extends Pick<BeamTextFieldProps, "label" | "errorMsg" | "onBlur" | "onFocus" | "helperText" | "hideLabel">,
+  extends Pick<
+      BeamTextFieldProps,
+      "label" | "required" | "errorMsg" | "onBlur" | "onFocus" | "helperText" | "hideLabel"
+    >,
     Partial<Pick<BeamTextFieldProps, "onChange">> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
@@ -34,6 +38,7 @@ interface TextFieldBaseProps
 export function TextFieldBase(props: TextFieldBaseProps) {
   const {
     label,
+    required,
     labelProps,
     hideLabel,
     inputProps,
@@ -49,6 +54,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     xss,
   } = props;
   const errorMessageId = `${inputProps.id}-error`;
+  const labelSuffix = getLabelSuffix(required);
 
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
   const tid = useTestIds(props, defaultTestId(label || "textField"));
@@ -72,7 +78,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
 
   return (
     <div css={Css.df.flexColumn.w100.maxw(px(550)).$} {...groupProps}>
-      {label && !hideLabel && <Label labelProps={labelProps} label={label} {...tid.label} />}
+      {label && !hideLabel && <Label labelProps={labelProps} label={label} suffix={labelSuffix} {...tid.label} />}
       <ElementType
         {...mergeProps(
           inputProps,
@@ -83,7 +89,8 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         ref={inputRef as any}
         rows={multiline ? 1 : undefined}
         css={{
-          ...Css.add("resize", "none").bgWhite.sm.px1.hPx(40).gray900.br4.outline0.ba.bGray300.if(compact).hPx(32).$,
+          ...Css.add("resize", "none").bgWhite.sm.px1.w100.hPx(40).gray900.br4.outline0.ba.bGray300.if(compact).hPx(32)
+            .$,
           ...xss,
           ...Css.if(multiline).mh(px(96)).py1.$,
           "&:focus": Css.bLightBlue700.$,

@@ -22,6 +22,7 @@ export function BoundDateField(props: BoundDateFieldProps) {
           value={field.value || undefined}
           onChange={onChange}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
+          required={field.required}
           onBlur={() => field.blur()}
           onFocus={() => field.focus()}
           {...testId}
