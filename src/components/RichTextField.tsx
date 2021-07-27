@@ -55,6 +55,10 @@ export function RichTextField(props: RichTextFieldProps) {
   // Use a ref for onChange b/c so trixChange always has the latest
   const onChangeRef = useRef<RichTextFieldProps["onChange"]>(onChange);
   onChangeRef.current = onChange;
+  const onBlurRef = useRef<RichTextFieldProps["onBlur"]>(onBlur);
+  onBlurRef.current = onBlur;
+  const onFocusRef = useRef<RichTextFieldProps["onFocus"]>(onFocus);
+  onFocusRef.current = onFocus;
 
   useEffect(
     () => {
@@ -96,8 +100,8 @@ export function RichTextField(props: RichTextFieldProps) {
       const preventDefault = (e: any) => e.preventDefault();
       window.addEventListener("trix-file-accept", preventDefault);
 
-      const trixBlur = () => maybeCall(onBlur);
-      const trixFocus = () => maybeCall(onFocus);
+      const trixBlur = () => maybeCall(onBlurRef.current);
+      const trixFocus = () => maybeCall(onFocusRef.current);
 
       editorElement.addEventListener("trix-change", trixChange as any, false);
       editorElement.addEventListener("trix-blur", trixBlur as any, false);
