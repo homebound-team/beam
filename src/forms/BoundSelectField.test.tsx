@@ -2,6 +2,7 @@ import { createObjectState, ObjectConfig, required } from "@homebound/form-state
 import { render } from "@homebound/rtl-utils";
 import { BoundSelectField } from "src/forms/BoundSelectField";
 import { AuthorInput } from "src/forms/formStateDomain";
+import { idAndName, identity } from "src/inputs/SelectField";
 
 const sports = [
   { id: "s:1", name: "Football" },
@@ -50,11 +51,3 @@ const formConfig: ObjectConfig<AuthorInput> = {
   favoriteSport: { type: "value", rules: [required] },
   isAvailable: { type: "value" },
 };
-
-function identity<T>(o: T): T {
-  return o;
-}
-
-function idAndName({ id, name }: { id: string; name: string }) {
-  return { value: id, label: name };
-}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Value } from "src/inputs";
 import { BeamSelectFieldBaseProps, SelectFieldBase } from "src/inputs/internal/SelectFieldBase";
 
@@ -8,7 +8,7 @@ export interface SelectFieldProps<O, V extends Value> extends BeamSelectFieldBas
   value: V | undefined;
   onSelect: (value: V, opt: O) => void;
   options: O[];
-  mapOption: (opt: O) => { label: string; value: V; menuLabel?: string };
+  mapOption: (opt: O) => { label: string; value: V; menuLabel?: ReactNode };
 }
 
 /**
@@ -39,4 +39,12 @@ export function SelectField<O, V extends Value>(props: SelectFieldProps<O, V>): 
       }}
     />
   );
+}
+
+export function identity<T>(o: T): T {
+  return o;
+}
+
+export function idAndName<V extends Value>({ id, name }: { id: V; name: string }) {
+  return { value: id, label: name };
 }

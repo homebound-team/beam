@@ -1,6 +1,6 @@
 import { click, input, render } from "@homebound/rtl-utils";
 import { useState } from "react";
-import { SelectField, SelectFieldProps, Value } from "src/inputs";
+import { idAndName, SelectField, SelectFieldProps, Value } from "src/inputs";
 
 const options = [
   { id: "1", name: "One" },
@@ -14,13 +14,7 @@ describe("SelectFieldTest", () => {
   it("can set a value", async () => {
     // Given a MultiSelectField
     const { getByRole } = await render(
-      <TestSelectField
-        label="Age"
-        value={"1"}
-        options={options}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
-      />,
+      <TestSelectField label="Age" value={"1"} options={options} mapOption={idAndName} />,
     );
     // That initially has "One" selected
     const text = getByRole("combobox");
