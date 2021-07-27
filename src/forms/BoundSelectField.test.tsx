@@ -11,20 +11,26 @@ const sports = [
 describe("BoundSelectField", () => {
   it("shows the current value", async () => {
     const author = createObjectState(formConfig, { favoriteSport: "s:1" });
-    const { favoriteSport } = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
+    const { favoriteSport } = await render(
+      <BoundSelectField field={author.favoriteSport} options={sports} mapOption={idAndName} />,
+    );
     expect(favoriteSport()).toHaveValue("Football");
   });
 
   it("shows the error message", async () => {
     const author = createObjectState(formConfig, {});
     author.favoriteSport.touched = true;
-    const { favoriteSport_errorMsg } = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
+    const { favoriteSport_errorMsg } = await render(
+      <BoundSelectField field={author.favoriteSport} options={sports} mapOption={idAndName} />,
+    );
     expect(favoriteSport_errorMsg()).toHaveTextContent("Required");
   });
 
   it("shows the label", async () => {
     const author = createObjectState(formConfig, { favoriteSport: "s:1" });
-    const { favoriteSport_label } = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
+    const { favoriteSport_label } = await render(
+      <BoundSelectField field={author.favoriteSport} options={sports} mapOption={idAndName} />,
+    );
     expect(favoriteSport_label()).toHaveTextContent("Favorite Sport");
   });
 
@@ -35,14 +41,7 @@ describe("BoundSelectField", () => {
       { label: "No", value: false },
       { label: "", value: undefined },
     ];
-    const r = await render(
-      <BoundSelectField
-        field={author.isAvailable}
-        options={options}
-        getOptionLabel={(o) => o.label}
-        getOptionValue={(o) => o.value}
-      />,
-    );
+    const r = await render(<BoundSelectField field={author.isAvailable} options={options} mapOption={identity} />);
     expect(r.isAvailable()).toHaveValue("");
   });
 });
@@ -51,3 +50,11 @@ const formConfig: ObjectConfig<AuthorInput> = {
   favoriteSport: { type: "value", rules: [required] },
   isAvailable: { type: "value" },
 };
+
+function identity<T>(o: T): T {
+  return o;
+}
+
+function idAndName({ id, name }: { id: string; name: string }) {
+  return { value: id, label: name };
+}
