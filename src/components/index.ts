@@ -5,6 +5,7 @@ export * from "./ButtonGroup";
 export * from "./ButtonMenu";
 export * from "./Chip";
 export * from "./Chips";
+export * from "./Copy";
 export * from "./CssReset";
 export * from "./Filters";
 export * from "./GridTable";

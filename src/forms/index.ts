@@ -11,3 +11,5 @@ export * from "./BoundTextAreaField";
 export * from "./BoundTextField";
 export * from "./BoundToggleChipGroupField";
 export * from "./FormLines";
+export * from "./StaticField";
+export * from "./StaticLinkField";
