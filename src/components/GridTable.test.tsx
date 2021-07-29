@@ -55,11 +55,6 @@ const nestedColumns: GridColumn<NestedRow>[] = [
 ];
 
 describe("GridTable", () => {
-  it("renders", async () => {
-    const c = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} />);
-    expect(c.baseElement).toMatchSnapshot();
-  });
-
   it("can align things", async () => {
     // Given a column that aligns center
     const valueColumn: GridColumn<Row> = {
