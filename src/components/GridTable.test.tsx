@@ -247,6 +247,37 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("c");
     });
 
+    it("can sort by dedicated sort values", async () => {
+      // Given the table is using client-side sorting
+      const r = await render(
+        <GridTable<Row>
+          columns={[
+            nameColumn,
+            {
+              header: () => "Value",
+              data: (row) => ({
+                // And the value is the name, for filtering
+                value: row.name,
+                // But the sort value is set to the numeric value
+                sortValue: row.value,
+                content: <div>{row.name}</div>,
+              }),
+            },
+          ]}
+          sorting={{ on: "client", initial: [1, "ASC"] }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // Then the `value: 1` row is first
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
+    });
+
     it("can sort undefined values", async () => {
       // Given the table is using client-side sorting
       const r = await render(
