@@ -733,6 +733,8 @@ export type GridCellContent = {
   alignment?: GridCellAlignment;
   /** Allow value to be a function in case it's a dynamic value i.e. reading from an inline-edited proxy. */
   value?: MaybeFn<number | string | Date>;
+  /** The value to use specifically for sorting (i.e. if `value` is used for filtering); defaults to `value`. */
+  sortValue?: MaybeFn<number | string | Date>;
   /** Whether to indent the cell. */
   indent?: 1 | 2;
 };
@@ -1065,8 +1067,8 @@ function sortBatch<R extends Kinded>(
   const column = columns[value];
   const invert = direction === "DESC";
   batch.sort((a, b) => {
-    const v1 = maybeValue(applyRowFn(column, a));
-    const v2 = maybeValue(applyRowFn(column, b));
+    const v1 = sortValue(applyRowFn(column, a));
+    const v2 = sortValue(applyRowFn(column, b));
     const v1e = v1 === null || v1 === undefined;
     const v2e = v2 === null || v2 === undefined;
     if ((v1e && v2e) || v1 === v2) {
@@ -1080,7 +1082,19 @@ function sortBatch<R extends Kinded>(
   });
 }
 
-function maybeValue(value: ReactNode | GridCellContent): any {
+/** Look at a row and get its sort value. */
+function sortValue(value: ReactNode | GridCellContent): any {
+  // Check sortValue and then fallback on value
+  const maybeFn = value && typeof value === "object" && "value" in value ? value.sortValue || value.value : value;
+  // Watch for functions that need to read from a potentially-changing proxy
+  if (maybeFn instanceof Function) {
+    return maybeFn();
+  }
+  return maybeFn;
+}
+
+/** Look at a row and get its filter value. */
+function filterValue(value: ReactNode | GridCellContent): any {
   const maybeFn = value && typeof value === "object" && "value" in value ? value.value : value;
   // Watch for functions that need to read from a potentially-changing proxy
   if (maybeFn instanceof Function) {
@@ -1165,7 +1179,7 @@ function maybeApplyFunction<T>(
 }
 
 export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter: string): boolean {
-  let value = maybeValue(maybeContent);
+  let value = filterValue(maybeContent);
   if (typeof value === "string") {
     return value.toLowerCase().includes(filter.toLowerCase());
   } else if (typeof value === "number") {
