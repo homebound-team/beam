@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
-import { Css, Margin, Only, Palette, Properties, px, Xss } from "src/Css";
+import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import tinycolor from "tinycolor2";
 
@@ -122,7 +122,7 @@ export let defaultStyle: GridStyle = {
   indentOneCss: Css.pl4.$,
   indentTwoCss: Css.pl7.$,
   // Use h100 so that all cells are the same height when scrolled; set bgWhite for when we're laid over other rows.
-  headerCellCss: Css.selfEnd.nowrap.py1.bgGray200.h100.itemsEnd.$,
+  headerCellCss: Css.selfEnd.nowrap.py1.bgGray100.h100.itemsEnd.$,
   firstRowMessageCss: Css.px1.py2.$,
   rowHoverColor: Palette.Gray200,
 };
@@ -130,7 +130,8 @@ export let defaultStyle: GridStyle = {
 /** Tightens up the padding of rows, great for rows that have form elements in them. */
 export const condensedStyle: GridStyle = {
   ...defaultStyle,
-  cellCss: Css.itemsCenter.p(px(6)).$,
+  headerCellCss: Css.bgGray100.tinyEm.$,
+  cellCss: Css.itemsCenter.sm.py1.px2.$,
   rootCss: Css.dg.gray700.xs.$,
 };
 
