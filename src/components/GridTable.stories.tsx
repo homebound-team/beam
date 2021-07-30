@@ -5,6 +5,7 @@ import {
   Button,
   cardStyle,
   condensedStyle,
+  defaultStyle,
   GridCollapseContext,
   GridColumn,
   GridDataRow,
@@ -245,6 +246,24 @@ export function StickyHeader() {
     </div>
   );
 }
+
+export const StyleDefault = newStory(() => {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
+  return (
+    <GridTable<Row>
+      columns={[nameColumn, valueColumn, actionColumn]}
+      style={defaultStyle}
+      rows={[
+        { kind: "header", id: "header" },
+        { kind: "data", id: "1", name: "c", value: 1 },
+        { kind: "data", id: "2", name: "b", value: 2 },
+        { kind: "data", id: "3", name: "a", value: 3 },
+      ]}
+    />
+  );
+}, {});
 
 export const StyleCondensed = newStory(() => {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
