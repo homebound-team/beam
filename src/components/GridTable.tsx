@@ -1127,7 +1127,8 @@ function useSortState<R extends Kinded, S>(
         return [(key as any) as S, initial[1]];
       } else {
         // If no explicit sorting, assume 1st column ascending
-        return [(0 as any) as S, "ASC"];
+        const firstSortableColumn = columns.findIndex((c) => c.clientSideSort !== false);
+        return [(firstSortableColumn as any) as S, "ASC"];
       }
       return undefined;
     } else {
