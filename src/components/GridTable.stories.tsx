@@ -43,7 +43,10 @@ type Row = SimpleHeaderAndDataOf<Data>;
 // f1 (total-total)
 
 export function ClientSideSorting() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const nameColumn: GridColumn<Row> = {
+    header: "Name",
+    data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
+  };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, clientSideSort: false };
   return (

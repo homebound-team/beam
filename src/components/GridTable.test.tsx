@@ -169,14 +169,14 @@ describe("GridTable", () => {
           ]}
         />,
       );
-      // Then the data is initially render un-sorted
-      expect(cell(r, 1, 0)).toHaveTextContent("b");
+      // Then the data is initially render sorted by 1st column
+      expect(cell(r, 1, 0)).toHaveTextContent("a");
 
       // And when sorted by column 1
       const { sortHeader_0, sortHeader_1 } = r;
       click(sortHeader_0);
-      // Then 'name: a' row is first
-      expect(cell(r, 1, 0)).toHaveTextContent("a");
+      // Then 'name: c' row is first
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
 
       // And when sorted by column 2
       click(sortHeader_1);
@@ -357,6 +357,27 @@ describe("GridTable", () => {
       );
       // Then the data is sorted by value
       expect(cell(r, 1, 0)).toHaveTextContent("c");
+      expect(cell(r, 2, 0)).toHaveTextContent("b");
+    });
+
+    it("initially sorts by the 1st column is not specified", async () => {
+      // Given a table
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          // And there is no initial sort given
+          sorting={{ on: "client" }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // Then the data is sorted by name
+      expect(cell(r, 1, 0)).toHaveTextContent("a");
       expect(cell(r, 2, 0)).toHaveTextContent("b");
     });
   });
