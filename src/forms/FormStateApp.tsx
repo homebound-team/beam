@@ -19,7 +19,10 @@ import {
   BoundSwitchField,
   BoundTextField,
   BoundToggleChipGroupField,
+  FieldGroup,
   FormDivider,
+  StaticField,
+  StaticLinkField,
 } from "src/forms";
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
 import { FormLines } from "src/forms/FormLines";
@@ -90,6 +93,10 @@ export function FormStateApp() {
               <BoundTextField field={formState.middleInitial} />
               <BoundTextField field={formState.lastName} />
               <BoundDateField field={formState.birthday} />
+              <FieldGroup>
+                <StaticField label="Revenue" value="$500" />
+                <StaticLinkField label="Website" href="https://google.com" />
+              </FieldGroup>
               <BoundNumberField field={formState.heightInInches} />
               <FormDivider />
               <BoundSelectField field={formState.favoriteSport} options={sports} />
