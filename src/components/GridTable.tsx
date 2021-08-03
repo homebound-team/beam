@@ -68,7 +68,7 @@ export function simpleDataRows<T extends { id: string }, R extends { kind: "head
  * a) `serverSideSortKey` if we're server-side sorting, or
  * b) it's index in the `columns` array, if client-side sorting
  */
-type SortState<S> = [S, Direction];
+type SortState<S> = readonly [S, Direction];
 
 export type Kinded = { kind: string };
 
@@ -1085,7 +1085,15 @@ function sortBatch<R extends Kinded>(
 /** Look at a row and get its sort value. */
 function sortValue(value: ReactNode | GridCellContent): any {
   // Check sortValue and then fallback on value
-  const maybeFn = value && typeof value === "object" && "value" in value ? value.sortValue || value.value : value;
+  let maybeFn = value;
+  if (value && typeof value === "object") {
+    // Look for GridCellContent.sortValue, then GridCellContent.value
+    if ("sortValue" in value) {
+      maybeFn = value.sortValue;
+    } else if ("value" in value) {
+      maybeFn = value.value;
+    }
+  }
   // Watch for functions that need to read from a potentially-changing proxy
   if (maybeFn instanceof Function) {
     return maybeFn();
@@ -1116,7 +1124,11 @@ function useSortState<R extends Kinded, S>(
       const { initial } = sorting;
       if (initial) {
         const key = typeof initial[0] === "number" ? initial[0] : columns.indexOf(initial[0] as any);
-        return ([key, initial[1]] as any) as SortState<S>;
+        return [(key as any) as S, initial[1]];
+      } else {
+        // If no explicit sorting, assume 1st column ascending
+        const firstSortableColumn = columns.findIndex((c) => c.clientSideSort !== false);
+        return [(firstSortableColumn as any) as S, "ASC"];
       }
       return undefined;
     } else {
