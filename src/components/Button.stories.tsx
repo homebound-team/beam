@@ -4,7 +4,7 @@ import { Button, ButtonProps } from "src";
 import { Css } from "src/Css";
 
 export default {
-  title: "Components/Buttons",
+  title: "Components/Button",
   component: Button,
   args: { onClick: action("onPress") },
   argTypes: {
