@@ -18,14 +18,8 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
 }
 
 export function Button(props: ButtonProps) {
-  const {
-    onClick: onPress,
-    disabled: isDisabled,
-    disabledReason,
-    endAdornment,
-    menuTriggerProps,
-    ...otherProps
-  } = props;
+  const { onClick: onPress, disabled, endAdornment, menuTriggerProps, ...otherProps } = props;
+  const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, ...otherProps, ...menuTriggerProps };
   const { label, icon, variant = "primary", size = "sm", buttonRef } = ariaProps;
   const ref = buttonRef || useRef(null);
@@ -59,9 +53,10 @@ export function Button(props: ButtonProps) {
     </button>
   );
 
-  if (disabledReason) {
+  // If we're disabled b/c of a non-boolean ReactNode, show it in a tooltip
+  if (isDisabled && typeof disabled !== "boolean") {
     return (
-      <Tooltip title={disabledReason} delay={100}>
+      <Tooltip title={disabled} delay={100}>
         {button}
       </Tooltip>
     );

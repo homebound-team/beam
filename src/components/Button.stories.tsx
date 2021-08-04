@@ -132,5 +132,5 @@ export function ButtonVariations(args: ButtonProps) {
 }
 
 export function ButtonWithTooltip() {
-  return <Button disabled={true} disabledReason="You cannot currently perform this operation." label="Upload" />;
+  return <Button disabled="You cannot currently perform this operation." label="Upload" />;
 }
