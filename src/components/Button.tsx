@@ -2,6 +2,7 @@ import { AriaButtonProps } from "@react-types/button";
 import { ReactNode, RefObject, useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src";
+import { Tooltip } from "src/components/Tooltip";
 import { Css } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 
@@ -16,13 +17,15 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   buttonRef?: RefObject<HTMLButtonElement>;
 }
 
-export function Button({
-  onClick: onPress,
-  disabled: isDisabled,
-  endAdornment,
-  menuTriggerProps,
-  ...otherProps
-}: ButtonProps) {
+export function Button(props: ButtonProps) {
+  const {
+    onClick: onPress,
+    disabled: isDisabled,
+    disabledReason,
+    endAdornment,
+    menuTriggerProps,
+    ...otherProps
+  } = props;
   const ariaProps = { onPress, isDisabled, ...otherProps, ...menuTriggerProps };
   const { label, icon, variant = "primary", size = "sm", buttonRef } = ariaProps;
   const ref = buttonRef || useRef(null);
@@ -35,7 +38,7 @@ export function Button({
   ]);
   const focusRingStyles = useMemo(() => (variant === "danger" ? Css.bshDanger.$ : Css.bshFocus.$), [variant]);
 
-  return (
+  const button = (
     <button
       ref={ref}
       {...buttonProps}
@@ -55,6 +58,16 @@ export function Button({
       {endAdornment && <span css={Css.ml1.$}>{endAdornment}</span>}
     </button>
   );
+
+  if (disabledReason) {
+    return (
+      <Tooltip title={disabledReason} delay={100}>
+        {button}
+      </Tooltip>
+    );
+  }
+
+  return button;
 }
 
 function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {

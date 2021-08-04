@@ -20,7 +20,7 @@ export default {
   },
 } as Meta<ButtonProps>;
 
-export function Buttons(args: ButtonProps) {
+export function ButtonVariations(args: ButtonProps) {
   const buttonRowStyles = Css.df.childGap1.my1.$;
   return (
     <div css={Css.dg.flexColumn.childGap2.$}>
@@ -129,4 +129,8 @@ export function Buttons(args: ButtonProps) {
       </div>
     </div>
   );
+}
+
+export function ButtonWithTooltip() {
+  return <Button disabled={true} disabledReason="You cannot currently perform this operation." label="Upload" />;
 }
