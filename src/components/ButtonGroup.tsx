@@ -2,33 +2,31 @@ import React, { useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
 import { Css } from "src/Css";
-import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
+import { Callback } from "src/types";
 
 export interface ButtonGroupProps {
+  buttons: ButtonGroupButton[];
   /** Disables all buttons in ButtonGroup */
   disabled?: boolean;
-  /**
-   * ButtonGroupButtonProps in an internal API.
-   * This is only exposing props that will be publicly accessible.
-   */
-  buttons: Pick<ButtonGroupButtonProps, "text" | "icon" | "active" | "onClick" | "disabled">[];
   size?: ButtonGroupSize;
 }
 
-interface ButtonGroupButtonProps extends BeamButtonProps, BeamFocusableProps {
-  text?: string;
+export type ButtonGroupButton = {
   icon?: IconProps["icon"];
-  // Active is used to indicate the active/selected button, as in a tab or toggle.
+  text?: string;
+  onClick?: Callback;
+  /** Disables the button. Note we don't support the `disabled: ReactNode`/tooltip for now. */
+  disabled?: boolean;
+  /** Indicates the active/selected button, as in a tab or toggle. */
   active?: boolean;
-  size: ButtonGroupSize;
-}
+};
 
 export function ButtonGroup(props: ButtonGroupProps) {
   const { buttons, disabled = false, size = "sm" } = props;
   return (
     <div css={Css.mPx(4).$}>
       {buttons.map(({ disabled: buttonDisabled, ...buttonProps }, i) => (
-        <ButtonGroupButton
+        <GroupButton
           key={i}
           {...buttonProps}
           {...{
@@ -43,19 +41,16 @@ export function ButtonGroup(props: ButtonGroupProps) {
   );
 }
 
-function ButtonGroupButton({
-  icon,
-  text,
-  active,
-  onClick: onPress,
-  disabled,
-  size,
-  ...otherProps
-}: ButtonGroupButtonProps) {
+interface GroupButtonProps extends ButtonGroupButton {
+  size: ButtonGroupSize;
+}
+
+function GroupButton(props: GroupButtonProps) {
+  const { icon, text, active, onClick: onPress, disabled, size, ...otherProps } = props;
   const ariaProps = { onPress, isDisabled: disabled, ...otherProps };
   const ref = useRef(null);
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
-  const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
+  const { isFocusVisible, focusProps } = useFocusRing();
   const { hoverProps, isHovered } = useHover(ariaProps);
 
   return (
