@@ -8,8 +8,12 @@ export interface BeamFocusableProps {
 }
 
 export interface BeamButtonProps {
-  /** Whether the interactive element is disabled. */
-  disabled?: boolean;
+  /**
+   * Whether the interactive element is disabled.
+   *
+   * If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
+   */
+  disabled?: boolean | ReactNode;
   /** Handler that is called when the press is released over the target. */
   onClick?: (e: PressEvent) => void;
 }

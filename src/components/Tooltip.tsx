@@ -1,4 +1,4 @@
-import React, { ReactElement, ReactNode, useRef, useState } from "react";
+import React, { cloneElement, ReactElement, ReactNode, useRef, useState } from "react";
 import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
 import { usePopper } from "react-popper";
 import { useTooltipTriggerState } from "react-stately";
@@ -10,7 +10,7 @@ import { Css } from "src/Css";
 
 interface TooltipProps {
   /** The content that shows up when hovered */
-  title: string;
+  title: ReactNode;
   children: ReactElement;
   placement?: Placement;
   delay?: number;
@@ -18,11 +18,12 @@ interface TooltipProps {
 }
 
 export function Tooltip(props: TooltipProps) {
-  const state = useTooltipTriggerState({ delay: 500, ...props });
+  const { placement, children, title, disabled, delay } = props;
+
+  const state = useTooltipTriggerState({ delay, isDisabled: disabled });
   const triggerRef = React.useRef(null);
-  const { placement, children, title, disabled } = props;
   const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger(
-    { ...props, isDisabled: disabled },
+    { delay, isDisabled: disabled },
     state,
     triggerRef,
   );
@@ -30,7 +31,7 @@ export function Tooltip(props: TooltipProps) {
 
   return (
     <>
-      {React.cloneElement(children, { ref: triggerRef, ...triggerProps })}
+      {cloneElement(children, { ref: triggerRef, ...triggerProps })}
       {state.isOpen && (
         <Popper
           {...mergeProps(_tooltipProps, tooltipProps)}

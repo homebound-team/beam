@@ -4,7 +4,7 @@ import { Button, ButtonProps } from "src";
 import { Css } from "src/Css";
 
 export default {
-  title: "Components/Buttons",
+  title: "Components/Button",
   component: Button,
   args: { onClick: action("onPress") },
   argTypes: {
@@ -20,7 +20,7 @@ export default {
   },
 } as Meta<ButtonProps>;
 
-export function Buttons(args: ButtonProps) {
+export function ButtonVariations(args: ButtonProps) {
   const buttonRowStyles = Css.df.childGap1.my1.$;
   return (
     <div css={Css.dg.flexColumn.childGap2.$}>
@@ -128,5 +128,22 @@ export function Buttons(args: ButtonProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+export function ButtonWithTooltip() {
+  return (
+    <Button
+      disabled={
+        <div>
+          You <b>cannot</b> currently perform this operation because of:
+          <ul>
+            <li>reason one</li>
+            <li>reason two</li>
+          </ul>
+        </div>
+      }
+      label="Upload"
+    />
   );
 }
