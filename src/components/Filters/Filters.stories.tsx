@@ -49,8 +49,8 @@ export function Filter() {
     const stage = multiFilter({
       options: stages,
       label: "Stage",
-      getOptionValue: (o) => o.code,
-      getOptionLabel: (o) => o.name,
+      getOptionValue: (o) => o,
+      getOptionLabel: (o) => (o === Stage.StageOne ? "One" : "Two"),
     });
     const status = multiFilter({
       options: statuses,
@@ -85,9 +85,14 @@ export function Filter() {
   );
 }
 
+export enum Stage {
+  StageOne = "ONE",
+  StageTwo = "TWO",
+}
+
 const internalUsers: InternalUser[] = zeroTo(10).map((i) => ({ id: `${i + 1}`, name: `Employee ${i + 1}` }));
 const markets: Market[] = zeroTo(5).map((i) => ({ code: `${i + 1}`, name: `Market ${i + 1}` }));
-const stages: Stage[] = zeroTo(3).map((i) => ({ code: `${i + 1}`, name: `Stage ${i + 1}` }));
+const stages: Stage[] = [Stage.StageOne, Stage.StageTwo];
 const statuses: Status[] = zeroTo(4).map((i) => ({ code: `${i + 1}`, name: `Status ${i + 1}` }));
 const tableData: Project[] = [
   {
@@ -257,7 +262,7 @@ const columns: GridColumn<Row>[] = [
   { header: () => "Project Manager", data: ({ internalUser }) => internalUser.name },
   { header: () => "Market", data: ({ market }) => market.name },
   { header: () => "Favorite", data: ({ favorite }) => (favorite ? "Yes" : "No") },
-  { header: () => "Stage", data: ({ stage }) => stage.name },
+  { header: () => "Stage", data: ({ stage }) => (stage === Stage.StageOne ? "One" : "Two") },
   { header: () => "Status", data: ({ status }) => status.name },
 ];
 
@@ -267,7 +272,7 @@ function filterRows(data: Project[], filter: ProjectFilter): GridDataRow<Row>[] 
     ...data
       .filter((p) => (filter.internalUserId?.length ? filter.internalUserId.includes(p.internalUser.id) : true))
       .filter((p) => (filter.marketId?.length ? filter.marketId.includes(p.market.code) : true))
-      .filter((p) => (filter.stage?.length ? filter.stage.includes(p.stage.code) : true))
+      .filter((p) => (filter.stage?.length ? filter.stage.includes(p.stage) : true))
       .filter((p) => (filter.status?.length ? filter.status.includes(p.status.code) : true))
       .filter((p) => (filter.favorite !== undefined ? filter.favorite === p.favorite : true))
       .map((p) => ({ kind: "data" as const, ...p })),
@@ -284,21 +289,17 @@ type InternalUser = {
   id: string;
 };
 
-type Stage = {
-  code: string;
-  name: string;
-};
-
 type Status = {
   code: string;
   name: string;
 };
 
-type ProjectFilter = {
+export type ProjectFilter = {
   marketId?: string[] | null;
   internalUserId?: string | null;
   favorite?: boolean | null;
-  stage?: string[] | null;
+  stage?: Stage[] | null;
+  stageSingle?: Stage | null;
   status?: string[] | null;
 };
 
