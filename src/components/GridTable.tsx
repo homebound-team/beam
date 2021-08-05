@@ -111,8 +111,13 @@ export interface GridStyle {
   rowHoverColor: string;
 }
 
+export interface GridTableDefaults {
+  style: GridStyle;
+  stickyHeader: boolean;
+}
+
 /** Our original table look & feel/style. */
-export let defaultStyle: GridStyle = {
+export const defaultStyle: GridStyle = {
   rootCss: Css.gray700.$,
   betweenRowsCss: Css.bt.bGray400.$,
   firstNonHeaderRowCss: Css.add({ borderTopStyle: "none" }).$,
@@ -152,9 +157,19 @@ export const cardStyle: GridStyle = {
   },
 };
 
+let defaults: GridTableDefaults = {
+  style: defaultStyle,
+  stickyHeader: false,
+};
+
 /** Configures the default/app-wide GridStyle. */
 export function setDefaultStyle(style: GridStyle): void {
-  defaultStyle = style;
+  defaults.style = style;
+}
+
+/** Configures the default/app-wide GridTable settings. */
+export function setGridTableDefaults(opts: Partial<GridTableDefaults>): void {
+  defaults = { ...defaults, ...opts };
 }
 
 type RenderAs = "div" | "table" | "virtual";
@@ -262,9 +277,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     as = "div",
     columns,
     rows,
-    style = defaultStyle,
+    style = defaults.style,
     rowStyles,
-    stickyHeader = false,
+    stickyHeader = defaults.stickyHeader,
     stickyOffset = "0",
     xss,
     sorting,
