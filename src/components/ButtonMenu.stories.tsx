@@ -58,3 +58,20 @@ export function InteractiveMenu() {
     />
   );
 }
+
+export function DisabledMenu() {
+  const menuItems: MenuItem[] = [
+    { label: "Page action", onClick: action("Test item clicked") },
+    { label: "Internal Link", onClick: "/fakeRoute" },
+    { label: "External Link - Homebound.com", onClick: "https://www.homebound.com" },
+  ];
+
+  return (
+    <ButtonMenu
+      trigger={{ label: "Menu trigger" }}
+      items={menuItems}
+      persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+      isDisabled={true}
+    />
+  );
+}
