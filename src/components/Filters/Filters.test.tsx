@@ -1,4 +1,4 @@
-import { ProjectFilter, Stage } from "src/components/Filters/Filters.stories";
+import { ProjectFilter, Stage } from "src/components/Filters/testDomain";
 import { FilterDefs } from "src/components/Filters/types";
 import { booleanFilter, multiFilter, singleFilter } from "src/components/Filters/utils";
 

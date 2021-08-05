@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useMemo } from "react";
+import { InternalUser, Market, Project, ProjectFilter, Stage, Status } from "src/components/Filters/testDomain";
 import {
   booleanFilter,
   FilterDefs,
@@ -83,11 +84,6 @@ export function Filter() {
       <GridTable columns={columns} rows={filterRows(tableData, filter)} />
     </div>
   );
-}
-
-export enum Stage {
-  StageOne = "ONE",
-  StageTwo = "TWO",
 }
 
 const internalUsers: InternalUser[] = zeroTo(10).map((i) => ({ id: `${i + 1}`, name: `Employee ${i + 1}` }));
@@ -278,36 +274,3 @@ function filterRows(data: Project[], filter: ProjectFilter): GridDataRow<Row>[] 
       .map((p) => ({ kind: "data" as const, ...p })),
   ];
 }
-
-type Market = {
-  code: string;
-  name: string;
-};
-
-type InternalUser = {
-  name: string;
-  id: string;
-};
-
-type Status = {
-  code: string;
-  name: string;
-};
-
-export type ProjectFilter = {
-  marketId?: string[] | null;
-  internalUserId?: string | null;
-  favorite?: boolean | null;
-  stage?: Stage[] | null;
-  stageSingle?: Stage | null;
-  status?: string[] | null;
-};
-
-type Project = {
-  id: string;
-  internalUser: InternalUser;
-  market: Market;
-  favorite: boolean;
-  stage: Stage;
-  status: Status;
-};
