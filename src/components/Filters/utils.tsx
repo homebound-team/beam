@@ -113,10 +113,10 @@ interface BooleanFilterProps {
   options?: BooleanOption[];
   label: string;
 }
-export function booleanFilter({
-  options = defaultBooleanOptions,
-  label,
-}: BooleanFilterProps): { kind: "boolean" } & SingleFilterProps<BooleanOption, string> {
+export function booleanFilter(
+  opts: BooleanFilterProps,
+): { kind: "boolean" } & SingleFilterProps<BooleanOption, string> {
+  const { options = defaultBooleanOptions, label } = opts;
   return {
     kind: "boolean" as const,
     options,
