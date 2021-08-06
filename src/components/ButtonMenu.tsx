@@ -21,13 +21,14 @@ interface ButtonMenuProps {
   placement?: "left" | "right";
   // for storybook purposes
   defaultOpen?: boolean;
+  disabled?: boolean;
 }
 
-export function ButtonMenu({ trigger, items, placement, persistentItems, defaultOpen }: ButtonMenuProps) {
+export function ButtonMenu({ trigger, items, placement, persistentItems, defaultOpen, disabled }: ButtonMenuProps) {
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef(null);
-  const { menuTriggerProps, menuProps: ariaMenuProps } = useMenuTrigger({}, state, buttonRef);
+  const { menuTriggerProps, menuProps: ariaMenuProps } = useMenuTrigger({ isDisabled: disabled }, state, buttonRef);
   const { overlayProps: positionProps } = useOverlayPosition({
     targetRef: buttonRef,
     overlayRef: popoverRef,
@@ -55,6 +56,7 @@ export function ButtonMenu({ trigger, items, placement, persistentItems, default
           menuTriggerProps={menuTriggerProps}
           buttonRef={buttonRef}
           endAdornment={<Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} />}
+          disabled={disabled}
         />
       ) : (
         <IconButton {...trigger} menuTriggerProps={menuTriggerProps} buttonRef={buttonRef} />
