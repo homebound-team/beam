@@ -8,5 +8,5 @@ import { capitalCase } from "change-case";
  * have a known id/key for a given form state field.
  */
 export function defaultLabel(id: string): string {
-  return capitalCase(id).replace(/Ids?$/, "");
+  return capitalCase(id).replace(/Ids?$/, "").trim();
 }
