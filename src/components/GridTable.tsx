@@ -674,7 +674,7 @@ type RenderCellFn<R extends Kinded> = (
 
 /** Defines row-specific styling for each given row `kind` in `R` */
 export type GridRowStyles<R extends Kinded> = {
-  [P in R["kind"]]: RowStyle<DiscriminateUnion<R, "kind", P>>;
+  [P in R["kind"]]?: RowStyle<DiscriminateUnion<R, "kind", P>>;
 };
 
 export interface RowStyle<R extends Kinded> {
