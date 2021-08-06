@@ -12,6 +12,7 @@ import {
   simpleHeader,
   SimpleHeaderAndDataOf,
   SimpleHeaderAndDataWith,
+  simpleRows,
 } from "src/components/GridTable";
 import { Css, Palette } from "src/Css";
 import { cell, click, render, row } from "src/utils/rtl";
@@ -796,6 +797,24 @@ describe("GridTable", () => {
     const r = await render(<GridTable columns={[valueColumn]} rows={rows} />);
     expect(cell(r, 1, 0)).toHaveTextContent("id=a:1 value=1");
     expect(cell(r, 2, 0)).toHaveTextContent("id=a:2 value=2");
+  });
+
+  it("simpleRows can accept undefined", async () => {
+    // Given a row that uses SimpleHeaderAndDataOf
+    type Row = SimpleHeaderAndDataOf<{ value: number }>;
+    // And we don't have any data defined yet
+    const rows: GridDataRow<Row>[] = simpleRows(undefined);
+    // Then we still get back the header row
+    expect(rows).toEqual([simpleHeader]);
+  });
+
+  it("simpleDataRows can accept undefined", async () => {
+    // Given a row that uses SimpleHeaderAndDataWith
+    type Row = SimpleHeaderAndDataWith<{ value: number }>;
+    // And we don't have any data defined yet
+    const rows: GridDataRow<Row>[] = simpleDataRows(undefined);
+    // Then we still get back the header row
+    expect(rows).toEqual([simpleHeader]);
   });
 });
 
