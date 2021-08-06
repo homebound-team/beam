@@ -9,6 +9,7 @@ import {
 import { MultiSelectField, SelectField } from "src/inputs";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 import { safeEntries } from "src/utils";
+import { defaultLabel } from "src/utils/defaultLabel";
 
 interface GetFilterComponentsOpts<F> {
   filterDefs: FilterDefs<F>;
@@ -23,10 +24,12 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
   // Need to set `filterDef` as `any` - not sure exactly why yet... but it breaks things.
   return safeEntries(filterDefs).map(([key, filterDef]: [keyof F, any]) => {
     if (filterDef.kind === "boolean") {
+      const label = filterDef.label || defaultLabel(key as string);
       return wrapIfModal(
         <SelectField
           {...filterDef}
           compact
+          label={label}
           value={String(filter[key])}
           inlineLabel
           sizeToContent={!inModal}
@@ -36,31 +39,33 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
           }}
         />,
         inModal,
-        filterDef.label,
+        label,
       );
     }
 
     if (filterDef.kind === "single") {
+      const label = filterDef.label || defaultLabel(key as string);
       return wrapIfModal(
         <SelectField
           {...filterDef}
           compact
           value={filter[key]}
+          label={label}
           inlineLabel
           sizeToContent={!inModal}
           onSelect={(value) => updateFilter(filter, key, value)}
         />,
         inModal,
-        filterDef.label,
+        label,
       );
     }
 
     if (filterDef.kind === "multi") {
+      const label = filterDef.label || defaultLabel(key as string);
       if (inModal && filterDef.options.length <= 8) {
-        debugger;
         return wrapIfModal(
           <ToggleChipGroup
-            label={filterDef.label}
+            label={label}
             options={filterDef.options.map((o: any) => ({
               label: filterDef.getOptionLabel(o),
               value: filterDef.getOptionValue(o),
@@ -70,14 +75,14 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
             hideLabel={true}
           />,
           inModal,
-          filterDef.label,
+          label,
         );
       }
-
       return wrapIfModal(
         <MultiSelectField
           {...filterDef}
           compact
+          label={label}
           values={filter[key] || []}
           inlineLabel
           sizeToContent={!inModal}
@@ -85,9 +90,11 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
           nothingSelectedText="All"
         />,
         inModal,
-        filterDef.label,
+        label,
       );
     }
+
+    throw new Error(`Unsupported filter ${filterDef.kind}`);
   });
 }
 

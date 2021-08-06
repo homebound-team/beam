@@ -29,7 +29,6 @@ export function Filter() {
   const filterDefs: FilterDefs<ProjectFilter> = useMemo(() => {
     const marketId = multiFilter({
       options: markets,
-      label: "Market",
       getOptionValue: (o) => o.code,
       getOptionLabel: (o) => o.name,
     });
