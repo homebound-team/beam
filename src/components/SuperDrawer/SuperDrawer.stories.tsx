@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf, Tag } from "src";
-import { GridDataRow, GridRowLookup } from "src/components/GridTable";
+import { GridDataRow, GridRowLookup, simpleRows } from "src/components/GridTable";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
@@ -186,7 +186,7 @@ export function TableWithPrevNextAndCloseCheck() {
   const { openInDrawer, addCanCloseDrawerCheck } = useSuperDrawer();
   const rowLookup = useRef<GridRowLookup<Row>>();
   // Always prompts a confirmation message
-  addCanCloseDrawerCheck(() => false)
+  addCanCloseDrawerCheck(() => false);
   // Creates a setContent with prev/next handles to move up or down the table
   function openRow(row: GridDataRow<Row>) {
     if (row.kind === "data") {
@@ -218,15 +218,11 @@ export function TableWithPrevNextAndCloseCheck() {
         columns={[titleColumn, authorColumn]}
         rowStyles={rowStyles}
         rowLookup={rowLookup}
-        rows={[
-          { kind: "header", id: "header" },
-          ...Books.map((book, i) => ({ kind: "data" as const, id: `${i}`, ...book })),
-        ]}
+        rows={simpleRows(Books.map((book, i) => ({ kind: "data" as const, id: `${i}`, ...book })))}
       />
     </div>
   );
 }
-
 
 /**
  * This component shows how a parent component (this one) can initiate the
