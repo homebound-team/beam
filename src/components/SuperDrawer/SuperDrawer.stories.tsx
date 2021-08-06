@@ -182,6 +182,52 @@ const Books: Book[] = [
   },
 ];
 
+export function TableWithPrevNextAndCloseCheck() {
+  const { openInDrawer, addCanCloseDrawerCheck } = useSuperDrawer();
+  const rowLookup = useRef<GridRowLookup<Row>>();
+  // Always prompts a confirmation message
+  addCanCloseDrawerCheck(() => false)
+  // Creates a setContent with prev/next handles to move up or down the table
+  function openRow(row: GridDataRow<Row>) {
+    if (row.kind === "data") {
+      const { prev, next } = rowLookup.current!.lookup(row)["data"];
+      openInDrawer({
+        title: row.bookTitle,
+        onPrevClick: prev && (() => openRow(prev)),
+        onNextClick: next && (() => openRow(next)),
+        content: <TestDrawerContent book={row} />,
+      });
+    }
+  }
+
+  // GridTable setup
+  const titleColumn: GridColumn<Row> = { header: "Title", data: ({ bookTitle }) => bookTitle };
+  const authorColumn: GridColumn<Row> = { header: "Author", data: ({ authorName }) => authorName };
+  // Example of triggering the drawer when clicking on a row
+  const rowStyles: GridRowStyles<Row> = {
+    header: {},
+    data: { indent: 2, onClick: openRow },
+  };
+
+  return (
+    <div>
+      <h1 css={Css.xl3Em.mb5.$}>Books</h1>
+      <p css={Css.base.mb3.$}>List of books from various authors</p>
+      <GridTable<Row>
+        as="table"
+        columns={[titleColumn, authorColumn]}
+        rowStyles={rowStyles}
+        rowLookup={rowLookup}
+        rows={[
+          { kind: "header", id: "header" },
+          ...Books.map((book, i) => ({ kind: "data" as const, id: `${i}`, ...book })),
+        ]}
+      />
+    </div>
+  );
+}
+
+
 /**
  * This component shows how a parent component (this one) can initiate the
  * render of the SuperDrawer with a chosen component (so it can give it the
