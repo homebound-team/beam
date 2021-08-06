@@ -1,5 +1,6 @@
 import React, { ReactNode, useContext, useMemo } from "react";
 import { BeamContext } from "src/components/BeamContext";
+import { Callback } from "src/types";
 import { useModal } from "../Modal";
 import { ConfirmCloseModal } from "./ConfirmCloseModal";
 
@@ -32,7 +33,7 @@ export interface UseSuperDrawerHook {
   /** Opens a new drawer, throwing away the current drawer is one exists. */
   openInDrawer: (opts: OpenInDrawerOpts) => void;
   /** Closes the entire drawer, returns false is the previous drawer can't be closed. */
-  closeDrawer: () => boolean;
+  closeDrawer: () => void;
   /** Opens a detail view in the current drawer. */
   openDrawerDetail: (opts: OpenDetailOpts) => void;
   /** Closes the detail view, or the entire drawer if there was no detail view. */
@@ -64,27 +65,37 @@ export function useSuperDrawer(): UseSuperDrawerHook {
   } = useContext(BeamContext);
   const { openModal } = useModal();
 
+  function canCloseDrawerDetails(i: number, doChange: Callback) {
+    for (const canCloseDrawerDetail of canCloseDetailsChecks.current[i] ?? []) {
+      if (!canCloseDrawerDetail()) {
+        openModal({
+          title: "Confirm",
+          content: <ConfirmCloseModal onClose={doChange} />,
+        });
+        return false;
+      }
+    }
+    return true;
+  }
+
   /**
-   * Validates whether a new Superdrawer can be opened / whether the current Superdrawer can be closed.
+   * Validates whether a new Superdrawer can be opened / whether the current Superdrawer can be closed, performing an
+   * action to "do on change"  when all validations (or close confirmations from the user) have passed.
    * Breaking the validation into a separate function allows openInDrawer
    * to validate the drawer's state without closing it
+   * @param doChange - A lambda to run once all validations have passed (or once the user has confirmed that they want to close)
    * */
-  function validateDrawerChange (onClose: () => void) {
+  function maybeChangeDrawer(doChange: Callback) {
     const contentStackLength = contentStack.current.length;
     if (contentStackLength === 0) {
-      return true;
+      doChange();
+      return;
     }
 
     // Attempt to close each drawer details
     for (let i = contentStackLength - 2; i >= 0; i--) {
-      for (const canCloseDrawerDetail of canCloseDetailsChecks.current[i] ?? []) {
-        if (!canCloseDrawerDetail()) {
-          openModal({
-            title: "Confirm",
-            content: <ConfirmCloseModal onClose={onClose} />,
-          });
-          return false;
-        }
+      if (!canCloseDrawerDetails(i, doChange)) {
+        return;
       }
     }
 
@@ -93,18 +104,18 @@ export function useSuperDrawer(): UseSuperDrawerHook {
       if (!canCloseDrawer()) {
         openModal({
           title: "Confirm",
-          content: <ConfirmCloseModal onClose={onClose} />,
+          content: <ConfirmCloseModal onClose={doChange} />,
         });
-        return false;
+        return;
       }
     }
+    doChange();
   }
-
 
   // Separate close actions to reference then in actions
   const closeActions = useMemo(() => {
     return {
-      /** Attempts to close the drawer. If any checks fail, a error modal will appear */
+      /** Attempts to close the drawer. If any checks fail, a confirmation modal will appear */
       closeDrawer() {
         /** Reset the contentStack, all checks and modalState */
         function onClose() {
@@ -118,27 +129,16 @@ export function useSuperDrawer(): UseSuperDrawerHook {
           // Reset Modal state
           modalState.current = undefined;
         }
-        const maybeValidated = validateDrawerChange(onClose);
-        if (maybeValidated !== undefined) {
-          return maybeValidated
-        }
-
-        onClose();
-        return true;
+        maybeChangeDrawer(onClose);
+        return;
       },
 
       closeDrawerDetail() {
         if (!(contentStack.current.length > 1)) return;
 
-        // Attempt to close the current drawer details
-        for (const check of canCloseDetailsChecks.current[contentStack.current.length - 2] ?? []) {
-          if (!check()) {
-            openModal({
-              title: "Confirm",
-              content: <ConfirmCloseModal onClose={onClose} />,
-            });
-            return;
-          }
+        // // Attempt to close the current drawer details
+        if (!canCloseDrawerDetails(contentStack.current.length - 2, onClose)) {
+          return;
         }
 
         /** Pop an element from the contentStacks and details checks */
@@ -163,17 +163,9 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         // When opening a new SuperDrawer, check if we can close the previous
         // SuperDrawer content. Bail if it fails
         // TODO: There needs to be try again logic here...
-        debugger;
-        const maybeValidated = validateDrawerChange(openNewModal);
-        if (maybeValidated === false) {
-          return maybeValidated
-        }
-        function openNewModal () {
-          // TODO: Check modal open?
+        maybeChangeDrawer(() => {
           contentStack.current = [{ kind: "open", opts }];
-        }
-        openNewModal();
-
+        });
       },
       openDrawerDetail(opts: OpenDetailOpts) {
         // TODO: Check modal open?
