@@ -36,10 +36,13 @@ describe("TextFieldTest", () => {
     expect(r.name()).toHaveAttribute("aria-invalid", "true");
   });
 
-  it("does not fire blur when readOnly", async () => {
+  it("does not fire focus/blur when readOnly", async () => {
+    const onFocus = jest.fn();
     const onBlur = jest.fn();
-    const r = await render(<TestTextField value="foo" readOnly={true} onBlur={onBlur} />);
+    const r = await render(<TestTextField value="foo" readOnly={true} onBlur={onBlur} onFocus={onFocus} />);
+    fireEvent.focus(r.name());
     fireEvent.blur(r.name());
+    expect(onFocus).not.toHaveBeenCalled();
     expect(onBlur).not.toHaveBeenCalled();
   });
 });

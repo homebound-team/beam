@@ -1,4 +1,5 @@
 import { click, input, render } from "@homebound/rtl-utils";
+import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 
@@ -31,6 +32,28 @@ describe("SelectFieldTest", () => {
     click(getByRole("option", { name: "Three" }));
     // Then onSelect was called
     expect(onSelect).toHaveBeenCalledWith("3");
+  });
+
+  it("does not fire focus/blur when readOnly", async () => {
+    const onFocus = jest.fn();
+    const onBlur = jest.fn();
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value={"1"}
+        readOnly={true}
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        data-testid="age"
+      />,
+    );
+    fireEvent.focus(r.age());
+    fireEvent.blur(r.age());
+    expect(onBlur).not.toHaveBeenCalled();
+    expect(onFocus).not.toHaveBeenCalled();
   });
 
   function TestSelectField<O, V extends Value>(props: Omit<SelectFieldProps<O, V>, "onSelect">): JSX.Element {

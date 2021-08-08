@@ -158,12 +158,15 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             // `inputValue`, so it thinks it needs to call `resetInputValue()`.
             //
             // I assume we don't pass `selectedKey` b/c we support multiple keys.
+            if (isReadOnly) {
+              return;
+            }
             maybeCall(onBlur);
             state.close();
           }}
           onFocus={(e) => {
-            maybeCall(onFocus);
             if (isReadOnly) return;
+            maybeCall(onFocus);
             e.target.select();
             state.open();
           }}
