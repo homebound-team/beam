@@ -7,6 +7,7 @@
   "module": "dist/index.mjs",
   "style": "dist/index.css",
   "typings": "dist/index.d.ts",
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/homebound-team/beam"
