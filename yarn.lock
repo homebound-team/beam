@@ -5507,20 +5507,6 @@
     lz-string "^1.4.4"
     pretty-format "^27.0.2"
 
-"@testing-library/dom@^8.5.0":
-  version "8.17.1"
-  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.17.1.tgz#2d7af4ff6dad8d837630fecd08835aee08320ad7"
-  integrity sha512-KnH2MnJUzmFNPW6RIKfd+zf2Wue8mEKX0M3cpX6aKl5ZXrJM1/c/Pc8c2xDNYQCnJO48Sm5ITbMXgqTr3h4jxQ==
-  dependencies:
-    "@babel/code-frame" "^7.10.4"
-    "@babel/runtime" "^7.12.5"
-    "@types/aria-query" "^4.2.0"
-    aria-query "^5.0.0"
-    chalk "^4.1.0"
-    dom-accessibility-api "^0.5.9"
-    lz-string "^1.4.4"
-    pretty-format "^27.0.2"
-
 "@testing-library/jest-dom@^5.11.2", "@testing-library/jest-dom@^5.11.9":
   version "5.11.10"
   resolved "https://registry.npmjs.org/@testing-library/jest-dom/-/jest-dom-5.11.10.tgz"
@@ -5545,15 +5531,6 @@
     "@types/react-dom" ">=16.9.0"
     "@types/react-test-renderer" ">=16.9.0"
     react-error-boundary "^3.1.0"
-
-"@testing-library/react@13.3.0":
-  version "13.3.0"
-  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-13.3.0.tgz#bf298bfbc5589326bbcc8052b211f3bb097a97c5"
-  integrity sha512-DB79aA426+deFgGSjnf5grczDPiL4taK3hFaa+M5q7q20Kcve9eQottOG5kZ74KEr55v0tU2CQormSSDK87zYQ==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    "@testing-library/dom" "^8.5.0"
-    "@types/react-dom" "^18.0.0"
 
 "@testing-library/react@^12.1.2":
   version "12.1.5"
@@ -5900,13 +5877,6 @@
   integrity sha512-i7NPZZpPte3jtVOoW+eLB7G/jsX5OM6GqQnH+lC0nq0rqwlK0x8WcMEvYDgFWqWhWMlTltTimzdMax6wYfZssA==
   dependencies:
     "@types/react" "^16"
-
-"@types/react-dom@^18.0.0":
-  version "18.0.6"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.0.6.tgz#36652900024842b74607a17786b6662dd1e103a1"
-  integrity sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==
-  dependencies:
-    "@types/react" "*"
 
 "@types/react-redux@^7.1.16":
   version "7.1.19"
