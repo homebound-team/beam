@@ -20,6 +20,13 @@ describe("TextAreaFieldTest", () => {
     expect(r.note()).toHaveValue("");
     expect(lastSet).toBeUndefined();
   });
+
+  it("does not fire blur when readOnly", async () => {
+    const onBlur = jest.fn();
+    const r = await render(<TestTextAreaField value="foo" readOnly={true} onBlur={onBlur} />);
+    fireEvent.blur(r.note());
+    expect(onBlur).not.toHaveBeenCalled();
+  });
 });
 
 function TestTextAreaField(props: Omit<TextAreaFieldProps, "onChange" | "label">) {

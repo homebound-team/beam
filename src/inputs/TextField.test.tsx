@@ -35,6 +35,13 @@ describe("TextFieldTest", () => {
     const r = await render(<TestTextField value="foo" errorMsg="Required" />);
     expect(r.name()).toHaveAttribute("aria-invalid", "true");
   });
+
+  it("does not fire blur when readOnly", async () => {
+    const onBlur = jest.fn();
+    const r = await render(<TestTextField value="foo" readOnly={true} onBlur={onBlur} />);
+    fireEvent.blur(r.name());
+    expect(onBlur).not.toHaveBeenCalled();
+  });
 });
 
 function TestTextField(props: Omit<TextFieldProps, "onChange" | "label">) {
