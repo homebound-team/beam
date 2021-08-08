@@ -19,6 +19,7 @@ export * from "./Pills";
 export * from "./RichTextField";
 export * from "./Stepper";
 export * from "./SuperDrawer";
-export { Tab, TabsWithContent } from "./Tabs";
+export { TabsWithContent } from "./Tabs";
+export type { Tab } from "./Tabs";
 export * from "./Tag";
 export * from "./Tooltip";
