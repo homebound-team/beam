@@ -1,7 +1,7 @@
 import { Css, Margin, Only, Xss } from "src/Css";
 
 type TagXss = Margin;
-type TagType = "info" | "caution" | "warning" | "success" | "neutral";
+export type TagType = "info" | "caution" | "warning" | "success" | "neutral";
 interface TagProps<X> {
   text: string;
   // Defaults to "neutral"
