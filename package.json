@@ -17,9 +17,6 @@
     "!dist/**/*.{stories,test}.*",
     "!dist/setupTests.*"
   ],
-  "engines": {
-    "node": ">=16.4.0"
-  },
   "scripts": {
     "start": "yarn storybook",
     "build": "yarn copy && ttsc",
