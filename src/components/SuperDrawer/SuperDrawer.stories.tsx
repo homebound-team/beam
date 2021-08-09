@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf, Tag } from "src";
-import { GridDataRow, GridRowLookup } from "src/components/GridTable";
+import { GridDataRow, GridRowLookup, simpleRows } from "src/components/GridTable";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
@@ -181,6 +181,48 @@ const Books: Book[] = [
       "Azra Raza is the Chan Soon-Shiong professor of medicine and the director of the MDS Center at Columbia University. In addition to publishing widely in basic and clinical cancer research, Raza is also the coeditor of the highly acclaimed website 3QuarksDaily.com. She lives in New York City.",
   },
 ];
+
+export function TableWithPrevNextAndCloseCheck() {
+  const { openInDrawer, addCanCloseDrawerCheck } = useSuperDrawer();
+  const rowLookup = useRef<GridRowLookup<Row>>();
+  // Always prompts a confirmation message
+  addCanCloseDrawerCheck(() => false);
+  // Creates a setContent with prev/next handles to move up or down the table
+  function openRow(row: GridDataRow<Row>) {
+    if (row.kind === "data") {
+      const { prev, next } = rowLookup.current!.lookup(row)["data"];
+      openInDrawer({
+        title: row.bookTitle,
+        onPrevClick: prev && (() => openRow(prev)),
+        onNextClick: next && (() => openRow(next)),
+        content: <TestDrawerContent book={row} />,
+      });
+    }
+  }
+
+  // GridTable setup
+  const titleColumn: GridColumn<Row> = { header: "Title", data: ({ bookTitle }) => bookTitle };
+  const authorColumn: GridColumn<Row> = { header: "Author", data: ({ authorName }) => authorName };
+  // Example of triggering the drawer when clicking on a row
+  const rowStyles: GridRowStyles<Row> = {
+    header: {},
+    data: { indent: 2, onClick: openRow },
+  };
+
+  return (
+    <div>
+      <h1 css={Css.xl3Em.mb5.$}>Books</h1>
+      <p css={Css.base.mb3.$}>List of books from various authors</p>
+      <GridTable<Row>
+        as="table"
+        columns={[titleColumn, authorColumn]}
+        rowStyles={rowStyles}
+        rowLookup={rowLookup}
+        rows={simpleRows(Books.map((book, i) => ({ kind: "data" as const, id: `${i}`, ...book })))}
+      />
+    </div>
+  );
+}
 
 /**
  * This component shows how a parent component (this one) can initiate the
