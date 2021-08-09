@@ -132,9 +132,9 @@ export function useSuperDrawer(): UseSuperDrawerHook {
       },
 
       closeDrawerDetail() {
-        if (!(contentStack.current.length > 1)) return;
+        if (contentStack.current.length < 2) return;
 
-        // // Attempt to close the current drawer details
+        // Attempt to close the current drawer details
         if (!canCloseDrawerDetails(contentStack.current.length - 2, onClose)) {
           return;
         }
