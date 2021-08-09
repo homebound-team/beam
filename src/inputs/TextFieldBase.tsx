@@ -91,6 +91,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
               : Css.add({ overflow: "hidden", whiteSpace: "nowrap" }).$),
           }}
           {...tid}
+          data-readonly="true"
         >
           {multiline
             ? (inputProps.value as string | undefined)?.split("\n\n").map((p) => <p>{p}</p>)

@@ -40,6 +40,7 @@ describe("TextFieldTest", () => {
     const onFocus = jest.fn();
     const onBlur = jest.fn();
     const r = await render(<TestTextField value="foo" readOnly={true} onBlur={onBlur} onFocus={onFocus} />);
+    expect(r.name()).toHaveAttribute("data-readonly");
     fireEvent.focus(r.name());
     fireEvent.blur(r.name());
     expect(onFocus).not.toHaveBeenCalled();
