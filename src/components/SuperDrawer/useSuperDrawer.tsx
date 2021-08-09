@@ -126,8 +126,6 @@ export function useSuperDrawer(): UseSuperDrawerHook {
           contentStack.current = [];
           canCloseChecks.current = [];
           canCloseDetailsChecks.current = [];
-          // Reset Modal state
-          modalState.current = undefined;
         }
         maybeChangeDrawer(onClose);
         return;
