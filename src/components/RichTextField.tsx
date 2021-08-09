@@ -175,7 +175,7 @@ const trixCssOverrides = {
   "&:focus-within": Css.bLightBlue700.$,
   "& trix-toolbar": Css.m1.$,
   // Make the buttons closer to ours
-  "& .trix-button:not(:first-child)": Css.bn.$,
+  "& .trix-button:not(:first-of-type)": Css.bn.$,
   "& .trix-button-group": Css.bn.m0.$,
   "& .trix-button": Css.bgWhite.sm.$,
   // Height is hard-coded to 1.6 in trix, and the default width is wider than we want
