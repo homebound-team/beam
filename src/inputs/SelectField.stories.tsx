@@ -3,8 +3,7 @@ import { Meta } from "@storybook/react";
 import { useState } from "react";
 import { GridColumn, GridTable, Icon, Icons, simpleHeader, SimpleHeaderAndDataOf } from "src/components";
 import { Css } from "src/Css";
-import { SelectField, SelectFieldProps, Value } from "src/inputs";
-import { HasIdAndName, Optional } from "src/types";
+import { idAndName2, identity, SelectField, SelectFieldProps, Value } from "src/inputs";
 import { noop } from "src/utils";
 import { zeroTo } from "src/utils/sb";
 
@@ -51,60 +50,58 @@ export function SelectFields() {
           label="Favorite Icon"
           value={options[2].id}
           options={options}
-          getOptionMenuLabel={(o) => (
-            <div css={Css.df.itemsCenter.$}>
-              {o.icon && (
-                <span css={Css.fs0.mr2.$}>
-                  <Icon icon={o.icon} />
-                </span>
-              )}
-              {o.name}
-            </div>
-          )}
+          mapOption={{
+            menuLabel: (o: TestOption) => (
+              <div css={Css.df.itemsCenter.$}>
+                {o.icon && (
+                  <span css={Css.fs0.mr2.$}>
+                    <Icon icon={o.icon} />
+                  </span>
+                )}
+                {o.name}
+              </div>
+            ),
+          }}
         />
         <TestSelectField
           label="Favorite Icon - with field decoration"
           options={options}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
           value={options[1].id}
-          getOptionMenuLabel={(o) => (
-            <div css={Css.df.itemsCenter.$}>
-              {o.icon && (
-                <span css={Css.fs0.mr2.$}>
-                  <Icon icon={o.icon} />
-                </span>
-              )}
-              {o.name}
-            </div>
-          )}
+          mapOption={{
+            menuLabel: (o: TestOption) => (
+              <div css={Css.df.itemsCenter.$}>
+                {o.icon && (
+                  <span css={Css.fs0.mr2.$}>
+                    <Icon icon={o.icon} />
+                  </span>
+                )}
+                {o.name}
+              </div>
+            ),
+          }}
         />
-        <TestSelectField<TestOption, string>
+        <TestSelectField
           label="Favorite Icon - Disabled"
           value={undefined}
           options={options}
           disabled
+          mapOption={idAndName2}
         />
         <TestSelectField label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
-        <TestSelectField<TestOption, string> label="Favorite Icon - Invalid" value={undefined} options={options} />
+        <TestSelectField label="Favorite Icon - Invalid" value={undefined} options={options} mapOption={idAndName2} />
         <TestSelectField
           label="Favorite Icon - Helper Text"
           value={options[0].id}
           options={options}
           helperText="Some really long helper text that we expect to wrap."
         />
-        <TestSelectField
-          label="Favorite Number - Numeric"
-          value={1}
-          options={optionsWithNumericIds}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
-        />
+        <TestSelectField label="Favorite Number - Numeric" value={1 as number} options={optionsWithNumericIds} />
         <TestSelectField
           label="Is Available - Boolean"
-          value={false}
+          value={false as boolean | undefined}
           options={booleanOptions}
-          getOptionValue={(o) => o.value}
-          getOptionLabel={(o) => o.label}
+          mapOption={identity}
         />
       </div>
 
@@ -115,16 +112,18 @@ export function SelectFields() {
           label="Favorite Icon"
           value={options[2].id}
           options={options}
-          getOptionMenuLabel={(o) => (
-            <div css={Css.df.itemsCenter.$}>
-              {o.icon && (
-                <span css={Css.fs0.mr2.$}>
-                  <Icon icon={o.icon} />
-                </span>
-              )}
-              {o.name}
-            </div>
-          )}
+          mapOption={{
+            menuLabel: (o: TestOption) => (
+              <div css={Css.df.itemsCenter.$}>
+                {o.icon && (
+                  <span css={Css.fs0.mr2.$}>
+                    <Icon icon={o.icon} />
+                  </span>
+                )}
+                {o.name}
+              </div>
+            ),
+          }}
         />
         <TestSelectField
           compact
@@ -132,30 +131,34 @@ export function SelectFields() {
           options={options}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
           value={options[1].id}
-          getOptionMenuLabel={(o) => (
-            <div css={Css.df.itemsCenter.$}>
-              {o.icon && (
-                <span css={Css.fs0.mr2.$}>
-                  <Icon icon={o.icon} />
-                </span>
-              )}
-              {o.name}
-            </div>
-          )}
+          mapOption={{
+            menuLabel: (o: TestOption) => (
+              <div css={Css.df.itemsCenter.$}>
+                {o.icon && (
+                  <span css={Css.fs0.mr2.$}>
+                    <Icon icon={o.icon} />
+                  </span>
+                )}
+                {o.name}
+              </div>
+            ),
+          }}
         />
-        <TestSelectField<TestOption, string>
+        <TestSelectField
           compact
           label="Favorite Icon - Disabled"
           value={undefined}
           options={options}
           disabled
+          mapOption={idAndName2}
         />
         <TestSelectField compact label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
-        <TestSelectField<TestOption, string>
+        <TestSelectField
           compact
           label="Favorite Icon - Invalid"
           options={options}
           value={undefined}
+          mapOption={idAndName2}
         />
       </div>
       <div css={Css.df.flexColumn.childGap2.$}>
@@ -168,16 +171,18 @@ export function SelectFields() {
           options={options}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
           value={options[4].id}
-          getOptionMenuLabel={(o) => (
-            <div css={Css.df.itemsCenter.$}>
-              {o.icon && (
-                <span css={Css.fs0.mr2.$}>
-                  <Icon icon={o.icon} />
-                </span>
-              )}
-              {o.name}
-            </div>
-          )}
+          mapOption={{
+            menuLabel: (o: TestOption) => (
+              <div css={Css.df.itemsCenter.$}>
+                {o.icon && (
+                  <span css={Css.fs0.mr2.$}>
+                    <Icon icon={o.icon} />
+                  </span>
+                )}
+                {o.name}
+              </div>
+            ),
+          }}
         />
       </div>
       <div css={Css.df.flexColumn.childGap2.$}>
@@ -210,15 +215,7 @@ const columns: GridColumn<Row>[] = [
   { header: "Address", data: (data) => data.address },
   {
     header: "Contact",
-    data: (data) => (
-      <SelectField
-        getOptionValue={(iu) => iu.id}
-        getOptionLabel={(iu) => iu.name}
-        value={data.user.id}
-        onSelect={noop}
-        options={people}
-      />
-    ),
+    data: (data) => <SelectField value={data.user.id} onSelect={noop} options={people} />,
   },
   { header: "Market", data: (data) => data.market },
 ];
@@ -226,24 +223,14 @@ type Row = SimpleHeaderAndDataOf<Request>;
 type InternalUser = { name: string; id: string };
 type Request = { id: string; user: InternalUser; address: string; homeowner: string; market: string };
 
-// Kind of annoying but to get type inference for HasIdAndName working, we
-// have to re-copy/paste the overload here.
-function TestSelectField<T extends object, V extends Value>(
-  props: Omit<SelectFieldProps<T, V>, "onSelect">,
-): JSX.Element;
-function TestSelectField<O extends HasIdAndName<V>, V extends Value>(
-  props: Optional<Omit<SelectFieldProps<O, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
-): JSX.Element;
-function TestSelectField<T extends object, V extends Value>(
-  props: Optional<Omit<SelectFieldProps<T, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
+function TestSelectField<T extends object, V extends Value, V2 extends Value>(
+  props: Omit<SelectFieldProps<T, V, V2>, "onSelect">,
 ): JSX.Element {
   const [selectedOption, setSelectedOption] = useState<V | undefined>(props.value);
 
   return (
     <div css={Css.df.$}>
-      <SelectField<T, V>
-        // The `as any` is due to something related to https://github.com/emotion-js/emotion/issues/2169
-        // We may have to redo the conditional getOptionValue/getOptionLabel
+      <SelectField<T, V, V2>
         {...(props as any)}
         value={selectedOption}
         onSelect={setSelectedOption}

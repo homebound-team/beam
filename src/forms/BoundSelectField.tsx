@@ -1,7 +1,6 @@
 import { FieldState } from "@homebound/form-state/dist/formState";
 import { Observer } from "mobx-react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
-import { HasIdAndName, Optional } from "src/types";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -24,19 +23,11 @@ export type BoundSelectFieldProps<T, V extends Value> = Omit<
  * The caller has to tell us how to turn `T` into `V`, which is usually a
  * lambda like `t => t.id`.
  */
-export function BoundSelectField<T, V extends Value>(props: BoundSelectFieldProps<T, V>): JSX.Element;
-export function BoundSelectField<T extends HasIdAndName<V>, V extends Value>(
-  props: Optional<BoundSelectFieldProps<T, V>, "getOptionLabel" | "getOptionValue">,
-): JSX.Element;
-export function BoundSelectField<T extends object, V extends Value>(
-  props: Optional<BoundSelectFieldProps<T, V>, "getOptionValue" | "getOptionLabel">,
-): JSX.Element {
+export function BoundSelectField<T extends object, V extends Value>(props: BoundSelectFieldProps<T, V>): JSX.Element {
   const {
     field,
     options,
     readOnly,
-    getOptionValue = (opt: T) => (opt as any).id, // if unset, assume O implements HasId
-    getOptionLabel = (opt: T) => (opt as any).name, // if unset, assume O implements HasName
     onSelect = (value) => field.set(value),
     label = defaultLabel(field.key),
     ...others
@@ -53,8 +44,6 @@ export function BoundSelectField<T extends object, V extends Value>(
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           required={field.required}
-          getOptionLabel={getOptionLabel}
-          getOptionValue={getOptionValue}
           onBlur={() => field.blur()}
           onFocus={() => field.focus()}
           {...others}

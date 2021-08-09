@@ -1,6 +1,6 @@
 import { click, input, render } from "@homebound/rtl-utils";
 import { useState } from "react";
-import { SelectField, SelectFieldProps, Value } from "src/inputs";
+import { idAndName2, SelectField, SelectFieldProps, Value } from "src/inputs";
 
 const options = [
   { id: "1", name: "One" },
@@ -14,13 +14,7 @@ describe("SelectFieldTest", () => {
   it("can set a value", async () => {
     // Given a MultiSelectField
     const { getByRole } = await render(
-      <TestSelectField
-        label="Age"
-        value={"1"}
-        options={options}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
-      />,
+      <TestSelectField label="Age" value={"1" as string} options={options} mapOption={idAndName2} />,
     );
     // That initially has "One" selected
     const text = getByRole("combobox");
@@ -33,11 +27,13 @@ describe("SelectFieldTest", () => {
     expect(onSelect).toHaveBeenCalledWith("3");
   });
 
-  function TestSelectField<O, V extends Value>(props: Omit<SelectFieldProps<O, V>, "onSelect">): JSX.Element {
-    const [selected, setSelected] = useState<V | undefined>(props.value);
+  function TestSelectField<O, V extends Value, V2 extends Value>(
+    props: Omit<SelectFieldProps<O, V, V2>, "onSelect">,
+  ): JSX.Element {
+    const [selected, setSelected] = useState<V2 | undefined>(props.value);
     return (
-      <SelectField<O, V>
-        {...props}
+      <SelectField<O, V, V2>
+        {...(props as any)}
         value={selected}
         onSelect={(value) => {
           onSelect(value);
