@@ -1,7 +1,7 @@
 import { camelCase } from "change-case";
 import { useState } from "react";
-import { RichTextFieldProps } from "src/components/RichTextField";
 import { useTestIds } from "src/utils";
+import { RichTextFieldProps } from "./RichTextField";
 
 export function RichTextField(props: RichTextFieldProps) {
   const [value, setValue] = useState(props.value || "");

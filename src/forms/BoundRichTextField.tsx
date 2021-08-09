@@ -1,6 +1,6 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { RichTextField, RichTextFieldProps } from "src/components/RichTextField";
+import { RichTextField, RichTextFieldProps } from "src/inputs/RichTextField";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
