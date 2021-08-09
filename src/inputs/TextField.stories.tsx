@@ -6,10 +6,10 @@ import { TextField, TextFieldProps } from "src/inputs";
 
 export default {
   component: TextField,
-  title: "Inputs/Text Fields",
+  title: "Inputs/Text Field",
 } as Meta;
 
-export function TextFields() {
+export function TextFieldStyles() {
   return (
     <div css={Css.df.flexColumn.childGap5.$}>
       <div css={Css.df.flexColumn.childGap2.$}>
@@ -59,6 +59,26 @@ export function TextFields() {
   );
 }
 
+export function TextFieldReadOnly() {
+  return (
+    <div css={Css.df.childGap2.$}>
+      <div css={Css.df.flexColumn.childGap3.$}>
+        <b>Read Only</b>
+        <TestTextField label="Name" value="first" readOnly={true} />
+        <TestTextField label="Name" value="first" hideLabel readOnly={true} />
+        <TestTextField label="Name" value={"first ".repeat(20) + "last"} readOnly={true} />
+      </div>
+      {/*Matching column but w/o readOnly for comparison*/}
+      <div css={Css.df.flexColumn.childGap3.$}>
+        <b>Editable</b>
+        <TestTextField label="Name" value="first" />
+        <TestTextField label="Name" value="first" hideLabel />
+        <TestTextField label="Name" value={"first ".repeat(20) + "last"} />
+      </div>
+    </div>
+  );
+}
+
 function TestTextField(props: Omit<TextFieldProps, "onChange">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
@@ -77,9 +97,10 @@ function ValidationTextField(props: Omit<TextFieldProps, "onChange">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState<string | undefined>(value);
   // Validates that the input's value is a properly formatted email address.
-  const isValid = useMemo(() => internalValue && /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(internalValue), [
-    internalValue,
-  ]);
+  const isValid = useMemo(
+    () => internalValue && /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(internalValue),
+    [internalValue],
+  );
   return (
     <TextField
       {...otherProps}
