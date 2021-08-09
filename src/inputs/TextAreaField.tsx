@@ -9,15 +9,8 @@ export interface TextAreaFieldProps extends BeamTextFieldProps {}
 
 /** Returns a <textarea /> element that auto-adjusts height based on the field's value */
 export function TextAreaField(props: TextAreaFieldProps) {
-  const {
-    value = "",
-    disabled: isDisabled = false,
-    readOnly: isReadOnly = false,
-    onBlur,
-    onFocus,
-    ...otherProps
-  } = props;
-  const textFieldProps = { ...otherProps, value, isDisabled, isReadOnly };
+  const { value = "", disabled = false, readOnly = false, onBlur, onFocus, ...otherProps } = props;
+  const textFieldProps = { ...otherProps, value, isDisabled: disabled, isReadOnly: readOnly };
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   // not in stately because this is so we know when to re-measure, which is a spectrum design
 
@@ -48,6 +41,7 @@ export function TextAreaField(props: TextAreaFieldProps) {
       labelProps={labelProps}
       inputProps={inputProps}
       inputRef={inputRef}
+      readOnly={readOnly}
     />
   );
 }

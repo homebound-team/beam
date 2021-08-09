@@ -44,10 +44,7 @@ export function TabsWithContent<V extends string, X extends Only<TabsContentXss,
         role="tabpanel"
         tabIndex={0}
         {...tid.panel}
-        css={{
-          ...Css.mt2.$,
-          ...contentXss,
-        }}
+        css={{ ...Css.mt2.$, ...contentXss }}
       >
         {selectedTab.render()}
       </div>
@@ -94,8 +91,6 @@ function Tabs<V extends string>(props: TabsProps<V, {}>) {
     <div css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...tid}>
       {tabs.map((tab, i) => {
         const { name, value, icon, disabled = false } = tab;
-        const testId = tid[i];
-
         return (
           <SingleTab
             active={active === value}
@@ -109,7 +104,7 @@ function Tabs<V extends string>(props: TabsProps<V, {}>) {
             onKeyUp={handleKeyUp}
             onBlur={handleBlur}
             value={value}
-            {...testId}
+            {...tid[value]}
           />
         );
       })}

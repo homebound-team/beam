@@ -6,10 +6,10 @@ import { TextAreaField, TextAreaFieldProps, TextField } from "src/inputs";
 
 export default {
   component: TextAreaField,
-  title: "Inputs/Text Areas",
+  title: "Inputs/Text Area",
 } as Meta;
 
-export function TextAreas() {
+export function TextAreaStyles() {
   return (
     <div css={Css.df.flexColumn.childGap5.$}>
       <div css={Css.df.flexColumn.childGap2.$}>
@@ -25,6 +25,26 @@ export function TextAreas() {
         />
         <ValidationTextArea value="Not enough characters" />
         <TextField label="Regular Field For Reference" value="value" onChange={() => {}} />
+      </div>
+    </div>
+  );
+}
+
+export function TextAreaReadOnly() {
+  return (
+    <div css={Css.df.childGap2.$}>
+      <div css={Css.df.flexColumn.childGap3.$}>
+        <b>Read Only</b>
+        <TestTextArea label="Name" value="first" readOnly={true} />
+        <TestTextArea label="Name" value="first" hideLabel readOnly={true} />
+        <TestTextArea label="Name" value={("first ".repeat(40) + "last.\n\n").repeat(4)} readOnly={true} />
+      </div>
+      {/*Matching column but w/o readOnly for comparison*/}
+      <div css={Css.df.flexColumn.childGap3.wPx(400).$}>
+        <b>Editable</b>
+        <TestTextArea label="Name" value="first" />
+        <TestTextArea label="Name" value="first" hideLabel />
+        <TestTextArea label="Name" value={("first ".repeat(40) + "last.\n\n").repeat(4)} />
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ export interface TextFieldProps extends BeamTextFieldProps {
 export function TextField(props: TextFieldProps) {
   const {
     disabled: isDisabled = false,
-    readOnly: isReadOnly = false,
+    readOnly = false,
     required,
     errorMsg,
     value = "",
@@ -22,7 +22,7 @@ export function TextField(props: TextFieldProps) {
   const textFieldProps = {
     ...otherProps,
     isDisabled,
-    isReadOnly,
+    isReadOnly: readOnly,
     isRequired: required,
     validationState: errorMsg ? ("invalid" as const) : ("valid" as const),
     value,
@@ -32,6 +32,7 @@ export function TextField(props: TextFieldProps) {
   return (
     <TextFieldBase
       {...mergeProps(textFieldProps, { onBlur, onFocus })}
+      readOnly={readOnly}
       errorMsg={errorMsg}
       required={required}
       labelProps={labelProps}

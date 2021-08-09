@@ -10,8 +10,8 @@ describe("TabsWithContent", () => {
     const r = await render(<TestTabs />);
     // tab panel should initially display Tab 1 Content
     expect(r.tab_panel()).toHaveTextContent("Tab 1 Content");
-    // when we click on the 4th tab (index 3)
-    click(r.getByTestId("tabs_3"));
+    // when we click on the 4th tab
+    click(r.tabs_tab4);
     // then expect to see the 4th tab's content
     expect(r.tab_panel()).toHaveTextContent("Tab 4 Content");
   });
@@ -19,33 +19,34 @@ describe("TabsWithContent", () => {
   it("should update the active tab", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />);
-    expect(r.getByTestId("tabs_0")).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab1()).toHaveStyleRule("color", Palette.LightBlue700);
     // when an external state change moves us to the 2nd tab
     click(r.goToTab2);
     // Then tab2 is now actively styled
-    expect(r.getByTestId("tabs_1")).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab2()).toHaveStyleRule("color", Palette.LightBlue700);
   });
 
   it("should reset the active tab on blur", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />);
-    expect(r.getByTestId("tabs_0")).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab1()).toHaveStyleRule("color", Palette.LightBlue700);
     // And we've moved to the 2nd tab
-    fireEvent.keyUp(r.getByTestId("tabs_1"), { key: "ArrowRight" });
-    expect(r.getByTestId("tabs_1")).toHaveStyleRule("color", Palette.LightBlue700);
+    fireEvent.keyUp(r.tabs_tab2(), { key: "ArrowRight" });
+    expect(r.tabs_tab2()).toHaveStyleRule("color", Palette.LightBlue700);
     // When we blur away
-    fireEvent.blur(r.getByTestId("tabs_1"));
+    fireEvent.blur(r.tabs_tab1());
     // Then the 1st tab goes back to highlighted
+    expect(r.tabs_tab1()).toHaveStyleRule("color", Palette.LightBlue700);
   });
 
   it("cannot click on disabled tabs", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />);
-    expect(r.getByTestId("tabs_0")).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab1()).toHaveStyleRule("color", Palette.LightBlue700);
     // And we try to click on the 3rd disabled tab
-    click(r.getByTestId("tabs_2"));
+    click(r.tabs_tab3);
     // Then nothing happens
-    expect(r.getByTestId("tabs_0")).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab1()).toHaveStyleRule("color", Palette.LightBlue700);
   });
 
   describe("getNextTabValue function", () => {

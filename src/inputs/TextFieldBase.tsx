@@ -20,7 +20,7 @@ import { useTestIds } from "src/utils/useTestIds";
 interface TextFieldBaseProps
   extends Pick<
       BeamTextFieldProps,
-      "label" | "required" | "errorMsg" | "onBlur" | "onFocus" | "helperText" | "hideLabel"
+      "label" | "required" | "readOnly" | "errorMsg" | "onBlur" | "onFocus" | "helperText" | "hideLabel"
     >,
     Partial<Pick<BeamTextFieldProps, "onChange">> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
@@ -48,6 +48,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     errorMsg,
     helperText,
     multiline = false,
+    readOnly,
     onChange,
     onBlur,
     onFocus,
@@ -79,26 +80,47 @@ export function TextFieldBase(props: TextFieldBaseProps) {
   return (
     <div css={Css.df.flexColumn.w100.maxw(px(550)).$} {...groupProps}>
       {label && !hideLabel && <Label labelProps={labelProps} label={label} suffix={labelSuffix} {...tid.label} />}
-      <ElementType
-        {...mergeProps(
-          inputProps,
-          { onBlur, onFocus: onFocusChained, onChange: onDomChange },
-          { "aria-invalid": Boolean(errorMsg), ...(hideLabel ? { "aria-label": label } : {}) },
-        )}
-        {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
-        ref={inputRef as any}
-        rows={multiline ? 1 : undefined}
-        css={{
-          ...Css.add("resize", "none").bgWhite.sm.px1.w100.hPx(40).gray900.br4.outline0.ba.bGray300.if(compact).hPx(32)
-            .$,
-          ...xss,
-          ...Css.if(multiline).mh(px(96)).py1.$,
-          "&:focus": Css.bLightBlue700.$,
-          "&:disabled": Css.gray400.bgGray100.cursorNotAllowed.$,
-          ...(errorMsg ? Css.bRed600.$ : {}),
-        }}
-        {...tid}
-      />
+      {readOnly && (
+        <div
+          css={{
+            // Copy/pasted from StaticField, maybe we should combine?
+            ...Css.smEm.gray900.hPx(40).df.itemsCenter.$,
+            ...Css.maxw(px(500)).$,
+            ...(multiline
+              ? Css.flexColumn.itemsStart.childGap2.$
+              : Css.add({ overflow: "hidden", whiteSpace: "nowrap" }).$),
+          }}
+          {...tid}
+        >
+          {multiline
+            ? (inputProps.value as string | undefined)?.split("\n\n").map((p) => <p>{p}</p>)
+            : inputProps.value}
+        </div>
+      )}
+      {!readOnly && (
+        <ElementType
+          {...mergeProps(
+            inputProps,
+            { onBlur, onFocus: onFocusChained, onChange: onDomChange },
+            { "aria-invalid": Boolean(errorMsg), ...(hideLabel ? { "aria-label": label } : {}) },
+          )}
+          {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
+          ref={inputRef as any}
+          rows={multiline ? 1 : undefined}
+          css={{
+            ...Css.add("resize", "none")
+              .bgWhite.sm.px1.w100.hPx(40)
+              .gray900.br4.outline0.ba.bGray300.if(compact)
+              .hPx(32).$,
+            ...xss,
+            ...Css.if(multiline).mh(px(96)).py1.$,
+            "&:focus": Css.bLightBlue700.$,
+            "&:disabled": Css.gray400.bgGray100.cursorNotAllowed.$,
+            ...(errorMsg ? Css.bRed600.$ : {}),
+          }}
+          {...tid}
+        />
+      )}
       {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}
       {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
     </div>
