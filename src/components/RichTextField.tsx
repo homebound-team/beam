@@ -1,4 +1,5 @@
 import { Global } from "@emotion/react";
+import DOMPurify from "dompurify";
 import { ChangeEvent, createElement, useEffect, useRef } from "react";
 import { useId } from "react-aria";
 import { Label } from "src/components/Label";
@@ -26,6 +27,8 @@ export interface RichTextFieldProps {
   onBlur: () => void;
   /** Called when the component is in focus. */
   onFocus: () => void;
+  /** For rendering formatted text */
+  readOnly?: boolean | undefined;
 }
 
 // There aren't types for trix, so add our own. For now `loadHTML` is all we call anyway.
@@ -41,7 +44,7 @@ type Editor = {
  * We also integrate [tributejs]{@link https://github.com/zurb/tribute} for @ mentions.
  */
 export function RichTextField(props: RichTextFieldProps) {
-  const { mergeTags, label, value = "", onChange, onBlur, onFocus } = props;
+  const { mergeTags, label, value = "", onChange, onBlur, onFocus, readOnly } = props;
   const id = useId();
 
   // We get a reference to the Editor instance after trix-init fires
@@ -62,88 +65,104 @@ export function RichTextField(props: RichTextFieldProps) {
 
   useEffect(
     () => {
-      const editorElement = document.getElementById(`editor-${id}`);
-      if (!editorElement) {
-        throw new Error("editorElement not found");
-      }
-
-      editor.current = (editorElement as any).editor;
-      if (!editor.current) {
-        throw new Error("editor not found");
-      }
-      if (mergeTags !== undefined) {
-        attachTributeJs(mergeTags, editorElement!);
-      }
-
-      // We have a 2nd useEffect to call loadHTML when value changes, but
-      // we do this here b/c we assume the 2nd useEffect's initial evaluation
-      // "missed" having editor.current set b/c trix-initialize hadn't fired.
-      currentHtml.current = value;
-      editor.current.loadHTML(value || "");
-
-      function trixChange(e: ChangeEvent) {
-        const { textContent, innerHTML } = e.target;
-        const onChange = onChangeRef.current;
-        // If the user only types whitespace, treat that as undefined
-        if ((textContent || "").trim() === "") {
-          currentHtml.current = undefined;
-          onChange && onChange(undefined, undefined, []);
-        } else {
-          currentHtml.current = innerHTML;
-          const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
-          onChange && onChange(innerHTML, textContent || undefined, mentions);
+      if (!readOnly) {
+        const editorElement = document.getElementById(`editor-${id}`);
+        if (!editorElement) {
+          throw new Error("editorElement not found IDIOT");
         }
+
+        editor.current = (editorElement as any).editor;
+        if (!editor.current) {
+          throw new Error("editor not found");
+        }
+        if (mergeTags !== undefined) {
+          attachTributeJs(mergeTags, editorElement!);
+        }
+
+        // We have a 2nd useEffect to call loadHTML when value changes, but
+        // we do this here b/c we assume the 2nd useEffect's initial evaluation
+        // "missed" having editor.current set b/c trix-initialize hadn't fired.
+        currentHtml.current = value;
+        editor.current.loadHTML(value || "");
+
+        function trixChange(e: ChangeEvent) {
+          const { textContent, innerHTML } = e.target;
+          const onChange = onChangeRef.current;
+          // If the user only types whitespace, treat that as undefined
+          if ((textContent || "").trim() === "") {
+            currentHtml.current = undefined;
+            onChange && onChange(undefined, undefined, []);
+          } else {
+            currentHtml.current = innerHTML;
+            const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
+            onChange && onChange(innerHTML, textContent || undefined, mentions);
+          }
+        }
+
+        // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
+        // https://github.com/basecamp/trix#storing-attached-files
+        const preventDefault = (e: any) => e.preventDefault();
+        window.addEventListener("trix-file-accept", preventDefault);
+
+        const trixBlur = () => maybeCall(onBlurRef.current);
+        const trixFocus = () => maybeCall(onFocusRef.current);
+
+        editorElement.addEventListener("trix-change", trixChange as any, false);
+        editorElement.addEventListener("trix-blur", trixBlur as any, false);
+        editorElement.addEventListener("trix-focus", trixFocus as any, false);
+
+        return () => {
+          editorElement.removeEventListener("trix-change", trixChange as any);
+          editorElement.removeEventListener("trix-blur", trixBlur as any);
+          editorElement.removeEventListener("trix-focus", trixFocus as any);
+          window.removeEventListener("trix-file-accept", preventDefault);
+        };
       }
-
-      // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
-      // https://github.com/basecamp/trix#storing-attached-files
-      const preventDefault = (e: any) => e.preventDefault();
-      window.addEventListener("trix-file-accept", preventDefault);
-
-      const trixBlur = () => maybeCall(onBlurRef.current);
-      const trixFocus = () => maybeCall(onFocusRef.current);
-
-      editorElement.addEventListener("trix-change", trixChange as any, false);
-      editorElement.addEventListener("trix-blur", trixBlur as any, false);
-      editorElement.addEventListener("trix-focus", trixFocus as any, false);
-
-      return () => {
-        editorElement.removeEventListener("trix-change", trixChange as any);
-        editorElement.removeEventListener("trix-blur", trixBlur as any);
-        editorElement.removeEventListener("trix-focus", trixFocus as any);
-        window.removeEventListener("trix-file-accept", preventDefault);
-      };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [readOnly],
   );
 
   useEffect(() => {
     // If our value prop changes (without the change coming from us), reload it
-    if (editor.current && value !== currentHtml.current) {
+    if (!readOnly && editor.current && value !== currentHtml.current) {
       editor.current.loadHTML(value || "");
     }
-  }, [value]);
+  }, [value, readOnly]);
 
   const { placeholder, autoFocus } = props;
 
-  return (
-    <div css={Css.w100.maxw("550px").$}>
-      {/* TODO: Not sure what to pass to labelProps. */}
-      {label && <Label labelProps={{}} label={label} />}
-      <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }}>
-        {createElement("trix-editor", {
-          id: `editor-${id}`,
-          input: `input-${id}`,
-          // Autofocus attribute is case sensitive since this is standard HTML
-          ...(autoFocus ? { autofocus: true } : {}),
-          ...(placeholder ? { placeholder } : {}),
-        })}
-        <input type="hidden" id={`input-${id}`} value={value} />
+  if (!readOnly) {
+    return (
+      <div css={Css.w100.maxw("550px").$}>
+        {/* TODO: Not sure what to pass to labelProps. */}
+        {label && <Label labelProps={{}} label={label} />}
+        <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }}>
+          {createElement("trix-editor", {
+            id: `editor-${id}`,
+            input: `input-${id}`,
+            // Autofocus attribute is case sensitive since this is standard HTML
+            ...(autoFocus ? { autofocus: true } : {}),
+            ...(placeholder ? { placeholder } : {}),
+          })}
+          <input type="hidden" id={`input-${id}`} value={value} />
+        </div>
+        <Global styles={[tributeOverrides]} />
       </div>
-      <Global styles={[tributeOverrides]} />
-    </div>
-  );
+    );
+  } else {
+    return (
+      <div css={Css.w100.maxw("550px").$}>
+        {/* TODO: Not sure what to pass to labelProps. */}
+        {label && <Label labelProps={{}} label={label} />}
+        <div
+          css={Css.mh("120px").bgWhite.sm.gray900.bn.p1.br4.bGray300.ba.$}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value) || placeholder || "" }}
+          data-readonly="true"
+        ></div>
+      </div>
+    );
+  }
 }
 
 function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
