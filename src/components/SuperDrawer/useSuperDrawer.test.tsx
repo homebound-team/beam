@@ -149,6 +149,17 @@ describe("useSuperDrawer", () => {
     // Then we called the callback
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it("should not throw when attempting to closeDrawer with an empty content stack", () => {
+    // Given a useSuperDrawer and BeamContext hook
+    const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
+    // And a closed SuperDrawer
+    // When we call onClose
+    // Then we do not expect to have an error thrown
+    act(() => {
+      expect(hook.closeDrawer).not.toThrow("Cannot read property 'kind' of undefined");
+    });
+  });
 });
 
 function TestDrawerContent(props: {
