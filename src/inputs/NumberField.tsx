@@ -28,9 +28,9 @@ export interface NumberFieldProps {
 
 export function NumberField(props: NumberFieldProps) {
   const {
-    disabled: isDisabled = false,
+    disabled = false,
     required,
-    readOnly: isReadOnly = false,
+    readOnly = false,
     type,
     label,
     onBlur,
@@ -94,14 +94,20 @@ export function NumberField(props: NumberFieldProps) {
     },
     validationState: errorMsg !== undefined ? "invalid" : "valid",
     label: label,
-    isDisabled,
-    isReadOnly,
+    isDisabled: disabled,
+    isReadOnly: readOnly,
     formatOptions,
   };
 
   const state = useNumberFieldState(useProps);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { labelProps, inputProps, groupProps } = useNumberField(useProps, state, inputRef);
+
+  // Pretty janky, but if readOnly=true, then TextFieldBase doesn't create an input element,
+  // but useNumberField _really_ wants the ref to be set, so give it a throw-away element.
+  if (readOnly && !inputRef.current) {
+    inputRef.current = document.createElement("input");
+  }
 
   return (
     <TextFieldBase
@@ -128,6 +134,7 @@ export function NumberField(props: NumberFieldProps) {
       onFocus={onFocus}
       errorMsg={errorMsg}
       helperText={helperText}
+      readOnly={readOnly}
       compact={compact}
       {...otherProps}
     />
