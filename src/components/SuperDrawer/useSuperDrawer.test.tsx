@@ -157,7 +157,7 @@ describe("useSuperDrawer", () => {
     // When we call onClose
     // Then we do not expect to have an error thrown
     act(() => {
-      expect(hook.closeDrawer).not.toThrow("Cannot read property 'kind' of undefined");
+      expect(hook.closeDrawer).not.toThrow();
     });
   });
 });
