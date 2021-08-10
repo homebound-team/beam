@@ -38,6 +38,7 @@ export function TextAreaReadOnly() {
         <TestTextArea label="Name" value="first" readOnly={true} />
         <TestTextArea label="Name" value="first" hideLabel readOnly={true} />
         <TestTextArea label="Name" value={("first ".repeat(40) + "last.\n\n").repeat(4)} readOnly={true} />
+        <TestTextArea label="Name" value={"this is a sentence\n".repeat(4)} readOnly={true} />
       </div>
       {/*Matching column but w/o readOnly for comparison*/}
       <div css={Css.df.flexColumn.childGap3.wPx(400).$}>
@@ -45,6 +46,7 @@ export function TextAreaReadOnly() {
         <TestTextArea label="Name" value="first" />
         <TestTextArea label="Name" value="first" hideLabel />
         <TestTextArea label="Name" value={("first ".repeat(40) + "last.\n\n").repeat(4)} />
+        <TestTextArea label="Name" value={"this is a sentence\n".repeat(4)} />
       </div>
     </div>
   );

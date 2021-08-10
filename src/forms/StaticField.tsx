@@ -11,7 +11,7 @@ export function StaticField(props: StaticFieldProps) {
     <div>
       <label css={Css.db.sm.gray700.mbPx(4).$}>{label}</label>
       {/*Our form fields are 40px high, so match that.*/}
-      <div css={Css.smEm.gray900.hPx(40).df.itemsCenter.$}>{value}</div>
+      <div css={Css.sm.gray900.hPx(40).df.itemsCenter.$}>{value}</div>
     </div>
   );
 }
