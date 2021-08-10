@@ -120,7 +120,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         /** Reset the contentStack, all checks and modalState */
         function onClose() {
           const first = contentStack.current[0];
-          if (first.kind === "open" && first.opts.onClose) {
+          if (first?.kind === "open" && first.opts.onClose) {
             first.opts.onClose();
           }
           contentStack.current = [];
