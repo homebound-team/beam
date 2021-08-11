@@ -28,7 +28,7 @@ export interface RichTextFieldProps {
   /** Called when the component is in focus. */
   onFocus: () => void;
   /** For rendering formatted text */
-  readOnly?: boolean | undefined;
+  readOnly?: boolean;
 }
 
 // There aren't types for trix, so add our own. For now `loadHTML` is all we call anyway.
@@ -65,59 +65,59 @@ export function RichTextField(props: RichTextFieldProps) {
 
   useEffect(
     () => {
-      if (!readOnly) {
-        const editorElement = document.getElementById(`editor-${id}`);
-        if (!editorElement) {
-          throw new Error("editorElement not found IDIOT");
-        }
+      if (readOnly) return;
 
-        editor.current = (editorElement as any).editor;
-        if (!editor.current) {
-          throw new Error("editor not found");
-        }
-        if (mergeTags !== undefined) {
-          attachTributeJs(mergeTags, editorElement!);
-        }
-
-        // We have a 2nd useEffect to call loadHTML when value changes, but
-        // we do this here b/c we assume the 2nd useEffect's initial evaluation
-        // "missed" having editor.current set b/c trix-initialize hadn't fired.
-        currentHtml.current = value;
-        editor.current.loadHTML(value || "");
-
-        function trixChange(e: ChangeEvent) {
-          const { textContent, innerHTML } = e.target;
-          const onChange = onChangeRef.current;
-          // If the user only types whitespace, treat that as undefined
-          if ((textContent || "").trim() === "") {
-            currentHtml.current = undefined;
-            onChange && onChange(undefined, undefined, []);
-          } else {
-            currentHtml.current = innerHTML;
-            const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
-            onChange && onChange(innerHTML, textContent || undefined, mentions);
-          }
-        }
-
-        // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
-        // https://github.com/basecamp/trix#storing-attached-files
-        const preventDefault = (e: any) => e.preventDefault();
-        window.addEventListener("trix-file-accept", preventDefault);
-
-        const trixBlur = () => maybeCall(onBlurRef.current);
-        const trixFocus = () => maybeCall(onFocusRef.current);
-
-        editorElement.addEventListener("trix-change", trixChange as any, false);
-        editorElement.addEventListener("trix-blur", trixBlur as any, false);
-        editorElement.addEventListener("trix-focus", trixFocus as any, false);
-
-        return () => {
-          editorElement.removeEventListener("trix-change", trixChange as any);
-          editorElement.removeEventListener("trix-blur", trixBlur as any);
-          editorElement.removeEventListener("trix-focus", trixFocus as any);
-          window.removeEventListener("trix-file-accept", preventDefault);
-        };
+      const editorElement = document.getElementById(`editor-${id}`);
+      if (!editorElement) {
+        throw new Error("editorElement not found");
       }
+
+      editor.current = (editorElement as any).editor;
+      if (!editor.current) {
+        throw new Error("editor not found");
+      }
+      if (mergeTags !== undefined) {
+        attachTributeJs(mergeTags, editorElement!);
+      }
+
+      // We have a 2nd useEffect to call loadHTML when value changes, but
+      // we do this here b/c we assume the 2nd useEffect's initial evaluation
+      // "missed" having editor.current set b/c trix-initialize hadn't fired.
+      currentHtml.current = value;
+      editor.current.loadHTML(value || "");
+
+      function trixChange(e: ChangeEvent) {
+        const { textContent, innerHTML } = e.target;
+        const onChange = onChangeRef.current;
+        // If the user only types whitespace, treat that as undefined
+        if ((textContent || "").trim() === "") {
+          currentHtml.current = undefined;
+          onChange && onChange(undefined, undefined, []);
+        } else {
+          currentHtml.current = innerHTML;
+          const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
+          onChange && onChange(innerHTML, textContent || undefined, mentions);
+        }
+      }
+
+      // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
+      // https://github.com/basecamp/trix#storing-attached-files
+      const preventDefault = (e: any) => e.preventDefault();
+      window.addEventListener("trix-file-accept", preventDefault);
+
+      const trixBlur = () => maybeCall(onBlurRef.current);
+      const trixFocus = () => maybeCall(onFocusRef.current);
+
+      editorElement.addEventListener("trix-change", trixChange as any, false);
+      editorElement.addEventListener("trix-blur", trixBlur as any, false);
+      editorElement.addEventListener("trix-focus", trixFocus as any, false);
+
+      return () => {
+        editorElement.removeEventListener("trix-change", trixChange as any);
+        editorElement.removeEventListener("trix-blur", trixBlur as any);
+        editorElement.removeEventListener("trix-focus", trixFocus as any);
+        window.removeEventListener("trix-file-accept", preventDefault);
+      };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [readOnly],

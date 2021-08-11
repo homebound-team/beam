@@ -8,8 +8,6 @@ export type BoundRichTextFieldProps = Omit<RichTextFieldProps, "value" | "onChan
   field: FieldState<any, string | null | undefined>;
   // Optional in case the page wants extra behavior
   onChange?: (value: string | undefined) => void;
-  // Optional for displaying formatted text
-  readOnly?: boolean | undefined;
 };
 
 /** Wraps `RichTextField` and binds it to a form field. */

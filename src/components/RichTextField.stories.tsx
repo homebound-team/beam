@@ -2,6 +2,7 @@ import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
 import { RichTextField as RichTextFieldComponent } from "src/components/RichTextField";
+import { Css } from "src/Css";
 import { noop } from "src/utils";
 
 export default {
@@ -12,6 +13,7 @@ export default {
 export function Editable() {
   const [value, setValue] = useState<string | undefined>();
   const [tags, setTags] = useState<string[]>([]);
+
   return (
     <>
       <RichTextFieldComponent
@@ -37,15 +39,40 @@ export function Editable() {
 export function ReadOnly() {
   const value =
     "<div><!--block-->This is some content<br><br></div><ul><li><!--block-->this is a bullet</li><li><!--block--><em>another bullet here</em></li></ul><div><!--block--><br><strong>some really important content</strong></div>";
+
   return (
     <RichTextFieldComponent
       label="Comment"
       value={value}
       onChange={noop}
       readOnly={true}
-      placeholder="No Content"
+      placeholder="Enter Text"
       onBlur={noop}
       onFocus={noop}
     />
+  );
+}
+
+export function ToggleReadOnly() {
+  const [readOnly, setReadOnly] = useState<boolean>(false);
+  const [value, setValue] = useState<string | undefined>();
+
+  return (
+    <>
+      <RichTextFieldComponent
+        label="Comment"
+        value={value}
+        onChange={(html, _text, tags) => {
+          setValue(html);
+        }}
+        readOnly={readOnly}
+        placeholder="Enter Text"
+        onBlur={noop}
+        onFocus={noop}
+      />
+      <button css={Css.mt2.p1.bgLightBlue700.white.$} onClick={() => setReadOnly(!readOnly)}>
+        Toggle ReadOnly
+      </button>
+    </>
   );
 }
