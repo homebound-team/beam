@@ -1,4 +1,11 @@
-import React, { Fragment, InputHTMLAttributes, LabelHTMLAttributes, MutableRefObject, ReactNode } from "react";
+import React, {
+  Fragment,
+  InputHTMLAttributes,
+  LabelHTMLAttributes,
+  MutableRefObject,
+  ReactNode,
+  useState,
+} from "react";
 import { mergeProps, useHover } from "react-aria";
 import { ComboBoxState } from "react-stately";
 import { Icon } from "src/components";
@@ -18,7 +25,6 @@ interface SelectFieldInputProps<O, V extends Value> {
   inputWrapRef: MutableRefObject<HTMLDivElement | null>;
   compact?: boolean;
   state: ComboBoxState<O>;
-  isFocused: boolean;
   isDisabled: boolean;
   isReadOnly: boolean;
   fieldDecoration?: (opt: O) => ReactNode;
@@ -47,7 +53,6 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
     required,
     helperText,
     state,
-    isFocused,
     fieldDecoration,
     isDisabled,
     isReadOnly,
@@ -61,6 +66,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
     sizeToContent,
   } = props;
   const errorMessageId = `${inputProps.id}-error`;
+  const [isFocused, setIsFocused] = useState(false);
   const { hoverProps, isHovered } = useHover({});
   const hoverStyles = isHovered && !isReadOnly && !isFocused ? Css.bgGray100.$ : {};
   const focusStyles = isFocused && !isReadOnly ? Css.bLightBlue700.$ : {};
@@ -163,12 +169,24 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             }
             maybeCall(onBlur);
             state.close();
+            setIsFocused(false);
+
+            // if the text input doesn't have the expected value, then reset it by setting the selected keys, which will in turn set the `inputProps`
+            if (
+              // If there is only one option selected, then the value for that option should be displayed in the text input.
+              (selectedOptions.length === 1 && inputProps.value !== getOptionValue(selectedOptions[0])) ||
+              // Otherwise, if no options, or multiple options are selected, then the input's value should be empty
+              (selectedOptions.length !== 1 && inputProps.value !== "")
+            ) {
+              state.selectionManager.setSelectedKeys(selectedOptions.map((so) => valueToKey(getOptionValue(so))));
+            }
           }}
           onFocus={(e) => {
             if (isReadOnly) return;
             maybeCall(onFocus);
             e.target.select();
             state.open();
+            setIsFocused(true);
           }}
           size={
             sizeToContent
