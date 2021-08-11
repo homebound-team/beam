@@ -153,8 +153,7 @@ export function RichTextField(props: RichTextFieldProps) {
   } else {
     return (
       <div css={Css.w100.maxw("550px").$}>
-        {/* TODO: Not sure what to pass to labelProps. */}
-        {label && <Label labelProps={{}} label={label} />}
+        {label && <Label label={label} />}
         <div
           css={Css.mh("120px").bgWhite.sm.gray900.bn.p1.br4.bGray300.ba.$}
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value) || placeholder || "" }}
