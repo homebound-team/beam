@@ -12,7 +12,7 @@ export type BoundRichTextFieldProps = Omit<RichTextFieldProps, "value" | "onChan
 
 /** Wraps `RichTextField` and binds it to a form field. */
 export function BoundRichTextField(props: BoundRichTextFieldProps) {
-  const { field, onChange = (value) => field.set(value), label = defaultLabel(field.key), ...others } = props;
+  const { field, onChange = (value) => field.set(value), label = defaultLabel(field.key), readOnly, ...others } = props;
   const testId = useTestIds(props, field.key);
   return (
     <Observer>
@@ -25,6 +25,7 @@ export function BoundRichTextField(props: BoundRichTextFieldProps) {
           // errorMsg={field.touched ? field.errors.join(" ") : undefined}
           onBlur={() => field.blur()}
           onFocus={() => field.focus()}
+          readOnly={readOnly}
           {...testId}
           {...others}
         />

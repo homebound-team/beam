@@ -1,4 +1,5 @@
 import { Global } from "@emotion/react";
+import DOMPurify from "dompurify";
 import { ChangeEvent, createElement, useEffect, useRef } from "react";
 import { useId } from "react-aria";
 import { Label } from "src/components/Label";
@@ -26,6 +27,8 @@ export interface RichTextFieldProps {
   onBlur: () => void;
   /** Called when the component is in focus. */
   onFocus: () => void;
+  /** For rendering formatted text */
+  readOnly?: boolean;
 }
 
 // There aren't types for trix, so add our own. For now `loadHTML` is all we call anyway.
@@ -41,7 +44,7 @@ type Editor = {
  * We also integrate [tributejs]{@link https://github.com/zurb/tribute} for @ mentions.
  */
 export function RichTextField(props: RichTextFieldProps) {
-  const { mergeTags, label, value = "", onChange, onBlur, onFocus } = props;
+  const { mergeTags, label, value = "", onChange, onBlur, onFocus, readOnly } = props;
   const id = useId();
 
   // We get a reference to the Editor instance after trix-init fires
@@ -62,6 +65,8 @@ export function RichTextField(props: RichTextFieldProps) {
 
   useEffect(
     () => {
+      if (readOnly) return;
+
       const editorElement = document.getElementById(`editor-${id}`);
       if (!editorElement) {
         throw new Error("editorElement not found");
@@ -115,35 +120,48 @@ export function RichTextField(props: RichTextFieldProps) {
       };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [readOnly],
   );
 
   useEffect(() => {
     // If our value prop changes (without the change coming from us), reload it
-    if (editor.current && value !== currentHtml.current) {
+    if (!readOnly && editor.current && value !== currentHtml.current) {
       editor.current.loadHTML(value || "");
     }
-  }, [value]);
+  }, [value, readOnly]);
 
   const { placeholder, autoFocus } = props;
 
-  return (
-    <div css={Css.w100.maxw("550px").$}>
-      {/* TODO: Not sure what to pass to labelProps. */}
-      {label && <Label labelProps={{}} label={label} />}
-      <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }}>
-        {createElement("trix-editor", {
-          id: `editor-${id}`,
-          input: `input-${id}`,
-          // Autofocus attribute is case sensitive since this is standard HTML
-          ...(autoFocus ? { autofocus: true } : {}),
-          ...(placeholder ? { placeholder } : {}),
-        })}
-        <input type="hidden" id={`input-${id}`} value={value} />
+  if (!readOnly) {
+    return (
+      <div css={Css.w100.maxw("550px").$}>
+        {/* TODO: Not sure what to pass to labelProps. */}
+        {label && <Label labelProps={{}} label={label} />}
+        <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }}>
+          {createElement("trix-editor", {
+            id: `editor-${id}`,
+            input: `input-${id}`,
+            // Autofocus attribute is case sensitive since this is standard HTML
+            ...(autoFocus ? { autofocus: true } : {}),
+            ...(placeholder ? { placeholder } : {}),
+          })}
+          <input type="hidden" id={`input-${id}`} value={value} />
+        </div>
+        <Global styles={[tributeOverrides]} />
       </div>
-      <Global styles={[tributeOverrides]} />
-    </div>
-  );
+    );
+  } else {
+    return (
+      <div css={Css.w100.maxw("550px").$}>
+        {label && <Label label={label} />}
+        <div
+          css={Css.mh("120px").bgWhite.sm.gray900.bn.p1.br4.bGray300.ba.$}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value) || placeholder || "" }}
+          data-readonly="true"
+        ></div>
+      </div>
+    );
+  }
 }
 
 function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
