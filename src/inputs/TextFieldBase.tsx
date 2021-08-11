@@ -84,7 +84,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         <div
           css={{
             // Copy/pasted from StaticField, maybe we should combine?
-            ...Css.smEm.gray900.hPx(40).df.itemsCenter.$,
+            ...Css.sm.gray900.df.itemsCenter.mh(px(40)).$,
             ...Css.maxw(px(500)).$,
             ...(multiline
               ? Css.flexColumn.itemsStart.childGap2.$
@@ -94,7 +94,16 @@ export function TextFieldBase(props: TextFieldBaseProps) {
           data-readonly="true"
         >
           {multiline
-            ? (inputProps.value as string | undefined)?.split("\n\n").map((p) => <p>{p}</p>)
+            ? (inputProps.value as string | undefined)?.split("\n\n").map((p) => (
+                <p css={Css.my1.$}>
+                  {p.split("\n").map((sentence) => (
+                    <span>
+                      {sentence}
+                      <br />
+                    </span>
+                  ))}
+                </p>
+              ))
             : inputProps.value}
         </div>
       )}

@@ -2,14 +2,14 @@ import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
 import { Css } from "src/Css";
-import { NumberField, NumberFieldProps } from "src/inputs";
+import { NumberField, NumberFieldProps, TextField } from "src/inputs";
 
 export default {
-  title: "Inputs/Number Fields",
+  title: "Inputs/Number Field",
   component: NumberField,
 } as Meta;
 
-export function NumberFields() {
+export function NumberFieldStyles() {
   return (
     <div css={Css.df.flexColumn.childGap5.$}>
       <div css={Css.df.flexColumn.childGap2.$}>
@@ -39,6 +39,30 @@ export function NumberFields() {
         <TestNumberField label="Percent" type="percent" value={12} />
         <TestNumberField label="Cents" type="cents" value={1000} />
         <TestNumberField label="Margin" type="basisPoints" value={1275} />
+      </div>
+    </div>
+  );
+}
+
+export function NumberFieldReadOnly() {
+  return (
+    <div css={Css.df.childGap2.$}>
+      <div css={Css.df.flexColumn.childGap3.$}>
+        <b>Read Only</b>
+        <TextField label="First Name" value="first" onChange={() => {}} readOnly={true} />
+        <TestNumberField label="Name" value={100} readOnly={true} />
+        <TestNumberField label="Name" value={100} hideLabel readOnly={true} />
+        <TestNumberField label="Name" value={100} readOnly={true} type="cents" />
+        <TestNumberField label="Name" value={100} readOnly={true} type="percent" />
+      </div>
+      {/*Matching column but w/o readOnly for comparison*/}
+      <div css={Css.df.flexColumn.childGap3.$}>
+        <b>Editable</b>
+        <TextField label="First Name" value="first" onChange={() => {}} />
+        <TestNumberField label="Name" value={100} />
+        <TestNumberField label="Name" value={100} hideLabel />
+        <TestNumberField label="Name" value={100} type="cents" />
+        <TestNumberField label="Name" value={100} type="percent" />
       </div>
     </div>
   );

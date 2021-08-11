@@ -83,6 +83,12 @@ describe("NumberFieldTest", () => {
     fireEvent.focus(r.cost());
     expect(r.cost()).toHaveValue("$12.00");
   });
+
+  it("can be read only", async () => {
+    const r = await render(<TestNumberField label="Cost" type="cents" value={1200} readOnly={true} />);
+    expect(r.cost()).toHaveTextContent("$12.00");
+    expect(r.cost()).toHaveAttribute("data-readonly", "true");
+  });
 });
 
 function TestNumberField(props: Omit<NumberFieldProps, "onChange">) {

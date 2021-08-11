@@ -1,6 +1,6 @@
 import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Button,
   GridColumn,
@@ -32,14 +32,18 @@ import { CheckboxGroupItemOption } from "src/inputs";
 
 export function FormStateApp() {
   // Simulate getting the initial form state back from a server call
-  const queryResponse = {
-    firstName: "a1",
-    books: [...Array(2)].map((_, i) => ({
-      id: String(i),
-      title: `b${i}`,
-      classification: { number: `10${i + 1}`, category: `Test Category ${i}` },
-    })),
-  };
+  const queryResponse = useMemo(
+    () => ({
+      firstName: "a1",
+      books: [...Array(2)].map((_, i) => ({
+        id: String(i),
+        title: `b${i}`,
+        classification: { number: `10${i + 1}`, category: `Test Category ${i}` },
+      })),
+    }),
+    [],
+  );
+  const [readOnly, setReadOnly] = useState(false);
 
   const formState = useFormState({
     config: formConfig,
@@ -49,6 +53,7 @@ export function FormStateApp() {
         return state.firstName.value === state.lastName.value ? "Last name cannot equal first name" : undefined;
       });
     },
+    readOnly,
   });
 
   const columns = useMemo(() => createColumns(formState), [formState]);
@@ -85,8 +90,8 @@ export function FormStateApp() {
   return (
     <Observer>
       {() => (
-        <div>
-          <header>
+        <div css={Css.df.$}>
+          <header css={Css.wPx(700).$}>
             <FormLines labelSuffix={{ required: "*", optional: "(Opt)" }}>
               <b>Author</b>
               <BoundTextField field={formState.firstName} />
@@ -130,6 +135,9 @@ export function FormStateApp() {
               />
             </div>
           </header>
+          <div>
+            <Button label="Read Only" onClick={() => setReadOnly(!readOnly)} />
+          </div>
         </div>
       )}
     </Observer>
