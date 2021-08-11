@@ -18,7 +18,11 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
   const [modalFilter, setModalFilter] = useState<F>(filter);
 
   const updateFilter = useCallback((currentFilter: F, key: keyof F, value: any | undefined) => {
-    if (value === undefined || (Array.isArray(value) && value.length === 0)) {
+    if (
+      value === undefined ||
+      (Array.isArray(value) && value.length === 0) ||
+      (filterDefs[key].kind === "toggle" && value === false)
+    ) {
       setModalFilter(omitKey(key, currentFilter));
     } else {
       setModalFilter({ ...currentFilter, [key]: value });

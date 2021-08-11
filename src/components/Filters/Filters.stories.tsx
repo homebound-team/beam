@@ -12,6 +12,7 @@ import {
   simpleHeader,
   SimpleHeaderAndDataOf,
   singleFilter,
+  toggleFilter,
 } from "src/components/index";
 import { Css } from "src/Css";
 import { usePersistedFilter } from "src/hooks";
@@ -59,12 +60,15 @@ export function Filter() {
       getOptionLabel: (o) => o.name,
     });
 
+    const isTest = toggleFilter({ label: "Only show test projects" });
+
     return {
       marketId,
       internalUserId,
       favorite,
       stage,
       status,
+      isTest,
     };
   }, []);
 
@@ -97,6 +101,7 @@ const tableData: Project[] = [
     favorite: true,
     stage: stages[0],
     status: statuses[0],
+    isTest: false,
   },
   {
     id: "2",
@@ -105,6 +110,7 @@ const tableData: Project[] = [
     favorite: true,
     stage: stages[2],
     status: statuses[1],
+    isTest: false,
   },
   {
     id: "3",
@@ -113,6 +119,7 @@ const tableData: Project[] = [
     favorite: false,
     stage: stages[1],
     status: statuses[1],
+    isTest: false,
   },
   {
     id: "4",
@@ -121,6 +128,7 @@ const tableData: Project[] = [
     favorite: true,
     stage: stages[0],
     status: statuses[0],
+    isTest: false,
   },
   {
     id: "5",
@@ -129,6 +137,7 @@ const tableData: Project[] = [
     favorite: true,
     stage: stages[1],
     status: statuses[2],
+    isTest: false,
   },
   {
     id: "6",
@@ -137,6 +146,7 @@ const tableData: Project[] = [
     favorite: false,
     stage: stages[0],
     status: statuses[2],
+    isTest: true,
   },
   {
     id: "7",
@@ -145,6 +155,7 @@ const tableData: Project[] = [
     favorite: true,
     stage: stages[2],
     status: statuses[0],
+    isTest: false,
   },
   {
     id: "8",
@@ -153,6 +164,7 @@ const tableData: Project[] = [
     favorite: true,
     stage: stages[0],
     status: statuses[2],
+    isTest: false,
   },
   {
     id: "9",
@@ -161,6 +173,7 @@ const tableData: Project[] = [
     favorite: false,
     stage: stages[2],
     status: statuses[1],
+    isTest: true,
   },
   {
     id: "10",
@@ -169,6 +182,7 @@ const tableData: Project[] = [
     favorite: false,
     stage: stages[1],
     status: statuses[1],
+    isTest: false,
   },
   {
     id: "11",
@@ -177,6 +191,7 @@ const tableData: Project[] = [
     favorite: true,
     stage: stages[1],
     status: statuses[0],
+    isTest: false,
   },
   {
     id: "12",
@@ -185,6 +200,7 @@ const tableData: Project[] = [
     favorite: false,
     stage: stages[2],
     status: statuses[0],
+    isTest: false,
   },
   {
     id: "13",
@@ -193,6 +209,7 @@ const tableData: Project[] = [
     favorite: true,
     stage: stages[0],
     status: statuses[2],
+    isTest: false,
   },
   {
     id: "14",
@@ -201,6 +218,7 @@ const tableData: Project[] = [
     favorite: false,
     stage: stages[0],
     status: statuses[1],
+    isTest: true,
   },
   {
     id: "15",
@@ -209,6 +227,7 @@ const tableData: Project[] = [
     favorite: true,
     stage: stages[1],
     status: statuses[0],
+    isTest: false,
   },
   {
     id: "16",
@@ -217,6 +236,7 @@ const tableData: Project[] = [
     favorite: false,
     stage: stages[0],
     status: statuses[1],
+    isTest: false,
   },
   {
     id: "17",
@@ -225,6 +245,7 @@ const tableData: Project[] = [
     favorite: false,
     stage: stages[2],
     status: statuses[2],
+    isTest: false,
   },
   {
     id: "18",
@@ -233,6 +254,7 @@ const tableData: Project[] = [
     favorite: false,
     stage: stages[1],
     status: statuses[0],
+    isTest: false,
   },
   {
     id: "19",
@@ -241,6 +263,7 @@ const tableData: Project[] = [
     favorite: false,
     stage: stages[1],
     status: statuses[2],
+    isTest: false,
   },
   {
     id: "20",
@@ -249,6 +272,7 @@ const tableData: Project[] = [
     favorite: false,
     stage: stages[0],
     status: statuses[0],
+    isTest: true,
   },
 ];
 
@@ -259,6 +283,7 @@ const columns: GridColumn<Row>[] = [
   { header: () => "Favorite", data: ({ favorite }) => (favorite ? "Yes" : "No") },
   { header: () => "Stage", data: ({ stage }) => (stage === Stage.StageOne ? "One" : "Two") },
   { header: () => "Status", data: ({ status }) => status.name },
+  { header: () => "Is Test", data: ({ isTest }) => (isTest ? "Yes" : "No") },
 ];
 
 function filterRows(data: Project[], filter: ProjectFilter): GridDataRow<Row>[] {
@@ -270,6 +295,7 @@ function filterRows(data: Project[], filter: ProjectFilter): GridDataRow<Row>[] 
       .filter((p) => (filter.stage?.length ? filter.stage.includes(p.stage) : true))
       .filter((p) => (filter.status?.length ? filter.status.includes(p.status.code) : true))
       .filter((p) => (filter.favorite !== undefined ? filter.favorite === p.favorite : true))
+      .filter((p) => (filter.isTest ? p.isTest : true))
       .map((p) => ({ kind: "data" as const, ...p })),
   ];
 }

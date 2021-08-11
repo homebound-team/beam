@@ -15,7 +15,7 @@ export interface SwitchProps {
   /** Input label */
   label: string;
   /** Where to put the label. */
-  labelStyle?: "form" | "inline";
+  labelStyle?: "form" | "inline" | "filter";
   /** Handler when the interactive element state changes. */
   onChange: (value: boolean) => void;
   /** Whether the switch is selected */
@@ -49,10 +49,12 @@ export function Switch(props: SwitchProps) {
         ...Css.relative.cursorPointer.df.w("max-content").smEm.selectNone.$,
         ...(labelStyle === "form" && Css.flexColumn.$),
         ...(labelStyle === "inline" && Css.childGap2.itemsCenter.$),
+        ...(labelStyle === "filter" && Css.justifyBetween.itemsCenter.w("auto").sm.$),
         ...(isDisabled && Css.cursorNotAllowed.gray400.$),
       }}
     >
       {labelStyle === "form" && <Label label={label} />}
+      {labelStyle === "filter" && <span>{label}</span>}
       {/* Background */}
       <div
         aria-hidden="true"
@@ -85,7 +87,7 @@ export function Switch(props: SwitchProps) {
         <span
           css={{
             // LineHeight is conditionally applied to handle compact version text alignment
-            ...Css.hPx(toggleHeight(compact)).if(compact).add("lineHeight", "1").$,
+            ...Css.if(compact).add("lineHeight", "1").$,
           }}
         >
           {label}

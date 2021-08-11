@@ -5,8 +5,9 @@ import {
   ModalFilterItem,
   MultiFilterProps,
   SingleFilterProps,
+  ToggleFilterProps,
 } from "src/components/Filters";
-import { MultiSelectField, SelectField } from "src/inputs";
+import { MultiSelectField, SelectField, Switch } from "src/inputs";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 import { safeEntries } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
@@ -40,6 +41,20 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
         />,
         inModal,
         label,
+      );
+    }
+
+    if (filterDef.kind === "toggle") {
+      const label = filterDef.label || defaultLabel(key as string);
+      return wrapIfModal(
+        <Switch
+          {...filterDef}
+          selected={filter[key]}
+          label={label}
+          labelStyle={inModal ? "filter" : "inline"}
+          onChange={(value) => updateFilter(filter, key, value)}
+        />,
+        inModal,
       );
     }
 
@@ -131,4 +146,8 @@ export function booleanFilter(
     getOptionValue: (o) => String(o[0]),
     getOptionLabel: (o) => o[1],
   };
+}
+
+export function toggleFilter({ label }: ToggleFilterProps): { kind: "toggle" } & ToggleFilterProps {
+  return { kind: "toggle" as const, label };
 }
