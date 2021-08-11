@@ -94,10 +94,10 @@ export function TextFieldBase(props: TextFieldBaseProps) {
           data-readonly="true"
         >
           {multiline
-            ? (inputProps.value as string | undefined)?.split("\n\n").map((p) => (
-                <p css={Css.my1.$}>
-                  {p.split("\n").map((sentence) => (
-                    <span>
+            ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
+                <p key={i} css={Css.my1.$}>
+                  {p.split("\n").map((sentence, j) => (
+                    <span key={j}>
                       {sentence}
                       <br />
                     </span>
