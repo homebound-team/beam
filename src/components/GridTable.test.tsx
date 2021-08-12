@@ -515,6 +515,22 @@ describe("GridTable", () => {
     expect(row(r, 2)).toBeUndefined();
   });
 
+  it("can filter by string content values", async () => {
+    const rows: GridDataRow<Row>[] = [
+      { kind: "header", id: "header" },
+      { kind: "data", id: "1", name: "foo", value: 1 },
+      { kind: "data", id: "2", name: "bar", value: 2 },
+    ];
+    const nameColumn: GridColumn<Row> = {
+      header: () => "Name",
+      data: ({ name }) => ({ content: name }),
+    };
+    const r = await render(<GridTable filter={"bar"} columns={[nameColumn]} rows={rows} />);
+    expect(cell(r, 0, 0)).toHaveTextContent("Name");
+    expect(cell(r, 1, 0)).toHaveTextContent("bar");
+    expect(row(r, 2)).toBeUndefined();
+  });
+
   it("can filter by numeric values", async () => {
     const rows: GridDataRow<Row>[] = [
       { kind: "header", id: "header" },

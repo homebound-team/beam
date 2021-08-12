@@ -300,7 +300,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const maybeSorted = useMemo(() => {
     if (sorting?.on === "client" && sortState) {
       // If using client-side sort, the sortState use S = number
-      return sortRows(columns, rows, (sortState as any) as SortState<number>);
+      return sortRows(columns, rows, sortState as any as SortState<number>);
     }
     return rows;
   }, [columns, rows, sorting, sortState]);
@@ -1107,6 +1107,8 @@ function sortValue(value: ReactNode | GridCellContent): any {
       maybeFn = value.sortValue;
     } else if ("value" in value) {
       maybeFn = value.value;
+    } else if ("content" in value) {
+      maybeFn = value.content;
     }
   }
   // Watch for functions that need to read from a potentially-changing proxy
@@ -1118,7 +1120,14 @@ function sortValue(value: ReactNode | GridCellContent): any {
 
 /** Look at a row and get its filter value. */
 function filterValue(value: ReactNode | GridCellContent): any {
-  const maybeFn = value && typeof value === "object" && "value" in value ? value.value : value;
+  let maybeFn = value;
+  if (value && typeof value === "object") {
+    if ("value" in value) {
+      maybeFn = value.value;
+    } else if ("content" in value) {
+      maybeFn = value.content;
+    }
+  }
   // Watch for functions that need to read from a potentially-changing proxy
   if (maybeFn instanceof Function) {
     return maybeFn();
@@ -1139,11 +1148,11 @@ function useSortState<R extends Kinded, S>(
       const { initial } = sorting;
       if (initial) {
         const key = typeof initial[0] === "number" ? initial[0] : columns.indexOf(initial[0] as any);
-        return [(key as any) as S, initial[1]];
+        return [key as any as S, initial[1]];
       } else {
         // If no explicit sorting, assume 1st column ascending
         const firstSortableColumn = columns.findIndex((c) => c.clientSideSort !== false);
-        return [(firstSortableColumn as any) as S, "ASC"];
+        return [firstSortableColumn as any as S, "ASC"];
       }
       return undefined;
     } else {
