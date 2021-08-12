@@ -41,7 +41,6 @@ function getChildren(label: string) {
 export const TabsWithContent = () => {
   const [selectedTab1, setSelectedTab1] = useState<TabValue>("tab1");
   const [selectedTab2, setSelectedTab2] = useState<TabValue>("tab1");
-
   return (
     <div css={Css.df.flexColumn.childGap3.$}>
       <div css={Css.df.flexColumn.childGap1.$}>
@@ -65,6 +64,16 @@ export const TabsWithContent = () => {
       </div>
     </div>
   );
+};
+
+export const TabsHiddenIfOnlyOneActive = () => {
+  const testTabs: Tab<TabValue>[] = [
+    { name: "Tab 1", value: "tab1", render: () => <TabContent title="Tab 1 Content" /> },
+    { name: "Tab 2", value: "tab2", disabled: true, render: () => <TabContent title="Tab 2 Content" /> },
+    { name: "Tab 3", value: "tab3", disabled: true, render: () => <TabContent title="Tab 3 Content" /> },
+    { name: "Tab 4", value: "tab4", disabled: true, render: () => <TabContent title="Tab 4 Content" /> },
+  ];
+  return <TabsWithContentComponent tabs={testTabs} onChange={() => {}} selected={"tab1"} ariaLabel="Sample Tabs" />;
 };
 
 const tabsWithIconsAndContent: Tab<TabValue>[] = [

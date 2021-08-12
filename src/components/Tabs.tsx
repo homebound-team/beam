@@ -35,9 +35,11 @@ export function TabsWithContent<V extends string, X extends Only<TabsContentXss,
   const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
   const tid = useTestIds(others, "tab");
 
+  const onlyOneTabEnabled = tabs.filter((t) => !t.disabled).length === 1;
+
   return (
     <div>
-      <Tabs {...props} />
+      {!onlyOneTabEnabled && <Tabs {...props} />}
       <div
         aria-labelledby={`${selectedTab.value}-tab`}
         id={`${selectedTab.value}-tabPanel`}
