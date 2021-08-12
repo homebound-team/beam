@@ -8,7 +8,9 @@ export type FormWidth =
   /** 480px, works well in a small, single-stack form. */
   | "md"
   /** 550px, works well for showing side-by-side/double-stack fields. */
-  | "lg";
+  | "lg"
+  /** 100%, works well for showing full width fields. */
+  | "full";
 
 export interface FormLinesProps {
   /** Let the user interleave group-less lines and grouped lines. */
@@ -30,7 +32,7 @@ export function FormLines(props: FormLinesProps) {
     <FormContext.Provider value={{ labelSuffix }}>
       <div
         css={{
-          ...Css.df.flexColumn.wPx(sizes[width]).$,
+          ...Css.df.flexColumn.w(sizes[width]).$,
           // Purposefully use this instead of childGap3 to put margin-bottom on the last line
           "& > *": Css.mb3.$,
         }}
@@ -71,8 +73,9 @@ export function FieldGroup(props: {
   );
 }
 
-const sizes: Record<FormWidth, number> = {
-  lg: 550,
-  md: 480,
-  sm: 320,
+const sizes: Record<FormWidth, string> = {
+  full: "100%",
+  lg: "550px",
+  md: "480px",
+  sm: "320px",
 };

@@ -27,6 +27,15 @@ export function SmallFlatList() {
   );
 }
 
+export function FullFlatList() {
+  return (
+    <FormLines width="full">
+      <TextField label="First" value="first" onChange={() => {}} />
+      <TextField label="Last" value="last" onChange={() => {}} />
+    </FormLines>
+  );
+}
+
 export function SideBySideMedium() {
   return (
     <FormLines>
