@@ -86,8 +86,8 @@ describe("TabsWithContent", () => {
     const r = await render(<TabsWithContent tabs={testTabs} onChange={() => {}} selected="tab1" />);
     // Then the tabs are not even in the dom
     expect(() => r.tabs_tab1()).toThrow("Unable to find an element");
-    // But the 1st tab's content is
-    expect(r.tab_panel()).toHaveTextContent("Tab 1 Content");
+    // But the selected tab's content is shown
+    expect(r.tab_panel().textContent).toBe("Tab 1 Content");
   });
 });
 
