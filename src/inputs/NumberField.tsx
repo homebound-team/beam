@@ -111,7 +111,7 @@ export function NumberField(props: NumberFieldProps) {
 
   return (
     <TextFieldBase
-      xss={{ ...Css.tr.$, ...xss }}
+      xss={{ ...Css.tr.justifyEnd.$, ...xss }}
       groupProps={groupProps}
       labelProps={labelProps}
       label={label}

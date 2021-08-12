@@ -89,6 +89,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
             ...(multiline
               ? Css.flexColumn.itemsStart.childGap2.$
               : Css.add({ overflow: "hidden", whiteSpace: "nowrap" }).$),
+            ...xss,
           }}
           {...tid}
           data-readonly="true"
