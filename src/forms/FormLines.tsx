@@ -9,7 +9,7 @@ export type FormWidth =
   | "md"
   /** 550px, works well for showing side-by-side/double-stack fields. */
   | "lg"
-  /** 100%, works well for showing full width inputs. */
+  /** 100%, works well for showing full width fields. */
   | "full";
 
 export interface FormLinesProps {
