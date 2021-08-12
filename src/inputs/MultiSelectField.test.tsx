@@ -1,4 +1,5 @@
 import { click, input, render, RenderResult } from "@homebound/rtl-utils";
+import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MultiSelectField, MultiSelectFieldProps } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
@@ -43,6 +44,41 @@ describe("MultiSelectFieldTest", () => {
     expect(text).toHaveValue("One");
   });
 
+  it("resets input value on blur if it does not match the selected option", async () => {
+    // Given a MultiSelectField without a selected options
+    const { getByRole, age } = await render(<TestMultiSelectField values={[]} options={options} />);
+    // When changing the inputs value, and not selecting an option
+    input(age(), "asdf");
+    // And `blur`ing the field
+    fireEvent.blur(age());
+    // Then expect the value to be reset to empty
+    expect(age()).toHaveValue("");
+
+    // Given a selected option
+    fireEvent.focus(age());
+    input(age(), "T");
+    click(getByRole("option", { name: "Three" }));
+    // When changing the inputs value to no longer match the selected option
+    input(age(), "asdf");
+    // And `blur`ing the field
+    fireEvent.blur(age());
+    // Then expect the value to be reset to the selected option
+    expect(age()).toHaveValue("Three");
+
+    // When selecting multiple options
+    fireEvent.focus(age());
+    input(age(), "T");
+    click(getByRole("option", { name: "Two" }));
+    // Then the input value should be empty
+    expect(age()).toHaveValue("");
+    // When changing the inputs value to no longer be empty, as expected for multiple options
+    input(age(), "asdf");
+    // And `blur`ing the field
+    fireEvent.blur(age());
+    // Then expect the value to be reset to empty
+    expect(age()).toHaveValue("");
+  });
+
   function TestMultiSelectField(
     props: Optional<
       MultiSelectFieldProps<HasIdAndName<string>, string>,
@@ -61,6 +97,7 @@ describe("MultiSelectFieldTest", () => {
           onSelect(values);
           setSelected(values);
         }}
+        data-testid="age"
       />
     );
   }
