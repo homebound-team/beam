@@ -1,6 +1,6 @@
 import { Selection } from "@react-types/shared";
 import { Key, ReactNode, useEffect, useRef, useState } from "react";
-import { useButton, useComboBox, useFilter, useFocusRing, useOverlayPosition } from "react-aria";
+import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
 import { Popover } from "src/components/internal";
 import { Css, px } from "src/Css";
@@ -197,7 +197,12 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   const popoverRef = useRef<HTMLDivElement | null>(null);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
-  const { buttonProps: triggerProps, inputProps, listBoxProps, labelProps } = useComboBox(
+  const {
+    buttonProps: triggerProps,
+    inputProps,
+    listBoxProps,
+    labelProps,
+  } = useComboBox(
     {
       ...comboBoxProps,
       inputRef,
@@ -209,7 +214,6 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   );
 
   const { buttonProps } = useButton({ ...triggerProps, isDisabled: isDisabled || isReadOnly }, triggerRef);
-  const { isFocused, focusProps } = useFocusRing({ ...props, within: true });
 
   // useOverlayPosition moves the overlay to the top of the DOM to avoid any z-index issues. Uses the `targetRef` to DOM placement
   const { overlayProps: positionProps } = useOverlayPosition({
@@ -227,7 +231,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   };
 
   return (
-    <div css={Css.dif.flexColumn.w100.maxw(px(550)).$} ref={comboBoxRef} {...focusProps}>
+    <div css={Css.dif.flexColumn.w100.maxw(px(550)).$} ref={comboBoxRef}>
       <SelectFieldInput
         buttonProps={buttonProps}
         buttonRef={triggerRef}
@@ -240,7 +244,6 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         inputWrapRef={inputWrapRef}
         isDisabled={isDisabled}
         required={required}
-        isFocused={isFocused}
         isReadOnly={isReadOnly}
         state={state}
         onBlur={onBlur}
