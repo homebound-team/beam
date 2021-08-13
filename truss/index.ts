@@ -81,6 +81,7 @@ const sections: Sections = {
       borderRadius: "4px",
       display: "inline-flex",
       alignItems: "center",
+      whiteSpace: "nowrap",
       transition,
     }),
   ],

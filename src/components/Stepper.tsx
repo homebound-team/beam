@@ -77,7 +77,7 @@ function StepButton({ label, disabled, state, isCurrent, onClick }: StepButtonPr
       {...hoverProps}
       css={{
         ...Css.buttonBase.$,
-        ...Css.tl.w100.h100.sm.gray700.if(state === "error").red600.$,
+        ...Css.tl.w100.h100.sm.gray700.add("whiteSpace", "initial").if(state === "error").red600.$,
         ...(isCurrent ? Css.lightBlue700.if(state === "error").red800.$ : {}),
         ...(isHovered && !isPressed ? Css.lightBlue800.if(state === "error").red500.$ : {}),
         ...(isPressed ? Css.lightBlue500.if(state === "error").red900.$ : {}),
