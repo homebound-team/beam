@@ -13,7 +13,7 @@ import {
   SimpleHeaderAndDataOf,
   SimpleHeaderAndDataWith,
   simpleRows,
-} from "src/components/GridTable";
+} from "src/components/Table/GridTable";
 import { Css, Palette } from "src/Css";
 import { cell, click, render, row } from "src/utils/rtl";
 

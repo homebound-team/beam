@@ -1,12 +1,14 @@
 import { Meta } from "@storybook/react";
 import { observable } from "mobx";
-import { useContext, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
+  actionColumn,
   Button,
   cardStyle,
+  CollapseToggle,
   condensedStyle,
+  dateColumn,
   defaultStyle,
-  GridCollapseContext,
   GridColumn,
   GridDataRow,
   GridRowLookup,
@@ -14,10 +16,13 @@ import {
   GridTable,
   Icon,
   IconButton,
+  numericColumn,
   observableColumns,
   SimpleHeaderAndDataOf,
 } from "src/components/index";
 import { Css } from "src/Css";
+import { NumberField } from "src/inputs";
+import { noop } from "src/utils";
 import { newStory, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
@@ -172,13 +177,12 @@ const rows: GridDataRow<NestedRow>[] = [
 ];
 
 export function NestedRows() {
-  const arrowColumn: GridColumn<NestedRow> = {
-    header: () => <Collapse />,
-    parent: () => <Collapse />,
-    child: () => <Collapse />,
+  const arrowColumn = actionColumn<NestedRow>({
+    header: () => <CollapseToggle isHeader />,
+    parent: () => <CollapseToggle />,
+    child: () => <CollapseToggle />,
     grandChild: () => "",
-    w: 0,
-  };
+  });
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
     parent: (row) => <div>{row.name}</div>,
@@ -186,16 +190,6 @@ export function NestedRows() {
     grandChild: (row) => <div css={Css.ml4.$}>{row.name}</div>,
   };
   return <GridTable columns={[arrowColumn, nameColumn]} {...{ rows }} />;
-}
-
-function Collapse() {
-  const { isCollapsed, toggleCollapse } = useContext(GridCollapseContext);
-  const icon = isCollapsed ? "+" : "-";
-  return (
-    <div css={Css.cursorPointer.$} onClick={toggleCollapse}>
-      {icon}
-    </div>
-  );
 }
 
 export function ObservableRows() {
@@ -408,6 +402,36 @@ export const AsTableWithRowLink = newStory(
           { kind: "data", id: "1", name: "c", value: 1 },
           { kind: "data", id: "2", name: "b", value: 2 },
           { kind: "data", id: "3", name: "a", value: 3 },
+        ]}
+      />
+    );
+  },
+  { decorators: [withRouter()] },
+);
+
+type Data2 = { name: string; role: string; date: string; priceInCents: number };
+type Row2 = SimpleHeaderAndDataOf<Data2>;
+export const DataTypeColumns = newStory(
+  () => {
+    const nameCol: GridColumn<Row2> = { header: "Name", data: ({ name }) => name };
+    const dateCol = dateColumn<Row2>({ header: "Date", data: ({ date }) => date });
+    const priceCol = numericColumn<Row2>({
+      header: "Price",
+      data: ({ priceInCents }) => (
+        <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} readOnly type="cents" />
+      ),
+    });
+    const detailCol: GridColumn<Row2> = { header: "Details", data: ({ role }) => role };
+    const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
+    return (
+      <GridTable<Row2>
+        columns={[nameCol, detailCol, dateCol, priceCol, actionCol]}
+        rows={[
+          { kind: "header", id: "header" },
+          { kind: "data", id: "1", name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
+          { kind: "data", id: "2", name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
+          { kind: "data", id: "3", name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
+          { kind: "data", id: "4", name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
         ]}
       />
     );
