@@ -1,9 +1,9 @@
 import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
 import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf, Tag } from "src";
-import { GridDataRow, GridRowLookup, simpleRows } from "src/components/GridTable";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
+import { GridDataRow, GridRowLookup, simpleRows } from "src/components/Table/GridTable";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { SuperDrawerContent, useSuperDrawer } from "./index";
 import { SuperDrawer as SuperDrawerComponent } from "./SuperDrawer";
