@@ -6,6 +6,7 @@ import {
   Button,
   cardStyle,
   CollapseToggle,
+  column,
   condensedStyle,
   dateColumn,
   defaultStyle,
@@ -182,6 +183,7 @@ export function NestedRows() {
     parent: () => <CollapseToggle />,
     child: () => <CollapseToggle />,
     grandChild: () => "",
+    w: 0,
   });
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
@@ -413,19 +415,25 @@ type Data2 = { name: string; role: string; date: string; priceInCents: number };
 type Row2 = SimpleHeaderAndDataOf<Data2>;
 export const DataTypeColumns = newStory(
   () => {
-    const nameCol: GridColumn<Row2> = { header: "Name", data: ({ name }) => name };
+    const nameCol = column<Row2>({ header: "Name", data: ({ name }) => name });
+    const detailCol = column<Row2>({ header: "Details", data: ({ role }) => role });
     const dateCol = dateColumn<Row2>({ header: "Date", data: ({ date }) => date });
     const priceCol = numericColumn<Row2>({
       header: "Price",
       data: ({ priceInCents }) => (
-        <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} readOnly type="cents" />
+        <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} type="cents" />
       ),
     });
-    const detailCol: GridColumn<Row2> = { header: "Details", data: ({ role }) => role };
+    const readOnlyPriceCol = numericColumn<Row2>({
+      header: "Read only Price",
+      data: ({ priceInCents }) => (
+        <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />
+      ),
+    });
     const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
     return (
       <GridTable<Row2>
-        columns={[nameCol, detailCol, dateCol, priceCol, actionCol]}
+        columns={[nameCol, detailCol, dateCol, priceCol, readOnlyPriceCol, actionCol]}
         rows={[
           { kind: "header", id: "header" },
           { kind: "data", id: "1", name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
