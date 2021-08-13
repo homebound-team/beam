@@ -2,12 +2,12 @@ import { Meta } from "@storybook/react";
 import { Fragment, useState } from "react";
 import { Css } from "src/Css";
 import { Icon } from "./Icon";
-import { getTabStyles, Tab, TabsWithContent as TabsWithContentComponent } from "./Tabs";
-import { TabContent, TabValue, testTabs } from "./testData";
+import { getTabStyles, Tab, TabContent, Tabs, TabsWithContent } from "./Tabs";
+import { TabValue, TestTabContent, testTabs } from "./testData";
 
 export default {
   title: "Components/Tabs",
-  component: TabsWithContentComponent,
+  component: TabsWithContent,
   parameters: {
     // To better view the icon hover state
     backgrounds: { default: "white" },
@@ -16,7 +16,6 @@ export default {
 
 export function TabBaseStates() {
   const styles = getTabStyles();
-
   return (
     <div css={Css.df.flexColumn.childGap2.$}>
       <div css={{ ...styles.baseStyles, ...styles.activeStyles }}>{getChildren("active")}</div>
@@ -29,6 +28,44 @@ export function TabBaseStates() {
   );
 }
 
+export function TabsWithJustNames() {
+  const [tab, setTab] = useState<TabValue>("tab1");
+  return <TabsWithContent tabs={testTabs} onChange={setTab} selected={tab} ariaLabel="Sample Tabs" />;
+}
+
+export function TabsWithIconAndMargin() {
+  const [tab, setTab] = useState<TabValue>("tab1");
+  return <TabsWithContent tabs={tabsWithIconsAndContent} onChange={setTab} selected={tab} contentXss={Css.m3.$} />;
+}
+
+export function TabsSeparateFromContent() {
+  const [tab, setTab] = useState<TabValue>("tab1");
+  return (
+    <div>
+      <Tabs tabs={testTabs} onChange={setTab} selected={tab} />
+      <hr />
+      <TabContent tabs={testTabs} selected={tab} />
+    </div>
+  );
+}
+
+export const TabsHiddenIfOnlyOneActive = () => {
+  const testTabs: Tab<TabValue>[] = [
+    { name: "Tab 1", value: "tab1", render: () => <TestTabContent title="Tab 1 Content" /> },
+    { name: "Tab 2", value: "tab2", disabled: true, render: () => <TestTabContent title="Tab 2 Content" /> },
+    { name: "Tab 3", value: "tab3", disabled: true, render: () => <TestTabContent title="Tab 3 Content" /> },
+    { name: "Tab 4", value: "tab4", disabled: true, render: () => <TestTabContent title="Tab 4 Content" /> },
+  ];
+  return <TabsWithContent tabs={testTabs} onChange={() => {}} selected={"tab1"} ariaLabel="Sample Tabs" />;
+};
+
+const tabsWithIconsAndContent: Tab<TabValue>[] = [
+  { name: "Tab 1", value: "tab1", icon: "camera", render: () => <TestTabContent title="Tab 1 Content" /> },
+  { name: "Tab 2", value: "tab2", icon: "dollar", render: () => <TestTabContent title="Tab 2 Content" /> },
+  { name: "Tab 3", value: "tab3", icon: "check", render: () => <TestTabContent title="Tab 3 Content" /> },
+  { name: "Tab 4", value: "tab4", icon: "plus", render: () => <TestTabContent title="Tab 4 Content" /> },
+];
+
 function getChildren(label: string) {
   return (
     <Fragment>
@@ -37,48 +74,3 @@ function getChildren(label: string) {
     </Fragment>
   );
 }
-
-export const TabsWithContent = () => {
-  const [selectedTab1, setSelectedTab1] = useState<TabValue>("tab1");
-  const [selectedTab2, setSelectedTab2] = useState<TabValue>("tab1");
-  return (
-    <div css={Css.df.flexColumn.childGap3.$}>
-      <div css={Css.df.flexColumn.childGap1.$}>
-        <h3>Tabs</h3>
-        <TabsWithContentComponent
-          tabs={testTabs}
-          onChange={setSelectedTab1}
-          selected={selectedTab1}
-          ariaLabel="Sample Tabs"
-        />
-      </div>
-      <div css={Css.df.flexColumn.childGap1.$}>
-        <h3>Tabs with icons</h3>
-        <TabsWithContentComponent
-          tabs={tabsWithIconsAndContent}
-          onChange={setSelectedTab2}
-          selected={selectedTab2}
-          ariaLabel="Sample Tabs With Content"
-          contentXss={Css.m3.$}
-        />
-      </div>
-    </div>
-  );
-};
-
-export const TabsHiddenIfOnlyOneActive = () => {
-  const testTabs: Tab<TabValue>[] = [
-    { name: "Tab 1", value: "tab1", render: () => <TabContent title="Tab 1 Content" /> },
-    { name: "Tab 2", value: "tab2", disabled: true, render: () => <TabContent title="Tab 2 Content" /> },
-    { name: "Tab 3", value: "tab3", disabled: true, render: () => <TabContent title="Tab 3 Content" /> },
-    { name: "Tab 4", value: "tab4", disabled: true, render: () => <TabContent title="Tab 4 Content" /> },
-  ];
-  return <TabsWithContentComponent tabs={testTabs} onChange={() => {}} selected={"tab1"} ariaLabel="Sample Tabs" />;
-};
-
-const tabsWithIconsAndContent: Tab<TabValue>[] = [
-  { name: "Tab 1", value: "tab1", icon: "camera", render: () => <TabContent title="Tab 1 Content" /> },
-  { name: "Tab 2", value: "tab2", icon: "dollar", render: () => <TabContent title="Tab 2 Content" /> },
-  { name: "Tab 3", value: "tab3", icon: "check", render: () => <TabContent title="Tab 3 Content" /> },
-  { name: "Tab 4", value: "tab4", icon: "plus", render: () => <TabContent title="Tab 4 Content" /> },
-];

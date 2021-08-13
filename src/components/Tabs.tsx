@@ -1,4 +1,4 @@
-import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useState } from "react";
+import { Fragment, HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
@@ -29,33 +29,40 @@ export interface TabsProps<V extends string, X extends Properties> {
  *
  * The caller is responsible for using `selected` / `onChange` to control
  * the current tab.
+ *
+ * If you want to tease apart Tabs from their TabContent, you can use the `Tab`
+ * and `TabContent` components directly.
  */
 export function TabsWithContent<V extends string, X extends Only<TabsContentXss, X>>(props: TabsProps<V, X>) {
-  const { selected, tabs, contentXss = {}, ...others } = props;
-  const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
-  const tid = useTestIds(others, "tab");
-
-  const onlyOneTabEnabled = tabs.filter((t) => !t.disabled).length === 1;
-
+  const onlyOneTabEnabled = props.tabs.filter((t) => !t.disabled).length === 1;
   return (
-    <div>
+    <Fragment>
       {!onlyOneTabEnabled && <Tabs {...props} />}
-      <div
-        aria-labelledby={`${selectedTab.value}-tab`}
-        id={`${selectedTab.value}-tabPanel`}
-        role="tabpanel"
-        tabIndex={0}
-        {...tid.panel}
-        css={{ ...Css.mt2.$, ...contentXss }}
-      >
-        {selectedTab.render()}
-      </div>
+      <TabContent {...props} />
+    </Fragment>
+  );
+}
+
+export function TabContent<V extends string>(props: Omit<TabsProps<V, {}>, "onChange">) {
+  const tid = useTestIds(props, "tab");
+  const { selected, tabs, contentXss = {} } = props;
+  const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
+  return (
+    <div
+      aria-labelledby={`${selectedTab.value}-tab`}
+      id={`${selectedTab.value}-tabPanel`}
+      role="tabpanel"
+      tabIndex={0}
+      {...tid.panel}
+      css={{ ...Css.mt2.$, ...contentXss }}
+    >
+      {selectedTab.render()}
     </div>
   );
 }
 
 /** The top list of tabs. */
-function Tabs<V extends string>(props: TabsProps<V, {}>) {
+export function Tabs<V extends string>(props: TabsProps<V, {}>) {
   const { ariaLabel, onChange, selected, tabs, ...others } = props;
   const { isFocusVisible, focusProps } = useFocusRing();
   const tid = useTestIds(others, "tabs");
@@ -89,9 +96,15 @@ function Tabs<V extends string>(props: TabsProps<V, {}>) {
     setActive(selected);
   }
 
+  // We also check this in TabsWithContent, but if someone is using Tabs standalone, check it here as well
+  const onlyOneTabEnabled = props.tabs.filter((t) => !t.disabled).length === 1;
+  if (onlyOneTabEnabled) {
+    return <></>;
+  }
+
   return (
     <div css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...tid}>
-      {tabs.map((tab, i) => {
+      {tabs.map((tab) => {
         const { name, value, icon, disabled = false } = tab;
         return (
           <SingleTab

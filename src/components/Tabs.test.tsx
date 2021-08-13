@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Palette } from "src/Css";
 import { click, render } from "src/utils/rtl";
 import { getNextTabValue, Tab, TabsWithContent } from "./Tabs";
-import { TabContent, TabValue, testTabs } from "./testData";
+import { TabValue, TestTabContent, testTabs } from "./testData";
 
 describe("TabsWithContent", () => {
   it("should display content of selected tab", async () => {
@@ -78,10 +78,10 @@ describe("TabsWithContent", () => {
   it("hides the tabs if only a single tab is enabled", async () => {
     // Given only the 1st tab is enabled
     const testTabs: Tab<TabValue>[] = [
-      { name: "Tab 1", value: "tab1", render: () => <TabContent title="Tab 1 Content" /> },
-      { name: "Tab 2", value: "tab2", disabled: true, render: () => <TabContent title="Tab 2 Content" /> },
-      { name: "Tab 3", value: "tab3", disabled: true, render: () => <TabContent title="Tab 3 Content" /> },
-      { name: "Tab 4", value: "tab4", disabled: true, render: () => <TabContent title="Tab 4 Content" /> },
+      { name: "Tab 1", value: "tab1", render: () => <TestTabContent title="Tab 1 Content" /> },
+      { name: "Tab 2", value: "tab2", disabled: true, render: () => <TestTabContent title="Tab 2 Content" /> },
+      { name: "Tab 3", value: "tab3", disabled: true, render: () => <TestTabContent title="Tab 3 Content" /> },
+      { name: "Tab 4", value: "tab4", disabled: true, render: () => <TestTabContent title="Tab 4 Content" /> },
     ];
     const r = await render(<TabsWithContent tabs={testTabs} onChange={() => {}} selected="tab1" />);
     // Then the tabs are not even in the dom
