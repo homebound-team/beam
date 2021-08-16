@@ -6,6 +6,9 @@ export * from "./forms";
 export * from "./hooks";
 export * from "./inputs";
 export * from "./interfaces";
-export { setupMockComponents } from "./utils/setupMocks";
+export { setupMockComponents }  from "./utils/setupMocks";
 export * from "./utils/defaultTestId";
 export * from "./utils/useTestIds";
+
+// import { setupMockComponents } from "./utils/setupMocks";
+// console.log("setupMockComponents", setupMockComponents);

@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { RichTextField as RichTextFieldComponent } from "src/components/RichTextField";
+import { RichTextField as RichTextFieldComponent } from "./RichTextField";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
 

@@ -6,6 +6,7 @@ export * from "./NumberField";
 export { RadioGroupField } from "./RadioGroupField";
 export type { RadioFieldOption, RadioGroupFieldProps } from "./RadioGroupField";
 export * from "./SelectField";
+export * as MockSelectField from "./SelectField.mock";
 export * from "./Switch";
 export * from "./TextAreaField";
 export * from "./TextField";
