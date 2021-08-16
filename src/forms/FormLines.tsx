@@ -76,6 +76,8 @@ export function FieldGroup(props: {
 const sizes: Record<FormWidth, string> = {
   full: "100%",
   lg: "550px",
-  md: "480px",
-  sm: "320px",
+  // Matches Modal.md 480px - 24*2 padding = 432px.
+  md: "432px",
+  // Matches Modal.sm 320px - 24*2 padding = 272px.
+  sm: "272px",
 };
