@@ -9,3 +9,5 @@ dist
 .eslintcache
 
 dist
+
+test.html
