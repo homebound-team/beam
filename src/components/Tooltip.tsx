@@ -18,15 +18,11 @@ interface TooltipProps {
 }
 
 export function Tooltip(props: TooltipProps) {
-  const { placement, children, title, disabled, delay } = props;
+  const { placement, children, title, disabled, delay = 0 } = props;
 
   const state = useTooltipTriggerState({ delay, isDisabled: disabled });
   const triggerRef = React.useRef(null);
-  const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger(
-    { delay, isDisabled: disabled },
-    state,
-    triggerRef,
-  );
+  const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger({ isDisabled: disabled }, state, triggerRef);
   const { tooltipProps } = useTooltip(_tooltipProps, state);
 
   return (
@@ -67,7 +63,12 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
   });
 
   return (
-    <div ref={popperRef} style={styles.popper} {...attributes.popper} css={Css.bgGray900.white.px1.py("4px").br4.xs.$}>
+    <div
+      ref={popperRef}
+      style={{ ...styles.popper, maxWidth: "320px" }}
+      {...attributes.popper}
+      css={Css.bgGray900.white.px1.py("4px").br4.xs.$}
+    >
       <div ref={setArrowRef} style={{ ...styles.arrow }} id="arrow" />
       {content}
     </div>
