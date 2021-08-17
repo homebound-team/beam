@@ -1,14 +1,11 @@
 export * from "./Checkbox";
 export * from "./CheckboxGroup";
 export * from "./DateField";
-export * as MockDateField from "./DateField.mock";
 export * from "./MultiSelectField";
-export * as MockMultiSelectField from "./MultiSelectField.mock";
 export * from "./NumberField";
 export { RadioGroupField } from "./RadioGroupField";
 export type { RadioFieldOption, RadioGroupFieldProps } from "./RadioGroupField";
 export * from "./SelectField";
-export * as MockSelectField from "./SelectField.mock";
 export * from "./Switch";
 export * from "./TextAreaField";
 export * from "./TextField";
