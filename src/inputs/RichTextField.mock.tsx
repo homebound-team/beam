@@ -3,9 +3,11 @@ import { useState } from "react";
 import { useTestIds } from "src/utils";
 import { RichTextFieldProps } from "./RichTextField";
 
+/** Mocks out `RichTextField` as a text `<input>` field. */
 export function RichTextField(props: RichTextFieldProps) {
+  const { onBlur = () => {}, onFocus = () => {}, readOnly } = props;
   const [value, setValue] = useState(props.value || "");
-  const tid = useTestIds(props, defaultTestId(props.label || "textField"));
+  const tid = useTestIds(props, defaultTestId(props.label || "richTextField"));
   return (
     <input
       type="text"
@@ -15,6 +17,9 @@ export function RichTextField(props: RichTextFieldProps) {
         setValue(value);
         props.onChange(value, value, props.mergeTags || []);
       }}
+      onBlur={onBlur}
+      onFocus={onFocus}
+      readOnly={readOnly}
       {...tid}
     />
   );

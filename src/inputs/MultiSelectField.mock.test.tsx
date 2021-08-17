@@ -1,5 +1,5 @@
-import { MultiSelectField as MockMultiSelectField } from "./MultiSelectField.mock";
 import { render, select } from "src/utils/rtl";
+import { MultiSelectField as MockMultiSelectField } from "./MultiSelectField.mock";
 
 describe("MockMultiSelectField", () => {
   it("fires onSelect when selecting one additional option", async () => {
@@ -21,7 +21,7 @@ describe("MockMultiSelectField", () => {
       />,
     );
     // When we select the 3rd option as well
-    select(r.select, ["thr"]);
+    select(r.multiSelect, ["thr"]);
     // Then onSelect was called with 2 and 3
     expect(onSelect).toHaveBeenCalledWith(
       ["2", "3"],
@@ -51,7 +51,7 @@ describe("MockMultiSelectField", () => {
       />,
     );
     // When we select the 1st and 3rd options and deselect the 2nd option
-    select(r.select, ["one", "two", "thr"]);
+    select(r.multiSelect, ["one", "two", "thr"]);
     // Then onSelect was called with 1 and 3
     expect(onSelect).toHaveBeenCalledWith(
       ["1", "3"],

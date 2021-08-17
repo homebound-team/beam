@@ -1,5 +1,5 @@
-import { SelectField as MockSelectField } from "./SelectField.mock";
 import { render, select } from "src/utils/rtl";
+import { SelectField as MockSelectField } from "./SelectField.mock";
 
 describe("MockSelectField", () => {
   it("fires onSelect when selecting an inital option", async () => {
@@ -21,7 +21,7 @@ describe("MockSelectField", () => {
     // When we select the 2nd option
     select(r.select, "two");
     // Then onSelect was called with 2
-    expect(onSelect).toHaveBeenCalledWith("2", {"id": "2", "name": "two"});
+    expect(onSelect).toHaveBeenCalledWith("2", { id: "2", name: "two" });
   });
 
   it("fires onSelect when selecting a different option", async () => {
@@ -45,6 +45,6 @@ describe("MockSelectField", () => {
     // When we select the 3rd option
     select(r.select, ["thr"]);
     // Then onSelect was called with 3
-    expect(onSelect).toHaveBeenCalledWith("3", {"id": "3", "name": "thr"});
+    expect(onSelect).toHaveBeenCalledWith("3", { id: "3", name: "thr" });
   });
 });

@@ -13,7 +13,7 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
     errorMsg,
     onBlur,
   } = props;
-  const tid = useTestIds(props, "select");
+  const tid = useTestIds(props, "multiSelect");
 
   return (
     <select
@@ -25,7 +25,7 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
         const { target } = e;
         const selectedValues: string[] = [values.join()];
         for (let i = 0; i < target.selectedOptions.length; i++) {
-          if(selectedValues.includes(target.selectedOptions.item(i)?.value!)) {
+          if (selectedValues.includes(target.selectedOptions.item(i)?.value!)) {
             // deSelect if already selected
             selectedValues.splice(selectedValues.indexOf(target.selectedOptions.item(i)?.value!), 1);
           } else {
