@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { ReactNode, useContext } from "react";
 import { Css } from "src/Css";
 import { FormContext, LabelSuffixStyle } from "src/forms/FormContext";
 
@@ -14,7 +14,7 @@ export type FormWidth =
 
 export interface FormLinesProps {
   /** Let the user interleave group-less lines and grouped lines. */
-  children: JSX.Element[];
+  children: ReactNode;
   labelSuffix?: LabelSuffixStyle;
   width?: FormWidth;
 }
