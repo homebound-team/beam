@@ -1,13 +1,13 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { RichTextField as RichTextFieldComponent } from "./RichTextField";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
+import { RichTextField as RichTextFieldComponent } from "./RichTextField";
 
 export default {
   component: RichTextFieldComponent,
-  title: "Components/Rich Text Field",
+  title: "Inputs/Rich Text Field",
 } as Meta;
 
 export function Editable() {
