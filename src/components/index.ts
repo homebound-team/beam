@@ -19,7 +19,7 @@ export * from "./Pills";
 export * from "./Stepper";
 export * from "./SuperDrawer";
 export * from "./Table";
-export { TabsWithContent } from "./Tabs";
+export { TabContent, Tabs, TabsWithContent } from "./Tabs";
 export type { Tab } from "./Tabs";
 export * from "./Tag";
 export * from "./Tooltip";
