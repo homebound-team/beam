@@ -14,8 +14,10 @@ export interface BeamButtonProps {
    * If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
    */
   disabled?: boolean | ReactNode;
-  /** Handler that is called when the press is released over the target. */
-  onClick?: (e: PressEvent) => void;
+  /** If function, then it is the handler that is called when the press is released over the target. Otherwise if string, it is the URL path for the link */
+  onClick?: ((e: PressEvent) => void) | string;
+  /** Text to be shown via a tooltip when the user hovers over the button */
+  tooltip?: ReactNode;
 }
 
 export interface BeamTextFieldProps extends BeamFocusableProps {

@@ -1,11 +1,12 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { IconButton as IconButton, IconButtonProps, iconButtonStylesHover, Icons } from "src";
-import { Css, Palette } from "src/Css";
+import { Css, IconButton as IconButton, IconButtonProps, iconButtonStylesHover, Icons, Palette } from "src";
+import { withRouter } from "src/utils/sb";
 
 export default {
   title: "Components/Icon Button",
   component: IconButton,
+  decorators: [withRouter()],
   args: {
     icon: "arrowBack",
     onClick: action("onPress"),
@@ -52,20 +53,44 @@ export const IconButtonStyles = (args: IconButtonProps) => (
   </div>
 );
 
-export function IconButtonDisabled() {
+export function WithTooltip() {
   return (
-    <IconButton
-      disabled={
-        <div>
-          You <b>cannot</b> currently perform this operation because of:
-          <ul>
-            <li>reason one</li>
-            <li>reason two</li>
-          </ul>
-        </div>
-      }
-      icon="arrowBack"
-    />
+    <div css={Css.dg.flexColumn.childGap2.justifyStart.$}>
+      <div>
+        <h2>Tooltip provided via 'disabled' property</h2>
+        <IconButton
+          disabled={
+            <div>
+              You <b>cannot</b> currently perform this operation because of:
+              <ul>
+                <li>reason one</li>
+                <li>reason two</li>
+              </ul>
+            </div>
+          }
+          icon="arrowBack"
+        />
+      </div>
+      <div>
+        <h2>Tooltip provided via 'tooltip' property</h2>
+        <IconButton icon="arrowBack" tooltip="Back to previous page" />
+      </div>
+    </div>
+  );
+}
+
+export function IconButtonLink() {
+  return (
+    <div>
+      <div>
+        <h2>Relative Path Link</h2>
+        <IconButton icon="plus" onClick="/fakePath" />
+      </div>
+      <div>
+        <h2>Absolute Link</h2>
+        <IconButton icon="linkExternal" onClick="https://www.homebound.com" />
+      </div>
+    </div>
   );
 }
 

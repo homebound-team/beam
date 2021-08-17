@@ -1,6 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { Button, ButtonProps, Icon } from "src";
+import { Button, ButtonProps } from "src";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 
@@ -28,7 +28,7 @@ export function ButtonVariations(args: ButtonProps) {
       <div>
         <h2>Primary</h2>
         <div css={buttonRowStyles}>
-          <Button onClick="https://google.com" label="Primary Button" autoFocus />
+          <Button {...args} label="Primary Button" autoFocus />
           <Button {...args} disabled label="Disabled" />
         </div>
         <div css={buttonRowStyles}>
@@ -165,48 +165,29 @@ export function ButtonLink() {
         <h2>Primary</h2>
         <div css={buttonRowStyles}>
           <Button onClick="/fakePath" label="Relative URL link" />
-          <Button
-            onClick="https://www.homebound.com"
-            label="Absolute URL link"
-            endAdornment={<Icon icon="linkExternal" />}
-          />
-          <Button icon="plus" onClick="https://www.homebound.com" label="Disabled link" disabled />
+          <Button onClick="https://www.homebound.com" label="Absolute URL link" />
+          <Button icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>
 
         <h2>Secondary</h2>
         <div css={buttonRowStyles}>
           <Button variant="secondary" onClick="/fakePath" label="Relative URL link" />
-          <Button
-            variant="secondary"
-            onClick="https://www.homebound.com"
-            label="Absolute URL link"
-            endAdornment={<Icon icon="linkExternal" />}
-          />
-          <Button variant="secondary" icon="plus" onClick="https://www.homebound.com" label="Disabled link" disabled />
+          <Button variant="secondary" onClick="https://www.homebound.com" label="Absolute URL link" />
+          <Button variant="secondary" icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>
 
         <h2>Tertiary</h2>
         <div css={buttonRowStyles}>
           <Button variant="tertiary" onClick="/fakePath" label="Relative URL link" />
-          <Button
-            variant="tertiary"
-            onClick="https://www.homebound.com"
-            label="Absolute URL link"
-            endAdornment={<Icon icon="linkExternal" />}
-          />
-          <Button variant="tertiary" icon="plus" onClick="https://www.homebound.com" label="Disabled link" disabled />
+          <Button variant="tertiary" onClick="https://www.homebound.com" label="Absolute URL link" />
+          <Button variant="tertiary" icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>
 
         <h2>Danger</h2>
         <div css={buttonRowStyles}>
           <Button variant="danger" onClick="/fakePath" label="Relative URL link" />
-          <Button
-            variant="danger"
-            onClick="https://www.homebound.com"
-            label="Absolute URL link"
-            endAdornment={<Icon icon="linkExternal" />}
-          />
-          <Button variant="danger" icon="plus" onClick="https://www.homebound.com" label="Disabled link" disabled />
+          <Button variant="danger" onClick="https://www.homebound.com" label="Absolute URL link" />
+          <Button variant="danger" icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>
       </div>
     </div>

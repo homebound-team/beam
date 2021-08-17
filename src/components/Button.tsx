@@ -1,5 +1,4 @@
 import { AriaButtonProps } from "@react-types/button";
-import { PressEvent } from "@react-types/shared";
 import { ReactNode, RefObject, useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Link } from "react-router-dom";
@@ -9,19 +8,16 @@ import { Css } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, noop } from "src/utils";
 
-export interface ButtonProps extends Omit<BeamButtonProps, "onClick">, BeamFocusableProps {
+export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   label: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: IconProps["icon"];
+  /** Displays contents after the Button's label. Will be ignored for Buttons rendered as a link with an absolute URL */
   endAdornment?: ReactNode;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
   buttonRef?: RefObject<HTMLElement>;
-  /** If function, then it is the handler that is called when the press is released over the target. Otherwise if string, it is the URL path for the link */
-  onClick?: ((e: PressEvent) => void) | string;
-  /** Text to be shown via a tooltip when the user hovers over the button */
-  tooltip?: ReactNode;
 }
 
 export function Button(props: ButtonProps) {
@@ -50,7 +46,10 @@ export function Button(props: ButtonProps) {
     <>
       {icon && <Icon xss={iconStyles[size]} icon={icon} />}
       {label}
-      {endAdornment && <span css={Css.ml1.$}>{endAdornment}</span>}
+      {/* Do not apply endAdornment for links to Absolute URLs. Component will apply the 'linkExternal' icon as an endAdornment by default */}
+      {!(typeof onPress === "string" && isAbsoluteUrl(onPress)) && endAdornment && (
+        <span css={Css.ml1.$}>{endAdornment}</span>
+      )}
     </>
   );
   const buttonAttrs = {
@@ -73,6 +72,9 @@ export function Button(props: ButtonProps) {
       isAbsoluteUrl(onPress) ? (
         <a {...buttonAttrs} href={onPress} className={navLink} target="_blank" rel="noreferrer noopener">
           {buttonContent}
+          <span css={Css.ml1.$}>
+            <Icon icon="linkExternal" />
+          </span>
         </a>
       ) : (
         <Link {...buttonAttrs} to={onPress} className={navLink}>
