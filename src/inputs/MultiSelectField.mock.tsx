@@ -1,7 +1,7 @@
 import { MultiSelectFieldProps, Value } from "src/inputs";
 import { useTestIds } from "src/utils";
 
-/** Mocks out `MultiSelectField` as a dumb `<select>` field. */
+/** Mocks out `MultiSelectField` as a multiple `<select>` field. */
 export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProps<T, V>) {
   const {
     getOptionValue = (o) => (o as any).id, // if unset, assume O implements HasId
@@ -23,9 +23,15 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
       value={values as string[]}
       onChange={(e) => {
         const { target } = e;
-        const selectedValues: string[] = [];
+        const selectedValues: string[] = [values.join()];
         for (let i = 0; i < target.selectedOptions.length; i++) {
-          selectedValues.push(target.selectedOptions.item(i)?.value!);
+          if(selectedValues.includes(target.selectedOptions.item(i)?.value!)) {
+            // deSelect if already selected
+            selectedValues.splice(selectedValues.indexOf(target.selectedOptions.item(i)?.value!), 1);
+          } else {
+            // add value
+            selectedValues.push(target.selectedOptions.item(i)?.value!);
+          }
         }
         const selectedOptions = options.filter((o) => selectedValues.includes(getOptionValue(o)));
         onSelect(

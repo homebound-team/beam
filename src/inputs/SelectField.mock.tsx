@@ -2,6 +2,7 @@ import { Key } from "react";
 import { SelectFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 
+/** Mocks out `SelectField` as a `<select>` field. */
 export function SelectField<T extends object, V extends Key>(props: SelectFieldProps<T, V>) {
   const {
     getOptionValue = (o) => (o as any).id, // if unset, assume O implements HasId
