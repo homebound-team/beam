@@ -5,9 +5,9 @@ import { createPortal } from "react-dom";
 import { BeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
-import { Css, Only, Xss } from "src/Css";
-import { useTestIds } from "src/utils";
+import { Css, Only, px, Xss } from "src/Css";
 import { Callback } from "src/types";
+import { useTestIds } from "src/utils";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl";
 
@@ -35,6 +35,7 @@ export interface ModalProps {
  */
 export function Modal(props: ModalProps) {
   const { title, size = "md", content, forceScrolling } = props;
+  const isFixedHeight = typeof size !== "string";
   const ref = useRef(null);
   const { modalBodyDiv, modalFooterDiv, drawerContentStack } = useContext(BeamContext);
   const { closeModal } = ourUseModal();
@@ -52,10 +53,9 @@ export function Modal(props: ModalProps) {
   usePreventScroll();
 
   const [hasScroll, setHasScroll] = useState(forceScrolling ?? false);
-  // This would be great to have work, but seems like the contentRef cannot be added/removed from the DOM or it breaks.
-  // Still trying to work on it, though... must be another way around it.
+
   useResizeObserver(contentRef, ({ target }) => {
-    if (forceScrolling === undefined) {
+    if (forceScrolling === undefined && !isFixedHeight) {
       setHasScroll(target.scrollHeight > target.clientHeight);
     }
   });
@@ -76,7 +76,14 @@ export function Modal(props: ModalProps) {
       <div css={Css.underlay.z4.$} {...underlayProps} {...testId.underlay}>
         <FocusScope contain restoreFocus autoFocus>
           <div
-            css={Css.br24.bgWhite.bshModal.maxh("90vh").df.flexColumn.wPx(width).hPx(height).$}
+            css={
+              Css.br24.bgWhite.bshModal
+                .maxh("90vh")
+                .df.flexColumn.wPx(width)
+                .mh(px(height))
+                .if(isFixedHeight)
+                .hPx(height).$
+            }
             ref={ref}
             {...overlayProps}
             {...dialogProps}
@@ -151,9 +158,11 @@ const widths: Record<ModalSize, number> = {
   xl: 800,
 };
 
+const defaultMinHeight = 204;
+
 function getSize(size: ModalSize | { width: ModalSize; height: number }): [number, number] {
   if (typeof size === "string") {
-    return [widths[size], widths[size] * 1.1];
+    return [widths[size], defaultMinHeight];
   } else {
     return [widths[size.width], size.height];
   }
