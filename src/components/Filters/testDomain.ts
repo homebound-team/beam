@@ -11,6 +11,7 @@ export type Market = {
 export type InternalUser = {
   name: string;
   id: string;
+  role?: string;
 };
 
 export type Status = {

@@ -1,7 +1,8 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { GridColumn, GridTable, Icon, Icons, simpleHeader, SimpleHeaderAndDataOf } from "src/components";
+import type { IconKey } from "src/components";
+import { GridColumn, GridTable, Icon, simpleHeader, SimpleHeaderAndDataOf } from "src/components";
 import { Css } from "src/Css";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
@@ -16,7 +17,7 @@ export default {
 type TestOption = {
   id: string;
   name: string;
-  icon?: keyof typeof Icons;
+  icon?: IconKey;
 };
 
 const options: TestOption[] = [
