@@ -5,6 +5,7 @@ export * from "./MultiSelectField";
 export * from "./NumberField";
 export { RadioGroupField } from "./RadioGroupField";
 export type { RadioFieldOption, RadioGroupFieldProps } from "./RadioGroupField";
+export * from "./RichTextField";
 export * from "./SelectField";
 export * from "./Switch";
 export * from "./TextAreaField";
