@@ -1,9 +1,10 @@
 import { RefObject, useMemo, useRef } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
+import type { IconKey } from "src/components";
 import { navLink } from "src/components";
 import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
-import { Icon, Icons } from "./Icon";
+import { Icon } from "./Icon";
 
 export interface NavLinkProps extends BeamFocusableProps {
   /** active indicates the user is on the current page */
@@ -11,7 +12,7 @@ export interface NavLinkProps extends BeamFocusableProps {
   disabled?: boolean;
   href: string;
   label: string;
-  icon?: keyof typeof Icons;
+  icon?: IconKey;
   variant: NavLinkVariant;
   /**
    * Target and rel attributes are added for external links

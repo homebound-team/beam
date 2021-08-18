@@ -1,7 +1,8 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { Icon, Icons } from "src/components";
+import type { IconKey } from "src/components";
+import { Icon } from "src/components";
 import { Css } from "src/Css";
 import { MultiSelectField, MultiSelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
@@ -14,7 +15,7 @@ export default {
 type TestOption = {
   id: Value;
   name: string;
-  icon?: keyof typeof Icons;
+  icon?: IconKey;
 };
 
 const options: TestOption[] = [

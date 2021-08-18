@@ -1,14 +1,15 @@
 import { Fragment, HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
+import type { IconKey } from "src/components";
 import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
-import { Icon, Icons } from "./Icon";
+import { Icon } from "./Icon";
 
 export interface Tab<V extends string = string> {
   name: string;
   value: V;
-  icon?: keyof typeof Icons;
+  icon?: IconKey;
   disabled?: boolean;
   render: () => ReactNode;
 }
@@ -132,7 +133,7 @@ interface TabProps<V extends string> extends BeamFocusableProps {
   active: boolean;
   disabled: boolean;
   label: string;
-  icon?: keyof typeof Icons;
+  icon?: IconKey;
   value: V;
   onClick: (value: V) => void;
   onKeyUp: (e: KeyboardEvent) => void;
