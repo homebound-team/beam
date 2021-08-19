@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react";
 import { FieldGroup, FormDivider, FormLines } from "src/forms/FormLines";
+import { NumberField, SelectField } from "src/inputs";
 import { Switch } from "src/inputs/Switch";
 import { TextField } from "src/inputs/TextField";
 import { noop } from "src/utils/index";
@@ -62,6 +63,18 @@ export function SideBySideMedium() {
         <TextField label="Middle" value="M" onChange={() => {}} />
         <TextField label="Last" value="last" onChange={() => {}} />
       </FieldGroup>
+      <FieldGroup>
+        <NumberField label="Qty" value={1} onChange={() => {}} />
+        <SelectField<Options, number>
+          label="Unit of Measure"
+          value={1}
+          options={[
+            { id: 1, name: "Each" },
+            { id: 2, name: "Square Feet" },
+          ]}
+          onSelect={noop}
+        />
+      </FieldGroup>
     </FormLines>
   );
 }
@@ -101,6 +114,18 @@ export function SideBySideLarge() {
         <TextField label="State" value="" onChange={noop} />
         <TextField label="Postal Code" value="" onChange={noop} />
       </FieldGroup>
+      <FieldGroup>
+        <NumberField label="Qty" value={1} onChange={() => {}} />
+        <SelectField<Options, number>
+          label="Unit of Measure"
+          value={1}
+          options={[
+            { id: 1, name: "Each" },
+            { id: 2, name: "Square Feet" },
+          ]}
+          onSelect={noop}
+        />
+      </FieldGroup>
     </FormLines>
   );
 }
@@ -130,6 +155,23 @@ export function SideBySideSmall() {
         <TextField label="Middle" value="M" onChange={() => {}} />
         <TextField label="Last" value="last" onChange={() => {}} />
       </FieldGroup>
+      <FieldGroup>
+        <NumberField label="Qty" value={1} onChange={() => {}} />
+        <SelectField<Options, number>
+          label="Unit of Measure"
+          value={1}
+          options={[
+            { id: 1, name: "Each" },
+            { id: 2, name: "Square Feet" },
+          ]}
+          onSelect={noop}
+        />
+      </FieldGroup>
     </FormLines>
   );
 }
+
+type Options = {
+  id: number;
+  name: string;
+};
