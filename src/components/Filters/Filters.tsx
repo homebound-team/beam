@@ -1,9 +1,15 @@
 import { memo, useMemo } from "react";
 import { Button } from "src/components/Button";
-import { filterBuilder, FilterDefs, FilterModal, getFilterComponents } from "src/components/Filters";
+import {
+  filterBuilder,
+  FilterDefs,
+  FilterModal,
+  filterTestIdPrefix,
+  getFilterComponents,
+} from "src/components/Filters";
 import { useModal } from "src/components/Modal";
 import { Css } from "src/Css";
-import { safeEntries, safeKeys } from "src/utils";
+import { safeEntries, safeKeys, useTestIds } from "src/utils";
 
 interface FilterProps<F> {
   filter: F;
@@ -15,6 +21,8 @@ interface FilterProps<F> {
 
 function Filters<F>(props: FilterProps<F>) {
   const { filter, onChange, filterDefs } = props;
+  const testId = useTestIds(props, filterTestIdPrefix);
+
   const { openModal } = useModal();
   const [pageFilterDefs, modalFilterDefs] = useMemo(() => {
     const filterEntries = safeEntries(filterDefs);
@@ -34,7 +42,8 @@ function Filters<F>(props: FilterProps<F>) {
   const numModalFilters = safeKeys(modalFilterDefs).filter((fk) => filter[fk] !== undefined).length;
 
   const pageFilters = getFilterComponents<F>({
-    filter,
+    // Spreading `props` to pass along `data-testid`
+    ...props,
     filterDefs: pageFilterDefs,
     updateFilter,
   });
@@ -59,12 +68,16 @@ function Filters<F>(props: FilterProps<F>) {
           onClick={() =>
             openModal({
               title: "More Filters",
-              content: <FilterModal onApply={onChange} filterDefs={modalFilterDefs} filter={filter} />,
+              // Spreading `props` to pass along `data-testid`
+              content: <FilterModal {...props} onApply={onChange} filterDefs={modalFilterDefs} filter={filter} />,
             })
           }
+          {...testId.moreFiltersBtn}
         />
       )}
-      {Object.keys(filter).length > 0 && <Button label="Clear" variant="tertiary" onClick={() => onChange({} as F)} />}
+      {Object.keys(filter).length > 0 && (
+        <Button label="Clear" variant="tertiary" onClick={() => onChange({} as F)} {...testId.clearBtn} />
+      )}
     </div>
   );
 }

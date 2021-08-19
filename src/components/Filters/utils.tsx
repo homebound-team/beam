@@ -9,8 +9,9 @@ import {
 } from "src/components/Filters";
 import { MultiSelectField, SelectField, Switch } from "src/inputs";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
-import { omitKey, safeEntries } from "src/utils";
+import { omitKey, safeEntries, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 interface GetFilterComponentsOpts<F> {
   filterDefs: FilterDefs<F>;
@@ -21,6 +22,7 @@ interface GetFilterComponentsOpts<F> {
 
 export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
   const { filterDefs, filter, updateFilter, inModal } = props;
+  const testId = useTestIds(props, filterTestIdPrefix);
 
   // Need to set `filterDef` as `any` - not sure exactly why yet... but it breaks things.
   return safeEntries(filterDefs).map(([key, filterDef]: [keyof F, any]) => {
@@ -38,6 +40,7 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
             const parsedValue = value === "undefined" ? undefined : value === "true" ? true : false;
             updateFilter(filter, key, parsedValue);
           }}
+          {...testId[defaultTestId(label)]}
         />,
         inModal,
         label,
@@ -54,6 +57,7 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
           label={label}
           labelStyle={inModal ? "filter" : "inline"}
           onChange={(value) => updateFilter(filter, key, value)}
+          {...testId[defaultTestId(label)]}
         />,
         inModal,
       );
@@ -70,6 +74,7 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
           inlineLabel
           sizeToContent={!inModal}
           onSelect={(value) => updateFilter(filter, key, value)}
+          {...testId[defaultTestId(label)]}
         />,
         inModal,
         label,
@@ -89,6 +94,7 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
             onChange={(values) => updateFilter(filter, key, values)}
             values={(filter[key] || []) as string[]}
             hideLabel={true}
+            {...testId[defaultTestId(label)]}
           />,
           inModal,
           label,
@@ -104,6 +110,7 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
           sizeToContent={!inModal}
           onSelect={(values) => updateFilter(filter, key, values)}
           nothingSelectedText="All"
+          {...testId[defaultTestId(label)]}
         />,
         inModal,
         label,
@@ -174,3 +181,5 @@ export function booleanFilter(
 export function toggleFilter(props: ToggleFilterProps): { kind: "toggle" } & ToggleFilterProps {
   return { kind: "toggle" as const, ...props };
 }
+
+export const filterTestIdPrefix = "filter";

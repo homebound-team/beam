@@ -1,9 +1,9 @@
 import { ReactNode, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
-import { filterBuilder, FilterDefs, getFilterComponents } from "src/components/Filters";
+import { filterBuilder, FilterDefs, filterTestIdPrefix, getFilterComponents } from "src/components/Filters";
 import { ModalBody, ModalFooter, useModal } from "src/components/Modal";
 import { Css } from "src/Css";
-import { omitKey, safeKeys } from "src/utils";
+import { omitKey, safeKeys, useTestIds } from "src/utils";
 
 interface FilterModalProps<F> {
   filter: F;
@@ -13,6 +13,7 @@ interface FilterModalProps<F> {
 
 export function FilterModal<F>(props: FilterModalProps<F>) {
   const { filter, filterDefs, onApply } = props;
+  const testId = useTestIds(props, filterTestIdPrefix);
   const { closeModal } = useModal();
   // Local copy of the filter that we'll use to manage the modal's state separate from the rest of the Filter
   const [modalFilter, setModalFilter] = useState<F>(filter);
@@ -43,15 +44,17 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
             // Only remove the filters keys that exist in the modal.
             setModalFilter(safeKeys(filterDefs).reduce((acc, fk) => omitKey(fk, acc), modalFilter))
           }
+          {...testId.modalClear}
         />
         <div css={Css.df.childGap1.$}>
-          <Button label="Cancel" variant="tertiary" onClick={closeModal} />
+          <Button label="Cancel" variant="tertiary" onClick={closeModal} {...testId.modalClose} />
           <Button
             label="Apply"
             onClick={() => {
               onApply(modalFilter);
               closeModal();
             }}
+            {...testId.modalApply}
           />
         </div>
       </ModalFooter>
