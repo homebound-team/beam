@@ -27,6 +27,7 @@ export type Project = {
   stage: Stage;
   status: Status;
   isTest: boolean;
+  doNotUse: boolean;
 };
 
 export type ProjectFilter = {
@@ -37,4 +38,5 @@ export type ProjectFilter = {
   stageSingle?: Stage | null;
   status?: string[] | null;
   isTest?: boolean | null;
+  doNotUse?: boolean | null;
 };

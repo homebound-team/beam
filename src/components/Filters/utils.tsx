@@ -9,7 +9,7 @@ import {
 } from "src/components/Filters";
 import { MultiSelectField, SelectField, Switch } from "src/inputs";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
-import { safeEntries } from "src/utils";
+import { omitKey, safeEntries } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
 interface GetFilterComponentsOpts<F> {
@@ -46,10 +46,11 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
 
     if (filterDef.kind === "toggle") {
       const label = filterDef.label || defaultLabel(key as string);
+      const enabledValue = typeof filterDef.enabledValue === "boolean" ? filterDef.enabledValue : true;
       return wrapIfModal(
         <Switch
           {...filterDef}
-          selected={filter[key]}
+          selected={filter[key] === enabledValue}
           label={label}
           labelStyle={inModal ? "filter" : "inline"}
           onChange={(value) => updateFilter(filter, key, value)}
@@ -117,6 +118,28 @@ function wrapIfModal(filterField: JSX.Element, inModal?: boolean, label?: string
   return inModal ? <ModalFilterItem label={label}>{filterField}</ModalFilterItem> : filterField;
 }
 
+export function filterBuilder<F>(cb: (f: F) => void, filterDefs: FilterDefs<F>) {
+  return (currentFilter: F, key: keyof F, value: any | undefined) => {
+    const filterDef = filterDefs[key];
+    if (
+      value === undefined ||
+      (Array.isArray(value) && value.length === 0) ||
+      (filterDef.kind === "toggle" && value === false)
+    ) {
+      cb(omitKey(key, currentFilter));
+    } else {
+      const enabledValue =
+        filterDef.kind === "toggle"
+          ? typeof filterDef.enabledValue === "boolean"
+            ? filterDef.enabledValue
+            : true
+          : value;
+
+      cb({ ...currentFilter, [key]: enabledValue });
+    }
+  };
+}
+
 export function singleFilter<O, V extends Key>(props: SingleFilterProps<O, V>) {
   return { kind: "single" as const, ...props };
 }
@@ -148,6 +171,6 @@ export function booleanFilter(
   };
 }
 
-export function toggleFilter({ label }: ToggleFilterProps): { kind: "toggle" } & ToggleFilterProps {
-  return { kind: "toggle" as const, label };
+export function toggleFilter(props: ToggleFilterProps): { kind: "toggle" } & ToggleFilterProps {
+  return { kind: "toggle" as const, ...props };
 }

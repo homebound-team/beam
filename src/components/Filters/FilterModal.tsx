@@ -1,6 +1,6 @@
-import { ReactNode, useCallback, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
-import { FilterDefs, getFilterComponents } from "src/components/Filters";
+import { filterBuilder, FilterDefs, getFilterComponents } from "src/components/Filters";
 import { ModalBody, ModalFooter, useModal } from "src/components/Modal";
 import { Css } from "src/Css";
 import { omitKey, safeKeys } from "src/utils";
@@ -16,18 +16,7 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
   const { closeModal } = useModal();
   // Local copy of the filter that we'll use to manage the modal's state separate from the rest of the Filter
   const [modalFilter, setModalFilter] = useState<F>(filter);
-
-  const updateFilter = useCallback((currentFilter: F, key: keyof F, value: any | undefined) => {
-    if (
-      value === undefined ||
-      (Array.isArray(value) && value.length === 0) ||
-      (filterDefs[key].kind === "toggle" && value === false)
-    ) {
-      setModalFilter(omitKey(key, currentFilter));
-    } else {
-      setModalFilter({ ...currentFilter, [key]: value });
-    }
-  }, []);
+  const updateFilter = useMemo(() => filterBuilder(setModalFilter, filterDefs), []);
 
   const filterComponents = getFilterComponents<F>({
     filter: modalFilter,

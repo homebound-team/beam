@@ -1,9 +1,9 @@
-import { memo, useCallback, useMemo } from "react";
+import { memo, useMemo } from "react";
 import { Button } from "src/components/Button";
-import { FilterDefs, FilterModal, getFilterComponents } from "src/components/Filters";
+import { filterBuilder, FilterDefs, FilterModal, getFilterComponents } from "src/components/Filters";
 import { useModal } from "src/components/Modal";
 import { Css } from "src/Css";
-import { omitKey, safeEntries, safeKeys } from "src/utils";
+import { safeEntries, safeKeys } from "src/utils";
 
 interface FilterProps<F> {
   filter: F;
@@ -30,14 +30,7 @@ function Filters<F>(props: FilterProps<F>) {
     return [filterDefs, {} as FilterDefs<F>];
   }, [filterDefs]);
 
-  const updateFilter = useCallback((currentFilter: F, key: keyof F, value: any | undefined) => {
-    if (value === undefined || (Array.isArray(value) && value.length === 0)) {
-      onChange(omitKey(key, currentFilter));
-    } else {
-      onChange({ ...currentFilter, [key]: value });
-    }
-  }, []);
-
+  const updateFilter = useMemo(() => filterBuilder(onChange, filterDefs), []);
   const numModalFilters = safeKeys(modalFilterDefs).filter((fk) => filter[fk] !== undefined).length;
 
   const pageFilters = getFilterComponents<F>({

@@ -62,6 +62,8 @@ export function Filter() {
 
     const isTest = toggleFilter({ label: "Only show test projects" });
 
+    const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", enabledValue: false });
+
     return {
       marketId,
       internalUserId,
@@ -69,6 +71,7 @@ export function Filter() {
       stage,
       status,
       isTest,
+      doNotUse,
     };
   }, []);
 
@@ -83,6 +86,9 @@ export function Filter() {
       <div css={Css.df.flexColumn.childGap2.$}>
         <h1 css={Css.lg.$}>Filters</h1>
         <Filters<ProjectFilter> filter={filter} onChange={setFilter} filterDefs={filterDefs} />
+      </div>
+      <div>
+        <strong>Applied Filter:</strong> {JSON.stringify(filter)}
       </div>
       <GridTable columns={columns} rows={filterRows(tableData, filter)} />
     </div>
@@ -102,6 +108,7 @@ const tableData: Project[] = [
     stage: stages[0],
     status: statuses[0],
     isTest: false,
+    doNotUse: true,
   },
   {
     id: "2",
@@ -111,6 +118,7 @@ const tableData: Project[] = [
     stage: stages[2],
     status: statuses[1],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "3",
@@ -120,6 +128,7 @@ const tableData: Project[] = [
     stage: stages[1],
     status: statuses[1],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "4",
@@ -129,6 +138,7 @@ const tableData: Project[] = [
     stage: stages[0],
     status: statuses[0],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "5",
@@ -138,6 +148,7 @@ const tableData: Project[] = [
     stage: stages[1],
     status: statuses[2],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "6",
@@ -147,6 +158,7 @@ const tableData: Project[] = [
     stage: stages[0],
     status: statuses[2],
     isTest: true,
+    doNotUse: false,
   },
   {
     id: "7",
@@ -156,6 +168,7 @@ const tableData: Project[] = [
     stage: stages[2],
     status: statuses[0],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "8",
@@ -165,6 +178,7 @@ const tableData: Project[] = [
     stage: stages[0],
     status: statuses[2],
     isTest: false,
+    doNotUse: true,
   },
   {
     id: "9",
@@ -174,6 +188,7 @@ const tableData: Project[] = [
     stage: stages[2],
     status: statuses[1],
     isTest: true,
+    doNotUse: false,
   },
   {
     id: "10",
@@ -183,6 +198,7 @@ const tableData: Project[] = [
     stage: stages[1],
     status: statuses[1],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "11",
@@ -192,6 +208,7 @@ const tableData: Project[] = [
     stage: stages[1],
     status: statuses[0],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "12",
@@ -201,6 +218,7 @@ const tableData: Project[] = [
     stage: stages[2],
     status: statuses[0],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "13",
@@ -210,6 +228,7 @@ const tableData: Project[] = [
     stage: stages[0],
     status: statuses[2],
     isTest: false,
+    doNotUse: true,
   },
   {
     id: "14",
@@ -219,6 +238,7 @@ const tableData: Project[] = [
     stage: stages[0],
     status: statuses[1],
     isTest: true,
+    doNotUse: false,
   },
   {
     id: "15",
@@ -228,6 +248,7 @@ const tableData: Project[] = [
     stage: stages[1],
     status: statuses[0],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "16",
@@ -237,6 +258,7 @@ const tableData: Project[] = [
     stage: stages[0],
     status: statuses[1],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "17",
@@ -246,6 +268,7 @@ const tableData: Project[] = [
     stage: stages[2],
     status: statuses[2],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "18",
@@ -255,6 +278,7 @@ const tableData: Project[] = [
     stage: stages[1],
     status: statuses[0],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "19",
@@ -264,6 +288,7 @@ const tableData: Project[] = [
     stage: stages[1],
     status: statuses[2],
     isTest: false,
+    doNotUse: false,
   },
   {
     id: "20",
@@ -273,6 +298,7 @@ const tableData: Project[] = [
     stage: stages[0],
     status: statuses[0],
     isTest: true,
+    doNotUse: false,
   },
 ];
 
@@ -284,6 +310,7 @@ const columns: GridColumn<Row>[] = [
   { header: () => "Stage", data: ({ stage }) => (stage === Stage.StageOne ? "One" : "Two") },
   { header: () => "Status", data: ({ status }) => status.name },
   { header: () => "Is Test", data: ({ isTest }) => (isTest ? "Yes" : "No") },
+  { header: () => "Do not use", data: ({ doNotUse }) => (doNotUse ? "True" : "False") },
 ];
 
 function filterRows(data: Project[], filter: ProjectFilter): GridDataRow<Row>[] {
@@ -296,6 +323,7 @@ function filterRows(data: Project[], filter: ProjectFilter): GridDataRow<Row>[] 
       .filter((p) => (filter.status?.length ? filter.status.includes(p.status.code) : true))
       .filter((p) => (filter.favorite !== undefined ? filter.favorite === p.favorite : true))
       .filter((p) => (filter.isTest ? p.isTest : true))
+      .filter((p) => (filter.doNotUse === undefined ? true : !p.doNotUse))
       .map((p) => ({ kind: "data" as const, ...p })),
   ];
 }
