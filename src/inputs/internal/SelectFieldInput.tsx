@@ -116,7 +116,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
           {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
           ref={inputRef as any}
           css={{
-            ...Css.sm.mw0.fg1.pr1.bgWhite.br4.gray900.outline0.$,
+            ...Css.sm.mw0.fg1.pr1.bgWhite.br4.gray900.outline0.w100.$,
             ...hoverStyles,
             ...disabledStyles,
             ...readOnlyStyles,
