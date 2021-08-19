@@ -18,14 +18,22 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
   const [modalFilter, setModalFilter] = useState<F>(filter);
 
   const updateFilter = useCallback((currentFilter: F, key: keyof F, value: any | undefined) => {
+    const filterDef = filterDefs[key];
     if (
       value === undefined ||
       (Array.isArray(value) && value.length === 0) ||
-      (filterDefs[key].kind === "toggle" && value === false)
+      (filterDef.kind === "toggle" && value === false)
     ) {
       setModalFilter(omitKey(key, currentFilter));
     } else {
-      setModalFilter({ ...currentFilter, [key]: value });
+      const enabledValue =
+        filterDef.kind === "toggle"
+          ? typeof filterDef.enabledValue === "boolean"
+            ? filterDef.enabledValue
+            : true
+          : value;
+
+      setModalFilter({ ...currentFilter, [key]: enabledValue });
     }
   }, []);
 

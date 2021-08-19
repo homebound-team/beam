@@ -46,10 +46,11 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
 
     if (filterDef.kind === "toggle") {
       const label = filterDef.label || defaultLabel(key as string);
+      const enabledValue = typeof filterDef.enabledValue === "boolean" ? filterDef.enabledValue : true;
       return wrapIfModal(
         <Switch
           {...filterDef}
-          selected={filter[key]}
+          selected={filter[key] === enabledValue}
           label={label}
           labelStyle={inModal ? "filter" : "inline"}
           onChange={(value) => updateFilter(filter, key, value)}
@@ -148,6 +149,6 @@ export function booleanFilter(
   };
 }
 
-export function toggleFilter({ label }: ToggleFilterProps): { kind: "toggle" } & ToggleFilterProps {
-  return { kind: "toggle" as const, label };
+export function toggleFilter(props: ToggleFilterProps): { kind: "toggle" } & ToggleFilterProps {
+  return { kind: "toggle" as const, ...props };
 }

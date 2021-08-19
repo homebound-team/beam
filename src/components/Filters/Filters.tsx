@@ -31,10 +31,22 @@ function Filters<F>(props: FilterProps<F>) {
   }, [filterDefs]);
 
   const updateFilter = useCallback((currentFilter: F, key: keyof F, value: any | undefined) => {
-    if (value === undefined || (Array.isArray(value) && value.length === 0)) {
+    const filterDef = filterDefs[key];
+    if (
+      value === undefined ||
+      (Array.isArray(value) && value.length === 0) ||
+      (filterDef.kind === "toggle" && value === false)
+    ) {
       onChange(omitKey(key, currentFilter));
     } else {
-      onChange({ ...currentFilter, [key]: value });
+      const enabledValue =
+        filterDef.kind === "toggle"
+          ? typeof filterDef.enabledValue === "boolean"
+            ? filterDef.enabledValue
+            : true
+          : value;
+
+      onChange({ ...currentFilter, [key]: enabledValue });
     }
   }, []);
 
