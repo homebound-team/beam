@@ -50,7 +50,7 @@ function Filters<F>(props: FilterProps<F>) {
 
   // Return list of filter components. `onSelect` should update the `filter`
   return (
-    <div css={Css.df.itemsCenter.childGap1.$}>
+    <div css={Css.df.itemsCenter.childGap1.$} {...testId}>
       {pageFilters.map((c, idx) => (
         <div key={idx}>{c}</div>
       ))}
