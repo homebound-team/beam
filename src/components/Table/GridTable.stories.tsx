@@ -53,13 +53,67 @@ export function ClientSideSorting() {
   const nameColumn: GridColumn<Row> = {
     header: "Name",
     data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
+    w: 1,
   };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, clientSideSort: false };
+  const valueColumn: GridColumn<Row> = {
+    header: "Value",
+    data: ({ value }) => value,
+    w: 1,
+  };
+  const priceColumn: GridColumn<Row> = {
+    header: "Price with some really long title",
+    data: ({ value }) => value,
+    align: "right",
+    w: "120px",
+  };
+  const actionColumn: GridColumn<Row> = {
+    header: "Action",
+    data: () => <div>Actions</div>,
+    clientSideSort: false,
+    w: 1,
+  };
   return (
     <GridTable
-      columns={[nameColumn, valueColumn, actionColumn]}
+      columns={[nameColumn, valueColumn, priceColumn, actionColumn]}
       sorting={{ on: "client", initial: [valueColumn, "ASC"] }}
+      rows={[
+        { kind: "header", id: "header" },
+        { kind: "data", id: "1", name: "c", value: 1 },
+        { kind: "data", id: "2", name: "b", value: 2 },
+        { kind: "data", id: "3", name: "a", value: 3 },
+      ]}
+    />
+  );
+}
+
+export function ClientSideSortingCondensed() {
+  const nameColumn: GridColumn<Row> = {
+    header: "Name",
+    data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
+    w: 1,
+  };
+  const valueColumn: GridColumn<Row> = {
+    header: "Value",
+    data: ({ value }) => value,
+    w: 1,
+  };
+  const priceColumn: GridColumn<Row> = {
+    header: "Price with some really long title",
+    data: ({ value }) => value,
+    align: "right",
+    w: "120px",
+  };
+  const actionColumn: GridColumn<Row> = {
+    header: "Action",
+    data: () => <div>Actions</div>,
+    clientSideSort: false,
+    w: 1,
+  };
+  return (
+    <GridTable
+      columns={[nameColumn, valueColumn, priceColumn, actionColumn]}
+      sorting={{ on: "client", initial: [valueColumn, "ASC"] }}
+      style={condensedStyle}
       rows={[
         { kind: "header", id: "header" },
         { kind: "data", id: "1", name: "c", value: 1 },
