@@ -1,4 +1,5 @@
 import { Css, Margin, Only, Xss } from "src/Css";
+import { useTestIds } from "src/utils";
 
 type TagXss = Margin;
 export type TagType = "info" | "caution" | "warning" | "success" | "neutral";
@@ -10,9 +11,15 @@ interface TagProps<X> {
 }
 
 /** Tag used for indicating a status */
-export function Tag<X extends Only<Xss<TagXss>, X>>({ text, type, xss }: TagProps<X>) {
+export function Tag<X extends Only<Xss<TagXss>, X>>({ text, type, xss, ...otherProps }: TagProps<X>) {
   const typeStyles = getStyles(type);
-  return <span css={{ ...Css.dib.tinyEm.ttu.px1.pyPx(4).gray900.br4.$, ...typeStyles, ...xss }}>{text}</span>;
+  const tid = useTestIds(otherProps);
+
+  return (
+    <span {...tid} css={{ ...Css.dib.tinyEm.ttu.px1.pyPx(4).gray900.br4.$, ...typeStyles, ...xss }}>
+      {text}
+    </span>
+  );
 }
 
 function getStyles(type?: TagType) {
