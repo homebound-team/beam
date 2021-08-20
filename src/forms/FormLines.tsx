@@ -3,7 +3,7 @@ import { Css } from "src/Css";
 import { FormContext, LabelSuffixStyle } from "src/forms/FormContext";
 
 export type FormWidth =
-  /** 320px, works well in a modal. */
+  /** 320px, works well in a modal (or full). */
   | "sm"
   /** 480px, works well in a small, single-stack form. */
   | "md"
@@ -34,7 +34,7 @@ export function FormLines(props: FormLinesProps) {
         css={{
           ...Css.df.flexColumn.w(sizes[width]).$,
           // Purposefully use this instead of childGap3 to put margin-bottom on the last line
-          "& > *": Css.mb3.$,
+          "& > *": Css.mb2.$,
         }}
       >
         {children}
