@@ -381,6 +381,22 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("a");
       expect(cell(r, 2, 0)).toHaveTextContent("b");
     });
+
+    it("throws an error if a column value is not sortable", async () => {
+      // Given the table is using client-side sorting
+      // And we have a column that returns a react component w/o GridCellContent
+      const nameColumn: GridColumn<Row> = { header: () => "Name", data: ({ name }) => <div>{name}</div> };
+      // Then the render will fail
+      await expect(
+        render(
+          <GridTable
+            columns={[nameColumn, valueColumn]}
+            sorting={{ on: "client" }}
+            rows={[simpleHeader, { kind: "data", id: "1", name: "a", value: 3 }]}
+          />,
+        ),
+      ).rejects.toThrow("Column 0 passed an unsortable value, use GridCellContent or clientSideSort=false");
+    });
   });
 
   describe("server-side sorting", () => {

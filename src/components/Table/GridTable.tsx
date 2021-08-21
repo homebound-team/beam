@@ -309,9 +309,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // For each row, keep it's ReactElement (React.memo'd) + its filter values, so we can re-filter w/o re-evaluating this useMemo.
   const allRows: RowTuple<R>[] = useMemo(() => {
     return maybeSorted.map((row) => {
-      // We only pass sortProps to header rows, b/c non-headers rows shouldn't have to re-render on sorting
+      // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
-      const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : {};
+      const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : { sorting };
       // We only pass `isCollapsed` as a prop so that the row only re-renders when it itself has
       // changed from collapsed/non-collapsed, and not other row's entering/leaving collapsedIds.
       // Note that we do memoized on toggleCollapsedId, but it's stable thanks to useToggleIds.
@@ -747,9 +747,9 @@ export type GridCellContent = {
   content: ReactNode;
   alignment?: GridCellAlignment;
   /** Allow value to be a function in case it's a dynamic value i.e. reading from an inline-edited proxy. */
-  value?: MaybeFn<number | string | Date>;
+  value?: MaybeFn<number | string | Date | boolean | null | undefined>;
   /** The value to use specifically for sorting (i.e. if `value` is used for filtering); defaults to `value`. */
-  sortValue?: MaybeFn<number | string | Date>;
+  sortValue?: MaybeFn<number | string | Date | boolean | null | undefined>;
   /** Whether to indent the cell. */
   indent?: 1 | 2;
 };
@@ -836,6 +836,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           (sorting?.on === "client" && column.clientSideSort !== false) ||
           (sorting?.on === "server" && !!column.serverSideSortKey);
         const content = toContent(maybeContent, isHeader, canSortColumn);
+
+        ensureClientSideSortValueIsSortable(sorting, isHeader, column, idx, maybeContent);
 
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
         // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
@@ -1340,3 +1342,30 @@ const tableRowStyles = (as: RenderAs, column?: GridColumn<any>) => {
       }
     : {};
 };
+
+function ensureClientSideSortValueIsSortable(
+  sorting: GridSortConfig<any> | undefined,
+  isHeader: boolean,
+  column: GridColumn<any>,
+  idx: number,
+  maybeContent: ReactNode | GridCellContent,
+): void {
+  if (
+    process.env.NODE_ENV !== "production" &&
+    !isHeader &&
+    sorting?.on === "client" &&
+    column.clientSideSort !== false
+  ) {
+    const value = sortValue(maybeContent);
+    if (!canClientSideSort(value)) {
+      throw new Error(`Column ${idx} passed an unsortable value, use GridCellContent or clientSideSort=false`);
+    }
+  }
+}
+
+function canClientSideSort(value: any): boolean {
+  const t = typeof value;
+  return (
+    t === null || t === "undefined" || t === "number" || t === "string" || t === "boolean" || value instanceof Date
+  );
+}
