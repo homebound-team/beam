@@ -2,6 +2,7 @@ import { createContext } from "react";
 
 export interface FormSettings {
   labelSuffix: LabelSuffixStyle;
+  compact: boolean;
 }
 
 /**
@@ -28,4 +29,5 @@ export type LabelSuffixStyle = {
  */
 export const FormContext = createContext<FormSettings>({
   labelSuffix: { required: undefined, optional: undefined },
+  compact: false,
 });

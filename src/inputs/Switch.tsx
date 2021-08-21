@@ -1,7 +1,8 @@
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import { useFocusRing, useHover, useSwitch, VisuallyHidden } from "react-aria";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
+import { FormContext } from "src/forms/FormContext";
 import { Icon } from "../components/Icon";
 import { toToggleState } from "../utils";
 
@@ -25,12 +26,13 @@ export interface SwitchProps {
 }
 
 export function Switch(props: SwitchProps) {
+  const settings = useContext(FormContext);
   const {
     selected: isSelected,
     disabled: isDisabled = false,
     onChange,
     withIcon,
-    compact = false,
+    compact = settings.compact,
     label,
     labelStyle = "inline",
     ...otherProps

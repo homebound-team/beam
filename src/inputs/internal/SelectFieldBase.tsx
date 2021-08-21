@@ -1,9 +1,10 @@
 import { Selection } from "@react-types/shared";
-import { Key, ReactNode, useEffect, useRef, useState } from "react";
+import { Key, ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
 import { Popover } from "src/components/internal";
 import { Css, px } from "src/Css";
+import { FormContext } from "src/forms/FormContext";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
@@ -39,8 +40,9 @@ export interface SelectFieldBaseProps<O, V extends Value> extends BeamSelectFiel
  * and so we cannot easily change them.
  */
 export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<O, V>): JSX.Element {
+  const settings = useContext(FormContext);
   const {
-    compact = false,
+    compact = settings.compact,
     disabled: isDisabled = false,
     errorMsg,
     helperText,

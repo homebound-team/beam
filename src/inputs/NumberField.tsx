@@ -1,8 +1,9 @@
 import type { NumberFieldStateProps } from "@react-stately/numberfield";
-import { ReactNode, useMemo, useRef } from "react";
+import { ReactNode, useContext, useMemo, useRef } from "react";
 import { useLocale, useNumberField } from "react-aria";
 import { useNumberFieldState } from "react-stately";
 import { Css, Xss } from "src/Css";
+import { FormContext } from "src/forms/FormContext";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { TextFieldBase } from "./TextFieldBase";
 
@@ -27,6 +28,7 @@ export interface NumberFieldProps {
 }
 
 export function NumberField(props: NumberFieldProps) {
+  const settings = useContext(FormContext);
   const {
     disabled = false,
     required,
@@ -37,7 +39,7 @@ export function NumberField(props: NumberFieldProps) {
     onFocus,
     errorMsg,
     helperText,
-    compact = false,
+    compact = settings.compact,
     value,
     onChange,
     xss,

@@ -17,6 +17,7 @@ export interface FormLinesProps {
   children: ReactNode;
   labelSuffix?: LabelSuffixStyle;
   width?: FormWidth;
+  compact?: boolean;
 }
 
 /**
@@ -27,14 +28,14 @@ export interface FormLinesProps {
  */
 export function FormLines(props: FormLinesProps) {
   const settings = useContext(FormContext);
-  const { children, width = "md", labelSuffix = settings.labelSuffix } = props;
+  const { children, width = "md", labelSuffix = settings.labelSuffix, compact = settings.compact } = props;
   return (
-    <FormContext.Provider value={{ labelSuffix }}>
+    <FormContext.Provider value={{ labelSuffix, compact }}>
       <div
         css={{
           ...Css.df.flexColumn.w(sizes[width]).$,
           // Purposefully use this instead of childGap3 to put margin-bottom on the last line
-          "& > *": Css.mb2.$,
+          "& > *": Css.mb(compact ? 2 : 3).$,
         }}
       >
         {children}

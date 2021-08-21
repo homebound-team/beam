@@ -6,11 +6,13 @@ import {
   LabelHTMLAttributes,
   MutableRefObject,
   TextareaHTMLAttributes,
+  useContext,
 } from "react";
 import { chain, mergeProps } from "react-aria";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { Css, px, Xss } from "src/Css";
+import { FormContext } from "src/forms/FormContext";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamTextFieldProps } from "src/interfaces";
@@ -36,6 +38,7 @@ interface TextFieldBaseProps
 
 // Used by both TextField and TextArea
 export function TextFieldBase(props: TextFieldBaseProps) {
+  const settings = useContext(FormContext);
   const {
     label,
     required,
@@ -44,7 +47,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     inputProps,
     inputRef,
     groupProps,
-    compact = false,
+    compact = settings.compact,
     errorMsg,
     helperText,
     multiline = false,

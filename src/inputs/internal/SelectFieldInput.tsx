@@ -4,6 +4,7 @@ import React, {
   LabelHTMLAttributes,
   MutableRefObject,
   ReactNode,
+  useContext,
   useState,
 } from "react";
 import { mergeProps, useHover } from "react-aria";
@@ -12,6 +13,7 @@ import { Icon } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
+import { FormContext } from "src/forms/FormContext";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { Value, valueToKey } from "src/inputs/Value";
@@ -42,13 +44,14 @@ interface SelectFieldInputProps<O, V extends Value> {
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
+  const settings = useContext(FormContext);
   const {
     inputProps,
     inputRef,
     inputWrapRef,
     buttonProps,
     buttonRef,
-    compact = false,
+    compact = settings.compact,
     errorMsg,
     required,
     helperText,

@@ -1,4 +1,6 @@
+import { useContext } from "react";
 import { useCheckboxGroup } from "react-aria";
+import { FormContext } from "src/forms/FormContext";
 import { Css } from "../Css";
 import { toGroupState } from "../utils";
 import { Switch } from "./Switch";
@@ -32,7 +34,8 @@ export interface SwitchGroupProps {
  * This is a great example on doing that https://react-spectrum.adobe.com/react-aria/FocusScope.html#usefocusmanager-example so lets make a wrapper to make it easier for others!
  */
 export function SwitchGroup(props: SwitchGroupProps) {
-  const { compact, label, onChange, options, values, withIcon } = props;
+  const settings = useContext(FormContext);
+  const { compact = settings.compact, label, onChange, options, values, withIcon } = props;
   const groupState = toGroupState<string>(values, onChange);
   const { groupProps, labelProps } = useCheckboxGroup({ ...props, "aria-label": label }, groupState);
   const { isSelected, addValue, removeValue } = groupState;
