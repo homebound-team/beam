@@ -18,5 +18,5 @@ export function numericColumn<T extends Kinded, S = {}>(columnDef: GridColumn<T,
 
 /** Provides default styling for a GridColumn representing an Action. */
 export function actionColumn<T extends Kinded, S = {}>(columnDef: GridColumn<T, S>): GridColumn<T, S> {
-  return { ...columnDef, align: "center" };
+  return { clientSideSort: false, ...columnDef, align: "center" };
 }
