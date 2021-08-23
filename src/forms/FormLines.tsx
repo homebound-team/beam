@@ -3,7 +3,7 @@ import { Css } from "src/Css";
 import { FormContext, LabelSuffixStyle } from "src/forms/FormContext";
 
 export type FormWidth =
-  /** 320px, works well in a modal (or full). */
+  /** 320px, works well in a modal (or actually "full" works better). */
   | "sm"
   /** 480px, works well in a small, single-stack form. */
   | "md"
