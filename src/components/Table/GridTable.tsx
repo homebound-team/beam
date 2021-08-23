@@ -1366,6 +1366,6 @@ function ensureClientSideSortValueIsSortable(
 function canClientSideSort(value: any): boolean {
   const t = typeof value;
   return (
-    t === null || t === "undefined" || t === "number" || t === "string" || t === "boolean" || value instanceof Date
+    value === null || t === "undefined" || t === "number" || t === "string" || t === "boolean" || value instanceof Date
   );
 }
