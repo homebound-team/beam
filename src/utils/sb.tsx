@@ -51,10 +51,11 @@ export const withBeamDecorator = (Story: () => JSX.Element) => (
  * Decorator to set explicit width and height dimensions for a story.
  * Used to help Chromatic properly render positioned `fixed` components.
  */
-export const withDimensions = (width: number | string = "100vw", height: number | string = "100vh", xss?: {}) => (
-  Story: () => JSX.Element,
-) => (
-  <div css={{ ...Css.w(width).h(height).$, ...xss }}>
-    <Story />
-  </div>
-);
+export const withDimensions =
+  (width: number | string = "100vw", height: number | string = "100vh", xss?: {}) =>
+  (Story: () => JSX.Element) =>
+    (
+      <div css={{ ...Css.w(width).h(height).$, ...xss }}>
+        <Story />
+      </div>
+    );
