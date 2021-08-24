@@ -1,8 +1,8 @@
 import { useContext, useMemo, useRef } from "react";
 import { BeamContext } from "src/components/BeamContext";
 import { Callback, CheckFn } from "src/types";
+import { maybeCall } from "src/utils";
 import { ModalProps } from "./Modal";
-import {maybeCall} from "src/utils";
 
 export interface UseModalHook {
   openModal: (props: ModalProps) => void;

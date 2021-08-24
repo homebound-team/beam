@@ -55,6 +55,7 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
   const [arrowRef, setArrowRef] = useState<HTMLDivElement | null>(null);
 
   const { styles, attributes } = usePopper(triggerRef.current, popperRef.current, {
+    strategy: "fixed",
     modifiers: [
       { name: "arrow", options: { element: arrowRef } },
       { name: "offset", options: { offset: [0, 5] } },
