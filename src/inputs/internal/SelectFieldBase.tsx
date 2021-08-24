@@ -91,11 +91,12 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     const firstSelectedOption = options.find((o) => valueToKey(getOptionValue(o)) === firstKey);
     if (multiselect) {
       setFieldState({
-        ...fieldState,
         isOpen: true,
-        inputValue: keysArray.length === 1 ? getOptionLabel(firstSelectedOption!) : "",
+        // Always reset inputValue upon selection in MultiSelectField. The input's value will be updated upon leaving/blurring the field.
+        inputValue: "",
         selectedKeys: keysArray as Key[],
         selectedOptions: options.filter((o) => keysArray.includes(valueToKey(getOptionValue(o)))),
+        filteredOptions: options,
       });
     } else {
       setFieldState({
@@ -119,7 +120,11 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   }
 
   function onOpenChange(isOpen: boolean) {
-    setFieldState((prevState) => ({ ...prevState, isOpen }));
+    setFieldState((prevState) => ({
+      ...prevState,
+      inputValue: multiselect && isOpen ? "" : prevState.inputValue,
+      isOpen,
+    }));
   }
 
   function initFieldState(): FieldState<O> {
@@ -141,9 +146,6 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   }
 
   const [fieldState, setFieldState] = useState<FieldState<O>>(initFieldState);
-
-  // Ensure we reset if the field's values change
-  useEffect(() => setFieldState(initFieldState), [values]);
 
   const comboBoxProps = {
     ...otherProps,
@@ -187,6 +189,13 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
 
   //@ts-ignore - `selectionManager.state` exists, but not according to the types
   state.selectionManager.state = multipleSelectionState;
+
+  // Ensure we reset if the field's values change and the user is not actively selecting options.
+  useEffect(() => {
+    if (!state.isOpen) {
+      setFieldState(initFieldState);
+    }
+  }, [values]);
 
   // Used to calculate the rendered width of the combo box (input + button)
   const comboBoxRef = useRef<HTMLDivElement | null>(null);
