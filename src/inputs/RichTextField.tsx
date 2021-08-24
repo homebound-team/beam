@@ -4,7 +4,7 @@ import { ChangeEvent, createElement, useEffect, useRef } from "react";
 import { useId } from "react-aria";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
-import { maybeCall } from "src/utils";
+import { maybeCall, noop } from "src/utils";
 import Tribute from "tributejs";
 import "tributejs/dist/tribute.css";
 import "trix/dist/trix";
@@ -24,9 +24,9 @@ export interface RichTextFieldProps {
   autoFocus?: boolean;
   placeholder?: string;
   /** Called when the component loses focus */
-  onBlur: () => void;
+  onBlur?: () => void;
   /** Called when the component is in focus. */
-  onFocus: () => void;
+  onFocus?: () => void;
   /** For rendering formatted text */
   readOnly?: boolean;
 }
@@ -44,7 +44,7 @@ type Editor = {
  * We also integrate [tributejs]{@link https://github.com/zurb/tribute} for @ mentions.
  */
 export function RichTextField(props: RichTextFieldProps) {
-  const { mergeTags, label, value = "", onChange, onBlur, onFocus, readOnly } = props;
+  const { mergeTags, label, value = "", onChange, onBlur = noop, onFocus = noop, readOnly } = props;
   const id = useId();
 
   // We get a reference to the Editor instance after trix-init fires
