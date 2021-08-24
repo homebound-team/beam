@@ -26,7 +26,7 @@ describe("NumberFieldTest", () => {
     const r = await render(<NumberField label="Complete" type="percent" value={12} onChange={onChange} />);
     change(r.complete, "15");
     expect(onChange).toBeCalledWith(15);
-    expect(onChange).toBeCalledTimes(1);
+    expect(onChange).toBeCalledTimes(2);
   });
 
   it("can set a basis points value", async () => {
@@ -42,7 +42,7 @@ describe("NumberFieldTest", () => {
     const r = await render(<NumberField label="Margin" type="basisPoints" value={1234} onChange={onChange} />);
     change(r.margin, "23.45");
     expect(onChange).toBeCalledWith(2345);
-    expect(onChange).toBeCalledTimes(1);
+    expect(onChange).toBeCalledTimes(2);
   });
 
   it("can set cents as dollars", async () => {
@@ -58,7 +58,7 @@ describe("NumberFieldTest", () => {
     const r = await render(<NumberField label="Cost" type="cents" value={1234} onChange={onChange} />);
     change(r.cost, "23.45");
     expect(onChange).toBeCalledWith(2345);
-    expect(onChange).toBeCalledTimes(1);
+    expect(onChange).toBeCalledTimes(2);
   });
 
   it("can set cents as cents", async () => {

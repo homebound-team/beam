@@ -1455,10 +1455,10 @@
     react-router "^5.1.2"
     use-query-params "^1.2.2"
 
-"@homebound/rtl-utils@^2.48.0":
-  version "2.48.0"
-  resolved "https://registry.yarnpkg.com/@homebound/rtl-utils/-/rtl-utils-2.48.0.tgz#098473d653947c1a7030da9b8fc86f671d0fecd1"
-  integrity sha512-CKPZTuWUF5d0wpqGQOrkOoy5WTVSANgD6oOYQkouIZ7YKrNDH0mo71a0bHtlnI8N5eo4IrphFUVf/DMk49Go8Q==
+"@homebound/rtl-utils@^2.50.0":
+  version "2.50.0"
+  resolved "https://registry.yarnpkg.com/@homebound/rtl-utils/-/rtl-utils-2.50.0.tgz#76adb2c1da36dfe48d4e1a116beee678ad52dcd0"
+  integrity sha512-bQnfqhO6FiQeajoowS4I8GK1fJuhzM06vwiaMkK//7oGlE41+BKXMzc3m1cYsb4NGFaQfv1lkVNhg/dUIPNh8g==
   dependencies:
     "@testing-library/react" "^12.0.0"
 
