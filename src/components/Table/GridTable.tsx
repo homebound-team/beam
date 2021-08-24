@@ -1039,13 +1039,15 @@ const alignmentToTextAlign: Record<GridCellAlignment, Properties["textAlign"]> =
   right: "right",
 };
 
-// For alignment, use: 1) user-specified, else 2) center if non-1st header, else 3) left.
+// For alignment, use: 1) cell def, else 2) column def, else 3) left.
 function getJustification(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent, as: RenderAs) {
   const alignment = (isContentAndSettings(maybeContent) && maybeContent.alignment) || column.align || "left";
+  // Always apply text alignment.
+  const textAlign = Css.add("textAlign", alignmentToTextAlign[alignment]).$;
   if (as === "table") {
-    return Css.add("textAlign", alignmentToTextAlign[alignment]).$;
+    return textAlign;
   }
-  return Css.justify(alignmentToJustify[alignment]).$;
+  return { ...Css.justify(alignmentToJustify[alignment]).$, ...textAlign };
 }
 
 // TODO This is very WIP / proof-of-concept and needs flushed out a lot more to handle nested batches.
@@ -1202,9 +1204,8 @@ export function SortHeader(props: { content: string; xss?: Properties }) {
   return (
     <div {...tid} css={{ ...Css.df.itemsCenter.cursorPointer.selectNone.$, ...xss }} onClick={toggleSort}>
       {content}
-      &nbsp;
-      {sorted === "ASC" && <Icon icon="sortUp" inc={2} {...tid.icon} />}
-      {sorted === "DESC" && <Icon icon="sortDown" inc={2} {...tid.icon} />}
+      {sorted === "ASC" && <Icon icon="sortUp" inc={2} {...tid.icon} xss={Css.mlPx(4).$} />}
+      {sorted === "DESC" && <Icon icon="sortDown" inc={2} {...tid.icon} xss={Css.mlPx(4).$} />}
     </div>
   );
 }

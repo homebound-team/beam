@@ -110,7 +110,7 @@ export function VirtualFiltering() {
     () => [
       { header: "Name", data: ({ name }) => name },
       { header: "Value", data: ({ value }) => value },
-      { header: "Action", data: () => <div>Actions</div>, sort: false },
+      { header: "Action", data: () => <div>Actions</div>, clientSideSort: false },
     ],
     [],
   );
@@ -446,3 +446,39 @@ export const DataTypeColumns = newStory(
   },
   { decorators: [withRouter()] },
 );
+
+export function WrappedHeaders() {
+  const leftAlignedColumn = column<Row2>({
+    header: "Left aligned column header",
+    data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
+    w: "150px",
+  });
+  const rightAlignedColumn = numericColumn<Row2>({
+    header: "Right aligned column header",
+    data: ({ priceInCents }) => ({
+      content: <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />,
+      sortValue: priceInCents,
+    }),
+    w: "150px",
+  });
+  const centerAlignedColumn = actionColumn<Row2>({
+    header: "Center aligned column header",
+    data: ({ role }) => role,
+    w: "150px",
+  });
+
+  return (
+    <GridTable<Row2>
+      columns={[leftAlignedColumn, rightAlignedColumn, centerAlignedColumn]}
+      sorting={{ on: "client", initial: [rightAlignedColumn, "ASC"] }}
+      style={condensedStyle}
+      rows={[
+        { kind: "header", id: "header" },
+        { kind: "data", id: "1", name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
+        { kind: "data", id: "2", name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
+        { kind: "data", id: "3", name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
+        { kind: "data", id: "4", name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+      ]}
+    />
+  );
+}
