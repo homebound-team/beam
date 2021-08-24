@@ -98,7 +98,8 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             {state.selectionManager.selectedKeys.size}
           </span>
         )}
-        {fieldDecoration && selectedOptions.length === 1 && (
+        {/* For MultiSelect -> Only show the `fieldDecoration` when input is not in focus. */}
+        {(!isMultiSelect || (isMultiSelect && !isFocused)) && fieldDecoration && selectedOptions.length === 1 && (
           <span
             css={{
               ...Css.itemsCenter.br4.fs0.pr1.$,

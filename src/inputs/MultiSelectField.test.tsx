@@ -35,12 +35,24 @@ describe("MultiSelectFieldTest", () => {
   it("can have custom an empty text", async () => {
     // Given a MultiSelectField with no selected values
     const r = await render(<TestMultiSelectField values={[]} options={options} nothingSelectedText="All" />);
+    const text = r.getByRole("combobox");
+    // Then expect the text input value to show the `nothingSelectedText` value
+    expect(text).toHaveValue("All");
+  });
+
+  it("only populates input field with selected single option on blur", async () => {
+    // Given a MultiSelectField with no selected values
+    const r = await render(<TestMultiSelectField values={[]} options={options} nothingSelectedText="All" />);
     // That initially has "One" selected
     const text = r.getByRole("combobox");
-    expect(text).toHaveValue("All");
     // And when we select the first option
     selectOption(r, "One");
-    // Then it changes to that one
+    // Then the input field is still empty
+    expect(text).toHaveValue("");
+
+    // When blurring the field
+    fireEvent.blur(text);
+    // Then the field should populate with the selected options's value.
     expect(text).toHaveValue("One");
   });
 
@@ -77,6 +89,22 @@ describe("MultiSelectFieldTest", () => {
     fireEvent.blur(age());
     // Then expect the value to be reset to empty
     expect(age()).toHaveValue("");
+  });
+
+  it("does not populate input field with multiple items selected", async () => {
+    // Given a MultiSelectField with no selected values
+    const r = await render(<TestMultiSelectField values={[]} options={options} nothingSelectedText="All" />);
+    const text = r.getByRole("combobox");
+
+    // When we select two options
+    selectOption(r, "One");
+    selectOption(r, "Two");
+
+    // And when blurring the field
+    fireEvent.blur(text);
+
+    // Then the input field is stay empty
+    expect(text).toHaveValue("");
   });
 
   function TestMultiSelectField(
