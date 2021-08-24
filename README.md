@@ -25,10 +25,10 @@ _To see the latest designs, check out the [Figma](https://www.figma.com/file/aWU
 
 Beam is specifically "Homebound's design system". Given this extremely narrow purpose, we can lean into the simplicity of:
 
-* We don't need to support everything for everyone
-* We can prefer API/UX consistency & simplicity over configuration & complexity
+- We don't need to support everything for everyone
+- We can prefer API/UX consistency & simplicity over configuration & complexity
 
-The most concrete manifestation of this is that we want to *provide as few props as possible*.
+The most concrete manifestation of this is that we want to _provide as few props as possible_.
 
 Fewer props generally means:
 
@@ -41,7 +41,7 @@ All of these points are generally in stark contrast to traditional, "big" UI too
 
 For them, a MUI application in Company A shouldn't have to look & behave exactly like a MUI application in Company B. Which makes sense.
 
-But for Beam at Homebound, we specifically *want* a component that behaves in our App A to look & behave the same as it does in our App B.
+But for Beam at Homebound, we specifically _want_ a component that behaves in our App A to look & behave the same as it does in our App B.
 
 ## Beam and Open Source
 

@@ -1,5 +1,6 @@
 import React, { cloneElement, ReactElement, ReactNode, useRef, useState } from "react";
 import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
+import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 import { useTooltipTriggerState } from "react-stately";
 import { Css } from "src/Css";
@@ -62,15 +63,11 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
     placement,
   });
 
-  return (
-    <div
-      ref={popperRef}
-      style={{ ...styles.popper, maxWidth: "320px" }}
-      {...attributes.popper}
-      css={Css.bgGray900.white.px1.py("4px").br4.xs.$}
-    >
+  return createPortal(
+    <div ref={popperRef} style={{ ...styles.popper, maxWidth: "320px" }} {...attributes.popper} css={Css.bgGray900.white.px1.py("4px").br4.xs.$}>
       <div ref={setArrowRef} style={{ ...styles.arrow }} id="arrow" />
       {content}
-    </div>
+    </div>,
+    document.body,
   );
 }

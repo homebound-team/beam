@@ -4,10 +4,7 @@ import { ToggleChipGroup, ToggleChipGroupProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundToggleChipGroupFieldProps = Omit<
-  ToggleChipGroupProps,
-  "values" | "onChange" | "label"
-> & {
+export type BoundToggleChipGroupFieldProps = Omit<ToggleChipGroupProps, "values" | "onChange" | "label"> & {
   field: FieldState<any, string[] | null | undefined>;
   /** Make optional so that callers can override if they want to. */
   onChange?: (values: string[]) => void;
@@ -20,15 +17,7 @@ export function BoundToggleChipGroupField(props: BoundToggleChipGroupFieldProps)
   const testId = useTestIds(props, field.key);
   return (
     <Observer>
-      {() => (
-        <ToggleChipGroup
-          label={label}
-          values={field.value || []}
-          onChange={onChange}
-          {...testId}
-          {...others}
-        />
-      )}
+      {() => <ToggleChipGroup label={label} values={field.value || []} onChange={onChange} {...testId} {...others} />}
     </Observer>
   );
 }
