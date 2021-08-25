@@ -34,7 +34,6 @@ function ModalExample(props: ModalExampleProps) {
   const modalProps = {
     size,
     forceScrolling,
-    title: "The title of the modal that might wrap",
     content: <TestModalContent initNumSentences={initNumSentences} showLeftAction={showLeftAction} />,
   };
 
@@ -50,7 +49,6 @@ function ModalFilterTableExample({ size, forceScrolling }: Pick<ModalProps, "siz
   const modalProps = {
     size,
     forceScrolling,
-    title: "Filterable table",
     content: <TestModalFilterTable />,
   };
 

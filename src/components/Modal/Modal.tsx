@@ -12,7 +12,6 @@ import { useTestIds } from "src/utils";
 export type ModalSize = "sm" | "md" | "lg" | "xl";
 
 export interface ModalProps {
-  title: string;
   /**
    * The modal size, defaults to `md`.
    *
@@ -34,10 +33,10 @@ export interface ModalProps {
  * Provides underlay, modal container, and header. Will disable scrolling of page under the modal.
  */
 export function Modal(props: ModalProps) {
-  const { title, size = "md", content, forceScrolling } = props;
+  const { size = "md", content, forceScrolling } = props;
   const isFixedHeight = typeof size !== "string";
   const ref = useRef(null);
-  const { modalBodyDiv, modalFooterDiv, drawerContentStack } = useContext(BeamContext);
+  const { modalBodyDiv, modalFooterDiv, modalHeaderDiv, drawerContentStack } = useContext(BeamContext);
   const { closeModal } = ourUseModal();
   const { overlayProps, underlayProps } = useOverlay(
     { ...props, isOpen: true, onClose: closeModal, isDismissable: true },
@@ -49,6 +48,7 @@ export function Modal(props: ModalProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
   const modalFooterRef = useRef<HTMLDivElement | null>(null);
+  const modalHeaderRef = useRef<HTMLHeadingElement | null>(null);
   const testId = useTestIds({}, testIdPrefix);
   usePreventScroll();
 
@@ -67,6 +67,7 @@ export function Modal(props: ModalProps) {
     if (drawerContentStack.current.length > 0) {
       return;
     }
+    modalHeaderRef.current!.appendChild(modalHeaderDiv);
     modalBodyRef.current!.appendChild(modalBodyDiv);
     modalFooterRef.current!.appendChild(modalFooterDiv);
   }, [modalBodyRef, modalFooterRef]);
@@ -92,29 +93,33 @@ export function Modal(props: ModalProps) {
           >
             {/* Setup three children (header, content, footer), and flex grow the content. */}
             <header css={Css.df.p3.fs0.$}>
-              <h1 css={Css.fg1.xl2Em.gray900.$} {...titleProps} {...testId.title}>
-                {title}
-              </h1>
+              <h1 css={Css.fg1.xl2Em.gray900.$} ref={modalHeaderRef} {...titleProps} />
               <span css={Css.fs0.pl1.$}>
                 <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
               </span>
             </header>
-            <div
+            <main
               ref={contentRef}
               css={Css.fg1.overflowYAuto.if(hasScroll).bb.bGray200.if(!!forceScrolling).overflowYScroll.$}
             >
               {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
               {content}
               <div ref={modalBodyRef} />
-            </div>
-            <div css={Css.fs0.$}>
+            </main>
+            <footer css={Css.fs0.$}>
               <div ref={modalFooterRef} />
-            </div>
+            </footer>
           </div>
         </FocusScope>
       </div>
     </OverlayContainer>
   );
+}
+
+export function ModalHeader({ children }: { children: ReactNode }): JSX.Element {
+  const { modalHeaderDiv } = useContext(BeamContext);
+  const testId = useTestIds({}, testIdPrefix);
+  return createPortal(<>{children}</>, modalHeaderDiv);
 }
 
 /** Provides consistent styling and the scrolling behavior for a modal's primary content. */

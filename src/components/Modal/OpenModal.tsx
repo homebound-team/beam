@@ -21,9 +21,9 @@ import { useModal } from "src/components/Modal/useModal";
  * And `OpenModal` will do a boilerplate `openModal` call, so that the content
  * shows up in the DOM as expected.
  */
-export function OpenModal(props: { children: JSX.Element; size?: ModalProps["size"]; title?: string }): JSX.Element {
+export function OpenModal(props: { children: JSX.Element; size?: ModalProps["size"] }): JSX.Element {
   const { openModal } = useModal();
-  const { size, title = "Title", children } = props;
-  useEffect(() => openModal({ size, title, content: children }), [openModal, size, title, children]);
+  const { size, children } = props;
+  useEffect(() => openModal({ size, content: children }), [openModal, size, title, children]);
   return <div>dummy content</div>;
 }

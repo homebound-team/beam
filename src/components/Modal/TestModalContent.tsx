@@ -2,7 +2,7 @@ import { action } from "@storybook/addon-actions";
 import { useState } from "react";
 import { Button } from "src/components/Button";
 import { InternalUser } from "src/components/Filters/testDomain";
-import { ModalBody, ModalFooter } from "src/components/Modal/Modal";
+import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
 import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndDataOf } from "src/components/Table";
 import { Css } from "src/Css";
@@ -17,6 +17,7 @@ export function TestModalContent(props: { initNumSentences?: number; showLeftAct
   const [leftActionDisabled, setLeftActionDisabled] = useState(false);
   return (
     <>
+      <ModalHeader>The title of the modal that might wrap</ModalHeader>
       <ModalBody>
         <div css={Css.df.gap1.flexColumn.itemsStart.$}>
           <div css={Css.df.childGap1.$}>
