@@ -13,23 +13,29 @@ export function SelectField<T extends object, V extends Key>(props: SelectFieldP
     readOnly = false,
     errorMsg,
     onBlur,
+    onFocus,
   } = props;
   const tid = useTestIds(props, "select");
+
+  const currentOption = options.find((o) => getOptionValue(o) === value) || options[0];
 
   return (
     <select
       {...tid}
       value={
         // @ts-ignore - allow `value` to be seen as a string
-        value !== undefined && value !== ""
-          ? getOptionValue(options.find((o) => getOptionValue(o) === value) || options[0])
-          : ""
+        value !== undefined && value !== "" && currentOption ? getOptionValue(currentOption) : ""
       }
       onChange={(e) => {
         const option = options.find((o) => `${getOptionValue(o)}` === e.target.value) || options[0];
         onSelect(getOptionValue(option), option);
       }}
-      onBlur={onBlur}
+      onFocus={() => {
+        if (!readOnly && onFocus) onFocus();
+      }}
+      onBlur={() => {
+        if (!readOnly && onBlur) onBlur();
+      }}
       // Read Only does not apply to `select` fields, instead we'll add in disabled for tests to verify.
       disabled={readOnly}
       data-error={!!errorMsg}

@@ -11,12 +11,14 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
     onSelect,
     readOnly = false,
     errorMsg,
+    onFocus,
     onBlur,
   } = props;
   const tid = useTestIds(props, "multiSelect");
 
   return (
     <select
+      {...tid}
       // We're cheating and assume the values are strings...what we should really do is either:
       // a) use beam's valueToKey mapping to string-encode any Value, or
       // b) instead of using `values` directly, use the index of each value's `option` in `options`
@@ -40,13 +42,17 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
         );
       }}
       multiple
-      onBlur={onBlur}
+      onFocus={() => {
+        if (!readOnly && onFocus) onFocus();
+      }}
+      onBlur={() => {
+        if (!readOnly && onBlur) onBlur();
+      }}
       // Read Only does not apply to `select` fields, instead we'll add in disabled for tests to verify.
       disabled={readOnly}
       data-error={!!errorMsg}
       data-errormsg={errorMsg}
       data-readonly={readOnly}
-      {...tid}
     >
       <option disabled value=""></option>
       {options.map((option, i) => {
