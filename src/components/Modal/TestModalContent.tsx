@@ -51,6 +51,7 @@ export function TestModalFilterTable() {
   const { closeModal } = useModal();
   return (
     <>
+      <ModalHeader>Filterable table</ModalHeader>
       <ModalBody>
         <TextField label="Search" value={filter} onChange={setFilter} />
         <GridTable columns={columns} rows={rows} filter={filter} xss={Css.mt1.$} />

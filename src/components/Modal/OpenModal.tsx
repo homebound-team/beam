@@ -24,6 +24,6 @@ import { useModal } from "src/components/Modal/useModal";
 export function OpenModal(props: { children: JSX.Element; size?: ModalProps["size"] }): JSX.Element {
   const { openModal } = useModal();
   const { size, children } = props;
-  useEffect(() => openModal({ size, content: children }), [openModal, size, title, children]);
+  useEffect(() => openModal({ size, content: children }), [openModal, size, children]);
   return <div>dummy content</div>;
 }

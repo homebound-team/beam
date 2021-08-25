@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Button, Css } from "src";
+import { Button, Css, ModalBody, ModalFooter, ModalHeader } from "src";
 import { BeamContext } from "../BeamContext";
 
 interface ConfirmCloseModalProps {
@@ -18,10 +18,15 @@ export function ConfirmCloseModal({ onClose }: ConfirmCloseModalProps) {
   }
 
   return (
-    <div css={Css.wPx(400).df.flexColumn.justifyCenter.itemsCenter.tc.$}>
-      <p css={Css.lgEm.gray900.mb2.$}>Are you sure you want to cancel without saving your changes?</p>
-      <p css={Css.base.gray700.$}>Any changes you've made so far will be lost.</p>
-      <div css={Css.mt4.gap1.$}>
+    <>
+      <ModalHeader>Confirm</ModalHeader>
+      <ModalBody>
+        <div css={Css.tc.wPx(400).$}>
+          <p css={Css.lgEm.gray900.mb2.$}>Are you sure you want to cancel without saving your changes?</p>
+          <p css={Css.base.gray700.$}>Any changes you've made so far will be lost.</p>
+        </div>
+      </ModalBody>
+      <ModalFooter>
         <Button variant="tertiary" label="Cancel" onClick={closeModal} />
         <Button
           label="Close"
@@ -31,7 +36,7 @@ export function ConfirmCloseModal({ onClose }: ConfirmCloseModalProps) {
             closeModal();
           }}
         />
-      </div>
-    </div>
+      </ModalFooter>
+    </>
   );
 }

@@ -70,7 +70,7 @@ export function Modal(props: ModalProps) {
     modalHeaderRef.current!.appendChild(modalHeaderDiv);
     modalBodyRef.current!.appendChild(modalBodyDiv);
     modalFooterRef.current!.appendChild(modalFooterDiv);
-  }, [modalBodyRef, modalFooterRef]);
+  }, [modalBodyRef, modalFooterRef, modalHeaderRef]);
 
   return (
     <OverlayContainer>
@@ -93,7 +93,7 @@ export function Modal(props: ModalProps) {
           >
             {/* Setup three children (header, content, footer), and flex grow the content. */}
             <header css={Css.df.p3.fs0.$}>
-              <h1 css={Css.fg1.xl2Em.gray900.$} ref={modalHeaderRef} {...titleProps} />
+              <h1 css={Css.fg1.xl2Em.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
               <span css={Css.fs0.pl1.$}>
                 <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
               </span>
@@ -118,7 +118,6 @@ export function Modal(props: ModalProps) {
 
 export function ModalHeader({ children }: { children: ReactNode }): JSX.Element {
   const { modalHeaderDiv } = useContext(BeamContext);
-  const testId = useTestIds({}, testIdPrefix);
   return createPortal(<>{children}</>, modalHeaderDiv);
 }
 
