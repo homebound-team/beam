@@ -2,7 +2,7 @@ import { render, select } from "src/utils/rtl";
 import { SelectField as MockSelectField } from "./SelectField.mock";
 
 describe("MockSelectField", () => {
-  it("fires onSelect when selecting an inital option", async () => {
+  it("fires onSelect when selecting an initial option", async () => {
     const options = [
       { id: "1", name: "one" },
       { id: "2", name: "two" },
