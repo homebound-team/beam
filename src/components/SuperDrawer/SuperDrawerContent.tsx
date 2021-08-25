@@ -33,7 +33,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
   function wrapWithMotionAndMaybeBack(children: ReactNode): ReactNode {
     if (kind === "open") {
       return (
-        <motion.div key="content" css={Css.p3.fg1.$} style={{ overflow: "auto" }}>
+        <motion.div key="content" css={Css.p3.fg1.overflowAuto.$}>
           {children}
         </motion.div>
       );

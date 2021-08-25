@@ -1,6 +1,17 @@
 import { Meta } from "@storybook/react";
 import { useEffect, useRef } from "react";
-import { Button, Css, GridColumn, GridRowStyles, GridTable, SimpleHeaderAndDataOf, Tag } from "src";
+import {
+  Button,
+  Css,
+  GridColumn,
+  GridRowStyles,
+  GridTable,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  SimpleHeaderAndDataOf,
+  Tag,
+} from "src";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
 import { GridDataRow, GridRowLookup, simpleRows } from "src/components/Table/GridTable";
@@ -121,7 +132,7 @@ export function OpenWithModal() {
   const { openModal } = useModal();
   function open() {
     openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
-    openModal({ title: "Modal Title", content: <TestModalContent /> });
+    openModal({ content: <TestModalContent /> });
   }
   useEffect(open, [openInDrawer, openModal]);
   return (
@@ -284,10 +295,7 @@ function TestDrawerContent({ book, hasActions = true }: TestDrawerContentProps) 
   const { openModal } = useModal();
 
   function handlePurchase() {
-    openModal({
-      title: "Confirm",
-      content: <TestSimpleModalContent book={book} onPrimaryClick={closeDrawer} />,
-    });
+    openModal({ content: <TestSimpleModalContent book={book} onPrimaryClick={closeDrawer} /> });
   }
 
   return (
@@ -347,12 +355,17 @@ function TestDetailContent({ book, onPurchase }: { book: Book; onPurchase?: () =
 function TestSimpleModalContent({ book, onPrimaryClick }: { book: Book; onPrimaryClick: () => void }) {
   const { closeModal } = useModal();
   return (
-    <div css={Css.wPx(500).df.flexColumn.justifyCenter.itemsCenter.tc.$}>
-      <p css={Css.lgEm.$}>Are you sure you want to purchase {book.bookTitle} ?</p>
-      <div css={Css.gap1.$}>
+    <>
+      <ModalHeader>Confirm</ModalHeader>
+      <ModalBody>
+        <div css={Css.wPx(500).df.flexColumn.justifyCenter.itemsCenter.tc.$}>
+          <p css={Css.lgEm.$}>Are you sure you want to purchase {book.bookTitle} ?</p>
+        </div>
+      </ModalBody>
+      <ModalFooter>
         <Button label="Purchase" onClick={onPrimaryClick} />
         <Button variant="tertiary" label="Cancel" onClick={() => closeModal()} />
-      </div>
-    </div>
+      </ModalFooter>
+    </>
   );
 }

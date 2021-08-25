@@ -28,15 +28,23 @@ import { useTestIds } from "src/utils";
  * above the SuperDrawer.
  */
 export function SuperDrawer(): ReactPortal | null {
-  const { drawerContentStack: contentStack, modalState, modalBodyDiv, modalFooterDiv } = useContext(BeamContext);
+  const {
+    drawerContentStack: contentStack,
+    modalState,
+    modalBodyDiv,
+    modalFooterDiv,
+    modalHeaderDiv,
+  } = useContext(BeamContext);
   const { closeDrawer } = useSuperDrawer();
+  const drawerHeaderRef = useRef<HTMLDivElement | null>(null);
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
   const modalFooterRef = useRef<HTMLDivElement | null>(null);
   const testId = useTestIds({}, "superDrawer");
 
   // Steal the modal body/footer portals from Modal, if we're open
   useEffect(() => {
-    if (modalBodyRef.current && modalFooterRef.current && modalState.current) {
+    if (modalBodyRef.current && modalFooterRef.current && drawerHeaderRef.current && modalState.current) {
+      drawerHeaderRef.current.appendChild(modalHeaderDiv);
       modalBodyRef.current.appendChild(modalBodyDiv);
       modalFooterRef.current.appendChild(modalFooterDiv);
     }
@@ -97,8 +105,8 @@ export function SuperDrawer(): ReactPortal | null {
               <header css={Css.df.p3.bb.bGray200.df.itemsCenter.justifyBetween.$}>
                 {/* Left */}
                 <div css={Css.df.itemsCenter.$}>
-                  <div css={Css.xl2Em.gray900.mr2.$} {...testId.title}>
-                    {modalState.current?.title || title}
+                  <div css={Css.xl2Em.gray900.mr2.$} {...testId.title} ref={drawerHeaderRef}>
+                    {!modalState.current && (title || null)}
                   </div>
                   {!modalState.current && (titleLeftContent || null)}
                 </div>

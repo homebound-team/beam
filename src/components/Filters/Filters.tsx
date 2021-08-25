@@ -67,7 +67,6 @@ function Filters<F>(props: FilterProps<F>) {
           variant="secondary"
           onClick={() =>
             openModal({
-              title: "More Filters",
               // Spreading `props` to pass along `data-testid`
               content: <FilterModal {...props} onApply={onChange} filterDefs={modalFilterDefs} filter={filter} />,
             })

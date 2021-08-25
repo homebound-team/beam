@@ -1,7 +1,7 @@
 import { ReactNode, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { filterBuilder, FilterDefs, filterTestIdPrefix, getFilterComponents } from "src/components/Filters";
-import { ModalBody, ModalFooter, useModal } from "src/components/Modal";
+import { ModalBody, ModalFooter, ModalHeader, useModal } from "src/components/Modal";
 import { Css } from "src/Css";
 import { omitKey, safeKeys, useTestIds } from "src/utils";
 
@@ -28,6 +28,7 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
 
   return (
     <>
+      <ModalHeader>More Filters</ModalHeader>
       <ModalBody>
         <div css={Css.df.flexColumn.$}>
           {filterComponents.map((c, idx) => (
