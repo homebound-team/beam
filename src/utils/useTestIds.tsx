@@ -36,6 +36,8 @@ export function useTestIds(props: object, defaultPrefix?: string): Record<string
     (defaultPrefix ? defaultTestId(defaultPrefix) : undefined);
   const rootId = { "data-testid": prefix };
   return newMethodMissingProxy(rootId, (key) => {
+    // If we get tagged ids, remove the colon so that we can do `r.foo_m2` for `m:2`
+    key = key.replace(":", "");
     return { "data-testid": prefix ? `${prefix}_${key}` : key };
   }) as any;
 }

@@ -3,6 +3,7 @@ import { useCheckboxGroup, useCheckboxGroupItem, useFocusRing, VisuallyHidden } 
 import { CheckboxGroupState, useCheckboxGroupState } from "react-stately";
 import { Label } from "src/components/Label";
 import { Css } from "src/Css";
+import { useTestIds } from "src/utils/useTestIds";
 
 type ToggleChipItemProps = {
   label: string;
@@ -21,6 +22,7 @@ export function ToggleChipGroup(props: ToggleChipGroupProps) {
   const { values, label, options, hideLabel } = props;
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
+  const tid = useTestIds(props, "toggleChip");
 
   return (
     <div {...groupProps} css={Css.relative.$}>
@@ -33,6 +35,7 @@ export function ToggleChipGroup(props: ToggleChipGroupProps) {
             groupState={state}
             selected={state.value.includes(o.value)}
             label={o.label}
+            {...tid[o.value]}
           />
         ))}
       </div>
@@ -48,7 +51,7 @@ interface ToggleChipProps {
 }
 
 function ToggleChip(props: ToggleChipProps) {
-  const { label, value, groupState, selected: isSelected } = props;
+  const { label, value, groupState, selected: isSelected, ...others } = props;
   const ref = useRef(null);
   const { inputProps } = useCheckboxGroupItem({ value, "aria-label": label }, groupState, ref);
   const { isFocusVisible, focusProps } = useFocusRing();
@@ -65,6 +68,8 @@ function ToggleChip(props: ToggleChipProps) {
           : { ":hover": Css.bgGray300.$ }),
         ...(isFocusVisible ? Css.bshFocus.$ : {}),
       }}
+      data-selected={isSelected}
+      {...others}
     >
       <VisuallyHidden>
         <input {...inputProps} {...focusProps} />
