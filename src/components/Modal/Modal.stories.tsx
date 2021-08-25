@@ -21,20 +21,22 @@ export const FilterableDynamicHeight = () => <ModalFilterTableExample />;
 export const FilterableStaticHeight = () => (
   <ModalFilterTableExample size={{ width: "md", height: 600 }} forceScrolling={true} />
 );
+export const HeaderWithComponents = () => <ModalExample size="lg" withTag />;
 
 interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling"> {
   initNumSentences?: number;
   showLeftAction?: boolean;
+  withTag?: boolean;
 }
 
 function ModalExample(props: ModalExampleProps) {
-  const { size, showLeftAction, initNumSentences = 1, forceScrolling } = props;
+  const { size, showLeftAction, initNumSentences = 1, forceScrolling, withTag } = props;
   const { openModal } = useModal();
 
   const modalProps = {
     size,
     forceScrolling,
-    content: <TestModalContent initNumSentences={initNumSentences} showLeftAction={showLeftAction} />,
+    content: <TestModalContent initNumSentences={initNumSentences} showLeftAction={showLeftAction} withTag={withTag} />,
   };
 
   // Immediately open the modal for Chromatic snapshots
