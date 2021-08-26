@@ -42,7 +42,7 @@ export function SelectField<O, V extends Value>(
       options={options}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
-      values={value ? [value] : []}
+      values={[value]}
       onSelect={(values) => {
         if (values.length > 0) {
           const selectedOption = options.find((o) => getOptionValue(o) === values[0]);

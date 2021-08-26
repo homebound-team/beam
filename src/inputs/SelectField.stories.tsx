@@ -107,6 +107,13 @@ export function SelectFields() {
           getOptionValue={(o) => o.value}
           getOptionLabel={(o) => o.label}
         />
+        <TestSelectField
+          label="Has 'unselect' option"
+          value={undefined}
+          options={[{ id: undefined, name: "No Selection", icon: "x" }, ...options]}
+          getOptionValue={(o) => o.id}
+          getOptionLabel={(o) => o.name}
+        />
       </div>
 
       <div css={Css.df.flexColumn.childGap2.$}>
