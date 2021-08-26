@@ -16,6 +16,7 @@ import {
 } from "src/components/index";
 import { Css } from "src/Css";
 import { usePersistedFilter } from "src/hooks";
+import { useGroupBy } from "src/hooks/useGroupBy";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
@@ -89,6 +90,70 @@ export function Filter() {
         <strong>Applied Filter:</strong> {JSON.stringify(filter)}
       </div>
       <GridTable columns={columns} rows={filterRows(tableData, filter)} />
+    </div>
+  );
+}
+
+export function GroupBy() {
+  const groupBy = useGroupBy({ costCode: "Cost Code", tradeCategory: "Trade Category" });
+  type Filter = ProjectFilter & { view: string };
+  const filterDefs: FilterDefs<Filter> = useMemo(() => {
+    return {
+      view: singleFilter({
+        options: [{ id: "selections", name: "Selections" }],
+        getOptionValue: (o) => o.id,
+        getOptionLabel: (o) => o.name,
+      }),
+      internalUserId: singleFilter({
+        options: internalUsers,
+        label: "Project Manager",
+        getOptionValue: (o) => o.id,
+        getOptionLabel: (o) => o.name,
+      }),
+    };
+  }, []);
+  const { setFilter, filter } = usePersistedFilter<ProjectFilter>({
+    storageKey: "GroupBy",
+    filterDefs,
+  });
+  return (
+    <div css={Css.df.flexColumn.childGap2.$}>
+      <Filters groupBy={groupBy} filter={filter} onChange={setFilter} filterDefs={filterDefs} />
+      <strong>Applied Filter:</strong> {JSON.stringify(filter)}
+    </div>
+  );
+}
+
+export function GroupByViewAll() {
+  const groupBy = useGroupBy({ costCode: "Cost Code", tradeCategory: "Trade Category" });
+  type Filter = ProjectFilter & { view: string };
+  const filterDefs: FilterDefs<Filter> = useMemo(() => {
+    return {
+      view: singleFilter({
+        options: [
+          { id: "selections", name: "Selections" },
+          { id: "all", name: "All" },
+        ],
+        getOptionValue: (o) => o.id,
+        getOptionLabel: (o) => o.name,
+        defaultValue: "all",
+      }),
+      internalUserId: singleFilter({
+        options: internalUsers,
+        label: "Project Manager",
+        getOptionValue: (o) => o.id,
+        getOptionLabel: (o) => o.name,
+      }),
+    };
+  }, []);
+  const { setFilter, filter } = usePersistedFilter<ProjectFilter>({
+    storageKey: "GroupByViewAll",
+    filterDefs,
+  });
+  return (
+    <div css={Css.df.flexColumn.childGap2.$}>
+      <Filters groupBy={groupBy} filter={filter} onChange={setFilter} filterDefs={filterDefs} />
+      <strong>Applied Filter:</strong> {JSON.stringify(filter)}
     </div>
   );
 }
