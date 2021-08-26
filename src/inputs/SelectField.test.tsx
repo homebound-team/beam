@@ -86,24 +86,39 @@ describe("SelectFieldTest", () => {
     expect(age()).toHaveValue("Three");
   });
 
-  it("resets input value on blur if it does not match the selected option 2", async () => {
-    // Given a Select Field with a selected option
-    const r = await render(
+  it("can initialize with an 'undefined' value", async () => {
+    // Given a Select Field with an undefined value
+    const { age, getByRole } = await render(
       <TestSelectField
         label="Age"
-        value={"1"}
-        options={options}
+        value={undefined}
+        options={[{ id: undefined, name: "Unassigned" }, ...options]}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
         data-testid="age"
       />,
     );
-    // When changing the inputs value to no longer match the selected option
-    fireEvent.input(r.age(), { target: { value: "asdf" } });
-    // And `blur`ing the field
-    fireEvent.blur(r.age());
-    // Then expect the value to be reset to the selected option
-    expect(r.age()).toHaveValue("One");
+    // Then expect the value to be that of the `undefined` entry
+    expect(age()).toHaveValue("Unassigned");
+  });
+
+  it("can select an 'undefined' value", async () => {
+    // Given a Select Field with a value selected
+    const { age, getByRole } = await render(
+      <TestSelectField
+        label="Age"
+        value="1"
+        options={[{ id: undefined, name: "Unassigned" }, ...options]}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+      />,
+    );
+    // When selecting the option which an `undefined` value
+    fireEvent.focus(age());
+    click(getByRole("option", { name: "Unassigned" }));
+    // Then expect the value to be that of the `undefined` entry
+    expect(age()).toHaveValue("Unassigned");
   });
 
   function TestSelectField<O, V extends Value>(props: Omit<SelectFieldProps<O, V>, "onSelect">): JSX.Element {

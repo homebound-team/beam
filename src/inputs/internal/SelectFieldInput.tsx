@@ -102,7 +102,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
         {(!isMultiSelect || (isMultiSelect && !isFocused)) && fieldDecoration && selectedOptions.length === 1 && (
           <span
             css={{
-              ...Css.itemsCenter.br4.fs0.pr1.$,
+              ...Css.df.itemsCenter.br4.fs0.pr1.$,
               ...errorStyles,
               ...hoverStyles,
               ...focusStyles,
