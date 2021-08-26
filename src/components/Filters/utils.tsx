@@ -162,18 +162,22 @@ const defaultBooleanOptions: BooleanOption[] = [
 
 interface BooleanFilterProps {
   options?: BooleanOption[];
-  label: string;
+  label?: string;
+  defaultValue?: undefined | boolean;
 }
 export function booleanFilter(
   opts: BooleanFilterProps,
 ): { kind: "boolean" } & SingleFilterProps<BooleanOption, string> {
-  const { options = defaultBooleanOptions, label } = opts;
+  const { options = defaultBooleanOptions, label, defaultValue } = opts;
   return {
     kind: "boolean" as const,
     options,
     label,
     getOptionValue: (o) => String(o[0]),
     getOptionLabel: (o) => o[1],
+    // The as any is because we want this to be a `boolean | undefined` for usePersistedFilter
+    // even though the rest of the singleFilter we mixin expects our munged string values
+    defaultValue: (options.find((o) => o[0] === defaultValue) || [])[0] as any,
   };
 }
 

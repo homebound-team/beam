@@ -44,6 +44,7 @@ export function Filter() {
         [false, "Not favorited"],
       ],
       label: "Favorite Status",
+      defaultValue: true,
     });
     const stage = multiFilter({
       options: stages,
