@@ -104,10 +104,9 @@ export function GroupBy() {
         getOptionValue: (o) => o.id,
         getOptionLabel: (o) => o.name,
       }),
-      internalUserId: singleFilter({
-        options: internalUsers,
-        label: "Project Manager",
-        getOptionValue: (o) => o.id,
+      marketId: multiFilter({
+        options: markets,
+        getOptionValue: (o) => o.code,
         getOptionLabel: (o) => o.name,
       }),
     };
@@ -138,10 +137,9 @@ export function GroupByViewAll() {
         getOptionLabel: (o) => o.name,
         defaultValue: "all",
       }),
-      internalUserId: singleFilter({
-        options: internalUsers,
-        label: "Project Manager",
-        getOptionValue: (o) => o.id,
+      marketId: multiFilter({
+        options: markets,
+        getOptionValue: (o) => o.code,
         getOptionLabel: (o) => o.name,
       }),
     };
