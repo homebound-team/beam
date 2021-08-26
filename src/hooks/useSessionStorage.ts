@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
-export function useSessionStorage<T>(key: string, defaultValue: T) {
+type UseSessionStorage<T> = [T, (value: T) => void];
+
+export function useSessionStorage<T>(key: string, defaultValue: T): UseSessionStorage<T> {
   let hasSessionStorage = false;
   try {
     hasSessionStorage = !!window.sessionStorage;
@@ -9,20 +11,28 @@ export function useSessionStorage<T>(key: string, defaultValue: T) {
   }
 
   const [state, setState] = useState(() => {
-    if (hasSessionStorage) {
-      return getParsedStorage(key) || defaultValue;
-    } else {
+    if (!hasSessionStorage) {
       return defaultValue;
     }
+    const parsed = getParsedStorage(key);
+    if (parsed) {
+      return parsed;
+    }
+    sessionStorage.setItem(key, JSON.stringify(defaultValue));
+    return defaultValue;
   });
 
-  useEffect(() => {
-    if (hasSessionStorage && state) {
-      sessionStorage.setItem(key, JSON.stringify(state));
-    }
-  }, [key, state, hasSessionStorage]);
+  const setAndSave = useCallback(
+    (value: T) => {
+      if (hasSessionStorage && value) {
+        sessionStorage.setItem(key, JSON.stringify(value));
+      }
+      setState(value);
+    },
+    [hasSessionStorage, key],
+  );
 
-  return [state, setState];
+  return [state, setAndSave];
 }
 
 function getParsedStorage(key: string) {

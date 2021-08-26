@@ -1,13 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { FilterDefs } from "src/components";
 import { useSessionStorage } from "src/hooks";
-import { safeKeys } from "src/utils";
+import { safeEntries, safeKeys } from "src/utils";
 import { JsonParam, useQueryParams } from "use-query-params";
 
 interface UsePersistedFilterProps<F> {
-  defaultFilter?: F;
-  storageKey: string;
   filterDefs: FilterDefs<F>;
+  storageKey: string;
+}
+
+interface PersistedFilterHook<F> {
+  filter: F;
+  setFilter: (filter: F) => void;
 }
 
 /**
@@ -15,8 +19,17 @@ interface UsePersistedFilterProps<F> {
  * If a valid filter is present in the query params, then that will be used.
  * Otherwise it looks at browser storage, and finally the defaultFilter prop.
  */
-export function usePersistedFilter<F>({ defaultFilter = {} as F, storageKey, filterDefs }: UsePersistedFilterProps<F>) {
+export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFilterProps<F>): PersistedFilterHook<F> {
   const filterKeys = Object.keys(filterDefs);
+  const defaultFilter = useMemo(
+    () =>
+      Object.fromEntries(
+        safeEntries(filterDefs)
+          .filter(([, def]) => def.defaultValue !== undefined)
+          .map(([key, def]) => [key, (def as any).defaultValue]),
+      ),
+    [filterDefs],
+  );
   const [{ filter: queryParamsFilter }, setQueryParams] = useQueryParams({ filter: JsonParam });
   const [storedFilter, setStoredFilter] = useSessionStorage<F>(storageKey, queryParamsFilter ?? defaultFilter);
   const isQueryParamFilterValid = hasValidFilterKeys(queryParamsFilter, filterKeys);
@@ -31,8 +44,8 @@ export function usePersistedFilter<F>({ defaultFilter = {} as F, storageKey, fil
       // back button will go to previous url
       setQueryParams({ filter: storedFilter }, "replaceIn");
     } else if (!isQueryParamFilterValid) {
-      // if there are invalid query params, clear filters
-      setQueryParams({ filter: {} }, "replaceIn");
+      // if there are invalid query params, fallback to the default filters
+      setQueryParams({ filter: defaultFilter }, "replaceIn");
     } else if (JSON.stringify(queryParamsFilter) !== JSON.stringify(storedFilter)) {
       // if there is a valid filter in query params and its different from the
       // current storedFilter, use query params filter
@@ -44,11 +57,6 @@ export function usePersistedFilter<F>({ defaultFilter = {} as F, storageKey, fil
 }
 
 // check for valid filter keys in the query params
-function hasValidFilterKeys<F>(queryParamsFilter: F, filterKeys: (keyof F)[]): queryParamsFilter is F {
-  if (!queryParamsFilter) return false;
-  const invalidKey = safeKeys(queryParamsFilter).find((key) => {
-    return !filterKeys.includes(key);
-  });
-  if (invalidKey !== undefined) return false;
-  return true;
+function hasValidFilterKeys<F>(queryParamsFilter: F, definedKeys: (keyof F)[]): queryParamsFilter is F {
+  return queryParamsFilter && safeKeys(queryParamsFilter).every((key) => definedKeys.includes(key));
 }

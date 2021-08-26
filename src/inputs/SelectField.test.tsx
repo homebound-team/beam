@@ -1,4 +1,4 @@
-import { click, input, render } from "@homebound/rtl-utils";
+import { click, render } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
@@ -28,7 +28,6 @@ describe("SelectFieldTest", () => {
     expect(age()).toHaveValue("One");
     // When we select the 3rd option
     fireEvent.focus(age());
-    input(age(), "");
     click(getByRole("option", { name: "Three" }));
     // Then onSelect was called
     expect(onSelect).toHaveBeenCalledWith("3");
@@ -69,7 +68,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When changing the inputs value, and not selecting an option
-    input(age(), "asdf");
+    fireEvent.input(age(), { target: { value: "asdf" } });
     // And `blur`ing the field
     fireEvent.blur(age());
     // Then expect the value to be reset to empty
@@ -77,17 +76,17 @@ describe("SelectFieldTest", () => {
 
     // Given a selected option
     fireEvent.focus(age());
-    input(age(), "T");
+    fireEvent.input(age(), { target: { value: "T" } });
     click(getByRole("option", { name: "Three" }));
     // When changing the inputs value to no longer match the selected option
-    input(age(), "asdf");
+    fireEvent.input(age(), { target: { value: "asdf" } });
     // And `blur`ing the field
     fireEvent.blur(age());
     // Then expect the value to be reset to the selected option
     expect(age()).toHaveValue("Three");
   });
 
-  it("resets input value on blur if it does not match the selected option", async () => {
+  it("resets input value on blur if it does not match the selected option 2", async () => {
     // Given a Select Field with a selected option
     const r = await render(
       <TestSelectField
@@ -100,7 +99,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When changing the inputs value to no longer match the selected option
-    input(r.age(), "asdf");
+    fireEvent.input(r.age(), { target: { value: "asdf" } });
     // And `blur`ing the field
     fireEvent.blur(r.age());
     // Then expect the value to be reset to the selected option

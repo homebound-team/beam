@@ -68,7 +68,7 @@ describe("MultiSelectFieldTest", () => {
 
     // Given a selected option
     fireEvent.focus(age());
-    input(age(), "T");
+    fireEvent.input(age(), { target: { value: "T" } });
     click(getByRole("option", { name: "Three" }));
     // When changing the inputs value to no longer match the selected option
     input(age(), "asdf");
@@ -79,7 +79,7 @@ describe("MultiSelectFieldTest", () => {
 
     // When selecting multiple options
     fireEvent.focus(age());
-    input(age(), "T");
+    fireEvent.input(age(), { target: { value: "T" } });
     click(getByRole("option", { name: "Two" }));
     // Then the input value should be empty
     expect(age()).toHaveValue("");
@@ -134,6 +134,6 @@ describe("MultiSelectFieldTest", () => {
 function selectOption(r: RenderResult, name: string): void {
   const text = r.getByRole("combobox");
   text.focus();
-  input(text, "");
+  fireEvent.input(text, { target: { value: "" } });
   click(r.getByRole("option", { name }));
 }

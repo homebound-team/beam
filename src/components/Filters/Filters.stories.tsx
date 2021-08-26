@@ -25,8 +25,6 @@ export default {
 } as Meta;
 
 export function Filter() {
-  const defaultFilter: ProjectFilter = {};
-
   const filterDefs: FilterDefs<ProjectFilter> = useMemo(() => {
     const marketId = multiFilter({
       options: markets,
@@ -76,7 +74,6 @@ export function Filter() {
   }, []);
 
   const { setFilter, filter } = usePersistedFilter<ProjectFilter>({
-    defaultFilter,
     storageKey: "storybookFilter",
     filterDefs,
   });

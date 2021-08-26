@@ -27,10 +27,10 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
   // Need to set `filterDef` as `any` - not sure exactly why yet... but it breaks things.
   return safeEntries(filterDefs).map(([key, filterDef]: [keyof F, any]) => {
     if (filterDef.kind === "boolean") {
-      const label = filterDef.label || defaultLabel(key as string);
+      const { kind, label = defaultLabel(key as string), defaultValue, ...props } = filterDef;
       return wrapIfModal(
         <SelectField
-          {...filterDef}
+          {...props}
           compact
           label={label}
           value={String(filter[key])}
@@ -48,11 +48,10 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
     }
 
     if (filterDef.kind === "toggle") {
-      const label = filterDef.label || defaultLabel(key as string);
-      const enabledValue = typeof filterDef.enabledValue === "boolean" ? filterDef.enabledValue : true;
+      const { kind, label = defaultLabel(key as string), enabledValue = true, defaultValue, ...props } = filterDef;
       return wrapIfModal(
         <Switch
-          {...filterDef}
+          {...props}
           selected={filter[key] === enabledValue}
           label={label}
           labelStyle={inModal ? "filter" : "inline"}
@@ -64,10 +63,10 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
     }
 
     if (filterDef.kind === "single") {
-      const label = filterDef.label || defaultLabel(key as string);
+      const { kind, label = defaultLabel(key as string), defaultValue, ...props } = filterDef;
       return wrapIfModal(
         <SelectField
-          {...filterDef}
+          {...props}
           compact
           value={filter[key]}
           label={label}
@@ -82,7 +81,7 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
     }
 
     if (filterDef.kind === "multi") {
-      const label = filterDef.label || defaultLabel(key as string);
+      const { kind, label = defaultLabel(key as string), defaultValue, ...props } = filterDef;
       if (inModal && filterDef.options.length <= 8) {
         return wrapIfModal(
           <ToggleChipGroup
@@ -102,7 +101,7 @@ export function getFilterComponents<F>(props: GetFilterComponentsOpts<F>) {
       }
       return wrapIfModal(
         <MultiSelectField
-          {...filterDef}
+          {...props}
           compact
           label={label}
           values={filter[key] || []}
