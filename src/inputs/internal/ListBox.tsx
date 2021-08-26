@@ -5,6 +5,7 @@ import { Virtuoso } from "react-virtuoso";
 import { Chip } from "src/components/Chip";
 import { Option } from "src/components/internal/index";
 import { Css } from "src/Css";
+import { BeamTheme } from "src/types";
 
 interface ListBoxProps<O, V extends Key> {
   compact: boolean;
@@ -14,6 +15,7 @@ interface ListBoxProps<O, V extends Key> {
   selectedOptions: O[];
   getOptionLabel: (opt: O) => string;
   getOptionValue: (opt: O) => V;
+  theme?: BeamTheme;
 }
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
@@ -28,8 +30,10 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     selectedOptions,
     getOptionLabel,
     getOptionValue,
+    theme,
     ...otherProps
   } = props;
+  const isDarkTheme = theme === BeamTheme.Dark;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...otherProps }, state, listBoxRef);
 
   const [listHeight, setListHeight] = useState(maxListHeight);
@@ -38,7 +42,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
   return (
     <div
       css={{
-        ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.$,
+        ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.if(isDarkTheme).bgGray700.$,
         "&:hover": Css.bshHover.$,
       }}
       ref={listBoxRef}
@@ -70,7 +74,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
             const keys = [...state.collection.getKeys()];
             const item = state.collection.getItem(keys[idx]);
             if (item) {
-              return <Option key={item.key} item={item} state={state} />;
+              return <Option key={item.key} item={item} state={state} theme={theme} />;
             }
           }}
         />

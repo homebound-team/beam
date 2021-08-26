@@ -15,6 +15,7 @@ import { Css, Palette } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { Value, valueToKey } from "src/inputs/Value";
+import { BeamTheme } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 
 interface SelectFieldInputProps<O, V extends Value> {
@@ -39,6 +40,8 @@ interface SelectFieldInputProps<O, V extends Value> {
   selectedOptions: O[];
   getOptionValue: (opt: O) => V;
   sizeToContent: boolean;
+  // Theme only supported locally on SelectFields at the moment. At some point the Theme should be inherited from a Context
+  theme?: BeamTheme;
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
@@ -64,14 +67,26 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
     selectedOptions,
     getOptionValue,
     sizeToContent,
+    theme,
   } = props;
+  const isDarkTheme = theme === "dark";
+  const themeStyles = {
+    wrapper: Css.bgWhite.bGray300.gray900.if(isDarkTheme).bgGray700.bGray700.white.$,
+    hover: Css.bgGray100.if(isDarkTheme).bgGray600.bGray600.$,
+    focus: Css.bLightBlue700.if(isDarkTheme).bLightBlue500.$,
+    // Not using Truss's inline `if` statement here because `addIn` properties are applied regardless.
+    input: !isDarkTheme ? Css.bgWhite.$ : Css.bgGray700.addIn("&::selection", Css.bgGray800.$).$,
+    disabled: Css.cursorNotAllowed.gray400.bgGray100.if(isDarkTheme).gray500.bgGray700.$,
+    error: Css.bRed500.if(isDarkTheme).bRed400.$,
+  };
+
   const errorMessageId = `${inputProps.id}-error`;
   const [isFocused, setIsFocused] = useState(false);
   const { hoverProps, isHovered } = useHover({});
-  const hoverStyles = isHovered && !isReadOnly && !isFocused ? Css.bgGray100.$ : {};
-  const focusStyles = isFocused && !isReadOnly ? Css.bLightBlue700.$ : {};
-  const errorStyles = errorMsg ? Css.bRed500.$ : {};
-  const disabledStyles = isDisabled ? Css.gray400.bgGray100.cursorNotAllowed.$ : {};
+  const hoverStyles = isHovered && !isReadOnly && !isFocused ? themeStyles.hover : {};
+  const focusStyles = isFocused && !isReadOnly ? themeStyles.focus : {};
+  const errorStyles = errorMsg ? themeStyles.error : {};
+  const disabledStyles = isDisabled ? themeStyles.disabled : {};
   const readOnlyStyles = isReadOnly ? Css.bn.pl0.pt0.add("backgroundColor", "unset").$ : {};
   const tid = useTestIds(inputProps); // data-testid comes in through here
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
@@ -79,10 +94,13 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
 
   return (
     <Fragment>
-      {!inlineLabel && label && <Label labelProps={labelProps} label={label} suffix={labelSuffix} {...tid.label} />}
+      {!inlineLabel && label && (
+        <Label labelProps={labelProps} label={label} suffix={labelSuffix} theme={theme} {...tid.label} />
+      )}
       <div
         css={{
-          ...Css.df.ba.bGray300.br4.px1.itemsCenter.bgWhite.hPx(40).if(compact).hPx(32).$,
+          ...Css.df.ba.br4.px1.itemsCenter.hPx(40).if(compact).hPx(32).$,
+          ...themeStyles.wrapper,
           ...hoverStyles,
           ...errorStyles,
           ...focusStyles,
@@ -105,7 +123,6 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
               ...Css.df.itemsCenter.br4.fs0.pr1.$,
               ...errorStyles,
               ...hoverStyles,
-              ...focusStyles,
             }}
           >
             {fieldDecoration(selectedOptions[0])}
@@ -117,7 +134,8 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
           {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
           ref={inputRef as any}
           css={{
-            ...Css.sm.mw0.fg1.pr1.bgWhite.br4.gray900.outline0.w100.$,
+            ...Css.mw0.fg1.pr1.br4.outline0.truncate.w100.sm.if(!inlineLabel).smEm.$,
+            ...themeStyles.input,
             ...hoverStyles,
             ...disabledStyles,
             ...readOnlyStyles,
@@ -207,13 +225,16 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
               ...disabledStyles,
             }}
           >
-            <Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} color={Palette.Gray700} />
+            <Icon
+              icon={state.isOpen ? "chevronUp" : "chevronDown"}
+              color={isDarkTheme ? Palette.Gray400 : Palette.Gray700}
+            />
           </button>
         )}
       </div>
 
-      {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}
-      {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+      {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} theme={theme} {...tid.errorMsg} />}
+      {helperText && <HelperText helperText={helperText} theme={theme} {...tid.helperText} />}
     </Fragment>
   );
 }

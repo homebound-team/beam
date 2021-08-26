@@ -8,6 +8,7 @@ import { ListBox } from "src/inputs/internal/ListBox";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
+import { BeamTheme } from "src/types";
 
 type FieldState<O> = {
   isOpen: boolean;
@@ -60,6 +61,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     sizeToContent = false,
     values,
     nothingSelectedText = "",
+    theme,
     ...otherProps
   } = props;
 
@@ -263,6 +265,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         selectedOptions={fieldState.selectedOptions}
         getOptionValue={getOptionValue}
         sizeToContent={sizeToContent}
+        theme={theme}
       />
       {state.isOpen && (
         <Popover
@@ -279,6 +282,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
             selectedOptions={fieldState.selectedOptions}
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
+            theme={theme}
           />
         </Popover>
       )}
@@ -304,4 +308,6 @@ export interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
   sizeToContent?: boolean;
   /** The text to show when nothing is selected, i.e. could be "All" for filters. */
   nothingSelectedText?: string;
+  // Theme only supported locally on SelectFields at the moment. At some point the Theme should be inherited from a Context
+  theme?: BeamTheme;
 }

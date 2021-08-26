@@ -1,17 +1,18 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import type { IconKey } from "src/components";
-import { GridColumn, GridTable, Icon, simpleHeader, SimpleHeaderAndDataOf } from "src/components";
+import { GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndDataOf } from "src/components";
 import { Css } from "src/Css";
-import { SelectField, SelectFieldProps, Value } from "src/inputs";
-import { HasIdAndName, Optional } from "src/types";
+import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
+import { Value } from "src/inputs/Value";
+import { BeamTheme, HasIdAndName, Optional } from "src/types";
 import { noop } from "src/utils";
 import { zeroTo } from "src/utils/sb";
 
 export default {
   component: SelectField,
   title: "Inputs/Select Fields",
+  parameters: { layout: "fullscreen" },
 } as Meta;
 
 type TestOption = {
@@ -45,7 +46,7 @@ export function SelectFields() {
   const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
 
   return (
-    <div css={Css.df.flexColumn.childGap5.$}>
+    <div css={Css.df.flexColumn.childGap5.p2.$}>
       <div css={Css.df.flexColumn.childGap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <TestSelectField
@@ -233,6 +234,217 @@ const columns: GridColumn<Row>[] = [
 type Row = SimpleHeaderAndDataOf<Request>;
 type InternalUser = { name: string; id: string };
 type Request = { id: string; user: InternalUser; address: string; homeowner: string; market: string };
+
+export function DarkTheme() {
+  const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
+
+  return (
+    <div css={Css.df.flexColumn.childGap5.bgGray800.p2.white.$}>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Regular</h1>
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          label="Favorite Icon"
+          value={options[2].id}
+          options={options}
+          getOptionMenuLabel={(o) => (
+            <div css={Css.df.itemsCenter.$}>
+              {o.icon && (
+                <span css={Css.fs0.mr2.$}>
+                  <Icon icon={o.icon} />
+                </span>
+              )}
+              {o.name}
+            </div>
+          )}
+        />
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          label="Favorite Icon"
+          value={options[2].id}
+          options={options}
+          getOptionMenuLabel={(o) => (
+            <div css={Css.df.itemsCenter.$}>
+              {o.icon && (
+                <span css={Css.fs0.mr2.$}>
+                  <Icon icon={o.icon} />
+                </span>
+              )}
+              {o.name}
+            </div>
+          )}
+        />
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          label="Favorite Icon - with field decoration"
+          options={options}
+          fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
+          value={options[1].id}
+          getOptionMenuLabel={(o) => (
+            <div css={Css.df.itemsCenter.$}>
+              {o.icon && (
+                <span css={Css.fs0.mr2.$}>
+                  <Icon icon={o.icon} />
+                </span>
+              )}
+              {o.name}
+            </div>
+          )}
+        />
+        <TestSelectField<TestOption, string>
+          theme={BeamTheme.Dark}
+          label="Favorite Icon - Disabled"
+          value={undefined}
+          options={options}
+          disabled
+        />
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          label="Favorite Icon - Read Only"
+          options={options}
+          value={options[2].id}
+          readOnly
+        />
+        <TestSelectField<TestOption, string>
+          theme={BeamTheme.Dark}
+          label="Favorite Icon - Invalid"
+          value={undefined}
+          options={options}
+        />
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          label="Favorite Icon - Helper Text"
+          value={options[0].id}
+          options={options}
+          helperText="Some really long helper text that we expect to wrap."
+        />
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          label="Favorite Number - Numeric"
+          value={1}
+          options={optionsWithNumericIds}
+          getOptionValue={(o) => o.id}
+          getOptionLabel={(o) => o.name}
+        />
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          label="Is Available - Boolean"
+          value={false}
+          options={booleanOptions}
+          getOptionValue={(o) => o.value}
+          getOptionLabel={(o) => o.label}
+        />
+      </div>
+
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Compact</h1>
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          compact
+          label="Favorite Icon"
+          value={options[2].id}
+          options={options}
+          getOptionMenuLabel={(o) => (
+            <div css={Css.df.itemsCenter.$}>
+              {o.icon && (
+                <span css={Css.fs0.mr2.$}>
+                  <Icon icon={o.icon} />
+                </span>
+              )}
+              {o.name}
+            </div>
+          )}
+        />
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          compact
+          label="Favorite Icon - with field decoration"
+          options={options}
+          fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
+          value={options[1].id}
+          getOptionMenuLabel={(o) => (
+            <div css={Css.df.itemsCenter.$}>
+              {o.icon && (
+                <span css={Css.fs0.mr2.$}>
+                  <Icon icon={o.icon} />
+                </span>
+              )}
+              {o.name}
+            </div>
+          )}
+        />
+        <TestSelectField<TestOption, string>
+          theme={BeamTheme.Dark}
+          compact
+          label="Favorite Icon - Disabled"
+          value={undefined}
+          options={options}
+          disabled
+        />
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          compact
+          label="Favorite Icon - Read Only"
+          options={options}
+          value={options[2].id}
+          readOnly
+        />
+        <TestSelectField<TestOption, string>
+          theme={BeamTheme.Dark}
+          compact
+          label="Favorite Icon - Invalid"
+          options={options}
+          value={undefined}
+        />
+      </div>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Inline Label</h1>
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          inlineLabel
+          label="Favorite Icon"
+          value={options[2].id}
+          options={options}
+        />
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          inlineLabel
+          compact
+          label="Favorite Icon"
+          value={options[2].id}
+          options={options}
+        />
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          label="Favorite Icon"
+          inlineLabel
+          options={options}
+          fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
+          value={options[4].id}
+          getOptionMenuLabel={(o) => (
+            <div css={Css.df.itemsCenter.$}>
+              {o.icon && (
+                <span css={Css.fs0.mr2.$}>
+                  <Icon icon={o.icon} />
+                </span>
+              )}
+              {o.name}
+            </div>
+          )}
+        />
+      </div>
+      <div css={Css.df.flexColumn.childGap2.$}>
+        <h1 css={Css.lg.$}>Load test, 1000 Options</h1>
+        <TestSelectField
+          theme={BeamTheme.Dark}
+          label="Project"
+          value={loadTestOptions[2].id}
+          options={loadTestOptions}
+        />
+      </div>
+    </div>
+  );
+}
 
 // Kind of annoying but to get type inference for HasIdAndName working, we
 // have to re-copy/paste the overload here.
