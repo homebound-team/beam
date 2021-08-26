@@ -130,8 +130,8 @@ export function GroupByViewAll() {
     return {
       view: singleFilter({
         options: [
-          { id: "selections", name: "Selections" },
           { id: "all", name: "All" },
+          { id: "selections", name: "Selections" },
         ],
         getOptionValue: (o) => o.id,
         getOptionLabel: (o) => o.name,
