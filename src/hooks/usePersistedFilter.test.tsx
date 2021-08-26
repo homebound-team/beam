@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { Filters } from "src/components/Filters/Filters";
 import { ProjectFilter, Stage } from "src/components/Filters/testDomain";
 import { FilterDefs } from "src/components/Filters/types";
-import { singleFilter } from "src/components/Filters/utils";
+import { booleanFilter, singleFilter } from "src/components/Filters/utils";
 import { usePersistedFilter } from "src/hooks/usePersistedFilter";
 
 describe("usePersistedFilter", () => {
@@ -38,6 +38,16 @@ describe("usePersistedFilter", () => {
     // Then the filter renders with one
     expect(r.filter_stageSingle()).toHaveValue("One");
     expect(r.applied().textContent).toEqual(`{"stageSingle":"ONE"}`);
+  });
+
+  it("uses default filter for booleans", async () => {
+    // Given a filter with a default value
+    type FavoriteFilter = FilterDefs<ProjectFilter>["favorite"];
+    const favorite: FavoriteFilter = booleanFilter({ defaultValue: true });
+    const r = await render(<TestPage filterDefs={{ favorite }} />, withRouter());
+    await wait();
+    // Then the filter renders with one
+    expect(r.applied().textContent).toEqual(`{"favorite":true}`);
   });
 });
 
