@@ -114,7 +114,7 @@ describe("SelectFieldTest", () => {
         data-testid="age"
       />,
     );
-    // When selecting the option which an `undefined` value
+    // When selecting the option with an `undefined` value
     fireEvent.focus(age());
     click(getByRole("option", { name: "Unassigned" }));
     // Then expect the value to be that of the `undefined` entry
