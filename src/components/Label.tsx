@@ -1,7 +1,6 @@
 import React, { LabelHTMLAttributes } from "react";
 import { VisuallyHidden } from "react-aria";
 import { Css } from "src/Css";
-import { BeamTheme } from "src/types";
 
 interface LabelProps {
   // We don't usually have `fooProps`-style props, but this is for/from react-aria
@@ -10,15 +9,14 @@ interface LabelProps {
   suffix?: string;
   // If set, it is recommended to wrap in an element with `position: relative;` set, as the label will have an absolute position.
   hidden?: boolean;
-  // At some point the Theme should be inherited from a Context
-  theme?: BeamTheme;
+  contrast?: boolean;
 }
 
 /** An internal helper component for rendering form labels. */
 export function Label(props: LabelProps) {
-  const { labelProps, label, hidden, suffix, theme, ...others } = props;
+  const { labelProps, label, hidden, suffix, contrast = false, ...others } = props;
   const labelEl = (
-    <label {...labelProps} {...others} css={Css.dib.sm.gray700.mbPx(4).if(theme === BeamTheme.Dark).white.$}>
+    <label {...labelProps} {...others} css={Css.dib.sm.gray700.mbPx(4).if(contrast).white.$}>
       {label}
       {suffix && ` ${suffix}`}
     </label>

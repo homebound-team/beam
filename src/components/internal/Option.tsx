@@ -4,19 +4,17 @@ import { useHover, useOption } from "react-aria";
 import { ListState, TreeState } from "react-stately";
 import { Icon } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
-import { BeamTheme } from "src/types";
 
 /** Represents a single option within a ListBox - used by SelectField and MultiSelectField */
 export function Option<T>({
   item,
   state,
-  theme,
+  contrast = false,
 }: {
   item: Node<T>;
   state: ListState<T> | TreeState<T>;
-  theme?: BeamTheme;
+  contrast?: boolean;
 }) {
-  const isDarkTheme = theme === BeamTheme.Dark;
   const ref = useRef<HTMLLIElement>(null);
   const isDisabled = state.disabledKeys.has(item.key);
   const isSelected = state.selectionManager.isSelected(item.key);
@@ -26,9 +24,9 @@ export function Option<T>({
   const { hoverProps, isHovered } = useHover({});
 
   const themeStyles = {
-    item: Css.gray900.if(isDarkTheme).white.$,
-    hover: Css.bgGray100.if(isDarkTheme).bgGray600.$,
-    focus: Css.add("boxShadow", `inset 0 0 0 1px ${!isDarkTheme ? Palette.LightBlue700 : Palette.LightBlue500}`).$,
+    item: Css.gray900.if(contrast).white.$,
+    hover: Css.bgGray100.if(contrast).bgGray600.$,
+    focus: Css.add("boxShadow", `inset 0 0 0 1px ${!contrast ? Palette.LightBlue700 : Palette.LightBlue500}`).$,
   };
 
   // Get props for the option element.
@@ -65,7 +63,7 @@ export function Option<T>({
       {item.rendered}
       {isSelected && (
         <span css={Css.fs0.$}>
-          <Icon icon="check" color={!isDarkTheme ? Palette.LightBlue700 : Palette.White} />
+          <Icon icon="check" color={!contrast ? Palette.LightBlue700 : Palette.White} />
         </span>
       )}
     </li>

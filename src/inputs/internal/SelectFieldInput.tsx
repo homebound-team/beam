@@ -15,7 +15,6 @@ import { Css, Palette } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { Value, valueToKey } from "src/inputs/Value";
-import { BeamTheme } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 
 interface SelectFieldInputProps<O, V extends Value> {
@@ -40,8 +39,7 @@ interface SelectFieldInputProps<O, V extends Value> {
   selectedOptions: O[];
   getOptionValue: (opt: O) => V;
   sizeToContent: boolean;
-  // Theme only supported locally on SelectFields at the moment. At some point the Theme should be inherited from a Context
-  theme?: BeamTheme;
+  contrast?: boolean;
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
@@ -67,17 +65,16 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
     selectedOptions,
     getOptionValue,
     sizeToContent,
-    theme,
+    contrast = false,
   } = props;
-  const isDarkTheme = theme === "dark";
   const themeStyles = {
-    wrapper: Css.bgWhite.bGray300.gray900.if(isDarkTheme).bgGray700.bGray700.white.$,
-    hover: Css.bgGray100.if(isDarkTheme).bgGray600.bGray600.$,
-    focus: Css.bLightBlue700.if(isDarkTheme).bLightBlue500.$,
+    wrapper: Css.bgWhite.bGray300.gray900.if(contrast).bgGray700.bGray700.white.$,
+    hover: Css.bgGray100.if(contrast).bgGray600.bGray600.$,
+    focus: Css.bLightBlue700.if(contrast).bLightBlue500.$,
     // Not using Truss's inline `if` statement here because `addIn` properties are applied regardless.
-    input: !isDarkTheme ? Css.bgWhite.$ : Css.bgGray700.addIn("&::selection", Css.bgGray800.$).$,
-    disabled: Css.cursorNotAllowed.gray400.bgGray100.if(isDarkTheme).gray500.bgGray700.$,
-    error: Css.bRed500.if(isDarkTheme).bRed400.$,
+    input: !contrast ? Css.bgWhite.$ : Css.bgGray700.addIn("&::selection", Css.bgGray800.$).$,
+    disabled: Css.cursorNotAllowed.gray400.bgGray100.if(contrast).gray500.bgGray700.$,
+    error: Css.bRed500.if(contrast).bRed400.$,
   };
 
   const errorMessageId = `${inputProps.id}-error`;
@@ -95,7 +92,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
   return (
     <Fragment>
       {!inlineLabel && label && (
-        <Label labelProps={labelProps} label={label} suffix={labelSuffix} theme={theme} {...tid.label} />
+        <Label labelProps={labelProps} label={label} suffix={labelSuffix} contrast={contrast} {...tid.label} />
       )}
       <div
         css={{
@@ -227,14 +224,14 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
           >
             <Icon
               icon={state.isOpen ? "chevronUp" : "chevronDown"}
-              color={isDarkTheme ? Palette.Gray400 : Palette.Gray700}
+              color={contrast ? Palette.Gray400 : Palette.Gray700}
             />
           </button>
         )}
       </div>
 
-      {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} theme={theme} {...tid.errorMsg} />}
-      {helperText && <HelperText helperText={helperText} theme={theme} {...tid.helperText} />}
+      {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} contrast={contrast} {...tid.errorMsg} />}
+      {helperText && <HelperText helperText={helperText} contrast={contrast} {...tid.helperText} />}
     </Fragment>
   );
 }
