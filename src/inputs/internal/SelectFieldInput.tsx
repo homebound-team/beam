@@ -140,10 +140,10 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
           onKeyDown={(e) => {
             // We need to do some custom logic when using MultiSelect, as react-aria/stately Combobox doesn't support multiselect out of the box.
             if (isMultiSelect) {
-              // Enter/Tab should toggle the focused item.
-              if (e.key === "Enter" || e.key === "Tab") {
+              // Enter should toggle the focused item.
+              if (e.key === "Enter") {
                 // Prevent form submissions if menu is open.
-                if (state.isOpen && e.key === "Enter") {
+                if (state.isOpen) {
                   e.preventDefault();
                 }
 

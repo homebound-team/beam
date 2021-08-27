@@ -79,7 +79,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
       setFieldState({
         ...fieldState,
         isOpen: true,
-        inputValue: nothingSelectedText,
+        inputValue: state.isOpen ? "" : nothingSelectedText,
         selectedKeys: [],
         selectedOptions: [],
       });
@@ -93,8 +93,8 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     if (multiselect) {
       setFieldState({
         isOpen: true,
-        // Always reset inputValue upon selection in MultiSelectField. The input's value will be updated upon leaving/blurring the field.
-        inputValue: "",
+        // If menu is open then reset inputValue to "". Otherwise set inputValue depending on number of options selected.
+        inputValue: state.isOpen ? "" : keysArray.length === 1 ? getOptionLabel(firstSelectedOption!) : "",
         selectedKeys: keysArray as Key[],
         selectedOptions: options.filter((o) => keysArray.includes(valueToKey(getOptionValue(o)))),
         filteredOptions: options,
