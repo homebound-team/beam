@@ -74,6 +74,15 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     if (keys === "all") {
       return;
     }
+
+    // `onSelectionChange` may be called even if the selection's didn't change.
+    // For example, we trigger this `onBlur` of SelectFieldInput in order to reset the input's value.
+    // In those cases, we do not need to again call `onSelect` so let's avoid it if we can.
+    const selectionChanged = !(
+      keys.size === state.selectionManager.selectedKeys.size &&
+      [...keys].every((value) => state.selectionManager.selectedKeys.has(value))
+    );
+
     if (multiselect && keys.size === 0) {
       // "All" happens if we selected everything or nothing.
       setFieldState({
@@ -83,7 +92,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         selectedKeys: [],
         selectedOptions: [],
       });
-      onSelect && onSelect([]);
+      selectionChanged && onSelect([]);
       return;
     }
     const keysArray = [...keys.values()];
@@ -92,7 +101,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     const firstSelectedOption = options.find((o) => valueToKey(getOptionValue(o)) === firstKey);
     if (multiselect) {
       setFieldState({
-        isOpen: true,
+        ...fieldState,
         // If menu is open then reset inputValue to "". Otherwise set inputValue depending on number of options selected.
         inputValue: state.isOpen ? "" : keysArray.length === 1 ? getOptionLabel(firstSelectedOption!) : "",
         selectedKeys: keysArray as Key[],
@@ -108,7 +117,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         selectedOptions: firstSelectedOption ? [firstSelectedOption] : [],
       });
     }
-    onSelect(([...keys.values()] as Key[]).map(keyToValue) as V[]);
+    selectionChanged && onSelect(([...keys.values()] as Key[]).map(keyToValue) as V[]);
   }
 
   function onInputChange(value: string) {

@@ -187,15 +187,9 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             state.close();
             setIsFocused(false);
 
-            // if the text input doesn't have the expected value, then reset it by setting the selected keys, which will in turn set the `inputProps`
-            if (
-              // If there is only one option selected, then the value for that option should be displayed in the text input.
-              (selectedOptions.length === 1 && inputProps.value !== getOptionValue(selectedOptions[0])) ||
-              // Otherwise, if no options, or multiple options are selected, then the input's value should be empty
-              (selectedOptions.length !== 1 && inputProps.value !== "")
-            ) {
-              state.selectionManager.setSelectedKeys(selectedOptions.map((so) => valueToKey(getOptionValue(so))));
-            }
+            // Always call `setSelectedKeys` onBlur with its existing selected keys..
+            // This ensures the field's `input.value` resets to what it should be in case it doesn't currently match.
+            state.selectionManager.setSelectedKeys(state.selectionManager.selectedKeys);
           }}
           onFocus={(e) => {
             if (isReadOnly) return;
