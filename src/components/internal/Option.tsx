@@ -6,7 +6,15 @@ import { Icon } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
 
 /** Represents a single option within a ListBox - used by SelectField and MultiSelectField */
-export function Option<T>({ item, state }: { item: Node<T>; state: ListState<T> | TreeState<T> }) {
+export function Option<T>({
+  item,
+  state,
+  contrast = false,
+}: {
+  item: Node<T>;
+  state: ListState<T> | TreeState<T>;
+  contrast?: boolean;
+}) {
   const ref = useRef<HTMLLIElement>(null);
   const isDisabled = state.disabledKeys.has(item.key);
   const isSelected = state.selectionManager.isSelected(item.key);
@@ -14,6 +22,12 @@ export function Option<T>({ item, state }: { item: Node<T>; state: ListState<T> 
   // since focus never leaves the text input in a ComboBox
   const isFocused = state.selectionManager.focusedKey === item.key;
   const { hoverProps, isHovered } = useHover({});
+
+  const themeStyles = {
+    item: Css.gray900.if(contrast).white.$,
+    hover: Css.bgGray100.if(contrast).bgGray600.$,
+    focus: Css.add("boxShadow", `inset 0 0 0 1px ${!contrast ? Palette.LightBlue700 : Palette.LightBlue500}`).$,
+  };
 
   // Get props for the option element.
   // Prevent options from receiving browser focus via shouldUseVirtualFocus.
@@ -40,15 +54,16 @@ export function Option<T>({ item, state }: { item: Node<T>; state: ListState<T> 
       {...hoverProps}
       ref={ref as any}
       css={{
-        ...Css.df.itemsCenter.justifyBetween.py1.px2.mh("42px").cursorPointer.gray900.sm.$,
-        ...(isHovered ? Css.bgGray100.$ : {}),
-        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
+        ...Css.df.itemsCenter.justifyBetween.py1.px2.mh("42px").cursorPointer.sm.$,
+        ...themeStyles.item,
+        ...(isHovered ? themeStyles.hover : {}),
+        ...(isFocused ? themeStyles.focus : {}),
       }}
     >
       {item.rendered}
       {isSelected && (
         <span css={Css.fs0.$}>
-          <Icon icon="check" color={Palette.LightBlue700} />
+          <Icon icon="check" color={!contrast ? Palette.LightBlue700 : Palette.White} />
         </span>
       )}
     </li>

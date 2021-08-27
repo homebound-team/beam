@@ -60,6 +60,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     sizeToContent = false,
     values,
     nothingSelectedText = "",
+    contrast,
     ...otherProps
   } = props;
 
@@ -263,6 +264,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         selectedOptions={fieldState.selectedOptions}
         getOptionValue={getOptionValue}
         sizeToContent={sizeToContent}
+        contrast={contrast}
       />
       {state.isOpen && (
         <Popover
@@ -279,6 +281,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
             selectedOptions={fieldState.selectedOptions}
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
+            contrast={contrast}
           />
         </Popover>
       )}
@@ -304,4 +307,6 @@ export interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
   sizeToContent?: boolean;
   /** The text to show when nothing is selected, i.e. could be "All" for filters. */
   nothingSelectedText?: string;
+  /** When set the SelectField is expected to be put on a darker background */
+  contrast?: boolean;
 }

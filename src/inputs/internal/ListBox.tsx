@@ -14,6 +14,7 @@ interface ListBoxProps<O, V extends Key> {
   selectedOptions: O[];
   getOptionLabel: (opt: O) => string;
   getOptionValue: (opt: O) => V;
+  contrast?: boolean;
 }
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
@@ -28,6 +29,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     selectedOptions,
     getOptionLabel,
     getOptionValue,
+    contrast = false,
     ...otherProps
   } = props;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...otherProps }, state, listBoxRef);
@@ -38,7 +40,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
   return (
     <div
       css={{
-        ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.$,
+        ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.if(contrast).bgGray700.$,
         "&:hover": Css.bshHover.$,
       }}
       ref={listBoxRef}
@@ -70,7 +72,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
             const keys = [...state.collection.getKeys()];
             const item = state.collection.getItem(keys[idx]);
             if (item) {
-              return <Option key={item.key} item={item} state={state} />;
+              return <Option key={item.key} item={item} state={state} contrast={contrast} />;
             }
           }}
         />
