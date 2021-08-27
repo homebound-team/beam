@@ -1,4 +1,4 @@
-import { click, input, render, RenderResult } from "@homebound/rtl-utils";
+import { click, render, RenderResult } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MultiSelectField, MultiSelectFieldProps } from "src/inputs";
@@ -17,7 +17,7 @@ describe("MultiSelectFieldTest", () => {
     // Given a MultiSelectField with 1 selected value
     const r = await render(<TestMultiSelectField values={["1"] as string[]} options={options} />);
     // That initially has "One" selected
-    expect(r.getByRole("combobox")).toHaveValue("One");
+    expect(r.age()).toHaveValue("One");
     // When we select the 3rd option
     selectOption(r, "Three");
     // Then onSelect was called
@@ -26,69 +26,66 @@ describe("MultiSelectFieldTest", () => {
 
   it("has an empty text box not set", async () => {
     // Given a MultiSelectField with no selected values
-    const { getByRole } = await render(<TestMultiSelectField values={[]} options={options} />);
+    const { age } = await render(<TestMultiSelectField values={[]} options={options} />);
     // That initially has "One" selected
-    const text = getByRole("combobox");
-    expect(text).toHaveValue("");
+    expect(age()).toHaveValue("");
   });
 
   it("can have custom an empty text", async () => {
     // Given a MultiSelectField with no selected values
-    const r = await render(<TestMultiSelectField values={[]} options={options} nothingSelectedText="All" />);
-    const text = r.getByRole("combobox");
+    const { age } = await render(<TestMultiSelectField values={[]} options={options} nothingSelectedText="All" />);
     // Then expect the text input value to show the `nothingSelectedText` value
-    expect(text).toHaveValue("All");
+    expect(age()).toHaveValue("All");
   });
 
   it("only populates input field with selected single option on blur", async () => {
     // Given a MultiSelectField with no selected values
     const r = await render(<TestMultiSelectField values={[]} options={options} nothingSelectedText="All" />);
-    // That initially has "One" selected
-    const text = r.getByRole("combobox");
     // And when we select the first option
     selectOption(r, "One");
     // Then the input field is still empty
-    expect(text).toHaveValue("");
+    expect(r.age()).toHaveValue("");
 
     // When blurring the field
-    fireEvent.blur(text);
-    // Then the field should populate with the selected options's value.
-    expect(text).toHaveValue("One");
+    fireEvent.blur(r.age());
+    // Calling blur twice - First blur closes menu and retains focus on input. Second blur actually blurs the input.
+    fireEvent.blur(r.age());
+    // Then the field should populate with the selected option's value.
+    expect(r.age()).toHaveValue("One");
   });
 
   it("resets input value on blur if it does not match the selected option", async () => {
     // Given a MultiSelectField without a selected options
-    const { getByRole, age } = await render(<TestMultiSelectField values={[]} options={options} />);
+    const r = await render(<TestMultiSelectField values={[]} options={options} />);
     // When changing the inputs value, and not selecting an option
-    input(age(), "asdf");
+    fireEvent.input(r.age(), "asdf");
     // And `blur`ing the field
-    fireEvent.blur(age());
+    fireEvent.blur(r.age());
     // Then expect the value to be reset to empty
-    expect(age()).toHaveValue("");
+    expect(r.age()).toHaveValue("");
 
     // Given a selected option
-    fireEvent.focus(age());
-    fireEvent.input(age(), { target: { value: "T" } });
-    click(getByRole("option", { name: "Three" }));
+    selectOption(r, "Three");
     // When changing the inputs value to no longer match the selected option
-    input(age(), "asdf");
+    fireEvent.input(r.age(), "asdf");
+
     // And `blur`ing the field
-    fireEvent.blur(age());
+    fireEvent.blur(r.age());
+    // Calling blur twice - First blur closes menu and retains focus on input. Second blur actually blurs the input.
+    fireEvent.blur(r.age());
     // Then expect the value to be reset to the selected option
-    expect(age()).toHaveValue("Three");
+    expect(r.age()).toHaveValue("Three");
 
     // When selecting multiple options
-    fireEvent.focus(age());
-    fireEvent.input(age(), { target: { value: "T" } });
-    click(getByRole("option", { name: "Two" }));
+    selectOption(r, "Two");
     // Then the input value should be empty
-    expect(age()).toHaveValue("");
+    expect(r.age()).toHaveValue("");
     // When changing the inputs value to no longer be empty, as expected for multiple options
-    input(age(), "asdf");
+    fireEvent.input(r.age(), "asdf");
     // And `blur`ing the field
-    fireEvent.blur(age());
+    fireEvent.blur(r.age());
     // Then expect the value to be reset to empty
-    expect(age()).toHaveValue("");
+    expect(r.age()).toHaveValue("");
   });
 
   it("does not populate input field with multiple items selected", async () => {

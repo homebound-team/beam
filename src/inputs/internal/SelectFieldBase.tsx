@@ -74,16 +74,25 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     if (keys === "all") {
       return;
     }
+
+    // `onSelectionChange` may be called even if the selection's didn't change.
+    // For example, we trigger this `onBlur` of SelectFieldInput in order to reset the input's value.
+    // In those cases, we do not need to again call `onSelect` so let's avoid it if we can.
+    const selectionChanged = !(
+      keys.size === state.selectionManager.selectedKeys.size &&
+      [...keys].every((value) => state.selectionManager.selectedKeys.has(value))
+    );
+
     if (multiselect && keys.size === 0) {
       // "All" happens if we selected everything or nothing.
       setFieldState({
         ...fieldState,
         isOpen: true,
-        inputValue: nothingSelectedText,
+        inputValue: state.isOpen ? "" : nothingSelectedText,
         selectedKeys: [],
         selectedOptions: [],
       });
-      onSelect && onSelect([]);
+      selectionChanged && onSelect([]);
       return;
     }
     const keysArray = [...keys.values()];
@@ -92,9 +101,9 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     const firstSelectedOption = options.find((o) => valueToKey(getOptionValue(o)) === firstKey);
     if (multiselect) {
       setFieldState({
-        isOpen: true,
-        // Always reset inputValue upon selection in MultiSelectField. The input's value will be updated upon leaving/blurring the field.
-        inputValue: "",
+        ...fieldState,
+        // If menu is open then reset inputValue to "". Otherwise set inputValue depending on number of options selected.
+        inputValue: state.isOpen ? "" : keysArray.length === 1 ? getOptionLabel(firstSelectedOption!) : "",
         selectedKeys: keysArray as Key[],
         selectedOptions: options.filter((o) => keysArray.includes(valueToKey(getOptionValue(o)))),
         filteredOptions: options,
@@ -108,7 +117,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         selectedOptions: firstSelectedOption ? [firstSelectedOption] : [],
       });
     }
-    onSelect(([...keys.values()] as Key[]).map(keyToValue) as V[]);
+    selectionChanged && onSelect(([...keys.values()] as Key[]).map(keyToValue) as V[]);
   }
 
   function onInputChange(value: string) {
