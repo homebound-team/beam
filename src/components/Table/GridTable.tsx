@@ -174,7 +174,7 @@ export function setGridTableDefaults(opts: Partial<GridTableDefaults>): void {
 
 type RenderAs = "div" | "table" | "virtual";
 
-type RowTuple<R extends Kinded> = [GridDataRow<R>, string[], ReactElement, Array<ReactNode | GridCellContent>];
+type RowTuple<R extends Kinded> = [GridDataRow<R>, ReactElement];
 
 /**
  * The sort settings for the current table; whether it's client-side or server-side.
@@ -306,9 +306,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   }, [columns, rows, sorting, sortState]);
   const noData = !rows.some((row) => row.kind !== "header");
 
-  // For each row, keep it's ReactElement (React.memo'd) + its filter values, so we can re-filter w/o re-evaluating this useMemo.
-  const allRows: RowTuple<R>[] = useMemo(() => {
-    return maybeSorted.map((row) => {
+  // For each row, keep it's it + it's ReactElement (React.memo'd)
+  let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
+    // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
+    const filters = (filter && filter.split(/ +/)) || [];
+
+    function makeComponent(row: GridDataRow<R>): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
       const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : { sorting };
@@ -317,7 +320,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       // Note that we do memoized on toggleCollapsedId, but it's stable thanks to useToggleIds.
       const isCollapsed = collapsedIds.includes(row.id);
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
-      const rowElement = (
+      return (
         <RowComponent
           key={`${row.kind}-${row.id}`}
           {...{
@@ -334,13 +337,43 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           }}
         />
       );
-      const filterValues = columns.map((c) => applyRowFn(c, row));
-      return [row, row.parentIds || [], rowElement, filterValues];
-    });
+    }
+
+    // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
+    const headerRows: RowTuple<R>[] = [];
+    const filteredRows: RowTuple<R>[] = [];
+
+    // Depth-first to filter
+    function visit(row: GridDataRow<R>): void {
+      if (row.kind === "header") {
+        headerRows.push([row, makeComponent(row)]);
+        return;
+      }
+
+      const passesFilter =
+        filters.length === 0 ||
+        filters.every((filter) =>
+          columns.map((c) => applyRowFn(c, row)).some((maybeContent) => matchesFilter(maybeContent, filter)),
+        );
+      if (!passesFilter) {
+        return;
+      }
+
+      filteredRows.push([row, makeComponent(row)]);
+      const isCollapsed = collapsedIds.includes(row.id);
+      if (!isCollapsed && row.children) {
+        row.children.forEach(visit);
+      }
+    }
+
+    maybeSorted.forEach(visit);
+
+    return [headerRows, filteredRows];
   }, [
     as,
     maybeSorted,
     columns,
+    filter,
     style,
     rowStyles,
     sorting,
@@ -352,20 +385,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     toggleCollapsedId,
     observeRows,
   ]);
-
-  // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
-  const headerRows = allRows.filter(([row]) => row.kind === "header");
-
-  // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
-  const filters = (filter && filter.split(/ +/)) || [];
-  let filteredRows = allRows.filter(([row, parentIds, , rowValues]) => {
-    const notHeader = row.kind !== "header";
-    const passesCollapsed = !parentIds.some((id) => collapsedIds.includes(id));
-    const passesFilter =
-      filters.length === 0 ||
-      filters.every((filter) => rowValues.some((maybeContent) => matchesFilter(maybeContent, filter)));
-    return notHeader && passesFilter && passesCollapsed;
-  });
 
   let tooManyClientSideRows = false;
   if (filterMaxRows && filteredRows.length > filterMaxRows) {
@@ -469,14 +488,14 @@ function renderCssGrid<R extends Kinded>(
       }}
       data-testid={id}
     >
-      {headerRows.map(([, , node]) => node)}
+      {headerRows.map(([, node]) => node)}
       {/* Show an all-column-span info message if it's set. */}
       {firstRowMessage && (
         <div css={Css.add("gridColumn", `${columns.length} span`).$}>
           <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
         </div>
       )}
-      {filteredRows.map(([, , node]) => node)}
+      {filteredRows.map(([, node]) => node)}
     </div>
   );
 }
@@ -505,7 +524,7 @@ function renderTable<R extends Kinded>(
       }}
       data-testid={id}
     >
-      <thead>{headerRows.map(([, , node]) => node)}</thead>
+      <thead>{headerRows.map(([, node]) => node)}</thead>
       <tbody>
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
@@ -515,7 +534,7 @@ function renderTable<R extends Kinded>(
             </td>
           </tr>
         )}
-        {filteredRows.map(([, , node]) => node)}
+        {filteredRows.map(([, node]) => node)}
       </tbody>
     </table>
   );
@@ -566,7 +585,7 @@ function renderVirtual<R extends Kinded>(
         // so we pick the right header / first row message / actual row.
         let i = index;
         if (i < headerRows.length) {
-          return headerRows[i][2];
+          return headerRows[i][1];
         }
         i -= headerRows.length;
         if (firstRowMessage) {
@@ -579,7 +598,7 @@ function renderVirtual<R extends Kinded>(
           }
           i -= 1;
         }
-        return filteredRows[i][2];
+        return filteredRows[i][1];
       }}
       totalCount={(headerRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)}
     />
@@ -635,6 +654,12 @@ function calcGridColumns(columns: GridColumn<any>[]): string {
  */
 type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<K, V> ? T : never;
 
+/** A specific kind of row, including the GridDataRow props. */
+type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "kind", P> & {
+  id: string;
+  children: GridDataRow<R>[];
+};
+
 /**
  * Defines how a single column will render each given row `kind` in `R`.
  *
@@ -647,11 +672,11 @@ type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<
  * column being sorted, in which case we use the GridCellContent.value.
  */
 export type GridColumn<R extends Kinded, S = {}> = {
-  [P in R["kind"]]:
+  [K in R["kind"]]:
     | string
-    | (DiscriminateUnion<R, "kind", P> extends { data: infer D }
-        ? (data: D, id: string) => ReactNode | GridCellContent
-        : (row: DiscriminateUnion<R, "kind", P>) => ReactNode | GridCellContent);
+    | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
+        ? (data: D, row: GridRowKind<R, K>) => ReactNode | GridCellContent
+        : (row: GridRowKind<R, K>) => ReactNode | GridCellContent);
 } & {
   /** The column's grid column width, defaults to `auto`. */
   w?: number | string;
@@ -759,18 +784,18 @@ type MaybeFn<T> = T | (() => T);
 /**
  * The data for any row in the table, marked by `kind` so that each column knows how to render it.
  *
- * This should contain very little presentation data, i.e. the bulk of the keys should be data for
- * the given `kind: ...` of each row (which we pull in via the `DiscriminateUnion` intersection).
+ * Each `kind` should contain very little presentation logic, i.e. mostly just off-the-wire data from
+ * a GraphQL query.
  *
- * The presentation concerns instead live in each GridColumn definition, which formats a given
- * data row for its column.
+ * The presentation concerns instead mainly live in each GridColumn definition, which will format/render
+ * each kind's data for that specific row+column (i.e. cell) combination.
  */
 export type GridDataRow<R extends Kinded> = {
   kind: R["kind"];
   /** Combined with the `kind` to determine a table wide React key. */
   id: string;
   /** A list of parent/grand-parent ids for collapsing parent/child rows. */
-  parentIds?: string[];
+  children?: GridDataRow<R>[];
 } & DiscriminateUnion<R, "kind", R["kind"]>;
 
 interface GridRowProps<R extends Kinded, S> {
@@ -1050,9 +1075,12 @@ function getJustification(column: GridColumn<any>, maybeContent: ReactNode | Gri
   return { ...Css.justify(alignmentToJustify[alignment]).$, ...textAlign };
 }
 
-// TODO This is very WIP / proof-of-concept and needs flushed out a lot more to handle nested batches.
 function sortRows<R extends Kinded>(columns: GridColumn<R>[], rows: GridDataRow<R>[], sortState: SortState<number>) {
   const sorted: GridDataRow<R>[] = [];
+  // The "watch current batch" code can probably go away, and was the original
+  // version of sortRows that expected rows to be _flat_, and so we were going
+  // to detect/guess hierarchy from watching `kind` change. This was cute, but
+  // now we just have the client pass in the existing structure.
   let currentKind: R["kind"] | undefined = undefined;
   let currentBatch: GridDataRow<R>[] = [];
 
@@ -1066,6 +1094,10 @@ function sortRows<R extends Kinded>(columns: GridColumn<R>[], rows: GridDataRow<
       sorted.push(...currentBatch);
       currentBatch = [row];
       currentKind = row.kind;
+    }
+    // Recursively sort child rows
+    if (row.children) {
+      row.children = sortRows(columns, row.children, sortState);
     }
   }
 
@@ -1158,7 +1190,6 @@ function useSortState<R extends Kinded, S>(
         const firstSortableColumn = columns.findIndex((c) => c.clientSideSort !== false);
         return [firstSortableColumn as any as S, "ASC"];
       }
-      return undefined;
     } else {
       return sorting?.value;
     }
@@ -1268,11 +1299,16 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
         } else {
           // Otherwise push `header` on the list as a hint that we're in the collapsed-all state
           collapsedIds.push("header");
-          // Find all non-leaf nodes
+          // Find all non-leaf rows
           const parentIds = new Set<string>();
-          rows.forEach((r) => {
-            (r.parentIds || []).forEach((id) => parentIds.add(id));
-          });
+          const todo = [...rows];
+          while (todo.length > 0) {
+            const r = todo.pop()!;
+            if (r.children) {
+              parentIds.add(r.id);
+              todo.push(...r.children);
+            }
+          }
           // And then mark all parent rows as collapsed.
           collapsedIds.push(...parentIds);
         }
@@ -1301,30 +1337,6 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const copy = useMemo(() => [...collapsedIds], [tick, collapsedIds]);
   return [copy, toggleId] as const;
-}
-
-/**
- * Decorates a list of `GridColumn`s to `Observer`-ize their render methods.
- *
- * This is useful when your rows have mobx observables/proxies as their data, and you want
- * the GridTable cells to re-render as those observables change, without having to add
- * the `Observer` component + function boilerplate in each cell.
- */
-export function observableColumns<T extends Kinded>(cols: GridColumn<T>[]): GridColumn<T>[] {
-  return cols.map((col) => {
-    return Object.fromEntries(
-      Object.entries(col).map(([key, value]) => {
-        // Note that currently we're guessing that all functions are the kind() render
-        // functions and any "setting" flags, i.e. the width, sortValue, are not functions.
-        // If the heuristic eventually doesn't work, we could just hard-code all of the known
-        // GridColumn setting keys.
-        if (typeof value === "function") {
-          return [key, (row: any) => <Observer>{() => value(row)}</Observer>];
-        }
-        return [key, value];
-      }),
-    );
-  }) as any;
 }
 
 function getKinds<R extends Kinded>(columns: GridColumn<R>[]): R[] {

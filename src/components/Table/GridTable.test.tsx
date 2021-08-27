@@ -294,8 +294,7 @@ describe("GridTable", () => {
         />,
       );
       // Then when sorted by the 2nd column
-      const { sortHeader_1 } = r;
-      click(sortHeader_1);
+      click(r.sortHeader_1);
       // Then the `value: undefined` row is first
       expect(cell(r, 1, 0)).toHaveTextContent("a");
       expect(cell(r, 2, 0)).toHaveTextContent("d");
@@ -380,6 +379,51 @@ describe("GridTable", () => {
       // Then the data is sorted by name
       expect(cell(r, 1, 0)).toHaveTextContent("a");
       expect(cell(r, 2, 0)).toHaveTextContent("b");
+    });
+
+    it("can sort nested rows", async () => {
+      // Given a table with nested rows
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          // And there is no initial sort given
+          sorting={{ on: "client" }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            {
+              ...{ kind: "data", id: "2", name: "2", value: 2 },
+              children: [
+                { kind: "data", id: "20", name: "1", value: 1 },
+                { kind: "data", id: "21", name: "2", value: 2 },
+              ],
+            },
+            {
+              ...{ kind: "data", id: "1", name: "1", value: 1 },
+              children: [
+                { kind: "data", id: "10", name: "1", value: 1 },
+                { kind: "data", id: "11", name: "2", value: 2 },
+              ],
+            },
+          ]}
+        />,
+      );
+      // Then the data is sorted by 1 (1 2) then 2 (1 2)
+      expect(cell(r, 1, 0)).toHaveTextContent("1");
+      expect(cell(r, 2, 0)).toHaveTextContent("1");
+      expect(cell(r, 3, 0)).toHaveTextContent("2");
+      expect(cell(r, 4, 0)).toHaveTextContent("2");
+      expect(cell(r, 5, 0)).toHaveTextContent("1");
+      expect(cell(r, 6, 0)).toHaveTextContent("2");
+      // And when we reverse the sort
+      click(r.sortHeader_0);
+      // Then the data is sorted by 2 (2 1) then 1 (2 1)
+      expect(cell(r, 1, 0)).toHaveTextContent("2");
+      expect(cell(r, 2, 0)).toHaveTextContent("2");
+      expect(cell(r, 3, 0)).toHaveTextContent("1");
+      expect(cell(r, 4, 0)).toHaveTextContent("1");
+      expect(cell(r, 5, 0)).toHaveTextContent("2");
+      expect(cell(r, 6, 0)).toHaveTextContent("1");
     });
 
     it("throws an error if a column value is not sortable", async () => {
@@ -611,9 +655,15 @@ describe("GridTable", () => {
   it("can collapse parent rows", async () => {
     // Given a parent with a child and grandchild
     const rows: GridDataRow<NestedRow>[] = [
-      { kind: "parent", id: "p1", name: "parent 1" },
-      { kind: "child", id: "p1c1", parentIds: ["p1"], name: "child p1c1" },
-      { kind: "grandChild", id: "p1c1g1", parentIds: ["p1", "p1c1"], name: "grandchild p1c1g1" },
+      {
+        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+            children: [{ kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" }],
+          },
+        ],
+      },
     ];
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
     // And all three rows are initially rendered
@@ -630,9 +680,15 @@ describe("GridTable", () => {
   it("can collapse child rows", async () => {
     // Given a parent with a child and grandchild
     const rows: GridDataRow<NestedRow>[] = [
-      { kind: "parent", id: "p1", name: "parent 1" },
-      { kind: "child", id: "p1c1", parentIds: ["p1"], name: "child p1c1" },
-      { kind: "grandChild", id: "p1c1g1", parentIds: ["p1", "p1c1"], name: "grandchild p1c1g1" },
+      {
+        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+            children: [{ kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" }],
+          },
+        ],
+      },
     ];
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
     // And all three rows are initially rendered
@@ -652,9 +708,15 @@ describe("GridTable", () => {
     // Given a parent with a child and grandchild
     const rows: GridDataRow<NestedRow>[] = [
       { kind: "header", id: "header" },
-      { kind: "parent", id: "p1", name: "parent 1" },
-      { kind: "child", id: "p1c1", parentIds: ["p1"], name: "child p1c1" },
-      { kind: "grandChild", id: "p1c1g1", parentIds: ["p1", "p1c1"], name: "grandchild p1c1g1" },
+      {
+        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+            children: [{ kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" }],
+          },
+        ],
+      },
     ];
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
     // And all three rows are initially rendered
@@ -684,10 +746,8 @@ describe("GridTable", () => {
     // And two parents with a child each
     const rows: GridDataRow<NestedRow>[] = [
       { kind: "header", id: "header" },
-      { kind: "parent", id: "p1", name: "parent 1" },
-      { kind: "child", id: "p1c1", parentIds: ["p1"], name: "child p1c1" },
-      { kind: "parent", id: "p2", name: "parent 2" },
-      { kind: "child", id: "p2c1", parentIds: ["p2"], name: "child p2c1" },
+      { kind: "parent", id: "p1", name: "parent 1", children: [{ kind: "child", id: "p1c1", name: "child p1c1" }] },
+      { kind: "parent", id: "p2", name: "parent 2", children: [{ kind: "child", id: "p2c1", name: "child p2c1" }] },
     ];
 
     // When we render the table with the persistCollapse prop set
