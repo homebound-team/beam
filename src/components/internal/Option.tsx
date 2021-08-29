@@ -26,6 +26,7 @@ export function Option<T>({
   const themeStyles = {
     item: Css.gray900.if(contrast).white.$,
     hover: Css.bgGray100.if(contrast).bgGray600.$,
+    disabled: Css.cursorNotAllowed.gray600.if(contrast).gray500.$,
     focus: Css.add("boxShadow", `inset 0 0 0 1px ${!contrast ? Palette.LightBlue700 : Palette.LightBlue500}`).$,
   };
 
@@ -56,8 +57,9 @@ export function Option<T>({
       css={{
         ...Css.df.itemsCenter.justifyBetween.py1.px2.mh("42px").cursorPointer.sm.$,
         ...themeStyles.item,
-        ...(isHovered ? themeStyles.hover : {}),
+        ...(isHovered && !isDisabled ? themeStyles.hover : {}),
         ...(isFocused ? themeStyles.focus : {}),
+        ...(isDisabled ? themeStyles.disabled : {}),
       }}
     >
       {item.rendered}

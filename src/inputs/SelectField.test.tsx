@@ -121,6 +121,32 @@ describe("SelectFieldTest", () => {
     expect(age()).toHaveValue("Unassigned");
   });
 
+  it("respects disabled options", async () => {
+    const onSelect = jest.fn();
+    // Given a Select Field with a disabled option
+    const { age, getByRole } = await render(
+      <SelectField
+        label="Age"
+        value="1"
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+        disabledKeys={["2"]}
+        onSelect={onSelect}
+      />,
+    );
+    // When opening the menu
+    fireEvent.focus(age());
+    const optionTwo = getByRole("option", { name: "Two" });
+    // Then expect the disabled option to have the correct aria attributes
+    expect(optionTwo).toHaveAttribute("aria-disabled", "true");
+    // And when clicking on that option
+    click(optionTwo);
+    // Then the `onSelect` callback is not called
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
   function TestSelectField<O, V extends Value>(props: Omit<SelectFieldProps<O, V>, "onSelect">): JSX.Element {
     const [selected, setSelected] = useState<V | undefined>(props.value);
     return (

@@ -56,6 +56,7 @@ function Template(args: SelectFieldProps<any, any>) {
         <h1 css={Css.lg.$}>{args.compact ? "Compact" : "Regular"}</h1>
         <TestSelectField
           {...args}
+          disabledKeys={["1"]}
           label="Favorite Icon"
           value={options[2].id}
           options={options}
