@@ -1288,7 +1288,8 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
         } else {
           // Otherwise push `header` on the list as a hint that we're in the collapsed-all state
           collapsedIds.push("header");
-          // Find all non-leaf rows
+          // Find all non-leaf rows so that toggling "all collapsed" -> "all not collapsed" opens
+          // the parent rows of any level.
           const parentIds = new Set<string>();
           const todo = [...rows];
           while (todo.length > 0) {
