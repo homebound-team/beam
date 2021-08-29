@@ -300,7 +300,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const maybeSorted = useMemo(() => {
     if (sorting?.on === "client" && sortState) {
       // If using client-side sort, the sortState use S = number
-      return sortRows(columns, rows, sortState as any as SortState<number>);
+      sortRows(columns, rows, sortState as any as SortState<number>);
+      return rows;
     }
     return rows;
   }, [columns, rows, sorting, sortState]);
@@ -1075,37 +1076,25 @@ function getJustification(column: GridColumn<any>, maybeContent: ReactNode | Gri
   return { ...Css.justify(alignmentToJustify[alignment]).$, ...textAlign };
 }
 
-function sortRows<R extends Kinded>(columns: GridColumn<R>[], rows: GridDataRow<R>[], sortState: SortState<number>) {
-  const sorted: GridDataRow<R>[] = [];
-  // The "watch current batch" code can probably go away, and was the original
-  // version of sortRows that expected rows to be _flat_, and so we were going
-  // to detect/guess hierarchy from watching `kind` change. This was cute, but
-  // now we just have the client pass in the existing structure.
-  let currentKind: R["kind"] | undefined = undefined;
-  let currentBatch: GridDataRow<R>[] = [];
-
+// We currently mutate `rows` while sorting; this would be bad if rows was directly
+// read from an immutable store like the apollo cache, but we basically always make
+// a copy in the process of adding our `kind` tags.
+//
+// I suppose that is an interesting idea, would we ever want to render a GQL query/cache
+// result directly into the table without first doing a kind-mapping? Like maybe we could
+// use __typename as the kind.
+function sortRows<R extends Kinded>(
+  columns: GridColumn<R>[],
+  rows: GridDataRow<R>[],
+  sortState: SortState<number>,
+): void {
+  sortBatch(columns, rows, sortState);
+  // Recursively sort child rows
   for (const row of rows) {
-    if (row.kind === "header") {
-      sorted.push(row);
-    } else if (row.kind === currentKind) {
-      currentBatch.push(row);
-    } else {
-      sortBatch(columns, currentBatch, sortState);
-      sorted.push(...currentBatch);
-      currentBatch = [row];
-      currentKind = row.kind;
-    }
-    // Recursively sort child rows
     if (row.children) {
-      row.children = sortRows(columns, row.children, sortState);
+      sortRows(columns, row.children, sortState);
     }
   }
-
-  // Flush last batch
-  sortBatch(columns, currentBatch, sortState);
-  sorted.push(...currentBatch);
-
-  return sorted;
 }
 
 function sortBatch<R extends Kinded>(
