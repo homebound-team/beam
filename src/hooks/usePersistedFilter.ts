@@ -25,8 +25,8 @@ export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFi
     () =>
       Object.fromEntries(
         safeEntries(filterDefs)
-          .filter(([, def]) => def.defaultValue !== undefined)
-          .map(([key, def]) => [key, (def as any).defaultValue]),
+          .filter(([key, def]) => def(key as string).defaultValue !== undefined)
+          .map(([key, def]) => [key, def(key as string).defaultValue]),
       ),
     [filterDefs],
   );

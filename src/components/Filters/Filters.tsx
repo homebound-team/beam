@@ -1,12 +1,6 @@
 import { memo, useMemo } from "react";
 import { Button } from "src/components/Button";
-import {
-  filterBuilder,
-  FilterDefs,
-  FilterModal,
-  filterTestIdPrefix,
-  getFilterComponents,
-} from "src/components/Filters";
+import { Filter, FilterDefs, FilterImpls, FilterModal, filterTestIdPrefix, updateFilter } from "src/components/Filters";
 import { useModal } from "src/components/Modal";
 import { Css } from "src/Css";
 import { SelectField } from "src/inputs/SelectField";
@@ -19,7 +13,7 @@ interface FilterProps<F, G extends Value = string> {
   /** The current filter value. */
   filter: F;
   /** Called when the filters have changed. */
-  onChange: (f: F) => void;
+  onChange: (filter: F) => void;
   groupBy?: {
     /** The current group by value. */
     value: G;
@@ -36,29 +30,22 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
 
   const { openModal } = useModal();
   const numberOfPageFilters = groupBy ? 2 : 3;
-  const [pageFilterDefs, modalFilterDefs] = useMemo(() => {
-    const filterEntries = safeEntries(filterDefs);
+  const [pageFilters, modalFilters] = useMemo(() => {
+    // Take the FilterDefs that have a `key => ...` factory and eval it
+    const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)]);
     // If we have more than 4 filters,
-    if (filterEntries.length > numberOfPageFilters + 1) {
+    if (impls.length > numberOfPageFilters + 1) {
       // Then return the first three to show on the page, and the remainder for the modal.
       return [
-        Object.fromEntries(filterEntries.slice(0, numberOfPageFilters)) as FilterDefs<F>,
-        Object.fromEntries(filterEntries.slice(numberOfPageFilters)) as FilterDefs<F>,
+        Object.fromEntries(impls.slice(0, numberOfPageFilters)) as FilterImpls<F>,
+        Object.fromEntries(impls.slice(numberOfPageFilters)) as FilterImpls<F>,
       ];
     }
     // Otherwise, we don't have enough to show the modal, so only use page filter keys
-    return [filterDefs, {} as FilterDefs<F>];
-  }, [filterDefs]);
+    return [Object.fromEntries(impls) as FilterImpls<F>, {} as FilterImpls<F>];
+  }, [numberOfPageFilters, filterDefs]);
 
-  const updateFilter = useMemo(() => filterBuilder(onChange, filterDefs), []);
-  const numModalFilters = safeKeys(modalFilterDefs).filter((fk) => filter[fk] !== undefined).length;
-
-  const pageFilters = getFilterComponents<F>({
-    // Spreading `props` to pass along `data-testid`
-    ...props,
-    filterDefs: pageFilterDefs,
-    updateFilter,
-  });
+  const numModalFilters = safeKeys(modalFilters).filter((fk) => filter[fk] !== undefined).length;
 
   const maybeGroupByField = groupBy ? (
     <div>
@@ -80,10 +67,14 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
   return (
     <div css={Css.df.aic.childGap1.$} {...testId}>
       {maybeGroupByField}
-      {pageFilters.map((c, idx) => (
-        <div key={idx}>{c}</div>
+
+      {safeEntries(pageFilters).map(([key, f]: [keyof F, Filter<any>]) => (
+        <div key={key as string}>
+          {f.render(filter[key], (value) => onChange(updateFilter(filter, key, value)), testId, false)}
+        </div>
       ))}
-      {Object.keys(modalFilterDefs).length > 0 && (
+
+      {Object.keys(modalFilters).length > 0 && (
         <Button
           label="More Filters"
           endAdornment={
@@ -97,7 +88,7 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
           onClick={() =>
             openModal({
               // Spreading `props` to pass along `data-testid`
-              content: <FilterModal {...props} onApply={onChange} filterDefs={modalFilterDefs} filter={filter} />,
+              content: <FilterModal {...props} filter={filter} onApply={onChange} filters={modalFilters} />,
             })
           }
           {...testId.moreFiltersBtn}

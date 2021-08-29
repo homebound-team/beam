@@ -1,38 +1,37 @@
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useState } from "react";
 import { Button } from "src/components/Button";
-import { filterBuilder, FilterDefs, filterTestIdPrefix, getFilterComponents } from "src/components/Filters";
+import { Filter, FilterImpls, filterTestIdPrefix, updateFilter } from "src/components/Filters";
 import { ModalBody, ModalFooter, ModalHeader, useModal } from "src/components/Modal";
 import { Css } from "src/Css";
-import { omitKey, safeKeys, useTestIds } from "src/utils";
+import { omitKey, safeEntries, safeKeys, useTestIds } from "src/utils";
 
 interface FilterModalProps<F> {
   filter: F;
-  filterDefs: FilterDefs<F>;
+  filters: FilterImpls<F>;
   onApply: (f: F) => void;
 }
 
 export function FilterModal<F>(props: FilterModalProps<F>) {
-  const { filter, filterDefs, onApply } = props;
+  const { filter, filters, onApply } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
   const { closeModal } = useModal();
   // Local copy of the filter that we'll use to manage the modal's state separate from the rest of the Filter
   const [modalFilter, setModalFilter] = useState<F>(filter);
-  const updateFilter = useMemo(() => filterBuilder(setModalFilter, filterDefs), []);
-
-  const filterComponents = getFilterComponents<F>({
-    filter: modalFilter,
-    filterDefs,
-    updateFilter,
-    inModal: true,
-  });
 
   return (
     <>
       <ModalHeader>More Filters</ModalHeader>
       <ModalBody>
         <div css={Css.df.fdc.$}>
-          {filterComponents.map((c, idx) => (
-            <div key={idx}>{c}</div>
+          {safeEntries(filters).map(([key, f]: [keyof F, Filter<any>]) => (
+            <ModalFilterItem key={key as string} label={f.hideLabelInModal ? undefined : f.label}>
+              {f.render(
+                modalFilter[key],
+                (value) => setModalFilter(updateFilter(modalFilter, key, value)),
+                testId,
+                true,
+              )}
+            </ModalFilterItem>
           ))}
         </div>
       </ModalBody>
@@ -40,10 +39,10 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
         <Button
           label="Clear"
           variant="tertiary"
-          disabled={safeKeys(filterDefs).filter((fk) => modalFilter[fk] !== undefined).length === 0}
+          disabled={safeKeys(filters).filter((fk) => modalFilter[fk] !== undefined).length === 0}
           onClick={() =>
             // Only remove the filters keys that exist in the modal.
-            setModalFilter(safeKeys(filterDefs).reduce((acc, fk) => omitKey(fk, acc), modalFilter))
+            setModalFilter(safeKeys(filters).reduce((acc, fk) => omitKey(fk, acc), modalFilter))
           }
           {...testId.modalClear}
         />
