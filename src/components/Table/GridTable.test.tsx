@@ -49,9 +49,9 @@ const nestedColumns: GridColumn<NestedRow>[] = [
   },
   {
     header: () => "Name",
-    parent: (row) => <div>{row.name}</div>,
-    child: (row) => <div css={Css.ml2.$}>{row.name}</div>,
-    grandChild: (row) => <div css={Css.ml4.$}>{row.name}</div>,
+    parent: (row) => ({ content: <div>{row.name}</div>, value: row.name }),
+    child: (row) => ({ content: <div css={Css.ml2.$}>{row.name}</div>, value: row.name }),
+    grandChild: (row) => ({ content: <div css={Css.ml4.$}>{row.name}</div>, value: row.name }),
   },
 ];
 
@@ -649,6 +649,32 @@ describe("GridTable", () => {
     );
     expect(cell(r, 0, 0)).toHaveTextContent("Name");
     expect(cell(r, 1, 0)).toHaveTextContent("bar");
+    expect(row(r, 2)).toBeUndefined();
+  });
+
+  it("can filter child rows", async () => {
+    // Given a parent that won't match the filter
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "header", id: "header" },
+      {
+        kind: "parent",
+        id: "1",
+        name: "p1",
+        children: [
+          // And one child does match the filter
+          { kind: "child", id: "p1c1", name: "child foo" },
+          // And the other does not
+          { kind: "child", id: "p1c2", name: "child bar" },
+        ],
+      },
+    ];
+    // When we filter by 'foo'
+    const r = await render(<GridTable filter="foo" columns={nestedColumns} rows={rows} />);
+    // Then we show the header
+    expect(cell(r, 0, 1)).toHaveTextContent("Name");
+    // And the child that matched
+    expect(cell(r, 1, 1)).toHaveTextContent("foo");
+    // And that's it
     expect(row(r, 2)).toBeUndefined();
   });
 

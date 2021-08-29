@@ -297,6 +297,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
 
   const [sortState, setSortKey] = useSortState<R, S>(columns, sorting);
+  // Disclaimer that technically even though this is a useMemo, sortRows is mutating `rows` directly
   const maybeSorted = useMemo(() => {
     if (sorting?.on === "client" && sortState) {
       // If using client-side sort, the sortState use S = number
@@ -307,12 +308,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   }, [columns, rows, sorting, sortState]);
   const noData = !rows.some((row) => row.kind !== "header");
 
-  // For each row, keep it's it + it's ReactElement (React.memo'd)
+  // Filter + flatten + component-ize the sorted rows.
   let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
 
-    function makeComponent(row: GridDataRow<R>): JSX.Element {
+    function makeRowComponent(row: GridDataRow<R>): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
       const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : { sorting };
@@ -347,7 +348,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
       if (row.kind === "header") {
-        headerRows.push([row, makeComponent(row)]);
+        headerRows.push([row, makeRowComponent(row)]);
         return;
       }
 
@@ -356,11 +357,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         filters.every((filter) =>
           columns.map((c) => applyRowFn(c, row)).some((maybeContent) => matchesFilter(maybeContent, filter)),
         );
-      if (!passesFilter) {
-        return;
+      if (passesFilter) {
+        filteredRows.push([row, makeRowComponent(row)]);
       }
 
-      filteredRows.push([row, makeComponent(row)]);
       const isCollapsed = collapsedIds.includes(row.id);
       if (!isCollapsed && row.children) {
         row.children.forEach(visit);
