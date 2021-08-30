@@ -55,6 +55,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
               option={o}
               getOptionValue={getOptionValue}
               getOptionLabel={getOptionLabel}
+              disabled={state.disabledKeys.has(getOptionValue(o))}
             />
           ))}
         </ul>
@@ -87,11 +88,12 @@ interface ListBoxChipProps<O, V extends Key> {
   option: O;
   getOptionLabel: (opt: O) => string;
   getOptionValue: (opt: O) => V;
+  disabled?: boolean;
 }
 
 /** Chip used to display selections within ListBox when using the MultiSelectField */
 function ListBoxChip<O, V extends Key>(props: ListBoxChipProps<O, V>) {
-  const { state, option, getOptionLabel, getOptionValue } = props;
+  const { state, option, getOptionLabel, getOptionValue, disabled = false } = props;
   return (
     <li css={Css.mr1.mb1.$}>
       <Chip
@@ -99,6 +101,7 @@ function ListBoxChip<O, V extends Key>(props: ListBoxChipProps<O, V>) {
         onClick={() => {
           state.selectionManager.toggleSelection(String(getOptionValue(option)));
         }}
+        disabled={disabled}
       />
     </li>
   );

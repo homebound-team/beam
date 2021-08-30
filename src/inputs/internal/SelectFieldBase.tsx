@@ -61,7 +61,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     values,
     nothingSelectedText = "",
     contrast,
-    disabledKeys,
+    disabledOptions,
     ...otherProps
   } = props;
 
@@ -160,7 +160,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
 
   const comboBoxProps = {
     ...otherProps,
-    disabledKeys: disabledKeys?.map(valueToKey),
+    disabledKeys: disabledOptions?.map(valueToKey),
     inputValue: fieldState.inputValue,
     items: fieldState.filteredOptions,
     isDisabled,
@@ -301,7 +301,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
 }
 
 export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusableProps {
-  disabledKeys?: V[];
+  disabledOptions?: V[];
   compact?: boolean;
   disabled?: boolean;
   required?: boolean;
