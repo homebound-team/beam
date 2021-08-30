@@ -104,6 +104,86 @@ describe("MultiSelectFieldTest", () => {
     expect(text).toHaveValue("");
   });
 
+  it("respects disabled options", async () => {
+    const onSelect = jest.fn();
+    // Given a Select Field with a disabled option
+    const { age, getByRole } = await render(
+      <MultiSelectField
+        label="Age"
+        values={["1"]}
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+        disabledOptions={["2"]}
+        onSelect={onSelect}
+      />,
+    );
+    // When opening the menu
+    fireEvent.focus(age());
+    const optionTwo = getByRole("option", { name: "Two" });
+    // Then expect the disabled option to have the correct aria attributes
+    expect(optionTwo).toHaveAttribute("aria-disabled", "true");
+    // And when clicking on that option
+    click(optionTwo);
+    // Then the `onSelect` callback is not called
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("sets chips to disabled for options that are already selected and disabled", async () => {
+    const onSelect = jest.fn();
+    // Given a Select Field with a selected disabled option
+    const { age, getByRole, chip } = await render(
+      <MultiSelectField
+        label="Age"
+        values={["1"]}
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+        disabledOptions={["1"]}
+        onSelect={onSelect}
+      />,
+    );
+    // When opening the menu
+    fireEvent.focus(age());
+    // Then expect the chip to be disabled
+    expect(chip()).toHaveAttribute("disabled");
+    // And when clicking on that chip
+    click(chip());
+    // Then the `onSelect` callback is not called
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("retains state of disabled options that are already selected", async () => {
+    const onSelect = jest.fn();
+    // Given a Select Field with a disabled option that is a selected value
+    const { age, getByRole } = await render(
+      <MultiSelectField
+        label="Age"
+        values={["1"]}
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+        disabledOptions={["1"]}
+        onSelect={onSelect}
+      />,
+    );
+    fireEvent.focus(age());
+    const optionTwo = getByRole("option", { name: "Two" });
+    // When selecting another option
+    click(optionTwo);
+    // Then the `onSelect` is returned with both the new value and the disabled value.
+    expect(onSelect).toHaveBeenCalledWith(
+      ["1", "2"],
+      [
+        { id: "1", name: "One" },
+        { id: "2", name: "Two" },
+      ],
+    );
+  });
+
   function TestMultiSelectField(
     props: Optional<
       MultiSelectFieldProps<HasIdAndName<string>, string>,

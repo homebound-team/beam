@@ -3,7 +3,7 @@ import { Value } from "src/inputs";
 import { BeamSelectFieldBaseProps, SelectFieldBase } from "src/inputs/internal/SelectFieldBase";
 import { HasIdAndName, Optional } from "src/types";
 
-export interface MultiSelectFieldProps<O, V extends Value> extends BeamSelectFieldBaseProps<O> {
+export interface MultiSelectFieldProps<O, V extends Value> extends BeamSelectFieldBaseProps<O, V> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;

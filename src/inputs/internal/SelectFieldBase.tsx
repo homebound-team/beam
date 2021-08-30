@@ -17,7 +17,7 @@ type FieldState<O> = {
   selectedOptions: O[];
 };
 
-export interface SelectFieldBaseProps<O, V extends Value> extends BeamSelectFieldBaseProps<O> {
+export interface SelectFieldBaseProps<O, V extends Value> extends BeamSelectFieldBaseProps<O, V> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
@@ -61,6 +61,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     values,
     nothingSelectedText = "",
     contrast,
+    disabledOptions,
     ...otherProps
   } = props;
 
@@ -159,6 +160,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
 
   const comboBoxProps = {
     ...otherProps,
+    disabledKeys: disabledOptions?.map(valueToKey),
     inputValue: fieldState.inputValue,
     items: fieldState.filteredOptions,
     isDisabled,
@@ -298,7 +300,8 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   );
 }
 
-export interface BeamSelectFieldBaseProps<T> extends BeamFocusableProps {
+export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusableProps {
+  disabledOptions?: V[];
   compact?: boolean;
   disabled?: boolean;
   required?: boolean;
