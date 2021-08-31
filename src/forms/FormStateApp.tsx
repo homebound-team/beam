@@ -63,6 +63,7 @@ export function FormStateApp() {
   );
 
   const sports = [
+    { id: undefined as any, name: "Undecided" },
     { id: "s:1", name: "Football" },
     { id: "s:2", name: "Soccer" },
   ];
@@ -136,7 +137,14 @@ export function FormStateApp() {
             </div>
           </header>
           <div>
-            <Button label="Read Only" onClick={() => setReadOnly(!readOnly)} />
+            <div>
+              <Button label="Read Only" onClick={() => setReadOnly(!readOnly)} />
+            </div>
+
+            <div css={Css.mt1.$}>
+              <strong>Form Values:</strong>
+              <pre>{JSON.stringify(formState.value, null, 2)}</pre>
+            </div>
           </div>
         </div>
       )}
@@ -151,7 +159,7 @@ function createColumns(formState: FormValue): GridColumn<Row>[] {
     { header: "#", data: ({ id }) => <span>{id.value}</span> },
     {
       header: "Title",
-      data: ({ title }) => <BoundTextField label="" compact field={title} />,
+      data: ({ title }) => <BoundTextField label="Book Title" hideLabel compact field={title} />,
     },
     {
       header: "Actions",
@@ -169,7 +177,7 @@ export const formConfig: ObjectConfig<AuthorInput> = {
   lastName: { type: "value", rules: [required] },
   birthday: { type: "value", rules: [required] },
   heightInInches: { type: "value", rules: [required] },
-  favoriteSport: { type: "value", rules: [required] },
+  favoriteSport: { type: "value" },
   favoriteColors: { type: "value", rules: [required] },
   favoriteShapes: { type: "value", rules: [required] },
   books: {
