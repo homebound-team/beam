@@ -45,6 +45,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     errorMsg,
     helperText,
     label,
+    hideLabel,
     required,
     inlineLabel,
     readOnly: isReadOnly = false,
@@ -271,6 +272,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         onFocus={onFocus}
         inlineLabel={inlineLabel}
         label={label}
+        hideLabel={hideLabel}
         labelProps={labelProps}
         selectedOptions={fieldState.selectedOptions}
         getOptionValue={getOptionValue}
@@ -311,6 +313,7 @@ export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusa
   fieldDecoration?: (opt: T) => ReactNode;
   /** Sets the form field label. */
   label?: string;
+  hideLabel?: boolean;
   /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
   readOnly?: boolean;
