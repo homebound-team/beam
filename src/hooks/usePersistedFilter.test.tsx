@@ -18,7 +18,7 @@ describe("usePersistedFilter", () => {
     });
     const r = await render(<TestPage filterDefs={{ stageSingle: stage }} />, withRouter());
     // Then the filter is initially empty
-    expect(r.filter_stageSingle()).toHaveValue("");
+    expect(r.filter_stageSingle()).toHaveValue("All");
     expect(r.applied().textContent).toEqual("{}");
   });
 

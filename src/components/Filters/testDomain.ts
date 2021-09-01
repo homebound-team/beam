@@ -1,3 +1,7 @@
+import { multiFilter } from "src/components/Filters/MultiSelectFilter";
+import { singleFilter } from "src/components/Filters/SingleSelectFilter";
+import { FilterDefs } from "src/components/Filters/types";
+
 export enum Stage {
   StageOne = "ONE",
   StageTwo = "TWO",
@@ -40,3 +44,23 @@ export type ProjectFilter = {
   isTest?: boolean | null;
   doNotUse?: boolean | null;
 };
+
+export type StageFilter = FilterDefs<ProjectFilter>["stage"];
+export type StageSingleFilter = FilterDefs<ProjectFilter>["stageSingle"];
+
+const stageOptions = [
+  { code: Stage.StageOne, name: "One" },
+  { code: Stage.StageTwo, name: "Two" },
+];
+
+export const stageFilter: StageFilter = multiFilter({
+  options: stageOptions,
+  getOptionValue: (s) => s.code,
+  getOptionLabel: (s) => s.name,
+});
+
+export const stageSingleFilter: StageSingleFilter = singleFilter({
+  options: stageOptions,
+  getOptionValue: (s) => s.code,
+  getOptionLabel: (s) => s.name,
+});
