@@ -18,7 +18,6 @@ import {
   Icon,
   IconButton,
   numericColumn,
-  observableColumns,
   SimpleHeaderAndDataOf,
 } from "src/components/index";
 import { Css } from "src/Css";
@@ -33,21 +32,6 @@ export default {
 
 type Data = { name: string; value: number };
 type Row = SimpleHeaderAndDataOf<Data>;
-
-// Test case
-// Potential algorithm: see k1, scan until the next k1
-// h1
-// k1 (division)
-//   k2 (sub)
-//     k3
-//     k3
-//   k2 (sub)
-//     k3
-//     k3
-//   k4 (division-total)
-// k1 (division)
-//   k4 (division-total)
-// f1 (total-total)
 
 export function ClientSideSorting() {
   const nameColumn: GridColumn<Row> = {
@@ -162,36 +146,57 @@ type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow;
 const rows: GridDataRow<NestedRow>[] = [
   { kind: "header", id: "header" },
   // a parent w/ two children, 1st child has 2 grandchild, 2nd child has 1 grandchild
-  { kind: "parent", id: "p1", name: "parent 1" },
-  { kind: "child", id: "p1c1", parentIds: ["p1"], name: "child p1c1" },
-  { kind: "grandChild", id: "p1c1g1", parentIds: ["p1", "p1c1"], name: "grandchild p1c1g1" },
-  { kind: "grandChild", id: "p1c1g2", parentIds: ["p1", "p1c1"], name: "grandchild p1c1g2" },
-  { kind: "child", id: "p1c2", parentIds: ["p1"], name: "child p1c2" },
-  { kind: "grandChild", id: "p1c2g1", parentIds: ["p1", "p1c2"], name: "grandchild p1c2g1" },
-
+  {
+    ...{ kind: "parent", id: "p1", name: "parent 1" },
+    children: [
+      {
+        ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+        children: [
+          { kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" },
+          { kind: "grandChild", id: "p1c1g2", name: "grandchild p1c1g2" },
+        ],
+      },
+      {
+        ...{ kind: "child", id: "p1c2", name: "child p1c2" },
+        children: [{ kind: "grandChild", id: "p1c2g1", name: "grandchild p1c2g1" }],
+      },
+    ],
+  },
   // a parent with just a child
-  { kind: "parent", id: "p2", name: "parent 2" },
-  { kind: "child", id: "p2c1", parentIds: ["p2"], name: "child p2c1" },
-
+  {
+    ...{ kind: "parent", id: "p2", name: "parent 2" },
+    children: [{ kind: "child", id: "p2c1", name: "child p2c1" }],
+  },
   // a parent with no children
   { kind: "parent", id: "p3", name: "parent 3" },
 ];
 
 export function NestedRows() {
   const arrowColumn = actionColumn<NestedRow>({
-    header: () => <CollapseToggle isHeader />,
-    parent: () => <CollapseToggle />,
-    child: () => <CollapseToggle />,
+    header: (row) => <CollapseToggle row={row} />,
+    parent: (row) => <CollapseToggle row={row} />,
+    child: (row) => <CollapseToggle row={row} />,
     grandChild: () => "",
     w: 0,
   });
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
-    parent: (row) => <div>{row.name}</div>,
-    child: (row) => <div css={Css.ml2.$}>{row.name}</div>,
-    grandChild: (row) => <div css={Css.ml4.$}>{row.name}</div>,
+    parent: (row) => ({
+      content: <div>{row.name}</div>,
+      value: row.name,
+    }),
+    child: (row) => ({
+      content: <div css={Css.ml2.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    grandChild: (row) => ({
+      content: <div css={Css.ml4.$}>{row.name}</div>,
+      value: row.name,
+    }),
   };
-  return <GridTable columns={[arrowColumn, nameColumn]} {...{ rows }} />;
+  return (
+    <GridTable columns={[arrowColumn, nameColumn]} {...{ rows }} sorting={{ on: "client", initial: [1, "ASC"] }} />
+  );
 }
 
 export function ObservableRows() {
@@ -209,7 +214,8 @@ export function ObservableRows() {
     <div>
       <IconButton onClick={() => (o.a = o.a + 1)} icon="plus" />
       <GridTable
-        columns={observableColumns([nameColumn])}
+        columns={[nameColumn]}
+        observeRows={true}
         rows={[
           { kind: "header", id: "header" },
           { kind: "data", id: "1", name: "a", value: 1 },
