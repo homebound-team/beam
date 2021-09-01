@@ -7,7 +7,7 @@ import { Css } from "src/Css";
 export function HelperText(props: { helperText: string | ReactNode; contrast?: boolean }) {
   const { helperText, contrast = false, ...others } = props;
   return (
-    <div css={Css.gray700.sm.mtPx(4).if(contrast).gray100.$} {...others}>
+    <div css={Css.gray700.xs.mtPx(4).if(contrast).gray100.$} {...others}>
       {helperText}
     </div>
   );
