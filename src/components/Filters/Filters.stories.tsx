@@ -123,39 +123,6 @@ export function GroupBy() {
   );
 }
 
-export function GroupByViewAll() {
-  const groupBy = useGroupBy({ costCode: "Cost Code", tradeCategory: "Trade Category" });
-  type Filter = ProjectFilter & { view: string };
-  const filterDefs: FilterDefs<Filter> = useMemo(() => {
-    return {
-      view: singleFilter({
-        options: [
-          { id: "all", name: "All" },
-          { id: "selections", name: "Selections" },
-        ],
-        getOptionValue: (o) => o.id,
-        getOptionLabel: (o) => o.name,
-        defaultValue: "all",
-      }),
-      marketId: multiFilter({
-        options: markets,
-        getOptionValue: (o) => o.code,
-        getOptionLabel: (o) => o.name,
-      }),
-    };
-  }, []);
-  const { setFilter, filter } = usePersistedFilter<ProjectFilter>({
-    storageKey: "GroupByViewAll",
-    filterDefs,
-  });
-  return (
-    <div css={Css.df.fdc.childGap2.$}>
-      <Filters groupBy={groupBy} filter={filter} onChange={setFilter} filterDefs={filterDefs} />
-      <strong>Applied Filter:</strong> {JSON.stringify(filter)}
-    </div>
-  );
-}
-
 const internalUsers: InternalUser[] = zeroTo(10).map((i) => ({ id: `${i + 1}`, name: `Employee ${i + 1}` }));
 const markets: Market[] = zeroTo(5).map((i) => ({ code: `${i + 1}`, name: `Market ${i + 1}` }));
 const stages: Stage[] = [Stage.StageOne, Stage.StageTwo];
