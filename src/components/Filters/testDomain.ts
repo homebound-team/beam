@@ -1,5 +1,5 @@
-import { multiFilter } from "src/components/Filters/MultiSelectFilter";
-import { singleFilter } from "src/components/Filters/SingleSelectFilter";
+import { multiFilter } from "src/components/Filters/MultiFilter";
+import { singleFilter } from "src/components/Filters/SingleFilter";
 import { FilterDefs } from "src/components/Filters/types";
 
 export enum Stage {
