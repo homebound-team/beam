@@ -1,6 +1,5 @@
+import { booleanFilter, FilterDefs, multiFilter, singleFilter } from "src/components/Filters";
 import { ProjectFilter, Stage } from "src/components/Filters/testDomain";
-import { FilterDefs } from "src/components/Filters/types";
-import { booleanFilter, multiFilter, singleFilter } from "src/components/Filters/utils";
 
 describe("Filters", () => {
   it("can match GQL types of enum arrays", () => {

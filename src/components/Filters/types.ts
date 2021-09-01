@@ -1,35 +1,34 @@
-import { MultiSelectFieldProps, SelectFieldProps, Value } from "src/inputs";
+import { TestIds } from "src/utils/useTestIds";
 
+/**
+ * Defines the filters for a given filter type `F`.
+ *
+ * Generally `F` will be a GraphQL filter type i.e. `BillFilter`, but it can also
+ * be an adaption or even completely custom type to match the UX for the given page.
+ *
+ * Each filter is typically created by a factory function, i.e. `singleFilter`,
+ * `multiFilter`, etc.
+ */
 export type FilterDefs<F> = {
-  [K in keyof F]: FilterDef<Exclude<F[K], null | undefined>>;
+  // Filter values can still be `null | undefined`, but extract it out for clarity in `FilterDef`
+  [K in keyof F]: (key: string) => Filter<Exclude<F[K], null | undefined>>;
 };
 
-export type SingleFilterProps<O, V extends Value> = Omit<SelectFieldProps<O, V>, "value" | "onSelect"> & {
-  defaultValue?: V;
+// Like FilterDefs but with the key lambda eval'd, i.e. values are the actual Filter instance
+export type FilterImpls<F> = {
+  // Filter values can still be `null | undefined`, but extract it out for clarity in `FilterDef`
+  [K in keyof F]: Filter<Exclude<F[K], null | undefined>>;
 };
 
-export type MultiFilterProps<O, V extends Value> = Omit<MultiSelectFieldProps<O, V>, "values" | "onSelect"> & {
-  defaultValue?: V[];
-};
+/** A filter instance that knows how to render itself within the `Filters` component. */
+export interface Filter<V> {
+  label: string;
 
-export type BooleanOption = [boolean | undefined, string];
-export type BooleanFilterProps = SingleFilterProps<BooleanOption, string> & {
-  defaultValue?: string;
-};
+  hideLabelInModal?: boolean;
 
-export type ToggleFilterProps = { label: string; enabledValue?: boolean; defaultValue?: boolean };
+  /** The default value to use in `usePersistedFilter` for creating the initial filter. */
+  defaultValue: V | undefined;
 
-// What is V?
-// - V might be `string[]` and could be used for a multiselect that getOptionValue returned strings
-// - V might be `number[]` and could be used for a multiselect that getOptionValue returned numbers
-// - V might be `boolean` and could be used for ...boolFilter...
-
-// All of the extra brackets are to avoid `Stage` turning into `Stage.One` | `Stage.Two`:
-// https://stackoverflow.com/questions/53996797/typescript-conditional-type-array-of-union-type-distribution
-export type FilterDef<V> = [V] extends [boolean | undefined]
-  ? ({ kind: "boolean" } & BooleanFilterProps) | ({ kind: "toggle" } & ToggleFilterProps)
-  : [V] extends [Value]
-  ? { kind: "single" } & SingleFilterProps<any, V>
-  : V extends Array<Value>
-  ? { kind: "multi" } & MultiFilterProps<any, Value>
-  : never;
+  /** Renders the filter into either the page or the modal. */
+  render(value: V | undefined, setValue: (value: V | undefined) => void, tid: TestIds, inModal: boolean): JSX.Element;
+}

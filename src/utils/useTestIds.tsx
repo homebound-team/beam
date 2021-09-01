@@ -29,6 +29,8 @@
  */
 import { defaultTestId } from "src/utils/defaultTestId";
 
+export type TestIds = Record<string, object>;
+
 export function useTestIds(props: object, defaultPrefix?: string): Record<string, object> {
   const prefix: string | undefined =
     (props as any)["data-testid"] ||
