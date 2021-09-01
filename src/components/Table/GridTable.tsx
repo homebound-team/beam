@@ -88,27 +88,27 @@ export function setRunningInJest() {
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
 export interface GridStyle {
   /** Applied to the base div element. */
-  rootCss: Properties;
+  rootCss?: Properties;
   /** Applied with the owl operator between rows for rendering border lines. */
-  betweenRowsCss: Properties;
+  betweenRowsCss?: Properties;
   /** Applied to the first non-header row, i.e. if you want to cancel out `betweenRowsCss`. */
-  firstNonHeaderRowCss: Properties;
+  firstNonHeaderRowCss?: Properties;
   /** Applied to all cell divs (via a selector off the base div). */
-  cellCss: Properties;
+  cellCss?: Properties;
   /** Applied to the header (really first) row div. */
-  headerCellCss: Properties;
+  headerCellCss?: Properties;
   /** Applied to the first cell of all rows, i.e. for table-wide padding or left-side borders. */
-  firstCellCss: Properties;
+  firstCellCss?: Properties;
   /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
-  lastCellCss: Properties;
+  lastCellCss?: Properties;
   /** Applied to a cell div when `indent: 1` is used. */
-  indentOneCss: Properties;
+  indentOneCss?: Properties;
   /** Applied to a cell div when `indent: 2` is used. */
-  indentTwoCss: Properties;
+  indentTwoCss?: Properties;
   /** Applied if there is a fallback/overflow message showing. */
-  firstRowMessageCss: Properties;
+  firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
-  rowHoverColor: string;
+  rowHoverColor?: string;
 }
 
 export interface GridTableDefaults {
@@ -481,9 +481,9 @@ function renderCssGrid<R extends Kinded>(
           // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
           // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
           // The `div + div` is also the "owl operator", i.e. don't apply to the 1st row.
-          .addIn("& > div + div > *", style.betweenRowsCss)
+          .addIn("& > div + div > *", style.betweenRowsCss || {})
           // removes border between header and second row
-          .addIn("& > div:nth-of-type(2) > *", style.firstNonHeaderRowCss).$,
+          .addIn("& > div:nth-of-type(2) > *", style.firstNonHeaderRowCss || {}).$,
         ...style.rootCss,
         ...xss,
       }}
@@ -517,9 +517,9 @@ function renderTable<R extends Kinded>(
     <table
       css={{
         ...Css.w100.add("borderCollapse", "collapse").$,
-        ...Css.addIn("& > tbody > tr ", style.betweenRowsCss)
+        ...Css.addIn("& > tbody > tr ", style.betweenRowsCss || {})
           // removes border between header and second row
-          .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss).$,
+          .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss || {}).$,
         ...style.rootCss,
         ...xss,
       }}
@@ -624,7 +624,7 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
           css={{
             ...Css.dg.gtc(calcGridColumns(columns)).$,
             // Add an extra `> div` due to Item + itemContent both having divs
-            ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss).$,
+            ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
             // Add `display:contents` to Item to flatten it like we do GridRow
             ...Css.addIn("& > div", Css.display("contents").$).$,
             ...gs.rootCss,
@@ -749,7 +749,7 @@ function getIndentationCss<R extends Kinded>(
 ): Properties {
   // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
   const indent = (isContentAndSettings(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
-  return indent === 1 ? style.indentOneCss : indent === 2 ? style.indentTwoCss : {};
+  return indent === 1 ? style.indentOneCss || {} : indent === 2 ? style.indentTwoCss || {} : {};
 }
 
 function getFirstOrLastCellCss<R extends Kinded>(
@@ -844,10 +844,11 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     // hovers and styling. In theory this would change with subgrids.
     // Only enable when using div as elements
     ...(as === "table" ? {} : Css.display("contents").$),
-    ...((rowStyle?.rowLink || rowStyle?.onClick) && {
-      // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
-      "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
-    }),
+    ...((rowStyle?.rowLink || rowStyle?.onClick) &&
+      style.rowHoverColor && {
+        // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
+        "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
+      }),
     ...maybeApplyFunction(row, rowStyle?.rowCss),
   };
 
