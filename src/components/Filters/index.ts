@@ -1,8 +1,8 @@
-export * from "./BooleanFilter";
+export { booleanFilter } from "./BooleanFilter";
 export * from "./FilterModal";
 export * from "./Filters";
-export * from "./MultiSelectFilter";
-export * from "./SingleSelectFilter";
-export * from "./ToggleFilter";
+export { multiFilter } from "./MultiSelectFilter";
+export { singleFilter } from "./SingleSelectFilter";
+export { toggleFilter } from "./ToggleFilter";
 export * from "./types";
 export * from "./utils";

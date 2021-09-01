@@ -1,7 +1,6 @@
+import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
 import { SelectField } from "src/inputs/SelectField";
-import { defaultLabel } from "src/utils/defaultLabel";
-import { defaultTestId } from "src/utils/defaultTestId";
 import { TestIds } from "src/utils/useTestIds";
 
 export type BooleanOption = [boolean | undefined, string];
@@ -16,9 +15,7 @@ export function booleanFilter(props: BooleanFilterProps): (key: string) => Filte
   return (key) => new BooleanFilter(key, props);
 }
 
-class BooleanFilter implements Filter<boolean> {
-  constructor(private key: string, private props: BooleanFilterProps) {}
-
+class BooleanFilter extends BaseFilter<boolean, BooleanFilterProps> implements Filter<boolean> {
   render(
     value: boolean | undefined,
     setValue: (value: boolean | undefined) => void,
@@ -44,17 +41,9 @@ class BooleanFilter implements Filter<boolean> {
           const parsedValue = value === "undefined" ? undefined : value === "true";
           setValue(parsedValue);
         }}
-        {...tid[defaultTestId(this.label)]}
+        {...this.testId(tid)}
       />
     );
-  }
-
-  get label(): string {
-    return this.props.label || defaultLabel(this.key);
-  }
-
-  get defaultValue() {
-    return this.props.defaultValue;
   }
 }
 
