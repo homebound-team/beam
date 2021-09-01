@@ -1,9 +1,9 @@
 import { Key } from "react";
+import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
 import { MultiSelectField, MultiSelectFieldProps } from "src/inputs/MultiSelectField";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 import { Value } from "src/inputs/Value";
-import { defaultLabel } from "src/utils/defaultLabel";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { TestIds } from "src/utils/useTestIds";
 
@@ -15,9 +15,7 @@ export function multiFilter<O, V extends Key>(props: MultiFilterProps<O, V>): (k
   return (key) => new MultiFilter(key, props);
 }
 
-class MultiFilter<O, V extends Value> implements Filter<V[]> {
-  constructor(private key: string, private props: MultiFilterProps<O, V>) {}
-
+class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O, V>> implements Filter<V[]> {
   render(
     value: V[] | undefined,
     setValue: (value: V[] | undefined) => void,
@@ -55,16 +53,8 @@ class MultiFilter<O, V extends Value> implements Filter<V[]> {
           setValue(values.length === 0 ? undefined : values);
         }}
         nothingSelectedText="All"
-        {...tid[defaultTestId(this.label)]}
+        {...this.testId(tid)}
       />
     );
-  }
-
-  get label(): string {
-    return this.props.label || defaultLabel(this.key as string);
-  }
-
-  get defaultValue(): V[] | undefined {
-    return this.props.defaultValue;
   }
 }
