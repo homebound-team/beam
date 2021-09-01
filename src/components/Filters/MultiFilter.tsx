@@ -47,7 +47,8 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
         compact
         label={this.label}
         values={value || []}
-        inlineLabel
+        hideLabel={inModal}
+        inlineLabel={!inModal}
         sizeToContent={!inModal}
         onSelect={(values) => {
           setValue(values.length === 0 ? undefined : values);
