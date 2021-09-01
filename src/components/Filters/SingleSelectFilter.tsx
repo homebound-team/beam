@@ -15,7 +15,7 @@ export function singleFilter<O, V extends Key>(props: SingleFilterProps<O, V>): 
 }
 
 // Make an option that we'll sneak into every select field
-const unboundOption = {} as any;
+const allOption = {} as any;
 
 class SingleFilter<O, V extends Key> implements Filter<V> {
   constructor(private key: string, private props: SingleFilterProps<O, V>) {}
@@ -27,11 +27,11 @@ class SingleFilter<O, V extends Key> implements Filter<V> {
         {...props}
         options={[
           // We always add "All" as the 1st option, to allow unselecting with a click
-          unboundOption as O,
+          allOption as O,
           ...options,
         ]}
-        getOptionValue={(o) => (o === unboundOption ? (undefined as any as V) : getOptionValue(o))}
-        getOptionLabel={(o) => (o === unboundOption ? "All" : getOptionLabel(o))}
+        getOptionValue={(o) => (o === allOption ? (undefined as any as V) : getOptionValue(o))}
+        getOptionLabel={(o) => (o === allOption ? "All" : getOptionLabel(o))}
         compact
         value={value}
         label={this.label}
