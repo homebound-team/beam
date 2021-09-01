@@ -52,7 +52,7 @@ export function MenuItemImpl(props: MenuItemProps) {
       {...hoverProps}
       ref={ref}
       css={{
-        ...Css.df.itemsCenter.py1.px2.cursorPointer.outline0.mh("42px").$,
+        ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").$,
         ...(isHovered ? Css.bgGray100.$ : {}),
         ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
       }}
@@ -104,13 +104,7 @@ function IconMenuItem(item: IconMenuItemType) {
 function maybeWrapInLink(onClick: MenuItem["onClick"], content: JSX.Element | string): JSX.Element {
   return typeof onClick === "string" ? (
     isAbsoluteUrl(onClick) ? (
-      <a
-        href={onClick}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="navLink"
-        css={Css.df.justifyBetween.w100.$}
-      >
+      <a href={onClick} target="_blank" rel="noopener noreferrer" className="navLink" css={Css.df.jcsb.w100.$}>
         {content}
         <span css={Css.fs0.ml2.$}>
           <Icon icon="linkExternal" />

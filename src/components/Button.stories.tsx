@@ -24,7 +24,7 @@ export default {
 
 export function ButtonVariations(args: ButtonProps) {
   return (
-    <div css={Css.dg.flexColumn.childGap2.$}>
+    <div css={Css.dg.fdc.childGap2.$}>
       <div>
         <h2>Primary</h2>
         <div css={buttonRowStyles}>
@@ -134,7 +134,7 @@ export function ButtonVariations(args: ButtonProps) {
 
 export function ButtonWithTooltip() {
   return (
-    <div css={Css.dg.flexColumn.childGap2.justifyStart.$}>
+    <div css={Css.dg.fdc.childGap2.jcfs.$}>
       <div>
         <h2>Tooltip provided via 'disabled' property</h2>
         <Button
@@ -160,7 +160,7 @@ export function ButtonWithTooltip() {
 
 export function ButtonLink() {
   return (
-    <div css={Css.dg.flexColumn.childGap2.$}>
+    <div css={Css.dg.fdc.childGap2.$}>
       <div>
         <h2>Primary</h2>
         <div css={buttonRowStyles}>

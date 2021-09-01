@@ -32,12 +32,12 @@ export function Stepper({ steps, currentStep, onChange }: StepperBarProps) {
   }, [currentStep]);
 
   return (
-    <nav aria-label="steps" css={Css.df.flexColumn.$}>
+    <nav aria-label="steps" css={Css.df.fdc.$}>
       <ol css={Css.listReset.df.$}>
         {steps.map((step) => {
           const isCurrent = currentStep === step.value;
           return (
-            <li css={Css.df.flexColumn.wPx(200).$} key={step.label} aria-current={isCurrent}>
+            <li css={Css.df.fdc.wPx(200).$} key={step.label} aria-current={isCurrent}>
               <StepButton {...step} onClick={() => onChange(step.value)} isCurrent={isCurrent} />
             </li>
           );
@@ -111,7 +111,7 @@ function StepIcon({ state, isHovered = false, isPressed = false, isCurrent = fal
 
   // Otherwise state is "incomplete", return the custom circle "icon"
   return (
-    <div css={Css.wPx(24).hPx(24).df.itemsCenter.justifyCenter.$}>
+    <div css={Css.wPx(24).hPx(24).df.aic.jcc.$}>
       <div
         css={
           Css.wPx(10)

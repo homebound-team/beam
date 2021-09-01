@@ -28,15 +28,15 @@ const options: TestOption[] = [
 
 export function MultiSelectFields() {
   return (
-    <div css={Css.df.flexColumn.childGap5.$}>
-      <div css={Css.df.flexColumn.childGap2.$}>
+    <div css={Css.df.fdc.childGap5.$}>
+      <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <TestMultiSelectField
           label="Favorite Icons"
           values={[options[2].id]}
           options={options}
           getOptionMenuLabel={(o) => (
-            <div css={Css.df.itemsCenter.$}>
+            <div css={Css.df.aic.$}>
               {o.icon && (
                 <span css={Css.fs0.mr2.$}>
                   <Icon icon={o.icon} />
@@ -52,7 +52,7 @@ export function MultiSelectFields() {
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
           values={[options[1].id]}
           getOptionMenuLabel={(o) => (
-            <div css={Css.df.itemsCenter.$}>
+            <div css={Css.df.aic.$}>
               {o.icon && (
                 <span css={Css.fs0.mr2.$}>
                   <Icon icon={o.icon} />
@@ -76,7 +76,7 @@ export function MultiSelectFields() {
         />
       </div>
 
-      <div css={Css.df.flexColumn.childGap2.$}>
+      <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Compact</h1>
         <TestMultiSelectField
           compact
@@ -84,7 +84,7 @@ export function MultiSelectFields() {
           values={[options[2].id]}
           options={options}
           getOptionMenuLabel={(o) => (
-            <div css={Css.df.itemsCenter.$}>
+            <div css={Css.df.aic.$}>
               {o.icon && (
                 <span css={Css.fs0.mr2.$}>
                   <Icon icon={o.icon} />
@@ -101,7 +101,7 @@ export function MultiSelectFields() {
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
           values={[options[1].id]}
           getOptionMenuLabel={(o) => (
-            <div css={Css.df.itemsCenter.$}>
+            <div css={Css.df.aic.$}>
               {o.icon && (
                 <span css={Css.fs0.mr2.$}>
                   <Icon icon={o.icon} />
@@ -126,7 +126,7 @@ export function MultiSelectFields() {
           values={[] as Value[]}
         />
       </div>
-      <div css={Css.df.flexColumn.childGap2.$}>
+      <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Inline Label</h1>
         <TestMultiSelectField inlineLabel label="Favorite Icon" values={[options[2].id]} options={options} />
         <TestMultiSelectField inlineLabel compact label="Favorite Icon" values={[options[2].id]} options={options} />
@@ -137,7 +137,7 @@ export function MultiSelectFields() {
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
           values={[options[4].id]}
           getOptionMenuLabel={(o) => (
-            <div css={Css.df.itemsCenter.$}>
+            <div css={Css.df.aic.$}>
               {o.icon && (
                 <span css={Css.fs0.mr2.$}>
                   <Icon icon={o.icon} />

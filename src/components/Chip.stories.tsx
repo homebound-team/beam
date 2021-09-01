@@ -9,7 +9,7 @@ export default {
 
 export function DefaultChip() {
   return (
-    <div css={Css.wPx(300).df.flexColumn.itemsStart.childGap2.$}>
+    <div css={Css.wPx(300).df.fdc.aifs.childGap2.$}>
       <Chip text="First Last" onClick={action("click")} />
       <Chip text="Disabled Chip" disabled onClick={action("click")} />
       <Chip text={"First Last ".repeat(10)} onClick={action("click")} />

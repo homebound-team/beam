@@ -80,7 +80,7 @@ export function SuperDrawer(): ReactPortal | null {
             // TODO: Should this color be part of the Palette?
             // z-index of 3 is used to give flexibility for future overlapping content
             // Not using `inset` due to Safari 14.0.x not supporting this CSS property.
-            css={Css.fixed.df.justifyEnd.add("backgroundColor", "rgba(36,36,36,0.2)").top0.right0.bottom0.left0.z3.$}
+            css={Css.fixed.df.jcfe.add("backgroundColor", "rgba(36,36,36,0.2)").top0.right0.bottom0.left0.z3.$}
             // Initial styles (acts similar to `from` in keyframe animations)
             initial={{ opacity: 0 }}
             // Rendered styles (acts similar to `to` in keyframe animations)
@@ -92,7 +92,7 @@ export function SuperDrawer(): ReactPortal | null {
             {/* Content container */}
             <motion.aside
               key="superDrawerContainer"
-              css={Css.bgWhite.h100.maxw(px(1040)).w100.df.flexColumn.relative.$}
+              css={Css.bgWhite.h100.maxw(px(1040)).w100.df.fdc.relative.$}
               // Keeping initial x to 1040 as this will still work if the container is smaller
               initial={{ x: 1040 }}
               animate={{ x: 0 }}
@@ -102,9 +102,9 @@ export function SuperDrawer(): ReactPortal | null {
               // Preventing clicks from triggering parent onClick
               onClick={(e) => e.stopPropagation()}
             >
-              <header css={Css.df.p3.bb.bGray200.df.itemsCenter.justifyBetween.$}>
+              <header css={Css.df.p3.bb.bGray200.df.aic.jcsb.$}>
                 {/* Left */}
-                <div css={Css.df.itemsCenter.$}>
+                <div css={Css.df.aic.$}>
                   <div css={Css.xl2Em.gray900.mr2.$} {...testId.title} ref={drawerHeaderRef}>
                     {!modalState.current && (title || null)}
                   </div>
@@ -113,7 +113,7 @@ export function SuperDrawer(): ReactPortal | null {
                 {/* Right */}
                 {!modalState.current && (
                   // Forcing height to 32px to match title height
-                  <div css={Css.df.childGap3.itemsCenter.hPx(32).$}>
+                  <div css={Css.df.childGap3.aic.hPx(32).$}>
                     {titleRightContent || null}
                     {/* Disable buttons is handlers are not given or if childContent is shown */}
                     <ButtonGroup
@@ -142,8 +142,7 @@ export function SuperDrawer(): ReactPortal | null {
                 <div
                   css={
                     // topPX(81) is the offset from the header
-                    Css.fg1.topPx(81).left0.right0.bottom0.absolute.bgWhite.df.itemsCenter.justifyCenter.fg1.flexColumn
-                      .z5.$
+                    Css.fg1.topPx(81).left0.right0.bottom0.absolute.bgWhite.df.aic.jcc.fg1.fdc.z5.$
                   }
                 >
                   {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}

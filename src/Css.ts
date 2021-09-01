@@ -96,6 +96,7 @@ class CssBuilder<T extends Properties1> {
   get bViolet700() { return this.add("borderColor", "rgba(153,126,181,1)"); }
   get bViolet800() { return this.add("borderColor", "rgba(128,103,151,1)"); }
   get bViolet900() { return this.add("borderColor", "rgba(100,78,116,1)"); }
+  bc(value: Properties["borderColor"]) { return this.add("borderColor", value); }
 
   // borderRadius
   get br0() { return this.add("borderRadius", "0"); }
@@ -105,12 +106,14 @@ class CssBuilder<T extends Properties1> {
   get br16() { return this.add("borderRadius", "16px"); }
   get br24() { return this.add("borderRadius", "24px"); }
   get br100() { return this.add("borderRadius", "100%"); }
+  borderRadius(value: Properties["borderRadius"]) { return this.add("borderRadius", value); }
 
   // borderStyle
   get bsDashed() { return this.add("borderStyle", "dashed"); }
   get bsDotted() { return this.add("borderStyle", "dotted"); }
   get bsNone() { return this.add("borderStyle", "none"); }
   get bsSolid() { return this.add("borderStyle", "solid"); }
+  bs(value: Properties["borderStyle"]) { return this.add("borderStyle", value); }
 
   // borderWidth
   get bw1() { return this.add("borderWidth", "1px"); }
@@ -124,6 +127,7 @@ class CssBuilder<T extends Properties1> {
   get bshFocus() { return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px rgba(3,105,161,1)"); }
   get bshDanger() { return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px rgba(149,68,64,1)"); }
   get bshModal() { return this.add("boxShadow", "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)"); }
+  boxShadow(value: Properties["boxShadow"]) { return this.add("boxShadow", value); }
 
   // coordinates
   get top0() { return this.top(0); }
@@ -174,6 +178,7 @@ class CssBuilder<T extends Properties1> {
   // cursor
   get cursorPointer() { return this.add("cursor", "pointer"); }
   get cursorNotAllowed() { return this.add("cursor", "not-allowed"); }
+  cursor(value: Properties["cursor"]) { return this.add("cursor", value); }
 
   // display
   get dn() { return this.add("display", "none"); }
@@ -192,25 +197,25 @@ class CssBuilder<T extends Properties1> {
   display(value: Properties["display"]) { return this.add("display", value); }
 
   // flexbox
-  get justifyStart() { return this.add("justifyContent", "flex-start"); }
-  get justifyEnd() { return this.add("justifyContent", "flex-end"); }
-  get justifyCenter() { return this.add("justifyContent", "center"); }
-  get justifyBetween() { return this.add("justifyContent", "space-between"); }
-  get justifyAround() { return this.add("justifyContent", "space-around"); }
-  get justifyEvenly() { return this.add("justifyContent", "space-evenly"); }
-  justify(value: Properties["justifyContent"]) { return this.add("justifyContent", value); }
-  get selfStart() { return this.add("alignSelf", "flex-start"); }
-  get selfEnd() { return this.add("alignSelf", "flex-end"); }
-  get selfCenter() { return this.add("alignSelf", "center"); }
-  get selfBaseline() { return this.add("alignSelf", "baseline"); }
-  get selfStretch() { return this.add("alignSelf", "stretch"); }
-  self(value: Properties["alignSelf"]) { return this.add("alignSelf", value); }
-  get itemsStart() { return this.add("alignItems", "flex-start"); }
-  get itemsEnd() { return this.add("alignItems", "flex-end"); }
-  get itemsCenter() { return this.add("alignItems", "center"); }
-  get itemsBaseline() { return this.add("alignItems", "baseline"); }
-  get itemsStretch() { return this.add("alignItems", "stretch"); }
-  items(value: Properties["alignItems"]) { return this.add("alignItems", value); }
+  get jcfs() { return this.add("justifyContent", "flex-start"); }
+  get jcfe() { return this.add("justifyContent", "flex-end"); }
+  get jcc() { return this.add("justifyContent", "center"); }
+  get jcsb() { return this.add("justifyContent", "space-between"); }
+  get jcsa() { return this.add("justifyContent", "space-around"); }
+  get jcse() { return this.add("justifyContent", "space-evenly"); }
+  jc(value: Properties["justifyContent"]) { return this.add("justifyContent", value); }
+  get asfs() { return this.add("alignSelf", "flex-start"); }
+  get asfe() { return this.add("alignSelf", "flex-end"); }
+  get asc() { return this.add("alignSelf", "center"); }
+  get asb() { return this.add("alignSelf", "baseline"); }
+  get asStretch() { return this.add("alignSelf", "stretch"); }
+  as(value: Properties["alignSelf"]) { return this.add("alignSelf", value); }
+  get aifs() { return this.add("alignItems", "flex-start"); }
+  get aife() { return this.add("alignItems", "flex-end"); }
+  get aic() { return this.add("alignItems", "center"); }
+  get aib() { return this.add("alignItems", "baseline"); }
+  get ais() { return this.add("alignItems", "stretch"); }
+  ai(value: Properties["alignItems"]) { return this.add("alignItems", value); }
   get fb1() { return this.add("flexBasis", "100%"); }
   get fb2() { return this.add("flexBasis", "50%"); }
   get fb3() { return this.add("flexBasis", "33.333333%"); }
@@ -229,16 +234,17 @@ class CssBuilder<T extends Properties1> {
   get fs0() { return this.add("flexShrink", 0); }
   get fs1() { return this.add("flexShrink", 1); }
   flexShrink(value: Properties["flexShrink"]) { return this.add("flexShrink", value); }
-  get flexRow() { return this.add("flexDirection", "row"); }
-  get flexRowReverse() { return this.add("flexDirection", "row-reverse"); }
-  get flexColumn() { return this.add("flexDirection", "column"); }
-  get flexColumnReverse() { return this.add("flexDirection", "column-reverse"); }
-  flexDirection(value: Properties["flexDirection"]) { return this.add("flexDirection", value); }
+  get fdr() { return this.add("flexDirection", "row"); }
+  get fdrr() { return this.add("flexDirection", "row-reverse"); }
+  get fdc() { return this.add("flexDirection", "column"); }
+  get fdcr() { return this.add("flexDirection", "column-reverse"); }
+  fd(value: Properties["flexDirection"]) { return this.add("flexDirection", value); }
 
   // float
   get fl() { return this.add("float", "left"); }
   get fn() { return this.add("float", "none"); }
   get fr() { return this.add("float", "right"); }
+  f(value: Properties["float"]) { return this.add("float", value); }
 
   // fontWeight
   get normal() { return this.add("fontWeight", "normal"); }
@@ -252,6 +258,7 @@ class CssBuilder<T extends Properties1> {
   get fw7() { return this.add("fontWeight", 700); }
   get fw8() { return this.add("fontWeight", 800); }
   get fw9() { return this.add("fontWeight", 900); }
+  fw(value: Properties["fontWeight"]) { return this.add("fontWeight", value); }
 
   // grid
   gtc(value: Properties["gridTemplateColumns"]) { return this.add("gridTemplateColumns", value); }
@@ -267,6 +274,28 @@ class CssBuilder<T extends Properties1> {
   get gap8() { return this.gap(8); }
   gap(inc: number | string) { return this.add("gap", maybeInc(inc)); }
   gapPx(px: number) { return this.add("gap", `${px}px`); }
+  get rg0() { return this.rg(0); }
+  get rg1() { return this.rg(1); }
+  get rg2() { return this.rg(2); }
+  get rg3() { return this.rg(3); }
+  get rg4() { return this.rg(4); }
+  get rg5() { return this.rg(5); }
+  get rg6() { return this.rg(6); }
+  get rg7() { return this.rg(7); }
+  get rg8() { return this.rg(8); }
+  rg(inc: number | string) { return this.add("rowGap", maybeInc(inc)); }
+  rgPx(px: number) { return this.add("rowGap", `${px}px`); }
+  get cg0() { return this.cg(0); }
+  get cg1() { return this.cg(1); }
+  get cg2() { return this.cg(2); }
+  get cg3() { return this.cg(3); }
+  get cg4() { return this.cg(4); }
+  get cg5() { return this.cg(5); }
+  get cg6() { return this.cg(6); }
+  get cg7() { return this.cg(7); }
+  get cg8() { return this.cg(8); }
+  cg(inc: number | string) { return this.add("columnGap", maybeInc(inc)); }
+  cgPx(px: number) { return this.add("columnGap", `${px}px`); }
 
   // height
   get h0() { return this.h(0); }
@@ -295,12 +324,14 @@ class CssBuilder<T extends Properties1> {
   get mh100() { return this.add("minHeight", "100%"); }
   get mvh100() { return this.add("minHeight", "100vh"); }
   mh(value: Properties["minHeight"]) { return this.add("minHeight", value); }
+  mhPx(px: number) { return this.add("minHeight", `${px}px`); }
   get maxh0() { return this.add("maxHeight", "0"); }
   get maxh25() { return this.add("maxHeight", "25%"); }
   get maxh50() { return this.add("maxHeight", "50%"); }
   get maxh75() { return this.add("maxHeight", "75%"); }
   get maxh100() { return this.add("maxHeight", "100%"); }
   maxh(value: Properties["maxHeight"]) { return this.add("maxHeight", value); }
+  maxhPx(px: number) { return this.add("maxHeight", `${px}px`); }
 
   // objectFit
   get objectContain() { return this.add("objectFit", "contain"); }
@@ -311,9 +342,10 @@ class CssBuilder<T extends Properties1> {
   objectFit(value: Properties["objectFit"]) { return this.add("objectFit", value); }
 
   // outline
-  get outline() { return this.add("outline", "1px solid"); }
+  get outline1() { return this.add("outline", "1px solid"); }
   get outlineTransparent() { return this.add("outline", "1px solid transparent"); }
   get outline0() { return this.add("outline", "0"); }
+  outline(value: Properties["outline"]) { return this.add("outline", value); }
 
   // overflow
   get overflowVisible() { return this.add("overflow", "visible"); }
@@ -338,6 +370,7 @@ class CssBuilder<T extends Properties1> {
   get static() { return this.add("position", "static"); }
   get relative() { return this.add("position", "relative"); }
   get sticky() { return this.add("position", "sticky"); }
+  position(value: Properties["position"]) { return this.add("position", value); }
 
   // skins
   get white() { return this.add("color", "rgba(254,254,254,1)"); }
@@ -402,7 +435,7 @@ class CssBuilder<T extends Properties1> {
   get violet700() { return this.add("color", "rgba(153,126,181,1)"); }
   get violet800() { return this.add("color", "rgba(128,103,151,1)"); }
   get violet900() { return this.add("color", "rgba(100,78,116,1)"); }
-  color(value: string) { return this.add("color", value); }
+  color(value: Properties["color"]) { return this.add("color", value); }
   get bgWhite() { return this.add("backgroundColor", "rgba(254,254,254,1)"); }
   get bgTransparent() { return this.add("backgroundColor", "rgba(0,0,0,0)"); }
   get bgGray50() { return this.add("backgroundColor", "rgba(255,253,253,1)"); }
@@ -465,7 +498,7 @@ class CssBuilder<T extends Properties1> {
   get bgViolet700() { return this.add("backgroundColor", "rgba(153,126,181,1)"); }
   get bgViolet800() { return this.add("backgroundColor", "rgba(128,103,151,1)"); }
   get bgViolet900() { return this.add("backgroundColor", "rgba(100,78,116,1)"); }
-  bgColor(value: string) { return this.add("backgroundColor", value); }
+  bgColor(value: Properties["backgroundColor"]) { return this.add("backgroundColor", value); }
   get fWhite() { return this.add("fill", "rgba(254,254,254,1)"); }
   get fTransparent() { return this.add("fill", "rgba(0,0,0,0)"); }
   get fGray50() { return this.add("fill", "rgba(255,253,253,1)"); }
@@ -528,7 +561,7 @@ class CssBuilder<T extends Properties1> {
   get fViolet700() { return this.add("fill", "rgba(153,126,181,1)"); }
   get fViolet800() { return this.add("fill", "rgba(128,103,151,1)"); }
   get fViolet900() { return this.add("fill", "rgba(100,78,116,1)"); }
-  fill(value: string) { return this.add("fill", value); }
+  fill(value: Properties["fill"]) { return this.add("fill", value); }
 
   // spacing
   get mt0() { return this.mt(0); }
@@ -691,17 +724,20 @@ class CssBuilder<T extends Properties1> {
   get tc() { return this.add("textAlign", "center"); }
   get tr() { return this.add("textAlign", "right"); }
   get tj() { return this.add("textAlign", "justify"); }
+  ta(value: Properties["textAlign"]) { return this.add("textAlign", value); }
 
   // textDecoration
   get noUnderline() { return this.add("textDecoration", "none"); }
   get strike() { return this.add("textDecoration", "line-through"); }
   get underline() { return this.add("textDecoration", "underline"); }
+  textDecoration(value: Properties["textDecoration"]) { return this.add("textDecoration", value); }
 
   // textTransform
   get ttc() { return this.add("textTransform", "capitalize"); }
   get ttl() { return this.add("textTransform", "lowercase"); }
   get ttu() { return this.add("textTransform", "uppercase"); }
   get ttn() { return this.add("textTransform", "none"); }
+  tt(value: Properties["textTransform"]) { return this.add("textTransform", value); }
 
   // typeScale
   get tiny() { return this.add("fontWeight", 400).add("fontSize", "10px").add("lineHeight", "14px"); }
@@ -738,21 +774,25 @@ class CssBuilder<T extends Properties1> {
   get selectText() { return this.add("userSelect", "text"); }
   get selectAll() { return this.add("userSelect", "all"); }
   get selectAuto() { return this.add("userSelect", "auto"); }
+  select(value: Properties["userSelect"]) { return this.add("userSelect", value); }
 
   // verticalAlign
   get vBase() { return this.add("verticalAlign", "baseline"); }
   get vMid() { return this.add("verticalAlign", "middle"); }
   get vTop() { return this.add("verticalAlign", "top"); }
   get vBottom() { return this.add("verticalAlign", "bottom"); }
+  va(value: Properties["verticalAlign"]) { return this.add("verticalAlign", value); }
 
   // visibility
   get visible() { return this.add("visibility", "visible"); }
   get invisible() { return this.add("visibility", "hidden"); }
+  visibility(value: Properties["visibility"]) { return this.add("visibility", value); }
 
   // whitespace
   get nowrap() { return this.add("whiteSpace", "nowrap"); }
   get pre() { return this.add("whiteSpace", "pre"); }
   get wsNormal() { return this.add("whiteSpace", "normal"); }
+  whiteSpace(value: Properties["whiteSpace"]) { return this.add("whiteSpace", value); }
 
   // width
   get w25() { return this.add("width", "25%"); }
@@ -799,6 +839,7 @@ class CssBuilder<T extends Properties1> {
 
   // fontFamily
   get sansSerif() { return this.add("fontFamily", "'Inter', sans-serif"); }
+  fontFamily(value: Properties["fontFamily"]) { return this.add("fontFamily", value); }
 
   // animation
   get transition() { return this.add("transition", "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms"); }
@@ -862,10 +903,13 @@ class CssBuilder<T extends Properties1> {
   }
 
   /** Adds new properties, either a specific key/value or a Properties object, to a nested selector. */
-  addIn<P extends Properties>(selector: string, props: P): CssBuilder<T & P>;
+  addIn<P extends Properties>(selector: string, props: P | undefined): CssBuilder<T & P>;
   addIn<K extends keyof Properties>(selector: string, prop: K, value: Properties[K]): CssBuilder<T & { [U in K]: Properties[K] }>;
   addIn<K extends keyof Properties>(selector: string, propOrProperties: K | Properties, value?: Properties[K]): CssBuilder<any> {
     const newRules = typeof propOrProperties === "string" ?  { [propOrProperties]: value } : propOrProperties;
+    if (newRules === undefined) {
+      return this;
+    }
     const rules = { ...this.rules, [selector]: { ...(this.rules as any)[selector], ...newRules } };
     return this.newCss({ rules: rules as any });
   }

@@ -19,7 +19,7 @@ export function Chip<X extends Only<ChipXss, X>>(props: ChipProps<X>) {
     <button
       type="button"
       css={{
-        ...Css.dif.itemsCenter.br16.sm.pl1
+        ...Css.dif.aic.br16.sm.pl1
           // Use a lower right-padding to get closer to the `X` circle
           .prPx(4)
           .pyPx(2)

@@ -101,7 +101,7 @@ export function VirtualFiltering() {
   const rowLookup = useRef<GridRowLookup<Row> | undefined>();
   const [filter, setFilter] = useState<string | undefined>();
   return (
-    <div css={Css.df.flexColumn.add({ height: heightWithoutStorybookPadding }).$}>
+    <div css={Css.df.fdc.add({ height: heightWithoutStorybookPadding }).$}>
       <div>
         <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
         <Button label="goto 500" onClick={() => rowLookup.current!.scrollTo("data", "500")} />

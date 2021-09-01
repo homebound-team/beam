@@ -55,7 +55,7 @@ export function Option<T>({
       {...hoverProps}
       ref={ref as any}
       css={{
-        ...Css.df.itemsCenter.justifyBetween.py1.px2.mh("42px").cursorPointer.sm.$,
+        ...Css.df.aic.jcsb.py1.px2.mh("42px").cursorPointer.sm.$,
         ...themeStyles.item,
         ...(isHovered && !isDisabled ? themeStyles.hover : {}),
         ...(isFocused ? themeStyles.focus : {}),

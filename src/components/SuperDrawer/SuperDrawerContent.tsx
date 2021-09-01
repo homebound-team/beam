@@ -70,7 +70,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
       {wrapWithMotionAndMaybeBack(children)}
       {/* Optionally render footer section with row of given footer buttons */}
       {actions && (
-        <footer css={Css.bt.bGray200.p3.df.itemsCenter.justifyEnd.$}>
+        <footer css={Css.bt.bGray200.p3.df.aic.jcfe.$}>
           <div css={Css.df.childGap1.$}>
             {actions.map((buttonProps, i) => (
               <Button key={i} {...buttonProps} />

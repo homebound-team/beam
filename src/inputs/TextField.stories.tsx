@@ -11,8 +11,8 @@ export default {
 
 export function TextFieldStyles() {
   return (
-    <div css={Css.df.flexColumn.childGap5.$}>
-      <div css={Css.df.flexColumn.childGap2.$}>
+    <div css={Css.df.fdc.childGap5.$}>
+      <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <TestTextField value="" label="Name" hideLabel />
         <TestTextField label="Name" value="" />
@@ -41,7 +41,7 @@ export function TextFieldStyles() {
         />
       </div>
 
-      <div css={Css.df.flexColumn.childGap2.$}>
+      <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Compact</h1>
         <TestTextField compact value="" label="Name" hideLabel />
         <TestTextField compact label="Name" value="" />
@@ -62,14 +62,14 @@ export function TextFieldStyles() {
 export function TextFieldReadOnly() {
   return (
     <div css={Css.df.childGap2.$}>
-      <div css={Css.df.flexColumn.childGap3.$}>
+      <div css={Css.df.fdc.childGap3.$}>
         <b>Read Only</b>
         <TestTextField label="Name" value="first" readOnly={true} />
         <TestTextField label="Name" value="first" hideLabel readOnly={true} />
         <TestTextField label="Name" value={"first ".repeat(20) + "last"} readOnly={true} />
       </div>
       {/*Matching column but w/o readOnly for comparison*/}
-      <div css={Css.df.flexColumn.childGap3.$}>
+      <div css={Css.df.fdc.childGap3.$}>
         <b>Editable</b>
         <TestTextField label="Name" value="first" />
         <TestTextField label="Name" value="first" hideLabel />

@@ -107,7 +107,7 @@ function AuthorDetails({ formState, onNext }: { formState: FormValue; onNext: Ca
             <BoundTextField field={formState.lastName} helperText="Required to enable next step" />
           </div>
 
-          <div css={Css.df.justifyEnd.bt.bGray300.py1.mt2.$}>
+          <div css={Css.df.jcfe.bt.bGray300.py1.mt2.$}>
             <Button
               label="Continue to Books"
               disabled={!formState.firstName.valid || !formState.lastName.valid}
@@ -129,7 +129,7 @@ function BookList({ formState, onNext, onBack }: { formState: FormValue; onNext:
 
   return (
     <div>
-      <h1 css={Css.df.itemsCenter.$}>
+      <h1 css={Css.df.aic.$}>
         Books
         <IconButton
           icon="plus"
@@ -138,7 +138,7 @@ function BookList({ formState, onNext, onBack }: { formState: FormValue; onNext:
       </h1>
       <GridTable<Row> columns={columns} rows={rows} observeRows={true} />
 
-      <div css={Css.df.justifyBetween.bt.bGray300.py1.mt2.$}>
+      <div css={Css.df.jcsb.bt.bGray300.py1.mt2.$}>
         <Button variant="tertiary" label="Back" onClick={onBack} />
         <Button label="Continue to Misc." disabled={!formState.books.valid} onClick={onNext} />
       </div>
@@ -176,7 +176,7 @@ function MiscAuthorDetails({ formState, onBack }: { formState: FormValue; onBack
             <BoundNumberField field={formState.heightInInches} />
           </div>
 
-          <div css={Css.df.justifyBetween.bt.bGray300.py1.mt2.$}>
+          <div css={Css.df.jcsb.bt.bGray300.py1.mt2.$}>
             <Button variant="tertiary" label="Back" onClick={onBack} />
             <Button
               disabled={!formState.valid}

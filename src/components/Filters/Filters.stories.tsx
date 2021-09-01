@@ -81,8 +81,8 @@ export function Filter() {
   });
 
   return (
-    <div css={Css.df.flexColumn.childGap5.$}>
-      <div css={Css.df.flexColumn.childGap2.$}>
+    <div css={Css.df.fdc.childGap5.$}>
+      <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Filters</h1>
         <Filters<ProjectFilter> filter={filter} onChange={setFilter} filterDefs={filterDefs} />
       </div>
@@ -116,7 +116,7 @@ export function GroupBy() {
     filterDefs,
   });
   return (
-    <div css={Css.df.flexColumn.childGap2.$}>
+    <div css={Css.df.fdc.childGap2.$}>
       <Filters groupBy={groupBy} filter={filter} onChange={setFilter} filterDefs={filterDefs} />
       <strong>Applied Filter:</strong> {JSON.stringify(filter)}
     </div>
@@ -149,7 +149,7 @@ export function GroupByViewAll() {
     filterDefs,
   });
   return (
-    <div css={Css.df.flexColumn.childGap2.$}>
+    <div css={Css.df.fdc.childGap2.$}>
       <Filters groupBy={groupBy} filter={filter} onChange={setFilter} filterDefs={filterDefs} />
       <strong>Applied Filter:</strong> {JSON.stringify(filter)}
     </div>

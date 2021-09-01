@@ -17,7 +17,7 @@ export default {
 export function TabBaseStates() {
   const styles = getTabStyles();
   return (
-    <div css={Css.df.flexColumn.childGap2.$}>
+    <div css={Css.df.fdc.childGap2.$}>
       <div css={{ ...styles.baseStyles, ...styles.activeStyles }}>{getChildren("active")}</div>
       <div css={{ ...styles.baseStyles, ...styles.focusRingStyles }}>{getChildren("focus ring")}</div>
       <div css={styles.baseStyles}>{getChildren("default")}</div>

@@ -78,12 +78,7 @@ export function Modal(props: ModalProps) {
         <FocusScope contain restoreFocus autoFocus>
           <div
             css={
-              Css.br24.bgWhite.bshModal
-                .maxh("90vh")
-                .df.flexColumn.wPx(width)
-                .mh(px(height))
-                .if(isFixedHeight)
-                .hPx(height).$
+              Css.br24.bgWhite.bshModal.maxh("90vh").df.fdc.wPx(width).mh(px(height)).if(isFixedHeight).hPx(height).$
             }
             ref={ref}
             {...overlayProps}
@@ -146,7 +141,7 @@ export function ModalFooter<X extends Only<ModalFooterXss, X>>({
   const { modalFooterDiv } = useContext(BeamContext);
   const testId = useTestIds({}, testIdPrefix);
   return createPortal(
-    <div css={{ ...Css.p3.df.itemsCenter.justifyEnd.$, ...xss }} {...testId.footer}>
+    <div css={{ ...Css.p3.df.aic.jcfe.$, ...xss }} {...testId.footer}>
       {children}
     </div>,
     modalFooterDiv,

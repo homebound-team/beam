@@ -20,7 +20,7 @@ export const Switch = () => {
   return (
     <div css={{ h1: Css.xl4Em.mb4.$, h2: Css.xl2Em.$ }}>
       <h1>Switch</h1>
-      <div css={Css.df.gap4.flexColumn.$}>
+      <div css={Css.df.gap4.fdc.$}>
         <h2>Switch</h2>
         <div css={Css.dg.gapPx(48).gtc("repeat(auto-fit, 365px)").$}>
           <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>

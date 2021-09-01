@@ -11,8 +11,8 @@ export default {
 
 export function TextAreaStyles() {
   return (
-    <div css={Css.df.flexColumn.childGap5.$}>
-      <div css={Css.df.flexColumn.childGap2.$}>
+    <div css={Css.df.fdc.childGap5.$}>
+      <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <TestTextArea value="" label="Description" hideLabel />
         <TestTextArea label="Description" value="" />
@@ -33,7 +33,7 @@ export function TextAreaStyles() {
 export function TextAreaReadOnly() {
   return (
     <div css={Css.df.childGap2.$}>
-      <div css={Css.df.flexColumn.childGap3.$}>
+      <div css={Css.df.fdc.childGap3.$}>
         <b>Read Only</b>
         <TestTextArea label="Name" value="first" readOnly={true} />
         <TestTextArea label="Name" value="first" hideLabel readOnly={true} />
@@ -41,7 +41,7 @@ export function TextAreaReadOnly() {
         <TestTextArea label="Name" value={"this is a sentence\n".repeat(4)} readOnly={true} />
       </div>
       {/*Matching column but w/o readOnly for comparison*/}
-      <div css={Css.df.flexColumn.childGap3.wPx(400).$}>
+      <div css={Css.df.fdc.childGap3.wPx(400).$}>
         <b>Editable</b>
         <TestTextArea label="Name" value="first" />
         <TestTextArea label="Name" value="first" hideLabel />

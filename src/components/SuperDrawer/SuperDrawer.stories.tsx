@@ -314,7 +314,7 @@ function TestDrawerContent({ book, hasActions = true }: TestDrawerContentProps) 
         <strong>Description:</strong> {book.bookDescription}
       </p>
       <hr css={Css.my1.$} />
-      <div css={Css.df.gap1.itemsCenter.$}>
+      <div css={Css.df.gap1.aic.$}>
         <p>
           <strong>Author:</strong> {book.authorName}
         </p>
@@ -358,7 +358,7 @@ function TestSimpleModalContent({ book, onPrimaryClick }: { book: Book; onPrimar
     <>
       <ModalHeader>Confirm</ModalHeader>
       <ModalBody>
-        <div css={Css.wPx(500).df.flexColumn.justifyCenter.itemsCenter.tc.$}>
+        <div css={Css.wPx(500).df.fdc.jcc.aic.tc.$}>
           <p css={Css.lgEm.$}>Are you sure you want to purchase {book.bookTitle} ?</p>
         </div>
       </ModalBody>

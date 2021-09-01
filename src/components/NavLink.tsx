@@ -76,7 +76,7 @@ export function getNavLinkStyles(variant: NavLinkVariant) {
   return navLinkVariantStyles[variant];
 }
 
-const baseStyles = Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.outline0.$;
+const baseStyles = Css.df.aic.hPx(32).pyPx(6).px1.br4.smEm.outline0.$;
 
 const navLinkVariantStyles: Record<
   NavLinkVariant,

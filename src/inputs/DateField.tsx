@@ -41,7 +41,7 @@ export function DateField(props: DateFieldProps) {
   return (
     <div
       css={{
-        ...Css.df.flexColumn.w100.maxw("550px").$,
+        ...Css.df.fdc.w100.maxw("550px").$,
         "& .DayPickerInput": Css.relative.$,
         // Copy/pasted from TextFieldBase to soften the border, fix our border/padding/height
         "& .DayPickerInput input": {
