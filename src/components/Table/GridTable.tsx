@@ -127,7 +127,7 @@ export const defaultStyle: GridStyle = {
   indentOneCss: Css.pl4.$,
   indentTwoCss: Css.pl7.$,
   // Use h100 so that all cells are the same height when scrolled; set bgWhite for when we're laid over other rows.
-  headerCellCss: Css.selfEnd.nowrap.py1.bgGray100.h100.itemsEnd.$,
+  headerCellCss: Css.asfe.nowrap.py1.bgGray100.h100.aife.$,
   firstRowMessageCss: Css.px1.py2.$,
   rowHoverColor: Palette.Gray200,
 };
@@ -136,7 +136,7 @@ export const defaultStyle: GridStyle = {
 export const condensedStyle: GridStyle = {
   ...defaultStyle,
   headerCellCss: Css.bgGray100.tinyEm.$,
-  cellCss: Css.itemsCenter.sm.py1.px2.$,
+  cellCss: Css.aic.sm.py1.px2.$,
   rootCss: Css.dg.gray700.xs.$,
 };
 
@@ -1073,7 +1073,7 @@ function getJustification(column: GridColumn<any>, maybeContent: ReactNode | Gri
   if (as === "table") {
     return textAlign;
   }
-  return { ...Css.justify(alignmentToJustify[alignment]).$, ...textAlign };
+  return { ...Css.jc(alignmentToJustify[alignment]).$, ...textAlign };
 }
 
 // We currently mutate `rows` while sorting; this would be bad if rows was directly
@@ -1222,7 +1222,7 @@ export function SortHeader(props: { content: string; xss?: Properties }) {
   const { sorted, toggleSort } = useContext(GridSortContext);
   const tid = useTestIds(props, "sortHeader");
   return (
-    <div {...tid} css={{ ...Css.df.itemsCenter.cursorPointer.selectNone.$, ...xss }} onClick={toggleSort}>
+    <div {...tid} css={{ ...Css.df.aic.cursorPointer.selectNone.$, ...xss }} onClick={toggleSort}>
       {content}
       {sorted === "ASC" && <Icon icon="sortUp" inc={2} {...tid.icon} xss={Css.mlPx(4).$} />}
       {sorted === "DESC" && <Icon icon="sortDown" inc={2} {...tid.icon} xss={Css.mlPx(4).$} />}

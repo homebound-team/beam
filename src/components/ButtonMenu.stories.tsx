@@ -18,7 +18,7 @@ export function MenuOpen() {
   ];
 
   return (
-    <div css={Css.df.flexColumn.$}>
+    <div css={Css.df.fdc.$}>
       <h2 css={Css.lg.$}>Default - Anchored left</h2>
       <ButtonMenu
         trigger={{ label: "Menu trigger" }}

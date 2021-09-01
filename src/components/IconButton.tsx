@@ -80,8 +80,7 @@ export function IconButton(props: IconButtonProps) {
 }
 
 const iconButtonStylesReset =
-  Css.hPx(28).wPx(28).br8.bTransparent.bsSolid.bw2.bgTransparent.cursorPointer.outline0.p0.dif.itemsCenter.justifyCenter
-    .transition.$;
+  Css.hPx(28).wPx(28).br8.bTransparent.bsSolid.bw2.bgTransparent.cursorPointer.outline0.p0.dif.aic.jcc.transition.$;
 export const iconButtonStylesHover = Css.bgGray100.$;
 const iconButtonStylesFocus = Css.bLightBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;

@@ -50,10 +50,7 @@ const sections: Sections = {
       br24: "24px",
       br100: "100%",
     }),
-  animation: () =>
-    newMethodsForProp("transition", {
-      transition,
-    }),
+  animation: () => [newMethod("transition", { transition })],
   boxShadow: () =>
     newMethodsForProp("boxShadow", {
       bsh0: "none",

@@ -30,13 +30,13 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
     <>
       <ModalHeader>More Filters</ModalHeader>
       <ModalBody>
-        <div css={Css.df.flexColumn.$}>
+        <div css={Css.df.fdc.$}>
           {filterComponents.map((c, idx) => (
             <div key={idx}>{c}</div>
           ))}
         </div>
       </ModalBody>
-      <ModalFooter xss={Css.justifyBetween.$}>
+      <ModalFooter xss={Css.jcsb.$}>
         <Button
           label="Clear"
           variant="tertiary"

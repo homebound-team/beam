@@ -193,8 +193,7 @@ function SingleTab<V extends string>(props: TabProps<V>) {
 
 export function getTabStyles() {
   return {
-    baseStyles: Css.df.itemsCenter.hPx(32).pyPx(6).px1.br4.smEm.outline0.gray700.add("width", "fit-content")
-      .cursorPointer.$,
+    baseStyles: Css.df.aic.hPx(32).pyPx(6).px1.br4.smEm.outline0.gray700.add("width", "fit-content").cursorPointer.$,
     activeStyles: Css.lightBlue700.bgLightBlue50.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
     focusRingStyles: Css.bgLightBlue50.bshFocus.$,

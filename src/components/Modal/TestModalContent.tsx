@@ -20,7 +20,7 @@ export function TestModalContent(props: { initNumSentences?: number; showLeftAct
     <>
       <ModalHeader>
         {props.withTag ? (
-          <div css={Css.df.itemsCenter.$}>
+          <div css={Css.df.aic.$}>
             <span>Modal Title with Tag</span>
             <Tag text="In progress" type="info" xss={Css.ml1.$} />
           </div>
@@ -29,7 +29,7 @@ export function TestModalContent(props: { initNumSentences?: number; showLeftAct
         )}
       </ModalHeader>
       <ModalBody>
-        <div css={Css.df.gap1.flexColumn.itemsStart.$}>
+        <div css={Css.df.gap1.fdc.aifs.$}>
           <div css={Css.df.childGap1.$}>
             <Button label="More" onClick={() => setNumSentences(numSentences + 2)} />
             <Button label="Clear" onClick={() => setNumSentences(0)} />
@@ -41,7 +41,7 @@ export function TestModalContent(props: { initNumSentences?: number; showLeftAct
           <p>{"The body content of the modal. This content can be anything!".repeat(numSentences)}</p>
         </div>
       </ModalBody>
-      <ModalFooter xss={showLeftAction ? Css.justifyBetween.$ : undefined}>
+      <ModalFooter xss={showLeftAction ? Css.jcsb.$ : undefined}>
         {showLeftAction && (
           <div>
             <Button label="Clear" onClick={action("Clear Action")} variant="tertiary" disabled={leftActionDisabled} />

@@ -78,7 +78,7 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
 
   // Return list of filter components. `onSelect` should update the `filter`
   return (
-    <div css={Css.df.itemsCenter.childGap1.$} {...testId}>
+    <div css={Css.df.aic.childGap1.$} {...testId}>
       {maybeGroupByField}
       {pageFilters.map((c, idx) => (
         <div key={idx}>{c}</div>
@@ -88,7 +88,7 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
           label="More Filters"
           endAdornment={
             numModalFilters > 0 && (
-              <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinyEm.df.itemsCenter.justifyCenter.$}>
+              <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinyEm.df.aic.jcc.$}>
                 {numModalFilters}
               </span>
             )

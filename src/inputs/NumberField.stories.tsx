@@ -11,8 +11,8 @@ export default {
 
 export function NumberFieldStyles() {
   return (
-    <div css={Css.df.flexColumn.childGap5.$}>
-      <div css={Css.df.flexColumn.childGap2.$}>
+    <div css={Css.df.fdc.childGap5.$}>
+      <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <TestNumberField value={0} label="Age" hideLabel />
         <TestNumberField label="Age" value={1000} />
@@ -26,7 +26,7 @@ export function NumberFieldStyles() {
         <ValidationNumberField label="Age Validated" value={-1} />
       </div>
 
-      <div css={Css.df.flexColumn.childGap2.$}>
+      <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Compact</h1>
         <TestNumberField compact value={0} label="Age" hideLabel />
         <TestNumberField compact label="Age" value={1000} />
@@ -34,7 +34,7 @@ export function NumberFieldStyles() {
         <ValidationNumberField label="Age Validated" compact value={-1} />
       </div>
 
-      <div css={Css.df.flexColumn.childGap2.$}>
+      <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Unit Types</h1>
         <TestNumberField label="Percent" type="percent" value={12} />
         <TestNumberField label="Cents" type="cents" value={1000} />
@@ -47,7 +47,7 @@ export function NumberFieldStyles() {
 export function NumberFieldReadOnly() {
   return (
     <div css={Css.df.childGap2.$}>
-      <div css={Css.df.flexColumn.childGap3.$}>
+      <div css={Css.df.fdc.childGap3.$}>
         <b>Read Only</b>
         <TextField label="First Name" value="first" onChange={() => {}} readOnly={true} />
         <TestNumberField label="Name" value={100} readOnly={true} />
@@ -56,7 +56,7 @@ export function NumberFieldReadOnly() {
         <TestNumberField label="Name" value={100} readOnly={true} type="percent" />
       </div>
       {/*Matching column but w/o readOnly for comparison*/}
-      <div css={Css.df.flexColumn.childGap3.$}>
+      <div css={Css.df.fdc.childGap3.$}>
         <b>Editable</b>
         <TextField label="First Name" value="first" onChange={() => {}} />
         <TestNumberField label="Name" value={100} />

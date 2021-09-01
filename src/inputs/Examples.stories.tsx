@@ -26,9 +26,7 @@ export function SuperDrawerWithForm() {
 function DrawerWithInputs() {
   return (
     <SuperDrawerContent actions={[{ label: "Cancel" }, { label: "Save" }]}>
-      <form
-        css={{ ...Css.df.flexColumn.childGap5.$, fieldset: Css.df.flexColumn.childGap2.$, legend: Css.baseEm.mb2.$ }}
-      >
+      <form css={{ ...Css.df.fdc.childGap5.$, fieldset: Css.df.fdc.childGap2.$, legend: Css.baseEm.mb2.$ }}>
         <fieldset>
           <legend>Details</legend>
           <TextField label="Item Name" value="Counters" onChange={action("TextField - onChange")} />

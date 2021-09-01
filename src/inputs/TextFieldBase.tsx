@@ -78,17 +78,15 @@ export function TextFieldBase(props: TextFieldBaseProps) {
   );
 
   return (
-    <div css={Css.df.flexColumn.w100.maxw(px(550)).$} {...groupProps}>
+    <div css={Css.df.fdc.w100.maxw(px(550)).$} {...groupProps}>
       {label && !hideLabel && <Label labelProps={labelProps} label={label} suffix={labelSuffix} {...tid.label} />}
       {readOnly && (
         <div
           css={{
             // Copy/pasted from StaticField, maybe we should combine?
-            ...Css.sm.gray900.df.itemsCenter.mh(px(40)).$,
+            ...Css.sm.gray900.df.aic.mh(px(40)).$,
             ...Css.maxw(px(500)).$,
-            ...(multiline
-              ? Css.flexColumn.itemsStart.childGap2.$
-              : Css.add({ overflow: "hidden", whiteSpace: "nowrap" }).$),
+            ...(multiline ? Css.fdc.aifs.childGap2.$ : Css.add({ overflow: "hidden", whiteSpace: "nowrap" }).$),
             ...xss,
           }}
           {...tid}

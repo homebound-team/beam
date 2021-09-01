@@ -32,7 +32,7 @@ export function FormLines(props: FormLinesProps) {
     <FormContext.Provider value={{ labelSuffix }}>
       <div
         css={{
-          ...Css.df.flexColumn.w(sizes[width]).$,
+          ...Css.df.fdc.w(sizes[width]).$,
           // Purposefully use this instead of childGap3 to put margin-bottom on the last line
           "& > *": Css.mb2.$,
         }}

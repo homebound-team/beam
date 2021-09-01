@@ -47,9 +47,9 @@ export function Switch(props: SwitchProps) {
       {...hoverProps}
       css={{
         ...Css.relative.cursorPointer.df.w("max-content").smEm.selectNone.$,
-        ...(labelStyle === "form" && Css.flexColumn.$),
-        ...(labelStyle === "inline" && Css.childGap2.itemsCenter.$),
-        ...(labelStyle === "filter" && Css.justifyBetween.itemsCenter.w("auto").sm.$),
+        ...(labelStyle === "form" && Css.fdc.$),
+        ...(labelStyle === "inline" && Css.childGap2.aic.$),
+        ...(labelStyle === "filter" && Css.jcsb.aic.w("auto").sm.$),
         ...(isDisabled && Css.cursorNotAllowed.gray400.$),
       }}
     >
@@ -116,7 +116,7 @@ const switchCircleDefaultStyles = (isCompact: boolean) => ({
   ...Css.wPx(circleDiameter(isCompact))
     .hPx(circleDiameter(isCompact))
     .br100.bgWhite.bshBasic.absolute.leftPx(2)
-    .topPx(isCompact ? 1 : 2).transition.df.itemsCenter.justifyCenter.$,
+    .topPx(isCompact ? 1 : 2).transition.df.aic.jcc.$,
   svg: Css.hPx(toggleHeight(isCompact) / 2).wPx(toggleHeight(isCompact) / 2).$,
 });
 

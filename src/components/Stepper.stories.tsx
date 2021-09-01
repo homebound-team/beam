@@ -68,7 +68,7 @@ export function StepperStates() {
   const [currentStep, setCurrentStep] = useState(steps[0].value);
 
   return (
-    <div css={Css.df.flexColumn.childGap4.$}>
+    <div css={Css.df.fdc.childGap4.$}>
       <div>
         <h2>Enabled Steps</h2>
         <Stepper steps={steps} currentStep={currentStep} onChange={setCurrentStep} />

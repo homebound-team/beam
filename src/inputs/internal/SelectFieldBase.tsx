@@ -253,7 +253,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   };
 
   return (
-    <div css={Css.dif.flexColumn.w100.maxw(px(550)).$} ref={comboBoxRef}>
+    <div css={Css.dif.fdc.w100.maxw(px(550)).$} ref={comboBoxRef}>
       <SelectFieldInput
         buttonProps={buttonProps}
         buttonRef={triggerRef}

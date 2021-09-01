@@ -55,7 +55,7 @@ export const IconButtonStyles = (args: IconButtonProps) => (
 
 export function WithTooltip() {
   return (
-    <div css={Css.dg.flexColumn.childGap2.justifyStart.$}>
+    <div css={Css.dg.fdc.childGap2.jcfs.$}>
       <div>
         <h2>Tooltip provided via 'disabled' property</h2>
         <IconButton

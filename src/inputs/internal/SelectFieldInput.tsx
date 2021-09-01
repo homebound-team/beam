@@ -105,7 +105,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
       )}
       <div
         css={{
-          ...Css.df.ba.br4.px1.itemsCenter.hPx(40).if(compact).hPx(32).$,
+          ...Css.df.ba.br4.px1.aic.hPx(40).if(compact).hPx(32).$,
           ...themeStyles.wrapper,
           ...hoverStyles,
           ...errorStyles,
@@ -118,7 +118,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
       >
         {inlineLabel && label && <InlineLabel labelProps={labelProps} label={label} {...tid.label} />}
         {isMultiSelect && state.selectionManager.selectedKeys.size > 1 && (
-          <span css={Css.wPx(16).hPx(16).mr1.fs0.br100.bgLightBlue700.white.tinyEm.df.itemsCenter.justifyCenter.$}>
+          <span css={Css.wPx(16).hPx(16).mr1.fs0.br100.bgLightBlue700.white.tinyEm.df.aic.jcc.$}>
             {state.selectionManager.selectedKeys.size}
           </span>
         )}
@@ -126,7 +126,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
         {(!isMultiSelect || (isMultiSelect && !isFocused)) && fieldDecoration && selectedOptions.length === 1 && (
           <span
             css={{
-              ...Css.df.itemsCenter.br4.fs0.pr1.$,
+              ...Css.df.aic.br4.fs0.pr1.$,
               ...errorStyles,
               ...hoverStyles,
             }}
