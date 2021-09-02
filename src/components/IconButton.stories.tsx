@@ -87,6 +87,10 @@ export function IconButtonLink() {
         <IconButton icon="plus" onClick="/fakePath" />
       </div>
       <div>
+        <h2>Relative Path - Open in new tab</h2>
+        <IconButton icon="arrowBack" onClick="/" openInNew />
+      </div>
+      <div>
         <h2>Absolute Link</h2>
         <IconButton icon="linkExternal" onClick="https://www.homebound.com" />
       </div>

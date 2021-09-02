@@ -1,6 +1,7 @@
 import { matchers } from "@emotion/jest";
 import { configureGlobalWrappers } from "@homebound/rtl-utils";
 import "@testing-library/jest-dom";
+import "jest-chain";
 import { configure } from "mobx";
 import { withBeamRTL } from "src/utils/rtl";
 
