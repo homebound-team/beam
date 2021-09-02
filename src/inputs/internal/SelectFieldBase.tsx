@@ -276,8 +276,10 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         labelProps={labelProps}
         selectedOptions={fieldState.selectedOptions}
         getOptionValue={getOptionValue}
+        getOptionLabel={getOptionLabel}
         sizeToContent={sizeToContent}
         contrast={contrast}
+        nothingSelectedText={nothingSelectedText}
       />
       {state.isOpen && (
         <Popover
