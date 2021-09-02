@@ -72,7 +72,7 @@ export function Button(props: ButtonProps) {
 
   const button =
     typeof onPress === "string" ? (
-      isAbsoluteUrl(onPress) ? (
+      isAbsoluteUrl(onPress) || openInNew ? (
         <a {...buttonAttrs} href={onPress} className={navLink} target="_blank" rel="noreferrer noopener">
           {buttonContent}
           <span css={Css.ml1.$}>
@@ -80,12 +80,7 @@ export function Button(props: ButtonProps) {
           </span>
         </a>
       ) : (
-        <Link
-          {...buttonAttrs}
-          to={onPress}
-          className={navLink}
-          {...(openInNew ? { target: "_blank", rel: "noreferrer noopener" } : {})}
-        >
+        <Link {...buttonAttrs} to={onPress} className={navLink}>
           {buttonContent}
         </Link>
       )

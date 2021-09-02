@@ -65,17 +65,12 @@ export function IconButton(props: IconButtonProps) {
 
   const button =
     typeof onPress === "string" ? (
-      isAbsoluteUrl(onPress) ? (
+      isAbsoluteUrl(onPress) || openInNew ? (
         <a {...buttonAttrs} href={onPress} className={navLink} target="_blank" rel="noreferrer noopener">
           {buttonContent}
         </a>
       ) : (
-        <Link
-          {...buttonAttrs}
-          to={onPress}
-          className={navLink}
-          {...(openInNew ? { target: "_blank", rel: "noreferrer noopener" } : {})}
-        >
+        <Link {...buttonAttrs} to={onPress} className={navLink}>
           {buttonContent}
         </Link>
       )

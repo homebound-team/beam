@@ -21,31 +21,31 @@ describe("Button", () => {
 
   it("fires onClick method", async () => {
     const onClick = jest.fn();
-    const { button } = await render(<Button label="Button" onClick={onClick} />);
-    expect(button().tagName).toBe("BUTTON");
-    click(button);
+    const r = await render(<Button label="Button" onClick={onClick} />);
+    expect(r.button().tagName).toBe("BUTTON");
+    click(r.button);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   it("applies expected properties when rendering a link with an absolute url", async () => {
-    const { button } = await render(<Button label="Button" onClick="https://www.homebound.com" />, withRouter());
-    expect(button().tagName).toBe("A");
-    expect(button())
+    const r = await render(<Button label="Button" onClick="https://www.homebound.com" />, withRouter());
+    expect(r.button().tagName).toBe("A");
+    expect(r.button())
       .toHaveAttribute("href", "https://www.homebound.com")
       .toHaveAttribute("target", "_blank")
       .toHaveAttribute("rel", "noreferrer noopener");
   });
 
   it("applies expected properties when rendering a link with a relative url", async () => {
-    const { button } = await render(<Button label="Button" onClick="/testPath" />, withRouter());
-    expect(button().tagName).toBe("A");
-    expect(button()).toHaveAttribute("href", "/testPath").not.toHaveAttribute("target").not.toHaveAttribute("rel");
+    const r = await render(<Button label="Button" onClick="/testPath" />, withRouter());
+    expect(r.button().tagName).toBe("A");
+    expect(r.button()).toHaveAttribute("href", "/testPath").not.toHaveAttribute("target").not.toHaveAttribute("rel");
   });
 
   it("applies expected properties when rendering a link with a relative url to open in new tab", async () => {
-    const { button } = await render(<Button label="Button" onClick="/testPath" openInNew />, withRouter());
-    expect(button().tagName).toBe("A");
-    expect(button())
+    const r = await render(<Button label="Button" onClick="/testPath" openInNew />, withRouter());
+    expect(r.button().tagName).toBe("A");
+    expect(r.button())
       .toHaveAttribute("href", "/testPath")
       .toHaveAttribute("target", "_blank")
       .toHaveAttribute("rel", "noreferrer noopener");
