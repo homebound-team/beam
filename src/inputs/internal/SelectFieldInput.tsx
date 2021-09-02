@@ -39,8 +39,10 @@ interface SelectFieldInputProps<O, V extends Value> {
   hideLabel?: boolean;
   selectedOptions: O[];
   getOptionValue: (opt: O) => V;
+  getOptionLabel: (opt: O) => string;
   sizeToContent: boolean;
   contrast?: boolean;
+  nothingSelectedText: string;
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
@@ -66,8 +68,10 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
     hideLabel,
     selectedOptions,
     getOptionValue,
+    getOptionLabel,
     sizeToContent,
     contrast = false,
+    nothingSelectedText,
   } = props;
   const themeStyles = {
     wrapper: Css.bgWhite.bGray300.gray900.if(contrast).bgGray700.bGray700.white.$,
@@ -208,10 +212,22 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             setIsFocused(true);
           }}
           size={
+            // If sizeToContent, then, in order of precedence, base it of from:
+            // 1. input's value if any
+            // 2. If is MultiSelect and only one option is chosen, then use the length of that option to define the width to avoid size jumping on blur.
+            // 3. Use `nothingSelectedText`
+            // 4. Default to "1"
+            // And do not allow it to grow past a size of 20.
             sizeToContent
-              ? isFocused
-                ? Math.max(String(inputProps.value || "").length, 20)
-                : String(inputProps.value || "").length || 1
+              ? Math.min(
+                  String(
+                    inputProps.value ||
+                      (isMultiSelect && selectedOptions.length === 1 && getOptionLabel(selectedOptions[0])) ||
+                      nothingSelectedText ||
+                      "",
+                  ).length || 1,
+                  20,
+                )
               : undefined
           }
         />
