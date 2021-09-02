@@ -1,0 +1,19 @@
+import { Meta } from "@storybook/react";
+import { stageSingleFilter } from "src/components/Filters/testDomain";
+import { Filters } from "src/components/index";
+
+export default {
+  component: Filters,
+  title: "Components/Filters",
+  decorators: [],
+} as Meta;
+
+export function SingleFilterInPage() {
+  const filter = stageSingleFilter("stage");
+  return filter.render(undefined, () => {}, {}, false);
+}
+
+export function SingleFilterInModal() {
+  const filter = stageSingleFilter("stage");
+  return filter.render(undefined, () => {}, {}, true);
+}

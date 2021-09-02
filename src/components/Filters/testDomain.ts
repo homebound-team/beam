@@ -45,8 +45,8 @@ export type ProjectFilter = {
   doNotUse?: boolean | null;
 };
 
-export type StageFilter = FilterDefs<ProjectFilter>["stage"];
-export type StageSingleFilter = FilterDefs<ProjectFilter>["stageSingle"];
+export type StageFilter = NonNullable<FilterDefs<ProjectFilter>["stage"]>;
+export type StageSingleFilter = NonNullable<FilterDefs<ProjectFilter>["stageSingle"]>;
 
 const stageOptions = [
   { code: Stage.StageOne, name: "One" },
