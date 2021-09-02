@@ -2,7 +2,8 @@ import { AriaButtonProps } from "@react-types/button";
 import { ReactNode, RefObject, useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Link } from "react-router-dom";
-import { Icon, IconProps, navLink } from "src";
+import { navLink, useTestIds } from "src";
+import { Icon, IconProps } from "src/components";
 import { Tooltip } from "src/components/Tooltip";
 import { Css } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
@@ -21,11 +22,12 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
 }
 
 export function Button(props: ButtonProps) {
-  const { onClick: onPress, disabled, endAdornment, menuTriggerProps, tooltip, ...otherProps } = props;
+  const { onClick: onPress, disabled, endAdornment, menuTriggerProps, tooltip, openInNew, ...otherProps } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, ...otherProps, ...menuTriggerProps };
   const { label, icon, variant = "primary", size = "sm", buttonRef } = ariaProps;
   const ref = buttonRef || useRef(null);
+  const tid = useTestIds(props, label);
   const { buttonProps, isPressed } = useButton(
     {
       ...ariaProps,
@@ -65,6 +67,7 @@ export function Button(props: ButtonProps) {
       ...(isDisabled ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
       ...(isFocusVisible ? focusRingStyles : {}),
     },
+    ...tid,
   };
 
   const button =
@@ -77,7 +80,12 @@ export function Button(props: ButtonProps) {
           </span>
         </a>
       ) : (
-        <Link {...buttonAttrs} to={onPress} className={navLink}>
+        <Link
+          {...buttonAttrs}
+          to={onPress}
+          className={navLink}
+          {...(openInNew ? { target: "_blank", rel: "noreferrer noopener" } : {})}
+        >
           {buttonContent}
         </Link>
       )

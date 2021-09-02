@@ -20,7 +20,18 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
 }
 
 export function IconButton(props: IconButtonProps) {
-  const { onClick: onPress, disabled, color, icon, autoFocus, inc, buttonRef, tooltip, menuTriggerProps } = props;
+  const {
+    onClick: onPress,
+    disabled,
+    color,
+    icon,
+    autoFocus,
+    inc,
+    buttonRef,
+    tooltip,
+    menuTriggerProps,
+    openInNew,
+  } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -59,7 +70,12 @@ export function IconButton(props: IconButtonProps) {
           {buttonContent}
         </a>
       ) : (
-        <Link {...buttonAttrs} to={onPress} className={navLink}>
+        <Link
+          {...buttonAttrs}
+          to={onPress}
+          className={navLink}
+          {...(openInNew ? { target: "_blank", rel: "noreferrer noopener" } : {})}
+        >
           {buttonContent}
         </Link>
       )

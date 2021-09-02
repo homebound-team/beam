@@ -165,6 +165,7 @@ export function ButtonLink() {
         <h2>Primary</h2>
         <div css={buttonRowStyles}>
           <Button onClick="/fakePath" label="Relative URL link" />
+          <Button onClick="/" label="Relative URL - Open in New Tab" openInNew />
           <Button onClick="https://www.homebound.com" label="Absolute URL link" />
           <Button icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>
@@ -172,6 +173,7 @@ export function ButtonLink() {
         <h2>Secondary</h2>
         <div css={buttonRowStyles}>
           <Button variant="secondary" onClick="/fakePath" label="Relative URL link" />
+          <Button variant="secondary" onClick="/" label="Relative URL - Open in New Tab" openInNew />
           <Button variant="secondary" onClick="https://www.homebound.com" label="Absolute URL link" />
           <Button variant="secondary" icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>
@@ -179,6 +181,7 @@ export function ButtonLink() {
         <h2>Tertiary</h2>
         <div css={buttonRowStyles}>
           <Button variant="tertiary" onClick="/fakePath" label="Relative URL link" />
+          <Button variant="tertiary" onClick="/" label="Relative URL - Open in New Tab" openInNew />
           <Button variant="tertiary" onClick="https://www.homebound.com" label="Absolute URL link" />
           <Button variant="tertiary" icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>
@@ -186,6 +189,7 @@ export function ButtonLink() {
         <h2>Danger</h2>
         <div css={buttonRowStyles}>
           <Button variant="danger" onClick="/fakePath" label="Relative URL link" />
+          <Button variant="danger" onClick="/" label="Relative URL - Open in New Tab" openInNew />
           <Button variant="danger" onClick="https://www.homebound.com" label="Absolute URL link" />
           <Button variant="danger" icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>

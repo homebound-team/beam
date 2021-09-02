@@ -18,6 +18,8 @@ export interface BeamButtonProps {
   onClick?: ((e: PressEvent) => void) | string;
   /** Text to be shown via a tooltip when the user hovers over the button */
   tooltip?: ReactNode;
+  /** Whether to open link in a new tab. This only effects the element if the `onClick` is a `string`/URL. */
+  openInNew?: boolean;
 }
 
 export interface BeamTextFieldProps extends BeamFocusableProps {
