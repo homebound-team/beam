@@ -218,6 +218,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             // 3. Use `nothingSelectedText`
             // 4. Default to "1"
             // And do not allow it to grow past a size of 20.
+            // TODO: Combine logic to determine the input's value. Similar logic is used in SelectFieldBase, though it is intertwined with other state logic. Such as when to open/close menu, or filter the options within that menu, etc...
             sizeToContent
               ? Math.min(
                   String(
