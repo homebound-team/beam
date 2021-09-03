@@ -311,9 +311,13 @@ export function NestedCardsFirstCell() {
           <div />
         </div>
         <div css={Css.display("contents").$}>
+          <div data-level="level1" css={Css.pl1.$}>
+            Milestone 1
+          </div>
           <div data-level="level1">Milestone 1</div>
-          <div data-level="level1">Milestone 1</div>
-          <div data-level="level1">Milestone 1</div>
+          <div data-level="level1" css={Css.pr1.$}>
+            Milestone 1
+          </div>
         </div>
 
         {/*Row is not closing, so spacer level1.*/}
@@ -329,11 +333,15 @@ export function NestedCardsFirstCell() {
         </div>
         <div css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
-            <div data-level="level2">Group 1</div>
+            <div data-level="level2" css={Css.pl1.$}>
+              Group 1
+            </div>
           </div>
           <div data-level="level2">Group 1</div>
           <div data-level="level1" css={Css.pr1.$}>
-            <div data-level="level2">Group 1</div>
+            <div data-level="level2" css={Css.pr1.$}>
+              Group 1
+            </div>
           </div>
         </div>
         <div data-card-close="level2">
@@ -355,11 +363,15 @@ export function NestedCardsFirstCell() {
         </div>
         <div css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
-            <div data-level="level2">Group 2</div>
+            <div data-level="level2" css={Css.pl1.$}>
+              Group 2
+            </div>
           </div>
           <div data-level="level2">Group 2</div>
           <div data-level="level1" css={Css.pr1.$}>
-            <div data-level="level2">Group 2</div>
+            <div data-level="level2" css={Css.pr1.$}>
+              Group 2
+            </div>
           </div>
         </div>
 
@@ -381,13 +393,17 @@ export function NestedCardsFirstCell() {
         <div css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
             <div data-level="level2" css={Css.pl1.$}>
-              <div data-level="level3">Task 1</div>
+              <div data-level="level3" css={Css.pl1.$}>
+                Task 1
+              </div>
             </div>
           </div>
           <div data-level="level3">Task 1</div>
           <div data-level="level1" css={Css.pr1.$}>
             <div data-level="level2" css={Css.pr1.$}>
-              <div data-level="level3">Task 1</div>
+              <div data-level="level3" css={Css.pr1.$}>
+                Task 1
+              </div>
             </div>
           </div>
         </div>
@@ -417,13 +433,17 @@ export function NestedCardsFirstCell() {
         <div css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
             <div data-level="level2" css={Css.pl1.$}>
-              <div data-level="level3">Task 2</div>
+              <div data-level="level3" css={Css.pl1.$}>
+                Task 2
+              </div>
             </div>
           </div>
           <div data-level="level3">Task 2</div>
           <div data-level="level1" css={Css.pr1.$}>
             <div data-level="level2" css={Css.pr1.$}>
-              <div data-level="level3">Task 2</div>
+              <div data-level="level3" css={Css.pr1.$}>
+                Task 2
+              </div>
             </div>
           </div>
         </div>
@@ -453,11 +473,15 @@ export function NestedCardsFirstCell() {
         </div>
         <div css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
-            <div data-level="level2">Group 3</div>
+            <div data-level="level2" css={Css.pl1.$}>
+              Group 3
+            </div>
           </div>
           <div data-level="level2">Group 3</div>
           <div data-level="level1" css={Css.pr1.$}>
-            <div data-level="level2">Group 3</div>
+            <div data-level="level2" css={Css.pr1.$}>
+              Group 3
+            </div>
           </div>
         </div>
         <div data-card-close="level2">
@@ -476,9 +500,13 @@ export function NestedCardsFirstCell() {
           <div />
         </div>
         <div css={Css.display("contents").$}>
+          <div data-level="level1" css={Css.pl1.$}>
+            Milestone 1
+          </div>
           <div data-level="level1">Milestone 1</div>
-          <div data-level="level1">Milestone 1</div>
-          <div data-level="level1">Milestone 1</div>
+          <div data-level="level1" css={Css.pr1.$}>
+            Milestone 1
+          </div>
         </div>
         <div data-card-close="level1">
           <div />
