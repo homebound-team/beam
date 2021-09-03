@@ -40,8 +40,8 @@ const sections: Sections = {
     newMethodsForProp("fontFamily", {
       sansSerif: "'Inter', sans-serif",
     }),
-  borderRadius: () =>
-    newMethodsForProp("borderRadius", {
+  borderRadius: () => [
+    ...newMethodsForProp("borderRadius", {
       br0: "0",
       br4: "4px",
       br8: "8px",
@@ -50,6 +50,9 @@ const sections: Sections = {
       br24: "24px",
       br100: "100%",
     }),
+    newMethod("brt4", { borderTopRightRadius: "4px", borderTopLeftRadius: "4px" }),
+    newMethod("brb4", { borderBottomRightRadius: "4px", borderBottomLeftRadius: "4px" }),
+  ],
   animation: () => [newMethod("transition", { transition })],
   boxShadow: () =>
     newMethodsForProp("boxShadow", {

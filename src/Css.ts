@@ -107,6 +107,8 @@ class CssBuilder<T extends Properties1> {
   get br24() { return this.add("borderRadius", "24px"); }
   get br100() { return this.add("borderRadius", "100%"); }
   borderRadius(value: Properties["borderRadius"]) { return this.add("borderRadius", value); }
+  get brt4() { return this.add("borderTopRightRadius", "4px").add("borderTopLeftRadius", "4px"); }
+  get brb4() { return this.add("borderBottomRightRadius", "4px").add("borderBottomLeftRadius", "4px"); }
 
   // borderStyle
   get bsDashed() { return this.add("borderStyle", "dashed"); }

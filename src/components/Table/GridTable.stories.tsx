@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { observable } from "mobx";
-import { useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import {
   actionColumn,
   Button,
@@ -196,6 +196,293 @@ export function NestedRows() {
   };
   return (
     <GridTable columns={[arrowColumn, nameColumn]} {...{ rows }} sorting={{ on: "client", initial: [1, "ASC"] }} />
+  );
+}
+
+export function NestedCardsBeforeAfter() {
+  return (
+    <div>
+      foo
+      <div
+        css={{
+          ...Css.dg.gtc("100px 100px 100px").$,
+          "& > div[data-level*='open1'] > div": Css.bgGray500.$,
+          "& > div[data-level*='open2'] > div": Css.bgGray200.$,
+          // cards for top-level
+          "& > div[data-level*='open1']::before": Css.hPx(4)
+            .bgGray500.add({ content: "''", gridColumn: "span 3" })
+            .add({ borderTopLeftRadius: "4px", borderTopRightRadius: "4px" }).$,
+          "& > div[data-level*='close1']::after": Css.hPx(4)
+            .bgGray500.add({ content: "''", gridColumn: "span 3" })
+            .add({ borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }).$,
+          // Draw gray between children to get a background effect
+          "& > div[data-level*='middle1']::before": Css.hPx(4).bgGray500.add({ content: "''", gridColumn: "span 3" }).$,
+          // cards for 2nd-level
+          "& > div[data-level*='open2']::before": Css.hPx(4)
+            .bgGray200.add({ content: "''", gridColumn: "span 3" })
+            .add({ borderTopLeftRadius: "4px", borderTopRightRadius: "4px" }).$,
+          "& > div[data-level*='close2']::after": Css.hPx(4)
+            .bgGray200.add({ content: "''", gridColumn: "span 3" })
+            .add({ borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }).$,
+          // spacers
+          "& > div[data-spacer='level1']": Css.hPx(4).bgGray500.add({ gridColumn: "span 3" }).$,
+        }}
+      >
+        {/* Grand-parent row */}
+        <div data-level="open1" css={Css.display("contents").$}>
+          <div>Milestone 1</div>
+          <div>Milestone 1</div>
+          <div>Milestone 1</div>
+        </div>
+        <div data-spacer="level1" />
+        {/* Child row */}
+        <div data-level="open2 close2 middle1" css={Css.display("contents").$}>
+          <div>Group 1</div>
+          <div>Group 1</div>
+          <div>Group 1</div>
+        </div>
+        <div data-spacer="level1" />
+        {/* Child row */}
+        <div data-level="open2 close2 middle1" css={Css.display("contents").$}>
+          <div>Group 2</div>
+          <div>Group 2</div>
+          <div>Group 2</div>
+        </div>
+        <div data-spacer="level1" />
+        {/* Child row, could be "last grand-child" as well as "last child" */}
+        <div data-level="open2 close2 middle1 close1 " css={Css.display("contents").$}>
+          <div>Group 3</div>
+          <div>Group 3</div>
+          <div>Group 3</div>
+        </div>
+        <div data-spacer="level0" />
+        <div data-level="open1 close1" css={Css.display("contents").$}>
+          <div>Milestone 1</div>
+          <div>Milestone 1</div>
+          <div>Milestone 1</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Every row by-definition opens or closes a card.
+// Every row has a space between.
+
+export function NestedCardsFirstCell() {
+  return (
+    <div>
+      foo
+      <div
+        css={{
+          ...Css.dg.gtc("100px 100px 100px").$,
+          // All open/close rows are 4px
+          "& > [data-card-open]": Css.hPx(4).add({ gridColumn: "span 3" }).$,
+          "& > [data-card-close]": Css.hPx(4).add({ gridColumn: "span 3" }).$,
+          // three levels of open
+          "& > div[data-card-open]": Css.hPx(4).bgGray500.px1.$,
+          "& > div[data-card-open] > div": Css.hPx(4).bgGray200.px1.$,
+          "& > div[data-card-open] > div > div": Css.hPx(4).bgGreen200.px1.$,
+          "& > div[data-card-close] > div > div": Css.hPx(4).bgGreen200.px1.$,
+          "& > div[data-card-close] > div": Css.hPx(4).bgGray200.px1.$,
+          "& > div[data-card-close]": Css.hPx(4).bgGray500.px1.$,
+          // open corners
+          "& > div[data-card-open='level1']": Css.brt4.$,
+          "& > div[data-card-open='level2'] > div": Css.brt4.$,
+          "& > div[data-card-open='level3'] > div > div": Css.brt4.$,
+          "& > div[data-card-close='level3'] > div > div": Css.brb4.$,
+          "& > div[data-card-close='level2'] > div": Css.brb4.$,
+          "& > div[data-card-close='level1']": Css.brb4.$,
+          // spaces
+          "& > div[data-spacer='level0']": Css.hPx(4).add({ gridColumn: "span 3" }).$,
+          "& > div[data-spacer='level1']": Css.hPx(4).bgGray500.add({ gridColumn: "span 3" }).$,
+          "& > div[data-spacer='level1'] > div": Css.hPx(4).bgGray200.$,
+          // backgrounds
+          "& div[data-level='level1']": Css.bgGray500.$,
+          "& div[data-level='level2']": Css.bgGray200.$,
+          "& div[data-level='level3']": Css.bgGreen200.$,
+        }}
+      >
+        {/* Grand-parent row */}
+        <div data-card-open="level1" />
+        <div css={Css.display("contents").$}>
+          <div data-level="level1">Milestone 1</div>
+          <div data-level="level1">Milestone 1</div>
+          <div data-level="level1">Milestone 1</div>
+        </div>
+
+        <div data-spacer="level1" />
+
+        {/* Child row */}
+        <div data-card-open="level2">
+          <div />
+        </div>
+        <div data-level="open2 close2" css={Css.display("contents").$}>
+          <div>
+            <div data-level="level1" css={Css.pl1.$}>
+              <div data-level="level2">Group 1</div>
+            </div>
+          </div>
+          <div data-level="level2">Group 1</div>
+          <div data-level="level1" css={Css.pr1.$}>
+            <div data-level="level2">Group 1</div>
+          </div>
+        </div>
+        <div data-card-close="level2">
+          <div />
+        </div>
+
+        <div data-spacer="level1" />
+
+        {/* Child row */}
+        <div data-card-open="level2">
+          <div />
+        </div>
+        <div css={Css.display("contents").$}>
+          <div>
+            <div data-level="level1" css={Css.pl1.$}>
+              <div data-level="level2">Group 2</div>
+            </div>
+          </div>
+          <div data-level="level2">Group 2</div>
+          <div>
+            <div data-level="level1" css={Css.pr1.$}>
+              <div data-level="level2">Group 2</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 1st Grandchild row. */}
+        <div data-card-open="level3">
+          <div>
+            <div />
+          </div>
+        </div>
+        <div css={Css.display("contents").$}>
+          <div>
+            <div data-level="level1" css={Css.pl1.$}>
+              <div data-level="level2" css={Css.pl1.$}>
+                <div data-level="level3">Task 1</div>
+              </div>
+            </div>
+          </div>
+          <div data-level="level3">Task 1</div>
+          <div>
+            <div data-level="level1" css={Css.pr1.$}>
+              <div data-level="level2" css={Css.pr1.$}>
+                <div data-level="level3">Task 3</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-card-close="level3">
+          <div>
+            <div />
+          </div>
+        </div>
+
+        <div data-spacer="level1" css={Css.px1.$}>
+          <div data-spacer="level2" />
+        </div>
+
+        {/* 2nd Grandchild row. */}
+        <div data-card-open="level3">
+          <div>
+            <div />
+          </div>
+        </div>
+        <div css={Css.display("contents").$}>
+          <div>
+            <div data-level="level1" css={Css.pl1.$}>
+              <div data-level="level2" css={Css.pl1.$}>
+                <div data-level="level3">Task 2</div>
+              </div>
+            </div>
+          </div>
+          <div data-level="level3">Task 1</div>
+          <div>
+            <div data-level="level1" css={Css.pr1.$}>
+              <div data-level="level2" css={Css.pr1.$}>
+                <div data-level="level3">Task 2</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-card-close="level3">
+          <div>
+            <div />
+          </div>
+        </div>
+        <div data-card-close="level2">
+          <div />
+        </div>
+
+        <div data-spacer="level1" />
+
+        {/* Child row, could be "last grand-child" as well as "last child" */}
+        <div data-card-open="level2">
+          <div />
+        </div>
+        <div css={Css.display("contents").$}>
+          <div>
+            <div data-level="level1" css={Css.pl1.$}>
+              <div data-level="level2">Group 3</div>
+            </div>
+          </div>
+          <div data-level="level2">Group 3</div>
+          <div>
+            <div data-level="level1" css={Css.pr1.$}>
+              <div data-level="level2">Group 3</div>
+            </div>
+          </div>
+        </div>
+        <div data-card-close="level2">
+          <div />
+        </div>
+        <div data-card-close="level1" />
+
+        <div data-spacer="level0" />
+
+        <div data-card-open="level1" />
+        <div css={Css.display("contents").$}>
+          <div data-level="level1">Milestone 1</div>
+          <div data-level="level1">Milestone 1</div>
+          <div data-level="level1">Milestone 1</div>
+        </div>
+        <div data-card-close="level1" />
+      </div>
+    </div>
+  );
+}
+
+export function OneOffInlineTable() {
+  const items: { code: string; name: string; quantity: number }[] = [
+    { code: "AAA", name: "Aaa", quantity: 1 },
+    { code: "BBB", name: "Bbb", quantity: 2 },
+    { code: "Ccc", name: "Ccc", quantity: 3 },
+  ];
+  return (
+    <div
+      css={{
+        ...Css.dig.gtc("auto auto auto").rg1.cg3.gray700.bgGray300.br4.p1.$,
+        "& > div:nth-of-type(-n+3)": Css.tinyEm.$,
+        "& > div:nth-of-type(n+4)": Css.xs.$,
+        "& > div:nth-of-type(3n)": Css.tr.$,
+      }}
+    >
+      <div>Code</div>
+      <div>Item</div>
+      <div>Qty</div>
+      {items.map((item) => {
+        return (
+          <Fragment key={item.code}>
+            <div>{item.code}</div>
+            <div>{item.name}</div>
+            <div>{item.quantity}</div>
+          </Fragment>
+        );
+      })}
+    </div>
   );
 }
 
