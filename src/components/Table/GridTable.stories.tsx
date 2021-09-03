@@ -199,77 +199,10 @@ export function NestedRows() {
   );
 }
 
-export function NestedCardsBeforeAfter() {
-  return (
-    <div>
-      foo
-      <div
-        css={{
-          ...Css.dg.gtc("100px 100px 100px").$,
-          "& > div[data-level*='open1'] > div": Css.bgGray500.$,
-          "& > div[data-level*='open2'] > div": Css.bgGray200.$,
-          // cards for top-level
-          "& > div[data-level*='open1']::before": Css.hPx(4)
-            .bgGray500.add({ content: "''", gridColumn: "span 3" })
-            .add({ borderTopLeftRadius: "4px", borderTopRightRadius: "4px" }).$,
-          "& > div[data-level*='close1']::after": Css.hPx(4)
-            .bgGray500.add({ content: "''", gridColumn: "span 3" })
-            .add({ borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }).$,
-          // Draw gray between children to get a background effect
-          "& > div[data-level*='middle1']::before": Css.hPx(4).bgGray500.add({ content: "''", gridColumn: "span 3" }).$,
-          // cards for 2nd-level
-          "& > div[data-level*='open2']::before": Css.hPx(4)
-            .bgGray200.add({ content: "''", gridColumn: "span 3" })
-            .add({ borderTopLeftRadius: "4px", borderTopRightRadius: "4px" }).$,
-          "& > div[data-level*='close2']::after": Css.hPx(4)
-            .bgGray200.add({ content: "''", gridColumn: "span 3" })
-            .add({ borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }).$,
-          // spacers
-          "& > div[data-spacer='level1']": Css.hPx(4).bgGray500.add({ gridColumn: "span 3" }).$,
-        }}
-      >
-        {/* Grand-parent row */}
-        <div data-level="open1" css={Css.display("contents").$}>
-          <div>Milestone 1</div>
-          <div>Milestone 1</div>
-          <div>Milestone 1</div>
-        </div>
-        <div data-spacer="level1" />
-        {/* Child row */}
-        <div data-level="open2 close2 middle1" css={Css.display("contents").$}>
-          <div>Group 1</div>
-          <div>Group 1</div>
-          <div>Group 1</div>
-        </div>
-        <div data-spacer="level1" />
-        {/* Child row */}
-        <div data-level="open2 close2 middle1" css={Css.display("contents").$}>
-          <div>Group 2</div>
-          <div>Group 2</div>
-          <div>Group 2</div>
-        </div>
-        <div data-spacer="level1" />
-        {/* Child row, could be "last grand-child" as well as "last child" */}
-        <div data-level="open2 close2 middle1 close1 " css={Css.display("contents").$}>
-          <div>Group 3</div>
-          <div>Group 3</div>
-          <div>Group 3</div>
-        </div>
-        <div data-spacer="level0" />
-        <div data-level="open1 close1" css={Css.display("contents").$}>
-          <div>Milestone 1</div>
-          <div>Milestone 1</div>
-          <div>Milestone 1</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // Every row by-definition opens or closes a card.
 // Every row has a space between.
 
-export function NestedCardsFirstCell() {
+export function NestedCardsProofOfConcept() {
   return (
     <div>
       foo
