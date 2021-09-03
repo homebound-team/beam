@@ -281,25 +281,16 @@ export function NestedCardsFirstCell() {
           "& > [data-card-close]": Css.add({ gridColumn: "span 3" }).$,
           "& > [data-card-open] div": Css.hPx(4).px1.$,
           "& > [data-card-close] div": Css.hPx(4).px1.$,
-          // open/close backgrounds
-          "& > div[data-card-open] > div": Css.bgGray500.$,
-          "& > div[data-card-open] > div > div": Css.bgGray200.$,
-          "& > div[data-card-open] > div > div > div": Css.bgGreen200.$,
-          "& > div[data-card-close] > div > div > div": Css.bgGreen200.$,
-          "& > div[data-card-close] > div > div": Css.bgGray200.$,
-          "& > div[data-card-close] > div": Css.bgGray500.$,
           // open/close corners
           "& > div[data-card-open='level1'] > div": Css.brt4.$,
           "& > div[data-card-open='level2'] > div > div": Css.brt4.$,
-          "& > div[data-card-open='level3'] > div> div > div": Css.brt4.$,
+          "& > div[data-card-open='level3'] > div > div > div": Css.brt4.$,
           "& > div[data-card-close='level3'] > div > div > div": Css.brb4.$,
           "& > div[data-card-close='level2'] > div > div": Css.brb4.$,
           "& > div[data-card-close='level1'] > div": Css.brb4.$,
           // spacers
           "& > div[data-spacer]": Css.add({ gridColumn: "span 3" }).hPx(4).$,
           "& > div[data-spacer] div": Css.hPx(4).px1.$,
-          "& > div[data-spacer] > div": Css.bgGray500.$,
-          "& > div[data-spacer] > div > div": Css.bgGray200.$,
           // backgrounds
           "& div[data-level='level1']": Css.bgGray500.$,
           "& div[data-level='level2']": Css.bgGray200.$,
@@ -308,7 +299,7 @@ export function NestedCardsFirstCell() {
       >
         {/* Grand-parent row */}
         <div data-card-open="level1">
-          <div />
+          <div data-level="level1" />
         </div>
         <div css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
@@ -322,13 +313,13 @@ export function NestedCardsFirstCell() {
 
         {/*Row is not closing, so spacer level1.*/}
         <div data-spacer="true">
-          <div />
+          <div data-level="level1" />
         </div>
 
         {/* Child row */}
         <div data-card-open="level2">
-          <div>
-            <div />
+          <div data-level="level1">
+            <div data-level="level2" />
           </div>
         </div>
         <div css={Css.display("contents").$}>
@@ -345,20 +336,20 @@ export function NestedCardsFirstCell() {
           </div>
         </div>
         <div data-card-close="level2">
-          <div>
-            <div />
+          <div data-level="level1">
+            <div data-level="level2" />
           </div>
         </div>
 
         {/*Row has closed, so spacer level1.*/}
         <div data-spacer="true">
-          <div />
+          <div data-level="level1" />
         </div>
 
         {/* Child row */}
         <div data-card-open="level2">
-          <div>
-            <div />
+          <div data-level="level1">
+            <div data-level="level2" />
           </div>
         </div>
         <div css={Css.display("contents").$}>
@@ -377,16 +368,16 @@ export function NestedCardsFirstCell() {
 
         {/*Row is not closing, so spacer level2.*/}
         <div data-spacer="true">
-          <div>
-            <div />
+          <div data-level="level1">
+            <div data-level="level2" />
           </div>
         </div>
 
         {/* 1st Grandchild row. */}
         <div data-card-open="level3">
-          <div>
-            <div>
-              <div />
+          <div data-level="level1">
+            <div data-level="level2">
+              <div data-level="level3" />
             </div>
           </div>
         </div>
@@ -408,25 +399,25 @@ export function NestedCardsFirstCell() {
           </div>
         </div>
         <div data-card-close="level3">
-          <div>
-            <div>
-              <div />
+          <div data-level="level1">
+            <div data-level="level2">
+              <div data-level="level3" />
             </div>
           </div>
         </div>
 
         {/*Row is not closing, so spacer level2.*/}
         <div data-spacer="true">
-          <div>
-            <div />
+          <div data-level="level1">
+            <div data-level="level2" />
           </div>
         </div>
 
         {/* 2nd Grandchild row. */}
         <div data-card-open="level3">
-          <div>
-            <div>
-              <div />
+          <div data-level="level1">
+            <div data-level="level2">
+              <div data-level="level3" />
             </div>
           </div>
         </div>
@@ -448,27 +439,27 @@ export function NestedCardsFirstCell() {
           </div>
         </div>
         <div data-card-close="level3">
-          <div>
-            <div>
-              <div />
+          <div data-level="level1">
+            <div data-level="level2">
+              <div data-level="level3" />
             </div>
           </div>
         </div>
         <div data-card-close="level2">
-          <div>
-            <div />
+          <div data-level="level1">
+            <div data-level="level2" />
           </div>
         </div>
 
         {/*Child has closed, so spacer level1.*/}
         <div data-spacer="true">
-          <div />
+          <div data-level="level1" />
         </div>
 
         {/* Child row, could be "last grand-child" as well as "last child" */}
         <div data-card-open="level2">
-          <div>
-            <div />
+          <div data-level="level1">
+            <div data-level="level2" />
           </div>
         </div>
         <div css={Css.display("contents").$}>
@@ -485,19 +476,19 @@ export function NestedCardsFirstCell() {
           </div>
         </div>
         <div data-card-close="level2">
-          <div>
-            <div />
+          <div data-level="level1">
+            <div data-level="level2" />
           </div>
         </div>
         <div data-card-close="level1">
-          <div />
+          <div data-level="level1" />
         </div>
 
         {/*Child has closed, so spacer level0.*/}
         <div data-spacer="true" />
 
         <div data-card-open="level1">
-          <div />
+          <div data-level="level1" />
         </div>
         <div css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
@@ -509,7 +500,7 @@ export function NestedCardsFirstCell() {
           </div>
         </div>
         <div data-card-close="level1">
-          <div />
+          <div data-level="level1" />
         </div>
       </div>
     </div>
