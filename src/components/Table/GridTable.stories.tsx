@@ -20,7 +20,7 @@ import {
   numericColumn,
   SimpleHeaderAndDataOf,
 } from "src/components/index";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { NumberField } from "src/inputs";
 import { noop } from "src/utils";
 import { newStory, withRouter, zeroTo } from "src/utils/sb";
@@ -28,6 +28,7 @@ import { newStory, withRouter, zeroTo } from "src/utils/sb";
 export default {
   component: GridTable,
   title: "Components/GridTable",
+  parameters: { backgrounds: { default: "white" } },
 } as Meta;
 
 type Data = { name: string; value: number };
@@ -203,9 +204,22 @@ export function NestedRows() {
 // Every row has a space between.
 
 export function NestedCardsProofOfConcept() {
+  const gridStyle = {
+    nestedCards: {
+      0: { bg: Palette.Gray500 },
+      1: { bg: Palette.Gray200, border: Palette.Gray100 },
+      2: { bg: Palette.Green200 },
+      br: 4, // 4px border radius
+      px: 8, // 1 increment x padding within each
+      py: 8, // 1 increment y spacing between rows
+    },
+  };
+
+  // Combine rows into a single "kind: chrome" div that goes between
+  // each real row.
+
   return (
-    <div>
-      foo
+    <div css={Css.bgGray900.p2.$}>
       <div
         css={{
           ...Css.dg.gtc("100px 100px 100px").$,
@@ -216,17 +230,25 @@ export function NestedCardsProofOfConcept() {
           "& > [data-card-close] div": Css.hPx(4).px1.$,
           // open/close corners
           "& > div[data-card-open='level1'] > div": Css.brt4.$,
-          "& > div[data-card-open='level2'] > div > div": Css.brt4.$,
+          "& > div[data-card-open='level2'] > div > div": Css.brt4.bt.br.bl.bGray200.$,
           "& > div[data-card-open='level3'] > div > div > div": Css.brt4.$,
           "& > div[data-card-close='level3'] > div > div > div": Css.brb4.$,
-          "& > div[data-card-close='level2'] > div > div": Css.brb4.$,
+          "& > div[data-card-close='level2'] > div > div": Css.brb4.bb.br.bl.bGray200.$,
           "& > div[data-card-close='level1'] > div": Css.brb4.$,
+          // the 2nd level is special/has a border
+          "& > div[data-card-open='level3'] > div > div": Css.bGray200.bl.br.$,
+          "& > div[data-card-close='level3'] > div > div": Css.bGray200.bl.br.$,
+          // borders (TODO should not apply to 1st level)
+          "& > div[data-card] > div:first-of-type > div": Css.bl.bGray200.$,
+          "& > div[data-card] > div:last-of-type > div": Css.br.bGray200.$,
           // spacers
-          "& > div[data-spacer]": Css.add({ gridColumn: "span 3" }).hPx(4).$,
-          "& > div[data-spacer] div": Css.hPx(4).px1.$,
+          "& > div[data-spacer]": Css.add({ gridColumn: "span 3" }).hPx(8).$,
+          "& > div[data-spacer] div": Css.hPx(8).px1.$,
+          // the 2nd level is special/has a border
+          "& > div[data-spacer] > div > div": Css.bl.br.bGray200.$,
           // backgrounds
-          "& div[data-level='level1']": Css.bgGray500.$,
-          "& div[data-level='level2']": Css.bgGray200.$,
+          "& div[data-level='level1']": Css.bgGray100.$,
+          "& div[data-level='level2']": Css.bgWhite.$,
           "& div[data-level='level3']": Css.bgGreen200.$,
         }}
       >
@@ -234,7 +256,7 @@ export function NestedCardsProofOfConcept() {
         <div data-card-open="level1">
           <div data-level="level1" />
         </div>
-        <div css={Css.display("contents").$}>
+        <div data-card="level1" css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
             Milestone 1
           </div>
@@ -255,7 +277,7 @@ export function NestedCardsProofOfConcept() {
             <div data-level="level2" />
           </div>
         </div>
-        <div css={Css.display("contents").$}>
+        <div data-card="level2" css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
             <div data-level="level2" css={Css.pl1.$}>
               Group 1
@@ -285,7 +307,7 @@ export function NestedCardsProofOfConcept() {
             <div data-level="level2" />
           </div>
         </div>
-        <div css={Css.display("contents").$}>
+        <div data-card="level2" css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
             <div data-level="level2" css={Css.pl1.$}>
               Group 2
@@ -314,7 +336,7 @@ export function NestedCardsProofOfConcept() {
             </div>
           </div>
         </div>
-        <div css={Css.display("contents").$}>
+        <div data-card="level3" css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
             <div data-level="level2" css={Css.pl1.$}>
               <div data-level="level3" css={Css.pl1.$}>
@@ -354,7 +376,7 @@ export function NestedCardsProofOfConcept() {
             </div>
           </div>
         </div>
-        <div css={Css.display("contents").$}>
+        <div data-card="level3" css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
             <div data-level="level2" css={Css.pl1.$}>
               <div data-level="level3" css={Css.pl1.$}>
@@ -395,7 +417,7 @@ export function NestedCardsProofOfConcept() {
             <div data-level="level2" />
           </div>
         </div>
-        <div css={Css.display("contents").$}>
+        <div data-card="level2" css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
             <div data-level="level2" css={Css.pl1.$}>
               Group 3
@@ -423,13 +445,13 @@ export function NestedCardsProofOfConcept() {
         <div data-card-open="level1">
           <div data-level="level1" />
         </div>
-        <div css={Css.display("contents").$}>
+        <div data-card="level1" css={Css.display("contents").$}>
           <div data-level="level1" css={Css.pl1.$}>
-            Milestone 1
+            Milestone 2
           </div>
-          <div data-level="level1">Milestone 1</div>
+          <div data-level="level1">Milestone 2</div>
           <div data-level="level1" css={Css.pr1.$}>
-            Milestone 1
+            Milestone 2
           </div>
         </div>
         <div data-card-close="level1">
