@@ -61,12 +61,20 @@ export interface GridStyle {
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
   rowHoverColor?: string;
+  /** Styling for nested cards (see `cardStyle` if you only need a flat list of cards). */
   nestedCards?: {
-    // Map of kind --> card style
+    // Map of kind --> card style. We don't current have `K` to make this type checked.
     [kind: string]: NestedCardStyle;
   };
 }
 
+/**
+ * Styles for making cards nested within other cards.
+ *
+ * Because all of our output renderers (i.e. CSS grid and react-virtuoso) fundamentally need a flat
+ * list of elements, to create the look & feel of "nested cards", GridTable creates extra "chrome"
+ * elements like open card, close, and card padding.
+ */
 export interface NestedCardStyle {
   /** The card background color. */
   bgColor: string;
@@ -323,7 +331,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // A stack of the current cards we're showing
     const openCards: NestedCardStyle[] = [];
     // Take the current buffer of close row(s), spacers, and open row, and creates a single chrome DOM row
-    function flushChromeContent(): void {
+    function flushChromeRow(): void {
       filteredRows.push([
         undefined,
         <div css={Css.add({ gridColumn: `span ${columns.length}` }).$}>
@@ -337,11 +345,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
-      if (row.kind === "header") {
-        headerRows.push([row, makeRowComponent(row)]);
-        return;
-      }
-
       const passesFilter =
         filters.length === 0 ||
         filters.every((filter) =>
@@ -353,14 +356,14 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           // Maybe make a new chrome
           openCards.push(nestedCardStyle[row.kind] || fail(`no card style for ${row.kind}`));
           chromeContent.push(makeOpenOrCloseCard(openCards, "open"));
-          flushChromeContent();
+          flushChromeRow();
         }
         filteredRows.push([row, makeRowComponent(row)]);
       }
 
       const isCollapsed = collapsedIds.includes(row.id);
       if (!isCollapsed && row.children) {
-        row.children.forEach(visit);
+        visitRows(row.children);
       }
 
       if (nestedCards) {
@@ -369,8 +372,22 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       }
     }
 
-    maybeSorted.forEach(visit);
-    flushChromeContent();
+    function visitRows(rows: GridDataRow<R>[]): void {
+      const length = rows.length;
+      rows.forEach((row, i) => {
+        if (row.kind === "header") {
+          headerRows.push([row, makeRowComponent(row)]);
+          return;
+        }
+        visit(row);
+        if (nestedCards && i !== length - 1) {
+          chromeContent.push(makeSpacer(nestedCardStyle[row.kind] || fail(`No kind for ${row.kind}`), openCards));
+        }
+      });
+    }
+
+    visitRows(maybeSorted);
+    flushChromeRow();
 
     return [headerRows, filteredRows];
   }, [
@@ -1347,8 +1364,15 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
 
 /** For the first or last cell, nest them in divs that re-create the outer card padding + background. */
 export function addCardPadding(openCards: NestedCardStyle[], div: any, kind: "left" | "right"): any {
-  const copy = [...openCards];
-  copy.reverse().forEach((card) => {
+  [...openCards].reverse().forEach((card) => {
+    div = <div css={Css.bgColor(card.bgColor).pxPx(card.pxPx).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>;
+  });
+  return div;
+}
+
+export function makeSpacer(current: NestedCardStyle, openCards: NestedCardStyle[]) {
+  let div = <div css={Css.hPx(current.spacerPx).$} />;
+  [...openCards].reverse().forEach((card) => {
     div = <div css={Css.bgColor(card.bgColor).pxPx(card.pxPx).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>;
   });
   return div;
