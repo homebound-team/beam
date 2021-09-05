@@ -1,6 +1,8 @@
+import { fail } from "@homebound/form-state/dist/utils";
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
 import React, {
+  Fragment,
   MutableRefObject,
   ReactElement,
   ReactNode,
@@ -60,15 +62,22 @@ export interface GridStyle {
   /** Applied on hover if a row has a rowLink/onClick set. */
   rowHoverColor?: string;
   nestedCards?: {
-    // Map of kind --> that card's background color + optional border color (assumed 1px solid)
-    [kind: string]: {
-      bgColor: string;
-      bColor?: string;
-      brPx: number; // 4px border radius
-      pxPx: number; // 1 increment x padding within each
-      spacerPx: number; // 1 increment y spacing between rows
-    };
+    // Map of kind --> card style
+    [kind: string]: NestedCardStyle;
   };
+}
+
+export interface NestedCardStyle {
+  /** The card background color. */
+  bgColor: string;
+  /** The optional border color, assumes 1px solid if set. */
+  bColor?: string;
+  /** I.e. 4px border radius. */
+  brPx: number;
+  /** The left/right padding of the card. */
+  pxPx: number;
+  /** The y spacing between each card. */
+  spacerPx: number;
 }
 
 export interface GridTableDefaults {
@@ -134,7 +143,8 @@ export function setGridTableDefaults(opts: Partial<GridTableDefaults>): void {
 
 type RenderAs = "div" | "table" | "virtual";
 
-export type RowTuple<R extends Kinded> = [GridDataRow<R>, ReactElement];
+// The row is optional b/c the nested card chrome rows only have ReactElements.
+export type RowTuple<R extends Kinded> = [GridDataRow<R> | undefined, ReactElement];
 
 /**
  * The sort settings for the current table; whether it's client-side or server-side.
@@ -304,6 +314,25 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const headerRows: RowTuple<R>[] = [];
     const filteredRows: RowTuple<R>[] = [];
 
+    // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
+    const nestedCardStyle = style.nestedCards;
+    const nestedCards = !!nestedCardStyle;
+    let chromeContent: JSX.Element[] = [];
+    // A stack of the current cards we're showing
+    const openCards: NestedCardStyle[] = [];
+    // Take the current buffer of close row(s), spacers, and open row, and creates a single chrome DOM row
+    function flushChromeContent(): void {
+      filteredRows.push([
+        undefined,
+        <div css={Css.add({ gridColumn: `span ${columns.length}` }).$}>
+          {chromeContent.map((c, i) => (
+            <Fragment key={i}>{c}</Fragment>
+          ))}
+        </div>,
+      ]);
+      chromeContent = [];
+    }
+
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
       if (row.kind === "header") {
@@ -316,7 +345,14 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         filters.every((filter) =>
           columns.map((c) => applyRowFn(c, row)).some((maybeContent) => matchesFilter(maybeContent, filter)),
         );
+      // Even if we don't pass the filter, one of our children might, so we continue on after this check
       if (passesFilter) {
+        if (nestedCards) {
+          // Maybe make a new chrome
+          openCards.push(nestedCardStyle[row.kind] || fail(`no card style for ${row.kind}`));
+          chromeContent.push(makeOpenOrCloseCard(openCards, "open"));
+          flushChromeContent();
+        }
         filteredRows.push([row, makeRowComponent(row)]);
       }
 
@@ -324,9 +360,15 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       if (!isCollapsed && row.children) {
         row.children.forEach(visit);
       }
+
+      if (nestedCards) {
+        chromeContent.push(makeOpenOrCloseCard(openCards, "close"));
+        openCards.pop();
+      }
     }
 
     maybeSorted.forEach(visit);
+    flushChromeContent();
 
     return [headerRows, filteredRows];
   }, [
@@ -1264,4 +1306,30 @@ function canClientSideSort(value: any): boolean {
   return (
     value === null || t === "undefined" || t === "number" || t === "string" || t === "boolean" || value instanceof Date
   );
+}
+
+export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" | "close"): JSX.Element {
+  let div: any = null;
+  const place = kind === "open" ? "Top" : "Bottom";
+  [...openCards].reverse().forEach((card) => {
+    div = (
+      <div
+        css={
+          Css.bgColor(card.bgColor)
+            .pxPx(card.pxPx)
+            .if(!!card.bColor)
+            .bc(card.bColor)
+            .bl.br.if(!div)
+            .add({
+              [`border${place}RightRadius`]: `${card.brPx}px`,
+              [`border${place}LeftRadius`]: `${card.brPx}px`,
+            })
+            .hPx(card.brPx).$
+        }
+      >
+        {div}
+      </div>
+    );
+  });
+  return div;
 }

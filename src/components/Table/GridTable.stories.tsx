@@ -201,7 +201,7 @@ export function NestedRows() {
   );
 }
 
-export function Nested() {
+export function NestedCards() {
   const arrowColumn = actionColumn<NestedRow>({
     header: (row) => <CollapseToggle row={row} />,
     parent: (row) => <CollapseToggle row={row} />,
