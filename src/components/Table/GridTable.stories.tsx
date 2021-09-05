@@ -223,8 +223,8 @@ export function NestedCards() {
   const nestedStyle: GridStyle = {
     nestedCards: {
       parent: { bgColor: Palette.Gray500, ...spacing },
-      child: { bgColor: Palette.Gray200, bColor: Palette.Gray100, ...spacing },
-      grandChild: { bgColor: Palette.Green200, ...spacing },
+      child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
+      grandChild: { bgColor: Palette.Green200, bColor: Palette.Green400, ...spacing },
     },
   };
 
