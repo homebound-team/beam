@@ -1,19 +1,21 @@
 import React, { MutableRefObject, useContext } from "react";
+import { GridRowLookup } from "src/components/Table/GridRowLookup";
 import {
   GridCollapseContext,
   GridColumn,
   GridDataRow,
-  GridRowLookup,
   GridRowStyles,
   GridTable,
   matchesFilter,
   setRunningInJest,
+} from "src/components/Table/GridTable";
+import {
   simpleDataRows,
   simpleHeader,
   SimpleHeaderAndDataOf,
   SimpleHeaderAndDataWith,
   simpleRows,
-} from "src/components/Table/GridTable";
+} from "src/components/Table/simpleHelpers";
 import { Css, Palette } from "src/Css";
 import { cell, click, render, row } from "src/utils/rtl";
 
