@@ -202,25 +202,18 @@ export function NestedRows() {
 }
 
 export function NestedCards() {
-  const arrowColumn = actionColumn<NestedRow>({
-    header: (row) => <CollapseToggle row={row} />,
-    parent: (row) => <CollapseToggle row={row} />,
-    child: (row) => <CollapseToggle row={row} />,
-    grandChild: () => "",
-    w: 0,
-  });
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
     parent: (row) => ({
-      content: <div>{row.name}</div>,
+      content: <div css={Css.base.$}>{row.name}</div>,
       value: row.name,
     }),
     child: (row) => ({
-      content: <div css={Css.ml2.$}>{row.name}</div>,
+      content: <div css={Css.sm.$}>{row.name}</div>,
       value: row.name,
     }),
     grandChild: (row) => ({
-      content: <div css={Css.ml4.$}>{row.name}</div>,
+      content: <div css={Css.xs.$}>{row.name}</div>,
       value: row.name,
     }),
   };
@@ -235,10 +228,10 @@ export function NestedCards() {
 
   return (
     <GridTable
-      columns={[arrowColumn, nameColumn]}
+      columns={[nameColumn]}
       {...{ rows }}
       style={nestedStyle}
-      sorting={{ on: "client", initial: [1, "ASC"] }}
+      sorting={{ on: "client", initial: [0, "ASC"] }}
     />
   );
 }

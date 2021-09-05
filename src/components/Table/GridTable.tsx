@@ -304,6 +304,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             stickyOffset,
             isCollapsed,
             toggleCollapsedId,
+            // TODO: How will this effect with memoization?
+            openCards: [...openCards],
             ...sortProps,
           }}
         />
@@ -752,6 +754,7 @@ interface GridRowProps<R extends Kinded, S> {
   setSortKey?: (value: S) => void;
   isCollapsed: boolean;
   toggleCollapsedId: (id: string) => void;
+  openCards: NestedCardStyle[];
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -769,6 +772,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     setSortKey,
     isCollapsed,
     toggleCollapsedId,
+    openCards,
     ...others
   } = props;
 
@@ -806,6 +810,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, idx, maybeContent);
 
+        const card = openCards.length > 0 && openCards[openCards.length - 1];
+
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
         // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
         // a few descendent selectors. However, that approach means the root grid-applied
@@ -828,6 +834,9 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
           ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
+          ...(card && Css.bgColor(card.bgColor).$),
+          ...(card && idx === 0 && card.bColor && Css.bc(card.bColor).bl.$),
+          ...(card && idx === columns.length - 1 && card.bColor && Css.bc(card.bColor).br.$),
           // And finally the specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
         };
@@ -841,7 +850,14 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             ? rowClickRenderFn(as)
             : defaultRenderFn(as);
 
-        return renderFn(idx, cellCss, content, row, rowStyle);
+        let rendered = renderFn(idx, cellCss, content, row, rowStyle);
+        // Sneak in card padding for the 1st / last cells
+        if (card && idx === 0) {
+          rendered = addCardPadding(openCards, rendered, "left");
+        } else if (card && idx === columns.length - 1) {
+          rendered = addCardPadding(openCards, rendered, "right");
+        }
+        return rendered;
       })}
     </Row>
   );
@@ -1311,25 +1327,34 @@ function canClientSideSort(value: any): boolean {
 export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" | "close"): JSX.Element {
   let div: any = null;
   const place = kind === "open" ? "Top" : "Bottom";
+  const btOrBb = kind === "open" ? "bt" : "bb";
   [...openCards].reverse().forEach((card) => {
     div = (
       <div
-        css={
-          Css.bgColor(card.bgColor)
-            .pxPx(card.pxPx)
-            .if(!!card.bColor)
-            .bc(card.bColor)
-            .bl.br.if(!div)
-            .add({
+        css={{
+          ...Css.bgColor(card.bgColor).pxPx(card.pxPx).$,
+          ...(!div &&
+            Css.add({
               [`border${place}RightRadius`]: `${card.brPx}px`,
               [`border${place}LeftRadius`]: `${card.brPx}px`,
-            })
-            .hPx(card.brPx).$
-        }
+            }).hPx(card.brPx).$),
+          ...(card.bColor && Css.bc(card.bColor).bl.br.if(div)[btOrBb].$),
+        }}
       >
         {div}
       </div>
     );
+  });
+  return div;
+}
+
+/** For the first or last cell, nest them in divs that re-create the outer card padding + background. */
+export function addCardPadding(openCards: NestedCardStyle[], div: any, kind: "left" | "right"): any {
+  const copy = [...openCards];
+  // We don't need to wrap the current card (we draw any borders directly on the cell)
+  copy.pop();
+  copy.reverse().forEach((card) => {
+    div = <div css={Css.bgColor(card.bgColor).pxPx(card.pxPx).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>;
   });
   return div;
 }
