@@ -163,8 +163,80 @@ describe("GridTable nestedCards", () => {
     `);
   });
 
-  it("can add padding w/two levels", async () => {
-    const r = await render(addCardPadding([parentCardStyle, childCardStyle], <div>content</div>, "left"));
+  it("can add left padding w/two levels", async () => {
+    const r = await render(
+      addCardPadding([{} as any, {} as any], [parentCardStyle, childCardStyle], 0, <div>content</div>),
+    );
+    expect(r.firstElement).toMatchInlineSnapshot(`
+      .emotion-0 {
+        background-color: rgba(247,245,245,1);
+        padding-left: 8px;
+      }
+
+      .emotion-1 {
+        background-color: rgba(221,220,220,1);
+        border-color: rgba(236,235,235,1);
+        border-left-style: solid;
+        border-left-width: 1px;
+        padding-left: 6px;
+      }
+
+      <div
+        data-overlay-container="true"
+      >
+        <div
+          class="emotion-0"
+        >
+          <div
+            class="emotion-1"
+          >
+            <div>
+              content
+            </div>
+          </div>
+        </div>
+      </div>
+    `);
+  });
+
+  it("can add right padding w/two levels", async () => {
+    const r = await render(
+      addCardPadding([{} as any, {} as any], [parentCardStyle, childCardStyle], 1, <div>content</div>),
+    );
+    expect(r.firstElement).toMatchInlineSnapshot(`
+      .emotion-0 {
+        background-color: rgba(247,245,245,1);
+        padding-right: 8px;
+      }
+
+      .emotion-1 {
+        background-color: rgba(221,220,220,1);
+        border-color: rgba(236,235,235,1);
+        border-right-style: solid;
+        border-right-width: 1px;
+        padding-right: 6px;
+      }
+
+      <div
+        data-overlay-container="true"
+      >
+        <div
+          class="emotion-0"
+        >
+          <div
+            class="emotion-1"
+          >
+            <div>
+              content
+            </div>
+          </div>
+        </div>
+      </div>
+    `);
+  });
+
+  it("can add left and right padding w/two levels if only one column", async () => {
+    const r = await render(addCardPadding([{} as any], [parentCardStyle, childCardStyle], 0, <div>content</div>));
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
         background-color: rgba(247,245,245,1);
@@ -177,9 +249,9 @@ describe("GridTable nestedCards", () => {
         border-color: rgba(236,235,235,1);
         border-left-style: solid;
         border-left-width: 1px;
+        padding-left: 6px;
         border-right-style: solid;
         border-right-width: 1px;
-        padding-left: 6px;
         padding-right: 6px;
       }
 

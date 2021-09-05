@@ -870,10 +870,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
         let rendered = renderFn(idx, cellCss, content, row, rowStyle);
         // Sneak in card padding for the 1st / last cells
-        if (card && idx === 0) {
-          rendered = addCardPadding(openCards, rendered, "left");
-        } else if (card && idx === columns.length - 1) {
-          rendered = addCardPadding(openCards, rendered, "right");
+        if (card) {
+          rendered = addCardPadding(columns, openCards, idx, rendered);
         }
         return rendered;
       })}
@@ -1367,9 +1365,24 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
 }
 
 /** For the first or last cell, nest them in divs that re-create the outer card padding + background. */
-export function addCardPadding(openCards: NestedCardStyle[], div: any, kind: "left" | "right"): any {
+export function addCardPadding(columns: GridColumn<any>[], openCards: NestedCardStyle[], idx: number, div: any): any {
+  const addLeft = idx === 0;
+  const addRight = idx === columns.length - 1;
+  if (!addLeft && !addRight) {
+    return div;
+  }
   [...openCards].reverse().forEach((card) => {
-    div = <div css={Css.bgColor(card.bgColor).pxPx(card.pxPx).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>;
+    div = (
+      <div
+        css={{
+          ...Css.bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).$,
+          ...(addLeft && Css.plPx(card.pxPx).if(!!card.bColor).bl.$),
+          ...(addRight && Css.prPx(card.pxPx).if(!!card.bColor).br.$),
+        }}
+      >
+        {div}
+      </div>
+    );
   });
   return div;
 }
