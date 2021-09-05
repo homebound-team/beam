@@ -162,6 +162,8 @@ const rows: GridDataRow<NestedRow>[] = [
         ...{ kind: "child", id: "p1c2", name: "child p1c2" },
         children: [{ kind: "grandChild", id: "p1c2g1", name: "grandchild p1c2g1" }],
       },
+      // Put this "grandchild" in the 2nd level to show heterogeneous levels
+      { kind: "grandChild", id: "p1g1", name: "grandchild p1g1" },
     ],
   },
   // a parent with just a child
