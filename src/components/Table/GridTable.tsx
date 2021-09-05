@@ -332,15 +332,17 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const openCards: NestedCardStyle[] = [];
     // Take the current buffer of close row(s), spacers, and open row, and creates a single chrome DOM row
     function flushChromeRow(): void {
-      filteredRows.push([
-        undefined,
-        <div css={Css.add({ gridColumn: `span ${columns.length}` }).$}>
-          {chromeContent.map((c, i) => (
-            <Fragment key={i}>{c}</Fragment>
-          ))}
-        </div>,
-      ]);
-      chromeContent = [];
+      if (chromeContent.length > 0) {
+        filteredRows.push([
+          undefined,
+          <div css={Css.add({ gridColumn: `span ${columns.length}` }).$}>
+            {chromeContent.map((c, i) => (
+              <Fragment key={i}>{c}</Fragment>
+            ))}
+          </div>,
+        ]);
+        chromeContent = [];
+      }
     }
 
     // Depth-first to filter
