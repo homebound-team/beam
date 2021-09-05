@@ -313,7 +313,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             isCollapsed,
             toggleCollapsedId,
             // TODO: How will this effect with memoization?
-            openCards: [...openCards],
+            // At least for non-nested card tables, we make this null so it will be fine.
+            openCards: openCards && [...openCards],
             ...sortProps,
           }}
         />
@@ -326,10 +327,11 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
     const nestedCardStyle = style.nestedCards;
-    const nestedCards = !!nestedCardStyle;
-    let chromeContent: JSX.Element[] = [];
     // A stack of the current cards we're showing
-    const openCards: NestedCardStyle[] = [];
+    const openCards: NestedCardStyle[] | null = !!nestedCardStyle ? [] : null;
+    // Just a helper boolean condition of "are nesting cards yes/no"
+    const nestedCards = !!nestedCardStyle && openCards !== null;
+    let chromeContent: JSX.Element[] = [];
     // Take the current buffer of close row(s), spacers, and open row, and creates a single chrome DOM row
     function flushChromeRow(): void {
       if (chromeContent.length > 0) {
@@ -773,7 +775,7 @@ interface GridRowProps<R extends Kinded, S> {
   setSortKey?: (value: S) => void;
   isCollapsed: boolean;
   toggleCollapsedId: (id: string) => void;
-  openCards: NestedCardStyle[];
+  openCards: NestedCardStyle[] | null;
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -829,7 +831,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, idx, maybeContent);
 
-        const card = openCards.length > 0 && openCards[openCards.length - 1];
+        const card = openCards && openCards.length > 0 && openCards[openCards.length - 1];
 
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
         // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
