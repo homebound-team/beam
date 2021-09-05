@@ -14,6 +14,7 @@ import {
   GridDataRow,
   GridRowLookup,
   GridRowStyles,
+  GridStyle,
   GridTable,
   Icon,
   IconButton,
@@ -200,21 +201,52 @@ export function NestedRows() {
   );
 }
 
+export function Nested() {
+  const arrowColumn = actionColumn<NestedRow>({
+    header: (row) => <CollapseToggle row={row} />,
+    parent: (row) => <CollapseToggle row={row} />,
+    child: (row) => <CollapseToggle row={row} />,
+    grandChild: () => "",
+    w: 0,
+  });
+  const nameColumn: GridColumn<NestedRow> = {
+    header: () => "Name",
+    parent: (row) => ({
+      content: <div>{row.name}</div>,
+      value: row.name,
+    }),
+    child: (row) => ({
+      content: <div css={Css.ml2.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    grandChild: (row) => ({
+      content: <div css={Css.ml4.$}>{row.name}</div>,
+      value: row.name,
+    }),
+  };
+  const spacing = { brPx: 4, pxPx: 8, spacerPx: 8 };
+  const nestedStyle: GridStyle = {
+    nestedCards: {
+      parent: { bgColor: Palette.Gray500, ...spacing },
+      child: { bgColor: Palette.Gray200, bColor: Palette.Gray100, ...spacing },
+      grandChild: { bgColor: Palette.Green200, ...spacing },
+    },
+  };
+
+  return (
+    <GridTable
+      columns={[arrowColumn, nameColumn]}
+      {...{ rows }}
+      style={nestedStyle}
+      sorting={{ on: "client", initial: [1, "ASC"] }}
+    />
+  );
+}
+
 // Every row by-definition opens or closes a card.
 // Every row has a space between.
 
 export function NestedCardsProofOfConcept() {
-  const gridStyle = {
-    nestedCards: {
-      0: { bg: Palette.Gray500 },
-      1: { bg: Palette.Gray200, border: Palette.Gray100 },
-      2: { bg: Palette.Green200 },
-      br: 4, // 4px border radius
-      px: 8, // 1 increment x padding within each
-      py: 8, // 1 increment y spacing between rows
-    },
-  };
-
   // Combine rows into a single "kind: chrome" div that goes between
   // each real row.
 

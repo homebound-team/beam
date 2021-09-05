@@ -15,60 +15,10 @@ import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
+import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import tinycolor from "tinycolor2";
-
-/** A helper for making `Row` type aliases of simple/flat tables that are just header + data. */
-export type SimpleHeaderAndDataOf<T> = { kind: "header" } | ({ kind: "data" } & T);
-
-/**
- * A helper for making `Row` type aliases of simple/flat tables that are just header + data.
- *
- * Unlike `SimpleHeaderAndDataOf`, we keep `T` in a separate `data`, which is useful
- * when rows are mobx proxies and we need proxy accesses to happen within the column
- * rendering.
- */
-export type SimpleHeaderAndDataWith<T> =
-  | { kind: "header" }
-  // We put `id` here so that GridColumn can match against `extends { data, id }`,
-  // kinda looks like we should combine Row and GridDataRow, i.e. Rows always have ids,
-  // they already have kinds, and need to have ids when passed to rows anyway...
-  | { kind: "data"; data: T; id: string };
-
-/** A const for a marker header row. */
-export const simpleHeader = { kind: "header" as const, id: "header" };
-
-export function simpleRows<R extends SimpleHeaderAndDataOf<D>, D>(
-  data: Array<D & { id: string }> | undefined = [],
-): GridDataRow<R>[] {
-  // @ts-ignore
-  return [simpleHeader, ...data.map((c) => ({ kind: "data" as const, ...c }))];
-}
-
-/** Like `simpleRows` but for `SimpleHeaderAndDataWith`. */
-export function simpleDataRows<R extends SimpleHeaderAndDataWith<D>, D>(
-  data: Array<D & { id: string }> | undefined = [],
-): GridDataRow<R>[] {
-  // @ts-ignore Not sure why this doesn't type-check, something esoteric with the DiscriminateUnion type
-  return [simpleHeader, ...data.map((data) => ({ kind: "data" as const, data, id: data.id }))];
-}
-
-// function createSimpleHeaderAndRows<D extends { id: string }>(
-//   dataFn: (q: TeamMembersQuery) => GridDataRow<SimpleHeaderAndDataOf<D>>[],
-// ): (data: TeamMembersQuery) => GridDataRow<SimpleHeaderAndDataOf<D>>[] {
-//   return data => [simpleHeader, ...(dataFn(data) || []).map(row => ({ kind: "data" as const, ...row }))];
-// }
-
-/**
- * Our internal sorting state.
- *
- * `S` is, for whatever current column we're sorting by, either it's:
- *
- * a) `serverSideSortKey` if we're server-side sorting, or
- * b) it's index in the `columns` array, if client-side sorting
- */
-type SortState<S> = readonly [S, Direction];
 
 export type Kinded = { kind: string };
 
@@ -109,6 +59,16 @@ export interface GridStyle {
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
   rowHoverColor?: string;
+  nestedCards?: {
+    // Map of kind --> that card's background color + optional border color (assumed 1px solid)
+    [kind: string]: {
+      bgColor: string;
+      bColor?: string;
+      brPx: number; // 4px border radius
+      pxPx: number; // 1 increment x padding within each
+      spacerPx: number; // 1 increment y spacing between rows
+    };
+  };
 }
 
 export interface GridTableDefaults {
@@ -174,7 +134,7 @@ export function setGridTableDefaults(opts: Partial<GridTableDefaults>): void {
 
 type RenderAs = "div" | "table" | "virtual";
 
-type RowTuple<R extends Kinded> = [GridDataRow<R>, ReactElement];
+export type RowTuple<R extends Kinded> = [GridDataRow<R>, ReactElement];
 
 /**
  * The sort settings for the current table; whether it's client-side or server-side.
@@ -306,7 +266,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     }
     return rows;
   }, [columns, rows, sorting, sortState]);
-  const noData = !rows.some((row) => row.kind !== "header");
 
   // Filter + flatten + component-ize the sorted rows.
   let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
@@ -397,52 +356,14 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const { rowLookup } = props;
   if (rowLookup) {
     // Refs are cheap to assign to, so we don't bother doing this in a useEffect
-    rowLookup.current = {
-      scrollTo(kind, id) {
-        if (virtuosoRef.current === null) {
-          // In theory we could support as=div and as=table by finding the DOM
-          // element and calling .scrollIntoView, just not doing that yet.
-          throw new Error("scrollTo is only supported for as=virtual");
-        }
-        const index = filteredRows.findIndex(([r]) => r.kind === kind && r.id === id);
-        virtuosoRef.current.scrollToIndex({ index, behavior: "smooth" });
-      },
-      currentList() {
-        return filteredRows.map((r) => r[0]);
-      },
-      lookup(row, additionalFilter = () => true) {
-        const rows = filteredRows.map((r) => r[0]).filter(additionalFilter);
-        // Ensure we have `result.kind = {}` for each kind
-        const result: any = Object.fromEntries(getKinds(columns).map((kind) => [kind, {}]));
-        // This is an admittedly cute/fancy scan, instead of just `rows.findIndex`, but
-        // we do it this way so that we can do kind-aware prev/next detection.
-        let key: "prev" | "next" = "prev";
-        for (let i = 0; i < rows.length; i++) {
-          const each = rows[i];
-          // Flip from prev to next when we find it
-          if (each.kind === row.kind && each.id === row.id) {
-            key = "next";
-          } else {
-            if (key === "prev") {
-              // prev always overwrites what was there before
-              result[key] = each;
-              result[each.kind][key] = each;
-            } else {
-              // next only writes first seen
-              result[key] ??= each;
-              result[each.kind][key] ??= each;
-            }
-          }
-        }
-        return result;
-      },
-    };
+    rowLookup.current = createRowLookup(columns, filteredRows, virtuosoRef);
   }
 
   useEffect(() => {
     setRowCount && filteredRows?.length !== undefined && setRowCount(filteredRows.length);
   }, [filteredRows?.length, setRowCount]);
 
+  const noData = filteredRows.length === 0;
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
@@ -653,7 +574,7 @@ function calcGridColumns(columns: GridColumn<any>[]): string {
  *
  * See https://stackoverflow.com/a/50125960/355031
  */
-type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<K, V> ? T : never;
+export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<K, V> ? T : never;
 
 /** A specific kind of row, including the GridDataRow props. */
 type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "kind", P> & {
@@ -716,29 +637,6 @@ export interface RowStyle<R extends Kinded> {
   rowLink?: (row: R) => string;
   /** Fired when the row is clicked, similar to rowLink but for actions that aren't 'go to this link'. */
   onClick?: (row: GridDataRow<R>) => void;
-}
-
-/** Allows a caller to ask for the currently shown rows, given the current sorting/filtering. */
-export interface GridRowLookup<R extends Kinded> {
-  /** Returns both the immediate next/prev rows, as well as `[kind].next/prev` values, ignoring headers. */
-  lookup(
-    row: GridDataRow<R>,
-    additionalFilter?: (row: GridDataRow<R>) => boolean,
-  ): NextPrev<R> &
-    {
-      [P in R["kind"]]: NextPrev<DiscriminateUnion<R, "kind", P>>;
-    };
-
-  /** Returns the list of currently filtered/sorted rows, without headers. */
-  currentList(): readonly GridDataRow<R>[];
-
-  /** Scroll's to the row with the given kind + id. Requires using `as=virtual`. */
-  scrollTo(kind: R["kind"], id: string): void;
-}
-
-interface NextPrev<R extends Kinded> {
-  next: GridDataRow<R> | undefined;
-  prev: GridDataRow<R> | undefined;
 }
 
 function getIndentationCss<R extends Kinded>(
@@ -1328,12 +1226,6 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const copy = useMemo(() => [...collapsedIds], [tick, collapsedIds]);
   return [copy, toggleId] as const;
-}
-
-function getKinds<R extends Kinded>(columns: GridColumn<R>[]): R[] {
-  // Use the 1st column to get the runtime list of kinds
-  const nonKindKeys = ["w", "sort", "sortValue", "align"];
-  return Object.keys(columns[0] || {}).filter((key) => !nonKindKeys.includes(key)) as any;
 }
 
 /** GridTable as Table utility to apply <tr> element override styles */
