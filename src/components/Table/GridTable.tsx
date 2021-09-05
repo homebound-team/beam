@@ -834,9 +834,6 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
           ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
-          ...(card && Css.bgColor(card.bgColor).$),
-          ...(card && idx === 0 && card.bColor && Css.bc(card.bColor).bl.$),
-          ...(card && idx === columns.length - 1 && card.bColor && Css.bc(card.bColor).br.$),
           // And finally the specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
         };
@@ -1351,8 +1348,6 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
 /** For the first or last cell, nest them in divs that re-create the outer card padding + background. */
 export function addCardPadding(openCards: NestedCardStyle[], div: any, kind: "left" | "right"): any {
   const copy = [...openCards];
-  // We don't need to wrap the current card (we draw any borders directly on the cell)
-  copy.pop();
   copy.reverse().forEach((card) => {
     div = <div css={Css.bgColor(card.bgColor).pxPx(card.pxPx).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>;
   });

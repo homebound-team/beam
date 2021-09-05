@@ -172,14 +172,29 @@ describe("GridTable nestedCards", () => {
         padding-right: 8px;
       }
 
+      .emotion-1 {
+        background-color: rgba(221,220,220,1);
+        border-color: rgba(236,235,235,1);
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-right-style: solid;
+        border-right-width: 1px;
+        padding-left: 6px;
+        padding-right: 6px;
+      }
+
       <div
         data-overlay-container="true"
       >
         <div
           class="emotion-0"
         >
-          <div>
-            content
+          <div
+            class="emotion-1"
+          >
+            <div>
+              content
+            </div>
           </div>
         </div>
       </div>
