@@ -1,5 +1,6 @@
 import React from "react";
-import { addCardPadding, makeOpenOrCloseCard, NestedCardStyle } from "src/components/Table/GridTable";
+import { NestedCardStyle } from "src/components/Table/GridTable";
+import { addCardPadding, makeOpenOrCloseCard } from "src/components/Table/nestedCards";
 import { Palette } from "src/Css";
 import { render } from "src/utils/rtl";
 
@@ -18,7 +19,7 @@ const childCardStyle: NestedCardStyle = {
   spacerPx: 6,
 };
 
-describe("GridTable nestedCards", () => {
+describe("nestedCards", () => {
   it("can make open card w/one level", async () => {
     const r = await render(makeOpenOrCloseCard([parentCardStyle], "open"));
     expect(r.firstElement).toMatchInlineSnapshot(`

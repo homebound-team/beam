@@ -18,6 +18,7 @@ import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
+import { addCardPadding, makeOpenOrCloseCard, makeSpacer } from "src/components/Table/nestedCards";
 import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import tinycolor from "tinycolor2";
@@ -1338,59 +1339,4 @@ function canClientSideSort(value: any): boolean {
   return (
     value === null || t === "undefined" || t === "number" || t === "string" || t === "boolean" || value instanceof Date
   );
-}
-
-export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" | "close"): JSX.Element {
-  let div: any = null;
-  const place = kind === "open" ? "Top" : "Bottom";
-  const btOrBb = kind === "open" ? "bt" : "bb";
-  [...openCards].reverse().forEach((card) => {
-    div = (
-      <div
-        css={{
-          ...Css.bgColor(card.bgColor).pxPx(card.pxPx).$,
-          ...(!div &&
-            Css.add({
-              [`border${place}RightRadius`]: `${card.brPx}px`,
-              [`border${place}LeftRadius`]: `${card.brPx}px`,
-            }).hPx(card.brPx).$),
-          ...(card.bColor && Css.bc(card.bColor).bl.br.if(div)[btOrBb].$),
-        }}
-      >
-        {div}
-      </div>
-    );
-  });
-  return div;
-}
-
-/** For the first or last cell, nest them in divs that re-create the outer card padding + background. */
-export function addCardPadding(columns: GridColumn<any>[], openCards: NestedCardStyle[], idx: number, div: any): any {
-  const addLeft = idx === 0;
-  const addRight = idx === columns.length - 1;
-  if (!addLeft && !addRight) {
-    return div;
-  }
-  [...openCards].reverse().forEach((card) => {
-    div = (
-      <div
-        css={{
-          ...Css.bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).$,
-          ...(addLeft && Css.plPx(card.pxPx).if(!!card.bColor).bl.$),
-          ...(addRight && Css.prPx(card.pxPx).if(!!card.bColor).br.$),
-        }}
-      >
-        {div}
-      </div>
-    );
-  });
-  return div;
-}
-
-export function makeSpacer(current: NestedCardStyle, openCards: NestedCardStyle[]) {
-  let div = <div css={Css.hPx(current.spacerPx).$} />;
-  [...openCards].reverse().forEach((card) => {
-    div = <div css={Css.bgColor(card.bgColor).pxPx(card.pxPx).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>;
-  });
-  return div;
 }
