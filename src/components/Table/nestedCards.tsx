@@ -6,10 +6,10 @@ import { Css } from "src/Css";
 /**
  * A helper class to create our nested card DOM shenanigans.
  *
- * This acts as a one-off visitor that accepts for "begin row", "between row",
- * "end row" calls from GridTable while it's translating the user's nested
+ * This acts as a one-off visitor that accepts "begin row", "between row",
+ * "end row" calls from GridTable while its translating the user's nested
  * GridDataRows into a flat list of RowTuples, and interjects fake/chrome
- * rows into `filteredList` as necessary.
+ * rows into `filteredRows` as necessary.
  *
  * Note that this class only handles *between row* chrome and that within
  * a content row itself, the nested padding is handled separately by the
@@ -27,8 +27,7 @@ export class NestedCards {
   }
 
   beginRow(row: GridDataRow<any>) {
-    // Maybe make a new chrome
-    this.openCards.push(this.styles[row.kind] || fail(`no card style for ${row.kind}`));
+    this.openCards.push(this.getStyle(row));
     this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, "open"));
     maybeCreateChromeRow(this.columns, this.filteredRows, this.chromeBuffer);
   }
@@ -39,7 +38,7 @@ export class NestedCards {
   }
 
   betweenChildren(row: GridDataRow<any>) {
-    this.chromeBuffer.push(makeSpacer(this.styles[row.kind] || fail(`No kind for ${row.kind}`), this.openCards));
+    this.chromeBuffer.push(makeSpacer(this.getStyle(row), this.openCards));
   }
 
   done() {
@@ -49,6 +48,10 @@ export class NestedCards {
   /** Return a stable copy of the cards, so it won't change as we keep going. */
   currentOpenCards() {
     return [...this.openCards];
+  }
+
+  private getStyle(row: GridDataRow<any>): NestedCardStyle {
+    return this.styles[row.kind] || fail(`No kind for ${row.kind}`);
   }
 }
 
