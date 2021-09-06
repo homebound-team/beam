@@ -1,6 +1,7 @@
 import { MutableRefObject } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
 import { DiscriminateUnion, GridColumn, GridDataRow, Kinded, RowTuple } from "src/components/Table/GridTable";
+import { dropChromeRows } from "src/components/Table/nestedCards";
 
 /**
  * Allows a caller to ask for the currently shown rows, given the current sorting/filtering.
@@ -42,14 +43,16 @@ export function createRowLookup<R extends Kinded>(
         // element and calling .scrollIntoView, just not doing that yet.
         throw new Error("scrollTo is only supported for as=virtual");
       }
-      const index = filteredRows.findIndex(([r]) => r.kind === kind && r.id === id);
+      const index = filteredRows.findIndex(([r]) => r && r.kind === kind && r.id === id);
       virtuosoRef.current.scrollToIndex({ index, behavior: "smooth" });
     },
     currentList() {
-      return filteredRows.map((r) => r[0]);
+      return dropChromeRows(filteredRows).map((r) => r[0]);
     },
     lookup(row, additionalFilter = () => true) {
-      const rows = filteredRows.map((r) => r[0]).filter(additionalFilter);
+      const rows = dropChromeRows(filteredRows)
+        .map((r) => r[0])
+        .filter(additionalFilter);
       // Ensure we have `result.kind = {}` for each kind
       const result: any = Object.fromEntries(getKinds(columns).map((kind) => [kind, {}]));
       // This is an admittedly cute/fancy scan, instead of just `rows.findIndex`, but

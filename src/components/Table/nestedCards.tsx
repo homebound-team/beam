@@ -1,6 +1,6 @@
 import { fail } from "@homebound/form-state/dist/utils";
-import React, { Fragment } from "react";
-import { GridColumn, GridDataRow, GridStyle, NestedCardStyle, RowTuple } from "src/components/Table/GridTable";
+import React, { Fragment, ReactElement } from "react";
+import { GridColumn, GridDataRow, GridStyle, Kinded, NestedCardStyle, RowTuple } from "src/components/Table/GridTable";
 import { Css } from "src/Css";
 
 /**
@@ -170,4 +170,8 @@ export function maybeCreateChromeRow(
     // clear the buffer
     chromeBuffer.splice(0, chromeBuffer.length);
   }
+}
+
+export function dropChromeRows<R extends Kinded>(filteredRows: RowTuple<R>[]): [GridDataRow<R>, ReactElement][] {
+  return filteredRows.filter(([r]) => !!r) as [GridDataRow<R>, ReactElement][];
 }

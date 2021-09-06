@@ -14,7 +14,7 @@ import {
 } from "src";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
-import { GridDataRow, GridRowLookup, simpleRows } from "src/components/Table/GridTable";
+import { GridDataRow, GridRowLookup, simpleRows } from "src/components/Table";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { SuperDrawerContent, useSuperDrawer } from "./index";
 import { SuperDrawer as SuperDrawerComponent } from "./SuperDrawer";
