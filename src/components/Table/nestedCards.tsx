@@ -57,9 +57,9 @@ export function maybeAddCardPadding(
   idx: number,
   div: any,
 ): any {
-  const addLeft = idx === 0;
-  const addRight = idx === columns.length - 1;
-  if (!addLeft && !addRight) {
+  const isFirst = idx === 0;
+  const isFinal = idx === columns.length - 1;
+  if (!isFirst && !isFinal) {
     return div;
   }
   [...openCards].reverse().forEach((card) => {
@@ -67,8 +67,8 @@ export function maybeAddCardPadding(
       <div
         css={{
           ...Css.bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).$,
-          ...(addLeft && Css.plPx(card.pxPx).if(!!card.bColor).bl.$),
-          ...(addRight && Css.prPx(card.pxPx).if(!!card.bColor).br.$),
+          ...(isFirst && Css.plPx(card.pxPx).if(!!card.bColor).bl.$),
+          ...(isFinal && Css.prPx(card.pxPx).if(!!card.bColor).br.$),
         }}
       >
         {div}
