@@ -39,7 +39,7 @@ export function setRunningInJest() {
 }
 
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
-export interface GridStyle {
+export interface GridStyle<R extends Kinded = {}> {
   /** Applied to the base div element. */
   rootCss?: Properties;
   /** Applied with the owl operator between rows for rendering border lines. */
@@ -64,8 +64,8 @@ export interface GridStyle {
   rowHoverColor?: string;
   /** Styling for nested cards (see `cardStyle` if you only need a flat list of cards). */
   nestedCards?: {
-    // Map of kind --> card style. We don't current have `K` to make this type checked.
-    [kind: string]: NestedCardStyle;
+    // Map of kind --> card style.
+    [P in Exclude<R["kind"], "header">]: NestedCardStyle;
   };
 }
 
