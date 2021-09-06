@@ -1,4 +1,5 @@
-import { GridColumn, NestedCardStyle } from "src/components/Table/GridTable";
+import React, { Fragment } from "react";
+import { GridColumn, NestedCardStyle, RowTuple } from "src/components/Table/GridTable";
 import { Css } from "src/Css";
 
 // Util methods for our nested card DOM shenanigans.
@@ -87,4 +88,35 @@ export function makeSpacer(current: NestedCardStyle, openCards: NestedCardStyle[
     div = <div css={Css.bgColor(card.bgColor).pxPx(card.pxPx).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>;
   });
   return div;
+}
+
+/**
+ * Takes the current buffer of close row(s), spacers, and open row, and creates a single chrome DOM row.
+ *
+ * This allows a minimal amount of DOM overhead, insofar as to the css-grid or react-virtuoso we only
+ * 1 extra DOM node between each row of content to achieve our nested card look & feel, i.e.:
+ *
+ * - chrome row (open)
+ * - card1 content row
+ * - chrome row (card2 open)
+ * - nested card2 content row
+ * - chrome row (card2 close, card1 cloard)
+ */
+export function maybeCreateChromeRow(
+  columns: GridColumn<any>[],
+  filteredRows: RowTuple<any>[],
+  chromeBuffer: JSX.Element[],
+): void {
+  if (chromeBuffer.length > 0) {
+    filteredRows.push([
+      undefined,
+      <div css={Css.add({ gridColumn: `span ${columns.length}` }).$}>
+        {chromeBuffer.map((c, i) => (
+          <Fragment key={i}>{c}</Fragment>
+        ))}
+      </div>,
+    ]);
+    // clear the buffer
+    chromeBuffer.splice(0, chromeBuffer.length);
+  }
 }

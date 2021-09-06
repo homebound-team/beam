@@ -2,7 +2,6 @@ import { fail } from "@homebound/form-state/dist/utils";
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
 import React, {
-  Fragment,
   MutableRefObject,
   ReactElement,
   ReactNode,
@@ -18,7 +17,12 @@ import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
-import { makeOpenOrCloseCard, makeSpacer, maybeAddCardPadding } from "src/components/Table/nestedCards";
+import {
+  makeOpenOrCloseCard,
+  makeSpacer,
+  maybeAddCardPadding,
+  maybeCreateChromeRow,
+} from "src/components/Table/nestedCards";
 import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import tinycolor from "tinycolor2";
@@ -332,21 +336,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const openCards: NestedCardStyle[] | null = !!nestedCardStyle ? [] : null;
     // Just a helper boolean condition of "are nesting cards yes/no"
     const nestedCards = !!style.nestedCards && openCards !== null;
-    let chromeContent: JSX.Element[] = [];
-    // Take the current buffer of close row(s), spacers, and open row, and creates a single chrome DOM row
-    function flushChromeRow(): void {
-      if (chromeContent.length > 0) {
-        filteredRows.push([
-          undefined,
-          <div css={Css.add({ gridColumn: `span ${columns.length}` }).$}>
-            {chromeContent.map((c, i) => (
-              <Fragment key={i}>{c}</Fragment>
-            ))}
-          </div>,
-        ]);
-        chromeContent = [];
-      }
-    }
+    const chromeBuffer: JSX.Element[] = [];
 
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
@@ -360,8 +350,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         if (nestedCards) {
           // Maybe make a new chrome
           openCards.push(nestedCardStyle[row.kind] || fail(`no card style for ${row.kind}`));
-          chromeContent.push(makeOpenOrCloseCard(openCards, "open"));
-          flushChromeRow();
+          chromeBuffer.push(makeOpenOrCloseCard(openCards, "open"));
+          maybeCreateChromeRow(columns, filteredRows, chromeBuffer);
         }
         filteredRows.push([row, makeRowComponent(row)]);
       }
@@ -372,7 +362,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       }
 
       if (nestedCards) {
-        chromeContent.push(makeOpenOrCloseCard(openCards, "close"));
+        chromeBuffer.push(makeOpenOrCloseCard(openCards, "close"));
         openCards.pop();
       }
     }
@@ -386,13 +376,13 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         }
         visit(row);
         if (nestedCards && i !== length - 1) {
-          chromeContent.push(makeSpacer(nestedCardStyle[row.kind] || fail(`No kind for ${row.kind}`), openCards));
+          chromeBuffer.push(makeSpacer(nestedCardStyle[row.kind] || fail(`No kind for ${row.kind}`), openCards));
         }
       });
     }
 
     visitRows(maybeSorted);
-    flushChromeRow();
+    maybeCreateChromeRow(columns, filteredRows, chromeBuffer);
 
     return [headerRows, filteredRows];
   }, [
