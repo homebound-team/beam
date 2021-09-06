@@ -22,8 +22,8 @@ export class NestedCards {
   private chromeBuffer: JSX.Element[] = [];
   private styles: Record<string, NestedCardStyle>;
 
-  constructor(private columns: GridColumn<any>[], private filteredRows: RowTuple<any>[], style: GridStyle<any>) {
-    this.styles = (style.nestedCards || {}) as Record<string, NestedCardStyle>;
+  constructor(private columns: GridColumn<any>[], private filteredRows: RowTuple<any>[], style: GridStyle) {
+    this.styles = style.nestedCards || {};
   }
 
   beginRow(row: GridDataRow<any>) {

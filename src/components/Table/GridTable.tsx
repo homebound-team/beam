@@ -37,7 +37,7 @@ export function setRunningInJest() {
 }
 
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
-export interface GridStyle<R extends Kinded = { kind: string }> {
+export interface GridStyle {
   /** Applied to the base div element. */
   rootCss?: Properties;
   /** Applied with the owl operator between rows for rendering border lines. */
@@ -61,10 +61,7 @@ export interface GridStyle<R extends Kinded = { kind: string }> {
   /** Applied on hover if a row has a rowLink/onClick set. */
   rowHoverColor?: string;
   /** Styling for nested cards (see `cardStyle` if you only need a flat list of cards). */
-  nestedCards?: {
-    // Map of kind --> card style.
-    [P in Exclude<R["kind"], "header">]: NestedCardStyle;
-  };
+  nestedCards?: Record<string, NestedCardStyle>;
 }
 
 /**
@@ -219,7 +216,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
   /** Sets the rows to be wrapped by mobx observers. */
   observeRows?: boolean;
   /** A combination of CSS settings to set the static look & feel (vs. rowStyles which is per-row styling). */
-  style?: GridStyle<R>;
+  style?: GridStyle;
   /**
    * If provided, collapsed rows on the table persists when the page is reloaded.
    *

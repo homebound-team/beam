@@ -220,7 +220,7 @@ export function NestedCards() {
     }),
   };
   const spacing = { brPx: 4, pxPx: 8, spacerPx: 8 };
-  const nestedStyle: GridStyle<NestedRow> = {
+  const nestedStyle: GridStyle = {
     nestedCards: {
       parent: { bgColor: Palette.Gray500, ...spacing },
       child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
