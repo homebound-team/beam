@@ -51,7 +51,12 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
  * For the first or last cell of actual content, wrap them in divs that re-create the
  * outer cards' padding + background.
  */
-export function addCardPadding(columns: GridColumn<any>[], openCards: NestedCardStyle[], idx: number, div: any): any {
+export function maybeAddCardPadding(
+  columns: GridColumn<any>[],
+  openCards: NestedCardStyle[],
+  idx: number,
+  div: any,
+): any {
   const addLeft = idx === 0;
   const addRight = idx === columns.length - 1;
   if (!addLeft && !addRight) {

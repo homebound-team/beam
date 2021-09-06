@@ -18,7 +18,7 @@ import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
-import { addCardPadding, makeOpenOrCloseCard, makeSpacer } from "src/components/Table/nestedCards";
+import { makeOpenOrCloseCard, makeSpacer, maybeAddCardPadding } from "src/components/Table/nestedCards";
 import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import tinycolor from "tinycolor2";
@@ -872,7 +872,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         let rendered = renderFn(idx, cellCss, content, row, rowStyle);
         // Sneak in card padding for the 1st / last cells
         if (card) {
-          rendered = addCardPadding(columns, openCards, idx, rendered);
+          rendered = maybeAddCardPadding(columns, openCards, idx, rendered);
         }
         return rendered;
       })}

@@ -1,6 +1,6 @@
 import React from "react";
 import { NestedCardStyle } from "src/components/Table/GridTable";
-import { addCardPadding, makeOpenOrCloseCard } from "src/components/Table/nestedCards";
+import { makeOpenOrCloseCard, maybeAddCardPadding } from "src/components/Table/nestedCards";
 import { Palette } from "src/Css";
 import { render } from "src/utils/rtl";
 
@@ -83,7 +83,7 @@ describe("nestedCards", () => {
 
   it("can add left padding w/two levels", async () => {
     const r = await render(
-      addCardPadding([{} as any, {} as any], [parentCardStyle, childCardStyle], 0, <div>content</div>),
+      maybeAddCardPadding([{} as any, {} as any], [parentCardStyle, childCardStyle], 0, <div>content</div>),
     );
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
@@ -119,7 +119,7 @@ describe("nestedCards", () => {
 
   it("can add right padding w/two levels", async () => {
     const r = await render(
-      addCardPadding([{} as any, {} as any], [parentCardStyle, childCardStyle], 1, <div>content</div>),
+      maybeAddCardPadding([{} as any, {} as any], [parentCardStyle, childCardStyle], 1, <div>content</div>),
     );
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
@@ -154,7 +154,7 @@ describe("nestedCards", () => {
   });
 
   it("can add left and right padding w/two levels if only one column", async () => {
-    const r = await render(addCardPadding([{} as any], [parentCardStyle, childCardStyle], 0, <div>content</div>));
+    const r = await render(maybeAddCardPadding([{} as any], [parentCardStyle, childCardStyle], 0, <div>content</div>));
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
         background-color: rgba(247,245,245,1);
