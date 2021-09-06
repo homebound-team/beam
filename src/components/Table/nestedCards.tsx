@@ -1,8 +1,56 @@
+import { fail } from "@homebound/form-state/dist/utils";
 import React, { Fragment } from "react";
-import { GridColumn, NestedCardStyle, RowTuple } from "src/components/Table/GridTable";
+import { GridColumn, GridDataRow, GridStyle, NestedCardStyle, RowTuple } from "src/components/Table/GridTable";
 import { Css } from "src/Css";
 
-// Util methods for our nested card DOM shenanigans.
+/**
+ * A helper class to create our nested card DOM shenanigans.
+ *
+ * This acts as a one-off visitor that accepts for "begin row", "between row",
+ * "end row" calls from GridTable while it's translating the user's nested
+ * GridDataRows into a flat list of RowTuples, and interjects fake/chrome
+ * rows into `filteredList` as necessary.
+ *
+ * Note that this class only handles *between row* chrome and that within
+ * a content row itself, the nested padding is handled separately by the
+ * GridRow component.
+ */
+export class NestedCards {
+  // A stack of the current cards we're showing
+  private openCards: NestedCardStyle[] = [];
+  // A buffer of the open/close/spacer rows we need between each content row.
+  private chromeBuffer: JSX.Element[] = [];
+  private styles: Record<string, NestedCardStyle>;
+
+  constructor(private columns: GridColumn<any>[], private filteredRows: RowTuple<any>[], style: GridStyle<any>) {
+    this.styles = (style.nestedCards || {}) as Record<string, NestedCardStyle>;
+  }
+
+  beginRow(row: GridDataRow<any>) {
+    // Maybe make a new chrome
+    this.openCards.push(this.styles[row.kind] || fail(`no card style for ${row.kind}`));
+    this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, "open"));
+    maybeCreateChromeRow(this.columns, this.filteredRows, this.chromeBuffer);
+  }
+
+  endRow() {
+    this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, "close"));
+    this.openCards.pop();
+  }
+
+  betweenChildren(row: GridDataRow<any>) {
+    this.chromeBuffer.push(makeSpacer(this.styles[row.kind] || fail(`No kind for ${row.kind}`), this.openCards));
+  }
+
+  done() {
+    maybeCreateChromeRow(this.columns, this.filteredRows, this.chromeBuffer);
+  }
+
+  /** Return a stable copy of the cards, so it won't change as we keep going. */
+  currentOpenCards() {
+    return [...this.openCards];
+  }
+}
 
 /**
  * Draws the rounded corners (either open or close) for a new card.

@@ -1,4 +1,3 @@
-import { fail } from "@homebound/form-state/dist/utils";
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
 import React, {
@@ -17,12 +16,7 @@ import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
-import {
-  makeOpenOrCloseCard,
-  makeSpacer,
-  maybeAddCardPadding,
-  maybeCreateChromeRow,
-} from "src/components/Table/nestedCards";
+import { maybeAddCardPadding, NestedCards } from "src/components/Table/nestedCards";
 import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import tinycolor from "tinycolor2";
@@ -43,7 +37,7 @@ export function setRunningInJest() {
 }
 
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
-export interface GridStyle<R extends Kinded = { kind: "header" }> {
+export interface GridStyle<R extends Kinded = { kind: string }> {
   /** Applied to the base div element. */
   rootCss?: Properties;
   /** Applied with the owl operator between rows for rendering border lines. */
@@ -318,8 +312,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             isCollapsed,
             toggleCollapsedId,
             // TODO: How will this effect with memoization?
-            // At least for non-nested card tables, we make this null so it will be fine.
-            openCards: openCards && [...openCards],
+            // At least for non-nested card tables, we make this undefined so it will be fine.
+            openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
             ...sortProps,
           }}
         />
@@ -331,12 +325,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const filteredRows: RowTuple<R>[] = [];
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
-    const nestedCardStyle = (style.nestedCards || {}) as Record<string, NestedCardStyle>;
-    // A stack of the current cards we're showing
-    const openCards: NestedCardStyle[] | null = !!nestedCardStyle ? [] : null;
-    // Just a helper boolean condition of "are nesting cards yes/no"
-    const nestedCards = !!style.nestedCards && openCards !== null;
-    const chromeBuffer: JSX.Element[] = [];
+    const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style);
 
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
@@ -347,12 +336,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         );
       // Even if we don't pass the filter, one of our children might, so we continue on after this check
       if (passesFilter) {
-        if (nestedCards) {
-          // Maybe make a new chrome
-          openCards.push(nestedCardStyle[row.kind] || fail(`no card style for ${row.kind}`));
-          chromeBuffer.push(makeOpenOrCloseCard(openCards, "open"));
-          maybeCreateChromeRow(columns, filteredRows, chromeBuffer);
-        }
+        nestedCards && nestedCards.beginRow(row);
         filteredRows.push([row, makeRowComponent(row)]);
       }
 
@@ -361,10 +345,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         visitRows(row.children);
       }
 
-      if (nestedCards) {
-        chromeBuffer.push(makeOpenOrCloseCard(openCards, "close"));
-        openCards.pop();
-      }
+      nestedCards && nestedCards.endRow();
     }
 
     function visitRows(rows: GridDataRow<R>[]): void {
@@ -375,14 +356,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           return;
         }
         visit(row);
-        if (nestedCards && i !== length - 1) {
-          chromeBuffer.push(makeSpacer(nestedCardStyle[row.kind] || fail(`No kind for ${row.kind}`), openCards));
-        }
+        nestedCards && i !== length - 1 && nestedCards.betweenChildren(row);
       });
     }
 
     visitRows(maybeSorted);
-    maybeCreateChromeRow(columns, filteredRows, chromeBuffer);
+    nestedCards && nestedCards.done();
 
     return [headerRows, filteredRows];
   }, [
@@ -766,7 +745,7 @@ interface GridRowProps<R extends Kinded, S> {
   setSortKey?: (value: S) => void;
   isCollapsed: boolean;
   toggleCollapsedId: (id: string) => void;
-  openCards: NestedCardStyle[] | null;
+  openCards: NestedCardStyle[] | undefined;
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
