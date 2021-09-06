@@ -39,7 +39,7 @@ export function setRunningInJest() {
 }
 
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
-export interface GridStyle<R extends Kinded = {}> {
+export interface GridStyle<R extends Kinded = { kind: "header" }> {
   /** Applied to the base div element. */
   rootCss?: Properties;
   /** Applied with the owl operator between rows for rendering border lines. */
@@ -221,7 +221,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
   /** Sets the rows to be wrapped by mobx observers. */
   observeRows?: boolean;
   /** A combination of CSS settings to set the static look & feel (vs. rowStyles which is per-row styling). */
-  style?: GridStyle;
+  style?: GridStyle<R>;
   /**
    * If provided, collapsed rows on the table persists when the page is reloaded.
    *
@@ -327,11 +327,11 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const filteredRows: RowTuple<R>[] = [];
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
-    const nestedCardStyle = style.nestedCards;
+    const nestedCardStyle = (style.nestedCards || {}) as Record<string, NestedCardStyle>;
     // A stack of the current cards we're showing
     const openCards: NestedCardStyle[] | null = !!nestedCardStyle ? [] : null;
     // Just a helper boolean condition of "are nesting cards yes/no"
-    const nestedCards = !!nestedCardStyle && openCards !== null;
+    const nestedCards = !!style.nestedCards && openCards !== null;
     let chromeContent: JSX.Element[] = [];
     // Take the current buffer of close row(s), spacers, and open row, and creates a single chrome DOM row
     function flushChromeRow(): void {
