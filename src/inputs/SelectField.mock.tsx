@@ -14,6 +14,7 @@ export function SelectField<T extends object, V extends Key>(props: SelectFieldP
     errorMsg,
     onBlur,
     onFocus,
+    disabled,
   } = props;
   const tid = useTestIds(props, "select");
 
@@ -37,7 +38,7 @@ export function SelectField<T extends object, V extends Key>(props: SelectFieldP
         if (!readOnly && onBlur) onBlur();
       }}
       // Read Only does not apply to `select` fields, instead we'll add in disabled for tests to verify.
-      disabled={readOnly}
+      disabled={disabled || readOnly}
       data-error={!!errorMsg}
       data-errormsg={errorMsg}
       data-readonly={readOnly}
