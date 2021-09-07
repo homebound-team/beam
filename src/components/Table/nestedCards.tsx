@@ -161,7 +161,7 @@ export function maybeCreateChromeRow(
   if (chromeBuffer.length > 0) {
     filteredRows.push([
       undefined,
-      <div css={Css.add({ gridColumn: `span ${columns.length}` }).$}>
+      <div css={Css.gc(`span ${columns.length}`).$}>
         {chromeBuffer.map((c, i) => (
           <Fragment key={i}>{c}</Fragment>
         ))}
