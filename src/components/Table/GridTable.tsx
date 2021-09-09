@@ -39,16 +39,16 @@ export type SimpleHeaderAndDataWith<T> =
 /** A const for a marker header row. */
 export const simpleHeader = { kind: "header" as const, id: "header" };
 
-export function simpleRows<T extends { id: string }, R extends { kind: "header" | "data" }>(
-  data: T[] | undefined = [],
+export function simpleRows<R extends SimpleHeaderAndDataOf<D>, D>(
+  data: Array<D & { id: string }> | undefined = [],
 ): GridDataRow<R>[] {
-  // @ts-ignore Not sure why this doesn't type-check, something esoteric with the DiscriminateUnion type
+  // @ts-ignore
   return [simpleHeader, ...data.map((c) => ({ kind: "data" as const, ...c }))];
 }
 
 /** Like `simpleRows` but for `SimpleHeaderAndDataWith`. */
-export function simpleDataRows<T extends { id: string }, R extends { kind: "header" | "data" }>(
-  data: T[] | undefined = [],
+export function simpleDataRows<R extends SimpleHeaderAndDataWith<D>, D>(
+  data: Array<D & { id: string }> | undefined = [],
 ): GridDataRow<R>[] {
   // @ts-ignore Not sure why this doesn't type-check, something esoteric with the DiscriminateUnion type
   return [simpleHeader, ...data.map((data) => ({ kind: "data" as const, data, id: data.id }))];
