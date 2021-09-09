@@ -1,15 +1,15 @@
-import { ReactNode, useContext } from "react";
+import React, { Children, cloneElement, ReactNode, useContext } from "react";
 import { Css } from "src/Css";
 import { FormContext, LabelSuffixStyle } from "src/forms/FormContext";
 
 export type FormWidth =
-  /** 320px, works well in a modal (or full). */
+  /** 320px. */
   | "sm"
   /** 480px, works well in a small, single-stack form. */
   | "md"
   /** 550px, works well for showing side-by-side/double-stack fields. */
   | "lg"
-  /** 100%, works well for showing full width fields. */
+  /** 100%, works well for showing full width fields, or deferring to the parent width. */
   | "full";
 
 export interface FormLinesProps {
@@ -27,7 +27,8 @@ export interface FormLinesProps {
  */
 export function FormLines(props: FormLinesProps) {
   const settings = useContext(FormContext);
-  const { children, width = "md", labelSuffix = settings.labelSuffix } = props;
+  const { children, width = "full", labelSuffix = settings.labelSuffix } = props;
+  let firstFormHeading = true;
   return (
     <FormContext.Provider value={{ labelSuffix }}>
       <div
@@ -37,7 +38,15 @@ export function FormLines(props: FormLinesProps) {
           "& > *": Css.mb2.$,
         }}
       >
-        {children}
+        {Children.map(children, (child) => {
+          if (child && typeof child === "object" && "type" in child && (child.type as any).isFormHeading) {
+            const clone = cloneElement(child, { isFirst: firstFormHeading });
+            firstFormHeading = false;
+            return clone;
+          } else {
+            return child;
+          }
+        })}
       </div>
     </FormContext.Provider>
   );
@@ -64,13 +73,7 @@ export function FieldGroup(props: {
       return typeof width === `number` ? `${width}fr` : width;
     })
     .join(" ");
-  return (
-    <div css={Css.dg.gap2.gtc(gtc).$}>
-      {children.map((child) => {
-        return child;
-      })}
-    </div>
-  );
+  return <div css={Css.dg.gap2.gtc(gtc).$}>{children}</div>;
 }
 
 const sizes: Record<FormWidth, string> = {
