@@ -145,7 +145,7 @@ const tableData: Project[] = [
     favorite: true,
     stage: stages[2],
     status: statuses[1],
-    isTest: false,
+    isTest: true,
     doNotUse: false,
   },
   {
@@ -255,7 +255,7 @@ const tableData: Project[] = [
     favorite: true,
     stage: stages[0],
     status: statuses[2],
-    isTest: false,
+    isTest: true,
     doNotUse: true,
   },
   {
