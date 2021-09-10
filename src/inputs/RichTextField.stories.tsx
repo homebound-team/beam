@@ -23,7 +23,7 @@ export function Editable() {
           setValue(html);
           setTags(tags);
         }}
-        mergeTags={["foo", "bar", "zaz"]}
+        mergeTags={["foo bar", "bar foo", "zaz ziz"]}
         autoFocus
         placeholder="Enter Text"
         // Used to validate input states

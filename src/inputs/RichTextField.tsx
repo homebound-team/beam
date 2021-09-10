@@ -169,10 +169,15 @@ function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
   const tribute = new Tribute({
     trigger: "@",
     lookup: "value",
-    allowSpaces: true,
+    /** Not using allowSpaces due to a bug: {@link https://github.com/zurb/tribute/issues/606}
+     * This will prevent lookups that include a space. However, it can still tag a name with spaces in it. Just the autocomplete menu will disappear once the user types a space. */
+    allowSpaces: false,
     /** {@link https://github.com/zurb/tribute#hide-menu-when-no-match-is-returned} */
     noMatchTemplate: () => `<span style:"visibility: hidden;"></span>`,
-    selectTemplate: ({ original: { value } }) => `<span style="color: ${Palette.LightBlue700};">@${value}</span>`,
+    // According to the Tribute Types, `original.value` should always be present.
+    // However, we have received errors in DataDog for "Cannot read properties of undefined (reading 'original')", so we're adding some checks.
+    selectTemplate: (item) =>
+      item?.original?.value ? `<span style="color: ${Palette.LightBlue700};">@${item.original.value}</span>` : "",
     values,
   });
   // In dev mode, this fails because jsdom doesn't support contentEditable. Note that
