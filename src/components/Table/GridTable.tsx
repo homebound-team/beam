@@ -5,7 +5,6 @@ import React, {
   ReactElement,
   ReactNode,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -14,22 +13,14 @@ import React, {
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
-import { Icon } from "src/components/Icon";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
+import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
 import { maybeAddCardPadding, NestedCards } from "src/components/Table/nestedCards";
+import { SortHeader } from "src/components/Table/SortHeader";
+import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
+import { SortState, useSortState } from "src/components/Table/useSortState";
 import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
-import { useTestIds } from "src/utils/useTestIds";
 import tinycolor from "tinycolor2";
-
-/**
- * Our internal sorting state.
- *
- * `S` is, for whatever current column we're sorting by, either it's:
- *
- * a) `serverSideSortKey` if we're server-side sorting, or
- * b) it's index in the `columns` array, if client-side sorting
- */
-type SortState<S> = readonly [S, Direction];
 
 export type Kinded = { kind: string };
 
@@ -798,7 +789,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
   const div = (
     <Row css={rowCss} {...others}>
-      {columns.map((column, idx) => {
+      {columns.map((column, columnIndex) => {
         const maybeContent = applyRowFn(column, row);
 
         const canSortColumn =
@@ -806,7 +797,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           (sorting?.on === "server" && !!column.serverSideSortKey);
         const content = toContent(maybeContent, isHeader, canSortColumn);
 
-        ensureClientSideSortValueIsSortable(sorting, isHeader, column, idx, maybeContent);
+        ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
 
         const card = openCards && openCards.length > 0 && openCards[openCards.length - 1];
 
@@ -825,10 +816,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           // Apply any static/all-cell styling
           ...style.cellCss,
           // Then override with first/last cell styling
-          ...getFirstOrLastCellCss(style, idx, columns),
+          ...getFirstOrLastCellCss(style, columnIndex, columns),
           // Then override with per-cell/per-row justification/indentation
           ...getJustification(column, maybeContent, as),
-          ...getIndentationCss(style, rowStyle, idx, maybeContent),
+          ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
           ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
@@ -845,10 +836,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             ? rowClickRenderFn(as)
             : defaultRenderFn(as);
 
-        let rendered = renderFn(idx, cellCss, content, row, rowStyle);
+        let rendered = renderFn(columnIndex, cellCss, content, row, rowStyle);
         // Sneak in card padding for the 1st / last cells
         if (card) {
-          rendered = maybeAddCardPadding(columns, openCards, idx, rendered);
+          rendered = maybeAddCardPadding(columns, openCards, columnIndex, rendered);
         }
         return rendered;
       })}
@@ -896,7 +887,7 @@ function isContentAndSettings(content: ReactNode | GridCellContent): content is 
 }
 
 /** Return the content for a given column def applied to a given row. */
-function applyRowFn<R extends Kinded>(column: GridColumn<R>, row: GridDataRow<R>): ReactNode | GridCellContent {
+export function applyRowFn<R extends Kinded>(column: GridColumn<R>, row: GridDataRow<R>): ReactNode | GridCellContent {
   // Usually this is a function to apply against the row, but sometimes it's a hard-coded value, i.e. for headers
   const maybeContent = column[row.kind];
   if (typeof maybeContent === "function") {
@@ -920,23 +911,6 @@ const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (
     </Row>
   );
 };
-
-/**
- * Provides the sorting settings to headers.
- *
- * This is broken out into it's own context (i.e. separate from `GridCollapseContextProps`)
- * so that we can have sort changes only re-render the header row, and not trigger a re-render
- * of every row in the table.
- */
-type GridSortContextProps = {
-  sorted: "ASC" | "DESC" | undefined;
-  toggleSort(): void;
-};
-
-export const GridSortContext = React.createContext<GridSortContextProps>({
-  sorted: undefined,
-  toggleSort: () => {},
-});
 
 /**
  * Provides each row access to its `collapsed` current state and toggle.
@@ -1026,73 +1000,6 @@ function getJustification(column: GridColumn<any>, maybeContent: ReactNode | Gri
   return { ...Css.jc(alignmentToJustify[alignment]).$, ...textAlign };
 }
 
-// We currently mutate `rows` while sorting; this would be bad if rows was directly
-// read from an immutable store like the apollo cache, but we basically always make
-// a copy in the process of adding our `kind` tags.
-//
-// I suppose that is an interesting idea, would we ever want to render a GQL query/cache
-// result directly into the table without first doing a kind-mapping? Like maybe we could
-// use __typename as the kind.
-function sortRows<R extends Kinded>(
-  columns: GridColumn<R>[],
-  rows: GridDataRow<R>[],
-  sortState: SortState<number>,
-): void {
-  sortBatch(columns, rows, sortState);
-  // Recursively sort child rows
-  for (const row of rows) {
-    if (row.children) {
-      sortRows(columns, row.children, sortState);
-    }
-  }
-}
-
-function sortBatch<R extends Kinded>(
-  columns: GridColumn<R>[],
-  batch: GridDataRow<R>[],
-  sortState: SortState<number>,
-): void {
-  // When client-side sort, the sort value is the column index
-  const [value, direction] = sortState;
-  const column = columns[value];
-  const invert = direction === "DESC";
-  batch.sort((a, b) => {
-    const v1 = sortValue(applyRowFn(column, a));
-    const v2 = sortValue(applyRowFn(column, b));
-    const v1e = v1 === null || v1 === undefined;
-    const v2e = v2 === null || v2 === undefined;
-    if ((v1e && v2e) || v1 === v2) {
-      return 0;
-    } else if (v1e || v1 < v2) {
-      return invert ? 1 : -1;
-    } else if (v2e || v1 > v2) {
-      return invert ? -1 : 1;
-    }
-    return 0;
-  });
-}
-
-/** Look at a row and get its sort value. */
-function sortValue(value: ReactNode | GridCellContent): any {
-  // Check sortValue and then fallback on value
-  let maybeFn = value;
-  if (value && typeof value === "object") {
-    // Look for GridCellContent.sortValue, then GridCellContent.value
-    if ("sortValue" in value) {
-      maybeFn = value.sortValue;
-    } else if ("value" in value) {
-      maybeFn = value.value;
-    } else if ("content" in value) {
-      maybeFn = value.content;
-    }
-  }
-  // Watch for functions that need to read from a potentially-changing proxy
-  if (maybeFn instanceof Function) {
-    return maybeFn();
-  }
-  return maybeFn;
-}
-
 /** Look at a row and get its filter value. */
 function filterValue(value: ReactNode | GridCellContent): any {
   let maybeFn = value;
@@ -1108,76 +1015,6 @@ function filterValue(value: ReactNode | GridCellContent): any {
     return maybeFn();
   }
   return maybeFn;
-}
-
-/** Small custom hook that wraps the "setSortColumn inverts the current sort" logic. */
-function useSortState<R extends Kinded, S>(
-  columns: GridColumn<R, S>[],
-  sorting?: GridSortConfig<S>,
-): [SortState<S> | undefined, (value: S) => void] {
-  // If we're server-side sorting, use the caller's `sorting.value` prop to initialize our internal
-  // `useState`. After this, we ignore `sorting.value` because we assume it should match what our
-  // `setSortState` just changed anyway (in response to the user sorting a column).
-  const [sortState, setSortState] = useState<SortState<S> | undefined>(() => {
-    if (sorting?.on === "client") {
-      const { initial } = sorting;
-      if (initial) {
-        const key = typeof initial[0] === "number" ? initial[0] : columns.indexOf(initial[0] as any);
-        return [key as any as S, initial[1]];
-      } else {
-        // If no explicit sorting, assume 1st column ascending
-        const firstSortableColumn = columns.findIndex((c) => c.clientSideSort !== false);
-        return [firstSortableColumn as any as S, "ASC"];
-      }
-    } else {
-      return sorting?.value;
-    }
-  });
-
-  // Make a custom setSortKey that is useState-like but contains the invert-if-same-column-clicked-twice logic.
-  const setSortKey = useCallback(
-    (clickedKey: S) => {
-      const [currentKey, currentDirection] = sortState || [];
-      const [newKey, newDirection] =
-        // If clickedKey === currentKey, then toggle direction
-        clickedKey === currentKey
-          ? [currentKey, currentDirection === ASC ? DESC : ASC]
-          : // Otherwise, use the new key, and default to ascending
-            [clickedKey, ASC];
-      setSortState([newKey, newDirection]);
-      if (sorting?.on === "server") {
-        sorting.onSort(newKey, newDirection);
-      }
-    },
-    // Note that sorting.onSort is not listed here, so we bind to whatever the 1st sorting.onSort was
-    [sortState, setSortState],
-  );
-
-  return [sortState, setSortKey];
-}
-
-/**
- * Wraps column header names with up/down sorting icons.
- *
- * GridTable will use this automatically if the header content is just a text string.
- *
- * Alternatively, callers can also:
- *
- * - Instantiate this SortHeader directly with some customizations in `xss`, or
- * - Write their own component that uses `GridSortContext` to access the column's
- *   current sort state + `toggleSort` function
- */
-export function SortHeader(props: { content: string; xss?: Properties }) {
-  const { content, xss } = props;
-  const { sorted, toggleSort } = useContext(GridSortContext);
-  const tid = useTestIds(props, "sortHeader");
-  return (
-    <div {...tid} css={{ ...Css.df.aic.cursorPointer.selectNone.$, ...xss }} onClick={toggleSort}>
-      {content}
-      {sorted === "ASC" && <Icon icon="sortUp" inc={2} {...tid.icon} xss={Css.mlPx(4).$} />}
-      {sorted === "DESC" && <Icon icon="sortDown" inc={2} {...tid.icon} xss={Css.mlPx(4).$} />}
-    </div>
-  );
 }
 
 function maybeApplyFunction<T>(
@@ -1289,30 +1126,3 @@ const tableRowStyles = (as: RenderAs, column?: GridColumn<any>) => {
       }
     : {};
 };
-
-function ensureClientSideSortValueIsSortable(
-  sorting: GridSortConfig<any> | undefined,
-  isHeader: boolean,
-  column: GridColumn<any>,
-  idx: number,
-  maybeContent: ReactNode | GridCellContent,
-): void {
-  if (
-    process.env.NODE_ENV !== "production" &&
-    !isHeader &&
-    sorting?.on === "client" &&
-    column.clientSideSort !== false
-  ) {
-    const value = sortValue(maybeContent);
-    if (!canClientSideSort(value)) {
-      throw new Error(`Column ${idx} passed an unsortable value, use GridCellContent or clientSideSort=false`);
-    }
-  }
-}
-
-function canClientSideSort(value: any): boolean {
-  const t = typeof value;
-  return (
-    value === null || t === "undefined" || t === "number" || t === "string" || t === "boolean" || value instanceof Date
-  );
-}

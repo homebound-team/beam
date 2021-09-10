@@ -106,11 +106,11 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
 export function maybeAddCardPadding(
   columns: GridColumn<any>[],
   openCards: NestedCardStyle[],
-  idx: number,
+  columnIndex: number,
   div: any,
 ): any {
-  const isFirst = idx === 0;
-  const isFinal = idx === columns.length - 1;
+  const isFirst = columnIndex === 0;
+  const isFinal = columnIndex === columns.length - 1;
   if (!isFirst && !isFinal) {
     // Even if we don't need the nested color+padding of each open card, at
     // least add the background color of the closed open card.

@@ -1,6 +1,7 @@
 export * from "./CollapseToggle";
 export * from "./columns";
 export type { GridRowLookup } from "./GridRowLookup";
+export { GridSortContext } from "./GridSortContext";
 export {
   ASC,
   cardStyle,
@@ -20,7 +21,6 @@ export type {
   GridDataRow,
   GridRowStyles,
   GridSortConfig,
-  GridSortContext,
   GridStyle,
   GridTableDefaults,
   GridTableProps,
@@ -28,7 +28,7 @@ export type {
   Kinded,
   RowStyle,
   setRunningInJest,
-  SortHeader,
 } from "./GridTable";
 export { simpleDataRows, simpleHeader, simpleRows } from "./simpleHelpers";
 export type { SimpleHeaderAndDataOf, SimpleHeaderAndDataWith } from "./simpleHelpers";
+export { SortHeader } from "./SortHeader";
