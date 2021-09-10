@@ -20,7 +20,7 @@ class ToggleFilter extends BaseFilter<boolean, ToggleFilterProps> implements Fil
     return (
       <Switch
         {...props}
-        selected={(value || false) === enabledValue}
+        selected={(value ?? enabledValue) === enabledValue}
         label={this.label}
         labelStyle={inModal ? "filter" : "inline"}
         onChange={(value) => {
