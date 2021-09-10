@@ -17,26 +17,22 @@ class ToggleFilter extends BaseFilter<boolean, ToggleFilterProps> implements Fil
     inModal: boolean,
   ): JSX.Element {
     const { defaultValue, enabledValue = true, ...props } = this.props;
-    // if the incoming `value` is undefined it means the switch has not been toggled
-    // or setValue(...) set it to undefined
-    // - set it to false under normal behaviour
-    // - set it to true when enabledValue === false
-    value = value ?? (enabledValue === false ? true : false);
     return (
       <Switch
         {...props}
-        // just like the setValue(...) in onChange,
-        // for the visual representation we invert value when enabledValue === false
-        selected={enabledValue === false ? !value : value}
+        // if the incoming `value` is undefined it means the switch has not been toggled
+        // - set it to false under normal behaviour
+        // - set it to true when enabledValue === false
+        selected={value === undefined ? false : enabledValue === false ? !value : value}
         label={this.label}
         labelStyle={inModal ? "filter" : "inline"}
-        onChange={(value) => {
+        onChange={(on) => {
           // Basically, when the switch is off we return undefined
           // to signify that no filtering should occur on this field
           // And when the switch is on we return:
           // - true (normal behaviour)
           // - false (if enabledValue is false)
-          setValue(enabledValue === false ? (value ? !value : undefined) : (value ? value : undefined));
+          setValue(!on ? undefined : enabledValue);
         }}
         {...this.testId(tid)}
       />
