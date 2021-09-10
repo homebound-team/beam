@@ -283,6 +283,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
       />
       {state.isOpen && (
         <Popover
+          triggerRef={triggerRef}
           popoverRef={popoverRef}
           positionProps={positionProps}
           onClose={() => state.close()}

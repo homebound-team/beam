@@ -1,7 +1,8 @@
-import { Key, MutableRefObject, useState } from "react";
+import { Key, MutableRefObject, useEffect, useRef, useState } from "react";
 import { DismissButton, useListBox } from "react-aria";
 import { SelectState } from "react-stately";
 import { Virtuoso } from "react-virtuoso";
+import { VirtuosoHandle } from "react-virtuoso/dist/components";
 import { Chip } from "src/components/Chip";
 import { Option } from "src/components/internal/index";
 import { Css } from "src/Css";
@@ -36,6 +37,15 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
 
   const [listHeight, setListHeight] = useState(maxListHeight);
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
+  const focusedItem = state.collection.getItem(state.selectionManager.focusedKey);
+
+  // Handle scrolling to the item in focus when navigating options via Keyboard
+  useEffect(() => {
+    if (virtuosoRef.current && focusedItem?.index) {
+      virtuosoRef.current.scrollToIndex({ index: focusedItem.index, align: "center" });
+    }
+  }, [focusedItem]);
 
   return (
     <div
@@ -62,6 +72,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
       )}
       <ul css={Css.listReset.hPx(Math.min(maxListHeight, listHeight)).$}>
         <Virtuoso
+          ref={virtuosoRef}
           totalListHeightChanged={setListHeight}
           totalCount={state.collection.size}
           // We don't really need to set this, but it's handy for tests, which would
