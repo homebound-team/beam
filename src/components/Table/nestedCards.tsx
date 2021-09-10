@@ -112,7 +112,10 @@ export function maybeAddCardPadding(
   const isFirst = idx === 0;
   const isFinal = idx === columns.length - 1;
   if (!isFirst && !isFinal) {
-    return div;
+    // Even if we don't need the nested color+padding of each open card, at
+    // least add the background color of the closed open card.
+    const card = openCards[openCards.length - 1];
+    return !card ? div : <div css={Css.bgColor(card.bgColor).$}>{div}</div>;
   }
   [...openCards].reverse().forEach((card) => {
     div = (
