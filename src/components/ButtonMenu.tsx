@@ -63,6 +63,7 @@ export function ButtonMenu({ trigger, items, placement, persistentItems, default
       )}
       {state.isOpen && (
         <Popover
+          triggerRef={buttonRef}
           popoverRef={popoverRef}
           positionProps={positionProps}
           onClose={() => state.close()}
