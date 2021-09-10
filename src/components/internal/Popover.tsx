@@ -15,9 +15,16 @@ export function Popover(props: PopoverProps) {
   const { overlayProps } = useOverlay(
     {
       onClose,
-      shouldCloseOnBlur: false,
       isOpen,
       isDismissable: true,
+      shouldCloseOnInteractOutside: () => {
+        // By default when passing `isDismissable: true` then Popover will `stopPropagation` of the PointerDown event, which is used nearly everywhere in React-Aria (like for clicking buttons)
+        // We do not want that propagation to be stopped, but we still want the overlay to be dismissable.
+        // When providing `isDimissable: true`, then you can also provide this callback function, `shouldCloseOnInteractOutside`
+        // By returning `false` in this function it will no longer call `stopPropagation`, but it also will not call `onHide` for us, so we need to call `onClose` ourselves.
+        onClose();
+        return false;
+      },
     },
     popoverRef,
   );
