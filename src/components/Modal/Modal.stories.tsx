@@ -1,8 +1,9 @@
 import { Meta } from "@storybook/react";
 import { useEffect } from "react";
-import { Button, ModalProps, useModal } from "src/components/index";
+import { Button, ModalFooter, ModalHeader, ModalProps, useModal } from "src/components/index";
 import { Modal } from "src/components/Modal/Modal";
 import { TestModalContent, TestModalFilterTable } from "src/components/Modal/TestModalContent";
+import { noop } from "src/utils/index";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 
 export default {
@@ -22,6 +23,24 @@ export const FilterableStaticHeight = () => (
   <ModalFilterTableExample size={{ width: "md", height: 600 }} forceScrolling={true} />
 );
 export const HeaderWithComponents = () => <ModalExample size="lg" withTag />;
+export const ButtonsInFooter = () => {
+  const { openModal } = useModal();
+  const open = () =>
+    openModal({
+      content: (
+        <>
+          <ModalHeader>Add</ModalHeader>
+          <ModalFooter>
+            <Button variant="tertiary" label="Cancel" onClick={noop} />
+            <Button variant="primary" label="Add" onClick={noop} />
+          </ModalFooter>
+        </>
+      ),
+    });
+  // Immediately open the modal for Chromatic snapshots
+  useEffect(open, [openModal]);
+  return <Button label="Open" onClick={open} />;
+};
 
 interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling"> {
   initNumSentences?: number;
@@ -32,17 +51,16 @@ interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling"> 
 function ModalExample(props: ModalExampleProps) {
   const { size, showLeftAction, initNumSentences = 1, forceScrolling, withTag } = props;
   const { openModal } = useModal();
-
-  const modalProps = {
-    size,
-    forceScrolling,
-    content: <TestModalContent initNumSentences={initNumSentences} showLeftAction={showLeftAction} withTag={withTag} />,
-  };
-
+  const open = () =>
+    openModal({
+      size,
+      forceScrolling,
+      content: (
+        <TestModalContent initNumSentences={initNumSentences} showLeftAction={showLeftAction} withTag={withTag} />
+      ),
+    });
   // Immediately open the modal for Chromatic snapshots
-  const open = () => openModal(modalProps);
   useEffect(open, [openModal]);
-
   return <Button label="Open" onClick={open} />;
 }
 

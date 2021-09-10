@@ -141,7 +141,7 @@ export function ModalFooter<X extends Only<ModalFooterXss, X>>({
   const { modalFooterDiv } = useContext(BeamContext);
   const testId = useTestIds({}, testIdPrefix);
   return createPortal(
-    <div css={{ ...Css.p3.df.aic.jcfe.$, ...xss }} {...testId.footer}>
+    <div css={{ ...Css.p3.df.aic.jcfe.childGap1.$, ...xss }} {...testId.footer}>
       {children}
     </div>,
     modalFooterDiv,
