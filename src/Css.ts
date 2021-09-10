@@ -107,6 +107,8 @@ class CssBuilder<T extends Properties1> {
   get br24() { return this.add("borderRadius", "24px"); }
   get br100() { return this.add("borderRadius", "100%"); }
   borderRadius(value: Properties["borderRadius"]) { return this.add("borderRadius", value); }
+  get brt4() { return this.add("borderTopRightRadius", "4px").add("borderTopLeftRadius", "4px"); }
+  get brb4() { return this.add("borderBottomRightRadius", "4px").add("borderBottomLeftRadius", "4px"); }
 
   // borderStyle
   get bsDashed() { return this.add("borderStyle", "dashed"); }
@@ -263,6 +265,8 @@ class CssBuilder<T extends Properties1> {
   // grid
   gtc(value: Properties["gridTemplateColumns"]) { return this.add("gridTemplateColumns", value); }
   gtr(value: Properties["gridTemplateRows"]) { return this.add("gridTemplateRows", value); }
+  gr(value: Properties["gridRow"]) { return this.add("gridRow", value); }
+  gc(value: Properties["gridColumn"]) { return this.add("gridColumn", value); }
   get gap0() { return this.gap(0); }
   get gap1() { return this.gap(1); }
   get gap2() { return this.gap(2); }

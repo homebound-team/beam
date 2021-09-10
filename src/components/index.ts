@@ -1,4 +1,5 @@
 export * from "src/components/Table/GridTable";
+export { makeOpenOrCloseCard, makeSpacer, maybeAddCardPadding } from "src/components/Table/nestedCards";
 export * from "./Alert";
 export { BeamProvider } from "./BeamContext";
 export * from "./Button";

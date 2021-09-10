@@ -15,50 +15,11 @@ import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { Icon } from "src/components/Icon";
+import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
+import { maybeAddCardPadding, NestedCards } from "src/components/Table/nestedCards";
 import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import tinycolor from "tinycolor2";
-
-/** A helper for making `Row` type aliases of simple/flat tables that are just header + data. */
-export type SimpleHeaderAndDataOf<T> = { kind: "header" } | ({ kind: "data" } & T);
-
-/**
- * A helper for making `Row` type aliases of simple/flat tables that are just header + data.
- *
- * Unlike `SimpleHeaderAndDataOf`, we keep `T` in a separate `data`, which is useful
- * when rows are mobx proxies and we need proxy accesses to happen within the column
- * rendering.
- */
-export type SimpleHeaderAndDataWith<T> =
-  | { kind: "header" }
-  // We put `id` here so that GridColumn can match against `extends { data, id }`,
-  // kinda looks like we should combine Row and GridDataRow, i.e. Rows always have ids,
-  // they already have kinds, and need to have ids when passed to rows anyway...
-  | { kind: "data"; data: T; id: string };
-
-/** A const for a marker header row. */
-export const simpleHeader = { kind: "header" as const, id: "header" };
-
-export function simpleRows<R extends SimpleHeaderAndDataOf<D>, D>(
-  data: Array<D & { id: string }> | undefined = [],
-): GridDataRow<R>[] {
-  // @ts-ignore
-  return [simpleHeader, ...data.map((c) => ({ kind: "data" as const, ...c }))];
-}
-
-/** Like `simpleRows` but for `SimpleHeaderAndDataWith`. */
-export function simpleDataRows<R extends SimpleHeaderAndDataWith<D>, D>(
-  data: Array<D & { id: string }> | undefined = [],
-): GridDataRow<R>[] {
-  // @ts-ignore Not sure why this doesn't type-check, something esoteric with the DiscriminateUnion type
-  return [simpleHeader, ...data.map((data) => ({ kind: "data" as const, data, id: data.id }))];
-}
-
-// function createSimpleHeaderAndRows<D extends { id: string }>(
-//   dataFn: (q: TeamMembersQuery) => GridDataRow<SimpleHeaderAndDataOf<D>>[],
-// ): (data: TeamMembersQuery) => GridDataRow<SimpleHeaderAndDataOf<D>>[] {
-//   return data => [simpleHeader, ...(dataFn(data) || []).map(row => ({ kind: "data" as const, ...row }))];
-// }
 
 /**
  * Our internal sorting state.
@@ -109,6 +70,28 @@ export interface GridStyle {
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
   rowHoverColor?: string;
+  /** Styling for nested cards (see `cardStyle` if you only need a flat list of cards). */
+  nestedCards?: Record<string, NestedCardStyle>;
+}
+
+/**
+ * Styles for making cards nested within other cards.
+ *
+ * Because all of our output renderers (i.e. CSS grid and react-virtuoso) fundamentally need a flat
+ * list of elements, to create the look & feel of "nested cards", GridTable creates extra "chrome"
+ * elements like open card, close, and card padding.
+ */
+export interface NestedCardStyle {
+  /** The card background color. */
+  bgColor: string;
+  /** The optional border color, assumes 1px solid if set. */
+  bColor?: string;
+  /** I.e. 4px border radius. */
+  brPx: number;
+  /** The left/right padding of the card. */
+  pxPx: number;
+  /** The y spacing between each card. */
+  spacerPx: number;
 }
 
 export interface GridTableDefaults {
@@ -174,7 +157,8 @@ export function setGridTableDefaults(opts: Partial<GridTableDefaults>): void {
 
 type RenderAs = "div" | "table" | "virtual";
 
-type RowTuple<R extends Kinded> = [GridDataRow<R>, ReactElement];
+// The row is optional b/c the nested card chrome rows only have ReactElements.
+export type RowTuple<R extends Kinded> = [GridDataRow<R> | undefined, ReactElement];
 
 /**
  * The sort settings for the current table; whether it's client-side or server-side.
@@ -306,7 +290,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     }
     return rows;
   }, [columns, rows, sorting, sortState]);
-  const noData = !rows.some((row) => row.kind !== "header");
 
   // Filter + flatten + component-ize the sorted rows.
   let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
@@ -335,6 +318,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             stickyOffset,
             isCollapsed,
             toggleCollapsedId,
+            // TODO: How will this effect with memoization?
+            // At least for non-nested card tables, we make this undefined so it will be fine.
+            openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
             ...sortProps,
           }}
         />
@@ -345,29 +331,44 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const headerRows: RowTuple<R>[] = [];
     const filteredRows: RowTuple<R>[] = [];
 
+    // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
+    const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style);
+
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
-      if (row.kind === "header") {
-        headerRows.push([row, makeRowComponent(row)]);
-        return;
-      }
-
-      const passesFilter =
+      const matches =
         filters.length === 0 ||
         filters.every((filter) =>
           columns.map((c) => applyRowFn(c, row)).some((maybeContent) => matchesFilter(maybeContent, filter)),
         );
-      if (passesFilter) {
+      // Even if we don't pass the filter, one of our children might, so we continue on after this check
+      if (matches) {
+        nestedCards && nestedCards.beginRow(row);
         filteredRows.push([row, makeRowComponent(row)]);
       }
 
       const isCollapsed = collapsedIds.includes(row.id);
       if (!isCollapsed && row.children) {
-        row.children.forEach(visit);
+        visitRows(row.children);
       }
+
+      nestedCards && nestedCards.endRow();
     }
 
-    maybeSorted.forEach(visit);
+    function visitRows(rows: GridDataRow<R>[]): void {
+      const length = rows.length;
+      rows.forEach((row, i) => {
+        if (row.kind === "header") {
+          headerRows.push([row, makeRowComponent(row)]);
+          return;
+        }
+        visit(row);
+        nestedCards && i !== length - 1 && nestedCards.betweenChildren(row);
+      });
+    }
+
+    visitRows(maybeSorted);
+    nestedCards && nestedCards.done();
 
     return [headerRows, filteredRows];
   }, [
@@ -397,52 +398,14 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const { rowLookup } = props;
   if (rowLookup) {
     // Refs are cheap to assign to, so we don't bother doing this in a useEffect
-    rowLookup.current = {
-      scrollTo(kind, id) {
-        if (virtuosoRef.current === null) {
-          // In theory we could support as=div and as=table by finding the DOM
-          // element and calling .scrollIntoView, just not doing that yet.
-          throw new Error("scrollTo is only supported for as=virtual");
-        }
-        const index = filteredRows.findIndex(([r]) => r.kind === kind && r.id === id);
-        virtuosoRef.current.scrollToIndex({ index, behavior: "smooth" });
-      },
-      currentList() {
-        return filteredRows.map((r) => r[0]);
-      },
-      lookup(row, additionalFilter = () => true) {
-        const rows = filteredRows.map((r) => r[0]).filter(additionalFilter);
-        // Ensure we have `result.kind = {}` for each kind
-        const result: any = Object.fromEntries(getKinds(columns).map((kind) => [kind, {}]));
-        // This is an admittedly cute/fancy scan, instead of just `rows.findIndex`, but
-        // we do it this way so that we can do kind-aware prev/next detection.
-        let key: "prev" | "next" = "prev";
-        for (let i = 0; i < rows.length; i++) {
-          const each = rows[i];
-          // Flip from prev to next when we find it
-          if (each.kind === row.kind && each.id === row.id) {
-            key = "next";
-          } else {
-            if (key === "prev") {
-              // prev always overwrites what was there before
-              result[key] = each;
-              result[each.kind][key] = each;
-            } else {
-              // next only writes first seen
-              result[key] ??= each;
-              result[each.kind][key] ??= each;
-            }
-          }
-        }
-        return result;
-      },
-    };
+    rowLookup.current = createRowLookup(columns, filteredRows, virtuosoRef);
   }
 
   useEffect(() => {
     setRowCount && filteredRows?.length !== undefined && setRowCount(filteredRows.length);
   }, [filteredRows?.length, setRowCount]);
 
+  const noData = filteredRows.length === 0;
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
@@ -653,7 +616,7 @@ function calcGridColumns(columns: GridColumn<any>[]): string {
  *
  * See https://stackoverflow.com/a/50125960/355031
  */
-type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<K, V> ? T : never;
+export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<K, V> ? T : never;
 
 /** A specific kind of row, including the GridDataRow props. */
 type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "kind", P> & {
@@ -716,29 +679,6 @@ export interface RowStyle<R extends Kinded> {
   rowLink?: (row: R) => string;
   /** Fired when the row is clicked, similar to rowLink but for actions that aren't 'go to this link'. */
   onClick?: (row: GridDataRow<R>) => void;
-}
-
-/** Allows a caller to ask for the currently shown rows, given the current sorting/filtering. */
-export interface GridRowLookup<R extends Kinded> {
-  /** Returns both the immediate next/prev rows, as well as `[kind].next/prev` values, ignoring headers. */
-  lookup(
-    row: GridDataRow<R>,
-    additionalFilter?: (row: GridDataRow<R>) => boolean,
-  ): NextPrev<R> &
-    {
-      [P in R["kind"]]: NextPrev<DiscriminateUnion<R, "kind", P>>;
-    };
-
-  /** Returns the list of currently filtered/sorted rows, without headers. */
-  currentList(): readonly GridDataRow<R>[];
-
-  /** Scroll's to the row with the given kind + id. Requires using `as=virtual`. */
-  scrollTo(kind: R["kind"], id: string): void;
-}
-
-interface NextPrev<R extends Kinded> {
-  next: GridDataRow<R> | undefined;
-  prev: GridDataRow<R> | undefined;
 }
 
 function getIndentationCss<R extends Kinded>(
@@ -812,6 +752,7 @@ interface GridRowProps<R extends Kinded, S> {
   setSortKey?: (value: S) => void;
   isCollapsed: boolean;
   toggleCollapsedId: (id: string) => void;
+  openCards: NestedCardStyle[] | undefined;
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -829,6 +770,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     setSortKey,
     isCollapsed,
     toggleCollapsedId,
+    openCards,
     ...others
   } = props;
 
@@ -866,6 +808,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, idx, maybeContent);
 
+        const card = openCards && openCards.length > 0 && openCards[openCards.length - 1];
+
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
         // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
         // a few descendent selectors. However, that approach means the root grid-applied
@@ -901,7 +845,12 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             ? rowClickRenderFn(as)
             : defaultRenderFn(as);
 
-        return renderFn(idx, cellCss, content, row, rowStyle);
+        let rendered = renderFn(idx, cellCss, content, row, rowStyle);
+        // Sneak in card padding for the 1st / last cells
+        if (card) {
+          rendered = maybeAddCardPadding(columns, openCards, idx, rendered);
+        }
+        return rendered;
       })}
     </Row>
   );
@@ -1328,12 +1277,6 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const copy = useMemo(() => [...collapsedIds], [tick, collapsedIds]);
   return [copy, toggleId] as const;
-}
-
-function getKinds<R extends Kinded>(columns: GridColumn<R>[]): R[] {
-  // Use the 1st column to get the runtime list of kinds
-  const nonKindKeys = ["w", "sort", "sortValue", "align"];
-  return Object.keys(columns[0] || {}).filter((key) => !nonKindKeys.includes(key)) as any;
 }
 
 /** GridTable as Table utility to apply <tr> element override styles */
