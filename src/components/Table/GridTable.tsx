@@ -326,13 +326,13 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
-      const passesFilter =
+      const matches =
         filters.length === 0 ||
         filters.every((filter) =>
           columns.map((c) => applyRowFn(c, row)).some((maybeContent) => matchesFilter(maybeContent, filter)),
         );
       // Even if we don't pass the filter, one of our children might, so we continue on after this check
-      if (passesFilter) {
+      if (matches) {
         nestedCards && nestedCards.beginRow(row);
         filteredRows.push([row, makeRowComponent(row)]);
       }
