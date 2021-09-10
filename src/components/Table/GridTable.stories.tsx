@@ -230,7 +230,7 @@ export function NestedCards() {
 
   return (
     <GridTable
-      columns={[nameColumn]}
+      columns={[nameColumn, nameColumn, nameColumn]}
       {...{ rows }}
       style={nestedStyle}
       sorting={{ on: "client", initial: [0, "ASC"] }}
