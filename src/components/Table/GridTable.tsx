@@ -21,6 +21,16 @@ import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import tinycolor from "tinycolor2";
 
+/**
+ * Our internal sorting state.
+ *
+ * `S` is, for whatever current column we're sorting by, either it's:
+ *
+ * a) `serverSideSortKey` if we're server-side sorting, or
+ * b) it's index in the `columns` array, if client-side sorting
+ */
+type SortState<S> = readonly [S, Direction];
+
 export type Kinded = { kind: string };
 
 export type GridTableXss = Xss<Margin>;
