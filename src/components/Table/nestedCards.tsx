@@ -83,13 +83,13 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
       <div
         css={{
           ...Css.bgColor(card.bgColor).pxPx(card.pxPx).$,
-          // Only the 1st div needs border radius.
+          // Only the 1st div needs border left/right radius + border top/bottom.
           ...(!div &&
             Css.add({
               [`border${place}RightRadius`]: `${card.brPx}px`,
               [`border${place}LeftRadius`]: `${card.brPx}px`,
             }).hPx(card.brPx).$),
-          ...(card.bColor && Css.bc(card.bColor).bl.br.if(div)[btOrBb].$),
+          ...(card.bColor && Css.bc(card.bColor).bl.br.if(!div)[btOrBb].$),
         }}
       >
         {div}
