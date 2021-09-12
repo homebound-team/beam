@@ -61,8 +61,19 @@ export interface GridStyle {
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
   rowHoverColor?: string;
-  /** Styling for nested cards (see `cardStyle` if you only need a flat list of cards). */
-  nestedCards?: Record<string, NestedCardStyle>;
+  /** Styling for our special "nested card" output mode. */
+  nestedCards?: NestedCardsStyle;
+}
+
+export interface NestedCardsStyle {
+  /** The space between top-level cards. */
+  topLevelSpacerPx: number;
+  /**
+   * Per-kind styling for nested cards (see `cardStyle` if you only need a flat list of cards).
+   *
+   * Entries are optional, i.e. you can leave out kinds and they won't be wrapped/turned into cards.
+   */
+  kinds: Record<string, NestedCardStyle>;
 }
 
 /**
@@ -81,7 +92,7 @@ export interface NestedCardStyle {
   brPx: number;
   /** The left/right padding of the card. */
   pxPx: number;
-  /** The y spacing between each card. */
+  /** The y spacing between each row within this card. */
   spacerPx: number;
 }
 
@@ -333,20 +344,21 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           columns.map((c) => applyRowFn(c, row)).some((maybeContent) => matchesFilter(maybeContent, filter)),
         );
       // Even if we don't pass the filter, one of our children might, so we continue on after this check
+      let isCard = false;
       if (matches) {
-        nestedCards && nestedCards.beginRow(row);
+        isCard = nestedCards && nestedCards.maybeOpenCard(row);
         filteredRows.push([row, makeRowComponent(row)]);
       }
 
       const isCollapsed = collapsedIds.includes(row.id);
       if (!isCollapsed && row.children) {
-        visitRows(row.children);
+        visitRows(row.children, isCard);
       }
 
-      nestedCards && nestedCards.endRow();
+      isCard && nestedCards && nestedCards.closeCard();
     }
 
-    function visitRows(rows: GridDataRow<R>[]): void {
+    function visitRows(rows: GridDataRow<R>[], addSpacerBetweenCards: boolean): void {
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
@@ -354,11 +366,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           return;
         }
         visit(row);
-        nestedCards && i !== length - 1 && nestedCards.betweenChildren(row);
+        addSpacerBetweenCards && nestedCards && i !== length - 1 && nestedCards.addSpacerBetweenCards();
       });
     }
 
-    visitRows(maybeSorted);
+    // If nestedCards is set, we assume the top-level kind is a card
+    visitRows(maybeSorted, !!nestedCards);
     nestedCards && nestedCards.done();
 
     return [headerRows, filteredRows];

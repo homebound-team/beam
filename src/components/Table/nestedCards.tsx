@@ -1,4 +1,3 @@
-import { fail } from "@homebound/form-state/dist/utils";
 import React, { Fragment, ReactElement } from "react";
 import { GridColumn, GridDataRow, GridStyle, Kinded, NestedCardStyle, RowTuple } from "src/components/Table/GridTable";
 import { Css } from "src/Css";
@@ -17,28 +16,37 @@ import { Css } from "src/Css";
  */
 export class NestedCards {
   // A stack of the current cards we're showing
-  private openCards: NestedCardStyle[] = [];
+  private readonly openCards: Array<NestedCardStyle> = [];
   // A buffer of the open/close/spacer rows we need between each content row.
-  private chromeBuffer: JSX.Element[] = [];
-  private styles: Record<string, NestedCardStyle>;
+  private readonly chromeBuffer: JSX.Element[] = [];
+  private readonly styles: Record<string, NestedCardStyle>;
 
-  constructor(private columns: GridColumn<any>[], private filteredRows: RowTuple<any>[], style: GridStyle) {
-    this.styles = style.nestedCards || {};
+  constructor(private columns: GridColumn<any>[], private filteredRows: RowTuple<any>[], private style: GridStyle) {
+    this.styles = style.nestedCards!.kinds;
   }
 
-  beginRow(row: GridDataRow<any>) {
-    this.openCards.push(this.getStyle(row));
-    this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, "open"));
+  maybeOpenCard(row: GridDataRow<any>): boolean {
+    const card = this.styles[row.kind];
+    // If this kind doesn't have a card defined, don't put it on the card stack
+    if (card) {
+      this.openCards.push(card);
+      this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, "open"));
+    }
+    // But always close previous cards if needed
     maybeCreateChromeRow(this.columns, this.filteredRows, this.chromeBuffer);
+    return !!card;
   }
 
-  endRow() {
+  closeCard() {
     this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, "close"));
     this.openCards.pop();
   }
 
-  betweenChildren(row: GridDataRow<any>) {
-    this.chromeBuffer.push(makeSpacer(this.getStyle(row), this.openCards));
+  addSpacerBetweenCards() {
+    const openCard = this.openCards[this.openCards.length - 1];
+    // If we're between two top-level cards, we may not have, so fallback on topLevelSpacerPx
+    const height = openCard?.spacerPx || this.style.nestedCards!.topLevelSpacerPx;
+    this.chromeBuffer.push(makeSpacer(height, this.openCards));
   }
 
   done() {
@@ -48,10 +56,6 @@ export class NestedCards {
   /** Return a stable copy of the cards, so it won't change as we keep going. */
   currentOpenCards() {
     return [...this.openCards];
-  }
-
-  private getStyle(row: GridDataRow<any>): NestedCardStyle {
-    return this.styles[row.kind] || fail(`No kind for ${row.kind}`);
   }
 }
 
@@ -133,9 +137,14 @@ export function maybeAddCardPadding(
   return div;
 }
 
-/** Create a spacer between rows of children. */
-export function makeSpacer(current: NestedCardStyle, openCards: NestedCardStyle[]) {
-  let div = <div css={Css.hPx(current.spacerPx).$} />;
+/**
+ * Create a spacer between rows of children.
+ *
+ * Our height is not based on `openCards`, b/c for the top-most level, we won't
+ * have any open cards, but still want a space between top-level cards.
+ */
+export function makeSpacer(height: number, openCards: NestedCardStyle[]) {
+  let div = <div css={Css.hPx(height).$} />;
   // Start at the current/inside card, and wrap outward padding + borders.
   // | card1 | card2 | ... card3 ... | card2 | card1 |
   [...openCards].reverse().forEach((card) => {
