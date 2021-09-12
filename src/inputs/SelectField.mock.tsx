@@ -16,7 +16,7 @@ export function SelectField<T extends object, V extends Key>(props: SelectFieldP
     onFocus,
     disabled,
   } = props;
-  const tid = useTestIds(props, "select");
+  const tid = useTestIds(props, props.label || "select");
 
   const currentOption = options.find((o) => getOptionValue(o) === value) || options[0];
 
