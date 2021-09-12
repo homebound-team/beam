@@ -358,7 +358,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       isCard && nestedCards && nestedCards.closeCard();
     }
 
-    function visitRows(rows: GridDataRow<R>[], addSpacerBetweenCards: boolean): void {
+    function visitRows(rows: GridDataRow<R>[], addSpacer: boolean): void {
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
@@ -366,7 +366,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           return;
         }
         visit(row);
-        addSpacerBetweenCards && nestedCards && i !== length - 1 && nestedCards.addSpacerBetweenCards();
+        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacerBetweenChildren();
       });
     }
 

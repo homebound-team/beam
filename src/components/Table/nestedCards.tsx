@@ -42,7 +42,7 @@ export class NestedCards {
     this.openCards.pop();
   }
 
-  addSpacerBetweenCards() {
+  addSpacerBetweenChildren() {
     const openCard = this.openCards[this.openCards.length - 1];
     // If we're between two top-level cards, we may not have, so fallback on topLevelSpacerPx
     const height = openCard?.spacerPx || this.style.nestedCards!.topLevelSpacerPx;
