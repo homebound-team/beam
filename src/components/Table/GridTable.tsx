@@ -741,6 +741,8 @@ export type GridDataRow<R extends Kinded> = {
   id: string;
   /** A list of parent/grand-parent ids for collapsing parent/child rows. */
   children?: GridDataRow<R>[];
+  /** Whether to pin this sort to the first/last of its parent's children. */
+  pin?: "first" | "last";
 } & DiscriminateUnion<R, "kind", R["kind"]>;
 
 interface GridRowProps<R extends Kinded, S> {

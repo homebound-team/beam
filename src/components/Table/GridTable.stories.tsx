@@ -166,7 +166,7 @@ const rows: GridDataRow<NestedRow>[] = [
       // Put this "grandchild" in the 2nd level to show heterogeneous levels
       { kind: "grandChild", id: "p1g1", name: "grandchild p1g1" },
       // Put this "kind" into the 2nd level to show it doesn't have to be a card
-      { kind: "add", id: "add" },
+      { kind: "add", id: "add", pin: "last" },
     ],
   },
   // a parent with just a child

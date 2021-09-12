@@ -537,6 +537,48 @@ describe("GridTable", () => {
       // Then it is shown as initially sorted desc
       expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown");
     });
+
+    it("can pin rows first", async () => {
+      // Given the table is using client-side sorting
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn]}
+          sorting={{ on: "client" }}
+          rows={[
+            simpleHeader,
+            // And the 1st row is pinned first
+            { kind: "data", id: "2", name: "b", value: 2, pin: "first" },
+            { kind: "data", id: "3", name: "c", value: 3 },
+            { kind: "data", id: "1", name: "a", value: 1 },
+          ]}
+        />,
+      );
+      // Then the `value: 2` row stayed first
+      expect(cell(r, 1, 0)).toHaveTextContent("b");
+      expect(cell(r, 2, 0)).toHaveTextContent("a");
+      expect(cell(r, 3, 0)).toHaveTextContent("c");
+    });
+
+    it("can pin rows last", async () => {
+      // Given the table is using client-side sorting
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn]}
+          sorting={{ on: "client" }}
+          rows={[
+            simpleHeader,
+            { kind: "data", id: "3", name: "c", value: 3 },
+            { kind: "data", id: "2", name: "b", value: 2 },
+            // And the last row is pinned first
+            { kind: "data", id: "1", name: "a", value: 1, pin: "last" },
+          ]}
+        />,
+      );
+      // Then the `value: 1` row stayed last
+      expect(cell(r, 1, 0)).toHaveTextContent("b");
+      expect(cell(r, 2, 0)).toHaveTextContent("c");
+      expect(cell(r, 3, 0)).toHaveTextContent("a");
+    });
   });
 
   it("can handle onClick for rows", async () => {
