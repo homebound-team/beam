@@ -44,7 +44,7 @@ export class NestedCards {
 
   addSpacerBetweenChildren() {
     const openCard = this.openCards[this.openCards.length - 1];
-    // If we're between two top-level cards, we may not have, so fallback on topLevelSpacerPx
+    // If we're between two top-level cards, there is no open card, so fallback on topLevelSpacerPx
     const height = openCard?.spacerPx || this.style.nestedCards!.topLevelSpacerPx;
     this.chromeBuffer.push(makeSpacer(height, this.openCards));
   }
