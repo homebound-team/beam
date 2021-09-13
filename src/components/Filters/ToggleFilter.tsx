@@ -19,8 +19,6 @@ export type ToggleFilterProps<V> = {
  * `on === false` and off === undefined`.
  *
  * Or you can set on/off directly, by passing both `onValue` and `offValue`.
- *
- * @param props
  */
 export function toggleFilter<V>(props: ToggleFilterProps<V>): (key: string) => Filter<V> {
   return (key) =>
