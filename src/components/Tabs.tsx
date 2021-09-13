@@ -1,9 +1,12 @@
-import { Fragment, HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useState } from "react";
+import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
+import { matchPath, useLocation } from "react-router";
+import { Link } from "react-router-dom";
 import type { IconKey } from "src/components";
-import { Css, Margin, Only, Properties, Xss } from "src/Css";
+import { Css, Margin, Only, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 import { Icon } from "./Icon";
 
 export interface Tab<V extends string = string> {
@@ -16,13 +19,22 @@ export interface Tab<V extends string = string> {
 
 type TabsContentXss = Xss<Margin>;
 
-export interface TabsProps<V extends string, X extends Properties> {
+export interface TabsProps<V extends string, X> {
   ariaLabel?: string;
   // the selected tab is connected to the contents displayed
   selected: V;
   tabs: Tab<V>[];
   onChange: (value: V) => void;
   contentXss?: X;
+}
+
+// Tabs can be rendered as Links (omit "onChange") and we'll use React-Router for matching (omit "selected")/
+export interface RouteTabsProps<V extends string, X> extends Omit<TabsProps<V, X>, "onChange" | "selected" | "tabs"> {
+  tabs: RouteTab<V>[];
+}
+export interface RouteTab<V extends string> extends Tab<V> {
+  // This is a React-Router path(s) to match the current URL to. Matching on the path(s) is what dictates which TabContent to render
+  path: string | string[];
 }
 
 /**
@@ -34,20 +46,29 @@ export interface TabsProps<V extends string, X extends Properties> {
  * If you want to tease apart Tabs from their TabContent, you can use the `Tab`
  * and `TabContent` components directly.
  */
-export function TabsWithContent<V extends string, X extends Only<TabsContentXss, X>>(props: TabsProps<V, X>) {
+export function TabsWithContent<V extends string, X extends Only<TabsContentXss, X>>(
+  props: TabsProps<V, X> | RouteTabsProps<V, X>,
+) {
   const onlyOneTabEnabled = props.tabs.filter((t) => !t.disabled).length === 1;
   return (
-    <Fragment>
+    <>
       {!onlyOneTabEnabled && <Tabs {...props} />}
       <TabContent {...props} />
-    </Fragment>
+    </>
   );
 }
 
-export function TabContent<V extends string>(props: Omit<TabsProps<V, {}>, "onChange">) {
+export function TabContent<V extends string>(props: Omit<TabsProps<V, {}>, "onChange"> | RouteTabsProps<V, {}>) {
   const tid = useTestIds(props, "tab");
-  const { selected, tabs, contentXss = {} } = props;
-  const selectedTab = tabs.find((tab) => tab.value === selected) || tabs[0];
+  const { tabs, contentXss = {} } = props;
+  const location = useLocation();
+  const selectedTab = isRouteTabs(props)
+    ? props.tabs.find((t) => {
+        const paths = Array.isArray(t.path) ? t.path : [t.path];
+        return paths.some((p) => !!matchPath(location.pathname, { path: t.path, exact: true }));
+      }) || tabs[0]
+    : tabs.find((tab) => tab.value === props.selected) || tabs[0];
+
   return (
     <div
       aria-labelledby={`${selectedTab.value}-tab`}
@@ -63,8 +84,13 @@ export function TabContent<V extends string>(props: Omit<TabsProps<V, {}>, "onCh
 }
 
 /** The top list of tabs. */
-export function Tabs<V extends string>(props: TabsProps<V, {}>) {
-  const { ariaLabel, onChange, selected, tabs, ...others } = props;
+export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<V, {}>) {
+  const { ariaLabel, tabs, ...others } = props;
+  const location = useLocation();
+  const selected = isRouteTabs(props)
+    ? props.tabs.find((t) => !!matchPath(location.pathname, { path: t.path, exact: true }))?.value ||
+      props.tabs[0].value
+    : props.selected;
   const { isFocusVisible, focusProps } = useFocusRing();
   const tid = useTestIds(others, "tabs");
   const [active, setActive] = useState(selected);
@@ -74,26 +100,24 @@ export function Tabs<V extends string>(props: TabsProps<V, {}>) {
 
   // the active tab is highlighted, but not necessarily "selected"
   // the selected tab dictates what is displayed in the content panel
-  function handleKeyUp(e: KeyboardEvent) {
+  function onKeyUp(e: KeyboardEvent) {
     // left and right arrow keys update the active tab
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       const nextTabValue = getNextTabValue(active, e.key, tabs);
       setActive(nextTabValue);
-    }
-    // hitting enter will select the active tab and display the related contents
-    if (e.key === "Enter") {
-      onChange(active);
+
+      // Ensure the browser's focus follows the active element.
+      document.getElementById(`${nextTabValue}-tab`)?.focus();
     }
   }
 
   // clicking on a tab sets it to selected and active
-  function handleOnClick(value: V) {
-    onChange(value);
-    setActive(value);
+  function onClick(value: V) {
+    !isRouteTabs(props) && props.onChange(value);
   }
 
   // bluring out resets active to whatever selected is
-  function handleBlur() {
+  function onBlur() {
     setActive(selected);
   }
 
@@ -106,21 +130,18 @@ export function Tabs<V extends string>(props: TabsProps<V, {}>) {
   return (
     <div css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...tid}>
       {tabs.map((tab) => {
-        const { name, value, icon, disabled = false } = tab;
+        const { value } = tab;
         return (
-          <SingleTab
+          <TabImpl
             active={active === value}
-            disabled={disabled}
             focusProps={focusProps}
-            icon={icon}
             isFocusVisible={isFocusVisible}
             key={value}
-            label={name}
-            onClick={disabled ? () => {} : handleOnClick}
-            onKeyUp={handleKeyUp}
-            onBlur={handleBlur}
-            value={value}
-            {...tid[value]}
+            onClick={onClick}
+            onKeyUp={onKeyUp}
+            onBlur={onBlur}
+            tab={tab}
+            {...tid[defaultTestId(value)]}
           />
         );
       })}
@@ -128,66 +149,67 @@ export function Tabs<V extends string>(props: TabsProps<V, {}>) {
   );
 }
 
-interface TabProps<V extends string> extends BeamFocusableProps {
+interface TabImplProps<V extends string> extends BeamFocusableProps {
   /** active indicates the current tab is highlighted */
   active: boolean;
-  disabled: boolean;
-  label: string;
-  icon?: IconKey;
-  value: V;
   onClick: (value: V) => void;
   onKeyUp: (e: KeyboardEvent) => void;
   onBlur: () => void;
   focusProps: HTMLAttributes<HTMLElement>;
   isFocusVisible: boolean;
+  tab: Tab<V> | RouteTab<V>;
 }
 
-function SingleTab<V extends string>(props: TabProps<V>) {
-  const {
-    disabled: isDisabled,
-    label,
-    value,
-    onClick,
-    active,
-    icon = false,
-    onKeyUp,
-    onBlur,
-    focusProps,
-    isFocusVisible = false,
-    ...others
-  } = props;
+function TabImpl<V extends string>(props: TabImplProps<V>) {
+  const { tab, onClick, active, onKeyUp, onBlur, focusProps, isFocusVisible = false, ...others } = props;
+  const { disabled: isDisabled = false, name: label, value, icon } = tab;
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
     () => getTabStyles(),
     [],
   );
+  const ref = useRef<HTMLElement>();
 
-  return (
-    <div
-      aria-controls={`${value}-tabPanel`}
-      aria-selected={active}
-      aria-disabled={isDisabled || undefined}
-      id={`${value}-tab`}
-      role="tab"
-      tabIndex={active ? 0 : -1}
-      {...mergeProps(focusProps, hoverProps, { onKeyUp, onBlur, onClick: () => onClick(value) })}
-      {...others}
-      css={{
-        ...baseStyles,
-        ...(active && activeStyles),
-        ...(isDisabled && disabledStyles),
-        ...(isHovered && hoverStyles),
-        ...(isHovered && active && activeHoverStyles),
-        ...(isFocusVisible && active && focusRingStyles),
-      }}
-    >
+  const tabProps = {
+    "aria-controls": `${value}-tabPanel`,
+    "aria-selected": active,
+    "aria-disabled": isDisabled || undefined,
+    id: `${value}-tab`,
+    role: "tab",
+    tabIndex: active ? 0 : -1,
+    ...mergeProps(focusProps, hoverProps, { onKeyUp, onBlur }),
+    ...others,
+    css: {
+      ...baseStyles,
+      ...(active && activeStyles),
+      ...(isDisabled && disabledStyles),
+      ...(isHovered && hoverStyles),
+      ...(isHovered && active && activeHoverStyles),
+      ...(isFocusVisible && active && focusRingStyles),
+    },
+  };
+
+  const tabLabel = (
+    <>
       {label}
       {icon && (
         <span css={Css.ml1.$}>
           <Icon icon={icon} />
         </span>
       )}
-    </div>
+    </>
+  );
+
+  return isDisabled ? (
+    <div {...tabProps}>{tabLabel}</div>
+  ) : isRouteTab(tab) ? (
+    <Link {...tabProps} {...mergeProps(focusProps, hoverProps)} to={value}>
+      {tabLabel}
+    </Link>
+  ) : (
+    <button {...tabProps} {...mergeProps(focusProps, focusProps, { onClick: () => onClick(value) })}>
+      {tabLabel}
+    </button>
   );
 }
 
@@ -208,4 +230,15 @@ export function getNextTabValue<V extends string>(selected: V, key: "ArrowLeft" 
   const currentIndex = tabsToScan.findIndex((tab) => tab.value === selected);
   const nextIndex = currentIndex === tabsToScan.length - 1 ? 0 : currentIndex + 1;
   return tabsToScan[nextIndex].value;
+}
+
+function isRouteTabs(
+  props: Omit<TabsProps<any, any>, "onChange"> | RouteTabsProps<any, any>,
+): props is RouteTabsProps<any, any> {
+  const { tabs } = props;
+  return tabs.length > 0 && isRouteTab(tabs[0]);
+}
+
+function isRouteTab(tab: Tab<any> | RouteTab<any>): tab is RouteTab<any> {
+  return "path" in tab;
 }

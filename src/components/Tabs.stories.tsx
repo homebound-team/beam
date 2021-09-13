@@ -1,8 +1,12 @@
 import { Meta } from "@storybook/react";
 import { Fragment, useState } from "react";
+import { Route, useHistory, useLocation } from "react-router";
+import { Link } from "react-router-dom";
+import { Button } from "src/components/Button";
 import { Css } from "src/Css";
+import { withRouter } from "src/utils/sb";
 import { Icon } from "./Icon";
-import { getTabStyles, Tab, TabContent, Tabs, TabsWithContent } from "./Tabs";
+import { getTabStyles, RouteTab, Tab, TabContent, Tabs, TabsWithContent } from "./Tabs";
 import { TabValue, TestTabContent, testTabs } from "./testData";
 
 export default {
@@ -12,6 +16,7 @@ export default {
     // To better view the icon hover state
     backgrounds: { default: "white" },
   },
+  decorators: [withRouter()],
 } as Meta;
 
 export function TabBaseStates() {
@@ -49,21 +54,109 @@ export function TabsSeparateFromContent() {
   );
 }
 
+export function TabsAsLinks() {
+  return <TestComponent />;
+}
+TabsAsLinks.decorators = [withRouter("/ce:1", "/:ceId")];
+
+function TestComponent() {
+  const location = useLocation();
+  const history = useHistory();
+  const routeTabs: RouteTab<string>[] = [
+    {
+      name: "Tab 1",
+      value: "/ce:1/overview",
+      path: ["/:ceId/overview", "/:ceId"],
+      render: () => (
+        <TestTabContent
+          content={
+            <>
+              <h1>Tab 1 Content</h1>
+              <div>
+                <pre css={Css.dib.$}>tab.path = ["/:ceId/overview", "/:ceId"]</pre>
+              </div>
+            </>
+          }
+        />
+      ),
+    },
+    {
+      name: "Tab 2",
+      value: "/ce:1/line-items",
+      path: ["/:ceId/line-items", "/:ceId/line-items/*"],
+      render: () => (
+        <TestTabContent
+          content={
+            <>
+              <h1>Tab 2 Content</h1>
+              <div>
+                <pre css={Css.dib.$}>tab.path = ["/:ceId/line-items", "/:ceId/line-items/*"]</pre>
+              </div>
+              <div css={Css.mt2.$}>
+                <p>Click below to load a sub route of this tab, which should keep this tab as "active"</p>
+                <Link to="/ce:1/line-items/celi:1/overview">Line Item Details</Link>
+                <div>
+                  <Route path="/:ceId/line-items/:celiId">Loaded Line Items Overview!</Route>
+                </div>
+              </div>
+            </>
+          }
+        />
+      ),
+    },
+    {
+      name: "Tab 3",
+      value: "/ce:1/history",
+      path: "/:ceId/history",
+      render: () => (
+        <TestTabContent
+          content={
+            <>
+              <h1>Tab 3 Content</h1>
+              <div>
+                <pre css={Css.dib.$}>tab.path = "/:ceId/history"</pre>
+              </div>
+            </>
+          }
+        />
+      ),
+    },
+    {
+      name: "Disabled Tab",
+      value: "/ce:1/disabled",
+      path: "/:ceId/disabled",
+      disabled: true,
+      render: () => <TestTabContent content="Disabled Tab" />,
+    },
+  ];
+  return (
+    <div>
+      <div css={Css.bb.bGray200.py1.mb2.$}>
+        <div>
+          <strong>Current URL:</strong> <pre css={Css.dib.$}>{location?.pathname}</pre>
+        </div>
+        <Button label="Reset to root path" onClick={() => history.push("/:ceId")} /> (Will match Tab 1)
+      </div>
+      <TabsWithContent tabs={routeTabs} />
+    </div>
+  );
+}
+
 export const TabsHiddenIfOnlyOneActive = () => {
   const testTabs: Tab<TabValue>[] = [
-    { name: "Tab 1", value: "tab1", render: () => <TestTabContent title="Tab 1 Content" /> },
-    { name: "Tab 2", value: "tab2", disabled: true, render: () => <TestTabContent title="Tab 2 Content" /> },
-    { name: "Tab 3", value: "tab3", disabled: true, render: () => <TestTabContent title="Tab 3 Content" /> },
-    { name: "Tab 4", value: "tab4", disabled: true, render: () => <TestTabContent title="Tab 4 Content" /> },
+    { name: "Tab 1", value: "tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
+    { name: "Tab 2", value: "tab2", disabled: true, render: () => <TestTabContent content="Tab 2 Content" /> },
+    { name: "Tab 3", value: "tab3", disabled: true, render: () => <TestTabContent content="Tab 3 Content" /> },
+    { name: "Tab 4", value: "tab4", disabled: true, render: () => <TestTabContent content="Tab 4 Content" /> },
   ];
   return <TabsWithContent tabs={testTabs} onChange={() => {}} selected={"tab1"} ariaLabel="Sample Tabs" />;
 };
 
 const tabsWithIconsAndContent: Tab<TabValue>[] = [
-  { name: "Tab 1", value: "tab1", icon: "camera", render: () => <TestTabContent title="Tab 1 Content" /> },
-  { name: "Tab 2", value: "tab2", icon: "dollar", render: () => <TestTabContent title="Tab 2 Content" /> },
-  { name: "Tab 3", value: "tab3", icon: "check", render: () => <TestTabContent title="Tab 3 Content" /> },
-  { name: "Tab 4", value: "tab4", icon: "plus", render: () => <TestTabContent title="Tab 4 Content" /> },
+  { name: "Tab 1", value: "tab1", icon: "camera", render: () => <TestTabContent content="Tab 1 Content" /> },
+  { name: "Tab 2", value: "tab2", icon: "dollar", render: () => <TestTabContent content="Tab 2 Content" /> },
+  { name: "Tab 3", value: "tab3", icon: "check", render: () => <TestTabContent content="Tab 3 Content" /> },
+  { name: "Tab 4", value: "tab4", icon: "plus", render: () => <TestTabContent content="Tab 4 Content" /> },
 ];
 
 function getChildren(label: string) {
