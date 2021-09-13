@@ -68,11 +68,29 @@ describe("ToggleFilter", () => {
     expect(r.filter_filter()).not.toBeChecked();
     expect(r.value()).toHaveTextContent("bar");
   });
+
+  it("can default to checked", async () => {
+    // Given a default boolean filter
+    const r = await render(
+      <TestFilter
+        toggleFilter={{}}
+        // That has a persisted value coming in from usePersistedFilter
+        persistedValue={true}
+      />,
+    );
+    // It's initially checked
+    expect(r.filter_filter()).toBeChecked();
+    expect(r.value()).toHaveTextContent("true");
+    // And when they click it, we turn false
+    click(r.filter_filter());
+    expect(r.filter_filter()).not.toBeChecked();
+    expect(r.value()).toHaveTextContent("undefined");
+  });
 });
 
-function TestFilter<V>(props: { toggleFilter: ToggleFilterProps<V> }) {
+function TestFilter<V>(props: { toggleFilter: ToggleFilterProps<V>; persistedValue?: V }) {
   const filter = toggleFilter(props.toggleFilter)("filter");
-  const [value, setValue] = useState<V | undefined>(filter.defaultValue);
+  const [value, setValue] = useState<V | undefined>(props.persistedValue || filter.defaultValue);
   const tid = useTestIds({}, "filter");
   return (
     <div>
