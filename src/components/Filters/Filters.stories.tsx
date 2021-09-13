@@ -62,7 +62,7 @@ export function Filter() {
 
     const isTest = toggleFilter({ label: "Only show test projects" });
 
-    const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", enabledValue: false });
+    const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", onValue: false });
 
     return {
       marketId,
