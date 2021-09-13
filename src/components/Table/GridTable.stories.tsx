@@ -143,7 +143,8 @@ type HeaderRow = { kind: "header" };
 type ParentRow = { kind: "parent"; id: string; name: string };
 type ChildRow = { kind: "child"; id: string; name: string };
 type GrandChildRow = { kind: "grandChild"; id: string; name: string };
-type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow;
+type AddRow = { kind: "add" };
+type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow | AddRow;
 
 const rows: GridDataRow<NestedRow>[] = [
   { kind: "header", id: "header" },
@@ -164,6 +165,8 @@ const rows: GridDataRow<NestedRow>[] = [
       },
       // Put this "grandchild" in the 2nd level to show heterogeneous levels
       { kind: "grandChild", id: "p1g1", name: "grandchild p1g1" },
+      // Put this "kind" into the 2nd level to show it doesn't have to be a card
+      { kind: "add", id: "add", pin: "last" },
     ],
   },
   // a parent with just a child
@@ -181,6 +184,7 @@ export function NestedRows() {
     parent: (row) => <CollapseToggle row={row} />,
     child: (row) => <CollapseToggle row={row} />,
     grandChild: () => "",
+    add: () => "",
     w: 0,
   });
   const nameColumn: GridColumn<NestedRow> = {
@@ -197,6 +201,7 @@ export function NestedRows() {
       content: <div css={Css.ml4.$}>{row.name}</div>,
       value: row.name,
     }),
+    add: () => "Add",
   };
   return (
     <GridTable columns={[arrowColumn, nameColumn]} {...{ rows }} sorting={{ on: "client", initial: [1, "ASC"] }} />
@@ -218,13 +223,18 @@ export function NestedCards() {
       content: <div css={Css.xs.$}>{row.name}</div>,
       value: row.name,
     }),
+    add: () => "Add",
   };
   const spacing = { brPx: 4, pxPx: 8, spacerPx: 8 };
   const nestedStyle: GridStyle = {
     nestedCards: {
-      parent: { bgColor: Palette.Gray500, ...spacing },
-      child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
-      grandChild: { bgColor: Palette.Green200, bColor: Palette.Green400, ...spacing },
+      topLevelSpacerPx: 8,
+      kinds: {
+        parent: { bgColor: Palette.Gray500, ...spacing },
+        child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
+        grandChild: { bgColor: Palette.Green200, bColor: Palette.Green400, ...spacing },
+        // Purposefully leave out the `add` kind
+      },
     },
   };
 

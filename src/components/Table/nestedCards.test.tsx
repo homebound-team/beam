@@ -19,7 +19,7 @@ const childCardStyle: NestedCardStyle = {
   spacerPx: 6,
 };
 
-describe("nestedCards", () => {
+describe("NestedCards", () => {
   it("can make open card w/one level", async () => {
     const r = await render(makeOpenOrCloseCard([parentCardStyle], "open"));
     expect(r.firstElement).toMatchInlineSnapshot(`
