@@ -21,7 +21,7 @@ export type ToggleFilterProps<V> = {
  * Or you can set on/off directly, by passing both `onValue` and `offValue`, even to
  * non-boolean values, i.e. `onValue: "foo", offValue: "bar"`.
  */
-export function toggleFilter<V>(props: ToggleFilterProps<V>): (key: string) => Filter<V> {
+export function toggleFilter<V = boolean>(props: ToggleFilterProps<V>): (key: string) => Filter<V> {
   return (key) =>
     new ToggleFilter(key, {
       // If the user has set the offValue, that should be the default b/c we're only a two-state
