@@ -3,36 +3,45 @@ import { Filter } from "src/components/Filters/types";
 import { Switch } from "src/inputs/Switch";
 import { TestIds } from "src/utils/useTestIds";
 
-export type ToggleFilterProps = { label?: string; enabledValue?: boolean; defaultValue?: boolean };
+export type ToggleFilterProps<V> = {
+  label?: string;
+  onValue?: V | undefined;
+  offValue?: V | undefined;
+  defaultValue?: V | undefined;
+};
 
-export function toggleFilter(props: ToggleFilterProps): (key: string) => Filter<boolean> {
-  return (key) => new ToggleFilter(key, props);
+/**
+ * Provides a two-state "on/off" filter.
+ *
+ * By default the on/off values are `on === true` and `off === undefined`.
+ *
+ * You can flip the on/off values by passing `onValue: false`, in which case
+ * `on === false` and off === undefined`.
+ *
+ * Or you can set on/off directly, by passing both `onValue` and `offValue`.
+ *
+ * @param props
+ */
+export function toggleFilter<V>(props: ToggleFilterProps<V>): (key: string) => Filter<V> {
+  return (key) =>
+    new ToggleFilter(key, {
+      // If the user has set the offValue, that should be the default b/c we're only a two-state
+      defaultValue: props.offValue,
+      ...props,
+    });
 }
 
-class ToggleFilter extends BaseFilter<boolean, ToggleFilterProps> implements Filter<boolean> {
-  render(
-    value: boolean | undefined,
-    setValue: (value: boolean | undefined) => void,
-    tid: TestIds,
-    inModal: boolean,
-  ): JSX.Element {
-    const { defaultValue, enabledValue = true, ...props } = this.props;
+class ToggleFilter<V> extends BaseFilter<V, ToggleFilterProps<V>> implements Filter<V> {
+  render(value: V | undefined, setValue: (value: V | undefined) => void, tid: TestIds, inModal: boolean): JSX.Element {
+    const { defaultValue, onValue = true as any as V, offValue = undefined, ...props } = this.props;
     return (
       <Switch
         {...props}
-        // if the incoming `value` is undefined it means the switch has not been toggled
-        // - set it to false under normal behaviour
-        // - set it to true when enabledValue === false
-        selected={value === undefined ? false : enabledValue === false ? !value : value}
+        selected={value === undefined ? false : value === onValue}
         label={this.label}
         labelStyle={inModal ? "filter" : "inline"}
         onChange={(on) => {
-          // Basically, when the switch is off we return undefined
-          // to signify that no filtering should occur on this field
-          // And when the switch is on we return:
-          // - true (normal behaviour)
-          // - false (if enabledValue is false)
-          setValue(!on ? undefined : enabledValue);
+          setValue(on ? onValue : offValue);
         }}
         {...this.testId(tid)}
       />
