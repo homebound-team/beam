@@ -18,7 +18,8 @@ export type ToggleFilterProps<V> = {
  * You can flip the on/off values by passing `onValue: false`, in which case
  * `on === false` and off === undefined`.
  *
- * Or you can set on/off directly, by passing both `onValue` and `offValue`.
+ * Or you can set on/off directly, by passing both `onValue` and `offValue`, even to
+ * non-boolean values, i.e. `onValue: "foo", offValue: "bar"`.
  */
 export function toggleFilter<V>(props: ToggleFilterProps<V>): (key: string) => Filter<V> {
   return (key) =>
