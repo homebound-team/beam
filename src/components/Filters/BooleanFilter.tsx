@@ -21,19 +21,20 @@ class BooleanFilter extends BaseFilter<boolean, BooleanFilterProps> implements F
     setValue: (value: boolean | undefined) => void,
     tid: TestIds,
     inModal: boolean,
+    vertical: boolean,
   ): JSX.Element {
     // Our options are a list of tuples
     const { options = defaultBooleanOptions, label, defaultValue, ...props } = this.props;
     return (
       <SelectField<BooleanOption, string>
         {...props}
-        compact
+        compact={!vertical}
         label={this.label}
         // We use `String(value)` so that `undefined` becomes "undefined"
         value={String(value)}
         hideLabel={inModal}
-        inlineLabel={!inModal}
-        sizeToContent={!inModal}
+        inlineLabel={!inModal && !vertical}
+        sizeToContent={!inModal && !vertical}
         options={options}
         getOptionValue={(o) => String(o[0])}
         getOptionLabel={(o) => o[1]}

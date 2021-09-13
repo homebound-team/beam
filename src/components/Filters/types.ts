@@ -30,5 +30,11 @@ export interface Filter<V> {
   defaultValue: V | undefined;
 
   /** Renders the filter into either the page or the modal. */
-  render(value: V | undefined, setValue: (value: V | undefined) => void, tid: TestIds, inModal: boolean): JSX.Element;
+  render(
+    value: V | undefined,
+    setValue: (value: V | undefined) => void,
+    tid: TestIds,
+    inModal: boolean,
+    vertical: boolean,
+  ): JSX.Element;
 }

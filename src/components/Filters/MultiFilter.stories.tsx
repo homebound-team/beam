@@ -10,10 +10,15 @@ export default {
 
 export function MultiFilterInPage() {
   const filter = stageFilter("stage");
-  return filter.render(undefined, () => {}, {}, false);
+  return filter.render(undefined, () => {}, {}, false, false);
 }
 
 export function MultiFilterInModal() {
   const filter = stageFilter("stage");
-  return filter.render(undefined, () => {}, {}, true);
+  return filter.render(undefined, () => {}, {}, true, false);
+}
+
+export function MultiFilterVertical() {
+  const filter = stageFilter("stage");
+  return filter.render(undefined, () => {}, {}, false, true);
 }

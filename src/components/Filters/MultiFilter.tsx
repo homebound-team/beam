@@ -21,6 +21,7 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
     setValue: (value: V[] | undefined) => void,
     tid: TestIds,
     inModal: boolean,
+    vertical: boolean,
   ): JSX.Element {
     if (inModal && this.props.options.length <= 8) {
       return (
@@ -44,12 +45,12 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
     return (
       <MultiSelectField<O, V>
         {...props}
-        compact
+        compact={!vertical}
         label={this.label}
         values={value || []}
         hideLabel={inModal}
-        inlineLabel={!inModal}
-        sizeToContent={!inModal}
+        inlineLabel={!inModal && !vertical}
+        sizeToContent={!inModal && !vertical}
         onSelect={(values) => {
           setValue(values.length === 0 ? undefined : values);
         }}

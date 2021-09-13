@@ -17,6 +17,7 @@ import {
 import { Css } from "src/Css";
 import { usePersistedFilter } from "src/hooks";
 import { useGroupBy } from "src/hooks/useGroupBy";
+import { safeEntries } from "src/utils";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
@@ -26,6 +27,43 @@ export default {
 } as Meta;
 
 export function Filter() {
+  return <TestFilterPage />;
+}
+
+export function Vertical() {
+  return <TestFilterPage vertical />;
+}
+
+export function GroupBy() {
+  const groupBy = useGroupBy({ costCode: "Cost Code", tradeCategory: "Trade Category" });
+  type Filter = ProjectFilter & { view: string };
+  const filterDefs: FilterDefs<Filter> = useMemo(() => {
+    return {
+      view: singleFilter({
+        options: [{ id: "selections", name: "Selections" }],
+        getOptionValue: (o) => o.id,
+        getOptionLabel: (o) => o.name,
+      }),
+      marketId: multiFilter({
+        options: markets,
+        getOptionValue: (o) => o.code,
+        getOptionLabel: (o) => o.name,
+      }),
+    };
+  }, []);
+  const { setFilter, filter } = usePersistedFilter<ProjectFilter>({
+    storageKey: "GroupBy",
+    filterDefs,
+  });
+  return (
+    <div css={Css.df.fdc.childGap2.$}>
+      <Filters groupBy={groupBy} filter={filter} onChange={setFilter} filterDefs={filterDefs} />
+      <strong>Applied Filter:</strong> {JSON.stringify(filter)}
+    </div>
+  );
+}
+
+function TestFilterPage({ vertical }: { vertical?: boolean }) {
   const filterDefs: FilterDefs<ProjectFilter> = useMemo(() => {
     const marketId = multiFilter({
       options: markets,
@@ -48,10 +86,12 @@ export function Filter() {
       defaultValue: true,
     });
     const stage = multiFilter({
-      options: stages,
+      // Need to use `safeEntries`, otherwise we get a "Weak Map" error in MultiSelectField.
+      options: safeEntries(stages),
       label: "Stage",
-      getOptionValue: (o) => o,
-      getOptionLabel: (o) => (o === Stage.StageOne ? "One" : "Two"),
+      // Getting odd types back from safeEntries, can be a `number | [number | Stage] | () => some iterator... soo kind of hacky here.
+      getOptionValue: (o) => (typeof o === "object" ? o[1] : Stage.StageOne),
+      getOptionLabel: (o) => (typeof o === "object" ? (o[1] === Stage.StageOne ? "One" : "Two") : Stage.StageOne),
     });
     const status = multiFilter({
       options: statuses,
@@ -81,44 +121,21 @@ export function Filter() {
   });
 
   return (
-    <div css={Css.df.fdc.childGap5.$}>
-      <div css={Css.df.fdc.childGap2.$}>
-        <h1 css={Css.lg.$}>Filters</h1>
-        <Filters<ProjectFilter> filter={filter} onChange={setFilter} filterDefs={filterDefs} />
-      </div>
+    <div
+      css={{
+        ...(vertical ? Css.df.childGap2.$ : Css.df.fdc.childGap5.$),
+      }}
+    >
       <div>
-        <strong>Applied Filter:</strong> {JSON.stringify(filter)}
+        <div css={Css.df.fdc.childGap2.if(!!vertical).wPx(360).p2.bgGray100.br.bGray600.$}>
+          <h1 css={Css.lg.$}>Filters</h1>
+          <Filters<ProjectFilter> filter={filter} onChange={setFilter} filterDefs={filterDefs} vertical={vertical} />
+        </div>
       </div>
-      <GridTable columns={columns} rows={filterRows(tableData, filter)} />
-    </div>
-  );
-}
-
-export function GroupBy() {
-  const groupBy = useGroupBy({ costCode: "Cost Code", tradeCategory: "Trade Category" });
-  type Filter = ProjectFilter & { view: string };
-  const filterDefs: FilterDefs<Filter> = useMemo(() => {
-    return {
-      view: singleFilter({
-        options: [{ id: "selections", name: "Selections" }],
-        getOptionValue: (o) => o.id,
-        getOptionLabel: (o) => o.name,
-      }),
-      marketId: multiFilter({
-        options: markets,
-        getOptionValue: (o) => o.code,
-        getOptionLabel: (o) => o.name,
-      }),
-    };
-  }, []);
-  const { setFilter, filter } = usePersistedFilter<ProjectFilter>({
-    storageKey: "GroupBy",
-    filterDefs,
-  });
-  return (
-    <div css={Css.df.fdc.childGap2.$}>
-      <Filters groupBy={groupBy} filter={filter} onChange={setFilter} filterDefs={filterDefs} />
-      <strong>Applied Filter:</strong> {JSON.stringify(filter)}
+      <div css={Css.fg1.$}>
+        <strong>Applied Filter:</strong> {JSON.stringify(filter)}
+        <GridTable columns={columns} rows={filterRows(tableData, filter)} />
+      </div>
     </div>
   );
 }
