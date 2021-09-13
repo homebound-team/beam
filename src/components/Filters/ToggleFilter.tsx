@@ -31,14 +31,20 @@ export function toggleFilter<V = boolean>(props: ToggleFilterProps<V>): (key: st
 }
 
 class ToggleFilter<V> extends BaseFilter<V, ToggleFilterProps<V>> implements Filter<V> {
-  render(value: V | undefined, setValue: (value: V | undefined) => void, tid: TestIds, inModal: boolean): JSX.Element {
+  render(
+    value: V | undefined,
+    setValue: (value: V | undefined) => void,
+    tid: TestIds,
+    inModal: boolean,
+    vertical: boolean,
+  ): JSX.Element {
     const { defaultValue, onValue = true as any as V, offValue = undefined, ...props } = this.props;
     return (
       <Switch
         {...props}
         selected={value === undefined ? false : value === onValue}
         label={this.label}
-        labelStyle={inModal ? "filter" : "inline"}
+        labelStyle={inModal || vertical ? "filter" : "inline"}
         onChange={(on) => {
           setValue(on ? onValue : offValue);
         }}

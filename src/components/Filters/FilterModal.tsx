@@ -30,6 +30,7 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
                 (value) => setModalFilter(updateFilter(modalFilter, key, value)),
                 testId,
                 true,
+                false,
               )}
             </ModalFilterItem>
           ))}

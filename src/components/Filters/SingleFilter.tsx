@@ -17,7 +17,13 @@ export function singleFilter<O, V extends Key>(props: SingleFilterProps<O, V>): 
 const allOption = {} as any;
 
 class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, V>> implements Filter<V> {
-  render(value: V | undefined, setValue: (value: V | undefined) => void, tid: TestIds, inModal: boolean) {
+  render(
+    value: V | undefined,
+    setValue: (value: V | undefined) => void,
+    tid: TestIds,
+    inModal: boolean,
+    vertical: boolean,
+  ) {
     const { label, defaultValue, options, getOptionLabel, getOptionValue, ...props } = this.props;
     return (
       <SelectField<O, V>
@@ -29,12 +35,12 @@ class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, 
         ]}
         getOptionValue={(o) => (o === allOption ? (undefined as any as V) : getOptionValue(o))}
         getOptionLabel={(o) => (o === allOption ? "All" : getOptionLabel(o))}
-        compact
+        compact={!vertical}
         value={value}
         label={this.label}
-        inlineLabel={!inModal}
+        inlineLabel={!inModal && !vertical}
         hideLabel={inModal}
-        sizeToContent={!inModal}
+        sizeToContent={!inModal && !vertical}
         nothingSelectedText="All"
         onSelect={(value) => setValue(value || undefined)}
         {...this.testId(tid)}

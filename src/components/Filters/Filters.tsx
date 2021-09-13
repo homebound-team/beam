@@ -22,10 +22,12 @@ interface FilterProps<F, G extends Value = string> {
     /** The list of group by options. */
     options: Array<{ id: G; name: string }>;
   };
+  /** Specifies the layout of the filters. If not supplied it will use the default (horizontal) layout. Using the 'vertical' layout will also remove the "More Filters" button/modal */
+  vertical?: boolean;
 }
 
 function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
-  const { filter, onChange, filterDefs, groupBy } = props;
+  const { filter, onChange, filterDefs, groupBy, vertical = false } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
 
   const { openModal } = useModal();
@@ -34,7 +36,7 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
     // Take the FilterDefs that have a `key => ...` factory and eval it
     const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)]);
     // If we have more than 4 filters,
-    if (impls.length > numberOfPageFilters + 1) {
+    if (!vertical && impls.length > numberOfPageFilters + 1) {
       // Then return the first three to show on the page, and the remainder for the modal.
       return [
         Object.fromEntries(impls.slice(0, numberOfPageFilters)) as FilterImpls<F>,
@@ -51,9 +53,9 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
     <div>
       <SelectField
         label="Group by"
-        compact={true}
-        inlineLabel={true}
-        sizeToContent={true}
+        compact={!vertical}
+        inlineLabel={!vertical}
+        sizeToContent={!vertical}
         options={groupBy.options}
         getOptionValue={(o) => o.id}
         getOptionLabel={(o) => o.name}
@@ -65,12 +67,17 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
 
   // Return list of filter components. `onSelect` should update the `filter`
   return (
-    <div css={Css.df.aic.childGap1.$} {...testId}>
+    <div
+      css={{
+        ...(vertical ? Css.df.fdc.childGap2.$ : Css.df.aic.childGap1.$),
+      }}
+      {...testId}
+    >
       {maybeGroupByField}
 
       {safeEntries(pageFilters).map(([key, f]: [keyof F, Filter<any>]) => (
         <div key={key as string}>
-          {f.render(filter[key], (value) => onChange(updateFilter(filter, key, value)), testId, false)}
+          {f.render(filter[key], (value) => onChange(updateFilter(filter, key, value)), testId, false, vertical)}
         </div>
       ))}
 
@@ -95,7 +102,9 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
         />
       )}
       {Object.keys(filter).length > 0 && (
-        <Button label="Clear" variant="tertiary" onClick={() => onChange({} as F)} {...testId.clearBtn} />
+        <div>
+          <Button label="Clear" variant="tertiary" onClick={() => onChange({} as F)} {...testId.clearBtn} />
+        </div>
       )}
     </div>
   );

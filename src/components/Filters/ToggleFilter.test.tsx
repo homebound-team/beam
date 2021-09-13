@@ -94,7 +94,7 @@ function TestFilter<V>(props: { toggleFilter: ToggleFilterProps<V>; persistedVal
   const tid = useTestIds({}, "filter");
   return (
     <div>
-      {filter.render(value, setValue, tid, false)}
+      {filter.render(value, setValue, tid, false, false)}
       <div data-testid="value">{typeof value !== "string" ? String(value) : value}</div>
     </div>
   );

@@ -10,10 +10,15 @@ export default {
 
 export function SingleFilterInPage() {
   const filter = stageSingleFilter("stage");
-  return filter.render(undefined, () => {}, {}, false);
+  return filter.render(undefined, () => {}, {}, false, false);
 }
 
 export function SingleFilterInModal() {
   const filter = stageSingleFilter("stage");
-  return filter.render(undefined, () => {}, {}, true);
+  return filter.render(undefined, () => {}, {}, true, false);
+}
+
+export function SingleFilterVertical() {
+  const filter = stageSingleFilter("stage");
+  return filter.render(undefined, () => {}, {}, false, true);
 }
