@@ -47,7 +47,7 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
         {...props}
         compact={!vertical}
         label={this.label}
-        values={value || []}
+        values={value || defaultValue || []}
         hideLabel={inModal}
         inlineLabel={!inModal && !vertical}
         sizeToContent={!inModal && !vertical}

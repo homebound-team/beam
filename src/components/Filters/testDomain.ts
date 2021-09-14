@@ -59,8 +59,22 @@ export const stageFilter: StageFilter = multiFilter({
   getOptionLabel: (s) => s.name,
 });
 
+export const stageFilterDefaultValue: StageFilter = multiFilter({
+  options: stageOptions,
+  defaultValue: [stageOptions[1].code],
+  getOptionValue: (s) => s.code,
+  getOptionLabel: (s) => s.name,
+});
+
 export const stageSingleFilter: StageSingleFilter = singleFilter({
   options: stageOptions,
+  getOptionValue: (s) => s.code,
+  getOptionLabel: (s) => s.name,
+});
+
+export const stageSingleFilterDefaultValue: StageSingleFilter = singleFilter({
+  options: stageOptions,
+  defaultValue: stageOptions[0].code,
   getOptionValue: (s) => s.code,
   getOptionLabel: (s) => s.name,
 });

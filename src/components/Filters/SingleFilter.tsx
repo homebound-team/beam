@@ -36,7 +36,7 @@ class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, 
         getOptionValue={(o) => (o === allOption ? (undefined as any as V) : getOptionValue(o))}
         getOptionLabel={(o) => (o === allOption ? "All" : getOptionLabel(o))}
         compact={!vertical}
-        value={value}
+        value={value || defaultValue}
         label={this.label}
         inlineLabel={!inModal && !vertical}
         hideLabel={inModal}
