@@ -1,9 +1,9 @@
 import { Meta } from "@storybook/react";
 import { PropsWithChildren, ReactNode, useState } from "react";
 import { IconButton } from "src/components/IconButton";
-import { NestedScrollProvider } from "src/components/Layout/NestedScrollLayoutContext";
 import { PreventBrowserScroll } from "src/components/Layout/PreventBrowserScroll";
 import { ScrollableContent } from "src/components/Layout/ScrollableContent";
+import { ScrollableParent } from "src/components/Layout/ScrollableParent";
 import { Tab, Tabs } from "src/components/Tabs";
 import { Css } from "src/Css";
 import { FormLines } from "src/forms";
@@ -12,7 +12,7 @@ import { noop } from "src/utils";
 import { withBeamDecorator, withDimensions, zeroTo } from "src/utils/sb";
 
 export default {
-  component: NestedScrollProvider,
+  component: ScrollableParent,
   title: "Components/NestedScroll",
   decorators: [withBeamDecorator, withDimensions()],
   parameters: { layout: "fullscreen" },
@@ -142,7 +142,7 @@ function TestLayout({ children }: PropsWithChildren<{}>) {
   return (
     <PreventBrowserScroll>
       <TestTopNav />
-      <NestedScrollProvider>{children}</NestedScrollProvider>
+      <ScrollableParent>{children}</ScrollableParent>
     </PreventBrowserScroll>
   );
 }
@@ -153,7 +153,7 @@ function TestProjectLayout({ children }: PropsWithChildren<{}>) {
       {/* Required to use `overflowHidden` as the prevent the `TestLayout`'s scrollbar from kicking in. */}
       <div css={Css.df.overflowHidden.$}>
         <TestSideNav />
-        <NestedScrollProvider xss={Css.fg1.$}>{children}</NestedScrollProvider>
+        <ScrollableParent xss={Css.fg1.$}>{children}</ScrollableParent>
       </div>
     </TestLayout>
   );
@@ -166,7 +166,7 @@ function TestTopNav() {
 function TestSideNav() {
   const [showNav, setShowNav] = useState(true);
   return (
-    <NestedScrollProvider xss={Css.transition.br.bGray200.fg0.fs0.ml0.wPx(224).if(!showNav).mlPx(-186).$}>
+    <ScrollableParent xss={Css.transition.br.bGray200.fg0.fs0.ml0.wPx(224).if(!showNav).mlPx(-186).$}>
       <div css={Css.relative.$}>
         <div css={Css.absolute.top1.rightPx(4).bgGray50.df.aic.jcc.$}>
           <IconButton icon={showNav ? "menuClose" : "menuOpen"} onClick={() => setShowNav(!showNav)} />
@@ -187,7 +187,7 @@ function TestSideNav() {
           </>
         )}
       </div>
-    </NestedScrollProvider>
+    </ScrollableParent>
   );
 }
 
