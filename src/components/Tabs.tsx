@@ -1,6 +1,7 @@
+import { camelCase } from "change-case";
 import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
-import { matchPath, useLocation } from "react-router";
+import { matchPath, Route, useLocation } from "react-router";
 import { Link } from "react-router-dom";
 import type { IconKey } from "src/components";
 import { Css, Margin, Only, Xss } from "src/Css";
@@ -32,7 +33,9 @@ export interface TabsProps<V extends string, X> {
 export interface RouteTabsProps<V extends string, X> extends Omit<TabsProps<V, X>, "onChange" | "selected" | "tabs"> {
   tabs: RouteTab<V>[];
 }
-export interface RouteTab<V extends string> extends Tab<V> {
+// A Route Tab has a `href` prop rather than a `value` prop
+export interface RouteTab<V extends string> extends Omit<Tab<V>, "value"> {
+  href: V;
   // This is a React-Router path(s) to match the current URL to. Matching on the path(s) is what dictates which TabContent to render
   path: string | string[];
 }
@@ -49,7 +52,7 @@ export interface RouteTab<V extends string> extends Tab<V> {
 export function TabsWithContent<V extends string, X extends Only<TabsContentXss, X>>(
   props: TabsProps<V, X> | RouteTabsProps<V, X>,
 ) {
-  const onlyOneTabEnabled = props.tabs.filter((t) => !t.disabled).length === 1;
+  const onlyOneTabEnabled = (props.tabs as any[]).filter((t: RouteTab<V> | Tab<V>) => !t.disabled).length === 1;
   return (
     <>
       {!onlyOneTabEnabled && <Tabs {...props} />}
@@ -67,18 +70,19 @@ export function TabContent<V extends string>(props: Omit<TabsProps<V, {}>, "onCh
         const paths = Array.isArray(t.path) ? t.path : [t.path];
         return paths.some((p) => !!matchPath(location.pathname, { path: t.path, exact: true }));
       }) || tabs[0]
-    : tabs.find((tab) => tab.value === props.selected) || tabs[0];
+    : props.tabs.find((tab) => tab.value === props.selected) || tabs[0];
+  const uniqueValue = uniqueTabValue(selectedTab);
 
   return (
     <div
-      aria-labelledby={`${selectedTab.value}-tab`}
-      id={`${selectedTab.value}-tabPanel`}
+      aria-labelledby={`${uniqueValue}-tab`}
+      id={`${uniqueValue}-tabPanel`}
       role="tabpanel"
       tabIndex={0}
       {...tid.panel}
       css={{ ...Css.mt2.$, ...contentXss }}
     >
-      {selectedTab.render()}
+      {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
     </div>
   );
 }
@@ -88,12 +92,14 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
   const { ariaLabel, tabs, ...others } = props;
   const location = useLocation();
   const selected = isRouteTabs(props)
-    ? props.tabs.find((t) => !!matchPath(location.pathname, { path: t.path, exact: true }))?.value ||
-      props.tabs[0].value
+    ? uniqueTabValue(
+        props.tabs.find((t) => !!matchPath(location.pathname, { path: t.path, exact: true })) || props.tabs[0],
+      )
     : props.selected;
   const { isFocusVisible, focusProps } = useFocusRing();
   const tid = useTestIds(others, "tabs");
   const [active, setActive] = useState(selected);
+  const ref = useRef<HTMLDivElement>(null);
 
   // Whenever selected changes, reset active
   useEffect(() => setActive(selected), [selected]);
@@ -117,31 +123,34 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
   }
 
   // bluring out resets active to whatever selected is
-  function onBlur() {
-    setActive(selected);
+  function onBlur(e: FocusEvent) {
+    // only reset active state if we've moved focus out of the tab list
+    if (!(ref.current && ref.current.contains(e.relatedTarget as Node))) {
+      setActive(selected);
+    }
   }
 
   // We also check this in TabsWithContent, but if someone is using Tabs standalone, check it here as well
-  const onlyOneTabEnabled = props.tabs.filter((t) => !t.disabled).length === 1;
+  const onlyOneTabEnabled = (props.tabs as any[]).filter((t) => !t.disabled).length === 1;
   if (onlyOneTabEnabled) {
     return <></>;
   }
 
   return (
-    <div css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...tid}>
+    <div ref={ref} css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...tid}>
       {tabs.map((tab) => {
-        const { value } = tab;
+        const uniqueValue = uniqueTabValue(tab);
         return (
           <TabImpl
-            active={active === value}
+            active={active === uniqueValue}
             focusProps={focusProps}
             isFocusVisible={isFocusVisible}
-            key={value}
+            key={uniqueValue}
             onClick={onClick}
             onKeyUp={onKeyUp}
             onBlur={onBlur}
             tab={tab}
-            {...tid[defaultTestId(value)]}
+            {...tid[defaultTestId(uniqueValue)]}
           />
         );
       })}
@@ -154,7 +163,7 @@ interface TabImplProps<V extends string> extends BeamFocusableProps {
   active: boolean;
   onClick: (value: V) => void;
   onKeyUp: (e: KeyboardEvent) => void;
-  onBlur: () => void;
+  onBlur: (e: FocusEvent) => void;
   focusProps: HTMLAttributes<HTMLElement>;
   isFocusVisible: boolean;
   tab: Tab<V> | RouteTab<V>;
@@ -162,22 +171,21 @@ interface TabImplProps<V extends string> extends BeamFocusableProps {
 
 function TabImpl<V extends string>(props: TabImplProps<V>) {
   const { tab, onClick, active, onKeyUp, onBlur, focusProps, isFocusVisible = false, ...others } = props;
-  const { disabled: isDisabled = false, name: label, value, icon } = tab;
+  const { disabled: isDisabled = false, name: label, icon } = tab;
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
     () => getTabStyles(),
     [],
   );
-  const ref = useRef<HTMLElement>();
+  const uniqueValue = uniqueTabValue(tab);
 
   const tabProps = {
-    "aria-controls": `${value}-tabPanel`,
+    "aria-controls": `${uniqueValue}-tabPanel`,
     "aria-selected": active,
     "aria-disabled": isDisabled || undefined,
-    id: `${value}-tab`,
+    id: `${uniqueValue}-tab`,
     role: "tab",
     tabIndex: active ? 0 : -1,
-    ...mergeProps(focusProps, hoverProps, { onKeyUp, onBlur }),
     ...others,
     css: {
       ...baseStyles,
@@ -188,6 +196,11 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
       ...(isFocusVisible && active && focusRingStyles),
     },
   };
+  const interactiveProps = mergeProps(focusProps, hoverProps, {
+    onKeyUp,
+    onBlur,
+    ...(isRouteTab(tab) ? {} : { onClick: () => onClick(tab.value) }),
+  });
 
   const tabLabel = (
     <>
@@ -203,13 +216,11 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
   return isDisabled ? (
     <div {...tabProps}>{tabLabel}</div>
   ) : isRouteTab(tab) ? (
-    <Link {...tabProps} {...mergeProps(focusProps, hoverProps)} to={value}>
+    <Link {...{ ...tabProps, ...interactiveProps }} className="navLink" to={tab.href}>
       {tabLabel}
     </Link>
   ) : (
-    <button {...tabProps} {...mergeProps(focusProps, focusProps, { onClick: () => onClick(value) })}>
-      {tabLabel}
-    </button>
+    <button {...{ ...tabProps, ...interactiveProps }}>{tabLabel}</button>
   );
 }
 
@@ -224,12 +235,16 @@ export function getTabStyles() {
   };
 }
 
-export function getNextTabValue<V extends string>(selected: V, key: "ArrowLeft" | "ArrowRight", tabs: Tab<V>[]): V {
-  const enabledTabs = tabs.filter((tab) => tab.disabled !== true);
+export function getNextTabValue<V extends string>(
+  selected: V,
+  key: "ArrowLeft" | "ArrowRight",
+  tabs: Tab<V>[] | RouteTab<V>[],
+): V {
+  const enabledTabs: RouteTab<V>[] | Tab<V>[] = (tabs as any[]).filter((tab) => tab.disabled !== true);
   const tabsToScan = key === "ArrowRight" ? enabledTabs : enabledTabs.reverse();
-  const currentIndex = tabsToScan.findIndex((tab) => tab.value === selected);
+  const currentIndex = tabsToScan.findIndex((tab) => uniqueTabValue(tab) === selected);
   const nextIndex = currentIndex === tabsToScan.length - 1 ? 0 : currentIndex + 1;
-  return tabsToScan[nextIndex].value;
+  return uniqueTabValue(tabsToScan[nextIndex]);
 }
 
 function isRouteTabs(
@@ -241,4 +256,8 @@ function isRouteTabs(
 
 function isRouteTab(tab: Tab<any> | RouteTab<any>): tab is RouteTab<any> {
   return "path" in tab;
+}
+
+function uniqueTabValue(tab: Tab<any> | RouteTab<any>) {
+  return isRouteTab(tab) ? camelCase(tab.name) : tab.value;
 }

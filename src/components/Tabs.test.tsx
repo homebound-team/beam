@@ -1,5 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
+import { useParams } from "react-router";
 import { Palette } from "src/Css";
 import { click, render, withRouter } from "src/utils/rtl";
 import { getNextTabValue, RouteTab, Tab, TabsWithContent } from "./Tabs";
@@ -94,16 +95,16 @@ describe("TabsWithContent", () => {
     const router = withRouter("/tab1");
     // Given tabs with `path` values
     const testTabs: RouteTab<string>[] = [
-      { name: "Tab 1", path: "/tab1", value: "/tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
-      { name: "Tab 2", path: "/tab2", value: "/tab2", render: () => <TestTabContent content="Tab 2 Content" /> },
+      { name: "Tab A", path: "/tab1", href: "/tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
+      { name: "Tab B", path: "/tab2", href: "/tab2", render: () => <TestTabContent content="Tab 2 Content" /> },
     ];
     const r = await render(<TabsWithContent tabs={testTabs} />, router);
 
     // Then the tab elements are links with expected `href` values
-    expect(r.tabs_tab1().tagName).toBe("A");
-    expect(r.tabs_tab1()).toHaveAttribute("href", "/tab1");
-    expect(r.tabs_tab2().tagName).toBe("A");
-    expect(r.tabs_tab2()).toHaveAttribute("href", "/tab2");
+    expect(r.tabs_tabA().tagName).toBe("A");
+    expect(r.tabs_tabA()).toHaveAttribute("href", "/tab1");
+    expect(r.tabs_tabB().tagName).toBe("A");
+    expect(r.tabs_tabB()).toHaveAttribute("href", "/tab2");
   });
 
   it("can match tab based on multiple paths", async () => {
@@ -112,15 +113,15 @@ describe("TabsWithContent", () => {
     // And a tab that supports multiple routes
     const testTabs: RouteTab<string>[] = [
       {
-        name: "Tab 1",
+        name: "Tab A",
         path: "/:ceId/line-items",
-        value: "/ce:1/line-items",
+        href: "/ce:1/line-items",
         render: () => <TestTabContent content="Tab 1 Content" />,
       },
       {
-        name: "Tab 2",
+        name: "Tab B",
         path: ["/:ceId", "/:ceId/overview"],
-        value: "/ce:1/overview",
+        href: "/ce:1/overview",
         render: () => <TestTabContent content="Tab 2 Content" />,
       },
     ];
@@ -134,8 +135,8 @@ describe("TabsWithContent", () => {
     // Given Route-able tabs, rendered at the first tab's route
     const router = withRouter("/tab1", "/");
     const testTabs: RouteTab<string>[] = [
-      { name: "Tab 1", path: "/tab1", value: "/tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
-      { name: "Tab 2", path: "/tab2", value: "/tab2", render: () => <TestTabContent content="Tab 2 Content" /> },
+      { name: "Tab A", path: "/tab1", href: "/tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
+      { name: "Tab B", path: "/tab2", href: "/tab2", render: () => <TestTabContent content="Tab 2 Content" /> },
     ];
     const r = await render(<TabsWithContent tabs={testTabs} />, router);
 
@@ -143,11 +144,48 @@ describe("TabsWithContent", () => {
     expect(r.tab_panel().textContent).toBe("Tab 1 Content");
 
     // When clicking the second tab
-    click(r.tabs_tab2);
+    click(r.tabs_tabB);
 
     // Then expect the URL to be updated and the tab panel to show the selected tab's content
     expect(router.history.location.pathname).toBe("/tab2");
     expect(r.tab_panel().textContent).toBe("Tab 2 Content");
+  });
+
+  it("captures path parameters within Route context", async () => {
+    // Given Route-able tabs with path parameters
+    const router = withRouter("/ce:1/overview", "/");
+    const testTabs: RouteTab<string>[] = [
+      { name: "Tab A", path: "/:ceId/overview", href: "/ce:1/overview", render: () => <TestRouteTab /> },
+      {
+        name: "Tab B",
+        path: "/:ceId/line-items/:celiId",
+        href: "/ce:2/line-items/celi:2",
+        render: () => <TestRouteTab />,
+      },
+    ];
+    const r = await render(<TabsWithContent tabs={testTabs} />, router);
+    //Then expect the first tab to have captured the param
+    expect(r.ceId().textContent).toBe("ce:1");
+
+    // When clicking the second tab
+    click(r.tabs_tabB);
+    //Then expect the second tab to have captured both params
+    expect(r.ceId().textContent).toBe("ce:2");
+    expect(r.celiId().textContent).toBe("celi:2");
+  });
+
+  it("renders a disabled route tab as a div", async () => {
+    // Give a disabled tab (must include two non-disabled tabs to have tab-list show).
+    const testTabs: RouteTab<string>[] = [
+      { name: "Tab A", path: "/a", href: "/a", render: () => <TestRouteTab /> },
+      { name: "Tab B", path: "/b", href: "/b", render: () => <TestRouteTab /> },
+      { name: "Tab C", path: "/c", href: "/c", render: () => <TestRouteTab />, disabled: true },
+    ];
+
+    const r = await render(<TabsWithContent tabs={testTabs} />, withRouter("/a", ""));
+
+    // Then the disabled tab should be rendered as a div
+    expect(r.tabs_tabC().tagName).toBe("DIV");
   });
 });
 
@@ -158,5 +196,15 @@ function TestTabs() {
       <TabsWithContent tabs={testTabs} onChange={setSelectedTab} selected={selectedTab} />
       <button data-testid="goToTab2" onClick={() => setSelectedTab("tab2")} />
     </div>
+  );
+}
+
+function TestRouteTab() {
+  const { ceId, celiId } = useParams<{ ceId: string; celiId?: string }>();
+  return (
+    <>
+      <span data-testid="ceId">{ceId}</span>
+      <span data-testid="celiId">{celiId}</span>
+    </>
   );
 }

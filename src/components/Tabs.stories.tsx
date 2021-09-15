@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { Fragment, useState } from "react";
-import { Route, useHistory, useLocation } from "react-router";
+import { Route, useHistory, useLocation, useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
@@ -22,13 +22,29 @@ export default {
 export function TabBaseStates() {
   const styles = getTabStyles();
   return (
-    <div css={Css.df.fdc.childGap2.$}>
-      <div css={{ ...styles.baseStyles, ...styles.activeStyles }}>{getChildren("active")}</div>
-      <div css={{ ...styles.baseStyles, ...styles.focusRingStyles }}>{getChildren("focus ring")}</div>
-      <div css={styles.baseStyles}>{getChildren("default")}</div>
-      <div css={{ ...styles.baseStyles, ...styles.disabledStyles }}>{getChildren("disabled")}</div>
-      <div css={{ ...styles.baseStyles, ...styles.hoverStyles }}>{getChildren("hovered")}</div>
-      <div css={{ ...styles.baseStyles, ...styles.activeHoverStyles }}>{getChildren("active hover")}</div>
+    <div css={Css.df.childGap5.$}>
+      <div css={Css.df.fdc.childGap2.$}>
+        <h2>
+          Rendered as <pre css={Css.dib.$}>&lt;Button /&gt;</pre>
+        </h2>
+        <div css={{ ...styles.baseStyles, ...styles.activeStyles }}>{getChildren("active")}</div>
+        <div css={{ ...styles.baseStyles, ...styles.focusRingStyles }}>{getChildren("focus ring")}</div>
+        <div css={styles.baseStyles}>{getChildren("default")}</div>
+        <div css={{ ...styles.baseStyles, ...styles.disabledStyles }}>{getChildren("disabled")}</div>
+        <div css={{ ...styles.baseStyles, ...styles.hoverStyles }}>{getChildren("hovered")}</div>
+        <div css={{ ...styles.baseStyles, ...styles.activeHoverStyles }}>{getChildren("active hover")}</div>
+      </div>
+      <div css={Css.df.fdc.childGap2.$}>
+        <h2>
+          Rendered as <pre css={Css.dib.$}>&lt;a /&gt;</pre>
+        </h2>
+        <div css={{ ...styles.baseStyles, ...styles.activeStyles }}>{getChildren("active")}</div>
+        <div css={{ ...styles.baseStyles, ...styles.focusRingStyles }}>{getChildren("focus ring")}</div>
+        <div css={styles.baseStyles}>{getChildren("default")}</div>
+        <div css={{ ...styles.baseStyles, ...styles.disabledStyles }}>{getChildren("disabled")}</div>
+        <div css={{ ...styles.baseStyles, ...styles.hoverStyles }}>{getChildren("hovered")}</div>
+        <div css={{ ...styles.baseStyles, ...styles.activeHoverStyles }}>{getChildren("active hover")}</div>
+      </div>
     </div>
   );
 }
@@ -57,7 +73,8 @@ export function TabsSeparateFromContent() {
 export function TabsAsLinks() {
   return <TestComponent />;
 }
-TabsAsLinks.decorators = [withRouter("/ce:1", "/:ceId")];
+// Use `/` as the root path in order to ensure the Tab's component provides a <Route /> wrapper for matching.
+TabsAsLinks.decorators = [withRouter("/ce:2", "/")];
 
 function TestComponent() {
   const location = useLocation();
@@ -65,65 +82,25 @@ function TestComponent() {
   const routeTabs: RouteTab<string>[] = [
     {
       name: "Tab 1",
-      value: "/ce:1/overview",
+      href: "/ce:2/overview",
       path: ["/:ceId/overview", "/:ceId"],
-      render: () => (
-        <TestTabContent
-          content={
-            <>
-              <h1>Tab 1 Content</h1>
-              <div>
-                <pre css={Css.dib.$}>tab.path = ["/:ceId/overview", "/:ceId"]</pre>
-              </div>
-            </>
-          }
-        />
-      ),
+      render: () => <RouteTab1 />,
     },
     {
       name: "Tab 2",
-      value: "/ce:1/line-items",
+      href: "/ce:2/line-items",
       path: ["/:ceId/line-items", "/:ceId/line-items/*"],
-      render: () => (
-        <TestTabContent
-          content={
-            <>
-              <h1>Tab 2 Content</h1>
-              <div>
-                <pre css={Css.dib.$}>tab.path = ["/:ceId/line-items", "/:ceId/line-items/*"]</pre>
-              </div>
-              <div css={Css.mt2.$}>
-                <p>Click below to load a sub route of this tab, which should keep this tab as "active"</p>
-                <Link to="/ce:1/line-items/celi:1/overview">Line Item Details</Link>
-                <div>
-                  <Route path="/:ceId/line-items/:celiId">Loaded Line Items Overview!</Route>
-                </div>
-              </div>
-            </>
-          }
-        />
-      ),
+      render: () => <RouteTab2 />,
     },
     {
       name: "Tab 3",
-      value: "/ce:1/history",
+      href: "/ce:2/history",
       path: "/:ceId/history",
-      render: () => (
-        <TestTabContent
-          content={
-            <>
-              <h1>Tab 3 Content</h1>
-              <div>
-                <pre css={Css.dib.$}>tab.path = "/:ceId/history"</pre>
-              </div>
-            </>
-          }
-        />
-      ),
+      render: () => <RouteTab3 />,
     },
     {
       name: "Disabled Tab",
-      value: "/ce:1/disabled",
+      href: "/ce:2/disabled",
       path: "/:ceId/disabled",
       disabled: true,
       render: () => <TestTabContent content="Disabled Tab" />,
@@ -135,7 +112,7 @@ function TestComponent() {
         <div>
           <strong>Current URL:</strong> <pre css={Css.dib.$}>{location?.pathname}</pre>
         </div>
-        <Button label="Reset to root path" onClick={() => history.push("/:ceId")} /> (Will match Tab 1)
+        <Button label="Reset to root path" onClick={() => history.push("/ce:2")} /> (Will match Tab 1)
       </div>
       <TabsWithContent tabs={routeTabs} />
     </div>
@@ -165,5 +142,51 @@ function getChildren(label: string) {
       {label}
       <Icon icon="checkCircle" css={Css.ml1.$} />
     </Fragment>
+  );
+}
+
+function RouteTab1() {
+  const { ceId } = useParams<{ ceId: string }>();
+  return (
+    <>
+      <h1 css={Css.lgEm.$}>Tab 1 Content</h1>
+      <h2>Params ceId = {ceId}</h2>
+      <div>
+        <pre css={Css.dib.$}>tab.path = ["/:ceId/overview", "/:ceId"]</pre>
+      </div>
+    </>
+  );
+}
+
+function RouteTab2() {
+  const { ceId } = useParams<{ ceId: string }>();
+  return (
+    <>
+      <h1 css={Css.lgEm.$}>Tab 2 Content</h1>
+      <h2>Params ceId = {ceId}</h2>
+      <div>
+        <pre css={Css.dib.$}>tab.path = ["/:ceId/line-items", "/:ceId/line-items/*"]</pre>
+      </div>
+      <div css={Css.mt2.$}>
+        <p>Click below to load a sub route of this tab, which should keep this tab as "active"</p>
+        <Link to="/ce:1/line-items/celi:1/overview">Line Item Details</Link>
+        <div>
+          <Route path="/:ceId/line-items/:celiId">Loaded Line Items Overview!</Route>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function RouteTab3() {
+  const { ceId } = useParams<{ ceId: string }>();
+  return (
+    <>
+      <h1 css={Css.lgEm.$}>Tab 3 Content</h1>
+      <h2>Params ceId = {ceId}</h2>
+      <div>
+        <pre css={Css.dib.$}>tab.path = "/:ceId/history"</pre>
+      </div>
+    </>
   );
 }
