@@ -2,6 +2,7 @@ import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { ReactNode, useState } from "react";
 import { Css } from "src/Css";
+import { FormLines } from "src/forms";
 import {
   radioChecked,
   radioDefault,
@@ -124,19 +125,37 @@ export function BaseStates() {
 export function OnlyLabels() {
   const [state, setState] = useState<string | undefined>();
   return (
-    <RadioGroupField
-      label={"Favorite cheese"}
-      value={state}
-      onChange={setState}
-      options={[
-        { label: "Asiago", value: "a" },
-        { label: "Burratta", value: "b" },
-        { label: "Camembert", value: "c" },
-        { label: "Roquefort", value: "d" },
-      ]}
-      onBlur={action("onBlur")}
-      onFocus={action("onFocus")}
-    />
+    <FormLines>
+      <p css={Css.mb1.$}>With RadioGroupField label</p>
+      <RadioGroupField
+        label={"Favorite cheese"}
+        value={state}
+        onChange={setState}
+        options={[
+          { label: "Asiago", value: "a" },
+          { label: "Burratta", value: "b" },
+          { label: "Camembert", value: "c" },
+          { label: "Roquefort", value: "d" },
+        ]}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+      <p css={Css.mb1.$}>With hidden RadioGroupField label</p>
+      <RadioGroupField
+        label={"Favorite cheese"}
+        hideLabel
+        value={state}
+        onChange={setState}
+        options={[
+          { label: "Asiago", value: "a" },
+          { label: "Burratta", value: "b" },
+          { label: "Camembert", value: "c" },
+          { label: "Roquefort", value: "d" },
+        ]}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+    </FormLines>
   );
 }
 

@@ -23,6 +23,7 @@ export interface RadioFieldOption<K extends string> {
 export interface RadioGroupFieldProps<K extends string> {
   /** The label for the choice itself, i.e. "Favorite Cheese". */
   label: string;
+  hideLabel?: boolean;
   /** The currently selected option value (i.e. an id). */
   value: K | undefined;
   /** Called when an option is selected. We don't support unselecting. */
@@ -44,7 +45,7 @@ export interface RadioGroupFieldProps<K extends string> {
  * TODO: Add hover (non selected and selected) styles
  */
 export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>) {
-  const { label, value, onChange, options, disabled = false, errorMsg, helperText, ...otherProps } = props;
+  const { label, hideLabel, value, onChange, options, disabled = false, errorMsg, helperText, ...otherProps } = props;
 
   // useRadioGroupState uses a random group name, so use our name
   const name = useMemo(() => `radio-group-${++nextNameId}`, []);
@@ -67,7 +68,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   return (
     // width of `max-content` is used to limit invisible label clicking
     <div css={Css.w("max-content").maxw(anyDescriptions ? "344px" : "320px").$}>
-      <Label label={label} {...labelProps} {...tid.label} />
+      <Label label={label} {...labelProps} {...tid.label} hidden={hideLabel} />
       <div {...radioGroupProps}>
         {options.map((option) => (
           <Radio
