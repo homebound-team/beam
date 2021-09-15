@@ -1,14 +1,11 @@
 import { Meta } from "@storybook/react";
 import { PropsWithChildren, ReactNode, useState } from "react";
 import { IconButton } from "src/components/IconButton";
-import { PreventBrowserScroll } from "src/components/Layout/PreventBrowserScroll";
-import { ScrollableContent } from "src/components/Layout/ScrollableContent";
-import { ScrollableParent } from "src/components/Layout/ScrollableParent";
-import { Tab, Tabs } from "src/components/Tabs";
+import { Tab, TabsWithContent } from "src/components/Tabs";
 import { Css } from "src/Css";
 import { FormLines } from "src/forms";
+import { PreventBrowserScroll, ScrollableContent, ScrollableParent } from "src/index";
 import { NumberField } from "src/inputs";
-import { noop } from "src/utils";
 import { withBeamDecorator, withDimensions, zeroTo } from "src/utils/sb";
 
 export default {
@@ -22,14 +19,6 @@ export function BasicLayout() {
   return (
     <TestLayout>
       <ExamplePageComponent />
-    </TestLayout>
-  );
-}
-
-export function ContentAboveTable() {
-  return (
-    <TestLayout>
-      <ExamplePageComponent contentAboveTable />
     </TestLayout>
   );
 }
@@ -72,7 +61,7 @@ export function EditableTableSize() {
       </div>
       <ScrollableContent>
         <div css={consistentPadding}>
-          <TableExample numCols={cols} numRows={rows} />
+          <ScrollableTableExample numCols={cols} numRows={rows} />
         </div>
       </ScrollableContent>
     </TestProjectLayout>
@@ -80,10 +69,11 @@ export function EditableTableSize() {
 }
 
 function ExamplePageComponent({ contentAboveTable }: { contentAboveTable?: boolean }) {
+  const [selectedTab, setSelectedTab] = useState("lineItems");
   const tabs: Tab[] = [
-    { value: "overview", name: "Overview", render: () => <></> },
-    { value: "lineItems", name: "Line Items", render: () => <></> },
-    { value: "history", name: "History", render: () => <></> },
+    { value: "overview", name: "Overview", render: () => <OverviewExample /> },
+    { value: "lineItems", name: "Line Items", render: () => <ScrollableTableExample /> },
+    { value: "history", name: "History", render: () => <HistoryExample /> },
   ];
   return (
     <>
@@ -91,22 +81,55 @@ function ExamplePageComponent({ contentAboveTable }: { contentAboveTable?: boole
       <TestHeader title="Change Event - Mud Room" />
 
       <div css={{ ...consistentPadding, ...Css.py1.$ }}>
-        <Tabs selected="overview" tabs={tabs} onChange={noop} />
+        <TabsWithContent selected={selectedTab} tabs={tabs} onChange={(t) => setSelectedTab(t)} />
       </div>
+    </>
+  );
+}
 
+function OverviewExample() {
+  return (
+    <ScrollableContent>
+      <div css={consistentPadding}>
+        <h1 css={Css.lgEm.mb3.$}>Detail</h1>
+        {zeroTo(10).map((i) => (
+          <p css={Css.mb3.$}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
+            anim id est laborum.
+          </p>
+        ))}
+      </div>
+    </ScrollableContent>
+  );
+}
+
+function HistoryExample() {
+  return (
+    <>
+      <div css={{ ...Css.lgEm.$, ...consistentPadding }}>History</div>
       <ScrollableContent>
         <div css={consistentPadding}>
-          {contentAboveTable && (
-            <p css={Css.py2.$}>
-              This is some content above the table that will not be fixed in place.
-              <br />
-              As the user scrolls, this content should be scrolled out of view.
-            </p>
-          )}
-          <TableExample />
+          <ul css={Css.df.fdc.childGap2.$}>
+            {zeroTo(20).map((i) => (
+              <li>History Item {i + 1}</li>
+            ))}
+          </ul>
         </div>
       </ScrollableContent>
     </>
+  );
+}
+
+function ScrollableTableExample({ numCols, numRows }: { numCols?: number; numRows?: number }) {
+  return (
+    <ScrollableContent>
+      <div css={consistentPadding}>
+        <TableExample numCols={numCols} numRows={numRows} />
+      </div>
+    </ScrollableContent>
   );
 }
 
