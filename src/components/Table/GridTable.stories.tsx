@@ -29,7 +29,7 @@ import { newStory, withRouter, zeroTo } from "src/utils/sb";
 export default {
   component: GridTable,
   title: "Components/GridTable",
-  parameters: { backgrounds: { default: "white" } },
+  parameters: { layout: "fullscreen", backgrounds: { default: "white" } },
 } as Meta;
 
 type Data = { name: string; value: number };
@@ -103,7 +103,7 @@ export function VirtualFiltering() {
   const rowLookup = useRef<GridRowLookup<Row> | undefined>();
   const [filter, setFilter] = useState<string | undefined>();
   return (
-    <div css={Css.df.fdc.add({ height: heightWithoutStorybookPadding }).$}>
+    <div css={Css.df.fdc.vh100.$}>
       <div>
         <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
         <Button label="goto 500" onClick={() => rowLookup.current!.scrollTo("data", "500")} />
@@ -122,9 +122,6 @@ export function VirtualFiltering() {
     </div>
   );
 }
-
-// .sb-main-padded adds 1rem on top/bottom
-const heightWithoutStorybookPadding = "calc(100vh - 2rem)";
 
 export function NoRowsFallback() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
@@ -318,7 +315,7 @@ export function StickyHeader() {
     data: () => <div>Actions</div>,
   };
   return (
-    <div style={{ height: heightWithoutStorybookPadding }}>
+    <div style={Css.vh100.$}>
       some other top of page content
       <GridTable
         columns={[nameColumn, valueColumn, actionColumn]}

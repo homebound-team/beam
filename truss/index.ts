@@ -30,7 +30,7 @@ const fonts: Record<string, { fontWeight: 400 | 500 | 600, fontSize: string; lin
   xl5Em:  { fontWeight: 600, fontSize: "48px", lineHeight: "48px" },
 };
 
-const transition: string = ["background-color", "border-color", "box-shadow", "left", "right"]
+const transition: string = ["background-color", "border-color", "box-shadow", "left", "right", "margin"]
   .map((property) => `${property} 200ms`)
   .join(", ");
 

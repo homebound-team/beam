@@ -24,6 +24,7 @@ export default {
   component: Filters,
   title: "Components/Filters",
   decorators: [withDimensions(), withRouter(), withBeamDecorator],
+  parameters: { layout: "fullscreen" },
 } as Meta;
 
 export function Filter() {

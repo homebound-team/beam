@@ -12,6 +12,7 @@ export * from "./CssReset";
 export * from "./Filters";
 export * from "./Icon";
 export * from "./IconButton";
+export * from "./Layout";
 export * from "./Modal";
 export * from "./Modal/useModal";
 export { NavLink } from "./NavLink";
