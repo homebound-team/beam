@@ -245,6 +245,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     shouldFlip: true,
     isOpen: state.isOpen,
     onClose: state.close,
+    placement: "bottom",
   });
 
   positionProps.style = {
@@ -291,6 +292,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         >
           <ListBox
             {...listBoxProps}
+            positionProps={positionProps}
             state={state}
             compact={compact}
             listBoxRef={listBoxRef}

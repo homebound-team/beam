@@ -1,4 +1,4 @@
-import { Key, MutableRefObject, useEffect, useRef, useState } from "react";
+import React, { Key, MutableRefObject, useEffect, useRef, useState } from "react";
 import { DismissButton, useListBox } from "react-aria";
 import { SelectState } from "react-stately";
 import { Virtuoso } from "react-virtuoso";
@@ -11,11 +11,11 @@ interface ListBoxProps<O, V extends Key> {
   compact: boolean;
   listBoxRef: MutableRefObject<HTMLDivElement | null>;
   state: SelectState<O>;
-  maxListHeight?: number;
   selectedOptions: O[];
   getOptionLabel: (opt: O) => string;
   getOptionValue: (opt: O) => V;
   contrast?: boolean;
+  positionProps: React.HTMLAttributes<Element>;
 }
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
@@ -24,17 +24,25 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     state,
     compact,
     listBoxRef,
-    // Choosing `273` as a defined max-height. `42px` is the min-height of each option, so this allows
-    // 6.5 options in view at a time (doing `.5` so the user can easily tell if there are more).
-    maxListHeight = 273,
     selectedOptions,
     getOptionLabel,
     getOptionValue,
     contrast = false,
+    positionProps,
     ...otherProps
   } = props;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...otherProps }, state, listBoxRef);
 
+  const positionMaxHeight = positionProps.style?.maxHeight;
+  // The maxListHeight will be based on the value defined by the positionProps returned from `useOverlayPosition` (which will always be a defined as a `number` based on React-Aria's `calculatePosition`).
+  // If `maxHeight` is set use that, otherwise use `273` as a default (`42px` is the min-height of each option, so this allows
+  // 6.5 options in view at a time (doing `.5` so the user can easily tell if there are more).
+  const maxListHeight = positionMaxHeight && typeof positionMaxHeight === "number" ? positionMaxHeight : 273;
+  // We define some spacing between the ListBox and the trigger element, and depending on where the list box renders (above or below) we need to adjust the spacing.
+  // We can determine if the position was flipped based on what style is defined, `top` (for positioned below the trigger), and `bottom` (for above the trigger).
+  // The above assumption regarding `top` and `bottom` is true as long as we use `bottom` as our default `OverlayPosition.placement` (set in SelectFieldBase).
+  // The reason the placement may not be on bottom even though we set `bottom` is because also set `shouldFlip: true`
+  const isPositionedAbove = !positionProps.style?.top;
   const [listHeight, setListHeight] = useState(maxListHeight);
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
   const virtuosoRef = useRef<VirtuosoHandle>(null);
@@ -50,7 +58,9 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
   return (
     <div
       css={{
-        ...Css.mtPx(4).bgWhite.br4.w100.bshBasic.if(contrast).bgGray700.$,
+        ...Css.bgWhite.br4.w100.bshBasic.if(contrast).bgGray700.$,
+        // Add spacing based on menu's position relative to the trigger element
+        ...(isPositionedAbove ? Css.mbPx(4).$ : Css.mtPx(4).$),
         "&:hover": Css.bshHover.$,
       }}
       ref={listBoxRef}
