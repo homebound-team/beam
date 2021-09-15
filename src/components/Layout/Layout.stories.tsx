@@ -6,12 +6,12 @@ import { Css } from "src/Css";
 import { FormLines } from "src/forms";
 import { PreventBrowserScroll, ScrollableContent, ScrollableParent } from "src/index";
 import { NumberField } from "src/inputs";
-import { withBeamDecorator, withDimensions, zeroTo } from "src/utils/sb";
+import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
   component: ScrollableParent,
   title: "Components/NestedScroll",
-  decorators: [withBeamDecorator, withDimensions()],
+  decorators: [withBeamDecorator, withDimensions(), withRouter()],
   parameters: { layout: "fullscreen" },
 } as Meta;
 
