@@ -152,7 +152,7 @@ const rows: GridDataRow<NestedRow>[] = [
       {
         ...{ kind: "child", id: "p1c1", name: "child p1c1" },
         children: [
-          { kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" },
+          { kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" + " foo".repeat(20) },
           { kind: "grandChild", id: "p1c1g2", name: "grandchild p1c1g2" },
         ],
       },
