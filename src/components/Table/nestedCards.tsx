@@ -54,7 +54,7 @@ export class NestedCards {
   }
 
   maxCardPadding(current: number | undefined): number {
-    const padding = this.openCards.map((c) => c.pxPx).reduce((a, b) => a + b, 0);
+    const padding = this.openCards.map((c) => c.pxPx + (!!c.bColor ? 1 : 0)).reduce((a, b) => a + b, 0);
     return Math.max(padding, current || 0);
   }
 
