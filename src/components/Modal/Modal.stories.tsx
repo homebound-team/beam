@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useEffect } from "react";
-import { Button, ModalFooter, ModalHeader, ModalProps, useModal } from "src/components/index";
+import { Button, ModalBody, ModalFooter, ModalHeader, ModalProps, OpenModal, useModal } from "src/components/index";
 import { Modal } from "src/components/Modal/Modal";
 import { TestModalContent, TestModalFilterTable } from "src/components/Modal/TestModalContent";
 import { noop } from "src/utils/index";
@@ -23,6 +23,7 @@ export const FilterableStaticHeight = () => (
   <ModalFilterTableExample size={{ width: "md", height: 600 }} forceScrolling={true} />
 );
 export const HeaderWithComponents = () => <ModalExample size="lg" withTag />;
+
 export const ButtonsInFooter = () => {
   const { openModal } = useModal();
   const open = () =>
@@ -40,6 +41,30 @@ export const ButtonsInFooter = () => {
   // Immediately open the modal for Chromatic snapshots
   useEffect(open, [openModal]);
   return <Button label="Open" onClick={open} />;
+};
+
+export const OpenModalTest = () => {
+  return (
+    <OpenModal>
+      <>
+        <ModalHeader>Add</ModalHeader>
+        <ModalBody>Body</ModalBody>
+        <ModalFooter>Footer</ModalFooter>
+      </>
+    </OpenModal>
+  );
+};
+
+export const OpenModalKeepOpen = () => {
+  return (
+    <OpenModal keepOpen={true}>
+      <>
+        <ModalHeader>Add</ModalHeader>
+        <ModalBody>Body</ModalBody>
+        <ModalFooter> Footer </ModalFooter>
+      </>
+    </OpenModal>
+  );
 };
 
 interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling"> {
