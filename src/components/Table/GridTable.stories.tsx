@@ -230,7 +230,7 @@ export function NestedCards() {
     add: () => "",
     clientSideSort: false,
   };
-  const spacing = { brPx: 4, pxPx: 8, spacerPx: 8 };
+  const spacing = { brPx: 4, pxPx: 4, spacerPx: 1 };
   const nestedStyle: GridStyle = {
     nestedCards: {
       topLevelSpacerPx: 8,
