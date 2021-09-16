@@ -294,7 +294,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   }, [columns, rows, sorting, sortState]);
 
   // Filter + flatten + component-ize the sorted rows.
-  let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
+  let [headerRows, filteredRows, maxCardPadding]: [RowTuple<R>[], RowTuple<R>[], number | undefined] = useMemo(() => {
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
 
@@ -332,6 +332,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: RowTuple<R>[] = [];
     const filteredRows: RowTuple<R>[] = [];
+    // If we're doing nested cards, we will add extra first/last columns, and need to know how wide to make them
+    let maxCardPadding: number | undefined = undefined;
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
     const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style);
@@ -347,6 +349,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       let isCard = false;
       if (matches) {
         isCard = nestedCards && nestedCards.maybeOpenCard(row);
+        if (isCard && nestedCards) {
+          maxCardPadding = nestedCards.maxCardPadding(maxCardPadding);
+        }
         filteredRows.push([row, makeRowComponent(row)]);
       }
 
@@ -374,7 +379,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     visitRows(maybeSorted, !!nestedCards);
     nestedCards && nestedCards.done();
 
-    return [headerRows, filteredRows];
+    return [headerRows, filteredRows, maxCardPadding];
   }, [
     as,
     maybeSorted,
@@ -418,7 +423,18 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // just trust the GridTable impl that, at runtime, `as=virtual` will (other than being virtualized)
   // behave semantically the same as `as=div` did for its tests.
   const _as = as === "virtual" && runningInJest ? "div" : as;
-  return renders[_as](style, id, columns, headerRows, filteredRows, firstRowMessage, stickyHeader, xss, virtuosoRef);
+  return renders[_as](
+    style,
+    id,
+    columns,
+    headerRows,
+    filteredRows,
+    firstRowMessage,
+    stickyHeader,
+    maxCardPadding,
+    xss,
+    virtuosoRef,
+  );
 }
 
 // Determine which HTML element to use to build the GridTable
@@ -437,13 +453,14 @@ function renderCssGrid<R extends Kinded>(
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
+  maxCardPadding: number | undefined,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
   return (
     <div
       css={{
-        ...Css.dg.gtc(calcGridColumns(columns)).$,
+        ...Css.dg.gtc(calcGridColumns(columns, maxCardPadding)).$,
         ...Css
           // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
           // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
@@ -477,6 +494,7 @@ function renderTable<R extends Kinded>(
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
+  maxCardPadding: number | undefined,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
@@ -536,13 +554,14 @@ function renderVirtual<R extends Kinded>(
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
+  maxCardPadding: number | undefined,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
   return (
     <Virtuoso
       ref={virtuosoRef}
-      components={{ List: VirtualRoot(style, columns, id, xss) }}
+      components={{ List: VirtualRoot(style, columns, id, maxCardPadding, xss) }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
       // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
@@ -580,39 +599,48 @@ function renderVirtual<R extends Kinded>(
  * identity, even though technically we have a different "component" per the given set of props
  * (solely to capture as params that we can't pass through react-virtuoso's API as props).
  */
-const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: string, xss: any) => Components["List"]>(
-  (gs, columns, id, xss) => {
-    return React.forwardRef(({ style, children }, ref) => {
-      // This re-renders each time we have new children in the view port
-      return (
-        <div
-          ref={ref}
-          style={style}
-          css={{
-            ...Css.dg.gtc(calcGridColumns(columns)).$,
-            // Add an extra `> div` due to Item + itemContent both having divs
-            ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
-            // Add `display:contents` to Item to flatten it like we do GridRow
-            ...Css.addIn("& > div", Css.display("contents").$).$,
-            ...gs.rootCss,
-            ...xss,
-          }}
-          data-testid={id}
-        >
-          {children}
-        </div>
-      );
-    });
-  },
-);
+const VirtualRoot = memoizeOne<
+  (
+    gs: GridStyle,
+    columns: GridColumn<any>[],
+    id: string,
+    maxCardPadding: number | undefined,
+    xss: any,
+  ) => Components["List"]
+>((gs, columns, id, maxCardPadding, xss) => {
+  return React.forwardRef(({ style, children }, ref) => {
+    // This re-renders each time we have new children in the view port
+    return (
+      <div
+        ref={ref}
+        style={style}
+        css={{
+          ...Css.dg.gtc(calcGridColumns(columns, maxCardPadding)).$,
+          // Add an extra `> div` due to Item + itemContent both having divs
+          ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
+          // Add `display:contents` to Item to flatten it like we do GridRow
+          ...Css.addIn("& > div", Css.display("contents").$).$,
+          ...gs.rootCss,
+          ...xss,
+        }}
+        data-testid={id}
+      >
+        {children}
+      </div>
+    );
+  });
+});
 
-function calcGridColumns(columns: GridColumn<any>[]): string {
-  return (
-    columns
-      // Default to auto, but use `c.w` as a fr if numeric or else `c.w` as-if if a string
-      .map((c) => (typeof c.w === "string" ? c.w : c.w !== undefined ? `${c.w}fr` : "auto"))
-      .join(" ")
-  );
+function calcGridColumns(columns: GridColumn<any>[], maxCardPadding: number | undefined): string {
+  let sizes = columns.map((c) => {
+    // Default to auto, but use `c.w` as a fr if numeric or else `c.w` as-if if a string
+    return typeof c.w === "string" ? c.w : c.w !== undefined ? `${c.w}fr` : "auto";
+  });
+  // If we're doing nested cards, we add extra 1st/last cells...
+  if (maxCardPadding) {
+    sizes = [`${maxCardPadding}px`, ...sizes, `${maxCardPadding}px`];
+  }
+  return sizes.join(" ");
 }
 
 /**
@@ -802,8 +830,11 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
   const Row = as === "table" ? "tr" : "div";
 
+  const currentCard = openCards && openCards.length > 0 && openCards[openCards.length - 1];
+
   const div = (
     <Row css={rowCss} {...others}>
+      {openCards && maybeAddCardPadding(openCards, "first")}
       {columns.map((column, columnIndex) => {
         const maybeContent = applyRowFn(column, row);
 
@@ -813,8 +844,6 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         const content = toContent(maybeContent, isHeader, canSortColumn);
 
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
-
-        const card = openCards && openCards.length > 0 && openCards[openCards.length - 1];
 
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
         // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
@@ -838,6 +867,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
           ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
+          // If we're within a card, use its background color
+          ...(currentCard && Css.bgColor(currentCard.bgColor).$),
           // And finally the specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
         };
@@ -851,13 +882,9 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             ? rowClickRenderFn(as)
             : defaultRenderFn(as);
 
-        let rendered = renderFn(columnIndex, cellCss, content, row, rowStyle);
-        // Sneak in card padding for the 1st / last cells
-        if (card) {
-          rendered = maybeAddCardPadding(columns, openCards, columnIndex, rendered);
-        }
-        return rendered;
+        return renderFn(columnIndex, cellCss, content, row, rowStyle);
       })}
+      {openCards && maybeAddCardPadding(openCards, "final")}
     </Row>
   );
 

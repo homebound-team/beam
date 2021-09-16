@@ -53,6 +53,11 @@ export class NestedCards {
     maybeCreateChromeRow(this.columns, this.filteredRows, this.chromeBuffer);
   }
 
+  maxCardPadding(current: number | undefined): number {
+    const padding = this.openCards.map((c) => c.pxPx + (!!c.bColor ? 1 : 0)).reduce((a, b) => a + b, 0);
+    return Math.max(padding, current || 0);
+  }
+
   /** Return a stable copy of the cards, so it won't change as we keep going. */
   currentOpenCards() {
     return [...this.openCards];
@@ -73,7 +78,7 @@ export class NestedCards {
  * row separate from the card's actual content.
  */
 export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" | "close"): JSX.Element {
-  let div: any = null;
+  let div: any = <div />;
   const place = kind === "open" ? "Top" : "Bottom";
   const btOrBb = kind === "open" ? "bt" : "bb";
   // Create nesting for the all open cards, i.e.:
@@ -82,18 +87,19 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
   // | card1 | card2 / ... card3 ... \ card2 | card1 |
   // | card1 | card2 | ... card3 ... | card2 | card1 |
   //
-  [...openCards].reverse().forEach((card) => {
+  [...openCards].reverse().forEach((card, i) => {
+    const first = i === 0;
     div = (
       <div
         css={{
           ...Css.bgColor(card.bgColor).pxPx(card.pxPx).$,
           // Only the 1st div needs border left/right radius + border top/bottom.
-          ...(!div &&
+          ...(first &&
             Css.add({
               [`border${place}RightRadius`]: `${card.brPx}px`,
               [`border${place}LeftRadius`]: `${card.brPx}px`,
             }).hPx(card.brPx).$),
-          ...(card.bColor && Css.bc(card.bColor).bl.br.if(!div)[btOrBb].$),
+          ...(card.bColor && Css.bc(card.bColor).bl.br.if(first)[btOrBb].$),
         }}
       >
         {div}
@@ -107,27 +113,15 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
  * For the first or last cell of actual content, wrap them in divs that re-create the
  * outer cards' padding + background.
  */
-export function maybeAddCardPadding(
-  columns: GridColumn<any>[],
-  openCards: NestedCardStyle[],
-  columnIndex: number,
-  div: any,
-): any {
-  const isFirst = columnIndex === 0;
-  const isFinal = columnIndex === columns.length - 1;
-  if (!isFirst && !isFinal) {
-    // Even if we don't need the nested color+padding of each open card, at
-    // least add the background color of the closed open card.
-    const card = openCards[openCards.length - 1];
-    return !card ? div : <div css={Css.bgColor(card.bgColor).$}>{div}</div>;
-  }
+export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first" | "final"): any {
+  let div: any = <div />;
   [...openCards].reverse().forEach((card) => {
     div = (
       <div
         css={{
-          ...Css.bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).$,
-          ...(isFirst && Css.plPx(card.pxPx).if(!!card.bColor).bl.$),
-          ...(isFinal && Css.prPx(card.pxPx).if(!!card.bColor).br.$),
+          ...Css.h100.bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).$,
+          ...(column === "first" && Css.plPx(card.pxPx).if(!!card.bColor).bl.$),
+          ...(column === "final" && Css.prPx(card.pxPx).if(!!card.bColor).br.$),
         }}
       >
         {div}
@@ -163,7 +157,7 @@ export function makeSpacer(height: number, openCards: NestedCardStyle[]) {
  * - card1 content row
  * - chrome row (card2 open)
  * - nested card2 content row
- * - chrome row (card2 close, card1 cloard)
+ * - chrome row (card2 close, card1 close)
  */
 export function maybeCreateChromeRow(
   columns: GridColumn<any>[],
@@ -173,7 +167,8 @@ export function maybeCreateChromeRow(
   if (chromeBuffer.length > 0) {
     filteredRows.push([
       undefined,
-      <div css={Css.gc(`span ${columns.length}`).$}>
+      // We add 2 to account for our dedicated open/close columns
+      <div css={Css.gc(`span ${columns.length + 2}`).$}>
         {chromeBuffer.map((c, i) => (
           <Fragment key={i}>{c}</Fragment>
         ))}
