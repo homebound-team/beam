@@ -636,7 +636,7 @@ function calcGridColumns(columns: GridColumn<any>[], maxCardPadding: number | un
     // Default to auto, but use `c.w` as a fr if numeric or else `c.w` as-if if a string
     return typeof c.w === "string" ? c.w : c.w !== undefined ? `${c.w}fr` : "auto";
   });
-  // If we're doing nest cards, we add extra 1st/last cells...
+  // If we're doing nested cards, we add extra 1st/last cells...
   if (maxCardPadding) {
     sizes = [`${maxCardPadding}px`, ...sizes, `${maxCardPadding}px`];
   }
