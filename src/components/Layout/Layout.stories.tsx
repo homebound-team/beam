@@ -174,10 +174,10 @@ function VirutalizedPage() {
   return (
     <>
       <TestHeader title="Change Event - Mud Room" />
-      <p>Content above the table</p>
+      <p css={Css.py2.$}>Content above the table</p>
       {/*
         Providing a <ScrollableContent> wrapper here isn't really necessary,
-        as the Virtualized component will provides its own scrolling behavior.
+        as the Virtualized component will provide its own scrolling behavior.
         Though, because we want to wrap the VirtualizedTable in an element to provide some consistent padding,
         that means we need to set h100 on the wrapping element. Since setting h100 means it'll take the full height of the parent,
         then it's better to wrap in ScrollableContent because ScrollableContent's height is based on the remaining space available in the viewport. But...
@@ -189,13 +189,8 @@ function VirutalizedPage() {
         Because I am unsure why/how ends up taking up the correct amount of space, I would push to continue to wrap inside of <ScrollableContent />
         ¯\_(ツ)_/¯
       */}
-      <ScrollableContent>
-        {/* To prevent Virtuoso's scrollbar from being set in based on the Layout's padding, we will use the FullBleed component w/o padding to push it back over */}
-        <FullBleed omitPadding>
-          <div css={Css.h100.pl(pl).$}>
-            <VirutalizedTable />
-          </div>
-        </FullBleed>
+      <ScrollableContent virtualized>
+        <VirutalizedTable />
       </ScrollableContent>
     </>
   );
