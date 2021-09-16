@@ -3,7 +3,7 @@ import { PropsWithChildren, ReactNode, useState } from "react";
 import { IconButton } from "src/components/IconButton";
 import { FullBleed } from "src/components/Layout/FullBleed";
 import { Tab, TabsWithContent } from "src/components/Tabs";
-import { Css, increment } from "src/Css";
+import { Css } from "src/Css";
 import { FormLines } from "src/forms";
 import { PreventBrowserScroll, ScrollableContent, ScrollableParent } from "src/index";
 import { NumberField } from "src/inputs";
@@ -65,7 +65,7 @@ export function EditableTableSize() {
   );
 }
 
-function ExamplePageComponent({ contentAboveTable }: { contentAboveTable?: boolean }) {
+function ExamplePageComponent() {
   const [selectedTab, setSelectedTab] = useState("lineItems");
   const tabs: Tab[] = [
     { value: "overview", name: "Overview", render: () => <OverviewExample /> },
@@ -156,7 +156,7 @@ function TestLayout({ children }: PropsWithChildren<{}>) {
   return (
     <PreventBrowserScroll>
       <TestTopNav />
-      <ScrollableParent paddingX={increment(3)}>{children}</ScrollableParent>
+      <ScrollableParent xss={Css.px(3).$}>{children}</ScrollableParent>
     </PreventBrowserScroll>
   );
 }
@@ -168,9 +168,7 @@ function TestProjectLayout({ children }: PropsWithChildren<{}>) {
       {/* Required to use `overflowHidden` as the prevent the `TestLayout`'s scrollbar from kicking in. */}
       <div css={Css.df.overflowHidden.$}>
         <TestSideNav />
-        <ScrollableParent xss={Css.fg1.$} paddingX={increment(3)}>
-          {children}
-        </ScrollableParent>
+        <ScrollableParent xss={Css.fg1.px3.$}>{children}</ScrollableParent>
       </div>
     </PreventBrowserScroll>
   );
@@ -183,10 +181,7 @@ function TestTopNav() {
 function TestSideNav() {
   const [showNav, setShowNav] = useState(true);
   return (
-    <ScrollableParent
-      paddingX={increment(2)}
-      xss={Css.transition.br.bGray200.fg0.fs0.wPx(224).if(!showNav).mlPx(-186).$}
-    >
+    <ScrollableParent xss={Css.transition.br.bGray200.fg0.fs0.wPx(224).px2.if(!showNav).mlPx(-186).$}>
       <div css={Css.relative.$}>
         <div css={Css.absolute.top1.rightPx(-12).bgGray50.df.aic.jcc.$}>
           <IconButton icon={showNav ? "menuClose" : "menuOpen"} onClick={() => setShowNav(!showNav)} />

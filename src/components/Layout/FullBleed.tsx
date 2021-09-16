@@ -4,12 +4,10 @@ import { Css } from "src/Css";
 
 /** Provides a way to extend the full width of the ScrollableParent */
 export function FullBleed({ children, omitPadding = false }: { children: ReactElement; omitPadding?: boolean }) {
-  const { paddingX } = useScrollableParent();
-  return !paddingX
+  const { pr, pl } = useScrollableParent();
+  return !pr && !pl
     ? children
     : cloneElement(children, {
-        style: Css.mxPx(paddingX * -1)
-          .if(!omitPadding)
-          .pxPx(paddingX).$,
+        style: Css.ml(`-${pl}`).mr(`-${pr}`).if(!omitPadding).pl(pl).pr(pr).$,
       });
 }
