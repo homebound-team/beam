@@ -1,8 +1,9 @@
 import { Meta } from "@storybook/react";
 import { PropsWithChildren, ReactNode, useState } from "react";
 import { IconButton } from "src/components/IconButton";
+import { FullBleed } from "src/components/Layout/FullBleed";
 import { Tab, TabsWithContent } from "src/components/Tabs";
-import { Css } from "src/Css";
+import { Css, increment } from "src/Css";
 import { FormLines } from "src/forms";
 import { PreventBrowserScroll, ScrollableContent, ScrollableParent } from "src/index";
 import { NumberField } from "src/inputs";
@@ -35,13 +36,11 @@ export function WithoutScrollContainer() {
   return (
     <TestLayout>
       <TestHeader title="Change Event - Mud Room" />
-      <div css={consistentPadding}>
-        <p css={Css.py1.$}>
-          This is page "forgot" to use the Nested Scrolling components, though still can scroll thanks to an overflow
-          auto fallback.
-        </p>
-        <TableExample />
-      </div>
+      <p css={Css.py1.$}>
+        This is page "forgot" to use the Nested Scrolling components, though still can scroll thanks to an overflow auto
+        fallback.
+      </p>
+      <TableExample />
     </TestLayout>
   );
 }
@@ -53,16 +52,14 @@ export function EditableTableSize() {
   return (
     <TestProjectLayout>
       <TestHeader title="Change Event - Mud Room" />
-      <div css={{ ...consistentPadding, ...Css.py1.$ }}>
+      <div css={Css.py1.$}>
         <FormLines width="sm">
           <NumberField label="Number of rows" value={rows} onChange={(n) => n && setRows(n)} compact />
           <NumberField label="Number of columns" value={cols} onChange={(n) => n && setCols(n)} compact />
         </FormLines>
       </div>
       <ScrollableContent>
-        <div css={consistentPadding}>
-          <ScrollableTableExample numCols={cols} numRows={rows} />
-        </div>
+        <ScrollableTableExample numCols={cols} numRows={rows} />
       </ScrollableContent>
     </TestProjectLayout>
   );
@@ -80,7 +77,7 @@ function ExamplePageComponent({ contentAboveTable }: { contentAboveTable?: boole
       {/* Probably will move away from `usePageHeader` and instead go to this. */}
       <TestHeader title="Change Event - Mud Room" />
 
-      <div css={{ ...consistentPadding, ...Css.py1.$ }}>
+      <div css={Css.py1.$}>
         <TabsWithContent selected={selectedTab} tabs={tabs} onChange={(t) => setSelectedTab(t)} />
       </div>
     </>
@@ -90,18 +87,16 @@ function ExamplePageComponent({ contentAboveTable }: { contentAboveTable?: boole
 function OverviewExample() {
   return (
     <ScrollableContent>
-      <div css={consistentPadding}>
-        <h1 css={Css.lgEm.mb3.$}>Detail</h1>
-        {zeroTo(10).map((i) => (
-          <p css={Css.mb3.$}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-            anim id est laborum.
-          </p>
-        ))}
-      </div>
+      <h1 css={Css.lgEm.mb3.$}>Detail</h1>
+      {zeroTo(10).map((i) => (
+        <p css={Css.mb3.$}>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+          magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+          consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
+          est laborum.
+        </p>
+      ))}
     </ScrollableContent>
   );
 }
@@ -109,15 +104,13 @@ function OverviewExample() {
 function HistoryExample() {
   return (
     <>
-      <div css={{ ...Css.lgEm.$, ...consistentPadding }}>History</div>
+      <div css={Css.lgEm.$}>History</div>
       <ScrollableContent>
-        <div css={consistentPadding}>
-          <ul css={Css.df.fdc.childGap2.$}>
-            {zeroTo(20).map((i) => (
-              <li>History Item {i + 1}</li>
-            ))}
-          </ul>
-        </div>
+        <ul css={Css.df.fdc.childGap2.$}>
+          {zeroTo(20).map((i) => (
+            <li>History Item {i + 1}</li>
+          ))}
+        </ul>
       </ScrollableContent>
     </>
   );
@@ -126,9 +119,7 @@ function HistoryExample() {
 function ScrollableTableExample({ numCols, numRows }: { numCols?: number; numRows?: number }) {
   return (
     <ScrollableContent>
-      <div css={consistentPadding}>
-        <TableExample numCols={numCols} numRows={numRows} />
-      </div>
+      <TableExample numCols={numCols} numRows={numRows} />
     </ScrollableContent>
   );
 }
@@ -165,20 +156,23 @@ function TestLayout({ children }: PropsWithChildren<{}>) {
   return (
     <PreventBrowserScroll>
       <TestTopNav />
-      <ScrollableParent>{children}</ScrollableParent>
+      <ScrollableParent paddingX={increment(3)}>{children}</ScrollableParent>
     </PreventBrowserScroll>
   );
 }
 
 function TestProjectLayout({ children }: PropsWithChildren<{}>) {
   return (
-    <TestLayout>
+    <PreventBrowserScroll>
+      <TestTopNav />
       {/* Required to use `overflowHidden` as the prevent the `TestLayout`'s scrollbar from kicking in. */}
       <div css={Css.df.overflowHidden.$}>
         <TestSideNav />
-        <ScrollableParent xss={Css.fg1.$}>{children}</ScrollableParent>
+        <ScrollableParent xss={Css.fg1.$} paddingX={increment(3)}>
+          {children}
+        </ScrollableParent>
       </div>
-    </TestLayout>
+    </PreventBrowserScroll>
   );
 }
 
@@ -189,17 +183,22 @@ function TestTopNav() {
 function TestSideNav() {
   const [showNav, setShowNav] = useState(true);
   return (
-    <ScrollableParent xss={Css.transition.br.bGray200.fg0.fs0.ml0.wPx(224).if(!showNav).mlPx(-186).$}>
+    <ScrollableParent
+      paddingX={increment(2)}
+      xss={Css.transition.br.bGray200.fg0.fs0.wPx(224).if(!showNav).mlPx(-186).$}
+    >
       <div css={Css.relative.$}>
-        <div css={Css.absolute.top1.rightPx(4).bgGray50.df.aic.jcc.$}>
+        <div css={Css.absolute.top1.rightPx(-12).bgGray50.df.aic.jcc.$}>
           <IconButton icon={showNav ? "menuClose" : "menuOpen"} onClick={() => setShowNav(!showNav)} />
         </div>
         {showNav && (
           <>
-            <h2 css={Css.bb.bGray200.px2.py3.$}>Scrollable Side Navigation</h2>
+            <FullBleed>
+              <h2 css={Css.bb.bGray200.py3.$}>Scrollable Side Navigation</h2>
+            </FullBleed>
             <ScrollableContent>
               <nav>
-                <ul css={Css.listReset.df.fdc.childGap5.mt2.px2.$}>
+                <ul css={Css.listReset.df.fdc.childGap5.mt2.$}>
                   {zeroTo(20).map((i) => (
                     <li key={i}>Side Navigation Item</li>
                   ))}
@@ -214,12 +213,12 @@ function TestSideNav() {
   );
 }
 
-const consistentPadding = Css.px3.$;
-
 function TestHeader({ title }: { title: ReactNode }) {
   return (
-    <header css={{ ...Css.py2.bb.bGray200.$, ...consistentPadding }}>
-      <h1 css={Css.xlEm.$}>{title}</h1>
-    </header>
+    <FullBleed>
+      <header css={{ ...Css.py2.bb.bGray200.$ }}>
+        <h1 css={Css.xlEm.$}>{title}</h1>
+      </header>
+    </FullBleed>
   );
 }
