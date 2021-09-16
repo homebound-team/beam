@@ -19,7 +19,12 @@ interface ScrollableParentContextProviderProps {
 }
 
 export function ScrollableParent({ children, xss }: PropsWithChildren<ScrollableParentContextProviderProps>) {
-  const scrollableEl = useMemo(() => document.createElement("div"), []);
+  const scrollableEl = useMemo(() => {
+    const el = document.createElement("div");
+    // Ensure this wrapping div takes up the full height of its container
+    el.style.height = "100%";
+    return el;
+  }, []);
   const scrollableRef = useRef<HTMLDivElement | null>(null);
   const { paddingLeft, paddingRight, ...otherXss } = xss || {};
   const context: ScrollableParentContextProps = { scrollableEl, pl: paddingLeft ?? 0, pr: paddingRight ?? 0 };
@@ -36,7 +41,7 @@ export function ScrollableParent({ children, xss }: PropsWithChildren<Scrollable
       <div css={{ ...Css.mh0.mw0.df.fdc.$, ...otherXss }}>
         <div css={Css.pl(context.pl).pr(context.pr).$}>{children}</div>
         {/* Set fg1 to take up the remaining space in the viewport.*/}
-        <div css={{ ...Css.overflowAuto.$, ...Css.pl(context.pl).pr(context.pr).$ }} ref={scrollableRef}></div>
+        <div css={Css.fg1.overflowAuto.pl(context.pl).pr(context.pr).$} ref={scrollableRef}></div>
       </div>
     </ScrollableParentContext.Provider>
   );

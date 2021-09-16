@@ -1,17 +1,26 @@
 import { Meta } from "@storybook/react";
-import { PropsWithChildren, ReactNode, useState } from "react";
+import { PropsWithChildren, ReactNode, useMemo, useState } from "react";
 import { IconButton } from "src/components/IconButton";
-import { FullBleed } from "src/components/Layout/FullBleed";
 import { Tab, TabsWithContent } from "src/components/Tabs";
 import { Css } from "src/Css";
 import { FormLines } from "src/forms";
-import { PreventBrowserScroll, ScrollableContent, ScrollableParent } from "src/index";
+import {
+  FullBleed,
+  GridColumn,
+  GridDataRow,
+  GridTable,
+  PreventBrowserScroll,
+  ScrollableContent,
+  ScrollableParent,
+  SimpleHeaderAndDataOf,
+  useScrollableParent,
+} from "src/index";
 import { NumberField } from "src/inputs";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
   component: ScrollableParent,
-  title: "Components/NestedScroll",
+  title: "Components/Layout",
   decorators: [withBeamDecorator, withDimensions(), withRouter()],
   parameters: { layout: "fullscreen" },
 } as Meta;
@@ -61,6 +70,14 @@ export function EditableTableSize() {
       <ScrollableContent>
         <ScrollableTableExample numCols={cols} numRows={rows} />
       </ScrollableContent>
+    </TestProjectLayout>
+  );
+}
+
+export function VirtualizedScrolling() {
+  return (
+    <TestProjectLayout>
+      <VirutalizedPage />
     </TestProjectLayout>
   );
 }
@@ -150,6 +167,52 @@ function TableExample({ numCols = 10, numRows = 100 }: { numCols?: number; numRo
       </tbody>
     </table>
   );
+}
+
+function VirutalizedPage() {
+  const { pl } = useScrollableParent();
+  return (
+    <>
+      <TestHeader title="Change Event - Mud Room" />
+      <p>Content above the table</p>
+      {/*
+        Providing a <ScrollableContent> wrapper here isn't really necessary,
+        as the Virtualized component will provides its own scrolling behavior.
+        Though, because we want to wrap the VirtualizedTable in an element to provide some consistent padding,
+        that means we need to set h100 on the wrapping element. Since setting h100 means it'll take the full height of the parent,
+        then it's better to wrap in ScrollableContent because ScrollableContent's height is based on the remaining space available in the viewport. But...
+
+        Side note: Even removing <ScrollableContent /> here and keeping the wrapping div with `h100` seems to work.
+        I am kind of perplexed on why `h100` isn't taking up 100% of the parent container, but somehow taking up just the remaining space.
+        For example, my parent container is 868px. Within this container I have the <TestHeader /> and <p>, then the `h100` div below.
+        That `h100` was translating to '735px', though if I set the `height: 10%`, then it translates to 86.8px. (if 10% is 86.8 how is 100% 735???)
+        Because I am unsure why/how ends up taking up the correct amount of space, I would push to continue to wrap inside of <ScrollableContent />
+        ¯\_(ツ)_/¯
+      */}
+      <ScrollableContent>
+        {/* To prevent Virtuoso's scrollbar from being set in based on the Layout's padding, we will use the FullBleed component w/o padding to push it back over */}
+        <FullBleed omitPadding>
+          <div css={Css.h100.pl(pl).$}>
+            <VirutalizedTable />
+          </div>
+        </FullBleed>
+      </ScrollableContent>
+    </>
+  );
+}
+
+type Row = SimpleHeaderAndDataOf<{ name: string }>;
+function VirutalizedTable() {
+  const rows: GridDataRow<Row>[] = useMemo(
+    () => [
+      { kind: "header", id: "header" },
+      ...zeroTo(500).map((i) => ({ kind: "data" as const, id: String(i), name: `ccc ${i}` })),
+    ],
+    [],
+  );
+  const columns: GridColumn<Row>[] = useMemo(() => [{ header: "Name", data: ({ name }) => name }], []);
+
+  return <GridTable as="virtual" columns={columns} stickyHeader={true} rows={rows} />;
 }
 
 function TestLayout({ children }: PropsWithChildren<{}>) {
