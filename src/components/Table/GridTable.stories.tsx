@@ -205,7 +205,7 @@ export function NestedRows() {
   );
 }
 
-export function NestedCards() {
+export function NestedCardsThreeLevels() {
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
     parent: (row) => ({
@@ -243,6 +243,65 @@ export function NestedCards() {
     },
   };
 
+  return (
+    <GridTable
+      columns={[nameColumn, nameColumn, actionColumn]}
+      {...{ rows }}
+      style={nestedStyle}
+      sorting={{ on: "client", initial: [0, "ASC"] }}
+    />
+  );
+}
+
+export function NestedCardsTwoLevels() {
+  const nameColumn: GridColumn<NestedRow> = {
+    header: () => "Name",
+    parent: (row) => ({
+      content: <div css={Css.base.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    child: (row) => ({
+      content: <div css={Css.sm.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    grandChild: (row) => ({
+      content: <div css={Css.xs.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    add: () => "Add",
+  };
+  const actionColumn: GridColumn<NestedRow> = {
+    header: () => "Action",
+    parent: () => "",
+    child: () => "",
+    grandChild: () => <div css={Css.xs.$}>Delete</div>,
+    add: () => "",
+    clientSideSort: false,
+  };
+  const spacing = { brPx: 4, pxPx: 4, spacerPx: 1 };
+  const nestedStyle: GridStyle = {
+    nestedCards: {
+      topLevelSpacerPx: 8,
+      kinds: {
+        parent: { bgColor: Palette.Gray100, ...spacing },
+        child: { bgColor: Palette.White, ...spacing },
+      },
+    },
+  };
+  const rows: GridDataRow<NestedRow>[] = [
+    { kind: "header", id: "header" },
+    {
+      ...{ kind: "parent", id: "p1", name: "parent 1" },
+      children: [
+        { kind: "child", id: "p1c1", name: "child p1c1" },
+        { kind: "child", id: "p1c2", name: "child p1c2" },
+      ],
+    },
+    {
+      ...{ kind: "parent", id: "p2", name: "parent 2" },
+      children: [{ kind: "child", id: "p2c1", name: "child p2c1" }],
+    },
+  ];
   return (
     <GridTable
       columns={[nameColumn, nameColumn, actionColumn]}
