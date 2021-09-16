@@ -222,6 +222,14 @@ export function NestedCards() {
     }),
     add: () => "Add",
   };
+  const actionColumn: GridColumn<NestedRow> = {
+    header: () => "Action",
+    parent: () => "",
+    child: () => "",
+    grandChild: () => <div css={Css.xs.$}>Delete</div>,
+    add: () => "",
+    clientSideSort: false,
+  };
   const spacing = { brPx: 4, pxPx: 8, spacerPx: 8 };
   const nestedStyle: GridStyle = {
     nestedCards: {
@@ -237,7 +245,7 @@ export function NestedCards() {
 
   return (
     <GridTable
-      columns={[nameColumn, nameColumn, nameColumn]}
+      columns={[nameColumn, nameColumn, actionColumn]}
       {...{ rows }}
       style={nestedStyle}
       sorting={{ on: "client", initial: [0, "ASC"] }}
