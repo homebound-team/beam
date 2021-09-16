@@ -10,6 +10,7 @@ export * from "./BoundSwitchField";
 export * from "./BoundTextAreaField";
 export * from "./BoundTextField";
 export * from "./BoundToggleChipGroupField";
+export * from "./FormHeading";
 export * from "./FormLines";
 export * from "./StaticField";
 export * from "./StaticLinkField";
