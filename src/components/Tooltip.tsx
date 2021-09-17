@@ -64,7 +64,12 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
   });
 
   return createPortal(
-    <div ref={popperRef} style={{ ...styles.popper, maxWidth: "320px" }} {...attributes.popper} css={Css.bgGray900.white.px1.py("4px").br4.xs.$}>
+    <div
+      ref={popperRef}
+      style={styles.popper}
+      {...attributes.popper}
+      css={Css.maxw("320px").bgGray900.white.px1.py("4px").br4.xs.z999.$}
+    >
       <div ref={setArrowRef} style={{ ...styles.arrow }} id="arrow" />
       {content}
     </div>,
