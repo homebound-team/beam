@@ -16,6 +16,7 @@ const ScrollableParentContext = createContext<ScrollableParentContextProps>({
 // Allow any css to be applied to the ScrollableParent container.
 interface ScrollableParentContextProviderProps {
   xss?: Properties;
+  // I.e. for blueprint we use the `main` tag in our layouts.
   tagName?: keyof JSX.IntrinsicElements;
 }
 
