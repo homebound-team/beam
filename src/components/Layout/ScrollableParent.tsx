@@ -16,9 +16,12 @@ const ScrollableParentContext = createContext<ScrollableParentContextProps>({
 // Allow any css to be applied to the ScrollableParent container.
 interface ScrollableParentContextProviderProps {
   xss?: Properties;
+  // I.e. for blueprint we use the `main` tag in our layouts.
+  tagName?: keyof JSX.IntrinsicElements;
 }
 
-export function ScrollableParent({ children, xss }: PropsWithChildren<ScrollableParentContextProviderProps>) {
+export function ScrollableParent(props: PropsWithChildren<ScrollableParentContextProviderProps>) {
+  const { children, xss, tagName: Tag = "div" as keyof JSX.IntrinsicElements } = props;
   const scrollableEl = useMemo(() => {
     const el = document.createElement("div");
     // Ensure this wrapping div takes up the full height of its container
@@ -38,11 +41,11 @@ export function ScrollableParent({ children, xss }: PropsWithChildren<Scrollable
       {/* mh0/mw0 will respect the flexbox boundaries of the "flex-direction" if set on a parent.
        * Otherwise, the flex-item's min-height/width is based on the content of the flex-item, which maybe overflow the container.
        * See https://stackoverflow.com/questions/42130384/why-should-i-specify-height-0-even-if-i-specified-flex-basis-0-in-css3-flexbox */}
-      <div css={{ ...Css.mh0.mw0.df.fdc.$, ...otherXss }}>
+      <Tag css={{ ...Css.mh0.mw0.df.fdc.$, ...otherXss }}>
         <div css={Css.pl(context.pl).pr(context.pr).$}>{children}</div>
         {/* Set fg1 to take up the remaining space in the viewport.*/}
         <div css={Css.fg1.overflowAuto.pl(context.pl).pr(context.pr).$} ref={scrollableRef}></div>
-      </div>
+      </Tag>
     </ScrollableParentContext.Provider>
   );
 }
