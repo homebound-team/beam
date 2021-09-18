@@ -460,7 +460,7 @@ function renderCssGrid<R extends Kinded>(
   return (
     <div
       css={{
-        ...Css.dg.gtc(calcGridColumns("div", columns, maxCardPadding)).$,
+        ...Css.dg.gtc(calcDivGridColumns(columns, maxCardPadding)).$,
         ...Css
           // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
           // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
@@ -615,7 +615,7 @@ const VirtualRoot = memoizeOne<
         ref={ref}
         style={style}
         css={{
-          ...Css.dg.gtc(calcGridColumns("virtual", columns, maxCardPadding)).$,
+          ...Css.dg.gtc(calcVirtualGridColumns(columns, maxCardPadding)).$,
           // Add an extra `> div` due to Item + itemContent both having divs
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
           // Add `display:contents` to Item to flatten it like we do GridRow
@@ -631,52 +631,83 @@ const VirtualRoot = memoizeOne<
   });
 });
 
-// Because of:
-// a) react-virtuoso puts the header in a different div than the normal rows, and
-// b) content-aware sizing just in general look look janky/constantly resize while scrolling
-// When we're as=virtual, we change our default + enforce only fixed-sized units (% and px)
-export function calcGridColumns(as: RenderAs, columns: GridColumn<any>[], maxCardPadding: number | undefined): string {
-  let defaultWidth = "auto";
-  const unit = as === "virtual" ? "px" : "fr";
+/**
+ * Creates a `grid-template-column` specific to our virtual output.
+ *
+ * Because of two things:
+ *
+ * a) react-virtuoso puts the header in a different div than the normal rows, and
+ *
+ * b) content-aware sizing just in general look janky/constantly resize while scrolling
+ *
+ * When we're as=virtual, we change our default + enforce only fixed-sized units (% and px)
+ */
+export function calcVirtualGridColumns(columns: GridColumn<any>[], maxCardPadding: number | undefined): string {
+  // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
+  // calc((100% - allOtherPercent - allOtherPx) * ((myFr / totalFr))`
+  //
+  // Which looks _a lot_ like how `fr` units just work out-of-the-box.
+  //
+  // Unfortunately, something about having our header & body rows in separate divs (which is controlled
+  // by react-virtuoso), even if they have the same width, for some reason `fr` units between the two
+  // will resolve every slightly differently, where as this approach they will match exactly.
+  const claimedPercentages = columns
+    .filter(({ w }) => typeof w === "string" && w.endsWith("%"))
+    .map(({ w }) => Number((w as string).replace("%", "")))
+    .reduce((a, b) => a + b, 0);
+  const claimedPixels = columns
+    .filter(({ w }) => typeof w === "string" && w.endsWith("px"))
+    .map(({ w }) => Number((w as string).replace("px", "")))
+    .reduce((a, b) => a + b, 0);
+  const totalFr = columns
+    .filter(({ w }) => typeof w === "undefined" || typeof w === "number" || (typeof w === "string" && w.endsWith("fr")))
+    .map(({ w }) =>
+      typeof w === "undefined" ? 1 : typeof w === "number" ? w : Number((w as string).replace("fr", "")),
+    )
+    .reduce((a, b) => a + b, 0);
 
-  if (as === "virtual") {
-    // Set the default with to a cute `calc((100% - allOtherPercent - allOtherPx) / numAutoColumns)` expression
-    // This lets pages combine fixed width columns (px/%) with kinda-responsive "split the remaining" columns.
-    const claimedPercentages = columns
-      .filter(({ w }) => typeof w === "string" && w.endsWith("%"))
-      .map(({ w }) => Number((w as string).replace("%", "")))
-      .reduce((a, b) => a + b, 0);
-    const claimedPixels = columns
-      .filter(({ w }) => typeof w === "number" || (typeof w === "string" && w.endsWith("px")))
-      .map(({ w }) => (typeof w === "number" ? w : Number((w as string).replace("px", ""))))
-      .reduce((a, b) => a + b, 0);
-    const defaultColumns = columns.filter(({ w }) => w === undefined).length;
-    if (claimedPixels === 0 && claimedPercentages === 0) {
-      defaultWidth = `${(1 / columns.length) * 100}%`;
-    } else {
-      defaultWidth = `calc((100% - ${claimedPercentages}% - ${claimedPixels}px) / ${defaultColumns})`;
-    }
+  function fr(myFr: number): string {
+    return `calc((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
   let sizes = columns.map(({ w }) => {
     if (typeof w === "undefined") {
-      return defaultWidth;
-    }
-    if (typeof w === "string") {
+      return fr(1);
+    } else if (typeof w === "string") {
       if (w.endsWith("%") || w.endsWith("px")) {
         return w;
+      } else if (w.endsWith("fr")) {
+        return fr(Number(w.replace("fr", "")));
       } else {
-        throw new Error("as=virtual only supports px or percentage units");
+        throw new Error("as=virtual only supports px, percentage, or fr units");
       }
     } else {
-      return `${w}${unit}`;
+      return fr(w);
     }
   });
-  // If we're doing nested cards, we add extra 1st/last cells...
-  if (maxCardPadding) {
-    sizes = [`${maxCardPadding}px`, ...sizes, `${maxCardPadding}px`];
-  }
-  return sizes.join(" ");
+
+  return maybeAddCardColumns(sizes, maxCardPadding);
+}
+
+export function calcDivGridColumns(columns: GridColumn<any>[], maxCardPadding: number | undefined): string {
+  const sizes = columns.map(({ w }) => {
+    if (typeof w === "undefined") {
+      // Hrm, I waffle between 'auto' or '1fr' being the better default here...
+      return "auto";
+    } else if (typeof w === "string") {
+      // Use whatever the user passed in
+      return w;
+    } else {
+      // Otherwise assume fr units
+      return `${w}fr`;
+    }
+  });
+  return maybeAddCardColumns(sizes, maxCardPadding);
+}
+
+// If we're doing nested cards, we add extra 1st/last cells...
+function maybeAddCardColumns(sizes: string[], maxCardPadding: number | undefined): string {
+  return (!maxCardPadding ? sizes : [`${maxCardPadding}px`, ...sizes, `${maxCardPadding}px`]).join(" ");
 }
 
 /**
@@ -721,13 +752,13 @@ export type GridColumn<R extends Kinded, S = {}> = {
    *
    * For `as=virtual` output:
    *
-   * - Only px or percentage units are supported, due to a) react-virtuoso puts the sticky header
+   * - Only px, percentage, or fr units are supported, due to a) react-virtuoso puts the sticky header
    * rows in a separate `div` and so we end up with two `grid-template-columns`, so cannot rely on
    * any content-aware sizing, and b) content-aware sizing in a scrolling/virtual table results in
    * a ~janky experience as the columns will constantly resize as new/different content is put in/out
    * of the DOM.
-   * - Numbers are treated as `px` units
-   * - The default value is `(1 / numberOfColumns) * 100`, i.e. even percentage width of all columns.
+   * - Numbers are treated as `fr` units
+   * - The default value is `1fr`
    */
   w?: number | string;
   /** The column's default alignment for each cell. */
