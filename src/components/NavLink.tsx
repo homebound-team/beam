@@ -83,7 +83,7 @@ const navLinkVariantStyles: Record<
   { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; focusRingStyles: {}; activeStyles: {}; pressedStyles: {} }
 > = {
   side: {
-    baseStyles: { ...baseStyles, ...Css.wPx(184).gray700.$ },
+    baseStyles: { ...baseStyles, ...Css.gray700.$ },
     activeStyles: Css.lightBlue700.bgLightBlue50.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
     focusRingStyles: Css.bgLightBlue50.bshFocus.$,
