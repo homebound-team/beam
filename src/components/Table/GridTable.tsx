@@ -460,7 +460,7 @@ function renderCssGrid<R extends Kinded>(
   return (
     <div
       css={{
-        ...Css.dg.gtc(calcGridColumns(columns, maxCardPadding)).$,
+        ...Css.dg.gtc(calcGridColumns("div", columns, maxCardPadding)).$,
         ...Css
           // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
           // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
@@ -615,7 +615,7 @@ const VirtualRoot = memoizeOne<
         ref={ref}
         style={style}
         css={{
-          ...Css.dg.gtc(calcGridColumns(columns, maxCardPadding)).$,
+          ...Css.dg.gtc(calcGridColumns("virtual", columns, maxCardPadding)).$,
           // Add an extra `> div` due to Item + itemContent both having divs
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
           // Add `display:contents` to Item to flatten it like we do GridRow
@@ -631,10 +631,26 @@ const VirtualRoot = memoizeOne<
   });
 });
 
-function calcGridColumns(columns: GridColumn<any>[], maxCardPadding: number | undefined): string {
-  let sizes = columns.map((c) => {
-    // Default to auto, but use `c.w` as a fr if numeric or else `c.w` as-if if a string
-    return typeof c.w === "string" ? c.w : c.w !== undefined ? `${c.w}fr` : "auto";
+export function calcGridColumns(as: RenderAs, columns: GridColumn<any>[], maxCardPadding: number | undefined): string {
+  // Because of:
+  // a) react-virtuoso puts the header in a different div than the normal rows, and
+  // b) content-aware sizing just in general look look janky/constantly resize while scrolling
+  // When we're as=virtual, we change our default + enforce only fixed-sized units (% and px)
+  const defaultWidth = as === "virtual" ? `${(1 / columns.length) * 100}%` : "auto";
+  const unit = as === "virtual" ? "px" : "fr";
+  let sizes = columns.map(({ w }) => {
+    if (typeof w === "undefined") {
+      return defaultWidth;
+    }
+    if (typeof w === "string") {
+      if (w.endsWith("%") || w.endsWith("px")) {
+        return w;
+      } else {
+        throw new Error("as=virtual only supports px or percentage units");
+      }
+    } else {
+      return `${w}${unit}`;
+    }
   });
   // If we're doing nested cards, we add extra 1st/last cells...
   if (maxCardPadding) {
@@ -674,7 +690,25 @@ export type GridColumn<R extends Kinded, S = {}> = {
         ? (data: D, row: GridRowKind<R, K>) => ReactNode | GridCellContent
         : (row: GridRowKind<R, K>) => ReactNode | GridCellContent);
 } & {
-  /** The column's grid column width, defaults to `auto`. */
+  /**
+   * The column's grid column width.
+   *
+   * For `as=div` output:
+   *
+   * - Any CSS grid units are supported
+   * - Numbers are treated as `fr` units
+   * - The default value is `auto`, which in CSS grid will do content-aware/responsive layout.
+   *
+   * For `as=virtual` output:
+   *
+   * - Only px or percentage units are supported, due to a) react-virtuoso puts the sticky header
+   * rows in a separate `div` and so we end up with two `grid-template-columns`, so cannot rely on
+   * any content-aware sizing, and b) content-aware sizing in a scrolling/virtual table results in
+   * a ~janky experience as the columns will constantly resize as new/different content is put in/out
+   * of the DOM.
+   * - Numbers are treated as `px` units
+   * - The default value is `(1 / numberOfColumns) * 100`, i.e. even percentage width of all columns.
+   */
   w?: number | string;
   /** The column's default alignment for each cell. */
   align?: GridCellAlignment;

@@ -1,6 +1,7 @@
 import React, { MutableRefObject, useContext } from "react";
 import { GridRowLookup } from "src/components/Table/GridRowLookup";
 import {
+  calcGridColumns,
   GridCollapseContext,
   GridColumn,
   GridDataRow,
@@ -578,6 +579,40 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("b");
       expect(cell(r, 2, 0)).toHaveTextContent("c");
       expect(cell(r, 3, 0)).toHaveTextContent("a");
+    });
+  });
+
+  describe("gtc", () => {
+    it("as=div defaults to auto", () => {
+      expect(calcGridColumns("div", [{}, {}], undefined)).toEqual("auto auto");
+    });
+
+    it("as=virtual defaults to percentage widths", () => {
+      expect(calcGridColumns("virtual", [{}, {}], undefined)).toEqual("50% 50%");
+    });
+
+    it("as=div treats numbers as fr", () => {
+      expect(calcGridColumns("div", [{ w: 1 }, { w: 2 }] as any, undefined)).toEqual("1fr 2fr");
+    });
+
+    it("as=virtual treats numbers as pixels", () => {
+      expect(calcGridColumns("virtual", [{ w: 1 }, { w: 2 }] as any, undefined)).toEqual("1px 2px");
+    });
+
+    it("as=virtual accepts percentages ", () => {
+      expect(calcGridColumns("virtual", [{ w: "10%" }, { w: 2 }] as any, undefined)).toEqual("10% 2px");
+    });
+
+    it("as=virtual rejects relative units", () => {
+      expect(() => calcGridColumns("virtual", [{ w: "10fr" }, { w: 2 }] as any, undefined)).toThrow(
+        "as=virtual only supports px or percentage units",
+      );
+    });
+
+    it("as=virtual with both px and default", () => {
+      expect(calcGridColumns("virtual", [{ w: 200 }, {}, {}] as any, undefined)).toEqual(
+        "200px 33.33333333333333% 33.33333333333333%",
+      );
     });
   });
 
