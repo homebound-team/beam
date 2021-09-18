@@ -651,21 +651,26 @@ export function calcVirtualGridColumns(columns: GridColumn<any>[], maxCardPaddin
   // Unfortunately, something about having our header & body rows in separate divs (which is controlled
   // by react-virtuoso), even if they have the same width, for some reason `fr` units between the two
   // will resolve every slightly differently, where as this approach they will match exactly.
-  const claimedPercentages = columns
-    .filter(({ w }) => typeof w === "string" && w.endsWith("%"))
-    .map(({ w }) => Number((w as string).replace("%", "")))
-    .reduce((a, b) => a + b, 0);
-  const claimedPixels = columns
-    .filter(({ w }) => typeof w === "string" && w.endsWith("px"))
-    .map(({ w }) => Number((w as string).replace("px", "")))
-    .reduce((a, b) => a + b, 0);
-  const totalFr = columns
-    .filter(({ w }) => typeof w === "undefined" || typeof w === "number" || (typeof w === "string" && w.endsWith("fr")))
-    .map(({ w }) =>
-      typeof w === "undefined" ? 1 : typeof w === "number" ? w : Number((w as string).replace("fr", "")),
-    )
-    .reduce((a, b) => a + b, 0);
+  const { claimedPercentages, claimedPixels, totalFr } = columns.reduce(
+    (acc, { w }) => {
+      if (typeof w === "undefined") {
+        return { ...acc, totalFr: acc.totalFr + 1 };
+      } else if (typeof w === "number") {
+        return { ...acc, totalFr: acc.totalFr + w };
+      } else if (w.endsWith("fr")) {
+        return { ...acc, totalFr: acc.totalFr + Number(w.replace("fr", "")) };
+      } else if (w.endsWith("px")) {
+        return { ...acc, claimedPixels: acc.claimedPixels + Number(w.replace("px", "")) };
+      } else if (w.endsWith("%")) {
+        return { ...acc, claimedPercentages: acc.claimedPercentages + Number(w.replace("%", "")) };
+      } else {
+        throw new Error("as=virtual only supports px, percentage, or fr units");
+      }
+    },
+    { claimedPercentages: 0, claimedPixels: 0, totalFr: 0 },
+  );
 
+  // This is our "fake but for some reason it lines up better" fr calc
   function fr(myFr: number): string {
     return `calc((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
