@@ -610,9 +610,9 @@ describe("GridTable", () => {
     });
 
     it("as=virtual with both px and default", () => {
-      expect(calcGridColumns("virtual", [{ w: 200 }, {}, {}] as any, undefined)).toEqual(
-        "200px 33.33333333333333% 33.33333333333333%",
-      );
+      expect(
+        calcGridColumns("virtual", [{ w: 200 }, { w: "100px" }, { w: "10%" }, { w: "20%" }, {}, {}] as any, undefined),
+      ).toEqual("200px 100px 10% 20% calc((100% - 30% - 300px) / 2) calc((100% - 30% - 300px) / 2)");
     });
   });
 

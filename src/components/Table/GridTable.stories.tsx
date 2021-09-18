@@ -95,7 +95,7 @@ export function VirtualFiltering() {
   const columns: GridColumn<Row>[] = useMemo(
     () => [
       { header: "Name", data: ({ name }) => name, w: 200 },
-      { header: "Value", data: ({ value }) => value },
+      { header: "Value", data: ({ value }) => value, w: "10%" },
       { header: "Value", data: ({ value }) => value },
       { header: "Value", data: ({ value }) => value },
       { header: "Value", data: ({ value }) => value },

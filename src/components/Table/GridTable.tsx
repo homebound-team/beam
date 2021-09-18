@@ -631,13 +631,33 @@ const VirtualRoot = memoizeOne<
   });
 });
 
+// Because of:
+// a) react-virtuoso puts the header in a different div than the normal rows, and
+// b) content-aware sizing just in general look look janky/constantly resize while scrolling
+// When we're as=virtual, we change our default + enforce only fixed-sized units (% and px)
 export function calcGridColumns(as: RenderAs, columns: GridColumn<any>[], maxCardPadding: number | undefined): string {
-  // Because of:
-  // a) react-virtuoso puts the header in a different div than the normal rows, and
-  // b) content-aware sizing just in general look look janky/constantly resize while scrolling
-  // When we're as=virtual, we change our default + enforce only fixed-sized units (% and px)
-  const defaultWidth = as === "virtual" ? `${(1 / columns.length) * 100}%` : "auto";
+  let defaultWidth = "auto";
   const unit = as === "virtual" ? "px" : "fr";
+
+  if (as === "virtual") {
+    // Set the default with to a cute `calc((100% - allOtherPercent - allOtherPx) / numAutoColumns)` expression
+    // This lets pages combine fixed width columns (px/%) with kinda-responsive "split the remaining" columns.
+    const claimedPercentages = columns
+      .filter(({ w }) => typeof w === "string" && w.endsWith("%"))
+      .map(({ w }) => Number((w as string).replace("%", "")))
+      .reduce((a, b) => a + b, 0);
+    const claimedPixels = columns
+      .filter(({ w }) => typeof w === "number" || (typeof w === "string" && w.endsWith("px")))
+      .map(({ w }) => (typeof w === "number" ? w : Number((w as string).replace("px", ""))))
+      .reduce((a, b) => a + b, 0);
+    const defaultColumns = columns.filter(({ w }) => w === undefined).length;
+    if (claimedPixels === 0 && claimedPercentages === 0) {
+      defaultWidth = `${(1 / columns.length) * 100}%`;
+    } else {
+      defaultWidth = `calc((100% - ${claimedPercentages}% - ${claimedPixels}px) / ${defaultColumns})`;
+    }
+  }
+
   let sizes = columns.map(({ w }) => {
     if (typeof w === "undefined") {
       return defaultWidth;
