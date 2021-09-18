@@ -96,7 +96,7 @@ export function VirtualFiltering() {
     () => [
       { header: "Name", data: ({ name }) => name, w: "200px" },
       { header: "Value", data: ({ value }) => value, w: "10%" },
-      { header: "Value", data: ({ value }) => value },
+      { header: "Value", data: ({ value }) => value, w: "2fr" },
       { header: "Value", data: ({ value }) => value },
       { header: "Value", data: ({ value }) => value },
       { header: "Value", data: ({ value }) => value },
