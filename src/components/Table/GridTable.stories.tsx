@@ -95,10 +95,14 @@ export function VirtualFiltering() {
   const columns: GridColumn<Row>[] = useMemo(
     () => [
       { header: "Name", data: ({ name }) => name, w: "200px" },
-      { header: "Value", data: ({ value }) => value, w: "10%" },
-      { header: "Value", data: ({ value }) => `${value} `.repeat(10), w: "2fr" },
-      { header: "Value", data: ({ value }) => value },
-      { header: "Action", data: () => <div>Actions</div>, clientSideSort: false },
+      { header: "Value", data: ({ value }) => `${value} `.repeat(10) },
+      { header: "Value", data: ({ value }) => value, w: "200px" },
+      { header: "Value", data: ({ value }) => value, w: "200px" },
+      { header: "Value", data: ({ value }) => value, w: "200px" },
+      { header: "Value", data: ({ value }) => value, w: "200px" },
+      { header: "Value", data: ({ value }) => value, w: "200px" },
+      { header: "Value", data: ({ value }) => value, w: "200px" },
+      { header: "Action", data: () => <div>Actions</div>, clientSideSort: false, w: "100px" },
     ],
     [],
   );

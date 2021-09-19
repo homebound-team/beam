@@ -957,6 +957,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
           ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
+          // Frozen prototype
+          ...(columnIndex === 0 ? Css.sticky.z1.left0.bgWhite.$ : {}),
+          ...(columnIndex === columns.length - 1 ? Css.sticky.z1.right0.w100.bgWhite.$ : {}),
+          ...(columnIndex === 0 && isHeader ? Css.z2.$ : {}),
           // If we're within a card, use its background color
           ...(currentCard && Css.bgColor(currentCard.bgColor).$),
           // And finally the specific cell's css (if any from GridCellContent)
