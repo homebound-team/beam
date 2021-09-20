@@ -2,13 +2,13 @@ import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRe
 import { Css, Properties } from "src/Css";
 
 interface ScrollableParentContextProps {
-  scrollableEl: HTMLElement;
+  scrollableEl: HTMLElement | null;
   pr: string | number;
   pl: string | number;
 }
 
 const ScrollableParentContext = createContext<ScrollableParentContextProps>({
-  scrollableEl: document.createElement("div"),
+  scrollableEl: null,
   pr: 0,
   pl: 0,
 });

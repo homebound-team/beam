@@ -11,8 +11,14 @@ export function ScrollableContent({
 }: {
   children: ReactNode;
   virtualized?: boolean;
-}): ReactPortal {
+}): ReactPortal | JSX.Element {
   const { scrollableEl, pl } = useScrollableParent();
+
+  // Escape hatch specifically for tests where a "ScrollableParent" context may not be present.
+  if (!scrollableEl) {
+    return <>{children}</>;
+  }
+
   return createPortal(
     !virtualized ? (
       children
