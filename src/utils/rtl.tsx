@@ -1,6 +1,6 @@
 import { RenderResult, Wrapper } from "@homebound/rtl-utils";
 import { prettyDOM } from "@testing-library/react";
-import { BeamProvider } from "src/components";
+import { BeamProvider, ScrollableParent } from "src/components";
 export * from "@homebound/rtl-react-router-utils";
 export * from "@homebound/rtl-utils";
 
@@ -30,5 +30,9 @@ export function rowAnd(r: RenderResult, row: number, testId: string): HTMLElemen
 
 /** RTL wrapper for Beam's SuperDrawer/Modal context. */
 export const withBeamRTL: Wrapper = {
-  wrap: (c) => <BeamProvider>{c}</BeamProvider>,
+  wrap: (c) => (
+    <BeamProvider>
+      <ScrollableParent>{c}</ScrollableParent>
+    </BeamProvider>
+  ),
 };
