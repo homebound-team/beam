@@ -2,6 +2,7 @@ import { Meta } from "@storybook/react";
 import { Fragment } from "react";
 import { navLink } from "src/components";
 import { Css } from "src/Css";
+import { withRouter } from "src/utils/sb";
 import { Icon, Icons } from "./Icon";
 import { getNavLinkStyles, NavLink, NavLinkProps } from "./NavLink";
 
@@ -20,6 +21,7 @@ export default {
     // To better view the hover state
     backgrounds: { default: "white" },
   },
+  decorators: [withRouter()],
 } as Meta;
 
 export function BaseStates() {
