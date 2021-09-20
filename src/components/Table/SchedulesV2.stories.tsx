@@ -1,5 +1,8 @@
+import { DragEventHandler } from "@reach/router/node_modules/@types/react";
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
+import { arrayMoveImmutable } from "array-move";
+import { useState } from "react";
 import { CollapseToggle, GridStyle, GridTable } from "src/components/Table";
 import { Css, Palette } from "src/Css";
 import { Checkbox } from "src/inputs";
@@ -185,6 +188,7 @@ export function SchedulesV2() {
     </div>
   );
 }
+SchedulesV2.storyName = "SchedulesV2";
 
 /**
  * Example table using the same approach as GridTable to test out drag libraries
@@ -234,25 +238,37 @@ export function Draggable1() {
     </div>
   );
 }
-Draggable1.storyName = "Draggability - HTML Attribute";
+Draggable1.storyName = "Draggability - HTML Draggable Attribute on Row";
 
 /**
  * Example table using the same approach as GridTable to test out drag libraries
  *
  * Approach #2: HTML Draggable Attribute on First Cell
- * This approach does work, we do lose the niceness of the drag image since we
- * are only dragging the cell itself vs the rows. There are ways to change the
- * dragImage https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API#define_the_drag_image
- * which might help make it better.
+ * This approach does work, we do lose the niceness of the row drag image since we
+ * are only dragging the cell itself vs the rows.
  *
  * Learnings:
  * - `display: contents` rows can still be used for hover detection.
  * - Div's withing `display: contents` are fully draggable.
- * - Maybe try changing the dragImage?
+ * - Changing the dragImage is very usable.
+ *
+ * TODO:
+ * - Remove row highlight styles on end
  */
 export function Draggable2() {
-  const columns = ["Task", "Start", "End", "Duration", "Milestone"];
-  const rows = zeroTo(5).map((i) => columns.map((c) => `${c}#${i}`));
+  const columns = ["", "Task", "Start", "End", "Duration", "Milestone"];
+  const [rows, setRows] = useState(() => zeroTo(5).map((i) => columns.map((c) => `${c}#${i}`)));
+
+  const addDragHoverStyles: DragEventHandler<HTMLDivElement> = (e) =>
+    e.currentTarget.childNodes.forEach((cn) => {
+      // Set border bottom
+      cn.style.borderBottom = "1px solid red";
+    });
+  const removeDragHoverStyles: DragEventHandler<HTMLDivElement> = (e) =>
+    e.currentTarget!.childNodes.forEach((cn) => {
+      // Remove border bottom
+      cn.style.borderBottom = null;
+    });
 
   return (
     // Grid Container
@@ -264,7 +280,7 @@ export function Draggable2() {
         </div>
       ))}
       {/* Grid Items - Rows */}
-      {rows.map((row) => (
+      {rows.map((row, rowIndex) => (
         <div
           key={row.toString()}
           style={{
@@ -272,24 +288,64 @@ export function Draggable2() {
             // This allows us to wrap all of the children for a single row
             display: "contents",
           }}
-          onDragEnter={(e) => e.currentTarget.childNodes.forEach((cn) => (cn.style.backgroundColor = "red"))}
-          onDragLeave={(e) => e.currentTarget.childNodes.forEach((cn) => (cn.style.backgroundColor = null))}
+          onDragEnter={addDragHoverStyles}
+          onDragLeave={removeDragHoverStyles}
+          // This allows us to drop on a row
+          onDragOver={(e) => e.preventDefault()}
+          // Handle when an element is dropped over it
+          onDrop={(e) => {
+            // Find the dropped row index
+            const fromRowIndex = parseInt(e.dataTransfer.getData("text"));
+            // Find where the dropped row wants to be
+            const toRowIndex = rowIndex;
+
+            // Reorder rows
+            setRows((prev) => arrayMoveImmutable(prev, fromRowIndex, toRowIndex));
+          }}
         >
           {/* Grid Item - Cell */}
-          {row.map((cell, i) => (
+          {row.map((cell, cellIndex) => (
             // Only making the first column draggable
             <div
               key={cell.toString()}
-              draggable={i % 5 === 0}
-              style={
-                i % 5 === 0
-                  ? {
-                      cursor: "grab",
-                    }
-                  : {}
-              }
+              // Setting borders so drag row highlights won't vertically shift
+              css={Css.bt.bb.bc("transparent").$}
+              // Setting the first cell to be draggable
+              draggable={cellIndex % columns.length === 0}
+              // Setting the first cell to use a drag cursor
+              style={{ cursor: cellIndex % columns.length === 0 ? "grab" : "auto" }}
+              onDragStart={async (e) => {
+                // This removed the + icon which appears when dragging
+                e.dataTransfer.dropEffect = "none";
+                e.dataTransfer.effectAllowed = "move";
+
+                // Save the rowIndex
+                e.dataTransfer.setData("text", String(rowIndex));
+
+                // Setting the drag image as the task column
+                e.dataTransfer.setDragImage(e.currentTarget.nextSibling!, 0, 0);
+
+                /* TODO: Attempting to use html2Canvas to get an image of the row
+                  did not result an a render-able image (because of `display: contents`)
+                  since we can render an image of the body or table.
+
+                  On way around this could be to take an image of the table and
+                  crop the image to the row only to get around the `display: contents`.
+
+                  Below does not work.
+                */
+                // const parentRow = e.currentTarget.parentElement!;
+                // const canvas = await html2canvas(parentRow);
+                // const img = new Image();
+                // img.src = canvas.toDataURL();
+                // document.body.append(img);
+                // e.dataTransfer.setDragImage(img, 0, 0);
+
+                // Here's an example of using the table as the drag image
+                // e.dataTransfer.setDragImage(document.getElementById("table")!, 0, 0);
+              }}
             >
-              {i % 5 === 0 ? <Icon icon="drag" /> : cell}
+              {cellIndex % columns.length === 0 ? <Icon icon="drag" /> : cell}
             </div>
           ))}
         </div>
@@ -297,7 +353,7 @@ export function Draggable2() {
     </div>
   );
 }
-Draggable2.storyName = "Draggability - HTML Attribute Hack";
+Draggable2.storyName = "Draggability - HTML Draggable Attribute on First Cell";
 
 /**** Utils *****/
 function createTasks(howMany: number, subGroup: string, milestone: string, COUNTER: number): TaskRow[] {
