@@ -2,13 +2,30 @@
 
 exports[`RadioGroupField renders with just labels 1`] = `
 .emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.emotion-1 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.emotion-2 {
   max-width: 320px;
   width: -webkit-max-content;
   width: -moz-max-content;
   width: max-content;
 }
 
-.emotion-1 {
+.emotion-3 {
   color: rgba(100,100,100,1);
   display: inline-block;
   font-size: 14px;
@@ -17,7 +34,7 @@ exports[`RadioGroupField renders with just labels 1`] = `
   margin-bottom: 4px;
 }
 
-.emotion-2 {
+.emotion-4 {
   cursor: pointer;
   display: -webkit-box;
   display: -webkit-flex;
@@ -26,7 +43,7 @@ exports[`RadioGroupField renders with just labels 1`] = `
   margin-bottom: 8px;
 }
 
-.emotion-3 {
+.emotion-5 {
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -65,14 +82,14 @@ exports[`RadioGroupField renders with just labels 1`] = `
   margin-top: 2px;
 }
 
-.emotion-4 {
+.emotion-6 {
   color: rgba(53,53,53,1);
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
 }
 
-.emotion-6 {
+.emotion-8 {
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -106,6 +123,16 @@ exports[`RadioGroupField renders with just labels 1`] = `
   margin-top: 2px;
 }
 
+.emotion-10 {
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  overflow: auto;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
 <body>
   <div>
     <div
@@ -114,62 +141,77 @@ exports[`RadioGroupField renders with just labels 1`] = `
       <div
         class="emotion-0"
       >
-        <label
-          class="emotion-1"
-          data-testid="favoriteCheese_label"
-          id="react-aria-2"
-        >
-          Favorite cheese
-        </label>
         <div
-          aria-labelledby="react-aria-2"
-          aria-orientation="vertical"
-          id="react-aria-1"
-          role="radiogroup"
+          class="emotion-1"
         >
-          <label
+          <div
             class="emotion-2"
           >
-            <input
-              aria-labelledby="radio-group-1-a-label"
-              checked=""
+            <label
               class="emotion-3"
-              data-testid="favoriteCheese_a"
-              name="react-aria-3"
-              tabindex="0"
-              type="radio"
-              value="a"
-            />
-            <div>
-              <div
+              data-testid="favoriteCheese_label"
+              id="react-aria-2"
+            >
+              Favorite cheese
+            </label>
+            <div
+              aria-labelledby="react-aria-2"
+              aria-orientation="vertical"
+              id="react-aria-1"
+              role="radiogroup"
+            >
+              <label
                 class="emotion-4"
-                id="radio-group-1-a-label"
               >
-                Asiago
-              </div>
-            </div>
-          </label>
-          <label
-            class="emotion-2"
-          >
-            <input
-              aria-labelledby="radio-group-1-b-label"
-              class="emotion-6"
-              data-testid="favoriteCheese_b"
-              name="react-aria-3"
-              tabindex="0"
-              type="radio"
-              value="b"
-            />
-            <div>
-              <div
+                <input
+                  aria-labelledby="radio-group-1-a-label"
+                  checked=""
+                  class="emotion-5"
+                  data-testid="favoriteCheese_a"
+                  name="react-aria-3"
+                  tabindex="0"
+                  type="radio"
+                  value="a"
+                />
+                <div>
+                  <div
+                    class="emotion-6"
+                    id="radio-group-1-a-label"
+                  >
+                    Asiago
+                  </div>
+                </div>
+              </label>
+              <label
                 class="emotion-4"
-                id="radio-group-1-b-label"
               >
-                Burratta
-              </div>
+                <input
+                  aria-labelledby="radio-group-1-b-label"
+                  class="emotion-8"
+                  data-testid="favoriteCheese_b"
+                  name="react-aria-3"
+                  tabindex="0"
+                  type="radio"
+                  value="b"
+                />
+                <div>
+                  <div
+                    class="emotion-6"
+                    id="radio-group-1-b-label"
+                  >
+                    Burratta
+                  </div>
+                </div>
+              </label>
             </div>
-          </label>
+          </div>
+        </div>
+        <div
+          class="emotion-10"
+        >
+          <div
+            style="height: 100%;"
+          />
         </div>
       </div>
     </div>
@@ -179,13 +221,30 @@ exports[`RadioGroupField renders with just labels 1`] = `
 
 exports[`RadioGroupField renders with just labels and description 1`] = `
 .emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.emotion-1 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.emotion-2 {
   max-width: 344px;
   width: -webkit-max-content;
   width: -moz-max-content;
   width: max-content;
 }
 
-.emotion-1 {
+.emotion-3 {
   color: rgba(100,100,100,1);
   display: inline-block;
   font-size: 14px;
@@ -194,7 +253,7 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
   margin-bottom: 4px;
 }
 
-.emotion-2 {
+.emotion-4 {
   cursor: pointer;
   display: -webkit-box;
   display: -webkit-flex;
@@ -203,7 +262,7 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
   margin-bottom: 8px;
 }
 
-.emotion-3 {
+.emotion-5 {
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -242,14 +301,14 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
   margin-top: 2px;
 }
 
-.emotion-4 {
+.emotion-6 {
   color: rgba(53,53,53,1);
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
 }
 
-.emotion-6 {
+.emotion-8 {
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -283,11 +342,21 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
   margin-top: 2px;
 }
 
-.emotion-8 {
+.emotion-10 {
   color: rgba(100,100,100,1);
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
+}
+
+.emotion-11 {
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  overflow: auto;
+  padding-left: 0px;
+  padding-right: 0px;
 }
 
 <body>
@@ -298,69 +367,84 @@ exports[`RadioGroupField renders with just labels and description 1`] = `
       <div
         class="emotion-0"
       >
-        <label
-          class="emotion-1"
-          data-testid="favoriteCheese_label"
-          id="react-aria-5"
-        >
-          Favorite cheese
-        </label>
         <div
-          aria-labelledby="react-aria-5"
-          aria-orientation="vertical"
-          id="react-aria-4"
-          role="radiogroup"
+          class="emotion-1"
         >
-          <label
+          <div
             class="emotion-2"
           >
-            <input
-              aria-labelledby="radio-group-2-a-label"
-              checked=""
+            <label
               class="emotion-3"
-              data-testid="favoriteCheese_a"
-              name="react-aria-6"
-              tabindex="0"
-              type="radio"
-              value="a"
-            />
-            <div>
-              <div
+              data-testid="favoriteCheese_label"
+              id="react-aria-5"
+            >
+              Favorite cheese
+            </label>
+            <div
+              aria-labelledby="react-aria-5"
+              aria-orientation="vertical"
+              id="react-aria-4"
+              role="radiogroup"
+            >
+              <label
                 class="emotion-4"
-                id="radio-group-2-a-label"
               >
-                Asiago
-              </div>
-            </div>
-          </label>
-          <label
-            class="emotion-2"
-          >
-            <input
-              aria-labelledby="radio-group-2-b-label"
-              class="emotion-6"
-              data-testid="favoriteCheese_b"
-              name="react-aria-6"
-              tabindex="0"
-              type="radio"
-              value="b"
-            />
-            <div>
-              <div
-                aria-describedby="radio-group-2-b-description"
+                <input
+                  aria-labelledby="radio-group-2-a-label"
+                  checked=""
+                  class="emotion-5"
+                  data-testid="favoriteCheese_a"
+                  name="react-aria-6"
+                  tabindex="0"
+                  type="radio"
+                  value="a"
+                />
+                <div>
+                  <div
+                    class="emotion-6"
+                    id="radio-group-2-a-label"
+                  >
+                    Asiago
+                  </div>
+                </div>
+              </label>
+              <label
                 class="emotion-4"
-                id="radio-group-2-b-label"
               >
-                Burratta
-              </div>
-              <div
-                class="emotion-8"
-                id="radio-group-2-b-description"
-              >
-                Burrata is an Italian cow milk cheese made from mozzarella and cream.
-              </div>
+                <input
+                  aria-labelledby="radio-group-2-b-label"
+                  class="emotion-8"
+                  data-testid="favoriteCheese_b"
+                  name="react-aria-6"
+                  tabindex="0"
+                  type="radio"
+                  value="b"
+                />
+                <div>
+                  <div
+                    aria-describedby="radio-group-2-b-description"
+                    class="emotion-6"
+                    id="radio-group-2-b-label"
+                  >
+                    Burratta
+                  </div>
+                  <div
+                    class="emotion-10"
+                    id="radio-group-2-b-description"
+                  >
+                    Burrata is an Italian cow milk cheese made from mozzarella and cream.
+                  </div>
+                </div>
+              </label>
             </div>
-          </label>
+          </div>
+        </div>
+        <div
+          class="emotion-11"
+        >
+          <div
+            style="height: 100%;"
+          />
         </div>
       </div>
     </div>

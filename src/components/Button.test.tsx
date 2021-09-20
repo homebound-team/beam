@@ -5,18 +5,18 @@ import { useTestIds } from "src/utils/useTestIds";
 describe("Button", () => {
   it("can have a data-testid", async () => {
     const r = await render(<Button label="Button" data-testid="custom" />);
-    expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("custom");
+    expect(r.baseElement.getElementsByTagName("button")[0].getAttribute("data-testid")).toEqual("custom");
   });
 
   it("defaults data-testid to the label", async () => {
     const r = await render(<Button label="Button" />);
-    expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("button");
+    expect(r.baseElement.getElementsByTagName("button")[0].getAttribute("data-testid")).toEqual("button");
   });
 
   it("can accept prefixed test ids", async () => {
     const testIds = useTestIds({}, "page1");
     const r = await render(<Button label="Button" {...testIds.custom} />);
-    expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("page1_custom");
+    expect(r.baseElement.getElementsByTagName("button")[0].getAttribute("data-testid")).toEqual("page1_custom");
   });
 
   it("fires onClick method", async () => {

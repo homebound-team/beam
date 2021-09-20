@@ -23,6 +23,23 @@ describe("NestedCards", () => {
     const r = await render(makeOpenOrCloseCard([parentCardStyle], "open"));
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-height: 0;
+        min-width: 0;
+      }
+
+      .emotion-1 {
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
+      .emotion-2 {
         background-color: rgba(247,245,245,1);
         padding-left: 8px;
         padding-right: 8px;
@@ -31,13 +48,38 @@ describe("NestedCards", () => {
         height: 8px;
       }
 
+      .emotion-3 {
+        -webkit-box-flex: 1;
+        -webkit-flex-grow: 1;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+        overflow: auto;
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
       <div
         data-overlay-container="true"
       >
         <div
           class="emotion-0"
         >
-          <div />
+          <div
+            class="emotion-1"
+          >
+            <div
+              class="emotion-2"
+            >
+              <div />
+            </div>
+          </div>
+          <div
+            class="emotion-3"
+          >
+            <div
+              style="height: 100%;"
+            />
+          </div>
         </div>
       </div>
     `);
@@ -47,12 +89,29 @@ describe("NestedCards", () => {
     const r = await render(makeOpenOrCloseCard([parentCardStyle, childCardStyle], "open"));
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-height: 0;
+        min-width: 0;
+      }
+
+      .emotion-1 {
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
+      .emotion-2 {
         background-color: rgba(247,245,245,1);
         padding-left: 8px;
         padding-right: 8px;
       }
 
-      .emotion-1 {
+      .emotion-3 {
         background-color: rgba(221,220,220,1);
         padding-left: 6px;
         padding-right: 6px;
@@ -68,6 +127,16 @@ describe("NestedCards", () => {
         border-top-width: 1px;
       }
 
+      .emotion-4 {
+        -webkit-box-flex: 1;
+        -webkit-flex-grow: 1;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+        overflow: auto;
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
       <div
         data-overlay-container="true"
       >
@@ -77,7 +146,22 @@ describe("NestedCards", () => {
           <div
             class="emotion-1"
           >
-            <div />
+            <div
+              class="emotion-2"
+            >
+              <div
+                class="emotion-3"
+              >
+                <div />
+              </div>
+            </div>
+          </div>
+          <div
+            class="emotion-4"
+          >
+            <div
+              style="height: 100%;"
+            />
           </div>
         </div>
       </div>
@@ -88,18 +172,45 @@ describe("NestedCards", () => {
     const r = await render(maybeAddCardPadding([parentCardStyle, childCardStyle], "first"));
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-height: 0;
+        min-width: 0;
+      }
+
+      .emotion-1 {
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
+      .emotion-2 {
         background-color: rgba(247,245,245,1);
         height: 100%;
         padding-left: 8px;
       }
 
-      .emotion-1 {
+      .emotion-3 {
         background-color: rgba(221,220,220,1);
         border-color: rgba(236,235,235,1);
         height: 100%;
         border-left-style: solid;
         border-left-width: 1px;
         padding-left: 6px;
+      }
+
+      .emotion-4 {
+        -webkit-box-flex: 1;
+        -webkit-flex-grow: 1;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+        overflow: auto;
+        padding-left: 0px;
+        padding-right: 0px;
       }
 
       <div
@@ -111,7 +222,22 @@ describe("NestedCards", () => {
           <div
             class="emotion-1"
           >
-            <div />
+            <div
+              class="emotion-2"
+            >
+              <div
+                class="emotion-3"
+              >
+                <div />
+              </div>
+            </div>
+          </div>
+          <div
+            class="emotion-4"
+          >
+            <div
+              style="height: 100%;"
+            />
           </div>
         </div>
       </div>
@@ -122,18 +248,45 @@ describe("NestedCards", () => {
     const r = await render(maybeAddCardPadding([parentCardStyle, childCardStyle], "final"));
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-height: 0;
+        min-width: 0;
+      }
+
+      .emotion-1 {
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
+      .emotion-2 {
         background-color: rgba(247,245,245,1);
         height: 100%;
         padding-right: 8px;
       }
 
-      .emotion-1 {
+      .emotion-3 {
         background-color: rgba(221,220,220,1);
         border-color: rgba(236,235,235,1);
         height: 100%;
         border-right-style: solid;
         border-right-width: 1px;
         padding-right: 6px;
+      }
+
+      .emotion-4 {
+        -webkit-box-flex: 1;
+        -webkit-flex-grow: 1;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+        overflow: auto;
+        padding-left: 0px;
+        padding-right: 0px;
       }
 
       <div
@@ -145,7 +298,22 @@ describe("NestedCards", () => {
           <div
             class="emotion-1"
           >
-            <div />
+            <div
+              class="emotion-2"
+            >
+              <div
+                class="emotion-3"
+              >
+                <div />
+              </div>
+            </div>
+          </div>
+          <div
+            class="emotion-4"
+          >
+            <div
+              style="height: 100%;"
+            />
           </div>
         </div>
       </div>
