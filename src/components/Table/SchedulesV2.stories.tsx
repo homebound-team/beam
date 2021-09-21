@@ -1,8 +1,8 @@
-import { DragEventHandler } from "@reach/router/node_modules/@types/react";
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { arrayMoveImmutable } from "array-move";
-import { useState } from "react";
+import { DragEventHandler, useLayoutEffect, useRef, useState } from "react";
+import { DragDropContext, DragDropContextProps, Draggable, Droppable } from "react-beautiful-dnd";
 import { CollapseToggle, GridStyle, GridTable } from "src/components/Table";
 import { Css, Palette } from "src/Css";
 import { Checkbox } from "src/inputs";
@@ -203,7 +203,6 @@ SchedulesV2.storyName = "SchedulesV2";
  * Learnings:
  * - We do know that JS events like onMouseOver and onClick do still work. This means
  * that a fully JS solution might be the only key.
- * * Approach #2: Attempt to get an row cell outside the `display: content`
  */
 export function Draggable1() {
   const columns = ["Task", "Start", "End", "Duration", "Milestone"];
@@ -354,6 +353,153 @@ export function Draggable2() {
   );
 }
 Draggable2.storyName = "Draggability - HTML Draggable Attribute on First Cell";
+
+/**
+ * Example table using the same approach as GridTable to test out drag libraries
+ *
+ * Approach #3: React DND
+ * react-beautiful-dnd does not seem to work nicely with `display: contents` as
+ * the following issue https://github.com/atlassian/react-beautiful-dnd/issues/2025
+ * describes.
+ *
+ * Learnings:
+ * - If we can circumvent the `display: contents` approach that would be great
+ */
+export function Draggable3() {
+  const columns = ["", "Task", "Start", "End", "Duration", "Milestone"];
+  const [rows, setRows] = useState(() => zeroTo(5).map((i) => columns.map((c) => `${c}#${i}`)));
+
+  const onDragEnd: DragDropContextProps["onDragEnd"] = (result, provided) => {
+    // TODO: reorder our columns
+    console.log("onDragEnd");
+  };
+
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      {/* Grid Container */}
+      <div css={Css.dg.gtc(`50px repeat(${columns.length - 1}, 1fr)`).$}>
+        {/* Grid Items - Header */}
+        {columns.map((column) => (
+          <div key={column.toString()} css={Css.bgGray100.bb.mb1.$}>
+            {column}
+          </div>
+        ))}
+        <Droppable key="droppable" droppableId="droppable">
+          {(provided) => (
+            // Grid Items - Rows Container
+            <div ref={provided.innerRef} {...provided.droppableProps} css={{ display: "contents" }}>
+              {/* Grid Items - Row */}
+              {rows.map((row, rowIndex) => (
+                <Draggable key={row.toString()} draggableId={row[1]} index={rowIndex}>
+                  {(provided) => (
+                    <div
+                      {...provided.draggableProps}
+                      style={{
+                        paddingTop: "10px",
+                        // This allows us to wrap all of the children for a single row
+                        display: "contents",
+                      }}
+                      ref={provided.innerRef}
+                    >
+                      {row.map((cell, cellIndex) => (
+                        <div key={cell.toString()}>
+                          {cellIndex % columns.length === 0 ? (
+                            <div {...provided.dragHandleProps}>
+                              <Icon icon="drag" />
+                            </div>
+                          ) : (
+                            cell
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </div>
+    </DragDropContext>
+  );
+}
+Draggable3.storyName = "Draggability - React DND";
+
+/**
+ * Example table using the same approach as GridTable to test out drag libraries
+ *
+ * Approach #4: React DND - Hack
+ * Since `display: contents` is causing so many issues, this approach tries to
+ * recreate the row itself but without the need to use `display: contents`
+ *
+ * Learnings:
+ * -
+ */
+export function Draggable4() {
+  const columns = ["", "Task", "Start", "End", "Duration", "Milestone"];
+  const [rows, setRows] = useState(() => zeroTo(5).map((i) => columns.map((c) => `${c}#${i}`)));
+  const headerRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [columnWidths, setColumnWidths] = useState([]);
+
+  useLayoutEffect(() => {
+    const newColumnWidths = headerRefs.current.map((hr) => hr?.clientWidth);
+    setColumnWidths(newColumnWidths);
+  }, [headerRefs.current]);
+
+  const onDragEnd: DragDropContextProps["onDragEnd"] = (result, provided) => {
+    // TODO: reorder our columns
+    console.log("onDragEnd");
+  };
+
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      {/* Table - Headers */}
+      <div css={Css.dg.gtc(`50px repeat(${columns.length - 1}, 1fr)`).$}>
+        {columns.map((column, columnIndex) => (
+          <div
+            key={column.toString()}
+            ref={(el) => (headerRefs.current[columnIndex] = el)}
+            css={Css.bgGray100.bb.mb1.$}
+          >
+            {column}
+          </div>
+        ))}
+      </div>
+      {/* Table - Body */}
+      <Droppable key="droppable" droppableId="droppable">
+        {(provided) => (
+          // Table - Body - Container
+          <div ref={provided.innerRef} {...provided.droppableProps}>
+            {/* Table - Body - Container - Row */}
+            {rows.map((row, rowIndex) => (
+              <Draggable key={row.toString()} draggableId={row[1]} index={rowIndex}>
+                {(provided) => (
+                  <div {...provided.draggableProps} ref={provided.innerRef} css={Css.df.$}>
+                    {row.map((cell, cellIndex) => (
+                      // Table - Body - Container - Row
+                      <div key={cell.toString()} style={{ width: columnWidths[cellIndex] }}>
+                        {cellIndex % columns.length === 0 ? (
+                          <div {...provided.dragHandleProps}>
+                            <Icon icon="drag" />
+                          </div>
+                        ) : (
+                          cell
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+}
+Draggable4.storyName = "Draggability - React DND Hack";
 
 /**** Utils *****/
 function createTasks(howMany: number, subGroup: string, milestone: string, COUNTER: number): TaskRow[] {
