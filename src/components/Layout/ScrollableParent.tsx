@@ -40,8 +40,8 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
     el.style.height = "100%";
     return el;
   }, []);
-  const [tick, setTick] = useState(0);
-  const [hasScrollableContent, setHasScrollableContent] = useState(true);
+  const [, setTick] = useState(0);
+  const hasScrollableContent = scrollableEl.childNodes.length > 0;
   const scrollableRef = useRef<HTMLDivElement | null>(null);
   const { paddingLeft, paddingRight, ...otherXss } = xss || {};
   const context: ScrollableParentContextProps = {
@@ -54,9 +54,6 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
   useEffect(() => {
     scrollableRef.current!.appendChild(scrollableEl);
   }, [scrollableEl]);
-
-  // Whenever the `tick` changes, reevaluate the needs for fallback scrollable styles
-  useEffect(() => setHasScrollableContent(scrollableEl.childNodes.length > 0), [tick]);
 
   return (
     <ScrollableParentContext.Provider value={context}>
