@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react";
 import { FieldGroup, FormDivider, FormLines } from "src/forms/FormLines";
-import { NumberField, SelectField } from "src/inputs/NumberField";
+import { SelectField } from "src/inputs";
+import { NumberField } from "src/inputs/NumberField";
 import { Switch } from "src/inputs/Switch";
 import { TextField } from "src/inputs/TextField";
 import { noop } from "src/utils/index";
