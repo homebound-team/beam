@@ -471,6 +471,8 @@ export function Draggable4() {
         {(provided) => (
           // Table - Body - Container
           <div ref={provided.innerRef} {...provided.droppableProps}>
+            {/* Fake Chrome Row */}
+            <div css={Css.bgGray200.hPx(20).$} />
             {/* Table - Body - Container - Row */}
             {rows.map((row, rowIndex) => (
               <Draggable key={row.toString()} draggableId={row[1]} index={rowIndex}>
