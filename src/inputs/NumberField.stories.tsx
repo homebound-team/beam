@@ -2,7 +2,8 @@ import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
 import { Css } from "src/Css";
-import { NumberField, NumberFieldProps, TextField } from "src/inputs";
+import { TextField } from "src/inputs";
+import { NumberField, NumberFieldProps } from "./NumberField";
 
 export default {
   title: "Inputs/Number Field",

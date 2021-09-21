@@ -1,7 +1,7 @@
 import { change, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { NumberField, NumberFieldProps } from "src/inputs";
+import { NumberField, NumberFieldProps, removeNonNumericChars } from "./NumberField";
 
 let lastSet: any = undefined;
 
@@ -88,6 +88,26 @@ describe("NumberFieldTest", () => {
     const r = await render(<TestNumberField label="Cost" type="cents" value={1200} readOnly={true} />);
     expect(r.cost()).toHaveTextContent("$12.00");
     expect(r.cost()).toHaveAttribute("data-readonly", "true");
+  });
+});
+
+describe("removeNonNumericChars function", () => {
+  it("should return 0 when no numbers are input", () => {
+    const actual = removeNonNumericChars("asdf");
+
+    expect(actual).toBe(0);
+  });
+
+  it("should remove non-numeric characters and return numeric characters", () => {
+    const actual = removeNonNumericChars("10kb");
+
+    expect(actual).toBe(10);
+  });
+
+  it("should not remove negative signs", () => {
+    const actual = removeNonNumericChars("-10kb");
+
+    expect(actual).toBe(-10);
   });
 });
 
