@@ -1,4 +1,4 @@
-import { ReactNode, ReactPortal } from "react";
+import { ReactNode, ReactPortal, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FullBleed } from "src/components/Layout/FullBleed";
 import { useScrollableParent } from "src/components/Layout/ScrollableParent";
@@ -12,7 +12,15 @@ export function ScrollableContent({
   children: ReactNode;
   virtualized?: boolean;
 }): ReactPortal | JSX.Element {
-  const { scrollableEl, pl } = useScrollableParent();
+  const { scrollableEl, setPortalTick, pl } = useScrollableParent();
+
+  useEffect(() => {
+    // The below `tick` logic is a way to detect whether the ScrollableContent is being used.
+    // The ScrollableParent sets scrolling style based on whether or not there are children inside of the `scrollableEl` portal.
+    setPortalTick((prev) => prev + 1);
+    // Ensure a tick happens on unmount in the event the next component loaded does not utilize `ScrollableContent`
+    return () => setPortalTick((prev) => prev + 1);
+  }, [setPortalTick]);
 
   // Escape hatch specifically for tests where a "ScrollableParent" context may not be present.
   if (!scrollableEl) {
