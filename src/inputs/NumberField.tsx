@@ -120,7 +120,7 @@ export function NumberField(props: NumberFieldProps) {
       // This is called on each DOM change, to push the latest value into the field
       onChange={(rawInputValue) => {
         // If the wip value is invalid, i.e. it's `10b`, don't push that back into the field state
-        const wip = Number((rawInputValue || "").replace(/[^0-9\.]/g, ""));
+        const wip = Number((rawInputValue || "").replace(/[^-0-9\.]/g, ""));
         if (!Number.isNaN(wip)) {
           // For percentage values we need to initially divide by 100 in order to get their "number value" ("4%" = .04) for the factor multiplier to be accurate.
           // For example, if the using basisPoints and the user enters "4.31%", then we would expect the response to be 431 basisPoints. If only basing off the `factor` value, then 4.31 * 10000 = 43100, which would not be correct.
