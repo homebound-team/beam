@@ -1,7 +1,7 @@
 import { change, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { NumberField, NumberFieldProps, removeNonNumericChars } from "src/inputs/NumberField";
+import { NumberField, NumberFieldProps, NumberFieldType, parseRawInput } from "src/inputs/NumberField";
 
 let lastSet: any = undefined;
 
@@ -91,24 +91,33 @@ describe("NumberFieldTest", () => {
   });
 });
 
-describe("removeNonNumericChars function", () => {
-  it("should return 0 when no numbers are input", () => {
-    const actual = removeNonNumericChars("asdf");
+describe("parseRawInput function", () => {
+  it.each([
+    // if rawInput is NaN return undefined
+    ["asdf", 100, "percent" as NumberFieldType, undefined],
+    ["asdf", 100, "cents" as NumberFieldType, undefined],
+    ["asdf", 10_000, "basisPoints" as NumberFieldType, undefined],
+    ["asdf", 1, undefined, undefined],
 
-    expect(actual).toBe(0);
-  });
+    // if rawInput includes numbers followed by letters, return number and value based on type
+    ["10kb", 100, "percent" as NumberFieldType, 10],
+    ["10kb", 100, "cents" as NumberFieldType, 1000],
+    ["10kb", 10_000, "basisPoints" as NumberFieldType, 1000],
+    ["10kb", 1, undefined, 10],
 
-  it("should remove non-numeric characters and return numeric characters", () => {
-    const actual = removeNonNumericChars("10kb");
+    // it can return negative numbers
+    ["-10kb", 100, "percent" as NumberFieldType, -10],
+    ["-10kb", 100, "cents" as NumberFieldType, -1000],
+    ["-10kb", 10_000, "basisPoints" as NumberFieldType, -1000],
+    ["-10kb", 1, undefined, -10],
+  ])(
+    "with a rawInput of %s, a factor of %s and a type of %s, it should return %s",
+    (rawInput, factor, type, expected) => {
+      const actual = parseRawInput(rawInput, factor, type);
 
-    expect(actual).toBe(10);
-  });
-
-  it("should not remove negative signs", () => {
-    const actual = removeNonNumericChars("-10kb");
-
-    expect(actual).toBe(-10);
-  });
+      expect(actual).toBe(expected);
+    },
+  );
 });
 
 function TestNumberField(props: Omit<NumberFieldProps, "onChange">) {
