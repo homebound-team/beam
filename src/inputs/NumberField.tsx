@@ -6,12 +6,14 @@ import { Css, Xss } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { TextFieldBase } from "./TextFieldBase";
 
+export type NumberFieldType = "cents" | "percent" | "basisPoints";
+
 // exported for testing purposes
 export interface NumberFieldProps {
   label: string;
   /** If set, the label will be defined as 'aria-label` on the input element */
   hideLabel?: boolean;
-  type?: "cents" | "percent" | "basisPoints";
+  type?: NumberFieldType;
   value: number | undefined;
   onChange: (value: number | undefined) => void;
   compact?: boolean;
@@ -119,15 +121,8 @@ export function NumberField(props: NumberFieldProps) {
       inputProps={inputProps}
       // This is called on each DOM change, to push the latest value into the field
       onChange={(rawInputValue) => {
-        // If the wip value is invalid, i.e. it's `10b`, don't push that back into the field state
-        const wip = Number((rawInputValue || "").replace(/[^0-9\.]/g, ""));
-        if (!Number.isNaN(wip)) {
-          // For percentage values we need to initially divide by 100 in order to get their "number value" ("4%" = .04) for the factor multiplier to be accurate.
-          // For example, if the using basisPoints and the user enters "4.31%", then we would expect the response to be 431 basisPoints. If only basing off the `factor` value, then 4.31 * 10000 = 43100, which would not be correct.
-          const value = type === "percent" || type === "basisPoints" ? wip / 100 : wip;
-          // Since the values returned is exactly what is in the field
-          onChange(factor !== 1 ? Math.round(value * factor) : value);
-        }
+        const changeValue = parseRawInput(rawInputValue, factor, type);
+        onChange(changeValue);
       }}
       inputRef={inputRef}
       onBlur={onBlur}
@@ -139,4 +134,16 @@ export function NumberField(props: NumberFieldProps) {
       {...otherProps}
     />
   );
+}
+
+export function parseRawInput(rawInputValue: string = "", factor: number, type?: NumberFieldType) {
+  // If the wip value is invalid, i.e. it's `10b`, don't push that back into the field state
+  const wip = parseFloat(rawInputValue);
+  if (isNaN(wip)) return;
+
+  // For percentage values we need to initially divide by 100 in order to get their "number value" ("4%" = .04) for the factor multiplier to be accurate.
+  // For example, if the using basisPoints and the user enters "4.31%", then we would expect the response to be 431 basisPoints. If only basing off the `factor` value, then 4.31 * 10000 = 43100, which would not be correct.
+  const value = type === "percent" || type === "basisPoints" ? wip / 100 : wip;
+  // Since the values returned is exactly what is in the field
+  return factor !== 1 ? Math.round(value * factor) : value;
 }

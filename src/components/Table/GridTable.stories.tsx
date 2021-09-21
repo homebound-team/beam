@@ -22,7 +22,7 @@ import {
   SimpleHeaderAndDataOf,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
-import { NumberField } from "src/inputs";
+import { NumberField } from "src/inputs/NumberField";
 import { noop } from "src/utils";
 import { newStory, withRouter, zeroTo } from "src/utils/sb";
 
