@@ -1,9 +1,11 @@
 import { RefObject, useMemo, useRef } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
+import { Link } from "react-router-dom";
 import type { IconKey } from "src/components";
 import { navLink } from "src/components";
 import { Css } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
+import { isAbsoluteUrl } from "src/utils";
 import { Icon } from "./Icon";
 
 export interface NavLinkProps extends BeamFocusableProps {
@@ -14,16 +16,13 @@ export interface NavLinkProps extends BeamFocusableProps {
   label: string;
   icon?: IconKey;
   variant: NavLinkVariant;
-  /**
-   * Target and rel attributes are added for external links
-   * TODO: maybe infer this property based on the href */
-  external?: boolean;
+  openInNew?: boolean;
 }
 
 type NavLinkVariant = "side" | "global";
 
 export function NavLink(props: NavLinkProps) {
-  const { disabled: isDisabled, label, external, ...otherProps } = props;
+  const { disabled: isDisabled, label, openInNew, ...otherProps } = props;
   const ariaProps = { children: label, isDisabled, ...otherProps };
   const { href, active = false, icon = false, variant } = ariaProps;
   const ref = useRef() as RefObject<HTMLAnchorElement>;
@@ -38,37 +37,46 @@ export function NavLink(props: NavLinkProps) {
     [variant],
   );
 
-  const target = external ? "_blank" : undefined;
-  const rel = external ? "noopener noreferrer" : undefined;
+  const external = isAbsoluteUrl(href) || openInNew;
 
-  return (
-    <a
-      {...mergeProps(otherButtonProps, focusProps, hoverProps)}
-      className={navLink}
-      href={href}
-      ref={ref}
-      rel={rel}
-      /** does not focus if disabled */
-      tabIndex={isDisabled ? -1 : 0}
-      target={target}
-      /** aria-current represents the current page within a set of pages */
-      aria-current={active && `page`}
-      css={{
-        ...baseStyles,
-        ...(active && activeStyles),
-        ...(isDisabled && disabledStyles),
-        ...(isFocusVisible && focusRingStyles),
-        ...(isHovered && hoverStyles),
-        ...(isPressed && pressedStyles),
-      }}
-    >
+  const linkAttributes = {
+    className: navLink,
+    ref: ref,
+    rel: external ? "noopener noreferrer" : undefined,
+    /** does not focus if disabled */
+    tabIndex: isDisabled ? -1 : 0,
+    target: external ? "_blank" : undefined,
+    /** aria-current represents the current page within a set of pages */
+    "aria-current": active ? ("page" as const) : undefined,
+    css: {
+      ...baseStyles,
+      ...(active && activeStyles),
+      ...(isDisabled && disabledStyles),
+      ...(isFocusVisible && focusRingStyles),
+      ...(isHovered && hoverStyles),
+      ...(isPressed && pressedStyles),
+    },
+  };
+
+  const linkContent = (
+    <>
       {label}
       {icon && (
         <span css={Css.ml1.$}>
           <Icon icon={icon} />
         </span>
       )}
+    </>
+  );
+
+  return external ? (
+    <a href={href} {...mergeProps(otherButtonProps, focusProps, hoverProps)} {...linkAttributes}>
+      {linkContent}
     </a>
+  ) : (
+    <Link to={href} {...mergeProps(otherButtonProps, focusProps, hoverProps)} {...linkAttributes}>
+      {linkContent}
+    </Link>
   );
 }
 
