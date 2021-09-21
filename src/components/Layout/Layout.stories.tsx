@@ -15,7 +15,7 @@ import {
   SimpleHeaderAndDataOf,
   useScrollableParent,
 } from "src/index";
-import { NumberField } from "src/inputs";
+import { NumberField } from "src/inputs/NumberField";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 
 export default {

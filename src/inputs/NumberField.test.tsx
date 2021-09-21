@@ -1,7 +1,7 @@
 import { change, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { NumberField, NumberFieldProps, removeNonNumericChars } from "./NumberField";
+import { NumberField, NumberFieldProps, removeNonNumericChars } from "src/inputs/NumberField";
 
 let lastSet: any = undefined;
 

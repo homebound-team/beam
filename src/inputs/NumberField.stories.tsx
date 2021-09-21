@@ -3,7 +3,7 @@ import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
 import { Css } from "src/Css";
 import { TextField } from "src/inputs";
-import { NumberField, NumberFieldProps } from "./NumberField";
+import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
 
 export default {
   title: "Inputs/Number Field",
