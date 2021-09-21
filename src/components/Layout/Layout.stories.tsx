@@ -96,7 +96,7 @@ export function WithoutScrollableContent() {
   );
 }
 
-export function NestedWithoutScrollableContent() {
+export function ScrollableParentFallback() {
   return (
     <TestProjectLayout>
       <TestHeader title="Change Event - Mud Room" />
