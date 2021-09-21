@@ -41,19 +41,6 @@ export function SideNavLayout() {
   );
 }
 
-export function WithoutScrollContainer() {
-  return (
-    <TestLayout>
-      <TestHeader title="Change Event - Mud Room" />
-      <p css={Css.py1.$}>
-        This is page "forgot" to use the Nested Scrolling components, though still can scroll thanks to an overflow auto
-        fallback.
-      </p>
-      <TableExample />
-    </TestLayout>
-  );
-}
-
 export function EditableTableSize() {
   const [rows, setRows] = useState<number>(100);
   const [cols, setCols] = useState<number>(30);
@@ -82,6 +69,47 @@ export function VirtualizedScrolling() {
   );
 }
 
+export function WithoutScrollableParent() {
+  return (
+    <PreventBrowserScroll>
+      <TestTopNav />
+      <TestHeader title="Change Event - Mud Room" />
+      <p css={Css.py1.$}>
+        This is page "forgot" to use the "ScrollableParent" component, though still can scroll thanks to an overflow
+        auto fallback.
+      </p>
+      <TableExample />
+    </PreventBrowserScroll>
+  );
+}
+
+export function WithoutScrollableContent() {
+  return (
+    <TestLayout>
+      <TestHeader title="Change Event - Mud Room" />
+      <p css={Css.py1.$}>
+        This is page "forgot" to use the "ScrollableContent" component, though still can scroll thanks to an overflow
+        auto fallback.
+      </p>
+      <TableExample />
+    </TestLayout>
+  );
+}
+
+export function NestedWithoutScrollableContent() {
+  return (
+    <TestProjectLayout>
+      <TestHeader title="Change Event - Mud Room" />
+      <p css={Css.py1.$}>
+        This is page "forgot" to use the "ScrollableContent" component and lives within a layout that disables the
+        scrolling fallback from "PreventBrowserScroll". Instead, it utilizes the fallback from within the
+        ScrollableParent component.
+      </p>
+      <TableExample />
+    </TestProjectLayout>
+  );
+}
+
 function ExamplePageComponent() {
   const [selectedTab, setSelectedTab] = useState("lineItems");
   const tabs: Tab[] = [
@@ -106,7 +134,7 @@ function OverviewExample() {
     <ScrollableContent>
       <h1 css={Css.lgEm.mb3.$}>Detail</h1>
       {zeroTo(10).map((i) => (
-        <p css={Css.mb3.$}>
+        <p key={i} css={Css.mb3.$}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
           magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
           consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
@@ -122,13 +150,12 @@ function HistoryExample() {
   return (
     <>
       <div css={Css.lgEm.$}>History</div>
-      <ScrollableContent>
-        <ul css={Css.df.fdc.childGap2.$}>
-          {zeroTo(20).map((i) => (
-            <li>History Item {i + 1}</li>
-          ))}
-        </ul>
-      </ScrollableContent>
+      <p>Demonstrates not utilizing ScrollableContent component. Expect this section of the layout to scroll</p>
+      <ul css={Css.df.fdc.childGap2.$}>
+        {zeroTo(20).map((i) => (
+          <li key={i}>History Item {i + 1}</li>
+        ))}
+      </ul>
     </>
   );
 }
@@ -223,10 +250,11 @@ function TestProjectLayout({ children }: PropsWithChildren<{}>) {
   return (
     <PreventBrowserScroll>
       <TestTopNav />
-      {/* Required to use `overflowHidden` as the prevent the `TestLayout`'s scrollbar from kicking in. */}
+      {/* Required to use `overflowHidden` to prevent the `PreventBrowserScroll`'s scrollbar from kicking in,
+          which would scroll both the side nav and the main content at the same time. */}
       <div css={Css.df.overflowHidden.$}>
         <TestSideNav />
-        <ScrollableParent xss={Css.fg1.px3.$}>{children}</ScrollableParent>
+        <ScrollableParent xss={Css.px3.$}>{children}</ScrollableParent>
       </div>
     </PreventBrowserScroll>
   );
