@@ -63,6 +63,7 @@ const arrowColumn = actionColumn<Row>({
   subgroup: (row) => <CollapseToggle row={row} />,
   task: "",
   add: "",
+  w: "32px",
 });
 const selectColumn = actionColumn<Row>({
   header: (row) => <Checkbox label="" onChange={action("Select All")} />,
@@ -145,17 +146,18 @@ const progressColumn = actionColumn<Row>({
 // TODO: Potentially add 8px spacer between each row
 const spacing = { brPx: 8, pxPx: 16, spacerPx: 8 };
 const style: GridStyle = {
-  headerCellCss: Css.bgGray100.xsEm.gray700.p1.df.aic.$,
+  headerCellCss: Css.xsEm.gray700.py1.df.aic.$,
   firstNonHeaderRowCss: Css.mt2.$,
   cellCss: Css.h100.gray700.xs.aic.$,
   nestedCards: {
     topLevelSpacerPx: 8,
     kinds: {
+      header: { bgColor: Palette.Gray100, brPx: 0, spacerPx: 0, pxPx: 0 },
       // TODO: It would be nice if this used CSS Properties so that we can use TRUSS
       milestone: { bgColor: Palette.Gray100, ...spacing },
       subgroup: { bgColor: Palette.White, ...spacing },
       // TODO: Validate with Dare regarding nested 3rd child.
-      task: { bgColor: Palette.White, bColor: Palette.Gray200, ...spacing },
+      task: { bgColor: Palette.White, bColor: Palette.Gray200, ...spacing, pxPx: 0 },
       // Purposefully leave out the `add` kind
     },
   },
@@ -180,6 +182,11 @@ export function SchedulesV2() {
           progressColumn,
         ]}
         style={style}
+        rowStyles={{
+          task: {
+            cellCss: Css.py1.$,
+          },
+        }}
         // FIXME: `firstNonHeaderRowCss` does not work when virtual is enabled
         // Possible fix is to use an ref/class/id for this row
         // as="virtual"

@@ -344,7 +344,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
       const matches =
-        filters.length === 0 ||
+        filters.length === 0 || row.pin ||
         filters.every((filter) =>
           columns.map((c) => applyRowFn(c, row)).some((maybeContent) => matchesFilter(maybeContent, filter)),
         );
@@ -359,7 +359,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       }
 
       const isCollapsed = collapsedIds.includes(row.id);
-      if (!isCollapsed && row.children) {
+      if (!isCollapsed && !!row.children?.length) {
+        nestedCards && matches && nestedCards.addSpacerBetweenChildren();
         visitRows(row.children, isCard);
       }
 
@@ -370,7 +371,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
+          nestedCards && nestedCards.maybeOpenCard(row);
           headerRows.push([row, makeRowComponent(row)]);
+          nestedCards && nestedCards.closeCard();
           return;
         }
         visit(row);
