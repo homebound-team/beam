@@ -86,7 +86,7 @@ function ImageMenuItem(item: ImageMenuItemType) {
   return (
     <>
       <span css={Css.fs0.mr2.$}>
-        <img width={size} src={src} css={styles} />
+        <img width={size} src={src} css={styles} alt={label} />
       </span>
       {label}
     </>
