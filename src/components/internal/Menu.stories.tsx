@@ -18,7 +18,7 @@ export function BasicMenuItems() {
       items={[
         { label: "Menu item 1", onClick: noop },
         { label: "Menu item 2", onClick: noop },
-        { label: "Menu item 3", onClick: noop },
+        { label: "Menu item 3", onClick: noop, disabled: true },
         { label: "Menu item 4", onClick: noop },
       ]}
     />
