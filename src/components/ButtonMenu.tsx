@@ -91,6 +91,7 @@ type MenuItemBase = {
   label: string;
   // If the `onClick` property is set as a string, then the menu item will be rendered as a link with the `onClick` value being the href
   onClick: string | Callback;
+  disabled?: boolean;
 };
 
 export type IconMenuItemType = MenuItemBase & {

@@ -19,6 +19,7 @@ interface MenuItemProps {
 export function MenuItemImpl(props: MenuItemProps) {
   const { item, state, onClose } = props;
   const menuItem = item.value;
+  const { disabled: isDisabled } = menuItem;
   const isFocused = state.selectionManager.focusedKey === item.key;
   const ref = useRef<HTMLLIElement>(null);
   const history = useHistory();
@@ -26,8 +27,9 @@ export function MenuItemImpl(props: MenuItemProps) {
   const { menuItemProps } = useMenuItem(
     {
       key: item.key,
+      isDisabled,
       onAction: () => {
-        const { onClick } = item.value;
+        const { onClick } = menuItem;
         if (typeof onClick === "string") {
           // if it is an absolute URL, then open in new window. Assuming this should leave the App
           if (isAbsoluteUrl(onClick)) {
@@ -53,8 +55,9 @@ export function MenuItemImpl(props: MenuItemProps) {
       ref={ref}
       css={{
         ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").$,
-        ...(isHovered ? Css.bgGray100.$ : {}),
+        ...(!isDisabled && isHovered ? Css.bgGray100.$ : {}),
         ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
+        ...(isDisabled ? Css.gray500.cursorNotAllowed.$ : {}),
       }}
     >
       {maybeWrapInLink(
@@ -66,6 +69,7 @@ export function MenuItemImpl(props: MenuItemProps) {
         ) : (
           menuItem.label
         ),
+        isDisabled,
       )}
     </li>
   );
@@ -101,22 +105,26 @@ function IconMenuItem(item: IconMenuItemType) {
   );
 }
 
-function maybeWrapInLink(onClick: MenuItem["onClick"], content: JSX.Element | string): JSX.Element {
-  return typeof onClick === "string" ? (
-    isAbsoluteUrl(onClick) ? (
-      <a href={onClick} target="_blank" rel="noopener noreferrer" className="navLink" css={Css.df.jcsb.w100.$}>
-        {content}
-        <span css={Css.fs0.ml2.$}>
-          <Icon icon="linkExternal" />
-        </span>
-      </a>
-    ) : (
-      <NavLink to={onClick} className="navLink">
-        {content}
-      </NavLink>
-    )
+function maybeWrapInLink(
+  onClick: MenuItem["onClick"],
+  content: JSX.Element | string,
+  disabled: boolean | undefined,
+): JSX.Element {
+  if (disabled || typeof onClick !== "string") {
+    return <>{content}</>;
+  }
+
+  return isAbsoluteUrl(onClick) ? (
+    <a href={onClick} target="_blank" rel="noopener noreferrer" className="navLink" css={Css.df.jcsb.w100.$}>
+      {content}
+      <span css={Css.fs0.ml2.$}>
+        <Icon icon="linkExternal" />
+      </span>
+    </a>
   ) : (
-    <>{content}</>
+    <NavLink to={onClick} className="navLink">
+      {content}
+    </NavLink>
   );
 }
 
