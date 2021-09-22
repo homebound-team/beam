@@ -19,7 +19,7 @@ interface MenuItemProps {
 export function MenuItemImpl(props: MenuItemProps) {
   const { item, state, onClose } = props;
   const menuItem = item.value;
-  const { disabled: isDisabled } = menuItem;
+  const { disabled: isDisabled, onClick, label } = menuItem;
   const isFocused = state.selectionManager.focusedKey === item.key;
   const ref = useRef<HTMLLIElement>(null);
   const history = useHistory();
@@ -29,7 +29,6 @@ export function MenuItemImpl(props: MenuItemProps) {
       key: item.key,
       isDisabled,
       onAction: () => {
-        const { onClick } = menuItem;
         if (typeof onClick === "string") {
           // if it is an absolute URL, then open in new window. Assuming this should leave the App
           if (isAbsoluteUrl(onClick)) {
@@ -61,13 +60,13 @@ export function MenuItemImpl(props: MenuItemProps) {
       }}
     >
       {maybeWrapInLink(
-        menuItem.onClick,
+        onClick,
         isIconMenuItem(menuItem) ? (
           <IconMenuItem {...menuItem} />
         ) : isImageMenuItem(menuItem) ? (
           <ImageMenuItem {...menuItem} />
         ) : (
-          menuItem.label
+          label
         ),
         isDisabled,
       )}
