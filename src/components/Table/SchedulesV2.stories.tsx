@@ -58,20 +58,32 @@ const rows: GridDataRow<Row>[] = [{ kind: "header", id: "header" }, ...createMil
 /** Columns */
 // FIXME: This column is not vertically aligned
 const arrowColumn = actionColumn<Row>({
-  header: (row) => <CollapseToggle row={row} />,
-  milestone: (row) => <CollapseToggle row={row} />,
-  subgroup: (row) => <CollapseToggle row={row} />,
+  header: (row) => (
+    <div css={Css.pr1.$}>
+      <CollapseToggle row={row} />
+    </div>
+  ),
+  milestone: (row) => (
+    <div css={Css.pr1.$}>
+      <CollapseToggle row={row} />
+    </div>
+  ),
+  subgroup: (row) => (
+    <div css={Css.pr1.$}>
+      <CollapseToggle row={row} />
+    </div>
+  ),
   task: "",
   add: "",
-  w: "32px",
+  w: "36px",
 });
 const selectColumn = actionColumn<Row>({
   header: (row) => <Checkbox label="" onChange={action("Select All")} />,
-  milestone: "",
-  subgroup: "",
+  milestone: (row) => ({ colspan: 3, content: <div css={Css.smEm.gray900.$}>{row.name}</div>, alignment: "left" }),
+  subgroup: (row) => ({ colspan: 3, content: <div css={Css.smEm.gray900.$}>{row.name}</div>, alignment: "left" }),
   task: (task) => <Checkbox label="" onChange={action(`Select ${task.name}`)} />,
   add: "",
-  w: "20px",
+  w: "32px",
 });
 // TODO: Skipping selectable row
 const idColumn = column<Row>({
@@ -85,8 +97,8 @@ const idColumn = column<Row>({
 });
 const nameColumn = column<Row>({
   header: "Task",
-  milestone: (row) => <div css={Css.baseEm.gray900.df.aic.$}>{row.name}</div>,
-  subgroup: (row) => <div css={Css.smEm.gray900.df.aic.$}>{row.name}</div>,
+  milestone: (row) => ({ value: row.name, content: "" }),
+  subgroup: (row) => ({ value: row.name, content: "" }),
   task: (row) => row.name,
   add: "Add",
 });
@@ -142,6 +154,18 @@ const progressColumn = actionColumn<Row>({
   add: "",
   w: "150px",
 });
+const buttonColumns = actionColumn<Row>({
+  header: "",
+  milestone: "",
+  subgroup: "",
+  task: (row) => (
+    <div css={Css.df.gap1.$}>
+      <Icon icon="comment" />
+      <Icon icon="infoCircle" />
+    </div>
+  ),
+  add: "",
+});
 
 // TODO: Potentially add 8px spacer between each row
 const spacing = { brPx: 8, pxPx: 16, spacerPx: 8 };
@@ -180,6 +204,7 @@ export function SchedulesV2() {
           subCategoryColumn,
           statusColumn,
           progressColumn,
+          buttonColumns,
         ]}
         style={style}
         rowStyles={{
