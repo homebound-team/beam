@@ -53,7 +53,7 @@ type Row = HeaderRow | MilestoneRow | SubGroupRow | TaskRow | AddRow;
 
 /** Rows */
 // TODO: Handle all 4 situations
-const rows: GridDataRow<Row>[] = [{ kind: "header", id: "header" }, ...createMilestones(1, 1, 5)];
+const rows: GridDataRow<Row>[] = [{ kind: "header", id: "header" }, ...createMilestones(1, 3, 2)];
 
 /** Columns */
 // FIXME: This column is not vertically aligned
@@ -536,49 +536,49 @@ export function Draggable4() {
 Draggable4.storyName = "Draggability - React DND Hack";
 
 /**** Utils *****/
-function createTasks(howMany: number, subGroup: string, milestone: string, COUNTER: number): TaskRow[] {
-  return zeroTo(howMany).map((id) => ({
-    kind: "task",
-    id: String(COUNTER++),
-    name: `Task #${id}`,
-    startDate: "May. 1, 2021",
-    endDate: "May. 10, 2021",
-    duration: 10,
-    milestone,
-    subGroup,
-    status: "Active",
-  }));
-}
-
-function createSubGroups(howMany: number, howManyTasks: number, milestone: string, COUNTER: number) {
-  return zeroTo(howMany).map<SubGroupRow>((id) => {
-    const name = `SubGroup #${id}`;
-
+function createTasks(howMany: number, subGroup: string, milestone: string, startIdAt: number): TaskRow[] {
+  return zeroTo(howMany).map((id) => {
+    const name = `Task #${id + 1}`;
     return {
-      kind: "subgroup",
-      id: String(COUNTER++),
+      kind: "task",
+      id: String(startIdAt + id),
       name,
       startDate: "May. 1, 2021",
       endDate: "May. 10, 2021",
       duration: 10,
-      children: createTasks(howManyTasks, name, milestone, COUNTER++),
+      milestone,
+      subGroup,
+      status: "Active",
+    };
+  });
+}
+
+function createSubGroups(howMany: number, howManyTasks: number, milestone: string, startIdAt: number) {
+  return zeroTo(howMany).map<SubGroupRow>((id) => {
+    const name = `SubGroup #${id + 1}`;
+    return {
+      kind: "subgroup",
+      id: `s${(startIdAt + 1) * id}`,
+      name,
+      startDate: "May. 1, 2021",
+      endDate: "May. 10, 2021",
+      duration: 10,
+      children: createTasks(howManyTasks, name, milestone, (startIdAt + 1) * id * howManyTasks),
     } as SubGroupRow;
   });
 }
 
 function createMilestones(howMany: number, howManySubGroups: number, howManyTasks: number) {
-  let COUNTER = 0;
-
   return zeroTo(howMany).map<MilestoneRow>((id) => {
-    const name = `Milestone #${id}`;
+    const name = `Milestone #${id + 1}`;
     return {
       kind: "milestone",
-      id: String(COUNTER++),
+      id: `m${id}`,
       name,
       startDate: "May 1, 2021",
       endDate: "May 10, 2021",
       duration: 10,
-      children: createSubGroups(howManySubGroups, howManyTasks, name, COUNTER++),
+      children: createSubGroups(howManySubGroups, howManyTasks, name, id * howManySubGroups * howManyTasks),
     } as MilestoneRow;
   });
 }
