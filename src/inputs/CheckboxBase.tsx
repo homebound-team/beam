@@ -76,7 +76,9 @@ export function CheckboxBase(props: CheckboxBaseProps) {
       >
         {markIcon}
       </span>
-      <div css={Css.ml1.$}>
+      {/* Use a mtPx(-2) to better align the label with the checkbox.
+      Not using align-items: center as the checkbox would align with all content below, where we really want it to stay only aligned with the label */}
+      <div css={Css.ml1.mtPx(-2).$}>
         {label && <div css={{ ...labelStyles, ...(isDisabled && disabledColor) }}>{label}</div>}
         {description && <div css={{ ...descStyles, ...(isDisabled && disabledColor) }}>{description}</div>}
         {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
@@ -86,7 +88,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
   );
 }
 
-const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bGray300.br4.bgWhite.transition.topPx(2).$;
+const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bGray300.br4.bgWhite.transition.$;
 const filledBoxStyles = Css.bLightBlue700.bgLightBlue700.$;
 const filledBoxHoverStyles = Css.bgLightBlue900.$;
 const disabledBoxStyles = Css.bGray400.bGray100.$;
