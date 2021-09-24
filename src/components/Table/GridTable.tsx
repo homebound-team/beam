@@ -967,7 +967,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           // If we're within a card, use its background color
           ...(currentCard && Css.bgColor(currentCard.bgColor).$),
           // Add in colspan css if needed
-          ...(currentColspan > 1 ? Css.gc(`${columnIndex + 1} / span ${currentColspan}`).$ : {}),
+          ...(currentColspan > 1 ? Css.gc(`span ${currentColspan}`).$ : {}),
           // And finally the specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
         };
