@@ -1023,6 +1023,26 @@ describe("GridTable", () => {
     // Then we still get back the header row
     expect(rows).toEqual([simpleHeader]);
   });
+
+  it("can apply emptyCell to missing content", async () => {
+    // Given the table with a specified emptyCell
+    const r = await render(
+      <GridTable<Row>
+        columns={[nameColumn, valueColumn]}
+        style={{ emptyCell: <>empty</> }}
+        rows={[
+          simpleHeader,
+          // And some content is undefined and empty strings
+          { kind: "data", id: "2", name: "", value: 2 },
+          { kind: "data", id: "1", name: "a", value: undefined },
+          { kind: "data", id: "3", name: "c", value: 1 },
+        ]}
+      />,
+    );
+    // Then the cells with missing content have the `emptyCell` node applied.
+    expect(cell(r, 1, 0).textContent).toBe("empty");
+    expect(cell(r, 2, 1).textContent).toBe("empty");
+  });
 });
 
 function Collapse() {

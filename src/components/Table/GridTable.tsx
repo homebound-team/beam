@@ -63,6 +63,8 @@ export interface GridStyle {
   rowHoverColor?: string;
   /** Styling for our special "nested card" output mode. */
   nestedCards?: NestedCardsStyle;
+  /** Default content to put into an empty cell */
+  emptyCell?: ReactNode;
 }
 
 export interface NestedCardsStyle {
@@ -938,7 +940,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         const canSortColumn =
           (sorting?.on === "client" && column.clientSideSort !== false) ||
           (sorting?.on === "server" && !!column.serverSideSortKey);
-        const content = toContent(maybeContent, isHeader, canSortColumn);
+        const content = toContent(maybeContent, isHeader, canSortColumn, style);
 
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
 
@@ -1014,11 +1016,19 @@ const ObservedGridRow = React.memo((props: GridRowProps<any, any>) => (
 ));
 
 /** If a column def return just string text for a given row, apply some default styling. */
-function toContent(content: ReactNode | GridCellContent, isHeader: boolean, canSortColumn: boolean): ReactNode {
+function toContent(
+  content: ReactNode | GridCellContent,
+  isHeader: boolean,
+  canSortColumn: boolean,
+  style: GridStyle,
+): ReactNode {
   if (typeof content === "string" && isHeader && canSortColumn) {
     return <SortHeader content={content} />;
   } else if (isContentAndSettings(content)) {
     return content.content;
+  } else if (style.emptyCell && !content) {
+    // If the content is empty and the user specified an `emptyCell` node, return that.
+    return style.emptyCell;
   }
   return content;
 }
