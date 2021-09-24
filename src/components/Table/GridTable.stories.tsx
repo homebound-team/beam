@@ -19,6 +19,7 @@ import {
   Icon,
   IconButton,
   numericColumn,
+  simpleHeader,
   SimpleHeaderAndDataOf,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
@@ -634,3 +635,47 @@ export function WrappedHeaders() {
     />
   );
 }
+
+type DataRow = { kind: "data"; name: string; role: string; date: string; priceInCents: number };
+type TotalsRow = { kind: "total"; totalPriceInCents: number };
+type ColspanRow = HeaderRow | DataRow | TotalsRow;
+export function ColSpan() {
+  const idCol = column<ColspanRow>({
+    header: "ID",
+    data: ({ id }) => id,
+    // Not putting the colspan here just as a POC that we can colspan somewhere other than from the first column.
+    total: "",
+  });
+  const nameCol = column<ColspanRow>({
+    header: "Name",
+    data: ({ name }) => name,
+    total: () => ({ content: "Totals:", colspan: 3, alignment: "right" }),
+  });
+  const detailCol = column<ColspanRow>({ header: "Details", data: ({ role }) => role, total: "" });
+  const dateCol = dateColumn<ColspanRow>({ header: "Date", data: ({ date }) => date, total: "" });
+  const priceCol = numericColumn<ColspanRow>({
+    header: "Price",
+    data: ({ priceInCents }) => (
+      <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} type="cents" />
+    ),
+    total: ({ totalPriceInCents }) => (
+      <NumberField hideLabel label="Price" readOnly value={totalPriceInCents} onChange={noop} type="cents" />
+    ),
+  });
+  // Use a green background to show the 1st column is flush left
+  return (
+    <GridTable<ColspanRow>
+      columns={[idCol, nameCol, detailCol, dateCol, priceCol]}
+      rows={[
+        simpleHeader,
+        { kind: "data", id: "1", name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
+        { kind: "data", id: "2", name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
+        { kind: "data", id: "3", name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
+        { kind: "data", id: "4", name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+        { kind: "total", id: "total", totalPriceInCents: 14_083_64 },
+      ]}
+    />
+  );
+}
+
+113_00 + 1_524_99 + 80_65 + 12_365_00;

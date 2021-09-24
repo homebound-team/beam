@@ -840,6 +840,7 @@ export type GridCellContent = {
   sortValue?: MaybeFn<number | string | Date | boolean | null | undefined>;
   /** Whether to indent the cell. */
   indent?: 1 | 2;
+  colspan?: number;
 };
 
 type MaybeFn<T> = T | (() => T);
@@ -921,12 +922,18 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const Row = as === "table" ? "tr" : "div";
 
   const currentCard = openCards && openCards.length > 0 && openCards[openCards.length - 1];
-
+  let currentColspan = 1;
   const div = (
     <Row css={rowCss} {...others}>
       {openCards && maybeAddCardPadding(openCards, "first")}
       {columns.map((column, columnIndex) => {
+        // Decrement colspan count and skip if greater than 1.
+        if (currentColspan > 1) {
+          currentColspan -= 1;
+          return;
+        }
         const maybeContent = applyRowFn(column, row);
+        currentColspan = isContentAndSettings(maybeContent) ? maybeContent.colspan ?? 1 : 1;
 
         const canSortColumn =
           (sorting?.on === "client" && column.clientSideSort !== false) ||
@@ -959,6 +966,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
           // If we're within a card, use its background color
           ...(currentCard && Css.bgColor(currentCard.bgColor).$),
+          // Add in colspan css if needed
+          ...(currentColspan > 1 ? Css.gc(`${columnIndex + 1} / span ${currentColspan}`).$ : {}),
           // And finally the specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
         };
