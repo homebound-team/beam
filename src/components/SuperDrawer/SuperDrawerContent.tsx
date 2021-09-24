@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { ReactNode, useContext } from "react";
-import { BeamContext } from "src/components/BeamContext";
+import { ReactNode } from "react";
+import { useBeamContext } from "src/components/BeamContext";
 import { Button, ButtonProps } from "src/components/Button";
 import { useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
 import { Css } from "src/Css";
@@ -25,7 +25,7 @@ interface SuperDrawerContentProps {
  */
 export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProps) => {
   const { closeDrawerDetail } = useSuperDrawer();
-  const { drawerContentStack: contentStack } = useContext(BeamContext);
+  const { drawerContentStack: contentStack } = useBeamContext();
 
   // Determine if the current element is a new content element or an detail element
   const { kind } = contentStack.current[contentStack.current.length - 1];

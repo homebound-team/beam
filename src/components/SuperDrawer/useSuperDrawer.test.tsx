@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react-hooks";
-import { ReactElement, useContext, useEffect } from "react";
+import { ReactElement, useEffect } from "react";
 import { render, withBeamRTL } from "src/utils/rtl";
-import { BeamContext } from "../BeamContext";
+import { useBeamContext } from "../BeamContext";
 import { useSuperDrawer } from "./index";
 
 describe("useSuperDrawer", () => {
@@ -59,7 +59,7 @@ describe("useSuperDrawer", () => {
   it("should not add canCloseDrawerCheck when SuperDrawer is closed", () => {
     // Given the useSuperDrawer hook
     const superDrawerHook = renderHook(useSuperDrawer, { wrapper }).result.current;
-    const beamHook = renderHook(() => useContext(BeamContext), { wrapper }).result.current;
+    const beamHook = renderHook(() => useBeamContext(), { wrapper }).result.current;
 
     // When adding a canCloseDrawerCheck
     act(() => superDrawerHook.addCanCloseDrawerCheck(() => true));
@@ -92,7 +92,7 @@ describe("useSuperDrawer", () => {
   it("should not add canCloseDrawerCheckDetail when SuperDrawer details is closed", () => {
     // Given the useSuperDrawer and beamContent hook
     const superDrawerHook = renderHook(useSuperDrawer, { wrapper }).result.current;
-    const beamHook = renderHook(() => useContext(BeamContext), { wrapper }).result.current;
+    const beamHook = renderHook(() => useBeamContext(), { wrapper }).result.current;
     // And a opened SuperDrawer with no detail content
     act(() => {
       superDrawerHook.openInDrawer({ title: "title", content: "content" });

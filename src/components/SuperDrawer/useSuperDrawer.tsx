@@ -1,5 +1,5 @@
-import React, { ReactNode, useContext, useMemo } from "react";
-import { BeamContext } from "src/components/BeamContext";
+import React, { ReactNode, useMemo } from "react";
+import { useBeamContext } from "src/components/BeamContext";
 import { Callback } from "src/types";
 import { useModal } from "../Modal";
 import { ConfirmCloseModal } from "./ConfirmCloseModal";
@@ -62,7 +62,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
     modalState,
     drawerCanCloseChecks: canCloseChecks,
     drawerCanCloseDetailsChecks: canCloseDetailsChecks,
-  } = useContext(BeamContext);
+  } = useBeamContext();
   const { openModal } = useModal();
 
   function canCloseDrawerDetails(i: number, doChange: Callback) {
