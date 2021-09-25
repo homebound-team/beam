@@ -80,7 +80,7 @@ export function TabContent<V extends string>(props: Omit<TabsProps<V, {}>, "onCh
       role="tabpanel"
       tabIndex={0}
       {...tid.panel}
-      css={{ ...Css.mt2.$, ...contentXss }}
+      css={{ ...Css.mt3.$, ...contentXss }}
     >
       {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
     </div>
