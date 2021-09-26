@@ -29,6 +29,7 @@ export type GridTableXss = Xss<Margin>;
 export const ASC = "ASC" as const;
 export const DESC = "DESC" as const;
 export type Direction = "ASC" | "DESC";
+export const emptyCell: () => ReactNode = () => <></>;
 
 let runningInJest = false;
 
@@ -1024,17 +1025,22 @@ function toContent(
 ): ReactNode {
   if (typeof content === "string" && isHeader && canSortColumn) {
     return <SortHeader content={content} />;
-  } else if (isContentAndSettings(content)) {
-    return content.content;
-  } else if (style.emptyCell && !content) {
+  } else if (style.emptyCell && isContentEmpty(content)) {
     // If the content is empty and the user specified an `emptyCell` node, return that.
     return style.emptyCell;
+  } else if (isContentAndSettings(content)) {
+    return content.content;
   }
   return content;
 }
 
 function isContentAndSettings(content: ReactNode | GridCellContent): content is GridCellContent {
   return typeof content === "object" && !!content && "content" in content;
+}
+
+const emptyValues = ["", null, undefined] as any[];
+function isContentEmpty(content: ReactNode | GridCellContent): boolean {
+  return emptyValues.includes(isContentAndSettings(content) ? content.content : content);
 }
 
 /** Return the content for a given column def applied to a given row. */

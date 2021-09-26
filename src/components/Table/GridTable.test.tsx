@@ -3,6 +3,7 @@ import { GridRowLookup } from "src/components/Table/GridRowLookup";
 import {
   calcDivGridColumns,
   calcVirtualGridColumns,
+  emptyCell,
   GridCollapseContext,
   GridColumn,
   GridDataRow,
@@ -22,7 +23,7 @@ import { Css, Palette } from "src/Css";
 import { cell, click, render, row } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
-type Data = { name: string; value: number | undefined };
+type Data = { name: string; value: number | undefined | null };
 type Row = SimpleHeaderAndDataOf<Data>;
 
 const nameColumn: GridColumn<Row> = { header: () => "Name", data: ({ name }) => name };
@@ -1032,16 +1033,32 @@ describe("GridTable", () => {
         style={{ emptyCell: <>empty</> }}
         rows={[
           simpleHeader,
-          // And some content is undefined and empty strings
-          { kind: "data", id: "2", name: "", value: 2 },
-          { kind: "data", id: "1", name: "a", value: undefined },
+          // And some content is null, undefined, and empty strings
+          { kind: "data", id: "1", name: "", value: null },
+          { kind: "data", id: "2", name: "a", value: undefined },
           { kind: "data", id: "3", name: "c", value: 1 },
         ]}
       />,
     );
     // Then the cells with missing content have the `emptyCell` node applied.
     expect(cell(r, 1, 0).textContent).toBe("empty");
+    expect(cell(r, 1, 1).textContent).toBe("empty");
     expect(cell(r, 2, 1).textContent).toBe("empty");
+  });
+
+  it("can show an actually empty cell using 'emptyCell' const", async () => {
+    // Given the table with a column that defines the `kind: data` as an empty cell
+    const nameColumn: GridColumn<Row> = { header: () => "Name", data: emptyCell };
+    // And a table where the there is an `emptyCell` style specified
+    const r = await render(
+      <GridTable<Row>
+        columns={[nameColumn, valueColumn]}
+        style={{ emptyCell: <>empty</> }}
+        rows={[simpleHeader, { kind: "data", id: "1", name: "a", value: 1 }]}
+      />,
+    );
+    // Then the cell in this column should actually be empty
+    expect(cell(r, 1, 0)).toBeEmptyDOMElement();
   });
 });
 

@@ -10,6 +10,7 @@ import {
   condensedStyle,
   dateColumn,
   defaultStyle,
+  emptyCell,
   GridColumn,
   GridDataRow,
   GridRowLookup,
@@ -684,9 +685,10 @@ export function CustomEmptyCell() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
+  const fourthColumn: GridColumn<Row> = { header: "Really Empty", data: () => emptyCell };
   return (
     <GridTable<Row>
-      columns={[nameColumn, valueColumn, actionColumn]}
+      columns={[nameColumn, valueColumn, actionColumn, fourthColumn]}
       style={{ ...condensedStyle, emptyCell: <>&mdash;</> }}
       rows={[
         { kind: "header", id: "header" },
