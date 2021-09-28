@@ -91,6 +91,21 @@ describe("TabsWithContent", () => {
     expect(r.tab_panel().textContent).toBe("Tab 1 Content");
   });
 
+  it("shows all the tabs if 'forceShow' is defined, but only a single tab is enabled ", async () => {
+    // Given only the 1st tab is enabled
+    const testTabs: Tab<TabValue>[] = [
+      { name: "Tab 1", value: "tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
+      { name: "Tab 2", value: "tab2", disabled: true, render: () => <TestTabContent content="Tab 2 Content" /> },
+    ];
+    // And defining `forceShow`
+    const r = await render(
+      <TabsWithContent forceShow tabs={testTabs} onChange={() => {}} selected="tab1" />,
+      withRouter(),
+    );
+    // Then all tabs should be shown in the DOM
+    expect(r.queryAllByRole("tab")).toHaveLength(2);
+  });
+
   it("renders tabs as links", async () => {
     const router = withRouter("/tab1");
     // Given tabs with `path` values
