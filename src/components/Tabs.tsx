@@ -31,7 +31,7 @@ export interface TabsProps<V extends string, X> {
   onChange: (value: V) => void;
   contentXss?: X;
   // Allow for showing the tabs even if there is only one enabled tab
-  forceShow?: boolean;
+  alwaysShowAllTabs?: boolean;
 }
 
 // Tabs can be rendered as Links (omit "onChange") and we'll use React-Router for matching (omit "selected")/
@@ -57,8 +57,8 @@ export interface RouteTab<V extends string = string> extends Omit<Tab<V>, "value
 export function TabsWithContent<V extends string, X extends Only<TabsContentXss, X>>(
   props: TabsProps<V, X> | RouteTabsProps<V, X>,
 ) {
-  // Hide the tabs if only one tab is enabled, and `forceShow` is not true
-  const hideTabs = props.forceShow
+  // Hide the tabs if only one tab is enabled, and `alwaysShowAllTabs` is not true
+  const hideTabs = props.alwaysShowAllTabs
     ? false
     : (props.tabs as any[]).filter((t: RouteTab<V> | Tab<V>) => !t.disabled).length === 1;
   return (
@@ -139,7 +139,7 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
   }
 
   // We also check this in TabsWithContent, but if someone is using Tabs standalone, check it here as well
-  const hideTabs = props.forceShow ? false : (props.tabs as any[]).filter((t) => !t.disabled).length === 1;
+  const hideTabs = props.alwaysShowAllTabs ? false : (props.tabs as any[]).filter((t) => !t.disabled).length === 1;
   if (hideTabs) {
     return <></>;
   }
