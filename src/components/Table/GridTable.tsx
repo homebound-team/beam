@@ -29,6 +29,7 @@ export type GridTableXss = Xss<Margin>;
 export const ASC = "ASC" as const;
 export const DESC = "DESC" as const;
 export type Direction = "ASC" | "DESC";
+export const emptyCell: () => ReactNode = () => <></>;
 
 let runningInJest = false;
 
@@ -63,6 +64,8 @@ export interface GridStyle {
   rowHoverColor?: string;
   /** Styling for our special "nested card" output mode. */
   nestedCards?: NestedCardsStyle;
+  /** Default content to put into an empty cell */
+  emptyCell?: ReactNode;
 }
 
 export interface NestedCardsStyle {
@@ -938,7 +941,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         const canSortColumn =
           (sorting?.on === "client" && column.clientSideSort !== false) ||
           (sorting?.on === "server" && !!column.serverSideSortKey);
-        const content = toContent(maybeContent, isHeader, canSortColumn);
+        const content = toContent(maybeContent, isHeader, canSortColumn, style);
 
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
 
@@ -1014,9 +1017,17 @@ const ObservedGridRow = React.memo((props: GridRowProps<any, any>) => (
 ));
 
 /** If a column def return just string text for a given row, apply some default styling. */
-function toContent(content: ReactNode | GridCellContent, isHeader: boolean, canSortColumn: boolean): ReactNode {
+function toContent(
+  content: ReactNode | GridCellContent,
+  isHeader: boolean,
+  canSortColumn: boolean,
+  style: GridStyle,
+): ReactNode {
   if (typeof content === "string" && isHeader && canSortColumn) {
     return <SortHeader content={content} />;
+  } else if (style.emptyCell && isContentEmpty(content)) {
+    // If the content is empty and the user specified an `emptyCell` node, return that.
+    return style.emptyCell;
   } else if (isContentAndSettings(content)) {
     return content.content;
   }
@@ -1025,6 +1036,11 @@ function toContent(content: ReactNode | GridCellContent, isHeader: boolean, canS
 
 function isContentAndSettings(content: ReactNode | GridCellContent): content is GridCellContent {
   return typeof content === "object" && !!content && "content" in content;
+}
+
+const emptyValues = ["", null, undefined] as any[];
+function isContentEmpty(content: ReactNode | GridCellContent): boolean {
+  return emptyValues.includes(isContentAndSettings(content) ? content.content : content);
 }
 
 /** Return the content for a given column def applied to a given row. */

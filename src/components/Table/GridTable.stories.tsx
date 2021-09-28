@@ -10,6 +10,7 @@ import {
   condensedStyle,
   dateColumn,
   defaultStyle,
+  emptyCell,
   GridColumn,
   GridDataRow,
   GridRowLookup,
@@ -33,7 +34,7 @@ export default {
   parameters: { layout: "fullscreen", backgrounds: { default: "white" } },
 } as Meta;
 
-type Data = { name: string; value: number };
+type Data = { name: string | undefined; value: number | undefined };
 type Row = SimpleHeaderAndDataOf<Data>;
 
 export function ClientSideSorting() {
@@ -644,6 +645,7 @@ export function ColSpan() {
     header: "ID",
     data: ({ id }) => id,
     // Not putting the colspan here just as a POC that we can colspan somewhere other than from the first column.
+    // We should expect this to show the `emptyCell` fallback
     total: "",
   });
   const nameCol = column<ColspanRow>({
@@ -666,6 +668,7 @@ export function ColSpan() {
   return (
     <GridTable<ColspanRow>
       columns={[idCol, nameCol, detailCol, dateCol, priceCol]}
+      style={{ ...condensedStyle, emptyCell: <>&mdash;</> }}
       rows={[
         simpleHeader,
         { kind: "data", id: "1", name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
@@ -673,6 +676,25 @@ export function ColSpan() {
         { kind: "data", id: "3", name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
         { kind: "data", id: "4", name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
         { kind: "total", id: "total", totalPriceInCents: 14_083_64 },
+      ]}
+    />
+  );
+}
+
+export function CustomEmptyCell() {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
+  const fourthColumn: GridColumn<Row> = { header: "Really Empty", data: () => emptyCell };
+  return (
+    <GridTable<Row>
+      columns={[nameColumn, valueColumn, actionColumn, fourthColumn]}
+      style={{ ...condensedStyle, emptyCell: <>&mdash;</> }}
+      rows={[
+        { kind: "header", id: "header" },
+        { kind: "data", id: "1", name: "c", value: 1 },
+        { kind: "data", id: "2", name: "b", value: undefined },
+        { kind: "data", id: "3", name: "", value: 3 },
       ]}
     />
   );
