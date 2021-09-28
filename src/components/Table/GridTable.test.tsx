@@ -1043,7 +1043,10 @@ describe("GridTable", () => {
     // Then the cells with missing content have the `emptyCell` node applied.
     expect(cell(r, 1, 0).textContent).toBe("empty");
     expect(cell(r, 1, 1).textContent).toBe("empty");
+    expect(cell(r, 2, 0).textContent).toBe("a");
     expect(cell(r, 2, 1).textContent).toBe("empty");
+    expect(cell(r, 3, 0).textContent).toBe("c");
+    expect(cell(r, 3, 1).textContent).toBe("1");
   });
 
   it("can show an actually empty cell using 'emptyCell' const", async () => {
@@ -1059,6 +1062,7 @@ describe("GridTable", () => {
     );
     // Then the cell in this column should actually be empty
     expect(cell(r, 1, 0)).toBeEmptyDOMElement();
+    expect(cell(r, 1, 1).textContent).toBe("1");
   });
 });
 
