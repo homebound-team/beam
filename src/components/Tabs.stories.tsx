@@ -7,7 +7,15 @@ import { Button } from "src/components/Button";
 import { Css } from "src/Css";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
 import { Icon } from "./Icon";
-import { getTabStyles, RouteTab, Tab, TabActions, TabContent, Tabs, TabsWithContent } from "./Tabs";
+import {
+  getTabStyles,
+  RouteTabWithContent,
+  TabActions,
+  TabContent,
+  Tabs,
+  TabsWithContent,
+  TabWithContent,
+} from "./Tabs";
 import { TabValue, TestTabContent, testTabs } from "./testData";
 
 export default {
@@ -63,7 +71,7 @@ export function TabsWithIconAndMargin() {
 export function TabsWithEndAdornment() {
   const redCircle = <div css={Css.br8.bgRed400.wPx(16).hPx(16).$} />;
   const greenCircle = <div css={Css.br8.bgGreen400.wPx(16).hPx(16).$} />;
-  const tabsWithAdornment: Tab<TabValue>[] = [
+  const tabsWithAdornment: TabWithContent<TabValue>[] = [
     { name: "Tab 1", value: "tab1", endAdornment: redCircle, render: () => <TestTabContent content="Tab 1 Content" /> },
     {
       name: "Tab 2",
@@ -96,7 +104,7 @@ TabsAsLinks.decorators = [withRouter("/ce:2", "/")];
 function TestComponent() {
   const location = useLocation();
   const history = useHistory();
-  const routeTabs: RouteTab<string>[] = [
+  const routeTabs: RouteTabWithContent[] = [
     {
       name: "Tab 1",
       href: "/ce:2/overview",
@@ -137,7 +145,7 @@ function TestComponent() {
 }
 
 export const TabsHiddenIfOnlyOneActive = () => {
-  const testTabs: Tab<TabValue>[] = [
+  const testTabs: TabWithContent<TabValue>[] = [
     { name: "Tab 1", value: "tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
     { name: "Tab 2", value: "tab2", disabled: true, render: () => <TestTabContent content="Tab 2 Content" /> },
     { name: "Tab 3", value: "tab3", disabled: true, render: () => <TestTabContent content="Tab 3 Content" /> },
@@ -148,7 +156,7 @@ export const TabsHiddenIfOnlyOneActive = () => {
 
 export const TabsWithActions = () => {
   const [selectedTab, setSelectedTab] = useState("tab1");
-  const testTabs: Tab<TabValue>[] = [
+  const testTabs: TabWithContent<TabValue>[] = [
     {
       name: "Tab 1",
       value: "tab1",
@@ -163,7 +171,7 @@ export const TabsWithActions = () => {
 
 export const OneTabWithActions = () => {
   const [selectedTab, setSelectedTab] = useState("tab1");
-  const testTabs: Tab<TabValue>[] = [
+  const testTabs: TabWithContent<TabValue>[] = [
     {
       name: "Tab 1",
       value: "tab1",
@@ -183,7 +191,7 @@ export const OneTabWithActions = () => {
   );
 };
 
-const tabsWithIconsAndContent: Tab<TabValue>[] = [
+const tabsWithIconsAndContent: TabWithContent<TabValue>[] = [
   { name: "Tab 1", value: "tab1", icon: "camera", render: () => <TestTabContent content="Tab 1 Content" /> },
   { name: "Tab 2", value: "tab2", icon: "dollar", render: () => <TestTabContent content="Tab 2 Content" /> },
   { name: "Tab 3", value: "tab3", icon: "check", render: () => <TestTabContent content="Tab 3 Content" /> },

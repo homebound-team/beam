@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react";
 import { PropsWithChildren, ReactNode, useMemo, useState } from "react";
 import { IconButton } from "src/components/IconButton";
-import { Tab, TabsWithContent } from "src/components/Tabs";
+import { TabsWithContent, TabWithContent } from "src/components/Tabs";
 import { Css } from "src/Css";
 import { FormLines } from "src/forms";
 import {
@@ -112,7 +112,7 @@ export function ScrollableParentFallback() {
 
 function ExamplePageComponent() {
   const [selectedTab, setSelectedTab] = useState("lineItems");
-  const tabs: Tab[] = [
+  const tabs: TabWithContent[] = [
     { value: "overview", name: "Overview", render: () => <OverviewExample /> },
     { value: "lineItems", name: "Line Items", render: () => <ScrollableTableExample /> },
     { value: "history", name: "History", render: () => <HistoryExample /> },
