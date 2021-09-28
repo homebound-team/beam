@@ -13,7 +13,10 @@ import { Icon } from "./Icon";
 export interface Tab<V extends string = string> {
   name: string;
   value: V;
+  // Suffixes label with specified Icon. If `icon` and `endAdornment` are supplied, only the `icon` will be displayed
   icon?: IconKey;
+  // Suffixes label with specified node. Expected to be used for cases where the decoration is not just an icon.
+  endAdornment?: ReactNode;
   disabled?: boolean;
   render: () => ReactNode;
 }
@@ -34,7 +37,7 @@ export interface RouteTabsProps<V extends string, X> extends Omit<TabsProps<V, X
   tabs: RouteTab<V>[];
 }
 // A Route Tab has a `href` prop rather than a `value` prop
-export interface RouteTab<V extends string> extends Omit<Tab<V>, "value"> {
+export interface RouteTab<V extends string = string> extends Omit<Tab<V>, "value"> {
   href: V;
   // This is a React-Router path(s) to match the current URL to. Matching on the path(s) is what dictates which TabContent to render
   path: string | string[];
@@ -171,7 +174,7 @@ interface TabImplProps<V extends string> extends BeamFocusableProps {
 
 function TabImpl<V extends string>(props: TabImplProps<V>) {
   const { tab, onClick, active, onKeyUp, onBlur, focusProps, isFocusVisible = false, ...others } = props;
-  const { disabled: isDisabled = false, name: label, icon } = tab;
+  const { disabled: isDisabled = false, name: label, icon, endAdornment } = tab;
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
     () => getTabStyles(),
@@ -205,11 +208,7 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
   const tabLabel = (
     <>
       {label}
-      {icon && (
-        <span css={Css.ml1.$}>
-          <Icon icon={icon} />
-        </span>
-      )}
+      {(icon || endAdornment) && <span css={Css.ml1.$}>{icon ? <Icon icon={icon} /> : endAdornment}</span>}
     </>
   );
 

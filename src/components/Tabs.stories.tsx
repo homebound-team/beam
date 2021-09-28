@@ -59,6 +59,22 @@ export function TabsWithIconAndMargin() {
   return <TabsWithContent tabs={tabsWithIconsAndContent} onChange={setTab} selected={tab} contentXss={Css.m3.$} />;
 }
 
+export function TabsWithEndAdornment() {
+  const redCircle = <div css={Css.br8.bgRed400.wPx(16).hPx(16).$} />;
+  const greenCircle = <div css={Css.br8.bgGreen400.wPx(16).hPx(16).$} />;
+  const tabsWithAdornment: Tab<TabValue>[] = [
+    { name: "Tab 1", value: "tab1", endAdornment: redCircle, render: () => <TestTabContent content="Tab 1 Content" /> },
+    {
+      name: "Tab 2",
+      value: "tab2",
+      endAdornment: greenCircle,
+      render: () => <TestTabContent content="Tab 2 Content" />,
+    },
+  ];
+  const [tab, setTab] = useState<TabValue>("tab1");
+  return <TabsWithContent tabs={tabsWithAdornment} onChange={setTab} selected={tab} contentXss={Css.m3.$} />;
+}
+
 export function TabsSeparateFromContent() {
   const [tab, setTab] = useState<TabValue>("tab1");
   return (
