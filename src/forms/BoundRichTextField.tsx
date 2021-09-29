@@ -25,7 +25,7 @@ export function BoundRichTextField(props: BoundRichTextFieldProps) {
           // errorMsg={field.touched ? field.errors.join(" ") : undefined}
           onBlur={() => field.blur()}
           onFocus={() => field.focus()}
-          readOnly={readOnly}
+          readOnly={readOnly ?? field.readOnly}
           {...testId}
           {...others}
         />
