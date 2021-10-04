@@ -35,9 +35,11 @@
   "dependencies": {
     "@react-hook/resize-observer": "^1.2.2",
     "change-case": "^4.1.2",
-    "date-fns": "^2.21.3",
+    "date-fns": "^2.24.0",
     "dompurify": "^2.3.0",
     "framer-motion": "^4.1.11",
+    "highcharts": "^9.2.2",
+    "highcharts-react-official": "^3.0.0",
     "memoize-one": "^5.2.1",
     "react-aria": "^3.8.0",
     "react-day-picker": "^7.4.10",

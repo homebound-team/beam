@@ -1,4 +1,7 @@
 import { Meta } from "@storybook/react";
+import { addDays } from "date-fns/esm";
+import HighchartsReact from "highcharts-react-official";
+import Highcharts from "highcharts/highcharts-gantt.src";
 import { Chart } from "react-google-charts";
 import { GoogleDataTableColumn, GoogleDataTableRow } from "react-google-charts/dist/types";
 
@@ -48,5 +51,54 @@ export function GoogleGanttChart() {
       }}
       legendToggle
     />
+  );
+}
+
+export function HighchartsGanttChart() {
+  const today = new Date();
+
+  const options: Highcharts.Options = {
+    title: {
+      text: "Gantt Chart",
+    },
+    tooltip: {
+      enabled: true,
+    },
+    series: [
+      {
+        type: "gantt",
+        data: [
+          {
+            id: "t1",
+            start: today.getTime(),
+            end: addDays(today, 2).getTime(),
+          },
+          {
+            id: "t2",
+            start: addDays(today, 1).getTime(),
+            end: addDays(today, 5).getTime(),
+            dependency: ["t1"],
+          },
+          {
+            id: "t3",
+            start: addDays(today, 2).getTime(),
+            end: addDays(today, 4).getTime(),
+            dependency: ["t1"],
+          },
+          {
+            id: "t4",
+            start: addDays(today, 5).getTime(),
+            end: addDays(today, 10).getTime(),
+            dependency: ["t1"],
+          },
+        ],
+      },
+    ],
+  };
+
+  return (
+    <div css={{ height: "100vh", width: "100vw" }}>
+      <HighchartsReact highcharts={Highcharts} options={options} constructorType={"ganttChart"} />
+    </div>
   );
 }
