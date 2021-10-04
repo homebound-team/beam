@@ -41,6 +41,7 @@
     "memoize-one": "^5.2.1",
     "react-aria": "^3.8.0",
     "react-day-picker": "^7.4.10",
+    "react-google-charts": "^3.0.15",
     "react-popper": "^2.2.5",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
