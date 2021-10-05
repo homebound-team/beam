@@ -69,13 +69,9 @@ export interface RouteTab<V extends string = string> extends Omit<Tab<V>, "value
 export function TabsWithContent<V extends string, X extends Only<TabsContentXss, X>>(
   props: TabsProps<V, X> | RouteTabsProps<V, X>,
 ) {
-  // Hide the tabs if only one tab is enabled, and `alwaysShowAllTabs` is not true
-  const hideTabs = props.alwaysShowAllTabs
-    ? false
-    : (props.tabs as any[]).filter((t: RouteTab<V> | Tab<V>) => !t.disabled).length === 1;
   return (
     <>
-      {!hideTabs && <Tabs {...props} />}
+      <Tabs {...props} />
       <TabContent {...props} />
     </>
   );
@@ -157,10 +153,12 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
     }
   }
 
-  // We also check this in TabsWithContent, but if someone is using Tabs standalone, check it here as well
+  const actionsDiv = <div css={Css.ml("auto").addIn("&>div", Css.df.aic.childGap1.$).$} ref={tabActionsRef} />;
+
+  // Check to see if we should hide the tabs. We will still return something so that the Tab Actions (if any) can render
   const hideTabs = props.alwaysShowAllTabs ? false : (props.tabs as any[]).filter((t) => !t.disabled).length === 1;
   if (hideTabs) {
-    return <></>;
+    return <div css={Css.df.aic.$}>{actionsDiv}</div>;
   }
 
   return (
@@ -184,7 +182,7 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
         })}
       </div>
       {/* ref for actions specific to a tab. Targeting the immediate div (tabActionsEl) to set default styles */}
-      <div css={Css.ml("auto").addIn("&>div", Css.df.aic.childGap1.$).$} ref={tabActionsRef}></div>
+      {actionsDiv}
     </div>
   );
 }
