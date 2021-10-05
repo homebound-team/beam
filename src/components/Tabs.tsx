@@ -89,6 +89,9 @@ export function TabContent<V extends string>(props: Omit<TabsProps<V, {}>, "onCh
     : props.tabs.find((tab) => tab.value === props.selected) || tabs[0];
   const uniqueValue = uniqueTabValue(selectedTab);
 
+  // Do not apply default top margin styles if the tabs are being hidden. This avoids unnecessary white space being added
+  const styles = hideTabs(props) ? {} : Css.mt3.$;
+
   return (
     <div
       aria-labelledby={`${uniqueValue}-tab`}
@@ -96,7 +99,7 @@ export function TabContent<V extends string>(props: Omit<TabsProps<V, {}>, "onCh
       role="tabpanel"
       tabIndex={0}
       {...tid.panel}
-      css={{ ...Css.mt3.$, ...contentXss }}
+      css={{ ...styles, ...contentXss }}
     >
       {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
     </div>
@@ -153,36 +156,31 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
     }
   }
 
-  const actionsDiv = <div css={Css.ml("auto").addIn("&>div", Css.df.aic.childGap1.$).$} ref={tabActionsRef} />;
-
-  // Check to see if we should hide the tabs. We will still return something so that the Tab Actions (if any) can render
-  const hideTabs = props.alwaysShowAllTabs ? false : (props.tabs as any[]).filter((t) => !t.disabled).length === 1;
-  if (hideTabs) {
-    return <div css={Css.df.aic.$}>{actionsDiv}</div>;
-  }
-
   return (
     <div css={Css.df.aic.$}>
-      <div ref={ref} css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...tid}>
-        {tabs.map((tab) => {
-          const uniqueValue = uniqueTabValue(tab);
-          return (
-            <TabImpl
-              active={active === uniqueValue}
-              focusProps={focusProps}
-              isFocusVisible={isFocusVisible}
-              key={uniqueValue}
-              onClick={onClick}
-              onKeyUp={onKeyUp}
-              onBlur={onBlur}
-              tab={tab}
-              {...tid[defaultTestId(uniqueValue)]}
-            />
-          );
-        })}
-      </div>
+      {/* Do not show if we should hide the tabs */}
+      {!hideTabs(props) && (
+        <div ref={ref} css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...tid}>
+          {tabs.map((tab) => {
+            const uniqueValue = uniqueTabValue(tab);
+            return (
+              <TabImpl
+                active={active === uniqueValue}
+                focusProps={focusProps}
+                isFocusVisible={isFocusVisible}
+                key={uniqueValue}
+                onClick={onClick}
+                onKeyUp={onKeyUp}
+                onBlur={onBlur}
+                tab={tab}
+                {...tid[defaultTestId(uniqueValue)]}
+              />
+            );
+          })}
+        </div>
+      )}
       {/* ref for actions specific to a tab. Targeting the immediate div (tabActionsEl) to set default styles */}
-      {actionsDiv}
+      <div css={Css.ml("auto").addIn("&>div", Css.df.aic.childGap1.$).$} ref={tabActionsRef} />
     </div>
   );
 }
@@ -293,4 +291,9 @@ export function TabActions({ children }: PropsWithChildren<{}>): ReactPortal {
     throw new Error("Tab Actions element is not defined");
   }
   return createPortal(children, tabActionsDiv);
+}
+
+// Determines whether we should hide the Tab panel. Returns true if there is only one enabled tab and `alwaysShowAllTabs` is falsey.
+function hideTabs(props: Omit<TabsProps<any, {}>, "onChange"> | RouteTabsProps<any, {}>) {
+  return props.alwaysShowAllTabs ? false : (props.tabs as any[]).filter((t) => !t.disabled).length === 1;
 }

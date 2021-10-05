@@ -167,13 +167,18 @@ export const OneTabWithActions = () => {
     {
       name: "Tab 1",
       value: "tab1",
-      render: () => <TabWithActions actions={["Add New", "Edit"]}>Tab Content</TabWithActions>,
+      render: () => (
+        <TabWithActions actions={["Add New", "Edit"]}>
+          <div css={Css.bgGray100.bt.bGray800.p2.$}>Tab Content</div>
+        </TabWithActions>
+      ),
     },
   ];
   return (
     <>
       <Tabs tabs={testTabs} onChange={setSelectedTab} selected={selectedTab} ariaLabel="Sample Tabs" />
-      <TabContent tabs={testTabs} selected={selectedTab} />
+      {/* The tabs will be hidden, which causes the TabContent default top margin to be removed. But we are adding in actions, so add the margin back in ourselves. */}
+      <TabContent contentXss={Css.mt3.$} tabs={testTabs} selected={selectedTab} />
     </>
   );
 };
