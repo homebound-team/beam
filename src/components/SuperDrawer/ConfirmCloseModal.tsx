@@ -1,6 +1,5 @@
-import { useContext } from "react";
 import { Button, Css, ModalBody, ModalFooter, ModalHeader } from "src";
-import { BeamContext } from "../BeamContext";
+import { useBeamContext } from "../BeamContext";
 
 interface ConfirmCloseModalProps {
   onClose: () => void;
@@ -8,7 +7,7 @@ interface ConfirmCloseModalProps {
 
 /** Modal content to appear when a close checks fails */
 export function ConfirmCloseModal({ onClose }: ConfirmCloseModalProps) {
-  const { modalState } = useContext(BeamContext);
+  const { modalState } = useBeamContext();
 
   // TODO: Change to closeModal from useModal when canCloseChecks are reset
   function closeModal() {

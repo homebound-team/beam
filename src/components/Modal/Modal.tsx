@@ -1,8 +1,8 @@
 import useResizeObserver from "@react-hook/resize-observer";
-import { ReactNode, useContext, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { FocusScope, OverlayContainer, useDialog, useModal, useOverlay, usePreventScroll } from "react-aria";
 import { createPortal } from "react-dom";
-import { BeamContext } from "src/components/BeamContext";
+import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, px, Xss } from "src/Css";
@@ -36,7 +36,7 @@ export function Modal(props: ModalProps) {
   const { size = "md", content, forceScrolling } = props;
   const isFixedHeight = typeof size !== "string";
   const ref = useRef(null);
-  const { modalBodyDiv, modalFooterDiv, modalHeaderDiv, drawerContentStack } = useContext(BeamContext);
+  const { modalBodyDiv, modalFooterDiv, modalHeaderDiv, drawerContentStack } = useBeamContext();
   const { closeModal } = ourUseModal();
   const { overlayProps, underlayProps } = useOverlay(
     { ...props, isOpen: true, onClose: closeModal, isDismissable: true },
@@ -112,13 +112,13 @@ export function Modal(props: ModalProps) {
 }
 
 export function ModalHeader({ children }: { children: ReactNode }): JSX.Element {
-  const { modalHeaderDiv } = useContext(BeamContext);
+  const { modalHeaderDiv } = useBeamContext();
   return createPortal(<>{children}</>, modalHeaderDiv);
 }
 
 /** Provides consistent styling and the scrolling behavior for a modal's primary content. */
 export function ModalBody({ children }: { children: ReactNode }): JSX.Element {
-  const { modalBodyDiv } = useContext(BeamContext);
+  const { modalBodyDiv } = useBeamContext();
   const testId = useTestIds({}, testIdPrefix);
   return createPortal(
     <div css={Css.px3.$} {...testId.content}>
@@ -138,7 +138,7 @@ export function ModalFooter<X extends Only<ModalFooterXss, X>>({
   children: ReactNode;
   xss?: X;
 }): JSX.Element {
-  const { modalFooterDiv } = useContext(BeamContext);
+  const { modalFooterDiv } = useBeamContext();
   const testId = useTestIds({}, testIdPrefix);
   return createPortal(
     <div css={{ ...Css.p3.df.aic.jcfe.childGap1.$, ...xss }} {...testId.footer}>

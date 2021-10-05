@@ -1,4 +1,4 @@
-import { createContext, MutableRefObject, ReactNode, useMemo, useReducer, useRef } from "react";
+import { createContext, MutableRefObject, ReactNode, useContext, useMemo, useReducer, useRef } from "react";
 import { OverlayProvider } from "react-aria";
 import { Modal, ModalProps } from "src/components/Modal/Modal";
 import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
@@ -22,6 +22,10 @@ export interface BeamContextState {
   drawerCanCloseChecks: MutableRefObject<CheckFn[]>;
   /** Checks when closing SuperDrawer Details, a double array to keep per-detail lists. */
   drawerCanCloseDetailsChecks: MutableRefObject<CheckFn[][]>;
+  /** The ref for defining the portal element's location for Tab actions */
+  tabActionsRef: MutableRefObject<HTMLDivElement | null>;
+  /** The div for Tab actions to portal into */
+  tabActionsDiv: HTMLDivElement;
 }
 
 /** This is only exported internally, for useModal and useSuperDrawer, it's not a public API. */
@@ -34,6 +38,8 @@ export const BeamContext = createContext<BeamContextState>({
   drawerContentStack: new EmptyRef(),
   drawerCanCloseChecks: new EmptyRef(),
   drawerCanCloseDetailsChecks: new EmptyRef(),
+  tabActionsRef: new EmptyRef(),
+  tabActionsDiv: undefined!,
 });
 
 export function BeamProvider({ children }: { children: ReactNode }) {
@@ -50,6 +56,8 @@ export function BeamProvider({ children }: { children: ReactNode }) {
   const drawerContentStackRef = useRef<ContentStack[]>([]);
   const drawerCanCloseChecks = useRef<CheckFn[]>([]);
   const drawerCanCloseDetailsChecks = useRef<CheckFn[][]>([]);
+  const tabActionsRef = useRef<HTMLDivElement>(null);
+  const tabActionsDiv = useMemo(() => document.createElement("div"), []);
 
   // We essentially expose the refs, but with our own getters/setters so that we can
   // have the setters call `tick` to re-render this Provider
@@ -65,6 +73,8 @@ export function BeamProvider({ children }: { children: ReactNode }) {
       modalFooterDiv,
       drawerCanCloseChecks,
       drawerCanCloseDetailsChecks,
+      tabActionsRef,
+      tabActionsDiv,
     };
   }, [modalBodyDiv, modalFooterDiv]);
 
@@ -91,4 +101,8 @@ class PretendRefThatTicks<T> implements MutableRefObject<T> {
     this.ref.current = value;
     this.tick();
   }
+}
+
+export function useBeamContext() {
+  return useContext(BeamContext);
 }

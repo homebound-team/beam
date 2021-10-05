@@ -1,12 +1,13 @@
+import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { Fragment, useState } from "react";
+import { Fragment, PropsWithChildren, useState } from "react";
 import { Route, useHistory, useLocation, useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
-import { withRouter } from "src/utils/sb";
+import { withBeamDecorator, withRouter } from "src/utils/sb";
 import { Icon } from "./Icon";
-import { getTabStyles, RouteTab, Tab, TabContent, Tabs, TabsWithContent } from "./Tabs";
+import { getTabStyles, RouteTab, Tab, TabActions, TabContent, Tabs, TabsWithContent } from "./Tabs";
 import { TabValue, TestTabContent, testTabs } from "./testData";
 
 export default {
@@ -16,7 +17,7 @@ export default {
     // To better view the icon hover state
     backgrounds: { default: "white" },
   },
-  decorators: [withRouter()],
+  decorators: [withRouter(), withBeamDecorator],
 } as Meta;
 
 export function TabBaseStates() {
@@ -145,6 +146,21 @@ export const TabsHiddenIfOnlyOneActive = () => {
   return <TabsWithContent tabs={testTabs} onChange={() => {}} selected={"tab1"} ariaLabel="Sample Tabs" />;
 };
 
+export const TabsWithActions = () => {
+  const [selectedTab, setSelectedTab] = useState("tab1");
+  const testTabs: Tab<TabValue>[] = [
+    {
+      name: "Tab 1",
+      value: "tab1",
+      render: () => <TabWithActions actions={["Add New", "Edit"]}>Tab Content</TabWithActions>,
+    },
+    { name: "Tab 2", value: "tab2", render: () => <TabWithActions actions={["Action 2"]}>Tab Content</TabWithActions> },
+    { name: "Tab 3", value: "tab3", render: () => <TabWithActions actions={["Action 3"]}>Tab Content</TabWithActions> },
+    { name: "Tab 4", value: "tab4", render: () => <TabWithActions actions={["Action 4"]}>Tab Content</TabWithActions> },
+  ];
+  return <TabsWithContent tabs={testTabs} onChange={setSelectedTab} selected={selectedTab} ariaLabel="Sample Tabs" />;
+};
+
 const tabsWithIconsAndContent: Tab<TabValue>[] = [
   { name: "Tab 1", value: "tab1", icon: "camera", render: () => <TestTabContent content="Tab 1 Content" /> },
   { name: "Tab 2", value: "tab2", icon: "dollar", render: () => <TestTabContent content="Tab 2 Content" /> },
@@ -203,6 +219,19 @@ function RouteTab3() {
       <div>
         <pre css={Css.dib.$}>tab.path = "/:ceId/history"</pre>
       </div>
+    </>
+  );
+}
+
+function TabWithActions({ children, actions }: PropsWithChildren<{ actions: string[] }>) {
+  return (
+    <>
+      <TabActions>
+        {actions.map((t) => (
+          <Button key={t} variant="secondary" label={t} onClick={action("Tab Action clicked")} />
+        ))}
+      </TabActions>
+      {children}
     </>
   );
 }

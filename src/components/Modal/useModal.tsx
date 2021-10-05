@@ -1,5 +1,5 @@
-import { useContext, useMemo, useRef } from "react";
-import { BeamContext } from "src/components/BeamContext";
+import { useMemo, useRef } from "react";
+import { useBeamContext } from "src/components/BeamContext";
 import { Callback, CheckFn } from "src/types";
 import { maybeCall } from "src/utils";
 import { ModalProps } from "./Modal";
@@ -11,7 +11,7 @@ export interface UseModalHook {
 }
 
 export function useModal(): UseModalHook {
-  const { modalState, modalCanCloseChecks } = useContext(BeamContext);
+  const { modalState, modalCanCloseChecks } = useBeamContext();
   const lastCanClose = useRef<CheckFn | undefined>();
   return useMemo(
     () => ({
