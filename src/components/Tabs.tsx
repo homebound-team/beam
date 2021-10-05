@@ -126,9 +126,7 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
   useEffect(() => setActive(selected), [selected]);
 
   useEffect(() => {
-    console.log("in effect", tabActionsRef, tabActionsDiv);
     if (tabActionsRef && tabActionsDiv) {
-      console.log("attemp to append!");
       tabActionsRef.current!.appendChild(tabActionsDiv);
     }
   }, [tabActionsRef, tabActionsDiv]);
