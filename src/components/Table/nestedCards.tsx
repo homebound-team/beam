@@ -53,11 +53,6 @@ export class NestedCards {
     maybeCreateChromeRow(this.columns, this.filteredRows, this.chromeBuffer);
   }
 
-  maxCardPadding(current: number | undefined): number {
-    const padding = this.openCards.map((c) => c.pxPx + (!!c.bColor ? 1 : 0)).reduce((a, b) => a + b, 0);
-    return Math.max(padding, current || 0);
-  }
-
   /** Return a stable copy of the cards, so it won't change as we keep going. */
   currentOpenCards() {
     return [...this.openCards];

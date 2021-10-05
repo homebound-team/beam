@@ -101,6 +101,7 @@ const nameColumn = column<Row>({
   subgroup: (row) => ({ value: row.name, content: "" }),
   task: (row) => row.name,
   add: "Add",
+  w: 1,
 });
 const startColumn = dateColumn<Row>({
   header: "Start",
@@ -108,6 +109,7 @@ const startColumn = dateColumn<Row>({
   subgroup: (row) => <div css={Css.smEm.gray900.$}>{row.startDate}</div>,
   task: (row) => row.startDate,
   add: "",
+  w: 1,
 });
 const endColumn = dateColumn<Row>({
   header: "End",
@@ -115,6 +117,7 @@ const endColumn = dateColumn<Row>({
   subgroup: (row) => <div css={Css.smEm.gray900.$}>{row.endDate}</div>,
   task: (row) => row.endDate,
   add: "",
+  w: 1,
 });
 const durationColumn = column<Row>({
   header: "Duration",
@@ -122,6 +125,7 @@ const durationColumn = column<Row>({
   subgroup: (row) => <div css={Css.smEm.gray900.$}>{row.duration} days</div>,
   task: (row) => `${row.duration} days`,
   add: "",
+  w: 1,
 });
 const milestoneColumn = column<Row>({
   header: "Milestone",
@@ -130,6 +134,7 @@ const milestoneColumn = column<Row>({
   subgroup: "",
   task: (row) => row.milestone,
   add: "",
+  w: 1,
 });
 const subCategoryColumn = column<Row>({
   header: "SubCategory",
@@ -138,6 +143,7 @@ const subCategoryColumn = column<Row>({
   subgroup: "",
   task: (row) => row.subGroup,
   add: "",
+  w: 1,
 });
 const statusColumn = column<Row>({
   header: "Status",
@@ -145,6 +151,7 @@ const statusColumn = column<Row>({
   subgroup: "",
   task: (row) => row.status,
   add: "",
+  w: 1,
 });
 const progressColumn = actionColumn<Row>({
   header: "",
@@ -165,6 +172,7 @@ const buttonColumns = actionColumn<Row>({
     </div>
   ),
   add: "",
+  w: 1,
 });
 
 // TODO: Potentially add 8px spacer between each row
@@ -174,6 +182,11 @@ const style: GridStyle = {
   firstNonHeaderRowCss: Css.mt2.$,
   cellCss: Css.h100.gray700.xs.aic.$,
   nestedCards: {
+    // New
+    spacerPx: 8,
+    // Note: We want 32px left spacing but we need 1px for the border.
+    firstLastColumnWidth: 33,
+    // Old
     topLevelSpacerPx: 8,
     kinds: {
       header: { bgColor: Palette.Gray100, brPx: 0, spacerPx: 0, pxPx: 0 },
