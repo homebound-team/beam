@@ -126,7 +126,9 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
   useEffect(() => setActive(selected), [selected]);
 
   useEffect(() => {
+    console.log("in effect", tabActionsRef, tabActionsDiv);
     if (tabActionsRef && tabActionsDiv) {
+      console.log("attemp to append!");
       tabActionsRef.current!.appendChild(tabActionsDiv);
     }
   }, [tabActionsRef, tabActionsDiv]);
@@ -157,10 +159,12 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
     }
   }
 
+  const actionsDiv = <div css={Css.ml("auto").addIn("&>div", Css.df.aic.childGap1.$).$} ref={tabActionsRef} />;
+
   // We also check this in TabsWithContent, but if someone is using Tabs standalone, check it here as well
   const hideTabs = props.alwaysShowAllTabs ? false : (props.tabs as any[]).filter((t) => !t.disabled).length === 1;
   if (hideTabs) {
-    return <></>;
+    return <div css={Css.df.aic.$}>{actionsDiv}</div>;
   }
 
   return (
@@ -184,7 +188,7 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
         })}
       </div>
       {/* ref for actions specific to a tab. Targeting the immediate div (tabActionsEl) to set default styles */}
-      <div css={Css.ml("auto").addIn("&>div", Css.df.aic.childGap1.$).$} ref={tabActionsRef}></div>
+      {actionsDiv}
     </div>
   );
 }

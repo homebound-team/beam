@@ -161,6 +161,23 @@ export const TabsWithActions = () => {
   return <TabsWithContent tabs={testTabs} onChange={setSelectedTab} selected={selectedTab} ariaLabel="Sample Tabs" />;
 };
 
+export const OneTabWithActions = () => {
+  const [selectedTab, setSelectedTab] = useState("tab1");
+  const testTabs: Tab<TabValue>[] = [
+    {
+      name: "Tab 1",
+      value: "tab1",
+      render: () => <TabWithActions actions={["Add New", "Edit"]}>Tab Content</TabWithActions>,
+    },
+  ];
+  return (
+    <>
+      <Tabs tabs={testTabs} onChange={setSelectedTab} selected={selectedTab} ariaLabel="Sample Tabs" />
+      <TabContent tabs={testTabs} selected={selectedTab} />
+    </>
+  );
+};
+
 const tabsWithIconsAndContent: Tab<TabValue>[] = [
   { name: "Tab 1", value: "tab1", icon: "camera", render: () => <TestTabContent content="Tab 1 Content" /> },
   { name: "Tab 2", value: "tab2", icon: "dollar", render: () => <TestTabContent content="Tab 2 Content" /> },
