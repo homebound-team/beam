@@ -306,11 +306,13 @@ export function Draggable2() {
   const addDragHoverStyles: DragEventHandler<HTMLDivElement> = (e) =>
     e.currentTarget.childNodes.forEach((cn) => {
       // Set border bottom
+      // @ts-ignore
       cn.style.borderBottom = "1px solid red";
     });
   const removeDragHoverStyles: DragEventHandler<HTMLDivElement> = (e) =>
     e.currentTarget!.childNodes.forEach((cn) => {
       // Remove border bottom
+      // @ts-ignore
       cn.style.borderBottom = null;
     });
 
@@ -367,6 +369,7 @@ export function Draggable2() {
                 e.dataTransfer.setData("text", String(rowIndex));
 
                 // Setting the drag image as the task column
+                // @ts-ignore
                 e.dataTransfer.setDragImage(e.currentTarget.nextSibling!, 0, 0);
 
                 /* TODO: Attempting to use html2Canvas to get an image of the row
@@ -479,13 +482,13 @@ Draggable3.storyName = "Draggability - React DND";
  * recreate the row itself but without the need to use `display: contents`
  *
  * Learnings:
- * -
+ * - It works but doesn't handle Chrome rows
  */
 export function Draggable4() {
   const columns = ["", "Task", "Start", "End", "Duration", "Milestone"];
-  const [rows, setRows] = useState(() => zeroTo(5).map((i) => columns.map((c) => `${c}#${i}`)));
+  const [rows] = useState(() => zeroTo(5).map((i) => columns.map((c) => `${c}#${i}`)));
   const headerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [columnWidths, setColumnWidths] = useState([]);
+  const [columnWidths, setColumnWidths] = useState<Array<number | undefined>>([]);
 
   useLayoutEffect(() => {
     const newColumnWidths = headerRefs.current.map((hr) => hr?.clientWidth);

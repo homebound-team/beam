@@ -264,7 +264,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   }, [columns, rows, sorting, sortState]);
 
   // Filter + flatten + component-ize the sorted rows.
-  let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[], number | undefined] = useMemo(() => {
+  let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
 
