@@ -9,13 +9,14 @@ import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
+import { TextField } from "src/inputs/TextField";
 import "./DateField.css";
 
 const format = "MM/dd/yy";
 
 export interface DateFieldProps {
   value: Date | undefined;
-  label?: string;
+  label: string;
   onChange: (value: Date) => void;
   /** Called when the component loses focus */
   onBlur?: () => void;
@@ -24,11 +25,24 @@ export interface DateFieldProps {
   disabled?: boolean;
   errorMsg?: string;
   required?: boolean;
+  readOnly?: boolean;
   helperText?: string | ReactNode;
 }
 
 export function DateField(props: DateFieldProps) {
-  const { label, disabled, required, value, onChange, onFocus, onBlur, errorMsg, helperText } = props;
+  const {
+    label,
+    disabled,
+    required,
+    value,
+    onChange,
+    onFocus,
+    onBlur,
+    errorMsg,
+    helperText,
+    readOnly = false,
+    ...others
+  } = props;
   const labelSuffix = getLabelSuffix(required);
 
   const { ...otherProps } = {};
@@ -37,6 +51,24 @@ export function DateField(props: DateFieldProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const textFieldProps = { ...otherProps, label: label ?? "date", isDisabled: disabled, isReadOnly: false };
   const { labelProps, inputProps } = useTextField(textFieldProps, inputRef);
+
+  if (readOnly) {
+    return (
+      <TextField
+        label={label}
+        readOnly={true}
+        errorMsg={errorMsg}
+        helperText={helperText}
+        onBlur={onBlur}
+        onFocus={onFocus}
+        required={required}
+        disabled={disabled}
+        value={value ? formatDate(value) : ""}
+        onChange={() => {}}
+        {...others}
+      />
+    );
+  }
 
   return (
     <div

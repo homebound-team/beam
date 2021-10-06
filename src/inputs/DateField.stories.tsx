@@ -15,10 +15,13 @@ export function DateFields() {
   return samples(
     ["TextField for comparison", <TextField label="First Name" value="Foo" onChange={() => {}} />],
     ["With Label", <TestDateField label="Projected Client Presentation Date" />],
-    ["Without Label", <TestDateField />],
-    ["Disabled", <TestDateField disabled />],
-    ["Error Message", <TestDateField errorMsg="Required" />],
-    ["Helper Text", <TestDateField helperText="Some really long helper text that we expect to wrap." />],
+    ["Disabled", <TestDateField label="Start Date" disabled />],
+    ["Read Only", <TestDateField label="Start Date" readOnly />],
+    ["Error Message", <TestDateField label="Start Date" errorMsg="Required" />],
+    [
+      "Helper Text",
+      <TestDateField label="Start Date" helperText="Some really long helper text that we expect to wrap." />,
+    ],
   );
 }
 
