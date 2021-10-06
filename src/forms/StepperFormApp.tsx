@@ -42,6 +42,12 @@ function StepperForm({ formState }: { formState: FormValue }) {
 
   const [currentStep, setActiveStep] = useState(steps[0].value);
 
+  const setStep = useCallback(
+    (stepValue: string, stepData: Partial<Step>) =>
+      setSteps(steps.map((s) => (s.value === stepValue ? { ...s, ...stepData } : s))),
+    [steps],
+  );
+
   const onNext = useCallback(() => {
     // If we can proceed to the next step, then we should consider this step complete.
     setStep(currentStep, { state: "complete" });
@@ -49,18 +55,12 @@ function StepperForm({ formState }: { formState: FormValue }) {
     if (currentStepIndex !== undefined) {
       setActiveStep(steps[currentStepIndex + 1].value);
     }
-  }, [steps, currentStep]);
+  }, [steps, currentStep, setStep]);
 
   const onBack = useCallback(() => {
     const currentStepIndex = steps.findIndex((s) => s.value === currentStep);
     setActiveStep(steps[currentStepIndex === 0 ? 0 : currentStepIndex - 1].value);
   }, [currentStep]);
-
-  const setStep = useCallback(
-    (stepValue: string, stepData: Partial<Step>) =>
-      setSteps(steps.map((s) => (s.value === stepValue ? { ...s, ...stepData } : s))),
-    [steps],
-  );
 
   useEffect(() => {
     const disposer = reaction(

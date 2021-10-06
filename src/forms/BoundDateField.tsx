@@ -4,8 +4,10 @@ import { DateField, DateFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundDateFieldProps = Omit<DateFieldProps, "value" | "onChange" | "onBlur" | "onFocus"> & {
+export type BoundDateFieldProps = Omit<DateFieldProps, "label" | "value" | "onChange" | "onBlur" | "onFocus"> & {
   field: FieldState<any, Date | null | undefined>;
+  // Make optional as it'll create a label from the field's key if not present
+  label?: string;
   // Optional in case the page wants extra behavior
   onChange?: (value: Date) => void;
 };
