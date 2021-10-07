@@ -41,5 +41,6 @@ export interface BeamTextFieldProps extends BeamFocusableProps {
   onFocus?: () => void;
   readOnly?: boolean;
   placeholder?: string;
+  /** If the field should be rendered without a border - This could happen if rendering within a table or as part of a CompoundField */
   borderless?: boolean;
 }

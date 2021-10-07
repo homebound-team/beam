@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { InternalUser, Market, Project, ProjectFilter, Stage, Status } from "src/components/Filters/testDomain";
 import {
   booleanFilter,
+  dateFilter,
   FilterDefs,
   Filters,
   GridColumn,
@@ -15,6 +16,7 @@ import {
   toggleFilter,
 } from "src/components/index";
 import { Css } from "src/Css";
+import { jan1 } from "src/forms/formStateDomain";
 import { usePersistedFilter } from "src/hooks";
 import { useGroupBy } from "src/hooks/useGroupBy";
 import { safeEntries } from "src/utils";
@@ -101,8 +103,20 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       getOptionLabel: (o) => o.name,
     });
 
-    const isTest = toggleFilter({ label: "Only show test projects" });
+    const date = dateFilter({
+      operations: [
+        { label: "On", value: "ON" },
+        { label: "Before", value: "BEFORE" },
+        { label: "After", value: "AFTER" },
+      ],
+      label: "Task Due",
+      getOperationLabel: (o) => o.label,
+      getOperationValue: (o) => o.value,
+      // Providing a default value, otherwise the default date in the DateField will be today's date, which will cause storybook diffs every day.
+      defaultValue: { op: "BEFORE", date: jan1 },
+    });
 
+    const isTest = toggleFilter({ label: "Only show test projects" });
     const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", onValue: false });
 
     return {
@@ -111,6 +125,7 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       favorite,
       stage,
       status,
+      date,
       isTest,
       doNotUse,
     };

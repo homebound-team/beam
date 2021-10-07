@@ -36,6 +36,7 @@ export function DateFields() {
         value={undefined}
       />,
     ],
+    ["Compact", <TestDateField compact label="Start Date" />],
   );
 }
 
