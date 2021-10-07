@@ -13,6 +13,7 @@ import { TextField } from "src/inputs/TextField";
 import "./DateField.css";
 
 const format = "MM/dd/yy";
+const longFormat = "EEEE LLLL	d, uuuu";
 
 export interface DateFieldProps {
   value: Date | undefined;
@@ -27,6 +28,8 @@ export interface DateFieldProps {
   required?: boolean;
   readOnly?: boolean;
   helperText?: string | ReactNode;
+  /** Renders as `Monday, January 1, 2018` when in read-only mode. */
+  long?: boolean;
 }
 
 export function DateField(props: DateFieldProps) {
@@ -41,6 +44,7 @@ export function DateField(props: DateFieldProps) {
     errorMsg,
     helperText,
     readOnly = false,
+    long = false,
     ...others
   } = props;
   const labelSuffix = getLabelSuffix(required);
@@ -63,7 +67,7 @@ export function DateField(props: DateFieldProps) {
         onFocus={onFocus}
         required={required}
         disabled={disabled}
-        value={value ? formatDate(value) : ""}
+        value={value ? (long ? dateFnsFormat(value, longFormat) : formatDate(value)) : ""}
         onChange={() => {}}
         {...others}
       />
