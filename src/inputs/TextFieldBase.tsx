@@ -1,15 +1,17 @@
 import type { NumberFieldAria } from "@react-aria/numberfield";
-import {
+import React, {
   ChangeEvent,
   FocusEvent,
   InputHTMLAttributes,
   LabelHTMLAttributes,
   MutableRefObject,
+  ReactNode,
   TextareaHTMLAttributes,
+  useState,
 } from "react";
-import { chain, mergeProps } from "react-aria";
+import { chain, mergeProps, useFocusWithin } from "react-aria";
 import { HelperText } from "src/components/HelperText";
-import { Label } from "src/components/Label";
+import { InlineLabel, Label } from "src/components/Label";
 import { Css, px, Xss } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
@@ -26,12 +28,15 @@ interface TextFieldBaseProps
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
   inputRef?: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>;
+  inputWrapRef?: MutableRefObject<HTMLDivElement | null>;
   multiline?: boolean;
   groupProps?: NumberFieldAria["groupProps"];
   /** TextField specific */
   compact?: boolean;
   /** Styles overrides */
   xss?: Xss<"textAlign">;
+  endAdornment?: ReactNode;
+  inlineLabel?: boolean;
 }
 
 // Used by both TextField and TextArea
@@ -43,6 +48,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     hideLabel,
     inputProps,
     inputRef,
+    inputWrapRef,
     groupProps,
     compact = false,
     errorMsg,
@@ -53,12 +59,17 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     onBlur,
     onFocus,
     xss,
+    endAdornment,
+    inlineLabel,
   } = props;
   const errorMessageId = `${inputProps.id}-error`;
   const labelSuffix = getLabelSuffix(required);
-
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
   const tid = useTestIds(props, defaultTestId(label || "textField"));
+  const [isFocused, setIsFocused] = useState(false);
+  const { focusWithinProps } = useFocusWithin({
+    onFocusWithinChange: (isFocusedWithin) => setIsFocused(isFocusedWithin),
+  });
 
   // Watch for each WIP change, convert empty to undefined, and call the user's onChange
   function onDomChange(e: ChangeEvent<HTMLInputElement>) {
@@ -71,15 +82,15 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     }
   }
 
-  const onFocusChained = chain(
-    inputProps.onFocus,
-    (e: FocusEvent<HTMLInputElement> | FocusEvent<HTMLTextAreaElement>) => e.target.select(),
-    onFocus,
-  );
+  const onFocusChained = chain((e: FocusEvent<HTMLInputElement> | FocusEvent<HTMLTextAreaElement>) => {
+    e.target.select();
+  }, onFocus);
 
   return (
-    <div css={Css.df.fdc.w100.maxw(px(550)).$} {...groupProps}>
-      {label && !hideLabel && <Label labelProps={labelProps} label={label} suffix={labelSuffix} {...tid.label} />}
+    <div css={Css.df.fdc.w100.maxw(px(550)).$} {...groupProps} {...focusWithinProps}>
+      {label && !hideLabel && !inlineLabel && (
+        <Label labelProps={labelProps} label={label} suffix={labelSuffix} {...tid.label} />
+      )}
       {readOnly && (
         <div
           css={{
@@ -92,6 +103,9 @@ export function TextFieldBase(props: TextFieldBaseProps) {
           {...tid}
           data-readonly="true"
         >
+          {!multiline && inlineLabel && label && !hideLabel && (
+            <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
+          )}
           {multiline
             ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
                 <p key={i} css={Css.my1.$}>
@@ -107,28 +121,38 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         </div>
       )}
       {!readOnly && (
-        <ElementType
-          {...mergeProps(
-            inputProps,
-            { onBlur, onFocus: onFocusChained, onChange: onDomChange },
-            { "aria-invalid": Boolean(errorMsg), ...(hideLabel ? { "aria-label": label } : {}) },
-          )}
-          {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
-          ref={inputRef as any}
-          rows={multiline ? 1 : undefined}
+        <div
           css={{
-            ...Css.add("resize", "none")
-              .bgWhite.sm.px1.w100.hPx(40)
-              .gray900.br4.outline0.ba.bGray300.if(compact)
-              .hPx(32).$,
-            ...xss,
-            ...Css.if(multiline).mh(px(96)).py1.$,
-            "&:focus": Css.bLightBlue700.$,
-            "&:disabled": Css.gray400.bgGray100.cursorNotAllowed.$,
+            ...Css.df.aic.bgWhite.sm.px1.w100.hPx(40).gray900.br4.ba.bGray300.overflowHidden.if(compact).hPx(32).$,
+            ...(inputProps.disabled ? Css.gray400.bgGray100.cursorNotAllowed.$ : {}),
+            ...(isFocused ? Css.bLightBlue700.$ : {}),
             ...(errorMsg ? Css.bRed600.$ : {}),
+            ...Css.if(multiline).aifs.px0.mh(px(96)).$,
           }}
-          {...tid}
-        />
+          ref={inputWrapRef as any}
+        >
+          {!multiline && inlineLabel && label && !hideLabel && (
+            <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
+          )}
+          <ElementType
+            {...mergeProps(
+              inputProps,
+              { onBlur, onFocus: onFocusChained, onChange: onDomChange },
+              { "aria-invalid": Boolean(errorMsg), ...(hideLabel ? { "aria-label": label } : {}) },
+            )}
+            {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
+            ref={inputRef as any}
+            rows={multiline ? 1 : undefined}
+            css={{
+              ...Css.add("resize", "none").sm.w100.gray900.outline0.$,
+              ...(inputProps.disabled ? Css.gray400.bgGray100.cursorNotAllowed.$ : {}),
+              ...xss,
+              ...Css.if(multiline).h100.p1.$,
+            }}
+            {...tid}
+          />
+          {!multiline && endAdornment && <span>{endAdornment}</span>}
+        </div>
       )}
       {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}
       {helperText && <HelperText helperText={helperText} {...tid.helperText} />}

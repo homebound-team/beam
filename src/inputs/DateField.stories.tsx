@@ -16,6 +16,7 @@ export function DateFields() {
     ["TextField for comparison", <TextField label="First Name" value="Foo" onChange={() => {}} />],
     ["With Label", <TestDateField label="Projected Client Presentation Date" />],
     ["Disabled", <TestDateField label="Start Date" disabled />],
+    ["Inline Label", <TestDateField label="Start Date" inlineLabel />],
     ["Read Only", <TestDateField label="Start Date" readOnly />],
     ["Read Only Long", <TestDateField label="Start Date" readOnly long />],
     ["Error Message", <TestDateField label="Start Date" errorMsg="Required" />],

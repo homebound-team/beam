@@ -2,7 +2,7 @@ import React, { MutableRefObject } from "react";
 import { OverlayContainer, useOverlay } from "react-aria";
 
 interface PopoverProps extends React.PropsWithChildren<any> {
-  triggerRef: MutableRefObject<HTMLButtonElement | null>;
+  triggerRef: MutableRefObject<HTMLElement | null>;
   popoverRef: MutableRefObject<HTMLDivElement | null>;
   positionProps: React.HTMLAttributes<Element>;
   width?: number;

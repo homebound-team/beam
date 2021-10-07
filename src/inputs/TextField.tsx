@@ -6,6 +6,7 @@ import { BeamTextFieldProps } from "src/interfaces";
 // exported for testing purposes
 export interface TextFieldProps extends BeamTextFieldProps {
   compact?: boolean;
+  inlineLabel?: boolean;
 }
 
 export function TextField(props: TextFieldProps) {

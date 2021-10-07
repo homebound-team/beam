@@ -12,16 +12,20 @@ export function TextAreaField(props: TextAreaFieldProps) {
   const { value = "", disabled = false, readOnly = false, onBlur, onFocus, ...otherProps } = props;
   const textFieldProps = { ...otherProps, value, isDisabled: disabled, isReadOnly: readOnly };
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const inputWrapRef = useRef<HTMLDivElement | null>(null);
   // not in stately because this is so we know when to re-measure, which is a spectrum design
 
   const onHeightChange = useCallback(() => {
     const input = inputRef.current;
-    if (input) {
+    const inputWrap = inputWrapRef.current;
+    if (input && inputWrap) {
       const prevAlignment = input.style.alignSelf;
       input.style.alignSelf = "start";
       input.style.height = "auto";
       // Adding 2px to height avoids showing the scrollbar. This is to compensate for the border due to `box-sizing: border-box;`
-      input.style.height = `${input.scrollHeight + 2}px`;
+      inputWrap.style.height = `${input.scrollHeight + 2}px`;
+      // Set the textarea's height back to 100% so it takes up the full `inputWrap`
+      input.style.height = "100%";
       input.style.alignSelf = prevAlignment;
     }
   }, [inputRef]);
@@ -42,6 +46,7 @@ export function TextAreaField(props: TextAreaFieldProps) {
       inputProps={inputProps}
       inputRef={inputRef}
       readOnly={readOnly}
+      inputWrapRef={inputWrapRef}
     />
   );
 }
