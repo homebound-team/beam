@@ -101,6 +101,10 @@ export function Button(props: ButtonProps) {
 }
 
 function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {
+  if (variant === "text") {
+    // The text variant does not support the 'size'. The 'size' prop only effects the button's height and padding which is not relevant for this variant.
+    return variantStyles[variant];
+  }
   return {
     ...variantStyles[variant],
     baseStyles: { ...variantStyles[variant].baseStyles, ...sizeStyles[size] },
@@ -136,6 +140,13 @@ const variantStyles: Record<ButtonVariant, { baseStyles: {}; hoverStyles: {}; di
       pressedStyles: Css.bgRed900.$,
       disabledStyles: Css.bgRed200.$,
     },
+
+    text: {
+      baseStyles: Css.lightBlue700.$,
+      hoverStyles: {},
+      pressedStyles: {},
+      disabledStyles: Css.lightBlue300.$,
+    },
   };
 
 const sizeStyles: Record<ButtonSize, {}> = {
@@ -151,4 +162,4 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
 };
 
 type ButtonSize = "sm" | "md" | "lg";
-type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger";
+type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger" | "text";
