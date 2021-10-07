@@ -128,6 +128,23 @@ export function ButtonVariations(args: ButtonProps) {
           <Button {...args} icon="trash" size="lg" variant="danger" disabled label="Disabled" />
         </div>
       </div>
+
+      <div>
+        <h2>Text</h2>
+        <div css={buttonRowStyles}>
+          <Button {...args} variant="text" label="Text Button" />
+          <Button {...args} variant="text" disabled label="Disabled" />
+        </div>
+        <div css={buttonRowStyles}>
+          <Button {...args} icon="plus" variant="text" label="Text Button" />
+          <Button {...args} icon="plus" variant="text" disabled label="Disabled" />
+        </div>
+        <div css={buttonRowStyles}>
+          <p css={Css.sm.$}>
+            Example of a <Button {...args} variant="text" label="Text Button" /> placed inline within other text.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
