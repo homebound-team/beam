@@ -67,9 +67,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
   const tid = useTestIds(props, defaultTestId(label || "textField"));
   const [isFocused, setIsFocused] = useState(false);
-  const { focusWithinProps } = useFocusWithin({
-    onFocusWithinChange: (isFocusedWithin) => setIsFocused(isFocusedWithin),
-  });
+  const { focusWithinProps } = useFocusWithin({ onFocusWithinChange: setIsFocused });
 
   // Watch for each WIP change, convert empty to undefined, and call the user's onChange
   function onDomChange(e: ChangeEvent<HTMLInputElement>) {

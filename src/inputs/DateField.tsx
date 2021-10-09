@@ -53,12 +53,12 @@ export function DateField(props: DateFieldProps) {
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
-  const [inputValue, setValue] = useState(
+  const [inputValue, setInputValue] = useState(
     value ? (long && readOnly ? dateFnsFormat(value, longFormat) : formatDate(value)) : "",
   );
   const textFieldProps = {
     ...others,
-    label: label ?? "date",
+    label,
     isDisabled: disabled,
     isReadOnly: false,
     "aria-haspopup": "dialog" as const,
@@ -85,7 +85,7 @@ export function DateField(props: DateFieldProps) {
 
         // If the user leaves the input and has an invalid date, reset to previous value.
         if (!parseDate(inputValue, format)) {
-          setValue(value ? formatDate(value) : "");
+          setInputValue(value ? formatDate(value) : "");
         }
         maybeCall(onBlur, e);
       },
@@ -129,7 +129,7 @@ export function DateField(props: DateFieldProps) {
           // hide the calendar if the user is manually entering the date
           state.close();
           if (v) {
-            setValue(v);
+            setInputValue(v);
             const parsed = parseDate(v, format);
             if (parsed) {
               onChange(parsed);
@@ -156,7 +156,7 @@ export function DateField(props: DateFieldProps) {
             value={value}
             positionProps={positionProps}
             onChange={(d) => {
-              setValue(formatDate(d));
+              setInputValue(formatDate(d));
               onChange(d);
             }}
           />
