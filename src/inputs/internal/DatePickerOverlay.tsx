@@ -23,6 +23,9 @@ export function DatePickerOverlay(props: DatePickerOverlayProps) {
   const tid = useTestIds(props, "datePicker");
 
   return (
+    // Wrap in `FocusScope` to move focus immediately into this overlay (autoFocus).
+    // This allows the DateField to work properly within a Modal, which has its own FocusScope and did not like allowing the user to interact with another overlay.
+    // Also using `contain` to ensure tabbing only moves within this overlay, otherwise you could tab out of the overlay and it'd stay open.
     <FocusScope contain autoFocus>
       <div
         css={{
