@@ -1,5 +1,5 @@
 import { format as dateFnsFormat, parse as dateFnsParse } from "date-fns";
-import React, { ReactNode, useRef, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
 import { DateUtils } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
@@ -8,7 +8,8 @@ import { Popover } from "src/components/internal";
 import { Css } from "src/Css";
 import { DatePickerOverlay } from "src/inputs/internal/DatePickerOverlay";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
-import { maybeCall } from "src/utils";
+import { maybeCall, useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 import "./DateField.css";
 
 const format = "MM/dd/yy";
@@ -31,6 +32,7 @@ export interface DateFieldProps {
   long?: boolean;
   /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
+  placeholder?: string;
 }
 
 export function DateField(props: DateFieldProps) {
@@ -56,6 +58,12 @@ export function DateField(props: DateFieldProps) {
   const [inputValue, setInputValue] = useState(
     value ? (long && readOnly ? dateFnsFormat(value, longFormat) : formatDate(value)) : "",
   );
+  const tid = useTestIds(props, defaultTestId(label));
+
+  useEffect(() => {
+    setInputValue(value ? (long && readOnly ? dateFnsFormat(value, longFormat) : formatDate(value)) : "");
+  }, [value]);
+
   const textFieldProps = {
     ...others,
     label,
@@ -97,8 +105,9 @@ export function DateField(props: DateFieldProps) {
     {
       ...triggerProps,
       isDisabled: disabled || readOnly,
-      // When pressed, focus the input, which will select the text and trigger the DatePicker to open
+      // When pressed or focused then move focus the input, which will select the text and trigger the DatePicker to open
       onPress: () => inputRef?.current?.focus(),
+      onFocus: () => inputRef?.current?.focus(),
     },
     buttonRef,
   );
@@ -137,7 +146,13 @@ export function DateField(props: DateFieldProps) {
           }
         }}
         endAdornment={
-          <button ref={buttonRef} {...buttonProps} disabled={disabled} css={Css.if(disabled).cursorNotAllowed.$}>
+          <button
+            ref={buttonRef}
+            {...buttonProps}
+            disabled={disabled}
+            css={Css.if(disabled).cursorNotAllowed.$}
+            {...tid.calendarButton}
+          >
             <Icon icon="calendar" />
           </button>
         }
@@ -159,6 +174,7 @@ export function DateField(props: DateFieldProps) {
               setInputValue(formatDate(d));
               onChange(d);
             }}
+            {...tid.datePicker}
           />
         </Popover>
       )}

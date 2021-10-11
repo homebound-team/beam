@@ -22,7 +22,7 @@ import { useTestIds } from "src/utils/useTestIds";
 interface TextFieldBaseProps
   extends Pick<
       BeamTextFieldProps,
-      "label" | "required" | "readOnly" | "errorMsg" | "onBlur" | "onFocus" | "helperText" | "hideLabel"
+      "label" | "required" | "readOnly" | "errorMsg" | "onBlur" | "onFocus" | "helperText" | "hideLabel" | "placeholder"
     >,
     Partial<Pick<BeamTextFieldProps, "onChange">> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;

@@ -3,6 +3,7 @@ import DayPicker, { NavbarElementProps, WeekdayElementProps } from "react-day-pi
 import { OverlayTriggerState } from "react-stately";
 import { IconButton } from "src/components";
 import { Css, Palette } from "src/Css";
+import { useTestIds } from "src/utils";
 
 interface DatePickerOverlayProps {
   value: Date | undefined;
@@ -18,6 +19,7 @@ export function DatePickerOverlay(props: DatePickerOverlayProps) {
   // The above assumption regarding `top` and `bottom` is true as long as we use `bottom` as our default `OverlayPosition.placement` (set in DateField).
   // The reason the placement may not be on bottom even though we set `bottom` is because also set `shouldFlip: true`
   const isPositionedAbove = !positionProps.style?.top;
+  const tid = useTestIds(props, "datePicker");
 
   return (
     <div
@@ -39,6 +41,7 @@ export function DatePickerOverlay(props: DatePickerOverlayProps) {
         // Make the month title, i.e. "May 2021", match figma; pyPx nudge matches the NavbarElement nudging
         "& .DayPicker-Caption > div": Css.base.pyPx(2).$,
       }}
+      {...tid}
     >
       <DayPicker
         navbarElement={NavbarElement}
