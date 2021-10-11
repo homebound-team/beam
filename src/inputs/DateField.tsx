@@ -78,7 +78,7 @@ export function DateField(props: DateFieldProps) {
       ...textFieldProps,
       // Open on focus of the input.
       onFocus: (e) => {
-        state.toggle();
+        state.open();
         maybeCall(onFocus, e);
       },
       onBlur: (e) => {
