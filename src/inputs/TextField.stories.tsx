@@ -15,6 +15,7 @@ export function TextFieldStyles() {
       <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <TestTextField value="" label="Name" hideLabel />
+        <TestTextField value="Brandon" label="Name" inlineLabel />
         <TestTextField label="Name" value="" />
         <TestTextField label="Name" required value="" />
         <TestTextField label="Name Focused" value="Brandon" autoFocus />
@@ -44,6 +45,7 @@ export function TextFieldStyles() {
       <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Compact</h1>
         <TestTextField compact value="" label="Name" hideLabel />
+        <TestTextField compact value="Brandon" label="Name" inlineLabel />
         <TestTextField compact label="Name" value="" />
         <TestTextField compact label="Name" value="Brandon" />
         <TestTextField compact label="Name" value="Brandon" disabled />
@@ -65,6 +67,7 @@ export function TextFieldReadOnly() {
       <div css={Css.df.fdc.childGap3.$}>
         <b>Read Only</b>
         <TestTextField label="Name" value="first" readOnly={true} />
+        <TestTextField label="Name" value="first" inlineLabel readOnly={true} />
         <TestTextField label="Name" value="first" hideLabel readOnly={true} />
         <TestTextField label="Name" value={"first ".repeat(20) + "last"} readOnly={true} />
       </div>
@@ -72,6 +75,7 @@ export function TextFieldReadOnly() {
       <div css={Css.df.fdc.childGap3.$}>
         <b>Editable</b>
         <TestTextField label="Name" value="first" />
+        <TestTextField label="Name" value="first" inlineLabel />
         <TestTextField label="Name" value="first" hideLabel />
         <TestTextField label="Name" value={"first ".repeat(20) + "last"} />
       </div>

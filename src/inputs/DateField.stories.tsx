@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "src/components";
 import { jan1 } from "src/forms/formStateDomain";
 import { DateField, DateFieldProps, TextField } from "src/inputs";
+import { noop } from "src/utils";
 import { samples } from "src/utils/sb";
 
 export default {
@@ -16,12 +17,24 @@ export function DateFields() {
     ["TextField for comparison", <TextField label="First Name" value="Foo" onChange={() => {}} />],
     ["With Label", <TestDateField label="Projected Client Presentation Date" />],
     ["Disabled", <TestDateField label="Start Date" disabled />],
+    ["Inline Label", <TestDateField label="Start Date" inlineLabel />],
     ["Read Only", <TestDateField label="Start Date" readOnly />],
     ["Read Only Long", <TestDateField label="Start Date" readOnly long />],
     ["Error Message", <TestDateField label="Start Date" errorMsg="Required" />],
     [
       "Helper Text",
       <TestDateField label="Start Date" helperText="Some really long helper text that we expect to wrap." />,
+    ],
+    [
+      "Placeholder",
+      <DateField
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+        placeholder="Select a date"
+        label="Date"
+        onChange={noop}
+        value={undefined}
+      />,
     ],
   );
 }
