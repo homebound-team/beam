@@ -23,6 +23,7 @@ export const FilterableStaticHeight = () => (
   <ModalFilterTableExample size={{ width: "md", height: 600 }} forceScrolling={true} />
 );
 export const HeaderWithComponents = () => <ModalExample size="lg" withTag />;
+export const WithDatePicker = () => <ModalExample withDateField />;
 
 export const ButtonsInFooter = () => {
   const { openModal } = useModal();
@@ -71,17 +72,23 @@ interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling"> 
   initNumSentences?: number;
   showLeftAction?: boolean;
   withTag?: boolean;
+  withDateField?: boolean;
 }
 
 function ModalExample(props: ModalExampleProps) {
-  const { size, showLeftAction, initNumSentences = 1, forceScrolling, withTag } = props;
+  const { size, showLeftAction, initNumSentences = 1, forceScrolling, withTag, withDateField } = props;
   const { openModal } = useModal();
   const open = () =>
     openModal({
       size,
       forceScrolling,
       content: (
-        <TestModalContent initNumSentences={initNumSentences} showLeftAction={showLeftAction} withTag={withTag} />
+        <TestModalContent
+          initNumSentences={initNumSentences}
+          showLeftAction={showLeftAction}
+          withTag={withTag}
+          withDateField={withDateField}
+        />
       ),
     });
   // Immediately open the modal for Chromatic snapshots
