@@ -1,5 +1,4 @@
 import React from "react";
-import { FocusScope } from "react-aria";
 import DayPicker, { NavbarElementProps, WeekdayElementProps } from "react-day-picker";
 import { OverlayTriggerState } from "react-stately";
 import { IconButton } from "src/components";
@@ -23,44 +22,39 @@ export function DatePickerOverlay(props: DatePickerOverlayProps) {
   const tid = useTestIds(props, "datePicker");
 
   return (
-    // Wrap in `FocusScope` to move focus immediately into this overlay (autoFocus).
-    // This allows the DateField to work properly within a Modal, which has its own FocusScope and did not like allowing the user to interact with another overlay.
-    // Also using `contain` to ensure tabbing only moves within this overlay, otherwise you could tab out of the overlay and it'd stay open.
-    <FocusScope contain autoFocus>
-      <div
-        css={{
-          ...Css.bgWhite.xs.br4.bshModal.$,
-          ...(isPositionedAbove ? Css.mbPx(4).$ : Css.mtPx(4).$),
-          // The S / M / T / W ... heading
-          "& .DayPicker-Weekday": Css.pPx(8).xs.gray400.important.$,
-          // Un-collapse the borders so we can hover each cell
-          "& .DayPicker-Month": Css.add({ borderCollapse: "separate" }).$,
-          // // Make the boxes smaller, this ends up being 32x32 which matches figma
-          "& .DayPicker-Day": Css.pPx(8).xs.ba.bWhite.br4.$,
-          // For today, use a background
-          "& .DayPicker-Day--today": Css.bgGray100.$,
-          // For selected, use a background - `--outside` modifier is set on placeholder days not within the viewed month
-          "& .DayPicker-Day--selected:not(.DayPicker-Day--outside)": Css.bgLightBlue700.white.$,
-          // For pressed
-          "& .DayPicker-Day:active": Css.bgGray400.$,
-          // Make the month title, i.e. "May 2021", match figma; pyPx nudge matches the NavbarElement nudging
-          "& .DayPicker-Caption > div": Css.base.pyPx(2).$,
+    <div
+      css={{
+        ...Css.bgWhite.xs.br4.bshModal.$,
+        ...(isPositionedAbove ? Css.mbPx(4).$ : Css.mtPx(4).$),
+        // The S / M / T / W ... heading
+        "& .DayPicker-Weekday": Css.pPx(8).xs.gray400.important.$,
+        // Un-collapse the borders so we can hover each cell
+        "& .DayPicker-Month": Css.add({ borderCollapse: "separate" }).$,
+        // // Make the boxes smaller, this ends up being 32x32 which matches figma
+        "& .DayPicker-Day": Css.pPx(8).xs.ba.bWhite.br4.$,
+        // For today, use a background
+        "& .DayPicker-Day--today": Css.bgGray100.$,
+        // For selected, use a background - `--outside` modifier is set on placeholder days not within the viewed month
+        "& .DayPicker-Day--selected:not(.DayPicker-Day--outside)": Css.bgLightBlue700.white.$,
+        // For pressed
+        "& .DayPicker-Day:active": Css.bgGray400.$,
+        // Make the month title, i.e. "May 2021", match figma; pyPx nudge matches the NavbarElement nudging
+        "& .DayPicker-Caption > div": Css.base.pyPx(2).$,
+      }}
+      {...tid}
+    >
+      <DayPicker
+        navbarElement={NavbarElement}
+        weekdayElement={Weekday}
+        selectedDays={[value]}
+        initialMonth={value ?? new Date()}
+        onDayClick={(day) => {
+          // Set the day value, and close the picker.
+          onChange(day);
+          state.close();
         }}
-        {...tid}
-      >
-        <DayPicker
-          navbarElement={NavbarElement}
-          weekdayElement={Weekday}
-          selectedDays={[value]}
-          initialMonth={value ?? new Date()}
-          onDayClick={(day) => {
-            // Set the day value, and close the picker.
-            onChange(day);
-            state.close();
-          }}
-        />
-      </div>
-    </FocusScope>
+      />
+    </div>
   );
 }
 

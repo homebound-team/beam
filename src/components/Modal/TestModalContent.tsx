@@ -7,15 +7,22 @@ import { useModal } from "src/components/Modal/useModal";
 import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndDataOf } from "src/components/Table";
 import { Tag } from "src/components/Tag";
 import { Css } from "src/Css";
-import { TextField } from "src/inputs";
+import { jan1 } from "src/forms/formStateDomain";
+import { DateField, TextField } from "src/inputs";
 
 /** A fake modal content component that we share across the modal and superdrawer stories. */
-export function TestModalContent(props: { initNumSentences?: number; showLeftAction?: boolean; withTag?: boolean }) {
+export function TestModalContent(props: {
+  initNumSentences?: number;
+  showLeftAction?: boolean;
+  withTag?: boolean;
+  withDateField?: boolean;
+}) {
   const { closeModal } = useModal();
-  const { initNumSentences = 1, showLeftAction } = props;
+  const { initNumSentences = 1, showLeftAction, withDateField } = props;
   const [numSentences, setNumSentences] = useState(initNumSentences);
   const [primaryDisabled, setPrimaryDisabled] = useState(false);
   const [leftActionDisabled, setLeftActionDisabled] = useState(false);
+  const [date, setDate] = useState(jan1);
   return (
     <>
       <ModalHeader>
@@ -40,6 +47,7 @@ export function TestModalContent(props: { initNumSentences?: number; showLeftAct
           </div>
           <p>{"The body content of the modal. This content can be anything!".repeat(numSentences)}</p>
         </div>
+        {withDateField && <DateField value={date} label="Date" onChange={setDate} />}
       </ModalBody>
       <ModalFooter xss={showLeftAction ? Css.jcsb.$ : undefined}>
         {showLeftAction && (
