@@ -133,6 +133,16 @@ function Template(args: SelectFieldProps<any, any>) {
           getOptionLabel={(o) => o.name}
         />
 
+        <TestSelectField
+          {...args}
+          label="Inline Label"
+          inlineLabel
+          value={undefined}
+          options={[{ id: undefined, name: "No Selection", icon: "x" }, ...options]}
+          getOptionValue={(o) => o.id}
+          getOptionLabel={(o) => o.name}
+        />
+
         <p>(SelectField with hidden label below)</p>
         <TestSelectField
           {...args}
