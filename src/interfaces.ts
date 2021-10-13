@@ -41,4 +41,5 @@ export interface BeamTextFieldProps extends BeamFocusableProps {
   onFocus?: () => void;
   readOnly?: boolean;
   placeholder?: string;
+  borderless?: boolean;
 }

@@ -133,6 +133,16 @@ function Template(args: SelectFieldProps<any, any>) {
           getOptionLabel={(o) => o.name}
         />
 
+        <TestSelectField
+          {...args}
+          label="Inline Label"
+          inlineLabel
+          value={undefined}
+          options={[{ id: undefined, name: "No Selection", icon: "x" }, ...options]}
+          getOptionValue={(o) => o.id}
+          getOptionLabel={(o) => o.name}
+        />
+
         <p>(SelectField with hidden label below)</p>
         <TestSelectField
           {...args}
@@ -187,6 +197,8 @@ const columns: GridColumn<Row>[] = [
     header: "Contact",
     data: (data) => (
       <SelectField
+        label="People"
+        hideLabel
         getOptionValue={(iu) => iu.id}
         getOptionLabel={(iu) => iu.name}
         value={data.user.id}

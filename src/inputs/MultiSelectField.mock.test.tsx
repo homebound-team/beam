@@ -13,6 +13,7 @@ describe("MockMultiSelectField", () => {
     const onSelect = jest.fn();
     const r = await render(
       <MockMultiSelectField
+        label="test"
         getOptionValue={(o) => o.id}
         getOptionLabel={(o) => o.name}
         values={values}
@@ -43,6 +44,7 @@ describe("MockMultiSelectField", () => {
     const onSelect = jest.fn();
     const r = await render(
       <MockMultiSelectField
+        label="test"
         getOptionValue={(o) => o.id}
         getOptionLabel={(o) => o.name}
         values={values}

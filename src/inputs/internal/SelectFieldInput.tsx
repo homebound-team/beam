@@ -1,21 +1,11 @@
-import React, {
-  Fragment,
-  InputHTMLAttributes,
-  LabelHTMLAttributes,
-  MutableRefObject,
-  ReactNode,
-  useState,
-} from "react";
-import { mergeProps, useHover } from "react-aria";
+import React, { InputHTMLAttributes, LabelHTMLAttributes, MutableRefObject, ReactNode, useState } from "react";
+import { mergeProps } from "react-aria";
 import { ComboBoxState } from "react-stately";
 import { Icon } from "src/components";
-import { HelperText } from "src/components/HelperText";
-import { InlineLabel, Label } from "src/components/Label";
-import { Css, Palette } from "src/Css";
-import { getLabelSuffix } from "src/forms/labelUtils";
-import { ErrorMessage } from "src/inputs/ErrorMessage";
+import { Css } from "src/Css";
+import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { Value, valueToKey } from "src/inputs/Value";
-import { maybeCall, useTestIds } from "src/utils";
+import { maybeCall } from "src/utils";
 
 interface SelectFieldInputProps<O, V extends Value> {
   buttonProps: any;
@@ -35,7 +25,7 @@ interface SelectFieldInputProps<O, V extends Value> {
   onFocus?: () => void;
   inlineLabel?: boolean;
   labelProps: LabelHTMLAttributes<HTMLLabelElement>;
-  label?: string;
+  label: string;
   hideLabel?: boolean;
   selectedOptions: O[];
   getOptionValue: (opt: O) => V;
@@ -72,85 +62,60 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
     sizeToContent,
     contrast = false,
     nothingSelectedText,
+    ...otherProps
   } = props;
-  const themeStyles = {
-    wrapper: Css.bgWhite.bGray300.gray900.if(contrast).bgGray700.bGray700.white.$,
-    hover: Css.bgGray100.if(contrast).bgGray600.bGray600.$,
-    focus: Css.bLightBlue700.if(contrast).bLightBlue500.$,
-    // Not using Truss's inline `if` statement here because `addIn` properties are applied regardless.
-    input: !contrast ? Css.bgWhite.$ : Css.bgGray700.addIn("&::selection", Css.bgGray800.$).$,
-    disabled: Css.cursorNotAllowed.gray400.bgGray100.if(contrast).gray500.bgGray700.$,
-    error: Css.bRed500.if(contrast).bRed400.$,
-  };
 
-  const errorMessageId = `${inputProps.id}-error`;
   const [isFocused, setIsFocused] = useState(false);
-  const { hoverProps, isHovered } = useHover({});
-  const hoverStyles = isHovered && !isReadOnly && !isFocused ? themeStyles.hover : {};
-  const focusStyles = isFocused && !isReadOnly ? themeStyles.focus : {};
-  const errorStyles = errorMsg ? themeStyles.error : {};
-  const disabledStyles = isDisabled ? themeStyles.disabled : {};
-  const readOnlyStyles = isReadOnly ? Css.bn.pl0.pt0.add("backgroundColor", "unset").$ : {};
-  const tid = useTestIds(inputProps); // data-testid comes in through here
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
-  const labelSuffix = getLabelSuffix(required);
+  const showNumSelection = isMultiSelect && state.selectionManager.selectedKeys.size > 1;
+  // For MultiSelect only show the `fieldDecoration` when input is not in focus.
+  const showFieldDecoration =
+    (!isMultiSelect || (isMultiSelect && !isFocused)) && fieldDecoration && selectedOptions.length === 1;
 
   return (
-    <Fragment>
-      {!inlineLabel && label && (
-        <Label
-          labelProps={labelProps}
-          label={label}
-          suffix={labelSuffix}
-          contrast={contrast}
-          {...tid.label}
-          hidden={hideLabel}
-        />
-      )}
-      <div
-        css={{
-          ...Css.df.ba.br4.px1.aic.hPx(40).if(compact).hPx(32).$,
-          ...themeStyles.wrapper,
-          ...hoverStyles,
-          ...errorStyles,
-          ...focusStyles,
-          ...disabledStyles,
-          ...readOnlyStyles,
-        }}
-        {...hoverProps}
-        ref={inputWrapRef as any}
-      >
-        {inlineLabel && label && <InlineLabel labelProps={labelProps} label={label} {...tid.label} />}
-        {isMultiSelect && state.selectionManager.selectedKeys.size > 1 && (
-          <span css={Css.wPx(16).hPx(16).mr1.fs0.br100.bgLightBlue700.white.tinyEm.df.aic.jcc.$}>
+    <TextFieldBase
+      {...otherProps}
+      inputRef={inputRef}
+      inputWrapRef={inputWrapRef}
+      label={label}
+      readOnly={isReadOnly}
+      hideLabel={hideLabel}
+      labelProps={labelProps}
+      inlineLabel={inlineLabel}
+      compact={compact}
+      required={required}
+      errorMsg={errorMsg}
+      helperText={helperText}
+      contrast={contrast}
+      xss={!inlineLabel ? Css.fw5.$ : {}}
+      startAdornment={
+        (showNumSelection && (
+          <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinyEm.df.aic.jcc.$}>
             {state.selectionManager.selectedKeys.size}
           </span>
-        )}
-        {/* For MultiSelect -> Only show the `fieldDecoration` when input is not in focus. */}
-        {(!isMultiSelect || (isMultiSelect && !isFocused)) && fieldDecoration && selectedOptions.length === 1 && (
-          <span
+        )) ||
+        (showFieldDecoration && fieldDecoration(selectedOptions[0]))
+      }
+      endAdornment={
+        !isReadOnly && (
+          <button
+            {...buttonProps}
+            disabled={isDisabled}
+            ref={buttonRef}
             css={{
-              ...Css.df.aic.br4.fs0.pr1.$,
-              ...errorStyles,
-              ...hoverStyles,
+              ...Css.br4.outline0.gray700.if(contrast).gray400.$,
+              ...(isDisabled ? Css.cursorNotAllowed.gray400.if(contrast).gray600.$ : {}),
             }}
           >
-            {fieldDecoration(selectedOptions[0])}
-          </span>
-        )}
-        {/* Add `onInput` event handler to trigger menu to be open when the user types. */}
-        <input
-          {...mergeProps(inputProps, { "aria-invalid": Boolean(errorMsg), onInput: () => state.open() })}
-          {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
-          ref={inputRef as any}
-          css={{
-            ...Css.mw0.fg1.pr1.br4.outline0.truncate.w100.sm.if(!inlineLabel).smEm.$,
-            ...themeStyles.input,
-            ...hoverStyles,
-            ...disabledStyles,
-            ...readOnlyStyles,
-          }}
-          onKeyDown={(e) => {
+            <Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} />
+          </button>
+        )
+      }
+      inputProps={{
+        ...mergeProps(inputProps, { "aria-invalid": Boolean(errorMsg), onInput: () => state.open() }),
+        // Not merging the following as we want them to overwrite existing events
+        ...{
+          onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
             // We need to do some custom logic when using MultiSelect, as react-aria/stately Combobox doesn't support multiselect out of the box.
             if (isMultiSelect) {
               // Enter should toggle the focused item.
@@ -185,8 +150,8 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             }
 
             inputProps.onKeyDown && inputProps.onKeyDown(e);
-          }}
-          onBlur={() => {
+          },
+          onBlur: () => {
             // We purposefully override onBlur here instead of using mergeProps, b/c inputProps.onBlur
             // goes into useComboBox's onBlur, which calls setFocused(false), which in useComboBoxState
             // detects a) there is no props.selectedKey (b/c we don't pass it), and b) there is an
@@ -196,22 +161,21 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             if (isReadOnly) {
               return;
             }
+            setIsFocused(false);
             maybeCall(onBlur);
             state.close();
-            setIsFocused(false);
 
             // Always call `setSelectedKeys` onBlur with its existing selected keys..
             // This ensures the field's `input.value` resets to what it should be in case it doesn't currently match.
             state.selectionManager.setSelectedKeys(state.selectionManager.selectedKeys);
-          }}
-          onFocus={(e) => {
+          },
+          onFocus: (e: React.FocusEvent<HTMLInputElement>) => {
             if (isReadOnly) return;
-            maybeCall(onFocus);
-            e.target.select();
-            state.open();
             setIsFocused(true);
-          }}
-          size={
+            maybeCall(onFocus);
+            state.open();
+          },
+          size:
             // If sizeToContent, then, in order of precedence, base it of from:
             // 1. input's value if any
             // 2. If is MultiSelect and only one option is chosen, then use the length of that option to define the width to avoid size jumping on blur.
@@ -229,29 +193,9 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
                   ).length || 1,
                   20,
                 )
-              : undefined
-          }
-        />
-        {!isReadOnly && (
-          <button
-            {...buttonProps}
-            disabled={isDisabled}
-            ref={buttonRef}
-            css={{
-              ...Css.br4.outline0.$,
-              ...disabledStyles,
-            }}
-          >
-            <Icon
-              icon={state.isOpen ? "chevronUp" : "chevronDown"}
-              color={contrast ? Palette.Gray400 : Palette.Gray700}
-            />
-          </button>
-        )}
-      </div>
-
-      {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} contrast={contrast} {...tid.errorMsg} />}
-      {helperText && <HelperText helperText={helperText} contrast={contrast} {...tid.helperText} />}
-    </Fragment>
+              : undefined,
+        },
+      }}
+    />
   );
 }

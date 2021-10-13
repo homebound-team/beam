@@ -256,6 +256,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   return (
     <div css={Css.df.fdc.w100.maxw(px(550)).$} ref={comboBoxRef}>
       <SelectFieldInput
+        {...otherProps}
         buttonProps={buttonProps}
         buttonRef={triggerRef}
         compact={compact}
@@ -317,7 +318,7 @@ export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusa
   /** Allow placing an icon/decoration within the input field. */
   fieldDecoration?: (opt: T) => ReactNode;
   /** Sets the form field label. */
-  label?: string;
+  label: string;
   hideLabel?: boolean;
   /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
