@@ -101,6 +101,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     },
     inputWrapperReadOnly: {
       ...Css.sm.df.aic.w100.mhPx(fieldHeight).if(compact).mhPx(compactFieldHeight).$,
+      ...Css.gray900.if(contrast).white.$,
     },
     input: {
       ...Css.w100.mw0.outline0.br4.fg1.$,
