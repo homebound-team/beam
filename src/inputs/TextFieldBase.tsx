@@ -84,23 +84,25 @@ export function TextFieldBase(props: TextFieldBaseProps) {
   const { hoverProps, isHovered } = useHover({});
   const { focusWithinProps } = useFocusWithin({ onFocusWithinChange: setIsFocused });
 
+  const maybeSmaller = borderless ? 2 : 0;
   const fieldHeight = 40;
   const compactFieldHeight = 32;
 
   const fieldStyles = {
     container: Css.df.fdc.w100.maxw(px(550)).$,
     inputWrapper: {
-      ...Css.sm.df.aic.br4.px1.w100.$,
+      ...Css.sm.df.aic.br4.px1.w100
+        .hPx(fieldHeight - maybeSmaller)
+        .if(compact)
+        .hPx(compactFieldHeight - maybeSmaller).$,
       ...Css.bgWhite.bGray300.gray900.if(contrast).bgGray700.bGray700.white.$,
-      // For borderless heights, remove the border from the element's height with the expectation the caller will apply a border if necessary (Example: DateFilter)
-      ...(borderless
-        ? Css.hPx(fieldHeight - 2)
-            .if(compact)
-            .hPx(compactFieldHeight - 2).$
-        : Css.ba.hPx(fieldHeight).if(compact).hPx(compactFieldHeight).$),
+      ...(!borderless ? Css.ba.$ : {}),
     },
     inputWrapperReadOnly: {
-      ...Css.sm.df.aic.w100.mhPx(fieldHeight).if(compact).mhPx(compactFieldHeight).$,
+      ...Css.sm.df.aic.w100
+        .mhPx(fieldHeight - maybeSmaller)
+        .if(compact)
+        .mhPx(compactFieldHeight - maybeSmaller).$,
       ...Css.gray900.if(contrast).white.$,
     },
     input: {
