@@ -7,11 +7,12 @@ import { useTestIds } from "src/utils/useTestIds";
 
 export type BoundSelectFieldProps<T, V extends Value> = Omit<
   SelectFieldProps<T, V>,
-  "value" | "onSelect" | "onBlur" | "onFocus"
+  "value" | "onSelect" | "onBlur" | "onFocus" | "label"
 > & {
   // Allow `onSelect` to be overridden to do more than just `field.set`.
   onSelect?: (option: V | undefined) => void;
   field: FieldState<any, V | null | undefined>;
+  label?: string;
 };
 
 /**

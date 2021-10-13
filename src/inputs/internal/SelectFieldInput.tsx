@@ -25,7 +25,7 @@ interface SelectFieldInputProps<O, V extends Value> {
   onFocus?: () => void;
   inlineLabel?: boolean;
   labelProps: LabelHTMLAttributes<HTMLLabelElement>;
-  label?: string;
+  label: string;
   hideLabel?: boolean;
   selectedOptions: O[];
   getOptionValue: (opt: O) => V;
@@ -77,7 +77,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
       {...otherProps}
       inputRef={inputRef}
       inputWrapRef={inputWrapRef}
-      label={label || ""}
+      label={label}
       readOnly={isReadOnly}
       hideLabel={hideLabel}
       labelProps={labelProps}

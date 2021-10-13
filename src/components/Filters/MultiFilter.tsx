@@ -7,8 +7,12 @@ import { Value } from "src/inputs/Value";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { TestIds } from "src/utils/useTestIds";
 
-export type MultiFilterProps<O, V extends Value> = Omit<MultiSelectFieldProps<O, V>, "values" | "onSelect"> & {
+export type MultiFilterProps<O, V extends Value> = Omit<
+  MultiSelectFieldProps<O, V>,
+  "values" | "onSelect" | "label"
+> & {
   defaultValue?: V[];
+  label?: string;
 };
 
 export function multiFilter<O, V extends Key>(props: MultiFilterProps<O, V>): (key: string) => Filter<V[]> {

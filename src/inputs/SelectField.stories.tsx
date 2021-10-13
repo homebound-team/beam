@@ -197,6 +197,8 @@ const columns: GridColumn<Row>[] = [
     header: "Contact",
     data: (data) => (
       <SelectField
+        label="People"
+        hideLabel
         getOptionValue={(iu) => iu.id}
         getOptionLabel={(iu) => iu.name}
         value={data.user.id}

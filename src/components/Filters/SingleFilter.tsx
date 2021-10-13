@@ -5,8 +5,9 @@ import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { TestIds } from "src/utils/useTestIds";
 
-export type SingleFilterProps<O, V extends Value> = Omit<SelectFieldProps<O, V>, "value" | "onSelect"> & {
+export type SingleFilterProps<O, V extends Value> = Omit<SelectFieldProps<O, V>, "value" | "onSelect" | "label"> & {
   defaultValue?: V;
+  label?: string;
 };
 
 export function singleFilter<O, V extends Key>(props: SingleFilterProps<O, V>): (key: string) => Filter<V> {
