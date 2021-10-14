@@ -3,7 +3,7 @@ import { OverlayProvider } from "react-aria";
 import { Modal, ModalProps } from "src/components/Modal/Modal";
 import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
-import { CheckFn } from "src/types";
+import { CanCloseCheck, CheckFn } from "src/types";
 import { EmptyRef } from "src/utils/index";
 
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */
@@ -19,9 +19,9 @@ export interface BeamContextState {
   /** SuperDrawer contentStack, i.e. the main/non-detail content + 0-N detail contents. */
   drawerContentStack: MutableRefObject<readonly ContentStack[]>;
   /** Checks when closing SuperDrawer, for the main/non-detail drawer content. */
-  drawerCanCloseChecks: MutableRefObject<CheckFn[]>;
+  drawerCanCloseChecks: MutableRefObject<CanCloseCheck[]>;
   /** Checks when closing SuperDrawer Details, a double array to keep per-detail lists. */
-  drawerCanCloseDetailsChecks: MutableRefObject<CheckFn[][]>;
+  drawerCanCloseDetailsChecks: MutableRefObject<CanCloseCheck[][]>;
   /** The ref for defining the portal element's location for Tab actions */
   tabActionsRef: MutableRefObject<HTMLDivElement | null>;
   /** The div for Tab actions to portal into */
@@ -54,8 +54,8 @@ export function BeamProvider({ children }: { children: ReactNode }) {
   const modalCanCloseChecksRef = useRef<CheckFn[]>([]);
   const modalFooterDiv = useMemo(() => document.createElement("div"), []);
   const drawerContentStackRef = useRef<ContentStack[]>([]);
-  const drawerCanCloseChecks = useRef<CheckFn[]>([]);
-  const drawerCanCloseDetailsChecks = useRef<CheckFn[][]>([]);
+  const drawerCanCloseChecks = useRef<CanCloseCheck[]>([]);
+  const drawerCanCloseDetailsChecks = useRef<CanCloseCheck[][]>([]);
   const tabActionsRef = useRef<HTMLDivElement>(null);
   const tabActionsDiv = useMemo(() => document.createElement("div"), []);
 

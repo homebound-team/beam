@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
 import { useBeamContext } from "src/components/BeamContext";
-import { Callback } from "src/types";
+import { Callback, CanCloseCheck } from "src/types";
 import { useModal } from "../Modal";
 import { ConfirmCloseModal } from "./ConfirmCloseModal";
 
@@ -46,14 +46,14 @@ export interface UseSuperDrawerHook {
    * false, a confirmation modal will appear allowing the user to confirm
    * the action.
    */
-  addCanCloseDrawerCheck: (canCloseCheck: () => boolean) => void;
+  addCanCloseDrawerCheck: (canCloseCheck: CanCloseCheck) => void;
   /**
    * Adds a check when attempting to close a SuperDrawer detail by clicking the
    * "back" button or calling `closeDrawerDetail()`. If any checks returns
    * false, a confirmation modal will appear allowing the user to confirm
    * the action.
    */
-  addCanCloseDrawerDetailCheck: (canCloseCheck: () => boolean) => void;
+  addCanCloseDrawerDetailCheck: (canCloseCheck: CanCloseCheck) => void;
 }
 
 export function useSuperDrawer(): UseSuperDrawerHook {
@@ -67,8 +67,8 @@ export function useSuperDrawer(): UseSuperDrawerHook {
 
   function canCloseDrawerDetails(i: number, doChange: Callback) {
     for (const canCloseDrawerDetail of canCloseDetailsChecks.current[i] ?? []) {
-      if (!canCloseDrawerDetail()) {
-        openModal({ content: <ConfirmCloseModal onClose={doChange} /> });
+      if (!canClose(canCloseDrawerDetail)) {
+        openModal({ content: <ConfirmCloseModal onClose={doChange} {...canCloseDrawerDetail} /> });
         return false;
       }
     }
@@ -98,9 +98,9 @@ export function useSuperDrawer(): UseSuperDrawerHook {
 
     // Attempt to close the drawer
     for (const canCloseDrawer of canCloseChecks.current) {
-      if (!canCloseDrawer()) {
+      if (!canClose(canCloseDrawer)) {
         openModal({
-          content: <ConfirmCloseModal onClose={doChange} />,
+          content: <ConfirmCloseModal onClose={doChange} {...canCloseDrawer} />,
         });
         return;
       }
@@ -169,7 +169,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         contentStack.current = [...contentStack.current, { kind: "detail", opts }];
       },
       /** Add a new close check to SuperDrawer */
-      addCanCloseDrawerCheck(canCloseCheck: () => boolean) {
+      addCanCloseDrawerCheck(canCloseCheck: CanCloseCheck) {
         // Check if we can add a canCloseDrawer check
         const stackLength = contentStack.current.length;
         if (!stackLength) {
@@ -180,7 +180,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
         canCloseChecks.current = [...canCloseChecks.current, canCloseCheck];
       },
       /** Add a new close check to the current SuperDrawer detail */
-      addCanCloseDrawerDetailCheck(canCloseCheck: () => boolean) {
+      addCanCloseDrawerDetailCheck(canCloseCheck: CanCloseCheck) {
         // Check if we can add a canCloseDrawerDetailCheck
         const stackLength = contentStack.current.length;
         if (stackLength <= 1) {
@@ -202,4 +202,11 @@ export function useSuperDrawer(): UseSuperDrawerHook {
     ...closeActions,
     isDrawerOpen: contentStack.current.length > 0,
   };
+}
+
+function canClose(canCloseCheck: CanCloseCheck): boolean {
+  return (
+    (typeof canCloseCheck === "function" && canCloseCheck()) ||
+    (typeof canCloseCheck !== "function" && canCloseCheck.check())
+  );
 }
