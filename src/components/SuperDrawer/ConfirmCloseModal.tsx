@@ -3,10 +3,13 @@ import { useBeamContext } from "../BeamContext";
 
 interface ConfirmCloseModalProps {
   onClose: () => void;
+  discardText?: string;
+  continueText?: string;
 }
 
 /** Modal content to appear when a close checks fails */
-export function ConfirmCloseModal({ onClose }: ConfirmCloseModalProps) {
+export function ConfirmCloseModal(props: ConfirmCloseModalProps) {
+  const { onClose, discardText = "Discard Changes", continueText = "Continue Editing" } = props;
   const { modalState } = useBeamContext();
 
   // TODO: Change to closeModal from useModal when canCloseChecks are reset
@@ -21,20 +24,23 @@ export function ConfirmCloseModal({ onClose }: ConfirmCloseModalProps) {
       <ModalHeader>Confirm</ModalHeader>
       <ModalBody>
         <div css={Css.tc.wPx(400).$}>
-          <p css={Css.lgEm.gray900.mb2.$}>Are you sure you want to cancel without saving your changes?</p>
-          <p css={Css.base.gray700.$}>Any changes you've made so far will be lost.</p>
+          <p css={Css.lgEm.gray900.mb2.$}>Are you sure you want to cancel?</p>
+          <p css={Css.base.gray700.$}>Any data you've entered so far will be lost.</p>
         </div>
       </ModalBody>
-      <ModalFooter>
-        <Button variant="tertiary" label="Cancel" onClick={closeModal} />
-        <Button
-          label="Close"
-          onClick={() => {
-            // The order of these calls doesn't really matter; close this modal and tell the call to do their close
-            onClose();
-            closeModal();
-          }}
-        />
+      <ModalFooter xss={Css.jcc.$}>
+        <div css={Css.df.fdc.childGap1.aic.$}>
+          <Button label={continueText} onClick={closeModal} />
+          <Button
+            variant="tertiary"
+            label={discardText}
+            onClick={() => {
+              // The order of these calls doesn't really matter; close this modal and tell the call to do their close
+              onClose();
+              closeModal();
+            }}
+          />
+        </div>
       </ModalFooter>
     </>
   );

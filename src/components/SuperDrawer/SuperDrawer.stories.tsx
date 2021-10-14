@@ -71,7 +71,11 @@ export function CanCloseDrawerChecks() {
     });
     // Add two canClose check to show that all checks are ran
     addCanCloseDrawerCheck(() => true);
-    addCanCloseDrawerCheck(() => false);
+    addCanCloseDrawerCheck({
+      check: () => false,
+      discardText: "Get me outta here!",
+      continueText: "Whoops! I didn't mean to do that",
+    });
   }
 
   useEffect(open, [openInDrawer, addCanCloseDrawerCheck]);
