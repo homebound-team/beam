@@ -1,3 +1,5 @@
+export { dateFilter } from "src/components/Filters/DateFilter";
+export type { DateFilterValue } from "src/components/Filters/DateFilter";
 export { multiFilter } from "src/components/Filters/MultiFilter";
 export { singleFilter } from "src/components/Filters/SingleFilter";
 export { booleanFilter } from "./BooleanFilter";

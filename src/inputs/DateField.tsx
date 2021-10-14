@@ -33,6 +33,9 @@ export interface DateFieldProps {
   /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
   placeholder?: string;
+  /** If the field should be rendered without a border - This could happen if rendering within a table or as part of a CompoundField */
+  borderless?: boolean;
+  compact?: boolean;
 }
 
 export function DateField(props: DateFieldProps) {
@@ -55,20 +58,21 @@ export function DateField(props: DateFieldProps) {
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const showLongFormat = long && readOnly;
   const [inputValue, setInputValue] = useState(
-    value ? (long && readOnly ? dateFnsFormat(value, longFormat) : formatDate(value)) : "",
+    value ? (showLongFormat ? dateFnsFormat(value, longFormat) : formatDate(value)) : "",
   );
   const tid = useTestIds(props, defaultTestId(label));
 
   useEffect(() => {
-    setInputValue(value ? (long && readOnly ? dateFnsFormat(value, longFormat) : formatDate(value)) : "");
+    setInputValue(value ? (showLongFormat ? dateFnsFormat(value, longFormat) : formatDate(value)) : "");
   }, [value]);
 
   const textFieldProps = {
     ...others,
     label,
     isDisabled: disabled,
-    isReadOnly: false,
+    isReadOnly: readOnly,
     "aria-haspopup": "dialog" as const,
     value: inputValue,
   };
@@ -121,6 +125,10 @@ export function DateField(props: DateFieldProps) {
     shouldUpdatePosition: true,
   });
 
+  // If showing the long format of the date, then leave size undefined. Otherwise we're showing it as "01/01/20", so set size to 8.
+  // (Setting the size 8 will currently only impact view of the DateField when placed on the "in page" filters. This is due to other styles set within TextFieldBase)
+  const inputSize = showLongFormat ? undefined : 8;
+
   return (
     <>
       <TextFieldBase
@@ -130,7 +138,7 @@ export function DateField(props: DateFieldProps) {
         helperText={helperText}
         required={required}
         labelProps={labelProps}
-        inputProps={{ ...triggerProps, ...inputProps }}
+        inputProps={{ ...triggerProps, ...inputProps, size: inputSize }}
         inputRef={inputRef}
         inputWrapRef={inputWrapRef}
         inlineLabel={inlineLabel}

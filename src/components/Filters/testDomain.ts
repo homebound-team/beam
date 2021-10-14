@@ -1,3 +1,4 @@
+import { dateFilter, DateFilterValue } from "src/components/Filters/DateFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { singleFilter } from "src/components/Filters/SingleFilter";
 import { FilterDefs } from "src/components/Filters/types";
@@ -43,10 +44,12 @@ export type ProjectFilter = {
   status?: string[] | null;
   isTest?: boolean | null;
   doNotUse?: boolean | null;
+  date?: DateFilterValue<string>;
 };
 
 export type StageFilter = NonNullable<FilterDefs<ProjectFilter>["stage"]>;
 export type StageSingleFilter = NonNullable<FilterDefs<ProjectFilter>["stageSingle"]>;
+export type DateFilter = NonNullable<FilterDefs<ProjectFilter>["date"]>;
 
 const stageOptions = [
   { code: Stage.StageOne, name: "One" },
@@ -63,4 +66,15 @@ export const stageSingleFilter: StageSingleFilter = singleFilter({
   options: stageOptions,
   getOptionValue: (s) => s.code,
   getOptionLabel: (s) => s.name,
+});
+
+export const taskDueFilter: DateFilter = dateFilter({
+  operations: [
+    { label: "On", value: "ON" },
+    { label: "Before", value: "BEFORE" },
+    { label: "After", value: "AFTER" },
+  ],
+  label: "Task Due",
+  getOperationLabel: (o) => o.label,
+  getOperationValue: (o) => o.value,
 });
