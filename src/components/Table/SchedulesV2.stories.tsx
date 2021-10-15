@@ -182,14 +182,10 @@ const style: GridStyle = {
   firstNonHeaderRowCss: Css.mt2.$,
   cellCss: Css.h100.gray700.xs.aic.$,
   nestedCards: {
-    // New
     spacerPx: 8,
-    // Note: We want 32px left spacing but we need 1px for the border.
-    firstLastColumnWidth: 33,
-    // Old
-    topLevelSpacerPx: 8,
+    firstLastColumnWidth: 33, // 32px + 1px border
     kinds: {
-      header: { bgColor: Palette.Gray100, brPx: 0, spacerPx: 0, pxPx: 0 },
+      header: { bgColor: Palette.Gray100, brPx: 0, pxPx: 0 },
       // TODO: It would be nice if this used CSS Properties so that we can use TRUSS
       milestone: { bgColor: Palette.Gray100, ...spacing },
       subgroup: { bgColor: Palette.White, ...spacing },

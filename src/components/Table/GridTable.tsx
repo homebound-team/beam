@@ -70,12 +70,9 @@ export interface GridStyle {
 
 export interface NestedCardsStyle {
   /** Space between each card. */
-  spacerPx?: number;
-  /** Space of the first and last "hidden" columns used to align nested columns. */
+  spacerPx: number;
+  /** Width of the first and last "hidden" columns used to align nested columns. */
   firstLastColumnWidth?: number;
-
-  /** The space between top-level cards. */
-  topLevelSpacerPx: number;
   /**
    * Per-kind styling for nested cards (see `cardStyle` if you only need a flat list of cards).
    *
@@ -100,11 +97,6 @@ export interface NestedCardStyle {
   brPx: number;
   /** The left/right padding of the card. */
   pxPx: number;
-  /**
-   * The y spacing between each row within this card.
-   * FIXME: Remove this
-   */
-  spacerPx: number;
 }
 
 export interface GridTableDefaults {
@@ -323,7 +315,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
       const isCollapsed = collapsedIds.includes(row.id);
       if (!isCollapsed && !!row.children?.length) {
-        nestedCards && matches && nestedCards.addSpacerBetweenChildren();
+        nestedCards && matches && nestedCards.addSpacer();
         visitRows(row.children, isCard);
       }
 
@@ -340,7 +332,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           return;
         }
         visit(row);
-        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacerBetweenChildren();
+        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
       });
     }
 
