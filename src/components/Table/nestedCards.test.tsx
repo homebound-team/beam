@@ -7,7 +7,6 @@ const parentCardStyle: NestedCardStyle = {
   bgColor: Palette.Gray100,
   brPx: 8,
   pxPx: 8,
-  spacerPx: 8,
 };
 
 const childCardStyle: NestedCardStyle = {
@@ -15,7 +14,6 @@ const childCardStyle: NestedCardStyle = {
   bColor: Palette.Gray200,
   brPx: 6,
   pxPx: 6,
-  spacerPx: 6,
 };
 
 describe("NestedCards", () => {
