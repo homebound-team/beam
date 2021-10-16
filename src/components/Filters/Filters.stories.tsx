@@ -113,7 +113,7 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       getOperationLabel: (o) => o.label,
       getOperationValue: (o) => o.value,
       // Providing a default value, otherwise the default date in the DateField will be today's date, which will cause storybook diffs every day.
-      defaultValue: { op: "BEFORE", date: jan1 },
+      defaultValue: { op: "BEFORE", value: jan1 },
     });
 
     const isTest = toggleFilter({ label: "Only show test projects" });
