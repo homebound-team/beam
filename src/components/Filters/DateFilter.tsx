@@ -15,7 +15,7 @@ export type DateFilterProps<O, V extends Value, DV extends DateFilterValue<V>> =
   defaultValue?: DV;
 };
 
-export type DateFilterValue<V extends Value> = { op: V; date: Date };
+export type DateFilterValue<V extends Value> = { op: V; value: Date };
 
 export function dateFilter<O, V extends Key>(
   props: DateFilterProps<O, V, DateFilterValue<V>>,
@@ -60,7 +60,7 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
               value={value?.op}
               onSelect={(op) =>
                 // default the selected date to today if it doesn't exist in the filter's value
-                setValue(op ? ({ op, date: value?.date ? new Date(value.date) : new Date() } as DV) : undefined)
+                setValue(op ? ({ op, value: value?.value ? new Date(value.value) : new Date() } as DV) : undefined)
               }
               label={inModal ? `${label} date filter operation` : label}
               inlineLabel={!inModal && !vertical}
@@ -85,9 +85,9 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
               borderless
               compact
               inlineLabel
-              value={value?.date ? new Date(value.date) : new Date()}
+              value={value?.value ? new Date(value.value) : new Date()}
               label="Date"
-              onChange={(d) => setValue({ ...value, date: d })}
+              onChange={(d) => setValue({ ...value, value: d })}
               disabled={!value}
               {...tid[`${defaultTestId(this.label)}_dateField`]}
               onFocus={() => setFocusedEl("date")}

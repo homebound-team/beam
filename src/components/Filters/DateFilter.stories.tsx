@@ -13,15 +13,15 @@ export default {
 export function DateFilterInPage() {
   const filter = taskDueFilter("date");
   // Mimics the container of the "in page" filters to demonstrate the field can shrink in size.
-  return <div css={Css.df.aic.$}>{filter.render({ op: "BEFORE", date: jan2 }, () => {}, {}, false, false)}</div>;
+  return <div css={Css.df.aic.$}>{filter.render({ op: "BEFORE", value: jan2 }, () => {}, {}, false, false)}</div>;
 }
 
 export function DateFilterInModal() {
   const filter = taskDueFilter("date");
-  return filter.render({ op: "BEFORE", date: jan2 }, () => {}, {}, true, false);
+  return filter.render({ op: "BEFORE", value: jan2 }, () => {}, {}, true, false);
 }
 
 export function DateFilterVertical() {
   const filter = taskDueFilter("date");
-  return filter.render({ op: "BEFORE", date: jan2 }, () => {}, {}, false, true);
+  return filter.render({ op: "BEFORE", value: jan2 }, () => {}, {}, false, true);
 }

@@ -28,7 +28,7 @@ describe("DateFilter", () => {
     // And we type in a new date
     type(r.filter_taskDue_dateField, "10/31/21");
     // Then the filter should be set (intentionally omitting the time value from the 'date' value)
-    expect(r.filter_value()).toHaveTextContent('{"date":{"op":"ON","date":"2021-10-31T');
+    expect(r.filter_value()).toHaveTextContent('{"date":{"op":"ON","value":"2021-10-31T');
     // When we select Any
     fireEvent.focus(r.filter_taskDue_dateOperation());
     click(r.getByRole("option", { name: "Any" }));
