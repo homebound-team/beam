@@ -2,7 +2,7 @@ import type { NumberFieldStateProps } from "@react-stately/numberfield";
 import { ReactNode, useMemo, useRef } from "react";
 import { useLocale, useNumberField } from "react-aria";
 import { useNumberFieldState } from "react-stately";
-import { useGridTable } from "src/components";
+import { usePresentationContext } from "src/components";
 import { Css, Xss } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { TextFieldBase } from "./TextFieldBase";
@@ -36,6 +36,7 @@ export function NumberField(props: NumberFieldProps) {
     readOnly = false,
     type,
     label,
+    hideLabel,
     onBlur,
     onFocus,
     errorMsg,
@@ -112,9 +113,9 @@ export function NumberField(props: NumberFieldProps) {
     inputRef.current = document.createElement("input");
   }
 
-  // Determine default alignment based on whether it is in a table or not
-  const { inTable } = useGridTable();
-  const defaultAlignment = inTable ? Css.tr.jcfe.$ : Css.tl.jcfs.$;
+  // Determine default alignment based on presentation context
+  const { numberAlignment, hideLabel: hideLabelContext } = usePresentationContext();
+  const defaultAlignment = numberAlignment && numberAlignment === "right" ? Css.tr.jcfe.$ : Css.tl.jcfs.$;
 
   return (
     <TextFieldBase
@@ -122,6 +123,7 @@ export function NumberField(props: NumberFieldProps) {
       groupProps={groupProps}
       labelProps={labelProps}
       label={label}
+      hideLabel={hideLabel ?? hideLabelContext}
       required={required}
       inputProps={inputProps}
       // This is called on each DOM change, to push the latest value into the field

@@ -1,8 +1,69 @@
-import { RenderResult, Wrapper } from "@homebound/rtl-utils";
+import { newLocation as _newLocation, withRouter as _withRouter } from "@homebound/rtl-react-router-utils";
+import {
+  change as _change,
+  click as _click,
+  getOptions as _getOptions,
+  input as _input,
+  render as rtlRender,
+  RenderResult,
+  select as _select,
+  type as _type,
+  typeAndWait as _typeAndWait,
+  wait as _wait,
+  Wrapper,
+} from "@homebound/rtl-utils";
 import { prettyDOM } from "@testing-library/react";
+import { ReactElement } from "react";
 import { BeamProvider } from "src/components";
-export * from "@homebound/rtl-react-router-utils";
-export * from "@homebound/rtl-utils";
+export {
+  _change as change,
+  _click as click,
+  _getOptions as getOptions,
+  _input as input,
+  _select as select,
+  _type as type,
+  _typeAndWait as typeAndWait,
+  _wait as wait,
+};
+export { _newLocation as newLocation, _withRouter as withRouter };
+
+interface RenderOpts {
+  at?: { url: string; route?: string };
+  omitBeamContext?: boolean;
+}
+
+export function render(
+  component: ReactElement,
+  withoutBeamProvider: RenderOpts,
+  ...otherWrappers: Wrapper[]
+): Promise<RenderResult & Record<string, HTMLElement & Function>>;
+export function render(
+  component: ReactElement,
+  ...otherWrappers: Wrapper[]
+): Promise<RenderResult & Record<string, HTMLElement & Function>>;
+export function render(
+  component: ReactElement,
+  wrapperOrOpts: RenderOpts | Wrapper | undefined,
+  ...otherWrappers: Wrapper[]
+): Promise<RenderResult & Record<string, HTMLElement & Function>> {
+  if (wrapperOrOpts && "wrap" in wrapperOrOpts) {
+    // They passed at least single wrapper + maybe more.
+    // We put `withBeamRTL` first so that any `withApollo`s wrap outside of beam, so in-drawer/in-modal content has apollo
+    return rtlRender(component, ...[withBeamRTL, wrapperOrOpts as Wrapper, ...otherWrappers]);
+  } else if (wrapperOrOpts) {
+    const { omitBeamContext, at } = wrapperOrOpts;
+    return rtlRender(
+      component,
+      ...[
+        ...otherWrappers,
+        ...(!omitBeamContext ? [withBeamRTL] : []),
+        ...(at ? [_withRouter(at.url, at.route)] : [_withRouter()]),
+      ],
+    );
+  }
+
+  return rtlRender(component, withBeamRTL);
+}
 
 export function cell(r: RenderResult, row: number, column: number): HTMLElement {
   return r.getByTestId("grid-table").childNodes[row].childNodes[column] as HTMLElement;

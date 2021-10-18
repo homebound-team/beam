@@ -13,9 +13,9 @@ import React, {
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
+import { PresentationProvider } from "src/components/PresentationContext";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
-import { GridTableProvider } from "src/components/Table/GridTableContext";
 import { maybeAddCardPadding, NestedCards } from "src/components/Table/nestedCards";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
@@ -386,7 +386,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // behave semantically the same as `as=div` did for its tests.
   const _as = as === "virtual" && runningInJest ? "div" : as;
   return (
-    <GridTableProvider>
+    <PresentationProvider numberAlignment="right" hideLabel>
       {renders[_as](
         style,
         id,
@@ -399,7 +399,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         xss,
         virtuosoRef,
       )}
-    </GridTableProvider>
+    </PresentationProvider>
   );
 }
 
