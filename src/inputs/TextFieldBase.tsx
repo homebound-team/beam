@@ -43,7 +43,7 @@ interface TextFieldBaseProps
   /** TextField specific */
   compact?: boolean;
   /** Styles overrides */
-  xss?: Xss<"textAlign" | "fontWeight">;
+  xss?: Xss<"textAlign" | "fontWeight" | "justifyContent">;
   endAdornment?: ReactNode;
   startAdornment?: ReactNode;
   inlineLabel?: boolean;

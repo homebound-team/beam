@@ -20,6 +20,7 @@ export type {
   RowStyle,
   setRunningInJest,
 } from "./GridTable";
+export { GridTableProvider, useGridTable } from "./GridTableContext";
 export { simpleDataRows, simpleHeader, simpleRows } from "./simpleHelpers";
 export type { SimpleHeaderAndDataOf, SimpleHeaderAndDataWith } from "./simpleHelpers";
 export { SortHeader } from "./SortHeader";

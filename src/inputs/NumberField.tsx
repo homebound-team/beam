@@ -2,6 +2,7 @@ import type { NumberFieldStateProps } from "@react-stately/numberfield";
 import { ReactNode, useMemo, useRef } from "react";
 import { useLocale, useNumberField } from "react-aria";
 import { useNumberFieldState } from "react-stately";
+import { useGridTable } from "src/components";
 import { Css, Xss } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { TextFieldBase } from "./TextFieldBase";
@@ -25,7 +26,7 @@ export interface NumberFieldProps {
   onFocus?: () => void;
   readOnly?: boolean;
   /** Styles overrides */
-  xss?: Xss<"textAlign">;
+  xss?: Xss<"textAlign" | "justifyContent">;
 }
 
 export function NumberField(props: NumberFieldProps) {
@@ -111,9 +112,13 @@ export function NumberField(props: NumberFieldProps) {
     inputRef.current = document.createElement("input");
   }
 
+  // Determine default alignment based on whether it is in a table or not
+  const { inTable } = useGridTable();
+  const defaultAlignment = inTable ? Css.tr.jcfe.$ : Css.tl.jcfs.$;
+
   return (
     <TextFieldBase
-      xss={{ ...Css.tr.jcfe.$, ...xss }}
+      xss={{ ...defaultAlignment, ...xss }}
       groupProps={groupProps}
       labelProps={labelProps}
       label={label}
