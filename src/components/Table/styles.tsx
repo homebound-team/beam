@@ -1,4 +1,4 @@
-import { Css, Palette } from "src";
+import { Css, Palette } from "src/Css";
 import { GridStyle } from ".";
 
 /** Our original table look & feel/style. */
