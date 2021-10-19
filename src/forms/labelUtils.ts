@@ -1,14 +1,13 @@
-import { useContext } from "react";
-import { FormContext } from "src/forms/FormContext";
+import { usePresentationContext } from "src/components/PresentationContext";
 
 export function getLabelSuffix(required: boolean | undefined): string | undefined {
   // We promise to always call `getLabelSuffix` deterministically
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const settings = useContext(FormContext);
+  const { fieldProps } = usePresentationContext();
   if (required === true) {
-    return settings.labelSuffix.required;
+    return fieldProps?.labelSuffix?.required;
   } else if (required === false) {
-    return settings.labelSuffix.optional;
+    return fieldProps?.labelSuffix?.optional;
   } else {
     return undefined;
   }

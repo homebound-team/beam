@@ -1,6 +1,6 @@
-import React, { Children, cloneElement, ReactNode, useContext } from "react";
+import React, { Children, cloneElement, ReactNode } from "react";
+import { LabelSuffixStyle, PresentationProvider, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
-import { FormContext, LabelSuffixStyle } from "src/forms/FormContext";
 
 export type FormWidth =
   /** 320px. */
@@ -26,11 +26,12 @@ export interface FormLinesProps {
  * (see the `FieldGroup` component), where they will be laid out side-by-side.
  */
 export function FormLines(props: FormLinesProps) {
-  const settings = useContext(FormContext);
-  const { children, width = "full", labelSuffix = settings.labelSuffix } = props;
+  const { fieldProps } = usePresentationContext();
+  const { children, width = "full", labelSuffix = fieldProps?.labelSuffix } = props;
   let firstFormHeading = true;
   return (
-    <FormContext.Provider value={{ labelSuffix }}>
+    // Only overwrite label suffix if the property was defined in `props`. Ensures we only set to `undefined` if explicitly set.
+    <PresentationProvider fieldProps={"labelSuffix" in props ? { labelSuffix } : {}}>
       <div
         css={{
           // Note that we're purposefully not using display:flex so that our children's margins will collapse.
@@ -49,7 +50,7 @@ export function FormLines(props: FormLinesProps) {
           }
         })}
       </div>
-    </FormContext.Provider>
+    </PresentationProvider>
   );
 }
 

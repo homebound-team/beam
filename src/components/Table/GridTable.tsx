@@ -13,6 +13,7 @@ import React, {
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
+import { PresentationProvider } from "src/components/PresentationContext";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
 import { maybeAddCardPadding, NestedCards } from "src/components/Table/nestedCards";
@@ -384,17 +385,21 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // just trust the GridTable impl that, at runtime, `as=virtual` will (other than being virtualized)
   // behave semantically the same as `as=div` did for its tests.
   const _as = as === "virtual" && runningInJest ? "div" : as;
-  return renders[_as](
-    style,
-    id,
-    columns,
-    headerRows,
-    filteredRows,
-    firstRowMessage,
-    stickyHeader,
-    style.nestedCards?.firstLastColumnWidth,
-    xss,
-    virtuosoRef,
+  return (
+    <PresentationProvider fieldProps={{ hideLabel: true, numberAlignment: "right" }}>
+      {renders[_as](
+        style,
+        id,
+        columns,
+        headerRows,
+        filteredRows,
+        firstRowMessage,
+        stickyHeader,
+        style.nestedCards?.firstLastColumnWidth,
+        xss,
+        virtuosoRef,
+      )}
+    </PresentationProvider>
   );
 }
 

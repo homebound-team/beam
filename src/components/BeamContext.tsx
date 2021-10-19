@@ -1,6 +1,7 @@
-import { createContext, MutableRefObject, ReactNode, useContext, useMemo, useReducer, useRef } from "react";
+import { createContext, MutableRefObject, PropsWithChildren, useContext, useMemo, useReducer, useRef } from "react";
 import { OverlayProvider } from "react-aria";
 import { Modal, ModalProps } from "src/components/Modal/Modal";
+import { PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
 import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
 import { CanCloseCheck, CheckFn } from "src/types";
@@ -42,7 +43,9 @@ export const BeamContext = createContext<BeamContextState>({
   tabActionsDiv: undefined!,
 });
 
-export function BeamProvider({ children }: { children: ReactNode }) {
+interface BeamProviderProps extends PropsWithChildren<PresentationContextProps> {}
+
+export function BeamProvider({ children, ...presentationProps }: BeamProviderProps) {
   // We want the identity of these to be stable, b/c they end up being used as dependencies
   // in both useModal's and useSuperDrawer's return values, which means the end-application's
   // dependencies as well, i.e. things like GridTable rowStyles will memoize on openInDrawer.
@@ -80,13 +83,15 @@ export function BeamProvider({ children }: { children: ReactNode }) {
 
   return (
     <BeamContext.Provider value={{ ...context }}>
-      {/* OverlayProvider is required for Modals generated via React-Aria */}
-      <OverlayProvider>
-        {children}
-        {/*If the drawer is open, assume it will show modal content internally. */}
-        {modalRef.current && drawerContentStackRef.current.length === 0 && <Modal {...modalRef.current} />}
-      </OverlayProvider>
-      <SuperDrawer />
+      <PresentationProvider {...presentationProps}>
+        {/* OverlayProvider is required for Modals generated via React-Aria */}
+        <OverlayProvider>
+          {children}
+          {/*If the drawer is open, assume it will show modal content internally. */}
+          {modalRef.current && drawerContentStackRef.current.length === 0 && <Modal {...modalRef.current} />}
+        </OverlayProvider>
+        <SuperDrawer />
+      </PresentationProvider>
     </BeamContext.Provider>
   );
 }

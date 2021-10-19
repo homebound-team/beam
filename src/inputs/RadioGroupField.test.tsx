@@ -1,5 +1,5 @@
-import { click, render } from "@homebound/rtl-utils";
 import { RadioGroupField } from "src/inputs";
+import { click, render } from "src/utils/rtl";
 
 describe("RadioGroupField", () => {
   it("renders with just labels", async () => {
