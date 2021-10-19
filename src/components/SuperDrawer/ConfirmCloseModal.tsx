@@ -1,4 +1,5 @@
-import { Button, Css, ModalBody, ModalFooter, ModalHeader } from "src";
+import { Button, ModalBody, ModalFooter, ModalHeader } from "src/components";
+import { Css } from "src/Css";
 import { useBeamContext } from "../BeamContext";
 
 interface ConfirmCloseModalProps {
