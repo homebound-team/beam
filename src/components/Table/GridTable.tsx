@@ -386,7 +386,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // behave semantically the same as `as=div` did for its tests.
   const _as = as === "virtual" && runningInJest ? "div" : as;
   return (
-    <PresentationProvider numberAlignment="right" hideLabel>
+    <PresentationProvider fieldProps={{ hideLabel: true, numberAlignment: "right" }}>
       {renders[_as](
         style,
         id,

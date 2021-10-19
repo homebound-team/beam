@@ -1,15 +1,14 @@
 import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 import { GridStyle } from "src/components/Table";
-import { LabelSuffixStyle } from "src/forms/FormContext";
 
 export type PresentationContextProps = {
-  // Value will be ignored if passed. The value is set based on existence of nested PresentationProviders
-  baseContext?: boolean;
-  numberAlignment?: "left" | "right";
+  fieldProps?: {
+    numberAlignment?: "left" | "right";
+    // Hide labels for input fields. Helpful when displaying in a Table and the column header acts as the label
+    hideLabel?: boolean;
+    labelSuffix?: LabelSuffixStyle;
+  };
   gridTableStyle?: GridStyle;
-  formLabelSuffix?: LabelSuffixStyle;
-  // Hide labels for input fields. Helpful when displaying in a Table and the column header acts as the label
-  hideLabel?: boolean;
 };
 
 export const PresentationContext = createContext<PresentationContextProps>({});
@@ -20,10 +19,10 @@ export function PresentationProvider(props: PropsWithChildren<PresentationContex
   // Check to see if we are nested within another PresentationContext. If so, make sure values already above us are passed through if not overwritten (except baseContext)
   const existingContext = usePresentationContext();
 
-  const context: PresentationContextProps = useMemo(
-    () => ({ ...existingContext, ...presentationProps, baseContext: !existingContext.baseContext }),
-    [presentationProps, existingContext],
-  );
+  const context: PresentationContextProps = useMemo(() => {
+    const fieldProps = { ...existingContext.fieldProps, ...presentationProps.fieldProps };
+    return { ...existingContext, ...presentationProps, fieldProps };
+  }, [presentationProps, existingContext]);
 
   return <PresentationContext.Provider value={context}>{children}</PresentationContext.Provider>;
 }
@@ -31,3 +30,16 @@ export function PresentationProvider(props: PropsWithChildren<PresentationContex
 export function usePresentationContext() {
   return useContext(PresentationContext);
 }
+
+/**
+ * Label settings for required/optional fields.
+ *
+ * We may want to just hard-code this behavior, so that it's very consistent,
+ * but for now making it configurable.
+ */
+export type LabelSuffixStyle = {
+  /** The suffix to use for required fields. */
+  required?: string;
+  /** The suffix to use for explicitly optional (i.e. `required=false`) fields. */
+  optional?: string;
+};

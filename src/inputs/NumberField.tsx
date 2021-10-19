@@ -2,7 +2,7 @@ import type { NumberFieldStateProps } from "@react-stately/numberfield";
 import { ReactNode, useMemo, useRef } from "react";
 import { useLocale, useNumberField } from "react-aria";
 import { useNumberFieldState } from "react-stately";
-import { usePresentationContext } from "src/components";
+import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Xss } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { TextFieldBase } from "./TextFieldBase";
@@ -30,13 +30,16 @@ export interface NumberFieldProps {
 }
 
 export function NumberField(props: NumberFieldProps) {
+  // Determine default alignment based on presentation context
+  const { fieldProps } = usePresentationContext();
+  const alignment = fieldProps?.numberAlignment === "right" ? Css.tr.jcfe.$ : Css.tl.jcfs.$;
   const {
     disabled = false,
     required,
     readOnly = false,
     type,
     label,
-    hideLabel,
+    hideLabel = fieldProps?.hideLabel,
     onBlur,
     onFocus,
     errorMsg,
@@ -113,17 +116,13 @@ export function NumberField(props: NumberFieldProps) {
     inputRef.current = document.createElement("input");
   }
 
-  // Determine default alignment based on presentation context
-  const { numberAlignment, hideLabel: hideLabelContext } = usePresentationContext();
-  const defaultAlignment = numberAlignment && numberAlignment === "right" ? Css.tr.jcfe.$ : Css.tl.jcfs.$;
-
   return (
     <TextFieldBase
-      xss={{ ...defaultAlignment, ...xss }}
+      xss={{ ...alignment, ...xss }}
       groupProps={groupProps}
       labelProps={labelProps}
       label={label}
-      hideLabel={hideLabel ?? hideLabelContext}
+      hideLabel={hideLabel}
       required={required}
       inputProps={inputProps}
       // This is called on each DOM change, to push the latest value into the field

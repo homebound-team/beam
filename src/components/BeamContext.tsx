@@ -1,7 +1,7 @@
 import { createContext, MutableRefObject, PropsWithChildren, useContext, useMemo, useReducer, useRef } from "react";
 import { OverlayProvider } from "react-aria";
-import { PresentationContextProps, PresentationProvider } from "src/components";
 import { Modal, ModalProps } from "src/components/Modal/Modal";
+import { PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
 import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
 import { CanCloseCheck, CheckFn } from "src/types";

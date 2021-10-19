@@ -2,38 +2,14 @@ import { PresentationProvider, usePresentationContext } from "src/components/Pre
 import { render } from "src/utils/rtl";
 
 describe("PresentationContext", () => {
-  it("correctly sets 'baseContext' when not nested", async () => {
-    const r = await render(
-      <PresentationProvider>
-        <TestComponent />
-      </PresentationProvider>,
-      { omitBeamContext: true },
-    );
-    expect(r.baseContext().textContent).toBe("true");
-  });
-
-  it("correctly sets 'baseContext' when nested", async () => {
-    const r = await render(
-      <PresentationProvider>
-        <PresentationProvider>
-          <TestComponent />
-        </PresentationProvider>
-      </PresentationProvider>,
-      { omitBeamContext: true },
-    );
-    expect(r.baseContext().textContent).toBe("false");
-  });
-
   it("overrides only newly set values", async () => {
     // Given nested PresentationProviders that overwrites some values
     const r = await render(
       <PresentationProvider
-        hideLabel
-        formLabelSuffix={{ required: "*" }}
-        numberAlignment="right"
+        fieldProps={{ hideLabel: true, labelSuffix: { required: "*" }, numberAlignment: "right" }}
         gridTableStyle={{ emptyCell: "Test" }}
       >
-        <PresentationProvider hideLabel={false} formLabelSuffix={{ required: "?" }}>
+        <PresentationProvider fieldProps={{ hideLabel: false, labelSuffix: { required: "?" } }}>
           <TestComponent />
         </PresentationProvider>
       </PresentationProvider>,
@@ -52,8 +28,8 @@ describe("PresentationContext", () => {
   it("can reset value to undefined", async () => {
     // Given nested PresentationProviders that overwrites an existing value to `undefined`
     const r = await render(
-      <PresentationProvider numberAlignment="right">
-        <PresentationProvider numberAlignment={undefined}>
+      <PresentationProvider fieldProps={{ numberAlignment: "right" }}>
+        <PresentationProvider fieldProps={{ numberAlignment: undefined }}>
           <TestComponent />
         </PresentationProvider>
       </PresentationProvider>,
@@ -66,13 +42,12 @@ describe("PresentationContext", () => {
 });
 
 function TestComponent() {
-  const { baseContext, hideLabel, formLabelSuffix, numberAlignment, gridTableStyle } = usePresentationContext();
+  const { fieldProps, gridTableStyle } = usePresentationContext();
   return (
     <>
-      <div data-testid="baseContext">{JSON.stringify(baseContext)}</div>
-      <div data-testid="hideLabel">{JSON.stringify(hideLabel)}</div>
-      <div data-testid="formLabelSuffix">{JSON.stringify(formLabelSuffix)}</div>
-      <div data-testid="numberAlignment">{JSON.stringify(numberAlignment)}</div>
+      <div data-testid="hideLabel">{JSON.stringify(fieldProps?.hideLabel)}</div>
+      <div data-testid="formLabelSuffix">{JSON.stringify(fieldProps?.labelSuffix)}</div>
+      <div data-testid="numberAlignment">{JSON.stringify(fieldProps?.numberAlignment)}</div>
       <div data-testid="gridTableStyle">{JSON.stringify(gridTableStyle)}</div>
     </>
   );
