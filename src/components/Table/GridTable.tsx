@@ -19,11 +19,11 @@ import { maybeAddCardPadding, NestedCards } from "src/components/Table/nestedCar
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
 import { SortState, useSortState } from "src/components/Table/useSortState";
-import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
+import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import tinycolor from "tinycolor2";
+import { defaultStyle } from ".";
 
 export type Kinded = { kind: string };
-
 export type GridTableXss = Xss<Margin>;
 
 export const ASC = "ASC" as const;
@@ -69,8 +69,10 @@ export interface GridStyle {
 }
 
 export interface NestedCardsStyle {
-  /** The space between top-level cards. */
-  topLevelSpacerPx: number;
+  /** Space between each card. */
+  spacerPx: number;
+  /** Width of the first and last "hidden" columns used to align nested columns. */
+  firstLastColumnWidth?: number;
   /**
    * Per-kind styling for nested cards (see `cardStyle` if you only need a flat list of cards).
    *
@@ -95,55 +97,12 @@ export interface NestedCardStyle {
   brPx: number;
   /** The left/right padding of the card. */
   pxPx: number;
-  /** The y spacing between each row within this card. */
-  spacerPx: number;
 }
 
 export interface GridTableDefaults {
   style: GridStyle;
   stickyHeader: boolean;
 }
-
-/** Our original table look & feel/style. */
-export const defaultStyle: GridStyle = {
-  rootCss: Css.gray700.$,
-  betweenRowsCss: Css.bt.bGray400.$,
-  firstNonHeaderRowCss: Css.add({ borderTopStyle: "none" }).$,
-  cellCss: Css.py2.px3.$,
-  firstCellCss: Css.pl1.$,
-  lastCellCss: Css.$,
-  indentOneCss: Css.pl4.$,
-  indentTwoCss: Css.pl7.$,
-  // Use h100 so that all cells are the same height when scrolled; set bgWhite for when we're laid over other rows.
-  headerCellCss: Css.asfe.nowrap.py1.bgGray100.h100.aife.$,
-  firstRowMessageCss: Css.px1.py2.$,
-  rowHoverColor: Palette.Gray200,
-};
-
-/** Tightens up the padding of rows, great for rows that have form elements in them. */
-export const condensedStyle: GridStyle = {
-  ...defaultStyle,
-  headerCellCss: Css.bgGray100.tinyEm.$,
-  cellCss: Css.aic.sm.py1.px2.$,
-  rootCss: Css.dg.gray700.xs.$,
-};
-
-/** Renders each row as a card. */
-export const cardStyle: GridStyle = {
-  ...defaultStyle,
-  firstNonHeaderRowCss: Css.mt2.$,
-  cellCss: Css.p2.my1.bt.bb.bGray400.$,
-  firstCellCss: Css.bl.add({ borderTopLeftRadius: "4px", borderBottomLeftRadius: "4px" }).$,
-  lastCellCss: Css.br.add({ borderTopRightRadius: "4px", borderBottomRightRadius: "4px" }).$,
-  // Undo the card look & feel for the header
-  headerCellCss: {
-    ...defaultStyle.headerCellCss,
-    ...Css.add({
-      border: "none",
-      borderRadius: "unset",
-    }).p1.m0.xsEm.gray700.$,
-  },
-};
 
 let defaults: GridTableDefaults = {
   style: defaultStyle,
@@ -162,7 +121,7 @@ export function setGridTableDefaults(opts: Partial<GridTableDefaults>): void {
 
 type RenderAs = "div" | "table" | "virtual";
 
-// The row is optional b/c the nested card chrome rows only have ReactElements.
+/** The GridDataRow is optional b/c the nested card chrome rows only have ReactElements. */
 export type RowTuple<R extends Kinded> = [GridDataRow<R> | undefined, ReactElement];
 
 /**
@@ -254,7 +213,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
  * - Columns are mostly rendering logic
  *   - I.e. each column defines it's behavior for each given row `kind`
  *
- * In a kind of cute way, headers are not modeled specially, i.e. they are just another
+ * In a "kind" of cute way, headers are not modeled specially, i.e. they are just another
  * row `kind` along with the data rows. (Admittedly, out of pragmatism, we do apply some
  * special styling to the row that uses `kind: "header"`.)
  */
@@ -297,7 +256,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   }, [columns, rows, sorting, sortState]);
 
   // Filter + flatten + component-ize the sorted rows.
-  let [headerRows, filteredRows, maxCardPadding]: [RowTuple<R>[], RowTuple<R>[], number | undefined] = useMemo(() => {
+  let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
 
@@ -335,8 +294,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: RowTuple<R>[] = [];
     const filteredRows: RowTuple<R>[] = [];
-    // If we're doing nested cards, we will add extra first/last columns, and need to know how wide to make them
-    let maxCardPadding: number | undefined = undefined;
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
     const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style);
@@ -345,6 +302,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     function visit(row: GridDataRow<R>): void {
       const matches =
         filters.length === 0 ||
+        row.pin ||
         filters.every((filter) =>
           columns.map((c) => applyRowFn(c, row)).some((maybeContent) => matchesFilter(maybeContent, filter)),
         );
@@ -352,14 +310,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       let isCard = false;
       if (matches) {
         isCard = nestedCards && nestedCards.maybeOpenCard(row);
-        if (isCard && nestedCards) {
-          maxCardPadding = nestedCards.maxCardPadding(maxCardPadding);
-        }
         filteredRows.push([row, makeRowComponent(row)]);
       }
 
       const isCollapsed = collapsedIds.includes(row.id);
-      if (!isCollapsed && row.children) {
+      if (!isCollapsed && !!row.children?.length) {
+        nestedCards && matches && nestedCards.addSpacer();
         visitRows(row.children, isCard);
       }
 
@@ -370,11 +326,13 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
+          nestedCards && nestedCards.maybeOpenCard(row);
           headerRows.push([row, makeRowComponent(row)]);
+          nestedCards && nestedCards.closeCard();
           return;
         }
         visit(row);
-        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacerBetweenChildren();
+        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
       });
     }
 
@@ -382,7 +340,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     visitRows(maybeSorted, !!nestedCards);
     nestedCards && nestedCards.done();
 
-    return [headerRows, filteredRows, maxCardPadding];
+    return [headerRows, filteredRows];
   }, [
     as,
     maybeSorted,
@@ -434,7 +392,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     filteredRows,
     firstRowMessage,
     stickyHeader,
-    maxCardPadding,
+    style.nestedCards?.firstLastColumnWidth,
     xss,
     virtuosoRef,
   );
@@ -456,14 +414,14 @@ function renderCssGrid<R extends Kinded>(
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
-  maxCardPadding: number | undefined,
+  firstLastCardWidth: number | undefined,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
   return (
     <div
       css={{
-        ...Css.dg.gtc(calcDivGridColumns(columns, maxCardPadding)).$,
+        ...Css.dg.gtc(calcDivGridColumns(columns, firstLastCardWidth)).$,
         ...Css
           // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
           // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
@@ -496,10 +454,10 @@ function renderTable<R extends Kinded>(
   headerRows: RowTuple<R>[],
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
-  stickyHeader: boolean,
-  maxCardPadding: number | undefined,
+  _stickyHeader: boolean,
+  _firstLastColumnWidth: number | undefined,
   xss: any,
-  virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
   return (
     <table
@@ -557,14 +515,14 @@ function renderVirtual<R extends Kinded>(
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
-  maxCardPadding: number | undefined,
+  firstLastColumnWidth: number | undefined,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
   return (
     <Virtuoso
       ref={virtuosoRef}
-      components={{ List: VirtualRoot(style, columns, id, maxCardPadding, xss) }}
+      components={{ List: VirtualRoot(style, columns, id, firstLastColumnWidth, xss) }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
       // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
@@ -607,10 +565,10 @@ const VirtualRoot = memoizeOne<
     gs: GridStyle,
     columns: GridColumn<any>[],
     id: string,
-    maxCardPadding: number | undefined,
+    firstLastColumnWidth: number | undefined,
     xss: any,
   ) => Components["List"]
->((gs, columns, id, maxCardPadding, xss) => {
+>((gs, columns, id, firstLastColumnWidth, xss) => {
   return React.forwardRef(({ style, children }, ref) => {
     // This re-renders each time we have new children in the view port
     return (
@@ -618,7 +576,7 @@ const VirtualRoot = memoizeOne<
         ref={ref}
         style={style}
         css={{
-          ...Css.dg.gtc(calcVirtualGridColumns(columns, maxCardPadding)).$,
+          ...Css.dg.gtc(calcVirtualGridColumns(columns, firstLastColumnWidth)).$,
           // Add an extra `> div` due to Item + itemContent both having divs
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
           // Add `display:contents` to Item to flatten it like we do GridRow
@@ -645,7 +603,7 @@ const VirtualRoot = memoizeOne<
  *
  * When we're as=virtual, we change our default + enforce only fixed-sized units (% and px)
  */
-export function calcVirtualGridColumns(columns: GridColumn<any>[], maxCardPadding: number | undefined): string {
+export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColumnWidth: number | undefined): string {
   // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
   // calc((100% - allOtherPercent - allOtherPx) * ((myFr / totalFr))`
   //
@@ -694,10 +652,10 @@ export function calcVirtualGridColumns(columns: GridColumn<any>[], maxCardPaddin
     }
   });
 
-  return maybeAddCardColumns(sizes, maxCardPadding);
+  return maybeAddCardColumns(sizes, firstLastColumnWidth);
 }
 
-export function calcDivGridColumns(columns: GridColumn<any>[], maxCardPadding: number | undefined): string {
+export function calcDivGridColumns(columns: GridColumn<any>[], firstLastCardWidth: number | undefined): string {
   const sizes = columns.map(({ w }) => {
     if (typeof w === "undefined") {
       // Hrm, I waffle between 'auto' or '1fr' being the better default here...
@@ -710,12 +668,12 @@ export function calcDivGridColumns(columns: GridColumn<any>[], maxCardPadding: n
       return `${w}fr`;
     }
   });
-  return maybeAddCardColumns(sizes, maxCardPadding);
+  return maybeAddCardColumns(sizes, firstLastCardWidth);
 }
 
 // If we're doing nested cards, we add extra 1st/last cells...
-function maybeAddCardColumns(sizes: string[], maxCardPadding: number | undefined): string {
-  return (!maxCardPadding ? sizes : [`${maxCardPadding}px`, ...sizes, `${maxCardPadding}px`]).join(" ");
+function maybeAddCardColumns(sizes: string[], firstLastCardWidth: number | undefined): string {
+  return (!firstLastCardWidth ? sizes : [`${firstLastCardWidth}px`, ...sizes, `${firstLastCardWidth}px`]).join(" ");
 }
 
 /**

@@ -234,10 +234,10 @@ export function NestedCardsThreeLevels() {
     add: () => "",
     clientSideSort: false,
   };
-  const spacing = { brPx: 4, pxPx: 4, spacerPx: 1 };
+  const spacing = { brPx: 4, pxPx: 4 };
   const nestedStyle: GridStyle = {
     nestedCards: {
-      topLevelSpacerPx: 8,
+      spacerPx: 8,
       kinds: {
         parent: { bgColor: Palette.Gray500, ...spacing },
         child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
@@ -282,10 +282,10 @@ export function NestedCardsTwoLevels() {
     add: () => "",
     clientSideSort: false,
   };
-  const spacing = { brPx: 4, pxPx: 4, spacerPx: 1 };
+  const spacing = { brPx: 4, pxPx: 4 };
   const nestedStyle: GridStyle = {
     nestedCards: {
-      topLevelSpacerPx: 8,
+      spacerPx: 8,
       kinds: {
         parent: { bgColor: Palette.Gray100, ...spacing },
         child: { bgColor: Palette.White, ...spacing },

@@ -1,5 +1,13 @@
-import React, { Fragment, ReactElement } from "react";
-import { GridColumn, GridDataRow, GridStyle, Kinded, NestedCardStyle, RowTuple } from "src/components/Table/GridTable";
+import { Fragment, ReactElement } from "react";
+import {
+  GridColumn,
+  GridDataRow,
+  GridStyle,
+  Kinded,
+  NestedCardsStyle,
+  NestedCardStyle,
+  RowTuple,
+} from "src/components/Table/GridTable";
 import { Css } from "src/Css";
 
 /**
@@ -19,14 +27,14 @@ export class NestedCards {
   private readonly openCards: Array<NestedCardStyle> = [];
   // A buffer of the open/close/spacer rows we need between each content row.
   private readonly chromeBuffer: JSX.Element[] = [];
-  private readonly styles: Record<string, NestedCardStyle>;
+  private readonly styles: NestedCardsStyle;
 
   constructor(private columns: GridColumn<any>[], private filteredRows: RowTuple<any>[], private style: GridStyle) {
-    this.styles = style.nestedCards!.kinds;
+    this.styles = style.nestedCards!;
   }
 
   maybeOpenCard(row: GridDataRow<any>): boolean {
-    const card = this.styles[row.kind];
+    const card = this.styles.kinds[row.kind];
     // If this kind doesn't have a card defined, don't put it on the card stack
     if (card) {
       this.openCards.push(card);
@@ -42,20 +50,12 @@ export class NestedCards {
     this.openCards.pop();
   }
 
-  addSpacerBetweenChildren() {
-    const openCard = this.openCards[this.openCards.length - 1];
-    // If we're between two top-level cards, there is no open card, so fallback on topLevelSpacerPx
-    const height = openCard?.spacerPx || this.style.nestedCards!.topLevelSpacerPx;
-    this.chromeBuffer.push(makeSpacer(height, this.openCards));
+  addSpacer() {
+    this.chromeBuffer.push(makeSpacer(this.styles.spacerPx, this.openCards));
   }
 
   done() {
     maybeCreateChromeRow(this.columns, this.filteredRows, this.chromeBuffer);
-  }
-
-  maxCardPadding(current: number | undefined): number {
-    const padding = this.openCards.map((c) => c.pxPx + (!!c.bColor ? 1 : 0)).reduce((a, b) => a + b, 0);
-    return Math.max(padding, current || 0);
   }
 
   /** Return a stable copy of the cards, so it won't change as we keep going. */
