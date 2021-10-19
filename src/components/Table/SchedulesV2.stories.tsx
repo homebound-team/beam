@@ -176,7 +176,7 @@ const buttonColumns = actionColumn<Row>({
 });
 
 // TODO: Potentially add 8px spacer between each row
-const spacing = { brPx: 8, pxPx: 16, spacerPx: 8 };
+const spacing = { brPx: 8, pxPx: 16 };
 const style: GridStyle = {
   headerCellCss: Css.xsEm.gray700.py1.df.aic.$,
   firstNonHeaderRowCss: Css.mt2.$,

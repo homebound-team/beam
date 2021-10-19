@@ -234,7 +234,7 @@ export function NestedCardsThreeLevels() {
     add: () => "",
     clientSideSort: false,
   };
-  const spacing = { brPx: 4, pxPx: 4, spacerPx: 1 };
+  const spacing = { brPx: 4, pxPx: 4 };
   const nestedStyle: GridStyle = {
     nestedCards: {
       spacerPx: 8,
@@ -282,7 +282,7 @@ export function NestedCardsTwoLevels() {
     add: () => "",
     clientSideSort: false,
   };
-  const spacing = { brPx: 4, pxPx: 4, spacerPx: 1 };
+  const spacing = { brPx: 4, pxPx: 4 };
   const nestedStyle: GridStyle = {
     nestedCards: {
       spacerPx: 8,
