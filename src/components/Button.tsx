@@ -1,5 +1,5 @@
 import { AriaButtonProps } from "@react-types/button";
-import { ReactNode, RefObject, useMemo, useRef } from "react";
+import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Link } from "react-router-dom";
 import { navLink, useTestIds } from "src";
@@ -19,6 +19,8 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
   buttonRef?: RefObject<HTMLElement>;
+  /** Allow for setting "submit" | "button" | "reset" on button element */
+  type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
 }
 
 export function Button(props: ButtonProps) {

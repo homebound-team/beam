@@ -19,12 +19,18 @@ describe("Button", () => {
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("page1_custom");
   });
 
-  it("fires onClick method", async () => {
+  it("renders and can fires onClick", async () => {
     const onClick = jest.fn();
     const r = await render(<Button label="Button" onClick={onClick} />);
     expect(r.button().tagName).toBe("BUTTON");
+    expect(r.button()).toHaveAttribute("type", "button");
     click(r.button);
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("can render a specific button type", async () => {
+    const r = await render(<Button label="Button" type="submit" />);
+    expect(r.button()).toHaveAttribute("type", "submit");
   });
 
   it("applies expected properties when rendering a link with an absolute url", async () => {
