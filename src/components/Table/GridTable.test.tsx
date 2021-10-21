@@ -545,21 +545,31 @@ describe("GridTable", () => {
       // Given the table is using client-side sorting
       const r = await render(
         <GridTable<Row>
-          columns={[nameColumn]}
-          sorting={{ on: "client" }}
+          columns={[nameColumn, valueColumn]}
+          sorting={{ on: "client", initial: [1, "ASC"] }}
           rows={[
             simpleHeader,
             // And the 1st row is pinned first
-            { kind: "data", id: "2", name: "b", value: 2, pin: "first" },
+            { kind: "data", id: "1", name: "a", value: 11, pin: "first" },
+            { kind: "data", id: "2", name: "b", value: 10, pin: "first" },
+            // And the middle rows need sorted
             { kind: "data", id: "3", name: "c", value: 3 },
-            { kind: "data", id: "1", name: "a", value: 1 },
+            { kind: "data", id: "4", name: "d", value: 1 },
+            // And the last rows are pinned last
+            { kind: "data", id: "5", name: "e", value: 20, pin: "last" },
+            { kind: "data", id: "6", name: "f", value: 21, pin: "last" },
           ]}
         />,
       );
-      // Then the `value: 2` row stayed first
-      expect(cell(r, 1, 0)).toHaveTextContent("b");
-      expect(cell(r, 2, 0)).toHaveTextContent("a");
-      expect(cell(r, 3, 0)).toHaveTextContent("c");
+      // Then the a/b rows stayed first
+      expect(cell(r, 1, 0)).toHaveTextContent("a");
+      expect(cell(r, 2, 0)).toHaveTextContent("b");
+      // And the middle rows swapped
+      expect(cell(r, 3, 0)).toHaveTextContent("d");
+      expect(cell(r, 4, 0)).toHaveTextContent("c");
+      // And the last rows stayed last
+      expect(cell(r, 5, 0)).toHaveTextContent("e");
+      expect(cell(r, 6, 0)).toHaveTextContent("f");
     });
 
     it("can pin rows last", async () => {
