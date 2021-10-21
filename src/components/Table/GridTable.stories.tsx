@@ -237,6 +237,7 @@ export function NestedCardsThreeLevels() {
   const spacing = { brPx: 4, pxPx: 4 };
   const nestedStyle: GridStyle = {
     nestedCards: {
+      firstLastColumnWidth: 24,
       spacerPx: 8,
       kinds: {
         parent: { bgColor: Palette.Gray500, ...spacing },
@@ -285,6 +286,7 @@ export function NestedCardsTwoLevels() {
   const spacing = { brPx: 4, pxPx: 4 };
   const nestedStyle: GridStyle = {
     nestedCards: {
+      firstLastColumnWidth: 24,
       spacerPx: 8,
       kinds: {
         parent: { bgColor: Palette.Gray100, ...spacing },

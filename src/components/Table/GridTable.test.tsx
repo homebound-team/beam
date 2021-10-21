@@ -8,6 +8,7 @@ import {
   GridColumn,
   GridDataRow,
   GridRowStyles,
+  GridStyle,
   GridTable,
   matchesFilter,
   setRunningInJest,
@@ -20,7 +21,7 @@ import {
   simpleRows,
 } from "src/components/Table/simpleHelpers";
 import { Css, Palette } from "src/Css";
-import { cell, click, render, row } from "src/utils/rtl";
+import { cell, cellAnd, cellOf, click, render, row, rowAnd } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
@@ -50,7 +51,6 @@ const nestedColumns: GridColumn<NestedRow>[] = [
     parent: () => <Collapse />,
     child: () => <Collapse />,
     grandChild: () => "",
-    w: 0,
   },
   {
     header: () => "Name",
@@ -1074,10 +1074,55 @@ describe("GridTable", () => {
     expect(cell(r, 1, 0)).toBeEmptyDOMElement();
     expect(cell(r, 1, 1).textContent).toBe("1");
   });
+
+  it("ignores chrome and cardpadding elements in nestedCardStyle when using GridTable test helpers", async () => {
+    // Given a table with nested card styles
+    const kindStyle = { bgColor: Palette.Gray100, brPx: 4, pxPx: 4 };
+    const nestedStyle: GridStyle = {
+      nestedCards: {
+        firstLastColumnWidth: 24,
+        spacerPx: 8,
+        kinds: {
+          header: kindStyle,
+          parent: kindStyle,
+          child: kindStyle,
+          grandChild: kindStyle,
+        },
+      },
+    };
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "header", id: "header" },
+      {
+        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+            children: [{ kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" }],
+          },
+        ],
+      },
+    ];
+
+    const r = await render(<GridTable<NestedRow> columns={nestedColumns} style={nestedStyle} rows={rows} />);
+    // When using the various gridtable test helpers (cell, cellAnd, cellOf, row, rowAnd)
+    // Then chrome rows, and padding columns are ignored
+    expect(cellAnd(r, 0, 0, "collapse")).toBeTruthy();
+    expect(cell(r, 0, 1).textContent).toBe("Name");
+    expect(cellAnd(r, 1, 0, "collapse")).toBeTruthy();
+    expect(cell(r, 1, 1).textContent).toBe("parent 1");
+    expect(rowAnd(r, 2, "collapse")).toBeTruthy();
+    expect(cellOf(r, "grid-table", 2, 1).textContent).toBe("child p1c1");
+    expect(row(r, 3).querySelector("[data-testid='collapse']")).toBeFalsy();
+    expect(cell(r, 3, 1).textContent).toBe("grandchild p1c1g1");
+  });
 });
 
 function Collapse() {
   const { isCollapsed, toggleCollapse } = useContext(GridCollapseContext);
   const icon = isCollapsed ? "+" : "-";
-  return <div onClick={toggleCollapse}>{icon}</div>;
+  return (
+    <div onClick={toggleCollapse} data-testid="collapse">
+      {icon}
+    </div>
+  );
 }

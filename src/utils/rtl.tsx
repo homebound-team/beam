@@ -66,11 +66,14 @@ export function render(
 }
 
 export function cell(r: RenderResult, row: number, column: number): HTMLElement {
-  return r.getByTestId("grid-table").childNodes[row].childNodes[column] as HTMLElement;
+  return cellOf(r, "grid-table", row, column);
 }
 
-export function cellOf(r: RenderResult, testId: string, row: number, column: number): HTMLElement {
-  return r.getByTestId(testId).childNodes[row].childNodes[column] as HTMLElement;
+export function cellOf(r: RenderResult, testId: string, rowNum: number, column: number): HTMLElement {
+  const nonPaddingColumns = Array.from(row(r, rowNum).childNodes).filter(
+    (node) => !("cardpadding" in (node as HTMLElement).dataset),
+  );
+  return nonPaddingColumns[column] as HTMLElement;
 }
 
 export function cellAnd(r: RenderResult, row: number, column: number, testId: string): HTMLElement {
@@ -81,11 +84,14 @@ export function cellAnd(r: RenderResult, row: number, column: number, testId: st
 }
 
 export function row(r: RenderResult, row: number): HTMLElement {
-  return r.getByTestId("grid-table").childNodes[row] as HTMLElement;
+  const nonChromeRows = Array.from(r.getByTestId("grid-table").childNodes).filter(
+    (node) => !("chrome" in (node as HTMLElement).dataset),
+  );
+  return nonChromeRows[row] as HTMLElement;
 }
 
-export function rowAnd(r: RenderResult, row: number, testId: string): HTMLElement {
-  const e = r.getByTestId("grid-table").childNodes[row] as HTMLElement;
+export function rowAnd(r: RenderResult, rowNum: number, testId: string): HTMLElement {
+  const e = row(r, rowNum);
   return e.querySelector(`[data-testid="${testId}"]`) || fail(`Element not found ${prettyDOM(e)}`);
 }
 

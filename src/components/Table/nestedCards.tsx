@@ -8,7 +8,7 @@ import {
   NestedCardStyle,
   RowTuple,
 } from "src/components/Table/GridTable";
-import { Css } from "src/Css";
+import { Css, Properties } from "src/Css";
 
 /**
  * A helper class to create our nested card DOM shenanigans.
@@ -113,15 +113,21 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
  * For the first or last cell of actual content, wrap them in divs that re-create the
  * outer cards' padding + background.
  */
-export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first" | "final"): any {
-  let div: any = <div />;
+export function maybeAddCardPadding(
+  openCards: NestedCardStyle[],
+  column: "first" | "final",
+  styles: Properties = {},
+): any {
+  let div: any = <div data-cardpadding="true" />;
   [...openCards].reverse().forEach((card) => {
     div = (
       <div
+        data-cardpadding="true"
         css={{
           ...Css.h100.bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).$,
           ...(column === "first" && Css.plPx(card.pxPx).if(!!card.bColor).bl.$),
           ...(column === "final" && Css.prPx(card.pxPx).if(!!card.bColor).br.$),
+          ...styles,
         }}
       >
         {div}
@@ -168,7 +174,7 @@ export function maybeCreateChromeRow(
     filteredRows.push([
       undefined,
       // We add 2 to account for our dedicated open/close columns
-      <div css={Css.gc(`span ${columns.length + 2}`).$}>
+      <div css={Css.gc(`span ${columns.length + 2}`).$} data-chrome="true">
         {chromeBuffer.map((c, i) => (
           <Fragment key={i}>{c}</Fragment>
         ))}
