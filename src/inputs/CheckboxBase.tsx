@@ -5,6 +5,7 @@ import { Css, Palette, px } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 interface CheckboxAriaProps {
   description?: string | undefined;
@@ -41,7 +42,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
   const ref = useRef(null);
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover({ isDisabled });
-  const tid = useTestIds(props);
+  const tid = useTestIds(props, defaultTestId(label));
 
   const markIcon = isIndeterminate ? dashSmall : isSelected ? checkmarkSmall : "";
 
@@ -59,7 +60,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
       }
     >
       <VisuallyHidden>
-        <input ref={ref} {...inputProps} {...focusProps} />
+        <input ref={ref} {...inputProps} {...focusProps} {...tid} />
       </VisuallyHidden>
       <span
         {...hoverProps}
