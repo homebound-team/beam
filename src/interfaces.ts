@@ -1,5 +1,6 @@
 import type { PressEvent } from "@react-types/shared";
 import { ReactNode } from "react";
+import { PresentationFieldProps } from "src/components/PresentationContext";
 
 /** Base Interfaced */
 export interface BeamFocusableProps {
@@ -22,7 +23,7 @@ export interface BeamButtonProps {
   openInNew?: boolean;
 }
 
-export interface BeamTextFieldProps extends BeamFocusableProps {
+export interface BeamTextFieldProps extends BeamFocusableProps, PresentationFieldProps {
   /** Whether the interactive element is disabled. */
   disabled?: boolean;
   errorMsg?: string;
@@ -42,5 +43,5 @@ export interface BeamTextFieldProps extends BeamFocusableProps {
   readOnly?: boolean;
   placeholder?: string;
   /** If the field should be rendered without a border - This could happen if rendering within a table or as part of a CompoundField */
-  borderless?: boolean;
+  compound?: boolean;
 }

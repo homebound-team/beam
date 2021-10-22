@@ -34,7 +34,7 @@ interface SelectFieldInputProps<O, V extends Value> {
   contrast?: boolean;
   nothingSelectedText: string;
   /** If the field should be rendered without a border - This could happen if rendering within a table or as part of a CompoundField */
-  borderless?: boolean;
+  compound?: boolean;
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
@@ -64,7 +64,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
     sizeToContent,
     contrast = false,
     nothingSelectedText,
-    borderless,
+    compound,
     ...otherProps
   } = props;
 
@@ -91,7 +91,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
       helperText={helperText}
       contrast={contrast}
       xss={!inlineLabel ? Css.fw5.$ : {}}
-      borderless={borderless}
+      compound={compound}
       startAdornment={
         (showNumSelection && (
           <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinyEm.df.aic.jcc.$}>

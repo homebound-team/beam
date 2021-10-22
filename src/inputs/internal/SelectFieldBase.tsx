@@ -63,7 +63,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     nothingSelectedText = "",
     contrast,
     disabledOptions,
-    borderless,
+    compound,
     ...otherProps
   } = props;
 
@@ -283,7 +283,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         sizeToContent={sizeToContent}
         contrast={contrast}
         nothingSelectedText={nothingSelectedText}
-        borderless={borderless}
+        compound={compound}
       />
       {state.isOpen && (
         <Popover
@@ -333,5 +333,5 @@ export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusa
   /** When set the SelectField is expected to be put on a darker background */
   contrast?: boolean;
   /** If the field should be rendered without a border - This could happen if rendering within a table or as part of a CompoundField */
-  borderless?: boolean;
+  compound?: boolean;
 }

@@ -5,7 +5,7 @@ import { DragEventHandler, useLayoutEffect, useRef, useState } from "react";
 import { DragDropContext, DragDropContextProps, Draggable, Droppable } from "react-beautiful-dnd";
 import { CollapseToggle, GridStyle, GridTable } from "src/components/Table";
 import { Css, Palette } from "src/Css";
-import { Checkbox } from "src/inputs";
+import { Checkbox, TextAreaField } from "src/inputs";
 import { zeroTo } from "src/utils/sb";
 import { Icon } from "../Icon";
 import { actionColumn, column, dateColumn } from "./columns";
@@ -99,7 +99,7 @@ const nameColumn = column<Row>({
   header: "Task",
   milestone: (row) => ({ value: row.name, content: "" }),
   subgroup: (row) => ({ value: row.name, content: "" }),
-  task: (row) => row.name,
+  task: (row) => <TaskNameField value={row.name} />,
   add: "Add",
   w: 1,
 });
@@ -178,9 +178,9 @@ const buttonColumns = actionColumn<Row>({
 // TODO: Potentially add 8px spacer between each row
 const spacing = { brPx: 8, pxPx: 16 };
 const style: GridStyle = {
-  headerCellCss: Css.xsEm.gray700.py1.df.aic.$,
+  headerCellCss: Css.sm.gray700.py1.df.aic.$,
   firstNonHeaderRowCss: Css.mt2.$,
-  cellCss: Css.h100.gray700.xs.aic.$,
+  cellCss: Css.h100.gray700.sm.aic.pxPx(4).$,
   nestedCards: {
     spacerPx: 8,
     firstLastColumnWidth: 33, // 32px + 1px border
@@ -593,4 +593,20 @@ function createMilestones(howMany: number, howManySubGroups: number, howManyTask
       children: createSubGroups(howManySubGroups, howManyTasks, name, id * howManySubGroups * howManyTasks),
     } as MilestoneRow;
   });
+}
+
+function TaskNameField({ value }: { value: string }) {
+  const [internalValue, setValue] = useState(value);
+  return (
+    <TextAreaField
+      value={internalValue}
+      onChange={(val) => setValue(val ?? "")}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
+      label="Task name"
+      hideLabel
+      preventNewLines
+      borderless
+    />
+  );
 }

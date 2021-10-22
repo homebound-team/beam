@@ -34,7 +34,7 @@ export interface DateFieldProps {
   inlineLabel?: boolean;
   placeholder?: string;
   /** If the field should be rendered without a border - This could happen if rendering within a table or as part of a CompoundField */
-  borderless?: boolean;
+  compound?: boolean;
   compact?: boolean;
 }
 

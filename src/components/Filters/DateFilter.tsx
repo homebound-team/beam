@@ -48,7 +48,7 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
           >
             <SelectField
               compact
-              borderless
+              compound
               sizeToContent
               options={[
                 // Always show the 'Any' option
@@ -82,7 +82,7 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
             }}
           >
             <DateField
-              borderless
+              compound
               compact
               inlineLabel
               value={value?.value ? new Date(value.value) : new Date()}
