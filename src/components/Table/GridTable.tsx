@@ -891,7 +891,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
   const currentCard = openCards && openCards.length > 0 && openCards[openCards.length - 1];
   let currentColspan = 1;
-  const maybeStickyHeaderStyles = isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : {};
+  const maybeStickyHeaderStyles = isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined;
   const div = (
     <Row css={rowCss} {...others}>
       {openCards && maybeAddCardPadding(openCards, "first", maybeStickyHeaderStyles)}
