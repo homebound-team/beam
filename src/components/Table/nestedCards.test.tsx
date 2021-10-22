@@ -104,12 +104,14 @@ describe("NestedCards", () => {
         data-overlay-container="true"
       >
         <div
-          class="emotion-0"
+          data-cardpadding="true"
         >
           <div
-            class="emotion-1"
+            class="emotion-0"
           >
-            <div />
+            <div
+              class="emotion-1"
+            />
           </div>
         </div>
       </div>
@@ -138,12 +140,14 @@ describe("NestedCards", () => {
         data-overlay-container="true"
       >
         <div
-          class="emotion-0"
+          data-cardpadding="true"
         >
           <div
-            class="emotion-1"
+            class="emotion-0"
           >
-            <div />
+            <div
+              class="emotion-1"
+            />
           </div>
         </div>
       </div>

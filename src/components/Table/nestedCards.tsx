@@ -113,8 +113,8 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
  * For the first or last cell of actual content, wrap them in divs that re-create the
  * outer cards' padding + background.
  */
-export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first" | "final"): any {
-  let div: any = <div />;
+export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first" | "final", styles?: {}): any {
+  let div: any = undefined;
   [...openCards].reverse().forEach((card) => {
     div = (
       <div
@@ -128,7 +128,12 @@ export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first
       </div>
     );
   });
-  return div;
+
+  return (
+    <div data-cardpadding="true" {...(styles ? { css: styles } : {})}>
+      {div}
+    </div>
+  );
 }
 
 /**
@@ -168,7 +173,7 @@ export function maybeCreateChromeRow(
     filteredRows.push([
       undefined,
       // We add 2 to account for our dedicated open/close columns
-      <div css={Css.gc(`span ${columns.length + 2}`).$}>
+      <div css={Css.gc(`span ${columns.length + 2}`).$} data-chrome="true">
         {chromeBuffer.map((c, i) => (
           <Fragment key={i}>{c}</Fragment>
         ))}

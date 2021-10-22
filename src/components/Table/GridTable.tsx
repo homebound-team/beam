@@ -73,7 +73,7 @@ export interface NestedCardsStyle {
   /** Space between each card. */
   spacerPx: number;
   /** Width of the first and last "hidden" columns used to align nested columns. */
-  firstLastColumnWidth?: number;
+  firstLastColumnWidth: number;
   /**
    * Per-kind styling for nested cards (see `cardStyle` if you only need a flat list of cards).
    *
@@ -270,6 +270,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       // Note that we do memoized on toggleCollapsedId, but it's stable thanks to useToggleIds.
       const isCollapsed = collapsedIds.includes(row.id);
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
+
       return (
         <RowComponent
           key={`${row.kind}-${row.id}`}
@@ -419,21 +420,20 @@ function renderCssGrid<R extends Kinded>(
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
-  firstLastCardWidth: number | undefined,
+  firstLastColumnWidth: number | undefined,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
   return (
     <div
       css={{
-        ...Css.dg.gtc(calcDivGridColumns(columns, firstLastCardWidth)).$,
-        ...Css
-          // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
-          // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
-          // The `div + div` is also the "owl operator", i.e. don't apply to the 1st row.
-          .addIn("& > div + div > *", style.betweenRowsCss || {})
-          // removes border between header and second row
-          .addIn("& > div:nth-of-type(2) > *", style.firstNonHeaderRowCss || {}).$,
+        ...Css.dg.gtc(calcDivGridColumns(columns, firstLastColumnWidth)).$,
+        // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
+        // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
+        // The `div + div` is also the "owl operator", i.e. don't apply to the 1st row.
+        ...(style.betweenRowsCss ? Css.addIn("& > div + div > *", style.betweenRowsCss).$ : {}),
+        // removes border between header and second row
+        ...(style.firstNonHeaderRowCss ? Css.addIn("& > div:nth-of-type(2) > *", style.firstNonHeaderRowCss).$ : {}),
         ...style.rootCss,
         ...xss,
       }}
@@ -660,7 +660,7 @@ export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColu
   return maybeAddCardColumns(sizes, firstLastColumnWidth);
 }
 
-export function calcDivGridColumns(columns: GridColumn<any>[], firstLastCardWidth: number | undefined): string {
+export function calcDivGridColumns(columns: GridColumn<any>[], firstLastColumnWidth: number | undefined): string {
   const sizes = columns.map(({ w }) => {
     if (typeof w === "undefined") {
       // Hrm, I waffle between 'auto' or '1fr' being the better default here...
@@ -673,12 +673,14 @@ export function calcDivGridColumns(columns: GridColumn<any>[], firstLastCardWidt
       return `${w}fr`;
     }
   });
-  return maybeAddCardColumns(sizes, firstLastCardWidth);
+  return maybeAddCardColumns(sizes, firstLastColumnWidth);
 }
 
 // If we're doing nested cards, we add extra 1st/last cells...
-function maybeAddCardColumns(sizes: string[], firstLastCardWidth: number | undefined): string {
-  return (!firstLastCardWidth ? sizes : [`${firstLastCardWidth}px`, ...sizes, `${firstLastCardWidth}px`]).join(" ");
+function maybeAddCardColumns(sizes: string[], firstLastColumnWidth: number | undefined): string {
+  return (!firstLastColumnWidth ? sizes : [`${firstLastColumnWidth}px`, ...sizes, `${firstLastColumnWidth}px`]).join(
+    " ",
+  );
 }
 
 /**
@@ -889,9 +891,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
   const currentCard = openCards && openCards.length > 0 && openCards[openCards.length - 1];
   let currentColspan = 1;
+  const maybeStickyHeaderStyles = isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined;
   const div = (
     <Row css={rowCss} {...others}>
-      {openCards && maybeAddCardPadding(openCards, "first")}
+      {openCards && maybeAddCardPadding(openCards, "first", maybeStickyHeaderStyles)}
       {columns.map((column, columnIndex) => {
         // Decrement colspan count and skip if greater than 1.
         if (currentColspan > 1) {
@@ -929,7 +932,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
-          ...(isHeader && stickyHeader && Css.sticky.top(stickyOffset).z1.$),
+          ...maybeStickyHeaderStyles,
           // If we're within a card, use its background color
           ...(currentCard && Css.bgColor(currentCard.bgColor).$),
           // Add in colspan css if needed
@@ -949,7 +952,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
         return renderFn(columnIndex, cellCss, content, row, rowStyle);
       })}
-      {openCards && maybeAddCardPadding(openCards, "final")}
+      {openCards && maybeAddCardPadding(openCards, "final", maybeStickyHeaderStyles)}
     </Row>
   );
 
