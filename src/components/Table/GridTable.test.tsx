@@ -1115,6 +1115,12 @@ describe("GridTable", () => {
     expect(row(r, 3).querySelector("[data-testid='collapse']")).toBeFalsy();
     expect(cell(r, 3, 1).textContent).toBe("grandchild p1c1g1");
   });
+
+  it("can use custom table test ids on cell helpers that support it", async () => {
+    const r = await render(<GridTable id="customTestId" rows={rows} columns={columns} />);
+    expect(cellOf(r, "customTestId", 0, 0).textContent).toBe("Name");
+    expect(row(r, 0, "customTestId").textContent).toBe("NameValue");
+  });
 });
 
 function Collapse() {
