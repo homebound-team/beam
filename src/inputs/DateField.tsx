@@ -5,15 +5,12 @@ import { DateUtils } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
 import { Icon } from "src/components";
 import { Popover } from "src/components/internal";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { DatePickerOverlay } from "src/inputs/internal/DatePickerOverlay";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import "./DateField.css";
-
-const format = "MM/dd/yy";
-const longFormat = "EEEE LLLL	d, uuuu";
 
 export interface DateFieldProps {
   value: Date | undefined;
@@ -28,12 +25,14 @@ export interface DateFieldProps {
   required?: boolean;
   readOnly?: boolean;
   helperText?: string | ReactNode;
-  /** Renders as `Monday, January 1, 2018` when in read-only mode. */
-  long?: boolean;
   /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
   placeholder?: string;
   compact?: boolean;
+  format?: keyof typeof dateFormats;
+  iconLeft?: boolean;
+  hideLabel?: boolean;
+  borderless?: boolean;
 }
 
 export function DateField(props: DateFieldProps) {
@@ -49,21 +48,25 @@ export function DateField(props: DateFieldProps) {
     helperText,
     inlineLabel = false,
     readOnly = false,
-    long = false,
+    format = "short",
+    iconLeft = false,
     ...others
   } = props;
   const inputRef = useRef<HTMLInputElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
-  const showLongFormat = long && readOnly;
-  const [inputValue, setInputValue] = useState(
-    value ? (showLongFormat ? dateFnsFormat(value, longFormat) : formatDate(value)) : "",
-  );
+  // Local focus state for determining which `dateFormat` to show. When in focus, always show `short` format, otherwise based on `format` prop value.
+  const [isFocused, setIsFocused] = useState(false);
+  const dateFormat = getDateFormat(format);
+  const [inputValue, setInputValue] = useState(value ? formatDate(value, dateFormat) : "");
   const tid = useTestIds(props, defaultTestId(label));
 
   useEffect(() => {
-    setInputValue(value ? (showLongFormat ? dateFnsFormat(value, longFormat) : formatDate(value)) : "");
+    // Avoid updating any WIP values.
+    if (!isFocused) {
+      setInputValue(value ? formatDate(value, dateFormat) : "");
+    }
   }, [value]);
 
   const textFieldProps = {
@@ -74,30 +77,45 @@ export function DateField(props: DateFieldProps) {
     "aria-haspopup": "dialog" as const,
     value: inputValue,
   };
-  const state = useOverlayTriggerState({});
+  const state = useOverlayTriggerState({
+    onOpenChange: (isOpen) => {
+      // Handles calling `onBlur` for the case where the user interacts with the overlay, removing focus from the input field, and eventually closes the overlay (whether clicking away, or selecting a date)
+      if (!isOpen && !isFocused) {
+        maybeCall(onBlur);
+      }
+    },
+  });
   const { labelProps, inputProps } = useTextField(
     {
       ...textFieldProps,
-      // Open on focus of the input.
-      onFocus: (e) => {
+      onFocus: () => {
+        // Open overlay on focus of the input.
         state.open();
-        maybeCall(onFocus, e);
+        setIsFocused(true);
+        maybeCall(onFocus);
+
+        if (value) {
+          // When focused, change to use the "short" date format, as it is simpler to update by hand and parse.
+          setInputValue(formatDate(value, dateFormats.short));
+        }
       },
       onBlur: (e) => {
-        // If we are interacting any other part of the inputWrap (such as the calendar button) return early
-        if (e.relatedTarget && inputWrapRef.current && inputWrapRef.current.contains(e.relatedTarget as Node)) {
+        setIsFocused(false);
+        // If we are interacting any other part of `inputWrap` ref (such as the calendar button) return early as clicking anywhere within there will push focus to the input field.
+        // Or if interacting with the DatePicker then also return early. The overlay will handle calling `onBlur` once it closes.
+        if (
+          (inputWrapRef.current && inputWrapRef.current.contains(e.relatedTarget as Node)) ||
+          (overlayRef.current && overlayRef.current.contains(e.relatedTarget as Node))
+        ) {
           return;
         }
-        // I want to avoid calling `onBlur` if interacting with the DatePickerOverlay, but almost seems impossible, because we still want to fire the blur when the user leaves the field.
-        // One idea I had was to restore focus to the input when the overlay is closed, but how can we know that only on a certain focus event should open the DatePicker.
-        // So for now, just leaving it as "once you interact with the Datepicker, you've 'blurred' the field.
-        // ((overlayRef.current && overlayRef.current.contains(e.relatedTarget as Node))
 
         // If the user leaves the input and has an invalid date, reset to previous value.
-        if (!parseDate(inputValue, format)) {
-          setInputValue(value ? formatDate(value) : "");
+        if (!parseDate(inputValue, dateFormat)) {
+          setInputValue(value ? formatDate(value, dateFormat) : "");
         }
-        maybeCall(onBlur, e);
+        state.close();
+        maybeCall(onBlur);
       },
     },
     inputRef,
@@ -123,9 +141,25 @@ export function DateField(props: DateFieldProps) {
     shouldUpdatePosition: true,
   });
 
-  // If showing the long format of the date, then leave size undefined. Otherwise we're showing it as "01/01/20", so set size to 8.
-  // (Setting the size 8 will currently only impact view of the DateField when placed on the "in page" filters. This is due to other styles set within TextFieldBase)
-  const inputSize = showLongFormat ? undefined : 8;
+  // If showing the short date format, "01/01/20", so set size to 8. If medium (Wed, Nov 23) use 10 characters (leaving out the `,` character in the count because it is so small)
+  // Otherwise the long format can be `undefined`.
+  // Setting the size attribute only impacts the fields when displayed in a container that doesn't allow the field to grow to its max width, such as in an inline container.
+  // TODO: figure this out... seems weird to have now that we support multiple dates....
+  // How do other applications handle this defined sizing? Appears they use hard coded widths depending on format, which is similar here (using `size` instead of css `width`).
+  // But would also need to allow for the input to be `fullWidth`, which is basically also what we're accomplishing here... so maybe fine?
+  const inputSize = format === "short" ? 8 : format === "medium" ? 10 : undefined;
+
+  const calendarButton = (
+    <button
+      ref={buttonRef}
+      {...buttonProps}
+      disabled={disabled}
+      css={Css.if(disabled).cursorNotAllowed.$}
+      {...tid.calendarButton}
+    >
+      <Icon icon="calendar" color={Palette.Gray700} />
+    </button>
+  );
 
   return (
     <>
@@ -145,23 +179,15 @@ export function DateField(props: DateFieldProps) {
           state.close();
           if (v) {
             setInputValue(v);
-            const parsed = parseDate(v, format);
+            // If changing the value directly (vs using the DatePicker), then we always use the short format
+            const parsed = parseDate(v, dateFormats.short);
             if (parsed) {
               onChange(parsed);
             }
           }
         }}
-        endAdornment={
-          <button
-            ref={buttonRef}
-            {...buttonProps}
-            disabled={disabled}
-            css={Css.if(disabled).cursorNotAllowed.$}
-            {...tid.calendarButton}
-          >
-            <Icon icon="calendar" />
-          </button>
-        }
+        endAdornment={!iconLeft && calendarButton}
+        startAdornment={iconLeft && calendarButton}
         {...others}
       />
       {state.isOpen && (
@@ -177,7 +203,7 @@ export function DateField(props: DateFieldProps) {
             value={value}
             positionProps={positionProps}
             onChange={(d) => {
-              setInputValue(formatDate(d));
+              setInputValue(formatDate(d, dateFormat));
               onChange(d);
             }}
             {...tid.datePicker}
@@ -188,7 +214,7 @@ export function DateField(props: DateFieldProps) {
   );
 }
 
-function formatDate(date: Date) {
+function formatDate(date: Date, format: string) {
   return dateFnsFormat(date, format);
 }
 
@@ -224,4 +250,14 @@ function parseDate(str: string, format: string) {
     return undefined;
   }
   return parsed;
+}
+
+const dateFormats = {
+  short: "MM/dd/yy",
+  medium: "EEE, MMM d",
+  long: "EEEE LLLL d, uuuu",
+};
+
+function getDateFormat(format: keyof typeof dateFormats | undefined) {
+  return format ? dateFormats[format] : dateFormats.short;
 }
