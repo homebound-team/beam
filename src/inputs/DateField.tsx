@@ -34,6 +34,7 @@ export interface DateFieldProps {
   inlineLabel?: boolean;
   placeholder?: string;
   compact?: boolean;
+  format?: string;
 }
 
 export function DateField(props: DateFieldProps) {
