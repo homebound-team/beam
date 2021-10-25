@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useParams } from "react-router";
 import { Palette } from "src/Css";
 import { click, render, withRouter } from "src/utils/rtl";
-import { getNextTabValue, RouteTab, Tab, TabsWithContent } from "./Tabs";
+import { getNextTabValue, RouteTabWithContent, TabsWithContent, TabWithContent } from "./Tabs";
 import { TabValue, TestTabContent, testTabs } from "./testData";
 
 describe("TabsWithContent", () => {
@@ -78,7 +78,7 @@ describe("TabsWithContent", () => {
 
   it("hides the tabs if only a single tab is enabled", async () => {
     // Given only the 1st tab is enabled
-    const testTabs: Tab<TabValue>[] = [
+    const testTabs: TabWithContent<TabValue>[] = [
       { name: "Tab 1", value: "tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
       { name: "Tab 2", value: "tab2", disabled: true, render: () => <TestTabContent content="Tab 2 Content" /> },
       { name: "Tab 3", value: "tab3", disabled: true, render: () => <TestTabContent content="Tab 3 Content" /> },
@@ -93,7 +93,7 @@ describe("TabsWithContent", () => {
 
   it("shows all the tabs if 'alwaysShowAllTabs' is defined, but only a single tab is enabled ", async () => {
     // Given only the 1st tab is enabled
-    const testTabs: Tab<TabValue>[] = [
+    const testTabs: TabWithContent<TabValue>[] = [
       { name: "Tab 1", value: "tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
       { name: "Tab 2", value: "tab2", disabled: true, render: () => <TestTabContent content="Tab 2 Content" /> },
     ];
@@ -109,7 +109,7 @@ describe("TabsWithContent", () => {
   it("renders tabs as links", async () => {
     const router = withRouter("/tab1");
     // Given tabs with `path` values
-    const testTabs: RouteTab<string>[] = [
+    const testTabs: RouteTabWithContent<string>[] = [
       { name: "Tab A", path: "/tab1", href: "/tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
       { name: "Tab B", path: "/tab2", href: "/tab2", render: () => <TestTabContent content="Tab 2 Content" /> },
     ];
@@ -126,7 +126,7 @@ describe("TabsWithContent", () => {
     // Given a route
     const router = withRouter("/ce:1", "/:ceId");
     // And a tab that supports multiple routes
-    const testTabs: RouteTab<string>[] = [
+    const testTabs: RouteTabWithContent<string>[] = [
       {
         name: "Tab A",
         path: "/:ceId/line-items",
@@ -149,7 +149,7 @@ describe("TabsWithContent", () => {
   it("can navigate between tabs when rendered as links", async () => {
     // Given Route-able tabs, rendered at the first tab's route
     const router = withRouter("/tab1", "/");
-    const testTabs: RouteTab<string>[] = [
+    const testTabs: RouteTabWithContent<string>[] = [
       { name: "Tab A", path: "/tab1", href: "/tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
       { name: "Tab B", path: "/tab2", href: "/tab2", render: () => <TestTabContent content="Tab 2 Content" /> },
     ];
@@ -169,7 +169,7 @@ describe("TabsWithContent", () => {
   it("captures path parameters within Route context", async () => {
     // Given Route-able tabs with path parameters
     const router = withRouter("/ce:1/overview", "/");
-    const testTabs: RouteTab<string>[] = [
+    const testTabs: RouteTabWithContent<string>[] = [
       { name: "Tab A", path: "/:ceId/overview", href: "/ce:1/overview", render: () => <TestRouteTab /> },
       {
         name: "Tab B",
@@ -191,7 +191,7 @@ describe("TabsWithContent", () => {
 
   it("renders a disabled route tab as a div", async () => {
     // Give a disabled tab (must include two non-disabled tabs to have tab-list show).
-    const testTabs: RouteTab<string>[] = [
+    const testTabs: RouteTabWithContent<string>[] = [
       { name: "Tab A", path: "/a", href: "/a", render: () => <TestRouteTab /> },
       { name: "Tab B", path: "/b", href: "/b", render: () => <TestRouteTab /> },
       { name: "Tab C", path: "/c", href: "/c", render: () => <TestRouteTab />, disabled: true },

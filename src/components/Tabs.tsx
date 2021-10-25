@@ -30,7 +30,6 @@ export interface Tab<V extends string = string> {
   // Suffixes label with specified node. Expected to be used for cases where the decoration is not just an icon.
   endAdornment?: ReactNode;
   disabled?: boolean;
-  render: () => ReactNode;
 }
 
 type TabsContentXss = Xss<Margin>;
@@ -57,6 +56,22 @@ export interface RouteTab<V extends string = string> extends Omit<Tab<V>, "value
   path: string | string[];
 }
 
+export interface TabWithContent<V extends string = string> extends Omit<Tab<V>, "render"> {
+  render: () => ReactNode;
+}
+
+export interface RouteTabWithContent<V extends string = string> extends Omit<RouteTab<V>, "render"> {
+  render: () => ReactNode;
+}
+
+interface RequiredRenderTabs<V extends string, X> extends Omit<TabsProps<V, X>, "tabs"> {
+  tabs: TabWithContent<V>[];
+}
+
+interface RequiredRenderRouteTabs<V extends string, X> extends Omit<RouteTabsProps<V, X>, "tabs"> {
+  tabs: RouteTabWithContent<V>[];
+}
+
 /**
  * Provides a list of tabs and their content.
  *
@@ -67,7 +82,7 @@ export interface RouteTab<V extends string = string> extends Omit<Tab<V>, "value
  * and `TabContent` components directly.
  */
 export function TabsWithContent<V extends string, X extends Only<TabsContentXss, X>>(
-  props: TabsProps<V, X> | RouteTabsProps<V, X>,
+  props: RequiredRenderTabs<V, X> | RequiredRenderRouteTabs<V, X>,
 ) {
   return (
     <>
@@ -77,7 +92,9 @@ export function TabsWithContent<V extends string, X extends Only<TabsContentXss,
   );
 }
 
-export function TabContent<V extends string>(props: Omit<TabsProps<V, {}>, "onChange"> | RouteTabsProps<V, {}>) {
+export function TabContent<V extends string>(
+  props: Omit<RequiredRenderTabs<V, {}>, "onChange"> | RequiredRenderRouteTabs<V, {}>,
+) {
   const tid = useTestIds(props, "tab");
   const { tabs, contentXss = {} } = props;
   const location = useLocation();
