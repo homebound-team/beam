@@ -30,7 +30,6 @@ export interface Tab<V extends string = string> {
   // Suffixes label with specified node. Expected to be used for cases where the decoration is not just an icon.
   endAdornment?: ReactNode;
   disabled?: boolean;
-  render?: () => ReactNode;
 }
 
 type TabsContentXss = Xss<Margin>;
