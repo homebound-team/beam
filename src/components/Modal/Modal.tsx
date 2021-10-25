@@ -78,7 +78,12 @@ export function Modal(props: ModalProps) {
         <FocusScope contain restoreFocus autoFocus>
           <div
             css={
-              Css.br24.bgWhite.bshModal.maxh("90vh").df.fdc.wPx(width).mh(px(height)).if(isFixedHeight).hPx(height).$
+              Css.br24.bgWhite.bshModal
+                .maxh("90vh")
+                .df.fdc.wPx(width)
+                .mh(px(defaultMinHeight))
+                .if(isFixedHeight)
+                .hPx(height).$
             }
             ref={ref}
             {...overlayProps}
