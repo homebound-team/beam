@@ -604,7 +604,6 @@ function TaskNameField({ value }: { value: string }) {
       onBlur={action("onBlur")}
       onFocus={action("onFocus")}
       label="Task name"
-      hideLabel
       preventNewLines
       borderless
     />

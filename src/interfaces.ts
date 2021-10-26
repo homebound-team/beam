@@ -42,6 +42,13 @@ export interface BeamTextFieldProps extends BeamFocusableProps, PresentationFiel
   onFocus?: () => void;
   readOnly?: boolean;
   placeholder?: string;
-  /** If the field should be rendered without a border - This could happen if rendering within a table or as part of a CompoundField */
+}
+
+export interface TextFieldInternalProps {
+  /**
+   * Denoting a field as 'compound' will remove existing borders on the returned field, including the 2px of height added by the borders.
+   * It is expected that the caller reintroduces the border to achieve the expected field height and handles the custom border logic of a Compound Field
+   * This is explicitly an internal property that is not exposed to any field's API.
+   */
   compound?: boolean;
 }

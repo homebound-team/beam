@@ -16,7 +16,7 @@ import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, px, Xss } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
-import { BeamTextFieldProps } from "src/interfaces";
+import { BeamTextFieldProps, TextFieldInternalProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -32,7 +32,6 @@ interface TextFieldBaseProps
       | "helperText"
       | "hideLabel"
       | "placeholder"
-      | "compound"
       | "compact"
       | "borderless"
     >,
@@ -77,11 +76,13 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     endAdornment,
     startAdornment,
     inlineLabel,
-    compound = false,
     contrast = false,
     borderless = fieldProps?.borderless ?? false,
     minHeight = 96,
+    ...otherProps
   } = props;
+  const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
+  const { compound = false } = internalProps;
   const errorMessageId = `${inputProps.id}-error`;
   const labelSuffix = getLabelSuffix(required);
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
