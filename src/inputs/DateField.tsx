@@ -12,9 +12,6 @@ import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import "./DateField.css";
 
-const format = "MM/dd/yy";
-const longFormat = "EEEE LLLL	d, uuuu";
-
 export interface DateFieldProps {
   value: Date | undefined;
   label: string;
@@ -28,13 +25,12 @@ export interface DateFieldProps {
   required?: boolean;
   readOnly?: boolean;
   helperText?: string | ReactNode;
-  /** Renders as `Monday, January 1, 2018` when in read-only mode. */
-  long?: boolean;
   /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
   placeholder?: string;
   compact?: boolean;
-  format?: string;
+  format?: keyof typeof dateFormats;
+  iconLeft?: boolean;
 }
 
 export function DateField(props: DateFieldProps) {
@@ -50,21 +46,23 @@ export function DateField(props: DateFieldProps) {
     helperText,
     inlineLabel = false,
     readOnly = false,
-    long = false,
+    format = "short",
+    iconLeft = false,
     ...others
   } = props;
   const inputRef = useRef<HTMLInputElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
-  const showLongFormat = long && readOnly;
-  const [inputValue, setInputValue] = useState(
-    value ? (showLongFormat ? dateFnsFormat(value, longFormat) : formatDate(value)) : "",
-  );
+  const [isFocused, setIsFocused] = useState(false);
+  const dateFormat = getDateFormat(format);
+  const [inputValue, setInputValue] = useState(value ? formatDate(value, dateFormat) : "");
   const tid = useTestIds(props, defaultTestId(label));
 
   useEffect(() => {
-    setInputValue(value ? (showLongFormat ? dateFnsFormat(value, longFormat) : formatDate(value)) : "");
+    if (!isFocused) {
+      setInputValue(value ? formatDate(value, dateFormat) : "");
+    }
   }, [value]);
 
   const textFieldProps = {
@@ -75,30 +73,42 @@ export function DateField(props: DateFieldProps) {
     "aria-haspopup": "dialog" as const,
     value: inputValue,
   };
-  const state = useOverlayTriggerState({});
+  const state = useOverlayTriggerState({
+    onOpenChange: (isOpen) => {
+      // Handling `onBlur` is tricky here. If this closes and the user is still on the input, then do not call `blur`
+      if (!isOpen && !isFocused) {
+        maybeCall(onBlur);
+      }
+    },
+  });
   const { labelProps, inputProps } = useTextField(
     {
       ...textFieldProps,
       // Open on focus of the input.
-      onFocus: (e) => {
+      onFocus: () => {
         state.open();
-        maybeCall(onFocus, e);
+        setIsFocused(true);
+        maybeCall(onFocus);
+        if (value) {
+          setInputValue(formatDate(value, dateFormats.short));
+        }
       },
       onBlur: (e) => {
+        setIsFocused(false);
         // If we are interacting any other part of the inputWrap (such as the calendar button) return early
-        if (e.relatedTarget && inputWrapRef.current && inputWrapRef.current.contains(e.relatedTarget as Node)) {
+        // Or if interacting with the DatePicker then also return early - When the DatePicker closes, it will call `onBlur` if the input is not in focus still
+        if (
+          (inputWrapRef.current && inputWrapRef.current.contains(e.relatedTarget as Node)) ||
+          (overlayRef.current && overlayRef.current.contains(e.relatedTarget as Node))
+        ) {
           return;
         }
-        // I want to avoid calling `onBlur` if interacting with the DatePickerOverlay, but almost seems impossible, because we still want to fire the blur when the user leaves the field.
-        // One idea I had was to restore focus to the input when the overlay is closed, but how can we know that only on a certain focus event should open the DatePicker.
-        // So for now, just leaving it as "once you interact with the Datepicker, you've 'blurred' the field.
-        // ((overlayRef.current && overlayRef.current.contains(e.relatedTarget as Node))
 
         // If the user leaves the input and has an invalid date, reset to previous value.
-        if (!parseDate(inputValue, format)) {
-          setInputValue(value ? formatDate(value) : "");
+        if (!parseDate(inputValue, dateFormat)) {
+          setInputValue(value ? formatDate(value, dateFormat) : "");
         }
-        maybeCall(onBlur, e);
+        maybeCall(onBlur);
       },
     },
     inputRef,
@@ -126,7 +136,20 @@ export function DateField(props: DateFieldProps) {
 
   // If showing the long format of the date, then leave size undefined. Otherwise we're showing it as "01/01/20", so set size to 8.
   // (Setting the size 8 will currently only impact view of the DateField when placed on the "in page" filters. This is due to other styles set within TextFieldBase)
-  const inputSize = showLongFormat ? undefined : 8;
+  // TODO: figure this out... seems weird to have now that we support multiple dates....
+  const inputSize = format === "long" ? undefined : 8;
+
+  const calendarButton = (
+    <button
+      ref={buttonRef}
+      {...buttonProps}
+      disabled={disabled}
+      css={Css.if(disabled).cursorNotAllowed.$}
+      {...tid.calendarButton}
+    >
+      <Icon icon="calendar" />
+    </button>
+  );
 
   return (
     <>
@@ -146,23 +169,15 @@ export function DateField(props: DateFieldProps) {
           state.close();
           if (v) {
             setInputValue(v);
-            const parsed = parseDate(v, format);
+            // If changing the value directly (vs using the DatePicker), then we always use the short format
+            const parsed = parseDate(v, dateFormats.short);
             if (parsed) {
               onChange(parsed);
             }
           }
         }}
-        endAdornment={
-          <button
-            ref={buttonRef}
-            {...buttonProps}
-            disabled={disabled}
-            css={Css.if(disabled).cursorNotAllowed.$}
-            {...tid.calendarButton}
-          >
-            <Icon icon="calendar" />
-          </button>
-        }
+        endAdornment={!iconLeft && calendarButton}
+        startAdornment={iconLeft && calendarButton}
         {...others}
       />
       {state.isOpen && (
@@ -170,7 +185,9 @@ export function DateField(props: DateFieldProps) {
           triggerRef={inputWrapRef}
           popoverRef={overlayRef}
           positionProps={{ ...overlayProps, ...positionProps }}
-          onClose={state.close}
+          onClose={() => {
+            state.close();
+          }}
           isOpen={state.isOpen}
         >
           <DatePickerOverlay
@@ -178,7 +195,7 @@ export function DateField(props: DateFieldProps) {
             value={value}
             positionProps={positionProps}
             onChange={(d) => {
-              setInputValue(formatDate(d));
+              setInputValue(formatDate(d, dateFormat));
               onChange(d);
             }}
             {...tid.datePicker}
@@ -189,7 +206,7 @@ export function DateField(props: DateFieldProps) {
   );
 }
 
-function formatDate(date: Date) {
+function formatDate(date: Date, format: string) {
   return dateFnsFormat(date, format);
 }
 
@@ -225,4 +242,14 @@ function parseDate(str: string, format: string) {
     return undefined;
   }
   return parsed;
+}
+
+const dateFormats = {
+  short: "MM/dd/yy",
+  medium: "EEE, MMM d",
+  long: "EEEE LLLL d, uuuu",
+};
+
+function getDateFormat(format: keyof typeof dateFormats | undefined) {
+  return format ? dateFormats[format] : dateFormats.short;
 }
