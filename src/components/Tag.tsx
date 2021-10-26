@@ -17,7 +17,9 @@ export function Tag<X extends Only<Xss<TagXss>, X>>({ text, type, xss, ...otherP
 
   return (
     <span {...tid} css={{ ...Css.dib.tinyEm.ttu.px1.pyPx(4).gray900.br4.$, ...typeStyles, ...xss }}>
-      {text}
+      {/* Nesting `lineClamp` styles as the padding bottom set would expose the remainder of the text if applied on the same element */}
+      {/* Using `lineClamp1` instead of `truncate` as `truncate` requires a width set to properly truncate and `lineClamp` can smartly do it based on the parent's width */}
+      <span css={Css.lineClamp1.$}>{text}</span>
     </span>
   );
 }
