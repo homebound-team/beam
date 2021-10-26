@@ -12,10 +12,11 @@ import React, {
 import { chain, mergeProps, useFocusWithin, useHover } from "react-aria";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
+import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, px, Xss } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
-import { BeamTextFieldProps } from "src/interfaces";
+import { BeamTextFieldProps, TextFieldInternalProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -31,6 +32,7 @@ interface TextFieldBaseProps
       | "helperText"
       | "hideLabel"
       | "placeholder"
+      | "compact"
       | "borderless"
     >,
     Partial<Pick<BeamTextFieldProps, "onChange">> {
@@ -40,28 +42,29 @@ interface TextFieldBaseProps
   inputWrapRef?: MutableRefObject<HTMLDivElement | null>;
   multiline?: boolean;
   groupProps?: NumberFieldAria["groupProps"];
-  /** TextField specific */
-  compact?: boolean;
   /** Styles overrides */
   xss?: Xss<"textAlign" | "fontWeight" | "justifyContent">;
   endAdornment?: ReactNode;
   startAdornment?: ReactNode;
   inlineLabel?: boolean;
   contrast?: boolean;
+  // TextArea specific
+  minHeight?: number;
 }
 
 // Used by both TextField and TextArea
 export function TextFieldBase(props: TextFieldBaseProps) {
+  const { fieldProps } = usePresentationContext();
   const {
     label,
     required,
     labelProps,
-    hideLabel,
+    hideLabel = fieldProps?.hideLabel ?? false,
     inputProps,
     inputRef,
     inputWrapRef,
     groupProps,
-    compact = false,
+    compact = fieldProps?.compact ?? false,
     errorMsg,
     helperText,
     multiline = false,
@@ -73,9 +76,13 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     endAdornment,
     startAdornment,
     inlineLabel,
-    borderless = false,
     contrast = false,
+    borderless = fieldProps?.borderless ?? false,
+    minHeight = 96,
+    ...otherProps
   } = props;
+  const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
+  const { compound = false } = internalProps;
   const errorMessageId = `${inputProps.id}-error`;
   const labelSuffix = getLabelSuffix(required);
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
@@ -84,7 +91,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
   const { hoverProps, isHovered } = useHover({});
   const { focusWithinProps } = useFocusWithin({ onFocusWithinChange: setIsFocused });
 
-  const maybeSmaller = borderless ? 2 : 0;
+  const maybeSmaller = compound ? 2 : 0;
   const fieldHeight = 40;
   const compactFieldHeight = 32;
 
@@ -95,8 +102,9 @@ export function TextFieldBase(props: TextFieldBaseProps) {
         .hPx(fieldHeight - maybeSmaller)
         .if(compact)
         .hPx(compactFieldHeight - maybeSmaller).$,
-      ...Css.bgWhite.bGray300.gray900.if(contrast).bgGray700.bGray700.white.$,
-      ...(!borderless ? Css.ba.$ : {}),
+      ...Css.bgWhite.gray900.if(contrast).bgGray700.white.$,
+      ...(borderless ? Css.bTransparent.$ : Css.bGray300.if(contrast).bGray700.$),
+      ...(!compound ? Css.ba.$ : {}),
     },
     inputWrapperReadOnly: {
       ...Css.sm.df.aic.w100
@@ -111,7 +119,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
       ...(!contrast ? Css.bgWhite.$ : Css.bgGray700.addIn("&::selection", Css.bgGray800.$).$),
     },
     hover: Css.bgGray100.if(contrast).bgGray600.bGray600.$,
-    focus: Css.bLightBlue700.if(contrast).bLightBlue500.$,
+    focus: borderless ? Css.bshFocus.$ : Css.bLightBlue700.if(contrast).bLightBlue500.$,
     disabled: Css.cursorNotAllowed.gray400.bgGray100.if(contrast).gray500.bgGray700.$,
     error: Css.bRed600.if(contrast).bRed400.$,
   };
@@ -179,7 +187,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
             ...(isFocused && !readOnly ? fieldStyles.focus : {}),
             ...(isHovered && !inputProps.disabled && !readOnly && !isFocused ? fieldStyles.hover : {}),
             ...(errorMsg ? fieldStyles.error : {}),
-            ...Css.if(multiline).aifs.px0.mh(px(96)).$,
+            ...Css.if(multiline).aifs.px0.mhPx(minHeight).$,
           }}
           {...hoverProps}
           ref={inputWrapRef as any}
@@ -201,7 +209,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
               ...fieldStyles.input,
               ...(inputProps.disabled ? fieldStyles.disabled : {}),
               ...(isHovered && !inputProps.disabled && !readOnly && !isFocused ? fieldStyles.hover : {}),
-              ...(multiline ? Css.h100.p1.add("resize", "none").$ : Css.truncate.$),
+              ...(multiline ? Css.h100.p1.add("resize", "none").if(borderless).pPx(4).$ : Css.truncate.$),
               ...xss,
             }}
             {...tid}

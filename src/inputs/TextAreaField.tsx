@@ -5,16 +5,19 @@ import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps } from "src/interfaces";
 
 // Exported for test purposes
-export interface TextAreaFieldProps extends BeamTextFieldProps {}
+export interface TextAreaFieldProps extends BeamTextFieldProps {
+  // Does not allow the user to enter new line characters and removes minimum height for textarea.
+  preventNewLines?: boolean;
+}
 
 /** Returns a <textarea /> element that auto-adjusts height based on the field's value */
 export function TextAreaField(props: TextAreaFieldProps) {
-  const { value = "", disabled = false, readOnly = false, onBlur, onFocus, ...otherProps } = props;
+  const { value = "", disabled = false, readOnly = false, onBlur, onFocus, preventNewLines, ...otherProps } = props;
   const textFieldProps = { ...otherProps, value, isDisabled: disabled, isReadOnly: readOnly };
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
-  // not in stately because this is so we know when to re-measure, which is a spectrum design
 
+  // not in stately because this is so we know when to re-measure, which is a spectrum design
   const onHeightChange = useCallback(() => {
     const input = inputRef.current;
     const inputWrap = inputWrapRef.current;
@@ -36,7 +39,28 @@ export function TextAreaField(props: TextAreaFieldProps) {
     }
   }, [onHeightChange, value, inputRef]);
 
-  const { labelProps, inputProps } = useTextField({ ...textFieldProps, inputElementType: "textarea" }, inputRef);
+  const { labelProps, inputProps } = useTextField(
+    {
+      ...textFieldProps,
+      inputElementType: "textarea",
+      ...(preventNewLines
+        ? {
+            onKeyDown: (e) => {
+              // Prevent user from typing the new line character
+              if (e.keyCode === 13) {
+                e.preventDefault();
+              }
+            },
+            onInput: (e) => {
+              // Prevent user from pasting content that has new line characters and replace with empty space.
+              const target = e.target as HTMLTextAreaElement;
+              target.value = target.value.replace(/[\n\r]/g, " ");
+            },
+          }
+        : {}),
+    },
+    inputRef,
+  );
 
   return (
     <TextFieldBase
@@ -47,6 +71,7 @@ export function TextAreaField(props: TextAreaFieldProps) {
       inputRef={inputRef}
       readOnly={readOnly}
       inputWrapRef={inputWrapRef}
+      minHeight={preventNewLines ? 0 : undefined}
     />
   );
 }

@@ -4,6 +4,7 @@ import { Filter } from "src/components/Filters/types";
 import { Label } from "src/components/Label";
 import { Css } from "src/Css";
 import { DateField, SelectField, Value } from "src/inputs";
+import { TextFieldInternalProps } from "src/interfaces";
 import { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -35,6 +36,8 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
     const [focusedEl, setFocusedEl] = useState<"op" | "date" | undefined>();
     const commonStyles = Css.df.aic.fs1.maxwPx(550).bt.bb.bGray300.$;
 
+    const internalProps: TextFieldInternalProps = { compound: true };
+
     // TODO: Maybe make a `CompoundField` component, which could handle the `display: flex` and any sizing requirements per field and focus states.
     return (
       <>
@@ -48,7 +51,6 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
           >
             <SelectField
               compact
-              borderless
               sizeToContent
               options={[
                 // Always show the 'Any' option
@@ -69,6 +71,7 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
               {...tid[`${defaultTestId(this.label)}_dateOperation`]}
               onFocus={() => setFocusedEl("op")}
               onBlur={() => setFocusedEl(undefined)}
+              {...{ internalProps }}
             />
           </div>
 
@@ -82,7 +85,6 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
             }}
           >
             <DateField
-              borderless
               compact
               inlineLabel
               value={value?.value ? new Date(value.value) : new Date()}
@@ -92,6 +94,7 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
               {...tid[`${defaultTestId(this.label)}_dateField`]}
               onFocus={() => setFocusedEl("date")}
               onBlur={() => setFocusedEl(undefined)}
+              {...{ internalProps }}
             />
           </div>
         </div>

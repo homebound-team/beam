@@ -52,6 +52,22 @@ export function TextAreaReadOnly() {
   );
 }
 
+export function SchedulesV2TaskName() {
+  return (
+    <div css={Css.df.fdc.childGap2.p2.wPx(240).$}>
+      <TestTextArea label="Task name" hideLabel value="Task name" preventNewLines borderless />
+      <TestTextArea
+        label="Task name"
+        hideLabel
+        value="A task name that will wrap, but we don't support new lines. (And in focus)"
+        preventNewLines
+        borderless
+        autoFocus
+      />
+    </div>
+  );
+}
+
 function TestTextArea(props: Omit<TextAreaFieldProps, "onChange">) {
   const { value, ...others } = props;
   const [internalValue, setValue] = useState(value);

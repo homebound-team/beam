@@ -1,13 +1,19 @@
 import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 import { GridStyle } from "src/components/Table";
 
+export interface PresentationFieldProps {
+  numberAlignment?: "left" | "right";
+  // Hide labels for input fields. Helpful when displaying in a Table and the column header acts as the label
+  hideLabel?: boolean;
+  labelSuffix?: LabelSuffixStyle;
+  // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
+  borderless?: boolean;
+  // Defines height of the field
+  compact?: boolean;
+}
+
 export type PresentationContextProps = {
-  fieldProps?: {
-    numberAlignment?: "left" | "right";
-    // Hide labels for input fields. Helpful when displaying in a Table and the column header acts as the label
-    hideLabel?: boolean;
-    labelSuffix?: LabelSuffixStyle;
-  };
+  fieldProps?: PresentationFieldProps;
   gridTableStyle?: GridStyle;
 };
 
