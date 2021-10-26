@@ -40,6 +40,7 @@ export function TextFieldStyles() {
           value="Brandon"
           helperText="Some really long helper text that we expect to wrap."
         />
+        <TestTextField label="Name Clearable" value="Brandon" clearable />
       </div>
 
       <div css={Css.df.fdc.childGap2.$}>
@@ -56,6 +57,7 @@ export function TextFieldStyles() {
           helperText="Some really long helper text that we expect to wrap."
         />
         <ValidationTextField compact value="not a valid email" label="Email" />
+        <TestTextField compact label="Name Clearable" value="Brandon" clearable />
       </div>
     </div>
   );

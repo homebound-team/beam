@@ -2,6 +2,7 @@ import { render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { TextField, TextFieldProps } from "src/inputs";
+import { click } from "src/utils/rtl";
 
 let lastSet: any = undefined;
 
@@ -45,6 +46,23 @@ describe("TextFieldTest", () => {
     fireEvent.blur(r.name());
     expect(onFocus).not.toHaveBeenCalled();
     expect(onBlur).not.toHaveBeenCalled();
+  });
+
+  it("is clearable", async () => {
+    // Given an input that has the "clear" button
+    const r = await render(<TestTextField value="foo" clearable />);
+    // The "clear" button should not be shown until input is focused
+    expect(r.queryByTestId("xCircle")).toBeFalsy();
+    // When focused on the input
+    fireEvent.focus(r.name());
+    // Then the clear button is shown.
+    expect(r.xCircle()).toBeTruthy();
+
+    expect(r.name()).toHaveValue("foo");
+    // When clicking the clear button
+    click(r.xCircle);
+    // Then the value should be removed
+    expect(r.name()).toHaveValue("");
   });
 });
 
