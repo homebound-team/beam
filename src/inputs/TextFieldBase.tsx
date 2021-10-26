@@ -10,10 +10,11 @@ import React, {
   useState,
 } from "react";
 import { chain, mergeProps, useFocusWithin, useHover } from "react-aria";
+import { IconButton } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
-import { Css, px, Xss } from "src/Css";
+import { Css, Palette, px, Xss } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamTextFieldProps, TextFieldInternalProps } from "src/interfaces";
@@ -48,6 +49,7 @@ interface TextFieldBaseProps
   startAdornment?: ReactNode;
   inlineLabel?: boolean;
   contrast?: boolean;
+  clearable?: boolean;
   // TextArea specific
   minHeight?: number;
 }
@@ -79,6 +81,7 @@ export function TextFieldBase(props: TextFieldBaseProps) {
     contrast = false,
     borderless = fieldProps?.borderless ?? false,
     minHeight = 96,
+    clearable = false,
     ...otherProps
   } = props;
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
@@ -214,6 +217,9 @@ export function TextFieldBase(props: TextFieldBaseProps) {
             }}
             {...tid}
           />
+          {isFocused && clearable && onChange && inputProps.value && (
+            <IconButton icon="xCircle" color={Palette.Gray700} onClick={() => onChange(undefined)} />
+          )}
           {!multiline && endAdornment && <span css={Css.df.aic.pl1.fs0.$}>{endAdornment}</span>}
         </div>
       )}
