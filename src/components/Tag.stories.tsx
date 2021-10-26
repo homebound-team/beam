@@ -15,6 +15,9 @@ export function Tags() {
       <Tag text="caution" type="caution" />
       <Tag text="warning" type="warning" />
       <Tag text="success" type="success" />
+      <div css={Css.wPx(200).$}>
+        <Tag text="Tag text that will truncate as it is too long." />
+      </div>
     </div>
   );
 }
