@@ -5,6 +5,7 @@ import { Css } from "src/Css";
 describe("Tag", () => {
   it("renders", async () => {
     const r = await render(<Tag text="test" data-testid="testTag" />);
+    expect(r.testTag()).toHaveAttribute("title", "test");
     expect(r.testTag().textContent).toBe("test");
   });
 
