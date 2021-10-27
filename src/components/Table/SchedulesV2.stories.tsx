@@ -109,7 +109,7 @@ const startColumn = dateColumn<Row>({
   subgroup: (row) => <div css={Css.smEm.gray900.$}>{row.startDate}</div>,
   task: (row) => <TaskDateField value={new Date(row.startDate)} />,
   add: "",
-  w: 1,
+  w: "150px",
 });
 const endColumn = dateColumn<Row>({
   header: "End",
@@ -117,7 +117,7 @@ const endColumn = dateColumn<Row>({
   subgroup: (row) => <div css={Css.smEm.gray900.$}>{row.endDate}</div>,
   task: (row) => <TaskDateField value={new Date(row.endDate)} />,
   add: "",
-  w: 1,
+  w: "150px",
 });
 const durationColumn = column<Row>({
   header: "Duration",
