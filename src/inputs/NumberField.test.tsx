@@ -89,6 +89,13 @@ describe("NumberFieldTest", () => {
     expect(r.cost()).toHaveTextContent("$12.00");
     expect(r.cost()).toHaveAttribute("data-readonly", "true");
   });
+
+  it("displays and updates 'days' type", async () => {
+    const r = await render(<TestNumberField label="Days" type="days" value={2} />);
+    expect(r.days()).toHaveValue("2 days");
+    type(r.days, "1");
+    expect(r.days()).toHaveValue("1 day");
+  });
 });
 
 describe("parseRawInput function", () => {

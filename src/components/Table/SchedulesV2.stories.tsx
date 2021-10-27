@@ -3,6 +3,7 @@ import { Meta } from "@storybook/react";
 import { arrayMoveImmutable } from "array-move";
 import { DragEventHandler, useLayoutEffect, useRef, useState } from "react";
 import { DragDropContext, DragDropContextProps, Draggable, Droppable } from "react-beautiful-dnd";
+import { PresentationProvider } from "src/components/PresentationContext";
 import { CollapseToggle, GridStyle, GridTable } from "src/components/Table";
 import { Css, Palette } from "src/Css";
 import { Checkbox, DateField, TextAreaField } from "src/inputs";
@@ -199,33 +200,35 @@ const style: GridStyle = {
 export function SchedulesV2() {
   return (
     <div css={Css.h("100vh").$}>
-      <GridTable<Row>
-        rows={rows}
-        columns={[
-          arrowColumn,
-          selectColumn,
-          idColumn,
-          nameColumn,
-          startColumn,
-          endColumn,
-          durationColumn,
-          milestoneColumn,
-          subCategoryColumn,
-          statusColumn,
-          progressColumn,
-          buttonColumns,
-        ]}
-        style={style}
-        rowStyles={{
-          task: {
-            cellCss: Css.py1.$,
-          },
-        }}
-        // FIXME: `firstNonHeaderRowCss` does not work when virtual is enabled
-        // Possible fix is to use an ref/class/id for this row
-        // as="virtual"
-        stickyHeader
-      />
+      <PresentationProvider fieldProps={{ borderless: true }}>
+        <GridTable<Row>
+          rows={rows}
+          columns={[
+            arrowColumn,
+            selectColumn,
+            idColumn,
+            nameColumn,
+            startColumn,
+            endColumn,
+            durationColumn,
+            milestoneColumn,
+            subCategoryColumn,
+            statusColumn,
+            progressColumn,
+            buttonColumns,
+          ]}
+          style={style}
+          rowStyles={{
+            task: {
+              cellCss: Css.py1.$,
+            },
+          }}
+          // FIXME: `firstNonHeaderRowCss` does not work when virtual is enabled
+          // Possible fix is to use an ref/class/id for this row
+          // as="virtual"
+          stickyHeader
+        />
+      </PresentationProvider>
     </div>
   );
 }

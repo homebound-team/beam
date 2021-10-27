@@ -40,6 +40,7 @@ export function NumberFieldStyles() {
         <TestNumberField label="Percent" type="percent" value={12} />
         <TestNumberField label="Cents" type="cents" value={1000} />
         <TestNumberField label="Margin" type="basisPoints" value={1275} />
+        <TestNumberField label="Days" type="days" value={1} />
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import { Css, Xss } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { TextFieldBase } from "./TextFieldBase";
 
-export type NumberFieldType = "cents" | "percent" | "basisPoints";
+export type NumberFieldType = "cents" | "percent" | "basisPoints" | "days";
 
 // exported for testing purposes
 export interface NumberFieldProps {
@@ -63,6 +63,8 @@ export function NumberField(props: NumberFieldProps) {
       ? { style: "percent", minimumFractionDigits: 2 }
       : type === "cents"
       ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
+      : type === "days"
+      ? { style: "unit", unit: "day", unitDisplay: "long" }
       : undefined;
   }, [type]);
 
