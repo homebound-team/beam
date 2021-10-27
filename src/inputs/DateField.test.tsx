@@ -49,7 +49,46 @@ describe("DateField", () => {
     expect(onBlur).not.toBeCalled();
   });
 
-  it("can fire onFocus and onBlur", async () => {
+  it("does not call onBlur when changing focus to the calendar overlay", async () => {
+    const onBlur = jest.fn();
+    const r = await render(<DateField value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
+    // Given focus set on the input element.
+    fireEvent.focus(r.date());
+    // When "blur"ing the field with the overlay as the related target
+    fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
+    // Then `onBlur` should not have been called.
+    expect(onBlur).not.toBeCalled();
+  });
+
+  it("calls onBlur once the calendar overlay closes and focus is not returned to the input field", async () => {
+    const onBlur = jest.fn();
+    const r = await render(<DateField value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
+    // Given focus set on the input element.
+    fireEvent.focus(r.date());
+    // When "blur"ing the field with the overlay as the related target
+    fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
+    // And set focus back on the input field
+    fireEvent.focus(r.date());
+    // And modify the date field to close the overlay
+    fireEvent.input(r.date(), { target: { value: "01/29/20" } });
+    // Then the overlay should close
+    expect(r.queryByTestId("date_datePicker")).toBeFalsy();
+    // And `onBlur` should not have been called as the focus was returned to the input
+    expect(onBlur).not.toBeCalled();
+
+    // Given focus set on the input element.
+    fireEvent.focus(r.date());
+    // When "blur"ing the field with the overlay as the related target
+    fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
+    // And closing the overlay with focus not on the input
+    fireEvent.keyDown(r.date_datePicker(), { key: "Escape", code: "Escape" });
+    // Then the overlay should close
+    expect(r.queryByTestId("date_datePicker")).toBeFalsy();
+    // Then `onBlur` should have been called
+    expect(onBlur).toBeCalledTimes(1);
+  });
+
+  it("can fire onFocus and onBlur when interacting with the input field only", async () => {
     // Given a DateField with `onFocus` and `onBlur`
     const onBlur = jest.fn();
     const onFocus = jest.fn();
@@ -106,5 +145,22 @@ describe("DateField", () => {
     expect(r.date()).toHaveValue("01/29/20");
     // And onChange should be called with the new date
     expect(new Date(onChange.mock.calls[0][0]).toDateString()).toEqual(new Date("01/29/2020").toDateString());
+  });
+
+  it("changes date format upon focus and blur", async () => {
+    // Given a DateField with the "medium" format
+    const r = await render(<DateField value={jan2} label="Date" onChange={noop} format="medium" />);
+    // Then the format should be displayed as expected upon render
+    expect(r.date()).toHaveValue("Thu, Jan 2");
+
+    // When focusing the element.
+    fireEvent.focus(r.date());
+    // Then the format should change to "MM/DD/YY"
+    expect(r.date()).toHaveValue("01/02/20");
+
+    // And when blur-ing the element.
+    fireEvent.blur(r.date());
+    // Then the format should reset to specified in props
+    expect(r.date()).toHaveValue("Thu, Jan 2");
   });
 });

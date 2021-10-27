@@ -19,7 +19,7 @@ export function DateFields() {
     ["Disabled", <TestDateField label="Start Date" disabled />],
     ["Inline Label", <TestDateField label="Start Date" inlineLabel />],
     ["Read Only", <TestDateField label="Start Date" readOnly />],
-    ["Read Only Long", <TestDateField label="Start Date" readOnly long />],
+    ["Read Only Long", <TestDateField label="Start Date" readOnly format="long" />],
     ["Error Message", <TestDateField label="Start Date" errorMsg="Required" />],
     [
       "Helper Text",
@@ -37,6 +37,7 @@ export function DateFields() {
       />,
     ],
     ["Compact", <TestDateField compact label="Start Date" />],
+    ["SchedulesV2", <TestDateField compact label="Start Date" iconLeft format="medium" />],
   );
 }
 

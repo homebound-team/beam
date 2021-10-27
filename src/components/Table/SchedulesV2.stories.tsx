@@ -5,7 +5,7 @@ import { DragEventHandler, useLayoutEffect, useRef, useState } from "react";
 import { DragDropContext, DragDropContextProps, Draggable, Droppable } from "react-beautiful-dnd";
 import { CollapseToggle, GridStyle, GridTable } from "src/components/Table";
 import { Css, Palette } from "src/Css";
-import { Checkbox, TextAreaField } from "src/inputs";
+import { Checkbox, DateField, TextAreaField } from "src/inputs";
 import { zeroTo } from "src/utils/sb";
 import { Icon } from "../Icon";
 import { actionColumn, column, dateColumn } from "./columns";
@@ -107,17 +107,17 @@ const startColumn = dateColumn<Row>({
   header: "Start",
   milestone: (row) => <div css={Css.smEm.gray900.$}>{row.startDate}</div>,
   subgroup: (row) => <div css={Css.smEm.gray900.$}>{row.startDate}</div>,
-  task: (row) => row.startDate,
+  task: (row) => <TaskDateField value={new Date(row.startDate)} />,
   add: "",
-  w: 1,
+  w: "150px",
 });
 const endColumn = dateColumn<Row>({
   header: "End",
   milestone: (row) => <div css={Css.smEm.gray900.$}>{row.endDate}</div>,
   subgroup: (row) => <div css={Css.smEm.gray900.$}>{row.endDate}</div>,
-  task: (row) => row.endDate,
+  task: (row) => <TaskDateField value={new Date(row.endDate)} />,
   add: "",
-  w: 1,
+  w: "150px",
 });
 const durationColumn = column<Row>({
   header: "Duration",
@@ -605,7 +605,11 @@ function TaskNameField({ value }: { value: string }) {
       onFocus={action("onFocus")}
       label="Task name"
       preventNewLines
-      borderless
     />
   );
+}
+
+function TaskDateField({ value }: { value: Date }) {
+  const [internalValue, setValue] = useState(value);
+  return <DateField value={internalValue} label="Date" onChange={setValue} format="medium" iconLeft />;
 }
