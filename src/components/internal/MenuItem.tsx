@@ -8,7 +8,8 @@ import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/Bu
 import { Icon } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
 import { Callback } from "src/types";
-import { isAbsoluteUrl } from "src/utils";
+import { isAbsoluteUrl, useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 interface MenuItemProps {
   item: Node<MenuItem>;
@@ -24,6 +25,7 @@ export function MenuItemImpl(props: MenuItemProps) {
   const ref = useRef<HTMLLIElement>(null);
   const history = useHistory();
   const { hoverProps, isHovered } = useHover({});
+  const tid = useTestIds(props);
   const { menuItemProps } = useMenuItem(
     {
       key: item.key,
@@ -47,6 +49,7 @@ export function MenuItemImpl(props: MenuItemProps) {
     state,
     ref,
   );
+
   return (
     <li
       {...menuItemProps}
@@ -58,6 +61,7 @@ export function MenuItemImpl(props: MenuItemProps) {
         ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
         ...(isDisabled ? Css.gray500.cursorNotAllowed.$ : {}),
       }}
+      {...tid[defaultTestId(menuItem.label)]}
     >
       {maybeWrapInLink(
         onClick,
