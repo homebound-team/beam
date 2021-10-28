@@ -15,6 +15,7 @@ interface ListBoxProps<O, V extends Key> {
   getOptionValue: (opt: O) => V;
   contrast?: boolean;
   positionProps: React.HTMLAttributes<Element>;
+  positionOffset?: number;
 }
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
@@ -27,6 +28,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     getOptionValue,
     contrast = false,
     positionProps,
+    positionOffset = 4,
     ...otherProps
   } = props;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...otherProps }, state, listBoxRef);
@@ -58,7 +60,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
       css={{
         ...Css.bgWhite.br4.w100.bshBasic.if(contrast).bgGray700.$,
         // Add spacing based on menu's position relative to the trigger element
-        ...(isPositionedAbove ? Css.mbPx(4).$ : Css.mtPx(4).$),
+        ...(isPositionedAbove ? Css.mbPx(positionOffset).$ : Css.mtPx(positionOffset).$),
         "&:hover": Css.bshHover.$,
       }}
       ref={listBoxRef}

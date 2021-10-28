@@ -2,18 +2,18 @@ import React, { InputHTMLAttributes, LabelHTMLAttributes, MutableRefObject, Reac
 import { mergeProps } from "react-aria";
 import { ComboBoxState } from "react-stately";
 import { Icon } from "src/components";
+import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { Value, valueToKey } from "src/inputs/Value";
 import { maybeCall } from "src/utils";
 
-interface SelectFieldInputProps<O, V extends Value> {
+interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldProps {
   buttonProps: any;
   buttonRef: MutableRefObject<HTMLButtonElement | null>;
   inputProps: InputHTMLAttributes<HTMLInputElement>;
   inputRef: MutableRefObject<HTMLInputElement | null>;
   inputWrapRef: MutableRefObject<HTMLDivElement | null>;
-  compact?: boolean;
   state: ComboBoxState<O>;
   isDisabled: boolean;
   isReadOnly: boolean;
@@ -26,7 +26,6 @@ interface SelectFieldInputProps<O, V extends Value> {
   inlineLabel?: boolean;
   labelProps: LabelHTMLAttributes<HTMLLabelElement>;
   label: string;
-  hideLabel?: boolean;
   selectedOptions: O[];
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;

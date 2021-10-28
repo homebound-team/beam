@@ -33,6 +33,7 @@
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\""
   },
   "dependencies": {
+    "@homebound/form-state": "^2.1.5",
     "@react-aria/utils": "^3.8.1",
     "@react-hook/resize-observer": "^1.2.2",
     "@types/tinycolor2": "^1.4.2",
@@ -74,7 +75,6 @@
     "@emotion/babel-preset-css-prop": "^11.2.0",
     "@emotion/jest": "^11.3.0",
     "@emotion/react": "^11.1.5",
-    "@homebound/form-state": "^2.0.0",
     "@homebound/rtl-react-router-utils": "^1.0.3",
     "@homebound/rtl-utils": "^2.51.0",
     "@homebound/tsconfig": "^1.0.3",

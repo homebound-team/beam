@@ -5,14 +5,13 @@ interface PopoverProps extends React.PropsWithChildren<any> {
   triggerRef: MutableRefObject<HTMLElement | null>;
   popoverRef: MutableRefObject<HTMLDivElement | null>;
   positionProps: React.HTMLAttributes<Element>;
-  width?: number;
   onClose: () => void;
   isOpen: boolean;
 }
 
 /** Popover is used for generating menus and list-boxes */
 export function Popover(props: PopoverProps) {
-  const { triggerRef, popoverRef, positionProps, width, children, onClose, isOpen } = props;
+  const { triggerRef, popoverRef, positionProps, children, onClose, isOpen } = props;
   const { overlayProps } = useOverlay(
     {
       onClose,
@@ -36,13 +35,6 @@ export function Popover(props: PopoverProps) {
     },
     popoverRef,
   );
-
-  if (width) {
-    positionProps.style = {
-      ...positionProps.style,
-      width: width,
-    };
-  }
 
   return (
     <OverlayContainer>

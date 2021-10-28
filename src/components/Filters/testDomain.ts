@@ -78,3 +78,12 @@ export const taskDueFilter: DateFilter = dateFilter({
   getOperationLabel: (o) => o.label,
   getOperationValue: (o) => o.value,
 });
+
+export enum TaskStatus {
+  NotStarted = "NOT_STARTED",
+  InProgress = "IN_PROGRESS",
+  Complete = "COMPLETE",
+  Deactivated = "DEACTIVATED",
+  OnHold = "ON_HOLD",
+  Delayed = "DELAYED",
+}

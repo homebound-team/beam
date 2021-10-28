@@ -3,10 +3,11 @@ import { Meta } from "@storybook/react";
 import { arrayMoveImmutable } from "array-move";
 import { DragEventHandler, useLayoutEffect, useRef, useState } from "react";
 import { DragDropContext, DragDropContextProps, Draggable, Droppable } from "react-beautiful-dnd";
+import { TaskStatus } from "src/components/Filters/testDomain";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { CollapseToggle, GridStyle, GridTable } from "src/components/Table";
 import { Css, Palette } from "src/Css";
-import { Checkbox, DateField, TextAreaField } from "src/inputs";
+import { Checkbox, DateField, NumberField, SelectField, TextAreaField } from "src/inputs";
 import { zeroTo } from "src/utils/sb";
 import { Icon } from "../Icon";
 import { actionColumn, column, dateColumn } from "./columns";
@@ -47,7 +48,7 @@ type TaskRow = {
   duration: number;
   milestone: string;
   subGroup: string;
-  status: string;
+  status: TaskStatus;
 };
 type AddRow = { kind: "add" };
 type Row = HeaderRow | MilestoneRow | SubGroupRow | TaskRow | AddRow;
@@ -124,7 +125,7 @@ const durationColumn = column<Row>({
   header: "Duration",
   milestone: (row) => <div css={Css.smEm.gray900.$}>{row.duration} days</div>,
   subgroup: (row) => <div css={Css.smEm.gray900.$}>{row.duration} days</div>,
-  task: (row) => `${row.duration} days`,
+  task: (row) => <TaskDurationField value={row.duration} />,
   add: "",
   w: 1,
 });
@@ -150,9 +151,9 @@ const statusColumn = column<Row>({
   header: "Status",
   milestone: "",
   subgroup: "",
-  task: (row) => row.status,
+  task: (row) => <TaskStatusField value={row.status} />,
   add: "",
-  w: 1,
+  w: "150px",
 });
 const progressColumn = actionColumn<Row>({
   header: "",
@@ -200,7 +201,7 @@ const style: GridStyle = {
 export function SchedulesV2() {
   return (
     <div css={Css.h("100vh").$}>
-      <PresentationProvider fieldProps={{ borderless: true }}>
+      <PresentationProvider fieldProps={{ borderless: true, typeScale: "xs" }}>
         <GridTable<Row>
           rows={rows}
           columns={[
@@ -563,7 +564,7 @@ function createTasks(howMany: number, subGroup: string, milestone: string, start
       duration: 10,
       milestone,
       subGroup,
-      status: "Active",
+      status: TaskStatus.InProgress,
     };
   });
 }
@@ -615,4 +616,54 @@ function TaskNameField({ value }: { value: string }) {
 function TaskDateField({ value }: { value: Date }) {
   const [internalValue, setValue] = useState(value);
   return <DateField value={internalValue} label="Date" onChange={setValue} format="medium" iconLeft />;
+}
+
+function TaskDurationField({ value }: { value: number | undefined }) {
+  const [internalValue, setValue] = useState(value);
+  return <NumberField value={internalValue} onChange={setValue} label="Duration" type="days" xss={Css.tl.jcfs.$} />;
+}
+
+type TaskStatusDetails = { id: number; code: TaskStatus; name: string };
+
+const taskStatuses: TaskStatusDetails[] = [
+  { id: 1, code: TaskStatus.NotStarted, name: "Not Started" },
+  { id: 2, code: TaskStatus.InProgress, name: "In Progress" },
+  { id: 3, code: TaskStatus.Complete, name: "Complete" },
+  { id: 5, code: TaskStatus.OnHold, name: "On Hold" },
+  { id: 6, code: TaskStatus.Delayed, name: "Delayed" },
+];
+
+function TaskStatusField({ value }: { value: string }) {
+  const [internalValue, setValue] = useState(value);
+  return (
+    <SelectField
+      getOptionValue={(o) => o.code}
+      getOptionLabel={(o) => o.name}
+      fieldDecoration={(o) => getTaskStatusIcon(o.code)}
+      value={internalValue}
+      onSelect={setValue}
+      options={taskStatuses}
+      label="Status"
+      getOptionMenuLabel={(o) => (
+        <div css={Css.df.aic.$}>
+          {getTaskStatusIcon(o.code)}
+          <span css={Css.ml1.$}>{o.name}</span>
+        </div>
+      )}
+    />
+  );
+}
+
+const statusToColor: Record<TaskStatus, Palette> = {
+  [TaskStatus.NotStarted]: Palette.Gray600,
+  [TaskStatus.InProgress]: Palette.LightBlue600,
+  [TaskStatus.Complete]: Palette.Green400,
+  [TaskStatus.Deactivated]: Palette.Gray600,
+  [TaskStatus.OnHold]: Palette.Yellow600,
+  [TaskStatus.Delayed]: Palette.Red600,
+};
+
+function getTaskStatusIcon(status: TaskStatus) {
+  const color = statusToColor[status];
+  return <div css={Css.wPx(8).hPx(8).br4.bgColor(color).boxShadow("0px 1px 5px rgba(200, 98, 81, 0.3)").$} />;
 }
