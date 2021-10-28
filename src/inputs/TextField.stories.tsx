@@ -1,8 +1,9 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { Css } from "src/Css";
+import { Css, Only } from "src/Css";
 import { TextField, TextFieldProps } from "src/inputs";
+import { TextFieldXss } from "src/interfaces";
 
 export default {
   component: TextField,
@@ -85,7 +86,7 @@ export function TextFieldReadOnly() {
   );
 }
 
-function TestTextField(props: Omit<TextFieldProps, "onChange">) {
+function TestTextField<X extends Only<TextFieldXss, X>>(props: Omit<TextFieldProps<X>, "onChange">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
   return (
@@ -99,7 +100,7 @@ function TestTextField(props: Omit<TextFieldProps, "onChange">) {
   );
 }
 
-function ValidationTextField(props: Omit<TextFieldProps, "onChange">) {
+function ValidationTextField<X extends Only<TextFieldXss, X>>(props: Omit<TextFieldProps<X>, "onChange">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState<string | undefined>(value);
   // Validates that the input's value is a properly formatted email address.

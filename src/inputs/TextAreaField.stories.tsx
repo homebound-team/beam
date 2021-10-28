@@ -1,8 +1,9 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
-import { Css } from "src/Css";
+import { Css, Only } from "src/Css";
 import { TextAreaField, TextAreaFieldProps, TextField } from "src/inputs";
+import { TextFieldXss } from "src/interfaces";
 
 export default {
   component: TextAreaField,
@@ -25,6 +26,9 @@ export function TextAreaStyles() {
         />
         <ValidationTextArea value="Not enough characters" />
         <TextField label="Regular Field For Reference" value="value" onChange={() => {}} />
+
+        <h1 css={Css.lg.$}>Modified for Blueprint To Do Title</h1>
+        <TestTextArea label="Title" value="Test title" preventNewLines hideLabel borderless xss={Css.xl2Em.$} />
       </div>
     </div>
   );
@@ -68,7 +72,7 @@ export function SchedulesV2TaskName() {
   );
 }
 
-function TestTextArea(props: Omit<TextAreaFieldProps, "onChange">) {
+function TestTextArea<X extends Only<TextFieldXss, X>>(props: Omit<TextAreaFieldProps<X>, "onChange">) {
   const { value, ...others } = props;
   const [internalValue, setValue] = useState(value);
   return (

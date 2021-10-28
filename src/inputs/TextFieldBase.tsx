@@ -14,16 +14,16 @@ import { IconButton } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
-import { Css, Palette, px, Xss } from "src/Css";
+import { Css, Only, Palette, px } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
-import { BeamTextFieldProps, TextFieldInternalProps } from "src/interfaces";
+import { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
-interface TextFieldBaseProps
+interface TextFieldBaseProps<X>
   extends Pick<
-      BeamTextFieldProps,
+      BeamTextFieldProps<X>,
       | "label"
       | "required"
       | "readOnly"
@@ -35,16 +35,15 @@ interface TextFieldBaseProps
       | "placeholder"
       | "compact"
       | "borderless"
+      | "xss"
     >,
-    Partial<Pick<BeamTextFieldProps, "onChange">> {
+    Partial<Pick<BeamTextFieldProps<X>, "onChange">> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
   inputRef?: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>;
   inputWrapRef?: MutableRefObject<HTMLDivElement | null>;
   multiline?: boolean;
   groupProps?: NumberFieldAria["groupProps"];
-  /** Styles overrides */
-  xss?: Xss<"textAlign" | "fontWeight" | "justifyContent">;
   endAdornment?: ReactNode;
   startAdornment?: ReactNode;
   inlineLabel?: boolean;
@@ -55,7 +54,7 @@ interface TextFieldBaseProps
 }
 
 // Used by both TextField and TextArea
-export function TextFieldBase(props: TextFieldBaseProps) {
+export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldBaseProps<X>) {
   const { fieldProps } = usePresentationContext();
   const {
     label,

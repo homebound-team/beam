@@ -1,7 +1,9 @@
 import { render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
+import { Only } from "src/Css";
 import { TextField, TextFieldProps } from "src/inputs";
+import { TextFieldXss } from "src/interfaces";
 import { click } from "src/utils/rtl";
 
 let lastSet: any = undefined;
@@ -66,7 +68,7 @@ describe("TextFieldTest", () => {
   });
 });
 
-function TestTextField(props: Omit<TextFieldProps, "onChange" | "label">) {
+function TestTextField<X extends Only<TextFieldXss, X>>(props: Omit<TextFieldProps<X>, "onChange" | "label">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
   return (
