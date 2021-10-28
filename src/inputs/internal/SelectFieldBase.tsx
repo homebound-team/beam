@@ -40,7 +40,7 @@ export interface SelectFieldBaseProps<O, V extends Value> extends BeamSelectFiel
  */
 export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<O, V>): JSX.Element {
   const {
-    compact = false,
+    compact,
     disabled: isDisabled = false,
     errorMsg,
     helperText,
@@ -295,7 +295,6 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
             {...listBoxProps}
             positionProps={positionProps}
             state={state}
-            compact={compact}
             listBoxRef={listBoxRef}
             selectedOptions={fieldState.selectedOptions}
             getOptionLabel={getOptionLabel}

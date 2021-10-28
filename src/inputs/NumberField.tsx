@@ -4,7 +4,6 @@ import { useLocale, useNumberField } from "react-aria";
 import { useNumberFieldState } from "react-stately";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Xss } from "src/Css";
-import { getLabelSuffix } from "src/forms/labelUtils";
 import { TextFieldBase } from "./TextFieldBase";
 
 export type NumberFieldType = "cents" | "percent" | "basisPoints" | "days";
@@ -44,7 +43,7 @@ export function NumberField(props: NumberFieldProps) {
     onFocus,
     errorMsg,
     helperText,
-    compact = false,
+    compact,
     value,
     onChange,
     xss,
@@ -52,7 +51,6 @@ export function NumberField(props: NumberFieldProps) {
   } = props;
 
   const factor = type === "percent" || type === "cents" ? 100 : type === "basisPoints" ? 10_000 : 1;
-  const labelSuffix = getLabelSuffix(required);
 
   // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
   // see: https://github.com/adobe/react-spectrum/issues/1893.

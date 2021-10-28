@@ -1,5 +1,5 @@
 import React, { Children, cloneElement, ReactNode } from "react";
-import { LabelSuffixStyle, PresentationProvider, usePresentationContext } from "src/components/PresentationContext";
+import { LabelSuffixStyle, PresentationProvider } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 
 export type FormWidth =
@@ -17,6 +17,7 @@ export interface FormLinesProps {
   children: ReactNode;
   labelSuffix?: LabelSuffixStyle;
   width?: FormWidth;
+  compact?: boolean;
 }
 
 /**
@@ -26,12 +27,17 @@ export interface FormLinesProps {
  * (see the `FieldGroup` component), where they will be laid out side-by-side.
  */
 export function FormLines(props: FormLinesProps) {
-  const { fieldProps } = usePresentationContext();
-  const { children, width = "full", labelSuffix = fieldProps?.labelSuffix } = props;
+  const { children, width = "full", labelSuffix, compact } = props;
   let firstFormHeading = true;
+
+  // Only overwrite `fieldProps` if new values are explicitly set. Ensures we only set to `undefined` if explicitly set.
+  const newFieldProps = {
+    ...("labelSuffix" in props ? { labelSuffix } : {}),
+    ...("compact" in props ? { compact } : {}),
+  };
+
   return (
-    // Only overwrite label suffix if the property was defined in `props`. Ensures we only set to `undefined` if explicitly set.
-    <PresentationProvider fieldProps={"labelSuffix" in props ? { labelSuffix } : {}}>
+    <PresentationProvider fieldProps={newFieldProps}>
       <div
         css={{
           // Note that we're purposefully not using display:flex so that our children's margins will collapse.
