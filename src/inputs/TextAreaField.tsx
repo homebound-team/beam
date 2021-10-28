@@ -1,17 +1,18 @@
 import { useLayoutEffect } from "@react-aria/utils";
 import { useCallback, useRef } from "react";
 import { mergeProps, useTextField } from "react-aria";
+import { Only } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
-import { BeamTextFieldProps } from "src/interfaces";
+import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
 
 // Exported for test purposes
-export interface TextAreaFieldProps extends BeamTextFieldProps {
+export interface TextAreaFieldProps<X> extends BeamTextFieldProps<X> {
   // Does not allow the user to enter new line characters and removes minimum height for textarea.
   preventNewLines?: boolean;
 }
 
 /** Returns a <textarea /> element that auto-adjusts height based on the field's value */
-export function TextAreaField(props: TextAreaFieldProps) {
+export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFieldProps<X>) {
   const { value = "", disabled = false, readOnly = false, onBlur, onFocus, preventNewLines, ...otherProps } = props;
   const textFieldProps = { ...otherProps, value, isDisabled: disabled, isReadOnly: readOnly };
   const inputRef = useRef<HTMLTextAreaElement | null>(null);

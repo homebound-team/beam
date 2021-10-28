@@ -1,6 +1,7 @@
 import type { PressEvent } from "@react-types/shared";
 import { ReactNode } from "react";
 import { PresentationFieldProps } from "src/components/PresentationContext";
+import { Xss } from "src/Css";
 
 /** Base Interfaced */
 export interface BeamFocusableProps {
@@ -23,7 +24,9 @@ export interface BeamButtonProps {
   openInNew?: boolean;
 }
 
-export interface BeamTextFieldProps extends BeamFocusableProps, PresentationFieldProps {
+export type TextFieldXss = Xss<"textAlign" | "justifyContent" | "fontWeight" | "fontSize" | "lineHeight">;
+
+export interface BeamTextFieldProps<X> extends BeamFocusableProps, PresentationFieldProps {
   /** Whether the interactive element is disabled. */
   disabled?: boolean;
   errorMsg?: string;
@@ -42,6 +45,8 @@ export interface BeamTextFieldProps extends BeamFocusableProps, PresentationFiel
   onFocus?: () => void;
   readOnly?: boolean;
   placeholder?: string;
+  /** Styles overrides */
+  xss?: X;
 }
 
 export interface TextFieldInternalProps {

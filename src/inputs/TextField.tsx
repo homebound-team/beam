@@ -1,16 +1,17 @@
 import { useRef } from "react";
 import { mergeProps, useTextField } from "react-aria";
+import { Only } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
-import { BeamTextFieldProps } from "src/interfaces";
+import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
 
 // exported for testing purposes
-export interface TextFieldProps extends BeamTextFieldProps {
+export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
   compact?: boolean;
   inlineLabel?: boolean;
   clearable?: boolean;
 }
 
-export function TextField(props: TextFieldProps) {
+export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
   const {
     disabled: isDisabled = false,
     readOnly = false,
