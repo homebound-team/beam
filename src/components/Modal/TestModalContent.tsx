@@ -8,7 +8,7 @@ import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndDataOf
 import { Tag } from "src/components/Tag";
 import { Css } from "src/Css";
 import { jan1 } from "src/forms/formStateDomain";
-import { DateField, TextField } from "src/inputs";
+import { DateField, RichTextField, TextField } from "src/inputs";
 
 /** A fake modal content component that we share across the modal and superdrawer stories. */
 export function TestModalContent(props: {
@@ -22,7 +22,9 @@ export function TestModalContent(props: {
   const [numSentences, setNumSentences] = useState(initNumSentences);
   const [primaryDisabled, setPrimaryDisabled] = useState(false);
   const [leftActionDisabled, setLeftActionDisabled] = useState(false);
+  const [showRTE, setShowRTE] = useState(true);
   const [date, setDate] = useState(jan1);
+  const [rte, setRTE] = useState<string | undefined>("Init value");
   return (
     <>
       <ModalHeader>
@@ -41,6 +43,7 @@ export function TestModalContent(props: {
             <Button label="More" onClick={() => setNumSentences(numSentences + 2)} />
             <Button label="Clear" onClick={() => setNumSentences(0)} />
             <Button label="Primary" onClick={() => setPrimaryDisabled(!primaryDisabled)} />
+            <Button label="setShowRTE" onClick={() => setShowRTE(true)} />
             {showLeftAction && (
               <Button label="Left Action" onClick={() => setLeftActionDisabled(!leftActionDisabled)} />
             )}
@@ -48,6 +51,15 @@ export function TestModalContent(props: {
           <p>{"The body content of the modal. This content can be anything!".repeat(numSentences)}</p>
         </div>
         {withDateField && <DateField value={date} label="Date" onChange={setDate} />}
+
+        {showRTE && (
+          <RichTextField
+            value={rte}
+            onChange={(html) => {
+              setRTE(html);
+            }}
+          />
+        )}
       </ModalBody>
       <ModalFooter xss={showLeftAction ? Css.jcsb.$ : undefined}>
         {showLeftAction && (

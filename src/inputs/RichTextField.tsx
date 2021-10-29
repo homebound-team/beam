@@ -1,6 +1,6 @@
 import { Global } from "@emotion/react";
 import DOMPurify from "dompurify";
-import { ChangeEvent, createElement, useEffect, useRef } from "react";
+import { ChangeEvent, createElement, useEffect, useRef, useState } from "react";
 import { useId } from "react-aria";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
@@ -63,28 +63,13 @@ export function RichTextField(props: RichTextFieldProps) {
   const onFocusRef = useRef<RichTextFieldProps["onFocus"]>(onFocus);
   onFocusRef.current = onFocus;
 
+  const editorElement = useRef<HTMLElement>(null);
+  const parentRef = useRef<HTMLElement>(null);
+  const [showTrix, setShowTrix] = useState(false);
+
   useEffect(
     () => {
-      if (readOnly) return;
-
-      const editorElement = document.getElementById(`editor-${id}`);
-      if (!editorElement) {
-        throw new Error("editorElement not found");
-      }
-
-      editor.current = (editorElement as any).editor;
-      if (!editor.current) {
-        throw new Error("editor not found");
-      }
-      if (mergeTags !== undefined) {
-        attachTributeJs(mergeTags, editorElement!);
-      }
-
-      // We have a 2nd useEffect to call loadHTML when value changes, but
-      // we do this here b/c we assume the 2nd useEffect's initial evaluation
-      // "missed" having editor.current set b/c trix-initialize hadn't fired.
-      currentHtml.current = value;
-      editor.current.loadHTML(value || "");
+      if (readOnly || !editorElement.current) return;
 
       function trixChange(e: ChangeEvent) {
         const { textContent, innerHTML } = e.target;
@@ -100,27 +85,31 @@ export function RichTextField(props: RichTextFieldProps) {
         }
       }
 
+      const trixBlur = () => maybeCall(onBlurRef.current);
+      const trixFocus = () => maybeCall(onFocusRef.current);
+
       // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
       // https://github.com/basecamp/trix#storing-attached-files
       const preventDefault = (e: any) => e.preventDefault();
       window.addEventListener("trix-file-accept", preventDefault);
 
-      const trixBlur = () => maybeCall(onBlurRef.current);
-      const trixFocus = () => maybeCall(onFocusRef.current);
-
-      editorElement.addEventListener("trix-change", trixChange as any, false);
-      editorElement.addEventListener("trix-blur", trixBlur as any, false);
-      editorElement.addEventListener("trix-focus", trixFocus as any, false);
+      const { addEventListener } = editorElement.current;
+      addEventListener("trix-change", trixChange as any);
+      addEventListener("trix-blur", trixBlur);
+      addEventListener("trix-focus", trixFocus);
 
       return () => {
-        editorElement.removeEventListener("trix-change", trixChange as any);
-        editorElement.removeEventListener("trix-blur", trixBlur as any);
-        editorElement.removeEventListener("trix-focus", trixFocus as any);
-        window.removeEventListener("trix-file-accept", preventDefault);
+        if (editorElement.current) {
+          const { removeEventListener } = editorElement.current;
+          removeEventListener("trix-change", trixChange as any);
+          removeEventListener("trix-blur", trixBlur);
+          removeEventListener("trix-focus", trixFocus);
+          window.removeEventListener("trix-file-accept", preventDefault);
+        }
       };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [readOnly],
+    [readOnly, editorElement.current, showTrix],
   );
 
   useEffect(() => {
@@ -130,6 +119,29 @@ export function RichTextField(props: RichTextFieldProps) {
     }
   }, [value, readOnly]);
 
+  useEffect(() => {
+    if (parentRef.current) {
+      function onEditorInit() {
+        editor.current = (editorElement.current as any).editor;
+        if (mergeTags !== undefined) {
+          attachTributeJs(mergeTags, editorElement.current!);
+        }
+
+        currentHtml.current = value;
+        editor.current!.loadHTML(value || "");
+      }
+
+      parentRef.current.addEventListener("trix-initialize", onEditorInit);
+      setShowTrix(true);
+
+      return () => {
+        if (parentRef.current) {
+          parentRef.current.removeEventListener("trix-initialize", onEditorInit);
+        }
+      };
+    }
+  }, [parentRef]);
+
   const { placeholder, autoFocus } = props;
 
   if (!readOnly) {
@@ -137,15 +149,33 @@ export function RichTextField(props: RichTextFieldProps) {
       <div css={Css.w100.maxw("550px").$}>
         {/* TODO: Not sure what to pass to labelProps. */}
         {label && <Label labelProps={{}} label={label} />}
-        <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }}>
-          {createElement("trix-editor", {
-            id: `editor-${id}`,
-            input: `input-${id}`,
-            // Autofocus attribute is case sensitive since this is standard HTML
-            ...(autoFocus ? { autofocus: true } : {}),
-            ...(placeholder ? { placeholder } : {}),
-          })}
-          <input type="hidden" id={`input-${id}`} value={value} />
+        <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }} ref={parentRef as any}>
+          {/*
+              Conditionally rendering the <trix-editor/> via `showTrix` is a real bummer to do, but seems necessary.
+              In order to properly handle the `trix-initialize` event, then we have to add an event listener before
+              the <trix-editor/> is mounted. This is because we can only attach the custom event listeners in a useEffect (after the component mounted).
+              By conditionally rendering, and adding the event listener to the parent, we can ensure we have the event listener attached,
+              then render the element, and the event will bubble up to the `parentRef` and then we can properly initialize.
+              Again, its a bummer, but not sure of a better way to ensure order or operation execution.
+          */}
+          {showTrix ? (
+            <>
+              {/*
+                "hidden" input element should to be in the DOM prior to the trix-editor element in order for initialize to fire properly
+                https://github.com/basecamp/trix/issues/254#issuecomment-321814353
+              */}
+              <input type="hidden" id={`input-${id}`} value={value} />
+              {createElement("trix-editor", {
+                input: `input-${id}`,
+                // Autofocus attribute is case sensitive since this is standard HTML
+                ...(autoFocus ? { autofocus: true } : {}),
+                ...(placeholder ? { placeholder } : {}),
+                ref: editorElement,
+              })}
+            </>
+          ) : (
+            <></>
+          )}
         </div>
         <Global styles={[tributeOverrides]} />
       </div>
