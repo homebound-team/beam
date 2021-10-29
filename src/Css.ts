@@ -7,6 +7,28 @@ export type Only<X, T> = X & Record<Exclude<keyof T, keyof X>, never>;
 
 export type Properties = Properties1;
 
+export type Typography =
+  | "tiny"
+  | "tinyEm"
+  | "xs"
+  | "xsEm"
+  | "sm"
+  | "smEm"
+  | "base"
+  | "baseEm"
+  | "lg"
+  | "lgEm"
+  | "xl"
+  | "xlEm"
+  | "xl2"
+  | "xl2Em"
+  | "xl3"
+  | "xl3Em"
+  | "xl4"
+  | "xl4Em"
+  | "xl5"
+  | "xl5Em";
+
 type Opts<T> = {
   rules: T;
   enabled: boolean;

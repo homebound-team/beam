@@ -1,6 +1,6 @@
 import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 import { GridStyle } from "src/components/Table";
-import { TypeScale } from "src/types";
+import { Typography } from "src/Css";
 
 export interface PresentationFieldProps {
   numberAlignment?: "left" | "right";
@@ -12,7 +12,7 @@ export interface PresentationFieldProps {
   // Defines height of the field
   compact?: boolean;
   // Changes default font styles for input fields
-  typeScale?: TypeScale;
+  typeScale?: Typography;
 }
 
 export type PresentationContextProps = {
