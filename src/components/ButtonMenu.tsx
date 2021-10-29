@@ -46,12 +46,14 @@ export function ButtonMenu(props: ButtonMenuProps) {
   // Build out the Menu's Tree data to include the Persistent Action, if any. This is a collection of Nodes that is used
   // by React-Aria to keep track of item states such as focus, and provide hooks for calling those actions.
   const tree = useTreeData({
-    initialItems: [items, persistentItems ? persistentItems : []].flatMap((i, idx) =>
-      i.length > 0 ? ([{ label: idx === 0 ? "items" : "persistent", items: i }] as MenuSection[]) : ([] as MenuItem[]),
+    initialItems: [items, persistentItems ? persistentItems : []].flatMap(
+      (i, idx) => [{ label: idx === 0 ? "items" : "persistent", items: i }] as MenuSection[],
     ),
     getKey: (item) => camelCase(item.label),
     getChildren: (item) => (item as MenuSection).items ?? [],
   });
+
+  debugger;
 
   // Bulk updates of MenuItems below. If we find this to be of sluggish performance, then we can change to be more surgical in our updating.
   // If our list of items change, update the "items" menu section. (key is based on label in `getKey` above)
