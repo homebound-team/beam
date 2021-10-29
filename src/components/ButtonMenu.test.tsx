@@ -34,6 +34,20 @@ describe("ButtonMenu", () => {
     expect(r.menuTrigger_menuItems().childNodes).toHaveLength(3);
   });
 
+  it("can initialize with an empty list and load items afterwards", async () => {
+    // Given a Button Menu with no items to start out with
+    const r = await render(<TestButtonMenu empty />);
+
+    // The menu items should initially be empty
+    click(r.menuTrigger);
+    expect(r.menuTrigger_menuItems().childNodes).toHaveLength(0);
+
+    // When loading in items
+    click(r.load);
+    // Then the menu list should populate
+    expect(r.menuTrigger_menuItems().childNodes).toHaveLength(3);
+  });
+
   it("can accept testid", async () => {
     // Given a Button Menu with a testid defined
     const r = await render(<TestButtonMenu data-testid="example" />);
@@ -47,7 +61,8 @@ describe("ButtonMenu", () => {
   });
 });
 
-function TestButtonMenu(props: any) {
+function TestButtonMenu({ empty = false, ...others }: { empty?: boolean }) {
+  const [loaded, setLoaded] = useState(!empty);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([
     { label: "Item One", onClick: noop },
     { label: "Item 2", onClick: noop },
@@ -73,8 +88,9 @@ function TestButtonMenu(props: any) {
           }
         />
         <Button label="Delete" onClick={() => setMenuItems((prevItems) => prevItems.slice(1))} />
+        <Button label="Load" onClick={() => setLoaded(true)} />
       </div>
-      <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} {...props} />
+      <ButtonMenu trigger={{ label: "Menu trigger" }} items={loaded ? menuItems : []} {...others} />
     </>
   );
 }
