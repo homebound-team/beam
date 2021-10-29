@@ -42,7 +42,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
     inputWrapRef,
     buttonProps,
     buttonRef,
-    compact = false,
+    compact,
     errorMsg,
     required,
     helperText,

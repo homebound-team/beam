@@ -172,6 +172,15 @@ export function SideBySideSmall() {
   );
 }
 
+export function WithFieldProps() {
+  return (
+    <FormLines compact labelSuffix={{ required: "*", optional: "(optional)" }}>
+      <TextField label="First" value="first" onChange={() => {}} required />
+      <TextField label="Last" value="last" onChange={() => {}} required={false} />
+    </FormLines>
+  );
+}
+
 type Options = {
   id: number;
   name: string;

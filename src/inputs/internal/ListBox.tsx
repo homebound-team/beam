@@ -8,7 +8,6 @@ import { Option } from "src/components/internal/index";
 import { Css } from "src/Css";
 
 interface ListBoxProps<O, V extends Key> {
-  compact: boolean;
   listBoxRef: MutableRefObject<HTMLDivElement | null>;
   state: SelectState<O>;
   selectedOptions: O[];
@@ -22,7 +21,6 @@ interface ListBoxProps<O, V extends Key> {
 export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
   const {
     state,
-    compact,
     listBoxRef,
     selectedOptions,
     getOptionLabel,

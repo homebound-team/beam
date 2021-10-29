@@ -81,8 +81,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     borderless = fieldProps?.borderless ?? false,
     minHeight = 96,
     clearable = false,
-    ...otherProps
   } = props;
+  const typeScale = fieldProps?.typeScale ?? "sm";
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
   const { compound = false } = internalProps;
   const errorMessageId = `${inputProps.id}-error`;
@@ -100,7 +100,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const fieldStyles = {
     container: Css.df.fdc.w100.maxw(px(550)).$,
     inputWrapper: {
-      ...Css.sm.df.aic.br4.px1.w100
+      ...Css[typeScale].df.aic.br4.px1.w100
         .hPx(fieldHeight - maybeSmaller)
         .if(compact)
         .hPx(compactFieldHeight - maybeSmaller).$,
@@ -109,7 +109,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...(!compound ? Css.ba.$ : {}),
     },
     inputWrapperReadOnly: {
-      ...Css.sm.df.aic.w100
+      ...Css[typeScale].df.aic.w100
         .mhPx(fieldHeight - maybeSmaller)
         .if(compact)
         .mhPx(compactFieldHeight - maybeSmaller).$,

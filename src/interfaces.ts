@@ -35,8 +35,6 @@ export interface BeamTextFieldProps<X> extends BeamFocusableProps, PresentationF
   label: string;
   /** Marks the field as required or optional, the default is assumed ambiguous/unknown. */
   required?: boolean;
-  /** If set, label will be placed as `aria-label` on input element */
-  hideLabel?: boolean;
   value: string | undefined;
   /** Handler called when the interactive element state changes. */
   onChange: (value: string | undefined) => void;
