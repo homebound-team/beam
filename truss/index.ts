@@ -1,11 +1,12 @@
 import { generate, newIncrementDelegateMethods, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
+import { TypeScale } from "../src/types";
 import { palette } from "./palette";
 
 const increment = 8;
 const numberOfIncrements = 8;
 
 // prettier-ignore
-const fonts: Record<string, { fontWeight: 400 | 500 | 600, fontSize: string; lineHeight: string }> = {
+const fonts: Record<TypeScale, { fontWeight: 400 | 500 | 600, fontSize: string; lineHeight: string }> = {
   tiny:   { fontWeight: 400, fontSize: "10px", lineHeight: "14px" },
   // Em denotes Emphasized
   tinyEm: { fontWeight: 600, fontSize: "10px", lineHeight: "14px" },

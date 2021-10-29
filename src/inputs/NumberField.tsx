@@ -38,12 +38,10 @@ export function NumberField(props: NumberFieldProps) {
     readOnly = false,
     type,
     label,
-    hideLabel = fieldProps?.hideLabel,
     onBlur,
     onFocus,
     errorMsg,
     helperText,
-    compact,
     value,
     onChange,
     xss,
@@ -122,7 +120,6 @@ export function NumberField(props: NumberFieldProps) {
       groupProps={groupProps}
       labelProps={labelProps}
       label={label}
-      hideLabel={hideLabel}
       required={required}
       inputProps={inputProps}
       // This is called on each DOM change, to push the latest value into the field
@@ -136,7 +133,6 @@ export function NumberField(props: NumberFieldProps) {
       errorMsg={errorMsg}
       helperText={helperText}
       readOnly={readOnly}
-      compact={compact}
       {...otherProps}
     />
   );
