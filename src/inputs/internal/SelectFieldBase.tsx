@@ -3,6 +3,7 @@ import { Key, ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
 import { Popover } from "src/components/internal";
+import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css, px } from "src/Css";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
@@ -63,6 +64,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     nothingSelectedText = "",
     contrast,
     disabledOptions,
+    borderless,
     ...otherProps
   } = props;
 
@@ -245,12 +247,14 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     shouldFlip: true,
     isOpen: state.isOpen,
     onClose: state.close,
-    placement: "bottom",
+    placement: "bottom left",
   });
 
   positionProps.style = {
     ...positionProps.style,
     width: comboBoxRef?.current?.clientWidth,
+    // Ensures the menu never gets too small.
+    minWidth: 200,
   };
 
   return (
@@ -282,6 +286,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         sizeToContent={sizeToContent}
         contrast={contrast}
         nothingSelectedText={nothingSelectedText}
+        borderless={borderless}
       />
       {state.isOpen && (
         <Popover
@@ -290,6 +295,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
           positionProps={positionProps}
           onClose={() => state.close()}
           isOpen={state.isOpen}
+          minWidth={200}
         >
           <ListBox
             {...listBoxProps}
@@ -300,6 +306,8 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
+            // If the field is set as `borderless`, then the focus state is done with a box-shadow and set further away from the input. If this happens then we want the ListBox to be positioned further away as well.
+            positionOffset={borderless ? 8 : undefined}
           />
         </Popover>
       )}
@@ -307,9 +315,8 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   );
 }
 
-export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusableProps {
+export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   disabledOptions?: V[];
-  compact?: boolean;
   disabled?: boolean;
   required?: boolean;
   errorMsg?: string;
@@ -318,7 +325,6 @@ export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusa
   fieldDecoration?: (opt: T) => ReactNode;
   /** Sets the form field label. */
   label: string;
-  hideLabel?: boolean;
   /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
   readOnly?: boolean;
