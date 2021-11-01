@@ -1,7 +1,6 @@
 import { Global } from "@emotion/react";
 import DOMPurify from "dompurify";
-import { ChangeEvent, createElement, useEffect, useRef } from "react";
-import { useId } from "react-aria";
+import { ChangeEvent, createElement, useEffect, useMemo, useRef } from "react";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
 import { maybeCall, noop } from "src/utils";
@@ -31,11 +30,6 @@ export interface RichTextFieldProps {
   readOnly?: boolean;
 }
 
-// There aren't types for trix, so add our own. For now `loadHTML` is all we call anyway.
-type Editor = {
-  loadHTML(html: string): void;
-};
-
 /**
  * Provides a simple rich text editor based on trix.
  *
@@ -45,10 +39,10 @@ type Editor = {
  */
 export function RichTextField(props: RichTextFieldProps) {
   const { mergeTags, label, value = "", onChange, onBlur = noop, onFocus = noop, readOnly } = props;
-  const id = useId();
 
   // We get a reference to the Editor instance after trix-init fires
   const editor = useRef<Editor | undefined>(undefined);
+  const editorElement = useRef<HTMLElement>();
 
   // Keep track of what we pass to onChange, so that we can make ourselves keep looking
   // like a controlled input, i.e. by only calling loadHTML if a new incoming `value` !== `currentHtml`,
@@ -63,65 +57,60 @@ export function RichTextField(props: RichTextFieldProps) {
   const onFocusRef = useRef<RichTextFieldProps["onFocus"]>(onFocus);
   onFocusRef.current = onFocus;
 
-  useEffect(
-    () => {
-      if (readOnly) return;
+  // Generate a unique id to be used for matching `trix-initialize` event for this instance.
+  const id = useMemo(() => {
+    if (readOnly) return;
 
-      const editorElement = document.getElementById(`editor-${id}`);
-      if (!editorElement) {
-        throw new Error("editorElement not found");
-      }
+    const id = `trix-editor-${trixId}`;
+    trixId++;
 
-      editor.current = (editorElement as any).editor;
-      if (!editor.current) {
-        throw new Error("editor not found");
-      }
-      if (mergeTags !== undefined) {
-        attachTributeJs(mergeTags, editorElement!);
-      }
-
-      // We have a 2nd useEffect to call loadHTML when value changes, but
-      // we do this here b/c we assume the 2nd useEffect's initial evaluation
-      // "missed" having editor.current set b/c trix-initialize hadn't fired.
-      currentHtml.current = value;
-      editor.current.loadHTML(value || "");
-
-      function trixChange(e: ChangeEvent) {
-        const { textContent, innerHTML } = e.target;
-        const onChange = onChangeRef.current;
-        // If the user only types whitespace, treat that as undefined
-        if ((textContent || "").trim() === "") {
-          currentHtml.current = undefined;
-          onChange && onChange(undefined, undefined, []);
-        } else {
-          currentHtml.current = innerHTML;
-          const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
-          onChange && onChange(innerHTML, textContent || undefined, mentions);
+    function onEditorInit(e: Event) {
+      const targetEl = e.target as HTMLElement;
+      if (targetEl.id === id) {
+        editorElement.current = targetEl;
+        editor.current = (editorElement.current as any).editor;
+        if (mergeTags !== undefined) {
+          attachTributeJs(mergeTags, editorElement.current!);
         }
+
+        currentHtml.current = value;
+        editor.current!.loadHTML(value || "");
+        // Remove listener once we've initialized
+        window.removeEventListener("trix-initialize", onEditorInit);
+
+        function trixChange(e: ChangeEvent) {
+          const { textContent, innerHTML } = e.target;
+          const onChange = onChangeRef.current;
+          // If the user only types whitespace, treat that as undefined
+          if ((textContent || "").trim() === "") {
+            currentHtml.current = undefined;
+            onChange && onChange(undefined, undefined, []);
+          } else {
+            currentHtml.current = innerHTML;
+            const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
+            onChange && onChange(innerHTML, textContent || undefined, mentions);
+          }
+        }
+
+        const trixBlur = () => maybeCall(onBlurRef.current);
+        const trixFocus = () => maybeCall(onFocusRef.current);
+
+        // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
+        // https://github.com/basecamp/trix#storing-attached-files
+        const preventDefault = (e: any) => e.preventDefault();
+        window.addEventListener("trix-file-accept", preventDefault);
+
+        editorElement.current.addEventListener("trix-change", trixChange as any);
+        editorElement.current.addEventListener("trix-blur", trixBlur);
+        editorElement.current.addEventListener("trix-focus", trixFocus);
       }
+    }
 
-      // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
-      // https://github.com/basecamp/trix#storing-attached-files
-      const preventDefault = (e: any) => e.preventDefault();
-      window.addEventListener("trix-file-accept", preventDefault);
-
-      const trixBlur = () => maybeCall(onBlurRef.current);
-      const trixFocus = () => maybeCall(onFocusRef.current);
-
-      editorElement.addEventListener("trix-change", trixChange as any, false);
-      editorElement.addEventListener("trix-blur", trixBlur as any, false);
-      editorElement.addEventListener("trix-focus", trixFocus as any, false);
-
-      return () => {
-        editorElement.removeEventListener("trix-change", trixChange as any);
-        editorElement.removeEventListener("trix-blur", trixBlur as any);
-        editorElement.removeEventListener("trix-focus", trixFocus as any);
-        window.removeEventListener("trix-file-accept", preventDefault);
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [readOnly],
-  );
+    // Attaching listener to the `window` to we're listening prior to render.
+    // The <trix-editor /> web component's `trix-initialize` event may fire before a `useEffect` hook in the component is executed, making it difficult ot attach the event listener locally.
+    window.addEventListener("trix-initialize", onEditorInit);
+    return id;
+  }, []);
 
   useEffect(() => {
     // If our value prop changes (without the change coming from us), reload it
@@ -138,14 +127,15 @@ export function RichTextField(props: RichTextFieldProps) {
         {/* TODO: Not sure what to pass to labelProps. */}
         {label && <Label labelProps={{}} label={label} />}
         <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }}>
+          {/* "hidden" input element should to be in the DOM prior to the trix-editor element in order for initialize to fire properly (https://github.com/basecamp/trix/issues/254#issuecomment-321814353) */}
+          <input type="hidden" id={`input-${id}`} value={value} />
           {createElement("trix-editor", {
-            id: `editor-${id}`,
+            id: id,
             input: `input-${id}`,
             // Autofocus attribute is case sensitive since this is standard HTML
             ...(autoFocus ? { autofocus: true } : {}),
             ...(placeholder ? { placeholder } : {}),
           })}
-          <input type="hidden" id={`input-${id}`} value={value} />
         </div>
         <Global styles={[tributeOverrides]} />
       </div>
@@ -227,3 +217,11 @@ const tributeOverrides = {
 function extractIdsFromMentions(mergeTags: string[], content: string): string[] {
   return mergeTags.filter((tag) => content.includes(`@${tag}`));
 }
+
+// There aren't types for trix, so add our own. For now `loadHTML` is all we call anyway.
+type Editor = {
+  loadHTML(html: string): void;
+};
+
+// Used for creating unique identified for each trix-editor instance
+let trixId = 1;
