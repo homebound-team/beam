@@ -1,6 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { Css, IconButton as IconButton, IconButtonProps, iconButtonStylesHover, Icons, Palette } from "src";
+import { Css, IconButton, IconButtonProps, iconButtonStylesHover, Icons, Palette } from "src";
 import { withRouter } from "src/utils/sb";
 
 export default {

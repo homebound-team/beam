@@ -39,7 +39,16 @@ export function Modal(props: ModalProps) {
   const { modalBodyDiv, modalFooterDiv, modalHeaderDiv, drawerContentStack } = useBeamContext();
   const { closeModal } = ourUseModal();
   const { overlayProps, underlayProps } = useOverlay(
-    { ...props, isOpen: true, onClose: closeModal, isDismissable: true },
+    {
+      ...props,
+      isOpen: true,
+      onClose: closeModal,
+      isDismissable: true,
+      shouldCloseOnInteractOutside: (el) => {
+        // Do not close the Modal if the user is interacting with the Tribute mentions dropdown (via RichTextField).
+        return !el.closest(".tribute-container");
+      },
+    },
     ref,
   );
   const { modalProps } = useModal();

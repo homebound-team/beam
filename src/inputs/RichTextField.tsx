@@ -30,11 +30,6 @@ export interface RichTextFieldProps {
   readOnly?: boolean;
 }
 
-// There aren't types for trix, so add our own. For now `loadHTML` is all we call anyway.
-type Editor = {
-  loadHTML(html: string): void;
-};
-
 /**
  * Provides a simple rich text editor based on trix.
  *
@@ -47,8 +42,7 @@ export function RichTextField(props: RichTextFieldProps) {
 
   // We get a reference to the Editor instance after trix-init fires
   const editor = useRef<Editor | undefined>(undefined);
-  const editorElement = useRef<HTMLElement>(null);
-  const parentRef = useRef<HTMLElement>(null);
+  const editorElement = useRef<HTMLElement>();
 
   // Keep track of what we pass to onChange, so that we can make ourselves keep looking
   // like a controlled input, i.e. by only calling loadHTML if a new incoming `value` !== `currentHtml`,
@@ -67,11 +61,13 @@ export function RichTextField(props: RichTextFieldProps) {
   const id = useMemo(() => {
     if (readOnly) return;
 
-    const id = `${new Date().getTime()}-${Math.floor(Math.random() * 1000)}`;
+    const id = `trix-editor-${trixId}`;
+    trixId++;
 
     function onEditorInit(e: Event) {
-      const elId = (e.target as HTMLElement).id;
-      if (elId === `trix-editor-${id}`) {
+      const targetEl = e.target as HTMLElement;
+      if (targetEl.id === id) {
+        editorElement.current = targetEl;
         editor.current = (editorElement.current as any).editor;
         if (mergeTags !== undefined) {
           attachTributeJs(mergeTags, editorElement.current!);
@@ -81,6 +77,32 @@ export function RichTextField(props: RichTextFieldProps) {
         editor.current!.loadHTML(value || "");
         // Remove listener once we've initialized
         window.removeEventListener("trix-initialize", onEditorInit);
+
+        function trixChange(e: ChangeEvent) {
+          const { textContent, innerHTML } = e.target;
+          const onChange = onChangeRef.current;
+          // If the user only types whitespace, treat that as undefined
+          if ((textContent || "").trim() === "") {
+            currentHtml.current = undefined;
+            onChange && onChange(undefined, undefined, []);
+          } else {
+            currentHtml.current = innerHTML;
+            const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
+            onChange && onChange(innerHTML, textContent || undefined, mentions);
+          }
+        }
+
+        const trixBlur = () => maybeCall(onBlurRef.current);
+        const trixFocus = () => maybeCall(onFocusRef.current);
+
+        // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
+        // https://github.com/basecamp/trix#storing-attached-files
+        const preventDefault = (e: any) => e.preventDefault();
+        window.addEventListener("trix-file-accept", preventDefault);
+
+        editorElement.current.addEventListener("trix-change", trixChange as any);
+        editorElement.current.addEventListener("trix-blur", trixBlur);
+        editorElement.current.addEventListener("trix-focus", trixFocus);
       }
     }
 
@@ -88,51 +110,6 @@ export function RichTextField(props: RichTextFieldProps) {
     window.addEventListener("trix-initialize", onEditorInit);
     return id;
   }, []);
-
-  useEffect(
-    () => {
-      if (readOnly || !editorElement.current) return;
-
-      function trixChange(e: ChangeEvent) {
-        const { textContent, innerHTML } = e.target;
-        const onChange = onChangeRef.current;
-        // If the user only types whitespace, treat that as undefined
-        if ((textContent || "").trim() === "") {
-          currentHtml.current = undefined;
-          onChange && onChange(undefined, undefined, []);
-        } else {
-          currentHtml.current = innerHTML;
-          const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
-          onChange && onChange(innerHTML, textContent || undefined, mentions);
-        }
-      }
-
-      const trixBlur = () => maybeCall(onBlurRef.current);
-      const trixFocus = () => maybeCall(onFocusRef.current);
-
-      // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
-      // https://github.com/basecamp/trix#storing-attached-files
-      const preventDefault = (e: any) => e.preventDefault();
-      window.addEventListener("trix-file-accept", preventDefault);
-
-      const { addEventListener } = editorElement.current;
-      addEventListener("trix-change", trixChange as any);
-      addEventListener("trix-blur", trixBlur);
-      addEventListener("trix-focus", trixFocus);
-
-      return () => {
-        if (editorElement.current) {
-          const { removeEventListener } = editorElement.current;
-          removeEventListener("trix-change", trixChange as any);
-          removeEventListener("trix-blur", trixBlur);
-          removeEventListener("trix-focus", trixFocus);
-          window.removeEventListener("trix-file-accept", preventDefault);
-        }
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [readOnly, editorElement.current],
-  );
 
   useEffect(() => {
     // If our value prop changes (without the change coming from us), reload it
@@ -148,22 +125,16 @@ export function RichTextField(props: RichTextFieldProps) {
       <div css={Css.w100.maxw("550px").$}>
         {/* TODO: Not sure what to pass to labelProps. */}
         {label && <Label labelProps={{}} label={label} />}
-        <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }} ref={parentRef as any}>
-          <>
-            {/*
-              "hidden" input element should to be in the DOM prior to the trix-editor element in order for initialize to fire properly
-              https://github.com/basecamp/trix/issues/254#issuecomment-321814353
-            */}
-            <input type="hidden" id={`input-${id}`} value={value} />
-            {createElement("trix-editor", {
-              id: `trix-editor-${id}`,
-              input: `input-${id}`,
-              // Autofocus attribute is case sensitive since this is standard HTML
-              ...(autoFocus ? { autofocus: true } : {}),
-              ...(placeholder ? { placeholder } : {}),
-              ref: editorElement,
-            })}
-          </>
+        <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }}>
+          {/* "hidden" input element should to be in the DOM prior to the trix-editor element in order for initialize to fire properly (https://github.com/basecamp/trix/issues/254#issuecomment-321814353) */}
+          <input type="hidden" id={`input-${id}`} value={value} />
+          {createElement("trix-editor", {
+            id: id,
+            input: `input-${id}`,
+            // Autofocus attribute is case sensitive since this is standard HTML
+            ...(autoFocus ? { autofocus: true } : {}),
+            ...(placeholder ? { placeholder } : {}),
+          })}
         </div>
         <Global styles={[tributeOverrides]} />
       </div>
@@ -245,3 +216,11 @@ const tributeOverrides = {
 function extractIdsFromMentions(mergeTags: string[], content: string): string[] {
   return mergeTags.filter((tag) => content.includes(`@${tag}`));
 }
+
+// There aren't types for trix, so add our own. For now `loadHTML` is all we call anyway.
+type Editor = {
+  loadHTML(html: string): void;
+};
+
+// Used for creating unique identified for each trix-editor instance
+let trixId = 1;
