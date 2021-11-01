@@ -1,7 +1,6 @@
 import { Global } from "@emotion/react";
 import DOMPurify from "dompurify";
-import { ChangeEvent, createElement, useEffect, useRef, useState } from "react";
-import { useId } from "react-aria";
+import { ChangeEvent, createElement, useEffect, useMemo, useRef } from "react";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
 import { maybeCall, noop } from "src/utils";
@@ -45,10 +44,11 @@ type Editor = {
  */
 export function RichTextField(props: RichTextFieldProps) {
   const { mergeTags, label, value = "", onChange, onBlur = noop, onFocus = noop, readOnly } = props;
-  const id = useId();
 
   // We get a reference to the Editor instance after trix-init fires
   const editor = useRef<Editor | undefined>(undefined);
+  const editorElement = useRef<HTMLElement>(null);
+  const parentRef = useRef<HTMLElement>(null);
 
   // Keep track of what we pass to onChange, so that we can make ourselves keep looking
   // like a controlled input, i.e. by only calling loadHTML if a new incoming `value` !== `currentHtml`,
@@ -63,9 +63,31 @@ export function RichTextField(props: RichTextFieldProps) {
   const onFocusRef = useRef<RichTextFieldProps["onFocus"]>(onFocus);
   onFocusRef.current = onFocus;
 
-  const editorElement = useRef<HTMLElement>(null);
-  const parentRef = useRef<HTMLElement>(null);
-  const [showTrix, setShowTrix] = useState(false);
+  // Generate a unique id to be used for matching `trix-initialize` event for this instance.
+  const id = useMemo(() => {
+    if (readOnly) return;
+
+    const id = `${new Date().getTime()}-${Math.floor(Math.random() * 1000)}`;
+
+    function onEditorInit(e: Event) {
+      const elId = (e.target as HTMLElement).id;
+      if (elId === `trix-editor-${id}`) {
+        editor.current = (editorElement.current as any).editor;
+        if (mergeTags !== undefined) {
+          attachTributeJs(mergeTags, editorElement.current!);
+        }
+
+        currentHtml.current = value;
+        editor.current!.loadHTML(value || "");
+        // Remove listener once we've initialized
+        window.removeEventListener("trix-initialize", onEditorInit);
+      }
+    }
+
+    // Attaching listener to the `window` to we're listening prior to render.
+    window.addEventListener("trix-initialize", onEditorInit);
+    return id;
+  }, []);
 
   useEffect(
     () => {
@@ -109,7 +131,7 @@ export function RichTextField(props: RichTextFieldProps) {
       };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [readOnly, editorElement.current, showTrix],
+    [readOnly, editorElement.current],
   );
 
   useEffect(() => {
@@ -119,29 +141,6 @@ export function RichTextField(props: RichTextFieldProps) {
     }
   }, [value, readOnly]);
 
-  useEffect(() => {
-    if (parentRef.current) {
-      function onEditorInit() {
-        editor.current = (editorElement.current as any).editor;
-        if (mergeTags !== undefined) {
-          attachTributeJs(mergeTags, editorElement.current!);
-        }
-
-        currentHtml.current = value;
-        editor.current!.loadHTML(value || "");
-      }
-
-      parentRef.current.addEventListener("trix-initialize", onEditorInit);
-      setShowTrix(true);
-
-      return () => {
-        if (parentRef.current) {
-          parentRef.current.removeEventListener("trix-initialize", onEditorInit);
-        }
-      };
-    }
-  }, [parentRef]);
-
   const { placeholder, autoFocus } = props;
 
   if (!readOnly) {
@@ -150,32 +149,21 @@ export function RichTextField(props: RichTextFieldProps) {
         {/* TODO: Not sure what to pass to labelProps. */}
         {label && <Label labelProps={{}} label={label} />}
         <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }} ref={parentRef as any}>
-          {/*
-              Conditionally rendering the <trix-editor/> via `showTrix` is a real bummer to do, but seems necessary.
-              In order to properly handle the `trix-initialize` event, then we have to add an event listener before
-              the <trix-editor/> is mounted. This is because we can only attach the custom event listeners in a useEffect (after the component mounted).
-              By conditionally rendering, and adding the event listener to the parent, we can ensure we have the event listener attached,
-              then render the element, and the event will bubble up to the `parentRef` and then we can properly initialize.
-              Again, its a bummer, but not sure of a better way to ensure order or operation execution.
-          */}
-          {showTrix ? (
-            <>
-              {/*
-                "hidden" input element should to be in the DOM prior to the trix-editor element in order for initialize to fire properly
-                https://github.com/basecamp/trix/issues/254#issuecomment-321814353
-              */}
-              <input type="hidden" id={`input-${id}`} value={value} />
-              {createElement("trix-editor", {
-                input: `input-${id}`,
-                // Autofocus attribute is case sensitive since this is standard HTML
-                ...(autoFocus ? { autofocus: true } : {}),
-                ...(placeholder ? { placeholder } : {}),
-                ref: editorElement,
-              })}
-            </>
-          ) : (
-            <></>
-          )}
+          <>
+            {/*
+              "hidden" input element should to be in the DOM prior to the trix-editor element in order for initialize to fire properly
+              https://github.com/basecamp/trix/issues/254#issuecomment-321814353
+            */}
+            <input type="hidden" id={`input-${id}`} value={value} />
+            {createElement("trix-editor", {
+              id: `trix-editor-${id}`,
+              input: `input-${id}`,
+              // Autofocus attribute is case sensitive since this is standard HTML
+              ...(autoFocus ? { autofocus: true } : {}),
+              ...(placeholder ? { placeholder } : {}),
+              ref: editorElement,
+            })}
+          </>
         </div>
         <Global styles={[tributeOverrides]} />
       </div>
