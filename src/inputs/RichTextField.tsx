@@ -107,6 +107,7 @@ export function RichTextField(props: RichTextFieldProps) {
     }
 
     // Attaching listener to the `window` to we're listening prior to render.
+    // The <trix-editor /> web component's `trix-initialize` event may fire before a `useEffect` hook in the component is executed, making it difficult ot attach the event listener locally.
     window.addEventListener("trix-initialize", onEditorInit);
     return id;
   }, []);
