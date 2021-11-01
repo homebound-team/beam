@@ -92,7 +92,7 @@ export function DisabledMenu() {
       trigger={{ label: "Menu trigger" }}
       items={menuItems}
       persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
-      disabled={true}
+      disabled="Disabled reason"
     />
   );
 }
