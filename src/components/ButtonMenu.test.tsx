@@ -59,6 +59,26 @@ describe("ButtonMenu", () => {
     expect(r.example_menuItems()).toBeTruthy();
     expect(r.example_itemOne()).toBeTruthy();
   });
+
+  it("properly sets disabled on the button menu", async () => {
+    // Given the permutations how a button can be disabled/enabled.
+    const commonProps = { trigger: { label: "Label" }, items: [] };
+    const r = await render(
+      <>
+        <ButtonMenu data-testid="disabled" disabled={true} {...commonProps} />
+        <ButtonMenu data-testid="disabled" disabled={"Tooltip"} {...commonProps} />
+        <ButtonMenu data-testid="enabled" disabled={false} {...commonProps} />
+        <ButtonMenu data-testid="enabled" {...commonProps} />
+      </>,
+    );
+
+    // Then ButtonMenu with disabled=true and disabled="Tooltip" are disabled
+    expect(r.disabled_0()).toBeDisabled();
+    expect(r.disabled_1()).toBeDisabled();
+    // And ButtonMenu with disabled=false and undefined are not disabled
+    expect(r.enabled_0()).not.toBeDisabled();
+    expect(r.enabled_1()).not.toBeDisabled();
+  });
 });
 
 function TestButtonMenu({ empty = false, ...others }: { empty?: boolean }) {

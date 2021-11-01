@@ -1,6 +1,6 @@
 import type { Placement } from "@react-types/overlays";
 import { camelCase } from "change-case";
-import { useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { DismissButton, useMenuTrigger, useOverlayPosition } from "react-aria";
 import { Item, Section, useMenuTriggerState, useTreeData } from "react-stately";
 import { Button, ButtonProps } from "src/components/Button";
@@ -24,7 +24,8 @@ interface ButtonMenuProps {
   placement?: "left" | "right";
   // for storybook purposes
   defaultOpen?: boolean;
-  disabled?: boolean;
+  /** Whether the Button is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
+  disabled?: boolean | ReactNode;
 }
 
 export function ButtonMenu(props: ButtonMenuProps) {
@@ -32,7 +33,7 @@ export function ButtonMenu(props: ButtonMenuProps) {
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef(null);
-  const { menuTriggerProps, menuProps: ariaMenuProps } = useMenuTrigger({ isDisabled: disabled }, state, buttonRef);
+  const { menuTriggerProps, menuProps: ariaMenuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const { overlayProps: positionProps } = useOverlayPosition({
     targetRef: buttonRef,
     overlayRef: popoverRef,
