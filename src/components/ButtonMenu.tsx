@@ -26,10 +26,12 @@ interface ButtonMenuProps {
   defaultOpen?: boolean;
   /** Whether the Button is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
+  /** Text to be shown via a tooltip when the user hovers over the button */
+  tooltip?: ReactNode;
 }
 
 export function ButtonMenu(props: ButtonMenuProps) {
-  const { trigger, items, placement, persistentItems, defaultOpen, disabled } = props;
+  const { trigger, items, placement, persistentItems, defaultOpen, disabled, tooltip } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef(null);
@@ -74,6 +76,7 @@ export function ButtonMenu(props: ButtonMenuProps) {
           buttonRef={buttonRef}
           endAdornment={<Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} />}
           disabled={disabled}
+          tooltip={tooltip}
           {...tid}
         />
       ) : (

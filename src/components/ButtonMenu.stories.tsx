@@ -96,3 +96,13 @@ export function DisabledMenu() {
     />
   );
 }
+
+export function WithTooltip() {
+  const menuItems: MenuItem[] = [
+    { label: "Menu Item 1", onClick: action("Menu Item 1") },
+    { label: "Menu Item 2", onClick: action("Menu Item 2") },
+    { label: "Menu Item 3", onClick: action("Menu Item 3") },
+  ];
+
+  return <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} tooltip="Tool tip text" />;
+}

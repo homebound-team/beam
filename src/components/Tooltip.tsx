@@ -1,4 +1,4 @@
-import React, { cloneElement, ReactElement, ReactNode, useRef, useState } from "react";
+import React, { ReactElement, ReactNode, useRef, useState } from "react";
 import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
 import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
@@ -28,7 +28,9 @@ export function Tooltip(props: TooltipProps) {
 
   return (
     <>
-      {cloneElement(children, { ref: triggerRef, ...triggerProps })}
+      <span ref={triggerRef} {...triggerProps}>
+        {children}
+      </span>
       {state.isOpen && (
         <Popper
           {...mergeProps(_tooltipProps, tooltipProps)}
