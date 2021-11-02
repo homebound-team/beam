@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { Pills } from "src/components/Pills";
+import { Chips } from "src/components/Chips";
 import { FieldGroup, FormLines } from "src/forms/FormLines";
 import { StaticField as StaticFieldComponent } from "src/forms/StaticField";
 
@@ -17,7 +17,7 @@ export function StaticField() {
         <StaticFieldComponent label="First" value="Bob" />
       </FieldGroup>
       <StaticFieldComponent label="First">
-        <Pills values={["First", "Last"]} />
+        <Chips values={["First", "Last"]} />
       </StaticFieldComponent>
     </FormLines>
   );

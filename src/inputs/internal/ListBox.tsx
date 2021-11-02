@@ -3,8 +3,8 @@ import { DismissButton, useListBox } from "react-aria";
 import { SelectState } from "react-stately";
 import { Virtuoso } from "react-virtuoso";
 import { VirtuosoHandle } from "react-virtuoso/dist/components";
-import { Chip } from "src/components/Chip";
 import { Option } from "src/components/internal/index";
+import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
 
 interface ListBoxProps<O, V extends Key> {
@@ -117,7 +117,7 @@ function ListBoxChip<O, V extends Key>(props: ListBoxChipProps<O, V>) {
   const { state, option, getOptionLabel, getOptionValue, disabled = false } = props;
   return (
     <li css={Css.mr1.mb1.$}>
-      <Chip
+      <ToggleChip
         text={getOptionLabel(option)}
         onClick={() => {
           state.selectionManager.toggleSelection(String(getOptionValue(option)));
