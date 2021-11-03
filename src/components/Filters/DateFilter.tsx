@@ -1,10 +1,9 @@
-import { Key, useState } from "react";
+import { Key } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
+import { CompoundField } from "src/components/internal/CompoundField";
 import { Label } from "src/components/Label";
-import { Css } from "src/Css";
 import { DateField, SelectField, Value } from "src/inputs";
-import { TextFieldInternalProps } from "src/interfaces";
 import { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -33,71 +32,42 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
 {
   render(value: DV, setValue: (value: DV | undefined) => void, tid: TestIds, inModal: boolean, vertical: boolean) {
     const { label, operations, getOperationValue, getOperationLabel } = this.props;
-    const [focusedEl, setFocusedEl] = useState<"op" | "date" | undefined>();
-    const commonStyles = Css.df.aic.fs1.maxwPx(550).bt.bb.bGray300.$;
 
-    const internalProps: TextFieldInternalProps = { compound: true };
-
-    // TODO: Maybe make a `CompoundField` component, which could handle the `display: flex` and any sizing requirements per field and focus states.
     return (
       <>
         {vertical && <Label label={label} />}
-        <div {...this.testId(tid)} css={Css.df.$}>
-          <div
-            css={{
-              ...commonStyles,
-              ...Css.bl.borderRadius("4px 0 0 4px").if(focusedEl === "op").bLightBlue700.$,
-            }}
-          >
-            <SelectField
-              compact
-              sizeToContent
-              options={[
-                // Always show the 'Any' option
-                anyOption as O,
-                ...operations,
-              ]}
-              getOptionValue={(o) => (o === anyOption ? (undefined as any) : getOperationValue(o))}
-              getOptionLabel={(o) => (o === anyOption ? "Any" : getOperationLabel(o))}
-              value={value?.op}
-              onSelect={(op) =>
-                // default the selected date to today if it doesn't exist in the filter's value
-                setValue(op ? ({ op, value: value?.value ? new Date(value.value) : new Date() } as DV) : undefined)
-              }
-              label={inModal ? `${label} date filter operation` : label}
-              inlineLabel={!inModal && !vertical}
-              hideLabel={inModal || vertical}
-              nothingSelectedText="Any"
-              {...tid[`${defaultTestId(this.label)}_dateOperation`]}
-              onFocus={() => setFocusedEl("op")}
-              onBlur={() => setFocusedEl(undefined)}
-              {...{ internalProps }}
-            />
-          </div>
-
-          {/* Separation line */}
-          <div css={Css.wPx(1).flexNone.bgGray300.if(focusedEl !== undefined).bgLightBlue700.$} />
-
-          <div
-            css={{
-              ...commonStyles,
-              ...Css.fg1.br.borderRadius("0 4px 4px 0").if(focusedEl === "date").bLightBlue700.$,
-            }}
-          >
-            <DateField
-              compact
-              inlineLabel
-              value={value?.value ? new Date(value.value) : new Date()}
-              label="Date"
-              onChange={(d) => setValue({ ...value, value: d })}
-              disabled={!value}
-              {...tid[`${defaultTestId(this.label)}_dateField`]}
-              onFocus={() => setFocusedEl("date")}
-              onBlur={() => setFocusedEl(undefined)}
-              {...{ internalProps }}
-            />
-          </div>
-        </div>
+        <CompoundField>
+          <SelectField
+            compact
+            sizeToContent
+            options={[
+              // Always show the 'Any' option
+              anyOption as O,
+              ...operations,
+            ]}
+            getOptionValue={(o) => (o === anyOption ? (undefined as any) : getOperationValue(o))}
+            getOptionLabel={(o) => (o === anyOption ? "Any" : getOperationLabel(o))}
+            value={value?.op}
+            onSelect={(op) =>
+              // default the selected date to today if it doesn't exist in the filter's value
+              setValue(op ? ({ op, value: value?.value ? new Date(value.value) : new Date() } as DV) : undefined)
+            }
+            label={inModal ? `${label} date filter operation` : label}
+            inlineLabel={!inModal && !vertical}
+            hideLabel={inModal || vertical}
+            nothingSelectedText="Any"
+            {...tid[`${defaultTestId(this.label)}_dateOperation`]}
+          />
+          <DateField
+            compact
+            inlineLabel
+            value={value?.value ? new Date(value.value) : new Date()}
+            label="Date"
+            onChange={(d) => setValue({ ...value, value: d })}
+            disabled={!value}
+            {...tid[`${defaultTestId(this.label)}_dateField`]}
+          />
+        </CompoundField>
       </>
     );
   }
