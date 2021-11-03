@@ -65,6 +65,8 @@ describe("TextFieldTest", () => {
     click(r.xCircle);
     // Then the value should be removed
     expect(r.name()).toHaveValue("");
+    // And the focus should return to the input element
+    expect(r.name()).toHaveFocus();
   });
 });
 

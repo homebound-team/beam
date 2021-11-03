@@ -7,6 +7,7 @@ import React, {
   MutableRefObject,
   ReactNode,
   TextareaHTMLAttributes,
+  useRef,
   useState,
 } from "react";
 import { chain, mergeProps, useFocusWithin, useHover } from "react-aria";
@@ -92,6 +93,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const [isFocused, setIsFocused] = useState(false);
   const { hoverProps, isHovered } = useHover({});
   const { focusWithinProps } = useFocusWithin({ onFocusWithinChange: setIsFocused });
+  const fieldRef = inputRef ?? useRef();
 
   const maybeSmaller = compound ? 2 : 0;
   const fieldHeight = 40;
@@ -205,7 +207,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               { "aria-invalid": Boolean(errorMsg), ...(hideLabel ? { "aria-label": label } : {}) },
             )}
             {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
-            ref={inputRef as any}
+            ref={fieldRef as any}
             rows={multiline ? 1 : undefined}
             css={{
               ...fieldStyles.input,
@@ -217,7 +219,15 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             {...tid}
           />
           {isFocused && clearable && onChange && inputProps.value && (
-            <IconButton icon="xCircle" color={Palette.Gray700} onClick={() => onChange(undefined)} />
+            <IconButton
+              icon="xCircle"
+              color={Palette.Gray700}
+              onClick={() => {
+                onChange(undefined);
+                // Reset focus to input element
+                fieldRef.current?.focus();
+              }}
+            />
           )}
           {!multiline && endAdornment && <span css={Css.df.aic.pl1.fs0.$}>{endAdornment}</span>}
         </div>
