@@ -10,7 +10,7 @@ export interface ChipProps<X> {
 /** Kinda like a chip, but read-only, so no `onClick` or `hover`. */
 export function Chip<X extends Only<Xss<Margin>, X>>(props: ChipProps<X>) {
   const { text, xss = {} } = props;
-  const tid = useTestIds(props, "pill");
+  const tid = useTestIds(props, "chip");
   return (
     <span
       css={{
