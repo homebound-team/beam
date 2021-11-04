@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { cloneElement, useState } from "react";
 import { Css } from "src/Css";
 import { TextFieldInternalProps } from "src/interfaces";
 import { maybeCall } from "src/utils";
@@ -20,21 +20,17 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
           ...Css.bl.borderRadius("4px 0 0 4px").if(focusedEl === "left").bLightBlue700.$,
         }}
       >
-        {{
-          ...children[0],
-          props: {
-            ...children[0].props,
-            onFocus: () => {
-              maybeCall(children[0].props.onFocus);
-              setFocusedEl("left");
-            },
-            onBlur: () => {
-              maybeCall(children[0].props.onBlur);
-              setFocusedEl(undefined);
-            },
-            internalProps,
+        {cloneElement(children[0], {
+          onFocus: () => {
+            maybeCall(children[0].props.onFocus);
+            setFocusedEl("left");
           },
-        }}
+          onBlur: () => {
+            maybeCall(children[0].props.onBlur);
+            setFocusedEl(undefined);
+          },
+          internalProps,
+        })}
       </div>
       {/* Separation line */}
       <div css={Css.wPx(1).flexNone.bgGray300.if(focusedEl !== undefined).bgLightBlue700.$} />
@@ -45,21 +41,17 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
           ...Css.fg1.br.borderRadius("0 4px 4px 0").if(focusedEl === "right").bLightBlue700.$,
         }}
       >
-        {{
-          ...children[1],
-          props: {
-            ...children[1].props,
-            onFocus: () => {
-              maybeCall(children[1].props.onFocus);
-              setFocusedEl("right");
-            },
-            onBlur: () => {
-              maybeCall(children[1].props.onBlur);
-              setFocusedEl(undefined);
-            },
-            internalProps,
+        {cloneElement(children[1], {
+          onFocus: () => {
+            maybeCall(children[1].props.onFocus);
+            setFocusedEl("right");
           },
-        }}
+          onBlur: () => {
+            maybeCall(children[1].props.onBlur);
+            setFocusedEl(undefined);
+          },
+          internalProps,
+        })}
       </div>
     </div>
   );
