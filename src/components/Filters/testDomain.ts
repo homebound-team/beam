@@ -87,3 +87,8 @@ export enum TaskStatus {
   OnHold = "ON_HOLD",
   Delayed = "DELAYED",
 }
+
+export enum ScheduleTypes {
+  Task = "TASK",
+  Milestone = "MILESTONE",
+}

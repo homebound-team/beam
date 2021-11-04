@@ -146,9 +146,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   return (
     <div css={fieldStyles.container} {...groupProps} {...focusWithinProps}>
       {label && !inlineLabel && (
+        // set `hidden` if being rendered as a compound field
         <Label
           labelProps={labelProps}
-          hidden={hideLabel}
+          hidden={hideLabel || compound}
           label={label}
           suffix={labelSuffix}
           contrast={contrast}
@@ -232,8 +233,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
           {!multiline && endAdornment && <span css={Css.df.aic.pl1.fs0.$}>{endAdornment}</span>}
         </div>
       )}
-      {errorMsg && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}
-      {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+
+      {/* Compound fields will handle their own error and helper text */}
+      {errorMsg && !compound && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}
+      {helperText && !compound && <HelperText helperText={helperText} {...tid.helperText} />}
     </div>
   );
 }

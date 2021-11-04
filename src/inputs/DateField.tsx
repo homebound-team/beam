@@ -155,6 +155,7 @@ export function DateField(props: DateFieldProps) {
       {...buttonProps}
       disabled={disabled}
       css={Css.if(disabled).cursorNotAllowed.$}
+      tabIndex={-1}
       {...tid.calendarButton}
     >
       <Icon icon="calendar" color={Palette.Gray700} />
