@@ -96,6 +96,30 @@ describe("NumberFieldTest", () => {
     type(r.days, "1");
     expect(r.days()).toHaveValue("1 day");
   });
+
+  it("does not allow for decimal values in days type", async () => {
+    const r = await render(<TestNumberField label="Days" type="days" value={2} />);
+    expect(r.days()).toHaveValue("2 days");
+    type(r.days, "1.23");
+    expect(r.days()).toHaveValue("1 day");
+  });
+
+  it("displays direction of positive values and no direction display for zero", async () => {
+    const r = await render(
+      <>
+        <TestNumberField label="Days" type="days" value={123} displayDirection />
+        <TestNumberField label="Cents" type="cents" value={456} displayDirection />
+        <TestNumberField label="Basis Points" type="basisPoints" value={789} displayDirection />
+        <TestNumberField label="Percent" type="percent" value={123} displayDirection />
+        <TestNumberField label="Zero Percent" type="percent" value={0} displayDirection />
+      </>,
+    );
+    expect(r.days()).toHaveValue("+123 days");
+    expect(r.cents()).toHaveValue("+$4.56");
+    expect(r.basisPoints()).toHaveValue("+7.89%");
+    expect(r.percent()).toHaveValue("+123%");
+    expect(r.zeroPercent()).toHaveValue("0%");
+  });
 });
 
 describe("parseRawInput function", () => {
