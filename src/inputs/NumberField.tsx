@@ -26,6 +26,8 @@ export interface NumberFieldProps {
   readOnly?: boolean;
   /** Styles overrides */
   xss?: Xss<"textAlign" | "justifyContent">;
+  // If set, all positive values will be prefixed with "+". (Zero will not show +/-)
+  displayDirection?: boolean;
 }
 
 export function NumberField(props: NumberFieldProps) {
@@ -45,22 +47,24 @@ export function NumberField(props: NumberFieldProps) {
     value,
     onChange,
     xss,
+    displayDirection = false,
     ...otherProps
   } = props;
 
   const factor = type === "percent" || type === "cents" ? 100 : type === "basisPoints" ? 10_000 : 1;
+  const signDisplay = displayDirection ? "exceptZero" : "auto";
 
   // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
   // see: https://github.com/adobe/react-spectrum/issues/1893.
   const formatOptions: Intl.NumberFormatOptions | undefined = useMemo(() => {
     return type === "percent"
-      ? { style: "percent" }
+      ? { style: "percent", signDisplay }
       : type === "basisPoints"
-      ? { style: "percent", minimumFractionDigits: 2 }
+      ? { style: "percent", minimumFractionDigits: 2, signDisplay }
       : type === "cents"
-      ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
+      ? { style: "currency", currency: "USD", minimumFractionDigits: 2, signDisplay }
       : type === "days"
-      ? { style: "unit", unit: "day", unitDisplay: "long" }
+      ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0, signDisplay }
       : undefined;
   }, [type]);
 
