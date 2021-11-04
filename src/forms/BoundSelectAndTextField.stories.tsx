@@ -22,7 +22,6 @@ export function Example() {
       <BoundSelectAndTextField
         selectFieldProps={{ field: formState.type, options: types }}
         textFieldProps={{ field: formState.name, clearable: true, placeholder: "Add new" }}
-        compact
       />
       <Observer>
         {() => (

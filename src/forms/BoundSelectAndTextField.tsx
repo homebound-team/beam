@@ -4,6 +4,8 @@ import { BoundSelectField, BoundSelectFieldProps, BoundTextField, BoundTextField
 import { Value } from "src/inputs/Value";
 import { TextFieldXss } from "src/interfaces";
 import { HasIdAndName, Optional } from "src/types";
+import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 interface BoundSelectAndTextFieldProps<O, V extends Value, X> {
   selectFieldProps: CompoundSelectFieldProps<O, V>;
@@ -25,10 +27,20 @@ export function BoundSelectAndTextField<O extends HasIdAndName<V>, V extends Val
   },
 ): JSX.Element {
   const { selectFieldProps, textFieldProps, compact = true } = props;
+  const tid = useTestIds(props);
   return (
     <CompoundField>
-      <BoundSelectField {...selectFieldProps} sizeToContent compact={compact} />
-      <BoundTextField {...textFieldProps} compact={compact} />
+      <BoundSelectField
+        {...tid[defaultTestId(selectFieldProps.label ?? selectFieldProps.field.key)]}
+        {...selectFieldProps}
+        sizeToContent
+        compact={compact}
+      />
+      <BoundTextField
+        {...tid[defaultTestId(textFieldProps.label ?? textFieldProps.field.key)]}
+        {...textFieldProps}
+        compact={compact}
+      />
     </CompoundField>
   );
 }

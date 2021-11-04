@@ -30,9 +30,18 @@ describe("BoundSelectAndTextField", () => {
     expect(r.name()).toHaveValue("Test Task Name");
     expect(r.nameValue().textContent).toBe("Test Task Name");
   });
+
+  it("can set custom testid", async () => {
+    // Given a BoundSelectAndTextField with a custom testid
+    const r = await render(<TestComponent data-testid="custom" />);
+
+    // Then expect it to prefix the default field testids
+    expect(r.custom_type()).toBeTruthy();
+    expect(r.custom_name()).toBeTruthy();
+  });
 });
 
-function TestComponent() {
+function TestComponent(props: any) {
   const formState = useFormState({ config });
   const types = [
     { id: ScheduleTypes.Task, name: "Task" },
@@ -44,7 +53,7 @@ function TestComponent() {
       <BoundSelectAndTextField
         selectFieldProps={{ field: formState.type, options: types }}
         textFieldProps={{ field: formState.name, clearable: true, placeholder: "Add new" }}
-        compact
+        {...props}
       />
       <Observer>
         {() => (
