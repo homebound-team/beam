@@ -56,7 +56,7 @@ interface TextFieldBaseProps<X>
 
 // Used by both TextField and TextArea
 export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldBaseProps<X>) {
-  const { fieldProps } = usePresentationContext();
+  const { fieldProps, typeScale = "sm" } = usePresentationContext();
   const {
     label,
     required,
@@ -83,7 +83,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     minHeight = 96,
     clearable = false,
   } = props;
-  const typeScale = fieldProps?.typeScale ?? "sm";
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
   const { compound = false } = internalProps;
   const errorMessageId = `${inputProps.id}-error`;

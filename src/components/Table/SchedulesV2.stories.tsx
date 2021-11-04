@@ -201,7 +201,7 @@ const style: GridStyle = {
 export function SchedulesV2() {
   return (
     <div css={Css.h("100vh").$}>
-      <PresentationProvider fieldProps={{ borderless: true, typeScale: "xs" }}>
+      <PresentationProvider fieldProps={{ borderless: true }} typeScale="xs">
         <GridTable<Row>
           rows={rows}
           columns={[

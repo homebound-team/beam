@@ -49,7 +49,7 @@ export function PresentationFieldProps() {
 
       <div css={Css.pb2.mb2.bb.bGray300.$}>
         <h1 css={Css.xlEm.$}>Small Font size</h1>
-        <PresentationProvider fieldProps={{ typeScale: "xs", compact: true }}>
+        <PresentationProvider fieldProps={{ compact: true }} typeScale="xs">
           <TestFields />
         </PresentationProvider>
       </div>

@@ -11,13 +11,13 @@ export interface PresentationFieldProps {
   borderless?: boolean;
   // Defines height of the field
   compact?: boolean;
-  // Changes default font styles for input fields
-  typeScale?: Typography;
 }
 
 export type PresentationContextProps = {
   fieldProps?: PresentationFieldProps;
   gridTableStyle?: GridStyle;
+  // Changes default font styles
+  typeScale?: Typography;
 };
 
 export const PresentationContext = createContext<PresentationContextProps>({});
