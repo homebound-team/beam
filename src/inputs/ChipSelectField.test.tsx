@@ -43,6 +43,8 @@ describe("ChipSelectField", () => {
     click(r.chipSelectField_clearButton);
     // Then expect the default placeholder value to display
     expect(r.chipSelectField()).toHaveTextContent("Select an option");
+    // And the clear button is removed when no value is selected
+    expect(r.queryByTestId("chipSelectField_clearButton")).toBeFalsy();
     // And onSelect to be called
     expect(onSelect).toBeCalledWith([undefined, undefined]);
   });

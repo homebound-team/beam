@@ -49,6 +49,7 @@ export function ChipSelectField<O, V extends Value>(
   } = props;
   const tid = useTestIds(props, "chipSelectField");
   const typeScale = fieldProps?.typeScale ?? "sm";
+  const showClearButton = clearable && !!value;
 
   const [isFocused, setIsFocused] = useState(false);
   const [isClearFocused, setIsClearFocused] = useState(false);
@@ -141,14 +142,14 @@ export function ChipSelectField<O, V extends Value>(
           {...mergeProps(focusProps, buttonProps)}
           ref={buttonRef}
           css={{
-            ...Css.br16.pxPx(10).pyPx(2).outline0.if(clearable).prPx(4).borderRadius("16px 0 0 16px").$,
+            ...Css.br16.pxPx(10).pyPx(2).outline0.if(showClearButton).prPx(4).borderRadius("16px 0 0 16px").$,
             "&:hover": Css.bgGray400.if(!value).bgGray300.$,
           }}
           {...tid}
         >
           <span {...valueProps}>{state.selectedItem ? state.selectedItem.textValue : placeholder}</span>
         </button>
-        {clearable && (
+        {showClearButton && (
           // Apply a tabIndex=-1 to remove need for addresses this focus behavior separately from the rest of the button.
           // This will require the user to click on the button if they want to remove it.
           <button
@@ -158,7 +159,10 @@ export function ChipSelectField<O, V extends Value>(
               "&:hover": Css.bgGray400.$,
               ...(isClearFocused ? Css.boxShadow(`0px 0px 0px 2px rgba(3,105,161,1)`).$ : {}),
             }}
-            onClick={() => onSelect(undefined as any, undefined as any)}
+            onClick={() => {
+              onSelect(undefined as any, undefined as any);
+              setIsClearFocused(false);
+            }}
             aria-label="Remove"
             {...tid.clearButton}
           >
