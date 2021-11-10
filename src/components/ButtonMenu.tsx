@@ -1,7 +1,7 @@
 import type { Placement } from "@react-types/overlays";
 import { camelCase } from "change-case";
 import { ReactNode, useEffect, useRef } from "react";
-import { DismissButton, useMenuTrigger, useOverlayPosition } from "react-aria";
+import { useMenuTrigger, useOverlayPosition } from "react-aria";
 import { Item, Section, useMenuTriggerState, useTreeData } from "react-stately";
 import { Button, ButtonProps } from "src/components/Button";
 import { Icon, IconProps } from "src/components/Icon";
@@ -49,8 +49,8 @@ export function ButtonMenu(props: ButtonMenuProps) {
   // Build out the Menu's Tree data to include the Persistent Action, if any. This is a collection of Nodes that is used
   // by React-Aria to keep track of item states such as focus, and provide hooks for calling those actions.
   const tree = useTreeData({
-    initialItems: [items, persistentItems ? persistentItems : []].flatMap(
-      (i, idx) => [{ label: idx === 0 ? "items" : "persistent", items: i }] as MenuSection[],
+    initialItems: [items, persistentItems ? persistentItems : []].map(
+      (i, idx) => ({ label: idx === 0 ? "items" : "persistent", items: i } as MenuSection),
     ),
     getKey: (item) => camelCase(item.label),
     getChildren: (item) => (item as MenuSection).items ?? [],
@@ -92,12 +92,11 @@ export function ButtonMenu(props: ButtonMenuProps) {
         >
           <Menu ariaMenuProps={ariaMenuProps} items={tree.items} onClose={() => state.close()} {...tid}>
             {(s) => (
-              <Section key={s.label.replace(/\"/g, "")} title={s.label} items={s.items}>
-                {(item) => <Item key={item.label.replace(/\"/g, "")}>{item.label}</Item>}
+              <Section key={s.label.replace(/"/g, "")} title={s.label} items={s.items}>
+                {(item) => <Item key={item.label.replace(/"/g, "")}>{item.label}</Item>}
               </Section>
             )}
           </Menu>
-          <DismissButton onDismiss={() => state.close()} />
         </Popover>
       )}
     </div>

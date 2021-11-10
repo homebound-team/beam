@@ -1,5 +1,5 @@
 import React, { MutableRefObject } from "react";
-import { OverlayContainer, useOverlay } from "react-aria";
+import { DismissButton, OverlayContainer, useOverlay } from "react-aria";
 
 interface PopoverProps extends React.PropsWithChildren<any> {
   triggerRef: MutableRefObject<HTMLElement | null>;
@@ -41,6 +41,7 @@ export function Popover(props: PopoverProps) {
     <OverlayContainer>
       <div {...{ ...overlayProps, ...positionProps }} ref={popoverRef}>
         {children}
+        <DismissButton onDismiss={() => onClose()} />
       </div>
     </OverlayContainer>
   );

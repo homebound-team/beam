@@ -4,6 +4,7 @@ import { mergeProps, useHover, useOption } from "react-aria";
 import { ListState, TreeState } from "react-stately";
 import { Icon } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
+import { isPersistentKey } from "src/inputs/ChipSelectField";
 
 interface OptionProps<O> {
   item: Node<O>;
@@ -37,6 +38,8 @@ export function Option<O>(props: OptionProps<O>) {
       ref={ref as any}
       css={{
         ...Css.df.aic.jcsb.py1.px2.mh("42px").outline0.cursorPointer.sm.$,
+        // Assumes only one Persistent Item per list - will need to change to utilize Sections if that assumption is incorrect.
+        ...(isPersistentKey(item.key) ? Css.bt.bGray200.$ : {}),
         ...themeStyles.item,
         ...(isHovered && !isDisabled ? themeStyles.hover : {}),
         ...(isFocused ? themeStyles.focus : {}),

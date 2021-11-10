@@ -2746,7 +2746,7 @@
     "@react-types/shared" "^3.8.0"
     "@react-types/tooltip" "^3.1.2"
 
-"@react-aria/utils@^3.8.1", "@react-aria/utils@^3.8.2", "@react-aria/utils@^3.9.0":
+"@react-aria/utils@^3.8.2", "@react-aria/utils@^3.9.0":
   version "3.9.0"
   resolved "https://registry.yarnpkg.com/@react-aria/utils/-/utils-3.9.0.tgz#c5446f807091a744311d4d559fa8a42e7448824d"
   integrity sha512-P0dEOMHGHHJ5KC8iCpaMxAtgdUdeISAm4FZnmoD5fK3JxlKEC046hUxlad83RkNOBZkT2dDvF4HeDCUqdMWHKQ==
@@ -12965,7 +12965,7 @@ react-app-polyfill@^1.0.6:
     regenerator-runtime "^0.13.3"
     whatwg-fetch "^3.0.0"
 
-react-aria@^3.8.0:
+react-aria@^3.10.0:
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/react-aria/-/react-aria-3.10.0.tgz#11201ce7cff295a71f848cffdb6ab0ad5a1045b0"
   integrity sha512-z4U4CPHDDVO7HulTQlx3uLii0V849e8N15sYIGqYBHVex8Mi60YZb+rZq5qzZxMjDL0rvPHBAJl5i2F4d4QQWA==
@@ -13225,7 +13225,7 @@ react-sizeme@^3.0.1:
     shallowequal "^1.1.0"
     throttle-debounce "^3.0.1"
 
-react-stately@^3.7.0:
+react-stately@^3.9.0:
   version "3.9.0"
   resolved "https://registry.yarnpkg.com/react-stately/-/react-stately-3.9.0.tgz#0a3d8b8d065994b3b9046688d8359c98d04aa95d"
   integrity sha512-r9M/pG1uw0uJCJ7WFDoszsI9+EMVCV5cY3bbawlCdCxYtLG7klBJGuHeLbmSAmoTFXsyEAdFpDIOGfSIqeUOuQ==
