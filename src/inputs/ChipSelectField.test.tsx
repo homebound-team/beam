@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { ChipSelectField, ChipSelectFieldProps } from "src/inputs/ChipSelectField";
+import { ChipSelectField, ChipSelectFieldProps } from "src";
 import { Value } from "src/inputs/Value";
 import { Optional } from "src/types";
 import { maybeCall } from "src/utils";

@@ -1,10 +1,10 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
+import { ChipSelectField } from "src";
 import { PresentationProvider } from "src/components";
 import { TaskStatus } from "src/components/Filters/testDomain";
 import { Css } from "src/Css";
-import { ChipSelectField } from "src/inputs/ChipSelectField";
 
 export default {
   component: ChipSelectField,

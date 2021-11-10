@@ -1,6 +1,6 @@
 import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
 import { fireEvent } from "@testing-library/react";
-import { BoundChipSelectField } from "src/forms/BoundChipSelectField";
+import { BoundChipSelectField } from "src";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { click, render } from "src/utils/rtl";
 
