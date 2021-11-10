@@ -1,5 +1,6 @@
 export * from "./Checkbox";
 export * from "./CheckboxGroup";
+export * from "./ChipSelectField";
 export * from "./DateField";
 export * from "./MultiSelectField";
 export * from "./NumberField";

@@ -1,26 +1,19 @@
 import { Node } from "@react-types/shared";
 import React, { useRef } from "react";
-import { useHover, useOption } from "react-aria";
+import { mergeProps, useHover, useOption } from "react-aria";
 import { ListState, TreeState } from "react-stately";
 import { Icon } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
 
-/** Represents a single option within a ListBox - used by SelectField and MultiSelectField */
-export function Option<T>({
-  item,
-  state,
-  contrast = false,
-}: {
-  item: Node<T>;
-  state: ListState<T> | TreeState<T>;
+interface OptionProps<O> {
+  item: Node<O>;
+  state: ListState<O> | TreeState<O>;
   contrast?: boolean;
-}) {
+}
+/** Represents a single option within a ListBox - used by SelectField and MultiSelectField */
+export function Option<O>(props: OptionProps<O>) {
+  const { item, state, contrast = false } = props;
   const ref = useRef<HTMLLIElement>(null);
-  const isDisabled = state.disabledKeys.has(item.key);
-  const isSelected = state.selectionManager.isSelected(item.key);
-  // Track focus via focusedKey state instead of with focus event listeners
-  // since focus never leaves the text input in a ComboBox
-  const isFocused = state.selectionManager.focusedKey === item.key;
   const { hoverProps, isHovered } = useHover({});
 
   const themeStyles = {
@@ -32,26 +25,18 @@ export function Option<T>({
 
   // Get props for the option element.
   // Prevent options from receiving browser focus via shouldUseVirtualFocus.
-  const { optionProps } = useOption(
-    {
-      key: item.key,
-      isDisabled,
-      isSelected,
-      shouldSelectOnPressUp: true,
-      shouldFocusOnHover: true,
-      shouldUseVirtualFocus: true,
-    },
+  const { optionProps, isDisabled, isFocused, isSelected } = useOption(
+    { key: item.key, shouldSelectOnPressUp: true, shouldFocusOnHover: false },
     state,
     ref,
   );
 
   return (
     <li
-      {...optionProps}
-      {...hoverProps}
+      {...mergeProps(optionProps, hoverProps)}
       ref={ref as any}
       css={{
-        ...Css.df.aic.jcsb.py1.px2.mh("42px").cursorPointer.sm.$,
+        ...Css.df.aic.jcsb.py1.px2.mh("42px").outline0.cursorPointer.sm.$,
         ...themeStyles.item,
         ...(isHovered && !isDisabled ? themeStyles.hover : {}),
         ...(isFocused ? themeStyles.focus : {}),
