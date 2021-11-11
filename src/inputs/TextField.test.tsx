@@ -97,7 +97,7 @@ function TestTextField<X extends Only<TextFieldXss, X>>(props: Omit<TextFieldPro
           lastSet = v;
           setValue(v);
         }}
-        textFieldApi={textFieldApi}
+        api={textFieldApi}
         {...otherProps}
       />
       <button onClick={() => textFieldApi.current && textFieldApi.current.focus()} data-testid="setFocus" />

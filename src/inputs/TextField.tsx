@@ -10,7 +10,7 @@ export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
   compact?: boolean;
   inlineLabel?: boolean;
   clearable?: boolean;
-  textFieldApi?: MutableRefObject<TextFieldApi | undefined>;
+  api?: MutableRefObject<TextFieldApi | undefined>;
 }
 
 export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
@@ -22,7 +22,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     value = "",
     onBlur,
     onFocus,
-    textFieldApi,
+    api,
     ...otherProps
   } = props;
   const textFieldProps = {
@@ -37,8 +37,8 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
   const { labelProps, inputProps } = useTextField(textFieldProps, inputRef);
 
   // Construct our TextFieldApi to give access to some imperative methods
-  if (textFieldApi) {
-    textFieldApi.current = {
+  if (api) {
+    api.current = {
       focus: () => inputRef.current && inputRef.current.focus(),
     };
   }
