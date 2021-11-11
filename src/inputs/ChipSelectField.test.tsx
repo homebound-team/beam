@@ -11,7 +11,7 @@ describe("ChipSelectField", () => {
     // Given a ChipSelectField
     const r = await render(<TestComponent label="Test Label" value="s:2" options={sports} />);
     // Then the initial value should display
-    expect(r.chipSelectField()).toHaveTextContent("Soccer");
+    expect(r.chipSelectField()).toHaveTextContent("Soccer").toHaveAttribute("title", "Soccer");
     // And the label should display
     expect(r.chipSelectField_label()).toHaveTextContent("Test Label");
   });
@@ -57,6 +57,7 @@ describe("ChipSelectField", () => {
     expect(r.chipSelectField()).toHaveTextContent("Soccer");
     // When selecting a new value
     click(r.chipSelectField);
+    expect(r.getByRole("option", { name: "Basketball" }).firstChild).toHaveAttribute("title", "Basketball");
     click(r.getByRole("option", { name: "Basketball" }));
     // Then the field's value updates
     expect(r.chipSelectField()).toHaveTextContent("Basketball");

@@ -73,13 +73,15 @@ export function ChipSelectField<O, V extends Value>(
   const popoverRef = useRef<HTMLDivElement>(null);
   const listBoxRef = useRef(null);
 
-  const chipStyles = Css[typeScale].bgGray300.gray900.br16.pxPx(10).pyPx(2).$;
+  const chipStyles = Css[typeScale].tl.bgGray300.gray900.br16.pxPx(10).pyPx(2).$;
 
   const selectChildren = useMemo(
     () =>
       options.map((o) => (
         <Item key={valueToKey(getOptionValue(o))} textValue={getOptionLabel(o)}>
-          <span css={chipStyles}>{getOptionLabel(o)}</span>
+          <span css={{ ...Css.lineClamp1.$, ...chipStyles }} title={getOptionLabel(o)}>
+            {getOptionLabel(o)}
+          </span>
         </Item>
       )),
     [options],
@@ -133,7 +135,7 @@ export function ChipSelectField<O, V extends Value>(
       <div
         css={{
           ...chipStyles,
-          ...Css.dif.p0.mwPx(32).if(!value).bgGray200.$,
+          ...Css.dif.relative.p0.mwPx(32).if(!value).bgGray200.$,
           ...(isFocused ? Css.bshFocus.$ : {}),
         }}
       >
@@ -142,12 +144,15 @@ export function ChipSelectField<O, V extends Value>(
           {...mergeProps(focusProps, buttonProps)}
           ref={buttonRef}
           css={{
-            ...Css.br16.pxPx(10).pyPx(2).outline0.if(showClearButton).prPx(4).borderRadius("16px 0 0 16px").$,
+            ...Css.tl.br16.pxPx(10).pyPx(2).outline0.if(showClearButton).prPx(4).borderRadius("16px 0 0 16px").$,
             "&:hover": Css.bgGray400.if(!value).bgGray300.$,
           }}
+          title={state.selectedItem ? state.selectedItem.textValue : placeholder}
           {...tid}
         >
-          <span {...valueProps}>{state.selectedItem ? state.selectedItem.textValue : placeholder}</span>
+          <span {...valueProps} css={Css.lineClamp1.$}>
+            {state.selectedItem ? state.selectedItem.textValue : placeholder}
+          </span>
         </button>
         {showClearButton && (
           // Apply a tabIndex=-1 to remove need for addresses this focus behavior separately from the rest of the button.
