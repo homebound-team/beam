@@ -1,8 +1,8 @@
 import { render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Only } from "src/Css";
-import { TextField, TextFieldProps } from "src/inputs";
+import { TextField, TextFieldApi, TextFieldProps } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
 import { click } from "src/utils/rtl";
 
@@ -68,20 +68,39 @@ describe("TextFieldTest", () => {
     // And the focus should return to the input element
     expect(r.name()).toHaveFocus();
   });
+
+  it("can use TextFielApi to focus input", async () => {
+    const onFocus = jest.fn();
+    // Given a textfield
+    const r = await render(<TestTextField value="foo" onFocus={onFocus} />);
+    // With the field not in focus
+    expect(r.name()).not.toHaveFocus();
+    // When clicking a button to use the TextFieldApi.focus method
+    click(r.setFocus);
+    // Then expect field to now be in focus
+    expect(r.name()).toHaveFocus();
+    // And onFocus callback to be called
+    expect(onFocus).toHaveBeenCalledTimes(1);
+  });
 });
 
 function TestTextField<X extends Only<TextFieldXss, X>>(props: Omit<TextFieldProps<X>, "onChange" | "label">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
+  const textFieldApi = useRef<TextFieldApi | undefined>();
   return (
-    <TextField
-      label="Name"
-      value={internalValue}
-      onChange={(v) => {
-        lastSet = v;
-        setValue(v);
-      }}
-      {...otherProps}
-    />
+    <>
+      <TextField
+        label="Name"
+        value={internalValue}
+        onChange={(v) => {
+          lastSet = v;
+          setValue(v);
+        }}
+        api={textFieldApi}
+        {...otherProps}
+      />
+      <button onClick={() => textFieldApi.current && textFieldApi.current.focus()} data-testid="setFocus" />
+    </>
   );
 }
