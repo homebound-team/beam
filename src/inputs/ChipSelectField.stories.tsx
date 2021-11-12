@@ -18,10 +18,11 @@ export function Example() {
     { id: "ts:1", code: TaskStatus.NotStarted, name: "Not Started" },
     { id: "ts:2", code: TaskStatus.InProgress, name: "In Progress" },
     { id: "ts:3", code: TaskStatus.Complete, name: "Complete" },
-    { id: "ts:5", code: TaskStatus.OnHold, name: "On Hold" },
+    { id: "ts:5", code: TaskStatus.OnHold, name: "On Hold ".repeat(10) },
     { id: "ts:6", code: TaskStatus.Delayed, name: "Delayed" },
   ]);
   const [value, setValue] = useState<string>(taskStatuses[0].id);
+  const [value2, setValue2] = useState<string>(taskStatuses[3].id);
 
   return (
     <div>
@@ -47,6 +48,19 @@ export function Example() {
           placeholder="+ Task Status"
         />
       </div>
+      <div css={Css.wPx(250).$}>
+        <h1>Truncation demo</h1>
+        <ChipSelectField
+          label="Test"
+          onSelect={(v) => setValue2(v)}
+          options={taskStatuses}
+          value={value2}
+          clearable
+          onFocus={action("onFocus")}
+          onBlur={action("onBlur")}
+          placeholder="+ Task Status"
+        />
+      </div>
 
       <h1 css={Css.mt4.$}>Chip SelectField With Presentation typeScale of "xs"</h1>
       <PresentationProvider fieldProps={{ typeScale: "xs" }}>
@@ -65,6 +79,19 @@ export function Example() {
             onSelect={(v) => setValue(v)}
             options={taskStatuses}
             value={value}
+            clearable
+            onFocus={action("onFocus")}
+            onBlur={action("onBlur")}
+            placeholder="+ Task Status"
+          />
+        </div>
+        <div css={Css.wPx(250).$}>
+          <h1>Truncation demo</h1>
+          <ChipSelectField
+            label="Test"
+            onSelect={(v) => setValue2(v)}
+            options={taskStatuses}
+            value={value2}
             clearable
             onFocus={action("onFocus")}
             onBlur={action("onBlur")}
