@@ -101,6 +101,12 @@ export function NumberField(props: NumberFieldProps) {
     onBlur: () => {
       valueRef.current = { wip: false };
     },
+    onKeyDown: (e) => {
+      if (e.key === "Enter") {
+        // Blur the field when the user hits the enter key - as if they are "committing" the value and done with the field
+        inputRef.current?.blur();
+      }
+    },
     validationState: errorMsg !== undefined ? "invalid" : "valid",
     label: label,
     isDisabled: disabled,

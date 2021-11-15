@@ -34,7 +34,18 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     value,
   };
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const { labelProps, inputProps } = useTextField(textFieldProps, inputRef);
+  const { labelProps, inputProps } = useTextField(
+    {
+      ...textFieldProps,
+      onKeyDown: (e) => {
+        if (e.key === "Enter") {
+          // Blur the field when the user hits the enter key - as if they are "committing" the value and done with the field
+          inputRef.current?.blur();
+        }
+      },
+    },
+    inputRef,
+  );
 
   // Construct our TextFieldApi to give access to some imperative methods
   if (api) {

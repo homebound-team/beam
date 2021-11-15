@@ -36,7 +36,10 @@ describe("ChipSelectField", () => {
   it("is clearable", async () => {
     // Given a ChipSelectField that is clearable
     const onSelect = jest.fn();
-    const r = await render(<TestComponent label="Label" value="s:2" options={sports} clearable onSelect={onSelect} />);
+    const onBlur = jest.fn();
+    const r = await render(
+      <TestComponent label="Label" value="s:2" options={sports} clearable onSelect={onSelect} onBlur={onBlur} />,
+    );
     // With an existing value
     expect(r.chipSelectField()).toHaveTextContent("Soccer");
     // When clicking the clear button
@@ -47,6 +50,8 @@ describe("ChipSelectField", () => {
     expect(r.queryByTestId("chipSelectField_clearButton")).toBeFalsy();
     // And onSelect to be called
     expect(onSelect).toBeCalledWith([undefined, undefined]);
+    // And the `onBlur` callback is triggered
+    expect(onBlur).toBeCalledTimes(1);
   });
 
   it("can select options", async () => {
@@ -100,9 +105,7 @@ describe("ChipSelectField", () => {
     click(r.getByRole("option", { name: "Basketball" }));
     // Then the focus is returned to the field
     expect(onFocus).toBeCalledTimes(2);
-    // When firing the onBlur event
-    fireEvent.blur(r.chipSelectField());
-    // Then expect blur is now able to be called
+    // And immediately blurred.
     expect(onBlur).toBeCalledTimes(1);
   });
 

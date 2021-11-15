@@ -142,10 +142,14 @@ export function ChipSelectField<O, V extends Value>(
       if (selectedItem) {
         onSelect(key as V, selectedItem);
       }
+      // Per UX, when a field is selected then we want to call our `onBlur` callback and remove the focus styles. The field _is_ still in focus, but that is only to retain tab position in the DOM.
+      setIsFocused(false);
+      maybeCall(onBlur);
     },
     onOpenChange: (isOpen) => {
       if (!isOpen && buttonRef.current) {
-        // When closing reset the focus to the button element.
+        // When closing reset the focus to the button element. This is to retain "tab position" in the document, allowing hte user to hit "Tab" and move to the next tabbable element.
+        // If the menu closed due to a user selecting an option, then the field will not visually appear focused.
         buttonRef.current.focus();
       }
     },
@@ -232,6 +236,7 @@ export function ChipSelectField<O, V extends Value>(
             }}
             onClick={() => {
               onSelect(undefined as any, undefined as any);
+              maybeCall(onBlur);
               setIsClearFocused(false);
             }}
             aria-label="Remove"

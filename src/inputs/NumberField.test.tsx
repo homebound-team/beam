@@ -120,6 +120,21 @@ describe("NumberFieldTest", () => {
     expect(r.percent()).toHaveValue("+123%");
     expect(r.zeroPercent()).toHaveValue("0%");
   });
+
+  it("can blur on Enter", async () => {
+    const onBlur = jest.fn();
+    // Given a numberfield
+    const r = await render(<TestNumberField label="Age" value={10} onBlur={onBlur} />);
+    // With focus
+    r.age().focus();
+    expect(r.age()).toHaveFocus();
+    // When hitting the Enter key
+    fireEvent.keyDown(r.age(), { key: "Enter" });
+    // Then the field should no longer have focus
+    expect(r.age()).not.toHaveFocus();
+    // And onBlur should be called
+    expect(onBlur).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("parseRawInput function", () => {
