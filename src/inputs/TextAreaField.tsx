@@ -36,6 +36,11 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
 
   useLayoutEffect(() => {
     if (inputRef.current) {
+      // Temp hack until we can figure out a better way to ensure proper measurements when rendered through a portal (i.e. Modals)
+      if (inputRef.current.scrollHeight === 0) {
+        setTimeout(() => onHeightChange(), 0);
+        return;
+      }
       onHeightChange();
     }
   }, [onHeightChange, value, inputRef]);
@@ -72,7 +77,7 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
       inputRef={inputRef}
       readOnly={readOnly}
       inputWrapRef={inputWrapRef}
-      minHeight={preventNewLines ? 0 : undefined}
+      textAreaMinHeight={preventNewLines ? 0 : undefined}
     />
   );
 }

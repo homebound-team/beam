@@ -51,7 +51,7 @@ interface TextFieldBaseProps<X>
   contrast?: boolean;
   clearable?: boolean;
   // TextArea specific
-  minHeight?: number;
+  textAreaMinHeight?: number;
 }
 
 // Used by both TextField and TextArea
@@ -80,7 +80,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     inlineLabel,
     contrast = false,
     borderless = fieldProps?.borderless ?? false,
-    minHeight = 96,
+    textAreaMinHeight = 96,
     clearable = false,
   } = props;
   const typeScale = fieldProps?.typeScale ?? "sm";
@@ -192,7 +192,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             ...(isFocused && !readOnly ? fieldStyles.focus : {}),
             ...(isHovered && !inputProps.disabled && !readOnly && !isFocused ? fieldStyles.hover : {}),
             ...(errorMsg ? fieldStyles.error : {}),
-            ...Css.if(multiline).aifs.px0.mhPx(minHeight).$,
+            ...Css.if(multiline).aifs.px0.mhPx(textAreaMinHeight).$,
           }}
           {...hoverProps}
           ref={inputWrapRef as any}
