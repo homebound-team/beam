@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react";
 import { useEffect } from "react";
 import { Button, ModalBody, ModalFooter, ModalHeader, ModalProps, OpenModal, useModal } from "src/components/index";
 import { Modal } from "src/components/Modal/Modal";
-import { TestModalContent, TestModalFilterTable } from "src/components/Modal/TestModalContent";
+import { TestModalContent, TestModalContentProps, TestModalFilterTable } from "src/components/Modal/TestModalContent";
 import { noop } from "src/utils/index";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 
@@ -24,6 +24,7 @@ export const FilterableStaticHeight = () => (
 );
 export const HeaderWithComponents = () => <ModalExample size="lg" withTag />;
 export const WithDatePicker = () => <ModalExample withDateField />;
+export const WithFieldInHeader = () => <ModalExample withTextArea />;
 
 export const ButtonsInFooter = () => {
   const { openModal } = useModal();
@@ -68,12 +69,7 @@ export const OpenModalKeepOpen = () => {
   );
 };
 
-interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling"> {
-  initNumSentences?: number;
-  showLeftAction?: boolean;
-  withTag?: boolean;
-  withDateField?: boolean;
-}
+interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling">, TestModalContentProps {}
 
 function ModalExample(props: ModalExampleProps) {
   const { size, showLeftAction, initNumSentences = 1, forceScrolling, withTag, withDateField } = props;
@@ -82,14 +78,7 @@ function ModalExample(props: ModalExampleProps) {
     openModal({
       size,
       forceScrolling,
-      content: (
-        <TestModalContent
-          initNumSentences={initNumSentences}
-          showLeftAction={showLeftAction}
-          withTag={withTag}
-          withDateField={withDateField}
-        />
-      ),
+      content: <TestModalContent {...props} />,
     });
   // Immediately open the modal for Chromatic snapshots
   useEffect(open, [openModal]);
