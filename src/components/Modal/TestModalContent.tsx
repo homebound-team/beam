@@ -27,7 +27,7 @@ export function TestModalContent(props: TestModalContentProps) {
   const [leftActionDisabled, setLeftActionDisabled] = useState(false);
   const [date, setDate] = useState(jan1);
   const [internalValue, setValue] = useState<string | undefined>("");
-  console.log("withTextArea", props.withTextArea);
+
   return (
     <>
       <ModalHeader>
