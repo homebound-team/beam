@@ -4,7 +4,7 @@ import { ChipSelectField, ChipSelectFieldProps } from "src";
 import { Value } from "src/inputs/Value";
 import { Optional } from "src/types";
 import { maybeCall } from "src/utils";
-import { click, render } from "src/utils/rtl";
+import { click, render, wait } from "src/utils/rtl";
 
 describe("ChipSelectField", () => {
   it("renders", async () => {
@@ -104,6 +104,58 @@ describe("ChipSelectField", () => {
     fireEvent.blur(r.chipSelectField());
     // Then expect blur is now able to be called
     expect(onBlur).toBeCalledTimes(1);
+  });
+
+  it("can disable field", async () => {
+    const r = await render(<TestComponent label="Label" value="s:2" options={sports} disabled="Disabled reason" />);
+    expect(r.chipSelectField()).toBeDisabled();
+  });
+
+  it("handles onCreateNew flow", async () => {
+    // Given a ChipSelectField with the onCreateNew prop
+    const newOpt = { id: "s:100", name: "New Sport" };
+    const onCreateNew = jest.fn();
+    const r = await render(
+      <TestComponent
+        label="Label"
+        value="s:2"
+        options={sports}
+        onCreateNew={async (str) => {
+          onCreateNew(str);
+          return newOpt;
+        }}
+      />,
+    );
+    // When selecting the "Create new" option
+    click(r.chipSelectField);
+    click(r.getByRole("option", { name: "Create new" }));
+    // Then expect the select field to be removed and input field to show
+    expect(r.chipSelectField_createNewField()).toBeTruthy();
+    expect(r.queryByTestId("chipSelectField")).not.toBeVisible();
+    // And when entering a new value
+    fireEvent.input(r.chipSelectField_createNewField(), { target: { textContent: newOpt.name } });
+    // And hitting the Enter key
+    fireEvent.keyDown(r.chipSelectField_createNewField(), { key: "Enter" });
+    // Wait for the async request to finish
+    await wait();
+    // Then expect the text field to be removed
+    expect(r.queryByTestId("chipSelectField_createNewField")).toBeFalsy();
+    // And onCreateNew to be called with text field value
+    expect(onCreateNew).toBeCalledWith(newOpt.name);
+  });
+
+  it("can escape out of Add New field", async () => {
+    // Given a ChipSelectField with the onCreateNew prop
+    const r = await render(<TestComponent label="Label" value="s:2" options={sports} onCreateNew={async () => ({})} />);
+    // When selecting the "Create new" option
+    click(r.chipSelectField);
+    click(r.getByRole("option", { name: "Create new" }));
+    // And when hitting the Escape key
+    fireEvent.keyDown(r.chipSelectField_createNewField(), { key: "Escape" });
+    // Then expect the text field to be removed
+    expect(r.queryByTestId("chipSelectField_createNewField")).toBeFalsy();
+    // And the previous selected value to still be shown
+    expect(r.chipSelectField()).toHaveTextContent("Soccer");
   });
 });
 

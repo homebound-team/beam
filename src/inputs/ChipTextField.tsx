@@ -1,4 +1,4 @@
-import { KeyboardEvent, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useFocus } from "react-aria";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
@@ -22,11 +22,12 @@ interface ChipTextFieldProps {
   onFocus?: () => void;
   // Callback when the user presses the "Enter" key while focused on the input
   onEnter?: () => void;
+  autoFocus?: boolean;
 }
 
 // A TextField styled to look like a Chip
 export function ChipTextField(props: ChipTextFieldProps) {
-  const { onFocus, onBlur, onEnter, onChange, required, label, value, blurOnEscape = true } = props;
+  const { autoFocus, onFocus, onBlur, onEnter, onChange, required, label, value, blurOnEscape = true } = props;
   const { fieldProps } = usePresentationContext();
   // Use a ref for the value to not cause a re-render when it changes, avoiding cursor position resetting.
   const valueRef = useRef(value);
@@ -52,6 +53,10 @@ export function ChipTextField(props: ChipTextFieldProps) {
 
   const fieldRef = useRef<HTMLSpanElement>(null);
   const typeScale = fieldProps?.typeScale ?? "sm";
+
+  useEffect(() => {
+    autoFocus && fieldRef.current?.focus();
+  }, []);
 
   // React doesn't like contentEditable because it takes the children of the node out of React's scope. This is fine in this case as it is just a text value and we are managing it.
   return (

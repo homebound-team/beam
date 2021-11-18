@@ -1,11 +1,11 @@
 import React, { Key, MutableRefObject, useEffect, useRef, useState } from "react";
-import { DismissButton, useListBox } from "react-aria";
+import { useListBox } from "react-aria";
 import { SelectState } from "react-stately";
 import { Virtuoso } from "react-virtuoso";
 import { VirtuosoHandle } from "react-virtuoso/dist/components";
-import { Option } from "src/components/internal/index";
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
+import { Option } from "src/inputs/internal/Option";
 
 interface ListBoxProps<O, V extends Key> {
   listBoxRef: MutableRefObject<HTMLDivElement | null>;
@@ -84,7 +84,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
           // We don't really need to set this, but it's handy for tests, which would
           // otherwise render just 1 row. A better way to do this would be to jest.mock
           // out Virtuoso with an impl that just rendered everything, but doing this for now.
-          initialItemCount={3}
+          initialItemCount={5}
           itemContent={(idx) => {
             // MapIterator doesn't have at/index lookup so make a copy
             const keys = [...state.collection.getKeys()];
@@ -95,7 +95,6 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
           }}
         />
       </ul>
-      <DismissButton onDismiss={() => state.close()} />
     </div>
   );
 }
