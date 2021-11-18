@@ -33,7 +33,7 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
       onClick={onClick}
       {...tid}
     >
-      <span css={Css.prPx(6).tl.lineClamp1.if(disabled).prPx(4).$} title={text}>
+      <span css={Css.prPx(6).tl.lineClamp1.breakAll.if(disabled).prPx(4).$} title={text}>
         {text}
       </span>
       {!disabled && (
