@@ -4,8 +4,8 @@ import {
   GridDataRow,
   GridStyle,
   Kinded,
+  NestedCard,
   NestedCardsStyle,
-  NestedCardStyle,
   RowTuple,
 } from "src/components/Table/GridTable";
 import { Css } from "src/Css";
@@ -24,7 +24,7 @@ import { Css } from "src/Css";
  */
 export class NestedCards {
   // A stack of the current cards we're showing
-  private readonly openCards: Array<NestedCardStyle> = [];
+  private readonly openCards: Array<NestedCard<any>> = [];
   // A buffer of the open/close/spacer rows we need between each content row.
   private readonly chromeBuffer: JSX.Element[] = [];
   private readonly styles: NestedCardsStyle;
@@ -34,15 +34,18 @@ export class NestedCards {
   }
 
   maybeOpenCard(row: GridDataRow<any>): boolean {
-    const card = this.styles.kinds[row.kind];
+    const openCard: NestedCard<any> = {
+      style: this.styles.kinds[row.kind],
+      row,
+    };
     // If this kind doesn't have a card defined, don't put it on the card stack
-    if (card) {
-      this.openCards.push(card);
+    if (openCard.style) {
+      this.openCards.push(openCard);
       this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, "open"));
     }
     // But always close previous cards if needed
     maybeCreateChromeRow(this.columns, this.filteredRows, this.chromeBuffer);
-    return !!card;
+    return !!openCard.style;
   }
 
   closeCard() {
@@ -50,8 +53,8 @@ export class NestedCards {
     this.openCards.pop();
   }
 
-  addSpacer() {
-    this.chromeBuffer.push(makeSpacer(this.styles.spacerPx, this.openCards));
+  addSpacer(prev: GridDataRow<R> | undefined, next: GridDataRow<R> | undefined) {
+    this.chromeBuffer.push(makeSpacer(this.styles.spacerPx, this.openCards, prev, next));
   }
 
   done() {
@@ -77,7 +80,7 @@ export class NestedCards {
  * I.e. due to the flatness of our DOM, we inherently have to add a "close"
  * row separate from the card's actual content.
  */
-export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" | "close"): JSX.Element {
+export function makeOpenOrCloseCard(openCards: Array<NestedCard<any>>, kind: "open" | "close"): JSX.Element {
   let div: any = <div />;
   const place = kind === "open" ? "Top" : "Bottom";
   const btOrBb = kind === "open" ? "bt" : "bb";
@@ -87,25 +90,26 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
   // | card1 | card2 / ... card3 ... \ card2 | card1 |
   // | card1 | card2 | ... card3 ... | card2 | card1 |
   //
-  [...openCards].reverse().forEach((card, i) => {
+  [...openCards].reverse().forEach(({ style }, i) => {
     const first = i === 0;
     div = (
       <div
         css={{
-          ...Css.bgColor(card.bgColor).pxPx(card.pxPx).$,
+          ...Css.bgColor(style.bgColor).pxPx(style.pxPx).$,
           // Only the 1st div needs border left/right radius + border top/bottom.
           ...(first &&
             Css.add({
-              [`border${place}RightRadius`]: `${card.brPx}px`,
-              [`border${place}LeftRadius`]: `${card.brPx}px`,
-            }).hPx(card.brPx).$),
-          ...(card.bColor && Css.bc(card.bColor).bl.br.if(first)[btOrBb].$),
+              [`border${place}RightRadius`]: `${style.brPx}px`,
+              [`border${place}LeftRadius`]: `${style.brPx}px`,
+            }).hPx(style.brPx).$),
+          ...(style.bColor && Css.bc(style.bColor).bl.br.if(first)[btOrBb].$),
         }}
       >
         {div}
       </div>
     );
   });
+
   return div;
 }
 
@@ -113,15 +117,15 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
  * For the first or last cell of actual content, wrap them in divs that re-create the
  * outer cards' padding + background.
  */
-export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first" | "final", styles?: {}): any {
+export function maybeAddCardPadding(openCards: Array<NestedCard<any>>, column: "first" | "final", styles?: {}): any {
   let div: any = undefined;
-  [...openCards].reverse().forEach((card) => {
+  [...openCards].reverse().forEach(({ style }) => {
     div = (
       <div
         css={{
-          ...Css.h100.bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).$,
-          ...(column === "first" && Css.plPx(card.pxPx).if(!!card.bColor).bl.$),
-          ...(column === "final" && Css.prPx(card.pxPx).if(!!card.bColor).br.$),
+          ...Css.h100.bgColor(style.bgColor).if(!!style.bColor).bc(style.bColor).$,
+          ...(column === "first" && Css.plPx(style.pxPx).if(!!style.bColor).bl.$),
+          ...(column === "final" && Css.prPx(style.pxPx).if(!!style.bColor).br.$),
         }}
       >
         {div}
@@ -142,12 +146,74 @@ export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first
  * Our height is not based on `openCards`, b/c for the top-most level, we won't
  * have any open cards, but still want a space between top-level cards.
  */
-export function makeSpacer(height: number, openCards: NestedCardStyle[]) {
-  let div = <div css={Css.hPx(height).$} />;
+export function makeSpacer(
+  height: number,
+  openCards: Array<NestedCard<any>>,
+  prev: GridDataRow<any> | undefined,
+  next: GridDataRow<any> | undefined,
+) {
+  const noOpenCards = openCards.length == 0;
+  const parentId = noOpenCards ? "root" : openCards[openCards.length - 1].row.id;
+
+  let div = (
+    <div
+      css={Css.hPx(height).$}
+      data-parent-id={parentId}
+      {...{
+        onDragOver: (e) => e.preventDefault(),
+        onDrop: (e) => {
+          // The row data being dropped
+          // TODO: TS types?
+          const row = JSON.parse(e.dataTransfer.getData("row"));
+
+          console.log(`
+            DroppedId: ${row.id}\n
+            ParentId: ${e.currentTarget.dataset.parentId}\n
+            AboveRowId: ${prev?.id}
+            BelowRowId: ${next?.id}
+          `);
+          console.log(row);
+        },
+      }}
+      {...(noOpenCards && {
+        onDragEnter: (e) => {
+          e.currentTarget.style.backgroundColor = "red";
+        },
+        onDragLeave: (e) => {
+          // Restore previous styles
+          // Before changing the background, save the current styles
+          // @ts-ignore
+          // TODO: Restore the orig styles
+        },
+      })}
+    />
+  );
+
   // Start at the current/inside card, and wrap outward padding + borders.
   // | card1 | card2 | ... card3 ... | card2 | card1 |
-  [...openCards].reverse().forEach((card) => {
-    div = <div css={Css.bgColor(card.bgColor).pxPx(card.pxPx).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>;
+  [...openCards].reverse().forEach(({ row, style }, i, arr) => {
+    // Flag for top level div
+    const isShallowestDiv = i === 0;
+
+    div = (
+      <div
+        {...(isShallowestDiv && {
+          onDragEnter: (e) => {
+            e.currentTarget.style.backgroundColor = "red";
+          },
+          onDragLeave: (e) => {
+            // Restore previous styles
+            // Before changing the background, save the current styles
+            // @ts-ignore
+            // TODO: Restore the orig styles
+          },
+        })}
+        data-parentid={isShallowestDiv ? arr[0].row.id : undefined}
+        css={Css.bgColor(style.bgColor).pxPx(style.pxPx).if(!!style.bColor).bc(style.bColor).bl.br.$}
+      >
+        {div}
+      </div>
+    );
   });
   return div;
 }
@@ -173,7 +239,9 @@ export function maybeCreateChromeRow(
     filteredRows.push([
       undefined,
       // We add 2 to account for our dedicated open/close columns
-      <div css={Css.gc(`span ${columns.length + 2}`).$} data-chrome="true">
+      // TODO: Here is where we will place the onDrop and onDragOver, onDragExit.
+      // TODO: Maybe in here we can pass some metadate that we can pass on to the caller
+      <div css={Css.gc(`span ${columns.length + 2}`).gtc("auto").important.$} data-chrome="true">
         {chromeBuffer.map((c, i) => (
           <Fragment key={i}>{c}</Fragment>
         ))}

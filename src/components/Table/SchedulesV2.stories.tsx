@@ -251,34 +251,48 @@ SchedulesV2.storyName = "SchedulesV2";
  */
 export function Draggable1() {
   const columns = ["Task", "Start", "End", "Duration", "Milestone"];
-  const rows = zeroTo(5).map((i) => columns.map((c) => `${c}#${i}`));
+  const rows = zeroTo(5).map((i) => columns.map((c) => `${c} #${i}`));
+
+  const Spacer = () => (
+    <div
+      css={Css.hPx(10).$}
+      onDragOver={(e) => (e.currentTarget.style.backgroundColor = "red")}
+      onDragLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
+    ></div>
+  );
 
   return (
-    // Grid Container
-    <div css={Css.dg.gtc(`repeat(${columns.length}, 1fr)`).$}>
-      {/* Grid Items - Headers */}
-      {columns.map((column) => (
-        <div key={column.toString()} css={Css.bgGray100.bb.mb1.$}>
-          {column}
-        </div>
-      ))}
-      {/* Grid Items - Rows */}
+    // Table
+    <div css={Css.w100.$}>
+      {/* Header */}
+      <div css={Css.bgGray100.bb.p1.df.$}>
+        {columns.map((column) => (
+          <div key={column.toString()} css={Css.w(`${100 / columns.length}%`).$}>
+            {column}
+          </div>
+        ))}
+      </div>
+
+      {/* Header + Row Spacer */}
+      <Spacer />
+
+      {/* Rows */}
       {rows.map((row) => (
-        <div
-          key={row.toString()}
-          style={{
-            cursor: "grab",
-            paddingTop: "10px",
-            // This allows us to wrap all of the children for a single row
-            display: "contents",
-          }}
-          draggable
-        >
-          {row.map((cell) => (
-            <div key={cell.toString()}>{cell}</div>
-          ))}
-        </div>
+        <>
+          <div key={row.toString()} css={Css.ba.cursorPointer.df.$} draggable>
+            {row.map((cell) => (
+              <div key={cell.toString()} css={Css.w(`${100 / columns.length}%`).$}>
+                {cell}
+              </div>
+            ))}
+          </div>
+          {/* Bottom Spacer */}
+          <Spacer />
+        </>
       ))}
+
+      {/* Grid Items - Headers */}
+      {/* Grid Items - Rows */}
     </div>
   );
 }

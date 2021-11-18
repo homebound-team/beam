@@ -39,6 +39,11 @@ export function setRunningInJest() {
   runningInJest = true;
 }
 
+export type NestedCard<T extends Kinded> = {
+  style: NestedCardStyle;
+  row: GridDataRow<T>;
+};
+
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
 export interface GridStyle {
   /** Applied to the base div element. */
@@ -120,7 +125,7 @@ export function setGridTableDefaults(opts: Partial<GridTableDefaults>): void {
   defaults = { ...defaults, ...opts };
 }
 
-type RenderAs = "div" | "table" | "virtual";
+type RenderAs = "div" | "table" | "virtual" | "virtualFixed";
 
 /** The GridDataRow is optional b/c the nested card chrome rows only have ReactElements. */
 export type RowTuple<R extends Kinded> = [GridDataRow<R> | undefined, ReactElement];
@@ -261,6 +266,52 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
 
+    // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
+    const headerRows: RowTuple<R>[] = [];
+    const filteredRows: RowTuple<R>[] = [];
+
+    // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
+    const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style);
+
+    // Depth-first to filter
+    function visit(row: GridDataRow<R>, prev: GridDataRow<R> | undefined, next: GridDataRow<R> | undefined): void {
+      const matches =
+        filters.length === 0 ||
+        row.pin ||
+        filters.every((filter) =>
+          columns.map((c) => applyRowFn(c, row)).some((maybeContent) => matchesFilter(maybeContent, filter)),
+        );
+      // Even if we don't pass the filter, one of our children might, so we continue on after this check
+      let isCard = false;
+      if (matches) {
+        isCard = nestedCards && nestedCards.maybeOpenCard(row);
+        filteredRows.push([row, makeRowComponent(row)]);
+      }
+
+      const isCollapsed = collapsedIds.includes(row.id);
+      if (!isCollapsed && !!row.children?.length) {
+        nestedCards && matches && nestedCards.addSpacer(prev, next);
+        visitRows(row.children, isCard);
+      }
+
+      isCard && nestedCards && nestedCards.closeCard();
+    }
+
+    function visitRows(rows: GridDataRow<R>[], addSpacer: boolean): void {
+      const length = rows.length;
+      rows.forEach((row, i) => {
+        if (row.kind === "header") {
+          nestedCards && nestedCards.maybeOpenCard(row);
+          headerRows.push([row, makeRowComponent(row)]);
+          nestedCards && nestedCards.closeCard();
+          return;
+        }
+
+        visit(row, rows[i - 1], rows[i + 1]);
+        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
+      });
+    }
+
     function makeRowComponent(row: GridDataRow<R>): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
@@ -291,51 +342,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           }}
         />
       );
-    }
-
-    // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
-    const headerRows: RowTuple<R>[] = [];
-    const filteredRows: RowTuple<R>[] = [];
-
-    // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
-    const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style);
-
-    // Depth-first to filter
-    function visit(row: GridDataRow<R>): void {
-      const matches =
-        filters.length === 0 ||
-        row.pin ||
-        filters.every((filter) =>
-          columns.map((c) => applyRowFn(c, row)).some((maybeContent) => matchesFilter(maybeContent, filter)),
-        );
-      // Even if we don't pass the filter, one of our children might, so we continue on after this check
-      let isCard = false;
-      if (matches) {
-        isCard = nestedCards && nestedCards.maybeOpenCard(row);
-        filteredRows.push([row, makeRowComponent(row)]);
-      }
-
-      const isCollapsed = collapsedIds.includes(row.id);
-      if (!isCollapsed && !!row.children?.length) {
-        nestedCards && matches && nestedCards.addSpacer();
-        visitRows(row.children, isCard);
-      }
-
-      isCard && nestedCards && nestedCards.closeCard();
-    }
-
-    function visitRows(rows: GridDataRow<R>[], addSpacer: boolean): void {
-      const length = rows.length;
-      rows.forEach((row, i) => {
-        if (row.kind === "header") {
-          nestedCards && nestedCards.maybeOpenCard(row);
-          headerRows.push([row, makeRowComponent(row)]);
-          nestedCards && nestedCards.closeCard();
-          return;
-        }
-        visit(row);
-        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
-      });
     }
 
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
@@ -409,6 +415,7 @@ const renders: Record<RenderAs, typeof renderTable> = {
   table: renderTable,
   div: renderCssGrid,
   virtual: renderVirtual,
+  virtualFixed: renderVirtualFixed,
 };
 
 /** Renders as a CSS Grid, which is the default / most well-supported rendered. */
@@ -559,6 +566,52 @@ function renderVirtual<R extends Kinded>(
 }
 
 /**
+ * renderVirtual without the `display: contents`
+ */
+function renderVirtualFixed<R extends Kinded>(
+  style: GridStyle,
+  id: string,
+  columns: GridColumn<R>[],
+  headerRows: RowTuple<R>[],
+  filteredRows: RowTuple<R>[],
+  firstRowMessage: string | undefined,
+  stickyHeader: boolean,
+  firstLastColumnWidth: number | undefined,
+  xss: any,
+  virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+): ReactElement {
+  return (
+    <Virtuoso
+      ref={virtuosoRef}
+      components={{ List: VirtualRootFixed(style, columns, id, firstLastColumnWidth, xss) }}
+      // Pin/sticky both the header row(s) + firstRowMessage to the top
+      topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
+      itemContent={(index) => {
+        // We keep header and filter rows separate, but react-virtuoso is a flat list,
+        // so we pick the right header / first row message / actual row.
+        let i = index;
+        if (i < headerRows.length) {
+          return headerRows[i][1];
+        }
+        i -= headerRows.length;
+        if (firstRowMessage) {
+          if (i === 0) {
+            return (
+              <div css={Css.add("gridColumn", `${columns.length} span`).$}>
+                <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
+              </div>
+            );
+          }
+          i -= 1;
+        }
+        return filteredRows[i][1];
+      }}
+      totalCount={(headerRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)}
+    />
+  );
+}
+
+/**
  * Customizes the `List` element that react-virtuoso renders, to have our css grid logic.
  *
  * We wrap this in memoizeOne so that React.createElement sees a consistent/stable component
@@ -586,6 +639,39 @@ const VirtualRoot = memoizeOne<
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
           // Add `display:contents` to Item to flatten it like we do GridRow
           ...Css.addIn("& > div", Css.display("contents").$).$,
+          ...gs.rootCss,
+          ...xss,
+        }}
+        data-testid={id}
+      >
+        {children}
+      </div>
+    );
+  });
+});
+
+/**
+ * VirtualRoot without `display: contents`
+ */
+const VirtualRootFixed = memoizeOne<
+  (
+    gs: GridStyle,
+    columns: GridColumn<any>[],
+    id: string,
+    firstLastColumnWidth: number | undefined,
+    xss: any,
+  ) => Components["List"]
+>((gs, columns, id, firstLastColumnWidth, xss) => {
+  return React.forwardRef(({ style, children }, ref) => {
+    // This re-renders each time we have new children in the view port
+    return (
+      <div
+        ref={ref}
+        style={style}
+        css={{
+          ...Css.addIn("& > div > div", Css.dg.gtc(calcVirtualGridColumns(columns, firstLastColumnWidth)).$).$,
+          // Add an extra `> div` due to Item + itemContent both having divs
+          ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
           ...gs.rootCss,
           ...xss,
         }}
@@ -845,7 +931,7 @@ interface GridRowProps<R extends Kinded, S> {
   setSortKey?: (value: S) => void;
   isCollapsed: boolean;
   toggleCollapsedId: (id: string) => void;
-  openCards: NestedCardStyle[] | undefined;
+  openCards: Array<NestedCard<any>> | undefined;
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -878,7 +964,6 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     // root-element > row-element > cell-elements, so that we can have a hook for
     // hovers and styling. In theory this would change with subgrids.
     // Only enable when using div as elements
-    ...(as === "table" ? {} : Css.display("contents").$),
     ...((rowStyle?.rowLink || rowStyle?.onClick) &&
       style.rowHoverColor && {
         // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
@@ -892,8 +977,31 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const currentCard = openCards && openCards.length > 0 && openCards[openCards.length - 1];
   let currentColspan = 1;
   const maybeStickyHeaderStyles = isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined;
+
+  // TODO: Setup types
+  // const draggableProps: {
+  //   draggable: boolean,
+  //   onDragStart: DragEventHandler<HTMLElement>m
+  // } = {
+  //   draggable: true,
+  //   onDragStart: (e) => ({
+  //     e.dataTransfer.effectAllowed = "move";
+  //     e.dataTransfer.setData("row", JSON.stringify(row));
+  //   }),
+  // }
+
   const div = (
-    <Row css={rowCss} {...others}>
+    // TODO: Here we will add onDrag into the drag object
+    <Row
+      css={rowCss}
+      {...others}
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("row", JSON.stringify(row));
+      }}
+    >
+      {/* Send in the rows that are openned */}
       {openCards && maybeAddCardPadding(openCards, "first", maybeStickyHeaderStyles)}
       {columns.map((column, columnIndex) => {
         // Decrement colspan count and skip if greater than 1.
@@ -934,7 +1042,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...(isHeader && style.headerCellCss),
           ...maybeStickyHeaderStyles,
           // If we're within a card, use its background color
-          ...(currentCard && Css.bgColor(currentCard.bgColor).$),
+          ...(currentCard && Css.bgColor(currentCard.style.bgColor).$),
           // Add in colspan css if needed
           ...(currentColspan > 1 ? Css.gc(`span ${currentColspan}`).$ : {}),
           // And finally the specific cell's css (if any from GridCellContent)

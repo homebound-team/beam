@@ -258,6 +258,58 @@ export function NestedCardsThreeLevels() {
   );
 }
 
+export function NestedCardsThreeLevelsDraggable() {
+  const nameColumn: GridColumn<NestedRow> = {
+    header: () => "Name",
+    parent: (row) => ({
+      content: <div css={Css.base.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    child: (row) => ({
+      content: <div css={Css.sm.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    grandChild: (row) => ({
+      content: <div css={Css.xs.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    add: () => "Add",
+  };
+  const actionColumn: GridColumn<NestedRow> = {
+    header: () => "Action",
+    parent: () => "",
+    child: () => "",
+    grandChild: () => <div css={Css.xs.$}>Delete</div>,
+    add: () => "",
+    clientSideSort: false,
+  };
+  const spacing = { brPx: 4, pxPx: 4 };
+  const nestedStyle: GridStyle = {
+    nestedCards: {
+      firstLastColumnWidth: 24,
+      spacerPx: 8,
+      kinds: {
+        parent: { bgColor: Palette.Gray500, ...spacing },
+        child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
+        grandChild: { bgColor: Palette.Green200, bColor: Palette.Green400, ...spacing },
+        // Purposefully leave out the `add` kind
+      },
+    },
+  };
+
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <GridTable
+        as="virtualFixed"
+        columns={[nameColumn, nameColumn, actionColumn]}
+        {...{ rows }}
+        style={nestedStyle}
+        sorting={{ on: "client", initial: [0, "ASC"] }}
+      />
+    </div>
+  );
+}
+
 export function NestedCardsTwoLevels() {
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
