@@ -87,7 +87,7 @@ export function Modal(props: ModalProps) {
         <FocusScope contain restoreFocus autoFocus>
           <div
             css={
-              Css.br24.bgWhite.bshModal
+              Css.br24.bgWhite.bshModal.overflowHidden
                 .maxh("90vh")
                 .df.fdc.wPx(width)
                 .mh(px(defaultMinHeight))
