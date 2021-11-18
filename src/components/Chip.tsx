@@ -20,7 +20,7 @@ export function Chip<X extends Only<Xss<Margin>, X>>(props: ChipProps<X>) {
       {...tid}
       title={text}
     >
-      <span css={Css.lineClamp1.$}>{text}</span>
+      <span css={Css.lineClamp1.breakAll.$}>{text}</span>
     </span>
   );
 }

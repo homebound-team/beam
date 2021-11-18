@@ -113,7 +113,7 @@ export function ChipSelectField<O, V extends Value>(
         {isPersistent ? (
           label
         ) : (
-          <span css={{ ...Css.lineClamp1.$, ...chipStyles }} title={label}>
+          <span css={{ ...Css.lineClamp1.breakAll.$, ...chipStyles }} title={label}>
             {label}
           </span>
         )}
@@ -216,7 +216,7 @@ export function ChipSelectField<O, V extends Value>(
           title={state.selectedItem ? state.selectedItem.textValue : placeholder}
           {...tid}
         >
-          <span {...valueProps} css={Css.lineClamp1.$}>
+          <span {...valueProps} css={Css.lineClamp1.breakAll.$}>
             {state.selectedItem ? state.selectedItem.textValue : placeholder}
           </span>
         </button>
