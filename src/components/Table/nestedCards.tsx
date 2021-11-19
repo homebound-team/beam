@@ -53,8 +53,8 @@ export class NestedCards {
     this.openCards.pop();
   }
 
-  addSpacer(prev: GridDataRow<R> | undefined, next: GridDataRow<R> | undefined) {
-    this.chromeBuffer.push(makeSpacer(this.styles.spacerPx, this.openCards, prev, next));
+  addSpacer(below: GridDataRow<any> | undefined, above: GridDataRow<any> | undefined) {
+    this.chromeBuffer.push(makeSpacer(this.styles.spacerPx, this.openCards, below, above));
   }
 
   done() {
@@ -149,8 +149,8 @@ export function maybeAddCardPadding(openCards: Array<NestedCard<any>>, column: "
 export function makeSpacer(
   height: number,
   openCards: Array<NestedCard<any>>,
-  prev: GridDataRow<any> | undefined,
-  next: GridDataRow<any> | undefined,
+  below: GridDataRow<any> | undefined,
+  above: GridDataRow<any> | undefined,
 ) {
   const noOpenCards = openCards.length == 0;
   const parentId = noOpenCards ? "root" : openCards[openCards.length - 1].row.id;
@@ -160,6 +160,13 @@ export function makeSpacer(
       css={Css.hPx(height).$}
       data-parent-id={parentId}
       {...{
+        onClick: (e) => {
+          console.log(`
+            ParentId: ${e.currentTarget.dataset.parentId}\n
+            Dropped AboveRowId: ${above?.id}
+            Dropped BelowRowId: ${below?.id}
+          `);
+        },
         onDragOver: (e) => e.preventDefault(),
         onDrop: (e) => {
           // The row data being dropped
@@ -169,13 +176,20 @@ export function makeSpacer(
           console.log(`
             DroppedId: ${row.id}\n
             ParentId: ${e.currentTarget.dataset.parentId}\n
-            AboveRowId: ${prev?.id}
-            BelowRowId: ${next?.id}
+            AboveRowId: ${below?.id}
+            BelowRowId: ${above?.id}
           `);
           console.log(row);
         },
       }}
       {...(noOpenCards && {
+        onClick: (e) => {
+          console.log(`
+            ParentId: ${e.currentTarget.dataset.parentId}\n
+            Dropped AboveRowId: ${above?.id}
+            Dropped BelowRowId: ${below?.id}
+          `);
+        },
         onDragEnter: (e) => {
           e.currentTarget.style.backgroundColor = "red";
         },

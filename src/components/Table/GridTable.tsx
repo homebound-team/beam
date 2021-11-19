@@ -274,7 +274,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style);
 
     // Depth-first to filter
-    function visit(row: GridDataRow<R>, prev: GridDataRow<R> | undefined, next: GridDataRow<R> | undefined): void {
+    function visit(row: GridDataRow<R>): void {
       const matches =
         filters.length === 0 ||
         row.pin ||
@@ -290,7 +290,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
       const isCollapsed = collapsedIds.includes(row.id);
       if (!isCollapsed && !!row.children?.length) {
-        nestedCards && matches && nestedCards.addSpacer(prev, next);
+        nestedCards && matches && nestedCards.addSpacer(undefined, row.children[0]);
         visitRows(row.children, isCard);
       }
 
@@ -301,15 +301,17 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
+          addSpacer && nestedCards && nestedCards.addSpacer(undefined, rows[i + 1]);
           nestedCards && nestedCards.maybeOpenCard(row);
           headerRows.push([row, makeRowComponent(row)]);
           nestedCards && nestedCards.closeCard();
           return;
         }
 
-        visit(row, rows[i - 1], rows[i + 1]);
-        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
+        visit(row);
+        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer(rows[i], rows[i + 1]);
       });
+      addSpacer && nestedCards && nestedCards.addSpacer(rows[rows.length - 1], undefined);
     }
 
     function makeRowComponent(row: GridDataRow<R>): JSX.Element {
