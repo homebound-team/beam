@@ -54,7 +54,7 @@ export class NestedCards {
   }
 
   addSpacer(below: GridDataRow<any> | undefined, above: GridDataRow<any> | undefined) {
-    this.chromeBuffer.push(makeSpacer(this.styles.spacerPx, this.openCards, below, above));
+    this.chromeBuffer.push(Spacer(this.styles.spacerPx, this.openCards, below, above));
   }
 
   done() {
@@ -146,14 +146,24 @@ export function maybeAddCardPadding(openCards: Array<NestedCard<any>>, column: "
  * Our height is not based on `openCards`, b/c for the top-most level, we won't
  * have any open cards, but still want a space between top-level cards.
  */
-export function makeSpacer(
+export function Spacer(
   height: number,
   openCards: Array<NestedCard<any>>,
   below: GridDataRow<any> | undefined,
   above: GridDataRow<any> | undefined,
 ) {
-  const noOpenCards = openCards.length == 0;
+  const noOpenCards = openCards.length === 0;
   const parentId = noOpenCards ? "root" : openCards[openCards.length - 1].row.id;
+
+  // TODO: Currently hardcoding these styles. Should pass down the variable
+  const visuallyDraggableProps = {
+    onDragEnter: (e) => {
+      e.currentTarget.classList.add("row-drag-hover");
+    },
+    onDragLeave: (e) => {
+      e.currentTarget.classList.remove("row-drag-hover");
+    },
+  };
 
   let div = (
     <div
@@ -182,24 +192,7 @@ export function makeSpacer(
           console.log(row);
         },
       }}
-      {...(noOpenCards && {
-        onClick: (e) => {
-          console.log(`
-            ParentId: ${e.currentTarget.dataset.parentId}\n
-            Dropped AboveRowId: ${above?.id}
-            Dropped BelowRowId: ${below?.id}
-          `);
-        },
-        onDragEnter: (e) => {
-          e.currentTarget.style.backgroundColor = "red";
-        },
-        onDragLeave: (e) => {
-          // Restore previous styles
-          // Before changing the background, save the current styles
-          // @ts-ignore
-          // TODO: Restore the orig styles
-        },
-      })}
+      {...(noOpenCards && visuallyDraggableProps)}
     />
   );
 
@@ -211,17 +204,7 @@ export function makeSpacer(
 
     div = (
       <div
-        {...(isShallowestDiv && {
-          onDragEnter: (e) => {
-            e.currentTarget.style.backgroundColor = "red";
-          },
-          onDragLeave: (e) => {
-            // Restore previous styles
-            // Before changing the background, save the current styles
-            // @ts-ignore
-            // TODO: Restore the orig styles
-          },
-        })}
+        {...(isShallowestDiv && visuallyDraggableProps)}
         data-parentid={isShallowestDiv ? arr[0].row.id : undefined}
         css={Css.bgColor(style.bgColor).pxPx(style.pxPx).if(!!style.bColor).bc(style.bColor).bl.br.$}
       >

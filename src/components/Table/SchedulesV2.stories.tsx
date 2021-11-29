@@ -203,6 +203,7 @@ export function SchedulesV2() {
     <div css={Css.h("100vh").$}>
       <PresentationProvider fieldProps={{ borderless: true, typeScale: "xs" }}>
         <GridTable<Row>
+          as="virtualFixed"
           rows={rows}
           columns={[
             arrowColumn,
@@ -224,9 +225,6 @@ export function SchedulesV2() {
               cellCss: Css.py1.$,
             },
           }}
-          // FIXME: `firstNonHeaderRowCss` does not work when virtual is enabled
-          // Possible fix is to use an ref/class/id for this row
-          // as="virtual"
           stickyHeader
         />
       </PresentationProvider>
@@ -290,9 +288,6 @@ export function Draggable1() {
           <Spacer />
         </>
       ))}
-
-      {/* Grid Items - Headers */}
-      {/* Grid Items - Rows */}
     </div>
   );
 }

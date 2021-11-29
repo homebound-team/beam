@@ -1,3 +1,4 @@
+import { Global } from "@emotion/react";
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
 import React, {
@@ -311,6 +312,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         visit(row);
         addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer(rows[i], rows[i + 1]);
       });
+
+      // Add spacer after a card
       addSpacer && nestedCards && nestedCards.addSpacer(rows[rows.length - 1], undefined);
     }
 
@@ -396,6 +399,11 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const _as = as === "virtual" && runningInJest ? "div" : as;
   return (
     <PresentationProvider fieldProps={{ hideLabel: true, numberAlignment: "right", compact: true }}>
+      <Global
+        styles={{
+          ".row-drag-hover": Css.bgLightBlue100.important.$,
+        }}
+      />
       {renders[_as](
         style,
         id,
