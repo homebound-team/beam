@@ -59,7 +59,8 @@ export function ChipSelectField<O, V extends Value>(
   const isDisabled = !!disabled;
   const showClearButton = !disabled && clearable && !!value;
   const chipStyles = Css[typeScale].tl.bgGray300.gray900.br16.pxPx(10).pyPx(2).$;
-  const [isFocused, setIsFocused] = useState(false);
+  // Controls showing the focus border styles.
+  const [visualFocus, setVisualFocus] = useState(false);
   const [isClearFocused, setIsClearFocused] = useState(false);
   const { focusProps } = useFocus({
     onFocus: (e) => {
@@ -70,10 +71,16 @@ export function ChipSelectField<O, V extends Value>(
 
       maybeCall(onFocus);
     },
-    // Do not call onBlur if we just opened the menu
-    onBlur: () => !state.isOpen && maybeCall(onBlur),
-    // Do not change focus state if select menu is opened
-    onFocusChange: (isFocused) => !state.isOpen && setIsFocused(isFocused),
+    onBlur: (e) => {
+      // Do not call onBlur if focus moved to within the Popover
+      if (popoverRef.current && popoverRef.current.contains(e.relatedTarget as HTMLElement)) {
+        return;
+      }
+
+      maybeCall(onBlur);
+    },
+    // Do not change visual focus state if select menu is opened
+    onFocusChange: (isFocused) => !state.isOpen && setVisualFocus(isFocused),
   });
   const { focusProps: clearFocusProps } = useFocus({ onFocusChange: setIsClearFocused });
 
@@ -126,13 +133,13 @@ export function ChipSelectField<O, V extends Value>(
     isDisabled,
     items: listData.items,
     children: selectChildren,
+    autoFocus: true,
   };
 
   const state = useSelectState<any>({
     ...selectHookProps,
-    autoFocus: false,
     selectedKey: valueToKey(value),
-    disallowEmptySelection: true,
+    disallowEmptySelection: false,
     onSelectionChange: (key) => {
       if (key === createNewOpt.id) {
         setShowInput(true);
@@ -142,11 +149,19 @@ export function ChipSelectField<O, V extends Value>(
       if (selectedItem) {
         onSelect(key as V, selectedItem);
       }
+      // Per UX, when an option is selected then we want to call our `onBlur` callback and remove the focus styles. The field _is_ still in focus but that is only to retain tab position in the DOM.
+      // We cannot simply call `buttonRef.current.blur()` here because `state.isOpen === true` and we keep the visualFocus shown when the menu is open.
+      setVisualFocus(false);
+      maybeCall(onBlur);
     },
     onOpenChange: (isOpen) => {
-      if (!isOpen && buttonRef.current) {
-        // When closing reset the focus to the button element.
-        buttonRef.current.focus();
+      if (!isOpen) {
+        // When closing, reset the focus to the button element. This is to retain "tab position" in the document, allowing hte user to hit "Tab" and move to the next tabbable element.
+        // If the menu closed due to a user selecting an option, then the field will not visually appear focused.
+        buttonRef.current?.focus();
+      } else {
+        // If opened, set visual focus to true. It is possible to be in a state where the browser focus is on this element, but we are not "visually" focused (see `onSelectionChange`). If the user opens the menu again, we should trigger the visual focus.
+        setVisualFocus(true);
       }
     },
   });
@@ -200,7 +215,7 @@ export function ChipSelectField<O, V extends Value>(
         css={{
           ...chipStyles,
           ...Css.dif.relative.p0.mwPx(32).if(!value).bgGray200.$,
-          ...(isFocused ? Css.bshFocus.$ : {}),
+          ...(visualFocus ? Css.bshFocus.$ : {}),
           ...(showInput ? Css.dn.$ : {}),
         }}
       >
@@ -221,8 +236,6 @@ export function ChipSelectField<O, V extends Value>(
           </span>
         </button>
         {showClearButton && (
-          // Apply a tabIndex=-1 to remove need for addresses this focus behavior separately from the rest of the button.
-          // This will require the user to click on the button if they want to remove it.
           <button
             {...clearFocusProps}
             css={{
@@ -232,6 +245,7 @@ export function ChipSelectField<O, V extends Value>(
             }}
             onClick={() => {
               onSelect(undefined as any, undefined as any);
+              maybeCall(onBlur);
               setIsClearFocused(false);
             }}
             aria-label="Remove"
@@ -257,6 +271,7 @@ export function ChipSelectField<O, V extends Value>(
             getOptionLabel={getOptionLabel}
             getOptionValue={getOptionValue}
             positionProps={overlayProps}
+            positionOffset={8}
           />
         </Popover>
       )}

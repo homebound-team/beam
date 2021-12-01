@@ -103,15 +103,20 @@ describe("DateField", () => {
     expect(onBlur).toBeCalledTimes(1);
   });
 
-  it("can select dates", async () => {
+  it("can select dates and calls onBlur", async () => {
     // Given a DateField with `jan2` as our date
     const onChange = jest.fn();
-    const r = await render(<DateField value={jan2} label="Date" onChange={onChange} />);
+    const onBlur = jest.fn();
+    const r = await render(<DateField value={jan2} label="Date" onChange={onChange} onBlur={onBlur} />);
 
     // When triggering the Date Picker
     fireEvent.focus(r.date());
     // Then the Date Picker should be shown
     expect(r.date_datePicker()).toBeTruthy();
+
+    // Fire the blur event with the date picker as the related target. This should not fire `onBlur`, but will set the proper focus state internally.
+    fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
+    expect(onBlur).toBeCalledTimes(0);
 
     // And when selecting a date - React-Day-Picker uses role="gridcell" for all dates. Choose the first of these, which should be `jan1`
     click(r.queryAllByRole("gridcell")[0]);
@@ -121,6 +126,22 @@ describe("DateField", () => {
     expect(r.date()).toHaveValue("01/01/20");
     expect(onChange).toBeCalledTimes(1);
     expect(new Date(onChange.mock.calls[0][0]).toDateString()).toEqual(jan1.toDateString());
+    // And the date picker closes
+    expect(onBlur).toBeCalledTimes(1);
+  });
+
+  it("fires on blur when pressing Enter key", async () => {
+    // Given a DateField with `jan2` as our date
+    const onBlur = jest.fn();
+    const r = await render(<DateField value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
+    // When changing the input value to an valid date
+    r.date().focus();
+    // And when hitting the Enter key
+    fireEvent.keyDown(r.date(), { key: "Enter" });
+    // Then field should be no longer in focus
+    expect(r.date()).not.toHaveFocus();
+    // And the onBlur callback should be triggered
+    expect(onBlur).toBeCalledTimes(1);
   });
 
   it("resets to previous date if user enters invalid value and does not fire onChange", async () => {

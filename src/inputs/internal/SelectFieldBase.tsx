@@ -120,6 +120,8 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         selectedKeys: [firstKey] as Key[],
         selectedOptions: firstSelectedOption ? [firstSelectedOption] : [],
       });
+      // When a single select menu item changes, then blur the field
+      inputRef.current?.blur();
     }
     selectionChanged && onSelect(([...keys.values()] as Key[]).map(keyToValue) as V[]);
   }

@@ -53,8 +53,10 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
         ? {
             onKeyDown: (e) => {
               // Prevent user from typing the new line character
-              if (e.keyCode === 13) {
+              if (e.key === "Enter") {
                 e.preventDefault();
+                // And then leave the field
+                inputRef.current?.blur();
               }
             },
             onInput: (e) => {

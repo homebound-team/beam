@@ -14,7 +14,8 @@ describe("SelectFieldTest", () => {
 
   it("can set a value", async () => {
     // Given a MultiSelectField
-    const { getByRole, age } = await render(
+    const onBlur = jest.fn();
+    const r = await render(
       <TestSelectField
         label="Age"
         value={"1"}
@@ -22,15 +23,21 @@ describe("SelectFieldTest", () => {
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
         data-testid="age"
+        onBlur={onBlur}
       />,
     );
     // That initially has "One" selected
-    expect(age()).toHaveValue("One");
-    // When we select the 3rd option
-    fireEvent.focus(age());
-    click(getByRole("option", { name: "Three" }));
+    expect(r.age()).toHaveValue("One");
+    // When we focus the field to open the menu
+    r.age().focus();
+    expect(r.age()).toHaveFocus();
+    // And we select the 3rd option
+    click(r.getByRole("option", { name: "Three" }));
     // Then onSelect was called
     expect(onSelect).toHaveBeenCalledWith("3");
+    // And the field is no longer in focus
+    expect(r.age()).not.toHaveFocus();
+    expect(onBlur).toHaveBeenCalledTimes(1);
   });
 
   it("does not fire focus/blur when readOnly", async () => {
