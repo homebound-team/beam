@@ -96,8 +96,8 @@ describe("ChipSelectField", () => {
     click(r.chipSelectField);
     // And onFocus should have been called
     expect(onFocus).toBeCalledTimes(1);
-    // And when firing the blur event while the menu is opened,
-    fireEvent.blur(r.chipSelectField());
+    // And when firing the blur event with a related target being an element within the menu
+    fireEvent.blur(r.chipSelectField(), { relatedTarget: r.getByRole("option", { name: "Basketball" }) });
     // Then the onBlur event should not be called
     expect(onBlur).toBeCalledTimes(0);
 
