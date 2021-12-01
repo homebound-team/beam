@@ -119,15 +119,7 @@ describe("ChipSelectField", () => {
     const newOpt = { id: "s:100", name: "New Sport" };
     const onCreateNew = jest.fn();
     const r = await render(
-      <TestComponent
-        label="Label"
-        value="s:2"
-        options={sports}
-        onCreateNew={async (str) => {
-          onCreateNew(str);
-          return newOpt;
-        }}
-      />,
+      <TestComponent label="Label" value="s:2" options={sports} onCreateNew={async (str) => onCreateNew(str)} />,
     );
     // When selecting the "Create new" option
     click(r.chipSelectField);
@@ -149,7 +141,7 @@ describe("ChipSelectField", () => {
 
   it("can escape out of Add New field", async () => {
     // Given a ChipSelectField with the onCreateNew prop
-    const r = await render(<TestComponent label="Label" value="s:2" options={sports} onCreateNew={async () => ({})} />);
+    const r = await render(<TestComponent label="Label" value="s:2" options={sports} onCreateNew={async () => {}} />);
     // When selecting the "Create new" option
     click(r.chipSelectField);
     click(r.getByRole("option", { name: "Create new" }));

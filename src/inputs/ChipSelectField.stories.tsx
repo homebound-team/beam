@@ -121,7 +121,6 @@ export function Example() {
               // Requires user to update their local state.
               setTaskStatuses((prevState) => [...prevState, newOpt]);
               setCreateValue(newOpt.id);
-              return newOpt;
             }}
           />
         </div>
