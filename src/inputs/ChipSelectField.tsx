@@ -27,7 +27,7 @@ export interface ChipSelectFieldProps<O, V extends Value> {
   // Whether to show the "X"/clear button on the Chip
   clearable?: boolean;
   // If set, appends "Create new" option to list. When "Create new" is chosen, then the SelectField is replaced with the ChipTextField for creating a new option.
-  onCreateNew?: (value: string) => Promise<O>;
+  onCreateNew?: (value: string) => Promise<void>;
   // Whether the Button is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
   disabled?: boolean | ReactNode;
 }
@@ -202,8 +202,7 @@ export function ChipSelectField<O, V extends Value>(
           value={inputValue}
           onChange={setInputValue}
           onEnter={async () => {
-            const newOption = await onCreateNew(inputValue);
-            listData.insertBefore(createNewOpt.id, newOption);
+            await onCreateNew(inputValue);
             removeCreateNewField();
           }}
           onBlur={removeCreateNewField}
