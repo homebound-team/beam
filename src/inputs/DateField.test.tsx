@@ -115,8 +115,8 @@ describe("DateField", () => {
     expect(r.date_datePicker()).toBeTruthy();
 
     // Fire the blur event with the date picker as the related target. This should not fire `onBlur`, but will set the proper focus state internally.
-    expect(onBlur).toBeCalledTimes(0);
     fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
+    expect(onBlur).toBeCalledTimes(0);
 
     // And when selecting a date - React-Day-Picker uses role="gridcell" for all dates. Choose the first of these, which should be `jan1`
     click(r.queryAllByRole("gridcell")[0]);
