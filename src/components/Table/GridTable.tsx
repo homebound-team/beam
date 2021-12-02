@@ -633,15 +633,12 @@ export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColu
         throw new Error("as=virtual only supports px, percentage, or fr units");
       }
     },
-    { claimedPercentages: 0, claimedPixels: 0, totalFr: 0 },
+    { claimedPercentages: 0, claimedPixels: firstLastColumnWidth ? firstLastColumnWidth * 2 : 0, totalFr: 0 },
   );
-
-  // Take into account the extra width `firstLastColumnWidth` adds when sizing the full table
-  const totalClaimedPixels = firstLastColumnWidth ? claimedPixels + (firstLastColumnWidth * 2) : claimedPixels;
 
   // This is our "fake but for some reason it lines up better" fr calc
   function fr(myFr: number): string {
-    return `calc((100% - ${claimedPercentages}% - ${totalClaimedPixels}px) * (${myFr} / ${totalFr}))`;
+    return `calc((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
   let sizes = columns.map(({ w }) => {
