@@ -1,5 +1,6 @@
 import { act } from "@testing-library/react";
 import { useEffect } from "react";
+import { BeamContextState, useBeamContext } from "src/components/BeamContext";
 import { ModalProps } from "src/components/Modal/Modal";
 import { useModal, UseModalHook } from "src/components/Modal/useModal";
 import { click, render } from "src/utils/rtl";
@@ -59,7 +60,9 @@ describe("useModal", () => {
   });
 
   it("can close modal when checks pass", async () => {
+    let beamContext: BeamContextState;
     function TestApp(props: ModalProps) {
+      beamContext = useBeamContext();
       const { openModal } = useModal();
       useEffect(() => openModal(props), []);
       return <div>App</div>;
@@ -84,5 +87,8 @@ describe("useModal", () => {
     // And the modal should have closed since the canClose check is true.
     expect(onClose).toBeCalledTimes(1);
     expect(r.queryByTestId("modal")).toBeFalsy();
+
+    // And the BeamContext has been cleared
+    expect(beamContext!.modalCanCloseChecks.current).toEqual([]);
   });
 });
