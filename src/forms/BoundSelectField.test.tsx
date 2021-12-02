@@ -1,5 +1,5 @@
-import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
-import { render } from "@homebound/rtl-utils";
+import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
+import { click, render } from "@homebound/rtl-utils";
 import { BoundSelectField } from "src/forms/BoundSelectField";
 import { AuthorInput } from "src/forms/formStateDomain";
 
@@ -11,21 +11,21 @@ const sports = [
 describe("BoundSelectField", () => {
   it("shows the current value", async () => {
     const author = createObjectState(formConfig, { favoriteSport: "s:1" });
-    const { favoriteSport } = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
-    expect(favoriteSport()).toHaveValue("Football");
+    const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
+    expect(r.favoriteSport()).toHaveValue("Football");
   });
 
   it("shows the error message", async () => {
     const author = createObjectState(formConfig, {});
     author.favoriteSport.touched = true;
-    const { favoriteSport_errorMsg } = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
-    expect(favoriteSport_errorMsg()).toHaveTextContent("Required");
+    const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
+    expect(r.favoriteSport_errorMsg()).toHaveTextContent("Required");
   });
 
   it("shows the label", async () => {
     const author = createObjectState(formConfig, { favoriteSport: "s:1" });
-    const { favoriteSport_label } = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
-    expect(favoriteSport_label()).toHaveTextContent("Favorite Sport");
+    const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
+    expect(r.favoriteSport_label()).toHaveTextContent("Favorite Sport");
   });
 
   it("can bind against boolean fields", async () => {
@@ -44,6 +44,23 @@ describe("BoundSelectField", () => {
       />,
     );
     expect(r.isAvailable()).toHaveValue("");
+  });
+
+  it("has the latest value when onBlur is triggered", async () => {
+    // Given a FormState/ObjectState with an onBlur callback
+    const onBlur = jest.fn();
+    const author: ObjectState<AuthorInput> = createObjectState(
+      formConfig,
+      { favoriteSport: "s:1" },
+      { onBlur: () => onBlur(author.favoriteSport.value) },
+    );
+    const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
+    // When changing the value
+    r.favoriteSport().focus();
+    click(r.getByRole("option", { name: "Soccer" }));
+
+    // Then formState has the latest value when onBlur is called
+    expect(onBlur).toBeCalledWith("s:2");
   });
 });
 
