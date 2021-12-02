@@ -253,6 +253,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     isOpen: state.isOpen,
     onClose: state.close,
     placement: "bottom left",
+    offset: borderless ? 8 : 4,
   });
 
   positionProps.style = {
@@ -311,8 +312,6 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
-            // If the field is set as `borderless`, then the focus state is done with a box-shadow and set further away from the input. If this happens then we want the ListBox to be positioned further away as well.
-            positionOffset={borderless ? 8 : undefined}
           />
         </Popover>
       )}

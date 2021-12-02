@@ -118,12 +118,21 @@ describe("ChipSelectField", () => {
     // Given a ChipSelectField with the onCreateNew prop
     const newOpt = { id: "s:100", name: "New Sport" };
     const onCreateNew = jest.fn();
+    const onBlur = jest.fn();
     const r = await render(
-      <TestComponent label="Label" value="s:2" options={sports} onCreateNew={async (str) => onCreateNew(str)} />,
+      <TestComponent
+        label="Label"
+        value="s:2"
+        options={sports}
+        onCreateNew={async (str) => onCreateNew(str)}
+        onBlur={onBlur}
+      />,
     );
     // When selecting the "Create new" option
     click(r.chipSelectField);
     click(r.getByRole("option", { name: "Create new" }));
+    // Then onBlur should be called initially when the ChipInputField is shown
+    expect(onBlur).toBeCalledTimes(1);
     // Then expect the select field to be removed and input field to show
     expect(r.chipSelectField_createNewField()).toBeTruthy();
     expect(r.queryByTestId("chipSelectField")).not.toBeVisible();
@@ -137,6 +146,8 @@ describe("ChipSelectField", () => {
     expect(r.queryByTestId("chipSelectField_createNewField")).toBeFalsy();
     // And onCreateNew to be called with text field value
     expect(onCreateNew).toBeCalledWith(newOpt.name);
+    // And triggers onBlur again
+    expect(onBlur).toBeCalledTimes(2);
   });
 
   it("can escape out of Add New field", async () => {

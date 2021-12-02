@@ -1,6 +1,7 @@
+import { camelCase } from "change-case";
 import React, { Key, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { mergeProps, useButton, useFocus, useOverlayPosition, useSelect } from "react-aria";
-import { Item, useListData, useSelectState } from "react-stately";
+import { Item, Section, useListData, useSelectState } from "react-stately";
 import { Icon, Tooltip } from "src/components";
 import { Popover } from "src/components/internal";
 import { Label } from "src/components/Label";
@@ -90,40 +91,51 @@ export function ChipSelectField<O, V extends Value>(
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   // Using `ListData` in order to dynamically update the items
-  const listData = useListData({
-    initialItems: [...options, ...(onCreateNew ? [createNewOpt as unknown as O] : [])],
+  const listData = useListData<O | ListBoxSection<O>>({
+    initialItems: !onCreateNew
+      ? options
+      : [
+          { title: "Options", options },
+          { title: "Actions", isPersistent: true, options: [createNewOpt as unknown as O] },
+        ],
     initialSelectedKeys: [valueToKey(value)],
-    getKey: (item) => (isPersistentItem(item) ? item.id : getOptionValue(item)),
+    getKey: (item) => (isListBoxSection(item) ? item.title : getOptionValue(item)),
   });
 
-  // If the options change, blow away existing items and replace with new values.
-  useEffect(() => {
-    // Create a list of all existing keys to be removed.
-    const optionKeys = listData.items.reduce(
-      // Filter out Persistent Items
-      (acc, o) => (isPersistentItem(o) ? acc : acc.concat(getOptionValue(o))),
-      [] as Key[],
-    );
+  useEffect(() => listData.update("Options", { title: "Options", options }), [options]);
 
-    listData.remove(...optionKeys);
+  const selectChildren = listData.items.map((s) => {
+    if (isListBoxSection(s)) {
+      return (
+        <Section key={camelCase(s.title)} title={s.title} items={s.options}>
+          {(item) => {
+            if (isPersistentItem(item)) {
+              return (
+                <Item key={item.id} textValue={item.name}>
+                  {item.name}
+                </Item>
+              );
+            }
 
-    // Using `prepend` to keep Persistent Items (if they exist) at the bottom of the list.
-    listData.prepend(...options);
-  }, [options]);
+            const label = getOptionLabel(item);
+            return (
+              <Item key={getOptionValue(item)} textValue={label}>
+                <span css={{ ...Css.lineClamp1.breakAll.$, ...chipStyles }} title={label}>
+                  {label}
+                </span>
+              </Item>
+            );
+          }}
+        </Section>
+      );
+    }
 
-  const selectChildren = listData.items.map((o) => {
-    const isPersistent = isPersistentItem(o);
-    const value = isPersistent ? o.id : getOptionValue(o);
-    const label = isPersistent ? o.name : getOptionLabel(o);
+    const label = getOptionLabel(s);
     return (
-      <Item key={value} textValue={label}>
-        {isPersistent ? (
-          label
-        ) : (
-          <span css={{ ...Css.lineClamp1.breakAll.$, ...chipStyles }} title={label}>
-            {label}
-          </span>
-        )}
+      <Item key={getOptionValue(s)} textValue={label}>
+        <span css={{ ...Css.lineClamp1.breakAll.$, ...chipStyles }} title={label}>
+          {label}
+        </span>
       </Item>
     );
   });
@@ -175,6 +187,7 @@ export function ChipSelectField<O, V extends Value>(
     isOpen: state.isOpen,
     onClose: state.close,
     placement: "bottom left",
+    offset: 8,
   });
 
   overlayProps.style = {
@@ -190,7 +203,8 @@ export function ChipSelectField<O, V extends Value>(
   const removeCreateNewField = useCallback(() => {
     setShowInput(false);
     setInputValue("Add new");
-    buttonRef.current?.focus();
+    // Trigger onBlur to initiate any auto-saving behavior.
+    maybeCall(onBlur);
   }, [setShowInput, setInputValue]);
 
   const field = (
@@ -270,7 +284,6 @@ export function ChipSelectField<O, V extends Value>(
             getOptionLabel={getOptionLabel}
             getOptionValue={getOptionValue}
             positionProps={overlayProps}
-            positionOffset={8}
           />
         </Popover>
       )}
@@ -300,4 +313,9 @@ export function isPersistentItem<T extends PersistentItem>(opt: any): opt is Per
 
 export function isPersistentKey(key: Key): boolean {
   return typeof key === "string" && key.startsWith(persistentItemPrefix);
+}
+
+type ListBoxSection<O> = { title: string; options: O[]; isPersistent?: boolean };
+export function isListBoxSection<O>(obj: O | ListBoxSection<O>): obj is ListBoxSection<O> {
+  return typeof obj === "object" && "options" in obj;
 }
