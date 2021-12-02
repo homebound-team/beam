@@ -42,7 +42,7 @@ export function useSortState<R extends Kinded, S>(
       const [newKey, newDirection] =
         // If clickedKey === currentKey, then toggle direction
         clickedKey === currentKey
-          ? [currentKey, currentDirection === ASC ? DESC : ASC]
+          ? [currentKey, currentDirection === ASC ? DESC : currentDirection === DESC ? undefined : ASC]
           : // Otherwise, use the new key, and default to ascending
             [clickedKey, ASC];
       setSortState([newKey, newDirection]);
