@@ -14,10 +14,14 @@ export function useModal(): UseModalHook {
   const { modalState, modalCanCloseChecks } = useBeamContext();
   const lastCanClose = useRef<CheckFn | undefined>();
   useEffect(() => {
+    // Capture the lastCanClose from when the `useEffect` runs, so that when our cleanup
+    // lambda is called later, we clean up the as-when-scheduled value, and not the super-latest
+    // value, because then we need up nuking the actually valid current value.
+    const { current } = lastCanClose;
     return () => {
-      modalCanCloseChecks.current = [...modalCanCloseChecks.current.filter((c) => c !== lastCanClose.current)];
+      modalCanCloseChecks.current = [...modalCanCloseChecks.current.filter((c) => c !== current)];
     };
-  });
+  }, [modalCanCloseChecks]);
   return useMemo(
     () => ({
       openModal(props) {
