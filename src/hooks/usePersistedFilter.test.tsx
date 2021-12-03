@@ -1,9 +1,9 @@
 import { withRouter } from "@homebound/rtl-react-router-utils";
-import { render, wait } from "@homebound/rtl-utils";
 import { useMemo } from "react";
 import { booleanFilter, FilterDefs, Filters, singleFilter } from "src/components/Filters";
 import { ProjectFilter, Stage } from "src/components/Filters/testDomain";
 import { usePersistedFilter } from "src/hooks/usePersistedFilter";
+import { render, wait } from "src/utils/rtl";
 
 describe("usePersistedFilter", () => {
   beforeEach(() => sessionStorage.clear());
