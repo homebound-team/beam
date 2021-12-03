@@ -19,7 +19,7 @@ export function useModal(): UseModalHook {
     // value, because then we need up nuking the actually valid current value.
     const { current } = lastCanClose;
     return () => {
-      modalCanCloseChecks.current = [...modalCanCloseChecks.current.filter((c) => c !== current)];
+      modalCanCloseChecks.current = modalCanCloseChecks.current.filter((c) => c !== current);
     };
   }, [modalCanCloseChecks]);
   return useMemo(
