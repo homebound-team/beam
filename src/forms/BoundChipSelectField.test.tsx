@@ -1,8 +1,8 @@
-import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
+import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { fireEvent } from "@testing-library/react";
 import { BoundChipSelectField } from "src";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { click, render } from "src/utils/rtl";
+import { click, render, wait } from "src/utils/rtl";
 
 describe("BoundChipSelectField", () => {
   it("renders", async () => {
@@ -53,6 +53,35 @@ describe("BoundChipSelectField", () => {
 
     // Then expect that testid to be set
     expect(r.customTestId()).toBeTruthy();
+  });
+
+  it("has latest field value when onBlur is called", async () => {
+    // Given a FormState/ObjectState with an onBlur callback
+    const onBlur = jest.fn();
+    const formState: ObjectState<AuthorInput> = createObjectState(
+      formConfig,
+      {},
+      { onBlur: () => onBlur(formState.favoriteSport.value) },
+    );
+    const r = await render(
+      <BoundChipSelectField
+        field={formState.favoriteSport}
+        options={sports}
+        onCreateNew={async () => {
+          // set the new value
+          formState.favoriteSport.set("newId");
+        }}
+      />,
+    );
+    // When creating a new option
+    click(r.favoriteSport);
+    click(r.getByRole("option", { name: "Create new" }));
+    fireEvent.input(r.favoriteSport_createNewField(), { target: { textContent: "New Option" } });
+    // And hitting the Enter key
+    fireEvent.keyDown(r.favoriteSport_createNewField(), { key: "Enter" });
+    await wait();
+    // Then expect onBlur to be called with the newId.
+    expect(onBlur).toBeCalledWith("newId");
   });
 });
 
