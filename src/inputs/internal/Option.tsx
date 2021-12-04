@@ -33,6 +33,7 @@ export function Option<O>(props: OptionProps<O>) {
     ref,
   );
 
+  // Additional onKeyDown logic to ensure the  the virtualized list (in <VirtualizedOptions />) scrolls to keep the "focused" option in view
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!scrollToIndex || !(e.key === "ArrowDown" || e.key === "ArrowUp")) {

@@ -15,6 +15,9 @@ interface ListBoxSectionProps<O> {
   popoverHeight: number;
   scrollOnFocus?: boolean;
 }
+
+// Creates a section of options within a ListBox.
+// Currently only expects two possible sections; 1. The list of options, and 2. A persistent action (in that order).
 export function ListBoxSection<O>(props: ListBoxSectionProps<O>) {
   const { section, state, contrast, onListHeightChange, popoverHeight, scrollOnFocus } = props;
   const { itemProps, groupProps } = useListBoxSection(section);
