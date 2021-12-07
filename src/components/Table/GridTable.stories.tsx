@@ -215,7 +215,7 @@ export function NestedRows() {
   );
 }
 
-export function NestedCardsThreeLevelsSorted() {
+export function NestedCardsThreeLevels() {
   return <NestedCards rows={rowsWithHeader} sorting={{ on: "client", initial: [0, "ASC"] }} />;
 }
 
@@ -267,7 +267,7 @@ export function NestedCardsTwoLevels() {
       children: [{ kind: "child", id: "p2c1", name: "child p2c1" }],
     },
   ];
-  return <NestedCards rows={rows} style={nestedStyle} />;
+  return <NestedCards rows={rows} style={nestedStyle} sorting={{ on: "client", initial: [0, "ASC"] }} />;
 }
 
 type NestedCardsProps = Pick<GridTableProps<NestedRow, any, any>, "rows" | "as" | "sorting" | "style">;
