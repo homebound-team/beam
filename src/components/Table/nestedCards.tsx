@@ -82,6 +82,7 @@ export class NestedCards {
  * row separate from the card's actual content.
  */
 export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" | "close"): Chrome {
+  const scopeCards = [...openCards];
   return () => {
     let div: any = <div />;
     const place = kind === "open" ? "Top" : "Bottom";
@@ -92,7 +93,7 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
     // | card1 | card2 / ... card3 ... \ card2 | card1 |
     // | card1 | card2 | ... card3 ... | card2 | card1 |
     //
-    [...openCards].reverse().forEach((card, i) => {
+    [...scopeCards].reverse().forEach((card, i) => {
       const first = i === 0;
       div = (
         <div
@@ -149,11 +150,12 @@ export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first
  * have any open cards, but still want a space between top-level cards.
  */
 export function makeSpacer(height: number, openCards: NestedCardStyle[]): Chrome {
+  const scopeCards = [...openCards];
   return () => {
     let div = <div css={Css.hPx(height).$} />;
     // Start at the current/inside card, and wrap outward padding + borders.
     // | card1 | card2 | ... card3 ... | card2 | card1 |
-    [...openCards].reverse().forEach((card) => {
+    [...scopeCards].reverse().forEach((card) => {
       div = <div css={Css.bgColor(card.bgColor).pxPx(card.pxPx).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>;
     });
     return div;
@@ -182,13 +184,6 @@ export function maybeCreateChromeRow(
       undefined,
       // We add 2 to account for our dedicated open/close columns
       <ChromeRow chromeBuffer={[...chromeBuffer]} columns={columns.length} />,
-      // () => (
-      //   <div css={Css.gc(`span ${columns.length + 2}`).$} data-chrome="true">
-      //     {chromeBuffer.map((c, i) => (
-      //       <Fragment key={i}>{c()}</Fragment>
-      //     ))}
-      //   </div>
-      // ),
     ]);
     // clear the buffer
     chromeBuffer.splice(0, chromeBuffer.length);
