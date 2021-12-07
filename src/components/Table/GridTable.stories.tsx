@@ -221,7 +221,7 @@ export function NestedCardsThreeLevels() {
 
 export function NestedCardsThreeLevelsVirtualizedAtScale() {
   return (
-    <div css={Css.df.fdc.h(200).$}>
+    <div css={Css.df.fdc.vh100.$}>
       Rendering {rows.length * 500} rows virtualized
       <NestedCards rows={[header, ...zeroTo(100).flatMap(() => rows)]} as={"virtual"} />
     </div>
@@ -230,7 +230,7 @@ export function NestedCardsThreeLevelsVirtualizedAtScale() {
 
 export function NestedCardsThreeLevelsVirtualizedAtScaleSorted() {
   return (
-    <div css={Css.df.fdc.h(200).$}>
+    <div css={Css.df.fdc.vh100.$}>
       Rendering {rows.length * 500} rows virtualized & sorted
       <NestedCards
         rows={[header, ...zeroTo(100).flatMap(() => rows)]}
