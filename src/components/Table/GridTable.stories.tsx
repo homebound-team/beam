@@ -17,6 +17,7 @@ import {
   GridRowStyles,
   GridStyle,
   GridTable,
+  GridTableProps,
   Icon,
   IconButton,
   numericColumn,
@@ -148,7 +149,6 @@ type AddRow = { kind: "add" };
 type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow | AddRow;
 
 const rows: GridDataRow<NestedRow>[] = [
-  { kind: "header", id: "header" },
   // a parent w/ two children, 1st child has 2 grandchild, 2nd child has 1 grandchild
   {
     ...{ kind: "parent", id: "p1", name: "parent 1" },
@@ -178,6 +178,8 @@ const rows: GridDataRow<NestedRow>[] = [
   // a parent with no children
   { kind: "parent", id: "p3", name: "parent 3" },
 ];
+const header = { kind: "header", id: "header" } as const;
+const rowsWithHeader: GridDataRow<NestedRow>[] = [header, ...rows];
 
 export function NestedRows() {
   const arrowColumn = actionColumn<NestedRow>({
@@ -205,11 +207,71 @@ export function NestedRows() {
     add: () => "Add",
   };
   return (
-    <GridTable columns={[arrowColumn, nameColumn]} {...{ rows }} sorting={{ on: "client", initial: [1, "ASC"] }} />
+    <GridTable
+      columns={[arrowColumn, nameColumn]}
+      {...{ rows: rowsWithHeader }}
+      sorting={{ on: "client", initial: [1, "ASC"] }}
+    />
   );
 }
 
-export function NestedCardsThreeLevels() {
+export function NestedCardsThreeLevelsSorted() {
+  return <NestedCards rows={rowsWithHeader} sorting={{ on: "client", initial: [0, "ASC"] }} />;
+}
+
+export function NestedCardsThreeLevelsVirtualizedAtScale() {
+  return (
+    <div css={Css.df.fdc.h(200).$}>
+      Rendering {rows.length * 500} rows virtualized
+      <NestedCards rows={[header, ...zeroTo(100).flatMap(() => rows)]} as={"virtual"} />
+    </div>
+  );
+}
+
+export function NestedCardsThreeLevelsVirtualizedAtScaleSorted() {
+  return (
+    <div css={Css.df.fdc.h(200).$}>
+      Rendering {rows.length * 500} rows virtualized & sorted
+      <NestedCards
+        rows={[header, ...zeroTo(100).flatMap(() => rows)]}
+        as={"virtual"}
+        sorting={{ on: "client", initial: [0, "ASC"] }}
+      />
+    </div>
+  );
+}
+
+export function NestedCardsTwoLevels() {
+  const spacing = { brPx: 4, pxPx: 4 };
+  const nestedStyle: GridStyle = {
+    nestedCards: {
+      firstLastColumnWidth: 24,
+      spacerPx: 8,
+      kinds: {
+        parent: { bgColor: Palette.Gray100, ...spacing },
+        child: { bgColor: Palette.White, ...spacing },
+      },
+    },
+  };
+  const rows: GridDataRow<NestedRow>[] = [
+    { kind: "header", id: "header" },
+    {
+      ...{ kind: "parent", id: "p1", name: "parent 1" },
+      children: [
+        { kind: "child", id: "p1c1", name: "child p1c1" },
+        { kind: "child", id: "p1c2", name: "child p1c2" },
+      ],
+    },
+    {
+      ...{ kind: "parent", id: "p2", name: "parent 2" },
+      children: [{ kind: "child", id: "p2c1", name: "child p2c1" }],
+    },
+  ];
+  return <NestedCards rows={rows} style={nestedStyle} />;
+}
+
+type NestedCardsProps = Pick<GridTableProps<NestedRow, any, any>, "rows" | "as" | "sorting" | "style">;
+function NestedCards({ rows, as, sorting, style }: NestedCardsProps) {
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
     parent: (row) => ({
@@ -250,70 +312,11 @@ export function NestedCardsThreeLevels() {
 
   return (
     <GridTable
+      as={as}
       columns={[nameColumn, nameColumn, actionColumn]}
-      {...{ rows }}
-      style={nestedStyle}
-      sorting={{ on: "client", initial: [0, "ASC"] }}
-    />
-  );
-}
-
-export function NestedCardsTwoLevels() {
-  const nameColumn: GridColumn<NestedRow> = {
-    header: () => "Name",
-    parent: (row) => ({
-      content: <div css={Css.base.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    child: (row) => ({
-      content: <div css={Css.sm.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    grandChild: (row) => ({
-      content: <div css={Css.xs.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    add: () => "Add",
-  };
-  const actionColumn: GridColumn<NestedRow> = {
-    header: () => "Action",
-    parent: () => "",
-    child: () => "",
-    grandChild: () => <div css={Css.xs.$}>Delete</div>,
-    add: () => "",
-    clientSideSort: false,
-  };
-  const spacing = { brPx: 4, pxPx: 4 };
-  const nestedStyle: GridStyle = {
-    nestedCards: {
-      firstLastColumnWidth: 24,
-      spacerPx: 8,
-      kinds: {
-        parent: { bgColor: Palette.Gray100, ...spacing },
-        child: { bgColor: Palette.White, ...spacing },
-      },
-    },
-  };
-  const rows: GridDataRow<NestedRow>[] = [
-    { kind: "header", id: "header" },
-    {
-      ...{ kind: "parent", id: "p1", name: "parent 1" },
-      children: [
-        { kind: "child", id: "p1c1", name: "child p1c1" },
-        { kind: "child", id: "p1c2", name: "child p1c2" },
-      ],
-    },
-    {
-      ...{ kind: "parent", id: "p2", name: "parent 2" },
-      children: [{ kind: "child", id: "p2c1", name: "child p2c1" }],
-    },
-  ];
-  return (
-    <GridTable
-      columns={[nameColumn, nameColumn, actionColumn]}
-      {...{ rows }}
-      style={nestedStyle}
-      sorting={{ on: "client", initial: [0, "ASC"] }}
+      rows={rows}
+      style={style ?? nestedStyle}
+      sorting={sorting}
     />
   );
 }
