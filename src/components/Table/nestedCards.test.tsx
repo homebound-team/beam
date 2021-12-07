@@ -18,7 +18,7 @@ const childCardStyle: NestedCardStyle = {
 
 describe("NestedCards", () => {
   it("can make open card w/one level", async () => {
-    const r = await render(makeOpenOrCloseCard([parentCardStyle], "open"));
+    const r = await render(makeOpenOrCloseCard([parentCardStyle], "open")());
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
         background-color: rgba(247,245,245,1);
@@ -42,7 +42,7 @@ describe("NestedCards", () => {
   });
 
   it("can make open card w/two levels", async () => {
-    const r = await render(makeOpenOrCloseCard([parentCardStyle, childCardStyle], "open"));
+    const r = await render(makeOpenOrCloseCard([parentCardStyle, childCardStyle], "open")());
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
         background-color: rgba(247,245,245,1);
