@@ -1,5 +1,5 @@
 import { camelCase } from "change-case";
-import React, { Key, ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import React, { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useButton, useFocus, useOverlayPosition, useSelect } from "react-aria";
 import { Item, Section, useListData, useSelectState } from "react-stately";
 import { Icon, Tooltip } from "src/components";
@@ -9,9 +9,11 @@ import { usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { ChipTextField } from "src/inputs/ChipTextField";
 import { ListBox } from "src/inputs/internal/ListBox";
+import { ListBoxChip } from "src/inputs/internal/ListBoxChip";
 import { Value, valueToKey } from "src/inputs/Value";
-import { HasIdAndName, Optional } from "src/types";
+import { Callback, HasIdAndName, Optional } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
+import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 
 export interface ChipSelectFieldProps<O, V extends Value> {
   label: string;
@@ -48,8 +50,8 @@ export function ChipSelectField<O, V extends Value>(
     placeholder = "Select an option",
     options,
     onSelect,
-    getOptionValue = (opt: O) => (opt as any).id, // if unset, assume O implements HasId
-    getOptionLabel = (opt: O) => (opt as any).name, // if unset, assume O implements HasName
+    getOptionValue = defaultOptionValue, // if unset, assume O implements HasId
+    getOptionLabel = defaultOptionLabel, // if unset, assume O implements HasName
     onFocus,
     onBlur,
     clearable = false,
@@ -59,7 +61,7 @@ export function ChipSelectField<O, V extends Value>(
   const typeScale = fieldProps?.typeScale ?? "sm";
   const isDisabled = !!disabled;
   const showClearButton = !disabled && clearable && !!value;
-  const chipStyles = Css[typeScale].tl.bgGray300.gray900.br16.pxPx(10).pyPx(2).$;
+  const chipStyles = useMemo(() => Css[typeScale].tl.bgGray300.gray900.br16.pxPx(10).pyPx(2).$, [typeScale]);
   // Controls showing the focus border styles.
   const [visualFocus, setVisualFocus] = useState(false);
   const [isClearFocused, setIsClearFocused] = useState(false);
@@ -102,43 +104,49 @@ export function ChipSelectField<O, V extends Value>(
     getKey: (item) => (isListBoxSection(item) ? item.title : getOptionValue(item)),
   });
 
-  useEffect(() => listData.update("Options", { title: "Options", options }), [options]);
-
-  const selectChildren = listData.items.map((s) => {
-    if (isListBoxSection(s)) {
-      return (
-        <Section key={camelCase(s.title)} title={s.title} items={s.options}>
-          {(item) => {
-            if (isPersistentItem(item)) {
-              return (
-                <Item key={item.id} textValue={item.name}>
-                  {item.name}
-                </Item>
-              );
-            }
-
-            const label = getOptionLabel(item);
-            return (
-              <Item key={getOptionValue(item)} textValue={label}>
-                <span css={{ ...Css.lineClamp1.breakAll.$, ...chipStyles }} title={label}>
-                  {label}
-                </span>
-              </Item>
-            );
-          }}
-        </Section>
-      );
+  useEffect(() => {
+    // Avoid unnecessary update of `options` on first render. We define the initial set of items based on the options in the `useListData` hook.
+    if (!firstRender) {
+      listData.update("Options", { title: "Options", options });
     }
+    firstRender = false;
+  }, [options]);
 
-    const label = getOptionLabel(s);
-    return (
-      <Item key={getOptionValue(s)} textValue={label}>
-        <span css={{ ...Css.lineClamp1.breakAll.$, ...chipStyles }} title={label}>
-          {label}
-        </span>
-      </Item>
-    );
-  });
+  const selectChildren = useMemo(
+    () =>
+      listData.items.map((s) => {
+        if (isListBoxSection(s)) {
+          return (
+            <Section key={camelCase(s.title)} title={s.title} items={s.options}>
+              {(item) => {
+                if (isPersistentItem(item)) {
+                  return (
+                    <Item key={item.id} textValue={item.name}>
+                      {item.name}
+                    </Item>
+                  );
+                }
+
+                const label = getOptionLabel(item);
+                return (
+                  <Item key={getOptionValue(item)} textValue={label}>
+                    <ListBoxChip label={label} />
+                  </Item>
+                );
+              }}
+            </Section>
+          );
+        }
+
+        const label = getOptionLabel(s);
+        return (
+          <Item key={getOptionValue(s)} textValue={label}>
+            <ListBoxChip label={label} />
+          </Item>
+        );
+      }),
+    [listData.items, getOptionLabel, getOptionValue],
+  );
 
   const selectHookProps = {
     label,
@@ -177,7 +185,9 @@ export function ChipSelectField<O, V extends Value>(
       }
     },
   });
+
   const { labelProps, triggerProps, valueProps, menuProps } = useSelect(selectHookProps, state, buttonRef);
+
   const { buttonProps } = useButton({ ...triggerProps, isDisabled }, buttonRef);
   const { overlayProps } = useOverlayPosition({
     targetRef: buttonRef,
@@ -199,27 +209,21 @@ export function ChipSelectField<O, V extends Value>(
 
   // State management for the "Create new" flow with ChipTextField.
   const [showInput, setShowInput] = useState(false);
-  const [inputValue, setInputValue] = useState<string>("Add new");
   const removeCreateNewField = useCallback(() => {
     setShowInput(false);
-    setInputValue("Add new");
     // Trigger onBlur to initiate any auto-saving behavior.
     maybeCall(onBlur);
-  }, [setShowInput, setInputValue]);
+  }, [setShowInput]);
 
   const field = (
     <>
       {showInput && onCreateNew && (
-        <ChipTextField
-          autoFocus
-          label="Add new"
-          value={inputValue}
-          onChange={setInputValue}
-          onEnter={async () => {
-            await onCreateNew(inputValue);
+        <CreateNewField
+          onBlur={removeCreateNewField}
+          onEnter={async (value) => {
+            await onCreateNew(value);
             removeCreateNewField();
           }}
-          onBlur={removeCreateNewField}
           {...tid.createNewField}
         />
       )}
@@ -319,3 +323,29 @@ type ListBoxSection<O> = { title: string; options: O[]; isPersistent?: boolean }
 export function isListBoxSection<O>(obj: O | ListBoxSection<O>): obj is ListBoxSection<O> {
   return typeof obj === "object" && "options" in obj;
 }
+
+interface CreateNewFieldProps {
+  onBlur: Callback;
+  onEnter: (value: string) => {};
+}
+
+// Wrapper for the ChipTextField used in the "Create New" flow on ChipSelectField
+function CreateNewField(props: CreateNewFieldProps) {
+  const { onBlur, onEnter } = props;
+  const [value, setValue] = useState<string>("Add new");
+  const tid = useTestIds(props);
+
+  return (
+    <ChipTextField
+      autoFocus
+      label="Add new"
+      value={value}
+      onChange={setValue}
+      onEnter={() => onEnter(value)}
+      onBlur={onBlur}
+      {...tid}
+    />
+  );
+}
+
+let firstRender = true;

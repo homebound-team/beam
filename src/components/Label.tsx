@@ -13,7 +13,7 @@ interface LabelProps {
 }
 
 /** An internal helper component for rendering form labels. */
-export function Label(props: LabelProps) {
+export const Label = React.memo((props: LabelProps) => {
   const { labelProps, label, hidden, suffix, contrast = false, ...others } = props;
   const labelEl = (
     <label {...labelProps} {...others} css={Css.dib.sm.gray700.mbPx(4).if(contrast).white.$}>
@@ -22,7 +22,7 @@ export function Label(props: LabelProps) {
     </label>
   );
   return hidden ? <VisuallyHidden>{labelEl}</VisuallyHidden> : labelEl;
-}
+});
 
 /** Used for showing labels within text fields. */
 export function InlineLabel({ labelProps, label, contrast, ...others }: LabelProps) {

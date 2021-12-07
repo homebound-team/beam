@@ -1,11 +1,12 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ChipSelectField } from "src";
 import { PresentationProvider } from "src/components";
-import { TaskStatus } from "src/components/Filters/testDomain";
+import { InternalUser, TaskStatus } from "src/components/Filters/testDomain";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
+import { zeroTo } from "src/utils/sb";
 
 export default {
   component: ChipSelectField,
@@ -142,3 +143,34 @@ export function Example() {
     </div>
   );
 }
+
+export function PerfTest() {
+  const [internalUsers, setInternalUsers] = useState<InternalUser[]>(
+    zeroTo(100).map((i) => ({ id: `iu:${i}`, name: `Internal User ${i}` })),
+  );
+  const [createValue, setCreateValue] = useState<string>(internalUsers[0].id);
+  const onFocus = useCallback(action("onFocus"), []);
+  const onBlur = useCallback(action("onBlur"), []);
+  return (
+    <ChipSelectField
+      clearable
+      label="Test"
+      placeholder="+ User"
+      options={internalUsers}
+      value={createValue}
+      onSelect={(v) => setCreateValue(v)}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      onCreateNew={async (name) => {
+        const newOpt = { id: `ts:${internalUsers.length + 1}`, name };
+        // Requires user to update their local state.
+        setInternalUsers((prevState) => [...prevState, newOpt]);
+        setCreateValue(newOpt.id);
+      }}
+    />
+  );
+}
+
+PerfTest.parameters = {
+  chromatic: { disableSnapshot: true },
+};

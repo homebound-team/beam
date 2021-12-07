@@ -1,10 +1,10 @@
 import React, { Key, MutableRefObject, useState } from "react";
 import { useListBox } from "react-aria";
 import { SelectState } from "react-stately";
-import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
 import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/internal/constants";
 import { ListBoxSection } from "src/inputs/internal/ListBoxSection";
+import { ListBoxToggleChip } from "src/inputs/internal/ListBoxToggleChip";
 import { VirtualizedOptions } from "src/inputs/internal/VirtualizedOptions";
 
 interface ListBoxProps<O, V extends Key> {
@@ -61,7 +61,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
       {isMultiSelect && state.selectionManager.selectedKeys.size > 0 && (
         <ul css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").$}>
           {selectedOptions.map((o) => (
-            <ListBoxChip
+            <ListBoxToggleChip
               key={getOptionValue(o)}
               state={state}
               option={o}
@@ -99,30 +99,6 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
         )}
       </ul>
     </div>
-  );
-}
-
-interface ListBoxChipProps<O, V extends Key> {
-  state: SelectState<O>;
-  option: O;
-  getOptionLabel: (opt: O) => string;
-  getOptionValue: (opt: O) => V;
-  disabled?: boolean;
-}
-
-/** Chip used to display selections within ListBox when using the MultiSelectField */
-function ListBoxChip<O, V extends Key>(props: ListBoxChipProps<O, V>) {
-  const { state, option, getOptionLabel, getOptionValue, disabled = false } = props;
-  return (
-    <li css={Css.mr1.mb1.$}>
-      <ToggleChip
-        text={getOptionLabel(option)}
-        onClick={() => {
-          state.selectionManager.toggleSelection(String(getOptionValue(option)));
-        }}
-        disabled={disabled}
-      />
-    </li>
   );
 }
 
