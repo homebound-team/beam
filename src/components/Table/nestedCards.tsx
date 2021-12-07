@@ -180,11 +180,7 @@ export function maybeCreateChromeRow(
   chromeBuffer: ChromeBuffer,
 ): void {
   if (chromeBuffer.length > 0) {
-    filteredRows.push([
-      undefined,
-      // We add 2 to account for our dedicated open/close columns
-      <ChromeRow chromeBuffer={[...chromeBuffer]} columns={columns.length} />,
-    ]);
+    filteredRows.push([undefined, <ChromeRow chromeBuffer={[...chromeBuffer]} columns={columns.length} />]);
     // clear the buffer
     chromeBuffer.splice(0, chromeBuffer.length);
   }
@@ -196,6 +192,7 @@ interface ChromeRowProps {
 }
 export function ChromeRow({ chromeBuffer, columns }: ChromeRowProps) {
   return (
+    // We add 2 to account for our dedicated open/close columns
     <div css={Css.gc(`span ${columns + 2}`).$} data-chrome="true">
       {chromeBuffer.map((c, i) => (
         <Fragment key={i}>{c()}</Fragment>
