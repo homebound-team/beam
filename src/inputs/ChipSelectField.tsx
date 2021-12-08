@@ -42,6 +42,7 @@ export function ChipSelectField<O extends HasIdAndName<V>, V extends Value>(
 export function ChipSelectField<O, V extends Value>(
   props: Optional<ChipSelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,
 ): JSX.Element {
+  const firstRender = useRef(true);
   const { fieldProps } = usePresentationContext();
   const {
     label,
@@ -106,10 +107,17 @@ export function ChipSelectField<O, V extends Value>(
 
   useEffect(() => {
     // Avoid unnecessary update of `options` on first render. We define the initial set of items based on the options in the `useListData` hook.
-    if (!firstRender) {
-      listData.update("Options", { title: "Options", options });
+    if (!firstRender.current) {
+      if (onCreateNew) {
+        // if we have the options in a section, update that section
+        listData.update("Options", { title: "Options", options });
+      } else {
+        // otherwise, reset the list completely. We could traverse through the list and update/add/remove when needed, though this is simpler for now.
+        listData.remove(...state.collection.getKeys());
+        listData.append(...options);
+      }
     }
-    firstRender = false;
+    firstRender.current = false;
   }, [options]);
 
   const selectChildren = useMemo(
@@ -347,5 +355,3 @@ function CreateNewField(props: CreateNewFieldProps) {
     />
   );
 }
-
-let firstRender = true;
