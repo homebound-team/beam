@@ -223,7 +223,7 @@ export function ChipSelectField<O, V extends Value>(
     maybeCall(onBlur);
   }, [setShowInput]);
 
-  const field = (
+  return (
     <>
       {showInput && onCreateNew && (
         <CreateNewField
@@ -235,51 +235,56 @@ export function ChipSelectField<O, V extends Value>(
           {...tid.createNewField}
         />
       )}
-      <div
-        ref={wrapperRef}
-        css={{
-          ...chipStyles,
-          ...Css.dif.relative.p0.mwPx(32).if(!value).bgGray200.$,
-          ...(visualFocus ? Css.bshFocus.$ : {}),
-          ...(showInput ? Css.dn.$ : {}),
-        }}
+      <Tooltip
+        title={selectHookProps.isDisabled && typeof disabled !== "boolean" ? disabled : undefined}
+        placement="top"
       >
-        <Label label={label} labelProps={labelProps} hidden {...tid.label} />
-        <button
-          {...mergeProps(focusProps, buttonProps)}
-          ref={buttonRef}
+        <div
+          ref={wrapperRef}
           css={{
-            ...Css.tl.br16.pxPx(10).pyPx(2).outline0.if(showClearButton).prPx(4).borderRadius("16px 0 0 16px").$,
-            ...(isDisabled ? Css.cursorNotAllowed.gray700.$ : {}),
-            "&:hover:not(:disabled)": Css.bgGray400.if(!value).bgGray300.$,
+            ...chipStyles,
+            ...Css.dif.relative.p0.mwPx(32).if(!value).bgGray200.$,
+            ...(visualFocus ? Css.bshFocus.$ : {}),
+            ...(showInput ? Css.dn.$ : {}),
           }}
-          title={state.selectedItem ? state.selectedItem.textValue : placeholder}
-          {...tid}
         >
-          <span {...valueProps} css={Css.lineClamp1.breakAll.$}>
-            {state.selectedItem ? state.selectedItem.textValue : placeholder}
-          </span>
-        </button>
-        {showClearButton && (
+          <Label label={label} labelProps={labelProps} hidden {...tid.label} />
           <button
-            {...clearFocusProps}
+            {...mergeProps(focusProps, buttonProps)}
+            ref={buttonRef}
             css={{
-              ...Css.prPx(4).borderRadius("0 16px 16px 0").outline0.$,
-              "&:hover": Css.bgGray400.$,
-              ...(isClearFocused ? Css.boxShadow(`0px 0px 0px 2px rgba(3,105,161,1)`).$ : {}),
+              ...Css.tl.br16.pxPx(10).pyPx(2).outline0.if(showClearButton).prPx(4).borderRadius("16px 0 0 16px").$,
+              ...(isDisabled ? Css.cursorNotAllowed.gray700.$ : {}),
+              "&:hover:not(:disabled)": Css.bgGray400.if(!value).bgGray300.$,
             }}
-            onClick={() => {
-              onSelect(undefined as any, undefined as any);
-              maybeCall(onBlur);
-              setIsClearFocused(false);
-            }}
-            aria-label="Remove"
-            {...tid.clearButton}
+            title={state.selectedItem ? state.selectedItem.textValue : placeholder}
+            {...tid}
           >
-            <Icon icon="x" inc={typeScale === "xs" ? 2 : undefined} />
+            <span {...valueProps} css={Css.lineClamp1.breakAll.$}>
+              {state.selectedItem ? state.selectedItem.textValue : placeholder}
+            </span>
           </button>
-        )}
-      </div>
+          {showClearButton && (
+            <button
+              {...clearFocusProps}
+              css={{
+                ...Css.prPx(4).borderRadius("0 16px 16px 0").outline0.$,
+                "&:hover": Css.bgGray400.$,
+                ...(isClearFocused ? Css.boxShadow(`0px 0px 0px 2px rgba(3,105,161,1)`).$ : {}),
+              }}
+              onClick={() => {
+                onSelect(undefined as any, undefined as any);
+                maybeCall(onBlur);
+                setIsClearFocused(false);
+              }}
+              aria-label="Remove"
+              {...tid.clearButton}
+            >
+              <Icon icon="x" inc={typeScale === "xs" ? 2 : undefined} />
+            </button>
+          )}
+        </div>
+      </Tooltip>
       {state.isOpen && (
         <Popover
           triggerRef={buttonRef}
@@ -300,15 +305,6 @@ export function ChipSelectField<O, V extends Value>(
         </Popover>
       )}
     </>
-  );
-
-  const tooltipText = selectHookProps.isDisabled && typeof disabled !== "boolean" ? disabled : undefined;
-  return tooltipText ? (
-    <Tooltip title={tooltipText} placement="top">
-      {field}
-    </Tooltip>
-  ) : (
-    field
   );
 }
 

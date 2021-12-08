@@ -91,15 +91,11 @@ export function Button(props: ButtonProps) {
     );
 
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip
-  if ((isDisabled && typeof disabled !== "boolean") || tooltip) {
-    return (
-      <Tooltip title={isDisabled && typeof disabled !== "boolean" ? disabled : tooltip} placement="top">
-        {button}
-      </Tooltip>
-    );
-  }
-
-  return button;
+  return (
+    <Tooltip title={isDisabled && typeof disabled !== "boolean" ? disabled : tooltip} placement="top">
+      {button}
+    </Tooltip>
+  );
 }
 
 function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {

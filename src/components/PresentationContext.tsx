@@ -13,6 +13,8 @@ export interface PresentationFieldProps {
   compact?: boolean;
   // Changes default font styles for input fields
   typeScale?: Typography;
+  // If set to `false` then fields will not appear disabled, but will still be disabled.
+  visuallyDisabled?: false;
 }
 
 export type PresentationContextProps = {
