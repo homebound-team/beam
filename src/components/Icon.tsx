@@ -1,5 +1,5 @@
 import { DOMProps } from "@react-types/shared";
-import { AriaAttributes } from "react";
+import React, { AriaAttributes } from "react";
 import { Css, increment, Margin, Palette, Xss } from "src/Css";
 
 export interface IconProps extends AriaAttributes, DOMProps {
@@ -13,7 +13,7 @@ export interface IconProps extends AriaAttributes, DOMProps {
   xss?: Xss<Margin>;
 }
 
-export function Icon(props: IconProps) {
+export const Icon = React.memo((props: IconProps) => {
   const { icon, inc = 3, color = "currentColor", xss, ...other } = props;
   const size = increment(inc);
   return (
@@ -30,7 +30,7 @@ export function Icon(props: IconProps) {
       {Icons[icon]}
     </svg>
   );
-}
+});
 
 /**
  * Map of icons paths mapped to their respective name.
