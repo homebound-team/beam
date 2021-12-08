@@ -200,7 +200,12 @@ export interface GridTableProps<R extends Kinded, S, X> {
    */
   persistCollapse?: string;
   xss?: X;
+  api?: MutableRefObject<GridTableApi | undefined>;
 }
+
+export type GridTableApi = {
+  scrollToRow: (index: number) => void;
+};
 
 /**
  * Renders data in our table layout.
@@ -239,11 +244,18 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     setRowCount,
     observeRows,
     persistCollapse,
+    api,
   } = props;
 
   const [collapsedIds, toggleCollapsedId] = useToggleIds(rows, persistCollapse);
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
+
+  if (api) {
+    api.current = {
+      scrollToRow: (index) => virtuosoRef.current && virtuosoRef.current.scrollToIndex(index),
+    };
+  }
 
   const [sortState, setSortKey] = useSortState<R, S>(columns, sorting);
   // Disclaimer that technically even though this is a useMemo, sortRows is mutating `rows` directly
@@ -524,10 +536,15 @@ function renderVirtual<R extends Kinded>(
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
+  // If a padding-bottom is set on rootCss, then apply that padding as the height of Virtuoso's footer
+  const { paddingBottom } = style.rootCss || {};
   return (
     <Virtuoso
       ref={virtuosoRef}
-      components={{ List: VirtualRoot(style, columns, id, firstLastColumnWidth, xss) }}
+      components={{
+        List: VirtualRoot(style, columns, id, firstLastColumnWidth, xss),
+        Footer: () => <div css={{ paddingBottom }} />,
+      }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
       itemSize={(el) => {

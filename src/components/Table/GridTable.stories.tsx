@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { observable } from "mobx";
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   actionColumn,
   Button,
@@ -17,6 +17,7 @@ import {
   GridRowStyles,
   GridStyle,
   GridTable,
+  GridTableApi,
   GridTableProps,
   Icon,
   IconButton,
@@ -223,7 +224,7 @@ export function NestedCardsThreeLevelsVirtualizedAtScale() {
   return (
     <div css={Css.df.fdc.vh100.$}>
       Rendering {rows.length * 500} rows virtualized
-      <NestedCards rows={[header, ...zeroTo(100).flatMap(() => rows)]} as={"virtual"} />
+      <NestedCards rows={[header, ...zeroTo(20).flatMap(() => rows)]} as={"virtual"} />
     </div>
   );
 }
@@ -298,6 +299,7 @@ function NestedCards({ rows, as, sorting, style }: NestedCardsProps) {
   };
   const spacing = { brPx: 4, pxPx: 4 };
   const nestedStyle: GridStyle = {
+    rootCss: Css.pb(3).$,
     nestedCards: {
       firstLastColumnWidth: 24,
       spacerPx: 8,
@@ -309,6 +311,13 @@ function NestedCards({ rows, as, sorting, style }: NestedCardsProps) {
       },
     },
   };
+  const api = useRef<GridTableApi>();
+
+  useEffect(() => {
+    if (api.current) {
+      api.current.scrollToRow(2500);
+    }
+  });
 
   return (
     <GridTable
@@ -317,6 +326,7 @@ function NestedCards({ rows, as, sorting, style }: NestedCardsProps) {
       rows={rows}
       style={style ?? nestedStyle}
       sorting={sorting}
+      api={api}
     />
   );
 }
