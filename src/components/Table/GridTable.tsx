@@ -530,9 +530,18 @@ function renderVirtual<R extends Kinded>(
       components={{ List: VirtualRoot(style, columns, id, firstLastColumnWidth, xss) }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
-      // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
-      // so instead drill into the 1st real content cell.
-      itemSize={(el) => (el.firstElementChild!.firstElementChild! as HTMLElement).offsetHeight}
+      itemSize={(el) => {
+        const maybeContentsDiv = el.firstElementChild! as HTMLElement;
+
+        // If it is a chrome row, then we are not using `display: contents;`, return the height of this element.
+        if ("chrome" in maybeContentsDiv.dataset) {
+          return maybeContentsDiv.offsetHeight;
+        }
+
+        // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
+        // so instead drill into the 1st real content cell.
+        return (maybeContentsDiv.firstElementChild! as HTMLElement).offsetHeight;
+      }}
       itemContent={(index) => {
         // We keep header and filter rows separate, but react-virtuoso is a flat list,
         // so we pick the right header / first row message / actual row.
