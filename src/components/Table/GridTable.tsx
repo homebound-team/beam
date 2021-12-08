@@ -200,6 +200,8 @@ export interface GridTableProps<R extends Kinded, S, X> {
    */
   persistCollapse?: string;
   xss?: X;
+  /** Adds padding to a footer at the bottom of a GridTable that's rendered `as=virtual` */
+  virtualFooterPadding?: number;
 }
 
 /**
@@ -239,6 +241,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     setRowCount,
     observeRows,
     persistCollapse,
+    virtualFooterPadding,
   } = props;
 
   const [collapsedIds, toggleCollapsedId] = useToggleIds(rows, persistCollapse);
@@ -399,6 +402,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         style.nestedCards?.firstLastColumnWidth,
         xss,
         virtuosoRef,
+        virtualFooterPadding,
       )}
     </PresentationProvider>
   );
@@ -423,6 +427,7 @@ function renderCssGrid<R extends Kinded>(
   firstLastColumnWidth: number | undefined,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  _virtuosoFooterPadding?: number,
 ): ReactElement {
   return (
     <div
@@ -463,6 +468,7 @@ function renderTable<R extends Kinded>(
   _firstLastColumnWidth: number | undefined,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  _virtuosoFooterPadding?: number,
 ): ReactElement {
   return (
     <table
@@ -523,11 +529,15 @@ function renderVirtual<R extends Kinded>(
   firstLastColumnWidth: number | undefined,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  footerPadding?: number,
 ): ReactElement {
   return (
     <Virtuoso
       ref={virtuosoRef}
-      components={{ List: VirtualRoot(style, columns, id, firstLastColumnWidth, xss) }}
+      components={{
+        List: VirtualRoot(style, columns, id, firstLastColumnWidth, xss),
+        Footer: () => <div css={Css.pb(footerPadding ?? 0).$}></div>,
+      }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
       itemSize={(el) => {
