@@ -19,10 +19,6 @@ interface TooltipProps {
 }
 
 export function Tooltip(props: TooltipProps) {
-  return props.title ? <_Tooltip {...props} /> : props.children;
-}
-
-function _Tooltip(props: TooltipProps) {
   const { placement, children, title, disabled, delay = 0 } = props;
 
   const state = useTooltipTriggerState({ delay, isDisabled: disabled });
@@ -81,4 +77,9 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
     </div>,
     document.body,
   );
+}
+
+// Helper function to conditionally wrap component with Tooltip if necessary.
+export function maybeTooltip(props: TooltipProps) {
+  return props.title ? <Tooltip {...props} /> : props.children;
 }
