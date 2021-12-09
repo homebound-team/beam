@@ -39,7 +39,7 @@ export const IconButtonStyles = (args: IconButtonProps) => (
       </div>
       <div>
         <h2>Disabled</h2>
-        <IconButton {...args} disabled />
+        <IconButton {...args} disabled="Disabled reason" />
       </div>
       <div>
         <h2>Colored</h2>
