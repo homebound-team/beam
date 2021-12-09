@@ -2,7 +2,7 @@ import { camelCase } from "change-case";
 import React, { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useButton, useFocus, useOverlayPosition, useSelect } from "react-aria";
 import { Item, Section, useListData, useSelectState } from "react-stately";
-import { Icon, Tooltip } from "src/components";
+import { Icon, maybeTooltip, resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
 import { Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
@@ -223,7 +223,7 @@ export function ChipSelectField<O, V extends Value>(
     maybeCall(onBlur);
   }, [setShowInput]);
 
-  const field = (
+  return (
     <>
       {showInput && onCreateNew && (
         <CreateNewField
@@ -235,51 +235,57 @@ export function ChipSelectField<O, V extends Value>(
           {...tid.createNewField}
         />
       )}
-      <div
-        ref={wrapperRef}
-        css={{
-          ...chipStyles,
-          ...Css.dif.relative.p0.mwPx(32).if(!value).bgGray200.$,
-          ...(visualFocus ? Css.bshFocus.$ : {}),
-          ...(showInput ? Css.dn.$ : {}),
-        }}
-      >
-        <Label label={label} labelProps={labelProps} hidden {...tid.label} />
-        <button
-          {...mergeProps(focusProps, buttonProps)}
-          ref={buttonRef}
-          css={{
-            ...Css.tl.br16.pxPx(10).pyPx(2).outline0.if(showClearButton).prPx(4).borderRadius("16px 0 0 16px").$,
-            ...(isDisabled ? Css.cursorNotAllowed.gray700.$ : {}),
-            "&:hover:not(:disabled)": Css.bgGray400.if(!value).bgGray300.$,
-          }}
-          title={state.selectedItem ? state.selectedItem.textValue : placeholder}
-          {...tid}
-        >
-          <span {...valueProps} css={Css.lineClamp1.breakAll.$}>
-            {state.selectedItem ? state.selectedItem.textValue : placeholder}
-          </span>
-        </button>
-        {showClearButton && (
-          <button
-            {...clearFocusProps}
+      {maybeTooltip({
+        title: resolveTooltip(disabled),
+        placement: "top",
+        children: (
+          <div
+            ref={wrapperRef}
             css={{
-              ...Css.prPx(4).borderRadius("0 16px 16px 0").outline0.$,
-              "&:hover": Css.bgGray400.$,
-              ...(isClearFocused ? Css.boxShadow(`0px 0px 0px 2px rgba(3,105,161,1)`).$ : {}),
+              ...chipStyles,
+              ...Css.dif.relative.p0.mwPx(32).if(!value).bgGray200.$,
+              ...(visualFocus ? Css.bshFocus.$ : {}),
+              ...(showInput ? Css.dn.$ : {}),
             }}
-            onClick={() => {
-              onSelect(undefined as any, undefined as any);
-              maybeCall(onBlur);
-              setIsClearFocused(false);
-            }}
-            aria-label="Remove"
-            {...tid.clearButton}
           >
-            <Icon icon="x" inc={typeScale === "xs" ? 2 : undefined} />
-          </button>
-        )}
-      </div>
+            <Label label={label} labelProps={labelProps} hidden {...tid.label} />
+            <button
+              {...mergeProps(focusProps, buttonProps)}
+              ref={buttonRef}
+              css={{
+                ...Css.tl.br16.pxPx(10).pyPx(2).outline0.if(showClearButton).prPx(4).borderRadius("16px 0 0 16px").$,
+                ...(isDisabled ? Css.cursorNotAllowed.gray700.$ : {}),
+                "&:hover:not(:disabled)": Css.bgGray400.if(!value).bgGray300.$,
+              }}
+              title={state.selectedItem ? state.selectedItem.textValue : placeholder}
+              {...tid}
+            >
+              <span {...valueProps} css={Css.lineClamp1.breakAll.$}>
+                {state.selectedItem ? state.selectedItem.textValue : placeholder}
+              </span>
+            </button>
+            {showClearButton && (
+              <button
+                {...clearFocusProps}
+                css={{
+                  ...Css.prPx(4).borderRadius("0 16px 16px 0").outline0.$,
+                  "&:hover": Css.bgGray400.$,
+                  ...(isClearFocused ? Css.boxShadow(`0px 0px 0px 2px rgba(3,105,161,1)`).$ : {}),
+                }}
+                onClick={() => {
+                  onSelect(undefined as any, undefined as any);
+                  maybeCall(onBlur);
+                  setIsClearFocused(false);
+                }}
+                aria-label="Remove"
+                {...tid.clearButton}
+              >
+                <Icon icon="x" inc={typeScale === "xs" ? 2 : undefined} />
+              </button>
+            )}
+          </div>
+        ),
+      })}
       {state.isOpen && (
         <Popover
           triggerRef={buttonRef}
@@ -300,15 +306,6 @@ export function ChipSelectField<O, V extends Value>(
         </Popover>
       )}
     </>
-  );
-
-  const tooltipText = selectHookProps.isDisabled && typeof disabled !== "boolean" ? disabled : undefined;
-  return tooltipText ? (
-    <Tooltip title={tooltipText} placement="top">
-      {field}
-    </Tooltip>
-  ) : (
-    field
   );
 }
 
