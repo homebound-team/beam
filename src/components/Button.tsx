@@ -2,11 +2,11 @@ import { AriaButtonProps } from "@react-types/button";
 import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Link } from "react-router-dom";
-import { useTestIds } from "src";
-import { Icon, IconProps, maybeTooltip, navLink } from "src/components";
+import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Css } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, noop } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   label: string;
@@ -91,7 +91,7 @@ export function Button(props: ButtonProps) {
 
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip
   return maybeTooltip({
-    title: isDisabled && typeof disabled !== "boolean" ? disabled : tooltip,
+    title: resolveTooltip(disabled, tooltip),
     placement: "top",
     children: button,
   });

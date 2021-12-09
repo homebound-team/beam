@@ -83,3 +83,9 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
 export function maybeTooltip(props: TooltipProps) {
   return props.title ? <Tooltip {...props} /> : props.children;
 }
+
+// Helper function for resolving showing the Tooltip text via a 'disabled' prop, or the 'tooltip' prop.
+export function resolveTooltip(disabled?: boolean | ReactNode, tooltip?: ReactNode): ReactNode | undefined {
+  // If `disabled` is a ReactNode, then return that. Otherwise, return `tooltip`
+  return typeof disabled !== "boolean" && disabled ? disabled : tooltip ?? undefined;
+}

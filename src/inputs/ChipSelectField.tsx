@@ -2,7 +2,7 @@ import { camelCase } from "change-case";
 import React, { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useButton, useFocus, useOverlayPosition, useSelect } from "react-aria";
 import { Item, Section, useListData, useSelectState } from "react-stately";
-import { Icon, maybeTooltip } from "src/components";
+import { Icon, maybeTooltip, resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
 import { Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
@@ -236,7 +236,7 @@ export function ChipSelectField<O, V extends Value>(
         />
       )}
       {maybeTooltip({
-        title: selectHookProps.isDisabled && typeof disabled !== "boolean" ? disabled : undefined,
+        title: resolveTooltip(disabled),
         placement: "top",
         children: (
           <div
