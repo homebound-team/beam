@@ -69,6 +69,8 @@ export interface GridStyle {
   emptyCell?: ReactNode;
 }
 
+export type NestedCardStyleByKind = Record<string, NestedCardStyle>;
+
 export interface NestedCardsStyle {
   /** Space between each card. */
   spacerPx: number;
@@ -79,7 +81,7 @@ export interface NestedCardsStyle {
    *
    * Entries are optional, i.e. you can leave out kinds and they won't be wrapped/turned into cards.
    */
-  kinds: Record<string, NestedCardStyle>;
+  kinds: NestedCardStyleByKind;
 }
 
 /**
@@ -845,7 +847,8 @@ interface GridRowProps<R extends Kinded, S> {
   setSortKey?: (value: S) => void;
   isCollapsed: boolean;
   toggleCollapsedId: (id: string) => void;
-  openCards: NestedCardStyle[] | undefined;
+  // A comma separated list of the currently open kinds, so that the prop will be stable
+  openCards: string | undefined;
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -889,12 +892,16 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
   const Row = as === "table" ? "tr" : "div";
 
-  const currentCard = openCards && openCards.length > 0 && openCards[openCards.length - 1];
+  const openCardStyles =
+    typeof openCards === "string"
+      ? openCards.split(":").map((openCardKind) => style.nestedCards!.kinds[openCardKind])
+      : undefined;
+  const currentCard = openCardStyles && openCardStyles[openCardStyles.length - 1];
   let currentColspan = 1;
   const maybeStickyHeaderStyles = isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined;
   const div = (
     <Row css={rowCss} {...others}>
-      {openCards && maybeAddCardPadding(openCards, "first", maybeStickyHeaderStyles)}
+      {openCardStyles && maybeAddCardPadding(openCardStyles, "first", maybeStickyHeaderStyles)}
       {columns.map((column, columnIndex) => {
         // Decrement colspan count and skip if greater than 1.
         if (currentColspan > 1) {
@@ -952,7 +959,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
         return renderFn(columnIndex, cellCss, content, row, rowStyle);
       })}
-      {openCards && maybeAddCardPadding(openCards, "final", maybeStickyHeaderStyles)}
+      {openCardStyles && maybeAddCardPadding(openCardStyles, "final", maybeStickyHeaderStyles)}
     </Row>
   );
 
