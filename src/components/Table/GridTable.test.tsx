@@ -47,9 +47,9 @@ type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow;
 // And two columns for NestedRow
 const nestedColumns: GridColumn<NestedRow>[] = [
   {
-    header: () => <Collapse />,
-    parent: () => <Collapse />,
-    child: () => <Collapse />,
+    header: (row) => <Collapse id={row.id} />,
+    parent: (row) => <Collapse id={row.id} />,
+    child: (row) => <Collapse id={row.id} />,
     grandChild: () => "",
   },
   {
@@ -1123,11 +1123,11 @@ describe("GridTable", () => {
   });
 });
 
-function Collapse() {
-  const { isCollapsed, toggleCollapse } = useContext(GridCollapseContext);
-  const icon = isCollapsed ? "+" : "-";
+function Collapse({ id }: { id: string }) {
+  const { isCollapsed, toggleCollapsed } = useContext(GridCollapseContext);
+  const icon = isCollapsed(id) ? "+" : "-";
   return (
-    <div onClick={toggleCollapse} data-testid="collapse">
+    <div onClick={() => toggleCollapsed(id)} data-testid="collapse">
       {icon}
     </div>
   );
