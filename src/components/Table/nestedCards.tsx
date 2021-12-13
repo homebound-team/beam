@@ -6,6 +6,7 @@ import {
   Kinded,
   NestedCardsStyle,
   NestedCardStyle,
+  NestedCardStyleByKind,
   RowTuple,
 } from "src/components/Table/GridTable";
 import { Css } from "src/Css";
@@ -28,7 +29,7 @@ type ChromeBuffer = Chrome[];
 
 export class NestedCards {
   // A stack of the current cards we're showing
-  private readonly openCards: Array<NestedCardStyle> = [];
+  private readonly openCards: Array<string> = [];
   // A buffer of the open/close/spacer rows we need between each content row.
   private readonly chromeBuffer: ChromeBuffer = [];
   private readonly styles: NestedCardsStyle;
@@ -41,8 +42,8 @@ export class NestedCards {
     const card = this.styles.kinds[row.kind];
     // If this kind doesn't have a card defined, don't put it on the card stack
     if (card) {
-      this.openCards.push(card);
-      this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, "open"));
+      this.openCards.push(row.kind);
+      this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, this.styles.kinds, "open"));
     }
     // But always close previous cards if needed
     maybeCreateChromeRow(this.columns, this.filteredRows, this.chromeBuffer);
@@ -50,12 +51,12 @@ export class NestedCards {
   }
 
   closeCard() {
-    this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, "close"));
+    this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, this.styles.kinds, "close"));
     this.openCards.pop();
   }
 
   addSpacer() {
-    this.chromeBuffer.push(makeSpacer(this.styles.spacerPx, this.openCards));
+    this.chromeBuffer.push(makeSpacer(this.styles.spacerPx, this.openCards, this.styles));
   }
 
   done() {
@@ -64,7 +65,7 @@ export class NestedCards {
 
   /** Return a stable copy of the cards, so it won't change as we keep going. */
   currentOpenCards() {
-    return [...this.openCards];
+    return this.openCards.join(":");
   }
 }
 
@@ -81,7 +82,11 @@ export class NestedCards {
  * I.e. due to the flatness of our DOM, we inherently have to add a "close"
  * row separate from the card's actual content.
  */
-export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" | "close"): Chrome {
+export function makeOpenOrCloseCard(
+  openCards: string[],
+  cardStyles: NestedCardStyleByKind,
+  kind: "open" | "close",
+): Chrome {
   const scopeCards = [...openCards];
   return () => {
     let div: any = <div />;
@@ -93,25 +98,28 @@ export function makeOpenOrCloseCard(openCards: NestedCardStyle[], kind: "open" |
     // | card1 | card2 / ... card3 ... \ card2 | card1 |
     // | card1 | card2 | ... card3 ... | card2 | card1 |
     //
-    [...scopeCards].reverse().forEach((card, i) => {
-      const first = i === 0;
-      div = (
-        <div
-          css={{
-            ...Css.bgColor(card.bgColor).pxPx(card.pxPx).$,
-            // Only the 1st div needs border left/right radius + border top/bottom.
-            ...(first &&
-              Css.add({
-                [`border${place}RightRadius`]: `${card.brPx}px`,
-                [`border${place}LeftRadius`]: `${card.brPx}px`,
-              }).hPx(card.brPx).$),
-            ...(card.bColor && Css.bc(card.bColor).bl.br.if(first)[btOrBb].$),
-          }}
-        >
-          {div}
-        </div>
-      );
-    });
+    [...scopeCards]
+      .map((cardKind) => cardStyles[cardKind])
+      .reverse()
+      .forEach((card, i) => {
+        const first = i === 0;
+        div = (
+          <div
+            css={{
+              ...Css.bgColor(card.bgColor).pxPx(card.pxPx).$,
+              // Only the 1st div needs border left/right radius + border top/bottom.
+              ...(first &&
+                Css.add({
+                  [`border${place}RightRadius`]: `${card.brPx}px`,
+                  [`border${place}LeftRadius`]: `${card.brPx}px`,
+                }).hPx(card.brPx).$),
+              ...(card.bColor && Css.bc(card.bColor).bl.br.if(first)[btOrBb].$),
+            }}
+          >
+            {div}
+          </div>
+        );
+      });
     return div;
   };
 }
@@ -149,15 +157,20 @@ export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first
  * Our height is not based on `openCards`, b/c for the top-most level, we won't
  * have any open cards, but still want a space between top-level cards.
  */
-export function makeSpacer(height: number, openCards: NestedCardStyle[]): Chrome {
+export function makeSpacer(height: number, openCards: string[], styles: NestedCardsStyle): Chrome {
   const scopeCards = [...openCards];
   return () => {
     let div = <div css={Css.hPx(height).$} />;
     // Start at the current/inside card, and wrap outward padding + borders.
     // | card1 | card2 | ... card3 ... | card2 | card1 |
-    [...scopeCards].reverse().forEach((card) => {
-      div = <div css={Css.bgColor(card.bgColor).pxPx(card.pxPx).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>;
-    });
+    [...scopeCards]
+      .map((cardKind) => styles.kinds[cardKind])
+      .reverse()
+      .forEach((card) => {
+        div = (
+          <div css={Css.bgColor(card.bgColor).pxPx(card.pxPx).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>
+        );
+      });
     return div;
   };
 }

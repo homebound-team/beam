@@ -1,4 +1,4 @@
-import { NestedCardStyle } from "src/components/Table/GridTable";
+import { NestedCardStyle, NestedCardStyleByKind } from "src/components/Table/GridTable";
 import { makeOpenOrCloseCard, maybeAddCardPadding } from "src/components/Table/nestedCards";
 import { Palette } from "src/Css";
 import { render } from "src/utils/rtl";
@@ -16,9 +16,11 @@ const childCardStyle: NestedCardStyle = {
   pxPx: 6,
 };
 
+const cardStyleByKind: NestedCardStyleByKind = { parent: parentCardStyle, child: childCardStyle };
+
 describe("NestedCards", () => {
   it("can make open card w/one level", async () => {
-    const r = await render(makeOpenOrCloseCard([parentCardStyle], "open")());
+    const r = await render(makeOpenOrCloseCard(["parent"], cardStyleByKind, "open")());
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
         background-color: rgba(247,245,245,1);
@@ -42,7 +44,7 @@ describe("NestedCards", () => {
   });
 
   it("can make open card w/two levels", async () => {
-    const r = await render(makeOpenOrCloseCard([parentCardStyle, childCardStyle], "open")());
+    const r = await render(makeOpenOrCloseCard(["parent", "child"], cardStyleByKind, "open")());
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
         background-color: rgba(247,245,245,1);
