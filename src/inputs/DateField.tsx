@@ -10,7 +10,7 @@ import { DatePickerOverlay } from "src/inputs/internal/DatePickerOverlay";
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
-// import "./DateField.css";
+import "./DateField.css";
 
 export interface DateFieldProps
   extends Pick<TextFieldBaseProps<{}>, "borderless" | "visuallyDisabled" | "hideLabel" | "compact"> {
