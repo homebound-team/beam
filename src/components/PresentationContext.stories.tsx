@@ -53,11 +53,18 @@ export function PresentationFieldProps() {
           <TestFields />
         </PresentationProvider>
       </div>
+
+      <div css={Css.pb2.mb2.bb.bGray300.$}>
+        <h1 css={Css.xlEm.$}>visuallyDisabled=false</h1>
+        <PresentationProvider fieldProps={{ visuallyDisabled: false }}>
+          <TestFields disabled />
+        </PresentationProvider>
+      </div>
     </div>
   );
 }
 
-function TestFields() {
+function TestFields({ disabled = false }: { disabled?: boolean }) {
   const [name, setName] = useState<string | undefined>("Brandon");
   const [description, setDescription] = useState<string | undefined>("Initial Description");
   const [age, setAge] = useState<number | undefined>(35);
@@ -67,10 +74,16 @@ function TestFields() {
 
   return (
     <div css={Css.df.fdc.childGap1.$}>
-      <TextField label="Name" value={name} onChange={setName} required />
-      <TextAreaField label="Description" value={description} onChange={setDescription} required={false} />
-      <NumberField label="Age" value={age} onChange={setAge} required />
-      <DateField value={birthday} label="Birthday" onChange={setBirthday} required={false} />
+      <TextField label="Name" value={name} onChange={setName} required disabled={disabled} />
+      <TextAreaField
+        label="Description"
+        value={description}
+        onChange={setDescription}
+        required={false}
+        disabled={disabled}
+      />
+      <NumberField label="Age" value={age} onChange={setAge} required disabled={disabled} />
+      <DateField value={birthday} label="Birthday" onChange={setBirthday} required={false} disabled={disabled} />
       <SelectField
         getOptionValue={(o) => o.id}
         getOptionLabel={(o) => o.name}
@@ -79,6 +92,7 @@ function TestFields() {
         options={superheros}
         label="Favorite Superhero"
         required={false}
+        disabled={disabled}
       />
       <MultiSelectField
         getOptionValue={(o) => o.id}
@@ -88,6 +102,7 @@ function TestFields() {
         options={superheros}
         label="Top 5 Superheros"
         required
+        disabled={disabled}
       />
     </div>
   );

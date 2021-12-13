@@ -1,6 +1,6 @@
 {
   "name": "@homebound/beam",
-  "version": "2.91.6",
+  "version": "2.93.1",
   "author": "Homebound",
   "license": "MIT",
   "main": "dist/index.js",
@@ -119,6 +119,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^16.14.0",
     "semantic-release": "^17.4.0",
+    "storybook-addon-performance": "^0.16.1",
     "ts-jest": "^26.5.3",
     "ts-node": "^9.1.1",
     "tslib": "^2.1.0",

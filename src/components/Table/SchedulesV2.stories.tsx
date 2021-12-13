@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { arrayMoveImmutable } from "array-move";
-import { DragEventHandler, useLayoutEffect, useRef, useState } from "react";
+import { DragEventHandler, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DragDropContext, DragDropContextProps, Draggable, Droppable } from "react-beautiful-dnd";
 import { TaskStatus } from "src/components/Filters/testDomain";
 import { PresentationProvider } from "src/components/PresentationContext";
@@ -11,7 +11,7 @@ import { Checkbox, DateField, NumberField, SelectField, TextAreaField } from "sr
 import { zeroTo } from "src/utils/sb";
 import { Icon } from "../Icon";
 import { actionColumn, column, dateColumn } from "./columns";
-import { GridDataRow } from "./GridTable";
+import { GridDataRow, GridTableApi } from "./GridTable";
 
 export default {
   title: "Pages / SchedulesV2",
@@ -183,11 +183,12 @@ const style: GridStyle = {
   headerCellCss: Css.sm.gray700.py1.df.aic.$,
   firstNonHeaderRowCss: Css.mt2.$,
   cellCss: Css.h100.gray700.sm.aic.pxPx(4).$,
+  rootCss: Css.pb(2).$,
   nestedCards: {
     spacerPx: 8,
     firstLastColumnWidth: 33, // 32px + 1px border
     kinds: {
-      header: { bgColor: Palette.Gray100, brPx: 0, pxPx: 0 },
+      header: { bgColor: Palette.Gray100, brPx: 1, pxPx: 0 },
       // TODO: It would be nice if this used CSS Properties so that we can use TRUSS
       milestone: { bgColor: Palette.Gray100, ...spacing },
       subgroup: { bgColor: Palette.White, ...spacing },
@@ -235,6 +236,51 @@ export function SchedulesV2() {
 }
 SchedulesV2.storyName = "SchedulesV2";
 
+export function SchedulesV2Virtualized() {
+  const api = useRef<GridTableApi>();
+
+  // Scroll to the bottom of the page before taking snapshot
+  useEffect(() => {
+    if (api.current) {
+      api.current.scrollToIndex(50);
+    }
+  });
+
+  return (
+    <div css={Css.h("100vh").$}>
+      <PresentationProvider fieldProps={{ borderless: true, typeScale: "xs" }}>
+        <GridTable<Row>
+          id="virtual-schedules-grid-table"
+          rows={rows}
+          columns={[
+            arrowColumn,
+            selectColumn,
+            idColumn,
+            nameColumn,
+            startColumn,
+            endColumn,
+            durationColumn,
+            milestoneColumn,
+            subCategoryColumn,
+            statusColumn,
+            progressColumn,
+            buttonColumns,
+          ]}
+          style={{ ...style, rootCss: Css.pb4.$ }}
+          rowStyles={{
+            task: {
+              cellCss: Css.py1.$,
+            },
+          }}
+          stickyHeader
+          as="virtual"
+          api={api}
+        />
+      </PresentationProvider>
+    </div>
+  );
+}
+SchedulesV2Virtualized.storyName = "Virtualized Schedules V2";
 /**
  * Example table using the same approach as GridTable to test out drag libraries
  *

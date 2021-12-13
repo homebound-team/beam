@@ -7,7 +7,7 @@ import { Css } from "src/Css";
 
 // We combine react-popper and aria-tooltip to makeup the tooltip component for the following reasons:
 // Aria can handle all aspects of the tooltip accessibility and rendering it except handling the dynamic positioning aspect
-// Popper provides the functionlity for positioning the tooltip wrt the trigger element
+// Popper provides the functionality for positioning the tooltip wrt the trigger element
 
 interface TooltipProps {
   /** The content that shows up when hovered */
@@ -77,4 +77,15 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
     </div>,
     document.body,
   );
+}
+
+// Helper function to conditionally wrap component with Tooltip if necessary.
+export function maybeTooltip(props: TooltipProps) {
+  return props.title ? <Tooltip {...props} /> : props.children;
+}
+
+// Helper function for resolving showing the Tooltip text via a 'disabled' prop, or the 'tooltip' prop.
+export function resolveTooltip(disabled?: boolean | ReactNode, tooltip?: ReactNode): ReactNode | undefined {
+  // If `disabled` is a ReactNode, then return that. Otherwise, return `tooltip`
+  return typeof disabled !== "boolean" && disabled ? disabled : tooltip ?? undefined;
 }
