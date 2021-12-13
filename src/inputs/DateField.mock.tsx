@@ -20,6 +20,8 @@ export function DateField(props: DateFieldProps) {
       }}
       onBlur={() => maybeCall(onBlur)}
       onFocus={() => maybeCall(onFocus)}
+      disabled={!!props.disabled}
+      readOnly={props.readOnly}
     />
   );
 }
