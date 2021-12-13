@@ -251,7 +251,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     api,
   } = props;
 
-  const [collapsedIds, collapseContextAll, collapseContextRow] = useToggleIds(rows, persistCollapse);
+  const [collapsedIds, collapseAllContext, collapseRowContext] = useToggleIds(rows, persistCollapse);
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
 
@@ -284,7 +284,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
       return (
-        <GridCollapseContext.Provider value={row.kind === "header" ? collapseContextAll : collapseContextRow}>
+        <GridCollapseContext.Provider value={row.kind === "header" ? collapseAllContext : collapseRowContext}>
           <RowComponent
             key={`${row.kind}-${row.id}`}
             {...{
@@ -366,8 +366,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     stickyHeader,
     stickyOffset,
     collapsedIds,
-    collapseContextAll,
-    collapseContextRow,
+    collapseAllContext,
+    collapseRowContext,
     observeRows,
   ]);
 
@@ -1202,75 +1202,72 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
   // Use this to trigger the component to re-render even though we're not calling `setList`
   const [tick, setTick] = useState<string>("");
 
-  // Create the stable `toggleId`, i.e. we are purposefully passing an (almost) empty dep list
-  const toggleAll = useCallback(
-    (_id: string) => {
-      // We have different behavior when going from expand/collapse all.
-      const isAllCollapsed = collapsedIds[0] === "header";
-      collapsedIds.splice(0, collapsedIds.length);
-      if (isAllCollapsed) {
-        // Expand all means keep `collapsedIds` empty
-      } else {
-        // Otherwise push `header` on the list as a hint that we're in the collapsed-all state
-        collapsedIds.push("header");
-        // Find all non-leaf rows so that toggling "all collapsed" -> "all not collapsed" opens
-        // the parent rows of any level.
-        const parentIds = new Set<string>();
-        const todo = [...rows];
-        while (todo.length > 0) {
-          const r = todo.pop()!;
-          if (r.children) {
-            parentIds.add(r.id);
-            todo.push(...r.children);
-          }
-        }
-        // And then mark all parent rows as collapsed.
-        collapsedIds.push(...parentIds);
-      }
-      if (persistCollapse) {
-        localStorage.setItem(persistCollapse, JSON.stringify(collapsedIds));
-      }
-      // Trigger a re-render
-      setTick(collapsedIds.join(","));
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [rows],
-  );
-
-  // Create the stable `toggleId`, i.e. we are purposefully passing an (almost) empty dep list
-  const toggleRow = useCallback(
-    (id: string) => {
-      // This is the regular/non-header behavior to just add/remove the individual row id
-      const i = collapsedIds.indexOf(id);
-      if (i === -1) {
-        collapsedIds.push(id);
-      } else {
-        collapsedIds.splice(i, 1);
-      }
-      if (persistCollapse) {
-        localStorage.setItem(persistCollapse, JSON.stringify(collapsedIds));
-      }
-      // Trigger a re-render
-      setTick(collapsedIds.join(","));
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
+  // Checking whether something is collapsed does not depend on anything
   const isCollapsed = useCallback(
     (id: string) => collapsedIds.includes(id),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
-  const collapseContextAll = useMemo(
-    () => ({ isCollapsed, toggleCollapsed: toggleAll }),
+  const collapseAllContext = useMemo(
+    () => {
+      // Create the stable `toggleCollapsed`, i.e. we are purposefully passing an (almost) empty dep list
+      // Since only toggling all rows required knowledge of what the rows are
+      const toggleAll = (_id: string) => {
+        // We have different behavior when going from expand/collapse all.
+        const isAllCollapsed = collapsedIds[0] === "header";
+        collapsedIds.splice(0, collapsedIds.length);
+        if (isAllCollapsed) {
+          // Expand all means keep `collapsedIds` empty
+        } else {
+          // Otherwise push `header` on the list as a hint that we're in the collapsed-all state
+          collapsedIds.push("header");
+          // Find all non-leaf rows so that toggling "all collapsed" -> "all not collapsed" opens
+          // the parent rows of any level.
+          const parentIds = new Set<string>();
+          const todo = [...rows];
+          while (todo.length > 0) {
+            const r = todo.pop()!;
+            if (r.children) {
+              parentIds.add(r.id);
+              todo.push(...r.children);
+            }
+          }
+          // And then mark all parent rows as collapsed.
+          collapsedIds.push(...parentIds);
+        }
+        if (persistCollapse) {
+          localStorage.setItem(persistCollapse, JSON.stringify(collapsedIds));
+        }
+        // Trigger a re-render
+        setTick(collapsedIds.join(","));
+      };
+      return { isCollapsed, toggleCollapsed: toggleAll };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [toggleAll],
+    [rows],
   );
 
-  const collapseContextRow = useMemo(
-    () => ({ isCollapsed, toggleCollapsed: toggleRow }),
+  const collapseRowContext = useMemo(
+    () => {
+      // Create the stable `toggleCollapsed`, i.e. we are purposefully passing an empty dep list
+      // Since toggling a single row does not need to know about the other rows
+      const toggleRow = (id: string) => {
+        // This is the regular/non-header behavior to just add/remove the individual row id
+        const i = collapsedIds.indexOf(id);
+        if (i === -1) {
+          collapsedIds.push(id);
+        } else {
+          collapsedIds.splice(i, 1);
+        }
+        if (persistCollapse) {
+          localStorage.setItem(persistCollapse, JSON.stringify(collapsedIds));
+        }
+        // Trigger a re-render
+        setTick(collapsedIds.join(","));
+      };
+      return { isCollapsed, toggleCollapsed: toggleRow };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
@@ -1280,7 +1277,7 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
   // see as new list identity).
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const copy = useMemo(() => [...collapsedIds], [tick, collapsedIds]);
-  return [copy, collapseContextAll, collapseContextRow] as const;
+  return [copy, collapseAllContext, collapseRowContext] as const;
 }
 
 /** GridTable as Table utility to apply <tr> element override styles */
