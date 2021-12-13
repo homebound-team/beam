@@ -912,7 +912,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
   const openCardStyles =
     typeof openCards === "string"
-      ? openCards.split(":").map((openCardKind) => style.nestedCards!.kinds[openCardKind])
+      ? openCards
+          .split(":")
+          .map((openCardKind) => style.nestedCards!.kinds[openCardKind])
+          .filter((style) => style)
       : undefined;
   const currentCard = openCardStyles && openCardStyles[openCardStyles.length - 1];
   let currentColspan = 1;
