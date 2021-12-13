@@ -32,6 +32,7 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   sizeToContent: boolean;
   contrast?: boolean;
   nothingSelectedText: string;
+  tooltip?: ReactNode;
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {

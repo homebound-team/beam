@@ -85,7 +85,15 @@ export function maybeTooltip(props: TooltipProps) {
 }
 
 // Helper function for resolving showing the Tooltip text via a 'disabled' prop, or the 'tooltip' prop.
-export function resolveTooltip(disabled?: boolean | ReactNode, tooltip?: ReactNode): ReactNode | undefined {
+export function resolveTooltip(
+  disabled?: boolean | ReactNode,
+  tooltip?: ReactNode,
+  readOnly?: boolean | ReactNode,
+): ReactNode | undefined {
   // If `disabled` is a ReactNode, then return that. Otherwise, return `tooltip`
-  return typeof disabled !== "boolean" && disabled ? disabled : tooltip ?? undefined;
+  return typeof disabled !== "boolean" && disabled
+    ? disabled
+    : typeof readOnly !== "boolean" && readOnly
+    ? readOnly
+    : tooltip ?? undefined;
 }
