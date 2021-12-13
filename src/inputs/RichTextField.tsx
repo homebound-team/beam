@@ -5,9 +5,9 @@ import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
 import { maybeCall, noop } from "src/utils";
 import Tribute from "tributejs";
-// import "tributejs/dist/tribute.css";
+import "tributejs/dist/tribute.css";
 import "trix/dist/trix";
-// import "trix/dist/trix.css";
+import "trix/dist/trix.css";
 
 export interface RichTextFieldProps {
   /** The initial html value to show in the trix editor. */
