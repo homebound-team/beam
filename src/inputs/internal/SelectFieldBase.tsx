@@ -2,6 +2,7 @@ import { Selection } from "@react-types/shared";
 import { Key, ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
+import { resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
 import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css, px } from "src/Css";
@@ -42,14 +43,14 @@ export interface SelectFieldBaseProps<O, V extends Value> extends BeamSelectFiel
 export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<O, V>): JSX.Element {
   const {
     compact,
-    disabled: isDisabled = false,
+    disabled,
     errorMsg,
     helperText,
     label,
     hideLabel,
     required,
     inlineLabel,
-    readOnly: isReadOnly = false,
+    readOnly,
     onSelect,
     fieldDecoration,
     options,
@@ -69,6 +70,8 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   } = props;
 
   const { contains } = useFilter({ sensitivity: "base" });
+  const isDisabled = !!disabled;
+  const isReadOnly = !!readOnly;
 
   function onSelectionChange(keys: Selection): void {
     // Close menu upon selection change only for Single selection mode
@@ -293,6 +296,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         contrast={contrast}
         nothingSelectedText={nothingSelectedText}
         borderless={borderless}
+        tooltip={resolveTooltip(disabled, undefined, readOnly)}
       />
       {state.isOpen && (
         <Popover
@@ -321,7 +325,8 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
 
 export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   disabledOptions?: V[];
-  disabled?: boolean;
+  // Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
+  disabled?: boolean | ReactNode;
   required?: boolean;
   errorMsg?: string;
   helperText?: string | ReactNode;
@@ -331,7 +336,8 @@ export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusa
   label: string;
   /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
-  readOnly?: boolean;
+  // Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip.
+  readOnly?: boolean | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
   sizeToContent?: boolean;

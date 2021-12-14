@@ -92,9 +92,15 @@ function Template(args: SelectFieldProps<any, any>) {
           label="Favorite Icon - Disabled"
           value={undefined}
           options={options}
-          disabled
+          disabled="Disabled reason"
         />
-        <TestSelectField {...args} label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
+        <TestSelectField
+          {...args}
+          label="Favorite Icon - Read Only"
+          options={options}
+          value={options[2].id}
+          readOnly="Read only reason"
+        />
         <TestSelectField<TestOption, string>
           {...args}
           label="Favorite Icon - Invalid"

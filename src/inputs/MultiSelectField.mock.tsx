@@ -13,6 +13,7 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
     errorMsg,
     onFocus,
     onBlur,
+    disabled,
   } = props;
   const tid = useTestIds(props, "multiSelect");
 
@@ -49,7 +50,7 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
         if (!readOnly && onBlur) onBlur();
       }}
       // Read Only does not apply to `select` fields, instead we'll add in disabled for tests to verify.
-      disabled={readOnly}
+      disabled={!!(readOnly || disabled)}
       data-error={!!errorMsg}
       data-errormsg={errorMsg}
       data-readonly={readOnly}

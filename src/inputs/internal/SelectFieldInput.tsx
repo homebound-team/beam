@@ -32,6 +32,7 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   sizeToContent: boolean;
   contrast?: boolean;
   nothingSelectedText: string;
+  tooltip?: ReactNode;
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
@@ -86,7 +87,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
       errorMsg={errorMsg}
       helperText={helperText}
       contrast={contrast}
-      xss={!inlineLabel ? Css.fw5.$ : {}}
+      xss={!inlineLabel && !isReadOnly ? Css.fw5.$ : {}}
       startAdornment={
         (showNumSelection && (
           <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinyEm.df.aic.jcc.$}>
