@@ -12,6 +12,7 @@ describe("Tooltip", () => {
     expect(resolveTooltip("Test")).toBe("Test");
     expect(resolveTooltip("Test", "Test 2")).toBe("Test");
     expect(resolveTooltip(disabledNode, "Test 2")).toBe(disabledNode);
+    expect(resolveTooltip("Test", "Test 2", "Test 3")).toBe("Test");
 
     // `readOnly` param should always trump `tooltip` param
     expect(resolveTooltip(false, undefined, "read only")).toBe("read only");
