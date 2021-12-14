@@ -14,7 +14,6 @@ export function CollapseToggle(props: GridTableCollapseToggleProps) {
     toggleCollapsed(row.id);
     setTick(Date.now());
   }, [row.id, currentlyCollapsed, toggleCollapsed]);
-  console.log({ id: row.id, currentlyCollapsed });
   const iconKey = currentlyCollapsed ? "chevronRight" : "chevronDown";
   const headerIconKey = currentlyCollapsed ? "chevronsRight" : "chevronsDown";
   const isHeader = row.kind === "header";

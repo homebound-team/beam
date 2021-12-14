@@ -1204,7 +1204,10 @@ function getCollapsedRows(persistCollapse: string | undefined): string[] {
  * function should see/update the latest list of values, which is not possible with a
  * traditional `useState` hook because it captures the original/stale list identity.
  */
-function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | undefined) {
+function useToggleIds(
+  rows: GridDataRow<Kinded>[],
+  persistCollapse: string | undefined,
+): readonly [string[], GridCollapseContextProps, GridCollapseContextProps] {
   // Make a list that we will only mutate, so that our callbacks have a stable identity.
   const [collapsedIds] = useState<string[]>(getCollapsedRows(persistCollapse));
   // Use this to trigger the component to re-render even though we're not calling `setList`
@@ -1250,7 +1253,7 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
         // Trigger a re-render
         setTick(collapsedIds.join(","));
       };
-      return { allCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleAll };
+      return { headerCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleAll };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [rows],
@@ -1274,7 +1277,7 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
         // Trigger a re-render
         setTick(collapsedIds.join(","));
       };
-      return { allCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleRow };
+      return { headerCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleRow };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [collapseAllContext.isCollapsed("header")],
