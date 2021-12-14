@@ -101,6 +101,24 @@ function Template(args: SelectFieldProps<any, any>) {
           value={options[2].id}
           readOnly="Read only reason"
         />
+        <TestSelectField
+          {...args}
+          label="With Placeholder"
+          value={undefined}
+          options={options}
+          placeholder="Placeholder Content"
+          getOptionMenuLabel={(o) => (
+            <div css={Css.df.aic.$}>
+              {o.icon && (
+                <span css={Css.fs0.mr2.$}>
+                  <Icon icon={o.icon} />
+                </span>
+              )}
+              {o.name}
+            </div>
+          )}
+        />
+        <TestSelectField {...args} label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
         <TestSelectField<TestOption, string>
           {...args}
           label="Favorite Icon - Invalid"

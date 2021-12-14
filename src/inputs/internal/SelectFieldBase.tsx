@@ -345,4 +345,6 @@ export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusa
   nothingSelectedText?: string;
   /** When set the SelectField is expected to be put on a darker background */
   contrast?: boolean;
+  /** Placeholder content */
+  placeholder?: string;
 }

@@ -74,6 +74,14 @@ export function MultiSelectFields() {
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
           values={[] as Value[]}
         />
+
+        <TestMultiSelectField
+          label="With Placeholder"
+          options={options}
+          placeholder="Placeholder Content"
+          fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
+          values={[] as Value[]}
+        />
       </div>
 
       <div css={Css.df.fdc.childGap2.$}>
