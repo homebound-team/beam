@@ -1052,15 +1052,23 @@ const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (
 };
 
 /**
- * Provides each row access to its `collapsed` current state and toggle.
+ * Provides each row access to a method to check if it is collapsed and toggle it's collapsed state.
  *
  * Calling `toggleCollapse` will keep the row itself showing, but will hide any
  * children rows (specifically those that have this row's `id` in their `parentIds`
  * prop).
+ *
+ * headerCollapsed is used to trigger rows at the root level to rerender their chevron when all are
+ * collapsed/expanded.
  */
-type GridCollapseContextProps = { isCollapsed: (id: string) => boolean; toggleCollapsed(id: string): void };
+type GridCollapseContextProps = {
+  headerCollapsed: boolean;
+  isCollapsed: (id: string) => boolean;
+  toggleCollapsed(id: string): void;
+};
 
 export const GridCollapseContext = React.createContext<GridCollapseContextProps>({
+  headerCollapsed: false,
   isCollapsed: (id: string) => false,
   toggleCollapsed: (id: string) => {},
 });
@@ -1242,7 +1250,7 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
         // Trigger a re-render
         setTick(collapsedIds.join(","));
       };
-      return { isCollapsed, toggleCollapsed: toggleAll };
+      return { allCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleAll };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [rows],
@@ -1266,10 +1274,10 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
         // Trigger a re-render
         setTick(collapsedIds.join(","));
       };
-      return { isCollapsed, toggleCollapsed: toggleRow };
+      return { allCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleRow };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [collapseAllContext.isCollapsed("header")],
   );
 
   // Return a copy of the list, b/c we want external useMemos that do explicitly use the

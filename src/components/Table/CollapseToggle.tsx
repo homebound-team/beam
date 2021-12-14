@@ -1,4 +1,4 @@
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 import { GridCollapseContext, GridDataRow, IconButton } from "src/components";
 
 export interface GridTableCollapseToggleProps {
@@ -8,9 +8,15 @@ export interface GridTableCollapseToggleProps {
 export function CollapseToggle(props: GridTableCollapseToggleProps) {
   const { row } = props;
   const { isCollapsed, toggleCollapsed } = useContext(GridCollapseContext);
-  const toggleOnClick = useCallback(() => toggleCollapsed(row.id), [row.id, toggleCollapsed]);
-  const iconKey = isCollapsed(row.id) ? "chevronRight" : "chevronDown";
-  const headerIconKey = isCollapsed(row.id) ? "chevronsRight" : "chevronsDown";
+  const [, setTick] = useState(0);
+  const currentlyCollapsed = isCollapsed(row.id);
+  const toggleOnClick = useCallback(() => {
+    toggleCollapsed(row.id);
+    setTick(Date.now());
+  }, [row.id, currentlyCollapsed, toggleCollapsed]);
+  console.log({ id: row.id, currentlyCollapsed });
+  const iconKey = currentlyCollapsed ? "chevronRight" : "chevronDown";
+  const headerIconKey = currentlyCollapsed ? "chevronsRight" : "chevronsDown";
   const isHeader = row.kind === "header";
   if (!isHeader && (!props.row.children || props.row.children.length === 0)) {
     return null;
