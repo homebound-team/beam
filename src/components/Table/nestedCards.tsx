@@ -28,17 +28,28 @@ type Chrome = () => JSX.Element;
 type ChromeBuffer = Chrome[];
 
 export class NestedCards {
+  private columns: GridColumn<any>[];
   // A stack of the current cards we're showing
   private readonly openCards: Array<string> = [];
   // A buffer of the open/close/spacer rows we need between each content row.
   private readonly chromeBuffer: ChromeBuffer = [];
   private readonly styles: NestedCardsStyle;
 
-  constructor(private columns: GridColumn<any>[], private filteredRows: RowTuple<any>[], private style: GridStyle) {
+  constructor(columns: GridColumn<any>[], style: GridStyle) {
+    this.columns = columns;
     this.styles = style.nestedCards!;
   }
 
-  maybeOpenCard(row: GridDataRow<any>): boolean {
+  /**
+   * Maybe add an opening Chrome row to the given `row` if its a nested card.
+   *
+   * @param row The row which will be opened. The open Chrome row will appear
+   * above this row.
+   * @param buffer The buffer, array of rows, to add the open Chrome row.
+   * Currently there are two buffers, one for header rows (`headerRows`) and a
+   * second for filtered rows (`filteredRows`).
+   */
+  maybeOpenCard(row: GridDataRow<any>, buffer: RowTuple<any>[]): boolean {
     const card = this.styles.kinds[row.kind];
     // If this kind doesn't have a card defined, don't put it on the card stack
     if (card) {
@@ -46,7 +57,7 @@ export class NestedCards {
       this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, this.styles.kinds, "open"));
     }
     // But always close previous cards if needed
-    maybeCreateChromeRow(this.columns, this.filteredRows, this.chromeBuffer);
+    maybeCreateChromeRow(this.columns, buffer, this.chromeBuffer);
     return !!card;
   }
 
@@ -59,8 +70,15 @@ export class NestedCards {
     this.chromeBuffer.push(makeSpacer(this.styles.spacerPx, this.openCards, this.styles));
   }
 
-  done() {
-    maybeCreateChromeRow(this.columns, this.filteredRows, this.chromeBuffer);
+  /**
+   * Close the remaining open rows with a close Chrome row.
+   *
+   * @param buffer The buffer, array of rows, to close the opened Chrome rows so
+   * far. Currently there are two buffers, one for header rows (`headerRows`) and a
+   * second for filtered rows (`filteredRows`).
+   */
+  done(buffer: RowTuple<any>[]) {
+    maybeCreateChromeRow(this.columns, buffer, this.chromeBuffer);
   }
 
   /** Return a stable copy of the cards, so it won't change as we keep going. */
@@ -176,25 +194,32 @@ export function makeSpacer(height: number, openCards: string[], styles: NestedCa
 }
 
 /**
- * Takes the current buffer of close row(s), spacers, and open row, and creates a single chrome DOM row.
+ * Takes the current Chrome row buffer of close row(s), spacers, and open row,
+ * and creates a single chrome DOM row.
  *
- * This allows a minimal amount of DOM overhead, insofar as to the css-grid or react-virtuoso we only
- * 1 extra DOM node between each row of content to achieve our nested card look & feel, i.e.:
+ * This allows a minimal amount of DOM overhead, insofar as to the css-grid or
+ * react-virtuoso we only add 1 extra DOM node between each row of content to
+ * achieve our nested card look & feel.
  *
+ * i.e.:
  * - chrome row (open)
  * - card1 content row
  * - chrome row (card2 open)
  * - nested card2 content row
  * - chrome row (card2 close, card1 close)
+ *
+ * @param columns The columns for the GridTable
+ * @param buffer The buffer to store the Chrome row created.
+ * @param chromeBuffer The Chrome row buffer to flush.
  */
 export function maybeCreateChromeRow(
   columns: GridColumn<any>[],
-  filteredRows: RowTuple<any>[],
+  buffer: RowTuple<any>[],
   chromeBuffer: ChromeBuffer,
 ): void {
   if (chromeBuffer.length > 0) {
-    filteredRows.push([undefined, <ChromeRow chromeBuffer={[...chromeBuffer]} columns={columns.length} />]);
-    // clear the buffer
+    buffer.push([undefined, <ChromeRow chromeBuffer={[...chromeBuffer]} columns={columns.length} />]);
+    // clear the Chrome buffer
     chromeBuffer.splice(0, chromeBuffer.length);
   }
 }

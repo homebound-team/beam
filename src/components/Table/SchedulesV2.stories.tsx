@@ -55,7 +55,7 @@ type Row = HeaderRow | MilestoneRow | SubGroupRow | TaskRow | AddRow;
 
 /** Rows */
 // TODO: Handle all 4 situations
-const rows: GridDataRow<Row>[] = [{ kind: "header", id: "header" }, ...createMilestones(1, 3, 2)];
+const rows: GridDataRow<Row>[] = [{ kind: "header", id: "header" }, ...createMilestones(2, 3, 2)];
 
 /** Columns */
 // FIXME: This column is not vertically aligned
@@ -182,13 +182,13 @@ const spacing = { brPx: 8, pxPx: 16 };
 const style: GridStyle = {
   headerCellCss: Css.sm.gray700.py1.df.aic.$,
   firstNonHeaderRowCss: Css.mt2.$,
-  cellCss: Css.gray700.sm.aic.pxPx(4).$,
+  cellCss: Css.h100.gray700.sm.aic.pxPx(4).$,
   rootCss: Css.pb(2).$,
   nestedCards: {
     spacerPx: 8,
     firstLastColumnWidth: 33, // 32px + 1px border
     kinds: {
-      header: { bgColor: Palette.Gray100, brPx: 1, pxPx: 0 },
+      header: { bgColor: Palette.Gray100, brPx: 4, pxPx: 0 },
       // TODO: It would be nice if this used CSS Properties so that we can use TRUSS
       milestone: { bgColor: Palette.Gray100, ...spacing },
       subgroup: { bgColor: Palette.White, ...spacing },
@@ -225,9 +225,6 @@ export function SchedulesV2() {
               cellCss: Css.py1.$,
             },
           }}
-          // FIXME: `firstNonHeaderRowCss` does not work when virtual is enabled
-          // Possible fix is to use an ref/class/id for this row
-          // as="virtual"
           stickyHeader
         />
       </PresentationProvider>

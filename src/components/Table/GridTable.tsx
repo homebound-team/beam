@@ -49,7 +49,16 @@ export interface GridStyle {
   firstNonHeaderRowCss?: Properties;
   /** Applied to all cell divs (via a selector off the base div). */
   cellCss?: Properties;
-  /** Applied to the header (really first) row div. */
+  /**
+   * Applied to the header (really first) row div.
+   *
+   * NOTE: Adding margin bottom to a virtual table header will not result in the
+   * expected of adding space between the header and list. This will only add
+   * margin bottom to the cell itself and now the header row.
+   *
+   * To achieve space between the header and list, add margin top to the
+   * `firstNonHeaderRowCss` styles.
+   * */
   headerCellCss?: Properties;
   /** Applied to the first cell of all rows, i.e. for table-wide padding or left-side borders. */
   firstCellCss?: Properties;
@@ -315,7 +324,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const filteredRows: RowTuple<R>[] = [];
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
-    const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style);
+    const nestedCards = !!style.nestedCards && new NestedCards(columns, style);
 
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
@@ -327,8 +336,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         );
       // Even if we don't pass the filter, one of our children might, so we continue on after this check
       let isCard = false;
+
       if (matches) {
-        isCard = nestedCards && nestedCards.maybeOpenCard(row);
+        isCard = nestedCards && nestedCards.maybeOpenCard(row, filteredRows);
         filteredRows.push([row, makeRowComponent(row)]);
       }
 
@@ -345,9 +355,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
-          nestedCards && nestedCards.maybeOpenCard(row);
+          nestedCards && nestedCards.maybeOpenCard(row, headerRows);
           headerRows.push([row, makeRowComponent(row)]);
           nestedCards && nestedCards.closeCard();
+          nestedCards && nestedCards.done(headerRows);
           return;
         }
         visit(row);
@@ -357,7 +368,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
     visitRows(maybeSorted, !!nestedCards);
-    nestedCards && nestedCards.done();
+    nestedCards && nestedCards.done(filteredRows);
 
     return [headerRows, filteredRows];
   }, [
@@ -442,6 +453,13 @@ function renderCssGrid<R extends Kinded>(
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
+  // We must determine if the header is using nested card styles to account for
+  // the opening and closing Chrome rows.
+  const isNestedCardStyleHeader = !!style.nestedCards?.kinds["header"];
+  // Determine at what index is the first non header row.
+  // The +1 at the end is to compensate for CSS nth counter starting at 1 (vs 0 for JS)
+  const firstNonHeaderRowIndex = (!isNestedCardStyleHeader ? 0 : 3) + 1;
+
   return (
     <div
       css={{
@@ -451,7 +469,9 @@ function renderCssGrid<R extends Kinded>(
         // The `div + div` is also the "owl operator", i.e. don't apply to the 1st row.
         ...(style.betweenRowsCss ? Css.addIn("& > div + div > *", style.betweenRowsCss).$ : {}),
         // removes border between header and second row
-        ...(style.firstNonHeaderRowCss ? Css.addIn("& > div:nth-of-type(2) > *", style.firstNonHeaderRowCss).$ : {}),
+        ...(style.firstNonHeaderRowCss
+          ? Css.addIn(`& > div:nth-of-type(${firstNonHeaderRowIndex}) > *`, style.firstNonHeaderRowCss).$
+          : {}),
         ...style.rootCss,
         ...xss,
       }}
@@ -569,24 +589,34 @@ function renderVirtual<R extends Kinded>(
         return (maybeContentsDiv.firstElementChild! as HTMLElement).getBoundingClientRect().height;
       }}
       itemContent={(index) => {
-        // We keep header and filter rows separate, but react-virtuoso is a flat list,
-        // so we pick the right header / first row message / actual row.
-        let i = index;
-        if (i < headerRows.length) {
-          return headerRows[i][1];
+        // Since we have two arrays of rows: `headerRows` and `filteredRow` we
+        // must determine which one to render.
+
+        // Determine if we need to render a header row
+        if (index < headerRows.length) {
+          return headerRows[index][1];
         }
-        i -= headerRows.length;
+
+        // Reset index
+        index -= headerRows.length;
+
+        // Show firstRowMessage as the first `filteredRow`
         if (firstRowMessage) {
-          if (i === 0) {
+          if (index === 0) {
             return (
               <div css={Css.add("gridColumn", `${columns.length} span`).$}>
                 <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
               </div>
             );
           }
-          i -= 1;
+
+          // Shift index -1 when there is a firstRowMessage to not skip the
+          // first `filteredRow`
+          index--;
         }
-        return filteredRows[i][1];
+
+        // Lastly render `filteredRow`
+        return filteredRows[index][1];
       }}
       totalCount={(headerRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)}
     />
@@ -594,11 +624,18 @@ function renderVirtual<R extends Kinded>(
 }
 
 /**
- * Customizes the `List` element that react-virtuoso renders, to have our css grid logic.
+ * A table might render two of these components to represent two virtual lists.
+ * This generally happens when `topItemCount` prop is used and React-Virtuoso
+ * creates to Virtual lists where the first represents, generally, the header
+ * rows and the second represents the non-header rows (list rows).
  *
- * We wrap this in memoizeOne so that React.createElement sees a consistent/stable component
- * identity, even though technically we have a different "component" per the given set of props
- * (solely to capture as params that we can't pass through react-virtuoso's API as props).
+ * The main goal of this custom component is to:
+ * - Customize the list wrapper to our css grid logic styles
+ *
+ * We wrap this in memoizeOne so that React.createElement sees a
+ * consistent/stable component identity, even though technically we have a
+ * different "component" per the given set of props (solely to capture as
+ * params that we can't pass through react-virtuoso's API as props).
  */
 const VirtualRoot = memoizeOne<
   (
@@ -609,7 +646,11 @@ const VirtualRoot = memoizeOne<
     xss: any,
   ) => Components["List"]
 >((gs, columns, id, firstLastColumnWidth, xss) => {
-  return React.forwardRef(function VirtualRoot({ style, children }, ref) {
+  return React.forwardRef(function VirtualRooot({ style, children }, ref) => {
+    // This VirtualRoot list represent the header when no styles are given. The
+    // table list generally has styles to scroll the page for windowing.
+    const isList = Object.keys(style || {}).length !== 0;
+
     // This re-renders each time we have new children in the view port
     return (
       <div
@@ -618,6 +659,14 @@ const VirtualRoot = memoizeOne<
         css={{
           // Add an extra `> div` due to Item + itemContent both having divs
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
+          // Add `display:contents` to Item to flatten it like we do GridRow
+          ...Css.addIn("& > div", Css.display("contents").$).$,
+          // Table list styles only
+          ...(isList
+            ? {
+                ...Css.addIn("& > div:first-of-type > *", gs.firstNonHeaderRowCss).$,
+              }
+            : {}),
           ...gs.rootCss,
           ...xss,
         }}
