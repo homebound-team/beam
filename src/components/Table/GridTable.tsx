@@ -354,10 +354,15 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
-          nestedCards && nestedCards.maybeOpenCard(row, headerRows);
+          // Flag to determine if the header has nested card styles.
+          // This will determine if we should include opening and closing
+          // Chrome rows.
+          const isHeaderNested = !!style.nestedCards?.kinds["header"];
+
+          isHeaderNested && nestedCards.maybeOpenCard(row, headerRows);
           headerRows.push([row, makeRowComponent(row)]);
-          nestedCards && nestedCards.closeCard();
-          nestedCards && nestedCards.done(headerRows);
+          isHeaderNested && nestedCards.closeCard();
+          isHeaderNested && nestedCards.done(row, headerRows);
           return;
         }
         visit(row);
