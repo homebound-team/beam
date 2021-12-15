@@ -359,10 +359,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           // Chrome rows.
           const isHeaderNested = !!style.nestedCards?.kinds["header"];
 
-          isHeaderNested && nestedCards.maybeOpenCard(row, headerRows);
+          isHeaderNested && nestedCards && nestedCards.maybeOpenCard(row, headerRows);
           headerRows.push([row, makeRowComponent(row)]);
-          isHeaderNested && nestedCards.closeCard();
-          isHeaderNested && nestedCards.done(row, headerRows);
+          isHeaderNested && nestedCards && nestedCards.closeCard();
+          isHeaderNested && nestedCards && nestedCards.done(row, headerRows);
           return;
         }
         visit(row);
