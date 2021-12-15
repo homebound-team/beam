@@ -1,7 +1,7 @@
 import { format as dateFnsFormat, parse as dateFnsParse } from "date-fns";
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
-import { DateUtils } from "react-day-picker";
+import { DateUtils, Modifier } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
 import { Icon } from "src/components";
 import { Popover } from "src/components/internal";
@@ -32,6 +32,7 @@ export interface DateFieldProps
   placeholder?: string;
   format?: keyof typeof dateFormats;
   iconLeft?: boolean;
+  disabledDays?: Modifier;
 }
 
 export function DateField(props: DateFieldProps) {
@@ -49,6 +50,7 @@ export function DateField(props: DateFieldProps) {
     readOnly = false,
     format = "short",
     iconLeft = false,
+    disabledDays,
     ...others
   } = props;
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -214,6 +216,7 @@ export function DateField(props: DateFieldProps) {
               setInputValue(formatDate(d, dateFormat));
               onChange(d);
             }}
+            disabledDays={disabledDays}
             {...tid.datePicker}
           />
         </Popover>

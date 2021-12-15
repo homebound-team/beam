@@ -1,5 +1,5 @@
 import React from "react";
-import DayPicker, { NavbarElementProps, WeekdayElementProps } from "react-day-picker";
+import DayPicker, { NavbarElementProps, WeekdayElementProps, Modifier } from "react-day-picker";
 import { OverlayTriggerState } from "react-stately";
 import { IconButton } from "src/components";
 import { Css, Palette } from "src/Css";
@@ -10,10 +10,11 @@ interface DatePickerOverlayProps {
   state: OverlayTriggerState;
   positionProps: React.HTMLAttributes<Element>;
   onChange: (value: Date) => void;
+  disabledDays: Modifier;
 }
 
 export function DatePickerOverlay(props: DatePickerOverlayProps) {
-  const { value, state, positionProps, onChange } = props;
+  const { value, state, positionProps, onChange, disabledDays } = props;
   // We define some spacing between the Calendar overlay and the trigger element, and depending on where the overlay renders (above or below) we need to adjust the spacing.
   // We can determine if the position was flipped based on what style is defined, `top` (for positioned below the trigger), and `bottom` (for above the trigger).
   // The above assumption regarding `top` and `bottom` is true as long as we use `bottom` as our default `OverlayPosition.placement` (set in DateField).
@@ -48,11 +49,13 @@ export function DatePickerOverlay(props: DatePickerOverlayProps) {
         weekdayElement={Weekday}
         selectedDays={[value]}
         initialMonth={value ?? new Date()}
-        onDayClick={(day) => {
+        onDayClick={(day, modifiers) => {
+          if (modifiers.disabled) return;
           // Set the day value, and close the picker.
           onChange(day);
           state.close();
         }}
+        disabledDays={disabledDays}
       />
     </div>
   );

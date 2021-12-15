@@ -2,7 +2,7 @@ import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
 import { Button } from "src/components";
-import { jan1 } from "src/forms/formStateDomain";
+import { jan1, jan2 } from "src/forms/formStateDomain";
 import { DateField, DateFieldProps, TextField } from "src/inputs";
 import { noop } from "src/utils";
 import { samples } from "src/utils/sb";
@@ -38,6 +38,7 @@ export function DateFields() {
     ],
     ["Compact", <TestDateField compact label="Start Date" />],
     ["SchedulesV2", <TestDateField compact label="Start Date" iconLeft format="medium" />],
+    ["Disabled Days", <TestDateField compact label="End Date" iconLeft format="medium" disabledDays={{ after: jan2 }}/>],
   );
 }
 
