@@ -301,7 +301,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           value={row.kind === "header" ? collapseAllContext : collapseRowContext}
         >
           <RowComponent
-            key={`${row.kind}-${row.id}`}
             {...{
               as,
               columns,
@@ -368,7 +367,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
     visitRows(maybeSorted, !!nestedCards);
-    nestedCards && nestedCards.done(filteredRows);
+    nestedCards && nestedCards.done(maybeSorted[maybeSorted.length - 1], filteredRows);
 
     return [headerRows, filteredRows];
   }, [

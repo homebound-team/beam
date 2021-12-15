@@ -1,4 +1,4 @@
-import { Fragment, ReactElement } from "react";
+import { Fragment, Key, ReactElement } from "react";
 import {
   GridColumn,
   GridDataRow,
@@ -57,7 +57,12 @@ export class NestedCards {
       this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, this.styles.kinds, "open"));
     }
     // But always close previous cards if needed
-    maybeCreateChromeRow(this.columns, buffer, this.chromeBuffer);
+    maybeCreateChromeRow({
+      key: `chrome-open-${row.kind}-${row.id}`,
+      columns: this.columns,
+      buffer,
+      chromeBuffer: this.chromeBuffer,
+    });
     return !!card;
   }
 
@@ -73,12 +78,18 @@ export class NestedCards {
   /**
    * Close the remaining open rows with a close Chrome row.
    *
+   * @param row The row that is completing/closing nested open Chrome rows.
    * @param buffer The buffer, array of rows, to close the opened Chrome rows so
    * far. Currently there are two buffers, one for header rows (`headerRows`) and a
    * second for filtered rows (`filteredRows`).
    */
-  done(buffer: RowTuple<any>[]) {
-    maybeCreateChromeRow(this.columns, buffer, this.chromeBuffer);
+  done(row: GridDataRow<any>, buffer: RowTuple<any>[]) {
+    maybeCreateChromeRow({
+      key: `chrome-close-${row.kind}-${row.id}`,
+      columns: this.columns,
+      buffer,
+      chromeBuffer: this.chromeBuffer,
+    });
   }
 
   /** Return a stable copy of the cards, so it won't change as we keep going. */
@@ -212,13 +223,19 @@ export function makeSpacer(height: number, openCards: string[], styles: NestedCa
  * @param buffer The buffer to store the Chrome row created.
  * @param chromeBuffer The Chrome row buffer to flush.
  */
-export function maybeCreateChromeRow(
-  columns: GridColumn<any>[],
-  buffer: RowTuple<any>[],
-  chromeBuffer: ChromeBuffer,
-): void {
+export function maybeCreateChromeRow({
+  key,
+  columns,
+  buffer,
+  chromeBuffer,
+}: {
+  key: Key;
+  columns: GridColumn<any>[];
+  buffer: RowTuple<any>[];
+  chromeBuffer: ChromeBuffer;
+}): void {
   if (chromeBuffer.length > 0) {
-    buffer.push([undefined, <ChromeRow chromeBuffer={[...chromeBuffer]} columns={columns.length} />]);
+    buffer.push([undefined, <ChromeRow key={key} chromeBuffer={[...chromeBuffer]} columns={columns.length} />]);
     // clear the Chrome buffer
     chromeBuffer.splice(0, chromeBuffer.length);
   }
