@@ -21,6 +21,7 @@ import {
   simpleRows,
 } from "src/components/Table/simpleHelpers";
 import { Css, Palette } from "src/Css";
+import { noop } from "src/utils";
 import { cell, cellAnd, cellOf, click, render, row, rowAnd } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
@@ -44,21 +45,34 @@ type ChildRow = { kind: "child"; id: string; name: string };
 type GrandChildRow = { kind: "grandChild"; id: string; name: string };
 type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow;
 
+type RenderCounter = (kind: string, id: string) => void;
+
 // And two columns for NestedRow
-const nestedColumns: GridColumn<NestedRow>[] = [
-  {
-    header: (row) => <Collapse id={row.id} />,
-    parent: (row) => <Collapse id={row.id} />,
-    child: (row) => <Collapse id={row.id} />,
-    grandChild: () => "",
-  },
-  {
-    header: () => "Name",
-    parent: (row) => ({ content: <div>{row.name}</div>, value: row.name }),
-    child: (row) => ({ content: <div css={Css.ml2.$}>{row.name}</div>, value: row.name }),
-    grandChild: (row) => ({ content: <div css={Css.ml4.$}>{row.name}</div>, value: row.name }),
-  },
-];
+function nestedColumns(renderCounter: RenderCounter = noop): GridColumn<NestedRow>[] {
+  return [
+    {
+      header: (row) => <Collapse id={row.id} renderCounter={renderCounter} />,
+      parent: (row) => <Collapse id={row.id} renderCounter={renderCounter} />,
+      child: (row) => <Collapse id={row.id} renderCounter={renderCounter} />,
+      grandChild: () => "",
+    },
+    {
+      header: () => "Name",
+      parent: (row) => {
+        renderCounter(row.kind, row.id);
+        return { content: <div>{row.name}</div>, value: row.name };
+      },
+      child: (row) => {
+        renderCounter(row.kind, row.id);
+        return { content: <div css={Css.ml2.$}>{row.name}</div>, value: row.name };
+      },
+      grandChild: (row) => {
+        renderCounter(row.kind, row.id);
+        return { content: <div css={Css.ml4.$}>{row.name}</div>, value: row.name };
+      },
+    },
+  ];
+}
 
 describe("GridTable", () => {
   it("can align things", async () => {
@@ -769,7 +783,7 @@ describe("GridTable", () => {
       },
     ];
     // When we filter by 'foo'
-    const r = await render(<GridTable filter="foo" columns={nestedColumns} rows={rows} />);
+    const r = await render(<GridTable filter="foo" columns={nestedColumns()} rows={rows} />);
     // Then we show the header
     expect(cell(r, 0, 1)).toHaveTextContent("Name");
     // And the child that matched
@@ -791,7 +805,7 @@ describe("GridTable", () => {
         ],
       },
     ];
-    const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+    const r = await render(<GridTable<NestedRow> columns={nestedColumns()} rows={rows} />);
     // And all three rows are initially rendered
     expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
     expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
@@ -801,6 +815,58 @@ describe("GridTable", () => {
     // Then only the parent row is still shown
     expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
     expect(row(r, 1)).toBeUndefined();
+  });
+
+  it("collapsing a parent row only rerenders the collapse cell", async () => {
+    // Given a parent with a child and grandchild
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+            children: [{ kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" }],
+          },
+        ],
+      },
+    ];
+    const renderedCells: [string, string][] = [];
+    function renderCounter(kind: string, column: string) {
+      renderedCells.push([kind, column]);
+    }
+    const r = await render(<GridTable<NestedRow> columns={nestedColumns(renderCounter)} rows={rows} />);
+    renderedCells.length = 0;
+    expect(cell(r, 0, 0)).toHaveTextContent("-");
+    // When the parent is collapsed
+    click(cell(r, 0, 0).children[0] as any);
+    // Then only the parent row is still shown
+    expect(cell(r, 0, 0)).toHaveTextContent("+");
+    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
+    expect(row(r, 1)).toBeUndefined();
+    expect(renderedCells).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "parent",
+          "p1",
+        ],
+        Array [
+          "header",
+          "p1",
+        ],
+        Array [
+          "child",
+          "p1c1",
+        ],
+        Array [
+          "header",
+          "p1c1",
+        ],
+        Array [
+          "grandChild",
+          "p1c1g1",
+        ],
+      ]
+    `);
   });
 
   it("can collapse child rows", async () => {
@@ -816,7 +882,7 @@ describe("GridTable", () => {
         ],
       },
     ];
-    const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+    const r = await render(<GridTable<NestedRow> columns={nestedColumns()} rows={rows} />);
     // And all three rows are initially rendered
     expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
     expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
@@ -844,7 +910,7 @@ describe("GridTable", () => {
         ],
       },
     ];
-    const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+    const r = await render(<GridTable<NestedRow> columns={nestedColumns()} rows={rows} />);
     // And all three rows are initially rendered
     expect(cell(r, 1, 1)).toHaveTextContent("parent 1");
     expect(cell(r, 2, 1)).toHaveTextContent("child p1c1");
@@ -878,7 +944,7 @@ describe("GridTable", () => {
 
     // When we render the table with the persistCollapse prop set
     const r = await render(
-      <GridTable<NestedRow> columns={nestedColumns} rows={rows} persistCollapse={tableIdentifier} />,
+      <GridTable<NestedRow> columns={nestedColumns()} rows={rows} persistCollapse={tableIdentifier} />,
     );
     // Expect that the header is shown
     expect(row(r, 0)).toBeDefined();
@@ -954,7 +1020,7 @@ describe("GridTable", () => {
 
     // A pretend MutableRefObject
     const rowLookup: MutableRefObject<GridRowLookup<NestedRow> | undefined> = { current: undefined };
-    await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} rowLookup={rowLookup} />);
+    await render(<GridTable<NestedRow> columns={nestedColumns()} rows={rows} rowLookup={rowLookup} />);
     expect(rowLookup.current!.lookup(p1)).toMatchObject({
       next: p1c1,
       child: { next: p1c1 },
@@ -1075,7 +1141,7 @@ describe("GridTable", () => {
     expect(cell(r, 1, 1).textContent).toBe("1");
   });
 
-  it("ignores chrome and cardpadding elements in nestedCardStyle when using GridTable test helpers", async () => {
+  it("ignores chrome and card padding elements in nestedCardStyle when using GridTable test helpers", async () => {
     // Given a table with nested card styles
     const kindStyle = { bgColor: Palette.Gray100, brPx: 4, pxPx: 4 };
     const nestedStyle: GridStyle = {
@@ -1103,7 +1169,7 @@ describe("GridTable", () => {
       },
     ];
 
-    const r = await render(<GridTable<NestedRow> columns={nestedColumns} style={nestedStyle} rows={rows} />);
+    const r = await render(<GridTable<NestedRow> columns={nestedColumns()} style={nestedStyle} rows={rows} />);
     // When using the various gridtable test helpers (cell, cellAnd, cellOf, row, rowAnd)
     // Then chrome rows, and padding columns are ignored
     expect(cellAnd(r, 0, 0, "collapse")).toBeTruthy();
@@ -1123,9 +1189,10 @@ describe("GridTable", () => {
   });
 });
 
-function Collapse({ id }: { id: string }) {
+function Collapse({ id, renderCounter }: { id: string; renderCounter?: RenderCounter }) {
   const { isCollapsed, toggleCollapsed } = useContext(GridCollapseContext);
   const icon = isCollapsed(id) ? "+" : "-";
+  if (renderCounter) renderCounter("header", id);
   return (
     <div onClick={() => toggleCollapsed(id)} data-testid="collapse">
       {icon}
