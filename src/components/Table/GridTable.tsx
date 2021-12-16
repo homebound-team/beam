@@ -1279,6 +1279,7 @@ function useToggleIds(
       };
       return { headerCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleRow };
     },
+    // Break the memo on the individual row context if the header is toggled
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [collapseAllContext.isCollapsed("header")],
   );
