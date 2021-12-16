@@ -535,12 +535,12 @@ function renderVirtual<R extends Kinded>(
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
-  const { paddingBottom } = style.rootCss ?? {};
+  const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
   return (
     <Virtuoso
       ref={virtuosoRef}
       components={{
-        List: VirtualRoot(style, columns, id, firstLastColumnWidth, xss),
+        List: VirtualRoot({ ...style, rootCss: otherRootStyles }, columns, id, firstLastColumnWidth, xss),
         Footer: () => <div css={{ paddingBottom }}></div>,
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
