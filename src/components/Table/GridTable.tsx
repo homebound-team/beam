@@ -535,12 +535,12 @@ function renderVirtual<R extends Kinded>(
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
-  const { paddingBottom } = style.rootCss ?? {};
+  const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
   return (
     <Virtuoso
       ref={virtuosoRef}
       components={{
-        List: VirtualRoot(style, columns, id, firstLastColumnWidth, xss),
+        List: VirtualRoot({ ...style, rootCss: otherRootStyles }, columns, id, firstLastColumnWidth, xss),
         Footer: () => <div css={{ paddingBottom }}></div>,
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
@@ -1052,15 +1052,23 @@ const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (
 };
 
 /**
- * Provides each row access to its `collapsed` current state and toggle.
+ * Provides each row access to a method to check if it is collapsed and toggle it's collapsed state.
  *
  * Calling `toggleCollapse` will keep the row itself showing, but will hide any
  * children rows (specifically those that have this row's `id` in their `parentIds`
  * prop).
+ *
+ * headerCollapsed is used to trigger rows at the root level to rerender their chevron when all are
+ * collapsed/expanded.
  */
-type GridCollapseContextProps = { isCollapsed: (id: string) => boolean; toggleCollapsed(id: string): void };
+type GridCollapseContextProps = {
+  headerCollapsed: boolean;
+  isCollapsed: (id: string) => boolean;
+  toggleCollapsed(id: string): void;
+};
 
 export const GridCollapseContext = React.createContext<GridCollapseContextProps>({
+  headerCollapsed: false,
   isCollapsed: (id: string) => false,
   toggleCollapsed: (id: string) => {},
 });
@@ -1196,7 +1204,10 @@ function getCollapsedRows(persistCollapse: string | undefined): string[] {
  * function should see/update the latest list of values, which is not possible with a
  * traditional `useState` hook because it captures the original/stale list identity.
  */
-function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | undefined) {
+function useToggleIds(
+  rows: GridDataRow<Kinded>[],
+  persistCollapse: string | undefined,
+): readonly [string[], GridCollapseContextProps, GridCollapseContextProps] {
   // Make a list that we will only mutate, so that our callbacks have a stable identity.
   const [collapsedIds] = useState<string[]>(getCollapsedRows(persistCollapse));
   // Use this to trigger the component to re-render even though we're not calling `setList`
@@ -1242,7 +1253,7 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
         // Trigger a re-render
         setTick(collapsedIds.join(","));
       };
-      return { isCollapsed, toggleCollapsed: toggleAll };
+      return { headerCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleAll };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [rows],
@@ -1266,10 +1277,10 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
         // Trigger a re-render
         setTick(collapsedIds.join(","));
       };
-      return { isCollapsed, toggleCollapsed: toggleRow };
+      return { headerCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleRow };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [collapseAllContext.isCollapsed("header")],
   );
 
   // Return a copy of the list, b/c we want external useMemos that do explicitly use the
