@@ -433,8 +433,11 @@ describe("GridTable", () => {
 
     it("throws an error if a column value is not sortable", async () => {
       // Given the table is using client-side sorting
-      // And we have a column that returns a react component w/o GridCellContent
-      const nameColumn: GridColumn<Row> = { header: () => "Name", data: ({ name }) => <div>{name}</div> };
+      const nameColumn: GridColumn<Row> = {
+        header: () => "Name",
+        // And we have a column that returns a react component w/o GridCellContent
+        data: ({ name }) => <div>{name}</div>,
+      };
       // Then the render will fail
       await expect(
         render(
@@ -997,6 +1000,54 @@ describe("GridTable", () => {
     // Then we can still assert against the content
     expect(cell(r, 1, 0)).toHaveTextContent("foo");
     expect(cell(r, 2, 0)).toHaveTextContent("bar");
+  });
+
+  it("as=virtual cannot use JSX directly content", async () => {
+    // Given an application would call this in their setupTests/beforeEach
+    setRunningInJest();
+    // When the GridTable is rendered as=virtual
+    const r = render(
+      <GridTable<Row>
+        columns={[
+          {
+            header: () => "Name",
+            // And a column returns GridCellContent.content as directly JSX
+            data: ({ name }) => ({ content: <div>{name}</div> }),
+          },
+        ]}
+        // And the table is using client-side sorting
+        sorting={{ on: "client" }}
+        rows={rows}
+        as="virtual"
+      />,
+    );
+    // Then it fails b/c it would be too expensive
+    await expect(r).rejects.toThrow(
+      "GridTables with as=virtual & sortable columns should use functions that return JSX, instead of JSX",
+    );
+  });
+
+  it("as=virtual can use JSX functions as content", async () => {
+    // Given an application would call this in their setupTests/beforeEach
+    setRunningInJest();
+    // When the GridTable is rendered as=virtual
+    const r = await render(
+      <GridTable<Row>
+        columns={[
+          {
+            header: () => "Name",
+            // And a column returns GridCellContent.content a JSX function
+            data: ({ name }) => ({ content: () => <div>{name}</div>, value: 1 }),
+          },
+        ]}
+        // And the table is using client-side sorting
+        sorting={{ on: "client" }}
+        rows={rows}
+        as="virtual"
+      />,
+    );
+    // Then it rendered
+    expect(cell(r, 1, 0)).toHaveTextContent("foo");
   });
 
   it("provides simpleDataRows", async () => {
