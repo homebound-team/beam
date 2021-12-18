@@ -284,7 +284,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
       return (
-        <GridCollapseContext.Provider value={row.kind === "header" ? collapseAllContext : collapseRowContext}>
+        <GridCollapseContext.Provider
+          key={`${row.kind}-${row.id}`}
+          value={row.kind === "header" ? collapseAllContext : collapseRowContext}
+        >
           <RowComponent
             key={`${row.kind}-${row.id}`}
             {...{
@@ -600,8 +603,8 @@ const VirtualRoot = memoizeOne<
     firstLastColumnWidth: number | undefined,
     xss: any,
   ) => Components["List"]
->(function VirtualRoot(gs, columns, id, firstLastColumnWidth, xss) {
-  return React.forwardRef(({ style, children }, ref) => {
+>((gs, columns, id, firstLastColumnWidth, xss) => {
+  return React.forwardRef(function VirtualRoot({ style, children }, ref) {
     // This re-renders each time we have new children in the view port
     return (
       <div
