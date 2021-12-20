@@ -284,7 +284,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
       return (
-        <GridCollapseContext.Provider value={row.kind === "header" ? collapseAllContext : collapseRowContext}>
+        <GridCollapseContext.Provider
+          key={`${row.kind}-${row.id}`}
+          value={row.kind === "header" ? collapseAllContext : collapseRowContext}
+        >
           <RowComponent
             key={`${row.kind}-${row.id}`}
             {...{
@@ -535,13 +538,16 @@ function renderVirtual<R extends Kinded>(
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
-  const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
+  const { footerStyle, listStyle } = useMemo(() => {
+    const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
+    return { footerStyle: { paddingBottom }, listStyle: { ...style, rootCss: otherRootStyles } };
+  }, [style]);
   return (
     <Virtuoso
       ref={virtuosoRef}
       components={{
-        List: VirtualRoot({ ...style, rootCss: otherRootStyles }, columns, id, firstLastColumnWidth, xss),
-        Footer: () => <div css={{ paddingBottom }}></div>,
+        List: VirtualRoot(listStyle, columns, id, firstLastColumnWidth, xss),
+        Footer: () => <div css={footerStyle}></div>,
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
@@ -598,7 +604,7 @@ const VirtualRoot = memoizeOne<
     xss: any,
   ) => Components["List"]
 >((gs, columns, id, firstLastColumnWidth, xss) => {
-  return React.forwardRef(({ style, children }, ref) => {
+  return React.forwardRef(function VirtualRoot({ style, children }, ref) {
     // This re-renders each time we have new children in the view port
     return (
       <div
