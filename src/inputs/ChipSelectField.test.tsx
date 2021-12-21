@@ -131,8 +131,8 @@ describe("ChipSelectField", () => {
     // When selecting the "Create new" option
     click(r.chipSelectField);
     click(r.getByRole("option", { name: "Create new" }));
-    // Then onBlur should be called initially when the ChipInputField is shown
-    expect(onBlur).toBeCalledTimes(1);
+    // Then onBlur should not be called initially when the ChipInputField is shown
+    expect(onBlur).not.toBeCalled();
     // Then expect the select field to be removed and input field to show
     expect(r.chipSelectField_createNewField()).toBeTruthy();
     expect(r.queryByTestId("chipSelectField")).not.toBeVisible();
@@ -147,7 +147,7 @@ describe("ChipSelectField", () => {
     // And onCreateNew to be called with text field value
     expect(onCreateNew).toBeCalledWith(newOpt.name);
     // And triggers onBlur again
-    expect(onBlur).toBeCalledTimes(2);
+    expect(onBlur).toBeCalledTimes(1);
   });
 
   it("can escape out of Add New field", async () => {
