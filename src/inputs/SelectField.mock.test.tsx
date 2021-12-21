@@ -74,5 +74,8 @@ describe("MockSelectField", () => {
     // Then matching options are disabled
     expect(r.getByText("two")).toBeDisabled();
     expect(r.getByText("thr")).toBeDisabled();
+    // and unmatching options are not disabled
+    expect(r.getByText("one")).not.toBeDisabled();
+    expect(r.getByText("four")).not.toBeDisabled();
   });
 });
