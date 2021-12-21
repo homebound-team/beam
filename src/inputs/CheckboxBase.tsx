@@ -1,5 +1,5 @@
 import { InputHTMLAttributes, ReactNode, useRef } from "react";
-import { useFocusRing, useHover, VisuallyHidden } from "react-aria";
+import { mergeProps, useFocusRing, useHover, VisuallyHidden } from "react-aria";
 import { HelperText } from "src/components/HelperText";
 import { Css, Palette, px } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
@@ -60,7 +60,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
       }
     >
       <VisuallyHidden>
-        <input ref={ref} {...inputProps} {...focusProps} {...tid} />
+        <input ref={ref} {...mergeProps(inputProps, focusProps)} {...tid} />
       </VisuallyHidden>
       <span
         {...hoverProps}

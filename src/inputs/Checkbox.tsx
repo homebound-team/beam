@@ -18,6 +18,10 @@ export interface CheckboxProps {
   selected?: boolean;
   errorMsg?: string;
   helperText?: string | ReactNode;
+  /** Callback fired when focus removes from the component */
+  onBlur?: () => void;
+  /** Callback fired when focus is set to the component */
+  onFocus?: () => void;
 }
 
 export function Checkbox(props: CheckboxProps) {
