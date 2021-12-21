@@ -50,7 +50,7 @@ export function SelectField<T extends object, V extends Key>(props: SelectFieldP
           <option
             key={i}
             value={`${getOptionValue(option)}`}
-            disabled={disabledOptions.includes(getOptionValue(option).toString())}
+            disabled={disabledOptions.includes(getOptionValue(option))}
           >
             {getOptionLabel(option)}
           </option>
