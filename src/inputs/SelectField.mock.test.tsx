@@ -49,4 +49,30 @@ describe("MockSelectField", () => {
     // Then onSelect was called with 3
     expect(onSelect).toHaveBeenCalledWith("3", { id: "3", name: "thr" });
   });
+
+  it("disables options that match disabledOptions", async () => {
+    const options = [
+      { id: "1", name: "one" },
+      { id: "2", name: "two" },
+      { id: "3", name: "thr" },
+      { id: "4", name: "four" },
+    ];
+    const value = "1";
+    const onSelect = jest.fn();
+    // When disabledOptions are provided
+    const r = await render(
+      <MockSelectField
+        label="test"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+        value={value}
+        onSelect={onSelect}
+        options={options}
+        disabledOptions={["2", "3"]}
+      />,
+    );
+    // Then matching options are disabled
+    expect(r.getByText("two")).toHaveAttribute("disabled");
+    expect(r.getByText("thr")).toHaveAttribute("disabled");
+  });
 });
