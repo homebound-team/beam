@@ -72,7 +72,7 @@ describe("MockSelectField", () => {
       />,
     );
     // Then matching options are disabled
-    expect(r.getByText("two")).toHaveAttribute("disabled");
-    expect(r.getByText("thr")).toHaveAttribute("disabled");
+    expect(r.getByText("two")).toBeDisabled();
+    expect(r.getByText("thr")).toBeDisabled();
   });
 });

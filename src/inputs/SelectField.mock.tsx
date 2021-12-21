@@ -15,7 +15,7 @@ export function SelectField<T extends object, V extends Key>(props: SelectFieldP
     onBlur,
     onFocus,
     disabled,
-    disabledOptions,
+    disabledOptions = [],
   } = props;
   const tid = useTestIds(props, "select");
 
@@ -46,10 +46,12 @@ export function SelectField<T extends object, V extends Key>(props: SelectFieldP
     >
       <option disabled value=""></option>
       {options.map((option, i) => {
-        const isDisabled =
-          disabledOptions && disabledOptions.includes(getOptionValue(option).toString()) ? true : false;
         return (
-          <option key={i} value={`${getOptionValue(option)}`} disabled={isDisabled}>
+          <option
+            key={i}
+            value={`${getOptionValue(option)}`}
+            disabled={disabledOptions.includes(getOptionValue(option).toString())}
+          >
             {getOptionLabel(option)}
           </option>
         );
