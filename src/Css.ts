@@ -7,28 +7,6 @@ export type Only<X, T> = X & Record<Exclude<keyof T, keyof X>, never>;
 
 export type Properties = Properties1;
 
-export type Typography =
-  | "tiny"
-  | "tinyEm"
-  | "xs"
-  | "xsEm"
-  | "sm"
-  | "smEm"
-  | "base"
-  | "baseEm"
-  | "lg"
-  | "lgEm"
-  | "xl"
-  | "xlEm"
-  | "xl2"
-  | "xl2Em"
-  | "xl3"
-  | "xl3Em"
-  | "xl4"
-  | "xl4Em"
-  | "xl5"
-  | "xl5Em";
-
 type Opts<T> = {
   rules: T;
   enabled: boolean;
@@ -164,7 +142,7 @@ class CssBuilder<T extends Properties1> {
   get top7() { return this.top(7); }
   get top8() { return this.top(8); }
   top(inc: number | string) { return this.add("top", maybeInc(inc)); }
-  topPx(px: number) { return this.top(`${px}px`); }
+  topPx(px: number) { return this.add("top", `${px}px`); }
   get right0() { return this.right(0); }
   get right1() { return this.right(1); }
   get right2() { return this.right(2); }
@@ -175,7 +153,7 @@ class CssBuilder<T extends Properties1> {
   get right7() { return this.right(7); }
   get right8() { return this.right(8); }
   right(inc: number | string) { return this.add("right", maybeInc(inc)); }
-  rightPx(px: number) { return this.right(`${px}px`); }
+  rightPx(px: number) { return this.add("right", `${px}px`); }
   get bottom0() { return this.bottom(0); }
   get bottom1() { return this.bottom(1); }
   get bottom2() { return this.bottom(2); }
@@ -186,7 +164,7 @@ class CssBuilder<T extends Properties1> {
   get bottom7() { return this.bottom(7); }
   get bottom8() { return this.bottom(8); }
   bottom(inc: number | string) { return this.add("bottom", maybeInc(inc)); }
-  bottomPx(px: number) { return this.bottom(`${px}px`); }
+  bottomPx(px: number) { return this.add("bottom", `${px}px`); }
   get left0() { return this.left(0); }
   get left1() { return this.left(1); }
   get left2() { return this.left(2); }
@@ -197,7 +175,7 @@ class CssBuilder<T extends Properties1> {
   get left7() { return this.left(7); }
   get left8() { return this.left(8); }
   left(inc: number | string) { return this.add("left", maybeInc(inc)); }
-  leftPx(px: number) { return this.left(`${px}px`); }
+  leftPx(px: number) { return this.add("left", `${px}px`); }
 
   // cursor
   get cursorPointer() { return this.add("cursor", "pointer"); }
@@ -221,15 +199,6 @@ class CssBuilder<T extends Properties1> {
   display(value: Properties["display"]) { return this.add("display", value); }
 
   // flexbox
-  get fi() { return this.add("flex", "initial"); }
-  get fa() { return this.add("flex", "auto"); }
-  get fn() { return this.add("flex", "none"); }
-  get f1() { return this.add("flex", "1"); }
-  get f2() { return this.add("flex", "2"); }
-  get f3() { return this.add("flex", "3"); }
-  get f4() { return this.add("flex", "4"); }
-  get f5() { return this.add("flex", "5"); }
-  f(value: Properties["flex"]) { return this.add("flex", value); }
   get jcfs() { return this.add("justifyContent", "flex-start"); }
   get jcfe() { return this.add("justifyContent", "flex-end"); }
   get jcc() { return this.add("justifyContent", "center"); }
@@ -275,8 +244,9 @@ class CssBuilder<T extends Properties1> {
 
   // float
   get fl() { return this.add("float", "left"); }
+  get fn() { return this.add("float", "none"); }
   get fr() { return this.add("float", "right"); }
-  float(value: Properties["float"]) { return this.add("float", value); }
+  f(value: Properties["float"]) { return this.add("float", value); }
 
   // fontWeight
   get normal() { return this.add("fontWeight", "normal"); }
@@ -307,7 +277,7 @@ class CssBuilder<T extends Properties1> {
   get gap7() { return this.gap(7); }
   get gap8() { return this.gap(8); }
   gap(inc: number | string) { return this.add("gap", maybeInc(inc)); }
-  gapPx(px: number) { return this.gap(`${px}px`); }
+  gapPx(px: number) { return this.add("gap", `${px}px`); }
   get rg0() { return this.rg(0); }
   get rg1() { return this.rg(1); }
   get rg2() { return this.rg(2); }
@@ -318,7 +288,7 @@ class CssBuilder<T extends Properties1> {
   get rg7() { return this.rg(7); }
   get rg8() { return this.rg(8); }
   rg(inc: number | string) { return this.add("rowGap", maybeInc(inc)); }
-  rgPx(px: number) { return this.rg(`${px}px`); }
+  rgPx(px: number) { return this.add("rowGap", `${px}px`); }
   get cg0() { return this.cg(0); }
   get cg1() { return this.cg(1); }
   get cg2() { return this.cg(2); }
@@ -329,7 +299,7 @@ class CssBuilder<T extends Properties1> {
   get cg7() { return this.cg(7); }
   get cg8() { return this.cg(8); }
   cg(inc: number | string) { return this.add("columnGap", maybeInc(inc)); }
-  cgPx(px: number) { return this.cg(`${px}px`); }
+  cgPx(px: number) { return this.add("columnGap", `${px}px`); }
 
   // height
   get h0() { return this.h(0); }
@@ -342,7 +312,7 @@ class CssBuilder<T extends Properties1> {
   get h7() { return this.h(7); }
   get h8() { return this.h(8); }
   h(inc: number | string) { return this.add("height", maybeInc(inc)); }
-  hPx(px: number) { return this.h(`${px}px`); }
+  hPx(px: number) { return this.add("height", `${px}px`); }
   get h25() { return this.add("height", "25%"); }
   get h50() { return this.add("height", "50%"); }
   get h75() { return this.add("height", "75%"); }
@@ -366,15 +336,6 @@ class CssBuilder<T extends Properties1> {
   get maxh100() { return this.add("maxHeight", "100%"); }
   maxh(value: Properties["maxHeight"]) { return this.add("maxHeight", value); }
   maxhPx(px: number) { return this.add("maxHeight", `${px}px`); }
-
-  // lineClamp
-  get lineClamp1() { return this.add("overflow", "hidden").add("display", "-webkit-box").add("WebkitBoxOrient", "vertical").add("WebkitLineClamp", 1).add("textOverflow", "ellipsis"); }
-  get lineClamp2() { return this.add("overflow", "hidden").add("display", "-webkit-box").add("WebkitBoxOrient", "vertical").add("WebkitLineClamp", 2).add("textOverflow", "ellipsis"); }
-  get lineClamp3() { return this.add("overflow", "hidden").add("display", "-webkit-box").add("WebkitBoxOrient", "vertical").add("WebkitLineClamp", 3).add("textOverflow", "ellipsis"); }
-  get lineClamp4() { return this.add("overflow", "hidden").add("display", "-webkit-box").add("WebkitBoxOrient", "vertical").add("WebkitLineClamp", 4).add("textOverflow", "ellipsis"); }
-  get lineClamp5() { return this.add("overflow", "hidden").add("display", "-webkit-box").add("WebkitBoxOrient", "vertical").add("WebkitLineClamp", 5).add("textOverflow", "ellipsis"); }
-  get lineClamp6() { return this.add("overflow", "hidden").add("display", "-webkit-box").add("WebkitBoxOrient", "vertical").add("WebkitLineClamp", 6).add("textOverflow", "ellipsis"); }
-  get lineClampNone() { return this.add("WebkitLineClamp", "unset"); }
 
   // objectFit
   get objectContain() { return this.add("objectFit", "contain"); }
@@ -617,7 +578,7 @@ class CssBuilder<T extends Properties1> {
   get mt7() { return this.mt(7); }
   get mt8() { return this.mt(8); }
   mt(inc: number | string) { return this.add("marginTop", maybeInc(inc)); }
-  mtPx(px: number) { return this.mt(`${px}px`); }
+  mtPx(px: number) { return this.add("marginTop", `${px}px`); }
   get mr0() { return this.mr(0); }
   get mr1() { return this.mr(1); }
   get mr2() { return this.mr(2); }
@@ -628,7 +589,7 @@ class CssBuilder<T extends Properties1> {
   get mr7() { return this.mr(7); }
   get mr8() { return this.mr(8); }
   mr(inc: number | string) { return this.add("marginRight", maybeInc(inc)); }
-  mrPx(px: number) { return this.mr(`${px}px`); }
+  mrPx(px: number) { return this.add("marginRight", `${px}px`); }
   get mb0() { return this.mb(0); }
   get mb1() { return this.mb(1); }
   get mb2() { return this.mb(2); }
@@ -639,7 +600,7 @@ class CssBuilder<T extends Properties1> {
   get mb7() { return this.mb(7); }
   get mb8() { return this.mb(8); }
   mb(inc: number | string) { return this.add("marginBottom", maybeInc(inc)); }
-  mbPx(px: number) { return this.mb(`${px}px`); }
+  mbPx(px: number) { return this.add("marginBottom", `${px}px`); }
   get ml0() { return this.ml(0); }
   get ml1() { return this.ml(1); }
   get ml2() { return this.ml(2); }
@@ -650,7 +611,7 @@ class CssBuilder<T extends Properties1> {
   get ml7() { return this.ml(7); }
   get ml8() { return this.ml(8); }
   ml(inc: number | string) { return this.add("marginLeft", maybeInc(inc)); }
-  mlPx(px: number) { return this.ml(`${px}px`); }
+  mlPx(px: number) { return this.add("marginLeft", `${px}px`); }
   get mx0() { return this.mx(0); }
   get mx1() { return this.mx(1); }
   get mx2() { return this.mx(2); }
@@ -694,7 +655,7 @@ class CssBuilder<T extends Properties1> {
   get pt7() { return this.pt(7); }
   get pt8() { return this.pt(8); }
   pt(inc: number | string) { return this.add("paddingTop", maybeInc(inc)); }
-  ptPx(px: number) { return this.pt(`${px}px`); }
+  ptPx(px: number) { return this.add("paddingTop", `${px}px`); }
   get pr0() { return this.pr(0); }
   get pr1() { return this.pr(1); }
   get pr2() { return this.pr(2); }
@@ -705,7 +666,7 @@ class CssBuilder<T extends Properties1> {
   get pr7() { return this.pr(7); }
   get pr8() { return this.pr(8); }
   pr(inc: number | string) { return this.add("paddingRight", maybeInc(inc)); }
-  prPx(px: number) { return this.pr(`${px}px`); }
+  prPx(px: number) { return this.add("paddingRight", `${px}px`); }
   get pb0() { return this.pb(0); }
   get pb1() { return this.pb(1); }
   get pb2() { return this.pb(2); }
@@ -716,7 +677,7 @@ class CssBuilder<T extends Properties1> {
   get pb7() { return this.pb(7); }
   get pb8() { return this.pb(8); }
   pb(inc: number | string) { return this.add("paddingBottom", maybeInc(inc)); }
-  pbPx(px: number) { return this.pb(`${px}px`); }
+  pbPx(px: number) { return this.add("paddingBottom", `${px}px`); }
   get pl0() { return this.pl(0); }
   get pl1() { return this.pl(1); }
   get pl2() { return this.pl(2); }
@@ -727,7 +688,7 @@ class CssBuilder<T extends Properties1> {
   get pl7() { return this.pl(7); }
   get pl8() { return this.pl(8); }
   pl(inc: number | string) { return this.add("paddingLeft", maybeInc(inc)); }
-  plPx(px: number) { return this.pl(`${px}px`); }
+  plPx(px: number) { return this.add("paddingLeft", `${px}px`); }
   get px0() { return this.px(0); }
   get px1() { return this.px(1); }
   get px2() { return this.px(2); }
@@ -848,14 +809,12 @@ class CssBuilder<T extends Properties1> {
   get mw75() { return this.add("minWidth", "75%"); }
   get mw100() { return this.add("minWidth", "100%"); }
   mw(value: Properties["minWidth"]) { return this.add("minWidth", value); }
-  mwPx(px: number) { return this.mw(`${px}px`); }
   get maxw0() { return this.add("maxWidth", "0"); }
   get maxw25() { return this.add("maxWidth", "25%"); }
   get maxw50() { return this.add("maxWidth", "50%"); }
   get maxw75() { return this.add("maxWidth", "75%"); }
   get maxw100() { return this.add("maxWidth", "100%"); }
   maxw(value: Properties["maxWidth"]) { return this.add("maxWidth", value); }
-  maxwPx(px: number) { return this.maxw(`${px}px`); }
   get w0() { return this.w(0); }
   get w1() { return this.w(1); }
   get w2() { return this.w(2); }
@@ -866,14 +825,7 @@ class CssBuilder<T extends Properties1> {
   get w7() { return this.w(7); }
   get w8() { return this.w(8); }
   w(inc: number | string) { return this.add("width", maybeInc(inc)); }
-  wPx(px: number) { return this.w(`${px}px`); }
-
-  // wordBreak
-  get breakNormal() { return this.add("wordBreak", "normal"); }
-  get breakAll() { return this.add("wordBreak", "break-all"); }
-  get breakKeepAll() { return this.add("wordBreak", "keep-all"); }
-  get breakWord() { return this.add("wordBreak", "break-word"); }
-  wordBreak(value: Properties["wordBreak"]) { return this.add("wordBreak", value); }
+  wPx(px: number) { return this.add("width", `${px}px`); }
 
   // zIndex
   get z0() { return this.add("zIndex", 0); }
