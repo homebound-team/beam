@@ -1,5 +1,5 @@
 import { Selection } from "@react-types/shared";
-import { Key, ReactNode, useEffect, useRef, useState } from "react";
+import React, { Key, ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
 import { resolveTooltip } from "src/components";
@@ -66,6 +66,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     contrast,
     disabledOptions,
     borderless,
+    optionsLoading = false,
     ...otherProps
   } = props;
 
@@ -220,6 +221,12 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     }
   }, [values]);
 
+  useEffect(() => {
+    if (options !== fieldState.filteredOptions) {
+      setFieldState((prevState) => ({ ...prevState, filteredOptions: options }));
+    }
+  }, [options]);
+
   // Used to calculate the rendered width of the combo box (input + button)
   const comboBoxRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -316,6 +323,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
+            loading={optionsLoading}
           />
         </Popover>
       )}
@@ -347,4 +355,6 @@ export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusa
   contrast?: boolean;
   /** Placeholder content */
   placeholder?: string;
+  /** If truthy then either the generic loading dots are shown or the JSX.Element element returned by the specified function */
+  optionsLoading?: boolean | (() => JSX.Element);
 }

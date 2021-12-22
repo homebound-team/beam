@@ -15,6 +15,7 @@ interface ListBoxProps<O, V extends Key> {
   getOptionValue: (opt: O) => V;
   contrast?: boolean;
   positionProps: React.HTMLAttributes<Element>;
+  loading?: boolean | (() => JSX.Element);
 }
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
@@ -27,6 +28,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     getOptionValue,
     contrast = false,
     positionProps,
+    loading,
   } = props;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...props }, state, listBoxRef);
   const positionMaxHeight = positionProps.style?.maxHeight;
@@ -95,6 +97,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
             contrast={contrast}
             // Only scroll on focus if using VirtualFocus (used for ComboBoxState (SelectField), but not SelectState (ChipSelectField))
             scrollOnFocus={(props as any).shouldUseVirtualFocus}
+            loading={loading}
           />
         )}
       </ul>

@@ -14,8 +14,35 @@ export function CssReset() {
 export const navLink = "navLink";
 
 const ourReset = css`
-  a:not(.${navLink}) { color: ${Palette.LightBlue700} },
-  a:visited:not(.${navLink}) { color: ${Palette.LightBlue500} },
+  a:not(.${navLink}) {
+    color: ${Palette.LightBlue700};
+  }
+
+  a:visited:not(.${navLink}) {
+    color: ${Palette.LightBlue500};
+  }
+
+  /**
+   * Beam animations
+   */
+  @keyframes loadingDots {
+    0% {
+      background-color: ${Palette.Gray600};
+    }
+    50%,
+    100% {
+      background-color: ${Palette.Gray300};
+    }
+  }
+  @keyframes loadingDotsContrast {
+    0% {
+      background-color: ${Palette.Gray200};
+    }
+    50%,
+    100% {
+      background-color: ${Palette.Gray500};
+    }
+  }
 `;
 
 // Copy/pasted from TW which uses this as their base reset.
