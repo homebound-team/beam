@@ -25,15 +25,16 @@ class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, 
     inModal: boolean,
     vertical: boolean,
   ) {
-    const { label, defaultValue, options, getOptionLabel, getOptionValue, ...props } = this.props;
+    const { label, defaultValue, options: maybeOptions, getOptionLabel, getOptionValue, ...props } = this.props;
+
+    const options = Array.isArray(maybeOptions)
+      ? [allOption as O, ...maybeOptions]
+      : { ...maybeOptions, initial: [allOption as O, ...maybeOptions.initial] };
+
     return (
       <SelectField<O, V>
         {...props}
-        options={[
-          // We always add "All" as the 1st option, to allow unselecting with a click
-          allOption as O,
-          ...options,
-        ]}
+        options={options}
         getOptionValue={(o) => (o === allOption ? (undefined as any as V) : getOptionValue(o))}
         getOptionLabel={(o) => (o === allOption ? "All" : getOptionLabel(o))}
         compact={!vertical}

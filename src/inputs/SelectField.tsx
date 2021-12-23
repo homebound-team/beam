@@ -1,17 +1,13 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { Value } from "src/inputs";
 import { BeamSelectFieldBaseProps, SelectFieldBase } from "src/inputs/internal/SelectFieldBase";
 import { HasIdAndName, Optional } from "src/types";
 
-export interface SelectFieldProps<O, V extends Value> extends BeamSelectFieldBaseProps<O, V> {
-  /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
-  getOptionMenuLabel?: (opt: O) => string | ReactNode;
-  getOptionValue: (opt: O) => V;
-  getOptionLabel: (opt: O) => string;
+export interface SelectFieldProps<O, V extends Value>
+  extends Omit<BeamSelectFieldBaseProps<O, V>, "values" | "onSelect"> {
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   value: V | undefined;
   onSelect: (value: V, opt: O) => void;
-  options: O[];
 }
 
 /**
@@ -43,10 +39,9 @@ export function SelectField<O, V extends Value>(
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
       values={[value]}
-      onSelect={(values) => {
-        if (values.length > 0) {
-          const selectedOption = options.find((o) => getOptionValue(o) === values[0]);
-          onSelect && selectedOption && onSelect(getOptionValue(selectedOption), selectedOption);
+      onSelect={(values, options) => {
+        if (values.length > 0 && options.length > 0) {
+          onSelect && onSelect(values[0], options[0]);
         }
       }}
     />

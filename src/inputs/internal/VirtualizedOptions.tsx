@@ -92,7 +92,7 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
                                 .addIn("&:before", Css.leftPx(-12).add("animationDelay", "0").$)
                                 .addIn("&:after", Css.rightPx(-12).add("animationDelay", "600ms").$).$,
                             }}
-                          ></div>
+                          />
                         </div>
                       );
                     },

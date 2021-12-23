@@ -8,27 +8,43 @@ import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css, px } from "src/Css";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
-import { keyToValue, Value, valueToKey } from "src/inputs/Value";
+import { Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
+import { areArraysEqual } from "src/utils";
 
-type FieldState<O> = {
-  isOpen: boolean;
-  selectedKeys: Key[];
-  inputValue: string;
-  filteredOptions: O[];
-  selectedOptions: O[];
-};
-
-export interface SelectFieldBaseProps<O, V extends Value> extends BeamSelectFieldBaseProps<O, V> {
+export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
-  onSelect: (values: V[]) => void;
-  options: O[];
+  onSelect: (values: V[], opts: O[]) => void;
   multiselect?: boolean;
+  disabledOptions?: V[];
+  options: O[] | { initial: O[]; load: () => Promise<{ options: O[] }> };
+  /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
+  disabled?: boolean | ReactNode;
+  required?: boolean;
+  errorMsg?: string;
+  helperText?: string | ReactNode;
+  /** Allow placing an icon/decoration within the input field. */
+  fieldDecoration?: (opt: O) => ReactNode;
+  /** Sets the form field label. */
+  label: string;
+  /** Renders the label inside the input field, i.e. for filters. */
+  inlineLabel?: boolean;
+  // Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip.
+  readOnly?: boolean | ReactNode;
+  onBlur?: () => void;
+  onFocus?: () => void;
+  sizeToContent?: boolean;
+  /** The text to show when nothing is selected, i.e. could be "All" for filters. */
+  nothingSelectedText?: string;
+  /** When set the SelectField is expected to be put on a darker background */
+  contrast?: boolean;
+  /** Placeholder content */
+  placeholder?: string;
 }
 
 /**
@@ -40,33 +56,21 @@ export interface SelectFieldBaseProps<O, V extends Value> extends BeamSelectFiel
  * Note that the `V extends Key` constraint come from react-aria,
  * and so we cannot easily change them.
  */
-export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<O, V>): JSX.Element {
+export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBaseProps<O, V>): JSX.Element {
   const {
-    compact,
     disabled,
-    errorMsg,
-    helperText,
-    label,
-    hideLabel,
-    required,
-    inlineLabel,
     readOnly,
     onSelect,
-    fieldDecoration,
-    options,
-    onBlur,
-    onFocus,
+    options: maybeOptions,
     multiselect = false,
     getOptionLabel,
     getOptionValue,
     getOptionMenuLabel = getOptionLabel,
-    sizeToContent = false,
-    values,
+    values = [],
     nothingSelectedText = "",
     contrast,
     disabledOptions,
     borderless,
-    optionsLoading = false,
     ...otherProps
   } = props;
 
@@ -74,11 +78,46 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
 
-  function onSelectionChange(keys: Selection): void {
-    // Close menu upon selection change only for Single selection mode
-    if (!multiselect) {
-      state.close();
+  const [fieldState, setFieldState] = useState<FieldState<O>>(() => {
+    const initOptions = Array.isArray(maybeOptions) ? maybeOptions : maybeOptions.initial;
+    const selectedOptions = initOptions.filter((o) => values.includes(getOptionValue(o)));
+    return {
+      isOpen: false,
+      selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
+      inputValue: getInputValue(
+        initOptions.filter((o) => values?.includes(getOptionValue(o))),
+        getOptionLabel,
+        multiselect,
+        nothingSelectedText,
+      ),
+      filteredOptions: initOptions,
+      allOptions: initOptions,
+      selectedOptions: selectedOptions,
+      optionsLoading: false,
+    };
+  });
+
+  /** Resets field's input value and filtered options list for cases where the user exists the field without making changes (on Escape, or onBlur) */
+  function resetField() {
+    const inputValue = getInputValue(
+      fieldState.allOptions.filter((o) => values?.includes(getOptionValue(o))),
+      getOptionLabel,
+      multiselect,
+      nothingSelectedText,
+    );
+    // Conditionally reset the value if the current inputValue doesn't match that of the passed in value, or we filtered the list
+    if (inputValue !== fieldState.inputValue || fieldState.filteredOptions.length !== fieldState.allOptions.length) {
+      setFieldState((prevState) => ({
+        ...prevState,
+        isOpen: false,
+        inputValue,
+        filteredOptions: prevState.allOptions,
+      }));
     }
+  }
+
+  function onSelectionChange(keys: Selection): void {
+    // We don't currently handle the "all" case
     if (keys === "all") {
       return;
     }
@@ -92,7 +131,6 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     );
 
     if (multiselect && keys.size === 0) {
-      // "All" happens if we selected everything or nothing.
       setFieldState({
         ...fieldState,
         isOpen: true,
@@ -100,32 +138,31 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         selectedKeys: [],
         selectedOptions: [],
       });
-      selectionChanged && onSelect([]);
+      selectionChanged && onSelect([], []);
       return;
     }
-    const keysArray = [...keys.values()];
-    const firstKey = keysArray[0];
-    // Even though the key is number|string, this will always be a string
-    const firstSelectedOption = options.find((o) => valueToKey(getOptionValue(o)) === firstKey);
-    if (multiselect) {
-      setFieldState({
-        ...fieldState,
-        // If menu is open then reset inputValue to "". Otherwise set inputValue depending on number of options selected.
-        inputValue: state.isOpen ? "" : keysArray.length === 1 ? getOptionLabel(firstSelectedOption!) : "",
-        selectedKeys: keysArray as Key[],
-        selectedOptions: options.filter((o) => keysArray.includes(valueToKey(getOptionValue(o)))),
-        filteredOptions: options,
-      });
-    } else {
-      setFieldState({
-        ...fieldState,
-        isOpen: false,
-        inputValue: firstSelectedOption ? getOptionLabel(firstSelectedOption) : "",
-        selectedKeys: [firstKey] as Key[],
-        selectedOptions: firstSelectedOption ? [firstSelectedOption] : [],
-      });
-    }
-    selectionChanged && onSelect(([...keys.values()] as Key[]).map(keyToValue) as V[]);
+
+    const selectedKeys = [...keys.values()];
+    const selectedOptions = fieldState.allOptions.filter((o) => selectedKeys.includes(valueToKey(getOptionValue(o))));
+    const firstSelectedOption = selectedOptions[0];
+
+    setFieldState((prevState) => ({
+      ...prevState,
+      // Close menu upon selection change only for Single selection mode
+      isOpen: multiselect,
+      // If menu is open then reset inputValue to "". Otherwise set inputValue depending on number of options selected.
+      inputValue:
+        multiselect && (state.isOpen || selectedKeys.length > 1)
+          ? ""
+          : firstSelectedOption
+          ? getOptionLabel(firstSelectedOption!)
+          : "",
+      selectedKeys,
+      selectedOptions,
+      filteredOptions: fieldState.allOptions,
+    }));
+
+    selectionChanged && onSelect(selectedKeys as V[], selectedOptions);
 
     if (!multiselect) {
       // When a single select menu item changes, then blur the field AFTER `onSelect` has been called
@@ -134,41 +171,49 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   }
 
   function onInputChange(value: string) {
-    setFieldState((prevState) => ({
-      ...prevState,
-      isOpen: true,
-      inputValue: value,
-      filteredOptions: options.filter((o) => contains(getOptionLabel(o), value)),
-    }));
+    if (value !== fieldState.inputValue) {
+      setFieldState((prevState) => ({
+        ...prevState,
+        inputValue: value,
+        filteredOptions: fieldState.allOptions.filter((o) => contains(getOptionLabel(o), value)),
+      }));
+    }
   }
 
+  async function maybeInitLoad() {
+    if (!Array.isArray(maybeOptions)) {
+      setFieldState((prevState) => ({ ...prevState, optionsLoading: true }));
+      const { options } = await maybeOptions.load();
+      setFieldState((prevState) => ({
+        ...prevState,
+        filteredOptions: options,
+        allOptions: options,
+        optionsLoading: false,
+      }));
+    }
+  }
+
+  const firstOpen = useRef(true);
   function onOpenChange(isOpen: boolean) {
+    if (firstOpen.current && isOpen) {
+      maybeInitLoad();
+      firstOpen.current = false;
+    }
     setFieldState((prevState) => ({
       ...prevState,
+      // When using the multiselect field, always empty the input upon open.
       inputValue: multiselect && isOpen ? "" : prevState.inputValue,
       isOpen,
     }));
   }
 
-  function initFieldState(): FieldState<O> {
-    // Use the current value to find the option
-    const selectedKeys: V[] = values ?? [];
-    const selectedOptions = options.filter((o) => selectedKeys.includes(getOptionValue(o)));
-    return {
-      isOpen: false,
-      selectedKeys: selectedKeys.map(valueToKey),
-      inputValue:
-        selectedOptions.length === 1
-          ? getOptionLabel(selectedOptions[0])
-          : multiselect && selectedOptions.length === 0
-          ? nothingSelectedText
-          : "",
-      filteredOptions: options,
-      selectedOptions: selectedOptions,
-    };
-  }
-
-  const [fieldState, setFieldState] = useState<FieldState<O>>(initFieldState);
+  // Used to calculate the rendered width of the combo box (input + button)
+  const comboBoxRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputWrapRef = useRef<HTMLDivElement | null>(null);
+  const listBoxRef = useRef<HTMLDivElement | null>(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
 
   const comboBoxProps = {
     ...otherProps,
@@ -177,7 +222,6 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     items: fieldState.filteredOptions,
     isDisabled,
     isReadOnly,
-    label,
     onInputChange,
     onOpenChange,
     menuTrigger: "focus" as const,
@@ -190,20 +234,23 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
 
   const state = useComboBoxState<any>({
     ...comboBoxProps,
+
+    allowsEmptyCollection: true,
     // useComboBoxState.onSelectionChange will be executed if a keyboard interaction (Enter key) is used to select an item
     onSelectionChange: (key) => {
       // ignore undefined/null keys - `null` can happen if input field's value is completely deleted after having a value assigned.
       if (key) {
-        const selectedKeys = multipleSelectionState.selectedKeys;
+        const selectedKeys = state.selectionManager.selectedKeys;
         // Create the `newSelection` Set depending on the value type of SelectField.
         const newSelection: Set<Key> = new Set(!multiselect ? [key] : [...selectedKeys, key]);
         // Use only the `multipleSelectionState` to manage selected keys
-        multipleSelectionState.setSelectedKeys(newSelection);
+        state.selectionManager.setSelectedKeys(newSelection);
       }
     },
   });
 
-  const multipleSelectionState = useMultipleSelectionState({
+  //@ts-ignore - `selectionManager.state` exists, but not according to the types
+  state.selectionManager.state = useMultipleSelectionState({
     selectionMode: multiselect ? "multiple" : "single",
     // Do not allow an empty selection if single select mode
     disallowEmptySelection: !multiselect,
@@ -211,29 +258,34 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
     onSelectionChange,
   });
 
-  //@ts-ignore - `selectionManager.state` exists, but not according to the types
-  state.selectionManager.state = multipleSelectionState;
-
   // Ensure we reset if the field's values change and the user is not actively selecting options.
   useEffect(() => {
-    if (!state.isOpen) {
-      setFieldState(initFieldState);
+    if (!state.isOpen && !areArraysEqual(values, fieldState.selectedKeys)) {
+      setFieldState((prevState) => {
+        const selectedOptions = prevState.allOptions.filter((o) => values?.includes(getOptionValue(o)));
+
+        return {
+          ...prevState,
+          selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
+          inputValue:
+            selectedOptions.length === 1
+              ? getOptionLabel(selectedOptions[0])
+              : multiselect && selectedOptions.length === 0
+              ? nothingSelectedText
+              : "",
+          selectedOptions: selectedOptions,
+        };
+      });
     }
   }, [values]);
 
   useEffect(() => {
-    if (options !== fieldState.filteredOptions) {
-      setFieldState((prevState) => ({ ...prevState, filteredOptions: options }));
+    // Only update the fieldset when options change, when options is an array.
+    // Otherwise, if the options are passed in as an object, then we assume the caller is updating options via a Promise and not via updating props.
+    if (Array.isArray(maybeOptions) && maybeOptions !== fieldState.allOptions) {
+      setFieldState((prevState) => ({ ...prevState, filteredOptions: maybeOptions, allOptions: maybeOptions }));
     }
-  }, [options]);
-
-  // Used to calculate the rendered width of the combo box (input + button)
-  const comboBoxRef = useRef<HTMLDivElement | null>(null);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const inputWrapRef = useRef<HTMLDivElement | null>(null);
-  const listBoxRef = useRef<HTMLDivElement | null>(null);
-  const popoverRef = useRef<HTMLDivElement | null>(null);
+  }, [maybeOptions]);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
   const {
@@ -279,31 +331,19 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
         {...otherProps}
         buttonProps={buttonProps}
         buttonRef={triggerRef}
-        compact={compact}
-        errorMsg={errorMsg}
-        helperText={helperText}
-        fieldDecoration={fieldDecoration}
         inputProps={inputProps}
         inputRef={inputRef}
         inputWrapRef={inputWrapRef}
-        isDisabled={isDisabled}
-        required={required}
-        isReadOnly={isReadOnly}
         state={state}
-        onBlur={onBlur}
-        onFocus={onFocus}
-        inlineLabel={inlineLabel}
-        label={label}
-        hideLabel={hideLabel}
         labelProps={labelProps}
         selectedOptions={fieldState.selectedOptions}
         getOptionValue={getOptionValue}
         getOptionLabel={getOptionLabel}
-        sizeToContent={sizeToContent}
         contrast={contrast}
         nothingSelectedText={nothingSelectedText}
         borderless={borderless}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
+        resetField={resetField}
       />
       {state.isOpen && (
         <Popover
@@ -323,7 +363,7 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
-            loading={optionsLoading}
+            loading={fieldState.optionsLoading}
           />
         </Popover>
       )}
@@ -331,30 +371,25 @@ export function SelectFieldBase<O, V extends Value>(props: SelectFieldBaseProps<
   );
 }
 
-export interface BeamSelectFieldBaseProps<T, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
-  disabledOptions?: V[];
-  // Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
-  disabled?: boolean | ReactNode;
-  required?: boolean;
-  errorMsg?: string;
-  helperText?: string | ReactNode;
-  /** Allow placing an icon/decoration within the input field. */
-  fieldDecoration?: (opt: T) => ReactNode;
-  /** Sets the form field label. */
-  label: string;
-  /** Renders the label inside the input field, i.e. for filters. */
-  inlineLabel?: boolean;
-  // Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip.
-  readOnly?: boolean | ReactNode;
-  onBlur?: () => void;
-  onFocus?: () => void;
-  sizeToContent?: boolean;
-  /** The text to show when nothing is selected, i.e. could be "All" for filters. */
-  nothingSelectedText?: string;
-  /** When set the SelectField is expected to be put on a darker background */
-  contrast?: boolean;
-  /** Placeholder content */
-  placeholder?: string;
-  /** If truthy then either the generic loading dots are shown or the JSX.Element element returned by the specified function */
-  optionsLoading?: boolean | (() => JSX.Element);
+type FieldState<O> = {
+  isOpen: boolean;
+  selectedKeys: Key[];
+  inputValue: string;
+  filteredOptions: O[];
+  selectedOptions: O[];
+  allOptions: O[];
+  optionsLoading: boolean;
+};
+
+function getInputValue<O>(
+  selectedOptions: O[],
+  getOptionLabel: (o: O) => string,
+  multiselect: boolean,
+  nothingSelectedText: string,
+) {
+  return selectedOptions.length === 1
+    ? getOptionLabel(selectedOptions[0])
+    : multiselect && selectedOptions.length === 0
+    ? nothingSelectedText
+    : "";
 }

@@ -1,5 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
+import { fireEvent, within } from "@storybook/testing-library";
 import { useState } from "react";
 import { GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndDataOf } from "src/components";
 import { Css } from "src/Css";
@@ -196,6 +197,59 @@ Compact.args = { compact: true };
 export const Contrast = Template.bind({});
 // @ts-ignore
 Contrast.args = { compact: true, contrast: true };
+
+export function PerfTest() {
+  const [selectedValue, setSelectedValue] = useState<string>(loadTestOptions[2].id);
+
+  return (
+    <SelectField
+      label="Project"
+      value={selectedValue}
+      onSelect={setSelectedValue}
+      errorMsg={selectedValue !== undefined ? "" : "Select an option. Plus more error text to force it to wrap."}
+      options={{
+        initial: [loadTestOptions[2]],
+        load: async () => {
+          return new Promise((resolve) => {
+            // @ts-ignore - believes `options` should be of type `never[]`
+            setTimeout(() => resolve({ options: loadTestOptions }), 1500);
+          });
+        },
+      }}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
+    />
+  );
+}
+const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
+
+export function LoadingState() {
+  const [selectedValue, setSelectedValue] = useState<string>(loadTestOptions[2].id);
+
+  return (
+    <SelectField
+      label="Project"
+      value={selectedValue}
+      onSelect={setSelectedValue}
+      options={{
+        initial: [loadTestOptions[2]],
+        load: async () => {
+          return new Promise((resolve) => {
+            // @ts-ignore - believes `options` should be of type `never[]`
+            setTimeout(() => resolve({ options: loadTestOptions }), 5000);
+          });
+        },
+      }}
+    />
+  );
+}
+LoadingState.parameters = {
+  chromatic: { delay: 1000 },
+};
+LoadingState.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const canvas = within(canvasElement);
+  await fireEvent.focus(canvas.getByTestId("project"));
+};
 
 export function InTable() {
   return (
