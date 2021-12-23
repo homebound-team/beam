@@ -1683,10 +1683,15 @@
   dependencies:
     tslib "^2.1.0"
 
-"@homebound/form-state@^2.1.5":
-  version "2.1.5"
-  resolved "https://registry.npmjs.org/@homebound/form-state/-/form-state-2.1.5.tgz"
-  integrity sha512-wDvaK61V3jfvbI7RMq6NWCNk9D0hKpZ9r92u8essIbOzq+72BXeWntjb6f/cNLbtlHNCPvDG3Bv/6eydZ5iC6g==
+"@homebound/form-state@^2.2.13":
+  version "2.2.13"
+  resolved "https://registry.yarnpkg.com/@homebound/form-state/-/form-state-2.2.13.tgz#1e8df19306ced4d07018e7a284cdeee72e10833e"
+  integrity sha512-pezynd1M3iWQ7h8DR86HgrRWEmsyTYeyMB/C+bJ+nx5RFIGV9lzJpEKRLNejv3COMQJqvm0haufpZXA0M46L6Q==
+  dependencies:
+    fast-deep-equal "^3.1.3"
+    is-plain-object "^5.0.0"
+    mobx "^6.3.2"
+    mobx-react "^7.2.0"
 
 "@homebound/rtl-react-router-utils@^1.0.3":
   version "1.0.3"
