@@ -1683,10 +1683,10 @@
   dependencies:
     tslib "^2.1.0"
 
-"@homebound/form-state@^2.1.5":
-  version "2.1.5"
-  resolved "https://registry.npmjs.org/@homebound/form-state/-/form-state-2.1.5.tgz"
-  integrity sha512-wDvaK61V3jfvbI7RMq6NWCNk9D0hKpZ9r92u8essIbOzq+72BXeWntjb6f/cNLbtlHNCPvDG3Bv/6eydZ5iC6g==
+"@homebound/form-state@^2.2.11":
+  version "2.2.11"
+  resolved "https://registry.yarnpkg.com/@homebound/form-state/-/form-state-2.2.11.tgz#3f2bf0a5700fe2c6b58bcd8391ec357a4968ae9e"
+  integrity sha512-MGLP30c++0QYF+pPtDIs75In/Tpt49sd4u98Mkgp5pFMb+msy4hZmcNOlj2uWjfjjuIuoOg/g01lpI6KG2Ewwg==
 
 "@homebound/rtl-react-router-utils@^1.0.3":
   version "1.0.3"
@@ -10124,6 +10124,13 @@ is-plain-obj@^2.0.0:
   resolved "https://registry.npmjs.org/is-plain-obj/-/is-plain-obj-2.1.0.tgz"
   integrity sha512-YWnfyRwxL/+SsrWYfOpUtz5b3YD+nyfkHvjbcanzk8zgyO4ASD67uVMRt8k5bM4lLMDnXfriRhOpemw+NfT1eA==
 
+is-plain-object@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-2.0.0.tgz#8612587fa90279dc1b6e1cec2056f6c1df7abb2a"
+  integrity sha1-hhJYf6kCedwbbhzsIFb2wd96uyo=
+  dependencies:
+    isobject "^0.2.0"
+
 is-plain-object@5.0.0, is-plain-object@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-5.0.0.tgz#4427f50ab3429e9025ea7d52e9043a9ef4159344"
@@ -10249,6 +10256,11 @@ isexe@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/isexe/-/isexe-2.0.0.tgz"
   integrity sha1-6PvzdNxVb/iUehDcsFctYz8s+hA=
+
+isobject@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/isobject/-/isobject-0.2.0.tgz#a3432192f39b910b5f02cc989487836ec70aa85e"
+  integrity sha1-o0MhkvObkQtfAsyYlIeDbscKqF4=
 
 isobject@^2.0.0:
   version "2.1.0"

@@ -33,7 +33,7 @@
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\""
   },
   "dependencies": {
-    "@homebound/form-state": "^2.1.5",
+    "@homebound/form-state": "^2.2.11",
     "@react-aria/utils": "^3.9.0",
     "@react-hook/resize-observer": "^1.2.2",
     "@types/tinycolor2": "^1.4.2",
@@ -69,6 +69,7 @@
     }
   },
   "devDependencies": {
+    "is-plain-object": "2.0.0",
     "@babel/core": "^7.15.5",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
     "@babel/preset-typescript": "^7.15.0",
