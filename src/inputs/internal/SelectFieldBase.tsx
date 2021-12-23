@@ -8,7 +8,7 @@ import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css, px } from "src/Css";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
-import { Value, valueToKey } from "src/inputs/Value";
+import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { areArraysEqual } from "src/utils";
 
@@ -162,7 +162,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
       filteredOptions: fieldState.allOptions,
     }));
 
-    selectionChanged && onSelect(selectedKeys as V[], selectedOptions);
+    selectionChanged && onSelect(selectedKeys.map(keyToValue) as V[], selectedOptions);
 
     if (!multiselect) {
       // When a single select menu item changes, then blur the field AFTER `onSelect` has been called
