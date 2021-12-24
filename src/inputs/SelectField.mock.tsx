@@ -1,4 +1,4 @@
-import { Key, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import { SelectFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 
@@ -21,6 +21,12 @@ export function SelectField<O extends object, V extends Key>(props: SelectFieldP
 
   const [options, setOptions] = useState(Array.isArray(maybeOptions) ? maybeOptions : maybeOptions.initial);
   const currentOption = options.find((o) => getOptionValue(o) === value) || options[0];
+
+  useEffect(() => {
+    if (Array.isArray(maybeOptions) && maybeOptions !== options) {
+      setOptions(maybeOptions);
+    }
+  }, [maybeOptions]);
 
   return (
     <select

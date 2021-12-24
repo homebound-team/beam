@@ -8,7 +8,7 @@ import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { HasIdAndName, Optional } from "src/types";
 import { noop } from "src/utils";
-import { zeroTo } from "src/utils/sb";
+import { withDimensions, zeroTo } from "src/utils/sb";
 
 export default {
   component: SelectField,
@@ -243,6 +243,7 @@ export function LoadingState() {
     />
   );
 }
+LoadingState.decorators = [withDimensions()];
 LoadingState.parameters = {
   chromatic: { delay: 1000 },
 };
