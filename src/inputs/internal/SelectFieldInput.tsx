@@ -66,6 +66,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
   return (
     <TextFieldBase
       {...otherProps}
+      readOnly={inputProps.readOnly}
       inlineLabel={inlineLabel}
       errorMsg={errorMsg}
       contrast={contrast}

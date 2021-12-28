@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { SelectState } from "react-stately";
 import { Virtuoso } from "react-virtuoso";
 import { VirtuosoHandle } from "react-virtuoso/dist/components";
-import { Css, Palette } from "src/Css";
+import { LoadingDots } from "src/inputs/internal/LoadingDots";
 import { Option } from "src/inputs/internal/Option";
 
 interface VirtualizedOptionsProps<O> {
@@ -64,38 +64,7 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
         !loading
           ? {}
           : {
-              Footer:
-                typeof loading === "function"
-                  ? loading
-                  : () => {
-                      const circleCss = Css.hPx(8)
-                        .wPx(8)
-                        .br4.bgColor(contrast ? Palette.Gray500 : Palette.Gray300)
-                        .add("animationName", contrast ? "loadingDotsContrast" : "loadingDots")
-                        .add("animationDuration", "800ms")
-                        .add("animationIterationCount", "infinite")
-                        .add("animationTimingFunction", "linear")
-                        .add("animationDirection", "alternate").$;
-                      return (
-                        <div css={Css.py2.df.jcc.$}>
-                          <div
-                            aria-label="Loading"
-                            css={{
-                              ...circleCss,
-                              ...Css.relative
-                                .add("animationDelay", "300ms")
-
-                                .addIn("&:before, &:after", {
-                                  ...circleCss,
-                                  ...Css.add("content", "' '").absolute.dib.$,
-                                })
-                                .addIn("&:before", Css.leftPx(-12).add("animationDelay", "0").$)
-                                .addIn("&:after", Css.rightPx(-12).add("animationDelay", "600ms").$).$,
-                            }}
-                          />
-                        </div>
-                      );
-                    },
+              Footer: typeof loading === "function" ? loading : () => <LoadingDots contrast={contrast} />,
             }
       }
     />

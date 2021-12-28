@@ -1,4 +1,8 @@
-import { render, select } from "src/utils/rtl";
+import { fireEvent } from "@testing-library/react";
+import { useState } from "react";
+import { Value } from "src/inputs/Value";
+import { noop } from "src/utils";
+import { click, render, select, wait } from "src/utils/rtl";
 import { SelectField as MockSelectField } from "./SelectField.mock";
 
 describe("MockSelectField", () => {
@@ -78,4 +82,67 @@ describe("MockSelectField", () => {
     expect(r.getByText("one")).not.toBeDisabled();
     expect(r.getByText("four")).not.toBeDisabled();
   });
+
+  it("can load options via options prop callback", async () => {
+    const options = [
+      { id: "1", name: "one" },
+      { id: "2", name: "two" },
+      { id: "3", name: "thr" },
+    ];
+    // Given a Select Field with options that are loaded via a callback
+    const r = await render(
+      <MockSelectField
+        label="Age"
+        value="1"
+        options={{ initial: [options[0]], load: async () => ({ options }) }}
+        onSelect={noop}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+      />,
+    );
+    // When opening the menu
+    fireEvent.focus(r.age());
+    // Then expect to see the initial option - (should have length of 2 as the mock provides an blank options)
+    expect(r.getAllByRole("option")).toHaveLength(2);
+    // And when waiting for the promise to resolve
+    await wait();
+    // Then expect the rest of the options to be loaded in
+    expect(r.getAllByRole("option")).toHaveLength(4);
+  });
+
+  it("reflects new options when prop changes", async () => {
+    // Given a Select Field with options that are loaded via a callback
+    const r = await render(<TestUpdateOptionsField />);
+    // Initially expect to see the initial option - (should have length of 2 as the mock provides an blank options)
+    expect(r.getAllByRole("option")).toHaveLength(2);
+    // When updating the options prop
+    click(r.updateOptions);
+    // Then expect the rest of the options to be loaded in
+    expect(r.getAllByRole("option")).toHaveLength(4);
+  });
 });
+
+function TestUpdateOptionsField<O, V extends Value>() {
+  const options = [
+    { id: "1", name: "one" },
+    { id: "2", name: "two" },
+    { id: "3", name: "thr" },
+  ];
+  const [initOptions, setOptions] = useState([options[0]]);
+  return (
+    <>
+      <MockSelectField
+        label="Age"
+        value="1"
+        options={initOptions}
+        onSelect={noop}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+      />
+      ,
+      <button data-testid="updateOptions" onClick={() => setOptions(options as any)} />
+    </>
+  );
+}

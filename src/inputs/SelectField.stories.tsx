@@ -198,9 +198,10 @@ export const Contrast = Template.bind({});
 // @ts-ignore
 Contrast.args = { compact: true, contrast: true };
 
+const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
+
 export function PerfTest() {
   const [selectedValue, setSelectedValue] = useState<string>(loadTestOptions[2].id);
-
   return (
     <SelectField
       label="Project"
@@ -221,7 +222,7 @@ export function PerfTest() {
     />
   );
 }
-const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
+PerfTest.parameters = { chromatic: { disableSnapshot: true } };
 
 export function LoadingState() {
   const [selectedValue, setSelectedValue] = useState<string>(loadTestOptions[2].id);
