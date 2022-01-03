@@ -11,7 +11,7 @@ import React, {
   useState,
 } from "react";
 import { Link } from "react-router-dom";
-import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import { Components, LogLevel, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
@@ -544,7 +544,13 @@ function renderVirtual<R extends Kinded>(
   }, [style]);
   return (
     <Virtuoso
+      logLevel={LogLevel.DEBUG}
+      // overscan={{ main: 10, reverse: 10 }}
       ref={virtuosoRef}
+      // scrollSeekConfiguration={{
+      //   enter: (velocity) => velocity > 50,
+      //   exit: (velocity) => velocity < 10,
+      // }}
       components={{
         List: VirtualRoot(listStyle, columns, id, firstLastColumnWidth, xss),
         Footer: () => <div css={footerStyle} />,
@@ -556,12 +562,12 @@ function renderVirtual<R extends Kinded>(
 
         // If it is a chrome row, then we are not using `display: contents;`, return the height of this element.
         if ("chrome" in maybeContentsDiv.dataset) {
-          return maybeContentsDiv.offsetHeight;
+          return maybeContentsDiv.getBoundingClientRect().height || 1;
         }
 
         // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
         // so instead drill into the 1st real content cell.
-        return (maybeContentsDiv.firstElementChild! as HTMLElement).offsetHeight;
+        return (maybeContentsDiv.firstElementChild! as HTMLElement).getBoundingClientRect().height;
       }}
       itemContent={(index) => {
         // We keep header and filter rows separate, but react-virtuoso is a flat list,

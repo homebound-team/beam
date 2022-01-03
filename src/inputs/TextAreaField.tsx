@@ -1,5 +1,4 @@
-import { useLayoutEffect } from "@react-aria/utils";
-import { useCallback, useRef } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { mergeProps, useTextField } from "react-aria";
 import { Only } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
@@ -20,6 +19,8 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
 
   // not in stately because this is so we know when to re-measure, which is a spectrum design
   const onHeightChange = useCallback(() => {
+    // debugger;
+
     const input = inputRef.current;
     const inputWrap = inputWrapRef.current;
     if (input && inputWrap) {
