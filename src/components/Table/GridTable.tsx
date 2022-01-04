@@ -11,7 +11,7 @@ import React, {
   useState,
 } from "react";
 import { Link } from "react-router-dom";
-import { Components, LogLevel, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
@@ -544,13 +544,8 @@ function renderVirtual<R extends Kinded>(
   }, [style]);
   return (
     <Virtuoso
-      logLevel={LogLevel.DEBUG}
-      // overscan={{ main: 10, reverse: 10 }}
+      overscan={5}
       ref={virtuosoRef}
-      // scrollSeekConfiguration={{
-      //   enter: (velocity) => velocity > 50,
-      //   exit: (velocity) => velocity < 10,
-      // }}
       components={{
         List: VirtualRoot(listStyle, columns, id, firstLastColumnWidth, xss),
         Footer: () => <div css={footerStyle} />,

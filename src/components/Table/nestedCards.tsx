@@ -187,7 +187,7 @@ export function makeSpacer(height: number, openCards: string[], styles: NestedCa
  * - nested card2 content row
  * - chrome row (card2 close, card1 close)
  */
-export function maybeCreateChromeRow( // ensure none-zero height for virtual header??
+export function maybeCreateChromeRow(
   columns: GridColumn<any>[],
   filteredRows: RowTuple<any>[],
   chromeBuffer: ChromeBuffer,
