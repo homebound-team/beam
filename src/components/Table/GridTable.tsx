@@ -544,6 +544,7 @@ function renderVirtual<R extends Kinded>(
   }, [style]);
   return (
     <Virtuoso
+      overscan={5}
       ref={virtuosoRef}
       components={{
         List: VirtualRoot(listStyle, columns, id, firstLastColumnWidth, xss),
@@ -556,12 +557,12 @@ function renderVirtual<R extends Kinded>(
 
         // If it is a chrome row, then we are not using `display: contents;`, return the height of this element.
         if ("chrome" in maybeContentsDiv.dataset) {
-          return maybeContentsDiv.offsetHeight;
+          return maybeContentsDiv.getBoundingClientRect().height || 1;
         }
 
         // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
         // so instead drill into the 1st real content cell.
-        return (maybeContentsDiv.firstElementChild! as HTMLElement).offsetHeight;
+        return (maybeContentsDiv.firstElementChild! as HTMLElement).getBoundingClientRect().height;
       }}
       itemContent={(index) => {
         // We keep header and filter rows separate, but react-virtuoso is a flat list,
