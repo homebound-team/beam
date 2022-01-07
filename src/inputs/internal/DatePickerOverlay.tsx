@@ -41,6 +41,10 @@ export function DatePickerOverlay(props: DatePickerOverlayProps) {
         "& .DayPicker-Day:active": Css.bgGray400.$,
         // Make the month title, i.e. "May 2021", match figma; pyPx nudge matches the NavbarElement nudging
         "& .DayPicker-Caption > div": Css.base.pyPx(2).$,
+        // For days that are disabled via `disabledDays`, 
+        "& .DayPicker-Day--disabled": Css.cursorNotAllowed.$,
+        // Override `.DayPicker-Day:active` background when the day is disabled
+        "& .DayPicker-Day--disabled:active": Css.bgWhite.$,
       }}
       {...tid}
     >

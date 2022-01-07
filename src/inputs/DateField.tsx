@@ -32,6 +32,7 @@ export interface DateFieldProps
   placeholder?: string;
   format?: keyof typeof dateFormats;
   iconLeft?: boolean;
+  // Set custom logic for individual dates or date ranges to be disabled in the picker, exposed from `react-day-picker`
   disabledDays?: Modifier;
 }
 
