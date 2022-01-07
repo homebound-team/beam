@@ -284,7 +284,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
       return (
-        <GridCollapseContext.Provider value={row.kind === "header" ? collapseAllContext : collapseRowContext}>
+        <GridCollapseContext.Provider
+          key={`${row.kind}-${row.id}`}
+          value={row.kind === "header" ? collapseAllContext : collapseRowContext}
+        >
           <RowComponent
             key={`${row.kind}-${row.id}`}
             {...{
@@ -535,13 +538,17 @@ function renderVirtual<R extends Kinded>(
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
-  const { paddingBottom } = style.rootCss ?? {};
+  const { footerStyle, listStyle } = useMemo(() => {
+    const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
+    return { footerStyle: { paddingBottom }, listStyle: { ...style, rootCss: otherRootStyles } };
+  }, [style]);
   return (
     <Virtuoso
+      overscan={5}
       ref={virtuosoRef}
       components={{
-        List: VirtualRoot(style, columns, id, firstLastColumnWidth, xss),
-        Footer: () => <div css={{ paddingBottom }}></div>,
+        List: VirtualRoot(listStyle, columns, id, firstLastColumnWidth, xss),
+        Footer: () => <div css={footerStyle} />,
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
@@ -550,12 +557,12 @@ function renderVirtual<R extends Kinded>(
 
         // If it is a chrome row, then we are not using `display: contents;`, return the height of this element.
         if ("chrome" in maybeContentsDiv.dataset) {
-          return maybeContentsDiv.offsetHeight;
+          return maybeContentsDiv.getBoundingClientRect().height || 1;
         }
 
         // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
         // so instead drill into the 1st real content cell.
-        return (maybeContentsDiv.firstElementChild! as HTMLElement).offsetHeight;
+        return (maybeContentsDiv.firstElementChild! as HTMLElement).getBoundingClientRect().height;
       }}
       itemContent={(index) => {
         // We keep header and filter rows separate, but react-virtuoso is a flat list,
@@ -598,7 +605,7 @@ const VirtualRoot = memoizeOne<
     xss: any,
   ) => Components["List"]
 >((gs, columns, id, firstLastColumnWidth, xss) => {
-  return React.forwardRef(({ style, children }, ref) => {
+  return React.forwardRef(function VirtualRoot({ style, children }, ref) {
     // This re-renders each time we have new children in the view port
     return (
       <div
@@ -728,7 +735,7 @@ type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "
  * - For server-side sorting, it's the sortKey to pass back to the server to
  * request "sort by this column".
  *
- * - For client-side sorting, it the type `number`, to represent the current
+ * - For client-side sorting, it's type `number`, to represent the current
  * column being sorted, in which case we use the GridCellContent.value.
  */
 export type GridColumn<R extends Kinded, S = {}> = {
@@ -802,7 +809,7 @@ function getIndentationCss<R extends Kinded>(
   maybeContent: ReactNode | GridCellContent,
 ): Properties {
   // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
-  const indent = (isContentAndSettings(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
+  const indent = (isGridCellContent(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
   return indent === 1 ? style.indentOneCss || {} : indent === 2 ? style.indentTwoCss || {} : {};
 }
 
@@ -824,7 +831,8 @@ export type GridCellAlignment = "left" | "right" | "center";
  * primitive value for filtering and sorting.
  */
 export type GridCellContent = {
-  content: ReactNode;
+  /** The JSX content of the cell. Virtual tables that client-side sort should use a function to avaid perf overhead. */
+  content: ReactNode | (() => ReactNode);
   alignment?: GridCellAlignment;
   /** Allow value to be a function in case it's a dynamic value i.e. reading from an inline-edited proxy. */
   value?: MaybeFn<number | string | Date | boolean | null | undefined>;
@@ -930,12 +938,12 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           return;
         }
         const maybeContent = applyRowFn(column, row);
-        currentColspan = isContentAndSettings(maybeContent) ? maybeContent.colspan ?? 1 : 1;
+        currentColspan = isGridCellContent(maybeContent) ? maybeContent.colspan ?? 1 : 1;
 
         const canSortColumn =
           (sorting?.on === "client" && column.clientSideSort !== false) ||
           (sorting?.on === "server" && !!column.serverSideSortKey);
-        const content = toContent(maybeContent, isHeader, canSortColumn, style);
+        const content = toContent(maybeContent, isHeader, canSortColumn, sorting?.on === "client", style, as);
 
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
 
@@ -998,31 +1006,54 @@ const ObservedGridRow = React.memo((props: GridRowProps<any, any>) => (
   </Observer>
 ));
 
+/** A heuristic to detect the result of `React.createElement` / i.e. JSX. */
+function isJSX(content: any): boolean {
+  return typeof content === "object" && content && "type" in content && "props" in content;
+}
+
 /** If a column def return just string text for a given row, apply some default styling. */
 function toContent(
   content: ReactNode | GridCellContent,
   isHeader: boolean,
   canSortColumn: boolean,
+  isClientSideSorting: boolean,
   style: GridStyle,
+  as: RenderAs,
 ): ReactNode {
-  if (typeof content === "string" && isHeader && canSortColumn) {
+  content = isGridCellContent(content) ? content.content : content;
+  if (typeof content === "function") {
+    // Actually create the JSX by calling `content()` here (which should be as late as
+    // possible, i.e. only for visible rows if we're in a virtual table).
+    content = content();
+  } else if (as === "virtual" && canSortColumn && isClientSideSorting && isJSX(content)) {
+    // When using client-side sorting, we call `applyRowFn` not only during rendering, but
+    // up-front against all rows (for the currently sorted column) to determine their
+    // sort values.
+    //
+    // Pedantically this means that any table using client-side sorting should not
+    // build JSX directly in its GridColumn functions, but this overhead is especially
+    // noticeable for large/virtualized tables, so we only enforce using functions
+    // for those tables.
+    throw new Error(
+      "GridTables with as=virtual & sortable columns should use functions that return JSX, instead of JSX",
+    );
+  }
+  if (content && typeof content === "string" && isHeader && canSortColumn) {
     return <SortHeader content={content} />;
   } else if (style.emptyCell && isContentEmpty(content)) {
     // If the content is empty and the user specified an `emptyCell` node, return that.
     return style.emptyCell;
-  } else if (isContentAndSettings(content)) {
-    return content.content;
   }
   return content;
 }
 
-function isContentAndSettings(content: ReactNode | GridCellContent): content is GridCellContent {
+function isGridCellContent(content: ReactNode | GridCellContent): content is GridCellContent {
   return typeof content === "object" && !!content && "content" in content;
 }
 
 const emptyValues = ["", null, undefined] as any[];
-function isContentEmpty(content: ReactNode | GridCellContent): boolean {
-  return emptyValues.includes(isContentAndSettings(content) ? content.content : content);
+function isContentEmpty(content: ReactNode): boolean {
+  return emptyValues.includes(content);
 }
 
 /** Return the content for a given column def applied to a given row. */
@@ -1052,17 +1083,25 @@ const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (
 };
 
 /**
- * Provides each row access to its `collapsed` current state and toggle.
+ * Provides each row access to a method to check if it is collapsed and toggle it's collapsed state.
  *
  * Calling `toggleCollapse` will keep the row itself showing, but will hide any
  * children rows (specifically those that have this row's `id` in their `parentIds`
  * prop).
+ *
+ * headerCollapsed is used to trigger rows at the root level to rerender their chevron when all are
+ * collapsed/expanded.
  */
-type GridCollapseContextProps = { isCollapsed: (id: string) => boolean; toggleCollapsed(id: string): void };
+type GridCollapseContextProps = {
+  headerCollapsed: boolean;
+  isCollapsed: (id: string) => boolean;
+  toggleCollapsed(id: string): void;
+};
 
 export const GridCollapseContext = React.createContext<GridCollapseContextProps>({
-  isCollapsed: (id: string) => false,
-  toggleCollapsed: (id: string) => {},
+  headerCollapsed: false,
+  isCollapsed: () => false,
+  toggleCollapsed: () => {},
 });
 
 /** Sets up the `GridContext` so that header cells can access the current sort settings. */
@@ -1130,7 +1169,7 @@ const alignmentToTextAlign: Record<GridCellAlignment, Properties["textAlign"]> =
 
 // For alignment, use: 1) cell def, else 2) column def, else 3) left.
 function getJustification(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent, as: RenderAs) {
-  const alignment = (isContentAndSettings(maybeContent) && maybeContent.alignment) || column.align || "left";
+  const alignment = (isGridCellContent(maybeContent) && maybeContent.alignment) || column.align || "left";
   // Always apply text alignment.
   const textAlign = Css.add("textAlign", alignmentToTextAlign[alignment]).$;
   if (as === "table") {
@@ -1196,7 +1235,10 @@ function getCollapsedRows(persistCollapse: string | undefined): string[] {
  * function should see/update the latest list of values, which is not possible with a
  * traditional `useState` hook because it captures the original/stale list identity.
  */
-function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | undefined) {
+function useToggleIds(
+  rows: GridDataRow<Kinded>[],
+  persistCollapse: string | undefined,
+): readonly [string[], GridCollapseContextProps, GridCollapseContextProps] {
   // Make a list that we will only mutate, so that our callbacks have a stable identity.
   const [collapsedIds] = useState<string[]>(getCollapsedRows(persistCollapse));
   // Use this to trigger the component to re-render even though we're not calling `setList`
@@ -1242,7 +1284,7 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
         // Trigger a re-render
         setTick(collapsedIds.join(","));
       };
-      return { isCollapsed, toggleCollapsed: toggleAll };
+      return { headerCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleAll };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [rows],
@@ -1266,10 +1308,10 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
         // Trigger a re-render
         setTick(collapsedIds.join(","));
       };
-      return { isCollapsed, toggleCollapsed: toggleRow };
+      return { headerCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleRow };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [collapseAllContext.isCollapsed("header")],
   );
 
   // Return a copy of the list, b/c we want external useMemos that do explicitly use the

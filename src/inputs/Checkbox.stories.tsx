@@ -15,7 +15,12 @@ export function Checkboxes() {
       <div>
         <h2 css={Css.mb1.$}>Basic Checkboxes</h2>
         <div css={Css.dg.gap1.$}>
-          <Checkbox onChange={action("onChange")} label="Default" />
+          <Checkbox
+            onChange={action("onChange")}
+            onFocus={action("onFocus")}
+            onBlur={action("onBlur")}
+            label="Default"
+          />
           <Checkbox onChange={action("onChange")} selected label="Selected" />
           <Checkbox onChange={action("onChange")} indeterminate label="Indeterminate" />
           <Checkbox onChange={action("onChange")} disabled label="Disabled" />

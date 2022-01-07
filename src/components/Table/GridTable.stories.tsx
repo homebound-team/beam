@@ -148,36 +148,7 @@ type GrandChildRow = { kind: "grandChild"; id: string; name: string };
 type AddRow = { kind: "add" };
 type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow | AddRow;
 
-const rows: GridDataRow<NestedRow>[] = [
-  // a parent w/ two children, 1st child has 2 grandchild, 2nd child has 1 grandchild
-  {
-    ...{ kind: "parent", id: "p1", name: "parent 1" },
-    children: [
-      {
-        ...{ kind: "child", id: "p1c1", name: "child p1c1" },
-        children: [
-          { kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" + " foo".repeat(20) },
-          { kind: "grandChild", id: "p1c1g2", name: "grandchild p1c1g2" },
-        ],
-      },
-      {
-        ...{ kind: "child", id: "p1c2", name: "child p1c2" },
-        children: [{ kind: "grandChild", id: "p1c2g1", name: "grandchild p1c2g1" }],
-      },
-      // Put this "grandchild" in the 2nd level to show heterogeneous levels
-      { kind: "grandChild", id: "p1g1", name: "grandchild p1g1" },
-      // Put this "kind" into the 2nd level to show it doesn't have to be a card
-      { kind: "add", id: "add", pin: "last" },
-    ],
-  },
-  // a parent with just a child
-  {
-    ...{ kind: "parent", id: "p2", name: "parent 2" },
-    children: [{ kind: "child", id: "p2c1", name: "child p2c1" }],
-  },
-  // a parent with no children
-  { kind: "parent", id: "p3", name: "parent 3" },
-];
+const rows = makeNestedRows(1);
 const header = { kind: "header", id: "header" } as const;
 const rowsWithHeader: GridDataRow<NestedRow>[] = [header, ...rows];
 
@@ -219,24 +190,26 @@ export function NestedCardsThreeLevels() {
   return <NestedCards rows={rowsWithHeader} sorting={{ on: "client", initial: [0, "ASC"] }} />;
 }
 
+function deepCount(rows: GridDataRow<any>[]): number {
+  return rows.map((row) => 1 + deepCount(row.children ?? [])).reduce((a, b) => a + b, 0);
+}
+
 export function NestedCardsThreeLevelsVirtualizedAtScale() {
+  const rows = useMemo(() => [header, ...makeNestedRows(500)], []);
   return (
     <div css={Css.df.fdc.vh100.$}>
-      Rendering {rows.length * 500} rows virtualized
-      <NestedCards rows={[header, ...zeroTo(100).flatMap(() => rows)]} as={"virtual"} />
+      Rendering {deepCount(rows)} rows virtualized
+      <NestedCards rows={rows} as="virtual" />
     </div>
   );
 }
 
 export function NestedCardsThreeLevelsVirtualizedAtScaleSorted() {
+  const rows = useMemo(() => [header, ...makeNestedRows(500)], []);
   return (
     <div css={Css.df.fdc.vh100.$}>
-      Rendering {rows.length * 500} rows virtualized & sorted
-      <NestedCards
-        rows={[header, ...zeroTo(100).flatMap(() => rows)]}
-        as={"virtual"}
-        sorting={{ on: "client", initial: [0, "ASC"] }}
-      />
+      Rendering {deepCount(rows)} rows virtualized & sorted
+      <NestedCards rows={rows} as="virtual" sorting={{ on: "client", initial: [0, "ASC"] }} />
     </div>
   );
 }
@@ -275,15 +248,15 @@ function NestedCards({ rows, as, sorting, style }: NestedCardsProps) {
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
     parent: (row) => ({
-      content: <div css={Css.base.$}>{row.name}</div>,
+      content: () => <div css={Css.base.$}>{row.name}</div>,
       value: row.name,
     }),
     child: (row) => ({
-      content: <div css={Css.sm.$}>{row.name}</div>,
+      content: () => <div css={Css.sm.$}>{row.name}</div>,
       value: row.name,
     }),
     grandChild: (row) => ({
-      content: <div css={Css.xs.$}>{row.name}</div>,
+      content: () => <div css={Css.xs.$}>{row.name}</div>,
       value: row.name,
     }),
     add: () => "Add",
@@ -703,4 +676,46 @@ export function CustomEmptyCell() {
       ]}
     />
   );
+}
+
+function makeNestedRows(repeat: number = 1): GridDataRow<NestedRow>[] {
+  let parentId = 0;
+  return zeroTo(repeat).flatMap((i) => {
+    // Make three unique parent ids for this iteration
+    const p1 = `p${parentId++}`;
+    const p2 = `p${parentId++}`;
+    const p3 = `p${parentId++}`;
+    const prefix = i === 0 ? "" : `${i}.`;
+    const rows: GridDataRow<NestedRow>[] = [
+      // a parent w/ two children, 1st child has 2 grandchild, 2nd child has 1 grandchild
+      {
+        ...{ kind: "parent", id: p1, name: `parent ${prefix}1` },
+        children: [
+          {
+            ...{ kind: "child", id: `${p1}c1`, name: `child ${prefix}p1c1` },
+            children: [
+              { kind: "grandChild", id: `${p1}c1g1`, name: `grandchild ${prefix}p1c1g1` + " foo".repeat(20) },
+              { kind: "grandChild", id: `${p1}c1g2`, name: `grandchild ${prefix}p1c1g2` },
+            ],
+          },
+          {
+            ...{ kind: "child", id: `${p1}c2`, name: `child ${prefix}p1c2` },
+            children: [{ kind: "grandChild", id: `${p1}c2g1`, name: `grandchild ${prefix}p1c2g1` }],
+          },
+          // Put this "grandchild" in the 2nd level to show heterogeneous levels
+          { kind: "grandChild", id: `${p1}g1`, name: `grandchild ${prefix}p1g1` },
+          // Put this "kind" into the 2nd level to show it doesn't have to be a card
+          { kind: "add", id: `${p1}add`, pin: "last" },
+        ],
+      },
+      // a parent with just a child
+      {
+        ...{ kind: "parent", id: p2, name: `parent ${prefix}2` },
+        children: [{ kind: "child", id: `${p2}c1`, name: `child ${prefix}p2c1` }],
+      },
+      // a parent with no children
+      { kind: "parent", id: p3, name: `parent ${prefix}3` },
+    ];
+    return rows;
+  });
 }

@@ -77,7 +77,7 @@ export function ChipSelectField<O, V extends Value>(
     },
     onBlur: (e) => {
       // Do not call onBlur if focus moved to within the Popover
-      if (popoverRef.current && popoverRef.current.contains(e.relatedTarget as HTMLElement)) {
+      if ((popoverRef.current && popoverRef.current.contains(e.relatedTarget as HTMLElement)) || showInput) {
         return;
       }
 
