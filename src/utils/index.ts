@@ -69,3 +69,7 @@ export class EmptyRef<T> implements MutableRefObject<T> {
 }
 
 export const isAbsoluteUrl = (url: string) => /^(http(s?)):\/\//i.test(url);
+
+export function areArraysEqual(a: any[], b: any[]): boolean {
+  return a.length === b.length && a.every((val, idx) => val === b[idx]);
+}

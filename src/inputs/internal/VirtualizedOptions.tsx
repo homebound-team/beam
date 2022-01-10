@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { SelectState } from "react-stately";
 import { Virtuoso } from "react-virtuoso";
 import { VirtuosoHandle } from "react-virtuoso/dist/components";
+import { LoadingDots } from "src/inputs/internal/LoadingDots";
 import { Option } from "src/inputs/internal/Option";
 
 interface VirtualizedOptionsProps<O> {
@@ -12,11 +13,13 @@ interface VirtualizedOptionsProps<O> {
   contrast: boolean;
   // Whether we should auto-scroll to the item in focus. Should only be used when Options are using "virtual focus". Should not be used if focus is triggered on clicking an element.
   scrollOnFocus?: boolean;
+  // Adds 'Loading' footer to the list
+  loading?: boolean | (() => JSX.Element);
 }
 
 // Displays ListBox options in a virtualized container for performance reasons
 export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
-  const { state, items, onListHeightChange, contrast, scrollOnFocus } = props;
+  const { state, items, onListHeightChange, contrast, scrollOnFocus, loading } = props;
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const focusedItem = state.collection.getItem(state.selectionManager.focusedKey);
   const selectedItem =
@@ -57,6 +60,13 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
           );
         }
       }}
+      components={
+        !loading
+          ? {}
+          : {
+              Footer: typeof loading === "function" ? loading : () => <LoadingDots contrast={contrast} />,
+            }
+      }
     />
   );
 }

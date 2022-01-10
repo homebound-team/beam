@@ -1,6 +1,11 @@
 module.exports = {
   stories: ["../src/**/*.stories.tsx"],
-  addons: ["@storybook/addon-links", "@storybook/addon-essentials", "storybook-addon-performance/register"],
+  addons: [
+    "@storybook/addon-links",
+    "@storybook/addon-essentials",
+    "storybook-addon-performance/register",
+    "@storybook/addon-interactions",
+  ],
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: { check: false },
   webpackFinal: async (config) => {
