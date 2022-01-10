@@ -83,10 +83,11 @@ describe("TextFieldTest", () => {
     expect(onFocus).toHaveBeenCalledTimes(1);
   });
 
-  it("can blur on Enter", async () => {
+  it("can blur on Enter and call onEnter callback", async () => {
     const onBlur = jest.fn();
+    const onEnter = jest.fn();
     // Given a textfield
-    const r = await render(<TestTextField value="foo" onBlur={onBlur} />);
+    const r = await render(<TestTextField value="foo" onBlur={onBlur} onEnter={onEnter} />);
     // With focus
     r.name().focus();
     expect(r.name()).toHaveFocus();
@@ -96,6 +97,7 @@ describe("TextFieldTest", () => {
     expect(r.name()).not.toHaveFocus();
     // And onBlur should be called
     expect(onBlur).toHaveBeenCalledTimes(1);
+    expect(onEnter).toHaveBeenCalledTimes(1);
   });
 });
 
