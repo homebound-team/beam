@@ -2,6 +2,7 @@ import { click, render } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
+import { HasIdAndName } from "src/types";
 import { wait } from "src/utils/rtl";
 
 describe("SelectFieldTest", () => {
@@ -193,6 +194,26 @@ describe("SelectFieldTest", () => {
     click(r.updateOptions);
     // Then expect the rest of the options to be loaded in
     expect(r.getAllByRole("option")).toHaveLength(3);
+  });
+
+  it("can set value when options are loaded later", async () => {
+    // Given a Select Field with options that are loaded lazily
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value="1"
+        options={[] as HasIdAndName[]}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+      />,
+    );
+    // The input value will initially be blank
+    expect(r.age()).toHaveValue("");
+    // And when options are loaded
+    click(r.updateOptions);
+    // Then expect the input value to be updated based on field's value
+    expect(r.age()).toHaveValue("One");
   });
 
   const options = [
