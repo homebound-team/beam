@@ -283,7 +283,22 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     // Only update the fieldset when options change, when options is an array.
     // Otherwise, if the options are passed in as an object, then we assume the caller is updating options via a Promise and not via updating props.
     if (Array.isArray(maybeOptions) && maybeOptions !== fieldState.allOptions) {
-      setFieldState((prevState) => ({ ...prevState, filteredOptions: maybeOptions, allOptions: maybeOptions }));
+      setFieldState((prevState) => {
+        const selectedOptions = maybeOptions.filter((o) => values?.includes(getOptionValue(o)));
+        return {
+          ...prevState,
+          selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
+          inputValue:
+            selectedOptions.length === 1
+              ? getOptionLabel(selectedOptions[0])
+              : multiselect && selectedOptions.length === 0
+              ? nothingSelectedText
+              : "",
+          selectedOptions: selectedOptions,
+          filteredOptions: maybeOptions,
+          allOptions: maybeOptions,
+        };
+      });
     }
   }, [maybeOptions]);
 
