@@ -97,7 +97,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     };
   });
 
-  /** Resets field's input value and filtered options list for cases where the user exists the field without making changes (on Escape, or onBlur) */
+  /** Resets field's input value and filtered options list for cases where the user exits the field without making changes (on Escape, or onBlur) */
   function resetField() {
     const inputValue = getInputValue(
       fieldState.allOptions.filter((o) => values?.includes(getOptionValue(o))),
