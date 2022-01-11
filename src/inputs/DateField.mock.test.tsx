@@ -33,4 +33,12 @@ describe("MockDateField", () => {
     expect(onFocus).toBeCalledTimes(1);
     expect(onBlur).toBeCalledTimes(1);
   });
+
+  it("forwards disabledDays prop as stringified object", async () => {
+    const testDate = new Date(2020, 0, 1)
+    const r = await render(<MockDateField label="Start Date" value={testDate} disabledDays={{ before: testDate }} onChange={() => {}} />);
+
+    const expectedResult = JSON.stringify({ before: testDate });
+    expect(r.date()).toHaveAttribute("data-disabled-days", expectedResult);
+  });
 });
