@@ -5,6 +5,7 @@ import { CheckboxBase } from "src/inputs/CheckboxBase";
 
 export interface CheckboxProps {
   label: string;
+  checkboxOnly?: boolean;
   /** Handler that is called when the element's selection state changes. */
   onChange: (selected: boolean) => void;
   /** Additional text displayed below label */
