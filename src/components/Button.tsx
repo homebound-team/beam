@@ -139,7 +139,7 @@ const variantStyles: Record<ButtonVariant, { baseStyles: {}; hoverStyles: {}; di
     },
 
     text: {
-      baseStyles: Css.lightBlue700.$,
+      baseStyles: Css.lightBlue700.add("fontSize", "inherit").$,
       hoverStyles: {},
       pressedStyles: {},
       disabledStyles: Css.lightBlue300.$,
