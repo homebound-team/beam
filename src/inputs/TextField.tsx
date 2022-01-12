@@ -42,8 +42,6 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
       ...textFieldProps,
       onKeyDown: (e) => {
         if (e.key === "Enter") {
-          // Blur the field when the user hits the enter key - as if they are "committing" the value and done with the field
-          inputRef.current?.blur();
           maybeCall(onEnter);
         }
       },
