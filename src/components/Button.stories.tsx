@@ -140,8 +140,13 @@ export function ButtonVariations(args: ButtonProps) {
           <Button {...args} icon="plus" variant="text" disabled label="Disabled" />
         </div>
         <div css={buttonRowStyles}>
-          <p css={Css.sm.$}>
-            Example of a <Button {...args} variant="text" label="Text Button" /> placed inline within other text.
+          <p css={Css.xs.$}>
+            Example of a <Button {...args} variant="text" label="Text Button" /> placed inheriting "xs" font size.
+          </p>
+        </div>
+        <div css={buttonRowStyles}>
+          <p css={Css.lg.$}>
+            Example of a <Button {...args} variant="text" label="Text Button" /> placed inheriting "lg" font size.
           </p>
         </div>
       </div>
