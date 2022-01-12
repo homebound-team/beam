@@ -3,7 +3,7 @@ import { Observer } from "mobx-react";
 import { Only } from "src/Css";
 import { TextField, TextFieldProps } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
-import { useTestIds } from "src/utils";
+import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
 export type BoundTextFieldProps<X> = Omit<TextFieldProps<X>, "value" | "onChange" | "onBlur" | "onFocus" | "label"> & {
@@ -16,7 +16,14 @@ export type BoundTextFieldProps<X> = Omit<TextFieldProps<X>, "value" | "onChange
 
 /** Wraps `TextField` and binds it to a form field. */
 export function BoundTextField<X extends Only<TextFieldXss, X>>(props: BoundTextFieldProps<X>) {
-  const { field, readOnly, onChange = (value) => field.set(value), label = defaultLabel(field.key), ...others } = props;
+  const {
+    field,
+    readOnly,
+    onChange = (value) => field.set(value),
+    label = defaultLabel(field.key),
+    onEnter,
+    ...others
+  } = props;
   const testId = useTestIds(props, field.key);
   return (
     <Observer>
@@ -30,6 +37,11 @@ export function BoundTextField<X extends Only<TextFieldXss, X>>(props: BoundText
           required={field.required}
           onBlur={() => field.blur()}
           onFocus={() => field.focus()}
+          onEnter={() => {
+            maybeCall(onEnter);
+            // Blur the field when the user hits the enter key - as if they are "committing" the value and done with the field
+            field.blur();
+          }}
           {...testId}
           {...others}
         />
