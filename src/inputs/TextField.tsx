@@ -4,6 +4,7 @@ import { Only } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
 import { Callback } from "src/types";
+import { maybeCall } from "src/utils";
 
 // exported for testing purposes
 export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
@@ -11,6 +12,8 @@ export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
   inlineLabel?: boolean;
   clearable?: boolean;
   api?: MutableRefObject<TextFieldApi | undefined>;
+  // Callback when the user presses the "Enter" key while focused on the input
+  onEnter?: () => void;
 }
 
 export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
@@ -22,6 +25,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     value = "",
     onBlur,
     onFocus,
+    onEnter,
     api,
     ...otherProps
   } = props;
@@ -41,6 +45,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
         if (e.key === "Enter") {
           // Blur the field when the user hits the enter key - as if they are "committing" the value and done with the field
           inputRef.current?.blur();
+          maybeCall(onEnter);
         }
       },
     },

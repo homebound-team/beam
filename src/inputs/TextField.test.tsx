@@ -97,6 +97,21 @@ describe("TextFieldTest", () => {
     // And onBlur should be called
     expect(onBlur).toHaveBeenCalledTimes(1);
   });
+
+  it("fires onEnter callback", async () => {
+    const onEnter = jest.fn();
+    // Given a textfield
+    const r = await render(<TestTextField value="foo" onEnter={onEnter} />);
+    // With focus
+    r.name().focus();
+    expect(r.name()).toHaveFocus();
+    // When hitting the Enter key
+    fireEvent.keyDown(r.name(), { key: "Enter" });
+    // Then the field should no longer have focus
+    expect(r.name()).not.toHaveFocus();
+    // And onEnter should be called
+    expect(onEnter).toHaveBeenCalledTimes(1);
+  });
 });
 
 function TestTextField<X extends Only<TextFieldXss, X>>(props: Omit<TextFieldProps<X>, "onChange" | "label">) {

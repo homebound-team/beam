@@ -12,6 +12,8 @@ export type BoundTextFieldProps<X> = Omit<TextFieldProps<X>, "value" | "onChange
   field: FieldState<any, string | null | undefined>;
   // Optional in case the page wants extra behavior
   onChange?: (value: string | undefined) => void;
+  // Callback when the user presses the "Enter" key while focused on the input
+  onEnter?: () => void;
 };
 
 /** Wraps `TextField` and binds it to a form field. */
