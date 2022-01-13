@@ -603,8 +603,8 @@ describe("GridTable", () => {
     });
 
     it("as=virtual defaults to fr widths", () => {
-      expect(calcVirtualGridColumns([{}, {}], undefined)).toEqual(
-        "calc((100% - 0% - 0px) * (1 / 2)) calc((100% - 0% - 0px) * (1 / 2))",
+      expect(calcVirtualGridColumns([{}, {}], undefined).join(" ")).toEqual(
+        "((100% - 0% - 0px) * (1 / 2)) ((100% - 0% - 0px) * (1 / 2))",
       );
     });
 
@@ -613,19 +613,19 @@ describe("GridTable", () => {
     });
 
     it("as=virtual treats numbers as fr", () => {
-      expect(calcVirtualGridColumns([{ w: 1 }, { w: 2 }] as any, undefined)).toEqual(
-        "calc((100% - 0% - 0px) * (1 / 3)) calc((100% - 0% - 0px) * (2 / 3))",
+      expect(calcVirtualGridColumns([{ w: 1 }, { w: 2 }] as any, undefined).join(" ")).toEqual(
+        "((100% - 0% - 0px) * (1 / 3)) ((100% - 0% - 0px) * (2 / 3))",
       );
     });
 
     it("as=virtual accepts percentages ", () => {
-      expect(calcVirtualGridColumns([{ w: "10%" }, { w: 2 }] as any, undefined)).toEqual(
-        "10% calc((100% - 10% - 0px) * (2 / 2))",
+      expect(calcVirtualGridColumns([{ w: "10%" }, { w: 2 }] as any, undefined).join(" ")).toEqual(
+        "10% ((100% - 10% - 0px) * (2 / 2))",
       );
     });
 
     it("as=virtual rejects relative units", () => {
-      expect(() => calcVirtualGridColumns([{ w: "auto" }] as any, undefined)).toThrow(
+      expect(() => calcVirtualGridColumns([{ w: "auto" }] as any, undefined).join(" ")).toThrow(
         "as=virtual only supports px, percentage, or fr units",
       );
     });
@@ -635,8 +635,8 @@ describe("GridTable", () => {
         calcVirtualGridColumns(
           [{ w: "200px" }, { w: "100px" }, { w: "10%" }, { w: "20%" }, { w: 2 }, {}] as any,
           undefined,
-        ),
-      ).toEqual("200px 100px 10% 20% calc((100% - 30% - 300px) * (2 / 3)) calc((100% - 30% - 300px) * (1 / 3))");
+        ).join(" "),
+      ).toEqual("200px 100px 10% 20% ((100% - 30% - 300px) * (2 / 3)) ((100% - 30% - 300px) * (1 / 3))");
     });
   });
 
