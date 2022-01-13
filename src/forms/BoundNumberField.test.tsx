@@ -1,6 +1,7 @@
 import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { fireEvent } from "@testing-library/react";
+import { act, fireEvent } from "@testing-library/react";
+import { Observer } from "mobx-react";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { AuthorInput } from "src/forms/formStateDomain";
 
@@ -65,6 +66,17 @@ describe("BoundNumberField", () => {
     fireEvent.input(royalties(), { target: { value: "0" } });
     fireEvent.blur(royalties());
     expect(royalties()).toHaveValue("$0.00");
+  });
+
+  it("retains null value", async () => {
+    const author = createObjectState(formConfig, { royaltiesInCents: 1_00 });
+    const r = await render(<Observer>{() => <BoundNumberField field={author.royaltiesInCents} />}</Observer>);
+    expect(r.royalties()).toHaveValue("$1.00");
+    act(() => {
+      author.royaltiesInCents.value = undefined;
+    });
+    expect(author.royaltiesInCents.value).toBeNull();
+    expect(r.royalties()).toHaveValue("");
   });
 });
 
