@@ -182,7 +182,7 @@ const spacing = { brPx: 8, pxPx: 16 };
 const style: GridStyle = {
   headerCellCss: Css.sm.gray700.py1.df.aic.$,
   firstNonHeaderRowCss: Css.mt2.$,
-  cellCss: Css.h100.gray700.sm.aic.pxPx(4).$,
+  cellCss: Css.gray700.sm.aic.pxPx(4).$,
   rootCss: Css.pb(2).$,
   nestedCards: {
     spacerPx: 8,

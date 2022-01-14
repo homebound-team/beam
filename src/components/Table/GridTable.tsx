@@ -277,6 +277,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
 
+    const columnSizes =
+      as === "virtual" ? calcVirtualGridColumns(columns, style.nestedCards?.firstLastColumnWidth) : undefined;
+
     function makeRowComponent(row: GridDataRow<R>): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
@@ -299,6 +302,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
               stickyHeader,
               stickyOffset,
               openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
+              columnSizes,
               ...sortProps,
             }}
           />
@@ -612,11 +616,8 @@ const VirtualRoot = memoizeOne<
         ref={ref}
         style={style}
         css={{
-          ...Css.dg.gtc(calcVirtualGridColumns(columns, firstLastColumnWidth)).$,
           // Add an extra `> div` due to Item + itemContent both having divs
-          ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
-          // Add `display:contents` to Item to flatten it like we do GridRow
-          ...Css.addIn("& > div", Css.display("contents").$).$,
+          ...Css.addIn("& > div + div > div", gs.betweenRowsCss || {}).$,
           ...gs.rootCss,
           ...xss,
         }}
@@ -639,7 +640,7 @@ const VirtualRoot = memoizeOne<
  *
  * When we're as=virtual, we change our default + enforce only fixed-sized units (% and px)
  */
-export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColumnWidth: number | undefined): string {
+export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColumnWidth: number | undefined): string[] {
   // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
   // calc((100% - allOtherPercent - allOtherPx) * ((myFr / totalFr))`
   //
@@ -669,7 +670,7 @@ export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColu
 
   // This is our "fake but for some reason it lines up better" fr calc
   function fr(myFr: number): string {
-    return `calc((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
+    return `((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
   let sizes = columns.map(({ w }) => {
@@ -704,14 +705,12 @@ export function calcDivGridColumns(columns: GridColumn<any>[], firstLastColumnWi
       return `${w}fr`;
     }
   });
-  return maybeAddCardColumns(sizes, firstLastColumnWidth);
+  return maybeAddCardColumns(sizes, firstLastColumnWidth).join(" ");
 }
 
 // If we're doing nested cards, we add extra 1st/last cells...
-function maybeAddCardColumns(sizes: string[], firstLastColumnWidth: number | undefined): string {
-  return (!firstLastColumnWidth ? sizes : [`${firstLastColumnWidth}px`, ...sizes, `${firstLastColumnWidth}px`]).join(
-    " ",
-  );
+function maybeAddCardColumns(sizes: string[], firstLastColumnWidth: number | undefined): string[] {
+  return !firstLastColumnWidth ? sizes : [`${firstLastColumnWidth}px`, ...sizes, `${firstLastColumnWidth}px`];
 }
 
 /**
@@ -877,6 +876,8 @@ interface GridRowProps<R extends Kinded, S> {
   setSortKey?: (value: S) => void;
   // NOTE: openCards is a string of colon separated open kinds, so that the result is stable across renders.
   openCards: string | undefined;
+  // Required for setting column widths in a virtualized table
+  columnSizes: string[] | undefined;
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -893,6 +894,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     sortState,
     setSortKey,
     openCards,
+    columnSizes,
     ...others
   } = props;
 
@@ -907,7 +909,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     // root-element > row-element > cell-elements, so that we can have a hook for
     // hovers and styling. In theory this would change with subgrids.
     // Only enable when using div as elements
-    ...(as === "table" ? {} : Css.display("contents").$),
+    ...(as === "table" ? {} : as === "virtual" ? Css.df.$ : Css.display("contents").$),
     ...((rowStyle?.rowLink || rowStyle?.onClick) &&
       style.rowHoverColor && {
         // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
@@ -928,9 +930,14 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const currentCard = openCardStyles && openCardStyles[openCardStyles.length - 1];
   let currentColspan = 1;
   const maybeStickyHeaderStyles = isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined;
+
   return (
     <Row css={rowCss} {...others}>
-      {openCardStyles && maybeAddCardPadding(openCardStyles, "first", maybeStickyHeaderStyles)}
+      {openCardStyles &&
+        maybeAddCardPadding(openCardStyles, "first", {
+          ...maybeStickyHeaderStyles,
+          ...(columnSizes ? Css.w(columnSizes[0]).$ : {}),
+        })}
       {columns.map((column, columnIndex) => {
         // Decrement colspan count and skip if greater than 1.
         if (currentColspan > 1) {
@@ -946,6 +953,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         const content = toContent(maybeContent, isHeader, canSortColumn, sorting?.on === "client", style, as);
 
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
+        const maybeNestedCardColumnIndex = columnIndex + (style.nestedCards ? 1 : 0);
 
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
         // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
@@ -968,6 +976,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
+          // Non-virtualized tables use h100 so that all cells are the same height across the row.
+          // Virtualized table rows use `display: flex;`, so the flex children are set to `align-self: stretch` by default, which achieves the same goal.
+          // Though, we need to omit setting `h100` on the flex children, as a flex container needs a defined height set for `h100` to work on flex children
+          ...(isHeader && as !== "virtual" ? Css.h100.$ : undefined),
           ...maybeStickyHeaderStyles,
           // If we're within a card, use its background color
           ...(currentCard && Css.bgColor(currentCard.bgColor).$),
@@ -975,6 +987,12 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...(currentColspan > 1 ? Css.gc(`span ${currentColspan}`).$ : {}),
           // And finally the specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
+          // For virtual tables we define the width of the column on each cell. Supports col spans.
+          ...(columnSizes && {
+            width: `calc(${columnSizes
+              .slice(maybeNestedCardColumnIndex, maybeNestedCardColumnIndex + currentColspan)
+              .join(" + ")})`,
+          }),
         };
 
         const renderFn: RenderCellFn<any> =
@@ -988,7 +1006,11 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
         return renderFn(columnIndex, cellCss, content, row, rowStyle);
       })}
-      {openCardStyles && maybeAddCardPadding(openCardStyles, "final", maybeStickyHeaderStyles)}
+      {openCardStyles &&
+        maybeAddCardPadding(openCardStyles, "final", {
+          ...maybeStickyHeaderStyles,
+          ...(columnSizes ? Css.w(columnSizes[columnSizes.length - 1]).$ : {}),
+        })}
     </Row>
   );
 }

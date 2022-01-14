@@ -11,8 +11,7 @@ export const defaultStyle: GridStyle = {
   lastCellCss: Css.$,
   indentOneCss: Css.pl4.$,
   indentTwoCss: Css.pl7.$,
-  // Use h100 so that all cells are the same height when scrolled; set bgWhite for when we're laid over other rows.
-  headerCellCss: Css.asfe.nowrap.py1.bgGray100.h100.aife.$,
+  headerCellCss: Css.asfe.nowrap.py1.bgGray100.aife.$,
   firstRowMessageCss: Css.px1.py2.$,
   rowHoverColor: Palette.Gray200,
 };
