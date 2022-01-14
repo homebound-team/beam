@@ -27,13 +27,14 @@ export const WithDatePicker = () => <ModalExample withDateField />;
 export const WithFieldInHeader = () => <ModalExample withTextArea />;
 
 export const ButtonsInFooter = () => {
-  const { openModal } = useModal();
+  const { openModal, setSize } = useModal();
   const open = () =>
     openModal({
       content: (
         <>
           <ModalHeader>Add</ModalHeader>
           <ModalFooter>
+            <Button label="Change Size" onClick={() => setSize("sm")} />
             <Button variant="tertiary" label="Cancel" onClick={noop} />
             <Button variant="primary" label="Add" onClick={noop} />
           </ModalFooter>
