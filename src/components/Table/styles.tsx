@@ -11,7 +11,7 @@ export const defaultStyle: GridStyle = {
   lastCellCss: Css.$,
   indentOneCss: Css.pl4.$,
   indentTwoCss: Css.pl7.$,
-  headerCellCss: Css.asfe.nowrap.py1.bgGray100.aife.$,
+  headerCellCss: Css.nowrap.py1.bgGray100.aife.$,
   firstRowMessageCss: Css.px1.py2.$,
   rowHoverColor: Palette.Gray200,
 };
