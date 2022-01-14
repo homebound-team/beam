@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ASC, DESC, Direction, GridColumn, GridSortConfig, Kinded } from "src/components/Table/GridTable";
 
 /**
@@ -19,7 +19,7 @@ export function useSortState<R extends Kinded, S>(
   // If we're server-side sorting, use the caller's `sorting.value` prop to initialize our internal
   // `useState`. After this, we ignore `sorting.value` because we assume it should match what our
   // `setSortState` just changed anyway (in response to the user sorting a column).
-  const [sortState, setSortState] = useState<SortState<S> | undefined>(() => {
+  const initialSortValue: SortState<S> | undefined = useMemo(() => {
     if (sorting?.on === "client") {
       const { initial } = sorting;
       if (initial) {
@@ -33,21 +33,42 @@ export function useSortState<R extends Kinded, S>(
     } else {
       return sorting?.value;
     }
-  });
+  }, [sorting, columns]);
+  const [sortState, setSortState] = useState<SortState<S> | undefined>(initialSortValue);
 
-  // Make a custom setSortKey that is useState-like but contains the invert-if-same-column-clicked-twice logic.
+  // Make a custom setSortKey that is useState-like but contains the ASC->DESC->RESET logic.
   const setSortKey = useCallback(
     (clickedKey: S) => {
       const [currentKey, currentDirection] = sortState || [];
-      const [newKey, newDirection] =
-        // If clickedKey === currentKey, then toggle direction
-        clickedKey === currentKey
-          ? [currentKey, currentDirection === ASC ? DESC : ASC]
-          : // Otherwise, use the new key, and default to ascending
-            [clickedKey, ASC];
-      setSortState([newKey, newDirection]);
-      if (sorting?.on === "server") {
-        sorting.onSort(newKey, newDirection);
+
+      // If sorting on a new key -> ASC this key.
+      if (clickedKey !== currentKey) {
+        setSortState([clickedKey, ASC]);
+
+        if (sorting?.on === "server") {
+          sorting.onSort(clickedKey, ASC);
+        }
+        return;
+      }
+
+      // Otherwise when clicking the current column, toggle through sort states
+      if (currentDirection === ASC) {
+        // if ASC -> go to desc
+        setSortState([clickedKey, DESC]);
+
+        if (sorting?.on === "server") {
+          sorting.onSort(clickedKey, DESC);
+        }
+        return;
+      }
+
+      if (currentDirection === DESC) {
+        // If DESC, then reset to initial sort
+        setSortState(initialSortValue);
+        if (sorting?.on === "server") {
+          const [initialKey, initialDirection] = initialSortValue ? initialSortValue : [undefined, undefined];
+          sorting.onSort(initialKey, initialDirection);
+        }
       }
     },
     // Note that sorting.onSort is not listed here, so we bind to whatever the 1st sorting.onSort was

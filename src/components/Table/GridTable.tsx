@@ -157,7 +157,7 @@ export type GridSortConfig<S> =
       /** The current sort by value + direction (if server-side sorting). */
       value?: [S, Direction];
       /** Callback for when the column is sorted (if server-side sorting). */
-      onSort: (orderBy: S, direction: Direction) => void;
+      onSort: (orderBy: S | undefined, direction: Direction | undefined) => void;
     };
 
 export interface GridTableProps<R extends Kinded, S, X> {

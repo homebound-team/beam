@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
 import { Icon } from "src/components/Icon";
 import { GridSortContext } from "src/components/Table/GridSortContext";
-import { Css, Properties } from "src/Css";
+import { Css, Palette, Properties } from "src/Css";
+import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils/useTestIds";
 
 /**
@@ -17,13 +18,26 @@ import { useTestIds } from "src/utils/useTestIds";
  */
 export function SortHeader(props: { content: string; xss?: Properties }) {
   const { content, xss } = props;
+  const { isHovered, hoverProps } = useHover({});
   const { sorted, toggleSort } = useContext(GridSortContext);
   const tid = useTestIds(props, "sortHeader");
   return (
-    <div {...tid} css={{ ...Css.df.aic.cursorPointer.selectNone.$, ...xss }} onClick={toggleSort}>
+    <div {...tid} css={{ ...Css.df.aic.h100.cursorPointer.selectNone.$, ...xss }} {...hoverProps} onClick={toggleSort}>
       {content}
-      {sorted === "ASC" && <Icon icon="sortUp" inc={2} {...tid.icon} xss={Css.mlPx(4).$} />}
-      {sorted === "DESC" && <Icon icon="sortDown" inc={2} {...tid.icon} xss={Css.mlPx(4).$} />}
+      <span css={Css.fs0.$}>
+        <Icon
+          icon={sorted === "DESC" ? "sortDown" : "sortUp"}
+          color={sorted !== undefined ? Palette.LightBlue700 : Palette.Gray400}
+          xss={
+            Css.ml1
+              .visibility("hidden")
+              .if(isHovered || sorted !== undefined)
+              .visibility("visible").$
+          }
+          inc={2}
+          {...tid.icon}
+        />
+      </span>
     </div>
   );
 }
