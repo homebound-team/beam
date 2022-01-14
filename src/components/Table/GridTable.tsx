@@ -617,7 +617,7 @@ const VirtualRoot = memoizeOne<
         style={style}
         css={{
           // Add an extra `> div` due to Item + itemContent both having divs
-          ...Css.addIn("& > div + div > div", gs.betweenRowsCss || {}).$,
+          ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
           ...gs.rootCss,
           ...xss,
         }}
@@ -909,7 +909,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     // root-element > row-element > cell-elements, so that we can have a hook for
     // hovers and styling. In theory this would change with subgrids.
     // Only enable when using div as elements
-    ...(as === "table" ? {} : as === "virtual" ? Css.df.$ : Css.display("contents").$),
+    // For virtual tables use `display: flex` to keep all cells on the same row, but use `flexNone` to ensure the cells stay their defined widths
+    ...(as === "table" ? {} : as === "virtual" ? Css.df.addIn("&>*", Css.flexNone.$).$ : Css.display("contents").$),
     ...((rowStyle?.rowLink || rowStyle?.onClick) &&
       style.rowHoverColor && {
         // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
