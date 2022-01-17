@@ -55,7 +55,7 @@ type Row = HeaderRow | MilestoneRow | SubGroupRow | TaskRow | AddRow;
 
 /** Rows */
 // TODO: Handle all 4 situations
-const rows: GridDataRow<Row>[] = [{ kind: "header", id: "header" }, ...createMilestones(2, 3, 2)];
+const rows: GridDataRow<Row>[] = [{ kind: "header", id: "header" }, ...createMilestones(1, 3, 2)];
 
 /** Columns */
 // FIXME: This column is not vertically aligned
