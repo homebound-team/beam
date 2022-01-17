@@ -1,8 +1,7 @@
-import { Fragment, Key, ReactElement } from "react";
+import { Fragment, ReactElement } from "react";
 import {
   GridColumn,
   GridDataRow,
-  GridStyle,
   Kinded,
   NestedCardsStyle,
   NestedCardStyle,
@@ -10,6 +9,9 @@ import {
   RowTuple,
 } from "src/components/Table/GridTable";
 import { Css } from "src/Css";
+
+type Chrome = () => JSX.Element;
+type ChromeBuffer = Chrome[];
 
 /**
  * A helper class to create our nested card DOM shenanigans.
@@ -23,33 +25,27 @@ import { Css } from "src/Css";
  * a content row itself, the nested padding is handled separately by the
  * GridRow component.
  */
-
-type Chrome = () => JSX.Element;
-type ChromeBuffer = Chrome[];
-
 export class NestedCards {
-  private columns: GridColumn<any>[];
   // A stack of the current cards we're showing
   private readonly openCards: Array<string> = [];
   // A buffer of the open/close/spacer rows we need between each content row.
   private readonly chromeBuffer: ChromeBuffer = [];
-  private readonly styles: NestedCardsStyle;
+  private chromeRowIndex: number = 0;
 
-  constructor(columns: GridColumn<any>[], style: GridStyle) {
-    this.columns = columns;
-    this.styles = style.nestedCards!;
-  }
+  constructor(
+    private readonly columns: GridColumn<any>[],
+    // An array of rows which we will add open Chrome rows too to create the table.
+    private readonly rows: RowTuple<any>[],
+    private readonly styles: NestedCardsStyle,
+  ) {}
 
   /**
    * Maybe add an opening Chrome row to the given `row` if its a nested card.
    *
    * @param row The row which will be opened. The open Chrome row will appear
    * above this row.
-   * @param buffer The buffer, array of rows, to add the open Chrome row.
-   * Currently there are two buffers, one for header rows (`headerRows`) and a
-   * second for filtered rows (`filteredRows`).
    */
-  maybeOpenCard(row: GridDataRow<any>, buffer: RowTuple<any>[]): boolean {
+  maybeOpenCard(row: GridDataRow<any>): boolean {
     const card = this.styles.kinds[row.kind];
     // If this kind doesn't have a card defined, don't put it on the card stack
     if (card) {
@@ -57,12 +53,7 @@ export class NestedCards {
       this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, this.styles.kinds, "open"));
     }
     // But always close previous cards if needed
-    maybeCreateChromeRow({
-      key: `chrome-open-${row.kind}-${row.id}`,
-      columns: this.columns,
-      buffer,
-      chromeBuffer: this.chromeBuffer,
-    });
+    this.maybeCreateChromeRow();
     return !!card;
   }
 
@@ -79,22 +70,40 @@ export class NestedCards {
    * Close the remaining open rows with a close Chrome row.
    *
    * @param row The row that is completing/closing nested open Chrome rows.
-   * @param buffer The buffer, array of rows, to close the opened Chrome rows so
-   * far. Currently there are two buffers, one for header rows (`headerRows`) and a
-   * second for filtered rows (`filteredRows`).
    */
-  done(row: GridDataRow<any>, buffer: RowTuple<any>[]) {
-    maybeCreateChromeRow({
-      key: `chrome-close-${row.kind}-${row.id}`,
-      columns: this.columns,
-      buffer,
-      chromeBuffer: this.chromeBuffer,
-    });
+  done() {
+    this.maybeCreateChromeRow();
   }
 
   /** Return a stable copy of the cards, so it won't change as we keep going. */
   currentOpenCards() {
     return this.openCards.join(":");
+  }
+
+  /**
+   * Takes the current Chrome row buffer of close row(s), spacers, and open row,
+   * and creates a single chrome DOM row.
+   *
+   * This allows a minimal amount of DOM overhead, insofar as to the css-grid or
+   * react-virtuoso we only add 1 extra DOM node between each row of content to
+   * achieve our nested card look & feel.
+   *
+   * i.e.:
+   * - chrome row (open)
+   * - card1 content row
+   * - chrome row (card2 open)
+   * - nested card2 content row
+   * - chrome row (card2 close, card1 close)
+   */
+  maybeCreateChromeRow(): void {
+    if (this.chromeBuffer.length > 0) {
+      this.rows.push([
+        undefined,
+        <ChromeRow key={this.chromeRowIndex++} chromeBuffer={[...this.chromeBuffer]} columns={this.columns.length} />,
+      ]);
+      // clear the Chrome buffer
+      this.chromeBuffer.splice(0, this.chromeBuffer.length);
+    }
   }
 }
 
@@ -204,43 +213,6 @@ export function makeSpacer(height: number, openCards: string[], styles: NestedCa
   };
 }
 
-/**
- * Takes the current Chrome row buffer of close row(s), spacers, and open row,
- * and creates a single chrome DOM row.
- *
- * This allows a minimal amount of DOM overhead, insofar as to the css-grid or
- * react-virtuoso we only add 1 extra DOM node between each row of content to
- * achieve our nested card look & feel.
- *
- * i.e.:
- * - chrome row (open)
- * - card1 content row
- * - chrome row (card2 open)
- * - nested card2 content row
- * - chrome row (card2 close, card1 close)
- *
- * @param columns The columns for the GridTable
- * @param buffer The buffer to store the Chrome row created.
- * @param chromeBuffer The Chrome row buffer to flush.
- */
-export function maybeCreateChromeRow({
-  key,
-  columns,
-  buffer,
-  chromeBuffer,
-}: {
-  key: Key;
-  columns: GridColumn<any>[];
-  buffer: RowTuple<any>[];
-  chromeBuffer: ChromeBuffer;
-}): void {
-  if (chromeBuffer.length > 0) {
-    buffer.push([undefined, <ChromeRow key={key} chromeBuffer={[...chromeBuffer]} columns={columns.length} />]);
-    // clear the Chrome buffer
-    chromeBuffer.splice(0, chromeBuffer.length);
-  }
-}
-
 interface ChromeRowProps {
   chromeBuffer: ChromeBuffer;
   columns: number;
@@ -256,6 +228,6 @@ export function ChromeRow({ chromeBuffer, columns }: ChromeRowProps) {
   );
 }
 
-export function dropChromeRows<R extends Kinded>(filteredRows: RowTuple<R>[]): [GridDataRow<R>, ReactElement][] {
-  return filteredRows.filter(([r]) => !!r) as [GridDataRow<R>, ReactElement][];
+export function dropChromeRows<R extends Kinded>(rows: RowTuple<R>[]): [GridDataRow<R>, ReactElement][] {
+  return rows.filter(([r]) => !!r) as [GridDataRow<R>, ReactElement][];
 }

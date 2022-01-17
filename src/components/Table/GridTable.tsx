@@ -50,15 +50,13 @@ export interface GridStyle {
   /** Applied to all cell divs (via a selector off the base div). */
   cellCss?: Properties;
   /**
-   * Applied to the header (really first) row div.
+   * Applied to the header row divs.
    *
-   * NOTE: Adding margin bottom to a virtual table header will not result in the
-   * expected of adding space between the header and list. This will only add
-   * margin bottom to the cell itself and now the header row.
-   *
-   * To achieve space between the header and list, add margin top to the
-   * `firstNonHeaderRowCss` styles.
-   * */
+   * NOTE `as=virtual`: When using a virtual table with the goal of adding space
+   * between the header and the first row use `firstNonHeaderRowCss` with a
+   * margin-top instead. Using `headerCellCss` will not work since the header
+   * rows are wrapper with Chrome rows.
+   */
   headerCellCss?: Properties;
   /** Applied to the first cell of all rows, i.e. for table-wide padding or left-side borders. */
   firstCellCss?: Properties;
@@ -295,6 +293,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : { sorting };
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
+      const openCards = row.kind === "header" ? headerCards : rowCards;
+
       return (
         <GridCollapseContext.Provider
           key={`${row.kind}-${row.id}`}
@@ -309,7 +309,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
               rowStyles,
               stickyHeader,
               stickyOffset,
-              openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
+              openCards: openCards ? openCards.currentOpenCards() : undefined,
               columnSizes,
               ...sortProps,
             }}
@@ -323,7 +323,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const filteredRows: RowTuple<R>[] = [];
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
-    const nestedCards = !!style.nestedCards && new NestedCards(columns, style);
+    // for the header and row (non-header rows) cards.
+    const headerCards = !!style.nestedCards && new NestedCards(columns, headerRows, style.nestedCards);
+    const rowCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style.nestedCards);
 
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
@@ -337,17 +339,17 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       let isCard = false;
 
       if (matches) {
-        isCard = nestedCards && nestedCards.maybeOpenCard(row, filteredRows);
+        isCard = rowCards && rowCards.maybeOpenCard(row);
         filteredRows.push([row, makeRowComponent(row)]);
       }
 
       const isCollapsed = collapsedIds.includes(row.id);
       if (!isCollapsed && !!row.children?.length) {
-        nestedCards && matches && nestedCards.addSpacer();
+        rowCards && matches && rowCards.addSpacer();
         visitRows(row.children, isCard);
       }
 
-      isCard && nestedCards && nestedCards.closeCard();
+      isCard && rowCards && rowCards.closeCard();
     }
 
     function visitRows(rows: GridDataRow<R>[], addSpacer: boolean): void {
@@ -359,20 +361,24 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           // Chrome rows.
           const isHeaderNested = !!style.nestedCards?.kinds["header"];
 
-          isHeaderNested && nestedCards && nestedCards.maybeOpenCard(row, headerRows);
+          isHeaderNested && headerCards && headerCards.maybeOpenCard(row);
           headerRows.push([row, makeRowComponent(row)]);
-          isHeaderNested && nestedCards && nestedCards.closeCard();
-          isHeaderNested && nestedCards && nestedCards.done(row, headerRows);
+          isHeaderNested && headerCards && headerCards.closeCard();
+
+          isHeaderNested && headerCards && headerCards.done();
+
           return;
         }
+
         visit(row);
-        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
+
+        addSpacer && rowCards && i !== length - 1 && rowCards.addSpacer();
       });
     }
 
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
-    visitRows(maybeSorted, !!nestedCards);
-    nestedCards && nestedCards.done(maybeSorted[maybeSorted.length - 1], filteredRows);
+    visitRows(maybeSorted, !!rowCards);
+    rowCards && rowCards.done();
 
     return [headerRows, filteredRows];
   }, [
@@ -452,10 +458,10 @@ function renderCssGrid<R extends Kinded>(
   headerRows: RowTuple<R>[],
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
-  stickyHeader: boolean,
+  _stickyHeader: boolean,
   firstLastColumnWidth: number | undefined,
   xss: any,
-  virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
   // We must determine if the header is using nested card styles to account for
   // the opening and closing Chrome rows.
