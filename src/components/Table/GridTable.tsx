@@ -460,19 +460,41 @@ function renderCssGrid<R extends Kinded>(
   // We must determine if the header is using nested card styles to account for
   // the opening and closing Chrome rows.
   const isNestedCardStyleHeader = !!style.nestedCards?.kinds["header"];
-  // Determine at what index is the first non header row.
-  // The +1 at the end is to compensate for CSS nth counter starting at 1 (vs 0 for JS)
-  const firstNonHeaderRowIndex = (!isNestedCardStyleHeader ? 0 : 3) + 1;
+  /*
+    Determine at what CSS selector index is the first non header row. Note that
+    CSS selectors are not zero-based, unlike JavaScript, so we must add 1 to
+    what we'd normally expect.
+
+    Ex: When we don't have nestedCard styled headers, then we don't have opening
+    and closing Chrome rows. Therefore, the first non-header row is the second
+    row and since CSS selectors are not zero-based, we are aiming for a value
+    of 2 (1 + 1).
+
+    Ex: When we have nestedCard styled headers, then we have opening and closing
+    Chrome rows. Therefore, the first non-header row is the fourth row because:
+    - Row 1 is the opening Chrome Row
+    - Row 2 is the header
+    - Row 3 is the closing Chrome Row
+    - Row 4 is the first non-header row
+    And since CSS selectors are not zero-based, we are aiming for a value of 4
+    (3 + 1).
+  */
+  const firstNonHeaderRowIndex = (!isNestedCardStyleHeader ? 1 : 3) + 1;
 
   return (
     <div
       css={{
         ...Css.dg.gtc(calcDivGridColumns(columns, firstLastColumnWidth)).$,
-        // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
-        // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
-        // The `div + div` is also the "owl operator", i.e. don't apply to the 1st row.
-        ...(style.betweenRowsCss ? Css.addIn("& > div + div > *", style.betweenRowsCss).$ : {}),
-        // removes border between header and second row
+        /*
+          Using n + (firstNonHeaderRowIndex + 1) here to target all rows that
+          are after the first non-header row. Since n starts at 0, we can use
+          the + operator as an offset.
+
+          Inspired by: https://stackoverflow.com/a/25005740/2551333
+        */
+        ...(style.betweenRowsCss
+          ? Css.addIn(`& > div:nth-of-type(n + ${firstNonHeaderRowIndex + 1}) > *`, style.betweenRowsCss).$
+          : {}),
         ...(style.firstNonHeaderRowCss
           ? Css.addIn(`& > div:nth-of-type(${firstNonHeaderRowIndex}) > *`, style.firstNonHeaderRowCss).$
           : {}),
@@ -566,10 +588,12 @@ function renderVirtual<R extends Kinded>(
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
     const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
     return { footerStyle: { paddingBottom }, listStyle: { ...style, rootCss: otherRootStyles } };
   }, [style]);
+
   return (
     <Virtuoso
       overscan={5}
@@ -649,8 +673,8 @@ const VirtualRoot = memoizeOne<
     firstLastColumnWidth: number | undefined,
     xss: any,
   ) => Components["List"]
->((gs, columns, id, firstLastColumnWidth, xss) => {
-  return React.forwardRef(function VirtualRooot({ style, children }, ref) => {
+>((gs, _columns, id, _firstLastColumnWidth, xss) => {
+  return React.forwardRef(function VirtualRoot({ style, children }, ref) {
     // This VirtualRoot list represent the header when no styles are given. The
     // table list generally has styles to scroll the page for windowing.
     const isList = Object.keys(style || {}).length !== 0;
