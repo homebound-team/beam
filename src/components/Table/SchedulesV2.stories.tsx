@@ -103,7 +103,7 @@ const nameColumn = column<Row>({
   subgroup: (row) => ({ value: row.name, content: "" }),
   task: (row) => <TaskNameField value={row.name} />,
   add: "Add",
-  w: 1,
+  w: "200px",
 });
 const startColumn = dateColumn<Row>({
   header: "Start",
@@ -127,7 +127,7 @@ const durationColumn = column<Row>({
   subgroup: (row) => <div css={Css.smEm.gray900.$}>{row.duration} days</div>,
   task: (row) => <TaskDurationField value={row.duration} />,
   add: "",
-  w: 1,
+  w: "100px",
 });
 const milestoneColumn = column<Row>({
   header: "Milestone",
@@ -136,7 +136,7 @@ const milestoneColumn = column<Row>({
   subgroup: "",
   task: (row) => row.milestone,
   add: "",
-  w: 1,
+  w: "100px",
 });
 const subCategoryColumn = column<Row>({
   header: "SubCategory",
@@ -145,21 +145,13 @@ const subCategoryColumn = column<Row>({
   subgroup: "",
   task: (row) => row.subGroup,
   add: "",
-  w: 1,
+  w: "100px",
 });
 const statusColumn = column<Row>({
   header: "Status",
   milestone: "",
   subgroup: "",
   task: (row) => <TaskStatusField value={row.status} />,
-  add: "",
-  w: "150px",
-});
-const progressColumn = actionColumn<Row>({
-  header: "",
-  milestone: "",
-  subgroup: "",
-  task: "",
   add: "",
   w: "150px",
 });
@@ -174,7 +166,7 @@ const buttonColumns = actionColumn<Row>({
     </div>
   ),
   add: "",
-  w: 1,
+  w: "100px",
 });
 
 // TODO: Potentially add 8px spacer between each row
@@ -182,7 +174,7 @@ const spacing = { brPx: 8, pxPx: 16 };
 const style: GridStyle = {
   headerCellCss: Css.sm.gray700.py1.df.aic.$,
   firstNonHeaderRowCss: Css.mt2.$,
-  cellCss: Css.h100.gray700.sm.aic.pxPx(4).$,
+  cellCss: Css.gray700.sm.aic.pxPx(4).$,
   rootCss: Css.pb(2).$,
   nestedCards: {
     spacerPx: 8,
@@ -201,7 +193,7 @@ const style: GridStyle = {
 
 export function SchedulesV2() {
   return (
-    <div css={Css.h("100vh").$}>
+    <div css={Css.h("100vh").w("fit-content").mx("auto").$}>
       <PresentationProvider fieldProps={{ borderless: true, typeScale: "xs" }}>
         <GridTable<Row>
           rows={rows}
@@ -216,7 +208,6 @@ export function SchedulesV2() {
             milestoneColumn,
             subCategoryColumn,
             statusColumn,
-            progressColumn,
             buttonColumns,
           ]}
           style={style}
@@ -244,7 +235,7 @@ export function SchedulesV2Virtualized() {
   });
 
   return (
-    <div css={Css.h("100vh").$}>
+    <div css={Css.h("100vh").w("fit-content").mx("auto").$}>
       <PresentationProvider fieldProps={{ borderless: true, typeScale: "xs" }}>
         <GridTable<Row>
           id="virtual-schedules-grid-table"
@@ -260,7 +251,6 @@ export function SchedulesV2Virtualized() {
             milestoneColumn,
             subCategoryColumn,
             statusColumn,
-            progressColumn,
             buttonColumns,
           ]}
           style={{ ...style, rootCss: Css.pb4.$ }}
