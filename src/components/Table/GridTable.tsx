@@ -693,8 +693,6 @@ const VirtualRoot = memoizeOne<
         css={{
           // Add an extra `> div` due to Item + itemContent both having divs
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
-          // Add `display:contents` to Item to flatten it like we do GridRow
-          ...Css.addIn("& > div", Css.display("contents").$).$,
           // Table list styles only
           ...(isList
             ? {
