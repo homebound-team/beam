@@ -1,5 +1,5 @@
 import useResizeObserver from "@react-hook/resize-observer";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { MutableRefObject, ReactNode, useEffect, useRef, useState } from "react";
 import { FocusScope, OverlayContainer, useDialog, useModal, useOverlay, usePreventScroll } from "react-aria";
 import { createPortal } from "react-dom";
 import { useBeamContext } from "src/components/BeamContext";
@@ -25,7 +25,13 @@ export interface ModalProps {
   forceScrolling?: boolean;
   /** Adds a callback that is called _after_ close has definitely happened. */
   onClose?: Callback;
+  /** Imperative API for interacting with the Modal */
+  api?: MutableRefObject<ModalApi | undefined>;
 }
+
+export type ModalApi = {
+  setSize: (size: ModalProps["size"]) => void;
+};
 
 /**
  * Internal component for displaying a Modal; see `useModal` for the public API.
@@ -33,7 +39,7 @@ export interface ModalProps {
  * Provides underlay, modal container, and header. Will disable scrolling of page under the modal.
  */
 export function Modal(props: ModalProps) {
-  const { size = "md", content, forceScrolling } = props;
+  const { size = "md", content, forceScrolling, api } = props;
   const isFixedHeight = typeof size !== "string";
   const ref = useRef(null);
   const { modalBodyDiv, modalFooterDiv, modalHeaderDiv, drawerContentStack } = useBeamContext();
@@ -53,13 +59,17 @@ export function Modal(props: ModalProps) {
   );
   const { modalProps } = useModal();
   const { dialogProps, titleProps } = useDialog({ role: "dialog" }, ref);
-  const [width, height] = getSize(size);
+  const [[width, height], setSize] = useState(getSize(size));
   const contentRef = useRef<HTMLDivElement>(null);
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
   const modalFooterRef = useRef<HTMLDivElement | null>(null);
   const modalHeaderRef = useRef<HTMLHeadingElement | null>(null);
   const testId = useTestIds({}, testIdPrefix);
   usePreventScroll();
+
+  if (api) {
+    api.current = { setSize: (size = "md") => setSize(getSize(size)) };
+  }
 
   const [hasScroll, setHasScroll] = useState(forceScrolling ?? false);
 
