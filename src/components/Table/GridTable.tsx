@@ -614,7 +614,7 @@ const VirtualRoot = memoizeOne<
     return (
       <div
         ref={ref}
-        style={style}
+        style={{ ...style, ...(gs.nestedCards ? { minWidth: "fit-content" } : {}) }}
         css={{
           // Add an extra `> div` due to Item + itemContent both having divs
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,

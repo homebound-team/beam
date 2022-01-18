@@ -27,7 +27,7 @@ import {
 import { Css, Palette } from "src/Css";
 import { NumberField } from "src/inputs/NumberField";
 import { noop } from "src/utils";
-import { newStory, withRouter, zeroTo } from "src/utils/sb";
+import { newStory, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
   component: GridTable,
@@ -293,6 +293,52 @@ function NestedCards({ rows, as, sorting, style }: NestedCardsProps) {
     />
   );
 }
+
+export const NestedCardsOverflowX = newStory(
+  () => {
+    const nameColumn: GridColumn<NestedRow> = {
+      header: () => "Name",
+      parent: (row) => ({
+        content: () => <div css={Css.base.$}>{row.name}</div>,
+        value: row.name,
+      }),
+      child: (row) => ({
+        content: () => <div css={Css.sm.$}>{row.name}</div>,
+        value: row.name,
+      }),
+      grandChild: (row) => ({
+        content: () => <div css={Css.xs.$}>{row.name}</div>,
+        value: row.name,
+      }),
+      add: () => "Add",
+      w: "300px",
+    };
+    const actionColumn: GridColumn<NestedRow> = {
+      header: () => "Action",
+      parent: () => "",
+      child: () => "",
+      grandChild: () => <div css={Css.xs.$}>Delete</div>,
+      add: () => "",
+      clientSideSort: false,
+      w: "300px",
+    };
+    const spacing = { brPx: 4, pxPx: 4 };
+    const nestedStyle: GridStyle = {
+      nestedCards: {
+        firstLastColumnWidth: 24,
+        spacerPx: 8,
+        kinds: {
+          parent: { bgColor: Palette.Gray500, ...spacing },
+          child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
+          grandChild: { bgColor: Palette.Green200, bColor: Palette.Green400, ...spacing },
+        },
+      },
+    };
+
+    return <GridTable as="virtual" columns={[nameColumn, nameColumn, actionColumn]} rows={rows} style={nestedStyle} />;
+  },
+  { decorators: [withDimensions("800px")] },
+);
 
 export function OneOffInlineTable() {
   const items: { code: string; name: string; quantity: number }[] = [
