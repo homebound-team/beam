@@ -103,7 +103,7 @@ const nameColumn = column<Row>({
   subgroup: (row) => ({ value: row.name, content: "" }),
   task: (row) => <TaskNameField value={row.name} />,
   add: "Add",
-  w: 1,
+  w: "200px",
 });
 const startColumn = dateColumn<Row>({
   header: "Start",
@@ -127,7 +127,7 @@ const durationColumn = column<Row>({
   subgroup: (row) => <div css={Css.smEm.gray900.$}>{row.duration} days</div>,
   task: (row) => <TaskDurationField value={row.duration} />,
   add: "",
-  w: 1,
+  w: "100px",
 });
 const milestoneColumn = column<Row>({
   header: "Milestone",
@@ -136,7 +136,7 @@ const milestoneColumn = column<Row>({
   subgroup: "",
   task: (row) => row.milestone,
   add: "",
-  w: 1,
+  w: "100px",
 });
 const subCategoryColumn = column<Row>({
   header: "SubCategory",
@@ -145,21 +145,13 @@ const subCategoryColumn = column<Row>({
   subgroup: "",
   task: (row) => row.subGroup,
   add: "",
-  w: 1,
+  w: "100px",
 });
 const statusColumn = column<Row>({
   header: "Status",
   milestone: "",
   subgroup: "",
   task: (row) => <TaskStatusField value={row.status} />,
-  add: "",
-  w: "150px",
-});
-const progressColumn = actionColumn<Row>({
-  header: "",
-  milestone: "",
-  subgroup: "",
-  task: "",
   add: "",
   w: "150px",
 });
@@ -174,7 +166,7 @@ const buttonColumns = actionColumn<Row>({
     </div>
   ),
   add: "",
-  w: 1,
+  w: "100px",
 });
 
 // TODO: Potentially add 8px spacer between each row
@@ -188,7 +180,7 @@ const style: GridStyle = {
     spacerPx: 8,
     firstLastColumnWidth: 33, // 32px + 1px border
     kinds: {
-      header: { bgColor: Palette.Gray100, brPx: 1, pxPx: 0 },
+      header: { bgColor: Palette.Gray100, brPx: 4, pxPx: 0 },
       // TODO: It would be nice if this used CSS Properties so that we can use TRUSS
       milestone: { bgColor: Palette.Gray100, ...spacing },
       subgroup: { bgColor: Palette.White, ...spacing },
@@ -201,7 +193,7 @@ const style: GridStyle = {
 
 export function SchedulesV2() {
   return (
-    <div css={Css.h("100vh").$}>
+    <div css={Css.h("100vh").w("fit-content").mx("auto").$}>
       <PresentationProvider fieldProps={{ borderless: true, typeScale: "xs" }}>
         <GridTable<Row>
           rows={rows}
@@ -216,7 +208,6 @@ export function SchedulesV2() {
             milestoneColumn,
             subCategoryColumn,
             statusColumn,
-            progressColumn,
             buttonColumns,
           ]}
           style={style}
@@ -225,9 +216,6 @@ export function SchedulesV2() {
               cellCss: Css.py1.$,
             },
           }}
-          // FIXME: `firstNonHeaderRowCss` does not work when virtual is enabled
-          // Possible fix is to use an ref/class/id for this row
-          // as="virtual"
           stickyHeader
         />
       </PresentationProvider>
@@ -247,7 +235,7 @@ export function SchedulesV2Virtualized() {
   });
 
   return (
-    <div css={Css.h("100vh").$}>
+    <div css={Css.h("100vh").w("fit-content").mx("auto").$}>
       <PresentationProvider fieldProps={{ borderless: true, typeScale: "xs" }}>
         <GridTable<Row>
           id="virtual-schedules-grid-table"
@@ -263,7 +251,6 @@ export function SchedulesV2Virtualized() {
             milestoneColumn,
             subCategoryColumn,
             statusColumn,
-            progressColumn,
             buttonColumns,
           ]}
           style={{ ...style, rootCss: Css.pb4.$ }}

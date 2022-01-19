@@ -49,7 +49,14 @@ export interface GridStyle {
   firstNonHeaderRowCss?: Properties;
   /** Applied to all cell divs (via a selector off the base div). */
   cellCss?: Properties;
-  /** Applied to the header (really first) row div. */
+  /**
+   * Applied to the header row divs.
+   *
+   * NOTE `as=virtual`: When using a virtual table with the goal of adding space
+   * between the header and the first row use `firstNonHeaderRowCss` with a
+   * margin-top instead. Using `headerCellCss` will not work since the header
+   * rows are wrapper with Chrome rows.
+   */
   headerCellCss?: Properties;
   /** Applied to the first cell of all rows, i.e. for table-wide padding or left-side borders. */
   firstCellCss?: Properties;
@@ -286,13 +293,14 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : { sorting };
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
+      const openCards = row.kind === "header" ? headerCards : rowCards;
+
       return (
         <GridCollapseContext.Provider
           key={`${row.kind}-${row.id}`}
           value={row.kind === "header" ? collapseAllContext : collapseRowContext}
         >
           <RowComponent
-            key={`${row.kind}-${row.id}`}
             {...{
               as,
               columns,
@@ -301,7 +309,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
               rowStyles,
               stickyHeader,
               stickyOffset,
-              openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
+              openCards: openCards ? openCards.currentOpenCards() : undefined,
               columnSizes,
               ...sortProps,
             }}
@@ -315,7 +323,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const filteredRows: RowTuple<R>[] = [];
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
-    const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style);
+    // for the header and row (non-header rows) cards.
+    const headerCards = !!style.nestedCards && new NestedCards(columns, headerRows, style.nestedCards);
+    const rowCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style.nestedCards);
 
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
@@ -327,37 +337,48 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         );
       // Even if we don't pass the filter, one of our children might, so we continue on after this check
       let isCard = false;
+
       if (matches) {
-        isCard = nestedCards && nestedCards.maybeOpenCard(row);
+        isCard = rowCards && rowCards.maybeOpenCard(row);
         filteredRows.push([row, makeRowComponent(row)]);
       }
 
       const isCollapsed = collapsedIds.includes(row.id);
       if (!isCollapsed && !!row.children?.length) {
-        nestedCards && matches && nestedCards.addSpacer();
+        rowCards && matches && rowCards.addSpacer();
         visitRows(row.children, isCard);
       }
 
-      isCard && nestedCards && nestedCards.closeCard();
+      isCard && rowCards && rowCards.closeCard();
     }
 
     function visitRows(rows: GridDataRow<R>[], addSpacer: boolean): void {
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
-          nestedCards && nestedCards.maybeOpenCard(row);
+          // Flag to determine if the header has nested card styles.
+          // This will determine if we should include opening and closing
+          // Chrome rows.
+          const isHeaderNested = !!style.nestedCards?.kinds["header"];
+
+          isHeaderNested && headerCards && headerCards.maybeOpenCard(row);
           headerRows.push([row, makeRowComponent(row)]);
-          nestedCards && nestedCards.closeCard();
+          isHeaderNested && headerCards && headerCards.closeCard();
+
+          isHeaderNested && headerCards && headerCards.done();
+
           return;
         }
+
         visit(row);
-        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
+
+        addSpacer && rowCards && i !== length - 1 && rowCards.addSpacer();
       });
     }
 
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
-    visitRows(maybeSorted, !!nestedCards);
-    nestedCards && nestedCards.done();
+    visitRows(maybeSorted, !!rowCards);
+    rowCards && rowCards.done();
 
     return [headerRows, filteredRows];
   }, [
@@ -437,21 +458,52 @@ function renderCssGrid<R extends Kinded>(
   headerRows: RowTuple<R>[],
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
-  stickyHeader: boolean,
+  _stickyHeader: boolean,
   firstLastColumnWidth: number | undefined,
   xss: any,
-  virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
+  // We must determine if the header is using nested card styles to account for
+  // the opening and closing Chrome rows.
+  const isNestedCardStyleHeader = !!style.nestedCards?.kinds["header"];
+  /*
+    Determine at what CSS selector index is the first non header row. Note that
+    CSS selectors are not zero-based, unlike JavaScript, so we must add 1 to
+    what we'd normally expect.
+
+    Ex: When we don't have nestedCard styled headers, then we don't have opening
+    and closing Chrome rows. Therefore, the first non-header row is the second
+    row and since CSS selectors are not zero-based, we are aiming for a value
+    of 2 (1 + 1).
+
+    Ex: When we have nestedCard styled headers, then we have opening and closing
+    Chrome rows. Therefore, the first non-header row is the fourth row because:
+    - Row 1 is the opening Chrome Row
+    - Row 2 is the header
+    - Row 3 is the closing Chrome Row
+    - Row 4 is the first non-header row
+    And since CSS selectors are not zero-based, we are aiming for a value of 4
+    (3 + 1).
+  */
+  const firstNonHeaderRowIndex = (!isNestedCardStyleHeader ? 1 : 3) + 1;
+
   return (
     <div
       css={{
         ...Css.dg.gtc(calcDivGridColumns(columns, firstLastColumnWidth)).$,
-        // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
-        // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
-        // The `div + div` is also the "owl operator", i.e. don't apply to the 1st row.
-        ...(style.betweenRowsCss ? Css.addIn("& > div + div > *", style.betweenRowsCss).$ : {}),
-        // removes border between header and second row
-        ...(style.firstNonHeaderRowCss ? Css.addIn("& > div:nth-of-type(2) > *", style.firstNonHeaderRowCss).$ : {}),
+        /*
+          Using n + (firstNonHeaderRowIndex + 1) here to target all rows that
+          are after the first non-header row. Since n starts at 0, we can use
+          the + operator as an offset.
+
+          Inspired by: https://stackoverflow.com/a/25005740/2551333
+        */
+        ...(style.betweenRowsCss
+          ? Css.addIn(`& > div:nth-of-type(n + ${firstNonHeaderRowIndex + 1}) > *`, style.betweenRowsCss).$
+          : {}),
+        ...(style.firstNonHeaderRowCss
+          ? Css.addIn(`& > div:nth-of-type(${firstNonHeaderRowIndex}) > *`, style.firstNonHeaderRowCss).$
+          : {}),
         ...style.rootCss,
         ...xss,
       }}
@@ -542,10 +594,12 @@ function renderVirtual<R extends Kinded>(
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
     const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
     return { footerStyle: { paddingBottom }, listStyle: { ...style, rootCss: otherRootStyles } };
   }, [style]);
+
   return (
     <Virtuoso
       overscan={5}
@@ -569,24 +623,34 @@ function renderVirtual<R extends Kinded>(
         return (maybeContentsDiv.firstElementChild! as HTMLElement).getBoundingClientRect().height;
       }}
       itemContent={(index) => {
-        // We keep header and filter rows separate, but react-virtuoso is a flat list,
-        // so we pick the right header / first row message / actual row.
-        let i = index;
-        if (i < headerRows.length) {
-          return headerRows[i][1];
+        // Since we have two arrays of rows: `headerRows` and `filteredRow` we
+        // must determine which one to render.
+
+        // Determine if we need to render a header row
+        if (index < headerRows.length) {
+          return headerRows[index][1];
         }
-        i -= headerRows.length;
+
+        // Reset index
+        index -= headerRows.length;
+
+        // Show firstRowMessage as the first `filteredRow`
         if (firstRowMessage) {
-          if (i === 0) {
+          if (index === 0) {
             return (
               <div css={Css.add("gridColumn", `${columns.length} span`).$}>
                 <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
               </div>
             );
           }
-          i -= 1;
+
+          // Shift index -1 when there is a firstRowMessage to not skip the
+          // first `filteredRow`
+          index--;
         }
-        return filteredRows[i][1];
+
+        // Lastly render `filteredRow`
+        return filteredRows[index][1];
       }}
       totalCount={(headerRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)}
     />
@@ -594,11 +658,18 @@ function renderVirtual<R extends Kinded>(
 }
 
 /**
- * Customizes the `List` element that react-virtuoso renders, to have our css grid logic.
+ * A table might render two of these components to represent two virtual lists.
+ * This generally happens when `topItemCount` prop is used and React-Virtuoso
+ * creates to Virtual lists where the first represents, generally, the header
+ * rows and the second represents the non-header rows (list rows).
  *
- * We wrap this in memoizeOne so that React.createElement sees a consistent/stable component
- * identity, even though technically we have a different "component" per the given set of props
- * (solely to capture as params that we can't pass through react-virtuoso's API as props).
+ * The main goal of this custom component is to:
+ * - Customize the list wrapper to our css grid logic styles
+ *
+ * We wrap this in memoizeOne so that React.createElement sees a
+ * consistent/stable component identity, even though technically we have a
+ * different "component" per the given set of props (solely to capture as
+ * params that we can't pass through react-virtuoso's API as props).
  */
 const VirtualRoot = memoizeOne<
   (
@@ -608,9 +679,13 @@ const VirtualRoot = memoizeOne<
     firstLastColumnWidth: number | undefined,
     xss: any,
   ) => Components["List"]
->((gs, columns, id, firstLastColumnWidth, xss) => {
+>((gs, _columns, id, _firstLastColumnWidth, xss) => {
   return React.forwardRef(function VirtualRoot({ style, children }, ref) {
-    // This re-renders each time we have new children in the view port
+    // This VirtualRoot list represent the header when no styles are given. The
+    // table list generally has styles to scroll the page for windowing.
+    const isHeader = Object.keys(style || {}).length === 0;
+
+    // This re-renders each time we have new children in the viewport
     return (
       <div
         ref={ref}
@@ -618,6 +693,12 @@ const VirtualRoot = memoizeOne<
         css={{
           // Add an extra `> div` due to Item + itemContent both having divs
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
+          // Table list styles only
+          ...(isHeader
+            ? {}
+            : {
+                ...Css.addIn("& > div:first-of-type > *", gs.firstNonHeaderRowCss).$,
+              }),
           ...gs.rootCss,
           ...xss,
         }}
