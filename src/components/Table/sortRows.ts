@@ -9,37 +9,35 @@ import {
 } from "src/components/Table/GridTable";
 import { SortState } from "src/components/Table/useSortState";
 
-// We currently mutate `rows` while sorting; this would be bad if rows was directly
-// read from an immutable store like the apollo cache, but we basically always make
-// a copy in the process of adding our `kind` tags.
-//
-// I suppose that is an interesting idea, would we ever want to render a GQL query/cache
-// result directly into the table without first doing a kind-mapping? Like maybe we could
-// use __typename as the kind.
+// Returns a shallow copy of the `rows` parameter sorted based on `sortState`
 export function sortRows<R extends Kinded>(
   columns: GridColumn<R>[],
   rows: GridDataRow<R>[],
   sortState: SortState<number>,
-): void {
-  sortBatch(columns, rows, sortState);
+): GridDataRow<R>[] {
+  const sorted = sortBatch(columns, rows, sortState);
   // Recursively sort child rows
-  for (const row of rows) {
+  for (const row of sorted) {
     if (row.children) {
-      sortRows(columns, row.children, sortState);
+      // Replace the existing `children` prop with a sorted shallow copy
+      Object.assign(row, { children: sortRows(columns, row.children, sortState) });
     }
   }
+  return sorted;
 }
 
 function sortBatch<R extends Kinded>(
   columns: GridColumn<R>[],
   batch: GridDataRow<R>[],
   sortState: SortState<number>,
-): void {
+): GridDataRow<R>[] {
   // When client-side sort, the sort value is the column index
   const [value, direction] = sortState;
   const column = columns[value];
   const invert = direction === "DESC";
-  batch.sort((a, b) => {
+
+  // Make a shallow copy for sorting to avoid mutating the original list
+  return [...batch].sort((a, b) => {
     const v1 = sortValue(applyRowFn(column, a));
     const v2 = sortValue(applyRowFn(column, b));
     const v1e = v1 === null || v1 === undefined;

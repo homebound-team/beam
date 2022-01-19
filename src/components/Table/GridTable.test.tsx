@@ -386,6 +386,87 @@ describe("GridTable", () => {
       expect(cell(r, 2, 0)).toHaveTextContent("b");
     });
 
+    it("reverts to initial sorted column", async () => {
+      // Given a table
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          // And there is an initial sort defined
+          sorting={{ on: "client", initial: [nameColumn, "ASC"] }}
+          rows={[
+            simpleHeader,
+            { kind: "data", id: "1", name: "a", value: 2 },
+            { kind: "data", id: "2", name: "b", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // When initializing sort on the "value" column
+      click(r.sortHeader_1);
+      // Then expect ASC order
+      expect(cell(r, 1, 1)).toHaveTextContent("1");
+      // And when clicking a 2nd time
+      click(r.sortHeader_1);
+      // Then expect DESC order
+      expect(cell(r, 1, 1)).toHaveTextContent("3");
+      // And when clicking a 3rd time
+      click(r.sortHeader_1);
+      // Then expect the order to have been reset
+      expect(cell(r, 1, 1)).toHaveTextContent("2");
+    });
+
+    it("initializes with undefined sort", async () => {
+      // Given a table
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          // And the initial sort is explicitly set to `undefined`
+          sorting={{ on: "client", initial: undefined }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // Then the data remains unsorted
+      expect(cell(r, 1, 0)).toHaveTextContent("b");
+      expect(cell(r, 2, 0)).toHaveTextContent("a");
+      expect(cell(r, 3, 0)).toHaveTextContent("c");
+    });
+
+    it("reverts to initially undefined sort", async () => {
+      // Given a table
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          // And the initial sort is explicitly set to `undefined`
+          sorting={{ on: "client", initial: undefined }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // When initializing sort on the "name" column
+      click(r.sortHeader_0);
+      // Then expect ASC order
+      expect(cell(r, 1, 0)).toHaveTextContent("a");
+      // And when clicking a 2nd time
+      click(r.sortHeader_0);
+      // Then expect DESC order
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
+      // And when clicking a 3rd time
+      click(r.sortHeader_0);
+      // Then expect the order to have been reset
+      expect(cell(r, 1, 0)).toHaveTextContent("b");
+    });
+
     it("can sort nested rows", async () => {
       // Given a table with nested rows
       const r = await render(
@@ -465,14 +546,14 @@ describe("GridTable", () => {
       );
       const { sortHeader_0, sortHeader_icon_0 } = r;
       // It is initially not sorted
-      expect(() => sortHeader_icon_0()).toThrow("Unable to find");
+      expect(sortHeader_icon_0()).not.toBeVisible();
 
       // Then when sorted by the 1st column
       click(sortHeader_0);
       // Then the callback was called
       expect(onSort).toHaveBeenCalledWith("name", "ASC");
       // And we show the sort toggle
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp");
+      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp").toBeVisible();
       // And the data was not reordered (we defer to the server-side)
       expect(cell(r, 1, 0)).toHaveTextContent("foo");
 
@@ -481,7 +562,14 @@ describe("GridTable", () => {
       // Then it was called again but desc
       expect(onSort).toHaveBeenCalledWith("name", "DESC");
       // And we flip the sort toggle
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown");
+      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown").toBeVisible();
+
+      // And when we sort again
+      click(sortHeader_0);
+      // Then it was called again with undefined
+      expect(onSort).toHaveBeenCalledWith(undefined, undefined);
+      // And we hide the sort toggle (back to the initial sort)
+      expect(sortHeader_icon_0()).not.toBeVisible();
     });
 
     it("doesn't sort columns w/o onSort", async () => {
@@ -521,7 +609,7 @@ describe("GridTable", () => {
         />,
       );
       // Then it is shown as initially sorted asc
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp");
+      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp").toBeVisible();
     });
 
     it("initializes with desc sorting", async () => {
@@ -541,7 +629,7 @@ describe("GridTable", () => {
         />,
       );
       // Then it is shown as initially sorted desc
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown");
+      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown").toBeVisible();
     });
 
     it("can pin rows first", async () => {

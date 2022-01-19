@@ -150,13 +150,13 @@ export type GridSortConfig<S> =
   | {
       on: "client";
       /** The optional initial column (index in columns) and direction to sort. */
-      initial?: [S | GridColumn<any>, Direction];
+      initial?: [S | GridColumn<any>, Direction] | undefined;
     }
   | {
       on: "server";
       /** The current sort by value + direction (if server-side sorting). */
       value?: [S, Direction];
-      /** Callback for when the column is sorted (if server-side sorting). */
+      /** Callback for when the column is sorted (if server-side sorting). Parameters set to `undefined` is a signal to return to the initial sort state */
       onSort: (orderBy: S | undefined, direction: Direction | undefined) => void;
     };
 
@@ -269,12 +269,11 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   }
 
   const [sortState, setSortKey] = useSortState<R, S>(columns, sorting);
-  // Disclaimer that technically even though this is a useMemo, sortRows is mutating `rows` directly
+
   const maybeSorted = useMemo(() => {
     if (sorting?.on === "client" && sortState) {
       // If using client-side sort, the sortState use S = number
-      sortRows(columns, rows, sortState as any as SortState<number>);
-      return rows;
+      return sortRows(columns, rows, sortState as any as SortState<number>);
     }
     return rows;
   }, [columns, rows, sorting, sortState]);
