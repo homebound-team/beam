@@ -683,9 +683,9 @@ const VirtualRoot = memoizeOne<
   return React.forwardRef(function VirtualRoot({ style, children }, ref) {
     // This VirtualRoot list represent the header when no styles are given. The
     // table list generally has styles to scroll the page for windowing.
-    const isList = Object.keys(style || {}).length !== 0;
+    const isHeader = Object.keys(style || {}).length === 0;
 
-    // This re-renders each time we have new children in the view port
+    // This re-renders each time we have new children in the viewport
     return (
       <div
         ref={ref}
@@ -694,11 +694,11 @@ const VirtualRoot = memoizeOne<
           // Add an extra `> div` due to Item + itemContent both having divs
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
           // Table list styles only
-          ...(isList
-            ? {
+          ...(isHeader
+            ? {}
+            : {
                 ...Css.addIn("& > div:first-of-type > *", gs.firstNonHeaderRowCss).$,
-              }
-            : {}),
+              }),
           ...gs.rootCss,
           ...xss,
         }}
