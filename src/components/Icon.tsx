@@ -10,7 +10,7 @@ export interface IconProps extends AriaAttributes, DOMProps {
   /** The size of the icon in increments, i.e. 1 == 8px, default is 3 == 24px. */
   inc?: number;
   /** Styles overrides */
-  xss?: Xss<Margin>;
+  xss?: Xss<Margin | "visibility">;
 }
 
 export const Icon = React.memo((props: IconProps) => {

@@ -648,7 +648,7 @@ export function WrappedHeaders() {
   return (
     <GridTable<Row2>
       columns={[leftAlignedColumn, rightAlignedColumn, centerAlignedColumn]}
-      sorting={{ on: "client", initial: [rightAlignedColumn, "ASC"] }}
+      sorting={{ on: "client", initial: undefined }}
       style={condensedStyle}
       rows={[
         { kind: "header", id: "header" },
