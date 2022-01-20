@@ -17,12 +17,12 @@ export function sortRows<R extends Kinded>(
 ): GridDataRow<R>[] {
   const sorted = sortBatch(columns, rows, sortState);
   // Recursively sort child rows
-  for (const row of sorted) {
+  sorted.forEach((row, i) => {
     if (row.children) {
-      // Replace the existing `children` prop with a sorted shallow copy
-      Object.assign(row, { children: sortRows(columns, row.children, sortState) });
+      sorted[i] = { ...sorted[i], children: sortRows(columns, row.children, sortState) };
     }
-  }
+  });
+
   return sorted;
 }
 

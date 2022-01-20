@@ -46,8 +46,8 @@ export function useSortState<R extends Kinded, S>(
       setSortState(newState);
 
       if (sorting?.on === "server") {
-        const [initialKey, initialDirection] = newState ? newState : [undefined, undefined];
-        sorting.onSort(initialKey, initialDirection);
+        const [newKey, newDirection] = newState ?? [undefined, undefined];
+        sorting.onSort(newKey, newDirection);
       }
     },
     // Note that sorting.onSort is not listed here, so we bind to whatever the 1st sorting.onSort was
@@ -76,6 +76,6 @@ export function deriveSortState<S>(
     return [clickedKey, DESC];
   }
 
-  // Else, direction is already DESC, so revert to original sort value or undefined.
-  return initialSortState ? [...initialSortState] : undefined;
+  // Else, direction is already DESC, so revert to original sort value.
+  return initialSortState;
 }
