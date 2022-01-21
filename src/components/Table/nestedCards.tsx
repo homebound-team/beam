@@ -1,4 +1,4 @@
-import { Fragment, ReactElement } from "react";
+import { Fragment, ReactElement, ReactNode } from "react";
 import {
   GridColumn,
   GridDataRow,
@@ -47,8 +47,8 @@ export class NestedCards {
    */
   maybeOpenCard(row: GridDataRow<any>): boolean {
     const card = this.styles.kinds[row.kind];
-    // If this kind doesn't have a card defined, don't put it on the card stack
-    if (card) {
+    // If this kind doesn't have a card defined or is a leaf card (which handle their own card styles in GridRow), then don't put it on the card stack
+    if (card && !isLeafRow(row)) {
       this.openCards.push(row.kind);
       this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, this.styles.kinds, "open"));
     }
@@ -190,6 +190,28 @@ export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first
 }
 
 /**
+ * Wraps a row within its parent cards. Creates a wrapping div to add the card padding.
+ * Example:
+ * <div parent> <div child> <div grandchild /> </div> </div>
+ */
+export function maybeWrapCard(openCards: NestedCardStyle[], row: ReactNode): any {
+  let div: ReactNode = row;
+  [...openCards].reverse().forEach((card) => {
+    div = (
+      <div
+        css={{
+          ...Css.h100.pxPx(card.pxPx).bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).bl.br.$,
+        }}
+      >
+        {div}
+      </div>
+    );
+  });
+
+  return div;
+}
+
+/**
  * Create a spacer between rows of children.
  *
  * Our height is not based on `openCards`, b/c for the top-most level, we won't
@@ -220,7 +242,7 @@ interface ChromeRowProps {
 export function ChromeRow({ chromeBuffer, columns }: ChromeRowProps) {
   return (
     // We add 2 to account for our dedicated open/close columns
-    <div css={Css.gc(`span ${columns + 2}`).$} data-chrome="true">
+    <div css={Css.gc(`span ${columns + 2}`).$}>
       {chromeBuffer.map((c, i) => (
         <Fragment key={i}>{c()}</Fragment>
       ))}
@@ -230,4 +252,8 @@ export function ChromeRow({ chromeBuffer, columns }: ChromeRowProps) {
 
 export function dropChromeRows<R extends Kinded>(rows: RowTuple<R>[]): [GridDataRow<R>, ReactElement][] {
   return rows.filter(([r]) => !!r) as [GridDataRow<R>, ReactElement][];
+}
+
+export function isLeafRow<R extends Kinded>(row: GridDataRow<R>): boolean {
+  return row.children === undefined || row.children.length === 0;
 }
