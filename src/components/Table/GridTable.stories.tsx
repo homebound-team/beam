@@ -782,21 +782,21 @@ export function StyleBeam() {
   const locationCol = column<BeamRow>({
     header: "Location",
     data: (row) => ({
-      content: <SelectField value={row.location} onSelect={noop} options={locations} label="Location" hideLabel />,
+      content: <SelectField value={row.location} onSelect={noop} options={locations} label="Location" />,
       sortValue: row.location,
     }),
   });
   const priceCol = numericColumn<BeamRow>({
     header: "Price",
     data: ({ priceInCents }) => ({
-      content: () => <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} type="cents" />,
+      content: () => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
       sortValue: priceInCents,
     }),
   });
   const readOnlyPriceCol = numericColumn<BeamRow>({
     header: "Read only Price",
     data: ({ priceInCents }) => ({
-      content: () => <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />,
+      content: () => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />,
       sortValue: priceInCents,
     }),
   });
