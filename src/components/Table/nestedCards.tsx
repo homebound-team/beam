@@ -45,10 +45,10 @@ export class NestedCards {
    * @param row The row which will be opened. The open Chrome row will appear
    * above this row.
    */
-  maybeOpenCard(row: GridDataRow<any>): boolean {
+  maybeOpenCard(row: GridDataRow<any>, isLeaf: boolean): boolean {
     const card = this.styles.kinds[row.kind];
-    // If this kind doesn't have a card defined, don't put it on the card stack
-    if (card) {
+    // If this kind doesn't have a card defined or is a leaf card (which handle their own card styles in GridRow), then don't put it on the card stack
+    if (card && !isLeaf) {
       this.openCards.push(row.kind);
       this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, this.styles.kinds, "open"));
     }
@@ -230,4 +230,15 @@ export function ChromeRow({ chromeBuffer, columns }: ChromeRowProps) {
 
 export function dropChromeRows<R extends Kinded>(rows: RowTuple<R>[]): [GridDataRow<R>, ReactElement][] {
   return rows.filter(([r]) => !!r) as [GridDataRow<R>, ReactElement][];
+}
+
+export function getLeafCardStyles(leaf: NestedCardStyle | undefined, column?: "first" | "final") {
+  return leaf
+    ? {
+        ...Css.bgColor(leaf.bgColor).if(!!leaf.bColor).bc(leaf.bColor).bt.bb.$,
+        ...(column === "first" && Css.borderRadius(`${leaf.brPx}px 0 0 ${leaf.brPx}px`).if(!!leaf.bColor).bl.$),
+        ...(column === "final" &&
+          Css.borderRadius(`0 ${leaf.brPx}px ${leaf.brPx}px 0`).prPx(leaf.pxPx).if(!!leaf.bColor).br.$),
+      }
+    : {};
 }

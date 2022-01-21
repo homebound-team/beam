@@ -172,7 +172,7 @@ const buttonColumns = actionColumn<Row>({
 // TODO: Potentially add 8px spacer between each row
 const spacing = { brPx: 8, pxPx: 16 };
 const style: GridStyle = {
-  headerCellCss: Css.sm.gray700.py1.df.aic.$,
+  headerCellCss: Css.sm.gray700.py1.df.aic.py1.$,
   firstNonHeaderRowCss: Css.mt2.$,
   cellCss: Css.gray700.sm.aic.pxPx(4).$,
   rootCss: Css.pb(2).$,
@@ -184,7 +184,7 @@ const style: GridStyle = {
       // TODO: It would be nice if this used CSS Properties so that we can use TRUSS
       milestone: { bgColor: Palette.Gray100, ...spacing },
       subgroup: { bgColor: Palette.White, ...spacing },
-      // TODO: Validate with Dare regarding nested 3rd child.
+      // TODO: Validate with Dara regarding nested 3rd child.
       task: { bgColor: Palette.White, bColor: Palette.Gray200, ...spacing, pxPx: 0 },
       // Purposefully leave out the `add` kind
     },
