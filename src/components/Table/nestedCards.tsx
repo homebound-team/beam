@@ -236,9 +236,27 @@ export function getLeafCardStyles(leaf: NestedCardStyle | undefined, column?: "f
   return leaf
     ? {
         ...Css.bgColor(leaf.bgColor).if(!!leaf.bColor).bc(leaf.bColor).bt.bb.$,
-        ...(column === "first" && Css.borderRadius(`${leaf.brPx}px 0 0 ${leaf.brPx}px`).if(!!leaf.bColor).bl.$),
+        ...(column === "first" &&
+          Css.borderRadius(`${leaf.brPx}px 0 0 ${leaf.brPx}px`).plPx(leaf.pxPx).if(!!leaf.bColor).bl.$),
         ...(column === "final" &&
           Css.borderRadius(`0 ${leaf.brPx}px ${leaf.brPx}px 0`).prPx(leaf.pxPx).if(!!leaf.bColor).br.$),
       }
     : {};
 }
+
+// TODO for nested card styles:
+// 1. left card first and and final columns need to place a background color behind them so the border radius doesn't reveal the background color behind the table.
+// Idea is to do this via a `:before` class. Needs to have a `width` of the `brPx`, find color of the parent... and basically:
+// content: " ";
+// background: rgba(175,175,175,1);
+// width: 4px;
+// z-index: -1;
+// margin: -1px;
+// height: calc(100% + 2px);
+
+// But finding the color of the parent may be tough...
+// 2. Maybe we can determine if the leaf is a parent - not nested, then don't apply border radius.
+// 3. Can we make the a grand child with no parent (See nested card three levels) extend the width of what would be the child?
+//    Yes we need to do this based on SchedulesV2 - "Add Task" starts at the `parent` card level.
+//      Maybe we need a column per card for padding.
+//      Or maybe we don't use the padding columns on leaf cards? - Not sure if this is okay, I think to acheive this then we'd need to nest elements that can be styles (non-display:contents), and maintain CSS Grid somehow - not really possible imo.

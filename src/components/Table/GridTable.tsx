@@ -332,7 +332,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         );
       // Even if we don't pass the filter, one of our children might, so we continue on after this check
       let isCard = false;
-      const isLeaf = row.children === undefined;
+      const isLeaf = row.children === undefined || row.children.length === 0;
 
       if (matches) {
         isCard = nestedCards && nestedCards.maybeOpenCard(row, isLeaf);
