@@ -159,7 +159,7 @@ export function NestedRows() {
     child: (row) => <CollapseToggle row={row} />,
     grandChild: () => "",
     add: () => "",
-    w: 0,
+    w: "60px",
   });
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",

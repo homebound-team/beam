@@ -283,8 +283,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
 
-    const columnSizes =
-      as === "virtual" ? calcVirtualGridColumns(columns, style.nestedCards?.firstLastColumnWidth) : undefined;
+    const columnSizes = calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth);
 
     function makeRowComponent(row: GridDataRow<R>): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
@@ -445,12 +444,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 // Determine which HTML element to use to build the GridTable
 const renders: Record<RenderAs, typeof renderTable> = {
   table: renderTable,
-  div: renderCssGrid,
+  div: renderDiv,
   virtual: renderVirtual,
 };
 
-/** Renders as a CSS Grid, which is the default / most well-supported rendered. */
-function renderCssGrid<R extends Kinded>(
+/** Renders table using divs with flexbox rows, which is the default render */
+function renderDiv<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumn<R>[],
@@ -489,7 +488,6 @@ function renderCssGrid<R extends Kinded>(
   return (
     <div
       css={{
-        ...Css.dg.gtc(calcDivGridColumns(columns, firstLastColumnWidth)).$,
         /*
           Using n + (firstNonHeaderRowIndex + 1) here to target all rows that
           are after the first non-header row. Since n starts at 0, we can use
@@ -509,12 +507,8 @@ function renderCssGrid<R extends Kinded>(
       data-testid={id}
     >
       {headerRows.map(([, node]) => node)}
-      {/* Show an all-column-span info message if it's set. */}
-      {firstRowMessage && (
-        <div css={Css.add("gridColumn", `${columns.length} span`).$}>
-          <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
-        </div>
-      )}
+      {/* Show a info message if it's set. */}
+      {firstRowMessage && <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>}
       {filteredRows.map(([, node]) => node)}
     </div>
   );
@@ -663,7 +657,7 @@ function renderVirtual<R extends Kinded>(
  * rows and the second represents the non-header rows (list rows).
  *
  * The main goal of this custom component is to:
- * - Customize the list wrapper to our css grid logic styles
+ * - Customize the list wrapper to our styles
  *
  * We wrap this in memoizeOne so that React.createElement sees a
  * consistent/stable component identity, even though technically we have a
@@ -710,17 +704,10 @@ const VirtualRoot = memoizeOne<
 });
 
 /**
- * Creates a `grid-template-column` specific to our virtual output.
- *
- * Because of two things:
- *
- * a) react-virtuoso puts the header in a different div than the normal rows, and
- *
- * b) content-aware sizing just in general look janky/constantly resize while scrolling
- *
- * When we're as=virtual, we change our default + enforce only fixed-sized units (% and px)
+ * Calculates column widths using a flexible `calc()` definition that allows for consistent column alignment without the use of `<table />`, CSS Grid, etc layouts.
+ * Enforces only fixed-sized units (% and px)
  */
-export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColumnWidth: number | undefined): string[] {
+export function calcColumnSizes(columns: GridColumn<any>[], firstLastColumnWidth: number | undefined): string[] {
   // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
   // calc((100% - allOtherPercent - allOtherPx) * ((myFr / totalFr))`
   //
@@ -762,7 +749,7 @@ export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColu
       } else if (w.endsWith("fr")) {
         return fr(Number(w.replace("fr", "")));
       } else {
-        throw new Error("as=virtual only supports px, percentage, or fr units");
+        throw new Error("Beam Table column width definition only supports px, percentage, or fr units");
       }
     } else {
       return fr(w);
@@ -770,22 +757,6 @@ export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColu
   });
 
   return maybeAddCardColumns(sizes, firstLastColumnWidth);
-}
-
-export function calcDivGridColumns(columns: GridColumn<any>[], firstLastColumnWidth: number | undefined): string {
-  const sizes = columns.map(({ w }) => {
-    if (typeof w === "undefined") {
-      // Hrm, I waffle between 'auto' or '1fr' being the better default here...
-      return "auto";
-    } else if (typeof w === "string") {
-      // Use whatever the user passed in
-      return w;
-    } else {
-      // Otherwise assume fr units
-      return `${w}fr`;
-    }
-  });
-  return maybeAddCardColumns(sizes, firstLastColumnWidth).join(" ");
 }
 
 // If we're doing nested cards, we add extra 1st/last cells...
@@ -825,21 +796,8 @@ export type GridColumn<R extends Kinded, S = {}> = {
         : (row: GridRowKind<R, K>) => ReactNode | GridCellContent);
 } & {
   /**
-   * The column's grid column width.
-   *
-   * For `as=div` output:
-   *
-   * - Any CSS grid units are supported
-   * - Numbers are treated as `fr` units
-   * - The default value is `auto`, which in CSS grid will do content-aware/responsive layout.
-   *
-   * For `as=virtual` output:
-   *
-   * - Only px, percentage, or fr units are supported, due to a) react-virtuoso puts the sticky header
-   * rows in a separate `div` and so we end up with two `grid-template-columns`, so cannot rely on
-   * any content-aware sizing, and b) content-aware sizing in a scrolling/virtual table results in
-   * a ~janky experience as the columns will constantly resize as new/different content is put in/out
-   * of the DOM.
+   * The column's width.
+   * - Only px, percentage, or fr units are supported, due to each GridRow acting as an independent table. This ensures consistent alignment between rows.
    * - Numbers are treated as `fr` units
    * - The default value is `1fr`
    */
@@ -910,7 +868,7 @@ export type GridCellAlignment = "left" | "right" | "center";
  * primitive value for filtering and sorting.
  */
 export type GridCellContent = {
-  /** The JSX content of the cell. Virtual tables that client-side sort should use a function to avaid perf overhead. */
+  /** The JSX content of the cell. Virtual tables that client-side sort should use a function to avoid perf overhead. */
   content: ReactNode | (() => ReactNode);
   alignment?: GridCellAlignment;
   /** Allow value to be a function in case it's a dynamic value i.e. reading from an inline-edited proxy. */
@@ -984,19 +942,15 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
   const rowStyleCellCss = maybeApplyFunction(row, rowStyle?.cellCss);
   const rowCss = {
-    // We add a display-contents so that we can have "row-level" div elements in our
-    // DOM structure. I.e. grid is normally root-element > cell-elements, but we want
-    // root-element > row-element > cell-elements, so that we can have a hook for
-    // hovers and styling. In theory this would change with subgrids.
-    // Only enable when using div as elements
     // For virtual tables use `display: flex` to keep all cells on the same row, but use `flexNone` to ensure the cells stay their defined widths
-    ...(as === "table" ? {} : as === "virtual" ? Css.df.addIn("&>*", Css.flexNone.$).$ : Css.display("contents").$),
+    ...(as === "table" ? {} : Css.df.addIn("&>*", Css.flexNone.$).$),
     ...((rowStyle?.rowLink || rowStyle?.onClick) &&
       style.rowHoverColor && {
         // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
         "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
       }),
     ...maybeApplyFunction(row, rowStyle?.rowCss),
+    ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined),
   };
 
   const Row = as === "table" ? "tr" : "div";
@@ -1057,18 +1011,11 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
-          // Non-virtualized tables use h100 so that all cells are the same height across the row.
-          // Virtualized table rows use `display: flex;`, so the flex children are set to `align-self: stretch` by default, which achieves the same goal.
-          // Though, we need to omit setting `h100` on the flex children, as a flex container needs a defined height set for `h100` to work on flex children
-          ...(isHeader && as !== "virtual" ? Css.h100.$ : undefined),
-          ...maybeStickyHeaderStyles,
           // If we're within a card, use its background color
           ...(currentCard && Css.bgColor(currentCard.bgColor).$),
-          // Add in colspan css if needed
-          ...(currentColspan > 1 ? Css.gc(`span ${currentColspan}`).$ : {}),
           // And finally the specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
-          // For virtual tables we define the width of the column on each cell. Supports col spans.
+          // Define the width of the column on each cell. Supports col spans.
           ...(columnSizes && {
             width: `calc(${columnSizes
               .slice(maybeNestedCardColumnIndex, maybeNestedCardColumnIndex + currentColspan)
@@ -1177,11 +1124,11 @@ export function applyRowFn<R extends Kinded>(column: GridColumn<R>, row: GridDat
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
 const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (key, css, content) => {
-  const Row = as === "table" ? "td" : "div";
+  const Cell = as === "table" ? "td" : "div";
   return (
-    <Row key={key} css={{ ...css, ...tableRowStyles(as) }}>
+    <Cell key={key} css={{ ...css, ...tableRowStyles(as) }}>
       {content}
-    </Row>
+    </Cell>
   );
 };
 
