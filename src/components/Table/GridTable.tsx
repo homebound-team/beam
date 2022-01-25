@@ -488,6 +488,8 @@ function renderDiv<R extends Kinded>(
   return (
     <div
       css={{
+        // Ensure all rows extend the same width
+        ...Css.mw("fit-content").$,
         /*
           Using n + (firstNonHeaderRowIndex + 1) here to target all rows that
           are after the first non-header row. Since n starts at 0, we can use
@@ -682,7 +684,7 @@ const VirtualRoot = memoizeOne<
     return (
       <div
         ref={ref}
-        style={{ ...style, ...(gs.nestedCards ? { minWidth: "fit-content" } : {}) }}
+        style={{ ...style, ...{ minWidth: "fit-content" } }}
         css={{
           // Add an extra `> div` due to Item + itemContent both having divs
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
