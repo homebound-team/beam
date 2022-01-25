@@ -705,7 +705,7 @@ describe("GridTable", () => {
 
     it("as=virtual rejects relative units", () => {
       expect(() => calcColumnSizes([{ w: "auto" }] as any, undefined).join(" ")).toThrow(
-        "as=virtual only supports px, percentage, or fr units",
+        "Beam Table column width definition only supports px, percentage, or fr units",
       );
     });
 

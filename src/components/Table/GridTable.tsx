@@ -729,7 +729,7 @@ export function calcColumnSizes(columns: GridColumn<any>[], firstLastColumnWidth
       } else if (w.endsWith("%")) {
         return { ...acc, claimedPercentages: acc.claimedPercentages + Number(w.replace("%", "")) };
       } else {
-        throw new Error("as=virtual only supports px, percentage, or fr units");
+        throw new Error("Beam Table column width definition only supports px, percentage, or fr units");
       }
     },
     { claimedPercentages: 0, claimedPixels: firstLastColumnWidth ? firstLastColumnWidth * 2 : 0, totalFr: 0 },
