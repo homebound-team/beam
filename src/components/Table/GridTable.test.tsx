@@ -1,8 +1,7 @@
 import React, { MutableRefObject, useContext } from "react";
 import { GridRowLookup } from "src/components/Table/GridRowLookup";
 import {
-  calcDivGridColumns,
-  calcVirtualGridColumns,
+  calcColumnSizes,
   emptyCell,
   GridCollapseContext,
   GridColumn,
@@ -685,42 +684,34 @@ describe("GridTable", () => {
     });
   });
 
-  describe("gtc", () => {
-    it("as=div defaults to auto", () => {
-      expect(calcDivGridColumns([{}, {}], undefined)).toEqual("auto auto");
-    });
-
+  describe("column sizes", () => {
     it("as=virtual defaults to fr widths", () => {
-      expect(calcVirtualGridColumns([{}, {}], undefined).join(" ")).toEqual(
+      expect(calcColumnSizes([{}, {}], undefined).join(" ")).toEqual(
         "((100% - 0% - 0px) * (1 / 2)) ((100% - 0% - 0px) * (1 / 2))",
       );
     });
 
-    it("as=div treats numbers as fr", () => {
-      expect(calcDivGridColumns([{ w: 1 }, { w: 2 }] as any, undefined)).toEqual("1fr 2fr");
-    });
-
     it("as=virtual treats numbers as fr", () => {
-      expect(calcVirtualGridColumns([{ w: 1 }, { w: 2 }] as any, undefined).join(" ")).toEqual(
+      expect(calcColumnSizes([{ w: 1 }, { w: 2 }] as any, undefined).join(" ")).toEqual(
         "((100% - 0% - 0px) * (1 / 3)) ((100% - 0% - 0px) * (2 / 3))",
       );
     });
 
     it("as=virtual accepts percentages ", () => {
-      expect(calcVirtualGridColumns([{ w: "10%" }, { w: 2 }] as any, undefined).join(" ")).toEqual(
+      expect(calcColumnSizes([{ w: "10%" }, { w: 2 }] as any, undefined).join(" ")).toEqual(
         "10% ((100% - 10% - 0px) * (2 / 2))",
       );
     });
 
     it("as=virtual rejects relative units", () => {
-      expect(() => calcVirtualGridColumns([{ w: "auto" }] as any, undefined).join(" ")).toThrow(
-        "as=virtual only supports px, percentage, or fr units",
+      expect(() => calcColumnSizes([{ w: "auto" }] as any, undefined).join(" ")).toThrow(
+        "Beam Table column width definition only supports px, percentage, or fr units",
       );
     });
 
     it("as=virtual with both px and default", () => {
       expect(
-        calcVirtualGridColumns(
+        calcColumnSizes(
           [{ w: "200px" }, { w: "100px" }, { w: "10%" }, { w: "20%" }, { w: 2 }, {}] as any,
           undefined,
         ).join(" "),
