@@ -104,7 +104,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const compactFieldHeight = 32;
 
   const fieldStyles = {
-    container: Css.df.fdc.w100.maxw(px(550)).$,
+    container: Css.df.fdc.w100.maxw(px(550)).relative.$,
     inputWrapper: {
       ...Css[typeScale].df.aic.br4.px1.w100
         .hPx(fieldHeight - maybeSmaller)
