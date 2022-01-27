@@ -37,7 +37,7 @@ export function NumberFieldStyles() {
 
       <div css={Css.df.fdc.childGap2.$}>
         <h1 css={Css.lg.$}>Unit Types</h1>
-        <TestNumberField label="Percent" type="percent" value={12} />
+        <TestNumberField label="Percent" type="percent" value={12.55} numFractionDigits={2} truncate />
         <TestNumberField label="Cents" type="cents" value={1000} />
         <TestNumberField label="Margin" type="basisPoints" value={1275} />
         <TestNumberField label="Days" type="days" value={1} />

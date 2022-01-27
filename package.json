@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@homebound/form-state": "^2.2.13",
+    "@internationalized/number": "^3.0.3",
     "@react-aria/utils": "^3.9.0",
     "@react-hook/resize-observer": "^1.2.2",
     "@types/tinycolor2": "^1.4.2",

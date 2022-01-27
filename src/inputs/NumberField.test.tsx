@@ -1,7 +1,7 @@
 import { change, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { NumberField, NumberFieldProps, NumberFieldType, parseRawInput } from "src/inputs/NumberField";
+import { formatValue, NumberField, NumberFieldProps } from "src/inputs/NumberField";
 
 let lastSet: any = undefined;
 
@@ -135,33 +135,47 @@ describe("NumberFieldTest", () => {
     // And onBlur should be called
     expect(onBlur).toHaveBeenCalledTimes(1);
   });
+
+  it("respects numFractionDigits and truncate props", async () => {
+    const r = await render(
+      <TestNumberField label="Complete" type="percent" value={12.5} numFractionDigits={2} truncate />,
+    );
+    expect(r.complete()).toHaveValue("12.5%");
+    type(r.complete, "14.55");
+    expect(r.complete()).toHaveValue("14.55%");
+    expect(lastSet).toEqual(14.55);
+
+    // Can truncate decimals
+    type(r.complete, "10.40");
+    expect(r.complete()).toHaveValue("10.4%");
+    expect(lastSet).toEqual(10.4);
+
+    type(r.complete, "12.00");
+    expect(r.complete()).toHaveValue("12%");
+    expect(lastSet).toEqual(12);
+  });
 });
 
-describe("parseRawInput function", () => {
+// test against factors and num fraction digits.
+describe("formatValue function", () => {
   it.each([
-    // if rawInput is NaN return undefined
-    ["asdf", 100, "percent" as NumberFieldType, undefined],
-    ["asdf", 100, "cents" as NumberFieldType, undefined],
-    ["asdf", 10_000, "basisPoints" as NumberFieldType, undefined],
-    ["asdf", 1, undefined, undefined],
+    // if value is NaN return undefined
+    [Number("a"), 100, undefined, undefined],
 
-    // if rawInput includes numbers followed by letters, return number and value based on type
-    ["10kb", 100, "percent" as NumberFieldType, 10],
-    ["10kb", 100, "cents" as NumberFieldType, 1000],
-    ["10kb", 10_000, "basisPoints" as NumberFieldType, 1000],
-    ["10kb", 1, undefined, 10],
+    // value returns as expected based on factor
+    [10, 100, undefined, 1_000],
+    [10, 10_000, undefined, 100_000],
+    [10, 1, undefined, 10],
 
-    // it can return negative numbers
-    ["-10kb", 100, "percent" as NumberFieldType, -10],
-    ["-10kb", 100, "cents" as NumberFieldType, -1000],
-    ["-10kb", 10_000, "basisPoints" as NumberFieldType, -1000],
-    ["-10kb", 1, undefined, -10],
+    // it can round and format with fractional values
+    [0.10456, 100, 2, 10.46],
+    [0.10456, 100, 1, 10.5],
+    [1.10456, 10_000, 2, 11045.6],
+    [-10.456, 1, 3, -10.456],
   ])(
-    "with a rawInput of %s, a factor of %s and a type of %s, it should return %s",
-    (rawInput, factor, type, expected) => {
-      const actual = parseRawInput(rawInput, factor, type);
-
-      expect(actual).toBe(expected);
+    "with a value of %s, a factor of %s and numFractionDigits of %s, it should return %s",
+    (value, factor, type, expected) => {
+      expect(formatValue(value, factor, type)).toBe(expected);
     },
   );
 });
