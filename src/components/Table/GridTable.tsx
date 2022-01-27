@@ -30,7 +30,7 @@ export type GridTableXss = Xss<Margin>;
 export const ASC = "ASC" as const;
 export const DESC = "DESC" as const;
 export type Direction = "ASC" | "DESC";
-export const emptyCell: () => ReactNode = () => <></>;
+export const emptyCell: GridCellContent = { content: () => <></>, value: "" };
 
 let runningInJest = false;
 
@@ -795,6 +795,7 @@ type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "
 export type GridColumn<R extends Kinded, S = {}> = {
   [K in R["kind"]]:
     | string
+    | GridCellContent
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (data: D, row: GridRowKind<R, K>) => ReactNode | GridCellContent
         : (row: GridRowKind<R, K>) => ReactNode | GridCellContent);

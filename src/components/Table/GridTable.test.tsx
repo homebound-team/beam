@@ -1191,7 +1191,7 @@ describe("GridTable", () => {
 
   it("can show an actually empty cell using 'emptyCell' const", async () => {
     // Given the table with a column that defines the `kind: data` as an empty cell
-    const nameColumn: GridColumn<Row> = { header: () => "Name", data: emptyCell };
+    const nameColumn: GridColumn<Row> = { header: () => "Name", data: () => emptyCell };
     // And a table where the there is an `emptyCell` style specified
     const r = await render(
       <GridTable<Row>
