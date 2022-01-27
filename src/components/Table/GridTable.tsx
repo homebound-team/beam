@@ -30,7 +30,7 @@ export type GridTableXss = Xss<Margin>;
 export const ASC = "ASC" as const;
 export const DESC = "DESC" as const;
 export type Direction = "ASC" | "DESC";
-export const emptyCell: () => ReactNode = () => <></>;
+export const emptyCell: GridCellContent = { content: () => <></>, value: "" };
 
 let runningInJest = false;
 
