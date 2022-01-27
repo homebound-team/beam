@@ -990,7 +990,17 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         const canSortColumn =
           (sorting?.on === "client" && column.clientSideSort !== false) ||
           (sorting?.on === "server" && !!column.serverSideSortKey);
-        const content = toContent(maybeContent, isHeader, canSortColumn, sorting?.on === "client", style, as);
+        const alignment = getAlignment(column, maybeContent);
+        const justificationCss = getJustification(column, maybeContent, as, alignment);
+        const content = toContent(
+          maybeContent,
+          isHeader,
+          canSortColumn,
+          sorting?.on === "client",
+          style,
+          as,
+          alignment,
+        );
 
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
         const maybeNestedCardColumnIndex = columnIndex + (style.nestedCards ? 1 : 0);
@@ -1012,7 +1022,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           // Then override with first/last cell styling
           ...getFirstOrLastCellCss(style, columnIndex, columns),
           // Then override with per-cell/per-row justification/indentation
-          ...getJustification(column, maybeContent, as),
+          ...justificationCss,
           ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
@@ -1074,6 +1084,7 @@ function toContent(
   isClientSideSorting: boolean,
   style: GridStyle,
   as: RenderAs,
+  alignment: GridCellAlignment,
 ): ReactNode {
   content = isGridCellContent(content) ? content.content : content;
   if (typeof content === "function") {
@@ -1094,7 +1105,7 @@ function toContent(
     );
   }
   if (content && typeof content === "string" && isHeader && canSortColumn) {
-    return <SortHeader content={content} />;
+    return <SortHeader content={content} iconOnLeft={alignment === "right"} />;
   } else if (style.emptyCell && isContentEmpty(content)) {
     // If the content is empty and the user specified an `emptyCell` node, return that.
     return style.emptyCell;
@@ -1222,9 +1233,17 @@ const alignmentToTextAlign: Record<GridCellAlignment, Properties["textAlign"]> =
   right: "right",
 };
 
+function getAlignment(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent): GridCellAlignment {
+  return (isGridCellContent(maybeContent) && maybeContent.alignment) || column.align || "left";
+}
+
 // For alignment, use: 1) cell def, else 2) column def, else 3) left.
-function getJustification(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent, as: RenderAs) {
-  const alignment = (isGridCellContent(maybeContent) && maybeContent.alignment) || column.align || "left";
+function getJustification(
+  column: GridColumn<any>,
+  maybeContent: ReactNode | GridCellContent,
+  as: RenderAs,
+  alignment: GridCellAlignment,
+) {
   // Always apply text alignment.
   const textAlign = Css.add("textAlign", alignmentToTextAlign[alignment]).$;
   if (as === "table") {
