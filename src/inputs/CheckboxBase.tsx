@@ -23,6 +23,7 @@ export interface CheckboxBaseProps extends BeamFocusableProps {
   inputProps: InputHTMLAttributes<HTMLInputElement>;
   isSelected?: boolean;
   label: string;
+  checkboxOnly?: boolean;
   errorMsg?: string;
   helperText?: string | ReactNode;
 }
@@ -38,6 +39,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
     label,
     errorMsg,
     helperText,
+    checkboxOnly = false,
   } = props;
   const ref = useRef(null);
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
@@ -58,6 +60,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
           .maxw(px(344))
           .if(isDisabled).cursorNotAllowed.$
       }
+      aria-label={label}
     >
       <VisuallyHidden>
         <input ref={ref} {...mergeProps(inputProps, focusProps)} {...tid} />
@@ -77,14 +80,16 @@ export function CheckboxBase(props: CheckboxBaseProps) {
       >
         {markIcon}
       </span>
-      {/* Use a mtPx(-2) to better align the label with the checkbox.
-      Not using align-items: center as the checkbox would align with all content below, where we really want it to stay only aligned with the label */}
-      <div css={Css.ml1.mtPx(-2).$}>
-        {label && <div css={{ ...labelStyles, ...(isDisabled && disabledColor) }}>{label}</div>}
-        {description && <div css={{ ...descStyles, ...(isDisabled && disabledColor) }}>{description}</div>}
-        {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
-        {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
-      </div>
+      {!checkboxOnly && (
+        // Use a mtPx(-2) to better align the label with the checkbox.
+        // Not using align-items: center as the checkbox would align with all content below, where we really want it to stay only aligned with the label
+        <div css={Css.ml1.mtPx(-2).$}>
+          {label && <div css={{ ...labelStyles, ...(isDisabled && disabledColor) }}>{label}</div>}
+          {description && <div css={{ ...descStyles, ...(isDisabled && disabledColor) }}>{description}</div>}
+          {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
+          {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+        </div>
+      )}
     </label>
   );
 }

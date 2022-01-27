@@ -40,3 +40,15 @@ export const cardStyle: GridStyle = {
     }).p1.m0.xsEm.gray700.$,
   },
 };
+
+// Once completely rolled out across all tables in Blueprint, this will change to be the `defaultStyle`.
+export const beamFixedStyle: GridStyle = {
+  rootCss: Css.gray700.$,
+  // Doing a mix of `min` and `max` height of 40 as each cell is currently defining `h100`.
+  headerCellCss: Css.xsEm.bgGray200.aic.nowrap.px2.mhPx(40).maxhPx(40).$,
+  // TODO: `cellCss` has incomplete styling at the moment. Will be done as part of SC-8145
+  cellCss: Css.xs.bgWhite.aic.nowrap.px2.hPx(40).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
+};
+
+// TODO: `cellCss` has incomplete styling at the moment. Will be done as part of SC-8145
+export const beamFlexibleStyle: GridStyle = { ...beamFixedStyle, cellCss: Css.p2.$ };

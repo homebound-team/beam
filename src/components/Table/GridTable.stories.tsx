@@ -5,6 +5,7 @@ import {
   actionColumn,
   Button,
   cardStyle,
+  Chip,
   CollapseToggle,
   column,
   condensedStyle,
@@ -21,11 +22,16 @@ import {
   Icon,
   IconButton,
   numericColumn,
+  selectColumn,
   simpleHeader,
   SimpleHeaderAndDataOf,
+  Tag,
 } from "src/components/index";
+import { beamFixedStyle } from "src/components/Table/styles";
 import { Css, Palette } from "src/Css";
+import { Checkbox, SelectField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
+import { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
 import { newStory, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 
@@ -719,6 +725,99 @@ export function CustomEmptyCell() {
         { kind: "data", id: "1", name: "c", value: 1 },
         { kind: "data", id: "2", name: "b", value: undefined },
         { kind: "data", id: "3", name: "", value: 3 },
+      ]}
+    />
+  );
+}
+
+type BeamData = {
+  id: string;
+  favorite: boolean;
+  status: string;
+  commitmentName: string;
+  tradeCategories: string[];
+  location: string;
+  date: string;
+  priceInCents: number;
+};
+type BeamRow = SimpleHeaderAndDataOf<BeamData>;
+export function StyleBeam() {
+  const locations: HasIdAndName<string>[] = [
+    { id: "l:1", name: "Living Room" },
+    { id: "l:2", name: "Great Room" },
+  ];
+
+  const selectCol = selectColumn<BeamRow>({
+    header: () => ({ content: <Checkbox label="Label" onChange={noop} checkboxOnly /> }),
+    data: () => ({ content: <Checkbox label="Label" onChange={noop} checkboxOnly /> }),
+  });
+  const favCol = column<BeamRow>({
+    header: () => ({ content: "" }),
+    data: ({ favorite }) => ({
+      content: <Icon icon="star" color={favorite ? Palette.Gray700 : Palette.Gray300} />,
+      sortValue: favorite ? 0 : 1,
+    }),
+    // Defining `w: 56px` to accommodate for the `27px` wide checkbox and `16px` of padding on either side.
+    w: "56px",
+  });
+  const statusCol = column<BeamRow>({
+    header: "Status",
+    data: ({ status }) => ({ content: <Tag text={status} type="success" />, sortValue: status }),
+  });
+  const nameCol = column<BeamRow>({ header: "Commitment Name", data: ({ commitmentName }) => commitmentName });
+  const tradeCol = column<BeamRow>({
+    header: "Trade Categories",
+    data: ({ tradeCategories }) => ({
+      content: () => (
+        <div css={Css.df.gap1.$}>
+          {tradeCategories.sort().map((tc) => (
+            <Chip text={tc} />
+          ))}
+        </div>
+      ),
+      sortValue: tradeCategories.sort().join(" "),
+    }),
+  });
+  const dateCol = dateColumn<BeamRow>({ header: "Date", data: ({ date }) => date });
+  const locationCol = column<BeamRow>({
+    header: "Location",
+    data: (row) => ({
+      content: <SelectField value={row.location} onSelect={noop} options={locations} label="Location" />,
+      sortValue: row.location,
+    }),
+  });
+  const priceCol = numericColumn<BeamRow>({
+    header: "Price",
+    data: ({ priceInCents }) => ({
+      content: () => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
+      sortValue: priceInCents,
+    }),
+  });
+  const readOnlyPriceCol = numericColumn<BeamRow>({
+    header: "Read only Price",
+    data: ({ priceInCents }) => ({
+      content: () => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />,
+      sortValue: priceInCents,
+    }),
+  });
+  return (
+    <GridTable<BeamRow>
+      style={beamFixedStyle}
+      sorting={{ on: "client", initial: [1, "ASC"] }}
+      columns={[selectCol, favCol, statusCol, nameCol, tradeCol, locationCol, dateCol, priceCol, readOnlyPriceCol]}
+      rows={[
+        { kind: "header", id: "header" },
+        ...zeroTo(20).map((idx) => ({
+          kind: "data" as const,
+          id: `r:${idx + 1}`,
+          favorite: idx < 5,
+          commitmentName: `Commitment ${idx + 1}`,
+          date: `01/${idx + 1 > 9 ? idx + 1 : `0${idx + 1}`}/2020`,
+          status: "Success",
+          tradeCategories: ["Roofing", "Architecture", "Plumbing"],
+          priceInCents: 1234_56 + idx,
+          location: idx % 2 ? "l:1" : "l:2",
+        })),
       ]}
     />
   );
