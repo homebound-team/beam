@@ -156,8 +156,9 @@ export function NumberField(props: NumberFieldProps) {
 }
 
 export function formatValue(value: number, factor: number, numFractionDigits: number | undefined): number | undefined {
-  // `value` for percentage style inputs will be in a number format, i.e. if input value is 4%, the `value` param will equal `.04`
-  // We allow for decimal places
+  // We treat percents & cents as (mostly) integers, while useNumberField wants decimals, so
+  // undo that via `* factor` and `Math.round`, but also keep any specifically-requested `numFractionDigits`,
+  // i.e. for `type=percent value=12.34`, `value` will be `0.1234` that we want turn into `12.34`.
   const maybeAdjustForDecimals = numFractionDigits ? Math.pow(10, numFractionDigits) : 1;
   // Reverse the integer/decimal conversion
   return Number.isNaN(value) ? undefined : Math.round(value * factor * maybeAdjustForDecimals) / maybeAdjustForDecimals;
