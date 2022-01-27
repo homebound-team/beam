@@ -709,7 +709,7 @@ export function CustomEmptyCell() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
-  const fourthColumn: GridColumn<Row> = { header: "Really Empty", data: () => emptyCell };
+  const fourthColumn: GridColumn<Row> = { header: "Really Empty", data: emptyCell };
   return (
     <GridTable<Row>
       columns={[nameColumn, valueColumn, actionColumn, fourthColumn]}
