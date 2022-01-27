@@ -24,7 +24,7 @@ import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import tinycolor from "tinycolor2";
 import { defaultStyle } from ".";
 
-export type Kinded = { kind: string };
+export type Kinded = { kind: string } | { __typename: string };
 export type GridTableXss = Xss<Margin>;
 
 export const ASC = "ASC" as const;
@@ -776,10 +776,16 @@ function maybeAddCardColumns(sizes: string[], firstLastColumnWidth: number | und
 export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<K, V> ? T : never;
 
 /** A specific kind of row, including the GridDataRow props. */
-type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "kind", P> & {
+type GridRowKind<R extends Kinded, P extends KindOrTypename<R>["kind"]> = DiscriminateUnion<
+  KindOrTypename<R>,
+  "kind",
+  P
+> & {
   id: string;
   children: GridDataRow<R>[];
 };
+
+type KindOrTypename<R extends Kinded> = R extends { __typename: infer T } ? { kind: T } : R;
 
 /**
  * Defines how a single column will render each given row `kind` in `R`.
@@ -793,9 +799,9 @@ type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "
  * column being sorted, in which case we use the GridCellContent.value.
  */
 export type GridColumn<R extends Kinded, S = {}> = {
-  [K in R["kind"]]:
+  [K in KindOrTypename<R>["kind"]]:
     | string
-    | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
+    | (DiscriminateUnion<KindOrTypename<R>, "kind", K> extends { data: infer D }
         ? (data: D, row: GridRowKind<R, K>) => ReactNode | GridCellContent
         : (row: GridRowKind<R, K>) => ReactNode | GridCellContent);
 } & {
@@ -825,7 +831,7 @@ type RenderCellFn<R extends Kinded> = (
 
 /** Defines row-specific styling for each given row `kind` in `R` */
 export type GridRowStyles<R extends Kinded> = {
-  [P in R["kind"]]?: RowStyle<DiscriminateUnion<R, "kind", P>>;
+  [P in KindOrTypename<R>["kind"]]?: RowStyle<DiscriminateUnion<KindOrTypename<R>, "kind", P>>;
 };
 
 export interface RowStyle<R extends Kinded> {
@@ -895,15 +901,17 @@ type MaybeFn<T> = T | (() => T);
  * The presentation concerns instead mainly live in each GridColumn definition, which will format/render
  * each kind's data for that specific row+column (i.e. cell) combination.
  */
-export type GridDataRow<R extends Kinded> = {
-  kind: R["kind"];
-  /** Combined with the `kind` to determine a table wide React key. */
-  id: string;
-  /** A list of parent/grand-parent ids for collapsing parent/child rows. */
-  children?: GridDataRow<R>[];
-  /** Whether to pin this sort to the first/last of its parent's children. */
-  pin?: "first" | "last";
-} & DiscriminateUnion<R, "kind", R["kind"]>;
+export type GridDataRow<R extends Kinded> = R extends { kind: any }
+  ? {
+      kind: R["kind"];
+      /** Combined with the `kind` to determine a table wide React key. */
+      id: string;
+      /** A list of parent/grand-parent ids for collapsing parent/child rows. */
+      children?: GridDataRow<R>[];
+      /** Whether to pin this sort to the first/last of its parent's children. */
+      pin?: "first" | "last";
+    } & DiscriminateUnion<R, "kind", R["kind"]>
+  : never;
 
 interface GridRowProps<R extends Kinded, S> {
   as: RenderAs;
@@ -942,7 +950,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
   // We treat the "header" kind as special for "good defaults" styling
   const isHeader = row.kind === "header";
-  const rowStyle = rowStyles?.[row.kind];
+  const rowStyle = rowStyles?.[(row.kind ?? row.__typename) as R];
 
   const rowStyleCellCss = maybeApplyFunction(row, rowStyle?.cellCss);
   const rowCss = {

@@ -1251,6 +1251,23 @@ describe("GridTable", () => {
     expect(cellOf(r, "customTestId", 0, 0).textContent).toBe("Name");
     expect(row(r, 0, "customTestId").textContent).toBe("NameValue");
   });
+
+  it("can use __typename for the kid", async () => {
+    // Given the table with a column that defines the `kind: data` as an empty cell
+    type AuthorFragment = { __typename: "Author"; id: string; firstName: string };
+    type Row = { kind: "header" } | AuthorFragment;
+    const nameColumn: GridColumn<Row> = { header: () => "Name", author: emptyCell };
+    // And a table where the there is an `emptyCell` style specified
+    const r = await render(
+      <GridTable<Row>
+        columns={[nameColumn]}
+        rows={[simpleHeader, { __typename: "Author", id: "a:1", firstName: "a" }]}
+      />,
+    );
+    // Then the cell in this column should actually be empty
+    expect(cell(r, 1, 0)).toBeEmptyDOMElement();
+    expect(cell(r, 1, 1).textContent).toBe("1");
+  });
 });
 
 function Collapse({ id }: { id: string }) {
