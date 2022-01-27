@@ -599,6 +599,8 @@ function renderVirtual<R extends Kinded>(
     <Virtuoso
       overscan={5}
       ref={virtuosoRef}
+      // Add `minWidth: fit-content` to ensure a sticky header and the virtualized table body maintain same width
+      style={{ minWidth: "fit-content" }}
       components={{
         List: VirtualRoot(listStyle, columns, id, firstLastColumnWidth, xss),
         Footer: () => <div css={footerStyle} />,
