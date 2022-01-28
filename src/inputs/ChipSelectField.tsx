@@ -1,5 +1,5 @@
 import { camelCase } from "change-case";
-import React, { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { Key, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useButton, useFocus, useOverlayPosition, useSelect } from "react-aria";
 import { Item, Section, useListData, useSelectState } from "react-stately";
 import { Icon, maybeTooltip, resolveTooltip } from "src/components";
@@ -177,10 +177,8 @@ export function ChipSelectField<O, V extends Value>(
       if (selectedItem) {
         onSelect(key as V, selectedItem);
       }
-      // Per UX, when an option is selected then we want to call our `onBlur` callback and remove the focus styles. The field _is_ still in focus but that is only to retain tab position in the DOM.
-      // We cannot simply call `buttonRef.current.blur()` here because `state.isOpen === true` and we keep the visualFocus shown when the menu is open.
+      // Per UX, we do not want to show visual focus upon selection change.
       setVisualFocus(false);
-      maybeCall(onBlur);
     },
     onOpenChange: (isOpen) => {
       if (!isOpen) {
@@ -217,20 +215,15 @@ export function ChipSelectField<O, V extends Value>(
 
   // State management for the "Create new" flow with ChipTextField.
   const [showInput, setShowInput] = useState(false);
-  const removeCreateNewField = useCallback(() => {
-    setShowInput(false);
-    // Trigger onBlur to initiate any auto-saving behavior.
-    maybeCall(onBlur);
-  }, [setShowInput]);
 
   return (
     <>
       {showInput && onCreateNew && (
         <CreateNewField
-          onBlur={removeCreateNewField}
+          onBlur={() => setShowInput(false)}
           onEnter={async (value) => {
             await onCreateNew(value);
-            removeCreateNewField();
+            setShowInput(false);
           }}
           {...tid.createNewField}
         />
@@ -274,7 +267,6 @@ export function ChipSelectField<O, V extends Value>(
                 }}
                 onClick={() => {
                   onSelect(undefined as any, undefined as any);
-                  maybeCall(onBlur);
                   setIsClearFocused(false);
                 }}
                 aria-label="Remove"

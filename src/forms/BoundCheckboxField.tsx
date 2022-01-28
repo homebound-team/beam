@@ -31,7 +31,7 @@ export function BoundCheckboxField(props: BoundCheckboxFieldProps) {
           onChange={(selected) => {
             // We are triggering blur manually for checkbox fields due to its transactional nature
             onChange(selected);
-            field.blur();
+            field.maybeAutoSave();
           }}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           onFocus={() => {

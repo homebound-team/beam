@@ -8,6 +8,7 @@ import { Popover } from "src/components/internal";
 import { Css, Palette } from "src/Css";
 import { DatePickerOverlay } from "src/inputs/internal/DatePickerOverlay";
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
+import { Callback } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import "./DateField.css";
@@ -32,11 +33,12 @@ export interface DateFieldProps
   placeholder?: string;
   format?: keyof typeof dateFormats;
   iconLeft?: boolean;
-  /** 
+  /**
    * Set custom logic for individual dates or date ranges to be disabled in the picker
    * exposed from `react-day-picker`: https://react-day-picker.js.org/api/DayPicker#modifiers
-  */
+   */
   disabledDays?: Modifier;
+  onEnter?: Callback;
 }
 
 export function DateField(props: DateFieldProps) {
@@ -55,6 +57,7 @@ export function DateField(props: DateFieldProps) {
     format = "short",
     iconLeft = false,
     disabledDays,
+    onEnter,
     ...others
   } = props;
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -125,7 +128,7 @@ export function DateField(props: DateFieldProps) {
       },
       onKeyDown: (e) => {
         if (e.key === "Enter") {
-          // Blur the field when the user hits the enter key - as if they are "committing" the value and done with the field
+          maybeCall(onEnter);
           inputRef.current?.blur();
         }
       },

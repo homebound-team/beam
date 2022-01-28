@@ -3,13 +3,10 @@ import { Observer } from "mobx-react";
 import { Only } from "src/Css";
 import { TextAreaField, TextAreaFieldProps } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
-import { useTestIds } from "src/utils";
+import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundTextAreaFieldProps<X> = Omit<
-  TextAreaFieldProps<X>,
-  "value" | "onChange" | "onBlur" | "onFocus" | "label"
-> & {
+export type BoundTextAreaFieldProps<X> = Omit<TextAreaFieldProps<X>, "value" | "onChange" | "label"> & {
   // Make optional as it'll create a label from the field's key if not present
   label?: string;
   field: FieldState<any, string | null | undefined>;
@@ -19,7 +16,16 @@ export type BoundTextAreaFieldProps<X> = Omit<
 
 /** Wraps `TextAreaField` and binds it to a form field. */
 export function BoundTextAreaField<X extends Only<TextFieldXss, X>>(props: BoundTextAreaFieldProps<X>) {
-  const { field, readOnly, onChange = (value) => field.set(value), label = defaultLabel(field.key), ...others } = props;
+  const {
+    field,
+    readOnly,
+    onChange = (value) => field.set(value),
+    label = defaultLabel(field.key),
+    onFocus,
+    onBlur,
+    onEnter,
+    ...others
+  } = props;
   const testId = useTestIds(props, field.key);
   return (
     <Observer>
@@ -30,8 +36,18 @@ export function BoundTextAreaField<X extends Only<TextFieldXss, X>>(props: Bound
           onChange={onChange}
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
-          onBlur={() => field.blur()}
-          onFocus={() => field.focus()}
+          onBlur={() => {
+            field.blur();
+            maybeCall(onBlur);
+          }}
+          onFocus={() => {
+            field.focus();
+            maybeCall(onFocus);
+          }}
+          onEnter={() => {
+            maybeCall(onEnter);
+            field.maybeAutoSave();
+          }}
           {...testId}
           {...others}
         />

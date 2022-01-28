@@ -2,12 +2,13 @@ import { FieldState } from "@homebound/form-state/dist/formState";
 import { Observer } from "mobx-react";
 import { MultiSelectField, MultiSelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
+import { maybeCall } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type BoundMultiSelectFieldProps<O, V extends Value> = Omit<
   MultiSelectFieldProps<O, V>,
-  "values" | "onSelect" | "onBlur" | "onFocus" | "label"
+  "values" | "onSelect" | "label"
 > & {
   // Allow `onSelect` to be overridden to do more than just `field.set`.
   onSelect?: (values: V[], opts: O[]) => void;
@@ -40,6 +41,8 @@ export function BoundMultiSelectField<O, V extends Value>(
     getOptionLabel = (opt: O) => (opt as any).name, // if unset, assume O implements HasName
     onSelect = (value) => field.set(value),
     label = defaultLabel(field.key),
+    onBlur,
+    onFocus,
     ...others
   } = props;
   const testId = useTestIds(props, field.key);
@@ -49,15 +52,24 @@ export function BoundMultiSelectField<O, V extends Value>(
         <MultiSelectField<O, V>
           label={label}
           values={(field.value as V[]) ?? []}
-          onSelect={onSelect}
+          onSelect={(values, options) => {
+            onSelect(values, options);
+            field.maybeAutoSave();
+          }}
           options={options}
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           required={field.required}
           getOptionLabel={getOptionLabel}
           getOptionValue={getOptionValue}
-          onBlur={() => field.blur()}
-          onFocus={() => field.focus()}
+          onBlur={() => {
+            field.blur();
+            maybeCall(onBlur);
+          }}
+          onFocus={() => {
+            field.focus();
+            maybeCall(onFocus);
+          }}
           {...others}
           {...testId}
         />

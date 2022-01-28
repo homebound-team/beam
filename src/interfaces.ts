@@ -2,6 +2,7 @@ import type { PressEvent } from "@react-types/shared";
 import { ReactNode } from "react";
 import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Xss } from "src/Css";
+import { Callback } from "src/types";
 
 /** Base Interfaced */
 export interface BeamFocusableProps {
@@ -39,8 +40,9 @@ export interface BeamTextFieldProps<X> extends BeamFocusableProps, PresentationF
   /** Handler called when the interactive element state changes. */
   onChange: (value: string | undefined) => void;
   /** Called when the component loses focus, mostly for BoundTextField to use. */
-  onBlur?: () => void;
-  onFocus?: () => void;
+  onBlur?: Callback;
+  onFocus?: Callback;
+  onEnter?: Callback;
   readOnly?: boolean;
   placeholder?: string;
   /** Styles overrides */

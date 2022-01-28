@@ -1,4 +1,4 @@
-import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
+import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { click, render } from "@homebound/rtl-utils";
 import { BoundSwitchField } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
@@ -14,8 +14,13 @@ describe("BoundSwitchField", () => {
   });
 
   it("should uncheck when clicked", async () => {
+    const autoSave = jest.fn();
     // Given a rendered checked BoundSwitchField
-    const formState = createObjectState(formConfig, { isAvailable: true });
+    const formState: ObjectState<AuthorInput> = createObjectState(
+      formConfig,
+      { isAvailable: true },
+      { maybeAutoSave: () => autoSave(formState.isAvailable.value) },
+    );
     const { isAvailable } = await render(<BoundSwitchField field={formState.isAvailable} />);
 
     // When interacting with a BoundSwitchField
@@ -24,6 +29,8 @@ describe("BoundSwitchField", () => {
     // Then expect the checkbox to be unchecked and the formState to reflect that state
     expect(isAvailable()).not.toBeChecked();
     expect(formState.isAvailable.value).toBeFalsy();
+    // And auto save was triggered with the correct value
+    expect(autoSave).toBeCalledWith(false);
   });
 });
 

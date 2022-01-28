@@ -31,9 +31,6 @@ describe("SelectFieldTest", () => {
     click(r.getByRole("option", { name: "Three" }));
     // Then onSelect was called
     expect(onSelect).toHaveBeenCalledWith("3");
-    // And the field is no longer in focus
-    expect(r.age()).not.toHaveFocus();
-    expect(onBlur).toHaveBeenCalledTimes(1);
   });
 
   it("does not fire focus/blur when readOnly", async () => {

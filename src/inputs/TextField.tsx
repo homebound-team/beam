@@ -43,6 +43,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
       onKeyDown: (e) => {
         if (e.key === "Enter") {
           maybeCall(onEnter);
+          inputRef.current?.blur();
         }
       },
     },

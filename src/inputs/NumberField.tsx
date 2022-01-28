@@ -5,6 +5,8 @@ import { useLocale, useNumberField } from "react-aria";
 import { useNumberFieldState } from "react-stately";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Xss } from "src/Css";
+import { Callback } from "src/types";
+import { maybeCall } from "src/utils";
 import { TextFieldBase } from "./TextFieldBase";
 
 export type NumberFieldType = "cents" | "percent" | "basisPoints" | "days";
@@ -31,6 +33,7 @@ export interface NumberFieldProps {
   displayDirection?: boolean;
   numFractionDigits?: number;
   truncate?: boolean;
+  onEnter?: Callback;
 }
 
 export function NumberField(props: NumberFieldProps) {
@@ -53,6 +56,7 @@ export function NumberField(props: NumberFieldProps) {
     displayDirection = false,
     numFractionDigits,
     truncate = false,
+    onEnter,
     ...otherProps
   } = props;
 
@@ -110,7 +114,7 @@ export function NumberField(props: NumberFieldProps) {
     },
     onKeyDown: (e) => {
       if (e.key === "Enter") {
-        // Blur the field when the user hits the enter key - as if they are "committing" the value and done with the field
+        maybeCall(onEnter);
         inputRef.current?.blur();
       }
     },

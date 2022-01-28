@@ -39,7 +39,10 @@ export function BoundChipSelectField<O, V extends Value>(
         <ChipSelectField
           label={label}
           value={field.value ?? undefined}
-          onSelect={onSelect}
+          onSelect={(value) => {
+            onSelect(value);
+            field.maybeAutoSave();
+          }}
           getOptionLabel={getOptionLabel}
           getOptionValue={getOptionValue}
           onBlur={() => {
