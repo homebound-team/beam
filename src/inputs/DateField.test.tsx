@@ -130,18 +130,20 @@ describe("DateField", () => {
     expect(onBlur).toBeCalledTimes(1);
   });
 
-  it("fires on blur when pressing Enter key", async () => {
+  it("fires onEnter and blurs field when pressing Enter key", async () => {
     // Given a DateField with `jan2` as our date
+    const onEnter = jest.fn();
     const onBlur = jest.fn();
-    const r = await render(<DateField value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
+    const r = await render(<DateField value={jan2} label="Date" onChange={noop} onEnter={onEnter} onBlur={onBlur} />);
     // When changing the input value to an valid date
     r.date().focus();
+    expect(r.date()).toHaveFocus();
     // And when hitting the Enter key
     fireEvent.keyDown(r.date(), { key: "Enter" });
-    // Then field should be no longer in focus
-    expect(r.date()).not.toHaveFocus();
-    // And the onBlur callback should be triggered
+    // And the onEnter and onBlur callbacks should be triggered
+    expect(onEnter).toBeCalledTimes(1);
     expect(onBlur).toBeCalledTimes(1);
+    expect(r.date()).not.toHaveFocus();
   });
 
   it("resets to previous date if user enters invalid value and does not fire onChange", async () => {

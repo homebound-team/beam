@@ -39,8 +39,7 @@ export function BoundTextField<X extends Only<TextFieldXss, X>>(props: BoundText
           onFocus={() => field.focus()}
           onEnter={() => {
             maybeCall(onEnter);
-            // Blur the field when the user hits the enter key - as if they are "committing" the value and done with the field
-            field.blur();
+            field.maybeAutoSave();
           }}
           {...testId}
           {...others}

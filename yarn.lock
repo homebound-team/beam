@@ -2422,10 +2422,10 @@
   dependencies:
     tslib "^2.1.0"
 
-"@homebound/form-state@^2.2.13":
-  version "2.2.13"
-  resolved "https://registry.yarnpkg.com/@homebound/form-state/-/form-state-2.2.13.tgz#1e8df19306ced4d07018e7a284cdeee72e10833e"
-  integrity sha512-pezynd1M3iWQ7h8DR86HgrRWEmsyTYeyMB/C+bJ+nx5RFIGV9lzJpEKRLNejv3COMQJqvm0haufpZXA0M46L6Q==
+"@homebound/form-state@2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@homebound/form-state/-/form-state-2.4.1.tgz#1526385916611b713dbe9b9b072cd46b5ab3ebef"
+  integrity sha512-8/xmpbKi0THL4iOfUHhxQCd0YwyI6JLm5fXOEGJx7WFPV4dlSMkP4whhS7pm2ZR4aZcPpcIyCk4NRkUmmUwhgA==
   dependencies:
     fast-deep-equal "^3.1.3"
     is-plain-object "^5.0.0"
@@ -2464,14 +2464,7 @@
     "@babel/runtime" "^7.6.2"
     intl-messageformat "^9.6.12"
 
-"@internationalized/number@^3.0.2":
-  version "3.0.3"
-  resolved "https://registry.npmjs.org/@internationalized/number/-/number-3.0.3.tgz"
-  integrity sha512-ewFoVvsxSyd9QZnknvOWPjirYqdMQhXTeDhJg3hM6C/FeZt0banpGH1nZ0SGMZXHz8NK9uAa2KVIq+jqAIOg4w==
-  dependencies:
-    "@babel/runtime" "^7.6.2"
-
-"@internationalized/number@^3.0.3":
+"@internationalized/number@^3.0.2", "@internationalized/number@^3.0.3":
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@internationalized/number/-/number-3.0.3.tgz#d29003dffdff54ca6f2287ec0cb77ff3d045478f"
   integrity sha512-ewFoVvsxSyd9QZnknvOWPjirYqdMQhXTeDhJg3hM6C/FeZt0banpGH1nZ0SGMZXHz8NK9uAa2KVIq+jqAIOg4w==

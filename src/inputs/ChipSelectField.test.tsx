@@ -50,8 +50,6 @@ describe("ChipSelectField", () => {
     expect(r.queryByTestId("chipSelectField_clearButton")).toBeFalsy();
     // And onSelect to be called
     expect(onSelect).toBeCalledWith([undefined, undefined]);
-    // And the `onBlur` callback is triggered
-    expect(onBlur).toBeCalledTimes(1);
   });
 
   it("can select options", async () => {
@@ -105,8 +103,6 @@ describe("ChipSelectField", () => {
     click(r.getByRole("option", { name: "Basketball" }));
     // Then the focus is returned to the field
     expect(onFocus).toBeCalledTimes(2);
-    // And immediately blurred.
-    expect(onBlur).toBeCalledTimes(1);
   });
 
   it("can disable field", async () => {
@@ -146,8 +142,6 @@ describe("ChipSelectField", () => {
     expect(r.queryByTestId("chipSelectField_createNewField")).toBeFalsy();
     // And onCreateNew to be called with text field value
     expect(onCreateNew).toBeCalledWith(newOpt.name);
-    // And triggers onBlur again
-    expect(onBlur).toBeCalledTimes(1);
   });
 
   it("can escape out of Add New field", async () => {

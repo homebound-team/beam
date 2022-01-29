@@ -82,7 +82,6 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     const initOptions = Array.isArray(maybeOptions) ? maybeOptions : maybeOptions.initial;
     const selectedOptions = initOptions.filter((o) => values.includes(getOptionValue(o)));
     return {
-      isOpen: false,
       selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
       inputValue: getInputValue(
         initOptions.filter((o) => values?.includes(getOptionValue(o))),
@@ -109,7 +108,6 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     if (inputValue !== fieldState.inputValue || fieldState.filteredOptions.length !== fieldState.allOptions.length) {
       setFieldState((prevState) => ({
         ...prevState,
-        isOpen: false,
         inputValue,
         filteredOptions: prevState.allOptions,
       }));
@@ -133,7 +131,6 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     if (multiselect && keys.size === 0) {
       setFieldState({
         ...fieldState,
-        isOpen: true,
         inputValue: state.isOpen ? "" : nothingSelectedText,
         selectedKeys: [],
         selectedOptions: [],
@@ -148,8 +145,6 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
 
     setFieldState((prevState) => ({
       ...prevState,
-      // Close menu upon selection change only for Single selection mode
-      isOpen: multiselect,
       // If menu is open then reset inputValue to "". Otherwise set inputValue depending on number of options selected.
       inputValue:
         multiselect && (state.isOpen || selectedKeys.length > 1)
@@ -165,8 +160,8 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     selectionChanged && onSelect(selectedKeys.map(keyToValue) as V[], selectedOptions);
 
     if (!multiselect) {
-      // When a single select menu item changes, then blur the field AFTER `onSelect` has been called
-      inputRef.current?.blur();
+      // Close menu upon selection change only for Single selection mode
+      state.close();
     }
   }
 
@@ -203,7 +198,6 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
       ...prevState,
       // When using the multiselect field, always empty the input upon open.
       inputValue: multiselect && isOpen ? "" : prevState.inputValue,
-      isOpen,
     }));
   }
 
@@ -234,7 +228,6 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
 
   const state = useComboBoxState<any>({
     ...comboBoxProps,
-
     allowsEmptyCollection: true,
     // useComboBoxState.onSelectionChange will be executed if a keyboard interaction (Enter key) is used to select an item
     onSelectionChange: (key) => {
@@ -387,7 +380,6 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
 }
 
 type FieldState<O> = {
-  isOpen: boolean;
   selectedKeys: Key[];
   inputValue: string;
   filteredOptions: O[];

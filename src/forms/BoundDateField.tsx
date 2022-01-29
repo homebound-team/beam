@@ -1,10 +1,10 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { DateField, DateFieldProps } from "src/inputs";
-import { useTestIds } from "src/utils";
+import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundDateFieldProps = Omit<DateFieldProps, "label" | "value" | "onChange" | "onBlur" | "onFocus"> & {
+export type BoundDateFieldProps = Omit<DateFieldProps, "label" | "value" | "onChange"> & {
   field: FieldState<any, Date | null | undefined>;
   // Make optional as it'll create a label from the field's key if not present
   label?: string;
@@ -14,7 +14,15 @@ export type BoundDateFieldProps = Omit<DateFieldProps, "label" | "value" | "onCh
 
 /** Wraps `TextField` and binds it to a form field. */
 export function BoundDateField(props: BoundDateFieldProps) {
-  const { field, onChange = (value) => field.set(value), label = defaultLabel(field.key), ...others } = props;
+  const {
+    field,
+    onChange = (value) => field.set(value),
+    label = defaultLabel(field.key),
+    onBlur,
+    onFocus,
+    onEnter,
+    ...others
+  } = props;
   const testId = useTestIds(props, field.key);
   return (
     <Observer>
@@ -22,11 +30,24 @@ export function BoundDateField(props: BoundDateFieldProps) {
         <DateField
           label={label}
           value={field.value || undefined}
-          onChange={onChange}
+          onChange={(value) => {
+            onChange(value);
+            field.maybeAutoSave();
+          }}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           required={field.required}
-          onBlur={() => field.blur()}
-          onFocus={() => field.focus()}
+          onBlur={() => {
+            field.blur();
+            maybeCall(onBlur);
+          }}
+          onFocus={() => {
+            field.focus();
+            maybeCall(onFocus);
+          }}
+          onEnter={() => {
+            maybeCall(onEnter);
+            field.maybeAutoSave();
+          }}
           {...testId}
           {...others}
         />

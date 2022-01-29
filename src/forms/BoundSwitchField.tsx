@@ -23,9 +23,8 @@ export function BoundSwitchField(props: BoundSwitchFieldProps) {
           labelStyle="form"
           selected={field.value ?? false}
           onChange={(selected) => {
-            // We are triggering blur manually for checkbox fields due to its transactional nature
             onChange(selected);
-            field.blur();
+            field.maybeAutoSave();
           }}
           // errorMsg={field.touched ? field.errors.join(" ") : undefined}
           {...testId}

@@ -2,13 +2,11 @@ import { FieldState } from "@homebound/form-state/dist/formState";
 import { Observer } from "mobx-react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
+import { maybeCall } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
 
-export type BoundSelectFieldProps<T, V extends Value> = Omit<
-  SelectFieldProps<T, V>,
-  "value" | "onSelect" | "onBlur" | "onFocus" | "label"
-> & {
+export type BoundSelectFieldProps<T, V extends Value> = Omit<SelectFieldProps<T, V>, "value" | "onSelect" | "label"> & {
   // Allow `onSelect` to be overridden to do more than just `field.set`.
   onSelect?: (option: V | undefined) => void;
   field: FieldState<any, V | null | undefined>;
@@ -40,6 +38,8 @@ export function BoundSelectField<T extends object, V extends Value>(
     getOptionLabel = (opt: T) => (opt as any).name, // if unset, assume O implements HasName
     onSelect = (value) => field.set(value),
     label = defaultLabel(field.key),
+    onBlur,
+    onFocus,
     ...others
   } = props;
   const testId = useTestIds(props, field.key);
@@ -49,15 +49,24 @@ export function BoundSelectField<T extends object, V extends Value>(
         <SelectField<T, V>
           label={label}
           value={field.value ?? undefined}
-          onSelect={onSelect}
+          onSelect={(value) => {
+            onSelect(value);
+            field.maybeAutoSave();
+          }}
           options={options}
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           required={field.required}
           getOptionLabel={getOptionLabel}
           getOptionValue={getOptionValue}
-          onBlur={() => field.blur()}
-          onFocus={() => field.focus()}
+          onBlur={() => {
+            field.blur();
+            maybeCall(onBlur);
+          }}
+          onFocus={() => {
+            field.focus();
+            maybeCall(onFocus);
+          }}
           {...others}
           {...testId}
         />

@@ -13,11 +13,20 @@ describe("BoundChipSelectField", () => {
     // Then expect it to render value and label
     expect(r.favoriteSport()).toHaveTextContent("Soccer");
     expect(r.favoriteSport_label()).toHaveTextContent("Favorite Sport");
+
+    // Should not have a Create New option
+    click(r.favoriteSport);
+    expect(r.queryByRole("option", { name: "Create new" })).toBeFalsy();
   });
 
-  it("can select a value", async () => {
+  it("can select a value and fire auto save", async () => {
     // Given a BoundChipSelectField within a FormState without an existing value
-    const formState = createObjectState(formConfig, {});
+    const autoSave = jest.fn();
+    const formState: ObjectState<AuthorInput> = createObjectState(
+      formConfig,
+      {},
+      { maybeAutoSave: () => autoSave(formState.favoriteSport.value) },
+    );
     const r = await render(<BoundChipSelectField field={formState.favoriteSport} options={sports} />);
 
     expect(r.favoriteSport()).toHaveTextContent("Select an option");
@@ -26,6 +35,40 @@ describe("BoundChipSelectField", () => {
     click(r.getByRole("option", { name: "Basketball" }));
     // Then expect it to update
     expect(r.favoriteSport()).toHaveTextContent("Basketball");
+    // And expect auto save to be called with the new value
+    expect(autoSave).toBeCalledWith("s:3");
+  });
+
+  it("fires auto save after `onCreateNew`", async () => {
+    // Given a BoundChipSelectField within a FormState without an existing value
+    const autoSave = jest.fn();
+    const formState: ObjectState<AuthorInput> = createObjectState(
+      formConfig,
+      {},
+      { maybeAutoSave: () => autoSave(formState.favoriteSport.value) },
+    );
+    const r = await render(
+      <BoundChipSelectField
+        field={formState.favoriteSport}
+        options={sports}
+        onCreateNew={async (value) => {
+          formState.favoriteSport.set(value);
+        }}
+      />,
+    );
+
+    expect(r.favoriteSport()).toHaveTextContent("Select an option");
+    // When selecting an option
+    click(r.favoriteSport);
+    click(r.getByRole("option", { name: "Create new" }));
+    // And when entering a new value
+    fireEvent.input(r.favoriteSport_createNewField(), { target: { textContent: "newId" } });
+    // And hitting the Enter key
+    fireEvent.keyDown(r.favoriteSport_createNewField(), { key: "Enter" });
+    // Wait for the async request to finish
+    await wait();
+    // And expect auto save to be called with the new value
+    expect(autoSave).toBeCalledWith("newId");
   });
 
   it("can fire callbacks", async () => {
@@ -53,35 +96,6 @@ describe("BoundChipSelectField", () => {
 
     // Then expect that testid to be set
     expect(r.customTestId()).toBeTruthy();
-  });
-
-  it("has latest field value when onBlur is called", async () => {
-    // Given a FormState/ObjectState with an onBlur callback
-    const onBlur = jest.fn();
-    const formState: ObjectState<AuthorInput> = createObjectState(
-      formConfig,
-      {},
-      { onBlur: () => onBlur(formState.favoriteSport.value) },
-    );
-    const r = await render(
-      <BoundChipSelectField
-        field={formState.favoriteSport}
-        options={sports}
-        onCreateNew={async () => {
-          // set the new value
-          formState.favoriteSport.set("newId");
-        }}
-      />,
-    );
-    // When creating a new option
-    click(r.favoriteSport);
-    click(r.getByRole("option", { name: "Create new" }));
-    fireEvent.input(r.favoriteSport_createNewField(), { target: { textContent: "New Option" } });
-    // And hitting the Enter key
-    fireEvent.keyDown(r.favoriteSport_createNewField(), { key: "Enter" });
-    await wait();
-    // Then expect onBlur to be called with the newId.
-    expect(onBlur).toBeCalledWith("newId");
   });
 });
 

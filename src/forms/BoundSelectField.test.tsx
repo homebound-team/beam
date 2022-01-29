@@ -46,13 +46,13 @@ describe("BoundSelectField", () => {
     expect(r.isAvailable()).toHaveValue("");
   });
 
-  it("has the latest value when onBlur is triggered", async () => {
+  it("has the latest value when onChange is triggered", async () => {
     // Given a FormState/ObjectState with an onBlur callback
-    const onBlur = jest.fn();
+    const autoSave = jest.fn();
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,
       { favoriteSport: "s:1" },
-      { onBlur: () => onBlur(author.favoriteSport.value) },
+      { maybeAutoSave: () => autoSave(author.favoriteSport.value) },
     );
     const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
     // When changing the value
@@ -60,7 +60,7 @@ describe("BoundSelectField", () => {
     click(r.getByRole("option", { name: "Soccer" }));
 
     // Then formState has the latest value when onBlur is called
-    expect(onBlur).toBeCalledWith("s:2");
+    expect(autoSave).toBeCalledWith("s:2");
   });
 });
 

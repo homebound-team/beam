@@ -85,15 +85,18 @@ describe("TextFieldTest", () => {
 
   it("can trigger onEnter callback", async () => {
     const onEnter = jest.fn();
+    const onBlur = jest.fn();
     // Given a Textfield
-    const r = await render(<TestTextField value="foo" onEnter={onEnter} />);
+    const r = await render(<TestTextField value="foo" onEnter={onEnter} onBlur={onBlur} />);
     // With focus
     r.name().focus();
     expect(r.name()).toHaveFocus();
     // When hitting the Enter key
     fireEvent.keyDown(r.name(), { key: "Enter" });
-    // Then onEnter should be called
+    // Then onEnter and onBlur callbacks should be called
     expect(onEnter).toHaveBeenCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledTimes(1);
+    expect(r.name()).not.toHaveFocus();
   });
 });
 

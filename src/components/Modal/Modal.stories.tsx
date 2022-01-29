@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Button, ModalBody, ModalFooter, ModalHeader, ModalProps, OpenModal, useModal } from "src/components/index";
 import { Modal } from "src/components/Modal/Modal";
 import { TestModalContent, TestModalContentProps, TestModalFilterTable } from "src/components/Modal/TestModalContent";
+import { FormStateApp } from "src/forms/FormStateApp";
 import { noop } from "src/utils/index";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 
@@ -69,6 +70,22 @@ export const OpenModalKeepOpen = () => {
     </OpenModal>
   );
 };
+
+export function ModalForm() {
+  return (
+    <OpenModal size="xl">
+      <>
+        <ModalHeader>Form Example</ModalHeader>
+        <ModalBody>
+          <FormStateApp />
+        </ModalBody>
+        <ModalFooter>
+          <Button label="Submit" />
+        </ModalFooter>
+      </>
+    </OpenModal>
+  );
+}
 
 interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling">, TestModalContentProps {}
 
