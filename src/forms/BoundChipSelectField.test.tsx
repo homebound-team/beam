@@ -2,7 +2,7 @@ import { createObjectState, ObjectConfig, ObjectState, required } from "@homebou
 import { fireEvent } from "@testing-library/react";
 import { BoundChipSelectField } from "src";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { click, render } from "src/utils/rtl";
+import { click, render, wait } from "src/utils/rtl";
 
 describe("BoundChipSelectField", () => {
   it("renders", async () => {
@@ -13,6 +13,10 @@ describe("BoundChipSelectField", () => {
     // Then expect it to render value and label
     expect(r.favoriteSport()).toHaveTextContent("Soccer");
     expect(r.favoriteSport_label()).toHaveTextContent("Favorite Sport");
+
+    // Should not have a Create New option
+    click(r.favoriteSport);
+    expect(r.queryByRole("option", { name: "Create new" })).toBeFalsy();
   });
 
   it("can select a value and fire auto save", async () => {
@@ -33,6 +37,38 @@ describe("BoundChipSelectField", () => {
     expect(r.favoriteSport()).toHaveTextContent("Basketball");
     // And expect auto save to be called with the new value
     expect(autoSave).toBeCalledWith("s:3");
+  });
+
+  it("fires auto save after `onCreateNew`", async () => {
+    // Given a BoundChipSelectField within a FormState without an existing value
+    const autoSave = jest.fn();
+    const formState: ObjectState<AuthorInput> = createObjectState(
+      formConfig,
+      {},
+      { maybeAutoSave: () => autoSave(formState.favoriteSport.value) },
+    );
+    const r = await render(
+      <BoundChipSelectField
+        field={formState.favoriteSport}
+        options={sports}
+        onCreateNew={async (value) => {
+          formState.favoriteSport.set(value);
+        }}
+      />,
+    );
+
+    expect(r.favoriteSport()).toHaveTextContent("Select an option");
+    // When selecting an option
+    click(r.favoriteSport);
+    click(r.getByRole("option", { name: "Create new" }));
+    // And when entering a new value
+    fireEvent.input(r.favoriteSport_createNewField(), { target: { textContent: "newId" } });
+    // And hitting the Enter key
+    fireEvent.keyDown(r.favoriteSport_createNewField(), { key: "Enter" });
+    // Wait for the async request to finish
+    await wait();
+    // And expect auto save to be called with the new value
+    expect(autoSave).toBeCalledWith("newId");
   });
 
   it("can fire callbacks", async () => {

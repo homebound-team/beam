@@ -29,6 +29,7 @@ export function BoundChipSelectField<O, V extends Value>(
     label = defaultLabel(field.key),
     onBlur,
     onFocus,
+    onCreateNew,
     ...others
   } = props;
   const testId = useTestIds(props, field.key);
@@ -53,6 +54,14 @@ export function BoundChipSelectField<O, V extends Value>(
             field.focus();
             maybeCall(onFocus);
           }}
+          onCreateNew={
+            onCreateNew
+              ? async (v) => {
+                  await onCreateNew(v);
+                  field.maybeAutoSave();
+                }
+              : undefined
+          }
           {...others}
           {...testId}
         />
