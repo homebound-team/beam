@@ -31,6 +31,9 @@ describe("SelectFieldTest", () => {
     click(r.getByRole("option", { name: "Three" }));
     // Then onSelect was called
     expect(onSelect).toHaveBeenCalledWith("3");
+    // And the field has not been blurred (regression test to prevent SelectField's list box from opening back up after selecting an option)
+    expect(r.age()).toHaveFocus();
+    expect(onBlur).not.toHaveBeenCalled();
   });
 
   it("does not fire focus/blur when readOnly", async () => {
