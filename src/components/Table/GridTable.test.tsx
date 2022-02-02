@@ -1241,7 +1241,7 @@ describe("GridTable", () => {
     expect(cellAnd(r, 1, 0, "collapse")).toBeTruthy();
     expect(cell(r, 1, 1).textContent).toBe("parent 1");
     expect(rowAnd(r, 2, "collapse")).toBeTruthy();
-    expect(cellOf(r, "grid-table", 2, 1).textContent).toBe("child p1c1");
+    expect(cellOf(r, "gridTable", 2, 1).textContent).toBe("child p1c1");
     expect(row(r, 3).querySelector("[data-testid='collapse']")).toBeFalsy();
     expect(cell(r, 3, 1).textContent).toBe("grandchild p1c1g1");
   });

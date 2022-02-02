@@ -66,7 +66,7 @@ export function render(
 }
 
 export function cell(r: RenderResult, row: number, column: number): HTMLElement {
-  return cellOf(r, "grid-table", row, column);
+  return cellOf(r, "gridTable", row, column);
 }
 
 export function cellOf(r: RenderResult, tableTestId: string, rowNum: number, column: number): HTMLElement {
@@ -83,7 +83,7 @@ export function cellAnd(r: RenderResult, row: number, column: number, testId: st
   );
 }
 
-export function row(r: RenderResult, row: number, tableTestId: string = "grid-table"): HTMLElement {
+export function row(r: RenderResult, row: number, tableTestId: string = "gridTable"): HTMLElement {
   const nonChromeRows = Array.from(r.getByTestId(tableTestId).childNodes).filter(
     (node) => !("chrome" in (node as HTMLElement).dataset),
   );
