@@ -238,7 +238,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   props: GridTableProps<R, S, X>,
 ) {
   const {
-    id = "grid-table",
+    id = "gridTable",
     as = "div",
     columns,
     rows,
