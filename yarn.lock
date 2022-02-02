@@ -2422,10 +2422,10 @@
   dependencies:
     tslib "^2.1.0"
 
-"@homebound/form-state@2.4.1":
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/@homebound/form-state/-/form-state-2.4.1.tgz#1526385916611b713dbe9b9b072cd46b5ab3ebef"
-  integrity sha512-8/xmpbKi0THL4iOfUHhxQCd0YwyI6JLm5fXOEGJx7WFPV4dlSMkP4whhS7pm2ZR4aZcPpcIyCk4NRkUmmUwhgA==
+"@homebound/form-state@2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@homebound/form-state/-/form-state-2.5.0.tgz#5242ae25a24bdf32297bef8b27e211e82dfc9748"
+  integrity sha512-aiwzZb2LhtOItq2uo24BNYHcfYnZzVj0L3reCbfPCNheAU8O1lppfPLvKWf+asmDahxK0p+4G8gaDXIy46sTtA==
   dependencies:
     fast-deep-equal "^3.1.3"
     is-plain-object "^5.0.0"
