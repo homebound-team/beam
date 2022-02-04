@@ -8,7 +8,7 @@ export interface FormHeadingProps {
 }
 
 export function FormHeading(props: FormHeadingProps) {
-  const { title, xss, isFirst = false } = props;
+  const { title, xss, isFirst = false, ...others } = props;
   return (
     <h3
       css={{
@@ -17,6 +17,7 @@ export function FormHeading(props: FormHeadingProps) {
         ...(!isFirst && Css.mt4.$),
         ...xss,
       }}
+      {...others}
     >
       {title}
     </h3>
