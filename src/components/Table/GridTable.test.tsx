@@ -731,7 +731,7 @@ describe("GridTable", () => {
   it("displays a custom fallback if only a header", async () => {
     const fallbackMessage = "No special rows found";
     const r = await render(<GridTable {...{ columns, rows: [simpleHeader], fallbackMessage }} />);
-    expect(r.firstElement).toHaveTextContent(fallbackMessage);
+    expect(row(r, 1)).toHaveTextContent(fallbackMessage);
   });
 
   it("displays a default fallback if only a header", async () => {
