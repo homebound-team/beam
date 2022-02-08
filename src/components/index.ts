@@ -1,7 +1,6 @@
 export * from "src/components/Chip";
 export * from "src/components/Chips";
 export * from "src/components/Table/GridTable";
-export { makeOpenOrCloseCard, makeSpacer, maybeAddCardPadding } from "src/components/Table/nestedCards";
 export * from "src/components/ToggleChip";
 export * from "src/components/ToggleChips";
 export * from "./Alert";

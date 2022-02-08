@@ -16,7 +16,7 @@ import { navLink } from "src/components/CssReset";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
-import { maybeAddCardPadding, NestedCards } from "src/components/Table/nestedCards";
+import { getNestedCardStyles, isLeafRow, NestedCards, wrapCard } from "src/components/Table/nestedCards";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
 import { SortState, useSortState } from "src/components/Table/useSortState";
@@ -291,8 +291,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : { sorting };
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
-      const openCards = row.kind === "header" ? headerCards : rowCards;
-
       return (
         <GridCollapseContext.Provider
           key={`${row.kind}-${row.id}`}
@@ -307,7 +305,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
               rowStyles,
               stickyHeader,
               stickyOffset,
-              openCards: openCards ? openCards.currentOpenCards() : undefined,
+              openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
               columnSizes,
               ...sortProps,
             }}
@@ -321,9 +319,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const filteredRows: RowTuple<R>[] = [];
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
-    // for the header and row (non-header rows) cards.
-    const headerCards = !!style.nestedCards && new NestedCards(columns, headerRows, style.nestedCards);
-    const rowCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style.nestedCards);
+    const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style.nestedCards);
 
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
@@ -337,46 +333,36 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       let isCard = false;
 
       if (matches) {
-        isCard = rowCards && rowCards.maybeOpenCard(row);
+        isCard = nestedCards && nestedCards.maybeOpenCard(row);
         filteredRows.push([row, makeRowComponent(row)]);
       }
 
       const isCollapsed = collapsedIds.includes(row.id);
       if (!isCollapsed && !!row.children?.length) {
-        rowCards && matches && rowCards.addSpacer();
+        nestedCards && matches && nestedCards.addSpacer();
         visitRows(row.children, isCard);
       }
 
-      isCard && rowCards && rowCards.closeCard();
+      !isLeafRow(row) && isCard && nestedCards && nestedCards.closeCard();
     }
 
     function visitRows(rows: GridDataRow<R>[], addSpacer: boolean): void {
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
-          // Flag to determine if the header has nested card styles.
-          // This will determine if we should include opening and closing
-          // Chrome rows.
-          const isHeaderNested = !!style.nestedCards?.kinds["header"];
-
-          isHeaderNested && headerCards && headerCards.maybeOpenCard(row);
           headerRows.push([row, makeRowComponent(row)]);
-          isHeaderNested && headerCards && headerCards.closeCard();
-
-          isHeaderNested && headerCards && headerCards.done();
-
           return;
         }
 
         visit(row);
 
-        addSpacer && rowCards && i !== length - 1 && rowCards.addSpacer();
+        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
       });
     }
 
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
-    visitRows(maybeSorted, !!rowCards);
-    rowCards && rowCards.done();
+    visitRows(maybeSorted, !!nestedCards);
+    nestedCards && nestedCards.done();
 
     return [headerRows, filteredRows];
   }, [
@@ -461,48 +447,18 @@ function renderDiv<R extends Kinded>(
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): ReactElement {
-  // We must determine if the header is using nested card styles to account for
-  // the opening and closing Chrome rows.
-  const isNestedCardStyleHeader = !!style.nestedCards?.kinds["header"];
-  /*
-    Determine at what CSS selector index is the first non header row. Note that
-    CSS selectors are not zero-based, unlike JavaScript, so we must add 1 to
-    what we'd normally expect.
-
-    Ex: When we don't have nestedCard styled headers, then we don't have opening
-    and closing Chrome rows. Therefore, the first non-header row is the second
-    row and since CSS selectors are not zero-based, we are aiming for a value
-    of 2 (1 + 1).
-
-    Ex: When we have nestedCard styled headers, then we have opening and closing
-    Chrome rows. Therefore, the first non-header row is the fourth row because:
-    - Row 1 is the opening Chrome Row
-    - Row 2 is the header
-    - Row 3 is the closing Chrome Row
-    - Row 4 is the first non-header row
-    And since CSS selectors are not zero-based, we are aiming for a value of 4
-    (3 + 1).
-  */
-  const firstNonHeaderRowIndex = (!isNestedCardStyleHeader ? 1 : 3) + 1;
-
   return (
     <div
       css={{
         // Ensure all rows extend the same width
         ...Css.mw("fit-content").$,
         /*
-          Using n + (firstNonHeaderRowIndex + 1) here to target all rows that
-          are after the first non-header row. Since n starts at 0, we can use
+          Using (n + 3) here to target all rows that are after the first non-header row. Since n starts at 0, we can use
           the + operator as an offset.
-
           Inspired by: https://stackoverflow.com/a/25005740/2551333
         */
-        ...(style.betweenRowsCss
-          ? Css.addIn(`& > div:nth-of-type(n + ${firstNonHeaderRowIndex + 1}) > *`, style.betweenRowsCss).$
-          : {}),
-        ...(style.firstNonHeaderRowCss
-          ? Css.addIn(`& > div:nth-of-type(${firstNonHeaderRowIndex}) > *`, style.firstNonHeaderRowCss).$
-          : {}),
+        ...(style.betweenRowsCss ? Css.addIn(`& > div:nth-of-type(n+3) > *`, style.betweenRowsCss).$ : {}),
+        ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:nth-of-type(2) > *`, style.firstNonHeaderRowCss).$ : {}),
         ...style.rootCss,
         ...xss,
       }}
@@ -607,18 +563,6 @@ function renderVirtual<R extends Kinded>(
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
-      itemSize={(el) => {
-        const maybeContentsDiv = el.firstElementChild! as HTMLElement;
-
-        // If it is a chrome row, then we are not using `display: contents;`, return the height of this element.
-        if ("chrome" in maybeContentsDiv.dataset) {
-          return maybeContentsDiv.getBoundingClientRect().height || 1;
-        }
-
-        // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
-        // so instead drill into the 1st real content cell.
-        return (maybeContentsDiv.firstElementChild! as HTMLElement).getBoundingClientRect().height;
-      }}
       itemContent={(index) => {
         // Since we have two arrays of rows: `headerRows` and `filteredRow` we
         // must determine which one to render.
@@ -736,7 +680,7 @@ export function calcColumnSizes(columns: GridColumn<any>[], firstLastColumnWidth
         throw new Error("Beam Table column width definition only supports px, percentage, or fr units");
       }
     },
-    { claimedPercentages: 0, claimedPixels: firstLastColumnWidth ? firstLastColumnWidth * 2 : 0, totalFr: 0 },
+    { claimedPercentages: 0, claimedPixels: 0, totalFr: 0 },
   );
 
   // This is our "fake but for some reason it lines up better" fr calc
@@ -944,20 +888,6 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   // We treat the "header" kind as special for "good defaults" styling
   const isHeader = row.kind === "header";
   const rowStyle = rowStyles?.[row.kind];
-
-  const rowStyleCellCss = maybeApplyFunction(row, rowStyle?.cellCss);
-  const rowCss = {
-    // For virtual tables use `display: flex` to keep all cells on the same row, but use `flexNone` to ensure the cells stay their defined widths
-    ...(as === "table" ? {} : Css.df.addIn("&>*", Css.flexNone.$).$),
-    ...((rowStyle?.rowLink || rowStyle?.onClick) &&
-      style.rowHoverColor && {
-        // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
-        "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
-      }),
-    ...maybeApplyFunction(row, rowStyle?.rowCss),
-    ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined),
-  };
-
   const Row = as === "table" ? "tr" : "div";
 
   const openCardStyles =
@@ -967,17 +897,26 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           .map((openCardKind) => style.nestedCards!.kinds[openCardKind])
           .filter((style) => style)
       : undefined;
-  const currentCard = openCardStyles && openCardStyles[openCardStyles.length - 1];
-  let currentColspan = 1;
-  const maybeStickyHeaderStyles = isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined;
 
-  return (
-    <Row css={rowCss} {...others}>
-      {openCardStyles &&
-        maybeAddCardPadding(openCardStyles, "first", {
-          ...maybeStickyHeaderStyles,
-          ...(columnSizes ? Css.w(columnSizes[0]).$ : {}),
-        })}
+  const rowStyleCellCss = maybeApplyFunction(row, rowStyle?.cellCss);
+  const rowCss = {
+    // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `flexNone` to ensure they stay their defined widths
+    ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.flexNone.$).$),
+    ...((rowStyle?.rowLink || rowStyle?.onClick) &&
+      style.rowHoverColor && {
+        // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
+        "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
+      }),
+    ...maybeApplyFunction(row, rowStyle?.rowCss),
+    // Maybe add the sticky header styles
+    ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined),
+    ...getNestedCardStyles(row, openCardStyles, style),
+  };
+
+  let currentColspan = 1;
+
+  const rowNode = (
+    <Row css={rowCss} {...others} data-gridrow>
       {columns.map((column, columnIndex) => {
         // Decrement colspan count and skip if greater than 1.
         if (currentColspan > 1) {
@@ -1026,8 +965,6 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
-          // If we're within a card, use its background color
-          ...(currentCard && Css.bgColor(currentCard.bgColor).$),
           // And finally the specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
           // Define the width of the column on each cell. Supports col spans.
@@ -1049,13 +986,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
         return renderFn(columnIndex, cellCss, content, row, rowStyle);
       })}
-      {openCardStyles &&
-        maybeAddCardPadding(openCardStyles, "final", {
-          ...maybeStickyHeaderStyles,
-          ...(columnSizes ? Css.w(columnSizes[columnSizes.length - 1]).$ : {}),
-        })}
     </Row>
   );
+
+  return openCardStyles && openCardStyles.length > 0 ? wrapCard(openCardStyles, rowNode) : rowNode;
 }
 
 // Fix to work with generics, see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37087#issuecomment-656596623

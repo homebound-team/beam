@@ -2,6 +2,7 @@ import { Fragment, ReactElement } from "react";
 import {
   GridColumn,
   GridDataRow,
+  GridStyle,
   Kinded,
   NestedCardsStyle,
   NestedCardStyle,
@@ -47,8 +48,8 @@ export class NestedCards {
    */
   maybeOpenCard(row: GridDataRow<any>): boolean {
     const card = this.styles.kinds[row.kind];
-    // If this kind doesn't have a card defined, don't put it on the card stack
-    if (card) {
+    // If this kind doesn't have a card defined or is a leaf card (which handle their own card styles in GridRow), then don't put it on the card stack
+    if (card && !isLeafRow(row)) {
       this.openCards.push(row.kind);
       this.chromeBuffer.push(makeOpenOrCloseCard(this.openCards, this.styles.kinds, "open"));
     }
@@ -163,18 +164,18 @@ export function makeOpenOrCloseCard(
 }
 
 /**
- * For the first or last cell of actual content, wrap them in divs that re-create the
- * outer cards' padding + background.
+ * Wraps a row within its parent cards. Creates a wrapping div to add the card padding.
+ * Adds non-leaf card padding and borders, e.g. if the current row is a non-leaf then it will already be in `openCards`
+ * Example:
+ * <div parent> <div child> <div grandchild /> </div> </div>
  */
-export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first" | "final", styles?: {}): any {
-  let div: any = undefined;
+export function wrapCard(openCards: NestedCardStyle[], row: JSX.Element): JSX.Element {
+  let div: JSX.Element = row;
   [...openCards].reverse().forEach((card) => {
     div = (
       <div
         css={{
-          ...Css.h100.bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).$,
-          ...(column === "first" && Css.plPx(card.pxPx).if(!!card.bColor).bl.$),
-          ...(column === "final" && Css.prPx(card.pxPx).if(!!card.bColor).br.$),
+          ...Css.h100.pxPx(card.pxPx).bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).bl.br.$,
         }}
       >
         {div}
@@ -182,11 +183,38 @@ export function maybeAddCardPadding(openCards: NestedCardStyle[], column: "first
     );
   });
 
-  return (
-    <div data-cardpadding="true" {...(styles ? { css: styles } : {})}>
-      {div}
-    </div>
-  );
+  return div;
+}
+
+export function getNestedCardStyles(
+  row: GridDataRow<any>,
+  openCardStyles: NestedCardStyle[] | undefined,
+  style: GridStyle,
+) {
+  const leafCardStyles = isLeafRow(row) ? style.nestedCards?.kinds[row.kind] : undefined;
+  // Calculate the horizontal space already allocated by the open cards (paddings and borders)
+  const openCardWidth = openCardStyles ? openCardStyles.reduce((acc, o) => acc + o.pxPx + (o.bColor ? 1 : 0), 0) : 0;
+  // Subtract the openCardWidth from the `firstLastColumnWidth` to determine the amount of padding to add to this card.
+  // Also if it is a leaf card, then we need to additionally subtract out the border width to have it properly line up with the chrome rows
+  const currentCardPaddingWidth =
+    (style.nestedCards?.firstLastColumnWidth ?? 0) - openCardWidth - (leafCardStyles?.bColor ? 1 : 0);
+
+  return {
+    // Card styles apply a calculated padding to ensure the content lines up properly across all columns
+    ...(currentCardPaddingWidth ? Css.pxPx(currentCardPaddingWidth).$ : undefined),
+    // Leaf cards define their own borders + padding
+    ...(leafCardStyles
+      ? // We can have versions of the same card as a leaf and not as a leaf.
+        // When it is not a leaf then it has chrome rows that create the top and bottom "padding" based on border-radius size. (brPx = "chrome" row height)
+        // When it is a leaf, then we need to apply the brPx to the row to ensure consistent spacing between leaf & non-leaf renders
+        // Additionally, if the leaf card has a border, then subtract the 1px border width from the padding to keep consistent with the "chrome" row
+        Css.pyPx(leafCardStyles.brPx - (leafCardStyles.bColor ? 1 : 0))
+          .borderRadius(`${leafCardStyles.brPx}px`)
+          .bgColor(leafCardStyles.bgColor)
+          .if(!!leafCardStyles.bColor)
+          .bc(leafCardStyles.bColor).ba.$
+      : undefined),
+  };
 }
 
 /**
@@ -220,7 +248,7 @@ interface ChromeRowProps {
 export function ChromeRow({ chromeBuffer, columns }: ChromeRowProps) {
   return (
     // We add 2 to account for our dedicated open/close columns
-    <div css={Css.gc(`span ${columns + 2}`).$} data-chrome="true">
+    <div css={Css.gc(`span ${columns + 2}`).$}>
       {chromeBuffer.map((c, i) => (
         <Fragment key={i}>{c()}</Fragment>
       ))}
@@ -230,4 +258,8 @@ export function ChromeRow({ chromeBuffer, columns }: ChromeRowProps) {
 
 export function dropChromeRows<R extends Kinded>(rows: RowTuple<R>[]): [GridDataRow<R>, ReactElement][] {
   return rows.filter(([r]) => !!r) as [GridDataRow<R>, ReactElement][];
+}
+
+export function isLeafRow<R extends Kinded>(row: GridDataRow<R>): boolean {
+  return row.children === undefined || row.children.length === 0;
 }

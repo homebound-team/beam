@@ -184,7 +184,7 @@ const style: GridStyle = {
       // TODO: It would be nice if this used CSS Properties so that we can use TRUSS
       milestone: { bgColor: Palette.Gray100, ...spacing },
       subgroup: { bgColor: Palette.White, ...spacing },
-      // TODO: Validate with Dare regarding nested 3rd child.
+      // TODO: Validate with Dara regarding nested 3rd child.
       task: { bgColor: Palette.White, bColor: Palette.Gray200, ...spacing, pxPx: 0 },
       // Purposefully leave out the `add` kind
     },
