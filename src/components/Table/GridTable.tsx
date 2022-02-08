@@ -466,7 +466,11 @@ function renderDiv<R extends Kinded>(
     >
       {headerRows.map(([, node]) => node)}
       {/* Show a info message if it's set. */}
-      {firstRowMessage && <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>}
+      {firstRowMessage && (
+        <div css={{ ...style.firstRowMessageCss }} data-gridrow>
+          {firstRowMessage}
+        </div>
+      )}
       {filteredRows.map(([, node]) => node)}
     </div>
   );
