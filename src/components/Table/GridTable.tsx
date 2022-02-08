@@ -16,7 +16,7 @@ import { navLink } from "src/components/CssReset";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
-import { isLeafRow, maybeWrapCard, NestedCards } from "src/components/Table/nestedCards";
+import { getNestedCardStyles, isLeafRow, NestedCards, wrapCard } from "src/components/Table/nestedCards";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
 import { SortState, useSortState } from "src/components/Table/useSortState";
@@ -898,14 +898,6 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           .filter((style) => style)
       : undefined;
 
-  const leafCardStyles = isLeafRow(row) ? style.nestedCards?.kinds[row.kind] : undefined;
-  // Calculate the horizontal space already allocated by the open cards (paddings and borders)
-  const openCardWidth = openCardStyles ? openCardStyles.reduce((acc, o) => acc + o.pxPx + (o.bColor ? 1 : 0), 0) : 0;
-  // Subtract the openCardWidth from the `firstLastColumnWidth` to determine the amount of padding to add to this card.
-  // Also if it is a leaf card, then we need to additionally subtract out the border width to have it properly line up with the chrome rows
-  const currentCardPaddingWidth =
-    (style.nestedCards?.firstLastColumnWidth ?? 0) - openCardWidth - (leafCardStyles?.bColor ? 1 : 0);
-
   const rowStyleCellCss = maybeApplyFunction(row, rowStyle?.cellCss);
   const rowCss = {
     // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `flexNone` to ensure they stay their defined widths
@@ -918,20 +910,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     ...maybeApplyFunction(row, rowStyle?.rowCss),
     // Maybe add the sticky header styles
     ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined),
-    // Card styles apply a calculated padding to ensure the content lines up properly across all columns
-    ...(currentCardPaddingWidth ? Css.pxPx(currentCardPaddingWidth).$ : undefined),
-    // Leaf cards define their own borders + padding
-    ...(leafCardStyles
-      ? // We can have versions of the same card as a leaf and not as a leaf.
-        // When it is not a leaf then it has chrome rows that create the top and bottom "padding" based on border-radius size. (brPx = "chrome" row height)
-        // When it is a leaf, then we need to apply the brPx to the row to ensure consistent spacing between leaf & non-leaf renders
-        // Additionally, if the leaf card has a border, then subtract the 1px border width from the padding to keep consistent with the "chrome" row
-        Css.pyPx(leafCardStyles.brPx - (leafCardStyles.bColor ? 1 : 0))
-          .borderRadius(`${leafCardStyles.brPx}px`)
-          .bgColor(leafCardStyles.bgColor)
-          .if(!!leafCardStyles.bColor)
-          .bc(leafCardStyles.bColor).ba.$
-      : undefined),
+    ...getNestedCardStyles(row, openCardStyles, style),
   };
 
   let currentColspan = 1;
@@ -1010,7 +989,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     </Row>
   );
 
-  return openCardStyles ? maybeWrapCard(openCardStyles, rowNode) : rowNode;
+  return openCardStyles && openCardStyles.length > 0 ? wrapCard(openCardStyles, rowNode) : rowNode;
 }
 
 // Fix to work with generics, see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37087#issuecomment-656596623

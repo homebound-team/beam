@@ -1,5 +1,5 @@
 import { NestedCardStyle, NestedCardStyleByKind } from "src/components/Table/GridTable";
-import { makeOpenOrCloseCard, maybeWrapCard } from "src/components/Table/nestedCards";
+import { makeOpenOrCloseCard, wrapCard } from "src/components/Table/nestedCards";
 import { Palette } from "src/Css";
 import { render } from "src/utils/rtl";
 
@@ -85,7 +85,7 @@ describe("NestedCards", () => {
   });
 
   it("can add padding w/two levels", async () => {
-    const r = await render(maybeWrapCard([parentCardStyle, childCardStyle], <div data-testid="grandchild" />));
+    const r = await render(wrapCard([parentCardStyle, childCardStyle], <div data-testid="grandchild" />));
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
         background-color: rgba(247,245,245,1);
