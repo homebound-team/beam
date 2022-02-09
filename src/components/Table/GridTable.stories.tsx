@@ -803,7 +803,7 @@ export function StyleBeam() {
   return (
     <GridTable<BeamRow>
       style={beamFixedStyle}
-      sorting={{ on: "client", initial: [1, "ASC"] }}
+      sorting={{ on: "client", initial: [3, "DESC"] }}
       columns={[selectCol, favCol, statusCol, nameCol, tradeCol, locationCol, dateCol, priceCol, readOnlyPriceCol]}
       rows={[
         { kind: "header", id: "header" },
