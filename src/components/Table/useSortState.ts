@@ -70,6 +70,12 @@ export function deriveSortState<S>(
     return [clickedKey, ASC];
   }
 
+  // If there is an `initialSortState` and we're clicking on that same key, then flip the sort.
+  // Handles cases where the initial sort is DESC so that we can allow for DESC to ASC sorting.
+  if (initialSortState && initialSortState[0] === clickedKey) {
+    return [clickedKey, currentDirection === ASC ? DESC : ASC];
+  }
+
   // Otherwise when clicking the current column, toggle through sort states
   if (currentDirection === ASC) {
     // if ASC -> go to desc
