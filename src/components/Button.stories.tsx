@@ -189,7 +189,7 @@ export function ButtonLink() {
           <Button onClick="/fakePath" label="Relative URL link" />
           <Button onClick="/" label="Relative URL - Open in New Tab" openInNew />
           <Button onClick="https://www.homebound.com" label="Absolute URL link" />
-          <Button onClick="https://www.homebound.com" label="External Download link" icon="download" omitExternalIcon />
+          <Button onClick="tony-stark.jpg" label="Download link" download />
           <Button icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>
 
@@ -198,13 +198,7 @@ export function ButtonLink() {
           <Button variant="secondary" onClick="/fakePath" label="Relative URL link" />
           <Button variant="secondary" onClick="/" label="Relative URL - Open in New Tab" openInNew />
           <Button variant="secondary" onClick="https://www.homebound.com" label="Absolute URL link" />
-          <Button
-            variant="secondary"
-            onClick="https://www.homebound.com"
-            label="External Download link"
-            icon="download"
-            omitExternalIcon
-          />
+          <Button variant="secondary" onClick="tony-stark.jpg" label="Download link" download />
           <Button variant="secondary" icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>
 
@@ -213,13 +207,7 @@ export function ButtonLink() {
           <Button variant="tertiary" onClick="/fakePath" label="Relative URL link" />
           <Button variant="tertiary" onClick="/" label="Relative URL - Open in New Tab" openInNew />
           <Button variant="tertiary" onClick="https://www.homebound.com" label="Absolute URL link" />
-          <Button
-            variant="tertiary"
-            onClick="https://www.homebound.com"
-            label="External Download link"
-            icon="download"
-            omitExternalIcon
-          />
+          <Button variant="tertiary" onClick="tony-stark.jpg" label="Download link" download />
           <Button variant="tertiary" icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>
 
@@ -228,13 +216,7 @@ export function ButtonLink() {
           <Button variant="danger" onClick="/fakePath" label="Relative URL link" />
           <Button variant="danger" onClick="/" label="Relative URL - Open in New Tab" openInNew />
           <Button variant="danger" onClick="https://www.homebound.com" label="Absolute URL link" />
-          <Button
-            variant="danger"
-            onClick="https://www.homebound.com"
-            label="External Download link"
-            icon="download"
-            omitExternalIcon
-          />
+          <Button variant="danger" onClick="tony-stark.jpg" label="Download link" download />
           <Button variant="danger" icon="plus" onClick="/fakePath" label="Disabled link" disabled />
         </div>
       </div>

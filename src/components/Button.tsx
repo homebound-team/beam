@@ -12,7 +12,7 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   label: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
-  icon?: IconProps["icon"];
+  icon?: IconProps["icon"] | null;
   /** Displays contents after the Button's label. Will be ignored for Buttons rendered as a link with an absolute URL */
   endAdornment?: ReactNode;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
@@ -20,8 +20,8 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   buttonRef?: RefObject<HTMLElement>;
   /** Allow for setting "submit" | "button" | "reset" on button element */
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
-  /** Allows for omitting the external icon automatically applied when the button links to an external site. */
-  omitExternalIcon?: boolean;
+  /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
+  download?: boolean;
 }
 
 export function Button(props: ButtonProps) {
@@ -32,12 +32,12 @@ export function Button(props: ButtonProps) {
     menuTriggerProps,
     tooltip,
     openInNew,
-    omitExternalIcon,
+    download,
     ...otherProps
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, ...otherProps, ...menuTriggerProps };
-  const { label, icon, variant = "primary", size = "sm", buttonRef } = ariaProps;
+  const { label, icon = download ? "download" : undefined, variant = "primary", size = "sm", buttonRef } = ariaProps;
   const ref = buttonRef || useRef(null);
   const tid = useTestIds(props, label);
   const { buttonProps, isPressed } = useButton(
@@ -84,10 +84,15 @@ export function Button(props: ButtonProps) {
 
   const button =
     typeof onPress === "string" ? (
-      isAbsoluteUrl(onPress) || openInNew ? (
-        <a {...buttonAttrs} href={onPress} className={navLink} target="_blank" rel="noreferrer noopener">
+      isAbsoluteUrl(onPress) || openInNew || download ? (
+        <a
+          {...buttonAttrs}
+          href={onPress}
+          className={navLink}
+          {...(download ? { download: "" } : { target: "_blank", rel: "noreferrer noopener" })}
+        >
           {buttonContent}
-          {!omitExternalIcon && (
+          {!download && (
             <span css={Css.ml1.$}>
               <Icon icon="linkExternal" />
             </span>
