@@ -20,10 +20,21 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   buttonRef?: RefObject<HTMLElement>;
   /** Allow for setting "submit" | "button" | "reset" on button element */
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
+  /** Allows for omitting the external icon automatically applied when the button links to an external site. */
+  omitExternalIcon?: boolean;
 }
 
 export function Button(props: ButtonProps) {
-  const { onClick: onPress, disabled, endAdornment, menuTriggerProps, tooltip, openInNew, ...otherProps } = props;
+  const {
+    onClick: onPress,
+    disabled,
+    endAdornment,
+    menuTriggerProps,
+    tooltip,
+    openInNew,
+    omitExternalIcon,
+    ...otherProps
+  } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, ...otherProps, ...menuTriggerProps };
   const { label, icon, variant = "primary", size = "sm", buttonRef } = ariaProps;
@@ -76,9 +87,11 @@ export function Button(props: ButtonProps) {
       isAbsoluteUrl(onPress) || openInNew ? (
         <a {...buttonAttrs} href={onPress} className={navLink} target="_blank" rel="noreferrer noopener">
           {buttonContent}
-          <span css={Css.ml1.$}>
-            <Icon icon="linkExternal" />
-          </span>
+          {!omitExternalIcon && (
+            <span css={Css.ml1.$}>
+              <Icon icon="linkExternal" />
+            </span>
+          )}
         </a>
       ) : (
         <Link {...buttonAttrs} to={onPress} className={navLink}>
