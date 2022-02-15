@@ -15,7 +15,6 @@ describe("ButtonDatePicker", () => {
 
     // And selecting a date
     click(r.queryAllByRole("gridcell")[0]);
-    // Then then Date Picker should close
 
     // Then the selected date should be returned and the date picker closed
     expect(onSelect).toBeCalledWith(jan1.toDateString());

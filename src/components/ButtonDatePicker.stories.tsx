@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { ButtonDatePicker } from "src/components/ButtonDatePicker";
+import { ButtonDatePicker } from "src";
 import { Css } from "src/Css";
 import { jan1 } from "src/forms/formStateDomain";
 import { withDimensions } from "src/utils/sb";

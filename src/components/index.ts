@@ -6,6 +6,7 @@ export * from "src/components/ToggleChips";
 export * from "./Alert";
 export { BeamProvider } from "./BeamContext";
 export * from "./Button";
+export * from "./ButtonDatePicker";
 export * from "./ButtonGroup";
 export * from "./ButtonMenu";
 export * from "./Copy";
