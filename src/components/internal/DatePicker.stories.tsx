@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { DatePicker } from "src/components/DatePicker";
+import { DatePicker } from "src/components/internal/DatePicker";
 import { jan1 } from "src/forms/formStateDomain";
 
 export default {

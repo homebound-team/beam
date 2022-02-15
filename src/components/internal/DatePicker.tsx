@@ -1,6 +1,6 @@
 import React from "react";
 import DayPicker, { Modifier, NavbarElementProps, WeekdayElementProps } from "react-day-picker";
-import { IconButton } from "src/components";
+import { IconButton } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { useTestIds } from "src/utils";
 import "./DatePicker.css";

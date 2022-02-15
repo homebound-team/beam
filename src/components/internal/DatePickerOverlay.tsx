@@ -1,6 +1,6 @@
 import React, { HTMLAttributes } from "react";
 import { OverlayTriggerState } from "react-stately";
-import { DatePicker, DatePickerProps } from "src/components/DatePicker";
+import { DatePicker, DatePickerProps } from "src/components/internal/DatePicker";
 import { Css } from "src/Css";
 
 interface DatePickerOverlayProps extends DatePickerProps {
