@@ -19,9 +19,9 @@ export interface PresentationFieldProps {
 
 export type PresentationContextProps = {
   fieldProps?: PresentationFieldProps;
-  // Defines if the table styles, allowing components to render accordingly.
-  tableStyle?: "fixed" | "flexible";
   gridTableStyle?: GridStyle;
+  // Defines whether content should be allowed to wrap or not. `undefined` is treated as true.
+  wrap?: boolean;
 };
 
 export const PresentationContext = createContext<PresentationContextProps>({});

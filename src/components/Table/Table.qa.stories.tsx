@@ -46,7 +46,7 @@ export function Fixed() {
           data: {
             id: `r:${idx + 1}`,
             favorite: idx < 5,
-            commitmentName: idx === 9 ? "A longer name that will truncate with an ellipsis" : `Commitment ${idx + 1}`,
+            commitmentName: idx === 2 ? "A longer name that will truncate with an ellipsis" : `Commitment ${idx + 1}`,
             date: `01/${idx + 1 > 9 ? idx + 1 : `0${idx + 1}`}/2020`,
             status: "Success",
             tradeCategories: ["Roofing", "Architecture", "Plumbing"],
@@ -73,7 +73,7 @@ export function Flexible() {
           data: {
             id: `r:${idx + 1}`,
             favorite: idx < 5,
-            commitmentName: idx === 9 ? "A longer name that will truncate with an ellipsis" : `Commitment ${idx + 1}`,
+            commitmentName: idx === 2 ? "A longer name that will truncate with an ellipsis" : `Commitment ${idx + 1}`,
             date: `01/${idx + 1 > 9 ? idx + 1 : `0${idx + 1}`}/2020`,
             status: "Success",
             tradeCategories: ["Roofing", "Architecture", "Plumbing"],
@@ -105,7 +105,7 @@ type BeamParentRow = { kind: "parent"; id: string } & BeamBudgetData;
 type BeamChildRow = { kind: "child"; id: string } & BeamBudgetData;
 type BeamNestedRow = BeamTotalsRow | HeaderRow | BeamParentRow | BeamChildRow;
 
-export function Nested() {
+export function NestedFixed() {
   const totalsRowStyles = useMemo(() => ({ totals: { cellCss: beamTotalsRowStyle } }), []);
   const rowStyles = useMemo(() => ({ parent: { cellCss: beamGroupRowStyle } }), []);
   return (
@@ -128,6 +128,29 @@ export function Nested() {
   );
 }
 
+export function NestedFlexible() {
+  const totalsRowStyles = useMemo(() => ({ totals: { cellCss: beamTotalsRowStyle } }), []);
+  const rowStyles = useMemo(() => ({ parent: { cellCss: beamGroupRowStyle } }), []);
+  return (
+    <div css={Css.mw("fit-content").$}>
+      <GridTable<BeamNestedRow>
+        style={beamFlexibleStyle}
+        columns={beamNestedColumns}
+        rows={beamTotalsRows}
+        rowStyles={totalsRowStyles}
+      />
+      <GridTable<BeamNestedRow>
+        style={beamFlexibleStyle}
+        sorting={{ on: "client" }}
+        columns={beamNestedColumns}
+        rows={beamNestedRows}
+        rowStyles={rowStyles}
+        stickyHeader
+      />
+    </div>
+  );
+}
+
 const beamNestedRows: GridDataRow<BeamNestedRow>[] = [
   { kind: "header", id: "header" },
   ...zeroTo(5).map((pIdx) => {
@@ -136,7 +159,7 @@ const beamNestedRows: GridDataRow<BeamNestedRow>[] = [
     const children = zeroTo(numChildren).map((cIdx) => ({
       kind: "child" as const,
       id: `p${pIdx + 1}_c${cIdx + 1}`,
-      name: `10${pIdx + 1}0.${cIdx + 1} - Project Item`,
+      name: `10${pIdx + 1}0.${cIdx + 1} - Project Item${pIdx === 0 ? " with a longer name that will wrap" : ""}`,
       original: 1234_56,
       changeOrders: 543_21,
       reallocations: 568_56,
@@ -151,7 +174,7 @@ const beamNestedRows: GridDataRow<BeamNestedRow>[] = [
     return {
       kind: "parent" as const,
       id: `p:${pIdx + 1}`,
-      name: `10${pIdx + 1}0 - Cost Code`,
+      name: `10${pIdx + 1}0 - Cost Code${pIdx === 1 ? " with a longer name that will wrap" : ""}`,
       original: children.map((c) => c.original ?? 0).reduce((acc, n) => acc + n, 0),
       changeOrders: children.map((c) => c.changeOrders ?? 0).reduce((acc, n) => acc + n, 0),
       reallocations: children.map((c) => c.reallocations ?? 0).reduce((acc, n) => acc + n, 0),

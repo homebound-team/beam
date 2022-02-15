@@ -46,15 +46,17 @@ export const beamFixedStyle: GridStyle = {
   headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
   cellCss: Css.gray900.xs.bgWhite.aic.nowrap.pxPx(12).hPx(36).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
   emptyCell: "-",
+  presentationSettings: { borderless: true, typeScale: "xs", wrap: false },
 };
 
 export const beamFlexibleStyle: GridStyle = {
   ...beamFixedStyle,
   cellCss: Css.xs.bgWhite.aic.p2.boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
+  presentationSettings: { borderless: false, typeScale: "xs", wrap: true },
 };
 
 export const beamGroupRowStyle: Properties = Css.smEm
-  .hPx(56)
+  .mhPx(56)
   .gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$;
 
 export const beamTotalsRowStyle: Properties = Css.gray700.smEm.hPx(40).mb1.bgWhite.boxShadow("none").$;

@@ -13,13 +13,16 @@ import React, {
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
-import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
+import {
+  PresentationContextProps,
+  PresentationFieldProps,
+  PresentationProvider,
+} from "src/components/PresentationContext";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
 import { getNestedCardStyles, isLeafRow, NestedCards, wrapCard } from "src/components/Table/nestedCards";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
-import { beamFixedStyle, beamFlexibleStyle } from "src/components/Table/styles";
 import { SortState, useSortState } from "src/components/Table/useSortState";
 import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import tinycolor from "tinycolor2";
@@ -75,6 +78,8 @@ export interface GridStyle {
   nestedCards?: NestedCardsStyle;
   /** Default content to put into an empty cell */
   emptyCell?: ReactNode;
+  presentationSettings?: Pick<PresentationFieldProps, "borderless" | "typeScale"> &
+    Pick<PresentationContextProps, "wrap">;
 }
 
 export type NestedCardStyleByKind = Record<string, NestedCardStyle>;
@@ -408,16 +413,18 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
-  const borderless = style === beamFixedStyle;
-  const tableStyle = style === beamFixedStyle ? "fixed" : style === beamFlexibleStyle ? "flexible" : undefined;
+  const borderless = style?.presentationSettings?.borderless;
+  const typeScale = style?.presentationSettings?.typeScale;
   const fieldProps: PresentationFieldProps = useMemo(
     () => ({
       hideLabel: true,
       numberAlignment: "right",
       compact: true,
-      ...(borderless ? { borderless, typeScale: "xs" } : {}),
+      // Avoid passing `undefined` as it will unset existing PresentationContext settings
+      ...(borderless !== undefined ? { borderless } : {}),
+      ...(typeScale !== undefined ? { typeScale } : {}),
     }),
-    [borderless],
+    [borderless, typeScale],
   );
 
   // If we're running in Jest, force using `as=div` b/c jsdom doesn't support react-virtuoso.
@@ -426,7 +433,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // behave semantically the same as `as=div` did for its tests.
   const _as = as === "virtual" && runningInJest ? "div" : as;
   return (
-    <PresentationProvider fieldProps={fieldProps} tableStyle={tableStyle}>
+    <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
       {renders[_as](
         style,
         id,
@@ -1060,7 +1067,7 @@ function toContent(
   }
   if (content && typeof content === "string" && isHeader && canSortColumn) {
     return <SortHeader content={content} iconOnLeft={alignment === "right"} />;
-  } else if (content && typeof content === "string" && style === beamFixedStyle) {
+  } else if (content && typeof content === "string" && style?.presentationSettings?.wrap === false) {
     return (
       <span css={Css.mw0.truncate.$} title={content}>
         {content}
