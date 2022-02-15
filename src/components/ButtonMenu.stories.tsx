@@ -51,6 +51,9 @@ export function InteractiveMenu() {
     { label: "Internal Link", onClick: "/fakeRoute" },
     { label: "External Link - Homebound.com", onClick: "https://www.homebound.com" },
   ]);
+  const [persistentItems, setPersistentItems] = useState<MenuItem[]>([
+    { label: "Persistent Action", onClick: action("Persistent action clicked") },
+  ]);
 
   return (
     <>
@@ -70,12 +73,20 @@ export function InteractiveMenu() {
             ])
           }
         />
+        <Button
+          label="Add New Persistent Item"
+          onClick={() =>
+            setPersistentItems((prevItems) => [
+              ...prevItems,
+              {
+                label: `Persistent Item ${prevItems.length + 1}`,
+                onClick: action(`Persistent Item ${prevItems.length + 1}`),
+              },
+            ])
+          }
+        />
       </div>
-      <ButtonMenu
-        trigger={{ label: "Menu trigger" }}
-        items={menuItems}
-        persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
-      />
+      <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} persistentItems={persistentItems} />
     </>
   );
 }
