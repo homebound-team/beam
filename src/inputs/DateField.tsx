@@ -5,13 +5,12 @@ import { DateUtils, Modifier } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
 import { Icon } from "src/components";
 import { Popover } from "src/components/internal";
+import { DatePickerOverlay } from "src/components/internal/DatePickerOverlay";
 import { Css, Palette } from "src/Css";
-import { DatePickerOverlay } from "src/inputs/internal/DatePickerOverlay";
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { Callback } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
-import "./DateField.css";
 
 export interface DateFieldProps
   extends Pick<TextFieldBaseProps<{}>, "borderless" | "visuallyDisabled" | "hideLabel" | "compact"> {
@@ -154,6 +153,7 @@ export function DateField(props: DateFieldProps) {
     onClose: state.close,
     placement: "bottom left",
     shouldUpdatePosition: true,
+    offset: 4,
   });
 
   // If showing the short date format, "01/01/20", so set size to 8. If medium (Wed, Nov 23) use 10 characters (leaving out the `,` character in the count because it is so small)
@@ -216,12 +216,11 @@ export function DateField(props: DateFieldProps) {
           isOpen={state.isOpen}
         >
           <DatePickerOverlay
-            state={state}
             value={value}
-            positionProps={positionProps}
-            onChange={(d) => {
+            onSelect={(d) => {
               setInputValue(formatDate(d, dateFormat));
               onChange(d);
+              state.close();
             }}
             disabledDays={disabledDays}
             {...tid.datePicker}

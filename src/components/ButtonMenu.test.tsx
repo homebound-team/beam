@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "src/components/Button";
 import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
 import { Css } from "src/Css";
+import { jan1, jan2 } from "src/forms/formStateDomain";
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
 
@@ -58,6 +59,25 @@ describe("ButtonMenu", () => {
     expect(r.example_menu()).toBeTruthy();
     expect(r.example_menuItems()).toBeTruthy();
     expect(r.example_itemOne()).toBeTruthy();
+  });
+
+  it("can render with date picker and select a date", async () => {
+    const onSelect = jest.fn();
+    // Given a Button Menu that opens the Date Picker
+    const r = await render(
+      <ButtonMenu trigger={{ label: "Trigger" }} value={jan2} onSelect={(d) => onSelect(d.toDateString())} />,
+    );
+
+    // When clicking the menu trigger
+    click(r.trigger);
+
+    // And selecting a date
+    click(r.queryAllByRole("gridcell")[0]);
+    // Then then Date Picker should close
+
+    // Then the selected date should be returned and the date picker closed
+    expect(onSelect).toBeCalledWith(jan1.toDateString());
+    expect(r.queryByTestId("date_datePicker")).toBeFalsy();
   });
 
   it("properly sets disabled on the button menu", async () => {

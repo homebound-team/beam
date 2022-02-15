@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "src/components/Button";
 import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
 import { Css } from "src/Css";
+import { jan1 } from "src/forms/formStateDomain";
 import { withDimensions, withRouter } from "src/utils/sb";
 
 export default {
@@ -18,27 +19,37 @@ export function MenuOpen() {
     { label: "Internal Link", onClick: "/fakeRoute" },
     { label: "External Link - Homebound.com", onClick: "https://www.homebound.com" },
   ];
+  const [date, setDate] = useState(jan1);
 
   return (
-    <div css={Css.df.fdc.$}>
-      <h2 css={Css.lg.$}>Default - Anchored left</h2>
-      <ButtonMenu
-        trigger={{ label: "Menu trigger" }}
-        items={menuItems}
-        persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
-        defaultOpen
-      />
+    <div css={Css.df.gap5.$}>
+      <div css={Css.df.fdc.$}>
+        <h2 css={Css.lg.$}>Default - Anchored left</h2>
+        <ButtonMenu
+          trigger={{ label: "Menu trigger" }}
+          items={menuItems}
+          persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+          defaultOpen
+        />
 
-      <div css={Css.mtPx(200).$}>
-        <h2 css={Css.lg.$}>Anchored right</h2>
-        <div css={Css.mlPx(200).$}>
-          <ButtonMenu
-            trigger={{ label: "Menu trigger" }}
-            items={menuItems}
-            persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
-            defaultOpen
-            placement="right"
-          />
+        <div css={Css.mtPx(200).$}>
+          <h2 css={Css.lg.$}>Anchored right</h2>
+          <div css={Css.mlPx(200).$}>
+            <ButtonMenu
+              trigger={{ label: "Menu trigger" }}
+              items={menuItems}
+              persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+              defaultOpen
+              placement="right"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 css={Css.lg.$}>Date Picker</h2>
+        <div>
+          <ButtonMenu trigger={{ label: "Select Date" }} value={date} onSelect={setDate} defaultOpen />
         </div>
       </div>
     </div>
@@ -50,6 +61,9 @@ export function InteractiveMenu() {
     { label: "Page action", onClick: action("Test item clicked") },
     { label: "Internal Link", onClick: "/fakeRoute" },
     { label: "External Link - Homebound.com", onClick: "https://www.homebound.com" },
+  ]);
+  const [persistentItems, setPersistentItems] = useState<MenuItem[]>([
+    { label: "Persistent Action", onClick: action("Persistent action clicked") },
   ]);
 
   return (
@@ -70,12 +84,20 @@ export function InteractiveMenu() {
             ])
           }
         />
+        <Button
+          label="Add New Persistent Item"
+          onClick={() =>
+            setPersistentItems((prevItems) => [
+              ...prevItems,
+              {
+                label: `Persistent Item ${prevItems.length + 1}`,
+                onClick: action(`Persistent Item ${prevItems.length + 1}`),
+              },
+            ])
+          }
+        />
       </div>
-      <ButtonMenu
-        trigger={{ label: "Menu trigger" }}
-        items={menuItems}
-        persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
-      />
+      <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} persistentItems={persistentItems} />
     </>
   );
 }
@@ -105,4 +127,9 @@ export function WithTooltip() {
   ];
 
   return <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} tooltip="Tool tip text" />;
+}
+
+export function DatePicker() {
+  const [date, setDate] = useState(jan1);
+  return <ButtonMenu trigger={{ label: "Select Date" }} value={date} onSelect={setDate} />;
 }
