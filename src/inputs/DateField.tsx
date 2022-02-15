@@ -211,7 +211,7 @@ export function DateField(props: DateFieldProps) {
         <Popover
           triggerRef={inputWrapRef}
           popoverRef={overlayRef}
-          positionProps={{ ...overlayProps, ...positionProps }}
+          positionProps={positionProps}
           onClose={state.close}
           isOpen={state.isOpen}
         >
@@ -220,9 +220,10 @@ export function DateField(props: DateFieldProps) {
             onSelect={(d) => {
               setInputValue(formatDate(d, dateFormat));
               onChange(d);
-              state.close();
             }}
+            state={state}
             disabledDays={disabledDays}
+            overlayProps={overlayProps}
             {...tid.datePicker}
           />
         </Popover>

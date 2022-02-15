@@ -16,7 +16,7 @@ interface MenuProps<T> {
 }
 
 export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
-  const { ariaMenuProps, items, persistentItems } = props;
+  const { ariaMenuProps, items, persistentItems, onClose } = props;
   // Build out the Menu's Tree data to include the Persistent Action, if any. This is a collection of Nodes that is used
   // by React-Aria to keep track of item states such as focus, and provide hooks for calling those actions.
   const tree = useTreeData({
@@ -59,7 +59,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
       >
         {/* It is possible to have, at most, 2 sections: One for items, and one for persisted items */}
         {[...state.collection].map((item) => (
-          <MenuSectionImpl key={item.key} section={item} state={state} onClose={props.onClose} {...tid} />
+          <MenuSectionImpl key={item.key} section={item} state={state} onClose={onClose} {...tid} />
         ))}
       </ul>
     </FocusScope>
