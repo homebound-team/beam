@@ -5,7 +5,7 @@ import { DateField as MockDateField } from "./DateField.mock";
 
 describe("MockDateField", () => {
   it("formats date value when provided", async () => {
-    const r = await render(<MockDateField label="Start Date" value={new Date(2020, 0, 1)} onChange={() => {}} />);
+    const r = await render(<MockDateField label="Start Date" value={new Date(2020, 0, 1)} onChange={noop} />);
     expect(r.date()).toHaveValue("01/01/20");
   });
 
@@ -35,10 +35,13 @@ describe("MockDateField", () => {
   });
 
   it("forwards disabledDays prop as stringified object", async () => {
-    const testDate = new Date(2020, 0, 1)
-    const r = await render(<MockDateField label="Start Date" value={testDate} disabledDays={{ before: testDate }} onChange={() => {}} />);
+    const testDate = new Date(2020, 0, 1);
+    const disabledDays = [{ before: testDate }, () => false];
+    const r = await render(
+      <MockDateField label="Start Date" value={testDate} disabledDays={disabledDays} onChange={noop} />,
+    );
 
-    const expectedResult = JSON.stringify({ before: testDate });
+    const expectedResult = JSON.stringify(disabledDays);
     expect(r.date()).toHaveAttribute("data-disabled-days", expectedResult);
   });
 });

@@ -38,7 +38,7 @@ export function DateFields() {
     ],
     ["Compact", <TestDateField compact label="Start Date" />],
     ["SchedulesV2", <TestDateField compact label="Start Date" iconLeft format="medium" />],
-    ["Disabled Days", <TestDateField compact label="End Date" iconLeft format="medium" disabledDays={{ after: jan2 }}/>],
+    ["Disabled Days", <TestDateField compact label="End Date" iconLeft format="medium" disabledDays={[{ after: jan2 }]}/>],
   );
 }
 
