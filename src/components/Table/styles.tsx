@@ -47,6 +47,7 @@ export const beamFixedStyle: GridStyle = {
   cellCss: Css.gray900.xs.bgWhite.aic.nowrap.pxPx(12).hPx(36).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
   emptyCell: "-",
   presentationSettings: { borderless: true, typeScale: "xs", wrap: false },
+  rowHoverColor: Palette.Gray200,
 };
 
 export const beamFlexibleStyle: GridStyle = {
