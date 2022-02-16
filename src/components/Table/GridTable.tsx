@@ -13,7 +13,11 @@ import React, {
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
-import { PresentationProvider } from "src/components/PresentationContext";
+import {
+  PresentationContextProps,
+  PresentationFieldProps,
+  PresentationProvider,
+} from "src/components/PresentationContext";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
 import { getNestedCardStyles, isLeafRow, NestedCards, wrapCard } from "src/components/Table/nestedCards";
@@ -74,6 +78,8 @@ export interface GridStyle {
   nestedCards?: NestedCardsStyle;
   /** Default content to put into an empty cell */
   emptyCell?: ReactNode;
+  presentationSettings?: Pick<PresentationFieldProps, "borderless" | "typeScale"> &
+    Pick<PresentationContextProps, "wrap">;
 }
 
 export type NestedCardStyleByKind = Record<string, NestedCardStyle>;
@@ -278,12 +284,15 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     return rows;
   }, [columns, rows, sorting, sortState]);
 
+  const columnSizes = useMemo(
+    () => calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth),
+    [columns, style.nestedCards?.firstLastColumnWidth],
+  );
+
   // Filter + flatten + component-ize the sorted rows.
   let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
-
-    const columnSizes = calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth);
 
     function makeRowComponent(row: GridDataRow<R>): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
@@ -404,13 +413,27 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
+  const borderless = style?.presentationSettings?.borderless;
+  const typeScale = style?.presentationSettings?.typeScale;
+  const fieldProps: PresentationFieldProps = useMemo(
+    () => ({
+      hideLabel: true,
+      numberAlignment: "right",
+      compact: true,
+      // Avoid passing `undefined` as it will unset existing PresentationContext settings
+      ...(borderless !== undefined ? { borderless } : {}),
+      ...(typeScale !== undefined ? { typeScale } : {}),
+    }),
+    [borderless, typeScale],
+  );
+
   // If we're running in Jest, force using `as=div` b/c jsdom doesn't support react-virtuoso.
   // This enables still putting the application's business/rendering logic under test, and letting it
   // just trust the GridTable impl that, at runtime, `as=virtual` will (other than being virtualized)
   // behave semantically the same as `as=div` did for its tests.
   const _as = as === "virtual" && runningInJest ? "div" : as;
   return (
-    <PresentationProvider fieldProps={{ hideLabel: true, numberAlignment: "right", compact: true }}>
+    <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
       {renders[_as](
         style,
         id,
@@ -1044,6 +1067,12 @@ function toContent(
   }
   if (content && typeof content === "string" && isHeader && canSortColumn) {
     return <SortHeader content={content} iconOnLeft={alignment === "right"} />;
+  } else if (content && typeof content === "string" && style?.presentationSettings?.wrap === false) {
+    return (
+      <span css={Css.mw0.truncate.$} title={content}>
+        {content}
+      </span>
+    );
   } else if (style.emptyCell && isContentEmpty(content)) {
     // If the content is empty and the user specified an `emptyCell` node, return that.
     return style.emptyCell;

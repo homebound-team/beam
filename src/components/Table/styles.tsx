@@ -1,4 +1,4 @@
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Properties } from "src/Css";
 import { GridStyle } from ".";
 
 /** Our original table look & feel/style. */
@@ -43,12 +43,21 @@ export const cardStyle: GridStyle = {
 
 // Once completely rolled out across all tables in Blueprint, this will change to be the `defaultStyle`.
 export const beamFixedStyle: GridStyle = {
-  rootCss: Css.gray700.$,
-  // Doing a mix of `min` and `max` height of 40 as each cell is currently defining `h100`.
-  headerCellCss: Css.xsEm.bgGray200.aic.nowrap.px2.mhPx(40).maxhPx(40).$,
-  // TODO: `cellCss` has incomplete styling at the moment. Will be done as part of SC-8145
-  cellCss: Css.xs.bgWhite.aic.nowrap.px2.hPx(40).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
+  headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
+  cellCss: Css.gray900.xs.bgWhite.aic.nowrap.pxPx(12).hPx(36).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
+  emptyCell: "-",
+  presentationSettings: { borderless: true, typeScale: "xs", wrap: false },
+  rowHoverColor: Palette.Gray200,
 };
 
-// TODO: `cellCss` has incomplete styling at the moment. Will be done as part of SC-8145
-export const beamFlexibleStyle: GridStyle = { ...beamFixedStyle, cellCss: Css.p2.$ };
+export const beamFlexibleStyle: GridStyle = {
+  ...beamFixedStyle,
+  cellCss: Css.xs.bgWhite.aic.p2.boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
+  presentationSettings: { borderless: false, typeScale: "xs", wrap: true },
+};
+
+export const beamGroupRowStyle: Properties = Css.smEm
+  .mhPx(56)
+  .gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$;
+
+export const beamTotalsRowStyle: Properties = Css.gray700.smEm.hPx(40).mb1.bgWhite.boxShadow("none").$;

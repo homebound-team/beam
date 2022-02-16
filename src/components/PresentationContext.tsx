@@ -11,7 +11,7 @@ export interface PresentationFieldProps {
   borderless?: boolean;
   // Defines height of the field
   compact?: boolean;
-  // Changes default font styles for input fields
+  // Changes default font styles for input fields and Chips
   typeScale?: Typography;
   // If set to `false` then fields will not appear disabled, but will still be disabled.
   visuallyDisabled?: false;
@@ -20,6 +20,8 @@ export interface PresentationFieldProps {
 export type PresentationContextProps = {
   fieldProps?: PresentationFieldProps;
   gridTableStyle?: GridStyle;
+  // Defines whether content should be allowed to wrap or not. `undefined` is treated as true.
+  wrap?: boolean;
 };
 
 export const PresentationContext = createContext<PresentationContextProps>({});
