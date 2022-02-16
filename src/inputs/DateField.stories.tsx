@@ -6,11 +6,12 @@ import { Css } from "src/Css";
 import { jan1, jan10, jan2 } from "src/forms/formStateDomain";
 import { DateField, DateFieldProps, TextField } from "src/inputs";
 import { noop } from "src/utils";
-import { samples } from "src/utils/sb";
+import { samples, withDimensions } from "src/utils/sb";
 
 export default {
   title: "Inputs/Date Field",
   component: Button,
+  decorators: [withDimensions()],
 } as Meta;
 
 export function DateFields() {
