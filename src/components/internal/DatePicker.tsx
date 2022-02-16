@@ -8,7 +8,7 @@ import "./DatePicker.css";
 export interface DatePickerProps {
   value?: Date;
   onSelect: (value: Date) => void;
-  disabledDays?: Modifier;
+  disabledDays?: Modifier | Modifier[];
 }
 
 export function DatePicker(props: DatePickerProps) {

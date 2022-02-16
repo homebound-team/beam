@@ -36,7 +36,7 @@ export interface DateFieldProps
    * Set custom logic for individual dates or date ranges to be disabled in the picker
    * exposed from `react-day-picker`: https://react-day-picker.js.org/api/DayPicker#modifiers
    */
-  disabledDays?: Modifier;
+  disabledDays?: Modifier | Modifier[];
   onEnter?: Callback;
 }
 
