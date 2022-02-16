@@ -2,14 +2,16 @@ import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
 import { Button } from "src/components";
-import { jan1, jan2 } from "src/forms/formStateDomain";
+import { Css } from "src/Css";
+import { jan1, jan10, jan2 } from "src/forms/formStateDomain";
 import { DateField, DateFieldProps, TextField } from "src/inputs";
 import { noop } from "src/utils";
-import { samples } from "src/utils/sb";
+import { samples, withDimensions } from "src/utils/sb";
 
 export default {
   title: "Inputs/Date Field",
   component: Button,
+  decorators: [withDimensions()],
 } as Meta;
 
 export function DateFields() {
@@ -38,7 +40,37 @@ export function DateFields() {
     ],
     ["Compact", <TestDateField compact label="Start Date" />],
     ["SchedulesV2", <TestDateField compact label="Start Date" iconLeft format="medium" />],
-    ["Disabled Days", <TestDateField compact label="End Date" iconLeft format="medium" disabledDays={{ after: jan2 }}/>],
+    [
+      "Disabled Days",
+      <TestDateField compact label="End Date" iconLeft format="medium" disabledDays={{ after: jan2 }} />,
+    ],
+    [
+      "Disabled Days - before Jan 1 and after Jan 10",
+      <TestDateField
+        compact
+        label="End Date"
+        iconLeft
+        format="medium"
+        // passing in Modifier array
+        disabledDays={[{ before: jan1 }, { after: jan10 }]}
+      />,
+    ],
+  );
+}
+
+export function DatePickerOpen() {
+  return (
+    <>
+      <h2 css={Css.lg.mb2.$}>DateField with disabled days</h2>
+      <TestDateField
+        compact
+        label="End Date"
+        iconLeft
+        format="medium"
+        disabledDays={[{ before: jan1 }, { after: jan10 }]}
+        defaultOpen
+      />
+    </>
   );
 }
 
