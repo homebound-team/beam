@@ -36,11 +36,14 @@ describe("MockDateField", () => {
 
   it("forwards disabledDays prop as stringified object", async () => {
     const testDate = new Date(2020, 0, 1);
-    const disabledDays = [{ before: testDate }, () => false];
+    // Given an array of disabled days with a BeforeModifier and a FunctionModifier
+    const disabledDays = [{ before: testDate }, (date: Date) => false];
+    // When we render the MockDateField
     const r = await render(
       <MockDateField label="Start Date" value={testDate} disabledDays={disabledDays} onChange={noop} />,
     );
 
+    // Then we expect to get a stringified disabledDays in the `data-disabled-days` attribute
     const expectedResult = JSON.stringify(disabledDays);
     expect(r.date()).toHaveAttribute("data-disabled-days", expectedResult);
   });

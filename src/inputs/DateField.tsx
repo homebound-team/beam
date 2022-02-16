@@ -36,8 +36,10 @@ export interface DateFieldProps
    * Set custom logic for individual dates or date ranges to be disabled in the picker
    * exposed from `react-day-picker`: https://react-day-picker.js.org/api/DayPicker#modifiers
    */
-  disabledDays?: Modifier[];
+  disabledDays?: Modifier | Modifier[];
   onEnter?: Callback;
+  // for storybook
+  defaultOpen?: boolean;
 }
 
 export function DateField(props: DateFieldProps) {
@@ -57,6 +59,7 @@ export function DateField(props: DateFieldProps) {
     iconLeft = false,
     disabledDays,
     onEnter,
+    defaultOpen,
     ...others
   } = props;
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -92,6 +95,7 @@ export function DateField(props: DateFieldProps) {
         maybeCall(onBlur);
       }
     },
+    isOpen: defaultOpen,
   });
   const { labelProps, inputProps } = useTextField(
     {
