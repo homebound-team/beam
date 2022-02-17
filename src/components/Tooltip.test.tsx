@@ -1,4 +1,5 @@
-import { resolveTooltip } from "src/components/Tooltip";
+import { resolveTooltip, Tooltip } from "src/components/Tooltip";
+import { render } from "src/utils/rtl";
 
 describe("Tooltip", () => {
   it("can resolve tooltip text", () => {
@@ -25,5 +26,10 @@ describe("Tooltip", () => {
     expect(resolveTooltip(undefined, "Test 2")).toBe("Test 2");
     expect(resolveTooltip(undefined, "Test 2", true)).toBe("Test 2");
     expect(resolveTooltip(undefined, "Test 2", "")).toBe("Test 2");
+  });
+
+  it("renders with title prop", async () => {
+    const r = await render(<Tooltip title="Test tooltip">Text</Tooltip>);
+    expect(r.tooltip()).toHaveAttribute("title", "Test tooltip");
   });
 });
