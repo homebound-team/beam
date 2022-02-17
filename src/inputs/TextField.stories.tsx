@@ -1,6 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useMemo, useState } from "react";
+import { Icon } from "src/components";
 import { Css, Only } from "src/Css";
 import { TextField, TextFieldProps } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
@@ -59,6 +60,13 @@ export function TextFieldStyles() {
         />
         <ValidationTextField compact value="not a valid email" label="Email" />
         <TestTextField compact label="Name Clearable" value="Brandon" clearable />
+        <TestTextField
+          compact
+          label="Start and End Adornments"
+          value="Brandon"
+          startAdornment={<Icon icon="search" />}
+          endAdornment={<Icon icon="star" />}
+        />
       </div>
     </div>
   );

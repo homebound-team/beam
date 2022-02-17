@@ -1,4 +1,4 @@
-import { MutableRefObject, useRef } from "react";
+import { MutableRefObject, ReactNode, useRef } from "react";
 import { mergeProps, useTextField } from "react-aria";
 import { Only } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
@@ -13,6 +13,8 @@ export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
   clearable?: boolean;
   api?: MutableRefObject<TextFieldApi | undefined>;
   onEnter?: Callback;
+  endAdornment?: ReactNode;
+  startAdornment?: ReactNode;
 }
 
 export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
