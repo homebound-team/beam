@@ -17,7 +17,7 @@ export function Chips<X extends Only<ChipsXss, X>>(props: ChipsProps<X>) {
   return (
     <div
       css={{
-        ...Css.df.gap1.whiteSpace("normal").$,
+        ...Css.df.aifs.gap1.whiteSpace("normal").$,
         ...(wrap !== false ? Css.add({ flexWrap: "wrap" }).$ : {}),
         ...xss,
       }}
