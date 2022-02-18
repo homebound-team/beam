@@ -854,6 +854,7 @@ export type GridCellContent = {
   /** Whether to indent the cell. */
   indent?: 1 | 2;
   colspan?: number;
+  css?: Properties;
 };
 
 type MaybeFn<T> = T | (() => T);
@@ -992,8 +993,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
-          // And finally the specific cell's css (if any from GridCellContent)
+          // The specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
+          // Cell Css from the specific cell/row kind
+          ...(isGridCellContent(maybeContent) ? maybeContent.css : {}),
           // Define the width of the column on each cell. Supports col spans.
           ...(columnSizes && {
             width: `calc(${columnSizes
