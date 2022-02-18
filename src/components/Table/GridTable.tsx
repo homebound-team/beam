@@ -778,6 +778,8 @@ export type GridColumn<R extends Kinded, S = {}> = {
    * - The default value is `1fr`
    */
   w?: number | string;
+  /** The minimum width the column can shrink to */
+  mw?: string;
   /** The column's default alignment for each cell. */
   align?: GridCellAlignment;
   /** Whether the column can be sorted (if client-side sorting). Defaults to true if sorting client-side. */
@@ -1002,6 +1004,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             width: `calc(${columnSizes
               .slice(maybeNestedCardColumnIndex, maybeNestedCardColumnIndex + currentColspan)
               .join(" + ")})`,
+            ...(column.mw ? Css.mw(column.mw).$ : {}),
           }),
         };
 

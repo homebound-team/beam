@@ -245,6 +245,8 @@ const beamNestedColumns: GridColumn<BeamNestedRow>[] = [
     header: "Original",
     parent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
     child: (row) => ({ content: () => numberFormatter(row.original) }),
+    w: "200px",
+    mw: "150px",
   }),
   numericColumn<BeamNestedRow>({
     totals: (row) => numberFormatter(row.changeOrders),
