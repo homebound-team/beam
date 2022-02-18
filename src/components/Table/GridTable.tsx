@@ -24,7 +24,7 @@ import { getNestedCardStyles, isLeafRow, NestedCards, wrapCard } from "src/compo
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
 import { SortState, useSortState } from "src/components/Table/useSortState";
-import { Css, Margin, Only, Properties, Xss } from "src/Css";
+import { Css, Margin, Only, Properties, Typography, Xss } from "src/Css";
 import tinycolor from "tinycolor2";
 import { defaultStyle } from ".";
 
@@ -778,6 +778,8 @@ export type GridColumn<R extends Kinded, S = {}> = {
    * - The default value is `1fr`
    */
   w?: number | string;
+  /** The minimum width the column can shrink to */
+  mw?: string;
   /** The column's default alignment for each cell. */
   align?: GridCellAlignment;
   /** Whether the column can be sorted (if client-side sorting). Defaults to true if sorting client-side. */
@@ -854,6 +856,7 @@ export type GridCellContent = {
   /** Whether to indent the cell. */
   indent?: 1 | 2;
   colspan?: number;
+  typeScale?: Typography;
 };
 
 type MaybeFn<T> = T | (() => T);
@@ -945,6 +948,13 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const rowNode = (
     <Row css={rowCss} {...others} data-gridrow>
       {columns.map((column, columnIndex) => {
+        if (column.mw) {
+          // Validate the column's minWidth definition if set.
+          if (!column.mw.endsWith("px") && !column.mw.endsWith("%")) {
+            throw new Error("Beam Table column min-width definition only supports px or percentage values");
+          }
+        }
+
         // Decrement colspan count and skip if greater than 1.
         if (currentColspan > 1) {
           currentColspan -= 1;
@@ -992,13 +1002,16 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
-          // And finally the specific cell's css (if any from GridCellContent)
+          // The specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
+          // Add any cell specific style overrides
+          ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
           // Define the width of the column on each cell. Supports col spans.
           ...(columnSizes && {
             width: `calc(${columnSizes
               .slice(maybeNestedCardColumnIndex, maybeNestedCardColumnIndex + currentColspan)
               .join(" + ")})`,
+            ...(column.mw ? Css.mw(column.mw).$ : {}),
           }),
         };
 

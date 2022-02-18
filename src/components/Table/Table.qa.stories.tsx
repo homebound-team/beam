@@ -232,7 +232,10 @@ const beamNestedColumns: GridColumn<BeamNestedRow>[] = [
   column<BeamNestedRow>({
     totals: "Totals",
     header: "Cost Code",
-    parent: (row) => `${row.name ?? ""} (${row.children.length})`,
+    parent: (row) => ({
+      content: () => `${row.name} (${row.children.length})`,
+      typeScale: "smEm",
+    }),
     child: (row) => row.name,
     w: "200px",
   }),

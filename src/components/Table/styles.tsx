@@ -56,7 +56,7 @@ export const beamFlexibleStyle: GridStyle = {
   presentationSettings: { borderless: false, typeScale: "xs", wrap: true },
 };
 
-export const beamGroupRowStyle: Properties = Css.smEm
+export const beamGroupRowStyle: Properties = Css.xsEm
   .mhPx(56)
   .gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$;
 
