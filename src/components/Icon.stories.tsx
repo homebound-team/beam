@@ -20,6 +20,7 @@ export const Icon = () => {
     "search",
     "comment",
     "plus",
+    "minus",
     "pencil",
     "cloudUpload",
     "toggleOn",
@@ -29,6 +30,9 @@ export const Icon = () => {
     "thumbsUp",
     "verticalDots",
     "star",
+    "starFilled",
+    "cloudSave",
+    "attachment",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
