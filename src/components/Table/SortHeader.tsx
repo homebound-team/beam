@@ -1,6 +1,8 @@
 import React, { useContext } from "react";
 import { Icon } from "src/components/Icon";
 import { GridSortContext } from "src/components/Table/GridSortContext";
+import { GridCellAlignment } from "src/components/Table/types";
+import { alignmentToJustify } from "src/components/Table/utils";
 import { Css, Palette, Properties } from "src/Css";
 import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils/useTestIds";
@@ -16,8 +18,9 @@ import { useTestIds } from "src/utils/useTestIds";
  * - Write their own component that uses `GridSortContext` to access the column's
  *   current sort state + `toggleSort` function
  */
-export function SortHeader(props: { content: string; xss?: Properties; iconOnLeft?: boolean }) {
-  const { content, xss, iconOnLeft = false } = props;
+export function SortHeader(props: { content: string; xss?: Properties; alignment: GridCellAlignment }) {
+  const { content, xss, alignment } = props;
+  const iconOnLeft = alignment === "right";
   const { isHovered, hoverProps } = useHover({});
   const { sorted, toggleSort } = useContext(GridSortContext);
   const tid = useTestIds(props, "sortHeader");
@@ -38,7 +41,12 @@ export function SortHeader(props: { content: string; xss?: Properties; iconOnLef
     </span>
   );
   return (
-    <div {...tid} css={{ ...Css.df.aic.h100.cursorPointer.selectNone.$, ...xss }} {...hoverProps} onClick={toggleSort}>
+    <div
+      {...tid}
+      css={{ ...Css.df.aic.h100.cursorPointer.jc(alignmentToJustify[alignment]).selectNone.$, ...xss }}
+      {...hoverProps}
+      onClick={toggleSort}
+    >
       {iconOnLeft && icon}
       {content}
       {!iconOnLeft && icon}

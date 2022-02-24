@@ -922,6 +922,12 @@ class CssBuilder<T extends Properties1> {
   // underlay
   get underlay() { return this.add("position", "fixed").add("top", 0).add("bottom", 0).add("left", 0).add("right", 0).add("display", "flex").add("alignItems", "center").add("justifyContent", "center").add("backgroundColor", "rgba(36,36,36,0.2)"); }
 
+  // contentEmpty
+  get contentEmpty() { return this.add("content", "''"); }
+
+  // lh0
+  get lh0() { return this.add("lineHeight", 0); }
+
   // aliases
   
   get $(): T { return maybeImportant(sortObject(this.rules), this.opts.important); }

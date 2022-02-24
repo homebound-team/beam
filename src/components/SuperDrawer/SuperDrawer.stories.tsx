@@ -14,6 +14,7 @@ import {
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
 import { GridDataRow, GridRowLookup, simpleRows } from "src/components/Table";
+import { originalTableStyles } from "src/components/Table/styles";
 import { Css } from "src/Css";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { SuperDrawerContent, useSuperDrawer } from "./index";
@@ -232,6 +233,7 @@ export function TableWithPrevNextAndCloseCheck() {
         as="table"
         columns={[titleColumn, authorColumn]}
         rowStyles={rowStyles}
+        style={originalTableStyles}
         rowLookup={rowLookup}
         rows={simpleRows(Books.map((book, i) => ({ kind: "data" as const, id: `${i}`, ...book })))}
       />
@@ -278,6 +280,7 @@ export function TableWithPrevNext() {
         as="table"
         columns={[titleColumn, authorColumn]}
         rowStyles={rowStyles}
+        style={originalTableStyles}
         rowLookup={rowLookup}
         rows={[
           { kind: "header", id: "header" },

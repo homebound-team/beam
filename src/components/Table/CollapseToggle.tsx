@@ -1,5 +1,6 @@
 import { useCallback, useContext, useState } from "react";
 import { GridCollapseContext, GridDataRow, IconButton } from "src/components";
+import { Css } from "src/Css";
 
 export interface GridTableCollapseToggleProps {
   row: GridDataRow<any>;
@@ -20,5 +21,11 @@ export function CollapseToggle(props: GridTableCollapseToggleProps) {
   if (!isHeader && (!props.row.children || props.row.children.length === 0)) {
     return null;
   }
-  return <IconButton onClick={toggleOnClick} icon={isHeader ? headerIconKey : iconKey} />;
+
+  // Wrapping with a `line-height: 0` element. This prevents the IconButton's inline element from adding extra height to its parent container.
+  return (
+    <div css={Css.lh0.$}>
+      <IconButton onClick={toggleOnClick} icon={isHeader ? headerIconKey : iconKey} />
+    </div>
+  );
 }

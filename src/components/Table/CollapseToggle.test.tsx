@@ -1,5 +1,5 @@
 import { CollapseToggle } from "src/components/Table/CollapseToggle";
-import { GridCollapseContext } from "src/components/Table/GridTable";
+import { GridCollapseContext } from "src/components/Table/GridCollapseContext";
 import { noop } from "src/utils";
 import { render } from "src/utils/rtl";
 

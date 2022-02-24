@@ -1,17 +1,7 @@
 import React, { MutableRefObject, useContext } from "react";
+import { GridCollapseContext } from "src/components/Table/GridCollapseContext";
 import { GridRowLookup } from "src/components/Table/GridRowLookup";
-import {
-  calcColumnSizes,
-  emptyCell,
-  GridCollapseContext,
-  GridColumn,
-  GridDataRow,
-  GridRowStyles,
-  GridStyle,
-  GridTable,
-  matchesFilter,
-  setRunningInJest,
-} from "src/components/Table/GridTable";
+import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
 import {
   simpleDataRows,
   simpleHeader,
@@ -19,6 +9,8 @@ import {
   SimpleHeaderAndDataWith,
   simpleRows,
 } from "src/components/Table/simpleHelpers";
+import { GridColumn, GridDataRow, GridRowStyles, GridStyle } from "src/components/Table/types";
+import { calcColumnSizes, emptyCell, matchesFilter } from "src/components/Table/utils";
 import { Css, Palette } from "src/Css";
 import { cell, cellAnd, cellOf, click, render, row, rowAnd } from "src/utils/rtl";
 
@@ -68,8 +60,8 @@ describe("GridTable", () => {
     };
     const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} />);
     // Then we add the center class
-    expect(cell(r, 0, 1)).toHaveStyleRule("justify-content", "center");
-    expect(cell(r, 1, 1)).toHaveStyleRule("justify-content", "center");
+    expect(cell(r, 0, 1)).toHaveStyleRule("text-align", "center");
+    expect(cell(r, 1, 1)).toHaveStyleRule("text-align", "center");
   });
 
   it("can align a column", async () => {
@@ -83,9 +75,9 @@ describe("GridTable", () => {
     };
     const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} />);
     // Then we applied the default of right aligned
-    expect(cell(r, 0, 1)).toHaveStyleRule("justify-content", "flex-end");
+    expect(cell(r, 0, 1)).toHaveStyleRule("text-align", "right");
     // And also the override of center aligned
-    expect(cell(r, 1, 1)).toHaveStyleRule("justify-content", "center");
+    expect(cell(r, 1, 1)).toHaveStyleRule("text-align", "center");
   });
 
   it("unwraps rows with a data key", async () => {
@@ -724,7 +716,7 @@ describe("GridTable", () => {
     await expect(
       render(
         <GridTable
-          columns={[{ header: () => "Name", data: "Test", mw: "fit-content" }]}
+          columns={[{ header: () => "Name", data: "Test" }]}
           rows={[simpleHeader, { kind: "data", id: "1", name: "a", value: 3 }]}
         />,
       ),

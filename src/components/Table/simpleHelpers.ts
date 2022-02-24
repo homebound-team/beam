@@ -1,4 +1,4 @@
-import { GridDataRow } from "src/components/Table/GridTable";
+import { GridDataRow } from "src/components/Table/types";
 
 /** A helper for making `Row` type aliases of simple/flat tables that are just header + data. */
 export type SimpleHeaderAndDataOf<T> = { kind: "header" } | ({ kind: "data" } & T);

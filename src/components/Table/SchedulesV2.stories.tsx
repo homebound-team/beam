@@ -11,7 +11,8 @@ import { Checkbox, DateField, NumberField, SelectField, TextAreaField } from "sr
 import { zeroTo } from "src/utils/sb";
 import { Icon } from "../Icon";
 import { actionColumn, column, dateColumn } from "./columns";
-import { GridDataRow, GridTableApi } from "./GridTable";
+import { GridTableApi } from "./GridTable";
+import { GridDataRow } from "./types";
 
 export default {
   title: "Pages / SchedulesV2",
@@ -65,24 +66,40 @@ const arrowColumn = actionColumn<Row>({
       <CollapseToggle row={row} />
     </div>
   ),
-  milestone: (row) => (
-    <div css={Css.pr1.$}>
-      <CollapseToggle row={row} />
-    </div>
-  ),
-  subgroup: (row) => (
-    <div css={Css.pr1.$}>
-      <CollapseToggle row={row} />
-    </div>
-  ),
+  milestone: (row) => ({
+    content: () => (
+      <div css={Css.pr1.$}>
+        <CollapseToggle row={row} />
+      </div>
+    ),
+    sticky: "left",
+  }),
+  subgroup: (row) => ({
+    content: () => (
+      <div css={Css.pr1.$}>
+        <CollapseToggle row={row} />
+      </div>
+    ),
+    sticky: "left",
+  }),
   task: "",
   add: "",
   w: "36px",
 });
 const selectColumn = actionColumn<Row>({
   header: (row) => <Checkbox label="" onChange={action("Select All")} />,
-  milestone: (row) => ({ colspan: 3, content: <div css={Css.smEm.gray900.$}>{row.name}</div>, alignment: "left" }),
-  subgroup: (row) => ({ colspan: 3, content: <div css={Css.smEm.gray900.$}>{row.name}</div>, alignment: "left" }),
+  milestone: (row) => ({
+    colspan: 3,
+    sticky: "left",
+    content: <div css={Css.smEm.gray900.$}>{row.name}</div>,
+    alignment: "left",
+  }),
+  subgroup: (row) => ({
+    colspan: 3,
+    sticky: "left",
+    content: <div css={Css.smEm.gray900.$}>{row.name}</div>,
+    alignment: "left",
+  }),
   task: (task) => <Checkbox label="" onChange={action(`Select ${task.name}`)} />,
   add: "",
   w: "32px",
@@ -136,7 +153,7 @@ const milestoneColumn = column<Row>({
   subgroup: "",
   task: (row) => row.milestone,
   add: "",
-  w: "100px",
+  w: "260px",
 });
 const subCategoryColumn = column<Row>({
   header: "SubCategory",
@@ -145,7 +162,7 @@ const subCategoryColumn = column<Row>({
   subgroup: "",
   task: (row) => row.subGroup,
   add: "",
-  w: "100px",
+  w: "150px",
 });
 const statusColumn = column<Row>({
   header: "Status",
@@ -159,12 +176,15 @@ const buttonColumns = actionColumn<Row>({
   header: "",
   milestone: "",
   subgroup: "",
-  task: (row) => (
-    <div css={Css.df.gap1.$}>
-      <Icon icon="comment" />
-      <Icon icon="infoCircle" />
-    </div>
-  ),
+  task: (row) => ({
+    content: () => (
+      <div css={Css.df.gap1.$}>
+        <Icon icon="comment" />
+        <Icon icon="infoCircle" />
+      </div>
+    ),
+    sticky: "right",
+  }),
   add: "",
   w: "100px",
 });
@@ -172,20 +192,21 @@ const buttonColumns = actionColumn<Row>({
 // TODO: Potentially add 8px spacer between each row
 const spacing = { brPx: 8, pxPx: 16 };
 const style: GridStyle = {
-  headerCellCss: Css.sm.gray700.py1.df.aic.$,
+  headerCellCss: Css.sm.gray700.py1.$,
   firstNonHeaderRowCss: Css.mt2.$,
-  cellCss: Css.gray700.sm.aic.pxPx(4).$,
-  rootCss: Css.pb(2).$,
+  cellCss: Css.gray700.sm.aic.pxPx(4).vMid.$,
+  rootCss: Css.pb(2).w("auto").$,
+  afterHeaderSpacing: 16,
   nestedCards: {
     spacerPx: 8,
-    firstLastColumnWidth: 33, // 32px + 1px border
+    firstLastColumnWidth: 41, // 32px + 8px + 1px border
     kinds: {
-      header: { bgColor: Palette.Gray100, brPx: 4, pxPx: 0 },
+      header: { bgColor: Palette.Gray100, brPx: 4, pxPx: 4 },
       // TODO: It would be nice if this used CSS Properties so that we can use TRUSS
       milestone: { bgColor: Palette.Gray100, ...spacing },
       subgroup: { bgColor: Palette.White, ...spacing },
       // TODO: Validate with Dara regarding nested 3rd child.
-      task: { bgColor: Palette.White, bColor: Palette.Gray200, ...spacing, pxPx: 0 },
+      task: { bgColor: Palette.White, bColor: Palette.Gray200, ...spacing, pxPx: 8 },
       // Purposefully leave out the `add` kind
     },
   },
@@ -193,7 +214,7 @@ const style: GridStyle = {
 
 export function SchedulesV2() {
   return (
-    <div css={Css.h("100vh").w("fit-content").mx("auto").$}>
+    <div css={Css.h("100vh").mx("auto").wPx(1228).$}>
       <PresentationProvider fieldProps={{ borderless: true, typeScale: "xs" }}>
         <GridTable<Row>
           rows={rows}
@@ -235,7 +256,7 @@ export function SchedulesV2Virtualized() {
   });
 
   return (
-    <div css={Css.h("100vh").w("fit-content").mx("auto").$}>
+    <div css={Css.h("100vh").mx("auto").wPx(1228).$}>
       <PresentationProvider fieldProps={{ borderless: true, typeScale: "xs" }}>
         <GridTable<Row>
           id="virtual-schedules-grid-table"
@@ -253,7 +274,7 @@ export function SchedulesV2Virtualized() {
             statusColumn,
             buttonColumns,
           ]}
-          style={{ ...style, rootCss: Css.pb4.$ }}
+          style={{ ...style, rootCss: Css.pb4.w("auto").$ }}
           rowStyles={{
             task: {
               cellCss: Css.py1.$,

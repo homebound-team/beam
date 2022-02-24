@@ -1,7 +1,7 @@
 import { MutableRefObject } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
-import { DiscriminateUnion, GridColumn, GridDataRow, Kinded, RowTuple } from "src/components/Table/GridTable";
-import { dropChromeRows } from "src/components/Table/nestedCards";
+import { dropChromeRows, isChromeRow } from "src/components/Table/nestedCards";
+import { DiscriminateUnion, GridColumn, GridDataRow, Kinded, RowTuple } from "src/components/Table/types";
 
 /**
  * Allows a caller to ask for the currently shown rows, given the current sorting/filtering.
@@ -43,7 +43,7 @@ export function createRowLookup<R extends Kinded>(
         // element and calling .scrollIntoView, just not doing that yet.
         throw new Error("scrollTo is only supported for as=virtual");
       }
-      const index = filteredRows.findIndex(([r]) => r && r.kind === kind && r.id === id);
+      const index = filteredRows.findIndex(([r]) => !isChromeRow(r) && r.kind === kind && r.id === id);
       virtuosoRef.current.scrollToIndex({ index, behavior: "smooth" });
     },
     currentList() {

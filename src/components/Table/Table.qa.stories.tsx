@@ -2,9 +2,9 @@ import { Meta } from "@storybook/react";
 import { ReactNode, useMemo } from "react";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
+import { emptyCell, GridColumn, GridDataRow, GridTable } from "src/components/Table";
 import { CollapseToggle } from "src/components/Table/CollapseToggle";
 import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/columns";
-import { emptyCell, GridColumn, GridDataRow, GridTable } from "src/components/Table/GridTable";
 import { SimpleHeaderAndDataWith } from "src/components/Table/simpleHelpers";
 import { beamFixedStyle, beamFlexibleStyle, beamGroupRowStyle, beamTotalsRowStyle } from "src/components/Table/styles";
 import { Tag } from "src/components/Tag";
@@ -34,28 +34,30 @@ type BeamRow = SimpleHeaderAndDataWith<BeamData>;
 
 export function Fixed() {
   return (
-    <GridTable<BeamRow>
-      style={beamFixedStyle}
-      sorting={{ on: "client", initial: [1, "ASC"] }}
-      columns={beamStyleColumns()}
-      rows={[
-        { kind: "header", id: "header" },
-        ...zeroTo(20).map((idx) => ({
-          kind: "data" as const,
-          id: `r:${idx + 1}`,
-          data: {
+    <div css={Css.df.fdc.vh100.$}>
+      <GridTable<BeamRow>
+        style={beamFixedStyle}
+        sorting={{ on: "client", initial: [1, "ASC"] }}
+        columns={beamStyleColumns()}
+        rows={[
+          { kind: "header", id: "header" },
+          ...zeroTo(20).map((idx) => ({
+            kind: "data" as const,
             id: `r:${idx + 1}`,
-            favorite: idx < 5,
-            commitmentName: idx === 2 ? "A longer name that will truncate with an ellipsis" : `Commitment ${idx + 1}`,
-            date: `01/${idx + 1 > 9 ? idx + 1 : `0${idx + 1}`}/2020`,
-            status: "Success",
-            tradeCategories: ["Roofing", "Architecture", "Plumbing"],
-            priceInCents: 1234_56 + idx,
-            location: idx % 2 ? "l:1" : "l:2",
-          },
-        })),
-      ]}
-    />
+            data: {
+              id: `r:${idx + 1}`,
+              favorite: idx < 5,
+              commitmentName: idx === 2 ? "A longer name that will truncate with an ellipsis" : `Commitment ${idx + 1}`,
+              date: `01/${idx + 1 > 9 ? idx + 1 : `0${idx + 1}`}/2020`,
+              status: "Success",
+              tradeCategories: ["Roofing", "Architecture", "Plumbing"],
+              priceInCents: 1234_56 + idx,
+              location: idx % 2 ? "l:1" : "l:2",
+            },
+          })),
+        ]}
+      />
+    </div>
   );
 }
 
@@ -302,13 +304,13 @@ function beamStyleColumns() {
   ];
 
   const selectCol = selectColumn<BeamRow>({
-    header: () => ({ content: <Checkbox label="Label" onChange={noop} checkboxOnly /> }),
-    data: () => ({ content: <Checkbox label="Label" onChange={noop} checkboxOnly /> }),
+    header: () => ({ content: () => <Checkbox label="Label" onChange={noop} checkboxOnly /> }),
+    data: () => ({ content: () => <Checkbox label="Label" onChange={noop} checkboxOnly /> }),
   });
   const favCol = column<BeamRow>({
     header: () => ({ content: "" }),
     data: ({ favorite }) => ({
-      content: <Icon icon="star" color={favorite ? Palette.Gray700 : Palette.Gray300} />,
+      content: () => <Icon icon="star" color={favorite ? Palette.Gray700 : Palette.Gray300} />,
       sortValue: favorite ? 0 : 1,
     }),
     // Defining `w: 56px` to accommodate for the `27px` wide checkbox and `16px` of padding on either side.
@@ -316,13 +318,13 @@ function beamStyleColumns() {
   });
   const statusCol = column<BeamRow>({
     header: "Status",
-    data: ({ status }) => ({ content: <Tag text={status} type="success" />, sortValue: status }),
+    data: ({ status }) => ({ content: () => <Tag text={status} type="success" />, sortValue: status }),
     w: "125px",
   });
   const nameCol = column<BeamRow>({
     header: "Commitment Name",
-    data: ({ commitmentName }) => commitmentName,
-    w: "220px",
+    data: ({ commitmentName }) => ({ content: () => commitmentName }),
+    w: "200px",
   });
   const tradeCol = column<BeamRow>({
     header: "Trade Categories",
@@ -330,14 +332,16 @@ function beamStyleColumns() {
       content: () => <Chips values={tradeCategories.sort()} />,
       sortValue: tradeCategories.sort().join(" "),
     }),
+    w: "250px",
   });
-  const dateCol = dateColumn<BeamRow>({ header: "Date", data: ({ date }) => date });
+  const dateCol = dateColumn<BeamRow>({ header: "Date", data: ({ date }) => ({ content: () => date }), w: "150px" });
   const locationCol = column<BeamRow>({
     header: "Location",
     data: (row) => ({
-      content: <SelectField value={row.location} onSelect={noop} options={locations} label="Location" />,
+      content: () => <SelectField value={row.location} onSelect={noop} options={locations} label="Location" />,
       sortValue: row.location,
     }),
+    w: "250px",
   });
   const priceCol = numericColumn<BeamRow>({
     header: "Price",
@@ -345,6 +349,7 @@ function beamStyleColumns() {
       content: () => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
       sortValue: priceInCents,
     }),
+    w: "150px",
   });
   const readOnlyPriceCol = numericColumn<BeamRow>({
     header: "Read only Price",
@@ -352,6 +357,7 @@ function beamStyleColumns() {
       content: () => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />,
       sortValue: priceInCents,
     }),
+    w: "150px",
   });
 
   return [selectCol, favCol, statusCol, nameCol, tradeCol, locationCol, dateCol, priceCol, readOnlyPriceCol];

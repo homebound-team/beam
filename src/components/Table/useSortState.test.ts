@@ -1,5 +1,5 @@
-import { ASC, DESC } from "src/components/Table/GridTable";
 import { deriveSortState } from "src/components/Table/useSortState";
+import { ASC, DESC } from "src/components/Table/utils";
 
 describe("useSortState", () => {
   it("can derive the next sort state when current state is undefined", () => {

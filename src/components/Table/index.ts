@@ -1,26 +1,27 @@
 export * from "./CollapseToggle";
 export * from "./columns";
+export { GridCollapseContext } from "./GridCollapseContext";
+export type { GridCollapseContextProps } from "./GridCollapseContext";
 export type { GridRowLookup } from "./GridRowLookup";
 export { GridSortContext } from "./GridSortContext";
-export { ASC, DESC, GridTable, setDefaultStyle, setGridTableDefaults } from "./GridTable";
+export { GridTable, setDefaultStyle, setGridTableDefaults } from "./GridTable";
+export type { GridTableDefaults, GridTableProps, setRunningInJest } from "./GridTable";
+export { simpleDataRows, simpleHeader, simpleRows } from "./simpleHelpers";
+export type { SimpleHeaderAndDataOf, SimpleHeaderAndDataWith } from "./simpleHelpers";
+export { SortHeader } from "./SortHeader";
+export { cardStyle, condensedStyle, defaultStyle } from "./styles";
 export type {
   Direction,
   GridCellAlignment,
   GridCellContent,
-  GridCollapseContext,
   GridColumn,
   GridDataRow,
   GridRowStyles,
   GridSortConfig,
   GridStyle,
-  GridTableDefaults,
-  GridTableProps,
   GridTableXss,
   Kinded,
+  RenderAs,
   RowStyle,
-  setRunningInJest,
-} from "./GridTable";
-export { simpleDataRows, simpleHeader, simpleRows } from "./simpleHelpers";
-export type { SimpleHeaderAndDataOf, SimpleHeaderAndDataWith } from "./simpleHelpers";
-export { SortHeader } from "./SortHeader";
-export { cardStyle, condensedStyle, defaultStyle } from "./styles";
+} from "./types";
+export { ASC, DESC, emptyCell, isGridCellContent } from "./utils";

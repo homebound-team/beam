@@ -1,4 +1,4 @@
-import { GridColumn, Kinded } from "src/components/Table/GridTable";
+import { GridColumn, Kinded } from "src/components/Table/types";
 
 /** Provides default styling for a GridColumn representing a Date. */
 export function column<T extends Kinded, S = {}>(columnDef: GridColumn<T, S>): GridColumn<T, S> {

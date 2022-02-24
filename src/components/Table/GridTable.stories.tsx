@@ -521,74 +521,6 @@ export const StyleCardWithOneColumn = newStory(() => {
   );
 }, {});
 
-export function AsTable() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
-
-  return (
-    <GridTable
-      as="table"
-      columns={[nameColumn, valueColumn, actionColumn]}
-      rows={[
-        { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
-      ]}
-    />
-  );
-}
-
-export function AsTableWithCustomStyles() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "75px", align: "right" };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
-
-  return (
-    <GridTable
-      as="table"
-      columns={[nameColumn, valueColumn, actionColumn]}
-      rows={[
-        { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
-      ]}
-      rowStyles={{
-        header: { cellCss: Css.p1.$ },
-        data: {},
-      }}
-    />
-  );
-}
-
-export const AsTableWithRowLink = newStory(
-  () => {
-    const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-    const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-    const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
-    const rowStyles: GridRowStyles<Row> = {
-      data: { indent: 2, rowLink: () => "http://homebound.com" },
-      header: {},
-    };
-    return (
-      <GridTable<Row>
-        as="table"
-        columns={[nameColumn, valueColumn, actionColumn]}
-        rowStyles={rowStyles}
-        rows={[
-          { kind: "header", id: "header" },
-          { kind: "data", id: "1", name: "c", value: 1 },
-          { kind: "data", id: "2", name: "b", value: 2 },
-          { kind: "data", id: "3", name: "a", value: 3 },
-        ]}
-      />
-    );
-  },
-  { decorators: [withRouter()] },
-);
-
 type Data2 = { name: string; role: string; date: string; priceInCents: number };
 type Row2 = SimpleHeaderAndDataOf<Data2>;
 export const DataTypeColumns = newStory(
@@ -608,7 +540,15 @@ export const DataTypeColumns = newStory(
         <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />
       ),
     });
-    const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
+    const actionCol = actionColumn<Row2>({
+      header: "Action",
+      // `line-height: 0` prevents inline elements from unnecessarily adding height.
+      data: () => (
+        <div css={Css.lh0.$}>
+          <IconButton icon="check" onClick={noop} />
+        </div>
+      ),
+    });
     return (
       <GridTable<Row2>
         columns={[nameCol, detailCol, dateCol, priceCol, readOnlyPriceCol, actionCol]}
@@ -649,7 +589,7 @@ export function WrappedHeaders() {
     <GridTable<Row2>
       columns={[leftAlignedColumn, rightAlignedColumn, centerAlignedColumn]}
       sorting={{ on: "client", initial: undefined }}
-      style={condensedStyle}
+      style={{ ...condensedStyle, rootCss: { ...condensedStyle.rootCss, ...Css.w("auto").$ } }}
       rows={[
         { kind: "header", id: "header" },
         { kind: "data", id: "1", name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },

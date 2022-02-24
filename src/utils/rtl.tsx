@@ -70,7 +70,10 @@ export function cell(r: RenderResult, row: number, column: number): HTMLElement 
 }
 
 export function cellOf(r: RenderResult, tableTestId: string, rowNum: number, column: number): HTMLElement {
-  return row(r, rowNum, tableTestId).childNodes[column] as HTMLElement;
+  const nonPaddingColumns = Array.from(row(r, rowNum, tableTestId).childNodes).filter(
+    (node) => !("cardpadding" in (node as HTMLElement).dataset),
+  );
+  return nonPaddingColumns[column] as HTMLElement;
 }
 
 export function cellAnd(r: RenderResult, row: number, column: number, testId: string): HTMLElement {
