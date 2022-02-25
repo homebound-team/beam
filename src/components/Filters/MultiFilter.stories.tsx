@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react";
 import { stageFilter } from "src/components/Filters/testDomain";
-import { Filters } from "src/components/index";
+import { Filters, multiFilter } from "src/components/index";
+import { HasIdAndName } from "src/types";
 
 export default {
   component: Filters,
@@ -21,4 +22,14 @@ export function MultiFilterInModal() {
 export function MultiFilterVertical() {
   const filter = stageFilter("stage");
   return filter.render(undefined, () => {}, {}, false, true);
+}
+
+export function ZeroOptions() {
+  const filter = multiFilter({
+    options: [] as HasIdAndName[],
+    getOptionValue: (s) => s.id,
+    getOptionLabel: (s) => s.name,
+    disabled: "Filter is disabled because there are no options",
+  })("key");
+  return filter.render(undefined, () => {}, {}, true, false);
 }
