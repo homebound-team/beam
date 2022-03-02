@@ -52,6 +52,7 @@ jobs:
     docker:
       - <<: *node-image
     steps:
+      - checkout
       - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc'
       - node/install-packages:
           pkg-manager: yarn
