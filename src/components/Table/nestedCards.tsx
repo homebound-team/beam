@@ -98,10 +98,7 @@ export class NestedCards {
    */
   maybeCreateChromeRow(): void {
     if (this.chromeBuffer.length > 0) {
-      this.rows.push([
-        undefined,
-        <ChromeRow key={this.chromeRowIndex++} chromeBuffer={[...this.chromeBuffer]} columns={this.columns.length} />,
-      ]);
+      this.rows.push([undefined, <ChromeRow key={this.chromeRowIndex++} chromeBuffer={[...this.chromeBuffer]} />]);
       // clear the Chrome buffer
       this.chromeBuffer.splice(0, this.chromeBuffer.length);
     }
@@ -243,12 +240,11 @@ export function makeSpacer(height: number, openCards: string[], styles: NestedCa
 
 interface ChromeRowProps {
   chromeBuffer: ChromeBuffer;
-  columns: number;
 }
-export function ChromeRow({ chromeBuffer, columns }: ChromeRowProps) {
+export function ChromeRow({ chromeBuffer }: ChromeRowProps) {
   return (
     // We add 2 to account for our dedicated open/close columns
-    <div css={Css.gc(`span ${columns + 2}`).$}>
+    <div>
       {chromeBuffer.map((c, i) => (
         <Fragment key={i}>{c()}</Fragment>
       ))}

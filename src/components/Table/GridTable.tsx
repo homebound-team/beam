@@ -1,3 +1,4 @@
+import { useResizeObserver } from "@react-aria/utils";
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
 import React, {
@@ -26,6 +27,7 @@ import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Ta
 import { SortState, useSortState } from "src/components/Table/useSortState";
 import { Css, Margin, Only, Properties, Typography, Xss } from "src/Css";
 import tinycolor from "tinycolor2";
+import { useDebouncedCallback } from "use-debounce";
 import { defaultStyle } from ".";
 
 export type Kinded = { kind: string };
@@ -80,6 +82,8 @@ export interface GridStyle {
   emptyCell?: ReactNode;
   presentationSettings?: Pick<PresentationFieldProps, "borderless" | "typeScale"> &
     Pick<PresentationContextProps, "wrap">;
+  /** Minimum table width in pixels. Used when calculating columns sizes */
+  minWidth?: number;
 }
 
 export type NestedCardStyleByKind = Record<string, NestedCardStyle>;
@@ -217,6 +221,8 @@ export interface GridTableProps<R extends Kinded, S, X> {
   xss?: X;
   /** Experimental API allowing one to scroll to a table index. Primarily intended for stories at the moment */
   api?: MutableRefObject<GridTableApi | undefined>;
+  /** Specify the element in which the table should resize its columns against. If not set, the table will resize columns based on its owns container's width */
+  resizeTarget?: MutableRefObject<HTMLElement | null>;
 }
 
 /** NOTE: This API is experimental and primarily intended for story and testing purposes */
@@ -262,11 +268,13 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     observeRows,
     persistCollapse,
     api,
+    resizeTarget,
   } = props;
 
   const [collapsedIds, collapseAllContext, collapseRowContext] = useToggleIds(rows, persistCollapse);
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
+  const tableRef = useRef<HTMLElement>(null);
 
   if (api) {
     api.current = {
@@ -284,10 +292,25 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     return rows;
   }, [columns, rows, sorting, sortState]);
 
-  const columnSizes = useMemo(
-    () => calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth),
-    [columns, style.nestedCards?.firstLastColumnWidth],
+  const [columnSizes, setColumnSizes] = useState<string[]>(
+    calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, undefined, style.minWidth),
   );
+
+  const [tableWidth, setTableWidth] = useState<number | undefined>();
+
+  const debouncedTableWidth = useDebouncedCallback((width) => {
+    setTableWidth(width);
+    setColumnSizes(calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, width, style.minWidth));
+  }, 100);
+
+  const onResize = useCallback(() => {
+    const target = resizeTarget?.current ? resizeTarget.current : tableRef.current;
+    if (target && target.clientWidth !== tableWidth) {
+      debouncedTableWidth(target.clientWidth);
+    }
+  }, [resizeTarget?.current, tableRef.current, debouncedTableWidth]);
+
+  useResizeObserver({ ref: resizeTarget ?? tableRef, onResize });
 
   // Filter + flatten + component-ize the sorted rows.
   let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
@@ -390,6 +413,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     collapseAllContext,
     collapseRowContext,
     observeRows,
+    columnSizes,
   ]);
 
   let tooManyClientSideRows = false;
@@ -445,6 +469,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         style.nestedCards?.firstLastColumnWidth,
         xss,
         virtuosoRef,
+        tableRef,
       )}
     </PresentationProvider>
   );
@@ -469,12 +494,12 @@ function renderDiv<R extends Kinded>(
   firstLastColumnWidth: number | undefined,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  tableRef: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
   return (
     <div
+      ref={tableRef as any}
       css={{
-        // Ensure all rows extend the same width
-        ...Css.mw("fit-content").$,
         /*
           Using (n + 3) here to target all rows that are after the first non-header row. Since n starts at 0, we can use
           the + operator as an offset.
@@ -483,6 +508,7 @@ function renderDiv<R extends Kinded>(
         ...(style.betweenRowsCss ? Css.addIn(`& > div:nth-of-type(n+3) > *`, style.betweenRowsCss).$ : {}),
         ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:nth-of-type(2) > *`, style.firstNonHeaderRowCss).$ : {}),
         ...style.rootCss,
+        ...(style.minWidth ? Css.mwPx(style.minWidth).$ : {}),
         ...xss,
       }}
       data-testid={id}
@@ -511,15 +537,18 @@ function renderTable<R extends Kinded>(
   _firstLastColumnWidth: number | undefined,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  tableRef: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
   return (
     <table
+      ref={tableRef as any}
       css={{
         ...Css.w100.add("borderCollapse", "collapse").$,
         ...Css.addIn("& > tbody > tr ", style.betweenRowsCss || {})
           // removes border between header and second row
           .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss || {}).$,
         ...style.rootCss,
+        ...(style.minWidth ? Css.mwPx(style.minWidth).$ : {}),
         ...xss,
       }}
       data-testid={id}
@@ -571,6 +600,7 @@ function renderVirtual<R extends Kinded>(
   firstLastColumnWidth: number | undefined,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  tableRef: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
@@ -582,8 +612,12 @@ function renderVirtual<R extends Kinded>(
     <Virtuoso
       overscan={5}
       ref={virtuosoRef}
-      // Add `minWidth: fit-content` to ensure a sticky header and the virtualized table body maintain same width
-      style={{ minWidth: "fit-content" }}
+      scrollerRef={(ref) => {
+        // This is fired multiple times per render. Only set `tableRef.current` if it has changed
+        if (ref && tableRef.current !== ref) {
+          tableRef.current = ref as HTMLElement;
+        }
+      }}
       components={{
         List: VirtualRoot(listStyle, columns, id, firstLastColumnWidth, xss),
         Footer: () => <div css={footerStyle} />,
@@ -668,6 +702,7 @@ const VirtualRoot = memoizeOne<
                 ...Css.addIn("& > div:first-of-type > *", gs.firstNonHeaderRowCss).$,
               }),
           ...gs.rootCss,
+          ...(gs.minWidth ? Css.mwPx(gs.minWidth).$ : {}),
           ...xss,
         }}
         data-testid={id}
@@ -682,7 +717,12 @@ const VirtualRoot = memoizeOne<
  * Calculates column widths using a flexible `calc()` definition that allows for consistent column alignment without the use of `<table />`, CSS Grid, etc layouts.
  * Enforces only fixed-sized units (% and px)
  */
-export function calcColumnSizes(columns: GridColumn<any>[], firstLastColumnWidth: number | undefined): string[] {
+export function calcColumnSizes(
+  columns: GridColumn<any>[],
+  firstLastColumnWidth: number | undefined,
+  tableWidth?: number,
+  tableMinWidthPx: number = 0,
+): string[] {
   // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
   // calc((100% - allOtherPercent - allOtherPx) * ((myFr / totalFr))`
   //
@@ -712,6 +752,16 @@ export function calcColumnSizes(columns: GridColumn<any>[], firstLastColumnWidth
 
   // This is our "fake but for some reason it lines up better" fr calc
   function fr(myFr: number): string {
+    // If the tableWidth, then return a pixel value
+    if (tableWidth) {
+      const widthBasis = tableWidth > tableMinWidthPx ? tableWidth : tableMinWidthPx;
+      // When the tableWidth is defined, then we need to account for the `firstLastColumnWidth`s.
+      return `(${
+        (widthBasis - (claimedPercentages / 100) * widthBasis - claimedPixels - (firstLastColumnWidth ?? 0) * 2) *
+        (myFr / totalFr)
+      }px)`;
+    }
+    // Otherwise return the `calc()` value
     return `((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
@@ -731,11 +781,7 @@ export function calcColumnSizes(columns: GridColumn<any>[], firstLastColumnWidth
     }
   });
 
-  return maybeAddCardColumns(sizes, firstLastColumnWidth);
-}
-
-// If we're doing nested cards, we add extra 1st/last cells...
-function maybeAddCardColumns(sizes: string[], firstLastColumnWidth: number | undefined): string[] {
+  // If we're doing nested cards, we add extra 1st/last cells...
   return !firstLastColumnWidth ? sizes : [`${firstLastColumnWidth}px`, ...sizes, `${firstLastColumnWidth}px`];
 }
 
@@ -893,8 +939,7 @@ interface GridRowProps<R extends Kinded, S> {
   setSortKey?: (value: S) => void;
   // NOTE: openCards is a string of colon separated open kinds, so that the result is stable across renders.
   openCards: string | undefined;
-  // Required for setting column widths in a virtualized table
-  columnSizes: string[] | undefined;
+  columnSizes: string[];
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -1007,12 +1052,12 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           // Add any cell specific style overrides
           ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
           // Define the width of the column on each cell. Supports col spans.
-          ...(columnSizes && {
+          ...{
             width: `calc(${columnSizes
               .slice(maybeNestedCardColumnIndex, maybeNestedCardColumnIndex + currentColspan)
               .join(" + ")})`,
-            ...(column.mw ? Css.mw(column.mw).$ : {}),
-          }),
+          },
+          ...(column.mw ? Css.mw(column.mw).$ : {}),
         };
 
         const renderFn: RenderCellFn<any> =
