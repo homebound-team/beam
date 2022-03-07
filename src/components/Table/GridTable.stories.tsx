@@ -260,6 +260,7 @@ function NestedCards({ rows, as, sorting, style }: NestedCardsProps) {
       value: row.name,
     }),
     add: () => "Add",
+    w: "800px",
   };
   const actionColumn: GridColumn<NestedRow> = {
     header: () => "Action",
@@ -268,6 +269,7 @@ function NestedCards({ rows, as, sorting, style }: NestedCardsProps) {
     grandChild: () => <div css={Css.xs.$}>Delete</div>,
     add: () => "",
     clientSideSort: false,
+    w: "400px",
   };
   const spacing = { brPx: 4, pxPx: 4 };
   const nestedStyle: GridStyle = {

@@ -20,7 +20,7 @@ import {
 } from "src/components/PresentationContext";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
-import { getNestedCardStyles, isLeafRow, NestedCards, wrapCard } from "src/components/Table/nestedCards";
+import { isLeafRow, maybeAddCardPadding, NestedCards } from "src/components/Table/nestedCards";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
 import { SortState, useSortState } from "src/components/Table/useSortState";
@@ -138,7 +138,7 @@ export function setGridTableDefaults(opts: Partial<GridTableDefaults>): void {
 type RenderAs = "div" | "table" | "virtual";
 
 /** The GridDataRow is optional b/c the nested card chrome rows only have ReactElements. */
-export type RowTuple<R extends Kinded> = [GridDataRow<R> | undefined, ReactElement];
+export type RowTuple<R extends Kinded> = [GridDataRow<R> | { chromeRow: true }, ReactElement];
 
 /**
  * The sort settings for the current table; whether it's client-side or server-side.
@@ -927,6 +927,11 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           .map((openCardKind) => style.nestedCards!.kinds[openCardKind])
           .filter((style) => style)
       : undefined;
+  const rowCardStyles: NestedCardStyle | undefined = style.nestedCards?.kinds[row.kind];
+  let cardPaddingStyles: NestedCardStyle[] | undefined = openCardStyles;
+  if (cardPaddingStyles && isLeafRow(row) && rowCardStyles) {
+    cardPaddingStyles.push(rowCardStyles);
+  }
 
   const rowStyleCellCss = maybeApplyFunction(row, rowStyle?.cellCss);
   const rowCss = {
@@ -940,13 +945,14 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     ...maybeApplyFunction(row, rowStyle?.rowCss),
     // Maybe add the sticky header styles
     ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined),
-    ...getNestedCardStyles(row, openCardStyles, style),
+    // ...getNestedCardStyles(row, openCardStyles, style),
   };
 
   let currentColspan = 1;
 
   const rowNode = (
     <Row css={rowCss} {...others} data-gridrow>
+      {cardPaddingStyles && maybeAddCardPadding(cardPaddingStyles, "first", style.nestedCards!, row)}
       {columns.map((column, columnIndex) => {
         if (column.mw) {
           // Validate the column's minWidth definition if set.
@@ -981,6 +987,14 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
         const maybeNestedCardColumnIndex = columnIndex + (style.nestedCards ? 1 : 0);
 
+        const cardStylesBgColor = rowCardStyles
+          ? rowCardStyles.bgColor
+          : openCardStyles && openCardStyles.length > 0
+          ? openCardStyles[openCardStyles.length - 1].bgColor
+          : undefined;
+
+        console.log("kind", row.kind, "rowCardStyles", rowCardStyles, "cardStylesBgColor", cardStylesBgColor);
+
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
         // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
         // a few descendent selectors. However, that approach means the root grid-applied
@@ -1013,6 +1027,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
               .join(" + ")})`,
             ...(column.mw ? Css.mw(column.mw).$ : {}),
           }),
+          ...(style.nestedCards && Css.bgColor(cardStylesBgColor).$),
+          ...(isLeafRow(row) && rowCardStyles && rowCardStyles.bColor && Css.bc(rowCardStyles.bColor).bb.bt.$),
         };
 
         const renderFn: RenderCellFn<any> =
@@ -1026,10 +1042,12 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
         return renderFn(columnIndex, cellCss, content, row, rowStyle);
       })}
+      {cardPaddingStyles && maybeAddCardPadding(cardPaddingStyles, "final", style.nestedCards!, row)}
     </Row>
   );
 
-  return openCardStyles && openCardStyles.length > 0 ? wrapCard(openCardStyles, rowNode) : rowNode;
+  // return openCardStyles && openCardStyles.length > 0 ? wrapCard(openCardStyles, rowNode) : rowNode;
+  return rowNode;
 }
 
 // Fix to work with generics, see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37087#issuecomment-656596623
