@@ -83,7 +83,7 @@ export interface GridStyle {
   presentationSettings?: Pick<PresentationFieldProps, "borderless" | "typeScale"> &
     Pick<PresentationContextProps, "wrap">;
   /** Minimum table width in pixels. Used when calculating columns sizes */
-  minWidth?: number;
+  minWidthPx?: number;
 }
 
 export type NestedCardStyleByKind = Record<string, NestedCardStyle>;
@@ -221,7 +221,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
   xss?: X;
   /** Experimental API allowing one to scroll to a table index. Primarily intended for stories at the moment */
   api?: MutableRefObject<GridTableApi | undefined>;
-  /** Specify the element in which the table should resize its columns against. If not set, the table will resize columns based on its owns container's width */
+  /** Experimental, expecting to be removed - Specify the element in which the table should resize its columns against. If not set, the table will resize columns based on its owns container's width */
   resizeTarget?: MutableRefObject<HTMLElement | null>;
 }
 
@@ -292,23 +292,24 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     return rows;
   }, [columns, rows, sorting, sortState]);
 
-  const [columnSizes, setColumnSizes] = useState<string[]>(
-    calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, undefined, style.minWidth),
-  );
-
   const [tableWidth, setTableWidth] = useState<number | undefined>();
 
-  const debouncedTableWidth = useDebouncedCallback((width) => {
+  // Calc our initial/first render sizes where we won't have a width yet
+  const [columnSizes, setColumnSizes] = useState<string[]>(
+    calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, tableWidth, style.minWidthPx),
+  );
+
+  const setTableWidthDebounced = useDebouncedCallback((width) => {
     setTableWidth(width);
-    setColumnSizes(calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, width, style.minWidth));
+    setColumnSizes(calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, width, style.minWidthPx));
   }, 100);
 
   const onResize = useCallback(() => {
     const target = resizeTarget?.current ? resizeTarget.current : tableRef.current;
     if (target && target.clientWidth !== tableWidth) {
-      debouncedTableWidth(target.clientWidth);
+      setTableWidthDebounced(target.clientWidth);
     }
-  }, [resizeTarget?.current, tableRef.current, debouncedTableWidth]);
+  }, [resizeTarget?.current, tableRef.current, setTableWidthDebounced]);
 
   useResizeObserver({ ref: resizeTarget ?? tableRef, onResize });
 
@@ -508,7 +509,7 @@ function renderDiv<R extends Kinded>(
         ...(style.betweenRowsCss ? Css.addIn(`& > div:nth-of-type(n+3) > *`, style.betweenRowsCss).$ : {}),
         ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:nth-of-type(2) > *`, style.firstNonHeaderRowCss).$ : {}),
         ...style.rootCss,
-        ...(style.minWidth ? Css.mwPx(style.minWidth).$ : {}),
+        ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
       }}
       data-testid={id}
@@ -548,7 +549,7 @@ function renderTable<R extends Kinded>(
           // removes border between header and second row
           .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss || {}).$,
         ...style.rootCss,
-        ...(style.minWidth ? Css.mwPx(style.minWidth).$ : {}),
+        ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
       }}
       data-testid={id}
@@ -702,7 +703,7 @@ const VirtualRoot = memoizeOne<
                 ...Css.addIn("& > div:first-of-type > *", gs.firstNonHeaderRowCss).$,
               }),
           ...gs.rootCss,
-          ...(gs.minWidth ? Css.mwPx(gs.minWidth).$ : {}),
+          ...(gs.minWidthPx ? Css.mwPx(gs.minWidthPx).$ : {}),
           ...xss,
         }}
         data-testid={id}
@@ -720,7 +721,7 @@ const VirtualRoot = memoizeOne<
 export function calcColumnSizes(
   columns: GridColumn<any>[],
   firstLastColumnWidth: number | undefined,
-  tableWidth?: number,
+  tableWidth: number | undefined,
   tableMinWidthPx: number = 0,
 ): string[] {
   // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
@@ -754,7 +755,7 @@ export function calcColumnSizes(
   function fr(myFr: number): string {
     // If the tableWidth, then return a pixel value
     if (tableWidth) {
-      const widthBasis = tableWidth > tableMinWidthPx ? tableWidth : tableMinWidthPx;
+      const widthBasis = Math.max(tableWidth, tableMinWidthPx);
       // When the tableWidth is defined, then we need to account for the `firstLastColumnWidth`s.
       return `(${
         (widthBasis - (claimedPercentages / 100) * widthBasis - claimedPixels - (firstLastColumnWidth ?? 0) * 2) *

@@ -243,7 +243,6 @@ interface ChromeRowProps {
 }
 export function ChromeRow({ chromeBuffer }: ChromeRowProps) {
   return (
-    // We add 2 to account for our dedicated open/close columns
     <div>
       {chromeBuffer.map((c, i) => (
         <Fragment key={i}>{c()}</Fragment>
