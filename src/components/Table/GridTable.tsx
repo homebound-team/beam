@@ -292,6 +292,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     return rows;
   }, [columns, rows, sorting, sortState]);
 
+  // Calculate the column sizes immediately rather than via the `debounce` method.
+  // We do this for Storybook integrations that may use MockDate. MockDate changes the behavior of `new Date()`, which is used by `useDebounce` and essentially turns off the callback.
+  const calculateImmediately = useRef<boolean>(true);
   const [tableWidth, setTableWidth] = useState<number | undefined>();
 
   // Calc our initial/first render sizes where we won't have a width yet
@@ -299,17 +302,33 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, tableWidth, style.minWidthPx),
   );
 
-  const setTableWidthDebounced = useDebouncedCallback((width) => {
-    setTableWidth(width);
-    setColumnSizes(calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, width, style.minWidthPx));
-  }, 100);
+  const setTableAndColumnWidths = useCallback(
+    (width: number) => {
+      setTableWidth(width);
+      setColumnSizes(calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, width, style.minWidthPx));
+    },
+    [setTableWidth, setColumnSizes, columns, style],
+  );
+
+  const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
 
   const onResize = useCallback(() => {
     const target = resizeTarget?.current ? resizeTarget.current : tableRef.current;
     if (target && target.clientWidth !== tableWidth) {
-      setTableWidthDebounced(target.clientWidth);
+      if (calculateImmediately.current) {
+        calculateImmediately.current = false;
+        setTableAndColumnWidths(target.clientWidth);
+      } else {
+        setTableAndColumnWidthsDebounced(target.clientWidth);
+      }
     }
-  }, [resizeTarget?.current, tableRef.current, setTableWidthDebounced]);
+  }, [
+    resizeTarget?.current,
+    tableRef.current,
+    setTableAndColumnWidths,
+    calculateImmediately,
+    setTableAndColumnWidthsDebounced,
+  ]);
 
   useResizeObserver({ ref: resizeTarget ?? tableRef, onResize });
 
