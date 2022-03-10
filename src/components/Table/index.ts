@@ -28,6 +28,8 @@ export {
   beamFlexibleStyle,
   beamNestedFixedStyle,
   beamNestedFlexibleStyle,
+  beamTotalsFixedStyle,
+  beamTotalsFlexibleStyle,
   cardStyle,
   condensedStyle,
   defaultStyle,
