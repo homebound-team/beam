@@ -2,7 +2,8 @@ import { Meta } from "@storybook/react";
 import { useEffect } from "react";
 import { Button, ModalBody, ModalFooter, ModalHeader, ModalProps, OpenModal, useModal } from "src/components/index";
 import { Modal } from "src/components/Modal/Modal";
-import { TestModalContent, TestModalFilterTable } from "src/components/Modal/TestModalContent";
+import { TestModalContent, TestModalContentProps, TestModalFilterTable } from "src/components/Modal/TestModalContent";
+import { FormStateApp } from "src/forms/FormStateApp";
 import { noop } from "src/utils/index";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 
@@ -24,15 +25,17 @@ export const FilterableStaticHeight = () => (
 );
 export const HeaderWithComponents = () => <ModalExample size="lg" withTag />;
 export const WithDatePicker = () => <ModalExample withDateField />;
+export const WithFieldInHeader = () => <ModalExample withTextArea />;
 
 export const ButtonsInFooter = () => {
-  const { openModal } = useModal();
+  const { openModal, setSize } = useModal();
   const open = () =>
     openModal({
       content: (
         <>
           <ModalHeader>Add</ModalHeader>
           <ModalFooter>
+            <Button label="Change Size" onClick={() => setSize("sm")} />
             <Button variant="tertiary" label="Cancel" onClick={noop} />
             <Button variant="primary" label="Add" onClick={noop} />
           </ModalFooter>
@@ -68,12 +71,23 @@ export const OpenModalKeepOpen = () => {
   );
 };
 
-interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling"> {
-  initNumSentences?: number;
-  showLeftAction?: boolean;
-  withTag?: boolean;
-  withDateField?: boolean;
+export function ModalForm() {
+  return (
+    <OpenModal size="xl">
+      <>
+        <ModalHeader>Form Example</ModalHeader>
+        <ModalBody>
+          <FormStateApp />
+        </ModalBody>
+        <ModalFooter>
+          <Button label="Submit" />
+        </ModalFooter>
+      </>
+    </OpenModal>
+  );
 }
+
+interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling">, TestModalContentProps {}
 
 function ModalExample(props: ModalExampleProps) {
   const { size, showLeftAction, initNumSentences = 1, forceScrolling, withTag, withDateField } = props;
@@ -82,14 +96,7 @@ function ModalExample(props: ModalExampleProps) {
     openModal({
       size,
       forceScrolling,
-      content: (
-        <TestModalContent
-          initNumSentences={initNumSentences}
-          showLeftAction={showLeftAction}
-          withTag={withTag}
-          withDateField={withDateField}
-        />
-      ),
+      content: <TestModalContent {...props} />,
     });
   // Immediately open the modal for Chromatic snapshots
   useEffect(open, [openModal]);

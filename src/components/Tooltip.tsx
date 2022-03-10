@@ -4,15 +4,16 @@ import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 import { useTooltipTriggerState } from "react-stately";
 import { Css } from "src/Css";
+import { useTestIds } from "src/utils";
 
 // We combine react-popper and aria-tooltip to makeup the tooltip component for the following reasons:
 // Aria can handle all aspects of the tooltip accessibility and rendering it except handling the dynamic positioning aspect
-// Popper provides the functionlity for positioning the tooltip wrt the trigger element
+// Popper provides the functionality for positioning the tooltip wrt the trigger element
 
 interface TooltipProps {
   /** The content that shows up when hovered */
   title: ReactNode;
-  children: ReactElement;
+  children: ReactNode;
   placement?: Placement;
   delay?: number;
   disabled?: boolean;
@@ -25,10 +26,16 @@ export function Tooltip(props: TooltipProps) {
   const triggerRef = React.useRef(null);
   const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger({ isDisabled: disabled }, state, triggerRef);
   const { tooltipProps } = useTooltip(_tooltipProps, state);
+  const tid = useTestIds(props, "tooltip");
 
   return (
     <>
-      <span ref={triggerRef} {...triggerProps}>
+      <span
+        ref={triggerRef}
+        {...triggerProps}
+        {...(!state.isOpen && typeof title === "string" ? { title } : {})}
+        {...tid}
+      >
         {children}
       </span>
       {state.isOpen && (
@@ -77,4 +84,24 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
     </div>,
     document.body,
   );
+}
+
+// Helper function to conditionally wrap component with Tooltip if necessary.
+// `maybeTooltip` requires that the `children` prop be a ReactElement, even though <Tooltip /> allows for ReactNode.
+export function maybeTooltip(props: Omit<TooltipProps, "children"> & { children: ReactElement }) {
+  return props.title ? <Tooltip {...props} /> : props.children;
+}
+
+// Helper function for resolving showing the Tooltip text via a 'disabled' prop, or the 'tooltip' prop.
+export function resolveTooltip(
+  disabled?: boolean | ReactNode,
+  tooltip?: ReactNode,
+  readOnly?: boolean | ReactNode,
+): ReactNode | undefined {
+  // If `disabled` is a ReactNode, then return that. Otherwise, return `tooltip`
+  return typeof disabled !== "boolean" && disabled
+    ? disabled
+    : typeof readOnly !== "boolean" && readOnly
+    ? readOnly
+    : tooltip ?? undefined;
 }

@@ -1,5 +1,5 @@
-import { NestedCardStyle } from "src/components/Table/GridTable";
-import { makeOpenOrCloseCard, maybeAddCardPadding } from "src/components/Table/nestedCards";
+import { NestedCardStyle, NestedCardStyleByKind } from "src/components/Table/GridTable";
+import { makeOpenOrCloseCard, wrapCard } from "src/components/Table/nestedCards";
 import { Palette } from "src/Css";
 import { render } from "src/utils/rtl";
 
@@ -16,9 +16,11 @@ const childCardStyle: NestedCardStyle = {
   pxPx: 6,
 };
 
+const cardStyleByKind: NestedCardStyleByKind = { parent: parentCardStyle, child: childCardStyle };
+
 describe("NestedCards", () => {
   it("can make open card w/one level", async () => {
-    const r = await render(makeOpenOrCloseCard([parentCardStyle], "open"));
+    const r = await render(makeOpenOrCloseCard(["parent"], cardStyleByKind, "open")());
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
         background-color: rgba(247,245,245,1);
@@ -42,7 +44,7 @@ describe("NestedCards", () => {
   });
 
   it("can make open card w/two levels", async () => {
-    const r = await render(makeOpenOrCloseCard([parentCardStyle, childCardStyle], "open"));
+    const r = await render(makeOpenOrCloseCard(["parent", "child"], cardStyleByKind, "open")());
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
         background-color: rgba(247,245,245,1);
@@ -82,57 +84,25 @@ describe("NestedCards", () => {
     `);
   });
 
-  it("can add left padding w/two levels", async () => {
-    const r = await render(maybeAddCardPadding([parentCardStyle, childCardStyle], "first"));
+  it("can add padding w/two levels", async () => {
+    const r = await render(wrapCard([parentCardStyle, childCardStyle], <div data-testid="grandchild" />));
     expect(r.firstElement).toMatchInlineSnapshot(`
       .emotion-0 {
         background-color: rgba(247,245,245,1);
         height: 100%;
         padding-left: 8px;
-      }
-
-      .emotion-1 {
-        background-color: rgba(221,220,220,1);
-        border-color: rgba(236,235,235,1);
-        height: 100%;
-        border-left-style: solid;
-        border-left-width: 1px;
-        padding-left: 6px;
-      }
-
-      <div
-        data-overlay-container="true"
-      >
-        <div
-          data-cardpadding="true"
-        >
-          <div
-            class="emotion-0"
-          >
-            <div
-              class="emotion-1"
-            />
-          </div>
-        </div>
-      </div>
-    `);
-  });
-
-  it("can add right padding w/two levels", async () => {
-    const r = await render(maybeAddCardPadding([parentCardStyle, childCardStyle], "final"));
-    expect(r.firstElement).toMatchInlineSnapshot(`
-      .emotion-0 {
-        background-color: rgba(247,245,245,1);
-        height: 100%;
         padding-right: 8px;
       }
 
       .emotion-1 {
         background-color: rgba(221,220,220,1);
         border-color: rgba(236,235,235,1);
-        height: 100%;
+        border-left-style: solid;
+        border-left-width: 1px;
         border-right-style: solid;
         border-right-width: 1px;
+        height: 100%;
+        padding-left: 6px;
         padding-right: 6px;
       }
 
@@ -140,13 +110,13 @@ describe("NestedCards", () => {
         data-overlay-container="true"
       >
         <div
-          data-cardpadding="true"
+          class="emotion-0"
         >
           <div
-            class="emotion-0"
+            class="emotion-1"
           >
             <div
-              class="emotion-1"
+              data-testid="grandchild"
             />
           </div>
         </div>

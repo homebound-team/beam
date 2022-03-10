@@ -5,6 +5,7 @@ describe("Chip", () => {
   it("renders", async () => {
     const r = await render(<Chip text="Chip text content" />);
     expect(r.chip().textContent).toBe("Chip text content");
+    expect(r.chip()).toHaveAttribute("title", "Chip text content");
   });
 
   it("can set custom testids", async () => {

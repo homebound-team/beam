@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  node: circleci/node@5.0.0
+
 node-image: &node-image
   image: cimg/node:16.4.0
   auth:
@@ -12,12 +15,24 @@ workflows:
     jobs:
       - build:
           context:
-            - npm
+            - npm-readonly
             - github
+            - dockerhub
+      - publish:
+          context:
+            - npm-publish
+            - github
+            - dockerhub
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - main
       - chromatic:
           context:
+            - npm-readonly
             - dockerhub
-            - npm
 
 jobs:
   build:
@@ -26,15 +41,22 @@ jobs:
       - <<: *node-image
     steps:
       - checkout
-      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
-      - run: yarn install
+      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc'
+      - node/install-packages:
+          pkg-manager: yarn
       - run: yarn build
       - run: yarn test
-      - when:
-          condition:
-            equal: [main, <<pipeline.git.branch>>]
-          steps:
-            - run: yarn semantic-release
+
+  publish:
+    resource_class: "xlarge"
+    docker:
+      - <<: *node-image
+    steps:
+      - checkout
+      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc'
+      - node/install-packages:
+          pkg-manager: yarn
+      - run: yarn semantic-release
 
   chromatic:
     resource_class: "xlarge"
@@ -47,8 +69,9 @@ jobs:
     working_directory: ~/project
     steps:
       - checkout
-      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc'
-      - run: yarn install
+      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc'
+      - node/install-packages:
+          pkg-manager: yarn
       - when:
           condition:
             equal: [main, <<pipeline.git.branch>>]

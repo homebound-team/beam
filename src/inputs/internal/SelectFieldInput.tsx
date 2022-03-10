@@ -5,7 +5,8 @@ import { Icon } from "src/components";
 import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
-import { Value, valueToKey } from "src/inputs/Value";
+import { Value } from "src/inputs/Value";
+import { Callback } from "src/types";
 import { maybeCall } from "src/utils";
 
 interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldProps {
@@ -15,8 +16,6 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   inputRef: MutableRefObject<HTMLInputElement | null>;
   inputWrapRef: MutableRefObject<HTMLDivElement | null>;
   state: ComboBoxState<O>;
-  isDisabled: boolean;
-  isReadOnly: boolean;
   fieldDecoration?: (opt: O) => ReactNode;
   errorMsg?: string;
   required?: boolean;
@@ -29,38 +28,31 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   selectedOptions: O[];
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
-  sizeToContent: boolean;
+  sizeToContent?: boolean;
   contrast?: boolean;
   nothingSelectedText: string;
+  tooltip?: ReactNode;
+  resetField: Callback;
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
   const {
     inputProps,
-    inputRef,
-    inputWrapRef,
     buttonProps,
     buttonRef,
-    compact,
     errorMsg,
-    required,
-    helperText,
     state,
     fieldDecoration,
-    isDisabled,
-    isReadOnly,
     onBlur,
     onFocus,
     inlineLabel,
-    label,
-    labelProps,
-    hideLabel,
     selectedOptions,
     getOptionValue,
     getOptionLabel,
-    sizeToContent,
+    sizeToContent = false,
     contrast = false,
     nothingSelectedText,
+    resetField,
     ...otherProps
   } = props;
 
@@ -74,19 +66,11 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
   return (
     <TextFieldBase
       {...otherProps}
-      inputRef={inputRef}
-      inputWrapRef={inputWrapRef}
-      label={label}
-      readOnly={isReadOnly}
-      hideLabel={hideLabel}
-      labelProps={labelProps}
+      readOnly={inputProps.readOnly}
       inlineLabel={inlineLabel}
-      compact={compact}
-      required={required}
       errorMsg={errorMsg}
-      helperText={helperText}
       contrast={contrast}
-      xss={!inlineLabel ? Css.fw5.$ : {}}
+      xss={!inlineLabel && !inputProps.readOnly ? Css.fw5.$ : {}}
       startAdornment={
         (showNumSelection && (
           <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinyEm.df.aic.jcc.$}>
@@ -96,14 +80,14 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
         (showFieldDecoration && fieldDecoration(selectedOptions[0]))
       }
       endAdornment={
-        !isReadOnly && (
+        !inputProps.readOnly && (
           <button
             {...buttonProps}
-            disabled={isDisabled}
+            disabled={inputProps.disabled}
             ref={buttonRef}
             css={{
               ...Css.br4.outline0.gray700.if(contrast).gray400.$,
-              ...(isDisabled ? Css.cursorNotAllowed.gray400.if(contrast).gray600.$ : {}),
+              ...(inputProps.disabled ? Css.cursorNotAllowed.gray400.if(contrast).gray600.$ : {}),
             }}
           >
             <Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} />
@@ -129,7 +113,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
               }
 
               // By default, the Escape key would "revert" changes,
-              // but we just want to close the menu and leave the selections as is
+              // but we just want to close the menu and leave the reset of the field state as is.
               if (e.key === "Escape") {
                 state.close();
                 return;
@@ -141,35 +125,36 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             // reset the field to its previous value. However, because we use a the Multiple Selection State manager,
             // then our `state.selectedKey` isn't set. So we need to properly reset the state ourselves.
             if (e.key === "Escape") {
-              // Triggering `Escape` is basically like re-selecting currently selected option, so do that if there is one.
-              state.selectionManager.setSelectedKeys(
-                selectedOptions.length > 0 ? [valueToKey(getOptionValue(selectedOptions[0]))] : [],
-              );
+              state.close();
+              resetField();
               return;
             }
 
             inputProps.onKeyDown && inputProps.onKeyDown(e);
           },
-          onBlur: () => {
+          onBlur: (e: React.FocusEvent) => {
+            // Do not call onBlur if readOnly or interacting within the input wrapper (such as the menu trigger button).
+            if (
+              inputProps.readOnly ||
+              (props.inputWrapRef.current && props.inputWrapRef.current.contains(e.relatedTarget as HTMLElement))
+            ) {
+              return;
+            }
+
             // We purposefully override onBlur here instead of using mergeProps, b/c inputProps.onBlur
             // goes into useComboBox's onBlur, which calls setFocused(false), which in useComboBoxState
             // detects a) there is no props.selectedKey (b/c we don't pass it), and b) there is an
             // `inputValue`, so it thinks it needs to call `resetInputValue()`.
-            //
-            // I assume we don't pass `selectedKey` b/c we support multiple keys.
-            if (isReadOnly) {
-              return;
-            }
             setIsFocused(false);
             maybeCall(onBlur);
             state.close();
 
-            // Always call `setSelectedKeys` onBlur with its existing selected keys..
-            // This ensures the field's `input.value` resets to what it should be in case it doesn't currently match.
-            state.selectionManager.setSelectedKeys(state.selectionManager.selectedKeys);
+            // Always call `resetField` onBlur, this ensures the field's `input.value` resets
+            // to what it should be in case it doesn't currently match.
+            resetField();
           },
           onFocus: () => {
-            if (isReadOnly) return;
+            if (inputProps.readOnly) return;
             setIsFocused(true);
             maybeCall(onFocus);
             state.open();

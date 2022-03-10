@@ -122,15 +122,14 @@ export function SuperDrawer(): ReactPortal | null {
                           icon: "chevronLeft",
                           onClick: () => onPrevClick && onPrevClick(),
                           disabled: !onPrevClick || isDetail,
-                          ...testId.prev,
                         },
                         {
                           icon: "chevronRight",
                           onClick: () => onNextClick && onNextClick(),
                           disabled: !onNextClick || isDetail,
-                          ...testId.next,
                         },
                       ]}
+                      {...testId.headerActions}
                     />
                     <IconButton icon="x" onClick={closeDrawer} {...testId.close} />
                   </div>

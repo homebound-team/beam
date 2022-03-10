@@ -1,5 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
+import { fireEvent, within } from "@storybook/testing-library";
 import { useState } from "react";
 import { GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndDataOf } from "src/components";
 import { Css } from "src/Css";
@@ -7,7 +8,7 @@ import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { HasIdAndName, Optional } from "src/types";
 import { noop } from "src/utils";
-import { zeroTo } from "src/utils/sb";
+import { withDimensions, zeroTo } from "src/utils/sb";
 
 export default {
   component: SelectField,
@@ -92,7 +93,31 @@ function Template(args: SelectFieldProps<any, any>) {
           label="Favorite Icon - Disabled"
           value={undefined}
           options={options}
-          disabled
+          disabled="Disabled reason"
+        />
+        <TestSelectField
+          {...args}
+          label="Favorite Icon - Read Only"
+          options={options}
+          value={options[2].id}
+          readOnly="Read only reason"
+        />
+        <TestSelectField
+          {...args}
+          label="With Placeholder"
+          value={undefined}
+          options={options}
+          placeholder="Placeholder Content"
+          getOptionMenuLabel={(o) => (
+            <div css={Css.df.aic.$}>
+              {o.icon && (
+                <span css={Css.fs0.mr2.$}>
+                  <Icon icon={o.icon} />
+                </span>
+              )}
+              {o.name}
+            </div>
+          )}
         />
         <TestSelectField {...args} label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
         <TestSelectField<TestOption, string>
@@ -172,6 +197,61 @@ Compact.args = { compact: true };
 export const Contrast = Template.bind({});
 // @ts-ignore
 Contrast.args = { compact: true, contrast: true };
+
+const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
+
+export function PerfTest() {
+  const [selectedValue, setSelectedValue] = useState<string>(loadTestOptions[2].id);
+  return (
+    <SelectField
+      label="Project"
+      value={selectedValue}
+      onSelect={setSelectedValue}
+      errorMsg={selectedValue !== undefined ? "" : "Select an option. Plus more error text to force it to wrap."}
+      options={{
+        initial: [loadTestOptions[2]],
+        load: async () => {
+          return new Promise((resolve) => {
+            // @ts-ignore - believes `options` should be of type `never[]`
+            setTimeout(() => resolve({ options: loadTestOptions }), 1500);
+          });
+        },
+      }}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
+    />
+  );
+}
+PerfTest.parameters = { chromatic: { disableSnapshot: true } };
+
+export function LoadingState() {
+  const [selectedValue, setSelectedValue] = useState<string>(loadTestOptions[2].id);
+
+  return (
+    <SelectField
+      label="Project"
+      value={selectedValue}
+      onSelect={setSelectedValue}
+      options={{
+        initial: [loadTestOptions[2]],
+        load: async () => {
+          return new Promise((resolve) => {
+            // @ts-ignore - believes `options` should be of type `never[]`
+            setTimeout(() => resolve({ options: loadTestOptions }), 5000);
+          });
+        },
+      }}
+    />
+  );
+}
+LoadingState.decorators = [withDimensions()];
+LoadingState.parameters = {
+  chromatic: { delay: 1000 },
+};
+LoadingState.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const canvas = within(canvasElement);
+  await fireEvent.focus(canvas.getByTestId("project"));
+};
 
 export function InTable() {
   return (

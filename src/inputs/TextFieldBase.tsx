@@ -11,7 +11,7 @@ import React, {
   useState,
 } from "react";
 import { chain, mergeProps, useFocusWithin, useHover } from "react-aria";
-import { IconButton } from "src/components";
+import { IconButton, maybeTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
@@ -22,7 +22,7 @@ import { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/in
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
-interface TextFieldBaseProps<X>
+export interface TextFieldBaseProps<X>
   extends Pick<
       BeamTextFieldProps<X>,
       | "label"
@@ -36,6 +36,7 @@ interface TextFieldBaseProps<X>
       | "placeholder"
       | "compact"
       | "borderless"
+      | "visuallyDisabled"
       | "xss"
     >,
     Partial<Pick<BeamTextFieldProps<X>, "onChange">> {
@@ -51,7 +52,8 @@ interface TextFieldBaseProps<X>
   contrast?: boolean;
   clearable?: boolean;
   // TextArea specific
-  minHeight?: number;
+  textAreaMinHeight?: number;
+  tooltip?: ReactNode;
 }
 
 // Used by both TextField and TextArea
@@ -80,8 +82,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     inlineLabel,
     contrast = false,
     borderless = fieldProps?.borderless ?? false,
-    minHeight = 96,
+    textAreaMinHeight = 96,
     clearable = false,
+    tooltip,
+    visuallyDisabled = fieldProps?.visuallyDisabled ?? true,
   } = props;
   const typeScale = fieldProps?.typeScale ?? "sm";
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
@@ -100,7 +104,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const compactFieldHeight = 32;
 
   const fieldStyles = {
-    container: Css.df.fdc.w100.maxw(px(550)).$,
+    container: Css.df.fdc.w100.maxw(px(550)).relative.$,
     inputWrapper: {
       ...Css[typeScale].df.aic.br4.px1.w100
         .hPx(fieldHeight - maybeSmaller)
@@ -123,8 +127,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...(!contrast ? Css.bgWhite.$ : Css.bgGray700.addIn("&::selection", Css.bgGray800.$).$),
     },
     hover: Css.bgGray100.if(contrast).bgGray600.bGray600.$,
-    focus: borderless ? Css.bshFocus.$ : Css.bLightBlue700.if(contrast).bLightBlue500.$,
-    disabled: Css.cursorNotAllowed.gray400.bgGray100.if(contrast).gray500.bgGray700.$,
+    focus: borderless ? Css.bshFocus.z1.$ : Css.bLightBlue700.if(contrast).bLightBlue500.$,
+    disabled: visuallyDisabled
+      ? Css.cursorNotAllowed.gray400.bgGray100.if(contrast).gray500.bgGray700.$
+      : Css.cursorNotAllowed.$,
     error: Css.bRed600.if(contrast).bRed400.$,
   };
 
@@ -156,83 +162,86 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
           {...tid.label}
         />
       )}
-      {readOnly && (
-        <div
-          css={{
-            // Use input wrapper to get common styles, but then we need to override some
-            ...fieldStyles.inputWrapperReadOnly,
-            ...(multiline ? Css.fdc.aifs.childGap2.$ : Css.truncate.$),
-            ...xss,
-          }}
-          data-readonly="true"
-          {...tid}
-        >
-          {!multiline && inlineLabel && label && !hideLabel && (
-            <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
-          )}
-          {multiline
-            ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
-                <p key={i} css={Css.my1.$}>
-                  {p.split("\n").map((sentence, j) => (
-                    <span key={j}>
-                      {sentence}
-                      <br />
-                    </span>
-                  ))}
-                </p>
-              ))
-            : inputProps.value}
-        </div>
-      )}
-      {!readOnly && (
-        <div
-          css={{
-            ...fieldStyles.inputWrapper,
-            ...(inputProps.disabled ? fieldStyles.disabled : {}),
-            ...(isFocused && !readOnly ? fieldStyles.focus : {}),
-            ...(isHovered && !inputProps.disabled && !readOnly && !isFocused ? fieldStyles.hover : {}),
-            ...(errorMsg ? fieldStyles.error : {}),
-            ...Css.if(multiline).aifs.px0.mhPx(minHeight).$,
-          }}
-          {...hoverProps}
-          ref={inputWrapRef as any}
-        >
-          {!multiline && inlineLabel && label && !hideLabel && (
-            <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
-          )}
-          {!multiline && startAdornment && <span css={Css.df.aic.fs0.br4.pr1.$}>{startAdornment}</span>}
-          <ElementType
-            {...mergeProps(
-              inputProps,
-              { onBlur, onFocus: onFocusChained, onChange: onDomChange },
-              { "aria-invalid": Boolean(errorMsg), ...(hideLabel ? { "aria-label": label } : {}) },
-            )}
-            {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
-            ref={fieldRef as any}
-            rows={multiline ? 1 : undefined}
+      {maybeTooltip({
+        title: tooltip,
+        placement: "top",
+        children: readOnly ? (
+          <div
             css={{
-              ...fieldStyles.input,
-              ...(inputProps.disabled ? fieldStyles.disabled : {}),
-              ...(isHovered && !inputProps.disabled && !readOnly && !isFocused ? fieldStyles.hover : {}),
-              ...(multiline ? Css.h100.p1.add("resize", "none").if(borderless).pPx(4).$ : Css.truncate.$),
+              // Use input wrapper to get common styles, but then we need to override some
+              ...fieldStyles.inputWrapperReadOnly,
+              ...(multiline ? Css.fdc.aifs.childGap2.$ : Css.truncate.$),
               ...xss,
             }}
+            data-readonly="true"
             {...tid}
-          />
-          {isFocused && clearable && onChange && inputProps.value && (
-            <IconButton
-              icon="xCircle"
-              color={Palette.Gray700}
-              onClick={() => {
-                onChange(undefined);
-                // Reset focus to input element
-                fieldRef.current?.focus();
+          >
+            {!multiline && inlineLabel && label && !hideLabel && (
+              <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
+            )}
+            {multiline
+              ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
+                  <p key={i} css={Css.my1.$}>
+                    {p.split("\n").map((sentence, j) => (
+                      <span key={j}>
+                        {sentence}
+                        <br />
+                      </span>
+                    ))}
+                  </p>
+                ))
+              : inputProps.value}
+          </div>
+        ) : (
+          <div
+            css={{
+              ...fieldStyles.inputWrapper,
+              ...(inputProps.disabled ? fieldStyles.disabled : {}),
+              ...(isFocused && !readOnly ? fieldStyles.focus : {}),
+              ...(isHovered && !inputProps.disabled && !readOnly && !isFocused ? fieldStyles.hover : {}),
+              ...(errorMsg ? fieldStyles.error : {}),
+              ...Css.if(multiline).aifs.px0.mhPx(textAreaMinHeight).$,
+            }}
+            {...hoverProps}
+            ref={inputWrapRef as any}
+          >
+            {!multiline && inlineLabel && label && !hideLabel && (
+              <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
+            )}
+            {!multiline && startAdornment && <span css={Css.df.aic.fs0.br4.pr1.$}>{startAdornment}</span>}
+            <ElementType
+              {...mergeProps(
+                inputProps,
+                { onBlur, onFocus: onFocusChained, onChange: onDomChange },
+                { "aria-invalid": Boolean(errorMsg), ...(hideLabel ? { "aria-label": label } : {}) },
+              )}
+              {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
+              ref={fieldRef as any}
+              rows={multiline ? 1 : undefined}
+              css={{
+                ...fieldStyles.input,
+                ...(inputProps.disabled ? fieldStyles.disabled : {}),
+                ...(isHovered && !inputProps.disabled && !readOnly && !isFocused ? fieldStyles.hover : {}),
+                ...(multiline ? Css.h100.p1.add("resize", "none").if(borderless).pPx(4).$ : Css.truncate.$),
+                ...xss,
               }}
+              {...tid}
             />
-          )}
-          {!multiline && endAdornment && <span css={Css.df.aic.pl1.fs0.$}>{endAdornment}</span>}
-        </div>
-      )}
+            {isFocused && clearable && onChange && inputProps.value && (
+              <IconButton
+                icon="xCircle"
+                color={Palette.Gray700}
+                onClick={() => {
+                  onChange(undefined);
+                  // Reset focus to input element
+                  fieldRef.current?.focus();
+                }}
+              />
+            )}
+            {!multiline && endAdornment && <span css={Css.df.aic.pl1.fs0.$}>{endAdornment}</span>}
+          </div>
+        ),
+      })}
 
       {/* Compound fields will handle their own error and helper text */}
       {errorMsg && !compound && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}

@@ -2,19 +2,16 @@ import { click, render } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
-
-const options = [
-  { id: "1", name: "One" },
-  { id: "2", name: "Two" },
-  { id: "3", name: "Three" },
-];
+import { HasIdAndName } from "src/types";
+import { wait } from "src/utils/rtl";
 
 describe("SelectFieldTest", () => {
   const onSelect = jest.fn();
 
   it("can set a value", async () => {
     // Given a MultiSelectField
-    const { getByRole, age } = await render(
+    const onBlur = jest.fn();
+    const r = await render(
       <TestSelectField
         label="Age"
         value={"1"}
@@ -22,15 +19,21 @@ describe("SelectFieldTest", () => {
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
         data-testid="age"
+        onBlur={onBlur}
       />,
     );
     // That initially has "One" selected
-    expect(age()).toHaveValue("One");
-    // When we select the 3rd option
-    fireEvent.focus(age());
-    click(getByRole("option", { name: "Three" }));
+    expect(r.age()).toHaveValue("One");
+    // When we focus the field to open the menu
+    r.age().focus();
+    expect(r.age()).toHaveFocus();
+    // And we select the 3rd option
+    click(r.getByRole("option", { name: "Three" }));
     // Then onSelect was called
     expect(onSelect).toHaveBeenCalledWith("3");
+    // And the field has not been blurred (regression test to prevent SelectField's list box from opening back up after selecting an option)
+    expect(r.age()).toHaveFocus();
+    expect(onBlur).not.toHaveBeenCalled();
   });
 
   it("does not fire focus/blur when readOnly", async () => {
@@ -147,17 +150,94 @@ describe("SelectFieldTest", () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 
+  it("can load options via options prop callback", async () => {
+    // Given a Select Field with options that are loaded via a callback
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value="1"
+        options={{ initial: [options[0]], load: async () => ({ options }) }}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+      />,
+    );
+    // When opening the menu
+    fireEvent.focus(r.age());
+    // Then expect to see the initial option and loading state
+    expect(r.getAllByRole("option")).toHaveLength(1);
+    expect(r.loadingDots()).toBeTruthy();
+    // And when waiting for the promise to resolve
+    await wait();
+    // Then expect the rest of the options to be loaded in and the loading state to be removed
+    expect(r.getAllByRole("option")).toHaveLength(3);
+    expect(r.queryByTestId("loadingDots")).toBeFalsy();
+  });
+
+  it("reflects new options when prop changes", async () => {
+    // Given a Select Field with options that are loaded via a callback
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value="1"
+        options={[options[0]]}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+      />,
+    );
+    // When opening the menu
+    fireEvent.focus(r.age());
+    // Then expect to see the initial option
+    expect(r.getAllByRole("option")).toHaveLength(1);
+    // And when changing the options
+    click(r.updateOptions);
+    // Then expect the rest of the options to be loaded in
+    expect(r.getAllByRole("option")).toHaveLength(3);
+  });
+
+  it("can set value when options are loaded later", async () => {
+    // Given a Select Field with options that are loaded lazily
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value="1"
+        options={[] as HasIdAndName[]}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+      />,
+    );
+    // The input value will initially be blank
+    expect(r.age()).toHaveValue("");
+    // And when options are loaded
+    click(r.updateOptions);
+    // Then expect the input value to be updated based on field's value
+    expect(r.age()).toHaveValue("One");
+  });
+
+  const options = [
+    { id: "1", name: "One" },
+    { id: "2", name: "Two" },
+    { id: "3", name: "Three" },
+  ];
+
   function TestSelectField<O, V extends Value>(props: Omit<SelectFieldProps<O, V>, "onSelect">): JSX.Element {
     const [selected, setSelected] = useState<V | undefined>(props.value);
+    const [initOptions, setOptions] = useState(props.options);
     return (
-      <SelectField<O, V>
-        {...props}
-        value={selected}
-        onSelect={(value) => {
-          onSelect(value);
-          setSelected(value);
-        }}
-      />
+      <>
+        <SelectField<O, V>
+          {...props}
+          options={initOptions}
+          value={selected}
+          onSelect={(value) => {
+            onSelect(value);
+            setSelected(value);
+          }}
+        />
+        <button data-testid="updateOptions" onClick={() => setOptions(options as any)} />
+      </>
     );
   }
 });

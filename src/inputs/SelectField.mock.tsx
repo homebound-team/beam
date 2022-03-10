@@ -1,24 +1,32 @@
-import { Key } from "react";
+import { Key, useEffect, useState } from "react";
 import { SelectFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 
 /** Mocks out `SelectField` as a `<select>` field. */
-export function SelectField<T extends object, V extends Key>(props: SelectFieldProps<T, V>) {
+export function SelectField<O extends object, V extends Key>(props: SelectFieldProps<O, V>) {
   const {
     getOptionValue = (o) => (o as any).id, // if unset, assume O implements HasId
     getOptionLabel = (o) => (o as any).name, // if unset, assume O implements HasName
     value,
-    options,
+    options: maybeOptions,
     onSelect,
     readOnly = false,
     errorMsg,
     onBlur,
     onFocus,
     disabled,
+    disabledOptions = [],
   } = props;
   const tid = useTestIds(props, "select");
 
+  const [options, setOptions] = useState(Array.isArray(maybeOptions) ? maybeOptions : maybeOptions.initial);
   const currentOption = options.find((o) => getOptionValue(o) === value) || options[0];
+
+  useEffect(() => {
+    if (Array.isArray(maybeOptions) && maybeOptions !== options) {
+      setOptions(maybeOptions);
+    }
+  }, [maybeOptions]);
 
   return (
     <select
@@ -31,14 +39,18 @@ export function SelectField<T extends object, V extends Key>(props: SelectFieldP
         const option = options.find((o) => `${getOptionValue(o)}` === e.target.value) || options[0];
         onSelect(getOptionValue(option), option);
       }}
-      onFocus={() => {
+      onFocus={async () => {
+        if (!Array.isArray(maybeOptions)) {
+          const result = await maybeOptions.load();
+          setOptions(result.options);
+        }
         if (!readOnly && onFocus) onFocus();
       }}
       onBlur={() => {
         if (!readOnly && onBlur) onBlur();
       }}
       // Read Only does not apply to `select` fields, instead we'll add in disabled for tests to verify.
-      disabled={disabled || readOnly}
+      disabled={!!(disabled || readOnly)}
       data-error={!!errorMsg}
       data-errormsg={errorMsg}
       data-readonly={readOnly}
@@ -46,7 +58,11 @@ export function SelectField<T extends object, V extends Key>(props: SelectFieldP
       <option disabled value=""></option>
       {options.map((option, i) => {
         return (
-          <option key={i} value={`${getOptionValue(option)}`}>
+          <option
+            key={i}
+            value={`${getOptionValue(option)}`}
+            disabled={disabledOptions.includes(getOptionValue(option))}
+          >
             {getOptionLabel(option)}
           </option>
         );

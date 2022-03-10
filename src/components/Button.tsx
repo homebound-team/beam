@@ -2,18 +2,17 @@ import { AriaButtonProps } from "@react-types/button";
 import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Link } from "react-router-dom";
-import { navLink, useTestIds } from "src";
-import { Icon, IconProps } from "src/components";
-import { Tooltip } from "src/components/Tooltip";
+import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Css } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, noop } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   label: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
-  icon?: IconProps["icon"];
+  icon?: IconProps["icon"] | null;
   /** Displays contents after the Button's label. Will be ignored for Buttons rendered as a link with an absolute URL */
   endAdornment?: ReactNode;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
@@ -21,13 +20,24 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   buttonRef?: RefObject<HTMLElement>;
   /** Allow for setting "submit" | "button" | "reset" on button element */
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
+  /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
+  download?: boolean;
 }
 
 export function Button(props: ButtonProps) {
-  const { onClick: onPress, disabled, endAdornment, menuTriggerProps, tooltip, openInNew, ...otherProps } = props;
+  const {
+    onClick: onPress,
+    disabled,
+    endAdornment,
+    menuTriggerProps,
+    tooltip,
+    openInNew,
+    download,
+    ...otherProps
+  } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, ...otherProps, ...menuTriggerProps };
-  const { label, icon, variant = "primary", size = "sm", buttonRef } = ariaProps;
+  const { label, icon = download ? "download" : undefined, variant = "primary", size = "sm", buttonRef } = ariaProps;
   const ref = buttonRef || useRef(null);
   const tid = useTestIds(props, label);
   const { buttonProps, isPressed } = useButton(
@@ -74,12 +84,19 @@ export function Button(props: ButtonProps) {
 
   const button =
     typeof onPress === "string" ? (
-      isAbsoluteUrl(onPress) || openInNew ? (
-        <a {...buttonAttrs} href={onPress} className={navLink} target="_blank" rel="noreferrer noopener">
+      isAbsoluteUrl(onPress) || openInNew || download ? (
+        <a
+          {...buttonAttrs}
+          href={onPress}
+          className={navLink}
+          {...(download ? { download: "" } : { target: "_blank", rel: "noreferrer noopener" })}
+        >
           {buttonContent}
-          <span css={Css.ml1.$}>
-            <Icon icon="linkExternal" />
-          </span>
+          {!download && (
+            <span css={Css.ml1.$}>
+              <Icon icon="linkExternal" />
+            </span>
+          )}
         </a>
       ) : (
         <Link {...buttonAttrs} to={onPress} className={navLink}>
@@ -91,15 +108,11 @@ export function Button(props: ButtonProps) {
     );
 
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip
-  if ((isDisabled && typeof disabled !== "boolean") || tooltip) {
-    return (
-      <Tooltip title={isDisabled && typeof disabled !== "boolean" ? disabled : tooltip} placement="top">
-        {button}
-      </Tooltip>
-    );
-  }
-
-  return button;
+  return maybeTooltip({
+    title: resolveTooltip(disabled, tooltip),
+    placement: "top",
+    children: button,
+  });
 }
 
 function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {
@@ -144,7 +157,7 @@ const variantStyles: Record<ButtonVariant, { baseStyles: {}; hoverStyles: {}; di
     },
 
     text: {
-      baseStyles: Css.lightBlue700.$,
+      baseStyles: Css.lightBlue700.add("fontSize", "inherit").$,
       hoverStyles: {},
       pressedStyles: {},
       disabledStyles: Css.lightBlue300.$,

@@ -1,9 +1,12 @@
+import { NumberParser } from "@internationalized/number";
 import type { NumberFieldStateProps } from "@react-stately/numberfield";
 import { ReactNode, useMemo, useRef } from "react";
 import { useLocale, useNumberField } from "react-aria";
 import { useNumberFieldState } from "react-stately";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Xss } from "src/Css";
+import { Callback } from "src/types";
+import { maybeCall } from "src/utils";
 import { TextFieldBase } from "./TextFieldBase";
 
 export type NumberFieldType = "cents" | "percent" | "basisPoints" | "days";
@@ -28,6 +31,9 @@ export interface NumberFieldProps {
   xss?: Xss<"textAlign" | "justifyContent">;
   // If set, all positive values will be prefixed with "+". (Zero will not show +/-)
   displayDirection?: boolean;
+  numFractionDigits?: number;
+  truncate?: boolean;
+  onEnter?: Callback;
 }
 
 export function NumberField(props: NumberFieldProps) {
@@ -48,25 +54,33 @@ export function NumberField(props: NumberFieldProps) {
     onChange,
     xss,
     displayDirection = false,
+    numFractionDigits,
+    truncate = false,
+    onEnter,
     ...otherProps
   } = props;
 
   const factor = type === "percent" || type === "cents" ? 100 : type === "basisPoints" ? 10_000 : 1;
   const signDisplay = displayDirection ? "exceptZero" : "auto";
 
+  const fractionFormatOptions = { [truncate ? "maximumFractionDigits" : "minimumFractionDigits"]: numFractionDigits };
+
+  const { locale } = useLocale();
   // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
   // see: https://github.com/adobe/react-spectrum/issues/1893.
   const formatOptions: Intl.NumberFormatOptions | undefined = useMemo(() => {
     return type === "percent"
-      ? { style: "percent", signDisplay }
+      ? { style: "percent", signDisplay, ...fractionFormatOptions }
       : type === "basisPoints"
       ? { style: "percent", minimumFractionDigits: 2, signDisplay }
       : type === "cents"
       ? { style: "currency", currency: "USD", minimumFractionDigits: 2, signDisplay }
       : type === "days"
       ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0, signDisplay }
-      : undefined;
+      : fractionFormatOptions;
   }, [type]);
+
+  const numberParser = useMemo(() => new NumberParser(locale, formatOptions), [locale, formatOptions]);
 
   // Keep a ref the last "before WIP" value that we passed into react-aria.
   //
@@ -83,23 +97,26 @@ export function NumberField(props: NumberFieldProps) {
   type ValueRef = { wip: true; value: number | undefined } | { wip: false };
   const valueRef = useRef<ValueRef>({ wip: false });
 
-  const { locale } = useLocale();
   // We can use this for both useNumberFieldState + useNumberField
   const useProps: NumberFieldStateProps = {
     locale,
     // We want percents && cents to be integers, useNumberFieldState excepts them as decimals
     value: valueRef.current.wip ? valueRef.current.value : value === undefined ? Number.NaN : value / factor,
-    // This is called on blur with the final/committed value.
+    // // This is called on blur with the final/committed value.
     onChange: (value) => {
-      // `value` for percentage style inputs will be in a number format, i.e. if input value is 4%, the `value` param will equal `.04`
-      // Reverse the integer/decimal conversion
-      onChange(Number.isNaN(value) ? undefined : factor !== 1 ? Math.round(value * factor) : value);
+      onChange(formatValue(value, factor, numFractionDigits));
     },
     onFocus: () => {
       valueRef.current = { wip: true, value: value === undefined ? Number.NaN : value / factor };
     },
     onBlur: () => {
       valueRef.current = { wip: false };
+    },
+    onKeyDown: (e) => {
+      if (e.key === "Enter") {
+        maybeCall(onEnter);
+        inputRef.current?.blur();
+      }
     },
     validationState: errorMsg !== undefined ? "invalid" : "valid",
     label: label,
@@ -128,8 +145,8 @@ export function NumberField(props: NumberFieldProps) {
       inputProps={inputProps}
       // This is called on each DOM change, to push the latest value into the field
       onChange={(rawInputValue) => {
-        const changeValue = parseRawInput(rawInputValue, factor, type);
-        onChange(changeValue);
+        const parsedValue = numberParser.parse(rawInputValue || "");
+        onChange(formatValue(parsedValue, factor, numFractionDigits));
       }}
       inputRef={inputRef}
       onBlur={onBlur}
@@ -142,14 +159,11 @@ export function NumberField(props: NumberFieldProps) {
   );
 }
 
-export function parseRawInput(rawInputValue: string = "", factor: number, type?: NumberFieldType) {
-  // If the wip value is invalid, i.e. it's `10b`, don't push that back into the field state
-  const wip = parseFloat(rawInputValue);
-  if (isNaN(wip)) return;
-
-  // For percentage values we need to initially divide by 100 in order to get their "number value" ("4%" = .04) for the factor multiplier to be accurate.
-  // For example, if the using basisPoints and the user enters "4.31%", then we would expect the response to be 431 basisPoints. If only basing off the `factor` value, then 4.31 * 10000 = 43100, which would not be correct.
-  const value = type === "percent" || type === "basisPoints" ? wip / 100 : wip;
-  // Since the values returned is exactly what is in the field
-  return factor !== 1 ? Math.round(value * factor) : value;
+export function formatValue(value: number, factor: number, numFractionDigits: number | undefined): number | undefined {
+  // We treat percents & cents as (mostly) integers, while useNumberField wants decimals, so
+  // undo that via `* factor` and `Math.round`, but also keep any specifically-requested `numFractionDigits`,
+  // i.e. for `type=percent value=12.34`, `value` will be `0.1234` that we want turn into `12.34`.
+  const maybeAdjustForDecimals = numFractionDigits ? Math.pow(10, numFractionDigits) : 1;
+  // Reverse the integer/decimal conversion
+  return Number.isNaN(value) ? undefined : Math.round(value * factor * maybeAdjustForDecimals) / maybeAdjustForDecimals;
 }

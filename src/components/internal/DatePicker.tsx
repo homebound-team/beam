@@ -1,31 +1,24 @@
 import React from "react";
-import DayPicker, { NavbarElementProps, WeekdayElementProps } from "react-day-picker";
-import { OverlayTriggerState } from "react-stately";
-import { IconButton } from "src/components";
+import DayPicker, { Modifier, NavbarElementProps, WeekdayElementProps } from "react-day-picker";
+import { IconButton } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { useTestIds } from "src/utils";
+import "./DatePicker.css";
 
-interface DatePickerOverlayProps {
-  value: Date | undefined;
-  state: OverlayTriggerState;
-  positionProps: React.HTMLAttributes<Element>;
-  onChange: (value: Date) => void;
+export interface DatePickerProps {
+  value?: Date;
+  onSelect: (value: Date) => void;
+  disabledDays?: Modifier | Modifier[];
 }
 
-export function DatePickerOverlay(props: DatePickerOverlayProps) {
-  const { value, state, positionProps, onChange } = props;
-  // We define some spacing between the Calendar overlay and the trigger element, and depending on where the overlay renders (above or below) we need to adjust the spacing.
-  // We can determine if the position was flipped based on what style is defined, `top` (for positioned below the trigger), and `bottom` (for above the trigger).
-  // The above assumption regarding `top` and `bottom` is true as long as we use `bottom` as our default `OverlayPosition.placement` (set in DateField).
-  // The reason the placement may not be on bottom even though we set `bottom` is because also set `shouldFlip: true`
-  const isPositionedAbove = !positionProps.style?.top;
+export function DatePicker(props: DatePickerProps) {
+  const { value, onSelect, disabledDays } = props;
   const tid = useTestIds(props, "datePicker");
 
   return (
     <div
       css={{
-        ...Css.bgWhite.xs.br4.bshModal.$,
-        ...(isPositionedAbove ? Css.mbPx(4).$ : Css.mtPx(4).$),
+        ...Css.dib.bgWhite.xs.$,
         // The S / M / T / W ... heading
         "& .DayPicker-Weekday": Css.pPx(8).xs.gray400.important.$,
         // Un-collapse the borders so we can hover each cell
@@ -40,6 +33,10 @@ export function DatePickerOverlay(props: DatePickerOverlayProps) {
         "& .DayPicker-Day:active": Css.bgGray400.$,
         // Make the month title, i.e. "May 2021", match figma; pyPx nudge matches the NavbarElement nudging
         "& .DayPicker-Caption > div": Css.base.pyPx(2).$,
+        // For days that are disabled via `disabledDays`,
+        "& .DayPicker-Day--disabled": Css.cursorNotAllowed.$,
+        // Override `.DayPicker-Day:active` background when the day is disabled
+        "& .DayPicker-Day--disabled:active": Css.bgWhite.$,
       }}
       {...tid}
     >
@@ -48,11 +45,12 @@ export function DatePickerOverlay(props: DatePickerOverlayProps) {
         weekdayElement={Weekday}
         selectedDays={[value]}
         initialMonth={value ?? new Date()}
-        onDayClick={(day) => {
-          // Set the day value, and close the picker.
-          onChange(day);
-          state.close();
+        onDayClick={(day, modifiers) => {
+          if (modifiers.disabled) return;
+          // Set the day value
+          onSelect(day);
         }}
+        disabledDays={disabledDays}
       />
     </div>
   );

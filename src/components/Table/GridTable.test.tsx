@@ -1,8 +1,7 @@
 import React, { MutableRefObject, useContext } from "react";
 import { GridRowLookup } from "src/components/Table/GridRowLookup";
 import {
-  calcDivGridColumns,
-  calcVirtualGridColumns,
+  calcColumnSizes,
   emptyCell,
   GridCollapseContext,
   GridColumn,
@@ -47,9 +46,9 @@ type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow;
 // And two columns for NestedRow
 const nestedColumns: GridColumn<NestedRow>[] = [
   {
-    header: () => <Collapse />,
-    parent: () => <Collapse />,
-    child: () => <Collapse />,
+    header: (row) => <Collapse id={row.id} />,
+    parent: (row) => <Collapse id={row.id} />,
+    child: (row) => <Collapse id={row.id} />,
     grandChild: () => "",
   },
   {
@@ -386,6 +385,87 @@ describe("GridTable", () => {
       expect(cell(r, 2, 0)).toHaveTextContent("b");
     });
 
+    it("reverts to initial sorted column", async () => {
+      // Given a table
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          // And there is an initial sort defined
+          sorting={{ on: "client", initial: [nameColumn, "ASC"] }}
+          rows={[
+            simpleHeader,
+            { kind: "data", id: "1", name: "a", value: 2 },
+            { kind: "data", id: "2", name: "b", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // When initializing sort on the "value" column
+      click(r.sortHeader_1);
+      // Then expect ASC order
+      expect(cell(r, 1, 1)).toHaveTextContent("1");
+      // And when clicking a 2nd time
+      click(r.sortHeader_1);
+      // Then expect DESC order
+      expect(cell(r, 1, 1)).toHaveTextContent("3");
+      // And when clicking a 3rd time
+      click(r.sortHeader_1);
+      // Then expect the order to have been reset
+      expect(cell(r, 1, 1)).toHaveTextContent("2");
+    });
+
+    it("initializes with undefined sort", async () => {
+      // Given a table
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          // And the initial sort is explicitly set to `undefined`
+          sorting={{ on: "client", initial: undefined }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // Then the data remains unsorted
+      expect(cell(r, 1, 0)).toHaveTextContent("b");
+      expect(cell(r, 2, 0)).toHaveTextContent("a");
+      expect(cell(r, 3, 0)).toHaveTextContent("c");
+    });
+
+    it("reverts to initially undefined sort", async () => {
+      // Given a table
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          // And the initial sort is explicitly set to `undefined`
+          sorting={{ on: "client", initial: undefined }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "1", name: "a", value: 3 },
+            { kind: "data", id: "3", name: "c", value: 1 },
+          ]}
+        />,
+      );
+      // When initializing sort on the "name" column
+      click(r.sortHeader_0);
+      // Then expect ASC order
+      expect(cell(r, 1, 0)).toHaveTextContent("a");
+      // And when clicking a 2nd time
+      click(r.sortHeader_0);
+      // Then expect DESC order
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
+      // And when clicking a 3rd time
+      click(r.sortHeader_0);
+      // Then expect the order to have been reset
+      expect(cell(r, 1, 0)).toHaveTextContent("b");
+    });
+
     it("can sort nested rows", async () => {
       // Given a table with nested rows
       const r = await render(
@@ -433,8 +513,11 @@ describe("GridTable", () => {
 
     it("throws an error if a column value is not sortable", async () => {
       // Given the table is using client-side sorting
-      // And we have a column that returns a react component w/o GridCellContent
-      const nameColumn: GridColumn<Row> = { header: () => "Name", data: ({ name }) => <div>{name}</div> };
+      const nameColumn: GridColumn<Row> = {
+        header: () => "Name",
+        // And we have a column that returns a react component w/o GridCellContent
+        data: ({ name }) => <div>{name}</div>,
+      };
       // Then the render will fail
       await expect(
         render(
@@ -462,14 +545,14 @@ describe("GridTable", () => {
       );
       const { sortHeader_0, sortHeader_icon_0 } = r;
       // It is initially not sorted
-      expect(() => sortHeader_icon_0()).toThrow("Unable to find");
+      expect(sortHeader_icon_0()).not.toBeVisible();
 
       // Then when sorted by the 1st column
       click(sortHeader_0);
       // Then the callback was called
       expect(onSort).toHaveBeenCalledWith("name", "ASC");
       // And we show the sort toggle
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp");
+      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp").toBeVisible();
       // And the data was not reordered (we defer to the server-side)
       expect(cell(r, 1, 0)).toHaveTextContent("foo");
 
@@ -478,7 +561,14 @@ describe("GridTable", () => {
       // Then it was called again but desc
       expect(onSort).toHaveBeenCalledWith("name", "DESC");
       // And we flip the sort toggle
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown");
+      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown").toBeVisible();
+
+      // And when we sort again
+      click(sortHeader_0);
+      // Then it was called again with undefined
+      expect(onSort).toHaveBeenCalledWith(undefined, undefined);
+      // And we hide the sort toggle (back to the initial sort)
+      expect(sortHeader_icon_0()).not.toBeVisible();
     });
 
     it("doesn't sort columns w/o onSort", async () => {
@@ -518,7 +608,7 @@ describe("GridTable", () => {
         />,
       );
       // Then it is shown as initially sorted asc
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp");
+      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp").toBeVisible();
     });
 
     it("initializes with desc sorting", async () => {
@@ -538,7 +628,7 @@ describe("GridTable", () => {
         />,
       );
       // Then it is shown as initially sorted desc
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown");
+      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown").toBeVisible();
     });
 
     it("can pin rows first", async () => {
@@ -594,47 +684,74 @@ describe("GridTable", () => {
     });
   });
 
-  describe("gtc", () => {
-    it("as=div defaults to auto", () => {
-      expect(calcDivGridColumns([{}, {}], undefined)).toEqual("auto auto");
-    });
-
+  describe("column sizes", () => {
     it("as=virtual defaults to fr widths", () => {
-      expect(calcVirtualGridColumns([{}, {}], undefined)).toEqual(
-        "calc((100% - 0% - 0px) * (1 / 2)) calc((100% - 0% - 0px) * (1 / 2))",
+      expect(calcColumnSizes([{}, {}], undefined, undefined).join(" ")).toEqual(
+        "((100% - 0% - 0px) * (1 / 2)) ((100% - 0% - 0px) * (1 / 2))",
       );
     });
 
-    it("as=div treats numbers as fr", () => {
-      expect(calcDivGridColumns([{ w: 1 }, { w: 2 }] as any, undefined)).toEqual("1fr 2fr");
-    });
-
     it("as=virtual treats numbers as fr", () => {
-      expect(calcVirtualGridColumns([{ w: 1 }, { w: 2 }] as any, undefined)).toEqual(
-        "calc((100% - 0% - 0px) * (1 / 3)) calc((100% - 0% - 0px) * (2 / 3))",
+      expect(calcColumnSizes([{ w: 1 }, { w: 2 }] as any, undefined, undefined).join(" ")).toEqual(
+        "((100% - 0% - 0px) * (1 / 3)) ((100% - 0% - 0px) * (2 / 3))",
       );
     });
 
     it("as=virtual accepts percentages ", () => {
-      expect(calcVirtualGridColumns([{ w: "10%" }, { w: 2 }] as any, undefined)).toEqual(
-        "10% calc((100% - 10% - 0px) * (2 / 2))",
+      expect(calcColumnSizes([{ w: "10%" }, { w: 2 }] as any, undefined, undefined).join(" ")).toEqual(
+        "10% ((100% - 10% - 0px) * (2 / 2))",
       );
     });
 
     it("as=virtual rejects relative units", () => {
-      expect(() => calcVirtualGridColumns([{ w: "auto" }] as any, undefined)).toThrow(
-        "as=virtual only supports px, percentage, or fr units",
+      expect(() => calcColumnSizes([{ w: "auto" }] as any, undefined, undefined).join(" ")).toThrow(
+        "Beam Table column width definition only supports px, percentage, or fr units",
       );
     });
 
     it("as=virtual with both px and default", () => {
       expect(
-        calcVirtualGridColumns(
+        calcColumnSizes(
           [{ w: "200px" }, { w: "100px" }, { w: "10%" }, { w: "20%" }, { w: 2 }, {}] as any,
           undefined,
-        ),
-      ).toEqual("200px 100px 10% 20% calc((100% - 30% - 300px) * (2 / 3)) calc((100% - 30% - 300px) * (1 / 3))");
+          undefined,
+        ).join(" "),
+      ).toEqual("200px 100px 10% 20% ((100% - 30% - 300px) * (2 / 3)) ((100% - 30% - 300px) * (1 / 3))");
     });
+  });
+
+  it("throws error if column min-width definition is set with a non-px/percentage value", async () => {
+    // Given a column with an invalid `mw` value, then the render will fail
+    await expect(
+      render(
+        <GridTable
+          columns={[{ header: () => "Name", data: "Test", mw: "fit-content" }]}
+          rows={[simpleHeader, { kind: "data", id: "1", name: "a", value: 3 }]}
+        />,
+      ),
+    ).rejects.toThrow("Beam Table column min-width definition only supports px or percentage values");
+  });
+
+  it("accepts pixel values for column min-width definition", async () => {
+    // Given a column with an valid `mw` percentage value, then the render will succeed.
+    const r = await render(
+      <GridTable
+        columns={[{ header: () => "Name", data: "Test", mw: "100px" }]}
+        rows={[simpleHeader, { kind: "data", id: "1", name: "a", value: 3 }]}
+      />,
+    );
+    expect(r.gridTable()).toBeTruthy();
+  });
+
+  it("accepts percentage values for column min-width definition", async () => {
+    // Given a column with an valid `mw` percentage value, then the render will succeed.
+    const r = await render(
+      <GridTable
+        columns={[{ header: () => "Name", data: "Test", mw: "100%" }]}
+        rows={[simpleHeader, { kind: "data", id: "1", name: "a", value: 3 }]}
+      />,
+    );
+    expect(r.gridTable()).toBeTruthy();
   });
 
   it("can handle onClick for rows", async () => {
@@ -649,7 +766,7 @@ describe("GridTable", () => {
   it("displays a custom fallback if only a header", async () => {
     const fallbackMessage = "No special rows found";
     const r = await render(<GridTable {...{ columns, rows: [simpleHeader], fallbackMessage }} />);
-    expect(r.firstElement).toHaveTextContent(fallbackMessage);
+    expect(row(r, 1)).toHaveTextContent(fallbackMessage);
   });
 
   it("displays a default fallback if only a header", async () => {
@@ -999,6 +1116,54 @@ describe("GridTable", () => {
     expect(cell(r, 2, 0)).toHaveTextContent("bar");
   });
 
+  it("as=virtual cannot use JSX directly content", async () => {
+    // Given an application would call this in their setupTests/beforeEach
+    setRunningInJest();
+    // When the GridTable is rendered as=virtual
+    const r = render(
+      <GridTable<Row>
+        columns={[
+          {
+            header: () => "Name",
+            // And a column returns GridCellContent.content as directly JSX
+            data: ({ name }) => ({ content: <div>{name}</div> }),
+          },
+        ]}
+        // And the table is using client-side sorting
+        sorting={{ on: "client" }}
+        rows={rows}
+        as="virtual"
+      />,
+    );
+    // Then it fails b/c it would be too expensive
+    await expect(r).rejects.toThrow(
+      "GridTables with as=virtual & sortable columns should use functions that return JSX, instead of JSX",
+    );
+  });
+
+  it("as=virtual can use JSX functions as content", async () => {
+    // Given an application would call this in their setupTests/beforeEach
+    setRunningInJest();
+    // When the GridTable is rendered as=virtual
+    const r = await render(
+      <GridTable<Row>
+        columns={[
+          {
+            header: () => "Name",
+            // And a column returns GridCellContent.content a JSX function
+            data: ({ name }) => ({ content: () => <div>{name}</div>, value: 1 }),
+          },
+        ]}
+        // And the table is using client-side sorting
+        sorting={{ on: "client" }}
+        rows={rows}
+        as="virtual"
+      />,
+    );
+    // Then it rendered
+    expect(cell(r, 1, 0)).toHaveTextContent("foo");
+  });
+
   it("provides simpleDataRows", async () => {
     // Given a row that uses SimpleHeaderAndDataWith
     type Row = SimpleHeaderAndDataWith<{ value: number }>;
@@ -1061,7 +1226,7 @@ describe("GridTable", () => {
 
   it("can show an actually empty cell using 'emptyCell' const", async () => {
     // Given the table with a column that defines the `kind: data` as an empty cell
-    const nameColumn: GridColumn<Row> = { header: () => "Name", data: emptyCell };
+    const nameColumn: GridColumn<Row> = { header: () => "Name", data: () => emptyCell };
     // And a table where the there is an `emptyCell` style specified
     const r = await render(
       <GridTable<Row>
@@ -1111,7 +1276,7 @@ describe("GridTable", () => {
     expect(cellAnd(r, 1, 0, "collapse")).toBeTruthy();
     expect(cell(r, 1, 1).textContent).toBe("parent 1");
     expect(rowAnd(r, 2, "collapse")).toBeTruthy();
-    expect(cellOf(r, "grid-table", 2, 1).textContent).toBe("child p1c1");
+    expect(cellOf(r, "gridTable", 2, 1).textContent).toBe("child p1c1");
     expect(row(r, 3).querySelector("[data-testid='collapse']")).toBeFalsy();
     expect(cell(r, 3, 1).textContent).toBe("grandchild p1c1g1");
   });
@@ -1123,11 +1288,11 @@ describe("GridTable", () => {
   });
 });
 
-function Collapse() {
-  const { isCollapsed, toggleCollapse } = useContext(GridCollapseContext);
-  const icon = isCollapsed ? "+" : "-";
+function Collapse({ id }: { id: string }) {
+  const { isCollapsed, toggleCollapsed } = useContext(GridCollapseContext);
+  const icon = isCollapsed(id) ? "+" : "-";
   return (
-    <div onClick={toggleCollapse} data-testid="collapse">
+    <div onClick={() => toggleCollapsed(id)} data-testid="collapse">
       {icon}
     </div>
   );

@@ -4,16 +4,29 @@ import { mergeProps, useTextField } from "react-aria";
 import { Only } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
+import { Callback } from "src/types";
+import { maybeCall } from "src/utils";
 
 // Exported for test purposes
 export interface TextAreaFieldProps<X> extends BeamTextFieldProps<X> {
   // Does not allow the user to enter new line characters and removes minimum height for textarea.
   preventNewLines?: boolean;
+  // `onEnter` is only triggered when `preventNewLines` is set to `true`
+  onEnter?: Callback;
 }
 
 /** Returns a <textarea /> element that auto-adjusts height based on the field's value */
 export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFieldProps<X>) {
-  const { value = "", disabled = false, readOnly = false, onBlur, onFocus, preventNewLines, ...otherProps } = props;
+  const {
+    value = "",
+    disabled = false,
+    readOnly = false,
+    onBlur,
+    onFocus,
+    preventNewLines,
+    onEnter,
+    ...otherProps
+  } = props;
   const textFieldProps = { ...otherProps, value, isDisabled: disabled, isReadOnly: readOnly };
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
@@ -36,6 +49,11 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
 
   useLayoutEffect(() => {
     if (inputRef.current) {
+      // Temp hack until we can figure out a better way to ensure proper measurements when rendered through a portal (i.e. Modals)
+      if (inputRef.current.scrollHeight === 0) {
+        setTimeout(() => onHeightChange(), 0);
+        return;
+      }
       onHeightChange();
     }
   }, [onHeightChange, value, inputRef]);
@@ -48,8 +66,10 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
         ? {
             onKeyDown: (e) => {
               // Prevent user from typing the new line character
-              if (e.keyCode === 13) {
+              if (e.key === "Enter") {
                 e.preventDefault();
+                maybeCall(onEnter);
+                inputRef.current?.blur();
               }
             },
             onInput: (e) => {
@@ -72,7 +92,7 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
       inputRef={inputRef}
       readOnly={readOnly}
       inputWrapRef={inputWrapRef}
-      minHeight={preventNewLines ? 0 : undefined}
+      textAreaMinHeight={preventNewLines ? 0 : undefined}
     />
   );
 }

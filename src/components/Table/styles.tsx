@@ -1,4 +1,4 @@
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Properties } from "src/Css";
 import { GridStyle } from ".";
 
 /** Our original table look & feel/style. */
@@ -11,8 +11,7 @@ export const defaultStyle: GridStyle = {
   lastCellCss: Css.$,
   indentOneCss: Css.pl4.$,
   indentTwoCss: Css.pl7.$,
-  // Use h100 so that all cells are the same height when scrolled; set bgWhite for when we're laid over other rows.
-  headerCellCss: Css.asfe.nowrap.py1.bgGray100.h100.aife.$,
+  headerCellCss: Css.nowrap.py1.bgGray100.aife.$,
   firstRowMessageCss: Css.px1.py2.$,
   rowHoverColor: Palette.Gray200,
 };
@@ -41,3 +40,24 @@ export const cardStyle: GridStyle = {
     }).p1.m0.xsEm.gray700.$,
   },
 };
+
+// Once completely rolled out across all tables in Blueprint, this will change to be the `defaultStyle`.
+export const beamFixedStyle: GridStyle = {
+  headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
+  cellCss: Css.gray900.xs.bgWhite.aic.nowrap.pxPx(12).hPx(36).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
+  emptyCell: "-",
+  presentationSettings: { borderless: true, typeScale: "xs", wrap: false },
+  rowHoverColor: Palette.Gray200,
+};
+
+export const beamFlexibleStyle: GridStyle = {
+  ...beamFixedStyle,
+  cellCss: Css.xs.bgWhite.aic.p2.boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
+  presentationSettings: { borderless: false, typeScale: "xs", wrap: true },
+};
+
+export const beamGroupRowStyle: Properties = Css.xsEm
+  .mhPx(56)
+  .gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$;
+
+export const beamTotalsRowStyle: Properties = Css.gray700.smEm.hPx(40).mb1.bgWhite.boxShadow("none").$;

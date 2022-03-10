@@ -3,6 +3,8 @@ import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
 import { Css } from "src/Css";
 import { Callback } from "src/types";
+import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 export interface ButtonGroupProps {
   buttons: ButtonGroupButton[];
@@ -23,19 +25,12 @@ export type ButtonGroupButton = {
 
 export function ButtonGroup(props: ButtonGroupProps) {
   const { buttons, disabled = false, size = "sm" } = props;
+  const tid = useTestIds(props, "buttonGroup");
   return (
-    <div css={Css.mPx(4).$}>
+    <div css={Css.mPx(4).$} {...tid}>
       {buttons.map(({ disabled: buttonDisabled, ...buttonProps }, i) => (
-        <GroupButton
-          key={i}
-          {...buttonProps}
-          {...{
-            // Disable the button if the ButtonGroup is disabled or if the current
-            // button is disabled.
-            disabled: disabled || buttonDisabled,
-            size,
-          }}
-        />
+        // Disable the button if the ButtonGroup is disabled or if the current button is disabled.
+        <GroupButton key={i} {...buttonProps} disabled={disabled || buttonDisabled} size={size} {...tid} />
       ))}
     </div>
   );
@@ -52,6 +47,7 @@ function GroupButton(props: GroupButtonProps) {
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
   const { isFocusVisible, focusProps } = useFocusRing();
   const { hoverProps, isHovered } = useHover(ariaProps);
+  const tid = useTestIds(props);
 
   return (
     <button
@@ -68,6 +64,7 @@ function GroupButton(props: GroupButtonProps) {
         ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
         ...(icon ? iconStyles[size] : {}),
       }}
+      {...tid[defaultTestId(text ?? icon ?? "button")]}
     >
       {icon && <Icon icon={icon} />}
       {text}

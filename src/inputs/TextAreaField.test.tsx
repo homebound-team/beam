@@ -32,6 +32,18 @@ describe("TextAreaFieldTest", () => {
     expect(onFocus).not.toHaveBeenCalled();
     expect(onBlur).not.toHaveBeenCalled();
   });
+
+  it("fires onEnter when preventNewLines is set and hitting the Enter key and blurs field", async () => {
+    const onEnter = jest.fn();
+    const onBlur = jest.fn();
+    const r = await render(<TestTextAreaField value="foo" onEnter={onEnter} onBlur={onBlur} preventNewLines />);
+    r.note().focus();
+    expect(r.note()).toHaveFocus();
+    fireEvent.keyDown(r.note(), { key: "Enter" });
+    expect(onEnter).toBeCalledTimes(1);
+    expect(onBlur).toBeCalledTimes(1);
+    expect(r.note()).not.toHaveFocus();
+  });
 });
 
 function TestTextAreaField<X extends Only<TextFieldXss, X>>(props: Omit<TextAreaFieldProps<X>, "onChange" | "label">) {

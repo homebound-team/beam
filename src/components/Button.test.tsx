@@ -39,13 +39,18 @@ describe("Button", () => {
     expect(r.button())
       .toHaveAttribute("href", "https://www.homebound.com")
       .toHaveAttribute("target", "_blank")
-      .toHaveAttribute("rel", "noreferrer noopener");
+      .toHaveAttribute("rel", "noreferrer noopener")
+      .not.toHaveAttribute("download");
   });
 
   it("applies expected properties when rendering a link with a relative url", async () => {
     const r = await render(<Button label="Button" onClick="/testPath" />, withRouter());
     expect(r.button().tagName).toBe("A");
-    expect(r.button()).toHaveAttribute("href", "/testPath").not.toHaveAttribute("target").not.toHaveAttribute("rel");
+    expect(r.button())
+      .toHaveAttribute("href", "/testPath")
+      .not.toHaveAttribute("target")
+      .not.toHaveAttribute("rel")
+      .not.toHaveAttribute("download");
   });
 
   it("applies expected properties when rendering a link with a relative url to open in new tab", async () => {
@@ -54,6 +59,17 @@ describe("Button", () => {
     expect(r.button())
       .toHaveAttribute("href", "/testPath")
       .toHaveAttribute("target", "_blank")
-      .toHaveAttribute("rel", "noreferrer noopener");
+      .toHaveAttribute("rel", "noreferrer noopener")
+      .not.toHaveAttribute("download");
+  });
+
+  it("applies expected properties when adding the 'download' prop", async () => {
+    const r = await render(<Button label="Button" onClick="/testPath" download />, withRouter());
+    expect(r.button().tagName).toBe("A");
+    expect(r.button())
+      .toHaveAttribute("href", "/testPath")
+      .toHaveAttribute("download")
+      .not.toHaveAttribute("target", "_blank")
+      .not.toHaveAttribute("rel", "noreferrer noopener");
   });
 });

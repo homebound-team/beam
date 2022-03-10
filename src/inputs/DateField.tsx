@@ -1,18 +1,19 @@
 import { format as dateFnsFormat, parse as dateFnsParse } from "date-fns";
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
-import { DateUtils } from "react-day-picker";
+import { DateUtils, Modifier } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
 import { Icon } from "src/components";
 import { Popover } from "src/components/internal";
+import { DatePickerOverlay } from "src/components/internal/DatePickerOverlay";
 import { Css, Palette } from "src/Css";
-import { DatePickerOverlay } from "src/inputs/internal/DatePickerOverlay";
-import { TextFieldBase } from "src/inputs/TextFieldBase";
+import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
+import { Callback } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
-import "./DateField.css";
 
-export interface DateFieldProps {
+export interface DateFieldProps
+  extends Pick<TextFieldBaseProps<{}>, "borderless" | "visuallyDisabled" | "hideLabel" | "compact"> {
   value: Date | undefined;
   label: string;
   onChange: (value: Date) => void;
@@ -20,7 +21,8 @@ export interface DateFieldProps {
   onBlur?: () => void;
   /** Called when the component is in focus. */
   onFocus?: () => void;
-  disabled?: boolean;
+  // Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
+  disabled?: boolean | ReactNode;
   errorMsg?: string;
   required?: boolean;
   readOnly?: boolean;
@@ -28,17 +30,22 @@ export interface DateFieldProps {
   /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
   placeholder?: string;
-  compact?: boolean;
   format?: keyof typeof dateFormats;
   iconLeft?: boolean;
-  hideLabel?: boolean;
-  borderless?: boolean;
+  /**
+   * Set custom logic for individual dates or date ranges to be disabled in the picker
+   * exposed from `react-day-picker`: https://react-day-picker.js.org/api/DayPicker#modifiers
+   */
+  disabledDays?: Modifier | Modifier[];
+  onEnter?: Callback;
+  // for storybook
+  defaultOpen?: boolean;
 }
 
 export function DateField(props: DateFieldProps) {
   const {
     label,
-    disabled = false,
+    disabled,
     required,
     value,
     onChange,
@@ -50,6 +57,9 @@ export function DateField(props: DateFieldProps) {
     readOnly = false,
     format = "short",
     iconLeft = false,
+    disabledDays,
+    onEnter,
+    defaultOpen,
     ...others
   } = props;
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -61,6 +71,7 @@ export function DateField(props: DateFieldProps) {
   const dateFormat = getDateFormat(format);
   const [inputValue, setInputValue] = useState(value ? formatDate(value, dateFormat) : "");
   const tid = useTestIds(props, defaultTestId(label));
+  const isDisabled = !!disabled;
 
   useEffect(() => {
     // Avoid updating any WIP values.
@@ -72,7 +83,7 @@ export function DateField(props: DateFieldProps) {
   const textFieldProps = {
     ...others,
     label,
-    isDisabled: disabled,
+    isDisabled,
     isReadOnly: readOnly,
     "aria-haspopup": "dialog" as const,
     value: inputValue,
@@ -84,6 +95,7 @@ export function DateField(props: DateFieldProps) {
         maybeCall(onBlur);
       }
     },
+    isOpen: defaultOpen,
   });
   const { labelProps, inputProps } = useTextField(
     {
@@ -117,6 +129,12 @@ export function DateField(props: DateFieldProps) {
         state.close();
         maybeCall(onBlur);
       },
+      onKeyDown: (e) => {
+        if (e.key === "Enter") {
+          maybeCall(onEnter);
+          inputRef.current?.blur();
+        }
+      },
     },
     inputRef,
   );
@@ -124,7 +142,7 @@ export function DateField(props: DateFieldProps) {
   const { buttonProps } = useButton(
     {
       ...triggerProps,
-      isDisabled: disabled || readOnly,
+      isDisabled: isDisabled || readOnly,
       // When pressed or focused then move focus the input, which will select the text and trigger the DatePicker to open
       onPress: () => inputRef?.current?.focus(),
       onFocus: () => inputRef?.current?.focus(),
@@ -139,6 +157,7 @@ export function DateField(props: DateFieldProps) {
     onClose: state.close,
     placement: "bottom left",
     shouldUpdatePosition: true,
+    offset: 4,
   });
 
   // If showing the short date format, "01/01/20", so set size to 8. If medium (Wed, Nov 23) use 10 characters (leaving out the `,` character in the count because it is so small)
@@ -153,8 +172,8 @@ export function DateField(props: DateFieldProps) {
     <button
       ref={buttonRef}
       {...buttonProps}
-      disabled={disabled}
-      css={Css.if(disabled).cursorNotAllowed.$}
+      disabled={isDisabled}
+      css={Css.if(isDisabled).cursorNotAllowed.$}
       tabIndex={-1}
       {...tid.calendarButton}
     >
@@ -189,24 +208,26 @@ export function DateField(props: DateFieldProps) {
         }}
         endAdornment={!iconLeft && calendarButton}
         startAdornment={iconLeft && calendarButton}
+        tooltip={isDisabled && typeof disabled !== "boolean" ? disabled : undefined}
         {...others}
       />
       {state.isOpen && (
         <Popover
           triggerRef={inputWrapRef}
           popoverRef={overlayRef}
-          positionProps={{ ...overlayProps, ...positionProps }}
+          positionProps={positionProps}
           onClose={state.close}
           isOpen={state.isOpen}
         >
           <DatePickerOverlay
-            state={state}
             value={value}
-            positionProps={positionProps}
-            onChange={(d) => {
+            onSelect={(d) => {
               setInputValue(formatDate(d, dateFormat));
               onChange(d);
             }}
+            state={state}
+            disabledDays={disabledDays}
+            overlayProps={overlayProps}
             {...tid.datePicker}
           />
         </Popover>

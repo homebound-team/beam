@@ -66,14 +66,11 @@ export function render(
 }
 
 export function cell(r: RenderResult, row: number, column: number): HTMLElement {
-  return cellOf(r, "grid-table", row, column);
+  return cellOf(r, "gridTable", row, column);
 }
 
 export function cellOf(r: RenderResult, tableTestId: string, rowNum: number, column: number): HTMLElement {
-  const nonPaddingColumns = Array.from(row(r, rowNum, tableTestId).childNodes).filter(
-    (node) => !("cardpadding" in (node as HTMLElement).dataset),
-  );
-  return nonPaddingColumns[column] as HTMLElement;
+  return row(r, rowNum, tableTestId).childNodes[column] as HTMLElement;
 }
 
 export function cellAnd(r: RenderResult, row: number, column: number, testId: string): HTMLElement {
@@ -83,11 +80,9 @@ export function cellAnd(r: RenderResult, row: number, column: number, testId: st
   );
 }
 
-export function row(r: RenderResult, row: number, tableTestId: string = "grid-table"): HTMLElement {
-  const nonChromeRows = Array.from(r.getByTestId(tableTestId).childNodes).filter(
-    (node) => !("chrome" in (node as HTMLElement).dataset),
-  );
-  return nonChromeRows[row] as HTMLElement;
+export function row(r: RenderResult, row: number, tableTestId: string = "gridTable"): HTMLElement {
+  const dataRows = Array.from(r.getByTestId(tableTestId).querySelectorAll("[data-gridrow]"));
+  return dataRows[row] as HTMLElement;
 }
 
 export function rowAnd(r: RenderResult, rowNum: number, testId: string): HTMLElement {

@@ -12,5 +12,6 @@ export * from "./SelectField";
 export * from "./Switch";
 export * from "./TextAreaField";
 export * from "./TextField";
+export type { TextFieldApi } from "./TextField";
 export * from "./ToggleChipGroup";
 export type { Value } from "./Value";

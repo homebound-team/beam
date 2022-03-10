@@ -1,4 +1,5 @@
 import { Global } from "@emotion/react";
+import { useResizeObserver } from "@react-aria/utils";
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
 import React, {
@@ -14,15 +15,20 @@ import React, {
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
-import { PresentationProvider } from "src/components/PresentationContext";
+import {
+  PresentationContextProps,
+  PresentationFieldProps,
+  PresentationProvider,
+} from "src/components/PresentationContext";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
-import { maybeAddCardPadding, NestedCards } from "src/components/Table/nestedCards";
+import { getNestedCardStyles, isLeafRow, NestedCards, wrapCard } from "src/components/Table/nestedCards";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
 import { SortState, useSortState } from "src/components/Table/useSortState";
-import { Css, Margin, Only, Properties, Xss } from "src/Css";
+import { Css, Margin, Only, Properties, Typography, Xss } from "src/Css";
 import tinycolor from "tinycolor2";
+import { useDebouncedCallback } from "use-debounce";
 import { defaultStyle } from ".";
 
 export type Kinded = { kind: string };
@@ -31,7 +37,7 @@ export type GridTableXss = Xss<Margin>;
 export const ASC = "ASC" as const;
 export const DESC = "DESC" as const;
 export type Direction = "ASC" | "DESC";
-export const emptyCell: () => ReactNode = () => <></>;
+export const emptyCell: GridCellContent = { content: () => <></>, value: "" };
 
 let runningInJest = false;
 
@@ -55,7 +61,14 @@ export interface GridStyle {
   firstNonHeaderRowCss?: Properties;
   /** Applied to all cell divs (via a selector off the base div). */
   cellCss?: Properties;
-  /** Applied to the header (really first) row div. */
+  /**
+   * Applied to the header row divs.
+   *
+   * NOTE `as=virtual`: When using a virtual table with the goal of adding space
+   * between the header and the first row use `firstNonHeaderRowCss` with a
+   * margin-top instead. Using `headerCellCss` will not work since the header
+   * rows are wrapper with Chrome rows.
+   */
   headerCellCss?: Properties;
   /** Applied to the first cell of all rows, i.e. for table-wide padding or left-side borders. */
   firstCellCss?: Properties;
@@ -73,7 +86,13 @@ export interface GridStyle {
   nestedCards?: NestedCardsStyle;
   /** Default content to put into an empty cell */
   emptyCell?: ReactNode;
+  presentationSettings?: Pick<PresentationFieldProps, "borderless" | "typeScale"> &
+    Pick<PresentationContextProps, "wrap">;
+  /** Minimum table width in pixels. Used when calculating columns sizes */
+  minWidthPx?: number;
 }
+
+export type NestedCardStyleByKind = Record<string, NestedCardStyle>;
 
 export interface NestedCardsStyle {
   /** Space between each card. */
@@ -85,7 +104,7 @@ export interface NestedCardsStyle {
    *
    * Entries are optional, i.e. you can leave out kinds and they won't be wrapped/turned into cards.
    */
-  kinds: Record<string, NestedCardStyle>;
+  kinds: NestedCardStyleByKind;
 }
 
 /**
@@ -147,14 +166,14 @@ export type GridSortConfig<S> =
   | {
       on: "client";
       /** The optional initial column (index in columns) and direction to sort. */
-      initial?: [S | GridColumn<any>, Direction];
+      initial?: [S | GridColumn<any>, Direction] | undefined;
     }
   | {
       on: "server";
       /** The current sort by value + direction (if server-side sorting). */
       value?: [S, Direction];
-      /** Callback for when the column is sorted (if server-side sorting). */
-      onSort: (orderBy: S, direction: Direction) => void;
+      /** Callback for when the column is sorted (if server-side sorting). Parameters set to `undefined` is a signal to return to the initial sort state */
+      onSort: (orderBy: S | undefined, direction: Direction | undefined) => void;
     };
 
 export interface GridTableProps<R extends Kinded, S, X> {
@@ -206,7 +225,16 @@ export interface GridTableProps<R extends Kinded, S, X> {
    */
   persistCollapse?: string;
   xss?: X;
+  /** Experimental API allowing one to scroll to a table index. Primarily intended for stories at the moment */
+  api?: MutableRefObject<GridTableApi | undefined>;
+  /** Experimental, expecting to be removed - Specify the element in which the table should resize its columns against. If not set, the table will resize columns based on its owns container's width */
+  resizeTarget?: MutableRefObject<HTMLElement | null>;
 }
+
+/** NOTE: This API is experimental and primarily intended for story and testing purposes */
+export type GridTableApi = {
+  scrollToIndex: (index: number) => void;
+};
 
 /**
  * Renders data in our table layout.
@@ -228,7 +256,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   props: GridTableProps<R, S, X>,
 ) {
   const {
-    id = "grid-table",
+    id = "gridTable",
     as = "div",
     columns,
     rows,
@@ -245,34 +273,111 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     setRowCount,
     observeRows,
     persistCollapse,
+    api,
+    resizeTarget,
   } = props;
 
-  const [collapsedIds, toggleCollapsedId] = useToggleIds(rows, persistCollapse);
+  const [collapsedIds, collapseAllContext, collapseRowContext] = useToggleIds(rows, persistCollapse);
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
+  const tableRef = useRef<HTMLElement>(null);
+
+  if (api) {
+    api.current = {
+      scrollToIndex: (index) => virtuosoRef.current && virtuosoRef.current.scrollToIndex(index),
+    };
+  }
 
   const [sortState, setSortKey] = useSortState<R, S>(columns, sorting);
-  // Disclaimer that technically even though this is a useMemo, sortRows is mutating `rows` directly
+
   const maybeSorted = useMemo(() => {
     if (sorting?.on === "client" && sortState) {
       // If using client-side sort, the sortState use S = number
-      sortRows(columns, rows, sortState as any as SortState<number>);
-      return rows;
+      return sortRows(columns, rows, sortState as any as SortState<number>);
     }
     return rows;
   }, [columns, rows, sorting, sortState]);
+
+  // Calculate the column sizes immediately rather than via the `debounce` method.
+  // We do this for Storybook integrations that may use MockDate. MockDate changes the behavior of `new Date()`, which is used by `useDebounce` and essentially turns off the callback.
+  const calculateImmediately = useRef<boolean>(true);
+  const [tableWidth, setTableWidth] = useState<number | undefined>();
+
+  // Calc our initial/first render sizes where we won't have a width yet
+  const [columnSizes, setColumnSizes] = useState<string[]>(
+    calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, tableWidth, style.minWidthPx),
+  );
+
+  const setTableAndColumnWidths = useCallback(
+    (width: number) => {
+      setTableWidth(width);
+      setColumnSizes(calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, width, style.minWidthPx));
+    },
+    [setTableWidth, setColumnSizes, columns, style],
+  );
+
+  const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
+
+  const onResize = useCallback(() => {
+    const target = resizeTarget?.current ? resizeTarget.current : tableRef.current;
+    if (target && target.clientWidth !== tableWidth) {
+      if (calculateImmediately.current) {
+        calculateImmediately.current = false;
+        setTableAndColumnWidths(target.clientWidth);
+      } else {
+        setTableAndColumnWidthsDebounced(target.clientWidth);
+      }
+    }
+  }, [
+    resizeTarget?.current,
+    tableRef.current,
+    setTableAndColumnWidths,
+    calculateImmediately,
+    setTableAndColumnWidthsDebounced,
+  ]);
+
+  useResizeObserver({ ref: resizeTarget ?? tableRef, onResize });
 
   // Filter + flatten + component-ize the sorted rows.
   let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
 
+    function makeRowComponent(row: GridDataRow<R>): JSX.Element {
+      // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
+      // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
+      const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : { sorting };
+      const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
+
+      return (
+        <GridCollapseContext.Provider
+          key={`${row.kind}-${row.id}`}
+          value={row.kind === "header" ? collapseAllContext : collapseRowContext}
+        >
+          <RowComponent
+            {...{
+              as,
+              columns,
+              row,
+              style,
+              rowStyles,
+              stickyHeader,
+              stickyOffset,
+              openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
+              columnSizes,
+              ...sortProps,
+            }}
+          />
+        </GridCollapseContext.Provider>
+      );
+    }
+
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: RowTuple<R>[] = [];
     const filteredRows: RowTuple<R>[] = [];
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
-    const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style);
+    const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style.nestedCards);
 
     // Depth-first to filter
     function visit(row: GridDataRow<R>): void {
@@ -284,6 +389,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         );
       // Even if we don't pass the filter, one of our children might, so we continue on after this check
       let isCard = false;
+
       if (matches) {
         isCard = nestedCards && nestedCards.maybeOpenCard(row);
         filteredRows.push([row, makeRowComponent(row)]);
@@ -295,17 +401,17 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         visitRows(row.children, isCard);
       }
 
-      isCard && nestedCards && nestedCards.closeCard();
+      !isLeafRow(row) && isCard && nestedCards && nestedCards.closeCard();
     }
 
     function visitRows(rows: GridDataRow<R>[], addSpacer: boolean): void {
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
-          addSpacer && nestedCards && nestedCards.addSpacer(undefined, rows[i + 1]);
-          nestedCards && nestedCards.maybeOpenCard(row);
+          // TODO: Is this still needed? Merge conflict which may no longer be applicable
+          // addSpacer && nestedCards && nestedCards.addSpacer(undefined, rows[i + 1]);
+          // nestedCards && nestedCards.maybeOpenCard(row);
           headerRows.push([row, makeRowComponent(row)]);
-          nestedCards && nestedCards.closeCard();
           return;
         }
 
@@ -315,38 +421,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
       // Add spacer after a card
       addSpacer && nestedCards && nestedCards.addSpacer(rows[rows.length - 1], undefined);
-    }
-
-    function makeRowComponent(row: GridDataRow<R>): JSX.Element {
-      // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
-      // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
-      const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : { sorting };
-      // We only pass `isCollapsed` as a prop so that the row only re-renders when it itself has
-      // changed from collapsed/non-collapsed, and not other row's entering/leaving collapsedIds.
-      // Note that we do memoized on toggleCollapsedId, but it's stable thanks to useToggleIds.
-      const isCollapsed = collapsedIds.includes(row.id);
-      const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
-
-      return (
-        <RowComponent
-          key={`${row.kind}-${row.id}`}
-          {...{
-            as,
-            columns,
-            row,
-            style,
-            rowStyles,
-            stickyHeader,
-            stickyOffset,
-            isCollapsed,
-            toggleCollapsedId,
-            // TODO: How will this effect with memoization?
-            // At least for non-nested card tables, we make this undefined so it will be fine.
-            openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
-            ...sortProps,
-          }}
-        />
-      );
     }
 
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
@@ -367,8 +441,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     stickyHeader,
     stickyOffset,
     collapsedIds,
-    toggleCollapsedId,
+    collapseAllContext,
+    collapseRowContext,
     observeRows,
+    columnSizes,
   ]);
 
   let tooManyClientSideRows = false;
@@ -392,13 +468,28 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
+  const borderless = style?.presentationSettings?.borderless;
+  const typeScale = style?.presentationSettings?.typeScale;
+  const fieldProps: PresentationFieldProps = useMemo(
+    () => ({
+      hideLabel: true,
+      numberAlignment: "right",
+      compact: true,
+      // Avoid passing `undefined` as it will unset existing PresentationContext settings
+      ...(borderless !== undefined ? { borderless } : {}),
+      ...(typeScale !== undefined ? { typeScale } : {}),
+    }),
+    [borderless, typeScale],
+  );
+
   // If we're running in Jest, force using `as=div` b/c jsdom doesn't support react-virtuoso.
   // This enables still putting the application's business/rendering logic under test, and letting it
   // just trust the GridTable impl that, at runtime, `as=virtual` will (other than being virtualized)
   // behave semantically the same as `as=div` did for its tests.
   const _as = as === "virtual" && runningInJest ? "div" : as;
   return (
-    <PresentationProvider fieldProps={{ hideLabel: true, numberAlignment: "right", compact: true }}>
+    <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
+      {/* TODO: These drag-over/add-in-place styles need to be applied in a different way? */}
       <Global
         styles={{
           ".row-drag-hover": Css.bgLightBlue100.important.$,
@@ -415,6 +506,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         style.nestedCards?.firstLastColumnWidth,
         xss,
         virtuosoRef,
+        tableRef,
       )}
     </PresentationProvider>
   );
@@ -423,44 +515,47 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 // Determine which HTML element to use to build the GridTable
 const renders: Record<RenderAs, typeof renderTable> = {
   table: renderTable,
-  div: renderCssGrid,
+  div: renderDiv,
   virtual: renderVirtual,
   virtualFixed: renderVirtualFixed,
 };
 
-/** Renders as a CSS Grid, which is the default / most well-supported rendered. */
-function renderCssGrid<R extends Kinded>(
+/** Renders table using divs with flexbox rows, which is the default render */
+function renderDiv<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumn<R>[],
   headerRows: RowTuple<R>[],
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
-  stickyHeader: boolean,
+  _stickyHeader: boolean,
   firstLastColumnWidth: number | undefined,
   xss: any,
-  virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  tableRef: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
   return (
     <div
+      ref={tableRef as any}
       css={{
-        ...Css.dg.gtc(calcDivGridColumns(columns, firstLastColumnWidth)).$,
-        // Apply the between-row styling with `div + div > *` so that we don't have to have conditional
-        // `if !lastRow add border` CSS applied via JS that would mean the row can't be React.memo'd.
-        // The `div + div` is also the "owl operator", i.e. don't apply to the 1st row.
-        ...(style.betweenRowsCss ? Css.addIn("& > div + div > *", style.betweenRowsCss).$ : {}),
-        // removes border between header and second row
-        ...(style.firstNonHeaderRowCss ? Css.addIn("& > div:nth-of-type(2) > *", style.firstNonHeaderRowCss).$ : {}),
+        /*
+          Using (n + 3) here to target all rows that are after the first non-header row. Since n starts at 0, we can use
+          the + operator as an offset.
+          Inspired by: https://stackoverflow.com/a/25005740/2551333
+        */
+        ...(style.betweenRowsCss ? Css.addIn(`& > div:nth-of-type(n+3) > *`, style.betweenRowsCss).$ : {}),
+        ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:nth-of-type(2) > *`, style.firstNonHeaderRowCss).$ : {}),
         ...style.rootCss,
+        ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
       }}
       data-testid={id}
     >
       {headerRows.map(([, node]) => node)}
-      {/* Show an all-column-span info message if it's set. */}
+      {/* Show a info message if it's set. */}
       {firstRowMessage && (
-        <div css={Css.add("gridColumn", `${columns.length} span`).$}>
-          <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
+        <div css={{ ...style.firstRowMessageCss }} data-gridrow>
+          {firstRowMessage}
         </div>
       )}
       {filteredRows.map(([, node]) => node)}
@@ -480,15 +575,18 @@ function renderTable<R extends Kinded>(
   _firstLastColumnWidth: number | undefined,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  tableRef: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
   return (
     <table
+      ref={tableRef as any}
       css={{
         ...Css.w100.add("borderCollapse", "collapse").$,
         ...Css.addIn("& > tbody > tr ", style.betweenRowsCss || {})
           // removes border between header and second row
           .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss || {}).$,
         ...style.rootCss,
+        ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
       }}
       data-testid={id}
@@ -540,35 +638,59 @@ function renderVirtual<R extends Kinded>(
   firstLastColumnWidth: number | undefined,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  tableRef: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { footerStyle, listStyle } = useMemo(() => {
+    const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
+    return { footerStyle: { paddingBottom }, listStyle: { ...style, rootCss: otherRootStyles } };
+  }, [style]);
+
   return (
     <Virtuoso
+      overscan={5}
       ref={virtuosoRef}
-      components={{ List: VirtualRoot(style, columns, id, firstLastColumnWidth, xss) }}
+      scrollerRef={(ref) => {
+        // This is fired multiple times per render. Only set `tableRef.current` if it has changed
+        if (ref && tableRef.current !== ref) {
+          tableRef.current = ref as HTMLElement;
+        }
+      }}
+      components={{
+        List: VirtualRoot(listStyle, columns, id, firstLastColumnWidth, xss),
+        Footer: () => <div css={footerStyle} />,
+      }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
-      // Both the `Item` and `itemContent` use `display: contents`, so their height is 0,
-      // so instead drill into the 1st real content cell.
-      itemSize={(el) => (el.firstElementChild!.firstElementChild! as HTMLElement).offsetHeight}
       itemContent={(index) => {
-        // We keep header and filter rows separate, but react-virtuoso is a flat list,
-        // so we pick the right header / first row message / actual row.
-        let i = index;
-        if (i < headerRows.length) {
-          return headerRows[i][1];
+        // Since we have two arrays of rows: `headerRows` and `filteredRow` we
+        // must determine which one to render.
+
+        // Determine if we need to render a header row
+        if (index < headerRows.length) {
+          return headerRows[index][1];
         }
-        i -= headerRows.length;
+
+        // Reset index
+        index -= headerRows.length;
+
+        // Show firstRowMessage as the first `filteredRow`
         if (firstRowMessage) {
-          if (i === 0) {
+          if (index === 0) {
             return (
               <div css={Css.add("gridColumn", `${columns.length} span`).$}>
                 <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
               </div>
             );
           }
-          i -= 1;
+
+          // Shift index -1 when there is a firstRowMessage to not skip the
+          // first `filteredRow`
+          index--;
         }
-        return filteredRows[i][1];
+
+        // Lastly render `filteredRow`
+        return filteredRows[index][1];
       }}
       totalCount={(headerRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)}
     />
@@ -623,10 +745,18 @@ function renderVirtualFixed<R extends Kinded>(
 
 /**
  * Customizes the `List` element that react-virtuoso renders, to have our css grid logic.
+ * A table might render two of these components to represent two virtual lists.
+ * This generally happens when `topItemCount` prop is used and React-Virtuoso
+ * creates to Virtual lists where the first represents, generally, the header
+ * rows and the second represents the non-header rows (list rows).
  *
- * We wrap this in memoizeOne so that React.createElement sees a consistent/stable component
- * identity, even though technically we have a different "component" per the given set of props
- * (solely to capture as params that we can't pass through react-virtuoso's API as props).
+ * The main goal of this custom component is to:
+ * - Customize the list wrapper to our styles
+ *
+ * We wrap this in memoizeOne so that React.createElement sees a
+ * consistent/stable component identity, even though technically we have a
+ * different "component" per the given set of props (solely to capture as
+ * params that we can't pass through react-virtuoso's API as props).
  */
 const VirtualRoot = memoizeOne<
   (
@@ -636,20 +766,28 @@ const VirtualRoot = memoizeOne<
     firstLastColumnWidth: number | undefined,
     xss: any,
   ) => Components["List"]
->((gs, columns, id, firstLastColumnWidth, xss) => {
-  return React.forwardRef(({ style, children }, ref) => {
-    // This re-renders each time we have new children in the view port
+>((gs, _columns, id, _firstLastColumnWidth, xss) => {
+  return React.forwardRef(function VirtualRoot({ style, children }, ref) {
+    // This VirtualRoot list represent the header when no styles are given. The
+    // table list generally has styles to scroll the page for windowing.
+    const isHeader = Object.keys(style || {}).length === 0;
+
+    // This re-renders each time we have new children in the viewport
     return (
       <div
         ref={ref}
-        style={style}
+        style={{ ...style, ...{ minWidth: "fit-content" } }}
         css={{
-          ...Css.dg.gtc(calcVirtualGridColumns(columns, firstLastColumnWidth)).$,
           // Add an extra `> div` due to Item + itemContent both having divs
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
-          // Add `display:contents` to Item to flatten it like we do GridRow
-          ...Css.addIn("& > div", Css.display("contents").$).$,
+          // Table list styles only
+          ...(isHeader
+            ? {}
+            : {
+                ...Css.addIn("& > div:first-of-type > *", gs.firstNonHeaderRowCss).$,
+              }),
           ...gs.rootCss,
+          ...(gs.minWidthPx ? Css.mwPx(gs.minWidthPx).$ : {}),
           ...xss,
         }}
         data-testid={id}
@@ -679,7 +817,7 @@ const VirtualRootFixed = memoizeOne<
         ref={ref}
         style={style}
         css={{
-          ...Css.addIn("& > div > div", Css.dg.gtc(calcVirtualGridColumns(columns, firstLastColumnWidth)).$).$,
+          // ...Css.addIn("& > div > div", Css.dg.gtc(calcColumnSizes(columns, firstLastColumnWidth, undefined)).$).$, // TODO is this still needed? Merge conflict which may no longer be applicable
           // Add an extra `> div` due to Item + itemContent both having divs
           ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
           ...gs.rootCss,
@@ -694,17 +832,15 @@ const VirtualRootFixed = memoizeOne<
 });
 
 /**
- * Creates a `grid-template-column` specific to our virtual output.
- *
- * Because of two things:
- *
- * a) react-virtuoso puts the header in a different div than the normal rows, and
- *
- * b) content-aware sizing just in general look janky/constantly resize while scrolling
- *
- * When we're as=virtual, we change our default + enforce only fixed-sized units (% and px)
+ * Calculates column widths using a flexible `calc()` definition that allows for consistent column alignment without the use of `<table />`, CSS Grid, etc layouts.
+ * Enforces only fixed-sized units (% and px)
  */
-export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColumnWidth: number | undefined): string {
+export function calcColumnSizes(
+  columns: GridColumn<any>[],
+  firstLastColumnWidth: number | undefined,
+  tableWidth: number | undefined,
+  tableMinWidthPx: number = 0,
+): string[] {
   // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
   // calc((100% - allOtherPercent - allOtherPx) * ((myFr / totalFr))`
   //
@@ -726,7 +862,7 @@ export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColu
       } else if (w.endsWith("%")) {
         return { ...acc, claimedPercentages: acc.claimedPercentages + Number(w.replace("%", "")) };
       } else {
-        throw new Error("as=virtual only supports px, percentage, or fr units");
+        throw new Error("Beam Table column width definition only supports px, percentage, or fr units");
       }
     },
     { claimedPercentages: 0, claimedPixels: 0, totalFr: 0 },
@@ -734,7 +870,17 @@ export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColu
 
   // This is our "fake but for some reason it lines up better" fr calc
   function fr(myFr: number): string {
-    return `calc((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
+    // If the tableWidth, then return a pixel value
+    if (tableWidth) {
+      const widthBasis = Math.max(tableWidth, tableMinWidthPx);
+      // When the tableWidth is defined, then we need to account for the `firstLastColumnWidth`s.
+      return `(${
+        (widthBasis - (claimedPercentages / 100) * widthBasis - claimedPixels - (firstLastColumnWidth ?? 0) * 2) *
+        (myFr / totalFr)
+      }px)`;
+    }
+    // Otherwise return the `calc()` value
+    return `((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
   let sizes = columns.map(({ w }) => {
@@ -746,37 +892,15 @@ export function calcVirtualGridColumns(columns: GridColumn<any>[], firstLastColu
       } else if (w.endsWith("fr")) {
         return fr(Number(w.replace("fr", "")));
       } else {
-        throw new Error("as=virtual only supports px, percentage, or fr units");
+        throw new Error("Beam Table column width definition only supports px, percentage, or fr units");
       }
     } else {
       return fr(w);
     }
   });
 
-  return maybeAddCardColumns(sizes, firstLastColumnWidth);
-}
-
-export function calcDivGridColumns(columns: GridColumn<any>[], firstLastColumnWidth: number | undefined): string {
-  const sizes = columns.map(({ w }) => {
-    if (typeof w === "undefined") {
-      // Hrm, I waffle between 'auto' or '1fr' being the better default here...
-      return "auto";
-    } else if (typeof w === "string") {
-      // Use whatever the user passed in
-      return w;
-    } else {
-      // Otherwise assume fr units
-      return `${w}fr`;
-    }
-  });
-  return maybeAddCardColumns(sizes, firstLastColumnWidth);
-}
-
-// If we're doing nested cards, we add extra 1st/last cells...
-function maybeAddCardColumns(sizes: string[], firstLastColumnWidth: number | undefined): string {
-  return (!firstLastColumnWidth ? sizes : [`${firstLastColumnWidth}px`, ...sizes, `${firstLastColumnWidth}px`]).join(
-    " ",
-  );
+  // If we're doing nested cards, we add extra 1st/last cells...
+  return !firstLastColumnWidth ? sizes : [`${firstLastColumnWidth}px`, ...sizes, `${firstLastColumnWidth}px`];
 }
 
 /**
@@ -800,36 +924,26 @@ type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "
  * - For server-side sorting, it's the sortKey to pass back to the server to
  * request "sort by this column".
  *
- * - For client-side sorting, it the type `number`, to represent the current
+ * - For client-side sorting, it's type `number`, to represent the current
  * column being sorted, in which case we use the GridCellContent.value.
  */
 export type GridColumn<R extends Kinded, S = {}> = {
   [K in R["kind"]]:
     | string
+    | GridCellContent
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (data: D, row: GridRowKind<R, K>) => ReactNode | GridCellContent
         : (row: GridRowKind<R, K>) => ReactNode | GridCellContent);
 } & {
   /**
-   * The column's grid column width.
-   *
-   * For `as=div` output:
-   *
-   * - Any CSS grid units are supported
-   * - Numbers are treated as `fr` units
-   * - The default value is `auto`, which in CSS grid will do content-aware/responsive layout.
-   *
-   * For `as=virtual` output:
-   *
-   * - Only px, percentage, or fr units are supported, due to a) react-virtuoso puts the sticky header
-   * rows in a separate `div` and so we end up with two `grid-template-columns`, so cannot rely on
-   * any content-aware sizing, and b) content-aware sizing in a scrolling/virtual table results in
-   * a ~janky experience as the columns will constantly resize as new/different content is put in/out
-   * of the DOM.
+   * The column's width.
+   * - Only px, percentage, or fr units are supported, due to each GridRow acting as an independent table. This ensures consistent alignment between rows.
    * - Numbers are treated as `fr` units
    * - The default value is `1fr`
    */
   w?: number | string;
+  /** The minimum width the column can shrink to */
+  mw?: string;
   /** The column's default alignment for each cell. */
   align?: GridCellAlignment;
   /** Whether the column can be sorted (if client-side sorting). Defaults to true if sorting client-side. */
@@ -874,7 +988,7 @@ function getIndentationCss<R extends Kinded>(
   maybeContent: ReactNode | GridCellContent,
 ): Properties {
   // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
-  const indent = (isContentAndSettings(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
+  const indent = (isGridCellContent(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
   return indent === 1 ? style.indentOneCss || {} : indent === 2 ? style.indentTwoCss || {} : {};
 }
 
@@ -896,7 +1010,8 @@ export type GridCellAlignment = "left" | "right" | "center";
  * primitive value for filtering and sorting.
  */
 export type GridCellContent = {
-  content: ReactNode;
+  /** The JSX content of the cell. Virtual tables that client-side sort should use a function to avoid perf overhead. */
+  content: ReactNode | (() => ReactNode);
   alignment?: GridCellAlignment;
   /** Allow value to be a function in case it's a dynamic value i.e. reading from an inline-edited proxy. */
   value?: MaybeFn<number | string | Date | boolean | null | undefined>;
@@ -905,6 +1020,7 @@ export type GridCellContent = {
   /** Whether to indent the cell. */
   indent?: 1 | 2;
   colspan?: number;
+  typeScale?: Typography;
 };
 
 type MaybeFn<T> = T | (() => T);
@@ -939,9 +1055,9 @@ interface GridRowProps<R extends Kinded, S> {
   sorting?: GridSortConfig<S>;
   sortState?: SortState<S>;
   setSortKey?: (value: S) => void;
-  isCollapsed: boolean;
-  toggleCollapsedId: (id: string) => void;
-  openCards: Array<NestedCard<any>> | undefined;
+  // NOTE: openCards is a string of colon separated open kinds, so that the result is stable across renders.
+  openCards: string | undefined;
+  columnSizes: string[];
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -957,15 +1073,23 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     sorting,
     sortState,
     setSortKey,
-    isCollapsed,
-    toggleCollapsedId,
     openCards,
+    columnSizes,
     ...others
   } = props;
 
   // We treat the "header" kind as special for "good defaults" styling
   const isHeader = row.kind === "header";
   const rowStyle = rowStyles?.[row.kind];
+  const Row = as === "table" ? "tr" : "div";
+
+  const openCardStyles =
+    typeof openCards === "string"
+      ? openCards
+          .split(":")
+          .map((openCardKind) => style.nestedCards!.kinds[openCardKind])
+          .filter((style) => style)
+      : undefined;
 
   const rowStyleCellCss = maybeApplyFunction(row, rowStyle?.cellCss);
   const rowCss = {
@@ -974,19 +1098,20 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     // root-element > row-element > cell-elements, so that we can have a hook for
     // hovers and styling. In theory this would change with subgrids.
     // Only enable when using div as elements
+    // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `flexNone` to ensure they stay their defined widths
+    ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.flexNone.$).$),
     ...((rowStyle?.rowLink || rowStyle?.onClick) &&
       style.rowHoverColor && {
         // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
         "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
       }),
     ...maybeApplyFunction(row, rowStyle?.rowCss),
+    // Maybe add the sticky header styles
+    ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined),
+    ...getNestedCardStyles(row, openCardStyles, style),
   };
 
-  const Row = as === "table" ? "tr" : "div";
-
-  const currentCard = openCards && openCards.length > 0 && openCards[openCards.length - 1];
   let currentColspan = 1;
-  const maybeStickyHeaderStyles = isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined;
 
   // TODO: Setup types
   // const draggableProps: {
@@ -999,9 +1124,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   //     e.dataTransfer.setData("row", JSON.stringify(row));
   //   }),
   // }
-
-  const div = (
-    // TODO: Here we will add onDrag into the drag object
+  const rowNode = (
     <Row
       css={rowCss}
       {...others}
@@ -1010,24 +1133,41 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         e.dataTransfer.effectAllowed = "move";
         e.dataTransfer.setData("row", JSON.stringify(row));
       }}
+      data-gridrow
     >
-      {/* Send in the rows that are openned */}
-      {openCards && maybeAddCardPadding(openCards, "first", maybeStickyHeaderStyles)}
       {columns.map((column, columnIndex) => {
+        if (column.mw) {
+          // Validate the column's minWidth definition if set.
+          if (!column.mw.endsWith("px") && !column.mw.endsWith("%")) {
+            throw new Error("Beam Table column min-width definition only supports px or percentage values");
+          }
+        }
+
         // Decrement colspan count and skip if greater than 1.
         if (currentColspan > 1) {
           currentColspan -= 1;
           return;
         }
         const maybeContent = applyRowFn(column, row);
-        currentColspan = isContentAndSettings(maybeContent) ? maybeContent.colspan ?? 1 : 1;
+        currentColspan = isGridCellContent(maybeContent) ? maybeContent.colspan ?? 1 : 1;
 
         const canSortColumn =
           (sorting?.on === "client" && column.clientSideSort !== false) ||
           (sorting?.on === "server" && !!column.serverSideSortKey);
-        const content = toContent(maybeContent, isHeader, canSortColumn, style);
+        const alignment = getAlignment(column, maybeContent);
+        const justificationCss = getJustification(column, maybeContent, as, alignment);
+        const content = toContent(
+          maybeContent,
+          isHeader,
+          canSortColumn,
+          sorting?.on === "client",
+          style,
+          as,
+          alignment,
+        );
 
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
+        const maybeNestedCardColumnIndex = columnIndex + (style.nestedCards ? 1 : 0);
 
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
         // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
@@ -1046,17 +1186,26 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           // Then override with first/last cell styling
           ...getFirstOrLastCellCss(style, columnIndex, columns),
           // Then override with per-cell/per-row justification/indentation
-          ...getJustification(column, maybeContent, as),
+          ...justificationCss,
           ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
-          ...maybeStickyHeaderStyles,
+          // ...maybeStickyHeaderStyles,  // TODO: Is this still needed? Merge conflict which may no longer be applicable
           // If we're within a card, use its background color
-          ...(currentCard && Css.bgColor(currentCard.style.bgColor).$),
+          // ...(currentCard && Css.bgColor(currentCard.style.bgColor).$),    // TODO: Is this still needed? Merge conflict which may no longer be applicable
           // Add in colspan css if needed
           ...(currentColspan > 1 ? Css.gc(`span ${currentColspan}`).$ : {}),
           // And finally the specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
+          // Add any cell specific style overrides
+          ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
+          // Define the width of the column on each cell. Supports col spans.
+          ...{
+            width: `calc(${columnSizes
+              .slice(maybeNestedCardColumnIndex, maybeNestedCardColumnIndex + currentColspan)
+              .join(" + ")})`,
+          },
+          ...(column.mw ? Css.mw(column.mw).$ : {}),
         };
 
         const renderFn: RenderCellFn<any> =
@@ -1070,21 +1219,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
         return renderFn(columnIndex, cellCss, content, row, rowStyle);
       })}
-      {openCards && maybeAddCardPadding(openCards, "final", maybeStickyHeaderStyles)}
     </Row>
   );
 
-  // Because of useToggleIds, this provider should basically never trigger a re-render, which is
-  // good because we don't want the context to change and re-render every row just because some
-  // other unrelated rows have collapsed/uncollapsed.
-  const collapseContext = useMemo<GridCollapseContextProps>(
-    () => ({
-      isCollapsed,
-      toggleCollapse: () => toggleCollapsedId(row.id),
-    }),
-    [isCollapsed, toggleCollapsedId, row],
-  );
-  return <GridCollapseContext.Provider value={collapseContext}>{div}</GridCollapseContext.Provider>;
+  return openCardStyles && openCardStyles.length > 0 ? wrapCard(openCardStyles, rowNode) : rowNode;
 }
 
 // Fix to work with generics, see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37087#issuecomment-656596623
@@ -1100,31 +1238,61 @@ const ObservedGridRow = React.memo((props: GridRowProps<any, any>) => (
   </Observer>
 ));
 
+/** A heuristic to detect the result of `React.createElement` / i.e. JSX. */
+function isJSX(content: any): boolean {
+  return typeof content === "object" && content && "type" in content && "props" in content;
+}
+
 /** If a column def return just string text for a given row, apply some default styling. */
 function toContent(
   content: ReactNode | GridCellContent,
   isHeader: boolean,
   canSortColumn: boolean,
+  isClientSideSorting: boolean,
   style: GridStyle,
+  as: RenderAs,
+  alignment: GridCellAlignment,
 ): ReactNode {
-  if (typeof content === "string" && isHeader && canSortColumn) {
-    return <SortHeader content={content} />;
+  content = isGridCellContent(content) ? content.content : content;
+  if (typeof content === "function") {
+    // Actually create the JSX by calling `content()` here (which should be as late as
+    // possible, i.e. only for visible rows if we're in a virtual table).
+    content = content();
+  } else if (as === "virtual" && canSortColumn && isClientSideSorting && isJSX(content)) {
+    // When using client-side sorting, we call `applyRowFn` not only during rendering, but
+    // up-front against all rows (for the currently sorted column) to determine their
+    // sort values.
+    //
+    // Pedantically this means that any table using client-side sorting should not
+    // build JSX directly in its GridColumn functions, but this overhead is especially
+    // noticeable for large/virtualized tables, so we only enforce using functions
+    // for those tables.
+    throw new Error(
+      "GridTables with as=virtual & sortable columns should use functions that return JSX, instead of JSX",
+    );
+  }
+  if (content && typeof content === "string" && isHeader && canSortColumn) {
+    return <SortHeader content={content} iconOnLeft={alignment === "right"} />;
+  } else if (content && typeof content === "string" && style?.presentationSettings?.wrap === false) {
+    return (
+      <span css={Css.mw0.truncate.$} title={content}>
+        {content}
+      </span>
+    );
   } else if (style.emptyCell && isContentEmpty(content)) {
     // If the content is empty and the user specified an `emptyCell` node, return that.
     return style.emptyCell;
-  } else if (isContentAndSettings(content)) {
-    return content.content;
   }
   return content;
 }
 
-function isContentAndSettings(content: ReactNode | GridCellContent): content is GridCellContent {
+function isGridCellContent(content: ReactNode | GridCellContent): content is GridCellContent {
   return typeof content === "object" && !!content && "content" in content;
 }
 
 const emptyValues = ["", null, undefined] as any[];
-function isContentEmpty(content: ReactNode | GridCellContent): boolean {
-  return emptyValues.includes(isContentAndSettings(content) ? content.content : content);
+function isContentEmpty(content: ReactNode): boolean {
+  return emptyValues.includes(content);
 }
 
 /** Return the content for a given column def applied to a given row. */
@@ -1145,26 +1313,34 @@ export function applyRowFn<R extends Kinded>(column: GridColumn<R>, row: GridDat
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
 const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (key, css, content) => {
-  const Row = as === "table" ? "td" : "div";
+  const Cell = as === "table" ? "td" : "div";
   return (
-    <Row key={key} css={{ ...css, ...tableRowStyles(as) }}>
+    <Cell key={key} css={{ ...css, ...tableRowStyles(as) }}>
       {content}
-    </Row>
+    </Cell>
   );
 };
 
 /**
- * Provides each row access to its `collapsed` current state and toggle.
+ * Provides each row access to a method to check if it is collapsed and toggle it's collapsed state.
  *
  * Calling `toggleCollapse` will keep the row itself showing, but will hide any
  * children rows (specifically those that have this row's `id` in their `parentIds`
  * prop).
+ *
+ * headerCollapsed is used to trigger rows at the root level to rerender their chevron when all are
+ * collapsed/expanded.
  */
-type GridCollapseContextProps = { isCollapsed: boolean; toggleCollapse(): void };
+type GridCollapseContextProps = {
+  headerCollapsed: boolean;
+  isCollapsed: (id: string) => boolean;
+  toggleCollapsed(id: string): void;
+};
 
 export const GridCollapseContext = React.createContext<GridCollapseContextProps>({
-  isCollapsed: false,
-  toggleCollapse: () => {},
+  headerCollapsed: false,
+  isCollapsed: () => false,
+  toggleCollapsed: () => {},
 });
 
 /** Sets up the `GridContext` so that header cells can access the current sort settings. */
@@ -1230,9 +1406,17 @@ const alignmentToTextAlign: Record<GridCellAlignment, Properties["textAlign"]> =
   right: "right",
 };
 
+function getAlignment(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent): GridCellAlignment {
+  return (isGridCellContent(maybeContent) && maybeContent.alignment) || column.align || "left";
+}
+
 // For alignment, use: 1) cell def, else 2) column def, else 3) left.
-function getJustification(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent, as: RenderAs) {
-  const alignment = (isContentAndSettings(maybeContent) && maybeContent.alignment) || column.align || "left";
+function getJustification(
+  column: GridColumn<any>,
+  maybeContent: ReactNode | GridCellContent,
+  as: RenderAs,
+  alignment: GridCellAlignment,
+) {
   // Always apply text alignment.
   const textAlign = Css.add("textAlign", alignmentToTextAlign[alignment]).$;
   if (as === "table") {
@@ -1298,17 +1482,28 @@ function getCollapsedRows(persistCollapse: string | undefined): string[] {
  * function should see/update the latest list of values, which is not possible with a
  * traditional `useState` hook because it captures the original/stale list identity.
  */
-function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | undefined) {
+function useToggleIds(
+  rows: GridDataRow<Kinded>[],
+  persistCollapse: string | undefined,
+): readonly [string[], GridCollapseContextProps, GridCollapseContextProps] {
   // Make a list that we will only mutate, so that our callbacks have a stable identity.
   const [collapsedIds] = useState<string[]>(getCollapsedRows(persistCollapse));
   // Use this to trigger the component to re-render even though we're not calling `setList`
   const [tick, setTick] = useState<string>("");
 
-  // Create the stable `toggleId`, i.e. we are purposefully passing an (almost) empty dep list
-  const toggleId = useCallback(
-    (id: string) => {
-      // We have different behavior when going from expand/collapse all.
-      if (id === "header") {
+  // Checking whether something is collapsed does not depend on anything
+  const isCollapsed = useCallback(
+    (id: string) => collapsedIds.includes(id),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const collapseAllContext = useMemo(
+    () => {
+      // Create the stable `toggleCollapsed`, i.e. we are purposefully passing an (almost) empty dep list
+      // Since only toggling all rows required knowledge of what the rows are
+      const toggleAll = (_id: string) => {
+        // We have different behavior when going from expand/collapse all.
         const isAllCollapsed = collapsedIds[0] === "header";
         collapsedIds.splice(0, collapsedIds.length);
         if (isAllCollapsed) {
@@ -1330,7 +1525,23 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
           // And then mark all parent rows as collapsed.
           collapsedIds.push(...parentIds);
         }
-      } else {
+        if (persistCollapse) {
+          localStorage.setItem(persistCollapse, JSON.stringify(collapsedIds));
+        }
+        // Trigger a re-render
+        setTick(collapsedIds.join(","));
+      };
+      return { headerCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleAll };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rows],
+  );
+
+  const collapseRowContext = useMemo(
+    () => {
+      // Create the stable `toggleCollapsed`, i.e. we are purposefully passing an empty dep list
+      // Since toggling a single row does not need to know about the other rows
+      const toggleRow = (id: string) => {
         // This is the regular/non-header behavior to just add/remove the individual row id
         const i = collapsedIds.indexOf(id);
         if (i === -1) {
@@ -1338,15 +1549,16 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
         } else {
           collapsedIds.splice(i, 1);
         }
-      }
-      if (persistCollapse) {
-        localStorage.setItem(persistCollapse, JSON.stringify(collapsedIds));
-      }
-      // Trigger a re-render
-      setTick(collapsedIds.join(","));
+        if (persistCollapse) {
+          localStorage.setItem(persistCollapse, JSON.stringify(collapsedIds));
+        }
+        // Trigger a re-render
+        setTick(collapsedIds.join(","));
+      };
+      return { headerCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleRow };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [rows],
+    [collapseAllContext.isCollapsed("header")],
   );
 
   // Return a copy of the list, b/c we want external useMemos that do explicitly use the
@@ -1354,7 +1566,7 @@ function useToggleIds(rows: GridDataRow<Kinded>[], persistCollapse: string | und
   // see as new list identity).
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const copy = useMemo(() => [...collapsedIds], [tick, collapsedIds]);
-  return [copy, toggleId] as const;
+  return [copy, collapseAllContext, collapseRowContext] as const;
 }
 
 /** GridTable as Table utility to apply <tr> element override styles */

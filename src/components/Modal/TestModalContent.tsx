@@ -8,21 +8,26 @@ import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndDataOf
 import { Tag } from "src/components/Tag";
 import { Css } from "src/Css";
 import { jan1 } from "src/forms/formStateDomain";
-import { DateField, TextField } from "src/inputs";
+import { DateField, TextAreaField, TextField } from "src/inputs";
 
-/** A fake modal content component that we share across the modal and superdrawer stories. */
-export function TestModalContent(props: {
+export interface TestModalContentProps {
   initNumSentences?: number;
   showLeftAction?: boolean;
   withTag?: boolean;
   withDateField?: boolean;
-}) {
+  withTextArea?: boolean;
+}
+
+/** A fake modal content component that we share across the modal and superdrawer stories. */
+export function TestModalContent(props: TestModalContentProps) {
   const { closeModal } = useModal();
   const { initNumSentences = 1, showLeftAction, withDateField } = props;
   const [numSentences, setNumSentences] = useState(initNumSentences);
   const [primaryDisabled, setPrimaryDisabled] = useState(false);
   const [leftActionDisabled, setLeftActionDisabled] = useState(false);
   const [date, setDate] = useState(jan1);
+  const [internalValue, setValue] = useState<string | undefined>("");
+
   return (
     <>
       <ModalHeader>
@@ -31,6 +36,17 @@ export function TestModalContent(props: {
             <span>Modal Title with Tag</span>
             <Tag text="In progress" type="info" xss={Css.ml1.$} />
           </div>
+        ) : props.withTextArea ? (
+          <TextAreaField
+            label="Title"
+            placeholder="Test title"
+            value={internalValue}
+            onChange={(v) => setValue(v)}
+            preventNewLines
+            hideLabel
+            borderless
+            xss={Css.xl.$}
+          />
         ) : (
           "The title of the modal that might wrap"
         )}

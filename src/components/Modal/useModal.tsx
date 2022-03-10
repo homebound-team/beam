@@ -1,24 +1,31 @@
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useBeamContext } from "src/components/BeamContext";
 import { Callback, CheckFn } from "src/types";
 import { maybeCall } from "src/utils";
-import { ModalProps } from "./Modal";
+import { ModalApi, ModalProps } from "./Modal";
 
 export interface UseModalHook {
   openModal: (props: ModalProps) => void;
   closeModal: Callback;
   addCanClose: (canClose: CheckFn) => void;
+  setSize: (size: ModalProps["size"]) => void;
 }
 
 export function useModal(): UseModalHook {
   const { modalState, modalCanCloseChecks } = useBeamContext();
   const lastCanClose = useRef<CheckFn | undefined>();
+  const api = useRef<ModalApi>();
+  useEffect(() => {
+    return () => {
+      modalCanCloseChecks.current = modalCanCloseChecks.current.filter((c) => c !== lastCanClose.current);
+    };
+  }, [modalCanCloseChecks]);
   return useMemo(
     () => ({
       openModal(props) {
         // TODO Check already open?
         // TODO Check can leave?
-        modalState.current = props;
+        modalState.current = { ...props, api };
       },
       closeModal() {
         // TODO: Should remove checks
@@ -38,6 +45,11 @@ export function useModal(): UseModalHook {
           canClose,
         ];
         lastCanClose.current = canClose;
+      },
+      setSize(size: ModalProps["size"]) {
+        if (modalState.current && modalState.current.api?.current) {
+          modalState.current.api.current.setSize(size);
+        }
       },
     }),
     [modalState, modalCanCloseChecks],

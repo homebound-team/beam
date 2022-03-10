@@ -1,10 +1,10 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
-import { useTestIds } from "src/utils";
+import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundNumberFieldProps = Omit<NumberFieldProps, "value" | "onChange" | "onBlur" | "onFocus" | "label"> & {
+export type BoundNumberFieldProps = Omit<NumberFieldProps, "value" | "onChange" | "label"> & {
   // Make optional as it'll create a label from the field's key if not present
   label?: string;
   field: FieldState<any, number | null | undefined>;
@@ -20,6 +20,9 @@ export function BoundNumberField(props: BoundNumberFieldProps) {
     onChange = (value) => field.set(value),
     label = defaultLabel(field.key.replace(/InCents$/, "")),
     type = field.key.endsWith("InCents") ? "cents" : undefined,
+    onFocus,
+    onBlur,
+    onEnter,
     ...others
   } = props;
   const testId = useTestIds(props, label || field.key);
@@ -34,8 +37,18 @@ export function BoundNumberField(props: BoundNumberFieldProps) {
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           required={field.required}
-          onFocus={() => field.focus()}
-          onBlur={() => field.blur()}
+          onFocus={() => {
+            field.focus();
+            maybeCall(onFocus);
+          }}
+          onBlur={() => {
+            field.blur();
+            maybeCall(onBlur);
+          }}
+          onEnter={() => {
+            maybeCall(onEnter);
+            field.maybeAutoSave();
+          }}
           {...testId}
           {...others}
         />
