@@ -48,6 +48,26 @@ export const beamFixedStyle: GridStyle = {
   emptyCell: "-",
   presentationSettings: { borderless: true, typeScale: "xs", wrap: false },
   rowHoverColor: Palette.Gray200,
+  // Included as a hacky "treat indent as deprecated for this table" hint to GridTable
+  levels: {},
+};
+
+// The look & feel for parent rows' cells in a nested parent/child table.
+export const beamGroupRowStyle: Properties = Css.xsEm
+  .mhPx(56)
+  .gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$;
+
+// The look & feel for a totals row's cells.
+export const beamTotalsRowStyle: Properties = Css.gray700.smEm.hPx(40).mb1.bgWhite.boxShadow("none").$;
+
+export const beamNestedFixedStyle: GridStyle = {
+  ...beamFixedStyle,
+  levels: { 0: { cellCss: beamGroupRowStyle } },
+};
+
+export const beamTotalsFixedStyle: GridStyle = {
+  ...beamFixedStyle,
+  cellCss: { ...beamFixedStyle.cellCss, ...beamTotalsRowStyle },
 };
 
 export const beamFlexibleStyle: GridStyle = {
@@ -56,8 +76,12 @@ export const beamFlexibleStyle: GridStyle = {
   presentationSettings: { borderless: false, typeScale: "xs", wrap: true },
 };
 
-export const beamGroupRowStyle: Properties = Css.xsEm
-  .mhPx(56)
-  .gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$;
+export const beamNestedFlexibleStyle: GridStyle = {
+  ...beamFlexibleStyle,
+  levels: { 0: { cellCss: beamGroupRowStyle } },
+};
 
-export const beamTotalsRowStyle: Properties = Css.gray700.smEm.hPx(40).mb1.bgWhite.boxShadow("none").$;
+export const beamTotalsFlexibleStyle: GridStyle = {
+  ...beamFlexibleStyle,
+  cellCss: { ...beamFlexibleStyle.cellCss, ...beamTotalsRowStyle },
+};
