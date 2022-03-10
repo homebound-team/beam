@@ -380,7 +380,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style.nestedCards);
 
     // Depth-first to filter
-    function visit(row: GridDataRow<R>): void {
+    function visit(parentId, row: GridDataRow<R>): void {
       const matches =
         filters.length === 0 ||
         row.pin ||
@@ -397,14 +397,14 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
       const isCollapsed = collapsedIds.includes(row.id);
       if (!isCollapsed && !!row.children?.length) {
-        nestedCards && matches && nestedCards.addSpacer(undefined, row.children[0]);
-        visitRows(row.children, isCard);
+        nestedCards && matches && nestedCards.addSpacer(parentId, undefined, row.children[0]);
+        visitRows(row.id, row.children, isCard);
       }
 
       !isLeafRow(row) && isCard && nestedCards && nestedCards.closeCard();
     }
 
-    function visitRows(rows: GridDataRow<R>[], addSpacer: boolean): void {
+    function visitRows(parentId: string, rows: GridDataRow<R>[], addSpacer: boolean): void {
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
@@ -415,16 +415,16 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           return;
         }
 
-        visit(row);
-        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer(rows[i], rows[i + 1]);
+        visit(parentId, row);
+        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer(parentId, rows[i], rows[i + 1]);
       });
 
       // Add spacer after a card
-      addSpacer && nestedCards && nestedCards.addSpacer(rows[rows.length - 1], undefined);
+      addSpacer && nestedCards && nestedCards.addSpacer(parentId, rows[rows.length - 1], undefined);
     }
 
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
-    visitRows(maybeSorted, !!nestedCards);
+    visitRows("root", maybeSorted, !!nestedCards);
     nestedCards && nestedCards.done();
 
     return [headerRows, filteredRows];

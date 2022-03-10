@@ -63,8 +63,8 @@ export class NestedCards {
     this.openCards.pop();
   }
 
-  addSpacer(below: GridDataRow<any> | undefined, above: GridDataRow<any> | undefined) {
-    this.chromeBuffer.push(Spacer(this.openCards, this.styles, below, above));
+  addSpacer(parentId: "root" | string, below: GridDataRow<any> | undefined, above: GridDataRow<any> | undefined) {
+    this.chromeBuffer.push(Spacer(this.openCards, this.styles, parentId, below, above));
     // this.chromeBuffer.push(makeSpacer(this.styles.spacerPx, this.openCards, this.styles));
   }
 
@@ -224,19 +224,19 @@ export function getNestedCardStyles(
 export function Spacer(
   openCards: string[],
   styles: NestedCardsStyle,
+  parentId: "root" | string,
   below: GridDataRow<any> | undefined,
   above: GridDataRow<any> | undefined,
 ) {
-  const noOpenCards = openCards.length === 0;
-  const parentId = noOpenCards ? "root" : "TODO"; // openCards[openCards.length - 1]?.row?.id;
+  const areCardsOpen = openCards.length > 0;
   const scopeCards = [...openCards];
   return () => {
     // TODO: Currently hardcoding these styles. Should pass down the variable
     const visuallyDraggableProps = {
-      onDragEnter: (e) => {
+      onDragEnter: (e: any) => {
         e.currentTarget.classList.add("row-drag-hover");
       },
-      onDragLeave: (e) => {
+      onDragLeave: (e: any) => {
         e.currentTarget.classList.remove("row-drag-hover");
       },
     };
@@ -279,7 +279,7 @@ export function Spacer(
             e.currentTarget.classList.remove("row-drag-hover");
           },
         }}
-        {...(!noOpenCards && visuallyDraggableProps)}
+        {...(areCardsOpen && visuallyDraggableProps)}
       />
     );
     // Start at the current/inside card, and wrap outward padding + borders.
