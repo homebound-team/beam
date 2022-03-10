@@ -23,4 +23,12 @@ export type {
 export { simpleDataRows, simpleHeader, simpleRows } from "./simpleHelpers";
 export type { SimpleHeaderAndDataOf, SimpleHeaderAndDataWith } from "./simpleHelpers";
 export { SortHeader } from "./SortHeader";
-export { cardStyle, condensedStyle, defaultStyle } from "./styles";
+export {
+  beamFixedStyle,
+  beamFlexibleStyle,
+  beamNestedFixedStyle,
+  beamNestedFlexibleStyle,
+  cardStyle,
+  condensedStyle,
+  defaultStyle,
+} from "./styles";
