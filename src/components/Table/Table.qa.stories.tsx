@@ -1,12 +1,19 @@
 import { Meta } from "@storybook/react";
-import { ReactNode, useMemo } from "react";
+import { ReactNode } from "react";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
 import { CollapseToggle } from "src/components/Table/CollapseToggle";
 import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/columns";
 import { emptyCell, GridColumn, GridDataRow, GridTable } from "src/components/Table/GridTable";
 import { SimpleHeaderAndDataWith } from "src/components/Table/simpleHelpers";
-import { beamFixedStyle, beamFlexibleStyle, beamGroupRowStyle, beamTotalsRowStyle } from "src/components/Table/styles";
+import {
+  beamFixedStyle,
+  beamFlexibleStyle,
+  beamNestedFixedStyle,
+  beamNestedFlexibleStyle,
+  beamTotalsFixedStyle,
+  beamTotalsFlexibleStyle,
+} from "src/components/Table/styles";
 import { Tag } from "src/components/Tag";
 import { Css, Palette } from "src/Css";
 import { Checkbox, NumberField, SelectField } from "src/inputs";
@@ -106,22 +113,14 @@ type BeamChildRow = { kind: "child"; id: string } & BeamBudgetData;
 type BeamNestedRow = BeamTotalsRow | HeaderRow | BeamParentRow | BeamChildRow;
 
 export function NestedFixed() {
-  const totalsRowStyles = useMemo(() => ({ totals: { cellCss: beamTotalsRowStyle } }), []);
-  const rowStyles = useMemo(() => ({ parent: { cellCss: beamGroupRowStyle } }), []);
   return (
     <div css={Css.mw("fit-content").$}>
+      <GridTable<BeamNestedRow> style={beamTotalsFixedStyle} columns={beamNestedColumns} rows={beamTotalsRows} />
       <GridTable<BeamNestedRow>
-        style={beamFixedStyle}
-        columns={beamNestedColumns}
-        rows={beamTotalsRows}
-        rowStyles={totalsRowStyles}
-      />
-      <GridTable<BeamNestedRow>
-        style={beamFixedStyle}
+        style={beamNestedFixedStyle}
         sorting={{ on: "client" }}
         columns={beamNestedColumns}
         rows={beamNestedRows}
-        rowStyles={rowStyles}
         stickyHeader
       />
     </div>
@@ -129,22 +128,14 @@ export function NestedFixed() {
 }
 
 export function NestedFlexible() {
-  const totalsRowStyles = useMemo(() => ({ totals: { cellCss: beamTotalsRowStyle } }), []);
-  const rowStyles = useMemo(() => ({ parent: { cellCss: beamGroupRowStyle } }), []);
   return (
     <div css={Css.mw("fit-content").$}>
+      <GridTable<BeamNestedRow> style={beamTotalsFlexibleStyle} columns={beamNestedColumns} rows={beamTotalsRows} />
       <GridTable<BeamNestedRow>
-        style={beamFlexibleStyle}
-        columns={beamNestedColumns}
-        rows={beamTotalsRows}
-        rowStyles={totalsRowStyles}
-      />
-      <GridTable<BeamNestedRow>
-        style={beamFlexibleStyle}
+        style={beamNestedFlexibleStyle}
         sorting={{ on: "client" }}
         columns={beamNestedColumns}
         rows={beamNestedRows}
-        rowStyles={rowStyles}
         stickyHeader
       />
     </div>
