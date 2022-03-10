@@ -84,6 +84,8 @@ export interface GridStyle {
     Pick<PresentationContextProps, "wrap">;
   /** Minimum table width in pixels. Used when calculating columns sizes */
   minWidthPx?: number;
+  /** Css to apply at each level of a parent/child nested table. */
+  levels?: Record<number, { cellCss: Properties }>;
 }
 
 export type NestedCardStyleByKind = Record<string, NestedCardStyle>;
@@ -337,7 +339,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
 
-    function makeRowComponent(row: GridDataRow<R>): JSX.Element {
+    function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
       const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : { sorting };
@@ -359,6 +361,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
               stickyOffset,
               openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
               columnSizes,
+              level,
               ...sortProps,
             }}
           />
@@ -374,7 +377,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style.nestedCards);
 
     // Depth-first to filter
-    function visit(row: GridDataRow<R>): void {
+    function visit(row: GridDataRow<R>, level: number): void {
       const matches =
         filters.length === 0 ||
         row.pin ||
@@ -386,34 +389,32 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
       if (matches) {
         isCard = nestedCards && nestedCards.maybeOpenCard(row);
-        filteredRows.push([row, makeRowComponent(row)]);
+        filteredRows.push([row, makeRowComponent(row, level)]);
       }
 
       const isCollapsed = collapsedIds.includes(row.id);
       if (!isCollapsed && !!row.children?.length) {
         nestedCards && matches && nestedCards.addSpacer();
-        visitRows(row.children, isCard);
+        visitRows(row.children, isCard, level + 1);
       }
 
       !isLeafRow(row) && isCard && nestedCards && nestedCards.closeCard();
     }
 
-    function visitRows(rows: GridDataRow<R>[], addSpacer: boolean): void {
+    function visitRows(rows: GridDataRow<R>[], addSpacer: boolean, level: number): void {
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row.kind === "header") {
-          headerRows.push([row, makeRowComponent(row)]);
+          headerRows.push([row, makeRowComponent(row, level)]);
           return;
         }
-
-        visit(row);
-
+        visit(row, level);
         addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
       });
     }
 
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
-    visitRows(maybeSorted, !!nestedCards);
+    visitRows(maybeSorted, !!nestedCards, 0);
     nestedCards && nestedCards.done();
 
     return [headerRows, filteredRows];
@@ -891,6 +892,11 @@ function getIndentationCss<R extends Kinded>(
 ): Properties {
   // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
   const indent = (isGridCellContent(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
+  if (typeof indent === "number" && style.levels !== undefined) {
+    throw new Error(
+      "The indent param is deprecated for new beam fixed & flexible styles, use beamNestedFixedStyle or beamNestedFlexibleStyle",
+    );
+  }
   return indent === 1 ? style.indentOneCss || {} : indent === 2 ? style.indentTwoCss || {} : {};
 }
 
@@ -960,6 +966,7 @@ interface GridRowProps<R extends Kinded, S> {
   // NOTE: openCards is a string of colon separated open kinds, so that the result is stable across renders.
   openCards: string | undefined;
   columnSizes: string[];
+  level: number;
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -977,6 +984,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     setSortKey,
     openCards,
     columnSizes,
+    level,
     ...others
   } = props;
 
@@ -1067,6 +1075,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
+          // Or level-specific styling
+          ...(!isHeader && !!style.levels && style.levels[level]?.cellCss),
           // The specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
           // Add any cell specific style overrides
