@@ -1,5 +1,6 @@
-import { useCallback, useContext, useState } from "react";
-import { GridCollapseContext, GridDataRow, IconButton } from "src/components";
+import { useContext } from "react";
+import { GridDataRow, IconButton, RowStateContext } from "src/components";
+import { useComputed } from "src/hooks";
 
 export interface GridTableCollapseToggleProps {
   row: GridDataRow<any>;
@@ -7,18 +8,17 @@ export interface GridTableCollapseToggleProps {
 
 export function CollapseToggle(props: GridTableCollapseToggleProps) {
   const { row } = props;
-  const { isCollapsed, toggleCollapsed } = useContext(GridCollapseContext);
-  const [, setTick] = useState(0);
-  const currentlyCollapsed = isCollapsed(row.id);
-  const toggleOnClick = useCallback(() => {
-    toggleCollapsed(row.id);
-    setTick(Date.now());
-  }, [row.id, currentlyCollapsed, toggleCollapsed]);
-  const iconKey = currentlyCollapsed ? "chevronRight" : "chevronDown";
-  const headerIconKey = currentlyCollapsed ? "chevronsRight" : "chevronsDown";
+  const { rowState } = useContext(RowStateContext);
+
+  const isCollapsed = useComputed(() => rowState.isCollapsed(row.id), [rowState]);
+  const iconKey = isCollapsed ? "chevronRight" : "chevronDown";
+  const headerIconKey = isCollapsed ? "chevronsRight" : "chevronsDown";
+
+  // If we're not a header, only render a toggle if we have child rows to actually collapse
   const isHeader = row.kind === "header";
   if (!isHeader && (!props.row.children || props.row.children.length === 0)) {
     return null;
   }
-  return <IconButton onClick={toggleOnClick} icon={isHeader ? headerIconKey : iconKey} />;
+
+  return <IconButton onClick={() => rowState.toggleCollapsed(row.id)} icon={isHeader ? headerIconKey : iconKey} />;
 }

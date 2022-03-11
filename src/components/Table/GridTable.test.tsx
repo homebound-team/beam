@@ -3,7 +3,6 @@ import { GridRowLookup } from "src/components/Table/GridRowLookup";
 import {
   calcColumnSizes,
   emptyCell,
-  GridCollapseContext,
   GridColumn,
   GridDataRow,
   GridRowStyles,
@@ -12,6 +11,7 @@ import {
   matchesFilter,
   setRunningInJest,
 } from "src/components/Table/GridTable";
+import { RowStateContext } from "src/components/Table/RowState";
 import {
   simpleDataRows,
   simpleHeader,
@@ -20,6 +20,7 @@ import {
   simpleRows,
 } from "src/components/Table/simpleHelpers";
 import { Css, Palette } from "src/Css";
+import { useComputed } from "src/hooks";
 import { cell, cellAnd, cellOf, click, render, row, rowAnd } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
@@ -1289,10 +1290,10 @@ describe("GridTable", () => {
 });
 
 function Collapse({ id }: { id: string }) {
-  const { isCollapsed, toggleCollapsed } = useContext(GridCollapseContext);
-  const icon = isCollapsed(id) ? "+" : "-";
+  const { rowState } = useContext(RowStateContext);
+  const icon = useComputed(() => (rowState.isCollapsed(id) ? "+" : "-"), [rowState]);
   return (
-    <div onClick={() => toggleCollapsed(id)} data-testid="collapse">
+    <div onClick={() => rowState.toggleCollapsed(id)} data-testid="collapse">
       {icon}
     </div>
   );
