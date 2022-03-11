@@ -1,4 +1,3 @@
-import { useResizeObserver } from "@react-aria/utils";
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
 import React, {
@@ -19,6 +18,7 @@ import {
   PresentationFieldProps,
   PresentationProvider,
 } from "src/components/PresentationContext";
+import { useSetupColumnSizes } from "src/components/Table/columnSizes";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
 import { getNestedCardStyles, isLeafRow, NestedCards, wrapCard } from "src/components/Table/nestedCards";
@@ -27,7 +27,6 @@ import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Ta
 import { SortState, useSortState } from "src/components/Table/useSortState";
 import { Css, Margin, Only, Properties, Typography, Xss } from "src/Css";
 import tinycolor from "tinycolor2";
-import { useDebouncedCallback } from "use-debounce";
 import { defaultStyle } from ".";
 
 export type Kinded = { kind: string };
@@ -294,45 +293,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     return rows;
   }, [columns, rows, sorting, sortState]);
 
-  // Calculate the column sizes immediately rather than via the `debounce` method.
-  // We do this for Storybook integrations that may use MockDate. MockDate changes the behavior of `new Date()`, which is used by `useDebounce` and essentially turns off the callback.
-  const calculateImmediately = useRef<boolean>(true);
-  const [tableWidth, setTableWidth] = useState<number | undefined>();
-
-  // Calc our initial/first render sizes where we won't have a width yet
-  const [columnSizes, setColumnSizes] = useState<string[]>(
-    calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, tableWidth, style.minWidthPx),
-  );
-
-  const setTableAndColumnWidths = useCallback(
-    (width: number) => {
-      setTableWidth(width);
-      setColumnSizes(calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, width, style.minWidthPx));
-    },
-    [setTableWidth, setColumnSizes, columns, style],
-  );
-
-  const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
-
-  const onResize = useCallback(() => {
-    const target = resizeTarget?.current ? resizeTarget.current : tableRef.current;
-    if (target && target.clientWidth !== tableWidth) {
-      if (calculateImmediately.current) {
-        calculateImmediately.current = false;
-        setTableAndColumnWidths(target.clientWidth);
-      } else {
-        setTableAndColumnWidthsDebounced(target.clientWidth);
-      }
-    }
-  }, [
-    resizeTarget?.current,
-    tableRef.current,
-    setTableAndColumnWidths,
-    calculateImmediately,
-    setTableAndColumnWidthsDebounced,
-  ]);
-
-  useResizeObserver({ ref: resizeTarget ?? tableRef, onResize });
+  const columnSizes = useSetupColumnSizes(style, columns, tableRef, resizeTarget);
 
   // Filter + flatten + component-ize the sorted rows.
   let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
