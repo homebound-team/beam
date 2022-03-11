@@ -4,12 +4,12 @@ import { render } from "src/utils/rtl";
 
 describe("Checkbox", () => {
   it("can set default test ids", async () => {
-    const r = await render(<Checkbox label="Test Label" onChange={noop} />);
+    const r = await render(<Checkbox label="Test Label" selected={false} onChange={noop} />);
     expect(r.testLabel()).toBeTruthy();
   });
 
   it("can set explicit test ids", async () => {
-    const r = await render(<Checkbox label="Test Label" onChange={noop} data-testid="customId" />);
+    const r = await render(<Checkbox label="Test Label" selected={false} onChange={noop} data-testid="customId" />);
     expect(r.customId()).toBeTruthy();
   });
 });

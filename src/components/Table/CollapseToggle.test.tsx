@@ -25,7 +25,7 @@ describe("CollapseToggle", () => {
     }
     const r = await render(
       <RowStateContext.Provider value={{ rowState }}>
-        <CollapseToggle row={{ id: "r:1", kind, children: [{}] }} />
+        <CollapseToggle row={{ id: "r:1", kind, children: [{} as any] }} />
       </RowStateContext.Provider>,
     );
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual(expectedIcon);

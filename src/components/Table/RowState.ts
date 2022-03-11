@@ -1,10 +1,9 @@
-import { makeAutoObservable, ObservableSet } from "mobx";
+import { makeAutoObservable, ObservableMap, ObservableSet } from "mobx";
 import React, { MutableRefObject } from "react";
 import { GridDataRow } from "src/components/Table/GridTable";
 
-// Will be used in the next PR...
 // A parent row can be partially selected when some children are selected/some aren't.
-// export type SelectedState = "checked" | "unchecked" | "partial";
+export type SelectedState = "checked" | "unchecked" | "partial";
 
 /**
  * Stores the collapsed & selected state of rows.
@@ -24,8 +23,7 @@ import { GridDataRow } from "src/components/Table/GridTable";
 export class RowState {
   // A set of just row ids, i.e. not row.kind+row.id
   private readonly collapsedRows: ObservableSet<string>;
-  // Coming in future PR
-  // readonly selectedRows = new ObservableMap<string, "checked" | "unchecked" | "partial">();
+  private readonly selectedRows = new ObservableMap<string, SelectedState>();
 
   /**
    * Creates the `RowState` for a given `GridTable`.
@@ -35,6 +33,82 @@ export class RowState {
     // Make ourselves an observable so that mobx will do caching of .collapseIds so
     // that it'll be a stable identity for GridTable to useMemo against.
     makeAutoObservable(this);
+  }
+
+  get selectedIds(): string[] {
+    // Return only ids that are fully checked, i.e. not partial
+    const ids = [...this.selectedRows.entries()].filter(([, v]) => v === "checked").map(([k]) => k);
+    // Hide our header marker
+    const headerIndex = ids.indexOf("header");
+    if (headerIndex > -1) {
+      ids.splice(headerIndex, 1);
+    }
+    return ids;
+  }
+
+  // Should be called in an Observer/useComputed to trigger re-renders
+  getSelected(id: string): SelectedState {
+    // We may not have every row in here, i.e. on 1st page load or after clicking here, so assume unchecked
+    return this.selectedRows.get(id) || "unchecked";
+  }
+
+  selectRow(id: string, selected: boolean): void {
+    if (id === "header") {
+      // Select/unselect all has special behavior
+      if (selected) {
+        // Just mash the header + all rows + children as selected
+        const map = new Map<string, SelectedState>();
+        map.set("header", "checked");
+        const todo = [...this.rows.current];
+        while (todo.length > 0) {
+          const r = todo.pop()!;
+          map.set(r.id, "checked");
+          if (r.children) {
+            todo.push(...r.children);
+          }
+        }
+        this.selectedRows.replace(map);
+      } else {
+        // Similarly "unmash" all rows + children.
+        this.selectedRows.clear();
+      }
+    } else {
+      // This is the regular/non-header behavior to just add/remove the individual row id,
+      // plus percolate the change down-to-child + up-to-parents.
+
+      // Find the clicked on row
+      const curr = findRow(this.rows.current, id);
+      if (!curr) {
+        return;
+      }
+
+      // Everything here & down is deterministically on/off
+      const map = new Map<string, SelectedState>();
+      const todo = [curr.row];
+      while (todo.length > 0) {
+        const row = todo.pop()!;
+        map.set(row.id, selected ? "checked" : "unchecked");
+        if (row.children) {
+          todo.push(...row.children);
+        }
+      }
+
+      // Now walk up the parents and see if they are now-all-checked/now-all-unchecked/some-of-each
+      for (const parent of [...curr.parents].reverse()) {
+        if (parent.children) {
+          const children = parent.children.map((row) => map.get(row.id) || this.getSelected(row.id));
+          map.set(parent.id, deriveParentSelected(children));
+        }
+      }
+
+      // And do the header + top-level "children" as a final one-off
+      const children = this.rows.current
+        .filter((row) => row.id !== "header")
+        .map((row) => map.get(row.id) || this.getSelected(row.id));
+      map.set("header", deriveParentSelected(children));
+
+      this.selectedRows.merge(map);
+    }
   }
 
   get collapsedIds(): string[] {
@@ -100,4 +174,28 @@ export const RowStateContext = React.createContext<{ rowState: RowState }>({
 function readLocalCollapseState(persistCollapse: string): string[] {
   const collapsedGridRowIds = localStorage.getItem(persistCollapse);
   return collapsedGridRowIds ? JSON.parse(collapsedGridRowIds) : [];
+}
+
+type FoundRow = { row: GridDataRow<any>; parents: GridDataRow<any>[] };
+
+/** Finds a row by id, and returns it + any parents. */
+function findRow(rows: GridDataRow<any>[], id: string): FoundRow | undefined {
+  // This is technically an array of "maybe FoundRow"
+  const todo: FoundRow[] = rows.map((row) => ({ row, parents: [] }));
+  while (todo.length > 0) {
+    const curr = todo.pop()!;
+    if (curr.row.id === id) {
+      return curr;
+    } else if (curr.row.children) {
+      // Search our children and pass along us as the parent
+      todo.push(...curr.row.children.map((child) => ({ row: child, parents: [...curr.parents, curr.row] })));
+    }
+  }
+  return undefined;
+}
+
+function deriveParentSelected(children: SelectedState[]): SelectedState {
+  const allChecked = children.every((child) => child === "checked");
+  const allUnchecked = children.every((child) => child === "unchecked");
+  return allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
 }
