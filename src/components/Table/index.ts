@@ -7,7 +7,6 @@ export type {
   Direction,
   GridCellAlignment,
   GridCellContent,
-  GridCollapseContext,
   GridColumn,
   GridDataRow,
   GridRowStyles,
@@ -20,6 +19,7 @@ export type {
   RowStyle,
   setRunningInJest,
 } from "./GridTable";
+export { RowState, RowStateContext } from "./RowState";
 export { simpleDataRows, simpleHeader, simpleRows } from "./simpleHelpers";
 export type { SimpleHeaderAndDataOf, SimpleHeaderAndDataWith } from "./simpleHelpers";
 export { SortHeader } from "./SortHeader";
