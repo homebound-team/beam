@@ -292,13 +292,13 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
   const columnSizes = useSetupColumnSizes(style, columns, tableRef, resizeTarget);
 
+  // Make a single copy of our current collapsed state, so we'll have a single observer.
+  const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
+
   // Filter + flatten + component-ize the sorted rows.
-  let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useComputed(() => {
+  let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
-
-    // Make a single copy of our current collapsed state, so we'll have a single observer
-    const collapsedIds = [...rowState.collapsedRows.values()];
 
     function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
@@ -389,6 +389,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     stickyOffset,
     observeRows,
     columnSizes,
+    collapsedIds,
   ]);
 
   let tooManyClientSideRows = false;
@@ -431,8 +432,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // just trust the GridTable impl that, at runtime, `as=virtual` will (other than being virtualized)
   // behave semantically the same as `as=div` did for its tests.
   const _as = as === "virtual" && runningInJest ? "div" : as;
+  const rowStateContext = useMemo(() => ({ rowState }), [rowState]);
   return (
-    <RowStateContext.Provider value={{ rowState }}>
+    <RowStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
         {renders[_as](
           style,
