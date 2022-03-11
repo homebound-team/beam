@@ -1,4 +1,4 @@
-import { ObservableSet } from "mobx";
+import { makeAutoObservable, ObservableSet } from "mobx";
 import React, { MutableRefObject } from "react";
 import { GridDataRow } from "src/components/Table/GridTable";
 
@@ -23,7 +23,7 @@ import { GridDataRow } from "src/components/Table/GridTable";
  */
 export class RowState {
   // A set of just row ids, i.e. not row.kind+row.id
-  readonly collapsedRows: ObservableSet<string>;
+  private readonly collapsedRows: ObservableSet<string>;
   // Coming in future PR
   // readonly selectedRows = new ObservableMap<string, "checked" | "unchecked" | "partial">();
 
@@ -32,6 +32,13 @@ export class RowState {
    */
   constructor(private rows: MutableRefObject<GridDataRow<any>[]>, private persistCollapse: string | undefined) {
     this.collapsedRows = new ObservableSet(persistCollapse ? readLocalCollapseState(persistCollapse) : []);
+    // Make ourselves an observable so that mobx will do caching of .collapseIds so
+    // that it'll be a stable identity for GridTable to useMemo against.
+    makeAutoObservable(this);
+  }
+
+  get collapsedIds(): string[] {
+    return [...this.collapsedRows.values()];
   }
 
   // Should be called in an Observer/useComputed to trigger re-renders

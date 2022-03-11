@@ -44,7 +44,13 @@ type ChildRow = { kind: "child"; id: string; name: string };
 type GrandChildRow = { kind: "grandChild"; id: string; name: string };
 type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow;
 
+// I tried https://github.com/keiya01/react-performance-testing#count-renders but
+// it didn't work with our fake timers, so this is easier for now.
+let renderedNameColumn: string[] = [];
+beforeEach(() => (renderedNameColumn = []));
+
 // And two columns for NestedRow
+// TODO Move this to the bottom of the file in it's own PR
 const nestedColumns: GridColumn<NestedRow>[] = [
   {
     header: (row) => <Collapse id={row.id} />,
@@ -54,9 +60,27 @@ const nestedColumns: GridColumn<NestedRow>[] = [
   },
   {
     header: () => "Name",
-    parent: (row) => ({ content: <div>{row.name}</div>, value: row.name }),
-    child: (row) => ({ content: <div css={Css.ml2.$}>{row.name}</div>, value: row.name }),
-    grandChild: (row) => ({ content: <div css={Css.ml4.$}>{row.name}</div>, value: row.name }),
+    parent: (row) => ({
+      content() {
+        renderedNameColumn.push(row.id);
+        return <div>{row.name}</div>;
+      },
+      value: row.name,
+    }),
+    child: (row) => ({
+      content() {
+        renderedNameColumn.push(row.id);
+        return <div css={Css.ml2.$}>{row.name}</div>;
+      },
+      value: row.name,
+    }),
+    grandChild: (row) => ({
+      content() {
+        renderedNameColumn.push(row.id);
+        return <div css={Css.ml4.$}>{row.name}</div>;
+      },
+      value: row.name,
+    }),
   },
 ];
 
@@ -939,6 +963,7 @@ describe("GridTable", () => {
     expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
     expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
     expect(cell(r, 2, 1)).toHaveTextContent("grandchild p1c1g1");
+    expectRenderedRows("p1", "p1c1", "p1c1g1");
     // When the child is collapsed
     click(cell(r, 1, 0).children[0] as any);
     // Then the parent and child rows are still shown
@@ -946,6 +971,8 @@ describe("GridTable", () => {
     expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
     // But not the grandchild
     expect(row(r, 2)).toBeUndefined();
+    // And nothing needed to re-render
+    expectRenderedRows();
   });
 
   it("can collapse all", async () => {
@@ -1297,4 +1324,11 @@ function Collapse({ id }: { id: string }) {
       {icon}
     </div>
   );
+}
+
+function expectRenderedRows(...rowIds: string[]): void {
+  expect(renderedNameColumn).toEqual(rowIds);
+  // Reset as a side effect so the test's next call to `expectRenderedRows` will
+  // include only the renders since the last assertion.
+  renderedNameColumn = [];
 }
