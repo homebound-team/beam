@@ -1,6 +1,6 @@
 import { Global } from "@emotion/react";
 import DOMPurify from "dompurify";
-import { ChangeEvent, createElement, useEffect, useMemo, useRef } from "react";
+import { ChangeEvent, createElement, useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
 import { maybeCall, noop } from "src/utils";
@@ -41,7 +41,7 @@ export function RichTextField(props: RichTextFieldProps) {
   const { mergeTags, label, value = "", onChange, onBlur = noop, onFocus = noop, readOnly } = props;
 
   // We get a reference to the Editor instance after trix-init fires
-  const editor = useRef<Editor | undefined>(undefined);
+  const [editor, setEditor] = useState<Editor>();
   const editorElement = useRef<HTMLElement>();
 
   // Keep track of what we pass to onChange, so that we can make ourselves keep looking
@@ -68,13 +68,14 @@ export function RichTextField(props: RichTextFieldProps) {
       const targetEl = e.target as HTMLElement;
       if (targetEl.id === id) {
         editorElement.current = targetEl;
-        editor.current = (editorElement.current as any).editor;
+        const editor = (editorElement.current as any).editor;
+        setEditor(editor);
         if (mergeTags !== undefined) {
           attachTributeJs(mergeTags, editorElement.current!);
         }
 
         currentHtml.current = value;
-        editor.current!.loadHTML(value || "");
+        editor.loadHTML(value || "");
         // Remove listener once we've initialized
         window.removeEventListener("trix-initialize", onEditorInit);
 
@@ -114,10 +115,10 @@ export function RichTextField(props: RichTextFieldProps) {
 
   useEffect(() => {
     // If our value prop changes (without the change coming from us), reload it
-    if (!readOnly && editor.current && value !== currentHtml.current) {
-      editor.current.loadHTML(value || "");
+    if (!readOnly && editor && value !== currentHtml.current) {
+      editor.loadHTML(value || "");
     }
-  }, [value, readOnly]);
+  }, [value, readOnly, editor]);
 
   const { placeholder, autoFocus } = props;
 
