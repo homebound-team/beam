@@ -23,7 +23,7 @@ export interface CheckboxProps {
 export function Checkbox(props: CheckboxProps) {
   const { label, disabled: isDisabled = false, selected, ...otherProps } = props;
   // Treat indeterminate as false so that clicking on indeterminate always goes --> true.
-  const isSelected = selected === "indeterminate" ? false : selected;
+  const isSelected = selected === true;
   const isIndeterminate = selected === "indeterminate";
   const ariaProps = { isSelected, isDisabled, isIndeterminate, ...otherProps };
   const checkboxProps = { ...ariaProps, "aria-label": label };
