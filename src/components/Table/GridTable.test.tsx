@@ -1314,6 +1314,14 @@ describe("GridTable", () => {
     expect(cellOf(r, "customTestId", 0, 0).textContent).toBe("Name");
     expect(row(r, 0, "customTestId").textContent).toBe("NameValue");
   });
+
+  it("does not blow up when rows have circular references", async () => {
+    // Given rows that have a circular reference, i.e. from our GraphQL fragment factories
+    const row1 = rows[1];
+    (row1 as any).parent = row1;
+    // Then we can still render
+    await render(<GridTable rows={[row1]} columns={columns} />);
+  });
 });
 
 function Collapse({ id }: { id: string }) {
