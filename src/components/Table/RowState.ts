@@ -59,14 +59,7 @@ export class RowState {
         // Just mash the header + all rows + children as selected
         const map = new Map<string, SelectedState>();
         map.set("header", "checked");
-        const todo = [...this.rows.current];
-        while (todo.length > 0) {
-          const r = todo.pop()!;
-          map.set(r.id, "checked");
-          if (r.children) {
-            todo.push(...r.children);
-          }
-        }
+        visit(this.rows.current, (row) => map.set(row.id, "checked"));
         this.selectedRows.replace(map);
       } else {
         // Similarly "unmash" all rows + children.
@@ -84,14 +77,7 @@ export class RowState {
 
       // Everything here & down is deterministically on/off
       const map = new Map<string, SelectedState>();
-      const todo = [curr.row];
-      while (todo.length > 0) {
-        const row = todo.pop()!;
-        map.set(row.id, selected ? "checked" : "unchecked");
-        if (row.children) {
-          todo.push(...row.children);
-        }
-      }
+      visit([curr.row], (row) => map.set(row.id, selected ? "checked" : "unchecked"));
 
       // Now walk up the parents and see if they are now-all-checked/now-all-unchecked/some-of-each
       for (const parent of [...curr.parents].reverse()) {
@@ -198,4 +184,15 @@ function deriveParentSelected(children: SelectedState[]): SelectedState {
   const allChecked = children.every((child) => child === "checked");
   const allUnchecked = children.every((child) => child === "unchecked");
   return allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
+}
+
+function visit(rows: GridDataRow<any>[], fn: (row: GridDataRow<any>) => void): void {
+  const todo = [...rows];
+  while (todo.length > 0) {
+    const row = todo.pop()!;
+    fn(row);
+    if (row.children) {
+      todo.push(...row.children);
+    }
+  }
 }
