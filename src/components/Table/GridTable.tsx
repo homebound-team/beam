@@ -222,6 +222,9 @@ export interface GridTableProps<R extends Kinded, S, X> {
 /** NOTE: This API is experimental and primarily intended for story and testing purposes */
 export type GridTableApi = {
   scrollToIndex: (index: number) => void;
+
+  /** Returns the ids of currently-selected rows. */
+  getSelectedRowIds(): string[];
 };
 
 /**
@@ -277,6 +280,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   if (api) {
     api.current = {
       scrollToIndex: (index) => virtuosoRef.current && virtuosoRef.current.scrollToIndex(index),
+      getSelectedRowIds: () => rowState.selectedIds,
     };
   }
 
@@ -908,7 +912,10 @@ export type GridDataRow<R extends Kinded> = {
   children?: GridDataRow<R>[];
   /** Whether to pin this sort to the first/last of its parent's children. */
   pin?: "first" | "last";
-} & DiscriminateUnion<R, "kind", R["kind"]>;
+} & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
+
+// Use IfAny so that GridDataRow<any> doesn't devolve into any
+type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
 
 interface GridRowProps<R extends Kinded, S> {
   as: RenderAs;
@@ -959,7 +966,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           .filter((style) => style)
       : undefined;
 
-  const rowStyleCellCss = maybeApplyFunction(row, rowStyle?.cellCss);
+  const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
   const rowCss = {
     // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `flexNone` to ensure they stay their defined widths
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.flexNone.$).$),
@@ -968,7 +975,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
         "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
       }),
-    ...maybeApplyFunction(row, rowStyle?.rowCss),
+    ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     // Maybe add the sticky header styles
     ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined),
     ...getNestedCardStyles(row, openCardStyles, style),

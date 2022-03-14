@@ -6,17 +6,12 @@ import { CheckboxBase } from "src/inputs/CheckboxBase";
 export interface CheckboxProps {
   label: string;
   checkboxOnly?: boolean;
+  selected: boolean | "indeterminate";
   /** Handler that is called when the element's selection state changes. */
   onChange: (selected: boolean) => void;
   /** Additional text displayed below label */
   description?: string;
   disabled?: boolean;
-  /**
-   * Indeterminism is presentational only.
-   * The indeterminate visual representation remains regardless of user interaction.
-   */
-  indeterminate?: boolean;
-  selected?: boolean;
   errorMsg?: string;
   helperText?: string | ReactNode;
   /** Callback fired when focus removes from the component */
@@ -26,18 +21,14 @@ export interface CheckboxProps {
 }
 
 export function Checkbox(props: CheckboxProps) {
-  const {
-    label,
-    indeterminate: isIndeterminate = false,
-    disabled: isDisabled = false,
-    selected,
-    ...otherProps
-  } = props;
-  const ariaProps = { isSelected: selected, isDisabled, isIndeterminate, ...otherProps };
+  const { label, disabled: isDisabled = false, selected, ...otherProps } = props;
+  // Treat indeterminate as false so that clicking on indeterminate always goes --> true.
+  const isSelected = selected === true;
+  const isIndeterminate = selected === "indeterminate";
+  const ariaProps = { isSelected, isDisabled, isIndeterminate, ...otherProps };
   const checkboxProps = { ...ariaProps, "aria-label": label };
   const ref = useRef(null);
   const toggleState = useToggleState(ariaProps);
-  const isSelected = toggleState.isSelected;
   const { inputProps } = useCheckbox(checkboxProps, toggleState, ref);
 
   return (

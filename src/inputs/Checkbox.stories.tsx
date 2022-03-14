@@ -16,14 +16,16 @@ export function Checkboxes() {
         <h2 css={Css.mb1.$}>Basic Checkboxes</h2>
         <div css={Css.dg.gap1.$}>
           <Checkbox
+            selected={false}
             onChange={action("onChange")}
             onFocus={action("onFocus")}
             onBlur={action("onBlur")}
             label="Default"
           />
-          <Checkbox onChange={action("onChange")} selected label="Selected" />
-          <Checkbox onChange={action("onChange")} indeterminate label="Indeterminate" />
-          <Checkbox onChange={action("onChange")} disabled label="Disabled" />
+          <Checkbox onChange={action("onChange")} selected={false} label="Selected" />
+          <Checkbox onChange={action("onChange")} selected="indeterminate" label="Indeterminate" />
+          <Checkbox onChange={action("onChange")} selected={false} disabled label="Disabled while unselected" />
+          <Checkbox onChange={action("onChange")} selected={true} disabled label="Disabled while selected" />
         </div>
       </div>
       <div>
@@ -33,6 +35,7 @@ export function Checkboxes() {
             onChange={action("onChange")}
             description="Get notified when someone posts a comment on a posting"
             label="Comments"
+            selected={false}
           />
         </div>
       </div>
@@ -40,6 +43,7 @@ export function Checkboxes() {
         <h2 css={Css.mb1.$}>Checkbox with error message and helper text</h2>
         <div>
           <Checkbox
+            selected={false}
             onChange={action("onChange")}
             description="Get notified when someone posts a comment on a posting"
             label="Comments"

@@ -1,4 +1,5 @@
 import React, { MutableRefObject, useContext } from "react";
+import { selectColumn } from "src/components/Table/columns";
 import { GridRowLookup } from "src/components/Table/GridRowLookup";
 import {
   calcColumnSizes,
@@ -8,6 +9,7 @@ import {
   GridRowStyles,
   GridStyle,
   GridTable,
+  GridTableApi,
   matchesFilter,
   setRunningInJest,
 } from "src/components/Table/GridTable";
@@ -21,6 +23,7 @@ import {
 } from "src/components/Table/simpleHelpers";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
+import { Checkbox } from "src/inputs";
 import { cell, cellAnd, cellOf, click, render, row, rowAnd } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
@@ -58,6 +61,12 @@ const nestedColumns: GridColumn<NestedRow>[] = [
     child: (row) => <Collapse id={row.id} />,
     grandChild: () => "",
   },
+  selectColumn<NestedRow>({
+    header: (row) => ({ content: <Select id={row.id} /> }),
+    parent: (row) => ({ content: <Select id={row.id} /> }),
+    child: (row) => ({ content: <Select id={row.id} /> }),
+    grandChild: (row) => ({ content: <Select id={row.id} /> }),
+  }),
   {
     header: () => "Name",
     parent: (row) => ({
@@ -913,9 +922,9 @@ describe("GridTable", () => {
     // When we filter by 'foo'
     const r = await render(<GridTable filter="foo" columns={nestedColumns} rows={rows} />);
     // Then we show the header
-    expect(cell(r, 0, 1)).toHaveTextContent("Name");
+    expect(cell(r, 0, 2)).toHaveTextContent("Name");
     // And the child that matched
-    expect(cell(r, 1, 1)).toHaveTextContent("foo");
+    expect(cell(r, 1, 2)).toHaveTextContent("foo");
     // And that's it
     expect(row(r, 2)).toBeUndefined();
   });
@@ -935,13 +944,13 @@ describe("GridTable", () => {
     ];
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
     // And all three rows are initially rendered
-    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
-    expect(cell(r, 2, 1)).toHaveTextContent("grandchild p1c1g1");
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
     // When the parent is collapsed
     click(cell(r, 0, 0).children[0] as any);
     // Then only the parent row is still shown
-    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
     expect(row(r, 1)).toBeUndefined();
   });
 
@@ -960,15 +969,15 @@ describe("GridTable", () => {
     ];
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
     // And all three rows are initially rendered
-    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
-    expect(cell(r, 2, 1)).toHaveTextContent("grandchild p1c1g1");
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
     expectRenderedRows("p1", "p1c1", "p1c1g1");
     // When the child is collapsed
     click(cell(r, 1, 0).children[0] as any);
     // Then the parent and child rows are still shown
-    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
     // But not the grandchild
     expect(row(r, 2)).toBeUndefined();
     // And nothing needed to re-render
@@ -991,9 +1000,9 @@ describe("GridTable", () => {
     ];
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
     // And all three rows are initially rendered
-    expect(cell(r, 1, 1)).toHaveTextContent("parent 1");
-    expect(cell(r, 2, 1)).toHaveTextContent("child p1c1");
-    expect(cell(r, 3, 1)).toHaveTextContent("grandchild p1c1g1");
+    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 3, 2)).toHaveTextContent("grandchild p1c1g1");
 
     // When we collapse all
     click(cell(r, 0, 0).children[0] as any);
@@ -1005,9 +1014,9 @@ describe("GridTable", () => {
     // And when we re-open all
     click(cell(r, 0, 0).children[0] as any);
     // Then all rows are shown
-    expect(cell(r, 1, 1)).toHaveTextContent("parent 1");
-    expect(cell(r, 2, 1)).toHaveTextContent("child p1c1");
-    expect(cell(r, 3, 1)).toHaveTextContent("grandchild p1c1g1");
+    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 3, 2)).toHaveTextContent("grandchild p1c1g1");
   });
 
   it("persists collapse", async () => {
@@ -1034,6 +1043,48 @@ describe("GridTable", () => {
 
     // Unset local storage
     localStorage.setItem(tableIdentifier, "");
+  });
+
+  it("can select all", async () => {
+    // Given a parent with a child and grandchild
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "header", id: "header" },
+      {
+        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+            children: [{ kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" }],
+          },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi | undefined> = { current: undefined };
+    const r = await render(<GridTable<NestedRow> api={api} columns={nestedColumns} rows={rows} />);
+    // And all three rows are initially rendered
+    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 3, 2)).toHaveTextContent("grandchild p1c1g1");
+
+    // When we select all
+    click(cell(r, 0, 1).children[0] as any);
+    // Then all rows are shown as selected
+    expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 2, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 3, 1, "select")).toBeChecked();
+    // And the api can fetch them
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g1"]);
+
+    // And when we unselect all
+    click(cell(r, 0, 1).children[0] as any);
+    // Then all rows are shown as unselected
+    expect(cellAnd(r, 0, 1, "select")).not.toBeChecked();
+    expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
+    expect(cellAnd(r, 2, 1, "select")).not.toBeChecked();
+    expect(cellAnd(r, 3, 1, "select")).not.toBeChecked();
+    // And they are no longer selected
+    expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
 
   describe("matchesFilter", () => {
@@ -1300,13 +1351,13 @@ describe("GridTable", () => {
     // When using the various gridtable test helpers (cell, cellAnd, cellOf, row, rowAnd)
     // Then chrome rows, and padding columns are ignored
     expect(cellAnd(r, 0, 0, "collapse")).toBeTruthy();
-    expect(cell(r, 0, 1).textContent).toBe("Name");
+    expect(cell(r, 0, 2).textContent).toBe("Name");
     expect(cellAnd(r, 1, 0, "collapse")).toBeTruthy();
-    expect(cell(r, 1, 1).textContent).toBe("parent 1");
+    expect(cell(r, 1, 2).textContent).toBe("parent 1");
     expect(rowAnd(r, 2, "collapse")).toBeTruthy();
-    expect(cellOf(r, "gridTable", 2, 1).textContent).toBe("child p1c1");
+    expect(cellOf(r, "gridTable", 2, 2).textContent).toBe("child p1c1");
     expect(row(r, 3).querySelector("[data-testid='collapse']")).toBeFalsy();
-    expect(cell(r, 3, 1).textContent).toBe("grandchild p1c1g1");
+    expect(cell(r, 3, 2).textContent).toBe("grandchild p1c1g1");
   });
 
   it("can use custom table test ids on cell helpers that support it", async () => {
@@ -1331,6 +1382,22 @@ function Collapse({ id }: { id: string }) {
     <div onClick={() => rowState.toggleCollapsed(id)} data-testid="collapse">
       {icon}
     </div>
+  );
+}
+
+function Select({ id }: { id: string }) {
+  const { rowState } = useContext(RowStateContext);
+  const state = useComputed(() => rowState.getSelected(id), [rowState]);
+  const selected = state === "checked" ? true : state === "unchecked" ? false : "indeterminate";
+  return (
+    <Checkbox
+      label="Select"
+      checkboxOnly={true}
+      selected={selected}
+      onChange={(selected) => {
+        rowState.selectRow(id, selected);
+      }}
+    />
   );
 }
 
