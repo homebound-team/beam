@@ -45,7 +45,7 @@ export function useTestIds(props: object, defaultPrefix?: string): Record<string
 }
 
 /** Uses `object` for any keys that exist on it, otherwise calls `methodMissing` fn. */
-function newMethodMissingProxy<T extends object, Y>(
+export function newMethodMissingProxy<T extends object, Y>(
   object: T,
   methodMissing: (key: string) => Y,
 ): T & Record<string, Y> {

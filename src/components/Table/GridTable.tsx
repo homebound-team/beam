@@ -817,6 +817,8 @@ export type GridColumn<R extends Kinded, S = {}> = {
   serverSideSortKey?: S;
 };
 
+export const nonKindGridColumnKeys = ["w", "mw", "align", "clientSideSort", "serverSideSortKey"];
+
 /** Allows rendering a specific cell. */
 type RenderCellFn<R extends Kinded> = (
   idx: number,

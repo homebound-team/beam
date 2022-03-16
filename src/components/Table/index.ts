@@ -20,6 +20,7 @@ export type {
   setRunningInJest,
 } from "./GridTable";
 export { RowState, RowStateContext } from "./RowState";
+export * from "./SelectToggle";
 export { simpleDataRows, simpleHeader, simpleRows } from "./simpleHelpers";
 export type { SimpleHeaderAndDataOf, SimpleHeaderAndDataWith } from "./simpleHelpers";
 export { SortHeader } from "./SortHeader";

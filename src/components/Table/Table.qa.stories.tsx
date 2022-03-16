@@ -1,11 +1,10 @@
 import { Meta } from "@storybook/react";
-import React, { ReactNode, useContext } from "react";
+import React, { ReactNode } from "react";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
 import { CollapseToggle } from "src/components/Table/CollapseToggle";
 import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/columns";
 import { emptyCell, GridColumn, GridDataRow, GridTable } from "src/components/Table/GridTable";
-import { RowStateContext } from "src/components/Table/RowState";
 import { SimpleHeaderAndDataWith } from "src/components/Table/simpleHelpers";
 import {
   beamFixedStyle,
@@ -17,8 +16,7 @@ import {
 } from "src/components/Table/styles";
 import { Tag } from "src/components/Tag";
 import { Css, Palette } from "src/Css";
-import { useComputed } from "src/hooks";
-import { Checkbox, NumberField, SelectField } from "src/inputs";
+import { NumberField, SelectField } from "src/inputs";
 import { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
 import { zeroTo } from "src/utils/sb";
@@ -222,12 +220,7 @@ const beamNestedColumns: GridColumn<BeamNestedRow>[] = [
     parent: (row) => <CollapseToggle row={row} />,
     child: emptyCell,
   }),
-  selectColumn<BeamNestedRow>({
-    totals: emptyCell,
-    header: (row) => ({ content: <Select id={row.id} /> }),
-    parent: (row) => ({ content: <Select id={row.id} /> }),
-    child: (row) => ({ content: <Select id={row.id} /> }),
-  }),
+  selectColumn<BeamNestedRow>({ totals: emptyCell }),
   column<BeamNestedRow>({
     totals: "Totals",
     header: "Cost Code",
@@ -300,10 +293,7 @@ function beamStyleColumns() {
     { id: "l:2", name: "Great Room" },
   ];
 
-  const selectCol = selectColumn<BeamRow>({
-    header: (row) => ({ content: <Select id={row.id} /> }),
-    data: (row) => ({ content: <Select id={row.id} /> }),
-  });
+  const selectCol = selectColumn<BeamRow>();
   const favCol = column<BeamRow>({
     header: () => ({ content: "" }),
     data: ({ favorite }) => ({
@@ -354,20 +344,4 @@ function beamStyleColumns() {
   });
 
   return [selectCol, favCol, statusCol, nameCol, tradeCol, locationCol, dateCol, priceCol, readOnlyPriceCol];
-}
-
-function Select({ id }: { id: string }) {
-  const { rowState } = useContext(RowStateContext);
-  const state = useComputed(() => rowState.getSelected(id), [rowState]);
-  const selected = state === "checked" ? true : state === "unchecked" ? false : "indeterminate";
-  return (
-    <Checkbox
-      label="Select"
-      checkboxOnly={true}
-      selected={selected}
-      onChange={(selected) => {
-        rowState.selectRow(id, selected);
-      }}
-    />
-  );
 }
