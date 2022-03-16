@@ -80,10 +80,10 @@ const arrowColumn = actionColumn<Row>({
   w: "36px",
 });
 const selectColumn = actionColumn<Row>({
-  header: (row) => <Checkbox label="" onChange={action("Select All")} />,
+  header: (row) => <Checkbox label="" selected={false} onChange={action("Select All")} />,
   milestone: (row) => ({ colspan: 3, content: <div css={Css.smEm.gray900.$}>{row.name}</div>, alignment: "left" }),
   subgroup: (row) => ({ colspan: 3, content: <div css={Css.smEm.gray900.$}>{row.name}</div>, alignment: "left" }),
-  task: (task) => <Checkbox label="" onChange={action(`Select ${task.name}`)} />,
+  task: (task) => <Checkbox label="" selected={false} onChange={action(`Select ${task.name}`)} />,
   add: "",
   w: "32px",
 });

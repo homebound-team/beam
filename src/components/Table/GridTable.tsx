@@ -1,17 +1,7 @@
 import { Global } from "@emotion/react";
-import { useResizeObserver } from "@react-aria/utils";
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
-import React, {
-  MutableRefObject,
-  ReactElement,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { MutableRefObject, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
@@ -20,15 +10,17 @@ import {
   PresentationFieldProps,
   PresentationProvider,
 } from "src/components/PresentationContext";
+import { useSetupColumnSizes } from "src/components/Table/columnSizes";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
 import { getNestedCardStyles, isLeafRow, NestedCards, wrapCard } from "src/components/Table/nestedCards";
+import { RowState, RowStateContext } from "src/components/Table/RowState";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
 import { SortState, useSortState } from "src/components/Table/useSortState";
 import { Css, Margin, Only, Properties, Typography, Xss } from "src/Css";
+import { useComputed } from "src/hooks";
 import tinycolor from "tinycolor2";
-import { useDebouncedCallback } from "use-debounce";
 import { defaultStyle } from ".";
 
 export type Kinded = { kind: string };
@@ -236,6 +228,9 @@ export interface GridTableProps<R extends Kinded, S, X> {
 /** NOTE: This API is experimental and primarily intended for story and testing purposes */
 export type GridTableApi = {
   scrollToIndex: (index: number) => void;
+
+  /** Returns the ids of currently-selected rows. */
+  getSelectedRowIds(): string[];
 };
 
 /**
@@ -279,7 +274,11 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     resizeTarget,
   } = props;
 
-  const [collapsedIds, collapseAllContext, collapseRowContext] = useToggleIds(rows, persistCollapse);
+  // Create a ref that always contains the latest rows, for our effectively-singleton RowState to use
+  const rowsRef = useRef(rows);
+  rowsRef.current = rows;
+  const [rowState] = useState(() => new RowState(rowsRef, persistCollapse));
+
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const tableRef = useRef<HTMLElement>(null);
@@ -287,6 +286,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   if (api) {
     api.current = {
       scrollToIndex: (index) => virtuosoRef.current && virtuosoRef.current.scrollToIndex(index),
+      getSelectedRowIds: () => rowState.selectedIds,
     };
   }
 
@@ -300,45 +300,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     return rows;
   }, [columns, rows, sorting, sortState]);
 
-  // Calculate the column sizes immediately rather than via the `debounce` method.
-  // We do this for Storybook integrations that may use MockDate. MockDate changes the behavior of `new Date()`, which is used by `useDebounce` and essentially turns off the callback.
-  const calculateImmediately = useRef<boolean>(true);
-  const [tableWidth, setTableWidth] = useState<number | undefined>();
+  const columnSizes = useSetupColumnSizes(style, columns, tableRef, resizeTarget);
 
-  // Calc our initial/first render sizes where we won't have a width yet
-  const [columnSizes, setColumnSizes] = useState<string[]>(
-    calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, tableWidth, style.minWidthPx),
-  );
-
-  const setTableAndColumnWidths = useCallback(
-    (width: number) => {
-      setTableWidth(width);
-      setColumnSizes(calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, width, style.minWidthPx));
-    },
-    [setTableWidth, setColumnSizes, columns, style],
-  );
-
-  const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
-
-  const onResize = useCallback(() => {
-    const target = resizeTarget?.current ? resizeTarget.current : tableRef.current;
-    if (target && target.clientWidth !== tableWidth) {
-      if (calculateImmediately.current) {
-        calculateImmediately.current = false;
-        setTableAndColumnWidths(target.clientWidth);
-      } else {
-        setTableAndColumnWidthsDebounced(target.clientWidth);
-      }
-    }
-  }, [
-    resizeTarget?.current,
-    tableRef.current,
-    setTableAndColumnWidths,
-    calculateImmediately,
-    setTableAndColumnWidthsDebounced,
-  ]);
-
-  useResizeObserver({ ref: resizeTarget ?? tableRef, onResize });
+  // Make a single copy of our current collapsed state, so we'll have a single observer.
+  const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
 
   // Filter + flatten + component-ize the sorted rows.
   let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
@@ -352,26 +317,22 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
       return (
-        <GridCollapseContext.Provider
+        <RowComponent
           key={`${row.kind}-${row.id}`}
-          value={row.kind === "header" ? collapseAllContext : collapseRowContext}
-        >
-          <RowComponent
-            {...{
-              as,
-              columns,
-              row,
-              style,
-              rowStyles,
-              stickyHeader,
-              stickyOffset,
-              openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
-              columnSizes,
-              level,
-              ...sortProps,
-            }}
-          />
-        </GridCollapseContext.Provider>
+          {...{
+            as,
+            columns,
+            row,
+            style,
+            rowStyles,
+            stickyHeader,
+            stickyOffset,
+            openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
+            columnSizes,
+            level,
+            ...sortProps,
+          }}
+        />
       );
     }
 
@@ -390,9 +351,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         filters.every((filter) =>
           columns.map((c) => applyRowFn(c, row)).some((maybeContent) => matchesFilter(maybeContent, filter)),
         );
-      // Even if we don't pass the filter, one of our children might, so we continue on after this check
       let isCard = false;
 
+      // Even if we don't pass the filter, one of our children might, so we continue on after this check
       if (matches) {
         isCard = nestedCards && nestedCards.maybeOpenCard(row);
         filteredRows.push([row, makeRowComponent(row, level)]);
@@ -443,11 +404,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     sortState,
     stickyHeader,
     stickyOffset,
-    collapsedIds,
-    collapseAllContext,
-    collapseRowContext,
     observeRows,
     columnSizes,
+    collapsedIds,
   ]);
 
   let tooManyClientSideRows = false;
@@ -490,28 +449,31 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // just trust the GridTable impl that, at runtime, `as=virtual` will (other than being virtualized)
   // behave semantically the same as `as=div` did for its tests.
   const _as = as === "virtual" && runningInJest ? "div" : as;
+  const rowStateContext = useMemo(() => ({ rowState }), [rowState]);
   return (
-    <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
-      {/* TODO: These drag-over/add-in-place styles need to be applied in a different way? */}
-      <Global
-        styles={{
-          ".row-drag-hover": Css.bgLightBlue100.important.$,
-        }}
-      />
-      {renders[_as](
-        style,
-        id,
-        columns,
-        headerRows,
-        filteredRows,
-        firstRowMessage,
-        stickyHeader,
-        style.nestedCards?.firstLastColumnWidth,
-        xss,
-        virtuosoRef,
-        tableRef,
-      )}
-    </PresentationProvider>
+    <RowStateContext.Provider value={rowStateContext}>
+      <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
+        {/* TODO: These drag-over/add-in-place styles need to be applied in a different way? */}
+        <Global
+          styles={{
+            ".row-drag-hover": Css.bgLightBlue100.important.$,
+          }}
+        />
+        {renders[_as](
+          style,
+          id,
+          columns,
+          headerRows,
+          filteredRows,
+          firstRowMessage,
+          stickyHeader,
+          style.nestedCards?.firstLastColumnWidth,
+          xss,
+          virtuosoRef,
+          tableRef,
+        )}
+      </PresentationProvider>
+    </RowStateContext.Provider>
   );
 }
 
@@ -555,7 +517,7 @@ function renderDiv<R extends Kinded>(
       data-testid={id}
     >
       {headerRows.map(([, node]) => node)}
-      {/* Show a info message if it's set. */}
+      {/* Show an info message if it's set. */}
       {firstRowMessage && (
         <div css={{ ...style.firstRowMessageCss }} data-gridrow>
           {firstRowMessage}
@@ -1050,7 +1012,10 @@ export type GridDataRow<R extends Kinded> = {
   children?: GridDataRow<R>[];
   /** Whether to pin this sort to the first/last of its parent's children. */
   pin?: "first" | "last";
-} & DiscriminateUnion<R, "kind", R["kind"]>;
+} & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
+
+// Use IfAny so that GridDataRow<any> doesn't devolve into any
+type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
 
 interface GridRowProps<R extends Kinded, S> {
   as: RenderAs;
@@ -1101,7 +1066,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           .filter((style) => style)
       : undefined;
 
-  const rowStyleCellCss = maybeApplyFunction(row, rowStyle?.cellCss);
+  const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
   const rowCss = {
     // We add a display-contents so that we can have "row-level" div elements in our
     // DOM structure. I.e. grid is normally root-element > cell-elements, but we want
@@ -1115,7 +1080,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
         "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
       }),
-    ...maybeApplyFunction(row, rowStyle?.rowCss),
+    ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     // Maybe add the sticky header styles
     ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined),
     ...getNestedCardStyles(row, openCardStyles, style),
@@ -1156,7 +1121,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         // Decrement colspan count and skip if greater than 1.
         if (currentColspan > 1) {
           currentColspan -= 1;
-          return;
+          return null;
         }
         const maybeContent = applyRowFn(column, row);
         currentColspan = isGridCellContent(maybeContent) ? maybeContent.colspan ?? 1 : 1;
@@ -1334,28 +1299,6 @@ const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (
   );
 };
 
-/**
- * Provides each row access to a method to check if it is collapsed and toggle it's collapsed state.
- *
- * Calling `toggleCollapse` will keep the row itself showing, but will hide any
- * children rows (specifically those that have this row's `id` in their `parentIds`
- * prop).
- *
- * headerCollapsed is used to trigger rows at the root level to rerender their chevron when all are
- * collapsed/expanded.
- */
-type GridCollapseContextProps = {
-  headerCollapsed: boolean;
-  isCollapsed: (id: string) => boolean;
-  toggleCollapsed(id: string): void;
-};
-
-export const GridCollapseContext = React.createContext<GridCollapseContextProps>({
-  headerCollapsed: false,
-  isCollapsed: () => false,
-  toggleCollapsed: () => {},
-});
-
 /** Sets up the `GridContext` so that header cells can access the current sort settings. */
 const headerRenderFn: (
   columns: GridColumn<any>[],
@@ -1476,114 +1419,8 @@ function maybeDarken(color: string | undefined, defaultColor: string): string {
   return color ? tinycolor(color).darken(4).toString() : defaultColor;
 }
 
-// Get the rows that are already in the toggled state, so we can keep them toggled
-function getCollapsedRows(persistCollapse: string | undefined): string[] {
-  if (!persistCollapse) return [];
-  const collapsedGridRowIds = localStorage.getItem(persistCollapse);
-  return collapsedGridRowIds ? JSON.parse(collapsedGridRowIds) : [];
-}
-
-/**
- * A custom hook to manage a list of ids.
- *
- * What's special about this hook is that we manage a stable identity
- * for the `toggleId` function, so that rows that have _not_ toggled
- * themselves on/off will have an unchanged callback and so not be
- * re-rendered.
- *
- * That said, when they do trigger a `toggleId`, the stable/"stale" callback
- * function should see/update the latest list of values, which is not possible with a
- * traditional `useState` hook because it captures the original/stale list identity.
- */
-function useToggleIds(
-  rows: GridDataRow<Kinded>[],
-  persistCollapse: string | undefined,
-): readonly [string[], GridCollapseContextProps, GridCollapseContextProps] {
-  // Make a list that we will only mutate, so that our callbacks have a stable identity.
-  const [collapsedIds] = useState<string[]>(getCollapsedRows(persistCollapse));
-  // Use this to trigger the component to re-render even though we're not calling `setList`
-  const [tick, setTick] = useState<string>("");
-
-  // Checking whether something is collapsed does not depend on anything
-  const isCollapsed = useCallback(
-    (id: string) => collapsedIds.includes(id),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
-  const collapseAllContext = useMemo(
-    () => {
-      // Create the stable `toggleCollapsed`, i.e. we are purposefully passing an (almost) empty dep list
-      // Since only toggling all rows required knowledge of what the rows are
-      const toggleAll = (_id: string) => {
-        // We have different behavior when going from expand/collapse all.
-        const isAllCollapsed = collapsedIds[0] === "header";
-        collapsedIds.splice(0, collapsedIds.length);
-        if (isAllCollapsed) {
-          // Expand all means keep `collapsedIds` empty
-        } else {
-          // Otherwise push `header` on the list as a hint that we're in the collapsed-all state
-          collapsedIds.push("header");
-          // Find all non-leaf rows so that toggling "all collapsed" -> "all not collapsed" opens
-          // the parent rows of any level.
-          const parentIds = new Set<string>();
-          const todo = [...rows];
-          while (todo.length > 0) {
-            const r = todo.pop()!;
-            if (r.children) {
-              parentIds.add(r.id);
-              todo.push(...r.children);
-            }
-          }
-          // And then mark all parent rows as collapsed.
-          collapsedIds.push(...parentIds);
-        }
-        if (persistCollapse) {
-          localStorage.setItem(persistCollapse, JSON.stringify(collapsedIds));
-        }
-        // Trigger a re-render
-        setTick(collapsedIds.join(","));
-      };
-      return { headerCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleAll };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [rows],
-  );
-
-  const collapseRowContext = useMemo(
-    () => {
-      // Create the stable `toggleCollapsed`, i.e. we are purposefully passing an empty dep list
-      // Since toggling a single row does not need to know about the other rows
-      const toggleRow = (id: string) => {
-        // This is the regular/non-header behavior to just add/remove the individual row id
-        const i = collapsedIds.indexOf(id);
-        if (i === -1) {
-          collapsedIds.push(id);
-        } else {
-          collapsedIds.splice(i, 1);
-        }
-        if (persistCollapse) {
-          localStorage.setItem(persistCollapse, JSON.stringify(collapsedIds));
-        }
-        // Trigger a re-render
-        setTick(collapsedIds.join(","));
-      };
-      return { headerCollapsed: isCollapsed("header"), isCollapsed, toggleCollapsed: toggleRow };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [collapseAllContext.isCollapsed("header")],
-  );
-
-  // Return a copy of the list, b/c we want external useMemos that do explicitly use the
-  // entire list as a dep to re-render whenever the list is changed (which they need to
-  // see as new list identity).
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const copy = useMemo(() => [...collapsedIds], [tick, collapsedIds]);
-  return [copy, collapseAllContext, collapseRowContext] as const;
-}
-
-/** GridTable as Table utility to apply <tr> element override styles */
-const tableRowStyles = (as: RenderAs, column?: GridColumn<any>) => {
+/** GridTable as Table utility to apply <tr> element override styles. */
+function tableRowStyles(as: RenderAs, column?: GridColumn<any>) {
   const thWidth = column?.w;
   return as === "table"
     ? {
@@ -1591,4 +1428,4 @@ const tableRowStyles = (as: RenderAs, column?: GridColumn<any>) => {
         ...(thWidth ? Css.w(thWidth).$ : {}),
       }
     : {};
-};
+}
