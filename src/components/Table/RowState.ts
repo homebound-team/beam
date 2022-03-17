@@ -1,6 +1,7 @@
 import { makeAutoObservable, ObservableMap, ObservableSet } from "mobx";
 import React, { MutableRefObject } from "react";
 import { GridDataRow } from "src/components/Table/GridTable";
+import { visit } from "src/components/Table/visitor";
 
 // A parent row can be partially selected when some children are selected/some aren't.
 export type SelectedState = "checked" | "unchecked" | "partial";
@@ -184,15 +185,4 @@ function deriveParentSelected(children: SelectedState[]): SelectedState {
   const allChecked = children.every((child) => child === "checked");
   const allUnchecked = children.every((child) => child === "unchecked");
   return allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
-}
-
-function visit(rows: GridDataRow<any>[], fn: (row: GridDataRow<any>) => void): void {
-  const todo = [...rows];
-  while (todo.length > 0) {
-    const row = todo.pop()!;
-    fn(row);
-    if (row.children) {
-      todo.push(...row.children);
-    }
-  }
 }
