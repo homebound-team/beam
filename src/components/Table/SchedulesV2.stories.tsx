@@ -225,7 +225,7 @@ export function SchedulesV2() {
 SchedulesV2.storyName = "SchedulesV2";
 
 export function SchedulesV2Virtualized() {
-  const api = useRef<GridTableApi>();
+  const api = useRef<GridTableApi<Row>>();
 
   // Scroll to the bottom of the page before taking snapshot
   useEffect(() => {
