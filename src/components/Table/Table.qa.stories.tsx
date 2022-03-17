@@ -2,7 +2,6 @@ import { Meta } from "@storybook/react";
 import React, { ReactNode } from "react";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
-import { CollapseToggle } from "src/components/Table/CollapseToggle";
 import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/columns";
 import { emptyCell, GridColumn, GridDataRow, GridTable } from "src/components/Table/GridTable";
 import { SimpleHeaderAndDataWith } from "src/components/Table/simpleHelpers";
@@ -214,12 +213,7 @@ function RollUpTotal({ num }: { num?: number }) {
 }
 
 const beamNestedColumns: GridColumn<BeamNestedRow>[] = [
-  collapseColumn<BeamNestedRow>({
-    totals: emptyCell,
-    header: (row) => <CollapseToggle row={row} />,
-    parent: (row) => <CollapseToggle row={row} />,
-    child: emptyCell,
-  }),
+  collapseColumn<BeamNestedRow>({ totals: emptyCell }),
   selectColumn<BeamNestedRow>({ totals: emptyCell }),
   column<BeamNestedRow>({
     totals: "Totals",
