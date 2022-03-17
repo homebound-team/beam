@@ -17,6 +17,7 @@ import { RowState, RowStateContext } from "src/components/Table/RowState";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
 import { SortState, useSortState } from "src/components/Table/useSortState";
+import { visit } from "src/components/Table/visitor";
 import { Css, Margin, Only, Properties, Typography, Xss } from "src/Css";
 import { useComputed } from "src/hooks";
 import tinycolor from "tinycolor2";
@@ -214,17 +215,20 @@ export interface GridTableProps<R extends Kinded, S, X> {
   persistCollapse?: string;
   xss?: X;
   /** Experimental API allowing one to scroll to a table index. Primarily intended for stories at the moment */
-  api?: MutableRefObject<GridTableApi | undefined>;
+  api?: MutableRefObject<GridTableApi<R> | undefined>;
   /** Experimental, expecting to be removed - Specify the element in which the table should resize its columns against. If not set, the table will resize columns based on its owns container's width */
   resizeTarget?: MutableRefObject<HTMLElement | null>;
 }
 
 /** NOTE: This API is experimental and primarily intended for story and testing purposes */
-export type GridTableApi = {
+export type GridTableApi<R extends Kinded> = {
   scrollToIndex: (index: number) => void;
 
   /** Returns the ids of currently-selected rows. */
   getSelectedRowIds(): string[];
+
+  /** Returns the currently-selected rows. */
+  getSelectedRows(): GridDataRow<R>[];
 };
 
 /**
@@ -281,6 +285,16 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     api.current = {
       scrollToIndex: (index) => virtuosoRef.current && virtuosoRef.current.scrollToIndex(index),
       getSelectedRowIds: () => rowState.selectedIds,
+      getSelectedRows(): GridDataRow<R>[] {
+        const ids = rowState.selectedIds;
+        const selected: GridDataRow<R>[] = [];
+        visit(rows, (row) => {
+          if (ids.includes(row.id)) {
+            selected.push(row as any);
+          }
+        });
+        return selected;
+      },
     };
   }
 
@@ -816,6 +830,8 @@ export type GridColumn<R extends Kinded, S = {}> = {
   /** This column's sort by value (if server-side sorting). */
   serverSideSortKey?: S;
 };
+
+export const nonKindGridColumnKeys = ["w", "mw", "align", "clientSideSort", "serverSideSortKey"];
 
 /** Allows rendering a specific cell. */
 type RenderCellFn<R extends Kinded> = (

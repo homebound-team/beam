@@ -6,6 +6,7 @@ export interface GridTableCollapseToggleProps {
   row: GridDataRow<any>;
 }
 
+/** Provides a chevron icons to collapse/un-collapse for parent/child tables. */
 export function CollapseToggle(props: GridTableCollapseToggleProps) {
   const { row } = props;
   const { rowState } = useContext(RowStateContext);

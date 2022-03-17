@@ -1059,7 +1059,7 @@ describe("GridTable", () => {
         ],
       },
     ];
-    const api: MutableRefObject<GridTableApi | undefined> = { current: undefined };
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
     const r = await render(<GridTable<NestedRow> api={api} columns={nestedColumns} rows={rows} />);
     // And all three rows are initially rendered
     expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
@@ -1075,6 +1075,7 @@ describe("GridTable", () => {
     expect(cellAnd(r, 3, 1, "select")).toBeChecked();
     // And the api can fetch them
     expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g1"]);
+    expect(api.current!.getSelectedRows()).toEqual([rows[1], rows[1].children![0], rows[1].children![0].children![0]]);
 
     // And when we unselect all
     click(cell(r, 0, 1).children[0] as any);
