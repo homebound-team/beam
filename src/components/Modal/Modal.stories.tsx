@@ -60,25 +60,6 @@ export const OpenModalTest = () => {
   );
 };
 
-export const drawHeaderBorderTest = () => {
-  const { openModal } = useModal();
-  const open = () =>
-    openModal({
-      content: (
-        <>
-          <ModalHeader>Header Border</ModalHeader>
-          <ModalBody>Body</ModalBody>
-          <ModalFooter>
-          </ModalFooter>
-        </>
-      ),
-      drawHeaderBorder: true,
-    });
-  // Immediately open the modal for Chromatic snapshots
-  useEffect(open, [openModal]);
-  return <Button label="Open" onClick={open} />;
-};
-
 export const OpenModalKeepOpen = () => {
   return (
     <OpenModal keepOpen={true}>
