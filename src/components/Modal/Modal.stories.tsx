@@ -26,6 +26,7 @@ export const FilterableStaticHeight = () => (
 export const HeaderWithComponents = () => <ModalExample size="lg" withTag />;
 export const WithDatePicker = () => <ModalExample withDateField />;
 export const WithFieldInHeader = () => <ModalExample withTextArea />;
+export const WithDrawHeaderBorder = () => <ModalExample drawHeaderBorder={true} />;
 
 export const ButtonsInFooter = () => {
   const { openModal, setSize } = useModal();
@@ -87,16 +88,17 @@ export function ModalForm() {
   );
 }
 
-interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling">, TestModalContentProps {}
+interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling" | "drawHeaderBorder">, TestModalContentProps {}
 
 function ModalExample(props: ModalExampleProps) {
-  const { size, showLeftAction, initNumSentences = 1, forceScrolling, withTag, withDateField } = props;
+  const { size, showLeftAction, initNumSentences = 1, forceScrolling, withTag, withDateField, drawHeaderBorder = false } = props;
   const { openModal } = useModal();
   const open = () =>
     openModal({
       size,
       forceScrolling,
       content: <TestModalContent {...props} />,
+      drawHeaderBorder,
     });
   // Immediately open the modal for Chromatic snapshots
   useEffect(open, [openModal]);
