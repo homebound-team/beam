@@ -41,7 +41,7 @@ export type ModalApi = {
  * Provides underlay, modal container, and header. Will disable scrolling of page under the modal.
  */
 export function Modal(props: ModalProps) {
-  const { size = "md", content, forceScrolling, api, drawHeaderBorder} = props;
+  const { size = "md", content, forceScrolling, api, drawHeaderBorder = false} = props;
   const isFixedHeight = typeof size !== "string";
   const ref = useRef(null);
   const { modalBodyDiv, modalFooterDiv, modalHeaderDiv, drawerContentStack } = useBeamContext();
@@ -113,7 +113,7 @@ export function Modal(props: ModalProps) {
             {...testId}
           >
             {/* Setup three children (header, content, footer), and flex grow the content. */}
-            <header css={Css.df.p3.fs0.if(!!drawHeaderBorder).bb.bGray200.$}>
+            <header css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bGray200.$}>
               <h1 css={Css.fg1.xl2Em.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
               <span css={Css.fs0.pl1.$}>
                 <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
