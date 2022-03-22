@@ -12,7 +12,13 @@ import {
 import { useSetupColumnSizes } from "src/components/Table/columnSizes";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
-import { getNestedCardStyles, isLeafRow, NestedCards, wrapCard } from "src/components/Table/nestedCards";
+import {
+  getCurrentBgColor,
+  getNestedCardStyles,
+  isLeafRow,
+  NestedCards,
+  wrapCard,
+} from "src/components/Table/nestedCards";
 import { RowState, RowStateContext } from "src/components/Table/RowState";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
@@ -837,6 +843,8 @@ export type GridColumn<R extends Kinded, S = {}> = {
   clientSideSort?: boolean;
   /** This column's sort by value (if server-side sorting). */
   serverSideSortKey?: S;
+  /** Allows the column to stay in place when the user scrolls horizontally */
+  sticky?: "left" | "right";
 };
 
 export const nonKindGridColumnKeys = ["w", "mw", "align", "clientSideSort", "serverSideSortKey"];
@@ -915,6 +923,8 @@ export type GridCellContent = {
   indent?: 1 | 2;
   colspan?: number;
   typeScale?: Typography;
+  /** Allows the cell to stay in place when the user scrolls horizontally */
+  sticky?: "left" | "right";
 };
 
 type MaybeFn<T> = T | (() => T);
@@ -1045,6 +1055,33 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
         const maybeNestedCardColumnIndex = columnIndex + (style.nestedCards ? 1 : 0);
 
+        const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
+        const maybeStickyColumnStyles =
+          maybeSticky && columnSizes
+            ? {
+                ...Css.sticky.z1.$,
+                // Need to apply a background to this cell to avoid content beneath it being shown when sticky.
+                // Assumes background is white for non-nestedCard styles. This can be overridden via cellCss.
+                ...(style.nestedCards?.kinds
+                  ? Css.bgColor(getCurrentBgColor(row, openCardStyles, style.nestedCards.kinds)).$
+                  : Css.bgWhite.$),
+                ...(maybeSticky === "left"
+                  ? Css.left(
+                      maybeNestedCardColumnIndex === 0
+                        ? 0
+                        : `calc(${columnSizes.slice(0, maybeNestedCardColumnIndex).join(" + ")})`,
+                    ).$
+                  : {}),
+                ...(maybeSticky === "right"
+                  ? Css.right(
+                      maybeNestedCardColumnIndex + 1 === columnSizes.length
+                        ? 0
+                        : `calc(${columnSizes.slice(maybeNestedCardColumnIndex + 1 - columnSizes.length).join(" + ")})`,
+                    ).$
+                  : {}),
+              }
+            : {};
+
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
         // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
         // a few descendent selectors. However, that approach means the root grid-applied
@@ -1057,6 +1094,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         const cellCss = {
           // Adding display flex so we can align content within the cells
           ...Css.df.$,
+          // Apply sticky column/cell styles
+          ...maybeStickyColumnStyles,
           // Apply any static/all-cell styling
           ...style.cellCss,
           // Then override with first/last cell styling

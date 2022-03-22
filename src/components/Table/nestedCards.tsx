@@ -9,7 +9,7 @@ import {
   NestedCardStyleByKind,
   RowTuple,
 } from "src/components/Table/GridTable";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 
 type Chrome = () => JSX.Element;
 type ChromeBuffer = Chrome[];
@@ -212,6 +212,27 @@ export function getNestedCardStyles(
           .bc(leafCardStyles.bColor).ba.$
       : undefined),
   };
+}
+
+/**
+ * Returns the background color for the row.
+ * Either based on the current row's card having a defined background color, or the last opened card's background color
+ * Defaults to White.
+ */
+export function getCurrentBgColor(
+  row: GridDataRow<any>,
+  openCardStyles: NestedCardStyle[] | undefined,
+  nestedKinds: NestedCardStyleByKind,
+): string {
+  if (nestedKinds[row.kind]) {
+    return nestedKinds[row.kind].bgColor;
+  }
+
+  if (openCardStyles && openCardStyles.length > 0) {
+    return openCardStyles[openCardStyles.length - 1].bgColor;
+  }
+
+  return Palette.White;
 }
 
 /**
