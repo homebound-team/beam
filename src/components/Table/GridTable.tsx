@@ -299,6 +299,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     };
   }
 
+  // We track render count at the table level, which seems odd (we should be able to track this
+  // internally within each GridRow using a useRef), but we have suspicions that react-virtuoso
+  // (or us) is resetting component state more than necessary, so we track render counts from
+  // here instead.
+  const { getCount } = useRenderCount();
+
   const [sortState, setSortKey] = useSortState<R, S>(columns, sorting);
 
   const maybeSorted = useMemo(() => {
@@ -339,6 +345,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
             columnSizes,
             level,
+            getCount,
             ...sortProps,
           }}
         />
@@ -949,6 +956,7 @@ interface GridRowProps<R extends Kinded, S> {
   openCards: string | undefined;
   columnSizes: string[];
   level: number;
+  getCount: (id: string) => object;
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -967,6 +975,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     openCards,
     columnSizes,
     level,
+    getCount,
     ...others
   } = props;
 
@@ -974,7 +983,6 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const isHeader = row.kind === "header";
   const rowStyle = rowStyles?.[row.kind];
   const Row = as === "table" ? "tr" : "div";
-  const count = useRenderCount();
 
   const openCardStyles =
     typeof openCards === "string"
@@ -1002,7 +1010,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   let currentColspan = 1;
 
   const rowNode = (
-    <Row css={rowCss} {...others} data-gridrow {...count}>
+    <Row css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
       {columns.map((column, columnIndex) => {
         if (column.mw) {
           // Validate the column's minWidth definition if set.

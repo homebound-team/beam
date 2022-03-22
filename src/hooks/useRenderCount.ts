@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 
 /**
  * A hook to add `data-render=${count}` to an element.
@@ -14,8 +14,12 @@ import { useRef } from "react";
  * but the intent is to use this in GridTable where "what's the render count?"
  * will be a common question.)
  */
-export function useRenderCount() {
-  const ref = useRef<number>(0);
-  ref.current++;
-  return { "data-render": ref.current };
+export function useRenderCount(): { getCount: (id: string) => object } {
+  const ref = useRef<Map<string, number>>(new Map());
+  const getCount = useCallback((id: string) => {
+    const count = ref.current.get(id) || 1;
+    ref.current.set(id, count + 1);
+    return { "data-render": count };
+  }, []);
+  return { getCount };
 }
