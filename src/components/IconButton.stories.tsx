@@ -45,9 +45,29 @@ export const IconButtonStyles = (args: IconButtonProps) => (
         <h2>Colored</h2>
         <IconButton {...args} color={Palette.Red700} />
       </div>
+    </div>
+
+    <h1 css={Css.mt2.$}>Compact</h1>
+    <div css={Css.df.gapPx(90).$}>
       <div>
-        <h2>Smaller</h2>
-        <IconButton {...args} inc={2} />
+        <h2>Default</h2>
+        <IconButton compact {...args} />
+      </div>
+      <div>
+        <h2>Hover</h2>
+        <HoveredIconButton compact {...args} />
+      </div>
+      <div>
+        <h2>Focused</h2>
+        <IconButton compact {...args} autoFocus />
+      </div>
+      <div>
+        <h2>Disabled</h2>
+        <IconButton compact {...args} disabled="Disabled reason" />
+      </div>
+      <div>
+        <h2>Colored</h2>
+        <IconButton compact {...args} color={Palette.Red700} />
       </div>
     </div>
   </div>

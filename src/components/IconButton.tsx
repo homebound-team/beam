@@ -17,6 +17,8 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
   buttonRef?: RefObject<HTMLButtonElement>;
+  /** Whether to show a 16x16px version of the IconButton */
+  compact?: boolean;
 }
 
 export function IconButton(props: IconButtonProps) {
@@ -31,6 +33,7 @@ export function IconButton(props: IconButtonProps) {
     tooltip,
     menuTriggerProps,
     openInNew,
+    compact = false,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
@@ -51,16 +54,17 @@ export function IconButton(props: IconButtonProps) {
   const styles = useMemo(
     () => ({
       ...iconButtonStylesReset,
+      ...(compact ? iconButtonCompact : iconButtonNormal),
       ...(isHovered && iconButtonStylesHover),
       ...(isFocusVisible && iconButtonStylesFocus),
       ...(isDisabled && iconButtonStylesDisabled),
     }),
-    [isHovered, isFocusVisible, isDisabled],
+    [isHovered, isFocusVisible, isDisabled, compact],
   );
 
   const buttonAttrs = { ...testIds, ...buttonProps, ...focusProps, ...hoverProps, ref: ref as any, css: styles };
   const buttonContent = (
-    <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : Palette.Gray900)} inc={inc} />
+    <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : Palette.Gray900)} inc={compact ? 2 : inc} />
   );
 
   const button =
@@ -86,8 +90,9 @@ export function IconButton(props: IconButtonProps) {
   });
 }
 
-const iconButtonStylesReset =
-  Css.hPx(28).wPx(28).br8.bTransparent.bsSolid.bw2.bgTransparent.cursorPointer.outline0.p0.dif.aic.jcc.transition.$;
+const iconButtonStylesReset = Css.bTransparent.bsSolid.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
+const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
+const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
 export const iconButtonStylesHover = Css.bgGray200.$;
 const iconButtonStylesFocus = Css.bLightBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;
