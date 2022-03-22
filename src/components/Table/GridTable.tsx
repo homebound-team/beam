@@ -20,6 +20,7 @@ import { SortState, useSortState } from "src/components/Table/useSortState";
 import { visit } from "src/components/Table/visitor";
 import { Css, Margin, Only, Properties, Typography, Xss } from "src/Css";
 import { useComputed } from "src/hooks";
+import { useRenderCount } from "src/hooks/useRenderCount";
 import tinycolor from "tinycolor2";
 import { defaultStyle } from ".";
 
@@ -973,6 +974,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const isHeader = row.kind === "header";
   const rowStyle = rowStyles?.[row.kind];
   const Row = as === "table" ? "tr" : "div";
+  const count = useRenderCount();
 
   const openCardStyles =
     typeof openCards === "string"
@@ -1000,7 +1002,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   let currentColspan = 1;
 
   const rowNode = (
-    <Row css={rowCss} {...others} data-gridrow>
+    <Row css={rowCss} {...others} data-gridrow {...count}>
       {columns.map((column, columnIndex) => {
         if (column.mw) {
           // Validate the column's minWidth definition if set.

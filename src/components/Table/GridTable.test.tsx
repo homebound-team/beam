@@ -1374,6 +1374,21 @@ describe("GridTable", () => {
     // Then we can still render
     await render(<GridTable rows={[row1]} columns={columns} />);
   });
+
+  it("providers a per-row render count ", async () => {
+    const [header, row1, row2] = rows;
+    const columns = [nameColumn];
+    // Given a table is initially rendered with 1 row
+    const r = await render(<GridTable columns={columns} rows={[header, row1]} />);
+    // Then the 1st row was rendered once
+    expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+    // And when we render a new row
+    r.rerender(<GridTable columns={columns} rows={[header, row1, row2]} />);
+    // Then the new row also rendered once
+    expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+    // And the original row did not need to re-render
+    expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+  });
 });
 
 function Collapse({ id }: { id: string }) {
