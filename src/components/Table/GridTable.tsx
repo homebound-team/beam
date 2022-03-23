@@ -1013,7 +1013,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
       }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     // Maybe add the sticky header styles
-    ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z1.$ : undefined),
+    ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z2.$ : undefined),
     ...getNestedCardStyles(row, openCardStyles, style),
   };
 

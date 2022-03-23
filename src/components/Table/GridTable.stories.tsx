@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { observable } from "mobx";
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   actionColumn,
   Button,
@@ -920,6 +920,33 @@ export function StickyColumnsNestedCards() {
           as="virtual"
         />
       </div>
+    </div>
+  );
+}
+
+export function StickyColumnsAndHeader() {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px", sticky: "left" };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
+  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
+  const rows: GridDataRow<Row>[] = useMemo(
+    () => [
+      { kind: "header", id: "header" },
+      ...zeroTo(500).map((i) => ({ kind: "data" as const, id: String(i), name: `ccc ${i}`, value: i })),
+    ],
+    [],
+  );
+  const scrollWrap = useRef<HTMLDivElement>(null);
+
+  // Scroll wrapping element's x & y coordinates to demonstrate proper z-indices for sticky header and columns.
+  useEffect(() => {
+    if (scrollWrap.current) {
+      scrollWrap.current.scroll(45, 26);
+    }
+  }, []);
+
+  return (
+    <div ref={scrollWrap} css={Css.wPx(500).hPx(500).overflowAuto.$}>
+      <GridTable columns={[nameColumn, valueColumn, actionColumn]} rows={rows} stickyHeader />
     </div>
   );
 }
