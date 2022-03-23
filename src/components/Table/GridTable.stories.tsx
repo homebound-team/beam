@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { observable } from "mobx";
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   actionColumn,
   Button,
@@ -764,4 +764,189 @@ function makeNestedRows(repeat: number = 1): GridDataRow<NestedRow>[] {
     ];
     return rows;
   });
+}
+
+export function StickyColumns() {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
+  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
+  return (
+    <div>
+      <h1 css={Css.lgEm.$}>First column sticky left</h1>
+      <div css={Css.wPx(500).overflowAuto.$}>
+        <GridTable
+          columns={[{ ...nameColumn, sticky: "left" }, valueColumn, actionColumn]}
+          rows={[
+            { kind: "header", id: "header" },
+            { kind: "data", id: "1", name: "a", value: 1 },
+            { kind: "data", id: "2", name: "b", value: 2 },
+          ]}
+        />
+      </div>
+
+      <h1 css={Css.lgEm.mt3.$}>Last column sticky right</h1>
+      <div css={Css.wPx(500).overflowAuto.$}>
+        <GridTable
+          columns={[nameColumn, valueColumn, { ...actionColumn, sticky: "right" }]}
+          rows={[
+            { kind: "header", id: "header" },
+            { kind: "data", id: "1", name: "a", value: 1 },
+            { kind: "data", id: "2", name: "b", value: 2 },
+          ]}
+        />
+      </div>
+
+      <h1 css={Css.lgEm.mt3.$}>Center column sticky left</h1>
+      <div css={Css.wPx(500).overflowAuto.$}>
+        <GridTable
+          columns={[nameColumn, { ...valueColumn, sticky: "left" }, actionColumn]}
+          rows={[
+            { kind: "header", id: "header" },
+            { kind: "data", id: "1", name: "a", value: 1 },
+            { kind: "data", id: "2", name: "b", value: 2 },
+          ]}
+        />
+      </div>
+
+      <h1 css={Css.lgEm.mt3.$}>Center column sticky right</h1>
+      <div css={Css.wPx(500).overflowAuto.$}>
+        <GridTable
+          columns={[nameColumn, { ...valueColumn, sticky: "right" }, actionColumn]}
+          rows={[
+            { kind: "header", id: "header" },
+            { kind: "data", id: "1", name: "a", value: 1 },
+            { kind: "data", id: "2", name: "b", value: 2 },
+          ]}
+        />
+      </div>
+
+      <h1 css={Css.lgEm.mt3.$}>Last column non-header cells sticky</h1>
+      <div css={Css.wPx(500).overflowAuto.$}>
+        <GridTable
+          columns={[
+            nameColumn,
+            valueColumn,
+            {
+              header: "Actions (not sticky)",
+              data: () => ({ content: "Actions (sticky)", sticky: "right" }),
+              w: "200px",
+            },
+          ]}
+          rows={[
+            { kind: "header", id: "header" },
+            { kind: "data", id: "1", name: "a", value: 1 },
+            { kind: "data", id: "2", name: "b", value: 2 },
+          ]}
+        />
+      </div>
+    </div>
+  );
+}
+
+export function StickyColumnsNestedCards() {
+  const nameColumn: GridColumn<NestedRow> = {
+    header: () => "Name",
+    parent: (row) => ({
+      content: () => <div css={Css.base.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    child: (row) => ({
+      content: () => <div css={Css.sm.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    grandChild: (row) => ({
+      content: () => <div css={Css.xs.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    add: () => "Add",
+    w: "200px",
+  };
+  const actionColumn: GridColumn<NestedRow> = {
+    header: () => "Action",
+    parent: () => "",
+    child: () => "",
+    grandChild: () => <div css={Css.xs.$}>Delete</div>,
+    add: () => "",
+    clientSideSort: false,
+    w: "200px",
+  };
+  const spacing = { brPx: 4, pxPx: 4 };
+  const nestedStyle: GridStyle = {
+    nestedCards: {
+      firstLastColumnWidth: 24,
+      spacerPx: 8,
+      kinds: {
+        parent: { bgColor: Palette.Gray500, ...spacing },
+        child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
+        grandChild: { bgColor: Palette.Green200, bColor: Palette.Green400, ...spacing },
+      },
+    },
+  };
+  return (
+    <div>
+      <h1 css={Css.lgEm.$}>First column sticky left</h1>
+      <div css={Css.wPx(500).hPx(460).overflowAuto.$}>
+        <GridTable
+          columns={[{ ...nameColumn, sticky: "left" }, nameColumn, actionColumn]}
+          rows={rowsWithHeader}
+          style={nestedStyle}
+          as="virtual"
+        />
+      </div>
+
+      <h1 css={Css.lgEm.mt3.$}>Last column sticky right</h1>
+      <div css={Css.wPx(500).hPx(460).overflowAuto.$}>
+        <GridTable
+          columns={[nameColumn, nameColumn, { ...actionColumn, sticky: "right" }]}
+          rows={rowsWithHeader}
+          style={nestedStyle}
+          as="virtual"
+        />
+      </div>
+
+      <h1 css={Css.lgEm.mt3.$}>Last column only "grandchild" cells sticky</h1>
+      <div css={Css.wPx(500).hPx(460).overflowAuto.$}>
+        <GridTable
+          columns={[
+            nameColumn,
+            nameColumn,
+            {
+              ...actionColumn,
+              grandChild: () => ({ content: () => <div css={Css.xs.$}>Delete</div>, sticky: "right" }),
+            },
+          ]}
+          rows={rowsWithHeader}
+          style={nestedStyle}
+          as="virtual"
+        />
+      </div>
+    </div>
+  );
+}
+
+export function StickyColumnsAndHeader() {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px", sticky: "left" };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
+  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
+  const rows: GridDataRow<Row>[] = useMemo(
+    () => [
+      { kind: "header", id: "header" },
+      ...zeroTo(500).map((i) => ({ kind: "data" as const, id: String(i), name: `ccc ${i}`, value: i })),
+    ],
+    [],
+  );
+  const scrollWrap = useRef<HTMLDivElement>(null);
+
+  // Scroll wrapping element's x & y coordinates to demonstrate proper z-indices for sticky header and columns.
+  useEffect(() => {
+    if (scrollWrap.current) {
+      scrollWrap.current.scroll(45, 26);
+    }
+  }, []);
+
+  return (
+    <div ref={scrollWrap} css={Css.wPx(500).hPx(500).overflowAuto.$}>
+      <GridTable columns={[nameColumn, valueColumn, actionColumn]} rows={rows} stickyHeader />
+    </div>
+  );
 }
