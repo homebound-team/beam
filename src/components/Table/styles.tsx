@@ -13,7 +13,6 @@ export const defaultStyle: GridStyle = {
   indentTwoCss: Css.pl7.$,
   headerCellCss: Css.nowrap.py1.bgGray100.aife.$,
   firstRowMessageCss: Css.px1.py2.$,
-  rowHoverColor: Palette.Gray200,
 };
 
 /** Tightens up the padding of rows, great for rows that have form elements in them. */
@@ -47,7 +46,6 @@ export const beamFixedStyle: GridStyle = {
   cellCss: Css.gray900.xs.bgWhite.aic.nowrap.pxPx(12).hPx(36).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
   emptyCell: "-",
   presentationSettings: { borderless: true, typeScale: "xs", wrap: false },
-  rowHoverColor: Palette.Gray200,
   // Included as a hacky "treat indent as deprecated for this table" hint to GridTable
   levels: {},
 };

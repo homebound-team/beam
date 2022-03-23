@@ -24,10 +24,9 @@ import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
 import { SortState, useSortState } from "src/components/Table/useSortState";
 import { visit } from "src/components/Table/visitor";
-import { Css, Margin, Only, Properties, Typography, Xss } from "src/Css";
+import { Css, Margin, Only, Palette, Properties, Typography, Xss } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
-import tinycolor from "tinycolor2";
 import { defaultStyle } from ".";
 
 export type Kinded = { kind: string };
@@ -75,7 +74,7 @@ export interface GridStyle {
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
-  rowHoverColor?: string;
+  rowHoverColor?: Palette;
   /** Styling for our special "nested card" output mode. */
   nestedCards?: NestedCardsStyle;
   /** Default content to put into an empty cell */
@@ -1006,11 +1005,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const rowCss = {
     // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `flexNone` to ensure they stay their defined widths
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.flexNone.$).$),
-    ...((rowStyle?.rowLink || rowStyle?.onClick) &&
-      style.rowHoverColor && {
-        // Even though backgroundColor is set on the cellCss (due to display: content), the hover target is the row.
-        "&:hover > *": Css.cursorPointer.bgColor(maybeDarken(rowStyleCellCss?.backgroundColor, style.rowHoverColor)).$,
-      }),
+    ...((rowStyle?.rowLink || rowStyle?.onClick) && {
+      // Even though backgroundColor is set on the cellCss, the hover target is the row.
+      "&:hover > *": Css.cursorPointer.bgColor(style.rowHoverColor ?? Palette.LightBlue100).$,
+    }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     // Maybe add the sticky header styles
     ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z2.$ : undefined),
@@ -1347,10 +1345,6 @@ export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter:
     return Number(filter) === value;
   }
   return false;
-}
-
-function maybeDarken(color: string | undefined, defaultColor: string): string {
-  return color ? tinycolor(color).darken(4).toString() : defaultColor;
 }
 
 /** GridTable as Table utility to apply <tr> element override styles. */
