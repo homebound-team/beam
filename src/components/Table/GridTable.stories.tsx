@@ -950,3 +950,83 @@ export function StickyColumnsAndHeader() {
     </div>
   );
 }
+
+export function ActiveRow() {
+  const [activeRowId, setActiveRowId] = useState("data_2");
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
+  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
+  const rowStyles: GridRowStyles<Row> = useMemo(
+    () => ({ data: { onClick: (row) => setActiveRowId(`data_${row.id}`) } }),
+    [],
+  );
+  const rows = useMemo(
+    () => [
+      { kind: "header" as const, id: "header" },
+      { kind: "data" as const, id: "1", name: "a", value: 1 },
+      { kind: "data" as const, id: "2", name: "b", value: 2 },
+      { kind: "data" as const, id: "3", name: "c", value: 3 },
+    ],
+    [],
+  );
+  const columns = useMemo(() => [nameColumn, valueColumn, actionColumn], []);
+  return <GridTable columns={columns} activeRowId={activeRowId} rowStyles={rowStyles} rows={rows} />;
+}
+
+export function ActiveRowNestedCard() {
+  const nameColumn: GridColumn<NestedRow> = {
+    header: () => "Name",
+    parent: (row) => ({
+      content: () => <div css={Css.base.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    child: (row) => ({
+      content: () => <div css={Css.sm.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    grandChild: (row) => ({
+      content: () => <div css={Css.xs.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    add: () => "Add",
+  };
+  const actionColumn: GridColumn<NestedRow> = {
+    header: () => "Action",
+    parent: () => "",
+    child: () => "",
+    grandChild: () => <div css={Css.xs.$}>Delete</div>,
+    add: () => "",
+    clientSideSort: false,
+  };
+  const spacing = { brPx: 4, pxPx: 4 };
+  const nestedStyle: GridStyle = useMemo(
+    () => ({
+      nestedCards: {
+        firstLastColumnWidth: 24,
+        spacerPx: 8,
+        kinds: {
+          parent: { bgColor: Palette.Gray500, ...spacing },
+          child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
+          grandChild: { bgColor: Palette.Green200, bColor: Palette.Green400, ...spacing },
+        },
+      },
+    }),
+    [],
+  );
+  const columns = useMemo(() => [nameColumn, nameColumn, actionColumn], []);
+  const [activeRowId, setActiveRowId] = useState("grandChild_p0c1g2");
+  const rowStyles: GridRowStyles<NestedRow> = useMemo(
+    () => ({ grandChild: { onClick: (row) => setActiveRowId(`grandChild_${row.id}`) } }),
+    [],
+  );
+
+  return (
+    <GridTable
+      columns={columns}
+      rows={rowsWithHeader}
+      style={nestedStyle}
+      activeRowId={activeRowId}
+      rowStyles={rowStyles}
+    />
+  );
+}

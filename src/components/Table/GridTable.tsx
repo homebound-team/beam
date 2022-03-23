@@ -224,6 +224,12 @@ export interface GridTableProps<R extends Kinded, S, X> {
   api?: MutableRefObject<GridTableApi<R> | undefined>;
   /** Experimental, expecting to be removed - Specify the element in which the table should resize its columns against. If not set, the table will resize columns based on its owns container's width */
   resizeTarget?: MutableRefObject<HTMLElement | null>;
+  /**
+   * Defines which row in the table should be provided with an "active" styling.
+   * Expected format is `${row.kind}_${row.id}`. This helps avoid id conflicts between rows of different types/kinds that may have the same id.
+   * Example "data_123"
+   */
+  activeRowId?: string;
 }
 
 /** NOTE: This API is experimental and primarily intended for story and testing purposes */
@@ -276,6 +282,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     persistCollapse,
     api,
     resizeTarget,
+    activeRowId,
   } = props;
 
   // Create a ref that always contains the latest rows, for our effectively-singleton RowState to use
@@ -351,6 +358,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             columnSizes,
             level,
             getCount,
+            isActive: `${row.kind}_${row.id}` === activeRowId,
             ...sortProps,
           }}
         />
@@ -421,6 +429,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     observeRows,
     columnSizes,
     collapsedIds,
+    activeRowId,
   ]);
 
   let tooManyClientSideRows = false;
@@ -966,6 +975,7 @@ interface GridRowProps<R extends Kinded, S> {
   columnSizes: string[];
   level: number;
   getCount: (id: string) => object;
+  isActive: boolean;
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -985,6 +995,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     columnSizes,
     level,
     getCount,
+    isActive,
     ...others
   } = props;
 
@@ -1012,7 +1023,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     // Maybe add the sticky header styles
     ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z2.$ : undefined),
-    ...getNestedCardStyles(row, openCardStyles, style),
+    ...getNestedCardStyles(row, openCardStyles, style, isActive),
   };
 
   let currentColspan = 1;
@@ -1107,6 +1118,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...(!isHeader && !!style.levels && style.levels[level]?.cellCss),
           // The specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
+          // Apply active row styling for non-nested card styles.
+          ...(style.nestedCards === undefined && isActive ? Css.bgLightBlue50.$ : {}),
           // Add any cell specific style overrides
           ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
           // Define the width of the column on each cell. Supports col spans.
