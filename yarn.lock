@@ -5617,11 +5617,6 @@
   dependencies:
     "@types/jest" "*"
 
-"@types/tinycolor2@^1.4.2":
-  version "1.4.2"
-  resolved "https://registry.npmjs.org/@types/tinycolor2/-/tinycolor2-1.4.2.tgz"
-  integrity sha512-PeHg/AtdW6aaIO2a+98Xj7rWY4KC1E6yOy7AFknJQ7VXUGNrMlyxDFxJo7HqLtjQms/ZhhQX52mLVW/EX3JGOw==
-
 "@types/trusted-types@*":
   version "2.0.2"
   resolved "https://registry.npmjs.org/@types/trusted-types/-/trusted-types-2.0.2.tgz"
@@ -16257,11 +16252,6 @@ tiny-warning@^1.0.0, tiny-warning@^1.0.3:
   version "1.0.3"
   resolved "https://registry.npmjs.org/tiny-warning/-/tiny-warning-1.0.3.tgz"
   integrity sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA==
-
-tinycolor2@^1.4.2:
-  version "1.4.2"
-  resolved "https://registry.npmjs.org/tinycolor2/-/tinycolor2-1.4.2.tgz"
-  integrity sha512-vJhccZPs965sV/L2sU4oRQVAos0pQXwsvTLkWYdqJ+a8Q5kPFzJTuOFwy7UniPli44NKQGAglksjvOcpo95aZA==
 
 tmp-promise@3.0.2:
   version "3.0.2"
