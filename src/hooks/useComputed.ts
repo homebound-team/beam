@@ -15,7 +15,12 @@ export function useComputed<T>(fn: () => T, deps: readonly any[]): T {
     }
     autoRunner.current = autorun(() => {
       // Always eval fn() (even on 1st render) to register our observable.
-      autoRanValue.current = fn();
+      const newValue = fn();
+      // We could eventually use a deep equals to handle objects
+      if (newValue === autoRanValue.current) {
+        return;
+      }
+      autoRanValue.current = newValue;
       // Only trigger a re-render if this is not the 1st autorun. Note
       // that if deps has changed, we're inherently in a re-render so also
       // don't need to trigger an additional re-render.
