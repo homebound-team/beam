@@ -206,7 +206,13 @@ export function getNestedCardStyles(
             .bgColor(leafCardStyles.bgColor)
             .if(!!leafCardStyles.bColor)
             .bc(leafCardStyles.bColor).ba.$,
-          ...(isActive ? Css.bshFocus.$ : {}),
+          ...(isActive
+            ? Css.boxShadow(
+                `0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px ${
+                  style.nestedCards?.activeBColor ?? Palette.LightBlue700
+                }`,
+              ).$
+            : {}),
         }
       : undefined),
   };

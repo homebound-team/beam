@@ -85,6 +85,8 @@ export interface GridStyle {
   minWidthPx?: number;
   /** Css to apply at each level of a parent/child nested table. */
   levels?: Record<number, { cellCss: Properties }>;
+  /** Allows for customization of the background color used to denote an "active" row */
+  activeBgColor?: Palette;
 }
 
 export type NestedCardStyleByKind = Record<string, NestedCardStyle>;
@@ -100,6 +102,8 @@ export interface NestedCardsStyle {
    * Entries are optional, i.e. you can leave out kinds and they won't be wrapped/turned into cards.
    */
   kinds: NestedCardStyleByKind;
+  /** Allows for customization of the border color used to denote an "active" row */
+  activeBColor?: Palette;
 }
 
 /**
@@ -1119,7 +1123,9 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           // The specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
           // Apply active row styling for non-nested card styles.
-          ...(style.nestedCards === undefined && isActive ? Css.bgLightBlue50.$ : {}),
+          ...(style.nestedCards === undefined && isActive
+            ? Css.bgColor(style.activeBgColor ?? Palette.LightBlue50).$
+            : {}),
           // Add any cell specific style overrides
           ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
           // Define the width of the column on each cell. Supports col spans.
