@@ -17,6 +17,7 @@ import {
   GridRowStyles,
   GridStyle,
   GridTable,
+  GridTableApi,
   GridTableProps,
   Icon,
   IconButton,
@@ -952,13 +953,21 @@ export function StickyColumnsAndHeader() {
 }
 
 export function ActiveRow() {
-  const [activeRowId, setActiveRowId] = useState("data_2");
+  const api = useRef<GridTableApi<Row> | undefined>();
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
   const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
   const rowStyles: GridRowStyles<Row> = useMemo(
-    () => ({ data: { onClick: (row) => setActiveRowId(`data_${row.id}`) } }),
-    [],
+    () => ({
+      data: {
+        onClick: (row) => {
+          if (api.current) {
+            api.current.setActiveRowId(`data_${row.id}`);
+          }
+        },
+      },
+    }),
+    [api],
   );
   const rows = useMemo(
     () => [
@@ -970,7 +979,7 @@ export function ActiveRow() {
     [],
   );
   const columns = useMemo(() => [nameColumn, valueColumn, actionColumn], []);
-  return <GridTable columns={columns} activeRowId={activeRowId} rowStyles={rowStyles} rows={rows} />;
+  return <GridTable columns={columns} activeRowId={"data_2"} api={api} rowStyles={rowStyles} rows={rows} observeRows />;
 }
 
 export function ActiveRowNestedCard() {
@@ -994,7 +1003,9 @@ export function ActiveRowNestedCard() {
     header: () => "Action",
     parent: () => "",
     child: () => "",
-    grandChild: () => <div css={Css.xs.$}>Delete</div>,
+    grandChild: (row, api) => (
+      <Button label="Activate Row" onClick={() => api.setActiveRowId(`grandChild_${row.id}`)} />
+    ),
     add: () => "",
     clientSideSort: false,
   };
@@ -1014,19 +1025,6 @@ export function ActiveRowNestedCard() {
     [],
   );
   const columns = useMemo(() => [nameColumn, nameColumn, actionColumn], []);
-  const [activeRowId, setActiveRowId] = useState("grandChild_p0c1g2");
-  const rowStyles: GridRowStyles<NestedRow> = useMemo(
-    () => ({ grandChild: { onClick: (row) => setActiveRowId(`grandChild_${row.id}`) } }),
-    [],
-  );
 
-  return (
-    <GridTable
-      columns={columns}
-      rows={rowsWithHeader}
-      style={nestedStyle}
-      activeRowId={activeRowId}
-      rowStyles={rowStyles}
-    />
-  );
+  return <GridTable columns={columns} rows={rowsWithHeader} style={nestedStyle} activeRowId="grandChild_p0c1g2" />;
 }

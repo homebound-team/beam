@@ -26,11 +26,19 @@ export class RowState {
   private readonly collapsedRows: ObservableSet<string>;
   private readonly selectedRows = new ObservableMap<string, SelectedState>();
 
+  // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
+  activeRowId: string | undefined;
+
   /**
    * Creates the `RowState` for a given `GridTable`.
    */
-  constructor(private rows: MutableRefObject<GridDataRow<any>[]>, private persistCollapse: string | undefined) {
+  constructor(
+    private rows: MutableRefObject<GridDataRow<any>[]>,
+    private persistCollapse: string | undefined,
+    activeRowId: string | undefined,
+  ) {
     this.collapsedRows = new ObservableSet(persistCollapse ? readLocalCollapseState(persistCollapse) : []);
+    this.activeRowId = activeRowId;
     // Make ourselves an observable so that mobx will do caching of .collapseIds so
     // that it'll be a stable identity for GridTable to useMemo against.
     makeAutoObservable(this, { rows: false } as any); // as any b/c rows is private, so the mapped type doesn't see it

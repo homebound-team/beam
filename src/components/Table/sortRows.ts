@@ -38,8 +38,8 @@ function sortBatch<R extends Kinded>(
 
   // Make a shallow copy for sorting to avoid mutating the original list
   return [...batch].sort((a, b) => {
-    const v1 = sortValue(applyRowFn(column, a));
-    const v2 = sortValue(applyRowFn(column, b));
+    const v1 = sortValue(applyRowFn(column, a, {} as any));
+    const v2 = sortValue(applyRowFn(column, b, {} as any));
     const v1e = v1 === null || v1 === undefined;
     const v2e = v2 === null || v2 === undefined;
     if (a.pin || b.pin) {
