@@ -35,6 +35,21 @@ describe("useComputed", () => {
     expect(name()).toHaveTextContent("bar");
   });
 
+  it("does not re-renders on proxy change that doesn't change return value", async () => {
+    const someProxy = observable({ name: "foo" });
+    const { name } = await render(<TestComponent someProxy={someProxy} computedFn={(p) => p.name.substring(0, 1)} />);
+    expect(renderedCount).toEqual(1);
+    expect(evaledCount).toEqual(1);
+    expect(name()).toHaveTextContent("f");
+
+    act(() => {
+      someProxy.name = "food";
+    });
+    expect(renderedCount).toEqual(1);
+    expect(evaledCount).toEqual(2);
+    expect(name()).toHaveTextContent("f");
+  });
+
   it("re-renders on other hook change", async () => {
     const someProxy = observable({ name: "foo" });
     const { name, color, makeBlue } = await render(<TestComponent someProxy={someProxy} />);
@@ -71,14 +86,21 @@ describe("useComputed", () => {
   });
 });
 
-function TestComponent(props: { someProxy: { name: string } }) {
-  const { someProxy } = props;
+type SomeProxy = { name: string };
+
+interface TestComponentProps {
+  someProxy: SomeProxy;
+  computedFn?: (o: SomeProxy, dep: string) => string;
+}
+
+function TestComponent(props: TestComponentProps) {
+  const { someProxy, computedFn } = props;
   const [dep, setDep] = useState("dep1");
   // Add another hook to trigger non-proxy-driven re-renders
   const [color, setColor] = useState("red");
   const name = useComputed(() => {
     evaledCount++;
-    return `${someProxy.name}-${dep}`;
+    return computedFn ? computedFn(someProxy, dep) : `${someProxy.name}-${dep}`;
   }, [dep]);
   renderedCount++;
   return (
