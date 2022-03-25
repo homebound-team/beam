@@ -170,13 +170,7 @@ export function wrapCard(openCards: NestedCardStyle[], row: JSX.Element): JSX.El
   let div: JSX.Element = row;
   [...openCards].reverse().forEach((card) => {
     div = (
-      <div
-        css={{
-          ...Css.h100.pxPx(card.pxPx).bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).bl.br.$,
-        }}
-      >
-        {div}
-      </div>
+      <div css={Css.h100.pxPx(card.pxPx).bgColor(card.bgColor).if(!!card.bColor).bc(card.bColor).bl.br.$}>{div}</div>
     );
   });
 
@@ -187,6 +181,7 @@ export function getNestedCardStyles(
   row: GridDataRow<any>,
   openCardStyles: NestedCardStyle[] | undefined,
   style: GridStyle,
+  isActive: boolean,
 ) {
   const leafCardStyles = isLeafRow(row) ? style.nestedCards?.kinds[row.kind] : undefined;
   // Calculate the horizontal space already allocated by the open cards (paddings and borders)
@@ -205,11 +200,20 @@ export function getNestedCardStyles(
         // When it is not a leaf then it has chrome rows that create the top and bottom "padding" based on border-radius size. (brPx = "chrome" row height)
         // When it is a leaf, then we need to apply the brPx to the row to ensure consistent spacing between leaf & non-leaf renders
         // Additionally, if the leaf card has a border, then subtract the 1px border width from the padding to keep consistent with the "chrome" row
-        Css.pyPx(leafCardStyles.brPx - (leafCardStyles.bColor ? 1 : 0))
-          .borderRadius(`${leafCardStyles.brPx}px`)
-          .bgColor(leafCardStyles.bgColor)
-          .if(!!leafCardStyles.bColor)
-          .bc(leafCardStyles.bColor).ba.$
+        {
+          ...Css.pyPx(leafCardStyles.brPx - (leafCardStyles.bColor ? 1 : 0))
+            .borderRadius(`${leafCardStyles.brPx}px`)
+            .bgColor(leafCardStyles.bgColor)
+            .if(!!leafCardStyles.bColor)
+            .bc(leafCardStyles.bColor).ba.$,
+          ...(isActive
+            ? Css.boxShadow(
+                `0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px ${
+                  style.nestedCards?.activeBColor ?? Palette.LightBlue700
+                }`,
+              ).$
+            : {}),
+        }
       : undefined),
   };
 }

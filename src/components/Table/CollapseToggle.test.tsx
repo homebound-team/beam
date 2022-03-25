@@ -4,7 +4,7 @@ import { render } from "src/utils/rtl";
 
 describe("CollapseToggle", () => {
   it("defaults to uncollapsed", async () => {
-    const rowState = new RowState(null!, undefined);
+    const rowState = new RowState(null!, undefined, undefined);
     const r = await render(
       <RowStateContext.Provider value={{ rowState }}>
         <CollapseToggle row={{ id: "r:1", kind: "header" }} />
@@ -19,7 +19,7 @@ describe("CollapseToggle", () => {
     [true, "otherKind", "chevronRight"],
     [false, "otherKind", "chevronDown"],
   ])("displays the correct chevron based on context and kind", async (isCollapsed, kind, expectedIcon) => {
-    const rowState = new RowState(null!, undefined);
+    const rowState = new RowState(null!, undefined, undefined);
     if (isCollapsed) {
       rowState.toggleCollapsed("r:1");
     }
@@ -32,7 +32,7 @@ describe("CollapseToggle", () => {
   });
 
   it("only renders for non-header rows when there are children", async () => {
-    const rowState = new RowState(null!, undefined);
+    const rowState = new RowState(null!, undefined, undefined);
     const r = await render(
       <RowStateContext.Provider value={{ rowState }}>
         <CollapseToggle row={{ id: "r:1", kind: "otherKind", children: [] }} />
