@@ -905,7 +905,7 @@ export interface RowStyle<R extends Kinded> {
   /** Whether the row should be a link. */
   rowLink?: (row: R) => string;
   /** Fired when the row is clicked, similar to rowLink but for actions that aren't 'go to this link'. */
-  onClick?: (row: GridDataRow<R>) => void;
+  onClick?: (row: GridDataRow<R>, api: GridTableApi<R>) => void;
 }
 
 function getIndentationCss<R extends Kinded>(
@@ -1164,7 +1164,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             : isHeader
             ? headerRenderFn(columns, column, sortState, setSortKey, as)
             : rowStyle?.onClick
-            ? rowClickRenderFn(as)
+            ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);
 
         return renderFn(columnIndex, cellCss, content, row, rowStyle);
@@ -1318,14 +1318,15 @@ const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (
 };
 
 /** Renders a cell that will fire the RowStyle.onClick. */
-const rowClickRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (key, css, content, row, rowStyle) => {
-  const Row = as === "table" ? "tr" : "div";
-  return (
-    <Row {...{ key }} css={{ ...css, ...tableRowStyles(as) }} onClick={() => rowStyle!.onClick!(row)}>
-      {content}
-    </Row>
-  );
-};
+const rowClickRenderFn: (as: RenderAs, api: MutableRefObject<GridTableApi<any>>) => RenderCellFn<any> =
+  (as: RenderAs, api: MutableRefObject<GridTableApi<any>>) => (key, css, content, row, rowStyle) => {
+    const Row = as === "table" ? "tr" : "div";
+    return (
+      <Row {...{ key }} css={{ ...css, ...tableRowStyles(as) }} onClick={() => rowStyle!.onClick!(row, api.current)}>
+        {content}
+      </Row>
+    );
+  };
 
 const alignmentToJustify: Record<GridCellAlignment, Properties["justifyContent"]> = {
   left: "flex-start",

@@ -17,7 +17,6 @@ import {
   GridRowStyles,
   GridStyle,
   GridTable,
-  GridTableApi,
   GridTableProps,
   Icon,
   IconButton,
@@ -953,21 +952,18 @@ export function StickyColumnsAndHeader() {
 }
 
 export function ActiveRow() {
-  const api = useRef<GridTableApi<Row> | undefined>();
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
   const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
   const rowStyles: GridRowStyles<Row> = useMemo(
     () => ({
       data: {
-        onClick: (row) => {
-          if (api.current) {
-            api.current.setActiveRowId(`data_${row.id}`);
-          }
+        onClick: (row, api) => {
+          api.setActiveRowId(`data_${row.id}`);
         },
       },
     }),
-    [api],
+    [],
   );
   const rows = useMemo(
     () => [
@@ -979,7 +975,7 @@ export function ActiveRow() {
     [],
   );
   const columns = useMemo(() => [nameColumn, valueColumn, actionColumn], []);
-  return <GridTable columns={columns} activeRowId={"data_2"} api={api} rowStyles={rowStyles} rows={rows} observeRows />;
+  return <GridTable columns={columns} activeRowId="data_2" rowStyles={rowStyles} rows={rows} observeRows />;
 }
 
 export function ActiveRowNestedCard() {
