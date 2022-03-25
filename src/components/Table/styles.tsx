@@ -12,7 +12,7 @@ export const defaultStyle: GridStyle = {
   indentOneCss: Css.pl4.$,
   indentTwoCss: Css.pl7.$,
   headerCellCss: Css.nowrap.py1.bgGray100.aife.$,
-  firstRowMessageCss: Css.px1.py2.$,
+  firstRowMessageCss: Css.tc.p3.$,
 };
 
 /** Tightens up the padding of rows, great for rows that have form elements in them. */
