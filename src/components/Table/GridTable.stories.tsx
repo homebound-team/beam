@@ -3,6 +3,7 @@ import { observable } from "mobx";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   actionColumn,
+  beamFlexibleStyle,
   Button,
   cardStyle,
   CollapseToggle,
@@ -482,6 +483,20 @@ export const StyleCondensedWithNoPadding = newStory(() => {
         ]}
       />
     </div>
+  );
+}, {});
+
+export const StyleCondensedWithNoRowsFallback = newStory(() => {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
+  return (
+    <GridTable<Row>
+      columns={[nameColumn, valueColumn, actionColumn]}
+      style={condensedStyle}
+      fallbackMessage="There were no rows"
+      rows={[]}
+    />
   );
 }, {});
 
