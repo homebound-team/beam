@@ -38,6 +38,7 @@ export function selectColumn<T extends Kinded, S = {}>(columnDef?: Partial<GridC
     align: "center",
     // Defining `w: 48px` to accommodate for the `16px` wide checkbox and `16px` of padding on either side.
     w: "48px",
+    wrapAction: false,
     // Use any of the user's per-row kind methods if they have them.
     ...columnDef,
   };
@@ -60,6 +61,7 @@ export function collapseColumn<T extends Kinded, S = {}>(columnDef?: Partial<Gri
     align: "center",
     // Defining `w: 38px` based on the designs
     w: "38px",
+    wrapAction: false,
     ...columnDef,
   };
   return newMethodMissingProxy(base, (key) => {

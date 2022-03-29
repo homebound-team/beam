@@ -875,6 +875,8 @@ export type GridColumn<R extends Kinded, S = {}> = {
   serverSideSortKey?: S;
   /** Allows the column to stay in place when the user scrolls horizontally */
   sticky?: "left" | "right";
+  /** Prevent column from supporting RowStyle.onClick/rowLink in order to avoid nested interactivity. Defaults to true */
+  wrapAction?: false;
 };
 
 export const nonKindGridColumnKeys = ["w", "mw", "align", "clientSideSort", "serverSideSortKey"];
@@ -1056,6 +1058,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const rowNode = (
     <Row css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
       {columns.map((column, columnIndex) => {
+        const { wrapAction = true } = column;
+
         if (column.mw) {
           // Validate the column's minWidth definition if set.
           if (!column.mw.endsWith("px") && !column.mw.endsWith("%")) {
@@ -1159,11 +1163,11 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         };
 
         const renderFn: RenderCellFn<any> =
-          rowStyle?.renderCell || rowStyle?.rowLink
+          (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
             ? rowLinkRenderFn(as)
             : isHeader
             ? headerRenderFn(columns, column, sortState, setSortKey, as)
-            : rowStyle?.onClick
+            : rowStyle?.onClick && wrapAction
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);
 

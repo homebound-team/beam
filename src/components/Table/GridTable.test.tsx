@@ -24,7 +24,7 @@ import {
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Checkbox } from "src/inputs";
-import { cell, cellAnd, cellOf, click, render, row, rowAnd } from "src/utils/rtl";
+import { cell, cellAnd, cellOf, click, render, row, rowAnd, withRouter } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
@@ -795,6 +795,39 @@ describe("GridTable", () => {
     click(cell(r, 1, 0));
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(onClick.mock.calls[0][0].name).toEqual("foo");
+  });
+
+  it("can omit onClick for columns", async () => {
+    // Given rowStyles that specify an action for each row
+    const onClick = jest.fn();
+    const rowStyles: GridRowStyles<Row> = { header: {}, data: { onClick } };
+    // And a table where one columns omits wrapping the action
+    const r = await render(
+      <GridTable {...{ columns: [{ ...columns[0], wrapAction: false }, columns[1]], rows, rowStyles }} />,
+    );
+    // When clicking on both columns
+    click(cell(r, 1, 0));
+    click(cell(r, 1, 1));
+    // Then the action is performed only once
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("can omit rowLink for columns", async () => {
+    // Given rowStyles that specify an action for each row
+    const rowStyles: GridRowStyles<Row> = {
+      header: {},
+      data: {
+        rowLink: () => "https://www.homebound.com",
+      },
+    };
+    // And a table where one columns omits wrapping the action
+    const r = await render(
+      <GridTable {...{ columns: [{ ...columns[0], wrapAction: false }, columns[1]], rows, rowStyles }} />,
+      withRouter(),
+    );
+    // Then expect that only one column is wrapped in an anchor tag
+    expect(cell(r, 1, 0).tagName).toBe("DIV");
+    expect(cell(r, 1, 1).tagName).toBe("A");
   });
 
   it("displays a custom fallback if only a header", async () => {
