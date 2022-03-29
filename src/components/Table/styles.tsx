@@ -12,7 +12,7 @@ export const defaultStyle: GridStyle = {
   indentOneCss: Css.pl4.$,
   indentTwoCss: Css.pl7.$,
   headerCellCss: Css.nowrap.py1.bgGray100.aife.$,
-  firstRowMessageCss: Css.tc.p3.$,
+  firstRowMessageCss: Css.tc.py3.$,
 };
 
 /** Tightens up the padding of rows, great for rows that have form elements in them. */
@@ -21,6 +21,7 @@ export const condensedStyle: GridStyle = {
   headerCellCss: Css.bgGray100.tinyEm.$,
   cellCss: Css.aic.sm.py1.px2.$,
   rootCss: Css.dg.gray700.xs.$,
+  firstRowMessageCss: Css.tc.py2.$,
 };
 
 /** Renders each row as a card. */
@@ -46,6 +47,7 @@ export const beamFixedStyle: GridStyle = {
   cellCss: Css.gray900.xs.bgWhite.aic.nowrap.pxPx(12).hPx(36).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
   emptyCell: "-",
   presentationSettings: { borderless: true, typeScale: "xs", wrap: false },
+  firstRowMessageCss: Css.tc.py3.$,
   // Included as a hacky "treat indent as deprecated for this table" hint to GridTable
   levels: {},
 };
