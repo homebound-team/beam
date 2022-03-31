@@ -15,7 +15,7 @@ interface Current<T> {
 /** Evaluates a computed function `fn` to a regular value and triggers a re-render whenever it changes. */
 export function useComputed<T>(fn: () => T, deps: readonly any[]): T {
   // We always return the useRef value, and use this just to trigger re-renders
-  const [, setValue] = useState(0);
+  const [, setTick] = useState(0);
 
   const ref = useRef<Current<T>>({
     runner: undefined,
@@ -28,25 +28,25 @@ export function useComputed<T>(fn: () => T, deps: readonly any[]): T {
   // with `useEffect`, which would only get calc'd after the 1st render has
   // already been done.
   useMemo(() => {
-    let tick = 0;
     const { current } = ref;
     // If deps has changed, unhook the previous observer
     if (current.runner) {
       current.runner();
     }
+    // If deps has changed, we're already re-running, so don't trigger a 2nd one
+    current.hasRan = false;
     current.runner = autorun(() => {
       // Always eval fn() (even on 1st render) to register our observable.
       const newValue = fn();
-      const oldValue = current.value;
+      const { value: oldValue, hasRan: oldHasRun } = current;
       current.value = newValue;
       current.hasRan = true;
       // Only trigger a re-render if this is not the 1st autorun. Note
       // that if deps has changed, we're inherently in a re-render so also
       // don't need to trigger an additional re-render.
-      if (tick > 0 && newValue !== oldValue) {
-        setValue(tick);
+      if (oldHasRun && newValue !== oldValue) {
+        setTick((tick) => tick + 1);
       }
-      tick++;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
