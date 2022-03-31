@@ -469,6 +469,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     tooManyClientSideRows = true;
     filteredRows = filteredRows.slice(0, filterMaxRows);
   }
+  rowState.visibleRows.replace(filteredRows.map(([row]) => row?.id ?? ""));
 
   // Push back to the caller a way to ask us where a row is.
   const { rowLookup } = props;
