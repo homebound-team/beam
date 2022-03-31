@@ -418,6 +418,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       if (matches) {
         isCard = nestedCards && nestedCards.maybeOpenCard(row);
         filteredRows.push([row, makeRowComponent(row, level)]);
+        rowState.visibleRows.add(row.id);
+      } else {
+        rowState.visibleRows.delete(row.id);
       }
 
       const isCollapsed = collapsedIds.includes(row.id);

@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useContext } from "react";
+import React, { MutableRefObject, useContext, useState } from "react";
 import { selectColumn } from "src/components/Table/columns";
 import { GridRowLookup } from "src/components/Table/GridRowLookup";
 import {
@@ -23,8 +23,8 @@ import {
 } from "src/components/Table/simpleHelpers";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
-import { Checkbox } from "src/inputs";
-import { cell, cellAnd, cellOf, click, render, row, rowAnd, withRouter } from "src/utils/rtl";
+import { Checkbox, TextField } from "src/inputs";
+import { cell, cellAnd, cellOf, click, render, row, rowAnd, type, withRouter } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
@@ -1123,6 +1123,45 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
 
+  it("only returns selected visible rows", async () => {
+    // Given a parent with a child and grandchildren
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "header", id: "header" },
+      {
+        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+            children: [
+              { kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" },
+              { kind: "grandChild", id: "p1c1g2", name: "grandchild p1c1g2" },
+            ],
+          },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    // When rendering a GridTable with filtering and selectable rows
+    const r = await render(<TestFilterAndSelect api={api} />);
+
+    // And selecting all rows
+    click(cell(r, 0, 1).children[0] as any);
+    // Then every row should be returned.
+    expect(api.current!.getSelectedRows()).toEqual([
+      rows[1],
+      rows[1].children![0],
+      rows[1].children![0].children![1],
+      rows[1].children![0].children![0],
+    ]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g2", "p1c1g1"]);
+
+    // And when applying a filter
+    type(r.filter, "p1c1g2");
+    // Then expect only the visible rows selected are returned
+    expect(api.current!.getSelectedRows()).toEqual([rows[1].children![0].children![1]]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1c1g2"]);
+  });
+
   describe("matchesFilter", () => {
     it("is case insensitive", () => {
       expect(matchesFilter("Foo", "foO")).toBeTruthy();
@@ -1467,4 +1506,30 @@ function expectRenderedRows(...rowIds: string[]): void {
   // Reset as a side effect so the test's next call to `expectRenderedRows` will
   // include only the renders since the last assertion.
   renderedNameColumn = [];
+}
+
+function TestFilterAndSelect({ api }: { api: MutableRefObject<GridTableApi<NestedRow> | undefined> }) {
+  const [filter, setFilter] = useState<string | undefined>("");
+  // Given a parent with a child and grandchild
+  const rows: GridDataRow<NestedRow>[] = [
+    { kind: "header", id: "header" },
+    {
+      ...{ kind: "parent", id: "p1", name: "parent 1" },
+      children: [
+        {
+          ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+          children: [
+            { kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" },
+            { kind: "grandChild", id: "p1c1g2", name: "grandchild p1c1g2" },
+          ],
+        },
+      ],
+    },
+  ];
+  return (
+    <div>
+      <TextField label="Filter" value={filter} onChange={setFilter} />
+      <GridTable<NestedRow> api={api} columns={nestedColumns} rows={rows} filter={filter} />
+    </div>
+  );
 }

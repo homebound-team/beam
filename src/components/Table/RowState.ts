@@ -26,6 +26,9 @@ export class RowState {
   private readonly collapsedRows: ObservableSet<string>;
   private readonly selectedRows = new ObservableMap<string, SelectedState>();
 
+  // Set of just row ids. Keeps track of which rows are visible. Used to filter out non-visible rows from `selectedIds`
+  visibleRows = new ObservableSet<string>();
+
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
   activeRowId: string | undefined;
 
@@ -46,7 +49,9 @@ export class RowState {
 
   get selectedIds(): string[] {
     // Return only ids that are fully checked, i.e. not partial
-    const ids = [...this.selectedRows.entries()].filter(([, v]) => v === "checked").map(([k]) => k);
+    const ids = [...this.selectedRows.entries()]
+      .filter(([id, v]) => this.visibleRows.has(id) && v === "checked")
+      .map(([k]) => k);
     // Hide our header marker
     const headerIndex = ids.indexOf("header");
     if (headerIndex > -1) {
