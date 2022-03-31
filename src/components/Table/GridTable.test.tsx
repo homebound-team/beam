@@ -1142,7 +1142,7 @@ describe("GridTable", () => {
     ];
     const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
     // When rendering a GridTable with filtering and selectable rows
-    const r = await render(<TestFilterAndSelect api={api} />);
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
 
     // And selecting all rows
     click(cell(r, 0, 1).children[0] as any);
@@ -1508,24 +1508,14 @@ function expectRenderedRows(...rowIds: string[]): void {
   renderedNameColumn = [];
 }
 
-function TestFilterAndSelect({ api }: { api: MutableRefObject<GridTableApi<NestedRow> | undefined> }) {
+function TestFilterAndSelect({
+  api,
+  rows,
+}: {
+  api: MutableRefObject<GridTableApi<NestedRow> | undefined>;
+  rows: GridDataRow<NestedRow>[];
+}) {
   const [filter, setFilter] = useState<string | undefined>("");
-  // Given a parent with a child and grandchild
-  const rows: GridDataRow<NestedRow>[] = [
-    { kind: "header", id: "header" },
-    {
-      ...{ kind: "parent", id: "p1", name: "parent 1" },
-      children: [
-        {
-          ...{ kind: "child", id: "p1c1", name: "child p1c1" },
-          children: [
-            { kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" },
-            { kind: "grandChild", id: "p1c1g2", name: "grandchild p1c1g2" },
-          ],
-        },
-      ],
-    },
-  ];
   return (
     <div>
       <TextField label="Filter" value={filter} onChange={setFilter} />
