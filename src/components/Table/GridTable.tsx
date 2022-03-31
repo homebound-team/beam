@@ -251,9 +251,11 @@ export type GridTableApi<R extends Kinded> = {
 
   /** Returns the ids of currently-selected rows. */
   getSelectedRowIds(): string[];
+  getSelectedRowIds<K extends R["kind"]>(kind: K): string[];
 
   /** Returns the currently-selected rows. */
   getSelectedRows(): GridDataRow<R>[];
+  getSelectedRows<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
 
   /** Sets the internal state of 'activeRowId' */
   setActiveRowId: (id: string | undefined) => void;
@@ -312,12 +314,19 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
   const api = useRef<GridTableApi<R>>({
     scrollToIndex: (index) => virtuosoRef.current && virtuosoRef.current.scrollToIndex(index),
-    getSelectedRowIds: () => rowState.selectedIds,
-    getSelectedRows(): GridDataRow<R>[] {
+    getSelectedRowIds(kind?: string): string[] {
+      if (kind === undefined) {
+        return rowState.selectedIds;
+      } else {
+        return this.getSelectedRows(kind).map((row) => row.id);
+      }
+    },
+    // The any is not great, but getting the overload to handle the optional kind is annoying
+    getSelectedRows(kind?: string): any {
       const ids = rowState.selectedIds;
       const selected: GridDataRow<R>[] = [];
       visit(rows, (row) => {
-        if (ids.includes(row.id)) {
+        if (ids.includes(row.id) && (!kind || row.kind === kind)) {
           selected.push(row as any);
         }
       });
@@ -332,7 +341,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
   useEffect(() => {
     rowState.activeRowId = activeRowId;
-  }, [activeRowId]);
+  }, [rowState, activeRowId]);
 
   // We track render count at the table level, which seems odd (we should be able to track this
   // internally within each GridRow using a useRef), but we have suspicions that react-virtuoso
@@ -452,6 +461,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     observeRows,
     columnSizes,
     collapsedIds,
+    getCount,
   ]);
 
   let tooManyClientSideRows = false;
