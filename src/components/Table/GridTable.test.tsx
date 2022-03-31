@@ -1108,7 +1108,9 @@ describe("GridTable", () => {
     expect(cellAnd(r, 3, 1, "select")).toBeChecked();
     // And the api can fetch them
     expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g1"]);
+    expect(api.current!.getSelectedRowIds("child")).toEqual(["p1c1"]);
     expect(api.current!.getSelectedRows()).toEqual([rows[1], rows[1].children![0], rows[1].children![0].children![0]]);
+    expect(api.current!.getSelectedRows("child")).toEqual([rows[1].children![0]]);
 
     // And when we unselect all
     click(cell(r, 0, 1).children[0] as any);
