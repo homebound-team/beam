@@ -182,7 +182,7 @@ function MiscAuthorDetails({ formState, onBack }: { formState: FormValue; onBack
               disabled={!formState.valid}
               onClick={() => {
                 if (formState.canSave()) {
-                  formState.save();
+                  formState.commitChanges();
                   setShowFormData(true);
                 }
               }}
