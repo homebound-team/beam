@@ -972,10 +972,12 @@ describe("GridTable", () => {
     const r = await render(<GridTable filter="foo" columns={nestedColumns} rows={rows} />);
     // Then we show the header
     expect(cell(r, 0, 2)).toHaveTextContent("Name");
+    // And the parent that had a child that matched
+    expect(cell(r, 1, 2)).toHaveTextContent("p1");
     // And the child that matched
-    expect(cell(r, 1, 2)).toHaveTextContent("foo");
+    expect(cell(r, 2, 2)).toHaveTextContent("foo");
     // And that's it
-    expect(row(r, 2)).toBeUndefined();
+    expect(row(r, 3)).toBeUndefined();
   });
 
   it("can collapse parent rows", async () => {
@@ -1174,8 +1176,79 @@ describe("GridTable", () => {
     // And when applying a filter
     type(r.filter, "p1c1g2");
     // Then expect only the visible rows selected are returned
-    expect(api.current!.getSelectedRows()).toEqual([rows[1].children![0].children![1]]);
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1c1g2"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g2"]);
+    expect(api.current!.getSelectedRows()).toEqual([rows[1], rows[1].children![0], rows[1].children![0].children![1]]);
+  });
+
+  it("re-derives parent row selected state", async () => {
+    // Given a parent with children
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "header", id: "header" },
+      {
+        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        children: [
+          { kind: "child", id: "p1c1", name: "child p1c1" },
+          { kind: "child", id: "p1c2", name: "child p1c2" },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    // When rendering a GridTable with filtering and selectable rows
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+
+    // And selecting one of the child rows
+    click(cell(r, 3, 1).children[0] as any);
+
+    // Then the Header and Parent rows should have the `indeterminate` checked value
+    expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked();
+    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+
+    // And when applying a filter to hide non-selected child rows
+    type(r.filter, "p1 c2");
+    // Then the header and parents should flip to fully checked
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+  });
+
+  it("only selects visible rows", async () => {
+    // Given a parent with a child and grandchildren
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "header", id: "header" },
+      {
+        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+            children: [
+              { kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" },
+              { kind: "grandChild", id: "p1c1g2", name: "grandchild p1c1g2" },
+            ],
+          },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    // When rendering a GridTable with filtering and selectable rows
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+    // And filtering without any rows selected
+    type(r.filter, "p1c1g2");
+    // And selecting the parent row
+    click(cellAnd(r, 1, 1, "select"));
+    // Then expect all rows should be checked
+    expect(cellAnd(r, 0, 1, "select")).toBeChecked(); // Header
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked(); // Parent
+    expect(cellAnd(r, 2, 1, "select")).toBeChecked(); // Child
+    expect(cellAnd(r, 3, 1, "select")).toBeChecked(); // Grandchild
+
+    // When removing the filter to show all rows.
+    type(r.filter, "");
+
+    // Then expect the parent rows to have updated based on the row status
+    expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked(); // Header
+    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked(); // Parent
+    expect(cellAnd(r, 2, 1, "select")).toBePartiallyChecked(); // Child
+    expect(cellAnd(r, 3, 1, "select")).not.toBeChecked(); // Grandchild - reintroduced by clearing filter.
+    expect(cellAnd(r, 4, 1, "select")).toBeChecked(); // Grandchild
   });
 
   describe("matchesFilter", () => {

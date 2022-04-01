@@ -1,4 +1,4 @@
-import { makeAutoObservable, ObservableMap, ObservableSet } from "mobx";
+import { comparer, makeAutoObservable, ObservableMap, ObservableSet, reaction } from "mobx";
 import React, { MutableRefObject } from "react";
 import { GridDataRow } from "src/components/Table/GridTable";
 import { visit } from "src/components/Table/visitor";
@@ -45,6 +45,23 @@ export class RowState {
     // Make ourselves an observable so that mobx will do caching of .collapseIds so
     // that it'll be a stable identity for GridTable to useMemo against.
     makeAutoObservable(this, { rows: false } as any); // as any b/c rows is private, so the mapped type doesn't see it
+
+    // Whenever our `visibleRows` change (i.e. via filtering) then we need to re-derive header and parent rows' selected state.
+    reaction(
+      () => [...this.visibleRows.values()].sort(),
+      () => {
+        const map = new Map<string, SelectedState>();
+        // go through the rows and re-derive all visible parent states.
+        this.rows.current.forEach((row) => this.setNestedSelectedStates(row, map));
+
+        // Finally re-derive the 'header's state.
+        map.set("header", deriveParentSelected(this.getVisibleImmediateChildrenSelectedStates(this.rows.current, map)));
+
+        // And finally merge the changes back into the selected rows state
+        this.selectedRows.merge(map);
+      },
+      { equals: comparer.shallow },
+    );
   }
 
   get selectedIds(): string[] {
@@ -73,7 +90,7 @@ export class RowState {
         // Just mash the header + all rows + children as selected
         const map = new Map<string, SelectedState>();
         map.set("header", "checked");
-        visit(this.rows.current, (row) => map.set(row.id, "checked"));
+        visit(this.rows.current, (row) => this.visibleRows.has(row.id) && map.set(row.id, "checked"));
         this.selectedRows.replace(map);
       } else {
         // Similarly "unmash" all rows + children.
@@ -91,21 +108,20 @@ export class RowState {
 
       // Everything here & down is deterministically on/off
       const map = new Map<string, SelectedState>();
-      visit([curr.row], (row) => map.set(row.id, selected ? "checked" : "unchecked"));
+      visit([curr.row], (row) => this.visibleRows.has(row.id) && map.set(row.id, selected ? "checked" : "unchecked"));
 
       // Now walk up the parents and see if they are now-all-checked/now-all-unchecked/some-of-each
       for (const parent of [...curr.parents].reverse()) {
         if (parent.children) {
-          const children = parent.children.map((row) => map.get(row.id) || this.getSelected(row.id));
-          map.set(parent.id, deriveParentSelected(children));
+          map.set(
+            parent.id,
+            deriveParentSelected(this.getVisibleImmediateChildrenSelectedStates(parent.children, map)),
+          );
         }
       }
 
       // And do the header + top-level "children" as a final one-off
-      const children = this.rows.current
-        .filter((row) => row.id !== "header")
-        .map((row) => map.get(row.id) || this.getSelected(row.id));
-      map.set("header", deriveParentSelected(children));
+      map.set("header", deriveParentSelected(this.getVisibleImmediateChildrenSelectedStates(this.rows.current, map)));
 
       this.selectedRows.merge(map);
     }
@@ -161,6 +177,30 @@ export class RowState {
       localStorage.setItem(this.persistCollapse, JSON.stringify(collapsedIds));
     }
   }
+
+  private getVisibleImmediateChildrenSelectedStates(
+    children: GridDataRow<any>[],
+    map: Map<string, SelectedState>,
+  ): SelectedState[] {
+    return children
+      .filter((row) => row.id !== "header" && this.visibleRows.has(row.id))
+      .map((row) => map.get(row.id) || this.getSelected(row.id));
+  }
+
+  // Recursively traverse through rows to determine selected state of parent rows based on children
+  private setNestedSelectedStates(row: GridDataRow<any>, map: Map<string, SelectedState>): SelectedState[] {
+    if (this.visibleRows.has(row.id)) {
+      if (!row.children) {
+        return [map.get(row.id) || this.getSelected(row.id)];
+      }
+
+      const childrenSelectedStates = row.children.flatMap((rc) => this.setNestedSelectedStates(rc, map));
+      const parentState = deriveParentSelected(childrenSelectedStates);
+      map.set(row.id, parentState);
+      return [parentState];
+    }
+    return [];
+  }
 }
 
 /** Provides a context for rows to access their table's `RowState`. */
@@ -197,5 +237,5 @@ function findRow(rows: GridDataRow<any>[], id: string): FoundRow | undefined {
 function deriveParentSelected(children: SelectedState[]): SelectedState {
   const allChecked = children.every((child) => child === "checked");
   const allUnchecked = children.every((child) => child === "unchecked");
-  return allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
+  return children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
 }

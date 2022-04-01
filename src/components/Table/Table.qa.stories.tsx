@@ -1,9 +1,17 @@
 import { Meta } from "@storybook/react";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useMemo, useRef, useState } from "react";
+import { Button } from "src/components/Button";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
 import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/columns";
-import { emptyCell, GridColumn, GridDataRow, GridTable } from "src/components/Table/GridTable";
+import {
+  emptyCell,
+  GridColumn,
+  GridDataRow,
+  GridSortConfig,
+  GridTable,
+  GridTableApi,
+} from "src/components/Table/GridTable";
 import { SimpleHeaderAndDataWith } from "src/components/Table/simpleHelpers";
 import {
   beamFixedStyle,
@@ -15,7 +23,7 @@ import {
 } from "src/components/Table/styles";
 import { Tag } from "src/components/Tag";
 import { Css, Palette } from "src/Css";
-import { NumberField, SelectField } from "src/inputs";
+import { NumberField, SelectField, TextField } from "src/inputs";
 import { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
 import { zeroTo } from "src/utils/sb";
@@ -44,23 +52,7 @@ export function Fixed() {
       style={beamFixedStyle}
       sorting={{ on: "client", initial: [1, "ASC"] }}
       columns={beamStyleColumns()}
-      rows={[
-        { kind: "header", id: "header" },
-        ...zeroTo(20).map((idx) => ({
-          kind: "data" as const,
-          id: `r:${idx + 1}`,
-          data: {
-            id: `r:${idx + 1}`,
-            favorite: idx < 5,
-            commitmentName: idx === 2 ? "A longer name that will truncate with an ellipsis" : `Commitment ${idx + 1}`,
-            date: `01/${idx + 1 > 9 ? idx + 1 : `0${idx + 1}`}/2020`,
-            status: "Success",
-            tradeCategories: ["Roofing", "Architecture", "Plumbing"],
-            priceInCents: 1234_56 + idx,
-            location: idx % 2 ? "l:1" : "l:2",
-          },
-        })),
-      ]}
+      rows={flatRows}
     />
   );
 }
@@ -71,23 +63,7 @@ export function Flexible() {
       style={beamFlexibleStyle}
       sorting={{ on: "client", initial: [1, "ASC"] }}
       columns={beamStyleColumns()}
-      rows={[
-        { kind: "header", id: "header" },
-        ...zeroTo(20).map((idx) => ({
-          kind: "data" as const,
-          id: `r:${idx + 1}`,
-          data: {
-            id: `r:${idx + 1}`,
-            favorite: idx < 5,
-            commitmentName: idx === 2 ? "A longer name that will truncate with an ellipsis" : `Commitment ${idx + 1}`,
-            date: `01/${idx + 1 > 9 ? idx + 1 : `0${idx + 1}`}/2020`,
-            status: "Success",
-            tradeCategories: ["Roofing", "Architecture", "Plumbing"],
-            priceInCents: 1234_56 + idx,
-            location: idx % 2 ? "l:1" : "l:2",
-          },
-        })),
-      ]}
+      rows={flatRows}
     />
   );
 }
@@ -136,6 +112,47 @@ export function NestedFlexible() {
         columns={beamNestedColumns}
         rows={beamNestedRows}
         stickyHeader
+      />
+    </div>
+  );
+}
+
+// Reproducible issue to fix for re-deriving:
+// 1. filter on "Yo"
+// 2. Select individual "Project Items". Note parent is "checked"
+// 3. Remove filter, additional project items under parent are "unchecked", though parent still shows "checked" instead of what it should show as "indeterminate".
+export function Filterable() {
+  const api = useRef<GridTableApi<BeamNestedRow>>();
+  const [selectedItems, setSelected] = useState<string[]>([]);
+  const [filter, setFilter] = useState<string>();
+  const sorting: GridSortConfig<{}> = useMemo(() => ({ on: "client" }), []);
+  return (
+    <div css={Css.p1.$}>
+      <div css={Css.df.gap2.aic.mb1.$}>
+        <div css={Css.wPx(250).$}>
+          <TextField
+            label="Filter"
+            hideLabel
+            placeholder="Search"
+            value={filter}
+            onChange={setFilter}
+            startAdornment={<Icon icon="search" />}
+            clearable
+          />
+        </div>
+        <Button label="Get Selected" onClick={() => setSelected(api.current?.getSelectedRowIds() ?? [])} />
+        <div>
+          <strong>Selected Row Ids:</strong> {selectedItems.length > 0 ? selectedItems.join(", ") : "None"}
+        </div>
+      </div>
+      <GridTable<BeamNestedRow>
+        style={beamNestedFixedStyle}
+        sorting={sorting}
+        columns={beamNestedColumns}
+        rows={beamNestedRows}
+        stickyHeader
+        filter={filter}
+        api={api}
       />
     </div>
   );
@@ -339,3 +356,21 @@ function beamStyleColumns() {
 
   return [selectCol, favCol, statusCol, nameCol, tradeCol, locationCol, dateCol, priceCol, readOnlyPriceCol];
 }
+
+const flatRows: GridDataRow<BeamRow>[] = [
+  { kind: "header", id: "header" },
+  ...zeroTo(20).map((idx) => ({
+    kind: "data" as const,
+    id: `r:${idx + 1}`,
+    data: {
+      id: `r:${idx + 1}`,
+      favorite: idx < 5,
+      commitmentName: idx === 2 ? "A longer name that will truncate with an ellipsis" : `Commitment ${idx + 1}`,
+      date: `01/${idx + 1 > 9 ? idx + 1 : `0${idx + 1}`}/2020`,
+      status: "Success",
+      tradeCategories: ["Roofing", "Architecture", "Plumbing"],
+      priceInCents: 1234_56 + idx,
+      location: idx % 2 ? "l:1" : "l:2",
+    },
+  })),
+];

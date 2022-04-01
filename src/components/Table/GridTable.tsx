@@ -4,6 +4,7 @@ import React, {
   MutableRefObject,
   ReactElement,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -157,6 +158,7 @@ type RenderAs = "div" | "table" | "virtual";
 
 /** The GridDataRow is optional b/c the nested card chrome rows only have ReactElements. */
 export type RowTuple<R extends Kinded> = [GridDataRow<R> | undefined, ReactElement];
+type ParentChildrenTuple<R extends Kinded> = [GridDataRow<R>, ParentChildrenTuple<R>[]];
 
 /**
  * The sort settings for the current table; whether it's client-side or server-side.
@@ -349,8 +351,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // here instead.
   const { getCount } = useRenderCount();
 
-  const [sortState, setSortKey] = useSortState<R, S>(columns, sorting);
+  const columnSizes = useSetupColumnSizes(style, columns, tableRef, resizeTarget);
 
+  // Make a single copy of our current collapsed state, so we'll have a single observer.
+  const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
+
+  const [sortState, setSortKey] = useSortState<R, S>(columns, sorting);
   const maybeSorted = useMemo(() => {
     if (sorting?.on === "client" && sortState) {
       // If using client-side sort, the sortState use S = number
@@ -359,16 +365,38 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     return rows;
   }, [columns, rows, sorting, sortState]);
 
-  const columnSizes = useSetupColumnSizes(style, columns, tableRef, resizeTarget);
+  // Filter rows - ensures parent rows remain in the list if any children match the filter.
+  const filterRows: (acc: ParentChildrenTuple<R>[], row: GridDataRow<R>) => ParentChildrenTuple<R>[] = useCallback(
+    (acc: ParentChildrenTuple<R>[], row: GridDataRow<R>) => {
+      // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
+      const filters = (filter && filter.split(/ +/)) || [];
+      const matches =
+        row.kind === "header" ||
+        filters.length === 0 ||
+        !!row.pin ||
+        filters.every((f) =>
+          columns.map((c) => applyRowFn(c, row, api)).some((maybeContent) => matchesFilter(maybeContent, f)),
+        );
 
-  // Make a single copy of our current collapsed state, so we'll have a single observer.
-  const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
+      if (matches) {
+        return acc.concat([[row, row.children?.reduce(filterRows, []) ?? []]]);
+      }
 
-  // Filter + flatten + component-ize the sorted rows.
+      const isCollapsed = collapsedIds.includes(row.id);
+      if (!isCollapsed && !!row.children?.length) {
+        const matchedChildren = row.children.reduce(filterRows, []);
+        if (matchedChildren.length > 0) {
+          return acc.concat([[row, matchedChildren]]);
+        }
+      }
+
+      return acc;
+    },
+    [filter, collapsedIds],
+  );
+
+  // Flatten + component-ize the sorted rows.
   let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
-    // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
-    const filters = (filter && filter.split(/ +/)) || [];
-
     function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
@@ -404,36 +432,24 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
     const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style.nestedCards);
 
-    // Depth-first to filter
-    function visit(row: GridDataRow<R>, level: number): void {
-      const matches =
-        filters.length === 0 ||
-        row.pin ||
-        filters.every((filter) =>
-          columns.map((c) => applyRowFn(c, row, api)).some((maybeContent) => matchesFilter(maybeContent, filter)),
-        );
-      let isCard = false;
+    function visit(row: ParentChildrenTuple<R>, level: number): void {
+      let isCard = nestedCards && nestedCards.maybeOpenCard(row[0]);
+      filteredRows.push([row[0], makeRowComponent(row[0], level)]);
 
-      // Even if we don't pass the filter, one of our children might, so we continue on after this check
-      if (matches) {
-        isCard = nestedCards && nestedCards.maybeOpenCard(row);
-        filteredRows.push([row, makeRowComponent(row, level)]);
+      const isCollapsed = collapsedIds.includes(row[0].id);
+      if (!isCollapsed && row[1].length) {
+        nestedCards && nestedCards.addSpacer();
+        visitRows(row[1], isCard, level + 1);
       }
 
-      const isCollapsed = collapsedIds.includes(row.id);
-      if (!isCollapsed && !!row.children?.length) {
-        nestedCards && matches && nestedCards.addSpacer();
-        visitRows(row.children, isCard, level + 1);
-      }
-
-      !isLeafRow(row) && isCard && nestedCards && nestedCards.closeCard();
+      !isLeafRow(row[0]) && isCard && nestedCards && nestedCards.closeCard();
     }
 
-    function visitRows(rows: GridDataRow<R>[], addSpacer: boolean, level: number): void {
+    function visitRows(rows: ParentChildrenTuple<R>[], addSpacer: boolean, level: number): void {
       const length = rows.length;
       rows.forEach((row, i) => {
-        if (row.kind === "header") {
-          headerRows.push([row, makeRowComponent(row, level)]);
+        if (row[0].kind === "header") {
+          headerRows.push([row[0], makeRowComponent(row[0], level)]);
           return;
         }
         visit(row, level);
@@ -441,8 +457,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       });
     }
 
+    // Call `visitRows` with our a pre-filtered set list
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
-    visitRows(maybeSorted, !!nestedCards, 0);
+    visitRows(maybeSorted.reduce(filterRows, []), !!nestedCards, 0);
     nestedCards && nestedCards.done();
 
     return [headerRows, filteredRows];
