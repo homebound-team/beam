@@ -1,4 +1,4 @@
-import { FieldState } from "@homebound/form-state/dist/formState";
+import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";

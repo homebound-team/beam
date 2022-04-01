@@ -58,7 +58,7 @@ function SuperDrawerForm() {
           label: "Save",
           onClick: () => {
             formState.canSave();
-            formState.save();
+            formState.commitChanges();
           },
         },
       ]}

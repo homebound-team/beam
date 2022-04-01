@@ -125,11 +125,11 @@ export function FormStateApp() {
             </div>
 
             <div css={Css.df.childGap1.$}>
-              <Button onClick={() => formState.reset()} label="Cancel" />
+              <Button onClick={() => formState.revertChanges()} label="Cancel" />
               <Button
                 onClick={() => {
                   if (formState.canSave()) {
-                    formState.save();
+                    formState.commitChanges();
                   }
                 }}
                 label="Save"
