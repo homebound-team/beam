@@ -1,5 +1,5 @@
-import { generate, newIncrementDelegateMethods, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
-import { palette } from "./palette";
+import { defineConfig, newIncrementDelegateMethods, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
+import { palette } from "./truss-palette";
 
 const increment = 8;
 const numberOfIncrements = 8;
@@ -107,8 +107,8 @@ const typeAliases = {};
 
 const breakpoints = {};
 
-generate({
-  outputPath: "../src/Css.ts",
+export default defineConfig({
+  outputPath: "./src/Css.ts",
   palette,
   fonts,
   increment,
@@ -117,6 +117,4 @@ generate({
   typeAliases,
   breakpoints,
   sections,
-})
-  .then(() => console.log("🚀 Truss styles generation complete"))
-  .catch(console.error);
+});
