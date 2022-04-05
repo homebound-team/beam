@@ -1,4 +1,4 @@
 module.exports = {
-  extends: ["react-app", "prettier"],
+  extends: ["@homebound/eslint-config/react"],
   rules: {},
 };
