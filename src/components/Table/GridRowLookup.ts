@@ -14,10 +14,9 @@ export interface GridRowLookup<R extends Kinded> {
   lookup(
     row: GridDataRow<R>,
     additionalFilter?: (row: GridDataRow<R>) => boolean,
-  ): NextPrev<R> &
-    {
-      [P in R["kind"]]: NextPrev<DiscriminateUnion<R, "kind", P>>;
-    };
+  ): NextPrev<R> & {
+    [P in R["kind"]]: NextPrev<DiscriminateUnion<R, "kind", P>>;
+  };
 
   /** Returns the list of currently filtered/sorted rows, without headers. */
   currentList(): readonly GridDataRow<R>[];

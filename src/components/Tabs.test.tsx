@@ -91,7 +91,7 @@ describe("TabsWithContent", () => {
     expect(r.tab_panel().textContent).toBe("Tab 1 Content");
   });
 
-  it("shows all the tabs if 'alwaysShowAllTabs' is defined, but only a single tab is enabled ", async () => {
+  it("shows all the tabs if 'alwaysShowAllTabs' is defined, but only a single tab is enabled", async () => {
     // Given only the 1st tab is enabled
     const testTabs: TabWithContent<TabValue>[] = [
       { name: "Tab 1", value: "tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
