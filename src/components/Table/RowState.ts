@@ -25,9 +25,8 @@ export class RowState {
   // A set of just row ids, i.e. not row.kind+row.id
   private readonly collapsedRows: ObservableSet<string>;
   private readonly selectedRows = new ObservableMap<string, SelectedState>();
-
   // Set of just row ids. Keeps track of which rows are visible. Used to filter out non-visible rows from `selectedIds`
-  visibleRows = new ObservableSet<string>();
+  private visibleRows = new ObservableSet<string>();
 
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
   activeRowId: string | undefined;
@@ -60,6 +59,17 @@ export class RowState {
       },
       { equals: comparer.shallow },
     );
+  }
+
+  setVisibleRows(rowIds: string[]): void {
+    // ObservableSet doesn't seem to do a `diff` inside `replace` before firing
+    // observers/reactions that watch it, which can lead to render loops with the
+    // application page is observing `GridTableApi.getSelectedRows`, and merely
+    // the act of rendering GridTable (w/o row changes) causes it's `useComputed`
+    // to be triggered.
+    if (!comparer.shallow(rowIds, [...this.visibleRows.values()])) {
+      this.visibleRows.replace(rowIds);
+    }
   }
 
   get selectedIds(): string[] {
