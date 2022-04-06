@@ -1,5 +1,6 @@
 import { autorun, IReactionDisposer } from "mobx";
 import { useMemo, useRef, useState } from "react";
+import equal from "fast-deep-equal";
 
 interface Current<T> {
   // Track the mobx autorunner
@@ -45,7 +46,7 @@ export function useComputed<T>(fn: () => T, deps: readonly any[]): T {
       // that if deps has changed, we're inherently in a re-render so also
       // don't need to trigger an additional re-render.
       //convert object or values to JSON string for deep value comparison 
-      if (oldHasRun && JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      if (oldHasRun && !equal(newValue, oldValue)) {
         setTick((tick) => tick + 1);
       }
     });
