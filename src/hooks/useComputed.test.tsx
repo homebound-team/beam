@@ -50,6 +50,23 @@ describe("useComputed", () => {
     expect(name()).toHaveTextContent("f");
   });
 
+  it("does not re-renders on proxy change that doesn't deeply change return value", async () => {
+    // Given an observable
+    const someProxy = observable({ name: "foo" });
+    // And a useComputed that returns an array
+    await render(<TestComponent someProxy={someProxy} computedFn={(p) => [p.name.charAt(0), p.name.charAt(1)]} />);
+    expect(renderedCount).toEqual(1);
+    expect(evaledCount).toEqual(1);
+    // When the proxy changes
+    act(() => {
+      someProxy.name = "food";
+    });
+    // Then we re-evaled the value
+    expect(evaledCount).toEqual(2);
+    // But didn't re-render b/c it was not deeply different
+    expect(renderedCount).toEqual(1);
+  });
+
   it("re-renders on other hook change", async () => {
     const someProxy = observable({ name: "foo" });
     const { name, color, makeBlue } = await render(<TestComponent someProxy={someProxy} />);
@@ -90,7 +107,7 @@ type SomeProxy = { name: string };
 
 interface TestComponentProps {
   someProxy: SomeProxy;
-  computedFn?: (o: SomeProxy, dep: string) => string;
+  computedFn?: (o: SomeProxy, dep: string) => any;
 }
 
 function TestComponent(props: TestComponentProps) {
@@ -105,7 +122,7 @@ function TestComponent(props: TestComponentProps) {
   renderedCount++;
   return (
     <div>
-      <div data-testid="name">{name}</div>
+      <div data-testid="name">{typeof name === "string" ? name : "any"}</div>
       <div data-testid="color">{color}</div>
       <button data-testid="makeBlue" onClick={() => setColor("blue")}>
         makeBlue
