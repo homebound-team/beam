@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useContext, useState } from "react";
+import React, { MutableRefObject, useContext, useMemo, useState } from "react";
 import { selectColumn } from "src/components/Table/columns";
 import { GridRowLookup } from "src/components/Table/GridRowLookup";
 import {
@@ -506,12 +506,11 @@ describe("GridTable", () => {
 
     it("can sort nested rows", async () => {
       // Given a table with nested rows
-      const r = await render(
-        <GridTable
-          columns={[nameColumn, valueColumn]}
-          // And there is no initial sort given
-          sorting={{ on: "client" }}
-          rows={[
+      function TestComponent() {
+        const [, setCount] = useState(0);
+        const columns = useMemo(() => [nameColumn, valueColumn], []);
+        const rows = useMemo<GridDataRow<Row>[]>(() => {
+          return [
             simpleHeader,
             // And the data is initially unsorted
             {
@@ -528,9 +527,23 @@ describe("GridTable", () => {
                 { kind: "data", id: "11", name: "2", value: 2 },
               ],
             },
-          ]}
-        />,
-      );
+          ];
+        }, []);
+        return (
+          <div>
+            <button data-testid="rerenderParent" onClick={() => setCount(1)}>
+              rerender
+            </button>
+            <GridTable
+              columns={columns}
+              // And there is no initial sort given
+              sorting={{ on: "client" }}
+              rows={rows}
+            />
+          </div>
+        );
+      }
+      const r = await render(<TestComponent />);
 
       // Then the data is sorted by 1 (1 2) then 2 (1 2)
       expect(cell(r, 1, 0)).toHaveTextContent("1");
@@ -553,6 +566,18 @@ describe("GridTable", () => {
       // And the header row re-rendered
       expect(row(r, 0).getAttribute("data-render")).toEqual("2");
       // But the data rows did not
+      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 3).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 4).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 5).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 6).getAttribute("data-render")).toEqual("1");
+
+      // And the table re-renders for some other reason
+      click(r.rerenderParent);
+
+      // Then memoization did not break
+      expect(row(r, 0).getAttribute("data-render")).toEqual("2");
       expect(row(r, 1).getAttribute("data-render")).toEqual("1");
       expect(row(r, 2).getAttribute("data-render")).toEqual("1");
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
