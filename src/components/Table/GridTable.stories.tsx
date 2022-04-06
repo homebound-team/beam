@@ -25,6 +25,7 @@ import {
   SimpleHeaderAndDataOf,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
+import { TextField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
 import { noop } from "src/utils";
 import { newStory, withDimensions, withRouter, zeroTo } from "src/utils/sb";
@@ -269,6 +270,7 @@ function NestedCards({ rows, as, sorting, style }: NestedCardsProps) {
     add: () => "",
     clientSideSort: false,
   };
+
   const spacing = { brPx: 4, pxPx: 4 };
   const nestedStyle: GridStyle = {
     nestedCards: {
@@ -282,15 +284,28 @@ function NestedCards({ rows, as, sorting, style }: NestedCardsProps) {
       },
     },
   };
+  const [filter, setFilter] = useState<string>();
 
   return (
-    <GridTable
-      as={as}
-      columns={[nameColumn, nameColumn, actionColumn]}
-      rows={rows}
-      style={style ?? nestedStyle}
-      sorting={sorting}
-    />
+    <>
+      <TextField
+        label="Filter"
+        hideLabel
+        placeholder="Search"
+        value={filter}
+        onChange={setFilter}
+        startAdornment={<Icon icon="search" />}
+        clearable
+      />
+      <GridTable
+        as={as}
+        columns={[nameColumn, nameColumn, actionColumn]}
+        rows={rows}
+        style={style ?? nestedStyle}
+        sorting={sorting}
+        filter={filter}
+      />
+    </>
   );
 }
 
