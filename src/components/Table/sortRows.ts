@@ -19,7 +19,7 @@ export function sortRows<R extends Kinded>(
   // Recursively sort child rows
   sorted.forEach((row, i) => {
     if (row.children) {
-      sorted[i] = { ...sorted[i], children: sortRows(columns, row.children, sortState) };
+      sorted[i].children = sortRows(columns, row.children, sortState);
     }
   });
 
