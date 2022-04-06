@@ -46,7 +46,7 @@
     "react-day-picker": "^7.4.10",
     "react-popper": "^2.2.5",
     "react-router": "^5.2.0",
-    "react-router-dom": ">=5.2",
+    "react-router-dom": "^5.2.0",
     "react-stately": "^3.9.0",
     "react-virtuoso": "^2.4.0",
     "tributejs": "^5.1.3",
