@@ -212,15 +212,19 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("a");
 
       // And when sorted by column 1
-      const { sortHeader_0, sortHeader_1 } = r;
-      click(sortHeader_0);
+      click(r.sortHeader_0);
       // Then 'name: c' row is first
       expect(cell(r, 1, 0)).toHaveTextContent("c");
 
       // And when sorted by column 2
-      click(sortHeader_1);
+      click(r.sortHeader_1);
       // Then the `value: 1` row is first
       expect(cell(r, 1, 0)).toHaveTextContent("c");
+
+      // And the rows were memoized so didn't re-render
+      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 3).getAttribute("data-render")).toEqual("1");
     });
 
     it("can sort by other value", async () => {
@@ -527,6 +531,7 @@ describe("GridTable", () => {
           ]}
         />,
       );
+
       // Then the data is sorted by 1 (1 2) then 2 (1 2)
       expect(cell(r, 1, 0)).toHaveTextContent("1");
       expect(cell(r, 2, 0)).toHaveTextContent("1");
@@ -534,6 +539,7 @@ describe("GridTable", () => {
       expect(cell(r, 4, 0)).toHaveTextContent("2");
       expect(cell(r, 5, 0)).toHaveTextContent("1");
       expect(cell(r, 6, 0)).toHaveTextContent("2");
+
       // And when we reverse the sort
       click(r.sortHeader_0);
       // Then the data is sorted by 2 (2 1) then 1 (2 1)
@@ -543,6 +549,16 @@ describe("GridTable", () => {
       expect(cell(r, 4, 0)).toHaveTextContent("1");
       expect(cell(r, 5, 0)).toHaveTextContent("2");
       expect(cell(r, 6, 0)).toHaveTextContent("1");
+
+      // And the header row re-rendered
+      expect(row(r, 0).getAttribute("data-render")).toEqual("2");
+      // But the data rows did not
+      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 3).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 4).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 5).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 6).getAttribute("data-render")).toEqual("1");
     });
 
     it("throws an error if a column value is not sortable", async () => {
