@@ -1622,13 +1622,11 @@ function expectRenderedRows(...rowIds: string[]): void {
   renderedNameColumn = [];
 }
 
-function TestFilterAndSelect({
-  api,
-  rows,
-}: {
+function TestFilterAndSelect(props: {
   api: MutableRefObject<GridTableApi<NestedRow> | undefined>;
   rows: GridDataRow<NestedRow>[];
 }) {
+  const { api, rows } = props;
   const [filter, setFilter] = useState<string | undefined>("");
   return (
     <div>

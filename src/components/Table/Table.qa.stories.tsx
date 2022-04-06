@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react";
-import React, { ReactNode, useMemo, useRef, useState } from "react";
-import { Button } from "src/components/Button";
+import { default as React, ReactNode, useMemo, useState } from "react";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
 import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/columns";
@@ -23,6 +22,7 @@ import {
 } from "src/components/Table/styles";
 import { Tag } from "src/components/Tag";
 import { Css, Palette } from "src/Css";
+import { useComputed } from "src/hooks";
 import { NumberField, SelectField, TextField } from "src/inputs";
 import { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
@@ -122,8 +122,14 @@ export function NestedFlexible() {
 // 2. Select individual "Project Items". Note parent is "checked"
 // 3. Remove filter, additional project items under parent are "unchecked", though parent still shows "checked" instead of what it should show as "indeterminate".
 export function Filterable() {
-  const api = useRef<GridTableApi<BeamNestedRow>>();
-  const [selectedItems, setSelected] = useState<string[]>([]);
+  // Using a useState so that useComputed works
+  const [api, setApi] = useState<GridTableApi<BeamNestedRow> | null>();
+  const selectedIds = useComputed(() => api?.getSelectedRows().map((r) => r.id) || [], [api]);
+
+  // This is useful to debug if doing `visibleRows.replace` in `RowState`
+  // spams the page component to re-render in a not-infinite-but-still-unhelpful loop.
+  console.log({ selectedIds });
+
   const [filter, setFilter] = useState<string>();
   const sorting: GridSortConfig<{}> = useMemo(() => ({ on: "client" }), []);
   return (
@@ -140,9 +146,8 @@ export function Filterable() {
             clearable
           />
         </div>
-        <Button label="Get Selected" onClick={() => setSelected(api.current?.getSelectedRowIds() ?? [])} />
         <div>
-          <strong>Selected Row Ids:</strong> {selectedItems.length > 0 ? selectedItems.join(", ") : "None"}
+          <strong>Selected Row Ids:</strong> {selectedIds.length > 0 ? selectedIds.join(", ") : "None"}
         </div>
       </div>
       <GridTable<BeamNestedRow>
@@ -152,7 +157,13 @@ export function Filterable() {
         rows={beamNestedRows}
         stickyHeader
         filter={filter}
-        api={api}
+        api={{
+          set current(newApi: GridTableApi<any>) {
+            if (api !== newApi) {
+              setApi(newApi);
+            }
+          },
+        }}
       />
     </div>
   );
