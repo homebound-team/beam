@@ -4,6 +4,7 @@ import React, {
   MutableRefObject,
   ReactElement,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -31,7 +32,7 @@ import {
 import { RowState, RowStateContext } from "src/components/Table/RowState";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
-import { SortState, useSortState } from "src/components/Table/useSortState";
+import { SortOn, SortState, useSortState } from "src/components/Table/useSortState";
 import { visit } from "src/components/Table/visitor";
 import { Css, Margin, Only, Palette, Properties, Typography, Xss } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -157,6 +158,7 @@ type RenderAs = "div" | "table" | "virtual";
 
 /** The GridDataRow is optional b/c the nested card chrome rows only have ReactElements. */
 export type RowTuple<R extends Kinded> = [GridDataRow<R> | undefined, ReactElement];
+type ParentChildrenTuple<R extends Kinded> = [GridDataRow<R>, ParentChildrenTuple<R>[]];
 
 /**
  * The sort settings for the current table; whether it's client-side or server-side.
@@ -210,6 +212,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
   /** Whether the header row should be sticky. */
   stickyHeader?: boolean;
   stickyOffset?: string;
+  /** Configures sorting via a hash, does not need to be stable. */
   sorting?: GridSortConfig<S>;
   /** Shown in the first row slot, if there are no rows to show, i.e. 'No rows found'. */
   fallbackMessage?: string;
@@ -290,7 +293,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     stickyHeader = defaults.stickyHeader,
     stickyOffset = "0",
     xss,
-    sorting,
     filter,
     filterMaxRows,
     fallbackMessage = "No rows found.",
@@ -349,30 +351,59 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // here instead.
   const { getCount } = useRenderCount();
 
-  const [sortState, setSortKey] = useSortState<R, S>(columns, sorting);
-
-  const maybeSorted = useMemo(() => {
-    if (sorting?.on === "client" && sortState) {
-      // If using client-side sort, the sortState use S = number
-      return sortRows(columns, rows, sortState as any as SortState<number>);
-    }
-    return rows;
-  }, [columns, rows, sorting, sortState]);
-
   const columnSizes = useSetupColumnSizes(style, columns, tableRef, resizeTarget);
 
   // Make a single copy of our current collapsed state, so we'll have a single observer.
   const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
 
-  // Filter + flatten + component-ize the sorted rows.
-  let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
-    // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
-    const filters = (filter && filter.split(/ +/)) || [];
+  const [sortState, setSortKey, sortOn] = useSortState<R, S>(columns, props.sorting);
+  const maybeSorted = useMemo(() => {
+    if (sortOn === "client" && sortState) {
+      // If using client-side sort, the sortState use S = number
+      return sortRows(columns, rows, sortState as any as SortState<number>);
+    }
+    return rows;
+  }, [columns, rows, sortOn, sortState]);
 
+  // Filter rows - ensures parent rows remain in the list if any children match the filter.
+  const filterRows: (acc: ParentChildrenTuple<R>[], row: GridDataRow<R>) => ParentChildrenTuple<R>[] = useCallback(
+    (acc: ParentChildrenTuple<R>[], row: GridDataRow<R>) => {
+      // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
+      const filters = (filter && filter.split(/ +/)) || [];
+      const matches =
+        row.kind === "header" ||
+        filters.length === 0 ||
+        !!row.pin ||
+        filters.every((f) =>
+          columns.map((c) => applyRowFn(c, row, api)).some((maybeContent) => matchesFilter(maybeContent, f)),
+        );
+
+      // If the row matches, add it in
+      if (matches) {
+        return acc.concat([[row, row.children?.reduce(filterRows, []) ?? []]]);
+      } else {
+        // Otherwise, maybe one of the children match.
+        const isCollapsed = collapsedIds.includes(row.id);
+        if (!isCollapsed && !!row.children?.length) {
+          const matchedChildren = row.children.reduce(filterRows, []);
+          // If some children did match, then add the parent row with its matched children.
+          if (matchedChildren.length > 0) {
+            return acc.concat([[row, matchedChildren]]);
+          }
+        }
+      }
+
+      return acc;
+    },
+    [filter, collapsedIds, columns],
+  );
+
+  // Flatten + component-ize the sorted rows.
+  let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
     function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
-      const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : { sorting };
+      const sortProps = row.kind === "header" ? { sortOn, sortState, setSortKey } : { sortOn };
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
       return (
@@ -404,36 +435,24 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
     const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style.nestedCards);
 
-    // Depth-first to filter
-    function visit(row: GridDataRow<R>, level: number): void {
-      const matches =
-        filters.length === 0 ||
-        row.pin ||
-        filters.every((filter) =>
-          columns.map((c) => applyRowFn(c, row, api)).some((maybeContent) => matchesFilter(maybeContent, filter)),
-        );
-      let isCard = false;
-
-      // Even if we don't pass the filter, one of our children might, so we continue on after this check
-      if (matches) {
-        isCard = nestedCards && nestedCards.maybeOpenCard(row);
-        filteredRows.push([row, makeRowComponent(row, level)]);
-      }
+    function visit([row, children]: ParentChildrenTuple<R>, level: number): void {
+      let isCard = nestedCards && nestedCards.maybeOpenCard(row);
+      filteredRows.push([row, makeRowComponent(row, level)]);
 
       const isCollapsed = collapsedIds.includes(row.id);
-      if (!isCollapsed && !!row.children?.length) {
-        nestedCards && matches && nestedCards.addSpacer();
-        visitRows(row.children, isCard, level + 1);
+      if (!isCollapsed && children.length) {
+        nestedCards && nestedCards.addSpacer();
+        visitRows(children, isCard, level + 1);
       }
 
       !isLeafRow(row) && isCard && nestedCards && nestedCards.closeCard();
     }
 
-    function visitRows(rows: GridDataRow<R>[], addSpacer: boolean, level: number): void {
+    function visitRows(rows: ParentChildrenTuple<R>[], addSpacer: boolean, level: number): void {
       const length = rows.length;
       rows.forEach((row, i) => {
-        if (row.kind === "header") {
-          headerRows.push([row, makeRowComponent(row, level)]);
+        if (row[0].kind === "header") {
+          headerRows.push([row[0], makeRowComponent(row[0], level)]);
           return;
         }
         visit(row, level);
@@ -441,8 +460,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       });
     }
 
+    // Call `visitRows` with our a pre-filtered set list
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
-    visitRows(maybeSorted, !!nestedCards, 0);
+    visitRows(maybeSorted.reduce(filterRows, []), !!nestedCards, 0);
     nestedCards && nestedCards.done();
 
     return [headerRows, filteredRows];
@@ -450,10 +470,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     as,
     maybeSorted,
     columns,
-    filter,
+    filterRows,
     style,
     rowStyles,
-    sorting,
+    sortOn,
     setSortKey,
     sortState,
     stickyHeader,
@@ -469,7 +489,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     tooManyClientSideRows = true;
     filteredRows = filteredRows.slice(0, filterMaxRows);
   }
-  rowState.visibleRows.replace(filteredRows.map(([row]) => row?.id ?? ""));
+
+  rowState.setVisibleRows(filteredRows.map(([row]) => row?.id ?? ""));
 
   // Push back to the caller a way to ask us where a row is.
   const { rowLookup } = props;
@@ -1002,7 +1023,7 @@ interface GridRowProps<R extends Kinded, S> {
   rowStyles: GridRowStyles<R> | undefined;
   stickyHeader: boolean;
   stickyOffset: string;
-  sorting?: GridSortConfig<S>;
+  sortOn: SortOn;
   sortState?: SortState<S>;
   setSortKey?: (value: S) => void;
   // NOTE: openCards is a string of colon separated open kinds, so that the result is stable across renders.
@@ -1023,7 +1044,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     rowStyles,
     stickyHeader,
     stickyOffset,
-    sorting,
+    sortOn,
     sortState,
     setSortKey,
     openCards,
@@ -1087,21 +1108,13 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         currentColspan = isGridCellContent(maybeContent) ? maybeContent.colspan ?? 1 : 1;
 
         const canSortColumn =
-          (sorting?.on === "client" && column.clientSideSort !== false) ||
-          (sorting?.on === "server" && !!column.serverSideSortKey);
+          (sortOn === "client" && column.clientSideSort !== false) ||
+          (sortOn === "server" && !!column.serverSideSortKey);
         const alignment = getAlignment(column, maybeContent);
         const justificationCss = getJustification(column, maybeContent, as, alignment);
-        const content = toContent(
-          maybeContent,
-          isHeader,
-          canSortColumn,
-          sorting?.on === "client",
-          style,
-          as,
-          alignment,
-        );
+        const content = toContent(maybeContent, isHeader, canSortColumn, sortOn === "client", style, as, alignment);
 
-        ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
+        ensureClientSideSortValueIsSortable(sortOn, isHeader, column, columnIndex, maybeContent);
         const maybeNestedCardColumnIndex = columnIndex + (style.nestedCards ? 1 : 0);
 
         const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;

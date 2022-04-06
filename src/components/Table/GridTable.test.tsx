@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useContext, useState } from "react";
+import React, { MutableRefObject, useContext, useMemo, useState } from "react";
 import { selectColumn } from "src/components/Table/columns";
 import { GridRowLookup } from "src/components/Table/GridRowLookup";
 import {
@@ -212,15 +212,19 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("a");
 
       // And when sorted by column 1
-      const { sortHeader_0, sortHeader_1 } = r;
-      click(sortHeader_0);
+      click(r.sortHeader_0);
       // Then 'name: c' row is first
       expect(cell(r, 1, 0)).toHaveTextContent("c");
 
       // And when sorted by column 2
-      click(sortHeader_1);
+      click(r.sortHeader_1);
       // Then the `value: 1` row is first
       expect(cell(r, 1, 0)).toHaveTextContent("c");
+
+      // And the rows were memoized so didn't re-render
+      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 3).getAttribute("data-render")).toEqual("1");
     });
 
     it("can sort by other value", async () => {
@@ -502,12 +506,11 @@ describe("GridTable", () => {
 
     it("can sort nested rows", async () => {
       // Given a table with nested rows
-      const r = await render(
-        <GridTable
-          columns={[nameColumn, valueColumn]}
-          // And there is no initial sort given
-          sorting={{ on: "client" }}
-          rows={[
+      function TestComponent() {
+        const [, setCount] = useState(0);
+        const columns = useMemo(() => [nameColumn, valueColumn], []);
+        const rows = useMemo<GridDataRow<Row>[]>(() => {
+          return [
             simpleHeader,
             // And the data is initially unsorted
             {
@@ -524,9 +527,24 @@ describe("GridTable", () => {
                 { kind: "data", id: "11", name: "2", value: 2 },
               ],
             },
-          ]}
-        />,
-      );
+          ];
+        }, []);
+        return (
+          <div>
+            <button data-testid="rerenderParent" onClick={() => setCount(1)}>
+              rerender
+            </button>
+            <GridTable
+              columns={columns}
+              // And there is no initial sort given
+              sorting={{ on: "client" }}
+              rows={rows}
+            />
+          </div>
+        );
+      }
+      const r = await render(<TestComponent />);
+
       // Then the data is sorted by 1 (1 2) then 2 (1 2)
       expect(cell(r, 1, 0)).toHaveTextContent("1");
       expect(cell(r, 2, 0)).toHaveTextContent("1");
@@ -534,6 +552,7 @@ describe("GridTable", () => {
       expect(cell(r, 4, 0)).toHaveTextContent("2");
       expect(cell(r, 5, 0)).toHaveTextContent("1");
       expect(cell(r, 6, 0)).toHaveTextContent("2");
+
       // And when we reverse the sort
       click(r.sortHeader_0);
       // Then the data is sorted by 2 (2 1) then 1 (2 1)
@@ -543,6 +562,28 @@ describe("GridTable", () => {
       expect(cell(r, 4, 0)).toHaveTextContent("1");
       expect(cell(r, 5, 0)).toHaveTextContent("2");
       expect(cell(r, 6, 0)).toHaveTextContent("1");
+
+      // And the header row re-rendered
+      expect(row(r, 0).getAttribute("data-render")).toEqual("2");
+      // But the data rows did not
+      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 3).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 4).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 5).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 6).getAttribute("data-render")).toEqual("1");
+
+      // And the table re-renders for some other reason
+      click(r.rerenderParent);
+
+      // Then memoization did not break
+      expect(row(r, 0).getAttribute("data-render")).toEqual("2");
+      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 3).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 4).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 5).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 6).getAttribute("data-render")).toEqual("1");
     });
 
     it("throws an error if a column value is not sortable", async () => {
@@ -956,10 +997,12 @@ describe("GridTable", () => {
     const r = await render(<GridTable filter="foo" columns={nestedColumns} rows={rows} />);
     // Then we show the header
     expect(cell(r, 0, 2)).toHaveTextContent("Name");
+    // And the parent that had a child that matched
+    expect(cell(r, 1, 2)).toHaveTextContent("p1");
     // And the child that matched
-    expect(cell(r, 1, 2)).toHaveTextContent("foo");
+    expect(cell(r, 2, 2)).toHaveTextContent("foo");
     // And that's it
-    expect(row(r, 2)).toBeUndefined();
+    expect(row(r, 3)).toBeUndefined();
   });
 
   it("can collapse parent rows", async () => {
@@ -1158,8 +1201,79 @@ describe("GridTable", () => {
     // And when applying a filter
     type(r.filter, "p1c1g2");
     // Then expect only the visible rows selected are returned
-    expect(api.current!.getSelectedRows()).toEqual([rows[1].children![0].children![1]]);
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1c1g2"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g2"]);
+    expect(api.current!.getSelectedRows()).toEqual([rows[1], rows[1].children![0], rows[1].children![0].children![1]]);
+  });
+
+  it("re-derives parent row selected state", async () => {
+    // Given a parent with children
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "header", id: "header" },
+      {
+        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        children: [
+          { kind: "child", id: "p1c1", name: "child p1c1" },
+          { kind: "child", id: "p1c2", name: "child p1c2" },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    // When rendering a GridTable with filtering and selectable rows
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+
+    // And selecting one of the child rows
+    click(cell(r, 3, 1).children[0] as any);
+
+    // Then the Header and Parent rows should have the `indeterminate` checked value
+    expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked();
+    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+
+    // And when applying a filter to hide non-selected child rows
+    type(r.filter, "p1 c2");
+    // Then the header and parents should flip to fully checked
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+  });
+
+  it("only selects visible rows", async () => {
+    // Given a parent with a child and grandchildren
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "header", id: "header" },
+      {
+        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+            children: [
+              { kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" },
+              { kind: "grandChild", id: "p1c1g2", name: "grandchild p1c1g2" },
+            ],
+          },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    // When rendering a GridTable with filtering and selectable rows
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+    // And filtering without any rows selected
+    type(r.filter, "p1c1g2");
+    // And selecting the parent row
+    click(cellAnd(r, 1, 1, "select"));
+    // Then expect all rows should be checked
+    expect(cellAnd(r, 0, 1, "select")).toBeChecked(); // Header
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked(); // Parent
+    expect(cellAnd(r, 2, 1, "select")).toBeChecked(); // Child
+    expect(cellAnd(r, 3, 1, "select")).toBeChecked(); // Grandchild
+
+    // When removing the filter to show all rows.
+    type(r.filter, "");
+
+    // Then expect the parent rows to have updated based on the row status
+    expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked(); // Header
+    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked(); // Parent
+    expect(cellAnd(r, 2, 1, "select")).toBePartiallyChecked(); // Child
+    expect(cellAnd(r, 3, 1, "select")).not.toBeChecked(); // Grandchild - reintroduced by clearing filter.
+    expect(cellAnd(r, 4, 1, "select")).toBeChecked(); // Grandchild
   });
 
   describe("matchesFilter", () => {
@@ -1508,13 +1622,11 @@ function expectRenderedRows(...rowIds: string[]): void {
   renderedNameColumn = [];
 }
 
-function TestFilterAndSelect({
-  api,
-  rows,
-}: {
+function TestFilterAndSelect(props: {
   api: MutableRefObject<GridTableApi<NestedRow> | undefined>;
   rows: GridDataRow<NestedRow>[];
 }) {
+  const { api, rows } = props;
   const [filter, setFilter] = useState<string | undefined>("");
   return (
     <div>
