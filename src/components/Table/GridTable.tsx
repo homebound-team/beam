@@ -378,15 +378,18 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           columns.map((c) => applyRowFn(c, row, api)).some((maybeContent) => matchesFilter(maybeContent, f)),
         );
 
+      // If the row matches, add it in
       if (matches) {
         return acc.concat([[row, row.children?.reduce(filterRows, []) ?? []]]);
-      }
-
-      const isCollapsed = collapsedIds.includes(row.id);
-      if (!isCollapsed && !!row.children?.length) {
-        const matchedChildren = row.children.reduce(filterRows, []);
-        if (matchedChildren.length > 0) {
-          return acc.concat([[row, matchedChildren]]);
+      } else {
+        // Otherwise, maybe one of the children match.
+        const isCollapsed = collapsedIds.includes(row.id);
+        if (!isCollapsed && !!row.children?.length) {
+          const matchedChildren = row.children.reduce(filterRows, []);
+          // If some children did match, then add the parent row with its matched children.
+          if (matchedChildren.length > 0) {
+            return acc.concat([[row, matchedChildren]]);
+          }
         }
       }
 
@@ -432,17 +435,17 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
     const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style.nestedCards);
 
-    function visit(row: ParentChildrenTuple<R>, level: number): void {
-      let isCard = nestedCards && nestedCards.maybeOpenCard(row[0]);
-      filteredRows.push([row[0], makeRowComponent(row[0], level)]);
+    function visit([row, children]: ParentChildrenTuple<R>, level: number): void {
+      let isCard = nestedCards && nestedCards.maybeOpenCard(row);
+      filteredRows.push([row, makeRowComponent(row, level)]);
 
-      const isCollapsed = collapsedIds.includes(row[0].id);
-      if (!isCollapsed && row[1].length) {
+      const isCollapsed = collapsedIds.includes(row.id);
+      if (!isCollapsed && children.length) {
         nestedCards && nestedCards.addSpacer();
-        visitRows(row[1], isCard, level + 1);
+        visitRows(children, isCard, level + 1);
       }
 
-      !isLeafRow(row[0]) && isCard && nestedCards && nestedCards.closeCard();
+      !isLeafRow(row) && isCard && nestedCards && nestedCards.closeCard();
     }
 
     function visitRows(rows: ParentChildrenTuple<R>[], addSpacer: boolean, level: number): void {

@@ -51,13 +51,11 @@ export class RowState {
       () => [...this.visibleRows.values()].sort(),
       () => {
         const map = new Map<string, SelectedState>();
-        // go through the rows and re-derive all visible parent states.
-        this.rows.current.forEach((row) => this.setNestedSelectedStates(row, map));
-
-        // Finally re-derive the 'header's state.
-        map.set("header", deriveParentSelected(this.getVisibleImmediateChildrenSelectedStates(this.rows.current, map)));
-
-        // And finally merge the changes back into the selected rows state
+        map.set(
+          "header",
+          deriveParentSelected(this.rows.current.flatMap((row) => this.setNestedSelectedStates(row, map))),
+        );
+        // Merge the changes back into the selected rows state
         this.selectedRows.merge(map);
       },
       { equals: comparer.shallow },
@@ -113,15 +111,12 @@ export class RowState {
       // Now walk up the parents and see if they are now-all-checked/now-all-unchecked/some-of-each
       for (const parent of [...curr.parents].reverse()) {
         if (parent.children) {
-          map.set(
-            parent.id,
-            deriveParentSelected(this.getVisibleImmediateChildrenSelectedStates(parent.children, map)),
-          );
+          map.set(parent.id, deriveParentSelected(this.getVisibleChildrenStates(parent.children, map)));
         }
       }
 
       // And do the header + top-level "children" as a final one-off
-      map.set("header", deriveParentSelected(this.getVisibleImmediateChildrenSelectedStates(this.rows.current, map)));
+      map.set("header", deriveParentSelected(this.getVisibleChildrenStates(this.rows.current, map)));
 
       this.selectedRows.merge(map);
     }
@@ -178,10 +173,7 @@ export class RowState {
     }
   }
 
-  private getVisibleImmediateChildrenSelectedStates(
-    children: GridDataRow<any>[],
-    map: Map<string, SelectedState>,
-  ): SelectedState[] {
+  private getVisibleChildrenStates(children: GridDataRow<any>[], map: Map<string, SelectedState>): SelectedState[] {
     return children
       .filter((row) => row.id !== "header" && this.visibleRows.has(row.id))
       .map((row) => map.get(row.id) || this.getSelected(row.id));
@@ -191,7 +183,7 @@ export class RowState {
   private setNestedSelectedStates(row: GridDataRow<any>, map: Map<string, SelectedState>): SelectedState[] {
     if (this.visibleRows.has(row.id)) {
       if (!row.children) {
-        return [map.get(row.id) || this.getSelected(row.id)];
+        return [this.getSelected(row.id)];
       }
 
       const childrenSelectedStates = row.children.flatMap((rc) => this.setNestedSelectedStates(rc, map));
