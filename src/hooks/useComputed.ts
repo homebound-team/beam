@@ -45,7 +45,7 @@ export function useComputed<T>(fn: () => T, deps: readonly any[]): T {
       // Only trigger a re-render if this is not the 1st autorun. Note
       // that if deps has changed, we're inherently in a re-render so also
       // don't need to trigger an additional re-render.
-      //convert object or values to JSON string for deep value comparison 
+      //include deep comparisons for objects
       if (oldHasRun && !equal(newValue, oldValue)) {
         setTick((tick) => tick + 1);
       }
