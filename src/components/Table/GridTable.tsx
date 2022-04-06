@@ -32,7 +32,7 @@ import {
 import { RowState, RowStateContext } from "src/components/Table/RowState";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
-import { SortState, useSortState } from "src/components/Table/useSortState";
+import { SortOn, SortState, useSortState } from "src/components/Table/useSortState";
 import { visit } from "src/components/Table/visitor";
 import { Css, Margin, Only, Palette, Properties, Typography, Xss } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -212,6 +212,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
   /** Whether the header row should be sticky. */
   stickyHeader?: boolean;
   stickyOffset?: string;
+  /** Configures sorting via a hash, does not need to be stable. */
   sorting?: GridSortConfig<S>;
   /** Shown in the first row slot, if there are no rows to show, i.e. 'No rows found'. */
   fallbackMessage?: string;
@@ -292,7 +293,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     stickyHeader = defaults.stickyHeader,
     stickyOffset = "0",
     xss,
-    sorting,
     filter,
     filterMaxRows,
     fallbackMessage = "No rows found.",
@@ -356,14 +356,14 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // Make a single copy of our current collapsed state, so we'll have a single observer.
   const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
 
-  const [sortState, setSortKey] = useSortState<R, S>(columns, sorting);
+  const [sortState, setSortKey, sortOn] = useSortState<R, S>(columns, props.sorting);
   const maybeSorted = useMemo(() => {
-    if (sorting?.on === "client" && sortState) {
+    if (sortOn === "client" && sortState) {
       // If using client-side sort, the sortState use S = number
       return sortRows(columns, rows, sortState as any as SortState<number>);
     }
     return rows;
-  }, [columns, rows, sorting, sortState]);
+  }, [columns, rows, sortOn, sortState]);
 
   // Filter rows - ensures parent rows remain in the list if any children match the filter.
   const filterRows: (acc: ParentChildrenTuple<R>[], row: GridDataRow<R>) => ParentChildrenTuple<R>[] = useCallback(
@@ -395,7 +395,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
       return acc;
     },
-    [filter, collapsedIds],
+    [filter, collapsedIds, columns],
   );
 
   // Flatten + component-ize the sorted rows.
@@ -403,7 +403,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
-      const sortProps = row.kind === "header" ? { sorting, sortState, setSortKey } : { sorting };
+      const sortProps = row.kind === "header" ? { sortOn, sortState, setSortKey } : { sortOn };
       const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
       return (
@@ -470,10 +470,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     as,
     maybeSorted,
     columns,
-    filter,
+    filterRows,
     style,
     rowStyles,
-    sorting,
+    sortOn,
     setSortKey,
     sortState,
     stickyHeader,
@@ -1022,7 +1022,7 @@ interface GridRowProps<R extends Kinded, S> {
   rowStyles: GridRowStyles<R> | undefined;
   stickyHeader: boolean;
   stickyOffset: string;
-  sorting?: GridSortConfig<S>;
+  sortOn: SortOn;
   sortState?: SortState<S>;
   setSortKey?: (value: S) => void;
   // NOTE: openCards is a string of colon separated open kinds, so that the result is stable across renders.
@@ -1043,7 +1043,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     rowStyles,
     stickyHeader,
     stickyOffset,
-    sorting,
+    sortOn,
     sortState,
     setSortKey,
     openCards,
@@ -1107,21 +1107,13 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         currentColspan = isGridCellContent(maybeContent) ? maybeContent.colspan ?? 1 : 1;
 
         const canSortColumn =
-          (sorting?.on === "client" && column.clientSideSort !== false) ||
-          (sorting?.on === "server" && !!column.serverSideSortKey);
+          (sortOn === "client" && column.clientSideSort !== false) ||
+          (sortOn === "server" && !!column.serverSideSortKey);
         const alignment = getAlignment(column, maybeContent);
         const justificationCss = getJustification(column, maybeContent, as, alignment);
-        const content = toContent(
-          maybeContent,
-          isHeader,
-          canSortColumn,
-          sorting?.on === "client",
-          style,
-          as,
-          alignment,
-        );
+        const content = toContent(maybeContent, isHeader, canSortColumn, sortOn === "client", style, as, alignment);
 
-        ensureClientSideSortValueIsSortable(sorting, isHeader, column, columnIndex, maybeContent);
+        ensureClientSideSortValueIsSortable(sortOn, isHeader, column, columnIndex, maybeContent);
         const maybeNestedCardColumnIndex = columnIndex + (style.nestedCards ? 1 : 0);
 
         const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;

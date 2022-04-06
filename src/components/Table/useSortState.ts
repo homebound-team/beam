@@ -11,50 +11,59 @@ import { ASC, DESC, Direction, GridColumn, GridSortConfig, Kinded } from "src/co
  */
 export type SortState<S> = readonly [S, Direction];
 
+export type SortOn = "client" | "server" | undefined;
+
 /** Small custom hook that wraps the "setSortColumn inverts the current sort" logic. */
 export function useSortState<R extends Kinded, S>(
   columns: GridColumn<R, S>[],
   sorting?: GridSortConfig<S>,
-): [SortState<S> | undefined, (value: S) => void] {
+): [SortState<S> | undefined, (value: S) => void, SortOn] {
   // If we're server-side sorting, use the caller's `sorting.value` prop to initialize our internal
   // `useState`. After this, we ignore `sorting.value` because we assume it should match what our
   // `setSortState` just changed anyway (in response to the user sorting a column).
-  const initialSortState: SortState<S> | undefined = useMemo(() => {
-    if (sorting?.on === "client") {
-      const { initial } = sorting;
-      if (initial === undefined && "initial" in sorting) {
-        // if explicitly set to `undefined`, then do not sort
-        return undefined;
-      } else if (initial) {
-        const key = typeof initial[0] === "number" ? initial[0] : columns.indexOf(initial[0] as any);
-        return [key as any as S, initial[1]];
+  const initialSortState: SortState<S> | undefined = useMemo(
+    () => {
+      if (sorting?.on === "client") {
+        const { initial } = sorting;
+        if (initial === undefined && "initial" in sorting) {
+          // if explicitly set to `undefined`, then do not sort
+          return undefined;
+        } else if (initial) {
+          const key = typeof initial[0] === "number" ? initial[0] : columns.indexOf(initial[0] as any);
+          return [key as any as S, initial[1]];
+        } else {
+          // If no explicit sorting, assume 1st column ascending
+          const firstSortableColumn = columns.findIndex((c) => c.clientSideSort !== false);
+          return [firstSortableColumn as any as S, ASC];
+        }
       } else {
-        // If no explicit sorting, assume 1st column ascending
-        const firstSortableColumn = columns.findIndex((c) => c.clientSideSort !== false);
-        return [firstSortableColumn as any as S, ASC];
+        return sorting?.value;
       }
-    } else {
-      return sorting?.value;
-    }
-  }, [sorting, columns]);
+    },
+    // We want to allow the user to not memoize `GridTableProps.sorting` b/c for the
+    // initialSortState calc, it's just a bunch of surely hard-coded primitives like
+    // sort on client/server, which column is initial.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [columns],
+  );
   const [sortState, setSortState] = useState<SortState<S> | undefined>(initialSortState);
 
   // Make a custom setSortKey that is useState-like but contains the ASC->DESC->RESET logic.
+  const onSort = sorting?.on === "server" ? sorting.onSort : undefined;
   const setSortKey = useCallback(
     (clickedKey: S) => {
       const newState = deriveSortState(sortState, clickedKey, initialSortState);
       setSortState(newState);
-
-      if (sorting?.on === "server") {
+      if (onSort) {
         const [newKey, newDirection] = newState ?? [undefined, undefined];
-        sorting.onSort(newKey, newDirection);
+        onSort(newKey, newDirection);
       }
     },
     // Note that sorting.onSort is not listed here, so we bind to whatever the 1st sorting.onSort was
-    [sortState, setSortState],
+    [initialSortState, sortState, onSort],
   );
 
-  return [sortState, setSortKey];
+  return [sortState, setSortKey, sorting?.on];
 }
 
 // Exported for testing purposes

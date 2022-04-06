@@ -1,13 +1,6 @@
 import { ReactNode } from "react";
-import {
-  applyRowFn,
-  GridCellContent,
-  GridColumn,
-  GridDataRow,
-  GridSortConfig,
-  Kinded,
-} from "src/components/Table/GridTable";
-import { SortState } from "src/components/Table/useSortState";
+import { applyRowFn, GridCellContent, GridColumn, GridDataRow, Kinded } from "src/components/Table/GridTable";
+import { SortOn, SortState } from "src/components/Table/useSortState";
 
 // Returns a shallow copy of the `rows` parameter sorted based on `sortState`
 export function sortRows<R extends Kinded>(
@@ -79,18 +72,13 @@ function sortValue(value: ReactNode | GridCellContent): any {
 }
 
 export function ensureClientSideSortValueIsSortable(
-  sorting: GridSortConfig<any> | undefined,
+  sortOn: SortOn,
   isHeader: boolean,
   column: GridColumn<any>,
   idx: number,
   maybeContent: ReactNode | GridCellContent,
 ): void {
-  if (
-    process.env.NODE_ENV !== "production" &&
-    !isHeader &&
-    sorting?.on === "client" &&
-    column.clientSideSort !== false
-  ) {
+  if (process.env.NODE_ENV !== "production" && !isHeader && sortOn === "client" && column.clientSideSort !== false) {
     const value = sortValue(maybeContent);
     if (!canClientSideSort(value)) {
       throw new Error(`Column ${idx} passed an unsortable value, use GridCellContent or clientSideSort=false`);
