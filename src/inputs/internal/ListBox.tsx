@@ -1,4 +1,4 @@
-import React, { Key, MutableRefObject, useState } from "react";
+import React, { Key, MutableRefObject, useEffect, useRef, useState } from "react";
 import { useListBox } from "react-aria";
 import { SelectState } from "react-stately";
 import { Css } from "src/Css";
@@ -43,7 +43,19 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
   const firstItem = state.collection.at(0);
   const hasSections = firstItem && firstItem.type === "section";
-  const onListHeightChange = (height: number) => {
+  // Create a reference for measuring the MultiSelect's selected list's height. Used for re-evaluating `popoverHeight`.
+  const selectedList = useRef<HTMLUListElement>(null);
+  const firstRender = useRef(true);
+  // Keep track of the virtuoso list height to properly update the ListBox's height.
+  // Using a ref, this itself should not trigger a rerender, only `popoverHeight` changes will trigger a rerender.
+  const virtuosoListHeight = useRef<number>(0);
+  const onListHeightChange = (listHeight: number) => {
+    virtuosoListHeight.current = listHeight;
+    // The "listHeight" is only the list of options.
+    // For multiple selects we need to also account for the height of the list of currently selected elements when re-evaluating.
+    // Using `offsetHeight` to account for borders
+    const height = (selectedList.current?.offsetHeight || 0) + listHeight;
+
     // Using Math.min to choose between the smaller height, either the total height of the List (`height` arg), or the maximum height defined by the space allotted on screen or our hard coded max.
     // If there are ListBoxSections, then we assume it is the persistent section with a single item and account for that height.
     setPopoverHeight(
@@ -51,17 +63,30 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     );
   };
 
+  useEffect(() => {
+    // Reevaluate the list height when introducing or removing the MultiSelect's options list.
+    // Do not call `onListHeightChange` on the first render. Only when the selectedKeys size has actually changed between empty and not empty.
+    if (
+      !firstRender.current &&
+      isMultiSelect &&
+      (state.selectionManager.selectedKeys.size === 0 || state.selectionManager.selectedKeys.size === 1)
+    ) {
+      onListHeightChange(virtuosoListHeight.current);
+    }
+    firstRender.current = false;
+  }, [state.selectionManager.selectedKeys.size]);
+
   return (
     <div
       css={{
-        ...Css.bgWhite.br4.w100.bshBasic.if(contrast).bgGray700.$,
+        ...Css.bgWhite.br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(contrast).bgGray700.$,
         "&:hover": Css.bshHover.$,
       }}
       ref={listBoxRef}
       {...listBoxProps}
     >
       {isMultiSelect && state.selectionManager.selectedKeys.size > 0 && (
-        <ul css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").$}>
+        <ul css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").$} ref={selectedList}>
           {selectedOptions.map((o) => (
             <ListBoxToggleChip
               key={getOptionValue(o)}
@@ -75,7 +100,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
         </ul>
       )}
 
-      <ul css={Css.listReset.hPx(popoverHeight).$}>
+      <ul css={Css.listReset.fg1.$}>
         {hasSections ? (
           [...state.collection].map((section) => (
             <ListBoxSection
