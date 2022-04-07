@@ -19,6 +19,8 @@ export type {
   RowStyle,
   setRunningInJest,
 } from "./GridTable";
+export { useGridTableApi } from "./GridTableApi";
+export type { GridTableApi } from "./GridTableApi";
 export { RowState, RowStateContext } from "./RowState";
 export * from "./SelectToggle";
 export { simpleDataRows, simpleHeader, simpleRows } from "./simpleHelpers";

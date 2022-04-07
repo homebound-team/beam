@@ -1,5 +1,5 @@
 import { comparer, makeAutoObservable, ObservableMap, ObservableSet, reaction } from "mobx";
-import React, { MutableRefObject } from "react";
+import React from "react";
 import { GridDataRow } from "src/components/Table/GridTable";
 import { visit } from "src/components/Table/visitor";
 
@@ -23,42 +23,39 @@ export type SelectedState = "checked" | "unchecked" | "partial";
  */
 export class RowState {
   // A set of just row ids, i.e. not row.kind+row.id
-  private readonly collapsedRows: ObservableSet<string>;
+  private readonly collapsedRows = new ObservableSet<string>();
+  private persistCollapse: string | undefined;
   private readonly selectedRows = new ObservableMap<string, SelectedState>();
   // Set of just row ids. Keeps track of which rows are visible. Used to filter out non-visible rows from `selectedIds`
   private visibleRows = new ObservableSet<string>();
-
+  // The current list of rows, basically a useRef.current. Not reactive.
+  public rows: GridDataRow<any>[] = [];
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
   activeRowId: string | undefined;
 
   /**
    * Creates the `RowState` for a given `GridTable`.
    */
-  constructor(
-    private rows: MutableRefObject<GridDataRow<any>[]>,
-    private persistCollapse: string | undefined,
-    activeRowId: string | undefined,
-  ) {
-    this.collapsedRows = new ObservableSet(persistCollapse ? readLocalCollapseState(persistCollapse) : []);
-    this.activeRowId = activeRowId;
+  constructor() {
     // Make ourselves an observable so that mobx will do caching of .collapseIds so
     // that it'll be a stable identity for GridTable to useMemo against.
     makeAutoObservable(this, { rows: false } as any); // as any b/c rows is private, so the mapped type doesn't see it
-
     // Whenever our `visibleRows` change (i.e. via filtering) then we need to re-derive header and parent rows' selected state.
     reaction(
       () => [...this.visibleRows.values()].sort(),
       () => {
         const map = new Map<string, SelectedState>();
-        map.set(
-          "header",
-          deriveParentSelected(this.rows.current.flatMap((row) => this.setNestedSelectedStates(row, map))),
-        );
+        map.set("header", deriveParentSelected(this.rows.flatMap((row) => this.setNestedSelectedStates(row, map))));
         // Merge the changes back into the selected rows state
         this.selectedRows.merge(map);
       },
       { equals: comparer.shallow },
     );
+  }
+
+  loadPersistedCollapse(persistCollapse: string): void {
+    this.persistCollapse = persistCollapse;
+    this.collapsedRows.replace(readLocalCollapseState(persistCollapse));
   }
 
   setVisibleRows(rowIds: string[]): void {
@@ -98,7 +95,7 @@ export class RowState {
         // Just mash the header + all rows + children as selected
         const map = new Map<string, SelectedState>();
         map.set("header", "checked");
-        visit(this.rows.current, (row) => this.visibleRows.has(row.id) && map.set(row.id, "checked"));
+        visit(this.rows, (row) => this.visibleRows.has(row.id) && map.set(row.id, "checked"));
         this.selectedRows.replace(map);
       } else {
         // Similarly "unmash" all rows + children.
@@ -109,7 +106,7 @@ export class RowState {
       // plus percolate the change down-to-child + up-to-parents.
 
       // Find the clicked on row
-      const curr = findRow(this.rows.current, id);
+      const curr = findRow(this.rows, id);
       if (!curr) {
         return;
       }
@@ -126,7 +123,7 @@ export class RowState {
       }
 
       // And do the header + top-level "children" as a final one-off
-      map.set("header", deriveParentSelected(this.getVisibleChildrenStates(this.rows.current, map)));
+      map.set("header", deriveParentSelected(this.getVisibleChildrenStates(this.rows, map)));
 
       this.selectedRows.merge(map);
     }
@@ -156,7 +153,7 @@ export class RowState {
         // Find all non-leaf rows so that toggling "all collapsed" -> "all not collapsed" opens
         // the parent rows of any level.
         const parentIds = new Set<string>();
-        const todo = [...this.rows.current];
+        const todo = [...this.rows];
         while (todo.length > 0) {
           const r = todo.pop()!;
           if (r.children) {

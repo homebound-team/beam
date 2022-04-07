@@ -3,14 +3,8 @@ import { default as React, ReactNode, useMemo, useState } from "react";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
 import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/columns";
-import {
-  emptyCell,
-  GridColumn,
-  GridDataRow,
-  GridSortConfig,
-  GridTable,
-  GridTableApi,
-} from "src/components/Table/GridTable";
+import { emptyCell, GridColumn, GridDataRow, GridSortConfig, GridTable } from "src/components/Table/GridTable";
+import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { SimpleHeaderAndDataWith } from "src/components/Table/simpleHelpers";
 import {
   beamFixedStyle,
@@ -122,9 +116,8 @@ export function NestedFlexible() {
 // 2. Select individual "Project Items". Note parent is "checked"
 // 3. Remove filter, additional project items under parent are "unchecked", though parent still shows "checked" instead of what it should show as "indeterminate".
 export function Filterable() {
-  // Using a useState so that useComputed works
-  const [api, setApi] = useState<GridTableApi<BeamNestedRow> | null>();
-  const selectedIds = useComputed(() => api?.getSelectedRows().map((r) => r.id) || [], [api]);
+  const api = useGridTableApi<BeamNestedRow>();
+  const selectedIds = useComputed(() => api.getSelectedRows().map((r) => r.id), [api]);
 
   // This is useful to debug if doing `visibleRows.replace` in `RowState`
   // spams the page component to re-render in a not-infinite-but-still-unhelpful loop.
@@ -157,13 +150,7 @@ export function Filterable() {
         rows={beamNestedRows}
         stickyHeader
         filter={filter}
-        api={{
-          set current(newApi: GridTableApi<any>) {
-            if (api !== newApi) {
-              setApi(newApi);
-            }
-          },
-        }}
+        api={api}
       />
     </div>
   );
