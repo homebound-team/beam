@@ -9,10 +9,10 @@ import {
   GridRowStyles,
   GridStyle,
   GridTable,
-  GridTableApi,
   matchesFilter,
   setRunningInJest,
 } from "src/components/Table/GridTable";
+import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import { RowStateContext } from "src/components/Table/RowState";
 import {
   simpleDataRows,
@@ -1136,7 +1136,12 @@ describe("GridTable", () => {
       },
     ];
     const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
-    const r = await render(<GridTable<NestedRow> api={api} columns={nestedColumns} rows={rows} />);
+    function Test() {
+      const _api = useGridTableApi<NestedRow>();
+      api.current = _api;
+      return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
+    }
+    const r = await render(<Test />);
     // And all three rows are initially rendered
     expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
     expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
@@ -1626,7 +1631,9 @@ function TestFilterAndSelect(props: {
   api: MutableRefObject<GridTableApi<NestedRow> | undefined>;
   rows: GridDataRow<NestedRow>[];
 }) {
-  const { api, rows } = props;
+  const { api: apiRef, rows } = props;
+  const api = useGridTableApi<NestedRow>();
+  apiRef.current = api;
   const [filter, setFilter] = useState<string | undefined>("");
   return (
     <div>

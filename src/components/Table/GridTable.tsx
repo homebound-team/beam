@@ -9,7 +9,6 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from "react";
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
@@ -22,6 +21,7 @@ import {
 import { useSetupColumnSizes } from "src/components/Table/columnSizes";
 import { createRowLookup, GridRowLookup } from "src/components/Table/GridRowLookup";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/GridSortContext";
+import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
 import {
   getCurrentBgColor,
   getNestedCardStyles,
@@ -29,11 +29,10 @@ import {
   NestedCards,
   wrapCard,
 } from "src/components/Table/nestedCards";
-import { RowState, RowStateContext } from "src/components/Table/RowState";
+import { RowStateContext } from "src/components/Table/RowState";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
 import { SortOn, SortState, useSortState } from "src/components/Table/useSortState";
-import { visit } from "src/components/Table/visitor";
 import { Css, Margin, Only, Palette, Properties, Typography, Xss } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
@@ -236,8 +235,8 @@ export interface GridTableProps<R extends Kinded, S, X> {
    */
   persistCollapse?: string;
   xss?: X;
-  /** Experimental API allowing one to scroll to a table index. Primarily intended for stories at the moment */
-  api?: MutableRefObject<GridTableApi<R> | undefined>;
+  /** Accepts the api, from `useGridTableApi`, that the caller wants to use for this table. */
+  api?: GridTableApi<R>;
   /** Experimental, expecting to be removed - Specify the element in which the table should resize its columns against. If not set, the table will resize columns based on its owns container's width */
   resizeTarget?: MutableRefObject<HTMLElement | null>;
   /**
@@ -247,22 +246,6 @@ export interface GridTableProps<R extends Kinded, S, X> {
    */
   activeRowId?: string;
 }
-
-/** NOTE: This API is experimental and primarily intended for story and testing purposes */
-export type GridTableApi<R extends Kinded> = {
-  scrollToIndex: (index: number) => void;
-
-  /** Returns the ids of currently-selected rows. */
-  getSelectedRowIds(): string[];
-  getSelectedRowIds<K extends R["kind"]>(kind: K): string[];
-
-  /** Returns the currently-selected rows. */
-  getSelectedRows(): GridDataRow<R>[];
-  getSelectedRows<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
-
-  /** Sets the internal state of 'activeRowId' */
-  setActiveRowId: (id: string | undefined) => void;
-};
 
 /**
  * Renders data in our table layout.
@@ -300,46 +283,23 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     setRowCount,
     observeRows,
     persistCollapse,
-    api: callerApi,
     resizeTarget,
     activeRowId,
   } = props;
-
-  // Create a ref that always contains the latest rows, for our effectively-singleton RowState to use
-  const rowsRef = useRef(rows);
-  rowsRef.current = rows;
-  const [rowState] = useState(() => new RowState(rowsRef, persistCollapse, activeRowId));
 
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const tableRef = useRef<HTMLElement>(null);
 
-  const api = useRef<GridTableApi<R>>({
-    scrollToIndex: (index) => virtuosoRef.current && virtuosoRef.current.scrollToIndex(index),
-    getSelectedRowIds(kind?: string): string[] {
-      if (kind === undefined) {
-        return rowState.selectedIds;
-      } else {
-        return this.getSelectedRows(kind).map((row) => row.id);
-      }
-    },
-    // The any is not great, but getting the overload to handle the optional kind is annoying
-    getSelectedRows(kind?: string): any {
-      const ids = rowState.selectedIds;
-      const selected: GridDataRow<R>[] = [];
-      visit(rows, (row) => {
-        if (ids.includes(row.id) && (!kind || row.kind === kind)) {
-          selected.push(row as any);
-        }
-      });
-      return selected;
-    },
-    setActiveRowId: (id: string | undefined) => (rowState.activeRowId = id),
-  });
+  const api = useMemo<GridTableApiImpl<R>>(() => {
+    const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
+    api.init(persistCollapse, virtuosoRef);
+    api.setActiveRowId(activeRowId);
+    return api;
+  }, [props.api]);
 
-  if (callerApi) {
-    callerApi.current = api.current;
-  }
+  const { rowState } = api;
+  rowState.rows = rows;
 
   useEffect(() => {
     rowState.activeRowId = activeRowId;
@@ -1031,7 +991,7 @@ interface GridRowProps<R extends Kinded, S> {
   columnSizes: string[];
   level: number;
   getCount: (id: string) => object;
-  api: MutableRefObject<GridTableApi<R>>;
+  api: GridTableApi<R>;
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -1277,16 +1237,16 @@ function isContentEmpty(content: ReactNode): boolean {
 export function applyRowFn<R extends Kinded>(
   column: GridColumn<R>,
   row: GridDataRow<R>,
-  api: MutableRefObject<GridTableApi<R>>,
+  api: GridTableApi<R>,
 ): ReactNode | GridCellContent {
   // Usually this is a function to apply against the row, but sometimes it's a hard-coded value, i.e. for headers
   const maybeContent = column[row.kind];
   if (typeof maybeContent === "function") {
     if ("data" in row && "id" in row) {
       // Auto-destructure data
-      return (maybeContent as Function)((row as any)["data"], (row as any)["id"], api.current);
+      return (maybeContent as Function)((row as any)["data"], (row as any)["id"], api);
     } else {
-      return (maybeContent as Function)(row, api.current);
+      return (maybeContent as Function)(row, api);
     }
   } else {
     return maybeContent;
@@ -1346,11 +1306,11 @@ const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (
 };
 
 /** Renders a cell that will fire the RowStyle.onClick. */
-const rowClickRenderFn: (as: RenderAs, api: MutableRefObject<GridTableApi<any>>) => RenderCellFn<any> =
-  (as: RenderAs, api: MutableRefObject<GridTableApi<any>>) => (key, css, content, row, rowStyle) => {
+const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>) => RenderCellFn<any> =
+  (as: RenderAs, api: GridTableApi<any>) => (key, css, content, row, rowStyle) => {
     const Row = as === "table" ? "tr" : "div";
     return (
-      <Row {...{ key }} css={{ ...css, ...tableRowStyles(as) }} onClick={() => rowStyle!.onClick!(row, api.current)}>
+      <Row {...{ key }} css={{ ...css, ...tableRowStyles(as) }} onClick={() => rowStyle!.onClick!(row, api)}>
         {content}
       </Row>
     );

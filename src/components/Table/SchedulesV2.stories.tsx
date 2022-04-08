@@ -6,12 +6,13 @@ import { DragDropContext, DragDropContextProps, Draggable, Droppable } from "rea
 import { TaskStatus } from "src/components/Filters/testDomain";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { CollapseToggle, GridStyle, GridTable } from "src/components/Table";
+import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { Css, Palette } from "src/Css";
 import { Checkbox, DateField, NumberField, SelectField, TextAreaField } from "src/inputs";
 import { zeroTo } from "src/utils/sb";
 import { Icon } from "../Icon";
 import { actionColumn, column, dateColumn } from "./columns";
-import { GridDataRow, GridTableApi } from "./GridTable";
+import { GridDataRow } from "./GridTable";
 
 export default {
   title: "Pages / SchedulesV2",
@@ -225,13 +226,11 @@ export function SchedulesV2() {
 SchedulesV2.storyName = "SchedulesV2";
 
 export function SchedulesV2Virtualized() {
-  const api = useRef<GridTableApi<Row>>();
+  const api = useGridTableApi<Row>();
 
   // Scroll to the bottom of the page before taking snapshot
   useEffect(() => {
-    if (api.current) {
-      api.current.scrollToIndex(50);
-    }
+    api.scrollToIndex(50);
   });
 
   return (
