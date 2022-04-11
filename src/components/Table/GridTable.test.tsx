@@ -21,6 +21,7 @@ import {
   SimpleHeaderAndDataWith,
   simpleRows,
 } from "src/components/Table/simpleHelpers";
+import { beamFixedStyle } from "src/components/Table/styles";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Checkbox, TextField } from "src/inputs";
@@ -1591,6 +1592,29 @@ describe("GridTable", () => {
     expect(row(r, 1).getAttribute("data-render")).toEqual("2");
     // But the 2nd added row did not
     expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+  });
+
+  it("reacts to setting activeRowId", async () => {
+    const activeRowIdRowStyles: GridRowStyles<Row> = {
+      data: {
+        onClick: (row, api) => {
+          api.setActiveRowId(`${row.kind}`);
+        },
+      },
+    };
+
+    // Given a table initially rendered without an active row id
+    const r = await render(
+      <GridTable columns={columns} rows={rows} rowStyles={activeRowIdRowStyles} style={beamFixedStyle} />,
+    );
+    // And the first row/cell has the default background color
+    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", "rgba(254,254,254,1)");
+
+    // When clicking the cell
+    click(cell(r, 1, 1));
+
+    // Then the first row/cell has the 'active' background color
+    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", "rgba(254,254,254,1)");
   });
 });
 
