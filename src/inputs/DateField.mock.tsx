@@ -21,7 +21,7 @@ export function DateField(props: DateFieldProps) {
       onBlur={() => maybeCall(onBlur)}
       onFocus={() => maybeCall(onFocus)}
       disabled={!!props.disabled}
-      readOnly={props.readOnly}
+      readOnly={!!props.readOnly}
       data-disabled-days={JSON.stringify(props.disabledDays)}
     />
   );

@@ -3,6 +3,7 @@ import type { NumberFieldStateProps } from "@react-stately/numberfield";
 import { ReactNode, useMemo, useRef } from "react";
 import { useLocale, useNumberField } from "react-aria";
 import { useNumberFieldState } from "react-stately";
+import { resolveTooltip } from "src/components";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Xss } from "src/Css";
 import { Callback } from "src/types";
@@ -20,13 +21,15 @@ export interface NumberFieldProps {
   value: number | undefined;
   onChange: (value: number | undefined) => void;
   compact?: boolean;
-  disabled?: boolean;
+  /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
+  disabled?: boolean | ReactNode;
   required?: boolean;
   errorMsg?: string;
   helperText?: string | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
-  readOnly?: boolean;
+  /* Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip. */
+  readOnly?: boolean | ReactNode;
   /** Styles overrides */
   xss?: Xss<"textAlign" | "justifyContent">;
   // If set, all positive values will be prefixed with "+". (Zero will not show +/-)
@@ -41,9 +44,9 @@ export function NumberField(props: NumberFieldProps) {
   const { fieldProps } = usePresentationContext();
   const alignment = fieldProps?.numberAlignment === "right" ? Css.tr.jcfe.$ : Css.tl.jcfs.$;
   const {
-    disabled = false,
+    disabled,
     required,
-    readOnly = false,
+    readOnly,
     type,
     label,
     onBlur,
@@ -60,11 +63,11 @@ export function NumberField(props: NumberFieldProps) {
     ...otherProps
   } = props;
 
+  const isDisabled = !!disabled;
+  const isReadOnly = !!readOnly;
   const factor = type === "percent" || type === "cents" ? 100 : type === "basisPoints" ? 10_000 : 1;
   const signDisplay = displayDirection ? "exceptZero" : "auto";
-
   const fractionFormatOptions = { [truncate ? "maximumFractionDigits" : "minimumFractionDigits"]: numFractionDigits };
-
   const { locale } = useLocale();
   // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
   // see: https://github.com/adobe/react-spectrum/issues/1893.
@@ -79,7 +82,6 @@ export function NumberField(props: NumberFieldProps) {
       ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0, signDisplay }
       : fractionFormatOptions;
   }, [type]);
-
   const numberParser = useMemo(() => new NumberParser(locale, formatOptions), [locale, formatOptions]);
 
   // Keep a ref the last "before WIP" value that we passed into react-aria.
@@ -120,8 +122,8 @@ export function NumberField(props: NumberFieldProps) {
     },
     validationState: errorMsg !== undefined ? "invalid" : "valid",
     label: label,
-    isDisabled: disabled,
-    isReadOnly: readOnly,
+    isDisabled,
+    isReadOnly,
     formatOptions,
   };
 
@@ -153,7 +155,7 @@ export function NumberField(props: NumberFieldProps) {
       onFocus={onFocus}
       errorMsg={errorMsg}
       helperText={helperText}
-      readOnly={readOnly}
+      tooltip={resolveTooltip(disabled, undefined, readOnly)}
       {...otherProps}
     />
   );

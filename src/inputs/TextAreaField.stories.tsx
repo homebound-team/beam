@@ -18,7 +18,11 @@ export function TextAreaStyles() {
         <TestTextArea value="" label="Description" hideLabel />
         <TestTextArea label="Description" value="" />
         <TestTextArea label="Description" value="An example description text." autoFocus />
-        <TestTextArea label="Description" value="This is a description that can no longer be edited." disabled />
+        <TestTextArea
+          label="Description"
+          value="This is a description that can no longer be edited."
+          disabled="Disabled reason tooltip"
+        />
         <TestTextArea
           label="Description"
           value="See helper text."
@@ -40,7 +44,7 @@ export function TextAreaReadOnly() {
       <div css={Css.df.fdc.childGap3.$}>
         <b>Read Only</b>
         <TestTextArea label="Name" value="first" readOnly={true} />
-        <TestTextArea label="Name" value="first" hideLabel readOnly={true} />
+        <TestTextArea label="Name" value="first - with a tooltip" hideLabel readOnly="Read only with a tooltip" />
         <TestTextArea label="Name" value={("first ".repeat(40) + "last.\n\n").repeat(4)} readOnly={true} />
         <TestTextArea label="Name" value={"this is a sentence\n".repeat(4)} readOnly={true} />
       </div>
