@@ -29,3 +29,13 @@ export function TooltipDisabled() {
     </Tooltip>
   );
 }
+
+export function TooltipTruncated() {
+  return (
+    <div css={Css.wPx(30).$}>
+      <Tooltip title="Tooltip Info" truncated>
+        <span css={Css.db.tc.my5.bgGray400.br4.$}>Long content long content long content</span>
+      </Tooltip>
+    </div>
+  );
+}

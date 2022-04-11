@@ -17,21 +17,24 @@ interface TooltipProps {
   placement?: Placement;
   delay?: number;
   disabled?: boolean;
+  truncated?: boolean;
 }
 
 export function Tooltip(props: TooltipProps) {
-  const { placement, children, title, disabled, delay = 0 } = props;
+  const { placement, children, title, disabled, delay = 0, truncated = false } = props;
 
   const state = useTooltipTriggerState({ delay, isDisabled: disabled });
   const triggerRef = React.useRef(null);
   const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger({ isDisabled: disabled }, state, triggerRef);
   const { tooltipProps } = useTooltip(_tooltipProps, state);
   const tid = useTestIds(props, "tooltip");
+  console.log(truncated);
 
   return (
     <>
       <span
         ref={triggerRef}
+        css={Css.if(truncated).truncate.$}
         {...triggerProps}
         {...(!state.isOpen && typeof title === "string" ? { title } : {})}
         {...tid}
