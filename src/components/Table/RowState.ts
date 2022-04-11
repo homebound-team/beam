@@ -31,7 +31,7 @@ export class RowState {
   // The current list of rows, basically a useRef.current. Not reactive.
   public rows: GridDataRow<any>[] = [];
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
-  activeRowId: string | undefined;
+  activeRowId: string | undefined = undefined;
 
   /**
    * Creates the `RowState` for a given `GridTable`.
