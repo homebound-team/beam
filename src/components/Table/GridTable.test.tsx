@@ -1598,7 +1598,7 @@ describe("GridTable", () => {
     const activeRowIdRowStyles: GridRowStyles<Row> = {
       data: {
         onClick: (row, api) => {
-          api.setActiveRowId(`${row.kind}`);
+          api.setActiveRowId(`${row.kind}_${row.id}`);
         },
       },
     };
@@ -1608,13 +1608,13 @@ describe("GridTable", () => {
       <GridTable columns={columns} rows={rows} rowStyles={activeRowIdRowStyles} style={beamFixedStyle} />,
     );
     // And the first row/cell has the default background color
-    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", "rgba(254,254,254,1)");
+    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.White);
 
     // When clicking the cell
     click(cell(r, 1, 1));
 
     // Then the first row/cell has the 'active' background color
-    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", "rgba(254,254,254,1)");
+    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.LightBlue50);
   });
 });
 
