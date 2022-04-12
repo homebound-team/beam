@@ -1,6 +1,14 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { Css, IconButton, IconButtonProps, iconButtonStylesHover, Icons, Palette } from "src";
+import {
+  Css,
+  IconButton,
+  iconButtonContrastStylesHover,
+  IconButtonProps,
+  iconButtonStylesHover,
+  Icons,
+  Palette,
+} from "src";
 import { withRouter } from "src/utils/sb";
 
 export default {
@@ -21,57 +29,44 @@ export default {
   },
 } as Meta<IconButtonProps>;
 
-export const IconButtonStyles = (args: IconButtonProps) => (
-  <div css={{ h1: Css.xl2Em.mbPx(30).$, h2: Css.smEm.$ }}>
-    <h1>Icon Only Button</h1>
-    <div css={Css.df.gapPx(90).$}>
-      <div>
-        <h2>Default</h2>
-        <IconButton {...args} />
-      </div>
-      <div>
-        <h2>Hover</h2>
-        <HoveredIconButton {...args} />
-      </div>
-      <div>
-        <h2>Focused</h2>
-        <IconButton {...args} autoFocus />
-      </div>
-      <div>
-        <h2>Disabled</h2>
-        <IconButton {...args} disabled="Disabled reason" />
-      </div>
-      <div>
-        <h2>Colored</h2>
-        <IconButton {...args} color={Palette.Red700} />
+function Template(args: IconButtonProps) {
+  return (
+    <div css={Css.if(!!args.contrast).bgGray800.white.$}>
+      <h1 css={Css.xl2Em.mbPx(30).$}>Icon Only Button</h1>
+      <div css={Css.df.gapPx(90).$}>
+        <div>
+          <h2>Default</h2>
+          <IconButton {...args} />
+        </div>
+        <div>
+          <h2>Hover</h2>
+          <HoveredIconButton {...args} />
+        </div>
+        <div>
+          <h2>Focused</h2>
+          <IconButton {...args} autoFocus />
+        </div>
+        <div>
+          <h2>Disabled</h2>
+          <IconButton {...args} disabled="Disabled reason" />
+        </div>
+        <div>
+          <h2>Colored</h2>
+          <IconButton {...args} color={Palette.Red700} />
+        </div>
       </div>
     </div>
+  );
+}
+export const Regular = Template.bind({});
 
-    <h1 css={Css.mt2.$}>Compact</h1>
-    <div css={Css.df.gapPx(90).$}>
-      <div>
-        <h2>Default</h2>
-        <IconButton compact {...args} />
-      </div>
-      <div>
-        <h2>Hover</h2>
-        <HoveredIconButton compact {...args} />
-      </div>
-      <div>
-        <h2>Focused</h2>
-        <IconButton compact {...args} autoFocus />
-      </div>
-      <div>
-        <h2>Disabled</h2>
-        <IconButton compact {...args} disabled="Disabled reason" />
-      </div>
-      <div>
-        <h2>Colored</h2>
-        <IconButton compact {...args} color={Palette.Red700} />
-      </div>
-    </div>
-  </div>
-);
+export const Compact = Template.bind({});
+// @ts-ignore
+Compact.args = { compact: true };
+
+export const Contrast = Template.bind({});
+// @ts-ignore
+Contrast.args = { contrast: true };
 
 export function WithTooltip() {
   return (
@@ -121,7 +116,7 @@ export function IconButtonLink() {
 /** Hover styled version of the IconButton */
 function HoveredIconButton(args: IconButtonProps) {
   return (
-    <div css={{ button: iconButtonStylesHover }}>
+    <div css={{ button: args.contrast ? iconButtonContrastStylesHover : iconButtonStylesHover }}>
       <IconButton {...args} />
     </div>
   );
