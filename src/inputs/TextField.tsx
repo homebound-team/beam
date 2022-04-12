@@ -1,5 +1,6 @@
 import { MutableRefObject, ReactNode, useRef } from "react";
 import { mergeProps, useTextField } from "react-aria";
+import { resolveTooltip } from "src/components";
 import { Only } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
@@ -19,7 +20,7 @@ export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
 
 export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
   const {
-    disabled: isDisabled = false,
+    disabled = false,
     readOnly = false,
     required,
     errorMsg,
@@ -30,10 +31,13 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     onEnter,
     ...otherProps
   } = props;
+
+  const isDisabled = !!disabled;
+  const isReadOnly = !!readOnly;
   const textFieldProps = {
     ...otherProps,
     isDisabled,
-    isReadOnly: readOnly,
+    isReadOnly,
     isRequired: required,
     validationState: errorMsg ? ("invalid" as const) : ("valid" as const),
     value,
@@ -62,12 +66,12 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
   return (
     <TextFieldBase
       {...mergeProps(textFieldProps, { onBlur, onFocus })}
-      readOnly={readOnly}
       errorMsg={errorMsg}
       required={required}
       labelProps={labelProps}
       inputProps={inputProps}
       inputRef={inputRef}
+      tooltip={resolveTooltip(disabled, undefined, readOnly)}
     />
   );
 }

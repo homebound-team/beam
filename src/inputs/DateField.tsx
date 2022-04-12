@@ -3,7 +3,7 @@ import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
 import { DateUtils, Modifier } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
-import { Icon } from "src/components";
+import { Icon, resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
 import { DatePickerOverlay } from "src/components/internal/DatePickerOverlay";
 import { Css, Palette } from "src/Css";
@@ -21,11 +21,12 @@ export interface DateFieldProps
   onBlur?: () => void;
   /** Called when the component is in focus. */
   onFocus?: () => void;
-  // Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
+  /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
   errorMsg?: string;
   required?: boolean;
-  readOnly?: boolean;
+  /** Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip. */
+  readOnly?: boolean | ReactNode;
   helperText?: string | ReactNode;
   /** Renders the label inside the input field, i.e. for filters. */
   inlineLabel?: boolean;
@@ -54,7 +55,7 @@ export function DateField(props: DateFieldProps) {
     errorMsg,
     helperText,
     inlineLabel = false,
-    readOnly = false,
+    readOnly,
     format = "short",
     iconLeft = false,
     disabledDays,
@@ -72,6 +73,7 @@ export function DateField(props: DateFieldProps) {
   const [inputValue, setInputValue] = useState(value ? formatDate(value, dateFormat) : "");
   const tid = useTestIds(props, defaultTestId(label));
   const isDisabled = !!disabled;
+  const isReadOnly = !!readOnly;
 
   useEffect(() => {
     // Avoid updating any WIP values.
@@ -84,7 +86,7 @@ export function DateField(props: DateFieldProps) {
     ...others,
     label,
     isDisabled,
-    isReadOnly: readOnly,
+    isReadOnly,
     "aria-haspopup": "dialog" as const,
     value: inputValue,
   };
@@ -142,7 +144,7 @@ export function DateField(props: DateFieldProps) {
   const { buttonProps } = useButton(
     {
       ...triggerProps,
-      isDisabled: isDisabled || readOnly,
+      isDisabled: isDisabled || isReadOnly,
       // When pressed or focused then move focus the input, which will select the text and trigger the DatePicker to open
       onPress: () => inputRef?.current?.focus(),
       onFocus: () => inputRef?.current?.focus(),
@@ -185,7 +187,6 @@ export function DateField(props: DateFieldProps) {
     <>
       <TextFieldBase
         {...textFieldProps}
-        readOnly={readOnly}
         errorMsg={errorMsg}
         helperText={helperText}
         required={required}
@@ -208,7 +209,7 @@ export function DateField(props: DateFieldProps) {
         }}
         endAdornment={!iconLeft && calendarButton}
         startAdornment={iconLeft && calendarButton}
-        tooltip={isDisabled && typeof disabled !== "boolean" ? disabled : undefined}
+        tooltip={resolveTooltip(disabled, undefined, readOnly)}
         {...others}
       />
       {state.isOpen && (

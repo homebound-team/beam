@@ -28,8 +28,8 @@ export interface BeamButtonProps {
 export type TextFieldXss = Xss<"textAlign" | "justifyContent" | "fontWeight" | "fontSize" | "lineHeight">;
 
 export interface BeamTextFieldProps<X> extends BeamFocusableProps, PresentationFieldProps {
-  /** Whether the interactive element is disabled. */
-  disabled?: boolean;
+  /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
+  disabled?: boolean | ReactNode;
   errorMsg?: string;
   helperText?: string | ReactNode;
   /** Input label */
@@ -43,7 +43,8 @@ export interface BeamTextFieldProps<X> extends BeamFocusableProps, PresentationF
   onBlur?: Callback;
   onFocus?: Callback;
   onEnter?: Callback;
-  readOnly?: boolean;
+  /** Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip. */
+  readOnly?: boolean | ReactNode;
   placeholder?: string;
   /** Styles overrides */
   xss?: X;

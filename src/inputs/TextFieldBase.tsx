@@ -27,7 +27,6 @@ export interface TextFieldBaseProps<X>
       BeamTextFieldProps<X>,
       | "label"
       | "required"
-      | "readOnly"
       | "errorMsg"
       | "onBlur"
       | "onFocus"
@@ -72,7 +71,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     errorMsg,
     helperText,
     multiline = false,
-    readOnly,
     onChange,
     onBlur,
     onFocus,
@@ -87,6 +85,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     tooltip,
     visuallyDisabled = fieldProps?.visuallyDisabled ?? true,
   } = props;
+
   const typeScale = fieldProps?.typeScale ?? "sm";
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
   const { compound = false } = internalProps;
@@ -165,7 +164,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       {maybeTooltip({
         title: tooltip,
         placement: "top",
-        children: readOnly ? (
+        children: inputProps.readOnly ? (
           <div
             css={{
               // Use input wrapper to get common styles, but then we need to override some
@@ -197,8 +196,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             css={{
               ...fieldStyles.inputWrapper,
               ...(inputProps.disabled ? fieldStyles.disabled : {}),
-              ...(isFocused && !readOnly ? fieldStyles.focus : {}),
-              ...(isHovered && !inputProps.disabled && !readOnly && !isFocused ? fieldStyles.hover : {}),
+              ...(isFocused && !inputProps.readOnly ? fieldStyles.focus : {}),
+              ...(isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused ? fieldStyles.hover : {}),
               ...(errorMsg ? fieldStyles.error : {}),
               ...Css.if(multiline).aifs.px0.mhPx(textAreaMinHeight).$,
             }}
@@ -221,7 +220,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               css={{
                 ...fieldStyles.input,
                 ...(inputProps.disabled ? fieldStyles.disabled : {}),
-                ...(isHovered && !inputProps.disabled && !readOnly && !isFocused ? fieldStyles.hover : {}),
+                ...(isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused ? fieldStyles.hover : {}),
                 ...(multiline ? Css.h100.p1.add("resize", "none").if(borderless).pPx(4).$ : Css.truncate.$),
                 ...xss,
               }}

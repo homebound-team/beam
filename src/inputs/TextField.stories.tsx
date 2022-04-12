@@ -21,7 +21,7 @@ export function TextFieldStyles() {
         <TestTextField label="Name" value="" />
         <TestTextField label="Name" required value="" />
         <TestTextField label="Name Focused" value="Brandon" autoFocus />
-        <TestTextField label="Name Disabled" value="Brandon" disabled />
+        <TestTextField label="Name Disabled" value="Brandon" disabled="Disabled reason tooltip" />
         <TestTextField
           label="Name Helper Text"
           value="Brandon"
@@ -78,7 +78,7 @@ export function TextFieldReadOnly() {
       <div css={Css.df.fdc.childGap3.$}>
         <b>Read Only</b>
         <TestTextField label="Name" value="first" readOnly={true} />
-        <TestTextField label="Name" value="first" inlineLabel readOnly={true} />
+        <TestTextField label="Name" value="first - with tooltip" inlineLabel readOnly="Read only reason tooltip" />
         <TestTextField label="Name" value="first" hideLabel readOnly={true} />
         <TestTextField label="Name" value={"first ".repeat(20) + "last"} readOnly={true} />
       </div>

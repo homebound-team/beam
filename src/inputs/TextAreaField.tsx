@@ -1,6 +1,7 @@
 import { useLayoutEffect } from "@react-aria/utils";
 import { useCallback, useRef } from "react";
 import { mergeProps, useTextField } from "react-aria";
+import { resolveTooltip } from "src/components";
 import { Only } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
@@ -27,7 +28,9 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
     onEnter,
     ...otherProps
   } = props;
-  const textFieldProps = { ...otherProps, value, isDisabled: disabled, isReadOnly: readOnly };
+  const isDisabled = !!disabled;
+  const isReadOnly = !!readOnly;
+  const textFieldProps = { ...otherProps, value, isDisabled, isReadOnly };
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
 
@@ -90,9 +93,9 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
       labelProps={labelProps}
       inputProps={inputProps}
       inputRef={inputRef}
-      readOnly={readOnly}
       inputWrapRef={inputWrapRef}
       textAreaMinHeight={preventNewLines ? 0 : undefined}
+      tooltip={resolveTooltip(disabled, undefined, readOnly)}
     />
   );
 }
