@@ -35,6 +35,12 @@ export function Tooltip(props: TooltipProps) {
         {...triggerProps}
         {...(!state.isOpen && typeof title === "string" ? { title } : {})}
         {...tid}
+        // Adding `draggable` as a hack to allow focus to continue through this element and into its children.
+        // This is due to some code in React-Aria that prevents default due ot mobile browser inconsistencies,
+        // and the only way they don't prevent default is if the element is draggable.
+        // See https://github.com/adobe/react-spectrum/discussions/3058 for discussion related to this issue.
+        draggable
+        onDragStart={(e) => e.preventDefault()}
       >
         {children}
       </span>
