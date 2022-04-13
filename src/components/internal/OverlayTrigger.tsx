@@ -12,7 +12,7 @@ import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 interface TextButtonTriggerProps extends Pick<ButtonProps, "label" | "variant" | "size" | "icon"> {}
-interface IconButtonTriggerProps extends Pick<IconButtonProps, "icon" | "color"> {}
+interface IconButtonTriggerProps extends Pick<IconButtonProps, "icon" | "color" | "compact" | "contrast"> {}
 
 export interface OverlayTriggerProps {
   trigger: TextButtonTriggerProps | IconButtonTriggerProps;
