@@ -19,6 +19,8 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   buttonRef?: RefObject<HTMLButtonElement>;
   /** Whether to show a 16x16px version of the IconButton */
   compact?: boolean;
+  /** Whether to display the contrast variant */
+  contrast?: boolean;
 }
 
 export function IconButton(props: IconButtonProps) {
@@ -34,6 +36,7 @@ export function IconButton(props: IconButtonProps) {
     menuTriggerProps,
     openInNew,
     compact = false,
+    contrast = false,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
@@ -55,16 +58,17 @@ export function IconButton(props: IconButtonProps) {
     () => ({
       ...iconButtonStylesReset,
       ...(compact ? iconButtonCompact : iconButtonNormal),
-      ...(isHovered && iconButtonStylesHover),
+      ...(isHovered && (contrast ? iconButtonContrastStylesHover : iconButtonStylesHover)),
       ...(isFocusVisible && iconButtonStylesFocus),
       ...(isDisabled && iconButtonStylesDisabled),
     }),
     [isHovered, isFocusVisible, isDisabled, compact],
   );
+  const iconColor = contrast ? contrastIconColor : defaultIconColor;
 
   const buttonAttrs = { ...testIds, ...buttonProps, ...focusProps, ...hoverProps, ref: ref as any, css: styles };
   const buttonContent = (
-    <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : Palette.Gray900)} inc={compact ? 2 : inc} />
+    <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : iconColor)} inc={compact ? 2 : inc} />
   );
 
   const button =
@@ -90,9 +94,12 @@ export function IconButton(props: IconButtonProps) {
   });
 }
 
+const defaultIconColor = Palette.Gray900;
+const contrastIconColor = Palette.White;
 const iconButtonStylesReset = Css.bTransparent.bsSolid.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
 const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
 const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
 export const iconButtonStylesHover = Css.bgGray200.$;
+export const iconButtonContrastStylesHover = Css.bgGray700.$;
 const iconButtonStylesFocus = Css.bLightBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;

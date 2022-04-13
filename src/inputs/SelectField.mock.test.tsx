@@ -24,7 +24,7 @@ describe("MockSelectField", () => {
       />,
     );
     // When we select the 2nd option
-    select(r.select, "two");
+    select(r.test, "two");
     // Then onSelect was called with 2
     expect(onSelect).toHaveBeenCalledWith("2", { id: "2", name: "two" });
   });
@@ -49,7 +49,7 @@ describe("MockSelectField", () => {
       />,
     );
     // When we select the 3rd option
-    select(r.select, ["thr"]);
+    select(r.test, ["thr"]);
     // Then onSelect was called with 3
     expect(onSelect).toHaveBeenCalledWith("3", { id: "3", name: "thr" });
   });
@@ -98,7 +98,6 @@ describe("MockSelectField", () => {
         onSelect={noop}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // When opening the menu
@@ -139,7 +138,6 @@ function TestUpdateOptionsField<O, V extends Value>() {
         onSelect={noop}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />
       ,
       <button data-testid="updateOptions" onClick={() => setOptions(options as any)} />

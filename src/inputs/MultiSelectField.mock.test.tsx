@@ -22,7 +22,7 @@ describe("MockMultiSelectField", () => {
       />,
     );
     // When we select the 3rd option as well
-    select(r.multiSelect, ["thr"]);
+    select(r.test, ["thr"]);
     // Then onSelect was called with 2 and 3
     expect(onSelect).toHaveBeenCalledWith(
       ["2", "3"],
@@ -53,7 +53,7 @@ describe("MockMultiSelectField", () => {
       />,
     );
     // When we select the 1st and 3rd options and deselect the 2nd option
-    select(r.multiSelect, ["one", "two", "thr"]);
+    select(r.test, ["one", "two", "thr"]);
     // Then onSelect was called with 1 and 3
     expect(onSelect).toHaveBeenCalledWith(
       ["1", "3"],
