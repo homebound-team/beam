@@ -44,10 +44,13 @@ export const cardStyle: GridStyle = {
 // Once completely rolled out across all tables in Blueprint, this will change to be the `defaultStyle`.
 export const beamFixedStyle: GridStyle = {
   headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
-  cellCss: Css.gray900.xs.bgWhite.aic.nowrap.pxPx(12).hPx(36).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
+  cellCss: Css.gray900.xs.bgWhite.aic.nowrap.pxPx(12).hPx(36).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
   emptyCell: "-",
   presentationSettings: { borderless: true, typeScale: "xs", wrap: false },
   firstRowMessageCss: Css.tc.py3.$,
+  // Indent styles extends the existing padding-left defined in CellCss. The indentation should be +12px.
+  indentOneCss: Css.pl3.$,
+  indentTwoCss: Css.plPx(36).$,
   // Included as a hacky "treat indent as deprecated for this table" hint to GridTable
   levels: {},
 };
