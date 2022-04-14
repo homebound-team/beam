@@ -15,6 +15,8 @@ export interface PresentationFieldProps {
   typeScale?: Typography;
   // If set to `false` then fields will not appear disabled, but will still be disabled.
   visuallyDisabled?: false;
+  // If set error messages will be rendered as tooltips rather than below the field
+  errorInTooltip?: true;
 }
 
 export type PresentationContextProps = {
