@@ -43,7 +43,7 @@ export function selectColumn<T extends Kinded, S = {}>(columnDef?: Partial<GridC
     ...columnDef,
   };
   return newMethodMissingProxy(base, (key) => {
-    return (row: any) => ({ content: <SelectToggle id={row.id} /> });
+    return (data: any, row: any) => ({ content: <SelectToggle id={row.id} /> });
   }) as any;
 }
 
@@ -65,7 +65,7 @@ export function collapseColumn<T extends Kinded, S = {}>(columnDef?: Partial<Gri
     ...columnDef,
   };
   return newMethodMissingProxy(base, (key) => {
-    return (row: any) => ({ content: <CollapseToggle row={row} /> });
+    return (data: any, row: any) => ({ content: <CollapseToggle row={row} /> });
   }) as any;
 }
 

@@ -5,7 +5,7 @@ import { DragEventHandler, useEffect, useLayoutEffect, useRef, useState } from "
 import { DragDropContext, DragDropContextProps, Draggable, Droppable } from "react-beautiful-dnd";
 import { TaskStatus } from "src/components/Filters/testDomain";
 import { PresentationProvider } from "src/components/PresentationContext";
-import { CollapseToggle, GridStyle, GridTable } from "src/components/Table";
+import { CollapseToggle, GridStyle, GridTable, simpleHeader } from "src/components/Table";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { Css, Palette } from "src/Css";
 import { Checkbox, DateField, NumberField, SelectField, TextAreaField } from "src/inputs";
@@ -23,55 +23,61 @@ export default {
 // TODO: Moving milestones and subgroups around too
 
 /** Types */
-type HeaderRow = { kind: "header" };
+type HeaderRow = { kind: "header"; data: {} };
 type MilestoneRow = {
   kind: "milestone";
   id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  duration: number;
+  data: {
+    name: string;
+    startDate: string;
+    endDate: string;
+    duration: number;
+  };
 };
 type SubGroupRow = {
   kind: "subgroup";
   id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  duration: number;
+  data: {
+    name: string;
+    startDate: string;
+    endDate: string;
+    duration: number;
+  };
 };
 type TaskRow = {
   kind: "task";
   id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  duration: number;
-  milestone: string;
-  subGroup: string;
-  status: TaskStatus;
+  data: {
+    name: string;
+    startDate: string;
+    endDate: string;
+    duration: number;
+    milestone: string;
+    subGroup: string;
+    status: TaskStatus;
+  };
 };
 type AddRow = { kind: "add" };
 type Row = HeaderRow | MilestoneRow | SubGroupRow | TaskRow | AddRow;
 
 /** Rows */
 // TODO: Handle all 4 situations
-const rows: GridDataRow<Row>[] = [{ kind: "header", id: "header" }, ...createMilestones(1, 3, 2)];
+const rows: GridDataRow<Row>[] = [simpleHeader, ...createMilestones(1, 3, 2)];
 
 /** Columns */
 // FIXME: This column is not vertically aligned
 const arrowColumn = actionColumn<Row>({
-  header: (row) => (
+  header: (data, row) => (
     <div css={Css.pr1.$}>
       <CollapseToggle row={row} />
     </div>
   ),
-  milestone: (row) => (
+  milestone: (data, row) => (
     <div css={Css.pr1.$}>
       <CollapseToggle row={row} />
     </div>
   ),
-  subgroup: (row) => (
+  subgroup: (data, row) => (
     <div css={Css.pr1.$}>
       <CollapseToggle row={row} />
     </div>
@@ -81,7 +87,7 @@ const arrowColumn = actionColumn<Row>({
   w: "36px",
 });
 const selectColumn = actionColumn<Row>({
-  header: (row) => <Checkbox label="" selected={false} onChange={action("Select All")} />,
+  header: () => <Checkbox label="" selected={false} onChange={action("Select All")} />,
   milestone: (row) => ({ colspan: 3, content: <div css={Css.smEm.gray900.$}>{row.name}</div>, alignment: "left" }),
   subgroup: (row) => ({ colspan: 3, content: <div css={Css.smEm.gray900.$}>{row.name}</div>, alignment: "left" }),
   task: (task) => <Checkbox label="" selected={false} onChange={action(`Select ${task.name}`)} />,
@@ -93,7 +99,7 @@ const idColumn = column<Row>({
   header: "",
   milestone: "",
   subgroup: "",
-  task: (row) => row.id,
+  task: (data, row) => row.id,
   add: "",
   w: "20px",
   align: "center",
@@ -590,13 +596,15 @@ function createTasks(howMany: number, subGroup: string, milestone: string, start
     return {
       kind: "task",
       id: String(startIdAt + id),
-      name,
-      startDate: "May. 1, 2021",
-      endDate: "May. 10, 2021",
-      duration: 10,
-      milestone,
-      subGroup,
-      status: TaskStatus.InProgress,
+      data: {
+        name,
+        startDate: "May. 1, 2021",
+        endDate: "May. 10, 2021",
+        duration: 10,
+        milestone,
+        subGroup,
+        status: TaskStatus.InProgress,
+      },
     };
   });
 }
@@ -607,10 +615,12 @@ function createSubGroups(howMany: number, howManyTasks: number, milestone: strin
     return {
       kind: "subgroup",
       id: `s${(startIdAt + 1) * id}`,
-      name,
-      startDate: "May. 1, 2021",
-      endDate: "May. 10, 2021",
-      duration: 10,
+      data: {
+        name,
+        startDate: "May. 1, 2021",
+        endDate: "May. 10, 2021",
+        duration: 10,
+      },
       children: createTasks(howManyTasks, name, milestone, (startIdAt + 1) * id * howManyTasks),
     } as SubGroupRow;
   });
@@ -622,10 +632,12 @@ function createMilestones(howMany: number, howManySubGroups: number, howManyTask
     return {
       kind: "milestone",
       id: `m${id}`,
-      name,
-      startDate: "May 1, 2021",
-      endDate: "May 10, 2021",
-      duration: 10,
+      data: {
+        name,
+        startDate: "May 1, 2021",
+        endDate: "May 10, 2021",
+        duration: 10,
+      },
       children: createSubGroups(howManySubGroups, howManyTasks, name, id * howManySubGroups * howManyTasks),
     } as MilestoneRow;
   });

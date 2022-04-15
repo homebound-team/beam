@@ -9,7 +9,7 @@ import {
   GridTable,
   IconButton,
   simpleHeader,
-  SimpleHeaderAndDataWith,
+  SimpleHeaderAndData,
 } from "src/components";
 import { Step, Stepper } from "src/components/Stepper";
 import { Css } from "src/Css";
@@ -146,7 +146,7 @@ function BookList({ formState, onNext, onBack }: { formState: FormValue; onNext:
   );
 }
 
-type Row = SimpleHeaderAndDataWith<FormValue["books"]["rows"][number]>;
+type Row = SimpleHeaderAndData<FormValue["books"]["rows"][number]>;
 
 function createColumns(formState: FormValue): GridColumn<Row>[] {
   return [

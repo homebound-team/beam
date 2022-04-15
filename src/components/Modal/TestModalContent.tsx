@@ -4,7 +4,7 @@ import { Button } from "src/components/Button";
 import { InternalUser } from "src/components/Filters/testDomain";
 import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
-import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndDataOf } from "src/components/Table";
+import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndData } from "src/components/Table";
 import { Tag } from "src/components/Tag";
 import { Css } from "src/Css";
 import { jan1 } from "src/forms/formStateDomain";
@@ -97,7 +97,7 @@ export function TestModalFilterTable() {
   );
 }
 
-type Row = SimpleHeaderAndDataOf<InternalUser>;
+type Row = SimpleHeaderAndData<InternalUser>;
 
 const users: InternalUser[] = [
   { id: "1", name: "Iron Man", role: "Leader" },
@@ -111,7 +111,7 @@ const users: InternalUser[] = [
   { id: "9", name: "Captain Marvel", role: "Does it all" },
   { id: "10", name: "Doctor Strange", role: "Doctor" },
 ];
-const rows: GridDataRow<Row>[] = [simpleHeader, ...users.map((u) => ({ kind: "data" as const, ...u }))];
+const rows: GridDataRow<Row>[] = [simpleHeader, ...users.map((u) => ({ kind: "data" as const, id: u.id, data: u }))];
 const columns: GridColumn<Row>[] = [
   { header: () => "Name", data: ({ name }) => name },
   { header: () => "Role", data: ({ role }) => role },

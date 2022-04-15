@@ -23,8 +23,8 @@ export { useGridTableApi } from "./GridTableApi";
 export type { GridTableApi } from "./GridTableApi";
 export { RowState, RowStateContext } from "./RowState";
 export * from "./SelectToggle";
-export { simpleDataRows, simpleHeader, simpleRows } from "./simpleHelpers";
-export type { SimpleHeaderAndDataOf, SimpleHeaderAndDataWith } from "./simpleHelpers";
+export { simpleDataRows, simpleHeader } from "./simpleHelpers";
+export type { SimpleHeaderAndData } from "./simpleHelpers";
 export { SortHeader } from "./SortHeader";
 export {
   beamFixedStyle,

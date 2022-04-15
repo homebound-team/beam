@@ -848,7 +848,7 @@ export type GridColumn<R extends Kinded, S = {}> = {
     | GridCellContent
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (data: D, row: GridRowKind<R, K>, api: GridTableApi<R>) => ReactNode | GridCellContent
-        : (row: GridRowKind<R, K>, api: GridTableApi<R>) => ReactNode | GridCellContent);
+        : (data: undefined, row: GridRowKind<R, K>, api: GridTableApi<R>) => ReactNode | GridCellContent);
 } & {
   /**
    * The column's width.
@@ -970,6 +970,7 @@ export type GridDataRow<R extends Kinded> = {
   children?: GridDataRow<R>[];
   /** Whether to pin this sort to the first/last of its parent's children. */
   pin?: "first" | "last";
+  data: unknown;
 } & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
 
 // Use IfAny so that GridDataRow<any> doesn't devolve into any
@@ -1242,12 +1243,8 @@ export function applyRowFn<R extends Kinded>(
   // Usually this is a function to apply against the row, but sometimes it's a hard-coded value, i.e. for headers
   const maybeContent = column[row.kind];
   if (typeof maybeContent === "function") {
-    if ("data" in row && "id" in row) {
-      // Auto-destructure data
-      return (maybeContent as Function)((row as any)["data"], (row as any)["id"], api);
-    } else {
-      return (maybeContent as Function)(row, api);
-    }
+    // Auto-destructure data
+    return (maybeContent as Function)((row as any)["data"], row as any, api);
   } else {
     return maybeContent;
   }

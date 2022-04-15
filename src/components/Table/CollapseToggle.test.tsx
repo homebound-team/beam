@@ -7,7 +7,7 @@ describe("CollapseToggle", () => {
     const rowState = new RowState();
     const r = await render(
       <RowStateContext.Provider value={{ rowState }}>
-        <CollapseToggle row={{ id: "r:1", kind: "header" }} />
+        <CollapseToggle row={{ id: "r:1", kind: "header", data: {} }} />
       </RowStateContext.Provider>,
     );
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("chevronsDown");
@@ -25,7 +25,7 @@ describe("CollapseToggle", () => {
     }
     const r = await render(
       <RowStateContext.Provider value={{ rowState }}>
-        <CollapseToggle row={{ id: "r:1", kind, children: [{} as any] }} />
+        <CollapseToggle row={{ id: "r:1", kind, data: {}, children: [{} as any] }} />
       </RowStateContext.Provider>,
     );
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual(expectedIcon);
@@ -35,7 +35,7 @@ describe("CollapseToggle", () => {
     const rowState = new RowState();
     const r = await render(
       <RowStateContext.Provider value={{ rowState }}>
-        <CollapseToggle row={{ id: "r:1", kind: "otherKind", children: [] }} />
+        <CollapseToggle row={{ id: "r:1", kind: "otherKind", data: {}, children: [] }} />
       </RowStateContext.Provider>,
     );
 

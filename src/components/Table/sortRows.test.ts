@@ -11,15 +11,15 @@ describe("sortRows", () => {
       {
         kind: "parent",
         id: "2",
-        name: "b",
+        data: { name: "b" },
         children: [
-          { kind: "child", id: "2.1", name: "b1" },
-          { kind: "child", id: "2.3", name: "b3" },
-          { kind: "child", id: "2.2", name: "b2" },
+          { kind: "child", id: "2.1", data: { name: "b1" } },
+          { kind: "child", id: "2.3", data: { name: "b3" } },
+          { kind: "child", id: "2.2", data: { name: "b2" } },
         ],
       },
-      { kind: "parent", id: "1", name: "a" },
-      { kind: "parent", id: "3", name: "c" },
+      { kind: "parent", id: "1", data: { name: "a" } },
+      { kind: "parent", id: "3", data: { name: "c" } },
     ];
     // When sorting them in ascending order based on the name property
     const sorted = sortRows([nameColumn], rows, [0, "ASC"]);
@@ -38,15 +38,15 @@ describe("sortRows", () => {
       {
         kind: "parent",
         id: "2",
-        name: "b",
+        data: { name: "b" },
         children: [
-          { kind: "child", id: "2.1", name: "b1" },
-          { kind: "child", id: "2.3", name: "b3" },
-          { kind: "child", id: "2.2", name: "b2" },
+          { kind: "child", id: "2.1", data: { name: "b1" } },
+          { kind: "child", id: "2.3", data: { name: "b3" } },
+          { kind: "child", id: "2.2", data: { name: "b2" } },
         ],
       },
-      { kind: "parent", id: "1", name: "a" },
-      { kind: "parent", id: "3", name: "c" },
+      { kind: "parent", id: "1", data: { name: "a" } },
+      { kind: "parent", id: "3", data: { name: "c" } },
     ];
     // When sorting them in descending order based on the name property
     const sorted = sortRows([nameColumn], rows, [0, "DESC"]);
@@ -59,8 +59,8 @@ describe("sortRows", () => {
 });
 
 type HeaderRow = { kind: "header" };
-type ParentRow = { kind: "parent"; id: string; name: string | undefined };
-type ChildRow = { kind: "child"; id: string; name: string | undefined };
+type ParentRow = { kind: "parent"; id: string; data: { name: string | undefined } };
+type ChildRow = { kind: "child"; id: string; data: { name: string | undefined } };
 type Row = HeaderRow | ParentRow | ChildRow;
 const nameColumn: GridColumn<Row> = { header: "Name", parent: ({ name }) => name, child: ({ name }) => name };
 

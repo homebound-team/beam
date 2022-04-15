@@ -8,12 +8,14 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  SimpleHeaderAndDataOf,
+  simpleDataRows,
+  simpleHeader,
+  SimpleHeaderAndData,
   Tag,
 } from "src/components";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
-import { GridDataRow, GridRowLookup, simpleRows } from "src/components/Table";
+import { GridDataRow, GridRowLookup } from "src/components/Table";
 import { Css } from "src/Css";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { SuperDrawerContent, useSuperDrawer } from "./index";
@@ -167,7 +169,7 @@ export function OpenWithTitleRightContent() {
 }
 
 type Book = { bookTitle: string; bookDescription: string; authorName: string; authorDescription: string };
-type Row = SimpleHeaderAndDataOf<Book>;
+type Row = SimpleHeaderAndData<Book>;
 
 // Faux DB
 const Books: Book[] = [
@@ -206,11 +208,12 @@ export function TableWithPrevNextAndCloseCheck() {
   function openRow(row: GridDataRow<Row>) {
     if (row.kind === "data") {
       const { prev, next } = rowLookup.current!.lookup(row)["data"];
+      console.log("prev = ", prev);
       openInDrawer({
-        title: row.bookTitle,
+        title: row.data.bookTitle,
         onPrevClick: prev && (() => openRow(prev)),
         onNextClick: next && (() => openRow(next)),
-        content: <TestDrawerContent book={row} />,
+        content: <TestDrawerContent book={row.data} />,
       });
     }
   }
@@ -233,7 +236,7 @@ export function TableWithPrevNextAndCloseCheck() {
         columns={[titleColumn, authorColumn]}
         rowStyles={rowStyles}
         rowLookup={rowLookup}
-        rows={simpleRows(Books.map((book, i) => ({ kind: "data" as const, id: `${i}`, ...book })))}
+        rows={simpleDataRows(Books.map((b, idx) => ({ id: `${idx}`, ...b })))}
       />
     </div>
   );
@@ -253,10 +256,10 @@ export function TableWithPrevNext() {
     if (row.kind === "data") {
       const { prev, next } = rowLookup.current!.lookup(row)["data"];
       openInDrawer({
-        title: row.bookTitle,
+        title: row.data.bookTitle,
         onPrevClick: prev && (() => openRow(prev)),
         onNextClick: next && (() => openRow(next)),
-        content: <TestDrawerContent book={row} />,
+        content: <TestDrawerContent book={row.data} />,
       });
     }
   }
@@ -279,10 +282,7 @@ export function TableWithPrevNext() {
         columns={[titleColumn, authorColumn]}
         rowStyles={rowStyles}
         rowLookup={rowLookup}
-        rows={[
-          { kind: "header", id: "header" },
-          ...Books.map((book, i) => ({ kind: "data" as const, id: `${i}`, ...book })),
-        ]}
+        rows={[simpleHeader, ...Books.map((book, i) => ({ kind: "data" as const, id: `${i}`, data: book }))]}
       />
     </div>
   );

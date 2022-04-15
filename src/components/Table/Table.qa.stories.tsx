@@ -5,7 +5,7 @@ import { Icon } from "src/components/Icon";
 import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/columns";
 import { emptyCell, GridColumn, GridDataRow, GridSortConfig, GridTable } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
-import { SimpleHeaderAndDataWith } from "src/components/Table/simpleHelpers";
+import { simpleHeader, SimpleHeaderAndData } from "src/components/Table/simpleHelpers";
 import {
   beamFixedStyle,
   beamFlexibleStyle,
@@ -38,7 +38,7 @@ type BeamData = {
   date: string;
   priceInCents: number;
 };
-type BeamRow = SimpleHeaderAndDataWith<BeamData>;
+type BeamRow = SimpleHeaderAndData<BeamData>;
 
 export function Fixed() {
   return (
@@ -76,9 +76,9 @@ type BeamBudgetData = {
   children?: BeamChildRow[];
 };
 type HeaderRow = { kind: "header" };
-type BeamTotalsRow = { kind: "totals"; id: string } & BeamBudgetData;
-type BeamParentRow = { kind: "parent"; id: string } & BeamBudgetData;
-type BeamChildRow = { kind: "child"; id: string } & BeamBudgetData;
+type BeamTotalsRow = { kind: "totals"; id: string; data: BeamBudgetData };
+type BeamParentRow = { kind: "parent"; id: string; data: BeamBudgetData };
+type BeamChildRow = { kind: "child"; id: string; data: BeamBudgetData };
 type BeamNestedRow = BeamTotalsRow | HeaderRow | BeamParentRow | BeamChildRow;
 
 export function NestedFixed() {
@@ -157,38 +157,42 @@ export function Filterable() {
 }
 
 const beamNestedRows: GridDataRow<BeamNestedRow>[] = [
-  { kind: "header", id: "header" },
+  simpleHeader,
   ...zeroTo(5).map((pIdx) => {
     // Get a semi-random, but repeatable number of children
     const numChildren = (pIdx % 3) + pIdx + 1;
     const children = zeroTo(numChildren).map((cIdx) => ({
       kind: "child" as const,
       id: `p${pIdx + 1}_c${cIdx + 1}`,
-      name: `10${pIdx + 1}0.${cIdx + 1} - Project Item${pIdx === 0 ? " with a longer name that will wrap" : ""}`,
-      original: 1234_56,
-      changeOrders: 543_21,
-      reallocations: 568_56,
-      revised: undefined,
-      committed: 129_86,
-      difference: 1025_23,
-      actuals: 1108_18,
-      projected: 421_21,
-      costToComplete: 1129_85,
+      data: {
+        name: `10${pIdx + 1}0.${cIdx + 1} - Project Item${pIdx === 0 ? " with a longer name that will wrap" : ""}`,
+        original: 1234_56,
+        changeOrders: 543_21,
+        reallocations: 568_56,
+        revised: undefined,
+        committed: 129_86,
+        difference: 1025_23,
+        actuals: 1108_18,
+        projected: 421_21,
+        costToComplete: 1129_85,
+      },
     }));
 
     return {
       kind: "parent" as const,
       id: `p:${pIdx + 1}`,
-      name: `10${pIdx + 1}0 - Cost Code${pIdx === 1 ? " with a longer name that will wrap" : ""}`,
-      original: children.map((c) => c.original ?? 0).reduce((acc, n) => acc + n, 0),
-      changeOrders: children.map((c) => c.changeOrders ?? 0).reduce((acc, n) => acc + n, 0),
-      reallocations: children.map((c) => c.reallocations ?? 0).reduce((acc, n) => acc + n, 0),
-      revised: children.map((c) => c.revised ?? 0).reduce((acc, n) => acc + n, 0),
-      committed: children.map((c) => c.committed ?? 0).reduce((acc, n) => acc + n, 0),
-      difference: children.map((c) => c.difference ?? 0).reduce((acc, n) => acc + n, 0),
-      actuals: children.map((c) => c.actuals ?? 0).reduce((acc, n) => acc + n, 0),
-      projected: children.map((c) => c.projected ?? 0).reduce((acc, n) => acc + n, 0),
-      costToComplete: children.map((c) => c.costToComplete ?? 0).reduce((acc, n) => acc + n, 0),
+      data: {
+        name: `10${pIdx + 1}0 - Cost Code${pIdx === 1 ? " with a longer name that will wrap" : ""}`,
+        original: children.map(({ data }) => data.original ?? 0).reduce((acc, n) => acc + n, 0),
+        changeOrders: children.map(({ data }) => data.changeOrders ?? 0).reduce((acc, n) => acc + n, 0),
+        reallocations: children.map(({ data }) => data.reallocations ?? 0).reduce((acc, n) => acc + n, 0),
+        revised: children.map(({ data }) => data.revised ?? 0).reduce((acc, n) => acc + n, 0),
+        committed: children.map(({ data }) => data.committed ?? 0).reduce((acc, n) => acc + n, 0),
+        difference: children.map(({ data }) => data.difference ?? 0).reduce((acc, n) => acc + n, 0),
+        actuals: children.map(({ data }) => data.actuals ?? 0).reduce((acc, n) => acc + n, 0),
+        projected: children.map(({ data }) => data.projected ?? 0).reduce((acc, n) => acc + n, 0),
+        costToComplete: children.map(({ data }) => data.costToComplete ?? 0).reduce((acc, n) => acc + n, 0),
+      },
       children,
     };
   }),
@@ -198,16 +202,18 @@ const beamTotalsRows: GridDataRow<BeamNestedRow>[] = [
   {
     kind: "totals",
     id: "totals",
-    name: "Totals",
-    original: 1234_56,
-    changeOrders: 1234_56,
-    reallocations: 1234_56,
-    revised: undefined,
-    committed: 1234_56,
-    difference: 1234_56,
-    actuals: 1234_56,
-    projected: 1234_56,
-    costToComplete: 1234_56,
+    data: {
+      name: "Totals",
+      original: 1234_56,
+      changeOrders: 1234_56,
+      reallocations: 1234_56,
+      revised: undefined,
+      committed: 1234_56,
+      difference: 1234_56,
+      actuals: 1234_56,
+      projected: 1234_56,
+      costToComplete: 1234_56,
+    },
   },
 ];
 
@@ -233,8 +239,8 @@ const beamNestedColumns: GridColumn<BeamNestedRow>[] = [
   column<BeamNestedRow>({
     totals: "Totals",
     header: "Cost Code",
-    parent: (row) => ({
-      content: () => `${row.name} (${row.children.length})`,
+    parent: (data, row) => ({
+      content: () => `${data.name} (${row.children.length})`,
       typeScale: "smEm",
     }),
     child: (row) => row.name,
@@ -356,7 +362,7 @@ function beamStyleColumns() {
 }
 
 const flatRows: GridDataRow<BeamRow>[] = [
-  { kind: "header", id: "header" },
+  simpleHeader,
   ...zeroTo(20).map((idx) => ({
     kind: "data" as const,
     id: `r:${idx + 1}`,
