@@ -93,7 +93,7 @@ export interface GridStyle {
   /** Minimum table width in pixels. Used when calculating columns sizes */
   minWidthPx?: number;
   /** Css to apply at each level of a parent/child nested table. */
-  levels?: Record<number, { cellCss: Properties }>;
+  levels?: Record<number, { cellCss?: Properties; firstContentColumn?: Properties }>;
   /** Allows for customization of the background color used to denote an "active" row */
   activeBgColor?: Palette;
 }
@@ -848,12 +848,13 @@ export type GridColumn<R extends Kinded, S = {}> = {
     | string
     | GridCellContent
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
-        ? (data: D, row: GridRowKind<R, K>, api: GridTableApi<R>, level: number) => ReactNode | GridCellContent
+        ? (
+            data: D,
+            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number },
+          ) => ReactNode | GridCellContent
         : (
             data: undefined,
-            row: GridRowKind<R, K>,
-            api: GridTableApi<R>,
-            level: number,
+            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number },
           ) => ReactNode | GridCellContent);
 } & {
   /**
@@ -913,11 +914,16 @@ export interface RowStyle<R extends Kinded> {
 function getIndentationCss<R extends Kinded>(
   style: GridStyle,
   rowStyle: RowStyle<R> | undefined,
+  columnIndex: number,
   maybeContent: ReactNode | GridCellContent,
-  applyRowIndent: boolean,
 ): Properties {
-  // Look for cell-specific indent or row-specific indent (row-specific is only one the first non-action)
-  const indent = (isGridCellContent(maybeContent) && maybeContent.indent) || (applyRowIndent && rowStyle?.indent);
+  // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
+  const indent = (isGridCellContent(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
+  if (typeof indent === "number" && style.levels !== undefined) {
+    throw new Error(
+      "The indent param is deprecated for new beam fixed & flexible styles, use beamNestedFixedStyle or beamNestedFlexibleStyle",
+    );
+  }
   return indent === 1 ? style.indentOneCss || {} : indent === 2 ? style.indentTwoCss || {} : {};
 }
 
@@ -1051,17 +1057,15 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
   let currentColspan = 1;
 
-  let rowIndentApplied = false;
+  let firstContentColumnStylesApplied = false;
 
   const rowNode = (
     <Row css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
       {columns.map((column, columnIndex) => {
         const { wrapAction = true, isAction = false } = column;
 
-        const applyRowIndent = !isAction && !rowIndentApplied && rowStyle?.indent !== undefined;
-        if (!rowIndentApplied && applyRowIndent) {
-          rowIndentApplied = true;
-        }
+        const applyFirstContentColumnStyles = !isAction && !firstContentColumnStylesApplied;
+        firstContentColumnStylesApplied ||= applyFirstContentColumnStyles;
 
         if (column.mw) {
           // Validate the column's minWidth definition if set.
@@ -1135,14 +1139,13 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...getFirstOrLastCellCss(style, columnIndex, columns),
           // Then override with per-cell/per-row justification/indentation
           ...justificationCss,
-          // If we are indenting the row, and it is 3rd level or greater, then also apply the `tiny` type scale on this column for further visualization of nesting
-          ...(applyRowIndent && level > 1 ? Css.tiny.$ : {}),
-          // Always call getIndentationCss in the case that the GridCellContent defined an indent property itself.
-          ...getIndentationCss(style, rowStyle, maybeContent, applyRowIndent),
+          ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
           // Or level-specific styling
           ...(!isHeader && !!style.levels && style.levels[level]?.cellCss),
+          // Level specific styling for the first content column
+          ...(applyFirstContentColumnStyles && !!style.levels && style.levels[level]?.firstContentColumn),
           // The specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
           // Apply active row styling for non-nested card styles.
@@ -1252,13 +1255,13 @@ export function applyRowFn<R extends Kinded>(
   column: GridColumn<R>,
   row: GridDataRow<R>,
   api: GridTableApi<R>,
-  level?: number,
+  level: number,
 ): ReactNode | GridCellContent {
   // Usually this is a function to apply against the row, but sometimes it's a hard-coded value, i.e. for headers
   const maybeContent = column[row.kind];
   if (typeof maybeContent === "function") {
     // Auto-destructure data
-    return (maybeContent as Function)((row as any)["data"], row as any, api, level);
+    return (maybeContent as Function)((row as any)["data"], { row: row as any, api, level });
   } else {
     return maybeContent;
   }

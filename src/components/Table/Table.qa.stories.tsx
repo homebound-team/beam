@@ -4,14 +4,7 @@ import { default as React, ReactNode, useMemo, useState } from "react";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
 import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/columns";
-import {
-  emptyCell,
-  GridColumn,
-  GridDataRow,
-  GridRowStyles,
-  GridSortConfig,
-  GridTable,
-} from "src/components/Table/GridTable";
+import { emptyCell, GridColumn, GridDataRow, GridSortConfig, GridTable } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { simpleHeader, SimpleHeaderAndData } from "src/components/Table/simpleHelpers";
 import {
@@ -174,12 +167,6 @@ export function Filterable() {
   );
 }
 
-const indentedChildRowStyles: GridRowStyles<BeamNestedRow> = {
-  child: {
-    indent: 1,
-  },
-};
-
 export function NestedThreeLevels() {
   return (
     <GridTable<BeamNestedRow>
@@ -187,7 +174,6 @@ export function NestedThreeLevels() {
       sorting={{ on: "client" }}
       columns={nestedColumnsThreeLevels}
       rows={nestedRowsThreeLevels}
-      rowStyles={indentedChildRowStyles}
       stickyHeader
     />
   );
@@ -306,12 +292,12 @@ function beamNestedColumns(threeLevels: boolean = false): GridColumn<BeamNestedR
     column<BeamNestedRow>({
       totals: "Totals",
       header: "Cost Code",
-      grandparent: (data, row) => ({
+      grandparent: (data, { row }) => ({
         content: () => `${data.name} (${row.children.length})`,
         // Apply `smEm` typeScale if nesting three levels
         typeScale: threeLevels ? "smEm" : undefined,
       }),
-      parent: (data, row) => ({
+      parent: (data, { row }) => ({
         content: () => `${data.name} (${row.children.length})`,
         // Apply `smEm` typeScale if not nesting three levels
         typeScale: threeLevels ? undefined : "smEm",
@@ -502,7 +488,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
   return [
     column<InputFieldRows>({
       header: "Name",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return <BoundTextField field={os.firstName} {...applyStateProps(row.id)} />;
@@ -511,7 +497,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
     }),
     column<InputFieldRows>({
       header: "Biography",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return flexible ? (
@@ -525,7 +511,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
     }),
     column<InputFieldRows>({
       header: "Birthdate",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return <BoundDateField field={os.birthday} {...applyStateProps(row.id)} />;
@@ -535,7 +521,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
     }),
     numericColumn<InputFieldRows>({
       header: "Height",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return <BoundNumberField field={os.heightInInches} {...applyStateProps(row.id)} />;
@@ -545,7 +531,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
     }),
     column<InputFieldRows>({
       header: "Favorite Sport",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return <BoundSelectField field={os.favoriteSport} options={sports} {...applyStateProps(row.id)} />;
@@ -554,7 +540,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
     }),
     column<InputFieldRows>({
       header: "Favorite Shapes",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return <BoundMultiSelectField field={os.favoriteShapes} options={shapes} {...applyStateProps(row.id)} />;

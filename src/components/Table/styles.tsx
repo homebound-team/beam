@@ -48,9 +48,6 @@ export const beamFixedStyle: GridStyle = {
   emptyCell: "-",
   presentationSettings: { borderless: true, typeScale: "xs", wrap: false },
   firstRowMessageCss: Css.tc.py3.$,
-  // Indent styles extends the existing padding-left defined in CellCss. The indentation should be +12px.
-  indentOneCss: Css.pl3.$,
-  indentTwoCss: Css.plPx(36).$,
   // Included as a hacky "treat indent as deprecated for this table" hint to GridTable
   levels: {},
 };
@@ -65,7 +62,7 @@ export const beamTotalsRowStyle: Properties = Css.gray700.smEm.hPx(40).mb1.bgWhi
 
 export const beamNestedFixedStyle: GridStyle = {
   ...beamFixedStyle,
-  levels: { 0: { cellCss: beamGroupRowStyle } },
+  levels: { 0: { cellCss: beamGroupRowStyle }, 2: { firstContentColumn: Css.tiny.pl3.$ } },
 };
 
 export const beamTotalsFixedStyle: GridStyle = {
@@ -81,7 +78,7 @@ export const beamFlexibleStyle: GridStyle = {
 
 export const beamNestedFlexibleStyle: GridStyle = {
   ...beamFlexibleStyle,
-  levels: { 0: { cellCss: beamGroupRowStyle } },
+  levels: { 0: { cellCss: beamGroupRowStyle }, 2: { firstContentColumn: Css.tiny.pl3.$ } },
 };
 
 export const beamTotalsFlexibleStyle: GridStyle = {

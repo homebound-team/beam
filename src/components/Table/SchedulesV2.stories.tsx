@@ -67,17 +67,17 @@ const rows: GridDataRow<Row>[] = [simpleHeader, ...createMilestones(1, 3, 2)];
 /** Columns */
 // FIXME: This column is not vertically aligned
 const arrowColumn = actionColumn<Row>({
-  header: (data, row) => (
+  header: (data, { row }) => (
     <div css={Css.pr1.$}>
       <CollapseToggle row={row} />
     </div>
   ),
-  milestone: (data, row) => (
+  milestone: (data, { row }) => (
     <div css={Css.pr1.$}>
       <CollapseToggle row={row} />
     </div>
   ),
-  subgroup: (data, row) => (
+  subgroup: (data, { row }) => (
     <div css={Css.pr1.$}>
       <CollapseToggle row={row} />
     </div>
@@ -99,7 +99,7 @@ const idColumn = column<Row>({
   header: "",
   milestone: "",
   subgroup: "",
-  task: (data, row) => row.id,
+  task: (data, { row }) => row.id,
   add: "",
   w: "20px",
   align: "center",

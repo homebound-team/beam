@@ -51,34 +51,34 @@ beforeEach(() => (renderedNameColumn = []));
 // TODO Move this to the bottom of the file in it's own PR
 const nestedColumns: GridColumn<NestedRow>[] = [
   {
-    header: (data, row) => <Collapse id={row.id} />,
-    parent: (data, row) => <Collapse id={row.id} />,
-    child: (data, row) => <Collapse id={row.id} />,
+    header: (data, { row }) => <Collapse id={row.id} />,
+    parent: (data, { row }) => <Collapse id={row.id} />,
+    child: (data, { row }) => <Collapse id={row.id} />,
     grandChild: () => "",
   },
   selectColumn<NestedRow>({
-    header: (data, row) => ({ content: <Select id={row.id} /> }),
-    parent: (data, row) => ({ content: <Select id={row.id} /> }),
-    child: (data, row) => ({ content: <Select id={row.id} /> }),
-    grandChild: (data, row) => ({ content: <Select id={row.id} /> }),
+    header: (data, { row }) => ({ content: <Select id={row.id} /> }),
+    parent: (data, { row }) => ({ content: <Select id={row.id} /> }),
+    child: (data, { row }) => ({ content: <Select id={row.id} /> }),
+    grandChild: (data, { row }) => ({ content: <Select id={row.id} /> }),
   }),
   {
     header: () => "Name",
-    parent: (data, row) => ({
+    parent: (data, { row }) => ({
       content() {
         renderedNameColumn.push(row.id);
         return <div>{data.name}</div>;
       },
       value: data.name,
     }),
-    child: (data, row) => ({
+    child: (data, { row }) => ({
       content() {
         renderedNameColumn.push(row.id);
         return <div css={Css.ml2.$}>{data.name}</div>;
       },
       value: data.name,
     }),
-    grandChild: (data, row) => ({
+    grandChild: (data, { row }) => ({
       content() {
         renderedNameColumn.push(row.id);
         return <div css={Css.ml4.$}>{data.name}</div>;
@@ -1452,7 +1452,7 @@ describe("GridTable", () => {
     const valueColumn: GridColumn<Row> = {
       header: "",
       // Then the column can accept both the value (not the GriDataRow) directly and the row id
-      data: (v, row) => `id=${row.id} value=${v.value}`,
+      data: (v, { row }) => `id=${row.id} value=${v.value}`,
     };
     const r = await render(<GridTable columns={[valueColumn]} rows={rows} />);
     expect(cell(r, 1, 0)).toHaveTextContent("id=a:1 value=1");
