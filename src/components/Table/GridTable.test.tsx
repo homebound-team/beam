@@ -14,13 +14,7 @@ import {
 } from "src/components/Table/GridTable";
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import { RowStateContext } from "src/components/Table/RowState";
-import {
-  simpleDataRows,
-  simpleHeader,
-  SimpleHeaderAndDataOf,
-  SimpleHeaderAndDataWith,
-  simpleRows,
-} from "src/components/Table/simpleHelpers";
+import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/simpleHelpers";
 import { beamFixedStyle } from "src/components/Table/styles";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -29,23 +23,23 @@ import { cell, cellAnd, cellOf, click, render, row, rowAnd, type, withRouter } f
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
-type Row = SimpleHeaderAndDataOf<Data>;
+type Row = SimpleHeaderAndData<Data>;
 
 const nameColumn: GridColumn<Row> = { header: () => "Name", data: ({ name }) => name };
 const valueColumn: GridColumn<Row> = { header: () => "Value", data: ({ value }) => value };
 const columns = [nameColumn, valueColumn];
 
 const rows: GridDataRow<Row>[] = [
-  { kind: "header", id: "header" },
-  { kind: "data", id: "1", name: "foo", value: 1 },
-  { kind: "data", id: "2", name: "bar", value: 2 },
+  simpleHeader,
+  { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+  { kind: "data", id: "2", data: { name: "bar", value: 2 } },
 ];
 
 // Make a `NestedRow` ADT for a table with a header + 3 levels of nesting
-type HeaderRow = { kind: "header" };
-type ParentRow = { kind: "parent"; id: string; name: string };
-type ChildRow = { kind: "child"; id: string; name: string };
-type GrandChildRow = { kind: "grandChild"; id: string; name: string };
+type HeaderRow = { kind: "header"; id: string; data: {} };
+type ParentRow = { kind: "parent"; id: string; data: { name: string } };
+type ChildRow = { kind: "child"; id: string; data: { name: string } };
+type GrandChildRow = { kind: "grandChild"; id: string; data: { name: string } };
 type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow;
 
 // I tried https://github.com/keiya01/react-performance-testing#count-renders but
@@ -57,39 +51,39 @@ beforeEach(() => (renderedNameColumn = []));
 // TODO Move this to the bottom of the file in it's own PR
 const nestedColumns: GridColumn<NestedRow>[] = [
   {
-    header: (row) => <Collapse id={row.id} />,
-    parent: (row) => <Collapse id={row.id} />,
-    child: (row) => <Collapse id={row.id} />,
+    header: (data, row) => <Collapse id={row.id} />,
+    parent: (data, row) => <Collapse id={row.id} />,
+    child: (data, row) => <Collapse id={row.id} />,
     grandChild: () => "",
   },
   selectColumn<NestedRow>({
-    header: (row) => ({ content: <Select id={row.id} /> }),
-    parent: (row) => ({ content: <Select id={row.id} /> }),
-    child: (row) => ({ content: <Select id={row.id} /> }),
-    grandChild: (row) => ({ content: <Select id={row.id} /> }),
+    header: (data, row) => ({ content: <Select id={row.id} /> }),
+    parent: (data, row) => ({ content: <Select id={row.id} /> }),
+    child: (data, row) => ({ content: <Select id={row.id} /> }),
+    grandChild: (data, row) => ({ content: <Select id={row.id} /> }),
   }),
   {
     header: () => "Name",
-    parent: (row) => ({
+    parent: (data, row) => ({
       content() {
         renderedNameColumn.push(row.id);
-        return <div>{row.name}</div>;
+        return <div>{data.name}</div>;
       },
-      value: row.name,
+      value: data.name,
     }),
-    child: (row) => ({
+    child: (data, row) => ({
       content() {
         renderedNameColumn.push(row.id);
-        return <div css={Css.ml2.$}>{row.name}</div>;
+        return <div css={Css.ml2.$}>{data.name}</div>;
       },
-      value: row.name,
+      value: data.name,
     }),
-    grandChild: (row) => ({
+    grandChild: (data, row) => ({
       content() {
         renderedNameColumn.push(row.id);
-        return <div css={Css.ml4.$}>{row.name}</div>;
+        return <div css={Css.ml4.$}>{data.name}</div>;
       },
-      value: row.name,
+      value: data.name,
     }),
   },
 ];
@@ -125,14 +119,14 @@ describe("GridTable", () => {
 
   it("unwraps rows with a data key", async () => {
     // Given a column using the `With` type
-    type Row = SimpleHeaderAndDataWith<Data>;
+    type Row = SimpleHeaderAndData<Data>;
     const valueColumn: GridColumn<Row> = {
       header: "Value",
       // Then we can destructure directly against data
       data: ({ value }) => value,
     };
     const rows: GridDataRow<Row>[] = [
-      { kind: "header", id: "header" },
+      simpleHeader,
       { kind: "data", id: "1", data: { name: "foo", value: 1 } },
       { kind: "data", id: "2", data: { name: "bar", value: 2 } },
     ];
@@ -167,8 +161,8 @@ describe("GridTable", () => {
     const rowStyles: GridRowStyles<Row> = {
       header: {},
       data: {
-        rowCss: (row) => (row.value === 1 ? Css.bgRed500.$ : Css.bgGreen500.$),
-        cellCss: (row) => (row.value === 1 ? Css.green500.$ : Css.red500.$),
+        rowCss: (row) => (row.data.value === 1 ? Css.bgRed500.$ : Css.bgGreen500.$),
+        cellCss: (row) => (row.data.value === 1 ? Css.green500.$ : Css.red500.$),
       },
     };
     const r = await render(<GridTable {...{ columns, rows, rowStyles }} />);
@@ -203,9 +197,9 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the data is initially unsorted
-            { kind: "data", id: "2", name: "b", value: 2 },
-            { kind: "data", id: "1", name: "a", value: 3 },
-            { kind: "data", id: "3", name: "c", value: 1 },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
           ]}
         />,
       );
@@ -241,9 +235,9 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the data is initially unsorted
-            { kind: "data", id: "2", name: "b", value: 2 },
-            { kind: "data", id: "1", name: "a", value: 3 },
-            { kind: "data", id: "3", name: "c", value: 1 },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
           ]}
         />,
       );
@@ -273,9 +267,9 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the data is initially unsorted
-            { kind: "data", id: "2", name: "b", value: 2 },
-            { kind: "data", id: "1", name: "a", value: 3 },
-            { kind: "data", id: "3", name: "c", value: 1 },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
           ]}
         />,
       );
@@ -307,9 +301,9 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the data is initially unsorted
-            { kind: "data", id: "2", name: "b", value: 2 },
-            { kind: "data", id: "1", name: "a", value: 3 },
-            { kind: "data", id: "3", name: "c", value: 1 },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
           ]}
         />,
       );
@@ -329,10 +323,10 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the 2nd row's value is undefined
-            { kind: "data", id: "2", name: "b", value: 2 },
-            { kind: "data", id: "1", name: "a", value: undefined },
-            { kind: "data", id: "3", name: "c", value: 1 },
-            { kind: "data", id: "4", name: "d", value: undefined },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: undefined } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
+            { kind: "data", id: "4", data: { name: "d", value: undefined } },
           ]}
         />,
       );
@@ -352,7 +346,7 @@ describe("GridTable", () => {
           // And the 2nd column has sorting disabled
           columns={[nameColumn, { ...valueColumn, clientSideSort: false }]}
           sorting={{ on: "client" }}
-          rows={[simpleHeader, { kind: "data", id: "2", name: "b", value: 2 }]}
+          rows={[simpleHeader, { kind: "data", id: "2", data: { name: "b", value: 2 } }]}
         />,
       );
       const { sortHeader_0, sortHeader_1 } = r;
@@ -371,9 +365,9 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the data is initially unsorted
-            { kind: "data", id: "2", name: "b", value: 2 },
-            { kind: "data", id: "1", name: "a", value: 3 },
-            { kind: "data", id: "3", name: "c", value: 1 },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
           ]}
         />,
       );
@@ -392,9 +386,9 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the data is initially unsorted
-            { kind: "data", id: "2", name: "b", value: 2 },
-            { kind: "data", id: "1", name: "a", value: 3 },
-            { kind: "data", id: "3", name: "c", value: 1 },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
           ]}
         />,
       );
@@ -413,9 +407,9 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the data is initially unsorted
-            { kind: "data", id: "2", name: "b", value: 2 },
-            { kind: "data", id: "1", name: "a", value: 3 },
-            { kind: "data", id: "3", name: "c", value: 1 },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
           ]}
         />,
       );
@@ -433,9 +427,9 @@ describe("GridTable", () => {
           sorting={{ on: "client", initial: [nameColumn, "ASC"] }}
           rows={[
             simpleHeader,
-            { kind: "data", id: "1", name: "a", value: 2 },
-            { kind: "data", id: "2", name: "b", value: 3 },
-            { kind: "data", id: "3", name: "c", value: 1 },
+            { kind: "data", id: "1", data: { name: "a", value: 2 } },
+            { kind: "data", id: "2", data: { name: "b", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
           ]}
         />,
       );
@@ -463,9 +457,9 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the data is initially unsorted
-            { kind: "data", id: "2", name: "b", value: 2 },
-            { kind: "data", id: "1", name: "a", value: 3 },
-            { kind: "data", id: "3", name: "c", value: 1 },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
           ]}
         />,
       );
@@ -485,9 +479,9 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the data is initially unsorted
-            { kind: "data", id: "2", name: "b", value: 2 },
-            { kind: "data", id: "1", name: "a", value: 3 },
-            { kind: "data", id: "3", name: "c", value: 1 },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
           ]}
         />,
       );
@@ -515,17 +509,17 @@ describe("GridTable", () => {
             simpleHeader,
             // And the data is initially unsorted
             {
-              ...{ kind: "data", id: "2", name: "2", value: 2 },
+              ...{ kind: "data", id: "2", data: { name: "2", value: 2 } },
               children: [
-                { kind: "data", id: "20", name: "1", value: 1 },
-                { kind: "data", id: "21", name: "2", value: 2 },
+                { kind: "data", id: "20", data: { name: "1", value: 1 } },
+                { kind: "data", id: "21", data: { name: "2", value: 2 } },
               ],
             },
             {
-              ...{ kind: "data", id: "1", name: "1", value: 1 },
+              ...{ kind: "data", id: "1", data: { name: "1", value: 1 } },
               children: [
-                { kind: "data", id: "10", name: "1", value: 1 },
-                { kind: "data", id: "11", name: "2", value: 2 },
+                { kind: "data", id: "10", data: { name: "1", value: 1 } },
+                { kind: "data", id: "11", data: { name: "2", value: 2 } },
               ],
             },
           ];
@@ -600,7 +594,7 @@ describe("GridTable", () => {
           <GridTable
             columns={[nameColumn, valueColumn]}
             sorting={{ on: "client" }}
-            rows={[simpleHeader, { kind: "data", id: "1", name: "a", value: 3 }]}
+            rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 3 } }]}
           />,
         ),
       ).rejects.toThrow("Column 0 passed an unsortable value, use GridCellContent or clientSideSort=false");
@@ -716,14 +710,14 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the 1st row is pinned first
-            { kind: "data", id: "1", name: "a", value: 11, pin: "first" },
-            { kind: "data", id: "2", name: "b", value: 10, pin: "first" },
+            { kind: "data", id: "1", pin: "first", data: { name: "a", value: 11 } },
+            { kind: "data", id: "2", pin: "first", data: { name: "b", value: 10 } },
             // And the middle rows need sorted
-            { kind: "data", id: "3", name: "c", value: 3 },
-            { kind: "data", id: "4", name: "d", value: 1 },
+            { kind: "data", id: "3", data: { name: "c", value: 3 } },
+            { kind: "data", id: "4", data: { name: "d", value: 1 } },
             // And the last rows are pinned last
-            { kind: "data", id: "5", name: "e", value: 20, pin: "last" },
-            { kind: "data", id: "6", name: "f", value: 21, pin: "last" },
+            { kind: "data", id: "5", pin: "last", data: { name: "e", value: 20 } },
+            { kind: "data", id: "6", pin: "last", data: { name: "f", value: 21 } },
           ]}
         />,
       );
@@ -746,10 +740,10 @@ describe("GridTable", () => {
           sorting={{ on: "client" }}
           rows={[
             simpleHeader,
-            { kind: "data", id: "3", name: "c", value: 3 },
-            { kind: "data", id: "2", name: "b", value: 2 },
+            { kind: "data", id: "3", data: { name: "c", value: 3 } },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
             // And the last row is pinned first
-            { kind: "data", id: "1", name: "a", value: 1, pin: "last" },
+            { kind: "data", id: "1", pin: "last", data: { name: "a", value: 1 } },
           ]}
         />,
       );
@@ -802,7 +796,7 @@ describe("GridTable", () => {
       render(
         <GridTable
           columns={[{ header: () => "Name", data: "Test", mw: "fit-content" }]}
-          rows={[simpleHeader, { kind: "data", id: "1", name: "a", value: 3 }]}
+          rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 3 } }]}
         />,
       ),
     ).rejects.toThrow("Beam Table column min-width definition only supports px or percentage values");
@@ -813,7 +807,7 @@ describe("GridTable", () => {
     const r = await render(
       <GridTable
         columns={[{ header: () => "Name", data: "Test", mw: "100px" }]}
-        rows={[simpleHeader, { kind: "data", id: "1", name: "a", value: 3 }]}
+        rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 3 } }]}
       />,
     );
     expect(r.gridTable()).toBeTruthy();
@@ -824,7 +818,7 @@ describe("GridTable", () => {
     const r = await render(
       <GridTable
         columns={[{ header: () => "Name", data: "Test", mw: "100%" }]}
-        rows={[simpleHeader, { kind: "data", id: "1", name: "a", value: 3 }]}
+        rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 3 } }]}
       />,
     );
     expect(r.gridTable()).toBeTruthy();
@@ -836,7 +830,7 @@ describe("GridTable", () => {
     const r = await render(<GridTable {...{ columns, rows, rowStyles }} />);
     click(cell(r, 1, 0));
     expect(onClick).toHaveBeenCalledTimes(1);
-    expect(onClick.mock.calls[0][0].name).toEqual("foo");
+    expect(onClick.mock.calls[0][0].data.name).toEqual("foo");
   });
 
   it("can omit onClick for columns", async () => {
@@ -891,9 +885,9 @@ describe("GridTable", () => {
 
   it("can filter by string values", async () => {
     const rows: GridDataRow<Row>[] = [
-      { kind: "header", id: "header" },
-      { kind: "data", id: "1", name: "foo", value: 1 },
-      { kind: "data", id: "2", name: "bar", value: 2 },
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
     ];
     const r = await render(<GridTable filter={"bar"} {...{ columns, rows }} />);
     expect(cell(r, 0, 0)).toHaveTextContent("Name");
@@ -903,9 +897,9 @@ describe("GridTable", () => {
 
   it("can filter by string content values", async () => {
     const rows: GridDataRow<Row>[] = [
-      { kind: "header", id: "header" },
-      { kind: "data", id: "1", name: "foo", value: 1 },
-      { kind: "data", id: "2", name: "bar", value: 2 },
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
     ];
     const nameColumn: GridColumn<Row> = {
       header: () => "Name",
@@ -919,9 +913,9 @@ describe("GridTable", () => {
 
   it("can filter by numeric values", async () => {
     const rows: GridDataRow<Row>[] = [
-      { kind: "header", id: "header" },
-      { kind: "data", id: "1", name: "foo", value: 1 },
-      { kind: "data", id: "2", name: "bar", value: 2 },
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
     ];
     const r = await render(<GridTable filter={"2"} {...{ columns, rows }} />);
     expect(cell(r, 0, 0)).toHaveTextContent("Name");
@@ -931,9 +925,9 @@ describe("GridTable", () => {
 
   it("can filter and treat space as 'and'", async () => {
     const rows: GridDataRow<Row>[] = [
-      { kind: "header", id: "header" },
-      { kind: "data", id: "1", name: "foo", value: 2 },
-      { kind: "data", id: "2", name: "bar", value: 2 },
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "foo", value: 2 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
     ];
     const r = await render(<GridTable filter={"bar 2"} {...{ columns, rows }} />);
     expect(cell(r, 0, 0)).toHaveTextContent("Name");
@@ -943,9 +937,9 @@ describe("GridTable", () => {
 
   it("treats filtering by empty string as no filter", async () => {
     const rows: GridDataRow<Row>[] = [
-      { kind: "header", id: "header" },
-      { kind: "data", id: "1", name: "foo", value: 1 },
-      { kind: "data", id: "2", name: "bar", value: 2 },
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
     ];
     const r = await render(<GridTable filter={""} {...{ columns, rows }} />);
     expect(cell(r, 0, 0)).toHaveTextContent("Name");
@@ -955,9 +949,9 @@ describe("GridTable", () => {
 
   it("can filter by GridCellContent values", async () => {
     const rows: GridDataRow<Row>[] = [
-      { kind: "header", id: "header" },
-      { kind: "data", id: "1", name: "foo", value: 1 },
-      { kind: "data", id: "2", name: "bar", value: 2 },
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
     ];
     const r = await render(
       <GridTable<Row>
@@ -981,16 +975,16 @@ describe("GridTable", () => {
   it("can filter child rows", async () => {
     // Given a parent that won't match the filter
     const rows: GridDataRow<NestedRow>[] = [
-      { kind: "header", id: "header" },
+      simpleHeader,
       {
         kind: "parent",
         id: "1",
-        name: "p1",
+        data: { name: "p1" },
         children: [
           // And one child does match the filter
-          { kind: "child", id: "p1c1", name: "child foo" },
+          { kind: "child", id: "p1c1", data: { name: "child foo" } },
           // And the other does not
-          { kind: "child", id: "p1c2", name: "child bar" },
+          { kind: "child", id: "p1c2", data: { name: "child bar" } },
         ],
       },
     ];
@@ -1010,11 +1004,11 @@ describe("GridTable", () => {
     // Given a parent with a child and grandchild
     const rows: GridDataRow<NestedRow>[] = [
       {
-        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
         children: [
           {
-            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
-            children: [{ kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" }],
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
           },
         ],
       },
@@ -1035,11 +1029,11 @@ describe("GridTable", () => {
     // Given a parent with a child and grandchild
     const rows: GridDataRow<NestedRow>[] = [
       {
-        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
         children: [
           {
-            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
-            children: [{ kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" }],
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
           },
         ],
       },
@@ -1064,13 +1058,13 @@ describe("GridTable", () => {
   it("can collapse all", async () => {
     // Given a parent with a child and grandchild
     const rows: GridDataRow<NestedRow>[] = [
-      { kind: "header", id: "header" },
+      simpleHeader,
       {
-        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
         children: [
           {
-            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
-            children: [{ kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" }],
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
           },
         ],
       },
@@ -1102,9 +1096,19 @@ describe("GridTable", () => {
     localStorage.setItem(tableIdentifier, JSON.stringify(["p2", "p2c1"]));
     // And two parents with a child each
     const rows: GridDataRow<NestedRow>[] = [
-      { kind: "header", id: "header" },
-      { kind: "parent", id: "p1", name: "parent 1", children: [{ kind: "child", id: "p1c1", name: "child p1c1" }] },
-      { kind: "parent", id: "p2", name: "parent 2", children: [{ kind: "child", id: "p2c1", name: "child p2c1" }] },
+      simpleHeader,
+      {
+        kind: "parent",
+        id: "p1",
+        data: { name: "parent 1" },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+      {
+        kind: "parent",
+        id: "p2",
+        data: { name: "parent 2" },
+        children: [{ kind: "child", id: "p2c1", data: { name: "child p2c1" } }],
+      },
     ];
 
     // When we render the table with the persistCollapse prop set
@@ -1125,13 +1129,13 @@ describe("GridTable", () => {
   it("can select all", async () => {
     // Given a parent with a child and grandchild
     const rows: GridDataRow<NestedRow>[] = [
-      { kind: "header", id: "header" },
+      simpleHeader,
       {
-        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
         children: [
           {
-            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
-            children: [{ kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" }],
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
           },
         ],
       },
@@ -1175,15 +1179,15 @@ describe("GridTable", () => {
   it("only returns selected visible rows", async () => {
     // Given a parent with a child and grandchildren
     const rows: GridDataRow<NestedRow>[] = [
-      { kind: "header", id: "header" },
+      simpleHeader,
       {
-        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
         children: [
           {
-            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
             children: [
-              { kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" },
-              { kind: "grandChild", id: "p1c1g2", name: "grandchild p1c1g2" },
+              { kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } },
+              { kind: "grandChild", id: "p1c1g2", data: { name: "grandchild p1c1g2" } },
             ],
           },
         ],
@@ -1214,12 +1218,12 @@ describe("GridTable", () => {
   it("re-derives parent row selected state", async () => {
     // Given a parent with children
     const rows: GridDataRow<NestedRow>[] = [
-      { kind: "header", id: "header" },
+      simpleHeader,
       {
-        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
         children: [
-          { kind: "child", id: "p1c1", name: "child p1c1" },
-          { kind: "child", id: "p1c2", name: "child p1c2" },
+          { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
         ],
       },
     ];
@@ -1244,15 +1248,15 @@ describe("GridTable", () => {
   it("only selects visible rows", async () => {
     // Given a parent with a child and grandchildren
     const rows: GridDataRow<NestedRow>[] = [
-      { kind: "header", id: "header" },
+      simpleHeader,
       {
-        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
         children: [
           {
-            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
             children: [
-              { kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" },
-              { kind: "grandChild", id: "p1c1g2", name: "grandchild p1c1g2" },
+              { kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } },
+              { kind: "grandChild", id: "p1c1g2", data: { name: "grandchild p1c1g2" } },
             ],
           },
         ],
@@ -1306,9 +1310,9 @@ describe("GridTable", () => {
 
   it("can look up row locations", async () => {
     // Given three rows
-    const r1 = { kind: "data", id: "r:1", name: "one", value: 1 } as const;
-    const r2 = { kind: "data", id: "r:2", name: "two", value: 2 } as const;
-    const r3 = { kind: "data", id: "r:3", name: "thr", value: 3 } as const;
+    const r1 = { kind: "data", id: "r:1", data: { name: "one", value: 1 } } as const;
+    const r2 = { kind: "data", id: "r:2", data: { name: "two", value: 2 } } as const;
+    const r3 = { kind: "data", id: "r:3", data: { name: "thr", value: 3 } } as const;
     const rows: GridDataRow<Row>[] = [r1, r2, r3];
     // A pretend MutableRefObject
     const rowLookup: MutableRefObject<GridRowLookup<Row> | undefined> = { current: undefined };
@@ -1320,28 +1324,27 @@ describe("GridTable", () => {
 
   it("can look up filtered row locations", async () => {
     // Given rows that have the same kind, but have some-big/some-small values
-    const r1 = { kind: "data", id: "r:1", name: "one", value: 1 } as const;
-    const r2 = { kind: "data", id: "r:2", name: "two", value: 2_000 } as const;
-    const r3 = { kind: "data", id: "r:3", name: "thr", value: 3 } as const;
-    const r4 = { kind: "data", id: "r:4", name: "fur", value: 4_000 } as const;
-    const r5 = { kind: "data", id: "r:5", name: "fiv", value: 5 } as const;
+    const r1 = { kind: "data", id: "r:1", data: { name: "one", value: 1 } } as const;
+    const r2 = { kind: "data", id: "r:2", data: { name: "two", value: 2_000 } } as const;
+    const r3 = { kind: "data", id: "r:3", data: { name: "thr", value: 3 } } as const;
+    const r4 = { kind: "data", id: "r:4", data: { name: "fur", value: 4_000 } } as const;
+    const r5 = { kind: "data", id: "r:5", data: { name: "fiv", value: 5 } } as const;
     const rows: GridDataRow<Row>[] = [r1, r2, r3, r4, r5];
     // A pretend MutableRefObject
     const rowLookup: MutableRefObject<GridRowLookup<Row> | undefined> = { current: undefined };
     await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
     // When the page does a lookup for only "small value" rows
-    const result = rowLookup.current!.lookup(r3, (r) => r.kind === "data" && !!r.value && r.value < 10);
+    const result = rowLookup.current!.lookup(r3, (r) => r.kind === "data" && !!r.data.value && r.data.value < 10);
     // Then we ignored r2 and r4
     expect(result).toMatchObject({ prev: r1, next: r5, data: { prev: r1, next: r5 } });
   });
 
   it("can look up row locations and be kind-aware", async () => {
-    const header = { kind: "header" as const, id: "header" };
-    const p1 = { kind: "parent" as const, id: "p1", name: "parent 1" };
-    const p1c1 = { kind: "child" as const, id: "p1c1", parentIds: ["p1"], name: "child p1c1" };
-    const p2 = { kind: "parent" as const, id: "p2", name: "parent 2" };
-    const p2c1 = { kind: "child" as const, id: "p2c1", parentIds: ["p2"], name: "child p2c1" };
-    const rows: GridDataRow<NestedRow>[] = [header, p1, p1c1, p2, p2c1];
+    const p1 = { kind: "parent" as const, id: "p1", data: { name: "parent 1" } };
+    const p1c1 = { kind: "child" as const, id: "p1c1", parentIds: ["p1"], data: { name: "child p1c1" } };
+    const p2 = { kind: "parent" as const, id: "p2", data: { name: "parent 2" } };
+    const p2c1 = { kind: "child" as const, id: "p2c1", parentIds: ["p2"], data: { name: "child p2c1" } };
+    const rows: GridDataRow<NestedRow>[] = [simpleHeader, p1, p1c1, p2, p2c1];
 
     // A pretend MutableRefObject
     const rowLookup: MutableRefObject<GridRowLookup<NestedRow> | undefined> = { current: undefined };
@@ -1371,7 +1374,7 @@ describe("GridTable", () => {
 
   it("can look up row locations when only one row", async () => {
     // Given just one row
-    const r1 = { kind: "data", id: "r:1", name: "one", value: 1 } as const;
+    const r1 = { kind: "data", id: "r:1", data: { name: "one", value: 1 } } as const;
     const rows: GridDataRow<Row>[] = [r1];
     // When we look it up
     const rowLookup: MutableRefObject<GridRowLookup<Row> | undefined> = { current: undefined };
@@ -1439,8 +1442,8 @@ describe("GridTable", () => {
   });
 
   it("provides simpleDataRows", async () => {
-    // Given a row that uses SimpleHeaderAndDataWith
-    type Row = SimpleHeaderAndDataWith<{ value: number }>;
+    // Given a row that uses SimpleHeaderAndData
+    type Row = SimpleHeaderAndData<{ value: number }>;
     // And also uses the simpleDataRows factory method
     const rows: GridDataRow<Row>[] = simpleDataRows([
       { id: "a:1", value: 1 },
@@ -1449,25 +1452,16 @@ describe("GridTable", () => {
     const valueColumn: GridColumn<Row> = {
       header: "",
       // Then the column can accept both the value (not the GriDataRow) directly and the row id
-      data: (v, id) => `id=${id} value=${v.value}`,
+      data: (v, row) => `id=${row.id} value=${v.value}`,
     };
     const r = await render(<GridTable columns={[valueColumn]} rows={rows} />);
     expect(cell(r, 1, 0)).toHaveTextContent("id=a:1 value=1");
     expect(cell(r, 2, 0)).toHaveTextContent("id=a:2 value=2");
   });
 
-  it("simpleRows can accept undefined", async () => {
-    // Given a row that uses SimpleHeaderAndDataOf
-    type Row = SimpleHeaderAndDataOf<{ value: number }>;
-    // And we don't have any data defined yet
-    const rows: GridDataRow<Row>[] = simpleRows(undefined);
-    // Then we still get back the header row
-    expect(rows).toEqual([simpleHeader]);
-  });
-
   it("simpleDataRows can accept undefined", async () => {
-    // Given a row that uses SimpleHeaderAndDataWith
-    type Row = SimpleHeaderAndDataWith<{ value: number }>;
+    // Given a row that uses SimpleHeaderAndData
+    type Row = SimpleHeaderAndData<{ value: number }>;
     // And we don't have any data defined yet
     const rows: GridDataRow<Row>[] = simpleDataRows(undefined);
     // Then we still get back the header row
@@ -1483,9 +1477,9 @@ describe("GridTable", () => {
         rows={[
           simpleHeader,
           // And some content is null, undefined, and empty strings
-          { kind: "data", id: "1", name: "", value: null },
-          { kind: "data", id: "2", name: "a", value: undefined },
-          { kind: "data", id: "3", name: "c", value: 1 },
+          { kind: "data", id: "1", data: { name: "", value: null } },
+          { kind: "data", id: "2", data: { name: "a", value: undefined } },
+          { kind: "data", id: "3", data: { name: "c", value: 1 } },
         ]}
       />,
     );
@@ -1506,7 +1500,7 @@ describe("GridTable", () => {
       <GridTable<Row>
         columns={[nameColumn, valueColumn]}
         style={{ emptyCell: <>empty</> }}
-        rows={[simpleHeader, { kind: "data", id: "1", name: "a", value: 1 }]}
+        rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 1 } }]}
       />,
     );
     // Then the cell in this column should actually be empty
@@ -1530,13 +1524,13 @@ describe("GridTable", () => {
       },
     };
     const rows: GridDataRow<NestedRow>[] = [
-      { kind: "header", id: "header" },
+      simpleHeader,
       {
-        ...{ kind: "parent", id: "p1", name: "parent 1" },
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
         children: [
           {
-            ...{ kind: "child", id: "p1c1", name: "child p1c1" },
-            children: [{ kind: "grandChild", id: "p1c1g1", name: "grandchild p1c1g1" }],
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
           },
         ],
       },
@@ -1586,7 +1580,7 @@ describe("GridTable", () => {
     expect(row(r, 1).getAttribute("data-render")).toEqual("1");
 
     // And when the original does actually change
-    const row1_changed: GridDataRow<Row> = { kind: "data", id: row1.id, name: "one", value: 3 };
+    const row1_changed: GridDataRow<Row> = { kind: "data", id: row1.id, data: { name: "one", value: 3 } };
     r.rerender(<GridTable columns={columns} rows={[header, row1_changed, row2]} />);
     // And the original row re-rendered
     expect(row(r, 1).getAttribute("data-render")).toEqual("2");

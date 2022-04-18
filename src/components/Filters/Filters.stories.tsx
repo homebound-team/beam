@@ -11,7 +11,7 @@ import {
   GridTable,
   multiFilter,
   simpleHeader,
-  SimpleHeaderAndDataOf,
+  SimpleHeaderAndData,
   singleFilter,
   toggleFilter,
 } from "src/components/index";
@@ -363,7 +363,7 @@ const tableData: Project[] = [
   },
 ];
 
-type Row = SimpleHeaderAndDataOf<Project>;
+type Row = SimpleHeaderAndData<Project>;
 const columns: GridColumn<Row>[] = [
   { header: () => "Project Manager", data: ({ internalUser }) => internalUser.name },
   { header: () => "Market", data: ({ market }) => market.name },
@@ -385,6 +385,6 @@ function filterRows(data: Project[], filter: ProjectFilter): GridDataRow<Row>[] 
       .filter((p) => (filter.favorite !== undefined ? filter.favorite === p.favorite : true))
       .filter((p) => (filter.isTest ? p.isTest : true))
       .filter((p) => (filter.doNotUse === undefined ? true : !p.doNotUse))
-      .map((p) => ({ kind: "data" as const, ...p })),
+      .map((p) => ({ kind: "data" as const, id: p.id, data: p })),
   ];
 }

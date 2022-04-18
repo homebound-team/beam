@@ -12,7 +12,8 @@ import {
   PreventBrowserScroll,
   ScrollableContent,
   ScrollableParent,
-  SimpleHeaderAndDataOf,
+  simpleHeader,
+  SimpleHeaderAndData,
   useScrollableParent,
 } from "src/index";
 import { NumberField } from "src/inputs/NumberField";
@@ -223,12 +224,12 @@ function VirutalizedPage() {
   );
 }
 
-type Row = SimpleHeaderAndDataOf<{ name: string }>;
+type Row = SimpleHeaderAndData<{ name: string }>;
 function VirutalizedTable() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
-      { kind: "header", id: "header" },
-      ...zeroTo(500).map((i) => ({ kind: "data" as const, id: String(i), name: `ccc ${i}` })),
+      simpleHeader,
+      ...zeroTo(500).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `ccc ${i}` } })),
     ],
     [],
   );

@@ -8,7 +8,7 @@ import {
   GridTable,
   IconButton,
   simpleHeader,
-  SimpleHeaderAndDataWith,
+  SimpleHeaderAndData,
 } from "src/components";
 import { Css } from "src/Css";
 import {
@@ -152,7 +152,7 @@ export function FormStateApp() {
   );
 }
 
-type Row = SimpleHeaderAndDataWith<FormValue["books"]["rows"][number]>;
+type Row = SimpleHeaderAndData<FormValue["books"]["rows"][number]>;
 
 function createColumns(formState: FormValue): GridColumn<Row>[] {
   return [

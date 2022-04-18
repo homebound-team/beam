@@ -22,7 +22,7 @@ import {
   IconButton,
   numericColumn,
   simpleHeader,
-  SimpleHeaderAndDataOf,
+  SimpleHeaderAndData,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { TextField } from "src/inputs";
@@ -37,7 +37,7 @@ export default {
 } as Meta;
 
 type Data = { name: string | undefined; value: number | undefined };
-type Row = SimpleHeaderAndDataOf<Data>;
+type Row = SimpleHeaderAndData<Data>;
 
 export function ClientSideSorting() {
   const nameColumn: GridColumn<Row> = {
@@ -51,10 +51,10 @@ export function ClientSideSorting() {
       columns={[nameColumn, valueColumn, actionColumn]}
       sorting={{ on: "client", initial: [valueColumn, "ASC"] }}
       rows={[
-        { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
       ]}
     />
   );
@@ -67,7 +67,7 @@ export const Hovering = newStory(
     const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
     const rowStyles: GridRowStyles<Row> = {
       data: {
-        cellCss: (row) => (row.value === 3 ? Css.bgRed300.$ : {}),
+        cellCss: (row) => (row.data.value === 3 ? Css.bgRed300.$ : {}),
         rowLink: () => "http://homebound.com",
       },
       header: {},
@@ -77,10 +77,10 @@ export const Hovering = newStory(
         columns={[nameColumn, valueColumn, actionColumn]}
         rowStyles={rowStyles}
         rows={[
-          { kind: "header", id: "header" },
-          { kind: "data", id: "1", name: "c", value: 1 },
-          { kind: "data", id: "2", name: "b", value: 2 },
-          { kind: "data", id: "3", name: "a", value: 3 },
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "b", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
         ]}
       />
     );
@@ -91,8 +91,8 @@ export const Hovering = newStory(
 export function VirtualFiltering() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
-      { kind: "header", id: "header" },
-      ...zeroTo(1_000).map((i) => ({ kind: "data" as const, id: String(i), name: `ccc ${i}`, value: i })),
+      simpleHeader,
+      ...zeroTo(1_000).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `ccc ${i}`, value: i } })),
     ],
     [],
   );
@@ -132,32 +132,25 @@ export function VirtualFiltering() {
 export function NoRowsFallback() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-  return (
-    <GridTable
-      columns={[nameColumn, valueColumn]}
-      rows={[{ kind: "header", id: "header" }]}
-      fallbackMessage="There were no rows."
-    />
-  );
+  return <GridTable columns={[nameColumn, valueColumn]} rows={[simpleHeader]} fallbackMessage="There were no rows." />;
 }
 
 // Make a `Row` ADT for a table with a header + 3 levels of nesting
-type HeaderRow = { kind: "header" };
-type ParentRow = { kind: "parent"; id: string; name: string };
-type ChildRow = { kind: "child"; id: string; name: string };
-type GrandChildRow = { kind: "grandChild"; id: string; name: string };
+type HeaderRow = { kind: "header"; data: {} };
+type ParentRow = { kind: "parent"; id: string; data: { name: string } };
+type ChildRow = { kind: "child"; id: string; data: { name: string } };
+type GrandChildRow = { kind: "grandChild"; id: string; data: { name: string } };
 type AddRow = { kind: "add" };
 type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow | AddRow;
 
 const rows = makeNestedRows(1);
-const header = { kind: "header", id: "header" } as const;
-const rowsWithHeader: GridDataRow<NestedRow>[] = [header, ...rows];
+const rowsWithHeader: GridDataRow<NestedRow>[] = [simpleHeader, ...rows];
 
 export function NestedRows() {
   const arrowColumn = actionColumn<NestedRow>({
-    header: (row) => <CollapseToggle row={row} />,
-    parent: (row) => <CollapseToggle row={row} />,
-    child: (row) => <CollapseToggle row={row} />,
+    header: (data, row) => <CollapseToggle row={row} />,
+    parent: (data, row) => <CollapseToggle row={row} />,
+    child: (data, row) => <CollapseToggle row={row} />,
     grandChild: () => "",
     add: () => "",
     w: "60px",
@@ -196,7 +189,7 @@ function deepCount(rows: GridDataRow<any>[]): number {
 }
 
 export function NestedCardsThreeLevelsVirtualizedAtScale() {
-  const rows = useMemo(() => [header, ...makeNestedRows(500)], []);
+  const rows = useMemo(() => [simpleHeader, ...makeNestedRows(500)], []);
   return (
     <div css={Css.df.fdc.vh100.$}>
       Rendering {deepCount(rows)} rows virtualized
@@ -206,7 +199,7 @@ export function NestedCardsThreeLevelsVirtualizedAtScale() {
 }
 
 export function NestedCardsThreeLevelsVirtualizedAtScaleSorted() {
-  const rows = useMemo(() => [header, ...makeNestedRows(500)], []);
+  const rows = useMemo(() => [simpleHeader, ...makeNestedRows(500)], []);
   return (
     <div css={Css.df.fdc.vh100.$}>
       Rendering {deepCount(rows)} rows virtualized & sorted
@@ -228,17 +221,17 @@ export function NestedCardsTwoLevels() {
     },
   };
   const rows: GridDataRow<NestedRow>[] = [
-    { kind: "header", id: "header" },
+    simpleHeader,
     {
-      ...{ kind: "parent", id: "p1", name: "parent 1" },
+      ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
       children: [
-        { kind: "child", id: "p1c1", name: "child p1c1" },
-        { kind: "child", id: "p1c2", name: "child p1c2" },
+        { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+        { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
       ],
     },
     {
-      ...{ kind: "parent", id: "p2", name: "parent 2" },
-      children: [{ kind: "child", id: "p2c1", name: "child p2c1" }],
+      ...{ kind: "parent", id: "p2", data: { name: "parent 2" } },
+      children: [{ kind: "child", id: "p2c1", data: { name: "child p2c1" } }],
     },
   ];
   return <NestedCards rows={rows} style={nestedStyle} sorting={{ on: "client", initial: [0, "ASC"] }} />;
@@ -404,9 +397,9 @@ export function ObservableRows() {
         columns={[nameColumn]}
         observeRows={true}
         rows={[
-          { kind: "header", id: "header" },
-          { kind: "data", id: "1", name: "a", value: 1 },
-          { kind: "data", id: "2", name: "b", value: 2 },
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "a", value: 1 } },
+          { kind: "data", id: "2", data: { name: "b", value: 2 } },
         ]}
       />
     </div>
@@ -431,8 +424,8 @@ export function StickyHeader() {
         columns={[nameColumn, valueColumn, actionColumn]}
         stickyHeader={true}
         rows={[
-          { kind: "header", id: "header" },
-          ...zeroTo(200).map((i) => ({ kind: "data" as const, id: `${i}`, name: `row ${i}`, value: i })),
+          simpleHeader,
+          ...zeroTo(200).map((i) => ({ kind: "data" as const, id: `${i}`, data: { name: `row ${i}`, value: i } })),
         ]}
       />
     </div>
@@ -448,10 +441,10 @@ export const StyleDefault = newStory(() => {
       columns={[nameColumn, valueColumn, actionColumn]}
       style={defaultStyle}
       rows={[
-        { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
       ]}
     />
   );
@@ -466,10 +459,10 @@ export const StyleCondensed = newStory(() => {
       columns={[nameColumn, valueColumn, actionColumn]}
       style={condensedStyle}
       rows={[
-        { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
       ]}
     />
   );
@@ -490,10 +483,10 @@ export const StyleCondensedWithNoPadding = newStory(() => {
           firstCellCss: Css.pl0.$,
         }}
         rows={[
-          { kind: "header", id: "header" },
-          { kind: "data", id: "1", name: "c", value: 1 },
-          { kind: "data", id: "2", name: "b", value: 2 },
-          { kind: "data", id: "3", name: "a", value: 3 },
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "b", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
         ]}
       />
     </div>
@@ -524,10 +517,10 @@ export const StyleCard = newStory(() => {
         columns={[nameColumn, valueColumn, actionColumn]}
         style={cardStyle}
         rows={[
-          { kind: "header", id: "header" },
-          { kind: "data", id: "1", name: "c", value: 1 },
-          { kind: "data", id: "2", name: "b", value: 2 },
-          { kind: "data", id: "3", name: "a", value: 3 },
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "b", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
         ]}
       />
     </div>
@@ -541,10 +534,10 @@ export const StyleCardWithOneColumn = newStory(() => {
       columns={[nameColumn]}
       style={cardStyle}
       rows={[
-        { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
       ]}
     />
   );
@@ -560,10 +553,10 @@ export function AsTable() {
       as="table"
       columns={[nameColumn, valueColumn, actionColumn]}
       rows={[
-        { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
       ]}
     />
   );
@@ -579,10 +572,10 @@ export function AsTableWithCustomStyles() {
       as="table"
       columns={[nameColumn, valueColumn, actionColumn]}
       rows={[
-        { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: 2 },
-        { kind: "data", id: "3", name: "a", value: 3 },
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
       ]}
       rowStyles={{
         header: { cellCss: Css.p1.$ },
@@ -607,10 +600,10 @@ export const AsTableWithRowLink = newStory(
         columns={[nameColumn, valueColumn, actionColumn]}
         rowStyles={rowStyles}
         rows={[
-          { kind: "header", id: "header" },
-          { kind: "data", id: "1", name: "c", value: 1 },
-          { kind: "data", id: "2", name: "b", value: 2 },
-          { kind: "data", id: "3", name: "a", value: 3 },
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "b", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
         ]}
       />
     );
@@ -619,7 +612,7 @@ export const AsTableWithRowLink = newStory(
 );
 
 type Data2 = { name: string; role: string; date: string; priceInCents: number };
-type Row2 = SimpleHeaderAndDataOf<Data2>;
+type Row2 = SimpleHeaderAndData<Data2>;
 export const DataTypeColumns = newStory(
   () => {
     const nameCol = column<Row2>({ header: "Name", data: ({ name }) => name });
@@ -642,11 +635,15 @@ export const DataTypeColumns = newStory(
       <GridTable<Row2>
         columns={[nameCol, detailCol, dateCol, priceCol, readOnlyPriceCol, actionCol]}
         rows={[
-          { kind: "header", id: "header" },
-          { kind: "data", id: "1", name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
-          { kind: "data", id: "2", name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
-          { kind: "data", id: "3", name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
-          { kind: "data", id: "4", name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 } },
+          { kind: "data", id: "2", data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 } },
+          { kind: "data", id: "3", data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 } },
+          {
+            kind: "data",
+            id: "4",
+            data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+          },
         ]}
       />
     );
@@ -680,23 +677,23 @@ export function WrappedHeaders() {
       sorting={{ on: "client", initial: undefined }}
       style={condensedStyle}
       rows={[
-        { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
-        { kind: "data", id: "2", name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
-        { kind: "data", id: "3", name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
-        { kind: "data", id: "4", name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 } },
+        { kind: "data", id: "2", data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 } },
+        { kind: "data", id: "3", data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 } },
+        { kind: "data", id: "4", data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 } },
       ]}
     />
   );
 }
 
-type DataRow = { kind: "data"; name: string; role: string; date: string; priceInCents: number };
-type TotalsRow = { kind: "total"; totalPriceInCents: number };
+type DataRow = { kind: "data"; id: string; data: { name: string; role: string; date: string; priceInCents: number } };
+type TotalsRow = { kind: "total"; data: { totalPriceInCents: number } };
 type ColspanRow = HeaderRow | DataRow | TotalsRow;
 export function ColSpan() {
   const idCol = column<ColspanRow>({
     header: "ID",
-    data: ({ id }) => id,
+    data: (data, { id }) => id,
     // Not putting the colspan here just as a POC that we can colspan somewhere other than from the first column.
     // We should expect this to show the `emptyCell` fallback
     total: "",
@@ -724,11 +721,11 @@ export function ColSpan() {
       style={{ ...condensedStyle, emptyCell: <>&mdash;</> }}
       rows={[
         simpleHeader,
-        { kind: "data", id: "1", name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
-        { kind: "data", id: "2", name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
-        { kind: "data", id: "3", name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
-        { kind: "data", id: "4", name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
-        { kind: "total", id: "total", totalPriceInCents: 14_083_64 },
+        { kind: "data", id: "1", data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 } },
+        { kind: "data", id: "2", data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 } },
+        { kind: "data", id: "3", data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 } },
+        { kind: "data", id: "4", data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 } },
+        { kind: "total", id: "total", data: { totalPriceInCents: 14_083_64 } },
       ]}
     />
   );
@@ -744,10 +741,10 @@ export function CustomEmptyCell() {
       columns={[nameColumn, valueColumn, actionColumn, fourthColumn]}
       style={{ ...condensedStyle, emptyCell: <>&mdash;</> }}
       rows={[
-        { kind: "header", id: "header" },
-        { kind: "data", id: "1", name: "c", value: 1 },
-        { kind: "data", id: "2", name: "b", value: undefined },
-        { kind: "data", id: "3", name: "", value: 3 },
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: undefined } },
+        { kind: "data", id: "3", data: { name: "", value: 3 } },
       ]}
     />
   );
@@ -764,32 +761,32 @@ function makeNestedRows(repeat: number = 1): GridDataRow<NestedRow>[] {
     const rows: GridDataRow<NestedRow>[] = [
       // a parent w/ two children, 1st child has 2 grandchild, 2nd child has 1 grandchild
       {
-        ...{ kind: "parent", id: p1, name: `parent ${prefix}1` },
+        ...{ kind: "parent", id: p1, data: { name: `parent ${prefix}1` } },
         children: [
           {
-            ...{ kind: "child", id: `${p1}c1`, name: `child ${prefix}p1c1` },
+            ...{ kind: "child", id: `${p1}c1`, data: { name: `child ${prefix}p1c1` } },
             children: [
-              { kind: "grandChild", id: `${p1}c1g1`, name: `grandchild ${prefix}p1c1g1` + " foo".repeat(20) },
-              { kind: "grandChild", id: `${p1}c1g2`, name: `grandchild ${prefix}p1c1g2` },
+              { kind: "grandChild", id: `${p1}c1g1`, data: { name: `grandchild ${prefix}p1c1g1` + " foo".repeat(20) } },
+              { kind: "grandChild", id: `${p1}c1g2`, data: { name: `grandchild ${prefix}p1c1g2` } },
             ],
           },
           {
-            ...{ kind: "child", id: `${p1}c2`, name: `child ${prefix}p1c2` },
-            children: [{ kind: "grandChild", id: `${p1}c2g1`, name: `grandchild ${prefix}p1c2g1` }],
+            ...{ kind: "child", id: `${p1}c2`, data: { name: `child ${prefix}p1c2` } },
+            children: [{ kind: "grandChild", id: `${p1}c2g1`, data: { name: `grandchild ${prefix}p1c2g1` } }],
           },
           // Put this "grandchild" in the 2nd level to show heterogeneous levels
-          { kind: "grandChild", id: `${p1}g1`, name: `grandchild ${prefix}p1g1` },
+          { kind: "grandChild", id: `${p1}g1`, data: { name: `grandchild ${prefix}p1g1` } },
           // Put this "kind" into the 2nd level to show it doesn't have to be a card
-          { kind: "add", id: `${p1}add`, pin: "last" },
+          { kind: "add", id: `${p1}add`, pin: "last", data: {} },
         ],
       },
       // a parent with just a child
       {
-        ...{ kind: "parent", id: p2, name: `parent ${prefix}2` },
-        children: [{ kind: "child", id: `${p2}c1`, name: `child ${prefix}p2c1` }],
+        ...{ kind: "parent", id: p2, data: { name: `parent ${prefix}2` } },
+        children: [{ kind: "child", id: `${p2}c1`, data: { name: `child ${prefix}p2c1` } }],
       },
       // a parent with no children
-      { kind: "parent", id: p3, name: `parent ${prefix}3` },
+      { kind: "parent", id: p3, data: { name: `parent ${prefix}3` } },
     ];
     return rows;
   });
@@ -806,9 +803,9 @@ export function StickyColumns() {
         <GridTable
           columns={[{ ...nameColumn, sticky: "left" }, valueColumn, actionColumn]}
           rows={[
-            { kind: "header", id: "header" },
-            { kind: "data", id: "1", name: "a", value: 1 },
-            { kind: "data", id: "2", name: "b", value: 2 },
+            simpleHeader,
+            { kind: "data", id: "1", data: { name: "a", value: 1 } },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
           ]}
         />
       </div>
@@ -818,9 +815,9 @@ export function StickyColumns() {
         <GridTable
           columns={[nameColumn, valueColumn, { ...actionColumn, sticky: "right" }]}
           rows={[
-            { kind: "header", id: "header" },
-            { kind: "data", id: "1", name: "a", value: 1 },
-            { kind: "data", id: "2", name: "b", value: 2 },
+            simpleHeader,
+            { kind: "data", id: "1", data: { name: "a", value: 1 } },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
           ]}
         />
       </div>
@@ -830,9 +827,9 @@ export function StickyColumns() {
         <GridTable
           columns={[nameColumn, { ...valueColumn, sticky: "left" }, actionColumn]}
           rows={[
-            { kind: "header", id: "header" },
-            { kind: "data", id: "1", name: "a", value: 1 },
-            { kind: "data", id: "2", name: "b", value: 2 },
+            simpleHeader,
+            { kind: "data", id: "1", data: { name: "a", value: 1 } },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
           ]}
         />
       </div>
@@ -842,9 +839,9 @@ export function StickyColumns() {
         <GridTable
           columns={[nameColumn, { ...valueColumn, sticky: "right" }, actionColumn]}
           rows={[
-            { kind: "header", id: "header" },
-            { kind: "data", id: "1", name: "a", value: 1 },
-            { kind: "data", id: "2", name: "b", value: 2 },
+            simpleHeader,
+            { kind: "data", id: "1", data: { name: "a", value: 1 } },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
           ]}
         />
       </div>
@@ -862,9 +859,9 @@ export function StickyColumns() {
             },
           ]}
           rows={[
-            { kind: "header", id: "header" },
-            { kind: "data", id: "1", name: "a", value: 1 },
-            { kind: "data", id: "2", name: "b", value: 2 },
+            simpleHeader,
+            { kind: "data", id: "1", data: { name: "a", value: 1 } },
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
           ]}
         />
       </div>
@@ -959,8 +956,8 @@ export function StickyColumnsAndHeader() {
   const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
-      { kind: "header", id: "header" },
-      ...zeroTo(500).map((i) => ({ kind: "data" as const, id: String(i), name: `ccc ${i}`, value: i })),
+      simpleHeader,
+      ...zeroTo(500).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `ccc ${i}`, value: i } })),
     ],
     [],
   );
@@ -996,10 +993,10 @@ export function ActiveRow() {
   );
   const rows = useMemo(
     () => [
-      { kind: "header" as const, id: "header" },
-      { kind: "data" as const, id: "1", name: "a", value: 1 },
-      { kind: "data" as const, id: "2", name: "b", value: 2 },
-      { kind: "data" as const, id: "3", name: "c", value: 3 },
+      simpleHeader,
+      { kind: "data" as const, id: "1", data: { name: "a", value: 1 } },
+      { kind: "data" as const, id: "2", data: { name: "b", value: 2 } },
+      { kind: "data" as const, id: "3", data: { name: "c", value: 3 } },
     ],
     [],
   );
@@ -1028,7 +1025,7 @@ export function ActiveRowNestedCard() {
     header: () => "Action",
     parent: () => "",
     child: () => "",
-    grandChild: (row, api) => (
+    grandChild: (data, row, api) => (
       <Button label="Activate Row" onClick={() => api.setActiveRowId(`grandChild_${row.id}`)} />
     ),
     add: () => "",

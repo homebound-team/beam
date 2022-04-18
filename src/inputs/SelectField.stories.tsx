@@ -2,7 +2,7 @@ import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { fireEvent, within } from "@storybook/testing-library";
 import { useState } from "react";
-import { GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndDataOf } from "src/components";
+import { GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndData } from "src/components";
 import { Css } from "src/Css";
 import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
@@ -255,7 +255,10 @@ LoadingState.play = async ({ canvasElement }: { canvasElement: HTMLElement }) =>
 
 export function InTable() {
   return (
-    <GridTable columns={columns} rows={[simpleHeader, ...rowData.map((r) => ({ kind: "data" as const, ...r }))]} />
+    <GridTable
+      columns={columns}
+      rows={[simpleHeader, ...rowData.map((r) => ({ kind: "data" as const, id: r.id, data: r }))]}
+    />
   );
 }
 const people: InternalUser[] = zeroTo(10).map((i) => ({
@@ -289,7 +292,7 @@ const columns: GridColumn<Row>[] = [
   },
   { header: "Market", data: (data) => data.market },
 ];
-type Row = SimpleHeaderAndDataOf<Request>;
+type Row = SimpleHeaderAndData<Request>;
 type InternalUser = { name: string; id: string };
 type Request = { id: string; user: InternalUser; address: string; homeowner: string; market: string };
 
