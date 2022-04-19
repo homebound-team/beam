@@ -1,3 +1,4 @@
+import { ObjectConfig, ObjectState, required, useFormStates } from "@homebound/form-state";
 import { Meta } from "@storybook/react";
 import { default as React, ReactNode, useMemo, useState } from "react";
 import { Chips } from "src/components/Chips";
@@ -16,6 +17,15 @@ import {
 } from "src/components/Table/styles";
 import { Tag } from "src/components/Tag";
 import { Css, Palette } from "src/Css";
+import {
+  BoundDateField,
+  BoundMultiSelectField,
+  BoundNumberField,
+  BoundSelectField,
+  BoundTextAreaField,
+  BoundTextField,
+} from "src/forms";
+import { AuthorInput, jan1, jan10, jan2, jan29 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
 import { NumberField, SelectField, TextField } from "src/inputs";
 import { HasIdAndName } from "src/types";
@@ -377,4 +387,189 @@ const flatRows: GridDataRow<BeamRow>[] = [
       location: idx % 2 ? "l:1" : "l:2",
     },
   })),
+];
+
+/* Input Field Story and data */
+type InputFieldRows = SimpleHeaderAndData<AuthorInput>;
+
+export function InputFieldStates() {
+  const { getFormState } = useFormStates<AuthorInput>({
+    config: formConfig,
+    getId: (o) => o.id!,
+  });
+
+  return (
+    <>
+      <h2 css={Css.mb1.$}>Fixed Table Styles</h2>
+      <GridTable<InputFieldRows>
+        style={beamFixedStyle}
+        columns={inputFieldColumns(getFormState)}
+        rows={inputFieldRows}
+        stickyHeader
+      />
+
+      <h2 css={Css.mt5.mb1.$}>Flexible Table Styles</h2>
+      <GridTable<InputFieldRows>
+        style={beamFlexibleStyle}
+        columns={inputFieldColumns(getFormState, true)}
+        rows={inputFieldRows}
+        stickyHeader
+      />
+    </>
+  );
+}
+
+function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<AuthorInput>, flexible?: boolean) {
+  function applyStateProps(id: string) {
+    return {
+      internalProps: { forceFocus: id === "a:3", forceHover: id === "a:2" },
+      errorMsg: id === "a:4" ? "Description of error" : undefined,
+    };
+  }
+  return [
+    column<InputFieldRows>({
+      header: "Name",
+      data: (data, row) => ({
+        content: () => {
+          const os = getFormState(data);
+          return <BoundTextField field={os.firstName} {...applyStateProps(row.id)} />;
+        },
+      }),
+    }),
+    column<InputFieldRows>({
+      header: "Biography",
+      data: (data, row) => ({
+        content: () => {
+          const os = getFormState(data);
+          return flexible ? (
+            <BoundTextAreaField field={os.bio} preventNewLines {...applyStateProps(row.id)} />
+          ) : (
+            <BoundTextField field={os.bio} {...applyStateProps(row.id)} />
+          );
+        },
+      }),
+      w: 2,
+    }),
+    column<InputFieldRows>({
+      header: "Birthdate",
+      data: (data, row) => ({
+        content: () => {
+          const os = getFormState(data);
+          return <BoundDateField field={os.birthday} {...applyStateProps(row.id)} />;
+        },
+      }),
+      w: "136px",
+    }),
+    numericColumn<InputFieldRows>({
+      header: "Height",
+      data: (data, row) => ({
+        content: () => {
+          const os = getFormState(data);
+          return <BoundNumberField field={os.heightInInches} {...applyStateProps(row.id)} />;
+        },
+      }),
+      w: "136px",
+    }),
+    column<InputFieldRows>({
+      header: "Favorite Sport",
+      data: (data, row) => ({
+        content: () => {
+          const os = getFormState(data);
+          return <BoundSelectField field={os.favoriteSport} options={sports} {...applyStateProps(row.id)} />;
+        },
+      }),
+    }),
+    column<InputFieldRows>({
+      header: "Favorite Shapes",
+      data: (data, row) => ({
+        content: () => {
+          const os = getFormState(data);
+          return <BoundMultiSelectField field={os.favoriteShapes} options={shapes} {...applyStateProps(row.id)} />;
+        },
+      }),
+    }),
+  ];
+}
+
+const inputFieldRows: GridDataRow<InputFieldRows>[] = [
+  simpleHeader,
+  {
+    kind: "data",
+    id: "a:1",
+    data: {
+      id: "a:1",
+      firstName: "Default State",
+      bio: "This is the default state for input fields in the table. ".repeat(2),
+      birthday: jan1,
+      heightInInches: 72,
+      favoriteSport: "s:1",
+      favoriteShapes: ["sh:1", "sh:8"],
+    },
+  },
+  {
+    kind: "data",
+    id: "a:2",
+    data: {
+      id: "a:2",
+      firstName: "Hover State",
+      bio: "This is the hover state for input fields in the table. ".repeat(2),
+      birthday: jan10,
+      heightInInches: 65,
+      favoriteSport: "s:2",
+      favoriteShapes: [],
+    },
+  },
+  {
+    kind: "data",
+    id: "a:3",
+    data: {
+      id: "a:3",
+      firstName: "Focus State",
+      bio: "This is the focus state for input fields in the table. ".repeat(2),
+      birthday: jan29,
+      heightInInches: 75,
+      favoriteSport: "s:3",
+      favoriteShapes: ["sh:2", "sh:4"],
+    },
+  },
+  {
+    kind: "data",
+    id: "a:4",
+    data: {
+      id: "a:4",
+      firstName: "Error State",
+      bio: "This is the error state for input fields in the table. ".repeat(2),
+      birthday: jan2,
+      heightInInches: 65,
+      favoriteSport: "s:4",
+      favoriteShapes: ["sh:5"],
+    },
+  },
+];
+
+const formConfig: ObjectConfig<AuthorInput> = {
+  firstName: { type: "value", rules: [required] }, // TextField
+  bio: { type: "value", rules: [required] }, // TextAreaField
+  birthday: { type: "value", rules: [required] }, // DateField
+  heightInInches: { type: "value", rules: [required] }, // NumberField
+  favoriteSport: { type: "value", rules: [required] }, // SelectField
+  favoriteShapes: { type: "value", rules: [required] }, // MultiSelectField
+};
+
+const sports = [
+  { id: undefined as any, name: "Undecided" },
+  { id: "s:1", name: "Football" },
+  { id: "s:2", name: "Soccer" },
+  { id: "s:3", name: "Basketball" },
+  { id: "s:4", name: "Hockey" },
+];
+
+const shapes = [
+  { id: "sh:1", name: "Triangle" },
+  { id: "sh:2", name: "Square" },
+  { id: "sh:3", name: "Circle" },
+  { id: "sh:4", name: "Trapezoid" },
+  { id: "sh:5", name: "Star" },
+  { id: "sh:6", name: "Hexagon" },
+  { id: "sh:7", name: "Octagon" },
 ];

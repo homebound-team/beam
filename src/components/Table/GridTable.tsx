@@ -474,6 +474,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       hideLabel: true,
       numberAlignment: "right",
       compact: true,
+      errorInTooltip: true,
       // Avoid passing `undefined` as it will unset existing PresentationContext settings
       ...(borderless !== undefined ? { borderless } : {}),
       ...(typeScale !== undefined ? { typeScale } : {}),

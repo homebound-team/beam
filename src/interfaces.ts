@@ -57,4 +57,8 @@ export interface TextFieldInternalProps {
    * This is explicitly an internal property that is not exposed to any field's API.
    */
   compound?: boolean;
+  /** Forces focus styles for storybook purposes */
+  forceFocus?: true;
+  /** Forces hover styles for storybook purposes */
+  forceHover?: boolean;
 }

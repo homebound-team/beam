@@ -87,8 +87,9 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? "sm";
+  const errorInTooltip = fieldProps?.errorInTooltip ?? false;
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
-  const { compound = false } = internalProps;
+  const { compound = false, forceFocus = false, forceHover = false } = internalProps;
   const errorMessageId = `${inputProps.id}-error`;
   const labelSuffix = getLabelSuffix(required);
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
@@ -121,12 +122,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...Css.gray900.if(contrast).white.$,
     },
     input: {
-      ...Css.w100.mw0.outline0.br4.fg1.$,
+      ...Css.w100.mw0.outline0.fg1.if(multiline).br4.$,
       // Not using Truss's inline `if` statement here because `addIn` properties do not respect the if statement.
       ...(!contrast ? Css.bgWhite.$ : Css.bgGray700.addIn("&::selection", Css.bgGray800.$).$),
     },
     hover: Css.bgGray100.if(contrast).bgGray600.bGray600.$,
-    focus: borderless ? Css.bshFocus.z1.$ : Css.bLightBlue700.if(contrast).bLightBlue500.$,
+    focus: Css.bLightBlue700.if(contrast).bLightBlue500.$,
     disabled: visuallyDisabled
       ? Css.cursorNotAllowed.gray400.bgGray100.if(contrast).gray500.bgGray700.$
       : Css.cursorNotAllowed.$,
@@ -148,6 +149,9 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     e.target.select();
   }, onFocus);
 
+  const showFocus = (isFocused && !inputProps.readOnly) || forceFocus;
+  const showHover = (isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused) || forceHover;
+
   return (
     <div css={fieldStyles.container} {...groupProps} {...focusWithinProps}>
       {label && !inlineLabel && (
@@ -162,7 +166,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         />
       )}
       {maybeTooltip({
-        title: tooltip,
+        title: (errorInTooltip && errorMsg) || tooltip,
         placement: "top",
         children: inputProps.readOnly ? (
           <div
@@ -196,8 +200,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             css={{
               ...fieldStyles.inputWrapper,
               ...(inputProps.disabled ? fieldStyles.disabled : {}),
-              ...(isFocused && !inputProps.readOnly ? fieldStyles.focus : {}),
-              ...(isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused ? fieldStyles.hover : {}),
+              ...(showFocus ? fieldStyles.focus : {}),
+              ...(showHover ? fieldStyles.hover : {}),
               ...(errorMsg ? fieldStyles.error : {}),
               ...Css.if(multiline).aifs.px0.mhPx(textAreaMinHeight).$,
             }}
@@ -220,8 +224,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               css={{
                 ...fieldStyles.input,
                 ...(inputProps.disabled ? fieldStyles.disabled : {}),
-                ...(isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused ? fieldStyles.hover : {}),
-                ...(multiline ? Css.h100.p1.add("resize", "none").if(borderless).pPx(4).$ : Css.truncate.$),
+                ...(showHover ? fieldStyles.hover : {}),
+                ...(multiline ? Css.h100.p1.add("resize", "none").$ : Css.truncate.$),
                 ...xss,
               }}
               {...tid}
@@ -243,7 +247,9 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       })}
 
       {/* Compound fields will handle their own error and helper text */}
-      {errorMsg && !compound && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}
+      {errorMsg && !compound && !errorInTooltip && (
+        <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />
+      )}
       {helperText && !compound && <HelperText helperText={helperText} {...tid.helperText} />}
     </div>
   );
