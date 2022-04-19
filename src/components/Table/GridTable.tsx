@@ -93,7 +93,7 @@ export interface GridStyle {
   /** Minimum table width in pixels. Used when calculating columns sizes */
   minWidthPx?: number;
   /** Css to apply at each level of a parent/child nested table. */
-  levels?: Record<number, { cellCss: Properties }>;
+  levels?: Record<number, { cellCss?: Properties; firstContentColumn?: Properties }>;
   /** Allows for customization of the background color used to denote an "active" row */
   activeBgColor?: Palette;
 }
@@ -335,7 +335,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         filters.length === 0 ||
         !!row.pin ||
         filters.every((f) =>
-          columns.map((c) => applyRowFn(c, row, api)).some((maybeContent) => matchesFilter(maybeContent, f)),
+          columns.map((c) => applyRowFn(c, row, api, 0)).some((maybeContent) => matchesFilter(maybeContent, f)),
         );
 
       // If the row matches, add it in
@@ -848,8 +848,14 @@ export type GridColumn<R extends Kinded, S = {}> = {
     | string
     | GridCellContent
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
-        ? (data: D, row: GridRowKind<R, K>, api: GridTableApi<R>) => ReactNode | GridCellContent
-        : (data: undefined, row: GridRowKind<R, K>, api: GridTableApi<R>) => ReactNode | GridCellContent);
+        ? (
+            data: D,
+            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number },
+          ) => ReactNode | GridCellContent
+        : (
+            data: undefined,
+            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number },
+          ) => ReactNode | GridCellContent);
 } & {
   /**
    * The column's width.
@@ -870,6 +876,8 @@ export type GridColumn<R extends Kinded, S = {}> = {
   sticky?: "left" | "right";
   /** Prevent column from supporting RowStyle.onClick/rowLink in order to avoid nested interactivity. Defaults to true */
   wrapAction?: false;
+  /** Used as a signal to defer adding the 'indent' styling */
+  isAction?: true;
 };
 
 export const nonKindGridColumnKeys = ["w", "mw", "align", "clientSideSort", "serverSideSortKey"];
@@ -1049,10 +1057,15 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
   let currentColspan = 1;
 
+  let firstContentColumnStylesApplied = false;
+
   const rowNode = (
     <Row css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
       {columns.map((column, columnIndex) => {
-        const { wrapAction = true } = column;
+        const { wrapAction = true, isAction = false } = column;
+
+        const applyFirstContentColumnStyles = !isAction && !firstContentColumnStylesApplied;
+        firstContentColumnStylesApplied ||= applyFirstContentColumnStyles;
 
         if (column.mw) {
           // Validate the column's minWidth definition if set.
@@ -1066,7 +1079,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           currentColspan -= 1;
           return null;
         }
-        const maybeContent = applyRowFn(column, row, api);
+        const maybeContent = applyRowFn(column, row, api, level);
         currentColspan = isGridCellContent(maybeContent) ? maybeContent.colspan ?? 1 : 1;
 
         const canSortColumn =
@@ -1131,6 +1144,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...(isHeader && style.headerCellCss),
           // Or level-specific styling
           ...(!isHeader && !!style.levels && style.levels[level]?.cellCss),
+          // Level specific styling for the first content column
+          ...(applyFirstContentColumnStyles && !!style.levels && style.levels[level]?.firstContentColumn),
           // The specific cell's css (if any from GridCellContent)
           ...rowStyleCellCss,
           // Apply active row styling for non-nested card styles.
@@ -1240,12 +1255,13 @@ export function applyRowFn<R extends Kinded>(
   column: GridColumn<R>,
   row: GridDataRow<R>,
   api: GridTableApi<R>,
+  level: number,
 ): ReactNode | GridCellContent {
   // Usually this is a function to apply against the row, but sometimes it's a hard-coded value, i.e. for headers
   const maybeContent = column[row.kind];
   if (typeof maybeContent === "function") {
     // Auto-destructure data
-    return (maybeContent as Function)((row as any)["data"], row as any, api);
+    return (maybeContent as Function)((row as any)["data"], { row: row as any, api, level });
   } else {
     return maybeContent;
   }

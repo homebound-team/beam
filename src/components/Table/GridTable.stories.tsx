@@ -148,9 +148,9 @@ const rowsWithHeader: GridDataRow<NestedRow>[] = [simpleHeader, ...rows];
 
 export function NestedRows() {
   const arrowColumn = actionColumn<NestedRow>({
-    header: (data, row) => <CollapseToggle row={row} />,
-    parent: (data, row) => <CollapseToggle row={row} />,
-    child: (data, row) => <CollapseToggle row={row} />,
+    header: (data, { row }) => <CollapseToggle row={row} />,
+    parent: (data, { row }) => <CollapseToggle row={row} />,
+    child: (data, { row }) => <CollapseToggle row={row} />,
     grandChild: () => "",
     add: () => "",
     w: "60px",
@@ -693,7 +693,7 @@ type ColspanRow = HeaderRow | DataRow | TotalsRow;
 export function ColSpan() {
   const idCol = column<ColspanRow>({
     header: "ID",
-    data: (data, { id }) => id,
+    data: (data, { row }) => row.id,
     // Not putting the colspan here just as a POC that we can colspan somewhere other than from the first column.
     // We should expect this to show the `emptyCell` fallback
     total: "",
@@ -1025,7 +1025,7 @@ export function ActiveRowNestedCard() {
     header: () => "Action",
     parent: () => "",
     child: () => "",
-    grandChild: (data, row, api) => (
+    grandChild: (data, { row, api }) => (
       <Button label="Activate Row" onClick={() => api.setActiveRowId(`grandChild_${row.id}`)} />
     ),
     add: () => "",

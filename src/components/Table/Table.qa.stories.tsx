@@ -87,19 +87,20 @@ type BeamBudgetData = {
 };
 type HeaderRow = { kind: "header" };
 type BeamTotalsRow = { kind: "totals"; id: string; data: BeamBudgetData };
+type BeamGrandParentRow = { kind: "grandparent"; id: string; data: BeamBudgetData };
 type BeamParentRow = { kind: "parent"; id: string; data: BeamBudgetData };
 type BeamChildRow = { kind: "child"; id: string; data: BeamBudgetData };
-type BeamNestedRow = BeamTotalsRow | HeaderRow | BeamParentRow | BeamChildRow;
+type BeamNestedRow = BeamTotalsRow | HeaderRow | BeamGrandParentRow | BeamParentRow | BeamChildRow;
 
 export function NestedFixed() {
   return (
     <div css={Css.mw("fit-content").$}>
-      <GridTable<BeamNestedRow> style={beamTotalsFixedStyle} columns={beamNestedColumns} rows={beamTotalsRows} />
+      <GridTable<BeamNestedRow> style={beamTotalsFixedStyle} columns={nestedColumnsTwoLevels} rows={beamTotalsRows} />
       <GridTable<BeamNestedRow>
         style={beamNestedFixedStyle}
         sorting={{ on: "client" }}
-        columns={beamNestedColumns}
-        rows={beamNestedRows}
+        columns={nestedColumnsTwoLevels}
+        rows={nestedRowsTwoLevels}
         stickyHeader
       />
     </div>
@@ -109,22 +110,22 @@ export function NestedFixed() {
 export function NestedFlexible() {
   return (
     <div css={Css.mw("fit-content").$}>
-      <GridTable<BeamNestedRow> style={beamTotalsFlexibleStyle} columns={beamNestedColumns} rows={beamTotalsRows} />
+      <GridTable<BeamNestedRow>
+        style={beamTotalsFlexibleStyle}
+        columns={nestedColumnsTwoLevels}
+        rows={beamTotalsRows}
+      />
       <GridTable<BeamNestedRow>
         style={beamNestedFlexibleStyle}
         sorting={{ on: "client" }}
-        columns={beamNestedColumns}
-        rows={beamNestedRows}
+        columns={nestedColumnsTwoLevels}
+        rows={nestedRowsTwoLevels}
         stickyHeader
       />
     </div>
   );
 }
 
-// Reproducible issue to fix for re-deriving:
-// 1. filter on "Yo"
-// 2. Select individual "Project Items". Note parent is "checked"
-// 3. Remove filter, additional project items under parent are "unchecked", though parent still shows "checked" instead of what it should show as "indeterminate".
 export function Filterable() {
   const api = useGridTableApi<BeamNestedRow>();
   const selectedIds = useComputed(() => api.getSelectedRows().map((r) => r.id), [api]);
@@ -156,8 +157,8 @@ export function Filterable() {
       <GridTable<BeamNestedRow>
         style={beamNestedFixedStyle}
         sorting={sorting}
-        columns={beamNestedColumns}
-        rows={beamNestedRows}
+        columns={beamNestedColumns()}
+        rows={nestedRowsTwoLevels}
         stickyHeader
         filter={filter}
         api={api}
@@ -166,47 +167,85 @@ export function Filterable() {
   );
 }
 
-const beamNestedRows: GridDataRow<BeamNestedRow>[] = [
-  simpleHeader,
-  ...zeroTo(5).map((pIdx) => {
-    // Get a semi-random, but repeatable number of children
-    const numChildren = (pIdx % 3) + pIdx + 1;
-    const children = zeroTo(numChildren).map((cIdx) => ({
-      kind: "child" as const,
-      id: `p${pIdx + 1}_c${cIdx + 1}`,
-      data: {
-        name: `10${pIdx + 1}0.${cIdx + 1} - Project Item${pIdx === 0 ? " with a longer name that will wrap" : ""}`,
-        original: 1234_56,
-        changeOrders: 543_21,
-        reallocations: 568_56,
-        revised: undefined,
-        committed: 129_86,
-        difference: 1025_23,
-        actuals: 1108_18,
-        projected: 421_21,
-        costToComplete: 1129_85,
-      },
-    }));
+export function NestedThreeLevels() {
+  return (
+    <GridTable<BeamNestedRow>
+      style={beamNestedFixedStyle}
+      sorting={{ on: "client" }}
+      columns={nestedColumnsThreeLevels}
+      rows={nestedRowsThreeLevels}
+      stickyHeader
+    />
+  );
+}
+
+const nestedRowsTwoLevels = beamNestedRows();
+const nestedRowsThreeLevels = beamNestedRows(true);
+
+function beamNestedRows(threeLevels: boolean = false): GridDataRow<BeamNestedRow>[] {
+  const grandParents: GridDataRow<BeamNestedRow>[] = zeroTo(2).map((idx) => {
+    const parents = zeroTo(2 + (idx % 2)).map((pIdx) => {
+      // Get a semi-random, but repeatable number of children
+      const numChildren = (pIdx % 3) + pIdx + idx + 1;
+      const children = zeroTo(numChildren).map((cIdx) => ({
+        kind: "child" as const,
+        id: `gp:${idx + 1}_p${pIdx + 1}_c${cIdx + 1}`,
+        data: {
+          name: `${idx + 1}0${pIdx + 1}0.${cIdx + 1} - Project Item${
+            pIdx === 0 ? " with a longer name that will wrap" : ""
+          }`,
+          original: 1234_56,
+          changeOrders: 543_21,
+          reallocations: 568_56,
+          revised: undefined,
+          committed: 129_86,
+          difference: 1025_23,
+          actuals: 1108_18,
+          projected: 421_21,
+          costToComplete: 1129_85,
+        },
+      }));
+
+      return {
+        kind: "parent" as const,
+        id: `gp:${idx + 1}_p:${pIdx + 1}`,
+        children,
+        data: {
+          name: `${idx + 1}0${pIdx + 1}0 - Cost Code${pIdx === 1 ? " with a longer name that will wrap" : ""}`,
+          original: children.map((c) => c.data.original ?? 0).reduce((acc, n) => acc + n, 0),
+          changeOrders: children.map((c) => c.data.changeOrders ?? 0).reduce((acc, n) => acc + n, 0),
+          reallocations: children.map((c) => c.data.reallocations ?? 0).reduce((acc, n) => acc + n, 0),
+          revised: children.map((c) => c.data.revised ?? 0).reduce((acc, n) => acc + n, 0),
+          committed: children.map((c) => c.data.committed ?? 0).reduce((acc, n) => acc + n, 0),
+          difference: children.map((c) => c.data.difference ?? 0).reduce((acc, n) => acc + n, 0),
+          actuals: children.map((c) => c.data.actuals ?? 0).reduce((acc, n) => acc + n, 0),
+          projected: children.map((c) => c.data.projected ?? 0).reduce((acc, n) => acc + n, 0),
+          costToComplete: children.map((c) => c.data.costToComplete ?? 0).reduce((acc, n) => acc + n, 0),
+        },
+      };
+    });
 
     return {
-      kind: "parent" as const,
-      id: `p:${pIdx + 1}`,
+      id: `gp:${idx + 1}`,
+      kind: "grandparent" as const,
+      children: parents,
       data: {
-        name: `10${pIdx + 1}0 - Cost Code${pIdx === 1 ? " with a longer name that will wrap" : ""}`,
-        original: children.map(({ data }) => data.original ?? 0).reduce((acc, n) => acc + n, 0),
-        changeOrders: children.map(({ data }) => data.changeOrders ?? 0).reduce((acc, n) => acc + n, 0),
-        reallocations: children.map(({ data }) => data.reallocations ?? 0).reduce((acc, n) => acc + n, 0),
-        revised: children.map(({ data }) => data.revised ?? 0).reduce((acc, n) => acc + n, 0),
-        committed: children.map(({ data }) => data.committed ?? 0).reduce((acc, n) => acc + n, 0),
-        difference: children.map(({ data }) => data.difference ?? 0).reduce((acc, n) => acc + n, 0),
-        actuals: children.map(({ data }) => data.actuals ?? 0).reduce((acc, n) => acc + n, 0),
-        projected: children.map(({ data }) => data.projected ?? 0).reduce((acc, n) => acc + n, 0),
-        costToComplete: children.map(({ data }) => data.costToComplete ?? 0).reduce((acc, n) => acc + n, 0),
+        name: `${idx + 1}000 - Division`,
+        original: parents.map((p) => p.data.original ?? 0).reduce((acc, n) => acc + n, 0),
+        changeOrders: parents.map((p) => p.data.changeOrders ?? 0).reduce((acc, n) => acc + n, 0),
+        reallocations: parents.map((p) => p.data.reallocations ?? 0).reduce((acc, n) => acc + n, 0),
+        revised: parents.map((p) => p.data.revised ?? 0).reduce((acc, n) => acc + n, 0),
+        committed: parents.map((p) => p.data.committed ?? 0).reduce((acc, n) => acc + n, 0),
+        difference: parents.map((p) => p.data.difference ?? 0).reduce((acc, n) => acc + n, 0),
+        actuals: parents.map((p) => p.data.actuals ?? 0).reduce((acc, n) => acc + n, 0),
+        projected: parents.map((p) => p.data.projected ?? 0).reduce((acc, n) => acc + n, 0),
+        costToComplete: parents.map((p) => p.data.costToComplete ?? 0).reduce((acc, n) => acc + n, 0),
       },
-      children,
     };
-  }),
-];
+  });
+
+  return [simpleHeader, ...(threeLevels ? grandParents : grandParents.flatMap((gp) => gp.children!))];
+}
 
 const beamTotalsRows: GridDataRow<BeamNestedRow>[] = [
   {
@@ -243,74 +282,94 @@ function RollUpTotal({ num }: { num?: number }) {
   return typeof num !== "number" || num === 0 ? null : <span css={Css.xs.$}>{numberFormatter(num)}</span>;
 }
 
-const beamNestedColumns: GridColumn<BeamNestedRow>[] = [
-  collapseColumn<BeamNestedRow>({ totals: emptyCell }),
-  selectColumn<BeamNestedRow>({ totals: emptyCell }),
-  column<BeamNestedRow>({
-    totals: "Totals",
-    header: "Cost Code",
-    parent: (data, row) => ({
-      content: () => `${data.name} (${row.children.length})`,
-      typeScale: "smEm",
+const nestedColumnsTwoLevels = beamNestedColumns();
+const nestedColumnsThreeLevels = beamNestedColumns(true);
+
+function beamNestedColumns(threeLevels: boolean = false): GridColumn<BeamNestedRow>[] {
+  return [
+    collapseColumn<BeamNestedRow>({ totals: emptyCell }),
+    selectColumn<BeamNestedRow>({ totals: emptyCell }),
+    column<BeamNestedRow>({
+      totals: "Totals",
+      header: "Cost Code",
+      grandparent: (data, { row }) => ({
+        content: () => `${data.name} (${row.children.length})`,
+        // Apply `smEm` typeScale if nesting three levels
+        typeScale: threeLevels ? "smEm" : undefined,
+      }),
+      parent: (data, { row }) => ({
+        content: () => `${data.name} (${row.children.length})`,
+        // Apply `smEm` typeScale if not nesting three levels
+        typeScale: threeLevels ? undefined : "smEm",
+      }),
+      child: (row) => row.name,
+      w: "200px",
     }),
-    child: (row) => row.name,
-    w: "200px",
-  }),
-  numericColumn<BeamNestedRow>({
-    totals: (row) => numberFormatter(row.original),
-    header: "Original",
-    parent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
-    child: (row) => ({ content: () => numberFormatter(row.original) }),
-  }),
-  numericColumn<BeamNestedRow>({
-    totals: (row) => numberFormatter(row.changeOrders),
-    header: "Change Orders",
-    parent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
-    child: (row) => ({ content: () => numberFormatter(row.changeOrders) }),
-  }),
-  numericColumn<BeamNestedRow>({
-    totals: (row) => numberFormatter(row.reallocations),
-    header: "Reallocations",
-    parent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
-    child: (row) => ({ content: () => numberFormatter(row.reallocations) }),
-  }),
-  numericColumn<BeamNestedRow>({
-    totals: (row) => numberFormatter(row.revised),
-    header: "Revised",
-    parent: (row) => ({ content: () => maybeFormatNumber(row.revised), value: row.revised }),
-    child: (row) => ({ content: () => numberFormatter(row.revised) }),
-  }),
-  numericColumn<BeamNestedRow>({
-    totals: (row) => numberFormatter(row.committed),
-    header: "Committed",
-    parent: (row) => ({ content: () => maybeFormatNumber(row.committed), value: row.committed }),
-    child: (row) => ({ content: () => numberFormatter(row.committed) }),
-  }),
-  numericColumn<BeamNestedRow>({
-    totals: (row) => numberFormatter(row.difference),
-    header: "Difference",
-    parent: (row) => ({ content: () => maybeFormatNumber(row.difference), value: row.difference }),
-    child: (row) => ({ content: () => numberFormatter(row.difference) }),
-  }),
-  numericColumn<BeamNestedRow>({
-    totals: (row) => numberFormatter(row.actuals),
-    header: "Actuals",
-    parent: (row) => ({ content: () => maybeFormatNumber(row.actuals), value: row.actuals }),
-    child: (row) => ({ content: () => numberFormatter(row.actuals) }),
-  }),
-  numericColumn<BeamNestedRow>({
-    totals: (row) => numberFormatter(row.projected),
-    header: "Projected",
-    parent: (row) => ({ content: () => maybeFormatNumber(row.projected), value: row.projected }),
-    child: (row) => ({ content: () => numberFormatter(row.projected) }),
-  }),
-  numericColumn<BeamNestedRow>({
-    totals: (row) => numberFormatter(row.costToComplete),
-    header: "Cost To Complete",
-    parent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
-    child: (row) => ({ content: () => numberFormatter(row.costToComplete) }),
-  }),
-];
+    numericColumn<BeamNestedRow>({
+      totals: (row) => numberFormatter(row.original),
+      header: "Original",
+      grandparent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
+      parent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
+      child: (row) => ({ content: () => numberFormatter(row.original) }),
+    }),
+    numericColumn<BeamNestedRow>({
+      totals: (row) => numberFormatter(row.changeOrders),
+      header: "Change Orders",
+      grandparent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
+      parent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
+      child: (row) => ({ content: () => numberFormatter(row.changeOrders) }),
+    }),
+    numericColumn<BeamNestedRow>({
+      totals: (row) => numberFormatter(row.reallocations),
+      header: "Reallocations",
+      grandparent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
+      parent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
+      child: (row) => ({ content: () => numberFormatter(row.reallocations) }),
+    }),
+    numericColumn<BeamNestedRow>({
+      totals: (row) => numberFormatter(row.revised),
+      header: "Revised",
+      grandparent: (row) => ({ content: () => maybeFormatNumber(row.revised), value: row.revised }),
+      parent: (row) => ({ content: () => maybeFormatNumber(row.revised), value: row.revised }),
+      child: (row) => ({ content: () => numberFormatter(row.revised) }),
+    }),
+    numericColumn<BeamNestedRow>({
+      totals: (row) => numberFormatter(row.committed),
+      header: "Committed",
+      grandparent: (row) => ({ content: () => maybeFormatNumber(row.committed), value: row.committed }),
+      parent: (row) => ({ content: () => maybeFormatNumber(row.committed), value: row.committed }),
+      child: (row) => ({ content: () => numberFormatter(row.committed) }),
+    }),
+    numericColumn<BeamNestedRow>({
+      totals: (row) => numberFormatter(row.difference),
+      header: "Difference",
+      grandparent: (row) => ({ content: () => maybeFormatNumber(row.difference), value: row.difference }),
+      parent: (row) => ({ content: () => maybeFormatNumber(row.difference), value: row.difference }),
+      child: (row) => ({ content: () => numberFormatter(row.difference) }),
+    }),
+    numericColumn<BeamNestedRow>({
+      totals: (row) => numberFormatter(row.actuals),
+      header: "Actuals",
+      grandparent: (row) => ({ content: () => maybeFormatNumber(row.actuals), value: row.actuals }),
+      parent: (row) => ({ content: () => maybeFormatNumber(row.actuals), value: row.actuals }),
+      child: (row) => ({ content: () => numberFormatter(row.actuals) }),
+    }),
+    numericColumn<BeamNestedRow>({
+      totals: (row) => numberFormatter(row.projected),
+      header: "Projected",
+      grandparent: (row) => ({ content: () => maybeFormatNumber(row.projected), value: row.projected }),
+      parent: (row) => ({ content: () => maybeFormatNumber(row.projected), value: row.projected }),
+      child: (row) => ({ content: () => numberFormatter(row.projected) }),
+    }),
+    numericColumn<BeamNestedRow>({
+      totals: (row) => numberFormatter(row.costToComplete),
+      header: "Cost To Complete",
+      grandparent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
+      parent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
+      child: (row) => ({ content: () => numberFormatter(row.costToComplete) }),
+    }),
+  ];
+}
 
 function beamStyleColumns() {
   const locations: HasIdAndName<string>[] = [
@@ -429,7 +488,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
   return [
     column<InputFieldRows>({
       header: "Name",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return <BoundTextField field={os.firstName} {...applyStateProps(row.id)} />;
@@ -438,7 +497,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
     }),
     column<InputFieldRows>({
       header: "Biography",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return flexible ? (
@@ -452,7 +511,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
     }),
     column<InputFieldRows>({
       header: "Birthdate",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return <BoundDateField field={os.birthday} {...applyStateProps(row.id)} />;
@@ -462,7 +521,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
     }),
     numericColumn<InputFieldRows>({
       header: "Height",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return <BoundNumberField field={os.heightInInches} {...applyStateProps(row.id)} />;
@@ -472,7 +531,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
     }),
     column<InputFieldRows>({
       header: "Favorite Sport",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return <BoundSelectField field={os.favoriteSport} options={sports} {...applyStateProps(row.id)} />;
@@ -481,7 +540,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
     }),
     column<InputFieldRows>({
       header: "Favorite Shapes",
-      data: (data, row) => ({
+      data: (data, { row }) => ({
         content: () => {
           const os = getFormState(data);
           return <BoundMultiSelectField field={os.favoriteShapes} options={shapes} {...applyStateProps(row.id)} />;

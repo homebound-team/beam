@@ -44,7 +44,7 @@ export const cardStyle: GridStyle = {
 // Once completely rolled out across all tables in Blueprint, this will change to be the `defaultStyle`.
 export const beamFixedStyle: GridStyle = {
   headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
-  cellCss: Css.gray900.xs.bgWhite.aic.nowrap.pxPx(12).hPx(36).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
+  cellCss: Css.gray900.xs.bgWhite.aic.nowrap.pxPx(12).hPx(36).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
   emptyCell: "-",
   presentationSettings: { borderless: true, typeScale: "xs", wrap: false },
   firstRowMessageCss: Css.tc.py3.$,
@@ -62,7 +62,7 @@ export const beamTotalsRowStyle: Properties = Css.gray700.smEm.hPx(40).mb1.bgWhi
 
 export const beamNestedFixedStyle: GridStyle = {
   ...beamFixedStyle,
-  levels: { 0: { cellCss: beamGroupRowStyle } },
+  levels: { 0: { cellCss: beamGroupRowStyle }, 2: { firstContentColumn: Css.tiny.pl3.$ } },
 };
 
 export const beamTotalsFixedStyle: GridStyle = {
@@ -78,7 +78,7 @@ export const beamFlexibleStyle: GridStyle = {
 
 export const beamNestedFlexibleStyle: GridStyle = {
   ...beamFlexibleStyle,
-  levels: { 0: { cellCss: beamGroupRowStyle } },
+  levels: { 0: { cellCss: beamGroupRowStyle }, 2: { firstContentColumn: Css.tiny.pl3.$ } },
 };
 
 export const beamTotalsFlexibleStyle: GridStyle = {
