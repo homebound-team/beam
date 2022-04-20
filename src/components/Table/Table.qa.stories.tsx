@@ -483,6 +483,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
     return {
       internalProps: { forceFocus: id === "a:3", forceHover: id === "a:2" },
       errorMsg: id === "a:4" ? "Description of error" : undefined,
+      readOnly: id === "a:5",
     };
   }
   return [
@@ -552,6 +553,19 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
 
 const inputFieldRows: GridDataRow<InputFieldRows>[] = [
   simpleHeader,
+  {
+    kind: "data",
+    id: "a:5",
+    data: {
+      id: "a:5",
+      firstName: "Read Only",
+      bio: "This is the read only for input fields in the table. ".repeat(2),
+      birthday: jan10,
+      heightInInches: 68,
+      favoriteSport: "s:4",
+      favoriteShapes: ["sh:5"],
+    },
+  },
   {
     kind: "data",
     id: "a:1",

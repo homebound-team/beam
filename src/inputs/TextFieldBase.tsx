@@ -120,6 +120,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         .if(compact)
         .mhPx(compactFieldHeight - maybeSmaller).$,
       ...Css.gray900.if(contrast).white.$,
+      // Make read-only fields vertically line up with editable fields in tables
+      ...(borderless ? Css.px1.$ : {}),
     },
     input: {
       ...Css.w100.mw0.outline0.fg1.if(multiline).br4.$,
