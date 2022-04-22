@@ -162,12 +162,12 @@ export function ChipSelectField<O, V extends Value>(
     items: listData.items,
     children: selectChildren,
     autoFocus: true,
+    disallowEmptySelection: false,
   };
 
   const state = useSelectState<any>({
     ...selectHookProps,
     selectedKey: valueToKey(value),
-    disallowEmptySelection: false,
     onSelectionChange: (key) => {
       if (key === createNewOpt.id) {
         setShowInput(true);
