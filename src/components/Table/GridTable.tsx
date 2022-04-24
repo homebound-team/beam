@@ -1187,7 +1187,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
  * We use a custom `propsAreEqual` for the `GridRowProps.row` property, which we memoize
  * based on the `GridDataRow.data` prop, such that if a table re-renders (i.e. for a cache
  * updated) and technically creates new row instances, but a row's `row.data` points to the
- * same/unchanged Apollo cache fragment, then we won't re-render that row).
+ * same/unchanged Apollo cache fragment, then we won't re-render that row.
  *
  * Note that if you're using virtualization, it can be surprising how unnoticeable broken row
  * memoization is.
@@ -1196,7 +1196,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 const MemoizedGridRow = React.memo(GridRow, (one, two) => {
   const { row: row1, ...others1 } = one;
   const { row: row2, ...others2 } = two;
-  return shallowEqual(row1.data, row2.data) && shallowEqual(others1, others2);
+  return shallowEqual(row1, row2) && shallowEqual(others1, others2);
 }) as typeof GridRow;
 
 /** Wraps a mobx Observer around the row's rendering/evaluation, so that it will be reactive. */
