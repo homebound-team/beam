@@ -46,23 +46,22 @@ export function render(
   wrapperOrOpts: RenderOpts | Wrapper | undefined,
   ...otherWrappers: Wrapper[]
 ): Promise<RenderResult & Record<string, HTMLElement & Function>> {
+  let wrappers: Wrapper[];
   if (wrapperOrOpts && "wrap" in wrapperOrOpts) {
     // They passed at least single wrapper + maybe more.
     // We put `withBeamRTL` first so that any `withApollo`s wrap outside of beam, so in-drawer/in-modal content has apollo
-    return rtlRender(component, ...[withBeamRTL, wrapperOrOpts as Wrapper, ...otherWrappers]);
+    wrappers = [withBeamRTL, wrapperOrOpts as Wrapper, ...otherWrappers];
   } else if (wrapperOrOpts) {
     const { omitBeamContext, at } = wrapperOrOpts;
-    return rtlRender(
-      component,
-      ...[
-        ...otherWrappers,
-        ...(!omitBeamContext ? [withBeamRTL] : []),
-        ...(at ? [_withRouter(at.url, at.route)] : [_withRouter()]),
-      ],
-    );
+    wrappers = [
+      ...otherWrappers,
+      ...(!omitBeamContext ? [withBeamRTL] : []),
+      ...(at ? [_withRouter(at.url, at.route)] : [_withRouter()]),
+    ];
+  } else {
+    wrappers = [withBeamRTL];
   }
-
-  return rtlRender(component, withBeamRTL);
+  return rtlRender(component, { wrappers, wait: true });
 }
 
 export function cell(r: RenderResult, row: number, column: number): HTMLElement {
