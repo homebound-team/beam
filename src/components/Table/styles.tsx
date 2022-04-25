@@ -72,7 +72,7 @@ export const beamTotalsFixedStyle: GridStyle = {
 
 export const beamFlexibleStyle: GridStyle = {
   ...beamFixedStyle,
-  cellCss: Css.xs.bgWhite.aic.p2.boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
+  cellCss: Css.xs.bgWhite.aic.py2.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
   presentationSettings: { borderless: true, typeScale: "xs", wrap: true },
 };
 
