@@ -9,10 +9,11 @@ export interface DatePickerProps {
   value?: Date;
   onSelect: (value: Date) => void;
   disabledDays?: Modifier | Modifier[];
+  indicators?: Modifier | Modifier[];
 }
 
 export function DatePicker(props: DatePickerProps) {
-  const { value, onSelect, disabledDays } = props;
+  const { value, onSelect, disabledDays, indicators } = props;
   const tid = useTestIds(props, "datePicker");
 
   return (
@@ -24,7 +25,7 @@ export function DatePicker(props: DatePickerProps) {
         // Un-collapse the borders so we can hover each cell
         "& .DayPicker-Month": Css.add({ borderCollapse: "separate" }).$,
         // // Make the boxes smaller, this ends up being 32x32 which matches figma
-        "& .DayPicker-Day": Css.pPx(8).xs.ba.bWhite.br4.$,
+        "& .DayPicker-Day": Css.px1.ptPx(6).pbPx(10).xs.ba.bWhite.br4.relative.$,
         // For today, use a background
         "& .DayPicker-Day--today": Css.bgGray100.$,
         // For selected, use a background - `--outside` modifier is set on placeholder days not within the viewed month
@@ -37,6 +38,13 @@ export function DatePicker(props: DatePickerProps) {
         "& .DayPicker-Day--disabled": Css.cursorNotAllowed.$,
         // Override `.DayPicker-Day:active` background when the day is disabled
         "& .DayPicker-Day--disabled:active": Css.bgWhite.$,
+        // Display indicators using positioned pseudo elements.
+        "& .DayPicker-Day--indicator": Css.addIn(
+          "&:after",
+          Css.wPx(4).hPx(4).br4.absolute.bottomPx(5).left("calc(50% - 2px)").bgLightBlue700.add("content", "''").$,
+        ).$,
+        // Update indicator color if day is "selected"
+        "& .DayPicker-Day--selected.DayPicker-Day--indicator": Css.addIn("&:after", Css.bgWhite.$).$,
       }}
       {...tid}
     >
@@ -51,6 +59,7 @@ export function DatePicker(props: DatePickerProps) {
           onSelect(day);
         }}
         disabledDays={disabledDays}
+        modifiers={{ indicator: indicators }}
       />
     </div>
   );
