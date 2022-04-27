@@ -10,5 +10,5 @@ export default {
 
 export function Default() {
   const [date, setDate] = useState(jan1);
-  return <DatePicker value={date} onSelect={setDate} indicators={[jan1, jan2, jan29]} />;
+  return <DatePicker value={date} onSelect={setDate} dottedDays={[jan1, jan2, jan29]} />;
 }

@@ -9,11 +9,11 @@ export interface DatePickerProps {
   value?: Date;
   onSelect: (value: Date) => void;
   disabledDays?: Modifier | Modifier[];
-  indicators?: Modifier | Modifier[];
+  dottedDays?: Modifier[];
 }
 
 export function DatePicker(props: DatePickerProps) {
-  const { value, onSelect, disabledDays, indicators } = props;
+  const { value, onSelect, disabledDays, dottedDays } = props;
   const tid = useTestIds(props, "datePicker");
 
   return (
@@ -38,13 +38,13 @@ export function DatePicker(props: DatePickerProps) {
         "& .DayPicker-Day--disabled": Css.cursorNotAllowed.$,
         // Override `.DayPicker-Day:active` background when the day is disabled
         "& .DayPicker-Day--disabled:active": Css.bgWhite.$,
-        // Display indicators using positioned pseudo elements.
-        "& .DayPicker-Day--indicator": Css.addIn(
+        // Display dottedDays using positioned pseudo elements.
+        "& .DayPicker-Day--indicatorDot": Css.addIn(
           "&:after",
           Css.wPx(4).hPx(4).br4.absolute.bottomPx(5).left("calc(50% - 2px)").bgLightBlue700.add("content", "''").$,
         ).$,
-        // Update indicator color if day is "selected"
-        "& .DayPicker-Day--selected.DayPicker-Day--indicator": Css.addIn("&:after", Css.bgWhite.$).$,
+        // Update dottedDays color if day is "selected"
+        "& .DayPicker-Day--selected.DayPicker-Day--indicatorDot": Css.addIn("&:after", Css.bgWhite.$).$,
       }}
       {...tid}
     >
@@ -59,7 +59,7 @@ export function DatePicker(props: DatePickerProps) {
           onSelect(day);
         }}
         disabledDays={disabledDays}
-        modifiers={{ indicator: indicators }}
+        modifiers={{ indicatorDot: dottedDays }}
       />
     </div>
   );
