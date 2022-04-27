@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
 import { DatePicker } from "src/components/internal/DatePicker";
-import { jan1 } from "src/forms/formStateDomain";
+import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
 
 export default {
   component: DatePicker,
@@ -10,5 +10,5 @@ export default {
 
 export function Default() {
   const [date, setDate] = useState(jan1);
-  return <DatePicker value={date} onSelect={setDate} />;
+  return <DatePicker value={date} onSelect={setDate} dottedDays={[jan1, jan2, jan29]} />;
 }
