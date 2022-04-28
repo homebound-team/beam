@@ -30,7 +30,7 @@ export const Switch = () => {
             <SwitchWrapper label="Remember me?" isHovered selected />
             <SwitchWrapper label="Remember me?" isFocused />
             <SwitchWrapper label="Remember me?" isFocused selected />
-            <SwitchWrapper label="Remember me?" disabled />
+            <SwitchWrapper label="Remember me?" disabled="Disabled reason" />
           </div>
           <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>
             <SwitchWrapper label="Remember me?" withIcon />
@@ -39,7 +39,7 @@ export const Switch = () => {
             <SwitchWrapper label="Remember me?" withIcon isHovered selected />
             <SwitchWrapper label="Remember me?" withIcon isFocused />
             <SwitchWrapper label="Remember me?" withIcon isFocused selected />
-            <SwitchWrapper label="Remember me?" withIcon disabled />
+            <SwitchWrapper label="Remember me?" withIcon disabled="Disabled reason" />
           </div>
           <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>
             <SwitchWrapper label="Remember me?" compact />
@@ -76,27 +76,32 @@ export const Switch = () => {
   );
 };
 
+export const LabelStyles = () => {
+  const [selected, setSelected] = useState(false);
+  return (
+    <div css={Css.wPx(200).$}>
+      <h2 css={Css.baseEm.mb1.$}>Inline (default)</h2>
+      <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} />
+      <h2 css={Css.baseEm.mb1.mt3.pt2.bt.bGray200.$}>Filter</h2>
+      <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="filter" />
+      <h2 css={Css.baseEm.mb1.mt3.pt2.bt.bGray200.$}>Form</h2>
+      <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="form" />
+      <h2 css={Css.baseEm.mb1.mt3.pt2.bt.bGray200.$}>Hidden</h2>
+      <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} hideLabel />
+    </div>
+  );
+};
+
 type StoryStates = {
   isHovered?: boolean;
   isFocused?: boolean;
 };
 
-type SwitchWrapperProps = {
-  /** Whether the element should receive focus on render. */
-  autoFocus?: boolean;
-  /** Whether to render a compact version of Switch */
-  compact?: boolean;
-  /** Whether the interactive element is disabled. */
-  disabled?: boolean;
-  /** Input label */
-  label: string;
-  /** Handler when the interactive element state changes. */
-  onChange?: (value: boolean) => void;
-  /** Whether the switch is selected */
-  selected?: boolean;
-  /** Whether to include icons like the check mark */
-  withIcon?: boolean;
-} & StoryStates;
+type SwitchWrapperProps = Omit<SwitchProps, "onChange" | "selected"> &
+  StoryStates & {
+    onChange?: (value: boolean) => void;
+    selected?: boolean;
+  };
 
 function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchWrapperProps) {
   const [selected, setSelected] = useState<boolean>(props.selected || false);
@@ -113,6 +118,7 @@ function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchWrapperProps) {
     >
       <SwitchComponent
         {...props}
+        labelStyle={"inline"}
         selected={selected}
         onChange={(value) => {
           action("onChange")(value);
