@@ -36,6 +36,9 @@ export type GridTableApi<R extends Kinded> = {
   getSelectedRows(): GridDataRow<R>[];
   getSelectedRows<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
 
+  /** Deselects all rows */
+  clearSelections: () => void;
+
   /** Sets the internal state of 'activeRowId' */
   setActiveRowId: (id: string | undefined) => void;
 };
@@ -76,6 +79,10 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
       }
     });
     return selected;
+  }
+
+  public clearSelections(id?: string) {
+    this.rowState.selectRow("header", false);
   }
 
   public setActiveRowId(id: string | undefined) {
