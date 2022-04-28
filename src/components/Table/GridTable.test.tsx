@@ -1286,6 +1286,33 @@ describe("GridTable", () => {
     expect(cellAnd(r, 4, 1, "select")).toBeChecked(); // Grandchild
   });
 
+  it("can deselect all rows via 'clearSelections' api method", async () => {
+    // Given a parent with children
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    // When rendering a GridTable with selectable rows
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+    // And selecting the header row
+    click(cellAnd(r, 0, 1, "select"));
+    // Then expect all rows should selected
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c2", "p1c1"]);
+
+    // When using the api to clear the selected rows
+    api.current!.clearSelections();
+
+    // Then all rows should be deselected
+    expect(api.current!.getSelectedRowIds()).toEqual([]);
+  });
+
   describe("matchesFilter", () => {
     it("is case insensitive", () => {
       expect(matchesFilter("Foo", "foO")).toBeTruthy();
