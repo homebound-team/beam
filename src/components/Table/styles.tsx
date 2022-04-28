@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Css, Palette } from "src/Css";
 import { GridStyle } from ".";
 
@@ -42,36 +41,45 @@ export const cardStyle: GridStyle = {
   },
 };
 
-interface UseTableStyleProps {
+interface TableStyleProps {
   form?: boolean;
   grouped?: boolean;
   flexible?: boolean;
   totals?: boolean;
 }
 
-/** Returns a memo'd/stable GridStyle definition */
-export function useTableStyle(props?: UseTableStyleProps): GridStyle {
-  const { form = false, grouped = false, flexible = false, totals = false } = props || {};
-  return useMemo(() => {
-    const groupedLevels = {
-      0: {
-        cellCss: Css.xsEm.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
-        firstContentColumn: Css.smEm.$,
-      },
-      2: { firstContentColumn: Css.tiny.pl3.$ },
-    };
-    const defaultLevels = { 1: { firstContentColumn: Css.tiny.pl3.$ } };
-    return {
-      emptyCell: "-",
-      firstRowMessageCss: Css.tc.py3.$,
-      headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
-      cellCss: {
-        ...Css.gray900.xs.bgWhite.aic.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
-        ...(flexible ? Css.py2.$ : Css.nowrap.hPx(form ? 48 : 36).$),
-        ...(totals ? Css.gray700.smEm.hPx(40).mb1.bgWhite.boxShadow("none").$ : {}),
-      },
-      presentationSettings: { borderless: true, typeScale: "xs", wrap: flexible },
-      levels: totals ? {} : grouped ? groupedLevels : defaultLevels,
-    };
-  }, [form, grouped, flexible, totals]);
+function memoizedTableStyles() {
+  const cache: Record<string, GridStyle> = {};
+  return (props?: TableStyleProps) => {
+    const { form = false, grouped = false, flexible = false, totals = false } = props || {};
+    const key = `${form}|${grouped}|${flexible}|${totals}`;
+
+    if (!cache[key]) {
+      const groupedLevels = {
+        0: {
+          cellCss: Css.xsEm.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+          firstContentColumn: Css.smEm.$,
+        },
+        2: { firstContentColumn: Css.tiny.pl3.$ },
+      };
+      const defaultLevels = { 1: { firstContentColumn: Css.tiny.pl3.$ } };
+
+      cache[key] = {
+        emptyCell: "-",
+        firstRowMessageCss: Css.tc.py3.$,
+        headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
+        cellCss: {
+          ...Css.gray900.xs.bgWhite.aic.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+          ...(flexible ? Css.py2.$ : Css.nowrap.hPx(form ? 48 : 36).$),
+          ...(totals ? Css.gray700.smEm.hPx(40).mb1.bgWhite.boxShadow("none").$ : {}),
+        },
+        presentationSettings: { borderless: true, typeScale: "xs", wrap: flexible },
+        levels: totals ? {} : grouped ? groupedLevels : defaultLevels,
+      };
+    }
+
+    return cache[key];
+  };
 }
+
+export const getTableStyles = memoizedTableStyles();

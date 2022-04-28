@@ -7,7 +7,7 @@ import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from 
 import { emptyCell, GridColumn, GridDataRow, GridSortConfig, GridTable } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { simpleHeader, SimpleHeaderAndData } from "src/components/Table/simpleHelpers";
-import { useTableStyle } from "src/components/Table/styles";
+import { getTableStyles } from "src/components/Table/styles";
 import { Tag } from "src/components/Tag";
 import { Css, Palette } from "src/Css";
 import {
@@ -44,7 +44,7 @@ type BeamData = {
 type BeamRow = SimpleHeaderAndData<BeamData>;
 
 export function Fixed() {
-  const style = useTableStyle();
+  const style = getTableStyles();
   return (
     <GridTable<BeamRow>
       style={style}
@@ -56,7 +56,7 @@ export function Fixed() {
 }
 
 export function Flexible() {
-  const style = useTableStyle({ flexible: true });
+  const style = getTableStyles({ flexible: true });
   return (
     <GridTable<BeamRow>
       style={style}
@@ -88,8 +88,8 @@ type BeamChildRow = { kind: "child"; id: string; data: BeamBudgetData };
 type BeamNestedRow = BeamTotalsRow | HeaderRow | BeamGrandParentRow | BeamParentRow | BeamChildRow;
 
 export function NestedFixed() {
-  const totalsStyle = useTableStyle({ grouped: true, totals: true });
-  const style = useTableStyle({ grouped: true });
+  const totalsStyle = getTableStyles({ grouped: true, totals: true });
+  const style = getTableStyles({ grouped: true });
   return (
     <div css={Css.mw("fit-content").$}>
       <GridTable<BeamNestedRow> style={totalsStyle} columns={nestedColumnsTwoLevels} rows={beamTotalsRows} />
@@ -105,8 +105,8 @@ export function NestedFixed() {
 }
 
 export function NestedFlexible() {
-  const totalsStyle = useTableStyle({ flexible: true, grouped: true, totals: true });
-  const style = useTableStyle({ flexible: true, grouped: true });
+  const totalsStyle = getTableStyles({ flexible: true, grouped: true, totals: true });
+  const style = getTableStyles({ flexible: true, grouped: true });
   return (
     <div css={Css.mw("fit-content").$}>
       <GridTable<BeamNestedRow> style={totalsStyle} columns={nestedColumnsTwoLevels} rows={beamTotalsRows} />
@@ -122,7 +122,7 @@ export function NestedFlexible() {
 }
 
 export function Filterable() {
-  const style = useTableStyle({ grouped: true });
+  const style = getTableStyles({ grouped: true });
   const api = useGridTableApi<BeamNestedRow>();
   const selectedIds = useComputed(() => api.getSelectedRows().map((r) => r.id), [api]);
 
@@ -164,7 +164,7 @@ export function Filterable() {
 }
 
 export function NestedThreeLevels() {
-  const style = useTableStyle({ grouped: true });
+  const style = getTableStyles({ grouped: true });
   return (
     <GridTable<BeamNestedRow>
       style={style}
@@ -177,7 +177,7 @@ export function NestedThreeLevels() {
 }
 
 export function NestedNonGrouped() {
-  const style = useTableStyle();
+  const style = getTableStyles();
   return (
     <GridTable<BeamNestedRow>
       style={style}
@@ -459,8 +459,8 @@ const flatRows: GridDataRow<BeamRow>[] = [
 type InputFieldRows = SimpleHeaderAndData<AuthorInput>;
 
 export function InputFieldStates() {
-  const styleFixed = useTableStyle({ form: true });
-  const styleFlexible = useTableStyle({ form: true, flexible: true });
+  const styleFixed = getTableStyles({ form: true });
+  const styleFlexible = getTableStyles({ form: true, flexible: true });
   const { getFormState } = useFormStates<AuthorInput>({
     config: formConfig,
     getId: (o) => o.id!,
