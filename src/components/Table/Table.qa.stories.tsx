@@ -44,10 +44,9 @@ type BeamData = {
 type BeamRow = SimpleHeaderAndData<BeamData>;
 
 export function Fixed() {
-  const style = getTableStyles();
   return (
     <GridTable<BeamRow>
-      style={style}
+      style={{}}
       sorting={{ on: "client", initial: [1, "ASC"] }}
       columns={beamStyleColumns()}
       rows={flatRows}
@@ -56,10 +55,9 @@ export function Fixed() {
 }
 
 export function Flexible() {
-  const style = getTableStyles({ flexible: true });
   return (
     <GridTable<BeamRow>
-      style={style}
+      style={{ flexible: true }}
       sorting={{ on: "client", initial: [1, "ASC"] }}
       columns={beamStyleColumns()}
       rows={flatRows}
@@ -88,13 +86,15 @@ type BeamChildRow = { kind: "child"; id: string; data: BeamBudgetData };
 type BeamNestedRow = BeamTotalsRow | HeaderRow | BeamGrandParentRow | BeamParentRow | BeamChildRow;
 
 export function NestedFixed() {
-  const totalsStyle = getTableStyles({ grouped: true, totals: true });
-  const style = getTableStyles({ grouped: true });
   return (
     <div css={Css.mw("fit-content").$}>
-      <GridTable<BeamNestedRow> style={totalsStyle} columns={nestedColumnsTwoLevels} rows={beamTotalsRows} />
       <GridTable<BeamNestedRow>
-        style={style}
+        style={{ grouped: true, totals: true }}
+        columns={nestedColumnsTwoLevels}
+        rows={beamTotalsRows}
+      />
+      <GridTable<BeamNestedRow>
+        style={{ grouped: true }}
         sorting={{ on: "client" }}
         columns={nestedColumnsTwoLevels}
         rows={nestedRowsTwoLevels}
@@ -105,13 +105,15 @@ export function NestedFixed() {
 }
 
 export function NestedFlexible() {
-  const totalsStyle = getTableStyles({ flexible: true, grouped: true, totals: true });
-  const style = getTableStyles({ flexible: true, grouped: true });
   return (
     <div css={Css.mw("fit-content").$}>
-      <GridTable<BeamNestedRow> style={totalsStyle} columns={nestedColumnsTwoLevels} rows={beamTotalsRows} />
       <GridTable<BeamNestedRow>
-        style={style}
+        style={{ flexible: true, grouped: true, totals: true }}
+        columns={nestedColumnsTwoLevels}
+        rows={beamTotalsRows}
+      />
+      <GridTable<BeamNestedRow>
+        style={{ flexible: true, grouped: true }}
         sorting={{ on: "client" }}
         columns={nestedColumnsTwoLevels}
         rows={nestedRowsTwoLevels}
@@ -122,7 +124,6 @@ export function NestedFlexible() {
 }
 
 export function Filterable() {
-  const style = getTableStyles({ grouped: true });
   const api = useGridTableApi<BeamNestedRow>();
   const selectedIds = useComputed(() => api.getSelectedRows().map((r) => r.id), [api]);
 
@@ -151,7 +152,7 @@ export function Filterable() {
         </div>
       </div>
       <GridTable<BeamNestedRow>
-        style={style}
+        style={{ grouped: true }}
         sorting={sorting}
         columns={beamNestedColumns()}
         rows={nestedRowsTwoLevels}
@@ -164,10 +165,9 @@ export function Filterable() {
 }
 
 export function NestedThreeLevels() {
-  const style = getTableStyles({ grouped: true });
   return (
     <GridTable<BeamNestedRow>
-      style={style}
+      style={{ grouped: true }}
       sorting={{ on: "client" }}
       columns={nestedColumnsThreeLevels}
       rows={nestedRowsThreeLevels}
@@ -177,10 +177,9 @@ export function NestedThreeLevels() {
 }
 
 export function NestedNonGrouped() {
-  const style = getTableStyles();
   return (
     <GridTable<BeamNestedRow>
-      style={style}
+      style={{}}
       sorting={{ on: "client" }}
       columns={nestedColumnsTwoLevelsNoActions}
       rows={nestedRowsTwoLevels}

@@ -41,7 +41,7 @@ export const cardStyle: GridStyle = {
   },
 };
 
-interface TableStyleProps {
+export interface GridStyleDef {
   form?: boolean;
   grouped?: boolean;
   flexible?: boolean;
@@ -50,7 +50,7 @@ interface TableStyleProps {
 
 function memoizedTableStyles() {
   const cache: Record<string, GridStyle> = {};
-  return (props?: TableStyleProps) => {
+  return (props?: GridStyleDef) => {
     const { form = false, grouped = false, flexible = false, totals = false } = props || {};
     const key = `${form}|${grouped}|${flexible}|${totals}`;
 
