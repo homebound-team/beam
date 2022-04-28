@@ -111,7 +111,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         .if(compact)
         .hPx(compactFieldHeight - maybeSmaller).$,
       ...Css.bgWhite.gray900.if(contrast).bgGray700.white.$,
-      ...(borderless ? Css.bTransparent.$ : Css.bGray300.if(contrast).bGray700.$),
+      // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
+      // This typically happens in tables when a column has a mix of static text (i.e. "roll up" rows and table headers) and input fields.
+      // To remedy this perceived misalignment then we increase the width by the horizontal padding applied (16px), and set a negative margin left margin to re-center the field.
+      ...(borderless ? Css.bTransparent.w("calc(100% + 16px)").ml(-1).$ : Css.bGray300.if(contrast).bGray700.$),
       ...(!compound ? Css.ba.$ : {}),
     },
     inputWrapperReadOnly: {
@@ -120,8 +123,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         .if(compact)
         .mhPx(compactFieldHeight - maybeSmaller).$,
       ...Css.gray900.if(contrast).white.$,
-      // Make read-only fields vertically line up with editable fields in tables
-      ...(borderless ? Css.px1.$ : {}),
     },
     input: {
       ...Css.w100.mw0.outline0.fg1.if(multiline).br4.$,
