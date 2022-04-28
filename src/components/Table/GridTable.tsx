@@ -654,7 +654,10 @@ function renderVirtual<R extends Kinded>(
         }
       }}
       components={{
-        TopItemList: VirtualHeader(listStyle, columns, id, firstLastColumnWidth, xss),
+        // Applying a zIndex: 2 to ensure it stays on top of sticky columns
+        TopItemList: React.forwardRef((props, ref) => (
+          <div {...props} ref={ref as MutableRefObject<HTMLDivElement>} style={{ ...props.style, ...{ zIndex: 2 } }} />
+        )),
         List: VirtualRoot(listStyle, columns, id, firstLastColumnWidth, xss),
         Footer: () => <div css={footerStyle} />,
       }}
@@ -743,24 +746,6 @@ const VirtualRoot = memoizeOne<
         }}
         data-testid={id}
       >
-        {children}
-      </div>
-    );
-  });
-});
-
-const VirtualHeader = memoizeOne<
-  (
-    gs: GridStyle,
-    columns: GridColumn<any>[],
-    id: string,
-    firstLastColumnWidth: number | undefined,
-    xss: any,
-  ) => Components["TopItemList"]
->((gs, _columns, id, _firstLastColumnWidth, xss) => {
-  return React.forwardRef(function VirtualHeader({ style, children }, ref) {
-    return (
-      <div ref={ref as MutableRefObject<HTMLDivElement>} style={{ ...style, ...{ zIndex: 2 } }}>
         {children}
       </div>
     );
