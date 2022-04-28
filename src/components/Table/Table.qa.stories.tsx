@@ -7,14 +7,7 @@ import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from 
 import { emptyCell, GridColumn, GridDataRow, GridSortConfig, GridTable } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { simpleHeader, SimpleHeaderAndData } from "src/components/Table/simpleHelpers";
-import {
-  beamFixedStyle,
-  beamFlexibleStyle,
-  beamNestedFixedStyle,
-  beamNestedFlexibleStyle,
-  beamTotalsFixedStyle,
-  beamTotalsFlexibleStyle,
-} from "src/components/Table/styles";
+import { useTableStyle } from "src/components/Table/styles";
 import { Tag } from "src/components/Tag";
 import { Css, Palette } from "src/Css";
 import {
@@ -51,9 +44,10 @@ type BeamData = {
 type BeamRow = SimpleHeaderAndData<BeamData>;
 
 export function Fixed() {
+  const style = useTableStyle();
   return (
     <GridTable<BeamRow>
-      style={beamFixedStyle}
+      style={style}
       sorting={{ on: "client", initial: [1, "ASC"] }}
       columns={beamStyleColumns()}
       rows={flatRows}
@@ -62,9 +56,10 @@ export function Fixed() {
 }
 
 export function Flexible() {
+  const style = useTableStyle({ flexible: true });
   return (
     <GridTable<BeamRow>
-      style={beamFlexibleStyle}
+      style={style}
       sorting={{ on: "client", initial: [1, "ASC"] }}
       columns={beamStyleColumns()}
       rows={flatRows}
@@ -93,11 +88,13 @@ type BeamChildRow = { kind: "child"; id: string; data: BeamBudgetData };
 type BeamNestedRow = BeamTotalsRow | HeaderRow | BeamGrandParentRow | BeamParentRow | BeamChildRow;
 
 export function NestedFixed() {
+  const totalsStyle = useTableStyle({ grouped: true, totals: true });
+  const style = useTableStyle({ grouped: true });
   return (
     <div css={Css.mw("fit-content").$}>
-      <GridTable<BeamNestedRow> style={beamTotalsFixedStyle} columns={nestedColumnsTwoLevels} rows={beamTotalsRows} />
+      <GridTable<BeamNestedRow> style={totalsStyle} columns={nestedColumnsTwoLevels} rows={beamTotalsRows} />
       <GridTable<BeamNestedRow>
-        style={beamNestedFixedStyle}
+        style={style}
         sorting={{ on: "client" }}
         columns={nestedColumnsTwoLevels}
         rows={nestedRowsTwoLevels}
@@ -108,15 +105,13 @@ export function NestedFixed() {
 }
 
 export function NestedFlexible() {
+  const totalsStyle = useTableStyle({ flexible: true, grouped: true, totals: true });
+  const style = useTableStyle({ flexible: true, grouped: true });
   return (
     <div css={Css.mw("fit-content").$}>
+      <GridTable<BeamNestedRow> style={totalsStyle} columns={nestedColumnsTwoLevels} rows={beamTotalsRows} />
       <GridTable<BeamNestedRow>
-        style={beamTotalsFlexibleStyle}
-        columns={nestedColumnsTwoLevels}
-        rows={beamTotalsRows}
-      />
-      <GridTable<BeamNestedRow>
-        style={beamNestedFlexibleStyle}
+        style={style}
         sorting={{ on: "client" }}
         columns={nestedColumnsTwoLevels}
         rows={nestedRowsTwoLevels}
@@ -127,6 +122,7 @@ export function NestedFlexible() {
 }
 
 export function Filterable() {
+  const style = useTableStyle({ grouped: true });
   const api = useGridTableApi<BeamNestedRow>();
   const selectedIds = useComputed(() => api.getSelectedRows().map((r) => r.id), [api]);
 
@@ -155,7 +151,7 @@ export function Filterable() {
         </div>
       </div>
       <GridTable<BeamNestedRow>
-        style={beamNestedFixedStyle}
+        style={style}
         sorting={sorting}
         columns={beamNestedColumns()}
         rows={nestedRowsTwoLevels}
@@ -168,12 +164,26 @@ export function Filterable() {
 }
 
 export function NestedThreeLevels() {
+  const style = useTableStyle({ grouped: true });
   return (
     <GridTable<BeamNestedRow>
-      style={beamNestedFixedStyle}
+      style={style}
       sorting={{ on: "client" }}
       columns={nestedColumnsThreeLevels}
       rows={nestedRowsThreeLevels}
+      stickyHeader
+    />
+  );
+}
+
+export function NestedNonGrouped() {
+  const style = useTableStyle();
+  return (
+    <GridTable<BeamNestedRow>
+      style={style}
+      sorting={{ on: "client" }}
+      columns={nestedColumnsTwoLevelsNoActions}
+      rows={nestedRowsTwoLevels}
       stickyHeader
     />
   );
@@ -283,6 +293,7 @@ function RollUpTotal({ num }: { num?: number }) {
 }
 
 const nestedColumnsTwoLevels = beamNestedColumns();
+const nestedColumnsTwoLevelsNoActions = beamNestedColumns().splice(2);
 const nestedColumnsThreeLevels = beamNestedColumns(true);
 
 function beamNestedColumns(threeLevels: boolean = false): GridColumn<BeamNestedRow>[] {
@@ -294,13 +305,9 @@ function beamNestedColumns(threeLevels: boolean = false): GridColumn<BeamNestedR
       header: "Cost Code",
       grandparent: (data, { row }) => ({
         content: () => `${data.name} (${row.children.length})`,
-        // Apply `smEm` typeScale if nesting three levels
-        typeScale: threeLevels ? "smEm" : undefined,
       }),
       parent: (data, { row }) => ({
         content: () => `${data.name} (${row.children.length})`,
-        // Apply `smEm` typeScale if not nesting three levels
-        typeScale: threeLevels ? undefined : "smEm",
       }),
       child: (row) => row.name,
       w: "200px",
@@ -452,6 +459,8 @@ const flatRows: GridDataRow<BeamRow>[] = [
 type InputFieldRows = SimpleHeaderAndData<AuthorInput>;
 
 export function InputFieldStates() {
+  const styleFixed = useTableStyle({ form: true });
+  const styleFlexible = useTableStyle({ form: true, flexible: true });
   const { getFormState } = useFormStates<AuthorInput>({
     config: formConfig,
     getId: (o) => o.id!,
@@ -461,7 +470,7 @@ export function InputFieldStates() {
     <>
       <h2 css={Css.mb1.$}>Fixed Table Styles</h2>
       <GridTable<InputFieldRows>
-        style={beamFixedStyle}
+        style={styleFixed}
         columns={inputFieldColumns(getFormState)}
         rows={inputFieldRows}
         stickyHeader
@@ -469,7 +478,7 @@ export function InputFieldStates() {
 
       <h2 css={Css.mt5.mb1.$}>Flexible Table Styles</h2>
       <GridTable<InputFieldRows>
-        style={beamFlexibleStyle}
+        style={styleFlexible}
         columns={inputFieldColumns(getFormState, true)}
         rows={inputFieldRows}
         stickyHeader

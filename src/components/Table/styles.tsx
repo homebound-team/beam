@@ -1,4 +1,5 @@
-import { Css, Palette, Properties } from "src/Css";
+import { useMemo } from "react";
+import { Css, Palette } from "src/Css";
 import { GridStyle } from ".";
 
 /** Our original table look & feel/style. */
@@ -41,47 +42,36 @@ export const cardStyle: GridStyle = {
   },
 };
 
-// Once completely rolled out across all tables in Blueprint, this will change to be the `defaultStyle`.
-export const beamFixedStyle: GridStyle = {
-  headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
-  cellCss: Css.gray900.xs.bgWhite.aic.nowrap.pxPx(12).hPx(36).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
-  emptyCell: "-",
-  presentationSettings: { borderless: true, typeScale: "xs", wrap: false },
-  firstRowMessageCss: Css.tc.py3.$,
-  // Included as a hacky "treat indent as deprecated for this table" hint to GridTable
-  levels: {},
-};
+interface UseTableStyleProps {
+  form?: boolean;
+  grouped?: boolean;
+  flexible?: boolean;
+  totals?: boolean;
+}
 
-// The look & feel for parent rows' cells in a nested parent/child table.
-export const beamGroupRowStyle: Properties = Css.xsEm
-  .mhPx(56)
-  .gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$;
-
-// The look & feel for a totals row's cells.
-export const beamTotalsRowStyle: Properties = Css.gray700.smEm.hPx(40).mb1.bgWhite.boxShadow("none").$;
-
-export const beamNestedFixedStyle: GridStyle = {
-  ...beamFixedStyle,
-  levels: { 0: { cellCss: beamGroupRowStyle }, 2: { firstContentColumn: Css.tiny.pl3.$ } },
-};
-
-export const beamTotalsFixedStyle: GridStyle = {
-  ...beamFixedStyle,
-  cellCss: { ...beamFixedStyle.cellCss, ...beamTotalsRowStyle },
-};
-
-export const beamFlexibleStyle: GridStyle = {
-  ...beamFixedStyle,
-  cellCss: Css.xs.bgWhite.aic.py2.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray100}`).$,
-  presentationSettings: { borderless: true, typeScale: "xs", wrap: true },
-};
-
-export const beamNestedFlexibleStyle: GridStyle = {
-  ...beamFlexibleStyle,
-  levels: { 0: { cellCss: beamGroupRowStyle }, 2: { firstContentColumn: Css.tiny.pl3.$ } },
-};
-
-export const beamTotalsFlexibleStyle: GridStyle = {
-  ...beamFlexibleStyle,
-  cellCss: { ...beamFlexibleStyle.cellCss, ...beamTotalsRowStyle },
-};
+/** Returns a memo'd/stable GridStyle definition */
+export function useTableStyle(props?: UseTableStyleProps): GridStyle {
+  const { form = false, grouped = false, flexible = false, totals = false } = props || {};
+  return useMemo(() => {
+    const groupedLevels = {
+      0: {
+        cellCss: Css.xsEm.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+        firstContentColumn: Css.smEm.$,
+      },
+      2: { firstContentColumn: Css.tiny.pl3.$ },
+    };
+    const defaultLevels = { 1: { firstContentColumn: Css.tiny.pl3.$ } };
+    return {
+      emptyCell: "-",
+      firstRowMessageCss: Css.tc.py3.$,
+      headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
+      cellCss: {
+        ...Css.gray900.xs.bgWhite.aic.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+        ...(flexible ? Css.py2.$ : Css.nowrap.hPx(form ? 48 : 36).$),
+        ...(totals ? Css.gray700.smEm.hPx(40).mb1.bgWhite.boxShadow("none").$ : {}),
+      },
+      presentationSettings: { borderless: true, typeScale: "xs", wrap: flexible },
+      levels: totals ? {} : grouped ? groupedLevels : defaultLevels,
+    };
+  }, [form, grouped, flexible, totals]);
+}

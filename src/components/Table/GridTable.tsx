@@ -1069,7 +1069,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
       {columns.map((column, columnIndex) => {
         const { wrapAction = true, isAction = false } = column;
 
-        const applyFirstContentColumnStyles = !isAction && !firstContentColumnStylesApplied;
+        const applyFirstContentColumnStyles = !isHeader && !isAction && !firstContentColumnStylesApplied;
         firstContentColumnStylesApplied ||= applyFirstContentColumnStyles;
 
         if (column.mw) {
