@@ -37,7 +37,7 @@ export type GridTableApi<R extends Kinded> = {
   getSelectedRows<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
 
   /** Deselects all rows */
-  clearSelections: () => void;
+  clearSelections(): void;
 
   /** Sets the internal state of 'activeRowId' */
   setActiveRowId: (id: string | undefined) => void;
