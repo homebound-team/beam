@@ -654,6 +654,10 @@ function renderVirtual<R extends Kinded>(
         }
       }}
       components={{
+        // Applying a zIndex: 2 to ensure it stays on top of sticky columns
+        TopItemList: React.forwardRef((props, ref) => (
+          <div {...props} ref={ref as MutableRefObject<HTMLDivElement>} style={{ ...props.style, ...{ zIndex: 2 } }} />
+        )),
         List: VirtualRoot(listStyle, columns, id, firstLastColumnWidth, xss),
         Footer: () => <div css={footerStyle} />,
       }}

@@ -23,6 +23,7 @@ import {
   numericColumn,
   simpleHeader,
   SimpleHeaderAndData,
+  useGridTableApi,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { TextField } from "src/inputs";
@@ -957,7 +958,7 @@ export function StickyColumnsAndHeader() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
       simpleHeader,
-      ...zeroTo(500).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `ccc ${i}`, value: i } })),
+      ...zeroTo(50).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `ccc ${i}`, value: i } })),
     ],
     [],
   );
@@ -973,6 +974,32 @@ export function StickyColumnsAndHeader() {
   return (
     <div ref={scrollWrap} css={Css.wPx(500).hPx(500).overflowAuto.$}>
       <GridTable columns={[nameColumn, valueColumn, actionColumn]} rows={rows} stickyHeader />
+    </div>
+  );
+}
+
+export function StickyColumnsAndHeaderVirtualized() {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px", sticky: "left" };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
+  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
+  const rows: GridDataRow<Row>[] = useMemo(
+    () => [
+      simpleHeader,
+      ...zeroTo(50).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `ccc ${i}`, value: i } })),
+    ],
+    [],
+  );
+
+  const api = useGridTableApi<Row>();
+
+  // Scroll the list prior to snapshot to ensure sticky header lays on top of sticky columns.
+  useEffect(() => {
+    api.scrollToIndex(5);
+  });
+
+  return (
+    <div css={Css.wPx(500).hPx(500).$}>
+      <GridTable columns={[nameColumn, valueColumn, actionColumn]} rows={rows} stickyHeader as="virtual" api={api} />
     </div>
   );
 }
