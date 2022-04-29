@@ -114,7 +114,11 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
       // This typically happens in tables when a column has a mix of static text (i.e. "roll up" rows and table headers) and input fields.
       // To remedy this perceived misalignment then we increase the width by the horizontal padding applied (16px), and set a negative margin left margin to re-center the field.
-      ...(borderless ? Css.bTransparent.w("calc(100% + 16px)").ml(-1).$ : Css.bGray300.if(contrast).bGray700.$),
+      // Note: Do not modify width and position of 'compound' fields.
+      ...(borderless && !compound
+        ? Css.bTransparent.w("calc(100% + 16px)").ml(-1).$
+        : Css.bGray300.if(contrast).bGray700.$),
+      // Do not add borders to compound fields. A compound field is responsible for drawing its own borders
       ...(!compound ? Css.ba.$ : {}),
     },
     inputWrapperReadOnly: {
