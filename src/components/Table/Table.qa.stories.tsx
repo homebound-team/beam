@@ -46,7 +46,7 @@ type BeamRow = SimpleHeaderAndData<BeamData>;
 export function Fixed() {
   return (
     <GridTable<BeamRow>
-      style={{}}
+      style={{ rowHeight: "fixed" }}
       sorting={{ on: "client", initial: [1, "ASC"] }}
       columns={beamStyleColumns()}
       rows={flatRows}
@@ -57,7 +57,7 @@ export function Fixed() {
 export function Flexible() {
   return (
     <GridTable<BeamRow>
-      style={{ flexible: true }}
+      style={{}}
       sorting={{ on: "client", initial: [1, "ASC"] }}
       columns={beamStyleColumns()}
       rows={flatRows}
@@ -89,12 +89,12 @@ export function NestedFixed() {
   return (
     <div css={Css.mw("fit-content").$}>
       <GridTable<BeamNestedRow>
-        style={{ grouped: true, totals: true }}
+        style={{ grouped: true, totals: true, rowHeight: "fixed" }}
         columns={nestedColumnsTwoLevels}
         rows={beamTotalsRows}
       />
       <GridTable<BeamNestedRow>
-        style={{ grouped: true }}
+        style={{ grouped: true, rowHeight: "fixed" }}
         sorting={{ on: "client" }}
         columns={nestedColumnsTwoLevels}
         rows={nestedRowsTwoLevels}
@@ -108,12 +108,12 @@ export function NestedFlexible() {
   return (
     <div css={Css.mw("fit-content").$}>
       <GridTable<BeamNestedRow>
-        style={{ flexible: true, grouped: true, totals: true }}
+        style={{ grouped: true, totals: true }}
         columns={nestedColumnsTwoLevels}
         rows={beamTotalsRows}
       />
       <GridTable<BeamNestedRow>
-        style={{ flexible: true, grouped: true }}
+        style={{ grouped: true }}
         sorting={{ on: "client" }}
         columns={nestedColumnsTwoLevels}
         rows={nestedRowsTwoLevels}
@@ -152,7 +152,7 @@ export function Filterable() {
         </div>
       </div>
       <GridTable<BeamNestedRow>
-        style={{ grouped: true }}
+        style={{ rowHeight: "fixed", grouped: true }}
         sorting={sorting}
         columns={beamNestedColumns()}
         rows={nestedRowsTwoLevels}
@@ -167,7 +167,7 @@ export function Filterable() {
 export function NestedThreeLevels() {
   return (
     <GridTable<BeamNestedRow>
-      style={{ grouped: true }}
+      style={{ rowHeight: "fixed", grouped: true }}
       sorting={{ on: "client" }}
       columns={nestedColumnsThreeLevels}
       rows={nestedRowsThreeLevels}
@@ -179,7 +179,7 @@ export function NestedThreeLevels() {
 export function NestedNonGrouped() {
   return (
     <GridTable<BeamNestedRow>
-      style={{}}
+      style={{ rowHeight: "fixed" }}
       sorting={{ on: "client" }}
       columns={nestedColumnsTwoLevelsNoActions}
       rows={nestedRowsTwoLevels}
@@ -458,8 +458,8 @@ const flatRows: GridDataRow<BeamRow>[] = [
 type InputFieldRows = SimpleHeaderAndData<AuthorInput>;
 
 export function InputFieldStates() {
-  const styleFixed = getTableStyles({ form: true });
-  const styleFlexible = getTableStyles({ form: true, flexible: true });
+  const styleFixed = getTableStyles({ inlineEditing: true, rowHeight: "fixed" });
+  const styleFlexible = getTableStyles({ inlineEditing: true });
   const { getFormState } = useFormStates<AuthorInput>({
     config: formConfig,
     getId: (o) => o.id!,

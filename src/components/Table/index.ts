@@ -26,4 +26,4 @@ export * from "./SelectToggle";
 export { simpleDataRows, simpleHeader } from "./simpleHelpers";
 export type { SimpleHeaderAndData } from "./simpleHelpers";
 export { SortHeader } from "./SortHeader";
-export { cardStyle, condensedStyle, defaultStyle, useTableStyle } from "./styles";
+export { cardStyle, condensedStyle, defaultStyle, getTableStyles } from "./styles";

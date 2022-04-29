@@ -1430,7 +1430,7 @@ function tableRowStyles(as: RenderAs, column?: GridColumn<any>) {
 }
 
 function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
-  const defKeys: (keyof GridStyleDef)[] = ["form", "grouped", "totals", "flexible"];
+  const defKeys: (keyof GridStyleDef)[] = ["inlineEditing", "grouped", "totals", "rowHeight"];
   const keys = safeKeys(style);
   if (keys.length === 0 || keys.some((k) => defKeys.includes(k))) {
     return getTableStyles(style as GridStyleDef);

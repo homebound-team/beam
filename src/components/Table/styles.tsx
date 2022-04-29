@@ -42,17 +42,17 @@ export const cardStyle: GridStyle = {
 };
 
 export interface GridStyleDef {
-  form?: boolean;
+  inlineEditing?: boolean;
   grouped?: boolean;
-  flexible?: boolean;
+  rowHeight?: "fixed" | "flexible";
   totals?: boolean;
 }
 
 function memoizedTableStyles() {
   const cache: Record<string, GridStyle> = {};
   return (props?: GridStyleDef) => {
-    const { form = false, grouped = false, flexible = false, totals = false } = props || {};
-    const key = `${form}|${grouped}|${flexible}|${totals}`;
+    const { inlineEditing = false, grouped = false, rowHeight = "flexible", totals = false } = props || {};
+    const key = `${inlineEditing}|${grouped}|${rowHeight}|${totals}`;
 
     if (!cache[key]) {
       const groupedLevels = {
@@ -70,10 +70,10 @@ function memoizedTableStyles() {
         headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
         cellCss: {
           ...Css.gray900.xs.bgWhite.aic.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
-          ...(flexible ? Css.py2.$ : Css.nowrap.hPx(form ? 48 : 36).$),
+          ...(rowHeight === "flexible" ? Css.py2.$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
           ...(totals ? Css.gray700.smEm.hPx(40).mb1.bgWhite.boxShadow("none").$ : {}),
         },
-        presentationSettings: { borderless: true, typeScale: "xs", wrap: flexible },
+        presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
         levels: totals ? {} : grouped ? groupedLevels : defaultLevels,
       };
     }
