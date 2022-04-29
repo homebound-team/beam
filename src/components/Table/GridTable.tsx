@@ -32,10 +32,12 @@ import {
 import { RowStateContext } from "src/components/Table/RowState";
 import { SortHeader } from "src/components/Table/SortHeader";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/sortRows";
+import { getTableStyles, GridStyleDef } from "src/components/Table/styles";
 import { SortOn, SortState, useSortState } from "src/components/Table/useSortState";
 import { Css, Margin, Only, Palette, Properties, Typography, Xss } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
+import { safeKeys } from "src/utils";
 import { shallowEqual } from "src/utils/shallowEqual";
 import { defaultStyle } from ".";
 
@@ -135,7 +137,7 @@ export interface NestedCardStyle {
 }
 
 export interface GridTableDefaults {
-  style: GridStyle;
+  style: GridStyle | GridStyleDef;
   stickyHeader: boolean;
 }
 
@@ -227,7 +229,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
   /** Sets the rows to be wrapped by mobx observers. */
   observeRows?: boolean;
   /** A combination of CSS settings to set the static look & feel (vs. rowStyles which is per-row styling). */
-  style?: GridStyle;
+  style?: GridStyle | GridStyleDef;
   /**
    * If provided, collapsed rows on the table persists when the page is reloaded.
    *
@@ -272,7 +274,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     as = "div",
     columns,
     rows,
-    style = defaults.style,
+    style: maybeStyle = defaults.style,
     rowStyles,
     stickyHeader = defaults.stickyHeader,
     stickyOffset = "0",
@@ -298,6 +300,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     api.setActiveRowId(activeRowId);
     return api;
   }, [props.api]);
+
+  const style = resolveStyles(maybeStyle);
 
   const { rowState } = api;
   rowState.rows = rows;
@@ -1069,7 +1073,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
       {columns.map((column, columnIndex) => {
         const { wrapAction = true, isAction = false } = column;
 
-        const applyFirstContentColumnStyles = !isAction && !firstContentColumnStylesApplied;
+        const applyFirstContentColumnStyles = !isHeader && !isAction && !firstContentColumnStylesApplied;
         firstContentColumnStylesApplied ||= applyFirstContentColumnStyles;
 
         if (column.mw) {
@@ -1423,4 +1427,13 @@ function tableRowStyles(as: RenderAs, column?: GridColumn<any>) {
         ...(thWidth ? Css.w(thWidth).$ : {}),
       }
     : {};
+}
+
+function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
+  const defKeys: (keyof GridStyleDef)[] = ["inlineEditing", "grouped", "totals", "rowHeight"];
+  const keys = safeKeys(style);
+  if (keys.length === 0 || keys.some((k) => defKeys.includes(k))) {
+    return getTableStyles(style as GridStyleDef);
+  }
+  return style as GridStyle;
 }

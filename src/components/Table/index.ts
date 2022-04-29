@@ -26,14 +26,4 @@ export * from "./SelectToggle";
 export { simpleDataRows, simpleHeader } from "./simpleHelpers";
 export type { SimpleHeaderAndData } from "./simpleHelpers";
 export { SortHeader } from "./SortHeader";
-export {
-  beamFixedStyle,
-  beamFlexibleStyle,
-  beamNestedFixedStyle,
-  beamNestedFlexibleStyle,
-  beamTotalsFixedStyle,
-  beamTotalsFlexibleStyle,
-  cardStyle,
-  condensedStyle,
-  defaultStyle,
-} from "./styles";
+export { cardStyle, condensedStyle, defaultStyle, getTableStyles } from "./styles";

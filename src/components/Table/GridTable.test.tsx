@@ -15,7 +15,6 @@ import {
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import { RowStateContext } from "src/components/Table/RowState";
 import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/simpleHelpers";
-import { beamFixedStyle } from "src/components/Table/styles";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Checkbox, TextField } from "src/inputs";
@@ -1638,7 +1637,7 @@ describe("GridTable", () => {
 
     // Given a table initially rendered without an active row id
     const r = await render(
-      <GridTable columns={columns} rows={rows} rowStyles={activeRowIdRowStyles} style={beamFixedStyle} />,
+      <GridTable columns={columns} rows={rows} rowStyles={activeRowIdRowStyles} style={{ cellCss: Css.bgWhite.$ }} />,
     );
     // And the first row/cell has the default background color
     expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.White);
