@@ -35,9 +35,17 @@ export function Button(props: ButtonProps) {
     download,
     ...otherProps
   } = props;
+  const showExternalLinkIcon = (typeof onPress === "string" && isAbsoluteUrl(onPress)) || openInNew;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, ...otherProps, ...menuTriggerProps };
-  const { label, icon = download ? "download" : undefined, variant = "primary", size = "sm", buttonRef } = ariaProps;
+  const {
+    label,
+    // Default the icon based on other properties.
+    icon = download ? "download" : showExternalLinkIcon ? "linkExternal" : undefined,
+    variant = "primary",
+    size = "sm",
+    buttonRef,
+  } = ariaProps;
   const ref = buttonRef || useRef(null);
   const tid = useTestIds(props, label);
   const { buttonProps, isPressed } = useButton(
@@ -60,10 +68,7 @@ export function Button(props: ButtonProps) {
     <>
       {icon && <Icon xss={iconStyles[size]} icon={icon} />}
       {label}
-      {/* Do not apply endAdornment for links to Absolute URLs. Component will apply the 'linkExternal' icon as an endAdornment by default */}
-      {!(typeof onPress === "string" && isAbsoluteUrl(onPress)) && endAdornment && (
-        <span css={Css.ml1.$}>{endAdornment}</span>
-      )}
+      {endAdornment && <span css={Css.ml1.$}>{endAdornment}</span>}
     </>
   );
   const buttonAttrs = {
@@ -92,11 +97,6 @@ export function Button(props: ButtonProps) {
           {...(download ? { download: "" } : { target: "_blank", rel: "noreferrer noopener" })}
         >
           {buttonContent}
-          {!download && (
-            <span css={Css.ml1.$}>
-              <Icon icon="linkExternal" />
-            </span>
-          )}
         </a>
       ) : (
         <Link {...buttonAttrs} to={onPress} className={navLink}>
