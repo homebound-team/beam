@@ -4,6 +4,7 @@ import { GridStyle } from ".";
 /** Our original table look & feel/style. */
 export const defaultStyle: GridStyle = {
   rootCss: Css.gray700.$,
+  totalsCellCss: Css.bgWhite.$,
   betweenRowsCss: Css.bt.bGray400.$,
   firstNonHeaderRowCss: Css.add({ borderTopStyle: "none" }).$,
   cellCss: Css.py2.px3.$,
@@ -45,14 +46,13 @@ export interface GridStyleDef {
   inlineEditing?: boolean;
   grouped?: boolean;
   rowHeight?: "fixed" | "flexible";
-  totals?: boolean;
 }
 
 function memoizedTableStyles() {
   const cache: Record<string, GridStyle> = {};
   return (props?: GridStyleDef) => {
-    const { inlineEditing = false, grouped = false, rowHeight = "flexible", totals = false } = props || {};
-    const key = `${inlineEditing}|${grouped}|${rowHeight}|${totals}`;
+    const { inlineEditing = false, grouped = false, rowHeight = "flexible" } = props || {};
+    const key = `${inlineEditing}|${grouped}|${rowHeight}`;
 
     if (!cache[key]) {
       const groupedLevels = {
@@ -68,13 +68,13 @@ function memoizedTableStyles() {
         emptyCell: "-",
         firstRowMessageCss: Css.tc.py3.$,
         headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
+        totalsCellCss: Css.bgWhite.gray700.smEm.hPx(52).pt0.pbPx(12).boxShadow("none").$,
         cellCss: {
           ...Css.gray900.xs.bgWhite.aic.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
           ...(rowHeight === "flexible" ? Css.py2.$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
-          ...(totals ? Css.gray700.smEm.hPx(40).mb1.bgWhite.boxShadow("none").$ : {}),
         },
         presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
-        levels: totals ? {} : grouped ? groupedLevels : defaultLevels,
+        levels: grouped ? groupedLevels : defaultLevels,
       };
     }
 

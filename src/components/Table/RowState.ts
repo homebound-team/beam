@@ -95,7 +95,7 @@ export class RowState {
         // Just mash the header + all rows + children as selected
         const map = new Map<string, SelectedState>();
         map.set("header", "checked");
-        visit(this.rows, (row) => this.visibleRows.has(row.id) && map.set(row.id, "checked"));
+        visit(this.rows, (row) => this.visibleRows.has(row.id) && row.kind !== "totals" && map.set(row.id, "checked"));
         this.selectedRows.replace(map);
       } else {
         // Similarly "unmash" all rows + children.
