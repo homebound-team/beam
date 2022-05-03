@@ -33,6 +33,8 @@ export const Icon = () => {
     "starFilled",
     "cloudSave",
     "attachment",
+    "archive",
+    "unarchive",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
