@@ -87,39 +87,25 @@ type BeamNestedRow = BeamTotalsRow | HeaderRow | BeamGrandParentRow | BeamParent
 
 export function NestedFixed() {
   return (
-    <div css={Css.mw("fit-content").$}>
-      <GridTable<BeamNestedRow>
-        style={{ grouped: true, totals: true, rowHeight: "fixed" }}
-        columns={nestedColumnsTwoLevels}
-        rows={beamTotalsRows}
-      />
-      <GridTable<BeamNestedRow>
-        style={{ grouped: true, rowHeight: "fixed" }}
-        sorting={{ on: "client" }}
-        columns={nestedColumnsTwoLevels}
-        rows={nestedRowsTwoLevels}
-        stickyHeader
-      />
-    </div>
+    <GridTable<BeamNestedRow>
+      style={{ grouped: true, rowHeight: "fixed" }}
+      sorting={{ on: "client" }}
+      columns={nestedColumnsTwoLevels}
+      rows={[...beamTotalsRows, ...nestedRowsTwoLevels]}
+      stickyHeader
+    />
   );
 }
 
 export function NestedFlexible() {
   return (
-    <div css={Css.mw("fit-content").$}>
-      <GridTable<BeamNestedRow>
-        style={{ grouped: true, totals: true }}
-        columns={nestedColumnsTwoLevels}
-        rows={beamTotalsRows}
-      />
-      <GridTable<BeamNestedRow>
-        style={{ grouped: true }}
-        sorting={{ on: "client" }}
-        columns={nestedColumnsTwoLevels}
-        rows={nestedRowsTwoLevels}
-        stickyHeader
-      />
-    </div>
+    <GridTable<BeamNestedRow>
+      style={{ grouped: true }}
+      sorting={{ on: "client" }}
+      columns={nestedColumnsTwoLevels}
+      rows={[...beamTotalsRows, ...nestedRowsTwoLevels]}
+      stickyHeader
+    />
   );
 }
 
@@ -155,7 +141,7 @@ export function Filterable() {
         style={{ rowHeight: "fixed", grouped: true }}
         sorting={sorting}
         columns={beamNestedColumns()}
-        rows={nestedRowsTwoLevels}
+        rows={[...beamTotalsRows, ...nestedRowsTwoLevels]}
         stickyHeader
         filter={filter}
         api={api}

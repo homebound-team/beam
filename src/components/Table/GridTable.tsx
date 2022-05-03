@@ -75,6 +75,8 @@ export interface GridStyle {
    * rows are wrapper with Chrome rows.
    */
   headerCellCss?: Properties;
+  /** Applied to 'kind: "totals"' cells */
+  totalsCellCss?: Properties;
   /** Applied to the first cell of all rows, i.e. for table-wide padding or left-side borders. */
   firstCellCss?: Properties;
   /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
@@ -213,7 +215,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
   rowLookup?: MutableRefObject<GridRowLookup<R> | undefined>;
   /** Whether the header row should be sticky. */
   stickyHeader?: boolean;
-  stickyOffset?: string;
+  stickyOffset?: number;
   /** Configures sorting via a hash, does not need to be stable. */
   sorting?: GridSortConfig<S>;
   /** Shown in the first row slot, if there are no rows to show, i.e. 'No rows found'. */
@@ -277,7 +279,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     style: maybeStyle = defaults.style,
     rowStyles,
     stickyHeader = defaults.stickyHeader,
-    stickyOffset = "0",
+    stickyOffset = 0,
     xss,
     filter,
     filterMaxRows,
@@ -330,6 +332,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     return rows;
   }, [columns, rows, sortOn, sortState]);
 
+  let hasTotalsRow = false;
+
   // Filter rows - ensures parent rows remain in the list if any children match the filter.
   const filterRows: (acc: ParentChildrenTuple<R>[], row: GridDataRow<R>) => ParentChildrenTuple<R>[] = useCallback(
     (acc: ParentChildrenTuple<R>[], row: GridDataRow<R>) => {
@@ -337,11 +341,14 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const filters = (filter && filter.split(/ +/)) || [];
       const matches =
         row.kind === "header" ||
+        row.kind === "totals" ||
         filters.length === 0 ||
         !!row.pin ||
         filters.every((f) =>
           columns.map((c) => applyRowFn(c, row, api, 0)).some((maybeContent) => matchesFilter(maybeContent, f)),
         );
+
+      hasTotalsRow ||= row.kind === "totals";
 
       // If the row matches, add it in
       if (matches) {
@@ -364,7 +371,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   );
 
   // Flatten + component-ize the sorted rows.
-  let [headerRows, filteredRows]: [RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
+  let [headerRows, filteredRows, totalsRows]: [RowTuple<R>[], RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
     function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
@@ -381,7 +388,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             style,
             rowStyles,
             stickyHeader,
-            stickyOffset,
+            // If we have a totals row then add the height of the totals row (52px) to the `stickyOffset` for the "header" kind
+            stickyOffset: hasTotalsRow && row.kind === "header" ? 52 + stickyOffset : stickyOffset,
             openCards: nestedCards ? nestedCards.currentOpenCards() : undefined,
             columnSizes,
             level,
@@ -395,6 +403,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: RowTuple<R>[] = [];
+    const totalsRows: RowTuple<R>[] = [];
     const filteredRows: RowTuple<R>[] = [];
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
@@ -420,6 +429,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           headerRows.push([row[0], makeRowComponent(row[0], level)]);
           return;
         }
+
+        if (row[0].kind === "totals") {
+          totalsRows.push([row[0], makeRowComponent(row[0], level)]);
+          return;
+        }
+
         visit(row, level);
         addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
       });
@@ -430,7 +445,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     visitRows(maybeSorted.reduce(filterRows, []), !!nestedCards, 0);
     nestedCards && nestedCards.done();
 
-    return [headerRows, filteredRows];
+    return [headerRows, filteredRows, totalsRows];
   }, [
     as,
     maybeSorted,
@@ -501,6 +516,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           id,
           columns,
           headerRows,
+          totalsRows,
           filteredRows,
           firstRowMessage,
           stickyHeader,
@@ -527,6 +543,7 @@ function renderDiv<R extends Kinded>(
   id: string,
   columns: GridColumn<R>[],
   headerRows: RowTuple<R>[],
+  totalsRows: RowTuple<R>[],
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   _stickyHeader: boolean,
@@ -552,6 +569,7 @@ function renderDiv<R extends Kinded>(
       }}
       data-testid={id}
     >
+      {totalsRows.map(([, node]) => node)}
       {headerRows.map(([, node]) => node)}
       {/* Show an info message if it's set. */}
       {firstRowMessage && (
@@ -570,6 +588,7 @@ function renderTable<R extends Kinded>(
   id: string,
   columns: GridColumn<R>[],
   headerRows: RowTuple<R>[],
+  totalsRows: RowTuple<R>[],
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   _stickyHeader: boolean,
@@ -592,7 +611,7 @@ function renderTable<R extends Kinded>(
       }}
       data-testid={id}
     >
-      <thead>{headerRows.map(([, node]) => node)}</thead>
+      <thead>{[...totalsRows, ...headerRows].map(([, node]) => node)}</thead>
       <tbody>
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
@@ -633,6 +652,7 @@ function renderVirtual<R extends Kinded>(
   id: string,
   columns: GridColumn<R>[],
   headerRows: RowTuple<R>[],
+  totalsRows: RowTuple<R>[],
   filteredRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
@@ -666,10 +686,18 @@ function renderVirtual<R extends Kinded>(
         Footer: () => <div css={footerStyle} />,
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
-      topItemCount={(stickyHeader ? headerRows.length : 0) + (firstRowMessage ? 1 : 0)}
+      topItemCount={(stickyHeader ? headerRows.length + totalsRows.length : 0) + (firstRowMessage ? 1 : 0)}
       itemContent={(index) => {
-        // Since we have two arrays of rows: `headerRows` and `filteredRow` we
+        // Since we have three arrays of rows: `headerRows`, `totalsRows`, and `filteredRow` we
         // must determine which one to render.
+
+        // Determine if we need to render a totals row
+        if (index < totalsRows.length) {
+          return totalsRows[index][1];
+        }
+
+        // Reset index
+        index -= totalsRows.length;
 
         // Determine if we need to render a header row
         if (index < headerRows.length) {
@@ -697,7 +725,9 @@ function renderVirtual<R extends Kinded>(
         // Lastly render `filteredRow`
         return filteredRows[index][1];
       }}
-      totalCount={(headerRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)}
+      totalCount={
+        (headerRows.length || 0) + (totalsRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)
+      }
     />
   );
 }
@@ -1001,7 +1031,7 @@ interface GridRowProps<R extends Kinded, S> {
   style: GridStyle;
   rowStyles: GridRowStyles<R> | undefined;
   stickyHeader: boolean;
-  stickyOffset: string;
+  stickyOffset: number;
   sortOn: SortOn;
   sortState?: SortState<S>;
   setSortKey?: (value: S) => void;
@@ -1037,8 +1067,9 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const { rowState } = useContext(RowStateContext);
   const isActive = useComputed(() => rowState.activeRowId === `${row.kind}_${row.id}`, [row, rowState]);
 
-  // We treat the "header" kind as special for "good defaults" styling
+  // We treat the "header" and "totals" kind as special for "good defaults" styling
   const isHeader = row.kind === "header";
+  const isTotals = row.kind === "totals";
   const rowStyle = rowStyles?.[row.kind];
   const Row = as === "table" ? "tr" : "div";
 
@@ -1060,7 +1091,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     // Maybe add the sticky header styles
-    ...(isHeader && stickyHeader ? Css.sticky.top(stickyOffset).z2.$ : undefined),
+    ...((isHeader || isTotals) && stickyHeader ? Css.sticky.topPx(stickyOffset).z2.$ : undefined),
     ...getNestedCardStyles(row, openCardStyles, style, isActive),
   };
 
@@ -1151,8 +1182,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
+          // Then apply any totals-specific override
+          ...(isTotals && style.totalsCellCss),
           // Or level-specific styling
-          ...(!isHeader && !!style.levels && style.levels[level]?.cellCss),
+          ...(!isHeader && !isTotals && !!style.levels && style.levels[level]?.cellCss),
           // Level specific styling for the first content column
           ...(applyFirstContentColumnStyles && !!style.levels && style.levels[level]?.firstContentColumn),
           // The specific cell's css (if any from GridCellContent)
@@ -1430,7 +1463,7 @@ function tableRowStyles(as: RenderAs, column?: GridColumn<any>) {
 }
 
 function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
-  const defKeys: (keyof GridStyleDef)[] = ["inlineEditing", "grouped", "totals", "rowHeight"];
+  const defKeys: (keyof GridStyleDef)[] = ["inlineEditing", "grouped", "rowHeight"];
   const keys = safeKeys(style);
   if (keys.length === 0 || keys.some((k) => defKeys.includes(k))) {
     return getTableStyles(style as GridStyleDef);

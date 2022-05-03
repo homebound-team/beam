@@ -951,12 +951,26 @@ export function StickyColumnsNestedCards() {
   );
 }
 
+type RowWithTotals = SimpleHeaderAndData<Data> | { kind: "totals"; id: "totals"; data: { value: number | undefined } };
+
 export function StickyColumnsAndHeader() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px", sticky: "left" };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
-  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
-  const rows: GridDataRow<Row>[] = useMemo(
+  const nameColumn: GridColumn<RowWithTotals> = {
+    header: "Name",
+    totals: "Totals",
+    data: ({ name }) => name,
+    w: "200px",
+    sticky: "left",
+  };
+  const valueColumn: GridColumn<RowWithTotals> = {
+    header: "Value",
+    totals: ({ value }) => value,
+    data: ({ value }) => value,
+    w: "200px",
+  };
+  const actionColumn: GridColumn<RowWithTotals> = { header: "Actions", totals: "", data: "Actions", w: "200px" };
+  const rows: GridDataRow<RowWithTotals>[] = useMemo(
     () => [
+      { kind: "totals", id: "totals", data: { value: 100 } },
       simpleHeader,
       ...zeroTo(50).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `ccc ${i}`, value: i } })),
     ],
@@ -967,7 +981,7 @@ export function StickyColumnsAndHeader() {
   // Scroll wrapping element's x & y coordinates to demonstrate proper z-indices for sticky header and columns.
   useEffect(() => {
     if (scrollWrap.current) {
-      scrollWrap.current.scroll(45, 26);
+      scrollWrap.current.scroll(45, 100);
     }
   }, []);
 
@@ -979,18 +993,30 @@ export function StickyColumnsAndHeader() {
 }
 
 export function StickyColumnsAndHeaderVirtualized() {
-  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px", sticky: "left" };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
-  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
-  const rows: GridDataRow<Row>[] = useMemo(
+  const nameColumn: GridColumn<RowWithTotals> = {
+    header: "Name",
+    totals: "Totals",
+    data: ({ name }) => name,
+    w: "200px",
+    sticky: "left",
+  };
+  const valueColumn: GridColumn<RowWithTotals> = {
+    header: "Value",
+    totals: ({ value }) => value,
+    data: ({ value }) => value,
+    w: "200px",
+  };
+  const actionColumn: GridColumn<RowWithTotals> = { header: "Actions", totals: "", data: "Actions", w: "200px" };
+  const rows: GridDataRow<RowWithTotals>[] = useMemo(
     () => [
+      { kind: "totals", id: "totals", data: { value: 100 } },
       simpleHeader,
       ...zeroTo(50).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `ccc ${i}`, value: i } })),
     ],
     [],
   );
 
-  const api = useGridTableApi<Row>();
+  const api = useGridTableApi<RowWithTotals>();
 
   // Scroll the list prior to snapshot to ensure sticky header lays on top of sticky columns.
   useEffect(() => {
