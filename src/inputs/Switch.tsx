@@ -69,7 +69,7 @@ export function Switch(props: SwitchProps) {
         <div
           aria-hidden="true"
           css={{
-            ...Css.wPx(toggleWidth(compact)).hPx(toggleHeight(compact)).bgGray200.br12.relative.transition.$,
+            ...Css.wPx(40).hPx(toggleHeight(compact)).bgGray200.br12.relative.transition.$,
             ...(isHovered && switchHoverStyles),
             ...(isKeyboardFocus && switchFocusStyles),
             ...(isDisabled && Css.bgGray300.$),
@@ -114,8 +114,7 @@ export function Switch(props: SwitchProps) {
 /** Styles */
 // Element sizes
 const toggleHeight = (isCompact: boolean) => (isCompact ? 16 : 24);
-const toggleWidth = (isCompact: boolean) => (isCompact ? 44 : 40);
-const circleDiameter = (isCompact: boolean) => (isCompact ? 14 : 20);
+const circleDiameter = (isCompact: boolean) => (isCompact ? 12 : 20);
 
 // Switcher/Toggle element styles
 export const switchHoverStyles = Css.bgGray400.$;
@@ -127,7 +126,7 @@ const switchCircleDefaultStyles = (isCompact: boolean) => ({
   ...Css.wPx(circleDiameter(isCompact))
     .hPx(circleDiameter(isCompact))
     .br100.bgWhite.bshBasic.absolute.leftPx(2)
-    .topPx(isCompact ? 1 : 2).transition.df.aic.jcc.$,
+    .topPx(2).transition.df.aic.jcc.$,
   svg: Css.hPx(toggleHeight(isCompact) / 2).wPx(toggleHeight(isCompact) / 2).$,
 });
 
