@@ -1175,6 +1175,36 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
 
+  it("getSelectedRows can see update rows", async () => {
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+    const _columns = [selectColumn<Row>(), ...columns];
+    // Given a component using a useComputed against getSelectedRows
+    function Test({ rows }: { rows: GridDataRow<Row>[] }) {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      const selectedNames = useComputed(() => {
+        return _api
+          .getSelectedRows("data")
+          .map((r) => r.data.name)
+          .join(",");
+      }, [_api]);
+      return (
+        <div>
+          <div data-testid="selectedNames">{selectedNames}</div>
+          <GridTable<Row> api={_api} columns={_columns} rows={rows} />
+        </div>
+      );
+    }
+    const r = await render(<Test rows={rows} />);
+    click(r.select_1);
+    // And selected rows is initially calc-d
+    expect(r.selectedNames()).toHaveTextContent("foo");
+    // When we re-render with an updated row
+    await r.rerender(<Test rows={[rows[0], { kind: "data", id: "1", data: { name: "foo2", value: 1 } }, rows[2]]} />);
+    // Then selected computed sees the new value
+    expect(r.selectedNames()).toHaveTextContent("foo2");
+  });
+
   it("only returns selected visible rows", async () => {
     // Given a parent with a child and grandchildren
     const rows: GridDataRow<NestedRow>[] = [

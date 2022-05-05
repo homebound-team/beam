@@ -1,6 +1,6 @@
+import equal from "fast-deep-equal";
 import { autorun, IReactionDisposer } from "mobx";
 import { useMemo, useRef, useState } from "react";
-import equal from "fast-deep-equal"
 
 interface Current<T> {
   // Track the mobx autorunner
