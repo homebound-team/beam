@@ -1,4 +1,4 @@
-import { comparer, makeAutoObservable, ObservableMap, ObservableSet, reaction } from "mobx";
+import { comparer, makeAutoObservable, observable, ObservableMap, ObservableSet, reaction } from "mobx";
 import React from "react";
 import { GridDataRow } from "src/components/Table/GridTable";
 import { visit } from "src/components/Table/visitor";
@@ -39,7 +39,15 @@ export class RowState {
   constructor() {
     // Make ourselves an observable so that mobx will do caching of .collapseIds so
     // that it'll be a stable identity for GridTable to useMemo against.
-    makeAutoObservable(this, { rows: false } as any); // as any b/c rows is private, so the mapped type doesn't see it
+    makeAutoObservable(
+      this,
+      // We only shallow observe rows so that:
+      // a) we don't deeply/needlessly proxy-ize a large Apollo fragment cache, but
+      // b) if rows changes, we re-run computeds like getSelectedRows that may need to see the
+      // updated _contents_ of a given row, even if our other selected/visible row states don't change.
+      // (as any b/c rows is private, so the mapped type doesn't see it)
+      { rows: observable.shallow } as any,
+    );
     // Whenever our `visibleRows` change (i.e. via filtering) then we need to re-derive header and parent rows' selected state.
     reaction(
       () => [...this.visibleRows.values()].sort(),
