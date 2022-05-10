@@ -1,11 +1,11 @@
 import { AriaButtonProps } from "@react-types/button";
 import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { Link } from "react-router-dom";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Css, Palette } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, noop } from "src/utils";
+import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { useTestIds } from "src/utils/useTestIds";
 
 export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
@@ -88,6 +88,7 @@ export function Button(props: ButtonProps) {
     ...buttonProps,
     ...focusProps,
     ...hoverProps,
+    className: typeof onPress === "string" ? navLink : undefined,
     css: {
       ...Css.buttonBase.tt("inherit").$,
       ...baseStyles,
@@ -99,31 +100,11 @@ export function Button(props: ButtonProps) {
     ...tid,
   };
 
-  const button =
-    typeof onPress === "string" ? (
-      isAbsoluteUrl(onPress) || openInNew || download ? (
-        <a
-          {...buttonAttrs}
-          href={onPress}
-          className={navLink}
-          {...(download ? { download: "" } : { target: "_blank", rel: "noreferrer noopener" })}
-        >
-          {buttonContent}
-        </a>
-      ) : (
-        <Link {...buttonAttrs} to={onPress} className={navLink}>
-          {buttonContent}
-        </Link>
-      )
-    ) : (
-      <button {...buttonAttrs}>{buttonContent}</button>
-    );
-
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip
   return maybeTooltip({
     title: resolveTooltip(disabled, tooltip),
     placement: "top",
-    children: button,
+    children: getButtonOrLink(buttonContent, onPress, buttonAttrs, openInNew, download),
   });
 }
 

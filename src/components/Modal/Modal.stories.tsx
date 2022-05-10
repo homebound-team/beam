@@ -81,17 +81,27 @@ export function ModalForm() {
           <FormStateApp />
         </ModalBody>
         <ModalFooter>
-          <Button label="Submit" />
+          <Button label="Submit" onClick={noop} />
         </ModalFooter>
       </>
     </OpenModal>
   );
 }
 
-interface ModalExampleProps extends Pick<ModalProps, "size" | "forceScrolling" | "drawHeaderBorder">, TestModalContentProps {}
+interface ModalExampleProps
+  extends Pick<ModalProps, "size" | "forceScrolling" | "drawHeaderBorder">,
+    TestModalContentProps {}
 
 function ModalExample(props: ModalExampleProps) {
-  const { size, showLeftAction, initNumSentences = 1, forceScrolling, withTag, withDateField, drawHeaderBorder = false } = props;
+  const {
+    size,
+    showLeftAction,
+    initNumSentences = 1,
+    forceScrolling,
+    withTag,
+    withDateField,
+    drawHeaderBorder = false,
+  } = props;
   const { openModal } = useModal();
   const open = () =>
     openModal({

@@ -38,6 +38,7 @@ import { Css, Margin, Only, Palette, Properties, Typography, Xss } from "src/Css
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { safeKeys } from "src/utils";
+import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { shallowEqual } from "src/utils/shallowEqual";
 import { defaultStyle } from ".";
 
@@ -998,6 +999,8 @@ export type GridCellContent = {
   typeScale?: Typography;
   /** Allows the cell to stay in place when the user scrolls horizontally */
   sticky?: "left" | "right";
+  /** If provided, content of the cell will be wrapped within a <button /> or <a /> tag depending on if the value is a function or a string. */
+  onClick?: () => {} | string;
 };
 
 type MaybeFn<T> = T | (() => T);
@@ -1258,7 +1261,7 @@ function isJSX(content: any): boolean {
 
 /** If a column def return just string text for a given row, apply some default styling. */
 function toContent(
-  content: ReactNode | GridCellContent,
+  maybeContent: ReactNode | GridCellContent,
   isHeader: boolean,
   canSortColumn: boolean,
   isClientSideSorting: boolean,
@@ -1266,7 +1269,7 @@ function toContent(
   as: RenderAs,
   alignment: GridCellAlignment,
 ): ReactNode {
-  content = isGridCellContent(content) ? content.content : content;
+  let content = isGridCellContent(maybeContent) ? maybeContent.content : maybeContent;
   if (typeof content === "function") {
     // Actually create the JSX by calling `content()` here (which should be as late as
     // possible, i.e. only for visible rows if we're in a virtual table).
@@ -1284,11 +1287,21 @@ function toContent(
       "GridTables with as=virtual & sortable columns should use functions that return JSX, instead of JSX",
     );
   }
+
+  content =
+    isGridCellContent(maybeContent) && !!maybeContent.onClick
+      ? getButtonOrLink(content, maybeContent.onClick, {
+          css: Css.maxw100.lightBlue700.if(style?.presentationSettings?.wrap === false).truncate.$,
+        })
+      : content;
+
   if (content && typeof content === "string" && isHeader && canSortColumn) {
     return <SortHeader content={content} iconOnLeft={alignment === "right"} />;
-  } else if (content && typeof content === "string" && style?.presentationSettings?.wrap === false) {
+  } else if (content && style?.presentationSettings?.wrap === false && typeof content === "string") {
+    // In order to truncate the text properly, then we need to wrap it in another element
+    // as our cell element is a flex container, which don't allow for applying truncation styles directly on it.
     return (
-      <span css={Css.mw0.truncate.$} title={content}>
+      <span css={Css.truncate.mw0.$} title={content}>
         {content}
       </span>
     );

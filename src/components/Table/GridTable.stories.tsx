@@ -1,3 +1,4 @@
+import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { observable } from "mobx";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
@@ -35,6 +36,7 @@ export default {
   component: GridTable,
   title: "Components/GridTable",
   parameters: { layout: "fullscreen", backgrounds: { default: "white" } },
+  decorators: [withRouter()],
 } as Meta;
 
 type Data = { name: string | undefined; value: number | undefined };
@@ -1102,4 +1104,44 @@ export function ActiveRowNestedCard() {
   const columns = useMemo(() => [nameColumn, nameColumn, actionColumn], []);
 
   return <GridTable columns={columns} rows={rowsWithHeader} style={nestedStyle} activeRowId="grandChild_p0c1g2" />;
+}
+
+export function TruncatingCells() {
+  const textCol: GridColumn<Row> = {
+    header: "As Text",
+    data: ({ name }) => ({ content: name }),
+  };
+  const elCol: GridColumn<Row> = {
+    header: "Truncated locally",
+    data: ({ name }) => ({
+      content: <span css={Css.green800.xsEm.truncate.$}>{name}</span>,
+    }),
+  };
+  const buttonCol: GridColumn<Row> = {
+    header: "As Button",
+    data: ({ name }) => ({ content: name, onClick: action("Name column button clicked") }),
+  };
+  const relativeLinkCol: GridColumn<Row> = {
+    header: "As Link",
+    data: ({ name }) => ({ content: <span>{name}</span>, onClick: "/relative/url" }),
+  };
+  const externalLinkCol: GridColumn<Row> = {
+    header: "As External Link",
+    data: ({ name }) => ({ content: <span>{name}</span>, onClick: "http://www.homebound.com" }),
+  };
+
+  return (
+    <div css={Css.wPx(800).$}>
+      <GridTable
+        columns={[textCol, elCol, buttonCol, relativeLinkCol, externalLinkCol]}
+        style={{ rowHeight: "fixed" }}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "Tony Stark, Iron Man", value: 1 } },
+          { kind: "data", id: "2", data: { name: "Natasha Romanova, Black Widow", value: 2 } },
+          { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
+        ]}
+      />
+    </div>
+  );
 }

@@ -1,21 +1,22 @@
 import { Button } from "src/components/Button";
+import { noop } from "src/utils";
 import { click, render, withRouter } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
 
 describe("Button", () => {
   it("can have a data-testid", async () => {
-    const r = await render(<Button label="Button" data-testid="custom" />);
+    const r = await render(<Button label="Button" data-testid="custom" onClick={noop} />);
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("custom");
   });
 
   it("defaults data-testid to the label", async () => {
-    const r = await render(<Button label="Button" />);
+    const r = await render(<Button label="Button" onClick={noop} />);
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("button");
   });
 
   it("can accept prefixed test ids", async () => {
     const testIds = useTestIds({}, "page1");
-    const r = await render(<Button label="Button" {...testIds.custom} />);
+    const r = await render(<Button label="Button" {...testIds.custom} onClick={noop} />);
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("page1_custom");
   });
 
@@ -29,7 +30,7 @@ describe("Button", () => {
   });
 
   it("can render a specific button type", async () => {
-    const r = await render(<Button label="Button" type="submit" />);
+    const r = await render(<Button label="Button" type="submit" onClick={noop} />);
     expect(r.button()).toHaveAttribute("type", "submit");
   });
 

@@ -8,7 +8,7 @@ import { Icon } from "src/components/Icon";
 import { IconButton, IconButtonProps } from "src/components/IconButton";
 import { Popover } from "src/components/internal";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils";
+import { noop, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 interface TextButtonTriggerProps extends Pick<ButtonProps, "label" | "variant" | "size" | "icon"> {}
@@ -56,10 +56,11 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           endAdornment={<Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} />}
           disabled={disabled}
           tooltip={tooltip}
+          onClick={noop}
           {...tid}
         />
       ) : (
-        <IconButton {...trigger} menuTriggerProps={menuTriggerProps} buttonRef={buttonRef} {...tid} />
+        <IconButton {...trigger} menuTriggerProps={menuTriggerProps} buttonRef={buttonRef} {...tid} onClick={noop} />
       )}
       {state.isOpen && (
         <Popover
