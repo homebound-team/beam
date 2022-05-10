@@ -102,7 +102,7 @@ export function SuperDrawer(): ReactPortal | null {
               // Preventing clicks from triggering parent onClick
               onClick={(e) => e.stopPropagation()}
             >
-              <header css={Css.df.p3.bb.bGray200.df.aic.jcsb.$}>
+              <header css={Css.df.p3.bb.bGray200.df.aic.jcsb.gap2.$}>
                 {/* Left */}
                 <div css={Css.df.aic.$}>
                   <div css={Css.xl2Em.gray900.mr2.$} {...testId.title} ref={drawerHeaderRef}>
@@ -113,7 +113,7 @@ export function SuperDrawer(): ReactPortal | null {
                 {/* Right */}
                 {!modalState.current && (
                   // Forcing height to 32px to match title height
-                  <div css={Css.df.childGap3.aic.hPx(32).$}>
+                  <div css={Css.df.childGap3.aic.hPx(32).fs0.$}>
                     {titleRightContent || null}
                     {/* Disable buttons is handlers are not given or if childContent is shown */}
                     <ButtonGroup
