@@ -168,6 +168,25 @@ export function OpenWithTitleRightContent() {
   );
 }
 
+export function LongTitle() {
+  const { openInDrawer } = useSuperDrawer();
+  function open() {
+    openInDrawer({
+      title: "A very long title that will cause it to wrap. ".repeat(2),
+      content: <TestDrawerContent book={Books[0]} />,
+      titleLeftContent: <Tag text={"ASSIGNED"} type={"success"} />,
+      titleRightContent: <Button label="Manage RFP" onClick={() => {}} />,
+    });
+  }
+  useEffect(open, [openInDrawer]);
+  return (
+    <>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open at Modal</h1>
+      <Button label="Show SuperDrawer" onClick={open} />
+    </>
+  );
+}
+
 type Book = { bookTitle: string; bookDescription: string; authorName: string; authorDescription: string };
 type Row = SimpleHeaderAndData<Book>;
 
