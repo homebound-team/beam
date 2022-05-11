@@ -46,7 +46,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
   useEffect(() => tree.update("items", { label: "items", items } as MenuSection), [items]);
 
   return (
-    <FocusScope restoreFocus>
+    <FocusScope>
       <ul
         css={{
           // Using `max-height: inherit` allows us to take advantage of the height set on the overlay container, which updates based on the available space for the overlay within the viewport
