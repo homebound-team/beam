@@ -89,7 +89,7 @@ export function Button(props: ButtonProps) {
     ...focusProps,
     ...hoverProps,
     css: {
-      ...Css.buttonBase.$,
+      ...Css.buttonBase.tt("inherit").$,
       ...baseStyles,
       ...(isHovered && !isPressed ? hoverStyles : {}),
       ...(isPressed ? pressedStyles : {}),

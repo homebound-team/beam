@@ -2,6 +2,7 @@ import { createContext, MutableRefObject, PropsWithChildren, useContext, useMemo
 import { OverlayProvider } from "react-aria";
 import { Modal, ModalProps } from "src/components/Modal/Modal";
 import { PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
+import { SnackbarProvider } from "src/components/Snackbar/SnackbarContext";
 import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
 import { CanCloseCheck, CheckFn } from "src/types";
@@ -84,13 +85,15 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
   return (
     <BeamContext.Provider value={{ ...context }}>
       <PresentationProvider {...presentationProps}>
-        {/* OverlayProvider is required for Modals generated via React-Aria */}
-        <OverlayProvider>
-          {children}
-          {/*If the drawer is open, assume it will show modal content internally. */}
-          {modalRef.current && drawerContentStackRef.current.length === 0 && <Modal {...modalRef.current} />}
-        </OverlayProvider>
-        <SuperDrawer />
+        <SnackbarProvider>
+          {/* OverlayProvider is required for Modals generated via React-Aria */}
+          <OverlayProvider>
+            {children}
+            {/*If the drawer is open, assume it will show modal content internally. */}
+            {modalRef.current && drawerContentStackRef.current.length === 0 && <Modal {...modalRef.current} />}
+          </OverlayProvider>
+          <SuperDrawer />
+        </SnackbarProvider>
       </PresentationProvider>
     </BeamContext.Provider>
   );
