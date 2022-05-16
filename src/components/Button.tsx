@@ -3,7 +3,7 @@ import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef } from "rea
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Link } from "react-router-dom";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, noop } from "src/utils";
 import { useTestIds } from "src/utils/useTestIds";
@@ -22,6 +22,7 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
   download?: boolean;
+  contrast?: boolean;
 }
 
 export function Button(props: ButtonProps) {
@@ -33,6 +34,7 @@ export function Button(props: ButtonProps) {
     tooltip,
     openInNew,
     download,
+    contrast = false,
     ...otherProps
   } = props;
   const showExternalLinkIcon = (typeof onPress === "string" && isAbsoluteUrl(onPress)) || openInNew;
@@ -59,10 +61,20 @@ export function Button(props: ButtonProps) {
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
   const { baseStyles, hoverStyles, disabledStyles, pressedStyles } = useMemo(
-    () => getButtonStyles(variant, size),
-    [variant, size],
+    () => getButtonStyles(variant, size, contrast),
+    [variant, size, contrast],
   );
-  const focusRingStyles = useMemo(() => (variant === "danger" ? Css.bshDanger.$ : Css.bshFocus.$), [variant]);
+  const focusStyles = useMemo(
+    () =>
+      !contrast
+        ? variant === "danger"
+          ? Css.bshDanger.$
+          : Css.bshFocus.$
+        : Css.boxShadow(`0 0 0 2px ${variant === "tertiary" ? Palette.LightBlue700 : Palette.White}`).if(
+            variant === "tertiary",
+          ).bgGray700.white.$,
+    [variant, contrast],
+  );
 
   const buttonContent = (
     <>
@@ -82,7 +94,7 @@ export function Button(props: ButtonProps) {
       ...(isHovered && !isPressed ? hoverStyles : {}),
       ...(isPressed ? pressedStyles : {}),
       ...(isDisabled ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
-      ...(isFocusVisible ? focusRingStyles : {}),
+      ...(isFocusVisible ? focusStyles : {}),
     },
     ...tid,
   };
@@ -115,54 +127,58 @@ export function Button(props: ButtonProps) {
   });
 }
 
-function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {
+function getButtonStyles(variant: ButtonVariant, size: ButtonSize, contrast: boolean) {
+  const styles = variantStyles(contrast)[variant];
   if (variant === "text") {
     // The text variant does not support the 'size'. The 'size' prop only effects the button's height and padding which is not relevant for this variant.
-    return variantStyles[variant];
+    return styles;
   }
   return {
-    ...variantStyles[variant],
-    baseStyles: { ...variantStyles[variant].baseStyles, ...sizeStyles[size] },
+    ...styles,
+    baseStyles: { ...styles.baseStyles, ...sizeStyles[size] },
   };
 }
 
-const variantStyles: Record<ButtonVariant, { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; pressedStyles: {} }> =
-  {
-    primary: {
-      baseStyles: Css.bgLightBlue700.white.$,
-      hoverStyles: Css.bgLightBlue900.$,
-      pressedStyles: Css.bgLightBlue500.$,
-      disabledStyles: Css.bgLightBlue200.$,
-    },
+const variantStyles: (
+  contrast: boolean,
+) => Record<ButtonVariant, { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; pressedStyles: {} }> = (
+  contrast,
+) => ({
+  primary: {
+    baseStyles: Css.bgLightBlue700.white.if(contrast).bgLightBlue400.$,
+    hoverStyles: Css.bgLightBlue900.if(contrast).bgLightBlue500.$,
+    pressedStyles: Css.bgLightBlue500.if(contrast).bgLightBlue900.$,
+    disabledStyles: Css.bgLightBlue200.if(contrast).gray600.bgLightBlue900.$,
+  },
 
-    secondary: {
-      baseStyles: Css.bgWhite.bGray300.bw1.ba.gray800.$,
-      hoverStyles: Css.bgGray100.$,
-      pressedStyles: Css.bgGray200.$,
-      disabledStyles: Css.bgWhite.gray400.$,
-    },
+  secondary: {
+    baseStyles: Css.bgWhite.bGray300.bw1.ba.gray800.$,
+    hoverStyles: Css.bgGray100.if(contrast).bgGray300.$,
+    pressedStyles: Css.bgGray200.if(contrast).bgGray100.$,
+    disabledStyles: Css.bgWhite.gray400.$,
+  },
 
-    tertiary: {
-      baseStyles: Css.bgTransparent.lightBlue700.$,
-      hoverStyles: Css.bgGray100.$,
-      pressedStyles: Css.lightBlue900.$,
-      disabledStyles: Css.gray400.$,
-    },
+  tertiary: {
+    baseStyles: Css.bgTransparent.lightBlue700.if(contrast).lightBlue400.$,
+    hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
+    pressedStyles: Css.lightBlue900.if(contrast).bgWhite.gray900.$,
+    disabledStyles: Css.gray400.if(contrast).gray700.$,
+  },
 
-    danger: {
-      baseStyles: Css.bgRed900.white.$,
-      hoverStyles: Css.bgRed500.$,
-      pressedStyles: Css.bgRed900.$,
-      disabledStyles: Css.bgRed200.$,
-    },
+  danger: {
+    baseStyles: Css.bgRed900.white.if(contrast).bgRed800.$,
+    hoverStyles: Css.bgRed500.if(contrast).bgRed600.$,
+    pressedStyles: Css.bgRed900.if(contrast).bgRed800.$,
+    disabledStyles: Css.bgRed200.if(contrast).bgRed900.gray600.$,
+  },
 
-    text: {
-      baseStyles: Css.lightBlue700.add("fontSize", "inherit").$,
-      hoverStyles: {},
-      pressedStyles: {},
-      disabledStyles: Css.lightBlue300.$,
-    },
-  };
+  text: {
+    baseStyles: Css.lightBlue700.add("fontSize", "inherit").if(contrast).lightBlue400.$,
+    hoverStyles: Css.lightBlue600.if(contrast).lightBlue300.$,
+    pressedStyles: Css.lightBlue700.if(contrast).lightBlue200.$,
+    disabledStyles: Css.lightBlue300.if(contrast).lightBlue700.$,
+  },
+});
 
 const sizeStyles: Record<ButtonSize, {}> = {
   sm: Css.hPx(32).pxPx(12).$,
@@ -176,5 +192,5 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
   lg: Css.mrPx(10).$,
 };
 
-type ButtonSize = "sm" | "md" | "lg";
-type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger" | "text";
+export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger" | "text";

@@ -21,6 +21,7 @@ export const parameters: Parameters = {
       { name: "light", value: "#F8F8F8" },
       // Adding this to help view with off white hover states
       { name: "white", value: "#FFF" },
+      { name: "dark", value: "rgba(53,53,53,1)" },
     ],
     // Defaulting to an off white to better see the color palette
     default: "light",
