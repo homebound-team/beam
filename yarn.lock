@@ -2461,10 +2461,10 @@
   dependencies:
     "@testing-library/react" "^12.1.2"
 
-"@homebound/truss@^1.111.3":
-  version "1.111.3"
-  resolved "https://registry.npmjs.org/@homebound/truss/-/truss-1.111.3.tgz"
-  integrity sha512-P37w4W/4mYC+QKLd+2UyWx1xIpd0OuudxEKfGB742xJFvU/4LFXU0S2e/xt4Y0RRB2xsgbo9wrGoNIOVEqpgcg==
+"@homebound/truss@^1.113.0":
+  version "1.113.0"
+  resolved "https://registry.yarnpkg.com/@homebound/truss/-/truss-1.113.0.tgz#20f5adaacd6fc80485b3e8b61c90b905975641f9"
+  integrity sha512-yfJbvT2pCUB3TN0l8DOHfa340CSaVi3043GWFmsuFO7SLrfcBlMLeOzwtAGeQLsAnCbunVG/YtXycTzGX9Fiiw==
   dependencies:
     csstype "^2.6.10"
     ts-node "^10.7.0"

@@ -237,6 +237,13 @@ class CssBuilder<T extends Properties1> {
   get jcsa() { return this.add("justifyContent", "space-around"); }
   get jcse() { return this.add("justifyContent", "space-evenly"); }
   jc(value: Properties["justifyContent"]) { return this.add("justifyContent", value); }
+  get jifs() { return this.add("justifyItems", "flex-start"); }
+  get jife() { return this.add("justifyItems", "flex-end"); }
+  get jic() { return this.add("justifyItems", "center"); }
+  get jisb() { return this.add("justifyItems", "space-between"); }
+  get jisa() { return this.add("justifyItems", "space-around"); }
+  get jise() { return this.add("justifyItems", "space-evenly"); }
+  ji(value: Properties["justifyItems"]) { return this.add("justifyItems", value); }
   get asfs() { return this.add("alignSelf", "flex-start"); }
   get asfe() { return this.add("alignSelf", "flex-end"); }
   get asc() { return this.add("alignSelf", "center"); }

@@ -78,7 +78,7 @@
     "@emotion/react": "^11.1.5",
     "@homebound/rtl-react-router-utils": "^1.0.3",
     "@homebound/rtl-utils": "^2.59.3",
-    "@homebound/truss": "^1.111.3",
+    "@homebound/truss": "^1.113.0",
     "@homebound/tsconfig": "^1.0.3",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^9.0.0",
