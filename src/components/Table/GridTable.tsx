@@ -181,6 +181,7 @@ export type GridSortConfig<S> =
       on: "client";
       /** The optional initial column (index in columns) and direction to sort. */
       initial?: [S | GridColumn<any>, Direction] | undefined;
+      caseSensitive?: boolean;
     }
   | {
       on: "server";
@@ -323,14 +324,14 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // Make a single copy of our current collapsed state, so we'll have a single observer.
   const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
 
-  const [sortState, setSortKey, sortOn] = useSortState<R, S>(columns, props.sorting);
+  const [sortState, setSortKey, sortOn, caseSensitive] = useSortState<R, S>(columns, props.sorting);
   const maybeSorted = useMemo(() => {
     if (sortOn === "client" && sortState) {
       // If using client-side sort, the sortState use S = number
-      return sortRows(columns, rows, sortState as any as SortState<number>);
+      return sortRows(columns, rows, sortState as any as SortState<number>, caseSensitive);
     }
     return rows;
-  }, [columns, rows, sortOn, sortState]);
+  }, [columns, rows, sortOn, sortState, caseSensitive]);
 
   let hasTotalsRow = false;
 

@@ -54,7 +54,7 @@ export function ClientSideSorting() {
       rows={[
         simpleHeader,
         { kind: "data", id: "1", data: { name: "c", value: 1 } },
-        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "2", data: { name: "B", value: 2 } },
         { kind: "data", id: "3", data: { name: "a", value: 3 } },
       ]}
     />
