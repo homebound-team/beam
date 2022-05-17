@@ -7,12 +7,13 @@ export function sortRows<R extends Kinded>(
   columns: GridColumn<R>[],
   rows: GridDataRow<R>[],
   sortState: SortState<number>,
+  caseSensitive: boolean,
 ): GridDataRow<R>[] {
-  const sorted = sortBatch(columns, rows, sortState);
+  const sorted = sortBatch(columns, rows, sortState, caseSensitive);
   // Recursively sort child rows
   sorted.forEach((row, i) => {
     if (row.children) {
-      sorted[i].children = sortRows(columns, row.children, sortState);
+      sorted[i].children = sortRows(columns, row.children, sortState, caseSensitive);
     }
   });
 
@@ -23,6 +24,7 @@ function sortBatch<R extends Kinded>(
   columns: GridColumn<R>[],
   batch: GridDataRow<R>[],
   sortState: SortState<number>,
+  caseSensitive: boolean,
 ): GridDataRow<R>[] {
   // When client-side sort, the sort value is the column index
   const [value, direction] = sortState;
@@ -31,8 +33,8 @@ function sortBatch<R extends Kinded>(
 
   // Make a shallow copy for sorting to avoid mutating the original list
   return [...batch].sort((a, b) => {
-    const v1 = sortValue(applyRowFn(column, a, {} as any, 0));
-    const v2 = sortValue(applyRowFn(column, b, {} as any, 0));
+    const v1 = sortValue(applyRowFn(column, a, {} as any, 0), caseSensitive);
+    const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
     const v1e = v1 === null || v1 === undefined;
     const v2e = v2 === null || v2 === undefined;
     if (a.pin || b.pin) {
@@ -51,7 +53,7 @@ function sortBatch<R extends Kinded>(
 }
 
 /** Look at a row and get its sort value. */
-function sortValue(value: ReactNode | GridCellContent): any {
+function sortValue(value: ReactNode | GridCellContent, caseSensitive: boolean): any {
   // Check sortValue and then fallback on value
   let maybeFn = value;
   if (value && typeof value === "object") {
@@ -68,7 +70,9 @@ function sortValue(value: ReactNode | GridCellContent): any {
   if (maybeFn instanceof Function) {
     return maybeFn();
   }
-  return maybeFn;
+
+  // If it is a string, then always lower case it for comparisons
+  return typeof maybeFn === "string" && !caseSensitive ? maybeFn.toLowerCase() : maybeFn;
 }
 
 export function ensureClientSideSortValueIsSortable(
@@ -79,7 +83,7 @@ export function ensureClientSideSortValueIsSortable(
   maybeContent: ReactNode | GridCellContent,
 ): void {
   if (process.env.NODE_ENV !== "production" && !isHeader && sortOn === "client" && column.clientSideSort !== false) {
-    const value = sortValue(maybeContent);
+    const value = sortValue(maybeContent, false);
     if (!canClientSideSort(value)) {
       throw new Error(`Column ${idx} passed an unsortable value, use GridCellContent or clientSideSort=false`);
     }

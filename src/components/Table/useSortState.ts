@@ -17,7 +17,7 @@ export type SortOn = "client" | "server" | undefined;
 export function useSortState<R extends Kinded, S>(
   columns: GridColumn<R, S>[],
   sorting?: GridSortConfig<S>,
-): [SortState<S> | undefined, (value: S) => void, SortOn] {
+): [SortState<S> | undefined, (value: S) => void, SortOn, boolean] {
   // If we're server-side sorting, use the caller's `sorting.value` prop to initialize our internal
   // `useState`. After this, we ignore `sorting.value` because we assume it should match what our
   // `setSortState` just changed anyway (in response to the user sorting a column).
@@ -63,7 +63,10 @@ export function useSortState<R extends Kinded, S>(
     [initialSortState, sortState, onSort],
   );
 
-  return [sortState, setSortKey, sorting?.on];
+  // If sorting is done on the client, the by default the sort will NOT be case sensitive
+  const caseSensitive = sorting?.on === "client" ? !!sorting.caseSensitive : false;
+
+  return [sortState, setSortKey, sorting?.on, caseSensitive];
 }
 
 // Exported for testing purposes
