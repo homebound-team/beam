@@ -16,8 +16,8 @@ export function NoticeExamples() {
     {},
     { hideCloseButton: true, action: { label: "Action", onClick: action("Action clicked"), variant: "tertiary" } },
     { action: { label: "Action", onClick: action("Action clicked"), variant: "tertiary" } },
-    { type: "success", action: { label: "Action", onClick: action("Action clicked"), variant: "primary" } },
-    { type: "error" },
+    { icon: "success", action: { label: "Action", onClick: action("Action clicked"), variant: "primary" } },
+    { icon: "error" },
   ];
   return (
     <div css={Css.dg.gtc("repeat(3, 420px)").jifs.aifs.gap("64px 16px").$}>

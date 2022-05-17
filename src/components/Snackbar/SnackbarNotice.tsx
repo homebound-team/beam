@@ -14,8 +14,8 @@ export interface SnackbarNoticeProps {
   message: ReactNode;
   /** This notice will persist on the screen until systematically closed by the app or by the user clicking the close button. */
   persistent?: boolean;
-  /** Supplying type will add an Icon to the left side of the notification. */
-  type?: SnackbarNoticeTypes;
+  /** Defines the icon that will show on the left side of the notification. */
+  icon?: SnackbarNoticeTypes;
   /** Unique identifier to allow notice to close itself */
   id: string;
   /** Removes the snackbar notice from the stack */
@@ -23,20 +23,20 @@ export interface SnackbarNoticeProps {
 }
 
 export function SnackbarNotice(props: SnackbarNoticeProps) {
-  const { type, message, action, hideCloseButton, persistent, onClose } = props;
+  const { icon, message, action, hideCloseButton, persistent, onClose } = props;
   const tid = useTestIds(props, "snackbar");
   // Only allow the "close" button to be hidden if not a `persistent` notice. Otherwise we could get in a state where the user cannot remove the notice from the screen.
   const reallyHideClose = hideCloseButton && !persistent;
   return (
-    <div css={Css.white.bgGray800.br4.base.df.maxwPx(420).$} {...tid}>
-      {type && (
-        <span css={Css.fs0.plPx(12).mtPx(12).asfs.$}>
-          <Icon icon={typeToIcon[type]} {...tid.icon} />
+    <div css={Css.white.bgGray800.br4.base.df.aic.maxwPx(420).$} {...tid}>
+      {icon && (
+        <span css={Css.fs0.plPx(12).$}>
+          <Icon icon={typeToIcon[icon]} {...tid.icon} />
         </span>
       )}
 
       <span
-        css={Css.lineClamp3.pr3.myPx(12).plPx(type ? 8 : 24).$}
+        css={Css.lineClamp3.pr2.myPx(12).plPx(icon ? 8 : 16).$}
         // Provide a 'title' attribute if we can in case the text is truncated
         {...(typeof message === "string" ? { title: message } : undefined)}
         {...tid.message}
@@ -47,7 +47,7 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
       {(action || !reallyHideClose) && (
         <span css={Css.fs0.df.aic.$}>
           {action && (
-            <span css={Css.ttu.prPx(!reallyHideClose ? 4 : 8).$}>
+            <span css={Css.ttu.sm.prPx(!reallyHideClose && action.variant !== "text" ? 4 : 8).$}>
               <Button contrast {...action} {...tid.action} />
             </span>
           )}

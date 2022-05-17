@@ -29,7 +29,7 @@ describe("SnackbarNotice", () => {
   });
 
   it("can render the icon", async () => {
-    const r = await render(<SnackbarNotice id="1" onClose={noop} message="message" type="success" />);
+    const r = await render(<SnackbarNotice id="1" onClose={noop} message="message" icon="success" />);
     expect(r.snackbar_icon()).toBeInTheDocument();
   });
 

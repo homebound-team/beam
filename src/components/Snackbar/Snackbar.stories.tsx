@@ -17,7 +17,7 @@ export default {
   title: "Components/Snackbar",
   decorators: [withBeamDecorator],
   args: {
-    type: undefined,
+    icon: undefined,
     persistent: false,
     hideCloseButton: false,
     message: "Hey there, I am a snackbar notice!",
@@ -25,7 +25,7 @@ export default {
     actionVariant: undefined,
   },
   argTypes: {
-    type: { control: { type: "select", options: [undefined, "error", "info", "success", "warning"] } },
+    icon: { control: { type: "select", options: [undefined, "error", "info", "success", "warning"] } },
     actionVariant: { control: { type: "select", options: ["primary", "secondary", "tertiary", "text", "danger"] } },
   },
   parameters: { controls: { exclude: "notices" } },

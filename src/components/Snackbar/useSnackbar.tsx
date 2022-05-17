@@ -63,7 +63,7 @@ export function useSnackbar(): UseSnackbarHook {
         },
       };
     },
-    [onClose],
+    [onClose, setNotices],
   );
 
   const closeNotice = useCallback((id: string) => onClose(id), [onClose]);
