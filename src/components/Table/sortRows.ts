@@ -68,7 +68,7 @@ function sortValue(value: ReactNode | GridCellContent, caseSensitive: boolean): 
   }
   // Watch for functions that need to read from a potentially-changing proxy
   if (maybeFn instanceof Function) {
-    return maybeFn();
+    maybeFn = maybeFn();
   }
 
   // If it is a string, then always lower case it for comparisons
