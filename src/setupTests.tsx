@@ -23,3 +23,14 @@ jest.mock("@react-aria/ssr", () => {
 
 // Add toHaveStyleRule
 expect.extend(matchers);
+
+expect.extend({
+  toNotBeInTheDom(rtlElement) {
+    try {
+      rtlElement();
+      return { pass: false, message: () => "Should not have been in the dom" };
+    } catch (e) {
+      return { pass: true, message: () => "" };
+    }
+  },
+});

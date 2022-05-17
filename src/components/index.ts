@@ -19,6 +19,7 @@ export * from "./Modal";
 export * from "./Modal/useModal";
 export { NavLink } from "./NavLink";
 export { PresentationProvider } from "./PresentationContext";
+export * from "./Snackbar";
 export * from "./Stepper";
 export * from "./SuperDrawer";
 export * from "./Table";
