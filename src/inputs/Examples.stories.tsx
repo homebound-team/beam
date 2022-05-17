@@ -3,6 +3,7 @@ import { Meta } from "@storybook/react";
 import { useEffect } from "react";
 import { SuperDrawerContent, useSuperDrawer } from "src/components";
 import { Css } from "src/Css";
+import { noop } from "src/utils";
 import { withBeamDecorator } from "src/utils/sb";
 import { SelectField } from "./SelectField";
 import { TextAreaField } from "./TextAreaField";
@@ -25,7 +26,12 @@ export function SuperDrawerWithForm() {
 
 function DrawerWithInputs() {
   return (
-    <SuperDrawerContent actions={[{ label: "Cancel" }, { label: "Save" }]}>
+    <SuperDrawerContent
+      actions={[
+        { label: "Cancel", onClick: noop },
+        { label: "Save", onClick: noop },
+      ]}
+    >
       <form css={{ ...Css.df.fdc.childGap5.$, fieldset: Css.df.fdc.childGap2.$, legend: Css.baseEm.mb2.$ }}>
         <fieldset>
           <legend>Details</legend>

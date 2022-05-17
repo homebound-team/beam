@@ -17,6 +17,7 @@ import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
 import { GridDataRow, GridRowLookup } from "src/components/Table";
 import { Css } from "src/Css";
+import { noop } from "src/utils";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { SuperDrawerContent, useSuperDrawer } from "./index";
 import { SuperDrawer as SuperDrawerComponent } from "./SuperDrawer";
@@ -363,7 +364,7 @@ function TestDetailContent({ book, onPurchase }: { book: Book; onPurchase?: () =
     <SuperDrawerContent
       actions={[
         { label: `Back to "${book.bookTitle}"`, onClick: closeDrawerDetail, variant: "tertiary" },
-        { label: `Purchase "${book.bookTitle}"`, onClick: onPurchase, disabled: !onPurchase },
+        { label: `Purchase "${book.bookTitle}"`, onClick: onPurchase ?? noop, disabled: !onPurchase },
       ]}
     >
       <h2 css={Css.xlEm.mb1.$}>{book.authorName}</h2>

@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react";
 import { Button, ButtonSize, ButtonVariant } from "src";
 import { Css } from "src/Css";
+import { noop } from "src/utils";
 import { withRouter } from "src/utils/sb";
 
 export default {
@@ -27,16 +28,31 @@ export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
               <h2 css={Css.xl.gc("1/5").if(idx !== 0).mt3.$}>{variantName}</h2>
               {sizes.map((size) => (
                 <>
-                  <Button size={size} variant={variant} label={`${variantName} button`} contrast={contrast} />
-                  <Button size={size} variant={variant} disabled label="Disabled" contrast={contrast} />
+                  <Button
+                    size={size}
+                    variant={variant}
+                    label={`${variantName} button`}
+                    contrast={contrast}
+                    onClick={noop}
+                  />
+                  <Button size={size} variant={variant} disabled label="Disabled" contrast={contrast} onClick={noop} />
                   <Button
                     size={size}
                     variant={variant}
                     icon="plus"
                     label={`${variantName} button`}
                     contrast={contrast}
+                    onClick={noop}
                   />
-                  <Button size={size} variant={variant} disabled icon="plus" label="Disabled" contrast={contrast} />
+                  <Button
+                    size={size}
+                    variant={variant}
+                    disabled
+                    icon="plus"
+                    label="Disabled"
+                    contrast={contrast}
+                    onClick={noop}
+                  />
                 </>
               ))}
             </>
@@ -47,18 +63,18 @@ export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
       <div css={Css.mt3.$}>
         <h2 css={Css.xl.$}>Text</h2>
         <div css={Css.my1.dg.gtc("repeat(2, max-content)").jifs.gap("8px 16px").$}>
-          <Button variant="text" label="Text Button" contrast={contrast} />
-          <Button variant="text" disabled label="Disabled" contrast={contrast} />
-          <Button icon="plus" variant="text" label="Text Button" contrast={contrast} />
-          <Button icon="plus" variant="text" disabled label="Disabled" contrast={contrast} />
+          <Button variant="text" label="Text Button" contrast={contrast} onClick={noop} />
+          <Button variant="text" disabled label="Disabled" contrast={contrast} onClick={noop} />
+          <Button icon="plus" variant="text" label="Text Button" contrast={contrast} onClick={noop} />
+          <Button icon="plus" variant="text" disabled label="Disabled" contrast={contrast} onClick={noop} />
         </div>
         <p css={Css.mb1.xs.$}>
-          Example of a <Button variant="text" label="Text Button" contrast={contrast} /> placed inheriting "xs" font
-          size.
+          Example of a <Button variant="text" label="Text Button" contrast={contrast} onClick={noop} /> placed
+          inheriting "xs" font size.
         </p>
         <p css={Css.lg.$}>
-          Example of a <Button variant="text" label="Text Button" contrast={contrast} /> placed inheriting "lg" font
-          size.
+          Example of a <Button variant="text" label="Text Button" contrast={contrast} onClick={noop} /> placed
+          inheriting "lg" font size.
         </p>
       </div>
     </div>
@@ -108,11 +124,12 @@ export function ButtonWithTooltip() {
             </div>
           }
           label="Upload"
+          onClick={noop}
         />
       </div>
       <div>
         <h2>Tooltip provided via 'tooltip' property</h2>
-        <Button tooltip="Create a new entity" label="Add new" />
+        <Button tooltip="Create a new entity" label="Add new" onClick={noop} />
       </div>
     </div>
   );

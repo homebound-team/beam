@@ -9,6 +9,7 @@ import {
   Icons,
   Palette,
 } from "src";
+import { noop } from "src/utils";
 import { withRouter } from "src/utils/sb";
 
 export default {
@@ -84,11 +85,12 @@ export function WithTooltip() {
             </div>
           }
           icon="arrowBack"
+          onClick={noop}
         />
       </div>
       <div>
         <h2>Tooltip provided via 'tooltip' property</h2>
-        <IconButton icon="arrowBack" tooltip="Back to previous page" />
+        <IconButton icon="arrowBack" tooltip="Back to previous page" onClick={noop} />
       </div>
     </div>
   );
