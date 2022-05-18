@@ -14,7 +14,6 @@ import {
   ScrollableParent,
   simpleHeader,
   SimpleHeaderAndData,
-  useScrollableParent,
 } from "src/index";
 import { NumberField } from "src/inputs/NumberField";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
@@ -169,36 +168,50 @@ function ScrollableTableExample({ numCols, numRows }: { numCols?: number; numRow
   );
 }
 
-function TableExample({ numCols = 10, numRows = 100 }: { numCols?: number; numRows?: number }) {
+type Row = SimpleHeaderAndData<{ name: string; value: number }>;
+function TableExample({
+  numCols = 10,
+  numRows = 100,
+  virtualized = false,
+}: {
+  numCols?: number;
+  numRows?: number;
+  virtualized?: boolean;
+}) {
+  const rows: GridDataRow<Row>[] = useMemo(
+    () => [
+      simpleHeader,
+      ...zeroTo(numRows).map((i) => ({
+        kind: "data" as const,
+        id: String(i),
+        data: { name: `ccc ${i}`, value: i + 1 },
+      })),
+    ],
+    [numRows],
+  );
+  const columns: GridColumn<Row>[] = useMemo(
+    () =>
+      zeroTo(numCols).map((i) => ({
+        header: `Header ${i + 1}`,
+        data: ({ value }) => `Cell ${i + 1}x${value}`,
+        w: "100px",
+        sticky: i === 0 ? "left" : undefined,
+      })),
+    [numCols],
+  );
+
   return (
-    <table css={Css.w100.$}>
-      <thead>
-        <tr>
-          {zeroTo(numCols).map((i) => (
-            <th key={`th-${i}`} css={Css.sticky.px1.bgGray50.top0.tl.nowrap.$}>{`Heading ${i + 1}`}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {zeroTo(numRows).map((trIdx) => (
-          <tr key={`tr-${trIdx}`}>
-            {zeroTo(numCols).map((tdIdx) => (
-              <td key={`td-${tdIdx}`} css={Css.px1.nowrap.$}>{`Cell ${tdIdx + 1}x${trIdx + 1}`}</td>
-            ))}
-          </tr>
-        ))}
-        <tr>
-          <td colSpan={4} css={Css.px1.$}>
-            Last Row!
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <GridTable
+      as={virtualized ? "virtual" : "div"}
+      stickyHeader
+      columns={columns}
+      rows={rows}
+      style={{ rowHeight: "fixed" }}
+    />
   );
 }
 
 function VirutalizedPage() {
-  const { pl } = useScrollableParent();
   return (
     <>
       <TestHeader title="Change Event - Mud Room" />
@@ -218,24 +231,10 @@ function VirutalizedPage() {
         ¯\_(ツ)_/¯
       */}
       <ScrollableContent virtualized>
-        <VirutalizedTable />
+        <TableExample virtualized numCols={30} />
       </ScrollableContent>
     </>
   );
-}
-
-type Row = SimpleHeaderAndData<{ name: string }>;
-function VirutalizedTable() {
-  const rows: GridDataRow<Row>[] = useMemo(
-    () => [
-      simpleHeader,
-      ...zeroTo(500).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `ccc ${i}` } })),
-    ],
-    [],
-  );
-  const columns: GridColumn<Row>[] = useMemo(() => [{ header: "Name", data: ({ name }) => name }], []);
-
-  return <GridTable as="virtual" columns={columns} stickyHeader={true} rows={rows} />;
 }
 
 function TestLayout({ children }: PropsWithChildren<{}>) {
@@ -253,7 +252,7 @@ function TestProjectLayout({ children }: PropsWithChildren<{}>) {
       <TestTopNav />
       {/* Required to use `overflowHidden` to prevent the `PreventBrowserScroll`'s scrollbar from kicking in,
           which would scroll both the side nav and the main content at the same time. */}
-      <div css={Css.df.overflowHidden.$}>
+      <div css={Css.df.overflowHidden.h100.$}>
         <TestSideNav />
         <ScrollableParent xss={Css.px3.$}>{children}</ScrollableParent>
       </div>

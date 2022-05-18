@@ -558,6 +558,11 @@ function renderDiv<R extends Kinded>(
     <div
       ref={tableRef as any}
       css={{
+        // Use `fit-content` to ensure the width of the table takes up the full width of its content.
+        // Otherwise, the table's width would be that of its container, which may not be as wide as the table itself.
+        // In cases where we have sticky columns on a very wide table, then the container which the columns "stick" to (which is the table),
+        // needs to be as wide as the table's content, or else we lose the "stickiness" once scrolling past width of the table's container.
+        ...Css.mw("fit-content").$,
         /*
           Using (n + 3) here to target all rows that are after the first non-header row. Since n starts at 0, we can use
           the + operator as an offset.
