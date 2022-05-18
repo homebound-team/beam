@@ -989,7 +989,21 @@ export function StickyColumnsAndHeader() {
 
   return (
     <div ref={scrollWrap} css={Css.wPx(500).hPx(500).overflowAuto.$}>
-      <GridTable columns={[nameColumn, valueColumn, actionColumn]} rows={rows} stickyHeader />
+      <GridTable
+        columns={[
+          nameColumn,
+          valueColumn,
+          valueColumn,
+          valueColumn,
+          valueColumn,
+          valueColumn,
+          valueColumn,
+          valueColumn,
+          actionColumn,
+        ]}
+        rows={rows}
+        stickyHeader
+      />
     </div>
   );
 }
@@ -1027,7 +1041,22 @@ export function StickyColumnsAndHeaderVirtualized() {
 
   return (
     <div css={Css.wPx(500).hPx(500).$}>
-      <GridTable columns={[nameColumn, valueColumn, actionColumn]} rows={rows} stickyHeader as="virtual" api={api} />
+      <GridTable
+        columns={[
+          nameColumn,
+          valueColumn,
+          valueColumn,
+          valueColumn,
+          valueColumn,
+          valueColumn,
+          valueColumn,
+          actionColumn,
+        ]}
+        rows={rows}
+        stickyHeader
+        as="virtual"
+        api={api}
+      />
     </div>
   );
 }
