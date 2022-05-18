@@ -1139,38 +1139,41 @@ export function TruncatingCells() {
   const textCol: GridColumn<Row> = {
     header: "As Text",
     data: ({ name }) => ({ content: name }),
+    w: "160px",
   };
   const elCol: GridColumn<Row> = {
     header: "Truncated locally",
     data: ({ name }) => ({
       content: <span css={Css.green800.xsEm.truncate.$}>{name}</span>,
     }),
+    w: "160px",
   };
   const buttonCol: GridColumn<Row> = {
     header: "As Button",
     data: ({ name }) => ({ content: name, onClick: action("Name column button clicked") }),
+    w: "160px",
   };
   const relativeLinkCol: GridColumn<Row> = {
     header: "As Link",
     data: ({ name }) => ({ content: <span>{name}</span>, onClick: "/relative/url" }),
+    w: "160px",
   };
   const externalLinkCol: GridColumn<Row> = {
     header: "As External Link",
     data: ({ name }) => ({ content: <span>{name}</span>, onClick: "http://www.homebound.com" }),
+    w: "160px",
   };
 
   return (
-    <div css={Css.wPx(800).$}>
-      <GridTable
-        columns={[textCol, elCol, buttonCol, relativeLinkCol, externalLinkCol]}
-        style={{ rowHeight: "fixed" }}
-        rows={[
-          simpleHeader,
-          { kind: "data", id: "1", data: { name: "Tony Stark, Iron Man", value: 1 } },
-          { kind: "data", id: "2", data: { name: "Natasha Romanova, Black Widow", value: 2 } },
-          { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
-        ]}
-      />
-    </div>
+    <GridTable
+      columns={[textCol, elCol, buttonCol, relativeLinkCol, externalLinkCol]}
+      style={{ rowHeight: "fixed" }}
+      rows={[
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "Tony Stark, Iron Man", value: 1 } },
+        { kind: "data", id: "2", data: { name: "Natasha Romanova, Black Widow", value: 2 } },
+        { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
+      ]}
+    />
   );
 }
