@@ -156,7 +156,7 @@ export class RowState {
         // Expand all means keep `collapsedIds` empty
         collapsedIds.splice(0, collapsedIds.length);
       } else {
-        // Otherwise splice `header` on the front of the list as a hint that we're in the collapsed-all state
+        // Otherwise push `header` to the list as a hint that we're in the collapsed-all state
         collapsedIds.push("header");
         // Find all non-leaf rows so that toggling "all collapsed" -> "all not collapsed" opens
         // the parent rows of any level.
@@ -185,7 +185,7 @@ export class RowState {
       if (collapsedIds.length === 1 && collapsedIds[0] === "header") {
         collapsedIds.splice(0, 1);
       } else {
-        // If every top level child has been collapsed, then splice the header to the front of the array to be considered collapsed as well.
+        // If every top level child has been collapsed, then push "header" into the array to be considered collapsed as well.
         if (this.rows.every((maybeParent) => (maybeParent.children ? collapsedIds.includes(maybeParent.id) : true))) {
           collapsedIds.push("header");
         }
