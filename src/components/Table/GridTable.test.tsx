@@ -52,7 +52,7 @@ const nestedColumns: GridColumn<NestedRow>[] = [
   {
     header: (data, { row }) => <Collapse id={row.id} />,
     parent: (data, { row }) => <Collapse id={row.id} />,
-    child: (data, { row }) => <Collapse id={row.id} />,
+    child: (data, { row }) => (row.children ? <Collapse id={row.id} /> : ""),
     grandChild: () => "",
   },
   selectColumn<NestedRow>({
@@ -1118,11 +1118,86 @@ describe("GridTable", () => {
     expect(row(r, 0)).toBeDefined();
     // And Child of parent 1 is shown
     expect(row(r, 2)).toBeDefined();
-    // And Parent 2 is collapesed
+    // And Parent 2 is collapsed
     expect(row(r, 4)).toBeUndefined();
 
     // Unset local storage
     localStorage.setItem(tableIdentifier, "");
+  });
+
+  it("updates collapse state in header when collapsing and expanding the parent rows", async () => {
+    // Given two parents with a child each
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        kind: "parent",
+        id: "p1",
+        data: { name: "parent 1" },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+      {
+        kind: "parent",
+        id: "p2",
+        data: { name: "parent 2" },
+        children: [{ kind: "child", id: "p2c1", data: { name: "child p2c1" } }],
+      },
+    ];
+
+    const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+
+    // Then the rows are all initially expanded state
+    expect(r.collapse_0().textContent).toBe("-");
+    expect(r.collapse_1().textContent).toBe("-");
+    expect(r.collapse_2().textContent).toBe("-");
+
+    // When we close the parent rows
+    click(r.collapse_1());
+    click(r.collapse_2());
+
+    // Then expect the header and parent row collapse toggles are in the 'collapsed' state
+    expect(r.collapse_0().textContent).toBe("+");
+    expect(r.collapse_1().textContent).toBe("+");
+    expect(r.collapse_2().textContent).toBe("+");
+
+    // And when we open the parent rows back up
+    click(r.collapse_1());
+    click(r.collapse_2());
+
+    // Then expect the header and parent row collapse toggles are in the 'expanded' state
+    expect(r.collapse_0().textContent).toBe("-");
+    expect(r.collapse_1().textContent).toBe("-");
+    expect(r.collapse_2().textContent).toBe("-");
+  });
+
+  it("can toggle the header state after parent rows have been collapsed", async () => {
+    // Given two parents with a child each
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        kind: "parent",
+        id: "p1",
+        data: { name: "parent 1" },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+      {
+        kind: "parent",
+        id: "p2",
+        data: { name: "parent 2" },
+        children: [{ kind: "child", id: "p2c1", data: { name: "child p2c1" } }],
+      },
+    ];
+
+    const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+
+    // When we close one of the parent rows
+    click(r.collapse_1());
+    // And then click the header collapse toggle
+    click(r.collapse_0());
+
+    // Then expect the header and parent row collapse toggles are in the 'collapsed' state
+    expect(r.collapse_0().textContent).toBe("+");
+    expect(r.collapse_1().textContent).toBe("+");
+    expect(r.collapse_2().textContent).toBe("+");
   });
 
   it("can select all", async () => {

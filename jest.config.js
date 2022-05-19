@@ -7,4 +7,5 @@ module.exports = {
     "\\.(css|less|scss)$": "identity-obj-proxy",
   },
   snapshotSerializers: ["@emotion/jest/serializer"],
+  watchPlugins: ["jest-watch-typeahead/filename", "jest-watch-typeahead/testname"],
 };

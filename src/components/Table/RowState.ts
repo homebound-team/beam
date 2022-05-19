@@ -143,7 +143,7 @@ export class RowState {
 
   // Should be called in an Observer/useComputed to trigger re-renders
   isCollapsed(id: string): boolean {
-    return this.collapsedRows.has(id) || this.collapsedRows.has("header");
+    return this.collapsedRows.has(id);
   }
 
   toggleCollapsed(id: string): void {
@@ -151,12 +151,12 @@ export class RowState {
 
     // We have different behavior when going from expand/collapse all.
     if (id === "header") {
-      const isAllCollapsed = collapsedIds[0] === "header";
+      const isAllCollapsed = collapsedIds.includes("header");
       if (isAllCollapsed) {
         // Expand all means keep `collapsedIds` empty
         collapsedIds.splice(0, collapsedIds.length);
       } else {
-        // Otherwise push `header` on the list as a hint that we're in the collapsed-all state
+        // Otherwise push `header` to the list as a hint that we're in the collapsed-all state
         collapsedIds.push("header");
         // Find all non-leaf rows so that toggling "all collapsed" -> "all not collapsed" opens
         // the parent rows of any level.
@@ -179,6 +179,16 @@ export class RowState {
         collapsedIds.push(id);
       } else {
         collapsedIds.splice(i, 1);
+      }
+
+      // If all rows have been expanded individually, but the 'header' was collapsed, then remove the header from the collapsedIds so it reverts to the expanded state
+      if (collapsedIds.length === 1 && collapsedIds[0] === "header") {
+        collapsedIds.splice(0, 1);
+      } else {
+        // If every top level child has been collapsed, then push "header" into the array to be considered collapsed as well.
+        if (this.rows.every((maybeParent) => (maybeParent.children ? collapsedIds.includes(maybeParent.id) : true))) {
+          collapsedIds.push("header");
+        }
       }
     }
 
