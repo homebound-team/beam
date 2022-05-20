@@ -53,6 +53,23 @@ describe("BoundCheckboxGroupField", () => {
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith(["c:1"]);
   });
+
+  it("does not consider the form dirty if selection order changes", async () => {
+    const autoSave = jest.fn();
+    // Given a BoundCheckboxField with selected colors
+    const author: ObjectState<AuthorInput> = createObjectState(formConfig, { favoriteColors: ["c:1", "c:2"] });
+    const r = await render(<BoundCheckboxGroupField field={author.favoriteColors} options={colors} />);
+
+    // When deselecting the first option
+    click(r.blue());
+    // Then the form should be dirty
+    expect(author.dirty).toBe(true);
+    // Then reselecting the option (which would push to the end of the array selected values, but BoundCheckboxGroupField sorts the values)
+    click(r.blue());
+
+    // Then the form should no longer be dirty
+    expect(author.dirty).toBe(false);
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {

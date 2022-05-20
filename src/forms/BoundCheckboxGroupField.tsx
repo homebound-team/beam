@@ -27,9 +27,10 @@ export function BoundCheckboxGroupField(props: BoundCheckboxGroupFieldProps) {
       {() => (
         <CheckboxGroup
           label={label}
-          values={field.value || []}
+          // Sort the values so that the array's contents can properly assert if the field is dirty no matter which order options are added/removed
+          values={field.value?.sort() || []}
           onChange={(values) => {
-            onChange(values);
+            onChange(values.sort());
             field.maybeAutoSave();
           }}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
