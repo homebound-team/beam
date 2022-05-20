@@ -296,7 +296,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
-  const tableRef = useRef<HTMLElement>(null);
   // Use this ref to watch for changes in the GridTable's container and resize columns accordingly.
   const resizeRef = useRef<HTMLDivElement>(null);
 
@@ -322,7 +321,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // here instead.
   const { getCount } = useRenderCount();
 
-  const columnSizes = useSetupColumnSizes(style, columns, resizeRef, resizeTarget);
+  const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef);
 
   // Make a single copy of our current collapsed state, so we'll have a single observer.
   const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
@@ -528,7 +527,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           style.nestedCards?.firstLastColumnWidth,
           xss,
           virtuosoRef,
-          tableRef,
         )}
       </PresentationProvider>
     </RowStateContext.Provider>
@@ -555,11 +553,9 @@ function renderDiv<R extends Kinded>(
   firstLastColumnWidth: number | undefined,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
-  tableRef: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
   return (
     <div
-      ref={tableRef as any}
       css={{
         // Use `fit-content` to ensure the width of the table takes up the full width of its content.
         // Otherwise, the table's width would be that of its container, which may not be as wide as the table itself.
@@ -605,11 +601,9 @@ function renderTable<R extends Kinded>(
   _firstLastColumnWidth: number | undefined,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
-  tableRef: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
   return (
     <table
-      ref={tableRef as any}
       css={{
         ...Css.w100.add("borderCollapse", "collapse").$,
         ...Css.addIn("& > tbody > tr ", style.betweenRowsCss || {})
@@ -669,7 +663,6 @@ function renderVirtual<R extends Kinded>(
   firstLastColumnWidth: number | undefined,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
-  tableRef: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
@@ -681,12 +674,6 @@ function renderVirtual<R extends Kinded>(
     <Virtuoso
       overscan={5}
       ref={virtuosoRef}
-      scrollerRef={(ref) => {
-        // This is fired multiple times per render. Only set `tableRef.current` if it has changed
-        if (ref && tableRef.current !== ref) {
-          tableRef.current = ref as HTMLElement;
-        }
-      }}
       components={{
         // Applying a zIndex: 2 to ensure it stays on top of sticky columns
         TopItemList: React.forwardRef((props, ref) => (
