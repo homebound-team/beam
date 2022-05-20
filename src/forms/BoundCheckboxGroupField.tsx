@@ -11,7 +11,8 @@ export type BoundCheckboxGroupFieldProps = Omit<CheckboxGroupProps, "values" | "
   label?: string;
 };
 
-/** Wraps `TextField` and binds it to a form field. */
+/** Wraps `CheckboxGroup` and binds it to a form field.
+ * To make the field agnostic to the order of selected values, add `strictOrder: false` to the field's ObjectConfig */
 export function BoundCheckboxGroupField(props: BoundCheckboxGroupFieldProps) {
   const {
     field,
