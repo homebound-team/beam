@@ -335,7 +335,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     return rows;
   }, [columns, rows, sortOn, sortState, caseSensitive]);
 
-  let hasTotalsRow = false;
+  const hasTotalsRow = rows.some((row) => row.id === "totals");
 
   // Filter rows - ensures parent rows remain in the list if any children match the filter.
   const filterRows: (acc: ParentChildrenTuple<R>[], row: GridDataRow<R>) => ParentChildrenTuple<R>[] = useCallback(
@@ -350,8 +350,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         filters.every((f) =>
           columns.map((c) => applyRowFn(c, row, api, 0)).some((maybeContent) => matchesFilter(maybeContent, f)),
         );
-
-      hasTotalsRow ||= row.kind === "totals";
 
       // If the row matches, add it in
       if (matches) {
@@ -465,6 +463,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     columnSizes,
     collapsedIds,
     getCount,
+    hasTotalsRow,
   ]);
 
   let tooManyClientSideRows = false;
