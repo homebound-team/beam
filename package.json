@@ -1,6 +1,6 @@
 {
   "name": "@homebound/beam",
-  "version": "2.132.4",
+  "version": "2.133.0",
   "author": "Homebound",
   "license": "MIT",
   "main": "dist/index.js",
