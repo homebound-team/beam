@@ -22,7 +22,7 @@ export function Checkboxes() {
             onBlur={action("onBlur")}
             label="Default"
           />
-          <Checkbox onChange={action("onChange")} selected={false} label="Selected" />
+          <Checkbox onChange={action("onChange")} selected={true} label="Selected" />
           <Checkbox onChange={action("onChange")} selected="indeterminate" label="Indeterminate" />
           <Checkbox onChange={action("onChange")} selected={false} disabled label="Disabled while unselected" />
           <Checkbox onChange={action("onChange")} selected={true} disabled label="Disabled while selected" />
