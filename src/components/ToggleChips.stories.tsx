@@ -10,7 +10,7 @@ export default {
 
 export function DefaultToggleChips() {
   return (
-    <div css={Css.wPx(300).ba.$}>
+    <div css={Css.wPx(300).$}>
       <ToggleChips
         values={[{ name: "First Last" }, { name: "Second Last" }, { name: "Third Last" }, { name: "Fourth Last" }]}
         getLabel={(v) => v.name}
