@@ -297,6 +297,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const tableRef = useRef<HTMLElement>(null);
+  // Use this ref to watch for changes in the GridTable's container and resize columns accordingly.
+  const resizeRef = useRef<HTMLDivElement>(null);
 
   const api = useMemo<GridTableApiImpl<R>>(() => {
     const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
@@ -320,7 +322,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // here instead.
   const { getCount } = useRenderCount();
 
-  const columnSizes = useSetupColumnSizes(style, columns, tableRef, resizeTarget);
+  const columnSizes = useSetupColumnSizes(style, columns, resizeRef, resizeTarget);
 
   // Make a single copy of our current collapsed state, so we'll have a single observer.
   const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
@@ -513,6 +515,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   return (
     <RowStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
+        <div ref={resizeRef} css={Css.w100.$} />
         {renders[_as](
           style,
           id,
