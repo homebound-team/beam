@@ -25,8 +25,8 @@ import { useDebouncedCallback } from "use-debounce";
 export function useSetupColumnSizes(
   style: GridStyle,
   columns: GridColumn<any>[],
-  tableRef: MutableRefObject<HTMLElement | null>,
-  resizeTarget: MutableRefObject<HTMLElement | null> | undefined,
+  resizeRef: MutableRefObject<HTMLDivElement | null>,
+  externalResizeTarget: MutableRefObject<HTMLElement | null> | undefined,
 ): string[] {
   // Calculate the column sizes immediately rather than via the `debounce` method.
   // We do this for Storybook integrations that may use MockDate. MockDate changes the behavior of `new Date()`,
@@ -50,8 +50,8 @@ export function useSetupColumnSizes(
 
   const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
 
-  const target = resizeTarget?.current ?? tableRef.current;
   const onResize = useCallback(() => {
+    const target = externalResizeTarget?.current ?? resizeRef.current;
     if (target && target.clientWidth !== tableWidth) {
       if (calculateImmediately.current) {
         calculateImmediately.current = false;
@@ -60,9 +60,9 @@ export function useSetupColumnSizes(
         setTableAndColumnWidthsDebounced(target.clientWidth);
       }
     }
-  }, [target, tableWidth, setTableAndColumnWidths, setTableAndColumnWidthsDebounced]);
+  }, [tableWidth, setTableAndColumnWidths, setTableAndColumnWidthsDebounced]);
 
-  useResizeObserver({ ref: resizeTarget ?? tableRef, onResize });
+  useResizeObserver({ ref: externalResizeTarget ?? resizeRef, onResize });
 
   return columnSizes;
 }
