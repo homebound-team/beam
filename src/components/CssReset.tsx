@@ -43,6 +43,15 @@ const ourReset = css`
       background-color: ${Palette.Gray500};
     }
   }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 `;
 
 // Copy/pasted from TW which uses this as their base reset.
