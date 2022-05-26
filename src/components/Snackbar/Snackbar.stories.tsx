@@ -8,7 +8,7 @@ import { Css } from "src/Css";
 import { withBeamDecorator } from "src/utils/sb";
 
 interface SnackBarStoryProps extends Omit<SnackbarNoticeProps, "action"> {
-  actionText?: string;
+  actionLabel?: string;
   actionVariant?: ButtonVariant;
 }
 
@@ -21,19 +21,23 @@ export default {
     persistent: false,
     hideCloseButton: false,
     message: "Hey there, I am a snackbar notice!",
-    actionText: "",
+    actionLabel: "",
     actionVariant: undefined,
   },
   argTypes: {
     icon: { control: { type: "select", options: [undefined, "error", "info", "success", "warning"] } },
-    actionVariant: { control: { type: "select", options: ["primary", "secondary", "tertiary", "text", "danger"] } },
+    actionVariant: {
+      control: { type: "select", options: ["primary", "secondary", "tertiary", "text", "danger"] },
+      name: "action.variant",
+    },
+    actionLabel: { name: "action.label" },
   },
   parameters: { controls: { exclude: "notices" } },
 } as Meta<SnackBarStoryProps>;
 
 export function Customizable(args: SnackBarStoryProps) {
   const { triggerNotice } = useSnackbar();
-  const { actionText, actionVariant, ...noticeProps } = args;
+  const { actionLabel, actionVariant, ...noticeProps } = args;
 
   useEffect(() => {
     triggerNotice({ message: "Initial notice for chromatic diff purposes to ensure proper placement." });
@@ -44,8 +48,8 @@ export function Customizable(args: SnackBarStoryProps) {
       onClick={() =>
         triggerNotice({
           ...noticeProps,
-          ...(actionText
-            ? { action: { label: actionText, variant: actionVariant, onClick: action(`${actionText} clicked`) } }
+          ...(actionLabel
+            ? { action: { label: actionLabel, variant: actionVariant, onClick: action(`${actionLabel} clicked`) } }
             : undefined),
         })
       }
@@ -58,13 +62,13 @@ export function SystematicClose(args: SnackBarStoryProps) {
   const { triggerNotice, closeNotice } = useSnackbar();
   const [noticeOpen, setNoticeOpen] = useState(false);
   const noticeId = "customId";
-  const { actionText, actionVariant, ...noticeProps } = args;
+  const { actionLabel, actionVariant, ...noticeProps } = args;
 
   const triggerOnClick = useCallback(() => {
     triggerNotice({
       ...noticeProps,
-      ...(actionText
-        ? { action: { label: actionText, variant: actionVariant, onClick: action(`${actionText} clicked`) } }
+      ...(actionLabel
+        ? { action: { label: actionLabel, variant: actionVariant, onClick: action(`${actionLabel} clicked`) } }
         : undefined),
       id: noticeId,
       persistent: true,
