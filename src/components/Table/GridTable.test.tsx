@@ -1753,6 +1753,93 @@ describe("GridTable", () => {
     // Then the first row/cell has the 'active' background color
     expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.LightBlue50);
   });
+
+  it("can render with rows initially collapsed", async () => {
+    // Given rows with multiple levels of nesting where one parent is initially collapsed and one child is initially collapsed
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        kind: "parent",
+        id: "p1",
+        data: { name: "parent 1" },
+        initCollapsed: true,
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
+          },
+        ],
+      },
+      {
+        kind: "parent",
+        id: "p2",
+        data: { name: "parent 2" },
+        children: [
+          {
+            ...{ kind: "child", id: "p2c1", data: { name: "child p2c1" }, initCollapsed: true },
+            children: [{ kind: "grandChild", id: "p2c1g1", data: { name: "grandchild p2c1g1" } }],
+          },
+        ],
+      },
+    ];
+
+    // When initially rendering the table
+    const r = await render(<GridTable columns={nestedColumns} rows={rows} />);
+
+    // Then expect "parent 1" to be collapsed
+    expect(cell(r, 1, 0).textContent).toBe("+");
+    expect(cell(r, 1, 2).textContent).toBe("parent 1");
+    // And "parent 2" to be expanded
+    expect(cell(r, 2, 0).textContent).toBe("-");
+    expect(cell(r, 2, 2).textContent).toBe("parent 2");
+    // And "child p2c1" to be collapsed
+    expect(cell(r, 3, 0).textContent).toBe("+");
+    expect(cell(r, 3, 2).textContent).toBe("child p2c1");
+  });
+
+  it("respects initCollapsed on rows if persistCollapse is set but not yet stored", async () => {
+    const tableIdentifier = "persistCollapse";
+    // Given rows with a group row that is initially collapsed
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" }, initCollapsed: true },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+    ];
+
+    // When initially rendering the table with a 'persistCollapse' value, but an associated local storage item has not been set
+    const r = await render(<GridTable columns={nestedColumns} rows={rows} persistCollapse={tableIdentifier} />);
+
+    // Then expect "parent 1" to be collapsed based on the GridDataRow property
+    expect(cell(r, 1, 0).textContent).toBe("+");
+    expect(cell(r, 1, 2).textContent).toBe("parent 1");
+
+    // And the local storage value is initially set with the current state
+    expect(localStorage.getItem(tableIdentifier)).toBe('["p1"]');
+  });
+
+  it("ignores initCollapsed on rows if persistCollapse is set and available in localStorage", async () => {
+    const tableIdentifier = "persistCollapse";
+    // Given rows with a group row that is initially collapsed
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" }, initCollapsed: true },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+    ];
+
+    localStorage.setItem(tableIdentifier, "[]");
+
+    // When initially rendering the table with a 'persistCollapse' value, but an associated local storage item has not been set
+    const r = await render(<GridTable columns={nestedColumns} rows={rows} persistCollapse={tableIdentifier} />);
+
+    // Then expect "parent 1" to not be collapsed
+    expect(cell(r, 1, 0).textContent).toBe("-");
+    expect(cell(r, 1, 2).textContent).toBe("parent 1");
+    expect(cell(r, 2, 2).textContent).toBe("child p1c1");
+  });
 });
 
 function Collapse({ id }: { id: string }) {

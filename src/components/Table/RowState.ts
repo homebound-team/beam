@@ -61,9 +61,20 @@ export class RowState {
     );
   }
 
-  loadPersistedCollapse(persistCollapse: string): void {
+  loadCollapse(persistCollapse: string | undefined, rows: GridDataRow<any>[]): void {
     this.persistCollapse = persistCollapse;
-    this.collapsedRows.replace(readLocalCollapseState(persistCollapse));
+    const localStorageIds = persistCollapse ? localStorage.getItem(persistCollapse) : null;
+    // Initialize with our collapsed rows based on what is in localStorage. Otherwise check if any rows have been defined as collapsed
+    const collapsedGridRowIds = localStorageIds ? JSON.parse(localStorageIds) : getCollapsedIdsFromRows(rows);
+
+    // If we have some initial rows to collapse, then set the internal prop
+    if (collapsedGridRowIds.length > 0) {
+      this.collapsedRows.replace(collapsedGridRowIds);
+      // If `persistCollapse` is set, but localStorageIds was not defined, then add them now.
+      if (this.persistCollapse && !localStorageIds) {
+        localStorage.setItem(this.persistCollapse, JSON.stringify(collapsedGridRowIds));
+      }
+    }
   }
 
   setVisibleRows(rowIds: string[]): void {
@@ -255,4 +266,18 @@ function deriveParentSelected(children: SelectedState[]): SelectedState {
   const allChecked = children.every((child) => child === "checked");
   const allUnchecked = children.every((child) => child === "unchecked");
   return children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
+}
+
+function getCollapsedIdsFromRows(rows: GridDataRow<any>[]): string[] {
+  return rows.reduce((acc, r) => {
+    if (r.initCollapsed) {
+      acc.push(r.id);
+    }
+
+    if (r.children) {
+      acc.push(...getCollapsedIdsFromRows(r.children));
+    }
+
+    return acc;
+  }, [] as string[]);
 }

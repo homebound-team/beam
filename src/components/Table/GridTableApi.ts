@@ -50,10 +50,12 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   virtuosoRef: MutableRefObject<VirtuosoHandle | null> = { current: null };
 
   /** Called once by the GridTable when it takes ownership of this api instance. */
-  init(persistCollapse: string | undefined, virtuosoRef: MutableRefObject<VirtuosoHandle | null>) {
-    if (persistCollapse) {
-      this.rowState.loadPersistedCollapse(persistCollapse);
-    }
+  init(
+    persistCollapse: string | undefined,
+    virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+    rows: GridDataRow<R>[],
+  ) {
+    this.rowState.loadCollapse(persistCollapse, rows);
     this.virtuosoRef = virtuosoRef;
   }
 
