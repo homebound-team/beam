@@ -15,6 +15,7 @@ export * from "./Filters";
 export * from "./Icon";
 export * from "./IconButton";
 export * from "./Layout";
+export * from "./Loader";
 export * from "./Modal";
 export * from "./Modal/useModal";
 export { NavLink } from "./NavLink";
