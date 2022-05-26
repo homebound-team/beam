@@ -309,7 +309,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const style = resolveStyles(maybeStyle);
 
   const { rowState } = api;
-  rowState.rows = rows;
+  rowState.setRows(rows);
 
   useEffect(() => {
     rowState.activeRowId = activeRowId;
