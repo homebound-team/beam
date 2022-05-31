@@ -301,7 +301,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
   const api = useMemo<GridTableApiImpl<R>>(() => {
     const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
-    api.init(persistCollapse, virtuosoRef);
+    api.init(persistCollapse, virtuosoRef, rows);
     api.setActiveRowId(activeRowId);
     return api;
   }, [props.api]);
@@ -309,7 +309,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const style = resolveStyles(maybeStyle);
 
   const { rowState } = api;
-  rowState.rows = rows;
+  rowState.setRows(rows);
 
   useEffect(() => {
     rowState.activeRowId = activeRowId;
@@ -1026,6 +1026,8 @@ export type GridDataRow<R extends Kinded> = {
   /** Whether to pin this sort to the first/last of its parent's children. */
   pin?: "first" | "last";
   data: unknown;
+  /** Whether to have the row collapsed (children not visible) on initial load. This will be ignore in subsequent re-renders of the table */
+  initCollapsed?: boolean;
 } & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
 
 // Use IfAny so that GridDataRow<any> doesn't devolve into any

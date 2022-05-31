@@ -35,11 +35,12 @@ const rows: GridDataRow<Row>[] = [
 ];
 
 // Make a `NestedRow` ADT for a table with a header + 3 levels of nesting
+type TotalsRow = { kind: "totals"; id: string; data: {} };
 type HeaderRow = { kind: "header"; id: string; data: {} };
 type ParentRow = { kind: "parent"; id: string; data: { name: string } };
 type ChildRow = { kind: "child"; id: string; data: { name: string } };
 type GrandChildRow = { kind: "grandChild"; id: string; data: { name: string } };
-type NestedRow = HeaderRow | ParentRow | ChildRow | GrandChildRow;
+type NestedRow = TotalsRow | HeaderRow | ParentRow | ChildRow | GrandChildRow;
 
 // I tried https://github.com/keiya01/react-performance-testing#count-renders but
 // it didn't work with our fake timers, so this is easier for now.
@@ -50,18 +51,21 @@ beforeEach(() => (renderedNameColumn = []));
 // TODO Move this to the bottom of the file in it's own PR
 const nestedColumns: GridColumn<NestedRow>[] = [
   {
+    totals: emptyCell,
     header: (data, { row }) => <Collapse id={row.id} />,
     parent: (data, { row }) => <Collapse id={row.id} />,
     child: (data, { row }) => (row.children ? <Collapse id={row.id} /> : ""),
     grandChild: () => "",
   },
   selectColumn<NestedRow>({
+    totals: emptyCell,
     header: (data, { row }) => ({ content: <Select id={row.id} /> }),
     parent: (data, { row }) => ({ content: <Select id={row.id} /> }),
     child: (data, { row }) => ({ content: <Select id={row.id} /> }),
     grandChild: (data, { row }) => ({ content: <Select id={row.id} /> }),
   }),
   {
+    totals: emptyCell,
     header: () => "Name",
     parent: (data, { row }) => ({
       content() {
@@ -1092,7 +1096,7 @@ describe("GridTable", () => {
   it("persists collapse", async () => {
     const tableIdentifier = "gridTableTest";
     // Given that parent 2 is set to collapsed in local storage
-    localStorage.setItem(tableIdentifier, JSON.stringify(["p2", "p2c1"]));
+    sessionStorage.setItem(tableIdentifier, JSON.stringify(["p2", "p2c1"]));
     // And two parents with a child each
     const rows: GridDataRow<NestedRow>[] = [
       simpleHeader,
@@ -1122,7 +1126,7 @@ describe("GridTable", () => {
     expect(row(r, 4)).toBeUndefined();
 
     // Unset local storage
-    localStorage.setItem(tableIdentifier, "");
+    sessionStorage.setItem(tableIdentifier, "");
   });
 
   it("updates collapse state in header when collapsing and expanding the parent rows", async () => {
@@ -1752,6 +1756,164 @@ describe("GridTable", () => {
 
     // Then the first row/cell has the 'active' background color
     expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.LightBlue50);
+  });
+
+  it("can render with rows with initCollapsed defined", async () => {
+    // Given rows with multiple levels of nesting where one parent is initially collapsed and one child is initially collapsed
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" }, initCollapsed: true },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
+          },
+        ],
+      },
+      {
+        ...{ kind: "parent", id: "p2", data: { name: "parent 2" } },
+        children: [
+          {
+            ...{ kind: "child", id: "p2c1", data: { name: "child p2c1" }, initCollapsed: true },
+            children: [{ kind: "grandChild", id: "p2c1g1", data: { name: "grandchild p2c1g1" } }],
+          },
+        ],
+      },
+    ];
+
+    // When initially rendering the table
+    const r = await render(<GridTable columns={nestedColumns} rows={rows} />);
+
+    // Then expect "parent 1" to be collapsed
+    expect(cell(r, 1, 0).textContent).toBe("+");
+    expect(cell(r, 1, 2).textContent).toBe("parent 1");
+    // And "parent 2" to be expanded
+    expect(cell(r, 2, 0).textContent).toBe("-");
+    expect(cell(r, 2, 2).textContent).toBe("parent 2");
+    // And "child p2c1" to be collapsed
+    expect(cell(r, 3, 0).textContent).toBe("+");
+    expect(cell(r, 3, 2).textContent).toBe("child p2c1");
+  });
+
+  it("respects initCollapsed on rows if persistCollapse is set but not yet stored", async () => {
+    const tableIdentifier = "persistCollapse";
+    // Given rows with a group row that is initially collapsed
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" }, initCollapsed: true },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+    ];
+
+    // When initially rendering the table with a 'persistCollapse' value, but an associated local storage item has not been set
+    const r = await render(<GridTable columns={nestedColumns} rows={rows} persistCollapse={tableIdentifier} />);
+
+    // Then expect "parent 1" to be collapsed based on the GridDataRow property
+    expect(cell(r, 1, 0).textContent).toBe("+");
+    expect(cell(r, 1, 2).textContent).toBe("parent 1");
+
+    // And the local storage value is initially set with the current state
+    expect(sessionStorage.getItem(tableIdentifier)).toBe('["p1"]');
+  });
+
+  it("ignores initCollapsed on rows if persistCollapse is set and available in sessionStorage", async () => {
+    const tableIdentifier = "persistCollapse";
+    // Given rows with a group row that is initially collapsed
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" }, initCollapsed: true },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+    ];
+
+    sessionStorage.setItem(tableIdentifier, "[]");
+
+    // When initially rendering the table with a 'persistCollapse' value with an existing sessionStorage value
+    const r = await render(<GridTable columns={nestedColumns} rows={rows} persistCollapse={tableIdentifier} />);
+
+    // Then expect "parent 1" to not be collapsed
+    expect(cell(r, 1, 0).textContent).toBe("-");
+    expect(cell(r, 1, 2).textContent).toBe("parent 1");
+    expect(cell(r, 2, 2).textContent).toBe("child p1c1");
+  });
+
+  it("can update table with new rows with initCollapsed set and updates sessionStorage with new values", async () => {
+    // Given a table that can update its set of rows and persists its collapse state
+    function TestComponent() {
+      const [rows, setRows] = useState<GridDataRow<NestedRow>[]>(staticRows);
+      return (
+        <>
+          <button onClick={() => setRows(initRows)} data-testid="initRows" />
+          <button onClick={() => setRows(newRows)} data-testid="updateRows" />
+          <GridTable
+            columns={nestedColumns}
+            rows={rows}
+            persistCollapse={tableIdentifier}
+            fallbackMessage="Loading..."
+          />
+        </>
+      );
+    }
+
+    const tableIdentifier = "persistCollapse";
+    const staticRows: GridDataRow<NestedRow>[] = [{ kind: "totals" as const, id: "totals", data: {} }, simpleHeader];
+    const initRows: GridDataRow<NestedRow>[] = [
+      ...staticRows,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" }, initCollapsed: true },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+      {
+        ...{ kind: "parent", id: "p2", data: { name: "parent 2" }, initCollapsed: true },
+        children: [{ kind: "child", id: "p2c1", data: { name: "child p2c1" } }],
+      },
+    ];
+
+    const newRows: GridDataRow<NestedRow>[] = [
+      ...initRows,
+      {
+        ...{ kind: "parent", id: "p3", data: { name: "parent 3" }, initCollapsed: true },
+        children: [{ kind: "child", id: "p3c1", data: { name: "child p3c1" } }],
+      },
+    ];
+
+    // With the sessionStorage value differing from the initial row set.
+    sessionStorage.setItem(tableIdentifier, "[]");
+
+    // When rendering the table
+    const r = await render(<TestComponent />);
+
+    // Then expect the fallback message
+    expect(cell(r, 2, 0).textContent).toBe("Loading...");
+
+    // When initializing the first set of rows
+    click(r.initRows);
+
+    // Then expect "parent 1" and "parent 2" to be expanded, as their `initCollapsed` properties were ignored due to the sessionStorage
+    expect(cell(r, 2, 0).textContent).toBe("-");
+    expect(cell(r, 4, 0).textContent).toBe("-");
+
+    // When expanding parent 2
+    click(r.collapse_2);
+
+    // Then expect parent 2 to now be expanded
+    expect(cell(r, 4, 0).textContent).toBe("+");
+
+    // When updating the set of rows
+    click(r.updateRows);
+
+    // Then expect "parent 1" to remain not collapsed
+    expect(cell(r, 2, 0).textContent).toBe("-");
+    // And parent 2 to remain expanded, as it was updated since the initial render
+    expect(cell(r, 4, 0).textContent).toBe("+");
+    // And parent 3, the newly added row, to be collapsed based on its `initCollapsed` prop
+    expect(cell(r, 5, 0).textContent).toBe("+");
+
+    // And the local storage value is updated with the current state
+    expect(sessionStorage.getItem(tableIdentifier)).toBe('["p2","p3"]');
   });
 });
 

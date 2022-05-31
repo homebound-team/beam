@@ -61,9 +61,55 @@ export class RowState {
     );
   }
 
-  loadPersistedCollapse(persistCollapse: string): void {
+  loadCollapse(persistCollapse: string | undefined, rows: GridDataRow<any>[]): void {
     this.persistCollapse = persistCollapse;
-    this.collapsedRows.replace(readLocalCollapseState(persistCollapse));
+    const sessionStorageIds = persistCollapse ? sessionStorage.getItem(persistCollapse) : null;
+    // Initialize with our collapsed rows based on what is in sessionStorage. Otherwise check if any rows have been defined as collapsed
+    const collapsedGridRowIds = sessionStorageIds ? JSON.parse(sessionStorageIds) : getCollapsedIdsFromRows(rows);
+
+    // If we have some initial rows to collapse, then set the internal prop
+    if (collapsedGridRowIds.length > 0) {
+      this.collapsedRows.replace(collapsedGridRowIds);
+      // If `persistCollapse` is set, but sessionStorageIds was not defined, then add them now.
+      if (this.persistCollapse && !sessionStorageIds) {
+        sessionStorage.setItem(this.persistCollapse, JSON.stringify(collapsedGridRowIds));
+      }
+    }
+  }
+
+  // Updates the list of rows and regenerates the collapsedRows property if needed.
+  setRows(rows: GridDataRow<any>[]): void {
+    // If the set of rows are different, and this is the first time adding "data" rows (non "totals" or "header" rows), then collapsedRows may need to be updated.
+    if (rows !== this.rows && this.rows.some((r) => r.kind !== "totals" && r.kind !== "header")) {
+      const currentCollapsedIds = this.collapsedIds;
+      // Create a list of the (maybe) new rows that should be initially collapsed
+      const maybeNewCollapsedRows = flattenRows(rows).filter((r) => r.initCollapsed);
+
+      // If the list of collapsed rows are different, then determine which are net-new rows and should be added to the newCollapsedIds array
+      if (
+        currentCollapsedIds.length !== maybeNewCollapsedRows.length ||
+        !currentCollapsedIds.every((id) => maybeNewCollapsedRows.some((r) => r.id === id))
+      ) {
+        // Flatten out the existing rows to make checking for new rows easier
+        const flattenedExistingIds = flattenRows(this.rows).map((r) => r.id);
+        const newCollapsedIds: string[] = maybeNewCollapsedRows
+          .filter((maybeNewRow) => !flattenedExistingIds.includes(maybeNewRow.id))
+          .map((row) => row.id);
+
+        // If there are new rows that should be collapsed then update the collapsedRows arrays
+        if (newCollapsedIds.length > 0) {
+          this.collapsedRows.replace(currentCollapsedIds.concat(newCollapsedIds));
+
+          // Also update our persistCollapse if set
+          if (this.persistCollapse) {
+            sessionStorage.setItem(this.persistCollapse, JSON.stringify(currentCollapsedIds.concat(newCollapsedIds)));
+          }
+        }
+      }
+    }
+
+    // Finally replace our existing list of rows
+    this.rows = rows;
   }
 
   setVisibleRows(rowIds: string[]): void {
@@ -194,7 +240,7 @@ export class RowState {
 
     this.collapsedRows.replace(collapsedIds);
     if (this.persistCollapse) {
-      localStorage.setItem(this.persistCollapse, JSON.stringify(collapsedIds));
+      sessionStorage.setItem(this.persistCollapse, JSON.stringify(collapsedIds));
     }
   }
 
@@ -229,7 +275,7 @@ export const RowStateContext = React.createContext<{ rowState: RowState }>({
 
 // Get the rows that are already in the toggled state, so we can keep them toggled
 function readLocalCollapseState(persistCollapse: string): string[] {
-  const collapsedGridRowIds = localStorage.getItem(persistCollapse);
+  const collapsedGridRowIds = sessionStorage.getItem(persistCollapse);
   return collapsedGridRowIds ? JSON.parse(collapsedGridRowIds) : [];
 }
 
@@ -255,4 +301,23 @@ function deriveParentSelected(children: SelectedState[]): SelectedState {
   const allChecked = children.every((child) => child === "checked");
   const allUnchecked = children.every((child) => child === "unchecked");
   return children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
+}
+
+function getCollapsedIdsFromRows(rows: GridDataRow<any>[]): string[] {
+  return rows.reduce((acc, r) => {
+    if (r.initCollapsed) {
+      acc.push(r.id);
+    }
+
+    if (r.children) {
+      acc.push(...getCollapsedIdsFromRows(r.children));
+    }
+
+    return acc;
+  }, [] as string[]);
+}
+
+function flattenRows(rows: GridDataRow<any>[]): GridDataRow<any>[] {
+  const childRows = rows.flatMap((r) => (r.children ? flattenRows(r.children) : []));
+  return [...rows, ...childRows];
 }
