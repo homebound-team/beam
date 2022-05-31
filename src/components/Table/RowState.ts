@@ -92,12 +92,9 @@ export class RowState {
       ) {
         // Flatten out the existing rows to make checking for new rows easier
         const flattenedExistingIds = flattenRows(this.rows).map((r) => r.id);
-        const newCollapsedIds: string[] = [];
-
-        // If the `maybeNewRow` is not yet in `this.rows`, then add it to newCollapsedIds
-        maybeNewCollapsedRows.forEach(
-          (maybeNewRow) => !flattenedExistingIds.includes(maybeNewRow.id) && newCollapsedIds.push(maybeNewRow.id),
-        );
+        const newCollapsedIds: string[] = maybeNewCollapsedRows
+          .filter((maybeNewRow) => !flattenedExistingIds.includes(maybeNewRow.id))
+          .map((row) => row.id);
 
         // If there are new rows that should be collapsed then update the collapsedRows arrays
         if (newCollapsedIds.length > 0) {
