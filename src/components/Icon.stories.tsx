@@ -1,13 +1,24 @@
 import { Meta } from "@storybook/react";
 import { Icon as IconComponent, IconProps } from "src";
 import { Css } from "src/Css";
+import { palette } from "truss-palette";
 
 export default {
   title: "Components/Icon",
   component: IconComponent,
+  args: { color: "currentColor" },
+  argTypes: {
+    color: {
+      control: {
+        type: "select",
+        labels: Object.fromEntries(Object.entries(palette).map(([key, value]) => [value, key])),
+      },
+    },
+  },
+  parameters: { controls: { exclude: ["xss", "icon", "inc"] } },
 } as Meta<IconProps>;
 
-export const Icon = () => {
+export const Icon = (props: IconProps) => {
   const actionIcons: IconProps["icon"][] = [
     "x",
     "loader",
@@ -67,7 +78,7 @@ export const Icon = () => {
       <ul css={{ gap: 24, listStyle: "none", gridTemplateColumns: "repeat(5, 1fr)", ...Css.dg.p0.$ }}>
         {actionIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.aic.fdc.$ }} key={icon}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
             {icon}
           </li>
         ))}
@@ -76,7 +87,7 @@ export const Icon = () => {
       <ul css={{ gap: 24, listStyle: "none", gridTemplateColumns: "repeat(5, 1fr)", ...Css.dg.p0.$ }}>
         {alertIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.aic.fdc.$ }} key={icon}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
             {icon}
           </li>
         ))}
@@ -85,7 +96,7 @@ export const Icon = () => {
       <ul css={{ gap: 24, listStyle: "none", gridTemplateColumns: "repeat(4, 1fr)", ...Css.dg.p0.$ }}>
         {arrowIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.aic.fdc.$ }} key={icon}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
             {icon}
           </li>
         ))}
@@ -94,7 +105,7 @@ export const Icon = () => {
       <ul css={{ gap: 24, listStyle: "none", gridTemplateColumns: "repeat(4, 1fr)", ...Css.dg.p0.$ }}>
         {mediaIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.aic.fdc.$ }} key={icon}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
             {icon}
           </li>
         ))}
@@ -103,7 +114,7 @@ export const Icon = () => {
       <ul css={{ gap: 24, listStyle: "none", gridTemplateColumns: "repeat(4, 1fr)", ...Css.dg.p0.$ }}>
         {miscIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.aic.fdc.$ }} key={icon}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
             {icon}
           </li>
         ))}
@@ -112,7 +123,7 @@ export const Icon = () => {
       <ul css={{ gap: 24, listStyle: "none", gridTemplateColumns: "repeat(4, 1fr)", ...Css.dg.p0.$ }}>
         {navigationIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.aic.fdc.$ }} key={icon}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} />
+            <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
             {icon}
           </li>
         ))}
