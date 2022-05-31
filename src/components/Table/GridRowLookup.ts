@@ -1,6 +1,13 @@
 import { MutableRefObject } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
-import { DiscriminateUnion, GridColumn, GridDataRow, Kinded, RowTuple } from "src/components/Table/GridTable";
+import {
+  DiscriminateUnion,
+  GridColumn,
+  GridDataRow,
+  Kinded,
+  nonKindGridColumnKeys,
+  RowTuple,
+} from "src/components/Table/GridTable";
 import { dropChromeRows } from "src/components/Table/nestedCards";
 
 /**
@@ -80,8 +87,8 @@ export function createRowLookup<R extends Kinded>(
   };
 }
 
-function getKinds<R extends Kinded>(columns: GridColumn<R>[]): R[] {
-  // Use the 1st column to get the runtime list of kinds
-  const nonKindKeys = ["w", "sort", "sortValue", "align"];
-  return Object.keys(columns[0] || {}).filter((key) => !nonKindKeys.includes(key)) as any;
+export function getKinds<R extends Kinded>(columns: GridColumn<R>[]): R[] {
+  return Object.keys(columns.find((c) => !c.isAction) || {}).filter(
+    (key) => !nonKindGridColumnKeys.includes(key),
+  ) as any;
 }

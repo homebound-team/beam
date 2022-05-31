@@ -915,7 +915,16 @@ export type GridColumn<R extends Kinded, S = {}> = {
   isAction?: true;
 };
 
-export const nonKindGridColumnKeys = ["w", "mw", "align", "clientSideSort", "serverSideSortKey"];
+export const nonKindGridColumnKeys = [
+  "w",
+  "mw",
+  "align",
+  "serverSideSortKey",
+  "clientSideSort",
+  "sticky",
+  "wrapAction",
+  "isAction",
+];
 
 /** Allows rendering a specific cell. */
 type RenderCellFn<R extends Kinded> = (
