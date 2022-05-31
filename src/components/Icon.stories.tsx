@@ -1,7 +1,6 @@
 import { Meta } from "@storybook/react";
 import { Icon as IconComponent, IconProps } from "src";
-import { Css } from "src/Css";
-import { palette } from "truss-palette";
+import { Css, Palette } from "src/Css";
 
 export default {
   title: "Components/Icon",
@@ -11,7 +10,7 @@ export default {
     color: {
       control: {
         type: "select",
-        labels: Object.fromEntries(Object.entries(palette).map(([key, value]) => [value, key])),
+        labels: Object.fromEntries(Object.entries(Palette).map(([key, value]) => [value, key])),
       },
     },
   },
