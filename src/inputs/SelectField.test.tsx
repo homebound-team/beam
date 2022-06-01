@@ -216,7 +216,102 @@ describe("SelectFieldTest", () => {
     expect(r.age()).toHaveValue("One");
   });
 
-  const options = [
+  it("can define and select 'unsetLabel' when options are an array", async () => {
+    // Given a Select Field with options that already available
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value="1"
+        unsetLabel="None"
+        options={labelValueOptions}
+        getOptionLabel={(o) => o.label}
+        getOptionValue={(o) => o.value}
+      />,
+    );
+    // When we focus the field to open the menu
+    r.age().focus();
+    // And we select the 'unset' option
+    click(r.getByRole("option", { name: "None" }));
+    // Then onSelect was called
+    expect(onSelect).toHaveBeenCalledWith(undefined);
+  });
+
+  it("can define and select 'unsetLabel' when options are lazily loaded", async () => {
+    // Given a Select Field with options that are loaded lazily
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value="1"
+        unsetLabel="None"
+        options={{ initial: [labelValueOptions[0]], load: async () => ({ options: labelValueOptions }) }}
+        getOptionLabel={(o) => o.label}
+        getOptionValue={(o) => o.value}
+      />,
+    );
+    // When we focus the field to open the menu
+    r.age().focus();
+    // Wait for the promise to finish
+    await wait();
+    // The 'unset' option is in the menu and we select it
+    click(r.getByRole("option", { name: "None" }));
+    // Then onSelect was called
+    expect(onSelect).toHaveBeenCalledWith(undefined);
+  });
+
+  it("can initially be set to the 'unsetLabel' option", async () => {
+    // Given a Select Field with the value set to `undefined`
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value={undefined}
+        unsetLabel="None"
+        options={labelValueOptions}
+        getOptionLabel={(o) => o.label}
+        getOptionValue={(o) => o.value}
+      />,
+    );
+    // The input value will be set to the `unsetLabel`
+    expect(r.age()).toHaveValue("None");
+  });
+
+  it("can customize the unset value in the menu", async () => {
+    // Given a Select Field providing the `getOptionMenuLabel`
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value={undefined}
+        unsetLabel="None"
+        options={labelValueOptions}
+        getOptionLabel={(o) => o.label}
+        getOptionValue={(o) => o.value}
+        getOptionMenuLabel={(o, isUnsetOpt) => (isUnsetOpt ? "Custom" : o.label)}
+      />,
+    );
+    // When we focus the field to open the menu
+    r.age().focus();
+    // Then the `unset` option in the menu should reflect the custom value we passed in
+    expect(r.getAllByRole("option").map((o) => o.textContent)).toMatchInlineSnapshot(`
+      Array [
+        "Custom",
+        "One",
+        "Two",
+        "Three",
+      ]
+    `);
+  });
+
+  // Used to validate the `unset` option can be applied to non-`HasIdAndName` options
+  type HasLabelAndValue = {
+    label: string;
+    value: string;
+  };
+  const labelValueOptions: HasLabelAndValue[] = [
+    { value: "1", label: "One" },
+    { value: "2", label: "Two" },
+    { value: "3", label: "Three" },
+  ];
+
+  const options: HasIdAndName[] = [
     { id: "1", name: "One" },
     { id: "2", name: "Two" },
     { id: "3", name: "Three" },
