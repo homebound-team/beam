@@ -4,7 +4,6 @@ import { useMenuTriggerState } from "react-stately";
 import { IconProps } from "src/components/Icon";
 import { Menu } from "src/components/internal/Menu";
 import { isTextButton, OverlayTrigger, OverlayTriggerProps } from "src/components/internal/OverlayTrigger";
-import { Callback } from "src/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -38,7 +37,7 @@ export function ButtonMenu(props: ButtonMenuProps) {
 type MenuItemBase = {
   label: string;
   // If the `onClick` property is set as a string, then the menu item will be rendered as a link with the `onClick` value being the href
-  onClick: string | Callback;
+  onClick: string | VoidFunction;
   disabled?: boolean;
 };
 

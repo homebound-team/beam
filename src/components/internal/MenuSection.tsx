@@ -5,13 +5,12 @@ import { TreeState } from "react-stately";
 import { MenuItem } from "src/components/ButtonMenu";
 import { MenuItemImpl } from "src/components/internal";
 import { Css } from "src/Css";
-import { Callback } from "src/types";
 import { useTestIds } from "src/utils";
 
 interface MenuSectionProps {
   section: Node<MenuItem>;
   state: TreeState<MenuItem>;
-  onClose: Callback;
+  onClose: VoidFunction;
 }
 
 export function MenuSectionImpl(props: MenuSectionProps) {

@@ -6,7 +6,6 @@ import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { Value } from "src/inputs/Value";
-import { Callback } from "src/types";
 import { maybeCall } from "src/utils";
 
 interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldProps {
@@ -32,7 +31,7 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   contrast?: boolean;
   nothingSelectedText: string;
   tooltip?: ReactNode;
-  resetField: Callback;
+  resetField: VoidFunction;
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {

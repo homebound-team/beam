@@ -18,7 +18,6 @@ import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
-import { Callback } from "src/types";
 
 export function StepperFormApp() {
   const formState = useFormState({
@@ -94,7 +93,7 @@ function StepperForm({ formState }: { formState: FormValue }) {
   );
 }
 
-function AuthorDetails({ formState, onNext }: { formState: FormValue; onNext: Callback }) {
+function AuthorDetails({ formState, onNext }: { formState: FormValue; onNext: VoidFunction }) {
   return (
     <Observer>
       {() => (
@@ -120,7 +119,7 @@ function AuthorDetails({ formState, onNext }: { formState: FormValue; onNext: Ca
   );
 }
 
-function BookList({ formState, onNext, onBack }: { formState: FormValue; onNext: Callback; onBack: Callback }) {
+function BookList({ formState, onNext, onBack }: { formState: FormValue; onNext: VoidFunction; onBack: VoidFunction }) {
   const columns = useMemo(() => createColumns(formState), [formState]);
   const rows: GridDataRow<Row>[] = useComputed(
     () => [simpleHeader, ...formState.books.rows.map((data) => ({ kind: "data" as const, id: data.id.value!, data }))],
@@ -162,7 +161,7 @@ function createColumns(formState: FormValue): GridColumn<Row>[] {
   ];
 }
 
-function MiscAuthorDetails({ formState, onBack }: { formState: FormValue; onBack: Callback }) {
+function MiscAuthorDetails({ formState, onBack }: { formState: FormValue; onBack: VoidFunction }) {
   const [showFormData, setShowFormData] = useState(false);
   return (
     <Observer>

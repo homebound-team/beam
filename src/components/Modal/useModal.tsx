@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useBeamContext } from "src/components/BeamContext";
-import { Callback, CheckFn } from "src/types";
+import { CheckFn } from "src/types";
 import { maybeCall } from "src/utils";
 import { ModalApi, ModalProps } from "./Modal";
 
 export interface UseModalHook {
   openModal: (props: ModalProps) => void;
-  closeModal: Callback;
+  closeModal: VoidFunction;
   addCanClose: (canClose: CheckFn) => void;
   setSize: (size: ModalProps["size"]) => void;
 }

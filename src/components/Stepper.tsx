@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css } from "src/Css";
-import { Callback } from "src/types";
 
 export interface Step {
   label: string;
@@ -57,7 +56,7 @@ export function Stepper({ steps, currentStep, onChange }: StepperBarProps) {
 }
 
 interface StepButtonProps extends Step {
-  onClick: Callback;
+  onClick: VoidFunction;
   isCurrent: boolean;
 }
 

@@ -4,7 +4,6 @@ import { resolveTooltip } from "src/components";
 import { Only } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
-import { Callback } from "src/types";
 import { maybeCall } from "src/utils";
 
 // exported for testing purposes
@@ -13,7 +12,7 @@ export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
   inlineLabel?: boolean;
   clearable?: boolean;
   api?: MutableRefObject<TextFieldApi | undefined>;
-  onEnter?: Callback;
+  onEnter?: VoidFunction;
   endAdornment?: ReactNode;
   startAdornment?: ReactNode;
 }
@@ -77,5 +76,5 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
 }
 
 export type TextFieldApi = {
-  focus: Callback;
+  focus: VoidFunction;
 };
