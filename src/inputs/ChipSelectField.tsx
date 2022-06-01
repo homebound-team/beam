@@ -11,7 +11,7 @@ import { ChipTextField } from "src/inputs/ChipTextField";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { ListBoxChip } from "src/inputs/internal/ListBoxChip";
 import { Value, valueToKey } from "src/inputs/Value";
-import { Callback, HasIdAndName, Optional } from "src/types";
+import { HasIdAndName, Optional } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 
@@ -322,7 +322,7 @@ export function isListBoxSection<O>(obj: O | ListBoxSection<O>): obj is ListBoxS
 }
 
 interface CreateNewFieldProps {
-  onBlur: Callback;
+  onBlur: VoidFunction;
   onEnter: (value: string) => {};
 }
 

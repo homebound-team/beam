@@ -6,7 +6,6 @@ import { useNumberFieldState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Xss } from "src/Css";
-import { Callback } from "src/types";
 import { maybeCall } from "src/utils";
 import { TextFieldBase } from "./TextFieldBase";
 
@@ -36,7 +35,7 @@ export interface NumberFieldProps {
   displayDirection?: boolean;
   numFractionDigits?: number;
   truncate?: boolean;
-  onEnter?: Callback;
+  onEnter?: VoidFunction;
 }
 
 export function NumberField(props: NumberFieldProps) {

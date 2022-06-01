@@ -6,7 +6,6 @@ import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, px, Xss } from "src/Css";
-import { Callback } from "src/types";
 import { useTestIds } from "src/utils";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl";
@@ -24,7 +23,7 @@ export interface ModalProps {
   /** Force scrolling i.e. to avoid content jumping left/right as scroll bar goes away/comes back. */
   forceScrolling?: boolean;
   /** Adds a callback that is called _after_ close has definitely happened. */
-  onClose?: Callback;
+  onClose?: VoidFunction;
   /** Imperative API for interacting with the Modal */
   api?: MutableRefObject<ModalApi | undefined>;
   /** Adds a border for the header. */
@@ -41,7 +40,7 @@ export type ModalApi = {
  * Provides underlay, modal container, and header. Will disable scrolling of page under the modal.
  */
 export function Modal(props: ModalProps) {
-  const { size = "md", content, forceScrolling, api, drawHeaderBorder = false} = props;
+  const { size = "md", content, forceScrolling, api, drawHeaderBorder = false } = props;
   const isFixedHeight = typeof size !== "string";
   const ref = useRef(null);
   const { modalBodyDiv, modalFooterDiv, modalHeaderDiv, drawerContentStack } = useBeamContext();

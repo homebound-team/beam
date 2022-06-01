@@ -5,12 +5,11 @@ import { Item, Section, useTreeData, useTreeState } from "react-stately";
 import { MenuItem, MenuSection } from "src/components";
 import { MenuSectionImpl } from "src/components/internal/MenuSection";
 import { Css } from "src/Css";
-import { Callback } from "src/types";
 import { useTestIds } from "src/utils";
 
 interface MenuProps<T> {
   ariaMenuProps: HTMLAttributes<HTMLElement>;
-  onClose: Callback;
+  onClose: VoidFunction;
   items: MenuItem[];
   persistentItems?: MenuItem[];
 }

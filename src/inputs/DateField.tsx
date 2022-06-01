@@ -8,7 +8,6 @@ import { Popover } from "src/components/internal";
 import { DatePickerOverlay } from "src/components/internal/DatePickerOverlay";
 import { Css, Palette } from "src/Css";
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
-import { Callback } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -38,7 +37,7 @@ export interface DateFieldProps
    * exposed from `react-day-picker`: https://react-day-picker.js.org/api/DayPicker#modifiers
    */
   disabledDays?: Modifier | Modifier[];
-  onEnter?: Callback;
+  onEnter?: VoidFunction;
   // for storybook
   defaultOpen?: boolean;
 }

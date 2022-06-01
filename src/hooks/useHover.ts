@@ -1,12 +1,11 @@
 import { HTMLAttributes } from "react";
 import { useHover as AriaUseHover } from "react-aria";
-import { Callback } from "src/types";
 
 interface useHoverProps {
   // Handler that is called when a hover interaction starts
-  onHoverStart?: Callback;
+  onHoverStart?: VoidFunction;
   // Handler that is called when a hover interaction ends
-  onHoverEnd?: Callback;
+  onHoverEnd?: VoidFunction;
   // Handler that is called when hover state changes
   onHoverChange?: (isHovering: boolean) => void;
   // If the hover events should be disabled

@@ -5,7 +5,6 @@ import { resolveTooltip } from "src/components";
 import { Only } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
-import { Callback } from "src/types";
 import { maybeCall } from "src/utils";
 
 // Exported for test purposes
@@ -13,7 +12,7 @@ export interface TextAreaFieldProps<X> extends BeamTextFieldProps<X> {
   // Does not allow the user to enter new line characters and removes minimum height for textarea.
   preventNewLines?: boolean;
   // `onEnter` is only triggered when `preventNewLines` is set to `true`
-  onEnter?: Callback;
+  onEnter?: VoidFunction;
 }
 
 /** Returns a <textarea /> element that auto-adjusts height based on the field's value */

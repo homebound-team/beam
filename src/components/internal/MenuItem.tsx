@@ -7,14 +7,13 @@ import { TreeState } from "react-stately";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
 import { Icon } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
-import { Callback } from "src/types";
 import { isAbsoluteUrl, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 interface MenuItemProps {
   item: Node<MenuItem>;
   state: TreeState<MenuItem>;
-  onClose: Callback;
+  onClose: VoidFunction;
 }
 
 export function MenuItemImpl(props: MenuItemProps) {

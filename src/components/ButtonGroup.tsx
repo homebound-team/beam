@@ -2,7 +2,6 @@ import React, { useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
 import { Css } from "src/Css";
-import { Callback } from "src/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -16,7 +15,7 @@ export interface ButtonGroupProps {
 export type ButtonGroupButton = {
   icon?: IconProps["icon"];
   text?: string;
-  onClick?: Callback;
+  onClick?: VoidFunction;
   /** Disables the button. Note we don't support the `disabled: ReactNode`/tooltip for now. */
   disabled?: boolean;
   /** Indicates the active/selected button, as in a tab or toggle. */

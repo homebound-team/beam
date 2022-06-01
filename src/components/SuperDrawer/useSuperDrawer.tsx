@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
 import { useBeamContext } from "src/components/BeamContext";
-import { Callback, CanCloseCheck } from "src/types";
+import { CanCloseCheck } from "src/types";
 import { useModal } from "../Modal";
 import { ConfirmCloseModal } from "./ConfirmCloseModal";
 
@@ -65,7 +65,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
   } = useBeamContext();
   const { openModal } = useModal();
 
-  function canCloseDrawerDetails(i: number, doChange: Callback) {
+  function canCloseDrawerDetails(i: number, doChange: VoidFunction) {
     for (const canCloseDrawerDetail of canCloseDetailsChecks.current[i] ?? []) {
       if (!canClose(canCloseDrawerDetail)) {
         openModal({ content: <ConfirmCloseModal onClose={doChange} {...canCloseDrawerDetail} /> });
@@ -82,7 +82,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
    * to validate the drawer's state without closing it
    * @param doChange - A lambda to run once all validations have passed (or once the user has confirmed that they want to close)
    * */
-  function maybeChangeDrawer(doChange: Callback) {
+  function maybeChangeDrawer(doChange: VoidFunction) {
     const contentStackLength = contentStack.current.length;
     if (contentStackLength === 0) {
       doChange();
