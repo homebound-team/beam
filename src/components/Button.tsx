@@ -83,6 +83,7 @@ export function Button(props: ButtonProps) {
       {endAdornment && <span css={Css.ml1.$}>{endAdornment}</span>}
     </>
   );
+
   const buttonAttrs = {
     ref: ref as any,
     ...buttonProps,
@@ -104,7 +105,7 @@ export function Button(props: ButtonProps) {
   return maybeTooltip({
     title: resolveTooltip(disabled, tooltip),
     placement: "top",
-    children: getButtonOrLink(buttonContent, onPress, buttonAttrs, openInNew, download),
+    children: getButtonOrLink(buttonContent, undefined, buttonAttrs, openInNew, download),
   });
 }
 

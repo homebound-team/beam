@@ -1,11 +1,10 @@
-import { PressEvent } from "@react-types/shared";
-import { HTMLAttributes, ReactNode } from "react";
+import React, { HTMLAttributes, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { isAbsoluteUrl } from "src/utils/index";
 
 export function getButtonOrLink(
   content: ReactNode,
-  onClick: ((e: PressEvent) => void) | string,
+  onClick: (() => void) | string | undefined,
   attrs: HTMLAttributes<HTMLButtonElement | HTMLAnchorElement>,
   openInNew: boolean = false,
   downloadLink: boolean = false,
@@ -25,6 +24,9 @@ export function getButtonOrLink(
       </Link>
     )
   ) : (
-    <button {...attrs}>{content}</button>
+    // Button.tsx will pass an `onClick` attribute as part of `attrs` prop.
+    <button onClick={onClick} {...attrs}>
+      {content}
+    </button>
   );
 }
