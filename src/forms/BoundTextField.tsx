@@ -6,7 +6,7 @@ import { TextFieldXss } from "src/interfaces";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundTextFieldProps<X> = Omit<TextFieldProps<X>, "value" | "onChange" | "onBlur" | "onFocus" | "label"> & {
+export type BoundTextFieldProps<X> = Omit<TextFieldProps<X>, "value" | "onChange" | "label"> & {
   // Make optional as it'll create a label from the field's key if not present
   label?: string;
   field: FieldState<any, string | null | undefined>;
@@ -19,6 +19,8 @@ export function BoundTextField<X extends Only<TextFieldXss, X>>(props: BoundText
   const {
     field,
     readOnly,
+    onBlur,
+    onFocus,
     onChange = (value) => field.set(value),
     label = defaultLabel(field.key),
     onEnter,
@@ -35,8 +37,14 @@ export function BoundTextField<X extends Only<TextFieldXss, X>>(props: BoundText
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           required={field.required}
-          onBlur={() => field.blur()}
-          onFocus={() => field.focus()}
+          onBlur={() => {
+            maybeCall(onBlur);
+            field.blur();
+          }}
+          onFocus={() => {
+            maybeCall(onFocus);
+            field.focus();
+          }}
           onEnter={() => {
             maybeCall(onEnter);
             field.maybeAutoSave();

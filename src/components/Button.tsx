@@ -105,7 +105,7 @@ export function Button(props: ButtonProps) {
   return maybeTooltip({
     title: resolveTooltip(disabled, tooltip),
     placement: "top",
-    children: getButtonOrLink(buttonContent, undefined, buttonAttrs, openInNew, download),
+    children: getButtonOrLink(buttonContent, onPress, buttonAttrs, openInNew, download),
   });
 }
 

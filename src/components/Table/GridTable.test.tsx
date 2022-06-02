@@ -869,6 +869,30 @@ describe("GridTable", () => {
     expect(cell(r, 1, 1).tagName).toBe("A");
   });
 
+  it("can handle onClick for GridCellContent", async () => {
+    const onClick = jest.fn();
+    // Given a table with an onClick specified GridCellContent
+    const nameColumn: GridColumn<Row> = {
+      header: () => "Name",
+      data: ({ name }) => ({ content: name, onClick: name === "button" ? onClick : name }),
+    };
+    const rows: GridDataRow<Row>[] = [
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "button", value: 1 } },
+      { kind: "data", id: "2", data: { name: "https://www.homebound.com", value: 2 } },
+      { kind: "data", id: "3", data: { name: "/testPath", value: 3 } },
+    ];
+    // When rendered
+    const r = await render(<GridTable rows={rows} columns={[nameColumn]} />, {});
+    // Then expect the cell with a callback function to be a button
+    click(r.getByText("button"));
+    // And can be clicked
+    expect(onClick).toHaveBeenCalledTimes(1);
+    // And onClick properties with a string value should be applied as the 'href' value
+    expect(r.getByText("https://www.homebound.com")).toHaveAttribute("href", "https://www.homebound.com");
+    expect(r.getByText("/testPath")).toHaveAttribute("href", "/testPath");
+  });
+
   it("displays a custom fallback if only a header", async () => {
     const fallbackMessage = "No special rows found";
     const r = await render(<GridTable {...{ columns, rows: [simpleHeader], fallbackMessage }} />);
