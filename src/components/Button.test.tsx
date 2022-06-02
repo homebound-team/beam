@@ -1,6 +1,6 @@
 import { Button } from "src/components/Button";
 import { noop } from "src/utils";
-import { click, render, withRouter } from "src/utils/rtl";
+import { click, render } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
 
 describe("Button", () => {
@@ -35,7 +35,7 @@ describe("Button", () => {
   });
 
   it("applies expected properties when rendering a link with an absolute url", async () => {
-    const r = await render(<Button label="Button" onClick="https://www.homebound.com" />, withRouter());
+    const r = await render(<Button label="Button" onClick="https://www.homebound.com" />, {});
     expect(r.button().tagName).toBe("A");
     expect(r.button())
       .toHaveAttribute("href", "https://www.homebound.com")
@@ -45,7 +45,7 @@ describe("Button", () => {
   });
 
   it("applies expected properties when rendering a link with a relative url", async () => {
-    const r = await render(<Button label="Button" onClick="/testPath" />, withRouter());
+    const r = await render(<Button label="Button" onClick="/testPath" />, {});
     expect(r.button().tagName).toBe("A");
     expect(r.button())
       .toHaveAttribute("href", "/testPath")
@@ -55,7 +55,7 @@ describe("Button", () => {
   });
 
   it("applies expected properties when rendering a link with a relative url to open in new tab", async () => {
-    const r = await render(<Button label="Button" onClick="/testPath" openInNew />, withRouter());
+    const r = await render(<Button label="Button" onClick="/testPath" openInNew />, {});
     expect(r.button().tagName).toBe("A");
     expect(r.button())
       .toHaveAttribute("href", "/testPath")
@@ -65,7 +65,7 @@ describe("Button", () => {
   });
 
   it("applies expected properties when adding the 'download' prop", async () => {
-    const r = await render(<Button label="Button" onClick="/testPath" download />, withRouter());
+    const r = await render(<Button label="Button" onClick="/testPath" download />, {});
     expect(r.button().tagName).toBe("A");
     expect(r.button())
       .toHaveAttribute("href", "/testPath")

@@ -83,6 +83,7 @@ export function Button(props: ButtonProps) {
       {endAdornment && <span css={Css.ml1.$}>{endAdornment}</span>}
     </>
   );
+
   const buttonAttrs = {
     ref: ref as any,
     ...buttonProps,
