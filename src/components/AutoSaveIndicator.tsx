@@ -1,27 +1,33 @@
-import { useAutoSaveStatus } from "@homebound/form-state";
-import { AutoSaveStatus } from "@homebound/form-state/dist/AutoSaveStatus/AutoSaveStatusProvider";
+import { AutoSaveStatus, useAutoSaveStatus } from "@homebound/form-state";
 import { assertNever } from "@homebound/form-state/dist/utils";
 import { useEffect } from "react";
+import { Tooltip } from ".";
+import { Palette } from "..";
+import { Icon } from "./Icon";
 
 interface AutoSaveIndicatorProps {
   hideOnIdle?: boolean;
 }
 
 export function AutoSaveIndicator({ hideOnIdle }: AutoSaveIndicatorProps) {
-  const { status, resetStatus } = useAutoSaveStatus();
+  const { status, resetStatus, errors } = useAutoSaveStatus();
 
   /** On Dismount, reset back to Idle so new pages don't imply something "saved" */
   useEffect(() => () => resetStatus(), []);
 
   switch (status) {
     case AutoSaveStatus.IDLE:
-      return hideOnIdle ? null : <div>Idle</div>;
+      return hideOnIdle ? null : <Icon icon="cloudSave" />;
     case AutoSaveStatus.SAVING:
-      return <div>Saving</div>;
+      return <Icon icon="refresh" helperText="Saving..." color={Palette.LightBlue500} />;
     case AutoSaveStatus.DONE:
-      return <div>Done</div>;
+      return <Icon icon="cloudSave" helperText="Saved" color={Palette.Green600} />;
     case AutoSaveStatus.ERROR:
-      return <div>Error</div>;
+      return (
+        <Tooltip title={String(errors)} placement="bottom">
+          <Icon icon="xCircle" helperText="Error saving" color={Palette.Red500} />
+        </Tooltip>
+      );
     default:
       assertNever(status);
   }

@@ -1,5 +1,4 @@
-import { AutoSaveStatusContext } from "@homebound/form-state";
-import { AutoSaveStatus } from "@homebound/form-state/dist/AutoSaveStatus/AutoSaveStatusProvider";
+import { AutoSaveStatus, AutoSaveStatusContext } from "@homebound/form-state";
 import React from "react";
 import { noop } from "src/utils";
 import { render } from "src/utils/rtl";
@@ -21,18 +20,20 @@ const MockAutoSaveProvider = ({
 
 describe(AutoSaveIndicator, () => {
   it.each([
-    [AutoSaveStatus.IDLE, "Idle"],
-    [AutoSaveStatus.SAVING, "Saving"],
-    [AutoSaveStatus.DONE, "Done"],
-    [AutoSaveStatus.ERROR, "Error"],
-  ])(`renders for %s`, async (status, text) => {
+    [AutoSaveStatus.IDLE, "cloudSave", ""],
+    [AutoSaveStatus.SAVING, "refresh", "Saving"],
+    [AutoSaveStatus.DONE, "cloudSave", "Saved"],
+    [AutoSaveStatus.ERROR, "xCircle", "Error saving"],
+  ])(`renders for %s`, async (status, iconName, helperText) => {
     const r = await render(
       <MockAutoSaveProvider status={status as AutoSaveStatus}>
         <AutoSaveIndicator />
       </MockAutoSaveProvider>,
     );
 
-    expect(r.getByText(text)).toBeInTheDocument();
+    const iconElement = r.container.querySelector(`[data-icon=${iconName}]`)!;
+    expect(iconElement).toBeInTheDocument();
+    if (helperText) expect(iconElement.nextSibling?.textContent).toMatch(helperText);
   });
 
   it("can hide on idle", async () => {
@@ -57,5 +58,23 @@ describe(AutoSaveIndicator, () => {
     r.unmount();
 
     expect(resetStatus).toBeCalledTimes(1);
+  });
+
+  it("has tooltips for errors", async () => {
+    const r = await render(
+      <AutoSaveStatusContext.Provider
+        value={{
+          errors: [new Error("Some error occurred")],
+          status: AutoSaveStatus.ERROR,
+          resetStatus() {},
+          resolveAutoSave() {},
+          triggerAutoSave() {},
+        }}
+      >
+        <AutoSaveIndicator />
+      </AutoSaveStatusContext.Provider>,
+    );
+
+    expect(r.tooltip()).toHaveAttribute("title", "Error: Some error occurred");
   });
 });

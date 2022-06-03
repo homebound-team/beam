@@ -1,34 +1,56 @@
-import { AutoSaveStatusContext } from "@homebound/form-state";
-import { AutoSaveStatus } from "@homebound/form-state/dist/AutoSaveStatus/AutoSaveStatusProvider";
+import { AutoSaveStatus, AutoSaveStatusContext, AutoSaveStatusProvider } from "@homebound/form-state";
 import { Meta } from "@storybook/react";
+import { Css } from "..";
 import { AutoSaveIndicator } from "./AutoSaveIndicator";
+import { Button } from "./Button";
 
 export default {
   component: AutoSaveIndicator,
   title: "Components/Auto Save Indicator",
 } as Meta;
 
-const renderForStatus = (status: AutoSaveStatus) => (
-  <AutoSaveStatusContext.Provider
-    value={{
-      status,
-      resetStatus() {},
-      errors: [],
-      resolveAutoSave() {},
-      triggerAutoSave() {},
-    }}
-  >
-    <AutoSaveIndicator />
-  </AutoSaveStatusContext.Provider>
+const autoSaveProviderValue = (status: AutoSaveStatus) => ({
+  status,
+  resetStatus() {},
+  errors: [],
+  resolveAutoSave() {},
+  triggerAutoSave() {},
+});
+
+export const AutoSaveIndicatorStatuses = () => (
+  <>
+    <AutoSaveStatusContext.Provider value={autoSaveProviderValue(AutoSaveStatus.IDLE)}>
+      <AutoSaveIndicator />
+    </AutoSaveStatusContext.Provider>
+    <AutoSaveStatusContext.Provider value={autoSaveProviderValue(AutoSaveStatus.SAVING)}>
+      <AutoSaveIndicator />
+    </AutoSaveStatusContext.Provider>
+    <AutoSaveStatusContext.Provider value={autoSaveProviderValue(AutoSaveStatus.DONE)}>
+      <AutoSaveIndicator />
+    </AutoSaveStatusContext.Provider>
+    <AutoSaveStatusContext.Provider
+      value={{ ...autoSaveProviderValue(AutoSaveStatus.ERROR), errors: [new Error("Some issue happened saving")] }}
+    >
+      <AutoSaveIndicator />
+    </AutoSaveStatusContext.Provider>
+  </>
 );
 
-export const AutoSaveIndicatorStatuses = () => {
-  return (
-    <>
-      {renderForStatus(AutoSaveStatus.IDLE)}
-      {renderForStatus(AutoSaveStatus.SAVING)}
-      {renderForStatus(AutoSaveStatus.DONE)}
-      {renderForStatus(AutoSaveStatus.ERROR)}
-    </>
-  );
-};
+export const AutoSaveIndicatorInAction = () => (
+  <AutoSaveStatusProvider resetToIdleTimeout={2000}>
+    <AutoSaveIndicator />
+    <AutoSaveStatusContext.Consumer>
+      {({ triggerAutoSave, resolveAutoSave }) => (
+        <Button
+          label="Do a Save"
+          variant="secondary"
+          onClick={() => {
+            triggerAutoSave();
+            setTimeout(resolveAutoSave, 1500);
+          }}
+          css={Css.buttonBase.$}
+        />
+      )}
+    </AutoSaveStatusContext.Consumer>
+  </AutoSaveStatusProvider>
+);
