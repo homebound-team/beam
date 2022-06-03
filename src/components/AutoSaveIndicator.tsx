@@ -25,7 +25,7 @@ export function AutoSaveIndicator({ hideOnIdle }: AutoSaveIndicatorProps) {
     case AutoSaveStatus.ERROR:
       return (
         <Tooltip title={String(errors)} placement="bottom">
-          <Icon icon="xCircle" helperText="Error saving" color={Palette.Red500} />
+          <Icon icon="error" helperText="Error saving" color={Palette.Red500} />
         </Tooltip>
       );
     default:

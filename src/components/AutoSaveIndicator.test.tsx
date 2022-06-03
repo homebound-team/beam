@@ -23,7 +23,7 @@ describe(AutoSaveIndicator, () => {
     [AutoSaveStatus.IDLE, "cloudSave", ""],
     [AutoSaveStatus.SAVING, "refresh", "Saving"],
     [AutoSaveStatus.DONE, "cloudSave", "Saved"],
-    [AutoSaveStatus.ERROR, "xCircle", "Error saving"],
+    [AutoSaveStatus.ERROR, "error", "Error saving"],
   ])(`renders for %s`, async (status, iconName, helperText) => {
     const r = await render(
       <MockAutoSaveProvider status={status as AutoSaveStatus}>
