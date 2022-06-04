@@ -9,14 +9,6 @@ export default {
   title: "Components/Auto Save Indicator",
 } as Meta;
 
-const autoSaveProviderValue = (status: AutoSaveStatus) => ({
-  status,
-  resetStatus() {},
-  errors: [],
-  resolveAutoSave() {},
-  triggerAutoSave() {},
-});
-
 export const AutoSaveIndicatorStatuses = () => (
   <>
     <AutoSaveStatusContext.Provider value={autoSaveProviderValue(AutoSaveStatus.IDLE)}>
@@ -54,3 +46,11 @@ export const AutoSaveIndicatorInAction = () => (
     </AutoSaveStatusContext.Consumer>
   </AutoSaveStatusProvider>
 );
+
+const autoSaveProviderValue = (status: AutoSaveStatus) => ({
+  status,
+  resetStatus() {},
+  errors: [],
+  resolveAutoSave() {},
+  triggerAutoSave() {},
+});

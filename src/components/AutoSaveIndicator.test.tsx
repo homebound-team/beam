@@ -4,20 +4,6 @@ import { noop } from "src/utils";
 import { render } from "src/utils/rtl";
 import { AutoSaveIndicator } from "./AutoSaveIndicator";
 
-const MockAutoSaveProvider = ({
-  status = AutoSaveStatus.IDLE,
-  resetStatus = noop,
-  children,
-}: React.PropsWithChildren<{ status?: AutoSaveStatus; resetStatus?: VoidFunction }>) => {
-  return (
-    <AutoSaveStatusContext.Provider
-      value={{ status, resetStatus, errors: [], resolveAutoSave() {}, triggerAutoSave() {} }}
-    >
-      {children}
-    </AutoSaveStatusContext.Provider>
-  );
-};
-
 describe(AutoSaveIndicator, () => {
   it.each([
     [AutoSaveStatus.IDLE, "cloudSave", ""],
@@ -78,3 +64,17 @@ describe(AutoSaveIndicator, () => {
     expect(r.tooltip()).toHaveAttribute("title", "Error: Some error occurred");
   });
 });
+
+function MockAutoSaveProvider({
+  status = AutoSaveStatus.IDLE,
+  resetStatus = noop,
+  children,
+}: React.PropsWithChildren<{ status?: AutoSaveStatus; resetStatus?: VoidFunction }>) {
+  return (
+    <AutoSaveStatusContext.Provider
+      value={{ status, resetStatus, errors: [], resolveAutoSave() {}, triggerAutoSave() {} }}
+    >
+      {children}
+    </AutoSaveStatusContext.Provider>
+  );
+}
