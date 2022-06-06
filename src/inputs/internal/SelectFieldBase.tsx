@@ -64,7 +64,6 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     readOnly,
     onSelect,
     options,
-    getOptionValue,
     multiselect = false,
     values = [],
     nothingSelectedText = "",
@@ -81,6 +80,10 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
   const getOptionLabel = useCallback(
     (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : props.getOptionLabel(o)),
     [props.getOptionLabel, unsetLabel],
+  );
+  const getOptionValue = useCallback(
+    (o: O) => (unsetLabel && o === unsetOption ? (undefined as V) : props.getOptionValue(o)),
+    [props.getOptionValue, unsetLabel],
   );
   const getOptionMenuLabel = useCallback(
     (o: O) =>
