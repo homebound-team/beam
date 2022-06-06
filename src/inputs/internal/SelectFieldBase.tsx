@@ -64,10 +64,8 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     readOnly,
     onSelect,
     options,
+    getOptionValue,
     multiselect = false,
-    getOptionLabel: gol,
-    getOptionValue: gov,
-    getOptionMenuLabel: goml,
     values = [],
     nothingSelectedText = "",
     contrast,
@@ -81,16 +79,15 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
   const maybeOptions = useMemo(() => initializeOptions(options, unsetLabel), [options, unsetLabel]);
   // Memoize the callback functions and handle the `unset` option if provided.
   const getOptionLabel = useCallback(
-    (o: O) => (unsetLabel && isUnsetOption(o) ? unsetLabel : gol(o)),
-    [gol, unsetLabel],
+    (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : props.getOptionLabel(o)),
+    [props.getOptionLabel, unsetLabel],
   );
-  const getOptionValue = useCallback(
-    (o: O) => (unsetLabel && isUnsetOption(o) ? (o.id as V) : gov(o)),
-    [gov, unsetLabel],
-  );
-  const getOptionMenuLabel = useMemo(
-    () => (goml ? (o: O) => goml(o, Boolean(unsetLabel) && isUnsetOption(o)) : getOptionLabel),
-    [goml, unsetLabel],
+  const getOptionMenuLabel = useCallback(
+    (o: O) =>
+      props.getOptionMenuLabel
+        ? props.getOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption)
+        : getOptionLabel(o),
+    [props.getOptionValue, unsetLabel, getOptionLabel],
   );
 
   const { contains } = useFilter({ sensitivity: "base" });
@@ -199,9 +196,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
       setFieldState((prevState) => ({ ...prevState, optionsLoading: true }));
       const loadedOptions = (await maybeOptions.load()).options;
       // Ensure the `unset` option is prepended to the top of the list if `unsetLabel` was provided
-      const options = !unsetLabel
-        ? loadedOptions
-        : getOptionsWithUnset(unsetLabel, (await maybeOptions.load()).options);
+      const options = !unsetLabel ? loadedOptions : getOptionsWithUnset(unsetLabel, loadedOptions);
       setFieldState((prevState) => ({
         ...prevState,
         filteredOptions: options,
@@ -439,9 +434,7 @@ export function initializeOptions<O>(options: OptionsOrLoad<O>, unsetLabel: stri
 }
 
 function getOptionsWithUnset<O>(unsetLabel: string, options: O[]): O[] {
-  return [{ id: undefined, name: unsetLabel } as unknown as O, ...options];
+  return [unsetOption as unknown as O, ...options];
 }
 
-function isUnsetOption<O>(o: UnsetOption | O): o is UnsetOption {
-  return typeof o === "object" && "id" in o && o.id === undefined;
-}
+const unsetOption = {};

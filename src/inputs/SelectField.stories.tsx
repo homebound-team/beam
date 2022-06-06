@@ -67,7 +67,7 @@ function Template(args: SelectFieldProps<any, any>) {
                   <Icon icon={o.icon} />
                 </span>
               )}
-              {o.name}
+              {o.name ?? "None"}
             </div>
           )}
         />

@@ -284,7 +284,7 @@ describe("SelectFieldTest", () => {
         options={labelValueOptions}
         getOptionLabel={(o) => o.label}
         getOptionValue={(o) => o.value}
-        getOptionMenuLabel={(o, isUnsetOpt) => (isUnsetOpt ? "Custom" : o.label)}
+        getOptionMenuLabel={(o, isUnsetOpt) => (isUnsetOpt ? "Unset Label" : o.label)}
       />,
     );
     // When we focus the field to open the menu
@@ -292,7 +292,7 @@ describe("SelectFieldTest", () => {
     // Then the `unset` option in the menu should reflect the custom value we passed in
     expect(r.getAllByRole("option").map((o) => o.textContent)).toMatchInlineSnapshot(`
       Array [
-        "Custom",
+        "Unset Label",
         "One",
         "Two",
         "Three",
