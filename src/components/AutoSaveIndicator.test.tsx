@@ -37,7 +37,7 @@ describe(AutoSaveIndicator, () => {
 
     const r = await render(
       <MockAutoSaveProvider resetStatus={resetStatus}>
-        <AutoSaveIndicator />
+        <AutoSaveIndicator resetOnDismount />
       </MockAutoSaveProvider>,
     );
 

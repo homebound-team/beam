@@ -7,13 +7,17 @@ import { Icon } from "./Icon";
 
 interface AutoSaveIndicatorProps {
   hideOnIdle?: boolean;
+  resetOnDismount?: boolean;
 }
 
-export function AutoSaveIndicator({ hideOnIdle }: AutoSaveIndicatorProps) {
+export function AutoSaveIndicator({ hideOnIdle, resetOnDismount }: AutoSaveIndicatorProps) {
   const { status, resetStatus, errors } = useAutoSaveStatus();
 
   /** On Dismount, reset back to Idle so new pages don't imply something "saved" */
-  useEffect(() => () => resetStatus(), []);
+  useEffect(() => {
+    if (!resetOnDismount) return;
+    return () => resetStatus();
+  }, [resetOnDismount]);
 
   switch (status) {
     case AutoSaveStatus.IDLE:
