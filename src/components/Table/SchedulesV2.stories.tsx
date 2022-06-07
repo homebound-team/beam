@@ -678,7 +678,7 @@ const taskStatuses: TaskStatusDetails[] = [
 ];
 
 function TaskStatusField({ value }: { value: string }) {
-  const [internalValue, setValue] = useState(value);
+  const [internalValue, setValue] = useState<string | undefined>(value);
   return (
     <SelectField
       getOptionValue={(o) => o.code}

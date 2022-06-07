@@ -60,7 +60,7 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
         getOptionValue={(o) => o.id}
         getOptionLabel={(o) => o.name}
         value={groupBy.value}
-        onSelect={(g) => groupBy.setValue(g)}
+        onSelect={(g) => g && groupBy.setValue(g)}
       />
     </div>
   ) : null;

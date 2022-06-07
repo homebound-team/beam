@@ -47,7 +47,6 @@ const booleanOptions = [
   { label: "Unset", value: undefined },
 ];
 
-// export function SelectFields() {
 function Template(args: SelectFieldProps<any, any>) {
   const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
 
@@ -60,6 +59,7 @@ function Template(args: SelectFieldProps<any, any>) {
           label="Favorite Icon"
           value={options[2].id}
           options={options}
+          unsetLabel="N/A"
           getOptionMenuLabel={(o) => (
             <div css={Css.df.aic.$}>
               {o.icon && (
@@ -67,7 +67,7 @@ function Template(args: SelectFieldProps<any, any>) {
                   <Icon icon={o.icon} />
                 </span>
               )}
-              {o.name}
+              {o.name ?? "None"}
             </div>
           )}
         />
@@ -201,7 +201,7 @@ Contrast.args = { compact: true, contrast: true };
 const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
 
 export function PerfTest() {
-  const [selectedValue, setSelectedValue] = useState<string>(loadTestOptions[2].id);
+  const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);
   return (
     <SelectField
       label="Project"
@@ -225,7 +225,7 @@ export function PerfTest() {
 PerfTest.parameters = { chromatic: { disableSnapshot: true } };
 
 export function LoadingState() {
-  const [selectedValue, setSelectedValue] = useState<string>(loadTestOptions[2].id);
+  const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);
 
   return (
     <SelectField
@@ -325,7 +325,7 @@ function TestSelectField<T extends object, V extends Value>(
         onBlur={action("onBlur")}
         onFocus={action("onFocus")}
       />
-      <div css={Css.m3.$}>value={selectedOption}</div>
+      <div css={Css.m3.$}>value = {`${selectedOption}`}</div>
     </div>
   );
 }
