@@ -1,5 +1,5 @@
 import { Selection } from "@react-types/shared";
-import React, { Key, ReactNode, useEffect, useRef, useState } from "react";
+import React, { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
 import { resolveTooltip } from "src/components";
@@ -13,8 +13,8 @@ import { BeamFocusableProps } from "src/interfaces";
 import { areArraysEqual } from "src/utils";
 
 export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
-  /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
-  getOptionMenuLabel?: (opt: O) => string | ReactNode;
+  /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
+  getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => string | ReactNode;
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
@@ -22,7 +22,7 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
   onSelect: (values: V[], opts: O[]) => void;
   multiselect?: boolean;
   disabledOptions?: V[];
-  options: O[] | { initial: O[]; load: () => Promise<{ options: O[] }> };
+  options: OptionsOrLoad<O>;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
   required?: boolean;
@@ -45,6 +45,8 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
   contrast?: boolean;
   /** Placeholder content */
   placeholder?: string;
+  /** Only used for Single Select Fields. If set, prepends an option with a `undefined` value at the top of the list */
+  unsetLabel?: string;
 }
 
 /**
@@ -61,18 +63,35 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     disabled,
     readOnly,
     onSelect,
-    options: maybeOptions,
+    options,
     multiselect = false,
-    getOptionLabel,
-    getOptionValue,
-    getOptionMenuLabel = getOptionLabel,
     values = [],
     nothingSelectedText = "",
     contrast,
     disabledOptions,
     borderless,
+    unsetLabel,
     ...otherProps
   } = props;
+
+  // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
+  const maybeOptions = useMemo(() => initializeOptions(options, unsetLabel), [options, unsetLabel]);
+  // Memoize the callback functions and handle the `unset` option if provided.
+  const getOptionLabel = useCallback(
+    (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : props.getOptionLabel(o)),
+    [props.getOptionLabel, unsetLabel],
+  );
+  const getOptionValue = useCallback(
+    (o: O) => (unsetLabel && o === unsetOption ? (undefined as V) : props.getOptionValue(o)),
+    [props.getOptionValue, unsetLabel],
+  );
+  const getOptionMenuLabel = useCallback(
+    (o: O) =>
+      props.getOptionMenuLabel
+        ? props.getOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption)
+        : getOptionLabel(o),
+    [props.getOptionValue, unsetLabel, getOptionLabel],
+  );
 
   const { contains } = useFilter({ sensitivity: "base" });
   const isDisabled = !!disabled;
@@ -178,7 +197,9 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
   async function maybeInitLoad() {
     if (!Array.isArray(maybeOptions)) {
       setFieldState((prevState) => ({ ...prevState, optionsLoading: true }));
-      const { options } = await maybeOptions.load();
+      const loadedOptions = (await maybeOptions.load()).options;
+      // Ensure the `unset` option is prepended to the top of the list if `unsetLabel` was provided
+      const options = !unsetLabel ? loadedOptions : getOptionsWithUnset(unsetLabel, loadedOptions);
       setFieldState((prevState) => ({
         ...prevState,
         filteredOptions: options,
@@ -387,6 +408,8 @@ type FieldState<O> = {
   allOptions: O[];
   optionsLoading: boolean;
 };
+type OptionsOrLoad<O> = O[] | { initial: O[]; load: () => Promise<{ options: O[] }> };
+type UnsetOption = { id: undefined; name: string };
 
 function getInputValue<O>(
   selectedOptions: O[],
@@ -400,3 +423,21 @@ function getInputValue<O>(
     ? nothingSelectedText
     : "";
 }
+
+export function initializeOptions<O>(options: OptionsOrLoad<O>, unsetLabel: string | undefined): OptionsOrLoad<O> {
+  if (!unsetLabel) {
+    return options;
+  }
+
+  if (Array.isArray(options)) {
+    return getOptionsWithUnset(unsetLabel, options);
+  }
+
+  return { ...options, initial: getOptionsWithUnset(unsetLabel, options.initial) };
+}
+
+function getOptionsWithUnset<O>(unsetLabel: string, options: O[]): O[] {
+  return [unsetOption as unknown as O, ...options];
+}
+
+export const unsetOption = {};
