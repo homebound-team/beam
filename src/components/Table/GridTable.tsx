@@ -356,8 +356,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
         return acc.concat([[row, row.children?.reduce(filterRows, []) ?? []]]);
       } else {
         // Otherwise, maybe one of the children match.
-        const isCollapsed = collapsedIds.includes(row.id);
-        if (!isCollapsed && !!row.children?.length) {
+        // Always filter children rows whether or not they are collapsed in order to determine proper "selected" state of the group row.
+        if (!!row.children?.length) {
           const matchedChildren = row.children.reduce(filterRows, []);
           // If some children did match, then add the parent row with its matched children.
           if (matchedChildren.length > 0) {
@@ -372,7 +372,12 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   );
 
   // Flatten + component-ize the sorted rows.
-  let [headerRows, filteredRows, totalsRows]: [RowTuple<R>[], RowTuple<R>[], RowTuple<R>[]] = useMemo(() => {
+  let [headerRows, visibleDataRows, totalsRows, matchedRowIds]: [
+    RowTuple<R>[],
+    RowTuple<R>[],
+    RowTuple<R>[],
+    string[],
+  ] = useMemo(() => {
     function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
@@ -405,25 +410,29 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: RowTuple<R>[] = [];
     const totalsRows: RowTuple<R>[] = [];
-    const filteredRows: RowTuple<R>[] = [];
+    const visibleDataRows: RowTuple<R>[] = [];
+    const matchedRowIds: string[] = [];
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
-    const nestedCards = !!style.nestedCards && new NestedCards(columns, filteredRows, style.nestedCards);
+    const nestedCards = !!style.nestedCards && new NestedCards(columns, visibleDataRows, style.nestedCards);
 
-    function visit([row, children]: ParentChildrenTuple<R>, level: number): void {
-      let isCard = nestedCards && nestedCards.maybeOpenCard(row);
-      filteredRows.push([row, makeRowComponent(row, level)]);
+    function visit([row, children]: ParentChildrenTuple<R>, level: number, visible: boolean): void {
+      let isCard = visible && nestedCards && nestedCards.maybeOpenCard(row);
 
-      const isCollapsed = collapsedIds.includes(row.id);
-      if (!isCollapsed && children.length) {
-        nestedCards && nestedCards.addSpacer();
-        visitRows(children, isCard, level + 1);
+      visible && visibleDataRows.push([row, makeRowComponent(row, level)]);
+      matchedRowIds.push(row.id);
+
+      if (children.length) {
+        // Consider "isCollapsed" as true if the parent wasn't visible.
+        const isCollapsed = !visible || collapsedIds.includes(row.id);
+        !isCollapsed && nestedCards && nestedCards.addSpacer();
+        visitRows(children, isCard, level + 1, !isCollapsed);
       }
 
-      !isLeafRow(row) && isCard && nestedCards && nestedCards.closeCard();
+      visible && !isLeafRow(row) && isCard && nestedCards && nestedCards.closeCard();
     }
 
-    function visitRows(rows: ParentChildrenTuple<R>[], addSpacer: boolean, level: number): void {
+    function visitRows(rows: ParentChildrenTuple<R>[], addSpacer: boolean, level: number, visible: boolean): void {
       const length = rows.length;
       rows.forEach((row, i) => {
         if (row[0].kind === "header") {
@@ -436,17 +445,17 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           return;
         }
 
-        visit(row, level);
-        addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
+        visit(row, level, visible);
+        visible && addSpacer && nestedCards && i !== length - 1 && nestedCards.addSpacer();
       });
     }
 
     // Call `visitRows` with our a pre-filtered set list
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
-    visitRows(maybeSorted.reduce(filterRows, []), !!nestedCards, 0);
+    visitRows(maybeSorted.reduce(filterRows, []), !!nestedCards, 0, true);
     nestedCards && nestedCards.done();
 
-    return [headerRows, filteredRows, totalsRows];
+    return [headerRows, visibleDataRows, totalsRows, matchedRowIds];
   }, [
     as,
     maybeSorted,
@@ -467,25 +476,25 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   ]);
 
   let tooManyClientSideRows = false;
-  if (filterMaxRows && filteredRows.length > filterMaxRows) {
+  if (filterMaxRows && visibleDataRows.length > filterMaxRows) {
     tooManyClientSideRows = true;
-    filteredRows = filteredRows.slice(0, filterMaxRows);
+    visibleDataRows = visibleDataRows.slice(0, filterMaxRows);
   }
 
-  rowState.setVisibleRows(filteredRows.map(([row]) => row?.id ?? ""));
+  rowState.setMatchedRows(matchedRowIds);
 
   // Push back to the caller a way to ask us where a row is.
   const { rowLookup } = props;
   if (rowLookup) {
     // Refs are cheap to assign to, so we don't bother doing this in a useEffect
-    rowLookup.current = createRowLookup(columns, filteredRows, virtuosoRef);
+    rowLookup.current = createRowLookup(columns, visibleDataRows, virtuosoRef);
   }
 
   useEffect(() => {
-    setRowCount && filteredRows?.length !== undefined && setRowCount(filteredRows.length);
-  }, [filteredRows?.length, setRowCount]);
+    setRowCount && visibleDataRows?.length !== undefined && setRowCount(visibleDataRows.length);
+  }, [visibleDataRows?.length, setRowCount]);
 
-  const noData = filteredRows.length === 0;
+  const noData = visibleDataRows.length === 0;
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
@@ -520,7 +529,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
           columns,
           headerRows,
           totalsRows,
-          filteredRows,
+          visibleDataRows,
           firstRowMessage,
           stickyHeader,
           style.nestedCards?.firstLastColumnWidth,
@@ -546,7 +555,7 @@ function renderDiv<R extends Kinded>(
   columns: GridColumn<R>[],
   headerRows: RowTuple<R>[],
   totalsRows: RowTuple<R>[],
-  filteredRows: RowTuple<R>[],
+  visibleDataRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   _stickyHeader: boolean,
   firstLastColumnWidth: number | undefined,
@@ -582,7 +591,7 @@ function renderDiv<R extends Kinded>(
           {firstRowMessage}
         </div>
       )}
-      {filteredRows.map(([, node]) => node)}
+      {visibleDataRows.map(([, node]) => node)}
     </div>
   );
 }
@@ -594,7 +603,7 @@ function renderTable<R extends Kinded>(
   columns: GridColumn<R>[],
   headerRows: RowTuple<R>[],
   totalsRows: RowTuple<R>[],
-  filteredRows: RowTuple<R>[],
+  visibleDataRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   _stickyHeader: boolean,
   _firstLastColumnWidth: number | undefined,
@@ -624,7 +633,7 @@ function renderTable<R extends Kinded>(
             </td>
           </tr>
         )}
-        {filteredRows.map(([, node]) => node)}
+        {visibleDataRows.map(([, node]) => node)}
       </tbody>
     </table>
   );
@@ -656,7 +665,7 @@ function renderVirtual<R extends Kinded>(
   columns: GridColumn<R>[],
   headerRows: RowTuple<R>[],
   totalsRows: RowTuple<R>[],
-  filteredRows: RowTuple<R>[],
+  visibleDataRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   firstLastColumnWidth: number | undefined,
@@ -719,10 +728,10 @@ function renderVirtual<R extends Kinded>(
         }
 
         // Lastly render `filteredRow`
-        return filteredRows[index][1];
+        return visibleDataRows[index][1];
       }}
       totalCount={
-        (headerRows.length || 0) + (totalsRows.length || 0) + (firstRowMessage ? 1 : 0) + (filteredRows.length || 0)
+        (headerRows.length || 0) + (totalsRows.length || 0) + (firstRowMessage ? 1 : 0) + (visibleDataRows.length || 0)
       }
     />
   );
