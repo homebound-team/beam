@@ -11,28 +11,24 @@ export interface IconProps extends AriaAttributes, DOMProps {
   inc?: number;
   /** Styles overrides */
   xss?: Xss<Margin | "visibility">;
-  helperText?: React.ReactNode;
 }
 
 export const Icon = React.memo((props: IconProps) => {
-  const { icon, inc = 3, color = "currentColor", xss, helperText, ...other } = props;
+  const { icon, inc = 3, color = "currentColor", xss, ...other } = props;
   const size = increment(inc);
   return (
-    <div css={Css.df.gap1.color(color).$}>
-      <svg
-        aria-hidden={true}
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        css={{ "path, rect": Css.fill(color).$, ...xss }}
-        data-icon={icon}
-        {...other}
-      >
-        {Icons[icon]}
-      </svg>
-      {helperText}
-    </div>
+    <svg
+      aria-hidden={true}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      css={{ "path, rect": Css.fill(color).$, ...xss }}
+      data-icon={icon}
+      {...other}
+    >
+      {Icons[icon]}
+    </svg>
   );
 });
 

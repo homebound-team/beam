@@ -86,8 +86,8 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
   return (
     <BeamContext.Provider value={{ ...context }}>
       <PresentationProvider {...presentationProps}>
-        <SnackbarProvider>
-          <AutoSaveStatusProvider>
+        <AutoSaveStatusProvider>
+          <SnackbarProvider>
             {/* OverlayProvider is required for Modals generated via React-Aria */}
             <OverlayProvider>
               {children}
@@ -95,8 +95,8 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
               {modalRef.current && drawerContentStackRef.current.length === 0 && <Modal {...modalRef.current} />}
             </OverlayProvider>
             <SuperDrawer />
-          </AutoSaveStatusProvider>
-        </SnackbarProvider>
+          </SnackbarProvider>
+        </AutoSaveStatusProvider>
       </PresentationProvider>
     </BeamContext.Provider>
   );
