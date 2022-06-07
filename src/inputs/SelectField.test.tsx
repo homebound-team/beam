@@ -2,14 +2,13 @@ import { click, render } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
-import { HasIdAndName } from "src/types";
+import { HasIdAndName, Optional } from "src/types";
 import { wait } from "src/utils/rtl";
 
 describe("SelectFieldTest", () => {
-  const onSelect = jest.fn();
-
   it("can set a value", async () => {
     // Given a MultiSelectField
+    const onSelect = jest.fn();
     const onBlur = jest.fn();
     const r = await render(
       <TestSelectField
@@ -20,6 +19,7 @@ describe("SelectFieldTest", () => {
         getOptionValue={(o) => o.id}
         data-testid="age"
         onBlur={onBlur}
+        onSelect={onSelect}
       />,
     );
     // That initially has "One" selected
@@ -30,7 +30,7 @@ describe("SelectFieldTest", () => {
     // And we select the 3rd option
     click(r.getByRole("option", { name: "Three" }));
     // Then onSelect was called
-    expect(onSelect).toHaveBeenCalledWith("3");
+    expect(onSelect).toHaveBeenCalledWith("3", options[2]);
     // And the field has not been blurred (regression test to prevent SelectField's list box from opening back up after selecting an option)
     expect(r.age()).toHaveFocus();
     expect(onBlur).not.toHaveBeenCalled();
@@ -217,6 +217,7 @@ describe("SelectFieldTest", () => {
   });
 
   it("can define and select 'unsetLabel' when options are an array", async () => {
+    const onSelect = jest.fn();
     // Given a Select Field with options that already available
     const r = await render(
       <TestSelectField
@@ -226,6 +227,7 @@ describe("SelectFieldTest", () => {
         options={labelValueOptions}
         getOptionLabel={(o) => o.label}
         getOptionValue={(o) => o.value}
+        onSelect={onSelect}
       />,
     );
     // When we focus the field to open the menu
@@ -233,10 +235,11 @@ describe("SelectFieldTest", () => {
     // And we select the 'unset' option
     click(r.getByRole("option", { name: "None" }));
     // Then onSelect was called
-    expect(onSelect).toHaveBeenCalledWith(undefined);
+    expect(onSelect).toHaveBeenCalledWith(undefined, undefined);
   });
 
   it("can define and select 'unsetLabel' when options are lazily loaded", async () => {
+    const onSelect = jest.fn();
     // Given a Select Field with options that are loaded lazily
     const r = await render(
       <TestSelectField
@@ -246,6 +249,7 @@ describe("SelectFieldTest", () => {
         options={{ initial: [labelValueOptions[0]], load: async () => ({ options: labelValueOptions }) }}
         getOptionLabel={(o) => o.label}
         getOptionValue={(o) => o.value}
+        onSelect={onSelect}
       />,
     );
     // When we focus the field to open the menu
@@ -255,7 +259,7 @@ describe("SelectFieldTest", () => {
     // The 'unset' option is in the menu and we select it
     click(r.getByRole("option", { name: "None" }));
     // Then onSelect was called
-    expect(onSelect).toHaveBeenCalledWith(undefined);
+    expect(onSelect).toHaveBeenCalledWith(undefined, undefined);
   });
 
   it("can initially be set to the 'unsetLabel' option", async () => {
@@ -317,7 +321,7 @@ describe("SelectFieldTest", () => {
     { id: "3", name: "Three" },
   ];
 
-  function TestSelectField<O, V extends Value>(props: Omit<SelectFieldProps<O, V>, "onSelect">): JSX.Element {
+  function TestSelectField<O, V extends Value>(props: Optional<SelectFieldProps<O, V>, "onSelect">): JSX.Element {
     const [selected, setSelected] = useState<V | undefined>(props.value);
     const [initOptions, setOptions] = useState(props.options);
     return (
@@ -326,8 +330,8 @@ describe("SelectFieldTest", () => {
           {...props}
           options={initOptions}
           value={selected}
-          onSelect={(value) => {
-            onSelect(value);
+          onSelect={(value, option) => {
+            props.onSelect && props.onSelect(value, option);
             setSelected(value);
           }}
         />

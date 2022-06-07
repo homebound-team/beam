@@ -440,4 +440,4 @@ function getOptionsWithUnset<O>(unsetLabel: string, options: O[]): O[] {
   return [unsetOption as unknown as O, ...options];
 }
 
-const unsetOption = {};
+export const unsetOption = {};
