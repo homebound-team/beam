@@ -13,7 +13,7 @@ describe(AutoSaveIndicator, () => {
   ])(`renders for %s`, async (status, iconName, helperText) => {
     const r = await render(
       <MockAutoSaveProvider status={status as AutoSaveStatus}>
-        <AutoSaveIndicator showOnIdle />
+        <AutoSaveIndicator />
       </MockAutoSaveProvider>,
     );
 
@@ -25,7 +25,7 @@ describe(AutoSaveIndicator, () => {
   it("can hide when idle", async () => {
     const r = await render(
       <MockAutoSaveProvider status={AutoSaveStatus.IDLE}>
-        <AutoSaveIndicator showOnIdle={false} />
+        <AutoSaveIndicator hideOnIdle />
       </MockAutoSaveProvider>,
     );
 

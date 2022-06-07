@@ -6,11 +6,11 @@ import { Tooltip } from ".";
 import { Icon } from "./Icon";
 
 interface AutoSaveIndicatorProps {
-  showOnIdle?: boolean;
+  hideOnIdle?: boolean;
   doNotReset?: boolean;
 }
 
-export function AutoSaveIndicator({ showOnIdle, doNotReset }: AutoSaveIndicatorProps) {
+export function AutoSaveIndicator({ hideOnIdle, doNotReset }: AutoSaveIndicatorProps) {
   const { status, resetStatus, errors } = useAutoSaveStatus();
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export function AutoSaveIndicator({ showOnIdle, doNotReset }: AutoSaveIndicatorP
 
   switch (status) {
     case AutoSaveStatus.IDLE:
-      return showOnIdle ? <Icon icon="cloudSave" color={Palette.Gray700} /> : null;
+      return hideOnIdle ? null : <Icon icon="cloudSave" color={Palette.Gray700} />;
     case AutoSaveStatus.SAVING:
       return (
         <HelperText text="Saving..." color={Palette.Gray700}>
