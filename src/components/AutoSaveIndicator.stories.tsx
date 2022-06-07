@@ -12,7 +12,7 @@ export default {
 export const AutoSaveIndicatorStatuses = () => (
   <>
     <AutoSaveStatusContext.Provider value={autoSaveProviderValue(AutoSaveStatus.IDLE)}>
-      <AutoSaveIndicator />
+      <AutoSaveIndicator showOnIdle />
     </AutoSaveStatusContext.Provider>
     <AutoSaveStatusContext.Provider value={autoSaveProviderValue(AutoSaveStatus.SAVING)}>
       <AutoSaveIndicator />
@@ -30,7 +30,7 @@ export const AutoSaveIndicatorStatuses = () => (
 
 export const AutoSaveIndicatorInAction = () => (
   <AutoSaveStatusProvider resetToIdleTimeout={2000}>
-    <AutoSaveIndicator />
+    <AutoSaveIndicator showOnIdle />
     <AutoSaveStatusContext.Consumer>
       {({ triggerAutoSave, resolveAutoSave }) => (
         <Button
