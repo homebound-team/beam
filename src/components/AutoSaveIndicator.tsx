@@ -6,22 +6,25 @@ import { Tooltip } from ".";
 import { Icon } from "./Icon";
 
 interface AutoSaveIndicatorProps {
-  hideOnIdle?: boolean;
-  resetOnDismount?: boolean;
+  showOnIdle?: boolean;
+  doNotReset?: boolean;
 }
 
-export function AutoSaveIndicator({ hideOnIdle, resetOnDismount }: AutoSaveIndicatorProps) {
+export function AutoSaveIndicator({ showOnIdle, doNotReset }: AutoSaveIndicatorProps) {
   const { status, resetStatus, errors } = useAutoSaveStatus();
 
-  /** On Dismount, reset back to Idle so new pages don't imply something "saved" */
   useEffect(() => {
-    if (!resetOnDismount) return;
+    if (doNotReset) return;
+    /**
+     * Any time AutoSaveIndicator dismounts, most likely on Page Navigation,
+     * state should clear before the next Indicator mounts
+     */
     return () => resetStatus();
-  }, [resetOnDismount]);
+  }, []);
 
   switch (status) {
     case AutoSaveStatus.IDLE:
-      return hideOnIdle ? null : <Icon icon="cloudSave" color={Palette.Gray700} />;
+      return showOnIdle ? <Icon icon="cloudSave" color={Palette.Gray700} /> : null;
     case AutoSaveStatus.SAVING:
       return (
         <HelperText text="Saving..." color={Palette.Gray700}>
