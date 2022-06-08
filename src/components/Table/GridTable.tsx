@@ -372,7 +372,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   );
 
   // Flatten + component-ize the sorted rows.
-  let [headerRows, visibleDataRows, totalsRows, matchedRowIds]: [
+  let [headerRows, visibleDataRows, totalsRows, filteredRowIds]: [
     RowTuple<R>[],
     RowTuple<R>[],
     RowTuple<R>[],
@@ -411,7 +411,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const headerRows: RowTuple<R>[] = [];
     const totalsRows: RowTuple<R>[] = [];
     const visibleDataRows: RowTuple<R>[] = [];
-    const matchedRowIds: string[] = [];
+    const filteredRowIds: string[] = [];
 
     // Misc state to track our nested card-ification, i.e. interleaved actual rows + chrome rows
     const nestedCards = !!style.nestedCards && new NestedCards(columns, visibleDataRows, style.nestedCards);
@@ -420,7 +420,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       let isCard = visible && nestedCards && nestedCards.maybeOpenCard(row);
 
       visible && visibleDataRows.push([row, makeRowComponent(row, level)]);
-      matchedRowIds.push(row.id);
+      // This row may be invisible (because it's parent is collapsed), but we still want
+      // to consider it matched if it or it's parent matched a filter.
+      filteredRowIds.push(row.id);
 
       if (children.length) {
         // Consider "isCollapsed" as true if the parent wasn't visible.
@@ -455,7 +457,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     visitRows(maybeSorted.reduce(filterRows, []), !!nestedCards, 0, true);
     nestedCards && nestedCards.done();
 
-    return [headerRows, visibleDataRows, totalsRows, matchedRowIds];
+    return [headerRows, visibleDataRows, totalsRows, filteredRowIds];
   }, [
     as,
     maybeSorted,
@@ -481,7 +483,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     visibleDataRows = visibleDataRows.slice(0, filterMaxRows);
   }
 
-  rowState.setMatchedRows(matchedRowIds);
+  rowState.setMatchedRows(filteredRowIds);
 
   // Push back to the caller a way to ask us where a row is.
   const { rowLookup } = props;
