@@ -1,11 +1,11 @@
-import { format as dateFnsFormat, parse as dateFnsParse } from "date-fns";
+import { format as dateFnsFormat, isDate, parse as dateFnsParse } from "date-fns";
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
-import { DateUtils, Modifier } from "react-day-picker";
+import { Matcher } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
 import { Icon, resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
-import { DatePickerOverlay } from "src/components/internal/DatePickerOverlay";
+import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
 import { Css, Palette } from "src/Css";
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { maybeCall, useTestIds } from "src/utils";
@@ -36,7 +36,7 @@ export interface DateFieldProps
    * Set custom logic for individual dates or date ranges to be disabled in the picker
    * exposed from `react-day-picker`: https://react-day-picker.js.org/api/DayPicker#modifiers
    */
-  disabledDays?: Modifier | Modifier[];
+  disabledDays?: Matcher | Matcher[];
   onEnter?: VoidFunction;
   // for storybook
   defaultOpen?: boolean;
@@ -66,7 +66,8 @@ export function DateField(props: DateFieldProps) {
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
-  // Local focus state for determining which `dateFormat` to show. When in focus, always show `short` format, otherwise based on `format` prop value.
+  // Local focus state to conditionally call onBlur when the date picker closes.
+  // E.g. If the picker closes due to focus going back to the input field then don't call onBlur. Also used to avoid updating WIP values
   const [isFocused, setIsFocused] = useState(false);
   const dateFormat = getDateFormat(format);
   const [inputValue, setInputValue] = useState(value ? formatDate(value, dateFormat) : "");
@@ -74,12 +75,14 @@ export function DateField(props: DateFieldProps) {
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
 
+  // Handle case where the input value is updated from outside the component.
   useEffect(() => {
     // Avoid updating any WIP values.
     if (!isFocused) {
       setInputValue(value ? formatDate(value, dateFormat) : "");
     }
-  }, [value]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps - Do not include `isFocused`, we don't want to update the internal `inputValue` back to `value` just because focus state changes
+  }, [value, dateFormat]);
 
   const textFieldProps = {
     ...others,
@@ -114,6 +117,7 @@ export function DateField(props: DateFieldProps) {
       },
       onBlur: (e) => {
         setIsFocused(false);
+
         // If we are interacting any other part of `inputWrap` ref (such as the calendar button) return early as clicking anywhere within there will push focus to the input field.
         // Or if interacting with the DatePicker then also return early. The overlay will handle calling `onBlur` once it closes.
         if (
@@ -123,9 +127,13 @@ export function DateField(props: DateFieldProps) {
           return;
         }
 
+        const parsedDate = parseDate(inputValue, dateFormats.short);
         // If the user leaves the input and has an invalid date, reset to previous value.
-        if (!parseDate(inputValue, dateFormat)) {
+        if (!parsedDate) {
           setInputValue(value ? formatDate(value, dateFormat) : "");
+        } else if (dateFormat !== dateFormats.short) {
+          // Or if we need to reset the dateFormat back from `short` to whatever the user specified
+          setInputValue(formatDate(parsedDate, dateFormat));
         }
         state.close();
         maybeCall(onBlur);
@@ -164,7 +172,7 @@ export function DateField(props: DateFieldProps) {
   // If showing the short date format, "01/01/20", so set size to 8. If medium (Wed, Nov 23) use 10 characters (leaving out the `,` character in the count because it is so small)
   // Otherwise the long format can be `undefined`.
   // Setting the size attribute only impacts the fields when displayed in a container that doesn't allow the field to grow to its max width, such as in an inline container.
-  // TODO: figure this out... seems weird to have now that we support multiple dates....
+  // TODO: figure this out... seems weird to have now that we support multiple dates formats....
   // How do other applications handle this defined sizing? Appears they use hard coded widths depending on format, which is similar here (using `size` instead of css `width`).
   // But would also need to allow for the input to be `fullWidth`, which is basically also what we're accomplishing here... so maybe fine?
   const inputSize = format === "short" ? 8 : format === "medium" ? 10 : undefined;
@@ -268,7 +276,7 @@ function parseDate(str: string, format: string) {
   }
 
   const parsed = dateFnsParse(str, format, new Date());
-  if (!DateUtils.isDate(parsed)) {
+  if (!isDate(parsed)) {
     return undefined;
   }
   return parsed;
