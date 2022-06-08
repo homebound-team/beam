@@ -1445,6 +1445,99 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
 
+  it("sets the selected state of the group row as expected when children are collapsed", async () => {
+    // Given a table that can apply a filter and three parents with children.
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        // One parent where all children match the filter
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "filter child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "filter child p1c2" } },
+        ],
+      },
+      {
+        ...{ kind: "parent", id: "p2", data: { name: "parent 2" } },
+        // A second parent where only one child matches the filter
+        children: [
+          { kind: "child", id: "p2c1", data: { name: "filter child p2c1" } },
+          { kind: "child", id: "p2c2", data: { name: "child p2c2" } },
+        ],
+      },
+      {
+        // A third parent that matches the filter, but no children match the filter
+        ...{ kind: "parent", id: "p3", data: { name: "filter parent 3" } },
+        children: [{ kind: "child", id: "p3c1", data: { name: "child p3c1" } }],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    const r = await render(<TestFilterAndSelect rows={rows} api={api} />);
+
+    // When triggering all rows as selected
+    click(cellAnd(r, 0, 1, "select"));
+    // Then expect all rows should selected
+    expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c2", "p2c1", "p1", "p1c2", "p1c1"]);
+
+    // When collapsing all rows
+    click(cellAnd(r, 0, 0, "collapse"));
+    // Then expect each group row to persist the selected stated
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 2, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 3, 1, "select")).toBeChecked();
+
+    // And all rows are still returned by the API
+    expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c2", "p2c1", "p1", "p1c2", "p1c1"]);
+
+    // When applying a filter
+    type(r.filter, "filter");
+    // Then each group rows selected state should reflect the children that match the filter
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 2, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 3, 1, "select")).not.toBeChecked();
+    // And the API reflects the expected selected states of rows that match the filter
+    expect(api.current!.getSelectedRowIds()).toEqual(["p2", "p2c1", "p1", "p1c2", "p1c1"]);
+  });
+
+  // it can switch between partially checked to checked depending on applied filter
+  it("can switch between partially checked to checked depending on applied filter", async () => {
+    // Given a table that can apply a filter and a parent row with one child will match the filter
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "filter child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    const r = await render(<TestFilterAndSelect rows={rows} api={api} />);
+
+    // When selecting the row that matches the filter
+    click(cellAnd(r, 2, 1, "select"));
+    // Then expect only the selected row to be returned
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1c1"]);
+    // And the group row to be partially checked
+    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+
+    // When collapsing all rows
+    click(cellAnd(r, 0, 0, "collapse"));
+    // Then expect each group row to persist the selected stated
+    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+
+    // When applying a filter
+    type(r.filter, "filter");
+    // Then the group row's selected state should reflect the children that match the filter
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+
+    // When removing the filter
+    type(r.filter, "");
+    // Then the group row's selected state should be back to partially checked
+    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+  });
+
   describe("matchesFilter", () => {
     it("is case insensitive", () => {
       expect(matchesFilter("Foo", "foO")).toBeTruthy();

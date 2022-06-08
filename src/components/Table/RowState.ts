@@ -26,8 +26,8 @@ export class RowState {
   private readonly collapsedRows = new ObservableSet<string>();
   private persistCollapse: string | undefined;
   private readonly selectedRows = new ObservableMap<string, SelectedState>();
-  // Set of just row ids. Keeps track of which rows are visible. Used to filter out non-visible rows from `selectedIds`
-  private visibleRows = new ObservableSet<string>();
+  // Set of just row ids. Keeps track of which rows match the filter. Used to filter rows from `selectedIds`
+  private matchedRows = new ObservableSet<string>();
   // The current list of rows, basically a useRef.current. Not reactive.
   public rows: GridDataRow<any>[] = [];
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
@@ -44,13 +44,13 @@ export class RowState {
       // We only shallow observe rows so that:
       // a) we don't deeply/needlessly proxy-ize a large Apollo fragment cache, but
       // b) if rows changes, we re-run computeds like getSelectedRows that may need to see the
-      // updated _contents_ of a given row, even if our other selected/visible row states don't change.
+      // updated _contents_ of a given row, even if our other selected/matched row states don't change.
       // (as any b/c rows is private, so the mapped type doesn't see it)
       { rows: observable.shallow } as any,
     );
-    // Whenever our `visibleRows` change (i.e. via filtering) then we need to re-derive header and parent rows' selected state.
+    // Whenever our `matchedRows` change (i.e. via filtering) then we need to re-derive header and parent rows' selected state.
     reaction(
-      () => [...this.visibleRows.values()].sort(),
+      () => [...this.matchedRows.values()].sort(),
       () => {
         const map = new Map<string, SelectedState>();
         map.set("header", deriveParentSelected(this.rows.flatMap((row) => this.setNestedSelectedStates(row, map))));
@@ -112,21 +112,21 @@ export class RowState {
     this.rows = rows;
   }
 
-  setVisibleRows(rowIds: string[]): void {
+  setMatchedRows(rowIds: string[]): void {
     // ObservableSet doesn't seem to do a `diff` inside `replace` before firing
     // observers/reactions that watch it, which can lead to render loops with the
     // application page is observing `GridTableApi.getSelectedRows`, and merely
     // the act of rendering GridTable (w/o row changes) causes it's `useComputed`
     // to be triggered.
-    if (!comparer.shallow(rowIds, [...this.visibleRows.values()])) {
-      this.visibleRows.replace(rowIds);
+    if (!comparer.shallow(rowIds, [...this.matchedRows.values()])) {
+      this.matchedRows.replace(rowIds);
     }
   }
 
   get selectedIds(): string[] {
     // Return only ids that are fully checked, i.e. not partial
     const ids = [...this.selectedRows.entries()]
-      .filter(([id, v]) => this.visibleRows.has(id) && v === "checked")
+      .filter(([id, v]) => this.matchedRows.has(id) && v === "checked")
       .map(([k]) => k);
     // Hide our header marker
     const headerIndex = ids.indexOf("header");
@@ -149,7 +149,7 @@ export class RowState {
         // Just mash the header + all rows + children as selected
         const map = new Map<string, SelectedState>();
         map.set("header", "checked");
-        visit(this.rows, (row) => this.visibleRows.has(row.id) && row.kind !== "totals" && map.set(row.id, "checked"));
+        visit(this.rows, (row) => this.matchedRows.has(row.id) && row.kind !== "totals" && map.set(row.id, "checked"));
         this.selectedRows.replace(map);
       } else {
         // Similarly "unmash" all rows + children.
@@ -167,17 +167,17 @@ export class RowState {
 
       // Everything here & down is deterministically on/off
       const map = new Map<string, SelectedState>();
-      visit([curr.row], (row) => this.visibleRows.has(row.id) && map.set(row.id, selected ? "checked" : "unchecked"));
+      visit([curr.row], (row) => this.matchedRows.has(row.id) && map.set(row.id, selected ? "checked" : "unchecked"));
 
       // Now walk up the parents and see if they are now-all-checked/now-all-unchecked/some-of-each
       for (const parent of [...curr.parents].reverse()) {
         if (parent.children) {
-          map.set(parent.id, deriveParentSelected(this.getVisibleChildrenStates(parent.children, map)));
+          map.set(parent.id, deriveParentSelected(this.getMatchedChildrenStates(parent.children, map)));
         }
       }
 
       // And do the header + top-level "children" as a final one-off
-      map.set("header", deriveParentSelected(this.getVisibleChildrenStates(this.rows, map)));
+      map.set("header", deriveParentSelected(this.getMatchedChildrenStates(this.rows, map)));
 
       this.selectedRows.merge(map);
     }
@@ -244,15 +244,15 @@ export class RowState {
     }
   }
 
-  private getVisibleChildrenStates(children: GridDataRow<any>[], map: Map<string, SelectedState>): SelectedState[] {
+  private getMatchedChildrenStates(children: GridDataRow<any>[], map: Map<string, SelectedState>): SelectedState[] {
     return children
-      .filter((row) => row.id !== "header" && this.visibleRows.has(row.id))
+      .filter((row) => row.id !== "header" && this.matchedRows.has(row.id))
       .map((row) => map.get(row.id) || this.getSelected(row.id));
   }
 
   // Recursively traverse through rows to determine selected state of parent rows based on children
   private setNestedSelectedStates(row: GridDataRow<any>, map: Map<string, SelectedState>): SelectedState[] {
-    if (this.visibleRows.has(row.id)) {
+    if (this.matchedRows.has(row.id)) {
       if (!row.children) {
         return [this.getSelected(row.id)];
       }
