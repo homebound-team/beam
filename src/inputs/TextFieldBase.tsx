@@ -86,7 +86,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     visuallyDisabled = fieldProps?.visuallyDisabled ?? true,
   } = props;
 
-  const typeScale = fieldProps?.typeScale ?? "sm";
+  const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && !hideLabel ? "smEm" : "sm");
   const errorInTooltip = fieldProps?.errorInTooltip ?? false;
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
   const { compound = false, forceFocus = false, forceHover = false } = internalProps;
@@ -122,11 +122,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...(!compound ? Css.ba.$ : {}),
     },
     inputWrapperReadOnly: {
-      ...Css[typeScale].df.aic.w100
-        .mhPx(fieldHeight - maybeSmaller)
-        .if(compact)
-        .mhPx(compactFieldHeight - maybeSmaller).$,
-      ...Css.gray900.if(contrast).white.$,
+      ...Css[typeScale].df.aic.w100.gray900.if(contrast).white.$,
+      // If we are hiding the label, then we are typically in a table. Keep the `mh` in this case to ensure editable and non-editable fields in a single table row line up properly
+      ...(hideLabel &&
+        Css.mhPx(fieldHeight - maybeSmaller)
+          .if(compact)
+          .mhPx(compactFieldHeight - maybeSmaller).$),
     },
     input: {
       ...Css.w100.mw0.outline0.fg1.if(multiline).br4.$,
