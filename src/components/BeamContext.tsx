@@ -1,4 +1,3 @@
-import { AutoSaveStatusProvider } from "@homebound/form-state";
 import { createContext, MutableRefObject, PropsWithChildren, useContext, useMemo, useReducer, useRef } from "react";
 import { OverlayProvider } from "react-aria";
 import { Modal, ModalProps } from "src/components/Modal/Modal";
@@ -86,17 +85,15 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
   return (
     <BeamContext.Provider value={{ ...context }}>
       <PresentationProvider {...presentationProps}>
-        <AutoSaveStatusProvider>
-          <SnackbarProvider>
-            {/* OverlayProvider is required for Modals generated via React-Aria */}
-            <OverlayProvider>
-              {children}
-              {/*If the drawer is open, assume it will show modal content internally. */}
-              {modalRef.current && drawerContentStackRef.current.length === 0 && <Modal {...modalRef.current} />}
-            </OverlayProvider>
-            <SuperDrawer />
-          </SnackbarProvider>
-        </AutoSaveStatusProvider>
+        <SnackbarProvider>
+          {/* OverlayProvider is required for Modals generated via React-Aria */}
+          <OverlayProvider>
+            {children}
+            {/*If the drawer is open, assume it will show modal content internally. */}
+            {modalRef.current && drawerContentStackRef.current.length === 0 && <Modal {...modalRef.current} />}
+          </OverlayProvider>
+          <SuperDrawer />
+        </SnackbarProvider>
       </PresentationProvider>
     </BeamContext.Provider>
   );
