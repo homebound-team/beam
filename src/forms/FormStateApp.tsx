@@ -22,7 +22,6 @@ import {
   FieldGroup,
   FormDivider,
   StaticField,
-  StaticLinkField,
 } from "src/forms";
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
 import { FormLines } from "src/forms/FormLines";
@@ -101,7 +100,9 @@ export function FormStateApp() {
               <BoundDateField field={formState.birthday} />
               <FieldGroup>
                 <StaticField label="Revenue" value="$500" />
-                <StaticLinkField label="Website" href="https://google.com" />
+                <StaticField label="Website">
+                  <a href="https://google.com">google.com</a>
+                </StaticField>
               </FieldGroup>
               <BoundNumberField field={formState.heightInInches} />
               <FormDivider />
