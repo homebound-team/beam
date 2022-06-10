@@ -1,4 +1,5 @@
 import { Global } from "@emotion/react";
+import { AutoSaveStatusProvider } from "@homebound/form-state";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactPortal, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -102,55 +103,57 @@ export function SuperDrawer(): ReactPortal | null {
               // Preventing clicks from triggering parent onClick
               onClick={(e) => e.stopPropagation()}
             >
-              <header css={Css.df.p3.bb.bGray200.df.aic.jcsb.gap2.$}>
-                {/* Left */}
-                <div css={Css.df.aic.$}>
-                  <div css={Css.xl2Em.gray900.mr2.$} {...testId.title} ref={drawerHeaderRef}>
-                    {!modalState.current && (title || null)}
+              <AutoSaveStatusProvider>
+                <header css={Css.df.p3.bb.bGray200.df.aic.jcsb.gap2.$}>
+                  {/* Left */}
+                  <div css={Css.df.aic.$}>
+                    <div css={Css.xl2Em.gray900.mr2.$} {...testId.title} ref={drawerHeaderRef}>
+                      {!modalState.current && (title || null)}
+                    </div>
+                    {!modalState.current && (titleLeftContent || null)}
                   </div>
-                  {!modalState.current && (titleLeftContent || null)}
-                </div>
-                {/* Right */}
-                {!modalState.current && (
-                  // Forcing height to 32px to match title height
-                  <div css={Css.df.childGap3.aic.hPx(32).fs0.$}>
-                    {titleRightContent || null}
-                    {/* Disable buttons is handlers are not given or if childContent is shown */}
-                    <ButtonGroup
-                      buttons={[
-                        {
-                          icon: "chevronLeft",
-                          onClick: () => onPrevClick && onPrevClick(),
-                          disabled: !onPrevClick || isDetail,
-                        },
-                        {
-                          icon: "chevronRight",
-                          onClick: () => onNextClick && onNextClick(),
-                          disabled: !onNextClick || isDetail,
-                        },
-                      ]}
-                      {...testId.headerActions}
-                    />
-                    <IconButton icon="x" onClick={closeDrawer} {...testId.close} />
+                  {/* Right */}
+                  {!modalState.current && (
+                    // Forcing height to 32px to match title height
+                    <div css={Css.df.childGap3.aic.hPx(32).fs0.$}>
+                      {titleRightContent || null}
+                      {/* Disable buttons is handlers are not given or if childContent is shown */}
+                      <ButtonGroup
+                        buttons={[
+                          {
+                            icon: "chevronLeft",
+                            onClick: () => onPrevClick && onPrevClick(),
+                            disabled: !onPrevClick || isDetail,
+                          },
+                          {
+                            icon: "chevronRight",
+                            onClick: () => onNextClick && onNextClick(),
+                            disabled: !onNextClick || isDetail,
+                          },
+                        ]}
+                        {...testId.headerActions}
+                      />
+                      <IconButton icon="x" onClick={closeDrawer} {...testId.close} />
+                    </div>
+                  )}
+                </header>
+                {content}
+                {modalState.current && (
+                  // Forcing some design constraints on the modal component
+                  <div
+                    css={
+                      // topPX(81) is the offset from the header
+                      Css.fg1.topPx(81).left0.right0.bottom0.absolute.bgWhite.df.aic.jcc.fg1.fdc.z5.$
+                    }
+                  >
+                    {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
+                    {modalState.current.content}
+                    {/* TODO: Work in some notion of the modal size + width/height + scrolling?*/}
+                    <div ref={modalBodyRef} />
+                    <div ref={modalFooterRef} />
                   </div>
                 )}
-              </header>
-              {content}
-              {modalState.current && (
-                // Forcing some design constraints on the modal component
-                <div
-                  css={
-                    // topPX(81) is the offset from the header
-                    Css.fg1.topPx(81).left0.right0.bottom0.absolute.bgWhite.df.aic.jcc.fg1.fdc.z5.$
-                  }
-                >
-                  {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
-                  {modalState.current.content}
-                  {/* TODO: Work in some notion of the modal size + width/height + scrolling?*/}
-                  <div ref={modalBodyRef} />
-                  <div ref={modalFooterRef} />
-                </div>
-              )}
+              </AutoSaveStatusProvider>
             </motion.aside>
           </motion.div>
         </>
