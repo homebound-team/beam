@@ -15,20 +15,31 @@ interface StepperBarProps {
   // The 'value' of the Step that should be displayed
   currentStep: Step["value"];
   onChange: (stepValue: string) => void;
+  resetProgress?: boolean;
 }
 
-export function Stepper({ steps, currentStep, onChange }: StepperBarProps) {
+export function Stepper({ steps, currentStep, onChange, resetProgress }: StepperBarProps) {
   if (steps.length === 0) {
     throw new Error("Stepper must be initialized with at least one step");
   }
 
-  const [progressBarStep, setProgressBarStep] = useState(0);
+  const [progressBarStep, setProgressBarStep] = useState(-1);
+
   useEffect(() => {
-    const currentStepIndex = steps.findIndex((s: Step) => s.value === currentStep) || 0;
-    if (currentStepIndex > progressBarStep) {
-      setProgressBarStep(currentStepIndex);
+    if (resetProgress) {
+      return setProgressBarStep(-1);
     }
-  }, [currentStep]);
+
+    // calc step progress based index of last step that is completed
+    const stepProgress = steps.reduce((acc, step, idx) => {
+      if (step.state === "complete") {
+        acc = idx;
+      }
+      return acc;
+    }, -1);
+
+    setProgressBarStep(stepProgress);
+  }, [currentStep, progressBarStep, resetProgress, steps]);
 
   return (
     <nav aria-label="steps" css={Css.df.fdc.$}>
