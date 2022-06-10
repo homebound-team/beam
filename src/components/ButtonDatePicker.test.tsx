@@ -14,10 +14,10 @@ describe("ButtonDatePicker", () => {
     click(r.trigger);
 
     // And selecting a date
-    click(r.queryAllByRole("gridcell")[0]);
+    click(r.datePickerDay_0);
 
     // Then the selected date should be returned and the date picker closed
     expect(onSelect).toBeCalledWith(jan1.toDateString());
-    expect(r.queryByTestId("date_datePicker")).toBeFalsy();
+    expect(r.queryByTestId("trigger_datePicker")).toBeFalsy();
   });
 });

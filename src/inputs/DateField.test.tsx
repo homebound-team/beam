@@ -118,8 +118,8 @@ describe("DateField", () => {
     fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
     expect(onBlur).toBeCalledTimes(0);
 
-    // And when selecting a date - React-Day-Picker uses role="gridcell" for all dates. Choose the first of these, which should be `jan1`
-    click(r.queryAllByRole("gridcell")[0]);
+    // And when selecting a date - Choose the first of these, which should be `jan1`
+    click(r.datePickerDay_0);
     // Then then Date Picker should close
     expect(r.queryByTestId("date_datePicker")).toBeFalsy();
     // And the input's value should reflect the new date.

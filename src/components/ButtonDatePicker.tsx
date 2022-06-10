@@ -1,8 +1,8 @@
 import { useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
-import { DatePickerProps } from "src/components/internal/DatePicker";
-import { DatePickerOverlay } from "src/components/internal/DatePickerOverlay";
+import { DatePickerProps } from "src/components/internal/DatePicker/DatePicker";
+import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
 import { isTextButton, OverlayTrigger, OverlayTriggerProps } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";

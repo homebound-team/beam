@@ -37,8 +37,8 @@ describe("BoundDateField", () => {
 
     // When triggering the Date Picker
     r.birthday().focus();
-    // And when selecting a date - React-Day-Picker uses role="gridcell" for all dates. Choose the first of these, which should be `jan1`
-    click(r.queryAllByRole("gridcell")[0]);
+    // And when selecting a date - Choose the first of these, which should be `jan1`
+    click(r.datePickerDay_0);
 
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith(jan1.toDateString());
