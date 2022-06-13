@@ -43,9 +43,9 @@ export function Day(props: DayProps) {
       <div
         css={{
           ...Css.relative.br4.df.aic.jcc.wPx(28).hPx(30).mtPx(2).br4.$,
+          ...(today && Css.bgGray100.$),
           ...(selected && Css.white.bgLightBlue700.$),
           ...(disabled && Css.gray500.$),
-          ...(today && Css.bgGray100.$),
         }}
       >
         <div css={Css.mtPx(-2).$}>{children}</div>
