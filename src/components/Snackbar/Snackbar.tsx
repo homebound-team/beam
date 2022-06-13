@@ -7,7 +7,7 @@ interface SnackbarProps {
 
 export function Snackbar({ notices }: SnackbarProps) {
   return (
-    <div css={Css.fixed.bottom3.right3.df.fdc.aife.gapPx(12).$}>
+    <div css={Css.fixed.bottom3.left3.df.fdc.aifs.gapPx(12).$}>
       {notices.map((data) => (
         <SnackbarNotice key={data.id} {...data} />
       ))}
