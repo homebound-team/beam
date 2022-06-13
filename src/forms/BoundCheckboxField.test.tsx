@@ -15,7 +15,7 @@ describe("BoundCheckboxField", () => {
     // When rendered
     const r = await render(<BoundCheckboxField field={formState.isAvailable} />);
 
-    // Expect the BoundCheckboxField to be checked
+    // Then the BoundCheckboxField should be checked
     expect(r.isAvailable()).toBeChecked();
   });
 

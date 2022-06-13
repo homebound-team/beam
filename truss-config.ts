@@ -99,6 +99,7 @@ const sections: Sections = {
       backgroundColor: "rgba(36,36,36,0.2)",
     }),
   ],
+  contentEmpty: () => [newMethod("contentEmpty", { content: "''" })],
 };
 
 const aliases: Record<string, string[]> = {};

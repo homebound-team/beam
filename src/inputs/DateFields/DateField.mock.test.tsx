@@ -1,7 +1,7 @@
 import { fireEvent } from "@testing-library/react";
+import { DateField as MockDateField } from "src/inputs/DateFields/DateField.mock";
 import { noop } from "src/utils";
 import { render, type } from "src/utils/rtl";
-import { DateField as MockDateField } from "./DateField.mock";
 
 describe("MockDateField", () => {
   it("formats date value when provided", async () => {
@@ -29,7 +29,7 @@ describe("MockDateField", () => {
     // When firing the events
     fireEvent.focus(r.date());
     fireEvent.blur(r.date());
-    // Expect the callbacks to be invoked
+    // Then the callbacks are invoked
     expect(onFocus).toBeCalledTimes(1);
     expect(onBlur).toBeCalledTimes(1);
   });

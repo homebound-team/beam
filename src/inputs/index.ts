@@ -1,7 +1,7 @@
 export * from "./Checkbox";
 export * from "./CheckboxGroup";
 export * from "./ChipSelectField";
-export * from "./DateField";
+export * from "./DateFields";
 export * from "./MultiSelectField";
 export * from "./NumberField";
 export type { NumberFieldProps } from "./NumberField";

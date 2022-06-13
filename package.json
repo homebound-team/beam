@@ -43,7 +43,7 @@
     "framer-motion": "^4.1.11",
     "memoize-one": "^5.2.1",
     "react-aria": "^3.14.1",
-    "react-day-picker": "^8.0.6",
+    "react-day-picker": "^8.0.7",
     "react-popper": "^2.2.5",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",

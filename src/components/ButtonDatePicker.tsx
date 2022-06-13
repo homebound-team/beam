@@ -22,7 +22,7 @@ export function ButtonDatePicker(props: ButtonDatePickerProps) {
 
   return (
     <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
-      <DatePickerOverlay {...props} state={state} overlayProps={menuProps} {...tid.datePicker} />
+      <DatePickerOverlay {...props} state={state} overlayProps={menuProps} {...tid.datePicker} mode="single" />
     </OverlayTrigger>
   );
 }

@@ -14,6 +14,11 @@
   --rdp-outline-selected: 2px solid rgba(3,105,161,1);
 }
 
+/* Added in By Beam */
+.rdp-cell:focus-visible {
+  outline: 0;
+}
+
 .rdp {
   /* Modified by Beam (1em -> 16px) */
   margin: 16px;
