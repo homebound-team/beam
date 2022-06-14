@@ -28,6 +28,7 @@ export const condensedStyle: GridStyle = {
 /** Renders each row as a card. */
 export const cardStyle: GridStyle = {
   ...defaultStyle,
+  betweenRowsCss: {},
   firstNonHeaderRowCss: Css.mt2.$,
   cellCss: Css.p2.my1.bt.bb.bGray400.$,
   firstCellCss: Css.bl.add({ borderTopLeftRadius: "4px", borderBottomLeftRadius: "4px" }).$,
