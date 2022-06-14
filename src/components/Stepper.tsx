@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css } from "src/Css";
@@ -15,31 +15,15 @@ interface StepperBarProps {
   // The 'value' of the Step that should be displayed
   currentStep: Step["value"];
   onChange: (stepValue: string) => void;
-  resetProgress?: boolean;
 }
 
-export function Stepper({ steps, currentStep, onChange, resetProgress }: StepperBarProps) {
+export function Stepper({ steps, currentStep, onChange }: StepperBarProps) {
   if (steps.length === 0) {
     throw new Error("Stepper must be initialized with at least one step");
   }
 
-  const [progressBarStep, setProgressBarStep] = useState(-1);
-
-  useEffect(() => {
-    if (resetProgress) {
-      return setProgressBarStep(-1);
-    }
-
-    // calc step progress based index of last step that is completed
-    const stepProgress = steps.reduce((acc, step, idx) => {
-      if (step.state === "complete") {
-        acc = idx;
-      }
-      return acc;
-    }, -1);
-
-    setProgressBarStep(stepProgress);
-  }, [currentStep, progressBarStep, resetProgress, steps]);
+  // calc progress based on last completed step - return -1 when no steps completed
+  const progressBarStep = steps.reduce((acc, step, idx) => (step.state === "complete" ? idx : acc), -1);
 
   return (
     <nav aria-label="steps" css={Css.df.fdc.$}>
