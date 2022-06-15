@@ -23,7 +23,7 @@ export function Stepper({ steps, currentStep, onChange }: StepperBarProps) {
   }
 
   // calc progress based on last completed step - return -1 when no steps completed
-  const progressBarStep = steps.reduce((acc, step, idx) => (step.state === "complete" ? idx : acc), -1);
+  const lastCompletedStep = steps.map((step) => step.state).lastIndexOf("complete");
 
   return (
     <nav aria-label="steps" css={Css.df.fdc.$}>
@@ -42,7 +42,7 @@ export function Stepper({ steps, currentStep, onChange }: StepperBarProps) {
           css={
             Css.bgLightBlue600
               .add("transition", "width 200ms")
-              .h100.w(`${((progressBarStep + 1) / steps.length) * 100}%`).$
+              .h100.w(`${((lastCompletedStep + 1) / steps.length) * 100}%`).$
           }
         />
       </div>
