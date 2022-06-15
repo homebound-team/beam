@@ -59,12 +59,12 @@ function StepperForm({ formState }: { formState: FormValue }) {
   const onBack = useCallback(() => {
     const currentStepIndex = steps.findIndex((s) => s.value === currentStep);
     setActiveStep(steps[currentStepIndex === 0 ? 0 : currentStepIndex - 1].value);
-  }, [currentStep]);
+  }, [currentStep, steps]);
 
   useEffect(() => {
     const disposer = reaction(
-      () => [formState.firstName.valid && formState.lastName.valid, formState.books.valid],
-      ([step1Valid, step2Valid], [wasStep1Valid, wasStep2Valid]) => {
+      () => [formState.firstName.valid && formState.lastName.valid, formState.books.valid, formState.birthday.valid],
+      ([step1Valid, step2Valid, step3Valid], [wasStep1Valid, wasStep2Valid, wasStep3Valid]) => {
         if (step1Valid && step1Valid !== wasStep1Valid) {
           setStep("books", { disabled: !step1Valid });
           return;
@@ -74,11 +74,16 @@ function StepperForm({ formState }: { formState: FormValue }) {
           setStep("misc", { disabled: !step2Valid });
           return;
         }
+
+        if (step3Valid && step3Valid !== wasStep3Valid) {
+          setStep("misc", { state: "complete" });
+          return;
+        }
       },
     );
     // Return the disposer in order to clean up useEffect.
     return disposer;
-  }, [setStep]);
+  }, [setStep, formState.birthday.valid, formState.books.valid, formState.firstName.valid, formState.lastName.valid]);
 
   return (
     <div>
