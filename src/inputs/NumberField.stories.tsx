@@ -42,6 +42,11 @@ export function NumberFieldStyles() {
         <TestNumberField label="Margin" type="basisPoints" value={1275} />
         <TestNumberField label="Days" type="days" value={1} />
       </div>
+      <div css={Css.df.fdc.childGap2.$}>
+        <h1 css={Css.lg.$}>Custom Format Options</h1>
+        <TestNumberField label="kph" value={50} numberFormatOptions={{ style: "unit", unit: "kilometer-per-hour" }} />
+        <TestNumberField label="Euro" value={500} numberFormatOptions={{ style: "currency", currency: "EUR" }} />
+      </div>
     </div>
   );
 }

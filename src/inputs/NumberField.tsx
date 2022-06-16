@@ -34,6 +34,8 @@ export interface NumberFieldProps {
   // If set, all positive values will be prefixed with "+". (Zero will not show +/-)
   displayDirection?: boolean;
   numFractionDigits?: number;
+  // Override for default formatting based on `type`.
+  numberFormatOptions?: Intl.NumberFormatOptions;
   truncate?: boolean;
   onEnter?: VoidFunction;
 }
@@ -71,6 +73,10 @@ export function NumberField(props: NumberFieldProps) {
   // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
   // see: https://github.com/adobe/react-spectrum/issues/1893.
   const formatOptions: Intl.NumberFormatOptions | undefined = useMemo(() => {
+    if (props.numberFormatOptions !== undefined) {
+      return props.numberFormatOptions;
+    }
+
     return type === "percent"
       ? { style: "percent", signDisplay, ...fractionFormatOptions }
       : type === "basisPoints"

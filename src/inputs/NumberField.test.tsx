@@ -104,6 +104,20 @@ describe("NumberFieldTest", () => {
     expect(r.days()).toHaveValue("1 day");
   });
 
+  it("allows override of numberFormatOptions", async () => {
+    const r = await render(
+      <TestNumberField
+        label="Cost"
+        value={1200}
+        numFractionDigits={2}
+        numberFormatOptions={{ style: "currency", currency: "USD" }}
+      />,
+    );
+    expect(r.cost()).toHaveValue("$1,200.00");
+    type(r.cost, "14.14");
+    expect(r.cost()).toHaveValue("$14.14");
+  });
+
   it("displays direction of positive values and no direction display for zero", async () => {
     const r = await render(
       <>
