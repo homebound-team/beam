@@ -9,7 +9,7 @@ import { Css, Xss } from "src/Css";
 import { maybeCall } from "src/utils";
 import { TextFieldBase } from "./TextFieldBase";
 
-export type NumberFieldType = "cents" | "percent" | "basisPoints" | "days";
+export type NumberFieldType = "cents" | "dollars" | "percent" | "basisPoints" | "days";
 
 // exported for testing purposes
 export interface NumberFieldProps {
@@ -83,6 +83,8 @@ export function NumberField(props: NumberFieldProps) {
       ? { style: "percent", minimumFractionDigits: 2, signDisplay }
       : type === "cents"
       ? { style: "currency", currency: "USD", minimumFractionDigits: 2, signDisplay }
+      : type === "dollars"
+      ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 0, signDisplay }
       : type === "days"
       ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0, signDisplay }
       : fractionFormatOptions;
