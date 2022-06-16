@@ -58,7 +58,7 @@ export function NumberField(props: NumberFieldProps) {
     onChange,
     xss,
     displayDirection = false,
-    numFractionDigits,
+    numFractionDigits = type === "dollars" ? 2 : undefined,
     truncate = false,
     onEnter,
     ...otherProps
@@ -84,7 +84,7 @@ export function NumberField(props: NumberFieldProps) {
       : type === "cents"
       ? { style: "currency", currency: "USD", minimumFractionDigits: 2, signDisplay }
       : type === "dollars"
-      ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 0, signDisplay }
+      ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2, signDisplay }
       : type === "days"
       ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0, signDisplay }
       : fractionFormatOptions;

@@ -53,20 +53,20 @@ describe("NumberFieldTest", () => {
     expect(lastSet).toEqual(1400);
   });
 
-  it("can set dollars as dollars", async () => {
-    const r = await render(<TestNumberField label="Cost" type="dollars" value={1200} />);
-    expect(r.cost()).toHaveValue("$1,200");
-    type(r.cost, "14.25");
-    expect(r.cost()).toHaveValue("$14");
-    expect(lastSet).toEqual(14);
-  });
-
   it("can set dollars and cents as dollars", async () => {
-    const r = await render(<TestNumberField label="Cost" type="dollars" value={1200} numFractionDigits={2} />);
+    const r = await render(<TestNumberField label="Cost" type="dollars" value={1200} />);
     expect(r.cost()).toHaveValue("$1,200.00");
     type(r.cost, "14.25");
     expect(r.cost()).toHaveValue("$14.25");
     expect(lastSet).toEqual(14.25);
+  });
+
+  it("can set dollars as dollars only", async () => {
+    const r = await render(<TestNumberField label="Cost" type="dollars" value={1200} numFractionDigits={0} />);
+    expect(r.cost()).toHaveValue("$1,200");
+    type(r.cost, "14.25");
+    expect(r.cost()).toHaveValue("$14");
+    expect(lastSet).toEqual(14);
   });
 
   it("calls onChange with expected value for cents", async () => {
