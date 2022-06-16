@@ -53,6 +53,22 @@ describe("NumberFieldTest", () => {
     expect(lastSet).toEqual(1400);
   });
 
+  it("can set dollars and cents as dollars", async () => {
+    const r = await render(<TestNumberField label="Cost" type="dollars" value={1200} />);
+    expect(r.cost()).toHaveValue("$1,200.00");
+    type(r.cost, "14.25");
+    expect(r.cost()).toHaveValue("$14.25");
+    expect(lastSet).toEqual(14.25);
+  });
+
+  it("can set dollars as dollars only", async () => {
+    const r = await render(<TestNumberField label="Cost" type="dollars" value={1200} numFractionDigits={0} />);
+    expect(r.cost()).toHaveValue("$1,200");
+    type(r.cost, "14.25");
+    expect(r.cost()).toHaveValue("$14");
+    expect(lastSet).toEqual(14);
+  });
+
   it("calls onChange with expected value for cents", async () => {
     const onChange = jest.fn();
     const r = await render(<NumberField label="Cost" type="cents" value={1234} onChange={onChange} />);
@@ -102,6 +118,20 @@ describe("NumberFieldTest", () => {
     expect(r.days()).toHaveValue("2 days");
     type(r.days, "1.23");
     expect(r.days()).toHaveValue("1 day");
+  });
+
+  it("allows override of numberFormatOptions", async () => {
+    const r = await render(
+      <TestNumberField
+        label="Cost"
+        value={1200}
+        numFractionDigits={2}
+        numberFormatOptions={{ style: "currency", currency: "USD" }}
+      />,
+    );
+    expect(r.cost()).toHaveValue("$1,200.00");
+    type(r.cost, "14.14");
+    expect(r.cost()).toHaveValue("$14.14");
   });
 
   it("displays direction of positive values and no direction display for zero", async () => {

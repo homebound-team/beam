@@ -39,8 +39,14 @@ export function NumberFieldStyles() {
         <h1 css={Css.lg.$}>Unit Types</h1>
         <TestNumberField label="Percent" type="percent" value={12.55} numFractionDigits={2} truncate />
         <TestNumberField label="Cents" type="cents" value={1000} />
+        <TestNumberField label="Dollars" type="dollars" value={1000} />
         <TestNumberField label="Margin" type="basisPoints" value={1275} />
         <TestNumberField label="Days" type="days" value={1} />
+      </div>
+      <div css={Css.df.fdc.childGap2.$}>
+        <h1 css={Css.lg.$}>Custom Format Options</h1>
+        <TestNumberField label="kph" value={50} numberFormatOptions={{ style: "unit", unit: "kilometer-per-hour" }} />
+        <TestNumberField label="Euro" value={500} numberFormatOptions={{ style: "currency", currency: "EUR" }} />
       </div>
     </div>
   );

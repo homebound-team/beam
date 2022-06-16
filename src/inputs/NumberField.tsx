@@ -9,7 +9,7 @@ import { Css, Xss } from "src/Css";
 import { maybeCall } from "src/utils";
 import { TextFieldBase } from "./TextFieldBase";
 
-export type NumberFieldType = "cents" | "percent" | "basisPoints" | "days";
+export type NumberFieldType = "cents" | "dollars" | "percent" | "basisPoints" | "days";
 
 // exported for testing purposes
 export interface NumberFieldProps {
@@ -34,6 +34,8 @@ export interface NumberFieldProps {
   // If set, all positive values will be prefixed with "+". (Zero will not show +/-)
   displayDirection?: boolean;
   numFractionDigits?: number;
+  // Override for default formatting based on `type`.
+  numberFormatOptions?: Intl.NumberFormatOptions;
   truncate?: boolean;
   onEnter?: VoidFunction;
 }
@@ -56,7 +58,7 @@ export function NumberField(props: NumberFieldProps) {
     onChange,
     xss,
     displayDirection = false,
-    numFractionDigits,
+    numFractionDigits = type === "dollars" ? 2 : undefined,
     truncate = false,
     onEnter,
     ...otherProps
@@ -71,12 +73,18 @@ export function NumberField(props: NumberFieldProps) {
   // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
   // see: https://github.com/adobe/react-spectrum/issues/1893.
   const formatOptions: Intl.NumberFormatOptions | undefined = useMemo(() => {
+    if (props.numberFormatOptions !== undefined) {
+      return props.numberFormatOptions;
+    }
+
     return type === "percent"
       ? { style: "percent", signDisplay, ...fractionFormatOptions }
       : type === "basisPoints"
       ? { style: "percent", minimumFractionDigits: 2, signDisplay }
       : type === "cents"
       ? { style: "currency", currency: "USD", minimumFractionDigits: 2, signDisplay }
+      : type === "dollars"
+      ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2, signDisplay }
       : type === "days"
       ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0, signDisplay }
       : fractionFormatOptions;
