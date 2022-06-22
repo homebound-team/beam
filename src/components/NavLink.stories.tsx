@@ -26,12 +26,13 @@ export default {
 
 export function BaseStates() {
   const sideNavStyles = getNavLinkStyles("side");
+  const sideContrastNavStyles = getNavLinkStyles("side", true);
   const globalNavStyles = getNavLinkStyles("global");
   const args = { href: "", className: navLink };
 
   return (
     <div css={Css.df.childGap2.$}>
-      <div css={Css.df.fdc.childGap2.$}>
+      <div css={Css.df.fdc.childGap2.p1.$}>
         <a {...args} css={sideNavStyles.baseStyles}>
           {getChildren("Side nav default")}
         </a>
@@ -51,7 +52,27 @@ export function BaseStates() {
           {getChildren("Side nav disabled")}
         </a>
       </div>
-      <div css={Css.df.fdc.childGap2.$}>
+      <div css={Css.df.fdc.childGap2.bgGray900.p1.br12.$}>
+        <a {...args} css={sideContrastNavStyles.baseStyles}>
+          {getChildren("Side contrast nav default")}
+        </a>
+        <a {...args} css={{ ...sideContrastNavStyles.baseStyles, ...sideContrastNavStyles.hoverStyles }}>
+          {getChildren("Side contrast nav hovered")}
+        </a>
+        <a {...args} css={{ ...sideContrastNavStyles.baseStyles, ...sideContrastNavStyles.pressedStyles }}>
+          {getChildren("Side contrast nav pressed")}
+        </a>
+        <a {...args} css={{ ...sideContrastNavStyles.baseStyles, ...sideContrastNavStyles.activeStyles }}>
+          {getChildren("Side contrast nav active")}
+        </a>
+        <a {...args} css={{ ...sideContrastNavStyles.baseStyles, ...sideContrastNavStyles.focusRingStyles }}>
+          {getChildren("Side contrast nav focus ring")}
+        </a>
+        <a {...args} css={{ ...sideContrastNavStyles.baseStyles, ...sideContrastNavStyles.disabledStyles }}>
+          {getChildren("Side contrast nav disabled")}
+        </a>
+      </div>
+      <div css={Css.df.fdc.childGap2.p1.$}>
         <a {...args} css={globalNavStyles.baseStyles}>
           {getChildren("Global nav default")}
         </a>
