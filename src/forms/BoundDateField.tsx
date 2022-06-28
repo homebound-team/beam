@@ -16,6 +16,7 @@ export type BoundDateFieldProps = Omit<DateFieldProps, "label" | "value" | "onCh
 export function BoundDateField(props: BoundDateFieldProps) {
   const {
     field,
+    readOnly,
     onChange = (value) => field.set(value),
     label = defaultLabel(field.key),
     onBlur,
@@ -34,6 +35,7 @@ export function BoundDateField(props: BoundDateFieldProps) {
             onChange(value);
             field.maybeAutoSave();
           }}
+          readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           required={field.required}
           onBlur={() => {

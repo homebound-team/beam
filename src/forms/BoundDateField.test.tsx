@@ -61,6 +61,18 @@ describe("BoundDateField", () => {
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith(jan2.toDateString());
   });
+
+  it("respects form state's readonly property", async () => {
+    const autoSave = jest.fn();
+    // Given a BoundDateField
+    const author: ObjectState<AuthorInput> = createObjectState(formConfig, { birthday: jan2 });
+    const r = await render(<BoundDateField field={author.birthday} />);
+    // When setting the form state to readOnly
+    author.readOnly = true;
+
+    // Then the field should be read only
+    expect(r.birthday()).toHaveAttribute("data-readonly", "true");
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {
