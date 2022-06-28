@@ -254,11 +254,13 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         ),
       })}
 
-      {/* Compound fields will handle their own error and helper text */}
-      {errorMsg && !compound && !errorInTooltip && (
-        <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />
+      {/* Compound fields will handle their own error and helper text. Do not show error or helper text when 'readOnly' or disabled */}
+      {!compound && !inputProps.disabled && !inputProps.readOnly && (
+        <>
+          {errorMsg && !errorInTooltip && <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />}
+          {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+        </>
       )}
-      {helperText && !compound && <HelperText helperText={helperText} {...tid.helperText} />}
     </div>
   );
 }
