@@ -17,6 +17,7 @@ export interface NavLinkProps extends BeamFocusableProps {
   icon?: IconKey;
   variant: NavLinkVariant;
   openInNew?: boolean;
+  contrast?: boolean;
 }
 
 type NavLinkVariant = "side" | "global";
@@ -80,23 +81,24 @@ export function NavLink(props: NavLinkProps) {
   );
 }
 
-export function getNavLinkStyles(variant: NavLinkVariant) {
-  return navLinkVariantStyles[variant];
+export function getNavLinkStyles(variant: NavLinkVariant, contrast: boolean = false) {
+  return navLinkVariantStyles(contrast)[variant];
 }
 
 const baseStyles = Css.df.aic.hPx(32).pyPx(6).px1.br4.smEm.outline0.$;
 
-const navLinkVariantStyles: Record<
-  NavLinkVariant,
-  { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; focusRingStyles: {}; activeStyles: {}; pressedStyles: {} }
-> = {
+const navLinkVariantStyles: (
+  contrast: boolean
+) => Record<NavLinkVariant, { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; focusRingStyles: {}; activeStyles: {}; pressedStyles: {} }> = (
+  contrast,
+) => ({
   side: {
-    baseStyles: { ...baseStyles, ...Css.gray700.$ },
-    activeStyles: Css.lightBlue700.bgLightBlue50.$,
-    disabledStyles: Css.gray400.cursorNotAllowed.$,
-    focusRingStyles: Css.bgLightBlue50.bshFocus.$,
-    hoverStyles: Css.gray700.bgGray100.$,
-    pressedStyles: Css.gray700.bgGray200.$,
+    baseStyles: { ...baseStyles, ...Css.gray700.if(contrast).gray600.$ },
+    activeStyles: Css.lightBlue700.bgLightBlue50.if(contrast).white.bgGray700.$,
+    disabledStyles: Css.gray400.cursorNotAllowed.if(contrast).gray800.$,
+    focusRingStyles: Css.bgLightBlue50.bshFocus.if(contrast).bgGray700.white.$,
+    hoverStyles: Css.gray700.bgGray100.if(contrast).bgGray800.gray600.$,
+    pressedStyles: Css.gray700.bgGray200.if(contrast).bgGray200.gray800.$,
   },
   global: {
     baseStyles: { ...baseStyles, ...Css.add("width", "max-content").gray500.$ },
@@ -108,5 +110,5 @@ const navLinkVariantStyles: Record<
     ).$,
     hoverStyles: Css.gray500.bgGray900.$,
     pressedStyles: Css.gray500.bgGray700.$,
-  },
-};
+  }
+});
