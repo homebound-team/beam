@@ -1,7 +1,7 @@
-import { useRef } from "react";
+import React, { useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
-import { DatePickerProps } from "src/components/internal/DatePicker/DatePicker";
+import { DatePicker, DatePickerProps } from "src/components/internal/DatePicker/DatePicker";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
 import { isTextButton, OverlayTrigger, OverlayTriggerProps } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
@@ -14,7 +14,7 @@ interface ButtonDatePickerProps
 }
 
 export function ButtonDatePicker(props: ButtonDatePickerProps) {
-  const { defaultOpen, disabled, trigger } = props;
+  const { defaultOpen, disabled, trigger, onSelect, ...datePickerProps } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -22,7 +22,16 @@ export function ButtonDatePicker(props: ButtonDatePickerProps) {
 
   return (
     <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
-      <DatePickerOverlay {...props} state={state} overlayProps={menuProps} {...tid.datePicker} mode="single" />
+      <DatePickerOverlay overlayProps={menuProps}>
+        <DatePicker
+          {...datePickerProps}
+          onSelect={(d) => {
+            onSelect(d);
+            state.close();
+          }}
+          {...tid.datePicker}
+        />
+      </DatePickerOverlay>
     </OverlayTrigger>
   );
 }

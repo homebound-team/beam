@@ -1,6 +1,6 @@
 import { format, parse } from "date-fns";
 import { useState } from "react";
-import { DateFieldProps } from "src/inputs/index";
+import { DateFieldProps } from "src/inputs";
 import { maybeCall, useTestIds } from "src/utils";
 
 /** Mocks out `DateField` as a text `<input>` field. */

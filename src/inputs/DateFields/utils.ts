@@ -1,6 +1,7 @@
 import { format as dateFnsFormat, isDate, parse as dateFnsParse } from "date-fns";
 import { DateRange } from "src/types";
 
+export type DateFieldModeTuple = readonly ["range", DateRange] | readonly ["single", Date];
 export type DateFieldMode = "single" | "range";
 
 export const dateFormats = {
@@ -13,35 +14,37 @@ export function getDateFormat(format: keyof typeof dateFormats | undefined) {
   return format ? dateFormats[format] : dateFormats.short;
 }
 
-export function formatDate(date: Date | DateRange | undefined, format: string, mode: DateFieldMode) {
+export function formatDate(date: Date | undefined, format: string) {
   if (!date) return "";
-  if (mode === "range") {
-    const { from, to } = date as DateRange;
-    const fromFormatted = from ? dateFnsFormat(from, format) : "";
-    const toFormatted = to ? dateFnsFormat(to, format) : "";
-    // return `undefined` if both dates are improperly formatted
-    return !fromFormatted && !toFormatted ? undefined : `${fromFormatted} - ${toFormatted}`;
-  }
-
   return dateFnsFormat(date as Date, format);
 }
 
-export function parseDate(str: string, format: string, mode: DateFieldMode): Date | DateRange | undefined {
-  if (mode === "range") {
-    const [from = "", to = ""] = str.split("-");
-    const fromDate = parseDateString(from.trim(), format);
-    const toDate = parseDateString(to.trim(), format);
-    // In the event the user mixes up the to/from dates then correct them.
-    if (toDate && fromDate && toDate < fromDate) {
-      return { from: toDate, to: fromDate };
-    }
-    // If both dates are undefined, return undefined rather than { from: undefined; to: undefined }
-    if (toDate === undefined && fromDate === undefined) {
-      return undefined;
-    }
-    return { from: fromDate, to: toDate };
-  }
+export function formatDateRange(date: DateRange | undefined, format: string) {
+  if (!date) return "";
+  const { from, to } = date as DateRange;
+  const fromFormatted = from ? dateFnsFormat(from, format) : "";
+  const toFormatted = to ? dateFnsFormat(to, format) : "";
+  // return `undefined` if both dates are improperly formatted
+  return !fromFormatted && !toFormatted ? undefined : `${fromFormatted} - ${toFormatted}`;
+}
+
+export function parseDate(str: string, format: string): Date | undefined {
   return parseDateString(str, format);
+}
+
+export function parseDateRange(str: string, format: string): DateRange | undefined {
+  const [from = "", to = ""] = str.split("-");
+  const fromDate = parseDateString(from.trim(), format);
+  const toDate = parseDateString(to.trim(), format);
+  // In the event the user mixes up the to/from dates then correct them.
+  if (toDate && fromDate && toDate < fromDate) {
+    return { from: toDate, to: fromDate };
+  }
+  // If both dates are undefined, return undefined rather than { from: undefined; to: undefined }
+  if (toDate === undefined && fromDate === undefined) {
+    return undefined;
+  }
+  return { from: fromDate, to: toDate };
 }
 
 function parseDateString(str: string, format: string): Date | undefined {
