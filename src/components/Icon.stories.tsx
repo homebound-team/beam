@@ -45,6 +45,7 @@ export const Icon = (props: IconProps) => {
     "attachment",
     "archive",
     "unarchive",
+    "duplicate",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
@@ -68,7 +69,7 @@ export const Icon = (props: IconProps) => {
     "menuOpen",
   ];
   const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images", "openBook"];
-  const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar", "buildingHouse"];
+  const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar", "buildingHouse", "house"];
   const navigationIcons: IconProps["icon"][] = ["projects", "tasks", "finances", "templates", "tradePartners"];
 
   return (
