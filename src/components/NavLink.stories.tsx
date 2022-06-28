@@ -25,9 +25,9 @@ export default {
 } as Meta;
 
 export function BaseStates() {
-  const sideNavStyles = getNavLinkStyles("side");
+  const sideNavStyles = getNavLinkStyles("side", false);
   const sideContrastNavStyles = getNavLinkStyles("side", true);
-  const globalNavStyles = getNavLinkStyles("global");
+  const globalNavStyles = getNavLinkStyles("global", false);
   const args = { href: "", className: navLink };
 
   return (

@@ -23,7 +23,7 @@ export interface NavLinkProps extends BeamFocusableProps {
 type NavLinkVariant = "side" | "global";
 
 export function NavLink(props: NavLinkProps) {
-  const { disabled: isDisabled, label, openInNew, ...otherProps } = props;
+  const { disabled: isDisabled, label, openInNew, contrast=false, ...otherProps } = props;
   const ariaProps = { children: label, isDisabled, ...otherProps };
   const { href, active = false, icon = false, variant } = ariaProps;
   const ref = useRef() as RefObject<HTMLAnchorElement>;
@@ -34,8 +34,8 @@ export function NavLink(props: NavLinkProps) {
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
 
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, pressedStyles } = useMemo(
-    () => getNavLinkStyles(variant),
-    [variant],
+    () => getNavLinkStyles(variant, contrast),
+    [variant, contrast],
   );
 
   const external = isAbsoluteUrl(href) || openInNew;
@@ -81,7 +81,7 @@ export function NavLink(props: NavLinkProps) {
   );
 }
 
-export function getNavLinkStyles(variant: NavLinkVariant, contrast: boolean = false) {
+export function getNavLinkStyles(variant: NavLinkVariant, contrast: boolean) {
   return navLinkVariantStyles(contrast)[variant];
 }
 
