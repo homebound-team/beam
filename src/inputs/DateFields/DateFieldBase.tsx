@@ -1,21 +1,29 @@
-import { format as dateFnsFormat, isDate, parse as dateFnsParse } from "date-fns";
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
-import { Matcher } from "react-day-picker";
+import { isDateRange, Matcher } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
 import { Icon, resolveTooltip } from "src/components";
-import { Popover } from "src/components/internal";
+import { DatePicker, DateRangePicker, Popover } from "src/components/internal";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
 import { Css, Palette } from "src/Css";
+import {
+  DateFieldMode,
+  dateFormats,
+  formatDate,
+  formatDateRange,
+  getDateFormat,
+  isValidDate,
+  parseDate,
+  parseDateRange,
+} from "src/inputs/DateFields/utils";
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
+import { DateRange } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-export interface DateFieldProps
+export interface DateFieldBaseProps
   extends Pick<TextFieldBaseProps<{}>, "borderless" | "visuallyDisabled" | "hideLabel" | "compact"> {
-  value: Date | undefined;
   label: string;
-  onChange: (value: Date) => void;
   /** Called when the component loses focus */
   onBlur?: () => void;
   /** Called when the component is in focus. */
@@ -38,19 +46,34 @@ export interface DateFieldProps
    */
   disabledDays?: Matcher | Matcher[];
   onEnter?: VoidFunction;
-  // for storybook
+  /** for storybook */
   defaultOpen?: boolean;
+  onChange: ((value: Date) => void) | ((value: DateRange) => void);
+  mode: DateFieldMode;
 }
 
-export function DateField(props: DateFieldProps) {
+export interface DateSingleFieldBaseProps extends DateFieldBaseProps {
+  mode: "single";
+  value: Date | undefined;
+  onChange: (value: Date) => void;
+}
+
+export interface DateRangeFieldBaseProps extends DateFieldBaseProps {
+  mode: "range";
+  value: DateRange | undefined;
+  onChange: (value: DateRange) => void;
+}
+
+export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBaseProps) {
   const {
     label,
     disabled,
     required,
     value,
-    onChange,
     onFocus,
     onBlur,
+    // Pull `onChange` out of the props, but we're not directly using it. Do not want to keep it in `...others`
+    onChange: _onChange,
     errorMsg,
     helperText,
     inlineLabel = false,
@@ -60,8 +83,10 @@ export function DateField(props: DateFieldProps) {
     disabledDays,
     onEnter,
     defaultOpen,
+    mode,
     ...others
   } = props;
+
   const inputRef = useRef<HTMLInputElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -70,19 +95,15 @@ export function DateField(props: DateFieldProps) {
   // E.g. If the picker closes due to focus going back to the input field then don't call onBlur. Also used to avoid updating WIP values
   const [isFocused, setIsFocused] = useState(false);
   const dateFormat = getDateFormat(format);
-  const [inputValue, setInputValue] = useState(value ? formatDate(value, dateFormat) : "");
+  // The `wipValue` allows the "range" mode to set the value to `undefined`, even if the `onChange` response cannot be undefined.
+  // This makes working within the DateRangePicker much more user friendly.
+  const [wipValue, setWipValue] = useState(value);
+  const [inputValue, setInputValue] = useState(
+    (props.mode === "range" ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
+  );
   const tid = useTestIds(props, defaultTestId(label));
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
-
-  // Handle case where the input value is updated from outside the component.
-  useEffect(() => {
-    // Avoid updating any WIP values.
-    if (!isFocused) {
-      setInputValue(value ? formatDate(value, dateFormat) : "");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps - Do not include `isFocused`, we don't want to update the internal `inputValue` back to `value` just because focus state changes
-  }, [value, dateFormat]);
 
   const textFieldProps = {
     ...others,
@@ -110,9 +131,13 @@ export function DateField(props: DateFieldProps) {
         setIsFocused(true);
         maybeCall(onFocus);
 
-        if (value) {
+        if (wipValue && dateFormat !== dateFormats.short) {
           // When focused, change to use the "short" date format, as it is simpler to update by hand and parse.
-          setInputValue(formatDate(value, dateFormats.short));
+          setInputValue(
+            (props.mode === "range"
+              ? formatDateRange(props.value, dateFormats.short)
+              : formatDate(props.value, dateFormats.short)) ?? "",
+          );
         }
       },
       onBlur: (e) => {
@@ -127,14 +152,23 @@ export function DateField(props: DateFieldProps) {
           return;
         }
 
-        const parsedDate = parseDate(inputValue, dateFormats.short);
+        const parsedDate =
+          mode === "range" ? parseDateRange(inputValue, dateFormats.short) : parseDate(inputValue, dateFormats.short);
         // If the user leaves the input and has an invalid date, reset to previous value.
-        if (!parsedDate) {
-          setInputValue(value ? formatDate(value, dateFormat) : "");
+        if (!isParsedDateValid(parsedDate)) {
+          setWipValue(value);
+          setInputValue(
+            (props.mode === "range" ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ??
+              "",
+          );
         } else if (dateFormat !== dateFormats.short) {
           // Or if we need to reset the dateFormat back from `short` to whatever the user specified
-          setInputValue(formatDate(parsedDate, dateFormat));
+          setInputValue(
+            (props.mode === "range" ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ??
+              "",
+          );
         }
+
         state.close();
         maybeCall(onBlur);
       },
@@ -169,13 +203,45 @@ export function DateField(props: DateFieldProps) {
     offset: 4,
   });
 
+  // Handle case where the input value is updated from outside the component.
+  useEffect(() => {
+    // Avoid updating any WIP values.
+    if (!isFocused && !state.isOpen) {
+      setWipValue(value);
+      setInputValue(
+        (props.mode === "range" ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps - Do not include `isFocused` or `state.isOpen`.
+    // We don't want to update the internal `wipValue` or `inputValue` back to `value` just because focus state changes or the overlay opens
+  }, [value, dateFormat]);
+
+  // Create a type safe `onChange` to handle both Single and Range date fields.
+  const onChange = useCallback(
+    (d: Date | DateRange | undefined) => {
+      setWipValue(d);
+      if (d && isParsedDateValid(d)) {
+        if (props.mode === "range" && isDateRange(d)) {
+          props.onChange(d);
+          return;
+        }
+
+        if (props.mode === "single" && !isDateRange(d)) {
+          props.onChange(d);
+          return;
+        }
+      }
+    },
+    [mode, props.onChange],
+  );
+
   // If showing the short date format, "01/01/20", so set size to 8. If medium (Wed, Nov 23) use 10 characters (leaving out the `,` character in the count because it is so small)
   // Otherwise the long format can be `undefined`.
   // Setting the size attribute only impacts the fields when displayed in a container that doesn't allow the field to grow to its max width, such as in an inline container.
   // TODO: figure this out... seems weird to have now that we support multiple dates formats....
   // How do other applications handle this defined sizing? Appears they use hard coded widths depending on format, which is similar here (using `size` instead of css `width`).
   // But would also need to allow for the input to be `fullWidth`, which is basically also what we're accomplishing here... so maybe fine?
-  const inputSize = format === "short" ? 8 : format === "medium" ? 10 : undefined;
+  const inputSize = mode !== "range" ? (format === "short" ? 8 : format === "medium" ? 10 : undefined) : undefined;
 
   const calendarButton = (
     <button
@@ -208,10 +274,8 @@ export function DateField(props: DateFieldProps) {
           if (v) {
             setInputValue(v);
             // If changing the value directly (vs using the DatePicker), then we always use the short format
-            const parsed = parseDate(v, dateFormats.short);
-            if (parsed) {
-              onChange(parsed);
-            }
+            const parsed = mode === "range" ? parseDateRange(v, dateFormats.short) : parseDate(v, dateFormats.short);
+            onChange(parsed);
           }
         }}
         endAdornment={!iconLeft && calendarButton}
@@ -227,67 +291,38 @@ export function DateField(props: DateFieldProps) {
           onClose={state.close}
           isOpen={state.isOpen}
         >
-          <DatePickerOverlay
-            value={value}
-            onSelect={(d) => {
-              setInputValue(formatDate(d, dateFormat));
-              onChange(d);
-            }}
-            state={state}
-            disabledDays={disabledDays}
-            overlayProps={overlayProps}
-            {...tid.datePicker}
-          />
+          <DatePickerOverlay overlayProps={overlayProps}>
+            {props.mode === "range" ? (
+              <DateRangePicker
+                range={wipValue as DateRange | undefined}
+                disabledDays={disabledDays}
+                onSelect={(dr) => {
+                  // Note: Do not close date range picker on select to allow the user to select multiple dates at a time
+                  setInputValue(formatDateRange(dr, dateFormats.short) ?? "");
+                  onChange(dr);
+                }}
+                {...tid.datePicker}
+              />
+            ) : (
+              <DatePicker
+                value={wipValue as Date | undefined}
+                disabledDays={disabledDays}
+                onSelect={(d) => {
+                  setInputValue(formatDate(d, dateFormats.short) ?? "");
+                  onChange(d);
+                  state.close();
+                }}
+                {...tid.datePicker}
+              />
+            )}
+          </DatePickerOverlay>
         </Popover>
       )}
     </>
   );
 }
 
-function formatDate(date: Date, format: string) {
-  return dateFnsFormat(date, format);
-}
-
-function parseDate(str: string, format: string) {
-  // Copy/pasted from react-day-picker so that typing "2/2/2" doesn't turn into "02/02/0002"
-  const split = str.split("/");
-  if (split.length !== 3) {
-    return undefined;
-  }
-  // Wait for the year to be 2 chars
-  if (split[2].length !== 2) {
-    return undefined;
-  }
-  const month = parseInt(split[0], 10) - 1;
-  const day = parseInt(split[1], 10);
-  let year = parseInt(split[2], 10);
-  // This is also ~verbatim copy/pasted from react-day-picker
-  if (
-    isNaN(year) ||
-    String(year).length > 4 ||
-    isNaN(month) ||
-    isNaN(day) ||
-    day <= 0 ||
-    day > 31 ||
-    month < 0 ||
-    month >= 12
-  ) {
-    return undefined;
-  }
-
-  const parsed = dateFnsParse(str, format, new Date());
-  if (!isDate(parsed)) {
-    return undefined;
-  }
-  return parsed;
-}
-
-const dateFormats = {
-  short: "MM/dd/yy",
-  medium: "EEE, MMM d",
-  long: "EEEE LLLL d, uuuu",
-};
-
-function getDateFormat(format: keyof typeof dateFormats | undefined) {
-  return format ? dateFormats[format] : dateFormats.short;
+function isParsedDateValid(d: DateRange | Date | undefined): boolean {
+  // Only consider a DateRange valid when both `from` and `to` values are valid dates
+  return d !== undefined && (!isDateRange(d) || (isDateRange(d) && isValidDate(d.from) && isValidDate(d.to)));
 }

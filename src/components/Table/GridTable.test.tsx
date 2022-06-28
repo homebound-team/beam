@@ -1142,7 +1142,7 @@ describe("GridTable", () => {
     const r = await render(
       <GridTable<NestedRow> columns={nestedColumns} rows={rows} persistCollapse={tableIdentifier} />,
     );
-    // Expect that the header is shown
+    // Then the header is shown
     expect(row(r, 0)).toBeDefined();
     // And Child of parent 1 is shown
     expect(row(r, 2)).toBeDefined();

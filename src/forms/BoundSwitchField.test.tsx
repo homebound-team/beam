@@ -9,7 +9,7 @@ describe("BoundSwitchField", () => {
     const formState = createObjectState(formConfig, { isAvailable: true });
     // When rendered
     const r = await render(<BoundSwitchField field={formState.isAvailable} />);
-    // Expect the BoundSwitchField to be checked
+    // Then the BoundSwitchField should be checked
     expect(r.isAvailable()).toBeChecked();
   });
 

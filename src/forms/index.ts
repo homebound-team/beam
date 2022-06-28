@@ -2,6 +2,7 @@ export * from "./BoundCheckboxField";
 export * from "./BoundCheckboxGroupField";
 export * from "./BoundChipSelectField";
 export * from "./BoundDateField";
+export * from "./BoundDateRangeField";
 export * from "./BoundMultiSelectField";
 export * from "./BoundNumberField";
 export * from "./BoundRadioGroupField";
