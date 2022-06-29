@@ -4,6 +4,7 @@ import { useHover, useMenuItem } from "react-aria";
 import { useHistory } from "react-router";
 import { NavLink } from "react-router-dom";
 import { TreeState } from "react-stately";
+import { Avatar } from "src/components/Avatar";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
 import { Icon } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
@@ -79,16 +80,14 @@ export function MenuItemImpl(props: MenuItemProps) {
 
 function ImageMenuItem(item: ImageMenuItemType) {
   const { src, size = 24, label, isAvatar = false } = item;
-  const styles = isAvatar
-    ? Css.br12
-        .wPx(size)
-        .hPx(size)
-        .objectCover.if(size === 48).br24.$
-    : Css.br4.$;
   return (
     <>
       <span css={Css.fs0.mr2.$}>
-        <img width={size} src={src} css={styles} alt={label} />
+        {isAvatar ? (
+          <Avatar src={src} name={label} size={size === 24 ? "sm" : "lg"} />
+        ) : (
+          <img width={size} src={src} css={Css.br4.$} alt={label} />
+        )}
       </span>
       {label}
     </>
