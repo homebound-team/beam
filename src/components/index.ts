@@ -4,6 +4,7 @@ export * from "src/components/Table/GridTable";
 export * from "src/components/ToggleChip";
 export * from "src/components/ToggleChips";
 export * from "./Alert";
+export * from "./AutoSaveIndicator";
 export { BeamProvider } from "./BeamContext";
 export * from "./Button";
 export * from "./ButtonDatePicker";
