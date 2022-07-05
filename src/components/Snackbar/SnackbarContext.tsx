@@ -6,13 +6,17 @@ export type SnackbarContextProps = { setNotices: React.Dispatch<React.SetStateAc
 
 export const SnackbarContext = createContext<SnackbarContextProps>({ setNotices: () => {} });
 
-export function SnackbarProvider(props: PropsWithChildren<{}>) {
+export function SnackbarProvider(
+  props: PropsWithChildren<{
+    bottomOffset?: number;
+  }>,
+) {
   const [notices, setNotices] = useState<SnackbarNoticeProps[]>([]);
   const contextValue = useMemo(() => ({ setNotices }), []);
   return (
     <SnackbarContext.Provider value={contextValue}>
       {props.children}
-      <Snackbar notices={notices} />
+      <Snackbar notices={notices} bottomOffset={props.bottomOffset} />
     </SnackbarContext.Provider>
   );
 }

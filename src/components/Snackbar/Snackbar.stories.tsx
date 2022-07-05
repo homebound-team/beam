@@ -6,10 +6,12 @@ import { Snackbar } from "src/components/Snackbar/Snackbar";
 import { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
 import { withBeamDecorator } from "src/utils/sb";
+import { SnackbarProvider } from "./SnackbarContext";
 
 interface SnackBarStoryProps extends Omit<SnackbarNoticeProps, "action"> {
   actionLabel?: string;
   actionVariant?: ButtonVariant;
+  bottomOffset?: number;
 }
 
 export default {
@@ -23,6 +25,7 @@ export default {
     message: "Hey there, I am a snackbar notice!",
     actionLabel: "",
     actionVariant: undefined,
+    bottomOffset: 24,
   },
   argTypes: {
     icon: { control: { type: "select", options: [undefined, "error", "info", "success", "warning"] } },
@@ -35,12 +38,26 @@ export default {
   parameters: { controls: { exclude: "notices" } },
 } as Meta<SnackBarStoryProps>;
 
+/**
+ * Defining specific provider to set bottomOffset
+ * instead of using the one from BeamProvider
+ */
 export function Customizable(args: SnackBarStoryProps) {
+  return (
+    <SnackbarProvider bottomOffset={args.bottomOffset}>
+      <Custom {...args} />
+    </SnackbarProvider>
+  );
+}
+
+function Custom(args: SnackBarStoryProps) {
   const { triggerNotice } = useSnackbar();
   const { actionLabel, actionVariant, ...noticeProps } = args;
 
   useEffect(() => {
-    triggerNotice({ message: "Initial notice for chromatic diff purposes to ensure proper placement." });
+    triggerNotice({
+      message: "Initial notice for chromatic diff purposes to ensure proper placement.",
+    });
   }, [triggerNotice]);
 
   return (
@@ -75,7 +92,7 @@ export function SystematicClose(args: SnackBarStoryProps) {
       onClose: () => setNoticeOpen(false),
     });
     setNoticeOpen(true);
-  }, [noticeId]);
+  }, [actionLabel, actionVariant, noticeId, noticeProps, triggerNotice]);
 
   const closeOnClick = useCallback(() => {
     closeNotice(noticeId);
