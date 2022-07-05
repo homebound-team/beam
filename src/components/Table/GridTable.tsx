@@ -337,39 +337,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
   const hasTotalsRow = rows.some((row) => row.id === "totals");
 
-  // Filter rows - ensures parent rows remain in the list if any children match the filter.
-  const filterRows: (acc: ParentChildrenTuple<R>[], row: GridDataRow<R>) => ParentChildrenTuple<R>[] = useCallback(
-    (acc: ParentChildrenTuple<R>[], row: GridDataRow<R>) => {
-      // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
-      const filters = (filter && filter.split(/ +/)) || [];
-      const matches =
-        row.kind === "header" ||
-        row.kind === "totals" ||
-        filters.length === 0 ||
-        !!row.pin ||
-        filters.every((f) =>
-          columns.map((c) => applyRowFn(c, row, api, 0)).some((maybeContent) => matchesFilter(maybeContent, f)),
-        );
-
-      // If the row matches, add it in
-      if (matches) {
-        return acc.concat([[row, row.children?.reduce(filterRows, []) ?? []]]);
-      } else {
-        // Otherwise, maybe one of the children match.
-        // Always filter children rows whether or not they are collapsed in order to determine proper "selected" state of the group row.
-        if (!!row.children?.length) {
-          const matchedChildren = row.children.reduce(filterRows, []);
-          // If some children did match, then add the parent row with its matched children.
-          if (matchedChildren.length > 0) {
-            return acc.concat([[row, matchedChildren]]);
-          }
-        }
-      }
-
-      return acc;
-    },
-    [filter, collapsedIds, columns],
-  );
 
   // Flatten + component-ize the sorted rows.
   let [headerRows, visibleDataRows, totalsRows, filteredRowIds]: [
@@ -454,15 +421,17 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
     // Call `visitRows` with our a pre-filtered set list
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
-    visitRows(maybeSorted.reduce(filterRows, []), !!nestedCards, 0, true);
+    const filteredRows = filterRows(api,  columns, maybeSorted, filter);
+    visitRows(filteredRows, !!nestedCards, 0, true);
     nestedCards && nestedCards.done();
 
     return [headerRows, visibleDataRows, totalsRows, filteredRowIds];
   }, [
     as,
+    api,
+    filter,
     maybeSorted,
     columns,
-    filterRows,
     style,
     rowStyles,
     sortOn,
@@ -1499,4 +1468,40 @@ function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
     return getTableStyles(style as GridStyleDef);
   }
   return style as GridStyle;
+}
+
+/**
+ * Filters rows given a client-side text `filter.
+ *
+ * Ensures parent rows remain in the list if any children match the filter.
+ *
+ * We return a copy of `[Parent, [Child]]` tuples so that we don't modify the `GridDataRow.children`.
+ */
+function filterRows<R extends Kinded>(
+  api: GridTableApi<R>,
+  columns: GridColumn<R>[],
+  rows: GridDataRow<R>[],
+  filter: string | undefined,
+): ParentChildrenTuple<R>[] {
+  // Make a function to do recursion
+  function filterFn(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
+    // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
+    const filters = (filter && filter.split(/ +/)) || [];
+    const matches =
+      row.kind === "header" ||
+      row.kind === "totals" ||
+      filters.length === 0 ||
+      !!row.pin ||
+      filters.every((f) =>
+        columns.map((c) => applyRowFn(c, row, api, 0)).some((maybeContent) => matchesFilter(maybeContent, f)),
+      );
+    const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
+    // If row or any children match, add the parent (and its matched children)
+    if (matches || matchedChildren.length > 0) {
+      return acc.concat([[row, matchedChildren]]);
+    } else {
+      return acc;
+    }
+  };
+  return rows.reduce(filterFn, []);
 }
