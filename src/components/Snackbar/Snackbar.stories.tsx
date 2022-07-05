@@ -106,4 +106,4 @@ export function SystematicClose(args: SnackBarStoryProps) {
     </div>
   );
 }
-SystematicClose.parameters = { controls: { exclude: ["notices", "persistent", "hideCloseButton"] } };
+SystematicClose.parameters = { controls: { exclude: ["notices", "persistent", "hideCloseButton", "bottomOffset"] } };
