@@ -6,9 +6,9 @@ import { maybeCall } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
 
-export type BoundSelectFieldProps<T, V extends Value> = Omit<SelectFieldProps<T, V>, "value" | "onSelect" | "label"> & {
+export type BoundSelectFieldProps<O, V extends Value> = Omit<SelectFieldProps<O, V>, "value" | "onSelect" | "label"> & {
   // Allow `onSelect` to be overridden to do more than just `field.set`.
-  onSelect?: (option: V | undefined) => void;
+  onSelect?: (value: V | undefined, opt: O | undefined) => void;
   field: FieldState<any, V | null | undefined>;
   label?: string;
 };
@@ -49,8 +49,8 @@ export function BoundSelectField<T extends object, V extends Value>(
         <SelectField<T, V>
           label={label}
           value={field.value ?? undefined}
-          onSelect={(value) => {
-            onSelect(value);
+          onSelect={(value, opt) => {
+            onSelect(value, opt);
             field.maybeAutoSave();
           }}
           options={options}
