@@ -5,6 +5,7 @@ import { HasIdAndName, Optional } from "src/types";
 import { maybeCall } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
+import {defaultTestId} from "../utils/defaultTestId";
 
 export type BoundSelectFieldProps<O, V extends Value> = Omit<SelectFieldProps<O, V>, "value" | "onSelect" | "label"> & {
   // Allow `onSelect` to be overridden to do more than just `field.set`.
@@ -42,7 +43,7 @@ export function BoundSelectField<T extends object, V extends Value>(
     onFocus,
     ...others
   } = props;
-  const testId = useTestIds(props, field.key);
+  const testId = useTestIds(props, defaultTestId(label));
   return (
     <Observer>
       {() => (

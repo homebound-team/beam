@@ -3,6 +3,7 @@ import { Observer } from "mobx-react";
 import { DateField, DateFieldProps } from "src/inputs";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
+import {defaultTestId} from "../utils/defaultTestId";
 
 export type BoundDateFieldProps = Omit<DateFieldProps, "label" | "value" | "onChange"> & {
   field: FieldState<any, Date | null | undefined>;
@@ -24,7 +25,7 @@ export function BoundDateField(props: BoundDateFieldProps) {
     onEnter,
     ...others
   } = props;
-  const testId = useTestIds(props, field.key);
+  const testId = useTestIds(props, defaultTestId(label));
   return (
     <Observer>
       {() => (

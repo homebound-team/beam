@@ -5,6 +5,7 @@ import { TextAreaField, TextAreaFieldProps } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
+import {defaultTestId} from "../utils/defaultTestId";
 
 export type BoundTextAreaFieldProps<X> = Omit<TextAreaFieldProps<X>, "value" | "onChange" | "label"> & {
   // Make optional as it'll create a label from the field's key if not present
@@ -26,7 +27,7 @@ export function BoundTextAreaField<X extends Only<TextFieldXss, X>>(props: Bound
     onEnter,
     ...others
   } = props;
-  const testId = useTestIds(props, field.key);
+  const testId = useTestIds(props, defaultTestId(label));
   return (
     <Observer>
       {() => (

@@ -4,6 +4,7 @@ import { DateRangeField, DateRangeFieldProps } from "src/inputs";
 import { DateRange } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
+import {defaultTestId} from "../utils/defaultTestId";
 
 export type BoundDateRangeFieldProps = Omit<DateRangeFieldProps, "label" | "value" | "onChange"> & {
   field: FieldState<any, DateRange | null | undefined>;
@@ -24,7 +25,7 @@ export function BoundDateRangeField(props: BoundDateRangeFieldProps) {
     onEnter,
     ...others
   } = props;
-  const testId = useTestIds(props, field.key);
+  const testId = useTestIds(props, defaultTestId(label));
   return (
     <Observer>
       {() => (

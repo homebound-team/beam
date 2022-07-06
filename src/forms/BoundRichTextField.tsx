@@ -3,6 +3,7 @@ import { Observer } from "mobx-react";
 import { RichTextField, RichTextFieldProps } from "src/inputs/RichTextField";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
+import {defaultTestId} from "../utils/defaultTestId";
 
 export type BoundRichTextFieldProps = Omit<RichTextFieldProps, "value" | "onChange"> & {
   field: FieldState<any, string | null | undefined>;
@@ -21,7 +22,7 @@ export function BoundRichTextField(props: BoundRichTextFieldProps) {
     onBlur,
     ...others
   } = props;
-  const testId = useTestIds(props, field.key);
+  const testId = useTestIds(props, defaultTestId(label));
   return (
     <Observer>
       {() => (

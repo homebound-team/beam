@@ -5,6 +5,7 @@ import { HasIdAndName, Optional } from "src/types";
 import { maybeCall } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
+import {defaultTestId} from "../utils/defaultTestId";
 
 export type BoundMultiSelectFieldProps<O, V extends Value> = Omit<
   MultiSelectFieldProps<O, V>,
@@ -45,7 +46,7 @@ export function BoundMultiSelectField<O, V extends Value>(
     onFocus,
     ...others
   } = props;
-  const testId = useTestIds(props, field.key);
+  const testId = useTestIds(props, defaultTestId(label));
   return (
     <Observer>
       {() => (
