@@ -3,6 +3,7 @@ import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 export interface ButtonGroupProps {
   buttons: ButtonGroupButton[];
@@ -45,7 +46,7 @@ function GroupButton(props: GroupButtonProps) {
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
   const { isFocusVisible, focusProps } = useFocusRing();
   const { hoverProps, isHovered } = useHover(ariaProps);
-  const tid = useTestIds(props, text ?? icon ?? "button");
+  const tid = useTestIds(props);
 
   return (
     <button
@@ -62,7 +63,7 @@ function GroupButton(props: GroupButtonProps) {
         ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
         ...(icon ? iconStyles[size] : {}),
       }}
-      {...tid}
+      {...tid[defaultTestId(text ?? icon ?? "button")]}
     >
       {icon && <Icon icon={icon} />}
       {text}
