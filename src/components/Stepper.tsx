@@ -24,20 +24,34 @@ export function Stepper({ steps, currentStep, onChange }: StepperBarProps) {
 
   // calc progress based on last completed step - return -1 when no steps completed
   const lastCompletedStep = steps.map((step) => step.state).lastIndexOf("complete");
+  const maxStepWidth = 200;
+  const minStepWidth = 100;
+  const gap = 8;
 
   return (
-    <nav aria-label="steps" css={Css.df.fdc.$}>
-      <ol css={Css.listReset.df.$}>
+    <nav aria-label="steps" css={Css.df.fdc.w100.$}>
+      <ol css={Css.listReset.df.gapPx(gap).$}>
         {steps.map((step) => {
           const isCurrent = currentStep === step.value;
           return (
-            <li css={Css.df.fdc.wPx(200).$} key={step.label} aria-current={isCurrent}>
+            <li
+              css={Css.df.fg1.fdc.maxwPx(maxStepWidth).mwPx(minStepWidth).$}
+              key={step.label}
+              aria-current={isCurrent}
+            >
               <StepButton {...step} onClick={() => onChange(step.value)} isCurrent={isCurrent} />
             </li>
           );
         })}
       </ol>
-      <div css={Css.mt1.bgGray300.hPx(4).w(`${steps.length * 200}px`).$}>
+      <div
+        css={
+          Css.mt1.bgGray300
+            .hPx(4)
+            .maxwPx(steps.length * maxStepWidth + (steps.length - 1) * gap)
+            .mwPx(steps.length * minStepWidth + (steps.length - 1) * gap).w100.$
+        }
+      >
         <div
           css={
             Css.bgLightBlue600
