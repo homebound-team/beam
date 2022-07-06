@@ -85,7 +85,7 @@ describe("useSnackbar", () => {
     // When we trigger a notice
     click(r.triggerNotice);
     // Then the offset is 200
-    expect(r.snackbarWrapper()).toHaveStyle("bottom: 200px");
+    expect(r.snackbarWrapper()).toHaveStyleRule("bottom", "200px");
 
     // When we drop the offset-caller from the DOM
     r.rerender(<TestComponent />);
