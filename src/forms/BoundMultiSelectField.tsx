@@ -2,7 +2,7 @@ import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { MultiSelectField, MultiSelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
-import { maybeCall, defaultLabel, useTestIds, defaultTestId } from "src/utils";
+import { defaultLabel, maybeCall, useTestIds } from "src/utils";
 
 export type BoundMultiSelectFieldProps<O, V extends Value> = Omit<
   MultiSelectFieldProps<O, V>,
@@ -43,7 +43,7 @@ export function BoundMultiSelectField<O, V extends Value>(
     onFocus,
     ...others
   } = props;
-  const testId = useTestIds(props, defaultTestId(label));
+  const testId = useTestIds(props, label);
   return (
     <Observer>
       {() => (

@@ -3,7 +3,6 @@ import { Observer } from "mobx-react";
 import { Checkbox, CheckboxProps } from "src/inputs";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
-import { defaultTestId } from "../utils/defaultTestId";
 
 export type BoundCheckboxFieldProps = Omit<CheckboxProps, "selected" | "onChange" | "label"> & {
   field: FieldState<any, boolean | null | undefined>;
@@ -22,7 +21,7 @@ export function BoundCheckboxField(props: BoundCheckboxFieldProps) {
     onBlur,
     ...others
   } = props;
-  const testId = useTestIds(props, defaultTestId(label));
+  const testId = useTestIds(props, label);
   return (
     <Observer>
       {() => (

@@ -1,7 +1,7 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { Switch, SwitchProps } from "src/inputs";
-import { useTestIds, defaultLabel, defaultTestId } from "src/utils";
+import { defaultLabel, useTestIds } from "src/utils";
 
 export type BoundSwitchFieldProps = Omit<SwitchProps, "selected" | "onChange" | "label"> & {
   field: FieldState<any, boolean | null | undefined>;
@@ -19,7 +19,7 @@ export function BoundSwitchField(props: BoundSwitchFieldProps) {
     labelStyle = "form",
     ...others
   } = props;
-  const testId = useTestIds(props, defaultTestId(label));
+  const testId = useTestIds(props, label);
   return (
     <Observer>
       {() => (

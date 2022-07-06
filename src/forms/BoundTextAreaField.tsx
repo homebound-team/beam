@@ -3,7 +3,7 @@ import { Observer } from "mobx-react";
 import { Only } from "src/Css";
 import { TextAreaField, TextAreaFieldProps } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
-import { maybeCall, useTestIds, defaultLabel, defaultTestId } from "src/utils";
+import { defaultLabel, maybeCall, useTestIds } from "src/utils";
 
 export type BoundTextAreaFieldProps<X> = Omit<TextAreaFieldProps<X>, "value" | "onChange" | "label"> & {
   // Make optional as it'll create a label from the field's key if not present
@@ -25,7 +25,7 @@ export function BoundTextAreaField<X extends Only<TextFieldXss, X>>(props: Bound
     onEnter,
     ...others
   } = props;
-  const testId = useTestIds(props, defaultTestId(label));
+  const testId = useTestIds(props, label);
   return (
     <Observer>
       {() => (

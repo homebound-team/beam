@@ -5,7 +5,6 @@ import { ChipSelectField, ChipSelectFieldProps } from "src/inputs/ChipSelectFiel
 import { HasIdAndName, Optional } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
-import { defaultTestId } from "src/utils/defaultTestId";
 
 interface BoundChipSelectFieldProps<O, V extends Value>
   extends Omit<ChipSelectFieldProps<O, V>, "onSelect" | "label" | "value"> {
@@ -33,7 +32,7 @@ export function BoundChipSelectField<O, V extends Value>(
     onCreateNew,
     ...others
   } = props;
-  const testId = useTestIds(props, defaultTestId(label));
+  const testId = useTestIds(props, label);
 
   return (
     <Observer>

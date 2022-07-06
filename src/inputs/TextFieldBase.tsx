@@ -19,7 +19,6 @@ import { Css, Only, Palette, px } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/interfaces";
-import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
 export interface TextFieldBaseProps<X>
@@ -93,7 +92,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const errorMessageId = `${inputProps.id}-error`;
   const labelSuffix = getLabelSuffix(required);
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
-  const tid = useTestIds(props, defaultTestId(label));
+  const tid = useTestIds(props, label);
   const [isFocused, setIsFocused] = useState(false);
   const { hoverProps, isHovered } = useHover({});
   const { focusWithinProps } = useFocusWithin({ onFocusWithinChange: setIsFocused });
