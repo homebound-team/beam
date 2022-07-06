@@ -1,9 +1,7 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { ToggleChipGroup, ToggleChipGroupProps } from "src/inputs";
-import { useTestIds } from "src/utils";
-import { defaultLabel } from "src/utils/defaultLabel";
-import { defaultTestId } from "../utils/defaultTestId";
+import { useTestIds, defaultLabel, defaultTestId } from "src/utils";
 
 export type BoundToggleChipGroupFieldProps = Omit<ToggleChipGroupProps, "values" | "onChange" | "label"> & {
   field: FieldState<any, string[] | null | undefined>;

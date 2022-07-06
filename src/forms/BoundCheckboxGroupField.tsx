@@ -3,7 +3,7 @@ import { Observer } from "mobx-react";
 import { CheckboxGroup, CheckboxGroupProps } from "src/inputs";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
-import { defaultTestId } from "../utils/defaultTestId";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 export type BoundCheckboxGroupFieldProps = Omit<CheckboxGroupProps, "values" | "onChange" | "label"> & {
   field: FieldState<any, string[] | null | undefined>;

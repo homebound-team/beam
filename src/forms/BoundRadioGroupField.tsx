@@ -1,9 +1,7 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { RadioGroupField, RadioGroupFieldProps } from "src/inputs";
-import { maybeCall, useTestIds } from "src/utils";
-import { defaultLabel } from "src/utils/defaultLabel";
-import { defaultTestId } from "../utils/defaultTestId";
+import { maybeCall, useTestIds, defaultLabel, defaultTestId } from "src/utils";
 
 export type BoundRadioGroupFieldProps<K extends string> = Omit<
   RadioGroupFieldProps<K>,
