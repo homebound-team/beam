@@ -2,7 +2,7 @@ import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useCallback, useEffect, useState } from "react";
 import { Button, ButtonVariant, useSnackbar } from "src/components";
-import { Snackbar } from "src/components/Snackbar/Snackbar";
+import { Offset, Snackbar } from "src/components/Snackbar/Snackbar";
 import { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
 import { withBeamDecorator } from "src/utils/sb";
@@ -10,6 +10,7 @@ import { withBeamDecorator } from "src/utils/sb";
 interface SnackBarStoryProps extends Omit<SnackbarNoticeProps, "action"> {
   actionLabel?: string;
   actionVariant?: ButtonVariant;
+  offset?: Offset;
 }
 
 export default {
@@ -23,6 +24,7 @@ export default {
     message: "Hey there, I am a snackbar notice!",
     actionLabel: "",
     actionVariant: undefined,
+    offset: { bottom: 200 },
   },
   argTypes: {
     icon: { control: { type: "select", options: [undefined, "error", "info", "success", "warning"] } },
@@ -31,6 +33,7 @@ export default {
       name: "action.variant",
     },
     actionLabel: { name: "action.label" },
+    offset: { name: "offset" },
   },
   parameters: { controls: { exclude: "notices" } },
 } as Meta<SnackBarStoryProps>;
@@ -54,6 +57,38 @@ export function Customizable(args: SnackBarStoryProps) {
         })
       }
       label="Trigger notice"
+    />
+  );
+}
+
+export function CustomOffset(args: SnackBarStoryProps) {
+  const [show, setShow] = useState(true);
+
+  return (
+    <div css={Css.df.fdc.aifs.gap3.$}>
+      <Button label={show ? "Dismount Triggerer" : "Re-mount Triggerer"} onClick={() => setShow(!show)} />
+      {show && <CustomOffsetComponent {...args} />}
+    </div>
+  );
+}
+
+function CustomOffsetComponent(props: SnackBarStoryProps) {
+  const { triggerNotice, useSnackbarOffset } = useSnackbar();
+  const { actionLabel, actionVariant, offset, ...noticeProps } = props;
+
+  useSnackbarOffset(offset ?? {});
+
+  return (
+    <Button
+      label="Trigger Notice"
+      onClick={() =>
+        triggerNotice({
+          ...noticeProps,
+          ...(actionLabel
+            ? { action: { label: actionLabel, variant: actionVariant, onClick: action(`${actionLabel} clicked`) } }
+            : undefined),
+        })
+      }
     />
   );
 }

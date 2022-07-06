@@ -1,18 +1,22 @@
 import React, { createContext, PropsWithChildren, useContext, useMemo, useState } from "react";
-import { Snackbar } from "src/components/Snackbar/Snackbar";
 import { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
+import { Offset, Snackbar } from "./Snackbar";
 
-export type SnackbarContextProps = { setNotices: React.Dispatch<React.SetStateAction<SnackbarNoticeProps[]>> };
+export type SnackbarContextProps = {
+  setNotices: React.Dispatch<React.SetStateAction<SnackbarNoticeProps[]>>;
+  setOffset: React.Dispatch<React.SetStateAction<Offset>>;
+};
 
-export const SnackbarContext = createContext<SnackbarContextProps>({ setNotices: () => {} });
+export const SnackbarContext = createContext<SnackbarContextProps>({ setNotices: () => {}, setOffset: () => {} });
 
 export function SnackbarProvider(props: PropsWithChildren<{}>) {
   const [notices, setNotices] = useState<SnackbarNoticeProps[]>([]);
-  const contextValue = useMemo(() => ({ setNotices }), []);
+  const [offset, setOffset] = useState<Offset>({});
+  const contextValue = useMemo(() => ({ setNotices, setOffset }), []);
   return (
     <SnackbarContext.Provider value={contextValue}>
       {props.children}
-      <Snackbar notices={notices} />
+      <Snackbar notices={notices} offset={offset} />
     </SnackbarContext.Provider>
   );
 }

@@ -1,15 +1,17 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useSnackbarContext } from "src/components/Snackbar/SnackbarContext";
 import { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { maybeCall } from "src/utils";
+import { Offset } from "./Snackbar";
 
 export interface UseSnackbarHook {
   triggerNotice: (props: TriggerNoticeProps) => { close: () => void };
   closeNotice: (id: string) => void;
+  useSnackbarOffset: (offset: Offset) => void;
 }
 
 export function useSnackbar(): UseSnackbarHook {
-  const { setNotices } = useSnackbarContext();
+  const { setNotices, setOffset } = useSnackbarContext();
 
   const onClose = useCallback((noticeId: string) => {
     setNotices((prev) => {
@@ -68,7 +70,13 @@ export function useSnackbar(): UseSnackbarHook {
 
   const closeNotice = useCallback((id: string) => onClose(id), [onClose]);
 
-  return { triggerNotice, closeNotice };
+  const useSnackbarOffset = ({ bottom }: Offset) =>
+    useEffect(() => {
+      setOffset({ bottom });
+      return () => setOffset({});
+    }, [bottom]);
+
+  return { triggerNotice, closeNotice, useSnackbarOffset };
 }
 
 let snackbarId = 1;
