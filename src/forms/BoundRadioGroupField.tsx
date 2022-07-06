@@ -3,7 +3,7 @@ import { Observer } from "mobx-react";
 import { RadioGroupField, RadioGroupFieldProps } from "src/inputs";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
-import {defaultTestId} from "../utils/defaultTestId";
+import { defaultTestId } from "../utils/defaultTestId";
 
 export type BoundRadioGroupFieldProps<K extends string> = Omit<
   RadioGroupFieldProps<K>,

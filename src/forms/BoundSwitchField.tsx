@@ -3,7 +3,7 @@ import { Observer } from "mobx-react";
 import { Switch, SwitchProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
-import {defaultTestId} from "../utils/defaultTestId";
+import { defaultTestId } from "../utils/defaultTestId";
 
 export type BoundSwitchFieldProps = Omit<SwitchProps, "selected" | "onChange" | "label"> & {
   field: FieldState<any, boolean | null | undefined>;

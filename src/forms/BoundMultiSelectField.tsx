@@ -5,7 +5,7 @@ import { HasIdAndName, Optional } from "src/types";
 import { maybeCall } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
-import {defaultTestId} from "../utils/defaultTestId";
+import { defaultTestId } from "../utils/defaultTestId";
 
 export type BoundMultiSelectFieldProps<O, V extends Value> = Omit<
   MultiSelectFieldProps<O, V>,

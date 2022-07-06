@@ -5,7 +5,7 @@ import { TextField, TextFieldProps } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
-import {defaultTestId} from "../utils/defaultTestId";
+import { defaultTestId } from "../utils/defaultTestId";
 
 export type BoundTextFieldProps<X> = Omit<TextFieldProps<X>, "value" | "onChange" | "label"> & {
   // Make optional as it'll create a label from the field's key if not present
