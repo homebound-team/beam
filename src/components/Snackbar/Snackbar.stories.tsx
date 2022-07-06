@@ -77,6 +77,9 @@ function CustomOffsetComponent(props: SnackBarStoryProps) {
   const { actionLabel, actionVariant, offset, ...noticeProps } = props;
 
   useSnackbarOffset(offset ?? {});
+  useEffect(() => {
+    triggerNotice({ message: "Initial notice for chromatic diff purposes to ensure proper placement." });
+  }, []);
 
   return (
     <Button
