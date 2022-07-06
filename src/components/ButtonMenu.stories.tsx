@@ -108,6 +108,40 @@ export function DisabledMenu() {
   );
 }
 
+export function IconButtonMenu() {
+  const menuItems: MenuItem[] = [
+    { label: "Page action", onClick: action("Test item clicked") },
+    { label: "Internal Link", onClick: "/fakeRoute" },
+    { label: "External Link - Homebound.com", onClick: "https://www.homebound.com" },
+  ];
+
+  return (
+    <ButtonMenu
+      trigger={{ icon: "infoCircle" }}
+      defaultOpen
+      items={menuItems}
+      persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+    />
+  );
+}
+
+export function AvatarButtonMenu() {
+  const menuItems: MenuItem[] = [
+    { label: "Page action", onClick: action("Test item clicked") },
+    { label: "Internal Link", onClick: "/fakeRoute" },
+    { label: "External Link - Homebound.com", onClick: "https://www.homebound.com" },
+  ];
+
+  return (
+    <ButtonMenu
+      trigger={{ src: "tony-stark.jpg", name: "Tony Stark" }}
+      defaultOpen
+      items={menuItems}
+      persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+    />
+  );
+}
+
 export function WithTooltip() {
   const menuItems: MenuItem[] = [
     { label: "Menu Item 1", onClick: action("Menu Item 1") },
