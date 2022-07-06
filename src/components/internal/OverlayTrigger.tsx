@@ -3,6 +3,7 @@ import type { Placement } from "@react-types/overlays";
 import { MutableRefObject, ReactElement, ReactNode, useRef } from "react";
 import { useOverlayPosition } from "react-aria";
 import { MenuTriggerState } from "react-stately";
+import { AvatarButton, AvatarButtonProps } from "src/components/AvatarButton";
 import { Button, ButtonProps } from "src/components/Button";
 import { Icon } from "src/components/Icon";
 import { IconButton, IconButtonProps } from "src/components/IconButton";
@@ -13,9 +14,10 @@ import { defaultTestId } from "src/utils/defaultTestId";
 
 interface TextButtonTriggerProps extends Pick<ButtonProps, "label" | "variant" | "size" | "icon"> {}
 interface IconButtonTriggerProps extends Pick<IconButtonProps, "icon" | "color" | "compact" | "contrast"> {}
+interface AvatarButtonTriggerProps extends Pick<AvatarButtonProps, "src" | "name" | "size"> {}
 
 export interface OverlayTriggerProps {
-  trigger: TextButtonTriggerProps | IconButtonTriggerProps;
+  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps;
   /** Defaults to "left" */
   placement?: "left" | "right";
   /** Whether the Button is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
@@ -43,7 +45,10 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     onClose: state.close,
     placement: (placement ? `bottom ${placement}` : "bottom left") as Placement,
   });
-  const tid = useTestIds(props, isTextButton(trigger) ? defaultTestId(trigger.label) : trigger.icon);
+  const tid = useTestIds(
+    props,
+    isTextButton(trigger) ? defaultTestId(trigger.label) : isIconButton(trigger) ? trigger.icon : trigger.name,
+  );
 
   return (
     <div css={Css.relative.dib.$}>
@@ -59,8 +64,26 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           onClick={noop}
           {...tid}
         />
+      ) : isIconButton(trigger) ? (
+        <IconButton
+          {...trigger}
+          menuTriggerProps={menuTriggerProps}
+          buttonRef={buttonRef}
+          {...tid}
+          disabled={disabled}
+          tooltip={tooltip}
+          onClick={noop}
+        />
       ) : (
-        <IconButton {...trigger} menuTriggerProps={menuTriggerProps} buttonRef={buttonRef} {...tid} onClick={noop} />
+        <AvatarButton
+          {...trigger}
+          menuTriggerProps={menuTriggerProps}
+          buttonRef={buttonRef}
+          {...tid}
+          disabled={disabled}
+          tooltip={tooltip}
+          onClick={noop}
+        />
       )}
       {state.isOpen && (
         <Popover
@@ -78,7 +101,12 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
 }
 
 export function isTextButton(
-  trigger: TextButtonTriggerProps | IconButtonTriggerProps,
+  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps,
 ): trigger is TextButtonTriggerProps {
   return trigger && typeof trigger === "object" && "label" in trigger;
+}
+export function isIconButton(
+  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps,
+): trigger is IconButtonTriggerProps {
+  return trigger && typeof trigger === "object" && "icon" in trigger;
 }

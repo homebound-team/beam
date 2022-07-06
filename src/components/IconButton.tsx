@@ -1,11 +1,11 @@
 import { AriaButtonProps } from "@react-types/button";
 import { RefObject, useMemo, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { Link } from "react-router-dom";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Css, Palette } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
-import { isAbsoluteUrl, noop } from "src/utils";
+import { noop } from "src/utils";
+import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { useTestIds } from "src/utils/useTestIds";
 
 export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
@@ -21,6 +21,8 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   compact?: boolean;
   /** Whether to display the contrast variant */
   contrast?: boolean;
+  /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
+  download?: boolean;
 }
 
 export function IconButton(props: IconButtonProps) {
@@ -37,6 +39,7 @@ export function IconButton(props: IconButtonProps) {
     openInNew,
     compact = false,
     contrast = false,
+    download = false,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
@@ -66,31 +69,24 @@ export function IconButton(props: IconButtonProps) {
   );
   const iconColor = contrast ? contrastIconColor : defaultIconColor;
 
-  const buttonAttrs = { ...testIds, ...buttonProps, ...focusProps, ...hoverProps, ref: ref as any, css: styles };
+  const buttonAttrs = {
+    ...testIds,
+    ...buttonProps,
+    ...focusProps,
+    ...hoverProps,
+    className: typeof onPress === "string" ? navLink : undefined,
+    ref: ref as any,
+    css: styles,
+  };
   const buttonContent = (
     <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : iconColor)} inc={compact ? 2 : inc} />
   );
-
-  const button =
-    typeof onPress === "string" ? (
-      isAbsoluteUrl(onPress) || openInNew ? (
-        <a {...buttonAttrs} href={onPress} className={navLink} target="_blank" rel="noreferrer noopener">
-          {buttonContent}
-        </a>
-      ) : (
-        <Link {...buttonAttrs} to={onPress} className={navLink}>
-          {buttonContent}
-        </Link>
-      )
-    ) : (
-      <button {...buttonAttrs}>{buttonContent}</button>
-    );
 
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip
   return maybeTooltip({
     title: resolveTooltip(disabled, tooltip),
     placement: "top",
-    children: button,
+    children: getButtonOrLink(buttonContent, onPress, buttonAttrs, openInNew, download),
   });
 }
 
