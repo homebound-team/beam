@@ -7,6 +7,13 @@ import { Offset } from "./Snackbar";
 export interface UseSnackbarHook {
   triggerNotice: (props: TriggerNoticeProps) => { close: () => void };
   closeNotice: (id: string) => void;
+  /**
+   * A custom hook that components may call to notify snackbar it should offset,
+   * such as a bottom-mounted Stepper component that ought not be covered by
+   * notifications. Behaves like a useEffect, and will clean up on dismount.
+   * (Known issue: If multiple components call this, last-to-render takes
+   * precedence and first-to-dismount unsets everything)
+   */
   useSnackbarOffset: (offset: Offset) => void;
 }
 

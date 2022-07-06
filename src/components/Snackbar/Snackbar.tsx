@@ -8,7 +8,7 @@ interface SnackbarProps {
 
 export function Snackbar({ notices, offset }: SnackbarProps) {
   return (
-    <div css={Css.fixed.bottomPx(offset.bottom ?? 24).left3.df.fdc.aifs.gapPx(12).$}>
+    <div css={Css.fixed.z999.bottomPx(offset.bottom ?? defaultOffset.bottom).left3.df.fdc.aifs.gapPx(12).$}>
       {notices.map((data) => (
         <SnackbarNotice key={data.id} {...data} />
       ))}
@@ -18,4 +18,8 @@ export function Snackbar({ notices, offset }: SnackbarProps) {
 
 export type Offset = {
   bottom?: number;
+};
+
+const defaultOffset: Required<Offset> = {
+  bottom: 24,
 };
