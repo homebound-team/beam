@@ -25,11 +25,12 @@ export function Stepper({ steps, currentStep, onChange }: StepperBarProps) {
   // calc progress based on last completed step - return -1 when no steps completed
   const lastCompletedStep = steps.map((step) => step.state).lastIndexOf("complete");
   const maxStepWidth = 200;
-  const minStepWidth = 120;
+  const minStepWidth = 100;
+  const gap = 8;
 
   return (
     <nav aria-label="steps" css={Css.df.fdc.w100.$}>
-      <ol css={Css.listReset.df.$}>
+      <ol css={Css.listReset.df.gapPx(gap).$}>
         {steps.map((step) => {
           const isCurrent = currentStep === step.value;
           return (
@@ -47,8 +48,8 @@ export function Stepper({ steps, currentStep, onChange }: StepperBarProps) {
         css={
           Css.mt1.bgGray300
             .hPx(4)
-            .maxwPx(steps.length * maxStepWidth)
-            .mwPx(steps.length * minStepWidth).w100.$
+            .maxwPx(steps.length * maxStepWidth + (steps.length - 1) * gap)
+            .mwPx(steps.length * minStepWidth + (steps.length - 1) * gap).w100.$
         }
       >
         <div
