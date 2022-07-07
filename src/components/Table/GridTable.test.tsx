@@ -1027,6 +1027,39 @@ describe("GridTable", () => {
     expect(row(r, 3)).toBeUndefined();
   });
 
+  it("filtering with match on parent row also shows nested children", async () => {
+    // Given a table that can apply a filter and two parents with children.
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "filter child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "filter child p1c2" } },
+        ],
+      },
+      {
+        ...{ kind: "parent", id: "p2", data: { name: "parent 2" } },
+        children: [
+          { kind: "child", id: "p2c1", data: { name: "filter child p2c1" } },
+          { kind: "child", id: "p2c2", data: { name: "child p2c2" } },
+        ],
+      },
+    ];
+    //applying filter to get parent 1 (p1)
+    const r = await render(<GridTable filter="parent 1" columns={nestedColumns} rows={rows} />);
+
+    // Then we show the header
+    expect(cell(r, 0, 2)).toHaveTextContent("Name");
+    // And the parent that matched the filter
+    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
+    // And the childs of the matched parent
+    expect(cell(r, 2, 2)).toHaveTextContent("filter child p1c1");
+    expect(cell(r, 3, 2)).toHaveTextContent("filter child p1c2");
+    // And that's it
+    expect(row(r, 4)).toBeUndefined();
+  });
+
   it("can collapse parent rows", async () => {
     // Given a parent with a child and grandchild
     const rows: GridDataRow<NestedRow>[] = [
@@ -1494,9 +1527,10 @@ describe("GridTable", () => {
     // Then each group rows selected state should reflect the children that match the filter
     expect(cellAnd(r, 1, 1, "select")).toBeChecked();
     expect(cellAnd(r, 2, 1, "select")).toBeChecked();
-    expect(cellAnd(r, 3, 1, "select")).not.toBeChecked();
+    //because the parent matches the filter, and the child was selected, the new behavior shows the nested childs of matched parent, child should keep selected
+    expect(cellAnd(r, 3, 1, "select")).toBeChecked();
     // And the API reflects the expected selected states of rows that match the filter
-    expect(api.current!.getSelectedRowIds()).toEqual(["p2", "p2c1", "p1", "p1c2", "p1c1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c1", "p1", "p1c2", "p1c1"]);
   });
 
   // it can switch between partially checked to checked depending on applied filter

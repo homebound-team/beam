@@ -1484,7 +1484,7 @@ function filterRows<R extends Kinded>(
   filter: string | undefined,
 ): ParentChildrenTuple<R>[] {
   // Make a function to do recursion
-  function filterFn(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
+  function filterFn(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>, parentMatches?: boolean): ParentChildrenTuple<R>[] {
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
     const matches =
@@ -1492,10 +1492,11 @@ function filterRows<R extends Kinded>(
       row.kind === "totals" ||
       filters.length === 0 ||
       !!row.pin ||
+      (filters.length > 0 && parentMatches) || //matching childrens if parent matches to display the nested records on searches
       filters.every((f) =>
         columns.map((c) => applyRowFn(c, row, api, 0)).some((maybeContent) => matchesFilter(maybeContent, f)),
       );
-    const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
+    const matchedChildren = row.children?.reduce((childAcc, childRow) => filterFn(childAcc, childRow, matches), [] as ParentChildrenTuple<R>[]) ?? [];
     // If row or any children match, add the parent (and its matched children)
     if (matches || matchedChildren.length > 0) {
       return acc.concat([[row, matchedChildren]]);
@@ -1503,5 +1504,5 @@ function filterRows<R extends Kinded>(
       return acc;
     }
   };
-  return rows.reduce(filterFn, []);
+  return rows.reduce((acc, row) => filterFn(acc, row), [] as ParentChildrenTuple<R>[]);
 }
