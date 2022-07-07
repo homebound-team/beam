@@ -1,15 +1,6 @@
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
-import React, {
-  MutableRefObject,
-  ReactElement,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import React, { MutableRefObject, ReactElement, ReactNode, useContext, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
@@ -337,7 +328,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
   const hasTotalsRow = rows.some((row) => row.id === "totals");
 
-
   // Flatten + component-ize the sorted rows.
   let [headerRows, visibleDataRows, totalsRows, filteredRowIds]: [
     RowTuple<R>[],
@@ -421,7 +411,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
     // Call `visitRows` with our a pre-filtered set list
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
-    const filteredRows = filterRows(api,  columns, maybeSorted, filter);
+    const filteredRows = filterRows(api, columns, maybeSorted, filter);
     visitRows(filteredRows, !!nestedCards, 0, true);
     nestedCards && nestedCards.done();
 
@@ -1483,7 +1473,11 @@ function filterRows<R extends Kinded>(
   rows: GridDataRow<R>[],
   filter: string | undefined,
 ): ParentChildrenTuple<R>[] {
-  // Make a function to do recursion
+  // Make a functions to do recursion
+  function acceptAll(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
+    return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
+  }
+
   function filterFn(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
@@ -1495,13 +1489,16 @@ function filterRows<R extends Kinded>(
       filters.every((f) =>
         columns.map((c) => applyRowFn(c, row, api, 0)).some((maybeContent) => matchesFilter(maybeContent, f)),
       );
-    const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
-    // If row or any children match, add the parent (and its matched children)
-    if (matches || matchedChildren.length > 0) {
-      return acc.concat([[row, matchedChildren]]);
+    if (matches) {
+      return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
     } else {
-      return acc;
+      const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
+      if (matchedChildren.length > 0) {
+        return acc.concat([[row, matchedChildren]]);
+      } else {
+        return acc;
+      }
     }
-  };
+  }
   return rows.reduce(filterFn, []);
 }
