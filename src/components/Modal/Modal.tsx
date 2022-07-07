@@ -1,12 +1,12 @@
 import { AutoSaveStatusProvider } from "@homebound/form-state";
 import useResizeObserver from "@react-hook/resize-observer";
-import { MutableRefObject, ReactNode, useEffect, useRef, useState } from "react";
+import { MutableRefObject, PropsWithChildren, ReactNode, useEffect, useRef, useState } from "react";
 import { FocusScope, OverlayContainer, useDialog, useModal, useOverlay, usePreventScroll } from "react-aria";
 import { createPortal } from "react-dom";
 import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
-import { Css, Only, px, Xss } from "src/Css";
+import { Css, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl";
@@ -62,7 +62,6 @@ export function Modal(props: ModalProps) {
   const { modalProps } = useModal();
   const { dialogProps, titleProps } = useDialog({ role: "dialog" }, ref);
   const [[width, height], setSize] = useState(getSize(size));
-  const contentRef = useRef<HTMLDivElement>(null);
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
   const modalFooterRef = useRef<HTMLDivElement | null>(null);
   const modalHeaderRef = useRef<HTMLHeadingElement | null>(null);
@@ -75,7 +74,7 @@ export function Modal(props: ModalProps) {
 
   const [hasScroll, setHasScroll] = useState(forceScrolling ?? false);
 
-  useResizeObserver(contentRef, ({ target }) => {
+  useResizeObserver(modalBodyRef, ({ target }) => {
     if (forceScrolling === undefined && !isFixedHeight) {
       setHasScroll(target.scrollHeight > target.clientHeight);
     }
@@ -103,7 +102,7 @@ export function Modal(props: ModalProps) {
                 Css.br24.bgWhite.bshModal.overflowHidden
                   .maxh("90vh")
                   .df.fdc.wPx(width)
-                  .mh(px(defaultMinHeight))
+                  .mhPx(defaultMinHeight)
                   .if(isFixedHeight)
                   .hPx(height).$
               }
@@ -121,12 +120,11 @@ export function Modal(props: ModalProps) {
                 </span>
               </header>
               <main
-                ref={contentRef}
+                ref={modalBodyRef}
                 css={Css.fg1.overflowYAuto.if(hasScroll).bb.bGray200.if(!!forceScrolling).overflowYScroll.$}
               >
                 {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
                 {content}
-                <div ref={modalBodyRef} />
               </main>
               <footer css={Css.fs0.$}>
                 <div ref={modalFooterRef} />
@@ -145,11 +143,15 @@ export function ModalHeader({ children }: { children: ReactNode }): JSX.Element 
 }
 
 /** Provides consistent styling and the scrolling behavior for a modal's primary content. */
-export function ModalBody({ children }: { children: ReactNode }): JSX.Element {
+export function ModalBody({
+  children,
+  virtualized = false,
+}: PropsWithChildren<{ virtualized?: boolean }>): JSX.Element {
   const { modalBodyDiv } = useBeamContext();
   const testId = useTestIds({}, testIdPrefix);
   return createPortal(
-    <div css={Css.px3.$} {...testId.content}>
+    // If `virtualized`, then we are expecting the `children` will handle their own scrollbar, so have the overflow hidden and adjust padding
+    <div css={Css.h100.if(virtualized).overflowHidden.pl3.else.px3.$} {...testId.content}>
       {children}
     </div>,
     modalBodyDiv,

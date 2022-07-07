@@ -2,6 +2,7 @@ import { action } from "@storybook/addon-actions";
 import { useState } from "react";
 import { Button } from "src/components/Button";
 import { InternalUser } from "src/components/Filters/testDomain";
+import { ScrollableContent, ScrollableParent } from "src/components/Layout";
 import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
 import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndData } from "src/components/Table";
@@ -89,6 +90,43 @@ export function TestModalFilterTable() {
       <ModalBody>
         <TextField label="Search" value={filter} onChange={setFilter} />
         <GridTable columns={columns} rows={rows} filter={filter} xss={Css.mt1.$} />
+      </ModalBody>
+      <ModalFooter>
+        <Button label="Cancel" onClick={closeModal} variant="tertiary" />
+      </ModalFooter>
+    </>
+  );
+}
+
+export function VirtualizedTable() {
+  const [filter, setFilter] = useState<string>();
+  const { closeModal } = useModal();
+  return (
+    <>
+      <ModalHeader>Filterable table</ModalHeader>
+      {/* Define `virtualized` on ModalBody to
+          (1) disable the modal's scrollbar, as it'll be introduced by the virtualized content.
+          (2) adjust padding to keep the scrollbar to the far right of the screen */}
+      <ModalBody virtualized>
+        {/*
+        Using ScrollableParent and ScrollableContent to keep TextField stuck to the top while ensuring
+        GridTable's scrollbar takes up only the 100% of the scrollable content area, and not all of ModalBody's.
+
+        However, if the only content within the ModalBody is the virtualized table, then there is no need for the
+        ScrollableParent and ScrollableContent. Would be much more simple, such as:
+        ```
+          <ModalBody virtualized>
+            <GridTable as="virtual" ... />
+          </ModalBod>
+        ```
+        */}
+
+        <ScrollableParent xss={Css.h100.$}>
+          <TextField label="Search" value={filter} onChange={setFilter} />
+          <ScrollableContent virtualized>
+            <GridTable as="virtual" columns={columns} rows={rows} filter={filter} xss={Css.mt1.$} />
+          </ScrollableContent>
+        </ScrollableParent>
       </ModalBody>
       <ModalFooter>
         <Button label="Cancel" onClick={closeModal} variant="tertiary" />
