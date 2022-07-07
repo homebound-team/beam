@@ -2,7 +2,12 @@ import { Meta } from "@storybook/react";
 import { useEffect } from "react";
 import { Button, ModalBody, ModalFooter, ModalHeader, ModalProps, OpenModal, useModal } from "src/components/index";
 import { Modal } from "src/components/Modal/Modal";
-import { TestModalContent, TestModalContentProps, TestModalFilterTable } from "src/components/Modal/TestModalContent";
+import {
+  TestModalContent,
+  TestModalContentProps,
+  TestModalFilterTable,
+  VirtualizedTable,
+} from "src/components/Modal/TestModalContent";
 import { FormStateApp } from "src/forms/FormStateApp";
 import { noop } from "src/utils/index";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
@@ -27,6 +32,17 @@ export const HeaderWithComponents = () => <ModalExample size="lg" withTag />;
 export const WithDatePicker = () => <ModalExample withDateField />;
 export const WithFieldInHeader = () => <ModalExample withTextArea />;
 export const WithDrawHeaderBorder = () => <ModalExample drawHeaderBorder={true} />;
+export const VirtualizedTableInBody = () => {
+  const { openModal } = useModal();
+  const open = () =>
+    openModal({
+      content: <VirtualizedTable />,
+      size: { width: "xl", height: 800 },
+    });
+  // Immediately open the modal for Chromatic snapshots
+  useEffect(open, [openModal]);
+  return <Button label="Open" onClick={open} />;
+};
 
 export const ButtonsInFooter = () => {
   const { openModal, setSize } = useModal();
