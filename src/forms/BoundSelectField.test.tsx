@@ -62,6 +62,12 @@ describe("BoundSelectField", () => {
     // Then formState has the latest value when onBlur is called
     expect(autoSave).toBeCalledWith("s:2");
   });
+
+  it("uses label as the default test id", async () => {
+    const author = createObjectState(formConfig, { favoriteSport: "s:1" });
+    const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} label="Sport" />);
+    expect(r.sport()).toHaveValue("Football");
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {

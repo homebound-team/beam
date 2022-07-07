@@ -1,8 +1,7 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { CheckboxGroup, CheckboxGroupProps } from "src/inputs";
-import { maybeCall, useTestIds } from "src/utils";
-import { defaultLabel } from "src/utils/defaultLabel";
+import { defaultLabel, maybeCall, useTestIds } from "src/utils";
 
 export type BoundCheckboxGroupFieldProps = Omit<CheckboxGroupProps, "values" | "onChange" | "label"> & {
   field: FieldState<any, string[] | null | undefined>;
@@ -22,7 +21,7 @@ export function BoundCheckboxGroupField(props: BoundCheckboxGroupFieldProps) {
     onFocus,
     ...others
   } = props;
-  const testId = useTestIds(props, field.key);
+  const testId = useTestIds(props, label);
   return (
     <Observer>
       {() => (

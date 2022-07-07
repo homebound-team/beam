@@ -1,6 +1,9 @@
 import { MutableRefObject } from "react";
 import type { CheckboxGroupState, ToggleState } from "react-stately";
 
+export * from "./defaultTestId";
+export * from "./defaultLabel";
+
 /** Adapts our state to what useToggleState returns in a stateless manner. */
 export function toToggleState(isSelected: boolean, onChange: (value: boolean) => void): ToggleState {
   return {

@@ -10,7 +10,6 @@ import {
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
-import { defaultTestId } from "src/utils/defaultTestId";
 
 interface ButtonDatePickerProps
   extends DatePickerProps,
@@ -25,7 +24,7 @@ export function ButtonDatePicker(props: ButtonDatePickerProps) {
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? defaultTestId(trigger.label) : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,
   );
 
   return (
