@@ -1,6 +1,15 @@
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
-import React, { MutableRefObject, ReactElement, ReactNode, useContext, useEffect, useMemo, useRef } from "react";
+import React, {
+  MutableRefObject,
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
@@ -328,6 +337,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
   const hasTotalsRow = rows.some((row) => row.id === "totals");
 
+
   // Flatten + component-ize the sorted rows.
   let [headerRows, visibleDataRows, totalsRows, filteredRowIds]: [
     RowTuple<R>[],
@@ -411,7 +421,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
     // Call `visitRows` with our a pre-filtered set list
     // If nestedCards is set, we assume the top-level kind is a card, and so should add spacers between them
-    const filteredRows = filterRows(api, columns, maybeSorted, filter);
+    const filteredRows = filterRows(api,  columns, maybeSorted, filter);
     visitRows(filteredRows, !!nestedCards, 0, true);
     nestedCards && nestedCards.done();
 
@@ -1492,6 +1502,6 @@ function filterRows<R extends Kinded>(
     } else {
       return acc;
     }
-  }
+  };
   return rows.reduce(filterFn, []);
 }

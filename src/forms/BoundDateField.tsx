@@ -24,7 +24,7 @@ export function BoundDateField(props: BoundDateFieldProps) {
     onEnter,
     ...others
   } = props;
-  const testId = useTestIds(props, label);
+  const testId = useTestIds(props, field.key);
   return (
     <Observer>
       {() => (
