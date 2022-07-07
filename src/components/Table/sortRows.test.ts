@@ -80,6 +80,22 @@ describe("sortRows", () => {
     // Then expected case sensitive sort in descending correct order
     expect(rowsToIdArray(sorted)).toEqual(["2", "2.2", "2.1", "2.3", "1", "header", "3"]);
   });
+
+  it("can sort within pinned rows", () => {
+    // Given a set of unsorted rows
+    const rows: GridDataRow<Row>[] = [
+      // And this row is not pinned, so should come last
+      { kind: "parent", id: "3", data: { name: "a" } },
+      // And this row is pinned, so should come first
+      { kind: "parent", id: "2", data: { name: "c" }, pin: "first" },
+      // And this row is pinned and also before the other pin
+      { kind: "parent", id: "1", data: { name: "b" }, pin: "first" },
+    ];
+    // When sorting them in descending order based on the name property
+    const sorted = sortRows([nameColumn], rows, [0, "ASC"], true);
+    // Then expected case sensitive sort in descending correct order
+    expect(rowsToIdArray(sorted)).toEqual(["1", "2", "3"]);
+  });
 });
 
 type HeaderRow = { kind: "header" };

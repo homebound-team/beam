@@ -37,7 +37,7 @@ function sortBatch<R extends Kinded>(
     const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
     const v1e = v1 === null || v1 === undefined;
     const v2e = v2 === null || v2 === undefined;
-    if (a.pin || b.pin) {
+    if ((a.pin || b.pin) && !(a.pin === b.pin)) {
       const ap = a.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
       const bp = b.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
       return ap === bp ? 0 : ap < bp ? -1 : 1;
