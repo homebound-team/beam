@@ -712,27 +712,27 @@ describe("GridTable", () => {
           sorting={{ on: "client", initial: [1, "ASC"] }}
           rows={[
             simpleHeader,
-            // And the 1st row is pinned first
-            { kind: "data", id: "1", pin: "first", data: { name: "a", value: 11 } },
-            { kind: "data", id: "2", pin: "first", data: { name: "b", value: 10 } },
+            // And the first rows are actually pinned last
+            { kind: "data", id: "5", pin: "last", data: { name: "e", value: 21 } },
+            { kind: "data", id: "6", pin: "last", data: { name: "f", value: 20 } },
             // And the middle rows need sorted
             { kind: "data", id: "3", data: { name: "c", value: 3 } },
             { kind: "data", id: "4", data: { name: "d", value: 1 } },
-            // And the last rows are pinned last
-            { kind: "data", id: "5", pin: "last", data: { name: "e", value: 20 } },
-            { kind: "data", id: "6", pin: "last", data: { name: "f", value: 21 } },
+            // And the last rows are actually pinned first
+            { kind: "data", id: "1", pin: "first", data: { name: "a", value: 11 } },
+            { kind: "data", id: "2", pin: "first", data: { name: "b", value: 10 } },
           ]}
         />,
       );
-      // Then the a/b rows stayed first
-      expect(cell(r, 1, 0)).toHaveTextContent("a");
-      expect(cell(r, 2, 0)).toHaveTextContent("b");
+      // Then the a/b rows stayed first (b has a lower value so was nudged first)
+      expect(cell(r, 1, 0)).toHaveTextContent("b");
+      expect(cell(r, 2, 0)).toHaveTextContent("a");
       // And the middle rows swapped
       expect(cell(r, 3, 0)).toHaveTextContent("d");
       expect(cell(r, 4, 0)).toHaveTextContent("c");
-      // And the last rows stayed last
-      expect(cell(r, 5, 0)).toHaveTextContent("e");
-      expect(cell(r, 6, 0)).toHaveTextContent("f");
+      // And the last rows stayed last (f has a lower value so was nudged first)
+      expect(cell(r, 5, 0)).toHaveTextContent("f");
+      expect(cell(r, 6, 0)).toHaveTextContent("e");
     });
 
     it("can pin rows last", async () => {
