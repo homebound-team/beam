@@ -39,7 +39,7 @@ function sortBatch<R extends Kinded>(
     const v2e = v2 === null || v2 === undefined;
     if ((a.pin || b.pin) && !(a.pin === b.pin)) {
       const ap = a.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
-      const bp = b.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
+      const bp = b.pin === "first" ? -1 : b.pin === "last" ? 1 : 0;
       return ap === bp ? 0 : ap < bp ? -1 : 1;
     } else if ((v1e && v2e) || v1 === v2) {
       return 0;
