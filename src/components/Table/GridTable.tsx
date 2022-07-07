@@ -1487,7 +1487,6 @@ function filterRows<R extends Kinded>(
       row.kind === "header" ||
       row.kind === "totals" ||
       filters.length === 0 ||
-      !!row.pin ||
       filters.every((f) =>
         columns.map((c) => applyRowFn(c, row, api, 0)).some((maybeContent) => matchesFilter(maybeContent, f)),
       );
@@ -1495,7 +1494,7 @@ function filterRows<R extends Kinded>(
       return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
     } else {
       const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
-      if (matchedChildren.length > 0) {
+      if (matchedChildren.length > 0 || row.pin) {
         return acc.concat([[row, matchedChildren]]);
       } else {
         return acc;
