@@ -23,7 +23,7 @@ export interface NavLinkProps extends BeamFocusableProps {
 type NavLinkVariant = "side" | "global";
 
 export function NavLink(props: NavLinkProps) {
-  const { disabled: isDisabled, label, openInNew, contrast=false, ...otherProps } = props;
+  const { disabled: isDisabled, label, openInNew, contrast = false, ...otherProps } = props;
   const ariaProps = { children: label, isDisabled, ...otherProps };
   const { href, active = false, icon = false, variant } = ariaProps;
   const ref = useRef() as RefObject<HTMLAnchorElement>;
@@ -88,10 +88,11 @@ export function getNavLinkStyles(variant: NavLinkVariant, contrast: boolean) {
 const baseStyles = Css.df.aic.hPx(32).pyPx(6).px1.br4.smEm.outline0.$;
 
 const navLinkVariantStyles: (
-  contrast: boolean
-) => Record<NavLinkVariant, { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; focusRingStyles: {}; activeStyles: {}; pressedStyles: {} }> = (
-  contrast,
-) => ({
+  contrast: boolean,
+) => Record<
+  NavLinkVariant,
+  { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; focusRingStyles: {}; activeStyles: {}; pressedStyles: {} }
+> = (contrast) => ({
   side: {
     baseStyles: { ...baseStyles, ...Css.gray700.if(contrast).gray600.$ },
     activeStyles: Css.lightBlue700.bgLightBlue50.if(contrast).white.bgGray700.$,
@@ -110,5 +111,5 @@ const navLinkVariantStyles: (
     ).$,
     hoverStyles: Css.gray500.bgGray900.$,
     pressedStyles: Css.gray500.bgGray700.$,
-  }
+  },
 });

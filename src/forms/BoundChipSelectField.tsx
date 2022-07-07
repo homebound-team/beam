@@ -32,7 +32,7 @@ export function BoundChipSelectField<O, V extends Value>(
     onCreateNew,
     ...others
   } = props;
-  const testId = useTestIds(props, field.key);
+  const testId = useTestIds(props, label);
 
   return (
     <Observer>

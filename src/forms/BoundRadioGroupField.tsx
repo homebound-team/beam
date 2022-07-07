@@ -1,8 +1,7 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { RadioGroupField, RadioGroupFieldProps } from "src/inputs";
-import { maybeCall, useTestIds } from "src/utils";
-import { defaultLabel } from "src/utils/defaultLabel";
+import { defaultLabel, maybeCall, useTestIds } from "src/utils";
 
 export type BoundRadioGroupFieldProps<K extends string> = Omit<
   RadioGroupFieldProps<K>,
@@ -24,7 +23,7 @@ export function BoundRadioGroupField<K extends string>(props: BoundRadioGroupFie
     onFocus,
     ...others
   } = props;
-  const testId = useTestIds(props, field.key);
+  const testId = useTestIds(props, label);
   return (
     <Observer>
       {() => (

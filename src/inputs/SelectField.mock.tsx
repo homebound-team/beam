@@ -1,7 +1,6 @@
 import { Key, useEffect, useState } from "react";
 import { SelectFieldProps } from "src/inputs";
 import { useTestIds } from "src/utils";
-import { defaultTestId } from "src/utils/defaultTestId";
 
 /** Mocks out `SelectField` as a `<select>` field. */
 export function SelectField<O extends object, V extends Key>(props: SelectFieldProps<O, V>) {
@@ -19,7 +18,7 @@ export function SelectField<O extends object, V extends Key>(props: SelectFieldP
     disabledOptions = [],
     label,
   } = props;
-  const tid = useTestIds(props, defaultTestId(label));
+  const tid = useTestIds(props, label);
 
   const [options, setOptions] = useState(Array.isArray(maybeOptions) ? maybeOptions : maybeOptions.initial);
   const currentOption = options.find((o) => getOptionValue(o) === value) || options[0];
