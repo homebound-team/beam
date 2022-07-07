@@ -19,6 +19,7 @@ import {
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { DateRange } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 export interface DateFieldBaseProps
   extends Pick<TextFieldBaseProps<{}>, "borderless" | "visuallyDisabled" | "hideLabel" | "compact"> {
@@ -100,7 +101,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   const [inputValue, setInputValue] = useState(
     (props.mode === "range" ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
   );
-  const tid = useTestIds(props, label);
+  const tid = useTestIds(props, defaultTestId(label));
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
 

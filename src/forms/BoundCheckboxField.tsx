@@ -21,7 +21,7 @@ export function BoundCheckboxField(props: BoundCheckboxFieldProps) {
     onBlur,
     ...others
   } = props;
-  const testId = useTestIds(props, label);
+  const testId = useTestIds(props, field.key);
   return (
     <Observer>
       {() => (

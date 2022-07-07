@@ -1,5 +1,6 @@
 import { MultiSelectFieldProps, Value } from "src/inputs";
 import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 /** Mocks out `MultiSelectField` as a multiple `<select>` field. */
 export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProps<T, V>) {
@@ -16,7 +17,7 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
     disabled,
     label,
   } = props;
-  const tid = useTestIds(props, label);
+  const tid = useTestIds(props, defaultTestId(label));
 
   return (
     <select

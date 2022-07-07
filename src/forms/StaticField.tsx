@@ -1,6 +1,7 @@
 import { useId } from "@react-aria/utils";
 import { ReactNode } from "react";
 import { Css } from "src/Css";
+import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
 interface StaticFieldProps {
@@ -11,7 +12,7 @@ interface StaticFieldProps {
 
 export function StaticField(props: StaticFieldProps) {
   const { label, value, children } = props;
-  const tid = useTestIds(props, label);
+  const tid = useTestIds(props, defaultTestId(label));
   const id = useId();
   return (
     <div>
