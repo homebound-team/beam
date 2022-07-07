@@ -2,7 +2,8 @@ import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { DateRangeField, DateRangeFieldProps } from "src/inputs";
 import { DateRange } from "src/types";
-import { defaultLabel, maybeCall, useTestIds } from "src/utils";
+import { maybeCall, useTestIds } from "src/utils";
+import { defaultLabel } from "src/utils/defaultLabel";
 
 export type BoundDateRangeFieldProps = Omit<DateRangeFieldProps, "label" | "value" | "onChange"> & {
   field: FieldState<any, DateRange | null | undefined>;
@@ -23,7 +24,7 @@ export function BoundDateRangeField(props: BoundDateRangeFieldProps) {
     onEnter,
     ...others
   } = props;
-  const testId = useTestIds(props, label);
+  const testId = useTestIds(props, field.key);
   return (
     <Observer>
       {() => (
