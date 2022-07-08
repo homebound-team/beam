@@ -11,9 +11,6 @@ export function sortRows<R extends Kinded>(
 ): GridDataRow<R>[] {
   const sorted = sortBatch(columns, rows, sortState, caseSensitive);
   // Recursively sort child rows
-
-  // check for persistent columns her move to top
-
   sorted.forEach((row, i) => {
     if (row.children) {
       sorted[i].children = sortRows(columns, row.children, sortState, caseSensitive);
@@ -44,10 +41,19 @@ function sortBatch<R extends Kinded>(
   return [...batch].sort((a, b) => {
     const v1 = sortValue(applyRowFn(column, a, {} as any, 0), caseSensitive);
     const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
-    const p1 = persistentValue(applyRowFn(persistentColumn, a, {} as any, 0));
-    const p2 = persistentValue(applyRowFn(persistentColumn, b, {} as any, 0));
     const v1e = v1 === null || v1 === undefined;
     const v2e = v2 === null || v2 === undefined;
+
+    let p1 = false;
+    let p2 = false;
+    if (persistentColumn) {
+      const pColumn = persistentColumn
+      p1 = sortValue(applyRowFn(persistentColumn, a, {} as any, 0), caseSensitive);
+      p2 = sortValue(applyRowFn(persistentColumn, b, {} as any, 0), caseSensitive); //persistent column is changing to read header column here and I don't know why
+      // some how I"m get 'value' instead of true or false here
+      //p1e = !(p1 === null || p1 === undefined);
+      //p2e = !(p2 === null || p2 === undefined);
+    }
     if ((a.pin || b.pin) && !(a.pin === b.pin)) {
       const ap = a.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
       const bp = b.pin === "first" ? -1 : b.pin === "last" ? 1 : 0;
@@ -61,9 +67,9 @@ function sortBatch<R extends Kinded>(
         return invert ? -1 : 1;
       }
     } else if (p1) {
-      return 1
+      return 1; 
     } else if (p2) {
-      return -1
+      return -1;
     }
     else if ((v1e && v2e) || v1 === v2) {
       return 0;
@@ -99,29 +105,6 @@ function sortValue(value: ReactNode | GridCellContent, caseSensitive: boolean): 
 
   // If it is a string, then always lower case it for comparisons
   return typeof maybeFn === "string" && !caseSensitive ? maybeFn.toLowerCase() : maybeFn;
-}
-
-/** Look at a row and get its persistent value. */
-function persistentValue(value: ReactNode | GridCellContent): any {
-  // Our persistenValue should hopefully be a Boolean
-  let maybeFn = value;
-  if (value && typeof value === "object") {
-    // Look for GridCellContent.sortValue, then GridCellContent.value
-    if ("sortValue" in value) {
-      maybeFn = value.sortValue;
-    } else if ("value" in value) {
-      maybeFn = value.value;
-    } else if ("content" in value) {
-      maybeFn = value.content;
-    }
-  }
-  // Watch for functions that need to read from a potentially-changing proxy  // no idea what this means
-  if (maybeFn instanceof Function) {
-    maybeFn = maybeFn();
-  }
-
-  // If it is a string, then always lower case it for comparisons
-  return maybeFn;
 }
 
 export function ensureClientSideSortValueIsSortable(
