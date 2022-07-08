@@ -64,11 +64,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   }
 
   public getSelectedRowIds(kind?: string): string[] {
-    if (kind === undefined) {
-      return this.rowState.selectedIds;
-    } else {
-      return this.getSelectedRows(kind).map((row: any) => row.id);
-    }
+    return this.getSelectedRows(kind).map((row: any) => row.id);
   }
 
   // The any is not great, but getting the overload to handle the optional kind is annoying
@@ -76,7 +72,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     const ids = this.rowState.selectedIds;
     const selected: GridDataRow<R>[] = [];
     visit(this.rowState.rows, (row) => {
-      if (ids.includes(row.id) && (!kind || row.kind === kind)) {
+      if (row.selectable !== false && ids.includes(row.id) && (!kind || row.kind === kind)) {
         selected.push(row as any);
       }
     });

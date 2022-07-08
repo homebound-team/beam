@@ -22,11 +22,13 @@ import {
   Icon,
   IconButton,
   numericColumn,
+  selectColumn,
   simpleHeader,
   SimpleHeaderAndData,
   useGridTableApi,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
+import { useComputed } from "src/hooks";
 import { TextField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
 import { noop } from "src/utils";
@@ -1175,5 +1177,37 @@ export function TruncatingCells() {
         { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
       ]}
     />
+  );
+}
+
+export function SelectableRows() {
+  const api = useGridTableApi<Row>();
+  const selectedIds = useComputed(() => api.getSelectedRows().map((r) => r.id), [api]);
+
+  const selectCol = selectColumn<Row>();
+
+  const nameCol: GridColumn<Row> = {
+    header: "Name",
+    data: ({ name }) => ({ content: name }),
+    mw: "160px",
+  };
+
+  return (
+    <>
+      <GridTable
+        columns={[selectCol, nameCol]}
+        style={{ rowHeight: "fixed" }}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "Tony Stark", value: 1 } },
+          { kind: "data", id: "2", selectable: false, data: { name: "Natasha Romanova", value: 2 } },
+          { kind: "data", id: "3", data: { name: "Thor Odinson", value: 3 } },
+        ]}
+        api={api}
+      />
+      <div>
+        <strong>Selected Row Ids:</strong> {selectedIds.length > 0 ? selectedIds.join(", ") : "None"}
+      </div>
+    </>
   );
 }

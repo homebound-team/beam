@@ -1451,6 +1451,50 @@ describe("GridTable", () => {
     expect(cellAnd(r, 4, 1, "select")).toBeChecked(); // Grandchild
   });
 
+  it("only selects non-disabled rows", async () => {
+    // Given three rows with a header
+    const _rows: GridDataRow<Row>[] = [
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "Tony Stark", value: 1 } },
+      { kind: "data", id: "2", selectable: false, data: { name: "Natasha Romanova", value: 2 } },
+      { kind: "data", id: "3", data: { name: "Thor Odinson", value: 3 } },
+    ];
+    const _columns = [selectColumn<Row>(), ...columns];
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+
+    // and a component using a useComputed against getSelectedRows
+    function Test() {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      const selectedNames = useComputed(() => {
+        return _api
+          .getSelectedRows("data")
+          .map((r) => r.data.name)
+          .join(",");
+      }, [_api]);
+      return (
+        <div>
+          <div data-testid="selectedNames">{selectedNames}</div>
+          <GridTable<Row> api={_api} columns={_columns} rows={_rows} />
+        </div>
+      );
+    }
+
+    // When table is rendered
+    const r = await render(<Test />);
+
+    // Then select toggle for row 2 is disabled
+    expect(r.select_2()).toBeDisabled();
+
+    // When selecting the header row select toggle
+    click(r.select_0);
+
+    // Then row id 2 is not selected as it's disabled
+    expect(api.current!.getSelectedRowIds()).toEqual(["3", "1"]);
+    // and selected rows does not include row 2 as it's disabled
+    expect(r.selectedNames()).toHaveTextContent("Thor Odinson,Tony Stark");
+  });
+
   it("can deselect all rows via 'clearSelections' api method", async () => {
     // Given a parent with children
     const rows: GridDataRow<NestedRow>[] = [

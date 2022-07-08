@@ -837,6 +837,7 @@ export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends 
 type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "kind", P> & {
   id: string;
   children: GridDataRow<R>[];
+  selectable?: false;
 };
 
 /**
@@ -1000,6 +1001,8 @@ export type GridDataRow<R extends Kinded> = {
   data: unknown;
   /** Whether to have the row collapsed (children not visible) on initial load. This will be ignore in subsequent re-renders of the table */
   initCollapsed?: boolean;
+  /** Whether row can be selected */
+  selectable?: false;
 } & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
 
 // Use IfAny so that GridDataRow<any> doesn't devolve into any
