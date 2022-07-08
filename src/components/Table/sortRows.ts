@@ -11,6 +11,9 @@ export function sortRows<R extends Kinded>(
 ): GridDataRow<R>[] {
   const sorted = sortBatch(columns, rows, sortState, caseSensitive);
   // Recursively sort child rows
+
+  // check for persistent columns her move to top
+
   sorted.forEach((row, i) => {
     if (row.children) {
       sorted[i].children = sortRows(columns, row.children, sortState, caseSensitive);
