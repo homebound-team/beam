@@ -180,6 +180,7 @@ export type GridSortConfig<S> =
       on: "server";
       /** The current sort by value + direction (if server-side sorting). */
       value?: [S, Direction];
+      persistent?: S | undefined;
       /** Callback for when the column is sorted (if server-side sorting). Parameters set to `undefined` is a signal to return to the initial sort state */
       onSort: (orderBy: S | undefined, direction: Direction | undefined) => void;
     };

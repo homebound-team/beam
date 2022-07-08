@@ -9,7 +9,7 @@ import { ASC, DESC, Direction, GridColumn, GridSortConfig, Kinded } from "src/co
  * a) `serverSideSortKey` if we're server-side sorting, or
  * b) it's index in the `columns` array, if client-side sorting
  */
-export type SortState<S> = readonly [S, Direction];
+export type SortState<S> = readonly [S, Direction, S | undefined];
 
 export type SortOn = "client" | "server" | undefined;
 
@@ -17,7 +17,7 @@ export type SortOn = "client" | "server" | undefined;
 export function useSortState<R extends Kinded, S>(
   columns: GridColumn<R, S>[],
   sorting?: GridSortConfig<S>,
-): [SortState<S> | undefined, (value: S) => void, SortOn, boolean] {
+): [SortState<S> | undefined, (value: S) => void, S, SortOn, boolean,] {
   // If we're server-side sorting, use the caller's `sorting.value` prop to initialize our internal
   // `useState`. After this, we ignore `sorting.value` because we assume it should match what our
   // `setSortState` just changed anyway (in response to the user sorting a column).
@@ -25,22 +25,19 @@ export function useSortState<R extends Kinded, S>(
     () => {
       if (sorting?.on === "client") {
         const { initial, persistent } = sorting;
-        if (persistent !== undefined) {
-          ///do something about the persistent values ........
-        }
         if (initial === undefined && "initial" in sorting) {
           // if explicitly set to `undefined`, then do not sort
           return undefined;
         } else if (initial) {
           const key = typeof initial[0] === "number" ? initial[0] : columns.indexOf(initial[0] as any);
-          return [key as any as S, initial[1]];
+          return [key as any as S, initial[1], persistent];
         } else {
           // If no explicit sorting, assume 1st column ascending
           const firstSortableColumn = columns.findIndex((c) => c.clientSideSort !== false);
-          return [firstSortableColumn as any as S, ASC];
+          return [firstSortableColumn as any as S, ASC, persistent];
         }
       } else {
-        return sorting?.value;
+        return [sorting?.value[0], sorting?.value[1], sorting?.persistent];
       }
     },
     // We want to allow the user to not memoize `GridTableProps.sorting` b/c for the

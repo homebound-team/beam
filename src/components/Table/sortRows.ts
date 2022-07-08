@@ -30,21 +30,42 @@ function sortBatch<R extends Kinded>(
   caseSensitive: boolean,
 ): GridDataRow<R>[] {
   // When client-side sort, the sort value is the column index
-  const [value, direction] = sortState;
+  const [value, direction, persistent] = sortState;
+  
   const column = columns[value];
   const invert = direction === "DESC";
+
+  let persistentColumn: GridColumn<R, {}>;
+  if (persistent) {
+    persistentColumn = columns[persistent]
+  }
 
   // Make a shallow copy for sorting to avoid mutating the original list
   return [...batch].sort((a, b) => {
     const v1 = sortValue(applyRowFn(column, a, {} as any, 0), caseSensitive);
     const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
+    const p1 = persistentValue(applyRowFn(persistentColumn, a, {} as any, 0));
+    const p2 = persistentValue(applyRowFn(persistentColumn, b, {} as any, 0));
     const v1e = v1 === null || v1 === undefined;
     const v2e = v2 === null || v2 === undefined;
     if ((a.pin || b.pin) && !(a.pin === b.pin)) {
       const ap = a.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
       const bp = b.pin === "first" ? -1 : b.pin === "last" ? 1 : 0;
       return ap === bp ? 0 : ap < bp ? -1 : 1;
-    } else if ((v1e && v2e) || v1 === v2) {
+    } else if (p1 && p2){
+      if ((v1e && v2e) || v1 === v2) {
+        return 0;
+      } else if (v1e || v1 < v2) {
+        return invert ? 1 : -1;
+      } else if (v2e || v1 > v2) {
+        return invert ? -1 : 1;
+      }
+    } else if (p1) {
+      return 1
+    } else if (p2) {
+      return -1
+    }
+    else if ((v1e && v2e) || v1 === v2) {
       return 0;
     } else if (v1e || v1 < v2) {
       return invert ? 1 : -1;
@@ -57,6 +78,8 @@ function sortBatch<R extends Kinded>(
 
 /** Look at a row and get its sort value. */
 function sortValue(value: ReactNode | GridCellContent, caseSensitive: boolean): any {
+  // Check for persistence
+  
   // Check sortValue and then fallback on value
   let maybeFn = value;
   if (value && typeof value === "object") {
@@ -76,6 +99,29 @@ function sortValue(value: ReactNode | GridCellContent, caseSensitive: boolean): 
 
   // If it is a string, then always lower case it for comparisons
   return typeof maybeFn === "string" && !caseSensitive ? maybeFn.toLowerCase() : maybeFn;
+}
+
+/** Look at a row and get its persistent value. */
+function persistentValue(value: ReactNode | GridCellContent): any {
+  // Our persistenValue should hopefully be a Boolean
+  let maybeFn = value;
+  if (value && typeof value === "object") {
+    // Look for GridCellContent.sortValue, then GridCellContent.value
+    if ("sortValue" in value) {
+      maybeFn = value.sortValue;
+    } else if ("value" in value) {
+      maybeFn = value.value;
+    } else if ("content" in value) {
+      maybeFn = value.content;
+    }
+  }
+  // Watch for functions that need to read from a potentially-changing proxy  // no idea what this means
+  if (maybeFn instanceof Function) {
+    maybeFn = maybeFn();
+  }
+
+  // If it is a string, then always lower case it for comparisons
+  return maybeFn;
 }
 
 export function ensureClientSideSortValueIsSortable(
