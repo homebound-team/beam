@@ -44,7 +44,9 @@ export function selectColumn<T extends Kinded, S = {}>(columnDef?: Partial<GridC
     ...columnDef,
   };
   return newMethodMissingProxy(base, (key) => {
-    return (data: any, { row }: { row: GridDataRow<any> }) => ({ content: <SelectToggle id={row.id} /> });
+    return (data: any, { row }: { row: GridDataRow<any> }) => ({
+      content: <SelectToggle id={row.id} disabled={row.selectable === false} />,
+    });
   }) as any;
 }
 
