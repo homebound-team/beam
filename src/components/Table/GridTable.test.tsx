@@ -190,6 +190,27 @@ describe("GridTable", () => {
     expect(cell(r, 0, 0)).toHaveStyleRule("padding-left", "8px");
   });
 
+  it("can apply cell-specific styling", async () => {
+    // Given a column
+    const nameColumn: GridColumn<Row> = {
+      header: () => "Name",
+      // That returns dynamic values from its GridCellContent.css
+      data: ({ name }) => ({
+        content: name,
+        css: name === "foo" ? Css.bgRed500.$ : Css.bgRed100.$,
+      }),
+    };
+    // When we render the data
+    const rows: GridDataRow<Row>[] = [
+      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+    ];
+    const r = await render(<GridTable columns={[nameColumn]} rows={rows} />);
+    // Then the rows are styled appropriately
+    expect(cell(r, 0, 0)).toHaveStyleRule("background-color", Palette.Red500);
+    expect(cell(r, 1, 0)).toHaveStyleRule("background-color", Palette.Red100);
+  });
+
   describe("client-side sorting", () => {
     it("can sort", async () => {
       // Given the table is using client-side sorting
