@@ -24,7 +24,10 @@ export function useSortState<R extends Kinded, S>(
   const initialSortState: SortState<S> | undefined = useMemo(
     () => {
       if (sorting?.on === "client") {
-        const { initial } = sorting;
+        const { initial, persistent } = sorting;
+        if (persistent !== undefined) {
+          ///do something about the persistent values ........
+        }
         if (initial === undefined && "initial" in sorting) {
           // if explicitly set to `undefined`, then do not sort
           return undefined;

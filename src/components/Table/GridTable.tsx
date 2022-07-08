@@ -174,6 +174,7 @@ export type GridSortConfig<S> =
       /** The optional initial column (index in columns) and direction to sort. */
       initial?: [S | GridColumn<any>, Direction] | undefined;
       caseSensitive?: boolean;
+      persistent?: S | undefined;
     }
   | {
       on: "server";

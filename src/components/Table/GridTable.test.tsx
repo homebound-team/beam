@@ -358,6 +358,40 @@ describe("GridTable", () => {
       expect(sortHeader_1()).toBeUndefined();
     });
 
+    it("can have persistent rows when sorting", async () => {
+      // Given the table is using client-side sorting
+      const r = await render(
+        <GridTable
+          columns={[nameColumn, valueColumn]}
+          sorting={{ on: "client", persistent:valueColumn }}
+          rows={[
+            simpleHeader,
+            // And the data is initially unsorted
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
+          ]}
+        />,
+      );
+      // Then the data is initially render sorted by 1st column
+      expect(cell(r, 1, 0)).toHaveTextContent("a");
+
+      // And when sorted by column 1
+      click(r.sortHeader_0);
+      // Then 'name: c' row is first
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
+
+      // And when sorted by column 2
+      click(r.sortHeader_1);
+      // Then the `value: 1` row is first
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
+
+      // And the rows were memoized so didn't re-render
+      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 3).getAttribute("data-render")).toEqual("1");
+    });
+
     it("can be initially sorted by a column index", async () => {
       // Given a table
       const r = await render(
