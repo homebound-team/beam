@@ -973,10 +973,12 @@ export type GridCellContent = {
   indent?: 1 | 2;
   colspan?: number;
   typeScale?: Typography;
-  /** Allows the cell to stay in place when the user scrolls horizontally */
+  /** Allows the cell to stay in place when the user scrolls horizontally, i.e. frozen columns. */
   sticky?: "left" | "right";
   /** If provided, content of the cell will be wrapped within a <button /> or <a /> tag depending on if the value is a function or a string. */
   onClick?: () => {} | string;
+  /** Custom css to apply directly to this cell, i.e. cell-specific borders. */
+  css?: Properties;
 };
 
 type MaybeFn<T> = T | (() => T);
@@ -1180,6 +1182,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             : {}),
           // Add any cell specific style overrides
           ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
+          // And any cell specific css
+          ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
           // Define the width of the column on each cell. Supports col spans.
           ...{
             width: `calc(${columnSizes
