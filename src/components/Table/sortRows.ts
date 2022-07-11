@@ -47,12 +47,8 @@ function sortBatch<R extends Kinded>(
     let p1 = false;
     let p2 = false;
     if (persistentColumn) {
-      const pColumn = persistentColumn
       p1 = sortValue(applyRowFn(persistentColumn, a, {} as any, 0), caseSensitive);
-      p2 = sortValue(applyRowFn(persistentColumn, b, {} as any, 0), caseSensitive); //persistent column is changing to read header column here and I don't know why
-      // some how I"m get 'value' instead of true or false here
-      //p1e = !(p1 === null || p1 === undefined);
-      //p2e = !(p2 === null || p2 === undefined);
+      p2 = sortValue(applyRowFn(persistentColumn, b, {} as any, 0), caseSensitive);
     }
     if ((a.pin || b.pin) && !(a.pin === b.pin)) {
       const ap = a.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
@@ -67,9 +63,9 @@ function sortBatch<R extends Kinded>(
         return invert ? -1 : 1;
       }
     } else if (p1) {
-      return 1; 
+      return -1; 
     } else if (p2) {
-      return -1;
+      return 1;
     }
     else if ((v1e && v2e) || v1 === v2) {
       return 0;

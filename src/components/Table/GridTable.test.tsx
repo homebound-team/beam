@@ -365,7 +365,7 @@ describe("GridTable", () => {
 
       const favNameColumn: GridColumn<FavoriteRow> = { header: () => "Name", data: ({ name }) => name };
       const favValueColumn: GridColumn<FavoriteRow> = { header: () => "Value", data: ({ value }) => value };
-      const favoriteColumn: GridColumn<FavoriteRow> = { header: () => "Value", data: ({ favorite }) => favorite };
+      const favoriteColumn: GridColumn<FavoriteRow> = { header: () => "Favorite", data: ({ favorite }) => favorite };
 
 
       const r = await render(
@@ -375,8 +375,8 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the data is initially unsorted
-            { kind: "data", id: "2", data: { name: "b", value: 2, favorite: false  } },
-            { kind: "data", id: "1", data: { name: "a", value: 3, favorite: true } },
+            { kind: "data", id: "2", data: { name: "b", value: 2, favorite: true  } },
+            { kind: "data", id: "1", data: { name: "a", value: 3, favorite: false } },
             { kind: "data", id: "3", data: { name: "c", value: 1, favorite: false } },
           ]}
         />,
