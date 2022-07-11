@@ -1186,19 +1186,16 @@ export function favoriting() {
   const favValueColumn: GridColumn<FavoriteRow> = { header: () => "Value", data: ({ value }) => value };
   const favoriteColumn: GridColumn<FavoriteRow> = {
     header: () => "Favorite",
-    data: ({ favorite }) => 
-    ({content:
-      <Icon
-        icon={favorite ? "starFilled" : "star"}
-        color={favorite ? Palette.Yellow500 : Palette.Gray900}
-      />
-    , sortValue: favorite })
+    data: ({ favorite }) => ({
+      content: <Icon icon={favorite ? "starFilled" : "star"} color={favorite ? Palette.Yellow500 : Palette.Gray900} />,
+      sortValue: favorite,
+    }),
   };
 
   return (
     <GridTable
       columns={[favNameColumn, favValueColumn, favoriteColumn]}
-      sorting={{ on: "client", persistent:favoriteColumn }}
+      sorting={{ on: "client", persistent: favoriteColumn }}
       rows={[
         simpleHeader,
         // And the data is initially unsorted
@@ -1218,29 +1215,34 @@ export function favoritingMore() {
   const favValueColumn: GridColumn<FavoriteRow> = { header: () => "Value", data: ({ value }) => value };
   const favoriteColumn: GridColumn<FavoriteRow> = {
     header: () => "Favorite",
-    data: ({ favorite }) => 
-    ({content:
-      <Icon
-        icon={favorite ? "starFilled" : "star"}
-        color={favorite ? Palette.Yellow500 : Palette.Gray900}
-      />
-    , sortValue: favorite })
+    data: ({ favorite }) => ({
+      content: <Icon icon={favorite ? "starFilled" : "star"} color={favorite ? Palette.Yellow500 : Palette.Gray900} />,
+      sortValue: favorite,
+    }),
   };
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [filter, setFilter] = useState<string | undefined>();
   return (
-    <GridTable
-      columns={[favNameColumn, favValueColumn, favoriteColumn]}
-      sorting={{ on: "client", persistent:favoriteColumn }}
-      rows={[
-        simpleHeader,
-        // And the data is initially unsorted
-        { kind: "data", id: "4", data: { name: "b", value: 2, favorite: true } },
-        { kind: "data", id: "1", data: { name: "a", value: 3, favorite: false } },
-        { kind: "data", id: "3", data: { name: "c", value: 1, favorite: false } },
-        { kind: "data", id: "2", data: { name: "d", value: 1, favorite: true  } },
-        { kind: "data", id: "5", data: { name: "e", value: 3, favorite: false } },
-        { kind: "data", id: "6", data: { name: "f", value: 1, favorite: false } },
-      ]}
-    />
+    <div>
+      <div>
+        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
+      </div>
+      <GridTable
+        filter={filter}
+        columns={[favNameColumn, favValueColumn, favoriteColumn]}
+        sorting={{ on: "client", persistent: favoriteColumn }}
+        rows={[
+          simpleHeader,
+          // And the data is initially unsorted
+          { kind: "data", id: "4", data: { name: "b", value: 2, favorite: true } },
+          { kind: "data", id: "1", data: { name: "a", value: 3, favorite: false } },
+          { kind: "data", id: "3", data: { name: "c", value: 1, favorite: false } },
+          { kind: "data", id: "2", data: { name: "d", value: 1, favorite: true } },
+          { kind: "data", id: "5", data: { name: "e", value: 3, favorite: false } },
+          { kind: "data", id: "6", data: { name: "f", value: 1, favorite: false } },
+        ]}
+      />
+    </div>
   );
 }

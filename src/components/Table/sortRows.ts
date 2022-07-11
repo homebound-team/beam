@@ -80,8 +80,6 @@ function sortBatch<R extends Kinded>(
 
 /** Look at a row and get its sort value. */
 function sortValue(value: ReactNode | GridCellContent, caseSensitive: boolean): any {
-  // Check for persistence
-  
   // Check sortValue and then fallback on value
   let maybeFn = value;
   if (value && typeof value === "object") {
