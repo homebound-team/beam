@@ -25,16 +25,20 @@ export function useSortState<R extends Kinded, S>(
     () => {
       if (sorting?.on === "client") {
         const { initial, persistent } = sorting;
+        console.log("inside useSortState")
+        console.log("initial: " + initial + " persistent: " + persistent)
+        const persistentKey = typeof persistent === "number" ? persistent : columns.indexOf(persistent as any);
         if (initial === undefined && "initial" in sorting) {
           // if explicitly set to `undefined`, then do not sort
           return undefined;
         } else if (initial) {
           const key = typeof initial[0] === "number" ? initial[0] : columns.indexOf(initial[0] as any);
-          return [key as any as S, initial[1], columns.indexOf(persistent as any) as any as S];
+          
+          return [key as any as S, initial[1], persistentKey as any as S];
         } else {
           // If no explicit sorting, assume 1st column ascending
           const firstSortableColumn = columns.findIndex((c) => c.clientSideSort !== false);
-          return [firstSortableColumn as any as S, ASC, columns.indexOf(persistent as any) as any as S];
+          return [firstSortableColumn as any as S, ASC, persistentKey as any as S];
         }
       } else {
         

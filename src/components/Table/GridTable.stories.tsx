@@ -1219,6 +1219,7 @@ export function favoritingMore() {
       content: <Icon icon={favorite ? "starFilled" : "star"} color={favorite ? Palette.Yellow500 : Palette.Gray900} />,
       sortValue: favorite,
     }),
+    clientSideSort: false,
   };
 
   // eslint-disable-next-line react-hooks/rules-of-hooks

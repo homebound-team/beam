@@ -32,10 +32,10 @@ function sortBatch<R extends Kinded>(
   const column = columns[value];
   const invert = direction === "DESC";
 
-  let persistentColumn: GridColumn<R, {}>;
-  if (persistent) {
-    persistentColumn = columns[persistent]
-  }
+  
+  // console.log("sort batch beam")
+  // console.log("persistent index: "+ persistent)
+  const persistentColumn = persistent && columns[persistent];
 
   // Make a shallow copy for sorting to avoid mutating the original list
   return [...batch].sort((a, b) => {
@@ -46,10 +46,10 @@ function sortBatch<R extends Kinded>(
 
     let p1 = false;
     let p2 = false;
-    if (persistentColumn) {
-      p1 = sortValue(applyRowFn(persistentColumn, a, {} as any, 0), caseSensitive);
-      p2 = sortValue(applyRowFn(persistentColumn, b, {} as any, 0), caseSensitive);
-    }
+    console.log("sort batch beam")
+    console.log(persistentColumn)
+    p1 = persistentColumn && sortValue(applyRowFn(persistentColumn, a, {} as any, 0), caseSensitive);
+    p2 = persistentColumn && sortValue(applyRowFn(persistentColumn, b, {} as any, 0), caseSensitive);
     if ((a.pin || b.pin) && !(a.pin === b.pin)) {
       const ap = a.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
       const bp = b.pin === "first" ? -1 : b.pin === "last" ? 1 : 0;

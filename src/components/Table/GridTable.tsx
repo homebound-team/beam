@@ -318,6 +318,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // Make a single copy of our current collapsed state, so we'll have a single observer.
   const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
 
+  // console.log("grid table sorting config");
+  // console.log(props.sorting)
+
   const [sortState, setSortKey, sortOn, caseSensitive] = useSortState<R, S>(columns, props.sorting);
   const maybeSorted = useMemo(() => {
     if (sortOn === "client" && sortState) {
