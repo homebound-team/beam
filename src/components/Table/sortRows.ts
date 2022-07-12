@@ -31,51 +31,46 @@ function sortBatch<R extends Kinded>(
   
   const column = columns[value];
   const invert = direction === "DESC";
-
-  
-  // console.log("sort batch beam")
-  // console.log("persistent index: "+ persistent)
   const persistentColumn = persistent && columns[persistent];
 
   // Make a shallow copy for sorting to avoid mutating the original list
   return [...batch].sort((a, b) => {
-    const v1 = sortValue(applyRowFn(column, a, {} as any, 0), caseSensitive);
-    const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
-    const v1e = v1 === null || v1 === undefined;
-    const v2e = v2 === null || v2 === undefined;
 
-    let p1 = false;
-    let p2 = false;
-    console.log("sort batch beam")
-    console.log(persistentColumn)
-    p1 = persistentColumn && sortValue(applyRowFn(persistentColumn, a, {} as any, 0), caseSensitive);
-    p2 = persistentColumn && sortValue(applyRowFn(persistentColumn, b, {} as any, 0), caseSensitive);
     if ((a.pin || b.pin) && !(a.pin === b.pin)) {
       const ap = a.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
       const bp = b.pin === "first" ? -1 : b.pin === "last" ? 1 : 0;
       return ap === bp ? 0 : ap < bp ? -1 : 1;
-    } else if (p1 && p2){
-      if ((v1e && v2e) || v1 === v2) {
-        return 0;
-      } else if (v1e || v1 < v2) {
-        return invert ? 1 : -1;
-      } else if (v2e || v1 > v2) {
-        return invert ? -1 : 1;
+    } else if (persistentColumn){
+      // there exist a persistent column, check if rows are persitent 
+      const p1 = persistentColumn && sortValue(applyRowFn(persistentColumn, a, {} as any, 0), caseSensitive);
+      const p2 = persistentColumn && sortValue(applyRowFn(persistentColumn, b, {} as any, 0), caseSensitive);
+      // if both rows are persistent compare the sort values
+      if (p1 && p2) {
+        return compare(column, a, b, false, caseSensitive);
+      } else if (p1) {
+        return -1; 
+      } else if (p2) {
+        return 1;
       }
-    } else if (p1) {
-      return -1; 
-    } else if (p2) {
-      return 1;
-    }
-    else if ((v1e && v2e) || v1 === v2) {
-      return 0;
-    } else if (v1e || v1 < v2) {
-      return invert ? 1 : -1;
-    } else if (v2e || v1 > v2) {
-      return invert ? -1 : 1;
-    }
-    return 0;
+    } 
+    return compare(column, a, b, invert, caseSensitive)
   });
+}
+
+function compare(column: any, a: GridDataRow<any>, b: GridDataRow<any>, invert: boolean, caseSensitive: boolean) {
+  const v1 = sortValue(applyRowFn(column, a, {} as any, 0), caseSensitive);
+  const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
+  const v1e = v1 === null || v1 === undefined;
+  const v2e = v2 === null || v2 === undefined;
+  if ((v1e && v2e) || v1 === v2) {
+    return 0;
+  } else if (v1e || v1 < v2) {
+    return invert ? 1 : -1;
+  } else if (v2e || v1 > v2) {
+    return invert ? -1 : 1;
+  } else {
+    return 0;
+  }
 }
 
 /** Look at a row and get its sort value. */

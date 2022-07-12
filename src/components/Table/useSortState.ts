@@ -25,8 +25,6 @@ export function useSortState<R extends Kinded, S>(
     () => {
       if (sorting?.on === "client") {
         const { initial, persistent } = sorting;
-        console.log("inside useSortState")
-        console.log("initial: " + initial + " persistent: " + persistent)
         const persistentKey = typeof persistent === "number" ? persistent : columns.indexOf(persistent as any);
         if (initial === undefined && "initial" in sorting) {
           // if explicitly set to `undefined`, then do not sort
