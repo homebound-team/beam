@@ -12,12 +12,12 @@ export interface ChipProps<X> {
 export function Chip<X extends Only<Xss<Margin>, X>>(props: ChipProps<X>) {
   const { text, xss = {} } = props;
   const { fieldProps } = usePresentationContext();
-  const typeScale = fieldProps?.typeScale ?? "sm";
+  const compact = fieldProps?.compact;
   const tid = useTestIds(props, "chip");
   return (
     <span
       css={{
-        ...Css[typeScale].dif.aic.br16.pl1.px1.pyPx(2).gray900.bgGray200.$,
+        ...Css[compact ? "xs" : "sm"].dif.aic.br16.pl1.px1.pyPx(2).gray900.bgGray200.$,
         ...xss,
       }}
       {...tid}
