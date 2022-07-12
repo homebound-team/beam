@@ -69,9 +69,10 @@ export function CheckboxBase(props: CheckboxBaseProps) {
         {...hoverProps}
         css={{
           ...baseStyles,
-          ...((isSelected || isIndeterminate) && filledBoxStyles),
-          ...((isSelected || isIndeterminate) && isHovered && filledBoxHoverStyles),
+          ...(((isSelected && !isDisabled) || isIndeterminate) && filledBoxStyles),
+          ...(((isSelected && !isDisabled) || isIndeterminate) && isHovered && filledBoxHoverStyles),
           ...(isDisabled && disabledBoxStyles),
+          ...(isDisabled && isSelected && disabledSelectedBoxStyles),
           ...(isFocusVisible && focusRingStyles),
           ...(isHovered && hoverBorderStyles),
           ...markStyles,
@@ -97,7 +98,8 @@ export function CheckboxBase(props: CheckboxBaseProps) {
 const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bGray300.br4.bgWhite.transition.$;
 const filledBoxStyles = Css.bLightBlue700.bgLightBlue700.$;
 const filledBoxHoverStyles = Css.bgLightBlue900.$;
-const disabledBoxStyles = Css.bGray400.bGray100.$;
+const disabledBoxStyles = Css.bgGray50.bGray100.$;
+const disabledSelectedBoxStyles = Css.bgGray400.bGray400.$;
 const disabledColor = Css.gray300.$;
 const focusRingStyles = Css.bshFocus.$;
 const hoverBorderStyles = Css.bLightBlue900.$;

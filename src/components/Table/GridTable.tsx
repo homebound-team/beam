@@ -838,6 +838,7 @@ export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends 
 type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "kind", P> & {
   id: string;
   children: GridDataRow<R>[];
+  selectable?: false;
 };
 
 /**
@@ -973,10 +974,12 @@ export type GridCellContent = {
   indent?: 1 | 2;
   colspan?: number;
   typeScale?: Typography;
-  /** Allows the cell to stay in place when the user scrolls horizontally */
+  /** Allows the cell to stay in place when the user scrolls horizontally, i.e. frozen columns. */
   sticky?: "left" | "right";
   /** If provided, content of the cell will be wrapped within a <button /> or <a /> tag depending on if the value is a function or a string. */
   onClick?: () => {} | string;
+  /** Custom css to apply directly to this cell, i.e. cell-specific borders. */
+  css?: Properties;
 };
 
 type MaybeFn<T> = T | (() => T);
@@ -1001,6 +1004,8 @@ export type GridDataRow<R extends Kinded> = {
   data: unknown;
   /** Whether to have the row collapsed (children not visible) on initial load. This will be ignore in subsequent re-renders of the table */
   initCollapsed?: boolean;
+  /** Whether row can be selected */
+  selectable?: false;
 } & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
 
 // Use IfAny so that GridDataRow<any> doesn't devolve into any
@@ -1178,6 +1183,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             : {}),
           // Add any cell specific style overrides
           ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
+          // And any cell specific css
+          ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
           // Define the width of the column on each cell. Supports col spans.
           ...{
             width: `calc(${columnSizes
@@ -1488,7 +1495,6 @@ function filterRows<R extends Kinded>(
       row.kind === "header" ||
       row.kind === "totals" ||
       filters.length === 0 ||
-      !!row.pin ||
       filters.every((f) =>
         columns.map((c) => applyRowFn(c, row, api, 0)).some((maybeContent) => matchesFilter(maybeContent, f)),
       );
@@ -1496,7 +1502,7 @@ function filterRows<R extends Kinded>(
       return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
     } else {
       const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
-      if (matchedChildren.length > 0) {
+      if (matchedChildren.length > 0 || row.pin) {
         return acc.concat([[row, matchedChildren]]);
       } else {
         return acc;
