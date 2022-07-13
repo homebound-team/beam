@@ -1,4 +1,4 @@
-import { ObjectConfig, required, useFormState } from "@homebound/form-state";
+import { createObjectState, ObjectConfig, required, useFormState } from "@homebound/form-state";
 import { click } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { Observer } from "mobx-react";
@@ -38,6 +38,64 @@ describe("BoundSelectAndTextField", () => {
     // Then expect it to prefix the default field testids
     expect(r.custom_type()).toBeTruthy();
     expect(r.custom_name()).toBeTruthy();
+  });
+
+  it("can fire onBlur and onFocus for fields", async () => {
+    const selectOnBlur = jest.fn();
+    const selectOnFocus = jest.fn();
+    const textOnBlur = jest.fn();
+    const textOnFocus = jest.fn();
+    // Given a BoundSelectAndTextField with the onBlur and onFocus callbacks and autoSave
+    const formState = createObjectState(config, {});
+    const types = [
+      { id: ScheduleTypes.Task, name: "Task" },
+      { id: ScheduleTypes.Milestone, name: "Milestone" },
+    ];
+    const r = await render(
+      <BoundSelectAndTextField
+        selectFieldProps={{ field: formState.type, options: types, onBlur: selectOnBlur, onFocus: selectOnFocus }}
+        textFieldProps={{ field: formState.name, onBlur: textOnBlur, onFocus: textOnFocus }}
+      />,
+    );
+
+    // When firing the focus and blur events on both fields
+    fireEvent.focus(r.type());
+    fireEvent.blur(r.type());
+    fireEvent.focus(r.name());
+    fireEvent.blur(r.name());
+
+    // Then the callback functions should each have been fired.
+    expect(selectOnFocus).toBeCalledTimes(1);
+    expect(selectOnBlur).toBeCalledTimes(1);
+    expect(textOnFocus).toBeCalledTimes(1);
+    expect(textOnBlur).toBeCalledTimes(1);
+  });
+
+  it("can fire auto save on select field change and text field enter", async () => {
+    const maybeAutoSave = jest.fn();
+    // Given a BoundSelectAndTextField with autoSave
+    const formState = createObjectState(config, {}, { maybeAutoSave });
+    const types = [
+      { id: ScheduleTypes.Task, name: "Task" },
+      { id: ScheduleTypes.Milestone, name: "Milestone" },
+    ];
+    const r = await render(
+      <BoundSelectAndTextField
+        selectFieldProps={{ field: formState.type, options: types }}
+        textFieldProps={{ field: formState.name }}
+      />,
+    );
+
+    // When making a selection from the dropdown
+    r.type().focus();
+    click(r.getByRole("option", { name: "Task" }));
+    // Then autoSave should be called.
+    expect(maybeAutoSave).toBeCalledTimes(1);
+
+    // And when using the "Enter" key on the text field
+    fireEvent.keyDown(r.name(), { key: "Enter" });
+    // Then autoSave should be called.
+    expect(maybeAutoSave).toBeCalledTimes(2);
   });
 });
 
