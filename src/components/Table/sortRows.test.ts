@@ -22,7 +22,7 @@ describe("sortRows", () => {
       { kind: "parent", id: "3", data: { name: "c" } },
     ];
     // When sorting them in ascending order based on the name property
-    const sorted = sortRows([nameColumn], rows, [0, "ASC", undefined], false);
+    const sorted = sortRows([nameColumn], rows, [0, "ASC", undefined, undefined], false);
     // Then expected sorted to be in ascending correct order
     expect(rowsToIdArray(sorted)).toEqual(["1", "2", "2.1", "2.2", "2.3", "3", "header"]);
     // TODO Put this back when we have tuple-based sorting
@@ -49,7 +49,7 @@ describe("sortRows", () => {
       { kind: "parent", id: "3", data: { name: "c" } },
     ];
     // When sorting them in descending order based on the name property
-    const sorted = sortRows([nameColumn], rows, [0, "DESC", undefined], false);
+    const sorted = sortRows([nameColumn], rows, [0, "DESC", undefined, undefined], false);
     // Then expected sorted to be in descending correct order
     expect(rowsToIdArray(sorted)).toEqual(["header", "3", "2", "2.3", "2.2", "2.1", "1"]);
     // TODO Put this back when we have tuple-based sorting
@@ -76,7 +76,7 @@ describe("sortRows", () => {
       { kind: "parent", id: "3", data: { name: "C" } },
     ];
     // When sorting them in descending order based on the name property
-    const sorted = sortRows([nameColumn], rows, [0, "DESC", undefined], true);
+    const sorted = sortRows([nameColumn], rows, [0, "DESC", undefined, undefined], true);
     // Then expected case sensitive sort in descending correct order
     expect(rowsToIdArray(sorted)).toEqual(["2", "2.2", "2.1", "2.3", "1", "header", "3"]);
   });
@@ -92,7 +92,7 @@ describe("sortRows", () => {
       { kind: "parent", id: "1", data: { name: "b" }, pin: "first" },
     ];
     // When sorting them in descending order based on the name property
-    const sorted = sortRows([nameColumn], rows, [0, "ASC", undefined], true);
+    const sorted = sortRows([nameColumn], rows, [0, "ASC", undefined, undefined], true);
     // Then expected case sensitive sort in descending correct order
     expect(rowsToIdArray(sorted)).toEqual(["1", "2", "3"]);
   });

@@ -27,11 +27,12 @@ function sortBatch<R extends Kinded>(
   caseSensitive: boolean,
 ): GridDataRow<R>[] {
   // When client-side sort, the sort value is the column index
-  const [value, direction, persistent] = sortState;
+  const [value, direction, primaryKey, primaryDirection] = sortState;
   
   const column = columns[value];
   const invert = direction === "DESC";
-  const persistentColumn = persistent && columns[persistent];
+  const primaryInvert = primaryDirection === "DESC"
+  const primaryColumn = primaryKey && columns[primaryKey];
 
   // Make a shallow copy for sorting to avoid mutating the original list
   return [...batch].sort((a, b) => {
@@ -40,17 +41,11 @@ function sortBatch<R extends Kinded>(
       const ap = a.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
       const bp = b.pin === "first" ? -1 : b.pin === "last" ? 1 : 0;
       return ap === bp ? 0 : ap < bp ? -1 : 1;
-    } else if (persistentColumn){
+    } else if (primaryColumn){
       // there exist a persistent column, check if rows are persitent 
-      const p1 = persistentColumn && sortValue(applyRowFn(persistentColumn, a, {} as any, 0), caseSensitive);
-      const p2 = persistentColumn && sortValue(applyRowFn(persistentColumn, b, {} as any, 0), caseSensitive);
-      // if both rows are persistent compare the sort values
-      if (p1 && p2) {
-        return compare(column, a, b, false, caseSensitive);
-      } else if (p1) {
-        return -1; 
-      } else if (p2) {
-        return 1;
+      const primaryCompare = compare(primaryColumn, a, b, primaryInvert,caseSensitive);
+      if (primaryCompare !== 0){
+        return primaryCompare
       }
     } 
     return compare(column, a, b, invert, caseSensitive)
