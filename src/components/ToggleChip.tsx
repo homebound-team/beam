@@ -24,11 +24,11 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
       type="button"
       css={{
         ...Css[compact ? "xs" : "sm"].dif.aic.br16.pl1
-          // Use a lower right-padding to get closer to the `X` circle
-          .prPx(4)
+          // Use a lower right-padding to get closer to the `X` circle when not disabled
+          .prPx(2)
           .pyPx(2)
           .gray900.bgGray200.if(disabled)
-          .mhPx(compact ? 20 : 28).gray600.$,
+          .gray600.pr1.mhPx(compact ? 20 : 28).$,
         ":hover:not(:disabled)": Css.bgGray300.$,
         ":disabled": Css.cursorNotAllowed.$,
         ...xss,
@@ -37,7 +37,7 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
       onClick={onClick}
       {...tid}
     >
-      <span css={Css.prPx(6).tl.lineClamp1.breakAll.if(disabled).prPx(4).$} title={text}>
+      <span css={Css.prPx(6).tl.lineClamp1.breakAll.if(disabled).pr0.$} title={text}>
         {text}
       </span>
       {!disabled && (
