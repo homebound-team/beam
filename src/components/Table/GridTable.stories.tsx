@@ -11,7 +11,6 @@ import {
   condensedStyle,
   dateColumn,
   defaultStyle,
-  Direction,
   emptyCell,
   GridColumn,
   GridDataRow,
@@ -1210,7 +1209,7 @@ export function favoriting() {
   );
 }
 
-export function favoritingMore() {
+export function PrimaryColumnSorting() {
   type FavoriteData = { name: string; value: number; favorite: boolean };
   type FavoriteRow = SimpleHeaderAndData<FavoriteData>;
 
@@ -1227,24 +1226,15 @@ export function favoritingMore() {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [filter, setFilter] = useState<string | undefined>();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [direction, setDirection] = useState<Direction>("DESC");
   return (
     <div>
       <div>
         <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
-        <Button
-                    label="Fav Direction button"
-                    onClick={() => {
-                      direction === "DESC" ? setDirection("ASC") : setDirection("DESC")
-                      console.log(direction)
-                    }}
-                  />
       </div>
       <GridTable
         filter={filter}
         columns={[favNameColumn, favValueColumn, favoriteColumn]}
-        sorting={{ on: "client", primary: [favoriteColumn, direction] }}
+        sorting={{ on: "client", primary: [favoriteColumn, "DESC"] }}
         rows={[
           simpleHeader,
           // And the data is initially unsorted

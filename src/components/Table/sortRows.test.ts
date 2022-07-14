@@ -96,13 +96,34 @@ describe("sortRows", () => {
     // Then expected case sensitive sort in descending correct order
     expect(rowsToIdArray(sorted)).toEqual(["1", "2", "3"]);
   });
+
+  it("can sort within primary rows", () => {
+    // Given a set of unsorted rows
+    const rows: GridDataRow<Row>[] = [
+      // And this row is primary and shoudl come first due to name
+      { kind: "parent", id: "3", data: { name: "a", favorite: true } },
+      // And this row is not primary, so should come last
+      { kind: "parent", id: "2", data: { name: "c", favorite: false } },
+      // And this row is primary and should come second due to name
+      { kind: "parent", id: "1", data: { name: "b", favorite: true } },
+    ];
+    // When sorting them in descending order based on the name property
+    const sorted = sortRows([nameColumn, favoriteColumn], rows, [0, "ASC", 1, "DESC"], true);
+    // Then expected case sensitive sort in descending correct order
+    expect(rowsToIdArray(sorted)).toEqual(["3", "1", "2"]);
+  });
 });
 
 type HeaderRow = { kind: "header" };
-type ParentRow = { kind: "parent"; id: string; data: { name: string | undefined } };
-type ChildRow = { kind: "child"; id: string; data: { name: string | undefined } };
+type ParentRow = { kind: "parent"; id: string; data: { name: string | undefined; favorite?: boolean | undefined } };
+type ChildRow = { kind: "child"; id: string; data: { name: string | undefined; favorite?: boolean | undefined } };
 type Row = HeaderRow | ParentRow | ChildRow;
 const nameColumn: GridColumn<Row> = { header: "Name", parent: ({ name }) => name, child: ({ name }) => name };
+const favoriteColumn: GridColumn<Row> = {
+  header: "favorite",
+  parent: ({ favorite }) => favorite,
+  child: ({ favorite }) => favorite,
+};
 
 function rowsToIdArray(rows: GridDataRow<Row>[]): string[] {
   return rows.flatMap((r) => (r.children ? [r.id, ...r.children.map((c) => c.id)] : r.id));

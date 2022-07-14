@@ -28,27 +28,27 @@ function sortBatch<R extends Kinded>(
 ): GridDataRow<R>[] {
   // When client-side sort, the sort value is the column index
   const [value, direction, primaryKey, primaryDirection] = sortState;
-  
+
   const column = columns[value];
   const invert = direction === "DESC";
-  const primaryInvert = primaryDirection === "DESC"
+  const primaryInvert = primaryDirection === "DESC";
   const primaryColumn = primaryKey && columns[primaryKey];
 
   // Make a shallow copy for sorting to avoid mutating the original list
   return [...batch].sort((a, b) => {
-
     if ((a.pin || b.pin) && !(a.pin === b.pin)) {
       const ap = a.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
       const bp = b.pin === "first" ? -1 : b.pin === "last" ? 1 : 0;
       return ap === bp ? 0 : ap < bp ? -1 : 1;
-    } else if (primaryColumn){
-      // there exist a persistent column, check if rows are persitent 
-      const primaryCompare = compare(primaryColumn, a, b, primaryInvert,caseSensitive);
-      if (primaryCompare !== 0){
-        return primaryCompare
+    } else if (primaryColumn) {
+      // there exist a primary column
+      const primaryCompare = compare(primaryColumn, a, b, primaryInvert, caseSensitive);
+      // if both rows are not primary
+      if (primaryCompare !== 0) {
+        return primaryCompare;
       }
-    } 
-    return compare(column, a, b, invert, caseSensitive)
+    }
+    return compare(column, a, b, invert, caseSensitive);
   });
 }
 

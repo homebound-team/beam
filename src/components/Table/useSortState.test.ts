@@ -3,7 +3,7 @@ import { deriveSortState } from "src/components/Table/useSortState";
 
 describe("useSortState", () => {
   it("can derive the next sort state when current state is undefined", () => {
-    expect(deriveSortState(undefined, 2, undefined)).toEqual([2, ASC, undefined]);
+    expect(deriveSortState(undefined, 2, undefined)).toEqual([2, ASC, undefined, undefined]);
   });
 
   it("can derive the next sort state when clicking on a new column", () => {
