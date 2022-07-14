@@ -1180,35 +1180,6 @@ export function TruncatingCells() {
   );
 }
 
-export function favoriting() {
-  type FavoriteData = { name: string; value: number; favorite: boolean };
-  type FavoriteRow = SimpleHeaderAndData<FavoriteData>;
-
-  const favNameColumn: GridColumn<FavoriteRow> = { header: () => "Name", data: ({ name }) => name };
-  const favValueColumn: GridColumn<FavoriteRow> = { header: () => "Value", data: ({ value }) => value };
-  const favoriteColumn: GridColumn<FavoriteRow> = {
-    header: () => "Favorite",
-    data: ({ favorite }) => ({
-      content: <Icon icon={favorite ? "starFilled" : "star"} color={favorite ? Palette.Yellow500 : Palette.Gray900} />,
-      sortValue: favorite,
-    }),
-  };
-
-  return (
-    <GridTable
-      columns={[favNameColumn, favValueColumn, favoriteColumn]}
-      sorting={{ on: "client", primary: [favoriteColumn, "DESC"] }}
-      rows={[
-        simpleHeader,
-        // And the data is initially unsorted
-        { kind: "data", id: "2", data: { name: "b", value: 2, favorite: true } },
-        { kind: "data", id: "1", data: { name: "a", value: 3, favorite: false } },
-        { kind: "data", id: "3", data: { name: "c", value: 1, favorite: false } },
-      ]}
-    />
-  );
-}
-
 export function PrimaryColumnSorting() {
   type FavoriteData = { name: string; value: number; favorite: boolean };
   type FavoriteRow = SimpleHeaderAndData<FavoriteData>;

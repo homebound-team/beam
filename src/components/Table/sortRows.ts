@@ -52,7 +52,7 @@ function sortBatch<R extends Kinded>(
   });
 }
 
-function compare(column: any, a: GridDataRow<any>, b: GridDataRow<any>, invert: boolean, caseSensitive: boolean) {
+function compare<R extends Kinded>(column: GridColumn<R> , a: GridDataRow<R>, b: GridDataRow<R>, invert: boolean, caseSensitive: boolean) {
   const v1 = sortValue(applyRowFn(column, a, {} as any, 0), caseSensitive);
   const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
   const v1e = v1 === null || v1 === undefined;
