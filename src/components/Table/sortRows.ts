@@ -41,9 +41,9 @@ function sortBatch<R extends Kinded>(
       const bp = b.pin === "first" ? -1 : b.pin === "last" ? 1 : 0;
       return ap === bp ? 0 : ap < bp ? -1 : 1;
     } else if (primaryColumn) {
-      // there exist a primary column
+      // When primary key exist sort that priority first
       const primaryCompare = compare(primaryColumn, a, b, primaryInvert, caseSensitive);
-      // if both rows are not primary
+      // if both rows are not primary sort equivalent 
       if (primaryCompare !== 0) {
         return primaryCompare;
       }

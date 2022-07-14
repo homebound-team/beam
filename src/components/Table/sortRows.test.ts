@@ -109,7 +109,7 @@ describe("sortRows", () => {
     ];
     // When sorting them in descending order based on the name property
     const sorted = sortRows([nameColumn, favoriteColumn], rows, [0, "ASC", 1, "DESC"], true);
-    // Then expected case sensitive sort in descending correct order
+    // Then expected sort in ascending order with primary column sorting on top
     expect(rowsToIdArray(sorted)).toEqual(["3", "1", "2"]);
   });
 });
