@@ -43,7 +43,7 @@ function sortBatch<R extends Kinded>(
     } else if (primaryColumn) {
       // When primary key exist sort that priority first
       const primaryCompare = compare(primaryColumn, a, b, primaryInvert, caseSensitive);
-      // if both rows are not primary sort equivalent 
+      // if both rows are not primary sort equivalent
       if (primaryCompare !== 0) {
         return primaryCompare;
       }
@@ -52,7 +52,13 @@ function sortBatch<R extends Kinded>(
   });
 }
 
-function compare<R extends Kinded>(column: GridColumn<R> , a: GridDataRow<R>, b: GridDataRow<R>, invert: boolean, caseSensitive: boolean) {
+function compare<R extends Kinded>(
+  column: GridColumn<R>,
+  a: GridDataRow<R>,
+  b: GridDataRow<R>,
+  invert: boolean,
+  caseSensitive: boolean,
+) {
   const v1 = sortValue(applyRowFn(column, a, {} as any, 0), caseSensitive);
   const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
   const v1e = v1 === null || v1 === undefined;
