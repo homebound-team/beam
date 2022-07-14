@@ -20,6 +20,7 @@ export interface NumberFieldProps {
   value: number | undefined;
   onChange: (value: number | undefined) => void;
   compact?: boolean;
+  clearable?: boolean;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
   required?: boolean;
