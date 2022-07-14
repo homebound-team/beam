@@ -27,29 +27,51 @@ function sortBatch<R extends Kinded>(
   caseSensitive: boolean,
 ): GridDataRow<R>[] {
   // When client-side sort, the sort value is the column index
-  const [value, direction] = sortState;
+  const [value, direction, primaryKey, primaryDirection] = sortState;
+
   const column = columns[value];
   const invert = direction === "DESC";
+  const primaryInvert = primaryDirection === "DESC";
+  const primaryColumn = primaryKey && columns[primaryKey];
 
   // Make a shallow copy for sorting to avoid mutating the original list
   return [...batch].sort((a, b) => {
-    const v1 = sortValue(applyRowFn(column, a, {} as any, 0), caseSensitive);
-    const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
-    const v1e = v1 === null || v1 === undefined;
-    const v2e = v2 === null || v2 === undefined;
     if ((a.pin || b.pin) && !(a.pin === b.pin)) {
       const ap = a.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
       const bp = b.pin === "first" ? -1 : b.pin === "last" ? 1 : 0;
       return ap === bp ? 0 : ap < bp ? -1 : 1;
-    } else if ((v1e && v2e) || v1 === v2) {
-      return 0;
-    } else if (v1e || v1 < v2) {
-      return invert ? 1 : -1;
-    } else if (v2e || v1 > v2) {
-      return invert ? -1 : 1;
+    } else if (primaryColumn) {
+      // When primary key exist sort that priority first
+      const primaryCompare = compare(primaryColumn, a, b, primaryInvert, caseSensitive);
+      // if both rows are not primary sort equivalent
+      if (primaryCompare !== 0) {
+        return primaryCompare;
+      }
     }
-    return 0;
+    return compare(column, a, b, invert, caseSensitive);
   });
+}
+
+function compare<R extends Kinded>(
+  column: GridColumn<R>,
+  a: GridDataRow<R>,
+  b: GridDataRow<R>,
+  invert: boolean,
+  caseSensitive: boolean,
+) {
+  const v1 = sortValue(applyRowFn(column, a, {} as any, 0), caseSensitive);
+  const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
+  const v1e = v1 === null || v1 === undefined;
+  const v2e = v2 === null || v2 === undefined;
+  if ((v1e && v2e) || v1 === v2) {
+    return 0;
+  } else if (v1e || v1 < v2) {
+    return invert ? 1 : -1;
+  } else if (v2e || v1 > v2) {
+    return invert ? -1 : 1;
+  } else {
+    return 0;
+  }
 }
 
 /** Look at a row and get its sort value. */

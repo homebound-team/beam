@@ -9,7 +9,7 @@ import { ASC, DESC, Direction, GridColumn, GridSortConfig, Kinded } from "src/co
  * a) `serverSideSortKey` if we're server-side sorting, or
  * b) it's index in the `columns` array, if client-side sorting
  */
-export type SortState<S> = readonly [S, Direction];
+export type SortState<S> = readonly [S, Direction, S | undefined, Direction | undefined];
 
 export type SortOn = "client" | "server" | undefined;
 
@@ -24,20 +24,23 @@ export function useSortState<R extends Kinded, S>(
   const initialSortState: SortState<S> | undefined = useMemo(
     () => {
       if (sorting?.on === "client") {
-        const { initial } = sorting;
+        const { initial, primary } = sorting;
+        const primaryKey = primary && (typeof primary[0] === "number" ? primary[0] : columns.indexOf(primary[0] as any))
         if (initial === undefined && "initial" in sorting) {
           // if explicitly set to `undefined`, then do not sort
           return undefined;
         } else if (initial) {
           const key = typeof initial[0] === "number" ? initial[0] : columns.indexOf(initial[0] as any);
-          return [key as any as S, initial[1]];
+          
+          return [key as any as S, initial[1], primaryKey as any as S, primary?.[1]];
         } else {
           // If no explicit sorting, assume 1st column ascending
           const firstSortableColumn = columns.findIndex((c) => c.clientSideSort !== false);
-          return [firstSortableColumn as any as S, ASC];
+          return [firstSortableColumn as any as S, ASC, primaryKey as any as S, primary?.[1] ];
         }
       } else {
-        return sorting?.value;
+        
+        return sorting?.value ? [sorting?.value[0], sorting?.value[1], undefined, undefined] : undefined;
       }
     },
     // We want to allow the user to not memoize `GridTableProps.sorting` b/c for the
@@ -79,19 +82,19 @@ export function deriveSortState<S>(
 
   // If the current sort state is not defined, or clicking a new column, then sort ASC on the clicked key
   if (!currentSortState || clickedKey !== currentKey) {
-    return [clickedKey, ASC];
+    return [clickedKey, ASC, initialSortState?.[2], initialSortState?.[3]];
   }
 
   // If there is an `initialSortState` and we're clicking on that same key, then flip the sort.
   // Handles cases where the initial sort is DESC so that we can allow for DESC to ASC sorting.
   if (initialSortState && initialSortState[0] === clickedKey) {
-    return [clickedKey, currentDirection === ASC ? DESC : ASC];
+    return [clickedKey, currentDirection === ASC ? DESC : ASC, initialSortState?.[2], initialSortState?.[3]];
   }
 
   // Otherwise when clicking the current column, toggle through sort states
   if (currentDirection === ASC) {
     // if ASC -> go to desc
-    return [clickedKey, DESC];
+    return [clickedKey, DESC, initialSortState?.[2], initialSortState?.[3]];
   }
 
   // Else, direction is already DESC, so revert to original sort value.
