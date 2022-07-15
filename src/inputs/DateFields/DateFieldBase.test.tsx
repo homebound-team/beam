@@ -34,6 +34,24 @@ describe(DateFieldBase, () => {
     expect(r.date_helperText().textContent).toBe("Helper text");
   });
 
+  it("renders correctly without calendar icon button", async () => {
+    // Given a DateField without a calendar icon
+    const r = await render(
+      <DateFieldBase
+        mode="single"
+        value={undefined}
+        label="Date"
+        onChange={noop}
+        placeholder="Select a date"
+        hideCalendarIcon
+      />,
+    );
+    // Then the calendar icon isn't rendered
+    expect(r.queryByTestId("date_calendarButton")).toBeNull()
+    // And the placeholder is still there
+    expect(r.date()).toHaveValue("").toHaveAttribute("placeholder", "Select a date");
+  });
+
   it("resets focus to input field when clicking calendar button and does not call onBlur", async () => {
     const onBlur = jest.fn();
     const r = await render(<DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
