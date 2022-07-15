@@ -58,9 +58,11 @@ export function Button(props: ButtonProps) {
       onPress: asLink
         ? noop
         : (e) => {
-            setOnPressRunning(true);
-            const result = Promise.resolve(onPress(e));
-            result.finally(() => setOnPressRunning(false));
+            const result = onPress(e);
+            if (isPromise(result)) {
+              setOnPressRunning(true);
+              result.finally(() => setOnPressRunning(false));
+            }
             return result;
           },
       elementType: asLink ? "a" : "button",
@@ -185,3 +187,7 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
 
 export type ButtonSize = "sm" | "md" | "lg";
 export type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger" | "text";
+
+function isPromise(obj: void | Promise<void>): obj is Promise<void> {
+  return typeof obj === "object" && "then" in obj && typeof obj.then === "function";
+}

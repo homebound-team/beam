@@ -97,4 +97,12 @@ describe("Button", () => {
     expect(r.button()).not.toBeDisabled();
     expect(onError).toBeCalledWith("Promise error");
   });
+
+  it("stays enabled with a sync function", async () => {
+    const r = await render(<Button label="Button" onClick={() => {}} />);
+
+    click(r.button);
+
+    expect(r.button()).not.toBeDisabled();
+  });
 });
