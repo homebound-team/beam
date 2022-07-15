@@ -37,14 +37,14 @@ describe(DateFieldBase, () => {
   it("renders correctly without calendar icon button", async () => {
     // Given a DateField without a calendar icon
     const r = await render(
-        <DateFieldBase
-            mode="single"
-            value={undefined}
-            label="Date"
-            onChange={noop}
-            placeholder="Select a date"
-            hideCalendarIcon
-        />,
+      <DateFieldBase
+        mode="single"
+        value={undefined}
+        label="Date"
+        onChange={noop}
+        placeholder="Select a date"
+        hideCalendarIcon
+      />,
     );
     // Calendar icon isn't rendered
     expect(r.queryByTestId("date_calendarButton")).toBeNull()
