@@ -1,5 +1,5 @@
 import { AriaButtonProps } from "@react-types/button";
-import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef } from "react";
+import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Css, Palette } from "src/Css";
@@ -37,9 +37,11 @@ export function Button(props: ButtonProps) {
     contrast = false,
     ...otherProps
   } = props;
-  const showExternalLinkIcon = (typeof onPress === "string" && isAbsoluteUrl(onPress)) || openInNew;
+  const asLink = typeof onPress === "string";
+  const showExternalLinkIcon = (asLink && isAbsoluteUrl(onPress)) || openInNew;
+  const [asyncInProgress, setAsyncInProgress] = useState(false);
   const isDisabled = !!disabled;
-  const ariaProps = { onPress, isDisabled, ...otherProps, ...menuTriggerProps };
+  const ariaProps = { onPress, isDisabled: isDisabled || asyncInProgress, ...otherProps, ...menuTriggerProps };
   const {
     label,
     // Default the icon based on other properties.
@@ -53,8 +55,17 @@ export function Button(props: ButtonProps) {
   const { buttonProps, isPressed } = useButton(
     {
       ...ariaProps,
-      onPress: typeof onPress === "string" ? noop : onPress,
-      elementType: typeof onPress === "string" ? "a" : "button",
+      onPress: asLink
+        ? noop
+        : (e) => {
+            const result = onPress(e);
+            if (isPromise(result)) {
+              setAsyncInProgress(true);
+              result.finally(() => setAsyncInProgress(false));
+            }
+            return result;
+          },
+      elementType: asLink ? "a" : "button",
     },
     ref as RefObject<HTMLElement>,
   );
@@ -78,13 +89,13 @@ export function Button(props: ButtonProps) {
     ...buttonProps,
     ...focusProps,
     ...hoverProps,
-    className: typeof onPress === "string" ? navLink : undefined,
+    className: asLink ? navLink : undefined,
     css: {
       ...Css.buttonBase.tt("inherit").$,
       ...baseStyles,
       ...(isHovered && !isPressed ? hoverStyles : {}),
       ...(isPressed ? pressedStyles : {}),
-      ...(isDisabled ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
+      ...(isDisabled || asyncInProgress ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
       ...(isFocusVisible ? focusStyles : {}),
     },
     ...tid,
@@ -181,3 +192,7 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
 
 export type ButtonSize = "sm" | "md" | "lg";
 export type ButtonVariant = "primary" | "secondary" | "tertiary" | "tertiaryDanger" | "danger" | "text";
+
+function isPromise(obj: void | Promise<void>): obj is Promise<void> {
+  return typeof obj === "object" && "then" in obj && typeof obj.then === "function";
+}
