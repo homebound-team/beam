@@ -1,6 +1,6 @@
 import { Button } from "src/components/Button";
 import { noop } from "src/utils";
-import { click, render, wait } from "src/utils/rtl";
+import { click, render } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
 
 describe("Button", () => {
@@ -72,29 +72,5 @@ describe("Button", () => {
       .toHaveAttribute("download")
       .not.toHaveAttribute("target", "_blank")
       .not.toHaveAttribute("rel", "noreferrer noopener");
-  });
-
-  it("disables button while onClick is in flight and re-enables it after a successful promise", async () => {
-    const r = await render(<Button label="Button" onClick={async () => new Promise((resolve) => resolve())} />);
-    click(r.button, { allowAsync: true });
-    expect(r.button()).toBeDisabled();
-    await wait();
-    expect(r.button()).not.toBeDisabled();
-  });
-
-  it("disables button while onClick is in flight and re-enables it after a failed promise", async () => {
-    const onError = jest.fn();
-    const r = await render(
-      <Button
-        label="Button"
-        onClick={async () => new Promise((resolve, reject) => reject("Promise error")).catch(onError)}
-      />,
-    );
-
-    click(r.button);
-    expect(r.button()).toBeDisabled();
-    await wait();
-    expect(r.button()).not.toBeDisabled();
-    expect(onError).toBeCalledWith("Promise error");
   });
 });
