@@ -1,5 +1,5 @@
 import { AriaButtonProps } from "@react-types/button";
-import { ButtonHTMLAttributes, ReactNode, RefObject, useEffect, useMemo, useRef, useState } from "react";
+import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Css, Palette } from "src/Css";
@@ -39,10 +39,8 @@ export function Button(props: ButtonProps) {
   } = props;
   const asLink = typeof onPress === "string";
   const showExternalLinkIcon = (asLink && isAbsoluteUrl(onPress)) || openInNew;
-  const [isDisabled, setIsDisabled] = useState(!!disabled);
-  useEffect(() => {
-    setIsDisabled(!!disabled);
-  }, [disabled]);
+  const [isOnPressRunning, setOnPressRunning] = useState(false);
+  const isDisabled = !!disabled || isOnPressRunning;
   const ariaProps = { onPress, isDisabled, ...otherProps, ...menuTriggerProps };
   const {
     label,
@@ -60,11 +58,9 @@ export function Button(props: ButtonProps) {
       onPress: asLink
         ? noop
         : (e) => {
-            const result = onPress(e);
-            if (isPromise(result)) {
-              setIsDisabled(true);
-              result.finally(() => setIsDisabled(false));
-            }
+            setOnPressRunning(true);
+            const result = Promise.resolve(onPress(e));
+            result.finally(() => setOnPressRunning(false));
             return result;
           },
       elementType: asLink ? "a" : "button",
@@ -189,7 +185,3 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
 
 export type ButtonSize = "sm" | "md" | "lg";
 export type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger" | "text";
-
-function isPromise(obj: void | Promise<void>): obj is Promise<void> {
-  return typeof obj === "object" && "then" in obj && typeof obj.then === "function";
-}
