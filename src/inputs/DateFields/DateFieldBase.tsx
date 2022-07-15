@@ -40,6 +40,7 @@ export interface DateFieldBaseProps
   placeholder?: string;
   format?: keyof typeof dateFormats;
   iconLeft?: boolean;
+  hideCalendarIcon?: boolean;
   /**
    * Set custom logic for individual dates or date ranges to be disabled in the picker
    * exposed from `react-day-picker`: https://react-day-picker.js.org/api/DayPicker#modifiers
@@ -80,6 +81,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     readOnly,
     format = "short",
     iconLeft = false,
+    hideCalendarIcon = false,
     disabledDays,
     onEnter,
     defaultOpen,
@@ -252,7 +254,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
       tabIndex={-1}
       {...tid.calendarButton}
     >
-      <Icon icon="calendar" color={Palette.Gray700} />
+      <Icon icon="calendar" color={Palette.Gray700}/>
     </button>
   );
 
@@ -278,8 +280,8 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
             onChange(parsed);
           }
         }}
-        endAdornment={!iconLeft && calendarButton}
-        startAdornment={iconLeft && calendarButton}
+        endAdornment={(!hideCalendarIcon && !iconLeft) && calendarButton}
+        startAdornment={(!hideCalendarIcon && iconLeft) && calendarButton}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         {...others}
       />
