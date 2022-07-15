@@ -46,9 +46,9 @@ describe(DateFieldBase, () => {
         hideCalendarIcon
       />,
     );
-    // Calendar icon isn't rendered
+    // Then the calendar icon isn't rendered
     expect(r.queryByTestId("date_calendarButton")).toBeNull()
-    // Sanity check placeholder
+    // And the placeholder is still there
     expect(r.date()).toHaveValue("").toHaveAttribute("placeholder", "Select a date");
   });
 
