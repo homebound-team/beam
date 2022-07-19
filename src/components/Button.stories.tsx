@@ -1,5 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
+import { capitalCase } from "change-case";
 import { Button, ButtonSize, ButtonVariant } from "src";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
@@ -15,14 +16,14 @@ export default {
 } as Meta;
 
 const sizes: ButtonSize[] = ["sm", "md", "lg"];
-const variants: ButtonVariant[] = ["primary", "secondary", "tertiary", "danger"];
+const variants: ButtonVariant[] = ["primary", "secondary", "tertiary", "tertiaryDanger", "danger"];
 
 export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
   return (
     <div css={Css.if(contrast).white.$}>
       <div css={Css.dg.gtc("repeat(4, max-content)").jifs.gap("8px 16px").$}>
         {variants.map((variant, idx) => {
-          const variantName = variant.charAt(0).toUpperCase() + variant.slice(1);
+          const variantName = capitalCase(variant);
           return (
             <>
               <h2 css={Css.xl.gc("1/5").if(idx !== 0).mt3.$}>{variantName}</h2>

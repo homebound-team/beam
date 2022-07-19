@@ -60,20 +60,9 @@ export function Button(props: ButtonProps) {
   );
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
-  const { baseStyles, hoverStyles, disabledStyles, pressedStyles } = useMemo(
+  const { baseStyles, hoverStyles, disabledStyles, pressedStyles, focusStyles } = useMemo(
     () => getButtonStyles(variant, size, contrast),
     [variant, size, contrast],
-  );
-  const focusStyles = useMemo(
-    () =>
-      !contrast
-        ? variant === "danger"
-          ? Css.bshDanger.$
-          : Css.bshFocus.$
-        : Css.boxShadow(`0 0 0 2px ${variant === "tertiary" ? Palette.LightBlue700 : Palette.White}`).if(
-            variant === "tertiary",
-          ).bgGray700.white.$,
-    [variant, contrast],
   );
 
   const buttonContent = (
@@ -123,14 +112,16 @@ function getButtonStyles(variant: ButtonVariant, size: ButtonSize, contrast: boo
 
 const variantStyles: (
   contrast: boolean,
-) => Record<ButtonVariant, { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; pressedStyles: {} }> = (
-  contrast,
-) => ({
+) => Record<
+  ButtonVariant,
+  { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; pressedStyles: {}; focusStyles: {} }
+> = (contrast) => ({
   primary: {
     baseStyles: Css.bgLightBlue700.white.if(contrast).bgLightBlue400.$,
     hoverStyles: Css.bgLightBlue900.if(contrast).bgLightBlue500.$,
     pressedStyles: Css.bgLightBlue500.if(contrast).bgLightBlue900.$,
     disabledStyles: Css.bgLightBlue200.if(contrast).gray600.bgLightBlue900.$,
+    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
 
   secondary: {
@@ -138,6 +129,7 @@ const variantStyles: (
     hoverStyles: Css.bgGray100.if(contrast).bgGray300.$,
     pressedStyles: Css.bgGray200.if(contrast).bgGray100.$,
     disabledStyles: Css.bgWhite.gray400.$,
+    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
 
   tertiary: {
@@ -145,6 +137,17 @@ const variantStyles: (
     hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
     pressedStyles: Css.lightBlue900.if(contrast).bgWhite.gray900.$,
     disabledStyles: Css.gray400.if(contrast).gray700.$,
+    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.LightBlue700}`).bgGray700.white.$,
+  },
+
+  tertiaryDanger: {
+    baseStyles: Css.bgTransparent.red500.if(contrast).red500.$,
+    hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
+    pressedStyles: Css.red900.if(contrast).bgWhite.gray900.$,
+    disabledStyles: Css.gray400.if(contrast).gray700.$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.White}, 0px 0px 0px 4px ${Palette.Red500}`)
+      .if(contrast)
+      .boxShadow(`0px 0px 0px 2px ${Palette.Red500}`).$,
   },
 
   danger: {
@@ -152,6 +155,7 @@ const variantStyles: (
     hoverStyles: Css.bgRed500.if(contrast).bgRed600.$,
     pressedStyles: Css.bgRed900.if(contrast).bgRed800.$,
     disabledStyles: Css.bgRed200.if(contrast).bgRed900.gray600.$,
+    focusStyles: Css.bshDanger.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
 
   text: {
@@ -159,6 +163,7 @@ const variantStyles: (
     hoverStyles: Css.lightBlue600.if(contrast).lightBlue300.$,
     pressedStyles: Css.lightBlue700.if(contrast).lightBlue200.$,
     disabledStyles: Css.lightBlue300.if(contrast).lightBlue700.$,
+    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
 });
 
@@ -175,4 +180,4 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
 };
 
 export type ButtonSize = "sm" | "md" | "lg";
-export type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger" | "text";
+export type ButtonVariant = "primary" | "secondary" | "tertiary" | "tertiaryDanger" | "danger" | "text";
