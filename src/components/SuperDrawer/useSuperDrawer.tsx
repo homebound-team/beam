@@ -15,6 +15,8 @@ export interface OpenInDrawerOpts {
   onPrevClick?: () => void;
   /** Invokes right, disabled if undefined. */
   onNextClick?: () => void;
+  /** Hides the pagination controls for `onNextClick` and `onPrevClick` */
+  hideControls?: true;
   /** Adds a callback that is called _after_ close has definitely happened. */
   onClose?: () => void;
   content: ReactNode;
