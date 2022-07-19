@@ -149,3 +149,12 @@ export function ButtonWithTooltip() {
     </div>
   );
 }
+
+export function AsyncButton() {
+  return (
+    <div>
+      <h2>Clicking the button will disable it for 2 seconds (while async request is in progress)</h2>
+      <Button label="Upload" onClick={async () => await new Promise((resolve) => setTimeout(resolve, 2000))} />
+    </div>
+  );
+}
