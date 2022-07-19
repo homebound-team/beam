@@ -308,6 +308,25 @@ export function TableWithPrevNext() {
   );
 }
 
+export function HiddenControls() {
+  const { openInDrawer, isDrawerOpen } = useSuperDrawer();
+  function open() {
+    openInDrawer({
+      title: "Drawer Title",
+      content: <TestDrawerContent book={Books[0]} />,
+      hideControls: true,
+    });
+  }
+  useEffect(open, [openInDrawer]);
+  return (
+    // Purposely set height to validate no scrolling behaviour
+    <div css={Css.hPx(5000).$}>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open</h1>
+      <Button label={isDrawerOpen ? "SuperDrawer is open" : "Show SuperDrawer"} onClick={open} />
+    </div>
+  );
+}
+
 interface TestDrawerContentProps {
   book: Book;
   hasActions?: boolean;

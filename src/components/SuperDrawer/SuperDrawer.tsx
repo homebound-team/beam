@@ -62,7 +62,7 @@ export function SuperDrawer(): ReactPortal | null {
 
   // Also get the first / non-detail element on the stack
   const firstContent = contentStack.current[0].opts as OpenInDrawerOpts;
-  const { onPrevClick, onNextClick, titleRightContent, titleLeftContent } = firstContent;
+  const { onPrevClick, onNextClick, titleRightContent, titleLeftContent, hideControls } = firstContent;
 
   const isDetail = currentContent !== firstContent;
   const title = currentContent.title || firstContent.title;
@@ -118,21 +118,23 @@ export function SuperDrawer(): ReactPortal | null {
                     <div css={Css.df.childGap3.aic.hPx(32).fs0.$}>
                       {titleRightContent || null}
                       {/* Disable buttons is handlers are not given or if childContent is shown */}
-                      <ButtonGroup
-                        buttons={[
-                          {
-                            icon: "chevronLeft",
-                            onClick: () => onPrevClick && onPrevClick(),
-                            disabled: !onPrevClick || isDetail,
-                          },
-                          {
-                            icon: "chevronRight",
-                            onClick: () => onNextClick && onNextClick(),
-                            disabled: !onNextClick || isDetail,
-                          },
-                        ]}
-                        {...testId.headerActions}
-                      />
+                      {!hideControls && (
+                        <ButtonGroup
+                          buttons={[
+                            {
+                              icon: "chevronLeft",
+                              onClick: () => onPrevClick && onPrevClick(),
+                              disabled: !onPrevClick || isDetail,
+                            },
+                            {
+                              icon: "chevronRight",
+                              onClick: () => onNextClick && onNextClick(),
+                              disabled: !onNextClick || isDetail,
+                            },
+                          ]}
+                          {...testId.headerActions}
+                        />
+                      )}
                       <IconButton icon="x" onClick={closeDrawer} {...testId.close} />
                     </div>
                   )}
