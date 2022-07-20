@@ -32,7 +32,7 @@ export function MenuOpen() {
         defaultOpen
       />
 
-      <div css={Css.mtPx(200).$}>
+      <div css={Css.mtPx(250).$}>
         <h2 css={Css.lg.$}>Anchored right</h2>
         <div css={Css.mlPx(200).$}>
           <ButtonMenu
