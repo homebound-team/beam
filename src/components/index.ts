@@ -23,6 +23,7 @@ export { NavLink } from "./NavLink";
 export { PresentationProvider } from "./PresentationContext";
 export * from "./Snackbar";
 export * from "./Stepper";
+export type { Step, StepperProps } from "./Stepper";
 export * from "./SuperDrawer";
 export * from "./Table";
 export { TabContent, Tabs, TabsWithContent } from "./Tabs";
