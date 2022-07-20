@@ -46,6 +46,7 @@ type MenuItemBase = {
   // If the `onClick` property is set as a string, then the menu item will be rendered as a link with the `onClick` value being the href
   onClick: string | VoidFunction;
   disabled?: boolean;
+  destructive?: boolean;
 };
 
 export type IconMenuItemType = MenuItemBase & {
