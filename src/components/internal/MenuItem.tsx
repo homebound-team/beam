@@ -20,7 +20,7 @@ interface MenuItemProps {
 export function MenuItemImpl(props: MenuItemProps) {
   const { item, state, onClose } = props;
   const menuItem = item.value;
-  const { disabled: isDisabled, onClick, label } = menuItem;
+  const { disabled: isDisabled, onClick, label, destructive } = menuItem;
   const isFocused = state.selectionManager.focusedKey === item.key;
   const ref = useRef<HTMLLIElement>(null);
   const history = useHistory();
@@ -60,6 +60,7 @@ export function MenuItemImpl(props: MenuItemProps) {
         ...(!isDisabled && isHovered ? Css.bgGray100.$ : {}),
         ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
         ...(isDisabled ? Css.gray500.cursorNotAllowed.$ : {}),
+        ...(destructive ? Css.red600.$ : {}),
       }}
       {...tid[defaultTestId(menuItem.label)]}
     >

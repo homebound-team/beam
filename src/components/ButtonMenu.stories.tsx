@@ -25,7 +25,10 @@ export function MenuOpen() {
       <ButtonMenu
         trigger={{ label: "Menu trigger" }}
         items={menuItems}
-        persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+        persistentItems={[
+          { label: "Persistent Action", onClick: action("Persistent action clicked") },
+          { label: "Destructive Action", onClick: action("Destructive Action Clicked"), destructive: true },
+        ]}
         defaultOpen
       />
 
@@ -35,7 +38,10 @@ export function MenuOpen() {
           <ButtonMenu
             trigger={{ label: "Menu trigger" }}
             items={menuItems}
-            persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+            persistentItems={[
+              { label: "Persistent Action", onClick: action("Persistent action clicked") },
+              { label: "Destructive Action", onClick: action("Destructive Action Clicked"), destructive: true },
+            ]}
             defaultOpen
             placement="right"
           />

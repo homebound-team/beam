@@ -20,6 +20,7 @@ export function BasicMenuItems() {
         { label: "Menu item 2", onClick: noop },
         { label: "Menu item 3", onClick: noop, disabled: true },
         { label: "Menu item 4", onClick: noop },
+        { label: "Destructive menu item", onClick: noop, destructive: true },
       ]}
     />
   );
@@ -34,7 +35,7 @@ export function IconMenuItems() {
         { label: "Edit", icon: "pencil", onClick: noop },
         { label: "Like", icon: "thumbsUp", onClick: noop },
         { label: "Favorite", icon: "star", onClick: noop },
-        { label: "Delete", icon: "trash", onClick: noop },
+        { label: "Delete", icon: "trash", onClick: noop, destructive: true },
       ]}
     />
   );
