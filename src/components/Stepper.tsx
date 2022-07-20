@@ -10,14 +10,14 @@ export interface Step {
   value: string;
 }
 
-interface StepperBarProps {
+export interface StepperProps {
   steps: Step[];
   // The 'value' of the Step that should be displayed
   currentStep: Step["value"];
   onChange: (stepValue: string) => void;
 }
 
-export function Stepper({ steps, currentStep, onChange }: StepperBarProps) {
+export function Stepper({ steps, currentStep, onChange }: StepperProps) {
   if (steps.length === 0) {
     throw new Error("Stepper must be initialized with at least one step");
   }
