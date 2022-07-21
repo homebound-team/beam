@@ -62,6 +62,30 @@ describe("BoundSelectField", () => {
     // Then formState has the latest value when onBlur is called
     expect(autoSave).toBeCalledWith("s:2");
   });
+
+  it("shows dirty indicator", async () => {
+    const author = createObjectState(formConfig, { favoriteSport: "s:1" });
+    const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} isDirtyIndicator />);
+    r.favoriteSport().focus();
+    click(r.getByRole("option", { name: "Soccer" }));
+    expect(r.favoriteSport_isDirtyIndicator()).toBeInTheDocument();
+  });
+
+  it("ignores isDirtyIndicator if fieldDecoration is provided", async () => {
+    const author = createObjectState(formConfig, { favoriteSport: "s:1" });
+    const r = await render(
+      <BoundSelectField
+        field={author.favoriteSport}
+        options={sports}
+        isDirtyIndicator
+        fieldDecoration={() => <div data-testid="lookforme" />}
+      />,
+    );
+    r.favoriteSport().focus();
+    click(r.getByRole("option", { name: "Soccer" }));
+    expect(r.lookforme()).toBeInTheDocument();
+    expect(r.queryByTestId("favoriteSport_isDirtyIndicator")).not.toBeInTheDocument();
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {

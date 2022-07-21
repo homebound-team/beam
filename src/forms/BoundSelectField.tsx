@@ -5,12 +5,15 @@ import { HasIdAndName, Optional } from "src/types";
 import { maybeCall } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { useTestIds } from "src/utils/useTestIds";
+import { Css } from "..";
 
 export type BoundSelectFieldProps<O, V extends Value> = Omit<SelectFieldProps<O, V>, "value" | "onSelect" | "label"> & {
-  // Allow `onSelect` to be overridden to do more than just `field.set`.
+  /** Allow `onSelect` to be overridden to do more than just `field.set`. */
   onSelect?: (value: V | undefined, opt: O | undefined) => void;
   field: FieldState<any, V | null | undefined>;
   label?: string;
+  /** Passes an indicator via fieldDecoration. If fieldDecoration is provided, this props is ignored */
+  isDirtyIndicator?: boolean;
 };
 
 /**
@@ -35,11 +38,13 @@ export function BoundSelectField<T extends object, V extends Value>(
     options,
     readOnly,
     getOptionValue = (opt: T) => (opt as any).id, // if unset, assume O implements HasId
-    getOptionLabel = (opt: T) => (opt as any).name, // if unset, assume O implements HasName
+    getOptionLabel = (opt: T) => (opt as any).name ?? (opt as any).label, // if unset, assume O implements HasName
     onSelect = (value) => field.set(value),
     label = defaultLabel(field.key),
     onBlur,
     onFocus,
+    fieldDecoration,
+    isDirtyIndicator,
     ...others
   } = props;
   const testId = useTestIds(props, field.key);
@@ -67,6 +72,12 @@ export function BoundSelectField<T extends object, V extends Value>(
             field.focus();
             maybeCall(onFocus);
           }}
+          fieldDecoration={
+            fieldDecoration ??
+            (isDirtyIndicator && field.dirty
+              ? () => <div css={Css.wPx(8).hPx(8).br100.bgYellow600.$} {...testId.isDirtyIndicator} />
+              : undefined)
+          }
           {...others}
           {...testId}
         />
