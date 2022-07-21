@@ -28,12 +28,14 @@ const ScrollableParentContext = createContext<ScrollableParentContextProps>({
 // Allow any css to be applied to the ScrollableParent container.
 interface ScrollableParentContextProviderProps {
   xss?: Properties;
+  // Allow any css to be applied to the scrollable content - E.g. custom background color, different padding from parent, border-radius, etc...
+  scrollerXss?: Properties;
   // I.e. for blueprint we use the `main` tag in our layouts.
   tagName?: keyof JSX.IntrinsicElements;
 }
 
 export function ScrollableParent(props: PropsWithChildren<ScrollableParentContextProviderProps>) {
-  const { children, xss, tagName: Tag = "div" as keyof JSX.IntrinsicElements } = props;
+  const { children, xss, tagName: Tag = "div" as keyof JSX.IntrinsicElements, scrollerXss } = props;
   const scrollableEl = useMemo(() => {
     const el = document.createElement("div");
     // Ensure this wrapping div takes up the full height of its container
@@ -65,7 +67,7 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
         {/* `overlay` needs to be applied using `addIn` otherwise the two `overflow` properties will be merged. */}
         <div css={Css.pl(context.pl).pr(context.pr).if(!hasScrollableContent).h100.overflowAuto.$}>{children}</div>
         {/* Set fg1 to take up the remaining space in the viewport.*/}
-        <div css={Css.fg1.overflowAuto.pl(context.pl).pr(context.pr).$} ref={scrollableRef} />
+        <div css={{ ...Css.fg1.overflowAuto.pl(context.pl).pr(context.pr).$, ...scrollerXss }} ref={scrollableRef} />
       </Tag>
     </ScrollableParentContext.Provider>
   );
