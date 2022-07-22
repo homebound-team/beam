@@ -28,7 +28,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
   const { drawerContentStack: contentStack } = useBeamContext();
 
   // Determine if the current element is a new content element or an detail element
-  const { kind } = contentStack.current[contentStack.current.length - 1];
+  const { kind } = contentStack.current[contentStack.current.length - 1] ?? {};
 
   function wrapWithMotionAndMaybeBack(children: ReactNode): ReactNode {
     if (kind === "open") {

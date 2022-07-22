@@ -52,20 +52,18 @@ export function SuperDrawer(): ReactPortal | null {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modalBodyRef.current, modalFooterRef.current, modalState.current]);
 
-  if (contentStack.current.length === 0) {
-    return null;
-  }
-
   // Get the latest element on the stack
-  const currentContent = contentStack.current[contentStack.current.length - 1].opts;
-  const { content } = currentContent;
+  // We use undefined, nullish operators and empty object here to allow AnimatePresence
+  // to animate the drawers exit transition when our stack is empty
+  const currentContent = contentStack.current[contentStack.current.length - 1]?.opts;
+  const { content } = currentContent ?? {};
 
   // Also get the first / non-detail element on the stack
-  const firstContent = contentStack.current[0].opts as OpenInDrawerOpts;
-  const { onPrevClick, onNextClick, titleRightContent, titleLeftContent, hideControls } = firstContent;
+  const firstContent = contentStack.current[0]?.opts as OpenInDrawerOpts;
+  const { onPrevClick, onNextClick, titleRightContent, titleLeftContent, hideControls } = firstContent ?? {};
 
   const isDetail = currentContent !== firstContent;
-  const title = currentContent.title || firstContent.title;
+  const title = content === undefined ? '' : currentContent.title || firstContent.title;
 
   return createPortal(
     <AnimatePresence>
