@@ -81,7 +81,7 @@ describe("sortRows", () => {
     expect(rowsToIdArray(sorted)).toEqual(["2", "2.2", "2.1", "2.3", "1", "header", "3"]);
   });
 
-  it("can sort within pinned rows", () => {
+  it("does not sort within pinned rows", () => {
     // Given a set of unsorted rows
     const rows: GridDataRow<Row>[] = [
       // And this row is not pinned, so should come last
@@ -93,8 +93,8 @@ describe("sortRows", () => {
     ];
     // When sorting them in descending order based on the name property
     const sorted = sortRows([nameColumn], rows, [0, "ASC", undefined, undefined], true);
-    // Then expected case sensitive sort in descending correct order
-    expect(rowsToIdArray(sorted)).toEqual(["1", "2", "3"]);
+    // Then we kept the 2nd pinned row where it was
+    expect(rowsToIdArray(sorted)).toEqual(["2", "1", "3"]);
   });
 
   it("can sort within primary rows", () => {
