@@ -36,7 +36,10 @@ function sortBatch<R extends Kinded>(
 
   // Make a shallow copy for sorting to avoid mutating the original list
   return [...batch].sort((a, b) => {
-    if ((a.pin || b.pin) && !(a.pin === b.pin)) {
+    if (a.pin || b.pin) {
+      // If both rows are pinned, we don't sort within them, because by pinning the page is taking
+      // explicit ownership over the order of the rows (and we also don't support "levels of pins",
+      // i.e. for change events putting "just added" rows `pin: last` and the "add new" row `pin: lastest`).
       const ap = a.pin === "first" ? -1 : a.pin === "last" ? 1 : 0;
       const bp = b.pin === "first" ? -1 : b.pin === "last" ? 1 : 0;
       return ap === bp ? 0 : ap < bp ? -1 : 1;
