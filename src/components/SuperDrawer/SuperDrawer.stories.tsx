@@ -46,6 +46,25 @@ export function Open() {
   );
 }
 
+export function SmallDrawer() {
+  const { openInDrawer, isDrawerOpen } = useSuperDrawer();
+  function open() {
+    openInDrawer({
+      title: "Drawer Title",
+      content: <TestDrawerContent book={Books[0]} />,
+      width: "small"
+    });
+  }
+  useEffect(open, [openInDrawer]);
+  return (
+    // Purposely set height to validate no scrolling behaviour
+    <div css={Css.hPx(5000).$}>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open</h1>
+      <Button label={isDrawerOpen ? "SuperDrawer is open" : "Show SuperDrawer"} onClick={open} />
+    </div>
+  );
+}
+
 export function OpenWithNoActions() {
   const { openInDrawer } = useSuperDrawer();
   function open() {

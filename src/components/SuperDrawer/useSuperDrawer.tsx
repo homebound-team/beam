@@ -20,6 +20,8 @@ export interface OpenInDrawerOpts {
   /** Adds a callback that is called _after_ close has definitely happened. */
   onClose?: () => void;
   content: ReactNode;
+  /** If set to "small", the Drawer will have a width of 560px. Otherwise 1040px */
+  width?: "small";
 }
 
 export interface OpenDetailOpts {
