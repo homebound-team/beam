@@ -65,7 +65,7 @@ export function SuperDrawer(): ReactPortal | null {
   const isDetail = currentContent !== firstContent;
   const title = content === undefined ? '' : currentContent.title || firstContent.title;
 
-  const width = !isDetail && firstContent && firstContent.width === "small" ? 560 : 1040;
+  const width = firstContent && firstContent.width === "small" ? 560 : 1040;
 
   return createPortal(
     <AnimatePresence>
