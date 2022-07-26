@@ -19,3 +19,16 @@ export function DefaultChip() {
     </div>
   );
 }
+
+export function ColoredChips() {
+  return (
+    <div>
+      <div css={Css.df.wPx(500).$}>
+        <Chip text="default" />
+        <Chip text="caution" type="caution" />
+        <Chip text="warning" type="warning" />
+        <Chip text="success" type="success" />
+      </div>
+    </div>
+  );
+}
