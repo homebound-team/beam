@@ -21,6 +21,7 @@ import { noop } from "src/utils";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { SuperDrawerContent, useSuperDrawer } from "./index";
 import { SuperDrawer as SuperDrawerComponent } from "./SuperDrawer";
+import { SuperDrawerWidth } from "./utils";
 
 export default {
   title: "Components/Super Drawer",
@@ -34,6 +35,25 @@ export function Open() {
     openInDrawer({
       title: "Drawer Title",
       content: <TestDrawerContent book={Books[0]} />,
+    });
+  }
+  useEffect(open, [openInDrawer]);
+  return (
+    // Purposely set height to validate no scrolling behaviour
+    <div css={Css.hPx(5000).$}>
+      <h1 css={Css.xl3Em.mb1.$}>SuperDrawer Open</h1>
+      <Button label={isDrawerOpen ? "SuperDrawer is open" : "Show SuperDrawer"} onClick={open} />
+    </div>
+  );
+}
+
+export function SmallDrawer() {
+  const { openInDrawer, isDrawerOpen } = useSuperDrawer();
+  function open() {
+    openInDrawer({
+      title: "Drawer Title",
+      content: <TestDrawerContent book={Books[0]} />,
+      width: SuperDrawerWidth.Small
     });
   }
   useEffect(open, [openInDrawer]);

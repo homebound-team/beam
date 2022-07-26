@@ -7,6 +7,7 @@ import { ButtonGroup, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/c
 import { useBeamContext } from "src/components/BeamContext";
 import { Css, px } from "src/Css";
 import { useTestIds } from "src/utils";
+import { SuperDrawerWidth } from "./utils";
 
 /**
  * Global drawer component.
@@ -65,6 +66,8 @@ export function SuperDrawer(): ReactPortal | null {
   const isDetail = currentContent !== firstContent;
   const title = content === undefined ? '' : currentContent.title || firstContent.title;
 
+  const { width = SuperDrawerWidth.Normal } = firstContent ?? {}
+
   return createPortal(
     <AnimatePresence>
       {content && (
@@ -91,13 +94,13 @@ export function SuperDrawer(): ReactPortal | null {
             {/* Content container */}
             <motion.aside
               key="superDrawerContainer"
-              css={Css.bgWhite.h100.maxw(px(1040)).w100.df.fdc.relative.$}
+              css={Css.bgWhite.h100.maxw(px(width)).w100.df.fdc.relative.$}
               // Keeping initial x to 1040 as this will still work if the container is smaller
-              initial={{ x: 1040 }}
+              initial={{ x: width }}
               animate={{ x: 0 }}
               // Custom transitions settings for the translateX animation
               transition={{ ease: "linear", duration: 0.2, delay: 0.2 }}
-              exit={{ transition: { ease: "linear", duration: 0.2 }, x: 1040 }}
+              exit={{ transition: { ease: "linear", duration: 0.2 }, x: width }}
               // Preventing clicks from triggering parent onClick
               onClick={(e) => e.stopPropagation()}
             >

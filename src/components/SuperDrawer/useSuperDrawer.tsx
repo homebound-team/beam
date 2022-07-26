@@ -3,6 +3,7 @@ import { useBeamContext } from "src/components/BeamContext";
 import { CanCloseCheck } from "src/types";
 import { useModal } from "../Modal";
 import { ConfirmCloseModal } from "./ConfirmCloseModal";
+import { SuperDrawerWidth } from "./utils";
 
 export interface OpenInDrawerOpts {
   /** Title of the SuperDrawer */
@@ -20,6 +21,8 @@ export interface OpenInDrawerOpts {
   /** Adds a callback that is called _after_ close has definitely happened. */
   onClose?: () => void;
   content: ReactNode;
+  /** Adds the ability to change the SuperDrawer width based on some pre-defined values */
+  width?: SuperDrawerWidth;
 }
 
 export interface OpenDetailOpts {
