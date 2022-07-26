@@ -2,8 +2,9 @@ import { motion } from "framer-motion";
 import { ReactNode } from "react";
 import { useBeamContext } from "src/components/BeamContext";
 import { Button, ButtonProps } from "src/components/Button";
-import { useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
+import { OpenInDrawerOpts, useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
 import { Css } from "src/Css";
+import { SuperDrawerWidth } from "./SuperDrawer";
 
 interface SuperDrawerContentProps {
   children: ReactNode;
@@ -29,6 +30,9 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
 
   // Determine if the current element is a new content element or an detail element
   const { kind } = contentStack.current[contentStack.current.length - 1] ?? {};
+  const firstContent = contentStack.current[0]?.opts as OpenInDrawerOpts;
+
+  const width = firstContent && firstContent.width === "small" ? SuperDrawerWidth.small : SuperDrawerWidth.normal;
 
   function wrapWithMotionAndMaybeBack(children: ReactNode): ReactNode {
     if (kind === "open") {
@@ -47,10 +51,10 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
         >
           <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={closeDrawerDetail} />
           <motion.div
-            initial={{ x: 1040, opacity: 0 }}
+            initial={{ x: width, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ ease: "linear", duration: 0.3, opacity: { delay: 0.15 } }}
-            exit={{ x: 1040, opacity: 0 }}
+            exit={{ x: width, opacity: 0 }}
             css={Css.pt2.$}
           >
             {children}
