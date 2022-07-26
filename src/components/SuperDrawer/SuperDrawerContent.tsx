@@ -32,7 +32,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
   const { kind } = contentStack.current[contentStack.current.length - 1] ?? {};
   const firstContent = contentStack.current[0]?.opts as OpenInDrawerOpts;
 
-  const width = (firstContent && firstContent.width) || SuperDrawerWidth.Normal;
+  const { width = SuperDrawerWidth.Normal } = firstContent ?? {}
 
   function wrapWithMotionAndMaybeBack(children: ReactNode): ReactNode {
     if (kind === "open") {

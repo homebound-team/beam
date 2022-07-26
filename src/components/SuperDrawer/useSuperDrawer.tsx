@@ -21,7 +21,7 @@ export interface OpenInDrawerOpts {
   /** Adds a callback that is called _after_ close has definitely happened. */
   onClose?: () => void;
   content: ReactNode;
-  /** Adds the hability to change the SuperDrawer width based on some pre-defined values */
+  /** Adds the ability to change the SuperDrawer width based on some pre-defined values */
   width?: SuperDrawerWidth;
 }
 
