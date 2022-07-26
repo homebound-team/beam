@@ -7,11 +7,7 @@ import { ButtonGroup, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/c
 import { useBeamContext } from "src/components/BeamContext";
 import { Css, px } from "src/Css";
 import { useTestIds } from "src/utils";
-
-export enum SuperDrawerWidth {
-  small = 560,
-  normal = 1040
-};
+import { SuperDrawerWidth } from "./utils";
 
 /**
  * Global drawer component.
@@ -70,7 +66,7 @@ export function SuperDrawer(): ReactPortal | null {
   const isDetail = currentContent !== firstContent;
   const title = content === undefined ? '' : currentContent.title || firstContent.title;
 
-  const width = firstContent && firstContent.width === "small" ? SuperDrawerWidth.small : SuperDrawerWidth.normal;
+  const { width = SuperDrawerWidth.Normal } = firstContent ?? {}
 
   return createPortal(
     <AnimatePresence>

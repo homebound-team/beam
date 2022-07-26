@@ -21,6 +21,7 @@ import { noop } from "src/utils";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { SuperDrawerContent, useSuperDrawer } from "./index";
 import { SuperDrawer as SuperDrawerComponent } from "./SuperDrawer";
+import { SuperDrawerWidth } from "./utils";
 
 export default {
   title: "Components/Super Drawer",
@@ -52,7 +53,7 @@ export function SmallDrawer() {
     openInDrawer({
       title: "Drawer Title",
       content: <TestDrawerContent book={Books[0]} />,
-      width: "small"
+      width: SuperDrawerWidth.Small
     });
   }
   useEffect(open, [openInDrawer]);

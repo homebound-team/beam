@@ -4,7 +4,7 @@ import { useBeamContext } from "src/components/BeamContext";
 import { Button, ButtonProps } from "src/components/Button";
 import { OpenInDrawerOpts, useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
 import { Css } from "src/Css";
-import { SuperDrawerWidth } from "./SuperDrawer";
+import { SuperDrawerWidth } from "./utils";
 
 interface SuperDrawerContentProps {
   children: ReactNode;
@@ -32,7 +32,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
   const { kind } = contentStack.current[contentStack.current.length - 1] ?? {};
   const firstContent = contentStack.current[0]?.opts as OpenInDrawerOpts;
 
-  const width = firstContent && firstContent.width === "small" ? SuperDrawerWidth.small : SuperDrawerWidth.normal;
+  const width = (firstContent && firstContent.width) || SuperDrawerWidth.Normal;
 
   function wrapWithMotionAndMaybeBack(children: ReactNode): ReactNode {
     if (kind === "open") {
