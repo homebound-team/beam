@@ -23,11 +23,13 @@ export function DefaultChip() {
 export function ColoredChips() {
   return (
     <div>
-      <div css={Css.df.wPx(500).$}>
+      <div css={Css.df.childGap1.wPx(500).$}>
         <Chip text="default" />
         <Chip text="caution" type={ChipTypes.caution} />
         <Chip text="warning" type={ChipTypes.warning} />
         <Chip text="success" type={ChipTypes.success} />
+        <Chip text="light" type={ChipTypes.light} />
+        <Chip text="dark" type={ChipTypes.dark} />
       </div>
     </div>
   );
