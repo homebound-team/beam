@@ -3,13 +3,15 @@ import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
-type ChipType = "caution" | "warning" | "success" | "neutral";
+type ChipType = "caution" | "warning" | "success" | "light" | "dark" | "neutral";
 
 // exporting for using in type prop as constant - this could be moved and become a global list for colors
 export const ChipTypes: Record<ChipType, ChipType> = {
   caution: "caution",
   warning: "warning",
   success: "success",
+  light: "light",
+  dark: "dark",
   neutral: "neutral",
 };
 
@@ -45,5 +47,7 @@ const typeStyles: Record<ChipType, Properties> = {
   caution: Css.bgYellow200.$,
   warning: Css.bgRed100.$,
   success: Css.bgGreen100.$,
+  light: Css.bgWhite.$,
+  dark: Css.bgGray900.white.$,
   neutral: Css.bgGray200.$,
 };
