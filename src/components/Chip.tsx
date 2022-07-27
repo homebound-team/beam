@@ -1,6 +1,6 @@
 import React from "react";
 import { usePresentationContext } from "src/components/PresentationContext";
-import { Css, Margin, Only, Xss } from "src/Css";
+import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
 type ChipType = "caution" | "warning" | "success" | "neutral";
@@ -41,7 +41,7 @@ export function Chip<X extends Only<Xss<Margin>, X>>({ type = ChipTypes.neutral,
   );
 }
 
-const typeStyles: Record<ChipType, { backgroundColor: string | undefined }> = {
+const typeStyles: Record<ChipType, Properties> = {
   caution: Css.bgYellow200.$,
   warning: Css.bgRed100.$,
   success: Css.bgGreen100.$,
