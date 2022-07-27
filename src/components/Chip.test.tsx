@@ -1,6 +1,6 @@
-import { Chip } from "src/components/Chip";
+import { Chip, ChipTypes } from "src/components/Chip";
 import { render } from "src/utils/rtl";
-import {Css} from "../Css";
+import { Css } from "../Css";
 
 describe("Chip", () => {
   it("renders", async () => {
@@ -10,7 +10,7 @@ describe("Chip", () => {
   });
 
   it("can set type to change background color", async () => {
-    const r = await render(<Chip text="Chip" type="caution" />);
+    const r = await render(<Chip text="Chip" type={ChipTypes.caution} />);
     expect(r.chip()).toHaveStyle(`background: ${Css.bgYellow200.$}`);
   });
 
