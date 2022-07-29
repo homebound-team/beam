@@ -1,3 +1,5 @@
+export { dateRangeFilter } from "src/components/Filters/DateRangeFilter";
+export type { DateRangeFilterValue } from "src/components/Filters/DateRangeFilter";
 export { dateFilter } from "src/components/Filters/DateFilter";
 export type { DateFilterValue } from "src/components/Filters/DateFilter";
 export { multiFilter } from "src/components/Filters/MultiFilter";

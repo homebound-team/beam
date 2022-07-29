@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { InternalUser, Market, Project, ProjectFilter, Stage, Status } from "src/components/Filters/testDomain";
 import {
   booleanFilter,
-  dateFilter,
+  dateFilter, dateRangeFilter,
   FilterDefs,
   Filters,
   GridColumn,
@@ -16,7 +16,7 @@ import {
   toggleFilter,
 } from "src/components/index";
 import { Css } from "src/Css";
-import { jan1 } from "src/forms/formStateDomain";
+import {jan1, jan19} from "src/forms/formStateDomain";
 import { usePersistedFilter } from "src/hooks";
 import { useGroupBy } from "src/hooks/useGroupBy";
 import { safeEntries } from "src/utils";
@@ -116,6 +116,10 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       defaultValue: { op: "BEFORE", value: jan1 },
     });
 
+    const dateRange = dateRangeFilter({
+      label: "Task Done Range"
+    })
+
     const isTest = toggleFilter({ label: "Only show test projects" });
     const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", onValue: false });
 
@@ -125,7 +129,8 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       favorite,
       stage,
       status,
-      date,
+      // date, TODO:
+      dateRange,
       isTest,
       doNotUse,
     };
