@@ -41,6 +41,12 @@ export type GridTableApi<R extends Kinded> = {
 
   /** Sets the internal state of 'activeRowId' */
   setActiveRowId: (id: string | undefined) => void;
+
+  /** Expands or collapse the row depending on the current state */
+  toggleCollapsed(id: string): void;
+
+  /** Returns the state of the row */
+  isCollapsed(id: string): boolean;
 };
 
 // Using `FooImpl`to keep the public GridTableApi definition separate.
@@ -85,5 +91,13 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public setActiveRowId(id: string | undefined) {
     this.rowState.activeRowId = id;
+  }
+
+  public toggleCollapsed(id: string): void {
+    this.rowState.toggleCollapsed(id);
+  }
+
+  public isCollapsed(id: string): boolean {
+    return this.rowState.isCollapsed(id);
   }
 }
