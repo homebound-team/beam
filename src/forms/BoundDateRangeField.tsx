@@ -32,8 +32,11 @@ export function BoundDateRangeField(props: BoundDateRangeFieldProps) {
           label={label}
           value={field.value || undefined}
           onChange={(value) => {
-            onChange(value);
-            field.maybeAutoSave();
+            // DateRangeField will return an undefined if part of filter, but we're not doing that here yet
+            if (value) {
+              onChange(value);
+              field.maybeAutoSave();
+            }
           }}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           required={field.required}

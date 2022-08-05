@@ -16,7 +16,7 @@ import {
   toggleFilter,
 } from "src/components/index";
 import { Css } from "src/Css";
-import {jan1, jan19} from "src/forms/formStateDomain";
+import { jan1, jan19 } from "src/forms/formStateDomain";
 import { usePersistedFilter } from "src/hooks";
 import { useGroupBy } from "src/hooks/useGroupBy";
 import { safeEntries } from "src/utils";
@@ -117,7 +117,11 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
     });
 
     const dateRange = dateRangeFilter({
-      label: "Task Done Range"
+      label: "Completion Estimate Range",
+      testFieldLabel: "Dates",
+      placeholderText: "All",
+      // Providing a default value, otherwise the default date in the DateField will be today's date, which will cause storybook diffs every day.
+      defaultValue: { value: { from: jan1, to: jan19 } },
     })
 
     const isTest = toggleFilter({ label: "Only show test projects" });
@@ -129,7 +133,7 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       favorite,
       stage,
       status,
-      // date, TODO:
+      date,
       dateRange,
       isTest,
       doNotUse,

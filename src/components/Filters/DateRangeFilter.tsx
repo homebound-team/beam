@@ -11,15 +11,13 @@ import { DateRange } from "src/types";
 export type DateRangeFilterProps = {
   label: string;
   defaultValue?: DateRangeFilterValue;
-  clearable?: boolean;
   placeholderText?: string;
   disabledDays?: Matcher | Matcher[];
+  // For storybook to support showing dateRange and date filters in same Filter component
+  testFieldLabel?: string
 };
 
-// Just make equivalent to DateFilter? or use same thing?
-// Does this value need to be DateRange type?
-export type DateRangeFilterValue = { value: DateRange | undefined };
-// export type DateRangeFilterValue = { value: DateRange };
+export type DateRangeFilterValue = { value: DateRange | undefined};
 
 export function dateRangeFilter(
   props: DateRangeFilterProps,
@@ -32,13 +30,13 @@ class DateRangeFilter
   implements Filter<DateRangeFilterValue>
 {
   render(
-    value: DateRangeFilterValue | undefined,
+    value: DateRangeFilterValue,
     setValue: (value: DateRangeFilterValue | undefined) => void,
     tid: TestIds,
     inModal: boolean,
     vertical: boolean,
   ) {
-    const { label, placeholderText, disabledDays } = this.props;
+    const { label, placeholderText, disabledDays, testFieldLabel } = this.props;
 
     return (
       <>
@@ -48,10 +46,10 @@ class DateRangeFilter
           inlineLabel
           isRangeFilterField
           placeholder={placeholderText}
-          label="Date"
-          value={value?.value}
-          onChange={(d) => setValue({ value: d })}
-          disabled={!value}
+          label={testFieldLabel ?? "Date"}
+          // Making sure that DateRange is Date type and not string before passing. Will never have undefined from/to
+          value={value?.value ? { from: new Date(value.value.from as Date), to: new Date(value.value.to as Date) } : undefined}
+          onChange={(d) => setValue(d ? { value: d } : undefined) }
           disabledDays={disabledDays}
           {...tid[`${defaultTestId(this.label)}_dateField`]}
         />
