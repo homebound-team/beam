@@ -138,39 +138,16 @@ export function VirtualFilteringWithFilterablePin() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
       simpleHeader,
-      ...zeroTo(1_000).map((i) => ({
-        kind: "data" as const,
-        id: String(i),
-        data: {
-          name:
-            i === 200
-              ? `ccc ${i} - pin first, filter true`
-              : i === 300
-              ? `ccc ${i} - pin first, filter false`
-              : i === 400
-              ? `ccc ${i} - pin first no filter`
-              : `ccc ${i}`,
-          value: i,
-        },
-        pin:
-          i === 200
-            ? { at: "first" as const, filter: true }
-            : i === 300
-            ? { at: "first" as const, filter: false }
-            : i === 400
-            ? ("first" as const)
-            : undefined,
-      })),
+      { kind: "data", id: "1", data: { name: "first, filter true", value: 1 }, pin: { at: "first", filter: true } },
+      { kind: "data", id: "2", data: { name: "first, filter false", value: 2 }, pin: { at: "first", filter: false } },
+      { kind: "data", id: "3", data: { name: "first, no filter", value: 3 }, pin: "first" },
     ],
     [],
   );
   const columns: GridColumn<Row>[] = useMemo(
     () => [
-      { header: "Name", data: ({ name }) => name, w: "200px" },
-      { header: "Value", data: ({ value }) => value, w: "10%" },
-      { header: "Value", data: ({ value }) => `${value} `.repeat(10), w: "2fr" },
+      { header: "Pin", data: ({ name }) => name },
       { header: "Value", data: ({ value }) => value },
-      { header: "Action", data: () => <div>Actions</div>, clientSideSort: false },
     ],
     [],
   );

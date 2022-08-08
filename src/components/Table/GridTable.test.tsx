@@ -717,7 +717,7 @@ describe("GridTable", () => {
         <GridTable<Row>
           filter={"d"}
           columns={[nameColumn, valueColumn]}
-          sorting={{ on: "client", initial: [1, "ASC"] }}
+          sorting={{ on: "client" }}
           rows={[
             simpleHeader,
             // pin that is filterable
