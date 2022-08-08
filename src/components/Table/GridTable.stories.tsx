@@ -224,11 +224,11 @@ export function FilteringWithFilterablePin() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
       simpleHeader,
-      ...zeroTo(1_000).map((i) => ({
+      ...zeroTo(20).map((i) => ({
         kind: "data" as const,
         id: String(i),
         data: { name: `ccc ${i}`, value: i },
-        pin: i === 500 ? { at: "first" as const, filter: true } : undefined,
+        pin: i === 19 ? { at: "first" as const, filter: true } : undefined,
       })),
     ],
     [],
