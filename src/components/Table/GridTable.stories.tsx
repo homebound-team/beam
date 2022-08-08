@@ -134,6 +134,128 @@ export function VirtualFiltering() {
   );
 }
 
+export function VirtualFilteringWithFilterablePin() {
+  const rows: GridDataRow<Row>[] = useMemo(
+    () => [
+      simpleHeader,
+      ...zeroTo(1_000).map((i) => ({
+        kind: "data" as const,
+        id: String(i),
+        data: { name: `ccc ${i}`, value: i },
+        pin: i === 500 ? { at: "first" as const, filter: true } : undefined,
+      })),
+    ],
+    [],
+  );
+  const columns: GridColumn<Row>[] = useMemo(
+    () => [
+      { header: "Name", data: ({ name }) => name, w: "200px" },
+      { header: "Value", data: ({ value }) => value, w: "10%" },
+      { header: "Value", data: ({ value }) => `${value} `.repeat(10), w: "2fr" },
+      { header: "Value", data: ({ value }) => value },
+      { header: "Action", data: () => <div>Actions</div>, clientSideSort: false },
+    ],
+    [],
+  );
+  const [filter, setFilter] = useState<string | undefined>();
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div>
+        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
+      </div>
+      <div css={Css.fg1.$}>
+        <GridTable
+          as="virtual"
+          columns={columns}
+          sorting={{ on: "client" }}
+          filter={filter}
+          stickyHeader={true}
+          rows={rows}
+        />
+      </div>
+    </div>
+  );
+}
+
+export function VirtualFilteringWithoutFilterablePin() {
+  const rows: GridDataRow<Row>[] = useMemo(
+    () => [
+      simpleHeader,
+      ...zeroTo(1_000).map((i) => ({
+        kind: "data" as const,
+        id: String(i),
+        data: { name: `ccc ${i}`, value: i },
+        pin: i === 500 ? ("first" as const) : undefined,
+      })),
+    ],
+    [],
+  );
+  const columns: GridColumn<Row>[] = useMemo(
+    () => [
+      { header: "Name", data: ({ name }) => name, w: "200px" },
+      { header: "Value", data: ({ value }) => value, w: "10%" },
+      { header: "Value", data: ({ value }) => `${value} `.repeat(10), w: "2fr" },
+      { header: "Value", data: ({ value }) => value },
+      { header: "Action", data: () => <div>Actions</div>, clientSideSort: false },
+    ],
+    [],
+  );
+  const [filter, setFilter] = useState<string | undefined>();
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div>
+        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
+      </div>
+      <div css={Css.fg1.$}>
+        <GridTable
+          as="virtual"
+          columns={columns}
+          sorting={{ on: "client" }}
+          filter={filter}
+          stickyHeader={true}
+          rows={rows}
+        />
+      </div>
+    </div>
+  );
+}
+
+export function FilteringWithFilterablePin() {
+  const rows: GridDataRow<Row>[] = useMemo(
+    () => [
+      simpleHeader,
+      ...zeroTo(1_000).map((i) => ({
+        kind: "data" as const,
+        id: String(i),
+        data: { name: `ccc ${i}`, value: i },
+        pin: i === 500 ? { at: "first" as const, filter: true } : undefined,
+      })),
+    ],
+    [],
+  );
+  const columns: GridColumn<Row>[] = useMemo(
+    () => [
+      { header: "Name", data: ({ name }) => name, w: "200px" },
+      { header: "Value", data: ({ value }) => value, w: "10%" },
+      { header: "Value", data: ({ value }) => `${value} `.repeat(10), w: "2fr" },
+      { header: "Value", data: ({ value }) => value },
+      { header: "Action", data: () => <div>Actions</div>, clientSideSort: false },
+    ],
+    [],
+  );
+  const [filter, setFilter] = useState<string | undefined>();
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div>
+        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
+      </div>
+      <div css={Css.fg1.$}>
+        <GridTable columns={columns} sorting={{ on: "client" }} filter={filter} stickyHeader={true} rows={rows} />
+      </div>
+    </div>
+  );
+}
+
 export function NoRowsFallback() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };

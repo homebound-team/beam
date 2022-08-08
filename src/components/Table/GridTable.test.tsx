@@ -710,6 +710,62 @@ describe("GridTable", () => {
         ),
       ).rejects.toThrow("Column 0 passed an unsortable value, use GridCellContent or clientSideSort=false");
     });
+
+    it("can pin rows and filter - filterable pin", async () => {
+      // Given the table is using client-side sorting
+      const r = await render(
+        <GridTable<Row>
+          filter={"e"}
+          columns={[nameColumn, valueColumn]}
+          sorting={{ on: "client", initial: [1, "ASC"] }}
+          rows={[
+            simpleHeader,
+            // And the 1st row is pinned first as a filterable pin
+            { kind: "data", id: "1", pin: { at: "first", filter: true }, data: { name: "a", value: 11 } },
+            { kind: "data", id: "2", pin: { at: "first", filter: true }, data: { name: "b", value: 10 } },
+            // And the middle rows need sorted
+            { kind: "data", id: "3", data: { name: "c", value: 3 } },
+            { kind: "data", id: "4", data: { name: "d", value: 1 } },
+            // And the last rows are pinned last
+            { kind: "data", id: "5", pin: { at: "last", filter: true }, data: { name: "e", value: 20 } },
+            { kind: "data", id: "6", pin: { at: "last", filter: true }, data: { name: "f", value: 21 } },
+          ]}
+        />,
+      );
+      // Then the e row stayed first and others filtered
+      expect(cell(r, 1, 0)).toHaveTextContent("e");
+    });
+
+    it("can pin rows - filterable pin", async () => {
+      // Given the table is using client-side sorting
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn]}
+          sorting={{ on: "client", initial: [1, "ASC"] }}
+          rows={[
+            simpleHeader,
+            // And the 1st row is pinned first as a filterable pin
+            { kind: "data", id: "1", pin: { at: "first", filter: true }, data: { name: "a", value: 11 } },
+            { kind: "data", id: "2", pin: { at: "first", filter: true }, data: { name: "b", value: 10 } },
+            // And the middle rows need sorted
+            { kind: "data", id: "3", data: { name: "c", value: 3 } },
+            { kind: "data", id: "4", data: { name: "d", value: 1 } },
+            // And the last rows are pinned last
+            { kind: "data", id: "5", pin: { at: "last", filter: true }, data: { name: "e", value: 20 } },
+            { kind: "data", id: "6", pin: { at: "last", filter: true }, data: { name: "f", value: 21 } },
+          ]}
+        />,
+      );
+      // Then the a/b rows stayed first
+      expect(cell(r, 1, 0)).toHaveTextContent("a");
+      expect(cell(r, 2, 0)).toHaveTextContent("b");
+      // And the middle rows swapped
+      expect(cell(r, 3, 0)).toHaveTextContent("d");
+      expect(cell(r, 4, 0)).toHaveTextContent("c");
+      // And the last rows stayed last
+      expect(cell(r, 5, 0)).toHaveTextContent("e");
+      expect(cell(r, 6, 0)).toHaveTextContent("f");
+    });
   });
 
   describe("server-side sorting", () => {
