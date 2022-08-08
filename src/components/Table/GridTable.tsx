@@ -1000,8 +1000,11 @@ export type GridDataRow<R extends Kinded> = {
   id: string;
   /** A list of parent/grand-parent ids for collapsing parent/child rows. */
   children?: GridDataRow<R>[];
-  /** Whether to pin this sort to the first/last of its parent's children. Providing Pin `filter` property will allow pinned rows to be hidden while filtering
-   * if they don't match the search term*/
+  /** * Whether to pin this sort to the first/last of its parent's children.
+   *
+   * By default, pinned rows are always shown/not filtered out, however providing
+   * the pin `filter: true` property will allow pinned rows to be hidden
+   * while filtering.*/
   pin?: "first" | "last" | Pin;
   data: unknown;
   /** Whether to have the row collapsed (children not visible) on initial load. This will be ignore in subsequent re-renders of the table */
@@ -1510,7 +1513,11 @@ function filterRows<R extends Kinded>(
       return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
     } else {
       const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
-      if (matchedChildren.length > 0 || typeof row.pin === "string" || row.pin?.filter === false) {
+      if (
+        matchedChildren.length > 0 ||
+        typeof row.pin === "string" ||
+        (row.pin !== undefined && row.pin.filter !== true)
+      ) {
         return acc.concat([[row, matchedChildren]]);
       } else {
         return acc;

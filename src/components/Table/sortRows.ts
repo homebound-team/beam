@@ -40,10 +40,10 @@ function sortBatch<R extends Kinded>(
       // If both rows are pinned, we don't sort within them, because by pinning the page is taking
       // explicit ownership over the order of the rows (and we also don't support "levels of pins",
       // i.e. for change events putting "just added" rows `pin: last` and the "add new" row `pin: lastest`).
-      const ap =
-        a.pin === "first" || (a.pin as Pin)?.at === "first" ? -1 : a.pin === "last" || a.pin?.at === "last" ? 1 : 0;
-      const bp =
-        b.pin === "first" || (b.pin as Pin)?.at === "first" ? -1 : b.pin === "last" || b.pin?.at === "last" ? 1 : 0;
+      const aPin = getPin(a.pin);
+      const bPin = getPin(b.pin);
+      const ap = aPin === "first" ? -1 : aPin === "last" ? 1 : 0;
+      const bp = bPin === "first" ? -1 : bPin === "last" ? 1 : 0;
       return ap === bp ? 0 : ap < bp ? -1 : 1;
     } else if (primaryColumn) {
       // When primary key exist sort that priority first
@@ -55,6 +55,10 @@ function sortBatch<R extends Kinded>(
     }
     return compare(column, a, b, invert, caseSensitive);
   });
+}
+
+function getPin(pin: string | Pin | undefined) {
+  return typeof pin === "string" ? pin : pin?.at;
 }
 
 function compare<R extends Kinded>(
