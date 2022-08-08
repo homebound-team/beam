@@ -92,8 +92,6 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     ...others
   } = props;
 
-  // TODO: PR Callout -
-  // I was a little concerned by how many `props.mode === "range"` and `mode === "range"` we were using
   const isRangeMode = mode === "range";
   const inputRef = useRef<HTMLInputElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
@@ -284,7 +282,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     </button>
   );
 
-  const SuperButton = (
+  const EndFieldButtons = (
     <>
       {isRangeFilterField && clearButton}{!hideCalendarIcon && calendarButton}
     </>
@@ -311,14 +309,12 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
             const parsed = isRangeMode ? parseDateRange(v, dateFormats.short) : parseDate(v, dateFormats.short);
             onChange(parsed);
           }
-          // TODO: Callout in PR -
-          //  EdgeCase bug fix Currently DateFieldBase actually doesn't allow users to clear out text completely so technically
-          //  if a user were to have from month `jan-sep` they couldnt manually change it to anything `oct-sept`
+          // User has deleted all text in field
           else if (v === undefined) {
             setInputValue("")
           }
         }}
-        endAdornment={(!iconLeft) && SuperButton}
+        endAdornment={(!iconLeft) && EndFieldButtons}
         startAdornment={(!hideCalendarIcon && iconLeft) && calendarButton}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         {...others}

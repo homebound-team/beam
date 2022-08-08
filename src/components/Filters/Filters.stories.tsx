@@ -3,7 +3,8 @@ import { useMemo } from "react";
 import { InternalUser, Market, Project, ProjectFilter, Stage, Status } from "src/components/Filters/testDomain";
 import {
   booleanFilter,
-  dateFilter, dateRangeFilter,
+  dateFilter,
+  dateRangeFilter,
   FilterDefs,
   Filters,
   GridColumn,

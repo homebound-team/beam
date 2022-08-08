@@ -19,12 +19,7 @@ export function Header(props: CaptionProps) {
   );
 }
 
-// TODO: Callout in PR - this was really helpful when building -
-// With us adding in the ability for a dateRangeField to be cleared if in filter, an updated header will provide a better UX and keep
-// our code a bit simpler E.G. fewer props and default logic to track in case a user does clear field
-// Some additional options could be to use selectors,
-//      or even adding in some simple logic based on the current calendar view that'll remind a user they're selecting `FROM/TO` if they go too far or get distracted
-//        "But isn't that even more logic?" - no because this would only use internal date picker values to show a label
+// Header with year skip option
 export function YearSkipHeader(props: CaptionProps) {
   const { displayMonth } = props;
   const { goToMonth } = useNavigation();
