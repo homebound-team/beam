@@ -710,6 +710,32 @@ describe("GridTable", () => {
         ),
       ).rejects.toThrow("Column 0 passed an unsortable value, use GridCellContent or clientSideSort=false");
     });
+
+    it("can pin rows and filter - filterable pin", async () => {
+      // Given the table with 3 rows with pins
+      const r = await render(
+        <GridTable<Row>
+          filter={"d"}
+          columns={[nameColumn, valueColumn]}
+          sorting={{ on: "client" }}
+          rows={[
+            simpleHeader,
+            // pin that is filterable
+            { kind: "data", id: "1", pin: { at: "first", filter: true }, data: { name: "a", value: 11 } },
+            // pin that is not filterable
+            { kind: "data", id: "2", pin: { at: "first", filter: false }, data: { name: "b", value: 10 } },
+            // traditional pin that by default is not filterable
+            { kind: "data", id: "3", pin: "first", data: { name: "c", value: 3 } },
+          ]}
+        />,
+      );
+
+      // We expect the 1 record to not be visible
+      // and the 2 record to be in the first row
+      expect(cell(r, 1, 0)).toHaveTextContent("b");
+      // and the 3 record to be the second row
+      expect(cell(r, 2, 0)).toHaveTextContent("c");
+    });
   });
 
   describe("server-side sorting", () => {

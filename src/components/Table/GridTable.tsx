@@ -175,7 +175,7 @@ export type GridSortConfig<S> =
       initial?: [S | GridColumn<any>, Direction] | undefined;
       caseSensitive?: boolean;
       /** The optional primary sort column, this will be sorted first above/below table sort  */
-      primary?: [S | GridColumn<any> , Direction ] | undefined;
+      primary?: [S | GridColumn<any>, Direction] | undefined;
     }
   | {
       on: "server";
@@ -1000,14 +1000,24 @@ export type GridDataRow<R extends Kinded> = {
   id: string;
   /** A list of parent/grand-parent ids for collapsing parent/child rows. */
   children?: GridDataRow<R>[];
-  /** Whether to pin this sort to the first/last of its parent's children. */
-  pin?: "first" | "last";
+  /** * Whether to pin this sort to the first/last of its parent's children.
+   *
+   * By default, pinned rows are always shown/not filtered out, however providing
+   * the pin `filter: true` property will allow pinned rows to be hidden
+   * while filtering.*/
+  pin?: "first" | "last" | Pin;
   data: unknown;
   /** Whether to have the row collapsed (children not visible) on initial load. This will be ignore in subsequent re-renders of the table */
   initCollapsed?: boolean;
   /** Whether row can be selected */
   selectable?: false;
 } & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
+
+/**
+ * Used to indicate where to pin the DataRow and if whether it should be filtered or always visible, setting `filter` to `true` will hide this row
+ * if it doesn't match the provided filtering search term
+ */
+export type Pin = { at: "first" | "last"; filter?: boolean };
 
 // Use IfAny so that GridDataRow<any> doesn't devolve into any
 type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
@@ -1503,7 +1513,11 @@ function filterRows<R extends Kinded>(
       return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
     } else {
       const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
-      if (matchedChildren.length > 0 || row.pin) {
+      if (
+        matchedChildren.length > 0 ||
+        typeof row.pin === "string" ||
+        (row.pin !== undefined && row.pin.filter !== true)
+      ) {
         return acc.concat([[row, matchedChildren]]);
       } else {
         return acc;

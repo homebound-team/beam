@@ -134,6 +134,43 @@ export function VirtualFiltering() {
   );
 }
 
+export function VirtualFilteringWithFilterablePin() {
+  const rows: GridDataRow<Row>[] = useMemo(
+    () => [
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "first, filter true", value: 1 }, pin: { at: "first", filter: true } },
+      { kind: "data", id: "2", data: { name: "first, filter false", value: 2 }, pin: { at: "first", filter: false } },
+      { kind: "data", id: "3", data: { name: "first, no filter", value: 3 }, pin: "first" },
+    ],
+    [],
+  );
+  const columns: GridColumn<Row>[] = useMemo(
+    () => [
+      { header: "Pin", data: ({ name }) => name },
+      { header: "Value", data: ({ value }) => value },
+    ],
+    [],
+  );
+  const [filter, setFilter] = useState<string | undefined>();
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div>
+        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
+      </div>
+      <div css={Css.fg1.$}>
+        <GridTable
+          as="virtual"
+          columns={columns}
+          sorting={{ on: "client" }}
+          filter={filter}
+          stickyHeader={true}
+          rows={rows}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function NoRowsFallback() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
