@@ -29,10 +29,10 @@ export function DateRangeFilterInPage() {
 
 export function DateRangeFilterInModal() {
   const filter = taskCompleteFilter("date");
-  return filter.render({ value: { from: jan2, to: jan19 } }, () => {}, {}, true, false);
+  return filter.render({op: "BEFORE", value: { from: jan2, to: jan19 } }, () => {}, {}, true, false);
 }
 
 export function DateRangeFilterVertical() {
   const filter = taskCompleteFilter("date");
-  return filter.render({ value: { from: jan2, to: jan19 } }, () => {}, {}, false, true);
+  return filter.render({op: "BEFORE", value: { from: jan2, to: jan19 } }, () => {}, {}, false, true);
 }

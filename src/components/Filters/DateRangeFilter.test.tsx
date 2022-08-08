@@ -6,7 +6,7 @@ import { click, render, type } from "src/utils/rtl";
 
 describe("DateRangeFilter", () => {
   it("shows date placeholder text when not given an initial value", async () => {
-    const r = await render(<TestFilters defs={{ date: taskCompleteFilter}} />)
+    const r = await render(<TestFilters defs={{ dateRange: taskCompleteFilter}} />)
 
     expect(r.filter_taskCompleted_dateField())
       .toHaveProperty("placeholder", "This is some placeholder text");
@@ -16,7 +16,7 @@ describe("DateRangeFilter", () => {
   });
 
   it("shows clear btn when a value is present", async () => {
-    const r = await render(<TestFilters defs={{ date: taskCompleteFilter}} />)
+    const r = await render(<TestFilters defs={{ dateRange: taskCompleteFilter}} />)
     const dateField = r.filter_taskCompleted_dateField();
 
     expect(r.queryByTestId("xCircle")).toBeNull();
@@ -30,7 +30,7 @@ describe("DateRangeFilter", () => {
   });
 
   it("clears text when clear btn is pressed", async () => {
-    const r = await render(<TestFilters defs={{ date: taskCompleteFilter}} />)
+    const r = await render(<TestFilters defs={{ dateRange: taskCompleteFilter}} />)
     const dateField = r.filter_taskCompleted_dateField();
     fireEvent.focus(dateField);
 
@@ -45,7 +45,7 @@ describe("DateRangeFilter", () => {
   });
 
   it("does not show clear btn when datePicker is open", async () => {
-    const r = await render(<TestFilters defs={{ date: taskCompleteFilter}} />)
+    const r = await render(<TestFilters defs={{ dateRange: taskCompleteFilter}} />)
     const dateField = r.filter_taskCompleted_dateField();
     fireEvent.focus(dateField);
 

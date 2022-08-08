@@ -46,7 +46,7 @@ export type ProjectFilter = {
   isTest?: boolean | null;
   doNotUse?: boolean | null;
   date?: DateFilterValue<string>;
-  dateRange?:DateRangeFilterValue;
+  dateRange?:DateRangeFilterValue<string>;
 };
 
 export type StageFilter = NonNullable<FilterDefs<ProjectFilter>["stage"]>;

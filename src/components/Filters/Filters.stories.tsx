@@ -121,7 +121,7 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       testFieldLabel: "Dates",
       placeholderText: "All",
       // Providing a default value, otherwise the default date in the DateField will be today's date, which will cause storybook diffs every day.
-      defaultValue: { value: { from: jan1, to: jan19 } },
+      defaultValue: { op: "BETWEEN",  value: { from: jan1, to: jan19 } },
     })
 
     const isTest = toggleFilter({ label: "Only show test projects" });
