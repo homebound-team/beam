@@ -1475,6 +1475,29 @@ describe("GridTable", () => {
     expect(r.selectedNames()).toHaveTextContent("foo2");
   });
 
+  it("can select rows via api", async () => {
+    // Given a table with selectable rows
+    const rows: GridDataRow<NestedRow>[] = [simpleHeader, { kind: "parent", id: "p1", data: { name: "parent 1" } }];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<NestedRow>();
+      api.current = _api;
+      return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
+    }
+    const r = await render(<Test />);
+    // And the row is not selected
+    expect(api.current!.getSelectedRowIds()).toEqual([]);
+    // When selecting the row via the API
+    api.current!.selectRow("p1");
+    // Then the row is now selected
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1"]);
+
+    // And when deselecting the row via the API
+    api.current!.selectRow("p1", false);
+    // Then the row is not selected
+    expect(api.current!.getSelectedRowIds()).toEqual([]);
+  });
+
   it("only returns selected visible rows", async () => {
     // Given a parent with a child and grandchildren
     const rows: GridDataRow<NestedRow>[] = [
