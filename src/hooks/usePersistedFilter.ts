@@ -21,6 +21,7 @@ interface PersistedFilterHook<F> {
  */
 export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFilterProps<F>): PersistedFilterHook<F> {
   const filterKeys = Object.keys(filterDefs);
+  // no default value
   const defaultFilter = useMemo(
     () =>
       Object.fromEntries(
@@ -30,11 +31,12 @@ export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFi
       ),
     [filterDefs],
   );
+  // key as a string to pass in queryParamKey
   const [{ filter: queryParamsFilter }, setQueryParams] = useQueryParams({ filter: JsonParam });
   const [storedFilter, setStoredFilter] = useSessionStorage<F>(storageKey, queryParamsFilter ?? defaultFilter);
   const isQueryParamFilterValid = hasValidFilterKeys(queryParamsFilter, filterKeys);
   const filter: F = isQueryParamFilterValid ? queryParamsFilter : storedFilter ?? defaultFilter;
-
+// set querystorage 
   const setFilter = (filter: F) => setQueryParams({ filter });
 
   useEffect(() => {
