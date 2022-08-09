@@ -28,7 +28,7 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
       value={values as string[]}
       onChange={(e) => {
         const { target } = e;
-        const selectedValues: string[] = [values.join()];
+        const selectedValues: string[] = [...(values as string[])];
         for (let i = 0; i < target.selectedOptions.length; i++) {
           if (selectedValues.includes(target.selectedOptions.item(i)?.value!)) {
             // deSelect if already selected

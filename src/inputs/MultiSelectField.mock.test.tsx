@@ -63,4 +63,29 @@ describe("MockMultiSelectField", () => {
       ],
     );
   });
+
+  it("can deselect", async () => {
+    const options = [
+      { id: "1", name: "one" },
+      { id: "2", name: "two" },
+      { id: "3", name: "thr" },
+    ];
+    // Given the 2nd and 3rd options are already selected
+    const values = ["2", "3"];
+    const onSelect = jest.fn();
+    const r = await render(
+      <MockMultiSelectField
+        label="test"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+        values={values}
+        onSelect={onSelect}
+        options={options}
+      />,
+    );
+    // when deselecting "two"
+    select(r.test, ["two"]);
+    // Then only "three" is returned
+    expect(onSelect).toHaveBeenCalledWith(["3"], [{ id: "3", name: "thr" }]);
+  });
 });
