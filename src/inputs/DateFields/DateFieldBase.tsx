@@ -52,7 +52,7 @@ export interface DateFieldBaseProps
   onChange: ((value: Date) => void) | ((value: DateRange | undefined) => void);
   mode: DateFieldMode;
   /** Range filters should only allow a full DateRange or nothing */
-  isRangeFilterField?: boolean
+  isRangeFilterField?: boolean;
 }
 
 export interface DateSingleFieldBaseProps extends DateFieldBaseProps {
@@ -158,20 +158,19 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           return;
         }
 
-        const parsedDate =
-          isRangeMode ? parseDateRange(inputValue, dateFormats.short) : parseDate(inputValue, dateFormats.short);
+        const parsedDate = isRangeMode
+          ? parseDateRange(inputValue, dateFormats.short)
+          : parseDate(inputValue, dateFormats.short);
         // If the user leaves the input and has an invalid date, reset to previous value.
         if (!isParsedDateValid(parsedDate)) {
           setWipValue(value);
           setInputValue(
-            (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ??
-              "",
+            (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
           );
         } else if (dateFormat !== dateFormats.short) {
           // Or if we need to reset the dateFormat back from `short` to whatever the user specified
           setInputValue(
-            (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ??
-              "",
+            (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
           );
         }
 
@@ -256,13 +255,13 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   // Support input range filter field w/ a clear btn that will appear when overlay is closed and input is not focused
   const clearButton = (
     <>
-      {(inputValue !== "" && !state.isOpen) && (
+      {inputValue !== "" && !state.isOpen && (
         <IconButton
           icon="xCircle"
           color={Palette.Gray700}
           onClick={() => {
-            setInputValue("")
-            onChange(undefined)
+            setInputValue("");
+            onChange(undefined);
           }}
         />
       )}
@@ -278,15 +277,16 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
       tabIndex={-1}
       {...tid.calendarButton}
     >
-      <Icon icon="calendar" color={Palette.Gray700}/>
+      <Icon icon="calendar" color={Palette.Gray700} />
     </button>
   );
 
   const EndFieldButtons = (
     <>
-      {isRangeFilterField && clearButton}{!hideCalendarIcon && calendarButton}
+      {isRangeFilterField && clearButton}
+      {!hideCalendarIcon && calendarButton}
     </>
-  )
+  );
 
   return (
     <>
@@ -311,11 +311,11 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           }
           // User has deleted all text in field
           else if (v === undefined) {
-            setInputValue("")
+            setInputValue("");
           }
         }}
-        endAdornment={(!iconLeft) && EndFieldButtons}
-        startAdornment={(!hideCalendarIcon && iconLeft) && calendarButton}
+        endAdornment={!iconLeft && EndFieldButtons}
+        startAdornment={!hideCalendarIcon && iconLeft && calendarButton}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         {...others}
       />

@@ -10,7 +10,7 @@ export type BoundDateRangeFieldProps = Omit<DateRangeFieldProps, "label" | "valu
   // Make optional as it'll create a label from the field's key if not present
   label?: string;
   // Optional in case the page wants extra behavior
-  onChange?: (value: DateRange) => void;
+  onChange?: (value: DateRange | undefined) => void;
 };
 
 /** Wraps `TextField` and binds it to a form field. */
@@ -32,11 +32,8 @@ export function BoundDateRangeField(props: BoundDateRangeFieldProps) {
           label={label}
           value={field.value || undefined}
           onChange={(value) => {
-            // DateRangeField will return an undefined if part of filter, but we're not doing that here yet
-            if (value) {
-              onChange(value);
-              field.maybeAutoSave();
-            }
+            onChange(value);
+            field.maybeAutoSave();
           }}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
           required={field.required}

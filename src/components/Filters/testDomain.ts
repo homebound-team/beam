@@ -1,7 +1,7 @@
 import { dateFilter, DateFilterValue } from "src/components/Filters/DateFilter";
+import { dateRangeFilter, DateRangeFilterValue } from "src/components/Filters/DateRangeFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { singleFilter } from "src/components/Filters/SingleFilter";
-import { dateRangeFilter, DateRangeFilterValue } from "src/components/Filters/DateRangeFilter"
 import { FilterDefs } from "src/components/Filters/types";
 
 export enum Stage {
@@ -46,7 +46,7 @@ export type ProjectFilter = {
   isTest?: boolean | null;
   doNotUse?: boolean | null;
   date?: DateFilterValue<string>;
-  dateRange?:DateRangeFilterValue<string>;
+  dateRange?: DateRangeFilterValue<string>;
 };
 
 export type StageFilter = NonNullable<FilterDefs<ProjectFilter>["stage"]>;
