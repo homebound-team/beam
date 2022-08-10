@@ -323,6 +323,12 @@ export const Icons = {
   flag: (
     <path d="M19 4H6V2H4V20H3V22H4H6H7V20H6V15H19C19.553 15 20 14.552 20 14V5C20 4.448 19.553 4 19 4Z" />
   ),
+  outlineFlag: (
+    <>
+      <path xmlns="http://www.w3.org/2000/svg" d="M6.38464 14H20.3846V5H6.38464" color="transparent" stroke="black" stroke-width="2" stroke-linejoin="round"/>
+      <path xmlns="http://www.w3.org/2000/svg" d="M6.38464 2V11V21M8.38464 21H4.38464" stroke="black" stroke-width="2" stroke-linejoin="round"/>
+    </>
+  ),
   // Navigation
   projects: (
     <path d="M4 6H6V8H4V6ZM4 11H6V13H4V11ZM4 16H6V18H4V16ZM20 8V6H18.8H9.2H8.023V8H9.2H18.8H20ZM8 11H20V13H8V11ZM8 16H20V18H8V16Z" />
