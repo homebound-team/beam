@@ -658,7 +658,7 @@ function TaskNameField({ value }: { value: string }) {
 }
 
 function TaskDateField({ value }: { value: Date }) {
-  const [internalValue, setValue] = useState(value);
+  const [internalValue, setValue] = useState<Date | undefined>(value);
   return <DateField value={internalValue} label="Date" onChange={setValue} format="medium" iconLeft />;
 }
 

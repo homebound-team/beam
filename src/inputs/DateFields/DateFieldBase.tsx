@@ -49,7 +49,7 @@ export interface DateFieldBaseProps
   onEnter?: VoidFunction;
   /** for storybook */
   defaultOpen?: boolean;
-  onChange: ((value: Date) => void) | ((value: DateRange | undefined) => void);
+  onChange: ((value: Date | undefined) => void) | ((value: DateRange | undefined) => void);
   mode: DateFieldMode;
   /** Range filters should only allow a full DateRange or nothing */
   isRangeFilterField?: boolean;
@@ -58,7 +58,7 @@ export interface DateFieldBaseProps
 export interface DateSingleFieldBaseProps extends DateFieldBaseProps {
   mode: "single";
   value: Date | undefined;
-  onChange: (value: Date) => void;
+  onChange: (value: Date | undefined) => void;
 }
 
 export interface DateRangeFieldBaseProps extends DateFieldBaseProps {
@@ -236,7 +236,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           props.onChange(d);
           return;
         }
-      } else if (isRangeMode && isRangeFilterField) {
+      } else {
         props.onChange(undefined);
         return;
       }

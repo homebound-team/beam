@@ -47,7 +47,7 @@ describe(DateFieldBase, () => {
       />,
     );
     // Then the calendar icon isn't rendered
-    expect(r.queryByTestId("date_calendarButton")).toBeNull()
+    expect(r.queryByTestId("date_calendarButton")).toBeNull();
     // And the placeholder is still there
     expect(r.date()).toHaveValue("").toHaveAttribute("placeholder", "Select a date");
   });
@@ -144,7 +144,7 @@ describe(DateFieldBase, () => {
   it("updates the field if the date changes from outside the component", async () => {
     // Given a component rendering the DateField with the ability to update the state.
     function TestComponent() {
-      const [date, setDate] = useState(jan2);
+      const [date, setDate] = useState<Date | undefined>(jan2);
       return (
         <>
           <DateFieldBase mode="single" value={date} label="Date" onChange={setDate} />
@@ -162,7 +162,7 @@ describe(DateFieldBase, () => {
   it("does not update the field if the focus is currently on the input", async () => {
     // Given a component rendering the DateField with the ability to update the state.
     function TestComponent() {
-      const [date, setDate] = useState(jan2);
+      const [date, setDate] = useState<Date | undefined>(jan2);
       return (
         <>
           <DateFieldBase mode="single" value={date} label="Date" onChange={setDate} />
@@ -182,7 +182,7 @@ describe(DateFieldBase, () => {
   it("does not update the field if the date picker is open", async () => {
     // Given a component rendering the DateField with the ability to update the state.
     function TestComponent() {
-      const [date, setDate] = useState(jan2);
+      const [date, setDate] = useState<Date | undefined>(jan2);
       return (
         <>
           <DateFieldBase mode="single" value={date} label="Date" onChange={setDate} />
