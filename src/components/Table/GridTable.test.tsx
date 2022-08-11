@@ -2267,6 +2267,50 @@ describe("GridTable", () => {
     // And the local storage value is updated with the current state
     expect(sessionStorage.getItem(tableIdentifier)).toBe('["p2","p3"]');
   });
+
+
+  it("can render with rows with initSelected defined", async () => {
+    const selectCol = selectColumn<Row>();
+    const nameCol: GridColumn<Row> = {
+      header: "Name",
+      data: ({ name }) => ({ content: name }),
+      mw: "160px",
+    };
+
+    // Given rows initially set as selected
+    const rows: GridDataRow<Row>[] = [
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
+    ];
+
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      return <GridTable<Row> api={_api} columns={[selectCol, nameCol]} rows={rows} />;
+    }
+    // When rendering the table
+    const r = await render(<Test />);
+
+    // Then all rows are shown as selected
+    expect(cellAnd(r, 1, 0, "select")).toBeChecked();
+    expect(cellAnd(r, 2, 0, "select")).toBeChecked();
+
+    // And the api can fetch them
+    expect(api.current!.getSelectedRowIds()).toEqual(["2", "1"]);;
+
+    // And when we unselect all
+    click(cellAnd(r, 1, 0, "select"));
+    click(cellAnd(r, 2, 0, "select"));
+
+    // Then all rows are shown as unselected
+    expect(cellAnd(r, 1, 0, "select")).not.toBeChecked();
+    expect(cellAnd(r, 2, 0, "select")).not.toBeChecked();
+
+    // And they can no longer be fetched by the api
+    expect(api.current!.getSelectedRowIds()).toEqual([]);
+  });
 });
 
 function Collapse({ id }: { id: string }) {

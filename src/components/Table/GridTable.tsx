@@ -1009,6 +1009,8 @@ export type GridDataRow<R extends Kinded> = {
   data: unknown;
   /** Whether to have the row collapsed (children not visible) on initial load. This will be ignore in subsequent re-renders of the table */
   initCollapsed?: boolean;
+  /** Whether to have the row selected on initial load. This will be ignore in subsequent re-renders of the table */
+  initSelected?: boolean;
   /** Whether row can be selected */
   selectable?: false;
 } & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
