@@ -67,6 +67,7 @@ export const Icon = (props: IconProps) => {
     "chevronLeft",
     "chevronRight",
     "arrowLeft",
+    "arrowBack",
     "arrowUp",
     "arrowDown",
     "arrowRight",

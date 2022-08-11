@@ -17,7 +17,7 @@ export default {
   component: IconButton,
   decorators: [withRouter()],
   args: {
-    icon: "arrowLeft",
+    icon: "arrowBack",
     onClick: action("onPress"),
   },
   argTypes: {
@@ -84,13 +84,13 @@ export function WithTooltip() {
               </ul>
             </div>
           }
-          icon="arrowLeft"
+          icon="arrowBack"
           onClick={noop}
         />
       </div>
       <div>
         <h2>Tooltip provided via 'tooltip' property</h2>
-        <IconButton icon="arrowLeft" tooltip="Back to previous page" onClick={noop} />
+        <IconButton icon="arrowBack" tooltip="Back to previous page" onClick={noop} />
       </div>
     </div>
   );
@@ -105,7 +105,7 @@ export function IconButtonLink() {
       </div>
       <div>
         <h2>Relative Path - Open in new tab</h2>
-        <IconButton icon="arrowLeft" onClick="/" openInNew />
+        <IconButton icon="arrowBack" onClick="/" openInNew />
       </div>
       <div>
         <h2>Absolute Link</h2>
