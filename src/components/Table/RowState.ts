@@ -77,6 +77,17 @@ export class RowState {
     }
   }
 
+  loadSelected(rows: GridDataRow<any>[]): void {
+    const selectedRows = rows.filter(row => row.initSelected)
+    // Initialize with selected rows as defined 
+    const map = new Map<string, SelectedState>();
+    selectedRows.forEach(row => {
+      map.set(row.id, "checked");
+    })
+
+    this.selectedRows.merge(map);
+  }
+
   // Updates the list of rows and regenerates the collapsedRows property if needed.
   setRows(rows: GridDataRow<any>[]): void {
     // If the set of rows are different, and this is the first time adding "data" rows (non "totals" or "header" rows), then collapsedRows may need to be updated.
