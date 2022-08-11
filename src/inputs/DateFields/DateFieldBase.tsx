@@ -254,7 +254,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
       tabIndex={-1}
       {...tid.calendarButton}
     >
-      <Icon icon="calendar" color={Palette.Gray700} />
+      <Icon icon="calendar" color={Palette.Gray700}/>
     </button>
   );
 
@@ -280,8 +280,8 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
             onChange(parsed);
           }
         }}
-        endAdornment={!hideCalendarIcon && !iconLeft && calendarButton}
-        startAdornment={!hideCalendarIcon && iconLeft && calendarButton}
+        endAdornment={(!hideCalendarIcon && !iconLeft) && calendarButton}
+        startAdornment={(!hideCalendarIcon && iconLeft) && calendarButton}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         {...others}
       />
