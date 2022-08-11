@@ -22,7 +22,7 @@ import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 export interface DateFieldBaseProps
-  extends Pick<TextFieldBaseProps<{}>, "borderless" | "visuallyDisabled" | "hideLabel" | "compact"> {
+  extends Pick<TextFieldBaseProps<{}>, "borderless" | "visuallyDisabled" | "hideLabel" | "compact" | "xss"> {
   label: string;
   /** Called when the component loses focus */
   onBlur?: () => void;
