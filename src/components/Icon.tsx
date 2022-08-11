@@ -324,10 +324,7 @@ export const Icons = {
     <path d="M19 4H6V2H4V20H3V22H4H6H7V20H6V15H19C19.553 15 20 14.552 20 14V5C20 4.448 19.553 4 19 4Z" />
   ),
   outlineFlag: (
-    <>
-      <path xmlns="http://www.w3.org/2000/svg" d="M6.38464 14H20.3846V5H6.38464" color="transparent" stroke="black" stroke-width="2" stroke-linejoin="round"/>
-      <path xmlns="http://www.w3.org/2000/svg" d="M6.38464 2V11V21M8.38464 21H4.38464" stroke="black" stroke-width="2" stroke-linejoin="round"/>
-    </>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 2H4V20H3V22H7V20H6V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H6V2ZM6 6V13H18V6H6Z" />
   ),
   // Navigation
   projects: (
