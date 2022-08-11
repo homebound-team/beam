@@ -79,13 +79,12 @@ export class RowState {
 
   loadSelected(rows: GridDataRow<any>[]): void {
     const selectedRows = rows.filter(row => row.initSelected)
-
     // Initialize with selected rows as defined 
     const map = new Map<string, SelectedState>();
     selectedRows.forEach(row => {
       map.set(row.id, "checked");
     })
-  
+
     this.selectedRows.merge(map);
   }
 

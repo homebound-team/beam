@@ -2268,14 +2268,9 @@ describe("GridTable", () => {
     expect(sessionStorage.getItem(tableIdentifier)).toBe('["p2","p3"]');
   });
 
-
   it("can render with rows with initSelected defined", async () => {
     const selectCol = selectColumn<Row>();
-    const nameCol: GridColumn<Row> = {
-      header: "Name",
-      data: ({ name }) => ({ content: name }),
-      mw: "160px",
-    };
+    const nameCol: GridColumn<Row> = { header: "Name", data: ({ name }) => ({ content: name }), mw: "160px" };
 
     // Given rows initially set as selected
     const rows: GridDataRow<Row>[] = [
