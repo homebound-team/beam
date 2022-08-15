@@ -46,6 +46,8 @@ export const Icon = (props: IconProps) => {
     "archive",
     "unarchive",
     "duplicate",
+    "filter",
+    "columns",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
@@ -64,7 +66,11 @@ export const Icon = (props: IconProps) => {
     "chevronUp",
     "chevronLeft",
     "chevronRight",
+    "arrowLeft",
     "arrowBack",
+    "arrowUp",
+    "arrowDown",
+    "arrowRight",
     "menuClose",
     "menuOpen",
   ];
