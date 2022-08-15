@@ -95,6 +95,26 @@ export function TabsSeparateFromContent() {
   );
 }
 
+export function LineTabs() {
+  const [tab, setTab] = useState<TabValue>("tab1");
+  return (
+    <div>
+      <Tabs tabs={testTabs} onChange={setTab} selected={tab} type="lineTab" />
+      <TabContent tabs={testTabs} selected={tab} />
+    </div>
+  );
+}
+
+export function LineTabsWithBorderAndIcons() {
+  const [tab, setTab] = useState<TabValue>("tab1");
+  return (
+    <div>
+      <Tabs tabs={tabsWithIconsAndContent} onChange={setTab} selected={tab} type="lineTab" includeLineTabBorder />
+      <TabContent tabs={testTabs} selected={tab} />
+    </div>
+  );
+}
+
 export function TabsAsLinks() {
   return <TestComponent />;
 }
