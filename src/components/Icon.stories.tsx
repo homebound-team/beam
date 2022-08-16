@@ -46,6 +46,8 @@ export const Icon = (props: IconProps) => {
     "archive",
     "unarchive",
     "duplicate",
+    "filter",
+    "columns",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
@@ -64,12 +66,16 @@ export const Icon = (props: IconProps) => {
     "chevronUp",
     "chevronLeft",
     "chevronRight",
+    "arrowLeft",
     "arrowBack",
+    "arrowUp",
+    "arrowDown",
+    "arrowRight",
     "menuClose",
     "menuOpen",
   ];
   const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images", "openBook"];
-  const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar", "buildingHouse", "house", "flag"];
+  const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar", "buildingHouse", "house", "flag", "outlineFlag"];
   const navigationIcons: IconProps["icon"][] = ["projects", "tasks", "finances", "templates", "tradePartners"];
 
   return (
