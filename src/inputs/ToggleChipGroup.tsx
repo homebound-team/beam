@@ -27,7 +27,7 @@ export function ToggleChipGroup(props: ToggleChipGroupProps) {
   return (
     <div {...groupProps} css={Css.relative.$}>
       <Label label={label} {...labelProps} hidden={hideLabel} />
-      <div>
+      <div css={Css.df.gap1.add("flexWrap", "wrap").$}>
         {options.map((o) => (
           <ToggleChip
             key={o.value}
@@ -59,7 +59,7 @@ function ToggleChip(props: ToggleChipProps) {
   return (
     <label
       css={{
-        ...Css.relative.dib.br16.sm.px1.cursorPointer.pyPx(4).mr1.mb1.bgGray200.$,
+        ...Css.relative.dib.br16.sm.px1.cursorPointer.pyPx(4).bgGray200.$,
         ...(isSelected
           ? {
               ...Css.white.bgLightBlue700.$,
