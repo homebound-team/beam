@@ -34,8 +34,6 @@ export interface Tab<V extends string = string> {
 
 type TabsContentXss = Xss<Margin>;
 
-export type TabType = "default" | "lineTab";
-
 export interface TabsProps<V extends string, X> {
   ariaLabel?: string;
   // the selected tab is connected to the contents displayed
@@ -45,9 +43,8 @@ export interface TabsProps<V extends string, X> {
   contentXss?: X;
   // Allow for showing the tabs even if there is only one enabled tab
   alwaysShowAllTabs?: boolean;
-  type?: TabType;
-  // Adds a bottom border to the Tabs container, only applicable when `type` is `lineTab`
-  includeLineTabBorder?: boolean;
+  // Adds a bottom border to the Tabs container
+  includeBottomBorder?: boolean;
 }
 
 // Tabs can be rendered as Links (omit "onChange") and we'll use React-Router for matching (omit "selected")/
@@ -131,7 +128,7 @@ export function TabContent<V extends string>(
 /** The top list of tabs. */
 export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<V, {}>) {
   const { tabActionsRef, tabActionsDiv } = useBeamContext();
-  const { ariaLabel, tabs, type, includeLineTabBorder, ...others } = props;
+  const { ariaLabel, tabs, includeBottomBorder, ...others } = props;
   const location = useLocation();
   const selected = isRouteTabs(props)
     ? uniqueTabValue(
@@ -178,23 +175,13 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
     }
   }
 
-  function lineTabBorderStyles() {
-    if (!includeLineTabBorder) return {};
-
-    if (includeLineTabBorder && type !== "lineTab") {
-      throw new Error("Prop `includeLineTabBorder` is currently only compatible with `type` of `lineTab`");
-    }
-
-    return { ...Css.bb.bGray200.$ };
-  }
-
   return (
     <div css={Css.df.aic.$}>
       {/* Do not show if we should hide the tabs */}
       {!hideTabs(props) && (
         <div
           ref={ref}
-          css={{ ...Css.dif.childGap1.$, ...lineTabBorderStyles() }}
+          css={{ ...Css.dif.childGap1.$, ...(includeBottomBorder ? { ...Css.bb.bGray200.$ } : {}) }}
           aria-label={ariaLabel}
           role="tablist"
           {...tid}
@@ -211,7 +198,6 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
                 onKeyUp={onKeyUp}
                 onBlur={onBlur}
                 tab={tab}
-                type={type}
                 {...tid[defaultTestId(uniqueValue)]}
               />
             );
@@ -233,16 +219,15 @@ interface TabImplProps<V extends string> extends BeamFocusableProps {
   focusProps: HTMLAttributes<HTMLElement>;
   isFocusVisible: boolean;
   tab: Tab<V> | RouteTab<V>;
-  type?: TabType;
 }
 
 function TabImpl<V extends string>(props: TabImplProps<V>) {
-  const { tab, onClick, active, onKeyUp, onBlur, focusProps, isFocusVisible = false, type, ...others } = props;
+  const { tab, onClick, active, onKeyUp, onBlur, focusProps, isFocusVisible = false, ...others } = props;
   const { disabled: isDisabled = false, name: label, icon, endAdornment } = tab;
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
-    () => getTabStyles(type),
-    [type],
+    () => getTabStyles(),
+    [],
   );
   const uniqueValue = uniqueTabValue(tab);
 
@@ -287,41 +272,23 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
   );
 }
 
-export function getTabStyles(type?: TabType) {
+export function getTabStyles() {
+  const borderBottomWidthPx = 4;
   const verticalPaddingPx = 6;
-  const sharedBaseStyles = Css.df.aic
-    .hPx(32)
-    .pyPx(verticalPaddingPx)
-    .px1.outline0.gray700.add("width", "fit-content").cursorPointer;
+  // Decrease the bottom padding by the same amount of the new border width to prevent text layout shift
+  const borderBottomStyles = Css.bb
+    .add("borderBottomWidth", `${borderBottomWidthPx}px`)
+    .pbPx(verticalPaddingPx - borderBottomWidthPx).$;
 
-  switch (type) {
-    case "lineTab":
-      // Decrease the bottom padding by the same amount of the new border width to prevent text layout shift
-      const borderBottomWidthPx = 4;
-      const borderBottomStyles = Css.bb
-        .add("borderBottomWidth", `${borderBottomWidthPx}px`)
-        .pbPx(verticalPaddingPx - borderBottomWidthPx).$;
-
-      return {
-        baseStyles: sharedBaseStyles.sm.$,
-        activeStyles: Css.add(borderBottomStyles).bLightBlue700.smEm.gray900.$,
-        disabledStyles: Css.gray400.cursorNotAllowed.$,
-        focusRingStyles: Css.bgLightBlue50.bshFocus.$,
-        hoverStyles: Css.add(borderBottomStyles).bGray400.$,
-        activeHoverStyles: Css.bgLightBlue50.add(borderBottomStyles).bLightBlue700.$,
-      };
-
-    default:
-      // "default" styles
-      return {
-        baseStyles: sharedBaseStyles.smEm.br4.$,
-        activeStyles: Css.lightBlue700.bgLightBlue50.$,
-        disabledStyles: Css.gray400.cursorNotAllowed.$,
-        focusRingStyles: Css.bgLightBlue50.bshFocus.$,
-        hoverStyles: Css.gray700.bgGray100.$,
-        activeHoverStyles: Css.bgLightBlue200.lightBlue700.$,
-      };
-  }
+  return {
+    baseStyles: Css.df.aic.hPx(32).pyPx(verticalPaddingPx).px1.outline0.gray700.add("width", "fit-content")
+      .cursorPointer.sm.$,
+    activeStyles: Css.add(borderBottomStyles).bLightBlue700.smEm.gray900.$,
+    disabledStyles: Css.gray400.cursorNotAllowed.$,
+    focusRingStyles: Css.bgLightBlue50.bshFocus.$,
+    hoverStyles: Css.add(borderBottomStyles).bGray400.$,
+    activeHoverStyles: Css.bgLightBlue50.add(borderBottomStyles).bLightBlue700.$,
+  };
 }
 
 export function getNextTabValue<V extends string>(

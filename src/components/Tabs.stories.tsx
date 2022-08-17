@@ -95,21 +95,11 @@ export function TabsSeparateFromContent() {
   );
 }
 
-export function LineTabs() {
+export function TabsWithBottomBorder() {
   const [tab, setTab] = useState<TabValue>("tab1");
   return (
     <div>
-      <Tabs tabs={testTabs} onChange={setTab} selected={tab} type="lineTab" />
-      <TabContent tabs={testTabs} selected={tab} />
-    </div>
-  );
-}
-
-export function LineTabsWithBorderAndIcons() {
-  const [tab, setTab] = useState<TabValue>("tab1");
-  return (
-    <div>
-      <Tabs tabs={tabsWithIconsAndContent} onChange={setTab} selected={tab} type="lineTab" includeLineTabBorder />
+      <Tabs tabs={tabsWithIconsAndContent} onChange={setTab} selected={tab} includeBottomBorder />
       <TabContent tabs={testTabs} selected={tab} />
     </div>
   );
