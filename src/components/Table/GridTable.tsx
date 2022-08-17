@@ -908,6 +908,7 @@ type RenderCellFn<R extends Kinded> = (
   content: ReactNode,
   row: R,
   rowStyle: RowStyle<R> | undefined,
+  classNames: string | undefined,
 ) => ReactNode;
 
 /** Defines row-specific styling for each given row `kind` in `R` */
@@ -981,6 +982,8 @@ export type GridCellContent = {
   onClick?: () => {} | string;
   /** Custom css to apply directly to this cell, i.e. cell-specific borders. */
   css?: Properties;
+  /** Allows cell to reveal content when the user hovers over a row */
+  revealOnRowHover?: true;
 };
 
 type MaybeFn<T> = T | (() => T);
@@ -1043,6 +1046,9 @@ interface GridRowProps<R extends Kinded, S> {
   api: GridTableApi<R>;
 }
 
+// Module level const to reduce the amount of code that needs to be written in the render function
+const revealOnRowHoverClass = "revealOnRowHover";
+
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
 function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const {
@@ -1093,6 +1099,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     // Maybe add the sticky header styles
     ...((isHeader || isTotals) && stickyHeader ? Css.sticky.topPx(stickyOffset).z2.$ : undefined),
     ...getNestedCardStyles(row, openCardStyles, style, isActive),
+    ...{
+      "> .revealOnRowHover > *": Css.invisible.$,
+      ":hover > .revealOnRowHover > *": Css.visible.$,
+    },
   };
 
   let currentColspan = 1;
@@ -1121,6 +1131,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         }
         const maybeContent = applyRowFn(column, row, api, level);
         currentColspan = isGridCellContent(maybeContent) ? maybeContent.colspan ?? 1 : 1;
+        const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
 
         const canSortColumn =
           (sortOn === "client" && column.clientSideSort !== false) ||
@@ -1207,6 +1218,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...(column.mw ? Css.mw(column.mw).$ : {}),
         };
 
+        const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
+
         const renderFn: RenderCellFn<any> =
           (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
             ? rowLinkRenderFn(as)
@@ -1216,7 +1229,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);
 
-        return renderFn(columnIndex, cellCss, content, row, rowStyle);
+        return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames);
       })}
     </Row>
   );
@@ -1337,14 +1350,15 @@ export function applyRowFn<R extends Kinded>(
 }
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
-const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (key, css, content) => {
-  const Cell = as === "table" ? "td" : "div";
-  return (
-    <Cell key={key} css={{ ...css, ...tableRowStyles(as) }}>
-      {content}
-    </Cell>
-  );
-};
+const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
+  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
+    const Cell = as === "table" ? "td" : "div";
+    return (
+      <Cell key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames}>
+        {content}
+      </Cell>
+    );
+  };
 
 /** Sets up the `GridContext` so that header cells can access the current sort settings. */
 const headerRenderFn: (
@@ -1353,47 +1367,62 @@ const headerRenderFn: (
   sortState: SortState<any> | undefined,
   setSortKey: Function | undefined,
   as: RenderAs,
-) => RenderCellFn<any> = (columns, column, sortState, setSortKey, as) => (key, css, content) => {
-  const [currentKey, direction] = sortState || [];
-  // If server-side sorting, use the user's key for this column; client-side sorting, use the index.
-  const ourSortKey = column.serverSideSortKey || columns.indexOf(column);
-  const context: GridSortContextProps = {
-    sorted: ourSortKey === currentKey ? direction : undefined,
-    toggleSort: () => setSortKey!(ourSortKey),
+) => RenderCellFn<any> =
+  (columns, column, sortState, setSortKey, as) =>
+  (key, css, content, row, rowStyle, classNames: string | undefined) => {
+    const [currentKey, direction] = sortState || [];
+    // If server-side sorting, use the user's key for this column; client-side sorting, use the index.
+    const ourSortKey = column.serverSideSortKey || columns.indexOf(column);
+    const context: GridSortContextProps = {
+      sorted: ourSortKey === currentKey ? direction : undefined,
+      toggleSort: () => setSortKey!(ourSortKey),
+    };
+    const Cell = as === "table" ? "th" : "div";
+    return (
+      <GridSortContext.Provider key={key} value={context}>
+        <Cell css={{ ...css, ...tableRowStyles(as, column) }} className={classNames}>
+          {content}
+        </Cell>
+      </GridSortContext.Provider>
+    );
   };
-  const Row = as === "table" ? "th" : "div";
-  return (
-    <GridSortContext.Provider key={key} value={context}>
-      <Row css={{ ...css, ...tableRowStyles(as, column) }}>{content}</Row>
-    </GridSortContext.Provider>
-  );
-};
 
 /** Renders a cell element when a row link is in play. */
-const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> = (as: RenderAs) => (key, css, content, row, rowStyle) => {
-  const to = rowStyle!.rowLink!(row);
-  if (as === "table") {
+const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
+  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
+    const to = rowStyle!.rowLink!(row);
+    if (as === "table") {
+      return (
+        <td key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames}>
+          <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
+            {content}
+          </Link>
+        </td>
+      );
+    }
     return (
-      <td key={key} css={{ ...css, ...tableRowStyles(as) }}>
-        <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
-          {content}
-        </Link>
-      </td>
+      <Link
+        key={key}
+        to={to}
+        css={{ ...Css.noUnderline.color("unset").$, ...css }}
+        className={`${navLink} ${classNames}`}
+      >
+        {content}
+      </Link>
     );
-  }
-  return (
-    <Link key={key} to={to} css={{ ...Css.noUnderline.color("unset").$, ...css }} className={navLink}>
-      {content}
-    </Link>
-  );
-};
+  };
 
 /** Renders a cell that will fire the RowStyle.onClick. */
 const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>) => RenderCellFn<any> =
-  (as: RenderAs, api: GridTableApi<any>) => (key, css, content, row, rowStyle) => {
+  (as: RenderAs, api: GridTableApi<any>) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
     const Row = as === "table" ? "tr" : "div";
     return (
-      <Row {...{ key }} css={{ ...css, ...tableRowStyles(as) }} onClick={() => rowStyle!.onClick!(row, api)}>
+      <Row
+        {...{ key }}
+        css={{ ...css, ...tableRowStyles(as) }}
+        className={classNames}
+        onClick={() => rowStyle!.onClick!(row, api)}
+      >
         {content}
       </Row>
     );

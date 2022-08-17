@@ -1289,3 +1289,29 @@ export function SelectableRows() {
     </>
   );
 }
+
+export function RevealOnRowHover() {
+  const nameColumn: GridColumn<Row> = {
+    header: "Name",
+    data: ({ name }) => ({ content: name }),
+    mw: "160px",
+  };
+
+  const revealColumn: GridColumn<Row> = {
+    header: "Reveal",
+    data: ({ value }) => ({ content: <span>{value}</span>, revealOnRowHover: true }),
+    mw: "160px",
+  };
+
+  return (
+    <>
+      <GridTable
+        columns={[nameColumn, revealColumn]}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "Hover over me to reveal the number!", value: 7 } },
+        ]}
+      />
+    </>
+  );
+}
