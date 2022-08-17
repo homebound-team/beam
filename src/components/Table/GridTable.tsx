@@ -982,7 +982,7 @@ export type GridCellContent = {
   onClick?: () => {} | string;
   /** Custom css to apply directly to this cell, i.e. cell-specific borders. */
   css?: Properties;
-  /** Allows cell to reveal content when the user hovers over a row */
+  /** Allows cell to reveal content when the user hovers over a row. Content must be wrapped in an element in order to be hidden. IE <div>{value}</div>*/
   revealOnRowHover?: true;
 };
 
@@ -1046,9 +1046,6 @@ interface GridRowProps<R extends Kinded, S> {
   api: GridTableApi<R>;
 }
 
-// Module level const to reduce the amount of code that needs to be written in the render function
-const revealOnRowHoverClass = "revealOnRowHover";
-
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
 function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   const {
@@ -1087,6 +1084,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           .filter((style) => style)
       : undefined;
 
+  const revealOnRowHoverClass = "revealOnRowHover";
+
   const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
   const rowCss = {
     // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `flexNone` to ensure they stay their defined widths
@@ -1100,8 +1099,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     ...((isHeader || isTotals) && stickyHeader ? Css.sticky.topPx(stickyOffset).z2.$ : undefined),
     ...getNestedCardStyles(row, openCardStyles, style, isActive),
     ...{
-      "> .revealOnRowHover > *": Css.invisible.$,
-      ":hover > .revealOnRowHover > *": Css.visible.$,
+      [` > .${revealOnRowHoverClass} > *`]: Css.invisible.$,
+      [`:hover > .${revealOnRowHoverClass} > *`]: Css.visible.$,
     },
   };
 
