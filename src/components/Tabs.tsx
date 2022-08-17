@@ -43,6 +43,8 @@ export interface TabsProps<V extends string, X> {
   contentXss?: X;
   // Allow for showing the tabs even if there is only one enabled tab
   alwaysShowAllTabs?: boolean;
+  // Adds a bottom border to the Tabs container
+  includeBottomBorder?: boolean;
 }
 
 // Tabs can be rendered as Links (omit "onChange") and we'll use React-Router for matching (omit "selected")/
@@ -126,7 +128,7 @@ export function TabContent<V extends string>(
 /** The top list of tabs. */
 export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<V, {}>) {
   const { tabActionsRef, tabActionsDiv } = useBeamContext();
-  const { ariaLabel, tabs, ...others } = props;
+  const { ariaLabel, tabs, includeBottomBorder, ...others } = props;
   const location = useLocation();
   const selected = isRouteTabs(props)
     ? uniqueTabValue(
@@ -177,7 +179,13 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
     <div css={Css.df.aic.$}>
       {/* Do not show if we should hide the tabs */}
       {!hideTabs(props) && (
-        <div ref={ref} css={Css.dif.childGap1.$} aria-label={ariaLabel} role="tablist" {...tid}>
+        <div
+          ref={ref}
+          css={{ ...Css.dif.childGap1.$, ...(includeBottomBorder ? { ...Css.bb.bGray200.$ } : {}) }}
+          aria-label={ariaLabel}
+          role="tablist"
+          {...tid}
+        >
           {tabs.map((tab) => {
             const uniqueValue = uniqueTabValue(tab);
             return (
@@ -265,13 +273,21 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
 }
 
 export function getTabStyles() {
+  const borderBottomWidthPx = 4;
+  const verticalPaddingPx = 6;
+  // Decrease the bottom padding by the same amount of the new border width to prevent text layout shift
+  const borderBottomStyles = Css.bb
+    .add("borderBottomWidth", `${borderBottomWidthPx}px`)
+    .pbPx(verticalPaddingPx - borderBottomWidthPx).$;
+
   return {
-    baseStyles: Css.df.aic.hPx(32).pyPx(6).px1.br4.smEm.outline0.gray700.add("width", "fit-content").cursorPointer.$,
-    activeStyles: Css.lightBlue700.bgLightBlue50.$,
+    baseStyles: Css.df.aic.hPx(32).pyPx(verticalPaddingPx).px1.outline0.gray700.add("width", "fit-content")
+      .cursorPointer.sm.$,
+    activeStyles: Css.add(borderBottomStyles).bLightBlue700.smEm.gray900.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
     focusRingStyles: Css.bgLightBlue50.bshFocus.$,
-    hoverStyles: Css.gray700.bgGray100.$,
-    activeHoverStyles: Css.bgLightBlue200.lightBlue700.$,
+    hoverStyles: Css.add(borderBottomStyles).bGray400.$,
+    activeHoverStyles: Css.bgLightBlue50.add(borderBottomStyles).bLightBlue700.$,
   };
 }
 

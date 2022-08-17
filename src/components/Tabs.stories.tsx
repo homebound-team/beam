@@ -95,6 +95,16 @@ export function TabsSeparateFromContent() {
   );
 }
 
+export function TabsWithBottomBorder() {
+  const [tab, setTab] = useState<TabValue>("tab1");
+  return (
+    <div>
+      <Tabs tabs={tabsWithIconsAndContent} onChange={setTab} selected={tab} includeBottomBorder />
+      <TabContent tabs={testTabs} selected={tab} />
+    </div>
+  );
+}
+
 export function TabsAsLinks() {
   return <TestComponent />;
 }
