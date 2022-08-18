@@ -84,6 +84,9 @@ export const LabelStyles = () => {
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} />
       <h2 css={Css.baseEm.mb1.mt3.pt2.bt.bGray200.$}>Filter</h2>
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="filter" />
+      <div css={Css.df.jcfe.$}>
+        <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="filter" />
+      </div>
       <h2 css={Css.baseEm.mb1.mt3.pt2.bt.bGray200.$}>Form</h2>
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="form" />
       <h2 css={Css.baseEm.mb1.mt3.pt2.bt.bGray200.$}>Hidden</h2>
