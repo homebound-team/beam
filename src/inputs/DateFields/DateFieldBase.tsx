@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from "reac
 import { useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
 import { isDateRange, Matcher } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
-import { Icon, resolveTooltip } from "src/components";
+import { Icon, IconButton, resolveTooltip } from "src/components";
 import { DatePicker, DateRangePicker, Popover } from "src/components/internal";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
 import { Css, Palette } from "src/Css";
@@ -49,20 +49,22 @@ export interface DateFieldBaseProps
   onEnter?: VoidFunction;
   /** for storybook */
   defaultOpen?: boolean;
-  onChange: ((value: Date) => void) | ((value: DateRange) => void);
+  onChange: ((value: Date | undefined) => void) | ((value: DateRange | undefined) => void);
   mode: DateFieldMode;
+  /** Range filters should only allow a full DateRange or nothing */
+  isRangeFilterField?: boolean;
 }
 
 export interface DateSingleFieldBaseProps extends DateFieldBaseProps {
   mode: "single";
   value: Date | undefined;
-  onChange: (value: Date) => void;
+  onChange: (value: Date | undefined) => void;
 }
 
 export interface DateRangeFieldBaseProps extends DateFieldBaseProps {
   mode: "range";
   value: DateRange | undefined;
-  onChange: (value: DateRange) => void;
+  onChange: (value: DateRange | undefined) => void;
 }
 
 export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBaseProps) {
@@ -86,9 +88,11 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     onEnter,
     defaultOpen,
     mode,
+    isRangeFilterField = false,
     ...others
   } = props;
 
+  const isRangeMode = mode === "range";
   const inputRef = useRef<HTMLInputElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -101,7 +105,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   // This makes working within the DateRangePicker much more user friendly.
   const [wipValue, setWipValue] = useState(value);
   const [inputValue, setInputValue] = useState(
-    (props.mode === "range" ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
+    (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
   );
   const tid = useTestIds(props, defaultTestId(label));
   const isDisabled = !!disabled;
@@ -136,7 +140,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         if (wipValue && dateFormat !== dateFormats.short) {
           // When focused, change to use the "short" date format, as it is simpler to update by hand and parse.
           setInputValue(
-            (props.mode === "range"
+            (isRangeMode
               ? formatDateRange(props.value, dateFormats.short)
               : formatDate(props.value, dateFormats.short)) ?? "",
           );
@@ -154,20 +158,19 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           return;
         }
 
-        const parsedDate =
-          mode === "range" ? parseDateRange(inputValue, dateFormats.short) : parseDate(inputValue, dateFormats.short);
+        const parsedDate = isRangeMode
+          ? parseDateRange(inputValue, dateFormats.short)
+          : parseDate(inputValue, dateFormats.short);
         // If the user leaves the input and has an invalid date, reset to previous value.
         if (!isParsedDateValid(parsedDate)) {
           setWipValue(value);
           setInputValue(
-            (props.mode === "range" ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ??
-              "",
+            (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
           );
         } else if (dateFormat !== dateFormats.short) {
           // Or if we need to reset the dateFormat back from `short` to whatever the user specified
           setInputValue(
-            (props.mode === "range" ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ??
-              "",
+            (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
           );
         }
 
@@ -194,6 +197,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     },
     buttonRef,
   );
+
   const { overlayProps: positionProps } = useOverlayPosition({
     targetRef: inputWrapRef,
     overlayRef,
@@ -211,10 +215,10 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     if (!isFocused && !state.isOpen) {
       setWipValue(value);
       setInputValue(
-        (props.mode === "range" ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
+        (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps - Do not include `isFocused` or `state.isOpen`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     // We don't want to update the internal `wipValue` or `inputValue` back to `value` just because focus state changes or the overlay opens
   }, [value, dateFormat]);
 
@@ -223,18 +227,21 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     (d: Date | DateRange | undefined) => {
       setWipValue(d);
       if (d && isParsedDateValid(d)) {
-        if (props.mode === "range" && isDateRange(d)) {
+        if (isRangeMode && isDateRange(d)) {
           props.onChange(d);
           return;
         }
 
-        if (props.mode === "single" && !isDateRange(d)) {
+        if (!isRangeMode && !isDateRange(d)) {
           props.onChange(d);
           return;
         }
+      } else {
+        props.onChange(undefined);
+        return;
       }
     },
-    [mode, props.onChange],
+    [isRangeMode, props.onChange],
   );
 
   // If showing the short date format, "01/01/20", so set size to 8. If medium (Wed, Nov 23) use 10 characters (leaving out the `,` character in the count because it is so small)
@@ -243,7 +250,23 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   // TODO: figure this out... seems weird to have now that we support multiple dates formats....
   // How do other applications handle this defined sizing? Appears they use hard coded widths depending on format, which is similar here (using `size` instead of css `width`).
   // But would also need to allow for the input to be `fullWidth`, which is basically also what we're accomplishing here... so maybe fine?
-  const inputSize = mode !== "range" ? (format === "short" ? 8 : format === "medium" ? 10 : undefined) : undefined;
+  const inputSize = !isRangeMode ? (format === "short" ? 8 : format === "medium" ? 10 : undefined) : undefined;
+
+  // Support input range filter field w/ a clear btn that will appear when overlay is closed and input is not focused
+  const clearButton = (
+    <>
+      {inputValue !== "" && !state.isOpen && (
+        <IconButton
+          icon="xCircle"
+          color={Palette.Gray700}
+          onClick={() => {
+            setInputValue("");
+            onChange(undefined);
+          }}
+        />
+      )}
+    </>
+  );
 
   const calendarButton = (
     <button
@@ -254,8 +277,15 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
       tabIndex={-1}
       {...tid.calendarButton}
     >
-      <Icon icon="calendar" color={Palette.Gray700}/>
+      <Icon icon="calendar" color={Palette.Gray700} />
     </button>
+  );
+
+  const EndFieldButtons = (
+    <>
+      {isRangeFilterField && clearButton}
+      {!hideCalendarIcon && calendarButton}
+    </>
   );
 
   return (
@@ -276,12 +306,16 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           if (v) {
             setInputValue(v);
             // If changing the value directly (vs using the DatePicker), then we always use the short format
-            const parsed = mode === "range" ? parseDateRange(v, dateFormats.short) : parseDate(v, dateFormats.short);
+            const parsed = isRangeMode ? parseDateRange(v, dateFormats.short) : parseDate(v, dateFormats.short);
             onChange(parsed);
           }
+          // User has deleted all text in field
+          else if (v === undefined) {
+            setInputValue("");
+          }
         }}
-        endAdornment={(!hideCalendarIcon && !iconLeft) && calendarButton}
-        startAdornment={(!hideCalendarIcon && iconLeft) && calendarButton}
+        endAdornment={!iconLeft && EndFieldButtons}
+        startAdornment={!hideCalendarIcon && iconLeft && calendarButton}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         {...others}
       />
@@ -294,7 +328,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           isOpen={state.isOpen}
         >
           <DatePickerOverlay overlayProps={overlayProps}>
-            {props.mode === "range" ? (
+            {isRangeMode ? (
               <DateRangePicker
                 range={wipValue as DateRange | undefined}
                 disabledDays={disabledDays}
@@ -303,6 +337,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
                   setInputValue(formatDateRange(dr, dateFormats.short) ?? "");
                   onChange(dr);
                 }}
+                useYearPicker={isRangeFilterField}
                 {...tid.datePicker}
               />
             ) : (

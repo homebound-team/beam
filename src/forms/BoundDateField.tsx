@@ -9,7 +9,7 @@ export type BoundDateFieldProps = Omit<DateFieldProps, "label" | "value" | "onCh
   // Make optional as it'll create a label from the field's key if not present
   label?: string;
   // Optional in case the page wants extra behavior
-  onChange?: (value: Date) => void;
+  onChange?: (value: Date | undefined) => void;
 };
 
 /** Wraps `TextField` and binds it to a form field. */

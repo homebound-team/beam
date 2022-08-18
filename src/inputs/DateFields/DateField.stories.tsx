@@ -76,6 +76,6 @@ export function DatePickerOpen() {
 }
 
 function TestDateField(props: Omit<DateFieldProps, "value" | "onChange" | "onBlur" | "onFocus">) {
-  const [value, onChange] = useState(jan1);
+  const [value, onChange] = useState<Date | undefined>(jan1);
   return <DateField {...props} {...{ value, onChange }} onBlur={action("onBlur")} onFocus={action("onFocus")} />;
 }

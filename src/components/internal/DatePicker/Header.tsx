@@ -1,4 +1,4 @@
-import { addMonths, format } from "date-fns";
+import { addMonths, addYears, format } from "date-fns";
 import React from "react";
 import { CaptionProps, useNavigation } from "react-day-picker";
 import { IconButton } from "src/components/IconButton";
@@ -14,6 +14,27 @@ export function Header(props: CaptionProps) {
       <div>
         <IconButton color={Palette.Gray700} icon="chevronLeft" onClick={() => goToMonth(addMonths(displayMonth, -1))} />
         <IconButton color={Palette.Gray700} icon="chevronRight" onClick={() => goToMonth(addMonths(displayMonth, 1))} />
+      </div>
+    </div>
+  );
+}
+
+// Header with year skip option
+export function YearSkipHeader(props: CaptionProps) {
+  const { displayMonth } = props;
+  const { goToMonth } = useNavigation();
+
+  return (
+    <div css={Css.df.jcsb.aic.mlPx(12).mrPx(12).hPx(32).$}>
+      <div css={Css.df.fdr.jcsb.$}>
+        <IconButton color={Palette.Gray700} icon="chevronLeft" onClick={() => goToMonth(addMonths(displayMonth, -1))} />
+        <h1 css={Css.base.$}>{format(displayMonth, "MMM")}</h1>
+        <IconButton color={Palette.Gray700} icon="chevronRight" onClick={() => goToMonth(addMonths(displayMonth, 1))} />
+      </div>
+      <div css={Css.df.fdr.jcsb.$}>
+        <IconButton color={Palette.Gray700} icon="chevronLeft" onClick={() => goToMonth(addYears(displayMonth, -1))} />
+        <h1 css={Css.base.$}>{format(displayMonth, "yyyy")}</h1>
+        <IconButton color={Palette.Gray700} icon="chevronRight" onClick={() => goToMonth(addYears(displayMonth, 1))} />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { InternalUser, Market, Project, ProjectFilter, Stage, Status } from "src
 import {
   booleanFilter,
   dateFilter,
+  dateRangeFilter,
   FilterDefs,
   Filters,
   GridColumn,
@@ -16,7 +17,7 @@ import {
   toggleFilter,
 } from "src/components/index";
 import { Css } from "src/Css";
-import { jan1 } from "src/forms/formStateDomain";
+import { jan1, jan19 } from "src/forms/formStateDomain";
 import { usePersistedFilter } from "src/hooks";
 import { useGroupBy } from "src/hooks/useGroupBy";
 import { safeEntries } from "src/utils";
@@ -116,6 +117,14 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       defaultValue: { op: "BEFORE", value: jan1 },
     });
 
+    const dateRange = dateRangeFilter({
+      label: "Completion Estimate Range",
+      testFieldLabel: "Dates",
+      placeholderText: "All",
+      // Providing a default value, otherwise the default date in the DateField will be today's date, which will cause storybook diffs every day.
+      defaultValue: { op: "BETWEEN", value: { from: jan1, to: jan19 } },
+    });
+
     const isTest = toggleFilter({ label: "Only show test projects" });
     const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", onValue: false });
 
@@ -126,6 +135,7 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       stage,
       status,
       date,
+      dateRange,
       isTest,
       doNotUse,
     };

@@ -1,4 +1,5 @@
 import { dateFilter, DateFilterValue } from "src/components/Filters/DateFilter";
+import { dateRangeFilter, DateRangeFilterValue } from "src/components/Filters/DateRangeFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { singleFilter } from "src/components/Filters/SingleFilter";
 import { FilterDefs } from "src/components/Filters/types";
@@ -45,11 +46,13 @@ export type ProjectFilter = {
   isTest?: boolean | null;
   doNotUse?: boolean | null;
   date?: DateFilterValue<string>;
+  dateRange?: DateRangeFilterValue<string>;
 };
 
 export type StageFilter = NonNullable<FilterDefs<ProjectFilter>["stage"]>;
 export type StageSingleFilter = NonNullable<FilterDefs<ProjectFilter>["stageSingle"]>;
 export type DateFilter = NonNullable<FilterDefs<ProjectFilter>["date"]>;
+export type DateRangeFilter = NonNullable<FilterDefs<ProjectFilter>["dateRange"]>;
 
 const stageOptions = [
   { code: Stage.StageOne, name: "One" },
@@ -77,6 +80,11 @@ export const taskDueFilter: DateFilter = dateFilter({
   label: "Task Due",
   getOperationLabel: (o) => o.label,
   getOperationValue: (o) => o.value,
+});
+
+export const taskCompleteFilter: DateRangeFilter = dateRangeFilter({
+  label: "Task Completed",
+  placeholderText: "This is some placeholder text",
 });
 
 export enum TaskStatus {

@@ -40,7 +40,7 @@ describe("DateField", () => {
     expect(onBlur).toBeCalledTimes(1);
   });
 
-  it("resets to previous date if user enters invalid value and does not fire onChange", async () => {
+  it("resets to previous date if user enters invalid value", async () => {
     // Given a DateField with `jan2` as our date
     const onChange = jest.fn();
     const r = await render(<DateField value={jan2} label="Date" onChange={onChange} />);
@@ -48,8 +48,6 @@ describe("DateField", () => {
     type(r.date, "f");
     // Then the date should reset to its initial value
     expect(r.date()).toHaveValue("01/02/20");
-    // And onChange should not be called
-    expect(onChange).not.toBeCalled();
   });
 
   it("fires onChange event when user types a valid date", async () => {

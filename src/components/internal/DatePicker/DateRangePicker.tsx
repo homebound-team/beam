@@ -1,7 +1,7 @@
 import React from "react";
 import { DayPicker, Matcher } from "react-day-picker";
 import { Day } from "src/components/internal/DatePicker/Day";
-import { Header } from "src/components/internal/DatePicker/Header";
+import { Header, YearSkipHeader } from "src/components/internal/DatePicker/Header";
 import { WeekHeader } from "src/components/internal/DatePicker/WeekHeader";
 import { Css } from "src/Css";
 import { DateRange } from "src/types";
@@ -13,10 +13,11 @@ export interface DateRangePickerProps {
   onSelect: (range: DateRange | undefined) => void;
   disabledDays?: Matcher | Matcher[];
   dottedDays?: Matcher[];
+  useYearPicker?: boolean;
 }
 
 export function DateRangePicker(props: DateRangePickerProps) {
-  const { range, onSelect, disabledDays, dottedDays } = props;
+  const { range, onSelect, disabledDays, dottedDays, useYearPicker } = props;
   const tid = useTestIds(props, "datePicker");
 
   return (
@@ -24,7 +25,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
       <DayPicker
         mode="range"
         selected={range}
-        components={{ Caption: Header, Head: WeekHeader, Day }}
+        components={{ Caption: useYearPicker ? YearSkipHeader : Header, Head: WeekHeader, Day }}
         defaultMonth={range?.to ?? new Date()}
         onSelect={(selection, day, activeModifiers) => {
           // Disallow returning disabled dates.

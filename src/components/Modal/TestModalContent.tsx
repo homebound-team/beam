@@ -26,7 +26,7 @@ export function TestModalContent(props: TestModalContentProps) {
   const [numSentences, setNumSentences] = useState(initNumSentences);
   const [primaryDisabled, setPrimaryDisabled] = useState(false);
   const [leftActionDisabled, setLeftActionDisabled] = useState(false);
-  const [date, setDate] = useState(jan1);
+  const [date, setDate] = useState<Date | undefined>(jan1);
   const [internalValue, setValue] = useState<string | undefined>("");
 
   return (
