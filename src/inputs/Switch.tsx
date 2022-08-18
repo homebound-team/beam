@@ -57,8 +57,8 @@ export function Switch(props: SwitchProps) {
         css={{
           ...Css.relative.cursorPointer.df.w("max-content").smEm.selectNone.$,
           ...(labelStyle === "form" && Css.fdc.$),
-          ...(labelStyle === "inline" && Css.childGap2.aic.$),
-          ...(labelStyle === "filter" && Css.jcsb.aic.w("auto").sm.$),
+          ...(labelStyle === "inline" && Css.gap2.aic.$),
+          ...(labelStyle === "filter" && Css.jcsb.gap1.aic.w("auto").sm.$),
           ...(isDisabled && Css.cursorNotAllowed.gray400.$),
         }}
         aria-label={label}
