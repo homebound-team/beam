@@ -20,34 +20,34 @@ describe("TabsWithContent", () => {
   it("should update the active tab", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />, withRouter());
-    expect(r.tabs_tab1()).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab1()).toHaveStyleRule("border-color", Palette.LightBlue700);
     // when an external state change moves us to the 2nd tab
     click(r.goToTab2);
     // Then tab2 is now actively styled
-    expect(r.tabs_tab2()).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab2()).toHaveStyleRule("border-color", Palette.LightBlue700);
   });
 
   it("should reset the active tab on blur", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />, withRouter());
-    expect(r.tabs_tab1()).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab1()).toHaveStyleRule("border-color", Palette.LightBlue700);
     // And we've moved to the 2nd tab
     fireEvent.keyUp(r.tabs_tab2(), { key: "ArrowRight" });
-    expect(r.tabs_tab2()).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab2()).toHaveStyleRule("border-color", Palette.LightBlue700);
     // When we blur away
     fireEvent.blur(r.tabs_tab1());
     // Then the 1st tab goes back to highlighted
-    expect(r.tabs_tab1()).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab1()).toHaveStyleRule("border-color", Palette.LightBlue700);
   });
 
   it("cannot click on disabled tabs", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />, withRouter());
-    expect(r.tabs_tab1()).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab1()).toHaveStyleRule("border-color", Palette.LightBlue700);
     // And we try to click on the 3rd disabled tab
     click(r.tabs_tab3);
     // Then nothing happens
-    expect(r.tabs_tab1()).toHaveStyleRule("color", Palette.LightBlue700);
+    expect(r.tabs_tab1()).toHaveStyleRule("border-color", Palette.LightBlue700);
   });
 
   describe("getNextTabValue function", () => {
