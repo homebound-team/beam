@@ -20,7 +20,7 @@ interface MenuItemProps {
 export function MenuItemImpl(props: MenuItemProps) {
   const { item, state, onClose } = props;
   const menuItem = item.value;
-  const { disabled: isDisabled, onClick, label, destructive } = menuItem;
+  const { disabled: isDisabled, onClick, label, destructive, forceSameBrowserTab } = menuItem;
   const isFocused = state.selectionManager.focusedKey === item.key;
   const ref = useRef<HTMLLIElement>(null);
   const history = useHistory();
@@ -34,7 +34,8 @@ export function MenuItemImpl(props: MenuItemProps) {
         if (typeof onClick === "string") {
           // if it is an absolute URL, then open in new window. Assuming this should leave the App
           if (isAbsoluteUrl(onClick)) {
-            window.open(onClick, "_blank", "noopener,noreferrer");
+            if (forceSameBrowserTab) (window.open(onClick, "_blank") as Window).opener = null;
+            else window.open(onClick, "_blank", "noopener,noreferrer");
             return;
           }
 
