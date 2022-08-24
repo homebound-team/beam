@@ -47,8 +47,6 @@ type MenuItemBase = {
   onClick: string | VoidFunction;
   disabled?: boolean;
   destructive?: boolean;
-  /** If using a string as the onClick value, and setting this to true will force the browser to open the link in the same browser window as a new tab */
-  forceSameBrowserTab?: boolean;
 };
 
 export type IconMenuItemType = MenuItemBase & {
