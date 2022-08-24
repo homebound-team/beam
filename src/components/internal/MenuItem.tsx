@@ -34,7 +34,13 @@ export function MenuItemImpl(props: MenuItemProps) {
         if (typeof onClick === "string") {
           // if it is an absolute URL, then open in new window. Assuming this should leave the App
           if (isAbsoluteUrl(onClick)) {
-            window.open(onClick, "_blank", "noopener,noreferrer");
+            // We want to do `window.open(url, "_blank", "noopener,noreferrer")` but that Safari treats
+            // that as "open in new window", this happens when safari has the "Open pages in tabs instead of windows" set to "Automatically" (which is the default)
+            // see https://support.apple.com/guide/safari/tabs-ibrw1045/mac (Open pages in tabs instead of windows) for other behaviors
+            //
+            // So we do this instead, and at least null out the opener
+            // as a way to manually mimic the `"noopener"` flag.
+            (window.open(onClick, "_blank") as Window).opener = null;
             return;
           }
 
