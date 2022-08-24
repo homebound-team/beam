@@ -1,6 +1,15 @@
 import memoizeOne from "memoize-one";
 import { Observer } from "mobx-react";
-import React, { MutableRefObject, ReactElement, ReactNode, useContext, useEffect, useMemo, useRef } from "react";
+import React, {
+  HTMLAttributes,
+  MutableRefObject,
+  ReactElement,
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { navLink } from "src/components/CssReset";
@@ -908,7 +917,7 @@ type RenderCellFn<R extends Kinded> = (
   content: ReactNode,
   row: R,
   rowStyle: RowStyle<R> | undefined,
-  classNames: string | undefined,
+  cellAttributes: HTMLAttributes<HTMLDivElement | HTMLAnchorElement | HTMLTableCellElement>,
 ) => ReactNode;
 
 /** Defines row-specific styling for each given row `kind` in `R` */
@@ -964,7 +973,7 @@ export type GridCellAlignment = "left" | "right" | "center";
  * Allows a cell to be more than just a RectNode, i.e. declare its alignment or
  * primitive value for filtering and sorting.
  */
-export type GridCellContent = {
+export type GridCellContent = Omit<HTMLAttributes<HTMLDivElement | HTMLAnchorElement | HTMLTableCellElement>, "css"> & {
   /** The JSX content of the cell. Virtual tables that client-side sort should use a function to avoid perf overhead. */
   content: ReactNode | (() => ReactNode);
   alignment?: GridCellAlignment;
@@ -1129,8 +1138,24 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           return null;
         }
         const maybeContent = applyRowFn(column, row, api, level);
-        currentColspan = isGridCellContent(maybeContent) ? maybeContent.colspan ?? 1 : 1;
-        const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
+
+        // Destructuring all properties out of GridCellContent so we can grab the `...others` that may include HTML Attributes, such as a data-testid
+        const {
+          content: _content,
+          alignment: _alignment,
+          value,
+          sortValue,
+          indent,
+          colspan = 1,
+          typeScale,
+          sticky: cellSticky,
+          onClick,
+          css: cellContentCss,
+          revealOnRowHover = false,
+          ...others
+        } = isGridCellContent(maybeContent) ? maybeContent : ({} as GridCellContent);
+
+        currentColspan = colspan;
 
         const canSortColumn =
           (sortOn === "client" && column.clientSideSort !== false) ||
@@ -1142,7 +1167,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
         ensureClientSideSortValueIsSortable(sortOn, isHeader, column, columnIndex, maybeContent);
         const maybeNestedCardColumnIndex = columnIndex + (style.nestedCards ? 1 : 0);
 
-        const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
+        const maybeSticky = (cellSticky || column.sticky) ?? undefined;
         const maybeStickyColumnStyles =
           maybeSticky && columnSizes
             ? {
@@ -1205,9 +1230,9 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             ? Css.bgColor(style.activeBgColor ?? Palette.LightBlue50).$
             : {}),
           // Add any cell specific style overrides
-          ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
+          ...(typeScale ? Css[typeScale].$ : {}),
           // And any cell specific css
-          ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
+          ...(cellContentCss ? cellContentCss : {}),
           // Define the width of the column on each cell. Supports col spans.
           ...{
             width: `calc(${columnSizes
@@ -1217,7 +1242,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...(column.mw ? Css.mw(column.mw).$ : {}),
         };
 
-        const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
+        const cellAttributes = { className: revealOnRowHover ? revealOnRowHoverClass : undefined, ...others };
 
         const renderFn: RenderCellFn<any> =
           (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
@@ -1228,7 +1253,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);
 
-        return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames);
+        return renderFn(columnIndex, cellCss, content, row, rowStyle, cellAttributes);
       })}
     </Row>
   );
@@ -1350,10 +1375,10 @@ export function applyRowFn<R extends Kinded>(
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
 const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
-  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
+  (as: RenderAs) => (key, css, content, row, rowStyle, cellAttributes) => {
     const Cell = as === "table" ? "td" : "div";
     return (
-      <Cell key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames}>
+      <Cell key={key} css={{ ...css, ...tableRowStyles(as) }} {...cellAttributes}>
         {content}
       </Cell>
     );
@@ -1367,8 +1392,7 @@ const headerRenderFn: (
   setSortKey: Function | undefined,
   as: RenderAs,
 ) => RenderCellFn<any> =
-  (columns, column, sortState, setSortKey, as) =>
-  (key, css, content, row, rowStyle, classNames: string | undefined) => {
+  (columns, column, sortState, setSortKey, as) => (key, css, content, row, rowStyle, cellAttributes) => {
     const [currentKey, direction] = sortState || [];
     // If server-side sorting, use the user's key for this column; client-side sorting, use the index.
     const ourSortKey = column.serverSideSortKey || columns.indexOf(column);
@@ -1379,7 +1403,7 @@ const headerRenderFn: (
     const Cell = as === "table" ? "th" : "div";
     return (
       <GridSortContext.Provider key={key} value={context}>
-        <Cell css={{ ...css, ...tableRowStyles(as, column) }} className={classNames}>
+        <Cell css={{ ...css, ...tableRowStyles(as, column) }} {...cellAttributes}>
           {content}
         </Cell>
       </GridSortContext.Provider>
@@ -1388,11 +1412,12 @@ const headerRenderFn: (
 
 /** Renders a cell element when a row link is in play. */
 const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
-  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
+  (as: RenderAs) => (key, css, content, row, rowStyle, cellAttributes) => {
     const to = rowStyle!.rowLink!(row);
+    const { className, ...others } = cellAttributes;
     if (as === "table") {
       return (
-        <td key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames}>
+        <td key={key} css={{ ...css, ...tableRowStyles(as) }} {...cellAttributes}>
           <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
             {content}
           </Link>
@@ -1404,7 +1429,8 @@ const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
         key={key}
         to={to}
         css={{ ...Css.noUnderline.color("unset").$, ...css }}
-        className={`${navLink} ${classNames}`}
+        className={`${navLink} ${className}`}
+        {...others}
       >
         {content}
       </Link>
@@ -1413,17 +1439,17 @@ const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
 
 /** Renders a cell that will fire the RowStyle.onClick. */
 const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>) => RenderCellFn<any> =
-  (as: RenderAs, api: GridTableApi<any>) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
-    const Row = as === "table" ? "tr" : "div";
+  (as: RenderAs, api: GridTableApi<any>) => (key, css, content, row, rowStyle, cellAttributes) => {
+    const Cell = as === "table" ? "td" : "div";
     return (
-      <Row
+      <Cell
         {...{ key }}
         css={{ ...css, ...tableRowStyles(as) }}
-        className={classNames}
+        {...cellAttributes}
         onClick={() => rowStyle!.onClick!(row, api)}
       >
         {content}
-      </Row>
+      </Cell>
     );
   };
 

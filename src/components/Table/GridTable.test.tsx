@@ -2306,6 +2306,72 @@ describe("GridTable", () => {
     // And they can no longer be fetched by the api
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
+
+  it("can set test ids on cell elements", async () => {
+    // Given different row types for each render function
+    type HeaderRender = { kind: "header"; id: string; data: {} };
+    type DefaultRender = { kind: "default"; id: string; data: { name: string; value: number } };
+    type RowLinkRender = { kind: "link"; id: string; data: { name: string; value: number } };
+    type RowClickRender = { kind: "click"; id: string; data: { name: string; value: number } };
+    type RowRenderFn = HeaderRender | DefaultRender | RowLinkRender | RowClickRender;
+    // And columns with `data-testid` defined
+    const nameColumn: GridColumn<RowRenderFn> = {
+      header: () => ({ content: "Name", "data-testid": "headerCell_name" }),
+      default: ({ name }) => ({ content: name, "data-testid": "defaultCell_name" }),
+      link: ({ name }) => ({ content: name, "data-testid": "linkCell_name" }),
+      click: ({ name }) => ({ content: name, "data-testid": "clickCell_name" }),
+    };
+    const valueColumn: GridColumn<RowRenderFn> = {
+      header: () => ({ content: "Value", "data-testid": "headerCell_value" }),
+      default: ({ value }) => ({ content: value, "data-testid": "defaultCell_value" }),
+      link: ({ value }) => ({ content: value, "data-testid": "linkCell_value" }),
+      click: ({ value }) => ({ content: value, "data-testid": "clickCell_value" }),
+    };
+    const columns = [nameColumn, valueColumn];
+    // Given three rows, one of each render function
+    const rows: GridDataRow<RowRenderFn>[] = [
+      simpleHeader,
+      { kind: "default", id: "1", data: { name: "Name 1", value: 1 } },
+      { kind: "link", id: "2", data: { name: "Name 2 ", value: 2 } },
+      { kind: "click", id: "3", data: { name: "Name 3", value: 3 } },
+    ];
+    // And a rowStyle to trigger the expected render functions
+    const rowStyles: GridRowStyles<RowRenderFn> = {
+      link: { rowLink: () => "http://www.homebound.com" },
+      click: { onClick: () => {} },
+    };
+    // And two tables, 1 rendered with table elements and 1 with div elements
+    const rAsTable = await render(
+      <GridTable id="table" as="table" rows={rows} columns={columns} rowStyles={rowStyles} />,
+      {
+        at: { url: "/" },
+      },
+    );
+    const rAsDiv = await render(<GridTable id="div" rows={rows} columns={columns} rowStyles={rowStyles} />, {
+      at: { url: "/" },
+    });
+
+    // Then the cells should have the defined testids in each table
+    expect(cellOf(rAsDiv, "div", 0, 0)).toHaveAttribute("data-testid", "headerCell_name");
+    expect(cellOf(rAsDiv, "div", 0, 1)).toHaveAttribute("data-testid", "headerCell_value");
+    expect(cellOf(rAsTable, "table", 0, 0)).toHaveAttribute("data-testid", "headerCell_name");
+    expect(cellOf(rAsTable, "table", 0, 1)).toHaveAttribute("data-testid", "headerCell_value");
+
+    expect(cellOf(rAsDiv, "div", 1, 0)).toHaveAttribute("data-testid", "defaultCell_name");
+    expect(cellOf(rAsDiv, "div", 1, 1)).toHaveAttribute("data-testid", "defaultCell_value");
+    expect(cellOf(rAsTable, "table", 1, 0)).toHaveAttribute("data-testid", "defaultCell_name");
+    expect(cellOf(rAsTable, "table", 1, 1)).toHaveAttribute("data-testid", "defaultCell_value");
+
+    expect(cellOf(rAsDiv, "div", 2, 0)).toHaveAttribute("data-testid", "linkCell_name");
+    expect(cellOf(rAsDiv, "div", 2, 1)).toHaveAttribute("data-testid", "linkCell_value");
+    expect(cellOf(rAsTable, "table", 2, 0)).toHaveAttribute("data-testid", "linkCell_name");
+    expect(cellOf(rAsTable, "table", 2, 1)).toHaveAttribute("data-testid", "linkCell_value");
+
+    expect(cellOf(rAsDiv, "div", 3, 0)).toHaveAttribute("data-testid", "clickCell_name");
+    expect(cellOf(rAsDiv, "div", 3, 1)).toHaveAttribute("data-testid", "clickCell_value");
+    expect(cellOf(rAsTable, "table", 3, 0)).toHaveAttribute("data-testid", "clickCell_name");
+    expect(cellOf(rAsTable, "table", 3, 1)).toHaveAttribute("data-testid", "clickCell_value");
+  });
 });
 
 function Collapse({ id }: { id: string }) {
