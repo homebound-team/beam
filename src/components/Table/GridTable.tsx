@@ -1301,7 +1301,7 @@ function toContent(
   content =
     isGridCellContent(maybeContent) && !!maybeContent.onClick
       ? getButtonOrLink(content, maybeContent.onClick, {
-          css: Css.maxw100.lightBlue700.if(style?.presentationSettings?.wrap === false).truncate.$,
+          css: Css.maxw100.lightBlue700.ta("inherit").if(style?.presentationSettings?.wrap === false).truncate.$,
         })
       : content;
 
