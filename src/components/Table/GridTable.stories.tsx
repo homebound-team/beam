@@ -1217,6 +1217,44 @@ export function TruncatingCells() {
   );
 }
 
+export function InteractiveCellAlignment() {
+  const textCol: GridColumn<AlignmentRow> = {
+    header: "As Text",
+    data: ({ name, alignment }) => ({ content: name, alignment }),
+    w: "160px",
+  };
+  const buttonCol: GridColumn<AlignmentRow> = {
+    header: "As Button",
+    data: ({ name, alignment }) => ({ content: name, onClick: action("Name column button clicked"), alignment }),
+    w: "160px",
+  };
+  const relativeLinkCol: GridColumn<AlignmentRow> = {
+    header: "As Link",
+    data: ({ name, alignment }) => ({ content: <span>{name}</span>, onClick: "/relative/url", alignment }),
+    w: "160px",
+  };
+  const externalLinkCol: GridColumn<AlignmentRow> = {
+    header: "As External Link",
+    data: ({ name, alignment }) => ({ content: <span>{name}</span>, onClick: "http://www.homebound.com", alignment }),
+    w: "160px",
+  };
+
+  return (
+    <GridTable
+      columns={[textCol, buttonCol, relativeLinkCol, externalLinkCol]}
+      style={{}}
+      rows={[
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "Left aligned ".repeat(3), alignment: "left" as const } },
+        { kind: "data", id: "2", data: { name: "Center aligned ".repeat(3), alignment: "center" as const } },
+        { kind: "data", id: "3", data: { name: "Right aligned ".repeat(3), alignment: "right" as const } },
+      ]}
+    />
+  );
+}
+type AlignmentData = { name: string | undefined; alignment: "left" | "right" | "center" };
+type AlignmentRow = SimpleHeaderAndData<AlignmentData>;
+
 export function PrimaryColumnSorting() {
   type FavoriteData = { name: string; value: number; favorite: boolean };
   type FavoriteRow = SimpleHeaderAndData<FavoriteData>;
