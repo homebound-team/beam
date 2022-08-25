@@ -37,7 +37,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
   const state = useTreeState({ children: menuChildren, items: tree.items.map((i) => i.value), selectionMode: "none" });
 
   const menuRef = useRef(null);
-  const { menuProps } = useMenu<any>({ ...ariaMenuProps, children: menuChildren, autoFocus: true }, state, menuRef);
+  const { menuProps } = useMenu<any>({ ...ariaMenuProps, autoFocus: true }, state, menuRef);
   const tid = useTestIds(props);
 
   // Bulk updates of MenuItems below. If we find this to be of sluggish performance, then we can change to be more surgical in our updating.

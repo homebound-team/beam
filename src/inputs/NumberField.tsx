@@ -1,8 +1,7 @@
 import { NumberParser } from "@internationalized/number";
-import type { NumberFieldStateProps } from "@react-stately/numberfield";
 import { ReactNode, useMemo, useRef } from "react";
 import { useLocale, useNumberField } from "react-aria";
-import { useNumberFieldState } from "react-stately";
+import { NumberFieldStateOptions, useNumberFieldState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Xss } from "src/Css";
@@ -108,7 +107,7 @@ export function NumberField(props: NumberFieldProps) {
   const valueRef = useRef<ValueRef>({ wip: false });
 
   // We can use this for both useNumberFieldState + useNumberField
-  const useProps: NumberFieldStateProps = {
+  const useProps: NumberFieldStateOptions = {
     locale,
     // We want percents && cents to be integers, useNumberFieldState excepts them as decimals
     value: valueRef.current.wip ? valueRef.current.value : value === undefined ? Number.NaN : value / factor,

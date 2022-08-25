@@ -17,11 +17,11 @@ describe("ButtonMenu", () => {
     expect(r.menuTrigger_menuItems().childNodes).toHaveLength(3);
 
     // With first item is not disabled
-    expect(r.menuTrigger_itemOne()).not.toHaveAttribute("aria-disabled");
+    expect(r.menuTrigger_itemOne()).toHaveAttribute("aria-disabled", "false");
     // When setting the disabled property on the first item
     click(r.disable);
     // Then expect the item to have disabled set
-    expect(r.menuTrigger_itemOne()).toHaveAttribute("aria-disabled");
+    expect(r.menuTrigger_itemOne()).toHaveAttribute("aria-disabled", "true");
 
     // When Adding a new item
     click(r.add);
