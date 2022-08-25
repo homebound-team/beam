@@ -47,6 +47,9 @@ type MenuItemBase = {
   onClick: string | VoidFunction;
   disabled?: boolean;
   destructive?: boolean;
+  // For section Menu Items
+  hideLabel?: boolean;
+  items?: MenuItem[];
 };
 
 export type IconMenuItemType = MenuItemBase & {
@@ -60,5 +63,3 @@ export type ImageMenuItemType = MenuItemBase & {
 };
 
 export type MenuItem = MenuItemBase | IconMenuItemType | ImageMenuItemType;
-// This is done just to adapt to the React-Aria API for generating Sectioned lists of Menu Items.
-export type MenuSection = MenuItem & { items?: MenuItem[] };

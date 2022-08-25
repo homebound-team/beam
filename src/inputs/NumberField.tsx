@@ -93,7 +93,7 @@ export function NumberField(props: NumberFieldProps) {
 
   // Keep a ref the last "before WIP" value that we passed into react-aria.
   //
-  // This is b/c NumberFieldStateProps.onChange only actually calls during
+  // This is b/c NumberFieldStateOptions.onChange only actually calls during
   // `onBlur`, with the committed value. But we want our FieldStates to have
   // the latest WIP value, i.e. so that validation rules can be reacting
   // real time.
