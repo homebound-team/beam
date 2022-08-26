@@ -106,7 +106,6 @@
     "chromatic": "^5.9.2",
     "conventional-changelog-conventionalcommits": "^4.5.0",
     "esbuild": "^0.15.5",
-    "esbuild-node-externals": "^1.4.1",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-config-react-app": "^6.0.0",
