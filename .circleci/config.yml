@@ -46,6 +46,7 @@ jobs:
           pkg-manager: yarn
       - run: yarn build
       - run: yarn test
+      - run: node ./esbuild.js
 
   publish:
     resource_class: "xlarge"

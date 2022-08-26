@@ -4,7 +4,10 @@
   "author": "Homebound",
   "license": "MIT",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "style": "dist/index.css",
   "typings": "dist/index.d.ts",
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/homebound-team/beam"
@@ -14,9 +17,6 @@
     "!dist/**/*.{stories,test}.*",
     "!dist/setupTests.*"
   ],
-  "engines": {
-    "node": ">=16.4.0"
-  },
   "scripts": {
     "start": "yarn storybook",
     "build": "yarn copy && ttsc",
@@ -105,6 +105,7 @@
     "babel-loader": "^8.2.2",
     "chromatic": "^5.9.2",
     "conventional-changelog-conventionalcommits": "^4.5.0",
+    "esbuild": "^0.15.5",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-config-react-app": "^6.0.0",
