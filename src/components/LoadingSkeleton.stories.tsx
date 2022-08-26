@@ -27,14 +27,12 @@ export const Examples = () => (
   </div>
 );
 
-function Template(args: LoadingSkeletonProps) {
-  return (
-    <div>
-      <h1 css={Css.xl2Em.mb1.bb.bGray400.$}>Use Control Panel to Set Properties</h1>
-      <LoadingSkeleton {...args} />
-    </div>
-  );
-}
+const Template = (args: LoadingSkeletonProps) => (
+  <div>
+    <h1 css={Css.xl2Em.mb1.bb.bGray400.$}>Use Control Panel to Set Properties</h1>
+    <LoadingSkeleton {...args} />
+  </div>
+);
 
 export const InteractiveExample = Template.bind({});
 // @ts-ignore
@@ -45,6 +43,10 @@ InteractiveExample.args = {
   randomizeWidths: true,
 };
 
-// TODO: Add contrast styles
-// export const Contrast = () =>
-// Contrast.parameters = { backgrounds: { default: "dark" } };
+export const Contrast = () => (
+  <div>
+    <h1 css={Css.xl2Em.mb1.bb.bGray400.gray400.$}>Contrast Background Example</h1>
+    <LoadingSkeleton rows={5} />
+  </div>
+);
+Contrast.parameters = { backgrounds: { default: "dark" } };
