@@ -46,7 +46,7 @@ InteractiveExample.args = {
 export const Contrast = () => (
   <div>
     <h1 css={Css.xl2Em.mb1.bb.bGray400.gray400.$}>Contrast Background Example</h1>
-    <LoadingSkeleton rows={5} />
+    <LoadingSkeleton rows={5} contrast />
   </div>
 );
 Contrast.parameters = { backgrounds: { default: "dark" } };

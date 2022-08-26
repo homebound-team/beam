@@ -55,7 +55,7 @@ const ourReset = css`
 
   @keyframes pulse {
     50% {
-      opacity: 0.7;
+      opacity: 0.6;
     }
   }
 `;
