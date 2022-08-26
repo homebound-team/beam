@@ -1,4 +1,4 @@
 module.exports = {
-  extends: ["react-app", "prettier"],
+  extends: ["react-app", "prettier", "plugin:storybook/recommended"],
   rules: {},
 };
