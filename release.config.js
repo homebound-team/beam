@@ -6,7 +6,7 @@ module.exports = {
     [
       "@semantic-release/exec",
       {
-        prepareCmd: "yarn build && node ./esbuild.js",
+        prepareCmd: "yarn build",
       },
     ],
     "@semantic-release/npm",
