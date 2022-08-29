@@ -1,0 +1,19 @@
+import { Meta, ArgsTable, Canvas, Story } from "@storybook/addon-docs";
+import { Button } from "./Button"
+
+<Meta title="Catalog/Button" component={Button} parameters={{options: { withPerformance: { disabled: true } }}} />
+
+export const Template = (args) => {
+  const onClick = () => {};
+  return <Button label="Test" onClick={onClick} {...args} />
+}
+
+# Buttons
+
+<Canvas>
+  <Story name="primary" args={{ variant: "primary" }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable exclude={["menuTriggerProps"]} />

@@ -4,7 +4,7 @@ const reactPlugin = require("@vitejs/plugin-react");
 
 module.exports = {
   core: { builder: "@storybook/builder-vite" },
-  stories: ["../src/**/*.stories.tsx"],
+  stories: ["../src/**/*.stories.tsx", "../src/**/*.stories.mdx"],
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
@@ -13,6 +13,7 @@ module.exports = {
   ],
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: { check: false },
+  features: { previewMdx2: true },
   async viteFinal(config) {
     const mergedConfig = mergeConfig(config, {
       esbuild: {
@@ -21,6 +22,7 @@ module.exports = {
         logOverride: { "this-is-undefined-in-esm": "silent" },
       },
       resolve: {
+        // Add aliasing to resolve absolute paths for imports
         alias: {
           src: path.resolve(__dirname, "../src"),
         },

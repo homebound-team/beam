@@ -1,7 +1,5 @@
 import { Parameters, StoryFn } from "@storybook/addons";
-import { addDecorator } from "@storybook/react";
 import { configure } from "mobx";
-import { withPerformance } from "storybook-addon-performance";
 import { CssReset } from "../src";
 
 // formState doesn't use actions
@@ -37,8 +35,6 @@ export const parameters: Parameters = {
     hideNoControlsWarning: true,
   },
 };
-
-addDecorator(withPerformance);
 
 // https://storybook.js.org/docs/react/writing-stories/decorators#global-decorators
 export const decorators = [withReset];
