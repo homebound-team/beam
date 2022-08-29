@@ -56,6 +56,8 @@ export const Icon = (props: IconProps) => {
     "helpCircle",
     "error",
     "xCircle",
+    "flag",
+    "outlineFlag",
   ];
   const arrowIcons: IconProps["icon"][] = [
     "chevronsDown",
@@ -75,8 +77,9 @@ export const Icon = (props: IconProps) => {
     "menuOpen",
   ];
   const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images", "openBook"];
-  const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar", "buildingHouse", "house", "flag", "outlineFlag"];
+  const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar", "buildingHouse", "house"];
   const navigationIcons: IconProps["icon"][] = ["projects", "tasks", "finances", "templates", "tradePartners"];
+  const weatherIcons: IconProps["icon"][] = ["fog", "cloudy", "hail", "ice", "partlyCloudy", "rain", "snow", "sunny", "thunderstorms", "windy"];
 
   return (
     <div css={Css.gray900.$}>
@@ -128,6 +131,15 @@ export const Icon = (props: IconProps) => {
       <h1 css={Css.xl2Em.$}>Navigation</h1>
       <ul css={{ gap: 24, listStyle: "none", gridTemplateColumns: "repeat(4, 1fr)", ...Css.dg.p0.$ }}>
         {navigationIcons.map((icon, i) => (
+          <li css={{ gap: 8, ...Css.xsEm.df.aic.fdc.$ }} key={icon}>
+            <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
+            {icon}
+          </li>
+        ))}
+      </ul>
+      <h1 css={Css.xl2Em.$}>Weather</h1>
+      <ul css={{ gap: 24, listStyle: "none", gridTemplateColumns: "repeat(5, 1fr)", ...Css.dg.p0.$ }}>
+        {weatherIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsEm.df.aic.fdc.$ }} key={icon}>
             <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
             {icon}
