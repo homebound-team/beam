@@ -52,23 +52,3 @@ Our proposal for solving this tension is to adopt a radically different model th
 "Adopters" of Beam should of course contribute back bug fixes and feature improvements; but they should also feel free (and encouraged) to run their own company-specific forks, and "customize by changing the source".
 
 In this way, Beam should be seen as a place to "copy & paste" start from, rather than a project that will have 1,000s of npm downloads, and 100s of companies all collaborating on getting this _one_ `TextField` implementation to behave in the 101 different ways that they each want.
-
-## Bundling
-
-Beam provides both CommonJS and ESM artifacts.
-
-The CommonJS artifacts are the output of the TypeScript compiler, are not bundled, and are intended to be used downstream for unit testing i.e. in Jest.
-
-The ESM artifacts are from esbuild, and are bundled, and instead to be used for downstream bundling, i.e. in create-react-app/vitejs.
-
-In terms of pros/cons of bundling:
-
-- Pro: The biggest pro is the `esbuild` also bundles our CSS into `dist/index.css`, which we can refer to using `style: dist/index.css` in our `package.json`.
-
-  Without this bundled CSS, vitejs was unable to rewrite the `require(./DateField.css)` line, and we were having to patch around it.
-
-  Granted, a) we really don't use a lot of external file CSS files anyway, and b) we could bundle _just_ our CSS.
-
-- Pro: The bundle is already ESM, which should "make life easier" (admittedly kinda vague) for vitejs downstream.
-
-- (Non-con): I'd thought that a single `index.mjs` would not get tree-shaken, but shaking happens at the `export`-d symbol level and not a file level, so we should be fine.
