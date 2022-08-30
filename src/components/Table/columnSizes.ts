@@ -1,5 +1,5 @@
 import { useResizeObserver } from "@react-aria/utils";
-import {MutableRefObject, useCallback, useEffect, useRef, useState} from "react";
+import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { calcColumnSizes, GridColumn, GridStyle } from "src/components/Table/GridTable";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -52,7 +52,7 @@ export function useSetupColumnSizes(
       const width = resizeRef.current?.clientWidth;
       width && setTableAndColumnWidths(width);
     }
-  }, [columns, setTableAndColumnWidths])
+  }, [columns, setTableAndColumnWidths]);
 
   const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
 
