@@ -34,3 +34,7 @@ export function ColoredChips() {
     </div>
   );
 }
+
+export function ChipWithCustomTitle() {
+  return <Chip text="Chip text content, hover me" title="Chip has a custom title, different than the content" />;
+}
