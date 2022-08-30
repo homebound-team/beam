@@ -1,5 +1,5 @@
 import { useResizeObserver } from "@react-aria/utils";
-import { MutableRefObject, useCallback, useRef, useState } from "react";
+import {MutableRefObject, useCallback, useEffect, useRef, useState} from "react";
 import { calcColumnSizes, GridColumn, GridStyle } from "src/components/Table/GridTable";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -35,7 +35,6 @@ export function useSetupColumnSizes(
 
   // Calc our initial/first render sizes where we won't have a width yet
   const [columnSizes, setColumnSizes] = useState<string[]>(
-    // TODO Add a useEffect to re-calc this on change
     calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, tableWidth, style.minWidthPx),
   );
 
@@ -46,6 +45,14 @@ export function useSetupColumnSizes(
     },
     [setTableWidth, setColumnSizes, columns, style],
   );
+
+  // Used to recalculate our columns sizes when columns change
+  useEffect(() => {
+    if (!calculateImmediately.current) {
+      const width = resizeRef.current?.clientWidth;
+      width && setTableAndColumnWidths(width);
+    }
+  }, [columns, setTableAndColumnWidths])
 
   const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
 
