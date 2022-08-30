@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { Chips } from "src/components/Chips";
+import { Chips, ChipValue } from "src/components/Chips";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 
@@ -29,4 +29,12 @@ export function DefaultChips() {
       </div>
     </>
   );
+}
+
+export function ChipsWithCustomTitles() {
+  const customChips: ChipValue[] = [
+    { text: "Chip 1 Content", title: "Custom title 1" },
+    { text: "Chip 2 Content", title: "Custom title 2" },
+  ];
+  return <Chips values={customChips} />;
 }
