@@ -18,4 +18,10 @@ describe("Chip", () => {
     const r = await render(<Chip text="Chip text content" data-testid="custom" />);
     expect(r.custom().textContent).toBe("Chip text content");
   });
+
+  it("can render with text different than title", async () => {
+    const r = await render(<Chip text="Chip text content" title="title is different" />);
+    expect(r.chip().textContent).toBe("Chip text content");
+    expect(r.chip()).toHaveAttribute("title", "title is different");
+  });
 });
