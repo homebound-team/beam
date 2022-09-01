@@ -65,9 +65,9 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
         {/* `overlay` needs to be applied using `addIn` otherwise the two `overflow` properties will be merged. */}
         <div
           css={{
-            ...Css.pl(context.pl).pr(context.pr).if(!hasScrollableContent).h100.overflowAuto.$,
+            ...Css.pl(context.pl).pr(context.pr),
             // Not using `Css.addIn` as it is added regardless of the `Css.if()` conditional
-            ...(!hasScrollableContent ? { "&:after": Css.contentEmpty.db.h2.$ } : undefined),
+            ...(!hasScrollableContent ? { ...Css.overflowAuto.$, ...scrollContainerBottomPadding } : undefined),
           }}
         >
           {children}
@@ -82,3 +82,6 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
 export function useScrollableParent() {
   return useContext(ScrollableParentContext);
 }
+
+// Styles to wrap around the scrollable content in order to give padding beneath the content within the scrollable container.
+export const scrollContainerBottomPadding = Css.h100.addIn("&:after", Css.contentEmpty.db.h2.$).$;
