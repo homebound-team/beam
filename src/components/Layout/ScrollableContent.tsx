@@ -24,7 +24,7 @@ export function ScrollableContent(props: { children: ReactNode; virtualized?: bo
 
   return createPortal(
     !virtualized ? (
-      children
+      <div css={Css.h100.addIn("&:after", Css.contentEmpty.db.h2.$).$}>{children}</div>
     ) : (
       // To prevent Virtuoso's scrollbar from being set in based on the Layout's padding, we will use the FullBleed component w/o padding to push it back over
       <FullBleed omitPadding>
