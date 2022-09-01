@@ -63,7 +63,14 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
       <Tag css={{ ...Css.mh0.mw0.fg1.df.fdc.$, ...otherXss }}>
         {/* Use `overflow: overlay` to prevent scrollbar from pushing content in when rendered. This is only supported in Webkit browsers, so we also keep `overflow: auto` as a fallback for other browsers.*/}
         {/* `overlay` needs to be applied using `addIn` otherwise the two `overflow` properties will be merged. */}
-        <div css={Css.pl(context.pl).pr(context.pr).if(!hasScrollableContent).h100.overflowAuto.$}>{children}</div>
+        <div
+          css={{
+            ...Css.pl(context.pl).pr(context.pr),
+            ...(!hasScrollableContent ? { ...Css.overflowAuto.$, ...scrollContainerBottomPadding } : undefined),
+          }}
+        >
+          {children}
+        </div>
         {/* Set fg1 to take up the remaining space in the viewport.*/}
         <div css={Css.fg1.overflowAuto.pl(context.pl).pr(context.pr).$} ref={scrollableRef} />
       </Tag>
@@ -74,3 +81,6 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
 export function useScrollableParent() {
   return useContext(ScrollableParentContext);
 }
+
+// Styles to wrap around the scrollable content in order to give padding beneath the content within the scrollable container.
+export const scrollContainerBottomPadding = Css.h100.addIn("&:after", Css.contentEmpty.db.h2.$).$;
