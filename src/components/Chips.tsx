@@ -5,8 +5,13 @@ import { Css, Margin, Only, Xss } from "src/Css";
 
 type ChipsXss = Xss<Margin>;
 
+export interface ChipValue {
+  text: string;
+  title: string;
+}
+
 export interface ChipsProps<X> {
-  values: string[];
+  values: string[] | ChipValue[];
   xss?: X;
 }
 
@@ -22,9 +27,10 @@ export function Chips<X extends Only<ChipsXss, X>>(props: ChipsProps<X>) {
         ...xss,
       }}
     >
-      {values.map((value, i) => (
-        <Chip key={i} text={value} />
-      ))}
+      {values.map((value, i) => {
+        const { text, title } = (value.hasOwnProperty("text") ? value : { text: value }) as ChipValue;
+        return <Chip key={i} text={text} title={title} />;
+      })}
     </div>
   );
 }

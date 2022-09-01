@@ -66,7 +66,6 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
         <div
           css={{
             ...Css.pl(context.pl).pr(context.pr),
-            // Not using `Css.addIn` as it is added regardless of the `Css.if()` conditional
             ...(!hasScrollableContent ? { ...Css.overflowAuto.$, ...scrollContainerBottomPadding } : undefined),
           }}
         >
