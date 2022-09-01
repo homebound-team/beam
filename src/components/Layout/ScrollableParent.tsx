@@ -65,7 +65,7 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
         {/* `overlay` needs to be applied using `addIn` otherwise the two `overflow` properties will be merged. */}
         <div
           css={{
-            ...Css.pl(context.pl).pr(context.pr),
+            ...Css.pl(context.pl).pr(context.pr).$,
             ...(!hasScrollableContent ? { ...Css.overflowAuto.$, ...scrollContainerBottomPadding } : undefined),
           }}
         >
