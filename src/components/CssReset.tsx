@@ -52,6 +52,12 @@ const ourReset = css`
       transform: rotate(360deg);
     }
   }
+
+  @keyframes pulse {
+    50% {
+      opacity: 0.6;
+    }
+  }
 `;
 
 // Copy/pasted from TW which uses this as their base reset.
