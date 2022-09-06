@@ -47,6 +47,7 @@ export interface GridStyleDef {
   inlineEditing?: boolean;
   grouped?: boolean;
   rowHeight?: "fixed" | "flexible";
+  cellHighlight?: boolean;
 }
 
 function memoizedTableStyles() {
