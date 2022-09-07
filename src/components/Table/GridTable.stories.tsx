@@ -93,6 +93,39 @@ export const Hovering = newStory(
   { decorators: [withRouter()] },
 );
 
+export const ActiveCell = newStory(
+    () => {
+        const nameColumn: GridColumn<Row> = { name: "name", header: "Name", data: ({ name }) => name };
+        const valueColumn: GridColumn<Row> = { name: "value", header: "Value", data: ({ value }) => value };
+        const actionColumn: GridColumn<Row> = { name: "actions", header: "Action", data: () => <div>Actions</div> };
+        const rowStyles: GridRowStyles<Row> = useMemo(
+            () => ({
+                data: {
+                    onClick: (row, api) => {
+                        api.setActiveRowId(`data_${row.id}`);
+                    },
+                },
+            }),
+            [],
+        );
+        return (
+            <GridTable<Row>
+                columns={[nameColumn, valueColumn, actionColumn]}
+                activeCellId={`data_1_value`}
+                style={{ cellHighlight: true }}
+                rowStyles={rowStyles}
+                rows={[
+                    simpleHeader,
+                    { kind: "data", id: "1", data: { name: "c", value: 1 } },
+                    { kind: "data", id: "2", data: { name: "b", value: 2 } },
+                    { kind: "data", id: "3", data: { name: "a", value: 3 } },
+                ]}
+            />
+        );
+    },
+    { decorators: [withRouter()] },
+);
+
 export function VirtualFiltering() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [

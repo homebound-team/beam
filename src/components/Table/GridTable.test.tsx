@@ -24,8 +24,8 @@ import { cell, cellAnd, cellOf, click, render, row, rowAnd, type, withRouter } f
 type Data = { name: string; value: number | undefined | null };
 type Row = SimpleHeaderAndData<Data>;
 
-const nameColumn: GridColumn<Row> = { header: () => "Name", data: ({ name }) => name };
-const valueColumn: GridColumn<Row> = { header: () => "Value", data: ({ value }) => value };
+const nameColumn: GridColumn<Row> = { name: "name", header: () => "Name", data: ({ name }) => name };
+const valueColumn: GridColumn<Row> = { name: "value", header: () => "Value", data: ({ value }) => value };
 const columns = [nameColumn, valueColumn];
 
 const rows: GridDataRow<Row>[] = [
@@ -2108,6 +2108,20 @@ describe("GridTable", () => {
 
     // Then the first row/cell has the 'active' background color
     expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.LightBlue50);
+  });
+
+  it("reacts to setting activeCellId", async () => {
+
+    // Given a table initially rendered with an active cell id
+    const r = await render(
+        <GridTable columns={columns} rows={rows} style={{ cellHighlight: true }} activeCellId={"data_1_name"} />,
+    );
+    // Then expect the cell to have highlight style
+    expect(cell(r, 1, 0)).toHaveStyleRule("border-width", "1px");
+    expect(cell(r, 1, 0)).toHaveStyleRule("border-color", Palette.LightBlue900);
+    // Then expect other cells not to have highlight style
+    expect(cell(r, 1, 1)).not.toHaveStyleRule("border-width", "1px");
+    expect(cell(r, 1, 1)).not.toHaveStyleRule("border-color", Palette.LightBlue900);
   });
 
   it("can render with rows with initCollapsed defined", async () => {
