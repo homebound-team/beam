@@ -120,6 +120,30 @@ describe("MockSelectField", () => {
     // Then expect the rest of the options to be loaded in
     expect(r.getAllByRole("option")).toHaveLength(4);
   });
+
+  it("shows the helperText if given", async () => {
+    const options = [
+      { id: "1", name: "one" },
+      { id: "2", name: "two" },
+      { id: "3", name: "thr" },
+    ];
+    // Given a Select Field with 
+    const onSelect = jest.fn();
+    // When we render the MultiSelectField
+    const { test_helperText } = await render(
+      <MockSelectField
+        label="test"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+        value={"1"}
+        onSelect={onSelect}
+        options={options}
+        helperText={"Helper text test"}
+      />,
+    );
+    // Then the helperText shows up
+    expect(test_helperText()).toHaveTextContent("Helper text test");
+  });
 });
 
 function TestUpdateOptionsField<O, V extends Value>() {

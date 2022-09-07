@@ -16,7 +16,7 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
     onBlur,
     disabled,
     label,
-    disabledOptions,
+    disabledOptions = [],
     helperText,
   } = props;
   const tid = useTestIds(props, defaultTestId(label));
@@ -63,7 +63,7 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
         <option disabled value=""></option>
         {options.map((option, i) => {
           return (
-            <option key={i} value={getOptionValue(option)} disabled={disabledOptions?.includes(getOptionValue(option))}>
+            <option key={i} value={getOptionValue(option)} disabled={disabledOptions.includes(getOptionValue(option))}>
               {getOptionLabel(option)}
             </option>
           );

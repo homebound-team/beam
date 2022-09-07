@@ -130,6 +130,7 @@ describe("MockMultiSelectField", () => {
     // Given the 2nd and 3rd options are already selected
     const values = ["2", "3"];
     const onSelect = jest.fn();
+    // When we render the MultiSelectField
     const { test_helperText } = await render(
       <MockMultiSelectField
         label="test"
@@ -141,6 +142,7 @@ describe("MockMultiSelectField", () => {
         helperText={"Helper text test"}
       />,
     );
+    // Then the helperText shows up
     expect(test_helperText()).toHaveTextContent("Helper text test");
-  })
+  });
 });
