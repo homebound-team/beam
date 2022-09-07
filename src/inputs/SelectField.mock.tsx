@@ -18,6 +18,7 @@ export function SelectField<O extends object, V extends Key>(props: SelectFieldP
     disabled,
     disabledOptions = [],
     label,
+    helperText,
   } = props;
   const tid = useTestIds(props, defaultTestId(label));
 
@@ -31,44 +32,47 @@ export function SelectField<O extends object, V extends Key>(props: SelectFieldP
   }, [maybeOptions]);
 
   return (
-    <select
-      {...tid}
-      value={
-        // @ts-ignore - allow `value` to be seen as a string
-        value !== undefined && value !== "" && currentOption ? getOptionValue(currentOption) : ""
-      }
-      onChange={(e) => {
-        const option = options.find((o) => `${getOptionValue(o)}` === e.target.value) || options[0];
-        onSelect(getOptionValue(option), option);
-      }}
-      onFocus={async () => {
-        if (!Array.isArray(maybeOptions)) {
-          const result = await maybeOptions.load();
-          setOptions(result.options);
+    <div>
+      <select
+        {...tid}
+        value={
+          // @ts-ignore - allow `value` to be seen as a string
+          value !== undefined && value !== "" && currentOption ? getOptionValue(currentOption) : ""
         }
-        if (!readOnly && onFocus) onFocus();
-      }}
-      onBlur={() => {
-        if (!readOnly && onBlur) onBlur();
-      }}
-      // Read Only does not apply to `select` fields, instead we'll add in disabled for tests to verify.
-      disabled={!!(disabled || readOnly)}
-      data-error={!!errorMsg}
-      data-errormsg={errorMsg}
-      data-readonly={readOnly}
-    >
-      <option disabled value=""></option>
-      {options.map((option, i) => {
-        return (
-          <option
-            key={i}
-            value={`${getOptionValue(option)}`}
-            disabled={disabledOptions.includes(getOptionValue(option))}
-          >
-            {getOptionLabel(option)}
-          </option>
-        );
-      })}
-    </select>
+        onChange={(e) => {
+          const option = options.find((o) => `${getOptionValue(o)}` === e.target.value) || options[0];
+          onSelect(getOptionValue(option), option);
+        }}
+        onFocus={async () => {
+          if (!Array.isArray(maybeOptions)) {
+            const result = await maybeOptions.load();
+            setOptions(result.options);
+          }
+          if (!readOnly && onFocus) onFocus();
+        }}
+        onBlur={() => {
+          if (!readOnly && onBlur) onBlur();
+        }}
+        // Read Only does not apply to `select` fields, instead we'll add in disabled for tests to verify.
+        disabled={!!(disabled || readOnly)}
+        data-error={!!errorMsg}
+        data-errormsg={errorMsg}
+        data-readonly={readOnly}
+      >
+        <option disabled value=""></option>
+        {options.map((option, i) => {
+          return (
+            <option
+              key={i}
+              value={`${getOptionValue(option)}`}
+              disabled={disabledOptions.includes(getOptionValue(option))}
+            >
+              {getOptionLabel(option)}
+            </option>
+          );
+        })}
+      </select>
+      {helperText && <div {...tid.helperText}>{helperText}</div>}
+    </div>
   );
 }
