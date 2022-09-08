@@ -2075,7 +2075,8 @@ describe("GridTable", () => {
     expect(row(r, 2).getAttribute("data-render")).toEqual("1");
   });
 
-  it("memoizes rows based on the data attribute", async () => {
+  // Skip since we are always using Observable rows
+  it.skip("memoizes rows based on the data attribute", async () => {
     const [header, row1, row2] = rows;
     const columns = [nameColumn];
     // Given a table is initially rendered with 2 rows
@@ -2111,10 +2112,9 @@ describe("GridTable", () => {
   });
 
   it("reacts to setting activeCellId", async () => {
-
     // Given a table initially rendered with an active cell id
     const r = await render(
-        <GridTable columns={columns} rows={rows} style={{ cellHighlight: true }} activeCellId={"data_1_name"} />,
+      <GridTable columns={columns} rows={rows} style={{ cellHighlight: true }} activeCellId={"data_1_name"} />,
     );
     // Then expect the cell to have highlight style
     expect(cell(r, 1, 0)).toHaveStyleRule("border-width", "1px");

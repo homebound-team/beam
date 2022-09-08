@@ -93,8 +93,6 @@ export interface GridStyle {
   levels?: Record<number, { cellCss?: Properties; firstContentColumn?: Properties }>;
   /** Allows for customization of the background color used to denote an "active" row */
   activeBgColor?: Palette;
-  /** Enables cells Highlight and hover */
-  cellHighlight?: boolean;
 }
 
 export type NestedCardStyleByKind = Record<string, NestedCardStyle>;
@@ -225,8 +223,6 @@ export interface GridTableProps<R extends Kinded, S, X> {
   filterMaxRows?: number;
   /** Accepts the number of filtered rows (based on `filter`), for the caller to observe and display if they want. */
   setRowCount?: (rowCount: number) => void;
-  /** Sets the rows to be wrapped by mobx observers. */
-  observeRows?: boolean;
   /** A combination of CSS settings to set the static look & feel (vs. rowStyles which is per-row styling). */
   style?: GridStyle | GridStyleDef;
   /**
@@ -288,7 +284,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     fallbackMessage = "No rows found.",
     infoMessage,
     setRowCount,
-    observeRows,
     persistCollapse,
     resizeTarget,
     activeRowId,
@@ -354,10 +349,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
       const sortProps = row.kind === "header" ? { sortOn, sortState, setSortKey } : { sortOn };
-      const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
       return (
-        <RowComponent
+        <ObservedGridRow
           key={`${row.kind}-${row.id}`}
           {...{
             as,
@@ -444,7 +438,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     sortState,
     stickyHeader,
     stickyOffset,
-    observeRows,
     columnSizes,
     collapsedIds,
     getCount,
@@ -1032,8 +1025,6 @@ export type GridDataRow<R extends Kinded> = {
   initSelected?: boolean;
   /** Whether row can be selected */
   selectable?: false;
-  /** Column name that will be used to generate an unique identifier for every row cell */
-  name?: string;
 } & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
 
 /**
@@ -1126,146 +1117,137 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
   let firstContentColumnStylesApplied = false;
 
-  const rowNode = useComputed(
-    () => (
-      <Row css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
-        {columns.map((column, columnIndex) => {
-          const { wrapAction = true, isAction = false } = column;
+  const rowNode = (
+    <Row css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
+      {columns.map((column, columnIndex) => {
+        const { wrapAction = true, isAction = false } = column;
 
-          const applyFirstContentColumnStyles = !isHeader && !isAction && !firstContentColumnStylesApplied;
-          firstContentColumnStylesApplied ||= applyFirstContentColumnStyles;
+        const applyFirstContentColumnStyles = !isHeader && !isAction && !firstContentColumnStylesApplied;
+        firstContentColumnStylesApplied ||= applyFirstContentColumnStyles;
 
-          if (column.mw) {
-            // Validate the column's minWidth definition if set.
-            if (!column.mw.endsWith("px") && !column.mw.endsWith("%")) {
-              throw new Error("Beam Table column min-width definition only supports px or percentage values");
-            }
+        if (column.mw) {
+          // Validate the column's minWidth definition if set.
+          if (!column.mw.endsWith("px") && !column.mw.endsWith("%")) {
+            throw new Error("Beam Table column min-width definition only supports px or percentage values");
           }
+        }
 
-          // Decrement colspan count and skip if greater than 1.
-          if (currentColspan > 1) {
-            currentColspan -= 1;
-            return null;
-          }
-          const maybeContent = applyRowFn(column, row, api, level);
-          currentColspan = isGridCellContent(maybeContent) ? maybeContent.colspan ?? 1 : 1;
-          const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
+        // Decrement colspan count and skip if greater than 1.
+        if (currentColspan > 1) {
+          currentColspan -= 1;
+          return null;
+        }
+        const maybeContent = applyRowFn(column, row, api, level);
+        currentColspan = isGridCellContent(maybeContent) ? maybeContent.colspan ?? 1 : 1;
+        const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
 
-          const canSortColumn =
-            (sortOn === "client" && column.clientSideSort !== false) ||
-            (sortOn === "server" && !!column.serverSideSortKey);
-          const alignment = getAlignment(column, maybeContent);
-          const justificationCss = getJustification(column, maybeContent, as, alignment);
-          const content = toContent(maybeContent, isHeader, canSortColumn, sortOn === "client", style, as, alignment);
+        const canSortColumn =
+          (sortOn === "client" && column.clientSideSort !== false) ||
+          (sortOn === "server" && !!column.serverSideSortKey);
+        const alignment = getAlignment(column, maybeContent);
+        const justificationCss = getJustification(column, maybeContent, as, alignment);
+        const content = toContent(maybeContent, isHeader, canSortColumn, sortOn === "client", style, as, alignment);
 
-          ensureClientSideSortValueIsSortable(sortOn, isHeader, column, columnIndex, maybeContent);
-          const maybeNestedCardColumnIndex = columnIndex + (style.nestedCards ? 1 : 0);
+        ensureClientSideSortValueIsSortable(sortOn, isHeader, column, columnIndex, maybeContent);
+        const maybeNestedCardColumnIndex = columnIndex + (style.nestedCards ? 1 : 0);
 
-          const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
-          const maybeStickyColumnStyles =
-            maybeSticky && columnSizes
-              ? {
-                  ...Css.sticky.z1.$,
-                  // Need to apply a background to this cell to avoid content beneath it being shown when sticky.
-                  // Assumes background is white for non-nestedCard styles. This can be overridden via cellCss.
-                  ...(style.nestedCards?.kinds
-                    ? Css.bgColor(getCurrentBgColor(row, openCardStyles, style.nestedCards.kinds)).$
-                    : Css.bgWhite.$),
-                  ...(maybeSticky === "left"
-                    ? Css.left(
-                        maybeNestedCardColumnIndex === 0
-                          ? 0
-                          : `calc(${columnSizes.slice(0, maybeNestedCardColumnIndex).join(" + ")})`,
-                      ).$
-                    : {}),
-                  ...(maybeSticky === "right"
-                    ? Css.right(
-                        maybeNestedCardColumnIndex + 1 === columnSizes.length
-                          ? 0
-                          : `calc(${columnSizes
-                              .slice(maybeNestedCardColumnIndex + 1 - columnSizes.length)
-                              .join(" + ")})`,
-                      ).$
-                    : {}),
-                }
-              : {};
+        const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
+        const maybeStickyColumnStyles =
+          maybeSticky && columnSizes
+            ? {
+                ...Css.sticky.z1.$,
+                // Need to apply a background to this cell to avoid content beneath it being shown when sticky.
+                // Assumes background is white for non-nestedCard styles. This can be overridden via cellCss.
+                ...(style.nestedCards?.kinds
+                  ? Css.bgColor(getCurrentBgColor(row, openCardStyles, style.nestedCards.kinds)).$
+                  : Css.bgWhite.$),
+                ...(maybeSticky === "left"
+                  ? Css.left(
+                      maybeNestedCardColumnIndex === 0
+                        ? 0
+                        : `calc(${columnSizes.slice(0, maybeNestedCardColumnIndex).join(" + ")})`,
+                    ).$
+                  : {}),
+                ...(maybeSticky === "right"
+                  ? Css.right(
+                      maybeNestedCardColumnIndex + 1 === columnSizes.length
+                        ? 0
+                        : `calc(${columnSizes.slice(maybeNestedCardColumnIndex + 1 - columnSizes.length).join(" + ")})`,
+                    ).$
+                  : {}),
+              }
+            : {};
 
-          const cellId = `${row.kind}_${row.id}_${column.name}`;
-          const applyCellHighlight = column.name && !isHeader && !isTotals && style.cellHighlight;
-          const isCellActive = rowState.activeCellId === cellId;
+        const cellId = `${row.kind}_${row.id}_${column.name}`;
+        const applyCellHighlight = !!column.name && !isHeader && !isTotals;
+        const isCellActive = rowState.activeCellId === cellId;
 
-          // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
-          // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
-          // a few descendent selectors. However, that approach means the root grid-applied
-          // CSS has a high-specificity and so its harder for per-page/per-cell business logic
-          // to override it. So, we just calc the combined table-wide+per-cell-overridden CSS here,
-          // in a very CSS-in-JS idiomatic manner.
-          //
-          // In practice we've not seen any performance issues with this from our "large but
-          // not Google spreadsheets" tables.
-          const cellCss = {
-            // Adding display flex so we can align content within the cells
-            ...Css.df.$,
-            // Apply sticky column/cell styles
-            ...maybeStickyColumnStyles,
-            // Apply any static/all-cell styling
-            ...style.cellCss,
-            // Then override with first/last cell styling
-            ...getFirstOrLastCellCss(style, columnIndex, columns),
-            // Then override with per-cell/per-row justification/indentation
-            ...justificationCss,
-            ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
-            // Then apply any header-specific override
-            ...(isHeader && style.headerCellCss),
-            // Then apply any totals-specific override
-            ...(isTotals && style.totalsCellCss),
-            // Or level-specific styling
-            ...(!isHeader && !isTotals && !!style.levels && style.levels[level]?.cellCss),
-            // Level specific styling for the first content column
-            ...(applyFirstContentColumnStyles && !!style.levels && style.levels[level]?.firstContentColumn),
-            // The specific cell's css (if any from GridCellContent)
-            ...rowStyleCellCss,
-            // Apply active row styling for non-nested card styles.
-            ...(style.nestedCards === undefined && isActive
-              ? Css.bgColor(style.activeBgColor ?? Palette.LightBlue50).$
-              : {}),
-            // Add any cell specific style overrides
-            ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
-            // And any cell specific css
-            ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
-            // Apply cell highlight styles to active cell and hover
-            ...(applyCellHighlight
-              ? isCellActive
-                ? Css.bw1.bsSolid.bLightBlue900.br4.$
-                : { ":hover": Css.bgGray100.$ }
-              : {}),
-            // Define the width of the column on each cell. Supports col spans.
-            ...{
-              width: `calc(${columnSizes
-                .slice(maybeNestedCardColumnIndex, maybeNestedCardColumnIndex + currentColspan)
-                .join(" + ")})`,
-            },
-            ...(column.mw ? Css.mw(column.mw).$ : {}),
-          };
+        // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
+        // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
+        // a few descendent selectors. However, that approach means the root grid-applied
+        // CSS has a high-specificity and so its harder for per-page/per-cell business logic
+        // to override it. So, we just calc the combined table-wide+per-cell-overridden CSS here,
+        // in a very CSS-in-JS idiomatic manner.
+        //
+        // In practice we've not seen any performance issues with this from our "large but
+        // not Google spreadsheets" tables.
+        const cellCss = {
+          // Adding display flex so we can align content within the cells
+          ...Css.df.$,
+          // Apply sticky column/cell styles
+          ...maybeStickyColumnStyles,
+          // Apply any static/all-cell styling
+          ...style.cellCss,
+          // Then override with first/last cell styling
+          ...getFirstOrLastCellCss(style, columnIndex, columns),
+          // Then override with per-cell/per-row justification/indentation
+          ...justificationCss,
+          ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
+          // Then apply any header-specific override
+          ...(isHeader && style.headerCellCss),
+          // Then apply any totals-specific override
+          ...(isTotals && style.totalsCellCss),
+          // Or level-specific styling
+          ...(!isHeader && !isTotals && !!style.levels && style.levels[level]?.cellCss),
+          // Level specific styling for the first content column
+          ...(applyFirstContentColumnStyles && !!style.levels && style.levels[level]?.firstContentColumn),
+          // The specific cell's css (if any from GridCellContent)
+          ...rowStyleCellCss,
+          // Apply active row styling for non-nested card styles.
+          ...(style.nestedCards === undefined && isActive
+            ? Css.bgColor(style.activeBgColor ?? Palette.LightBlue50).$
+            : {}),
+          // Add any cell specific style overrides
+          ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
+          // And any cell specific css
+          ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
+          // Apply cell highlight styles to active cell and hover
+          ...Css.bw1.bsSolid.br4.if(applyCellHighlight && isCellActive).bLightBlue900.else.bTransparent.$,
+          // Define the width of the column on each cell. Supports col spans.
+          ...{
+            width: `calc(${columnSizes
+              .slice(maybeNestedCardColumnIndex, maybeNestedCardColumnIndex + currentColspan)
+              .join(" + ")})`,
+          },
+          ...(column.mw ? Css.mw(column.mw).$ : {}),
+        };
 
-          const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
+        const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
 
-          const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
+        const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
 
-          const renderFn: RenderCellFn<any> =
-            (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
-              ? rowLinkRenderFn(as)
-              : isHeader
-              ? headerRenderFn(columns, column, sortState, setSortKey, as)
-              : rowStyle?.onClick && wrapAction
-              ? rowClickRenderFn(as, api)
-              : defaultRenderFn(as);
+        const renderFn: RenderCellFn<any> =
+          (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
+            ? rowLinkRenderFn(as)
+            : isHeader
+            ? headerRenderFn(columns, column, sortState, setSortKey, as)
+            : rowStyle?.onClick && wrapAction
+            ? rowClickRenderFn(as, api)
+            : defaultRenderFn(as);
 
-          return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick);
-        })}
-      </Row>
-    ),
-    [rowState],
+        return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick);
+      })}
+    </Row>
   );
 
   return openCardStyles && openCardStyles.length > 0 ? wrapCard(openCardStyles, rowNode) : rowNode;

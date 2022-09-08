@@ -140,7 +140,7 @@ function BookList({ formState, onNext, onBack }: { formState: FormValue; onNext:
           onClick={() => formState.books.add({ id: String(formState.books.value?.length || 1) })}
         />
       </h1>
-      <GridTable<Row> columns={columns} rows={rows} observeRows={true} />
+      <GridTable<Row> columns={columns} rows={rows} />
 
       <div css={Css.df.jcsb.bt.bGray300.py1.mt2.$}>
         <Button variant="tertiary" label="Back" onClick={onBack} />
