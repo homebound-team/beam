@@ -127,7 +127,7 @@ describe("MockSelectField", () => {
       { id: "2", name: "two" },
       { id: "3", name: "thr" },
     ];
-    // Given a Select Field with 
+    // Given a Select Field with
     const onSelect = jest.fn();
     // When we render the MultiSelectField
     const { test_helperText } = await render(
@@ -143,6 +143,22 @@ describe("MockSelectField", () => {
     );
     // Then the helperText shows up
     expect(test_helperText()).toHaveTextContent("Helper text test");
+  });
+
+  it("renders label", async () => {
+    // Given a SelectField
+    const r = await render(
+      <MockSelectField
+        label="Test"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+        value={"1"}
+        onSelect={() => {}}
+        options={[{ id: "1", name: "one" }]}
+      />,
+    );
+    // Then the label is displayed
+    expect(r.test_label()).toHaveTextContent("Test");
   });
 });
 

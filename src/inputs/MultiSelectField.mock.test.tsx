@@ -1,5 +1,5 @@
-import { click, render, select } from "src/utils/rtl";
 import { fireEvent } from "@testing-library/react";
+import { click, render, select } from "src/utils/rtl";
 import { MultiSelectField as MockMultiSelectField } from "./MultiSelectField.mock";
 
 describe("MockMultiSelectField", () => {
@@ -114,7 +114,7 @@ describe("MockMultiSelectField", () => {
     // Options will be ["", ...options], that's why we select the 2 index
     const optionTwo = test().options[2];
     // Then expect the second option to be disabled
-    expect(optionTwo).toBeDisabled()
+    expect(optionTwo).toBeDisabled();
     // And when clicking on that option
     click(optionTwo);
     // Then the `onSelect` callback is not called
@@ -144,5 +144,21 @@ describe("MockMultiSelectField", () => {
     );
     // Then the helperText shows up
     expect(test_helperText()).toHaveTextContent("Helper text test");
+  });
+
+  it("renders label", async () => {
+    // Given the MultiSelectField
+    const r = await render(
+      <MockMultiSelectField
+        label="Test"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+        values={[]}
+        onSelect={() => {}}
+        options={[{ id: "1", name: "one" }]}
+      />,
+    );
+    // Then the label has correct value
+    expect(r.test_label()).toHaveTextContent("Test");
   });
 });
