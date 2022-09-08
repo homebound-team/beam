@@ -22,7 +22,8 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
   const tid = useTestIds(props, defaultTestId(label));
 
   return (
-    <div>
+    <label {...tid.label}>
+      {label}
       <select
         {...tid}
         // We're cheating and assume the values are strings...what we should really do is either:
@@ -70,6 +71,6 @@ export function MultiSelectField<T, V extends Value>(props: MultiSelectFieldProp
         })}
       </select>
       {helperText && <div {...tid.helperText}>{helperText}</div>}
-    </div>
+    </label>
   );
 }
