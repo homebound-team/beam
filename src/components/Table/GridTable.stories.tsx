@@ -95,7 +95,7 @@ export const Hovering = newStory(
 
 export const ActiveCell = newStory(
   () => {
-    const nameColumn: GridColumn<Row> = {  header: "Name", data: ({ name }) => name };
+    const nameColumn: GridColumn<Row> = { name:"name", header: "Name", data: ({ name }) => name };
     const valueColumn: GridColumn<Row> = { name: "value", header: "Value", data: ({ value }) => value };
     const actionColumn: GridColumn<Row> = { name: "actions", header: "Action", data: () => <div>Actions</div> };
     const rowStyles: GridRowStyles<Row> = useMemo(
@@ -111,7 +111,7 @@ export const ActiveCell = newStory(
     return (
       <GridTable<Row>
         columns={[nameColumn, valueColumn, actionColumn]}
-        activeCellId={`data_1_value`}
+        activeCellId={"data_1_value"}
         style={{ cellHighlight: true }}
         rowStyles={rowStyles}
         rows={[
@@ -1135,7 +1135,7 @@ export function StickyColumnsAndHeaderVirtualized() {
 export function ActiveRow() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
-  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
+  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions" , w:"200px" };
   const rowStyles: GridRowStyles<Row> = useMemo(
     () => ({
       data: {

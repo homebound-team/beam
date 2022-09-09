@@ -1,5 +1,5 @@
 import memoizeOne from "memoize-one";
-import { Observer } from "mobx-react";
+import {observer, Observer} from "mobx-react";
 import React, { MutableRefObject, ReactElement, ReactNode, useContext, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
@@ -351,7 +351,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       const sortProps = row.kind === "header" ? { sortOn, sortState, setSortKey } : { sortOn };
 
       return (
-        <ObservedGridRow
+        <MemoizedGridRow
           key={`${row.kind}-${row.id}`}
           {...{
             as,
@@ -546,7 +546,7 @@ function renderDiv<R extends Kinded>(
           the + operator as an offset.
           Inspired by: https://stackoverflow.com/a/25005740/2551333
         */
-        ...(style.betweenRowsCss ? Css.addIn(`& > div:nth-of-type(n+3) > *`, style.betweenRowsCss).$ : {}),
+        ...(style.betweenRowsCss ? Css.addIn(`& > div:nth-of-type(n+${headerRows.length + totalsRows.length + 2}) > *`, style.betweenRowsCss).$ : {}),
         ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:nth-of-type(2) > *`, style.firstNonHeaderRowCss).$ : {}),
         ...style.rootCss,
         ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
@@ -1077,7 +1077,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   } = props;
 
   const { rowState } = useContext(RowStateContext);
-  const isActive = useComputed(() => rowState.activeRowId === `${row.kind}_${row.id}`, [row, rowState]);
+  const rowId = `${row.kind}_${row.id}`;
+  const isActive = useComputed(() => rowState.activeRowId === rowId, [rowId, rowState]);
 
   // We treat the "header" and "totals" kind as special for "good defaults" styling
   const isHeader = row.kind === "header";
@@ -1222,7 +1223,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           // And any cell specific css
           ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
           // Apply cell highlight styles to active cell and hover
-          ...Css.bw1.bsSolid.br4.if(applyCellHighlight && isCellActive).bLightBlue900.else.bTransparent.$,
+          ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.LightBlue700}`).$,
           // Define the width of the column on each cell. Supports col spans.
           ...{
             width: `calc(${columnSizes
@@ -1265,7 +1266,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
  * memoization is.
  */
 // Declared as a const + `as typeof GridRow` to work with generics, see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37087#issuecomment-656596623
-const MemoizedGridRow = React.memo(GridRow, (one, two) => {
+const MemoizedGridRow = React.memo(observer(GridRow), (one, two) => {
   const { row: row1, ...others1 } = one;
   const { row: row2, ...others2 } = two;
   return shallowEqual(row1, row2) && shallowEqual(others1, others2);
@@ -1405,11 +1406,11 @@ const headerRenderFn: (
 
 /** Renders a cell element when a row link is in play. */
 const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
-  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick) => {
+  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
     const to = rowStyle!.rowLink!(row);
     if (as === "table") {
       return (
-        <td key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames} onClick={onClick}>
+        <td key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames}>
           <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
             {content}
           </Link>
@@ -1422,7 +1423,6 @@ const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
         to={to}
         css={{ ...Css.noUnderline.color("unset").$, ...css }}
         className={`${navLink} ${classNames}`}
-        onClick={onClick}
       >
         {content}
       </Link>
@@ -1525,7 +1525,7 @@ function tableRowStyles(as: RenderAs, column?: GridColumn<any>) {
 }
 
 function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
-  const defKeys: (keyof GridStyleDef)[] = ["inlineEditing", "grouped", "rowHeight"];
+  const defKeys: (keyof GridStyleDef)[] = ["inlineEditing", "grouped", "rowHeight", "cellHighlight"];
   const keys = safeKeys(style);
   if (keys.length === 0 || keys.some((k) => defKeys.includes(k))) {
     return getTableStyles(style as GridStyleDef);

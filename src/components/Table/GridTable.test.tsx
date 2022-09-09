@@ -2075,8 +2075,7 @@ describe("GridTable", () => {
     expect(row(r, 2).getAttribute("data-render")).toEqual("1");
   });
 
-  // Skip since we are always using Observable rows
-  it.skip("memoizes rows based on the data attribute", async () => {
+  it("memoizes rows based on the data attribute", async () => {
     const [header, row1, row2] = rows;
     const columns = [nameColumn];
     // Given a table is initially rendered with 2 rows
@@ -2109,19 +2108,6 @@ describe("GridTable", () => {
 
     // Then the first row/cell has the 'active' background color
     expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.LightBlue50);
-  });
-
-  it("reacts to setting activeCellId", async () => {
-    // Given a table initially rendered with an active cell id
-    const r = await render(
-      <GridTable columns={columns} rows={rows} style={{ cellHighlight: true }} activeCellId={"data_1_name"} />,
-    );
-    // Then expect the cell to have highlight style
-    expect(cell(r, 1, 0)).toHaveStyleRule("border-width", "1px");
-    expect(cell(r, 1, 0)).toHaveStyleRule("border-color", Palette.LightBlue900);
-    // Then expect other cells not to have highlight style
-    expect(cell(r, 1, 1)).not.toHaveStyleRule("border-width", "1px");
-    expect(cell(r, 1, 1)).not.toHaveStyleRule("border-color", Palette.LightBlue900);
   });
 
   it("can render with rows with initCollapsed defined", async () => {

@@ -122,7 +122,7 @@ export function FormStateApp() {
                   onClick={() => formState.books.add({ id: String(formState.books.value.length) })}
                 />
               </strong>
-              <GridTable<Row> columns={columns} rows={rows} observeRows={true} />
+              <GridTable<Row> columns={columns} rows={rows} />
             </div>
 
             <div css={Css.df.childGap1.$}>

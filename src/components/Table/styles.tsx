@@ -75,7 +75,7 @@ function memoizedTableStyles() {
         cellCss: {
           ...Css.gray900.xs.bgWhite.aic.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
-          ...(cellHighlight ? { ":hover": Css.bshHover.bgGray100.$}: {})
+          ...(cellHighlight ? { "&:hover": Css.bgGray100.$}: {})
         },
         presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
         levels: grouped ? groupedLevels : defaultLevels,
