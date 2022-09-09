@@ -27,7 +27,7 @@ export * from "./Stepper";
 export type { Step, StepperProps } from "./Stepper";
 export * from "./SuperDrawer";
 export * from "./Table";
-export { TabContent, Tabs, TabsWithContent } from "./Tabs";
+export { TabActions, TabContent, Tabs, TabsWithContent } from "./Tabs";
 export type { RouteTab, RouteTabWithContent, Tab, TabWithContent } from "./Tabs";
 export * from "./Tag";
 export * from "./Tooltip";
