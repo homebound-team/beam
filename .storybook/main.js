@@ -36,7 +36,11 @@ module.exports = {
         ...config.plugins.filter(
           (plugin) => !(Array.isArray(plugin) && plugin.some((p) => p.name === "vite:react-jsx")),
         ),
-        reactPlugin({ jsxImportSource: "@emotion/react" }),
+        reactPlugin({ exclude: [/\.stories\.tsx?$/, /node_modules/], jsxImportSource: "@emotion/react" }),
+      ],
+      optimizeDeps: [
+        ...(mergedConfig.optimizeDeps ? mergedConfig.optimizeDeps.include || [] : []),
+        "@emotion/react/jsx-dev-runtime",
       ],
     };
   },
