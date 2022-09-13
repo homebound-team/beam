@@ -5,7 +5,7 @@ describe(Accordion, () => {
     it("displays the correct content", async () => {
         // Given an accordion component
         // When rendered
-        const r = await render(<Accordion title="Test title" > Test description </Accordion>);
+        const r = await render(<Accordion title="Test title"> Test description </Accordion>);
         // Then it shows the correct title
         expect(r.accordion_title()).toHaveTextContent("Test title");
         // And the description will be hidden by default
@@ -17,7 +17,7 @@ describe(Accordion, () => {
     });
 
     it("can expand by default", async () => {
-        // Given an accordion component with defaultExpandedSelected set
+        // Given an accordion component with defaultExpanded set
         // When rendered
         const r = await render(<Accordion title="Test title" defaultExpanded> Test description </Accordion>);
         // Then it shows the correct title and description
@@ -41,6 +41,16 @@ describe(Accordion, () => {
         const r = await render(<Accordion title="Test title" disabled> Test description </Accordion>);
         // Then the dropdown button is disabled
         expect(r.accordion_button()).toHaveAttribute("disabled");
+    });
+
+    it("updates styles when focused", async () => {
+        // Given an accordion component
+        const r = await render(<Accordion title="Test title"> Test description </Accordion>);
+        // When focused
+        r.accordion_button().click();
+        // Then the border styles are updated
+        expect(r.accordion_summary()).toHaveStyleRule("border-width", "2px");
+        expect(r.accordion_summary()).toHaveStyleRule("border-color", "rgba(2,143,199,1)");
     });
 
 });

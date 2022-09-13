@@ -10,7 +10,7 @@ export interface AccordionProps {
 }
 
 export function Accordion(props: AccordionProps) {
-  const { title, children, disabled = false, bottomSection = false, defaultExpanded = false } = props;
+  const { title, children, disabled = false, defaultExpanded = false, bottomSection = false} = props;
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [focused, setFocused] = useState(false);
   const testIds = useTestIds({}, "accordion");
