@@ -3,19 +3,12 @@ import { Meta } from "@storybook/react";
 import { Fragment, PropsWithChildren, useState } from "react";
 import { Route, useHistory, useLocation, useParams } from "react-router";
 import { Link } from "react-router-dom";
+import { RouteTabWithContent, TabActions, TabContent, Tabs, TabsWithContent, TabWithContent } from "src/components";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
 import { Icon } from "./Icon";
-import {
-  getTabStyles,
-  RouteTabWithContent,
-  TabActions,
-  TabContent,
-  Tabs,
-  TabsWithContent,
-  TabWithContent,
-} from "./Tabs";
+import { getTabStyles } from "./Tabs";
 import { TabValue, TestTabContent, testTabs } from "./testData";
 
 export default {

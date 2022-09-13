@@ -32,7 +32,8 @@ export function SelectField<O extends object, V extends Key>(props: SelectFieldP
   }, [maybeOptions]);
 
   return (
-    <div>
+    <label {...tid.label}>
+      {label}
       <select
         {...tid}
         value={
@@ -73,6 +74,6 @@ export function SelectField<O extends object, V extends Key>(props: SelectFieldP
         })}
       </select>
       {helperText && <div {...tid.helperText}>{helperText}</div>}
-    </div>
+    </label>
   );
 }
