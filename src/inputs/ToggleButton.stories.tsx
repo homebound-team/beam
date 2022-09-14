@@ -64,7 +64,7 @@ function ToggleButtonWrapper({ isHovered, isFocused, isPressed, onClick, ...prop
   return (
     <div
       css={{
-        "label > button:nth-of-type(1)": {
+        "label > div:nth-of-type(1)": {
           ...(isHovered && toggleHoverStyles),
           ...(isPressed && togglePressStyles),
           ...(props.selected && isHovered && toggleSelectedHoverStyles),

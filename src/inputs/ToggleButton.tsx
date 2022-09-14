@@ -34,22 +34,32 @@ export function ToggleButton(props: ToggleButtonProps) {
   const tid = useTestIds(props, label);
 
   const ariaProps = { isSelected, isDisabled: isDisabled || asyncInProgress, ...otherProps };
-  const { inputProps } = useSwitch({ ...ariaProps, "aria-label": label }, state, ref);
-  const { buttonProps, isPressed } = useButton(
-    {
-      ...ariaProps,
-      onPress: () => {
-        const result = onClick(!isSelected);
+  const { inputProps } = useSwitch({
+    ...ariaProps,
+    "aria-label": label,
+    onChange: (e) => {
+      const result = onClick(e);
         if (isPromise(result)) {
           setAsyncInProgress(true);
           result.finally(() => setAsyncInProgress(false));
         }
         return result;
-      },
-      elementType: "button",
-    },
-    ref,
-  );
+  } }, state, ref);
+  // const { buttonProps, isPressed } = useButton(
+  //   {
+  //     ...ariaProps,
+  //     // onPress: () => {
+  //     //   const result = onClick(!isSelected);
+  //     //   if (isPromise(result)) {
+  //     //     setAsyncInProgress(true);
+  //     //     result.finally(() => setAsyncInProgress(false));
+  //     //   }
+  //     //   return result;
+  //     // },
+  //     elementType: "button",
+  //   },
+  //   ref,
+  // );
   const { isFocusVisible: isKeyboardFocus, focusProps } = useFocusRing(otherProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
 
@@ -57,14 +67,14 @@ export function ToggleButton(props: ToggleButtonProps) {
 
   const buttonAttrs = {
     ref: ref as any,
-    ...buttonProps,
+    // ...buttonProps,
     ...focusProps,
     ...hoverProps,
     css: {
       ...Css.buttonBase.br8.tt("inherit").$,
       ...Css.bgTransparent.gray500.hPx(32).pxPx(12).$,
       ...(isHovered && toggleHoverStyles),
-      ...(isPressed ? togglePressStyles : {}),
+      // ...(isPressed ? togglePressStyles : {}),
       ...(isDisabled && Css.gray300.$),
       ...(isSelected && Css.lightBlue700.$),
       ...(isSelected && isHovered && toggleSelectedHoverStyles),
@@ -85,13 +95,13 @@ export function ToggleButton(props: ToggleButtonProps) {
         }}
         aria-label={label}
       >
-        <button
+        <div
            aria-hidden="true"
           {...buttonAttrs}
         >
           {icon && <Icon xss={Css.mrPx(4).$} icon={icon} />}
           {label}
-        </button>
+        </div>
         {/* Background */}
         <VisuallyHidden>
           <input {...tid.value} ref={ref} {...inputProps} {...focusProps} />
