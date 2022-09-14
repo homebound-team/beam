@@ -93,6 +93,39 @@ export const Hovering = newStory(
   { decorators: [withRouter()] },
 );
 
+export const ActiveCell = newStory(
+  () => {
+    const nameColumn: GridColumn<Row> = { name:"name", header: "Name", data: ({ name }) => name };
+    const valueColumn: GridColumn<Row> = { name: "value", header: "Value", data: ({ value }) => value };
+    const actionColumn: GridColumn<Row> = { name: "actions", header: "Action", data: () => <div>Actions</div> };
+    const rowStyles: GridRowStyles<Row> = useMemo(
+      () => ({
+        data: {
+          onClick: (row, api) => {
+            api.setActiveRowId(`data_${row.id}`);
+          },
+        },
+      }),
+      [],
+    );
+    return (
+      <GridTable<Row>
+        columns={[nameColumn, valueColumn, actionColumn]}
+        activeCellId={"data_1_value"}
+        style={{ cellHighlight: true }}
+        rowStyles={rowStyles}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "b", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
+        ]}
+      />
+    );
+  },
+  { decorators: [withRouter()] },
+);
+
 export function VirtualFiltering() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
@@ -437,7 +470,6 @@ export function ObservableRows() {
       <IconButton onClick={() => (o.a = o.a + 1)} icon="plus" />
       <GridTable
         columns={[nameColumn]}
-        observeRows={true}
         rows={[
           simpleHeader,
           { kind: "data", id: "1", data: { name: "a", value: 1 } },
@@ -1103,7 +1135,7 @@ export function StickyColumnsAndHeaderVirtualized() {
 export function ActiveRow() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
-  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
+  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions" , w:"200px" };
   const rowStyles: GridRowStyles<Row> = useMemo(
     () => ({
       data: {
@@ -1124,7 +1156,7 @@ export function ActiveRow() {
     [],
   );
   const columns = useMemo(() => [nameColumn, valueColumn, actionColumn], []);
-  return <GridTable columns={columns} activeRowId="data_2" rowStyles={rowStyles} rows={rows} observeRows />;
+  return <GridTable columns={columns} activeRowId="data_2" rowStyles={rowStyles} rows={rows} />;
 }
 
 export function ActiveRowNestedCard() {

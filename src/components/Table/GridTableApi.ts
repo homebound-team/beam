@@ -42,6 +42,9 @@ export type GridTableApi<R extends Kinded> = {
   /** Sets the internal state of 'activeRowId' */
   setActiveRowId: (id: string | undefined) => void;
 
+  /** Sets the internal state of 'activeCellId' */
+  setActiveCellId: (id: string | undefined) => void;
+
   /** Set selected state of a row by id */
   selectRow: (id: string, selected?: boolean) => void;
 };
@@ -89,6 +92,10 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public setActiveRowId(id: string | undefined) {
     this.rowState.activeRowId = id;
+  }
+
+  public setActiveCellId(id: string | undefined) {
+    this.rowState.activeCellId = id;
   }
 
   public selectRow(id: string, selected: boolean = true) {

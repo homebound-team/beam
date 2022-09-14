@@ -24,8 +24,8 @@ import { cell, cellAnd, cellOf, click, render, row, rowAnd, type, withRouter } f
 type Data = { name: string; value: number | undefined | null };
 type Row = SimpleHeaderAndData<Data>;
 
-const nameColumn: GridColumn<Row> = { header: () => "Name", data: ({ name }) => name };
-const valueColumn: GridColumn<Row> = { header: () => "Value", data: ({ value }) => value };
+const nameColumn: GridColumn<Row> = { name: "name", header: () => "Name", data: ({ name }) => name };
+const valueColumn: GridColumn<Row> = { name: "value", header: () => "Value", data: ({ value }) => value };
 const columns = [nameColumn, valueColumn];
 
 const rows: GridDataRow<Row>[] = [

@@ -1,5 +1,5 @@
 import memoizeOne from "memoize-one";
-import { Observer } from "mobx-react";
+import {observer, Observer} from "mobx-react";
 import React, { MutableRefObject, ReactElement, ReactNode, useContext, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
@@ -223,8 +223,6 @@ export interface GridTableProps<R extends Kinded, S, X> {
   filterMaxRows?: number;
   /** Accepts the number of filtered rows (based on `filter`), for the caller to observe and display if they want. */
   setRowCount?: (rowCount: number) => void;
-  /** Sets the rows to be wrapped by mobx observers. */
-  observeRows?: boolean;
   /** A combination of CSS settings to set the static look & feel (vs. rowStyles which is per-row styling). */
   style?: GridStyle | GridStyleDef;
   /**
@@ -245,6 +243,11 @@ export interface GridTableProps<R extends Kinded, S, X> {
    * Example "data_123"
    */
   activeRowId?: string;
+  /**
+   * Defines which cell in the table should be provided with an "active" styling.
+   * Expected format is `${row.kind}_${row.id}_${column.name}`.
+   */
+  activeCellId?: string;
 }
 
 /**
@@ -281,10 +284,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     fallbackMessage = "No rows found.",
     infoMessage,
     setRowCount,
-    observeRows,
     persistCollapse,
     resizeTarget,
     activeRowId,
+    activeCellId,
   } = props;
 
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
@@ -296,6 +299,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
     api.init(persistCollapse, virtuosoRef, rows);
     api.setActiveRowId(activeRowId);
+    api.setActiveCellId(activeCellId);
     return api;
   }, [props.api]);
 
@@ -307,6 +311,10 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   useEffect(() => {
     rowState.activeRowId = activeRowId;
   }, [rowState, activeRowId]);
+
+  useEffect(() => {
+    rowState.activeCellId = activeCellId;
+  }, [rowState, activeCellId]);
 
   // We track render count at the table level, which seems odd (we should be able to track this
   // internally within each GridRow using a useRef), but we have suspicions that react-virtuoso
@@ -341,10 +349,9 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
       // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
       // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
       const sortProps = row.kind === "header" ? { sortOn, sortState, setSortKey } : { sortOn };
-      const RowComponent = observeRows ? ObservedGridRow : MemoizedGridRow;
 
       return (
-        <RowComponent
+        <MemoizedGridRow
           key={`${row.kind}-${row.id}`}
           {...{
             as,
@@ -431,7 +438,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     sortState,
     stickyHeader,
     stickyOffset,
-    observeRows,
     columnSizes,
     collapsedIds,
     getCount,
@@ -540,7 +546,7 @@ function renderDiv<R extends Kinded>(
           the + operator as an offset.
           Inspired by: https://stackoverflow.com/a/25005740/2551333
         */
-        ...(style.betweenRowsCss ? Css.addIn(`& > div:nth-of-type(n+3) > *`, style.betweenRowsCss).$ : {}),
+        ...(style.betweenRowsCss ? Css.addIn(`& > div:nth-of-type(n+${headerRows.length + totalsRows.length + 2}) > *`, style.betweenRowsCss).$ : {}),
         ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:nth-of-type(2) > *`, style.firstNonHeaderRowCss).$ : {}),
         ...style.rootCss,
         ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
@@ -888,6 +894,8 @@ export type GridColumn<R extends Kinded, S = {}> = {
   wrapAction?: false;
   /** Used as a signal to defer adding the 'indent' styling */
   isAction?: true;
+  /** Column name that will be used to generate an unique identifier for every row cell */
+  name?: string;
 };
 
 export const nonKindGridColumnKeys = [
@@ -909,6 +917,7 @@ type RenderCellFn<R extends Kinded> = (
   row: R,
   rowStyle: RowStyle<R> | undefined,
   classNames: string | undefined,
+  onClick: (() => void) | undefined,
 ) => ReactNode;
 
 /** Defines row-specific styling for each given row `kind` in `R` */
@@ -1068,7 +1077,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
   } = props;
 
   const { rowState } = useContext(RowStateContext);
-  const isActive = useComputed(() => rowState.activeRowId === `${row.kind}_${row.id}`, [row, rowState]);
+  const rowId = `${row.kind}_${row.id}`;
+  const isActive = useComputed(() => rowState.activeRowId === rowId, [rowId, rowState]);
 
   // We treat the "header" and "totals" kind as special for "good defaults" styling
   const isHeader = row.kind === "header";
@@ -1169,6 +1179,10 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
               }
             : {};
 
+        const cellId = `${row.kind}_${row.id}_${column.name}`;
+        const applyCellHighlight = !!column.name && !isHeader && !isTotals;
+        const isCellActive = rowState.activeCellId === cellId;
+
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
         // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
         // a few descendent selectors. However, that approach means the root grid-applied
@@ -1208,6 +1222,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
           ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
           // And any cell specific css
           ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
+          // Apply cell highlight styles to active cell and hover
+          ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.LightBlue700}`).$,
           // Define the width of the column on each cell. Supports col spans.
           ...{
             width: `calc(${columnSizes
@@ -1219,6 +1235,8 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
 
         const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
 
+        const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
+
         const renderFn: RenderCellFn<any> =
           (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
             ? rowLinkRenderFn(as)
@@ -1228,7 +1246,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);
 
-        return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames);
+        return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick);
       })}
     </Row>
   );
@@ -1248,7 +1266,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
  * memoization is.
  */
 // Declared as a const + `as typeof GridRow` to work with generics, see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37087#issuecomment-656596623
-const MemoizedGridRow = React.memo(GridRow, (one, two) => {
+const MemoizedGridRow = React.memo(observer(GridRow), (one, two) => {
   const { row: row1, ...others1 } = one;
   const { row: row2, ...others2 } = two;
   return shallowEqual(row1, row2) && shallowEqual(others1, others2);
@@ -1350,10 +1368,10 @@ export function applyRowFn<R extends Kinded>(
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
 const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
-  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
+  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick) => {
     const Cell = as === "table" ? "td" : "div";
     return (
-      <Cell key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames}>
+      <Cell key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames} onClick={onClick}>
         {content}
       </Cell>
     );
@@ -1413,14 +1431,18 @@ const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
 
 /** Renders a cell that will fire the RowStyle.onClick. */
 const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>) => RenderCellFn<any> =
-  (as: RenderAs, api: GridTableApi<any>) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
+  (as: RenderAs, api: GridTableApi<any>) =>
+  (key, css, content, row, rowStyle, classNames: string | undefined, onClick) => {
     const Row = as === "table" ? "tr" : "div";
     return (
       <Row
         {...{ key }}
         css={{ ...css, ...tableRowStyles(as) }}
         className={classNames}
-        onClick={() => rowStyle!.onClick!(row, api)}
+        onClick={(e) => {
+          rowStyle!.onClick!(row, api);
+          onClick && onClick();
+        }}
       >
         {content}
       </Row>
@@ -1503,7 +1525,7 @@ function tableRowStyles(as: RenderAs, column?: GridColumn<any>) {
 }
 
 function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
-  const defKeys: (keyof GridStyleDef)[] = ["inlineEditing", "grouped", "rowHeight"];
+  const defKeys: (keyof GridStyleDef)[] = ["inlineEditing", "grouped", "rowHeight", "cellHighlight"];
   const keys = safeKeys(style);
   if (keys.length === 0 || keys.some((k) => defKeys.includes(k))) {
     return getTableStyles(style as GridStyleDef);
