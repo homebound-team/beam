@@ -22,7 +22,7 @@ export function ToggleButton(props: ToggleButtonProps) {
   const { selected: isSelected = false, disabled = false, label, onChange, icon, ...otherProps } = props;
   const [asyncInProgress, setAsyncInProgress] = useState(false);
   const isDisabled = !!disabled || asyncInProgress;
-  const ariaProps = { "aria-label": label, isSelected, isDisabled: isDisabled, ...otherProps };
+  const ariaProps = { "aria-label": label, isSelected, isDisabled, ...otherProps };
   const state = useToggleState({
     ...ariaProps,
     onChange: (e) => {
