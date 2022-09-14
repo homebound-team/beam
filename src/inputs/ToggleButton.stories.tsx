@@ -68,7 +68,6 @@ type ToggleButtonWrapperProps = Omit<ToggleButtonProps, "onChange" | "selected" 
 
 function ToggleButtonWrapper({ isHovered, isFocused, isPressed, onChange, ...props }: ToggleButtonWrapperProps) {
   const [selected, setSelected] = useState<boolean>(props.selected || false);
-  const [disabled, setDisabled] = useState<boolean>(false);
   return (
     <div
       css={{
@@ -79,13 +78,10 @@ function ToggleButtonWrapper({ isHovered, isFocused, isPressed, onChange, ...pro
         },
       }}
     >
-      <button onClick={() => setSelected((prev) => !prev)}>Toggle outside</button>
-      <button onClick={() => setDisabled((prev) => !prev)}>Toggle disabled</button>
       <ToggleButtonComponent
         {...props}
         icon="bell"
         selected={selected}
-        disabled={disabled}
         onChange={
           onChange
             ? (value) => {
