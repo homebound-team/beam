@@ -73,3 +73,7 @@ export const isAbsoluteUrl = (url: string) => /^(http(s?)):\/\//i.test(url);
 export function areArraysEqual(a: any[], b: any[]): boolean {
   return a.length === b.length && a.every((val, idx) => val === b[idx]);
 }
+
+export function isPromise(obj: void | Promise<void>): obj is Promise<void> {
+  return typeof obj === "object" && "then" in obj && typeof obj.then === "function";
+}
