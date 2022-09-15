@@ -1,6 +1,7 @@
 
 import { Meta } from "@storybook/react";
-import { AccordionList, AccordionProps } from "./Accordion";
+import { AccordionProps } from "./Accordion";
+import { AccordionList } from "./AccordionList";
 
 export default {
     component: AccordionList,

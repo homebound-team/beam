@@ -4,30 +4,23 @@ import { useFocusRing } from "react-aria";
 import { useId } from "@react-aria/utils";
 
 export interface AccordionProps {
-  label?: string;
   title: ReactNode;
   children: ReactNode;
   disabled?: boolean;
   defaultExpanded?: boolean;
   size?: AccordionSize;
   /** Adds a top border (enabled by default) */
-  topSection?: boolean;
+  topBorder?: boolean;
   /** Adds a bottom border (disabled by default) */
-  bottomSection?: boolean;
-  /** Used by AccordionList */
+  bottomBorder?: boolean;
+  /** 
+   * Used by AccordionList 
+   * Allows multiple accordions to be expanded simultaneously (enabled by default)
+   */
   allowMultipleExpanded?: boolean;
   index?: number;
   currentSelectedIndex?: number;
   setCurrentSelectedIndex?: Dispatch<SetStateAction<number | undefined>>;
-}
-
-type AccordionSize = "xs" | "s" | "m" | "l";
-
-const accordionSizes: Record<AccordionSize, number> = {
-  "xs": 240,
-  "s": 360,
-  "m": 480,
-  "l": 600
 }
 
 export function Accordion(props: AccordionProps) {
@@ -37,15 +30,14 @@ export function Accordion(props: AccordionProps) {
     size,
     disabled = false,
     defaultExpanded = false,
-    topSection = true,
-    bottomSection = false,
-    label = "accordion",
+    topBorder = true,
+    bottomBorder = false,
     allowMultipleExpanded = true,
     index,
     setCurrentSelectedIndex,
     currentSelectedIndex
   } = props;
-  const testIds = useTestIds({}, label);
+  const testIds = useTestIds(props, "accordion");
   const id = useId();
   const [expanded, setExpanded] = useState(defaultExpanded);
   const { isFocusVisible, focusProps } = useFocusRing();
@@ -59,51 +51,50 @@ export function Accordion(props: AccordionProps) {
 
   return (
     <div
-      {...testIds}
+      {...testIds.container}
       css={
-       {...Css.mbPx(4)
-        .if(topSection).bt.bGray400
-        .if(bottomSection && !(!expanded && isFocusVisible)).bb.$,
-        ...(size? Css.wPx(accordionSizes[size]).$ : {})} 
+        {
+          ...Css
+            .if(topBorder).bt.bGray400
+            .if(bottomBorder && !(!expanded && isFocusVisible)).bb.$,
+          ...(size ? Css.wPx(accordionSizes[size]).$ : {})
+        }
       }
     >
       <button
-        {...testIds.summary}
+        {...testIds.title}
         {...focusProps}
         aria-controls={id}
         aria-expanded={expanded}
         disabled={disabled}
-        css={Css.w100.df.addIn(":focus", { outline: "none" }).addIn(":hover", Css.bgGray100.$).if(isFocusVisible).bshFocus.$}
+        css={{
+          ...Css.df.jcsb.gap2.aic.w100.p2.baseEm.outline("none").addIn(":hover", Css.bgGray100.$).$,
+          ...(disabled && Css.gray500.$),
+          ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.LightBlue700}`).$),
+        }}
         onClick={() => {
-          setExpanded(!expanded)
-          if (!allowMultipleExpanded && setCurrentSelectedIndex) setCurrentSelectedIndex(index)
+          setExpanded(!expanded);
+          if (!allowMultipleExpanded && setCurrentSelectedIndex) setCurrentSelectedIndex(index);
         }}
       >
-        <div {...testIds.title} css={Css.p2.baseEm.if(disabled).gray500.$}>
-          {title}
-        </div>
-        <div css={Css.ml("auto").my("auto").prPx(14).$}>
-          <span
-            css={{
-              ...Css.mwPx(24).mhPx(24).pyPx(9).db.tc.cursorPointer.$,
-              ...{
-                transition: "transform 150ms linear",
-                WebkitTransform: expanded ? "translateY(-1px) rotate(180deg)" : "translateY(-1px) rotate(0deg)",
-              },
-            }}
-          >
-            <Icon icon="chevronDown" color={disabled ? Palette.Gray500 : Palette.Gray900} />
-          </span>
-        </div>
+        <span>{title}</span>
+        <span
+          css={{
+            transition: "transform 250ms linear",
+            transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+          }}
+        >
+          <Icon icon="chevronDown" />
+        </span>
       </button>
       <div
         {...testIds.details}
-        id={id} 
+        id={id}
         aria-hidden={!expanded}
         css={{
           // Use max-height for grow/shrink animation
           ...Css.overflowHidden.maxhPx(1000)
-          .add("transition", "max-height 0.25s ease-in-out").$,
+            .add("transition", "max-height 0.25s ease-in-out").$,
           ...(!expanded || disabled ? Css.maxh0.$ : {}),
         }}
       >
@@ -115,28 +106,11 @@ export function Accordion(props: AccordionProps) {
   );
 }
 
-interface AccordionListProps {
-  accordions: AccordionProps[];
-  /** Allows multiple accordions to be expanded simultaneously (enabled by default) */
-  allowMultipleExpanded?: boolean;
-  size?: AccordionSize;
-}
+export type AccordionSize = "xs" | "s" | "m" | "l";
 
-export function AccordionList({ accordions, size, allowMultipleExpanded = true }: AccordionListProps) {
-  const [currentSelectedIndex, setCurrentSelectedIndex] = useState<number>();
-  return (<>
-    {accordions.map((accordionProps, index, arr) => (
-      <Accordion
-        {...accordionProps}
-        key={index}
-        label={`accordion${index}`}
-        size={size}
-        bottomSection={index === arr.length - 1}
-        allowMultipleExpanded={allowMultipleExpanded}
-        index={index}
-        currentSelectedIndex={currentSelectedIndex}
-        setCurrentSelectedIndex={setCurrentSelectedIndex}
-      />
-    ))}
-  </>)
+const accordionSizes: Record<AccordionSize, number> = {
+  "xs": 240,
+  "s": 360,
+  "m": 480,
+  "l": 600
 }
