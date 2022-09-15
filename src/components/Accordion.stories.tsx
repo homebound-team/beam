@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { Css } from "src/Css";
-import { Accordion } from "./Accordion";
+import { Accordion} from "./Accordion";
 
 export default {
   component: Accordion,
@@ -10,31 +10,27 @@ export default {
 export function AccordionVariations() {
   return (
     <>
-        <Accordion title="Normal">
-          <div css={Css.sm.$}>
-            Our modern approach to homebuilding makes the process easier and more personal than ever before.
-          </div>
-        </Accordion>
-        <Accordion title="Default expanded" defaultExpanded>
-          <div css={Css.sm.$}>
-            Our modern approach to homebuilding makes the process easier and more personal than ever before.
-          </div>
-        </Accordion>
-        <Accordion disabled title="Disabled">
-          <div css={Css.sm.$}>
-            Our modern approach to homebuilding makes the process easier and more personal than ever before.
-          </div>
-        </Accordion>
-        <Accordion title="Disabled expanded" defaultExpanded disabled>
-          <div css={Css.sm.$}>
-            Our modern approach to homebuilding makes the process easier and more personal than ever before.
-          </div>
-        </Accordion>
-        <Accordion title="Bottom section" bottomSection>
-          <div css={Css.sm.$}>
-            Our modern approach to homebuilding makes the process easier and more personal than ever before.
-          </div>
-        </Accordion>
+      <Accordion title="Top section disabled" topSection={false}>
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
+      <Accordion title="Default expanded" defaultExpanded>
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
+      <Accordion disabled title="Disabled">
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
+      <Accordion title="Bottom section enabled" bottomSection>
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
     </>
   );
 }
+ 
