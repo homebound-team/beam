@@ -10,7 +10,7 @@ interface AccordionListProps {
 }
 
 export function AccordionList({ accordions, size, allowMultipleExpanded = true }: AccordionListProps) {
-  const [currentSelectedIndex, setCurrentSelectedIndex] = useState<number>();
+  const [expandedIndex, setExpandedIndex] = useState<number>();
   const tid = useTestIds({}, "accordionList");
 
   return (
@@ -22,10 +22,9 @@ export function AccordionList({ accordions, size, allowMultipleExpanded = true }
           key={index}
           size={size}
           bottomBorder={index === arr.length - 1}
-          allowMultipleExpanded={allowMultipleExpanded}
+          defaultExpanded={!allowMultipleExpanded && expandedIndex===index}
           index={index}
-          currentSelectedIndex={currentSelectedIndex}
-          setCurrentSelectedIndex={setCurrentSelectedIndex}
+          setExpandedIndex={setExpandedIndex}
         />
       ))}
     </>

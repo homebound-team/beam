@@ -17,10 +17,8 @@ export interface AccordionProps {
    * Used by AccordionList
    * Allows multiple accordions to be expanded simultaneously (enabled by default)
    */
-  allowMultipleExpanded?: boolean;
   index?: number;
-  currentSelectedIndex?: number;
-  setCurrentSelectedIndex?: Dispatch<SetStateAction<number | undefined>>;
+  setExpandedIndex?: Dispatch<SetStateAction<number | undefined>>;
 }
 
 export function Accordion(props: AccordionProps) {
@@ -32,22 +30,15 @@ export function Accordion(props: AccordionProps) {
     defaultExpanded = false,
     topBorder = true,
     bottomBorder = false,
-    allowMultipleExpanded = true,
     index,
-    setCurrentSelectedIndex,
-    currentSelectedIndex,
+    setExpandedIndex,
   } = props;
   const testIds = useTestIds(props, "accordion");
   const id = useId();
   const [expanded, setExpanded] = useState(defaultExpanded);
   const { isFocusVisible, focusProps } = useFocusRing();
 
-  useEffect(() => {
-    // Handle only one expanded accordion when selected in AccordionList
-    if (!allowMultipleExpanded && index !== currentSelectedIndex) {
-      setExpanded(false);
-    }
-  }, [allowMultipleExpanded, currentSelectedIndex, index]);
+  useEffect(() => { setExpanded(defaultExpanded); }, [defaultExpanded])
 
   return (
     <div
@@ -70,7 +61,7 @@ export function Accordion(props: AccordionProps) {
         }}
         onClick={() => {
           setExpanded(!expanded);
-          if (!allowMultipleExpanded && setCurrentSelectedIndex) setCurrentSelectedIndex(index);
+          if (setExpandedIndex) setExpandedIndex(index);
         }}
       >
         <span>{title}</span>
