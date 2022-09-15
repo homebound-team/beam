@@ -44,7 +44,7 @@ export function Accordion(props: AccordionProps) {
     <div
       {...testIds.container}
       css={{
-        ...Css.if(topBorder).bt.bGray400.if(bottomBorder && !(!expanded && isFocusVisible)).bb.$,
+        ...Css.bGray400.if(topBorder).bt.if(bottomBorder).bb.$,
         ...(size ? Css.wPx(accordionSizes[size]).$ : {}),
       }}
     >
@@ -80,7 +80,7 @@ export function Accordion(props: AccordionProps) {
         aria-hidden={!expanded}
         css={{
           // Use max-height for grow/shrink animation
-          ...Css.overflowHidden.maxhPx(1000).add("transition", "max-height 0.25s ease-in-out").$,
+          ...Css.overflowHidden.maxhPx(1000).add("transition", `max-height ${expanded? "300ms" : "0"} ease-in-out`).$,
           ...(!expanded || disabled ? Css.maxh0.$ : {}),
         }}
       >
