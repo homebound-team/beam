@@ -38,6 +38,15 @@ describe(Accordion, () => {
         expect(r.accordion()).toHaveStyleRule("border-bottom-style", "solid");
     });
 
+    it("can hide the top border", async () => {
+        // Given an accordion component with topSection set as false
+        // When rendered
+        const r = await render(<Accordion title="Test title" topSection={false}> Test description </Accordion>);
+
+        // Then it hides the top border
+        expect(r.accordion()).not.toHaveStyleRule("border-top-width", "1px");
+    });
+
     it("can be disabled", async () => {
         // Given an accordion component with disabled set
         // When rendered
@@ -56,11 +65,11 @@ describe(AccordionList, () => {
     ];
 
     it("displays the correct content", async () => {
-        // Given an list of accordions
+        // Given a list of accordions
         // When rendered
         const r = await render(<AccordionList accordions={accordions} />);
 
-        // Then it shows the correct title
+        // Then it shows the correct title for all
         expect(r.accordion0_title()).toHaveTextContent("First accordion title");
         expect(r.accordion1_title()).toHaveTextContent("Second accordion title");
         expect(r.accordion2_title()).toHaveTextContent("Third accordion title");
@@ -70,7 +79,7 @@ describe(AccordionList, () => {
     });
 
     it("can have multiple accordions expanded", async () => {
-        // Given an list of accordions
+        // Given a list of accordions
         const r = await render(<AccordionList accordions={accordions} />);
 
         // When the multiple accordions are selected
@@ -80,13 +89,13 @@ describe(AccordionList, () => {
         // Then both accordions are be expanded
         expect(r.accordion0_details()).not.toHaveStyleRule("max-height", "0");
         expect(r.accordion1_details()).not.toHaveStyleRule("max-height", "0");
-        
+
         // And the third one is still collapsed
         expect(r.accordion2_details()).toHaveStyleRule("max-height", "0");
     });
 
     it("can have only one accordion expanded", async () => {
-        // Given an list of accordions with allowMultipleExpanded set as false
+        // Given a list of accordions with allowMultipleExpanded set as false
         const r = await render(<AccordionList accordions={accordions} allowMultipleExpanded={false} />);
 
         // When the first accordions is selected

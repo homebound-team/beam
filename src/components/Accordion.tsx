@@ -1,6 +1,7 @@
 import { Css, Icon, useTestIds, Palette } from "src/index";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 import { useFocusRing } from "react-aria";
+import { useId } from "@react-aria/utils";
 
 export interface AccordionProps {
   label?: string;
@@ -9,7 +10,7 @@ export interface AccordionProps {
   disabled?: boolean;
   defaultExpanded?: boolean;
   size?: AccordionSize;
-  /** Adds a top border (enabled by default)*/
+  /** Adds a top border (enabled by default) */
   topSection?: boolean;
   /** Adds a bottom border (disabled by default) */
   bottomSection?: boolean;
@@ -44,12 +45,13 @@ export function Accordion(props: AccordionProps) {
     setCurrentSelectedIndex,
     currentSelectedIndex
   } = props;
+  const testIds = useTestIds({}, label);
+  const id = useId();
   const [expanded, setExpanded] = useState(defaultExpanded);
   const { isFocusVisible, focusProps } = useFocusRing();
-  const testIds = useTestIds({}, label);
 
   useEffect(() => {
-    // Handle only one selection when selected in AccordionList
+    // Handle only one expanded accordion when selected in AccordionList
     if (!allowMultipleExpanded && index !== currentSelectedIndex) {
       setExpanded(false)
     }
@@ -68,6 +70,8 @@ export function Accordion(props: AccordionProps) {
       <button
         {...testIds.summary}
         {...focusProps}
+        aria-controls={id}
+        aria-expanded={expanded}
         disabled={disabled}
         css={Css.w100.df.addIn(":focus", { outline: "none" }).addIn(":hover", Css.bgGray100.$).if(isFocusVisible).bshFocus.$}
         onClick={() => {
@@ -75,10 +79,10 @@ export function Accordion(props: AccordionProps) {
           if (!allowMultipleExpanded && setCurrentSelectedIndex) setCurrentSelectedIndex(index)
         }}
       >
-        <div {...testIds.title} css={Css.p2.baseEm.fw5.if(disabled).gray500.$}>
+        <div {...testIds.title} css={Css.p2.baseEm.if(disabled).gray500.$}>
           {title}
         </div>
-        <div css={Css.ml("auto").my("auto").pr1.$}>
+        <div css={Css.ml("auto").my("auto").prPx(14).$}>
           <span
             css={{
               ...Css.mwPx(24).mhPx(24).pyPx(9).db.tc.cursorPointer.$,
@@ -94,12 +98,12 @@ export function Accordion(props: AccordionProps) {
       </button>
       <div
         {...testIds.details}
+        id={id} 
+        aria-hidden={!expanded}
         css={{
           // Use max-height for grow/shrink animation
           ...Css.overflowHidden.maxhPx(1000)
-          // Use transitions to smooth the interaction
           .add("transition", "max-height 0.25s ease-in-out").$,
-          // When collapsed, set max-height to 0
           ...(!expanded || disabled ? Css.maxh0.$ : {}),
         }}
       >
@@ -113,7 +117,7 @@ export function Accordion(props: AccordionProps) {
 
 interface AccordionListProps {
   accordions: AccordionProps[];
-  /** Allows multiple accordions to be expanded simultaneously (enabled by default)*/
+  /** Allows multiple accordions to be expanded simultaneously (enabled by default) */
   allowMultipleExpanded?: boolean;
   size?: AccordionSize;
 }
@@ -124,6 +128,7 @@ export function AccordionList({ accordions, size, allowMultipleExpanded = true }
     {accordions.map((accordionProps, index, arr) => (
       <Accordion
         {...accordionProps}
+        key={index}
         label={`accordion${index}`}
         size={size}
         bottomSection={index === arr.length - 1}

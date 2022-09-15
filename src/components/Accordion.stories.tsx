@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { Css } from "src/Css";
-import { Accordion } from "./Accordion";
+import { Accordion, AccordionList, AccordionProps } from "./Accordion";
 
 export default {
   component: Accordion,
@@ -20,7 +20,7 @@ export function AccordionVariations() {
           Our modern approach to homebuilding makes the process easier and more personal than ever before.
         </div>
       </Accordion>
-      <Accordion disabled title="Disabled">
+      <Accordion title="Disabled" disabled>
         <div css={Css.sm.$}>
           Our modern approach to homebuilding makes the process easier and more personal than ever before.
         </div>
