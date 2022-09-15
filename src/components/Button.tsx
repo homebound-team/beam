@@ -4,7 +4,7 @@ import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Css, Palette } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
-import { isAbsoluteUrl, noop } from "src/utils";
+import { isAbsoluteUrl, isPromise, noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -192,7 +192,3 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
 
 export type ButtonSize = "sm" | "md" | "lg";
 export type ButtonVariant = "primary" | "secondary" | "tertiary" | "tertiaryDanger" | "danger" | "text";
-
-function isPromise(obj: void | Promise<void>): obj is Promise<void> {
-  return typeof obj === "object" && "then" in obj && typeof obj.then === "function";
-}
