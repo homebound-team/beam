@@ -5,6 +5,7 @@ import { Accordion } from "./Accordion";
 export default {
   component: Accordion,
   title: "Components/Accordion",
+  parameters: { backgrounds: { default: "white" } },
 } as Meta;
 
 export function AccordionVariations() {

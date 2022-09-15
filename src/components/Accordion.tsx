@@ -1,7 +1,7 @@
-import { Css, Icon, useTestIds, Palette } from "src/index";
+import { useId } from "@react-aria/utils";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 import { useFocusRing } from "react-aria";
-import { useId } from "@react-aria/utils";
+import { Css, Icon, Palette, useTestIds } from "src/index";
 
 export interface AccordionProps {
   title: ReactNode;
@@ -13,8 +13,8 @@ export interface AccordionProps {
   topBorder?: boolean;
   /** Adds a bottom border (disabled by default) */
   bottomBorder?: boolean;
-  /** 
-   * Used by AccordionList 
+  /**
+   * Used by AccordionList
    * Allows multiple accordions to be expanded simultaneously (enabled by default)
    */
   allowMultipleExpanded?: boolean;
@@ -35,7 +35,7 @@ export function Accordion(props: AccordionProps) {
     allowMultipleExpanded = true,
     index,
     setCurrentSelectedIndex,
-    currentSelectedIndex
+    currentSelectedIndex,
   } = props;
   const testIds = useTestIds(props, "accordion");
   const id = useId();
@@ -45,21 +45,17 @@ export function Accordion(props: AccordionProps) {
   useEffect(() => {
     // Handle only one expanded accordion when selected in AccordionList
     if (!allowMultipleExpanded && index !== currentSelectedIndex) {
-      setExpanded(false)
+      setExpanded(false);
     }
   }, [allowMultipleExpanded, currentSelectedIndex, index]);
 
   return (
     <div
       {...testIds.container}
-      css={
-        {
-          ...Css
-            .if(topBorder).bt.bGray400
-            .if(bottomBorder && !(!expanded && isFocusVisible)).bb.$,
-          ...(size ? Css.wPx(accordionSizes[size]).$ : {})
-        }
-      }
+      css={{
+        ...Css.if(topBorder).bt.bGray400.if(bottomBorder && !(!expanded && isFocusVisible)).bb.$,
+        ...(size ? Css.wPx(accordionSizes[size]).$ : {}),
+      }}
     >
       <button
         {...testIds.title}
@@ -93,14 +89,11 @@ export function Accordion(props: AccordionProps) {
         aria-hidden={!expanded}
         css={{
           // Use max-height for grow/shrink animation
-          ...Css.overflowHidden.maxhPx(1000)
-            .add("transition", "max-height 0.25s ease-in-out").$,
+          ...Css.overflowHidden.maxhPx(1000).add("transition", "max-height 0.25s ease-in-out").$,
           ...(!expanded || disabled ? Css.maxh0.$ : {}),
         }}
       >
-        <div css={Css.px2.pb2.pt1.$}>
-          {children}
-        </div>
+        <div css={Css.px2.pb2.pt1.$}>{children}</div>
       </div>
     </div>
   );
@@ -109,8 +102,8 @@ export function Accordion(props: AccordionProps) {
 export type AccordionSize = "xs" | "s" | "m" | "l";
 
 const accordionSizes: Record<AccordionSize, number> = {
-  "xs": 240,
-  "s": 360,
-  "m": 480,
-  "l": 600
-}
+  xs: 240,
+  s: 360,
+  m: 480,
+  l: 600,
+};
