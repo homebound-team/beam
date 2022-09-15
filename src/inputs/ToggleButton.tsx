@@ -9,13 +9,12 @@ export interface ToggleButtonProps {
   /** Input label */
   label: string;
   selected?: boolean;
-  onChange: ((selected: boolean) => void) | ((active: boolean) => Promise<void>);
+  onChange: ((selected: boolean) => void) | ((selected: boolean) => Promise<void>);
   autoFocus?: boolean;
   icon?: IconKey;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
   tooltip?: ReactNode;
-  /** Handler when the interactive element state changes. */
 }
 
 export function ToggleButton(props: ToggleButtonProps) {
@@ -68,7 +67,7 @@ export function ToggleButton(props: ToggleButtonProps) {
         {icon && <Icon icon={icon} />}
         {label}
         <VisuallyHidden>
-          <input {...tid.value} ref={ref} {...inputProps} />
+          <input ref={ref} {...inputProps} {...tid.value}  />
         </VisuallyHidden>
       </label>
     ),

@@ -64,7 +64,7 @@ describe("ToggleButton", () => {
   });
 
   it("can define a custom testid", async () => {
-    const r = await render(<ToggleButton label={"Custom test id"} onChange={() => {}} />);
+    const r = await render(<ToggleButton label="Not the test id" data-testid="customTestId" onChange={() => {}} />);
     expect(r.customTestId()).toBeInTheDocument();
   });
 });
