@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { Css } from "src/Css";
-import { Accordion} from "./Accordion";
+import { Accordion } from "./Accordion";
 
 export default {
   component: Accordion,
@@ -33,4 +33,29 @@ export function AccordionVariations() {
     </>
   );
 }
- 
+export function AccordionSizes() {
+  return (
+    <>
+      <Accordion title="Extra small" size="xs">
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
+      <Accordion title="Small" size="s">
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
+      <Accordion title="Medium" size="m">
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
+      <Accordion title="Large" size="l">
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
+    </>
+  );
+}

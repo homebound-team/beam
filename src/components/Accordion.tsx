@@ -8,6 +8,7 @@ export interface AccordionProps {
   children: ReactNode;
   disabled?: boolean;
   defaultExpanded?: boolean;
+  size?: AccordionSize;
   /** Adds a top border (enabled by default)*/
   topSection?: boolean;
   /** Adds a bottom border (disabled by default) */
@@ -19,10 +20,20 @@ export interface AccordionProps {
   setCurrentSelectedIndex?: Dispatch<SetStateAction<number | undefined>>;
 }
 
+type AccordionSize = "xs" | "s" | "m" | "l";
+
+const accordionSizes: Record<AccordionSize, number> = {
+  "xs": 240,
+  "s": 360,
+  "m": 480,
+  "l": 600
+}
+
 export function Accordion(props: AccordionProps) {
   const {
     title,
     children,
+    size,
     disabled = false,
     defaultExpanded = false,
     topSection = true,
@@ -47,7 +58,12 @@ export function Accordion(props: AccordionProps) {
   return (
     <div
       {...testIds}
-      css={Css.mbPx(4).if(topSection).bt.bGray400.if(bottomSection && !(!expanded && isFocusVisible)).bb.$}
+      css={
+       {...Css.mbPx(4)
+        .if(topSection).bt.bGray400
+        .if(bottomSection && !(!expanded && isFocusVisible)).bb.$,
+        ...(size? Css.wPx(accordionSizes[size]).$ : {})} 
+      }
     >
       <button
         {...testIds.summary}
@@ -56,7 +72,6 @@ export function Accordion(props: AccordionProps) {
         css={Css.w100.df.addIn(":focus", { outline: "none" }).addIn(":hover", Css.bgGray100.$).if(isFocusVisible).bshFocus.$}
         onClick={() => {
           setExpanded(!expanded)
-          console.log()
           if (!allowMultipleExpanded && setCurrentSelectedIndex) setCurrentSelectedIndex(index)
         }}
       >
@@ -72,7 +87,6 @@ export function Accordion(props: AccordionProps) {
                 WebkitTransform: expanded ? "translateY(-1px) rotate(180deg)" : "translateY(-1px) rotate(0deg)",
               },
             }}
-            data-testid="toggle-caret"
           >
             <Icon icon="chevronDown" color={disabled ? Palette.Gray500 : Palette.Gray900} />
           </span>
@@ -99,17 +113,19 @@ export function Accordion(props: AccordionProps) {
 
 interface AccordionListProps {
   accordions: AccordionProps[];
-  /** Allows multiple accordion to be expanded simultaneously (enabled by default)*/
+  /** Allows multiple accordions to be expanded simultaneously (enabled by default)*/
   allowMultipleExpanded?: boolean;
+  size?: AccordionSize;
 }
 
-export function AccordionList({ accordions, allowMultipleExpanded = true }: AccordionListProps) {
+export function AccordionList({ accordions, size, allowMultipleExpanded = true }: AccordionListProps) {
   const [currentSelectedIndex, setCurrentSelectedIndex] = useState<number>();
   return (<>
     {accordions.map((accordionProps, index, arr) => (
       <Accordion
         {...accordionProps}
         label={`accordion${index}`}
+        size={size}
         bottomSection={index === arr.length - 1}
         allowMultipleExpanded={allowMultipleExpanded}
         index={index}
