@@ -34,14 +34,12 @@ export function useSetupColumnSizes(
   const [tableWidth, setTableWidth] = useState<number | undefined>();
 
   // Calc our initial/first render sizes where we won't have a width yet
-  const [columnSizes, setColumnSizes] = useState<string[]>(
-    calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, tableWidth, style.minWidthPx),
-  );
+  const [columnSizes, setColumnSizes] = useState<string[]>(calcColumnSizes(columns, tableWidth, style.minWidthPx));
 
   const setTableAndColumnWidths = useCallback(
     (width: number) => {
       setTableWidth(width);
-      setColumnSizes(calcColumnSizes(columns, style.nestedCards?.firstLastColumnWidth, width, style.minWidthPx));
+      setColumnSizes(calcColumnSizes(columns, width, style.minWidthPx));
     },
     [setTableWidth, setColumnSizes, columns, style],
   );
