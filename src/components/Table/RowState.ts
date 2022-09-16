@@ -96,26 +96,26 @@ export class RowState {
     if (rows !== this.rows) {
       const currentCollapsedIds = this.collapsedIds;
       // Create a list of the (maybe) new rows that should be initially collapsed
-      const maybeNewCollapsedRows = flattenRows(rows).filter((r) => r.initCollapsed);
+      const maybeNewCollapsedRowIds = flattenRows(rows)
+        .filter((r) => r.initCollapsed)
+        .map((r) => r.id);
       // Check against local storage for collapsed state only if this is the first render of "data" (non-header or totals) rows.
       const checkLocalStorage =
         this.persistCollapse && !this.rows.some((r) => r.kind !== "totals" && r.kind !== "header");
 
       // If the list of collapsed rows are different, then determine which are net-new rows and should be added to the newCollapsedIds array
       if (
-        currentCollapsedIds.length !== maybeNewCollapsedRows.length ||
-        !currentCollapsedIds.every((id) => maybeNewCollapsedRows.some((r) => r.id === id))
+        currentCollapsedIds.length !== maybeNewCollapsedRowIds.length ||
+        !currentCollapsedIds.every((id) => maybeNewCollapsedRowIds.includes(id))
       ) {
         // Flatten out the existing rows to make checking for new rows easier
         const flattenedExistingIds = flattenRows(this.rows).map((r) => r.id);
-        const newCollapsedIds: string[] = maybeNewCollapsedRows
-          .filter(
-            (maybeNewRow) =>
-              !flattenedExistingIds.includes(maybeNewRow.id) &&
-              // Using `!` on `this.persistCollapse!` as `checkLocalStorage` ensures this.persistCollapse is truthy
-              (!checkLocalStorage || readLocalCollapseState(this.persistCollapse!).includes(maybeNewRow.id)),
-          )
-          .map((row) => row.id);
+        const newCollapsedIds: string[] = maybeNewCollapsedRowIds.filter(
+          (maybeNewRowId) =>
+            !flattenedExistingIds.includes(maybeNewRowId) &&
+            // Using `!` on `this.persistCollapse!` as `checkLocalStorage` ensures this.persistCollapse is truthy
+            (!checkLocalStorage || readLocalCollapseState(this.persistCollapse!).includes(maybeNewRowId)),
+        );
 
         // If there are new rows that should be collapsed then update the collapsedRows arrays
         if (newCollapsedIds.length > 0) {
