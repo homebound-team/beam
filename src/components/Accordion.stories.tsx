@@ -42,17 +42,17 @@ export function AccordionSizes() {
           Our modern approach to homebuilding makes the process easier and more personal than ever before.
         </div>
       </Accordion>
-      <Accordion title="Small" size="s">
+      <Accordion title="Small" size="sm">
         <div css={Css.sm.$}>
           Our modern approach to homebuilding makes the process easier and more personal than ever before.
         </div>
       </Accordion>
-      <Accordion title="Medium" size="m">
+      <Accordion title="Medium" size="md">
         <div css={Css.sm.$}>
           Our modern approach to homebuilding makes the process easier and more personal than ever before.
         </div>
       </Accordion>
-      <Accordion title="Large" size="l">
+      <Accordion title="Large" size="lg">
         <div css={Css.sm.$}>
           Our modern approach to homebuilding makes the process easier and more personal than ever before.
         </div>
