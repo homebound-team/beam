@@ -736,7 +736,6 @@ export function calcColumnSizes(
 
   // This is our "fake but for some reason it lines up better" fr calc
   function fr(myFr: number): string {
-    console.log("tableWidth", tableWidth);
     // If the tableWidth, then return a pixel value
     if (tableWidth) {
       const widthBasis = Math.max(tableWidth, tableMinWidthPx);
