@@ -9,9 +9,10 @@ interface AccordionListProps {
   size?: AccordionSize;
 }
 
-export function AccordionList({ accordions, size, allowMultipleExpanded = true }: AccordionListProps) {
+export function AccordionList(props: AccordionListProps) {
+  const { accordions, size, allowMultipleExpanded = true } = props
   const [expandedIndex, setExpandedIndex] = useState<number>();
-  const tid = useTestIds({}, "accordionList");
+  const tid = useTestIds(props, "accordionList");
 
   return (
     <>

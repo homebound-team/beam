@@ -79,8 +79,8 @@ export function Accordion(props: AccordionProps) {
         id={id}
         aria-hidden={!expanded}
         css={{
-          // Use max-height for grow/shrink animation
-          ...Css.overflowHidden.maxhPx(1000).add("transition", `max-height ${expanded? "300ms" : "0"} ease-in-out`).$,
+          // Use max-height for grow/shrink animation (remove close animation for AccordionList to avoid delays)
+          ...Css.overflowHidden.maxhPx(1000).add("transition", `max-height ${expanded || !index ? "250ms" : "0"} ease-in-out`).$,
           ...(!expanded || disabled ? Css.maxh0.$ : {}),
         }}
       >
@@ -90,11 +90,11 @@ export function Accordion(props: AccordionProps) {
   );
 }
 
-export type AccordionSize = "xs" | "s" | "m" | "l";
+export type AccordionSize = "xs" | "sm" | "md" | "lg";
 
 const accordionSizes: Record<AccordionSize, number> = {
   xs: 240,
-  s: 360,
-  m: 480,
-  l: 600,
+  sm: 360,
+  md: 480,
+  lg: 600,
 };
