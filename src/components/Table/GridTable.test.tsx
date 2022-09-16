@@ -7,7 +7,6 @@ import {
   GridColumn,
   GridDataRow,
   GridRowStyles,
-  GridStyle,
   GridTable,
   matchesFilter,
   setRunningInJest,
@@ -18,7 +17,7 @@ import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/component
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Checkbox, TextField } from "src/inputs";
-import { cell, cellAnd, cellOf, click, render, row, rowAnd, type, withRouter } from "src/utils/rtl";
+import { cell, cellAnd, cellOf, click, render, row, type, withRouter } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
@@ -1993,47 +1992,6 @@ describe("GridTable", () => {
     // Then the cell in this column should actually be empty
     expect(cell(r, 1, 0)).toBeEmptyDOMElement();
     expect(cell(r, 1, 1).textContent).toBe("1");
-  });
-
-  it("ignores chrome and cardpadding elements in nestedCardStyle when using GridTable test helpers", async () => {
-    // Given a table with nested card styles
-    const kindStyle = { bgColor: Palette.Gray100, brPx: 4, pxPx: 4 };
-    const nestedStyle: GridStyle = {
-      nestedCards: {
-        firstLastColumnWidth: 24,
-        spacerPx: 8,
-        kinds: {
-          header: kindStyle,
-          parent: kindStyle,
-          child: kindStyle,
-          grandChild: kindStyle,
-        },
-      },
-    };
-    const rows: GridDataRow<NestedRow>[] = [
-      simpleHeader,
-      {
-        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
-        children: [
-          {
-            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
-            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
-          },
-        ],
-      },
-    ];
-
-    const r = await render(<GridTable<NestedRow> columns={nestedColumns} style={nestedStyle} rows={rows} />);
-    // When using the various gridtable test helpers (cell, cellAnd, cellOf, row, rowAnd)
-    // Then chrome rows, and padding columns are ignored
-    expect(cellAnd(r, 0, 0, "collapse")).toBeTruthy();
-    expect(cell(r, 0, 2).textContent).toBe("Name");
-    expect(cellAnd(r, 1, 0, "collapse")).toBeTruthy();
-    expect(cell(r, 1, 2).textContent).toBe("parent 1");
-    expect(rowAnd(r, 2, "collapse")).toBeTruthy();
-    expect(cellOf(r, "gridTable", 2, 2).textContent).toBe("child p1c1");
-    expect(row(r, 3).querySelector("[data-testid='collapse']")).toBeFalsy();
-    expect(cell(r, 3, 2).textContent).toBe("grandchild p1c1g1");
   });
 
   it("can use custom table test ids on cell helpers that support it", async () => {

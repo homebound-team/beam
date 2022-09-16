@@ -16,9 +16,7 @@ import {
   GridDataRow,
   GridRowLookup,
   GridRowStyles,
-  GridStyle,
   GridTable,
-  GridTableProps,
   Icon,
   IconButton,
   numericColumn,
@@ -29,10 +27,9 @@ import {
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
-import { TextField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
 import { noop } from "src/utils";
-import { newStory, withDimensions, withRouter, zeroTo } from "src/utils/sb";
+import { newStory, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
   component: GridTable,
@@ -95,7 +92,7 @@ export const Hovering = newStory(
 
 export const ActiveCell = newStory(
   () => {
-    const nameColumn: GridColumn<Row> = { name:"name", header: "Name", data: ({ name }) => name };
+    const nameColumn: GridColumn<Row> = { name: "name", header: "Name", data: ({ name }) => name };
     const valueColumn: GridColumn<Row> = { name: "value", header: "Value", data: ({ value }) => value };
     const actionColumn: GridColumn<Row> = { name: "actions", header: "Action", data: () => <div>Actions</div> };
     const rowStyles: GridRowStyles<Row> = useMemo(
@@ -254,174 +251,6 @@ export function NestedRows() {
     />
   );
 }
-
-export function NestedCardsThreeLevels() {
-  return <NestedCards rows={rowsWithHeader} sorting={{ on: "client", initial: [0, "ASC"] }} />;
-}
-
-function deepCount(rows: GridDataRow<any>[]): number {
-  return rows.map((row) => 1 + deepCount(row.children ?? [])).reduce((a, b) => a + b, 0);
-}
-
-export function NestedCardsThreeLevelsVirtualizedAtScale() {
-  const rows = useMemo(() => [simpleHeader, ...makeNestedRows(500)], []);
-  return (
-    <div css={Css.df.fdc.vh100.$}>
-      Rendering {deepCount(rows)} rows virtualized
-      <NestedCards rows={rows} as="virtual" />
-    </div>
-  );
-}
-
-export function NestedCardsThreeLevelsVirtualizedAtScaleSorted() {
-  const rows = useMemo(() => [simpleHeader, ...makeNestedRows(500)], []);
-  return (
-    <div css={Css.df.fdc.vh100.$}>
-      Rendering {deepCount(rows)} rows virtualized & sorted
-      <NestedCards rows={rows} as="virtual" sorting={{ on: "client", initial: [0, "ASC"] }} />
-    </div>
-  );
-}
-
-export function NestedCardsTwoLevels() {
-  const spacing = { brPx: 4, pxPx: 4 };
-  const nestedStyle: GridStyle = {
-    nestedCards: {
-      firstLastColumnWidth: 24,
-      spacerPx: 8,
-      kinds: {
-        parent: { bgColor: Palette.Gray100, ...spacing },
-        child: { bgColor: Palette.White, ...spacing },
-      },
-    },
-  };
-  const rows: GridDataRow<NestedRow>[] = [
-    simpleHeader,
-    {
-      ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
-      children: [
-        { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
-        { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
-      ],
-    },
-    {
-      ...{ kind: "parent", id: "p2", data: { name: "parent 2" } },
-      children: [{ kind: "child", id: "p2c1", data: { name: "child p2c1" } }],
-    },
-  ];
-  return <NestedCards rows={rows} style={nestedStyle} sorting={{ on: "client", initial: [0, "ASC"] }} />;
-}
-
-type NestedCardsProps = Pick<GridTableProps<NestedRow, any, any>, "rows" | "as" | "sorting" | "style">;
-function NestedCards({ rows, as, sorting, style }: NestedCardsProps) {
-  const nameColumn: GridColumn<NestedRow> = {
-    header: () => "Name",
-    parent: (row) => ({
-      content: () => <div css={Css.base.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    child: (row) => ({
-      content: () => <div css={Css.sm.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    grandChild: (row) => ({
-      content: () => <div css={Css.xs.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    add: () => "Add",
-  };
-  const actionColumn: GridColumn<NestedRow> = {
-    header: () => "Action",
-    parent: () => "",
-    child: () => "",
-    grandChild: () => <div css={Css.xs.$}>Delete</div>,
-    add: () => "",
-    clientSideSort: false,
-  };
-
-  const spacing = { brPx: 4, pxPx: 4 };
-  const nestedStyle: GridStyle = {
-    nestedCards: {
-      firstLastColumnWidth: 24,
-      spacerPx: 8,
-      kinds: {
-        parent: { bgColor: Palette.Gray500, ...spacing },
-        child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
-        grandChild: { bgColor: Palette.Green200, bColor: Palette.Green400, ...spacing },
-        // Purposefully leave out the `add` kind
-      },
-    },
-  };
-  const [filter, setFilter] = useState<string>();
-
-  return (
-    <>
-      <TextField
-        label="Filter"
-        hideLabel
-        placeholder="Search"
-        value={filter}
-        onChange={setFilter}
-        startAdornment={<Icon icon="search" />}
-        clearable
-      />
-      <GridTable
-        as={as}
-        columns={[nameColumn, nameColumn, actionColumn]}
-        rows={rows}
-        style={style ?? nestedStyle}
-        sorting={sorting}
-        filter={filter}
-      />
-    </>
-  );
-}
-
-export const NestedCardsOverflowX = newStory(
-  () => {
-    const nameColumn: GridColumn<NestedRow> = {
-      header: () => "Name",
-      parent: (row) => ({
-        content: () => <div css={Css.base.$}>{row.name}</div>,
-        value: row.name,
-      }),
-      child: (row) => ({
-        content: () => <div css={Css.sm.$}>{row.name}</div>,
-        value: row.name,
-      }),
-      grandChild: (row) => ({
-        content: () => <div css={Css.xs.$}>{row.name}</div>,
-        value: row.name,
-      }),
-      add: () => "Add",
-      w: "300px",
-    };
-    const actionColumn: GridColumn<NestedRow> = {
-      header: () => "Action",
-      parent: () => "",
-      child: () => "",
-      grandChild: () => <div css={Css.xs.$}>Delete</div>,
-      add: () => "",
-      clientSideSort: false,
-      w: "300px",
-    };
-    const spacing = { brPx: 4, pxPx: 4 };
-    const nestedStyle: GridStyle = {
-      nestedCards: {
-        firstLastColumnWidth: 24,
-        spacerPx: 8,
-        kinds: {
-          parent: { bgColor: Palette.Gray500, ...spacing },
-          child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
-          grandChild: { bgColor: Palette.Green200, bColor: Palette.Green400, ...spacing },
-        },
-      },
-    };
-
-    return <GridTable as="virtual" columns={[nameColumn, nameColumn, actionColumn]} rows={rows} style={nestedStyle} />;
-  },
-  { decorators: [withDimensions("800px")] },
-);
 
 export function OneOffInlineTable() {
   const items: { code: string; name: string; quantity: number }[] = [
@@ -943,87 +772,6 @@ export function StickyColumns() {
   );
 }
 
-export function StickyColumnsNestedCards() {
-  const nameColumn: GridColumn<NestedRow> = {
-    header: () => "Name",
-    parent: (row) => ({
-      content: () => <div css={Css.base.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    child: (row) => ({
-      content: () => <div css={Css.sm.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    grandChild: (row) => ({
-      content: () => <div css={Css.xs.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    add: () => "Add",
-    w: "200px",
-  };
-  const actionColumn: GridColumn<NestedRow> = {
-    header: () => "Action",
-    parent: () => "",
-    child: () => "",
-    grandChild: () => <div css={Css.xs.$}>Delete</div>,
-    add: () => "",
-    clientSideSort: false,
-    w: "200px",
-  };
-  const spacing = { brPx: 4, pxPx: 4 };
-  const nestedStyle: GridStyle = {
-    nestedCards: {
-      firstLastColumnWidth: 24,
-      spacerPx: 8,
-      kinds: {
-        parent: { bgColor: Palette.Gray500, ...spacing },
-        child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
-        grandChild: { bgColor: Palette.Green200, bColor: Palette.Green400, ...spacing },
-      },
-    },
-  };
-  return (
-    <div>
-      <h1 css={Css.lgEm.$}>First column sticky left</h1>
-      <div css={Css.wPx(500).hPx(460).overflowAuto.$}>
-        <GridTable
-          columns={[{ ...nameColumn, sticky: "left" }, nameColumn, actionColumn]}
-          rows={rowsWithHeader}
-          style={nestedStyle}
-          as="virtual"
-        />
-      </div>
-
-      <h1 css={Css.lgEm.mt3.$}>Last column sticky right</h1>
-      <div css={Css.wPx(500).hPx(460).overflowAuto.$}>
-        <GridTable
-          columns={[nameColumn, nameColumn, { ...actionColumn, sticky: "right" }]}
-          rows={rowsWithHeader}
-          style={nestedStyle}
-          as="virtual"
-        />
-      </div>
-
-      <h1 css={Css.lgEm.mt3.$}>Last column only "grandchild" cells sticky</h1>
-      <div css={Css.wPx(500).hPx(460).overflowAuto.$}>
-        <GridTable
-          columns={[
-            nameColumn,
-            nameColumn,
-            {
-              ...actionColumn,
-              grandChild: () => ({ content: () => <div css={Css.xs.$}>Delete</div>, sticky: "right" }),
-            },
-          ]}
-          rows={rowsWithHeader}
-          style={nestedStyle}
-          as="virtual"
-        />
-      </div>
-    </div>
-  );
-}
-
 type RowWithTotals = SimpleHeaderAndData<Data> | { kind: "totals"; id: "totals"; data: { value: number | undefined } };
 
 export function StickyColumnsAndHeader() {
@@ -1135,7 +883,7 @@ export function StickyColumnsAndHeaderVirtualized() {
 export function ActiveRow() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
-  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions" , w:"200px" };
+  const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
   const rowStyles: GridRowStyles<Row> = useMemo(
     () => ({
       data: {
@@ -1157,53 +905,6 @@ export function ActiveRow() {
   );
   const columns = useMemo(() => [nameColumn, valueColumn, actionColumn], []);
   return <GridTable columns={columns} activeRowId="data_2" rowStyles={rowStyles} rows={rows} />;
-}
-
-export function ActiveRowNestedCard() {
-  const nameColumn: GridColumn<NestedRow> = {
-    header: () => "Name",
-    parent: (row) => ({
-      content: () => <div css={Css.base.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    child: (row) => ({
-      content: () => <div css={Css.sm.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    grandChild: (row) => ({
-      content: () => <div css={Css.xs.$}>{row.name}</div>,
-      value: row.name,
-    }),
-    add: () => "Add",
-  };
-  const actionColumn: GridColumn<NestedRow> = {
-    header: () => "Action",
-    parent: () => "",
-    child: () => "",
-    grandChild: (data, { row, api }) => (
-      <Button label="Activate Row" onClick={() => api.setActiveRowId(`grandChild_${row.id}`)} />
-    ),
-    add: () => "",
-    clientSideSort: false,
-  };
-  const spacing = { brPx: 4, pxPx: 4 };
-  const nestedStyle: GridStyle = useMemo(
-    () => ({
-      nestedCards: {
-        firstLastColumnWidth: 24,
-        spacerPx: 8,
-        kinds: {
-          parent: { bgColor: Palette.Gray500, ...spacing },
-          child: { bgColor: Palette.Gray200, bColor: Palette.Gray600, ...spacing },
-          grandChild: { bgColor: Palette.Green200, bColor: Palette.Green400, ...spacing },
-        },
-      },
-    }),
-    [],
-  );
-  const columns = useMemo(() => [nameColumn, nameColumn, actionColumn], []);
-
-  return <GridTable columns={columns} rows={rowsWithHeader} style={nestedStyle} activeRowId="grandChild_p0c1g2" />;
 }
 
 export function TruncatingCells() {

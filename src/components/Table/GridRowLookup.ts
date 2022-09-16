@@ -8,7 +8,6 @@ import {
   nonKindGridColumnKeys,
   RowTuple,
 } from "src/components/Table/GridTable";
-import { dropChromeRows } from "src/components/Table/nestedCards";
 
 /**
  * Allows a caller to ask for the currently shown rows, given the current sorting/filtering.
@@ -54,12 +53,10 @@ export function createRowLookup<R extends Kinded>(
       virtuosoRef.current.scrollToIndex({ index, behavior: "smooth" });
     },
     currentList() {
-      return dropChromeRows(filteredRows).map((r) => r[0]);
+      return filteredRows.map((r) => r[0]) as GridDataRow<R>[];
     },
     lookup(row, additionalFilter = () => true) {
-      const rows = dropChromeRows(filteredRows)
-        .map((r) => r[0])
-        .filter(additionalFilter);
+      const rows = filteredRows.map((r) => r[0] as GridDataRow<R>).filter(additionalFilter);
       // Ensure we have `result.kind = {}` for each kind
       const result: any = Object.fromEntries(getKinds(columns).map((kind) => [kind, {}]));
       // This is an admittedly cute/fancy scan, instead of just `rows.findIndex`, but
