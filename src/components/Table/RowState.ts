@@ -80,23 +80,26 @@ export class RowState {
   }
 
   loadSelected(rows: GridDataRow<any>[]): void {
-    const selectedRows = rows.filter(row => row.initSelected)
-    // Initialize with selected rows as defined 
+    const selectedRows = rows.filter((row) => row.initSelected);
+    // Initialize with selected rows as defined
     const map = new Map<string, SelectedState>();
-    selectedRows.forEach(row => {
+    selectedRows.forEach((row) => {
       map.set(row.id, "checked");
-    })
+    });
 
     this.selectedRows.merge(map);
   }
 
   // Updates the list of rows and regenerates the collapsedRows property if needed.
   setRows(rows: GridDataRow<any>[]): void {
-    // If the set of rows are different, and this is the first time adding "data" rows (non "totals" or "header" rows), then collapsedRows may need to be updated.
-    if (rows !== this.rows && this.rows.some((r) => r.kind !== "totals" && r.kind !== "header")) {
+    // If the set of rows are different
+    if (rows !== this.rows) {
       const currentCollapsedIds = this.collapsedIds;
       // Create a list of the (maybe) new rows that should be initially collapsed
       const maybeNewCollapsedRows = flattenRows(rows).filter((r) => r.initCollapsed);
+      // Check against local storage for collapsed state only if this is the first render of "data" (non-header or totals) rows.
+      const checkLocalStorage =
+        this.persistCollapse && !this.rows.some((r) => r.kind !== "totals" && r.kind !== "header");
 
       // If the list of collapsed rows are different, then determine which are net-new rows and should be added to the newCollapsedIds array
       if (
@@ -106,7 +109,12 @@ export class RowState {
         // Flatten out the existing rows to make checking for new rows easier
         const flattenedExistingIds = flattenRows(this.rows).map((r) => r.id);
         const newCollapsedIds: string[] = maybeNewCollapsedRows
-          .filter((maybeNewRow) => !flattenedExistingIds.includes(maybeNewRow.id))
+          .filter(
+            (maybeNewRow) =>
+              !flattenedExistingIds.includes(maybeNewRow.id) &&
+              // Using `!` on `this.persistCollapse!` as `checkLocalStorage` ensures this.persistCollapse is truthy
+              (!checkLocalStorage || readLocalCollapseState(this.persistCollapse!).includes(maybeNewRow.id)),
+          )
           .map((row) => row.id);
 
         // If there are new rows that should be collapsed then update the collapsedRows arrays

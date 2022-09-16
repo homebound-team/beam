@@ -2226,6 +2226,40 @@ describe("GridTable", () => {
     expect(sessionStorage.getItem(tableIdentifier)).toBe('["p2","p3"]');
   });
 
+  it("can lazily initialize table with collapsed rows", async () => {
+    // Given a table that can update its set of rows
+    function TestComponent() {
+      const [rows, setRows] = useState<GridDataRow<NestedRow>[]>(staticRows);
+      return (
+        <>
+          <button onClick={() => setRows(initRows)} data-testid="initRows" />
+          <GridTable columns={nestedColumns} rows={rows} fallbackMessage="Loading..." />
+        </>
+      );
+    }
+
+    const staticRows: GridDataRow<NestedRow>[] = [{ kind: "totals" as const, id: "totals", data: {} }, simpleHeader];
+    const initRows: GridDataRow<NestedRow>[] = [
+      ...staticRows,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" }, initCollapsed: true },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+    ];
+
+    // When rendering the table
+    const r = await render(<TestComponent />);
+
+    // Then expect the fallback message
+    expect(cell(r, 2, 0).textContent).toBe("Loading...");
+
+    // When initializing the rows
+    click(r.initRows);
+
+    // Then expect "parent 1" to be collapsed
+    expect(cell(r, 2, 0).textContent).toBe("+");
+  });
+
   it("can render with rows with initSelected defined", async () => {
     const selectCol = selectColumn<Row>();
     const nameCol: GridColumn<Row> = { header: "Name", data: ({ name }) => ({ content: name }), mw: "160px" };
