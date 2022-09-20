@@ -31,3 +31,5 @@ export { TabActions, TabContent, Tabs, TabsWithContent } from "./Tabs";
 export type { RouteTab, RouteTabWithContent, Tab, TabWithContent } from "./Tabs";
 export * from "./Tag";
 export * from "./Tooltip";
+export * from "./Accordion";
+export * from "./AccordionList";
