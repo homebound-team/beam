@@ -57,8 +57,8 @@ const sizeToFallbackTypeScale: Record<AvatarSize, Typography> = {
 };
 
 const sizeToTypeScale: Record<AvatarSize, Typography> = {
-  sm: "baseEm",
-  md: "baseEm",
+  sm: "baseMd",
+  md: "baseMd",
   lg: "lg",
   xl: "xl3",
 };

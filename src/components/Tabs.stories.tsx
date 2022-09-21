@@ -214,7 +214,7 @@ function RouteTab1() {
   const { ceId } = useParams<{ ceId: string }>();
   return (
     <>
-      <h1 css={Css.lgEm.$}>Tab 1 Content</h1>
+      <h1 css={Css.lgSb.$}>Tab 1 Content</h1>
       <h2>Params ceId = {ceId}</h2>
       <div>
         <pre css={Css.dib.$}>tab.path = ["/:ceId/overview", "/:ceId"]</pre>
@@ -227,7 +227,7 @@ function RouteTab2() {
   const { ceId } = useParams<{ ceId: string }>();
   return (
     <>
-      <h1 css={Css.lgEm.$}>Tab 2 Content</h1>
+      <h1 css={Css.lgSb.$}>Tab 2 Content</h1>
       <h2>Params ceId = {ceId}</h2>
       <div>
         <pre css={Css.dib.$}>tab.path = ["/:ceId/line-items", "/:ceId/line-items/*"]</pre>
@@ -247,7 +247,7 @@ function RouteTab3() {
   const { ceId } = useParams<{ ceId: string }>();
   return (
     <>
-      <h1 css={Css.lgEm.$}>Tab 3 Content</h1>
+      <h1 css={Css.lgSb.$}>Tab 3 Content</h1>
       <h2>Params ceId = {ceId}</h2>
       <div>
         <pre css={Css.dib.$}>tab.path = "/:ceId/history"</pre>

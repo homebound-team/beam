@@ -48,7 +48,7 @@ export function ToggleButton(props: ToggleButtonProps) {
     ...hoverProps,
     ...pressProps,
     css: {
-      ...Css.br4.dif.aic.gap1.bgTransparent.gray500.hPx(32).plPx(4).pr1.relative.cursorPointer.w("max-content").smEm
+      ...Css.br4.dif.aic.gap1.bgTransparent.gray500.hPx(32).plPx(4).pr1.relative.cursorPointer.w("max-content").smMd
         .selectNone.$,
       ...(isHovered && toggleHoverStyles),
       ...(isPressed && togglePressStyles),
@@ -67,7 +67,7 @@ export function ToggleButton(props: ToggleButtonProps) {
         {icon && <Icon icon={icon} />}
         {label}
         <VisuallyHidden>
-          <input ref={ref} {...inputProps} {...tid.value}  />
+          <input ref={ref} {...inputProps} {...tid.value} />
         </VisuallyHidden>
       </label>
     ),

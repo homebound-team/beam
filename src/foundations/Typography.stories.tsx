@@ -5,38 +5,116 @@ export default {
   title: "Foundations/Typography",
 } as Meta;
 
-export const Typography = () => (
-  <div css={{ p: Css.m0.$ }}>
-    <h1 css={Css.xl2Em.$}>Typography</h1>
-    <br />
-    <p css={Css.tiny.$}>tiny</p>
-    <p css={Css.tinyEm.$}>tinyEm</p>
-    <br />
-    <p css={Css.xs.$}>xs</p>
-    <p css={Css.xsEm.$}>xsEm</p>
-    <br />
-    <p css={Css.sm.$}>sm</p>
-    <p css={Css.smEm.$}>smEm</p>
-    <br />
-    <p css={Css.base.$}>base</p>
-    <p css={Css.baseEm.$}>baseEm</p>
-    <br />
-    <p css={Css.lg.$}>lg</p>
-    <p css={Css.lgEm.$}>lgEm</p>
-    <br />
-    <p css={Css.xl.$}>xl</p>
-    <p css={Css.xlEm.$}>xlEm</p>
-    <br />
-    <p css={Css.xl2.$}>xl2</p>
-    <p css={Css.xl2Em.$}>xl2Em</p>
-    <br />
-    <p css={Css.xl3.$}>xl3</p>
-    <p css={Css.xl3Em.$}>xl3Em</p>
-    <br />
-    <p css={Css.xl4.$}>xl4</p>
-    <p css={Css.xl4Em.$}>xl4Em</p>
-    <br />
-    <p css={Css.xl5.$}>xl5</p>
-    <p css={Css.xl5Em.$}>xl5Em</p>
-  </div>
-);
+export const Typography = () => {
+  return (
+    <div>
+      <h1 css={Css.xl2Sb.mb3.$}>Typography</h1>
+      <table
+        css={{
+          tr: Css.add("verticalAlign", "top").$,
+          "td:nth-of-type(1)": Css.pr4.$,
+        }}
+      >
+        <tr css={Css.tiny.$}>
+          <td>Tiny</td>
+          <td>
+            <p>Regular</p>
+            <p css={Css.tinyMd.$}>Medium</p>
+            <p css={Css.tinySb.$}>Semibold</p>
+            <p css={Css.tinyBd.$}>Bold</p>
+          </td>
+        </tr>
+
+        <tr css={Css.xs.$}>
+          <td>XS</td>
+          <td>
+            <p>Regular</p>
+            <p css={Css.xsMd.$}>Medium</p>
+            <p css={Css.xsSb.$}>Semibold</p>
+            <p css={Css.xsBd.$}>Bold</p>
+          </td>
+        </tr>
+
+        <tr css={Css.sm.$}>
+          <td>SM</td>
+          <td>
+            <p>Regular</p>
+            <p css={Css.smMd.$}>Medium</p>
+            <p css={Css.smSb.$}>Semibold</p>
+            <p css={Css.smBd.$}>Bold</p>
+          </td>
+        </tr>
+
+        <tr css={Css.base.$}>
+          <td>Base</td>
+          <td>
+            <p>Regular</p>
+            <p css={Css.baseMd.$}>Medium</p>
+            <p css={Css.baseSb.$}>Semibold</p>
+            <p css={Css.baseBd.$}>Bold</p>
+          </td>
+        </tr>
+
+        <tr css={Css.lg.$}>
+          <td>LG</td>
+          <td>
+            <p>Regular</p>
+            <p css={Css.lgMd.$}>Medium</p>
+            <p css={Css.lgSb.$}>Semibold</p>
+            <p css={Css.lgBd.$}>Bold</p>
+          </td>
+        </tr>
+
+        <tr css={Css.xl.$}>
+          <td>XL</td>
+          <td>
+            <p>Regular</p>
+            <p css={Css.xlMd.$}>Medium</p>
+            <p css={Css.xlSb.$}>Semibold</p>
+            <p css={Css.xlBd.$}>Bold</p>
+          </td>
+        </tr>
+
+        <tr css={Css.xl2.$}>
+          <td>2XL</td>
+          <td>
+            <p>Regular</p>
+            <p css={Css.xl2Md.$}>Medium</p>
+            <p css={Css.xl2Sb.$}>Semibold</p>
+            <p css={Css.xl2Bd.$}>Bold</p>
+          </td>
+        </tr>
+
+        <tr css={Css.xl3.$}>
+          <td>3XL</td>
+          <td>
+            <p>Regular</p>
+            <p css={Css.xl3Md.$}>Medium</p>
+            <p css={Css.xl3Sb.$}>Semibold</p>
+            <p css={Css.xl3Bd.$}>Bold</p>
+          </td>
+        </tr>
+
+        <tr css={Css.xl4.$}>
+          <td>4XL</td>
+          <td>
+            <p>Regular</p>
+            <p css={Css.xl4Md.$}>Medium</p>
+            <p css={Css.xl4Sb.$}>Semibold</p>
+            <p css={Css.xl4Bd.$}>Bold</p>
+          </td>
+        </tr>
+
+        <tr css={Css.xl5.$}>
+          <td>5XL</td>
+          <td>
+            <p>Regular</p>
+            <p css={Css.xl5Md.$}>Medium</p>
+            <p css={Css.xl5Sb.$}>Semibold</p>
+            <p css={Css.xl5Bd.$}>Bold</p>
+          </td>
+        </tr>
+      </table>
+    </div>
+  );
+};

@@ -64,9 +64,9 @@ export function SuperDrawer(): ReactPortal | null {
   const { onPrevClick, onNextClick, titleRightContent, titleLeftContent, hideControls } = firstContent ?? {};
 
   const isDetail = currentContent !== firstContent;
-  const title = content === undefined ? '' : currentContent.title || firstContent.title;
+  const title = content === undefined ? "" : currentContent.title || firstContent.title;
 
-  const { width = SuperDrawerWidth.Normal } = firstContent ?? {}
+  const { width = SuperDrawerWidth.Normal } = firstContent ?? {};
 
   return createPortal(
     <AnimatePresence>
@@ -108,7 +108,7 @@ export function SuperDrawer(): ReactPortal | null {
                 <header css={Css.df.p3.bb.bGray200.df.aic.jcsb.gap2.$}>
                   {/* Left */}
                   <div css={Css.df.aic.$}>
-                    <div css={Css.xl2Em.gray900.mr2.$} {...testId.title} ref={drawerHeaderRef}>
+                    <div css={Css.xl2Sb.gray900.mr2.$} {...testId.title} ref={drawerHeaderRef}>
                       {!modalState.current && (title || null)}
                     </div>
                     {!modalState.current && (titleLeftContent || null)}

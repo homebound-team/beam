@@ -262,7 +262,7 @@ export function OneOffInlineTable() {
     <div
       css={{
         ...Css.dig.gtc("auto auto auto").rg1.cg3.gray700.bgGray300.br4.p1.$,
-        "& > div:nth-of-type(-n+3)": Css.tinyEm.$,
+        "& > div:nth-of-type(-n+3)": Css.tinySb.$,
         "& > div:nth-of-type(n+4)": Css.xs.$,
         "& > div:nth-of-type(3n)": Css.tr.$,
       }}
@@ -382,7 +382,7 @@ export const StyleCondensedWithNoPadding = newStory(() => {
         columns={[nameColumn, valueColumn, actionColumn]}
         style={{
           ...condensedStyle,
-          headerCellCss: Css.smEm.$,
+          headerCellCss: Css.smMd.$,
           firstCellCss: Css.pl0.$,
         }}
         rows={[
@@ -701,7 +701,7 @@ export function StickyColumns() {
   const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
   return (
     <div>
-      <h1 css={Css.lgEm.$}>First column sticky left</h1>
+      <h1 css={Css.lgSb.$}>First column sticky left</h1>
       <div css={Css.wPx(500).overflowAuto.$}>
         <GridTable
           columns={[{ ...nameColumn, sticky: "left" }, valueColumn, actionColumn]}
@@ -713,7 +713,7 @@ export function StickyColumns() {
         />
       </div>
 
-      <h1 css={Css.lgEm.mt3.$}>Last column sticky right</h1>
+      <h1 css={Css.lgSb.mt3.$}>Last column sticky right</h1>
       <div css={Css.wPx(500).overflowAuto.$}>
         <GridTable
           columns={[nameColumn, valueColumn, { ...actionColumn, sticky: "right" }]}
@@ -725,7 +725,7 @@ export function StickyColumns() {
         />
       </div>
 
-      <h1 css={Css.lgEm.mt3.$}>Center column sticky left</h1>
+      <h1 css={Css.lgSb.mt3.$}>Center column sticky left</h1>
       <div css={Css.wPx(500).overflowAuto.$}>
         <GridTable
           columns={[nameColumn, { ...valueColumn, sticky: "left" }, actionColumn]}
@@ -737,7 +737,7 @@ export function StickyColumns() {
         />
       </div>
 
-      <h1 css={Css.lgEm.mt3.$}>Center column sticky right</h1>
+      <h1 css={Css.lgSb.mt3.$}>Center column sticky right</h1>
       <div css={Css.wPx(500).overflowAuto.$}>
         <GridTable
           columns={[nameColumn, { ...valueColumn, sticky: "right" }, actionColumn]}
@@ -749,7 +749,7 @@ export function StickyColumns() {
         />
       </div>
 
-      <h1 css={Css.lgEm.mt3.$}>Last column non-header cells sticky</h1>
+      <h1 css={Css.lgSb.mt3.$}>Last column non-header cells sticky</h1>
       <div css={Css.wPx(500).overflowAuto.$}>
         <GridTable
           columns={[
@@ -916,7 +916,7 @@ export function TruncatingCells() {
   const elCol: GridColumn<Row> = {
     header: "Truncated locally",
     data: ({ name }) => ({
-      content: <span css={Css.green800.xsEm.truncate.$}>{name}</span>,
+      content: <span css={Css.green800.xsMd.truncate.$}>{name}</span>,
     }),
     w: "160px",
   };

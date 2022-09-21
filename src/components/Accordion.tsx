@@ -38,7 +38,9 @@ export function Accordion(props: AccordionProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const { isFocusVisible, focusProps } = useFocusRing();
 
-  useEffect(() => { setExpanded(defaultExpanded); }, [defaultExpanded])
+  useEffect(() => {
+    setExpanded(defaultExpanded);
+  }, [defaultExpanded]);
 
   return (
     <div
@@ -55,7 +57,7 @@ export function Accordion(props: AccordionProps) {
         aria-expanded={expanded}
         disabled={disabled}
         css={{
-          ...Css.df.jcsb.gap2.aic.w100.p2.baseEm.outline("none").addIn(":hover", Css.bgGray100.$).$,
+          ...Css.df.jcsb.gap2.aic.w100.p2.baseMd.outline("none").addIn(":hover", Css.bgGray100.$).$,
           ...(disabled && Css.gray500.$),
           ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.LightBlue700}`).$),
         }}
@@ -80,7 +82,9 @@ export function Accordion(props: AccordionProps) {
         aria-hidden={!expanded}
         css={{
           // Use max-height for grow/shrink animation (remove close animation for AccordionList to avoid delays)
-          ...Css.overflowHidden.maxhPx(1000).add("transition", `max-height ${expanded || !index ? "250ms" : "0"} ease-in-out`).$,
+          ...Css.overflowHidden
+            .maxhPx(1000)
+            .add("transition", `max-height ${expanded || !index ? "250ms" : "0"} ease-in-out`).$,
           ...(!expanded || disabled ? Css.maxh0.$ : {}),
         }}
       >

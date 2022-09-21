@@ -9,25 +9,45 @@ export type Properties = Properties1;
 
 export type Typography =
   | "tiny"
-  | "tinyEm"
+  | "tinyMd"
+  | "tinySb"
+  | "tinyBd"
   | "xs"
-  | "xsEm"
+  | "xsMd"
+  | "xsSb"
+  | "xsBd"
   | "sm"
-  | "smEm"
+  | "smMd"
+  | "smSb"
+  | "smBd"
   | "base"
-  | "baseEm"
+  | "baseMd"
+  | "baseSb"
+  | "baseBd"
   | "lg"
-  | "lgEm"
+  | "lgMd"
+  | "lgSb"
+  | "lgBd"
   | "xl"
-  | "xlEm"
+  | "xlMd"
+  | "xlSb"
+  | "xlBd"
   | "xl2"
-  | "xl2Em"
+  | "xl2Md"
+  | "xl2Sb"
+  | "xl2Bd"
   | "xl3"
-  | "xl3Em"
+  | "xl3Md"
+  | "xl3Sb"
+  | "xl3Bd"
   | "xl4"
-  | "xl4Em"
+  | "xl4Md"
+  | "xl4Sb"
+  | "xl4Bd"
   | "xl5"
-  | "xl5Em";
+  | "xl5Md"
+  | "xl5Sb"
+  | "xl5Bd";
 
 type Opts<T> = {
   rules: T;
@@ -791,25 +811,45 @@ class CssBuilder<T extends Properties1> {
 
   // typeScale
   get tiny() { return this.add("fontWeight", 400).add("fontSize", "10px").add("lineHeight", "14px"); }
-  get tinyEm() { return this.add("fontWeight", 600).add("fontSize", "10px").add("lineHeight", "14px"); }
+  get tinyMd() { return this.add("fontWeight", 500).add("fontSize", "10px").add("lineHeight", "14px"); }
+  get tinySb() { return this.add("fontWeight", 600).add("fontSize", "10px").add("lineHeight", "14px"); }
+  get tinyBd() { return this.add("fontWeight", 700).add("fontSize", "10px").add("lineHeight", "14px"); }
   get xs() { return this.add("fontWeight", 400).add("fontSize", "12px").add("lineHeight", "16px"); }
-  get xsEm() { return this.add("fontWeight", 500).add("fontSize", "12px").add("lineHeight", "16px"); }
+  get xsMd() { return this.add("fontWeight", 500).add("fontSize", "12px").add("lineHeight", "16px"); }
+  get xsSb() { return this.add("fontWeight", 600).add("fontSize", "12px").add("lineHeight", "16px"); }
+  get xsBd() { return this.add("fontWeight", 700).add("fontSize", "12px").add("lineHeight", "16px"); }
   get sm() { return this.add("fontWeight", 400).add("fontSize", "14px").add("lineHeight", "20px"); }
-  get smEm() { return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px"); }
+  get smMd() { return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px"); }
+  get smSb() { return this.add("fontWeight", 600).add("fontSize", "14px").add("lineHeight", "20px"); }
+  get smBd() { return this.add("fontWeight", 700).add("fontSize", "14px").add("lineHeight", "20px"); }
   get base() { return this.add("fontWeight", 400).add("fontSize", "16px").add("lineHeight", "24px"); }
-  get baseEm() { return this.add("fontWeight", 500).add("fontSize", "16px").add("lineHeight", "24px"); }
+  get baseMd() { return this.add("fontWeight", 500).add("fontSize", "16px").add("lineHeight", "24px"); }
+  get baseSb() { return this.add("fontWeight", 600).add("fontSize", "16px").add("lineHeight", "24px"); }
+  get baseBd() { return this.add("fontWeight", 700).add("fontSize", "16px").add("lineHeight", "24px"); }
   get lg() { return this.add("fontWeight", 400).add("fontSize", "18px").add("lineHeight", "28px"); }
-  get lgEm() { return this.add("fontWeight", 600).add("fontSize", "18px").add("lineHeight", "28px"); }
+  get lgMd() { return this.add("fontWeight", 500).add("fontSize", "18px").add("lineHeight", "28px"); }
+  get lgSb() { return this.add("fontWeight", 600).add("fontSize", "18px").add("lineHeight", "28px"); }
+  get lgBd() { return this.add("fontWeight", 700).add("fontSize", "18px").add("lineHeight", "28px"); }
   get xl() { return this.add("fontWeight", 400).add("fontSize", "20px").add("lineHeight", "28px"); }
-  get xlEm() { return this.add("fontWeight", 600).add("fontSize", "20px").add("lineHeight", "28px"); }
+  get xlMd() { return this.add("fontWeight", 500).add("fontSize", "20px").add("lineHeight", "28px"); }
+  get xlSb() { return this.add("fontWeight", 600).add("fontSize", "20px").add("lineHeight", "28px"); }
+  get xlBd() { return this.add("fontWeight", 700).add("fontSize", "20px").add("lineHeight", "28px"); }
   get xl2() { return this.add("fontWeight", 400).add("fontSize", "24px").add("lineHeight", "32px"); }
-  get xl2Em() { return this.add("fontWeight", 600).add("fontSize", "24px").add("lineHeight", "32px"); }
+  get xl2Md() { return this.add("fontWeight", 500).add("fontSize", "24px").add("lineHeight", "32px"); }
+  get xl2Sb() { return this.add("fontWeight", 600).add("fontSize", "24px").add("lineHeight", "32px"); }
+  get xl2Bd() { return this.add("fontWeight", 700).add("fontSize", "24px").add("lineHeight", "32px"); }
   get xl3() { return this.add("fontWeight", 400).add("fontSize", "30px").add("lineHeight", "36px"); }
-  get xl3Em() { return this.add("fontWeight", 600).add("fontSize", "30px").add("lineHeight", "36px"); }
+  get xl3Md() { return this.add("fontWeight", 500).add("fontSize", "30px").add("lineHeight", "36px"); }
+  get xl3Sb() { return this.add("fontWeight", 600).add("fontSize", "30px").add("lineHeight", "36px"); }
+  get xl3Bd() { return this.add("fontWeight", 700).add("fontSize", "30px").add("lineHeight", "36px"); }
   get xl4() { return this.add("fontWeight", 400).add("fontSize", "36px").add("lineHeight", "40px"); }
-  get xl4Em() { return this.add("fontWeight", 600).add("fontSize", "36px").add("lineHeight", "40px"); }
+  get xl4Md() { return this.add("fontWeight", 500).add("fontSize", "36px").add("lineHeight", "40px"); }
+  get xl4Sb() { return this.add("fontWeight", 600).add("fontSize", "36px").add("lineHeight", "40px"); }
+  get xl4Bd() { return this.add("fontWeight", 700).add("fontSize", "36px").add("lineHeight", "40px"); }
   get xl5() { return this.add("fontWeight", 400).add("fontSize", "48px").add("lineHeight", "48px"); }
-  get xl5Em() { return this.add("fontWeight", 600).add("fontSize", "48px").add("lineHeight", "48px"); }
+  get xl5Md() { return this.add("fontWeight", 500).add("fontSize", "48px").add("lineHeight", "48px"); }
+  get xl5Sb() { return this.add("fontWeight", 600).add("fontSize", "48px").add("lineHeight", "48px"); }
+  get xl5Bd() { return this.add("fontWeight", 700).add("fontSize", "48px").add("lineHeight", "48px"); }
 
   // typography
   get measure() { return this.add("maxWidth", "30em"); }
@@ -1088,6 +1128,15 @@ export type Margin = "margin" | "marginTop" | "marginRight" | "marginBottom" | "
 
 export type Padding = "padding" | "paddingTop" | "paddingRight" | "paddingBottom" | "paddingLeft";
 
+export type Font = "fontSize" | "fontWeight" | "lineHeight";
+
 type Brand<K, T> = K & { __brand: T };
 type Breakpoint = Brand<string, "Breakpoint">;
 export const print = "@media print" as Breakpoint;
+export const sm = "@media screen and (max-width:599px)" as Breakpoint;
+export const md = "@media screen and (min-width:600px) and (max-width:959px)" as Breakpoint;
+export const smOrMd = "@media screen and (max-width:959px)" as Breakpoint;
+export const mdAndUp = "@media screen and (min-width:600px)" as Breakpoint;
+export const mdAndDown = "@media screen and (max-width:959px)" as Breakpoint;
+export const lg = "@media screen and (min-width:960px)" as Breakpoint;
+export const mdOrLg = "@media screen and (min-width:600px)" as Breakpoint;

@@ -54,7 +54,7 @@ interface IndicatorProps {
 }
 function Indicator({ text, icon, color }: IndicatorProps) {
   return (
-    <div data-testid="autoSave" css={Css.df.gap1.aic.gray700.smEm.$}>
+    <div data-testid="autoSave" css={Css.df.gap1.aic.gray700.smMd.$}>
       <Icon icon={icon} color={color} />
       {text}
     </div>

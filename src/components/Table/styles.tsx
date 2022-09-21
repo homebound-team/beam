@@ -19,7 +19,7 @@ export const defaultStyle: GridStyle = {
 /** Tightens up the padding of rows, great for rows that have form elements in them. */
 export const condensedStyle: GridStyle = {
   ...defaultStyle,
-  headerCellCss: Css.bgGray100.tinyEm.$,
+  headerCellCss: Css.bgGray100.tinySb.$,
   cellCss: Css.aic.sm.py1.px2.$,
   rootCss: Css.dg.gray700.xs.$,
   firstRowMessageCss: Css.tc.py2.$,
@@ -39,7 +39,7 @@ export const cardStyle: GridStyle = {
     ...Css.add({
       border: "none",
       borderRadius: "unset",
-    }).p1.m0.xsEm.gray700.$,
+    }).p1.m0.xsMd.gray700.$,
   },
 };
 
@@ -60,8 +60,8 @@ function memoizedTableStyles() {
     if (!cache[key]) {
       const groupedLevels = {
         0: {
-          cellCss: Css.xsEm.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
-          firstContentColumn: Css.smEm.$,
+          cellCss: Css.xsMd.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+          firstContentColumn: Css.smMd.$,
         },
         2: { firstContentColumn: Css.tiny.pl3.$ },
       };
@@ -70,12 +70,12 @@ function memoizedTableStyles() {
       cache[key] = {
         emptyCell: "-",
         firstRowMessageCss: Css.tc.py3.$,
-        headerCellCss: Css.gray700.xsEm.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
-        totalsCellCss: Css.bgWhite.gray700.smEm.hPx(52).pt0.pbPx(12).boxShadow("none").$,
+        headerCellCss: Css.gray700.xsMd.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
+        totalsCellCss: Css.bgWhite.gray700.smMd.hPx(52).pt0.pbPx(12).boxShadow("none").$,
         cellCss: {
           ...Css.gray900.xs.bgWhite.aic.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
-          ...(cellHighlight ? { "&:hover": Css.bgGray100.$}: {})
+          ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
         },
         presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
         levels: grouped ? groupedLevels : defaultLevels,

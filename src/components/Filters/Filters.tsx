@@ -86,7 +86,7 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
           label="More Filters"
           endAdornment={
             numModalFilters > 0 && (
-              <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinyEm.df.aic.jcc.$}>
+              <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinySb.df.aic.jcc.$}>
                 {numModalFilters}
               </span>
             )

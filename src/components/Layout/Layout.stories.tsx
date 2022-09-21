@@ -132,7 +132,7 @@ function ExamplePageComponent() {
 function OverviewExample() {
   return (
     <ScrollableContent>
-      <h1 css={Css.lgEm.mb3.$}>Detail</h1>
+      <h1 css={Css.lgSb.mb3.$}>Detail</h1>
       {zeroTo(10).map((i) => (
         <p key={i} css={Css.mb3.$}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
@@ -149,7 +149,7 @@ function OverviewExample() {
 function HistoryExample() {
   return (
     <>
-      <div css={Css.lgEm.$}>History</div>
+      <div css={Css.lgSb.$}>History</div>
       <p>Demonstrates not utilizing ScrollableContent component. Expect this section of the layout to scroll</p>
       <ul css={Css.df.fdc.childGap2.$}>
         {zeroTo(20).map((i) => (
@@ -298,7 +298,7 @@ function TestHeader({ title }: { title: ReactNode }) {
   return (
     <FullBleed>
       <header css={{ ...Css.py2.bb.bGray200.$ }}>
-        <h1 css={Css.xlEm.$}>{title}</h1>
+        <h1 css={Css.xlSb.$}>{title}</h1>
       </header>
     </FullBleed>
   );

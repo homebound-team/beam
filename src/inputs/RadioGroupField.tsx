@@ -135,7 +135,7 @@ function Radio<K extends string>(props: {
       <div>
         <div
           id={labelId}
-          css={Css.smEm.gray800.if(disabled).gray400.$}
+          css={Css.smMd.gray800.if(disabled).gray400.$}
           {...(description ? { "aria-describedby": descriptionId } : {})}
         >
           {label}
