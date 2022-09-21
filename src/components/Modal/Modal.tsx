@@ -114,7 +114,7 @@ export function Modal(props: ModalProps) {
             >
               {/* Setup three children (header, content, footer), and flex grow the content. */}
               <header css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bGray200.$}>
-                <h1 css={Css.fg1.xl2Em.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
+                <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
                 <span css={Css.fs0.pl1.$}>
                   <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
                 </span>

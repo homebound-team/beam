@@ -13,49 +13,49 @@ export function PresentationFieldProps() {
   return (
     <div>
       <div css={Css.pb2.mb2.bb.bGray300.$}>
-        <h1 css={Css.xlEm.$}>Borderless</h1>
+        <h1 css={Css.xlSb.$}>Borderless</h1>
         <PresentationProvider fieldProps={{ borderless: true }}>
           <TestFields />
         </PresentationProvider>
       </div>
 
       <div css={Css.pb2.mb2.bb.bGray300.$}>
-        <h1 css={Css.xlEm.$}>Compact</h1>
+        <h1 css={Css.xlSb.$}>Compact</h1>
         <PresentationProvider fieldProps={{ compact: true }}>
           <TestFields />
         </PresentationProvider>
       </div>
 
       <div css={Css.pb2.mb2.bb.bGray300.$}>
-        <h1 css={Css.xlEm.$}>Hidden Labels</h1>
+        <h1 css={Css.xlSb.$}>Hidden Labels</h1>
         <PresentationProvider fieldProps={{ hideLabel: true }}>
           <TestFields />
         </PresentationProvider>
       </div>
 
       <div css={Css.pb2.mb2.bb.bGray300.$}>
-        <h1 css={Css.xlEm.$}>Number Alignment Right</h1>
+        <h1 css={Css.xlSb.$}>Number Alignment Right</h1>
         <PresentationProvider fieldProps={{ numberAlignment: "right" }}>
           <TestFields />
         </PresentationProvider>
       </div>
 
       <div css={Css.pb2.mb2.bb.bGray300.$}>
-        <h1 css={Css.xlEm.$}>Label Suffix</h1>
+        <h1 css={Css.xlSb.$}>Label Suffix</h1>
         <PresentationProvider fieldProps={{ labelSuffix: { required: "*", optional: "(optional)" } }}>
           <TestFields />
         </PresentationProvider>
       </div>
 
       <div css={Css.pb2.mb2.bb.bGray300.$}>
-        <h1 css={Css.xlEm.$}>Small Font size</h1>
+        <h1 css={Css.xlSb.$}>Small Font size</h1>
         <PresentationProvider fieldProps={{ typeScale: "xs", compact: true }}>
           <TestFields />
         </PresentationProvider>
       </div>
 
       <div css={Css.pb2.mb2.bb.bGray300.$}>
-        <h1 css={Css.xlEm.$}>visuallyDisabled=false</h1>
+        <h1 css={Css.xlSb.$}>visuallyDisabled=false</h1>
         <PresentationProvider fieldProps={{ visuallyDisabled: false }}>
           <TestFields disabled />
         </PresentationProvider>

@@ -104,7 +104,7 @@ const disabledColor = Css.gray300.$;
 const focusRingStyles = Css.bshFocus.$;
 const hoverBorderStyles = Css.bLightBlue900.$;
 const markStyles = { svg: Css.absolute.topPx(-1).leftPx(-1).$ };
-const labelStyles = Css.smEm.$;
+const labelStyles = Css.smMd.$;
 const descStyles = Css.sm.gray700.$;
 
 const checkmarkSmall = (

@@ -67,7 +67,7 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
 export function ModalFilterItem({ label, children }: { label?: string; children: ReactNode }) {
   return (
     <div css={Css.mb4.if(!label).bt.bGray200.$}>
-      {label && <h2 css={Css.baseEm.mb2.$}>{label}</h2>}
+      {label && <h2 css={Css.baseMd.mb2.$}>{label}</h2>}
       <div css={Css.if(!label).pt3.$}>{children}</div>
     </div>
   );

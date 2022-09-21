@@ -8,7 +8,7 @@ export default {
 export const Color = () => {
   const paletteEntries = Object.entries(Palette);
   return (
-    <div css={{ h1: Css.xl4Em.mb4.$, h2: Css.xl2Em.mb4.$ }}>
+    <div css={{ h1: Css.xl4Sb.mb4.$, h2: Css.xl2Sb.mb4.$ }}>
       <h1>Extended Palette</h1>
       <h2>Gray</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Gray"))} />

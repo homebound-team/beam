@@ -25,7 +25,7 @@ export function ConfirmCloseModal(props: ConfirmCloseModalProps) {
       <ModalHeader>Confirm</ModalHeader>
       <ModalBody>
         <div css={Css.tc.wPx(400).$}>
-          <p css={Css.lgEm.gray900.mb2.$}>Are you sure you want to cancel?</p>
+          <p css={Css.lgSb.gray900.mb2.$}>Are you sure you want to cancel?</p>
           <p css={Css.base.gray700.$}>Any data you've entered so far will be lost.</p>
         </div>
       </ModalBody>

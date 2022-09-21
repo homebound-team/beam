@@ -33,7 +33,7 @@ export default {
 function Template(args: IconButtonProps) {
   return (
     <div css={Css.if(!!args.contrast).bgGray800.white.$}>
-      <h1 css={Css.xl2Em.mbPx(30).$}>Icon Only Button</h1>
+      <h1 css={Css.xl2Sb.mbPx(30).$}>Icon Only Button</h1>
       <div css={Css.df.gapPx(90).$}>
         <div>
           <h2>Default</h2>

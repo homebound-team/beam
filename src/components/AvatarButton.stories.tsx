@@ -31,7 +31,7 @@ export default {
 export function Examples(props: AvatarButtonProps) {
   return (
     <div>
-      <h1 css={Css.xl2Em.mbPx(30).$}>Avatar Button</h1>
+      <h1 css={Css.xl2Sb.mbPx(30).$}>Avatar Button</h1>
       <div css={Css.df.gapPx(90).$}>
         <div>
           <h2>Default</h2>

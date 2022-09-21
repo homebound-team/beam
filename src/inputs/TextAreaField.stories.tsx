@@ -32,7 +32,7 @@ export function TextAreaStyles() {
         <TextField label="Regular Field For Reference" value="value" onChange={() => {}} />
 
         <h1 css={Css.lg.$}>Modified for Blueprint To Do Title</h1>
-        <TestTextArea label="Title" value="Test title" preventNewLines hideLabel borderless xss={Css.xl2Em.$} />
+        <TestTextArea label="Title" value="Test title" preventNewLines hideLabel borderless xss={Css.xl2Sb.$} />
       </div>
     </div>
   );

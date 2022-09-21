@@ -86,7 +86,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     visuallyDisabled = fieldProps?.visuallyDisabled ?? true,
   } = props;
 
-  const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && !hideLabel ? "smEm" : "sm");
+  const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && !hideLabel ? "smMd" : "sm");
   const errorInTooltip = fieldProps?.errorInTooltip ?? false;
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
   const { compound = false, forceFocus = false, forceHover = false } = internalProps;
