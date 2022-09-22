@@ -54,8 +54,8 @@ export interface GridStyleDef {
 function memoizedTableStyles() {
   const cache: Record<string, GridStyle> = {};
   return (props?: GridStyleDef) => {
-    const { inlineEditing = false, grouped = false, rowHeight = "flexible", cellHighlight } = props || {};
-    const key = `${inlineEditing}|${grouped}|${rowHeight}`;
+    const { inlineEditing = false, grouped = false, rowHeight = "flexible", cellHighlight = false } = props || {};
+    const key = `${inlineEditing}|${grouped}|${rowHeight}|${cellHighlight}`;
 
     if (!cache[key]) {
       const groupedLevels = {
