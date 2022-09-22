@@ -1,4 +1,5 @@
 import { Css, Palette } from "src/Css";
+import { safeKeys } from "src/utils";
 import { GridStyle } from ".";
 
 /** Our original table look & feel/style. */
@@ -53,9 +54,12 @@ export interface GridStyleDef {
 
 function memoizedTableStyles() {
   const cache: Record<string, GridStyle> = {};
-  return (props?: GridStyleDef) => {
-    const { inlineEditing = false, grouped = false, rowHeight = "flexible", cellHighlight } = props || {};
-    const key = `${inlineEditing}|${grouped}|${rowHeight}`;
+  return (props: GridStyleDef = {}) => {
+    const { inlineEditing = false, grouped = false, rowHeight = "flexible", cellHighlight = false } = props;
+    const key = safeKeys(props)
+      .sort()
+      .map((k) => `${k}_${props[k]}`)
+      .join("|");
 
     if (!cache[key]) {
       const groupedLevels = {
