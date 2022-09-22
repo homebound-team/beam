@@ -1,21 +1,9 @@
 import { camelCase } from "change-case";
-import {
-  HTMLAttributes,
-  KeyboardEvent,
-  PropsWithChildren,
-  ReactNode,
-  ReactPortal,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
-import { createPortal } from "react-dom";
 import { matchPath, Route, useLocation } from "react-router";
 import { Link } from "react-router-dom";
 import type { IconKey } from "src/components";
-import { useBeamContext } from "src/components/BeamContext";
 import { Css, Margin, Only, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
@@ -45,6 +33,8 @@ export interface TabsProps<V extends string, X> {
   alwaysShowAllTabs?: boolean;
   // Adds a bottom border to the Tabs container
   includeBottomBorder?: boolean;
+  // Content to be placed to the far right of the tabs
+  right?: ReactNode;
 }
 
 // Tabs can be rendered as Links (omit "onChange") and we'll use React-Router for matching (omit "selected")/
@@ -127,8 +117,7 @@ export function TabContent<V extends string>(
 
 /** The top list of tabs. */
 export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<V, {}>) {
-  const { tabActionsRef, tabActionsDiv } = useBeamContext();
-  const { ariaLabel, tabs, includeBottomBorder, ...others } = props;
+  const { ariaLabel, tabs, includeBottomBorder, right, ...others } = props;
   const location = useLocation();
   const selected = isRouteTabs(props)
     ? uniqueTabValue(
@@ -142,12 +131,6 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
 
   // Whenever selected changes, reset active
   useEffect(() => setActive(selected), [selected]);
-
-  useEffect(() => {
-    if (tabActionsRef && tabActionsDiv) {
-      tabActionsRef.current!.appendChild(tabActionsDiv);
-    }
-  }, [tabActionsRef, tabActionsDiv]);
 
   // the active tab is highlighted, but not necessarily "selected"
   // the selected tab dictates what is displayed in the content panel
@@ -205,7 +188,7 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
         </div>
       )}
       {/* ref for actions specific to a tab. Targeting the immediate div (tabActionsEl) to set default styles */}
-      <div css={Css.ml("auto").addIn("&>div", Css.df.aic.childGap1.$).$} ref={tabActionsRef} />
+      {right && <div css={Css.ml("auto").df.aic.gap1.$}>{right}</div>}
     </div>
   );
 }
@@ -316,14 +299,6 @@ function isRouteTab(tab: Tab<any> | RouteTab<any>): tab is RouteTab<any> {
 
 function uniqueTabValue(tab: Tab<any> | RouteTab<any>) {
   return isRouteTab(tab) ? camelCase(tab.name) : tab.value;
-}
-
-export function TabActions({ children }: PropsWithChildren<{}>): ReactPortal {
-  const { tabActionsDiv } = useBeamContext();
-  if (!tabActionsDiv) {
-    throw new Error("Tab Actions element is not defined");
-  }
-  return createPortal(children, tabActionsDiv);
 }
 
 // Determines whether we should hide the Tab panel. Returns true if there is only one enabled tab and `alwaysShowAllTabs` is falsey.

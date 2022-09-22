@@ -25,10 +25,6 @@ export interface BeamContextState {
   drawerCanCloseChecks: MutableRefObject<CanCloseCheck[]>;
   /** Checks when closing SuperDrawer Details, a double array to keep per-detail lists. */
   drawerCanCloseDetailsChecks: MutableRefObject<CanCloseCheck[][]>;
-  /** The ref for defining the portal element's location for Tab actions */
-  tabActionsRef: MutableRefObject<HTMLDivElement | null>;
-  /** The div for Tab actions to portal into */
-  tabActionsDiv: HTMLDivElement;
 }
 
 /** This is only exported internally, for useModal and useSuperDrawer, it's not a public API. */
@@ -41,8 +37,6 @@ export const BeamContext = createContext<BeamContextState>({
   drawerContentStack: new EmptyRef(),
   drawerCanCloseChecks: new EmptyRef(),
   drawerCanCloseDetailsChecks: new EmptyRef(),
-  tabActionsRef: new EmptyRef(),
-  tabActionsDiv: undefined!,
 });
 
 interface BeamProviderProps extends PropsWithChildren<PresentationContextProps> {}
@@ -66,8 +60,6 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
   const drawerContentStackRef = useRef<ContentStack[]>([]);
   const drawerCanCloseChecks = useRef<CanCloseCheck[]>([]);
   const drawerCanCloseDetailsChecks = useRef<CanCloseCheck[][]>([]);
-  const tabActionsRef = useRef<HTMLDivElement>(null);
-  const tabActionsDiv = useMemo(() => document.createElement("div"), []);
 
   // We essentially expose the refs, but with our own getters/setters so that we can
   // have the setters call `tick` to re-render this Provider
@@ -83,8 +75,6 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
       modalFooterDiv,
       drawerCanCloseChecks,
       drawerCanCloseDetailsChecks,
-      tabActionsRef,
-      tabActionsDiv,
     };
   }, [modalBodyDiv, modalFooterDiv]);
 

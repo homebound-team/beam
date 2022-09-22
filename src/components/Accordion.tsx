@@ -1,7 +1,9 @@
 import { useId } from "@react-aria/utils";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 import { useFocusRing } from "react-aria";
-import { Css, Icon, Palette, useTestIds } from "src/index";
+import { Icon } from "src/components/Icon";
+import { Css, Palette } from "src/Css";
+import { useTestIds } from "src/utils";
 
 export interface AccordionProps {
   title: ReactNode;

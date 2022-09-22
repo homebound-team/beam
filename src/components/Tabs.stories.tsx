@@ -1,9 +1,8 @@
-import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { Fragment, PropsWithChildren, useState } from "react";
+import { Fragment, useState } from "react";
 import { Route, useHistory, useLocation, useParams } from "react-router";
 import { Link } from "react-router-dom";
-import { RouteTabWithContent, TabActions, TabContent, Tabs, TabsWithContent, TabWithContent } from "src/components";
+import { RouteTabWithContent, TabContent, Tabs, TabsWithContent, TabWithContent } from "src/components";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
@@ -157,37 +156,29 @@ export const TabsHiddenIfOnlyOneActive = () => {
   return <TabsWithContent tabs={testTabs} onChange={() => {}} selected={"tab1"} ariaLabel="Sample Tabs" />;
 };
 
-export const TabsWithActions = () => {
+export const TabWithRightContent = () => {
   const [selectedTab, setSelectedTab] = useState("tab1");
   const testTabs: TabWithContent<TabValue>[] = [
     {
       name: "Tab 1",
       value: "tab1",
-      render: () => <TabWithActions actions={["Add New", "Edit"]}>Tab Content</TabWithActions>,
+      render: () => <div css={Css.bgGray100.bt.bGray800.p2.$}>Tab 1 Content</div>,
     },
-    { name: "Tab 2", value: "tab2", render: () => <TabWithActions actions={["Action 2"]}>Tab Content</TabWithActions> },
-    { name: "Tab 3", value: "tab3", render: () => <TabWithActions actions={["Action 3"]}>Tab Content</TabWithActions> },
-    { name: "Tab 4", value: "tab4", render: () => <TabWithActions actions={["Action 4"]}>Tab Content</TabWithActions> },
-  ];
-  return <TabsWithContent tabs={testTabs} onChange={setSelectedTab} selected={selectedTab} ariaLabel="Sample Tabs" />;
-};
-
-export const OneTabWithActions = () => {
-  const [selectedTab, setSelectedTab] = useState("tab1");
-  const testTabs: TabWithContent<TabValue>[] = [
     {
-      name: "Tab 1",
-      value: "tab1",
-      render: () => (
-        <TabWithActions actions={["Add New", "Edit"]}>
-          <div css={Css.bgGray100.bt.bGray800.p2.$}>Tab Content</div>
-        </TabWithActions>
-      ),
+      name: "Tab 2",
+      value: "tab2",
+      render: () => <div css={Css.bgGray100.bt.bGray800.p2.$}>Tab 2 Content</div>,
     },
   ];
+  const right = (
+    <>
+      <Button variant="secondary" label="Add New" onClick={() => {}} />
+      <Button variant="secondary" label="Edit" onClick={() => {}} />
+    </>
+  );
   return (
     <>
-      <Tabs tabs={testTabs} onChange={setSelectedTab} selected={selectedTab} ariaLabel="Sample Tabs" />
+      <Tabs tabs={testTabs} onChange={setSelectedTab} selected={selectedTab} ariaLabel="Sample Tabs" right={right} />
       {/* The tabs will be hidden, which causes the TabContent default top margin to be removed. But we are adding in actions, so add the margin back in ourselves. */}
       <TabContent contentXss={Css.mt3.$} tabs={testTabs} selected={selectedTab} />
     </>
@@ -252,19 +243,6 @@ function RouteTab3() {
       <div>
         <pre css={Css.dib.$}>tab.path = "/:ceId/history"</pre>
       </div>
-    </>
-  );
-}
-
-function TabWithActions({ children, actions }: PropsWithChildren<{ actions: string[] }>) {
-  return (
-    <>
-      <TabActions>
-        {actions.map((t) => (
-          <Button key={t} variant="secondary" label={t} onClick={action("Tab Action clicked")} />
-        ))}
-      </TabActions>
-      {children}
     </>
   );
 }
