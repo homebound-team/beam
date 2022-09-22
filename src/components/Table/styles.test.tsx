@@ -18,5 +18,11 @@ describe("GridStyleDef", () => {
     expect(grouped).not.toBe(defaultStyles);
     expect(rowHeightFixed).not.toBe(defaultStyles);
     expect(cellHighlight).not.toBe(defaultStyles);
+
+    // And when passing properties in different orders
+    const highlightAndGrouped = getTableStyles({ cellHighlight: true, grouped: true });
+    const highlightAndGrouped2 = getTableStyles({ grouped: true, cellHighlight: true });
+    // Then they are still equal
+    expect(highlightAndGrouped).toBe(highlightAndGrouped2);
   });
 });
