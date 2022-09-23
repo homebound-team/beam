@@ -25,10 +25,10 @@ export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
         {variants.map((variant, idx) => {
           const variantName = capitalCase(variant);
           return (
-            <>
+            <div key={variantName} css={Css.display("contents").$}>
               <h2 css={Css.xl.gc("1/5").if(idx !== 0).mt3.$}>{variantName}</h2>
               {sizes.map((size) => (
-                <>
+                <div key={size} css={Css.display("contents").$}>
                   <Button
                     size={size}
                     variant={variant}
@@ -61,9 +61,9 @@ export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
                     contrast={contrast}
                     onClick={action("Clicked")}
                   />
-                </>
+                </div>
               ))}
-            </>
+            </div>
           );
         })}
       </div>
@@ -108,14 +108,14 @@ export function ButtonLink() {
         {variants.map((variant, idx) => {
           const variantName = variant.charAt(0).toUpperCase() + variant.slice(1);
           return (
-            <>
+            <div key={variantName} css={Css.display("contents").$}>
               <h2 css={Css.xl.gc("1/6").if(idx !== 0).mt3.$}>{variantName}</h2>
               <Button variant={variant} onClick="/fakePath" label="Relative URL link" />
               <Button variant={variant} onClick="/" label="Relative URL - Open in New Tab" openInNew />
               <Button variant={variant} onClick="https://www.homebound.com" label="Absolute URL link" />
               <Button variant={variant} onClick="tony-stark.jpg" label="Download link" download />
               <Button variant={variant} icon="plus" onClick="/fakePath" label="Disabled link" disabled />
-            </>
+            </div>
           );
         })}
       </div>
