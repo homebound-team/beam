@@ -1,4 +1,3 @@
 module.exports = {
-  extends: ["react-app", "prettier", "plugin:storybook/recommended"],
-  rules: {},
+  extends: ["react-app", "plugin:storybook/recommended", "@homebound/eslint-config/react"],
 };
