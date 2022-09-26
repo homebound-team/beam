@@ -8,7 +8,7 @@ import { withDimensions, withRouter } from "src/utils/sb";
 
 export default {
   component: ButtonMenu,
-  title: "Components/Button Menus",
+  title: "Workspace/Components/Button Menus",
   decorators: [withRouter(), withDimensions()],
 } as Meta;
 

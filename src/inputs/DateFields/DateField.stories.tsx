@@ -9,7 +9,7 @@ import { noop } from "src/utils";
 import { samples, withDimensions } from "src/utils/sb";
 
 export default {
-  title: "Inputs/Date Field",
+  title: "Workspace/Inputs/Date Field",
   component: Button,
   decorators: [withDimensions()],
 } as Meta;

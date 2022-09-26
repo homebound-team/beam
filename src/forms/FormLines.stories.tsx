@@ -8,7 +8,7 @@ import { noop } from "src/utils/index";
 
 export default {
   component: FormLines,
-  title: "Forms/Form Lines",
+  title: "Workspace/Forms/Form Lines",
 } as Meta;
 
 export function FlatList() {

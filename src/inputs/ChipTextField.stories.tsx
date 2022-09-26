@@ -6,7 +6,7 @@ import { ChipTextField } from "src/inputs/ChipTextField";
 
 export default {
   component: ChipTextField,
-  title: "inputs/ChipTextField",
+  title: "Workspace/Inputs/ChipTextField",
 };
 
 export function Example() {

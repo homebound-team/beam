@@ -5,7 +5,7 @@ import { jan1, jan10, jan2, jan29 } from "src/forms/formStateDomain";
 
 export default {
   component: DatePicker,
-  title: "Components/DatePicker",
+  title: "Workspace/Components/DatePicker",
 } as Meta;
 
 export function Default() {

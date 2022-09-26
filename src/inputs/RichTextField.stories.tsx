@@ -7,7 +7,7 @@ import { RichTextField as RichTextFieldComponent } from "./RichTextField";
 
 export default {
   component: RichTextFieldComponent,
-  title: "Inputs/Rich Text Field",
+  title: "Workspace/Inputs/Rich Text Field",
 } as Meta;
 
 export function Editable() {

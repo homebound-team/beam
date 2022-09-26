@@ -10,7 +10,7 @@ import { zeroTo } from "src/utils/sb";
 
 export default {
   component: ChipSelectField,
-  title: "inputs/ChipSelectField",
+  title: "Workspace/Inputs/ChipSelectField",
 } as Meta;
 
 type TaskStatusDetails = { id: string; code: TaskStatus; name: string };

@@ -33,7 +33,7 @@ import { newStory, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
   component: GridTable,
-  title: "Components/GridTable",
+  title: "Workspace/Components/GridTable",
   parameters: { layout: "fullscreen", backgrounds: { default: "white" } },
   decorators: [withRouter()],
 } as Meta;

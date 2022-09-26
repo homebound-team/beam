@@ -4,7 +4,7 @@ import { ButtonGroup } from "src/index";
 
 export default {
   component: ButtonGroup,
-  title: "Components/Button Groups",
+  title: "Workspace/Components/Button Groups",
 } as Meta;
 
 export function ButtonGroups() {

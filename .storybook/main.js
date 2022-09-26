@@ -4,7 +4,7 @@ const reactPlugin = require("@vitejs/plugin-react");
 
 module.exports = {
   core: { builder: "@storybook/builder-vite" },
-  stories: ["../src/**/*.stories.tsx", "../src/**/*.stories.mdx"],
+  stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.tsx"],
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",

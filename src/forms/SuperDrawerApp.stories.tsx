@@ -20,7 +20,7 @@ import { AuthorInput } from "./formStateDomain";
  * - When filling the form and successfully clicking "save", closing the form
  * does not show a confirmation message.
  */
-export default { title: "Forms/Super Drawer App", decorators: [withBeamDecorator, withDimensions()] } as Meta;
+export default { title: "Workspace/Forms/Super Drawer App", decorators: [withBeamDecorator, withDimensions()] } as Meta;
 
 export function SuperDrawerApp() {
   const { openInDrawer } = useSuperDrawer();

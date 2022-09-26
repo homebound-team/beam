@@ -8,7 +8,7 @@ import { DateRange } from "src/types";
 
 export default {
   component: DateRangePicker,
-  title: "Components/DateRangePicker",
+  title: "Workspace/Components/DateRangePicker",
 } as Meta;
 
 export function Default() {

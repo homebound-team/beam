@@ -7,7 +7,7 @@ import { noop } from "src/utils";
 
 export default {
   component: Stepper,
-  title: "Components/Stepper",
+  title: "Workspace/Components/Stepper",
 } as Meta;
 
 export function InteractiveStepper() {

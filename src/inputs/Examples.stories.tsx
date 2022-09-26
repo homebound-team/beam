@@ -10,7 +10,7 @@ import { TextAreaField } from "./TextAreaField";
 import { TextField } from "./TextField";
 
 export default {
-  title: "Inputs/Examples",
+  title: "Workspace/Inputs/Examples",
   decorators: [withBeamDecorator],
 } as Meta;
 

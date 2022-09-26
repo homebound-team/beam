@@ -6,7 +6,7 @@ import { jan19, jan2 } from "src/forms/formStateDomain";
 
 export default {
   component: Filters,
-  title: "Components/DateRangeFilters",
+  title: "Workspace/Components/Filter/DateRangeFilters",
   decorators: [],
 } as Meta;
 

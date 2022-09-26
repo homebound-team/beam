@@ -6,7 +6,7 @@ import { TextField } from "src/inputs";
 import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
 
 export default {
-  title: "Inputs/Number Field",
+  title: "Workspace/Inputs/Number Field",
   component: NumberField,
 } as Meta;
 

@@ -4,7 +4,7 @@ import { Accordion } from "./Accordion";
 
 export default {
   component: Accordion,
-  title: "Components/Accordion",
+  title: "Workspace/Components/Accordion",
   parameters: { backgrounds: { default: "white" } },
 } as Meta;
 

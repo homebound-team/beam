@@ -13,7 +13,7 @@ import { noop } from "src/utils";
 import { withRouter } from "src/utils/sb";
 
 export default {
-  title: "Components/Icon Button",
+  title: "Workspace/Components/Icon Button",
   component: IconButton,
   decorators: [withRouter()],
   args: {

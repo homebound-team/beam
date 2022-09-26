@@ -4,7 +4,7 @@ import { Alert, Css } from "src/index";
 
 export default {
   component: Alert,
-  title: "Components/Alert",
+  title: "Workspace/Components/Alert",
 } as Meta;
 
 export function DefaultAlert() {

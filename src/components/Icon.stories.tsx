@@ -3,7 +3,7 @@ import { Icon as IconComponent, IconProps } from "src";
 import { Css, Palette } from "src/Css";
 
 export default {
-  title: "Components/Icon",
+  title: "Workspace/Components/Icon",
   component: IconComponent,
   args: { color: "currentColor" },
   argTypes: {

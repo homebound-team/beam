@@ -1,0 +1,57 @@
+import { Meta, Canvas, Story, ArgsTable } from "@storybook/addon-docs";
+import { AccordionList } from "./AccordionList";
+
+<Meta
+  title="Catalog/AccordionList"
+  component={AccordionList}
+  args={{
+    accordions: [
+      {
+        title: "Iron Man",
+        children:
+          "Genius. Billionaire. Philanthropist. Tony Stark's confidence is only matched by his high-flying abilities as the hero called Iron Man.",
+      },
+      {
+        title: "Captain Marvel",
+        children:
+          "Carol Danvers becomes one of the universe's most powerful heroes when Earth is caught in the middle of a galactic war between two alien races.",
+      },
+      {
+        title: "Captain America",
+        children:
+          "Recipient of the Super Soldier serum, World War II hero Steve Rogers fights for American ideals as one of the world’s mightiest heroes and the leader of the Avengers.",
+      },
+      {
+        title: "Thor",
+        children:
+          "The son of Odin uses his mighty abilities as the God of Thunder to protect his home Asgard and planet Earth alike.",
+      },
+      {
+        title: "Black Widow",
+        children:
+          "Natasha Romanoff, separated from the now-fractured Avengers, confronts the dark path she took to becoming a spy and assassin, as well as events that followed.",
+      },
+    ],
+  }}
+  argTypes={{
+    accordions: { table: { control: { disable: true } } },
+    allowMultipleExpanded: { table: { defaultValue: { summary: true } } },
+    size: {
+      table: { defaultValue: { summary: "undefined" } },
+      control: { type: "select" },
+      options: [undefined, "xs", "sm", "md", "lg"],
+    },
+  }}
+/>
+
+export const Template = (args) => {
+  return <AccordionList {...args} />;
+};
+
+# Accordion
+
+<Canvas>
+  <Story name="AccordionList">{Template.bind({})}</Story>
+</Canvas>
+
+<ArgsTable story="AccordionList" />
