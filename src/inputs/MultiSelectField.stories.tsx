@@ -9,7 +9,7 @@ import { HasIdAndName, Optional } from "src/types";
 
 export default {
   component: MultiSelectField,
-  title: "Inputs/Multi Select Fields",
+  title: "Workspace/Inputs/Multi Select Fields",
 } as Meta;
 
 type TestOption = {

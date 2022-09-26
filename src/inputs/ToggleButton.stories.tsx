@@ -13,7 +13,7 @@ import {
 
 export default {
   component: ToggleButtonComponent,
-  title: "Inputs/ToggleButton",
+  title: "Workspace/Inputs/ToggleButton",
   parameters: { backgrounds: { default: "white" } },
 } as Meta<ToggleButtonProps>;
 

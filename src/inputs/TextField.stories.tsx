@@ -8,7 +8,7 @@ import { TextFieldXss } from "src/interfaces";
 
 export default {
   component: TextField,
-  title: "Inputs/Text Field",
+  title: "Workspace/Inputs/Text Field",
 } as Meta;
 
 export function TextFieldStyles() {

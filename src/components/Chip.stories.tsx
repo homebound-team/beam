@@ -4,7 +4,7 @@ import { Css } from "src/Css";
 
 export default {
   component: Chip,
-  title: "Components/Chip",
+  title: "Workspace/Components/Chip",
 } as Meta;
 
 export function DefaultChip() {

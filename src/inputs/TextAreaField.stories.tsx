@@ -7,7 +7,7 @@ import { TextFieldXss } from "src/interfaces";
 
 export default {
   component: TextAreaField,
-  title: "Inputs/Text Area",
+  title: "Workspace/Inputs/Text Area",
 } as Meta;
 
 export function TextAreaStyles() {

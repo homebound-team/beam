@@ -3,7 +3,7 @@ import { Css } from "src/Css";
 import { Tag } from "./Tag";
 
 export default {
-  title: "Components/Tags",
+  title: "Workspace/Components/Tags",
   component: Tag,
 } as Meta;
 

@@ -16,7 +16,7 @@ import {
 
 export default {
   component: RadioGroupField,
-  title: "Inputs/Radio Group",
+  title: "Workspace/Inputs/Radio Group",
 } as Meta;
 
 export function BaseStates() {

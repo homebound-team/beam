@@ -15,7 +15,7 @@ interface SnackBarStoryProps extends Omit<SnackbarNoticeProps, "action"> {
 
 export default {
   component: Snackbar,
-  title: "Components/Snackbar",
+  title: "Workspace/Components/Snackbar",
   decorators: [withBeamDecorator],
   args: {
     icon: undefined,

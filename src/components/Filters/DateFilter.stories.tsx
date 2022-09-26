@@ -6,7 +6,7 @@ import { jan2 } from "src/forms/formStateDomain";
 
 export default {
   component: Filters,
-  title: "Components/DateFilters",
+  title: "Workspace/Components/Filter/DateFilters",
   decorators: [],
 } as Meta;
 

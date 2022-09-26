@@ -6,7 +6,7 @@ import { withDimensions } from "src/utils/sb";
 
 export default {
   component: Menu,
-  title: "Components/Menu",
+  title: "Workspace/Components/Menu",
   decorators: [withDimensions()],
 } as Meta;
 

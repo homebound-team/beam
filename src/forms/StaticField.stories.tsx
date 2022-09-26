@@ -6,7 +6,7 @@ import { TextField } from "src/inputs";
 
 export default {
   component: StaticFieldComponent,
-  title: "Forms/Static Field",
+  title: "Workspace/Forms/Static Field",
 } as Meta;
 
 export function StaticField() {

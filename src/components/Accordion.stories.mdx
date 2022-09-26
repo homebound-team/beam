@@ -1,0 +1,37 @@
+import { Meta, Canvas, Story, ArgsTable } from "@storybook/addon-docs";
+import { Accordion } from "./Accordion";
+
+<Meta
+  title="Catalog/Accordion"
+  component={Accordion}
+  args={{ title: "Captain America" }}
+  argTypes={{
+    title: { control: { type: "text" }, table: { defaultValue: { summary: undefined } } },
+    topBorder: { table: { defaultValue: { summary: true } } },
+    disabled: { table: { defaultValue: { summary: false } } },
+    bottomBorder: { table: { defaultValue: { summary: false } } },
+    defaultExpanded: { table: { defaultValue: { summary: false } } },
+    size: {
+      table: { defaultValue: { summary: "undefined" } },
+      control: { type: "select" },
+      options: [undefined, "xs", "sm", "md", "lg"],
+    },
+  }}
+/>
+
+export const Template = (args) => {
+  return (
+    <Accordion {...args}>
+      Recipient of the Super Soldier serum, World War II hero Steve Rogers fights for American ideals as one of the
+      world’s mightiest heroes and the leader of the Avengers.
+    </Accordion>
+  );
+};
+
+# Accordion
+
+<Canvas>
+  <Story name="Accordion">{Template.bind({})}</Story>
+</Canvas>
+
+<ArgsTable story="Accordion" exclude={["index", "setExpandedIndex"]} />

@@ -4,7 +4,7 @@ import { Placement, Tooltip } from "./Tooltip";
 
 export default {
   component: Tooltip,
-  title: "Components/Tooltip",
+  title: "Workspace/Components/Tooltip",
 } as Meta;
 
 export function TooltipPlacements() {

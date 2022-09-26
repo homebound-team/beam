@@ -4,7 +4,7 @@ import { Css } from "src/Css";
 
 export default {
   component: Avatar,
-  title: "Components/Avatar",
+  title: "Workspace/Components/Avatar",
 } as Meta;
 
 export function Examples() {

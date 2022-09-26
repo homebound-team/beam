@@ -25,7 +25,7 @@ import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils
 
 export default {
   component: Filters,
-  title: "Components/Filters",
+  title: "Workspace/Components/Filter",
   decorators: [withDimensions(), withRouter(), withBeamDecorator],
   parameters: { layout: "fullscreen" },
 } as Meta;

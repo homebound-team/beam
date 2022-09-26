@@ -21,16 +21,16 @@
     "start": "yarn storybook",
     "build": "yarn copy && ttsc",
     "build:truss": "truss",
-    "build:storybook": "build-storybook -s ./testAssets",
+    "build:storybook": "build-storybook -s storybookAssets",
     "test": "jest --maxWorkers 4",
     "test:watch": "jest --watch",
     "lint": "eslint --ext js,ts,tsx src",
     "lint:fix": "eslint --ext js,ts,tsx --fix src",
-    "storybook": "start-storybook -p 9000 -s ./testAssets",
+    "storybook": "start-storybook -p 9000 -s storybookAssets",
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded",
     "copy": "npx copyfiles -u 1 \"./src/**/*.css\" \"./dist/\"",
     "copy-to-internal-frontend": "cp -r dist/* ~/homebound/internal-frontend/node_modules/@homebound/beam/dist/",
-    "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md}\""
+    "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\""
   },
   "dependencies": {
     "@homebound/form-state": "^2.15.3",

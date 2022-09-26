@@ -5,7 +5,7 @@ import { Css } from "src/Css";
 
 export default {
   component: AvatarButton,
-  title: "Components/Avatar Button",
+  title: "Workspace/Components/Avatar Button",
   args: {
     onClick: action("onClick"),
     src: "captain-marvel.jpg",

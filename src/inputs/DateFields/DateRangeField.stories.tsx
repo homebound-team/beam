@@ -7,7 +7,7 @@ import { DateRangeField } from "src/inputs/DateFields/DateRangeField";
 import { DateRange } from "src/types";
 
 export default {
-  title: "Inputs/DateRangeField",
+  title: "Workspace/Inputs/DateRangeField",
   component: DateRangeField,
 } as Meta;
 

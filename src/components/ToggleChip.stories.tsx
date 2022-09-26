@@ -4,7 +4,7 @@ import { Css, PresentationProvider, ToggleChip } from "src/index";
 
 export default {
   component: ToggleChip,
-  title: "Components/ToggleChip",
+  title: "Workspace/Components/ToggleChip",
 } as Meta;
 
 export function DefaultToggleChip() {

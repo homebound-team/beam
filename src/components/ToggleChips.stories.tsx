@@ -5,7 +5,7 @@ import { Css } from "src/Css";
 
 export default {
   component: ToggleChips,
-  title: "Components/ToggleChips",
+  title: "Workspace/Components/ToggleChips",
 } as Meta;
 
 export function DefaultToggleChips() {

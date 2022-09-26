@@ -5,7 +5,7 @@ import { HasIdAndName } from "src/types";
 
 export default {
   component: Filters,
-  title: "Components/MultiFilters",
+  title: "Workspace/Components/Filter/MultiFilters",
   decorators: [],
 } as Meta;
 

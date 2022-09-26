@@ -6,7 +6,7 @@ import { Button } from "./Button";
 
 export default {
   component: AutoSaveIndicator,
-  title: "Components/Auto Save Indicator",
+  title: "Workspace/Components/Auto Save Indicator",
 } as Meta;
 
 export const AutoSaveIndicatorStatuses = () => (

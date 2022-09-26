@@ -6,7 +6,7 @@ import { DateField, MultiSelectField, NumberField, SelectField, TextAreaField, T
 
 export default {
   component: PresentationProvider,
-  title: "components/PresentationProvider",
+  title: "Workspace/Components/PresentationProvider",
 };
 
 export function PresentationFieldProps() {

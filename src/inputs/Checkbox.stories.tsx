@@ -6,7 +6,7 @@ import { Checkbox, CheckboxGroup, CheckboxGroupProps } from "src/index";
 
 export default {
   component: Checkbox,
-  title: "Inputs/Checkboxes",
+  title: "Workspace/Inputs/Checkboxes",
 } as Meta;
 
 export function Checkboxes() {

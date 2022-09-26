@@ -4,7 +4,7 @@ import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 
 export default {
   component: ToggleChipGroup,
-  title: "Inputs/Toggle Chip Groups",
+  title: "Workspace/Inputs/Toggle Chip Groups",
 } as Meta;
 
 export function ToggleChipGroups() {
