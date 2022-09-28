@@ -1,4 +1,3 @@
-import * as React from "react";
 export const logo = (
   <svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="10" y="90" width="32" height="320" fill="#353535" />
