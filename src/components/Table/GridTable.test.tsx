@@ -2068,6 +2068,28 @@ describe("GridTable", () => {
     expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.LightBlue50);
   });
 
+  it("does not shows cell border when 'cellHighlight' is not defined", async () => {
+    // Given a table without cellHighlight defined
+    const r = await render(<GridTable columns={columns} rows={rows} style={{ cellHighlight: false }} />);
+
+    // When clicking a cell
+    click(cell(r, 1, 1));
+
+    // Then the cell does not have the highlight color.
+    expect(cell(r, 1, 1)).not.toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.LightBlue700}`);
+  });
+
+  it("shows cell border when 'cellHighlight' is defined", async () => {
+    // Given a table without cellHighlight defined
+    const r = await render(<GridTable columns={columns} rows={rows} style={{ cellHighlight: true }} />);
+
+    // When clicking a cell
+    click(cell(r, 1, 1));
+
+    // Then the cell has the highlight color.
+    expect(cell(r, 1, 1)).toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.LightBlue700}`);
+  });
+
   it("can render with rows with initCollapsed defined", async () => {
     // Given rows with multiple levels of nesting where one parent is initially collapsed and one child is initially collapsed
     const rows: GridDataRow<NestedRow>[] = [

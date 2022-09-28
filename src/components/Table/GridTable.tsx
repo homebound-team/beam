@@ -322,6 +322,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             level,
             getCount,
             api,
+            cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             ...sortProps,
           }}
         />
@@ -981,6 +982,7 @@ interface GridRowProps<R extends Kinded, S> {
   level: number;
   getCount: (id: string) => object;
   api: GridTableApi<R>;
+  cellHighlight: boolean;
 }
 
 // We extract GridRow to its own mini-component primarily so we can React.memo'ize it.
@@ -1000,6 +1002,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
     level,
     getCount,
     api,
+    cellHighlight,
     ...others
   } = props;
 
@@ -1088,7 +1091,7 @@ function GridRow<R extends Kinded, S>(props: GridRowProps<R, S>): ReactElement {
             : {};
 
         const cellId = `${row.kind}_${row.id}_${column.name}`;
-        const applyCellHighlight = !!column.name && !isHeader && !isTotals;
+        const applyCellHighlight = cellHighlight && !!column.name && !isHeader && !isTotals;
         const isCellActive = rowState.activeCellId === cellId;
 
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
