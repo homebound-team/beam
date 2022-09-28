@@ -4,6 +4,7 @@ import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { matchPath, Route, useLocation } from "react-router";
 import { Link } from "react-router-dom";
 import type { IconKey } from "src/components";
+import { FullBleed } from "src/components";
 import { Css, Margin, Only, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
@@ -20,7 +21,7 @@ export interface Tab<V extends string = string> {
   disabled?: boolean;
 }
 
-type TabsContentXss = Xss<Margin>;
+type TabsContentXss = Xss<Margin | "backgroundColor">;
 
 export interface TabsProps<V extends string, X> {
   ariaLabel?: string;
@@ -98,20 +99,22 @@ export function TabContent<V extends string>(
     : props.tabs.find((tab) => tab.value === props.selected) || tabs[0];
   const uniqueValue = uniqueTabValue(selectedTab);
 
-  // Do not apply default top margin styles if the tabs are being hidden. This avoids unnecessary white space being added
-  const styles = hideTabs(props) ? {} : Css.mt3.$;
+  // Do not apply default top padding styles if the tabs are being hidden. This avoids unnecessary white space being added
+  const styles = hideTabs(props) ? {} : Css.pt3.$;
 
   return (
-    <div
-      aria-labelledby={`${uniqueValue}-tab`}
-      id={`${uniqueValue}-tabPanel`}
-      role="tabpanel"
-      tabIndex={0}
-      {...tid.panel}
-      css={{ ...styles, ...contentXss }}
-    >
-      {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
-    </div>
+    <FullBleed>
+      <div
+        aria-labelledby={`${uniqueValue}-tab`}
+        id={`${uniqueValue}-tabPanel`}
+        role="tabpanel"
+        tabIndex={0}
+        {...tid.panel}
+        css={{ ...styles, ...contentXss }}
+      >
+        {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
+      </div>
+    </FullBleed>
   );
 }
 

@@ -64,13 +64,13 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
         <div
           css={{
             ...Css.pl(context.pl).pr(context.pr).$,
-            ...(!hasScrollableContent ? { ...Css.overflowAuto.$, ...scrollContainerBottomPadding } : undefined),
+            ...(!hasScrollableContent ? { ...Css.overflowAuto.h100.$, ...scrollContainerBottomPadding } : undefined),
           }}
         >
           {children}
         </div>
         {/* Set fg1 to take up the remaining space in the viewport.*/}
-        <div css={Css.fg1.overflowAuto.pl(context.pl).pr(context.pr).$} ref={scrollableRef} />
+        <div css={Css.fg1.overflowAuto.$} ref={scrollableRef} />
       </Tag>
     </ScrollableParentContext.Provider>
   );
@@ -81,4 +81,4 @@ export function useScrollableParent() {
 }
 
 // Styles to wrap around the scrollable content in order to give padding beneath the content within the scrollable container.
-export const scrollContainerBottomPadding = Css.h100.addIn("&:after", Css.contentEmpty.db.h2.$).$;
+export const scrollContainerBottomPadding = Css.addIn("&:after", Css.contentEmpty.db.h2.$).$;
