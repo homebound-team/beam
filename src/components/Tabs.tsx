@@ -103,6 +103,7 @@ export function TabContent<V extends string>(
   const styles = hideTabs(props) ? {} : Css.pt3.$;
 
   return (
+    // Using FullBleed to allow the tab's bgColor to extend to the edges of the <ScrollableContent /> element.
     <FullBleed>
       <div
         aria-labelledby={`${uniqueValue}-tab`}
