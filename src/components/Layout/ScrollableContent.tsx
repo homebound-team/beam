@@ -1,18 +1,18 @@
 import { ReactNode, ReactPortal, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { FullBleed } from "src/components/Layout/FullBleed";
 import { scrollContainerBottomPadding, useScrollableParent } from "src/components/Layout/ScrollableParent";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 
 interface ScrollableContentProps {
   children: ReactNode;
   virtualized?: boolean;
   omitBottomPadding?: true;
+  bgColor?: Palette;
 }
 /** Helper component for placing scrollable content within a `ScrollableParent`. */
 export function ScrollableContent(props: ScrollableContentProps): ReactPortal | JSX.Element {
-  const { children, virtualized = false, omitBottomPadding } = props;
-  const { scrollableEl, setPortalTick, pl } = useScrollableParent();
+  const { children, virtualized = false, omitBottomPadding, bgColor } = props;
+  const { scrollableEl, setPortalTick, pl, pr } = useScrollableParent();
 
   useEffect(() => {
     // The below `tick` logic is a way to detect whether the ScrollableContent is being used.
@@ -28,18 +28,15 @@ export function ScrollableContent(props: ScrollableContentProps): ReactPortal | 
   }
 
   return createPortal(
-    !virtualized ? (
-      omitBottomPadding ? (
-        children
-      ) : (
-        <div css={scrollContainerBottomPadding}>{children}</div>
-      )
-    ) : (
-      // To prevent Virtuoso's scrollbar from being set in based on the Layout's padding, we will use the FullBleed component w/o padding to push it back over
-      <FullBleed omitPadding>
-        <div css={Css.h100.pl(pl).$}>{children}</div>
-      </FullBleed>
-    ),
+    <div
+      css={{
+        ...Css.pr(pr).pl(pl).if(virtualized).pr0.h100.$,
+        ...(bgColor && Css.bgColor(bgColor).$),
+        ...(!omitBottomPadding && !virtualized && scrollContainerBottomPadding),
+      }}
+    >
+      {children}
+    </div>,
     scrollableEl,
   );
 }

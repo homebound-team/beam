@@ -4,7 +4,8 @@ import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { matchPath, Route, useLocation } from "react-router";
 import { Link } from "react-router-dom";
 import type { IconKey } from "src/components";
-import { Css, Margin, Only, Xss } from "src/Css";
+import { FullBleed } from "src/components";
+import { Css, Margin, Only, Padding, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -20,7 +21,7 @@ export interface Tab<V extends string = string> {
   disabled?: boolean;
 }
 
-type TabsContentXss = Xss<Margin>;
+type TabsContentXss = Xss<Margin | Padding | "backgroundColor">;
 
 export interface TabsProps<V extends string, X> {
   ariaLabel?: string;
@@ -76,10 +77,12 @@ interface RequiredRenderRouteTabs<V extends string, X> extends Omit<RouteTabsPro
 export function TabsWithContent<V extends string, X extends Only<TabsContentXss, X>>(
   props: RequiredRenderTabs<V, X> | RequiredRenderRouteTabs<V, X>,
 ) {
+  // Do not apply default top padding styles if the tabs are being hidden. This avoids unnecessary white space being added
+  const styles = hideTabs(props) ? {} : Css.pt3.$;
   return (
     <>
       <Tabs {...props} />
-      <TabContent {...props} />
+      <TabContent {...props} contentXss={{ ...styles, ...props.contentXss }} />
     </>
   );
 }
@@ -98,20 +101,20 @@ export function TabContent<V extends string>(
     : props.tabs.find((tab) => tab.value === props.selected) || tabs[0];
   const uniqueValue = uniqueTabValue(selectedTab);
 
-  // Do not apply default top margin styles if the tabs are being hidden. This avoids unnecessary white space being added
-  const styles = hideTabs(props) ? {} : Css.mt3.$;
-
   return (
-    <div
-      aria-labelledby={`${uniqueValue}-tab`}
-      id={`${uniqueValue}-tabPanel`}
-      role="tabpanel"
-      tabIndex={0}
-      {...tid.panel}
-      css={{ ...styles, ...contentXss }}
-    >
-      {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
-    </div>
+    // Using FullBleed to allow the tab's bgColor to extend to the edges of the <ScrollableContent /> element.
+    <FullBleed>
+      <div
+        aria-labelledby={`${uniqueValue}-tab`}
+        id={`${uniqueValue}-tabPanel`}
+        role="tabpanel"
+        tabIndex={0}
+        {...tid.panel}
+        css={contentXss}
+      >
+        {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
+      </div>
+    </FullBleed>
   );
 }
 

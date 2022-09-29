@@ -57,7 +57,7 @@ export function TabsWithJustNames() {
 
 export function TabsWithIconAndMargin() {
   const [tab, setTab] = useState<TabValue>("tab1");
-  return <TabsWithContent tabs={tabsWithIconsAndContent} onChange={setTab} selected={tab} contentXss={Css.m3.$} />;
+  return <TabsWithContent tabs={tabsWithIconsAndContent} onChange={setTab} selected={tab} contentXss={Css.m3.p0.$} />;
 }
 
 export function TabsWithEndAdornment() {
@@ -73,7 +73,7 @@ export function TabsWithEndAdornment() {
     },
   ];
   const [tab, setTab] = useState<TabValue>("tab1");
-  return <TabsWithContent tabs={tabsWithAdornment} onChange={setTab} selected={tab} contentXss={Css.m3.$} />;
+  return <TabsWithContent tabs={tabsWithAdornment} onChange={setTab} selected={tab} contentXss={Css.m3.p0.$} />;
 }
 
 export function TabsSeparateFromContent() {
@@ -82,7 +82,7 @@ export function TabsSeparateFromContent() {
     <div>
       <Tabs tabs={testTabs} onChange={setTab} selected={tab} />
       <hr />
-      <TabContent tabs={testTabs} selected={tab} />
+      <TabContent contentXss={Css.mt3.$} tabs={testTabs} selected={tab} />
     </div>
   );
 }
@@ -92,7 +92,7 @@ export function TabsWithBottomBorder() {
   return (
     <div>
       <Tabs tabs={tabsWithIconsAndContent} onChange={setTab} selected={tab} includeBottomBorder />
-      <TabContent tabs={testTabs} selected={tab} />
+      <TabContent contentXss={Css.mt3.$} tabs={testTabs} selected={tab} />
     </div>
   );
 }

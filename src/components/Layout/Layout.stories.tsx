@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react";
 import { PropsWithChildren, ReactNode, useMemo, useState } from "react";
 import { IconButton } from "src/components/IconButton";
 import { TabsWithContent, TabWithContent } from "src/components/Tabs";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { FormLines } from "src/forms";
 import {
   FullBleed,
@@ -110,6 +110,29 @@ export function ScrollableParentFallback() {
   );
 }
 
+export function WithBackgroundColor() {
+  const [selectedTab, setSelectedTab] = useState("lineItems");
+  const contentBgColor = Palette.Gray300;
+  const tabs: TabWithContent[] = [
+    { value: "overview", name: "Overview", render: () => <OverviewExample bgColor={contentBgColor} /> },
+    { value: "lineItems", name: "Line Items", render: () => <ScrollableTableExample bgColor={contentBgColor} /> },
+    { value: "history", name: "History", render: () => <HistoryExample /> },
+  ];
+  return (
+    <TestProjectLayout>
+      <TestHeader title="Change Event - Mud Room" />
+      <div css={Css.pt1.$}>
+        <TabsWithContent
+          selected={selectedTab}
+          tabs={tabs}
+          onChange={(t) => setSelectedTab(t)}
+          contentXss={Css.bgColor(contentBgColor).$}
+        />
+      </div>
+    </TestProjectLayout>
+  );
+}
+
 function ExamplePageComponent() {
   const [selectedTab, setSelectedTab] = useState("lineItems");
   const tabs: TabWithContent[] = [
@@ -119,19 +142,17 @@ function ExamplePageComponent() {
   ];
   return (
     <>
-      {/* Probably will move away from `usePageHeader` and instead go to this. */}
       <TestHeader title="Change Event - Mud Room" />
-
-      <div css={Css.py1.$}>
+      <div css={Css.pt1.$}>
         <TabsWithContent selected={selectedTab} tabs={tabs} onChange={(t) => setSelectedTab(t)} />
       </div>
     </>
   );
 }
 
-function OverviewExample() {
+function OverviewExample({ bgColor }: { bgColor?: Palette }) {
   return (
-    <ScrollableContent>
+    <ScrollableContent bgColor={bgColor}>
       <h1 css={Css.lgSb.mb3.$}>Detail</h1>
       {zeroTo(10).map((i) => (
         <p key={i} css={Css.mb3.$}>
@@ -160,9 +181,17 @@ function HistoryExample() {
   );
 }
 
-function ScrollableTableExample({ numCols, numRows }: { numCols?: number; numRows?: number }) {
+function ScrollableTableExample({
+  numCols,
+  numRows,
+  bgColor,
+}: {
+  numCols?: number;
+  numRows?: number;
+  bgColor?: Palette;
+}) {
   return (
-    <ScrollableContent>
+    <ScrollableContent bgColor={bgColor}>
       <TableExample numCols={numCols} numRows={numRows} />
     </ScrollableContent>
   );
