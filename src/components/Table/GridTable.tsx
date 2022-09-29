@@ -827,6 +827,10 @@ export type GridColumn<R extends Kinded, S = {}> = {
   isAction?: true;
   /** Column name that will be used to generate an unique identifier for every row cell */
   name?: string;
+  /** Flag that will allow to know which columns are hide-able */
+  canHide?: boolean;
+  /** Flag that will allow to know which columns are hide-able */
+  visible?: boolean;
 };
 
 export const nonKindGridColumnKeys = [

@@ -27,3 +27,4 @@ export { simpleDataRows, simpleHeader } from "./simpleHelpers";
 export type { SimpleHeaderAndData } from "./simpleHelpers";
 export { SortHeader } from "./SortHeader";
 export { cardStyle, condensedStyle, defaultStyle, getTableStyles } from "./styles";
+export { EditColumnsButton, useColumns } from "./EditColumnsButton";
