@@ -478,6 +478,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
       internalProps: { forceFocus: id === "a:3", forceHover: id === "a:2" },
       errorMsg: id === "a:4" ? "Description of error" : undefined,
       readOnly: id === "a:5",
+      disabled: id === "a:6",
     };
   }
   return [
@@ -606,6 +607,19 @@ const inputFieldRows: GridDataRow<InputFieldRows>[] = [
       id: "a:4",
       firstName: "Error State",
       bio: "This is the error state for input fields in the table. ".repeat(2),
+      birthday: jan2,
+      heightInInches: 65,
+      favoriteSport: "s:4",
+      favoriteShapes: ["sh:5"],
+    },
+  },
+  {
+    kind: "data",
+    id: "a:6",
+    data: {
+      id: "a:6",
+      firstName: "Disabled State",
+      bio: "This is the disabled state for input fields in the table. ".repeat(2),
       birthday: jan2,
       heightInInches: 65,
       favoriteSport: "s:4",
