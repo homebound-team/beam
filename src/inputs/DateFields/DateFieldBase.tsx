@@ -277,7 +277,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
       tabIndex={-1}
       {...tid.calendarButton}
     >
-      <Icon icon="calendar" color={Palette.Gray700} />
+      <Icon icon="calendar" color={isDisabled ? Palette.Gray400 : Palette.Gray700} />
     </button>
   );
 

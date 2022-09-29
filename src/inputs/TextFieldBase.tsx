@@ -103,6 +103,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const fieldHeight = 40;
   const compactFieldHeight = 32;
 
+  const [bgColor, hoverBgColor, disabledBgColor] = contrast
+    ? [Palette.Gray700, Palette.Gray600, Palette.Gray700]
+    : borderless && !compound
+    ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
+    : [Palette.White, Palette.Gray100, Palette.Gray100];
+
   const fieldStyles = {
     container: Css.df.fdc.w100.maxw(px(550)).relative.$,
     inputWrapper: {
@@ -110,7 +116,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         .hPx(fieldHeight - maybeSmaller)
         .if(compact)
         .hPx(compactFieldHeight - maybeSmaller).$,
-      ...Css.bgWhite.gray900.if(contrast).bgGray700.white.$,
+      ...Css.bgColor(bgColor).gray900.if(contrast).white.$,
       // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
       // This typically happens in tables when a column has a mix of static text (i.e. "roll up" rows and table headers) and input fields.
       // To remedy this perceived misalignment then we increase the width by the horizontal padding applied (16px), and set a negative margin left margin to re-center the field.
@@ -130,14 +136,14 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
           .mhPx(compactFieldHeight - maybeSmaller).$),
     },
     input: {
-      ...Css.w100.mw0.outline0.fg1.if(multiline).br4.$,
+      ...Css.w100.mw0.outline0.fg1.bgColor(bgColor).if(multiline).br4.$,
       // Not using Truss's inline `if` statement here because `addIn` properties do not respect the if statement.
-      ...(!contrast ? Css.bgWhite.$ : Css.bgGray700.addIn("&::selection", Css.bgGray800.$).$),
+      ...(contrast && Css.addIn("&::selection", Css.bgGray800.$).$),
     },
-    hover: Css.bgGray100.if(contrast).bgGray600.bGray600.$,
+    hover: Css.bgColor(hoverBgColor).if(contrast).bGray600.$,
     focus: Css.bLightBlue700.if(contrast).bLightBlue500.$,
     disabled: visuallyDisabled
-      ? Css.cursorNotAllowed.gray400.bgGray100.if(contrast).gray500.bgGray700.$
+      ? Css.cursorNotAllowed.gray600.bgColor(disabledBgColor).if(contrast).gray500.$
       : Css.cursorNotAllowed.$,
     error: Css.bRed600.if(contrast).bRed400.$,
   };
