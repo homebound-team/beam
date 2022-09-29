@@ -30,7 +30,7 @@ export function ScrollableContent(props: ScrollableContentProps): ReactPortal | 
   return createPortal(
     <div
       css={{
-        ...Css.pr(pr).pl(pl).if(virtualized).pr0.h100.$,
+        ...Css.h100.pr(pr).pl(pl).if(virtualized).pr0.$,
         ...(bgColor && Css.bgColor(bgColor).$),
         ...(!omitBottomPadding && !virtualized && scrollContainerBottomPadding),
       }}
