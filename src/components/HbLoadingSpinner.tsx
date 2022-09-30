@@ -40,7 +40,13 @@ export function HbLoadingSpinner({ noQuips, extraQuips = [], extraQuipsOnly, ico
         }
         alt="loading"
       />
-      {!iconOnly && <div>{quip}</div>}
+      {!iconOnly && (
+        <div
+          data-chromatic="ignore" // ignore spapshotting on randomized loading quips
+        >
+          {quip}
+        </div>
+      )}
     </div>
   );
 }
