@@ -14,17 +14,22 @@ type Data = { name: string | undefined; value: number | undefined };
 type Row = SimpleHeaderAndData<Data>;
 const nameColumn: GridColumn<Row> = { name: "name", header: "Name", data: ({ name }) => name };
 const valueColumn: GridColumn<Row> = { name: "value", header: "Value", canHide: true, data: ({ value }) => value };
-const actionColumn: GridColumn<Row> = { name: "actions", header: "Action", canHide: true, data: () => <div>Actions</div> };
-const otherColumn: GridColumn<Row> = { name: "other", header: "Other", canHide: true,  data: ({ name }) => name };
+const actionColumn: GridColumn<Row> = {
+  name: "actions",
+  header: "Action",
+  canHide: true,
+  data: () => <div>Actions</div>,
+};
+const otherColumn: GridColumn<Row> = { name: "other", header: "Other", canHide: true, data: ({ name }) => name };
 
 export function EditColumnButton() {
   return (
     <div>
       <h2 css={Css.lg.$}>Edit Columns Button</h2>
       <div css={Css.mlPx(200).mb4.$}>
-        <EditColumnsButton 
-          trigger={{ label: "Columns"}} 
-          placement="right" 
+        <EditColumnsButton
+          trigger={{ label: "Columns" }}
+          placement="right"
           columns={[nameColumn, valueColumn, actionColumn]}
           setColumns={noop}
           title="Select columns to show"
@@ -42,9 +47,9 @@ export function EditColumnButtonInAction() {
     <div>
       <h2 css={Css.lg.$}>Edit Columns Button In Action</h2>
       <div css={Css.mlPx(200).mb4.$}>
-        <EditColumnsButton 
-          trigger={{ label: "Columns"}} 
-          placement="right" 
+        <EditColumnsButton
+          trigger={{ label: "Columns" }}
+          placement="right"
           columns={columns.allColumns}
           setColumns={setColumns}
           title="Select columns to show"
