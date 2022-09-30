@@ -8,6 +8,7 @@ import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
 import { CanCloseCheck, CheckFn } from "src/types";
 import { EmptyRef } from "src/utils/index";
+import { HbSpinnerProvider } from "./HbLoadingSpinner";
 
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */
 export interface BeamContextState {
@@ -81,17 +82,19 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
   return (
     <BeamContext.Provider value={{ ...context }}>
       <PresentationProvider {...presentationProps}>
-        <AutoSaveStatusProvider>
-          <SnackbarProvider>
-            {/* OverlayProvider is required for Modals generated via React-Aria */}
-            <OverlayProvider>
-              {children}
-              {/*If the drawer is open, assume it will show modal content internally. */}
-              {modalRef.current && drawerContentStackRef.current.length === 0 && <Modal {...modalRef.current} />}
-            </OverlayProvider>
-            <SuperDrawer />
-          </SnackbarProvider>
-        </AutoSaveStatusProvider>
+        <HbSpinnerProvider>
+          <AutoSaveStatusProvider>
+            <SnackbarProvider>
+              {/* OverlayProvider is required for Modals generated via React-Aria */}
+              <OverlayProvider>
+                {children}
+                {/* If the drawer is open, assume it will show modal content internally. */}
+                {modalRef.current && drawerContentStackRef.current.length === 0 && <Modal {...modalRef.current} />}
+              </OverlayProvider>
+              <SuperDrawer />
+            </SnackbarProvider>
+          </AutoSaveStatusProvider>
+        </HbSpinnerProvider>
       </PresentationProvider>
     </BeamContext.Provider>
   );
