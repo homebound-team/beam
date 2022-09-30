@@ -4,9 +4,9 @@ import { Css } from "src/Css";
 import SpinnerGifBase64 from "./HbLoadingSpinner.base64";
 
 interface HbLoadingSpinnerProps {
-  /** Reverts loading text to `Loading...` if true. If global quips are off, they can be forced on by passing in `false`. */
+  /** Reverts loading text to `Loading...` if true. */
   noQuips?: boolean;
-  /** Contextually relevant quips, like "Where did I put that invoice??" on some invoice page. */
+  /** Contextually relevant quips, like "Where did I put that invoice??" on some invoice page. Will override global noQuips if non-empty. */
   extraQuips?: ReadonlyArray<string>;
   extraQuipsOnly?: boolean;
   /** No text at all */
