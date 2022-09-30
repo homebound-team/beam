@@ -15,21 +15,14 @@ interface HbLoadingSpinnerProps {
 export function HbLoadingSpinner({ noQuips, extraQuips = [], extraQuipsOnly, iconOnly }: HbLoadingSpinnerProps) {
   const ctx = useContext(HbLoadingSpinnerContext);
 
-  if (ctx.noQuips && extraQuips.length !== 0 && noQuips !== false) {
-    console.trace(
-      `${HbLoadingSpinner.name}: Quips are disabled under this context, but extraQuips were passed in without specifying noQuips={false}`,
-    );
-  }
-
   const quip = useMemo(() => {
-    // If quips are off globally but they specifiaclly passed in noQuips={false} and a quip, then override global
-    const forceQuips = noQuips === false && extraQuips.length !== 0;
+    // If quips are off globally but custom quips were provided, then override global
+    const forceQuips = extraQuips.length !== 0;
     if ((ctx.noQuips && !forceQuips) || noQuips) {
       return "Loading...";
     }
 
-    const allQuips =
-      (extraQuipsOnly && extraQuips.length !== 0) || forceQuips ? extraQuips : [...ctx.quips, ...extraQuips];
+    const allQuips = extraQuipsOnly && extraQuips.length !== 0 ? extraQuips : [...ctx.quips, ...extraQuips];
     return allQuips[random(allQuips.length - 1)];
   }, [ctx.noQuips, ctx.quips, extraQuips, extraQuipsOnly, noQuips]);
 

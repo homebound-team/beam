@@ -40,28 +40,12 @@ describe("HbLoadingSpinner", () => {
     const r = await render(
       // Given quips have been disabled globally
       <HbSpinnerProvider noQuips>
-        {/* When we pass in noQuips={fa]se} */}
-        <HbLoadingSpinner noQuips={false} extraQuips={["Find me"]} extraQuipsOnly />
+        {/* When we pass in extra quips */}
+        <HbLoadingSpinner extraQuips={["Find me"]} extraQuipsOnly />
       </HbSpinnerProvider>,
       { omitBeamContext: true },
     );
     // Then quips display
     expect(r.baseElement).toHaveTextContent("Find me");
-  });
-
-  it("warns of improper usage", async () => {
-    const spy = jest.spyOn(console, "trace").mockImplementation();
-
-    // Given we render a Spinner under a context disabling quips
-    await render(
-      <HbSpinnerProvider noQuips>
-        {/* When we fail to explicitly override noQuips */}
-        <HbLoadingSpinner extraQuips={[""]} />
-      </HbSpinnerProvider>,
-      { omitBeamContext: true },
-    );
-
-    // Then the error is detected and a warning is fired off to the console
-    expect(spy).toHaveBeenCalled();
   });
 });
