@@ -1,19 +1,85 @@
-import { Meta, ArgsTable, Canvas, Story } from "@storybook/addon-docs";
-import { Button } from "./Button"
+import { Meta, ArgsTable, Canvas, Story, Props } from "@storybook/addon-docs";
+import { Button } from "./Button";
+import { Css } from "../Css";
 
-<Meta title="Catalog/Button" component={Button} parameters={{options: { withPerformance: { disabled: true } }}} />
+<Meta title="Catalog/Button" component={Button} parameters={{ options: { withPerformance: { disabled: true } } }} />
 
 export const Template = (args) => {
   const onClick = () => {};
-  return <Button label="Test" onClick={onClick} {...args} />
-}
+  return <Button label="Test" onClick={onClick} {...args} />;
+};
 
-# Buttons
+# Button
+
+#### Button component for triggering actions or controls.
+
+# Example
 
 <Canvas>
-  <Story name="primary" args={{ variant: "primary" }}>
-    {Template.bind({})}
+  <Story name="PrimaryButton">{Template.bind({})}</Story>
+</Canvas>
+
+# API Reference
+
+<Props story={"PrimaryButton"} exclude={["menuTriggerProps"]} />
+
+# Variant
+
+#### There are 6 different variants for a Button.
+
+<Canvas>
+  <Story name="Variant">
+    <div css={Css.df.gap2.$}>
+      <Button variant="primary" label="Create" />
+      <Button variant="secondary" label="Add Item" />
+      <Button variant="tertiary" label="Cancel" />
+      <Button variant="tertiaryDanger" label="Delete" />
+      <Button variant="danger" label="Delete" />
+      <Button variant="text" label="Edit" />
+    </div>
   </Story>
 </Canvas>
 
-<ArgsTable exclude={["menuTriggerProps"]} />
+# Size
+
+#### There are 3 supported sizes.
+
+<Canvas>
+  <Story name="Size">
+    <div css={Css.df.gap2.$}>
+      <Button variant="primary" label="Small" size="sm" />
+      <Button variant="primary" label="Medium" size="md" />
+      <Button variant="primary" label="Large" size="lg" />
+    </div>
+  </Story>
+</Canvas>
+
+# Icon
+
+#### By default, icons appear to the left of the text.
+
+<Canvas>
+  <Story name="Icon">
+    <div css={Css.df.gap2.$}>
+      <Button variant="tertiary" label="Export" icon="linkExternal" size="sm" />
+      <Button variant="tertiary" label="Edit" icon="pencil" />
+      <Button label="Delete Note" variant="tertiaryDanger" icon="trash" />
+    </div>
+  </Story>
+</Canvas>
+
+# Disabled
+
+#### A button can be disabled.
+
+<Canvas>
+  <Story name="Disabled">
+    <div css={Css.df.gap2.$}>
+      <Button variant="primary" label="Create New" disabled={true} />
+      <Button variant="tertiary" label="Edit" icon="pencil" disabled={true} />
+      <Button label="Delete Note" variant="tertiaryDanger" disabled={true} />
+    </div>
+  </Story>
+</Canvas>
+
+# Events
