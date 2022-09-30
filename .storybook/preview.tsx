@@ -1,6 +1,7 @@
 import { Parameters, StoryFn } from "@storybook/addons";
 import { configure } from "mobx";
 import { CssReset } from "../src";
+import beamTheme from "./beamTheme";
 
 // formState doesn't use actions
 configure({ enforceActions: "never" });
@@ -34,6 +35,7 @@ export const parameters: Parameters = {
     // https://storybook.js.org/docs/react/essentials/controls#hide-nocontrols-warning
     hideNoControlsWarning: true,
   },
+  docs: { theme: beamTheme },
 };
 
 // https://storybook.js.org/docs/react/writing-stories/decorators#global-decorators
