@@ -74,8 +74,11 @@ interface HbSpinnerProviderProps {
 }
 
 export function HbSpinnerProvider({ extraAppQuips = [], noQuips = false, children }: HbSpinnerProviderProps) {
-  const quips = useMemo(() => [...GLOBAL_LOADING_QUIPS, ...extraAppQuips], [extraAppQuips]);
-  return <HbLoadingSpinnerContext.Provider value={{ quips, noQuips }}>{children}</HbLoadingSpinnerContext.Provider>;
+  const state = useMemo<HbLoadingSpinnerContextType>(
+    () => ({ quips: [...GLOBAL_LOADING_QUIPS, ...extraAppQuips], noQuips }),
+    [extraAppQuips, noQuips],
+  );
+  return <HbLoadingSpinnerContext.Provider value={state}>{children}</HbLoadingSpinnerContext.Provider>;
 }
 
 const BASE_64_HB_LOADING_GIF =
