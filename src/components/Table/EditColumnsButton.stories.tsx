@@ -1,9 +1,10 @@
 import { Meta } from "@storybook/react";
 import { noop } from "src/utils";
 import { Css } from "../../Css";
-import { EditColumnsButton, useColumns } from "./EditColumnsButton";
+import { EditColumnsButton } from "./EditColumnsButton";
 import { GridColumn, GridTable } from "./GridTable";
 import { simpleHeader, SimpleHeaderAndData } from "./simpleHelpers";
+import { useColumns } from "./useColumns";
 
 export default {
   title: "Workspace/Components/EditColumnsButton",

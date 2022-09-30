@@ -829,7 +829,7 @@ export type GridColumn<R extends Kinded, S = {}> = {
   name?: string;
   /** Flag that will allow to know which columns are hide-able */
   canHide?: boolean;
-  /** Flag that will allow to know which columns are hide-able */
+  /** Flag that will allow to know which hide-able columns are visible */
   visible?: boolean;
 };
 

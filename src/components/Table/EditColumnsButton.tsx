@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useMemo, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { Checkbox } from "src/inputs";
@@ -7,6 +7,7 @@ import { useTestIds } from "../../utils";
 import { Button } from "../Button";
 import { isIconButton, isTextButton, OverlayTrigger, OverlayTriggerProps } from "../internal/OverlayTrigger";
 import { GridColumn, Kinded } from "./GridTable";
+import { Columns } from "./useColumns";
 
 interface EditColumnsButtonProps<R extends Kinded, S>
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
@@ -74,23 +75,4 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
       </div>
     </OverlayTrigger>
   );
-}
-
-export interface Columns<R extends Kinded, S = {}> {
-  allColumns: GridColumn<R, S>[];
-  visibleColumns: GridColumn<R, S>[];
-}
-
-export function useColumns<R extends Kinded, S = {}>(
-  tableColumns: GridColumn<R, S>[],
-): [Columns<R, S>, Dispatch<SetStateAction<Columns<R, S>>>] {
-  const initColumns: Columns<R, S> = useMemo(() => {
-    return {
-      allColumns: tableColumns,
-      visibleColumns: tableColumns.filter((column) => (column.canHide && column.visible) || !column.canHide),
-    };
-  }, [tableColumns]);
-
-  const [columns, setColumns] = useState<Columns<R, S>>(initColumns);
-  return [columns, setColumns];
 }

@@ -1,6 +1,6 @@
 export * from "./CollapseToggle";
 export * from "./columns";
-export { EditColumnsButton, useColumns } from "./EditColumnsButton";
+export { EditColumnsButton } from "./EditColumnsButton";
 export type { GridRowLookup } from "./GridRowLookup";
 export { GridSortContext } from "./GridSortContext";
 export { ASC, DESC, GridTable, setDefaultStyle, setGridTableDefaults } from "./GridTable";
@@ -28,3 +28,4 @@ export { simpleDataRows, simpleHeader } from "./simpleHelpers";
 export type { SimpleHeaderAndData } from "./simpleHelpers";
 export { SortHeader } from "./SortHeader";
 export { cardStyle, condensedStyle, defaultStyle, getTableStyles } from "./styles";
+export { useColumns } from "./useColumns";
