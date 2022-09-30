@@ -4,7 +4,7 @@ import { Css } from "src/Css";
 import SpinnerGifBase64 from "./HbLoadingSpinner.base64";
 
 interface HbLoadingSpinnerProps {
-  /** Reverts loading text to `Loading...` if true. */
+  /** Reverts loading text to `Loading...` if true. May override global noQuips by passing in noQuips={false}. */
   noQuips?: boolean;
   /** Contextually relevant quips, like "Where did I put that invoice??" on some invoice page. Will override global noQuips if non-empty. */
   extraQuips?: ReadonlyArray<string>;
@@ -18,7 +18,7 @@ export function HbLoadingSpinner({ noQuips, extraQuips = [], extraQuipsOnly, ico
 
   const quip = useMemo(() => {
     // If quips are off globally but custom quips were provided, then override global
-    const forceQuips = extraQuips.length !== 0;
+    const forceQuips = extraQuips.length !== 0 || noQuips === false;
     if ((ctx.noQuips && !forceQuips) || noQuips) {
       return "Loading...";
     }
