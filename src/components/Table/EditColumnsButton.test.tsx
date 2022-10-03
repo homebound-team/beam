@@ -56,12 +56,11 @@ describe("EditColumnsButton", () => {
         defaultOpen={true}
       />,
     );
-    expect(valueColumn.visible).toEqual(false);
     // When click on an option
     click(r.value);
     // Then setColumns should be called and visible should be updated to true
     expect(setColumns).toHaveBeenCalled();
-    expect(valueColumn.visible).toEqual(true);
+    expect(r.value()).toBeChecked();
   });
 
   it("should call setColumns when clear seleccions is clicked", async () => {
@@ -80,13 +79,13 @@ describe("EditColumnsButton", () => {
     click(r.actions);
     // Then setColumns should be called and visible should be updated to true
     expect(setColumns).toHaveBeenCalled();
-    expect(valueColumn.visible).toEqual(true);
-    expect(actionColumn.visible).toEqual(true);
+    expect(r.value()).toBeChecked();
+    expect(r.actions()).toBeChecked();
     // When click clearSelections button
     click(r.clearSelections);
     // Then setColumns should be called and all columns should be updated to visible equal to false
     expect(setColumns).toHaveBeenCalled();
-    expect(valueColumn.visible).toEqual(false);
-    expect(actionColumn.visible).toEqual(false);
+    expect(r.value()).not.toBeChecked();
+    expect(r.actions()).not.toBeChecked();
   });
 });
