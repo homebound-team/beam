@@ -13,15 +13,15 @@ export default {
 
 type Data = { name: string | undefined; value: number | undefined };
 type Row = SimpleHeaderAndData<Data>;
-const nameColumn: GridColumn<Row> = { name: "name", header: "Name", data: ({ name }) => name };
-const valueColumn: GridColumn<Row> = { name: "value", header: "Value", canHide: true, data: ({ value }) => value };
+const nameColumn: GridColumn<Row> = { name: "Name", header: "Name", data: ({ name }) => name };
+const valueColumn: GridColumn<Row> = { name: "Value", header: "Value", canHide: true, data: ({ value }) => value };
 const actionColumn: GridColumn<Row> = {
-  name: "actions",
+  name: "Actions",
   header: "Action",
   canHide: true,
   data: () => <div>Actions</div>,
 };
-const otherColumn: GridColumn<Row> = { name: "other", header: "Other", canHide: true, data: ({ name }) => name };
+const otherColumn: GridColumn<Row> = { name: "Other", header: "Other", canHide: true, data: ({ name }) => name };
 
 export function EditColumnButton() {
   return (

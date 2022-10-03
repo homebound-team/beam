@@ -1,4 +1,3 @@
-import { capitalCase } from "capital-case";
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
@@ -49,7 +48,7 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
     .filter((column) => !!column) as string[];
 
   const options: CheckboxGroupItemOption[] = editableColumns.map((column) => ({
-    label: capitalCase(column.name!)!,
+    label: column.name!,
     value: column.name!,
   }));
 
