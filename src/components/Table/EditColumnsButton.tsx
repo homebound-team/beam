@@ -71,18 +71,22 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
     <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
       <div
         css={{
-          ...Css.bgWhite.py5.px3.maxwPx(380).dg.gap1.$,
+          ...Css.bgWhite.py5.px3.maxwPx(380).$,
           "&:hover": Css.bshHover.$,
         }}
       >
+        <div css={Css.gray500.xsSb.mb1.$}>{title || "Select columns to show"}</div>
         <CheckboxGroup
           label={title || "Select columns to show"}
           onChange={(values) => setSelectedValues(values)}
           values={selectedValues}
           options={options}
           columns={2}
+          hideLabel
         />
-        <Button variant={"tertiary"} label={"Clear selections"} onClick={clearSelections} />
+        <div css={Css.mt1.$}>
+         <Button variant={"tertiary"} label={"Clear selections"} onClick={clearSelections}/>
+        </div>
       </div>
     </OverlayTrigger>
   );
