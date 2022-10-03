@@ -48,7 +48,7 @@ export function Accordion(props: AccordionProps) {
     <div
       {...testIds.container}
       css={{
-        ...Css.bGray400.if(topBorder).bt.if(bottomBorder).bb.$,
+        ...Css.bGray300.if(topBorder).bt.if(bottomBorder).bb.$,
         ...(size ? Css.wPx(accordionSizes[size]).$ : {}),
       }}
     >
