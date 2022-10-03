@@ -4,17 +4,21 @@ import { HbLoadingSpinner, HbSpinnerProvider } from "./HbLoadingSpinner";
 describe("HbLoadingSpinner", () => {
   it("picks a quip", async () => {
     // When we render normally
-    const r = await render(<HbLoadingSpinner />, { omitBeamContext: true });
-    // Text is present, and the spinner has 2 children (icon + quip)
-    expect(r.baseElement).toHaveTextContent(/.+/);
-    expect(r.hbLoadingSpinner.childElementCount).toBe(2);
+    const r = await render(
+      <HbSpinnerProvider quips={["*"]}>
+        <HbLoadingSpinner />
+      </HbSpinnerProvider>,
+      { omitBeamContext: true },
+    );
+    // Then the quip is in the dom
+    expect(r.getByTestId("hbSpinner_quip")).toHaveTextContent("*");
   });
 
   it("responds to iconOnly", async () => {
     // When we render with iconOnly
     const r = await render(<HbLoadingSpinner iconOnly />, { omitBeamContext: true });
-    // The text child disappears from the DOM
-    expect(r.hbLoadingSpinner.childElementCount).toBe(1);
+    // The text is not in the DOM
+    expect(r.queryByTestId("hbSpinner_quip")).not.toBeInTheDocument();
   });
 
   it("may use extra quips only", async () => {
@@ -24,10 +28,10 @@ describe("HbLoadingSpinner", () => {
     expect(r.baseElement).toHaveTextContent("Find me");
   });
 
-  it("responds to global noQuips rules", async () => {
+  it("defaults when no quips are provided", async () => {
     // When the global context disables quips
     const r = await render(
-      <HbSpinnerProvider noQuips>
+      <HbSpinnerProvider quips={[]}>
         <HbLoadingSpinner />
       </HbSpinnerProvider>,
       { omitBeamContext: true },
@@ -39,9 +43,9 @@ describe("HbLoadingSpinner", () => {
   it("may override contextual noQuips rules", async () => {
     const r = await render(
       // Given quips have been disabled globally
-      <HbSpinnerProvider noQuips>
+      <HbSpinnerProvider quips={[]}>
         {/* When we pass in extra quips */}
-        <HbLoadingSpinner extraQuips={["Find me"]} extraQuipsOnly />
+        <HbLoadingSpinner extraQuips={["Find me"]} />
       </HbSpinnerProvider>,
       { omitBeamContext: true },
     );
