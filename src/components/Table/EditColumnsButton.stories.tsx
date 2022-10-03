@@ -34,7 +34,6 @@ export function EditColumnButton() {
           columns={[nameColumn, valueColumn, actionColumn]}
           setColumns={noop}
           title="Select columns to show"
-          buttonText="Clear selections"
           defaultOpen={true}
         />
       </div>
@@ -43,7 +42,8 @@ export function EditColumnButton() {
 }
 
 export function EditColumnButtonInAction() {
-  const [columns, setColumns] = useColumns([nameColumn, otherColumn, valueColumn, actionColumn]);
+  const tableColumns = [nameColumn, otherColumn, valueColumn, actionColumn];
+  const [columns, setColumns] = useColumns(tableColumns);
   return (
     <div>
       <h2 css={Css.lg.$}>Edit Columns Button In Action</h2>
@@ -51,10 +51,9 @@ export function EditColumnButtonInAction() {
         <EditColumnsButton
           trigger={{ label: "Columns" }}
           placement="right"
-          columns={columns.allColumns}
+          columns={tableColumns}
           setColumns={setColumns}
           title="Select columns to show"
-          buttonText="Clear selections"
         />
       </div>
       <GridTable<Row>

@@ -31,10 +31,12 @@ export interface CheckboxGroupProps {
   onBlur?: () => void;
   /** Called when the component is in focus */
   onFocus?: () => void;
+  /** Number of columns to display checkboxes */
+  columns?: number;
 }
 
 export function CheckboxGroup(props: CheckboxGroupProps) {
-  const { options, label, values, errorMsg, helperText, onBlur, onFocus } = props;
+  const { options, label, values, errorMsg, helperText, onBlur, onFocus, columns = 1 } = props;
 
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
@@ -43,7 +45,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
   return (
     <div {...groupProps} onBlur={onBlur} onFocus={onFocus} {...tid}>
       <Label label={label} {...labelProps} {...tid.label} />
-      <div css={Css.dg.gap2.$}>
+      <div css={Css.dg.gtc(`repeat(${columns}, auto)`).gap2.$}>
         {options.map((option) => (
           <CheckboxGroupItem
             key={option.value}

@@ -6,17 +6,17 @@ import { SimpleHeaderAndData } from "./simpleHelpers";
 
 type Data = { name: string | undefined; value: number | undefined };
 type Row = SimpleHeaderAndData<Data>;
-const nameColumn: GridColumn<Row> = { name: "name", header: "Name", data: ({ name }) => name };
-const valueColumn: GridColumn<Row> = { name: "value", header: "Value", canHide: true, data: ({ value }) => value };
+const nameColumn: GridColumn<Row> = { name: "Name", header: "Name", data: ({ name }) => name };
+const valueColumn: GridColumn<Row> = { name: "Value", header: "Value", canHide: true, data: ({ value }) => value };
 const actionColumn: GridColumn<Row> = {
-  name: "actions",
+  name: "Actions",
   header: "Action",
   canHide: true,
   data: () => <div>Actions</div>,
 };
 
 describe("EditColumnsButton", () => {
-  it("Should render editColumnsButton", async () => {
+  it("should render EditColumnsButton", async () => {
     // Given an edit columns button
     const r = await render(
       <EditColumnsButton
@@ -25,11 +25,11 @@ describe("EditColumnsButton", () => {
         setColumns={noop}
       />,
     );
-    // Expect to render the button with the expected label
+    // Then the button renders with the correct label
     expect(r.columns().textContent).toBe("Columns");
   });
 
-  it("Should render only hide-able columns", async () => {
+  it("should render only hide-able columns", async () => {
     // Given an edit columns button
     const r = await render(
       <EditColumnsButton
@@ -39,13 +39,32 @@ describe("EditColumnsButton", () => {
         defaultOpen={true}
       />,
     );
-    // Expect to render the button with the expected label
+    // Then the button renders with the correct label
     expect(r.columns().textContent).toBe("Columns");
-    // Expect to render only hide-able columns with this case the columns with canHide=true
+    // Then only hide-able columns should be render
     expect(r.getAllByRole("checkbox")).toHaveLength(2);
   });
 
-  it("Should call setColumns when an option is clicked", async () => {
+  it("should call setColumns when an option is clicked", async () => {
+    // Given an edit columns button with a column with visible equal to false
+    const setColumns = jest.fn();
+    const r = await render(
+      <EditColumnsButton
+        trigger={{ label: "Columns" }}
+        columns={[nameColumn, valueColumn, actionColumn]}
+        setColumns={setColumns}
+        defaultOpen={true}
+      />,
+    );
+    expect(valueColumn.visible).toEqual(false);
+    // When click on an option
+    click(r.value);
+    // Then setColumns should be called and visible should be updated to true
+    expect(setColumns).toHaveBeenCalled();
+    expect(valueColumn.visible).toEqual(true);
+  });
+
+  it("should call setColumns when clear seleccions is clicked", async () => {
     // Given an edit columns button
     const setColumns = jest.fn();
     const r = await render(
@@ -58,24 +77,16 @@ describe("EditColumnsButton", () => {
     );
     // When click on an option
     click(r.value);
-    // Expect for setColumns to be called
+    click(r.actions);
+    // Then setColumns should be called and visible should be updated to true
     expect(setColumns).toHaveBeenCalled();
-  });
-
-  it("Should call setColumns when clear seleccions is clicked", async () => {
-    // Given an edit columns button
-    const setColumns = jest.fn();
-    const r = await render(
-      <EditColumnsButton
-        trigger={{ label: "Columns" }}
-        columns={[nameColumn, valueColumn, actionColumn]}
-        setColumns={setColumns}
-        defaultOpen={true}
-      />,
-    );
+    expect(valueColumn.visible).toEqual(true);
+    expect(actionColumn.visible).toEqual(true);
     // When click clearSelections button
     click(r.clearSelections);
-    // Expect for setColumns to be called
+    // Then setColumns should be called and all columns should be updated to visible equal to false
     expect(setColumns).toHaveBeenCalled();
+    expect(valueColumn.visible).toEqual(false);
+    expect(actionColumn.visible).toEqual(false);
   });
 });

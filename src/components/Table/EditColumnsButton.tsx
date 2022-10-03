@@ -1,26 +1,26 @@
-import { Dispatch, SetStateAction, useRef } from "react";
+import { capitalCase } from "capital-case";
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
-import { Checkbox } from "src/inputs";
-import { Css, px } from "../../Css";
+import { CheckboxGroup, CheckboxGroupItemOption } from "src/inputs";
+import { Css } from "../../Css";
 import { useTestIds } from "../../utils";
 import { Button } from "../Button";
 import { isIconButton, isTextButton, OverlayTrigger, OverlayTriggerProps } from "../internal/OverlayTrigger";
 import { GridColumn, Kinded } from "./GridTable";
-import { Columns } from "./useColumns";
+import { GridColumnState } from "./useColumns";
 
 interface EditColumnsButtonProps<R extends Kinded, S>
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
   columns: GridColumn<R, S>[];
-  setColumns: Dispatch<SetStateAction<Columns<R, S>>>;
+  setColumns: Dispatch<SetStateAction<GridColumnState<R, S>>>;
   title?: string;
-  buttonText?: string;
   // for storybook purposes
   defaultOpen?: boolean;
 }
 
 export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsButtonProps<R, S>) {
-  const { defaultOpen, disabled, columns, setColumns, trigger, title, buttonText } = props;
+  const { defaultOpen, disabled, columns, setColumns, trigger, title } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -29,49 +29,61 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
     isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,
   );
 
-  function clearSelections() {
-    columns.map((column) => (column.visible = false));
+  const editableColumns = useMemo(
+    () =>
+      columns.filter((column) => {
+        if (!column.canHide) return false;
+        if (!column.name || column.name.length === 0) {
+          console.warn("Column is missing 'name' property required by the Edit Columns button", column);
+          return false;
+        }
+        return true;
+      }),
+    [columns],
+  );
+
+  const selectedColumns: string[] = editableColumns
+    .map((column) => {
+      if (column.canHide && column.visible) return column.name;
+    })
+    .filter((column) => !!column) as string[];
+
+  const options: CheckboxGroupItemOption[] = editableColumns.map((column) => ({
+    label: capitalCase(column.name!)!,
+    value: column.name!,
+  }));
+
+  const [selectedValues, setSelectedValues] = useState<string[]>(selectedColumns ?? []);
+
+  const clearSelections = useCallback(() => {
+    // When clearing all selections, all hide-able columns should be filtered out of `visibleColumns`.
+    setColumns((prevState) => ({ ...prevState, visibleColumns: columns.filter((column) => !column.canHide) }));
+    setSelectedValues([]);
+  }, [columns]);
+
+  useEffect(() => {
     setColumns((prevState) => ({
       ...prevState,
-      visibleColumns: columns.filter((column) => (column.canHide && column.visible) || !column.canHide),
+      visibleColumns: columns.filter((column) => (column.canHide ? selectedValues.includes(column.name!) : true)),
     }));
-  }
+  }, [selectedValues]);
 
   return (
     <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
       <div
         css={{
-          ...Css.df.fdc.bgWhite.py3.px2.maxw(px(380)).$,
+          ...Css.bgWhite.py5.px3.maxwPx(380).dg.gap1.$,
           "&:hover": Css.bshHover.$,
         }}
       >
-        <div css={Css.gray500.sm.ttu.$}>{title || "Select columns to show"}</div>
-        <div css={Css.df.add({ flexWrap: "wrap" }).gap2.py2.$}>
-          {columns.map((column, i) => {
-            return (
-              column.canHide && (
-                <div css={Css.add({ flex: "40%" }).ttc.$} key={i}>
-                  <Checkbox
-                    label={column.name || ""}
-                    selected={!!column.visible}
-                    onChange={(value) => {
-                      column.visible = value;
-                      setColumns((prevState) => ({
-                        ...prevState,
-                        visibleColumns: columns.filter(
-                          (column) => (column.canHide && column.visible) || !column.canHide,
-                        ),
-                      }));
-                    }}
-                  />
-                </div>
-              )
-            );
-          })}
-        </div>
-        <div css={Css.smMd.$}>
-          <Button size="sm" variant={"text"} label={buttonText || "Clear selections"} onClick={clearSelections} />
-        </div>
+        <CheckboxGroup
+          label={title || "Select columns to show"}
+          onChange={(values) => setSelectedValues(values)}
+          values={selectedValues}
+          options={options}
+          columns={2}
+        />
+        <Button variant={"tertiary"} label={"Clear selections"} onClick={clearSelections} />
       </div>
     </OverlayTrigger>
   );

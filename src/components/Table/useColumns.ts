@@ -1,21 +1,19 @@
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { GridColumn, Kinded } from "./GridTable";
 
-export interface Columns<R extends Kinded, S = {}> {
-  allColumns: GridColumn<R, S>[];
-  visibleColumns: GridColumn<R, S>[];
-}
-
 export function useColumns<R extends Kinded, S = {}>(
   tableColumns: GridColumn<R, S>[],
-): [Columns<R, S>, Dispatch<SetStateAction<Columns<R, S>>>] {
-  const initColumns: Columns<R, S> = useMemo(() => {
+): [GridColumnState<R, S>, Dispatch<SetStateAction<GridColumnState<R, S>>>] {
+  const initColumns: GridColumnState<R, S> = useMemo(() => {
     return {
-      allColumns: tableColumns,
-      visibleColumns: tableColumns.filter((column) => (column.canHide && column.visible) || !column.canHide),
+      visibleColumns: tableColumns.filter((column) => column.canHide ? column.visible : true),
     };
   }, [tableColumns]);
 
-  const [columns, setColumns] = useState<Columns<R, S>>(initColumns);
+  const [columns, setColumns] = useState<GridColumnState<R, S>>(initColumns);
   return [columns, setColumns];
+}
+
+export type GridColumnState<R extends Kinded, S = {}> = {
+  visibleColumns: GridColumn<R, S>[];
 }
