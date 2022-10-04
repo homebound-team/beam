@@ -15,6 +15,7 @@ export * from "./ButtonMenu";
 export * from "./Copy";
 export * from "./CssReset";
 export * from "./Filters";
+export { HbLoadingSpinner, HbSpinnerProvider, HB_QUIPS_FLAVOR, HB_QUIPS_MISSION } from "./HbLoadingSpinner";
 export * from "./Icon";
 export * from "./IconButton";
 export * from "./Layout";
