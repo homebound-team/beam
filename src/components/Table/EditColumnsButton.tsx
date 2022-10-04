@@ -28,29 +28,28 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
     isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,
   );
 
-  const editableColumns = useMemo(
-    () =>
-      columns.filter((column) => {
-        if (!column.canHide) return false;
-        if (!column.name || column.name.length === 0) {
-          console.warn("Column is missing 'name' property required by the Edit Columns button", column);
-          return false;
-        }
-        return true;
-      }),
-    [columns],
-  );
+  const { options, selectedColumns } = useMemo(() => {
+    const editableColumns = columns.filter((column) => {
+      if (!column.canHide) return false;
+      if (!column.name || column.name.length === 0) {
+        console.warn("Column is missing 'name' property required by the Edit Columns button", column);
+        return false;
+      }
+      return true;
+    });
 
-  const selectedColumns: string[] = editableColumns
-    .map((column) => {
+    const selectedColumns =  editableColumns.map((column) => {
       if (column.canHide && column.visible) return column.name;
-    })
-    .filter((column) => !!column) as string[];
+    }).filter((column) => !!column) as string[];
 
-  const options: CheckboxGroupItemOption[] = editableColumns.map((column) => ({
-    label: column.name!,
-    value: column.name!,
-  }));
+    const options: CheckboxGroupItemOption[] = editableColumns.map((column) => ({
+      label: column.name!,
+      value: column.name!,
+    }));
+
+    return {selectedColumns, options}
+  }, [columns]);
+
 
   const [selectedValues, setSelectedValues] = useState<string[]>(selectedColumns ?? []);
 
