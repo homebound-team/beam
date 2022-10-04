@@ -19,7 +19,7 @@ describe("useColumns", () => {
     // Given an useColumns with 2 columns 1 of them canHide=true
     const { result } = renderHook(() => useColumns([nameColumn, valueColumn]));
     // Then visible should be  have 1 element
-    expect(result.current[0].visibleColumns).toHaveLength(1);
-    expect(result.current[0].visibleColumns[0]).toEqual(nameColumn);
+    expect(result.current[0]).toHaveLength(1);
+    expect(result.current[0][0]).toEqual(nameColumn);
   });
 });

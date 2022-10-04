@@ -57,7 +57,7 @@ export function EditColumnButtonInAction() {
         />
       </div>
       <GridTable<Row>
-        columns={columns.visibleColumns}
+        columns={columns}
         style={{ cellHighlight: true }}
         rows={[
           simpleHeader,

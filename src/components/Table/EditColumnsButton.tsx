@@ -7,12 +7,11 @@ import { useTestIds } from "../../utils";
 import { Button } from "../Button";
 import { isIconButton, isTextButton, OverlayTrigger, OverlayTriggerProps } from "../internal/OverlayTrigger";
 import { GridColumn, Kinded } from "./GridTable";
-import { GridColumnState } from "./useColumns";
 
 interface EditColumnsButtonProps<R extends Kinded, S>
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
   columns: GridColumn<R, S>[];
-  setColumns: Dispatch<SetStateAction<GridColumnState<R, S>>>;
+  setColumns: Dispatch<SetStateAction<GridColumn<R, S>[]>>;
   title?: string;
   // for storybook purposes
   defaultOpen?: boolean;
@@ -38,32 +37,30 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
       return true;
     });
 
-    const selectedColumns =  editableColumns.map((column) => {
-      if (column.canHide && column.visible) return column.name;
-    }).filter((column) => !!column) as string[];
+    const selectedColumns = editableColumns
+      .map((column) => {
+        if (column.canHide && column.visible) return column.name;
+      })
+      .filter((column) => !!column) as string[];
 
     const options: CheckboxGroupItemOption[] = editableColumns.map((column) => ({
       label: column.name!,
       value: column.name!,
     }));
 
-    return {selectedColumns, options}
+    return { selectedColumns, options };
   }, [columns]);
-
 
   const [selectedValues, setSelectedValues] = useState<string[]>(selectedColumns ?? []);
 
   const clearSelections = useCallback(() => {
     // When clearing all selections, all hide-able columns should be filtered out of `visibleColumns`.
-    setColumns((prevState) => ({ ...prevState, visibleColumns: columns.filter((column) => !column.canHide) }));
+    setColumns(columns.filter((column) => !column.canHide));
     setSelectedValues([]);
   }, [columns]);
 
   useEffect(() => {
-    setColumns((prevState) => ({
-      ...prevState,
-      visibleColumns: columns.filter((column) => (column.canHide ? selectedValues.includes(column.name!) : true)),
-    }));
+    setColumns(columns.filter((column) => (column.canHide ? selectedValues.includes(column.name!) : true)));
   }, [selectedValues]);
 
   return (
@@ -74,7 +71,7 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
           "&:hover": Css.bshHover.$,
         }}
       >
-        <div css={Css.gray500.xsSb.mb1.$}>{title || "Select columns to show"}</div>
+        <div css={Css.gray500.xsSb.mb1.ttu.$}>{title || "Select columns to show"}</div>
         <CheckboxGroup
           label={title || "Select columns to show"}
           onChange={(values) => setSelectedValues(values)}
@@ -84,7 +81,7 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
           hideLabel
         />
         <div css={Css.mt1.$}>
-         <Button variant={"tertiary"} label={"Clear selections"} onClick={clearSelections}/>
+          <Button variant={"tertiary"} label={"Clear selections"} onClick={clearSelections} />
         </div>
       </div>
     </OverlayTrigger>
