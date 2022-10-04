@@ -8,7 +8,6 @@ describe("HbLoadingSpinner", () => {
       <HbSpinnerProvider quips={["*"]}>
         <HbLoadingSpinner />
       </HbSpinnerProvider>,
-      { omitBeamContext: true },
     );
     // Then the quip is in the dom
     expect(r.getByTestId("hbSpinner_quip")).toHaveTextContent("*");
@@ -16,14 +15,14 @@ describe("HbLoadingSpinner", () => {
 
   it("responds to iconOnly", async () => {
     // When we render with iconOnly
-    const r = await render(<HbLoadingSpinner iconOnly />, { omitBeamContext: true });
+    const r = await render(<HbLoadingSpinner iconOnly />);
     // The text is not in the DOM
     expect(r.queryByTestId("hbSpinner_quip")).not.toBeInTheDocument();
   });
 
   it("may use extra quips only", async () => {
     // When we render with extra quips, and specify to only use those quips
-    const r = await render(<HbLoadingSpinner extraQuips={["Find me"]} extraQuipsOnly />, { omitBeamContext: true });
+    const r = await render(<HbLoadingSpinner extraQuips={["Find me"]} extraQuipsOnly />);
     // Then we either got really lucky and this test instance picked our quip, or more likely it's only using our quip
     expect(r.baseElement).toHaveTextContent("Find me");
   });
@@ -34,7 +33,6 @@ describe("HbLoadingSpinner", () => {
       <HbSpinnerProvider quips={[]}>
         <HbLoadingSpinner />
       </HbSpinnerProvider>,
-      { omitBeamContext: true },
     );
     // Then we get the default text
     expect(r.baseElement).toHaveTextContent("Loading...");
@@ -47,7 +45,6 @@ describe("HbLoadingSpinner", () => {
         {/* When we pass in extra quips */}
         <HbLoadingSpinner extraQuips={["Find me"]} />
       </HbSpinnerProvider>,
-      { omitBeamContext: true },
     );
     // Then quips display
     expect(r.baseElement).toHaveTextContent("Find me");
