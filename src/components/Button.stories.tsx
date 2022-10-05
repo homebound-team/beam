@@ -125,7 +125,7 @@ export function ButtonLink() {
 
 export function ButtonWithTooltip() {
   return (
-    <div css={Css.dg.fdc.childGap2.jcfs.$}>
+    <div css={Css.dg.fdc.gap2.jcfs.$}>
       <div>
         <h2>Tooltip provided via 'disabled' property</h2>
         <Button

@@ -9,7 +9,7 @@ export default {
 
 export function DefaultAlert() {
   return (
-    <div css={Css.df.fdc.childGap3.$}>
+    <div css={Css.df.fdc.gap3.$}>
       <Alert onClose={action("close")}>
         <span css={Css.b.$}>Holy Smokes!</span>
         &nbsp;

@@ -73,7 +73,7 @@ function TestFields({ disabled = false }: { disabled?: boolean }) {
   const [top5Superheros, setTop5FavSuperheros] = useState<string[]>(["1", "2"]);
 
   return (
-    <div css={Css.df.fdc.childGap1.$}>
+    <div css={Css.df.fdc.gap1.$}>
       <TextField label="Name" value={name} onChange={setName} required disabled={disabled} />
       <TextAreaField
         label="Description"

@@ -30,7 +30,7 @@ export function Example() {
   return (
     <div>
       <h1>Chip SelectField</h1>
-      <div css={Css.df.childGap2.$}>
+      <div css={Css.df.gap2.$}>
         <ChipSelectField
           label="Test"
           onSelect={(v) => setValue(v)}
@@ -67,7 +67,7 @@ export function Example() {
 
       <h1 css={Css.mt4.$}>Chip SelectField With Presentation typeScale of "xs"</h1>
       <PresentationProvider fieldProps={{ typeScale: "xs" }}>
-        <div css={Css.df.childGap2.$}>
+        <div css={Css.df.gap2.$}>
           <ChipSelectField
             label="Test"
             onSelect={(v) => setValue(v)}

@@ -43,7 +43,7 @@ export function SwitchGroup(props: SwitchGroupProps) {
         {label}
       </legend>
       {/* Switches */}
-      <div css={Css.df.fdc.childGap2.$}>
+      <div css={Css.df.fdc.gap2.$}>
         {options.map(({ label, value }) => (
           <Switch
             compact={compact}

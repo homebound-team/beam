@@ -116,7 +116,7 @@ export function SuperDrawer(): ReactPortal | null {
                   {/* Right */}
                   {!modalState.current && (
                     // Forcing height to 32px to match title height
-                    <div css={Css.df.childGap3.aic.hPx(32).fs0.$}>
+                    <div css={Css.df.gap3.aic.hPx(32).fs0.$}>
                       {titleRightContent || null}
                       {/* Disable buttons is handlers are not given or if childContent is shown */}
                       {!hideControls && (

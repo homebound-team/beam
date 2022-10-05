@@ -32,7 +32,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
   const { kind } = contentStack.current[contentStack.current.length - 1] ?? {};
   const firstContent = contentStack.current[0]?.opts as OpenInDrawerOpts;
 
-  const { width = SuperDrawerWidth.Normal } = firstContent ?? {}
+  const { width = SuperDrawerWidth.Normal } = firstContent ?? {};
 
   function wrapWithMotionAndMaybeBack(children: ReactNode): ReactNode {
     if (kind === "open") {
@@ -75,7 +75,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
       {/* Optionally render footer section with row of given footer buttons */}
       {actions && (
         <footer css={Css.bt.bGray200.p3.df.aic.jcfe.$}>
-          <div css={Css.df.childGap1.$}>
+          <div css={Css.df.gap1.$}>
             {actions.map((buttonProps, i) => (
               <Button key={i} {...buttonProps} />
             ))}

@@ -30,7 +30,7 @@ export function ConfirmCloseModal(props: ConfirmCloseModalProps) {
         </div>
       </ModalBody>
       <ModalFooter xss={Css.jcc.$}>
-        <div css={Css.df.fdc.childGap1.aic.$}>
+        <div css={Css.df.fdc.gap1.aic.$}>
           <Button label={continueText} onClick={closeModal} />
           <Button
             variant="tertiary"

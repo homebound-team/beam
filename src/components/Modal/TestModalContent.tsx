@@ -54,7 +54,7 @@ export function TestModalContent(props: TestModalContentProps) {
       </ModalHeader>
       <ModalBody>
         <div css={Css.df.gap1.fdc.aifs.$}>
-          <div css={Css.df.childGap1.$}>
+          <div css={Css.df.gap1.$}>
             <Button label="More" onClick={() => setNumSentences(numSentences + 2)} />
             <Button label="Clear" onClick={() => setNumSentences(0)} />
             <Button label="Primary" onClick={() => setPrimaryDisabled(!primaryDisabled)} />
@@ -72,7 +72,7 @@ export function TestModalContent(props: TestModalContentProps) {
             <Button label="Clear" onClick={action("Clear Action")} variant="tertiary" disabled={leftActionDisabled} />
           </div>
         )}
-        <div css={Css.df.childGap1.$}>
+        <div css={Css.df.gap1.$}>
           <Button label="Cancel" onClick={closeModal} variant="tertiary" />
           <Button label="Apply" onClick={action("Primary action")} disabled={primaryDisabled} />
         </div>

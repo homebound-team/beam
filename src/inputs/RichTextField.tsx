@@ -182,7 +182,7 @@ function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
 const trixCssOverrides = {
   ...Css.relative.add({ wordBreak: "break-word" }).br4.bGray300.ba.$,
   // Put the toolbar on the bottom
-  ...Css.df.fdcr.childGap1.$,
+  ...Css.df.fdcr.gap1.$,
   // Some basic copy/paste from TextFieldBase
   "& trix-editor": Css.bgWhite.sm.gray900.bn.p1.$,
   // Highlight on focus

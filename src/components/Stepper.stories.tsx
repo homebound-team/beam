@@ -26,7 +26,7 @@ export function InteractiveStepper() {
     <div>
       <Stepper steps={steps} currentStep={currentStep} onChange={setCurrentStep} />
 
-      <div css={Css.mt2.df.childGap1.$}>
+      <div css={Css.mt2.df.gap1.$}>
         {currentStep === "trade" && (
           <>
             <Button
@@ -68,7 +68,7 @@ export function StepperStates() {
   const [currentStep, setCurrentStep] = useState(steps[0].value);
 
   return (
-    <div css={Css.df.fdc.childGap4.$}>
+    <div css={Css.df.fdc.gap4.$}>
       <div>
         <h2>Enabled Steps</h2>
         <Stepper steps={steps} currentStep={currentStep} onChange={setCurrentStep} />

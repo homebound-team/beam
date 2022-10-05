@@ -23,8 +23,8 @@ export default {
 export function TabBaseStates() {
   const styles = getTabStyles();
   return (
-    <div css={Css.df.childGap5.$}>
-      <div css={Css.df.fdc.childGap2.$}>
+    <div css={Css.df.gap5.$}>
+      <div css={Css.df.fdc.gap2.$}>
         <h2>
           Rendered as <pre css={Css.dib.$}>&lt;Button /&gt;</pre>
         </h2>
@@ -35,7 +35,7 @@ export function TabBaseStates() {
         <div css={{ ...styles.baseStyles, ...styles.hoverStyles }}>{getChildren("hovered")}</div>
         <div css={{ ...styles.baseStyles, ...styles.activeHoverStyles }}>{getChildren("active hover")}</div>
       </div>
-      <div css={Css.df.fdc.childGap2.$}>
+      <div css={Css.df.fdc.gap2.$}>
         <h2>
           Rendered as <pre css={Css.dib.$}>&lt;a /&gt;</pre>
         </h2>

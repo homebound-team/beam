@@ -125,7 +125,7 @@ export function FormStateApp() {
               <GridTable<Row> columns={columns} rows={rows} />
             </div>
 
-            <div css={Css.df.childGap1.$}>
+            <div css={Css.df.gap1.$}>
               <Button onClick={() => formState.revertChanges()} label="Cancel" />
               <Button
                 onClick={() => {
