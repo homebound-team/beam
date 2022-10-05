@@ -7,6 +7,8 @@ export * from "./Accordion";
 export * from "./AccordionList";
 export * from "./Alert";
 export * from "./AutoSaveIndicator";
+export * from "./Avatar";
+export * from "./AvatarButton";
 export { BeamProvider } from "./BeamContext";
 export * from "./Button";
 export * from "./ButtonDatePicker";
