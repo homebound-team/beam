@@ -63,8 +63,8 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
     <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
       <div
         css={{
-          ...Css.bgWhite.py5.px3.maxwPx(380).$,
-          "&:hover": Css.bshBasic.$,
+          ...Css.bgWhite.py5.px3.maxwPx(380).bshBasic.$,
+          "&:hover": Css.bshHover.$,
         }}
       >
         <div css={Css.gray500.xsSb.mb1.ttu.$}>{title || "Select columns to show"}</div>
