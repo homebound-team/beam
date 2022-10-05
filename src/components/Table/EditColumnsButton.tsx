@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { CheckboxGroup, CheckboxGroupItemOption } from "src/inputs";
@@ -51,10 +51,6 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
 
   const [selectedValues, setSelectedValues] = useState<string[]>(selectedColumns);
 
-  const clearSelections = useCallback(() => {
-    setSelectedValues([]);
-  }, [columns]);
-
   useEffect(() => {
     setColumns(columns.filter((column) => (column.canHide ? selectedValues.includes(column.name!) : true)));
   }, [selectedValues]);
@@ -77,7 +73,7 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
           hideLabel
         />
         <div css={Css.mt1.$}>
-          <Button variant={"tertiary"} label={"Clear selections"} onClick={clearSelections} />
+          <Button variant={"tertiary"} label={"Clear selections"} onClick={() => setSelectedValues([])} />
         </div>
       </div>
     </OverlayTrigger>
