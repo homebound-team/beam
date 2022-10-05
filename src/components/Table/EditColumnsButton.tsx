@@ -28,34 +28,30 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
   );
 
   const { options, selectedColumns } = useMemo(() => {
-    const editableColumns = columns.filter((column) => {
-      if (!column.canHide) return false;
-      if (!column.name || column.name.length === 0) {
-        console.warn("Column is missing 'name' property required by the Edit Columns button", column);
-        return false;
-      }
-      return true;
-    });
+    return columns.reduce(
+      (acc, column) => {
+        // Only include options that can be hidden and have the `name` property defined.
+        if (!column.canHide) return acc;
+        if (!column.name || column.name.length === 0) {
+          console.warn("Column is missing 'name' property required by the Edit Columns button", column);
+          return acc;
+        }
 
-    const selectedColumns = editableColumns
-      .map((column) => {
-        if (column.canHide && column.visible) return column.name;
-      })
-      .filter((column) => !!column) as string[];
+        // If currently visible, then add to selectedColumns
+        if (column.canHide && column.visible) {
+          acc.selectedColumns.push(column.name);
+        }
 
-    const options: CheckboxGroupItemOption[] = editableColumns.map((column) => ({
-      label: column.name!,
-      value: column.name!,
-    }));
-
-    return { selectedColumns, options };
+        // Add current column as an option
+        return { ...acc, options: acc.options.concat({ label: column.name!, value: column.name! }) };
+      },
+      { options: [] as CheckboxGroupItemOption[], selectedColumns: [] as string[] },
+    );
   }, [columns]);
 
-  const [selectedValues, setSelectedValues] = useState<string[]>(selectedColumns ?? []);
+  const [selectedValues, setSelectedValues] = useState<string[]>(selectedColumns);
 
   const clearSelections = useCallback(() => {
-    // When clearing all selections, all hide-able columns should be filtered out of `visibleColumns`.
-    setColumns(columns.filter((column) => !column.canHide));
     setSelectedValues([]);
   }, [columns]);
 
@@ -68,7 +64,7 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
       <div
         css={{
           ...Css.bgWhite.py5.px3.maxwPx(380).$,
-          "&:hover": Css.bshHover.$,
+          "&:hover": Css.bshBasic.$,
         }}
       >
         <div css={Css.gray500.xsSb.mb1.ttu.$}>{title || "Select columns to show"}</div>
