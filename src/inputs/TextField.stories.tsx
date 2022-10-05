@@ -13,8 +13,8 @@ export default {
 
 export function TextFieldStyles() {
   return (
-    <div css={Css.df.fdc.childGap5.$}>
-      <div css={Css.df.fdc.childGap2.$}>
+    <div css={Css.df.fdc.gap5.$}>
+      <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <TestTextField value="" label="Name" hideLabel />
         <TestTextField value="Brandon" label="Name" inlineLabel />
@@ -45,7 +45,7 @@ export function TextFieldStyles() {
         <TestTextField label="Name Clearable" value="Brandon" clearable />
       </div>
 
-      <div css={Css.df.fdc.childGap2.$}>
+      <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Compact</h1>
         <TestTextField compact value="" label="Name" hideLabel />
         <TestTextField compact value="Brandon" label="Name" inlineLabel />
@@ -74,8 +74,8 @@ export function TextFieldStyles() {
 
 export function TextFieldReadOnly() {
   return (
-    <div css={Css.df.childGap2.$}>
-      <div css={Css.df.fdc.childGap3.$}>
+    <div css={Css.df.gap2.$}>
+      <div css={Css.df.fdc.gap3.$}>
         <b>Read Only</b>
         <TestTextField label="Name" value="first" readOnly={true} />
         <TestTextField label="Name" value="first - with tooltip" inlineLabel readOnly="Read only reason tooltip" />
@@ -83,7 +83,7 @@ export function TextFieldReadOnly() {
         <TestTextField label="Name" value={"first ".repeat(20) + "last"} readOnly={true} />
       </div>
       {/*Matching column but w/o readOnly for comparison*/}
-      <div css={Css.df.fdc.childGap3.$}>
+      <div css={Css.df.fdc.gap3.$}>
         <b>Editable</b>
         <TestTextField label="Name" value="first" />
         <TestTextField label="Name" value="first" inlineLabel />

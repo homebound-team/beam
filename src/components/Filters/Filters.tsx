@@ -69,7 +69,7 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
   return (
     <div
       css={{
-        ...(vertical ? Css.df.fdc.childGap2.$ : Css.df.aic.childGap1.$),
+        ...(vertical ? Css.df.fdc.gap2.$ : Css.df.aic.gap1.$),
       }}
       {...testId}
     >

@@ -944,23 +944,6 @@ class CssBuilder<T extends Properties1> {
   // animation
   get transition() { return this.add("transition", "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms"); }
 
-  // childGap
-  get childGap0() { return this.childGap(0); }
-  get childGap1() { return this.childGap(1); }
-  get childGap2() { return this.childGap(2); }
-  get childGap3() { return this.childGap(3); }
-  get childGap4() { return this.childGap(4); }
-  get childGap5() { return this.childGap(5); }
-  get childGap6() { return this.childGap(6); }
-  get childGap7() { return this.childGap(7); }
-  get childGap8() { return this.childGap(8); }
-  childGap(inc: number | string) {
-    const direction = this.opts.rules["flexDirection"];
-    const p = direction === "column" ? "marginTop" : direction === "column-reverse" ? "marginBottom" : "marginLeft";
-    return this.addIn("& > * + *", Css.add(p, maybeInc(inc)).important.$);
-  }
-  childGapPx(px: number) { return this.childGap(`${px}px`); }
-
   // buttonBase
   get buttonBase() { return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px").add("outline", 0).add("borderRadius", "4px").add("display", "inline-flex").add("alignItems", "center").add("whiteSpace", "nowrap").add("transition", "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms"); }
 

@@ -41,7 +41,7 @@ export function LoadingSkeleton({
   return (
     <div aria-label="Loading">
       {rowArray.map((_, i) => (
-        <div key={`row-${i}`} css={Css.df.childGap1.mb1.hPx(rowHeight).$}>
+        <div key={`row-${i}`} css={Css.df.gap1.mb1.hPx(rowHeight).$}>
           {rowCells(i)}
         </div>
       ))}

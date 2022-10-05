@@ -32,7 +32,7 @@ function DrawerWithInputs() {
         { label: "Save", onClick: noop },
       ]}
     >
-      <form css={{ ...Css.df.fdc.childGap5.$, fieldset: Css.df.fdc.childGap2.$, legend: Css.baseMd.mb2.$ }}>
+      <form css={{ ...Css.df.fdc.gap5.$, fieldset: Css.df.fdc.gap2.$, legend: Css.baseMd.mb2.$ }}>
         <fieldset>
           <legend>Details</legend>
           <TextField label="Item Name" value="Counters" onChange={action("TextField - onChange")} />

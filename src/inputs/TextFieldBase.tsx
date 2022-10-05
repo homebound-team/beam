@@ -187,7 +187,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             css={{
               // Use input wrapper to get common styles, but then we need to override some
               ...fieldStyles.inputWrapperReadOnly,
-              ...(multiline ? Css.fdc.aifs.childGap2.$ : Css.truncate.$),
+              ...(multiline ? Css.fdc.aifs.gap2.$ : Css.truncate.$),
               ...xss,
             }}
             data-readonly="true"

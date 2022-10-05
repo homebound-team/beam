@@ -60,7 +60,7 @@ export function GroupBy() {
     filterDefs,
   });
   return (
-    <div css={Css.df.fdc.childGap2.$}>
+    <div css={Css.df.fdc.gap2.$}>
       <Filters groupBy={groupBy} filter={filter} onChange={setFilter} filterDefs={filterDefs} />
       <strong>Applied Filter:</strong> {JSON.stringify(filter)}
     </div>
@@ -149,11 +149,11 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
   return (
     <div
       css={{
-        ...(vertical ? Css.df.childGap2.$ : Css.df.fdc.childGap5.$),
+        ...(vertical ? Css.df.gap2.$ : Css.df.fdc.gap5.$),
       }}
     >
       <div>
-        <div css={Css.df.fdc.childGap2.if(!!vertical).wPx(360).p2.bgGray100.br.bGray600.$}>
+        <div css={Css.df.fdc.gap2.if(!!vertical).wPx(360).p2.bgGray100.br.bGray600.$}>
           <h1 css={Css.lg.$}>Filters</h1>
           <Filters<ProjectFilter> filter={filter} onChange={setFilter} filterDefs={filterDefs} vertical={vertical} />
         </div>

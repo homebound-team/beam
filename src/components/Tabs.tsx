@@ -167,7 +167,7 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
       {!hideTabs(props) && (
         <div
           ref={ref}
-          css={{ ...Css.dif.childGap1.$, ...(includeBottomBorder ? { ...Css.bb.bGray200.$ } : {}) }}
+          css={{ ...Css.dif.gap1.$, ...(includeBottomBorder ? { ...Css.bb.bGray200.$ } : {}) }}
           aria-label={ariaLabel}
           role="tablist"
           {...tid}

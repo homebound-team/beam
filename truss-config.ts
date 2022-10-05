@@ -1,4 +1,4 @@
-import { defineConfig, newIncrementDelegateMethods, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
+import { defineConfig, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
 import { palette } from "./truss-palette";
 
 const increment = 8;
@@ -91,17 +91,6 @@ const sections: Sections = {
       bshDanger: `0px 0px 0px 2px ${palette.White}, 0px 0px 0px 4px ${palette.Red800}`,
       bshModal: "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)",
     }),
-  // Due to Safari's limited support of the `gap` property, `childGap` will be
-  // its replacement until full browser support https://caniuse.com/?search=gap
-  childGap: (config) => [
-    ...newIncrementDelegateMethods("childGap", config.numberOfIncrements),
-    `childGap(inc: number | string) {
-    const direction = this.opts.rules["flexDirection"];
-    const p = direction === "column" ? "marginTop" : direction === "column-reverse" ? "marginBottom" : "marginLeft";
-    return this.addIn("& > * + *", Css.add(p, maybeInc(inc)).important.$);
-  }`,
-    `childGapPx(px: number) { return this.childGap(\`\${px}px\`); }`,
-  ],
   buttonBase: () => [
     newMethod("buttonBase", {
       ...fonts.smMd,

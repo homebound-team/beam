@@ -172,7 +172,7 @@ function HistoryExample() {
     <>
       <div css={Css.lgSb.$}>History</div>
       <p>Demonstrates not utilizing ScrollableContent component. Expect this section of the layout to scroll</p>
-      <ul css={Css.df.fdc.childGap2.$}>
+      <ul css={Css.df.fdc.gap2.$}>
         {zeroTo(20).map((i) => (
           <li key={i}>History Item {i + 1}</li>
         ))}
@@ -308,7 +308,7 @@ function TestSideNav() {
             </FullBleed>
             <ScrollableContent>
               <nav>
-                <ul css={Css.listReset.df.fdc.childGap5.mt2.$}>
+                <ul css={Css.listReset.df.fdc.gap5.mt2.$}>
                   {zeroTo(20).map((i) => (
                     <li key={i}>Side Navigation Item</li>
                   ))}

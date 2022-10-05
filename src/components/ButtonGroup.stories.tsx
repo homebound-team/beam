@@ -9,7 +9,7 @@ export default {
 
 export function ButtonGroups() {
   return (
-    <div css={Css.df.fdc.childGap2.$}>
+    <div css={Css.df.fdc.gap2.$}>
       <div>
         <h2>Icon Only</h2>
         <ButtonGroup buttons={[{ icon: "chevronLeft" }, { icon: "plus" }, { icon: "chevronRight" }]} />

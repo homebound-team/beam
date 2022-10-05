@@ -12,8 +12,8 @@ export default {
 
 export function TextAreaStyles() {
   return (
-    <div css={Css.df.fdc.childGap5.$}>
-      <div css={Css.df.fdc.childGap2.$}>
+    <div css={Css.df.fdc.gap5.$}>
+      <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <TestTextArea value="" label="Description" hideLabel />
         <TestTextArea label="Description" value="" />
@@ -40,8 +40,8 @@ export function TextAreaStyles() {
 
 export function TextAreaReadOnly() {
   return (
-    <div css={Css.df.childGap2.$}>
-      <div css={Css.df.fdc.childGap3.$}>
+    <div css={Css.df.gap2.$}>
+      <div css={Css.df.fdc.gap3.$}>
         <b>Read Only</b>
         <TestTextArea label="Name" value="first" readOnly={true} />
         <TestTextArea label="Name" value="first - with a tooltip" hideLabel readOnly="Read only with a tooltip" />
@@ -49,7 +49,7 @@ export function TextAreaReadOnly() {
         <TestTextArea label="Name" value={"this is a sentence\n".repeat(4)} readOnly={true} />
       </div>
       {/*Matching column but w/o readOnly for comparison*/}
-      <div css={Css.df.fdc.childGap3.wPx(400).$}>
+      <div css={Css.df.fdc.gap3.wPx(400).$}>
         <b>Editable</b>
         <TestTextArea label="Name" value="first" />
         <TestTextArea label="Name" value="first" hideLabel />
@@ -62,7 +62,7 @@ export function TextAreaReadOnly() {
 
 export function SchedulesV2TaskName() {
   return (
-    <div css={Css.df.fdc.childGap2.p2.wPx(240).$}>
+    <div css={Css.df.fdc.gap2.p2.wPx(240).$}>
       <TestTextArea label="Task name" hideLabel value="Task name" preventNewLines borderless />
       <TestTextArea
         label="Task name"

@@ -51,8 +51,8 @@ function Template(args: SelectFieldProps<any, any>) {
   const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
 
   return (
-    <div css={Css.df.fdc.childGap5.p2.if(args.contrast === true).white.bgGray800.$}>
-      <div css={Css.df.fdc.childGap2.$}>
+    <div css={Css.df.fdc.gap5.p2.if(args.contrast === true).white.bgGray800.$}>
+      <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>{args.compact ? "Compact" : "Regular"}</h1>
         <TestSelectField
           {...args}
@@ -180,7 +180,7 @@ function Template(args: SelectFieldProps<any, any>) {
         />
       </div>
 
-      <div css={Css.df.fdc.childGap2.$}>
+      <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Load test, 1000 Options</h1>
         <TestSelectField {...args} label="Project" value={loadTestOptions[2].id} options={loadTestOptions} />
       </div>

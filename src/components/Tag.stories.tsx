@@ -9,7 +9,7 @@ export default {
 
 export function Tags() {
   return (
-    <div css={Css.df.fdc.aifs.childGap1.$}>
+    <div css={Css.df.fdc.aifs.gap1.$}>
       <Tag text="Neutral" />
       <Tag text="info" type="info" />
       <Tag text="caution" type="caution" />

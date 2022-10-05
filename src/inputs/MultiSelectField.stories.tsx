@@ -28,8 +28,8 @@ const options: TestOption[] = [
 
 export function MultiSelectFields() {
   return (
-    <div css={Css.df.fdc.childGap5.$}>
-      <div css={Css.df.fdc.childGap2.$}>
+    <div css={Css.df.fdc.gap5.$}>
+      <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <TestMultiSelectField
           label="Favorite Icons"
@@ -84,7 +84,7 @@ export function MultiSelectFields() {
         />
       </div>
 
-      <div css={Css.df.fdc.childGap2.$}>
+      <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Compact</h1>
         <TestMultiSelectField
           compact
@@ -134,7 +134,7 @@ export function MultiSelectFields() {
           values={[] as Value[]}
         />
       </div>
-      <div css={Css.df.fdc.childGap2.$}>
+      <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Inline Label</h1>
         <TestMultiSelectField inlineLabel label="Favorite Icon" values={[options[2].id]} options={options} />
         <TestMultiSelectField inlineLabel compact label="Favorite Icon" values={[options[2].id]} options={options} />
