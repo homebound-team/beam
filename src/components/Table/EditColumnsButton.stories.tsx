@@ -19,7 +19,7 @@ const actionColumn: GridColumn<Row> = {
   name: "Actions",
   header: "Action",
   canHide: true,
-  data: () => <div>Actions</div>,
+  data: () => "Actions",
 };
 const otherColumn: GridColumn<Row> = { name: "Other", header: "Other", canHide: true, data: ({ name }) => name };
 
@@ -31,10 +31,11 @@ export function EditColumnButton() {
         <EditColumnsButton
           trigger={{ label: "Columns" }}
           placement="right"
-          columns={[nameColumn, valueColumn, actionColumn]}
+          allColumns={[nameColumn, valueColumn, actionColumn]}
           setColumns={noop}
           title="Select columns to show"
           defaultOpen={true}
+          selectedColumns={[]}
         />
       </div>
     </div>
@@ -43,8 +44,7 @@ export function EditColumnButton() {
 
 export function EditColumnButtonInAction() {
   const tableColumns = [nameColumn, otherColumn, valueColumn, actionColumn];
-  const storageKey = "gridColumns";
-  const [columns, setColumns] = useColumns(tableColumns, storageKey);
+  const [columns, setColumns] = useColumns(tableColumns);
   return (
     <div>
       <h2 css={Css.lg.$}>Edit Columns Button In Action</h2>
@@ -52,10 +52,10 @@ export function EditColumnButtonInAction() {
         <EditColumnsButton
           trigger={{ label: "Columns" }}
           placement="right"
-          columns={tableColumns}
+          allColumns={tableColumns}
           setColumns={setColumns}
+          selectedColumns={columns}
           title="Select columns to show"
-          storageKey={storageKey}
         />
       </div>
       <GridTable<Row>
@@ -67,6 +67,7 @@ export function EditColumnButtonInAction() {
           { kind: "data", id: "2", data: { name: "b", value: 2 } },
           { kind: "data", id: "3", data: { name: "a", value: 3 } },
         ]}
+        sorting={{ on: "client" }}
       />
     </div>
   );

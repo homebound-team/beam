@@ -21,7 +21,8 @@ describe("EditColumnsButton", () => {
     const r = await render(
       <EditColumnsButton
         trigger={{ label: "Columns" }}
-        columns={[nameColumn, valueColumn, actionColumn]}
+        allColumns={[nameColumn, valueColumn, actionColumn]}
+        selectedColumns={[]}
         setColumns={noop}
       />,
     );
@@ -34,7 +35,8 @@ describe("EditColumnsButton", () => {
     const r = await render(
       <EditColumnsButton
         trigger={{ label: "Columns" }}
-        columns={[nameColumn, valueColumn, actionColumn]}
+        allColumns={[nameColumn, valueColumn, actionColumn]}
+        selectedColumns={[]}
         setColumns={noop}
         defaultOpen={true}
       />,
@@ -51,7 +53,8 @@ describe("EditColumnsButton", () => {
     const r = await render(
       <EditColumnsButton
         trigger={{ label: "Columns" }}
-        columns={[nameColumn, valueColumn, actionColumn]}
+        allColumns={[nameColumn, valueColumn, actionColumn]}
+        selectedColumns={[]}
         setColumns={setColumns}
         defaultOpen={true}
       />,
@@ -69,7 +72,8 @@ describe("EditColumnsButton", () => {
     const r = await render(
       <EditColumnsButton
         trigger={{ label: "Columns" }}
-        columns={[nameColumn, valueColumn, actionColumn]}
+        allColumns={[nameColumn, valueColumn, actionColumn]}
+        selectedColumns={[]}
         setColumns={setColumns}
         defaultOpen={true}
       />,
