@@ -162,16 +162,10 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
   }
 
   return (
-    <div css={Css.df.aic.$}>
+    <div css={{ ...Css.df.aic.$, ...(includeBottomBorder ? { ...Css.bb.bGray200.$ } : {}) }}>
       {/* Do not show if we should hide the tabs */}
       {!hideTabs(props) && (
-        <div
-          ref={ref}
-          css={{ ...Css.dif.gap1.$, ...(includeBottomBorder ? { ...Css.bb.bGray200.$ } : {}) }}
-          aria-label={ariaLabel}
-          role="tablist"
-          {...tid}
-        >
+        <div ref={ref} css={Css.dif.gap1.asfe.$} aria-label={ariaLabel} role="tablist" {...tid}>
           {tabs.map((tab) => {
             const uniqueValue = uniqueTabValue(tab);
             return (
@@ -191,7 +185,7 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
         </div>
       )}
       {/* ref for actions specific to a tab. Targeting the immediate div (tabActionsEl) to set default styles */}
-      {right && <div css={Css.ml("auto").df.aic.gap1.$}>{right}</div>}
+      {right && <div css={Css.ml("auto").df.aic.gap1.pb1.$}>{right}</div>}
     </div>
   );
 }
