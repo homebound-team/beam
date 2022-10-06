@@ -44,7 +44,7 @@ export function EditColumnButton() {
 export function EditColumnButtonInAction() {
   const tableColumns = [nameColumn, otherColumn, valueColumn, actionColumn];
   const storageKey = "gridColumns";
-  const [columns, setColumns] = useColumns(storageKey, tableColumns);
+  const [columns, setColumns] = useColumns(tableColumns, storageKey);
   return (
     <div>
       <h2 css={Css.lg.$}>Edit Columns Button In Action</h2>
