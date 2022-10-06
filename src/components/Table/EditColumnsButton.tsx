@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { CheckboxGroup, CheckboxGroupItemOption } from "src/inputs";
@@ -11,14 +11,15 @@ import { GridColumn, Kinded } from "./GridTable";
 interface EditColumnsButtonProps<R extends Kinded, S>
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
   columns: GridColumn<R, S>[];
-  setColumns: Dispatch<SetStateAction<GridColumn<R, S>[]>>;
+  setColumns: (value: GridColumn<R, S>[]) => void;
   title?: string;
+  storageKey?: string;
   // for storybook purposes
   defaultOpen?: boolean;
 }
 
 export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsButtonProps<R, S>) {
-  const { defaultOpen, disabled, columns, setColumns, trigger, title } = props;
+  const { defaultOpen, disabled, columns, setColumns, trigger, title, storageKey } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -26,6 +27,9 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
     props,
     isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,
   );
+  
+  const storageData = storageKey ? (JSON.parse(sessionStorage.getItem(storageKey)!) as GridColumn<R, S>[]) : null;
+  const storageColumns = storageData && (storageData.map((column) => column.name) as string[]);
 
   const { options, selectedColumns } = useMemo(() => {
     return columns.reduce(
@@ -49,7 +53,7 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
     );
   }, [columns]);
 
-  const [selectedValues, setSelectedValues] = useState<string[]>(selectedColumns);
+  const [selectedValues, setSelectedValues] = useState<string[]>(storageColumns ?? selectedColumns);
 
   useEffect(() => {
     setColumns(columns.filter((column) => (column.canHide ? selectedValues.includes(column.name!) : true)));

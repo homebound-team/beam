@@ -43,7 +43,8 @@ export function EditColumnButton() {
 
 export function EditColumnButtonInAction() {
   const tableColumns = [nameColumn, otherColumn, valueColumn, actionColumn];
-  const [columns, setColumns] = useColumns(tableColumns);
+  const storageKey = "gridColumns";
+  const [columns, setColumns] = useColumns(storageKey, tableColumns);
   return (
     <div>
       <h2 css={Css.lg.$}>Edit Columns Button In Action</h2>
@@ -54,6 +55,7 @@ export function EditColumnButtonInAction() {
           columns={tableColumns}
           setColumns={setColumns}
           title="Select columns to show"
+          storageKey={storageKey}
         />
       </div>
       <GridTable<Row>
