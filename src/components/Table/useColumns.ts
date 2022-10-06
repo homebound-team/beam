@@ -10,7 +10,6 @@ export function useColumns<R extends Kinded, S = {}>(
   const { selectedColumns, hideColumns } = tableColumns.reduce(
     (acc, column) => {
       // Only include options that can be hidden and have the `name` property defined.
-      if (!column.canHide) return acc;
       if (!column.name || column.name.length === 0) {
         console.warn("Column is missing 'name' property required by the Edit Columns button", column);
         return acc;
@@ -20,7 +19,7 @@ export function useColumns<R extends Kinded, S = {}>(
         acc.hideColumns.push(column.name);
       }
       // Add selected columns
-      if (column.canHide && column.visible) {
+      if (!column.canHide || (column.canHide && column.visible)) {
         acc.selectedColumns.push(column.name);
       }
       return { ...acc };
