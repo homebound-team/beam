@@ -1,5 +1,5 @@
 import memoizeOne from "memoize-one";
-import { observer, Observer } from "mobx-react";
+import { observer } from "mobx-react";
 import React, { MutableRefObject, ReactElement, ReactNode, useContext, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
@@ -1178,16 +1178,6 @@ const MemoizedGridRow = React.memo(observer(GridRow), (one, two) => {
   const { row: row2, ...others2 } = two;
   return shallowEqual(row1, row2) && shallowEqual(others1, others2);
 }) as typeof GridRow;
-
-/** Wraps a mobx Observer around the row's rendering/evaluation, so that it will be reactive. */
-const ObservedGridRow = React.memo((props: GridRowProps<any, any>) => (
-  <Observer>
-    {() => {
-      // Invoke this just as a regular function so that Observer sees the proxy access's
-      return GridRow(props);
-    }}
-  </Observer>
-));
 
 /** A heuristic to detect the result of `React.createElement` / i.e. JSX. */
 function isJSX(content: any): boolean {
