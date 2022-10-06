@@ -178,7 +178,14 @@ export const TabWithRightContent = () => {
   );
   return (
     <>
-      <Tabs tabs={testTabs} onChange={setSelectedTab} selected={selectedTab} ariaLabel="Sample Tabs" right={right} />
+      <Tabs
+        includeBottomBorder
+        tabs={testTabs}
+        onChange={setSelectedTab}
+        selected={selectedTab}
+        ariaLabel="Sample Tabs"
+        right={right}
+      />
       {/* The tabs will be hidden, which causes the TabContent default top margin to be removed. But we are adding in actions, so add the margin back in ourselves. */}
       <TabContent contentXss={Css.mt3.$} tabs={testTabs} selected={selectedTab} />
     </>
