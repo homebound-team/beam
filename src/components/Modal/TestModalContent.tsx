@@ -5,6 +5,7 @@ import { InternalUser } from "src/components/Filters/testDomain";
 import { ScrollableContent, ScrollableParent } from "src/components/Layout";
 import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
+import { useSnackbar } from "src/components/Snackbar";
 import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndData } from "src/components/Table";
 import { Tag } from "src/components/Tag";
 import { Css } from "src/Css";
@@ -28,6 +29,7 @@ export function TestModalContent(props: TestModalContentProps) {
   const [leftActionDisabled, setLeftActionDisabled] = useState(false);
   const [date, setDate] = useState<Date | undefined>(jan1);
   const [internalValue, setValue] = useState<string | undefined>("");
+  const { triggerNotice } = useSnackbar();
 
   return (
     <>
@@ -58,6 +60,7 @@ export function TestModalContent(props: TestModalContentProps) {
             <Button label="More" onClick={() => setNumSentences(numSentences + 2)} />
             <Button label="Clear" onClick={() => setNumSentences(0)} />
             <Button label="Primary" onClick={() => setPrimaryDisabled(!primaryDisabled)} />
+            <Button label="Trigger Snackbar" onClick={() => triggerNotice({ message: "Snackbar message" })} />
             {showLeftAction && (
               <Button label="Left Action" onClick={() => setLeftActionDisabled(!leftActionDisabled)} />
             )}
