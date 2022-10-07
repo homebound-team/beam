@@ -28,7 +28,7 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
   // Only allow the "close" button to be hidden if not a `persistent` notice. Otherwise we could get in a state where the user cannot remove the notice from the screen.
   const reallyHideClose = hideCloseButton && !persistent;
   return (
-    <div css={Css.white.bgGray800.br4.base.df.aic.maxwPx(420).$} {...tid}>
+    <div css={Css.white.bgGray800.br4.base.df.aic.maxwPx(420).$} {...tid} role="alert">
       {icon && (
         <span css={Css.fs0.plPx(12).$}>
           <Icon icon={typeToIcon[icon]} {...tid.icon} />
