@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { Icon } from "src/components/Icon";
 import { Css, Typography } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export interface AvatarProps {
   src: string | undefined;
-  name: string;
+  name?: string;
   size?: AvatarSize;
   showName?: boolean;
 }
@@ -16,8 +17,8 @@ export function Avatar({ src, name, size = "md", showName = false, ...others }: 
   const styles = Css.br100.wPx(px).hPx(px).overflowHidden.$;
 
   const img = showFallback ? (
-    <div css={{ ...styles, ...Css[sizeToFallbackTypeScale[size]].bgLightBlue700.white.df.aic.jcc.$ }} {...tid}>
-      {nameToInitials(name)}
+    <div css={{ ...styles, ...Css[sizeToFallbackTypeScale[size]].bgGray400.gray100.df.aic.jcc.$ }} {...tid}>
+      {name ? nameToInitials(name) : <Icon icon="userCircle" inc={sizeToIconInc[size]} />}
     </div>
   ) : (
     <img
@@ -30,7 +31,7 @@ export function Avatar({ src, name, size = "md", showName = false, ...others }: 
     />
   );
 
-  return showName ? (
+  return showName && name ? (
     <div css={Css.dif.aic.gap1.if(size === "lg" || size === "xl").fdc.$}>
       {img}
       <span css={Css[sizeToTypeScale[size]].$}>{name}</span>
@@ -56,6 +57,13 @@ const sizeToFallbackTypeScale: Record<AvatarSize, Typography> = {
   xl: "xl3",
 };
 
+const sizeToIconInc = {
+  sm: 2.5,
+  md: 4,
+  lg: 5,
+  xl: 8,
+};
+
 const sizeToTypeScale: Record<AvatarSize, Typography> = {
   sm: "baseMd",
   md: "baseMd",
@@ -67,7 +75,7 @@ function nameToInitials(name: string) {
   return (
     name
       .split(" ")
-      .map((n) => n[0].toUpperCase())
+      .map((n) => (n.length > 0 ? n[0].toUpperCase() : ""))
       .join("")
       // Return at most 3 initials
       .slice(0, 3)
