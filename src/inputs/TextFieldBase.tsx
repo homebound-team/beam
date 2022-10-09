@@ -11,7 +11,7 @@ import React, {
   useState,
 } from "react";
 import { chain, mergeProps, useFocusWithin, useHover } from "react-aria";
-import { IconButton, maybeTooltip } from "src/components";
+import { Icon, IconButton, maybeTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
@@ -180,7 +180,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         />
       )}
       {maybeTooltip({
-        title: (errorInTooltip && errorMsg) || tooltip,
+        title: tooltip,
         placement: "top",
         children: inputProps.readOnly ? (
           <div
@@ -254,6 +254,11 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   fieldRef.current?.focus();
                 }}
               />
+            )}
+            {errorInTooltip && errorMsg && (
+              <span css={Css.df.aic.pl1.fs0.$}>
+                <Icon icon="error" color={Palette.Red600} tooltip={errorMsg} />
+              </span>
             )}
             {!multiline && endAdornment && <span css={Css.df.aic.pl1.fs0.$}>{endAdornment}</span>}
           </div>
