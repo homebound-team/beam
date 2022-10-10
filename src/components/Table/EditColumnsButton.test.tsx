@@ -1,8 +1,10 @@
+import { renderHook } from "@testing-library/react-hooks";
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
 import { EditColumnsButton } from "./EditColumnsButton";
 import { GridColumn } from "./GridTable";
 import { SimpleHeaderAndData } from "./simpleHelpers";
+import { useColumns } from "./useColumns";
 
 type Data = { name: string | undefined; value: number | undefined };
 type Row = SimpleHeaderAndData<Data>;
@@ -21,8 +23,9 @@ describe("EditColumnsButton", () => {
     const r = await render(
       <EditColumnsButton
         trigger={{ label: "Columns" }}
-        columns={[nameColumn, valueColumn, actionColumn]}
-        setColumns={noop}
+        allColumns={[nameColumn, valueColumn, actionColumn]}
+        selectedColumns={[]}
+        setSelectedColumns={noop}
       />,
     );
     // Then the button renders with the correct label
@@ -34,8 +37,9 @@ describe("EditColumnsButton", () => {
     const r = await render(
       <EditColumnsButton
         trigger={{ label: "Columns" }}
-        columns={[nameColumn, valueColumn, actionColumn]}
-        setColumns={noop}
+        allColumns={[nameColumn, valueColumn, actionColumn]}
+        selectedColumns={[]}
+        setSelectedColumns={noop}
         defaultOpen={true}
       />,
     );
@@ -47,45 +51,39 @@ describe("EditColumnsButton", () => {
 
   it("should call setColumns when an option is clicked", async () => {
     // Given an edit columns button with a column with visible equal to false
+    const { result } = renderHook(() => useColumns([nameColumn, valueColumn, actionColumn]));
     const setColumns = jest.fn();
     const r = await render(
       <EditColumnsButton
         trigger={{ label: "Columns" }}
-        columns={[nameColumn, valueColumn, actionColumn]}
-        setColumns={setColumns}
+        allColumns={[nameColumn, valueColumn, actionColumn]}
+        selectedColumns={result.current[0]}
+        setSelectedColumns={setColumns}
         defaultOpen={true}
       />,
     );
     // When click on an option
     click(r.value);
-    // Then setColumns should be called and visible should be updated to true
+    // Then setColumns should be called
     expect(setColumns).toHaveBeenCalled();
-    expect(r.value()).toBeChecked();
   });
 
   it("should call setColumns when clear seleccions is clicked", async () => {
     // Given an edit columns button
+    const { result } = renderHook(() => useColumns([nameColumn, valueColumn, actionColumn]));
     const setColumns = jest.fn();
     const r = await render(
       <EditColumnsButton
         trigger={{ label: "Columns" }}
-        columns={[nameColumn, valueColumn, actionColumn]}
-        setColumns={setColumns}
+        allColumns={[nameColumn, valueColumn, actionColumn]}
+        selectedColumns={result.current[0]}
+        setSelectedColumns={setColumns}
         defaultOpen={true}
       />,
     );
-    // When click on an option
-    click(r.value);
-    click(r.actions);
-    // Then setColumns should be called and visible should be updated to true
-    expect(setColumns).toHaveBeenCalled();
-    expect(r.value()).toBeChecked();
-    expect(r.actions()).toBeChecked();
     // When click clearSelections button
     click(r.clearSelections);
-    // Then setColumns should be called and all columns should be updated to visible equal to false
+    // Then setColumns should be called
     expect(setColumns).toHaveBeenCalled();
-    expect(r.value()).not.toBeChecked();
-    expect(r.actions()).not.toBeChecked();
   });
 });

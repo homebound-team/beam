@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useMemo, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { CheckboxGroup, CheckboxGroupItemOption } from "src/inputs";
@@ -10,15 +10,16 @@ import { GridColumn, Kinded } from "./GridTable";
 
 interface EditColumnsButtonProps<R extends Kinded, S>
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
-  columns: GridColumn<R, S>[];
-  setColumns: Dispatch<SetStateAction<GridColumn<R, S>[]>>;
+  allColumns: GridColumn<R, S>[];
+  selectedColumns: GridColumn<R, S>[];
+  setSelectedColumns: Dispatch<SetStateAction<GridColumn<R, S>[]>>;
   title?: string;
   // for storybook purposes
   defaultOpen?: boolean;
 }
 
 export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsButtonProps<R, S>) {
-  const { defaultOpen, disabled, columns, setColumns, trigger, title } = props;
+  const { defaultOpen, disabled, allColumns, setSelectedColumns, trigger, title, selectedColumns } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -27,8 +28,8 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
     isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,
   );
 
-  const { options, selectedColumns } = useMemo(() => {
-    return columns.reduce(
+  const { options } = useMemo(() => {
+    return allColumns.reduce(
       (acc, column) => {
         // Only include options that can be hidden and have the `name` property defined.
         if (!column.canHide) return acc;
@@ -37,23 +38,20 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
           return acc;
         }
 
-        // If currently visible, then add to selectedColumns
-        if (column.canHide && column.visible) {
-          acc.selectedColumns.push(column.name);
-        }
-
         // Add current column as an option
         return { ...acc, options: acc.options.concat({ label: column.name!, value: column.name! }) };
       },
-      { options: [] as CheckboxGroupItemOption[], selectedColumns: [] as string[] },
+      { options: [] as CheckboxGroupItemOption[] },
     );
-  }, [columns]);
+  }, [allColumns]);
 
-  const [selectedValues, setSelectedValues] = useState<string[]>(selectedColumns);
-
-  useEffect(() => {
-    setColumns(columns.filter((column) => (column.canHide ? selectedValues.includes(column.name!) : true)));
-  }, [selectedValues]);
+  const selectedValues = selectedColumns.map((column) => column.name!);
+  const setSelectedValues = useCallback(
+    (values: string[]) => {
+      setSelectedColumns(allColumns.filter((column) => (column.canHide ? values.includes(column.name!) : true)));
+    },
+    [allColumns, setSelectedColumns],
+  );
 
   return (
     <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>

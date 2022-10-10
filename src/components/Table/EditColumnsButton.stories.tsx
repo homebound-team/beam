@@ -19,7 +19,7 @@ const actionColumn: GridColumn<Row> = {
   name: "Actions",
   header: "Action",
   canHide: true,
-  data: () => <div>Actions</div>,
+  data: () => "Actions",
 };
 const otherColumn: GridColumn<Row> = { name: "Other", header: "Other", canHide: true, data: ({ name }) => name };
 
@@ -31,10 +31,11 @@ export function EditColumnButton() {
         <EditColumnsButton
           trigger={{ label: "Columns" }}
           placement="right"
-          columns={[nameColumn, valueColumn, actionColumn]}
-          setColumns={noop}
+          allColumns={[nameColumn, valueColumn, actionColumn]}
+          setSelectedColumns={noop}
           title="Select columns to show"
           defaultOpen={true}
+          selectedColumns={[]}
         />
       </div>
     </div>
@@ -51,8 +52,9 @@ export function EditColumnButtonInAction() {
         <EditColumnsButton
           trigger={{ label: "Columns" }}
           placement="right"
-          columns={tableColumns}
-          setColumns={setColumns}
+          allColumns={tableColumns}
+          setSelectedColumns={setColumns}
+          selectedColumns={columns}
           title="Select columns to show"
         />
       </div>
@@ -65,6 +67,7 @@ export function EditColumnButtonInAction() {
           { kind: "data", id: "2", data: { name: "b", value: 2 } },
           { kind: "data", id: "3", data: { name: "a", value: 3 } },
         ]}
+        sorting={{ on: "client" }}
       />
     </div>
   );
