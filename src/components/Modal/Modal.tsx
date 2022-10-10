@@ -54,7 +54,7 @@ export function Modal(props: ModalProps) {
       isDismissable: true,
       shouldCloseOnInteractOutside: (el) => {
         // Do not close the Modal if the user is interacting with the Tribute mentions dropdown (via RichTextField) or with another 3rd party dialog (such as a lightbox) on top of it.
-        return !(el.closest(".tribute-container") || el.closest("[role='dialog']"));
+        return !(el.closest(".tribute-container") || el.closest("[role='dialog']") || el.closest("[role='alert']"));
       },
     },
     ref,

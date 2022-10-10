@@ -32,6 +32,13 @@ export function Examples() {
         ))}
       </div>
 
+      <h1>Icon fallback</h1>
+      <div css={Css.df.gap2.aifs.$}>
+        {sizes.map((size) => (
+          <Avatar src={undefined} size={size} />
+        ))}
+      </div>
+
       <h1>With name</h1>
       <div css={Css.df.gap2.aifs.$}>
         {sizes.map((size) => (
