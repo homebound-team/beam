@@ -1,5 +1,6 @@
 import { DOMProps } from "@react-types/shared";
-import React, { AriaAttributes } from "react";
+import React, { AriaAttributes, ReactNode } from "react";
+import { maybeTooltip } from "src/components/Tooltip";
 import { Css, increment, Margin, Palette, Xss } from "src/Css";
 
 export interface IconProps extends AriaAttributes, DOMProps {
@@ -11,25 +12,30 @@ export interface IconProps extends AriaAttributes, DOMProps {
   inc?: number;
   /** Styles overrides */
   xss?: Xss<Margin | "visibility">;
+  tooltip?: ReactNode;
 }
 
 export const Icon = React.memo((props: IconProps) => {
-  const { icon, inc = 3, color = "currentColor", xss, ...other } = props;
+  const { icon, inc = 3, color = "currentColor", xss, tooltip, ...other } = props;
   const size = increment(inc);
-  return (
-    <svg
-      aria-hidden={true}
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      css={{ "path, rect": Css.fill(color).$, ...xss }}
-      data-icon={icon}
-      {...other}
-    >
-      {Icons[icon]}
-    </svg>
-  );
+  return maybeTooltip({
+    title: tooltip,
+    placement: "top",
+    children: (
+      <svg
+        aria-hidden={true}
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+        css={{ "path, rect": Css.fill(color).$, ...xss }}
+        data-icon={icon}
+        {...other}
+      >
+        {Icons[icon]}
+      </svg>
+    ),
+  });
 });
 
 /**
