@@ -32,7 +32,7 @@ export function EditColumnButton() {
           trigger={{ label: "Columns" }}
           placement="right"
           allColumns={[nameColumn, valueColumn, actionColumn]}
-          setColumns={noop}
+          setSelectedColumns={noop}
           title="Select columns to show"
           defaultOpen={true}
           selectedColumns={[]}
@@ -53,7 +53,7 @@ export function EditColumnButtonInAction() {
           trigger={{ label: "Columns" }}
           placement="right"
           allColumns={tableColumns}
-          setColumns={setColumns}
+          setSelectedColumns={setColumns}
           selectedColumns={columns}
           title="Select columns to show"
         />

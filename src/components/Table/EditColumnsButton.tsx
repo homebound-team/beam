@@ -12,14 +12,14 @@ interface EditColumnsButtonProps<R extends Kinded, S>
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
   allColumns: GridColumn<R, S>[];
   selectedColumns: GridColumn<R, S>[];
-  setColumns: Dispatch<SetStateAction<GridColumn<R, S>[]>>;
+  setSelectedColumns: Dispatch<SetStateAction<GridColumn<R, S>[]>>;
   title?: string;
   // for storybook purposes
   defaultOpen?: boolean;
 }
 
 export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsButtonProps<R, S>) {
-  const { defaultOpen, disabled, allColumns, setColumns, trigger, title, selectedColumns } = props;
+  const { defaultOpen, disabled, allColumns, setSelectedColumns, trigger, title, selectedColumns } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -48,9 +48,9 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
   const selectedValues = selectedColumns.map((column) => column.name!);
   const setSelectedValues = useCallback(
     (values: string[]) => {
-      setColumns(allColumns.filter((column) => (column.canHide ? values.includes(column.name!) : true)));
+      setSelectedColumns(allColumns.filter((column) => (column.canHide ? values.includes(column.name!) : true)));
     },
-    [allColumns, setColumns],
+    [allColumns, setSelectedColumns],
   );
 
   return (

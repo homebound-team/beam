@@ -25,7 +25,7 @@ describe("EditColumnsButton", () => {
         trigger={{ label: "Columns" }}
         allColumns={[nameColumn, valueColumn, actionColumn]}
         selectedColumns={[]}
-        setColumns={noop}
+        setSelectedColumns={noop}
       />,
     );
     // Then the button renders with the correct label
@@ -39,7 +39,7 @@ describe("EditColumnsButton", () => {
         trigger={{ label: "Columns" }}
         allColumns={[nameColumn, valueColumn, actionColumn]}
         selectedColumns={[]}
-        setColumns={noop}
+        setSelectedColumns={noop}
         defaultOpen={true}
       />,
     );
@@ -58,7 +58,7 @@ describe("EditColumnsButton", () => {
         trigger={{ label: "Columns" }}
         allColumns={[nameColumn, valueColumn, actionColumn]}
         selectedColumns={result.current[0]}
-        setColumns={setColumns}
+        setSelectedColumns={setColumns}
         defaultOpen={true}
       />,
     );
@@ -77,7 +77,7 @@ describe("EditColumnsButton", () => {
         trigger={{ label: "Columns" }}
         allColumns={[nameColumn, valueColumn, actionColumn]}
         selectedColumns={result.current[0]}
-        setColumns={setColumns}
+        setSelectedColumns={setColumns}
         defaultOpen={true}
       />,
     );

@@ -11,7 +11,7 @@ describe("useColumns", () => {
     name: "value",
     header: "Value",
     canHide: true,
-    visible: false,
+    initVisible: false,
     data: ({ value }) => value,
   };
 

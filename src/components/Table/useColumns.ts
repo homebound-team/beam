@@ -19,7 +19,7 @@ export function useColumns<R extends Kinded, S = {}>(
         acc.hideColumns.push(column.name);
       }
       // Add selected columns
-      if (!column.canHide || (column.canHide && column.visible)) {
+      if (!column.canHide || (column.canHide && column.initVisible)) {
         acc.selectedColumns.push(column.name);
       }
       return { ...acc };
