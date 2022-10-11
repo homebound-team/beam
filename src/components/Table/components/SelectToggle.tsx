@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { RowStateContext } from "src/components/Table/RowState";
-import { useComputed } from "src/hooks/index";
-import { Checkbox } from "src/inputs/index";
+import { RowStateContext } from "src/components/Table/utils/RowState";
+import { useComputed } from "src/hooks";
+import { Checkbox } from "src/inputs";
 
 interface SelectToggleProps {
   id: string;

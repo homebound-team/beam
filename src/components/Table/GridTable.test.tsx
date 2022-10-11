@@ -1,19 +1,14 @@
 import React, { MutableRefObject, useContext, useMemo, useState } from "react";
-import { selectColumn } from "src/components/Table/columns";
-import { GridRowLookup } from "src/components/Table/GridRowLookup";
-import {
-  calcColumnSizes,
-  emptyCell,
-  GridColumn,
-  GridDataRow,
-  GridRowStyles,
-  GridTable,
-  matchesFilter,
-  setRunningInJest,
-} from "src/components/Table/GridTable";
+import { GridDataRow } from "src/components/Table/components/Row";
+import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
-import { RowStateContext } from "src/components/Table/RowState";
-import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/simpleHelpers";
+import { RowStyles } from "src/components/Table/TableStyles";
+import { GridColumn } from "src/components/Table/types";
+import { calcColumnSizes, selectColumn } from "src/components/Table/utils/columns";
+import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import { RowStateContext } from "src/components/Table/utils/RowState";
+import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Checkbox, TextField } from "src/inputs";
@@ -140,7 +135,7 @@ describe("GridTable", () => {
 
   it("can have per-row styles", async () => {
     // Given the data row has specific row and cell styling
-    const rowStyles: GridRowStyles<Row> = {
+    const rowStyles: RowStyles<Row> = {
       header: {},
       data: { cellCss: Css.red500.$, rowCss: Css.bgRed500.$ },
     };
@@ -160,7 +155,7 @@ describe("GridTable", () => {
 
   it("can have dynamic per-row styles", async () => {
     // Given the data row css changes based on the row's value
-    const rowStyles: GridRowStyles<Row> = {
+    const rowStyles: RowStyles<Row> = {
       header: {},
       data: {
         rowCss: (row) => (row.data.value === 1 ? Css.bgRed500.$ : Css.bgGreen500.$),
@@ -178,7 +173,7 @@ describe("GridTable", () => {
 
   it("can indent rows", async () => {
     // Given the data row is indented
-    const rowStyles: GridRowStyles<Row> = {
+    const rowStyles: RowStyles<Row> = {
       header: {},
       data: { indent: 1 },
     };
@@ -962,7 +957,7 @@ describe("GridTable", () => {
 
   it("can handle onClick for rows", async () => {
     const onClick = jest.fn();
-    const rowStyles: GridRowStyles<Row> = { header: {}, data: { onClick } };
+    const rowStyles: RowStyles<Row> = { header: {}, data: { onClick } };
     const r = await render(<GridTable {...{ columns, rows, rowStyles }} />);
     click(cell(r, 1, 0));
     expect(onClick).toHaveBeenCalledTimes(1);
@@ -972,7 +967,7 @@ describe("GridTable", () => {
   it("can omit onClick for columns", async () => {
     // Given rowStyles that specify an action for each row
     const onClick = jest.fn();
-    const rowStyles: GridRowStyles<Row> = { header: {}, data: { onClick } };
+    const rowStyles: RowStyles<Row> = { header: {}, data: { onClick } };
     // And a table where one columns omits wrapping the action
     const r = await render(
       <GridTable {...{ columns: [{ ...columns[0], wrapAction: false }, columns[1]], rows, rowStyles }} />,
@@ -986,7 +981,7 @@ describe("GridTable", () => {
 
   it("can omit rowLink for columns", async () => {
     // Given rowStyles that specify an action for each row
-    const rowStyles: GridRowStyles<Row> = {
+    const rowStyles: RowStyles<Row> = {
       header: {},
       data: {
         rowLink: () => "https://www.homebound.com",
@@ -2046,7 +2041,7 @@ describe("GridTable", () => {
   });
 
   it("reacts to setting activeRowId", async () => {
-    const activeRowIdRowStyles: GridRowStyles<Row> = {
+    const activeRowIdRowStyles: RowStyles<Row> = {
       data: {
         onClick: (row, api) => {
           api.setActiveRowId(`${row.kind}_${row.id}`);

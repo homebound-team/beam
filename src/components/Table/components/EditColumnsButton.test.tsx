@@ -1,10 +1,10 @@
 import { renderHook } from "@testing-library/react-hooks";
+import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
+import { useColumns } from "src/components/Table/hooks/useColumns";
+import { GridColumn } from "src/components/Table/types";
+import { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
-import { EditColumnsButton } from "./EditColumnsButton";
-import { GridColumn } from "./GridTable";
-import { SimpleHeaderAndData } from "./simpleHelpers";
-import { useColumns } from "./useColumns";
 
 type Data = { name: string | undefined; value: number | undefined };
 type Row = SimpleHeaderAndData<Data>;

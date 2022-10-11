@@ -1,7 +1,7 @@
 import { camelCase } from "change-case";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { GridColumn, Kinded } from "src/components/Table/types";
 import { useSessionStorage } from "src/hooks/useSessionStorage";
-import { GridColumn, Kinded } from "./GridTable";
 
 export function useColumns<R extends Kinded, S = {}>(
   tableColumns: GridColumn<R, S>[],

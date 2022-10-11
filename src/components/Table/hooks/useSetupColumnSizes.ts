@@ -1,6 +1,8 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
-import { calcColumnSizes, GridColumn, GridStyle } from "src/components/Table/GridTable";
+import { GridStyle } from "src/components/Table/TableStyles";
+import { GridColumn } from "src/components/Table/types";
+import { calcColumnSizes } from "src/components/Table/utils/columns";
 import { useDebouncedCallback } from "use-debounce";
 
 /**

@@ -1,6 +1,9 @@
 import { ReactNode } from "react";
-import { applyRowFn, GridCellContent, GridColumn, GridDataRow, Kinded, Pin } from "src/components/Table/GridTable";
-import { SortOn, SortState } from "src/components/Table/useSortState";
+import { GridCellContent } from "src/components/Table/components/cell";
+import { GridDataRow } from "src/components/Table/components/Row";
+import { SortOn, SortState } from "src/components/Table/hooks/useSortState";
+import { GridColumn, Kinded, Pin } from "src/components/Table/types";
+import { applyRowFn } from "src/components/Table/utils/utils";
 
 // Returns a shallow copy of the `rows` parameter sorted based on `sortState`
 export function sortRows<R extends Kinded>(

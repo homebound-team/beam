@@ -1,6 +1,7 @@
-import { GridColumn, GridDataRow } from "src/components/Table/GridTable";
-import { simpleHeader } from "src/components/Table/simpleHelpers";
-import { sortRows } from "src/components/Table/sortRows";
+import { GridDataRow } from "src/components/Table/components/Row";
+import { GridColumn } from "src/components/Table/types";
+import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { sortRows } from "src/components/Table/utils/sortRows";
 
 describe("sortRows", () => {
   it("can return a sorted copy of nested rows in ascending order", () => {

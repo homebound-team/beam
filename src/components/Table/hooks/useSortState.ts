@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
-import { ASC, DESC, Direction, GridColumn, GridSortConfig, Kinded } from "src/components/Table/GridTable";
+import { GridSortConfig } from "src/components/Table/GridTable";
+import { Direction, GridColumn, Kinded } from "src/components/Table/types";
+import { ASC, DESC } from "src/components/Table/utils/utils";
 
 /**
  * Our internal sorting state.
@@ -25,21 +27,21 @@ export function useSortState<R extends Kinded, S>(
     () => {
       if (sorting?.on === "client") {
         const { initial, primary } = sorting;
-        const primaryKey = primary && (typeof primary[0] === "number" ? primary[0] : columns.indexOf(primary[0] as any))
+        const primaryKey =
+          primary && (typeof primary[0] === "number" ? primary[0] : columns.indexOf(primary[0] as any));
         if (initial === undefined && "initial" in sorting) {
           // if explicitly set to `undefined`, then do not sort
           return undefined;
         } else if (initial) {
           const key = typeof initial[0] === "number" ? initial[0] : columns.indexOf(initial[0] as any);
-          
+
           return [key as any as S, initial[1], primaryKey as any as S, primary?.[1]];
         } else {
           // If no explicit sorting, assume 1st column ascending
           const firstSortableColumn = columns.findIndex((c) => c.clientSideSort !== false);
-          return [firstSortableColumn as any as S, ASC, primaryKey as any as S, primary?.[1] ];
+          return [firstSortableColumn as any as S, ASC, primaryKey as any as S, primary?.[1]];
         }
       } else {
-        
         return sorting?.value ? [sorting?.value[0], sorting?.value[1], undefined, undefined] : undefined;
       }
     },

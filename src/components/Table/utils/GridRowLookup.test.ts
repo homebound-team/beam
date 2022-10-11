@@ -1,6 +1,6 @@
-import { collapseColumn, selectColumn } from "src/components/Table/columns";
-import { getKinds } from "src/components/Table/GridRowLookup";
-import { GridColumn } from "src/components/Table/GridTable";
+import { GridColumn } from "src/components/Table/types";
+import { collapseColumn, selectColumn } from "src/components/Table/utils/columns";
+import { getKinds } from "src/components/Table/utils/GridRowLookup";
 
 describe("GridRowLookup", () => {
   it("ignores action columns when calling 'getKinds'", () => {

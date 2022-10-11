@@ -1,12 +1,17 @@
 import { Dispatch, SetStateAction, useCallback, useMemo, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
+import { Button } from "src/components/Button";
+import {
+  isIconButton,
+  isTextButton,
+  OverlayTrigger,
+  OverlayTriggerProps,
+} from "src/components/internal/OverlayTrigger";
+import { GridColumn, Kinded } from "src/components/Table/types";
+import { Css } from "src/Css";
 import { CheckboxGroup, CheckboxGroupItemOption } from "src/inputs";
-import { Css } from "../../Css";
-import { useTestIds } from "../../utils";
-import { Button } from "../Button";
-import { isIconButton, isTextButton, OverlayTrigger, OverlayTriggerProps } from "../internal/OverlayTrigger";
-import { GridColumn, Kinded } from "./GridTable";
+import { useTestIds } from "src/utils";
 
 interface EditColumnsButtonProps<R extends Kinded, S>
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {

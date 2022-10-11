@@ -1,13 +1,7 @@
 import { MutableRefObject } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
-import {
-  DiscriminateUnion,
-  GridColumn,
-  GridDataRow,
-  Kinded,
-  nonKindGridColumnKeys,
-  RowTuple,
-} from "src/components/Table/GridTable";
+import { GridDataRow } from "src/components/Table/components/Row";
+import { DiscriminateUnion, GridColumn, Kinded, nonKindGridColumnKeys, RowTuple } from "src/components/Table/types";
 
 /**
  * Allows a caller to ask for the currently shown rows, given the current sorting/filtering.
