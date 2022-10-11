@@ -38,15 +38,13 @@ export function SuperDrawer(): ReactPortal | null {
     modalHeaderDiv,
   } = useBeamContext();
   const { closeDrawer } = useSuperDrawer();
-  const drawerHeaderRef = useRef<HTMLDivElement | null>(null);
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
   const modalFooterRef = useRef<HTMLDivElement | null>(null);
   const testId = useTestIds({}, "superDrawer");
 
   // Steal the modal body/footer portals from Modal, if we're open
   useEffect(() => {
-    if (modalBodyRef.current && modalFooterRef.current && drawerHeaderRef.current && modalState.current) {
-      drawerHeaderRef.current.appendChild(modalHeaderDiv);
+    if (modalBodyRef.current && modalFooterRef.current && modalState.current) {
       modalBodyRef.current.appendChild(modalBodyDiv);
       modalFooterRef.current.appendChild(modalFooterDiv);
     }
@@ -105,50 +103,42 @@ export function SuperDrawer(): ReactPortal | null {
               onClick={(e) => e.stopPropagation()}
             >
               <AutoSaveStatusProvider>
-                <header css={Css.df.p3.bb.bGray200.df.aic.jcsb.gap2.$}>
+                <header css={Css.df.p3.bb.bGray200.df.aic.jcsb.gap2.if(!!modalState.current).bn.$}>
                   {/* Left */}
                   <div css={Css.df.aic.$}>
-                    <div css={Css.xl2Sb.gray900.mr2.$} {...testId.title} ref={drawerHeaderRef}>
-                      {!modalState.current && (title || null)}
+                    <div css={Css.xl2Sb.gray900.mr2.$} {...testId.title}>
+                      {title ?? null}
                     </div>
-                    {!modalState.current && (titleLeftContent || null)}
+                    {titleLeftContent ?? null}
                   </div>
-                  {/* Right */}
-                  {!modalState.current && (
-                    // Forcing height to 32px to match title height
-                    <div css={Css.df.gap3.aic.hPx(32).fs0.$}>
-                      {titleRightContent || null}
-                      {/* Disable buttons is handlers are not given or if childContent is shown */}
-                      {!hideControls && (
-                        <ButtonGroup
-                          buttons={[
-                            {
-                              icon: "chevronLeft",
-                              onClick: () => onPrevClick && onPrevClick(),
-                              disabled: !onPrevClick || isDetail,
-                            },
-                            {
-                              icon: "chevronRight",
-                              onClick: () => onNextClick && onNextClick(),
-                              disabled: !onNextClick || isDetail,
-                            },
-                          ]}
-                          {...testId.headerActions}
-                        />
-                      )}
-                      <IconButton icon="x" onClick={closeDrawer} {...testId.close} />
-                    </div>
-                  )}
+                  {/* Right - Forcing height to 32px to match title height */}
+                  <div css={Css.df.gap3.aic.hPx(32).fs0.$}>
+                    {titleRightContent || null}
+                    {/* Disable buttons is handlers are not given or if childContent is shown */}
+                    {!hideControls && (
+                      <ButtonGroup
+                        buttons={[
+                          {
+                            icon: "chevronLeft",
+                            onClick: () => onPrevClick && onPrevClick(),
+                            disabled: !onPrevClick || isDetail,
+                          },
+                          {
+                            icon: "chevronRight",
+                            onClick: () => onNextClick && onNextClick(),
+                            disabled: !onNextClick || isDetail,
+                          },
+                        ]}
+                        {...testId.headerActions}
+                      />
+                    )}
+                    <IconButton icon="x" onClick={closeDrawer} {...testId.close} />
+                  </div>
                 </header>
                 {content}
                 {modalState.current && (
                   // Forcing some design constraints on the modal component
-                  <div
-                    css={
-                      // topPX(81) is the offset from the header
-                      Css.fg1.topPx(81).left0.right0.bottom0.absolute.bgWhite.df.aic.jcc.fg1.fdc.z5.$
-                    }
-                  >
+                  <div css={Css.fg1.top0.left0.right0.bottom0.absolute.bgWhite.df.aic.jcc.fg1.fdc.z5.$}>
                     {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
                     {modalState.current.content}
                     {/* TODO: Work in some notion of the modal size + width/height + scrolling?*/}
