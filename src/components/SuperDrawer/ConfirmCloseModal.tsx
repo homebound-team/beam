@@ -1,4 +1,4 @@
-import { Button, ModalBody, ModalFooter, ModalHeader } from "src/components";
+import { Button, ModalBody, ModalFooter } from "src/components";
 import { Css } from "src/Css";
 import { useBeamContext } from "../BeamContext";
 
@@ -22,11 +22,10 @@ export function ConfirmCloseModal(props: ConfirmCloseModalProps) {
 
   return (
     <>
-      <ModalHeader>Confirm</ModalHeader>
       <ModalBody>
         <div css={Css.tc.wPx(400).$}>
-          <p css={Css.lgSb.gray900.mb2.$}>Are you sure you want to cancel?</p>
-          <p css={Css.base.gray700.$}>Any data you've entered so far will be lost.</p>
+          <p css={Css.lgSb.gray900.mb1.$}>Are you sure you want to cancel?</p>
+          <p css={Css.base.gray700.$}>Any changes you've made so far will be lost.</p>
         </div>
       </ModalBody>
       <ModalFooter xss={Css.jcc.$}>
