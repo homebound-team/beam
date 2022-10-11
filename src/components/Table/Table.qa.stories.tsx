@@ -4,8 +4,9 @@ import { default as React, ReactNode, useMemo, useState } from "react";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { GridSortConfig, GridTable } from "src/components/Table/GridTable";
+import { GridSortConfig, GridTable, GridTableProps } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
+import { TableActions } from "src/components/Table/TableActions";
 import { getTableStyles } from "src/components/Table/TableStyles";
 import { GridColumn } from "src/components/Table/types";
 import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/utils/columns";
@@ -28,11 +29,70 @@ import { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
 import { zeroTo } from "src/utils/sb";
 
+interface TableStoryProps extends GridTableProps<any, any, any> {
+  nestingDepth?: number;
+  // Applies Group row styles
+  grouped?: boolean;
+  bordered?: boolean;
+  allWhite?: boolean;
+  rowHeight?: "fixed" | "flexible";
+  displayAs?: "default" | "virtual" | "table";
+  totals?: boolean;
+}
+
 export default {
   component: GridTable,
   title: "Design QA/Table",
-  parameters: { layout: "fullscreen", backgrounds: { default: "white" } },
-} as Meta;
+  parameters: {
+    layout: "fullscreen",
+    controls: {
+      exclude: [
+        "id",
+        "as",
+        "columns",
+        "rows",
+        "rowStyles",
+        "rowLookup",
+        "stickyHeader",
+        "stickyOffset",
+        "sorting",
+        "fallbackMessage",
+        "infoMessage",
+        "filter",
+        "filterMaxRows",
+        "setRowCount",
+        "style",
+        "persistCollapse",
+        "xss",
+        "api",
+        "resizeTarget",
+        "activeRowId",
+        "activeCellId",
+      ],
+    },
+  },
+  args: {
+    nestingDepth: 1,
+    grouped: false,
+    bordered: false,
+    allWhite: false,
+    rowHeight: "flexible",
+    displayAs: "default",
+    totals: false,
+  },
+  argTypes: {
+    nestingDepth: { name: "Nesting Depth", control: { type: "select", options: [1, 2, 3] } },
+    grouped: { name: "Group styles", control: { type: "boolean" }, if: { arg: "nestingDepth", neq: 1 } },
+    bordered: { name: "Bordered", control: { type: "boolean" } },
+    allWhite: { name: "All White", control: { type: "boolean" } },
+    totals: { name: "Show Totals row", control: { type: "boolean" } },
+    rowHeight: { name: "Row Height", control: { type: "select", options: ["flexible", "fixed"] } },
+    displayAs: {
+      name: "Implementation (may need to reload)",
+      control: { type: "select", options: ["default", "virtual", "table"] },
+    },
+  },
+} as Meta<TableStoryProps>;
 
 type BeamData = {
   id: string;
@@ -45,6 +105,53 @@ type BeamData = {
   priceInCents: number;
 };
 type BeamRow = SimpleHeaderAndData<BeamData>;
+
+export function Table(props: TableStoryProps) {
+  const { nestingDepth, allWhite, grouped, rowHeight, bordered, displayAs, totals } = props;
+  const [filter, setFilter] = useState<string>();
+
+  const [rows, columns] = useMemo(
+    () =>
+      nestingDepth === 1
+        ? [flatRowss, nestedColumnsTwoLevels]
+        : nestingDepth === 2
+        ? [nestedRowsTwoLevels, nestedColumnsTwoLevels]
+        : [nestedRowsThreeLevels, nestedColumnsThreeLevels],
+    [nestingDepth],
+  );
+
+  return (
+    <div css={Css.df.fdc.bgGray100.p2.if(displayAs === "virtual").h("100vh").$}>
+      <TableActions>
+        <TextField
+          label="Filter"
+          hideLabel
+          placeholder="Search"
+          value={filter}
+          onChange={setFilter}
+          startAdornment={<Icon icon="search" />}
+          clearable
+        />
+      </TableActions>
+      <div css={Css.fg1.$}>
+        <GridTable<BeamNestedRow>
+          as={displayAs === "default" ? undefined : displayAs}
+          style={{
+            allWhite,
+            ...(nestingDepth && nestingDepth > 1 ? { grouped } : {}),
+            rowHeight,
+            bordered,
+          }}
+          sorting={{ on: "client" }}
+          columns={columns}
+          rows={[...(totals ? beamTotalsRows : []), ...rows]}
+          stickyHeader
+          filter={filter}
+        />
+      </div>
+    </div>
+  );
+}
 
 export function Fixed() {
   return (
@@ -177,10 +284,11 @@ export function NestedNonGrouped() {
   );
 }
 
-const nestedRowsTwoLevels = beamNestedRows();
-const nestedRowsThreeLevels = beamNestedRows(true);
+const flatRowss = beamNestedRows();
+const nestedRowsTwoLevels = beamNestedRows(2);
+const nestedRowsThreeLevels = beamNestedRows(3);
 
-function beamNestedRows(threeLevels: boolean = false): GridDataRow<BeamNestedRow>[] {
+function beamNestedRows(levels: 1 | 2 | 3 = 1): GridDataRow<BeamNestedRow>[] {
   const grandParents: GridDataRow<BeamNestedRow>[] = zeroTo(2).map((idx) => {
     const parents = zeroTo(2 + (idx % 2)).map((pIdx) => {
       // Get a semi-random, but repeatable number of children
@@ -242,7 +350,14 @@ function beamNestedRows(threeLevels: boolean = false): GridDataRow<BeamNestedRow
     };
   });
 
-  return [simpleHeader, ...(threeLevels ? grandParents : grandParents.flatMap((gp) => gp.children!))];
+  return [
+    simpleHeader,
+    ...(levels === 3
+      ? grandParents
+      : levels === 2
+      ? grandParents.flatMap((gp) => gp.children!)
+      : grandParents.flatMap((gp) => gp.children!.flatMap((p) => p.children!))),
+  ];
 }
 
 const beamTotalsRows: GridDataRow<BeamNestedRow>[] = [

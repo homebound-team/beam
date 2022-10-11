@@ -11,6 +11,10 @@ export interface GridStyle {
   rootCss?: Properties;
   /** Applied with the owl operator between rows for rendering border lines. */
   betweenRowsCss?: Properties;
+  /** Applied on the last row of the table. */
+  lastRowCss?: Properties;
+  /** Applied on the first row of the table (could be the Header or Totals row). */
+  firstRowCss?: Properties;
   /** Applied to the first non-header row, i.e. if you want to cancel out `betweenRowsCss`. */
   firstNonHeaderRowCss?: Properties;
   /** Applied to all cell divs (via a selector off the base div). */
@@ -56,13 +60,23 @@ export interface GridStyleDef {
   rowHeight?: "fixed" | "flexible";
   /** Enables cells Highlight and hover */
   cellHighlight?: boolean;
+  allWhite?: boolean;
+  bordered?: boolean;
 }
 
 // Returns a "blessed" style of GridTable
 function memoizedTableStyles() {
   const cache: Record<string, GridStyle> = {};
   return (props: GridStyleDef = {}) => {
-    const { inlineEditing = false, grouped = false, rowHeight = "flexible", cellHighlight = false } = props;
+    const {
+      inlineEditing = false,
+      grouped = false,
+      rowHeight = "flexible",
+      cellHighlight = false,
+      allWhite = false,
+      bordered = false,
+    } = props;
+
     const key = safeKeys(props)
       .sort()
       .map((k) => `${k}_${props[k]}`)
@@ -71,8 +85,11 @@ function memoizedTableStyles() {
     if (!cache[key]) {
       const groupedLevels = {
         0: {
-          cellCss: Css.xsMd.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
-          firstContentColumn: Css.smMd.$,
+          cellCss: {
+            ...Css.xsMd.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+            ...(allWhite && Css.bgWhite.$),
+          },
+          firstContentColumn: { ...Css.smMd.$, ...(allWhite && Css.smBd.gray900.$) },
         },
         2: { firstContentColumn: Css.tiny.pl3.$ },
       };
@@ -81,13 +98,33 @@ function memoizedTableStyles() {
       cache[key] = {
         emptyCell: "-",
         firstRowMessageCss: Css.tc.py3.$,
-        headerCellCss: Css.gray700.xsMd.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
-        totalsCellCss: Css.bgWhite.gray700.smMd.hPx(52).pt0.pbPx(12).boxShadow("none").$,
+        headerCellCss: {
+          ...Css.gray700.xsMd.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
+          ...(allWhite && Css.bgWhite.$),
+          ...(bordered && Css.bt.bGray200.$),
+        },
+        totalsCellCss: Css.bgWhite.gray700.smMd.hPx(52).pt0.boxShadow("none").$,
         cellCss: {
           ...Css.gray900.xs.bgWhite.aic.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
           ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
+          ...(bordered && { "&:first-of-type": Css.bl.bGray200.$, "&:last-of-type": Css.br.bGray200.$ }),
         },
+        firstRowCss: {
+          // Only apply border-radius to the corners of the table when `allWhite` is true for now.
+          ...(allWhite &&
+            Css.addIn("& > *:first-of-type", Css.borderRadius("8px 0 0 0 ").$).addIn(
+              "& > *:last-of-type",
+              Css.borderRadius("0 8px 0 0").$,
+            ).$),
+          ...(bordered && Css.addIn("& > *", Css.bt.bGray200.$).$),
+        },
+        ...(allWhite && {
+          lastRowCss: Css.addIn("& > *:first-of-type", Css.borderRadius("0 0 0 8px").$).addIn(
+            "& > *:last-of-type",
+            Css.borderRadius("0 0 8px 0").$,
+          ).$,
+        }),
         presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
         levels: grouped ? groupedLevels : defaultLevels,
       };
@@ -139,7 +176,7 @@ export const condensedStyle: GridStyle = {
   ...defaultStyle,
   headerCellCss: Css.bgGray100.tinySb.$,
   cellCss: Css.aic.sm.py1.px2.$,
-  rootCss: Css.dg.gray700.xs.$,
+  rootCss: Css.gray700.xs.$,
   firstRowMessageCss: Css.tc.py2.$,
 };
 
@@ -173,7 +210,14 @@ export function tableRowStyles(as: RenderAs, column?: GridColumn<any>) {
 }
 
 export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
-  const defKeys: (keyof GridStyleDef)[] = ["inlineEditing", "grouped", "rowHeight", "cellHighlight"];
+  const defKeys: (keyof GridStyleDef)[] = [
+    "inlineEditing",
+    "grouped",
+    "rowHeight",
+    "cellHighlight",
+    "allWhite",
+    "bordered",
+  ];
   const keys = safeKeys(style);
   if (keys.length === 0 || keys.some((k) => defKeys.includes(k as keyof GridStyleDef))) {
     return getTableStyles(style as GridStyleDef);
