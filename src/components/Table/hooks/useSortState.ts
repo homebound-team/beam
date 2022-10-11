@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { GridSortConfig } from "src/components/Table/GridTable";
 import { Direction, GridColumn, Kinded } from "src/components/Table/types";
-import { ASC, DESC } from "src/components/Table/utils";
+import { ASC, DESC } from "src/components/Table/utils/utils";
 
 /**
  * Our internal sorting state.

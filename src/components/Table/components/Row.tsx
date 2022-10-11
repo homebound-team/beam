@@ -9,10 +9,10 @@ import {
 } from "src/components/Table/components/cell";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { SortOn, SortState } from "src/components/Table/hooks/useSortState";
-import { GridColumn, GridDataRow, Kinded, RenderAs } from "src/components/Table/types";
+import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
+import { DiscriminateUnion, GridColumn, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
 import { RowStateContext } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
-import { GridStyle, RowStyles } from "src/components/Table/utils/styles";
 import {
   applyRowFn,
   getAlignment,
@@ -234,3 +234,40 @@ export const Row = React.memo(observer(RowImpl), (one, two) => {
   const { row: row2, ...others2 } = two;
   return shallowEqual(row1, row2) && shallowEqual(others1, others2);
 }) as typeof RowImpl;
+
+/** A specific kind of row, including the GridDataRow props. */
+export type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "kind", P> & {
+  id: string;
+  children: GridDataRow<R>[];
+  selectable?: false;
+};
+
+/**
+ * The data for any row in the table, marked by `kind` so that each column knows how to render it.
+ *
+ * Each `kind` should contain very little presentation logic, i.e. mostly just off-the-wire data from
+ * a GraphQL query.
+ *
+ * The presentation concerns instead mainly live in each GridColumn definition, which will format/render
+ * each kind's data for that specific row+column (i.e. cell) combination.
+ */
+export type GridDataRow<R extends Kinded> = {
+  kind: R["kind"];
+  /** Combined with the `kind` to determine a table wide React key. */
+  id: string;
+  /** A list of parent/grand-parent ids for collapsing parent/child rows. */
+  children?: GridDataRow<R>[];
+  /** * Whether to pin this sort to the first/last of its parent's children.
+   *
+   * By default, pinned rows are always shown/not filtered out, however providing
+   * the pin `filter: true` property will allow pinned rows to be hidden
+   * while filtering.*/
+  pin?: "first" | "last" | Pin;
+  data: unknown;
+  /** Whether to have the row collapsed (children not visible) on initial load. This will be ignore in subsequent re-renders of the table */
+  initCollapsed?: boolean;
+  /** Whether to have the row selected on initial load. This will be ignore in subsequent re-renders of the table */
+  initSelected?: boolean;
+  /** Whether row can be selected */
+  selectable?: false;
+} & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;

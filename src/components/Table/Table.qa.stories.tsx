@@ -3,13 +3,14 @@ import { Meta } from "@storybook/react";
 import { default as React, ReactNode, useMemo, useState } from "react";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
+import { GridDataRow } from "src/components/Table/components/Row";
 import { GridSortConfig, GridTable } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
-import { GridColumn, GridDataRow } from "src/components/Table/types";
-import { emptyCell } from "src/components/Table/utils";
+import { getTableStyles } from "src/components/Table/TableStyles";
+import { GridColumn } from "src/components/Table/types";
 import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
-import { getTableStyles } from "src/components/Table/utils/styles";
+import { emptyCell } from "src/components/Table/utils/utils";
 import { Tag } from "src/components/Tag";
 import { Css, Palette } from "src/Css";
 import {

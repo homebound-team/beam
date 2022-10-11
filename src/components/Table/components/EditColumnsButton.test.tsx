@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-hooks";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
-import { useColumns } from "src/components/Table/hooks";
+import { useColumns } from "src/components/Table/hooks/useColumns";
 import { GridColumn } from "src/components/Table/types";
 import { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { noop } from "src/utils";

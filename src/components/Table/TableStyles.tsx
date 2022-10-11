@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { PresentationContextProps, PresentationFieldProps } from "src/components/PresentationContext";
-import { DiscriminateUnion, GridColumn, GridDataRow, GridTableApi, RenderCellFn } from "src/components/Table";
+import { DiscriminateUnion, GridColumn, GridDataRow, GridTableApi, RenderCellFn } from "src/components/Table/index";
 import { Kinded, RenderAs } from "src/components/Table/types";
 import { Css, Palette, Properties } from "src/Css";
 import { safeKeys } from "src/utils";

@@ -1,5 +1,5 @@
 import { deriveSortState } from "src/components/Table/hooks/useSortState";
-import { ASC, DESC } from "src/components/Table/utils";
+import { ASC, DESC } from "src/components/Table/utils/utils";
 
 describe("useSortState", () => {
   it("can derive the next sort state when current state is undefined", () => {

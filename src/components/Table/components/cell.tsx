@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { navLink } from "src/components/CssReset";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { SortState } from "src/components/Table/hooks/useSortState";
+import { RowStyle, tableRowStyles } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumn, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/utils/GridSortContext";
-import { RowStyle, tableRowStyles } from "src/components/Table/utils/styles";
 import { Css, Properties, Typography } from "src/Css";
 
 /**

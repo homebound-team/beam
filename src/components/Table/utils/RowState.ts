@@ -1,6 +1,6 @@
 import { comparer, makeAutoObservable, observable, ObservableMap, ObservableSet, reaction } from "mobx";
 import React from "react";
-import { GridDataRow } from "src/components/Table/types";
+import { GridDataRow } from "src/components/Table/components/Row";
 import { visit } from "src/components/Table/utils/visitor";
 
 // A parent row can be partially selected when some children are selected/some aren't.

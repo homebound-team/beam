@@ -5,25 +5,24 @@ import { PresentationFieldProps, PresentationProvider } from "src/components/Pre
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
 import { SortState, useSortState } from "src/components/Table/hooks/useSortState";
+import { defaultStyle, GridStyle, GridStyleDef, resolveStyles, RowStyles } from "src/components/Table/TableStyles";
 import {
   Direction,
   GridColumn,
-  GridDataRow,
   GridTableXss,
   Kinded,
   ParentChildrenTuple,
   RenderAs,
   RowTuple,
 } from "src/components/Table/types";
-import { filterRows } from "src/components/Table/utils";
 import { createRowLookup, GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { RowStateContext } from "src/components/Table/utils/RowState";
 import { sortRows } from "src/components/Table/utils/sortRows";
-import { defaultStyle, GridStyle, GridStyleDef, resolveStyles, RowStyles } from "src/components/Table/utils/styles";
+import { applyRowFn, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
-import { Row } from "./components";
+import { GridDataRow, Row } from "./components/Row";
 
 let runningInJest = false;
 
@@ -638,3 +637,49 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
     });
   },
 );
+
+/**
+ * Filters rows given a client-side text `filter.
+ *
+ * Ensures parent rows remain in the list if any children match the filter.
+ *
+ * We return a copy of `[Parent, [Child]]` tuples so that we don't modify the `GridDataRow.children`.
+ */
+export function filterRows<R extends Kinded>(
+  api: GridTableApi<R>,
+  columns: GridColumn<R>[],
+  rows: GridDataRow<R>[],
+  filter: string | undefined,
+): ParentChildrenTuple<R>[] {
+  // Make a functions to do recursion
+  function acceptAll(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
+    return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
+  }
+
+  function filterFn(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
+    // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
+    const filters = (filter && filter.split(/ +/)) || [];
+    const matches =
+      row.kind === "header" ||
+      row.kind === "totals" ||
+      filters.length === 0 ||
+      filters.every((f) =>
+        columns.map((c) => applyRowFn(c, row, api, 0)).some((maybeContent) => matchesFilter(maybeContent, f)),
+      );
+    if (matches) {
+      return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
+    } else {
+      const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
+      if (
+        matchedChildren.length > 0 ||
+        typeof row.pin === "string" ||
+        (row.pin !== undefined && row.pin.filter !== true)
+      ) {
+        return acc.concat([[row, matchedChildren]]);
+      } else {
+        return acc;
+      }
+    }
+  }
+  return rows.reduce(filterFn, []);
+}

@@ -1,6 +1,7 @@
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
+import { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
-import { GridColumn, GridDataRow, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
+import { GridColumn, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
 import { newMethodMissingProxy } from "src/utils";
 
 /** Provides default styling for a GridColumn representing a Date. */

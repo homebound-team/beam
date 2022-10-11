@@ -1,4 +1,4 @@
-import { GridDataRow } from "src/components/Table/types";
+import { GridDataRow } from "src/components/Table/components/Row";
 
 /**
  * A helper for making `Row` type aliases of simple/flat tables that are just header + data.

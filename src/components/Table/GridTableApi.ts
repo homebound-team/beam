@@ -1,6 +1,7 @@
 import { MutableRefObject, useMemo } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
-import { DiscriminateUnion, GridDataRow, Kinded } from "src/components/Table/types";
+import { GridDataRow } from "src/components/Table/components/Row";
+import { DiscriminateUnion, Kinded } from "src/components/Table/types";
 import { RowState } from "src/components/Table/utils/RowState";
 import { visit } from "src/components/Table/utils/visitor";
 

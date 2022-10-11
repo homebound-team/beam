@@ -1,12 +1,14 @@
 import React, { MutableRefObject, useContext, useMemo, useState } from "react";
+import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
-import { GridColumn, GridDataRow } from "src/components/Table/types";
-import { emptyCell, matchesFilter, RowStyles } from "src/components/Table/utils";
+import { RowStyles } from "src/components/Table/TableStyles";
+import { GridColumn } from "src/components/Table/types";
 import { calcColumnSizes, selectColumn } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { RowStateContext } from "src/components/Table/utils/RowState";
 import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Checkbox, TextField } from "src/inputs";

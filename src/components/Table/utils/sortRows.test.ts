@@ -1,4 +1,5 @@
-import { GridColumn, GridDataRow } from "src/components/Table/types";
+import { GridDataRow } from "src/components/Table/components/Row";
+import { GridColumn } from "src/components/Table/types";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { sortRows } from "src/components/Table/utils/sortRows";
 

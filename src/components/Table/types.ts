@@ -1,5 +1,6 @@
 import { ReactElement, ReactNode } from "react";
-import { GridCellContent } from "src/components/Table/components";
+import { GridCellContent } from "src/components/Table/components/cell";
+import { GridDataRow, GridRowKind } from "src/components/Table/components/Row";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { Margin, Xss } from "src/Css";
 
@@ -19,13 +20,6 @@ export type GridCellAlignment = "left" | "right" | "center";
  * See https://stackoverflow.com/a/50125960/355031
  */
 export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<K, V> ? T : never;
-
-/** A specific kind of row, including the GridDataRow props. */
-type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "kind", P> & {
-  id: string;
-  children: GridDataRow<R>[];
-  selectable?: false;
-};
 
 /**
  * Defines how a single column will render each given row `kind` in `R`.
@@ -96,40 +90,10 @@ export const nonKindGridColumnKeys = [
 ];
 
 /**
- * The data for any row in the table, marked by `kind` so that each column knows how to render it.
- *
- * Each `kind` should contain very little presentation logic, i.e. mostly just off-the-wire data from
- * a GraphQL query.
- *
- * The presentation concerns instead mainly live in each GridColumn definition, which will format/render
- * each kind's data for that specific row+column (i.e. cell) combination.
- */
-export type GridDataRow<R extends Kinded> = {
-  kind: R["kind"];
-  /** Combined with the `kind` to determine a table wide React key. */
-  id: string;
-  /** A list of parent/grand-parent ids for collapsing parent/child rows. */
-  children?: GridDataRow<R>[];
-  /** * Whether to pin this sort to the first/last of its parent's children.
-   *
-   * By default, pinned rows are always shown/not filtered out, however providing
-   * the pin `filter: true` property will allow pinned rows to be hidden
-   * while filtering.*/
-  pin?: "first" | "last" | Pin;
-  data: unknown;
-  /** Whether to have the row collapsed (children not visible) on initial load. This will be ignore in subsequent re-renders of the table */
-  initCollapsed?: boolean;
-  /** Whether to have the row selected on initial load. This will be ignore in subsequent re-renders of the table */
-  initSelected?: boolean;
-  /** Whether row can be selected */
-  selectable?: false;
-} & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
-
-/**
  * Used to indicate where to pin the DataRow and if whether it should be filtered or always visible, setting `filter` to `true` will hide this row
  * if it doesn't match the provided filtering search term
  */
 export type Pin = { at: "first" | "last"; filter?: boolean };
 
 // Use IfAny so that GridDataRow<any> doesn't devolve into any
-type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
+export type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
