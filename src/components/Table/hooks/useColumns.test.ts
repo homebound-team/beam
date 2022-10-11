@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-hooks";
-import { GridColumn } from "./GridTable";
-import { SimpleHeaderAndData } from "./simpleHelpers";
-import { useColumns } from "./useColumns";
+import { useColumns } from "src/components/Table/hooks/useColumns";
+import { GridColumn } from "src/components/Table/types";
+import { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 
 describe("useColumns", () => {
   type Data = { name: string | undefined; value: number | undefined };

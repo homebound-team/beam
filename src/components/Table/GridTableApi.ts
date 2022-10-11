@@ -1,8 +1,8 @@
 import { MutableRefObject, useMemo } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
-import { DiscriminateUnion, GridDataRow, Kinded } from "src/components/Table/GridTable";
-import { RowState } from "src/components/Table/RowState";
-import { visit } from "src/components/Table/visitor";
+import { DiscriminateUnion, GridDataRow, Kinded } from "src/components/Table/types";
+import { RowState } from "src/components/Table/utils/RowState";
+import { visit } from "src/components/Table/utils/visitor";
 
 /**
  * Creates an `api` handle to drive a `GridTable`.

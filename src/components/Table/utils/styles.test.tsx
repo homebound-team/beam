@@ -1,4 +1,4 @@
-import { getTableStyles } from "src/components/Table/styles";
+import { getTableStyles } from "src/components/Table/utils/styles";
 
 describe("GridStyleDef", () => {
   it("memoizes grid styles correctly", () => {

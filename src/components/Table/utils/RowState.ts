@@ -1,7 +1,7 @@
 import { comparer, makeAutoObservable, observable, ObservableMap, ObservableSet, reaction } from "mobx";
 import React from "react";
-import { GridDataRow } from "src/components/Table/GridTable";
-import { visit } from "src/components/Table/visitor";
+import { GridDataRow } from "src/components/Table/types";
+import { visit } from "src/components/Table/utils/visitor";
 
 // A parent row can be partially selected when some children are selected/some aren't.
 export type SelectedState = "checked" | "unchecked" | "partial";

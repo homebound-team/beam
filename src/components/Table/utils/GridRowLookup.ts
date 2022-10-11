@@ -7,7 +7,7 @@ import {
   Kinded,
   nonKindGridColumnKeys,
   RowTuple,
-} from "src/components/Table/GridTable";
+} from "src/components/Table/types";
 
 /**
  * Allows a caller to ask for the currently shown rows, given the current sorting/filtering.

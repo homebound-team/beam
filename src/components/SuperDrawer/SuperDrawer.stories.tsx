@@ -3,11 +3,11 @@ import { useEffect, useRef } from "react";
 import {
   Button,
   GridColumn,
-  GridRowStyles,
   GridTable,
   ModalBody,
   ModalFooter,
   ModalHeader,
+  RowStyles,
   simpleDataRows,
   simpleHeader,
   SimpleHeaderAndData,
@@ -262,7 +262,7 @@ export function TableWithPrevNextAndCloseCheck() {
   const titleColumn: GridColumn<Row> = { header: "Title", data: ({ bookTitle }) => bookTitle };
   const authorColumn: GridColumn<Row> = { header: "Author", data: ({ authorName }) => authorName };
   // Example of triggering the drawer when clicking on a row
-  const rowStyles: GridRowStyles<Row> = {
+  const rowStyles: RowStyles<Row> = {
     header: {},
     data: { indent: 2, onClick: openRow },
   };
@@ -308,7 +308,7 @@ export function TableWithPrevNext() {
   const titleColumn: GridColumn<Row> = { header: "Title", data: ({ bookTitle }) => bookTitle };
   const authorColumn: GridColumn<Row> = { header: "Author", data: ({ authorName }) => authorName };
   // Example of triggering the drawer when clicking on a row
-  const rowStyles: GridRowStyles<Row> = {
+  const rowStyles: RowStyles<Row> = {
     header: {},
     data: { indent: 2, onClick: openRow },
   };

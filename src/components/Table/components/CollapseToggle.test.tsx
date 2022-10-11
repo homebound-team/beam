@@ -1,5 +1,5 @@
-import { CollapseToggle } from "src/components/Table/CollapseToggle";
-import { RowState, RowStateContext } from "src/components/Table/RowState";
+import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
+import { RowState, RowStateContext } from "src/components/Table/utils/RowState";
 import { render } from "src/utils/rtl";
 
 describe("CollapseToggle", () => {

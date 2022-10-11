@@ -1,4 +1,4 @@
-import { GridDataRow } from "src/components/Table/GridTable";
+import { GridDataRow } from "src/components/Table/types";
 
 export function visit(rows: GridDataRow<any>[], fn: (row: GridDataRow<any>) => void): void {
   const todo = [...rows];

@@ -15,11 +15,11 @@ import {
   GridColumn,
   GridDataRow,
   GridRowLookup,
-  GridRowStyles,
   GridTable,
   Icon,
   IconButton,
   numericColumn,
+  RowStyles,
   selectColumn,
   simpleHeader,
   SimpleHeaderAndData,
@@ -67,7 +67,7 @@ export const Hovering = newStory(
     const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
     const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
     const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
-    const rowStyles: GridRowStyles<Row> = {
+    const rowStyles: RowStyles<Row> = {
       data: {
         cellCss: (row) => (row.data.value === 3 ? Css.bgRed300.$ : {}),
         rowLink: () => "http://homebound.com",
@@ -95,7 +95,7 @@ export const ActiveCell = newStory(
     const nameColumn: GridColumn<Row> = { name: "name", header: "Name", data: ({ name }) => name };
     const valueColumn: GridColumn<Row> = { name: "value", header: "Value", data: ({ value }) => value };
     const actionColumn: GridColumn<Row> = { name: "actions", header: "Action", data: () => <div>Actions</div> };
-    const rowStyles: GridRowStyles<Row> = useMemo(
+    const rowStyles: RowStyles<Row> = useMemo(
       () => ({
         data: {
           onClick: (row, api) => {
@@ -493,7 +493,7 @@ export const AsTableWithRowLink = newStory(
     const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
     const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
     const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
-    const rowStyles: GridRowStyles<Row> = {
+    const rowStyles: RowStyles<Row> = {
       data: { indent: 2, rowLink: () => "http://homebound.com" },
       header: {},
     };
@@ -884,7 +884,7 @@ export function ActiveRow() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
   const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
-  const rowStyles: GridRowStyles<Row> = useMemo(
+  const rowStyles: RowStyles<Row> = useMemo(
     () => ({
       data: {
         onClick: (row, api) => {

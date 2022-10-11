@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Icon } from "src/components/Icon";
-import { GridSortContext } from "src/components/Table/GridSortContext";
+import { GridSortContext } from "src/components/Table/utils/GridSortContext";
 import { Css, Palette, Properties } from "src/Css";
 import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils/useTestIds";
