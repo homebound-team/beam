@@ -28,6 +28,7 @@ export interface TextFieldBaseProps<X>
       | "label"
       | "required"
       | "errorMsg"
+      | "errorInTooltip"
       | "onBlur"
       | "onFocus"
       | "helperText"
@@ -84,10 +85,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     clearable = false,
     tooltip,
     visuallyDisabled = fieldProps?.visuallyDisabled ?? true,
+    errorInTooltip = fieldProps?.errorInTooltip ?? false,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && !hideLabel ? "smMd" : "sm");
-  const errorInTooltip = fieldProps?.errorInTooltip ?? false;
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
   const { compound = false, forceFocus = false, forceHover = false } = internalProps;
   const errorMessageId = `${inputProps.id}-error`;

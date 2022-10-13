@@ -185,28 +185,57 @@ describe("NumberFieldTest", () => {
     expect(r.complete()).toHaveValue("12%");
     expect(lastSet).toEqual(12);
   });
+
+  it("respects numIntegerDigits", async () => {
+    // Given a NumberField with a restriction of 3 digits, with a value of only two digits
+    const r = await render(<TestNumberField label="Code" numIntegerDigits={3} value={12} />);
+    // Then a leading zero is added to make it three digits
+    expect(r.code()).toHaveValue("012");
+    // When changing the value to a single digit
+    type(r.code, "1");
+    // Then leading zeros are added to make it three digits
+    expect(r.code()).toHaveValue("001");
+    // When changing to more than three digits
+    type(r.code, "1234");
+    // Then the value is formatted back to only three, stripping off the first digits
+    expect(r.code()).toHaveValue("234");
+  });
+
+  it("respects placeholder", async () => {
+    const r = await render(
+      <NumberField label="Code" value={undefined} placeholder="Test Placeholder" onChange={() => {}} />,
+    );
+    expect(r.code()).toHaveAttribute("placeholder", "Test Placeholder");
+  });
 });
 
 // test against factors and num fraction digits.
 describe("formatValue function", () => {
   it.each([
     // if value is NaN return undefined
-    [Number("a"), 100, undefined, undefined],
+    [Number("a"), 100, undefined, undefined, undefined],
 
     // value returns as expected based on factor
-    [10, 100, undefined, 1_000],
-    [10, 10_000, undefined, 100_000],
-    [10, 1, undefined, 10],
+    [10, 100, undefined, undefined, 1_000],
+    [10, 10_000, undefined, undefined, 100_000],
+    [10, 1, undefined, undefined, 10],
 
     // it can round and format with fractional values
-    [0.10456, 100, 2, 10.46],
-    [0.10456, 100, 1, 10.5],
-    [1.10456, 10_000, 2, 11045.6],
-    [-10.456, 1, 3, -10.456],
+    [0.10456, 100, 2, undefined, 10.46],
+    [0.10456, 100, 1, undefined, 10.5],
+    [1.10456, 10_000, 2, undefined, 11045.6],
+    [-10.456, 1, 3, undefined, -10.456],
+
+    // It can limit the number of integer digits
+    [0.10456, 100, 2, 2, 10.46],
+    [0.10456, 10_000, undefined, 3, 46],
+    [1234, 1, undefined, 2, 34],
+    [-1234, 1, undefined, 2, -34],
+    [1234.56, 1, 2, 2, 34.56],
   ])(
-    "with a value of %s, a factor of %s and numFractionDigits of %s, it should return %s",
-    (value, factor, type, expected) => {
-      expect(formatValue(value, factor, type)).toBe(expected);
+    "with a value of %s, a factor of %s, numFractionDigits of %s, and numIntegerDigits of %s, it should return %s",
+    (value, factor, numFractionDigits, numIntegerDigits, expected) => {
+      expect(formatValue(value, factor, numFractionDigits, numIntegerDigits)).toBe(expected);
     },
   );
 });
