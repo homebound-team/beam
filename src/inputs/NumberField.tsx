@@ -34,10 +34,14 @@ export interface NumberFieldProps {
   // If set, all positive values will be prefixed with "+". (Zero will not show +/-)
   displayDirection?: boolean;
   numFractionDigits?: number;
+  numIntegerDigits?: number;
   // Override for default formatting based on `type`.
   numberFormatOptions?: Intl.NumberFormatOptions;
   truncate?: boolean;
   onEnter?: VoidFunction;
+  placeholder?: string;
+  // If set error messages will be rendered as tooltips rather than below the field
+  errorInTooltip?: true;
 }
 
 export function NumberField(props: NumberFieldProps) {
@@ -61,6 +65,8 @@ export function NumberField(props: NumberFieldProps) {
     numFractionDigits = type === "dollars" ? 2 : undefined,
     truncate = false,
     onEnter,
+    numberFormatOptions,
+    numIntegerDigits,
     ...otherProps
   } = props;
 
@@ -68,17 +74,23 @@ export function NumberField(props: NumberFieldProps) {
   const isReadOnly = !!readOnly;
   const factor = type === "percent" || type === "cents" ? 100 : type === "basisPoints" ? 10_000 : 1;
   const signDisplay = displayDirection ? "exceptZero" : "auto";
-  const fractionFormatOptions = { [truncate ? "maximumFractionDigits" : "minimumFractionDigits"]: numFractionDigits };
+  const defaultFormatOptions: Intl.NumberFormatOptions = useMemo(
+    () => ({
+      [truncate ? "maximumFractionDigits" : "minimumFractionDigits"]: numFractionDigits,
+      ...(numIntegerDigits !== undefined && { minimumIntegerDigits: numIntegerDigits }),
+    }),
+    [truncate, numIntegerDigits],
+  );
   const { locale } = useLocale();
   // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
   // see: https://github.com/adobe/react-spectrum/issues/1893.
   const formatOptions: Intl.NumberFormatOptions | undefined = useMemo(() => {
-    if (props.numberFormatOptions !== undefined) {
-      return props.numberFormatOptions;
+    if (numberFormatOptions !== undefined) {
+      return numberFormatOptions;
     }
 
     return type === "percent"
-      ? { style: "percent", signDisplay, ...fractionFormatOptions }
+      ? { style: "percent", signDisplay, ...defaultFormatOptions }
       : type === "basisPoints"
       ? { style: "percent", minimumFractionDigits: 2, signDisplay }
       : type === "cents"
@@ -87,8 +99,8 @@ export function NumberField(props: NumberFieldProps) {
       ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2, signDisplay }
       : type === "days"
       ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0, signDisplay }
-      : fractionFormatOptions;
-  }, [type]);
+      : defaultFormatOptions;
+  }, [type, numberFormatOptions]);
   const numberParser = useMemo(() => new NumberParser(locale, formatOptions), [locale, formatOptions]);
 
   // Keep a ref the last "before WIP" value that we passed into react-aria.
@@ -113,7 +125,7 @@ export function NumberField(props: NumberFieldProps) {
     value: valueRef.current.wip ? valueRef.current.value : value === undefined ? Number.NaN : value / factor,
     // // This is called on blur with the final/committed value.
     onChange: (value) => {
-      onChange(formatValue(value, factor, numFractionDigits));
+      onChange(formatValue(value, factor, numFractionDigits, numIntegerDigits));
     },
     onFocus: () => {
       valueRef.current = { wip: true, value: value === undefined ? Number.NaN : value / factor };
@@ -132,6 +144,7 @@ export function NumberField(props: NumberFieldProps) {
     isDisabled,
     isReadOnly,
     formatOptions,
+    ...otherProps,
   };
 
   const state = useNumberFieldState(useProps);
@@ -155,7 +168,7 @@ export function NumberField(props: NumberFieldProps) {
       // This is called on each DOM change, to push the latest value into the field
       onChange={(rawInputValue) => {
         const parsedValue = numberParser.parse(rawInputValue || "");
-        onChange(formatValue(parsedValue, factor, numFractionDigits));
+        onChange(formatValue(parsedValue, factor, numFractionDigits, numIntegerDigits));
       }}
       inputRef={inputRef}
       onBlur={onBlur}
@@ -168,11 +181,32 @@ export function NumberField(props: NumberFieldProps) {
   );
 }
 
-export function formatValue(value: number, factor: number, numFractionDigits: number | undefined): number | undefined {
+export function formatValue(
+  value: number,
+  factor: number,
+  numFractionDigits: number | undefined,
+  numIntegerDigits: number | undefined,
+): number | undefined {
   // We treat percents & cents as (mostly) integers, while useNumberField wants decimals, so
   // undo that via `* factor` and `Math.round`, but also keep any specifically-requested `numFractionDigits`,
   // i.e. for `type=percent value=12.34`, `value` will be `0.1234` that we want turn into `12.34`.
   const maybeAdjustForDecimals = numFractionDigits ? Math.pow(10, numFractionDigits) : 1;
   // Reverse the integer/decimal conversion
-  return Number.isNaN(value) ? undefined : Math.round(value * factor * maybeAdjustForDecimals) / maybeAdjustForDecimals;
+  const decimalAdjusted = Number.isNaN(value)
+    ? undefined
+    : Math.round(value * factor * maybeAdjustForDecimals) / maybeAdjustForDecimals;
+
+  if (numIntegerDigits === undefined || decimalAdjusted === undefined) {
+    return decimalAdjusted;
+  }
+
+  // If `numIntegerDigits` is defined, then we must truncate that manually, so that 1234.56 can turn into 34.56
+  const fractionalValue = Math.round((decimalAdjusted % 1) * maybeAdjustForDecimals) / maybeAdjustForDecimals;
+  const maybeNegate = decimalAdjusted < 0 ? -1 : 1;
+  const trimmedInteger = Number(
+    Math.trunc(Math.abs(decimalAdjusted))
+      .toString()
+      .slice(-1 * numIntegerDigits),
+  );
+  return (trimmedInteger + fractionalValue) * maybeNegate;
 }
