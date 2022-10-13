@@ -45,7 +45,7 @@ export function Chip<X extends Only<Xss<Margin>, X>>({ type = ChipTypes.neutral,
 }
 
 const typeStyles: Record<ChipType, Properties> = {
-  caution: Css.bgYellow200.$,
+  caution: Css.bgYellow400.$,
   warning: Css.bgRed100.$,
   success: Css.bgGreen100.$,
   light: Css.bgWhite.$,
