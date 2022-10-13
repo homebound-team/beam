@@ -20,13 +20,13 @@ export interface ChipProps<X> {
   title?: string;
   xss?: X;
   type?: ChipType;
+  compact?: boolean;
 }
 
 /** Kinda like a chip, but read-only, so no `onClick` or `hover`. */
 export function Chip<X extends Only<Xss<Margin>, X>>({ type = ChipTypes.neutral, ...props }: ChipProps<X>) {
-  const { text, title = text, xss = {} } = props;
   const { fieldProps } = usePresentationContext();
-  const compact = fieldProps?.compact;
+  const { text, title = text, xss = {}, compact = fieldProps?.compact } = props;
   const tid = useTestIds(props, "chip");
 
   return (
@@ -45,7 +45,7 @@ export function Chip<X extends Only<Xss<Margin>, X>>({ type = ChipTypes.neutral,
 }
 
 const typeStyles: Record<ChipType, Properties> = {
-  caution: Css.bgYellow200.$,
+  caution: Css.bgYellow400.$,
   warning: Css.bgRed100.$,
   success: Css.bgGreen100.$,
   light: Css.bgWhite.$,
