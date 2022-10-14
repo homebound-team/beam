@@ -207,6 +207,13 @@ describe("NumberFieldTest", () => {
     );
     expect(r.code()).toHaveAttribute("placeholder", "Test Placeholder");
   });
+
+  it("respects useGrouping as false", async () => {
+    // Given a NumberField with `useGrouping` set to `false`
+    const r = await render(<TestNumberField label="Code" useGrouping={false} value={123456} />);
+    // Then the number should not have comma's.
+    expect(r.code()).toHaveValue("123456");
+  });
 });
 
 // test against factors and num fraction digits.
