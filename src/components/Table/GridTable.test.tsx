@@ -18,8 +18,8 @@ import { cell, cellAnd, cellOf, click, render, row, type, withRouter } from "src
 type Data = { name: string; value: number | undefined | null };
 type Row = SimpleHeaderAndData<Data>;
 
-const nameColumn: GridColumn<Row> = { name: "name", header: () => "Name", data: ({ name }) => name };
-const valueColumn: GridColumn<Row> = { name: "value", header: () => "Value", data: ({ value }) => value };
+const nameColumn: GridColumn<Row> = { id: "name", header: () => "Name", data: ({ name }) => name };
+const valueColumn: GridColumn<Row> = { id: "value", header: () => "Value", data: ({ value }) => value };
 const columns = [nameColumn, valueColumn];
 
 const rows: GridDataRow<Row>[] = [

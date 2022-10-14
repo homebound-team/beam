@@ -150,8 +150,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R, S>): ReactElement {
               }
             : {};
 
-        const cellId = `${row.kind}_${row.id}_${column.name}`;
-        const applyCellHighlight = cellHighlight && !!column.name && !isHeader && !isTotals;
+        const cellId = `${row.kind}_${row.id}_${column.id}`;
+        const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
         const isCellActive = rowState.activeCellId === cellId;
 
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
