@@ -432,6 +432,8 @@ function renderDiv<R extends Kinded>(
           ? Css.addIn(`& > div:nth-of-type(n+${headerRows.length + totalsRows.length + 2}) > *`, style.betweenRowsCss).$
           : {}),
         ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:nth-of-type(2) > *`, style.firstNonHeaderRowCss).$ : {}),
+        ...(style.lastRowCss && Css.addIn("& > div:last-of-type", style.lastRowCss).$),
+        ...(style.firstRowCss && Css.addIn("& > div:first-of-type", style.firstRowCss).$),
         ...style.rootCss,
         ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
@@ -467,10 +469,12 @@ function renderTable<R extends Kinded>(
   return (
     <table
       css={{
-        ...Css.w100.add("borderCollapse", "collapse").$,
-        ...Css.addIn("& > tbody > tr ", style.betweenRowsCss || {})
+        ...Css.w100.add("borderCollapse", "separate").add("borderSpacing", "0").$,
+        ...Css.addIn("& > tbody > tr > * ", style.betweenRowsCss || {})
           // removes border between header and second row
-          .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss || {}).$,
+          .addIn("& > tbody > tr:first-of-type > *", style.firstNonHeaderRowCss || {}).$,
+        ...Css.addIn("& > tbody > tr:last-of-type", style.lastRowCss).$,
+        ...Css.addIn("& > tbody > tr:first-of-type", style.firstRowCss).$,
         ...style.rootCss,
         ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
@@ -621,9 +625,10 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
             ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
             // Table list styles only
             ...(isHeader
-              ? {}
+              ? Css.addIn("& > div:first-of-type > *", gs.firstRowCss).$
               : {
                   ...Css.addIn("& > div:first-of-type > *", gs.firstNonHeaderRowCss).$,
+                  ...Css.addIn("& > div:last-of-type > *", gs.lastRowCss).$,
                 }),
             ...gs.rootCss,
             ...(gs.minWidthPx ? Css.mwPx(gs.minWidthPx).$ : {}),
