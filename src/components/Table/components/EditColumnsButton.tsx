@@ -38,22 +38,22 @@ export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsBu
       (acc, column) => {
         // Only include options that can be hidden and have the `name` property defined.
         if (!column.canHide) return acc;
-        if (!column.name || column.name.length === 0) {
+        if (!column.id || column.id.length === 0) {
           console.warn("Column is missing 'name' property required by the Edit Columns button", column);
           return acc;
         }
 
         // Add current column as an option
-        return { ...acc, options: acc.options.concat({ label: column.name!, value: column.name! }) };
+        return { ...acc, options: acc.options.concat({ label: column.id!, value: column.id! }) };
       },
       { options: [] as CheckboxGroupItemOption[] },
     );
   }, [allColumns]);
 
-  const selectedValues = selectedColumns.map((column) => column.name!);
+  const selectedValues = selectedColumns.map((column) => column.id!);
   const setSelectedValues = useCallback(
     (values: string[]) => {
-      setSelectedColumns(allColumns.filter((column) => (column.canHide ? values.includes(column.name!) : true)));
+      setSelectedColumns(allColumns.filter((column) => (column.canHide ? values.includes(column.id!) : true)));
     },
     [allColumns, setSelectedColumns],
   );
