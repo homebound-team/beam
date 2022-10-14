@@ -6,9 +6,9 @@ import { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 describe("useColumns", () => {
   type Data = { name: string | undefined; value: number | undefined };
   type Row = SimpleHeaderAndData<Data>;
-  const nameColumn: GridColumn<Row> = { name: "name", header: "Name", data: ({ name }) => name };
+  const nameColumn: GridColumn<Row> = { id: "name", header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = {
-    name: "value",
+    id: "value",
     header: "Value",
     canHide: true,
     initVisible: false,

@@ -140,7 +140,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
   activeRowId?: string;
   /**
    * Defines which cell in the table should be provided with an "active" styling.
-   * Expected format is `${row.kind}_${row.id}_${column.name}`.
+   * Expected format is `${row.kind}_${row.id}_${column.id}`.
    */
   activeCellId?: string;
 }

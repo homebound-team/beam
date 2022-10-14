@@ -8,10 +8,10 @@ import { click, render } from "src/utils/rtl";
 
 type Data = { name: string | undefined; value: number | undefined };
 type Row = SimpleHeaderAndData<Data>;
-const nameColumn: GridColumn<Row> = { name: "Name", header: "Name", data: ({ name }) => name };
-const valueColumn: GridColumn<Row> = { name: "Value", header: "Value", canHide: true, data: ({ value }) => value };
+const nameColumn: GridColumn<Row> = { id: "Name", header: "Name", data: ({ name }) => name };
+const valueColumn: GridColumn<Row> = { id: "Value", header: "Value", canHide: true, data: ({ value }) => value };
 const actionColumn: GridColumn<Row> = {
-  name: "Actions",
+  id: "Actions",
   header: "Action",
   canHide: true,
   data: () => <div>Actions</div>,

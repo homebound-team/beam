@@ -67,8 +67,8 @@ export type GridColumn<R extends Kinded, S = {}> = {
   wrapAction?: false;
   /** Used as a signal to defer adding the 'indent' styling */
   isAction?: true;
-  /** Column name that will be used to generate an unique identifier for every row cell */
-  name?: string;
+  /** Column id that will be used to generate an unique identifier for every row cell */
+  id?: string;
   /** Flag that will allow to know which columns are hide-able */
   canHide?: boolean;
   /** Flag that will allow to know which hide-able columns are visible on initial load */

@@ -9,18 +9,18 @@ export function useColumns<R extends Kinded, S = {}>(
 ): [GridColumn<R, S>[], Dispatch<SetStateAction<GridColumn<R, S>[]>>] {
   const { selectedColumns, hideColumns } = tableColumns.reduce(
     (acc, column) => {
-      // Only include options that can be hidden and have the `name` property defined.
-      if (!column.name || column.name.length === 0) {
-        console.warn("Column is missing 'name' property required by the Edit Columns button", column);
+      // Only include options that can be hidden and have the `id` property defined.
+      if (!column.id || column.id.length === 0) {
+        console.warn("Column is missing 'id' property required by the Edit Columns button", column);
         return acc;
       }
       // Add hide-able columns
       if (column.canHide) {
-        acc.hideColumns.push(column.name);
+        acc.hideColumns.push(column.id);
       }
       // Add selected columns
       if (!column.canHide || (column.canHide && column.initVisible)) {
-        acc.selectedColumns.push(column.name);
+        acc.selectedColumns.push(column.id);
       }
       return { ...acc };
     },
@@ -30,11 +30,11 @@ export function useColumns<R extends Kinded, S = {}>(
   const storageKey = maybeStorageKey ?? camelCase(hideColumns.map((c) => c).join(""));
   const [storageNames, setStorageNames] = useSessionStorage(storageKey, selectedColumns);
   const storageColumns: GridColumn<R, S>[] =
-    storageNames && storageNames.map((sc) => tableColumns.find((column) => column.name === sc)!);
+    storageNames && storageNames.map((sc) => tableColumns.find((column) => column.id === sc)!);
   const [columns, setColumns] = useState<GridColumn<R, S>[]>(storageColumns);
 
   useEffect(() => {
-    setStorageNames(columns.map((column) => column.name!));
+    setStorageNames(columns.map((column) => column.id!));
   }, [columns]);
 
   return [columns, setColumns];
