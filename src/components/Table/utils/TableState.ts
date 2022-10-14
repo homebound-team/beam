@@ -1,6 +1,9 @@
 import { comparer, makeAutoObservable, observable, ObservableMap, ObservableSet, reaction } from "mobx";
 import React from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
+import { GridSortConfig } from "src/components/Table/GridTable";
+import { Direction, GridColumnWithId } from "src/components/Table/types";
+import { ASC, DESC } from "src/components/Table/utils/utils";
 import { visit } from "src/components/Table/utils/visitor";
 
 // A parent row can be partially selected when some children are selected/some aren't.
@@ -21,7 +24,7 @@ export type SelectedState = "checked" | "unchecked" | "partial";
  * that need to change their toggle/select on/off in response to parent/child
  * changes.
  */
-export class RowState {
+export class TableState {
   // A set of just row ids, i.e. not row.kind+row.id
   private readonly collapsedRows = new ObservableSet<string>();
   private persistCollapse: string | undefined;
@@ -34,6 +37,14 @@ export class RowState {
   activeRowId: string | undefined = undefined;
   // Keeps track of the 'active' cell, formatted `${row.kind}_${row.id}_${column.name}`
   activeCellId: string | undefined = undefined;
+
+  // Keep a local copy of the `sortConfig` to ensure we only execute `initSortState` once, and determines if we should execute `setSortKey`
+  public sortConfig: GridSortConfig | undefined;
+  // Provide some defaults to get the sort state to properly work.
+  public sort: SortState | {} = {};
+  // Keep track of the `initialSortState` so we can (1) revert back to it, and (2) properly derive next sort state
+  private initialSortState: SortState | undefined;
+  private onSort: ((orderBy: any | undefined, direction: Direction | undefined) => void) | undefined;
 
   /**
    * Creates the `RowState` for a given `GridTable`.
@@ -88,6 +99,54 @@ export class RowState {
     });
 
     this.selectedRows.merge(map);
+  }
+
+  initSortState(sortConfig: GridSortConfig | undefined, columns: GridColumnWithId<any>[]) {
+    if (!this.sortConfig) {
+      this.sortConfig = sortConfig;
+
+      if (sortConfig?.on === "client") {
+        const { initial, primary } = sortConfig;
+        const primaryKey: string | undefined = primary?.[0];
+        const persistentSortData = { persistent: { columnId: primaryKey, direction: primary?.[1] } };
+        if (initial === undefined && "initial" in sortConfig) {
+          // if explicitly set to `undefined`, then do not sort
+          this.initialSortState = undefined;
+        } else if (initial) {
+          this.initialSortState = { current: { columnId: initial[0], direction: initial[1] }, ...persistentSortData };
+        } else {
+          // If no explicit sortState, assume 1st column ascending
+          const firstSortableColumn = columns.find((c) => c.clientSideSort !== false)?.id;
+          this.initialSortState = firstSortableColumn
+            ? { current: { columnId: firstSortableColumn, direction: ASC }, ...persistentSortData }
+            : undefined;
+        }
+      } else {
+        this.initialSortState = sortConfig?.value
+          ? { current: { columnId: sortConfig?.value[0], direction: sortConfig?.value[1] } }
+          : undefined;
+      }
+
+      this.sort = this.initialSortState ?? {};
+      this.onSort = sortConfig?.on === "server" ? sortConfig.onSort : undefined;
+    }
+  }
+
+  setSortKey(clickedColumnId: string) {
+    if (this.sortConfig) {
+      const newState = deriveSortState(this.sort, clickedColumnId, this.initialSortState);
+
+      this.sort = newState ?? {};
+
+      if (this.onSort) {
+        const { columnId, direction } = newState?.current ?? {};
+        this.onSort(columnId, direction);
+      }
+    }
+  }
+
+  get sortState(): SortState | undefined {
+    return isSortState(this.sort) ? this.sort : undefined;
   }
 
   // Updates the list of rows and regenerates the collapsedRows property if needed.
@@ -288,8 +347,8 @@ export class RowState {
 }
 
 /** Provides a context for rows to access their table's `RowState`. */
-export const RowStateContext = React.createContext<{ rowState: RowState }>({
-  get rowState(): RowState {
+export const RowStateContext = React.createContext<{ tableState: TableState }>({
+  get tableState(): TableState {
     throw new Error("No RowStateContext provider");
   },
 });
@@ -341,4 +400,60 @@ function getCollapsedIdsFromRows(rows: GridDataRow<any>[]): string[] {
 function flattenRows(rows: GridDataRow<any>[]): GridDataRow<any>[] {
   const childRows = rows.flatMap((r) => (r.children ? flattenRows(r.children) : []));
   return [...rows, ...childRows];
+}
+
+// Exported for testing purposes
+export function deriveSortState(
+  currentSortState: SortState | {},
+  clickedKey: string,
+  initialSortState: SortState | undefined,
+): SortState | undefined {
+  // If the current sort state is not defined then sort ASC on the clicked key.
+  if (!isSortState(currentSortState)) {
+    return { ...initialSortState, current: { columnId: clickedKey, direction: ASC } };
+  }
+
+  // const { sortedColumnId: currentKey, direction: currentDirection } = currentSortState;
+  const {
+    current: { columnId: currentKey, direction: currentDirection },
+  } = currentSortState;
+
+  // If clicking a new column, then sort ASC on the clicked key
+  if (clickedKey !== currentKey) {
+    return { ...initialSortState, current: { columnId: clickedKey, direction: ASC } };
+  }
+
+  // If there is an `initialSortState` and we're clicking on that same key, then flip the sort.
+  // Handles cases where the initial sort is DESC so that we can allow for DESC to ASC sorting.
+  if (initialSortState && initialSortState.current.columnId === clickedKey) {
+    return {
+      ...initialSortState,
+      current: { columnId: clickedKey, direction: (currentDirection as any as string) === ASC ? DESC : ASC },
+    };
+  }
+
+  // Otherwise when clicking the current column, toggle through sort states
+  if ((currentDirection as any as string) === ASC) {
+    // if ASC -> go to desc
+    return { ...initialSortState, current: { columnId: clickedKey, direction: DESC } };
+  }
+
+  // Else, direction is already DESC, so revert to original sort value.
+  return initialSortState;
+}
+
+type ColumnSort = {
+  columnId: string | undefined;
+  direction: Direction | undefined;
+};
+
+export type SortState = {
+  current: ColumnSort;
+  persistent?: ColumnSort;
+};
+
+export type SortOn = "client" | "server" | undefined;
+
+function isSortState(maybeSortState: SortState | {}): maybeSortState is SortState {
+  return typeof maybeSortState === "object" && Object.keys(maybeSortState).length > 0;
 }

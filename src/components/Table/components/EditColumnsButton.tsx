@@ -13,17 +13,17 @@ import { Css } from "src/Css";
 import { CheckboxGroup, CheckboxGroupItemOption } from "src/inputs";
 import { useTestIds } from "src/utils";
 
-interface EditColumnsButtonProps<R extends Kinded, S>
+interface EditColumnsButtonProps<R extends Kinded>
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
-  allColumns: GridColumn<R, S>[];
-  selectedColumns: GridColumn<R, S>[];
-  setSelectedColumns: Dispatch<SetStateAction<GridColumn<R, S>[]>>;
+  allColumns: GridColumn<R>[];
+  selectedColumns: GridColumn<R>[];
+  setSelectedColumns: Dispatch<SetStateAction<GridColumn<R>[]>>;
   title?: string;
   // for storybook purposes
   defaultOpen?: boolean;
 }
 
-export function EditColumnsButton<R extends Kinded, S = {}>(props: EditColumnsButtonProps<R, S>) {
+export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProps<R>) {
   const { defaultOpen, disabled, allColumns, setSelectedColumns, trigger, title, selectedColumns } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);

@@ -46,12 +46,12 @@ export function ClientSideSorting() {
     header: "Name",
     data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
   };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const valueColumn: GridColumn<Row> = { id: "value", header: "Value", data: ({ value }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, clientSideSort: false };
   return (
     <GridTable
       columns={[nameColumn, valueColumn, actionColumn]}
-      sorting={{ on: "client", initial: [valueColumn, "ASC"] }}
+      sorting={{ on: "client", initial: [valueColumn.id!, "ASC"] }}
       rows={[
         simpleHeader,
         { kind: "data", id: "1", data: { name: "c", value: 1 } },
@@ -247,7 +247,7 @@ export function NestedRows() {
     <GridTable
       columns={[arrowColumn, nameColumn]}
       {...{ rows: rowsWithHeader }}
-      sorting={{ on: "client", initial: [1, "ASC"] }}
+      sorting={{ on: "client", initial: ["c1", "ASC"] }}
     />
   );
 }
@@ -995,6 +995,7 @@ export function PrimaryColumnSorting() {
   const favNameColumn: GridColumn<FavoriteRow> = { header: () => "Name", data: ({ name }) => name };
   const favValueColumn: GridColumn<FavoriteRow> = { header: () => "Value", data: ({ value }) => value };
   const favoriteColumn: GridColumn<FavoriteRow> = {
+    id: "favorite",
     header: () => "Favorite",
     data: ({ favorite }) => ({
       content: <Icon icon={favorite ? "starFilled" : "star"} color={favorite ? Palette.Yellow500 : Palette.Gray900} />,
@@ -1013,7 +1014,7 @@ export function PrimaryColumnSorting() {
       <GridTable
         filter={filter}
         columns={[favNameColumn, favValueColumn, favoriteColumn]}
-        sorting={{ on: "client", primary: [favoriteColumn, "DESC"] }}
+        sorting={{ on: "client", primary: [favoriteColumn.id!, "DESC"] }}
         rows={[
           simpleHeader,
           // And the data is initially unsorted

@@ -4,7 +4,7 @@ import { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridStyle, RowStyle } from "src/components/Table/TableStyles";
-import { GridCellAlignment, GridColumn, Kinded, RenderAs } from "src/components/Table/types";
+import { GridCellAlignment, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { Css, Properties } from "src/Css";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
@@ -72,7 +72,7 @@ function isContentEmpty(content: ReactNode): boolean {
 
 /** Return the content for a given column def applied to a given row. */
 export function applyRowFn<R extends Kinded>(
-  column: GridColumn<R>,
+  column: GridColumnWithId<R>,
   row: GridDataRow<R>,
   api: GridTableApi<R>,
   level: number,
@@ -110,7 +110,7 @@ export function getIndentationCss<R extends Kinded>(
 export function getFirstOrLastCellCss<R extends Kinded>(
   style: GridStyle,
   columnIndex: number,
-  columns: GridColumn<R>[],
+  columns: GridColumnWithId<R>[],
 ): Properties {
   return {
     ...(columnIndex === 0 ? style.firstCellCss : {}),
@@ -134,13 +134,16 @@ const alignmentToTextAlign: Record<GridCellAlignment, Properties["textAlign"]> =
   right: "right",
 };
 
-export function getAlignment(column: GridColumn<any>, maybeContent: ReactNode | GridCellContent): GridCellAlignment {
+export function getAlignment(
+  column: GridColumnWithId<any>,
+  maybeContent: ReactNode | GridCellContent,
+): GridCellAlignment {
   return (isGridCellContent(maybeContent) && maybeContent.alignment) || column.align || "left";
 }
 
 // For alignment, use: 1) cell def, else 2) column def, else 3) left.
 export function getJustification(
-  column: GridColumn<any>,
+  column: GridColumnWithId<any>,
   maybeContent: ReactNode | GridCellContent,
   as: RenderAs,
   alignment: GridCellAlignment,

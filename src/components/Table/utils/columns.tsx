@@ -1,27 +1,27 @@
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
-import { GridColumn, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
+import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
 import { newMethodMissingProxy } from "src/utils";
 
 /** Provides default styling for a GridColumn representing a Date. */
-export function column<T extends Kinded, S = {}>(columnDef: GridColumn<T, S>): GridColumn<T, S> {
+export function column<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { ...columnDef };
 }
 
 /** Provides default styling for a GridColumn representing a Date. */
-export function dateColumn<T extends Kinded, S = {}>(columnDef: GridColumn<T, S>): GridColumn<T, S> {
+export function dateColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { ...columnDef, align: "left" };
 }
 
 /**
  * Provides default styling for a GridColumn representing a Numeric value (Price, percentage, PO #, etc.). */
-export function numericColumn<T extends Kinded, S = {}>(columnDef: GridColumn<T, S>): GridColumn<T, S> {
+export function numericColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { ...columnDef, align: "right" };
 }
 
 /** Provides default styling for a GridColumn representing an Action. */
-export function actionColumn<T extends Kinded, S = {}>(columnDef: GridColumn<T, S>): GridColumn<T, S> {
+export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { clientSideSort: false, ...columnDef, align: "center", isAction: true, wrapAction: false };
 }
 
@@ -32,9 +32,10 @@ export function actionColumn<T extends Kinded, S = {}>(columnDef: GridColumn<T, 
  * not have a `SelectToggle`, b/c we can provide the default behavior a `SelectToggle` for basically
  * all rows.
  */
-export function selectColumn<T extends Kinded, S = {}>(columnDef?: Partial<GridColumn<T, S>>): GridColumn<T, S> {
+export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>): GridColumn<T> {
   const base = {
     ...nonKindDefaults(),
+    id: "beamSelectColumn",
     clientSideSort: false,
     align: "center",
     // Defining `w: 48px` to accommodate for the `16px` wide checkbox and `16px` of padding on either side.
@@ -58,9 +59,10 @@ export function selectColumn<T extends Kinded, S = {}>(columnDef?: Partial<GridC
  * not have a `CollapseToggle`, b/c we can provide the default behavior a `CollapseToggle` for basically
  * all rows.
  */
-export function collapseColumn<T extends Kinded, S = {}>(columnDef?: Partial<GridColumn<T, S>>): GridColumn<T, S> {
+export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>): GridColumn<T> {
   const base = {
     ...nonKindDefaults(),
+    id: "beamCollapseColumn",
     clientSideSort: false,
     align: "center",
     // Defining `w: 38px` based on the designs
@@ -146,3 +148,10 @@ export function calcColumnSizes(
 
   return sizes;
 }
+
+/** Assign column ids if missing */
+export function assignDefaultColumnIds<T extends Kinded>(columns: GridColumn<T>[]): GridColumnWithId<T>[] {
+  return columns.map((c, idx) => (c.id ? (c as GridColumnWithId<T>) : { ...c, id: c.id ?? generateColumnId(idx) }));
+}
+
+export const generateColumnId = (columnIndex: number) => `c${columnIndex}`;

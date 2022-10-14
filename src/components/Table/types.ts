@@ -32,7 +32,7 @@ export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends 
  * - For client-side sorting, it's type `number`, to represent the current
  * column being sorted, in which case we use the GridCellContent.value.
  */
-export type GridColumn<R extends Kinded, S = {}> = {
+export type GridColumn<R extends Kinded> = {
   [K in R["kind"]]:
     | string
     | GridCellContent
@@ -60,7 +60,7 @@ export type GridColumn<R extends Kinded, S = {}> = {
   /** Whether the column can be sorted (if client-side sorting). Defaults to true if sorting client-side. */
   clientSideSort?: boolean;
   /** This column's sort by value (if server-side sorting). */
-  serverSideSortKey?: S;
+  serverSideSortKey?: string;
   /** Allows the column to stay in place when the user scrolls horizontally */
   sticky?: "left" | "right";
   /** Prevent column from supporting RowStyle.onClick/rowLink in order to avoid nested interactivity. Defaults to true */
@@ -75,6 +75,8 @@ export type GridColumn<R extends Kinded, S = {}> = {
   initVisible?: boolean;
 };
 
+export type GridColumnWithId<R extends Kinded> = GridColumn<R> & { id: string };
+
 export const nonKindGridColumnKeys = [
   "w",
   "mw",
@@ -84,7 +86,7 @@ export const nonKindGridColumnKeys = [
   "sticky",
   "wrapAction",
   "isAction",
-  "name",
+  "id",
   "canHide",
   "initVisible",
 ];

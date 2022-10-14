@@ -4,10 +4,10 @@ import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyles } from "src/components/Table/TableStyles";
 import { GridColumn } from "src/components/Table/types";
-import { calcColumnSizes, selectColumn } from "src/components/Table/utils/columns";
+import { calcColumnSizes, generateColumnId, selectColumn } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
-import { RowStateContext } from "src/components/Table/utils/RowState";
 import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import { RowStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -315,7 +315,7 @@ describe("GridTable", () => {
               }),
             },
           ]}
-          sorting={{ on: "client", initial: [1, "ASC"] }}
+          sorting={{ on: "client", initial: [generateColumnId(1), "ASC"] }}
           rows={[
             simpleHeader,
             // And the data is initially unsorted
@@ -380,12 +380,16 @@ describe("GridTable", () => {
 
       const favNameColumn: GridColumn<FavoriteRow> = { header: () => "Name", data: ({ name }) => name };
       const favValueColumn: GridColumn<FavoriteRow> = { header: () => "Value", data: ({ value }) => value };
-      const favoriteColumn: GridColumn<FavoriteRow> = { header: () => "Favorite", data: ({ favorite }) => favorite };
+      const favoriteColumn: GridColumn<FavoriteRow> = {
+        id: "favorite",
+        header: () => "Favorite",
+        data: ({ favorite }) => favorite,
+      };
 
       const r = await render(
         <GridTable
           columns={[favNameColumn, favValueColumn, favoriteColumn]}
-          sorting={{ on: "client", primary: [favoriteColumn, "DESC"] }}
+          sorting={{ on: "client", primary: [favoriteColumn.id!, "DESC"] }}
           rows={[
             simpleHeader,
             // And the data is initially unsorted
@@ -416,19 +420,23 @@ describe("GridTable", () => {
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
     });
 
-    it("can inverse sort priamry rows", async () => {
+    it("can inverse sort primary rows", async () => {
       // Given the table is using client-side sorting
       type FavoriteData = { name: string; value: number; favorite: boolean };
       type FavoriteRow = SimpleHeaderAndData<FavoriteData>;
 
       const favNameColumn: GridColumn<FavoriteRow> = { header: () => "Name", data: ({ name }) => name };
       const favValueColumn: GridColumn<FavoriteRow> = { header: () => "Value", data: ({ value }) => value };
-      const favoriteColumn: GridColumn<FavoriteRow> = { header: () => "Favorite", data: ({ favorite }) => favorite };
+      const favoriteColumn: GridColumn<FavoriteRow> = {
+        id: "favorite",
+        header: () => "Favorite",
+        data: ({ favorite }) => favorite,
+      };
 
       const r = await render(
         <GridTable
           columns={[favNameColumn, favValueColumn, favoriteColumn]}
-          sorting={{ on: "client", primary: [favoriteColumn, "ASC"] }}
+          sorting={{ on: "client", primary: [favoriteColumn.id!, "ASC"] }}
           rows={[
             simpleHeader,
             // And the data is initially unsorted
@@ -460,34 +468,13 @@ describe("GridTable", () => {
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
     });
 
-    it("can be initially sorted by a column index", async () => {
+    it("can be initially sorted by a column id", async () => {
       // Given a table
       const r = await render(
         <GridTable
           columns={[nameColumn, valueColumn]}
           // And it wants to be initially sorted by column 1/asc
-          sorting={{ on: "client", initial: [1, "ASC"] }}
-          rows={[
-            simpleHeader,
-            // And the data is initially unsorted
-            { kind: "data", id: "2", data: { name: "b", value: 2 } },
-            { kind: "data", id: "1", data: { name: "a", value: 3 } },
-            { kind: "data", id: "3", data: { name: "c", value: 1 } },
-          ]}
-        />,
-      );
-      // Then the data is sorted by value
-      expect(cell(r, 1, 0)).toHaveTextContent("c");
-      expect(cell(r, 2, 0)).toHaveTextContent("b");
-    });
-
-    it("can be initially sorted by a column reference", async () => {
-      // Given a table
-      const r = await render(
-        <GridTable
-          columns={[nameColumn, valueColumn]}
-          // And it wants to be initially sorted by value column/asc
-          sorting={{ on: "client", initial: [valueColumn, "ASC"] }}
+          sorting={{ on: "client", initial: [valueColumn.id!, "ASC"] }}
           rows={[
             simpleHeader,
             // And the data is initially unsorted
@@ -529,7 +516,7 @@ describe("GridTable", () => {
         <GridTable
           columns={[nameColumn, valueColumn]}
           // And there is an initial sort defined
-          sorting={{ on: "client", initial: [nameColumn, "ASC"] }}
+          sorting={{ on: "client", initial: [generateColumnId(0), "ASC"] }}
           rows={[
             simpleHeader,
             { kind: "data", id: "1", data: { name: "a", value: 2 } },
@@ -837,7 +824,7 @@ describe("GridTable", () => {
       const r = await render(
         <GridTable<Row>
           columns={[nameColumn, valueColumn]}
-          sorting={{ on: "client", initial: [1, "ASC"] }}
+          sorting={{ on: "client", initial: [valueColumn.id!, "ASC"] }}
           rows={[
             simpleHeader,
             // And the 1st row is pinned first
@@ -2318,18 +2305,18 @@ describe("GridTable", () => {
 });
 
 function Collapse({ id }: { id: string }) {
-  const { rowState } = useContext(RowStateContext);
-  const icon = useComputed(() => (rowState.isCollapsed(id) ? "+" : "-"), [rowState]);
+  const { tableState } = useContext(RowStateContext);
+  const icon = useComputed(() => (tableState.isCollapsed(id) ? "+" : "-"), [tableState]);
   return (
-    <div onClick={() => rowState.toggleCollapsed(id)} data-testid="collapse">
+    <div onClick={() => tableState.toggleCollapsed(id)} data-testid="collapse">
       {icon}
     </div>
   );
 }
 
 function Select({ id }: { id: string }) {
-  const { rowState } = useContext(RowStateContext);
-  const state = useComputed(() => rowState.getSelected(id), [rowState]);
+  const { tableState } = useContext(RowStateContext);
+  const state = useComputed(() => tableState.getSelected(id), [tableState]);
   const selected = state === "checked" ? true : state === "unchecked" ? false : "indeterminate";
   return (
     <Checkbox
@@ -2337,7 +2324,7 @@ function Select({ id }: { id: string }) {
       checkboxOnly={true}
       selected={selected}
       onChange={(selected) => {
-        rowState.selectRow(id, selected);
+        tableState.selectRow(id, selected);
       }}
     />
   );

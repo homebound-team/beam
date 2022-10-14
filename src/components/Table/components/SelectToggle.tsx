@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { RowStateContext } from "src/components/Table/utils/RowState";
+import { RowStateContext } from "src/components/Table/utils/TableState";
 import { useComputed } from "src/hooks";
 import { Checkbox } from "src/inputs";
 
@@ -10,8 +10,8 @@ interface SelectToggleProps {
 
 /** Provides a checkbox to show/drive this row's selected state. */
 export function SelectToggle({ id, disabled }: SelectToggleProps) {
-  const { rowState } = useContext(RowStateContext);
-  const state = useComputed(() => rowState.getSelected(id), [rowState]);
+  const { tableState } = useContext(RowStateContext);
+  const state = useComputed(() => tableState.getSelected(id), [tableState]);
   const selected = state === "checked" ? true : state === "unchecked" ? false : "indeterminate";
 
   return (
@@ -20,7 +20,7 @@ export function SelectToggle({ id, disabled }: SelectToggleProps) {
       disabled={disabled}
       label="Select"
       onChange={(selected) => {
-        rowState.selectRow(id, selected);
+        tableState.selectRow(id, selected);
       }}
       selected={selected}
     />
