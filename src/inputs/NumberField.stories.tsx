@@ -52,6 +52,10 @@ export function NumberFieldStyles() {
         <h1 css={Css.lg.$}>Force 3 Integers</h1>
         <TestNumberField value={undefined} numIntegerDigits={3} label="Code" hideLabel placeholder="Code.." />
       </div>
+      <div css={Css.df.fdc.gap2.$}>
+        <h1 css={Css.lg.$}>Without grouping</h1>
+        <TestNumberField value={123456789} label="No grouping" useGrouping={false} />
+      </div>
     </div>
   );
 }
