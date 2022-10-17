@@ -78,7 +78,15 @@ export const Icon = (props: IconProps) => {
   ];
   const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images", "openBook"];
   const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar", "buildingHouse", "house", "bell"];
-  const navigationIcons: IconProps["icon"][] = ["projects", "tasks", "finances", "templates", "tradePartners"];
+  const navigationIcons: IconProps["icon"][] = [
+    "projects",
+    "tasks",
+    "finances",
+    "templates",
+    "tradePartners",
+    "tile",
+    "list",
+  ];
   const weatherIcons: IconProps["icon"][] = [
     "fog",
     "cloudy",
