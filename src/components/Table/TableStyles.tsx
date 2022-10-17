@@ -103,7 +103,7 @@ function memoizedTableStyles() {
           ...(allWhite && Css.bgWhite.$),
           ...(bordered && Css.bt.bGray200.$),
         },
-        totalsCellCss: Css.bgWhite.gray700.smMd.hPx(52).pt0.boxShadow("none").$,
+        totalsCellCss: Css.bgWhite.gray700.smMd.hPx(52).pPx(12).boxShadow("none").$,
         cellCss: {
           ...Css.gray900.xs.bgWhite.aic.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
