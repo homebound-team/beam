@@ -1,7 +1,7 @@
 import { Global } from "@emotion/react";
 import { AutoSaveStatusProvider } from "@homebound/form-state";
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactPortal, useEffect, useRef } from "react";
+import { ReactPortal, useRef } from "react";
 import { createPortal } from "react-dom";
 import { ButtonGroup, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
 import { useBeamContext } from "src/components/BeamContext";
@@ -30,26 +30,11 @@ import { SuperDrawerWidth } from "./utils";
  * above the SuperDrawer.
  */
 export function SuperDrawer(): ReactPortal | null {
-  const {
-    drawerContentStack: contentStack,
-    modalState,
-    modalBodyDiv,
-    modalFooterDiv,
-    modalHeaderDiv,
-  } = useBeamContext();
+  const { drawerContentStack: contentStack } = useBeamContext();
   const { closeDrawer } = useSuperDrawer();
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
   const modalFooterRef = useRef<HTMLDivElement | null>(null);
   const testId = useTestIds({}, "superDrawer");
-
-  // Steal the modal body/footer portals from Modal, if we're open
-  useEffect(() => {
-    if (modalBodyRef.current && modalFooterRef.current && modalState.current) {
-      modalBodyRef.current.appendChild(modalBodyDiv);
-      modalFooterRef.current.appendChild(modalFooterDiv);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modalBodyRef.current, modalFooterRef.current, modalState.current]);
 
   // Get the latest element on the stack
   // We use undefined, nullish operators and empty object here to allow AnimatePresence
@@ -103,7 +88,7 @@ export function SuperDrawer(): ReactPortal | null {
               onClick={(e) => e.stopPropagation()}
             >
               <AutoSaveStatusProvider>
-                <header css={Css.df.p3.bb.bGray200.df.aic.jcsb.gap2.if(!!modalState.current).bn.$}>
+                <header css={Css.df.p3.bb.bGray200.df.aic.jcsb.gap2.$}>
                   {/* Left */}
                   <div css={Css.df.aic.$}>
                     <div css={Css.xl2Sb.gray900.mr2.$} {...testId.title}>
@@ -136,16 +121,6 @@ export function SuperDrawer(): ReactPortal | null {
                   </div>
                 </header>
                 {content}
-                {modalState.current && (
-                  // Forcing some design constraints on the modal component
-                  <div css={Css.fg1.top0.left0.right0.bottom0.absolute.bgWhite.df.aic.jcc.fg1.fdc.z5.$}>
-                    {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
-                    {modalState.current.content}
-                    {/* TODO: Work in some notion of the modal size + width/height + scrolling?*/}
-                    <div ref={modalBodyRef} />
-                    <div ref={modalFooterRef} />
-                  </div>
-                )}
               </AutoSaveStatusProvider>
             </motion.aside>
           </motion.div>
