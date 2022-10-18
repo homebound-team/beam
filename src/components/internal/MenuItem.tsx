@@ -2,7 +2,7 @@ import { Node } from "@react-types/shared";
 import { useRef } from "react";
 import { useHover, useMenuItem } from "react-aria";
 import { useHistory } from "react-router";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "src/components";
 import { TreeState } from "react-stately";
 import { Avatar } from "src/components/Avatar";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
@@ -117,6 +117,7 @@ function maybeWrapInLink(
   onClick: MenuItem["onClick"],
   content: JSX.Element | string,
   disabled: boolean | undefined,
+  active: boolean | undefined,
 ): JSX.Element {
   if (disabled || typeof onClick !== "string") {
     return <>{content}</>;
@@ -130,7 +131,7 @@ function maybeWrapInLink(
       </span>
     </a>
   ) : (
-    <NavLink to={onClick} className="navLink">
+    <NavLink href={onClick} className="navLink" active={active}>
       {content}
     </NavLink>
   );
