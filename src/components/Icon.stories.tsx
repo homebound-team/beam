@@ -84,6 +84,7 @@ export const Icon = (props: IconProps) => {
     "finances",
     "templates",
     "tradePartners",
+    "menu",
     "tile",
     "list",
   ];
