@@ -12,10 +12,12 @@ interface MenuProps<T> {
   onClose: VoidFunction;
   items: MenuItem[];
   persistentItems?: MenuItem[];
+  /** Whether to display the contrast variant */
+  contrast?: boolean;
 }
 
 export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
-  const { ariaMenuProps, items, persistentItems, onClose } = props;
+  const { ariaMenuProps, items, persistentItems, onClose, contrast } = props;
   // Build out the Menu's Tree data to include the Persistent Action, if any. This is a collection of Nodes that is used
   // by React-Aria to keep track of item states such as focus, and provide hooks for calling those actions.
   const tree = useTreeData({
@@ -42,7 +44,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
 
   // Bulk updates of MenuItems below. If we find this to be of sluggish performance, then we can change to be more surgical in our updating.
   // If our list of items change, update the "items" menu section. (key is based on label in `getKey` above)
-  useEffect(() => tree.update("items", { label: "items", items } as MenuSection), [items]);
+  useEffect(() => tree.update("items", { label: "items", contrast, items } as MenuSection), [items]);
 
   return (
     <FocusScope>

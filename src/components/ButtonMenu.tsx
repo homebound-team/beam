@@ -16,10 +16,12 @@ interface ButtonMenuProps extends Pick<OverlayTriggerProps, "trigger" | "placeme
   persistentItems?: MenuItem[];
   // for storybook purposes
   defaultOpen?: boolean;
+  /** Whether to display the contrast variant */
+  contrast?: boolean;
 }
 
 export function ButtonMenu(props: ButtonMenuProps) {
-  const { defaultOpen, disabled, items, persistentItems, trigger } = props;
+  const { defaultOpen, disabled, items, persistentItems, trigger, contrast } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -35,6 +37,7 @@ export function ButtonMenu(props: ButtonMenuProps) {
         onClose={() => state.close()}
         items={items}
         persistentItems={persistentItems}
+        contrast={contrast}
         {...tid}
       />
     </OverlayTrigger>
@@ -47,6 +50,8 @@ type MenuItemBase = {
   onClick: string | VoidFunction;
   disabled?: boolean;
   destructive?: boolean;
+  contrast?: boolean;
+  active?: boolean;
 };
 
 export type IconMenuItemType = MenuItemBase & {
