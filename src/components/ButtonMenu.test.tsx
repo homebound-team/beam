@@ -79,6 +79,17 @@ describe("ButtonMenu", () => {
     expect(r.enabled_0()).not.toBeDisabled();
     expect(r.enabled_1()).not.toBeDisabled();
   });
+
+  it("can open a Contextual modal", async () => {
+    // Given a Button Menu with a ContextualModal
+    const r = await render(<TestButtonMenuContextualModal />);
+
+    // When opening the menu
+    click(r.menuTrigger);
+    // Then expect Contextual Modal title and content to be rendered
+    expect(r.title).toBeTruthy();
+    expect(r.content).toBeTruthy();
+  });
 });
 
 function TestButtonMenu({ empty = false, ...others }: { empty?: boolean }) {
@@ -111,6 +122,14 @@ function TestButtonMenu({ empty = false, ...others }: { empty?: boolean }) {
         <Button label="Load" onClick={() => setLoaded(true)} />
       </div>
       <ButtonMenu trigger={{ label: "Menu trigger" }} items={loaded ? menuItems : []} {...others} />
+    </>
+  );
+}
+
+function TestButtonMenuContextualModal() {
+  return (
+    <>
+      <ButtonMenu trigger={{ label: "Menu trigger" }} content={"Lorum Ipsum"} title={"Modal Title"} />
     </>
   );
 }

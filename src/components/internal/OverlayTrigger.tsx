@@ -11,6 +11,7 @@ import { Popover } from "src/components/internal";
 import { Css } from "src/Css";
 import { noop, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { ButtonMenuProps } from "../ButtonMenu";
 
 interface TextButtonTriggerProps extends Pick<ButtonProps, "label" | "variant" | "size" | "icon"> {}
 interface IconButtonTriggerProps extends Pick<IconButtonProps, "icon" | "color" | "compact" | "contrast"> {}
@@ -109,4 +110,14 @@ export function isIconButton(
   trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps,
 ): trigger is IconButtonTriggerProps {
   return trigger && typeof trigger === "object" && "icon" in trigger;
+}
+
+export function isAvatarButton(
+  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps,
+): trigger is IconButtonTriggerProps {
+  return trigger && typeof trigger === "object" && "src" in trigger;
+}
+// adding typeguard for items in props to conditionally render inside ButtonMenu
+export function isItemsProps(props: ButtonMenuProps): props is ButtonMenuProps {
+  return "items" in props && typeof props === "object";
 }
