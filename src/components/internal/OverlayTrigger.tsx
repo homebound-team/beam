@@ -112,11 +112,6 @@ export function isIconButton(
   return trigger && typeof trigger === "object" && "icon" in trigger;
 }
 
-export function isAvatarButton(
-  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps,
-): trigger is IconButtonTriggerProps {
-  return trigger && typeof trigger === "object" && "src" in trigger;
-}
 // adding typeguard for items in props to conditionally render inside ButtonMenu
 export function isItemsProps(props: ButtonMenuProps): props is ButtonMenuProps {
   return "items" in props && typeof props === "object";
