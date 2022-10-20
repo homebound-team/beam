@@ -121,7 +121,7 @@ const sections: Sections = {
 
 const aliases: Record<string, string[]> = {};
 
-const breakpoints = { sm: 0, md: 600, lg: 960 };
+const breakpoints = { sm: 0, md: 600, lg: 1025 };
 
 export default defineConfig({
   outputPath: "./src/Css.ts",
