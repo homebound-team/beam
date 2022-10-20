@@ -87,8 +87,8 @@ describe("ButtonMenu", () => {
     // When opening the menu
     click(r.menuTrigger);
     // Then expect Contextual Modal title and content to be rendered
-    expect(r.title).toBeTruthy();
-    expect(r.content).toBeTruthy();
+    expect(r.popup_title).toBeTruthy();
+    expect(r.popup_content).toBeTruthy();
   });
 });
 
