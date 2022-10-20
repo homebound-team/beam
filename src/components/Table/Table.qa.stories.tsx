@@ -35,6 +35,7 @@ interface TableStoryProps extends GridTableProps<any, any, any> {
   grouped?: boolean;
   bordered?: boolean;
   allWhite?: boolean;
+  rowHover?: boolean;
   rowHeight?: "fixed" | "flexible";
   displayAs?: "default" | "virtual" | "table";
   totals?: boolean;
@@ -76,6 +77,7 @@ export default {
     grouped: false,
     bordered: false,
     allWhite: false,
+    rowHover: true,
     rowHeight: "flexible",
     displayAs: "default",
     totals: false,
@@ -85,6 +87,7 @@ export default {
     grouped: { name: "Group styles", control: { type: "boolean" }, if: { arg: "nestingDepth", neq: 1 } },
     bordered: { name: "Bordered", control: { type: "boolean" } },
     allWhite: { name: "All White", control: { type: "boolean" } },
+    rowHover: { name: "Row Hover styles", control: { type: "boolean" } },
     totals: { name: "Show Totals row", control: { type: "boolean" } },
     rowHeight: { name: "Row Height", control: { type: "select", options: ["flexible", "fixed"] } },
     displayAs: {
@@ -107,7 +110,7 @@ type BeamData = {
 type BeamRow = SimpleHeaderAndData<BeamData>;
 
 export function Table(props: TableStoryProps) {
-  const { nestingDepth, allWhite, grouped, rowHeight, bordered, displayAs, totals } = props;
+  const { nestingDepth, allWhite, grouped, rowHeight, bordered, displayAs, totals, rowHover } = props;
   const [filter, setFilter] = useState<string>();
 
   const [rows, columns] = useMemo(
@@ -141,6 +144,7 @@ export function Table(props: TableStoryProps) {
             ...(nestingDepth && nestingDepth > 1 ? { grouped } : {}),
             rowHeight,
             bordered,
+            rowHover,
           }}
           sorting={{ on: "client" }}
           columns={columns}

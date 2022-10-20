@@ -262,6 +262,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             getCount,
             api,
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
+            omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
             ...sortProps,
           }}
         />
@@ -288,7 +289,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     }
 
     function visitRows(rows: ParentChildrenTuple<R>[], level: number, visible: boolean): void {
-      const length = rows.length;
       rows.forEach((row, i) => {
         if (row[0].kind === "header") {
           headerRows.push([row[0], makeRowComponent(row[0], level)]);

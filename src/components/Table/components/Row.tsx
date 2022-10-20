@@ -43,6 +43,7 @@ interface RowProps<R extends Kinded, S> {
   getCount: (id: string) => object;
   api: GridTableApi<R>;
   cellHighlight: boolean;
+  omitRowHover: boolean;
 }
 
 // We extract Row to its own mini-component primarily so we can React.memo'ize it.
@@ -63,6 +64,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R, S>): ReactElement {
     getCount,
     api,
     cellHighlight,
+    omitRowHover,
     ...others
   } = props;
 
@@ -80,12 +82,15 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R, S>): ReactElement {
 
   const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
   const rowCss = {
+    // Optionally include the row hover styles, by default they should be turned on.
+    ...(!omitRowHover && {
+      // Even though backgroundColor is set on the cellCss, the hover target is the row.
+      "&:hover > *": Css.bgColor(style.rowHoverColor ?? Palette.LightBlue100).$,
+    }),
     // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `flexNone` to ensure they stay their defined widths
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.flexNone.$).$),
-    ...((rowStyle?.rowLink || rowStyle?.onClick) && {
-      // Even though backgroundColor is set on the cellCss, the hover target is the row.
-      "&:hover > *": Css.cursorPointer.bgColor(style.rowHoverColor ?? Palette.LightBlue100).$,
-    }),
+    // Apply `cursorPointer` to the row if it has a link or `onClick` value.
+    ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     // Maybe add the sticky header styles
     ...((isHeader || isTotals) && stickyHeader ? Css.sticky.topPx(stickyOffset).z2.$ : undefined),

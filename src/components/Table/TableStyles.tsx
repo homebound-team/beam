@@ -54,6 +54,7 @@ export interface GridStyle {
   activeBgColor?: Palette;
 }
 
+// If adding a new `GridStyleDef`, ensure if it added to the `defKeys` in the `resolveStyles` function below
 export interface GridStyleDef {
   inlineEditing?: boolean;
   grouped?: boolean;
@@ -62,6 +63,7 @@ export interface GridStyleDef {
   cellHighlight?: boolean;
   allWhite?: boolean;
   bordered?: boolean;
+  rowHover?: boolean;
 }
 
 // Returns a "blessed" style of GridTable
@@ -75,6 +77,7 @@ function memoizedTableStyles() {
       cellHighlight = false,
       allWhite = false,
       bordered = false,
+      rowHover = true,
     } = props;
 
     const key = safeKeys(props)
@@ -127,6 +130,7 @@ function memoizedTableStyles() {
         }),
         presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
         levels: grouped ? groupedLevels : defaultLevels,
+        rowHoverColor: Palette.LightBlue100,
       };
     }
 
@@ -217,6 +221,7 @@ export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
     "cellHighlight",
     "allWhite",
     "bordered",
+    "rowHover",
   ];
   const keys = safeKeys(style);
   if (keys.length === 0 || keys.some((k) => defKeys.includes(k as keyof GridStyleDef))) {
