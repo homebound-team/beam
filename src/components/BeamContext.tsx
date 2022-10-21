@@ -8,7 +8,7 @@ import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
 import { CanCloseCheck, CheckFn } from "src/types";
 import { EmptyRef } from "src/utils/index";
-import { AlertBanner, AlertBannerProps } from "./AlertBanner";
+import { AlertBannerProvider } from "./AlertBanner/AlertBannerContext";
 
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */
 export interface BeamContextState {
