@@ -28,7 +28,7 @@ export function useSetupColumnSizes(
   style: GridStyle,
   columns: GridColumn<any>[],
   resizeRef: MutableRefObject<HTMLElement | null>,
-): string[] {
+): [string[], (kay: number, widthChange?: number) => void] {
   // Calculate the column sizes immediately rather than via the `debounce` method.
   // We do this for Storybook integrations that may use MockDate. MockDate changes the behavior of `new Date()`,
   // which is used internally by `useDebounce`, so the frozen clock means the callback is never called.
@@ -70,5 +70,20 @@ export function useSetupColumnSizes(
 
   useResizeObserver({ ref: resizeRef, onResize });
 
-  return columnSizes;
+  const adjustColWidths = useCallback(
+    (resizeColumnIndex: number, widthChange?: number) => {
+      if (resizeColumnIndex > -1 && widthChange) {
+        const width = resizeRef.current?.clientWidth;
+        const newColumns = columns;
+        // TODO: use regExp
+        const newColumnWidth =
+          Number(columnSizes[resizeColumnIndex].replace("(", "").replace(")", "").slice(0, -2)) + widthChange;
+        newColumns[resizeColumnIndex].w = newColumnWidth + "px";
+        setColumnSizes(calcColumnSizes(newColumns, width, style.minWidthPx));
+      }
+    },
+    [columns, columnSizes, style.minWidthPx],
+  );
+
+  return [columnSizes, adjustColWidths];
 }

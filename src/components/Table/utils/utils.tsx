@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
@@ -7,6 +7,7 @@ import { GridStyle, RowStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumn, Kinded, RenderAs } from "src/components/Table/types";
 import { Css, Properties } from "src/Css";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
+import { Icon } from "../../Icon";
 
 /** If a column def return just string text for a given row, apply some default styling. */
 export function toContent(
@@ -59,6 +60,35 @@ export function toContent(
     return style.emptyCell;
   }
   return content;
+}
+
+export function ColumnResizeHandle(onResizeThisColumn: Function): ReactNode {
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragging, setDragging] = useState(false);
+
+  return (
+    <div
+      css={{ ...Css.df.asStretch.$, cursor: "grab" }}
+      onDragStart={(e) => {
+        // Your clientX is relevant to pointer position when starting
+        setDragging(true);
+        setDragStartX(e.clientX);
+      }}
+      onDragEnd={(e) => {
+        onResizeThisColumn(e.clientX - dragStartX);
+        setDragStartX(0);
+        setDragging(false);
+      }}
+      draggable
+    >
+      <Icon icon={"list"} xss={{ transform: "rotate(90deg)" }} />
+      {dragging && (
+        <span css={{ ...Css.bgGreen700.position("relative").leftPx(12).$ }}>
+          <span css={{ ...Css.position("absolute").z(99).vh100.bgGray900.wPx(1).$ }} />
+        </span>
+      )}
+    </div>
+  );
 }
 
 export function isGridCellContent(content: ReactNode | GridCellContent): content is GridCellContent {

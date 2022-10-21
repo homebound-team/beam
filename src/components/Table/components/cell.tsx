@@ -7,6 +7,7 @@ import { RowStyle, tableRowStyles } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumn, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/utils/GridSortContext";
 import { Css, Properties, Typography } from "src/Css";
+import { ColumnResizeHandle } from "../utils/utils";
 
 /**
  * Allows a cell to be more than just a RectNode, i.e. declare its alignment or
@@ -63,8 +64,9 @@ export const headerRenderFn: (
   sortState: SortState<any> | undefined,
   setSortKey: Function | undefined,
   as: RenderAs,
+  columnResize: Function,
 ) => RenderCellFn<any> =
-  (columns, column, sortState, setSortKey, as) =>
+  (columns, column, sortState, setSortKey, as, columnResize) =>
   (key, css, content, row, rowStyle, classNames: string | undefined) => {
     const [currentKey, direction] = sortState || [];
     // If server-side sorting, use the user's key for this column; client-side sorting, use the index.
@@ -78,6 +80,8 @@ export const headerRenderFn: (
       <GridSortContext.Provider key={key} value={context}>
         <Cell css={{ ...css, ...tableRowStyles(as, column) }} className={classNames}>
           {content}
+          {/* Handle not floating right */}
+          {ColumnResizeHandle(columnResize)}
         </Cell>
       </GridSortContext.Provider>
     );

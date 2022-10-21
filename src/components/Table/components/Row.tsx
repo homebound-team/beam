@@ -44,6 +44,8 @@ interface RowProps<R extends Kinded, S> {
   api: GridTableApi<R>;
   cellHighlight: boolean;
   omitRowHover: boolean;
+  // TODO: Naming
+  adjustColWidths: (e?: any, theChange?: number) => void;
 }
 
 // We extract Row to its own mini-component primarily so we can React.memo'ize it.
@@ -65,6 +67,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R, S>): ReactElement {
     api,
     cellHighlight,
     omitRowHover,
+    adjustColWidths,
     ...others
   } = props;
 
@@ -103,6 +106,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R, S>): ReactElement {
   let currentColspan = 1;
 
   let firstContentColumnStylesApplied = false;
+
+  function onColumnResize(e: any) {
+    adjustColWidths(e.columnIndex, e.widthChange);
+  }
 
   return (
     <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
@@ -211,7 +218,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R, S>): ReactElement {
           (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
             ? rowLinkRenderFn(as)
             : isHeader
-            ? headerRenderFn(columns, column, sortState, setSortKey, as)
+            ? headerRenderFn(columns, column, sortState, setSortKey, as, (widthChange: number) =>
+                onColumnResize({ columnIndex, widthChange }),
+              )
             : rowStyle?.onClick && wrapAction
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);

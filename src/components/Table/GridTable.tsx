@@ -217,7 +217,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // here instead.
   const { getCount } = useRenderCount();
 
-  const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef);
+  const [columnSizes, adjustColWidths] = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef);
 
   // Make a single copy of our current collapsed state, so we'll have a single observer.
   const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
@@ -263,6 +263,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             api,
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
+            adjustColWidths,
             ...sortProps,
           }}
         />
