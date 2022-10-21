@@ -5,6 +5,7 @@ import { Item, Section, useTreeData, useTreeState } from "react-stately";
 import { MenuItem, MenuSection } from "src/components";
 import { MenuSectionImpl } from "src/components/internal/MenuSection";
 import { Css } from "src/Css";
+import { TextField } from "src/inputs";
 import { useTestIds } from "src/utils";
 
 interface MenuProps<T> {
@@ -49,7 +50,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
       <ul
         css={{
           // Using `max-height: inherit` allows us to take advantage of the height set on the overlay container, which updates based on the available space for the overlay within the viewport
-          ...Css.df.fdc.myPx(4).bgWhite.outline0.br4.bshBasic.listReset.maxh("inherit").overflowAuto.$,
+          ...Css.df.fdc.bgWhite.outline0.brb4.bshBasic.listReset.maxh("inherit").overflowAuto.$,
           "&:hover, &:focus": Css.bshHover.$,
         }}
         {...menuProps}
