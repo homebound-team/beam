@@ -1,0 +1,27 @@
+import { Meta, Canvas, Story, Props } from "@storybook/addon-docs";
+import { AlertBannerNotice } from "./AlertBannerNotice";
+
+<Meta
+  title="Catalog/AlertBannerNotice"
+  component={AlertBannerNotice}
+  args={{ message: "Error", type: "error" }}
+/>
+
+export const Template = (args) => {
+  const onClose = () => {};
+  return <AlertBannerNotice onClose={onClose} {...args} />;
+};
+
+# AlertBannerNotice
+
+#### AlertBanner component for showing alerts.
+
+# Example
+
+<Canvas>
+  <Story name="AlertBannerNotice">{Template.bind({})}</Story>
+</Canvas>
+
+# API Reference
+
+<Props story={"AlertBannerNotice"} />

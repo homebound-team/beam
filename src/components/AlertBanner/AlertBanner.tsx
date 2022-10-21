@@ -1,4 +1,4 @@
-import { useTestIds } from "../../utils";
+import { useTestIds } from "src/utils";
 import { AlertBannerNotice, AlertBannerNoticeProps } from "./AlertBannerNotice";
 
 export interface AlertBannerProps {
