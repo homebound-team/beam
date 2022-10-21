@@ -5,7 +5,7 @@ export * from "src/components/ToggleChip";
 export * from "src/components/ToggleChips";
 export * from "./Accordion";
 export * from "./AccordionList";
-export * from "./Alert";
+export * from "./AlertBanner";
 export * from "./AutoSaveIndicator";
 export * from "./Avatar";
 export * from "./AvatarButton";
