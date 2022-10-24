@@ -11,7 +11,7 @@ import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
-import { RowStateContext, SortOn, SortState } from "src/components/Table/utils/TableState";
+import { RowStateContext, SortOn } from "src/components/Table/utils/TableState";
 import {
   applyRowFn,
   getAlignment,
@@ -35,8 +35,6 @@ interface RowProps<R extends Kinded> {
   stickyHeader: boolean;
   stickyOffset: number;
   sortOn: SortOn;
-  sortState?: SortState;
-  setSortKey?: (value: string) => void;
   columnSizes: string[];
   level: number;
   getCount: (id: string) => object;
@@ -56,8 +54,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     stickyHeader,
     stickyOffset,
     sortOn,
-    sortState,
-    setSortKey,
     columnSizes,
     level,
     getCount,
@@ -210,7 +206,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
             ? rowLinkRenderFn(as)
             : isHeader
-            ? headerRenderFn(columns, column, sortState, setSortKey, as)
+            ? headerRenderFn(columns, column, as)
             : rowStyle?.onClick && wrapAction
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);

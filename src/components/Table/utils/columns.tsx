@@ -151,6 +151,8 @@ export function calcColumnSizes(
 
 /** Assign column ids if missing */
 export function assignDefaultColumnIds<T extends Kinded>(columns: GridColumn<T>[]): GridColumnWithId<T>[] {
+  // Note: we are not _always_ spreading the `c` property as we need to be able to return the whole proxy object that
+  // exists as part of `selectColumn` and `collapseColumn`.
   return columns.map((c, idx) => (c.id ? (c as GridColumnWithId<T>) : { ...c, id: c.id ?? generateColumnId(idx) }));
 }
 

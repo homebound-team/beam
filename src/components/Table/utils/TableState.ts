@@ -41,7 +41,7 @@ export class TableState {
   // Keep a local copy of the `sortConfig` to ensure we only execute `initSortState` once, and determines if we should execute `setSortKey`
   public sortConfig: GridSortConfig | undefined;
   // Provide some defaults to get the sort state to properly work.
-  public sort: SortState | {} = {};
+  public sort: SortState = {};
   // Keep track of the `initialSortState` so we can (1) revert back to it, and (2) properly derive next sort state
   private initialSortState: SortState | undefined;
   private onSort: ((orderBy: any | undefined, direction: Direction | undefined) => void) | undefined;
@@ -108,7 +108,10 @@ export class TableState {
       if (sortConfig?.on === "client") {
         const { initial, primary } = sortConfig;
         const primaryKey: string | undefined = primary?.[0];
-        const persistentSortData = { persistent: { columnId: primaryKey, direction: primary?.[1] } };
+        const persistentSortData = primaryKey
+          ? { persistent: { columnId: primaryKey, direction: primary?.[1] ?? ASC } }
+          : {};
+
         if (initial === undefined && "initial" in sortConfig) {
           // if explicitly set to `undefined`, then do not sort
           this.initialSortState = undefined;
@@ -127,7 +130,11 @@ export class TableState {
           : undefined;
       }
 
-      this.sort = this.initialSortState ?? {};
+      // Only change `this.sort` if `initialSortState` is defined.
+      if (this.initialSortState) {
+        this.sort = this.initialSortState;
+      }
+
       this.onSort = sortConfig?.on === "server" ? sortConfig.onSort : undefined;
     }
   }
@@ -404,16 +411,15 @@ function flattenRows(rows: GridDataRow<any>[]): GridDataRow<any>[] {
 
 // Exported for testing purposes
 export function deriveSortState(
-  currentSortState: SortState | {},
+  currentSortState: SortState,
   clickedKey: string,
   initialSortState: SortState | undefined,
 ): SortState | undefined {
   // If the current sort state is not defined then sort ASC on the clicked key.
-  if (!isSortState(currentSortState)) {
+  if (!currentSortState.current) {
     return { ...initialSortState, current: { columnId: clickedKey, direction: ASC } };
   }
 
-  // const { sortedColumnId: currentKey, direction: currentDirection } = currentSortState;
   const {
     current: { columnId: currentKey, direction: currentDirection },
   } = currentSortState;
@@ -425,7 +431,7 @@ export function deriveSortState(
 
   // If there is an `initialSortState` and we're clicking on that same key, then flip the sort.
   // Handles cases where the initial sort is DESC so that we can allow for DESC to ASC sorting.
-  if (initialSortState && initialSortState.current.columnId === clickedKey) {
+  if (initialSortState && initialSortState.current?.columnId === clickedKey) {
     return {
       ...initialSortState,
       current: { columnId: clickedKey, direction: (currentDirection as any as string) === ASC ? DESC : ASC },
@@ -443,12 +449,12 @@ export function deriveSortState(
 }
 
 type ColumnSort = {
-  columnId: string | undefined;
-  direction: Direction | undefined;
+  columnId: string;
+  direction: Direction;
 };
 
 export type SortState = {
-  current: ColumnSort;
+  current?: ColumnSort;
   persistent?: ColumnSort;
 };
 

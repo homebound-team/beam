@@ -5,7 +5,7 @@ import { GridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyle, tableRowStyles } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumn, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/utils/GridSortContext";
-import { RowStateContext, SortState } from "src/components/Table/utils/TableState";
+import { RowStateContext } from "src/components/Table/utils/TableState";
 import { Css, Properties, Typography } from "src/Css";
 
 /**
@@ -57,17 +57,11 @@ export const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
   };
 
 /** Sets up the `GridContext` so that header cells can access the current sort settings. */
-export const headerRenderFn: (
-  columns: GridColumn<any>[],
-  column: GridColumn<any>,
-  sortState: SortState | undefined,
-  setSortKey: Function | undefined,
-  as: RenderAs,
-) => RenderCellFn<any> =
-  (columns, column, sortState, setSortKey, as) =>
-  (key, css, content, row, rowStyle, classNames: string | undefined) => {
+export const headerRenderFn: (columns: GridColumn<any>[], column: GridColumn<any>, as: RenderAs) => RenderCellFn<any> =
+  (columns, column, as) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
     const { tableState } = useContext(RowStateContext);
     const { current } = tableState.sortState ?? {};
+
     // If server-side sorting, use the user's key for this column; client-side sorting, use the index.
     const ourSortKey = column.serverSideSortKey || (column.id ?? `${columns.indexOf(column)}`);
     const context: GridSortContextProps = {

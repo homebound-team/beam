@@ -1,4 +1,5 @@
 import memoizeOne from "memoize-one";
+import { toJS } from "mobx";
 import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef } from "react";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
@@ -196,15 +197,21 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     api.init(persistCollapse, virtuosoRef, rows);
     api.setActiveRowId(activeRowId);
     api.setActiveCellId(activeCellId);
-    api.tableState.initSortState(props.sorting, columns);
     return api;
   }, [props.api]);
 
   const style = resolveStyles(maybeStyle);
   const { tableState } = api;
-  const { sortConfig, setSortKey } = tableState;
-  const { on: sortOn } = sortConfig ?? ({} as GridSortConfig);
-  const caseSensitive = sortConfig?.on === "client" ? !!sortConfig.caseSensitive : false;
+
+  // Initialize the sort state. This will only happen on the first render.
+  // Once the `TableState.sort` is defined, it will not re-initialize.
+  tableState.initSortState(props.sorting, columns);
+
+  const { setSortKey } = tableState;
+  const [sortOn, caseSensitive] = useComputed(() => {
+    const { sortConfig } = tableState;
+    return [sortConfig?.on, sortConfig?.on === "client" ? !!sortConfig.caseSensitive : false];
+  }, [tableState]);
 
   tableState.setRows(rows);
 
@@ -226,7 +233,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
 
   // Make a single copy of our current collapsed state, so we'll have a single observer.
   const collapsedIds = useComputed(() => tableState.collapsedIds, [tableState]);
-  const sortState = useComputed(() => tableState.sortState, [tableState]);
+  const sortState = useComputed(() => toJS(tableState.sortState), [tableState]);
 
   const maybeSorted = useMemo(() => {
     if (sortOn === "client" && sortState) {
@@ -246,10 +253,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     string[],
   ] = useMemo(() => {
     function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
-      // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
-      // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
-      const sortProps = row.kind === "header" ? { sortOn, sortState, setSortKey } : { sortOn };
-
       return (
         <Row
           key={`${row.kind}-${row.id}`}
@@ -268,7 +271,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
             api,
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
-            ...sortProps,
+            sortOn,
           }}
         />
       );
