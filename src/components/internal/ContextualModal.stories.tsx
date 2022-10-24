@@ -13,5 +13,5 @@ export function BasicContextualModal() {
 }
 
 export function BasicContextualModalWithTitle() {
-  return <ContextualModal content={"Hello"} title={"Modal title"} />;
+  return <ContextualModal content="Hello" title="Modal title" />;
 }

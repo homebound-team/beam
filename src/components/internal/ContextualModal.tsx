@@ -13,7 +13,7 @@ export function ContextualModal(props: ContextualModalProps) {
   const tid = useTestIds(props, "popup");
   return (
     <FocusScope restoreFocus autoFocus>
-      <div css={Css.p3.df.fdc.myPx(4).gap3.bgWhite.bshModal.br4.maxh("inherit").overflowAuto.$}>
+      <div css={Css.p3.df.fdc.gap3.bgWhite.bshModal.br4.maxh("inherit").overflowAuto.$}>
         {title && (
           <div css={Css.lg.tc.$} {...tid.title}>
             {title}
