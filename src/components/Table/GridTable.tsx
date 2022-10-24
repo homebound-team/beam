@@ -190,6 +190,15 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // Use this ref to watch for changes in the GridTable's container and resize columns accordingly.
   const resizeRef = useRef<HTMLDivElement>(null);
 
+  const [sortState, setSortKey, sortOn, caseSensitive] = useSortState<R, S>(columns, props.sorting);
+  const maybeSorted = useMemo(() => {
+    if (sortOn === "client" && sortState) {
+      // If using client-side sort, the sortState use S = number
+      return sortRows(columns, rows, sortState as any as SortState<number>, caseSensitive);
+    }
+    return rows;
+  }, [columns, rows, sortOn, sortState, caseSensitive]);
+
   const api = useMemo<GridTableApiImpl<R>>(() => {
     const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
     api.init(persistCollapse, virtuosoRef, rows);
@@ -221,15 +230,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
 
   // Make a single copy of our current collapsed state, so we'll have a single observer.
   const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
-
-  const [sortState, setSortKey, sortOn, caseSensitive] = useSortState<R, S>(columns, props.sorting);
-  const maybeSorted = useMemo(() => {
-    if (sortOn === "client" && sortState) {
-      // If using client-side sort, the sortState use S = number
-      return sortRows(columns, rows, sortState as any as SortState<number>, caseSensitive);
-    }
-    return rows;
-  }, [columns, rows, sortOn, sortState, caseSensitive]);
 
   const hasTotalsRow = rows.some((row) => row.id === "totals");
 
