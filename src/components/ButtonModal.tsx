@@ -10,7 +10,7 @@ import {
 import { useTestIds } from "src/utils";
 import { ContextualModal } from "./internal/ContextualModal";
 
-export interface WithContextualModalProps
+export interface ContextualModalProps
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
   content: ReactNode;
   title?: string;
@@ -18,12 +18,11 @@ export interface WithContextualModalProps
   defaultOpen?: boolean;
 }
 
-export function ButtonModal(props: WithContextualModalProps) {
+export function ButtonModal(props: ContextualModalProps) {
   const { defaultOpen, trigger, disabled } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
-  console.log(trigger);
   const tid = useTestIds(
     props,
     isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,

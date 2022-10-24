@@ -1,9 +1,9 @@
 import { FocusScope } from "react-aria";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
-import { WithContextualModalProps } from "../ButtonModal";
+import { ContextualModalProps } from "../ButtonModal";
 
-export function ContextualModal(props: WithContextualModalProps) {
+export function ContextualModal(props: ContextualModalProps) {
   const { content, title } = props;
   const tid = useTestIds(props, "popup");
   return (

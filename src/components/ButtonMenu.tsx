@@ -11,7 +11,7 @@ import {
 } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
 
-export interface ButtonMenuProps extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
+interface ButtonMenuProps extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
   items: MenuItem[];
   persistentItems?: MenuItem[];
   // for storybook purposes
@@ -19,7 +19,6 @@ export interface ButtonMenuProps extends Pick<OverlayTriggerProps, "trigger" | "
 }
 
 export function ButtonMenu(props: ButtonMenuProps) {
-  // only destructing like properties
   const { defaultOpen, disabled, items, persistentItems, trigger } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
