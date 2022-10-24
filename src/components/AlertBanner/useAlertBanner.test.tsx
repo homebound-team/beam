@@ -1,5 +1,3 @@
-// can open and close alert banner
-
 import { click, render } from "src/utils/rtl";
 import { Button } from "../Button";
 import { useAlertBanner } from "./useAlertBanner";
@@ -20,3 +18,6 @@ function TestAlertBannerComponent() {
   const onClose = jest.fn();
   return <Button label="alert" onClick={() => showAlert({ message: "Test Alert", type: "error", onClose })} />;
 }
+
+// need to figure out how to close in storybook
+// need to figure out black icon in info banner
