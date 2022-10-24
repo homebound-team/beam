@@ -1,7 +1,12 @@
+import { ReactNode } from "react";
 import { FocusScope } from "react-aria";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
-import { ContextualModalProps } from "../ButtonModal";
+
+export interface ContextualModalProps {
+  content: ReactNode;
+  title?: string;
+}
 
 export function ContextualModal(props: ContextualModalProps) {
   const { content, title } = props;
