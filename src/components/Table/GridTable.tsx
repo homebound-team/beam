@@ -207,7 +207,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
   // Once the `TableState.sort` is defined, it will not re-initialize.
   tableState.initSortState(props.sorting, columns);
 
-  const { setSortKey } = tableState;
   const [sortOn, caseSensitive] = useComputed(() => {
     const { sortConfig } = tableState;
     return [sortConfig?.on, sortConfig?.on === "client" ? !!sortConfig.caseSensitive : false];
@@ -326,8 +325,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     style,
     rowStyles,
     sortOn,
-    setSortKey,
-    sortState,
     stickyHeader,
     stickyOffset,
     columnSizes,

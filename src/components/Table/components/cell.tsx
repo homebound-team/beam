@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import { navLink } from "src/components/CssReset";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyle, tableRowStyles } from "src/components/Table/TableStyles";
-import { GridCellAlignment, GridColumn, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
+import { GridCellAlignment, GridColumn, GridColumnWithId, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
 import { GridSortContext, GridSortContextProps } from "src/components/Table/utils/GridSortContext";
 import { RowStateContext } from "src/components/Table/utils/TableState";
 import { Css, Properties, Typography } from "src/Css";
+import { useComputed } from "src/hooks";
 
 /**
  * Allows a cell to be more than just a RectNode, i.e. declare its alignment or
@@ -57,26 +58,29 @@ export const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
   };
 
 /** Sets up the `GridContext` so that header cells can access the current sort settings. */
-export const headerRenderFn: (columns: GridColumn<any>[], column: GridColumn<any>, as: RenderAs) => RenderCellFn<any> =
-  (columns, column, as) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
-    const { tableState } = useContext(RowStateContext);
-    const { current } = tableState.sortState ?? {};
+export const headerRenderFn: (
+  columns: GridColumn<any>[],
+  column: GridColumnWithId<any>,
+  as: RenderAs,
+) => RenderCellFn<any> = (columns, column, as) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
+  const { tableState } = useContext(RowStateContext);
+  const current = useComputed(() => tableState.sortState?.current, [tableState]);
 
-    // If server-side sorting, use the user's key for this column; client-side sorting, use the index.
-    const ourSortKey = column.serverSideSortKey || (column.id ?? `${columns.indexOf(column)}`);
-    const context: GridSortContextProps = {
-      sorted: ourSortKey === current?.columnId ? current?.direction : undefined,
-      toggleSort: () => tableState.setSortKey(ourSortKey),
-    };
-    const Cell = as === "table" ? "th" : "div";
-    return (
-      <GridSortContext.Provider key={key} value={context}>
-        <Cell css={{ ...css, ...tableRowStyles(as, column) }} className={classNames}>
-          {content}
-        </Cell>
-      </GridSortContext.Provider>
-    );
+  // If server-side sorting, use the user's key for this column; client-side sorting, use the index.
+  const ourSortKey = column.serverSideSortKey || column.id;
+  const context: GridSortContextProps = {
+    sorted: ourSortKey === current?.columnId ? current?.direction : undefined,
+    toggleSort: () => tableState.setSortKey(ourSortKey),
   };
+  const Cell = as === "table" ? "th" : "div";
+  return (
+    <GridSortContext.Provider key={key} value={context}>
+      <Cell css={{ ...css, ...tableRowStyles(as, column) }} className={classNames}>
+        {content}
+      </Cell>
+    </GridSortContext.Provider>
+  );
+};
 
 /** Renders a cell element when a row link is in play. */
 export const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =

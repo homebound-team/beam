@@ -102,41 +102,43 @@ export class TableState {
   }
 
   initSortState(sortConfig: GridSortConfig | undefined, columns: GridColumnWithId<any>[]) {
-    if (!this.sortConfig) {
-      this.sortConfig = sortConfig;
+    if (this.sortConfig) {
+      return;
+    }
 
-      if (sortConfig?.on === "client") {
-        const { initial, primary } = sortConfig;
-        const primaryKey: string | undefined = primary?.[0];
-        const persistentSortData = primaryKey
-          ? { persistent: { columnId: primaryKey, direction: primary?.[1] ?? ASC } }
-          : {};
+    this.sortConfig = sortConfig;
 
-        if (initial === undefined && "initial" in sortConfig) {
-          // if explicitly set to `undefined`, then do not sort
-          this.initialSortState = undefined;
-        } else if (initial) {
-          this.initialSortState = { current: { columnId: initial[0], direction: initial[1] }, ...persistentSortData };
-        } else {
-          // If no explicit sortState, assume 1st column ascending
-          const firstSortableColumn = columns.find((c) => c.clientSideSort !== false)?.id;
-          this.initialSortState = firstSortableColumn
-            ? { current: { columnId: firstSortableColumn, direction: ASC }, ...persistentSortData }
-            : undefined;
-        }
+    if (sortConfig?.on === "client") {
+      const { initial, primary } = sortConfig;
+      const primaryKey: string | undefined = primary?.[0];
+      const persistentSortData = primaryKey
+        ? { persistent: { columnId: primaryKey, direction: primary?.[1] ?? ASC } }
+        : {};
+
+      if (initial === undefined && "initial" in sortConfig) {
+        // if explicitly set to `undefined`, then do not sort
+        this.initialSortState = undefined;
+      } else if (initial) {
+        this.initialSortState = { current: { columnId: initial[0], direction: initial[1] }, ...persistentSortData };
       } else {
-        this.initialSortState = sortConfig?.value
-          ? { current: { columnId: sortConfig?.value[0], direction: sortConfig?.value[1] } }
+        // If no explicit sortState, assume 1st column ascending
+        const firstSortableColumn = columns.find((c) => c.clientSideSort !== false)?.id;
+        this.initialSortState = firstSortableColumn
+          ? { current: { columnId: firstSortableColumn, direction: ASC }, ...persistentSortData }
           : undefined;
       }
-
-      // Only change `this.sort` if `initialSortState` is defined.
-      if (this.initialSortState) {
-        this.sort = this.initialSortState;
-      }
-
-      this.onSort = sortConfig?.on === "server" ? sortConfig.onSort : undefined;
+    } else {
+      this.initialSortState = sortConfig?.value
+        ? { current: { columnId: sortConfig?.value[0], direction: sortConfig?.value[1] } }
+        : undefined;
     }
+
+    // Only change `this.sort` if `initialSortState` is defined.
+    if (this.initialSortState) {
+      this.sort = this.initialSortState;
+    }
+
+    this.onSort = sortConfig?.on === "server" ? sortConfig.onSort : undefined;
   }
 
   setSortKey(clickedColumnId: string) {
@@ -153,7 +155,7 @@ export class TableState {
   }
 
   get sortState(): SortState | undefined {
-    return isSortState(this.sort) ? this.sort : undefined;
+    return this.sort.current ? this.sort : undefined;
   }
 
   // Updates the list of rows and regenerates the collapsedRows property if needed.
@@ -459,7 +461,3 @@ export type SortState = {
 };
 
 export type SortOn = "client" | "server" | undefined;
-
-function isSortState(maybeSortState: SortState | {}): maybeSortState is SortState {
-  return typeof maybeSortState === "object" && Object.keys(maybeSortState).length > 0;
-}
