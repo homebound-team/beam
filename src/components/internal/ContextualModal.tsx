@@ -1,7 +1,7 @@
 import { FocusScope } from "react-aria";
 import { Css } from "src/Css";
-import { useTestIds } from "../../utils";
-import { WithContextualModalProps } from "../ButtonMenu";
+import { useTestIds } from "src/utils";
+import { WithContextualModalProps } from "../ButtonModal";
 
 export function ContextualModal(props: WithContextualModalProps) {
   const { content, title } = props;
