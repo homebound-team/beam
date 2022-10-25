@@ -1,0 +1,18 @@
+import { ButtonModal } from "./ButtonModal";
+import { Meta, Canvas, Story, ArgsTable } from "@storybook/addon-docs";
+
+<Meta
+  title="Catalog/ButtonModal"
+  component={ButtonModal}
+  args={{ trigger: { label: "ButtonModal" }, content: "Lorum Ipsum", title: "Modal Title" }}
+/>
+
+export const Template = (args) => {
+  return <ButtonModal {...args} />;
+};
+
+# ButtonModal
+
+<Canvas>
+  <Story name="ButtonModal">{Template.bind({})}</Story>
+</Canvas>
