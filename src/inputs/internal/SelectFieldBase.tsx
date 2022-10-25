@@ -47,6 +47,7 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
   placeholder?: string;
   /** Only used for Single Select Fields. If set, prepends an option with a `undefined` value at the top of the list */
   unsetLabel?: string;
+  omitErrorMessage?: boolean;
 }
 
 /**

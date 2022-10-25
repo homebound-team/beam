@@ -45,6 +45,7 @@ export interface NumberFieldProps {
   /** Whether to show comma separation for group numbers.
    * @default true */
   useGrouping?: boolean;
+  omitErrorMessage?: boolean;
 }
 
 export function NumberField(props: NumberFieldProps) {
