@@ -75,10 +75,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   const revealOnRowHoverClass = "revealOnRowHover";
 
+  const showRowHoverColor = row.kind !== "totals" && row.kind !== "header" && !omitRowHover;
+
   const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
   const rowCss = {
     // Optionally include the row hover styles, by default they should be turned on.
-    ...(!omitRowHover && {
+    ...(showRowHoverColor && {
       // Even though backgroundColor is set on the cellCss, the hover target is the row.
       "&:hover > *": Css.bgColor(style.rowHoverColor ?? Palette.LightBlue100).$,
     }),
