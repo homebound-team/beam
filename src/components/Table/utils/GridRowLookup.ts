@@ -1,7 +1,13 @@
 import { MutableRefObject } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { DiscriminateUnion, GridColumn, Kinded, nonKindGridColumnKeys, RowTuple } from "src/components/Table/types";
+import {
+  DiscriminateUnion,
+  GridColumnWithId,
+  Kinded,
+  nonKindGridColumnKeys,
+  RowTuple,
+} from "src/components/Table/types";
 
 /**
  * Allows a caller to ask for the currently shown rows, given the current sorting/filtering.
@@ -32,7 +38,7 @@ interface NextPrev<R extends Kinded> {
 }
 
 export function createRowLookup<R extends Kinded>(
-  columns: GridColumn<R>[],
+  columns: GridColumnWithId<R>[],
   filteredRows: RowTuple<R>[],
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): GridRowLookup<R> {
@@ -78,7 +84,7 @@ export function createRowLookup<R extends Kinded>(
   };
 }
 
-export function getKinds<R extends Kinded>(columns: GridColumn<R>[]): R[] {
+export function getKinds<R extends Kinded>(columns: GridColumnWithId<R>[]): R[] {
   return Object.keys(columns.find((c) => !c.isAction) || {}).filter(
     (key) => !nonKindGridColumnKeys.includes(key),
   ) as any;

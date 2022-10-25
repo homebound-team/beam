@@ -3,10 +3,10 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { GridColumn, Kinded } from "src/components/Table/types";
 import { useSessionStorage } from "src/hooks/useSessionStorage";
 
-export function useColumns<R extends Kinded, S = {}>(
-  tableColumns: GridColumn<R, S>[],
+export function useColumns<R extends Kinded>(
+  tableColumns: GridColumn<R>[],
   maybeStorageKey?: string,
-): [GridColumn<R, S>[], Dispatch<SetStateAction<GridColumn<R, S>[]>>] {
+): [GridColumn<R>[], Dispatch<SetStateAction<GridColumn<R>[]>>] {
   const { selectedColumns, hideColumns } = tableColumns.reduce(
     (acc, column) => {
       // Only include options that can be hidden and have the `id` property defined.
@@ -29,9 +29,9 @@ export function useColumns<R extends Kinded, S = {}>(
 
   const storageKey = maybeStorageKey ?? camelCase(hideColumns.map((c) => c).join(""));
   const [storageNames, setStorageNames] = useSessionStorage(storageKey, selectedColumns);
-  const storageColumns: GridColumn<R, S>[] =
+  const storageColumns: GridColumn<R>[] =
     storageNames && storageNames.map((sc) => tableColumns.find((column) => column.id === sc)!);
-  const [columns, setColumns] = useState<GridColumn<R, S>[]>(storageColumns);
+  const [columns, setColumns] = useState<GridColumn<R>[]>(storageColumns);
 
   useEffect(() => {
     setStorageNames(columns.map((column) => column.id!));

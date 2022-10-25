@@ -29,7 +29,7 @@ import { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
 import { zeroTo } from "src/utils/sb";
 
-interface TableStoryProps extends GridTableProps<any, any, any> {
+interface TableStoryProps extends GridTableProps<any, any> {
   nestingDepth?: number;
   // Applies Group row styles
   grouped?: boolean;
@@ -161,7 +161,7 @@ export function Fixed() {
   return (
     <GridTable<BeamRow>
       style={{ rowHeight: "fixed" }}
-      sorting={{ on: "client", initial: [1, "ASC"] }}
+      sorting={{ on: "client", initial: ["c1", "ASC"] }}
       columns={beamStyleColumns()}
       rows={flatRows}
     />
@@ -172,7 +172,7 @@ export function Flexible() {
   return (
     <GridTable<BeamRow>
       style={{}}
-      sorting={{ on: "client", initial: [1, "ASC"] }}
+      sorting={{ on: "client", initial: ["c1", "ASC"] }}
       columns={beamStyleColumns()}
       rows={flatRows}
     />
@@ -232,7 +232,7 @@ export function Filterable() {
   console.log({ selectedIds });
 
   const [filter, setFilter] = useState<string>();
-  const sorting: GridSortConfig<{}> = useMemo(() => ({ on: "client" }), []);
+  const sorting: GridSortConfig = useMemo(() => ({ on: "client" }), []);
   return (
     <div css={Css.p1.$}>
       <div css={Css.df.gap2.aic.mb1.$}>
@@ -297,24 +297,27 @@ function beamNestedRows(levels: 1 | 2 | 3 = 1): GridDataRow<BeamNestedRow>[] {
     const parents = zeroTo(2 + (idx % 2)).map((pIdx) => {
       // Get a semi-random, but repeatable number of children
       const numChildren = (pIdx % 3) + pIdx + idx + 1;
-      const children = zeroTo(numChildren).map((cIdx) => ({
-        kind: "child" as const,
-        id: `gp:${idx + 1}_p${pIdx + 1}_c${cIdx + 1}`,
-        data: {
-          name: `${idx + 1}0${pIdx + 1}0.${cIdx + 1} - Project Item${
-            pIdx === 0 ? " with a longer name that will wrap" : ""
-          }`,
-          original: 1234_56,
-          changeOrders: 543_21,
-          reallocations: 568_56,
-          revised: undefined,
-          committed: 129_86,
-          difference: 1025_23,
-          actuals: 1108_18,
-          projected: 421_21,
-          costToComplete: 1129_85,
-        },
-      }));
+      const children = zeroTo(numChildren).map((cIdx) => {
+        const valueMultiplier = cIdx + pIdx + idx + 1;
+        return {
+          kind: "child" as const,
+          id: `gp:${idx + 1}_p${pIdx + 1}_c${cIdx + 1}`,
+          data: {
+            name: `${idx + 1}0${pIdx + 1}0.${cIdx + 1} - Project Item${
+              pIdx === 0 ? " with a longer name that will wrap" : ""
+            }`,
+            original: 1234_56 * valueMultiplier,
+            changeOrders: 543_21 * valueMultiplier,
+            reallocations: 568_56 * valueMultiplier,
+            revised: undefined,
+            committed: 129_86 * valueMultiplier,
+            difference: 1025_23 * valueMultiplier,
+            actuals: 1108_18 * valueMultiplier,
+            projected: 421_21 * valueMultiplier,
+            costToComplete: 1129_85 * valueMultiplier,
+          },
+        };
+      });
 
       return {
         kind: "parent" as const,

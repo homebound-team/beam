@@ -2,7 +2,7 @@ import { MutableRefObject, useMemo } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { DiscriminateUnion, Kinded } from "src/components/Table/types";
-import { RowState } from "src/components/Table/utils/RowState";
+import { TableState } from "src/components/Table/utils/TableState";
 import { visit } from "src/components/Table/utils/visitor";
 
 /**
@@ -53,7 +53,7 @@ export type GridTableApi<R extends Kinded> = {
 // Using `FooImpl`to keep the public GridTableApi definition separate.
 export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   // This is public to GridTable but not exported outside of Beam
-  readonly rowState: RowState = new RowState();
+  readonly tableState: TableState = new TableState();
   virtuosoRef: MutableRefObject<VirtuosoHandle | null> = { current: null };
 
   /** Called once by the GridTable when it takes ownership of this api instance. */
@@ -62,8 +62,8 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
     rows: GridDataRow<R>[],
   ) {
-    this.rowState.loadCollapse(persistCollapse, rows);
-    this.rowState.loadSelected(rows);
+    this.tableState.loadCollapse(persistCollapse, rows);
+    this.tableState.loadSelected(rows);
     this.virtuosoRef = virtuosoRef;
   }
 
@@ -77,9 +77,9 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   // The any is not great, but getting the overload to handle the optional kind is annoying
   public getSelectedRows(kind?: string): any {
-    const ids = this.rowState.selectedIds;
+    const ids = this.tableState.selectedIds;
     const selected: GridDataRow<R>[] = [];
-    visit(this.rowState.rows, (row) => {
+    visit(this.tableState.rows, (row) => {
       if (row.selectable !== false && ids.includes(row.id) && (!kind || row.kind === kind)) {
         selected.push(row as any);
       }
@@ -88,18 +88,18 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   }
 
   public clearSelections(id?: string) {
-    this.rowState.selectRow("header", false);
+    this.tableState.selectRow("header", false);
   }
 
   public setActiveRowId(id: string | undefined) {
-    this.rowState.activeRowId = id;
+    this.tableState.activeRowId = id;
   }
 
   public setActiveCellId(id: string | undefined) {
-    this.rowState.activeCellId = id;
+    this.tableState.activeCellId = id;
   }
 
   public selectRow(id: string, selected: boolean = true) {
-    this.rowState.selectRow(id, selected);
+    this.tableState.selectRow(id, selected);
   }
 }

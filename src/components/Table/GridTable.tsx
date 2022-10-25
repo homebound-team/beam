@@ -1,23 +1,25 @@
 import memoizeOne from "memoize-one";
+import { toJS } from "mobx";
 import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef } from "react";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
-import { SortState, useSortState } from "src/components/Table/hooks/useSortState";
 import { defaultStyle, GridStyle, GridStyleDef, resolveStyles, RowStyles } from "src/components/Table/TableStyles";
 import {
   Direction,
   GridColumn,
+  GridColumnWithId,
   GridTableXss,
   Kinded,
   ParentChildrenTuple,
   RenderAs,
   RowTuple,
 } from "src/components/Table/types";
+import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { createRowLookup, GridRowLookup } from "src/components/Table/utils/GridRowLookup";
-import { RowStateContext } from "src/components/Table/utils/RowState";
 import { sortRows } from "src/components/Table/utils/sortRows";
+import { RowStateContext } from "src/components/Table/utils/TableState";
 import { applyRowFn, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -63,24 +65,24 @@ export function setGridTableDefaults(opts: Partial<GridTableDefaults>): void {
  * Note that we don't support multiple sort criteria, i.e. sort by column1 desc _and then_
  * column2 asc.
  */
-export type GridSortConfig<S> =
+export type GridSortConfig =
   | {
       on: "client";
       /** The optional initial column (index in columns) and direction to sort. */
-      initial?: [S | GridColumn<any>, Direction] | undefined;
+      initial?: [string, Direction] | undefined;
       caseSensitive?: boolean;
       /** The optional primary sort column, this will be sorted first above/below table sort  */
-      primary?: [S | GridColumn<any>, Direction] | undefined;
+      primary?: [string, Direction] | undefined;
     }
   | {
       on: "server";
       /** The current sort by value + direction (if server-side sorting). */
-      value?: [S, Direction];
+      value?: [string, Direction];
       /** Callback for when the column is sorted (if server-side sorting). Parameters set to `undefined` is a signal to return to the initial sort state */
-      onSort: (orderBy: S | undefined, direction: Direction | undefined) => void;
+      onSort: (orderBy: string | undefined, direction: Direction | undefined) => void;
     };
 
-export interface GridTableProps<R extends Kinded, S, X> {
+export interface GridTableProps<R extends Kinded, X> {
   id?: string;
   /**
    * The HTML used to create the table.
@@ -96,7 +98,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
    */
   as?: RenderAs;
   /** The column definitions i.e. how each column should render each row kind. */
-  columns: GridColumn<R, S>[];
+  columns: GridColumn<R>[];
   /** The rows of data (including any header/footer rows), to be rendered by the column definitions. */
   rows: GridDataRow<R>[];
   /** Optional row-kind-level styling / behavior like onClick/rowLinks. */
@@ -107,7 +109,7 @@ export interface GridTableProps<R extends Kinded, S, X> {
   stickyHeader?: boolean;
   stickyOffset?: number;
   /** Configures sorting via a hash, does not need to be stable. */
-  sorting?: GridSortConfig<S>;
+  sorting?: GridSortConfig;
   /** Shown in the first row slot, if there are no rows to show, i.e. 'No rows found'. */
   fallbackMessage?: string;
   /** Shown in the first row, kinda-like the fallbackMessage, but shown even if there are rows as well. */
@@ -161,13 +163,11 @@ export interface GridTableProps<R extends Kinded, S, X> {
  * row `kind` along with the data rows. (Admittedly, out of pragmatism, we do apply some
  * special styling to the row that uses `kind: "header"`.)
  */
-export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss, X> = {}>(
-  props: GridTableProps<R, S, X>,
-) {
+export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}>(props: GridTableProps<R, X>) {
   const {
     id = "gridTable",
     as = "div",
-    columns,
+    columns: _columns,
     rows,
     style: maybeStyle = defaults.style,
     rowStyles,
@@ -185,6 +185,8 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     activeCellId,
   } = props;
 
+  const columns = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
+
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   // Use this ref to watch for changes in the GridTable's container and resize columns accordingly.
@@ -199,17 +201,26 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   }, [props.api]);
 
   const style = resolveStyles(maybeStyle);
+  const { tableState } = api;
 
-  const { rowState } = api;
-  rowState.setRows(rows);
+  // Initialize the sort state. This will only happen on the first render.
+  // Once the `TableState.sort` is defined, it will not re-initialize.
+  tableState.initSortState(props.sorting, columns);
+
+  const [sortOn, caseSensitive] = useComputed(() => {
+    const { sortConfig } = tableState;
+    return [sortConfig?.on, sortConfig?.on === "client" ? !!sortConfig.caseSensitive : false];
+  }, [tableState]);
+
+  tableState.setRows(rows);
 
   useEffect(() => {
-    rowState.activeRowId = activeRowId;
-  }, [rowState, activeRowId]);
+    tableState.activeRowId = activeRowId;
+  }, [tableState, activeRowId]);
 
   useEffect(() => {
-    rowState.activeCellId = activeCellId;
-  }, [rowState, activeCellId]);
+    tableState.activeCellId = activeCellId;
+  }, [tableState, activeCellId]);
 
   // We track render count at the table level, which seems odd (we should be able to track this
   // internally within each GridRow using a useRef), but we have suspicions that react-virtuoso
@@ -220,13 +231,13 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef);
 
   // Make a single copy of our current collapsed state, so we'll have a single observer.
-  const collapsedIds = useComputed(() => rowState.collapsedIds, [rowState]);
+  const collapsedIds = useComputed(() => tableState.collapsedIds, [tableState]);
+  const sortState = useComputed(() => toJS(tableState.sortState), [tableState]);
 
-  const [sortState, setSortKey, sortOn, caseSensitive] = useSortState<R, S>(columns, props.sorting);
   const maybeSorted = useMemo(() => {
     if (sortOn === "client" && sortState) {
       // If using client-side sort, the sortState use S = number
-      return sortRows(columns, rows, sortState as any as SortState<number>, caseSensitive);
+      return sortRows(columns, rows, sortState, caseSensitive);
     }
     return rows;
   }, [columns, rows, sortOn, sortState, caseSensitive]);
@@ -241,10 +252,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     string[],
   ] = useMemo(() => {
     function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
-      // We only pass sortState to header rows, b/c non-headers rows shouldn't have to re-render on sorting
-      // changes, and so by not passing the sortProps, it means the data rows' React.memo will still cache them.
-      const sortProps = row.kind === "header" ? { sortOn, sortState, setSortKey } : { sortOn };
-
       return (
         <Row
           key={`${row.kind}-${row.id}`}
@@ -263,7 +270,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
             api,
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
-            ...sortProps,
+            sortOn,
           }}
         />
       );
@@ -318,8 +325,6 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     style,
     rowStyles,
     sortOn,
-    setSortKey,
-    sortState,
     stickyHeader,
     stickyOffset,
     columnSizes,
@@ -334,7 +339,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
     visibleDataRows = visibleDataRows.slice(0, filterMaxRows);
   }
 
-  rowState.setMatchedRows(filteredRowIds);
+  tableState.setMatchedRows(filteredRowIds);
 
   // Push back to the caller a way to ask us where a row is.
   const { rowLookup } = props;
@@ -371,7 +376,7 @@ export function GridTable<R extends Kinded, S = {}, X extends Only<GridTableXss,
   // just trust the GridTable impl that, at runtime, `as=virtual` will (other than being virtualized)
   // behave semantically the same as `as=div` did for its tests.
   const _as = as === "virtual" && runningInJest ? "div" : as;
-  const rowStateContext = useMemo(() => ({ rowState }), [rowState]);
+  const rowStateContext = useMemo(() => ({ tableState: tableState }), [tableState]);
   return (
     <RowStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
@@ -406,7 +411,7 @@ const renders: Record<RenderAs, typeof renderTable> = {
 function renderDiv<R extends Kinded>(
   style: GridStyle,
   id: string,
-  columns: GridColumn<R>[],
+  columns: GridColumnWithId<R>[],
   headerRows: RowTuple<R>[],
   totalsRows: RowTuple<R>[],
   visibleDataRows: RowTuple<R>[],
@@ -457,7 +462,7 @@ function renderDiv<R extends Kinded>(
 function renderTable<R extends Kinded>(
   style: GridStyle,
   id: string,
-  columns: GridColumn<R>[],
+  columns: GridColumnWithId<R>[],
   headerRows: RowTuple<R>[],
   totalsRows: RowTuple<R>[],
   visibleDataRows: RowTuple<R>[],
@@ -520,7 +525,7 @@ function renderTable<R extends Kinded>(
 function renderVirtual<R extends Kinded>(
   style: GridStyle,
   id: string,
-  columns: GridColumn<R>[],
+  columns: GridColumnWithId<R>[],
   headerRows: RowTuple<R>[],
   totalsRows: RowTuple<R>[],
   visibleDataRows: RowTuple<R>[],
@@ -652,7 +657,7 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
  */
 export function filterRows<R extends Kinded>(
   api: GridTableApi<R>,
-  columns: GridColumn<R>[],
+  columns: GridColumnWithId<R>[],
   rows: GridDataRow<R>[],
   filter: string | undefined,
 ): ParentChildrenTuple<R>[] {

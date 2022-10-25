@@ -8,11 +8,10 @@ import {
   rowLinkRenderFn,
 } from "src/components/Table/components/cell";
 import { GridTableApi } from "src/components/Table/GridTableApi";
-import { SortOn, SortState } from "src/components/Table/hooks/useSortState";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
-import { DiscriminateUnion, GridColumn, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
-import { RowStateContext } from "src/components/Table/utils/RowState";
+import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
+import { RowStateContext, SortOn } from "src/components/Table/utils/TableState";
 import {
   applyRowFn,
   getAlignment,
@@ -27,17 +26,15 @@ import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { shallowEqual } from "src/utils/shallowEqual";
 
-interface RowProps<R extends Kinded, S> {
+interface RowProps<R extends Kinded> {
   as: RenderAs;
-  columns: GridColumn<R>[];
+  columns: GridColumnWithId<R>[];
   row: GridDataRow<R>;
   style: GridStyle;
   rowStyles: RowStyles<R> | undefined;
   stickyHeader: boolean;
   stickyOffset: number;
   sortOn: SortOn;
-  sortState?: SortState<S>;
-  setSortKey?: (value: S) => void;
   columnSizes: string[];
   level: number;
   getCount: (id: string) => object;
@@ -47,7 +44,7 @@ interface RowProps<R extends Kinded, S> {
 }
 
 // We extract Row to its own mini-component primarily so we can React.memo'ize it.
-function RowImpl<R extends Kinded, S>(props: RowProps<R, S>): ReactElement {
+function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const {
     as,
     columns,
@@ -57,8 +54,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R, S>): ReactElement {
     stickyHeader,
     stickyOffset,
     sortOn,
-    sortState,
-    setSortKey,
     columnSizes,
     level,
     getCount,
@@ -68,9 +63,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R, S>): ReactElement {
     ...others
   } = props;
 
-  const { rowState } = useContext(RowStateContext);
+  const { tableState } = useContext(RowStateContext);
   const rowId = `${row.kind}_${row.id}`;
-  const isActive = useComputed(() => rowState.activeRowId === rowId, [rowId, rowState]);
+  const isActive = useComputed(() => tableState.activeRowId === rowId, [rowId, tableState]);
 
   // We treat the "header" and "totals" kind as special for "good defaults" styling
   const isHeader = row.kind === "header";
@@ -157,7 +152,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R, S>): ReactElement {
 
         const cellId = `${row.kind}_${row.id}_${column.id}`;
         const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
-        const isCellActive = rowState.activeCellId === cellId;
+        const isCellActive = tableState.activeCellId === cellId;
 
         // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
         // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
@@ -211,7 +206,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R, S>): ReactElement {
           (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
             ? rowLinkRenderFn(as)
             : isHeader
-            ? headerRenderFn(columns, column, sortState, setSortKey, as)
+            ? headerRenderFn(columns, column, as)
             : rowStyle?.onClick && wrapAction
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);

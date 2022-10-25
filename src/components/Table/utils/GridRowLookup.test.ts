@@ -1,5 +1,5 @@
 import { GridColumn } from "src/components/Table/types";
-import { collapseColumn, selectColumn } from "src/components/Table/utils/columns";
+import { assignDefaultColumnIds, collapseColumn, selectColumn } from "src/components/Table/utils/columns";
 import { getKinds } from "src/components/Table/utils/GridRowLookup";
 
 describe("GridRowLookup", () => {
@@ -15,6 +15,6 @@ describe("GridRowLookup", () => {
       { header: () => "Header", group: () => "Group", data: () => "Data" },
     ];
 
-    expect(getKinds(columns)).toEqual(["header", "group", "data"]);
+    expect(getKinds(assignDefaultColumnIds(columns))).toEqual(["header", "group", "data"]);
   });
 });
