@@ -1,9 +1,17 @@
-import React, { useContext } from "react";
+import React, { useCallback, useContext } from "react";
 import { Icon } from "src/components/Icon";
-import { GridSortContext } from "src/components/Table/utils/GridSortContext";
+import { GridColumnWithId } from "src/components/Table/types";
+import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css, Palette, Properties } from "src/Css";
-import { useHover } from "src/hooks";
+import { useComputed, useHover } from "src/hooks";
 import { useTestIds } from "src/utils/useTestIds";
+
+interface SortHeaderProps {
+  content: string;
+  xss?: Properties;
+  iconOnLeft?: boolean;
+  column: GridColumnWithId<any>;
+}
 
 /**
  * Wraps column header names with up/down sorting icons.
@@ -16,11 +24,17 @@ import { useTestIds } from "src/utils/useTestIds";
  * - Write their own component that uses `GridSortContext` to access the column's
  *   current sort state + `toggleSort` function
  */
-export function SortHeader(props: { content: string; xss?: Properties; iconOnLeft?: boolean }) {
-  const { content, xss, iconOnLeft = false } = props;
+export function SortHeader(props: SortHeaderProps) {
+  const { content, xss, iconOnLeft = false, column } = props;
   const { isHovered, hoverProps } = useHover({});
-  const { sorted, toggleSort } = useContext(GridSortContext);
+  const ourSortKey = column.serverSideSortKey || column.id;
+  const { tableState } = useContext(TableStateContext);
+  const current = useComputed(() => tableState.sortState?.current, [tableState]);
+  const sorted = ourSortKey === current?.columnId ? current?.direction : undefined;
+  const toggleSort = useCallback(() => tableState.setSortKey(ourSortKey), [ourSortKey, tableState]);
+
   const tid = useTestIds(props, "sortHeader");
+
   const icon = (
     <span css={Css.fs0.$}>
       <Icon

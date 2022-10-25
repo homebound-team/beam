@@ -355,10 +355,10 @@ export class TableState {
   }
 }
 
-/** Provides a context for rows to access their table's `RowState`. */
-export const RowStateContext = React.createContext<{ tableState: TableState }>({
+/** Provides a context for rows to access their table's `TableState`. */
+export const TableStateContext = React.createContext<{ tableState: TableState }>({
   get tableState(): TableState {
-    throw new Error("No RowStateContext provider");
+    throw new Error("No TableStateContext provider");
   },
 });
 

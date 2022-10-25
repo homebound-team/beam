@@ -7,7 +7,7 @@ import { GridColumn } from "src/components/Table/types";
 import { calcColumnSizes, generateColumnId, selectColumn } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
-import { RowStateContext } from "src/components/Table/utils/TableState";
+import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -651,7 +651,7 @@ describe("GridTable", () => {
       expect(cell(r, 6, 0)).toHaveTextContent("1");
 
       // And the header row re-rendered
-      expect(row(r, 0).getAttribute("data-render")).toEqual("2");
+      expect(row(r, 0).getAttribute("data-render")).toEqual("1");
       // But the data rows did not
       expect(row(r, 1).getAttribute("data-render")).toEqual("1");
       expect(row(r, 2).getAttribute("data-render")).toEqual("1");
@@ -664,7 +664,7 @@ describe("GridTable", () => {
       click(r.rerenderParent);
 
       // Then memoization did not break
-      expect(row(r, 0).getAttribute("data-render")).toEqual("2");
+      expect(row(r, 0).getAttribute("data-render")).toEqual("1");
       expect(row(r, 1).getAttribute("data-render")).toEqual("1");
       expect(row(r, 2).getAttribute("data-render")).toEqual("1");
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
@@ -2305,7 +2305,7 @@ describe("GridTable", () => {
 });
 
 function Collapse({ id }: { id: string }) {
-  const { tableState } = useContext(RowStateContext);
+  const { tableState } = useContext(TableStateContext);
   const icon = useComputed(() => (tableState.isCollapsed(id) ? "+" : "-"), [tableState]);
   return (
     <div onClick={() => tableState.toggleCollapsed(id)} data-testid="collapse">
@@ -2315,7 +2315,7 @@ function Collapse({ id }: { id: string }) {
 }
 
 function Select({ id }: { id: string }) {
-  const { tableState } = useContext(RowStateContext);
+  const { tableState } = useContext(TableStateContext);
   const state = useComputed(() => tableState.getSelected(id), [tableState]);
   const selected = state === "checked" ? true : state === "unchecked" ? false : "indeterminate";
   return (
