@@ -39,6 +39,13 @@ describe("TextFieldTest", () => {
     expect(r.name()).toHaveAttribute("aria-invalid", "true");
   });
 
+  it("sets aria-validation if invalid with border red, without error message", async () => {
+    const r = await render(<TestTextField value="foo" errorMsg="Required" omitErrorMessage />);
+    expect(r.name()).toHaveAttribute("aria-invalid", "true");
+    // The error message is not in the DOM
+    expect(r.queryByTestId("name_errorMsg")).not.toBeInTheDocument();
+  });
+
   it("does not fire focus/blur when readOnly", async () => {
     const onFocus = jest.fn();
     const onBlur = jest.fn();
@@ -97,6 +104,13 @@ describe("TextFieldTest", () => {
     expect(onEnter).toHaveBeenCalledTimes(1);
     expect(onBlur).toHaveBeenCalledTimes(1);
     expect(r.name()).not.toHaveFocus();
+  });
+
+  it("can set a value", async () => {
+    const r = await render(<TestTextField value="foo" />);
+    expect(r.name()).toHaveValue("foo");
+    type(r.name, "bar");
+    expect(r.name()).toHaveValue("bar");
   });
 });
 
