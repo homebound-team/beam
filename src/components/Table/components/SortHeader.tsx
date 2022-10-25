@@ -1,6 +1,5 @@
 import React, { useCallback, useContext } from "react";
 import { Icon } from "src/components/Icon";
-import { GridColumnWithId } from "src/components/Table/types";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css, Palette, Properties } from "src/Css";
 import { useComputed, useHover } from "src/hooks";
@@ -10,7 +9,7 @@ interface SortHeaderProps {
   content: string;
   xss?: Properties;
   iconOnLeft?: boolean;
-  column: GridColumnWithId<any>;
+  sortKey: string;
 }
 
 /**
@@ -25,13 +24,12 @@ interface SortHeaderProps {
  *   current sort state + `toggleSort` function
  */
 export function SortHeader(props: SortHeaderProps) {
-  const { content, xss, iconOnLeft = false, column } = props;
+  const { content, xss, iconOnLeft = false, sortKey } = props;
   const { isHovered, hoverProps } = useHover({});
-  const ourSortKey = column.serverSideSortKey || column.id;
   const { tableState } = useContext(TableStateContext);
   const current = useComputed(() => tableState.sortState?.current, [tableState]);
-  const sorted = ourSortKey === current?.columnId ? current?.direction : undefined;
-  const toggleSort = useCallback(() => tableState.setSortKey(ourSortKey), [ourSortKey, tableState]);
+  const sorted = sortKey === current?.columnId ? current?.direction : undefined;
+  const toggleSort = useCallback(() => tableState.setSortKey(sortKey), [sortKey, tableState]);
 
   const tid = useTestIds(props, "sortHeader");
 
