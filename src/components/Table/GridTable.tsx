@@ -19,7 +19,7 @@ import {
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { createRowLookup, GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { sortRows } from "src/components/Table/utils/sortRows";
-import { RowStateContext } from "src/components/Table/utils/TableState";
+import { TableStateContext } from "src/components/Table/utils/TableState";
 import { applyRowFn, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -378,7 +378,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
   const _as = as === "virtual" && runningInJest ? "div" : as;
   const rowStateContext = useMemo(() => ({ tableState: tableState }), [tableState]);
   return (
-    <RowStateContext.Provider value={rowStateContext}>
+    <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
         {/* If virtualized take some pixels off the width to accommodate when virtuoso's scrollbar is introduced. */}
         {/* Otherwise a horizontal scrollbar will _always_ appear once the vertical scrollbar is needed */}
@@ -396,7 +396,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
           virtuosoRef,
         )}
       </PresentationProvider>
-    </RowStateContext.Provider>
+    </TableStateContext.Provider>
   );
 }
 

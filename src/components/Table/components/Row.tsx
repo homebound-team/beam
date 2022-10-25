@@ -11,7 +11,7 @@ import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
-import { RowStateContext, SortOn } from "src/components/Table/utils/TableState";
+import { SortOn, TableStateContext } from "src/components/Table/utils/TableState";
 import {
   applyRowFn,
   getAlignment,
@@ -63,7 +63,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...others
   } = props;
 
-  const { tableState } = useContext(RowStateContext);
+  const { tableState } = useContext(TableStateContext);
   const rowId = `${row.kind}_${row.id}`;
   const isActive = useComputed(() => tableState.activeRowId === rowId, [rowId, tableState]);
 
@@ -128,7 +128,16 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           (sortOn === "server" && !!column.serverSideSortKey);
         const alignment = getAlignment(column, maybeContent);
         const justificationCss = getJustification(column, maybeContent, as, alignment);
-        const content = toContent(maybeContent, isHeader, canSortColumn, sortOn === "client", style, as, alignment);
+        const content = toContent(
+          maybeContent,
+          isHeader,
+          canSortColumn,
+          sortOn === "client",
+          style,
+          as,
+          alignment,
+          column,
+        );
 
         ensureClientSideSortValueIsSortable(sortOn, isHeader, column, columnIndex, maybeContent);
 
@@ -206,7 +215,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
             ? rowLinkRenderFn(as)
             : isHeader
-            ? headerRenderFn(columns, column, as)
+            ? headerRenderFn(column, as)
             : rowStyle?.onClick && wrapAction
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);
