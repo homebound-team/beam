@@ -46,7 +46,13 @@ export function toContent(
       : content;
 
   if (content && typeof content === "string" && isHeader && canSortColumn) {
-    return <SortHeader content={content} iconOnLeft={alignment === "right"} column={column} />;
+    return (
+      <SortHeader
+        content={content}
+        iconOnLeft={alignment === "right"}
+        sortKey={column.serverSideSortKey ?? column.id}
+      />
+    );
   } else if (content && style?.presentationSettings?.wrap === false && typeof content === "string") {
     // In order to truncate the text properly, then we need to wrap it in another element
     // as our cell element is a flex container, which don't allow for applying truncation styles directly on it.
