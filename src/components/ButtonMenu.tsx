@@ -75,6 +75,7 @@ export type MenuItem = MenuItemBase | IconMenuItemType | ImageMenuItemType;
 // This is done just to adapt to the React-Aria API for generating Sectioned lists of Menu Items.
 export type MenuSection = MenuItem & { items?: MenuItem[] };
 
+// Searching function the recuisively searches through the items through a built up regex and returns the items that match the search term. Maybe not necessary, as we could use .filter() instead.
 function match(term: string, items: MenuItem[]) {
   const builtExp = Array.from(term).reduce((prevVal, curVal, i) => `${prevVal}[^${term.substr(i)}]*?${curVal}`, '');
   const re = RegExp(builtExp);

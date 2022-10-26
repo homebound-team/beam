@@ -160,10 +160,10 @@ export function WithTooltip() {
 
 export function WithSearchListItems() {
     const menuItems: MenuItem[] = [
-    { label: "Menu Item 1", onClick: action("Menu Item 1") },
-    { label: "Menu Item 2", onClick: action("Menu Item 2") },
-    { label: "Menu Item 3", onClick: action("Menu Item 3") },
+    { label: "Ironman", onClick: action("Ironman") },
+    { label: "Starlord", onClick: action("Starlord") },
+    { label: "The Hulk", onClick: action("The Hulk") },
   ];
 
-    return <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} searchable />;
+    return <ButtonMenu trigger={{ label: "Select a hero" }} items={menuItems} searchable />;
 }
