@@ -27,7 +27,7 @@ describe(TextFieldBase, () => {
   });
 
   it("should the error state display border red on input without an error message below", async () => {
-    const r = await render(<TextFieldBase inputProps={{}} label="Test" errorMsg="Error" />);
+    const r = await render(<TextFieldBase inputProps={{}} label="Test" errorMsg="Error" omitErrorMessage />);
     expect(r.test()).toHaveAttribute("aria-invalid", "true");
     // The error message is not in the DOM
     expect(r.queryByTestId("test_errorMsg")).not.toBeInTheDocument();
