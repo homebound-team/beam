@@ -1,3 +1,4 @@
+import { camelCase } from "change-case";
 import { comparer, makeAutoObservable, observable, ObservableMap, ObservableSet, reaction } from "mobx";
 import React from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
@@ -46,21 +47,30 @@ export class TableState {
   private initialSortState: SortState | undefined;
   private onSort: ((orderBy: any | undefined, direction: Direction | undefined) => void) | undefined;
 
+  // Non-reactive list of our columns
+  public columns: GridColumnWithId<any>[] = [];
+  // An observable set of column ids to keep track of which columns are currently expanded
+  private expandedColumns = new ObservableSet<string>();
+  // An observable set of column ids to keep track of which columns are visible
+  public visibleColumns = new ObservableSet<string>();
+  private visibleColumnStorageKey: string = "";
+
   /**
    * Creates the `RowState` for a given `GridTable`.
    */
   constructor() {
     // Make ourselves an observable so that mobx will do caching of .collapseIds so
     // that it'll be a stable identity for GridTable to useMemo against.
-    makeAutoObservable(
-      this,
+    makeAutoObservable(this, {
       // We only shallow observe rows so that:
       // a) we don't deeply/needlessly proxy-ize a large Apollo fragment cache, but
       // b) if rows changes, we re-run computeds like getSelectedRows that may need to see the
       // updated _contents_ of a given row, even if our other selected/matched row states don't change.
       // (as any b/c rows is private, so the mapped type doesn't see it)
-      { rows: observable.shallow } as any,
-    );
+      rows: observable.shallow,
+      // Do not observe columns, expect this to be a non-reactive value for us to base our reactive values off of.
+      columns: false,
+    });
     // Whenever our `matchedRows` change (i.e. via filtering) then we need to re-derive header and parent rows' selected state.
     reaction(
       () => [...this.matchedRows.values()].sort(),
@@ -199,6 +209,37 @@ export class TableState {
 
     // Finally replace our existing list of rows
     this.rows = rows;
+  }
+
+  setColumns(columns: GridColumnWithId<any>[]): void {
+    if (columns !== this.columns) {
+      this.columns = columns;
+      this.visibleColumnStorageKey = camelCase(columns.map((c) => c.id).join());
+      this.visibleColumns.replace(readOrSetLocalVisibleColumnState(columns, this.visibleColumnStorageKey));
+      const expandedColumnIds = columns.filter((c) => c.initExpanded).map((c) => c.id);
+      this.expandedColumns.replace(expandedColumnIds);
+    }
+  }
+
+  setVisibleColumns(ids: string[]) {
+    sessionStorage.setItem(this.visibleColumnStorageKey, JSON.stringify(ids));
+    this.visibleColumns.replace(ids);
+  }
+
+  get visibleColumnIds(): string[] {
+    return [...this.visibleColumns.values()];
+  }
+
+  get expandedColumnIds(): string[] {
+    return [...this.expandedColumns.values()];
+  }
+
+  toggleExpandedColumn(columnId: string) {
+    if (this.expandedColumns.has(columnId)) {
+      this.expandedColumns.delete(columnId);
+    } else {
+      this.expandedColumns.add(columnId);
+    }
   }
 
   setMatchedRows(rowIds: string[]): void {
@@ -366,6 +407,17 @@ export const TableStateContext = React.createContext<{ tableState: TableState }>
 function readLocalCollapseState(persistCollapse: string): string[] {
   const collapsedGridRowIds = sessionStorage.getItem(persistCollapse);
   return collapsedGridRowIds ? JSON.parse(collapsedGridRowIds) : [];
+}
+
+// Get the columns that are already in the visible state so we keep them toggled.
+function readOrSetLocalVisibleColumnState(columns: GridColumnWithId<any>[], storageKey: string): string[] {
+  const storageValue = sessionStorage.getItem(storageKey);
+  if (storageValue) {
+    return JSON.parse(storageValue);
+  }
+  const visibleColumnIds = columns.filter((c) => c.initVisible || !c.canHide).map((c) => c.id);
+  sessionStorage.setItem(storageKey, JSON.stringify(visibleColumnIds));
+  return visibleColumnIds;
 }
 
 type FoundRow = { row: GridDataRow<any>; parents: GridDataRow<any>[] };

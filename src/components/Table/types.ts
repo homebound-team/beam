@@ -39,11 +39,11 @@ export type GridColumn<R extends Kinded> = {
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (
             data: D,
-            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number },
+            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number; expanded: boolean },
           ) => ReactNode | GridCellContent
         : (
             data: undefined,
-            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number },
+            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number; expanded: boolean },
           ) => ReactNode | GridCellContent);
 } & {
   /**
@@ -69,13 +69,22 @@ export type GridColumn<R extends Kinded> = {
   isAction?: true;
   /** Column id that will be used to generate an unique identifier for every row cell */
   id?: string;
+  /** String identifier of the column. Typically the same text content as in column header. This is used to in things like the Edit Columns Button */
+  name?: string;
   /** Flag that will allow to know which columns are hide-able */
   canHide?: boolean;
   /** Flag that will allow to know which hide-able columns are visible on initial load */
   initVisible?: boolean;
+  /** A list of columns that should only be shown when this column is "expanded" */
+  expandColumns?: GridColumn<R>[];
+  /** Determines whether the group should initially be expanded on load of the table */
+  initExpanded?: boolean;
 };
 
-export type GridColumnWithId<R extends Kinded> = GridColumn<R> & { id: string };
+export type GridColumnWithId<R extends Kinded> = GridColumn<R> & {
+  id: string;
+  expandColumns?: GridColumnWithId<R>[];
+};
 
 export const nonKindGridColumnKeys = [
   "w",
@@ -89,6 +98,8 @@ export const nonKindGridColumnKeys = [
   "id",
   "canHide",
   "initVisible",
+  "expandColumns",
+  "initExpanded",
 ];
 
 /**

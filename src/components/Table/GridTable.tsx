@@ -5,7 +5,15 @@ import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
-import { defaultStyle, GridStyle, GridStyleDef, resolveStyles, RowStyles } from "src/components/Table/TableStyles";
+import {
+  defaultStyle,
+  expandableHeaderRowHeight,
+  GridStyle,
+  GridStyleDef,
+  resolveStyles,
+  RowStyles,
+  totalsRowHeight,
+} from "src/components/Table/TableStyles";
 import {
   Direction,
   GridColumn,
@@ -20,7 +28,15 @@ import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { createRowLookup, GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { sortRows } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { applyRowFn, matchesFilter } from "src/components/Table/utils/utils";
+import {
+  applyRowFn,
+  EXPANDABLE_HEADER,
+  HEADER,
+  matchesFilter,
+  reservedRowKinds,
+  TOTALS,
+  zIndices,
+} from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
@@ -185,7 +201,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     activeCellId,
   } = props;
 
-  const columns = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
+  const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
 
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
@@ -203,6 +219,18 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
   const style = resolveStyles(maybeStyle);
   const { tableState } = api;
 
+  tableState.setRows(rows);
+  tableState.setColumns(columnsWithIds);
+  const columns: GridColumnWithId<R>[] = useComputed(
+    () =>
+      tableState.columns
+        .filter((c) => tableState.visibleColumnIds.includes(c.id))
+        .flatMap((c) =>
+          c.expandColumns && tableState.expandedColumnIds.includes(c.id) ? [c, ...c.expandColumns] : [c],
+        ) as GridColumnWithId<R>[],
+    [tableState],
+  );
+
   // Initialize the sort state. This will only happen on the first render.
   // Once the `TableState.sort` is defined, it will not re-initialize.
   tableState.initSortState(props.sorting, columns);
@@ -211,8 +239,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     const { sortConfig } = tableState;
     return [sortConfig?.on, sortConfig?.on === "client" ? !!sortConfig.caseSensitive : false];
   }, [tableState]);
-
-  tableState.setRows(rows);
 
   useEffect(() => {
     tableState.activeRowId = activeRowId;
@@ -242,16 +268,32 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     return rows;
   }, [columns, rows, sortOn, sortState, caseSensitive]);
 
-  const hasTotalsRow = rows.some((row) => row.id === "totals");
+  const hasTotalsRow = rows.some((row) => row.id === TOTALS);
+  const hasExpandableHeader = rows.some((row) => row.id === EXPANDABLE_HEADER);
 
   // Flatten + component-ize the sorted rows.
-  let [headerRows, visibleDataRows, totalsRows, filteredRowIds]: [
+  let [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, filteredRowIds]: [
+    RowTuple<R>[],
     RowTuple<R>[],
     RowTuple<R>[],
     RowTuple<R>[],
     string[],
   ] = useMemo(() => {
     function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
+      // We may have multiple rows that need to be sticky, if that is the case, then we need properly define the stickyOffset for each row.
+      // *TOTALS* will always be on top, so that can remain 0.
+      // *EXPANDABLE_HEADER Header* may need to include the height of the totals row in the offset
+      // *HEADER* may need to include both TOTALS and EXPANDABLE_HEADER in its offset.
+      // TODO: Create a single "table header" container that can hold multiple rows and use a single `position: sticky`. And we can get rid of this nonsense.
+      const maybeTotalsRowHeight = hasTotalsRow ? totalsRowHeight : 0;
+      const maybeExpandableRowsHeight = hasExpandableHeader ? expandableHeaderRowHeight : 0;
+      const rowStickyOffset =
+        row.kind === HEADER
+          ? maybeTotalsRowHeight + maybeExpandableRowsHeight
+          : row.kind === EXPANDABLE_HEADER
+          ? maybeTotalsRowHeight
+          : 0;
+
       return (
         <Row
           key={`${row.kind}-${row.id}`}
@@ -262,8 +304,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
             style,
             rowStyles,
             stickyHeader,
-            // If we have a totals row then add the height of the totals row (52px) to the `stickyOffset` for the "header" kind
-            stickyOffset: hasTotalsRow && row.kind === "header" ? 52 + stickyOffset : stickyOffset,
+            stickyOffset: rowStickyOffset + stickyOffset,
             columnSizes,
             level,
             getCount,
@@ -271,6 +312,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
             sortOn,
+            hasExpandableHeader,
           }}
         />
       );
@@ -278,6 +320,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
 
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: RowTuple<R>[] = [];
+    const expandableHeaderRows: RowTuple<R>[] = [];
     const totalsRows: RowTuple<R>[] = [];
     const visibleDataRows: RowTuple<R>[] = [];
     const filteredRowIds: string[] = [];
@@ -307,6 +350,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
           return;
         }
 
+        if (row[0].kind === "expandableHeader") {
+          expandableHeaderRows.push([row[0], makeRowComponent(row[0], level)]);
+          return;
+        }
+
         visit(row, level, visible);
       });
     }
@@ -315,7 +363,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     const filteredRows = filterRows(api, columns, maybeSorted, filter);
     visitRows(filteredRows, 0, true);
 
-    return [headerRows, visibleDataRows, totalsRows, filteredRowIds];
+    return [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, filteredRowIds];
   }, [
     as,
     api,
@@ -389,6 +437,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
           columns,
           headerRows,
           totalsRows,
+          expandableHeaderRows,
           visibleDataRows,
           firstRowMessage,
           stickyHeader,
@@ -414,6 +463,7 @@ function renderDiv<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   headerRows: RowTuple<R>[],
   totalsRows: RowTuple<R>[],
+  expandableHeaderRows: RowTuple<R>[],
   visibleDataRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   _stickyHeader: boolean,
@@ -446,6 +496,7 @@ function renderDiv<R extends Kinded>(
       data-testid={id}
     >
       {totalsRows.map(([, node]) => node)}
+      {expandableHeaderRows.map(([, node]) => node)}
       {headerRows.map(([, node]) => node)}
       {/* Show an info message if it's set. */}
       {firstRowMessage && (
@@ -465,6 +516,7 @@ function renderTable<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   headerRows: RowTuple<R>[],
   totalsRows: RowTuple<R>[],
+  expandableHeaderRows: RowTuple<R>[],
   visibleDataRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   _stickyHeader: boolean,
@@ -486,7 +538,7 @@ function renderTable<R extends Kinded>(
       }}
       data-testid={id}
     >
-      <thead>{[...totalsRows, ...headerRows].map(([, node]) => node)}</thead>
+      <thead>{[...totalsRows, ...expandableHeaderRows, ...headerRows].map(([, node]) => node)}</thead>
       <tbody>
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
@@ -528,6 +580,7 @@ function renderVirtual<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   headerRows: RowTuple<R>[],
   totalsRows: RowTuple<R>[],
+  expandableHeaderRows: RowTuple<R>[],
   visibleDataRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
@@ -547,15 +600,22 @@ function renderVirtual<R extends Kinded>(
       components={{
         // Applying a zIndex: 2 to ensure it stays on top of sticky columns
         TopItemList: React.forwardRef((props, ref) => (
-          <div {...props} ref={ref as MutableRefObject<HTMLDivElement>} style={{ ...props.style, ...{ zIndex: 2 } }} />
+          <div
+            {...props}
+            ref={ref as MutableRefObject<HTMLDivElement>}
+            style={{ ...props.style, ...{ zIndex: zIndices.stickyHeader } }}
+          />
         )),
         List: VirtualRoot(listStyle, columns, id, xss),
         Footer: () => <div css={footerStyle} />,
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
-      topItemCount={(stickyHeader ? headerRows.length + totalsRows.length : 0) + (firstRowMessage ? 1 : 0)}
+      topItemCount={
+        (stickyHeader ? headerRows.length + totalsRows.length + expandableHeaderRows.length : 0) +
+        (firstRowMessage ? 1 : 0)
+      }
       itemContent={(index) => {
-        // Since we have three arrays of rows: `headerRows`, `totalsRows`, and `filteredRow` we
+        // Since we have 4 arrays of rows: `headerRows`, `totalsRows`, `expandableHeaderRows`, and `filteredRow` we
         // must determine which one to render.
 
         // Determine if we need to render a totals row
@@ -565,6 +625,14 @@ function renderVirtual<R extends Kinded>(
 
         // Reset index
         index -= totalsRows.length;
+
+        // Determine if we need to render an expandableHeaderRows row
+        if (index < expandableHeaderRows.length) {
+          return expandableHeaderRows[index][1];
+        }
+
+        // Reset index
+        index -= expandableHeaderRows.length;
 
         // Determine if we need to render a header row
         if (index < headerRows.length) {
@@ -670,11 +738,10 @@ export function filterRows<R extends Kinded>(
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     const filters = (filter && filter.split(/ +/)) || [];
     const matches =
-      row.kind === "header" ||
-      row.kind === "totals" ||
+      reservedRowKinds.includes(row.kind) ||
       filters.length === 0 ||
       filters.every((f) =>
-        columns.map((c) => applyRowFn(c, row, api, 0)).some((maybeContent) => matchesFilter(maybeContent, f)),
+        columns.map((c) => applyRowFn(c, row, api, 0, false)).some((maybeContent) => matchesFilter(maybeContent, f)),
       );
     if (matches) {
       return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);

@@ -14,13 +14,18 @@ import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/
 import { SortOn, TableStateContext } from "src/components/Table/utils/TableState";
 import {
   applyRowFn,
+  EXPANDABLE_HEADER,
   getAlignment,
   getFirstOrLastCellCss,
   getIndentationCss,
   getJustification,
+  HEADER,
   isGridCellContent,
   maybeApplyFunction,
+  reservedRowKinds,
   toContent,
+  TOTALS,
+  zIndices,
 } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -41,6 +46,7 @@ interface RowProps<R extends Kinded> {
   api: GridTableApi<R>;
   cellHighlight: boolean;
   omitRowHover: boolean;
+  hasExpandableHeader: boolean;
 }
 
 // We extract Row to its own mini-component primarily so we can React.memo'ize it.
@@ -60,6 +66,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     api,
     cellHighlight,
     omitRowHover,
+    hasExpandableHeader,
     ...others
   } = props;
 
@@ -68,14 +75,15 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const isActive = useComputed(() => tableState.activeRowId === rowId, [rowId, tableState]);
 
   // We treat the "header" and "totals" kind as special for "good defaults" styling
-  const isHeader = row.kind === "header";
-  const isTotals = row.kind === "totals";
+  const isHeader = row.kind === HEADER;
+  const isTotals = row.kind === TOTALS;
+  const isExpandableHeader = row.kind === EXPANDABLE_HEADER;
   const rowStyle = rowStyles?.[row.kind];
   const RowTag = as === "table" ? "tr" : "div";
 
   const revealOnRowHoverClass = "revealOnRowHover";
 
-  const showRowHoverColor = row.kind !== "totals" && row.kind !== "header" && !omitRowHover;
+  const showRowHoverColor = !reservedRowKinds.includes(row.kind) && !omitRowHover;
 
   const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
   const rowCss = {
@@ -90,7 +98,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     // Maybe add the sticky header styles
-    ...((isHeader || isTotals) && stickyHeader ? Css.sticky.topPx(stickyOffset).z2.$ : undefined),
+    ...(reservedRowKinds.includes(row.kind) && stickyHeader
+      ? Css.sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$
+      : undefined),
     ...{
       [` > .${revealOnRowHoverClass} > *`]: Css.invisible.$,
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.visible.$,
@@ -98,12 +108,17 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   };
 
   let currentColspan = 1;
-
+  // Keep a running count of how many expanded columns are being shown.
+  let currentExpandedColumnCount: number = 0;
   let firstContentColumnStylesApplied = false;
+  let minStickyLeftOffset = 0;
 
   return (
     <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
       {columns.map((column, columnIndex) => {
+        // Need to keep track of the expanded columns so we can add borders as expected for the header rows
+        const isExpanded = tableState.expandedColumnIds.includes(column.id);
+
         const { wrapAction = true, isAction = false } = column;
 
         const applyFirstContentColumnStyles = !isHeader && !isAction && !firstContentColumnStylesApplied;
@@ -116,13 +131,30 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           }
         }
 
+        // When using the variation of the table with an EXPANDABLE_HEADER, then our HEADER row required special border styling
+        if (hasExpandableHeader && (isHeader || isTotals)) {
+          // When the value of `currentExpandedColumnCount` is 0, then we have started over.
+          // If the current column `isExpanded`, then store the number of expandable columns.
+          if (currentExpandedColumnCount === 0 && isExpanded) {
+            currentExpandedColumnCount = column.expandColumns?.length ?? 0;
+          } else if (currentExpandedColumnCount > 0) {
+            // If value is great than 0, then decrement. Once the value equals 0, then the special styling will be applied below.
+            currentExpandedColumnCount -= 1;
+          }
+        }
+
         // Decrement colspan count and skip if greater than 1.
         if (currentColspan > 1) {
           currentColspan -= 1;
           return null;
         }
-        const maybeContent = applyRowFn(column, row, api, level);
-        currentColspan = isGridCellContent(maybeContent) ? maybeContent.colspan ?? 1 : 1;
+        const maybeContent = applyRowFn(column, row, api, level, isExpanded);
+
+        const numExpandedColumns = isExpandableHeader && isExpanded ? column.expandColumns?.length ?? 0 : 0;
+
+        currentColspan = isGridCellContent(maybeContent)
+          ? maybeContent.colspan ?? numExpandedColumns + 1
+          : numExpandedColumns + 1;
         const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
 
         const canSortColumn =
@@ -130,6 +162,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           (sortOn === "server" && !!column.serverSideSortKey);
         const alignment = getAlignment(column, maybeContent);
         const justificationCss = getJustification(column, maybeContent, as, alignment);
+        const isExpandable = column.expandColumns !== undefined && column.expandColumns.length > 0;
+
         const content = toContent(
           maybeContent,
           isHeader,
@@ -139,15 +173,24 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           as,
           alignment,
           column,
+          isExpandableHeader,
+          isExpandable,
+          minStickyLeftOffset,
         );
 
-        ensureClientSideSortValueIsSortable(sortOn, isHeader, column, columnIndex, maybeContent);
+        ensureClientSideSortValueIsSortable(
+          sortOn,
+          isHeader || isTotals || isExpandableHeader,
+          column,
+          columnIndex,
+          maybeContent,
+        );
 
         const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
         const maybeStickyColumnStyles =
           maybeSticky && columnSizes
             ? {
-                ...Css.sticky.z1.bgWhite.$,
+                ...Css.sticky.z(zIndices.stickyColumns).bgWhite.$,
                 ...(maybeSticky === "left"
                   ? Css.left(columnIndex === 0 ? 0 : `calc(${columnSizes.slice(0, columnIndex).join(" + ")})`).$
                   : {}),
@@ -160,6 +203,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                   : {}),
               }
             : {};
+
+        // This relies on our column sizes being defined in pixel values, which is currently true as we calculate to pixel values in the `useSetupColumnSizes` hook
+        minStickyLeftOffset += maybeSticky === "left" ? parseInt(columnSizes[columnIndex].replace("px", ""), 10) : 0;
 
         const cellId = `${row.kind}_${row.id}_${column.id}`;
         const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
@@ -190,8 +236,16 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           ...(isHeader && style.headerCellCss),
           // Then apply any totals-specific override
           ...(isTotals && style.totalsCellCss),
+          ...(isTotals && hasExpandableHeader && Css.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$),
+          // Then apply any expandable header specific override
+          ...(isExpandableHeader && style.expandableHeaderCss),
+          // Apply the right border styling for the header row when using expandable tables and this column is the last expandable column, or not expanded.
+          ...(hasExpandableHeader &&
+            (isHeader || isTotals) &&
+            currentExpandedColumnCount === 0 &&
+            Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$),
           // Or level-specific styling
-          ...(!isHeader && !isTotals && !!style.levels && style.levels[level]?.cellCss),
+          ...(!isHeader && !isTotals && !isExpandableHeader && !!style.levels && style.levels[level]?.cellCss),
           // Level specific styling for the first content column
           ...(applyFirstContentColumnStyles && !!style.levels && style.levels[level]?.firstContentColumn),
           // The specific cell's css (if any from GridCellContent)
@@ -206,18 +260,21 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.LightBlue700}`).$,
           // Define the width of the column on each cell. Supports col spans.
           width: `calc(${columnSizes.slice(columnIndex, columnIndex + currentColspan).join(" + ")})`,
-          ...(column.mw ? Css.mw(column.mw).$ : {}),
+          ...(typeof column.mw === "string" ? Css.mw(column.mw).$ : {}),
         };
 
         const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
 
         const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
 
+        // If the expandable header is expanded, then we need to set a colspan on it which includes all expanded columns + this column.
+        const expandableHeaderColSpan = (isExpandableHeader && isExpanded ? column.expandColumns?.length ?? 0 : 0) + 1;
+
         const renderFn: RenderCellFn<any> =
           (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
             ? rowLinkRenderFn(as)
-            : isHeader
-            ? headerRenderFn(column, as)
+            : isHeader || isTotals || isExpandableHeader
+            ? headerRenderFn(column, as, expandableHeaderColSpan)
             : rowStyle?.onClick && wrapAction
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);

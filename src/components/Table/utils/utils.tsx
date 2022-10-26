@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
+import { ExpandableHeader } from "src/components/Table/components/ExpandableHeader";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
 import { GridTableApi } from "src/components/Table/GridTableApi";
@@ -18,6 +19,9 @@ export function toContent(
   as: RenderAs,
   alignment: GridCellAlignment,
   column: GridColumnWithId<any>,
+  isExpandableHeader: boolean,
+  isExpandable: boolean,
+  minStickyLeftOffset: number,
 ): ReactNode {
   let content = isGridCellContent(maybeContent) ? maybeContent.content : maybeContent;
   if (typeof content === "function") {
@@ -53,6 +57,10 @@ export function toContent(
         sortKey={column.serverSideSortKey ?? column.id}
       />
     );
+  } else if (content && typeof content === "string" && isExpandableHeader && isExpandable) {
+    return <ExpandableHeader title={content} column={column} minStickyLeftOffset={minStickyLeftOffset} as={as} />;
+  } else if (content && typeof content === "string" && isExpandableHeader) {
+    return <span css={Css.lineClamp2.$}>{content}</span>;
   } else if (content && style?.presentationSettings?.wrap === false && typeof content === "string") {
     // In order to truncate the text properly, then we need to wrap it in another element
     // as our cell element is a flex container, which don't allow for applying truncation styles directly on it.
@@ -83,12 +91,13 @@ export function applyRowFn<R extends Kinded>(
   row: GridDataRow<R>,
   api: GridTableApi<R>,
   level: number,
+  expanded: boolean,
 ): ReactNode | GridCellContent {
   // Usually this is a function to apply against the row, but sometimes it's a hard-coded value, i.e. for headers
   const maybeContent = column[row.kind];
   if (typeof maybeContent === "function") {
     // Auto-destructure data
-    return (maybeContent as Function)((row as any)["data"], { row: row as any, api, level });
+    return (maybeContent as Function)((row as any)["data"], { row: row as any, api, level, expanded });
   } else {
     return maybeContent;
   }
@@ -196,3 +205,15 @@ export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter:
   }
   return false;
 }
+
+export const HEADER = "header";
+export const TOTALS = "totals";
+export const EXPANDABLE_HEADER = "expandableHeader";
+export const reservedRowKinds = [HEADER, TOTALS, EXPANDABLE_HEADER];
+
+export const zIndices = {
+  stickyHeader: 4,
+  stickyColumns: 3,
+  expandableHeaderTitle: 2,
+  expandableHeaderIcon: 1,
+};
