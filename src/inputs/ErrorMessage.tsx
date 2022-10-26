@@ -1,3 +1,4 @@
+import { VisuallyHidden } from "react-aria";
 import { Icon } from "src/components";
 import { Css } from "src/Css";
 
@@ -6,6 +7,7 @@ interface ErrorMessageProps {
   id?: string;
   errorMsg: string;
   contrast?: boolean;
+  hidden?: boolean;
 }
 /**
  * A helper component for consistently showing error messages across form fields.
@@ -13,8 +15,8 @@ interface ErrorMessageProps {
  * Not currently exported as part of our public API.
  */
 export function ErrorMessage(props: ErrorMessageProps) {
-  const { id, errorMsg, contrast = false, ...others } = props;
-  return errorMsg ? (
+  const { id, errorMsg, contrast = false, hidden = false, ...others } = props;
+  const errorEl = errorMsg ? (
     <div css={Css.red600.sm.df.mtPx(4).if(contrast).red400.$}>
       <span css={Css.fs0.$}>
         <Icon icon="error" />
@@ -27,4 +29,5 @@ export function ErrorMessage(props: ErrorMessageProps) {
   ) : (
     <></>
   );
+  return hidden ? <VisuallyHidden>{errorEl}</VisuallyHidden> : errorEl;
 }

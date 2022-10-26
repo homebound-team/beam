@@ -32,7 +32,7 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   nothingSelectedText: string;
   tooltip?: ReactNode;
   resetField: VoidFunction;
-  omitErrorMessage?: boolean;
+  hideErrorMessage?: boolean;
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {

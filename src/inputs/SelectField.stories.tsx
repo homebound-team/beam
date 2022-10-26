@@ -185,7 +185,7 @@ function Template(args: SelectFieldProps<any, any>) {
           options={[{ id: undefined, name: "No Selection", icon: "x" }, ...options]}
           getOptionValue={(o) => o.id}
           getOptionLabel={(o) => o.name}
-          omitErrorMessage
+          hideErrorMessage
         />
       </div>
 

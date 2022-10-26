@@ -54,7 +54,7 @@ export interface TextFieldBaseProps<X>
   // TextArea specific
   textAreaMinHeight?: number;
   tooltip?: ReactNode;
-  omitErrorMessage?: boolean;
+  hideErrorMessage?: boolean;
 }
 
 // Used by both TextField and TextArea
@@ -87,7 +87,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     tooltip,
     visuallyDisabled = fieldProps?.visuallyDisabled ?? true,
     errorInTooltip = fieldProps?.errorInTooltip ?? false,
-    omitErrorMessage = false,
+    hideErrorMessage = false,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && !hideLabel ? "smMd" : "sm");
@@ -258,7 +258,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 }}
               />
             )}
-            {errorInTooltip && errorMsg && !omitErrorMessage && (
+            {errorInTooltip && errorMsg && !hideErrorMessage && (
               <span css={Css.df.aic.pl1.fs0.$}>
                 <Icon icon="error" color={Palette.Red600} tooltip={errorMsg} />
               </span>
@@ -271,8 +271,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       {/* Compound fields will handle their own error and helper text. Do not show error or helper text when 'readOnly' or disabled */}
       {!compound && !inputProps.disabled && !inputProps.readOnly && (
         <>
-          {errorMsg && !errorInTooltip && !omitErrorMessage && (
-            <ErrorMessage id={errorMessageId} errorMsg={errorMsg} {...tid.errorMsg} />
+          {errorMsg && !errorInTooltip && (
+            <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
           )}
           {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
         </>

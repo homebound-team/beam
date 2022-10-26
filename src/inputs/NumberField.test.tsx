@@ -13,13 +13,6 @@ describe("NumberFieldTest", () => {
     expect(r.age()).toHaveValue("2");
   });
 
-  it("sets aria-validation if invalid with border red, without error message", async () => {
-    const r = await render(<TestNumberField label="Age" value={1} errorMsg="Required" omitErrorMessage />);
-    expect(r.age()).toHaveAttribute("aria-invalid", "true");
-    // The error message is not in the DOM
-    expect(r.queryByTestId("age_errorMsg")).not.toBeInTheDocument();
-  });
-
   it("can set a percentage value", async () => {
     const r = await render(<TestNumberField label="Complete" type="percent" value={12} />);
     expect(r.complete()).toHaveValue("12%");

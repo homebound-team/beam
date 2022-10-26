@@ -25,7 +25,7 @@ export function NumberFieldStyles() {
           helperText="Some really long helper text that we expect to wrap."
         />
         <ValidationNumberField label="Age Validated" value={-1} />
-        <ValidationNumberField label="Omit Error Message" value={-1} omitErrorMessage />
+        <ValidationNumberField label="Omit Error Message" value={-1} hideErrorMessage />
       </div>
 
       <div css={Css.df.fdc.gap2.$}>
@@ -103,12 +103,12 @@ function ValidationNumberField({
   label,
   compact,
   value,
-  omitErrorMessage,
+  hideErrorMessage,
 }: {
   label: string;
   compact?: boolean;
   value: number;
-  omitErrorMessage?: boolean;
+  hideErrorMessage?: boolean;
 }) {
   const [internalValue, setValue] = useState<number | undefined>(value);
   const isValid = useMemo(() => internalValue && internalValue > 0, [internalValue]);
@@ -119,7 +119,7 @@ function ValidationNumberField({
       value={internalValue}
       onChange={setValue}
       errorMsg={!isValid ? "Cannot be negative" : undefined}
-      omitErrorMessage={omitErrorMessage}
+      hideErrorMessage={hideErrorMessage}
     />
   );
 }

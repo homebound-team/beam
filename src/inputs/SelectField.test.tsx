@@ -36,32 +36,6 @@ describe("SelectFieldTest", () => {
     expect(onBlur).not.toHaveBeenCalled();
   });
 
-  it("sets aria-validation if invalid with border red, without error message", async () => {
-    // Given a Select Field without a selected option
-    const r = await render(
-      <TestSelectField
-        label="Age"
-        value={undefined}
-        options={options}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
-        data-testid="age"
-        errorMsg="Required"
-        omitErrorMessage
-      />,
-    );
-    // When changing the inputs value, and not selecting an option
-    fireEvent.input(r.age(), { target: { value: "asdf" } });
-    // And `blur`ing the field
-    fireEvent.blur(r.age());
-
-    // Then expect the value to be reset to empty
-    expect(r.age()).toHaveValue("");
-    expect(r.age()).toHaveAttribute("aria-invalid", "true");
-    // The error message is not in the DOM
-    expect(r.queryByTestId("age_errorMsg")).not.toBeInTheDocument();
-  });
-
   it("does not fire focus/blur when readOnly", async () => {
     const onFocus = jest.fn();
     const onBlur = jest.fn();

@@ -43,7 +43,7 @@ export function TextFieldStyles() {
           helperText="Some really long helper text that we expect to wrap."
         />
         <TestTextField label="Name Clearable" value="Brandon" clearable />
-        <ValidationTextField label="Omit Error Message" value="Brandon" clearable omitErrorMessage />
+        <ValidationTextField label="Omit Error Message" value="Brandon" clearable hideErrorMessage />
       </div>
 
       <div css={Css.df.fdc.gap2.$}>
