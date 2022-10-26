@@ -15,6 +15,7 @@ export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
   onEnter?: VoidFunction;
   endAdornment?: ReactNode;
   startAdornment?: ReactNode;
+  hideErrorMessage?: boolean;
 }
 
 export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
@@ -28,6 +29,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     onFocus,
     api,
     onEnter,
+    hideErrorMessage,
     ...otherProps
   } = props;
 
@@ -71,6 +73,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
       inputProps={inputProps}
       inputRef={inputRef}
       tooltip={resolveTooltip(disabled, undefined, readOnly)}
+      hideErrorMessage={hideErrorMessage}
     />
   );
 }
