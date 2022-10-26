@@ -98,6 +98,7 @@ describe("TextFieldTest", () => {
     expect(onBlur).toHaveBeenCalledTimes(1);
     expect(r.name()).not.toHaveFocus();
   });
+});
 
 function TestTextField<X extends Only<TextFieldXss, X>>(props: Omit<TextFieldProps<X>, "onChange" | "label">) {
   const { value, ...otherProps } = props;
