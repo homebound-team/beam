@@ -99,14 +99,6 @@ describe("TextFieldTest", () => {
     expect(r.name()).not.toHaveFocus();
   });
 
-  it("can set a value", async () => {
-    const r = await render(<TestTextField value="foo" />);
-    expect(r.name()).toHaveValue("foo");
-    type(r.name, "bar");
-    expect(r.name()).toHaveValue("bar");
-  });
-});
-
 function TestTextField<X extends Only<TextFieldXss, X>>(props: Omit<TextFieldProps<X>, "onChange" | "label">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
