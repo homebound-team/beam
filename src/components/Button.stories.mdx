@@ -2,7 +2,16 @@ import { Meta, ArgsTable, Canvas, Story, Props } from "@storybook/addon-docs";
 import { Button } from "./Button";
 import { Css } from "../Css";
 
-<Meta title="Catalog/Button" component={Button} parameters={{ options: { withPerformance: { disabled: true } } }} />
+<Meta
+  title="Catalog/Button"
+  component={Button}
+  parameters={{
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31580%3A99838",
+    },
+  }}
+/>
 
 export const Template = (args) => {
   const onClick = () => {};

@@ -121,6 +121,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^16.14.0",
     "semantic-release": "^17.4.0",
+    "storybook-addon-designs": "^6.3.1",
     "storybook-addon-performance": "^0.16.1",
     "ts-jest": "^26.5.3",
     "ts-node": "^9.1.1",
