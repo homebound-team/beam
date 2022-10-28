@@ -59,7 +59,7 @@ export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs) => Re
   (column, as) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
     const Cell = as === "table" ? "th" : "div";
     return (
-      <Cell css={{ ...css, ...tableRowStyles(as, column) }} className={classNames}>
+      <Cell key={key} css={{ ...css, ...tableRowStyles(as, column) }} className={classNames}>
         {content}
       </Cell>
     );
