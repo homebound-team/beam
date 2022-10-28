@@ -45,7 +45,7 @@ export function ButtonModalInteractive() {
   );
 }
 
-export function ButtonModalWithVariantAndCustomHTML() {
+export function ButtonModalWithVariantAndHideEndAdornment() {
   return (
     <ButtonModal
       storybookDefaultOpen
