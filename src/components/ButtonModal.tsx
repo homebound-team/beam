@@ -8,12 +8,15 @@ import {
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
+import { ButtonVariant } from "./Button";
 import { ContextualModal } from "./internal/ContextualModal";
 
 export interface ButtonModalProps extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
   content: ReactNode;
   title?: string;
+  variant?: ButtonVariant;
   storybookDefaultOpen?: boolean;
+  hideEndAdornment?: boolean;
 }
 
 export function ButtonModal(props: ButtonModalProps) {

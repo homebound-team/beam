@@ -81,7 +81,19 @@ export const Icon = (props: IconProps) => {
     "arrowFromTop",
   ];
   const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images", "openBook"];
-  const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar", "buildingHouse", "house", "bell", "customize"];
+  const miscIcons: IconProps["icon"][] = [
+    "dollar",
+    "userCircle",
+    "calendar",
+    "buildingHouse",
+    "house",
+    "bell",
+    "customize",
+    "leaf",
+    "floorPlan",
+    "chair",
+    "bolt",
+  ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
     "tasks",
