@@ -1,19 +1,5 @@
 import { useEffect, useState } from "react";
-
-// this will be exported from truss soon
-type BreakpointKey = "print" | "sm" | "md" | "smOrMd" | "mdAndUp" | "mdAndDown" | "lg" | "mdOrLg";
-enum Breakpoints {
-  print = "@media print",
-  sm = "@media screen and (max-width:599px)",
-  md = "@media screen and (min-width:600px) and (max-width:1024px)",
-  smOrMd = "@media screen and (max-width:1024px)",
-  mdAndUp = "@media screen and (min-width:600px)",
-  mdAndDown = "@media screen and (max-width:1024px)",
-  lg = "@media screen and (min-width:1025px)",
-  mdOrLg = "@media screen and (min-width:600px)",
-}
-
-type BreakpointsType = Record<BreakpointKey, boolean>;
+import { BreakpointKey, Breakpoints } from "../Css";
 
 /**
  * A React hook to return a record of responsive breakpoints that updates on resize.
@@ -22,6 +8,8 @@ type BreakpointsType = Record<BreakpointKey, boolean>;
  * const { breakpoints } = useBreakpoint();
  * if(breakpoints.mdAndDown) {...do something cool}
  */
+
+type BreakpointsType = Record<BreakpointKey, boolean>;
 
 export function useBreakpoint(): { breakpoints: BreakpointsType } {
   const [breakpoints, setBreakpoints] = useState({} as BreakpointsType);
