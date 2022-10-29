@@ -1115,6 +1115,17 @@ export type Font = "fontSize" | "fontWeight" | "lineHeight";
 
 type Brand<K, T> = K & { __brand: T };
 type Breakpoint = Brand<string, "Breakpoint">;
+export type BreakpointKey = "print" | "sm" | "md" | "smOrMd" | "mdAndUp" | "mdAndDown" | "lg" | "mdOrLg";
+export enum Breakpoints {
+  print = "@media print",
+  sm = "@media screen and (max-width:599px)",
+  md = "@media screen and (min-width:600px) and (max-width:1024px)",
+  smOrMd = "@media screen and (max-width:1024px)",
+  mdAndUp = "@media screen and (min-width:600px)",
+  mdAndDown = "@media screen and (max-width:1024px)",
+  lg = "@media screen and (min-width:1025px)",
+  mdOrLg = "@media screen and (min-width:600px)",
+}
 export const print = "@media print" as Breakpoint;
 export const sm = "@media screen and (max-width:599px)" as Breakpoint;
 export const md = "@media screen and (min-width:600px) and (max-width:1024px)" as Breakpoint;
