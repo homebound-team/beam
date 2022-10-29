@@ -8,6 +8,12 @@ export default {
   component: Menu,
   title: "Workspace/Components/Menu",
   decorators: [withDimensions()],
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36062%3A105697",
+    }
+  },
 } as Meta;
 
 export function BasicMenuItems() {

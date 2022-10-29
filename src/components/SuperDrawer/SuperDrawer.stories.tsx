@@ -27,6 +27,12 @@ export default {
   title: "Workspace/Components/Super Drawer",
   component: SuperDrawerComponent,
   decorators: [withBeamDecorator, withDimensions()],
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=35964%3A102029",
+    }
+  },
 } as Meta;
 
 export function Open() {

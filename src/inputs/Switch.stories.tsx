@@ -14,6 +14,12 @@ import { SwitchGroup, SwitchGroupProps } from "./SwitchGroup";
 export default {
   component: SwitchComponent,
   title: "Workspace/Inputs/Switch",
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36943%3A102525",
+    }
+  },
 } as Meta<SwitchProps>;
 
 export const Switch = () => {

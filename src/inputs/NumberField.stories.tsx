@@ -8,6 +8,12 @@ import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
 export default {
   title: "Workspace/Inputs/Number Field",
   component: NumberField,
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=1291%3A0",
+    }
+  },
 } as Meta;
 
 export function NumberFieldStyles() {

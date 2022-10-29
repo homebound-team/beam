@@ -12,6 +12,12 @@ export default {
   title: "Workspace/Inputs/Date Field",
   component: Button,
   decorators: [withDimensions()],
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31699%3A99566",
+    }
+  },
 } as Meta;
 
 export function DateFields() {

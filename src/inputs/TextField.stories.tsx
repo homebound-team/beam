@@ -9,6 +9,12 @@ import { TextFieldXss } from "src/interfaces";
 export default {
   component: TextField,
   title: "Workspace/Inputs/Text Field",
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36923%3A102347",
+    }
+  },
 } as Meta;
 
 export function TextFieldStyles() {

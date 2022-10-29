@@ -10,6 +10,12 @@ import { HasIdAndName, Optional } from "src/types";
 export default {
   component: MultiSelectField,
   title: "Workspace/Inputs/Multi Select Fields",
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36053%3A101882",
+    }
+  },
 } as Meta;
 
 type TestOption = {

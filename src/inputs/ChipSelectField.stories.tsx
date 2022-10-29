@@ -11,6 +11,12 @@ import { zeroTo } from "src/utils/sb";
 export default {
   component: ChipSelectField,
   title: "Workspace/Inputs/ChipSelectField",
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101241",
+    }
+  },
 } as Meta;
 
 type TaskStatusDetails = { id: string; code: TaskStatus; name: string };
