@@ -3063,10 +3063,10 @@
   dependencies:
     "@testing-library/react" "^12.1.2"
 
-"@homebound/truss@^1.113.0":
-  version "1.113.0"
-  resolved "https://registry.yarnpkg.com/@homebound/truss/-/truss-1.113.0.tgz#20f5adaacd6fc80485b3e8b61c90b905975641f9"
-  integrity sha512-yfJbvT2pCUB3TN0l8DOHfa340CSaVi3043GWFmsuFO7SLrfcBlMLeOzwtAGeQLsAnCbunVG/YtXycTzGX9Fiiw==
+"@homebound/truss@^1.115.0":
+  version "1.115.0"
+  resolved "https://registry.yarnpkg.com/@homebound/truss/-/truss-1.115.0.tgz#f38dc322abf4787ac524dc227ce07f3691435f06"
+  integrity sha512-d8HTAA65nLy9OD5OcU6uw/uiRXrKMuTc6uq2Y2TTjqacrX8e18mWtnEkegZVERAV/MkGn2bbWgz07BBBQ/M21A==
   dependencies:
     csstype "^2.6.10"
     ts-node "^10.7.0"
