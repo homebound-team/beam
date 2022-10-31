@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { BreakpointKey, Breakpoints } from "../Css";
 
 /**
@@ -15,12 +16,18 @@ export function useBreakpoint(): { breakpoints: BreakpointsType } {
   const [breakpoints, setBreakpoints] = useState(matchMediaBreakpoints());
 
   useEffect(() => {
-    function handleResize() {
-      // Set breakpoints on resize
-      setBreakpoints(matchMediaBreakpoints());
-    }
+    const handleResize = useDebouncedCallback(
+      // function
+      () => {
+        setBreakpoints(matchMediaBreakpoints());
+      },
+      // delay in ms
+      1000,
+    );
+
     window.addEventListener("resize", handleResize);
     handleResize();
+
     // Remove event listener on cleanup
     return () => window.removeEventListener("resize", handleResize);
   }, []);
