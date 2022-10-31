@@ -25,7 +25,7 @@ export function Popover(props: PopoverProps) {
 
         // If we clicked the trigger element (or within it), then that will call a `state.toggle` for us.
         // Return early if that happens, otherwise we'd call `onClose`, then the trigger would toggle it back open.
-        if (popoverRef.current?.contains(e) || e.closest('[data-overlay-container]')) {
+        if (triggerRef.current?.contains(e) || e.closest('[data-overlay-container]')) {
           return true;
         }
 
