@@ -95,11 +95,11 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
         <AutoSaveStatusProvider>
           <SnackbarProvider>
             {/* OverlayProvider is required for Modals generated via React-Aria */}
-            <OverlayProvider>
-              {children}
-              {modalRef.current && <Modal {...modalRef.current} />}
-            </OverlayProvider>
             <ToastProvider>
+              <OverlayProvider>
+                {children}
+                {modalRef.current && <Modal {...modalRef.current} />}
+              </OverlayProvider>
             </ToastProvider>
             <SuperDrawer />
           </SnackbarProvider>

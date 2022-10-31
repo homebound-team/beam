@@ -7,9 +7,9 @@ describe("ToastNotice", () => {
     // Given a Toast Notice component
     const r = await render(<ToastNotice type={"error"} message={"Error"} onClose={noop} />);
     // Then expect the default properties to exist in the layout
-    expect(r.toast_type()).toBeInTheDocument();
-    expect(r.toast_message()).toBeInTheDocument();
-    expect(r.toast_close()).toBeInTheDocument();
+    expect(r.getAllByTestId("toast_type")[0]).toBeInTheDocument();
+    expect(r.getAllByTestId("toast_message")[0]).toBeInTheDocument();
+    expect(r.getAllByTestId("toast_close")[0]).toBeInTheDocument();
   });
 
   it("fires onClose callback", async () => {
@@ -17,7 +17,7 @@ describe("ToastNotice", () => {
     const onClose = jest.fn();
     const r = await render(<ToastNotice type={"error"} message={"Error"} onClose={onClose} />);
     // When clicking the x button to close the toast
-    click(r.toast_close);
+    click(r.getAllByTestId("toast_close")[0]);
     // Then expect the onClose callback to have been called
     expect(onClose).toHaveBeenCalledTimes(1);
   });
