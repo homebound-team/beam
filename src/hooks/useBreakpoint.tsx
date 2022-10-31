@@ -1,4 +1,4 @@
-import { isEqual } from "lodash";
+import equal from "fast-deep-equal";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { BreakpointKey, Breakpoints } from "../Css";
@@ -18,7 +18,7 @@ export const useBreakpoint = (): BreakpointsType => {
 
   const handleResize = useDebouncedCallback(() => {
     const newBps = matchMediaBreakpoints();
-    if (isEqual(breakpoints, newBps)) return;
+    if (equal(breakpoints, newBps)) return;
 
     setBreakpoints(newBps);
   }, 1000);
