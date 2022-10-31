@@ -9,19 +9,23 @@ import { BreakpointKey, Breakpoints } from "../Css";
  * if(breakpoints.mdAndDown) {...do something cool}
  */
 
-type BreakpointsType = Record<BreakpointKey, boolean>;
+type BreakpointsType = Partial<Record<BreakpointKey, boolean>>;
+
+function matchMediaBreakpoints(): BreakpointsType {
+  let bps = {} as BreakpointsType;
+  Object.entries(Breakpoints).forEach(([name, bp]) => {
+    bps[name as keyof BreakpointsType] = window.matchMedia(bp.replace("@media ", "")).matches;
+  });
+  return bps;
+}
 
 export function useBreakpoint(): { breakpoints: BreakpointsType } {
-  const [breakpoints, setBreakpoints] = useState({} as BreakpointsType);
+  const [breakpoints, setBreakpoints] = useState(matchMediaBreakpoints());
 
   useEffect(() => {
     function handleResize() {
       // Set breakpoints on resize
-      let bps = {} as BreakpointsType;
-      Object.entries(Breakpoints).forEach(([name, bp]) => {
-        bps[name as keyof BreakpointsType] = window.matchMedia(bp.replace("@media screen and ", "")).matches;
-      });
-      setBreakpoints(bps);
+      setBreakpoints(matchMediaBreakpoints());
     }
     window.addEventListener("resize", handleResize);
     handleResize();
