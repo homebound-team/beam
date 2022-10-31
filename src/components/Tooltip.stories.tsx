@@ -5,6 +5,12 @@ import { Placement, Tooltip } from "./Tooltip";
 export default {
   component: Tooltip,
   title: "Workspace/Components/Tooltip",
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36259%3A103869",
+    }
+  },
 } as Meta;
 
 export function TooltipPlacements() {

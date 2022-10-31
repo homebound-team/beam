@@ -17,6 +17,12 @@ import {
 export default {
   component: RadioGroupField,
   title: "Workspace/Inputs/Radio Group",
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36814%3A102223",
+    }
+  },
 } as Meta;
 
 export function BaseStates() {

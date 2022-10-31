@@ -5,6 +5,12 @@ import { ButtonGroup } from "src/index";
 export default {
   component: ButtonGroup,
   title: "Workspace/Components/Button Groups",
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31586%3A99872",
+    }
+  },
 } as Meta;
 
 export function ButtonGroups() {

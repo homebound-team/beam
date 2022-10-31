@@ -35,7 +35,13 @@ export default {
     actionLabel: { name: "action.label" },
     offset: { name: "offset" },
   },
-  parameters: { controls: { exclude: "notices" } },
+  parameters: {
+    controls: { exclude: "notices" },
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36152%3A102047",
+    }
+  },
 } as Meta<SnackBarStoryProps>;
 
 export function Customizable(args: SnackBarStoryProps) {

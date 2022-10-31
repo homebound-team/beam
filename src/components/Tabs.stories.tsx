@@ -16,6 +16,10 @@ export default {
   parameters: {
     // To better view the icon hover state
     backgrounds: { default: "white" },
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36087%3A106217",
+    }
   },
   decorators: [withRouter(), withBeamDecorator],
 } as Meta;
