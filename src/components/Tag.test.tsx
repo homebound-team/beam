@@ -13,4 +13,10 @@ describe("Tag", () => {
     const r = await render(<Tag text="test" data-testid="testTag" xss={Css.mt1.$} />);
     expect(r.testTag()).toHaveStyleRule("margin-top", "8px");
   });
+
+  it("renders with icon", async () => {
+    const r = await render(<Tag text="text" data-testid="testTag" icon="infoCircle" />);
+    const iconElement = r.container.querySelector(`[data-icon="infoCircle"]`)!;
+    expect(iconElement).toBeInTheDocument();
+  });
 });
