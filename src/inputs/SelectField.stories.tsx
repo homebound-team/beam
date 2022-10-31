@@ -13,7 +13,13 @@ import { withDimensions, zeroTo } from "src/utils/sb";
 export default {
   component: SelectField,
   title: "Workspace/Inputs/Select Fields",
-  parameters: { layout: "fullscreen" },
+  parameters: { 
+    layout: "fullscreen",
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=1287%3A789",
+    }
+  },
   argTypes: {
     compact: { control: false },
     contrast: { control: false },
