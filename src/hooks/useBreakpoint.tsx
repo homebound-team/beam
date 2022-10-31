@@ -11,14 +11,6 @@ import { BreakpointKey, Breakpoints } from "../Css";
 
 type BreakpointsType = Partial<Record<BreakpointKey, boolean>>;
 
-function matchMediaBreakpoints(): BreakpointsType {
-  let bps = {} as BreakpointsType;
-  Object.entries(Breakpoints).forEach(([name, bp]) => {
-    bps[name as keyof BreakpointsType] = window.matchMedia(bp.replace("@media ", "")).matches;
-  });
-  return bps;
-}
-
 export function useBreakpoint(): { breakpoints: BreakpointsType } {
   const [breakpoints, setBreakpoints] = useState(matchMediaBreakpoints());
 
@@ -34,4 +26,12 @@ export function useBreakpoint(): { breakpoints: BreakpointsType } {
   }, []);
 
   return { breakpoints };
+}
+
+function matchMediaBreakpoints(): BreakpointsType {
+  let bps = {} as BreakpointsType;
+  Object.entries(Breakpoints).forEach(([name, bp]) => {
+    bps[name as keyof BreakpointsType] = window.matchMedia(bp.replace("@media ", "")).matches;
+  });
+  return bps;
 }
