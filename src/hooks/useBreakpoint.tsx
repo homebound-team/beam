@@ -1,3 +1,4 @@
+import { isEqual } from "lodash";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { BreakpointKey, Breakpoints } from "../Css";
@@ -10,30 +11,26 @@ import { BreakpointKey, Breakpoints } from "../Css";
  * if(breakpoints.mdAndDown) {...do something cool}
  */
 
-type BreakpointsType = Partial<Record<BreakpointKey, boolean>>;
+type BreakpointsType = Record<BreakpointKey, boolean>;
 
-export function useBreakpoint(): { breakpoints: BreakpointsType } {
+export const useBreakpoint = (): BreakpointsType => {
   const [breakpoints, setBreakpoints] = useState(matchMediaBreakpoints());
 
+  const handleResize = useDebouncedCallback(() => {
+    const newBps = matchMediaBreakpoints();
+    if (isEqual(breakpoints, newBps)) return;
+
+    setBreakpoints(newBps);
+  }, 1000);
+
   useEffect(() => {
-    const handleResize = useDebouncedCallback(
-      // function
-      () => {
-        setBreakpoints(matchMediaBreakpoints());
-      },
-      // delay in ms
-      1000,
-    );
-
     window.addEventListener("resize", handleResize);
-    handleResize();
-
     // Remove event listener on cleanup
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  return { breakpoints };
-}
+  return breakpoints;
+};
 
 function matchMediaBreakpoints(): BreakpointsType {
   let bps = {} as BreakpointsType;
