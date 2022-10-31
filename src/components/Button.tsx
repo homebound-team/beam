@@ -2,7 +2,7 @@ import { AriaButtonProps } from "@react-types/button";
 import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Xss } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, isPromise, noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
@@ -23,6 +23,7 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
   download?: boolean;
   contrast?: boolean;
+  xss?: Xss<"borderColor">;
 }
 
 export function Button(props: ButtonProps) {
@@ -35,6 +36,7 @@ export function Button(props: ButtonProps) {
     openInNew,
     download,
     contrast = false,
+    xss,
     ...otherProps
   } = props;
   const asLink = typeof onPress === "string";
@@ -93,6 +95,7 @@ export function Button(props: ButtonProps) {
     css: {
       ...Css.buttonBase.tt("inherit").$,
       ...baseStyles,
+      ...xss,
       ...(isHovered && !isPressed ? hoverStyles : {}),
       ...(isPressed ? pressedStyles : {}),
       ...(isDisabled || asyncInProgress ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),

@@ -35,6 +35,7 @@ export interface OverlayTriggerProps {
   /** Prop set the style of the button element */
   variant?: ButtonVariant;
   hideEndAdornment?: boolean;
+  showActiveBorder?: boolean;
 }
 
 export function OverlayTrigger(props: OverlayTriggerProps) {
@@ -49,6 +50,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     children,
     variant,
     hideEndAdornment,
+    showActiveBorder = false
   } = props;
   const popoverRef = useRef(null);
   const { overlayProps: positionProps } = useOverlayPosition({
@@ -76,6 +78,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           disabled={disabled}
           tooltip={tooltip}
           onClick={noop}
+          xss={Css.if(showActiveBorder && state.isOpen).bLightBlue600.$}
           {...tid}
         />
       ) : isIconButton(trigger) ? (

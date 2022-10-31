@@ -58,3 +58,18 @@ export function ButtonModalWithVariantAndHideEndAdornment() {
     />
   );
 }
+
+export function ButtonModalWithActiveBorder() {
+  return (
+    <ButtonModal
+      storybookDefaultOpen
+      title={"Modal Title"}
+      content={
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ipsum purus, bibendum sit amet vulputate eget, porta semper ligula."
+      }
+      trigger={{ label: "Button Modal trigger" }}
+      hideEndAdornment
+      showActiveBorder
+    />
+  );
+}

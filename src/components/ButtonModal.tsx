@@ -17,6 +17,7 @@ export interface ButtonModalProps extends Pick<OverlayTriggerProps, "trigger" | 
   variant?: ButtonVariant;
   storybookDefaultOpen?: boolean;
   hideEndAdornment?: boolean;
+  showActiveBorder?: boolean;
 }
 
 export function ButtonModal(props: ButtonModalProps) {
