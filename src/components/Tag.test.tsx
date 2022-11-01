@@ -15,7 +15,7 @@ describe("Tag", () => {
   });
 
   it("renders with icon", async () => {
-    const r = await render(<Tag text="text" data-testid="testTag" icon="infoCircle" />);
+    const r = await render(<Tag text="text" icon="infoCircle" />);
     const iconElement = r.container.querySelector(`[data-icon="infoCircle"]`)!;
     expect(iconElement).toBeInTheDocument();
   });

@@ -20,12 +20,16 @@ export function Tag<X extends Only<Xss<TagXss>, X>>({ text, type, xss, ...otherP
   return (
     <span
       {...tid}
-      css={{ ...Css.dif.tinySb.ttu.aic.gap(0.5).pxPx(6).pyPx(2).gray900.br4.$, ...typeStyles, ...xss }}
+      css={{ ...Css.dif.tinySb.ttu.aic.gapPx(4).pxPx(6).pyPx(2).gray900.br4.$, ...typeStyles, ...xss }}
       title={text}
     >
       {/* Nesting `lineClamp` styles as the padding bottom set would expose the remainder of the text if applied on the same element */}
       {/* Using `lineClamp1` instead of `truncate` as `truncate` requires a width set to properly truncate and `lineClamp` can smartly do it based on the parent's width */}
-      {otherProps.icon && <Icon icon={otherProps.icon} inc={1.5} />}
+      {otherProps.icon && (
+        <span css={Css.fs0.$}>
+          <Icon icon={otherProps.icon} inc={1.5} />
+        </span>
+      )}
       <span css={Css.lineClamp1.breakAll.$}>{text}</span>
     </span>
   );
