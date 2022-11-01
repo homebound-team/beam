@@ -24,11 +24,11 @@ export function Popover(props: PopoverProps) {
         // By returning `false` in this function it will no longer call `stopPropagation`, but it also will not call `onHide` for us, so we need to call `onClose` ourselves.
 
         // If we clicked the trigger element (or within it), then that will call a `state.toggle` for us.
-        // Return early if that happens, otherwise we'd call `onClose`, then the trigger would toggle it back open.
+        // Return early if that happens.
         if (triggerRef.current?.contains(e)) {
           return true;
         }
-
+        //Do not close the Popover if the user is interacting with a tribute menu, dialog or alert on top of it, otherwise close it.
         return !(e.closest(".tribute-container") || e.closest("[role='dialog']") || e.closest("[role='alert']"));
       },
       ...others,
