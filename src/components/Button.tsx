@@ -2,7 +2,7 @@ import { AriaButtonProps } from "@react-types/button";
 import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
-import { Css, Palette, Xss } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, isPromise, noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
