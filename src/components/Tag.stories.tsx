@@ -13,7 +13,7 @@ export default {
   },
 } as Meta;
 
-export function Tags() {
+export function NoIcon() {
   return (
     <div css={Css.df.fdc.aifs.gap1.$}>
       <Tag text="Neutral" />
@@ -28,7 +28,7 @@ export function Tags() {
   );
 }
 
-export function TagsWithAnIcon() {
+export function WithAnIcon() {
   return (
     <div css={Css.df.fdc.aifs.gap1.$}>
       <Tag text="Neutral" icon="helpCircle" />
