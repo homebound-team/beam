@@ -78,7 +78,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           disabled={disabled}
           tooltip={tooltip}
           onClick={noop}
-          xss={Css.if(showActiveBorder && state.isOpen).bLightBlue600.$}
+          forceFocusStyles={showActiveBorder && state.isOpen}
           {...tid}
         />
       ) : isIconButton(trigger) ? (

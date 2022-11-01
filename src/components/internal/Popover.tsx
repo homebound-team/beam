@@ -25,9 +25,13 @@ export function Popover(props: PopoverProps) {
 
         // If we clicked the trigger element (or within it), then that will call a `state.toggle` for us.
         // Return early if that happens, otherwise we'd call `onClose`, then the trigger would toggle it back open.
-        if (triggerRef.current?.contains(e) || e.closest('[data-overlay-container]')) {
+        if (triggerRef.current?.contains(e)) {
           return true;
         }
+
+        // Do not close the Modal if the user is interacting with the Tribute mentions dropdown (via RichTextField) or with another 3rd party dialog (such as a lightbox) on top of it.
+        return !(e.closest(".tribute-container") || e.closest("[role='dialog']") || e.closest("[role='alert']"));
+
 
         onClose();
         return false;

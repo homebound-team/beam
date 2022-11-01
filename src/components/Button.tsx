@@ -23,7 +23,7 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
   download?: boolean;
   contrast?: boolean;
-  xss?: Xss<"borderColor">;
+  forceFocusStyles?: boolean;
 }
 
 export function Button(props: ButtonProps) {
@@ -36,7 +36,7 @@ export function Button(props: ButtonProps) {
     openInNew,
     download,
     contrast = false,
-    xss,
+    forceFocusStyles = false,
     ...otherProps
   } = props;
   const asLink = typeof onPress === "string";
@@ -95,11 +95,10 @@ export function Button(props: ButtonProps) {
     css: {
       ...Css.buttonBase.tt("inherit").$,
       ...baseStyles,
-      ...xss,
       ...(isHovered && !isPressed ? hoverStyles : {}),
       ...(isPressed ? pressedStyles : {}),
       ...(isDisabled || asyncInProgress ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
-      ...(isFocusVisible ? focusStyles : {}),
+      ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
     },
     ...tid,
   };
