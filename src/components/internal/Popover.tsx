@@ -29,12 +29,7 @@ export function Popover(props: PopoverProps) {
           return true;
         }
 
-        // Do not close the Modal if the user is interacting with the Tribute mentions dropdown (via RichTextField) or with another 3rd party dialog (such as a lightbox) on top of it.
         return !(e.closest(".tribute-container") || e.closest("[role='dialog']") || e.closest("[role='alert']"));
-
-
-        onClose();
-        return false;
       },
       ...others,
     },
