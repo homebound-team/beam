@@ -20,7 +20,7 @@ export function Tag<X extends Only<Xss<TagXss>, X>>({ text, type, xss, ...otherP
   return (
     <span
       {...tid}
-      css={{ ...Css.dif.tinySb.ttu.aic.gap(0.5).px(0.75).py(0.25).gray900.br4.$, ...typeStyles, ...xss }}
+      css={{ ...Css.dif.tinySb.ttu.aic.gap(0.5).pxPx(6).pyPx(2).gray900.br4.$, ...typeStyles, ...xss }}
       title={text}
     >
       {/* Nesting `lineClamp` styles as the padding bottom set would expose the remainder of the text if applied on the same element */}
