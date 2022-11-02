@@ -35,6 +35,7 @@ export interface OverlayTriggerProps {
   /** Prop set the style of the button element */
   variant?: ButtonVariant;
   hideEndAdornment?: boolean;
+  showActiveBorder?: boolean;
 }
 
 export function OverlayTrigger(props: OverlayTriggerProps) {
@@ -49,6 +50,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     children,
     variant,
     hideEndAdornment,
+    showActiveBorder = false
   } = props;
   const popoverRef = useRef(null);
   const { overlayProps: positionProps } = useOverlayPosition({
@@ -58,6 +60,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     isOpen: state.isOpen,
     onClose: state.close,
     placement: (placement ? `bottom ${placement}` : "bottom left") as Placement,
+    offset: showActiveBorder ? 4 : undefined,
   });
   const tid = useTestIds(
     props,
@@ -76,6 +79,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           disabled={disabled}
           tooltip={tooltip}
           onClick={noop}
+          forceFocusStyles={showActiveBorder && state.isOpen}
           {...tid}
         />
       ) : isIconButton(trigger) ? (
@@ -87,6 +91,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           disabled={disabled}
           tooltip={tooltip}
           onClick={noop}
+          forceFocusStyles={showActiveBorder && state.isOpen}
         />
       ) : (
         <AvatarButton
@@ -97,6 +102,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           disabled={disabled}
           tooltip={tooltip}
           onClick={noop}
+          forceFocusStyles={showActiveBorder && state.isOpen}
         />
       )}
       {state.isOpen && (

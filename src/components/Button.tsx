@@ -35,6 +35,7 @@ export function Button(props: ButtonProps) {
     openInNew,
     download,
     contrast = false,
+    forceFocusStyles = false,
     ...otherProps
   } = props;
   const asLink = typeof onPress === "string";
@@ -96,7 +97,7 @@ export function Button(props: ButtonProps) {
       ...(isHovered && !isPressed ? hoverStyles : {}),
       ...(isPressed ? pressedStyles : {}),
       ...(isDisabled || asyncInProgress ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
-      ...(isFocusVisible ? focusStyles : {}),
+      ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
     },
     ...tid,
   };

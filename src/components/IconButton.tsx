@@ -40,6 +40,7 @@ export function IconButton(props: IconButtonProps) {
     compact = false,
     contrast = false,
     download = false,
+    forceFocusStyles = false,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
@@ -62,7 +63,7 @@ export function IconButton(props: IconButtonProps) {
       ...iconButtonStylesReset,
       ...(compact ? iconButtonCompact : iconButtonNormal),
       ...(isHovered && (contrast ? iconButtonContrastStylesHover : iconButtonStylesHover)),
-      ...(isFocusVisible && iconButtonStylesFocus),
+      ...(isFocusVisible || forceFocusStyles ? iconButtonStylesFocus : {}),
       ...(isDisabled && iconButtonStylesDisabled),
     }),
     [isHovered, isFocusVisible, isDisabled, compact],
