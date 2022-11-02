@@ -1087,7 +1087,7 @@ export function RevealOnRowHover() {
   );
 }
 
-export function Toggle_Custom_Collapse() {
+export function ToggleCustomCollapse() {
   const api = useGridTableApi<Row | ChildRow>();
 
   const collapseCol = collapseColumn<Row | ChildRow>({
