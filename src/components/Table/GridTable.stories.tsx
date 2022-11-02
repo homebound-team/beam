@@ -6,6 +6,7 @@ import {
   actionColumn,
   Button,
   cardStyle,
+  collapseColumn,
   CollapseToggle,
   column,
   condensedStyle,
@@ -1082,6 +1083,56 @@ export function RevealOnRowHover() {
           { kind: "data", id: "1", data: { name: "Hover over me to reveal the number!", value: 7 } },
         ]}
       />
+    </>
+  );
+}
+
+export function Toggle_Custom_Collapse() {
+  const api = useGridTableApi<Row | ChildRow>();
+
+  const collapseCol = collapseColumn<Row | ChildRow>({
+    data: () => emptyCell,
+  });
+
+  const nameCol: GridColumn<Row | ChildRow> = {
+    header: "Name",
+    data: ({ name }, { row }) => {
+      return (
+        <>
+          <Button label={name!} variant="text" onClick={() => api.toggleCollapsedRow(row.id)} />
+          <CollapseToggle compact row={row} />
+        </>
+      );
+    },
+    child: ({ name }) => ({ content: name }),
+    mw: "160px",
+  };
+
+  return (
+    <>
+      <GridTable
+        columns={[collapseCol, nameCol]}
+        style={{ rowHeight: "fixed" }}
+        rows={[
+          simpleHeader,
+          {
+            id: "p1",
+            kind: "data",
+            data: { name: "Parent", value: 1 },
+            children: [
+              {
+                id: "c1",
+                kind: "child",
+                data: { name: "Child" },
+              },
+            ],
+          },
+        ]}
+        api={api}
+      />
+      <div>
+        <Button label={"Toggle Collpase"} variant="secondary" size="sm" onClick={() => api.toggleCollapsedRow("p1")} />
+      </div>
     </>
   );
 }

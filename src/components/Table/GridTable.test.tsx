@@ -1161,7 +1161,7 @@ describe("GridTable", () => {
         ],
       },
     ];
-    //applying filter to get parent 1 (p1)
+    // applying filter to get parent 1 (p1)
     const r = await render(<GridTable filter="parent 1" columns={nestedColumns} rows={rows} />);
 
     // Then we show the header
@@ -1263,6 +1263,42 @@ describe("GridTable", () => {
     expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
     expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
     expect(cell(r, 3, 2)).toHaveTextContent("grandchild p1c1g1");
+  });
+
+  it("can collapse using api", async () => {
+    // Given a parent with a child and grandchild
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
+          },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<NestedRow>();
+      api.current = _api;
+      return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
+    }
+    const r = await render(<Test />);
+    // And all three rows are initially rendered
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
+    expectRenderedRows("p1", "p1c1", "p1c1g1");
+    // When the child is collapsed
+    api.current!.toggleCollapsedRow(rows[0].children![0].id);
+    // Then the parent and child rows are still shown
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    // But not the grandchild
+    expect(row(r, 2)).toBeUndefined();
+    // And nothing needed to re-render
+    expectRenderedRows();
   });
 
   it("persists collapse", async () => {
