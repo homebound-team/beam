@@ -60,7 +60,6 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     isOpen: state.isOpen,
     onClose: state.close,
     placement: (placement ? `bottom ${placement}` : "bottom left") as Placement,
-    shouldUpdatePosition: showActiveBorder || undefined,
     offset: showActiveBorder ? 4 : undefined,
   });
   const tid = useTestIds(
