@@ -23,6 +23,7 @@ export function AvatarButton(props: AvatarButtonProps) {
     tooltip,
     menuTriggerProps,
     openInNew,
+    forceFocusStyles = false,
     ...avatarProps
   } = props;
   const isDisabled = !!disabled;
@@ -46,7 +47,7 @@ export function AvatarButton(props: AvatarButtonProps) {
       ...resetStyles,
       ...(isHovered && hoverStyles),
       ...(isPressed && pressedStyles),
-      ...(isFocusVisible && focusStyles),
+      ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
       ...(isDisabled && disabledStyles),
     }),
     [isHovered, isFocusVisible, isDisabled, isPressed],
