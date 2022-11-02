@@ -48,6 +48,9 @@ export type GridTableApi<R extends Kinded> = {
 
   /** Set selected state of a row by id */
   selectRow: (id: string, selected?: boolean) => void;
+
+  /** Toggle collapse state of a row by id */
+  toggleCollapsedRow: (id: string) => void;
 };
 
 // Using `FooImpl`to keep the public GridTableApi definition separate.
@@ -101,5 +104,9 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public selectRow(id: string, selected: boolean = true) {
     this.tableState.selectRow(id, selected);
+  }
+
+  public toggleCollapsedRow(id: string) {
+    this.tableState.toggleCollapsed(id);
   }
 }
