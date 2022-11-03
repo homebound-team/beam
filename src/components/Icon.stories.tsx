@@ -47,7 +47,7 @@ export const Icon = (props: IconProps) => {
     "unarchive",
     "duplicate",
     "filter",
-    "columns",
+    "kanban",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
