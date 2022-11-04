@@ -268,9 +268,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     return rows;
   }, [columns, rows, sortOn, sortState, caseSensitive]);
 
-  const hasTotalsRow = rows.some((row) => row.id === TOTALS);
-  const hasExpandableHeader = rows.some((row) => row.id === EXPANDABLE_HEADER);
-
   // Flatten + component-ize the sorted rows.
   let [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, filteredRowIds]: [
     RowTuple<R>[],
@@ -325,6 +322,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     const visibleDataRows: RowTuple<R>[] = [];
     const filteredRowIds: string[] = [];
 
+    const hasTotalsRow = rows.some((row) => row.id === TOTALS);
+    const hasExpandableHeader = rows.some((row) => row.id === EXPANDABLE_HEADER);
+
     function visit([row, children]: ParentChildrenTuple<R>, level: number, visible: boolean): void {
       visible && visibleDataRows.push([row, makeRowComponent(row, level)]);
       // This row may be invisible (because it's parent is collapsed), but we still want
@@ -378,7 +378,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     columnSizes,
     collapsedIds,
     getCount,
-    hasTotalsRow,
   ]);
 
   let tooManyClientSideRows = false;

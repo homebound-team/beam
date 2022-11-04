@@ -47,7 +47,9 @@ describe("EditColumnsButton", () => {
     }
     const r = await render(<Test />);
     // Then the warning is logged
-    expect(warnSpy.mock.calls[0][0]).toBe("Column is missing 'name' property required by the Edit Columns button");
+    expect(warnSpy.mock.calls[0][0]).toBe(
+      "Column is missing 'name' and/or 'id' property required by the Edit Columns button",
+    );
     // And the list does not include the Action column
     expect(r.getAllByRole("checkbox")).toHaveLength(1);
     expect(r.queryByText("Actions")).toBeFalsy();

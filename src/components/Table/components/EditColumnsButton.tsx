@@ -39,8 +39,8 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
       (acc, column) => {
         // Only include options that can be hidden and have the `name` property defined.
         if (!column.canHide) return acc;
-        if (!column.name || column.name.length === 0) {
-          console.warn("Column is missing 'name' property required by the Edit Columns button", column);
+        if (!column.name || column.name.length === 0 || !column.id || column.id.length === 0) {
+          console.warn("Column is missing 'name' and/or 'id' property required by the Edit Columns button", column);
           return acc;
         }
 
