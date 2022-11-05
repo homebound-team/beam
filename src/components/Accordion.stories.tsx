@@ -16,7 +16,7 @@ export function AccordionVariations() {
           Our modern approach to homebuilding makes the process easier and more personal than ever before.
         </div>
       </Accordion>
-      <Accordion title="Default expanded" defaultExpanded>
+      <Accordion title="Default expanded" disabled defaultExpanded>
         <div css={Css.sm.$}>
           Our modern approach to homebuilding makes the process easier and more personal than ever before.
         </div>
