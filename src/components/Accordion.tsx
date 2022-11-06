@@ -94,7 +94,7 @@ export function Accordion(props: AccordionProps) {
         css={Css.overflowHidden.hPx(contentHeight).add("transition", "height 250ms ease-in-out").$}
       >
         {expanded && (
-          <div css={Css.px2.pb2.pt1.$} ref={contentRef}>
+          <div css={Css.px2.pb2.pt1.$} ref={contentRef} {...testIds.content}>
             {children}
           </div>
         )}
