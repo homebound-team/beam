@@ -158,7 +158,6 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             maybeCall(onFocus);
           },
           onClick: () => {
-            if (inputProps.readOnly) return;
             buttonRef.current?.click();
           },
           size:
