@@ -55,7 +55,7 @@ describe("BoundMultiSelectField", () => {
     );
     const r = await render(<BoundMultiSelectField field={author.favoriteShapes} options={shapes} />);
 
-    r.favoriteShapes().focus();
+    r.favoriteShapes().click();
     click(r.getByRole("option", { name: "Square" }));
 
     // Then the callback should be triggered with the current value
