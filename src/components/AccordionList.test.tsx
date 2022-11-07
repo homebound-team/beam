@@ -5,7 +5,7 @@ import { AccordionList } from "./AccordionList";
 
 describe(AccordionList, () => {
   const accordions: AccordionProps[] = [
-    { title: "First accordion title", children: <div>Fisrt accordion description</div> },
+    { title: "First accordion title", children: <div>First accordion description</div> },
     { title: "Second accordion title", children: <div>Second accordion description</div> },
     { title: "Third accordion title", children: <div>Third accordion description</div> },
   ];
@@ -33,11 +33,7 @@ describe(AccordionList, () => {
     click(r.accordionList_title_1());
 
     // Then both accordions are be expanded
-    expect(r.accordionList_details_0()).not.toHaveStyleRule("max-height", "0");
-    expect(r.accordionList_details_1()).not.toHaveStyleRule("max-height", "0");
-
-    // And the third one is still collapsed
-    expect(r.accordionList_details_2()).toHaveStyleRule("max-height", "0");
+    expect(r.getAllByTestId("accordionList_content")).toHaveLength(2);
   });
 
   it("can have only one accordion expanded", async () => {
@@ -46,13 +42,12 @@ describe(AccordionList, () => {
 
     // When the first accordions is selected
     click(r.accordionList_title_0());
-    // Then it shows as expanded
-    expect(r.accordionList_details_0()).not.toHaveStyleRule("max-height", "0");
+    // Then one accordion's content is shown
+    expect(r.accordionList_content()).toHaveTextContent("First accordion description");
 
     // And when a second accordion is selected
     click(r.accordionList_title_1());
-    // Then the first accordion is collapsed and the second is expanded
-    expect(r.accordionList_details_0()).toHaveStyleRule("max-height", "0");
-    expect(r.accordionList_details_1()).not.toHaveStyleRule("max-height", "0");
+    // Then, still, only one accordion's content is shown.
+    expect(r.accordionList_content()).toHaveTextContent("Second accordion description");
   });
 });
