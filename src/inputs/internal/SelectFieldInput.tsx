@@ -159,7 +159,7 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
           },
           onClick: () => {
             if (inputProps.readOnly) return;
-            state.open();
+            buttonRef.current?.click();
           },
           size:
             // If sizeToContent, then, in order of precedence, base it of from:
