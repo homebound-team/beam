@@ -56,7 +56,7 @@ describe("BoundSelectField", () => {
     );
     const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
     // When changing the value
-    r.favoriteSport().focus();
+    r.favoriteSport().click();
     click(r.getByRole("option", { name: "Soccer" }));
 
     // Then formState has the latest value when onBlur is called
