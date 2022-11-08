@@ -2433,6 +2433,37 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("First name");
       expect(cell(r, 1, 1)).toHaveTextContent("Last name");
     });
+
+    it("auto assigns 'visibleColumnStorageKey'", async () => {
+      jest.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
+
+      // Given some hide-able columns
+      const columns: GridColumn<Row>[] = [
+        { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initVisible: true },
+        { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true },
+        { id: "action", header: () => "Action", data: () => "action" },
+      ];
+
+      // Given a table
+      await render(<GridTable columns={columns} rows={rows} />);
+      // Then the visible column session storage is defined using a key build via the columns' `id` prop
+      expect(sessionStorage.setItem).toHaveBeenLastCalledWith("nameValueAction", '["name","action"]');
+    });
+
+    it("accepts a specified 'visibleColumnStorageKey'", async () => {
+      jest.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
+
+      // Given some hide-able columns
+      const columns: GridColumn<Row>[] = [
+        { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initVisible: true },
+        { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true },
+      ];
+
+      // And a table with setting the `visibleColumnStorageKey`
+      await render(<GridTable columns={columns} rows={rows} visibleColumnStorageKey="testStorageKey" />);
+      // Then the visible column session storage is defined using the `visibleColumnStorageKey` prop
+      expect(sessionStorage.setItem).toHaveBeenLastCalledWith("testStorageKey", '["name"]');
+    });
   });
 });
 

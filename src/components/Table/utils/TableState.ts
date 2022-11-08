@@ -211,10 +211,10 @@ export class TableState {
     this.rows = rows;
   }
 
-  setColumns(columns: GridColumnWithId<any>[]): void {
+  setColumns(columns: GridColumnWithId<any>[], visibleColumnStorageKey: string | undefined): void {
     if (columns !== this.columns) {
       this.columns = columns;
-      this.visibleColumnStorageKey = camelCase(columns.map((c) => c.id).join());
+      this.visibleColumnStorageKey = visibleColumnStorageKey ?? camelCase(columns.map((c) => c.id).join());
       this.visibleColumns.replace(readOrSetLocalVisibleColumnState(columns, this.visibleColumnStorageKey));
       const expandedColumnIds = columns.filter((c) => c.initExpanded).map((c) => c.id);
       this.expandedColumns.replace(expandedColumnIds);
