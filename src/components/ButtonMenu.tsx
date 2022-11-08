@@ -1,6 +1,6 @@
 import { values } from "mobx";
 import { useRef, useState } from "react";
-import { useMenuTrigger } from "react-aria";
+import { useMenuTrigger, useFilter } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { IconProps } from "src/components/Icon";
 import { Menu } from "src/components/internal/Menu";
@@ -25,7 +25,6 @@ interface ButtonMenuProps extends Pick<OverlayTriggerProps, "trigger" | "placeme
 export function ButtonMenu(props: ButtonMenuProps) {
   const { defaultOpen, disabled, items, persistentItems, trigger, searchable } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
-  const [searchTerm, setSearchTerm] = useState<string | undefined>("");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
@@ -33,20 +32,14 @@ export function ButtonMenu(props: ButtonMenuProps) {
     isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,
   );
   
-  // filter our items by our search term
-  const filteredItems = searchTerm ? match(searchTerm, items) : items;
-
-
   return (
     <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
-      { searchable && (
-          <TextField placeholder="Search" value={searchTerm} onChange={setSearchTerm} label="" />
-      )}
       <Menu
         ariaMenuProps={menuProps}
         onClose={() => state.close()}
-        items={filteredItems}
+        items={items}
         persistentItems={persistentItems}
+        searchable={searchable}
         {...tid}
       />
     </OverlayTrigger>
@@ -74,10 +67,3 @@ export type ImageMenuItemType = MenuItemBase & {
 export type MenuItem = MenuItemBase | IconMenuItemType | ImageMenuItemType;
 // This is done just to adapt to the React-Aria API for generating Sectioned lists of Menu Items.
 export type MenuSection = MenuItem & { items?: MenuItem[] };
-
-// Searching function the recuisively searches through the items through a built up regex and returns the items that match the search term. Maybe not necessary, as we could use .filter() instead.
-function match(term: string, items: MenuItem[]) {
-  const builtExp = Array.from(term).reduce((prevVal, curVal, i) => `${prevVal}[^${term.substr(i)}]*?${curVal}`, '');
-  const re = RegExp(builtExp);
-  return items.filter(({ label }) => label.toLowerCase().match(re));
-}
