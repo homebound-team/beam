@@ -53,7 +53,7 @@ export class TableState {
   private expandedColumns = new ObservableSet<string>();
   // An observable set of column ids to keep track of which columns are visible
   public visibleColumns = new ObservableSet<string>();
-  private visibleColumnStorageKey: string = "";
+  private visibleColumnsStorageKey: string = "";
 
   /**
    * Creates the `RowState` for a given `GridTable`.
@@ -211,18 +211,18 @@ export class TableState {
     this.rows = rows;
   }
 
-  setColumns(columns: GridColumnWithId<any>[]): void {
+  setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
     if (columns !== this.columns) {
       this.columns = columns;
-      this.visibleColumnStorageKey = camelCase(columns.map((c) => c.id).join());
-      this.visibleColumns.replace(readOrSetLocalVisibleColumnState(columns, this.visibleColumnStorageKey));
+      this.visibleColumnsStorageKey = visibleColumnsStorageKey ?? camelCase(columns.map((c) => c.id).join());
+      this.visibleColumns.replace(readOrSetLocalVisibleColumnState(columns, this.visibleColumnsStorageKey));
       const expandedColumnIds = columns.filter((c) => c.initExpanded).map((c) => c.id);
       this.expandedColumns.replace(expandedColumnIds);
     }
   }
 
   setVisibleColumns(ids: string[]) {
-    sessionStorage.setItem(this.visibleColumnStorageKey, JSON.stringify(ids));
+    sessionStorage.setItem(this.visibleColumnsStorageKey, JSON.stringify(ids));
     this.visibleColumns.replace(ids);
   }
 
