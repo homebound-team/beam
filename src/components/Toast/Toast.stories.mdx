@@ -1,27 +1,26 @@
 import { Meta, Canvas, Story, Props } from "@storybook/addon-docs";
-import { ToastNotice } from "./ToastNotice";
+import {Toast} from "./Toast";
 
 <Meta
-  title="Catalog/ToastNotice"
-  component={ToastNotice}
+  title="Catalog/Toast"
+  component={Toast}
   args={{ message: "Error", type: "error" }}
 />
 
 export const Template = (args) => {
-  const onClose = () => {};
-  return <ToastNotice onClose={onClose} {...args} />;
+  return <Toast  {...args} />;
 };
 
-# ToastNotice
+# Toast
 
 #### Toast component for showing alerts.
 
 # Example
 
 <Canvas>
-  <Story name="ToastNotice">{Template.bind({})}</Story>
+  <Story name="Toast">{Template.bind({})}</Story>
 </Canvas>
 
 # API Reference
 
-<Props story={"ToastNotice"} />
+<Props story={"Toast"} />

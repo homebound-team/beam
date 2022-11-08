@@ -1,18 +1,18 @@
 import { useCallback } from "react";
+import { ToastProps } from "./Toast";
 import { useToastContext } from "./ToastContext";
-import { ToastNoticeProps } from "./ToastNotice";
 
 export interface UseToastHook {
-  showToast: (props: ToastNoticeProps) => void;
+  showToast: (props: ToastProps) => void;
 }
 export function useToast(): UseToastHook {
   const { setNotice } = useToastContext();
-
-  const showToast = useCallback((props) => {
-    setNotice({
-      ...props,
-    });
-  }, []);
+  const showToast = useCallback(
+    (props) => {
+      setNotice(props);
+    },
+    [setNotice],
+  );
 
   return { showToast };
 }
