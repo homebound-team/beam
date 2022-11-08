@@ -165,7 +165,7 @@ export interface GridTableProps<R extends Kinded, X> {
    * Defines the session storage key for which columns are visible. If not provided, a default storage key will be used based on column order and/or `GridColumn.id`
    * This is beneficial when looking at the same table, but of a different subject (i.e. Project A's PreCon Schedule vs Project A's Construction schedule)
    */
-  visibleColumnStorageKey?: string;
+  visibleColumnsStorageKey?: string;
 }
 
 /**
@@ -204,7 +204,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     resizeTarget,
     activeRowId,
     activeCellId,
-    visibleColumnStorageKey,
+    visibleColumnsStorageKey,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
@@ -226,7 +226,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
   const { tableState } = api;
 
   tableState.setRows(rows);
-  tableState.setColumns(columnsWithIds, visibleColumnStorageKey);
+  tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
   const columns: GridColumnWithId<R>[] = useComputed(
     () =>
       tableState.columns
