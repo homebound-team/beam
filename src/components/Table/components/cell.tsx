@@ -54,12 +54,20 @@ export const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
     );
   };
 
-/** Sets up the `GridContext` so that header cells can access the current sort settings. */
-export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs) => RenderCellFn<any> =
-  (column, as) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
+/**
+ * Sets up the `GridContext` so that header cells can access the current sort settings.
+ * Used for the Header, Totals, and Expanded Header row's cells.
+ * */
+export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSpan: number) => RenderCellFn<any> =
+  (column, as, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
     const Cell = as === "table" ? "th" : "div";
     return (
-      <Cell key={key} css={{ ...css, ...tableRowStyles(as, column) }} className={classNames}>
+      <Cell
+        key={key}
+        css={{ ...css, ...tableRowStyles(as, column) }}
+        className={classNames}
+        {...(as === "table" && { colSpan })}
+      >
         {content}
       </Cell>
     );

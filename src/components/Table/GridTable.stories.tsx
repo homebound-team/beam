@@ -1136,3 +1136,99 @@ export function ToggleCustomCollapse() {
     </>
   );
 }
+
+type ExpandHeader = { id: "expandableHeader"; kind: "expandableHeader" };
+type Header = { id: "header"; kind: "header" };
+type ExpandableData = {
+  kind: "data";
+  data: {
+    firstName: string | undefined;
+    lastName: string | undefined;
+    birthdate: string | undefined;
+    age: number | undefined;
+    occupation: string | undefined;
+    manager: string | undefined;
+  };
+};
+type ExpandableRow = ExpandHeader | Header | ExpandableData;
+
+export function ExpandableColumns() {
+  const rows: GridDataRow<ExpandableRow>[] = useMemo(
+    () => [
+      // New reserved 'kind' "groupHeader" property for GridTable to position row correctly
+      { kind: "header", id: "header", data: {} },
+      { kind: "expandableHeader", id: "expandableHeader", data: {} },
+      {
+        kind: "data" as const,
+        id: `user:1`,
+        data: {
+          firstName: "Brandon",
+          lastName: "Dow",
+          birthdate: "Jan 29, 1986",
+          age: 36,
+          occupation: "Software Engineer",
+          manager: "Steve Thompson",
+        },
+      },
+    ],
+    [],
+  );
+
+  const columns: GridColumn<ExpandableRow>[] = useMemo(
+    () => [
+      selectColumn<ExpandableRow>({ sticky: "left" }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Address",
+        header: emptyCell,
+        data: () => "123 Sesame St",
+        w: "200px",
+        sticky: "left",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Employee",
+        header: (data, { expanded }) => (expanded ? "First Name" : emptyCell),
+        data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+        expandColumns: [
+          column<ExpandableRow>({
+            expandableHeader: emptyCell,
+            header: "Last Name",
+            data: ({ lastName }) => lastName,
+            w: "250px",
+          }),
+          column<ExpandableRow>({
+            expandableHeader: emptyCell,
+            header: "Birthdate",
+            data: ({ birthdate }) => birthdate,
+            w: "150px",
+          }),
+          column<ExpandableRow>({
+            expandableHeader: emptyCell,
+            header: "Age",
+            data: ({ age }) => age,
+            w: "80px",
+          }),
+        ],
+        w: "250px",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Occupation",
+        header: emptyCell,
+        data: ({ occupation }) => occupation,
+        w: "280px",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Manager",
+        header: emptyCell,
+        data: ({ manager }) => manager,
+        w: "280px",
+      }),
+    ],
+    [],
+  );
+
+  return (
+    <div css={Css.df.fdc.bgGray100.p2.h("100vh").mw("fit-content").$}>
+      <GridTable stickyHeader columns={columns} rows={rows} style={{ allWhite: true }} as="div" />
+    </div>
+  );
+}

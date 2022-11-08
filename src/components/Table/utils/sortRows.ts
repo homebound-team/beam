@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { GridColumn, GridColumnWithId, Kinded, Pin } from "src/components/Table/types";
+import { GridColumnWithId, Kinded, Pin } from "src/components/Table/types";
 import { SortOn, SortState } from "src/components/Table/utils/TableState";
 import { applyRowFn } from "src/components/Table/utils/utils";
 
@@ -73,8 +73,8 @@ function compare<R extends Kinded>(
   invert: boolean,
   caseSensitive: boolean,
 ) {
-  const v1 = sortValue(applyRowFn(column, a, {} as any, 0), caseSensitive);
-  const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
+  const v1 = sortValue(applyRowFn(column, a, {} as any, 0, false), caseSensitive);
+  const v2 = sortValue(applyRowFn(column, b, {} as any, 0, false), caseSensitive);
   const v1e = v1 === null || v1 === undefined;
   const v2e = v2 === null || v2 === undefined;
   if ((v1e && v2e) || v1 === v2) {
@@ -114,14 +114,17 @@ function sortValue(value: ReactNode | GridCellContent, caseSensitive: boolean): 
 export function ensureClientSideSortValueIsSortable(
   sortOn: SortOn,
   isHeader: boolean,
-  column: GridColumn<any>,
+  column: GridColumnWithId<any>,
   idx: number,
   maybeContent: ReactNode | GridCellContent,
 ): void {
   if (process.env.NODE_ENV !== "production" && !isHeader && sortOn === "client" && column.clientSideSort !== false) {
     const value = sortValue(maybeContent, false);
     if (!canClientSideSort(value)) {
-      throw new Error(`Column ${idx} passed an unsortable value, use GridCellContent or clientSideSort=false`);
+      const columnIdentifier = !column.id.startsWith("beamColumn_") ? column.id : column.name ?? idx;
+      throw new Error(
+        `Column ${columnIdentifier} passed an unsortable value, use GridCellContent or clientSideSort=false`,
+      );
     }
   }
 }

@@ -16,6 +16,7 @@ export type SimpleHeaderAndData<T> =
 
 /** A const for a marker header row. */
 export const simpleHeader = { kind: "header" as const, id: "header", data: {} };
+export const simpleExpandableHeader = { kind: "expandableHeader" as const, id: "expandableHeader", data: {} };
 
 /** Like `simpleRows` but for `SimpleHeaderAndData`. */
 export function simpleDataRows<R extends SimpleHeaderAndData<D>, D>(

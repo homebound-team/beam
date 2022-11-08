@@ -14,7 +14,6 @@ export * from "src/components/Table/components/SortHeader";
 export { SortHeader } from "src/components/Table/components/SortHeader";
 export { useGridTableApi } from "src/components/Table/GridTableApi";
 export type { GridTableApi } from "src/components/Table/GridTableApi";
-export * from "src/components/Table/hooks/useColumns";
 export * from "src/components/Table/hooks/useSetupColumnSizes";
 export { cardStyle, condensedStyle, defaultStyle, getTableStyles } from "src/components/Table/TableStyles";
 export type { GridStyle, RowStyle, RowStyles } from "src/components/Table/TableStyles";

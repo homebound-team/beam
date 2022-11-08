@@ -39,6 +39,7 @@ interface TableStoryProps extends GridTableProps<any, any> {
   rowHeight?: "fixed" | "flexible";
   displayAs?: "default" | "virtual" | "table";
   totals?: boolean;
+  expandable?: boolean;
 }
 
 export default {
@@ -81,6 +82,7 @@ export default {
     rowHeight: "flexible",
     displayAs: "default",
     totals: false,
+    expandable: false,
   },
   argTypes: {
     nestingDepth: { name: "Nesting Depth", control: { type: "select", options: [1, 2, 3] } },
@@ -89,6 +91,7 @@ export default {
     allWhite: { name: "All White", control: { type: "boolean" } },
     rowHover: { name: "Row Hover styles", control: { type: "boolean" } },
     totals: { name: "Show Totals row", control: { type: "boolean" } },
+    expandable: { name: "With Expandable Columns", control: { type: "boolean" } },
     rowHeight: { name: "Row Height", control: { type: "select", options: ["flexible", "fixed"] } },
     displayAs: {
       name: "Implementation (may need to reload)",
@@ -110,21 +113,28 @@ type BeamData = {
 type BeamRow = SimpleHeaderAndData<BeamData>;
 
 export function Table(props: TableStoryProps) {
-  const { nestingDepth, allWhite, grouped, rowHeight, bordered, displayAs, totals, rowHover } = props;
+  const { nestingDepth, allWhite, grouped, rowHeight, bordered, displayAs, totals, rowHover, expandable } = props;
   const [filter, setFilter] = useState<string>();
 
-  const [rows, columns] = useMemo(
-    () =>
-      nestingDepth === 1
-        ? [flatRowss, nestedColumnsTwoLevels]
-        : nestingDepth === 2
-        ? [nestedRowsTwoLevels, nestedColumnsTwoLevels]
-        : [nestedRowsThreeLevels, nestedColumnsThreeLevels],
-    [nestingDepth],
-  );
+  const [rows, columns] = useMemo(() => {
+    // Make a copy of the `rows` as we may splice in the `expandableHeader` and we don't want to mutate the original rows array.
+    let rows =
+      nestingDepth === 1 ? flatRowss : nestingDepth === 2 ? [...nestedRowsTwoLevels] : [...nestedRowsThreeLevels];
+    if (expandable) {
+      rows = [...rows, { kind: "expandableHeader", id: "expandableHeader" } as GridDataRow<BeamNestedRow>];
+    }
+    return [rows, beamNestedColumns(expandable)];
+  }, [nestingDepth, expandable]);
 
   return (
-    <div css={Css.df.fdc.bgGray100.p2.if(displayAs === "virtual").h("100vh").$}>
+    <div
+      css={
+        Css.df.fdc.bgGray100
+          .mw("fit-content")
+          .p2.if(displayAs === "virtual")
+          .h("100vh").$
+      }
+    >
       <TableActions>
         <TextField
           label="Filter"
@@ -140,7 +150,7 @@ export function Table(props: TableStoryProps) {
         <GridTable<BeamNestedRow>
           as={displayAs === "default" ? undefined : displayAs}
           style={{
-            allWhite,
+            allWhite: allWhite || expandable,
             ...(nestingDepth && nestingDepth > 1 ? { grouped } : {}),
             rowHeight,
             bordered,
@@ -193,18 +203,19 @@ type BeamBudgetData = {
   children?: BeamChildRow[];
 };
 type HeaderRow = { kind: "header" };
+type BeamExpandableRow = { kind: "expandableHeader"; id: string };
 type BeamTotalsRow = { kind: "totals"; id: string; data: BeamBudgetData };
 type BeamGrandParentRow = { kind: "grandparent"; id: string; data: BeamBudgetData };
 type BeamParentRow = { kind: "parent"; id: string; data: BeamBudgetData };
 type BeamChildRow = { kind: "child"; id: string; data: BeamBudgetData };
-type BeamNestedRow = BeamTotalsRow | HeaderRow | BeamGrandParentRow | BeamParentRow | BeamChildRow;
+type BeamNestedRow = BeamTotalsRow | HeaderRow | BeamExpandableRow | BeamGrandParentRow | BeamParentRow | BeamChildRow;
 
 export function NestedFixed() {
   return (
     <GridTable<BeamNestedRow>
       style={{ grouped: true, rowHeight: "fixed" }}
       sorting={{ on: "client" }}
-      columns={nestedColumnsTwoLevels}
+      columns={nestedColumns}
       rows={[...beamTotalsRows, ...nestedRowsTwoLevels]}
       stickyHeader
     />
@@ -216,7 +227,7 @@ export function NestedFlexible() {
     <GridTable<BeamNestedRow>
       style={{ grouped: true }}
       sorting={{ on: "client" }}
-      columns={nestedColumnsTwoLevels}
+      columns={nestedColumns}
       rows={[...beamTotalsRows, ...nestedRowsTwoLevels]}
       stickyHeader
     />
@@ -269,7 +280,7 @@ export function NestedThreeLevels() {
     <GridTable<BeamNestedRow>
       style={{ rowHeight: "fixed", grouped: true }}
       sorting={{ on: "client" }}
-      columns={nestedColumnsThreeLevels}
+      columns={nestedColumns}
       rows={nestedRowsThreeLevels}
       stickyHeader
     />
@@ -281,7 +292,7 @@ export function NestedNonGrouped() {
     <GridTable<BeamNestedRow>
       style={{ rowHeight: "fixed" }}
       sorting={{ on: "client" }}
-      columns={nestedColumnsTwoLevelsNoActions}
+      columns={nestedColumnsNoActions}
       rows={nestedRowsTwoLevels}
       stickyHeader
     />
@@ -402,15 +413,15 @@ function RollUpTotal({ num }: { num?: number }) {
   return typeof num !== "number" || num === 0 ? null : <span css={Css.xs.$}>{numberFormatter(num)}</span>;
 }
 
-const nestedColumnsTwoLevels = beamNestedColumns();
-const nestedColumnsTwoLevelsNoActions = beamNestedColumns().splice(2);
-const nestedColumnsThreeLevels = beamNestedColumns(true);
+const nestedColumns = beamNestedColumns();
+const nestedColumnsNoActions = beamNestedColumns().splice(2);
 
-function beamNestedColumns(threeLevels: boolean = false): GridColumn<BeamNestedRow>[] {
+function beamNestedColumns(expandable: boolean = false): GridColumn<BeamNestedRow>[] {
   return [
-    collapseColumn<BeamNestedRow>({ totals: emptyCell }),
-    selectColumn<BeamNestedRow>({ totals: emptyCell }),
+    collapseColumn<BeamNestedRow>({ totals: emptyCell, expandableHeader: emptyCell }),
+    selectColumn<BeamNestedRow>({ totals: emptyCell, expandableHeader: emptyCell }),
     column<BeamNestedRow>({
+      expandableHeader: emptyCell,
       totals: "Totals",
       header: "Cost Code",
       grandparent: (data, { row }) => ({
@@ -423,67 +434,265 @@ function beamNestedColumns(threeLevels: boolean = false): GridColumn<BeamNestedR
       w: "200px",
     }),
     numericColumn<BeamNestedRow>({
+      expandableHeader: () => "Original Budget",
       totals: (row) => numberFormatter(row.original),
-      header: "Original",
+      header: (_, { expanded }) => (expandable ? (expanded ? "Baseline" : emptyCell) : "Original Budget"),
       grandparent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
       parent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
       child: (row) => ({ content: () => numberFormatter(row.original) }),
+      w: "150px",
+      expandColumns: [
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: emptyCell,
+          header: "Version 2",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
+          child: (row) => ({ content: () => numberFormatter(row.original) }),
+          w: "150px",
+        }),
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: emptyCell,
+          header: "Version 3",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
+          child: (row) => ({ content: () => numberFormatter(row.original) }),
+          w: "150px",
+        }),
+      ],
     }),
     numericColumn<BeamNestedRow>({
+      expandableHeader: () => "Change Orders",
       totals: (row) => numberFormatter(row.changeOrders),
-      header: "Change Orders",
+      header: (_, { expanded }) => (expandable ? (expanded ? "Baseline" : emptyCell) : "Change Orders"),
       grandparent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
       parent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
       child: (row) => ({ content: () => numberFormatter(row.changeOrders) }),
+      w: "150px",
+      expandColumns: [
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: emptyCell,
+          header: "Version 2",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
+          child: (row) => ({ content: () => numberFormatter(row.changeOrders) }),
+          w: "150px",
+        }),
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: emptyCell,
+          header: "Version 3",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
+          child: (row) => ({ content: () => numberFormatter(row.changeOrders) }),
+          w: "150px",
+        }),
+      ],
     }),
     numericColumn<BeamNestedRow>({
+      expandableHeader: () => "Reallocations",
       totals: (row) => numberFormatter(row.reallocations),
-      header: "Reallocations",
+      header: (_, { expanded }) => (expandable ? (expanded ? "Baseline" : emptyCell) : "Reallocations"),
       grandparent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
       parent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
       child: (row) => ({ content: () => numberFormatter(row.reallocations) }),
+      w: "150px",
+      expandColumns: [
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: (row) => numberFormatter(row.reallocations),
+          header: "Version 2",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
+          child: (row) => ({ content: () => numberFormatter(row.reallocations) }),
+          w: "150px",
+        }),
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: (row) => numberFormatter(row.reallocations),
+          header: "Version 3",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
+          child: (row) => ({ content: () => numberFormatter(row.reallocations) }),
+          w: "150px",
+        }),
+      ],
     }),
     numericColumn<BeamNestedRow>({
+      expandableHeader: () => "Revised",
       totals: (row) => numberFormatter(row.revised),
-      header: "Revised",
+      header: (_, { expanded }) => (expandable ? (expanded ? "Baseline" : emptyCell) : "Revised"),
       grandparent: (row) => ({ content: () => maybeFormatNumber(row.revised), value: row.revised }),
       parent: (row) => ({ content: () => maybeFormatNumber(row.revised), value: row.revised }),
       child: (row) => ({ content: () => numberFormatter(row.revised) }),
+      w: "150px",
+      expandColumns: [
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: (row) => numberFormatter(row.revised),
+          header: "Version 2",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.revised), value: row.revised }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.revised), value: row.revised }),
+          child: (row) => ({ content: () => numberFormatter(row.revised) }),
+          w: "150px",
+        }),
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: (row) => numberFormatter(row.revised),
+          header: "Version 3",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.revised), value: row.revised }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.revised), value: row.revised }),
+          child: (row) => ({ content: () => numberFormatter(row.revised) }),
+          w: "150px",
+        }),
+      ],
     }),
     numericColumn<BeamNestedRow>({
+      expandableHeader: () => "Committed",
       totals: (row) => numberFormatter(row.committed),
-      header: "Committed",
+      header: (_, { expanded }) => (expandable ? (expanded ? "Baseline" : emptyCell) : "Committed"),
       grandparent: (row) => ({ content: () => maybeFormatNumber(row.committed), value: row.committed }),
       parent: (row) => ({ content: () => maybeFormatNumber(row.committed), value: row.committed }),
       child: (row) => ({ content: () => numberFormatter(row.committed) }),
+      w: "150px",
+      expandColumns: [
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: (row) => numberFormatter(row.committed),
+          header: "Version 2",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.committed), value: row.committed }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.committed), value: row.committed }),
+          child: (row) => ({ content: () => numberFormatter(row.committed) }),
+          w: "150px",
+        }),
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: (row) => numberFormatter(row.committed),
+          header: "Version 3",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.committed), value: row.committed }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.committed), value: row.committed }),
+          child: (row) => ({ content: () => numberFormatter(row.committed) }),
+          w: "150px",
+        }),
+      ],
     }),
     numericColumn<BeamNestedRow>({
+      expandableHeader: () => "Difference",
       totals: (row) => numberFormatter(row.difference),
-      header: "Difference",
+      header: (_, { expanded }) => (expandable ? (expanded ? "Baseline" : emptyCell) : "Difference"),
       grandparent: (row) => ({ content: () => maybeFormatNumber(row.difference), value: row.difference }),
       parent: (row) => ({ content: () => maybeFormatNumber(row.difference), value: row.difference }),
       child: (row) => ({ content: () => numberFormatter(row.difference) }),
+      w: "150px",
+      expandColumns: [
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: (row) => numberFormatter(row.difference),
+          header: "Version 2",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.difference), value: row.difference }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.difference), value: row.difference }),
+          child: (row) => ({ content: () => numberFormatter(row.difference) }),
+          w: "150px",
+        }),
+        numericColumn<BeamNestedRow>({
+          expandableHeader: () => "Difference",
+          totals: (row) => numberFormatter(row.difference),
+          header: "Version 3",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.difference), value: row.difference }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.difference), value: row.difference }),
+          child: (row) => ({ content: () => numberFormatter(row.difference) }),
+          w: "150px",
+        }),
+      ],
     }),
     numericColumn<BeamNestedRow>({
+      expandableHeader: () => "Actuals",
       totals: (row) => numberFormatter(row.actuals),
-      header: "Actuals",
+      header: (_, { expanded }) => (expandable ? (expanded ? "Baseline" : emptyCell) : "Actuals"),
       grandparent: (row) => ({ content: () => maybeFormatNumber(row.actuals), value: row.actuals }),
       parent: (row) => ({ content: () => maybeFormatNumber(row.actuals), value: row.actuals }),
       child: (row) => ({ content: () => numberFormatter(row.actuals) }),
+      w: "150px",
+      expandColumns: [
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: (row) => numberFormatter(row.actuals),
+          header: "Version 2",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.actuals), value: row.actuals }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.actuals), value: row.actuals }),
+          child: (row) => ({ content: () => numberFormatter(row.actuals) }),
+          w: "150px",
+        }),
+        numericColumn<BeamNestedRow>({
+          expandableHeader: () => "Actuals",
+          totals: (row) => numberFormatter(row.actuals),
+          header: "Version 3",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.actuals), value: row.actuals }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.actuals), value: row.actuals }),
+          child: (row) => ({ content: () => numberFormatter(row.actuals) }),
+          w: "150px",
+        }),
+      ],
     }),
     numericColumn<BeamNestedRow>({
+      expandableHeader: () => "Projected",
       totals: (row) => numberFormatter(row.projected),
-      header: "Projected",
+      header: (_, { expanded }) => (expandable ? (expanded ? "Baseline" : emptyCell) : "Projected"),
       grandparent: (row) => ({ content: () => maybeFormatNumber(row.projected), value: row.projected }),
       parent: (row) => ({ content: () => maybeFormatNumber(row.projected), value: row.projected }),
       child: (row) => ({ content: () => numberFormatter(row.projected) }),
+      w: "150px",
+      expandColumns: [
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: (row) => numberFormatter(row.projected),
+          header: "Version 2",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.projected), value: row.projected }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.projected), value: row.projected }),
+          child: (row) => ({ content: () => numberFormatter(row.projected) }),
+          w: "150px",
+        }),
+        numericColumn<BeamNestedRow>({
+          expandableHeader: () => "Projected",
+          totals: (row) => numberFormatter(row.projected),
+          header: "Version 3",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.projected), value: row.projected }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.projected), value: row.projected }),
+          child: (row) => ({ content: () => numberFormatter(row.projected) }),
+          w: "150px",
+        }),
+      ],
     }),
     numericColumn<BeamNestedRow>({
+      expandableHeader: () => "Cost To Complete",
       totals: (row) => numberFormatter(row.costToComplete),
-      header: "Cost To Complete",
+      header: (_, { expanded }) => (expandable ? (expanded ? "Baseline" : emptyCell) : "Cost To Complete"),
       grandparent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
       parent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
       child: (row) => ({ content: () => numberFormatter(row.costToComplete) }),
+      w: "150px",
+      expandColumns: [
+        numericColumn<BeamNestedRow>({
+          expandableHeader: emptyCell,
+          totals: (row) => numberFormatter(row.costToComplete),
+          header: "Version 2",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
+          child: (row) => ({ content: () => numberFormatter(row.costToComplete) }),
+          w: "150px",
+        }),
+        numericColumn<BeamNestedRow>({
+          expandableHeader: () => "Cost To Complete",
+          totals: (row) => numberFormatter(row.costToComplete),
+          header: "Version 3",
+          grandparent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
+          parent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
+          child: (row) => ({ content: () => numberFormatter(row.costToComplete) }),
+          w: "150px",
+        }),
+      ],
     }),
   ];
 }

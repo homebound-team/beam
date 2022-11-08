@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { Button } from "src/components/Button";
@@ -8,23 +8,24 @@ import {
   OverlayTrigger,
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
+import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridColumn, Kinded } from "src/components/Table/types";
 import { Css } from "src/Css";
+import { useComputed } from "src/hooks";
 import { CheckboxGroup, CheckboxGroupItemOption } from "src/inputs";
 import { useTestIds } from "src/utils";
 
 interface EditColumnsButtonProps<R extends Kinded>
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
-  allColumns: GridColumn<R>[];
-  selectedColumns: GridColumn<R>[];
-  setSelectedColumns: Dispatch<SetStateAction<GridColumn<R>[]>>;
+  columns: GridColumn<R>[];
   title?: string;
+  api: GridTableApi<R>;
   // for storybook purposes
   defaultOpen?: boolean;
 }
 
 export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProps<R>) {
-  const { defaultOpen, disabled, allColumns, setSelectedColumns, trigger, title, selectedColumns } = props;
+  const { defaultOpen, disabled, columns, trigger, title, api } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -34,28 +35,30 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   );
 
   const { options } = useMemo(() => {
-    return allColumns.reduce(
+    return columns.reduce(
       (acc, column) => {
         // Only include options that can be hidden and have the `name` property defined.
         if (!column.canHide) return acc;
-        if (!column.id || column.id.length === 0) {
-          console.warn("Column is missing 'name' property required by the Edit Columns button", column);
+        if (!column.name || column.name.length === 0 || !column.id || column.id.length === 0) {
+          console.warn("Column is missing 'name' and/or 'id' property required by the Edit Columns button", column);
           return acc;
         }
 
         // Add current column as an option
-        return { ...acc, options: acc.options.concat({ label: column.id!, value: column.id! }) };
+        return { ...acc, options: acc.options.concat({ label: column.name!, value: column.id! }) };
       },
       { options: [] as CheckboxGroupItemOption[] },
     );
-  }, [allColumns]);
+  }, [columns]);
 
-  const selectedValues = selectedColumns.map((column) => column.id!);
+  const selectedValues = useComputed(() => api.getVisibleColumnIds(), [api]);
   const setSelectedValues = useCallback(
     (values: string[]) => {
-      setSelectedColumns(allColumns.filter((column) => (column.canHide ? values.includes(column.id!) : true)));
+      api.setVisibleColumns(
+        columns.filter((column) => (column.canHide ? values.includes(column.id!) : true)).map((c) => c.id!),
+      );
     },
-    [allColumns, setSelectedColumns],
+    [columns, api],
   );
 
   return (

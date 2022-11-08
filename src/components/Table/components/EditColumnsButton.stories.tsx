@@ -1,11 +1,10 @@
 import { Meta } from "@storybook/react";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable } from "src/components/Table/GridTable";
-import { useColumns } from "src/components/Table/hooks/useColumns";
+import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { GridColumn } from "src/components/Table/types";
 import { simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
-import { noop } from "src/utils";
 
 export default {
   title: "Workspace/Components/EditColumnsButton",
@@ -14,24 +13,42 @@ export default {
 
 type Data = { name: string | undefined; value: number | undefined };
 type Row = SimpleHeaderAndData<Data>;
-const nameColumn: GridColumn<Row> = { id: "Name", header: "Name", data: ({ name }) => name };
-const valueColumn: GridColumn<Row> = { id: "Value", header: "Value", canHide: true, data: ({ value }) => value };
-const actionColumn: GridColumn<Row> = { id: "Actions", header: "Action", canHide: true, data: () => "Actions" };
-const otherColumn: GridColumn<Row> = { id: "Other", header: "Other", canHide: true, data: ({ name }) => name };
+const nameColumn: GridColumn<Row> = { id: "Name", name: "Name", header: "Name", data: ({ name }) => name };
+const valueColumn: GridColumn<Row> = {
+  id: "Value",
+  name: "Value",
+  header: "Value",
+  canHide: true,
+  data: ({ value }) => value,
+};
+const actionColumn: GridColumn<Row> = {
+  id: "Actions",
+  name: "Actions",
+  header: "Action",
+  canHide: true,
+  data: () => "Actions",
+};
+const otherColumn: GridColumn<Row> = {
+  id: "Other",
+  name: "Other",
+  header: "Other",
+  canHide: true,
+  data: ({ name }) => name,
+};
 
 export function EditColumnButton() {
+  const api = useGridTableApi<Row>();
   return (
     <div>
       <h2 css={Css.lg.$}>Edit Columns Button</h2>
       <div css={Css.mlPx(200).mb4.$}>
         <EditColumnsButton
+          api={api}
           trigger={{ label: "Columns" }}
           placement="right"
-          allColumns={[nameColumn, valueColumn, actionColumn]}
-          setSelectedColumns={noop}
+          columns={[nameColumn, valueColumn, actionColumn]}
           title="Select columns to show"
-          defaultOpen={true}
-          selectedColumns={[]}
+          defaultOpen
         />
       </div>
     </div>
@@ -40,22 +57,21 @@ export function EditColumnButton() {
 
 export function EditColumnButtonInAction() {
   const tableColumns = [nameColumn, otherColumn, valueColumn, actionColumn];
-  const [columns, setColumns] = useColumns(tableColumns);
+  const api = useGridTableApi<Row>();
   return (
     <div>
       <h2 css={Css.lg.$}>Edit Columns Button In Action</h2>
       <div css={Css.mlPx(200).mb4.$}>
         <EditColumnsButton
+          api={api}
           trigger={{ label: "Columns" }}
           placement="right"
-          allColumns={tableColumns}
-          setSelectedColumns={setColumns}
-          selectedColumns={columns}
+          columns={tableColumns}
           title="Select columns to show"
         />
       </div>
       <GridTable<Row>
-        columns={columns}
+        columns={tableColumns}
         style={{ cellHighlight: true }}
         rows={[
           simpleHeader,
@@ -64,6 +80,7 @@ export function EditColumnButtonInAction() {
           { kind: "data", id: "3", data: { name: "a", value: 3 } },
         ]}
         sorting={{ on: "client" }}
+        api={api}
       />
     </div>
   );

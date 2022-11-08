@@ -4,7 +4,7 @@ import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyles } from "src/components/Table/TableStyles";
 import { GridColumn } from "src/components/Table/types";
-import { calcColumnSizes, generateColumnId, selectColumn } from "src/components/Table/utils/columns";
+import { calcColumnSizes, column, generateColumnId, selectColumn } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -39,7 +39,11 @@ type NestedRow = TotalsRow | HeaderRow | ParentRow | ChildRow | GrandChildRow;
 // I tried https://github.com/keiya01/react-performance-testing#count-renders but
 // it didn't work with our fake timers, so this is easier for now.
 let renderedNameColumn: string[] = [];
-beforeEach(() => (renderedNameColumn = []));
+beforeEach(() => {
+  renderedNameColumn = [];
+  sessionStorage.clear();
+});
+afterAll(() => sessionStorage.clear());
 
 // And two columns for NestedRow
 // TODO Move this to the bottom of the file in it's own PR
@@ -2337,6 +2341,98 @@ describe("GridTable", () => {
 
     // And they can no longer be fetched by the api
     expect(api.current!.getSelectedRowIds()).toEqual([]);
+  });
+
+  describe("expandable columns", () => {
+    type ExpandHeader = { id: "expandableHeader"; kind: "expandableHeader" };
+    type Header = { id: "header"; kind: "header" };
+    type ExpandableData = {
+      kind: "data";
+      data: { firstName: string | undefined; lastName: string | undefined; age: number | undefined };
+    };
+    type ExpandableRow = ExpandHeader | Header | ExpandableData;
+
+    it("can expand and collapse columns", async () => {
+      // Given a table with expandable columns
+      // When initially rendered
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              expandableHeader: () => "Client name",
+              header: (data, { expanded }) => (expanded ? "First name" : "Full name"),
+              data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                }),
+              ],
+            }),
+            column<ExpandableRow>({ expandableHeader: () => "Age", header: emptyCell, data: ({ age }) => age }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+        />,
+      );
+
+      // Then only two columns are shown
+      expect(cell(r, 0, 0)).toHaveTextContent("Client name");
+      expect(cell(r, 0, 1)).toHaveTextContent("Age");
+      // And the header row displays the expected values when the column is collapsed
+      expect(cell(r, 1, 0)).toHaveTextContent("Full name");
+      expect(cell(r, 1, 1)).toBeEmptyDOMElement();
+      // And the data row displays the expected values when the column is collapsed
+      expect(cell(r, 2, 0)).toHaveTextContent("Brandon Dow");
+      expect(cell(r, 2, 1)).toHaveTextContent("36");
+
+      // When clicking to expand the column
+      click(r.expandableColumn);
+
+      // Then the new column in introduced and the existing column's values have been updated
+      expect(cell(r, 1, 0)).toHaveTextContent("First name");
+      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
+      // And the data row displays the expected values when the column is collapsed
+      expect(cell(r, 2, 0)).toHaveTextContent("Brandon");
+      expect(cell(r, 2, 1)).toHaveTextContent("Dow");
+    });
+
+    it("can initialize with a column expanded", async () => {
+      // Given a table with expandable columns
+      // When initially rendered with the expandable column set to `initExpanded: true`.
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              expandableHeader: () => "Client name",
+              header: (data, { expanded }) => (expanded ? "First name" : "Full name"),
+              data: ({ firstName }) => firstName,
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                }),
+              ],
+              initExpanded: true,
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+        />,
+      );
+
+      // Then the column is initially expanded
+      expect(cell(r, 1, 0)).toHaveTextContent("First name");
+      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
+    });
   });
 });
 
