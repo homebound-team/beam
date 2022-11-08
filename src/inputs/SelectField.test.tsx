@@ -24,15 +24,13 @@ describe("SelectFieldTest", () => {
     );
     // That initially has "One" selected
     expect(r.age()).toHaveValue("One");
-    // When we focus the field to open the menu
-    r.age().focus();
-    expect(r.age()).toHaveFocus();
+    // When we click the field to open the menu
+    r.age().click();
     // And we select the 3rd option
     click(r.getByRole("option", { name: "Three" }));
     // Then onSelect was called
     expect(onSelect).toHaveBeenCalledWith("3", options[2]);
     // And the field has not been blurred (regression test to prevent SelectField's list box from opening back up after selecting an option)
-    expect(r.age()).toHaveFocus();
     expect(onBlur).not.toHaveBeenCalled();
   });
 
@@ -118,7 +116,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When selecting the option with an `undefined` value
-    fireEvent.focus(age());
+    fireEvent.click(age());
     click(getByRole("option", { name: "Unassigned" }));
     // Then expect the value to be that of the `undefined` entry
     expect(age()).toHaveValue("Unassigned");
@@ -140,7 +138,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    fireEvent.focus(age());
+    fireEvent.click(age());
     const optionTwo = getByRole("option", { name: "Two" });
     // Then expect the disabled option to have the correct aria attributes
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
@@ -163,7 +161,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    fireEvent.focus(r.age());
+    fireEvent.click(r.age());
     // Then expect to see the initial option and loading state
     expect(r.getAllByRole("option")).toHaveLength(1);
     expect(r.loadingDots()).toBeTruthy();
@@ -187,7 +185,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    fireEvent.focus(r.age());
+    fireEvent.click(r.age());
     // Then expect to see the initial option
     expect(r.getAllByRole("option")).toHaveLength(1);
     // And when changing the options
@@ -230,8 +228,8 @@ describe("SelectFieldTest", () => {
         onSelect={onSelect}
       />,
     );
-    // When we focus the field to open the menu
-    r.age().focus();
+    // When we click the field to open the menu
+    r.age().click();
     // And we select the 'unset' option
     click(r.getByRole("option", { name: "None" }));
     // Then onSelect was called
@@ -252,8 +250,8 @@ describe("SelectFieldTest", () => {
         onSelect={onSelect}
       />,
     );
-    // When we focus the field to open the menu
-    r.age().focus();
+    // When we click the field to open the menu
+    r.age().click();
     // Wait for the promise to finish
     await wait();
     // The 'unset' option is in the menu and we select it
@@ -291,8 +289,8 @@ describe("SelectFieldTest", () => {
         getOptionMenuLabel={(o, isUnsetOpt) => (isUnsetOpt ? "Unset Label" : o.label)}
       />,
     );
-    // When we focus the field to open the menu
-    r.age().focus();
+    // When we click the field to open the menu
+    r.age().click();
     // Then the `unset` option in the menu should reflect the custom value we passed in
     expect(r.getAllByRole("option").map((o) => o.textContent)).toMatchInlineSnapshot(`
       Array [

@@ -14,11 +14,11 @@ describe("SingleSelectFilter", () => {
   it("shows All as an option to unset the filter", async () => {
     const r = await render(<TestFilters defs={{ stageSingle: stageSingleFilter }} />);
     // Given we select a filter
-    fireEvent.focus(r.filter_stageSingle());
+    fireEvent.click(r.filter_stageSingle());
     click(r.getByRole("option", { name: "One" }));
     expect(r.filter_value()).toHaveTextContent(`{"stageSingle":"ONE"}`);
     // When we select All
-    fireEvent.focus(r.filter_stageSingle());
+    fireEvent.click(r.filter_stageSingle());
     click(r.getByRole("option", { name: "All" }));
     // Then it is unset
     expect(r.filter_value()).toHaveTextContent(`{}`);

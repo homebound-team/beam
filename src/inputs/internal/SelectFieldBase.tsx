@@ -240,7 +240,6 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     isReadOnly,
     onInputChange,
     onOpenChange,
-    menuTrigger: "focus" as const,
     children: (item: any) => (
       <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
         {getOptionMenuLabel(item)}
