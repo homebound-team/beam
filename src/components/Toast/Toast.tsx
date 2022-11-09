@@ -19,12 +19,14 @@ export function Toast(props: ToastProps) {
 
   return (
     <div css={{ ...variantStyles[type], ...Css.df.aic.w100.gap2.px2.py2.$ }} {...tid} role="alert">
-      <span css={Css.fs0.plPx(12).$}>
+      <span css={Css.fs0.$}>
         <Icon icon={typeToIcon[type]} {...tid.type} color={Palette.Gray900} />
       </span>
-      <span {...tid.message}>{message}</span>
-      <span css={Css.pr1.add("lineHeight", 0).add("marginLeft", "auto").$}>
-        <IconButton icon="x" contrast onClick={() => setNotice(undefined)} {...tid.close} color={Palette.Gray900} />
+      <span css={Css.fg1.$} {...tid.message}>
+        {message}
+      </span>
+      <span css={Css.lh(0).$}>
+        <IconButton icon="x" onClick={() => setNotice(undefined)} {...tid.close} color={Palette.Gray900} />
       </span>
     </div>
   );
