@@ -53,6 +53,10 @@ export type GridColumn<R extends Kinded> = {
    * - The default value is `1fr`
    */
   w?: number | string;
+  /** Represents the width the column will get when expanded. This prop is treated the same as the `GridColumn.w` prop.
+   *  Example: Collapsed state shows number of books. Expanded state shows titles of books.
+   */
+  expandedWidth?: number | string;
   /** The minimum width the column can shrink to */
   mw?: string;
   /** The column's default alignment for each cell. */
@@ -75,20 +79,15 @@ export type GridColumn<R extends Kinded> = {
   canHide?: boolean;
   /** Flag that will allow to know which hide-able columns are visible on initial load */
   initVisible?: boolean;
-  /**
-   * Either
-   * 1. A list of columns that should only be shown when this column is "expanded", or...
-   * 2. `number | string` representing width to allow for the column to expand itself larger. This prop is treated the same as the `GridColumn.w` prop.
-   *     Example: Collapsed state shows number of books. Expanded state shows titles of books.
-   */
-  expandColumns?: GridColumn<R>[] | number | string;
+  /** A list of columns that should only be shown when this column is "expanded" */
+  expandColumns?: GridColumn<R>[];
   /** Determines whether the group should initially be expanded on load of the table */
   initExpanded?: boolean;
 };
 
 export type GridColumnWithId<R extends Kinded> = GridColumn<R> & {
   id: string;
-  expandColumns?: GridColumnWithId<R>[] | number | string;
+  expandColumns?: GridColumnWithId<R>[];
 };
 
 export const nonKindGridColumnKeys = [

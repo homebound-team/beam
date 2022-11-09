@@ -166,7 +166,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           (sortOn === "server" && !!column.serverSideSortKey);
         const alignment = getAlignment(column, maybeContent);
         const justificationCss = getJustification(column, maybeContent, as, alignment);
-        const isExpandable = column.expandColumns !== undefined;
+        const isExpandable =
+          (column.expandColumns && column.expandColumns.length > 0) || column.expandedWidth !== undefined;
 
         const content = toContent(
           maybeContent,

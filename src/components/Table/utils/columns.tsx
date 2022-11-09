@@ -111,8 +111,8 @@ export function calcColumnSizes(
   // by react-virtuoso), even if they have the same width, for some reason `fr` units between the two
   // will resolve every slightly differently, where as this approach they will match exactly.
   const { claimedPercentages, claimedPixels, totalFr } = columns.reduce(
-    (acc, { id, w: _w, expandColumns }) => {
-      const w = expandedColumnIds.includes(id) && !Array.isArray(expandColumns) ? expandColumns : _w;
+    (acc, { id, w: _w, expandedWidth }) => {
+      const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
 
       if (typeof w === "undefined") {
         return { ...acc, totalFr: acc.totalFr + 1 };
@@ -142,8 +142,8 @@ export function calcColumnSizes(
     return `((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
-  let sizes = columns.map(({ id, expandColumns, w: _w }) => {
-    const w = expandedColumnIds.includes(id) && !Array.isArray(expandColumns) ? expandColumns : _w;
+  let sizes = columns.map(({ id, expandedWidth, w: _w }) => {
+    const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
 
     if (typeof w === "undefined") {
       return fr(1);
@@ -169,19 +169,14 @@ export function assignDefaultColumnIds<T extends Kinded>(columns: GridColumn<T>[
   // exists as part of `selectColumn` and `collapseColumn`.
   return columns.map((c, idx) => {
     const { expandColumns } = c;
-    const expandColumnsWithId: GridColumnWithId<T>[] | number | string | undefined =
-      expandColumns === undefined
-        ? undefined
-        : Array.isArray(expandColumns)
-        ? expandColumns.map((ec, ecIdx) => ({
-            ...ec,
-            id: ec.id ?? (`${generateColumnId(idx)}_${ecIdx}` as string),
-            // Defining this as undefined to make TS happy for now.
-            // If we do not explicitly set to `undefined`, TS thinks `expandColumns` could still be of type GridColumn<T> (not WithId).
-            // We only support a single level of expanding columns, so this is safe to do.
-            expandColumns: undefined,
-          }))
-        : expandColumns;
+    const expandColumnsWithId: GridColumnWithId<T>[] | undefined = expandColumns?.map((ec, ecIdx) => ({
+      ...ec,
+      id: ec.id ?? (`${generateColumnId(idx)}_${ecIdx}` as string),
+      // Defining this as undefined to make TS happy for now.
+      // If we do not explicitly set to `undefined`, TS thinks `expandColumns` could still be of type GridColumn<T> (not WithId).
+      // We only support a single level of expanding columns, so this is safe to do.
+      expandColumns: undefined,
+    }));
 
     return Object.assign(c, { id: c.id ?? generateColumnId(idx), expandColumns: expandColumnsWithId });
   });

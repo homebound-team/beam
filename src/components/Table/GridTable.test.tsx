@@ -914,7 +914,7 @@ describe("GridTable", () => {
 
     it("returns expandedColumns value if is a number and column is currently expanded", () => {
       expect(
-        calcColumnSizes([{ id: "c1", w: "10%", expandColumns: "300px" }, { w: 2 }] as any, undefined, undefined, [
+        calcColumnSizes([{ id: "c1", w: "10%", expandedWidth: "300px" }, { w: 2 }] as any, undefined, undefined, [
           "c1",
         ]).join(" "),
       ).toEqual("300px ((100% - 0% - 300px) * (2 / 2))");
@@ -2452,7 +2452,7 @@ describe("GridTable", () => {
               expandableHeader: () => "Client name",
               header: () => "Name",
               data: ({ firstName }) => firstName,
-              expandColumns: "300px",
+              expandedWidth: "300px",
               initExpanded: true,
               w: "200px",
             }),

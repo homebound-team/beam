@@ -1231,7 +1231,7 @@ export function ExpandableColumns() {
         data: ({ favoriteSports = [] }, { expanded }) =>
           expanded ? <Chips values={favoriteSports} /> : favoriteSports.length,
         w: "160px",
-        expandColumns: "280px",
+        expandedWidth: "280px",
       }),
     ],
     [],
