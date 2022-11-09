@@ -232,10 +232,14 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
       tableState.columns
         .filter((c) => tableState.visibleColumnIds.includes(c.id))
         .flatMap((c) =>
-          c.expandColumns && tableState.expandedColumnIds.includes(c.id) ? [c, ...c.expandColumns] : [c],
+          c.expandColumns && Array.isArray(c.expandColumns) && tableState.expandedColumnIds.includes(c.id)
+            ? [c, ...c.expandColumns]
+            : [c],
         ) as GridColumnWithId<R>[],
     [tableState],
   );
+
+  const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
 
   // Initialize the sort state. This will only happen on the first render.
   // Once the `TableState.sort` is defined, it will not re-initialize.
@@ -260,7 +264,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
   // here instead.
   const { getCount } = useRenderCount();
 
-  const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef);
+  const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
 
   // Make a single copy of our current collapsed state, so we'll have a single observer.
   const collapsedIds = useComputed(() => tableState.collapsedIds, [tableState]);
@@ -666,7 +670,11 @@ function renderVirtual<R extends Kinded>(
         return visibleDataRows[index][1];
       }}
       totalCount={
-        (headerRows.length || 0) + (totalsRows.length || 0) + (firstRowMessage ? 1 : 0) + (visibleDataRows.length || 0)
+        headerRows.length +
+        totalsRows.length +
+        expandableHeaderRows.length +
+        (firstRowMessage ? 1 : 0) +
+        visibleDataRows.length
       }
     />
   );
