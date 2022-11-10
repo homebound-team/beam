@@ -46,6 +46,8 @@ export interface NumberFieldProps {
    * @default true */
   useGrouping?: boolean;
   hideErrorMessage?: boolean;
+  // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
+  borderless?: boolean;
 }
 
 export function NumberField(props: NumberFieldProps) {
