@@ -219,7 +219,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               ...(inputProps.disabled ? fieldStyles.disabled : {}),
               ...(showFocus ? fieldStyles.focus : {}),
               ...(showHover ? fieldStyles.hover : {}),
-              ...(errorMsg ? fieldStyles.error : {}),
+              // Only show error styles if the field is not disabled, following the pattern that the error message is also hidden
+              ...(errorMsg && !inputProps.disabled ? fieldStyles.error : {}),
               ...Css.if(multiline).aifs.px0.mhPx(textAreaMinHeight).$,
             }}
             {...hoverProps}
