@@ -1,25 +1,30 @@
-import React, { createContext, PropsWithChildren, useContext, useMemo, useState } from "react";
-import { Toast, ToastProps } from "./Toast";
+import React, {
+  createContext,
+  Dispatch,
+  PropsWithChildren,
+  ReactNode,
+  SetStateAction,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
+
+export interface ToastProps {
+  type: "error" | "warning" | "success" | "info" | "alert";
+  message: ReactNode;
+}
 
 export type ToastContextProps = {
-  setNotice: React.Dispatch<React.SetStateAction<ToastProps | undefined>>;
+  notice: ToastProps | undefined;
+  setNotice: Dispatch<SetStateAction<ToastProps | undefined>>;
 };
 
-export const ToastContext = createContext<ToastContextProps>({
-  setNotice: () => {
-    throw new Error("Missing ToastProvider");
-  },
-});
+export const ToastContext = createContext<ToastContextProps>({ setNotice: (n) => {}, notice: undefined! });
 
 export function ToastProvider(props: PropsWithChildren<{}>) {
-  const [notice, setNotice] = useState<ToastProps>();
-  const contextValue = useMemo(() => ({ setNotice }), []);
-  return (
-    <ToastContext.Provider value={contextValue}>
-      {props.children}
-      {notice && <Toast message={notice.message} type={notice.type} />}
-    </ToastContext.Provider>
-  );
+  const [notice, setNotice] = useState<ToastContextProps>();
+  const contextValue = useMemo(() => ({ notice, setNotice }), [notice, setNotice]);
+  return <ToastContext.Provider value={contextValue}>{props.children}</ToastContext.Provider>;
 }
 
 export function useToastContext() {

@@ -1,34 +1,29 @@
-import { ReactNode } from "react";
 import { Icon, IconKey } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
 import { useTestIds } from "src/utils";
 import { IconButton } from "../IconButton";
-import { useToastContext } from "./ToastContext";
+import { useToast } from "./useToast";
 
 export type ToastTypes = "error" | "warning" | "success" | "info" | "alert";
-export interface ToastProps {
-  type: ToastTypes;
-  message: ReactNode;
-}
 
-export function Toast(props: ToastProps) {
-  const { message, type } = props;
+export function Toast() {
   // using toast context to set notice to undefined once the user clicks out of the alert
-  const { setNotice } = useToastContext();
+  const { notice, setNotice } = useToast();
   const tid = useTestIds(props, "toast");
-
+// conditionally render based on notice being set
   return (
-    <div css={{ ...variantStyles[type], ...Css.df.aic.w100.gap2.px2.py2.$ }} {...tid} role="alert">
+      {notice && <div css={{ ...variantStyles[type], ...Css.df.aic.w100.gap2.px2.py2.$ }} {...tid} role="alert">
       <span css={Css.fs0.$}>
         <Icon icon={typeToIcon[type]} {...tid.type} color={Palette.Gray900} />
       </span>
-      <span css={Css.fg1.$} {...tid.message}>
+          <span css={Css.fg1.$} {...tid.message}>
         {message}
       </span>
-      <span css={Css.lh(0).$}>
+          <span css={Css.lh(0).$}>
         <IconButton icon="x" onClick={() => setNotice(undefined)} {...tid.close} color={Palette.Gray900} />
       </span>
-    </div>
+      </div>}
+
   );
 }
 
