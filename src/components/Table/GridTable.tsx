@@ -232,14 +232,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
       tableState.columns
         .filter((c) => tableState.visibleColumnIds.includes(c.id))
         .flatMap((c) =>
-          c.expandColumns && Array.isArray(c.expandColumns) && tableState.expandedColumnIds.includes(c.id)
-            ? [c, ...c.expandColumns]
-            : [c],
+          c.expandColumns && tableState.expandedColumnIds.includes(c.id) ? [c, ...c.expandColumns] : [c],
         ) as GridColumnWithId<R>[],
     [tableState],
   );
-
-  const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
 
   // Initialize the sort state. This will only happen on the first render.
   // Once the `TableState.sort` is defined, it will not re-initialize.
@@ -264,6 +260,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
   // here instead.
   const { getCount } = useRenderCount();
 
+  const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
 
   // Make a single copy of our current collapsed state, so we'll have a single observer.
