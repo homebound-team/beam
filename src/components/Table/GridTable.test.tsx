@@ -878,25 +878,25 @@ describe("GridTable", () => {
 
   describe("column sizes", () => {
     it("as=virtual defaults to fr widths", () => {
-      expect(calcColumnSizes([{}, {}], undefined, undefined).join(" ")).toEqual(
+      expect(calcColumnSizes([{ id: "c1" }, { id: "c2" }], undefined, undefined, []).join(" ")).toEqual(
         "((100% - 0% - 0px) * (1 / 2)) ((100% - 0% - 0px) * (1 / 2))",
       );
     });
 
     it("as=virtual treats numbers as fr", () => {
-      expect(calcColumnSizes([{ w: 1 }, { w: 2 }] as any, undefined, undefined).join(" ")).toEqual(
+      expect(calcColumnSizes([{ w: 1 }, { w: 2 }] as any, undefined, undefined, []).join(" ")).toEqual(
         "((100% - 0% - 0px) * (1 / 3)) ((100% - 0% - 0px) * (2 / 3))",
       );
     });
 
     it("as=virtual accepts percentages ", () => {
-      expect(calcColumnSizes([{ w: "10%" }, { w: 2 }] as any, undefined, undefined).join(" ")).toEqual(
+      expect(calcColumnSizes([{ w: "10%" }, { w: 2 }] as any, undefined, undefined, []).join(" ")).toEqual(
         "10% ((100% - 10% - 0px) * (2 / 2))",
       );
     });
 
     it("as=virtual rejects relative units", () => {
-      expect(() => calcColumnSizes([{ w: "auto" }] as any, undefined, undefined).join(" ")).toThrow(
+      expect(() => calcColumnSizes([{ w: "auto" }] as any, undefined, undefined, []).join(" ")).toThrow(
         "Beam Table column width definition only supports px, percentage, or fr units",
       );
     });
@@ -907,8 +907,17 @@ describe("GridTable", () => {
           [{ w: "200px" }, { w: "100px" }, { w: "10%" }, { w: "20%" }, { w: 2 }, {}] as any,
           undefined,
           undefined,
+          [],
         ).join(" "),
       ).toEqual("200px 100px 10% 20% ((100% - 30% - 300px) * (2 / 3)) ((100% - 30% - 300px) * (1 / 3))");
+    });
+
+    it("returns expandedColumns value if is a number and column is currently expanded", () => {
+      expect(
+        calcColumnSizes([{ id: "c1", w: "10%", expandedWidth: "300px" }, { w: 2 }] as any, undefined, undefined, [
+          "c1",
+        ]).join(" "),
+      ).toEqual("300px ((100% - 0% - 300px) * (2 / 2))");
     });
   });
 
@@ -2432,6 +2441,32 @@ describe("GridTable", () => {
       // Then the column is initially expanded
       expect(cell(r, 1, 0)).toHaveTextContent("First name");
       expect(cell(r, 1, 1)).toHaveTextContent("Last name");
+    });
+
+    it("can expand columns when `expandedWidth` defines a value", async () => {
+      // Given a table with `expandedWidth` defined
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              expandableHeader: () => "Client name",
+              header: () => "Name",
+              data: ({ firstName }) => firstName,
+              expandedWidth: "300px",
+              initExpanded: true,
+              w: "200px",
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+        />,
+      );
+
+      // Then the column's width is initially set to the `column.expandColumns` property
+      expect(cell(r, 0, 0)).toHaveStyleRule("width", "calc(300px)");
     });
 
     it("auto assigns 'visibleColumnsStorageKey'", async () => {

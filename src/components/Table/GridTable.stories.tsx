@@ -6,6 +6,7 @@ import {
   actionColumn,
   Button,
   cardStyle,
+  Chips,
   collapseColumn,
   CollapseToggle,
   column,
@@ -1146,6 +1147,7 @@ type ExpandableData = {
     lastName: string | undefined;
     birthdate: string | undefined;
     age: number | undefined;
+    favoriteSports: string[] | undefined;
     occupation: string | undefined;
     manager: string | undefined;
   };
@@ -1166,6 +1168,7 @@ export function ExpandableColumns() {
           lastName: "Dow",
           birthdate: "Jan 29, 1986",
           age: 36,
+          favoriteSports: ["Basketball", "Football"],
           occupation: "Software Engineer",
           manager: "Steve Thompson",
         },
@@ -1221,6 +1224,14 @@ export function ExpandableColumns() {
         header: emptyCell,
         data: ({ manager }) => manager,
         w: "280px",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Favorite Sports",
+        header: emptyCell,
+        data: ({ favoriteSports = [] }, { expanded }) =>
+          expanded ? <Chips values={favoriteSports} /> : favoriteSports.length,
+        w: "160px",
+        expandedWidth: "280px",
       }),
     ],
     [],

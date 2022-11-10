@@ -1,7 +1,7 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { GridStyle } from "src/components/Table/TableStyles";
-import { GridColumn } from "src/components/Table/types";
+import { GridColumnWithId } from "src/components/Table/types";
 import { calcColumnSizes } from "src/components/Table/utils/columns";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -26,8 +26,9 @@ import { useDebouncedCallback } from "use-debounce";
  */
 export function useSetupColumnSizes(
   style: GridStyle,
-  columns: GridColumn<any>[],
+  columns: GridColumnWithId<any>[],
   resizeRef: MutableRefObject<HTMLElement | null>,
+  expandedColumnIds: string[],
 ): string[] {
   // Calculate the column sizes immediately rather than via the `debounce` method.
   // We do this for Storybook integrations that may use MockDate. MockDate changes the behavior of `new Date()`,
@@ -36,12 +37,14 @@ export function useSetupColumnSizes(
   const [tableWidth, setTableWidth] = useState<number | undefined>();
 
   // Calc our initial/first render sizes where we won't have a width yet
-  const [columnSizes, setColumnSizes] = useState<string[]>(calcColumnSizes(columns, tableWidth, style.minWidthPx));
+  const [columnSizes, setColumnSizes] = useState<string[]>(
+    calcColumnSizes(columns, tableWidth, style.minWidthPx, expandedColumnIds),
+  );
 
   const setTableAndColumnWidths = useCallback(
     (width: number) => {
       setTableWidth(width);
-      setColumnSizes(calcColumnSizes(columns, width, style.minWidthPx));
+      setColumnSizes(calcColumnSizes(columns, width, style.minWidthPx, expandedColumnIds));
     },
     [setTableWidth, setColumnSizes, columns, style],
   );

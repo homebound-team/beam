@@ -260,7 +260,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
   // here instead.
   const { getCount } = useRenderCount();
 
-  const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef);
+  const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
+  const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
 
   // Make a single copy of our current collapsed state, so we'll have a single observer.
   const collapsedIds = useComputed(() => tableState.collapsedIds, [tableState]);
@@ -666,7 +667,11 @@ function renderVirtual<R extends Kinded>(
         return visibleDataRows[index][1];
       }}
       totalCount={
-        (headerRows.length || 0) + (totalsRows.length || 0) + (firstRowMessage ? 1 : 0) + (visibleDataRows.length || 0)
+        headerRows.length +
+        totalsRows.length +
+        expandableHeaderRows.length +
+        (firstRowMessage ? 1 : 0) +
+        visibleDataRows.length
       }
     />
   );

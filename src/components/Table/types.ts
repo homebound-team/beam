@@ -53,6 +53,10 @@ export type GridColumn<R extends Kinded> = {
    * - The default value is `1fr`
    */
   w?: number | string;
+  /** Represents the width the column will get when expanded. This prop is treated the same as the `GridColumn.w` prop.
+   *  Example: Collapsed state shows number of books. Expanded state shows titles of books.
+   */
+  expandedWidth?: number | string;
   /** The minimum width the column can shrink to */
   mw?: string;
   /** The column's default alignment for each cell. */

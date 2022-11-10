@@ -118,6 +118,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       {columns.map((column, columnIndex) => {
         // Need to keep track of the expanded columns so we can add borders as expected for the header rows
         const isExpanded = tableState.expandedColumnIds.includes(column.id);
+        const numExpandedColumns = isExpanded ? column.expandColumns?.length ?? 0 : 0;
 
         const { wrapAction = true, isAction = false } = column;
 
@@ -131,12 +132,13 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           }
         }
 
-        // When using the variation of the table with an EXPANDABLE_HEADER, then our HEADER row required special border styling
+        // When using the variation of the table with an EXPANDABLE_HEADER, then our HEADER and TOTAL rows have special border styling
+        // Keep track of the when we get to the last expanded column so we can apply this styling properly.
         if (hasExpandableHeader && (isHeader || isTotals)) {
           // When the value of `currentExpandedColumnCount` is 0, then we have started over.
           // If the current column `isExpanded`, then store the number of expandable columns.
           if (currentExpandedColumnCount === 0 && isExpanded) {
-            currentExpandedColumnCount = column.expandColumns?.length ?? 0;
+            currentExpandedColumnCount = numExpandedColumns;
           } else if (currentExpandedColumnCount > 0) {
             // If value is great than 0, then decrement. Once the value equals 0, then the special styling will be applied below.
             currentExpandedColumnCount -= 1;
@@ -150,11 +152,13 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         }
         const maybeContent = applyRowFn(column, row, api, level, isExpanded);
 
-        const numExpandedColumns = isExpandableHeader && isExpanded ? column.expandColumns?.length ?? 0 : 0;
-
-        currentColspan = isGridCellContent(maybeContent)
-          ? maybeContent.colspan ?? numExpandedColumns + 1
-          : numExpandedColumns + 1;
+        // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
+        currentColspan =
+          isGridCellContent(maybeContent) && typeof maybeContent.colspan === "number"
+            ? maybeContent.colspan
+            : isExpandableHeader
+            ? numExpandedColumns + 1
+            : 1;
         const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
 
         const canSortColumn =
@@ -162,7 +166,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           (sortOn === "server" && !!column.serverSideSortKey);
         const alignment = getAlignment(column, maybeContent);
         const justificationCss = getJustification(column, maybeContent, as, alignment);
-        const isExpandable = column.expandColumns !== undefined && column.expandColumns.length > 0;
+        const isExpandable =
+          (column.expandColumns && column.expandColumns.length > 0) || column.expandedWidth !== undefined;
 
         const content = toContent(
           maybeContent,
@@ -267,14 +272,11 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
         const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
 
-        // If the expandable header is expanded, then we need to set a colspan on it which includes all expanded columns + this column.
-        const expandableHeaderColSpan = (isExpandableHeader && isExpanded ? column.expandColumns?.length ?? 0 : 0) + 1;
-
         const renderFn: RenderCellFn<any> =
           (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
             ? rowLinkRenderFn(as)
             : isHeader || isTotals || isExpandableHeader
-            ? headerRenderFn(column, as, expandableHeaderColSpan)
+            ? headerRenderFn(column, as, currentColspan)
             : rowStyle?.onClick && wrapAction
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);
