@@ -1,10 +1,12 @@
 import { Meta } from "@storybook/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { withBeamDecorator } from "src/utils/sb";
-import { Button, Toast, ToastProps } from "../index";
+import { Button } from "../index";
+import { Toast } from "./Toast";
+import { ToastNoticeProps } from "./ToastContext";
 import { useToast } from "./useToast";
 
-interface ToastStoryProps extends Omit<ToastProps, "action"> {}
+interface ToastStoryProps extends Omit<ToastNoticeProps, "action"> {}
 
 export default {
   component: Toast,
@@ -17,7 +19,7 @@ export default {
 } as Meta<ToastStoryProps>;
 
 export function DefaultToast(args: ToastStoryProps) {
-  const { ...noticeProps } = args;
+  const { message, type } = args;
   const { showToast } = useToast();
   // immediately show the toast for Chromatic snapshots
   useEffect(
@@ -28,11 +30,10 @@ export function DefaultToast(args: ToastStoryProps) {
       }),
     [showToast],
   );
-  return <Button onClick={() => showToast({ ...noticeProps })} label={"Toast"} />;
+  return <Button onClick={() => showToast({ message, type })} label={"Toast"} />;
 }
 
 export function ToastStory(args: ToastStoryProps) {
-  const [show, setShow] = useState(true);
   const { ...noticeProps } = args;
   const { showToast } = useToast();
   return <Button onClick={() => showToast({ ...noticeProps })} label={"Toast"} />;
