@@ -105,14 +105,14 @@ export function NumberField(props: NumberFieldProps) {
       type === "percent"
         ? { style: "percent" }
         : type === "basisPoints"
-          ? { style: "percent", minimumFractionDigits: 2 }
-          : type === "cents"
-            ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
-            : type === "dollars"
-              ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2 }
-              : type === "days"
-                ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0 }
-                : {};
+        ? { style: "percent", minimumFractionDigits: 2 }
+        : type === "cents"
+        ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
+        : type === "dollars"
+        ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2 }
+        : type === "days"
+        ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0 }
+        : {};
 
     return { ...defaultFormatOptions, ...typeFormat };
   }, [type, numberFormatOptions]);
@@ -179,7 +179,6 @@ export function NumberField(props: NumberFieldProps) {
       labelProps={labelProps}
       label={label}
       required={required}
-      // inputProps={inputProps}
       inputProps={mergeProps(inputProps, {
         size: sizeToContent ? String(inputProps.value ?? "").length || 1 : undefined,
       })}
