@@ -35,63 +35,71 @@ class NumberRangeFilter<V extends Key, DV extends NumberRangeFilterValue<V>>
     return (
       <>
         {/* In vertical view, we stack the number fields */}
-        {vertical && <div { ...tid }>
-          <Label label={label} />
-          <div css={Css.pb1.$}>
+        {vertical && (
+          <div {...tid}>
+            <Label label={label} />
+            <div css={Css.pb1.$}>
+              <NumberField
+                inlineLabel
+                clearable
+                label="Min"
+                value={min}
+                type={numberFieldType}
+                onChange={(minVal) => {
+                  const maxValue = max ? { max } : {};
+                  setValue(minVal || max ? ({ min: minVal, ...maxValue } as DV) : undefined);
+                }}
+                {...tid[`${defaultTestId(this.label)}_min_vertical`]}
+              />
+            </div>
             <NumberField
+              inlineLabel
+              clearable
+              label="Max"
+              value={max}
+              type={numberFieldType}
+              onChange={(maxVal) => {
+                const minValue = min ? { min } : {};
+                setValue(maxVal || min ? ({ max: maxVal, ...minValue } as DV) : undefined);
+              }}
+              {...tid[`${defaultTestId(this.label)}_max_vertical`]}
+            />
+          </div>
+        )}
+
+        {/* In horizontal / modal view, we wrap the number fields in a compound field */}
+        {!vertical && (
+          <CompoundField {...tid}>
+            <NumberField
+              compact
+              sizeToContent={!inModal}
               inlineLabel
               clearable
               label="Min"
               value={min}
-              type={numberFieldType ?? undefined}
+              type={numberFieldType}
               onChange={(minVal) => {
-                setValue({ min: minVal, max } as DV)
+                const maxValue = max ? { max } : {};
+                setValue(minVal || max ? ({ min: minVal, ...maxValue } as DV) : undefined);
               }}
-              {...tid[`${defaultTestId(this.label)}_min_vertical`]}
+              {...tid[`${defaultTestId(this.label)}_min`]}
             />
-          </div>
-          <NumberField
-            inlineLabel
-            clearable
-            label="Max"
-            value={max}
-            type={numberFieldType ?? undefined}
-            onChange={(maxVal) => {
-              setValue({ max: maxVal, min } as DV)
-            }}
-            {...tid[`${defaultTestId(this.label)}_max_vertical`]}
-          />
-        </div>}
-
-        {/* In horizontal / modal view, we wrap the number fields in a compound field */}
-        {!vertical && <CompoundField { ...tid }>
-          <NumberField
-            compact
-            sizeToContent={!inModal}
-            inlineLabel
-            clearable
-            label="Min"
-            value={min}
-            type={numberFieldType ?? undefined}
-            onChange={(minVal) => {
-              setValue({ min: minVal, max } as DV)
-            }}
-            {...tid[`${defaultTestId(this.label)}_min`]}
-          />
-          <NumberField
-            compact
-            sizeToContent={!inModal}
-            inlineLabel
-            clearable
-            label="Max"
-            value={max}
-            type={numberFieldType ?? undefined}
-            onChange={(maxVal) => {
-              setValue({ max: maxVal, min } as DV)
-            }}
-            {...tid[`${defaultTestId(this.label)}_max`]}
-          />
-        </CompoundField>}
+            <NumberField
+              compact
+              sizeToContent={!inModal}
+              inlineLabel
+              clearable
+              label="Max"
+              value={max}
+              type={numberFieldType}
+              onChange={(maxVal) => {
+                const minValue = min ? { min } : {};
+                setValue(maxVal || min ? ({ max: maxVal, ...minValue } as DV) : undefined);
+              }}
+              {...tid[`${defaultTestId(this.label)}_max`]}
+            />
+          </CompoundField>
+        )}
       </>
     );
   }

@@ -37,7 +37,29 @@ describe("NumberRangeFilter", () => {
     expect(r.filter_price_max()).toHaveValue("50");
   });
 
-  it("should set and render the filter range values", async () => {
+  it("should only set the min range value", async () => {
+    // Given we have a Number Range Filter
+    const r = await render(<TestFilters defs={{ numberRange: numberRangeFilter({ label: "Price" }) }} />);
+
+    // When we set the min / max value
+    type(r.filter_price_min(), "10");
+
+    // Then we expect the min / max filter to be set
+    expect(r.filter_value()).toHaveTextContent(JSON.stringify({ numberRange: { min: 10 } }));
+  });
+
+  it("should only set the max range value", async () => {
+    // Given we have a Number Range Filter
+    const r = await render(<TestFilters defs={{ numberRange: numberRangeFilter({ label: "Price" }) }} />);
+
+    // When we set the min / max value
+    type(r.filter_price_max(), "50");
+
+    // Then we expect the min / max filter to be set
+    expect(r.filter_value()).toHaveTextContent(JSON.stringify({ numberRange: { max: 50 } }));
+  });
+
+  it("should set and render both the min / max filter range values", async () => {
     // Given we have a Number Range Filter
     const r = await render(<TestFilters defs={{ numberRange: numberRangeFilter({ label: "Price" }) }} />);
 
@@ -45,8 +67,28 @@ describe("NumberRangeFilter", () => {
     type(r.filter_price_min(), "10");
     type(r.filter_price_max(), "50");
 
-    // Then we expect the min / max filter to be set
-    expect(r.filter_value()).toHaveTextContent(JSON.stringify({ max: 50, min: 10 }));
+    // Then we expect to render the min / max values
+    expect(r.filter_price_min()).toHaveValue("10");
+    expect(r.filter_price_max()).toHaveValue("50");
+
+    // And we expect the min / max filter to be set
+    expect(r.filter_value()).toHaveTextContent(JSON.stringify({ numberRange: { max: 50, min: 10 } }));
+  });
+
+  it("should unset filter range values", async () => {
+    // Given we have a Number Range Filter
+    const r = await render(<TestFilters defs={{ numberRange: numberRangeFilter({ label: "Price" }) }} />);
+
+    // And we set the min / max value
+    type(r.filter_price_min(), "10");
+    type(r.filter_price_max(), "50");
+
+    // When we unset the min / max values
+    type(r.filter_price_min(), "");
+    type(r.filter_price_max(), "");
+
+    // Then we expect the numberRange filter to be unset
+    expect(r.filter_value()).toHaveTextContent(JSON.stringify({}));
   });
 
   it("should render the formatted range values", async () => {
@@ -75,7 +117,7 @@ describe("NumberRangeFilter", () => {
     type(r.filter_price_max(), "50");
 
     // And we expect the min / max filter to be set in cents
-    expect(r.filter_value()).toHaveTextContent(JSON.stringify({ max: 5000, min: 1000 }));
+    expect(r.filter_value()).toHaveTextContent(JSON.stringify({ numberRange: { max: 5000, min: 1000 } }));
   });
 });
 
@@ -85,7 +127,7 @@ function TestFilters(props: TestFilterProps) {
   return (
     <div>
       <Filters vertical={!!showVertical} filterDefs={defs} filter={filter} onChange={setFilter} />
-      <div data-testid="filter_value">{JSON.stringify(filter.numberRange)}</div>
+      <div data-testid="filter_value">{JSON.stringify(filter)}</div>
     </div>
   );
 }
