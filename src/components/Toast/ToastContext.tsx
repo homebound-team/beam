@@ -12,7 +12,9 @@ export type ToastContextProps = {
 };
 
 export const ToastContext = createContext<ToastContextProps>({
-  setNotice: () => {},
+  setNotice: () => {
+    throw new Error("Missing ToastProvider");
+  },
   notice: { type: "error", message: "" },
 });
 
