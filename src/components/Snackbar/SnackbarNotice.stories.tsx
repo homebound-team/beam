@@ -1,5 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
+import { capitalCase } from "change-case";
 import { SnackbarNotice, SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
 import { withBeamDecorator } from "src/utils/sb";
@@ -49,11 +50,17 @@ export function NoticeIconExamples() {
     { icon: "error" },
     { icon: "warning" },
     { icon: "info" },
+    { icon: "alert" },
   ];
   return propVariations.map((props) => {
     return (
       <div css={Css.mb1.$}>
-        <SnackbarNotice onClose={action("Close notice")} id="1" message="Notice with one line of text." {...props} />
+        <SnackbarNotice
+          onClose={action("Close notice")}
+          id="1"
+          message={`${capitalCase(props.icon)} notice with one line of text.`}
+          {...props}
+        />
       </div>
     );
   });
