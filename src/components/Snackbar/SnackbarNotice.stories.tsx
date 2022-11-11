@@ -41,3 +41,20 @@ export function NoticeExamples() {
     </div>
   );
 }
+
+export function NoticeIconExamples() {
+  // export type SnackbarNoticeTypes = "error" | "warning" | "success" | "info";
+  const propVariations: Partial<SnackbarNoticeProps>[] = [
+    { icon: "success" },
+    { icon: "error" },
+    { icon: "warning" },
+    { icon: "info" },
+  ];
+  return propVariations.map((props) => {
+    return (
+      <div css={Css.mb1.$}>
+        <SnackbarNotice onClose={action("Close notice")} id="1" message="Notice with one line of text." {...props} />
+      </div>
+    );
+  });
+}
