@@ -45,7 +45,7 @@ export function NoticeExamples() {
 
 export function NoticeIconExamples() {
   // export type SnackbarNoticeTypes = "error" | "warning" | "success" | "info";
-  const propVariations: Partial<SnackbarNoticeProps>[] = [
+  const propVariations: Pick<SnackbarNoticeProps, "icon">[] = [
     { icon: "success" },
     { icon: "error" },
     { icon: "warning" },
@@ -58,7 +58,7 @@ export function NoticeIconExamples() {
         <SnackbarNotice
           onClose={action("Close notice")}
           id="1"
-          message={`${capitalCase(props.icon)} notice with one line of text.`}
+          message={`${capitalCase(props.icon!)} notice with one line of text.`}
           {...props}
         />
       </div>
