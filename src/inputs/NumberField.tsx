@@ -1,6 +1,6 @@
 import { NumberParser } from "@internationalized/number";
 import { ReactNode, useMemo, useRef } from "react";
-import { useLocale, useNumberField } from "react-aria";
+import { mergeProps, useLocale, useNumberField } from "react-aria";
 import { NumberFieldStateOptions, useNumberFieldState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { usePresentationContext } from "src/components/PresentationContext";
@@ -48,6 +48,8 @@ export interface NumberFieldProps {
   hideErrorMessage?: boolean;
   // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
   borderless?: boolean;
+  inlineLabel?: boolean;
+  sizeToContent?: boolean;
 }
 
 export function NumberField(props: NumberFieldProps) {
@@ -74,6 +76,7 @@ export function NumberField(props: NumberFieldProps) {
     numberFormatOptions,
     numIntegerDigits,
     useGrouping = true,
+    sizeToContent = false,
     ...otherProps
   } = props;
 
@@ -102,14 +105,14 @@ export function NumberField(props: NumberFieldProps) {
       type === "percent"
         ? { style: "percent" }
         : type === "basisPoints"
-        ? { style: "percent", minimumFractionDigits: 2 }
-        : type === "cents"
-        ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
-        : type === "dollars"
-        ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2 }
-        : type === "days"
-        ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0 }
-        : {};
+          ? { style: "percent", minimumFractionDigits: 2 }
+          : type === "cents"
+            ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
+            : type === "dollars"
+              ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2 }
+              : type === "days"
+                ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0 }
+                : {};
 
     return { ...defaultFormatOptions, ...typeFormat };
   }, [type, numberFormatOptions]);
@@ -176,7 +179,10 @@ export function NumberField(props: NumberFieldProps) {
       labelProps={labelProps}
       label={label}
       required={required}
-      inputProps={inputProps}
+      // inputProps={inputProps}
+      inputProps={mergeProps(inputProps, {
+        size: sizeToContent ? String(inputProps.value ?? "").length || 1 : undefined,
+      })}
       // This is called on each DOM change, to push the latest value into the field
       onChange={(rawInputValue) => {
         const parsedValue = numberParser.parse(rawInputValue || "");

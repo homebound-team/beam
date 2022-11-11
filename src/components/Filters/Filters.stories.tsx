@@ -11,6 +11,7 @@ import {
   GridDataRow,
   GridTable,
   multiFilter,
+  numberRangeFilter,
   simpleHeader,
   SimpleHeaderAndData,
   singleFilter,
@@ -131,12 +132,15 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       defaultValue: { op: "BETWEEN", value: { from: jan1, to: jan19 } },
     });
 
+    const numRangeFilter = numberRangeFilter({ label: "Price", numberFieldType: "cents" });
+
     const isTest = toggleFilter({ label: "Only show test projects" });
     const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", onValue: false });
 
     return {
       marketId,
       internalUserId,
+      numRangeFilter,
       favorite,
       stage,
       status,

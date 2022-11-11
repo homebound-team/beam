@@ -3,6 +3,7 @@ import { dateRangeFilter, DateRangeFilterValue } from "src/components/Filters/Da
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { singleFilter } from "src/components/Filters/SingleFilter";
 import { FilterDefs } from "src/components/Filters/types";
+import { NumberRangeFilterValue } from "./NumberRangeFilter";
 
 export enum Stage {
   StageOne = "ONE",
@@ -47,6 +48,7 @@ export type ProjectFilter = {
   doNotUse?: boolean | null;
   date?: DateFilterValue<string>;
   dateRange?: DateRangeFilterValue<string>;
+  numberRange?: NumberRangeFilterValue<number>;
 };
 
 export type StageFilter = NonNullable<FilterDefs<ProjectFilter>["stage"]>;
