@@ -40,7 +40,8 @@ export function Accordion(props: AccordionProps) {
   const [expanded, setExpanded] = useState(defaultExpanded && !disabled);
   const { isFocusVisible, focusProps } = useFocusRing();
   const contentRef = useRef<HTMLDivElement>(null);
-  const [contentHeight, setContentHeight] = useState(0);
+  // On initial render, if the accordion is expanded, then set `height` to auto to avoid unnecessary animation on render.
+  const [contentHeight, setContentHeight] = useState(expanded ? "auto" : "0");
 
   useEffect(() => {
     setExpanded(defaultExpanded && !disabled);
@@ -50,7 +51,7 @@ export function Accordion(props: AccordionProps) {
     // When the `expanded` value changes - If true, it means the Accordion's content has been rendered, Otherwise, it's been hidden
     // Then when the content is displayed, the calculate its height so we can give this value to the container to animate height smoothly.
     // When content is removed, simply set the height back to 0
-    setContentHeight(expanded && contentRef.current ? contentRef.current.scrollHeight : 0);
+    setContentHeight(expanded && contentRef.current ? `${contentRef.current.scrollHeight}px` : "0");
   }, [expanded]);
 
   return (
@@ -91,7 +92,7 @@ export function Accordion(props: AccordionProps) {
         {...testIds.details}
         id={id}
         aria-hidden={!expanded}
-        css={Css.overflowHidden.hPx(contentHeight).add("transition", "height 250ms ease-in-out").$}
+        css={Css.overflowHidden.h(contentHeight).add("transition", "height 250ms ease-in-out").$}
       >
         {expanded && (
           <div css={Css.px2.pb2.pt1.$} ref={contentRef} {...testIds.content}>
