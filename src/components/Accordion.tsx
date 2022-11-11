@@ -1,5 +1,5 @@
-import { useId } from "@react-aria/utils";
-import { Dispatch, ReactNode, SetStateAction, useEffect, useRef, useState } from "react";
+import { useId, useResizeObserver } from "@react-aria/utils";
+import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { useFocusRing } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
@@ -53,6 +53,17 @@ export function Accordion(props: AccordionProps) {
     // When content is removed, simply set the height back to 0
     setContentHeight(expanded && contentRef.current ? `${contentRef.current.scrollHeight}px` : "0");
   }, [expanded]);
+
+  // Using a resizing observer to check if the content of the accordion changes (i.e. lazy loaded image, auto-sizing textarea, etc..),
+  // If it does change, then we need to update the container's height accordingly. Only update the height if the accordion is expanded.
+  // Note - This may result in two `setContentHeight` calls when the accordion opens: (1) via the above `useEffect` and (2) in `onResize`
+  //        Both `setContentHeight` calls _should_ set the same value, so no unnecessary re-renders would be triggered, making this a harmless additional set call.
+  const onResize = useCallback(() => {
+    if (contentRef.current && expanded) {
+      setContentHeight(`${contentRef.current.scrollHeight}px`);
+    }
+  }, [expanded, setContentHeight]);
+  useResizeObserver({ ref: contentRef, onResize });
 
   return (
     <div
