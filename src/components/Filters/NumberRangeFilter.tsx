@@ -75,7 +75,9 @@ class NumberRangeFilter<V extends Key, DV extends NumberRangeFilterValue<V>>
               sizeToContent={!inModal}
               inlineLabel
               clearable
-              label="Min"
+              // When in horizontal view, we combine the filter label with the min / max labels as they are displayed inline
+              // i.e. "Price Min" / "Price Max"
+              label={!inModal ? `${this.label} Min` : "Min"}
               value={min}
               type={numberFieldType}
               onChange={(minVal) => {
@@ -89,7 +91,7 @@ class NumberRangeFilter<V extends Key, DV extends NumberRangeFilterValue<V>>
               sizeToContent={!inModal}
               inlineLabel
               clearable
-              label="Max"
+              label={!inModal ? `${this.label} Max` : "Max"}
               value={max}
               type={numberFieldType}
               onChange={(maxVal) => {
