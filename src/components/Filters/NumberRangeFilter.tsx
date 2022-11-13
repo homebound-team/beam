@@ -49,7 +49,7 @@ class NumberRangeFilter<V extends Key, DV extends NumberRangeFilterValue<V>>
                   const maxValue = max ? { max } : {};
                   setValue(minVal || max ? ({ min: minVal, ...maxValue } as DV) : undefined);
                 }}
-                {...tid[`${defaultTestId(this.label)}_min_vertical`]}
+                {...tid[`${defaultTestId(label)}_min_vertical`]}
               />
             </div>
             <NumberField
@@ -62,7 +62,7 @@ class NumberRangeFilter<V extends Key, DV extends NumberRangeFilterValue<V>>
                 const minValue = min ? { min } : {};
                 setValue(maxVal || min ? ({ max: maxVal, ...minValue } as DV) : undefined);
               }}
-              {...tid[`${defaultTestId(this.label)}_max_vertical`]}
+              {...tid[`${defaultTestId(label)}_max_vertical`]}
             />
           </div>
         )}
@@ -76,28 +76,28 @@ class NumberRangeFilter<V extends Key, DV extends NumberRangeFilterValue<V>>
               inlineLabel
               clearable
               // When in horizontal view, we combine the filter label with the min / max labels as all filter labels are displayed inline
-              label={!inModal ? `${this.label} Min` : "Min"}
+              label={!inModal ? `${label} Min` : "Min"}
               value={min}
               type={numberFieldType}
               onChange={(minVal) => {
                 const maxValue = max ? { max } : {};
                 setValue(minVal || max ? ({ min: minVal, ...maxValue } as DV) : undefined);
               }}
-              {...tid[`${defaultTestId(this.label)}_min`]}
+              {...tid[`${defaultTestId(label)}_min`]}
             />
             <NumberField
               compact
               sizeToContent={!inModal}
               inlineLabel
               clearable
-              label={!inModal ? `${this.label} Max` : "Max"}
+              label={!inModal ? `${label} Max` : "Max"}
               value={max}
               type={numberFieldType}
               onChange={(maxVal) => {
                 const minValue = min ? { min } : {};
                 setValue(maxVal || min ? ({ max: maxVal, ...minValue } as DV) : undefined);
               }}
-              {...tid[`${defaultTestId(this.label)}_max`]}
+              {...tid[`${defaultTestId(label)}_max`]}
             />
           </CompoundField>
         )}
