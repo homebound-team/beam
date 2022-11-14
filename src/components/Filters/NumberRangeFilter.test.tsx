@@ -135,5 +135,5 @@ function TestFilters(props: TestFilterProps) {
 interface TestFilterProps {
   defs: FilterDefs<ProjectFilter>;
   showVertical?: boolean;
-  defaultValue?: NumberRangeFilterValue<number>;
+  defaultValue?: NumberRangeFilterValue;
 }

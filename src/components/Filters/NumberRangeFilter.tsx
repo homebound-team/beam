@@ -1,36 +1,34 @@
-import { Key } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
 import { CompoundField } from "src/components/internal/CompoundField";
 import { Label } from "src/components/Label";
-import { Value } from "src/inputs";
 import { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { Css } from "../../Css";
 import { NumberField, NumberFieldType } from "../../inputs/NumberField";
 
-export type NumberRangeFilterProps<V extends Value, DV extends NumberRangeFilterValue<V>> = {
+export type NumberRangeFilterProps<DV extends NumberRangeFilterValue> = {
   label: string;
   numberFieldType?: NumberFieldType;
   defaultValue?: DV;
 };
 
-export type NumberRangeFilterValue<V extends Value> = { min: V; max: V };
+export type NumberRangeFilterValue = { min: number; max: number };
 
-export function numberRangeFilter<V extends Key>(
-  props: NumberRangeFilterProps<V, NumberRangeFilterValue<V>>,
-): (key: string) => Filter<NumberRangeFilterValue<V>> {
+export function numberRangeFilter(
+  props: NumberRangeFilterProps<NumberRangeFilterValue>,
+): (key: string) => Filter<NumberRangeFilterValue> {
   return (key) => new NumberRangeFilter(key, props);
 }
 
-class NumberRangeFilter<V extends Key, DV extends NumberRangeFilterValue<V>>
-  extends BaseFilter<DV, NumberRangeFilterProps<V, DV>>
+class NumberRangeFilter<DV extends NumberRangeFilterValue>
+  extends BaseFilter<DV, NumberRangeFilterProps<DV>>
   implements Filter<DV>
 {
   render(value: DV, setValue: (value: DV | undefined) => void, tid: TestIds, inModal: boolean, vertical: boolean) {
     const { label, numberFieldType } = this.props;
-    const max = (value?.max as number) ?? undefined;
-    const min = (value?.min as number) ?? undefined;
+    const min = value?.min ?? undefined;
+    const max = value?.max ?? undefined;
 
     return (
       <>
