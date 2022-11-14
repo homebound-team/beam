@@ -50,7 +50,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     children,
     variant,
     hideEndAdornment,
-    showActiveBorder = false
+    showActiveBorder = false,
   } = props;
   const popoverRef = useRef(null);
   const { overlayProps: positionProps } = useOverlayPosition({

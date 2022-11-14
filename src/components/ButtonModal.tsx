@@ -11,8 +11,9 @@ import { useTestIds } from "src/utils";
 import { ButtonVariant } from "./Button";
 import { ContextualModal } from "./internal/ContextualModal";
 
-export interface ButtonModalProps extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
-  content: ReactNode;
+export interface ButtonModalProps
+  extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
+  content: ReactNode | ((close: () => void) => ReactNode);
   title?: string;
   variant?: ButtonVariant;
   storybookDefaultOpen?: boolean;
@@ -31,7 +32,7 @@ export function ButtonModal(props: ButtonModalProps) {
 
   return (
     <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
-      <ContextualModal content={content} title={title} />
+      <ContextualModal content={content} title={title} close={state.close} />
     </OverlayTrigger>
   );
 }
