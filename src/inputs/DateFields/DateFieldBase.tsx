@@ -296,7 +296,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         helperText={helperText}
         required={required}
         labelProps={labelProps}
-        inputProps={{ ...triggerProps, ...inputProps, size: inputSize }}
+        inputProps={{ ...inputProps, size: inputSize }}
         inputRef={inputRef}
         inputWrapRef={inputWrapRef}
         inlineLabel={inlineLabel}
