@@ -6,7 +6,6 @@ describe("Chip", () => {
   it("renders", async () => {
     const r = await render(<Chip text="Chip text content" />);
     expect(r.chip().textContent).toBe("Chip text content");
-    expect(r.chip()).toHaveAttribute("title", "Chip text content");
   });
 
   it("can set type to change background color", async () => {
@@ -22,6 +21,6 @@ describe("Chip", () => {
   it("can render with text different than title", async () => {
     const r = await render(<Chip text="Chip text content" title="title is different" />);
     expect(r.chip().textContent).toBe("Chip text content");
-    expect(r.chip()).toHaveAttribute("title", "title is different");
+    expect(r.tooltip()).toHaveAttribute("title", "title is different");
   });
 });
