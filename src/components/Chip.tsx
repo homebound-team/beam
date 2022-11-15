@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Margin, Only, Properties, Xss } from "src/Css";
@@ -18,7 +18,7 @@ export const ChipTypes: Record<ChipType, ChipType> = {
 
 export interface ChipProps<X> {
   text: string;
-  title?: string;
+  title?: ReactNode;
   xss?: X;
   type?: ChipType;
   compact?: boolean;
