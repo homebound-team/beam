@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react";
+import { Css } from "src/Css";
 import { withDimensions, withRouter } from "src/utils/sb";
 import { ButtonModal } from "./ButtonModal";
 import { Chip } from "./Chip";
@@ -83,7 +84,7 @@ export function ButtonModalWithChipAndTooltip() {
       content={
         <Chip
           text="Chip text content, hover me"
-          title="Obiligation document must besigned and all templates set to active"
+          title={<p css={Css.tc.$}>Obiligation document must besigned and all templates set to active</p>}
         />
       }
       trigger={{ label: "Button Modal trigger" }}
