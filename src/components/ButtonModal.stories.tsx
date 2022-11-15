@@ -83,7 +83,7 @@ export function ButtonModalWithChipAndTooltip() {
       content={
         <Chip
           text="Chip text content, hover me"
-          title="Chip has a custom title, different than the content Chip has a custom title, different than the content"
+          title="Obiligation document must besigned and all templates set to active"
         />
       }
       trigger={{ label: "Button Modal trigger" }}

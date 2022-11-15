@@ -5,11 +5,11 @@ import { Css } from "src/Css";
 export default {
   component: Chip,
   title: "Workspace/Components/Chip",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101241",
-    }
+    },
   },
 } as Meta;
 
