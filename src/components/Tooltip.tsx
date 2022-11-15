@@ -83,7 +83,7 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
       ref={popperRef}
       style={styles.popper}
       {...attributes.popper}
-      css={Css.maxw("320px").bgGray900.white.px1.py("4px").br4.xs.z999.$}
+      css={Css.maxw("320px").bgGray900.white.px1.py("4px").br4.xs.add("zIndex", 999999).$}
     >
       <div ref={setArrowRef} style={{ ...styles.arrow }} id="arrow" />
       {content}

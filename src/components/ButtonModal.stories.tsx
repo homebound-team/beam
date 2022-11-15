@@ -1,6 +1,8 @@
 import { Meta } from "@storybook/react";
+import { Css } from "src/Css";
 import { withDimensions, withRouter } from "src/utils/sb";
 import { ButtonModal } from "./ButtonModal";
+import { Chip } from "./Chip";
 
 export default {
   component: ButtonModal,
@@ -70,6 +72,22 @@ export function ButtonModalWithActiveBorder() {
       trigger={{ label: "Button Modal trigger" }}
       hideEndAdornment
       showActiveBorder
+    />
+  );
+}
+
+export function ButtonModalWithChipAndTooltip() {
+  return (
+    <ButtonModal
+      storybookDefaultOpen
+      title={"Modal Title"}
+      content={
+        <Chip
+          text="Chip text content, hover me"
+          title={<p css={Css.tc.$}>Obiligation document must besigned and all templates set to active</p>}
+        />
+      }
+      trigger={{ label: "Button Modal trigger" }}
     />
   );
 }
