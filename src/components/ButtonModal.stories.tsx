@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react";
 import { withDimensions, withRouter } from "src/utils/sb";
 import { ButtonModal } from "./ButtonModal";
+import { Chip } from "./Chip";
 
 export default {
   component: ButtonModal,
@@ -70,6 +71,22 @@ export function ButtonModalWithActiveBorder() {
       trigger={{ label: "Button Modal trigger" }}
       hideEndAdornment
       showActiveBorder
+    />
+  );
+}
+
+export function ButtonModalWithChipAndTooltip() {
+  return (
+    <ButtonModal
+      storybookDefaultOpen
+      title={"Modal Title"}
+      content={
+        <Chip
+          text="Chip text content, hover me"
+          title="Chip has a custom title, different than the content Chip has a custom title, different than the content"
+        />
+      }
+      trigger={{ label: "Button Modal trigger" }}
     />
   );
 }

@@ -32,7 +32,7 @@ export function Chip<X extends Only<Xss<Margin>, X>>({ type = ChipTypes.neutral,
 
   return maybeTooltip({
     title,
-    placement: "top",
+    placement: "bottom",
     children: (
       <span
         css={{
