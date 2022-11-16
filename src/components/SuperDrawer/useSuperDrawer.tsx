@@ -6,18 +6,10 @@ import { ConfirmCloseModal } from "./ConfirmCloseModal";
 import { SuperDrawerWidth } from "./utils";
 
 export interface OpenInDrawerOpts {
-  /** Title of the SuperDrawer */
-  title: string;
-  /** Optional content to place left of the prev/next buttons, i.e. a "Manage" link. */
-  titleRightContent?: ReactNode;
-  /** Optional content to place right of the title, i.e. a status badge. */
-  titleLeftContent?: ReactNode;
   /** Invokes left, disabled if undefined. */
   onPrevClick?: () => void;
   /** Invokes right, disabled if undefined. */
   onNextClick?: () => void;
-  /** Hides the pagination controls for `onNextClick` and `onPrevClick` */
-  hideControls?: true;
   /** Adds a callback that is called _after_ close has definitely happened. */
   onClose?: () => void;
   content: ReactNode;
@@ -26,8 +18,6 @@ export interface OpenInDrawerOpts {
 }
 
 export interface OpenDetailOpts {
-  /** Title of the SuperDrawer for this detail page (replaces the original title). */
-  title?: string;
   content: ReactNode;
 }
 

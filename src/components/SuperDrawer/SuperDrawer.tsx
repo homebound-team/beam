@@ -1,9 +1,9 @@
 import { Global } from "@emotion/react";
 import { AutoSaveStatusProvider } from "@homebound/form-state";
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactPortal, useRef } from "react";
+import { ReactPortal, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { ButtonGroup, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
+import { IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
 import { useBeamContext } from "src/components/BeamContext";
 import { Css, px } from "src/Css";
 import { useTestIds } from "src/utils";
@@ -30,12 +30,10 @@ import { SuperDrawerWidth } from "./utils";
  * above the SuperDrawer.
  */
 export function SuperDrawer(): ReactPortal | null {
-  const { drawerContentStack: contentStack } = useBeamContext();
+  const { drawerContentStack: contentStack, sdHeaderDiv } = useBeamContext();
   const { closeDrawer } = useSuperDrawer();
-  const modalBodyRef = useRef<HTMLDivElement | null>(null);
-  const modalFooterRef = useRef<HTMLDivElement | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
   const testId = useTestIds({}, "superDrawer");
-
   // Get the latest element on the stack
   // We use undefined, nullish operators and empty object here to allow AnimatePresence
   // to animate the drawers exit transition when our stack is empty
@@ -44,12 +42,14 @@ export function SuperDrawer(): ReactPortal | null {
 
   // Also get the first / non-detail element on the stack
   const firstContent = contentStack.current[0]?.opts as OpenInDrawerOpts;
-  const { onPrevClick, onNextClick, titleRightContent, titleLeftContent, hideControls } = firstContent ?? {};
-
-  const isDetail = currentContent !== firstContent;
-  const title = content === undefined ? "" : currentContent.title || firstContent.title;
 
   const { width = SuperDrawerWidth.Normal } = firstContent ?? {};
+
+  useEffect(() => {
+    if (headerRef.current?.childNodes.length === 0 && content) {
+      headerRef.current.appendChild(sdHeaderDiv);
+    }
+  }, [headerRef, content]);
 
   return createPortal(
     <AnimatePresence>
@@ -88,37 +88,10 @@ export function SuperDrawer(): ReactPortal | null {
               onClick={(e) => e.stopPropagation()}
             >
               <AutoSaveStatusProvider>
-                <header css={Css.df.p3.bb.bGray200.df.aic.jcsb.gap2.$}>
-                  {/* Left */}
-                  <div css={Css.df.aic.$}>
-                    <div css={Css.xl2Sb.gray900.mr2.$} {...testId.title}>
-                      {title ?? null}
-                    </div>
-                    {titleLeftContent ?? null}
-                  </div>
-                  {/* Right - Forcing height to 32px to match title height */}
-                  <div css={Css.df.gap3.aic.hPx(32).fs0.$}>
-                    {titleRightContent || null}
-                    {/* Disable buttons is handlers are not given or if childContent is shown */}
-                    {!hideControls && (
-                      <ButtonGroup
-                        buttons={[
-                          {
-                            icon: "chevronLeft",
-                            onClick: () => onPrevClick && onPrevClick(),
-                            disabled: !onPrevClick || isDetail,
-                          },
-                          {
-                            icon: "chevronRight",
-                            onClick: () => onNextClick && onNextClick(),
-                            disabled: !onNextClick || isDetail,
-                          },
-                        ]}
-                        {...testId.headerActions}
-                      />
-                    )}
-                    <IconButton icon="x" onClick={closeDrawer} {...testId.close} />
-                  </div>
+                <header css={Css.p3.bb.bGray200.df.aic.jcsb.gap3.$}>
+                  {/* Provide default styling for the `h1` tag within SuperDrawer to help with consistency */}
+                  <div ref={headerRef} css={Css.gray900.fg1.addIn("h1", Css.xl2Sb.$).$}></div>
+                  <IconButton icon="x" onClick={closeDrawer} {...testId.close} />
                 </header>
                 {content}
               </AutoSaveStatusProvider>
