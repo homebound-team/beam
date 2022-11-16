@@ -52,16 +52,20 @@ export function NoticeIconExamples() {
     { icon: "info" },
     { icon: "alert" },
   ];
-  return propVariations.map((props) => {
-    return (
-      <div css={Css.mb1.$}>
-        <SnackbarNotice
-          onClose={action("Close notice")}
-          id="1"
-          message={`${capitalCase(props.icon!)} notice with one line of text.`}
-          {...props}
-        />
-      </div>
-    );
-  });
+  return (
+    <div css={Css.df.fdc.aifs.$}>
+      {propVariations.map((props) => {
+        return (
+          <div css={Css.mb1.$}>
+            <SnackbarNotice
+              onClose={action("Close notice")}
+              id="1"
+              message={`${capitalCase(props.icon!)} notice with one line of text.`}
+              {...props}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
 }
