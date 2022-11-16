@@ -49,27 +49,24 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
     }
   }, [tree, search, contains]);
 
-  console.log(filteredTree.items[0])
-
   const menuChildren = useMemo(() => {
-    return tree.items.map(({ value: s }) => (
+    return filteredTree.items.map(({ value: s }) => (
       <Section key={s.label.replace(/"/g, "")} title={s.label} items={s.items}>
         {(item) => <Item key={item.label.replace(/"/g, "")}>{item.label}</Item>}
       </Section>
     ));
-  }, [tree]);
+  }, [filteredTree]);
 
 
   const state = useTreeState({ children: menuChildren, items: filteredTree.items.map((i) => i.value), selectionMode: "none" });
 
   const menuRef = useRef(null);
-  const { menuProps } = useMenu<any>({ ...ariaMenuProps, autoFocus: true }, state, menuRef);
+  const { menuProps } = useMenu<any>({ ...ariaMenuProps, autoFocus: searchable ? false : true, }, state, menuRef);
   const tid = useTestIds(props);
 
   // Bulk updates of MenuItems below. If we find this to be of sluggish performance, then we can change to be more surgical in our updating.
   // If our list of items change, update the "items" menu section. (key is based on label in `getKey` above)
   useEffect(() => filteredTree.update("items", { label: "items", items } as MenuSection), [items]);
-  console.log([...state.collection])
   return (
     <FocusScope>
       { searchable && <MenuSearchField label="" value={search} placeholder="Search..." startAdornment={<Icon icon="search" />} inlineLabel={true} onChange={setSearch} /> }
@@ -83,7 +80,6 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
         ref={menuRef}
         {...tid.menu}
         >
-        {/* Add conditional custom text field  */}
         {/* It is possible to have, at most, 2 sections: One for items, and one for persisted items */}
         {[...state.collection].map((item) => (
           <MenuSectionImpl key={item.key} section={item} state={state} onClose={onClose} {...tid} />
