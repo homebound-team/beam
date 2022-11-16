@@ -5,15 +5,7 @@ import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
-import {
-  defaultStyle,
-  expandableHeaderRowHeight,
-  GridStyle,
-  GridStyleDef,
-  resolveStyles,
-  RowStyles,
-  totalsRowHeight,
-} from "src/components/Table/TableStyles";
+import { defaultStyle, GridStyle, GridStyleDef, resolveStyles, RowStyles } from "src/components/Table/TableStyles";
 import {
   Direction,
   GridColumn,
@@ -31,7 +23,6 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   applyRowFn,
   EXPANDABLE_HEADER,
-  HEADER,
   matchesFilter,
   reservedRowKinds,
   TOTALS,
@@ -284,20 +275,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     string[],
   ] = useMemo(() => {
     function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
-      // We may have multiple rows that need to be sticky, if that is the case, then we need properly define the stickyOffset for each row.
-      // *TOTALS* will always be on top, so that can remain 0.
-      // *EXPANDABLE_HEADER Header* may need to include the height of the totals row in the offset
-      // *HEADER* may need to include both TOTALS and EXPANDABLE_HEADER in its offset.
-      // TODO: Create a single "table header" container that can hold multiple rows and use a single `position: sticky`. And we can get rid of this nonsense.
-      const maybeTotalsRowHeight = hasTotalsRow ? totalsRowHeight : 0;
-      const maybeExpandableRowsHeight = hasExpandableHeader ? expandableHeaderRowHeight : 0;
-      const rowStickyOffset =
-        row.kind === HEADER
-          ? maybeTotalsRowHeight + maybeExpandableRowsHeight
-          : row.kind === EXPANDABLE_HEADER
-          ? maybeTotalsRowHeight
-          : 0;
-
       return (
         <Row
           key={`${row.kind}-${row.id}`}
@@ -307,8 +284,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
             row,
             style,
             rowStyles,
-            stickyHeader,
-            stickyOffset: rowStickyOffset + stickyOffset,
             columnSizes,
             level,
             getCount,
@@ -371,21 +346,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     visitRows(filteredRows, 0, true);
 
     return [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, filteredRowIds];
-  }, [
-    as,
-    api,
-    filter,
-    maybeSorted,
-    columns,
-    style,
-    rowStyles,
-    sortOn,
-    stickyHeader,
-    stickyOffset,
-    columnSizes,
-    collapsedIds,
-    getCount,
-  ]);
+  }, [as, api, filter, maybeSorted, columns, style, rowStyles, sortOn, columnSizes, collapsedIds, getCount]);
+
+  // Once our header rows are created we can organize them in expected order.
+  const tableHeadRows = totalsRows.concat(expandableHeaderRows).concat(headerRows);
 
   let tooManyClientSideRows = false;
   if (filterMaxRows && visibleDataRows.length > filterMaxRows) {
@@ -441,14 +405,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
           style,
           id,
           columns,
-          headerRows,
-          totalsRows,
-          expandableHeaderRows,
           visibleDataRows,
           firstRowMessage,
           stickyHeader,
           xss,
           virtuosoRef,
+          tableHeadRows,
+          stickyOffset,
         )}
       </PresentationProvider>
     </TableStateContext.Provider>
@@ -467,14 +430,13 @@ function renderDiv<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumnWithId<R>[],
-  headerRows: RowTuple<R>[],
-  totalsRows: RowTuple<R>[],
-  expandableHeaderRows: RowTuple<R>[],
   visibleDataRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
-  _stickyHeader: boolean,
+  stickyHeader: boolean,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  tableHeadRows: RowTuple<R>[],
+  stickyOffset: number,
 ): ReactElement {
   return (
     <div
@@ -484,33 +446,38 @@ function renderDiv<R extends Kinded>(
         // In cases where we have sticky columns on a very wide table, then the container which the columns "stick" to (which is the table),
         // needs to be as wide as the table's content, or else we lose the "stickiness" once scrolling past width of the table's container.
         ...Css.mw("fit-content").$,
-        /*
-          Using (n + 3) here to target all rows that are after the first non-header row. Since n starts at 0, we can use
-          the + operator as an offset.
-          Inspired by: https://stackoverflow.com/a/25005740/2551333
-        */
-        ...(style.betweenRowsCss
-          ? Css.addIn(`& > div:nth-of-type(n+${headerRows.length + totalsRows.length + 2}) > *`, style.betweenRowsCss).$
-          : {}),
-        ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:nth-of-type(2) > *`, style.firstNonHeaderRowCss).$ : {}),
-        ...(style.lastRowCss && Css.addIn("& > div:last-of-type", style.lastRowCss).$),
-        ...(style.firstRowCss && Css.addIn("& > div:first-of-type", style.firstRowCss).$),
         ...style.rootCss,
         ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
       }}
       data-testid={id}
     >
-      {totalsRows.map(([, node]) => node)}
-      {expandableHeaderRows.map(([, node]) => node)}
-      {headerRows.map(([, node]) => node)}
-      {/* Show an info message if it's set. */}
-      {firstRowMessage && (
-        <div css={{ ...style.firstRowMessageCss }} data-gridrow>
-          {firstRowMessage}
-        </div>
-      )}
-      {visibleDataRows.map(([, node]) => node)}
+      {/* Table Head */}
+      <div
+        css={{
+          ...(style.firstRowCss && Css.addIn("& > div:first-of-type", style.firstRowCss).$),
+          ...Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$,
+        }}
+      >
+        {tableHeadRows.map(([, node]) => node)}
+      </div>
+
+      {/* Table Body */}
+      <div
+        css={{
+          ...(style.betweenRowsCss ? Css.addIn(`& > div > *`, style.betweenRowsCss).$ : {}),
+          ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:first-of-type > *`, style.firstNonHeaderRowCss).$ : {}),
+          ...(style.lastRowCss && Css.addIn("& > div:last-of-type", style.lastRowCss).$),
+        }}
+      >
+        {/* Show an info message if it's set. */}
+        {firstRowMessage && (
+          <div css={{ ...style.firstRowMessageCss }} data-gridrow>
+            {firstRowMessage}
+          </div>
+        )}
+        {visibleDataRows.map(([, node]) => node)}
+      </div>
     </div>
   );
 }
@@ -520,14 +487,13 @@ function renderTable<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumnWithId<R>[],
-  headerRows: RowTuple<R>[],
-  totalsRows: RowTuple<R>[],
-  expandableHeaderRows: RowTuple<R>[],
   visibleDataRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
-  _stickyHeader: boolean,
+  stickyHeader: boolean,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  tableHeadRows: RowTuple<R>[],
+  stickyOffset: number,
 ): ReactElement {
   return (
     <table
@@ -537,14 +503,16 @@ function renderTable<R extends Kinded>(
           // removes border between header and second row
           .addIn("& > tbody > tr:first-of-type > *", style.firstNonHeaderRowCss || {}).$,
         ...Css.addIn("& > tbody > tr:last-of-type", style.lastRowCss).$,
-        ...Css.addIn("& > tbody > tr:first-of-type", style.firstRowCss).$,
+        ...Css.addIn("& > thead > tr:first-of-type", style.firstRowCss).$,
         ...style.rootCss,
         ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
       }}
       data-testid={id}
     >
-      <thead>{[...totalsRows, ...expandableHeaderRows, ...headerRows].map(([, node]) => node)}</thead>
+      <thead css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$}>
+        {tableHeadRows.map(([, node]) => node)}
+      </thead>
       <tbody>
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
@@ -584,14 +552,13 @@ function renderVirtual<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumnWithId<R>[],
-  headerRows: RowTuple<R>[],
-  totalsRows: RowTuple<R>[],
-  expandableHeaderRows: RowTuple<R>[],
   visibleDataRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  tableHeadRows: RowTuple<R>[],
+  _stickyOffset: number,
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
@@ -616,37 +583,16 @@ function renderVirtual<R extends Kinded>(
         Footer: () => <div css={footerStyle} />,
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
-      topItemCount={
-        (stickyHeader ? headerRows.length + totalsRows.length + expandableHeaderRows.length : 0) +
-        (firstRowMessage ? 1 : 0)
-      }
+      topItemCount={(stickyHeader ? tableHeadRows.length : 0) + (firstRowMessage ? 1 : 0)}
       itemContent={(index) => {
-        // Since we have 4 arrays of rows: `headerRows`, `totalsRows`, `expandableHeaderRows`, and `filteredRow` we
-        // must determine which one to render.
+        // Since we have 2 arrays of rows: `tableHeadRows`, and `filteredRow` we must determine which one to render.
 
-        // Determine if we need to render a totals row
-        if (index < totalsRows.length) {
-          return totalsRows[index][1];
+        if (index < tableHeadRows.length) {
+          return tableHeadRows[index][1];
         }
 
         // Reset index
-        index -= totalsRows.length;
-
-        // Determine if we need to render an expandableHeaderRows row
-        if (index < expandableHeaderRows.length) {
-          return expandableHeaderRows[index][1];
-        }
-
-        // Reset index
-        index -= expandableHeaderRows.length;
-
-        // Determine if we need to render a header row
-        if (index < headerRows.length) {
-          return headerRows[index][1];
-        }
-
-        // Reset index
-        index -= headerRows.length;
+        index -= tableHeadRows.length;
 
         // Show firstRowMessage as the first `filteredRow`
         if (firstRowMessage) {
@@ -666,13 +612,7 @@ function renderVirtual<R extends Kinded>(
         // Lastly render `filteredRow`
         return visibleDataRows[index][1];
       }}
-      totalCount={
-        headerRows.length +
-        totalsRows.length +
-        expandableHeaderRows.length +
-        (firstRowMessage ? 1 : 0) +
-        visibleDataRows.length
-      }
+      totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length}
     />
   );
 }
