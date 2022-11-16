@@ -37,8 +37,6 @@ interface RowProps<R extends Kinded> {
   row: GridDataRow<R>;
   style: GridStyle;
   rowStyles: RowStyles<R> | undefined;
-  stickyHeader: boolean;
-  stickyOffset: number;
   sortOn: SortOn;
   columnSizes: string[];
   level: number;
@@ -57,8 +55,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     row,
     style,
     rowStyles,
-    stickyHeader,
-    stickyOffset,
     sortOn,
     columnSizes,
     level,
@@ -97,10 +93,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
     ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
-    // Maybe add the sticky header styles
-    ...(reservedRowKinds.includes(row.kind) && stickyHeader
-      ? Css.sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$
-      : undefined),
     ...{
       [` > .${revealOnRowHoverClass} > *`]: Css.invisible.$,
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.visible.$,
