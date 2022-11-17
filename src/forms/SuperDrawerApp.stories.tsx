@@ -2,6 +2,7 @@ import { useFormState } from "@homebound/form-state";
 import { Meta } from "@storybook/react";
 import { useEffect } from "react";
 import { Button, SuperDrawerContent, useSuperDrawer } from "src/components";
+import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { Css } from "src/Css";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { BoundDateField } from "./BoundDateField";
@@ -29,7 +30,6 @@ export function SuperDrawerApp() {
 
   function openSuperDrawer() {
     openInDrawer({
-      title: "Create Author",
       content: <SuperDrawerForm />,
     });
   }
@@ -63,6 +63,9 @@ function SuperDrawerForm() {
         },
       ]}
     >
+      <SuperDrawerHeader>
+        <h1>Create Author</h1>
+      </SuperDrawerHeader>
       <fieldset>
         <legend css={Css.xl.mb2.$}>Author</legend>
         <BoundTextField field={formState.firstName} />

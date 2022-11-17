@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import {
   Button,
   GridColumn,
@@ -15,6 +15,7 @@ import {
 } from "src/components";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
+import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { GridDataRow, GridRowLookup } from "src/components/Table";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
@@ -27,11 +28,11 @@ export default {
   title: "Workspace/Components/Super Drawer",
   component: SuperDrawerComponent,
   decorators: [withBeamDecorator, withDimensions()],
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=35964%3A102029",
-    }
+    },
   },
 } as Meta;
 
@@ -39,8 +40,7 @@ export function Open() {
   const { openInDrawer, isDrawerOpen } = useSuperDrawer();
   function open() {
     openInDrawer({
-      title: "Drawer Title",
-      content: <TestDrawerContent book={Books[0]} />,
+      content: <TestDrawerContent book={Books[0]} title="Drawer Title" />,
     });
   }
   useEffect(open, [openInDrawer]);
@@ -57,8 +57,7 @@ export function SmallDrawer() {
   const { openInDrawer, isDrawerOpen } = useSuperDrawer();
   function open() {
     openInDrawer({
-      title: "Drawer Title",
-      content: <TestDrawerContent book={Books[0]} />,
+      content: <TestDrawerContent book={Books[0]} title="Drawer Title" />,
       width: SuperDrawerWidth.Small,
     });
   }
@@ -76,8 +75,7 @@ export function OpenWithNoActions() {
   const { openInDrawer } = useSuperDrawer();
   function open() {
     openInDrawer({
-      title: "Drawer Title",
-      content: <TestDrawerContent book={Books[0]} hasActions={false} />,
+      content: <TestDrawerContent book={Books[0]} hasActions={false} title="Drawer Title" />,
     });
   }
   useEffect(open, [openInDrawer]);
@@ -95,8 +93,7 @@ export function CanCloseDrawerChecks() {
 
   function open() {
     openInDrawer({
-      title: "Drawer Title",
-      content: <TestDrawerContent book={Books[0]} hasActions={false} />,
+      content: <TestDrawerContent book={Books[0]} hasActions={false} title="Drawer Title" />,
     });
     // Add two canClose check to show that all checks are ran
     addCanCloseDrawerCheck(() => true);
@@ -121,8 +118,8 @@ export function OpenAtDetail() {
   const { openInDrawer, openDrawerDetail } = useSuperDrawer();
 
   function open() {
-    openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
-    openDrawerDetail({ content: <TestDetailContent book={Books[0]} /> });
+    openInDrawer({ content: <TestDrawerContent book={Books[0]} title="Drawer Title" /> });
+    openDrawerDetail({ content: <TestDetailContent book={Books[0]} title="Drawer Title" /> });
   }
   useEffect(open, [openInDrawer, openDrawerDetail]);
   return (
@@ -143,8 +140,8 @@ export function CanCloseDrawerDetailsChecks() {
   const { openInDrawer, openDrawerDetail, addCanCloseDrawerCheck, addCanCloseDrawerDetailCheck } = useSuperDrawer();
 
   function open() {
-    openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
-    openDrawerDetail({ content: <TestDetailContent book={Books[0]} /> });
+    openInDrawer({ content: <TestDrawerContent book={Books[0]} title="Drawer Title" /> });
+    openDrawerDetail({ content: <TestDetailContent book={Books[0]} title="Drawer Title" /> });
     // Add failing checks for both drawer and drawer details
     addCanCloseDrawerCheck(() => false);
     addCanCloseDrawerDetailCheck(() => false);
@@ -164,7 +161,7 @@ export function OpenWithModal() {
   const { openInDrawer } = useSuperDrawer();
   const { openModal } = useModal();
   function open() {
-    openInDrawer({ title: "Drawer Title", content: <TestDrawerContent book={Books[0]} /> });
+    openInDrawer({ content: <TestDrawerContent book={Books[0]} title="Drawer Title" /> });
     openModal({ content: <TestModalContent /> });
   }
   useEffect(open, [openInDrawer, openModal]);
@@ -180,10 +177,14 @@ export function OpenWithTitleRightContent() {
   const { openInDrawer } = useSuperDrawer();
   function open() {
     openInDrawer({
-      title: "Title",
-      content: <TestDrawerContent book={Books[0]} />,
-      titleLeftContent: <Tag text={"ASSIGNED"} type={"success"} />,
-      titleRightContent: <Button label="Manage RFP" onClick={() => {}} />,
+      content: (
+        <TestDrawerContent
+          book={Books[0]}
+          title="Title"
+          leftContent={<Tag text={"ASSIGNED"} type={"success"} />}
+          rightContent={<Button label="Manage RFP" onClick={() => {}} />}
+        />
+      ),
     });
   }
   useEffect(open, [openInDrawer]);
@@ -199,10 +200,14 @@ export function LongTitle() {
   const { openInDrawer } = useSuperDrawer();
   function open() {
     openInDrawer({
-      title: "A very long title that will cause it to wrap. ".repeat(2),
-      content: <TestDrawerContent book={Books[0]} />,
-      titleLeftContent: <Tag text={"ASSIGNED"} type={"success"} />,
-      titleRightContent: <Button label="Manage RFP" onClick={() => {}} />,
+      content: (
+        <TestDrawerContent
+          book={Books[0]}
+          title={"A very long title that will cause it to wrap. ".repeat(2)}
+          leftContent={<Tag text={"ASSIGNED"} type={"success"} />}
+          rightContent={<Button label="Manage RFP" onClick={() => {}} />}
+        />
+      ),
     });
   }
   useEffect(open, [openInDrawer]);
@@ -254,12 +259,10 @@ export function TableWithPrevNextAndCloseCheck() {
   function openRow(row: GridDataRow<Row>) {
     if (row.kind === "data") {
       const { prev, next } = rowLookup.current!.lookup(row)["data"];
-      console.log("prev = ", prev);
       openInDrawer({
-        title: row.data.bookTitle,
         onPrevClick: prev && (() => openRow(prev)),
         onNextClick: next && (() => openRow(next)),
-        content: <TestDrawerContent book={row.data} />,
+        content: <TestDrawerContent book={row.data} title={row.data.bookTitle} />,
       });
     }
   }
@@ -302,10 +305,9 @@ export function TableWithPrevNext() {
     if (row.kind === "data") {
       const { prev, next } = rowLookup.current!.lookup(row)["data"];
       openInDrawer({
-        title: row.data.bookTitle,
         onPrevClick: prev && (() => openRow(prev)),
         onNextClick: next && (() => openRow(next)),
-        content: <TestDrawerContent book={row.data} />,
+        content: <TestDrawerContent book={row.data} title={row.data.bookTitle} />,
       });
     }
   }
@@ -338,9 +340,7 @@ export function HiddenControls() {
   const { openInDrawer, isDrawerOpen } = useSuperDrawer();
   function open() {
     openInDrawer({
-      title: "Drawer Title",
-      content: <TestDrawerContent book={Books[0]} />,
-      hideControls: true,
+      content: <TestDrawerContent book={Books[0]} title="Drawer Title" hideControls />,
     });
   }
   useEffect(open, [openInDrawer]);
@@ -356,10 +356,15 @@ export function HiddenControls() {
 interface TestDrawerContentProps {
   book: Book;
   hasActions?: boolean;
+  title: string;
+  leftContent?: ReactNode;
+  rightContent?: ReactNode;
+  hideControls?: boolean;
 }
 
 /** Example component to render inside the SuperDrawer */
-function TestDrawerContent({ book, hasActions = true }: TestDrawerContentProps) {
+function TestDrawerContent(props: TestDrawerContentProps) {
+  const { book, hasActions = true, title, leftContent, rightContent, hideControls } = props;
   const { openDrawerDetail, closeDrawer } = useSuperDrawer();
   const { openModal } = useModal();
 
@@ -368,55 +373,60 @@ function TestDrawerContent({ book, hasActions = true }: TestDrawerContentProps) 
   }
 
   return (
-    <SuperDrawerContent
-      actions={
-        hasActions
-          ? [
-              { label: "Close", onClick: () => closeDrawer(), variant: "tertiary" },
-              { label: `Purchase "${book.bookTitle}"`, onClick: handlePurchase },
-            ]
-          : undefined
-      }
-    >
-      <h2 css={Css.xlSb.mb1.$}>{book.bookTitle}</h2>
-      <p css={Css.base.$}>
-        <strong>Description:</strong> {book.bookDescription}
-      </p>
-      <hr css={Css.my1.$} />
-      <div css={Css.df.gap1.aic.$}>
-        <p>
-          <strong>Author:</strong> {book.authorName}
+    <>
+      <SuperDrawerHeader hideControls={hideControls} title={title} left={leftContent} right={rightContent} />
+      <SuperDrawerContent
+        actions={
+          hasActions
+            ? [
+                { label: "Close", onClick: () => closeDrawer(), variant: "tertiary" },
+                { label: `Purchase "${book.bookTitle}"`, onClick: handlePurchase },
+              ]
+            : undefined
+        }
+      >
+        <h2 css={Css.xlSb.mb1.$}>{book.bookTitle}</h2>
+        <p css={Css.base.$}>
+          <strong>Description:</strong> {book.bookDescription}
         </p>
-        <Button
-          variant="tertiary"
-          label={`Learn more about ${book.authorName.split(" ")[0]}`}
-          onClick={() =>
-            openDrawerDetail({
-              title: book.authorName,
-              content: <TestDetailContent book={book} onPurchase={handlePurchase} />,
-            })
-          }
-        />
-      </div>
-    </SuperDrawerContent>
+        <hr css={Css.my1.$} />
+        <div css={Css.df.gap1.aic.$}>
+          <p>
+            <strong>Author:</strong> {book.authorName}
+          </p>
+          <Button
+            variant="tertiary"
+            label={`Learn more about ${book.authorName.split(" ")[0]}`}
+            onClick={() =>
+              openDrawerDetail({
+                content: <TestDetailContent book={book} onPurchase={handlePurchase} title={title} />,
+              })
+            }
+          />
+        </div>
+      </SuperDrawerContent>
+    </>
   );
 }
 
 /** Example component to render inside the SuperDrawer */
-function TestDetailContent({ book, onPurchase }: { book: Book; onPurchase?: () => void }) {
+function TestDetailContent({ book, onPurchase, title }: { book: Book; onPurchase?: () => void; title: string }) {
   const { closeDrawerDetail } = useSuperDrawer();
   return (
-    <SuperDrawerContent
-      actions={[
-        { label: `Back to "${book.bookTitle}"`, onClick: closeDrawerDetail, variant: "tertiary" },
-        { label: `Purchase "${book.bookTitle}"`, onClick: onPurchase ?? noop, disabled: !onPurchase },
-      ]}
-    >
-      <h2 css={Css.xlSb.mb1.$}>{book.authorName}</h2>
-      <p css={Css.base.$}>
-        <strong>Description:</strong> {book.authorDescription}
-      </p>
-    </SuperDrawerContent>
+    <>
+      <SuperDrawerHeader title={title} />
+      <SuperDrawerContent
+        actions={[
+          { label: `Back to "${book.bookTitle}"`, onClick: closeDrawerDetail, variant: "tertiary" },
+          { label: `Purchase "${book.bookTitle}"`, onClick: onPurchase ?? noop, disabled: !onPurchase },
+        ]}
+      >
+        <h2 css={Css.xlSb.mb1.$}>{book.authorName}</h2>
+        <p css={Css.base.$}>
+          <strong>Description:</strong> {book.authorDescription}
+        </p>
+      </SuperDrawerContent>
+    </>
   );
 }
 
@@ -427,9 +437,7 @@ function TestSimpleModalContent({ book, onPrimaryClick }: { book: Book; onPrimar
     <>
       <ModalHeader>Confirm</ModalHeader>
       <ModalBody>
-        <div css={Css.wPx(500).df.fdc.jcc.aic.tc.$}>
-          <p css={Css.lgSb.$}>Are you sure you want to purchase {book.bookTitle} ?</p>
-        </div>
+        <p>Are you sure you want to purchase {book.bookTitle}?</p>
       </ModalBody>
       <ModalFooter>
         <Button label="Purchase" onClick={onPrimaryClick} />
