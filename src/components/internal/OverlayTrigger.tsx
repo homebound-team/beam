@@ -1,7 +1,6 @@
 import { AriaButtonProps } from "@react-types/button";
 import type { Placement } from "@react-types/overlays";
-import { ReactElement } from "@testing-library/react/node_modules/@types/react";
-import { MutableRefObject, ReactNode, useRef } from "react";
+import { MutableRefObject, ReactElement, ReactNode, useRef } from "react";
 import { useOverlayPosition } from "react-aria";
 import { MenuTriggerState } from "react-stately";
 import { AvatarButton, AvatarButtonProps } from "src/components/AvatarButton";
@@ -25,7 +24,7 @@ export interface OverlayTriggerProps {
   disabled?: boolean | ReactNode;
   /** Text to be shown via a tooltip when the user hovers over the button */
   tooltip?: ReactNode;
-  /** The components to be shown within the overlay */
+  /** The component to be shown within the overlay */
   children: ReactElement;
   /** Props returned by the useMenuTrigger hook to be passed to the button element */
   menuTriggerProps: AriaButtonProps;
