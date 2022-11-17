@@ -78,6 +78,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
   return (
     <FocusScope>
       <div
+        // Using `max-height: inherit` allows us to take advantage of the height set on the overlay container, which updates based on the available space for the overlay within the viewport
         css={{
           ...Css.df.fdc.myPx(4).bgWhite.outline0.br4.bshBasic.maxh("inherit").overflowAuto.$,
           "&:hover, &:focus": Css.bshHover.$,
@@ -93,17 +94,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
             {...tid}
           />
         )}
-        <ul
-          css={{
-            // Using `max-height: inherit` allows us to take advantage of the height set on the overlay container, which updates based on the available space for the overlay within the viewport
-            // ...Css.df.fdc.myPx(4).bgWhite.outline0.br4.bshBasic.listReset.maxh("inherit").overflowAuto.$,
-            // "&:hover, &:focus": Css.bshHover.$,
-            ...Css.df.fdc.listReset.$,
-          }}
-          {...menuProps}
-          ref={menuRef}
-          {...tid.menu}
-        >
+        <ul css={Css.listReset.$} {...menuProps} ref={menuRef} {...tid.menu}>
           {/* It is possible to have, at most, 2 sections: One for items, and one for persisted items */}
           {[...state.collection].map((item) => (
             <MenuSectionImpl key={item.key} section={item} state={state} onClose={onClose} {...tid} />
