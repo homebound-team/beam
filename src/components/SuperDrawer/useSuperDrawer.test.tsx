@@ -171,9 +171,7 @@ function TestDrawerContent(props: {
       context.openInDrawer({
         content: (
           <>
-            <SuperDrawerHeader>
-              <h1>Title</h1>
-            </SuperDrawerHeader>
+            <SuperDrawerHeader title="Title" />
             <h2 data-testid="superDrawerContent">SuperDrawer Content</h2>
           </>
         ),

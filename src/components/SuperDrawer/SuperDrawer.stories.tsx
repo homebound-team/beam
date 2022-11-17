@@ -185,8 +185,6 @@ export function OpenWithTitleRightContent() {
           rightContent={<Button label="Manage RFP" onClick={() => {}} />}
         />
       ),
-      // titleLeftContent: <Tag text={"ASSIGNED"} type={"success"} />,
-      // titleRightContent: <Button label="Manage RFP" onClick={() => {}} />,
     });
   }
   useEffect(open, [openInDrawer]);
@@ -210,8 +208,6 @@ export function LongTitle() {
           rightContent={<Button label="Manage RFP" onClick={() => {}} />}
         />
       ),
-      // titleLeftContent: <Tag text={"ASSIGNED"} type={"success"} />,
-      // titleRightContent: <Button label="Manage RFP" onClick={() => {}} />,
     });
   }
   useEffect(open, [openInDrawer]);
@@ -378,15 +374,7 @@ function TestDrawerContent(props: TestDrawerContentProps) {
 
   return (
     <>
-      <SuperDrawerHeader hideControls={hideControls}>
-        <div css={Css.df.jcsb.aic.gap2.$}>
-          <div css={Css.fg1.df.aic.gap2.$}>
-            <h1>{title}</h1>
-            {leftContent}
-          </div>
-          <div css={Css.fs0.$}>{rightContent}</div>
-        </div>
-      </SuperDrawerHeader>
+      <SuperDrawerHeader hideControls={hideControls} title={title} left={leftContent} right={rightContent} />
       <SuperDrawerContent
         actions={
           hasActions
@@ -426,9 +414,7 @@ function TestDetailContent({ book, onPurchase, title }: { book: Book; onPurchase
   const { closeDrawerDetail } = useSuperDrawer();
   return (
     <>
-      <SuperDrawerHeader>
-        <h1>{title}</h1>
-      </SuperDrawerHeader>
+      <SuperDrawerHeader title={title} />
       <SuperDrawerContent
         actions={[
           { label: `Back to "${book.bookTitle}"`, onClick: closeDrawerDetail, variant: "tertiary" },
