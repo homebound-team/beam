@@ -1,21 +1,23 @@
 import { camelCase } from "change-case";
-import { HTMLAttributes, PropsWithChildren, useEffect, useMemo, useRef } from "react";
-import { FocusScope, useMenu } from "react-aria";
+import { HTMLAttributes, PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
+import { FocusScope, useFilter, useMenu } from "react-aria";
 import { Item, Section, useTreeData, useTreeState } from "react-stately";
 import { MenuItem, MenuSection } from "src/components";
 import { MenuSectionImpl } from "src/components/internal/MenuSection";
 import { Css } from "src/Css";
+import { MenuSearchField } from "src/inputs/internal/MenuSearchField";
 import { useTestIds } from "src/utils";
 
 interface MenuProps<T> {
   ariaMenuProps: HTMLAttributes<HTMLElement>;
   onClose: VoidFunction;
   items: MenuItem[];
+  searchable?: boolean;
   persistentItems?: MenuItem[];
 }
 
 export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
-  const { ariaMenuProps, items, persistentItems, onClose } = props;
+  const { ariaMenuProps, items, persistentItems, onClose, searchable } = props;
   // Build out the Menu's Tree data to include the Persistent Action, if any. This is a collection of Nodes that is used
   // by React-Aria to keep track of item states such as focus, and provide hooks for calling those actions.
   const tree = useTreeData({
@@ -26,41 +28,88 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
     getChildren: (item) => (item as MenuSection).items ?? [],
   });
 
+  const [search, setSearch] = useState<string | undefined>(undefined);
+  let { contains } = useFilter({
+    sensitivity: "base",
+  });
+
+  // Filter our tree data items based on the search term
+  const filteredTree = useMemo(() => {
+    const { items, ...others } = tree;
+    const [itemsSection, persistentSection] = items;
+
+    if (search) {
+      const filteredChildren = itemsSection.children.filter((item) => contains(item.value.label, search));
+      const { items, ...otherValues } = itemsSection.value;
+      const filteredValue = items?.filter((item) => contains(item.label, search));
+      return {
+        ...others,
+        items: [
+          { ...itemsSection, value: { ...otherValues, children: filteredChildren, items: filteredValue } },
+          persistentSection,
+        ],
+      };
+    } else {
+      return tree;
+    }
+  }, [tree, search, contains]);
+
   const menuChildren = useMemo(() => {
-    return tree.items.map(({ value: s }) => (
+    return filteredTree.items.map(({ value: s }) => (
       <Section key={s.label.replace(/"/g, "")} title={s.label} items={s.items}>
         {(item) => <Item key={item.label.replace(/"/g, "")}>{item.label}</Item>}
       </Section>
     ));
-  }, [tree]);
+  }, [filteredTree]);
 
-  const state = useTreeState({ children: menuChildren, items: tree.items.map((i) => i.value), selectionMode: "none" });
+  const state = useTreeState({
+    children: menuChildren,
+    items: filteredTree.items.map((i) => i.value),
+    selectionMode: "none",
+  });
 
   const menuRef = useRef(null);
-  const { menuProps } = useMenu<any>({ ...ariaMenuProps, autoFocus: true }, state, menuRef);
+  const { menuProps } = useMenu<any>({ ...ariaMenuProps, autoFocus: searchable ? false : true }, state, menuRef);
   const tid = useTestIds(props);
 
   // Bulk updates of MenuItems below. If we find this to be of sluggish performance, then we can change to be more surgical in our updating.
   // If our list of items change, update the "items" menu section. (key is based on label in `getKey` above)
-  useEffect(() => tree.update("items", { label: "items", items } as MenuSection), [items]);
-
+  useEffect(() => filteredTree.update("items", { label: "items", items } as MenuSection), [items]);
   return (
     <FocusScope>
-      <ul
+      <div
         css={{
-          // Using `max-height: inherit` allows us to take advantage of the height set on the overlay container, which updates based on the available space for the overlay within the viewport
-          ...Css.df.fdc.myPx(4).bgWhite.outline0.br4.bshBasic.listReset.maxh("inherit").overflowAuto.$,
+          ...Css.df.fdc.myPx(4).bgWhite.outline0.br4.bshBasic.maxh("inherit").overflowAuto.$,
           "&:hover, &:focus": Css.bshHover.$,
         }}
-        {...menuProps}
-        ref={menuRef}
-        {...tid.menu}
       >
-        {/* It is possible to have, at most, 2 sections: One for items, and one for persisted items */}
-        {[...state.collection].map((item) => (
-          <MenuSectionImpl key={item.key} section={item} state={state} onClose={onClose} {...tid} />
-        ))}
-      </ul>
+        {searchable && (
+          <MenuSearchField
+            label=""
+            value={search}
+            placeholder="Search..."
+            inlineLabel={true}
+            onChange={setSearch}
+            {...tid}
+          />
+        )}
+        <ul
+          css={{
+            // Using `max-height: inherit` allows us to take advantage of the height set on the overlay container, which updates based on the available space for the overlay within the viewport
+            // ...Css.df.fdc.myPx(4).bgWhite.outline0.br4.bshBasic.listReset.maxh("inherit").overflowAuto.$,
+            // "&:hover, &:focus": Css.bshHover.$,
+            ...Css.df.fdc.listReset.$,
+          }}
+          {...menuProps}
+          ref={menuRef}
+          {...tid.menu}
+        >
+          {/* It is possible to have, at most, 2 sections: One for items, and one for persisted items */}
+          {[...state.collection].map((item) => (
+            <MenuSectionImpl key={item.key} section={item} state={state} onClose={onClose} {...tid} />
+          ))}
+        </ul>
+      </div>
     </FocusScope>
   );
 }

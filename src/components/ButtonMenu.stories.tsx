@@ -157,3 +157,21 @@ export function WithTooltip() {
 
   return <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} tooltip="Tool tip text" />;
 }
+
+export function WithSearchListItems() {
+  const menuItems: MenuItem[] = [
+    { label: "Development 1 - Cohort 1", onClick: action("Development 1 - Cohort 1") },
+    { label: "Development 1 - Cohort 2", onClick: action("Development 1 - Cohort 1") },
+    { label: "Development 1 - Cohort 3", onClick: action("Development 1 - Cohort 1") },
+    { label: "Development 2 - Cohort 1", onClick: action("Development 2 - Cohort 1") },
+  ];
+
+  return (
+    <ButtonMenu
+      trigger={{ label: "Select a cohort" }}
+      items={menuItems}
+      searchable
+      persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+    />
+  );
+}

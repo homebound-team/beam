@@ -14,12 +14,13 @@ import { useTestIds } from "src/utils";
 interface ButtonMenuProps extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
   items: MenuItem[];
   persistentItems?: MenuItem[];
+  searchable?: boolean;
   // for storybook purposes
   defaultOpen?: boolean;
 }
 
 export function ButtonMenu(props: ButtonMenuProps) {
-  const { defaultOpen, disabled, items, persistentItems, trigger } = props;
+  const { defaultOpen, disabled, items, persistentItems, trigger, searchable } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -35,6 +36,7 @@ export function ButtonMenu(props: ButtonMenuProps) {
         onClose={() => state.close()}
         items={items}
         persistentItems={persistentItems}
+        searchable={searchable}
         {...tid}
       />
     </OverlayTrigger>
