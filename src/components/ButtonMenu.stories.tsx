@@ -161,8 +161,8 @@ export function WithTooltip() {
 export function WithSearchListItems() {
   const menuItems: MenuItem[] = [
     { label: "Development 1 - Cohort 1", onClick: action("Development 1 - Cohort 1") },
-    { label: "Development 1 - Cohort 2", onClick: action("Development 1 - Cohort 1") },
-    { label: "Development 1 - Cohort 3", onClick: action("Development 1 - Cohort 1") },
+    { label: "Development 1 - Cohort 2", onClick: action("Development 1 - Cohort 2") },
+    { label: "Development 1 - Cohort 3", onClick: action("Development 1 - Cohort 3") },
     { label: "Development 2 - Cohort 1", onClick: action("Development 2 - Cohort 1") },
   ];
 
