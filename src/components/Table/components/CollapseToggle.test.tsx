@@ -48,14 +48,18 @@ describe("CollapseToggle", () => {
   });
 
   it("should render a labeled collapse", async () => {
+    // Given a table state
     const rowState = new TableState();
+    // When render it with a collapse toggle
     const r = await render(
       <TableStateContext.Provider value={{ tableState: rowState }}>
         <CollapseToggle label="customLabel" row={{ id: "r:1", kind: "otherKind", data: {}, children: [{} as any] }} />
       </TableStateContext.Provider>,
     );
 
+    // Then the element should be in the document
     expect(r.firstElement.firstElementChild).toBeInTheDocument();
+    // And the custom label should be displayed
     expect(r.getByText("customLabel")).toBeInTheDocument();
   });
 });
