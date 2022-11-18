@@ -1,7 +1,7 @@
 import { AriaButtonProps } from "@react-types/button";
 import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
+import { Icon, IconProps, Loader, maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Css, Palette } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, isPromise, noop } from "src/utils";
@@ -24,10 +24,8 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   download?: boolean;
   contrast?: boolean;
 
-  // Additional icon and text to further customize buttons whyle async request is in progress.
-  inFlightEndAdornment?: ReactNode;
-  inFlightIcon?: IconProps["icon"] | null;
-  inFlightLabel?: string;
+  /** Additional text to further customize button during an async request is in progress. */
+  labelInFlight?: string;
 }
 
 export function Button(props: ButtonProps) {
@@ -41,9 +39,7 @@ export function Button(props: ButtonProps) {
     download,
     contrast = false,
     forceFocusStyles = false,
-    inFlightEndAdornment,
-    inFlightIcon,
-    inFlightLabel,
+    labelInFlight,
     ...otherProps
   } = props;
   const asLink = typeof onPress === "string";
@@ -87,10 +83,10 @@ export function Button(props: ButtonProps) {
 
   const buttonContent = (
     <>
-      {icon && <Icon xss={iconStyles[size]} icon={inFlightIcon && asyncInProgress ? inFlightIcon : icon} />}
-      {inFlightLabel && asyncInProgress ? inFlightLabel : label}
+      {icon && <Icon xss={iconStyles[size]} icon={icon} />}
+      {labelInFlight && asyncInProgress ? labelInFlight : label}
       {(endAdornment || asyncInProgress) && (
-        <span css={Css.ml1.$}>{asyncInProgress ? inFlightEndAdornment : endAdornment}</span>
+        <span css={Css.ml1.$}>{asyncInProgress ? <Loader size={"xs"} contrast={contrast} /> : endAdornment}</span>
       )}
     </>
   );

@@ -98,11 +98,11 @@ describe("Button", () => {
     expect(onError).toBeCalledWith("Promise error");
   });
 
-  it("changes button label, adornment, and icon if present while onClick is in flight and reverts it after a successful promise", async () => {
+  it("changes button label if present while async onClick is in flight and reverts it after a successful promise", async () => {
     const r = await render(
       <Button
         label="Button"
-        inFlightLabel="Watch The Button Fly"
+        labelInFlight="Watch The Button Fly"
         onClick={async () => new Promise((resolve) => resolve())}
       />,
     );
