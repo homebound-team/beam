@@ -46,4 +46,16 @@ describe("CollapseToggle", () => {
     `);
     expect(r.firstElement.firstElementChild).toBeNull();
   });
+
+  it("should render a labeled collapse", async () => {
+    const rowState = new TableState();
+    const r = await render(
+      <TableStateContext.Provider value={{ tableState: rowState }}>
+        <CollapseToggle label="customLabel" row={{ id: "r:1", kind: "otherKind", data: {}, children: [{} as any] }} />
+      </TableStateContext.Provider>,
+    );
+
+    expect(r.firstElement.firstElementChild).toBeInTheDocument();
+    expect(r.getByText("customLabel")).toBeInTheDocument();
+  });
 });

@@ -1138,6 +1138,43 @@ export function ToggleCustomCollapse() {
   );
 }
 
+export function ToggleCustomCollapseLabeled() {
+  const collapseCol = collapseColumn<Row | ChildRow>({
+    data: () => emptyCell,
+  });
+
+  const nameCol: GridColumn<Row | ChildRow> = {
+    header: "Name",
+    data: ({ name }, { row }) => <CollapseToggle label={name} compact row={row} />,
+    child: ({ name }) => ({ content: name }),
+    mw: "160px",
+  };
+
+  return (
+    <>
+      <GridTable
+        columns={[collapseCol, nameCol]}
+        style={{ rowHeight: "fixed" }}
+        rows={[
+          simpleHeader,
+          {
+            id: "p1",
+            kind: "data",
+            data: { name: "Parent", value: 1 },
+            children: [
+              {
+                id: "c1",
+                kind: "child",
+                data: { name: "Child" },
+              },
+            ],
+          },
+        ]}
+      />
+    </>
+  );
+}
+
 type ExpandHeader = { id: "expandableHeader"; kind: "expandableHeader" };
 type Header = { id: "header"; kind: "header" };
 type ExpandableData = {
