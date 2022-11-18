@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { capitalCase } from "change-case";
-import { Button, ButtonSize, ButtonVariant } from "src";
+import { Button, ButtonSize, ButtonVariant, Icon, Loader } from "src";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 
@@ -151,10 +151,31 @@ export function ButtonWithTooltip() {
 }
 
 export function AsyncButton() {
+  const ea = <Icon icon={"cloudUpload"} />;
+  const eaInFlight = <Loader size="xs" />;
+  const label = "Upload";
+  const labelInFlight = "Uploading";
+  const icon = "archive";
+  const iconInFlight = "sunny";
+
   return (
-    <div>
-      <h2>Clicking the button will disable it for 2 seconds (while async request is in progress)</h2>
-      <Button label="Upload" onClick={async () => await new Promise((resolve) => setTimeout(resolve, 2000))} />
-    </div>
+    <>
+      <div>
+        <h2>Clicking the button will disable it for 2 seconds (while async request is in progress)</h2>
+        <Button label="Upload" onClick={async () => await new Promise((resolve) => setTimeout(resolve, 2000))} />
+      </div>
+      <div css={Css.mt4.$}>
+        <h2>Additional Props may be passed in to further customize in flight look</h2>
+        <Button
+          label={label}
+          endAdornment={ea}
+          icon={icon}
+          inFlightEndAdornment={eaInFlight}
+          inFlightIcon={iconInFlight}
+          inFlightLabel={labelInFlight}
+          onClick={async () => await new Promise((resolve) => setTimeout(resolve, 2000))}
+        />
+      </div>
+    </>
   );
 }

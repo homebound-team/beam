@@ -9,6 +9,7 @@ export default {
 function Loaders(contrast: boolean = false) {
   return (
     <div css={Css.df.fdc.gap3.$}>
+      <Loader contrast={contrast} size="xs" />
       <Loader contrast={contrast} size="sm" />
       <Loader contrast={contrast} size="md" />
       <Loader contrast={contrast} />

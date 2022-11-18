@@ -23,6 +23,11 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
   download?: boolean;
   contrast?: boolean;
+
+  // Additional icon and text to further customize buttons whyle async request is in progress.
+  inFlightEndAdornment?: ReactNode;
+  inFlightIcon?: IconProps["icon"] | null;
+  inFlightLabel?: string;
 }
 
 export function Button(props: ButtonProps) {
@@ -36,6 +41,9 @@ export function Button(props: ButtonProps) {
     download,
     contrast = false,
     forceFocusStyles = false,
+    inFlightEndAdornment,
+    inFlightIcon,
+    inFlightLabel,
     ...otherProps
   } = props;
   const asLink = typeof onPress === "string";
@@ -79,9 +87,11 @@ export function Button(props: ButtonProps) {
 
   const buttonContent = (
     <>
-      {icon && <Icon xss={iconStyles[size]} icon={icon} />}
-      {label}
-      {endAdornment && <span css={Css.ml1.$}>{endAdornment}</span>}
+      {icon && <Icon xss={iconStyles[size]} icon={inFlightIcon && asyncInProgress ? inFlightIcon : icon} />}
+      {inFlightLabel && asyncInProgress ? inFlightLabel : label}
+      {endAdornment && (
+        <span css={Css.ml1.$}>{inFlightEndAdornment && asyncInProgress ? inFlightEndAdornment : endAdornment}</span>
+      )}
     </>
   );
 

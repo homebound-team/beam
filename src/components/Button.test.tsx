@@ -97,4 +97,24 @@ describe("Button", () => {
     expect(r.button()).not.toBeDisabled();
     expect(onError).toBeCalledWith("Promise error");
   });
+
+  it("changes button label, adornment, and icon if present while onClick is in flight and reverts it after a successful promise", async () => {
+    const r = await render(
+      <Button
+        label="Button"
+        inFlightLabel="Watch The Button Fly"
+        onClick={async () => new Promise((resolve) => resolve())}
+      />,
+    );
+    expect(r.button()).toHaveTextContent("Button");
+
+    click(r.button, { allowAsync: true });
+    expect(r.button()).toBeDisabled();
+    expect(r.button()).toHaveTextContent("Watch The Button Fly");
+
+    await wait();
+
+    expect(r.button()).not.toBeDisabled();
+    expect(r.button()).toHaveTextContent("Button");
+  });
 });
