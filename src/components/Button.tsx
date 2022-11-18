@@ -89,8 +89,8 @@ export function Button(props: ButtonProps) {
     <>
       {icon && <Icon xss={iconStyles[size]} icon={inFlightIcon && asyncInProgress ? inFlightIcon : icon} />}
       {inFlightLabel && asyncInProgress ? inFlightLabel : label}
-      {endAdornment && (
-        <span css={Css.ml1.$}>{inFlightEndAdornment && asyncInProgress ? inFlightEndAdornment : endAdornment}</span>
+      {(endAdornment || asyncInProgress) && (
+        <span css={Css.ml1.$}>{asyncInProgress ? inFlightEndAdornment : endAdornment}</span>
       )}
     </>
   );
