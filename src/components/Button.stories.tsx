@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { capitalCase } from "change-case";
-import { Button, ButtonSize, ButtonVariant } from "src";
+import { Button, ButtonSize, ButtonVariant, Icon } from "src";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 
@@ -152,9 +152,40 @@ export function ButtonWithTooltip() {
 
 export function AsyncButton() {
   return (
-    <div>
-      <h2>Clicking the button will disable it for 2 seconds (while async request is in progress)</h2>
-      <Button label="Upload" onClick={async () => await new Promise((resolve) => setTimeout(resolve, 2000))} />
+    <>
+      <div>
+        <h2>
+          Clicking the button will disable it for 2 seconds (while async request is in progress) and show a loading icon
+        </h2>
+        <Button label="Upload" onClick={async () => await new Promise((resolve) => setTimeout(resolve, 2000))} />
+      </div>
+      <div css={Css.mt4.$}>
+        <h2>An Inflight label may be provided. End adornments are replaced with spinner</h2>
+        <Button
+          label="Upload"
+          endAdornment={<Icon icon={"cloudUpload"} />}
+          icon="templates"
+          labelInFlight="Uploading"
+          onClick={async () => await new Promise((resolve) => setTimeout(resolve, 2000))}
+        />
+      </div>
+    </>
+  );
+}
+export function ConstrastAsyncButton() {
+  return (
+    <div css={Css.white.$}>
+      <h2 css={Css.mb2.$}>Contrast is also passed to spinner</h2>
+      <Button
+        label="Upload"
+        endAdornment={<Icon icon={"cloudUpload"} />}
+        icon="templates"
+        labelInFlight="Uploading"
+        onClick={async () => await new Promise((resolve) => setTimeout(resolve, 2000))}
+        contrast
+      />
     </div>
   );
 }
+
+ConstrastAsyncButton.parameters = { backgrounds: { default: "dark" } };
