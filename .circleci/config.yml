@@ -41,7 +41,9 @@ jobs:
       - <<: *node-image
     steps:
       - checkout
-      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc'
+      - run:
+          name: Login in NPM
+          command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
       - node/install-packages:
           pkg-manager: yarn
       - run: yarn build
@@ -53,7 +55,9 @@ jobs:
       - <<: *node-image
     steps:
       - checkout
-      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc'
+      - run:
+          name: Login in NPM
+          command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
       - node/install-packages:
           pkg-manager: yarn
       - run: yarn semantic-release
@@ -69,7 +73,9 @@ jobs:
     working_directory: ~/project
     steps:
       - checkout
-      - run: 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc'
+      - run:
+          name: Login in NPM
+          command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
       - node/install-packages:
           pkg-manager: yarn
       - when:
