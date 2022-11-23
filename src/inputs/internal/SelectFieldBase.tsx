@@ -21,7 +21,7 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
   values: V[] | undefined;
   onSelect: (values: V[], opts: O[]) => void;
   multiselect?: boolean;
-  disabledOptions?: V[];
+  disabledOptions?: (V | [V, string])[];
   options: OptionsOrLoad<O>;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
@@ -231,9 +231,13 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
   const listBoxRef = useRef<HTMLDivElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
 
+  // `disabledKeys` from ComboBoxState does not support additional meta for showing a disabled reason to the user
+  // This lookup map helps us cleanly prune out the optional reason text, then access it further down the component tree
+  const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
+
   const comboBoxProps = {
     ...otherProps,
-    disabledKeys: disabledOptions?.map(valueToKey),
+    disabledKeys: Object.keys(disabledOptionsWithReasons),
     inputValue: fieldState.inputValue,
     items: fieldState.filteredOptions,
     isDisabled,
@@ -393,6 +397,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
             loading={fieldState.optionsLoading}
+            disabledOptionsWithReasons={disabledOptionsWithReasons}
           />
         </Popover>
       )}
@@ -441,3 +446,12 @@ function getOptionsWithUnset<O>(unsetLabel: string, options: O[]): O[] {
 }
 
 export const unsetOption = {};
+
+function disabledOptionToKeyedTuple(disabledOption: Value | [Value, string]): [React.Key, string | undefined] {
+  if (Array.isArray(disabledOption)) {
+    const [value, disabledReason] = disabledOption;
+    return [valueToKey(value), disabledReason];
+  } else {
+    return [valueToKey(disabledOption), undefined];
+  }
+}

@@ -13,12 +13,12 @@ import { withDimensions, zeroTo } from "src/utils/sb";
 export default {
   component: SelectField,
   title: "Workspace/Inputs/Select Fields",
-  parameters: { 
+  parameters: {
     layout: "fullscreen",
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=1287%3A789",
-    }
+    },
   },
   argTypes: {
     compact: { control: false },
@@ -192,6 +192,14 @@ function Template(args: SelectFieldProps<any, any>) {
           getOptionValue={(o) => o.id}
           getOptionLabel={(o) => o.name}
           hideErrorMessage
+        />
+        <TestSelectField
+          {...args}
+          label="Disabled Options"
+          value={options[2].id}
+          options={options}
+          disabledOptions={[options[0].id, [options[3].id, "Example disabled tooltip"]]}
+          helperText="Disabled options can optionally have tooltip text"
         />
       </div>
 
