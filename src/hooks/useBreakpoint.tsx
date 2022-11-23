@@ -1,18 +1,18 @@
 import equal from "fast-deep-equal";
 import { useEffect, useState } from "react";
+import { safeEntries } from "src/utils/index";
 import { useDebouncedCallback } from "use-debounce";
-import { BreakpointKey, Breakpoints } from "../Css";
+import { Breakpoint, Breakpoints } from "../Css";
+
+type BreakpointsType = Record<Breakpoint, boolean>;
 
 /**
  * A React hook to return a record of responsive breakpoints that updates on resize.
  *
  * @example
  * const { breakpoints } = useBreakpoint();
- * if(breakpoints.mdAndDown) {...do something cool}
+ * if (breakpoints.mdAndDown) { ...do something cool }
  */
-
-type BreakpointsType = Record<BreakpointKey, boolean>;
-
 export const useBreakpoint = (): BreakpointsType => {
   const [breakpoints, setBreakpoints] = useState(matchMediaBreakpoints());
 
@@ -27,15 +27,15 @@ export const useBreakpoint = (): BreakpointsType => {
     window.addEventListener("resize", handleResize);
     // Remove event listener on cleanup
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [handleResize]);
 
   return breakpoints;
 };
 
 function matchMediaBreakpoints(): BreakpointsType {
-  let bps = {} as BreakpointsType;
-  Object.entries(Breakpoints).forEach(([name, bp]) => {
-    bps[name as keyof BreakpointsType] = window.matchMedia(bp.replace("@media ", "")).matches;
+  const bps = {} as BreakpointsType;
+  safeEntries(Breakpoints).forEach(([name, bp]) => {
+    bps[name] = window.matchMedia(bp.replace("@media ", "")).matches;
   });
   return bps;
 }
