@@ -4,6 +4,7 @@ import { SelectState } from "react-stately";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";
 import { Option } from "src/inputs/internal/Option";
+import { TreeOption } from "./TreeOption";
 
 interface VirtualizedOptionsProps<O> {
   state: SelectState<O>;
@@ -15,11 +16,13 @@ interface VirtualizedOptionsProps<O> {
   // Adds 'Loading' footer to the list
   loading?: boolean | (() => JSX.Element);
   disabledOptionsWithReasons: Record<string, string | undefined>;
+  isTree?: boolean;
 }
 
 // Displays ListBox options in a virtualized container for performance reasons
 export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
-  const { state, items, onListHeightChange, contrast, scrollOnFocus, loading, disabledOptionsWithReasons } = props;
+  const { state, items, onListHeightChange, contrast, scrollOnFocus, loading, disabledOptionsWithReasons, isTree } =
+    props;
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const focusedItem = state.collection.getItem(state.selectionManager.focusedKey);
   const selectedItem =
@@ -47,6 +50,17 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
       initialItemCount={5}
       itemContent={(idx) => {
         const item = items[idx];
+        if (isTree) {
+          return (
+            <TreeOption
+              key={item.key}
+              item={item}
+              state={state}
+              contrast={contrast}
+              scrollToIndex={scrollOnFocus ? undefined : virtuosoRef.current?.scrollToIndex}
+            />
+          );
+        }
         if (item) {
           return (
             <Option

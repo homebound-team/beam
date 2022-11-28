@@ -12,6 +12,8 @@ import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { areArraysEqual } from "src/utils";
 
+export type NestedOption<O> = O & { children?: O[] };
+
 export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => string | ReactNode;
@@ -22,7 +24,7 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
   onSelect: (values: V[], opts: O[]) => void;
   multiselect?: boolean;
   disabledOptions?: (V | { value: V; reason: string })[];
-  options: OptionsOrLoad<O>;
+  options: OptionsOrLoad<O> | NestedOptionsOrLoad<O>;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
   required?: boolean;
@@ -46,6 +48,7 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
   /** Only used for Single Select Fields. If set, prepends an option with a `undefined` value at the top of the list */
   unsetLabel?: string;
   hideErrorMessage?: boolean;
+  isTree?: boolean;
 }
 
 /**
@@ -71,6 +74,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     disabledOptions,
     borderless,
     unsetLabel,
+    isTree,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
@@ -235,18 +239,39 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
   // This lookup map helps us cleanly prune out the optional reason text, then access it further down the component tree
   const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
 
+  function isNestedOption(o: O | NestedOption<O>): o is NestedOption<O> {
+    return o && typeof o === "object" && "children" in o;
+  }
+
+  // only matters for children
+  function flattenAndLevelOptions(o: O | NestedOption<O>, level: number): [O, number][] {
+    return [
+      [o, level],
+      ...(isNestedOption(o) && o.children?.length
+        ? o.children.flatMap((oc) => flattenAndLevelOptions(oc, level + 1))
+        : []),
+    ];
+  }
+
+  const items = useMemo(() => {
+    return fieldState.filteredOptions.flatMap((o) => flattenAndLevelOptions(o, 0));
+  }, [fieldState.filteredOptions]);
+
   const comboBoxProps = {
     ...otherProps,
     disabledKeys: Object.keys(disabledOptionsWithReasons),
     inputValue: fieldState.inputValue,
-    items: fieldState.filteredOptions,
+    // where we might want to do flatmap and return diff kind of array (children ? add level prop) inside children callback - can put markup wrapper div adds padding
+    // so we're not doing it multiple places
+    items,
     isDisabled,
     isReadOnly,
     onInputChange,
     onOpenChange,
-    children: (item: any) => (
+    children: ([item, level]: any) => (
+      // what we're telling it to render. look at padding here - dont have to pass down to tree option - filtered options is where we're flat mapping
       <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
-        {getOptionMenuLabel(item)}
+        <div css={Css.plPx(level * 8).$}>{getOptionMenuLabel(item)}</div>
       </Item>
     ),
   };
@@ -378,7 +403,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         resetField={resetField}
       />
-      {state.isOpen && (
+      {(state.isOpen || true) && (
         <Popover
           triggerRef={triggerRef}
           popoverRef={popoverRef}
@@ -399,6 +424,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
             horizontalLayout={labelStyle === "left"}
             loading={fieldState.optionsLoading}
             disabledOptionsWithReasons={disabledOptionsWithReasons}
+            isTree={isTree}
           />
         </Popover>
       )}
@@ -414,7 +440,9 @@ type FieldState<O> = {
   allOptions: O[];
   optionsLoading: boolean;
 };
+// needs a different type 0[] or nested options. so we know we can look into children attribute
 type OptionsOrLoad<O> = O[] | { initial: O[]; load: () => Promise<{ options: O[] }> };
+type NestedOptionsOrLoad<O> = NestedOption<O>[] | { initial: O[]; load: () => Promise<{ options: NestedOption<O>[] }> };
 type UnsetOption = { id: undefined; name: string };
 
 function getInputValue<O>(

@@ -18,6 +18,7 @@ interface ListBoxProps<O, V extends Key> {
   positionProps: React.HTMLAttributes<Element>;
   loading?: boolean | (() => JSX.Element);
   disabledOptionsWithReasons?: Record<string, string | undefined>;
+  isTree?: boolean;
 }
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
@@ -33,6 +34,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     horizontalLayout = false,
     loading,
     disabledOptionsWithReasons = {},
+    isTree,
   } = props;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...props }, state, listBoxRef);
   const positionMaxHeight = positionProps.style?.maxHeight;
@@ -134,6 +136,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
             scrollOnFocus={(props as any).shouldUseVirtualFocus}
             loading={loading}
             disabledOptionsWithReasons={disabledOptionsWithReasons}
+            isTree={isTree}
           />
         )}
       </ul>
