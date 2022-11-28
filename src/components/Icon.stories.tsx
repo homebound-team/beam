@@ -48,6 +48,8 @@ export const Icon = (props: IconProps) => {
     "duplicate",
     "filter",
     "kanban",
+    "expand",
+    "collapse"
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
