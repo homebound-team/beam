@@ -204,6 +204,7 @@ export function WithSearchListItems() {
 
   return (
     <ButtonMenu
+      defaultOpen
       trigger={{ label: "Select a cohort" }}
       items={menuItems}
       searchable
@@ -219,5 +220,5 @@ export function IconMenuWtihSearchableList() {
     { label: "Training plan", onClick: action("Training plan") },
   ];
 
-  return <ButtonMenu trigger={{ icon: "archive" }} items={menuItems} searchable />;
+  return <ButtonMenu defaultOpen trigger={{ icon: "archive" }} items={menuItems} searchable />;
 }
