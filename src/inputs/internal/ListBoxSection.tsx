@@ -14,12 +14,14 @@ interface ListBoxSectionProps<O> {
   onListHeightChange: (height: number) => void;
   popoverHeight: number;
   scrollOnFocus?: boolean;
+  disabledOptionsWithReasons: Record<string, string | undefined>;
 }
 
 // Creates a section of options within a ListBox.
 // Currently only expects two possible sections; 1. The list of options, and 2. A persistent action (in that order).
 export function ListBoxSection<O>(props: ListBoxSectionProps<O>) {
-  const { section, state, contrast, onListHeightChange, popoverHeight, scrollOnFocus } = props;
+  const { section, state, contrast, onListHeightChange, popoverHeight, scrollOnFocus, disabledOptionsWithReasons } =
+    props;
   const { itemProps, groupProps } = useListBoxSection(section);
   const { separatorProps } = useSeparator({ elementType: "li" });
   const isPersistentSection = section.key !== state.collection.getFirstKey();
@@ -37,7 +39,15 @@ export function ListBoxSection<O>(props: ListBoxSectionProps<O>) {
           {...groupProps}
         >
           {isPersistentSection ? (
-            childNodes.map((item) => <Option key={item.key} item={item} state={state} contrast={contrast} />)
+            childNodes.map((item) => (
+              <Option
+                key={item.key}
+                item={item}
+                state={state}
+                contrast={contrast}
+                disabledReason={disabledOptionsWithReasons[item.key]}
+              />
+            ))
           ) : (
             <VirtualizedOptions
               state={state}
@@ -45,6 +55,7 @@ export function ListBoxSection<O>(props: ListBoxSectionProps<O>) {
               onListHeightChange={onListHeightChange}
               contrast={contrast}
               scrollOnFocus={scrollOnFocus}
+              disabledOptionsWithReasons={disabledOptionsWithReasons}
             />
           )}
         </ul>

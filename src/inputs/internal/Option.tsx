@@ -2,6 +2,7 @@ import { Node } from "@react-types/shared";
 import React, { useCallback, useRef } from "react";
 import { mergeProps, useHover, useOption } from "react-aria";
 import { ListState, TreeState } from "react-stately";
+import { maybeTooltip } from "src/components";
 import { Icon } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
 import { isPersistentKey } from "src/inputs/ChipSelectField";
@@ -11,10 +12,11 @@ interface OptionProps<O> {
   state: ListState<O> | TreeState<O>;
   contrast?: boolean;
   scrollToIndex?: (index: number) => void;
+  disabledReason?: string;
 }
 /** Represents a single option within a ListBox - used by SelectField and MultiSelectField */
 export function Option<O>(props: OptionProps<O>) {
-  const { item, state, contrast = false, scrollToIndex } = props;
+  const { item, state, contrast = false, scrollToIndex, disabledReason } = props;
   const ref = useRef<HTMLLIElement>(null);
   const { hoverProps, isHovered } = useHover({});
 
@@ -59,37 +61,41 @@ export function Option<O>(props: OptionProps<O>) {
     [scrollToIndex, state],
   );
 
-  return (
-    <li
-      {...mergeProps(optionProps, hoverProps, { onKeyDown })}
-      ref={ref as any}
-      css={{
-        ...Css.df.aic.jcsb.py1.px2.mh("42px").outline0.cursorPointer.sm.$,
-        // Assumes only one Persistent Item per list - will need to change to utilize Sections if that assumption is incorrect.
-        ...(isPersistentKey(item.key) ? Css.bt.bGray200.$ : {}),
-        ...themeStyles.item,
-        ...(isHovered && !isDisabled ? themeStyles.hover : {}),
-        ...(isFocused ? themeStyles.focus : {}),
-        ...(isDisabled ? themeStyles.disabled : {}),
-      }}
-    >
-      {item.rendered}
-      {isSelected && (
-        <span css={Css.fs0.$}>
-          <Icon
-            icon="check"
-            color={
-              !contrast
-                ? isDisabled
-                  ? Palette.Gray400
-                  : Palette.LightBlue700
-                : isDisabled
-                ? Palette.Gray500
-                : Palette.White
-            }
-          />
-        </span>
-      )}
-    </li>
-  );
+  return maybeTooltip({
+    title: disabledReason,
+    placement: "right",
+    children: (
+      <li
+        {...mergeProps(optionProps, hoverProps, { onKeyDown })}
+        ref={ref as any}
+        css={{
+          ...Css.df.aic.jcsb.py1.px2.mh("42px").outline0.cursorPointer.sm.$,
+          // Assumes only one Persistent Item per list - will need to change to utilize Sections if that assumption is incorrect.
+          ...(isPersistentKey(item.key) ? Css.bt.bGray200.$ : {}),
+          ...themeStyles.item,
+          ...(isHovered && !isDisabled ? themeStyles.hover : {}),
+          ...(isFocused ? themeStyles.focus : {}),
+          ...(isDisabled ? themeStyles.disabled : {}),
+        }}
+      >
+        {item.rendered}
+        {isSelected && (
+          <span css={Css.fs0.$}>
+            <Icon
+              icon="check"
+              color={
+                !contrast
+                  ? isDisabled
+                    ? Palette.Gray400
+                    : Palette.LightBlue700
+                  : isDisabled
+                  ? Palette.Gray500
+                  : Palette.White
+              }
+            />
+          </span>
+        )}
+      </li>
+    ),
+  });
 }

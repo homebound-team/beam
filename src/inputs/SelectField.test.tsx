@@ -148,6 +148,36 @@ describe("SelectFieldTest", () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 
+  it("can disable options with tooltips", async () => {
+    const onSelect = jest.fn();
+    // Given a Select Field with a disabled option
+    const { age, getByRole } = await render(
+      <SelectField
+        label="Age"
+        value="1"
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+        disabledOptions={[{ value: "2", reason: "Example Tooltip" }]}
+        onSelect={onSelect}
+      />,
+    );
+
+    // When opening the menu
+    fireEvent.click(age());
+    const optionTwo = getByRole("option", { name: "Two" });
+
+    // Then expect the disabled option to be wrapped in the tooltip text
+    expect(optionTwo).toHaveAttribute("aria-disabled", "true");
+    expect(optionTwo.closest("[data-testid='tooltip']")).toHaveAttribute("title", "Example Tooltip");
+
+    // And when clicking on that option
+    click(optionTwo);
+    // Then the `onSelect` callback is not called
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
   it("can load options via options prop callback", async () => {
     // Given a Select Field with options that are loaded via a callback
     const r = await render(
