@@ -198,7 +198,7 @@ function Template(args: SelectFieldProps<any, any>) {
           label="Disabled Options"
           value={options[2].id}
           options={options}
-          disabledOptions={[options[0].id, [options[3].id, "Example disabled tooltip"]]}
+          disabledOptions={[options[0].id, { value: options[3].id, reason: "Example disabled tooltip" }]}
           helperText="Disabled options can optionally have tooltip text"
         />
       </div>

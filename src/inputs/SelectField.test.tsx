@@ -159,7 +159,7 @@ describe("SelectFieldTest", () => {
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
         data-testid="age"
-        disabledOptions={[["2", "Example Tooltip"]]}
+        disabledOptions={[{ value: "2", reason: "Example Tooltip" }]}
         onSelect={onSelect}
       />,
     );

@@ -21,7 +21,7 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
   values: V[] | undefined;
   onSelect: (values: V[], opts: O[]) => void;
   multiselect?: boolean;
-  disabledOptions?: (V | [V, string])[];
+  disabledOptions?: (V | { value: V; reason: string })[];
   options: OptionsOrLoad<O>;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
@@ -447,10 +447,11 @@ function getOptionsWithUnset<O>(unsetLabel: string, options: O[]): O[] {
 
 export const unsetOption = {};
 
-function disabledOptionToKeyedTuple(disabledOption: Value | [Value, string]): [React.Key, string | undefined] {
-  if (Array.isArray(disabledOption)) {
-    const [value, disabledReason] = disabledOption;
-    return [valueToKey(value), disabledReason];
+function disabledOptionToKeyedTuple(
+  disabledOption: Value | { value: Value; reason: string },
+): [React.Key, string | undefined] {
+  if (typeof disabledOption === "object" && disabledOption !== null) {
+    return [valueToKey(disabledOption.value), disabledOption.reason];
   } else {
     return [valueToKey(disabledOption), undefined];
   }

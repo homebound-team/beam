@@ -92,7 +92,7 @@ export function MultiSelectFields() {
           label="With Disabled Options"
           options={options}
           values={[] as Value[]}
-          disabledOptions={[options[0].id, [options[2].id, "Example disabled tooltip"]]}
+          disabledOptions={[options[0].id, { value: options[2].id, reason: "Example disabled tooltip" }]}
         />
       </div>
 
