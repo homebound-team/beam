@@ -160,10 +160,10 @@ export function WithTooltip() {
 
 export function WithSearchListItems() {
   const menuItems: MenuItem[] = [
-    { label: "Development 1 - Cohort 1", onClick: action("Development 1 - Cohort 1") },
-    { label: "Development 1 - Cohort 2", onClick: action("Development 1 - Cohort 2") },
-    { label: "Development 1 - Cohort 3", onClick: action("Development 1 - Cohort 3") },
-    { label: "Development 2 - Cohort 1", onClick: action("Development 2 - Cohort 1") },
+    { label: "Austin", onClick: action("Austin") },
+    { label: "Santa Rosa", onClick: action("Santa Rosa") },
+    { label: "Houston", onClick: action("Houston") },
+    { label: "Driftwood", onClick: action("Driftwood") },
   ];
 
   return (
@@ -174,4 +174,14 @@ export function WithSearchListItems() {
       persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
     />
   );
+}
+
+export function IconMenuWtihSearchableList() {
+  const menuItems: MenuItem[] = [
+    { label: "Design doc", onClick: action("Austin") },
+    { label: "Expense report", onClick: action("Expense report") },
+    { label: "Training plan", onClick: action("Training plan") },
+  ];
+
+  return <ButtonMenu trigger={{ icon: "archive" }} items={menuItems} searchable />;
 }
