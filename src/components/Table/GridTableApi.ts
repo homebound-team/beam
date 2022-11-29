@@ -51,6 +51,7 @@ export type GridTableApi<R extends Kinded> = {
 
   /** Toggle collapse state of a row by id */
   toggleCollapsedRow: (id: string) => void;
+  isCollapsedRow: (id: string) => boolean;
   setVisibleColumns: (ids: string[]) => void;
   getVisibleColumnIds: () => string[];
 };
@@ -110,6 +111,10 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public toggleCollapsedRow(id: string) {
     this.tableState.toggleCollapsed(id);
+  }
+
+  public isCollapsedRow(id: string) {
+    return this.tableState.isCollapsed(id);
   }
 
   public setVisibleColumns(ids: string[]) {
