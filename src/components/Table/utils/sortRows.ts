@@ -1,15 +1,15 @@
 import { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { SortOn, SortState } from "src/components/Table/hooks/useSortState";
-import { GridColumn, Kinded, Pin } from "src/components/Table/types";
+import { GridColumnWithId, Kinded, Pin } from "src/components/Table/types";
+import { SortOn, SortState } from "src/components/Table/utils/TableState";
 import { applyRowFn } from "src/components/Table/utils/utils";
 
 // Returns a shallow copy of the `rows` parameter sorted based on `sortState`
 export function sortRows<R extends Kinded>(
-  columns: GridColumn<R>[],
+  columns: GridColumnWithId<R>[],
   rows: GridDataRow<R>[],
-  sortState: SortState<number>,
+  sortState: SortState,
   caseSensitive: boolean,
 ): GridDataRow<R>[] {
   const sorted = sortBatch(columns, rows, sortState, caseSensitive);
@@ -24,18 +24,20 @@ export function sortRows<R extends Kinded>(
 }
 
 function sortBatch<R extends Kinded>(
-  columns: GridColumn<R>[],
+  columns: GridColumnWithId<R>[],
   batch: GridDataRow<R>[],
-  sortState: SortState<number>,
+  sortState: SortState,
   caseSensitive: boolean,
 ): GridDataRow<R>[] {
   // When client-side sort, the sort value is the column index
-  const [value, direction, primaryKey, primaryDirection] = sortState;
+  const { current, persistent } = sortState ?? {};
+  const { columnId, direction } = current ?? {};
+  const { columnId: persistentSortColumnId, direction: persistentSortDirection } = persistent ?? {};
 
-  const column = columns[value];
+  const column = columns.find((c) => c.id! === columnId);
   const invert = direction === "DESC";
-  const primaryInvert = primaryDirection === "DESC";
-  const primaryColumn = primaryKey && columns[primaryKey];
+  const primaryInvert = persistentSortDirection === "DESC";
+  const primaryColumn = persistentSortColumnId && columns.find((c) => c.id! === persistentSortColumnId);
 
   // Make a shallow copy for sorting to avoid mutating the original list
   return [...batch].sort((a, b) => {
@@ -56,7 +58,7 @@ function sortBatch<R extends Kinded>(
         return primaryCompare;
       }
     }
-    return compare(column, a, b, invert, caseSensitive);
+    return column ? compare(column, a, b, invert, caseSensitive) : 0;
   });
 }
 
@@ -65,14 +67,14 @@ function getPin(pin: string | Pin | undefined) {
 }
 
 function compare<R extends Kinded>(
-  column: GridColumn<R>,
+  column: GridColumnWithId<R>,
   a: GridDataRow<R>,
   b: GridDataRow<R>,
   invert: boolean,
   caseSensitive: boolean,
 ) {
-  const v1 = sortValue(applyRowFn(column, a, {} as any, 0), caseSensitive);
-  const v2 = sortValue(applyRowFn(column, b, {} as any, 0), caseSensitive);
+  const v1 = sortValue(applyRowFn(column, a, {} as any, 0, false), caseSensitive);
+  const v2 = sortValue(applyRowFn(column, b, {} as any, 0, false), caseSensitive);
   const v1e = v1 === null || v1 === undefined;
   const v2e = v2 === null || v2 === undefined;
   if ((v1e && v2e) || v1 === v2) {
@@ -112,14 +114,17 @@ function sortValue(value: ReactNode | GridCellContent, caseSensitive: boolean): 
 export function ensureClientSideSortValueIsSortable(
   sortOn: SortOn,
   isHeader: boolean,
-  column: GridColumn<any>,
+  column: GridColumnWithId<any>,
   idx: number,
   maybeContent: ReactNode | GridCellContent,
 ): void {
   if (process.env.NODE_ENV !== "production" && !isHeader && sortOn === "client" && column.clientSideSort !== false) {
     const value = sortValue(maybeContent, false);
     if (!canClientSideSort(value)) {
-      throw new Error(`Column ${idx} passed an unsortable value, use GridCellContent or clientSideSort=false`);
+      const columnIdentifier = !column.id.startsWith("beamColumn_") ? column.id : column.name ?? idx;
+      throw new Error(
+        `Column ${columnIdentifier} passed an unsortable value, use GridCellContent or clientSideSort=false`,
+      );
     }
   }
 }

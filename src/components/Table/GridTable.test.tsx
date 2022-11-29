@@ -4,10 +4,10 @@ import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyles } from "src/components/Table/TableStyles";
 import { GridColumn } from "src/components/Table/types";
-import { calcColumnSizes, selectColumn } from "src/components/Table/utils/columns";
+import { calcColumnSizes, column, generateColumnId, selectColumn } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
-import { RowStateContext } from "src/components/Table/utils/RowState";
 import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -39,7 +39,11 @@ type NestedRow = TotalsRow | HeaderRow | ParentRow | ChildRow | GrandChildRow;
 // I tried https://github.com/keiya01/react-performance-testing#count-renders but
 // it didn't work with our fake timers, so this is easier for now.
 let renderedNameColumn: string[] = [];
-beforeEach(() => (renderedNameColumn = []));
+beforeEach(() => {
+  renderedNameColumn = [];
+  sessionStorage.clear();
+});
+afterAll(() => sessionStorage.clear());
 
 // And two columns for NestedRow
 // TODO Move this to the bottom of the file in it's own PR
@@ -315,7 +319,7 @@ describe("GridTable", () => {
               }),
             },
           ]}
-          sorting={{ on: "client", initial: [1, "ASC"] }}
+          sorting={{ on: "client", initial: [generateColumnId(1), "ASC"] }}
           rows={[
             simpleHeader,
             // And the data is initially unsorted
@@ -380,12 +384,16 @@ describe("GridTable", () => {
 
       const favNameColumn: GridColumn<FavoriteRow> = { header: () => "Name", data: ({ name }) => name };
       const favValueColumn: GridColumn<FavoriteRow> = { header: () => "Value", data: ({ value }) => value };
-      const favoriteColumn: GridColumn<FavoriteRow> = { header: () => "Favorite", data: ({ favorite }) => favorite };
+      const favoriteColumn: GridColumn<FavoriteRow> = {
+        id: "favorite",
+        header: () => "Favorite",
+        data: ({ favorite }) => favorite,
+      };
 
       const r = await render(
         <GridTable
           columns={[favNameColumn, favValueColumn, favoriteColumn]}
-          sorting={{ on: "client", primary: [favoriteColumn, "DESC"] }}
+          sorting={{ on: "client", primary: [favoriteColumn.id!, "DESC"] }}
           rows={[
             simpleHeader,
             // And the data is initially unsorted
@@ -416,19 +424,23 @@ describe("GridTable", () => {
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
     });
 
-    it("can inverse sort priamry rows", async () => {
+    it("can inverse sort primary rows", async () => {
       // Given the table is using client-side sorting
       type FavoriteData = { name: string; value: number; favorite: boolean };
       type FavoriteRow = SimpleHeaderAndData<FavoriteData>;
 
       const favNameColumn: GridColumn<FavoriteRow> = { header: () => "Name", data: ({ name }) => name };
       const favValueColumn: GridColumn<FavoriteRow> = { header: () => "Value", data: ({ value }) => value };
-      const favoriteColumn: GridColumn<FavoriteRow> = { header: () => "Favorite", data: ({ favorite }) => favorite };
+      const favoriteColumn: GridColumn<FavoriteRow> = {
+        id: "favorite",
+        header: () => "Favorite",
+        data: ({ favorite }) => favorite,
+      };
 
       const r = await render(
         <GridTable
           columns={[favNameColumn, favValueColumn, favoriteColumn]}
-          sorting={{ on: "client", primary: [favoriteColumn, "ASC"] }}
+          sorting={{ on: "client", primary: [favoriteColumn.id!, "ASC"] }}
           rows={[
             simpleHeader,
             // And the data is initially unsorted
@@ -460,34 +472,13 @@ describe("GridTable", () => {
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
     });
 
-    it("can be initially sorted by a column index", async () => {
+    it("can be initially sorted by a column id", async () => {
       // Given a table
       const r = await render(
         <GridTable
           columns={[nameColumn, valueColumn]}
           // And it wants to be initially sorted by column 1/asc
-          sorting={{ on: "client", initial: [1, "ASC"] }}
-          rows={[
-            simpleHeader,
-            // And the data is initially unsorted
-            { kind: "data", id: "2", data: { name: "b", value: 2 } },
-            { kind: "data", id: "1", data: { name: "a", value: 3 } },
-            { kind: "data", id: "3", data: { name: "c", value: 1 } },
-          ]}
-        />,
-      );
-      // Then the data is sorted by value
-      expect(cell(r, 1, 0)).toHaveTextContent("c");
-      expect(cell(r, 2, 0)).toHaveTextContent("b");
-    });
-
-    it("can be initially sorted by a column reference", async () => {
-      // Given a table
-      const r = await render(
-        <GridTable
-          columns={[nameColumn, valueColumn]}
-          // And it wants to be initially sorted by value column/asc
-          sorting={{ on: "client", initial: [valueColumn, "ASC"] }}
+          sorting={{ on: "client", initial: [valueColumn.id!, "ASC"] }}
           rows={[
             simpleHeader,
             // And the data is initially unsorted
@@ -529,7 +520,7 @@ describe("GridTable", () => {
         <GridTable
           columns={[nameColumn, valueColumn]}
           // And there is an initial sort defined
-          sorting={{ on: "client", initial: [nameColumn, "ASC"] }}
+          sorting={{ on: "client", initial: [generateColumnId(0), "ASC"] }}
           rows={[
             simpleHeader,
             { kind: "data", id: "1", data: { name: "a", value: 2 } },
@@ -664,7 +655,7 @@ describe("GridTable", () => {
       expect(cell(r, 6, 0)).toHaveTextContent("1");
 
       // And the header row re-rendered
-      expect(row(r, 0).getAttribute("data-render")).toEqual("2");
+      expect(row(r, 0).getAttribute("data-render")).toEqual("1");
       // But the data rows did not
       expect(row(r, 1).getAttribute("data-render")).toEqual("1");
       expect(row(r, 2).getAttribute("data-render")).toEqual("1");
@@ -677,7 +668,7 @@ describe("GridTable", () => {
       click(r.rerenderParent);
 
       // Then memoization did not break
-      expect(row(r, 0).getAttribute("data-render")).toEqual("2");
+      expect(row(r, 0).getAttribute("data-render")).toEqual("1");
       expect(row(r, 1).getAttribute("data-render")).toEqual("1");
       expect(row(r, 2).getAttribute("data-render")).toEqual("1");
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
@@ -837,7 +828,7 @@ describe("GridTable", () => {
       const r = await render(
         <GridTable<Row>
           columns={[nameColumn, valueColumn]}
-          sorting={{ on: "client", initial: [1, "ASC"] }}
+          sorting={{ on: "client", initial: [valueColumn.id!, "ASC"] }}
           rows={[
             simpleHeader,
             // And the 1st row is pinned first
@@ -887,25 +878,25 @@ describe("GridTable", () => {
 
   describe("column sizes", () => {
     it("as=virtual defaults to fr widths", () => {
-      expect(calcColumnSizes([{}, {}], undefined, undefined).join(" ")).toEqual(
+      expect(calcColumnSizes([{ id: "c1" }, { id: "c2" }], undefined, undefined, []).join(" ")).toEqual(
         "((100% - 0% - 0px) * (1 / 2)) ((100% - 0% - 0px) * (1 / 2))",
       );
     });
 
     it("as=virtual treats numbers as fr", () => {
-      expect(calcColumnSizes([{ w: 1 }, { w: 2 }] as any, undefined, undefined).join(" ")).toEqual(
+      expect(calcColumnSizes([{ w: 1 }, { w: 2 }] as any, undefined, undefined, []).join(" ")).toEqual(
         "((100% - 0% - 0px) * (1 / 3)) ((100% - 0% - 0px) * (2 / 3))",
       );
     });
 
     it("as=virtual accepts percentages ", () => {
-      expect(calcColumnSizes([{ w: "10%" }, { w: 2 }] as any, undefined, undefined).join(" ")).toEqual(
+      expect(calcColumnSizes([{ w: "10%" }, { w: 2 }] as any, undefined, undefined, []).join(" ")).toEqual(
         "10% ((100% - 10% - 0px) * (2 / 2))",
       );
     });
 
     it("as=virtual rejects relative units", () => {
-      expect(() => calcColumnSizes([{ w: "auto" }] as any, undefined, undefined).join(" ")).toThrow(
+      expect(() => calcColumnSizes([{ w: "auto" }] as any, undefined, undefined, []).join(" ")).toThrow(
         "Beam Table column width definition only supports px, percentage, or fr units",
       );
     });
@@ -916,8 +907,17 @@ describe("GridTable", () => {
           [{ w: "200px" }, { w: "100px" }, { w: "10%" }, { w: "20%" }, { w: 2 }, {}] as any,
           undefined,
           undefined,
+          [],
         ).join(" "),
       ).toEqual("200px 100px 10% 20% ((100% - 30% - 300px) * (2 / 3)) ((100% - 30% - 300px) * (1 / 3))");
+    });
+
+    it("returns expandedColumns value if is a number and column is currently expanded", () => {
+      expect(
+        calcColumnSizes([{ id: "c1", w: "10%", expandedWidth: "300px" }, { w: 2 }] as any, undefined, undefined, [
+          "c1",
+        ]).join(" "),
+      ).toEqual("300px ((100% - 0% - 300px) * (2 / 2))");
     });
   });
 
@@ -1174,7 +1174,7 @@ describe("GridTable", () => {
         ],
       },
     ];
-    //applying filter to get parent 1 (p1)
+    // applying filter to get parent 1 (p1)
     const r = await render(<GridTable filter="parent 1" columns={nestedColumns} rows={rows} />);
 
     // Then we show the header
@@ -1276,6 +1276,75 @@ describe("GridTable", () => {
     expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
     expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
     expect(cell(r, 3, 2)).toHaveTextContent("grandchild p1c1g1");
+  });
+
+  it("can collapse using api", async () => {
+    // Given a parent with a child and grandchild
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
+          },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<NestedRow>();
+      api.current = _api;
+      return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
+    }
+    const r = await render(<Test />);
+    // And all three rows are initially rendered
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
+    expectRenderedRows("p1", "p1c1", "p1c1g1");
+    // When the child is collapsed
+    api.current!.toggleCollapsedRow(rows[0].children![0].id);
+    // Then the parent and child rows are still shown
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    // But not the grandchild
+    expect(row(r, 2)).toBeUndefined();
+    // And nothing needed to re-render
+    expectRenderedRows();
+  });
+
+  it("can check if row is collapsed via api", async () => {
+    // Given a parent with a child and grandchild
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
+          },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<NestedRow>();
+      api.current = _api;
+      return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
+    }
+    const r = await render(<Test />);
+    // And all three rows are initially rendered
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
+    expectRenderedRows("p1", "p1c1", "p1c1g1");
+    // When the child is collapsed
+    api.current!.toggleCollapsedRow(rows[0].children![0].id);
+    // Then isCollapsed for this row should be true
+    expect(api.current!.isCollapsedRow(rows[0].children![0].id)).toBeTruthy();
+    // And nothing needed to re-render
+    expectRenderedRows();
   });
 
   it("persists collapse", async () => {
@@ -1722,7 +1791,7 @@ describe("GridTable", () => {
     // Then each group rows selected state should reflect the children that match the filter
     expect(cellAnd(r, 1, 1, "select")).toBeChecked();
     expect(cellAnd(r, 2, 1, "select")).toBeChecked();
-    //because the parent matches the filter, and the child was selected, the new behavior shows the nested childs of matched parent, child should keep selected
+    // because the parent matches the filter, and the child was selected, the new behavior shows the nested childs of matched parent, child should keep selected
     expect(cellAnd(r, 3, 1, "select")).toBeChecked();
     // And the API reflects the expected selected states of rows that match the filter
     expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c1", "p1", "p1c2", "p1c1"]);
@@ -2315,21 +2384,170 @@ describe("GridTable", () => {
     // And they can no longer be fetched by the api
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
+
+  describe("expandable columns", () => {
+    type ExpandHeader = { id: "expandableHeader"; kind: "expandableHeader" };
+    type Header = { id: "header"; kind: "header" };
+    type ExpandableData = {
+      kind: "data";
+      data: { firstName: string | undefined; lastName: string | undefined; age: number | undefined };
+    };
+    type ExpandableRow = ExpandHeader | Header | ExpandableData;
+
+    it("can expand and collapse columns", async () => {
+      // Given a table with expandable columns
+      // When initially rendered
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              expandableHeader: () => "Client name",
+              header: (data, { expanded }) => (expanded ? "First name" : "Full name"),
+              data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                }),
+              ],
+            }),
+            column<ExpandableRow>({ expandableHeader: () => "Age", header: emptyCell, data: ({ age }) => age }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+        />,
+      );
+
+      // Then only two columns are shown
+      expect(cell(r, 0, 0)).toHaveTextContent("Client name");
+      expect(cell(r, 0, 1)).toHaveTextContent("Age");
+      // And the header row displays the expected values when the column is collapsed
+      expect(cell(r, 1, 0)).toHaveTextContent("Full name");
+      expect(cell(r, 1, 1)).toBeEmptyDOMElement();
+      // And the data row displays the expected values when the column is collapsed
+      expect(cell(r, 2, 0)).toHaveTextContent("Brandon Dow");
+      expect(cell(r, 2, 1)).toHaveTextContent("36");
+
+      // When clicking to expand the column
+      click(r.expandableColumn);
+
+      // Then the new column in introduced and the existing column's values have been updated
+      expect(cell(r, 1, 0)).toHaveTextContent("First name");
+      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
+      // And the data row displays the expected values when the column is collapsed
+      expect(cell(r, 2, 0)).toHaveTextContent("Brandon");
+      expect(cell(r, 2, 1)).toHaveTextContent("Dow");
+    });
+
+    it("can initialize with a column expanded", async () => {
+      // Given a table with expandable columns
+      // When initially rendered with the expandable column set to `initExpanded: true`.
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              expandableHeader: () => "Client name",
+              header: (data, { expanded }) => (expanded ? "First name" : "Full name"),
+              data: ({ firstName }) => firstName,
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                }),
+              ],
+              initExpanded: true,
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+        />,
+      );
+
+      // Then the column is initially expanded
+      expect(cell(r, 1, 0)).toHaveTextContent("First name");
+      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
+    });
+
+    it("can expand columns when `expandedWidth` defines a value", async () => {
+      // Given a table with `expandedWidth` defined
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              expandableHeader: () => "Client name",
+              header: () => "Name",
+              data: ({ firstName }) => firstName,
+              expandedWidth: "300px",
+              initExpanded: true,
+              w: "200px",
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+        />,
+      );
+
+      // Then the column's width is initially set to the `column.expandColumns` property
+      expect(cell(r, 0, 0)).toHaveStyleRule("width", "calc(300px)");
+    });
+
+    it("auto assigns 'visibleColumnsStorageKey'", async () => {
+      jest.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
+
+      // Given some hide-able columns
+      const columns: GridColumn<Row>[] = [
+        { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initVisible: true },
+        { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true },
+        { id: "action", header: () => "Action", data: () => "action" },
+      ];
+
+      // Given a table
+      await render(<GridTable columns={columns} rows={rows} />);
+      // Then the visible column session storage is defined using a key build via the columns' `id` prop
+      expect(sessionStorage.setItem).toHaveBeenLastCalledWith("nameValueAction", '["name","action"]');
+    });
+
+    it("accepts a specified 'visibleColumnsStorageKey'", async () => {
+      jest.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
+
+      // Given some hide-able columns
+      const columns: GridColumn<Row>[] = [
+        { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initVisible: true },
+        { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true },
+      ];
+
+      // And a table with setting the `visibleColumnsStorageKey`
+      await render(<GridTable columns={columns} rows={rows} visibleColumnsStorageKey="testStorageKey" />);
+      // Then the visible column session storage is defined using the `visibleColumnsStorageKey` prop
+      expect(sessionStorage.setItem).toHaveBeenLastCalledWith("testStorageKey", '["name"]');
+    });
+  });
 });
 
 function Collapse({ id }: { id: string }) {
-  const { rowState } = useContext(RowStateContext);
-  const icon = useComputed(() => (rowState.isCollapsed(id) ? "+" : "-"), [rowState]);
+  const { tableState } = useContext(TableStateContext);
+  const icon = useComputed(() => (tableState.isCollapsed(id) ? "+" : "-"), [tableState]);
   return (
-    <div onClick={() => rowState.toggleCollapsed(id)} data-testid="collapse">
+    <div onClick={() => tableState.toggleCollapsed(id)} data-testid="collapse">
       {icon}
     </div>
   );
 }
 
 function Select({ id }: { id: string }) {
-  const { rowState } = useContext(RowStateContext);
-  const state = useComputed(() => rowState.getSelected(id), [rowState]);
+  const { tableState } = useContext(TableStateContext);
+  const state = useComputed(() => tableState.getSelected(id), [tableState]);
   const selected = state === "checked" ? true : state === "unchecked" ? false : "indeterminate";
   return (
     <Checkbox
@@ -2337,7 +2555,7 @@ function Select({ id }: { id: string }) {
       checkboxOnly={true}
       selected={selected}
       onChange={(selected) => {
-        rowState.selectRow(id, selected);
+        tableState.selectRow(id, selected);
       }}
     />
   );

@@ -1,6 +1,6 @@
 import { NumberParser } from "@internationalized/number";
 import { ReactNode, useMemo, useRef } from "react";
-import { useLocale, useNumberField } from "react-aria";
+import { mergeProps, useLocale, useNumberField } from "react-aria";
 import { NumberFieldStateOptions, useNumberFieldState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { usePresentationContext } from "src/components/PresentationContext";
@@ -45,6 +45,11 @@ export interface NumberFieldProps {
   /** Whether to show comma separation for group numbers.
    * @default true */
   useGrouping?: boolean;
+  hideErrorMessage?: boolean;
+  // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
+  borderless?: boolean;
+  inlineLabel?: boolean;
+  sizeToContent?: boolean;
 }
 
 export function NumberField(props: NumberFieldProps) {
@@ -71,6 +76,7 @@ export function NumberField(props: NumberFieldProps) {
     numberFormatOptions,
     numIntegerDigits,
     useGrouping = true,
+    sizeToContent = false,
     ...otherProps
   } = props;
 
@@ -173,7 +179,9 @@ export function NumberField(props: NumberFieldProps) {
       labelProps={labelProps}
       label={label}
       required={required}
-      inputProps={inputProps}
+      inputProps={mergeProps(inputProps, {
+        size: sizeToContent ? String(inputProps.value ?? "").length || 1 : undefined,
+      })}
       // This is called on each DOM change, to push the latest value into the field
       onChange={(rawInputValue) => {
         const parsedValue = numberParser.parse(rawInputValue || "");

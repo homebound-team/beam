@@ -1,27 +1,28 @@
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
-import { GridColumn, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
+import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
+import { emptyCell } from "src/components/Table/utils/utils";
 import { newMethodMissingProxy } from "src/utils";
 
 /** Provides default styling for a GridColumn representing a Date. */
-export function column<T extends Kinded, S = {}>(columnDef: GridColumn<T, S>): GridColumn<T, S> {
+export function column<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { ...columnDef };
 }
 
 /** Provides default styling for a GridColumn representing a Date. */
-export function dateColumn<T extends Kinded, S = {}>(columnDef: GridColumn<T, S>): GridColumn<T, S> {
+export function dateColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { ...columnDef, align: "left" };
 }
 
 /**
  * Provides default styling for a GridColumn representing a Numeric value (Price, percentage, PO #, etc.). */
-export function numericColumn<T extends Kinded, S = {}>(columnDef: GridColumn<T, S>): GridColumn<T, S> {
+export function numericColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { ...columnDef, align: "right" };
 }
 
 /** Provides default styling for a GridColumn representing an Action. */
-export function actionColumn<T extends Kinded, S = {}>(columnDef: GridColumn<T, S>): GridColumn<T, S> {
+export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { clientSideSort: false, ...columnDef, align: "center", isAction: true, wrapAction: false };
 }
 
@@ -32,15 +33,20 @@ export function actionColumn<T extends Kinded, S = {}>(columnDef: GridColumn<T, 
  * not have a `SelectToggle`, b/c we can provide the default behavior a `SelectToggle` for basically
  * all rows.
  */
-export function selectColumn<T extends Kinded, S = {}>(columnDef?: Partial<GridColumn<T, S>>): GridColumn<T, S> {
+export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>): GridColumn<T> {
   const base = {
     ...nonKindDefaults(),
+    id: "beamSelectColumn",
     clientSideSort: false,
     align: "center",
     // Defining `w: 48px` to accommodate for the `16px` wide checkbox and `16px` of padding on either side.
     w: "48px",
     wrapAction: false,
     isAction: true,
+    expandColumns: undefined,
+    // Select Column should not display the select toggle for `expandableHeader` or `totals` row kinds
+    expandableHeader: emptyCell,
+    totals: emptyCell,
     // Use any of the user's per-row kind methods if they have them.
     ...columnDef,
   };
@@ -58,15 +64,20 @@ export function selectColumn<T extends Kinded, S = {}>(columnDef?: Partial<GridC
  * not have a `CollapseToggle`, b/c we can provide the default behavior a `CollapseToggle` for basically
  * all rows.
  */
-export function collapseColumn<T extends Kinded, S = {}>(columnDef?: Partial<GridColumn<T, S>>): GridColumn<T, S> {
+export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>): GridColumn<T> {
   const base = {
     ...nonKindDefaults(),
+    id: "beamCollapseColumn",
     clientSideSort: false,
     align: "center",
     // Defining `w: 38px` based on the designs
     w: "38px",
     wrapAction: false,
     isAction: true,
+    expandColumns: undefined,
+    // Collapse Column should not display the collapse toggle for `expandableHeader` or `totals` row kinds
+    expandableHeader: emptyCell,
+    totals: emptyCell,
     ...columnDef,
   };
   return newMethodMissingProxy(base, (key) => {
@@ -86,9 +97,10 @@ function nonKindDefaults() {
  * Enforces only fixed-sized units (% and px)
  */
 export function calcColumnSizes(
-  columns: GridColumn<any>[],
+  columns: GridColumnWithId<any>[],
   tableWidth: number | undefined,
   tableMinWidthPx: number = 0,
+  expandedColumnIds: string[],
 ): string[] {
   // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
   // calc((100% - allOtherPercent - allOtherPx) * ((myFr / totalFr))`
@@ -99,7 +111,9 @@ export function calcColumnSizes(
   // by react-virtuoso), even if they have the same width, for some reason `fr` units between the two
   // will resolve every slightly differently, where as this approach they will match exactly.
   const { claimedPercentages, claimedPixels, totalFr } = columns.reduce(
-    (acc, { w }) => {
+    (acc, { id, w: _w, expandedWidth }) => {
+      const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
+
       if (typeof w === "undefined") {
         return { ...acc, totalFr: acc.totalFr + 1 };
       } else if (typeof w === "number") {
@@ -128,7 +142,9 @@ export function calcColumnSizes(
     return `((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
-  let sizes = columns.map(({ w }) => {
+  let sizes = columns.map(({ id, expandedWidth, w: _w }) => {
+    const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
+
     if (typeof w === "undefined") {
       return fr(1);
     } else if (typeof w === "string") {
@@ -146,3 +162,24 @@ export function calcColumnSizes(
 
   return sizes;
 }
+
+/** Assign column ids if missing */
+export function assignDefaultColumnIds<T extends Kinded>(columns: GridColumn<T>[]): GridColumnWithId<T>[] {
+  // Note: we are not _always_ spreading the `c` property as we need to be able to return the whole proxy object that
+  // exists as part of `selectColumn` and `collapseColumn`.
+  return columns.map((c, idx) => {
+    const { expandColumns } = c;
+    const expandColumnsWithId: GridColumnWithId<T>[] | undefined = expandColumns?.map((ec, ecIdx) => ({
+      ...ec,
+      id: ec.id ?? (`${generateColumnId(idx)}_${ecIdx}` as string),
+      // Defining this as undefined to make TS happy for now.
+      // If we do not explicitly set to `undefined`, TS thinks `expandColumns` could still be of type GridColumn<T> (not WithId).
+      // We only support a single level of expanding columns, so this is safe to do.
+      expandColumns: undefined,
+    }));
+
+    return Object.assign(c, { id: c.id ?? generateColumnId(idx), expandColumns: expandColumnsWithId });
+  });
+}
+
+export const generateColumnId = (columnIndex: number) => `beamColumn_${columnIndex}`;

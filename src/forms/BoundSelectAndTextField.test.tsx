@@ -19,7 +19,7 @@ describe("BoundSelectAndTextField", () => {
     expect(r.nameValue()).toBeEmptyDOMElement();
 
     // When changing the values
-    fireEvent.focus(r.type());
+    fireEvent.click(r.type());
     click(r.getByRole("option", { name: "Task" }));
     type(r.name, "Test Task Name");
 
@@ -87,7 +87,7 @@ describe("BoundSelectAndTextField", () => {
     );
 
     // When making a selection from the dropdown
-    r.type().focus();
+    r.type().click();
     click(r.getByRole("option", { name: "Task" }));
     // Then autoSave should be called.
     expect(maybeAutoSave).toBeCalledTimes(1);

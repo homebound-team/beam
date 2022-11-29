@@ -47,7 +47,9 @@ export const Icon = (props: IconProps) => {
     "unarchive",
     "duplicate",
     "filter",
-    "columns",
+    "kanban",
+    "expand",
+    "collapse"
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
@@ -75,9 +77,25 @@ export const Icon = (props: IconProps) => {
     "arrowRight",
     "menuClose",
     "menuOpen",
+    "arrowFromBottom",
+    "arrowFromLeft",
+    "arrowFromRight",
+    "arrowFromTop",
   ];
   const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images", "openBook"];
-  const miscIcons: IconProps["icon"][] = ["dollar", "userCircle", "calendar", "buildingHouse", "house", "bell"];
+  const miscIcons: IconProps["icon"][] = [
+    "dollar",
+    "userCircle",
+    "calendar",
+    "buildingHouse",
+    "house",
+    "bell",
+    "customize",
+    "leaf",
+    "floorPlan",
+    "chair",
+    "bolt",
+  ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
     "tasks",

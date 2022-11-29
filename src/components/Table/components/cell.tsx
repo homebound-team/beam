@@ -2,10 +2,8 @@ import React, { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { navLink } from "src/components/CssReset";
 import { GridTableApi } from "src/components/Table/GridTableApi";
-import { SortState } from "src/components/Table/hooks/useSortState";
 import { RowStyle, tableRowStyles } from "src/components/Table/TableStyles";
-import { GridCellAlignment, GridColumn, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
-import { GridSortContext, GridSortContextProps } from "src/components/Table/utils/GridSortContext";
+import { GridCellAlignment, GridColumnWithId, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
 import { Css, Properties, Typography } from "src/Css";
 
 /**
@@ -56,30 +54,22 @@ export const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
     );
   };
 
-/** Sets up the `GridContext` so that header cells can access the current sort settings. */
-export const headerRenderFn: (
-  columns: GridColumn<any>[],
-  column: GridColumn<any>,
-  sortState: SortState<any> | undefined,
-  setSortKey: Function | undefined,
-  as: RenderAs,
-) => RenderCellFn<any> =
-  (columns, column, sortState, setSortKey, as) =>
-  (key, css, content, row, rowStyle, classNames: string | undefined) => {
-    const [currentKey, direction] = sortState || [];
-    // If server-side sorting, use the user's key for this column; client-side sorting, use the index.
-    const ourSortKey = column.serverSideSortKey || columns.indexOf(column);
-    const context: GridSortContextProps = {
-      sorted: ourSortKey === currentKey ? direction : undefined,
-      toggleSort: () => setSortKey!(ourSortKey),
-    };
+/**
+ * Sets up the `GridContext` so that header cells can access the current sort settings.
+ * Used for the Header, Totals, and Expanded Header row's cells.
+ * */
+export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSpan: number) => RenderCellFn<any> =
+  (column, as, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
     const Cell = as === "table" ? "th" : "div";
     return (
-      <GridSortContext.Provider key={key} value={context}>
-        <Cell css={{ ...css, ...tableRowStyles(as, column) }} className={classNames}>
-          {content}
-        </Cell>
-      </GridSortContext.Provider>
+      <Cell
+        key={key}
+        css={{ ...css, ...tableRowStyles(as, column) }}
+        className={classNames}
+        {...(as === "table" && { colSpan })}
+      >
+        {content}
+      </Cell>
     );
   };
 

@@ -10,6 +10,7 @@ module.exports = {
     "@storybook/addon-essentials",
     "storybook-addon-performance/register",
     "@storybook/addon-interactions",
+    "storybook-addon-designs",
   ],
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: { check: false },

@@ -7,6 +7,7 @@ import { Xss } from "src/Css";
 export interface BeamFocusableProps {
   /** Whether the element should receive focus on render. */
   autoFocus?: boolean;
+  forceFocusStyles?: boolean;
 }
 
 export interface BeamButtonProps {

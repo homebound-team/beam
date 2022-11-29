@@ -32,6 +32,7 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   nothingSelectedText: string;
   tooltip?: ReactNode;
   resetField: VoidFunction;
+  hideErrorMessage?: boolean;
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
@@ -155,7 +156,10 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
             if (inputProps.readOnly) return;
             setIsFocused(true);
             maybeCall(onFocus);
-            state.open();
+          },
+          onClick: () => {
+            if (inputProps.readOnly) return;
+            buttonRef.current?.click();
           },
           size:
             // If sizeToContent, then, in order of precedence, base it of from:

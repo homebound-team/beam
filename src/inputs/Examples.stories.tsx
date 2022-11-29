@@ -2,6 +2,7 @@ import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useEffect } from "react";
 import { SuperDrawerContent, useSuperDrawer } from "src/components";
+import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { withBeamDecorator } from "src/utils/sb";
@@ -18,7 +19,7 @@ export function SuperDrawerWithForm() {
   const { openInDrawer } = useSuperDrawer();
 
   useEffect(() => {
-    openInDrawer({ title: "5304.01 - Counters", content: <DrawerWithInputs /> });
+    openInDrawer({ content: <DrawerWithInputs /> });
   }, [openInDrawer]);
 
   return null;
@@ -32,6 +33,9 @@ function DrawerWithInputs() {
         { label: "Save", onClick: noop },
       ]}
     >
+      <SuperDrawerHeader>
+        <h1>5304.01 - Counters</h1>
+      </SuperDrawerHeader>
       <form css={{ ...Css.df.fdc.gap5.$, fieldset: Css.df.fdc.gap2.$, legend: Css.baseMd.mb2.$ }}>
         <fieldset>
           <legend>Details</legend>

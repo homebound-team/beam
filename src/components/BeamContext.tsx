@@ -25,6 +25,8 @@ export interface BeamContextState {
   drawerCanCloseChecks: MutableRefObject<CanCloseCheck[]>;
   /** Checks when closing SuperDrawer Details, a double array to keep per-detail lists. */
   drawerCanCloseDetailsChecks: MutableRefObject<CanCloseCheck[][]>;
+  /** The div for SuperDrawerHeader to portal into. */
+  sdHeaderDiv: HTMLDivElement;
 }
 
 /** This is only exported internally, for useModal and useSuperDrawer, it's not a public API. */
@@ -37,6 +39,7 @@ export const BeamContext = createContext<BeamContextState>({
   drawerContentStack: new EmptyRef(),
   drawerCanCloseChecks: new EmptyRef(),
   drawerCanCloseDetailsChecks: new EmptyRef(),
+  sdHeaderDiv: undefined!,
 });
 
 interface BeamProviderProps extends PropsWithChildren<PresentationContextProps> {}
@@ -60,6 +63,7 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
   const drawerContentStackRef = useRef<ContentStack[]>([]);
   const drawerCanCloseChecks = useRef<CanCloseCheck[]>([]);
   const drawerCanCloseDetailsChecks = useRef<CanCloseCheck[][]>([]);
+  const sdHeaderDiv = useMemo(() => document.createElement("div"), []);
 
   // We essentially expose the refs, but with our own getters/setters so that we can
   // have the setters call `tick` to re-render this Provider
@@ -75,6 +79,7 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
       modalFooterDiv,
       drawerCanCloseChecks,
       drawerCanCloseDetailsChecks,
+      sdHeaderDiv,
     };
   }, [modalBodyDiv, modalFooterDiv]);
 
@@ -86,8 +91,7 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
             {/* OverlayProvider is required for Modals generated via React-Aria */}
             <OverlayProvider>
               {children}
-              {/* If the drawer is open, assume it will show modal content internally. */}
-              {modalRef.current && drawerContentStackRef.current.length === 0 && <Modal {...modalRef.current} />}
+              {modalRef.current && <Modal {...modalRef.current} />}
             </OverlayProvider>
             <SuperDrawer />
           </SnackbarProvider>

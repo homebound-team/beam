@@ -21,7 +21,7 @@ describe("DateFilter", () => {
   it("can set and unset the date filter", async () => {
     const r = await render(<TestFilters defs={{ date: taskDueFilter }} />);
     // Given we select an operation
-    fireEvent.focus(r.filter_taskDue_dateOperation());
+    fireEvent.click(r.filter_taskDue_dateOperation());
     click(r.getByRole("option", { name: "On" }));
     // Then the date field should become enabled
     expect(r.filter_taskDue_dateField()).not.toBeDisabled();
@@ -30,7 +30,7 @@ describe("DateFilter", () => {
     // Then the filter should be set (intentionally omitting the time value from the 'date' value)
     expect(r.filter_value()).toHaveTextContent('{"date":{"op":"ON","value":"2021-10-31T');
     // When we select Any
-    fireEvent.focus(r.filter_taskDue_dateOperation());
+    fireEvent.click(r.filter_taskDue_dateOperation());
     click(r.getByRole("option", { name: "Any" }));
     // Then the date field is disabled
     expect(r.filter_taskDue_dateField()).toBeDisabled();

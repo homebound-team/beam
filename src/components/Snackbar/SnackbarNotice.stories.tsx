@@ -1,5 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
+import { capitalCase } from "change-case";
 import { SnackbarNotice, SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
 import { withBeamDecorator } from "src/utils/sb";
@@ -38,6 +39,33 @@ export function NoticeExamples() {
           />
         </div>
       ))}
+    </div>
+  );
+}
+
+export function NoticeIconExamples() {
+  // export type SnackbarNoticeTypes = "error" | "warning" | "success" | "info";
+  const propVariations: Pick<SnackbarNoticeProps, "icon">[] = [
+    { icon: "success" },
+    { icon: "error" },
+    { icon: "warning" },
+    { icon: "info" },
+    { icon: "alert" },
+  ];
+  return (
+    <div css={Css.df.fdc.aifs.$}>
+      {propVariations.map((props) => {
+        return (
+          <div css={Css.mb1.$}>
+            <SnackbarNotice
+              onClose={action("Close notice")}
+              id="1"
+              message={`${capitalCase(props.icon!)} notice with one line of text.`}
+              {...props}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { MutableRefObject, ReactElement, ReactNode, useRef } from "react";
 import { useOverlayPosition } from "react-aria";
 import { MenuTriggerState } from "react-stately";
 import { AvatarButton, AvatarButtonProps } from "src/components/AvatarButton";
-import { Button, ButtonProps } from "src/components/Button";
+import { Button, ButtonProps, ButtonVariant } from "src/components/Button";
 import { Icon } from "src/components/Icon";
 import { IconButton, IconButtonProps } from "src/components/IconButton";
 import { Popover } from "src/components/internal";
@@ -32,10 +32,26 @@ export interface OverlayTriggerProps {
   buttonRef: MutableRefObject<HTMLButtonElement | null>;
   /** Result of the useMenuTriggerState hook */
   state: MenuTriggerState;
+  /** Prop set the style of the button element */
+  variant?: ButtonVariant;
+  hideEndAdornment?: boolean;
+  showActiveBorder?: boolean;
 }
 
 export function OverlayTrigger(props: OverlayTriggerProps) {
-  const { trigger, buttonRef, menuTriggerProps, placement, state, disabled, tooltip, children } = props;
+  const {
+    trigger,
+    buttonRef,
+    menuTriggerProps,
+    placement,
+    state,
+    disabled,
+    tooltip,
+    children,
+    variant,
+    hideEndAdornment,
+    showActiveBorder = false,
+  } = props;
   const popoverRef = useRef(null);
   const { overlayProps: positionProps } = useOverlayPosition({
     targetRef: buttonRef,
@@ -44,6 +60,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     isOpen: state.isOpen,
     onClose: state.close,
     placement: (placement ? `bottom ${placement}` : "bottom left") as Placement,
+    offset: showActiveBorder ? 4 : undefined,
   });
   const tid = useTestIds(
     props,
@@ -54,14 +71,15 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     <div css={Css.relative.dib.$}>
       {isTextButton(trigger) ? (
         <Button
-          variant="secondary"
+          variant={variant ? variant : "secondary"}
           {...trigger}
           menuTriggerProps={menuTriggerProps}
           buttonRef={buttonRef}
-          endAdornment={<Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} />}
+          endAdornment={!hideEndAdornment ? <Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} /> : null}
           disabled={disabled}
           tooltip={tooltip}
           onClick={noop}
+          forceFocusStyles={showActiveBorder && state.isOpen}
           {...tid}
         />
       ) : isIconButton(trigger) ? (
@@ -73,6 +91,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           disabled={disabled}
           tooltip={tooltip}
           onClick={noop}
+          forceFocusStyles={showActiveBorder && state.isOpen}
         />
       ) : (
         <AvatarButton
@@ -83,6 +102,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           disabled={disabled}
           tooltip={tooltip}
           onClick={noop}
+          forceFocusStyles={showActiveBorder && state.isOpen}
         />
       )}
       {state.isOpen && (

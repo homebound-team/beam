@@ -1,13 +1,15 @@
 import { act, renderHook } from "@testing-library/react-hooks";
 import { ReactElement, useEffect } from "react";
+import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { render, withBeamRTL } from "src/utils/rtl";
 import { useBeamContext } from "../BeamContext";
 import { useSuperDrawer } from "./index";
 
 describe("useSuperDrawer", () => {
   it("should allow `new` element to be added", async () => {
-    const { superDrawerContent } = await render(<TestDrawerContent openInDrawer />);
-    expect(superDrawerContent()).toBeTruthy();
+    const r = await render(<TestDrawerContent openInDrawer />);
+    expect(r.superDrawerHeader()).toHaveTextContent("Title");
+    expect(r.superDrawerContent()).toBeTruthy();
   });
 
   it("should not allow `detail` element to be added", async () => {
@@ -17,23 +19,18 @@ describe("useSuperDrawer", () => {
   });
 
   it("should allow `detail` element to be added when as least one `new` element is present", async () => {
-    const { superDrawerDetailContent } = await render(<TestDrawerContent openInDrawer openDrawerDetail />);
-    expect(superDrawerDetailContent()).toBeTruthy();
-  });
-
-  it("should default `detail` element title to previous elements title", async () => {
-    const { superDrawer_title } = await render(<TestDrawerContent openInDrawer openDrawerDetail />);
-    expect(superDrawer_title()).toHaveTextContent("title");
+    const r = await render(<TestDrawerContent openInDrawer openDrawerDetail />);
+    expect(r.superDrawerDetailContent()).toBeTruthy();
   });
 
   it("should show `new` element after calling `closeDrawerDetail()`", async () => {
-    const { superDrawerContent } = await render(<TestDrawerContent openInDrawer openDrawerDetail closeDrawerDetail />);
-    expect(superDrawerContent()).toBeTruthy();
+    const r = await render(<TestDrawerContent openInDrawer openDrawerDetail closeDrawerDetail />);
+    expect(r.superDrawerContent()).toBeTruthy();
   });
 
   it("should reset state when calling `closeDrawer()`", async () => {
-    const { queryByTestId } = await render(<TestDrawerContent openInDrawer openDrawerDetail closeDrawer />);
-    expect(queryByTestId("superDrawer")).toBeFalsy();
+    const r = await render(<TestDrawerContent openInDrawer openDrawerDetail closeDrawer />);
+    expect(r.queryByTestId("superDrawer")).toBeFalsy();
   });
 
   const wrapper = ({ children }: { children: ReactElement }) => withBeamRTL.wrap(children);
@@ -44,7 +41,7 @@ describe("useSuperDrawer", () => {
     // Given the useSuperDrawer hook
     const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
     // And a opened SuperDrawer
-    act(() => hook.openInDrawer({ title: "title", content: "content" }));
+    act(() => hook.openInDrawer({ content: "content" }));
 
     // When adding a canCloseDrawerCheck
     act(() => hook.addCanCloseDrawerCheck(canCloseDrawerCheck));
@@ -75,7 +72,7 @@ describe("useSuperDrawer", () => {
     const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
     // And a opened SuperDrawer with a detail content
     act(() => {
-      hook.openInDrawer({ title: "title", content: "content" });
+      hook.openInDrawer({ content: "content" });
       hook.openDrawerDetail({ content: "detail content" });
     });
 
@@ -95,7 +92,7 @@ describe("useSuperDrawer", () => {
     const beamHook = renderHook(() => useBeamContext(), { wrapper }).result.current;
     // And a opened SuperDrawer with no detail content
     act(() => {
-      superDrawerHook.openInDrawer({ title: "title", content: "content" });
+      superDrawerHook.openInDrawer({ content: "content" });
     });
 
     // When adding a canCloseDrawerDetailCheck
@@ -109,7 +106,7 @@ describe("useSuperDrawer", () => {
     // Given a useSuperDrawer and BeamContext hook
     const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
     // And a opened SuperDrawer
-    act(() => hook.openInDrawer({ title: "title", content: "content" }));
+    act(() => hook.openInDrawer({ content: "content" }));
 
     // When adding a failing canCloseDrawerCheck
     act(() => hook.addCanCloseDrawerCheck(() => false));
@@ -123,7 +120,7 @@ describe("useSuperDrawer", () => {
     const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
     // And a opened SuperDrawer
     act(() => {
-      hook.openInDrawer({ title: "title", content: "content" });
+      hook.openInDrawer({ content: "content" });
       hook.openDrawerDetail({ content: "drawer detail" });
     });
 
@@ -141,7 +138,7 @@ describe("useSuperDrawer", () => {
     const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
 
     // When the drawer is opened and closed
-    act(() => hook.openInDrawer({ title: "title", content: "content", onClose }));
+    act(() => hook.openInDrawer({ content: "content", onClose }));
     act(() => {
       hook.closeDrawer();
     });
@@ -172,8 +169,12 @@ function TestDrawerContent(props: {
   useEffect(() => {
     if (props.openInDrawer) {
       context.openInDrawer({
-        title: "title",
-        content: <h2 data-testid="superDrawerContent">SuperDrawer Content</h2>,
+        content: (
+          <>
+            <SuperDrawerHeader title="Title" />
+            <h2 data-testid="superDrawerContent">SuperDrawer Content</h2>
+          </>
+        ),
       });
     }
     if (props.openDrawerDetail) {

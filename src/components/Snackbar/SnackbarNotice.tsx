@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
 import { Button, ButtonProps } from "src/components/Button";
-import { Icon, IconKey } from "src/components/Icon";
+import { Icon, IconProps } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { useTestIds } from "src/utils";
 
-export type SnackbarNoticeTypes = "error" | "warning" | "success" | "info";
+export type SnackbarNoticeTypes = "error" | "warning" | "success" | "info" | "alert";
 export interface SnackbarNoticeProps {
   /** Adds action button to the right of the notice */
   action?: Pick<ButtonProps, "label" | "onClick" | "variant">;
@@ -31,7 +31,7 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
     <div css={Css.white.bgGray800.br4.base.df.aic.maxwPx(420).$} {...tid} role="alert">
       {icon && (
         <span css={Css.fs0.plPx(12).$}>
-          <Icon icon={typeToIcon[icon]} {...tid.icon} />
+          <Icon {...typeToIcon[icon]} {...tid.icon} />
         </span>
       )}
 
@@ -62,9 +62,11 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
   );
 }
 
-const typeToIcon: Record<SnackbarNoticeTypes, IconKey> = {
-  error: "xCircle",
-  warning: "error",
-  success: "checkCircle",
-  info: "infoCircle",
+const typeToIcon: Record<SnackbarNoticeTypes, Pick<IconProps, "icon" | "color">> = {
+  // Can change to a Tupple with IconKey and color?
+  error: { icon: "xCircle", color: Palette.Red300 },
+  warning: { icon: "error", color: Palette.Yellow300 },
+  success: { icon: "checkCircle", color: Palette.Green300 },
+  info: { icon: "infoCircle", color: Palette.LightBlue200 },
+  alert: { icon: "errorCircle", color: Palette.White },
 };

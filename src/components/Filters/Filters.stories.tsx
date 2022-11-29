@@ -11,6 +11,7 @@ import {
   GridDataRow,
   GridTable,
   multiFilter,
+  numberRangeFilter,
   simpleHeader,
   SimpleHeaderAndData,
   singleFilter,
@@ -27,7 +28,13 @@ export default {
   component: Filters,
   title: "Workspace/Components/Filter",
   decorators: [withDimensions(), withRouter(), withBeamDecorator],
-  parameters: { layout: "fullscreen" },
+  parameters: { 
+    layout: "fullscreen",
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101334",
+    }
+  },
 } as Meta;
 
 export function Filter() {
@@ -125,12 +132,15 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       defaultValue: { op: "BETWEEN", value: { from: jan1, to: jan19 } },
     });
 
+    const numRangeFilter = numberRangeFilter({ label: "Price", numberFieldType: "cents" });
+
     const isTest = toggleFilter({ label: "Only show test projects" });
     const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", onValue: false });
 
     return {
       marketId,
       internalUserId,
+      numRangeFilter,
       favorite,
       stage,
       status,

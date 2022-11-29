@@ -1,7 +1,7 @@
 import { Css, Palette } from "src/Css";
 
 interface LoaderProps {
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   contrast?: boolean;
 }
 
@@ -30,8 +30,9 @@ export function Loader({ size = "lg", contrast = false }: LoaderProps) {
   );
 }
 
-type LoaderSize = "sm" | "md" | "lg";
+type LoaderSize = "xs" | "sm" | "md" | "lg";
 const sizeToPixels: Record<LoaderSize, [number, number]> = {
+  xs: [16, 2],
   sm: [32, 4],
   md: [64, 8],
   lg: [96, 12],

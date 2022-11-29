@@ -1,7 +1,7 @@
 import { AriaButtonProps } from "@react-types/button";
 import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
+import { Icon, IconProps, Loader, maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Css, Palette } from "src/Css";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, isPromise, noop } from "src/utils";
@@ -23,6 +23,9 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
   download?: boolean;
   contrast?: boolean;
+
+  /** Additional text to further customize button during an async request is in progress. */
+  labelInFlight?: string;
 }
 
 export function Button(props: ButtonProps) {
@@ -35,6 +38,8 @@ export function Button(props: ButtonProps) {
     openInNew,
     download,
     contrast = false,
+    forceFocusStyles = false,
+    labelInFlight,
     ...otherProps
   } = props;
   const asLink = typeof onPress === "string";
@@ -79,8 +84,10 @@ export function Button(props: ButtonProps) {
   const buttonContent = (
     <>
       {icon && <Icon xss={iconStyles[size]} icon={icon} />}
-      {label}
-      {endAdornment && <span css={Css.ml1.$}>{endAdornment}</span>}
+      {labelInFlight && asyncInProgress ? labelInFlight : label}
+      {(endAdornment || asyncInProgress) && (
+        <span css={Css.ml1.$}>{asyncInProgress ? <Loader size={"xs"} contrast={contrast} /> : endAdornment}</span>
+      )}
     </>
   );
 
@@ -96,7 +103,7 @@ export function Button(props: ButtonProps) {
       ...(isHovered && !isPressed ? hoverStyles : {}),
       ...(isPressed ? pressedStyles : {}),
       ...(isDisabled || asyncInProgress ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
-      ...(isFocusVisible ? focusStyles : {}),
+      ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
     },
     ...tid,
   };

@@ -120,7 +120,7 @@ describe("MultiSelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    fireEvent.focus(age());
+    fireEvent.click(age());
     const optionTwo = getByRole("option", { name: "Two" });
     // Then expect the disabled option to have the correct aria attributes
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
@@ -146,7 +146,7 @@ describe("MultiSelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    fireEvent.focus(age());
+    fireEvent.click(age());
     // Then expect the chip to be disabled
     expect(chip()).toHaveAttribute("disabled");
     // And when clicking on that chip
@@ -170,7 +170,7 @@ describe("MultiSelectFieldTest", () => {
         onSelect={onSelect}
       />,
     );
-    fireEvent.focus(age());
+    fireEvent.click(age());
     const optionTwo = getByRole("option", { name: "Two" });
     // When selecting another option
     click(optionTwo);

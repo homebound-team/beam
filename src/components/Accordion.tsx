@@ -1,5 +1,5 @@
-import { useId } from "@react-aria/utils";
-import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
+import { useId, useResizeObserver } from "@react-aria/utils";
+import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { useFocusRing } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css, Palette } from "src/Css";
@@ -37,12 +37,33 @@ export function Accordion(props: AccordionProps) {
   } = props;
   const testIds = useTestIds(props, "accordion");
   const id = useId();
-  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [expanded, setExpanded] = useState(defaultExpanded && !disabled);
   const { isFocusVisible, focusProps } = useFocusRing();
+  const contentRef = useRef<HTMLDivElement>(null);
+  // On initial render, if the accordion is expanded, then set `height` to auto to avoid unnecessary animation on render.
+  const [contentHeight, setContentHeight] = useState(expanded ? "auto" : "0");
 
   useEffect(() => {
-    setExpanded(defaultExpanded);
-  }, [defaultExpanded]);
+    setExpanded(defaultExpanded && !disabled);
+  }, [defaultExpanded, disabled]);
+
+  useEffect(() => {
+    // When the `expanded` value changes - If true, it means the Accordion's content has been rendered, Otherwise, it's been hidden
+    // Then when the content is displayed, the calculate its height so we can give this value to the container to animate height smoothly.
+    // When content is removed, simply set the height back to 0
+    setContentHeight(expanded && contentRef.current ? `${contentRef.current.scrollHeight}px` : "0");
+  }, [expanded]);
+
+  // Using a resizing observer to check if the content of the accordion changes (i.e. lazy loaded image, auto-sizing textarea, etc..),
+  // If it does change, then we need to update the container's height accordingly. Only update the height if the accordion is expanded.
+  // Note - This may result in two `setContentHeight` calls when the accordion opens: (1) via the above `useEffect` and (2) in `onResize`
+  //        Both `setContentHeight` calls _should_ set the same value, so no unnecessary re-renders would be triggered, making this a harmless additional set call.
+  const onResize = useCallback(() => {
+    if (contentRef.current && expanded) {
+      setContentHeight(`${contentRef.current.scrollHeight}px`);
+    }
+  }, [expanded, setContentHeight]);
+  useResizeObserver({ ref: contentRef, onResize });
 
   return (
     <div
@@ -82,15 +103,13 @@ export function Accordion(props: AccordionProps) {
         {...testIds.details}
         id={id}
         aria-hidden={!expanded}
-        css={{
-          // Use max-height for grow/shrink animation (remove close animation for AccordionList to avoid delays)
-          ...Css.overflowHidden
-            .maxhPx(1000)
-            .add("transition", `max-height ${expanded || !index ? "250ms" : "0"} ease-in-out`).$,
-          ...(!expanded || disabled ? Css.maxh0.$ : {}),
-        }}
+        css={Css.overflowHidden.h(contentHeight).add("transition", "height 250ms ease-in-out").$}
       >
-        <div css={Css.px2.pb2.pt1.$}>{children}</div>
+        {expanded && (
+          <div css={Css.px2.pb2.pt1.$} ref={contentRef} {...testIds.content}>
+            {children}
+          </div>
+        )}
       </div>
     </div>
   );

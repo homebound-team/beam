@@ -30,6 +30,8 @@ export interface GridStyle {
   headerCellCss?: Properties;
   /** Applied to 'kind: "totals"' cells */
   totalsCellCss?: Properties;
+  /** Applied to 'kind: "expandableHeader"' cells */
+  expandableHeaderCss?: Properties;
   /** Applied to the first cell of all rows, i.e. for table-wide padding or left-side borders. */
   firstCellCss?: Properties;
   /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
@@ -54,6 +56,7 @@ export interface GridStyle {
   activeBgColor?: Palette;
 }
 
+// If adding a new `GridStyleDef`, ensure if it added to the `defKeys` in the `resolveStyles` function below
 export interface GridStyleDef {
   inlineEditing?: boolean;
   grouped?: boolean;
@@ -62,6 +65,7 @@ export interface GridStyleDef {
   cellHighlight?: boolean;
   allWhite?: boolean;
   bordered?: boolean;
+  rowHover?: boolean;
 }
 
 // Returns a "blessed" style of GridTable
@@ -101,9 +105,13 @@ function memoizedTableStyles() {
         headerCellCss: {
           ...Css.gray700.xsMd.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
           ...(allWhite && Css.bgWhite.$),
-          ...(bordered && Css.bt.bGray200.$),
         },
-        totalsCellCss: Css.bgWhite.gray700.smMd.hPx(52).pPx(12).boxShadow("none").$,
+        totalsCellCss: Css.bgWhite.gray700.smMd.hPx(totalsRowHeight).pPx(12).boxShadow("none").$,
+        expandableHeaderCss: Css.bgWhite.gray900.xsMd.wsNormal
+          .hPx(expandableHeaderRowHeight)
+          .pxPx(12)
+          .py0.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
+          .addIn("&:not(:last-of-type)", Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$).$,
         cellCss: {
           ...Css.gray900.xs.bgWhite.aic.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
@@ -111,12 +119,10 @@ function memoizedTableStyles() {
           ...(bordered && { "&:first-of-type": Css.bl.bGray200.$, "&:last-of-type": Css.br.bGray200.$ }),
         },
         firstRowCss: {
-          // Only apply border-radius to the corners of the table when `allWhite` is true for now.
-          ...(allWhite &&
-            Css.addIn("& > *:first-of-type", Css.borderRadius("8px 0 0 0 ").$).addIn(
-              "& > *:last-of-type",
-              Css.borderRadius("0 8px 0 0").$,
-            ).$),
+          ...Css.addIn("& > *:first-of-type", Css.borderRadius("8px 0 0 0 ").$).addIn(
+            "& > *:last-of-type",
+            Css.borderRadius("0 8px 0 0").$,
+          ).$,
           ...(bordered && Css.addIn("& > *", Css.bt.bGray200.$).$),
         },
         ...(allWhite && {
@@ -127,6 +133,7 @@ function memoizedTableStyles() {
         }),
         presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
         levels: grouped ? groupedLevels : defaultLevels,
+        rowHoverColor: Palette.LightBlue100,
       };
     }
 
@@ -135,6 +142,9 @@ function memoizedTableStyles() {
 }
 
 export const getTableStyles = memoizedTableStyles();
+
+export const totalsRowHeight = 52;
+export const expandableHeaderRowHeight = 40;
 
 /** Defines row-specific styling for each given row `kind` in `R` */
 export type RowStyles<R extends Kinded> = {
@@ -217,6 +227,7 @@ export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
     "cellHighlight",
     "allWhite",
     "bordered",
+    "rowHover",
   ];
   const keys = safeKeys(style);
   if (keys.length === 0 || keys.some((k) => defKeys.includes(k as keyof GridStyleDef))) {

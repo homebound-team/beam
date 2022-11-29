@@ -6,6 +6,8 @@ import {
   actionColumn,
   Button,
   cardStyle,
+  Chips,
+  collapseColumn,
   CollapseToggle,
   column,
   condensedStyle,
@@ -46,12 +48,12 @@ export function ClientSideSorting() {
     header: "Name",
     data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
   };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const valueColumn: GridColumn<Row> = { id: "value", header: "Value", data: ({ value }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, clientSideSort: false };
   return (
     <GridTable
       columns={[nameColumn, valueColumn, actionColumn]}
-      sorting={{ on: "client", initial: [valueColumn, "ASC"] }}
+      sorting={{ on: "client", initial: [valueColumn.id!, "ASC"] }}
       rows={[
         simpleHeader,
         { kind: "data", id: "1", data: { name: "c", value: 1 } },
@@ -247,7 +249,7 @@ export function NestedRows() {
     <GridTable
       columns={[arrowColumn, nameColumn]}
       {...{ rows: rowsWithHeader }}
-      sorting={{ on: "client", initial: [1, "ASC"] }}
+      sorting={{ on: "client", initial: ["c1", "ASC"] }}
     />
   );
 }
@@ -995,6 +997,7 @@ export function PrimaryColumnSorting() {
   const favNameColumn: GridColumn<FavoriteRow> = { header: () => "Name", data: ({ name }) => name };
   const favValueColumn: GridColumn<FavoriteRow> = { header: () => "Value", data: ({ value }) => value };
   const favoriteColumn: GridColumn<FavoriteRow> = {
+    id: "favorite",
     header: () => "Favorite",
     data: ({ favorite }) => ({
       content: <Icon icon={favorite ? "starFilled" : "star"} color={favorite ? Palette.Yellow500 : Palette.Gray900} />,
@@ -1013,7 +1016,7 @@ export function PrimaryColumnSorting() {
       <GridTable
         filter={filter}
         columns={[favNameColumn, favValueColumn, favoriteColumn]}
-        sorting={{ on: "client", primary: [favoriteColumn, "DESC"] }}
+        sorting={{ on: "client", primary: [favoriteColumn.id!, "DESC"] }}
         rows={[
           simpleHeader,
           // And the data is initially unsorted
@@ -1082,5 +1085,161 @@ export function RevealOnRowHover() {
         ]}
       />
     </>
+  );
+}
+
+export function ToggleCustomCollapse() {
+  const api = useGridTableApi<Row | ChildRow>();
+
+  const collapseCol = collapseColumn<Row | ChildRow>({
+    data: () => emptyCell,
+  });
+
+  const nameCol: GridColumn<Row | ChildRow> = {
+    header: "Name",
+    data: ({ name }, { row }) => {
+      return (
+        <>
+          <Button label={name!} variant="text" onClick={() => api.toggleCollapsedRow(row.id)} />
+          <CollapseToggle compact row={row} />
+        </>
+      );
+    },
+    child: ({ name }) => ({ content: name }),
+    mw: "160px",
+  };
+
+  return (
+    <>
+      <GridTable
+        columns={[collapseCol, nameCol]}
+        style={{ rowHeight: "fixed" }}
+        rows={[
+          simpleHeader,
+          {
+            id: "p1",
+            kind: "data",
+            data: { name: "Parent", value: 1 },
+            children: [
+              {
+                id: "c1",
+                kind: "child",
+                data: { name: "Child" },
+              },
+            ],
+          },
+        ]}
+        api={api}
+      />
+      <div>
+        <Button label={"Toggle Collpase"} variant="secondary" size="sm" onClick={() => api.toggleCollapsedRow("p1")} />
+      </div>
+    </>
+  );
+}
+
+type ExpandHeader = { id: "expandableHeader"; kind: "expandableHeader" };
+type Header = { id: "header"; kind: "header" };
+type ExpandableData = {
+  kind: "data";
+  data: {
+    firstName: string | undefined;
+    lastName: string | undefined;
+    birthdate: string | undefined;
+    age: number | undefined;
+    favoriteSports: string[] | undefined;
+    occupation: string | undefined;
+    manager: string | undefined;
+  };
+};
+type ExpandableRow = ExpandHeader | Header | ExpandableData;
+
+export function ExpandableColumns() {
+  const rows: GridDataRow<ExpandableRow>[] = useMemo(
+    () => [
+      // New reserved 'kind' "groupHeader" property for GridTable to position row correctly
+      { kind: "header", id: "header", data: {} },
+      { kind: "expandableHeader", id: "expandableHeader", data: {} },
+      {
+        kind: "data" as const,
+        id: `user:1`,
+        data: {
+          firstName: "Brandon",
+          lastName: "Dow",
+          birthdate: "Jan 29, 1986",
+          age: 36,
+          favoriteSports: ["Basketball", "Football"],
+          occupation: "Software Engineer",
+          manager: "Steve Thompson",
+        },
+      },
+    ],
+    [],
+  );
+
+  const columns: GridColumn<ExpandableRow>[] = useMemo(
+    () => [
+      selectColumn<ExpandableRow>({ sticky: "left" }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Address",
+        header: emptyCell,
+        data: () => "123 Sesame St",
+        w: "200px",
+        sticky: "left",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Employee",
+        header: (data, { expanded }) => (expanded ? "First Name" : emptyCell),
+        data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+        expandColumns: [
+          column<ExpandableRow>({
+            expandableHeader: emptyCell,
+            header: "Last Name",
+            data: ({ lastName }) => lastName,
+            w: "250px",
+          }),
+          column<ExpandableRow>({
+            expandableHeader: emptyCell,
+            header: "Birthdate",
+            data: ({ birthdate }) => birthdate,
+            w: "150px",
+          }),
+          column<ExpandableRow>({
+            expandableHeader: emptyCell,
+            header: "Age",
+            data: ({ age }) => age,
+            w: "80px",
+          }),
+        ],
+        w: "250px",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Occupation",
+        header: emptyCell,
+        data: ({ occupation }) => occupation,
+        w: "280px",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Manager",
+        header: emptyCell,
+        data: ({ manager }) => manager,
+        w: "280px",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Favorite Sports",
+        header: emptyCell,
+        data: ({ favoriteSports = [] }, { expanded }) =>
+          expanded ? <Chips values={favoriteSports} /> : favoriteSports.length,
+        w: "160px",
+        expandedWidth: "280px",
+      }),
+    ],
+    [],
+  );
+
+  return (
+    <div css={Css.df.fdc.bgGray100.p2.h("100vh").mw("fit-content").$}>
+      <GridTable stickyHeader columns={columns} rows={rows} style={{ allWhite: true }} as="div" />
+    </div>
   );
 }

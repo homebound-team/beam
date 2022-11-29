@@ -1,6 +1,6 @@
 {
   "name": "@homebound/beam",
-  "version": "2.194.1",
+  "version": "2.220.0",
   "author": "Homebound",
   "license": "MIT",
   "main": "dist/index.js",
@@ -77,7 +77,7 @@
     "@homebound/eslint-config": "1.5.1",
     "@homebound/rtl-react-router-utils": "^1.0.3",
     "@homebound/rtl-utils": "^2.59.3",
-    "@homebound/truss": "^1.113.0",
+    "@homebound/truss": "^1.121.1",
     "@homebound/tsconfig": "^1.0.3",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@semantic-release/exec": "^6.0.3",
@@ -121,6 +121,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^16.14.0",
     "semantic-release": "^17.4.0",
+    "storybook-addon-designs": "^6.3.1",
     "storybook-addon-performance": "^0.16.1",
     "ts-jest": "^26.5.3",
     "ts-node": "^9.1.1",
@@ -130,5 +131,6 @@
     "typescript-transform-paths": "^3.2.1",
     "vite": "^3.0.9",
     "watch": "^1.0.2"
-  }
+  },
+  "packageManager": "yarn@3.3.0"
 }

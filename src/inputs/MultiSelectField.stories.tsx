@@ -10,6 +10,12 @@ import { HasIdAndName, Optional } from "src/types";
 export default {
   component: MultiSelectField,
   title: "Workspace/Inputs/Multi Select Fields",
+  parameters: {
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36053%3A101882",
+    },
+  },
 } as Meta;
 
 type TestOption = {
@@ -81,6 +87,12 @@ export function MultiSelectFields() {
           placeholder="Placeholder Content"
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
           values={[] as Value[]}
+        />
+        <TestMultiSelectField
+          label="With Disabled Options"
+          options={options}
+          values={[] as Value[]}
+          disabledOptions={[options[0].id, { value: options[2].id, reason: "Example disabled tooltip" }]}
         />
       </div>
 

@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { GridDataRow, IconButton, IconButtonProps, RowStateContext } from "src/components/index";
+import { GridDataRow, IconButton, IconButtonProps, TableStateContext } from "src/components/index";
 import { useComputed } from "src/hooks";
 
 export interface GridTableCollapseToggleProps extends Pick<IconButtonProps, "compact"> {
@@ -9,9 +9,9 @@ export interface GridTableCollapseToggleProps extends Pick<IconButtonProps, "com
 /** Provides a chevron icons to collapse/un-collapse for parent/child tables. */
 export function CollapseToggle(props: GridTableCollapseToggleProps) {
   const { row, compact } = props;
-  const { rowState } = useContext(RowStateContext);
+  const { tableState } = useContext(TableStateContext);
 
-  const isCollapsed = useComputed(() => rowState.isCollapsed(row.id), [rowState]);
+  const isCollapsed = useComputed(() => tableState.isCollapsed(row.id), [tableState]);
   const iconKey = isCollapsed ? "chevronRight" : "chevronDown";
   const headerIconKey = isCollapsed ? "chevronsRight" : "chevronsDown";
 
@@ -23,7 +23,7 @@ export function CollapseToggle(props: GridTableCollapseToggleProps) {
 
   return (
     <IconButton
-      onClick={() => rowState.toggleCollapsed(row.id)}
+      onClick={() => tableState.toggleCollapsed(row.id)}
       icon={isHeader ? headerIconKey : iconKey}
       compact={compact}
     />

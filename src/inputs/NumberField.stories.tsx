@@ -8,6 +8,12 @@ import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
 export default {
   title: "Workspace/Inputs/Number Field",
   component: NumberField,
+  parameters: { 
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=1291%3A0",
+    }
+  },
 } as Meta;
 
 export function NumberFieldStyles() {
@@ -25,6 +31,7 @@ export function NumberFieldStyles() {
           helperText="Some really long helper text that we expect to wrap."
         />
         <ValidationNumberField label="Age Validated" value={-1} />
+        <ValidationNumberField label="Omit Error Message" value={-1} hideErrorMessage />
       </div>
 
       <div css={Css.df.fdc.gap2.$}>
@@ -98,7 +105,17 @@ function TestNumberField(props: Omit<NumberFieldProps, "onChange" | "onBlur" | "
   );
 }
 
-function ValidationNumberField({ label, compact, value }: { label: string; compact?: boolean; value: number }) {
+function ValidationNumberField({
+  label,
+  compact,
+  value,
+  hideErrorMessage,
+}: {
+  label: string;
+  compact?: boolean;
+  value: number;
+  hideErrorMessage?: boolean;
+}) {
   const [internalValue, setValue] = useState<number | undefined>(value);
   const isValid = useMemo(() => internalValue && internalValue > 0, [internalValue]);
   return (
@@ -108,6 +125,7 @@ function ValidationNumberField({ label, compact, value }: { label: string; compa
       value={internalValue}
       onChange={setValue}
       errorMsg={!isValid ? "Cannot be negative" : undefined}
+      hideErrorMessage={hideErrorMessage}
     />
   );
 }
