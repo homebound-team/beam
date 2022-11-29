@@ -2,12 +2,18 @@ import { Meta, Canvas, Story, Props } from "@storybook/addon-docs";
 import { useToast } from "./useToast";
 import { Button } from "../Button";
 import { withBeamDecorator } from "src/utils/sb";
+import { Toast } from "./Toast";
 
 <Meta title="Catalog/Toast" args={{ message: "Error", type: "error" }} decorators={[withBeamDecorator]} />
 
 export const Template = (args) => {
   const { showToast } = useToast();
-  return <Button onClick={() => showToast({ ...args })} label="Trigger Toast" />;
+  return (
+    <>
+      <Toast />
+      <Button onClick={() => showToast({ ...args })} label="Trigger Toast" />
+    </>
+  );
 };
 
 # Toast

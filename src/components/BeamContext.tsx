@@ -28,7 +28,6 @@ export interface BeamContextState {
   drawerCanCloseDetailsChecks: MutableRefObject<CanCloseCheck[][]>;
   /** The div for SuperDrawerHeader to portal into. */
   sdHeaderDiv: HTMLDivElement;
-  alertBannerState: MutableRefObject<AlertBannerProps | undefined>;
 }
 
 /** This is only exported internally, for useModal and useSuperDrawer, it's not a public API. */
@@ -42,7 +41,6 @@ export const BeamContext = createContext<BeamContextState>({
   drawerCanCloseChecks: new EmptyRef(),
   drawerCanCloseDetailsChecks: new EmptyRef(),
   sdHeaderDiv: undefined!,
-  alertBannerState: new EmptyRef(),
 });
 
 interface BeamProviderProps extends PropsWithChildren<PresentationContextProps> {}
@@ -67,7 +65,6 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
   const drawerCanCloseChecks = useRef<CanCloseCheck[]>([]);
   const drawerCanCloseDetailsChecks = useRef<CanCloseCheck[][]>([]);
   const sdHeaderDiv = useMemo(() => document.createElement("div"), []);
-  const alertBannerRef = useRef<AlertBannerProps | undefined>();
 
   // We essentially expose the refs, but with our own getters/setters so that we can
   // have the setters call `tick` to re-render this Provider
@@ -84,8 +81,6 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
       drawerCanCloseChecks,
       drawerCanCloseDetailsChecks,
       sdHeaderDiv,
-      // alertBannerState: alertBannerRef,
-      alertBannerState: new PretendRefThatTicks(alertBannerRef, tick),
     };
   }, [modalBodyDiv, modalFooterDiv]);
 

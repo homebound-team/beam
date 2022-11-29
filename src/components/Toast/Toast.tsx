@@ -4,8 +4,6 @@ import { useTestIds } from "src/utils";
 import { IconButton } from "../IconButton";
 import { useToastContext } from "./ToastContext";
 
-export type ToastTypes = "error" | "warning" | "success" | "info" | "alert";
-
 export function Toast() {
   const { setNotice, notice } = useToastContext();
   const tid = useTestIds({}, "toast");
@@ -43,3 +41,5 @@ const variantStyles: Record<ToastTypes, {}> = {
   alert: Css.bgGray200.gray900.$,
   error: Css.bgRed100.gray900.$,
 };
+
+export type ToastTypes = "error" | "warning" | "success" | "info" | "alert";

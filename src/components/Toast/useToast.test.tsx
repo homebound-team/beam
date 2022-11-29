@@ -1,7 +1,6 @@
-import { clickAndWait } from "@homebound/rtl-utils";
-import { useState } from "react";
 import { click, render } from "src/utils/rtl";
 import { Button } from "../Button";
+import { Toast } from "./Toast";
 import { useToast } from "./useToast";
 
 describe("useToast", () => {
@@ -19,7 +18,7 @@ describe("useToast", () => {
     const r = await render(<TestToastComponent />);
     // When triggering the toast and clicking on the close button
     click(r.toastButton());
-    await clickAndWait(r.toast_close());
+    click(r.toast_close());
     // Then expect it to be closed
     expect(r.toast).toNotBeInTheDom();
   });
@@ -29,9 +28,12 @@ function TestToastComponent() {
   const { showToast } = useToast();
   const showToastOnClick = () => {
     showToast({ message: "Test Toast", type: "error" });
-    setNoticeOpen(true);
   };
-  const [noticeOpen, setNoticeOpen] = useState(true);
 
-  return <Button label="toastButton" onClick={showToastOnClick} />;
+  return (
+    <>
+      <Toast />
+      <Button label="toastButton" onClick={showToastOnClick} />
+    </>
+  );
 }

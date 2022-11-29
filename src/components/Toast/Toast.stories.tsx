@@ -30,11 +30,21 @@ export function DefaultToast(args: ToastStoryProps) {
       }),
     [showToast],
   );
-  return <Button onClick={() => showToast({ message, type })} label={"Toast"} />;
+  return (
+    <>
+      <Toast />
+      <Button onClick={() => showToast({ message, type })} label={"Toast"} />
+    </>
+  );
 }
 
 export function ToastStory(args: ToastStoryProps) {
   const { ...noticeProps } = args;
   const { showToast } = useToast();
-  return <Button onClick={() => showToast({ ...noticeProps })} label={"Toast"} />;
+  return (
+    <>
+      <Toast />
+      <Button onClick={() => showToast({ ...noticeProps })} label={"Toast"} />
+    </>
+  );
 }

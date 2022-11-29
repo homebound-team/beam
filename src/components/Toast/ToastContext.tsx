@@ -1,5 +1,5 @@
 import React, { createContext, PropsWithChildren, ReactNode, useContext, useMemo, useState } from "react";
-import { Toast, ToastTypes } from "./Toast";
+import { ToastTypes } from "./Toast";
 
 export interface ToastNoticeProps {
   type: ToastTypes;
@@ -15,18 +15,13 @@ export const ToastContext = createContext<ToastContextProps>({
   setNotice: () => {
     throw new Error("Missing ToastProvider");
   },
-  notice: { type: "error", message: "" },
+  notice: undefined,
 });
 
 export function ToastProvider(props: PropsWithChildren<{}>) {
   const [notice, setNotice] = useState<ToastNoticeProps>();
   const contextValue = useMemo(() => ({ setNotice, notice }), [setNotice, notice]);
-  return (
-    <ToastContext.Provider value={contextValue}>
-      {props.children}
-      <Toast />
-    </ToastContext.Provider>
-  );
+  return <ToastContext.Provider value={contextValue}>{props.children}</ToastContext.Provider>;
 }
 
 export function useToastContext() {

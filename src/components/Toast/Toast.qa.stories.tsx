@@ -24,7 +24,12 @@ export function SuccessToast() {
       }),
     [showToast],
   );
-  return <Button onClick={() => showToast({ message: "This is a success toast", type: "success" })} label={"Toast"} />;
+  return (
+    <>
+      <Toast />
+      <Button onClick={() => showToast({ message: "This is a success toast", type: "success" })} label={"Toast"} />
+    </>
+  );
 }
 
 export function ErrorToast() {
@@ -37,7 +42,12 @@ export function ErrorToast() {
       }),
     [showToast],
   );
-  return <Button onClick={() => showToast({ message: "This is an error toast", type: "error" })} label={"Toast"} />;
+  return (
+    <>
+      <Toast />
+      <Button onClick={() => showToast({ message: "This is an error toast", type: "error" })} label={"Toast"} />
+    </>
+  );
 }
 
 export function WarningToast() {
@@ -50,7 +60,12 @@ export function WarningToast() {
       }),
     [showToast],
   );
-  return <Button onClick={() => showToast({ message: "This is a warning toast", type: "warning" })} label={"Toast"} />;
+  return (
+    <>
+      <Toast />
+      <Button onClick={() => showToast({ message: "This is a warning toast", type: "warning" })} label={"Toast"} />
+    </>
+  );
 }
 
 export function InfoToast() {
@@ -63,7 +78,12 @@ export function InfoToast() {
       }),
     [showToast],
   );
-  return <Button onClick={() => showToast({ message: "This is an info toast", type: "info" })} label={"Toast"} />;
+  return (
+    <>
+      <Toast />
+      <Button onClick={() => showToast({ message: "This is an info toast", type: "info" })} label={"Toast"} />
+    </>
+  );
 }
 
 export function AlertToast() {
@@ -76,5 +96,10 @@ export function AlertToast() {
       }),
     [showToast],
   );
-  return <Button onClick={() => showToast({ message: "This is an alert toast", type: "alert" })} label={"Toast"} />;
+  return (
+    <>
+      <Toast />
+      <Button onClick={() => showToast({ message: "This is an alert toast", type: "alert" })} label={"Toast"} />
+    </>
+  );
 }
