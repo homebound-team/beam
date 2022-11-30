@@ -157,6 +157,8 @@ export interface GridTableProps<R extends Kinded, X> {
    * This is beneficial when looking at the same table, but of a different subject (i.e. Project A's PreCon Schedule vs Project A's Construction schedule)
    */
   visibleColumnsStorageKey?: string;
+  /** Scroll to active row if it set as true */
+  initActiveRow?: boolean;
 }
 
 /**
@@ -196,6 +198,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     activeRowId,
     activeCellId,
     visibleColumnsStorageKey,
+    initActiveRow,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
@@ -347,6 +350,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
 
     return [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, filteredRowIds];
   }, [as, api, filter, maybeSorted, columns, style, rowStyles, sortOn, columnSizes, collapsedIds, getCount]);
+
+  // Scroll to index of activeRowId if initActiveRow is set
+  if(initActiveRow && activeRowId){
+    const index = visibleDataRows.map((row)=> row[0]).findIndex(row => row.id === activeRowId.split("_")[1]);
+    if(index > 0)
+      api.scrollToIndex(index);
+  }
 
   // Once our header rows are created we can organize them in expected order.
   const tableHeadRows = totalsRows.concat(expandableHeaderRows).concat(headerRows);

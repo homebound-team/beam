@@ -1138,6 +1138,47 @@ export function ToggleCustomCollapse() {
   );
 }
 
+export function InitActiveRow() {
+  const nameColumn: GridColumn<RowWithTotals> = {
+    header: "Name",
+    totals: "Totals",
+    data: ({ name }) => name,
+  };
+  const valueColumn: GridColumn<RowWithTotals> = {
+    header: "Value",
+    totals: ({ value }) => value,
+    data: ({ value }) => value,
+  };
+  const actionColumn: GridColumn<RowWithTotals> = { header: "Actions", totals: "", data: "Actions"};
+  const rows: GridDataRow<RowWithTotals>[] = useMemo(
+    () => [
+      { kind: "totals", id: "totals", data: { value: 100 } },
+      simpleHeader,
+      ...zeroTo(15).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `Name ${i}`, value: i } })),
+    ],
+    [],
+  );
+
+  const api = useGridTableApi<RowWithTotals>();
+  return (
+    <div css={Css.wPx(500).hPx(500).$}>
+      <GridTable
+        columns={[
+          nameColumn,
+          valueColumn,
+          actionColumn,
+        ]}
+        stickyHeader
+        rows={rows}
+        as="virtual"
+        api={api}
+        initActiveRow={true}
+        activeRowId="data_10"
+      />
+    </div>
+  );
+}
+
 type ExpandHeader = { id: "expandableHeader"; kind: "expandableHeader" };
 type Header = { id: "header"; kind: "header" };
 type ExpandableData = {
