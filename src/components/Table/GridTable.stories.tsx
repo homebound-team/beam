@@ -65,6 +65,42 @@ export function ClientSideSorting() {
   );
 }
 
+export function ClientSideSortingWithApi() {
+  const nameColumn: GridColumn<Row> = {
+    header: "Name",
+    data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
+  };
+  const valueColumn: GridColumn<Row> = { id: "value", header: "Value", data: ({ value }) => value };
+  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, clientSideSort: false };
+  const api = useGridTableApi<Row>();
+  const sortKey = useComputed(() => api.getSortKey(), [api]);
+  const sortDirection = useComputed(() => api.getSortDirection(), [api]);
+  return (
+    <>
+    <div>
+      Current Sort Column: {sortKey}
+    </div>
+    <div>
+      Direction: {sortDirection}
+    </div>
+    <div>
+     Toggle
+    </div>
+    <GridTable
+      columns={[nameColumn, valueColumn, actionColumn]}
+      sorting={{ on: "client", initial: [valueColumn.id!, "ASC"] }}
+      rows={[
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "B", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
+      ]}
+      api={api}
+    />
+    </>
+  );
+}
+
 export const Hovering = newStory(
   () => {
     const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
