@@ -151,11 +151,11 @@ const variantStyles: (
   },
 
   tertiary: {
-    baseStyles: Css.bgTransparent.lightBlue700.if(contrast).lightBlue400.$,
+    baseStyles: Css.bgTransparent.lightBlue700.if(contrast).white.$,
     hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
     pressedStyles: Css.lightBlue900.if(contrast).bgWhite.gray900.$,
     disabledStyles: Css.gray400.if(contrast).gray700.$,
-    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.LightBlue700}`).bgGray700.white.$,
+    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.LightBlue400}`).bgGray700.white.$,
   },
 
   tertiaryDanger: {
