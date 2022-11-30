@@ -73,7 +73,7 @@ export function ClientSideSortingWithApi() {
   const valueColumn: GridColumn<Row> = { id: "value", header: "Value", data: ({ value }) => value };
   const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, clientSideSort: false };
   const api = useGridTableApi<Row>();
-  const sortKey = useComputed(() => api.getSortKey(), [api]);
+  const sortKey = useComputed(() => api.getSortColumn(), [api]);
   const sortDirection = useComputed(() => api.getSortDirection(), [api]);
   return (
     <>
