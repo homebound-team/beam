@@ -70,32 +70,32 @@ export function ClientSideSortingWithApi() {
     data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
   };
   const valueColumn: GridColumn<Row> = { id: "value", header: "Value", data: ({ value }) => value };
-  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div>, clientSideSort: false };
+  const countColumn: GridColumn<Row> = { id: "count", header: "Count", data: ({ value }) => value ? (value % 2) + 2 : 0 };
   const api = useGridTableApi<Row>();
   const sortKey = useComputed(() => api.getSortColumn(), [api]);
   const sortDirection = useComputed(() => api.getSortDirection(), [api]);
+
   return (
     <>
-    <div>
-      Current Sort Column: {sortKey}
-    </div>
-    <div>
-      Direction: {sortDirection}
-    </div>
-    <div>
-     Toggle
-    </div>
-    <GridTable
-      columns={[nameColumn, valueColumn, actionColumn]}
-      sorting={{ on: "client", initial: [valueColumn.id!, "ASC"] }}
-      rows={[
-        simpleHeader,
-        { kind: "data", id: "1", data: { name: "c", value: 1 } },
-        { kind: "data", id: "2", data: { name: "B", value: 2 } },
-        { kind: "data", id: "3", data: { name: "a", value: 3 } },
-      ]}
-      api={api}
-    />
+      <div>Current Sort Column: {sortKey}</div>
+      <div>Direction: {sortDirection}</div>
+      <div css={Css.df.gap1.$}>
+        <Button label="Set default sort" onClick={() => api.setSortColumn("")} />
+        <Button label="Toggle Name Sort" onClick={() => api.setSortColumn(nameColumn.id!)} />
+        <Button label="Toggle Value Sort" onClick={() => api.setSortColumn(valueColumn.id!)} />
+        <Button label="Toggle Count Sort" onClick={() => api.setSortColumn(countColumn.id!)} />
+      </div>
+      <GridTable
+        columns={[nameColumn, valueColumn, countColumn]}
+        sorting={{ on: "client", initial: [valueColumn.id!, "ASC"] }}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "c", value: 1, count: 2 } },
+          { kind: "data", id: "2", data: { name: "B", value: 2, count: 6 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3, count: 4 } },
+        ]}
+        api={api}
+      />
     </>
   );
 }
