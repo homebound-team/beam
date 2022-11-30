@@ -141,4 +141,8 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   public setSortColumn(columnId: string) {
     return this.tableState.setSortKey(columnId);
   }
+
+  public setSortColumn(columnId: string) {
+    return this.tableState.setSortKey(columnId);
+  }
 }
