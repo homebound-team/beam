@@ -56,6 +56,7 @@ export type GridTableApi<R extends Kinded> = {
   getVisibleColumnIds: () => string[];
   getSortColumn(): string | undefined;
   getSortDirection(): string | undefined;
+  setSortColumn(columnId: string): void;
 };
 
 // Using `FooImpl`to keep the public GridTableApi definition separate.
@@ -133,5 +134,9 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public getSortDirection() {
     return this.tableState.sortState?.current?.direction;
+  }
+
+  public setSortColumn(columnId: string) {
+    return this.tableState.setSortKey(columnId);
   }
 }
