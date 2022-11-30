@@ -1,13 +1,14 @@
 import { create } from "@storybook/theming";
+import { Palette } from "../src/Css";
 
 export default create({
   base: "light",
 
-  colorPrimary: "#0369A1",
-  colorSecondary: "#646464",
+  colorPrimary: Palette.LightBlue700,
+  colorSecondary: Palette.LightBlue300,
 
   // UI
-  appBg: "white",
+  appBg: Palette.White,
   appContentBg: "#F7F5F5",
   appBorderRadius: 4,
 
@@ -16,22 +17,22 @@ export default create({
   fontCode: "monospace",
 
   // Text colors
-  textColor: "black",
+  textColor: Palette.Gray900,
   textInverseColor: "rgba(255,255,255,0.9)",
 
   // Toolbar default and active colors
-  barTextColor: "white",
-  barSelectedColor: "black",
-  barBg: "#0369A1",
+  barTextColor: Palette.Gray700,
+  barSelectedColor: Palette.LightBlue700,
+  barBg: Palette.White,
 
   // Form colors
-  inputBg: "white",
-  inputBorder: "#646464",
-  inputTextColor: "black",
+  inputBg: Palette.White,
+  inputBorder: Palette.Gray200,
+  inputTextColor: Palette.Gray900,
   inputBorderRadius: 4,
 
   brandTitle: "Beam Storybook",
-  brandUrl: "https://homebound.com",
-  brandImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/JavaScript-logo.png/600px-JavaScript-logo.png",
+  brandUrl: "/",
+  brandImage: "/BeamLockup.png",
   brandTarget: "_self",
 });

@@ -1,7 +1,8 @@
-import { Parameters, StoryFn } from "@storybook/addons";
+import { Parameters } from "@storybook/addons";
+import { DecoratorFn } from "@storybook/react";
 import { configure } from "mobx";
+import { Title } from "src/docs/Title";
 import { CssReset } from "../src";
-import beamTheme from "./beamTheme";
 
 // formState doesn't use actions
 configure({ enforceActions: "never" });
@@ -12,7 +13,7 @@ export const parameters: Parameters = {
   actions: { argTypesRegex: "^on.*" },
   options: {
     // https://storybook.js.org/docs/react/writing-stories/naming-components-and-hierarchy#sorting-stories
-    storySort: { order: ["Intro", "Foundations", "Catalog", "Design QA", "Workspace"] },
+    storySort: { order: ["Getting Started", "Catalog", "Design QA", "Workspace"] },
   },
   // https://storybook.js.org/docs/react/essentials/backgrounds
   backgrounds: {
@@ -35,14 +36,16 @@ export const parameters: Parameters = {
     // https://storybook.js.org/docs/react/essentials/controls#hide-nocontrols-warning
     hideNoControlsWarning: true,
   },
-  docs: { theme: beamTheme },
+  docs: {
+    components: { Title },
+  },
 };
 
 // https://storybook.js.org/docs/react/writing-stories/decorators#global-decorators
-export const decorators = [withReset];
+export const decorators = [withReset()];
 
-function withReset(storyFn: StoryFn) {
-  return (
+function withReset(): DecoratorFn {
+  return (storyFn) => (
     <>
       <CssReset />
       {storyFn()}

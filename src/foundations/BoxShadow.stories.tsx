@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react";
 import { Css } from "src/Css";
 
 export default {
-  title: "Foundations/Box Shadow",
+  title: "Catalog/Foundations/Box Shadow",
 } as Meta;
 
 export const BoxShadow = () => (

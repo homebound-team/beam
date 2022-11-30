@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react";
 import { Css } from "src/Css";
 
 export default {
-  title: "Foundations/Typography",
+  title: "Catalog/Foundations/Typography",
 } as Meta;
 
 export const Typography = () => {

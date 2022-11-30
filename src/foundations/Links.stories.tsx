@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react";
 import { navLink } from "src/components";
 
 export default {
-  title: "Foundations/Links",
+  title: "Catalog/Foundations/Links",
 } as Meta;
 
 export const Links = () => {

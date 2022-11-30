@@ -1,4 +1,4 @@
-import { Meta, ArgsTable, Canvas, Story, Props } from "@storybook/addon-docs";
+import { Meta, Title, Canvas, Story, Props, Source, Description } from "@storybook/addon-docs";
 import { Button } from "./Button";
 import { Css } from "../Css";
 
@@ -18,11 +18,14 @@ export const Template = (args) => {
   return <Button label="Test" onClick={onClick} {...args} />;
 };
 
-# Button
-
-#### Button component for triggering actions or controls.
+export const Template2 = (args) => {
+  const onClick = () => {};
+  return <Button label="Test2" onClick={onClick} {...args} />;
+};
 
 # Example
+
+<Title>Test</Title>
 
 <Canvas>
   <Story name="PrimaryButton">{Template.bind({})}</Story>
@@ -38,7 +41,7 @@ export const Template = (args) => {
 
 <Canvas>
   <Story name="Variant">
-    <div css={Css.df.gap2.$}>
+    <div css={Css.df.gap1.$}>
       <Button variant="primary" label="Create" />
       <Button variant="secondary" label="Add Item" />
       <Button variant="tertiary" label="Cancel" />
@@ -46,6 +49,16 @@ export const Template = (args) => {
       <Button variant="danger" label="Delete" />
       <Button variant="text" label="Edit" />
     </div>
+  </Story>
+</Canvas>
+
+{" "}
+
+{" "}
+
+<Canvas>
+  <Story name="Sizer">
+    <div css={Css.dg.gtc("repeat(4, max-content)").jifs.gap("8px 16px").$}>Hi HI HI</div>
   </Story>
 </Canvas>
 

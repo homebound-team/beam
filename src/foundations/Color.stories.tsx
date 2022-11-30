@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react";
 import { Css, Palette, px } from "src/Css";
 
 export default {
-  title: "Foundations/Color",
+  title: "Catalog/Foundations/Color",
 } as Meta;
 
 export const Color = () => {

@@ -5,7 +5,7 @@ import { Css } from "src/Css";
 
 export default {
   component: AvatarButton,
-  title: "Workspace/Components/Avatar Button",
+  // title: "Workspace/Components/Avatar Button",
   args: {
     onClick: action("onClick"),
     src: "captain-marvel.jpg",
@@ -28,7 +28,7 @@ export default {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31578%3A99818",
-    }
+    },
   },
 } as Meta<AvatarButtonProps>;
 

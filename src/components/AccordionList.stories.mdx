@@ -2,7 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from "@storybook/addon-docs";
 import { AccordionList } from "./AccordionList";
 
 <Meta
-  title="Catalog/AccordionList"
+  title="Catalog/Accordions/AccordionList"
   component={AccordionList}
   args={{
     accordions: [
@@ -54,10 +54,18 @@ export const Template = (args) => {
   return <AccordionList {...args} />;
 };
 
-# Accordion
+# AccordionList
+
+The `AccordionList` component is a group `Accordion` components. This grouping allows the for defining interactions between multiple `Accordion`s. Specifically their size, layout, and whether only one or multiple can be opened at a time.
+
+## Example
 
 <Canvas>
   <Story name="AccordionList">{Template.bind({})}</Story>
 </Canvas>
+
+### Properties
+
+Modifying these properties will update the above example.
 
 <ArgsTable story="AccordionList" />

@@ -4,7 +4,7 @@ import { AccordionList } from "./AccordionList";
 
 export default {
   component: AccordionList,
-  title: "Workspace/Components/Accordion",
+  // title: "Workspace/Components/Accordion",
   parameters: { backgrounds: { default: "white" } },
 } as Meta;
 

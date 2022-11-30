@@ -26,14 +26,13 @@ import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils
 
 export default {
   component: Filters,
-  title: "Workspace/Components/Filter",
   decorators: [withDimensions(), withRouter(), withBeamDecorator],
-  parameters: { 
+  parameters: {
     layout: "fullscreen",
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101334",
-    }
+    },
   },
 } as Meta;
 

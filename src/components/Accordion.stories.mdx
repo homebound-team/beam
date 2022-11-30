@@ -2,7 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from "@storybook/addon-docs";
 import { Accordion } from "./Accordion";
 
 <Meta
-  title="Catalog/Accordion"
+  title="Catalog/Accordions/Accordion"
   component={Accordion}
   args={{ title: "Captain America" }}
   argTypes={{
@@ -36,8 +36,16 @@ export const Template = (args) => {
 
 # Accordion
 
+The `Accordion` component allows for expanding and collapsing details of a given subject.
+
+## Example
+
 <Canvas>
   <Story name="Accordion">{Template.bind({})}</Story>
 </Canvas>
+
+### Properties
+
+Modifying these properties will update the above example.
 
 <ArgsTable story="Accordion" exclude={["index", "setExpandedIndex"]} />
