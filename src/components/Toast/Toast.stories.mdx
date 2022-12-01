@@ -1,0 +1,31 @@
+import { Meta, Canvas, Story, Props } from "@storybook/addon-docs";
+import { useToast } from "./useToast";
+import { Button } from "../Button";
+import { withBeamDecorator } from "src/utils/sb";
+import { Toast } from "./Toast";
+
+<Meta title="Catalog/Toast" args={{ message: "Error", type: "error" }} decorators={[withBeamDecorator]} />
+
+export const Template = (args) => {
+  const { showToast } = useToast();
+  return (
+    <>
+      <Toast />
+      <Button onClick={() => showToast({ ...args })} label="Trigger Toast" />
+    </>
+  );
+};
+
+# Toast
+
+#### Toast component for showing alerts.
+
+# Example
+
+<Canvas>
+  <Story name="Toast">{Template.bind({})}</Story>
+</Canvas>
+
+# API Reference
+
+<Props story={"Toast"} />
