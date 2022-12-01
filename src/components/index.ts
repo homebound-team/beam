@@ -37,4 +37,5 @@ export type { RouteTab, RouteTabWithContent, Tab, TabWithContent } from "./Tabs"
 export * from "./Tag";
 export * from "./Toast/Toast";
 export { useToast } from "./Toast/useToast";
+export type { UseToastProps } from "./Toast/useToast";
 export * from "./Tooltip";
