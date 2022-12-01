@@ -183,6 +183,14 @@ const variantStyles: (
     disabledStyles: Css.lightBlue300.if(contrast).lightBlue700.$,
     focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
+
+  headerMenu: {
+    baseStyles: Css.bgLightBlue700.white.if(contrast).bgGray900.$,
+    hoverStyles: Css.bgLightBlue900.if(contrast).bgLightBlue500.$,
+    pressedStyles: Css.bgLightBlue500.if(contrast).bgLightBlue900.$,
+    disabledStyles: Css.bgLightBlue200.if(contrast).gray600.bgLightBlue900.$,
+    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
+  },
 });
 
 const sizeStyles: Record<ButtonSize, {}> = {
@@ -198,4 +206,4 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
 };
 
 export type ButtonSize = "sm" | "md" | "lg";
-export type ButtonVariant = "primary" | "secondary" | "tertiary" | "tertiaryDanger" | "danger" | "text";
+export type ButtonVariant = "primary" | "secondary" | "tertiary" | "tertiaryDanger" | "danger" | "text" | "headerMenu";

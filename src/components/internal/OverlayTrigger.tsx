@@ -36,6 +36,7 @@ export interface OverlayTriggerProps {
   variant?: ButtonVariant;
   hideEndAdornment?: boolean;
   showActiveBorder?: boolean;
+  contrast?: boolean;
 }
 
 export function OverlayTrigger(props: OverlayTriggerProps) {
@@ -51,6 +52,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     variant,
     hideEndAdornment,
     showActiveBorder = false,
+    contrast = false,
   } = props;
   const popoverRef = useRef(null);
   const { overlayProps: positionProps } = useOverlayPosition({
@@ -72,6 +74,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
       {isTextButton(trigger) ? (
         <Button
           variant={variant ? variant : "secondary"}
+          contrast={contrast}
           {...trigger}
           menuTriggerProps={menuTriggerProps}
           buttonRef={buttonRef}

@@ -10,6 +10,7 @@ import {
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
+import { ButtonVariant } from "./Button";
 
 interface ButtonMenuProps extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
   items: MenuItem[];
@@ -17,10 +18,12 @@ interface ButtonMenuProps extends Pick<OverlayTriggerProps, "trigger" | "placeme
   searchable?: boolean;
   // for storybook purposes
   defaultOpen?: boolean;
+  variant?: ButtonVariant;
+  contrast?: boolean;
 }
 
 export function ButtonMenu(props: ButtonMenuProps) {
-  const { defaultOpen, disabled, items, persistentItems, trigger, searchable } = props;
+  const { defaultOpen, disabled, items, persistentItems, trigger, searchable, variant, contrast = false } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -30,13 +33,14 @@ export function ButtonMenu(props: ButtonMenuProps) {
   );
 
   return (
-    <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
+    <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid} variant={variant} contrast={contrast}>
       <Menu
         ariaMenuProps={menuProps}
         onClose={() => state.close()}
         items={items}
         persistentItems={persistentItems}
         searchable={searchable}
+        contrast={contrast}
         {...tid}
       />
     </OverlayTrigger>

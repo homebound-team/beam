@@ -222,3 +222,49 @@ export function IconMenuWtihSearchableList() {
 
   return <ButtonMenu defaultOpen trigger={{ icon: "archive" }} items={menuItems} searchable />;
 }
+
+export function MenuWithContrast() {
+  const menuItems: MenuItem[] = [
+    { label: "Page action", onClick: action("Test item clicked") },
+    { label: "Internal Link", onClick: "/fakeRoute" },
+    { label: "External Link - Homebound.com", onClick: "https://www.homebound.com" },
+  ];
+
+  return (
+    <>
+      <div css={Css.df.fdr.$}>
+        <div>
+          <h2 css={Css.lg.$}>Default - Without Contrast</h2>
+          <ButtonMenu
+            trigger={{ label: "Menu trigger" }}
+            items={menuItems}
+            persistentItems={[
+              { label: "Persistent Action", onClick: action("Persistent action clicked") },
+              { label: "Destructive Action", onClick: action("Destructive Action Clicked"), destructive: true },
+            ]}
+            defaultOpen
+          />
+        </div>
+
+        <div css={Css.mlPx(200).$}>
+          <h2 css={Css.lg.$}>With Contrast</h2>
+          <ButtonMenu
+            trigger={{ label: "Menu trigger" }}
+            items={menuItems}
+            persistentItems={[
+              { label: "Persistent Action", onClick: action("Persistent action clicked") },
+              { label: "Destructive Action", onClick: action("Destructive Action Clicked"), destructive: true },
+            ]}
+            defaultOpen
+            contrast={true}
+            variant={"headerMenu"}
+          />
+        </div>
+      </div>
+
+      <div css={Css.df.fdc.$}>
+        
+      </div>
+    </>
+  );
+}

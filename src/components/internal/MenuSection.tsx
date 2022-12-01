@@ -11,10 +11,11 @@ interface MenuSectionProps {
   section: Node<MenuItem>;
   state: TreeState<MenuItem>;
   onClose: VoidFunction;
+  contrast?: boolean;
 }
 
 export function MenuSectionImpl(props: MenuSectionProps) {
-  const { section, state, onClose } = props;
+  const { section, state, onClose, contrast = false } = props;
   const { itemProps, groupProps } = useMenuSection(props.section);
   const { separatorProps } = useSeparator({ elementType: "li" });
   const isPersistentSection = section.key !== state.collection.getFirstKey();
@@ -23,10 +24,10 @@ export function MenuSectionImpl(props: MenuSectionProps) {
   return (
     <>
       {isPersistentSection && <li {...separatorProps} css={Css.bt.bGray200.$} />}
-      <li {...itemProps} css={Css.if(!isPersistentSection).overflowAuto.$}>
+      <li {...itemProps} css={Css.if(!isPersistentSection).overflowAuto.if(contrast).white.$}>
         <ul css={Css.listReset.$} {...groupProps} {...tid[isPersistentSection ? "persistentItems" : "menuItems"]}>
           {[...section.childNodes].map((item) => (
-            <MenuItemImpl key={item.key} item={item} state={state} onClose={onClose} {...tid} />
+            <MenuItemImpl key={item.key} item={item} state={state} onClose={onClose} contrast={contrast} {...tid} />
           ))}
         </ul>
       </li>
