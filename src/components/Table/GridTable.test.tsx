@@ -29,8 +29,8 @@ const rows: GridDataRow<Row>[] = [
 ];
 
 // Make a `NestedRow` ADT for a table with a header + 3 levels of nesting
-type TotalsRow = { kind: "totals"; id: string; data: {} };
-type HeaderRow = { kind: "header"; id: string; data: {} };
+type TotalsRow = { kind: "totals"; id: string; data: undefined };
+type HeaderRow = { kind: "header"; id: string; data: undefined };
 type ParentRow = { kind: "parent"; id: string; data: { name: string } };
 type ChildRow = { kind: "child"; id: string; data: { name: string } };
 type GrandChildRow = { kind: "grandChild"; id: string; data: { name: string } };
@@ -2255,7 +2255,10 @@ describe("GridTable", () => {
     }
 
     const tableIdentifier = "persistCollapse";
-    const staticRows: GridDataRow<NestedRow>[] = [{ kind: "totals" as const, id: "totals", data: {} }, simpleHeader];
+    const staticRows: GridDataRow<NestedRow>[] = [
+      { kind: "totals" as const, id: "totals", data: undefined },
+      simpleHeader,
+    ];
     const initRows: GridDataRow<NestedRow>[] = [
       ...staticRows,
       {
@@ -2324,7 +2327,10 @@ describe("GridTable", () => {
       );
     }
 
-    const staticRows: GridDataRow<NestedRow>[] = [{ kind: "totals" as const, id: "totals", data: {} }, simpleHeader];
+    const staticRows: GridDataRow<NestedRow>[] = [
+      { kind: "totals" as const, id: "totals", data: undefined },
+      simpleHeader,
+    ];
     const initRows: GridDataRow<NestedRow>[] = [
       ...staticRows,
       {

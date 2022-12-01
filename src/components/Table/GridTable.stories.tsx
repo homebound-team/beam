@@ -210,7 +210,7 @@ export function NoRowsFallback() {
 }
 
 // Make a `Row` ADT for a table with a header + 3 levels of nesting
-type HeaderRow = { kind: "header"; data: {} };
+type HeaderRow = { kind: "header"; data: undefined };
 type ParentRow = { kind: "parent"; id: string; data: { name: string } };
 type ChildRow = { kind: "child"; id: string; data: { name: string } };
 type GrandChildRow = { kind: "grandChild"; id: string; data: { name: string } };
