@@ -193,3 +193,32 @@ export function WithTooltip() {
 
   return <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} tooltip="Tool tip text" />;
 }
+
+export function WithSearchListItems() {
+  const menuItems: MenuItem[] = [
+    { label: "Austin", onClick: action("Austin") },
+    { label: "Santa Rosa", onClick: action("Santa Rosa") },
+    { label: "Houston", onClick: action("Houston") },
+    { label: "Driftwood", onClick: action("Driftwood") },
+  ];
+
+  return (
+    <ButtonMenu
+      defaultOpen
+      trigger={{ label: "Select a cohort" }}
+      items={menuItems}
+      searchable
+      persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+    />
+  );
+}
+
+export function IconMenuWtihSearchableList() {
+  const menuItems: MenuItem[] = [
+    { label: "Design doc", onClick: action("Austin") },
+    { label: "Expense report", onClick: action("Expense report") },
+    { label: "Training plan", onClick: action("Training plan") },
+  ];
+
+  return <ButtonMenu defaultOpen trigger={{ icon: "archive" }} items={menuItems} searchable />;
+}

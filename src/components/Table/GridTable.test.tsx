@@ -1314,6 +1314,39 @@ describe("GridTable", () => {
     expectRenderedRows();
   });
 
+  it("can check if row is collapsed via api", async () => {
+    // Given a parent with a child and grandchild
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          {
+            ...{ kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+            children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
+          },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<NestedRow>();
+      api.current = _api;
+      return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
+    }
+    const r = await render(<Test />);
+    // And all three rows are initially rendered
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
+    expectRenderedRows("p1", "p1c1", "p1c1g1");
+    // When the child is collapsed
+    api.current!.toggleCollapsedRow(rows[0].children![0].id);
+    // Then isCollapsed for this row should be true
+    expect(api.current!.isCollapsedRow(rows[0].children![0].id)).toBeTruthy();
+    // And nothing needed to re-render
+    expectRenderedRows();
+  });
+
   it("persists collapse", async () => {
     const tableIdentifier = "gridTableTest";
     // Given that parent 2 is set to collapsed in local storage
@@ -1758,7 +1791,7 @@ describe("GridTable", () => {
     // Then each group rows selected state should reflect the children that match the filter
     expect(cellAnd(r, 1, 1, "select")).toBeChecked();
     expect(cellAnd(r, 2, 1, "select")).toBeChecked();
-    //because the parent matches the filter, and the child was selected, the new behavior shows the nested childs of matched parent, child should keep selected
+    // because the parent matches the filter, and the child was selected, the new behavior shows the nested childs of matched parent, child should keep selected
     expect(cellAnd(r, 3, 1, "select")).toBeChecked();
     // And the API reflects the expected selected states of rows that match the filter
     expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c1", "p1", "p1c2", "p1c1"]);
