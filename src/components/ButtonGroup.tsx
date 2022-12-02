@@ -63,9 +63,8 @@ function GroupButton(props: GroupButtonProps) {
             {...focusProps}
             {...hoverProps}
             css={{
-              ...Css.buttonBase.px2.br0.$,
+              ...Css.buttonBase.px2.br0.h100.$,
               "&:disabled": Css.gray400.cursorNotAllowed.bGray300.$,
-              ...sizeStyles[size],
               ...(isFocusVisible ? defaultFocusRingStyles : {}),
               ...(active ? activeStyles : {}),
               ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
