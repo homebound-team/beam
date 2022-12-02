@@ -29,7 +29,7 @@ export function ButtonGroup(props: ButtonGroupProps) {
   const { buttons, disabled = false, size = "sm" } = props;
   const tid = useTestIds(props, "buttonGroup");
   return (
-    <div {...tid} css={sizeStyles[size]}>
+    <div {...tid} css={Css.df.add(sizeStyles[size]).$}>
       {buttons.map(({ disabled: buttonDisabled, ...buttonProps }, i) => (
         // Disable the button if the ButtonGroup is disabled or if the current button is disabled.
         <GroupButton key={i} {...buttonProps} disabled={disabled || buttonDisabled} size={size} {...tid} />
@@ -51,31 +51,34 @@ function GroupButton(props: GroupButtonProps) {
   const { hoverProps, isHovered } = useHover(ariaProps);
   const tid = useTestIds(props);
 
-  return maybeTooltip({
-    title: resolveTooltip(disabled, tooltip),
-    placement: "top",
-    children: (
-      <button
-        ref={ref}
-        {...buttonProps}
-        {...focusProps}
-        {...hoverProps}
-        css={{
-          ...Css.buttonBase.$,
-          ...getButtonStyles(),
-          ...sizeStyles[size],
-          ...(isFocusVisible ? defaultFocusRingStyles : {}),
-          ...(active ? activeStyles : {}),
-          ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
-          ...(icon ? iconStyles[size] : {}),
-        }}
-        {...tid[defaultTestId(text ?? icon ?? "button")]}
-      >
-        {icon && <Icon icon={icon} />}
-        {text}
-      </button>
-    ),
-  });
+  return (
+    <span css={getButtonStyles()}>
+      {maybeTooltip({
+        title: resolveTooltip(disabled, tooltip),
+        placement: "top",
+        children: (
+          <button
+            ref={ref}
+            {...buttonProps}
+            {...focusProps}
+            {...hoverProps}
+            css={{
+              ...Css.buttonBase.px2.br0.h100.$,
+              "&:disabled": Css.gray400.cursorNotAllowed.bGray300.$,
+              ...(isFocusVisible ? defaultFocusRingStyles : {}),
+              ...(active ? activeStyles : {}),
+              ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
+              ...(icon ? iconStyles[size] : {}),
+            }}
+            {...tid[defaultTestId(text ?? icon ?? "button")]}
+          >
+            {icon && <Icon icon={icon} />}
+            {text}
+          </button>
+        ),
+      })}
+    </span>
+  );
 }
 
 const pressedStyles = Css.bgGray200.$;
@@ -85,8 +88,7 @@ const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 
 function getButtonStyles() {
   return {
-    ...Css.z1.px2.bgWhite.bGray300.bw1.ba.gray900.br0.$,
-    "&:disabled": Css.gray400.cursorNotAllowed.bGray300.$,
+    ...Css.z1.bgWhite.bGray300.bw1.ba.gray900.br0.overflowHidden.$,
     // Our first button should have a rounded left border
     "&:first-of-type": Css.add("borderRadius", "4px 0 0 4px").$,
     // Our last button should have a rounded right border
