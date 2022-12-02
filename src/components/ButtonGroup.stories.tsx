@@ -18,16 +18,23 @@ export function ButtonGroups() {
     <div css={Css.df.fdc.gap2.$}>
       <div>
         <h2>Icon Only</h2>
+        <ButtonGroup size="xs" buttons={[{ icon: "chevronLeft" }, { icon: "plus" }, { icon: "chevronRight" }]} />
         <ButtonGroup buttons={[{ icon: "chevronLeft" }, { icon: "plus" }, { icon: "chevronRight" }]} />
         <ButtonGroup size="md" buttons={[{ icon: "chevronLeft" }, { icon: "plus" }, { icon: "chevronRight" }]} />
       </div>
       <div>
         <h2>Basic</h2>
+        <ButtonGroup size="xs" buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
         <ButtonGroup buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
         <ButtonGroup size="md" buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
       </div>
       <div>
         <h2>Active</h2>
+
+        <ButtonGroup
+          size="xs"
+          buttons={[{ text: "Leading", active: true }, { text: "Middle" }, { text: "Trailing" }]}
+        />
         <ButtonGroup buttons={[{ text: "Leading", active: true }, { text: "Middle" }, { text: "Trailing" }]} />
         <ButtonGroup
           size="md"
@@ -36,6 +43,7 @@ export function ButtonGroups() {
       </div>
       <div>
         <h2>Disabled</h2>
+        <ButtonGroup size="xs" disabled buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
         <ButtonGroup disabled buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
         <ButtonGroup size="md" disabled buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
       </div>
