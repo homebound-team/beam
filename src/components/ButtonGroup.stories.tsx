@@ -44,6 +44,7 @@ export function ButtonGroups() {
         <ButtonGroup
           buttons={[
             { text: "Leading", tooltip: "Active Tooltip" },
+            { text: "Middle" },
             { text: "Trailing", disabled: "Disabled Reason" },
           ]}
         />
