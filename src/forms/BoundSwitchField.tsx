@@ -18,6 +18,7 @@ export function BoundSwitchField(props: BoundSwitchFieldProps) {
     onChange = (value) => field.set(value),
     label = defaultLabel(field.key),
     labelStyle = "form",
+    disabled,
     ...others
   } = props;
   const testId = useTestIds(props, field.key);
@@ -32,6 +33,7 @@ export function BoundSwitchField(props: BoundSwitchFieldProps) {
             onChange(selected);
             field.maybeAutoSave();
           }}
+          disabled={disabled || field.readOnly}
           {...testId}
           {...others}
         />

@@ -7,6 +7,10 @@ const formConfig: ObjectConfig<AuthorInput> = {
   isAvailable: { type: "value", rules: [required] },
 };
 
+const formConfigReadOnly: ObjectConfig<AuthorInput> = {
+  isAvailable: { type: "value", rules: [required], readOnly: true },
+};
+
 describe("BoundCheckboxField", () => {
   it("should be checked", async () => {
     // Given a formState with true boolean field
@@ -64,5 +68,14 @@ describe("BoundCheckboxField", () => {
     click(r.isAvailable());
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith(false);
+  });
+
+  it("disables when field is readonly", async () => {
+    // Given a readOnly BoundCheckboxField
+    const formState: ObjectState<AuthorInput> = createObjectState(formConfigReadOnly, { isAvailable: true });
+    const r = await render(<BoundCheckboxField field={formState.isAvailable} />);
+
+    // Then the checkbox should be disabled
+    expect(r.isAvailable()).toBeDisabled();
   });
 });
