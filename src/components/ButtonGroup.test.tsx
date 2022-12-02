@@ -42,4 +42,19 @@ describe("ButtonGroup", () => {
     expect(r.buttonGroup_first()).toBeDisabled();
     expect(r.buttonGroup_last()).toBeDisabled();
   });
+
+  it("can add tooltips", async () => {
+    const r = await render(
+      <ButtonGroup
+        buttons={[
+          { text: "First", disabled: "Tooltip" },
+          { text: "Last", tooltip: "Other Tooltip" },
+        ]}
+      />,
+    );
+    expect(r.buttonGroup_first()).toBeDisabled();
+    expect(r.buttonGroup_first().closest("[data-testid='tooltip']")).toHaveAttribute("title", "Tooltip");
+    expect(r.buttonGroup_last()).not.toBeDisabled();
+    expect(r.buttonGroup_last().closest("[data-testid='tooltip']")).toHaveAttribute("title", "Other Tooltip");
+  });
 });
