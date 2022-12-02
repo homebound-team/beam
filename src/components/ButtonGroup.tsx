@@ -99,13 +99,15 @@ function getButtonStyles() {
 }
 
 const sizeStyles: Record<ButtonGroupSize, {}> = {
+  xs: Css.hPx(28).$,
   sm: Css.hPx(32).$,
   md: Css.hPx(40).$,
 };
 
 const iconStyles: Record<ButtonGroupSize, {}> = {
+  xs: Css.pxPx(2).$,
   sm: Css.pxPx(4).$,
   md: Css.px1.$,
 };
 
-type ButtonGroupSize = "sm" | "md";
+type ButtonGroupSize = "xs" | "sm" | "md";
