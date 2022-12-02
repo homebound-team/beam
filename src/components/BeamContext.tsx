@@ -95,8 +95,8 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
                 {children}
                 {modalRef.current && <Modal {...modalRef.current} />}
               </OverlayProvider>
+              <SuperDrawer />
             </ToastProvider>
-            <SuperDrawer />
           </SnackbarProvider>
         </AutoSaveStatusProvider>
       </PresentationProvider>
