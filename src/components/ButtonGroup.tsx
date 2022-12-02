@@ -17,7 +17,7 @@ export type ButtonGroupButton = {
   icon?: IconProps["icon"];
   text?: string;
   onClick?: VoidFunction;
-  /** Disables the button. Note we don't support the `disabled: ReactNode`/tooltip for now. */
+  /** Disables the button. Pass a ReactNode to disable the button and show a tooltip */
   disabled?: boolean | ReactNode;
   /** Indicates the active/selected button, as in a tab or toggle. */
   active?: boolean;
