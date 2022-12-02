@@ -29,7 +29,7 @@ export function ButtonGroup(props: ButtonGroupProps) {
   const { buttons, disabled = false, size = "sm" } = props;
   const tid = useTestIds(props, "buttonGroup");
   return (
-    <div {...tid} css={{ ...Css.df.$, ...sizeStyles[size] }}>
+    <div {...tid} css={Css.df.add(sizeStyles[size]).$}>
       {buttons.map(({ disabled: buttonDisabled, ...buttonProps }, i) => (
         // Disable the button if the ButtonGroup is disabled or if the current button is disabled.
         <GroupButton key={i} {...buttonProps} disabled={disabled || buttonDisabled} size={size} {...tid} />
