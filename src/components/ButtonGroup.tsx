@@ -1,6 +1,7 @@
-import React, { useRef } from "react";
+import React, { ReactNode, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -16,10 +17,12 @@ export type ButtonGroupButton = {
   icon?: IconProps["icon"];
   text?: string;
   onClick?: VoidFunction;
-  /** Disables the button. Note we don't support the `disabled: ReactNode`/tooltip for now. */
-  disabled?: boolean;
+  /** Disables the button. Pass a ReactNode to disable the button and show a tooltip */
+  disabled?: boolean | ReactNode;
   /** Indicates the active/selected button, as in a tab or toggle. */
   active?: boolean;
+  /** Adds tooltip to the button */
+  tooltip?: ReactNode;
 };
 
 export function ButtonGroup(props: ButtonGroupProps) {
@@ -40,35 +43,39 @@ interface GroupButtonProps extends ButtonGroupButton {
 }
 
 function GroupButton(props: GroupButtonProps) {
-  const { icon, text, active, onClick: onPress, disabled, size, ...otherProps } = props;
-  const ariaProps = { onPress, isDisabled: disabled, ...otherProps };
+  const { icon, text, active, onClick: onPress, disabled, size, tooltip, ...otherProps } = props;
+  const ariaProps = { onPress, isDisabled: !!disabled, ...otherProps };
   const ref = useRef(null);
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
   const { isFocusVisible, focusProps } = useFocusRing();
   const { hoverProps, isHovered } = useHover(ariaProps);
   const tid = useTestIds(props);
 
-  return (
-    <button
-      ref={ref}
-      {...buttonProps}
-      {...focusProps}
-      {...hoverProps}
-      css={{
-        ...Css.buttonBase.$,
-        ...getButtonStyles(),
-        ...sizeStyles[size],
-        ...(isFocusVisible ? defaultFocusRingStyles : {}),
-        ...(active ? activeStyles : {}),
-        ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
-        ...(icon ? iconStyles[size] : {}),
-      }}
-      {...tid[defaultTestId(text ?? icon ?? "button")]}
-    >
-      {icon && <Icon icon={icon} />}
-      {text}
-    </button>
-  );
+  return maybeTooltip({
+    title: resolveTooltip(disabled, tooltip),
+    placement: "top",
+    children: (
+      <button
+        ref={ref}
+        {...buttonProps}
+        {...focusProps}
+        {...hoverProps}
+        css={{
+          ...Css.buttonBase.$,
+          ...getButtonStyles(),
+          ...sizeStyles[size],
+          ...(isFocusVisible ? defaultFocusRingStyles : {}),
+          ...(active ? activeStyles : {}),
+          ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
+          ...(icon ? iconStyles[size] : {}),
+        }}
+        {...tid[defaultTestId(text ?? icon ?? "button")]}
+      >
+        {icon && <Icon icon={icon} />}
+        {text}
+      </button>
+    ),
+  });
 }
 
 const pressedStyles = Css.bgGray200.$;
