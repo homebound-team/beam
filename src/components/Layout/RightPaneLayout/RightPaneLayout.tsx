@@ -1,66 +1,59 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { ReactElement, ReactNode, useContext, useMemo, useState } from "react";
-import { Css, px } from "../../../Css";
+import React, { ReactElement } from "react";
+import { Css, Palette, px } from "../../../Css";
+import { useRightPaneContext } from "./RightPaneContext";
 
-export type RightPaneLayoutContextProps = {
-  openInPane: (pane: { content: ReactNode }) => void;
-  closePane: () => void;
-};
+export function RightPaneLayout({
+  children,
+  paneBgColor,
+  wrapProvider = false,
+}: {
+  children: ReactElement;
+  paneBgColor?: Palette;
+  wrapProvider?: Boolean;
+}) {
+  const { isRightPaneOpen, rightPaneContent } = useRightPaneContext();
 
-export const RightPaneContext = React.createContext<RightPaneLayoutContextProps>({
-  openInPane: () => {},
-  closePane: () => {},
-});
-
-export function RightPaneLayout({ children }: { children: ReactElement }) {
-  const [rightPaneContent, setRightPaneContent] = useState<ReactNode>(undefined);
-
-  const context = useMemo(() => {
-    return {
-      openInPane: (pane: { content: ReactNode }) => setRightPaneContent(pane.content),
-      closePane: () => setRightPaneContent(undefined),
-    };
-  }, [setRightPaneContent]);
+  // Todo pass as prop?
+  const paneWidth = 450;
 
   return (
-    <RightPaneContext.Provider value={context}>
-      <div css={Css.h100.df.$}>
-        <>
-          <motion.div
-            layout
-            key="rightPaneLayoutPageContent"
-            css={Css.bgWhite.h100.w100.df.fdc.relative.if(!rightPaneContent).mr3.$}
-          >
-            {children}
-          </motion.div>
-          <AnimatePresence>
-            {rightPaneContent && (
-              <motion.div
-                layout
-                key="superDrawerContainer"
-                css={
-                  Css.h100 // .bgWhite
-                    .maxw(px(498)).w100.df.fdc.relative.$
-                }
-                // Keeping initial x to 1040 as this will still work if the container is smaller
-                initial={{ x: 498 }}
-                animate={{ x: 0 }}
-                // Custom transitions settings for the translateX animation
-                transition={{ ease: "linear", duration: 0.2, delay: 0.2 }}
-                exit={{ transition: { ease: "linear", duration: 0.2 }, x: 498 }}
-                // Preventing clicks from triggering parent onClick
-                onClick={(e) => e.stopPropagation()}
-              >
-                {rightPaneContent}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </>
-      </div>
-    </RightPaneContext.Provider>
+    <div css={Css.h100.df.$}>
+      <>
+        <motion.div
+          layout="position"
+          key="rightPaneLayoutPageContent"
+          css={Css.h100.if(!!isRightPaneOpen).overflowX("scroll").mr3.if(!isRightPaneOpen).overflowX("unset").$}
+          initial={closed}
+          animate={!isRightPaneOpen ? "closed" : "open"}
+          variants={{
+            open: { width: `calc(100% - ${paneWidth + 24}px)` },
+            closed: { width: "100%" },
+          }}
+          transition={{ ease: "linear", duration: 0.2 }}
+        >
+          {children}
+        </motion.div>
+        <AnimatePresence>
+          {isRightPaneOpen && (
+            <motion.div
+              layout="position"
+              key="rightPane"
+              css={Css.bgColor(paneBgColor).h100.maxw(px(paneWidth)).w100.df.fdc.relative.$}
+              // Keeping initial x to offset pane width and space between panel and page content
+              initial={{ x: paneWidth + 24 }}
+              animate={{ x: 0 }}
+              // Custom transitions settings for the translateX animation
+              transition={{ ease: "linear", duration: 0.2 }}
+              exit={{ transition: { ease: "linear", duration: 0.2 }, x: paneWidth }}
+              // Preventing clicks from triggering parent onClick
+              onClick={(e) => e.stopPropagation()}
+            >
+              {rightPaneContent}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </>
+    </div>
   );
-}
-
-export function useRightPaneContext() {
-  return useContext(RightPaneContext);
 }
