@@ -1,6 +1,6 @@
 import { clickAndWait } from "@homebound/rtl-utils";
-import { waitFor } from "@testing-library/react";
-import { render } from "../../../utils/rtl";
+import { waitFor } from "@storybook/testing-library";
+import { click, render } from "../../../utils/rtl";
 import { Button } from "../../Button";
 import { RightPaneLayout, RightPaneProvider, useRightPane } from "./index";
 
@@ -17,8 +17,12 @@ describe("useRightPane", () => {
     expect(r.closePaneBtn()).toBeTruthy();
 
     // click and wait for right pane content to be removed from DOM
-    await clickAndWait(r.closePaneBtn());
-    await waitFor(() => expect(r.queryByTestId("rightPaneContent")).toBeNull());
+    click(r.closePaneBtn());
+
+    await waitFor(() => {
+      const rightPaneContent = r.queryByTestId("rightPaneContent");
+      expect(rightPaneContent).toNotBeInTheDom();
+    });
   });
 });
 
