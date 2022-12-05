@@ -32,6 +32,30 @@ interface ScrollableParentContextProviderProps {
   tagName?: keyof JSX.IntrinsicElements;
 }
 
+/**
+ * Provides a pattern for implementing "multiple sticky" components.
+ *
+ * In css, `position: sticky` is great for pinning 1 element to the top of a container.
+ *
+ * However, in UX patterns, we're often asked to pin multiple DOM elements that are actually
+ * spread across multiple React components. For example:
+ *
+ * - Sticky a Header (in FooPage)
+ * - Sticky the table filter & actions (in FooTable)
+ * - Sticky the table header row(s) (in GridTable)
+ *
+ * Historically the way we did this was passing `stickyOffset`s around, where the header would be
+ * `top: 0px`, the filter & actions would be `top: ${headerPx}px`, and the table header rows would
+ * be `top: ${headerPx + filterActionsPx}px`.
+ *
+ * However, this is brittle as the `headerPx` / `filterActionsPx` are likely dynamic.
+ *
+ * `ScrollableParent` solves this by putting all the stickied content (except the table header rows)
+ * into a single div, and then having the page use `ScrollableContent` to mark what should actually
+ * scroll, which then we "pull up" to be a sibling div of "everything that was stickied".
+ *
+ * See [this miro](https://miro.com/app/board/o9J_l-FQ-RU=/) and how we need to "cut the component in half".
+ */
 export function ScrollableParent(props: PropsWithChildren<ScrollableParentContextProviderProps>) {
   const { children, xss, tagName: Tag = "div" as keyof JSX.IntrinsicElements } = props;
   const scrollableEl = useMemo(() => {
