@@ -3,15 +3,7 @@ import React, { ReactElement } from "react";
 import { Css, Palette, px } from "../../../Css";
 import { useRightPaneContext } from "./RightPaneContext";
 
-export function RightPaneLayout({
-  children,
-  paneBgColor,
-  wrapProvider = false,
-}: {
-  children: ReactElement;
-  paneBgColor?: Palette;
-  wrapProvider?: Boolean;
-}) {
+export function RightPaneLayout({ children, paneBgColor }: { children: ReactElement; paneBgColor?: Palette }) {
   const { isRightPaneOpen, rightPaneContent } = useRightPaneContext();
 
   // Todo pass as prop?
@@ -24,7 +16,7 @@ export function RightPaneLayout({
           layout="position"
           key="rightPaneLayoutPageContent"
           css={Css.h100.if(!!isRightPaneOpen).overflowX("scroll").mr3.if(!isRightPaneOpen).overflowX("unset").$}
-          initial={closed}
+          initial={"closed"}
           animate={!isRightPaneOpen ? "closed" : "open"}
           variants={{
             open: { width: `calc(100% - ${paneWidth + 24}px)` },
@@ -39,6 +31,7 @@ export function RightPaneLayout({
             <motion.div
               layout="position"
               key="rightPane"
+              data-testid="rightPaneContent"
               css={Css.bgColor(paneBgColor).h100.maxw(px(paneWidth)).w100.df.fdc.relative.$}
               // Keeping initial x to offset pane width and space between panel and page content
               initial={{ x: paneWidth + 24 }}
