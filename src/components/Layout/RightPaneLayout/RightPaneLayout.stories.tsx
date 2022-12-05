@@ -83,7 +83,7 @@ function ScrollableTableExample({ numCols, numRows }: { numCols?: number; numRow
   return (
     <ScrollableContent>
       <RightPaneProvider>
-        <RightPaneLayout wrapProvider={true} paneBgColor={Palette.White}>
+        <RightPaneLayout paneBgColor={Palette.White}>
           <TableExample numCols={numCols} numRows={numRows} />
         </RightPaneLayout>
       </RightPaneProvider>
