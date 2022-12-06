@@ -28,12 +28,12 @@ export default {
   component: Filters,
   title: "Workspace/Components/Filter",
   decorators: [withDimensions(), withRouter(), withBeamDecorator],
-  parameters: { 
+  parameters: {
     layout: "fullscreen",
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101334",
-    }
+    },
   },
 } as Meta;
 
@@ -165,7 +165,13 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       <div>
         <div css={Css.df.fdc.gap2.if(!!vertical).wPx(360).p2.bgGray100.br.bGray600.$}>
           <h1 css={Css.lg.$}>Filters</h1>
-          <Filters<ProjectFilter> filter={filter} onChange={setFilter} filterDefs={filterDefs} vertical={vertical} />
+          <Filters<ProjectFilter>
+            filter={filter}
+            onChange={setFilter}
+            filterDefs={filterDefs}
+            vertical={vertical}
+            moreFilters={4}
+          />
         </div>
       </div>
       <div css={Css.fg1.$}>
