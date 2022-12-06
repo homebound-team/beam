@@ -1,12 +1,13 @@
-import React, { ReactElement, ReactNode, useContext, useMemo, useState } from "react";
+import React, { ReactNode, useCallback, useContext, useMemo, useState } from "react";
 
-interface OpenRightPaneOpts {
+export interface OpenRightPaneOpts {
   content: ReactNode;
 }
 
 export type RightPaneLayoutContextProps = {
   openInPane: (opts: OpenRightPaneOpts) => void;
   closePane: () => void;
+  clearPane: () => void;
   isRightPaneOpen: Boolean;
   rightPaneContent: ReactNode;
 };
@@ -14,25 +15,29 @@ export type RightPaneLayoutContextProps = {
 export const RightPaneContext = React.createContext<RightPaneLayoutContextProps>({
   openInPane: () => {},
   closePane: () => {},
+  clearPane: () => {},
   isRightPaneOpen: false,
   rightPaneContent: null,
 });
 
-export function RightPaneProvider({ children }: { children: ReactElement }) {
+export function RightPaneProvider({ children }: { children: ReactNode }) {
   const [rightPaneContent, setRightPaneContent] = useState<ReactNode>(undefined);
   const [isRightPaneOpen, setIsRightPaneOpen] = useState<Boolean>(false);
 
-  const context = useMemo(() => {
-    return {
-      openInPane: (opts: OpenRightPaneOpts) => {
-        setRightPaneContent(opts?.content);
-        setIsRightPaneOpen(true);
-      },
-      closePane: () => setIsRightPaneOpen(false),
-      rightPaneContent,
-      isRightPaneOpen,
-    };
-  }, [setRightPaneContent, rightPaneContent, isRightPaneOpen]);
+  const openInPane = useCallback(
+    (opts: OpenRightPaneOpts) => {
+      setRightPaneContent(opts?.content);
+      setIsRightPaneOpen(true);
+    },
+    [setRightPaneContent],
+  );
+  const closePane = useCallback(() => setIsRightPaneOpen(false), [setRightPaneContent, isRightPaneOpen]);
+  const clearPane = useCallback(() => setRightPaneContent(undefined), [setRightPaneContent]);
+
+  const context = useMemo(
+    () => ({ openInPane, closePane, clearPane, rightPaneContent, isRightPaneOpen }),
+    [openInPane, closePane, rightPaneContent, clearPane, isRightPaneOpen],
+  );
 
   return <RightPaneContext.Provider value={context}>{children}</RightPaneContext.Provider>;
 }

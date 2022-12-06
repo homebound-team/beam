@@ -3,29 +3,29 @@ import React, { ReactElement } from "react";
 import { Css, Palette, px } from "../../../Css";
 import { useRightPaneContext } from "./RightPaneContext";
 
-export function RightPaneLayout({ children, paneBgColor }: { children: ReactElement; paneBgColor?: Palette }) {
-  const { isRightPaneOpen, rightPaneContent } = useRightPaneContext();
-
-  // Todo pass as prop?
-  const paneWidth = 450;
+export function RightPaneLayout({
+  children,
+  paneBgColor,
+  paneWidth = 450,
+}: {
+  children: ReactElement;
+  paneBgColor?: Palette;
+  paneWidth?: number;
+}) {
+  const { isRightPaneOpen, rightPaneContent, clearPane } = useRightPaneContext();
 
   return (
-    <div css={Css.h100.df.$}>
+    <div css={Css.h100.df.overflowXHidden.$}>
       <>
-        <motion.div
-          layout="position"
-          key="rightPaneLayoutPageContent"
-          css={Css.h100.if(!!isRightPaneOpen).overflowX("scroll").mr3.if(!isRightPaneOpen).overflowX("unset").$}
-          initial={"closed"}
-          animate={!isRightPaneOpen ? "closed" : "open"}
-          variants={{
-            open: { width: `calc(100% - ${paneWidth + 24}px)` },
-            closed: { width: "100%" },
-          }}
-          transition={{ ease: "linear", duration: 0.2 }}
+        <div
+          css={
+            Css.add("width", `calc(100% - ${paneWidth + 24}px)`)
+              .add("transition", "width .2s linear")
+              .h100.mr3.overflowXAuto.if(!isRightPaneOpen).w100.mr0.$
+          }
         >
           {children}
-        </motion.div>
+        </div>
         <AnimatePresence>
           {isRightPaneOpen && (
             <motion.div
@@ -36,11 +36,10 @@ export function RightPaneLayout({ children, paneBgColor }: { children: ReactElem
               // Keeping initial x to offset pane width and space between panel and page content
               initial={{ x: paneWidth + 24 }}
               animate={{ x: 0 }}
-              // Custom transitions settings for the translateX animation
               transition={{ ease: "linear", duration: 0.2 }}
               exit={{ transition: { ease: "linear", duration: 0.2 }, x: paneWidth }}
-              // Preventing clicks from triggering parent onClick
-              onClick={(e) => e.stopPropagation()}
+              // Clear the content of the detail pane when the animation is completed and only when pane is closing
+              onAnimationComplete={(definition: { x: number }) => definition.x !== 0 && clearPane()}
             >
               {rightPaneContent}
             </motion.div>

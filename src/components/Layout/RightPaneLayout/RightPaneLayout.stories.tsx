@@ -1,21 +1,21 @@
 import { Meta } from "@storybook/react";
 import { PropsWithChildren, useMemo } from "react";
-import { zeroTo } from "src/utils/sb";
+import { withBeamDecorator, zeroTo } from "src/utils/sb";
 import { Css, Palette } from "../../../Css";
 import { Button } from "../../Button";
 import { IconButton } from "../../IconButton";
-import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndData } from "../../Table";
+import { GridColumn, GridDataRow, GridTable, SimpleHeaderAndData } from "../../Table";
 import { FullBleed } from "../FullBleed";
 import { PreventBrowserScroll } from "../PreventBrowserScroll";
 import { ScrollableContent } from "../ScrollableContent";
 import { ScrollableParent } from "../ScrollableParent";
-import { RightPaneProvider } from "./RightPaneContext";
 import { RightPaneLayout } from "./RightPaneLayout";
 import { useRightPane } from "./useRightPane";
 
 export default {
   component: RightPaneLayout,
   title: "Workspace/Components/Layout/RightPaneLayout",
+  decorators: [withBeamDecorator],
 } as Meta;
 
 function SampleContent() {
@@ -38,13 +38,11 @@ function DetailPane() {
 
 export function Basic() {
   return (
-    <RightPaneProvider>
-      <div css={Css.df.fdc.gap2.h100.$}>
-        <RightPaneLayout paneBgColor={Palette.White}>
-          <SampleContent />
-        </RightPaneLayout>
-      </div>
-    </RightPaneProvider>
+    <div css={Css.df.fdc.gap2.h100.$}>
+      <RightPaneLayout paneBgColor={Palette.White}>
+        <SampleContent />
+      </RightPaneLayout>
+    </div>
   );
 }
 
@@ -72,8 +70,8 @@ function ExamplePageComponent() {
 function TestProjectLayout({ children }: PropsWithChildren<{}>) {
   return (
     <PreventBrowserScroll>
-      <div css={Css.df.h100.$}>
-        <ScrollableParent xss={Css.px3.$}>{children}</ScrollableParent>
+      <div css={Css.df.h100.overflowHidden.$}>
+        <ScrollableParent>{children}</ScrollableParent>
       </div>
     </PreventBrowserScroll>
   );
@@ -81,12 +79,10 @@ function TestProjectLayout({ children }: PropsWithChildren<{}>) {
 
 function ScrollableTableExample({ numCols, numRows }: { numCols?: number; numRows?: number }) {
   return (
-    <ScrollableContent>
-      <RightPaneProvider>
-        <RightPaneLayout paneBgColor={Palette.White}>
-          <TableExample numCols={numCols} numRows={numRows} />
-        </RightPaneLayout>
-      </RightPaneProvider>
+    <ScrollableContent virtualized>
+      <RightPaneLayout paneBgColor={Palette.White}>
+        <TableExample numCols={numCols} numRows={numRows} />
+      </RightPaneLayout>
     </ScrollableContent>
   );
 }
@@ -97,7 +93,7 @@ function TableExample({ numCols = 10, numRows = 100 }: { numCols?: number; numRo
 
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
-      simpleHeader,
+      // simpleHeader,
       ...zeroTo(numRows).map((i) => ({
         kind: "data" as const,
         id: String(i),
