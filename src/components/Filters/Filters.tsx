@@ -24,20 +24,20 @@ interface FilterProps<F, G extends Value = string> {
   };
   /** Specifies the layout of the filters. If not supplied it will use the default (horizontal) layout. Using the 'vertical' layout will also remove the "More Filters" button/modal */
   vertical?: boolean;
-  /** Specifies the number of filters before more filters modal  */
-  moreFilters?: number;
+  /** Specifies the number of in line filters before more filters modal  */
+  numberOfInlineFilters?: number;
 }
 
 function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
-  const { filter, onChange, filterDefs, groupBy, vertical = false, moreFilters = 4 } = props;
+  const { filter, onChange, filterDefs, groupBy, vertical = false, numberOfInlineFilters = 4 } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
 
   const { openModal } = useModal();
-  const numberOfPageFilters = moreFilters - (groupBy ? 1 : 0);
+  const numberOfPageFilters = numberOfInlineFilters - (groupBy ? 1 : 0);
   const [pageFilters, modalFilters] = useMemo(() => {
     // Take the FilterDefs that have a `key => ...` factory and eval it
     const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)]);
-    // If we have more than moreFilters depending on groupby,
+    // If we have more than numberOfInlineFilters depending on groupby,
     if (!vertical && impls.length > numberOfPageFilters) {
       // Then return up to the numberOfPageFilters, and the remainder in the modal.
       return [

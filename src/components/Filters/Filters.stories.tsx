@@ -37,12 +37,12 @@ export default {
   },
 } as Meta;
 
-export function Filter(args: { vertical: boolean | undefined; moreFilters: number | undefined }) {
+export function Filter(args: { vertical: boolean | undefined; numberOfInlineFilters: number | undefined }) {
   return <TestFilterPage {...args} />;
 }
 
 Filter.args = {
-  moreFilters: 4,
+  numberOfInlineFilters: 4,
 };
 
 export function Vertical() {
@@ -78,7 +78,7 @@ export function GroupBy() {
   );
 }
 
-function TestFilterPage({ vertical = false, moreFilters = 4 }) {
+function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
   const filterDefs: FilterDefs<ProjectFilter> = useMemo(() => {
     const marketId = multiFilter({
       options: markets,
@@ -174,7 +174,7 @@ function TestFilterPage({ vertical = false, moreFilters = 4 }) {
             onChange={setFilter}
             filterDefs={filterDefs}
             vertical={vertical}
-            moreFilters={moreFilters}
+            numberOfInlineFilters={numberOfInlineFilters}
           />
         </div>
       </div>
