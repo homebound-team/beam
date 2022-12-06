@@ -24,7 +24,7 @@ interface FilterProps<F, G extends Value = string> {
   };
   /** Specifies the layout of the filters. If not supplied it will use the default (horizontal) layout. Using the 'vertical' layout will also remove the "More Filters" button/modal */
   vertical?: boolean;
-  /**  */
+  /** Specifies the number of filters before more filters modal  */
   moreFilters?: number;
 }
 
