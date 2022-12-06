@@ -21,6 +21,7 @@ export const RightPaneContext = React.createContext<RightPaneLayoutContextProps>
 });
 
 export function RightPaneProvider({ children }: { children: ReactNode }) {
+  // Note: separating the pane content from isOpen state to prevent animating when updating content.
   const [rightPaneContent, setRightPaneContent] = useState<ReactNode>(undefined);
   const [isRightPaneOpen, setIsRightPaneOpen] = useState<Boolean>(false);
 
@@ -31,7 +32,7 @@ export function RightPaneProvider({ children }: { children: ReactNode }) {
     },
     [setRightPaneContent],
   );
-  const closePane = useCallback(() => setIsRightPaneOpen(false), [setRightPaneContent, isRightPaneOpen]);
+  const closePane = useCallback(() => setIsRightPaneOpen(false), [setRightPaneContent]);
   const clearPane = useCallback(() => setRightPaneContent(undefined), [setRightPaneContent]);
 
   const context = useMemo(

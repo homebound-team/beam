@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react";
 import { PropsWithChildren, useMemo } from "react";
 import { withBeamDecorator, zeroTo } from "src/utils/sb";
-import { Css, Palette } from "../../../Css";
+import { Css } from "../../../Css";
 import { Button } from "../../Button";
 import { IconButton } from "../../IconButton";
 import { GridColumn, GridDataRow, GridTable, SimpleHeaderAndData } from "../../Table";
@@ -39,7 +39,7 @@ function DetailPane() {
 export function Basic() {
   return (
     <div css={Css.df.fdc.gap2.h100.$}>
-      <RightPaneLayout paneBgColor={Palette.White}>
+      <RightPaneLayout>
         <SampleContent />
       </RightPaneLayout>
     </div>
@@ -80,7 +80,7 @@ function TestProjectLayout({ children }: PropsWithChildren<{}>) {
 function ScrollableTableExample({ numCols, numRows }: { numCols?: number; numRows?: number }) {
   return (
     <ScrollableContent virtualized>
-      <RightPaneLayout paneBgColor={Palette.White}>
+      <RightPaneLayout>
         <TableExample numCols={numCols} numRows={numRows} />
       </RightPaneLayout>
     </ScrollableContent>

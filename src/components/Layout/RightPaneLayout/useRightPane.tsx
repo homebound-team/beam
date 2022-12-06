@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { OpenRightPaneOpts, useRightPaneContext } from "./RightPaneContext";
 
 export interface UseRightPaneHook {
@@ -10,13 +9,9 @@ export interface UseRightPaneHook {
 
 export function useRightPane(): UseRightPaneHook {
   const { openInPane, closePane } = useRightPaneContext();
-  const openRightPane = useCallback((opts: OpenRightPaneOpts) => {
-    openInPane(opts);
-  }, []);
-  const closeRightPane = useCallback(() => closePane(), []);
 
   return {
-    openRightPane,
-    closeRightPane,
+    openRightPane: (opts: OpenRightPaneOpts) => openInPane(opts),
+    closeRightPane: () => closePane(),
   };
 }

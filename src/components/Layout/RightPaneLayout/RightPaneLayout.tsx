@@ -5,7 +5,7 @@ import { useRightPaneContext } from "./RightPaneContext";
 
 export function RightPaneLayout({
   children,
-  paneBgColor,
+  paneBgColor = Palette.White,
   paneWidth = 450,
 }: {
   children: ReactElement;
