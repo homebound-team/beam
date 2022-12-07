@@ -29,25 +29,24 @@ interface FilterProps<F, G extends Value = string> {
 }
 
 function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
-  const { filter, onChange, filterDefs, groupBy, vertical = false, numberOfInlineFilters = 4 } = props;
+  const { filter, onChange, filterDefs, groupBy, vertical = false, numberOfInlineFilters = groupBy ? 3 : 4 } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
 
   const { openModal } = useModal();
-  const numberOfPageFilters = numberOfInlineFilters - (groupBy ? 1 : 0);
   const [pageFilters, modalFilters] = useMemo(() => {
     // Take the FilterDefs that have a `key => ...` factory and eval it
     const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)]);
     // If we have more than numberOfInlineFilters depending on groupby,
-    if (!vertical && impls.length > numberOfPageFilters) {
-      // Then return up to the numberOfPageFilters, and the remainder in the modal.
+    if (!vertical && impls.length > numberOfInlineFilters) {
+      // Then return up to the numberOfInlineFilters, and the remainder in the modal.
       return [
-        Object.fromEntries(impls.slice(0, numberOfPageFilters)) as FilterImpls<F>,
-        Object.fromEntries(impls.slice(numberOfPageFilters)) as FilterImpls<F>,
+        Object.fromEntries(impls.slice(0, numberOfInlineFilters)) as FilterImpls<F>,
+        Object.fromEntries(impls.slice(numberOfInlineFilters)) as FilterImpls<F>,
       ];
     }
     // Otherwise, we don't have enough to show the modal, so only use page filter keys
     return [Object.fromEntries(impls) as FilterImpls<F>, {} as FilterImpls<F>];
-  }, [numberOfPageFilters, filterDefs]);
+  }, [numberOfInlineFilters, filterDefs]);
 
   const numModalFilters = safeKeys(modalFilters).filter((fk) => filter[fk] !== undefined).length;
 
