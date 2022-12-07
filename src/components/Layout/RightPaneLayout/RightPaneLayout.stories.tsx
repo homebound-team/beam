@@ -130,14 +130,14 @@ function TestDetailPane({ value }: { value: number }) {
   const { closeRightPane } = useRightPane();
 
   return (
-    <ScrollableParent>
-      <div css={Css.relative.p2.bb.$}>
-        <div css={Css.df.jcsb.aic.$}>
-          <h2 css={Css.py2.$}>Detail Pane {value}</h2>
-          <div>
-            <IconButton icon={"x"} onClick={() => closeRightPane()} />
-          </div>
+    <div css={Css.df.fdc.h100.$}>
+      <div css={Css.df.jcsb.p2.aic.bb.$}>
+        <h2 css={Css.py2.$}>Detail Pane {value}</h2>
+        <div>
+          <IconButton icon={"x"} onClick={() => closeRightPane()} />
         </div>
+      </div>
+      <ScrollableParent>
         <ScrollableContent virtualized={true}>
           <nav>
             <ul css={Css.listReset.df.fdc.gap5.mt2.p2.$}>
@@ -148,7 +148,7 @@ function TestDetailPane({ value }: { value: number }) {
             </ul>
           </nav>
         </ScrollableContent>
-      </div>
-    </ScrollableParent>
+      </ScrollableParent>
+    </div>
   );
 }

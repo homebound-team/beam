@@ -19,7 +19,7 @@ export function RightPaneLayout({
       <>
         <div
           css={
-            Css.add("width", `calc(100% - ${paneWidth + 24}px)`)
+            Css.w(`calc(100% - ${paneWidth + 24}px)`)
               .add("transition", "width .2s linear")
               .h100.mr3.overflowXAuto.if(!isRightPaneOpen).w100.mr0.$
           }
@@ -32,7 +32,7 @@ export function RightPaneLayout({
               layout="position"
               key="rightPane"
               data-testid="rightPaneContent"
-              css={Css.bgColor(paneBgColor).h100.maxw(px(paneWidth)).w100.df.fdc.relative.$}
+              css={Css.bgColor(paneBgColor).h100.w(px(paneWidth)).$}
               // Keeping initial x to offset pane width and space between panel and page content
               initial={{ x: paneWidth + 24 }}
               animate={{ x: 0 }}

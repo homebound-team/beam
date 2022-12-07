@@ -11,7 +11,7 @@ export function useRightPane(): UseRightPaneHook {
   const { openInPane, closePane } = useRightPaneContext();
 
   return {
-    openRightPane: (opts: OpenRightPaneOpts) => openInPane(opts),
-    closeRightPane: () => closePane(),
+    openRightPane: openInPane,
+    closeRightPane: closePane,
   };
 }
