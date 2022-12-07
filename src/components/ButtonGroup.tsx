@@ -29,7 +29,8 @@ export function ButtonGroup(props: ButtonGroupProps) {
   const { buttons, disabled = false, size = "sm" } = props;
   const tid = useTestIds(props, "buttonGroup");
   return (
-    <div {...tid} css={Css.df.add(sizeStyles[size]).$}>
+    // Adding `line-height: 0` prevent inheriting line-heights that might throw off sizing within the button group.
+    <div {...tid} css={Css.df.lh(0).add(sizeStyles[size]).$}>
       {buttons.map(({ disabled: buttonDisabled, ...buttonProps }, i) => (
         // Disable the button if the ButtonGroup is disabled or if the current button is disabled.
         <GroupButton key={i} {...buttonProps} disabled={disabled || buttonDisabled} size={size} {...tid} />
