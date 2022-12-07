@@ -181,6 +181,16 @@ export function WithFieldProps() {
   );
 }
 
+export function WithHorizontalLayout() {
+  return (
+    <FormLines horizontalLayout>
+      <TextField label="First" value="first" hideLabel onChange={() => {}} />
+      <TextField label="Middle" value="middle" hideLabel onChange={() => {}} />
+      <TextField label="Last" value="last" hideLabel onChange={() => {}} />
+    </FormLines>
+  );
+}
+
 type Options = {
   id: number;
   name: string;
