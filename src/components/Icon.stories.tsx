@@ -49,7 +49,7 @@ export const Icon = (props: IconProps) => {
     "filter",
     "kanban",
     "expand",
-    "collapse"
+    "collapse",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
@@ -95,6 +95,7 @@ export const Icon = (props: IconProps) => {
     "floorPlan",
     "chair",
     "bolt",
+    "changeEvent",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
