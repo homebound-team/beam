@@ -183,7 +183,7 @@ export function WithFieldProps() {
 
 export function WithHorizontalLayout() {
   return (
-    <FormLines horizontalLayout>
+    <FormLines horizontalLayout width="lg">
       <TextField label="First" value="first" hideLabel onChange={() => {}} />
       <TextField label="Middle" value="middle" hideLabel onChange={() => {}} />
       <TextField label="Last" value="last" hideLabel onChange={() => {}} />

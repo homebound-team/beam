@@ -18,7 +18,7 @@ export interface FormLinesProps {
   labelSuffix?: LabelSuffixStyle;
   width?: FormWidth;
   compact?: boolean;
-  /** Creates a horizontal form field */
+  /** Creates a horizontal layout for Form fields */
   horizontalLayout?: boolean;
 }
 
