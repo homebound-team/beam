@@ -7,7 +7,7 @@ import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { safeEntries, safeKeys, useTestIds } from "src/utils";
 
-interface FilterProps<F, G extends Value = string> {
+interface FilterProps<F extends Record<string, unknown>, G extends Value = string> {
   /** List of filters */
   filterDefs: FilterDefs<F>;
   /** The current filter value. */
@@ -28,7 +28,7 @@ interface FilterProps<F, G extends Value = string> {
   numberOfInlineFilters?: number;
 }
 
-function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
+function Filters<F extends Record<string, unknown>, G extends Value = string>(props: FilterProps<F, G>) {
   const { filter, onChange, filterDefs, groupBy, vertical = false, numberOfInlineFilters = groupBy ? 3 : 4 } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
 
@@ -46,7 +46,7 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
     }
     // Otherwise, we don't have enough to show the modal, so only use page filter keys
     return [Object.fromEntries(impls) as FilterImpls<F>, {} as FilterImpls<F>];
-  }, [numberOfInlineFilters, filterDefs]);
+  }, [numberOfInlineFilters, vertical, filterDefs]);
 
   const numModalFilters = safeKeys(modalFilters).filter((fk) => filter[fk] !== undefined).length;
 
