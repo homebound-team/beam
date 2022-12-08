@@ -49,7 +49,7 @@ export function Vertical() {
   return <TestFilterPage vertical={true} />;
 }
 
-export function GroupBy(args) {
+export function GroupBy(args: { vertical: boolean | undefined; numberOfInlineFilters: number | undefined }) {
   const groupBy = useGroupBy({ costCode: "Cost Code", tradeCategory: "Trade Category" });
   type Filter = ProjectFilter & { view: string };
   const filterDefs: FilterDefs<Filter> = useMemo(() => {
