@@ -59,7 +59,7 @@ export type GridTableApi<R extends Kinded> = {
 // Using `FooImpl`to keep the public GridTableApi definition separate.
 export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   // This is public to GridTable but not exported outside of Beam
-  readonly tableState: TableState = new TableState();
+  readonly tableState: TableState<R> = new TableState();
   virtuosoRef: MutableRefObject<VirtuosoHandle | null> = { current: null };
 
   /** Called once by the GridTable when it takes ownership of this api instance. */
@@ -77,17 +77,17 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     this.virtuosoRef.current && this.virtuosoRef.current.scrollToIndex(index);
   }
 
-  public getSelectedRowIds(kind?: string): string[] {
+  public getSelectedRowIds(kind?: R["kind"]): string[] {
     return this.getSelectedRows(kind).map((row: any) => row.id);
   }
 
   // The any is not great, but getting the overload to handle the optional kind is annoying
-  public getSelectedRows(kind?: string): any {
+  public getSelectedRows(kind?: R["kind"]): any {
     const ids = this.tableState.selectedIds;
     const selected: GridDataRow<R>[] = [];
     visit(this.tableState.rows, (row) => {
       if (row.selectable !== false && ids.includes(row.id) && (!kind || row.kind === kind)) {
-        selected.push(row as any);
+        selected.push(row);
       }
     });
     return selected;

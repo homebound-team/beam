@@ -8,20 +8,19 @@ import { GridDataRow } from "src/components/Table/components/Row";
  * rendering.
  */
 export type SimpleHeaderAndData<T> =
-  | { kind: "header" }
+  | { kind: "header"; id: "header"; data: undefined }
   // We put `id` here so that GridColumn can match against `extends { data, id }`,
   // kinda looks like we should combine Row and GridDataRow, i.e. Rows always have ids,
   // they already have kinds, and need to have ids when passed to rows anyway...
-  | { kind: "data"; data: T; id: string };
+  | { kind: "data"; id: string; data: T };
 
 /** A const for a marker header row. */
-export const simpleHeader = { kind: "header" as const, id: "header", data: undefined };
+export const simpleHeader = { kind: "header" as const, id: "header" as const, data: undefined };
 export const simpleExpandableHeader = { kind: "expandableHeader" as const, id: "expandableHeader", data: undefined };
 
 /** Like `simpleRows` but for `SimpleHeaderAndData`. */
-export function simpleDataRows<R extends SimpleHeaderAndData<D>, D>(
-  data: Array<D & { id: string }> | undefined = [],
-): GridDataRow<R>[] {
-  // @ts-ignore Not sure why this doesn't type-check, something esoteric with the DiscriminateUnion type
+export function simpleDataRows<D extends { id: string }>(
+  data: Array<D> | undefined = [],
+): GridDataRow<SimpleHeaderAndData<D>>[] {
   return [simpleHeader, ...data.map((data) => ({ kind: "data" as const, data, id: data.id }))];
 }

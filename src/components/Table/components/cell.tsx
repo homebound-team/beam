@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { navLink } from "src/components/CssReset";
 import { GridTableApi } from "src/components/Table/GridTableApi";
-import { RowStyle, tableRowStyles } from "src/components/Table/TableStyles";
+import { tableRowStyles } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnWithId, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
 import { Css, Properties, Typography } from "src/Css";
 
@@ -25,7 +25,7 @@ export type GridCellContent = {
   /** Allows the cell to stay in place when the user scrolls horizontally, i.e. frozen columns. */
   sticky?: "left" | "right";
   /** If provided, content of the cell will be wrapped within a <button /> or <a /> tag depending on if the value is a function or a string. */
-  onClick?: () => {} | string;
+  onClick?: () => void | string;
   /** Custom css to apply directly to this cell, i.e. cell-specific borders. */
   css?: Properties;
   /** Allows cell to reveal content when the user hovers over a row. Content must be wrapped in an element in order to be hidden. IE <div>{value}</div>*/
@@ -38,14 +38,13 @@ export type RenderCellFn<R extends Kinded> = (
   css: Properties,
   content: ReactNode,
   row: R,
-  rowStyle: RowStyle<R> | undefined,
   classNames: string | undefined,
   onClick: (() => void) | undefined,
 ) => ReactNode;
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
 export const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
-  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick) => {
+  (as: RenderAs) => (key, css, content, row, classNames: string | undefined, onClick) => {
     const Cell = as === "table" ? "td" : "div";
     return (
       <Cell key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames} onClick={onClick}>
@@ -59,7 +58,7 @@ export const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
  * Used for the Header, Totals, and Expanded Header row's cells.
  * */
 export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSpan: number) => RenderCellFn<any> =
-  (column, as, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
+  (column, as, colSpan) => (key, css, content, row, classNames: string | undefined) => {
     const Cell = as === "table" ? "th" : "div";
     return (
       <Cell
@@ -75,8 +74,8 @@ export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSp
 
 /** Renders a cell element when a row link is in play. */
 export const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
-  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined) => {
-    const to = rowStyle!.rowLink!(row);
+  (as: RenderAs) => (key, css, content, row, classNames: string | undefined) => {
+    const to = row.onClick as string;
     if (as === "table") {
       return (
         <td key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames}>
@@ -98,18 +97,17 @@ export const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
     );
   };
 
-/** Renders a cell that will fire the RowStyle.onClick. */
+/** Renders a cell that will fire the Row.onClick. */
 export const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>) => RenderCellFn<any> =
-  (as: RenderAs, api: GridTableApi<any>) =>
-  (key, css, content, row, rowStyle, classNames: string | undefined, onClick) => {
+  (as: RenderAs, api: GridTableApi<any>) => (key, css, content, row, classNames: string | undefined, onClick) => {
     const Row = as === "table" ? "tr" : "div";
     return (
       <Row
         {...{ key }}
         css={{ ...css, ...tableRowStyles(as) }}
         className={classNames}
-        onClick={(e) => {
-          rowStyle!.onClick!(row, api);
+        onClick={() => {
+          row.onClick!(row, api);
           onClick && onClick();
         }}
       >

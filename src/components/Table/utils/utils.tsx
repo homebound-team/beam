@@ -4,7 +4,7 @@ import { ExpandableHeader } from "src/components/Table/components/ExpandableHead
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
 import { GridTableApi } from "src/components/Table/GridTableApi";
-import { GridStyle, RowStyle } from "src/components/Table/TableStyles";
+import { GridStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { Css, Properties } from "src/Css";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
@@ -107,14 +107,12 @@ export const ASC = "ASC" as const;
 export const DESC = "DESC" as const;
 export const emptyCell: GridCellContent = { content: () => <></>, value: "" };
 
-export function getIndentationCss<R extends Kinded>(
+export function getIndentationCss(
   style: GridStyle,
-  rowStyle: RowStyle<R> | undefined,
   columnIndex: number,
   maybeContent: ReactNode | GridCellContent,
 ): Properties {
-  // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
-  const indent = (isGridCellContent(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
+  const indent = isGridCellContent(maybeContent) && maybeContent.indent;
   if (typeof indent === "number" && style.levels !== undefined) {
     throw new Error(
       "The indent param is deprecated for new beam fixed & flexible styles, use beamNestedFixedStyle or beamNestedFlexibleStyle",
@@ -197,7 +195,7 @@ export function maybeApplyFunction<T>(
 }
 
 export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter: string): boolean {
-  let value = filterValue(maybeContent);
+  const value = filterValue(maybeContent);
   if (typeof value === "string") {
     return value.toLowerCase().includes(filter.toLowerCase());
   } else if (typeof value === "number") {
