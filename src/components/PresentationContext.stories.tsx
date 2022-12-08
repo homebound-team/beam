@@ -28,7 +28,7 @@ export function PresentationFieldProps() {
 
       <div css={Css.pb2.mb2.bb.bGray300.$}>
         <h1 css={Css.xlSb.$}>Hidden Labels</h1>
-        <PresentationProvider fieldProps={{ hideLabel: true }}>
+        <PresentationProvider fieldProps={{ labelStyle: "hidden" }}>
           <TestFields />
         </PresentationProvider>
       </div>

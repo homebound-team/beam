@@ -9,11 +9,11 @@ import { TextFieldXss } from "src/interfaces";
 export default {
   component: TextField,
   title: "Workspace/Inputs/Text Field",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36923%3A102347",
-    }
+    },
   },
 } as Meta;
 
@@ -22,8 +22,8 @@ export function TextFieldStyles() {
     <div css={Css.df.fdc.gap5.$}>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
-        <TestTextField value="" label="Name" hideLabel />
-        <TestTextField value="Brandon" label="Name" inlineLabel />
+        <TestTextField value="" label="Name" labelStyle="hidden" />
+        <TestTextField value="Brandon" label="Name" labelStyle="inline" />
         <TestTextField label="Name" value="" />
         <TestTextField label="Name" required value="" />
         <TestTextField label="Name Focused" value="Brandon" autoFocus />
@@ -54,8 +54,8 @@ export function TextFieldStyles() {
 
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Compact</h1>
-        <TestTextField compact value="" label="Name" hideLabel />
-        <TestTextField compact value="Brandon" label="Name" inlineLabel />
+        <TestTextField compact value="" label="Name" labelStyle="hidden" />
+        <TestTextField compact value="Brandon" label="Name" labelStyle="inline" />
         <TestTextField compact label="Name" value="" />
         <TestTextField compact label="Name" value="Brandon" />
         <TestTextField compact label="Name" value="Brandon" disabled />
@@ -85,16 +85,21 @@ export function TextFieldReadOnly() {
       <div css={Css.df.fdc.gap3.$}>
         <b>Read Only</b>
         <TestTextField label="Name" value="first" readOnly={true} />
-        <TestTextField label="Name" value="first - with tooltip" inlineLabel readOnly="Read only reason tooltip" />
-        <TestTextField label="Name" value="first" hideLabel readOnly={true} />
+        <TestTextField
+          label="Name"
+          value="first - with tooltip"
+          labelStyle="inline"
+          readOnly="Read only reason tooltip"
+        />
+        <TestTextField label="Name" value="first" labelStyle="hidden" readOnly={true} />
         <TestTextField label="Name" value={"first ".repeat(20) + "last"} readOnly={true} />
       </div>
-      {/*Matching column but w/o readOnly for comparison*/}
+      {/* Matching column but w/o readOnly for comparison */}
       <div css={Css.df.fdc.gap3.$}>
         <b>Editable</b>
         <TestTextField label="Name" value="first" />
-        <TestTextField label="Name" value="first" inlineLabel />
-        <TestTextField label="Name" value="first" hideLabel />
+        <TestTextField label="Name" value="first" labelStyle="inline" />
+        <TestTextField label="Name" value="first" labelStyle="hidden" />
         <TestTextField label="Name" value={"first ".repeat(20) + "last"} />
       </div>
     </div>

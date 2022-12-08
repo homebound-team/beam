@@ -8,11 +8,11 @@ import { TextFieldXss } from "src/interfaces";
 export default {
   component: TextAreaField,
   title: "Workspace/Inputs/Text Area",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36923%3A102353",
-    }
+    },
   },
 } as Meta;
 
@@ -21,7 +21,7 @@ export function TextAreaStyles() {
     <div css={Css.df.fdc.gap5.$}>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
-        <TestTextArea value="" label="Description" hideLabel />
+        <TestTextArea value="" label="Description" labelStyle="hidden" />
         <TestTextArea label="Description" value="" />
         <TestTextArea label="Description" value="An example description text." autoFocus />
         <TestTextArea
@@ -38,7 +38,14 @@ export function TextAreaStyles() {
         <TextField label="Regular Field For Reference" value="value" onChange={() => {}} />
 
         <h1 css={Css.lg.$}>Modified for Blueprint To Do Title</h1>
-        <TestTextArea label="Title" value="Test title" preventNewLines hideLabel borderless xss={Css.xl2Sb.$} />
+        <TestTextArea
+          label="Title"
+          value="Test title"
+          preventNewLines
+          labelStyle="hidden"
+          borderless
+          xss={Css.xl2Sb.$}
+        />
       </div>
     </div>
   );
@@ -50,15 +57,20 @@ export function TextAreaReadOnly() {
       <div css={Css.df.fdc.gap3.$}>
         <b>Read Only</b>
         <TestTextArea label="Name" value="first" readOnly={true} />
-        <TestTextArea label="Name" value="first - with a tooltip" hideLabel readOnly="Read only with a tooltip" />
+        <TestTextArea
+          label="Name"
+          value="first - with a tooltip"
+          labelStyle="hidden"
+          readOnly="Read only with a tooltip"
+        />
         <TestTextArea label="Name" value={("first ".repeat(40) + "last.\n\n").repeat(4)} readOnly={true} />
         <TestTextArea label="Name" value={"this is a sentence\n".repeat(4)} readOnly={true} />
       </div>
-      {/*Matching column but w/o readOnly for comparison*/}
+      {/* Matching column but w/o readOnly for comparison */}
       <div css={Css.df.fdc.gap3.wPx(400).$}>
         <b>Editable</b>
         <TestTextArea label="Name" value="first" />
-        <TestTextArea label="Name" value="first" hideLabel />
+        <TestTextArea label="Name" value="first" labelStyle="hidden" />
         <TestTextArea label="Name" value={("first ".repeat(40) + "last.\n\n").repeat(4)} />
         <TestTextArea label="Name" value={"this is a sentence\n".repeat(4)} />
       </div>
@@ -69,10 +81,10 @@ export function TextAreaReadOnly() {
 export function SchedulesV2TaskName() {
   return (
     <div css={Css.df.fdc.gap2.p2.wPx(240).$}>
-      <TestTextArea label="Task name" hideLabel value="Task name" preventNewLines borderless />
+      <TestTextArea label="Task name" labelStyle="hidden" value="Task name" preventNewLines borderless />
       <TestTextArea
         label="Task name"
-        hideLabel
+        labelStyle="hidden"
         value="A task name that will wrap, but we don't support new lines. (And in focus)"
         preventNewLines
         borderless

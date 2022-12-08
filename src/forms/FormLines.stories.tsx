@@ -184,11 +184,11 @@ export function WithFieldProps() {
 export function WithHorizontalLayout() {
   return (
     <FormLines horizontalLayout width="lg">
-      <TextField label="Name" value="first" hideLabel onChange={noop} />
+      <TextField label="Name" value="first" labelStyle="hidden" onChange={noop} />
       <SelectField<Options, number>
         label="Unit of Measure"
         value={1}
-        hideLabel
+        labelStyle="hidden"
         options={[
           { id: 1, name: "Each" },
           { id: 2, name: "Square Feet" },

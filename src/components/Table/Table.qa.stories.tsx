@@ -139,7 +139,7 @@ export function Table(props: TableStoryProps) {
       <TableActions>
         <TextField
           label="Filter"
-          hideLabel
+          labelStyle="hidden"
           placeholder="Search"
           value={filter}
           onChange={setFilter}
@@ -251,7 +251,7 @@ export function Filterable() {
         <div css={Css.wPx(250).$}>
           <TextField
             label="Filter"
-            hideLabel
+            labelStyle="hidden"
             placeholder="Search"
             value={filter}
             onChange={setFilter}

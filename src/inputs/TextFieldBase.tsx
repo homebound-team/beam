@@ -32,7 +32,7 @@ export interface TextFieldBaseProps<X>
       | "onBlur"
       | "onFocus"
       | "helperText"
-      | "hideLabel"
+      | "labelStyle"
       | "placeholder"
       | "compact"
       | "borderless"
@@ -48,7 +48,6 @@ export interface TextFieldBaseProps<X>
   groupProps?: NumberFieldAria["groupProps"];
   endAdornment?: ReactNode;
   startAdornment?: ReactNode;
-  inlineLabel?: boolean;
   contrast?: boolean;
   clearable?: boolean;
   // TextArea specific
@@ -64,7 +63,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     label,
     required,
     labelProps,
-    hideLabel = fieldProps?.hideLabel ?? false,
     inputProps,
     inputRef,
     inputWrapRef,
@@ -79,7 +77,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     xss,
     endAdornment,
     startAdornment,
-    inlineLabel,
+    labelStyle = fieldProps?.labelStyle ?? "above",
     contrast = false,
     borderless = fieldProps?.borderless ?? false,
     textAreaMinHeight = 96,
@@ -90,7 +88,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     hideErrorMessage = false,
   } = props;
 
-  const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && !hideLabel ? "smMd" : "sm");
+  const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
   const { compound = false, forceFocus = false, forceHover = false } = internalProps;
   const errorMessageId = `${inputProps.id}-error`;
@@ -133,7 +131,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     inputWrapperReadOnly: {
       ...Css[typeScale].df.aic.w100.gray900.if(contrast).white.$,
       // If we are hiding the label, then we are typically in a table. Keep the `mh` in this case to ensure editable and non-editable fields in a single table row line up properly
-      ...(hideLabel &&
+      ...(labelStyle === "hidden" &&
         Css.mhPx(fieldHeight - maybeSmaller)
           .if(compact)
           .mhPx(compactFieldHeight - maybeSmaller).$),
@@ -171,11 +169,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
 
   return (
     <div css={fieldStyles.container} {...groupProps} {...focusWithinProps}>
-      {label && !inlineLabel && (
+      {/* TODO: place the label */}
+      {label && labelStyle !== "inline" && (
         // set `hidden` if being rendered as a compound field
         <Label
           labelProps={labelProps}
-          hidden={hideLabel || compound}
+          hidden={labelStyle === "hidden" || compound}
           label={label}
           suffix={labelSuffix}
           contrast={contrast}
@@ -196,7 +195,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             data-readonly="true"
             {...tid}
           >
-            {!multiline && inlineLabel && label && !hideLabel && (
+            {!multiline && labelStyle === "inline" && label && (
               <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
             )}
             {multiline
@@ -226,7 +225,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             {...hoverProps}
             ref={inputWrapRef as any}
           >
-            {!multiline && inlineLabel && label && !hideLabel && (
+            {!multiline && labelStyle === "inline" && label && (
               <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
             )}
             {!multiline && startAdornment && <span css={Css.df.aic.fs0.br4.pr1.$}>{startAdornment}</span>}
@@ -234,7 +233,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               {...mergeProps(
                 inputProps,
                 { onBlur, onFocus: onFocusChained, onChange: onDomChange },
-                { "aria-invalid": Boolean(errorMsg), ...(hideLabel ? { "aria-label": label } : {}) },
+                { "aria-invalid": Boolean(errorMsg), ...(labelStyle === "hidden" ? { "aria-label": label } : {}) },
               )}
               {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
               ref={fieldRef as any}

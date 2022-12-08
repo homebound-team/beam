@@ -148,11 +148,17 @@ export function MultiSelectFields() {
       </div>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Inline Label</h1>
-        <TestMultiSelectField inlineLabel label="Favorite Icon" values={[options[2].id]} options={options} />
-        <TestMultiSelectField inlineLabel compact label="Favorite Icon" values={[options[2].id]} options={options} />
+        <TestMultiSelectField labelStyle="inline" label="Favorite Icon" values={[options[2].id]} options={options} />
+        <TestMultiSelectField
+          labelStyle="inline"
+          compact
+          label="Favorite Icon"
+          values={[options[2].id]}
+          options={options}
+        />
         <TestMultiSelectField
           label="Favorite Icon"
-          inlineLabel
+          labelStyle="inline"
           options={options}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
           values={[options[4].id]}

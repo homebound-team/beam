@@ -166,7 +166,7 @@ function Template(args: SelectFieldProps<any, any>) {
         <TestSelectField
           {...args}
           label="Inline Label"
-          inlineLabel
+          labelStyle="inline"
           value={undefined}
           options={[{ id: undefined, name: "No Selection", icon: "x" }, ...options]}
           getOptionValue={(o) => o.id}
@@ -176,7 +176,7 @@ function Template(args: SelectFieldProps<any, any>) {
         <TestSelectField
           {...args}
           label="Hidden Label"
-          hideLabel
+          labelStyle="hidden"
           value={undefined}
           options={[{ id: undefined, name: "No Selection", icon: "x" }, ...options]}
           getOptionValue={(o) => o.id}
@@ -186,7 +186,7 @@ function Template(args: SelectFieldProps<any, any>) {
         <TestSelectField
           {...args}
           label="Hidden Label"
-          hideLabel
+          labelStyle="hidden"
           value={undefined}
           options={[{ id: undefined, name: "No Selection", icon: "x" }, ...options]}
           getOptionValue={(o) => o.id}
@@ -304,7 +304,7 @@ const columns: GridColumn<Row>[] = [
     data: (data) => (
       <SelectField
         label="People"
-        hideLabel
+        labelStyle="hidden"
         getOptionValue={(iu) => iu.id}
         getOptionLabel={(iu) => iu.name}
         value={data.user.id}
