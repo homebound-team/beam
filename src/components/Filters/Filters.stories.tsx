@@ -28,24 +28,28 @@ export default {
   component: Filters,
   title: "Workspace/Components/Filter",
   decorators: [withDimensions(), withRouter(), withBeamDecorator],
-  parameters: { 
+  parameters: {
     layout: "fullscreen",
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101334",
-    }
+    },
   },
 } as Meta;
 
-export function Filter() {
-  return <TestFilterPage />;
+export function Filter(args: { vertical: boolean | undefined; numberOfInlineFilters: number | undefined }) {
+  return <TestFilterPage {...args} />;
 }
+
+Filter.args = {
+  numberOfInlineFilters: 4,
+};
 
 export function Vertical() {
-  return <TestFilterPage vertical />;
+  return <TestFilterPage vertical={true} />;
 }
 
-export function GroupBy() {
+export function GroupBy(args: { vertical: boolean | undefined; numberOfInlineFilters: number | undefined }) {
   const groupBy = useGroupBy({ costCode: "Cost Code", tradeCategory: "Trade Category" });
   type Filter = ProjectFilter & { view: string };
   const filterDefs: FilterDefs<Filter> = useMemo(() => {
@@ -68,13 +72,23 @@ export function GroupBy() {
   });
   return (
     <div css={Css.df.fdc.gap2.$}>
-      <Filters groupBy={groupBy} filter={filter} onChange={setFilter} filterDefs={filterDefs} />
+      <Filters
+        groupBy={groupBy}
+        filter={filter}
+        onChange={setFilter}
+        filterDefs={filterDefs}
+        numberOfInlineFilters={args.numberOfInlineFilters}
+      />
       <strong>Applied Filter:</strong> {JSON.stringify(filter)}
     </div>
   );
 }
 
-function TestFilterPage({ vertical }: { vertical?: boolean }) {
+GroupBy.args = {
+  numberOfInlineFilters: 4,
+};
+
+function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
   const filterDefs: FilterDefs<ProjectFilter> = useMemo(() => {
     const marketId = multiFilter({
       options: markets,
@@ -165,7 +179,13 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       <div>
         <div css={Css.df.fdc.gap2.if(!!vertical).wPx(360).p2.bgGray100.br.bGray600.$}>
           <h1 css={Css.lg.$}>Filters</h1>
-          <Filters<ProjectFilter> filter={filter} onChange={setFilter} filterDefs={filterDefs} vertical={vertical} />
+          <Filters<ProjectFilter>
+            filter={filter}
+            onChange={setFilter}
+            filterDefs={filterDefs}
+            vertical={vertical}
+            numberOfInlineFilters={numberOfInlineFilters}
+          />
         </div>
       </div>
       <div css={Css.fg1.$}>
