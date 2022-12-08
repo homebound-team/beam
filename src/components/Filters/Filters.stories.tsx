@@ -49,7 +49,7 @@ export function Vertical() {
   return <TestFilterPage vertical={true} />;
 }
 
-export function GroupBy() {
+export function GroupBy(args) {
   const groupBy = useGroupBy({ costCode: "Cost Code", tradeCategory: "Trade Category" });
   type Filter = ProjectFilter & { view: string };
   const filterDefs: FilterDefs<Filter> = useMemo(() => {
@@ -72,11 +72,21 @@ export function GroupBy() {
   });
   return (
     <div css={Css.df.fdc.gap2.$}>
-      <Filters groupBy={groupBy} filter={filter} onChange={setFilter} filterDefs={filterDefs} />
+      <Filters
+        groupBy={groupBy}
+        filter={filter}
+        onChange={setFilter}
+        filterDefs={filterDefs}
+        numberOfInlineFilters={args.numberOfInlineFilters}
+      />
       <strong>Applied Filter:</strong> {JSON.stringify(filter)}
     </div>
   );
 }
+
+GroupBy.args = {
+  numberOfInlineFilters: 4,
+};
 
 function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
   const filterDefs: FilterDefs<ProjectFilter> = useMemo(() => {
