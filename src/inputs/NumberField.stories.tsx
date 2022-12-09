@@ -8,11 +8,11 @@ import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
 export default {
   title: "Workspace/Inputs/Number Field",
   component: NumberField,
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=1291%3A0",
-    }
+    },
   },
 } as Meta;
 
@@ -21,7 +21,7 @@ export function NumberFieldStyles() {
     <div css={Css.df.fdc.gap5.$}>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
-        <TestNumberField value={0} label="Age" hideLabel />
+        <TestNumberField value={0} label="Age" labelStyle="hidden" />
         <TestNumberField label="Age" value={1000} />
         <TestNumberField label="Age Disabled" value={1000} disabled="Disabled reason tooltip" />
         <TestNumberField label="Age Read Only" value={1000} readOnly="Read only reason tooltip" />
@@ -36,7 +36,7 @@ export function NumberFieldStyles() {
 
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Compact</h1>
-        <TestNumberField compact value={0} label="Age" hideLabel />
+        <TestNumberField compact value={0} label="Age" labelStyle="hidden" />
         <TestNumberField compact label="Age" value={1000} />
         <TestNumberField compact label="Age Disabled" value={1000} disabled />
         <ValidationNumberField label="Age Validated" compact value={-1} />
@@ -57,7 +57,7 @@ export function NumberFieldStyles() {
       </div>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Force 3 Integers</h1>
-        <TestNumberField value={undefined} numIntegerDigits={3} label="Code" hideLabel placeholder="Code.." />
+        <TestNumberField value={undefined} numIntegerDigits={3} label="Code" labelStyle="hidden" placeholder="Code.." />
       </div>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Without grouping</h1>
@@ -74,16 +74,16 @@ export function NumberFieldReadOnly() {
         <b>Read Only</b>
         <TextField label="First Name" value="first" onChange={() => {}} readOnly={true} />
         <TestNumberField label="Name" value={100} readOnly={true} />
-        <TestNumberField label="Name" value={100} hideLabel readOnly={true} />
+        <TestNumberField label="Name" value={100} labelStyle="hidden" readOnly={true} />
         <TestNumberField label="Name" value={100} readOnly={true} type="cents" />
         <TestNumberField label="Name" value={100} readOnly={true} type="percent" />
       </div>
-      {/*Matching column but w/o readOnly for comparison*/}
+      {/* Matching column but w/o readOnly for comparison */}
       <div css={Css.df.fdc.gap3.$}>
         <b>Editable</b>
         <TextField label="First Name" value="first" onChange={() => {}} />
         <TestNumberField label="Name" value={100} />
-        <TestNumberField label="Name" value={100} hideLabel />
+        <TestNumberField label="Name" value={100} labelStyle="hidden" />
         <TestNumberField label="Name" value={100} type="cents" />
         <TestNumberField label="Name" value={100} type="percent" />
       </div>

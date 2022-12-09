@@ -3,6 +3,7 @@ import { useCheckboxGroup, useCheckboxGroupItem } from "react-aria";
 import { CheckboxGroupState, useCheckboxGroupState } from "react-stately";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
+import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
@@ -17,7 +18,7 @@ export interface CheckboxGroupItemOption {
   value: string;
 }
 
-export interface CheckboxGroupProps {
+export interface CheckboxGroupProps extends Pick<PresentationFieldProps, "labelStyle"> {
   label: string;
   /** Called when a checkbox is selected or deselected */
   onChange: (values: string[]) => void;
@@ -33,12 +34,10 @@ export interface CheckboxGroupProps {
   onFocus?: () => void;
   /** Number of columns to display checkboxes */
   columns?: number;
-  /** Hide label if it is not needed */
-  hideLabel?: boolean
 }
 
 export function CheckboxGroup(props: CheckboxGroupProps) {
-  const { options, label, values, errorMsg, helperText, onBlur, onFocus, columns = 1, hideLabel = false } = props;
+  const { options, label, labelStyle, values, errorMsg, helperText, onBlur, onFocus, columns = 1 } = props;
 
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
@@ -46,16 +45,22 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
 
   return (
     <div {...groupProps} onBlur={onBlur} onFocus={onFocus} {...tid}>
-     {!hideLabel && <Label label={label} {...labelProps} {...tid.label} />}
-      <div css={Css.dg.gtc(`repeat(${columns}, auto)`).gap2.$}>
-        {options.map((option) => (
-          <CheckboxGroupItem
-            key={option.value}
-            {...option}
-            groupState={state}
-            selected={state.value.includes(option.value)}
-          />
-        ))}
+      <div css={Css.if(labelStyle === "left").df.fdc.add("flexFlow", "wrap").$}>
+        {labelStyle !== "hidden" && (
+          <div css={Css.if(labelStyle === "left").mw50.my("auto").$}>
+            <Label label={label} {...labelProps} {...tid.label} />
+          </div>
+        )}
+        <div css={Css.dg.gtc(`repeat(${columns}, auto)`).gap2.$}>
+          {options.map((option) => (
+            <CheckboxGroupItem
+              key={option.value}
+              {...option}
+              groupState={state}
+              selected={state.value.includes(option.value)}
+            />
+          ))}
+        </div>
       </div>
       {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
       {helperText && <HelperText helperText={helperText} {...tid.helperText} />}

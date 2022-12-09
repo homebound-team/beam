@@ -22,6 +22,7 @@ export function TextAreaStyles() {
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <TestTextArea value="" label="Description" labelStyle="hidden" />
+        <TestTextArea value="" label="Description" labelStyle="left" />
         <TestTextArea label="Description" value="" />
         <TestTextArea label="Description" value="An example description text." autoFocus />
         <TestTextArea

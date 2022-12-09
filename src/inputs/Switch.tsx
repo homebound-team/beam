@@ -16,9 +16,7 @@ export interface SwitchProps {
   /** Input label */
   label: string;
   /** Where to put the label. */
-  labelStyle?: "form" | "inline" | "filter";
-  /** Whether or not to hide the label */
-  hideLabel?: boolean;
+  labelStyle?: "form" | "inline" | "filter" | "hidden" | "left";
   /** Handler when the interactive element state changes. */
   onChange: (value: boolean) => void;
   /** Whether the switch is selected */
@@ -36,7 +34,6 @@ export function Switch(props: SwitchProps) {
     compact = false,
     label,
     labelStyle = "inline",
-    hideLabel = false,
     ...otherProps
   } = props;
   const isDisabled = !!disabled;
@@ -63,8 +60,8 @@ export function Switch(props: SwitchProps) {
         }}
         aria-label={label}
       >
-        {!hideLabel && labelStyle === "form" && <Label label={label} />}
-        {!hideLabel && labelStyle === "filter" && <span>{label}</span>}
+        {labelStyle === "form" && <Label label={label} />}
+        {labelStyle === "filter" && <span>{label}</span>}
         {/* Background */}
         <div
           aria-hidden="true"
@@ -93,7 +90,7 @@ export function Switch(props: SwitchProps) {
         </div>
         {/* Since we are using childGap, we must wrap the label in an element and
         match the height of the icon for horizontal alignment */}
-        {!hideLabel && labelStyle === "inline" && (
+        {labelStyle === "inline" && (
           <span
             css={{
               // LineHeight is conditionally applied to handle compact version text alignment

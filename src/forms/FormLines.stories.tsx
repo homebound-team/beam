@@ -195,7 +195,7 @@ export function WithHorizontalLayout() {
         ]}
         onSelect={noop}
       />
-      <Switch label="Signatory" labelStyle="form" hideLabel selected={true} onChange={noop} />
+      <Switch label="Signatory" labelStyle="hidden" selected={true} onChange={noop} />
     </FormLines>
   );
 }

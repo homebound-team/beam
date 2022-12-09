@@ -24,6 +24,7 @@ export function TextFieldStyles() {
         <h1 css={Css.lg.$}>Regular</h1>
         <TestTextField value="" label="Name" labelStyle="hidden" />
         <TestTextField value="Brandon" label="Name" labelStyle="inline" />
+        <TestTextField value="" label="Name" labelStyle="left" />
         <TestTextField label="Name" value="" />
         <TestTextField label="Name" required value="" />
         <TestTextField label="Name Focused" value="Brandon" autoFocus />

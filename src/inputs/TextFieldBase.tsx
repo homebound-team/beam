@@ -111,7 +111,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     : [Palette.White, Palette.Gray100, Palette.Gray100];
 
   const fieldStyles = {
-    container: Css.df.fdc.w100.maxw(px(550)).relative.$,
+    container: Css.df.fdc.w100.maxw(px(550)).relative.if(labelStyle === "left").fdr.$,
     inputWrapper: {
       ...Css[typeScale].df.aic.br4.px1.w100
         .hPx(fieldHeight - maybeSmaller)
@@ -172,14 +172,16 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       {/* TODO: place the label */}
       {label && labelStyle !== "inline" && (
         // set `hidden` if being rendered as a compound field
-        <Label
-          labelProps={labelProps}
-          hidden={labelStyle === "hidden" || compound}
-          label={label}
-          suffix={labelSuffix}
-          contrast={contrast}
-          {...tid.label}
-        />
+        <div css={Css.if(labelStyle === "left").mw50.my("auto").$}>
+          <Label
+            labelProps={labelProps}
+            hidden={labelStyle === "hidden" || compound}
+            label={label}
+            suffix={labelSuffix}
+            contrast={contrast}
+            {...tid.label}
+          />
+        </div>
       )}
       {maybeTooltip({
         title: tooltip,

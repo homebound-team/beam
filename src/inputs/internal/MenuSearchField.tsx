@@ -6,9 +6,7 @@ import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
 import { useTestIds } from "src/utils";
 import { TextFieldBase } from "../TextFieldBase";
 
-interface TextFieldProps<X> extends BeamTextFieldProps<X> {
-  inlineLabel: boolean;
-}
+interface TextFieldProps<X> extends BeamTextFieldProps<X> {}
 
 export function MenuSearchField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
   const tid = useTestIds(props);
