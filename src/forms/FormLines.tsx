@@ -18,8 +18,6 @@ export interface FormLinesProps {
   labelSuffix?: LabelSuffixStyle;
   width?: FormWidth;
   compact?: boolean;
-  /** Creates a horizontal layout for Form fields */
-  horizontalLayout?: boolean;
 }
 
 /**
@@ -29,7 +27,7 @@ export interface FormLinesProps {
  * (see the `FieldGroup` component), where they will be laid out side-by-side.
  */
 export function FormLines(props: FormLinesProps) {
-  const { children, width = "full", labelSuffix, compact, horizontalLayout } = props;
+  const { children, width = "full", labelSuffix, compact } = props;
   let firstFormHeading = true;
 
   // Only overwrite `fieldProps` if new values are explicitly set. Ensures we only set to `undefined` if explicitly set.
@@ -53,14 +51,6 @@ export function FormLines(props: FormLinesProps) {
             const clone = cloneElement(child, { isFirst: firstFormHeading });
             firstFormHeading = false;
             return clone;
-          } else if (horizontalLayout && typeof child === "object" && (child as ReactElement).props?.label) {
-            return (
-              <div css={Css.df.$}>
-                {/* get the label from the Form field */}
-                <div css={Css.mw50.sm.gray700.my("auto").$}>{(child as ReactElement).props.label}</div>
-                {child}
-              </div>
-            );
           } else {
             return child;
           }
