@@ -29,7 +29,7 @@ interface FilterProps<F, G extends Value = string> {
 }
 
 function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
-  const { filter, onChange, filterDefs, groupBy, vertical = false, numberOfInlineFilters = groupBy ? 3 : 4 } = props;
+  const { filter, onChange, filterDefs, groupBy, vertical = false, numberOfInlineFilters = groupBy ? 2 : 3 } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
 
   const { openModal } = useModal();
@@ -37,7 +37,7 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
     // Take the FilterDefs that have a `key => ...` factory and eval it
     const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)]);
     // If we have more than numberOfInlineFilters depending on groupby,
-    if (!vertical && impls.length > numberOfInlineFilters) {
+    if (!vertical && impls.length > numberOfInlineFilters + 1) {
       // Then return up to the numberOfInlineFilters, and the remainder in the modal.
       return [
         Object.fromEntries(impls.slice(0, numberOfInlineFilters)) as FilterImpls<F>,
