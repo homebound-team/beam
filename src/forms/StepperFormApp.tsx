@@ -22,7 +22,7 @@ import { useComputed } from "src/hooks";
 export function StepperFormApp() {
   const formState = useFormState({
     config: formConfig,
-    init: { input: {}, map: (i) => i },
+    init: { input: {} as AuthorInput, map: (i) => i },
     addRules(state) {
       state.lastName.rules.push(() => {
         return state.firstName.value === state.lastName.value ? "Last name cannot equal first name" : undefined;
