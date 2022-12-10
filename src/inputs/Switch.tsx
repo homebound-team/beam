@@ -53,39 +53,45 @@ export function Switch(props: SwitchProps) {
         {...hoverProps}
         css={{
           ...Css.relative.cursorPointer.df.w("max-content").smMd.selectNone.$,
-          ...(labelStyle === "form" && Css.fdc.$),
+          ...((labelStyle === "form" || labelStyle === "left") && Css.w100.fdr.$),
           ...(labelStyle === "inline" && Css.gap2.aic.$),
           ...(labelStyle === "filter" && Css.jcsb.gap1.aic.w("auto").sm.$),
           ...(isDisabled && Css.cursorNotAllowed.gray400.$),
         }}
         aria-label={label}
       >
-        {labelStyle === "form" && <Label label={label} />}
+        {(labelStyle === "form" || labelStyle === "left") && (
+          <div css={Css.if(labelStyle === "left").w50.$}>
+            <Label label={label} />
+          </div>
+        )}
         {labelStyle === "filter" && <span>{label}</span>}
         {/* Background */}
-        <div
-          aria-hidden="true"
-          css={{
-            ...Css.wPx(40).hPx(toggleHeight(compact)).bgGray200.br12.relative.transition.$,
-            ...(isHovered && switchHoverStyles),
-            ...(isKeyboardFocus && switchFocusStyles),
-            ...(isDisabled && Css.bgGray300.$),
-            ...(isSelected && Css.bgLightBlue700.$),
-            ...(isSelected && isHovered && switchSelectedHoverStyles),
-          }}
-        >
-          {/* Circle */}
+        <div css={Css.if(labelStyle === "left").w50.$}>
           <div
+            aria-hidden="true"
             css={{
-              ...switchCircleDefaultStyles(compact),
-              ...(isDisabled && Css.bgGray100.$),
-              ...(isSelected && switchCircleSelectedStyles(compact)),
+              ...Css.wPx(40).hPx(toggleHeight(compact)).bgGray200.br12.relative.transition.$,
+              ...(isHovered && switchHoverStyles),
+              ...(isKeyboardFocus && switchFocusStyles),
+              ...(isDisabled && Css.bgGray300.$),
+              ...(isSelected && Css.bgLightBlue700.$),
+              ...(isSelected && isHovered && switchSelectedHoverStyles),
             }}
           >
-            {/* Icon */}
-            {withIcon && (
-              <Icon icon={isSelected ? "check" : "x"} color={isSelected ? Palette.LightBlue700 : Palette.Gray400} />
-            )}
+            {/* Circle */}
+            <div
+              css={{
+                ...switchCircleDefaultStyles(compact),
+                ...(isDisabled && Css.bgGray100.$),
+                ...(isSelected && switchCircleSelectedStyles(compact)),
+              }}
+            >
+              {/* Icon */}
+              {withIcon && (
+                <Icon icon={isSelected ? "check" : "x"} color={isSelected ? Palette.LightBlue700 : Palette.Gray400} />
+              )}
+            </div>
           </div>
         </div>
         {/* Since we are using childGap, we must wrap the label in an element and
