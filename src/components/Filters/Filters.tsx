@@ -29,7 +29,7 @@ interface FilterProps<F, G extends Value = string> {
 }
 
 function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
-  const { filter, onChange, filterDefs, groupBy, vertical = false, numberOfInlineFilters = groupBy ? 2 : 3 } = props;
+  const { filter, onChange, filterDefs, groupBy, vertical = false, numberOfInlineFilters = groupBy ? 3 : 4 } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
 
   const { openModal } = useModal();
@@ -37,11 +37,11 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
     // Take the FilterDefs that have a `key => ...` factory and eval it
     const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)]);
     // If we have more than numberOfInlineFilters depending on groupby,
-    if (!vertical && impls.length > numberOfInlineFilters + 1) {
+    if (!vertical && impls.length > numberOfInlineFilters) {
       // Then return up to the numberOfInlineFilters, and the remainder in the modal.
       return [
-        Object.fromEntries(impls.slice(0, numberOfInlineFilters)) as FilterImpls<F>,
-        Object.fromEntries(impls.slice(numberOfInlineFilters)) as FilterImpls<F>,
+        Object.fromEntries(impls.slice(0, numberOfInlineFilters - 1)) as FilterImpls<F>,
+        Object.fromEntries(impls.slice(numberOfInlineFilters - 1)) as FilterImpls<F>,
       ];
     }
     // Otherwise, we don't have enough to show the modal, so only use page filter keys
