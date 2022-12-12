@@ -9,7 +9,16 @@ interface ScrollableContentProps {
   omitBottomPadding?: true;
   bgColor?: Palette;
 }
-/** Helper component for placing scrollable content within a `ScrollableParent`. */
+
+/**
+ * Helper component for placing scrollable content within a `ScrollableParent`.
+ *
+ * See the docs on `ScrollableParent.
+ *
+ * Note that you should not use this "just to get a scrollbar", instead just use `Css.overflowAuto.$`
+ * or what not; this is only for implementing page-level patterns that need multiple stickied
+ * components (page header, tab bar, table filter & actions).
+ */
 export function ScrollableContent(props: ScrollableContentProps): ReactPortal | JSX.Element {
   const { children, virtualized = false, omitBottomPadding, bgColor } = props;
   const { scrollableEl, setPortalTick, pl, pr } = useScrollableParent();
