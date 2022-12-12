@@ -111,13 +111,15 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     : [Palette.White, Palette.Gray100, Palette.Gray100];
 
   const fieldStyles = {
-    container: Css.df.fdc.w100.maxw(px(550)).relative.if(labelStyle === "left").fdr.$,
+    container: Css.df.fdc.w100.maxw(px(550)).relative.if(labelStyle === "left").fdr.gap2.jcsb.aic.$,
     inputWrapper: {
       ...Css[typeScale].df.aic.br4.px1.w100
         .hPx(fieldHeight - maybeSmaller)
         .if(compact)
         .hPx(compactFieldHeight - maybeSmaller).$,
-      ...Css.bgColor(bgColor).gray900.if(contrast).white.$,
+      ...Css.bgColor(bgColor)
+        .gray900.if(contrast)
+        .white.if(labelStyle === "left").maxw50.$,
       // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
       // This typically happens in tables when a column has a mix of static text (i.e. "roll up" rows and table headers) and input fields.
       // To remedy this perceived misalignment then we increase the width by the horizontal padding applied (16px), and set a negative margin left margin to re-center the field.
@@ -171,17 +173,14 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     <div css={fieldStyles.container} {...groupProps} {...focusWithinProps}>
       {/* TODO: place the label */}
       {label && labelStyle !== "inline" && (
-        // set `hidden` if being rendered as a compound field
-        <div css={Css.if(labelStyle === "left").mw50.my("auto").$}>
-          <Label
-            labelProps={labelProps}
-            hidden={labelStyle === "hidden" || compound}
-            label={label}
-            suffix={labelSuffix}
-            contrast={contrast}
-            {...tid.label}
-          />
-        </div>
+        <Label
+          labelProps={labelProps}
+          hidden={labelStyle === "hidden" || compound}
+          label={label}
+          suffix={labelSuffix}
+          contrast={contrast}
+          {...tid.label}
+        />
       )}
       {maybeTooltip({
         title: tooltip,
