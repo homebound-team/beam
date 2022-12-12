@@ -193,6 +193,7 @@ function Template(args: SelectFieldProps<any, any>) {
           getOptionLabel={(o) => o.name}
           hideErrorMessage
         />
+
         <TestSelectField
           {...args}
           label="Disabled Options"
@@ -200,14 +201,6 @@ function Template(args: SelectFieldProps<any, any>) {
           options={options}
           disabledOptions={[options[0].id, { value: options[3].id, reason: "Example disabled tooltip" }]}
           helperText="Disabled options can optionally have tooltip text"
-        />
-
-        <TestSelectField
-          {...args}
-          label="With horizontal layout"
-          labelStyle="left"
-          value={options[1].id}
-          options={options}
         />
       </div>
 

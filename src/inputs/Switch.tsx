@@ -53,18 +53,14 @@ export function Switch(props: SwitchProps) {
         {...hoverProps}
         css={{
           ...Css.relative.cursorPointer.df.w("max-content").smMd.selectNone.$,
-          ...((labelStyle === "form" || labelStyle === "left") && Css.w100.fdr.$),
+          ...((labelStyle === "form" || labelStyle === "left") && Css.w100.fdr.gap1.jcsb.$),
           ...(labelStyle === "inline" && Css.gap2.aic.$),
           ...(labelStyle === "filter" && Css.jcsb.gap1.aic.w("auto").sm.$),
           ...(isDisabled && Css.cursorNotAllowed.gray400.$),
         }}
         aria-label={label}
       >
-        {(labelStyle === "form" || labelStyle === "left") && (
-          <div css={Css.if(labelStyle === "left").w50.$}>
-            <Label label={label} />
-          </div>
-        )}
+        {(labelStyle === "form" || labelStyle === "left") && <Label label={label} />}
         {labelStyle === "filter" && <span>{label}</span>}
         {/* Background */}
         <div css={Css.if(labelStyle === "left").w50.$}>
