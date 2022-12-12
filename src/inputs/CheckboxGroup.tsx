@@ -3,7 +3,7 @@ import { useCheckboxGroup, useCheckboxGroupItem } from "react-aria";
 import { CheckboxGroupState, useCheckboxGroupState } from "react-stately";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
-import { PresentationFieldProps } from "src/components/PresentationContext";
+import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
@@ -37,7 +37,18 @@ export interface CheckboxGroupProps extends Pick<PresentationFieldProps, "labelS
 }
 
 export function CheckboxGroup(props: CheckboxGroupProps) {
-  const { options, label, labelStyle, values, errorMsg, helperText, onBlur, onFocus, columns = 1 } = props;
+  const { fieldProps } = usePresentationContext();
+  const {
+    options,
+    label,
+    labelStyle = fieldProps?.labelStyle ?? "above",
+    values,
+    errorMsg,
+    helperText,
+    onBlur,
+    onFocus,
+    columns = 1,
+  } = props;
 
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
