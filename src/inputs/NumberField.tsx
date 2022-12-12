@@ -65,7 +65,6 @@ export function NumberField(props: NumberFieldProps) {
     errorMsg,
     helperText,
     value,
-    labelStyle,
     onChange,
     xss,
     displayDirection = false,

@@ -195,7 +195,7 @@ export function WithHorizontalLayout() {
         ]}
         onSelect={noop}
       />
-      <Switch label="Last" labelStyle="left" selected={false} onChange={() => {}} />
+      <Switch label="Last" labelStyle="left" selected={true} onChange={() => {}} />
     </FormLines>
   );
 }

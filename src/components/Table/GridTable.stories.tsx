@@ -525,14 +525,12 @@ export const DataTypeColumns = newStory(
     const dateCol = dateColumn<Row2>({ header: "Date", data: ({ date }) => date });
     const priceCol = numericColumn<Row2>({
       header: "Price",
-      data: ({ priceInCents }) => (
-        <NumberField labelStyle="hidden" label="Price" value={priceInCents} onChange={noop} type="cents" />
-      ),
+      data: ({ priceInCents }) => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
     });
     const readOnlyPriceCol = numericColumn<Row2>({
       header: "Read only Price",
       data: ({ priceInCents }) => (
-        <NumberField labelStyle="hidden" label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />
+        <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />
       ),
     });
     const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
@@ -565,9 +563,7 @@ export function WrappedHeaders() {
   const rightAlignedColumn = numericColumn<Row2>({
     header: "Right aligned column header",
     data: ({ priceInCents }) => ({
-      content: (
-        <NumberField labelStyle="hidden" label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />
-      ),
+      content: <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />,
       sortValue: priceInCents,
     }),
     w: "150px",
@@ -614,11 +610,9 @@ export function ColSpan() {
   const dateCol = dateColumn<ColspanRow>({ header: "Date", data: ({ date }) => date, total: "" });
   const priceCol = numericColumn<ColspanRow>({
     header: "Price",
-    data: ({ priceInCents }) => (
-      <NumberField labelStyle="hidden" label="Price" value={priceInCents} onChange={noop} type="cents" />
-    ),
+    data: ({ priceInCents }) => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
     total: ({ totalPriceInCents }) => (
-      <NumberField labelStyle="hidden" label="Price" readOnly value={totalPriceInCents} onChange={noop} type="cents" />
+      <NumberField label="Price" readOnly value={totalPriceInCents} onChange={noop} type="cents" />
     ),
   });
   // Use a green background to show the 1st column is flush left
