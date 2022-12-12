@@ -17,6 +17,8 @@ export interface SwitchProps {
   label: string;
   /** Where to put the label. */
   labelStyle?: "form" | "inline" | "filter" | "hidden" | "left"; // TODO: Update `labelStyle` to make consistent with other `labelStyle` properties in the library
+  /** Whether or not to hide the label */
+  hideLabel?: boolean;
   /** Handler when the interactive element state changes. */
   onChange: (value: boolean) => void;
   /** Whether the switch is selected */
@@ -34,6 +36,7 @@ export function Switch(props: SwitchProps) {
     compact = false,
     label,
     labelStyle = "inline",
+    hideLabel = false,
     ...otherProps
   } = props;
   const isDisabled = !!disabled;
@@ -53,41 +56,44 @@ export function Switch(props: SwitchProps) {
         {...hoverProps}
         css={{
           ...Css.relative.cursorPointer.df.w("max-content").smMd.selectNone.$,
-          ...((labelStyle === "form" || labelStyle === "left") && Css.w100.fdr.gap1.jcsb.$),
+          ...(labelStyle === "form" && Css.fdc.$),
+          ...(labelStyle === "left" && Css.w100.fdr.$),
           ...(labelStyle === "inline" && Css.gap2.aic.$),
           ...(labelStyle === "filter" && Css.jcsb.gap1.aic.w("auto").sm.$),
           ...(isDisabled && Css.cursorNotAllowed.gray400.$),
         }}
         aria-label={label}
       >
-        {(labelStyle === "form" || labelStyle === "left") && <Label label={label} />}
+        {(labelStyle === "form" || labelStyle === "left") && (
+          <div css={Css.if(labelStyle === "left").w50.$}>
+            <Label label={label} />
+          </div>
+        )}
         {labelStyle === "filter" && <span>{label}</span>}
         {/* Background */}
-        <div css={Css.if(labelStyle === "left").w50.$}>
+        <div
+          aria-hidden="true"
+          css={{
+            ...Css.wPx(40).hPx(toggleHeight(compact)).bgGray200.br12.relative.transition.$,
+            ...(isHovered && switchHoverStyles),
+            ...(isKeyboardFocus && switchFocusStyles),
+            ...(isDisabled && Css.bgGray300.$),
+            ...(isSelected && Css.bgLightBlue700.$),
+            ...(isSelected && isHovered && switchSelectedHoverStyles),
+          }}
+        >
+          {/* Circle */}
           <div
-            aria-hidden="true"
             css={{
-              ...Css.wPx(40).hPx(toggleHeight(compact)).bgGray200.br12.relative.transition.$,
-              ...(isHovered && switchHoverStyles),
-              ...(isKeyboardFocus && switchFocusStyles),
-              ...(isDisabled && Css.bgGray300.$),
-              ...(isSelected && Css.bgLightBlue700.$),
-              ...(isSelected && isHovered && switchSelectedHoverStyles),
+              ...switchCircleDefaultStyles(compact),
+              ...(isDisabled && Css.bgGray100.$),
+              ...(isSelected && switchCircleSelectedStyles(compact)),
             }}
           >
-            {/* Circle */}
-            <div
-              css={{
-                ...switchCircleDefaultStyles(compact),
-                ...(isDisabled && Css.bgGray100.$),
-                ...(isSelected && switchCircleSelectedStyles(compact)),
-              }}
-            >
-              {/* Icon */}
-              {withIcon && (
-                <Icon icon={isSelected ? "check" : "x"} color={isSelected ? Palette.LightBlue700 : Palette.Gray400} />
-              )}
-            </div>
+            {/* Icon */}
+            {withIcon && (
+              <Icon icon={isSelected ? "check" : "x"} color={isSelected ? Palette.LightBlue700 : Palette.Gray400} />
+            )}
           </div>
         </div>
         {/* Since we are using childGap, we must wrap the label in an element and
