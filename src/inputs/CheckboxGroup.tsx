@@ -55,23 +55,21 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
   const tid = useTestIds(props);
 
   return (
-    <div {...groupProps} onBlur={onBlur} onFocus={onFocus} {...tid}>
-      <div css={Css.if(labelStyle === "left").df.fdc.add("flexFlow", "wrap").$}>
-        {labelStyle !== "hidden" && (
-          <div css={Css.if(labelStyle === "left").mw50.my("auto").$}>
-            <Label label={label} {...labelProps} {...tid.label} />
-          </div>
-        )}
-        <div css={Css.dg.gtc(`repeat(${columns}, auto)`).gap2.$}>
-          {options.map((option) => (
-            <CheckboxGroupItem
-              key={option.value}
-              {...option}
-              groupState={state}
-              selected={state.value.includes(option.value)}
-            />
-          ))}
+    <div {...groupProps} css={Css.if(labelStyle === "left").df.fdr.$} onBlur={onBlur} onFocus={onFocus} {...tid}>
+      {labelStyle !== "hidden" && (
+        <div css={Css.if(labelStyle === "left").w50.$}>
+          <Label label={label} {...labelProps} {...tid.label} />
         </div>
+      )}
+      <div css={Css.dg.gtc(`repeat(${columns}, auto)`).gap2.$}>
+        {options.map((option) => (
+          <CheckboxGroupItem
+            key={option.value}
+            {...option}
+            groupState={state}
+            selected={state.value.includes(option.value)}
+          />
+        ))}
       </div>
       {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
       {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
