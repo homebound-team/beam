@@ -91,7 +91,7 @@ export function NumberField(props: NumberFieldProps) {
       useGrouping,
       signDisplay,
     }),
-    [truncate, numIntegerDigits, useGrouping, signDisplay],
+    [truncate, numIntegerDigits, useGrouping, signDisplay, numFractionDigits],
   );
   const { locale } = useLocale();
   // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
@@ -111,11 +111,11 @@ export function NumberField(props: NumberFieldProps) {
         : type === "dollars"
         ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2 }
         : type === "days"
-        ? { style: "unit", unit: "day", unitDisplay: "long", maximumFractionDigits: 0 }
+        ? { style: "unit", unit: "day", unitDisplay: "long" as const, maximumFractionDigits: 0 }
         : {};
 
     return { ...defaultFormatOptions, ...typeFormat };
-  }, [type, numberFormatOptions]);
+  }, [type, numberFormatOptions, defaultFormatOptions, numFractionDigits]);
   const numberParser = useMemo(() => new NumberParser(locale, formatOptions), [locale, formatOptions]);
 
   // Keep a ref the last "before WIP" value that we passed into react-aria.

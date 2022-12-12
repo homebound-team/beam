@@ -318,12 +318,12 @@ export function isPersistentKey(key: Key): boolean {
 
 type ListBoxSection<O> = { title: string; options: O[]; isPersistent?: boolean };
 export function isListBoxSection<O>(obj: O | ListBoxSection<O>): obj is ListBoxSection<O> {
-  return typeof obj === "object" && "options" in obj;
+  return obj && typeof obj === "object" && "options" in obj;
 }
 
 interface CreateNewFieldProps {
   onBlur: VoidFunction;
-  onEnter: (value: string) => {};
+  onEnter: (value: string) => void;
 }
 
 // Wrapper for the ChipTextField used in the "Create New" flow on ChipSelectField
