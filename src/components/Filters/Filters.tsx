@@ -40,8 +40,8 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
     if (!vertical && impls.length > numberOfInlineFilters) {
       // Then return up to the numberOfInlineFilters, and the remainder in the modal.
       return [
-        Object.fromEntries(impls.slice(0, numberOfInlineFilters)) as FilterImpls<F>,
-        Object.fromEntries(impls.slice(numberOfInlineFilters)) as FilterImpls<F>,
+        Object.fromEntries(impls.slice(0, numberOfInlineFilters - 1)) as FilterImpls<F>,
+        Object.fromEntries(impls.slice(numberOfInlineFilters - 1)) as FilterImpls<F>,
       ];
     }
     // Otherwise, we don't have enough to show the modal, so only use page filter keys
