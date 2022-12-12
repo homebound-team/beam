@@ -66,17 +66,9 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   const anyDescriptions = options.some((o) => !!o.description);
 
   return (
-    // width of `max-content` is used to limit invisible label clicking
-    <div
-      css={
-        Css.w("max-content")
-          .maxw(anyDescriptions ? "344px" : "320px")
-          .if(labelStyle === "left").w100.df.fdr.$
-      }
-    >
-      <div css={Css.if(labelStyle === "left").mw50.my("auto").$}>
-        <Label label={label} {...labelProps} {...tid.label} hidden={labelStyle === "hidden"} />
-      </div>
+    // default styling to position `<Label />` above.
+    <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$}>
+      <Label label={label} {...labelProps} {...tid.label} hidden={labelStyle === "hidden"} />
       <div {...radioGroupProps}>
         {options.map((option) => (
           <Radio
@@ -88,9 +80,9 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
             {...tid[option.value]}
           />
         ))}
+        {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
+        {helperText && <HelperText helperText={helperText} />}
       </div>
-      {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
-      {helperText && <HelperText helperText={helperText} />}
     </div>
   );
 }

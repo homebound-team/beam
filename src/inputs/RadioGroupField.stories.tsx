@@ -131,7 +131,7 @@ export function BaseStates() {
 export function OnlyLabels() {
   const [state, setState] = useState<string | undefined>();
   return (
-    <FormLines>
+    <FormLines width="sm">
       <p css={Css.mb1.$}>With RadioGroupField label</p>
       <RadioGroupField
         label={"Favorite cheese"}
@@ -161,7 +161,7 @@ export function OnlyLabels() {
         onBlur={action("onBlur")}
         onFocus={action("onFocus")}
       />
-      <p css={Css.mb1.$}>With a horizontal RadioGroupField label</p>
+      <p css={Css.mb1.$}>With a left RadioGroupField label</p>
       <RadioGroupField
         label={"Favorite cheese"}
         labelStyle="left"

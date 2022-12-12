@@ -16,7 +16,7 @@ export interface SwitchProps {
   /** Input label */
   label: string;
   /** Where to put the label. */
-  labelStyle?: "form" | "inline" | "filter" | "hidden" | "left";
+  labelStyle?: "form" | "inline" | "filter" | "hidden" | "left"; // TODO: Update `labelStyle` to make consistent with other `labelStyle` properties in the library
   /** Handler when the interactive element state changes. */
   onChange: (value: boolean) => void;
   /** Whether the switch is selected */
