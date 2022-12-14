@@ -3,18 +3,17 @@ import { ReactNode, useMemo, useRef } from "react";
 import { mergeProps, useLocale, useNumberField } from "react-aria";
 import { NumberFieldStateOptions, useNumberFieldState } from "react-stately";
 import { resolveTooltip } from "src/components";
-import { usePresentationContext } from "src/components/PresentationContext";
+import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Xss } from "src/Css";
 import { maybeCall } from "src/utils";
-import { TextFieldBase } from "./TextFieldBase";
+import { TextFieldBase, TextFieldBaseProps } from "./TextFieldBase";
 
 export type NumberFieldType = "cents" | "dollars" | "percent" | "basisPoints" | "days";
 
 // exported for testing purposes
-export interface NumberFieldProps {
+export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelStyle"> {
   label: string;
   /** If set, the label will be defined as 'aria-label` on the input element */
-  hideLabel?: boolean;
   type?: NumberFieldType;
   value: number | undefined;
   onChange: (value: number | undefined) => void;
@@ -48,7 +47,6 @@ export interface NumberFieldProps {
   hideErrorMessage?: boolean;
   // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
   borderless?: boolean;
-  inlineLabel?: boolean;
   sizeToContent?: boolean;
 }
 

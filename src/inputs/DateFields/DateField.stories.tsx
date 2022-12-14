@@ -26,7 +26,7 @@ export function DateFields() {
     ["With Label", <TestDateField label="Projected Client Presentation Date" />],
     ["Without calendar icon", <TestDateField label="Projected Client Presentation Date" hideCalendarIcon />],
     ["Disabled", <TestDateField label="Start Date" disabled="Disabled Reason" />],
-    ["Inline Label", <TestDateField label="Start Date" inlineLabel />],
+    ["Inline Label", <TestDateField label="Start Date" labelStyle="inline" />],
     ["Read Only", <TestDateField label="Start Date" readOnly="Read only reason tooltip" />],
     ["Read Only Long", <TestDateField label="Start Date" readOnly format="long" />],
     ["Error Message", <TestDateField label="Start Date" errorMsg="Required" />],

@@ -32,7 +32,7 @@ export interface TextFieldBaseProps<X>
       | "onBlur"
       | "onFocus"
       | "helperText"
-      | "hideLabel"
+      | "labelStyle"
       | "placeholder"
       | "compact"
       | "borderless"
@@ -48,7 +48,6 @@ export interface TextFieldBaseProps<X>
   groupProps?: NumberFieldAria["groupProps"];
   endAdornment?: ReactNode;
   startAdornment?: ReactNode;
-  inlineLabel?: boolean;
   contrast?: boolean;
   clearable?: boolean;
   // TextArea specific
@@ -64,7 +63,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     label,
     required,
     labelProps,
-    hideLabel = fieldProps?.hideLabel ?? false,
     inputProps,
     inputRef,
     inputWrapRef,
@@ -79,7 +77,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     xss,
     endAdornment,
     startAdornment,
-    inlineLabel,
+    labelStyle = fieldProps?.labelStyle ?? "above",
     contrast = false,
     borderless = fieldProps?.borderless ?? false,
     textAreaMinHeight = 96,
@@ -90,7 +88,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     hideErrorMessage = false,
   } = props;
 
-  const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && !hideLabel ? "smMd" : "sm");
+  const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
   const { compound = false, forceFocus = false, forceHover = false } = internalProps;
   const errorMessageId = `${inputProps.id}-error`;
@@ -113,13 +111,15 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     : [Palette.White, Palette.Gray100, Palette.Gray100];
 
   const fieldStyles = {
-    container: Css.df.fdc.w100.maxw(px(550)).relative.$,
+    container: Css.df.fdc.w100.maxw(px(550)).relative.if(labelStyle === "left").fdr.gap2.jcsb.aic.$,
     inputWrapper: {
       ...Css[typeScale].df.aic.br4.px1.w100
         .hPx(fieldHeight - maybeSmaller)
         .if(compact)
         .hPx(compactFieldHeight - maybeSmaller).$,
-      ...Css.bgColor(bgColor).gray900.if(contrast).white.$,
+      ...Css.bgColor(bgColor)
+        .gray900.if(contrast)
+        .white.if(labelStyle === "left").maxw50.$,
       // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
       // This typically happens in tables when a column has a mix of static text (i.e. "roll up" rows and table headers) and input fields.
       // To remedy this perceived misalignment then we increase the width by the horizontal padding applied (16px), and set a negative margin left margin to re-center the field.
@@ -133,7 +133,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     inputWrapperReadOnly: {
       ...Css[typeScale].df.aic.w100.gray900.if(contrast).white.$,
       // If we are hiding the label, then we are typically in a table. Keep the `mh` in this case to ensure editable and non-editable fields in a single table row line up properly
-      ...(hideLabel &&
+      ...(labelStyle === "hidden" &&
         Css.mhPx(fieldHeight - maybeSmaller)
           .if(compact)
           .mhPx(compactFieldHeight - maybeSmaller).$),
@@ -171,11 +171,11 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
 
   return (
     <div css={fieldStyles.container} {...groupProps} {...focusWithinProps}>
-      {label && !inlineLabel && (
-        // set `hidden` if being rendered as a compound field
+      {/* TODO: place the label */}
+      {label && labelStyle !== "inline" && (
         <Label
           labelProps={labelProps}
-          hidden={hideLabel || compound}
+          hidden={labelStyle === "hidden" || compound}
           label={label}
           suffix={labelSuffix}
           contrast={contrast}
@@ -196,7 +196,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             data-readonly="true"
             {...tid}
           >
-            {!multiline && inlineLabel && label && !hideLabel && (
+            {!multiline && labelStyle === "inline" && label && (
               <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
             )}
             {multiline
@@ -226,7 +226,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             {...hoverProps}
             ref={inputWrapRef as any}
           >
-            {!multiline && inlineLabel && label && !hideLabel && (
+            {!multiline && labelStyle === "inline" && label && (
               <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
             )}
             {!multiline && startAdornment && <span css={Css.df.aic.fs0.br4.pr1.$}>{startAdornment}</span>}
@@ -234,7 +234,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               {...mergeProps(
                 inputProps,
                 { onBlur, onFocus: onFocusChained, onChange: onDomChange },
-                { "aria-invalid": Boolean(errorMsg), ...(hideLabel ? { "aria-label": label } : {}) },
+                { "aria-invalid": Boolean(errorMsg), ...(labelStyle === "hidden" ? { "aria-label": label } : {}) },
               )}
               {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
               ref={fieldRef as any}

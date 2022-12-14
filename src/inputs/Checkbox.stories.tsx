@@ -111,6 +111,33 @@ export function CheckboxGroups() {
         />
       </div>
 
+      <div css={Css.mt4.dg.gap1.w50.$}>
+        <h2>Checkbox Group with a left label</h2>
+        <div css={Css.sm.lightBlue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
+        <CheckboxGroup
+          label="Favorite Chairs"
+          labelStyle="left"
+          onChange={(values) => setSelectedValues(values)}
+          values={selectedValues}
+          options={[
+            {
+              value: "shell",
+              label: "Shell Chair by Hans Wegner",
+              description:
+                "Sometimes called the “smiling chair,” Hans Wegner’s Shell Chair (1963) achieves a floating lightness with its wing-like seat and arching curved legs.",
+            },
+            {
+              value: "womb",
+              label: "Womb Chair by Eero Saarinen",
+              description:
+                "When Florence Knoll challenged Eero Saarinen to create a chair that she could curl up in, she found the right candidate for the task.",
+            },
+          ]}
+          onBlur={action("onBlur")}
+          onFocus={action("onFocus")}
+        />
+      </div>
+
       <div css={Css.dg.gap1.mt2.$}>
         <h2>Error Message</h2>
         <TestCheckboxGroup

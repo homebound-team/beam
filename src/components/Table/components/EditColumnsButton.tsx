@@ -76,7 +76,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
           values={selectedValues}
           options={options}
           columns={2}
-          hideLabel
+          labelStyle="hidden"
         />
         <div css={Css.mt1.$}>
           <Button variant={"tertiary"} label={"Clear selections"} onClick={() => setSelectedValues([])} />

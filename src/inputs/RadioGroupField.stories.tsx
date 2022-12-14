@@ -17,7 +17,7 @@ import {
 export default {
   component: RadioGroupField,
   title: "Workspace/Inputs/Radio Group",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36814%3A102223",
@@ -131,7 +131,7 @@ export function BaseStates() {
 export function OnlyLabels() {
   const [state, setState] = useState<string | undefined>();
   return (
-    <FormLines>
+    <FormLines width="sm">
       <p css={Css.mb1.$}>With RadioGroupField label</p>
       <RadioGroupField
         label={"Favorite cheese"}
@@ -149,7 +149,22 @@ export function OnlyLabels() {
       <p css={Css.mb1.$}>With hidden RadioGroupField label</p>
       <RadioGroupField
         label={"Favorite cheese"}
-        hideLabel
+        labelStyle="hidden"
+        value={state}
+        onChange={setState}
+        options={[
+          { label: "Asiago", value: "a" },
+          { label: "Burratta", value: "b" },
+          { label: "Camembert", value: "c" },
+          { label: "Roquefort", value: "d" },
+        ]}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+      <p css={Css.mb1.$}>With a left RadioGroupField label</p>
+      <RadioGroupField
+        label={"Favorite cheese"}
+        labelStyle="left"
         value={state}
         onChange={setState}
         options={[
@@ -206,7 +221,7 @@ export function Disabled() {
     <RadioGroupField
       label={"Favorite cheese"}
       value={"a"}
-      onChange={() => {}}
+      onChange={() => { }}
       disabled={true}
       options={[
         { label: "Asiago", value: "a" },
@@ -230,7 +245,7 @@ export function ErrorMessage() {
     <RadioGroupField
       label={"Favorite cheese"}
       value={"a"}
-      onChange={() => {}}
+      onChange={() => { }}
       errorMsg="Required"
       options={[
         { label: "Asiago", value: "a" },
@@ -247,7 +262,7 @@ export function HelperText() {
     <RadioGroupField
       label={"Favorite cheese"}
       value={"a"}
-      onChange={() => {}}
+      onChange={() => { }}
       options={[
         { label: "Asiago", value: "a" },
         { label: "Burratta", value: "b" },
