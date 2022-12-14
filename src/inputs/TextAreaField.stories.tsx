@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Css, Only } from "src/Css";
 import { TextAreaField, TextAreaFieldProps, TextField } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
+import { FormLines } from "..";
 
 export default {
   component: TextAreaField,
@@ -21,22 +22,24 @@ export function TextAreaStyles() {
     <div css={Css.df.fdc.gap5.$}>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
-        <TestTextArea value="" label="Description" labelStyle="hidden" />
-        <TestTextArea value="" label="Description" labelStyle="left" />
-        <TestTextArea label="Description" value="" />
-        <TestTextArea label="Description" value="An example description text." autoFocus />
-        <TestTextArea
-          label="Description"
-          value="This is a description that can no longer be edited."
-          disabled="Disabled reason tooltip"
-        />
-        <TestTextArea
-          label="Description"
-          value="See helper text."
-          helperText="Some really long helper text that we expect to wrap."
-        />
-        <ValidationTextArea value="Not enough characters" />
-        <TextField label="Regular Field For Reference" value="value" onChange={() => {}} />
+        <FormLines width="md">
+          <TestTextArea value="" label="Description" labelStyle="hidden" />
+          <TestTextArea value="" label="Description" labelStyle="left" />
+          <TestTextArea label="Description" value="" />
+          <TestTextArea label="Description" value="An example description text." autoFocus />
+          <TestTextArea
+            label="Description"
+            value="This is a description that can no longer be edited."
+            disabled="Disabled reason tooltip"
+          />
+          <TestTextArea
+            label="Description"
+            value="See helper text."
+            helperText="Some really long helper text that we expect to wrap."
+          />
+          <ValidationTextArea value="Not enough characters" />
+          <TextField label="Regular Field For Reference" value="value" onChange={() => { }} />
+        </FormLines>
 
         <h1 css={Css.lg.$}>Modified for Blueprint To Do Title</h1>
         <TestTextArea
