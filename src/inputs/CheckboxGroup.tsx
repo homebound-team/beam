@@ -3,6 +3,7 @@ import { useCheckboxGroup, useCheckboxGroupItem } from "react-aria";
 import { CheckboxGroupState, useCheckboxGroupState } from "react-stately";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
+import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
@@ -17,7 +18,7 @@ export interface CheckboxGroupItemOption {
   value: string;
 }
 
-export interface CheckboxGroupProps {
+export interface CheckboxGroupProps extends Pick<PresentationFieldProps, "labelStyle"> {
   label: string;
   /** Called when a checkbox is selected or deselected */
   onChange: (values: string[]) => void;
@@ -33,20 +34,33 @@ export interface CheckboxGroupProps {
   onFocus?: () => void;
   /** Number of columns to display checkboxes */
   columns?: number;
-  /** Hide label if it is not needed */
-  hideLabel?: boolean
 }
 
 export function CheckboxGroup(props: CheckboxGroupProps) {
-  const { options, label, values, errorMsg, helperText, onBlur, onFocus, columns = 1, hideLabel = false } = props;
+  const { fieldProps } = usePresentationContext();
+  const {
+    options,
+    label,
+    labelStyle = fieldProps?.labelStyle ?? "above",
+    values,
+    errorMsg,
+    helperText,
+    onBlur,
+    onFocus,
+    columns = 1,
+  } = props;
 
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
   const tid = useTestIds(props);
 
   return (
-    <div {...groupProps} onBlur={onBlur} onFocus={onFocus} {...tid}>
-     {!hideLabel && <Label label={label} {...labelProps} {...tid.label} />}
+    <div {...groupProps} css={Css.if(labelStyle === "left").df.fdr.$} onBlur={onBlur} onFocus={onFocus} {...tid}>
+      {labelStyle !== "hidden" && (
+        <div css={Css.if(labelStyle === "left").w50.$}>
+          <Label label={label} {...labelProps} {...tid.label} />
+        </div>
+      )}
       <div css={Css.dg.gtc(`repeat(${columns}, auto)`).gap2.$}>
         {options.map((option) => (
           <CheckboxGroupItem

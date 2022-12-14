@@ -21,7 +21,6 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   helperText?: string | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
-  inlineLabel?: boolean;
   labelProps: LabelHTMLAttributes<HTMLLabelElement>;
   label: string;
   selectedOptions: O[];
@@ -45,7 +44,6 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
     fieldDecoration,
     onBlur,
     onFocus,
-    inlineLabel,
     selectedOptions,
     getOptionValue,
     getOptionLabel,
@@ -66,10 +64,9 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
   return (
     <TextFieldBase
       {...otherProps}
-      inlineLabel={inlineLabel}
       errorMsg={errorMsg}
       contrast={contrast}
-      xss={!inlineLabel && !inputProps.readOnly ? Css.fw5.$ : {}}
+      xss={otherProps.labelStyle !== "inline" && !inputProps.readOnly ? Css.fw5.$ : {}}
       startAdornment={
         (showNumSelection && (
           <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinySb.df.aic.jcc.$}>

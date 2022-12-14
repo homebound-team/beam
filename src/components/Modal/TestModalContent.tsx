@@ -46,7 +46,7 @@ export function TestModalContent(props: TestModalContentProps) {
             value={internalValue}
             onChange={(v) => setValue(v)}
             preventNewLines
-            hideLabel
+            labelStyle="hidden"
             borderless
             xss={Css.xl.$}
           />

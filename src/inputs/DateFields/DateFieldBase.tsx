@@ -22,7 +22,7 @@ import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 export interface DateFieldBaseProps
-  extends Pick<TextFieldBaseProps<{}>, "borderless" | "visuallyDisabled" | "hideLabel" | "compact"> {
+  extends Pick<TextFieldBaseProps<{}>, "borderless" | "visuallyDisabled" | "labelStyle" | "compact"> {
   label: string;
   /** Called when the component loses focus */
   onBlur?: () => void;
@@ -35,8 +35,6 @@ export interface DateFieldBaseProps
   /** Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip. */
   readOnly?: boolean | ReactNode;
   helperText?: string | ReactNode;
-  /** Renders the label inside the input field, i.e. for filters. */
-  inlineLabel?: boolean;
   placeholder?: string;
   format?: keyof typeof dateFormats;
   iconLeft?: boolean;
@@ -79,7 +77,6 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     onChange: _onChange,
     errorMsg,
     helperText,
-    inlineLabel = false,
     readOnly,
     format = "short",
     iconLeft = false,
@@ -299,7 +296,6 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         inputProps={{ ...inputProps, size: inputSize }}
         inputRef={inputRef}
         inputWrapRef={inputWrapRef}
-        inlineLabel={inlineLabel}
         onChange={(v) => {
           // hide the calendar if the user is manually entering the date
           state.close();

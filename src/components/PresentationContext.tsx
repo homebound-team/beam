@@ -4,8 +4,8 @@ import { Typography } from "src/Css";
 
 export interface PresentationFieldProps {
   numberAlignment?: "left" | "right";
-  // Hide labels for input fields. Helpful when displaying in a Table and the column header acts as the label
-  hideLabel?: boolean;
+  /** Sets the label position or visibility. Defaults to "above" */
+  labelStyle?: "inline" | "hidden" | "above" | "left";
   labelSuffix?: LabelSuffixStyle;
   // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
   borderless?: boolean;

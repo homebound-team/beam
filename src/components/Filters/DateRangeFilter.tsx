@@ -39,7 +39,7 @@ class DateRangeFilter<V extends Key, DV extends DateRangeFilterValue<V>>
         {vertical && <Label label={label} />}
         <DateRangeField
           compact
-          inlineLabel
+          labelStyle="inline"
           isRangeFilterField
           placeholder={placeholderText}
           label={testFieldLabel ?? "Date"}

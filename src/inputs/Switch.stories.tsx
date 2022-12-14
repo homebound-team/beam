@@ -14,11 +14,11 @@ import { SwitchGroup, SwitchGroupProps } from "./SwitchGroup";
 export default {
   component: SwitchComponent,
   title: "Workspace/Inputs/Switch",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36943%3A102525",
-    }
+    },
   },
 } as Meta<SwitchProps>;
 
@@ -85,7 +85,7 @@ export const Switch = () => {
 export const LabelStyles = () => {
   const [selected, setSelected] = useState(false);
   return (
-    <div css={Css.wPx(200).$}>
+    <div css={Css.wPx(300).$}>
       <h2 css={Css.baseMd.mb1.$}>Inline (default)</h2>
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} />
       <h2 css={Css.baseMd.mb1.mt3.pt2.bt.bGray200.$}>Filter</h2>
@@ -96,7 +96,9 @@ export const LabelStyles = () => {
       <h2 css={Css.baseMd.mb1.mt3.pt2.bt.bGray200.$}>Form</h2>
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="form" />
       <h2 css={Css.baseMd.mb1.mt3.pt2.bt.bGray200.$}>Hidden</h2>
-      <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} hideLabel />
+      <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="hidden" />
+      <h2 css={Css.baseMd.mb1.mt3.pt2.bt.bGray200.$}>Left</h2>
+      <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="left" />
     </div>
   );
 };

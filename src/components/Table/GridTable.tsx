@@ -378,7 +378,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
   const typeScale = style?.presentationSettings?.typeScale;
   const fieldProps: PresentationFieldProps = useMemo(
     () => ({
-      hideLabel: true,
+      labelStyle: "hidden",
       numberAlignment: "right",
       compact: true,
       errorInTooltip: true,
