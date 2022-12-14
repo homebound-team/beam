@@ -1,6 +1,7 @@
 const { mergeConfig } = require("vite");
 const path = require("path");
 const reactPlugin = require("@vitejs/plugin-react");
+const turbosnap = require("vite-plugin-turbosnap");
 
 module.exports = {
   core: { builder: "@storybook/builder-vite" },
@@ -15,7 +16,7 @@ module.exports = {
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: { check: false },
   features: { previewMdx2: true },
-  async viteFinal(config) {
+  async viteFinal(config, { configType }) {
     const mergedConfig = mergeConfig(config, {
       esbuild: {
         // ignoring console warns of "Top-level "this" will be replaced with undefined since this file is an ECMAScript module"
@@ -40,6 +41,7 @@ module.exports = {
           (plugin) => !(Array.isArray(plugin) && plugin.some((p) => p.name === "vite:react-jsx")),
         ),
         reactPlugin({ exclude: [/\.stories\.tsx?$/, /node_modules/], jsxImportSource: "@emotion/react" }),
+        ...(configType === "PRODUCTION" ? [turbosnap({ rootDir: config.root ?? process.cwd() })] : []),
       ],
       optimizeDeps: [
         ...(mergedConfig.optimizeDeps ? mergedConfig.optimizeDeps.include || [] : []),
