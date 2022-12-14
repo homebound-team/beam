@@ -5,6 +5,7 @@ import { Icon } from "src/components";
 import { Css, Only } from "src/Css";
 import { TextField, TextFieldProps } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
+import { FormLines } from "..";
 
 export default {
   component: TextField,
@@ -22,35 +23,37 @@ export function TextFieldStyles() {
     <div css={Css.df.fdc.gap5.$}>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
-        <TestTextField value="" label="Name" labelStyle="hidden" />
-        <TestTextField value="Brandon" label="Name" labelStyle="inline" />
-        <TestTextField value="" label="Name" labelStyle="left" />
-        <TestTextField label="Name" value="" />
-        <TestTextField label="Name" required value="" />
-        <TestTextField label="Name Focused" value="Brandon" autoFocus />
-        <TestTextField label="Name Disabled" value="Brandon" disabled="Disabled reason tooltip" />
-        <TestTextField
-          label="Name Helper Text"
-          value="Brandon"
-          helperText="Some really long helper text that we expect to wrap."
-        />
-        <TestTextField
-          label="Name Helper Paragraph"
-          value="Brandon"
-          helperText={
-            <div>
-              sentence one <br /> sentence two
-            </div>
-          }
-        />
-        <ValidationTextField value="not a valid email" label="Email" />
-        <ValidationTextField
-          label="Name"
-          value="Brandon"
-          helperText="Some really long helper text that we expect to wrap."
-        />
-        <TestTextField label="Name Clearable" value="Brandon" clearable />
-        <ValidationTextField label="Omit Error Message" value="Brandon" clearable hideErrorMessage />
+        <FormLines width="md">
+          <TestTextField value="" label="Name" labelStyle="hidden" />
+          <TestTextField value="Brandon" label="Name" labelStyle="inline" />
+          <TestTextField value="" label="Name" labelStyle="left" />
+          <TestTextField label="Name" value="" />
+          <TestTextField label="Name" required value="" />
+          <TestTextField label="Name Focused" value="Brandon" autoFocus />
+          <TestTextField label="Name Disabled" value="Brandon" disabled="Disabled reason tooltip" />
+          <TestTextField
+            label="Name Helper Text"
+            value="Brandon"
+            helperText="Some really long helper text that we expect to wrap."
+          />
+          <TestTextField
+            label="Name Helper Paragraph"
+            value="Brandon"
+            helperText={
+              <div>
+                sentence one <br /> sentence two
+              </div>
+            }
+          />
+          <ValidationTextField value="not a valid email" label="Email" />
+          <ValidationTextField
+            label="Name"
+            value="Brandon"
+            helperText="Some really long helper text that we expect to wrap."
+          />
+          <TestTextField label="Name Clearable" value="Brandon" clearable />
+          <ValidationTextField label="Omit Error Message" value="Brandon" clearable hideErrorMessage />
+        </FormLines>
       </div>
 
       <div css={Css.df.fdc.gap2.$}>

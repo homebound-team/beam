@@ -357,7 +357,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
   };
 
   return (
-    <div css={Css.df.fdc.w100.maxw(px(550)).$} ref={comboBoxRef}>
+    <div css={Css.df.fdc.w100.maxw(px(550)).if(otherProps.labelStyle === "left").maxw100.$} ref={comboBoxRef}>
       <SelectFieldInput
         {...otherProps}
         buttonProps={buttonProps}
