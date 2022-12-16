@@ -168,8 +168,8 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
         multiselect && (state.isOpen || selectedKeys.length > 1)
           ? ""
           : firstSelectedOption
-          ? getOptionLabel(firstSelectedOption!)
-          : "",
+            ? getOptionLabel(firstSelectedOption!)
+            : "",
       selectedKeys,
       selectedOptions,
       filteredOptions: fieldState.allOptions,
@@ -287,8 +287,8 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
             selectedOptions.length === 1
               ? getOptionLabel(selectedOptions[0])
               : multiselect && selectedOptions.length === 0
-              ? nothingSelectedText
-              : "",
+                ? nothingSelectedText
+                : "",
           selectedOptions: selectedOptions,
         };
       });
@@ -308,8 +308,8 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
             selectedOptions.length === 1
               ? getOptionLabel(selectedOptions[0])
               : multiselect && selectedOptions.length === 0
-              ? nothingSelectedText
-              : "",
+                ? nothingSelectedText
+                : "",
           selectedOptions: selectedOptions,
           filteredOptions: maybeOptions,
           allOptions: maybeOptions,
@@ -394,6 +394,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
+            horizontalLayout={otherProps.labelStyle === "left"}
             loading={fieldState.optionsLoading}
             disabledOptionsWithReasons={disabledOptionsWithReasons}
           />
@@ -423,8 +424,8 @@ function getInputValue<O>(
   return selectedOptions.length === 1
     ? getOptionLabel(selectedOptions[0])
     : multiselect && selectedOptions.length === 0
-    ? nothingSelectedText
-    : "";
+      ? nothingSelectedText
+      : "";
 }
 
 export function initializeOptions<O>(options: OptionsOrLoad<O>, unsetLabel: string | undefined): OptionsOrLoad<O> {

@@ -170,114 +170,129 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const showHover = (isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused) || forceHover;
 
   return (
-    <div css={fieldStyles.container} {...groupProps} {...focusWithinProps}>
-      {/* TODO: place the label */}
-      {label && labelStyle !== "inline" && (
-        <Label
-          labelProps={labelProps}
-          hidden={labelStyle === "hidden" || compound}
-          label={label}
-          suffix={labelSuffix}
-          contrast={contrast}
-          {...tid.label}
-        />
-      )}
-      {maybeTooltip({
-        title: tooltip,
-        placement: "top",
-        children: inputProps.readOnly ? (
-          <div
-            css={{
-              // Use input wrapper to get common styles, but then we need to override some
-              ...fieldStyles.inputWrapperReadOnly,
-              ...(multiline ? Css.fdc.aifs.gap2.$ : Css.truncate.$),
-              ...xss,
-            }}
-            data-readonly="true"
-            {...tid}
-          >
-            {!multiline && labelStyle === "inline" && label && (
-              <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
-            )}
-            {multiline
-              ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
-                  <p key={i} css={Css.my1.$}>
-                    {p.split("\n").map((sentence, j) => (
-                      <span key={j}>
-                        {sentence}
-                        <br />
-                      </span>
-                    ))}
-                  </p>
-                ))
-              : inputProps.value}
-          </div>
-        ) : (
-          <div
-            css={{
-              ...fieldStyles.inputWrapper,
-              ...(inputProps.disabled ? fieldStyles.disabled : {}),
-              ...(showFocus ? fieldStyles.focus : {}),
-              ...(showHover ? fieldStyles.hover : {}),
-              // Only show error styles if the field is not disabled, following the pattern that the error message is also hidden
-              ...(errorMsg && !inputProps.disabled ? fieldStyles.error : {}),
-              ...Css.if(multiline).aifs.px0.mhPx(textAreaMinHeight).$,
-            }}
-            {...hoverProps}
-            ref={inputWrapRef as any}
-          >
-            {!multiline && labelStyle === "inline" && label && (
-              <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
-            )}
-            {!multiline && startAdornment && <span css={Css.df.aic.fs0.br4.pr1.$}>{startAdornment}</span>}
-            <ElementType
-              {...mergeProps(
-                inputProps,
-                { onBlur, onFocus: onFocusChained, onChange: onDomChange },
-                { "aria-invalid": Boolean(errorMsg), ...(labelStyle === "hidden" ? { "aria-label": label } : {}) },
-              )}
-              {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
-              ref={fieldRef as any}
-              rows={multiline ? 1 : undefined}
+    <>
+      <div css={fieldStyles.container} {...groupProps} {...focusWithinProps}>
+        {/* TODO: place the label */}
+        {label && labelStyle !== "inline" && (
+          <Label
+            labelProps={labelProps}
+            hidden={labelStyle === "hidden" || compound}
+            label={label}
+            suffix={labelSuffix}
+            contrast={contrast}
+            {...tid.label}
+          />
+        )}
+        {maybeTooltip({
+          title: tooltip,
+          placement: "top",
+          children: inputProps.readOnly ? (
+            <div
               css={{
-                ...fieldStyles.input,
-                ...(inputProps.disabled ? fieldStyles.disabled : {}),
-                ...(showHover ? fieldStyles.hover : {}),
-                ...(multiline ? Css.h100.p1.add("resize", "none").$ : Css.truncate.$),
+                // Use input wrapper to get common styles, but then we need to override some
+                ...fieldStyles.inputWrapperReadOnly,
+                ...(multiline ? Css.fdc.aifs.gap2.$ : Css.truncate.$),
                 ...xss,
               }}
+              data-readonly="true"
               {...tid}
-            />
-            {isFocused && clearable && onChange && inputProps.value && (
-              <IconButton
-                icon="xCircle"
-                color={Palette.Gray700}
-                onClick={() => {
-                  onChange(undefined);
-                  // Reset focus to input element
-                  fieldRef.current?.focus();
+            >
+              {!multiline && labelStyle === "inline" && label && (
+                <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
+              )}
+              {multiline
+                ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
+                    <p key={i} css={Css.my1.$}>
+                      {p.split("\n").map((sentence, j) => (
+                        <span key={j}>
+                          {sentence}
+                          <br />
+                        </span>
+                      ))}
+                    </p>
+                  ))
+                : inputProps.value}
+            </div>
+          ) : (
+            <div
+              css={{
+                ...fieldStyles.inputWrapper,
+                ...(inputProps.disabled ? fieldStyles.disabled : {}),
+                ...(showFocus ? fieldStyles.focus : {}),
+                ...(showHover ? fieldStyles.hover : {}),
+                // Only show error styles if the field is not disabled, following the pattern that the error message is also hidden
+                ...(errorMsg && !inputProps.disabled ? fieldStyles.error : {}),
+                ...Css.if(multiline).aifs.px0.mhPx(textAreaMinHeight).$,
+              }}
+              {...hoverProps}
+              ref={inputWrapRef as any}
+            >
+              {!multiline && labelStyle === "inline" && label && (
+                <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
+              )}
+              {!multiline && startAdornment && <span css={Css.df.aic.fs0.br4.pr1.$}>{startAdornment}</span>}
+              <ElementType
+                {...mergeProps(
+                  inputProps,
+                  { onBlur, onFocus: onFocusChained, onChange: onDomChange },
+                  { "aria-invalid": Boolean(errorMsg), ...(labelStyle === "hidden" ? { "aria-label": label } : {}) },
+                )}
+                {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
+                ref={fieldRef as any}
+                rows={multiline ? 1 : undefined}
+                css={{
+                  ...fieldStyles.input,
+                  ...(inputProps.disabled ? fieldStyles.disabled : {}),
+                  ...(showHover ? fieldStyles.hover : {}),
+                  ...(multiline ? Css.h100.p1.add("resize", "none").$ : Css.truncate.$),
+                  ...xss,
                 }}
+                {...tid}
               />
+              {isFocused && clearable && onChange && inputProps.value && (
+                <IconButton
+                  icon="xCircle"
+                  color={Palette.Gray700}
+                  onClick={() => {
+                    onChange(undefined);
+                    // Reset focus to input element
+                    fieldRef.current?.focus();
+                  }}
+                />
+              )}
+              {errorInTooltip && errorMsg && !hideErrorMessage && (
+                <span css={Css.df.aic.pl1.fs0.$}>
+                  <Icon icon="error" color={Palette.Red600} tooltip={errorMsg} />
+                </span>
+              )}
+              {!multiline && endAdornment && <span css={Css.df.aic.pl1.fs0.$}>{endAdornment}</span>}
+            </div>
+          ),
+        })}
+        {/* Compound fields will handle their own error and helper text. Do not show error or helper text when 'readOnly' or disabled */}
+        {labelStyle !== "left" && !compound && !inputProps.disabled && !inputProps.readOnly && (
+          <>
+            {errorMsg && !errorInTooltip && (
+              <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
             )}
-            {errorInTooltip && errorMsg && !hideErrorMessage && (
-              <span css={Css.df.aic.pl1.fs0.$}>
-                <Icon icon="error" color={Palette.Red600} tooltip={errorMsg} />
-              </span>
+            {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+          </>
+        )}
+      </div>
+      {/* Error message and helper text for "left" labelStyle */}
+      {labelStyle === "left" &&
+        !compound &&
+        !inputProps.disabled &&
+        !inputProps.readOnly &&
+        ((errorMsg && !errorInTooltip) || helperText) && (
+          // Reduces the margin between the error/helper text and input field
+          <div css={Css.mtPx(-8).$}>
+            {errorMsg && !errorInTooltip && (
+              <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
             )}
-            {!multiline && endAdornment && <span css={Css.df.aic.pl1.fs0.$}>{endAdornment}</span>}
+            {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
           </div>
-        ),
-      })}
-
-      {/* Compound fields will handle their own error and helper text. Do not show error or helper text when 'readOnly' or disabled */}
-      {!compound && !inputProps.disabled && !inputProps.readOnly && (
-        <>
-          {errorMsg && !errorInTooltip && (
-            <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
-          )}
-          {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
-        </>
-      )}
-    </div>
+        )}
+    </>
   );
 }
