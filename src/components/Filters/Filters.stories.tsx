@@ -23,6 +23,7 @@ import { usePersistedFilter } from "src/hooks";
 import { useGroupBy } from "src/hooks/useGroupBy";
 import { safeEntries } from "src/utils";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
+import { checkboxFilter } from "./CheckboxFilter";
 
 export default {
   component: Filters,
@@ -148,7 +149,7 @@ function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
 
     const numRangeFilter = numberRangeFilter({ label: "Price", numberFieldType: "cents" });
 
-    const isTest = toggleFilter({ label: "Only show test projects" });
+    const isTest = checkboxFilter({ label: "Only show test projects" });
     const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", onValue: false });
 
     return {
