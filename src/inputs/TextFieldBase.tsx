@@ -269,16 +269,30 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             </div>
           ),
         })}
+        {/* Compound fields will handle their own error and helper text. Do not show error or helper text when 'readOnly' or disabled */}
+        {labelStyle !== "left" && !compound && !inputProps.disabled && !inputProps.readOnly && (
+          <>
+            {errorMsg && !errorInTooltip && (
+              <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
+            )}
+            {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+          </>
+        )}
       </div>
-      {/* Compound fields will handle their own error and helper text. Do not show error or helper text when 'readOnly' or disabled */}
-      {!compound && !inputProps.disabled && !inputProps.readOnly && (
-        <>
-          {errorMsg && !errorInTooltip && (
-            <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
-          )}
-          {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
-        </>
-      )}
+      {/* alert and helper text for "left" labelStyle */}
+      {labelStyle === "left" &&
+        !compound &&
+        !inputProps.disabled &&
+        !inputProps.readOnly &&
+        ((errorMsg && !errorInTooltip) || helperText) && (
+          // reduces the margin between the error/helper text and input field
+          <div css={Css.mtPx(-8).$}>
+            {errorMsg && !errorInTooltip && (
+              <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
+            )}
+            {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+          </div>
+        )}
     </>
   );
 }
