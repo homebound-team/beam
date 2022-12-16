@@ -24,22 +24,22 @@ import { useTestIds } from "src/utils/useTestIds";
 
 export interface TextFieldBaseProps<X>
   extends Pick<
-    BeamTextFieldProps<X>,
-    | "label"
-    | "required"
-    | "errorMsg"
-    | "errorInTooltip"
-    | "onBlur"
-    | "onFocus"
-    | "helperText"
-    | "labelStyle"
-    | "placeholder"
-    | "compact"
-    | "borderless"
-    | "visuallyDisabled"
-    | "xss"
-  >,
-  Partial<Pick<BeamTextFieldProps<X>, "onChange">> {
+      BeamTextFieldProps<X>,
+      | "label"
+      | "required"
+      | "errorMsg"
+      | "errorInTooltip"
+      | "onBlur"
+      | "onFocus"
+      | "helperText"
+      | "labelStyle"
+      | "placeholder"
+      | "compact"
+      | "borderless"
+      | "visuallyDisabled"
+      | "xss"
+    >,
+    Partial<Pick<BeamTextFieldProps<X>, "onChange">> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
   inputRef?: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>;
@@ -107,8 +107,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const [bgColor, hoverBgColor, disabledBgColor] = contrast
     ? [Palette.Gray700, Palette.Gray600, Palette.Gray700]
     : borderless && !compound
-      ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
-      : [Palette.White, Palette.Gray100, Palette.Gray100];
+    ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
+    : [Palette.White, Palette.Gray100, Palette.Gray100];
 
   const fieldStyles = {
     container: Css.df.fdc.w100.maxw(px(550)).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
@@ -170,7 +170,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const showHover = (isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused) || forceHover;
 
   return (
-    <div>
+    <>
       <div css={fieldStyles.container} {...groupProps} {...focusWithinProps}>
         {/* TODO: place the label */}
         {label && labelStyle !== "inline" && (
@@ -202,15 +202,15 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               )}
               {multiline
                 ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
-                  <p key={i} css={Css.my1.$}>
-                    {p.split("\n").map((sentence, j) => (
-                      <span key={j}>
-                        {sentence}
-                        <br />
-                      </span>
-                    ))}
-                  </p>
-                ))
+                    <p key={i} css={Css.my1.$}>
+                      {p.split("\n").map((sentence, j) => (
+                        <span key={j}>
+                          {sentence}
+                          <br />
+                        </span>
+                      ))}
+                    </p>
+                  ))
                 : inputProps.value}
             </div>
           ) : (
@@ -272,13 +272,13 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       </div>
       {/* Compound fields will handle their own error and helper text. Do not show error or helper text when 'readOnly' or disabled */}
       {!compound && !inputProps.disabled && !inputProps.readOnly && (
-          <div>
-            {errorMsg && !errorInTooltip && (
-              <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
-            )}
-            {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
-          </div>
-        )}
-    </div>
+        <>
+          {errorMsg && !errorInTooltip && (
+            <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
+          )}
+          {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+        </>
+      )}
+    </>
   );
 }
