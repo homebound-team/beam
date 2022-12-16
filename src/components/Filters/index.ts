@@ -6,6 +6,7 @@ export { numberRangeFilter } from "src/components/Filters/NumberRangeFilter";
 export { multiFilter } from "src/components/Filters/MultiFilter";
 export { singleFilter } from "src/components/Filters/SingleFilter";
 export { booleanFilter } from "./BooleanFilter";
+export { checkboxFilter } from "./CheckboxFilter";
 export * from "./FilterModal";
 export * from "./Filters";
 export { toggleFilter } from "./ToggleFilter";
