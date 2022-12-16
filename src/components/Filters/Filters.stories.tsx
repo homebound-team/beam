@@ -23,6 +23,7 @@ import { usePersistedFilter } from "src/hooks";
 import { useGroupBy } from "src/hooks/useGroupBy";
 import { safeEntries } from "src/utils";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
+import { checkboxFilter } from "./CheckboxFilter";
 
 export default {
   component: Filters,
@@ -150,6 +151,7 @@ function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
 
     const isTest = toggleFilter({ label: "Only show test projects" });
     const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", onValue: false });
+    const isStale = checkboxFilter({ label: "Stale" });
 
     return {
       marketId,
@@ -162,6 +164,7 @@ function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
       dateRange,
       isTest,
       doNotUse,
+      isStale,
     };
   }, []);
 
@@ -210,6 +213,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: true,
+    isStale: true,
   },
   {
     id: "2",
@@ -220,6 +224,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: true,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "3",
@@ -230,6 +235,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "4",
@@ -240,6 +246,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "5",
@@ -250,6 +257,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "6",
@@ -260,6 +268,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: true,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "7",
@@ -270,6 +279,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "8",
@@ -280,6 +290,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: false,
     doNotUse: true,
+    isStale: false,
   },
   {
     id: "9",
@@ -290,6 +301,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: true,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "10",
@@ -300,6 +312,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "11",
@@ -310,6 +323,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "12",
@@ -320,6 +334,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "13",
@@ -330,6 +345,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: true,
     doNotUse: true,
+    isStale: true,
   },
   {
     id: "14",
@@ -340,6 +356,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: true,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "15",
@@ -350,6 +367,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "16",
@@ -360,6 +378,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "17",
@@ -370,6 +389,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "18",
@@ -380,6 +400,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "19",
@@ -390,6 +411,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "20",
@@ -400,6 +422,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: true,
     doNotUse: false,
+    isStale: true,
   },
 ];
 
@@ -412,6 +435,7 @@ const columns: GridColumn<Row>[] = [
   { header: () => "Status", data: ({ status }) => status.name },
   { header: () => "Is Test", data: ({ isTest }) => (isTest ? "Yes" : "No") },
   { header: () => "Do not use", data: ({ doNotUse }) => (doNotUse ? "True" : "False") },
+  { header: () => "Is Stale", data: ({ isStale }) => (isStale ? "True" : "False") },
 ];
 
 function filterRows(data: Project[], filter: ProjectFilter): GridDataRow<Row>[] {
@@ -425,6 +449,7 @@ function filterRows(data: Project[], filter: ProjectFilter): GridDataRow<Row>[] 
       .filter((p) => (filter.favorite !== undefined ? filter.favorite === p.favorite : true))
       .filter((p) => (filter.isTest ? p.isTest : true))
       .filter((p) => (filter.doNotUse === undefined ? true : !p.doNotUse))
+      .filter((p) => (filter.isStale ? p.isStale : true))
       .map((p) => ({ kind: "data" as const, id: p.id, data: p })),
   ];
 }
