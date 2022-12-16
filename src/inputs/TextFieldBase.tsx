@@ -279,13 +279,13 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
           </>
         )}
       </div>
-      {/* alert and helper text for "left" labelStyle */}
+      {/* Error message and helper text for "left" labelStyle */}
       {labelStyle === "left" &&
         !compound &&
         !inputProps.disabled &&
         !inputProps.readOnly &&
         ((errorMsg && !errorInTooltip) || helperText) && (
-          // reduces the margin between the error/helper text and input field
+          // Reduces the margin between the error/helper text and input field
           <div css={Css.mtPx(-8).$}>
             {errorMsg && !errorInTooltip && (
               <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
