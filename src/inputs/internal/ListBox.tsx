@@ -14,6 +14,7 @@ interface ListBoxProps<O, V extends Key> {
   getOptionLabel: (opt: O) => string;
   getOptionValue: (opt: O) => V;
   contrast?: boolean;
+  horizontalLayout?: boolean;
   positionProps: React.HTMLAttributes<Element>;
   loading?: boolean | (() => JSX.Element);
   disabledOptionsWithReasons?: Record<string, string | undefined>;
@@ -29,6 +30,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     getOptionValue,
     contrast = false,
     positionProps,
+    horizontalLayout = false,
     loading,
     disabledOptionsWithReasons = {},
   } = props;
@@ -81,7 +83,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
   return (
     <div
       css={{
-        ...Css.bgWhite.br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(contrast).bgGray700.$,
+        ...Css.bgWhite.br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(contrast).bgGray700.if(horizontalLayout).w50.$,
         "&:hover": Css.bshHover.$,
       }}
       ref={listBoxRef}

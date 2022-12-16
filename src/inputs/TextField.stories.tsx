@@ -51,6 +51,12 @@ export function TextFieldStyles() {
             value="Brandon"
             helperText="Some really long helper text that we expect to wrap."
           />
+          <ValidationTextField
+            label="Name"
+            labelStyle="left"
+            value="Brandon"
+            helperText="Some really long helper text that we expect to wrap."
+          />
           <TestTextField label="Name Clearable" value="Brandon" clearable />
           <ValidationTextField label="Omit Error Message" value="Brandon" clearable hideErrorMessage />
         </FormLines>
@@ -65,6 +71,13 @@ export function TextFieldStyles() {
         <TestTextField compact label="Name" value="Brandon" disabled />
         <TestTextField
           compact
+          label="Name"
+          value="Brandon"
+          helperText="Some really long helper text that we expect to wrap."
+        />
+        <TestTextField
+          compact
+          labelStyle="left"
           label="Name"
           value="Brandon"
           helperText="Some really long helper text that we expect to wrap."
