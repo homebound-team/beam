@@ -27,7 +27,13 @@ export function ButtonModal(props: ButtonModalProps) {
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger)
+      ? typeof trigger.label === "string"
+        ? trigger.label
+        : "buttonModal"
+      : isIconButton(trigger)
+      ? trigger.icon
+      : trigger.name,
   );
 
   return (
