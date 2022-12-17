@@ -4,6 +4,7 @@ import { useMenuTriggerState } from "react-stately";
 import {
   isIconButton,
   isTextButton,
+  labelOr,
   OverlayTrigger,
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
@@ -27,13 +28,7 @@ export function ButtonModal(props: ButtonModalProps) {
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
-    isTextButton(trigger)
-      ? typeof trigger.label === "string"
-        ? trigger.label
-        : "buttonModal"
-      : isIconButton(trigger)
-      ? trigger.icon
-      : trigger.name,
+    isTextButton(trigger) ? labelOr(trigger, "buttonModal") : isIconButton(trigger) ? trigger.icon : trigger.name,
   );
 
   return (

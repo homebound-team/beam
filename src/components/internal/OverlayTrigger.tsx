@@ -135,6 +135,6 @@ export function isIconButton(
   return trigger && typeof trigger === "object" && "icon" in trigger;
 }
 
-export function labelOr(trigger: TextButtonTriggerProps, fallback: string): string {
+export function labelOr(trigger: { label: unknown }, fallback: string): string {
   return typeof trigger.label === "string" ? trigger.label : fallback;
 }
