@@ -14,6 +14,11 @@ describe("Button", () => {
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("button");
   });
 
+  it("may render jsx for a label", async () => {
+    const r = await render(<Button label={<div>Beam Button</div>} onClick={noop} />);
+    expect(r.container).toHaveTextContent("Beam Button");
+  });
+
   it("can accept prefixed test ids", async () => {
     const testIds = useTestIds({}, "page1");
     const r = await render(<Button label="Button" {...testIds.custom} onClick={noop} />);
