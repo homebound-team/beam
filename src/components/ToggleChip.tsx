@@ -1,4 +1,3 @@
-import React from "react";
 import { Icon } from "src/components/Icon";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Margin, Only, Palette, Xss } from "src/Css";

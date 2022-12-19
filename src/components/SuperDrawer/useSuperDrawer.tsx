@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { useBeamContext } from "src/components/BeamContext";
 import { CanCloseCheck } from "src/types";
 import { useModal } from "../Modal";

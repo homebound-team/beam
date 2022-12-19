@@ -1,6 +1,6 @@
 import { ObjectConfig, ObjectState, required, useFormStates } from "@homebound/form-state";
 import { Meta } from "@storybook/react";
-import { default as React, ReactNode, useMemo, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
 import { GridDataRow } from "src/components/Table/components/Row";

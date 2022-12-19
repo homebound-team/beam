@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { useComputed } from "src/hooks";
 import { Checkbox } from "src/inputs";

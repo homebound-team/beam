@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { DayProps, useDayRender } from "react-day-picker";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";

@@ -1,5 +1,5 @@
 import { Node } from "@react-types/shared";
-import React, { useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { mergeProps, useHover, useOption } from "react-aria";
 import { ListState, TreeState } from "react-stately";
 import { maybeTooltip } from "src/components";

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 import { Css, Palette } from "../../../Css";
 import { useRightPaneContext } from "./RightPaneContext";
 

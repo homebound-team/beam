@@ -8,11 +8,11 @@ export default {
   component: Filters,
   title: "Workspace/Components/Filter/DateFilters",
   decorators: [],
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101340",
-    }
+    },
   },
 } as Meta;
 

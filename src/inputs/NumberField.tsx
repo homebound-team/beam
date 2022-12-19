@@ -6,7 +6,7 @@ import { resolveTooltip } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Xss } from "src/Css";
 import { maybeCall } from "src/utils";
-import { TextFieldBase, TextFieldBaseProps } from "./TextFieldBase";
+import { TextFieldBase } from "./TextFieldBase";
 
 export type NumberFieldType = "cents" | "dollars" | "percent" | "basisPoints" | "days";
 
