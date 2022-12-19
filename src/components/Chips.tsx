@@ -1,4 +1,3 @@
-import React from "react";
 import { Chip } from "src/components/Chip";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Margin, Only, Xss } from "src/Css";

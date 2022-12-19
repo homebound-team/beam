@@ -10,7 +10,11 @@ export function Toast() {
   return (
     <>
       {notice && (
-        <div css={{ ...variantStyles[notice.type], ...Css.df.aic.w100.gap1.p2.gray900.base.bshBasic.$ }} {...tid} role="alert">
+        <div
+          css={{ ...variantStyles[notice.type], ...Css.df.aic.w100.gap1.p2.gray900.base.bshBasic.$ }}
+          {...tid}
+          role="alert"
+        >
           <span css={Css.fs0.$}>
             <Icon icon={typeToIcon[notice.type]} {...tid.type} color={Palette.Gray900} />
           </span>

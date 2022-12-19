@@ -4159,8 +4159,8 @@ __metadata:
     memoize-one: ^5.2.1
     mobx: ^6.3.2
     mobx-react: ^7.2.0
-    prettier: ^2.2.1
-    prettier-plugin-organize-imports: ^1.1.1
+    prettier: ^2.8.1
+    prettier-plugin-organize-imports: ^3.2.1
     react: ^16.14.0
     react-aria: ^3.18.0
     react-beautiful-dnd: ^13.1.0
@@ -22170,16 +22170,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier-plugin-organize-imports@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "prettier-plugin-organize-imports@npm:1.1.1"
-  peerDependencies:
-    prettier: ">=1.10"
-    typescript: ">=2.8.2"
-  checksum: 030b9534ad40741643ca5747ddf85290c68f67b5b96a4c389670d2ac8b39c09df24f7aa821a2f5d5c4a95a99dd699276082bae5b4aeea7817d1e3596434dad10
-  languageName: node
-  linkType: hard
-
 "prettier-plugin-organize-imports@npm:^3.0.0":
   version: 3.1.1
   resolution: "prettier-plugin-organize-imports@npm:3.1.1"
@@ -22194,6 +22184,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prettier-plugin-organize-imports@npm:^3.2.1":
+  version: 3.2.1
+  resolution: "prettier-plugin-organize-imports@npm:3.2.1"
+  peerDependencies:
+    "@volar/vue-language-plugin-pug": ^1.0.4
+    "@volar/vue-typescript": ^1.0.4
+    prettier: ">=2.0"
+    typescript: ">=2.9"
+  peerDependenciesMeta:
+    "@volar/vue-language-plugin-pug":
+      optional: true
+    "@volar/vue-typescript":
+      optional: true
+  checksum: 57d0539e26ed6a1f5de6bdf390f8371a5637824bf6bb269d3a50c5c77ed4bdc3cdb97a797243baf6c2d65aa1bbda0b2307e55ab67dc639331c187b8d183bcdaa
+  languageName: node
+  linkType: hard
+
 "prettier@npm:>=2.2.1 <=2.3.0":
   version: 2.3.0
   resolution: "prettier@npm:2.3.0"
@@ -22203,21 +22210,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.2.1":
-  version: 2.3.2
-  resolution: "prettier@npm:2.3.2"
-  bin:
-    prettier: bin-prettier.js
-  checksum: 17ce5784ac67621c292df58e2da60b2ee150c2d6aebea22a6ad9e52fcd6a5e66c349d0a8436ea3bd8ff9d778920a5f68000d7625b74f43558718a49755aa5259
-  languageName: node
-  linkType: hard
-
 "prettier@npm:^2.7.1":
   version: 2.7.1
   resolution: "prettier@npm:2.7.1"
   bin:
     prettier: bin-prettier.js
   checksum: 55a4409182260866ab31284d929b3cb961e5fdb91fe0d2e099dac92eaecec890f36e524b4c19e6ceae839c99c6d7195817579cdffc8e2c80da0cb794463a748b
+  languageName: node
+  linkType: hard
+
+"prettier@npm:^2.8.1":
+  version: 2.8.1
+  resolution: "prettier@npm:2.8.1"
+  bin:
+    prettier: bin-prettier.js
+  checksum: 4f21a0f1269f76fb36f54e9a8a1ea4c11e27478958bf860661fb4b6d7ac69aac1581f8724fa98ea3585e56d42a2ea317a17ff6e3324f40cb11ff9e20b73785cc
   languageName: node
   linkType: hard
 

@@ -5,11 +5,11 @@ import { Css, PresentationProvider, ToggleChip } from "src/index";
 export default {
   component: ToggleChip,
   title: "Workspace/Components/ToggleChip",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101241",
-    }
+    },
   },
 } as Meta;
 

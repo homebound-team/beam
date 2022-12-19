@@ -21,7 +21,7 @@ export default {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36814%3A102223",
-    }
+    },
   },
 } as Meta;
 
@@ -221,7 +221,7 @@ export function Disabled() {
     <RadioGroupField
       label={"Favorite cheese"}
       value={"a"}
-      onChange={() => { }}
+      onChange={() => {}}
       disabled={true}
       options={[
         { label: "Asiago", value: "a" },
@@ -245,7 +245,7 @@ export function ErrorMessage() {
     <RadioGroupField
       label={"Favorite cheese"}
       value={"a"}
-      onChange={() => { }}
+      onChange={() => {}}
       errorMsg="Required"
       options={[
         { label: "Asiago", value: "a" },
@@ -262,7 +262,7 @@ export function HelperText() {
     <RadioGroupField
       label={"Favorite cheese"}
       value={"a"}
-      onChange={() => { }}
+      onChange={() => {}}
       options={[
         { label: "Asiago", value: "a" },
         { label: "Burratta", value: "b" },
