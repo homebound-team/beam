@@ -77,13 +77,9 @@ export function ClientSideSortingWithApi() {
     data: ({ value }) => (value ? (value % 2) + 2 : 0),
   };
   const api = useGridTableApi<Row>();
-  // const sortKey = useComputed(() => api.getSortColumn(), [api]);
-  // const sortDirection = useComputed(() => api.getSortDirection(), [api]);
 
   return (
     <>
-      {/*<div>Current Sort Column: {sortKey}</div>*/}
-      {/*<div>Direction: {sortDirection}</div>*/}
       <div css={Css.df.gap1.$}>
         <Button label="Set default sort" onClick={() => api.setSortColumn("")} />
         <Button label="Toggle Name Sort" onClick={() => api.setSortColumn(nameColumn.id!)} />
