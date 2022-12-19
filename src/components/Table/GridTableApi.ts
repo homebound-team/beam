@@ -54,10 +54,7 @@ export type GridTableApi<R extends Kinded> = {
   isCollapsedRow: (id: string) => boolean;
   setVisibleColumns: (ids: string[]) => void;
   getVisibleColumnIds: () => string[];
-  // // returns the sorted columns and/or sorted direction
-  // getSortColumn(): string | undefined;
-  // getSortDirection(): string | undefined;
-  // // Sets the internal state of 'sortColumn'
+  /** Sets the internal state of 'sortColumn' */
   setSortColumn(columnId: string): void;
 };
 
@@ -129,14 +126,6 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   public getVisibleColumnIds() {
     return this.tableState.visibleColumnIds;
   }
-
-  // public getSortColumn() {
-  //   return this.tableState.sortState?.current?.columnId;
-  // }
-  //
-  // public getSortDirection() {
-  //   return this.tableState.sortState?.current?.direction;
-  // }
 
   public setSortColumn(columnId: string) {
     return this.tableState.setSortKey(columnId);
