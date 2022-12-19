@@ -725,15 +725,16 @@ describe("GridTable", () => {
 
     it("can sort by column and/or direction using the api", async () => {
       // Given the table is using client-side sorting
-      // when we use the api
       const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+      // When we use the api
       function Test() {
         const _api = useGridTableApi<Row>();
         api.current = _api;
         return (
           <GridTable
             columns={[nameColumn, valueColumn]}
-            sorting={{ on: "client" }}
+            // intentionally setting initial sort to undefined
+            sorting={{ on: "client", initial: undefined }}
             rows={[
               simpleHeader,
               // And the data is initially unsorted
@@ -746,13 +747,10 @@ describe("GridTable", () => {
         );
       }
       const r = await render(<Test />);
-      // Then the data is initially render sorted by 1st column
-      expect(cell(r, 1, 0)).toHaveTextContent("a");
-
-      // And when sorted by column 1
+      // And when clicking on the header of the name
       click(r.sortHeader_0);
-      // Then 'name: c' row is first
-      expect(cell(r, 1, 0)).toHaveTextContent("c");
+      // Then 'name: a' row is first
+      expect(cell(r, 1, 0)).toHaveTextContent("a");
 
       // And when sorted by column 2
       click(r.sortHeader_1);
