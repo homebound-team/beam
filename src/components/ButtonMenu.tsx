@@ -6,6 +6,7 @@ import { Menu } from "src/components/internal/Menu";
 import {
   isIconButton,
   isTextButton,
+  labelOr,
   OverlayTrigger,
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
@@ -27,7 +28,7 @@ export function ButtonMenu(props: ButtonMenuProps) {
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger) ? labelOr(trigger, "buttonMenu") : isIconButton(trigger) ? trigger.icon : trigger.name,
   );
 
   return (
