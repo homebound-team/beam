@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { DatePicker, DatePickerProps } from "src/components/internal/DatePicker/DatePicker";

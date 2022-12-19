@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from "react";
+import { useCallback, useContext } from "react";
 import { Icon } from "src/components/Icon";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css, Palette, Properties } from "src/Css";

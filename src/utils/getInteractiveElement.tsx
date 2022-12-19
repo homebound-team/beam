@@ -1,5 +1,5 @@
 import { PressEvent } from "@react-types/shared";
-import React, { HTMLAttributes, ReactNode } from "react";
+import { HTMLAttributes, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { isAbsoluteUrl } from "src/utils/index";
 

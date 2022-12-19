@@ -1,4 +1,3 @@
-import React from "react";
 import { Value } from "src/inputs";
 import { BeamSelectFieldBaseProps, SelectFieldBase, unsetOption } from "src/inputs/internal/SelectFieldBase";
 import { HasIdAndName, Optional } from "src/types";

@@ -1,5 +1,5 @@
 import { Node } from "@react-types/shared";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { SelectState } from "react-stately";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";

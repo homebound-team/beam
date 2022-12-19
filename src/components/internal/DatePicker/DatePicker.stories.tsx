@@ -10,7 +10,7 @@ export default {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31586%3A99884",
-    }
+    },
   },
 } as Meta;
 

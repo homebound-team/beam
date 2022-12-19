@@ -5,12 +5,12 @@ import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 export default {
   component: ToggleChipGroup,
   title: "Workspace/Inputs/Toggle Chip Groups",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
-      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101241"
-    }
-  }
+      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101241",
+    },
+  },
 } as Meta;
 
 export function ToggleChipGroups() {

@@ -11,7 +11,8 @@ import {
 } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
 
-interface ButtonMenuProps extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
+interface ButtonMenuProps
+  extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
   items: MenuItem[];
   persistentItems?: MenuItem[];
   searchable?: boolean;
