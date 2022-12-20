@@ -142,7 +142,7 @@ export function calcColumnSizes(
     return `((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
-  let sizes = columns.map(({ id, expandedWidth, w: _w }) => {
+  const sizes = columns.map(({ id, expandedWidth, w: _w }) => {
     const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
 
     if (typeof w === "undefined") {

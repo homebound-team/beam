@@ -889,7 +889,7 @@ describe("GridTable", () => {
       );
     });
 
-    it("as=virtual accepts percentages ", () => {
+    it("as=virtual accepts percentages", () => {
       expect(calcColumnSizes([{ w: "10%" }, { w: 2 }] as any, undefined, undefined, []).join(" ")).toEqual(
         "10% ((100% - 10% - 0px) * (2 / 2))",
       );
@@ -2072,7 +2072,7 @@ describe("GridTable", () => {
     await render(<GridTable rows={[row1]} columns={columns} />);
   });
 
-  it("provides a per-row render count ", async () => {
+  it("provides a per-row render count", async () => {
     const [header, row1, row2] = rows;
     const columns = [nameColumn];
 
