@@ -3,7 +3,7 @@ import { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
 import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
 import { emptyCell } from "src/components/Table/utils/utils";
-import { newMethodMissingProxy } from "src/utils";
+import { isFunction, newMethodMissingProxy } from "src/utils";
 
 /** Provides default styling for a GridColumn representing a Date. */
 export function column<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
@@ -164,19 +164,24 @@ export function calcColumnSizes(
 }
 
 /** Assign column ids if missing */
+// once you get the columns back from the promise in loadExpandedColumns, run the result through this method
 export function assignDefaultColumnIds<T extends Kinded>(columns: GridColumn<T>[]): GridColumnWithId<T>[] {
   // Note: we are not _always_ spreading the `c` property as we need to be able to return the whole proxy object that
   // exists as part of `selectColumn` and `collapseColumn`.
   return columns.map((c, idx) => {
     const { expandColumns } = c;
-    const expandColumnsWithId: GridColumnWithId<T>[] | undefined = expandColumns?.map((ec, ecIdx) => ({
-      ...ec,
-      id: ec.id ?? (`${generateColumnId(idx)}_${ecIdx}` as string),
-      // Defining this as undefined to make TS happy for now.
-      // If we do not explicitly set to `undefined`, TS thinks `expandColumns` could still be of type GridColumn<T> (not WithId).
-      // We only support a single level of expanding columns, so this is safe to do.
-      expandColumns: undefined,
-    }));
+
+    // return isFunction(column.expandColumns) ? this.loadedColumns.get(column.id) : column.expandColumns;
+    const expandColumnsWithId = isFunction(expandColumns)
+      ? expandColumns
+      : expandColumns?.map((ec, ecIdx) => ({
+          ...ec,
+          id: ec.id ?? (`${generateColumnId(idx)}_${ecIdx}` as string),
+          // Defining this as undefined to make TS happy for now.
+          // If we do not explicitly set to `undefined`, TS thinks `expandColumns` could still be of type GridColumn<T> (not WithId).
+          // We only support a single level of expanding columns, so this is safe to do.
+          expandColumns: undefined,
+        }));
 
     return Object.assign(c, { id: c.id ?? generateColumnId(idx), expandColumns: expandColumnsWithId });
   });

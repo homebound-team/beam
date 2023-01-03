@@ -20,7 +20,7 @@ export type GridCellAlignment = "left" | "right" | "center";
  * See https://stackoverflow.com/a/50125960/355031
  */
 export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<K, V> ? T : never;
-
+// export type ExpandColumnsFn<R extends Kinded> = () => Promise<GridColumn<R>[]>;
 /**
  * Defines how a single column will render each given row `kind` in `R`.
  *
@@ -80,14 +80,15 @@ export type GridColumn<R extends Kinded> = {
   /** Flag that will allow to know which hide-able columns are visible on initial load */
   initVisible?: boolean;
   /** A list of columns that should only be shown when this column is "expanded" */
-  expandColumns?: GridColumn<R>[];
+  expandColumns?: GridColumn<R>[] | (() => Promise<GridColumn<R>[]>);
   /** Determines whether the group should initially be expanded on load of the table */
   initExpanded?: boolean;
 };
-
+// export type ExpandColumnsFn<R extends Kinded> = () => Promise<GridColumn<R>[]>;
+// when you do a type, you have to do an intersection - it can be this type & this type = ampersand is telling is its an intersection
 export type GridColumnWithId<R extends Kinded> = GridColumn<R> & {
   id: string;
-  expandColumns?: GridColumnWithId<R>[];
+  expandColumns?: GridColumnWithId<R>[] | (() => Promise<GridColumn<R>[]>);
 };
 
 export const nonKindGridColumnKeys = [

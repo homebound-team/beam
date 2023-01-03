@@ -6,6 +6,8 @@ import { GridSortConfig } from "src/components/Table/GridTable";
 import { Direction, GridColumnWithId } from "src/components/Table/types";
 import { ASC, DESC } from "src/components/Table/utils/utils";
 import { visit } from "src/components/Table/utils/visitor";
+import { isFunction } from "../../../utils";
+import { assignDefaultColumnIds } from "./columns";
 
 // A parent row can be partially selected when some children are selected/some aren't.
 export type SelectedState = "checked" | "unchecked" | "partial";
@@ -54,6 +56,8 @@ export class TableState {
   // An observable set of column ids to keep track of which columns are visible
   public visibleColumns = new ObservableSet<string>();
   private visibleColumnsStorageKey: string = "";
+  // Cache for already loaded expandable columns
+  private loadedColumns: Map<string, GridColumnWithId<any>[]> = new Map();
 
   /**
    * Creates the `RowState` for a given `GridTable`.
@@ -211,6 +215,7 @@ export class TableState {
     this.rows = rows;
   }
 
+  // first load the columns
   setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
     if (columns !== this.columns) {
       this.columns = columns;
@@ -219,6 +224,26 @@ export class TableState {
       const expandedColumnIds = columns.filter((c) => c.initExpanded).map((c) => c.id);
       this.expandedColumns.replace(expandedColumnIds);
     }
+  }
+
+  // load and trigger column to be expanded
+  async loadExpandedColumns(column: GridColumnWithId<any>): Promise<void> {
+    // if we dont have anything in our cache and our expanded columns are a function
+    if (!this.loadedColumns.has(column.id) && isFunction(column.expandColumns)) {
+      // @ts-ignore need to type this - should be a promise
+      // set our result to the function call of expandColumns
+      const result = await column.expandColumns();
+      // once we have the loaded columns, add result to local cache
+      this.loadedColumns.set(column.id, assignDefaultColumnIds(result));
+    }
+    // once column is in local cache, then toggle
+    this.toggleExpandedColumn(column.id);
+  }
+
+  // if we have a promise then load the expandable columns from the cache, if not them just return the expandedColumns
+  // need return type here...
+  getExpandedColumns(column: GridColumnWithId<any>) {
+    return isFunction(column.expandColumns) ? this.loadedColumns.get(column.id) : column.expandColumns;
   }
 
   setVisibleColumns(ids: string[]) {

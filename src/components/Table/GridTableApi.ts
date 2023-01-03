@@ -54,8 +54,6 @@ export type GridTableApi<R extends Kinded> = {
   isCollapsedRow: (id: string) => boolean;
   setVisibleColumns: (ids: string[]) => void;
   getVisibleColumnIds: () => string[];
-  /** Sets the internal state of 'sortColumn' */
-  setSortColumn(columnId: string): void;
 };
 
 // Using `FooImpl`to keep the public GridTableApi definition separate.
@@ -125,9 +123,5 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public getVisibleColumnIds() {
     return this.tableState.visibleColumnIds;
-  }
-
-  public setSortColumn(columnId: string) {
-    return this.tableState.setSortKey(columnId);
   }
 }

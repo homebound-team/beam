@@ -5,6 +5,7 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import { zIndices } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
 import { useComputed, useHover } from "src/hooks";
+import { isFunction } from "src/utils";
 
 interface ExpandableHeaderProps<R extends Kinded> {
   title: string;
@@ -17,18 +18,24 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
   const { title, column, minStickyLeftOffset, as } = props;
   const { tableState } = useContext(TableStateContext);
   const expandedColumnIds = useComputed(() => tableState.expandedColumnIds, [tableState]);
+
   const isExpanded = expandedColumnIds.includes(column.id);
+  // maybe create variable here to use w/the loading icon below
   // Do not apply sticky styles when rendering as table. Currently the table does not properly respect column widths, causing the sticky offsets to be incorrect
   const applyStickyStyles = isExpanded && as !== "table";
   const { hoverProps, isHovered } = useHover({});
-
   return (
     <button
       {...hoverProps}
       css={
         Css.df.xsMd.aic.jcsb.gap2.px1.hPx(32).mxPx(-8).w("calc(100% + 16px)").br4.lightBlue700.if(isHovered).bgGray100.$
       }
-      onClick={() => tableState.toggleExpandedColumn(column.id)}
+      onClick={() =>
+        // is this a function that will return a promise w/a grid column, if so then load and expand the column
+        isFunction(column.expandColumns)
+          ? tableState.loadExpandedColumns(column)
+          : tableState.toggleExpandedColumn(column.id)
+      }
       data-testid="expandableColumn"
     >
       <span
