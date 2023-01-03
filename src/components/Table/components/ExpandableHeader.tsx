@@ -18,12 +18,12 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
   const { title, column, minStickyLeftOffset, as } = props;
   const { tableState } = useContext(TableStateContext);
   const expandedColumnIds = useComputed(() => tableState.expandedColumnIds, [tableState]);
-
   const isExpanded = expandedColumnIds.includes(column.id);
   // maybe create variable here to use w/the loading icon below
   // Do not apply sticky styles when rendering as table. Currently the table does not properly respect column widths, causing the sticky offsets to be incorrect
   const applyStickyStyles = isExpanded && as !== "table";
   const { hoverProps, isHovered } = useHover({});
+
   return (
     <button
       {...hoverProps}

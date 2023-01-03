@@ -6,7 +6,7 @@ import { GridSortConfig } from "src/components/Table/GridTable";
 import { Direction, GridColumnWithId } from "src/components/Table/types";
 import { ASC, DESC } from "src/components/Table/utils/utils";
 import { visit } from "src/components/Table/utils/visitor";
-import { isFunction } from "../../../utils";
+import { isFunction } from "src/utils";
 import { assignDefaultColumnIds } from "./columns";
 
 // A parent row can be partially selected when some children are selected/some aren't.
@@ -215,7 +215,6 @@ export class TableState {
     this.rows = rows;
   }
 
-  // first load the columns
   setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
     if (columns !== this.columns) {
       this.columns = columns;
@@ -240,8 +239,7 @@ export class TableState {
     this.toggleExpandedColumn(column.id);
   }
 
-  // if we have a promise then load the expandable columns from the cache, if not them just return the expandedColumns
-  // need return type here...
+  // if there is a promise, then load the expandable columns from the cache, if not then return the expandedColumns
   getExpandedColumns(column: GridColumnWithId<any>) {
     return isFunction(column.expandColumns) ? this.loadedColumns.get(column.id) : column.expandColumns;
   }

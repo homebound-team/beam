@@ -30,8 +30,8 @@ import {
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { AnyObject } from "src/types";
+import { isFunction } from "src/utils";
 import { shallowEqual } from "src/utils/shallowEqual";
-import { isFunction } from "../../../utils";
 
 interface RowProps<R extends Kinded> {
   as: RenderAs;
@@ -160,7 +160,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           (sortOn === "server" && !!column.serverSideSortKey);
         const alignment = getAlignment(column, maybeContent);
         const justificationCss = getJustification(column, maybeContent, as, alignment);
-        // if our columns are expanded, or if we are returning a promise with a column then its expanded
         const isExpandable =
           isFunction(column.expandColumns) ||
           (column.expandColumns && column.expandColumns.length > 0) ||
