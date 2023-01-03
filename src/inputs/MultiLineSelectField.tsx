@@ -79,7 +79,7 @@ export function MultiLineSelectField<O, V extends Value>(
                   onSelect(selectedValues, selectedOptions);
                   setCurrentOptions(options.filter((o) => !selectedOptions.includes(o)));
                   // Display the input field if there are no selected values
-                  if (selectedValues.length === 0) setIsDisplayed(true);
+                  if (selectedOptions.length === 0) setIsDisplayed(true);
                 }}
               />
             </div>

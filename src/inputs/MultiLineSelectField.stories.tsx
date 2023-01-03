@@ -22,7 +22,7 @@ const options: TestOption[] = [
   { id: "sh:2", name: "Square" },
   { id: "sh:3", name: "Circle" },
   { id: "sh:4", name: "Star" },
-  { id: "sh:5", name: "Rectangle".repeat(5) },
+  { id: "sh:5", name: "Rectangle" },
 ];
 
 export function MultiLineSelectFields() {
@@ -33,19 +33,19 @@ export function MultiLineSelectFields() {
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <FormLines width="md">
-          <MultiLineSelectField label="Favorite Icons" values={values} options={options} onSelect={(val) => setValues(val)} />
+          <MultiLineSelectField label="Favorite Shapes" values={values} options={options} onSelect={(val) => setValues(val)} />
         </FormLines>
       </div>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>With a hidden label</h1>
         <FormLines width="md">
-          <MultiLineSelectField label="Favorite Icons" labelStyle="hidden" values={values} options={options} onSelect={(val) => setValues(val)} />
+          <MultiLineSelectField label="Favorite Shapes" labelStyle="hidden" values={values} options={options} onSelect={(val) => setValues(val)} />
         </FormLines>
       </div>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>With a horizontal layout</h1>
         <FormLines width="md">
-          <MultiLineSelectField label="Favorite Icons" labelStyle="left" values={values} options={options} onSelect={(val) => setValues(val)} />
+          <MultiLineSelectField label="Favorite Shapes" labelStyle="left" values={values} options={options} onSelect={(val) => setValues(val)} />
         </FormLines>
       </div>
     </div>
