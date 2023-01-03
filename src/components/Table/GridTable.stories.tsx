@@ -1335,6 +1335,7 @@ export function ExpandableColumnsWithSetTimeout() {
         expandableHeader: () => "Occupation",
         header: emptyCell,
         data: ({ occupation }) => occupation,
+        w: "280px",
       }),
       column<ExpandableRow>({
         expandableHeader: () => "Manager",

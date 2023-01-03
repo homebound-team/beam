@@ -171,7 +171,6 @@ export function assignDefaultColumnIds<T extends Kinded>(columns: GridColumn<T>[
   return columns.map((c, idx) => {
     const { expandColumns } = c;
 
-    // return isFunction(column.expandColumns) ? this.loadedColumns.get(column.id) : column.expandColumns;
     const expandColumnsWithId = isFunction(expandColumns)
       ? expandColumns
       : expandColumns?.map((ec, ecIdx) => ({

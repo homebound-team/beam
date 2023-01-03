@@ -31,7 +31,6 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
         Css.df.xsMd.aic.jcsb.gap2.px1.hPx(32).mxPx(-8).w("calc(100% + 16px)").br4.lightBlue700.if(isHovered).bgGray100.$
       }
       onClick={() =>
-        // is this a function that will return a promise w/a grid column, if so then load and expand the column
         isFunction(column.expandColumns)
           ? tableState.loadExpandedColumns(column)
           : tableState.toggleExpandedColumn(column.id)
