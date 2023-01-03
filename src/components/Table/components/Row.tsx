@@ -112,7 +112,11 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       {columns.map((column, columnIndex) => {
         // Need to keep track of the expanded columns so we can add borders as expected for the header rows
         const isExpanded = tableState.expandedColumnIds.includes(column.id);
-        const numExpandedColumns = isExpanded ? column.expandColumns?.length ?? 0 : 0;
+        const numExpandedColumns = isExpanded
+          ? typeof column.expandColumns === "function"
+            ? tableState.getExpandedColumns(column)!.length
+            : column.expandColumns?.length ?? 0
+          : 0;
         const { wrapAction = true, isAction = false } = column;
 
         const applyFirstContentColumnStyles = !isHeader && !isAction && !firstContentColumnStylesApplied;
