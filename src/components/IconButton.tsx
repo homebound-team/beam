@@ -45,7 +45,6 @@ export function IconButton(props: IconButtonProps) {
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const ref = useGetRef(buttonRef);
   const { buttonProps } = useButton(
     {

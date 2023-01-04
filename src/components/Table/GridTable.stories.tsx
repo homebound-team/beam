@@ -1002,7 +1002,6 @@ export function PrimaryColumnSorting() {
     clientSideSort: false,
   };
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [filter, setFilter] = useState<string | undefined>();
   return (
     <div>

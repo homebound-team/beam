@@ -215,8 +215,8 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     // We don't want to update the internal `wipValue` or `inputValue` back to `value` just because focus state changes or the overlay opens
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, dateFormat]);
 
   // Create a type safe `onChange` to handle both Single and Range date fields.
