@@ -14,7 +14,6 @@ export default {
 type TestOption = {
   id: Value;
   name: string;
-  icon?: IconKey;
 };
 
 const options: TestOption[] = [
@@ -22,7 +21,7 @@ const options: TestOption[] = [
   { id: "sh:2", name: "Square" },
   { id: "sh:3", name: "Circle" },
   { id: "sh:4", name: "Star" },
-  { id: "sh:5", name: "Rectangle" },
+  { id: "sh:5", name: "It's a Rectangle".repeat(5) },
 ];
 
 export function MultiLineSelectFields() {

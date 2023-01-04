@@ -20,8 +20,8 @@ export function MultiLineSelectField<O, V extends Value>(
 ): JSX.Element {
   const {
     options,
-    onSelect,
     values,
+    onSelect,
     getOptionValue = (opt: O) => (opt as any).id,
     getOptionLabel = (opt: O) => (opt as any).name,
     labelStyle,
@@ -30,6 +30,7 @@ export function MultiLineSelectField<O, V extends Value>(
 
   const tid = useTestIds(props, "");
   const [isDisplayed, setIsDisplayed] = useState(true);
+  // Set the available options for the current input field, initialize by filtering already selected options
   const [currentOptions, setCurrentOptions] = useState(options.filter((o) => !values.includes(getOptionValue(o))));
 
   return (

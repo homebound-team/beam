@@ -28,7 +28,6 @@ describe("MultiLineSelectField", () => {
     // Given a MultiLineSelectField with 1 selected value
     const r = await render(<TestMultiLineSelectField values={["1"]} options={options} />);
 
-    // That initially has "One" selected
     expect(r.selectField_0()).toHaveTextContent("Project one");
 
     // When we select a second option
@@ -38,21 +37,6 @@ describe("MultiLineSelectField", () => {
 
     // Then onSelect is called with the correct values
     expect(onSelect).toHaveBeenCalledWith(["1", "3"]);
-  });
-
-  it("can delete a selected value", async () => {
-    // Given a MultiLineSelectField with 2 selected value
-    const r = await render(<TestMultiLineSelectField values={["1", "2"]} options={options} />);
-
-    // That initially has "One" selected
-    expect(r.selectField_0()).toHaveTextContent("Project one");
-    expect(r.selectField_1()).toHaveTextContent("Project two");
-
-    // When we deleted the second value
-    click(r.deleteSelected_1());
-
-    // Then onSelect is called with the correct values
-    expect(onSelect).toHaveBeenCalledWith(["1"]);
   });
 
   it("filters the selected options", async () => {
@@ -66,6 +50,20 @@ describe("MultiLineSelectField", () => {
 
     // Then the already selected option doesn't appear on the list
     expect(r.queryByRole("option", { name: "Project one" })).toBeNull();
+  });
+
+  it("can delete a selected value", async () => {
+    // Given a MultiLineSelectField with 2 selected values
+    const r = await render(<TestMultiLineSelectField values={["1", "2"]} options={options} />);
+
+    expect(r.selectField_0()).toHaveTextContent("Project one");
+    expect(r.selectField_1()).toHaveTextContent("Project two");
+
+    // When we deleted the second value
+    click(r.deleteSelected_1());
+
+    // Then onSelect is called with the correct values
+    expect(onSelect).toHaveBeenCalledWith(["1"]);
   });
 
   function TestMultiLineSelectField(

@@ -12,20 +12,20 @@ const shapes = [
 
 describe("BoundMultiLineSelectField", () => {
   it("shows the current value and label", async () => {
-    // Given a BoundMultiSelectField with a selected value
+    // Given a BoundMultiLineSelectField with a selected value
     const author = createObjectState(formConfig, { favoriteShapes: ["sh:1"] });
 
     // When the component is rendered
     const r = await render(<BoundMultiLineSelectField field={author.favoriteShapes} options={shapes} />);
 
-    // Then it shows the correct value
+    // Then it shows the correct value and label
     expect(r.favoriteShapes_selectField_0()).toHaveTextContent("Triangle");
-    expect(r.favoriteShapes_label()).toHaveTextContent("Favorite Shape");
+    expect(r.favoriteShapes_label()).toHaveTextContent("Favorite Shapes");
   });
 
   it("triggers 'maybeAutoSave' on change", async () => {
     const autoSave = jest.fn();
-    // Given a BoundMultiSelectField with auto save
+    // Given a BoundMultiLineSelectField with auto save
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,
       { favoriteShapes: ["sh:1"] },
