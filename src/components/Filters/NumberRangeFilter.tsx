@@ -11,6 +11,8 @@ export type NumberRangeFilterProps<DV extends NumberRangeFilterValue> = {
   label: string;
   numberFieldType?: NumberFieldType;
   defaultValue?: DV;
+  // Support edge cases. Overrides numberFieldType
+  numberFormatOptions?: Intl.NumberFormatOptions;
 };
 
 export type NumberRangeFilterValue = { min: number; max: number };
@@ -26,7 +28,7 @@ class NumberRangeFilter<DV extends NumberRangeFilterValue>
   implements Filter<DV>
 {
   render(value: DV, setValue: (value: DV | undefined) => void, tid: TestIds, inModal: boolean, vertical: boolean) {
-    const { label, numberFieldType } = this.props;
+    const { label, numberFieldType, numberFormatOptions } = this.props;
     const min = value?.min ?? undefined;
     const max = value?.max ?? undefined;
 
@@ -43,6 +45,7 @@ class NumberRangeFilter<DV extends NumberRangeFilterValue>
                 label="Min"
                 value={min}
                 type={numberFieldType}
+                numberFormatOptions={numberFormatOptions}
                 onChange={(minVal) => {
                   const maxValue = max ? { max } : {};
                   setValue(minVal || max ? ({ min: minVal, ...maxValue } as DV) : undefined);
@@ -56,6 +59,7 @@ class NumberRangeFilter<DV extends NumberRangeFilterValue>
               label="Max"
               value={max}
               type={numberFieldType}
+              numberFormatOptions={numberFormatOptions}
               onChange={(maxVal) => {
                 const minValue = min ? { min } : {};
                 setValue(maxVal || min ? ({ max: maxVal, ...minValue } as DV) : undefined);
@@ -77,6 +81,7 @@ class NumberRangeFilter<DV extends NumberRangeFilterValue>
               label={!inModal ? `${label} Min` : "Min"}
               value={min}
               type={numberFieldType}
+              numberFormatOptions={numberFormatOptions}
               onChange={(minVal) => {
                 const maxValue = max ? { max } : {};
                 setValue(minVal || max ? ({ min: minVal, ...maxValue } as DV) : undefined);
@@ -91,6 +96,7 @@ class NumberRangeFilter<DV extends NumberRangeFilterValue>
               label={!inModal ? `${label} Max` : "Max"}
               value={max}
               type={numberFieldType}
+              numberFormatOptions={numberFormatOptions}
               onChange={(maxVal) => {
                 const minValue = min ? { min } : {};
                 setValue(maxVal || min ? ({ max: maxVal, ...minValue } as DV) : undefined);
