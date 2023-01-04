@@ -30,8 +30,9 @@ export function MultiLineSelectField<O, V extends Value>(
 
   const tid = useTestIds(props, "");
   const [isDisplayed, setIsDisplayed] = useState(true);
-  // Set the available options for the current input field, initialize by filtering already selected options
-  const [currentOptions, setCurrentOptions] = useState(options.filter((o) => !values.includes(getOptionValue(o))));
+
+  // Set the available options by filtering already selected options
+  const currentOptions = options.filter((o) => !values.includes(getOptionValue(o)));
 
   return (
     <div css={Css.mt1.if(labelStyle === "left").df.$}>
@@ -65,20 +66,12 @@ export function MultiLineSelectField<O, V extends Value>(
                 aria-label={`Delete selected ${otherProps.label}`}
                 icon={"x"}
                 onClick={() => {
-                  // Delete the selected value from the array
-                  const [selectedValues, selectedOptions] = options
-                    .filter((o) => values.filter((v) => v !== value).includes(getOptionValue(o)))
-                    .reduce(
-                      (acc, o) => {
-                        acc[0].push(getOptionValue(o));
-                        acc[1].push(o);
-                        return acc;
-                      },
-                      [[] as V[], [] as O[]],
-                    );
+                  const selectedOptions = options.filter(
+                    (o) => values.includes(getOptionValue(o)) && getOptionValue(o) !== value,
+                  );
+                  const selectedValues = selectedOptions.map((o) => getOptionValue(o));
 
                   onSelect(selectedValues, selectedOptions);
-                  setCurrentOptions(options.filter((o) => !selectedOptions.includes(o)));
                   // Display the input field if there are no selected values
                   if (selectedOptions.length === 0) setIsDisplayed(true);
                 }}
@@ -97,7 +90,6 @@ export function MultiLineSelectField<O, V extends Value>(
               value={"" as string}
               onSelect={(value) => {
                 onSelect([...values, value], options);
-                setCurrentOptions(currentOptions.filter((o) => getOptionValue(o) !== value));
                 setIsDisplayed(false);
               }}
               options={currentOptions}
