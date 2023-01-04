@@ -164,7 +164,6 @@ export function calcColumnSizes(
 }
 
 /** Assign column ids if missing */
-// once you get the columns back from the promise in loadExpandedColumns, run the result through this method
 export function assignDefaultColumnIds<T extends Kinded>(columns: GridColumn<T>[]): GridColumnWithId<T>[] {
   // Note: we are not _always_ spreading the `c` property as we need to be able to return the whole proxy object that
   // exists as part of `selectColumn` and `collapseColumn`.

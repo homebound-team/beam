@@ -229,7 +229,6 @@ export class TableState {
   async loadExpandedColumns(column: GridColumnWithId<any>): Promise<void> {
     // if we dont have anything in our cache and our expanded columns are a function
     if (!this.loadedColumns.has(column.id) && isFunction(column.expandColumns)) {
-      // @ts-ignore need to type this - should be a promise
       // set our result to the function call of expandColumns
       const result = await column.expandColumns();
       // once we have the loaded columns, add result to local cache
@@ -240,8 +239,8 @@ export class TableState {
   }
 
   // if there is a promise, then load the expandable columns from the cache, if not then return the expandedColumns
-  getExpandedColumns(column: GridColumnWithId<any>) {
-    return isFunction(column.expandColumns) ? this.loadedColumns.get(column.id) : column.expandColumns;
+  getExpandedColumns(column: GridColumnWithId<any>): GridColumnWithId<any>[] {
+    return isFunction(column.expandColumns) ? this.loadedColumns.get(column.id) ?? [] : column.expandColumns ?? [];
   }
 
   setVisibleColumns(ids: string[]) {
