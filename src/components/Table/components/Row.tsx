@@ -91,7 +91,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `flexNone` to ensure they stay their defined widths
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.flexNone.$).$),
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
-    ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
+    ...(row.onClick && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     ...{
       [` > .${revealOnRowHoverClass} > *`]: Css.invisible.$,
@@ -228,7 +228,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           ...getFirstOrLastCellCss(style, columnIndex, columns),
           // Then override with per-cell/per-row justification/indentation
           ...justificationCss,
-          ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
+          ...getIndentationCss(style, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
           // Then apply any totals-specific override
@@ -267,15 +267,15 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
 
         const renderFn: RenderCellFn<any> =
-          (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
+          (rowStyle?.renderCell || typeof row.onClick === "string") && wrapAction
             ? rowLinkRenderFn(as)
             : isHeader || isTotals || isExpandableHeader
             ? headerRenderFn(column, as, currentColspan)
-            : rowStyle?.onClick && wrapAction
+            : typeof row.onClick === "function" && wrapAction
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);
 
-        return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick);
+        return renderFn(columnIndex, cellCss, content, row, cellClassNames, cellOnClick);
       })}
     </RowTag>
   );
@@ -319,7 +319,7 @@ export type GridDataRow<R extends Kinded> = {
   kind: R["kind"];
   /** Combined with the `kind` to determine a table wide React key. */
   id: string;
-  /** A list of parent/grand-parent ids for collapsing parent/child rows. */
+  /** A list of parent/grandparent ids for collapsing parent/child rows. */
   children?: GridDataRow<R>[];
   /** * Whether to pin this sort to the first/last of its parent's children.
    *
@@ -334,4 +334,6 @@ export type GridDataRow<R extends Kinded> = {
   initSelected?: boolean;
   /** Whether row can be selected */
   selectable?: false;
+  /** Whether the entire row should be clickable. */
+  onClick?: string | ((row: GridDataRow<R>, api: GridTableApi<R>) => void);
 } & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;

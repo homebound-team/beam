@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { PresentationContextProps, PresentationFieldProps } from "src/components/PresentationContext";
-import { DiscriminateUnion, GridColumn, GridDataRow, GridTableApi, RenderCellFn } from "src/components/Table/index";
+import { DiscriminateUnion, GridColumn, RenderCellFn } from "src/components/Table/index";
 import { Kinded, RenderAs } from "src/components/Table/types";
 import { Css, Palette, Properties } from "src/Css";
 import { safeKeys } from "src/utils";
@@ -9,7 +9,7 @@ import { safeKeys } from "src/utils";
 export interface GridStyle {
   /** Applied to the base div element. */
   rootCss?: Properties;
-  /** Applied with the owl operator between rows for rendering border lines. */
+  /** Applied with the owl operator between rows for rendering borderlines. */
   betweenRowsCss?: Properties;
   /** Applied on the last row of the table. */
   lastRowCss?: Properties;
@@ -158,12 +158,6 @@ export interface RowStyle<R extends Kinded> {
   cellCss?: Properties | ((row: R) => Properties);
   /** Renders the cell element, i.e. a link to get whole-row links. */
   renderCell?: RenderCellFn<R>;
-  /** Whether the row should be indented (via a style applied to the 1st cell). */
-  indent?: 1 | 2;
-  /** Whether the row should be a link. */
-  rowLink?: (row: R) => string;
-  /** Fired when the row is clicked, similar to rowLink but for actions that aren't 'go to this link'. */
-  onClick?: (row: GridDataRow<R>, api: GridTableApi<R>) => void;
 }
 
 /** Our original table look & feel/style. */

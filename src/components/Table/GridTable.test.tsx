@@ -177,11 +177,12 @@ describe("GridTable", () => {
 
   it("can indent rows", async () => {
     // Given the data row is indented
-    const rowStyles: RowStyles<Row> = {
-      header: {},
-      data: { indent: 1 },
+    const column: GridColumn<Row> = {
+      id: "name",
+      header: () => "Name",
+      data: ({ name }) => ({ content: name, indent: 1 }),
     };
-    const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} rowStyles={rowStyles} />);
+    const r = await render(<GridTable<Row> columns={[column]} rows={rows} />);
     // Then the data row has the style added
     expect(cell(r, 1, 0)).toHaveStyleRule("padding-left", "32px");
     // But the header row does not
@@ -957,21 +958,26 @@ describe("GridTable", () => {
 
   it("can handle onClick for rows", async () => {
     const onClick = jest.fn();
-    const rowStyles: RowStyles<Row> = { header: {}, data: { onClick } };
-    const r = await render(<GridTable {...{ columns, rows, rowStyles }} />);
+    const r = await render(
+      <GridTable
+        {...{
+          columns,
+          rows: [simpleHeader, { kind: "data", id: "1", data: { name: "foo", value: 1 }, onClick }],
+        }}
+      />,
+    );
     click(cell(r, 1, 0));
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(onClick.mock.calls[0][0].data.name).toEqual("foo");
   });
 
   it("can omit onClick for columns", async () => {
-    // Given rowStyles that specify an action for each row
+    // Given a row.onClick is specified
     const onClick = jest.fn();
-    const rowStyles: RowStyles<Row> = { header: {}, data: { onClick } };
-    // And a table where one columns omits wrapping the action
-    const r = await render(
-      <GridTable {...{ columns: [{ ...columns[0], wrapAction: false }, columns[1]], rows, rowStyles }} />,
-    );
+    const row = { kind: "data", id: "1", data: { name: "foo", value: 1 }, onClick } as const;
+    // And a table where the 1st column omits wrapping the action
+    const column1 = { ...columns[0], wrapAction: false as const };
+    const r = await render(<GridTable {...{ columns: [column1, columns[1]], rows: [simpleHeader, row] }} />);
     // When clicking on both columns
     click(cell(r, 1, 0));
     click(cell(r, 1, 1));
@@ -981,20 +987,18 @@ describe("GridTable", () => {
 
   it("can omit rowLink for columns", async () => {
     // Given rowStyles that specify an action for each row
-    const rowStyles: RowStyles<Row> = {
-      header: {},
-      data: {
-        rowLink: () => "https://www.homebound.com",
-      },
-    };
-    // And a table where one columns omits wrapping the action
-    const r = await render(
-      <GridTable {...{ columns: [{ ...columns[0], wrapAction: false }, columns[1]], rows, rowStyles }} />,
-      withRouter(),
-    );
+    const row = {
+      kind: "data",
+      id: "1",
+      data: { name: "foo", value: 1 },
+      onClick: "https://www.homebound.com",
+    } as const;
+    // And a table where the 1st column omits wrapping the action
+    const column1 = { ...columns[0], wrapAction: false as const };
+    const r = await render(<GridTable {...{ columns: [column1, columns[1]], rows: [row] }} />, withRouter());
     // Then expect that only one column is wrapped in an anchor tag
-    expect(cell(r, 1, 0).tagName).toBe("DIV");
-    expect(cell(r, 1, 1).tagName).toBe("A");
+    expect(cell(r, 0, 0).tagName).toBe("DIV");
+    expect(cell(r, 0, 1).tagName).toBe("A");
   });
 
   it("can handle onClick for GridCellContent", async () => {
@@ -1993,7 +1997,7 @@ describe("GridTable", () => {
 
   it("provides simpleDataRows", async () => {
     // Given a row that uses SimpleHeaderAndData
-    type Row = SimpleHeaderAndData<{ value: number }>;
+    type Row = SimpleHeaderAndData<{ id: string; value: number }>;
     // And also uses the simpleDataRows factory method
     const rows: GridDataRow<Row>[] = simpleDataRows([
       { id: "a:1", value: 1 },
@@ -2011,7 +2015,7 @@ describe("GridTable", () => {
 
   it("simpleDataRows can accept undefined", async () => {
     // Given a row that uses SimpleHeaderAndData
-    type Row = SimpleHeaderAndData<{ value: number }>;
+    type Row = SimpleHeaderAndData<{ id: string; value: number }>;
     // And we don't have any data defined yet
     const rows: GridDataRow<Row>[] = simpleDataRows(undefined);
     // Then we still get back the header row
@@ -2110,24 +2114,18 @@ describe("GridTable", () => {
   });
 
   it("reacts to setting activeRowId", async () => {
-    const activeRowIdRowStyles: RowStyles<Row> = {
-      data: {
-        onClick: (row, api) => {
-          api.setActiveRowId(`${row.kind}_${row.id}`);
-        },
-      },
+    const row: GridDataRow<Row> = {
+      kind: "data",
+      id: "1",
+      data: { name: "foo", value: 1 },
+      onClick: (row, api) => api.setActiveRowId(`${row.kind}_${row.id}`),
     };
-
     // Given a table initially rendered without an active row id
-    const r = await render(
-      <GridTable columns={columns} rows={rows} rowStyles={activeRowIdRowStyles} style={{ cellCss: Css.bgWhite.$ }} />,
-    );
+    const r = await render(<GridTable columns={columns} rows={[row]} style={{ cellCss: Css.bgWhite.$ }} />);
     // And the first row/cell has the default background color
     expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.White);
-
     // When clicking the cell
     click(cell(r, 1, 1));
-
     // Then the first row/cell has the 'active' background color
     expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.LightBlue50);
   });

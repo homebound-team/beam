@@ -3,7 +3,7 @@ import { comparer, makeAutoObservable, observable, ObservableMap, ObservableSet,
 import React from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridSortConfig } from "src/components/Table/GridTable";
-import { Direction, GridColumnWithId } from "src/components/Table/types";
+import { Direction, GridColumnWithId, Kinded } from "src/components/Table/types";
 import { ASC, DESC } from "src/components/Table/utils/utils";
 import { visit } from "src/components/Table/utils/visitor";
 
@@ -25,7 +25,7 @@ export type SelectedState = "checked" | "unchecked" | "partial";
  * that need to change their toggle/select on/off in response to parent/child
  * changes.
  */
-export class TableState {
+export class TableState<R extends Kinded> {
   // A set of just row ids, i.e. not row.kind+row.id
   private readonly collapsedRows = new ObservableSet<string>();
   private persistCollapse: string | undefined;
@@ -33,7 +33,7 @@ export class TableState {
   // Set of just row ids. Keeps track of which rows match the filter. Used to filter rows from `selectedIds`
   private matchedRows = new ObservableSet<string>();
   // The current list of rows, basically a useRef.current. Not reactive.
-  public rows: GridDataRow<any>[] = [];
+  public rows: GridDataRow<R>[] = [];
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
   activeRowId: string | undefined = undefined;
   // Keeps track of the 'active' cell, formatted `${row.kind}_${row.id}_${column.name}`
@@ -48,7 +48,7 @@ export class TableState {
   private onSort: ((orderBy: any | undefined, direction: Direction | undefined) => void) | undefined;
 
   // Non-reactive list of our columns
-  public columns: GridColumnWithId<any>[] = [];
+  public columns: GridColumnWithId<R>[] = [];
   // An observable set of column ids to keep track of which columns are currently expanded
   private expandedColumns = new ObservableSet<string>();
   // An observable set of column ids to keep track of which columns are visible
@@ -84,7 +84,7 @@ export class TableState {
     );
   }
 
-  loadCollapse(persistCollapse: string | undefined, rows: GridDataRow<any>[]): void {
+  loadCollapse(persistCollapse: string | undefined, rows: GridDataRow<R>[]): void {
     this.persistCollapse = persistCollapse;
     const sessionStorageIds = persistCollapse ? sessionStorage.getItem(persistCollapse) : null;
     // Initialize with our collapsed rows based on what is in sessionStorage. Otherwise check if any rows have been defined as collapsed
@@ -100,7 +100,7 @@ export class TableState {
     }
   }
 
-  loadSelected(rows: GridDataRow<any>[]): void {
+  loadSelected(rows: GridDataRow<R>[]): void {
     const selectedRows = rows.filter((row) => row.initSelected);
     // Initialize with selected rows as defined
     const map = new Map<string, SelectedState>();
@@ -111,7 +111,7 @@ export class TableState {
     this.selectedRows.merge(map);
   }
 
-  initSortState(sortConfig: GridSortConfig | undefined, columns: GridColumnWithId<any>[]) {
+  initSortState(sortConfig: GridSortConfig | undefined, columns: GridColumnWithId<R>[]) {
     if (this.sortConfig) {
       return;
     }
@@ -169,7 +169,7 @@ export class TableState {
   }
 
   // Updates the list of rows and regenerates the collapsedRows property if needed.
-  setRows(rows: GridDataRow<any>[]): void {
+  setRows(rows: GridDataRow<R>[]): void {
     // If the set of rows are different
     if (rows !== this.rows) {
       const currentCollapsedIds = this.collapsedIds;
@@ -211,7 +211,7 @@ export class TableState {
     this.rows = rows;
   }
 
-  setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
+  setColumns(columns: GridColumnWithId<R>[], visibleColumnsStorageKey: string | undefined): void {
     if (columns !== this.columns) {
       this.columns = columns;
       this.visibleColumnsStorageKey = visibleColumnsStorageKey ?? camelCase(columns.map((c) => c.id).join());
@@ -374,14 +374,14 @@ export class TableState {
     }
   }
 
-  private getMatchedChildrenStates(children: GridDataRow<any>[], map: Map<string, SelectedState>): SelectedState[] {
+  private getMatchedChildrenStates(children: GridDataRow<R>[], map: Map<string, SelectedState>): SelectedState[] {
     return children
       .filter((row) => row.id !== "header" && this.matchedRows.has(row.id))
       .map((row) => map.get(row.id) || this.getSelected(row.id));
   }
 
   // Recursively traverse through rows to determine selected state of parent rows based on children
-  private setNestedSelectedStates(row: GridDataRow<any>, map: Map<string, SelectedState>): SelectedState[] {
+  private setNestedSelectedStates(row: GridDataRow<R>, map: Map<string, SelectedState>): SelectedState[] {
     if (this.matchedRows.has(row.id)) {
       if (!row.children) {
         return [this.getSelected(row.id)];
@@ -397,8 +397,8 @@ export class TableState {
 }
 
 /** Provides a context for rows to access their table's `TableState`. */
-export const TableStateContext = React.createContext<{ tableState: TableState }>({
-  get tableState(): TableState {
+export const TableStateContext = React.createContext<{ tableState: TableState<any> }>({
+  get tableState(): TableState<any> {
     throw new Error("No TableStateContext provider");
   },
 });
@@ -420,12 +420,12 @@ function readOrSetLocalVisibleColumnState(columns: GridColumnWithId<any>[], stor
   return visibleColumnIds;
 }
 
-type FoundRow = { row: GridDataRow<any>; parents: GridDataRow<any>[] };
+type FoundRow<R extends Kinded> = { row: GridDataRow<R>; parents: GridDataRow<R>[] };
 
 /** Finds a row by id, and returns it + any parents. */
-function findRow(rows: GridDataRow<any>[], id: string): FoundRow | undefined {
+function findRow<R extends Kinded>(rows: GridDataRow<R>[], id: string): FoundRow<R> | undefined {
   // This is technically an array of "maybe FoundRow"
-  const todo: FoundRow[] = rows.map((row) => ({ row, parents: [] }));
+  const todo: FoundRow<R>[] = rows.map((row) => ({ row, parents: [] }));
   while (todo.length > 0) {
     const curr = todo.pop()!;
     if (curr.row.id === id) {
@@ -444,21 +444,19 @@ function deriveParentSelected(children: SelectedState[]): SelectedState {
   return children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
 }
 
-function getCollapsedIdsFromRows(rows: GridDataRow<any>[]): string[] {
+function getCollapsedIdsFromRows<R extends Kinded>(rows: GridDataRow<R>[]): string[] {
   return rows.reduce((acc, r) => {
     if (r.initCollapsed) {
       acc.push(r.id);
     }
-
     if (r.children) {
       acc.push(...getCollapsedIdsFromRows(r.children));
     }
-
     return acc;
   }, [] as string[]);
 }
 
-function flattenRows(rows: GridDataRow<any>[]): GridDataRow<any>[] {
+function flattenRows<R extends Kinded>(rows: GridDataRow<R>[]): GridDataRow<R>[] {
   const childRows = rows.flatMap((r) => (r.children ? flattenRows(r.children) : []));
   return [...rows, ...childRows];
 }
