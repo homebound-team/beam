@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react";
-import { PropsWithChildren, useMemo } from "react";
+import { useMemo } from "react";
+import { ChildrenOnly } from "src/types";
 import { withBeamDecorator, zeroTo } from "src/utils/sb";
 import { Css } from "../../../Css";
 import { Button } from "../../Button";
@@ -67,7 +68,7 @@ function ExamplePageComponent() {
   );
 }
 
-function TestProjectLayout({ children }: PropsWithChildren<{}>) {
+function TestProjectLayout({ children }: ChildrenOnly) {
   return (
     <PreventBrowserScroll>
       <div css={Css.df.h100.overflowHidden.$}>

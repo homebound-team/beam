@@ -25,7 +25,7 @@ export type GridCellContent = {
   /** Allows the cell to stay in place when the user scrolls horizontally, i.e. frozen columns. */
   sticky?: "left" | "right";
   /** If provided, content of the cell will be wrapped within a <button /> or <a /> tag depending on if the value is a function or a string. */
-  onClick?: () => {} | string;
+  onClick?: VoidFunction | string;
   /** Custom css to apply directly to this cell, i.e. cell-specific borders. */
   css?: Properties;
   /** Allows cell to reveal content when the user hovers over a row. Content must be wrapped in an element in order to be hidden. IE <div>{value}</div>*/
@@ -40,7 +40,7 @@ export type RenderCellFn<R extends Kinded> = (
   row: R,
   rowStyle: RowStyle<R> | undefined,
   classNames: string | undefined,
-  onClick: (() => void) | undefined,
+  onClick: VoidFunction | undefined,
 ) => ReactNode;
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
