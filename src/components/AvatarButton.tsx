@@ -1,9 +1,10 @@
 import { AriaButtonProps } from "@react-types/button";
-import { RefObject, useMemo, useRef } from "react";
+import { RefObject, useMemo } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Avatar, AvatarProps } from "src/components/Avatar";
 import { Css, Palette } from "src/Css";
+import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
@@ -28,8 +29,7 @@ export function AvatarButton(props: AvatarButtonProps) {
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const ref = buttonRef || useRef(null);
+  const ref = useGetRef(buttonRef);
   const { buttonProps, isPressed } = useButton(
     {
       ...ariaProps,

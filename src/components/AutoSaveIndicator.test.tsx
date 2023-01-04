@@ -19,6 +19,7 @@ describe(AutoSaveIndicator, () => {
 
     const iconElement = r.container.querySelector(`[data-icon=${iconName}]`)!;
     expect(iconElement).toBeInTheDocument();
+    // eslint-disable-next-line jest/no-conditional-expect
     if (helperText) expect(iconElement.nextSibling?.textContent).toMatch(helperText);
   });
 

@@ -3,7 +3,7 @@ import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
 import { Link } from "react-router-dom";
 import type { IconKey } from "src/components";
 import { navLink } from "src/components";
-import { Css } from "src/Css";
+import { Css, Properties } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl } from "src/utils";
 import { Icon } from "./Icon";
@@ -87,11 +87,16 @@ export function getNavLinkStyles(variant: NavLinkVariant, contrast: boolean) {
 
 const baseStyles = Css.df.aic.hPx(32).pyPx(6).px1.br4.smMd.outline0.$;
 
-const navLinkVariantStyles: (
-  contrast: boolean,
-) => Record<
+const navLinkVariantStyles: (contrast: boolean) => Record<
   NavLinkVariant,
-  { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; focusRingStyles: {}; activeStyles: {}; pressedStyles: {} }
+  {
+    baseStyles: Properties;
+    hoverStyles: Properties;
+    disabledStyles: Properties;
+    focusRingStyles: Properties;
+    activeStyles: Properties;
+    pressedStyles: Properties;
+  }
 > = (contrast) => ({
   side: {
     baseStyles: { ...baseStyles, ...Css.gray700.if(contrast).gray600.$ },

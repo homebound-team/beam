@@ -1,7 +1,7 @@
 import { DecoratorFn } from "@storybook/react";
 import { ReactNode } from "react";
 import { BeamProvider } from "src/components";
-import { Css } from "src/Css";
+import { Css, Properties } from "src/Css";
 import { withRouter as rtlWithRouter } from "src/utils/rtl";
 
 export function withRouter(url?: string, path?: string): DecoratorFn {
@@ -51,7 +51,7 @@ export const withBeamDecorator = (Story: () => JSX.Element) => (
  * Used to help Chromatic properly render positioned `fixed` components.
  */
 export const withDimensions =
-  (width: number | string = "100vw", height: number | string = "100vh", xss?: {}) =>
+  (width: number | string = "100vw", height: number | string = "100vh", xss?: Properties) =>
   (Story: () => JSX.Element) =>
     (
       <div css={{ ...Css.w(width).h(height).$, ...xss }}>

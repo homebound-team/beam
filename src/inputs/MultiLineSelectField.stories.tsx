@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import type { IconKey } from "src/components";
 import { Css } from "src/Css";
 import { MultiLineSelectField, Value } from "src/inputs";
 import { FormLines } from "..";
@@ -32,19 +31,36 @@ export function MultiLineSelectFields() {
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
         <FormLines width="md">
-          <MultiLineSelectField label="Favorite Shapes" values={values} options={options} onSelect={(val) => setValues(val)} />
+          <MultiLineSelectField
+            label="Favorite Shapes"
+            values={values}
+            options={options}
+            onSelect={(val) => setValues(val)}
+          />
         </FormLines>
       </div>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>With a hidden label</h1>
         <FormLines width="md">
-          <MultiLineSelectField label="Favorite Shapes" labelStyle="hidden" values={values} options={options} onSelect={(val) => setValues(val)} />
+          <MultiLineSelectField
+            label="Favorite Shapes"
+            labelStyle="hidden"
+            values={values}
+            options={options}
+            onSelect={(val) => setValues(val)}
+          />
         </FormLines>
       </div>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>With a horizontal layout</h1>
         <FormLines width="md">
-          <MultiLineSelectField label="Favorite Shapes" labelStyle="left" values={values} options={options} onSelect={(val) => setValues(val)} />
+          <MultiLineSelectField
+            label="Favorite Shapes"
+            labelStyle="left"
+            values={values}
+            options={options}
+            onSelect={(val) => setValues(val)}
+          />
         </FormLines>
       </div>
     </div>

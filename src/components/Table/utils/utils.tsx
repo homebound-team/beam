@@ -197,7 +197,7 @@ export function maybeApplyFunction<T>(
 }
 
 export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter: string): boolean {
-  let value = filterValue(maybeContent);
+  const value = filterValue(maybeContent);
   if (typeof value === "string") {
     return value.toLowerCase().includes(filter.toLowerCase());
   } else if (typeof value === "number") {

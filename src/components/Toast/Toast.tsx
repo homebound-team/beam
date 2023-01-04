@@ -1,5 +1,5 @@
 import { Icon, IconKey } from "src/components/Icon";
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Properties } from "src/Css";
 import { useTestIds } from "src/utils";
 import { IconButton } from "../IconButton";
 import { useToastContext } from "./ToastContext";
@@ -38,7 +38,7 @@ const typeToIcon: Record<ToastTypes, IconKey> = {
   error: "xCircle",
 };
 
-const variantStyles: Record<ToastTypes, {}> = {
+const variantStyles: Record<ToastTypes, Properties> = {
   success: Css.bgGreen100.gray900.$,
   info: Css.bgLightBlue100.gray900.$,
   warning: Css.bgYellow200.gray900.$,

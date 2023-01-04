@@ -19,13 +19,6 @@ describe("BoundTextField", () => {
     expect(firstName_errorMsg()).toHaveTextContent("Required");
   });
 
-  it("shows an error message", async () => {
-    const author = createObjectState(formConfig, {});
-    author.touched = true;
-    const { firstName_errorMsg } = await render(<BoundTextField field={author.firstName} />);
-    expect(firstName_errorMsg()).toHaveTextContent("Required");
-  });
-
   it("can blur onEnter and call onEnter callback", async () => {
     const autoSave = jest.fn();
     const onEnter = jest.fn();

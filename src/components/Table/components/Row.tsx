@@ -29,6 +29,7 @@ import {
 } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
+import { AnyObject } from "src/types";
 import { shallowEqual } from "src/utils/shallowEqual";
 
 interface RowProps<R extends Kinded> {
@@ -336,4 +337,4 @@ export type GridDataRow<R extends Kinded> = {
   selectable?: false;
   /** Whether this row should infer its selected state based on its children's selected state */
   inferSelectedState?: false;
-} & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
+} & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;

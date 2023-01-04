@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { PropsWithChildren, ReactNode, useMemo, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { IconButton } from "src/components/IconButton";
 import { TabsWithContent, TabWithContent } from "src/components/Tabs";
 import { Css, Palette } from "src/Css";
@@ -16,6 +16,7 @@ import {
   SimpleHeaderAndData,
 } from "src/index";
 import { NumberField } from "src/inputs/NumberField";
+import { ChildrenOnly } from "src/types";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
@@ -266,7 +267,7 @@ function VirutalizedPage() {
   );
 }
 
-function TestLayout({ children }: PropsWithChildren<{}>) {
+function TestLayout({ children }: ChildrenOnly) {
   return (
     <PreventBrowserScroll>
       <TestTopNav />
@@ -275,7 +276,7 @@ function TestLayout({ children }: PropsWithChildren<{}>) {
   );
 }
 
-function TestProjectLayout({ children }: PropsWithChildren<{}>) {
+function TestProjectLayout({ children }: ChildrenOnly) {
   return (
     <PreventBrowserScroll>
       <TestTopNav />

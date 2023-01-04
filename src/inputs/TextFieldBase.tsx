@@ -7,7 +7,6 @@ import React, {
   MutableRefObject,
   ReactNode,
   TextareaHTMLAttributes,
-  useRef,
   useState,
 } from "react";
 import { chain, mergeProps, useFocusWithin, useHover } from "react-aria";
@@ -17,6 +16,7 @@ import { InlineLabel, Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Only, Palette, px } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
+import { useGetRef } from "src/hooks/useGetRef";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -98,7 +98,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const [isFocused, setIsFocused] = useState(false);
   const { hoverProps, isHovered } = useHover({});
   const { focusWithinProps } = useFocusWithin({ onFocusWithinChange: setIsFocused });
-  const fieldRef = inputRef ?? useRef();
+  const fieldRef = useGetRef(inputRef);
 
   const maybeSmaller = compound ? 2 : 0;
   const fieldHeight = 40;

@@ -8,7 +8,7 @@ export type RightPaneLayoutContextProps = {
   openInPane: (opts: OpenRightPaneOpts) => void;
   closePane: () => void;
   clearPane: () => void;
-  isRightPaneOpen: Boolean;
+  isRightPaneOpen: boolean;
   rightPaneContent: ReactNode;
 };
 
@@ -23,7 +23,7 @@ export const RightPaneContext = React.createContext<RightPaneLayoutContextProps>
 export function RightPaneProvider({ children }: { children: ReactNode }) {
   // Note: separating the pane content from isOpen state to prevent animating when updating content.
   const [rightPaneContent, setRightPaneContent] = useState<ReactNode>(undefined);
-  const [isRightPaneOpen, setIsRightPaneOpen] = useState<Boolean>(false);
+  const [isRightPaneOpen, setIsRightPaneOpen] = useState<boolean>(false);
 
   const openInPane = useCallback(
     (opts: OpenRightPaneOpts) => {

@@ -37,7 +37,7 @@ export function BaseStates() {
   return (
     <div css={Css.df.gap2.$}>
       <div css={Css.df.fdc.gap2.p1.$}>
-        <a {...args} css={sideNavStyles.baseStyles}>
+        <a {...args} css={{ ...sideNavStyles.baseStyles }}>
           {getChildren("Side nav default")}
         </a>
         <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.hoverStyles }}>
@@ -57,7 +57,7 @@ export function BaseStates() {
         </a>
       </div>
       <div css={Css.df.fdc.gap2.bgGray900.p1.br12.$}>
-        <a {...args} css={sideContrastNavStyles.baseStyles}>
+        <a {...args} css={{ ...sideContrastNavStyles.baseStyles }}>
           {getChildren("Side contrast nav default")}
         </a>
         <a {...args} css={{ ...sideContrastNavStyles.baseStyles, ...sideContrastNavStyles.hoverStyles }}>
@@ -77,7 +77,7 @@ export function BaseStates() {
         </a>
       </div>
       <div css={Css.df.fdc.gap2.p1.$}>
-        <a {...args} css={globalNavStyles.baseStyles}>
+        <a {...args} css={{ ...globalNavStyles.baseStyles }}>
           {getChildren("Global nav default")}
         </a>
         <a {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.hoverStyles }}>

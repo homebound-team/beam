@@ -5,7 +5,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { Icon, IconButton, resolveTooltip } from "src/components";
 import { DatePicker, DateRangePicker, Popover } from "src/components/internal";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Properties } from "src/Css";
 import {
   DateFieldMode,
   dateFormats,
@@ -22,7 +22,7 @@ import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 export interface DateFieldBaseProps
-  extends Pick<TextFieldBaseProps<{}>, "borderless" | "visuallyDisabled" | "labelStyle" | "compact"> {
+  extends Pick<TextFieldBaseProps<Properties>, "borderless" | "visuallyDisabled" | "labelStyle" | "compact"> {
   label: string;
   /** Called when the component loses focus */
   onBlur?: () => void;
@@ -215,8 +215,8 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     // We don't want to update the internal `wipValue` or `inputValue` back to `value` just because focus state changes or the overlay opens
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, dateFormat]);
 
   // Create a type safe `onChange` to handle both Single and Range date fields.
