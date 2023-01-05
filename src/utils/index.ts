@@ -63,6 +63,7 @@ export class EmptyRef<T> implements MutableRefObject<T> {
   get current(): T {
     throw new Error("BeamProvider is missing");
   }
+
   set current(value) {
     throw new Error("BeamProvider is missing");
   }
@@ -74,6 +75,10 @@ export function areArraysEqual(a: any[], b: any[]): boolean {
   return a.length === b.length && a.every((val, idx) => val === b[idx]);
 }
 
-export function isPromise(obj: void | Promise<void>): obj is Promise<void> {
+export function isPromise(obj: any | Promise<any>): obj is Promise<any> {
   return typeof obj === "object" && "then" in obj && typeof obj.then === "function";
+}
+
+export function isFunction(f: any): f is Function {
+  return typeof f === "function";
 }

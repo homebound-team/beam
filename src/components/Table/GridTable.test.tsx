@@ -634,6 +634,7 @@ describe("GridTable", () => {
           </div>
         );
       }
+
       const r = await render(<TestComponent />);
 
       // Then the data is sorted by 1 (1 2) then 2 (1 2)
@@ -1292,11 +1293,13 @@ describe("GridTable", () => {
       },
     ];
     const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+
     function Test() {
       const _api = useGridTableApi<NestedRow>();
       api.current = _api;
       return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
     }
+
     const r = await render(<Test />);
     // And all three rows are initially rendered
     expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
@@ -1328,11 +1331,13 @@ describe("GridTable", () => {
       },
     ];
     const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+
     function Test() {
       const _api = useGridTableApi<NestedRow>();
       api.current = _api;
       return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
     }
+
     const r = await render(<Test />);
     // And all three rows are initially rendered
     expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
@@ -1473,11 +1478,13 @@ describe("GridTable", () => {
       },
     ];
     const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+
     function Test() {
       const _api = useGridTableApi<NestedRow>();
       api.current = _api;
       return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
     }
+
     const r = await render(<Test />);
     // And all three rows are initially rendered
     expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
@@ -1511,6 +1518,7 @@ describe("GridTable", () => {
   it("getSelectedRows can see update rows", async () => {
     const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
     const _columns = [selectColumn<Row>(), ...columns];
+
     // Given a component using a useComputed against getSelectedRows
     function Test({ rows }: { rows: GridDataRow<Row>[] }) {
       const _api = useGridTableApi<Row>();
@@ -1528,6 +1536,7 @@ describe("GridTable", () => {
         </div>
       );
     }
+
     const r = await render(<Test rows={rows} />);
     click(r.select_1);
     // And selected rows is initially calc-d
@@ -1542,11 +1551,13 @@ describe("GridTable", () => {
     // Given a table with selectable rows
     const rows: GridDataRow<NestedRow>[] = [simpleHeader, { kind: "parent", id: "p1", data: { name: "parent 1" } }];
     const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+
     function Test() {
       const _api = useGridTableApi<NestedRow>();
       api.current = _api;
       return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
     }
+
     const r = await render(<Test />);
     // And the row is not selected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
@@ -2364,11 +2375,13 @@ describe("GridTable", () => {
     ];
 
     const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+
     function Test() {
       const _api = useGridTableApi<Row>();
       api.current = _api;
       return <GridTable<Row> api={_api} columns={[selectCol, nameCol]} rows={rows} />;
     }
+
     // When rendering the table
     const r = await render(<Test />);
 

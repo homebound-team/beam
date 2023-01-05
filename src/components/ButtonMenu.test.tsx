@@ -94,6 +94,19 @@ describe("ButtonMenu", () => {
     // Then the menu items are filtered
     expect(r.menuTrigger_menuItems().childNodes).toHaveLength(1);
   });
+
+  it("supports tooltips on disabled menu items", async () => {
+    // Given a menu item that is disabled with a value that will show as a tooltip
+    const menuItems = [{ label: "Disabled", disabled: "Tooltip", onClick: noop }];
+    const r = await render(<ButtonMenu trigger={{ label: "Trigger" }} items={menuItems} />);
+
+    // When opening the menu
+    click(r.trigger);
+
+    // Then the menu item should be disabled and have a tooltip
+    expect(r.trigger_disabled()).toHaveAttribute("aria-disabled", "true");
+    expect(r.tooltip()).toHaveAttribute("title", "Tooltip");
+  });
 });
 
 function TestButtonMenu({ empty = false, searchable = false, ...others }: { empty?: boolean; searchable?: boolean }) {

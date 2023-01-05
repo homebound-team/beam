@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { IconProps } from "src/components/Icon";
@@ -47,9 +47,10 @@ export function ButtonMenu(props: ButtonMenuProps) {
 
 type MenuItemBase = {
   label: string;
-  // If the `onClick` property is set as a string, then the menu item will be rendered as a link with the `onClick` value being the href
+  /** If the `onClick` property is set as a string, then the menu item will be rendered as a link with the `onClick` value being the href */
   onClick: string | VoidFunction;
-  disabled?: boolean;
+  /** Whether the interactive element is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
+  disabled?: boolean | ReactNode;
   destructive?: boolean;
 };
 

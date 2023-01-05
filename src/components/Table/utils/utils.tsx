@@ -81,6 +81,7 @@ export function isGridCellContent(content: ReactNode | GridCellContent): content
 }
 
 const emptyValues = ["", null, undefined] as any[];
+
 function isContentEmpty(content: ReactNode): boolean {
   return emptyValues.includes(content);
 }
