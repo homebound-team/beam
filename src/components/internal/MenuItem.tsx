@@ -7,6 +7,7 @@ import { TreeState } from "react-stately";
 import { Avatar } from "src/components/Avatar";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
 import { Icon } from "src/components/Icon";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette } from "src/Css";
 import { isAbsoluteUrl, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -20,7 +21,8 @@ interface MenuItemProps {
 export function MenuItemImpl(props: MenuItemProps) {
   const { item, state, onClose } = props;
   const menuItem = item.value;
-  const { disabled: isDisabled, onClick, label, destructive } = menuItem;
+  const { disabled, onClick, label, destructive } = menuItem;
+  const isDisabled = Boolean(disabled);
   const isFocused = state.selectionManager.focusedKey === item.key;
   const ref = useRef<HTMLLIElement>(null);
   const history = useHistory();
@@ -70,17 +72,21 @@ export function MenuItemImpl(props: MenuItemProps) {
       }}
       {...tid[defaultTestId(menuItem.label)]}
     >
-      {maybeWrapInLink(
-        onClick,
-        isIconMenuItem(menuItem) ? (
-          <IconMenuItem {...menuItem} />
-        ) : isImageMenuItem(menuItem) ? (
-          <ImageMenuItem {...menuItem} />
-        ) : (
-          label
+      {maybeTooltip({
+        title: resolveTooltip(disabled),
+        placement: "right",
+        children: maybeWrapInLink(
+          onClick,
+          isIconMenuItem(menuItem) ? (
+            <IconMenuItem {...menuItem} />
+          ) : isImageMenuItem(menuItem) ? (
+            <ImageMenuItem {...menuItem} />
+          ) : (
+            label
+          ),
+          isDisabled,
         ),
-        isDisabled,
-      )}
+      })}
     </li>
   );
 }
