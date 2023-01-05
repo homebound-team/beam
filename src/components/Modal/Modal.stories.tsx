@@ -16,11 +16,11 @@ export default {
   component: Modal,
   title: "Workspace/Components/Modal",
   decorators: [withBeamDecorator, withDimensions()],
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36070%3A105724",
-    }
+    },
   },
 } as Meta;
 

@@ -5,6 +5,7 @@ import { Button } from "src/components/Button";
 import {
   isIconButton,
   isTextButton,
+  labelOr,
   OverlayTrigger,
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
@@ -31,7 +32,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger) ? labelOr(trigger, "editColumnsButton") : isIconButton(trigger) ? trigger.icon : trigger.name,
   );
 
   const { options } = useMemo(() => {
@@ -76,7 +77,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
           values={selectedValues}
           options={options}
           columns={2}
-          hideLabel
+          labelStyle="hidden"
         />
         <div css={Css.mt1.$}>
           <Button variant={"tertiary"} label={"Clear selections"} onClick={() => setSelectedValues([])} />

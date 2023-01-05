@@ -7,11 +7,11 @@ import { Checkbox, CheckboxGroup, CheckboxGroupProps } from "src/index";
 export default {
   component: Checkbox,
   title: "Workspace/Inputs/Checkboxes",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36894%3A102260",
-    }
+    },
   },
 } as Meta;
 
@@ -104,6 +104,33 @@ export function CheckboxGroups() {
               label: "Disabled Option",
               disabled: true,
               description: "This chair cannot be selected.",
+            },
+          ]}
+          onBlur={action("onBlur")}
+          onFocus={action("onFocus")}
+        />
+      </div>
+
+      <div css={Css.mt4.dg.gap1.w50.$}>
+        <h2>Checkbox Group with a left label</h2>
+        <div css={Css.sm.lightBlue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
+        <CheckboxGroup
+          label="Favorite Chairs"
+          labelStyle="left"
+          onChange={(values) => setSelectedValues(values)}
+          values={selectedValues}
+          options={[
+            {
+              value: "shell",
+              label: "Shell Chair by Hans Wegner",
+              description:
+                "Sometimes called the “smiling chair,” Hans Wegner’s Shell Chair (1963) achieves a floating lightness with its wing-like seat and arching curved legs.",
+            },
+            {
+              value: "womb",
+              label: "Womb Chair by Eero Saarinen",
+              description:
+                "When Florence Knoll challenged Eero Saarinen to create a chair that she could curl up in, she found the right candidate for the task.",
             },
           ]}
           onBlur={action("onBlur")}

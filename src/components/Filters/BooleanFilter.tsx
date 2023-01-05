@@ -32,8 +32,7 @@ class BooleanFilter extends BaseFilter<boolean, BooleanFilterProps> implements F
         label={this.label}
         // We use `String(value)` so that `undefined` becomes "undefined"
         value={String(value)}
-        hideLabel={inModal}
-        inlineLabel={!inModal && !vertical}
+        labelStyle={inModal ? "hidden" : !inModal && !vertical ? "inline" : "above"}
         sizeToContent={!inModal && !vertical}
         options={options}
         getOptionValue={(o) => String(o[0])}

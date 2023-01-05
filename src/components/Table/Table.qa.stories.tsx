@@ -1,6 +1,6 @@
 import { ObjectConfig, ObjectState, required, useFormStates } from "@homebound/form-state";
 import { Meta } from "@storybook/react";
-import { default as React, ReactNode, useMemo, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
 import { GridDataRow } from "src/components/Table/components/Row";
@@ -139,7 +139,7 @@ export function Table(props: TableStoryProps) {
       <TableActions>
         <TextField
           label="Filter"
-          hideLabel
+          labelStyle="hidden"
           placeholder="Search"
           value={filter}
           onChange={setFilter}
@@ -251,7 +251,7 @@ export function Filterable() {
         <div css={Css.wPx(250).$}>
           <TextField
             label="Filter"
-            hideLabel
+            labelStyle="hidden"
             placeholder="Search"
             value={filter}
             onChange={setFilter}
@@ -447,8 +447,14 @@ function beamNestedColumns(expandable: boolean = false): GridColumn<BeamNestedRo
           expandableHeader: emptyCell,
           totals: emptyCell,
           header: "Version 2",
-          grandparent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
-          parent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
+          grandparent: (row) => ({
+            content: () => maybeFormatNumber(row.original),
+            value: row.original,
+          }),
+          parent: (row) => ({
+            content: () => maybeFormatNumber(row.original),
+            value: row.original,
+          }),
           child: (row) => ({ content: () => numberFormatter(row.original) }),
           w: "150px",
         }),
@@ -456,8 +462,14 @@ function beamNestedColumns(expandable: boolean = false): GridColumn<BeamNestedRo
           expandableHeader: emptyCell,
           totals: emptyCell,
           header: "Version 3",
-          grandparent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
-          parent: (row) => ({ content: () => maybeFormatNumber(row.original), value: row.original }),
+          grandparent: (row) => ({
+            content: () => maybeFormatNumber(row.original),
+            value: row.original,
+          }),
+          parent: (row) => ({
+            content: () => maybeFormatNumber(row.original),
+            value: row.original,
+          }),
           child: (row) => ({ content: () => numberFormatter(row.original) }),
           w: "150px",
         }),
@@ -476,7 +488,10 @@ function beamNestedColumns(expandable: boolean = false): GridColumn<BeamNestedRo
           expandableHeader: emptyCell,
           totals: emptyCell,
           header: "Version 2",
-          grandparent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
+          grandparent: (row) => ({
+            content: () => maybeFormatNumber(row.changeOrders),
+            value: row.changeOrders,
+          }),
           parent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
           child: (row) => ({ content: () => numberFormatter(row.changeOrders) }),
           w: "150px",
@@ -485,7 +500,10 @@ function beamNestedColumns(expandable: boolean = false): GridColumn<BeamNestedRo
           expandableHeader: emptyCell,
           totals: emptyCell,
           header: "Version 3",
-          grandparent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
+          grandparent: (row) => ({
+            content: () => maybeFormatNumber(row.changeOrders),
+            value: row.changeOrders,
+          }),
           parent: (row) => ({ content: () => maybeFormatNumber(row.changeOrders), value: row.changeOrders }),
           child: (row) => ({ content: () => numberFormatter(row.changeOrders) }),
           w: "150px",
@@ -505,7 +523,10 @@ function beamNestedColumns(expandable: boolean = false): GridColumn<BeamNestedRo
           expandableHeader: emptyCell,
           totals: (row) => numberFormatter(row.reallocations),
           header: "Version 2",
-          grandparent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
+          grandparent: (row) => ({
+            content: () => maybeFormatNumber(row.reallocations),
+            value: row.reallocations,
+          }),
           parent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
           child: (row) => ({ content: () => numberFormatter(row.reallocations) }),
           w: "150px",
@@ -514,7 +535,10 @@ function beamNestedColumns(expandable: boolean = false): GridColumn<BeamNestedRo
           expandableHeader: emptyCell,
           totals: (row) => numberFormatter(row.reallocations),
           header: "Version 3",
-          grandparent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
+          grandparent: (row) => ({
+            content: () => maybeFormatNumber(row.reallocations),
+            value: row.reallocations,
+          }),
           parent: (row) => ({ content: () => maybeFormatNumber(row.reallocations), value: row.reallocations }),
           child: (row) => ({ content: () => numberFormatter(row.reallocations) }),
           w: "150px",
@@ -679,8 +703,14 @@ function beamNestedColumns(expandable: boolean = false): GridColumn<BeamNestedRo
           expandableHeader: emptyCell,
           totals: (row) => numberFormatter(row.costToComplete),
           header: "Version 2",
-          grandparent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
-          parent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
+          grandparent: (row) => ({
+            content: () => maybeFormatNumber(row.costToComplete),
+            value: row.costToComplete,
+          }),
+          parent: (row) => ({
+            content: () => maybeFormatNumber(row.costToComplete),
+            value: row.costToComplete,
+          }),
           child: (row) => ({ content: () => numberFormatter(row.costToComplete) }),
           w: "150px",
         }),
@@ -688,8 +718,14 @@ function beamNestedColumns(expandable: boolean = false): GridColumn<BeamNestedRo
           expandableHeader: () => "Cost To Complete",
           totals: (row) => numberFormatter(row.costToComplete),
           header: "Version 3",
-          grandparent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
-          parent: (row) => ({ content: () => maybeFormatNumber(row.costToComplete), value: row.costToComplete }),
+          grandparent: (row) => ({
+            content: () => maybeFormatNumber(row.costToComplete),
+            value: row.costToComplete,
+          }),
+          parent: (row) => ({
+            content: () => maybeFormatNumber(row.costToComplete),
+            value: row.costToComplete,
+          }),
           child: (row) => ({ content: () => numberFormatter(row.costToComplete) }),
           w: "150px",
         }),
@@ -816,6 +852,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
       disabled: id === "a:6",
     };
   }
+
   return [
     column<InputFieldRows>({
       header: "Name",

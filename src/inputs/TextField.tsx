@@ -9,7 +9,6 @@ import { maybeCall } from "src/utils";
 // exported for testing purposes
 export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
   compact?: boolean;
-  inlineLabel?: boolean;
   clearable?: boolean;
   api?: MutableRefObject<TextFieldApi | undefined>;
   onEnter?: VoidFunction;

@@ -32,8 +32,6 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
   fieldDecoration?: (opt: O) => ReactNode;
   /** Sets the form field label. */
   label: string;
-  /** Renders the label inside the input field, i.e. for filters. */
-  inlineLabel?: boolean;
   // Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip.
   readOnly?: boolean | ReactNode;
   onBlur?: () => void;
@@ -267,7 +265,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     },
   });
 
-  //@ts-ignore - `selectionManager.state` exists, but not according to the types
+  // @ts-ignore - `selectionManager.state` exists, but not according to the types
   state.selectionManager.state = useMultipleSelectionState({
     selectionMode: multiselect ? "multiple" : "single",
     // Do not allow an empty selection if single select mode
@@ -359,7 +357,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
   };
 
   return (
-    <div css={Css.df.fdc.w100.maxw(px(550)).$} ref={comboBoxRef}>
+    <div css={Css.df.fdc.w100.maxw(px(550)).if(otherProps.labelStyle === "left").maxw100.$} ref={comboBoxRef}>
       <SelectFieldInput
         {...otherProps}
         buttonProps={buttonProps}
@@ -396,6 +394,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
+            horizontalLayout={otherProps.labelStyle === "left"}
             loading={fieldState.optionsLoading}
             disabledOptionsWithReasons={disabledOptionsWithReasons}
           />

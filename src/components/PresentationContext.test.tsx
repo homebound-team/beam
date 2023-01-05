@@ -6,10 +6,10 @@ describe("PresentationContext", () => {
     // Given nested PresentationProviders that overwrites some values
     const r = await render(
       <PresentationProvider
-        fieldProps={{ hideLabel: true, labelSuffix: { required: "*" }, numberAlignment: "right" }}
+        fieldProps={{ labelStyle: "hidden", labelSuffix: { required: "*" }, numberAlignment: "right" }}
         gridTableStyle={{ emptyCell: "Test" }}
       >
-        <PresentationProvider fieldProps={{ hideLabel: false, labelSuffix: { required: "?" } }}>
+        <PresentationProvider fieldProps={{ labelStyle: "above", labelSuffix: { required: "?" } }}>
           <TestComponent />
         </PresentationProvider>
       </PresentationProvider>,
@@ -45,7 +45,7 @@ function TestComponent() {
   const { fieldProps, gridTableStyle } = usePresentationContext();
   return (
     <>
-      <div data-testid="hideLabel">{JSON.stringify(fieldProps?.hideLabel)}</div>
+      <div data-testid="hideLabel">{JSON.stringify(fieldProps?.labelStyle === "hidden")}</div>
       <div data-testid="formLabelSuffix">{JSON.stringify(fieldProps?.labelSuffix)}</div>
       <div data-testid="numberAlignment">{JSON.stringify(fieldProps?.numberAlignment)}</div>
       <div data-testid="gridTableStyle">{JSON.stringify(gridTableStyle)}</div>

@@ -1,5 +1,4 @@
 import { Node } from "@react-types/shared";
-import React from "react";
 import { useListBoxSection, useSeparator } from "react-aria";
 import { SelectState } from "react-stately";
 import { Css } from "src/Css";

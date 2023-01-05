@@ -29,6 +29,8 @@ import {
 } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
+import { AnyObject } from "src/types";
+import { isFunction } from "src/utils";
 import { shallowEqual } from "src/utils/shallowEqual";
 
 interface RowProps<R extends Kinded> {
@@ -110,8 +112,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       {columns.map((column, columnIndex) => {
         // Need to keep track of the expanded columns so we can add borders as expected for the header rows
         const isExpanded = tableState.expandedColumnIds.includes(column.id);
-        const numExpandedColumns = isExpanded ? column.expandColumns?.length ?? 0 : 0;
-
+        const numExpandedColumns = isExpanded ? tableState.getExpandedColumns(column)?.length ?? 0 : 0;
         const { wrapAction = true, isAction = false } = column;
 
         const applyFirstContentColumnStyles = !isHeader && !isAction && !firstContentColumnStylesApplied;
@@ -159,8 +160,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         const alignment = getAlignment(column, maybeContent);
         const justificationCss = getJustification(column, maybeContent, as, alignment);
         const isExpandable =
-          (column.expandColumns && column.expandColumns.length > 0) || column.expandedWidth !== undefined;
-
+          isFunction(column.expandColumns) ||
+          (column.expandColumns && column.expandColumns.length > 0) ||
+          column.expandedWidth !== undefined;
         const content = toContent(
           maybeContent,
           isHeader,
@@ -334,4 +336,6 @@ export type GridDataRow<R extends Kinded> = {
   initSelected?: boolean;
   /** Whether row can be selected */
   selectable?: false;
-} & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
+  /** Whether this row should infer its selected state based on its children's selected state */
+  inferSelectedState?: false;
+} & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;

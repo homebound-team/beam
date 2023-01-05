@@ -1,4 +1,3 @@
-import React from "react";
 import { Css, Palette } from "src/Css";
 import { useTestIds } from "src/utils";
 
