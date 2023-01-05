@@ -249,7 +249,7 @@ export function MenuWithContrast() {
         <div css={Css.mlPx(200).$}>
           <h2 css={Css.lg.$}>With Contrast</h2>
           <ButtonMenu
-            trigger={{ label: "Menu trigger" }}
+            trigger={{ label: "Menu trigger", variant: "tertiary" }}
             items={menuItems}
             persistentItems={[
               { label: "Persistent Action", onClick: action("Persistent action clicked") },
@@ -257,7 +257,6 @@ export function MenuWithContrast() {
             ]}
             defaultOpen
             contrast={true}
-            variant={"tertiary"}
           />
         </div>
       </div>
