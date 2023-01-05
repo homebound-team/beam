@@ -7,11 +7,11 @@ import { ChipTextField } from "src/inputs/ChipTextField";
 export default {
   component: ChipTextField,
   title: "Workspace/Inputs/ChipTextField",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101241",
-    }
+    },
   },
 };
 

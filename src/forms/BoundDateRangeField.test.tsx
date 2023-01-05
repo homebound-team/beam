@@ -61,8 +61,23 @@ describe(BoundDateRangeField, () => {
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith({ from: jan2, to: jan19 });
   });
+
+  it("reflects readOnly correctly", async () => {
+    const onBlur = jest.fn();
+    const onFocus = jest.fn();
+    // Given a BoundDateRangeField for a field marked as readOnly is rendered
+    const author = createObjectState(formConfigReadOnly, {});
+    const r = await render(<BoundDateRangeField field={author.saleDates} onBlur={onBlur} onFocus={onFocus} />);
+
+    // Then the field should be disabled
+    expect(r.saleDates()).toHaveAttribute("data-readonly", "true");
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {
   saleDates: { type: "value" },
+};
+
+const formConfigReadOnly: ObjectConfig<AuthorInput> = {
+  saleDates: { type: "value", readOnly: true },
 };

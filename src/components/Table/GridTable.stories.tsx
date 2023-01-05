@@ -210,7 +210,7 @@ export function NoRowsFallback() {
 }
 
 // Make a `Row` ADT for a table with a header + 3 levels of nesting
-type HeaderRow = { kind: "header"; data: {} };
+type HeaderRow = { kind: "header"; data: undefined };
 type ParentRow = { kind: "parent"; id: string; data: { name: string } };
 type ChildRow = { kind: "child"; id: string; data: { name: string } };
 type GrandChildRow = { kind: "grandChild"; id: string; data: { name: string } };
@@ -330,7 +330,11 @@ export function StickyHeader() {
         stickyHeader={true}
         rows={[
           simpleHeader,
-          ...zeroTo(200).map((i) => ({ kind: "data" as const, id: `${i}`, data: { name: `row ${i}`, value: i } })),
+          ...zeroTo(200).map((i) => ({
+            kind: "data" as const,
+            id: `${i}`,
+            data: { name: `row ${i}`, value: i },
+          })),
         ]}
       />
     </div>
@@ -525,14 +529,12 @@ export const DataTypeColumns = newStory(
     const dateCol = dateColumn<Row2>({ header: "Date", data: ({ date }) => date });
     const priceCol = numericColumn<Row2>({
       header: "Price",
-      data: ({ priceInCents }) => (
-        <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} type="cents" />
-      ),
+      data: ({ priceInCents }) => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
     });
     const readOnlyPriceCol = numericColumn<Row2>({
       header: "Read only Price",
       data: ({ priceInCents }) => (
-        <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />
+        <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />
       ),
     });
     const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
@@ -541,9 +543,17 @@ export const DataTypeColumns = newStory(
         columns={[nameCol, detailCol, dateCol, priceCol, readOnlyPriceCol, actionCol]}
         rows={[
           simpleHeader,
-          { kind: "data", id: "1", data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 } },
+          {
+            kind: "data",
+            id: "1",
+            data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
+          },
           { kind: "data", id: "2", data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 } },
-          { kind: "data", id: "3", data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 } },
+          {
+            kind: "data",
+            id: "3",
+            data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
+          },
           {
             kind: "data",
             id: "4",
@@ -565,7 +575,7 @@ export function WrappedHeaders() {
   const rightAlignedColumn = numericColumn<Row2>({
     header: "Right aligned column header",
     data: ({ priceInCents }) => ({
-      content: <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />,
+      content: <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />,
       sortValue: priceInCents,
     }),
     w: "150px",
@@ -586,7 +596,11 @@ export function WrappedHeaders() {
         { kind: "data", id: "1", data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 } },
         { kind: "data", id: "2", data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 } },
         { kind: "data", id: "3", data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 } },
-        { kind: "data", id: "4", data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 } },
+        {
+          kind: "data",
+          id: "4",
+          data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+        },
       ]}
     />
   );
@@ -595,6 +609,7 @@ export function WrappedHeaders() {
 type DataRow = { kind: "data"; id: string; data: { name: string; role: string; date: string; priceInCents: number } };
 type TotalsRow = { kind: "total"; data: { totalPriceInCents: number } };
 type ColspanRow = HeaderRow | DataRow | TotalsRow;
+
 export function ColSpan() {
   const idCol = column<ColspanRow>({
     header: "ID",
@@ -612,11 +627,9 @@ export function ColSpan() {
   const dateCol = dateColumn<ColspanRow>({ header: "Date", data: ({ date }) => date, total: "" });
   const priceCol = numericColumn<ColspanRow>({
     header: "Price",
-    data: ({ priceInCents }) => (
-      <NumberField hideLabel label="Price" value={priceInCents} onChange={noop} type="cents" />
-    ),
+    data: ({ priceInCents }) => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
     total: ({ totalPriceInCents }) => (
-      <NumberField hideLabel label="Price" readOnly value={totalPriceInCents} onChange={noop} type="cents" />
+      <NumberField label="Price" readOnly value={totalPriceInCents} onChange={noop} type="cents" />
     ),
   });
   // Use a green background to show the 1st column is flush left
@@ -629,7 +642,11 @@ export function ColSpan() {
         { kind: "data", id: "1", data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 } },
         { kind: "data", id: "2", data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 } },
         { kind: "data", id: "3", data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 } },
-        { kind: "data", id: "4", data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 } },
+        {
+          kind: "data",
+          id: "4",
+          data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+        },
         { kind: "total", id: "total", data: { totalPriceInCents: 14_083_64 } },
       ]}
     />
@@ -671,7 +688,11 @@ function makeNestedRows(repeat: number = 1): GridDataRow<NestedRow>[] {
           {
             ...{ kind: "child", id: `${p1}c1`, data: { name: `child ${prefix}p1c1` } },
             children: [
-              { kind: "grandChild", id: `${p1}c1g1`, data: { name: `grandchild ${prefix}p1c1g1` + " foo".repeat(20) } },
+              {
+                kind: "grandChild",
+                id: `${p1}c1g1`,
+                data: { name: `grandchild ${prefix}p1c1g1` + " foo".repeat(20) },
+              },
               { kind: "grandChild", id: `${p1}c1g2`, data: { name: `grandchild ${prefix}p1c1g2` } },
             ],
           },
@@ -987,6 +1008,7 @@ export function InteractiveCellAlignment() {
     />
   );
 }
+
 type AlignmentData = { name: string | undefined; alignment: "left" | "right" | "center" };
 type AlignmentRow = SimpleHeaderAndData<AlignmentData>;
 
@@ -1006,7 +1028,6 @@ export function PrimaryColumnSorting() {
     clientSideSort: false,
   };
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [filter, setFilter] = useState<string | undefined>();
   return (
     <div>
@@ -1236,7 +1257,103 @@ export function ExpandableColumns() {
     ],
     [],
   );
+  return (
+    <div css={Css.df.fdc.bgGray100.p2.h("100vh").mw("fit-content").$}>
+      <GridTable stickyHeader columns={columns} rows={rows} style={{ allWhite: true }} as="div" />
+    </div>
+  );
+}
 
+export function ExpandableColumnsWithSetTimeout() {
+  const rows: GridDataRow<ExpandableRow>[] = useMemo(
+    () => [
+      // New reserved 'kind' "groupHeader" property for GridTable to position row correctly
+      { kind: "header", id: "header", data: {} },
+      { kind: "expandableHeader", id: "expandableHeader", data: {} },
+      {
+        kind: "data" as const,
+        id: `user:1`,
+        data: {
+          firstName: "Brandon",
+          lastName: "Dow",
+          birthdate: "Jan 29, 1986",
+          age: 36,
+          favoriteSports: ["Basketball", "Football"],
+          occupation: "Software Engineer",
+          manager: "Steve Thompson",
+        },
+      },
+    ],
+    [],
+  );
+
+  const columns: GridColumn<ExpandableRow>[] = useMemo(
+    () => [
+      selectColumn<ExpandableRow>({ sticky: "left" }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Address",
+        header: emptyCell,
+        data: () => "123 Sesame St",
+        w: "200px",
+        sticky: "left",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Employee",
+        header: (data, { expanded }) => (expanded ? "First Name" : emptyCell),
+        data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+        expandColumns: async () =>
+          await new Promise((resolve) =>
+            setTimeout(
+              () =>
+                resolve([
+                  column<ExpandableRow>({
+                    expandableHeader: emptyCell,
+                    header: "Last Name",
+                    data: ({ lastName }) => lastName,
+                    w: "250px",
+                  }),
+                  column<ExpandableRow>({
+                    expandableHeader: emptyCell,
+                    header: "Birthdate",
+                    data: ({ birthdate }) => birthdate,
+                    w: "150px",
+                  }),
+                  column<ExpandableRow>({
+                    expandableHeader: emptyCell,
+                    header: "Age",
+                    data: ({ age }) => age,
+                    w: "80px",
+                  }),
+                ]),
+              2000,
+            ),
+          ),
+        w: "250px",
+      }),
+
+      column<ExpandableRow>({
+        expandableHeader: () => "Occupation",
+        header: emptyCell,
+        data: ({ occupation }) => occupation,
+        w: "280px",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Manager",
+        header: emptyCell,
+        data: ({ manager }) => manager,
+        w: "280px",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Favorite Sports",
+        header: emptyCell,
+        data: ({ favoriteSports = [] }, { expanded }) =>
+          expanded ? <Chips values={favoriteSports} /> : favoriteSports.length,
+        w: "160px",
+        expandedWidth: "280px",
+      }),
+    ],
+    [],
+  );
   return (
     <div css={Css.df.fdc.bgGray100.p2.h("100vh").mw("fit-content").$}>
       <GridTable stickyHeader columns={columns} rows={rows} style={{ allWhite: true }} as="div" />

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { IconProps } from "src/components/Icon";
@@ -6,12 +6,14 @@ import { Menu } from "src/components/internal/Menu";
 import {
   isIconButton,
   isTextButton,
+  labelOr,
   OverlayTrigger,
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
 
-interface ButtonMenuProps extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
+interface ButtonMenuProps
+  extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
   items: MenuItem[];
   persistentItems?: MenuItem[];
   searchable?: boolean;
@@ -26,7 +28,7 @@ export function ButtonMenu(props: ButtonMenuProps) {
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger) ? labelOr(trigger, "buttonMenu") : isIconButton(trigger) ? trigger.icon : trigger.name,
   );
 
   return (
@@ -45,9 +47,10 @@ export function ButtonMenu(props: ButtonMenuProps) {
 
 type MenuItemBase = {
   label: string;
-  // If the `onClick` property is set as a string, then the menu item will be rendered as a link with the `onClick` value being the href
+  /** If the `onClick` property is set as a string, then the menu item will be rendered as a link with the `onClick` value being the href */
   onClick: string | VoidFunction;
-  disabled?: boolean;
+  /** Whether the interactive element is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
+  disabled?: boolean | ReactNode;
   destructive?: boolean;
 };
 

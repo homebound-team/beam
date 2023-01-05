@@ -29,7 +29,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
   });
 
   const [search, setSearch] = useState<string | undefined>(undefined);
-  let { contains } = useFilter({
+  const { contains } = useFilter({
     sensitivity: "base",
   });
 
@@ -89,7 +89,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
             label=""
             value={search}
             placeholder="Search..."
-            inlineLabel={true}
+            labelStyle="inline"
             onChange={setSearch}
             {...tid}
           />

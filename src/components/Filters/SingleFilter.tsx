@@ -40,8 +40,7 @@ class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, 
         compact={!vertical}
         value={value}
         label={this.label}
-        inlineLabel={!inModal && !vertical}
-        hideLabel={inModal}
+        labelStyle={inModal ? "hidden" : !inModal && !vertical ? "inline" : "above"}
         sizeToContent={!inModal && !vertical}
         nothingSelectedText="All"
         onSelect={(value) => setValue(value || undefined)}

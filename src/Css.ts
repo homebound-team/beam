@@ -431,13 +431,13 @@ class CssBuilder<T extends Properties> {
   get bsh0() {
     return this.add("boxShadow", "none");
   }
-  /** Sets `boxShadow: "0px 2px 16px 0px rgba(17,24,39,0.03), 0px 4px 8px 0px rgba(17,24,39,0.08)"`. */
+  /** Sets `boxShadow: "0px 4px 8px rgba(53, 53, 53, 0.08), 0px 2px 16px rgba(53, 53, 53, 0.03);"`. */
   get bshBasic() {
-    return this.add("boxShadow", "0px 2px 16px 0px rgba(17,24,39,0.03), 0px 4px 8px 0px rgba(17,24,39,0.08)");
+    return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.08), 0px 2px 16px rgba(53, 53, 53, 0.03);");
   }
-  /** Sets `boxShadow: "0px 2px 24px 0px rgba(17,24,39,0.08), 0px 4px 8px 0px rgba(17,24,39,0.1)"`. */
+  /** Sets `boxShadow: "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08);"`. */
   get bshHover() {
-    return this.add("boxShadow", "0px 2px 24px 0px rgba(17,24,39,0.08), 0px 4px 8px 0px rgba(17,24,39,0.1)");
+    return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08);");
   }
   /** Sets `boxShadow: "0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px rgba(3,105,161,1)"`. */
   get bshFocus() {

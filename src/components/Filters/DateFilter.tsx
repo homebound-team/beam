@@ -53,14 +53,13 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
               setValue(op ? ({ op, value: value?.value ? new Date(value.value) : new Date() } as DV) : undefined)
             }
             label={inModal ? `${label} date filter operation` : label}
-            inlineLabel={!inModal && !vertical}
-            hideLabel={inModal || vertical}
+            labelStyle={!inModal && !vertical ? "inline" : inModal || vertical ? "hidden" : "above"}
             nothingSelectedText="Any"
             {...tid[`${defaultTestId(this.label)}_dateOperation`]}
           />
           <DateField
             compact
-            inlineLabel
+            labelStyle="inline"
             value={value?.value ? new Date(value.value) : new Date()}
             label="Date"
             onChange={(d) => setValue({ ...value, value: d })}

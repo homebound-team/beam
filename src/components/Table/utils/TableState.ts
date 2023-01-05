@@ -6,6 +6,8 @@ import { GridSortConfig } from "src/components/Table/GridTable";
 import { Direction, GridColumnWithId } from "src/components/Table/types";
 import { ASC, DESC } from "src/components/Table/utils/utils";
 import { visit } from "src/components/Table/utils/visitor";
+import { isFunction } from "src/utils";
+import { assignDefaultColumnIds } from "./columns";
 
 // A parent row can be partially selected when some children are selected/some aren't.
 export type SelectedState = "checked" | "unchecked" | "partial";
@@ -54,6 +56,8 @@ export class TableState {
   // An observable set of column ids to keep track of which columns are visible
   public visibleColumns = new ObservableSet<string>();
   private visibleColumnsStorageKey: string = "";
+  // Cache for already loaded expandable columns
+  private loadedColumns: Map<string, GridColumnWithId<any>[]> = new Map();
 
   /**
    * Creates the `RowState` for a given `GridTable`.
@@ -212,13 +216,32 @@ export class TableState {
   }
 
   setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
+    const isInitial = !this.columns || this.columns.length === 0;
     if (columns !== this.columns) {
       this.columns = columns;
       this.visibleColumnsStorageKey = visibleColumnsStorageKey ?? camelCase(columns.map((c) => c.id).join());
       this.visibleColumns.replace(readOrSetLocalVisibleColumnState(columns, this.visibleColumnsStorageKey));
       const expandedColumnIds = columns.filter((c) => c.initExpanded).map((c) => c.id);
-      this.expandedColumns.replace(expandedColumnIds);
+      if (isInitial) this.expandedColumns.replace(expandedColumnIds);
     }
+  }
+
+  // load and trigger column to be expanded
+  async loadExpandedColumns(column: GridColumnWithId<any>): Promise<void> {
+    // if we dont have anything in our cache and our expanded columns are a function
+    if (!this.loadedColumns.has(column.id) && isFunction(column.expandColumns)) {
+      // set our result to the function call of expandColumns
+      const result = await column.expandColumns();
+      // once we have the loaded columns, add result to local cache
+      this.loadedColumns.set(column.id, assignDefaultColumnIds(result));
+    }
+    // once column is in local cache, then toggle
+    this.toggleExpandedColumn(column.id);
+  }
+
+  // if there is a promise, then load the expandable columns from the cache, if not then return the expandedColumns
+  getExpandedColumns(column: GridColumnWithId<any>): GridColumnWithId<any>[] {
+    return isFunction(column.expandColumns) ? this.loadedColumns.get(column.id) ?? [] : column.expandColumns ?? [];
   }
 
   setVisibleColumns(ids: string[]) {
@@ -301,7 +324,8 @@ export class TableState {
 
       // Now walk up the parents and see if they are now-all-checked/now-all-unchecked/some-of-each
       for (const parent of [...curr.parents].reverse()) {
-        if (parent.children) {
+        // Only derive selected state of the parent row if `inferSelectedState` is not `false`
+        if (parent.children && parent.inferSelectedState !== false) {
           map.set(parent.id, deriveParentSelected(this.getMatchedChildrenStates(parent.children, map)));
         }
       }
@@ -375,7 +399,8 @@ export class TableState {
   }
 
   private getMatchedChildrenStates(children: GridDataRow<any>[], map: Map<string, SelectedState>): SelectedState[] {
-    return children
+    const respectedChildren = children.flatMap(getChildrenForDerivingSelectState);
+    return respectedChildren
       .filter((row) => row.id !== "header" && this.matchedRows.has(row.id))
       .map((row) => map.get(row.id) || this.getSelected(row.id));
   }
@@ -383,7 +408,8 @@ export class TableState {
   // Recursively traverse through rows to determine selected state of parent rows based on children
   private setNestedSelectedStates(row: GridDataRow<any>, map: Map<string, SelectedState>): SelectedState[] {
     if (this.matchedRows.has(row.id)) {
-      if (!row.children) {
+      // do not derive selected state if there are no children, or if `inferSelectedState` is set to false
+      if (!row.children || row.inferSelectedState === false) {
         return [this.getSelected(row.id)];
       }
 
@@ -394,6 +420,14 @@ export class TableState {
     }
     return [];
   }
+}
+
+/** Returns the child rows needed for deriving the selected state of a parent/group row */
+function getChildrenForDerivingSelectState(row: GridDataRow<any>): GridDataRow<any>[] {
+  if (row.children && row.inferSelectedState === false) {
+    return [row, ...row.children.flatMap(getChildrenForDerivingSelectState)];
+  }
+  return [row];
 }
 
 /** Provides a context for rows to access their table's `TableState`. */

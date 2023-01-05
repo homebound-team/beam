@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
 import { ExpandableHeader } from "src/components/Table/components/ExpandableHeader";
 import { GridDataRow } from "src/components/Table/components/Row";
@@ -81,6 +81,7 @@ export function isGridCellContent(content: ReactNode | GridCellContent): content
 }
 
 const emptyValues = ["", null, undefined] as any[];
+
 function isContentEmpty(content: ReactNode): boolean {
   return emptyValues.includes(content);
 }
@@ -197,7 +198,7 @@ export function maybeApplyFunction<T>(
 }
 
 export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter: string): boolean {
-  let value = filterValue(maybeContent);
+  const value = filterValue(maybeContent);
   if (typeof value === "string") {
     return value.toLowerCase().includes(filter.toLowerCase());
   } else if (typeof value === "number") {

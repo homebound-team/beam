@@ -1,15 +1,17 @@
 import { AriaButtonProps } from "@react-types/button";
-import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useRef, useState } from "react";
+import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps, Loader, maybeTooltip, navLink, resolveTooltip } from "src/components";
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Properties } from "src/Css";
+import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, isPromise, noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { useTestIds } from "src/utils/useTestIds";
+import { labelOr } from "./internal/OverlayTrigger";
 
 export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
-  label: string;
+  label: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: IconProps["icon"] | null;
@@ -55,8 +57,8 @@ export function Button(props: ButtonProps) {
     size = "sm",
     buttonRef,
   } = ariaProps;
-  const ref = buttonRef || useRef(null);
-  const tid = useTestIds(props, label);
+  const ref = useGetRef(buttonRef);
+  const tid = useTestIds(props, labelOr(ariaProps, "button"));
   const { buttonProps, isPressed } = useButton(
     {
       ...ariaProps,
@@ -128,11 +130,15 @@ function getButtonStyles(variant: ButtonVariant, size: ButtonSize, contrast: boo
   };
 }
 
-const variantStyles: (
-  contrast: boolean,
-) => Record<
+const variantStyles: (contrast: boolean) => Record<
   ButtonVariant,
-  { baseStyles: {}; hoverStyles: {}; disabledStyles: {}; pressedStyles: {}; focusStyles: {} }
+  {
+    baseStyles: Properties;
+    hoverStyles: Properties;
+    disabledStyles: Properties;
+    pressedStyles: Properties;
+    focusStyles: Properties;
+  }
 > = (contrast) => ({
   primary: {
     baseStyles: Css.bgLightBlue700.white.if(contrast).bgLightBlue400.$,
@@ -185,7 +191,7 @@ const variantStyles: (
   },
 });
 
-const sizeStyles: Record<ButtonSize, {}> = {
+const sizeStyles: Record<ButtonSize, Properties> = {
   sm: Css.hPx(32).pxPx(12).$,
   md: Css.hPx(40).px2.$,
   lg: Css.hPx(48).px3.$,

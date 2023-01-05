@@ -175,7 +175,7 @@ export interface GridTableProps<R extends Kinded, X> {
  * row `kind` along with the data rows. (Admittedly, out of pragmatism, we do apply some
  * special styling to the row that uses `kind: "header"`.)
  */
-export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}>(props: GridTableProps<R, X>) {
+export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = any>(props: GridTableProps<R, X>) {
   const {
     id = "gridTable",
     as = "div",
@@ -223,7 +223,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
       tableState.columns
         .filter((c) => tableState.visibleColumnIds.includes(c.id))
         .flatMap((c) =>
-          c.expandColumns && tableState.expandedColumnIds.includes(c.id) ? [c, ...c.expandColumns] : [c],
+          c.expandColumns && tableState.expandedColumnIds.includes(c.id)
+            ? [c, ...tableState.getExpandedColumns(c)]
+            : [c],
         ) as GridColumnWithId<R>[],
     [tableState],
   );
@@ -378,7 +380,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
   const typeScale = style?.presentationSettings?.typeScale;
   const fieldProps: PresentationFieldProps = useMemo(
     () => ({
-      hideLabel: true,
+      labelStyle: "hidden",
       numberAlignment: "right",
       compact: true,
       errorInTooltip: true,
@@ -708,5 +710,6 @@ export function filterRows<R extends Kinded>(
       }
     }
   }
+
   return rows.reduce(filterFn, []);
 }

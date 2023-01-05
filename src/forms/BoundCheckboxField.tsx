@@ -19,6 +19,7 @@ export function BoundCheckboxField(props: BoundCheckboxFieldProps) {
     label = defaultLabel(field.key),
     onFocus,
     onBlur,
+    disabled,
     ...others
   } = props;
   const testId = useTestIds(props, field.key);
@@ -42,6 +43,7 @@ export function BoundCheckboxField(props: BoundCheckboxFieldProps) {
             field.blur();
             maybeCall(onBlur);
           }}
+          disabled={disabled || field.readOnly}
           {...testId}
           {...others}
         />

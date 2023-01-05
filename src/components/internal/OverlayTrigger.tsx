@@ -64,7 +64,11 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
   });
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? defaultTestId(trigger.label) : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger)
+      ? defaultTestId(labelOr(trigger, "overlayTrigger"))
+      : isIconButton(trigger)
+      ? trigger.icon
+      : trigger.name,
   );
 
   return (
@@ -129,4 +133,8 @@ export function isIconButton(
   trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps,
 ): trigger is IconButtonTriggerProps {
   return trigger && typeof trigger === "object" && "icon" in trigger;
+}
+
+export function labelOr(trigger: { label: unknown }, fallback: string): string {
+  return typeof trigger.label === "string" ? trigger.label : fallback;
 }
