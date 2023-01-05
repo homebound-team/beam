@@ -14,7 +14,7 @@ interface MenuProps<T> {
   items: MenuItem[];
   searchable?: boolean;
   persistentItems?: MenuItem[];
-  contrast?: boolean;
+  contrast: boolean;
 }
 
 export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
@@ -98,7 +98,14 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
         <ul css={Css.listReset.$} {...menuProps} ref={menuRef} {...tid.menu}>
           {/* It is possible to have, at most, 2 sections: One for items, and one for persisted items */}
           {[...state.collection].map((item) => (
-            <MenuSectionImpl key={item.key} section={item} state={state} onClose={onClose} contrast={contrast} {...tid} />
+            <MenuSectionImpl
+              key={item.key}
+              section={item}
+              state={state}
+              onClose={onClose}
+              contrast={contrast}
+              {...tid}
+            />
           ))}
         </ul>
       </div>

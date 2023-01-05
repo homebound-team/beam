@@ -12,7 +12,8 @@ import {
 import { useTestIds } from "src/utils";
 import { ButtonVariant } from "./Button";
 
-interface ButtonMenuProps extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
+interface ButtonMenuProps
+  extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
   items: MenuItem[];
   persistentItems?: MenuItem[];
   searchable?: boolean;
@@ -33,7 +34,15 @@ export function ButtonMenu(props: ButtonMenuProps) {
   );
 
   return (
-    <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid} variant={variant} contrast={contrast}>
+    <OverlayTrigger
+      {...props}
+      menuTriggerProps={menuTriggerProps}
+      state={state}
+      buttonRef={buttonRef}
+      {...tid}
+      variant={variant}
+      contrast={contrast}
+    >
       <Menu
         ariaMenuProps={menuProps}
         onClose={() => state.close()}

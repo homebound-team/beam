@@ -1,5 +1,4 @@
 import { Node } from "@react-types/shared";
-import React from "react";
 import { useMenuSection, useSeparator } from "react-aria";
 import { TreeState } from "react-stately";
 import { MenuItem } from "src/components/ButtonMenu";
@@ -11,7 +10,7 @@ interface MenuSectionProps {
   section: Node<MenuItem>;
   state: TreeState<MenuItem>;
   onClose: VoidFunction;
-  contrast?: boolean;
+  contrast: boolean;
 }
 
 export function MenuSectionImpl(props: MenuSectionProps) {

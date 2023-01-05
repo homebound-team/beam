@@ -257,13 +257,9 @@ export function MenuWithContrast() {
             ]}
             defaultOpen
             contrast={true}
-            variant={"headerMenu"}
+            variant={"tertiary"}
           />
         </div>
-      </div>
-
-      <div css={Css.df.fdc.$}>
-        
       </div>
     </>
   );

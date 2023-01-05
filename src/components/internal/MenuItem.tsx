@@ -15,7 +15,7 @@ interface MenuItemProps {
   item: Node<MenuItem>;
   state: TreeState<MenuItem>;
   onClose: VoidFunction;
-  contrast?: boolean;
+  contrast: boolean;
 }
 
 export function MenuItemImpl(props: MenuItemProps) {
