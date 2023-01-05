@@ -224,7 +224,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         .filter((c) => tableState.visibleColumnIds.includes(c.id))
         .flatMap((c) =>
           c.expandColumns && tableState.expandedColumnIds.includes(c.id)
-            ? [c, ...(tableState.getExpandedColumns(c) as GridColumnWithId<R>[])]
+            ? [c, ...tableState.getExpandedColumns(c)]
             : [c],
         ) as GridColumnWithId<R>[],
     [tableState],

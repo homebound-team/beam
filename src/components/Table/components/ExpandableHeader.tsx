@@ -6,6 +6,7 @@ import { zIndices } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
 import { useComputed, useHover } from "src/hooks";
 import { isFunction } from "src/utils";
+import { Loader } from "../../Loader";
 
 interface ExpandableHeaderProps<R extends Kinded> {
   title: string;
@@ -53,7 +54,7 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
         {title}
       </span>
       <span css={Css.if(applyStickyStyles).sticky.rightPx(12).z(zIndices.expandableHeaderIcon).$}>
-        <Icon icon={isExpanded ? "chevronLeft" : isLoading ? "loader" : "chevronRight"} inc={2} />
+        {isLoading ? <Loader size="xs" /> : <Icon icon={isExpanded ? "chevronLeft" : "chevronRight"} inc={2} />}
       </span>
     </button>
   );
