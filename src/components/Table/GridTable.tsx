@@ -175,7 +175,7 @@ export interface GridTableProps<R extends Kinded, X> {
  * row `kind` along with the data rows. (Admittedly, out of pragmatism, we do apply some
  * special styling to the row that uses `kind: "header"`.)
  */
-export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}>(props: GridTableProps<R, X>) {
+export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = any>(props: GridTableProps<R, X>) {
   const {
     id = "gridTable",
     as = "div",

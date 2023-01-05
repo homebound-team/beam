@@ -929,7 +929,7 @@ describe("GridTable", () => {
       );
     });
 
-    it("as=virtual accepts percentages ", () => {
+    it("as=virtual accepts percentages", () => {
       expect(calcColumnSizes([{ w: "10%" }, { w: 2 }] as any, undefined, undefined, []).join(" ")).toEqual(
         "10% ((100% - 10% - 0px) * (2 / 2))",
       );
@@ -2112,7 +2112,7 @@ describe("GridTable", () => {
     await render(<GridTable rows={[row1]} columns={columns} />);
   });
 
-  it("provides a per-row render count ", async () => {
+  it("provides a per-row render count", async () => {
     const [header, row1, row2] = rows;
     const columns = [nameColumn];
 
@@ -2577,6 +2577,59 @@ describe("GridTable", () => {
       await render(<GridTable columns={columns} rows={rows} visibleColumnsStorageKey="testStorageKey" />);
       // Then the visible column session storage is defined using the `visibleColumnsStorageKey` prop
       expect(sessionStorage.setItem).toHaveBeenLastCalledWith("testStorageKey", '["name"]');
+    });
+
+    it("respects setting inferSelectState to false", async () => {
+      // Given nested rows
+      const rows: GridDataRow<NestedRow>[] = [
+        simpleHeader,
+        {
+          // With one grand parent that sets `inferSelectedState: false`
+          ...{ kind: "parent", id: "p1", inferSelectedState: false, data: { name: "parent 1" } },
+          children: [
+            {
+              ...{ kind: "child", id: "p1c1", data: { name: "child 1" } },
+              children: [
+                { kind: "grandChild", id: "p1c1gc1", data: { name: "grandChild p1c1gc1" } },
+                { kind: "grandChild", id: "p1c1gc2", data: { name: "grandChild p1c1gc2" } },
+              ],
+            },
+          ],
+        },
+      ];
+      const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+      const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+
+      // When selecting a grand child of the grand parent that sets `inferSelectedState: false`
+      click(cellAnd(r, 3, 1, "select"));
+
+      // Then the header row should be indeterminate
+      expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked();
+      // And the grand parent row to not be checked.
+      expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
+      // And the parent row should show indeterminate,
+      expect(cellAnd(r, 2, 1, "select")).toBePartiallyChecked();
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1c1gc1"]);
+
+      // When selecting the grand parent
+      click(cellAnd(r, 1, 1, "select"));
+
+      // Then all rows should be considered selected
+      expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+      expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+      expect(cellAnd(r, 2, 1, "select")).toBeChecked();
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1gc2", "p1c1gc1"]);
+
+      // When unselecting a single grand child
+      click(cellAnd(r, 3, 1, "select"));
+
+      // Then the header row should return to indeterminate
+      expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked();
+      // And the grand parent row to remain checked.
+      expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+      // And the parent row should return to indeterminate,
+      expect(cellAnd(r, 2, 1, "select")).toBePartiallyChecked();
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1gc2"]);
     });
   });
 });

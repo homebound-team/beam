@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, ReactNode, useContext, useMemo, useState } from "react";
+import React, { createContext, ReactNode, useContext, useMemo, useState } from "react";
 import { ToastTypes } from "./Toast";
 
 export interface ToastNoticeProps {
@@ -18,7 +18,7 @@ export const ToastContext = createContext<ToastContextProps>({
   notice: undefined,
 });
 
-export function ToastProvider(props: PropsWithChildren<{}>) {
+export function ToastProvider(props: { children: ReactNode }) {
   const [notice, setNotice] = useState<ToastNoticeProps>();
   const contextValue = useMemo(() => ({ setNotice, notice }), [setNotice, notice]);
   return <ToastContext.Provider value={contextValue}>{props.children}</ToastContext.Provider>;

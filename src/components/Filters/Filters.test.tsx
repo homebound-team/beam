@@ -7,7 +7,7 @@ describe("Filters", () => {
     type StageFilter = FilterDefs<ProjectFilter>["stage"];
     // type StageFilter = FilterDef<Stage[]>;
     // Then we can assign multiFilter to it
-    let f: StageFilter = multiFilter({
+    const f: StageFilter = multiFilter({
       options: [Stage.StageOne, Stage.StageTwo],
       getOptionValue: (s) => s,
       getOptionLabel: () => "name",
@@ -20,7 +20,7 @@ describe("Filters", () => {
     type StageFilter = FilterDefs<ProjectFilter>["stageSingle"];
     // type StageFilter = FilterDef<Stage>;
     // Then we can assign singleFilter to it
-    let f: StageFilter = singleFilter({
+    const f: StageFilter = singleFilter({
       options: [Stage.StageOne, Stage.StageTwo],
       getOptionValue: (s) => s,
       getOptionLabel: (s) => "name",
@@ -33,7 +33,7 @@ describe("Filters", () => {
     type FavoriteFilter = FilterDefs<ProjectFilter>["favorite"];
     // type StageFilter = FilterDef<Stage>;
     // Then we can assign singleFilter to it
-    let f: FavoriteFilter = booleanFilter({
+    const f: FavoriteFilter = booleanFilter({
       options: [
         [undefined, "All"],
         [true, "Favorited"],

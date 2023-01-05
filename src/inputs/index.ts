@@ -2,6 +2,7 @@ export * from "./Checkbox";
 export * from "./CheckboxGroup";
 export * from "./ChipSelectField";
 export * from "./DateFields";
+export * from "./MultiLineSelectField";
 export * from "./MultiSelectField";
 export * from "./NumberField";
 export type { NumberFieldProps } from "./NumberField";
