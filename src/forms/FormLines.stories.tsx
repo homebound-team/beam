@@ -186,7 +186,7 @@ export function WithHorizontalLayout() {
     <FormLines width="lg">
       <TextField label="First" value="first" labelStyle="left" onChange={noop} />
       <SelectField<Options, number>
-        label="Middle"
+        label="Second"
         labelStyle="left"
         value={1}
         options={[
@@ -195,7 +195,8 @@ export function WithHorizontalLayout() {
         ]}
         onSelect={noop}
       />
-      <Switch label="Last" labelStyle="left" selected={true} onChange={() => {}} />
+      <TextField label="Read only" readOnly value="read only" labelStyle="left" onChange={noop} />
+      <Switch label="Last" labelStyle="left" selected={true} onChange={noop} />
     </FormLines>
   );
 }
