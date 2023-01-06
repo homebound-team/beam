@@ -236,7 +236,7 @@ export function NavLinkButtonMenu() {
 
   return (
     <div css={Css.mlPx(200).$}>
-      <h2 css={Css.lg.$}>Global Nav Link Menu</h2>
+      <h2 css={Css.lg.$}>Nav Link Button Menu</h2>
       <ButtonMenu
         trigger={{ navLabel: "Menu trigger", variant: "global" }}
         items={menuItems}
