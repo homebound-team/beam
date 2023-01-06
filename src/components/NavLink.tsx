@@ -1,35 +1,46 @@
-import { RefObject, useMemo, useRef } from "react";
+import { AriaButtonProps } from "@react-types/button";
+import { RefObject, useMemo } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
-import { Link } from "react-router-dom";
 import type { IconKey } from "src/components";
 import { navLink } from "src/components";
 import { Css, Properties } from "src/Css";
+import { useGetRef } from "src/hooks/useGetRef";
 import { BeamFocusableProps } from "src/interfaces";
-import { isAbsoluteUrl } from "src/utils";
+import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { Icon } from "./Icon";
 
 export interface NavLinkProps extends BeamFocusableProps {
   /** active indicates the user is on the current page */
   active?: boolean;
   disabled?: boolean;
-  href: string;
+  /** if `href` isn't provided, it is treated as a <button> */
+  href?: string;
   label: string;
   icon?: IconKey;
   variant: NavLinkVariant;
   openInNew?: boolean;
   contrast?: boolean;
+  /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
+  menuTriggerProps?: AriaButtonProps;
+  buttonRef?: RefObject<HTMLElement>;
 }
 
 type NavLinkVariant = "side" | "global";
 
 export function NavLink(props: NavLinkProps) {
-  const { disabled: isDisabled, label, openInNew, contrast = false, ...otherProps } = props;
-  const ariaProps = { children: label, isDisabled, ...otherProps };
+  const {
+    disabled: isDisabled,
+    label,
+    openInNew,
+    contrast = false,
+    menuTriggerProps,
+    buttonRef,
+    ...otherProps
+  } = props;
+  const ariaProps = { children: label, isDisabled, ...menuTriggerProps, ...otherProps };
   const { href, active = false, icon = false, variant } = ariaProps;
-  const ref = useRef() as RefObject<HTMLAnchorElement>;
-  const { buttonProps, isPressed } = useButton({ ...ariaProps, elementType: "a" }, ref);
-  // remove `type=button` from being passed into the component, as it causes style issues in Safari.
-  const { type, ...otherButtonProps } = buttonProps;
+  const ref = useGetRef(buttonRef);
+  const { buttonProps, isPressed } = useButton({ ...ariaProps, elementType: href ? "a" : "button" }, ref);
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
 
@@ -38,15 +49,11 @@ export function NavLink(props: NavLinkProps) {
     [variant, contrast],
   );
 
-  const external = isAbsoluteUrl(href) || openInNew;
-
   const linkAttributes = {
     className: navLink,
     ref: ref,
-    rel: external ? "noopener noreferrer" : undefined,
     /** does not focus if disabled */
     tabIndex: isDisabled ? -1 : 0,
-    target: external ? "_blank" : undefined,
     /** aria-current represents the current page within a set of pages */
     "aria-current": active ? ("page" as const) : undefined,
     css: {
@@ -70,15 +77,7 @@ export function NavLink(props: NavLinkProps) {
     </>
   );
 
-  return external ? (
-    <a href={href} {...mergeProps(otherButtonProps, focusProps, hoverProps)} {...linkAttributes}>
-      {linkContent}
-    </a>
-  ) : (
-    <Link to={href} {...mergeProps(otherButtonProps, focusProps, hoverProps)} {...linkAttributes}>
-      {linkContent}
-    </Link>
-  );
+  return getButtonOrLink(linkContent, href, { ...mergeProps(buttonProps, focusProps, hoverProps), ...linkAttributes });
 }
 
 export function getNavLinkStyles(variant: NavLinkVariant, contrast: boolean) {

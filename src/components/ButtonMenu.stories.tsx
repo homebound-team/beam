@@ -92,7 +92,11 @@ export function InteractiveMenu() {
           }
         />
       </div>
-      <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} persistentItems={persistentItems} />
+      <ButtonMenu
+        trigger={{ navLabel: "Menu trigger", variant: "global" }}
+        items={menuItems}
+        persistentItems={persistentItems}
+      />
     </>
   );
 }

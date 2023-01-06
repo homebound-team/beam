@@ -5,12 +5,14 @@ import { IconProps } from "src/components/Icon";
 import { Menu } from "src/components/internal/Menu";
 import {
   isIconButton,
+  isNavLinkButton,
   isTextButton,
   labelOr,
   OverlayTrigger,
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 interface ButtonMenuProps
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
@@ -29,7 +31,13 @@ export function ButtonMenu(props: ButtonMenuProps) {
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? labelOr(trigger, "buttonMenu") : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger)
+      ? labelOr(trigger, "buttonMenu")
+      : isNavLinkButton(trigger)
+      ? defaultTestId(trigger.navLabel)
+      : isIconButton(trigger)
+      ? trigger.icon
+      : trigger.name,
   );
 
   return (
