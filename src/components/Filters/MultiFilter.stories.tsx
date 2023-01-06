@@ -10,6 +10,11 @@ export default {
 } as Meta;
 
 export function MultiFilterInPage() {
+  const filter = stageFilter("stage");
+  return filter.render(undefined, () => {}, {}, false, false);
+}
+
+export function MultiFilterWithDisabledOptionsInPage() {
   const filter = stageFilterDisabledOptions("stage");
   return (
     <>
