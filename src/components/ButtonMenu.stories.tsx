@@ -227,7 +227,7 @@ export function IconMenuWtihSearchableList() {
   return <ButtonMenu defaultOpen trigger={{ icon: "archive" }} items={menuItems} searchable />;
 }
 
-export function GlobalNavLinkMenu() {
+export function NavLinkButtonMenu() {
   const menuItems: MenuItem[] = [
     { label: "Page action", onClick: action("Test item clicked") },
     { label: "Internal Link", onClick: "/fakeRoute" },
