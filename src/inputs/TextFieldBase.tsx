@@ -131,7 +131,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...(!compound ? Css.ba.$ : {}),
     },
     inputWrapperReadOnly: {
-      ...Css[typeScale].df.aic.w100.gray900.if(contrast).white.$,
+      ...Css[typeScale].df.aic.w100.gray900.if(contrast).white.if(labelStyle === "left").w50.$,
       // If we are hiding the label, then we are typically in a table. Keep the `mh` in this case to ensure editable and non-editable fields in a single table row line up properly
       ...(labelStyle === "hidden" &&
         Css.mhPx(fieldHeight - maybeSmaller)
