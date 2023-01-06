@@ -5,6 +5,7 @@ import { DatePicker, DatePickerProps } from "src/components/internal/DatePicker/
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
 import {
   isIconButton,
+  isNavLinkButton,
   isTextButton,
   labelOr,
   OverlayTrigger,
@@ -28,6 +29,8 @@ export function ButtonDatePicker(props: ButtonDatePickerProps) {
     props,
     isTextButton(trigger)
       ? defaultTestId(labelOr(trigger, "buttonDatePicker"))
+      : isNavLinkButton(trigger)
+      ? defaultTestId(trigger.navLabel)
       : isIconButton(trigger)
       ? trigger.icon
       : trigger.name,

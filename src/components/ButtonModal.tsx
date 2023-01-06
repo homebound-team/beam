@@ -3,12 +3,14 @@ import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import {
   isIconButton,
+  isNavLinkButton,
   isTextButton,
   labelOr,
   OverlayTrigger,
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 import { ButtonVariant } from "./Button";
 import { ContextualModal } from "./internal/ContextualModal";
 
@@ -28,7 +30,13 @@ export function ButtonModal(props: ButtonModalProps) {
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? labelOr(trigger, "buttonModal") : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger)
+      ? labelOr(trigger, "buttonModal")
+      : isNavLinkButton(trigger)
+      ? defaultTestId(trigger.navLabel)
+      : isIconButton(trigger)
+      ? trigger.icon
+      : trigger.name,
   );
 
   return (
