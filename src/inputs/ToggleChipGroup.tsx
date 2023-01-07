@@ -1,7 +1,7 @@
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { useCheckboxGroup, useCheckboxGroupItem, useFocusRing, VisuallyHidden } from "react-aria";
 import { CheckboxGroupState, useCheckboxGroupState } from "react-stately";
-import { maybeTooltip } from "src/components";
+import { maybeTooltip, resolveTooltip } from "src/components";
 import { Label } from "src/components/Label";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
@@ -9,8 +9,12 @@ import { useTestIds } from "src/utils/useTestIds";
 type ToggleChipItemProps = {
   label: string;
   value: string;
-  isDisabled?: boolean;
-  disabledReason?: string;
+  /**
+   * Whether the interactive element is disabled.
+   *
+   * If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
+   */
+  disabled?: boolean | ReactNode;
 };
 
 export interface ToggleChipGroupProps {
@@ -38,8 +42,7 @@ export function ToggleChipGroup(props: ToggleChipGroupProps) {
             groupState={state}
             selected={state.value.includes(o.value)}
             label={o.label}
-            isDisabled={o.isDisabled}
-            disabledReason={o.disabledReason}
+            disabled={o.disabled}
             {...tid[o.value]}
           />
         ))}
@@ -53,18 +56,24 @@ interface ToggleChipProps {
   value: string;
   groupState: CheckboxGroupState;
   selected: boolean;
-  isDisabled?: boolean;
-  disabledReason?: string;
+  /**
+   * Whether the interactive element is disabled.
+   *
+   * If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
+   */
+  disabled?: boolean | ReactNode;
 }
 
 function ToggleChip(props: ToggleChipProps) {
-  const { label, value, groupState, selected: isSelected, isDisabled = false, disabledReason, ...others } = props;
+  const { label, value, groupState, selected: isSelected, disabled = false, ...others } = props;
+  const isDisabled = !!disabled;
   const ref = useRef(null);
   const { inputProps } = useCheckboxGroupItem({ value, "aria-label": label, isDisabled }, groupState, ref);
   const { isFocusVisible, focusProps } = useFocusRing();
+  const tooltip = resolveTooltip(disabled);
 
   return maybeTooltip({
-    title: disabledReason,
+    title: tooltip,
     placement: "top",
     children: (
       <label
@@ -73,9 +82,9 @@ function ToggleChip(props: ToggleChipProps) {
           ...(isSelected
             ? {
                 ...Css.white.bgLightBlue700.$,
-                ":hover:not(:isDisabled)": Css.bgLightBlue800.$,
+                ":hover:not([data-disabled='true'])": Css.bgLightBlue800.$,
               }
-            : { ":hover:not(:isDisabled)": Css.bgGray300.$ }),
+            : { ":hover:not([data-disabled='true'])": Css.bgGray300.$ }),
           ...(isFocusVisible ? Css.bshFocus.$ : {}),
         }}
         data-selected={isSelected}

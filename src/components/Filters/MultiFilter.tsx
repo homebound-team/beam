@@ -37,13 +37,12 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
           label={this.label}
           options={this.props.options.map((o: O) => {
             const value = this.props.getOptionValue(o);
-            const isDisabled = value && disabledKeys.includes(value.toString());
-            const disabledReason = isDisabled ? disabledOptionsWithReasons[value.toString()] : undefined;
+            const disabled = value && disabledKeys.includes(value.toString());
+            const disabledReason = disabled ? disabledOptionsWithReasons[value.toString()] : undefined;
             return {
               label: this.props.getOptionLabel(o),
               value: value as string,
-              isDisabled,
-              disabledReason,
+              disabled: disabledReason ?? disabled,
             };
           })}
           onChange={(values) => {
