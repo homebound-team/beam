@@ -18,8 +18,8 @@ describe("ToggleGroupChip", () => {
   it("supports disabled options with tooltips", async () => {
     const options = [
       { label: "Bahamas", value: "m:1" },
-      { label: "Southern California", value: "m:2", isDisabled: true, disabledReason: undefined },
-      { label: "Northern California", value: "m:3", isDisabled: true, disabledReason: "No data" },
+      { label: "Southern California", value: "m:2", disabled: true },
+      { label: "Northern California", value: "m:3", disabled: "No data" },
     ];
     const r = await render(
       <ToggleChipGroup label="Market" options={options} values={["m:2"]} onChange={() => {}} data-testid="market" />,
