@@ -1,6 +1,7 @@
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { useCheckboxGroup, useCheckboxGroupItem, useFocusRing, VisuallyHidden } from "react-aria";
 import { CheckboxGroupState, useCheckboxGroupState } from "react-stately";
+import { maybeTooltip, resolveTooltip } from "src/components";
 import { Label } from "src/components/Label";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
@@ -8,6 +9,12 @@ import { useTestIds } from "src/utils/useTestIds";
 type ToggleChipItemProps = {
   label: string;
   value: string;
+  /**
+   * Whether the interactive element is disabled.
+   *
+   * If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
+   */
+  disabled?: boolean | ReactNode;
 };
 
 export interface ToggleChipGroupProps {
@@ -35,6 +42,7 @@ export function ToggleChipGroup(props: ToggleChipGroupProps) {
             groupState={state}
             selected={state.value.includes(o.value)}
             label={o.label}
+            disabled={o.disabled}
             {...tid[o.value]}
           />
         ))}
@@ -48,33 +56,47 @@ interface ToggleChipProps {
   value: string;
   groupState: CheckboxGroupState;
   selected: boolean;
+  /**
+   * Whether the interactive element is disabled.
+   *
+   * If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
+   */
+  disabled?: boolean | ReactNode;
 }
 
 function ToggleChip(props: ToggleChipProps) {
-  const { label, value, groupState, selected: isSelected, ...others } = props;
+  const { label, value, groupState, selected: isSelected, disabled = false, ...others } = props;
+  const isDisabled = !!disabled;
   const ref = useRef(null);
-  const { inputProps } = useCheckboxGroupItem({ value, "aria-label": label }, groupState, ref);
+  const { inputProps } = useCheckboxGroupItem({ value, "aria-label": label, isDisabled }, groupState, ref);
   const { isFocusVisible, focusProps } = useFocusRing();
+  const tooltip = resolveTooltip(disabled);
 
-  return (
-    <label
-      css={{
-        ...Css.relative.dib.br16.sm.px1.cursorPointer.pyPx(4).bgGray200.$,
-        ...(isSelected
-          ? {
-              ...Css.white.bgLightBlue700.$,
-              ":hover": Css.bgLightBlue800.$,
-            }
-          : { ":hover": Css.bgGray300.$ }),
-        ...(isFocusVisible ? Css.bshFocus.$ : {}),
-      }}
-      data-selected={isSelected}
-      {...others}
-    >
-      <VisuallyHidden>
-        <input {...inputProps} {...focusProps} />
-      </VisuallyHidden>
-      {label}
-    </label>
-  );
+  return maybeTooltip({
+    title: tooltip,
+    placement: "top",
+    children: (
+      <label
+        css={{
+          ...Css.relative.dib.br16.sm.px1.cursorPointer.pyPx(4).bgGray200.if(isDisabled).cursorNotAllowed.gray600.pr1.$,
+          ...(isSelected
+            ? {
+                ...Css.white.bgLightBlue700.$,
+                ":hover:not([data-disabled='true'])": Css.bgLightBlue800.$,
+              }
+            : { ":hover:not([data-disabled='true'])": Css.bgGray300.$ }),
+          ...(isFocusVisible ? Css.bshFocus.$ : {}),
+        }}
+        data-selected={isSelected}
+        data-disabled={isDisabled}
+        aria-disabled={isDisabled}
+        {...others}
+      >
+        <VisuallyHidden>
+          <input {...inputProps} {...focusProps} />
+        </VisuallyHidden>
+        {label}
+      </label>
+    ),
+  });
 }
