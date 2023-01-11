@@ -20,7 +20,7 @@ interface MenuItemProps {
 }
 
 export function MenuItemImpl(props: MenuItemProps) {
-  const { item, state, onClose, contrast = false } = props;
+  const { item, state, onClose, contrast } = props;
   const menuItem = item.value;
   const { disabled, onClick, label, destructive } = menuItem;
   const isDisabled = Boolean(disabled);

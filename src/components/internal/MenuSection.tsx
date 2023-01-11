@@ -14,7 +14,7 @@ interface MenuSectionProps {
 }
 
 export function MenuSectionImpl(props: MenuSectionProps) {
-  const { section, state, onClose, contrast = false } = props;
+  const { section, state, onClose, contrast } = props;
   const { itemProps, groupProps } = useMenuSection(props.section);
   const { separatorProps } = useSeparator({ elementType: "li" });
   const isPersistentSection = section.key !== state.collection.getFirstKey();

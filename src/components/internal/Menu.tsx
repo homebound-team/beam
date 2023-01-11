@@ -18,7 +18,7 @@ interface MenuProps<T> {
 }
 
 export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
-  const { ariaMenuProps, items, persistentItems, onClose, searchable, contrast = false } = props;
+  const { ariaMenuProps, items, persistentItems, onClose, searchable, contrast } = props;
   // Build out the Menu's Tree data to include the Persistent Action, if any. This is a collection of Nodes that is used
   // by React-Aria to keep track of item states such as focus, and provide hooks for calling those actions.
   const tree = useTreeData({
