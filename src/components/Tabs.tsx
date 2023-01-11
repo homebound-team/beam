@@ -187,7 +187,7 @@ export function Tabs<V extends string>(props: TabsProps<V, AnyObject> | RouteTab
         </div>
       )}
       {/* ref for actions specific to a tab. Targeting the immediate div (tabActionsEl) to set default styles */}
-      {right && <div css={Css.ml("auto").df.aic.gap1.pb1.$}>{right}</div>}
+      {right && <div css={Css.mla.df.aic.gap1.pb1.$}>{right}</div>}
     </div>
   );
 }

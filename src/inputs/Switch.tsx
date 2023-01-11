@@ -59,7 +59,7 @@ export function Switch(props: SwitchProps) {
           ...(labelStyle === "form" && Css.fdc.$),
           ...(labelStyle === "left" && Css.w100.fdr.$),
           ...(labelStyle === "inline" && Css.gap2.aic.$),
-          ...(labelStyle === "filter" && Css.jcsb.gap1.aic.w("auto").sm.$),
+          ...(labelStyle === "filter" && Css.jcsb.gap1.aic.wa.sm.$),
           ...(isDisabled && Css.cursorNotAllowed.gray400.$),
         }}
         aria-label={label}

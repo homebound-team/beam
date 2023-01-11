@@ -446,7 +446,7 @@ function getOptionsWithUnset<O>(unsetLabel: string, options: O[]): O[] {
 
 export const unsetOption = {};
 
-function disabledOptionToKeyedTuple(
+export function disabledOptionToKeyedTuple(
   disabledOption: Value | { value: Value; reason: string },
 ): [React.Key, string | undefined] {
   if (typeof disabledOption === "object" && disabledOption !== null) {
