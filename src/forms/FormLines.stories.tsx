@@ -183,11 +183,10 @@ export function WithFieldProps() {
 
 export function WithHorizontalLayout() {
   return (
-    <FormLines width="lg">
-      <TextField label="First" value="first" labelStyle="left" onChange={noop} />
+    <FormLines width="lg" labelStyle="left">
+      <TextField label="First" value="first" onChange={noop} />
       <SelectField<Options, number>
         label="Second"
-        labelStyle="left"
         value={1}
         options={[
           { id: 1, name: "Each" },
@@ -195,7 +194,7 @@ export function WithHorizontalLayout() {
         ]}
         onSelect={noop}
       />
-      <TextField label="Read only" readOnly value="read only" labelStyle="left" onChange={noop} />
+      <TextField label="Read only" readOnly value="read only" onChange={noop} />
       <Switch label="Last" labelStyle="left" selected={true} onChange={noop} />
     </FormLines>
   );
