@@ -15,10 +15,12 @@ interface MenuProps<T> {
   searchable?: boolean;
   persistentItems?: MenuItem[];
   contrast: boolean;
+  selectedItem: string | undefined;
+  onChange: ((key: string) => void) | undefined;
 }
 
 export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
-  const { ariaMenuProps, items, persistentItems, onClose, searchable, contrast } = props;
+  const { ariaMenuProps, items, persistentItems, onClose, searchable, contrast, selectedItem, onChange } = props;
   // Build out the Menu's Tree data to include the Persistent Action, if any. This is a collection of Nodes that is used
   // by React-Aria to keep track of item states such as focus, and provide hooks for calling those actions.
   const tree = useTreeData({
@@ -30,9 +32,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
   });
 
   const [search, setSearch] = useState<string | undefined>(undefined);
-  const { contains } = useFilter({
-    sensitivity: "base",
-  });
+  const { contains } = useFilter({ sensitivity: "base" });
 
   // Filter our tree data items based on the search term
   const filteredTree = useMemo(() => {
@@ -66,7 +66,12 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
   const state = useTreeState({
     children: menuChildren,
     items: filteredTree.items.map((i) => i.value),
-    selectionMode: "none",
+    selectionMode: typeof onChange === "function" ? "single" : "none",
+    disallowEmptySelection: typeof onChange === "function",
+    selectedKeys: selectedItem ? [selectedItem] : undefined,
+    onSelectionChange: (keys) => {
+      keys !== "all" && onChange && onChange([...keys.values()].map((k) => k.toString())[0]);
+    },
   });
 
   const menuRef = useRef(null);

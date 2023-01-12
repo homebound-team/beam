@@ -14,7 +14,7 @@ import {
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-interface ButtonMenuProps
+interface ButtonMenuBaseProps
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
   items: MenuItem[];
   persistentItems?: MenuItem[];
@@ -24,8 +24,21 @@ interface ButtonMenuProps
   contrast?: boolean;
 }
 
-export function ButtonMenu(props: ButtonMenuProps) {
+interface SelectionButtonMenuProps extends ButtonMenuBaseProps {
+  /** Display a menu item as selected based. Use the Menu Item's label to identify */
+  selectedItem: string | undefined;
+  onChange: (key: string) => void;
+}
+
+export function ButtonMenu(props: ButtonMenuBaseProps | SelectionButtonMenuProps) {
   const { defaultOpen, disabled, items, persistentItems, trigger, searchable, contrast = false } = props;
+
+  let selectedItem, onChange;
+  if (isSelectionButtonMenuProps(props)) {
+    selectedItem = props.selectedItem;
+    onChange = props.onChange;
+  }
+
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -56,6 +69,8 @@ export function ButtonMenu(props: ButtonMenuProps) {
         persistentItems={persistentItems}
         searchable={searchable}
         contrast={contrast}
+        selectedItem={selectedItem}
+        onChange={onChange}
         {...tid}
       />
     </OverlayTrigger>
@@ -84,3 +99,9 @@ export type ImageMenuItemType = MenuItemBase & {
 export type MenuItem = MenuItemBase | IconMenuItemType | ImageMenuItemType;
 // This is done just to adapt to the React-Aria API for generating Sectioned lists of Menu Items.
 export type MenuSection = MenuItem & { items?: MenuItem[] };
+
+function isSelectionButtonMenuProps(
+  props: ButtonMenuBaseProps | SelectionButtonMenuProps,
+): props is SelectionButtonMenuProps {
+  return typeof props === "object" && "selectedItem" in props && "onChange" in props;
+}

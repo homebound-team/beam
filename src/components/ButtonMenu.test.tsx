@@ -107,6 +107,45 @@ describe("ButtonMenu", () => {
     expect(r.trigger_disabled()).toHaveAttribute("aria-disabled", "true");
     expect(r.tooltip()).toHaveAttribute("title", "Tooltip");
   });
+
+  it("handles selecting button menu items", async () => {
+    // Given two menu items that can be selected
+    function TestComponent() {
+      const [selected, setSelected] = useState("Option A");
+      const menuItems: MenuItem[] = [
+        { label: "Option A", onClick: noop },
+        { label: "Option B", onClick: noop },
+      ];
+
+      return (
+        <ButtonMenu
+          trigger={{ label: "Trigger" }}
+          items={menuItems}
+          selectedItem={selected}
+          onChange={(key) => setSelected(key)}
+        />
+      );
+    }
+
+    const r = await render(<TestComponent />);
+
+    // When opening the menu
+    click(r.trigger);
+
+    // Then the first option should be selected
+    expect(r.trigger_optionA()).toHaveAttribute("aria-checked", "true");
+    expect(r.trigger_optionA().querySelector("[data-icon='check']")).toBeTruthy();
+    expect(r.trigger_optionB()).toHaveAttribute("aria-checked", "false");
+
+    // When clicking the second option
+    click(r.trigger_optionB);
+
+    // Then `onChange` should have been called to update the selection properly.
+    click(r.trigger);
+    expect(r.trigger_optionA()).toHaveAttribute("aria-checked", "false");
+    expect(r.trigger_optionB()).toHaveAttribute("aria-checked", "true");
+    expect(r.trigger_optionB().querySelector("[data-icon='check']")).toBeTruthy();
+  });
 });
 
 function TestButtonMenu({ empty = false, searchable = false, ...others }: { empty?: boolean; searchable?: boolean }) {

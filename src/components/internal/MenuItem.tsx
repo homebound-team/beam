@@ -24,6 +24,7 @@ export function MenuItemImpl(props: MenuItemProps) {
   const menuItem = item.value;
   const { disabled, onClick, label, destructive } = menuItem;
   const isDisabled = Boolean(disabled);
+  const isSelected = state.selectionManager.selectedKeys.has(label);
   const isFocused = state.selectionManager.focusedKey === item.key;
   const ref = useRef<HTMLLIElement>(null);
   const history = useHistory();
@@ -76,19 +77,43 @@ export function MenuItemImpl(props: MenuItemProps) {
       {maybeTooltip({
         title: resolveTooltip(disabled),
         placement: "right",
-        children: maybeWrapInLink(
-          onClick,
+        children: renderMenuItem(menuItem, isSelected, isDisabled, contrast),
+      })}
+    </li>
+  );
+}
+
+function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boolean, contrast: boolean) {
+  return (
+    <div css={Css.df.w100.aic.jcsb.gap2.$}>
+      <div css={Css.df.aic.$}>
+        {maybeWrapInLink(
+          menuItem.onClick,
           isIconMenuItem(menuItem) ? (
             <IconMenuItem {...menuItem} />
           ) : isImageMenuItem(menuItem) ? (
             <ImageMenuItem {...menuItem} />
           ) : (
-            label
+            menuItem.label
           ),
           isDisabled,
-        ),
-      })}
-    </li>
+        )}
+      </div>
+      {isSelected && (
+        <Icon
+          icon="check"
+          color={
+            !contrast
+              ? isDisabled
+                ? Palette.Gray400
+                : Palette.LightBlue700
+              : isDisabled
+              ? Palette.Gray500
+              : Palette.White
+          }
+        />
+      )}
+    </div>
   );
 }
 
