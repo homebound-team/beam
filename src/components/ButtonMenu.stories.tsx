@@ -213,16 +213,6 @@ export function WithSearchListItems() {
   );
 }
 
-export function IconMenuWtihSearchableList() {
-  const menuItems: MenuItem[] = [
-    { label: "Design doc", onClick: action("Austin") },
-    { label: "Expense report", onClick: action("Expense report") },
-    { label: "Training plan", onClick: action("Training plan") },
-  ];
-
-  return <ButtonMenu defaultOpen trigger={{ icon: "archive" }} items={menuItems} searchable />;
-}
-
 export function NavLinkButtonMenu() {
   const menuItems: MenuItem[] = [
     { label: "Page action", onClick: action("Test item clicked") },
@@ -244,5 +234,23 @@ export function NavLinkButtonMenu() {
         contrast={true}
       />
     </div>
+  );
+}
+
+export function SelectableMenuItems() {
+  const [selectedItem, setSelectedItem] = useState("Design doc");
+  const menuItems: MenuItem[] = [
+    { label: "Design doc", onClick: action("Design doc") },
+    { label: "Expense report", onClick: action("Expense report") },
+    { label: "Training plan", onClick: action("Training plan") },
+  ];
+
+  return (
+    <ButtonMenu
+      trigger={{ icon: "verticalDots" }}
+      items={menuItems}
+      selectedItem={selectedItem}
+      onChange={(key) => setSelectedItem(key)}
+    />
   );
 }
