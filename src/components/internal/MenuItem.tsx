@@ -16,10 +16,11 @@ interface MenuItemProps {
   item: Node<MenuItem>;
   state: TreeState<MenuItem>;
   onClose: VoidFunction;
+  contrast: boolean;
 }
 
 export function MenuItemImpl(props: MenuItemProps) {
-  const { item, state, onClose } = props;
+  const { item, state, onClose, contrast } = props;
   const menuItem = item.value;
   const { disabled, onClick, label, destructive } = menuItem;
   const isDisabled = Boolean(disabled);
@@ -65,7 +66,7 @@ export function MenuItemImpl(props: MenuItemProps) {
       ref={ref}
       css={{
         ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").$,
-        ...(!isDisabled && isHovered ? Css.bgGray100.$ : {}),
+        ...(!isDisabled && isHovered ? (contrast ? Css.bgGray800.$ : Css.bgGray100.$) : {}),
         ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
         ...(isDisabled ? Css.gray500.cursorNotAllowed.$ : {}),
         ...(destructive ? Css.red600.$ : {}),

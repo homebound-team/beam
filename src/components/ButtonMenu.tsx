@@ -5,12 +5,14 @@ import { IconProps } from "src/components/Icon";
 import { Menu } from "src/components/internal/Menu";
 import {
   isIconButton,
+  isNavLinkButton,
   isTextButton,
   labelOr,
   OverlayTrigger,
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 interface ButtonMenuProps
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
@@ -19,26 +21,41 @@ interface ButtonMenuProps
   searchable?: boolean;
   // for storybook purposes
   defaultOpen?: boolean;
+  contrast?: boolean;
 }
 
 export function ButtonMenu(props: ButtonMenuProps) {
-  const { defaultOpen, disabled, items, persistentItems, trigger, searchable } = props;
+  const { defaultOpen, disabled, items, persistentItems, trigger, searchable, contrast = false } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? labelOr(trigger, "buttonMenu") : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger)
+      ? labelOr(trigger, "buttonMenu")
+      : isNavLinkButton(trigger)
+      ? defaultTestId(trigger.navLabel)
+      : isIconButton(trigger)
+      ? trigger.icon
+      : trigger.name,
   );
 
   return (
-    <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
+    <OverlayTrigger
+      {...props}
+      menuTriggerProps={menuTriggerProps}
+      state={state}
+      buttonRef={buttonRef}
+      {...tid}
+      contrast={contrast}
+    >
       <Menu
         ariaMenuProps={menuProps}
         onClose={() => state.close()}
         items={items}
         persistentItems={persistentItems}
         searchable={searchable}
+        contrast={contrast}
         {...tid}
       />
     </OverlayTrigger>

@@ -14,10 +14,11 @@ interface MenuProps<T> {
   items: MenuItem[];
   searchable?: boolean;
   persistentItems?: MenuItem[];
+  contrast: boolean;
 }
 
 export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
-  const { ariaMenuProps, items, persistentItems, onClose, searchable } = props;
+  const { ariaMenuProps, items, persistentItems, onClose, searchable, contrast } = props;
   // Build out the Menu's Tree data to include the Persistent Action, if any. This is a collection of Nodes that is used
   // by React-Aria to keep track of item states such as focus, and provide hooks for calling those actions.
   const tree = useTreeData({
@@ -80,7 +81,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
       <div
         // Using `max-height: inherit` allows us to take advantage of the height set on the overlay container, which updates based on the available space for the overlay within the viewport
         css={{
-          ...Css.df.fdc.myPx(4).bgWhite.outline0.br4.bshBasic.maxh("inherit").overflowAuto.$,
+          ...Css.df.fdc.myPx(4).bgWhite.outline0.br4.bshBasic.maxh("inherit").overflowAuto.if(contrast).bgGray900.$,
           "&:hover": Css.bshHover.$,
         }}
       >
@@ -97,7 +98,14 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
         <ul css={Css.listReset.$} {...menuProps} ref={menuRef} {...tid.menu}>
           {/* It is possible to have, at most, 2 sections: One for items, and one for persisted items */}
           {[...state.collection].map((item) => (
-            <MenuSectionImpl key={item.key} section={item} state={state} onClose={onClose} {...tid} />
+            <MenuSectionImpl
+              key={item.key}
+              section={item}
+              state={state}
+              onClose={onClose}
+              contrast={contrast}
+              {...tid}
+            />
           ))}
         </ul>
       </div>
