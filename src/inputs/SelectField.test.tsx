@@ -332,6 +332,46 @@ describe("SelectFieldTest", () => {
     `);
   });
 
+  it("supports boolean values properly", async () => {
+    // Given a select field with boolean and an undefined values
+    const onSelect = jest.fn();
+    const r = await render(
+      <SelectField
+        label="label"
+        value={true}
+        onSelect={onSelect}
+        options={[
+          { id: undefined, name: "Undefined" },
+          { id: false, name: "False" },
+          { id: true, name: "True" },
+        ]}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+      />,
+    );
+
+    // When selecting the `false` option
+    click(r.label);
+    click(r.getByRole("option", { name: "False" }));
+
+    // Then `onSelect` is triggered with `false`
+    expect(onSelect.mock.calls[0][0]).toBe(false);
+
+    // When selecting the `true` option
+    click(r.label);
+    click(r.getByRole("option", { name: "True" }));
+
+    // Then `onSelect` is triggered with `true`
+    expect(onSelect.mock.calls[1][0]).toBe(true);
+
+    // When selecting the `undefined` option
+    click(r.label);
+    click(r.getByRole("option", { name: "Undefined" }));
+
+    // Then `onSelect` is triggered with `undefined`
+    expect(onSelect.mock.calls[2][0]).toBe(undefined);
+  });
+
   // Used to validate the `unset` option can be applied to non-`HasIdAndName` options
   type HasLabelAndValue = {
     label: string;
