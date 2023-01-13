@@ -83,6 +83,8 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
   return (
     <div
       css={{
+        // If `horizontalLayout`, then that means `labelStyle === "left"`. In this case the label the the field both take 50% of the horizontal space.
+        // Add `w50` in that case to ensure the ListBox is only the width of the field. If the width definitions ever change, we need to update here as well.
         ...Css.bgWhite.br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(contrast).bgGray700.if(horizontalLayout).w50.$,
         "&:hover": Css.bshHover.$,
       }}
@@ -90,7 +92,10 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
       {...listBoxProps}
     >
       {isMultiSelect && state.selectionManager.selectedKeys.size > 0 && (
-        <ul css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").$} ref={selectedList}>
+        <ul
+          css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").maxh("50%").overflowAuto.$}
+          ref={selectedList}
+        >
           {selectedOptions.map((o) => (
             <ListBoxToggleChip
               key={getOptionValue(o)}
