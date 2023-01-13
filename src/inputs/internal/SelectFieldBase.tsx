@@ -4,7 +4,7 @@ import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-ari
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
-import { PresentationFieldProps } from "src/components/PresentationContext";
+import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, px } from "src/Css";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
@@ -58,6 +58,7 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
  * and so we cannot easily change them.
  */
 export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBaseProps<O, V>): JSX.Element {
+  const { fieldProps } = usePresentationContext();
   const {
     disabled,
     readOnly,
@@ -72,6 +73,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     unsetLabel,
     ...otherProps
   } = props;
+  const labelStyle = fieldProps?.labelStyle ?? "above";
 
   // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
   const maybeOptions = useMemo(() => initializeOptions(options, unsetLabel), [options, unsetLabel]);
@@ -357,7 +359,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
   };
 
   return (
-    <div css={Css.df.fdc.w100.maxw(px(550)).if(otherProps.labelStyle === "left").maxw100.$} ref={comboBoxRef}>
+    <div css={Css.df.fdc.w100.maxw(px(550)).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
       <SelectFieldInput
         {...otherProps}
         buttonProps={buttonProps}
@@ -394,7 +396,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
-            horizontalLayout={otherProps.labelStyle === "left"}
+            horizontalLayout={labelStyle === "left"}
             loading={fieldState.optionsLoading}
             disabledOptionsWithReasons={disabledOptionsWithReasons}
           />
