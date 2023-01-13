@@ -73,7 +73,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     unsetLabel,
     ...otherProps
   } = props;
-  const labelStyle = fieldProps?.labelStyle ?? "above";
+  const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
 
   // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
   const maybeOptions = useMemo(() => initializeOptions(options, unsetLabel), [options, unsetLabel]);
