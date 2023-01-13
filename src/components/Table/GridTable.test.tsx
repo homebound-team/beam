@@ -726,6 +726,7 @@ describe("GridTable", () => {
     it("can sort by column and/or direction using the api", async () => {
       // Given the table is using client-side sorting
       const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+
       // When we use the api
       function Test() {
         const _api = useGridTableApi<Row>();
@@ -746,6 +747,7 @@ describe("GridTable", () => {
           />
         );
       }
+
       const r = await render(<Test />);
       // And when clicking on the header of the name
       click(r.sortHeader_0);
@@ -2643,6 +2645,44 @@ describe("GridTable", () => {
       // And the parent row should return to indeterminate,
       expect(cellAnd(r, 2, 1, "select")).toBePartiallyChecked();
       expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1gc2"]);
+    });
+
+    it("respects initExpand and updates localStorage", async () => {
+      const tableIdentifier = "persistCollapse";
+
+      // Given a table with expandable columns that are initially expanded
+      // When initially rendered with the expandable column set to `initExpanded: true`.
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              expandableHeader: () => "Client name",
+              initExpanded: true,
+              header: () => "First name",
+              data: ({ firstName }) => firstName,
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                  // initExpanded: true,
+                }),
+              ],
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+          persistCollapse={tableIdentifier}
+        />,
+      );
+
+      // Then the column is initially expanded
+      expect(cell(r, 1, 0)).toHaveTextContent("First name");
+      // And the local storage value is updated with the current state
+      expect(sessionStorage.getItem(tableIdentifier)).toBe('["p2","p3"]');
     });
   });
 });

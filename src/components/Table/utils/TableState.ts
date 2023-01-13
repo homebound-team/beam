@@ -184,7 +184,6 @@ export class TableState {
       // Check against local storage for collapsed state only if this is the first render of "data" (non-header or totals) rows.
       const checkLocalStorage =
         this.persistCollapse && !this.rows.some((r) => r.kind !== "totals" && r.kind !== "header");
-
       // If the list of collapsed rows are different, then determine which are net-new rows and should be added to the newCollapsedIds array
       // you can add/remove columns, when you add new columns, it can re-render, keep track of current state of collapsed columns and see what is the new state regarding collapsed
       // respect the initi collapsed value for any new columns, but any existing columns (based on ids) take w/e the current state is - collapsed or expanded, follow similar pattern below
@@ -198,8 +197,8 @@ export class TableState {
           (maybeNewRowId) =>
             !flattenedExistingIds.includes(maybeNewRowId) &&
             // Using `!` on `this.persistCollapse!` as `checkLocalStorage` ensures this.persistCollapse is truthy
-            // do something similar below
-            (!checkLocalStorage || readLocalCollapseState(this.persistCollapse!).includes(maybeNewRowId)),
+            (!checkLocalStorage || readCollapsedRowStorage(this.persistCollapse!).includes(maybeNewRowId)),
+          // do something similar below
         );
 
         // If there are new rows that should be collapsed then update the collapsedRows arrays
@@ -218,21 +217,48 @@ export class TableState {
     this.rows = rows;
   }
 
-  // only update if
   setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
     const isInitial = !this.columns || this.columns.length === 0;
     if (columns !== this.columns) {
       this.columns = columns;
       this.visibleColumnsStorageKey = visibleColumnsStorageKey ?? camelCase(columns.map((c) => c.id).join());
       this.visibleColumns.replace(readOrSetLocalVisibleColumnState(columns, this.visibleColumnsStorageKey));
-      // instead of filter, maybe look at forEach, loop through each column, if initExpanded is true && expandColumns is a function - then call the function immediately initExpand function - initially load lazy loaded columns
-      //
-      // need async in forEach, promise.all
-      const expandedColumnIds = columns.filter((c) => c.initExpanded).map((c) => c.id);
-      // similar check as to rows, what should our expanded column Ids be, need to find out which columns show as expanded, do that by looking at both
-      // read local storage
-      // read init expand properties if this is the initial load - when initial is true, then read both local storage and init expanded
-      if (isInitial) this.expandedColumns.replace(expandedColumnIds);
+      // looks at initExpanded and reads localStorage
+      // list of local storage columns (right now its returning null)
+      const sessionStorageIds = this.persistCollapse ? sessionStorage.getItem(this.persistCollapse) : null;
+      console.log(sessionStorageIds);
+      const localStorageColumns = this.persistCollapse ? readExpandedColumnsStorage(this.persistCollapse) : undefined;
+      const expandedColumnIds: string[] = [];
+
+      columns.forEach((c) => {
+        if (isInitial && c.initExpanded) {
+          // local storage definitions trump data
+          console.log(c.initExpanded);
+          expandedColumnIds.concat(localStorageColumns!);
+        } else {
+          // subsequent load
+          // look through this.columns - if its a new column or existing column then create new expanded column ids
+          // new expanded column ids would merge with whatever we have in local storage - ignoring initExpanded
+        }
+      });
+
+      // const expandedColumnIds2 = columns
+      //   .filter((c) => {
+      //     localStorageColumns ? localStorageColumns.includes(c.id) : c.initExpanded;
+      //   })
+      //   .map((c) => c.id);
+      // console.log({ expandedColumnIds2 });
+
+      if (isInitial) {
+        // similar check as to rows, what should our expanded column Ids be, need to find out which columns show as expanded, do that by looking at both
+        // read local storage
+        this.expandedColumns.replace(expandedColumnIds);
+        // read init expand properties if this is the initial load - when initial is true, then read both local storage and init expanded
+      }
+      // Also update our persistCollapse if set
+      if (this.persistCollapse) {
+        sessionStorage.setItem(this.persistCollapse, JSON.stringify(expandedColumnIds));
+      }
     }
   }
 
@@ -273,6 +299,10 @@ export class TableState {
       this.expandedColumns.delete(columnId);
     } else {
       this.expandedColumns.add(columnId);
+    }
+
+    if (this.persistCollapse) {
+      sessionStorage.setItem(this.persistCollapse, JSON.stringify(this.expandedColumnIds));
     }
   }
 
@@ -404,10 +434,8 @@ export class TableState {
     }
 
     this.collapsedRows.replace(collapsedIds);
-    // helper function for setting localstorage are we setting rows or columns
     if (this.persistCollapse) {
-      // updating persist collapse w/all new row ids and exisitng column ids
-      sessionStorage.setItem(this.persistCollapse, JSON.stringify([...collapsedIds, ...this.expandedColumnIds]));
+      sessionStorage.setItem(this.persistCollapse, JSON.stringify(collapsedIds));
     }
   }
 
@@ -450,12 +478,14 @@ export const TableStateContext = React.createContext<{ tableState: TableState }>
   },
 });
 
-// Get the rows that are already in the toggled state, so we can keep them toggled
-// maybe keep them separate o
-function readLocalCollapseState(persistCollapse: string): string[] {
-  // keep this to handle row ids and add column ids (prefix it w/beam column)
+function readCollapsedRowStorage(persistCollapse: string): string[] {
   const collapsedGridRowIds = sessionStorage.getItem(persistCollapse);
   return collapsedGridRowIds ? JSON.parse(collapsedGridRowIds) : [];
+}
+
+function readExpandedColumnsStorage(persistCollapse: string): string[] | undefined {
+  const expandedGridColumnIds = sessionStorage.getItem(persistCollapse);
+  return expandedGridColumnIds ? JSON.parse(expandedGridColumnIds) : [];
 }
 
 // Get the columns that are already in the visible state so we keep them toggled.
