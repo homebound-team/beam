@@ -1302,7 +1302,6 @@ export function ExpandableColumnsWithSetTimeout() {
         expandableHeader: () => "Employee",
         header: (data, { expanded }) => (expanded ? "First Name" : emptyCell),
         data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
-        // initExpanded: true,
         expandColumns: async () =>
           await new Promise((resolve) =>
             setTimeout(
