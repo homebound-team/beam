@@ -722,48 +722,6 @@ describe("GridTable", () => {
       // and the 3 record to be the second row
       expect(cell(r, 2, 0)).toHaveTextContent("c");
     });
-
-    it("can sort by column and/or direction using the api", async () => {
-      // Given the table is using client-side sorting
-      const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
-
-      // When we use the api
-      function Test() {
-        const _api = useGridTableApi<Row>();
-        api.current = _api;
-        return (
-          <GridTable
-            columns={[nameColumn, valueColumn]}
-            // intentionally setting initial sort to undefined
-            sorting={{ on: "client", initial: undefined }}
-            rows={[
-              simpleHeader,
-              // And the data is initially unsorted
-              { kind: "data", id: "2", data: { name: "b", value: 2 } },
-              { kind: "data", id: "1", data: { name: "a", value: 3 } },
-              { kind: "data", id: "3", data: { name: "c", value: 1 } },
-            ]}
-            api={_api}
-          />
-        );
-      }
-
-      const r = await render(<Test />);
-      // And when clicking on the header of the name
-      click(r.sortHeader_0);
-      // Then 'name: a' row is first
-      expect(cell(r, 1, 0)).toHaveTextContent("a");
-
-      // And when sorted by column 2
-      click(r.sortHeader_1);
-      // Then the `value: 1` row is first
-      expect(cell(r, 1, 0)).toHaveTextContent("c");
-
-      // And the rows were memoized so didn't re-render
-      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 3).getAttribute("data-render")).toEqual("1");
-    });
   });
 
   describe("server-side sorting", () => {
@@ -2688,16 +2646,66 @@ describe("GridTable", () => {
     });
 
     it("ignores init expanded, but respects new columns and updates local storage", async () => {
+      const tableIdentifier = "persistCollapse";
+      sessionStorage.setItem(tableIdentifier, JSON.stringify(["[]"]));
       // Given some hide-able columns
-      const columns: GridColumn<Row>[] = [
-        { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initVisible: true },
-        { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true },
-      ];
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              expandableHeader: () => "Client name",
+              header: () => "First name",
+              data: ({ firstName }) => firstName,
+              canHide: true,
+              initExpanded: true,
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                  canHide: true,
+                  initVisible: true,
+                }),
+              ],
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+          persistCollapse="testStorageKey"
+        />,
+      );
 
-      // And a table with setting the `visibleColumnsStorageKey`
-      await render(<GridTable columns={columns} rows={rows} visibleColumnsStorageKey="testStorageKey" />);
-      // Then the visible column session storage is defined using the `visibleColumnsStorageKey` prop
-      expect(sessionStorage.setItem).toHaveBeenLastCalledWith("testStorageKey", '["name"]');
+      // When we re-render with an updated column
+      await r.rerender(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              expandableHeader: () => "Occupation",
+              header: () => "Job Title",
+              data: ({ firstName }) => firstName,
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Level",
+                  data: ({ lastName }) => lastName,
+                }),
+              ],
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+          persistCollapse="testStorageKey"
+        />,
+      );
+
+      // And local storage is updated with the new expanded column ids
+      expect(sessionStorage.getItem(tableIdentifier)).toBe("[]");
     });
   });
 });

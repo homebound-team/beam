@@ -184,9 +184,8 @@ export class TableState {
       // Check against local storage for collapsed state only if this is the first render of "data" (non-header or totals) rows.
       const checkLocalStorage =
         this.persistCollapse && !this.rows.some((r) => r.kind !== "totals" && r.kind !== "header");
+
       // If the list of collapsed rows are different, then determine which are net-new rows and should be added to the newCollapsedIds array
-      // you can add/remove columns, when you add new columns, it can re-render, keep track of current state of collapsed columns and see what is the new state regarding collapsed
-      // respect the initi collapsed value for any new columns, but any existing columns (based on ids) take w/e the current state is - collapsed or expanded, follow similar pattern below
       if (
         currentCollapsedIds.length !== maybeNewCollapsedRowIds.length ||
         !currentCollapsedIds.every((id) => maybeNewCollapsedRowIds.includes(id))
@@ -198,7 +197,6 @@ export class TableState {
             !flattenedExistingIds.includes(maybeNewRowId) &&
             // Using `!` on `this.persistCollapse!` as `checkLocalStorage` ensures this.persistCollapse is truthy
             (!checkLocalStorage || readCollapsedRowStorage(this.persistCollapse!).includes(maybeNewRowId)),
-          // do something similar below
         );
 
         // If there are new rows that should be collapsed then update the collapsedRows arrays
@@ -230,26 +228,23 @@ export class TableState {
       columns.forEach((c) => {
         // looks at initExpanded and reads localStorage
         if (isInitial && c.initExpanded) {
-          // push expanded columns into the expandedColumnId array
           expandedColumnIds.push(c.id);
-          // then concat the expandedColumnId array with local storage
-          // local storage definitions trump data
           expandedColumnIds.concat(localStorageColumns!);
         } else {
-          console.log(c.id);
           console.log("subsequent load");
           // subsequent load
-          //   const newExpandedIds =
-          // expandedColumnIds.concat(newExpandedIds)
+          const newExpandedColumnIds: string[] = [];
+          // new expanded column ids merge with local storage
+          newExpandedColumnIds.concat(localStorageColumns!);
+          this.expandedColumns.replace(newExpandedColumnIds);
+          console.log(newExpandedColumnIds);
           // look through this.columns - if its a new column or existing column then create new expanded column ids
-          // new expanded column ids would merge with whatever we have in local storage - ignoring initExpanded
+          // ignoring initExpanded
         }
       });
 
       if (isInitial) {
-        // similar check as to rows, what should our expanded column Ids be, need to find out which columns show as expanded, do that by looking at both
         this.expandedColumns.replace(expandedColumnIds);
-        // read init expand properties if this is the initial load - when initial is true, then read both local storage and init expanded
       }
       // Also update our persistCollapse if set
       if (this.persistCollapse) {

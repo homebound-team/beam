@@ -65,42 +65,6 @@ export function ClientSideSorting() {
   );
 }
 
-export function ClientSideSortingWithApi() {
-  const nameColumn: GridColumn<Row> = {
-    header: "Name",
-    data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
-  };
-  const valueColumn: GridColumn<Row> = { id: "value", header: "Value", data: ({ value }) => value };
-  const countColumn: GridColumn<Row> = {
-    id: "count",
-    header: "Count",
-    data: ({ value }) => (value ? (value % 2) + 2 : 0),
-  };
-  const api = useGridTableApi<Row>();
-
-  return (
-    <>
-      <div css={Css.df.gap1.$}>
-        <Button label="Set default sort" onClick={() => api.setSortColumn("")} />
-        <Button label="Toggle Name Sort" onClick={() => api.setSortColumn(nameColumn.id!)} />
-        <Button label="Toggle Value Sort" onClick={() => api.setSortColumn(valueColumn.id!)} />
-        <Button label="Toggle Count Sort" onClick={() => api.setSortColumn(countColumn.id!)} />
-      </div>
-      <GridTable
-        columns={[nameColumn, valueColumn, countColumn]}
-        sorting={{ on: "client", initial: [valueColumn.id!, "ASC"] }}
-        rows={[
-          simpleHeader,
-          { kind: "data", id: "1", data: { name: "c", value: 1, count: 2 } },
-          { kind: "data", id: "2", data: { name: "B", value: 2, count: 6 } },
-          { kind: "data", id: "3", data: { name: "a", value: 3, count: 4 } },
-        ]}
-        api={api}
-      />
-    </>
-  );
-}
-
 export const Hovering = newStory(
   () => {
     const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
@@ -1338,7 +1302,7 @@ export function ExpandableColumnsWithSetTimeout() {
         expandableHeader: () => "Employee",
         header: (data, { expanded }) => (expanded ? "First Name" : emptyCell),
         data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
-        initExpanded: true,
+        // initExpanded: true,
         expandColumns: async () =>
           await new Promise((resolve) =>
             setTimeout(
