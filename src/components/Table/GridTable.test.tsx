@@ -2665,7 +2665,7 @@ describe("GridTable", () => {
                   expandableHeader: emptyCell,
                   header: "Last name",
                   data: ({ lastName }) => lastName,
-                  // initExpanded: true,
+                  initExpanded: true,
                 }),
               ],
             }),
@@ -2678,11 +2678,26 @@ describe("GridTable", () => {
           persistCollapse={tableIdentifier}
         />,
       );
+      // when we set localStorage
+      sessionStorage.setItem(tableIdentifier, JSON.stringify(["expandColumn1"]));
 
       // Then the column is initially expanded
       expect(cell(r, 1, 0)).toHaveTextContent("First name");
       // And the local storage value is updated with the current state
-      expect(sessionStorage.getItem(tableIdentifier)).toBe('["p2","p3"]');
+      expect(sessionStorage.getItem(tableIdentifier)).toBe('["expandColumn1"]');
+    });
+
+    it("ignores init expanded, but respects new columns and updates local storage", async () => {
+      // Given some hide-able columns
+      const columns: GridColumn<Row>[] = [
+        { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initVisible: true },
+        { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true },
+      ];
+
+      // And a table with setting the `visibleColumnsStorageKey`
+      await render(<GridTable columns={columns} rows={rows} visibleColumnsStorageKey="testStorageKey" />);
+      // Then the visible column session storage is defined using the `visibleColumnsStorageKey` prop
+      expect(sessionStorage.setItem).toHaveBeenLastCalledWith("testStorageKey", '["name"]');
     });
   });
 });
