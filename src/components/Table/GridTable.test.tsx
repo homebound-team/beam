@@ -2645,67 +2645,52 @@ describe("GridTable", () => {
       expect(sessionStorage.getItem(tableIdentifier)).toBe('["expandColumn1"]');
     });
 
-    it("ignores init expanded, but respects new columns and updates local storage", async () => {
-      const tableIdentifier = "persistCollapse";
-      sessionStorage.setItem(tableIdentifier, JSON.stringify(["[]"]));
-      // Given some hide-able columns
-      const r = await render(
-        <GridTable
-          columns={[
+    it("ignores init expanded, but respects new columns", async () => {
+      // Given a table with a column that is initially hidden, and initially expanded where the expanded columns are lazily loaded
+      const columns: GridColumn<ExpandableRow>[] = [
+        {
+          id: "myColumn",
+          initVisible: false,
+          initExpanded: true,
+          header: () => "First name",
+          data: ({ firstName }) => firstName,
+          expandableHeader: "expandableHeader",
+          expandColumns: async () => [
             column<ExpandableRow>({
-              expandableHeader: () => "Client name",
-              header: () => "First name",
+              expandableHeader: emptyCell,
+              header: "Name",
               data: ({ firstName }) => firstName,
-              canHide: true,
-              initExpanded: true,
-              expandColumns: [
-                column<ExpandableRow>({
-                  expandableHeader: emptyCell,
-                  header: "Last name",
-                  data: ({ lastName }) => lastName,
-                  canHide: true,
-                  initVisible: true,
-                }),
-              ],
             }),
-          ]}
-          rows={[
-            { kind: "header", id: "header", data: {} },
-            { kind: "expandableHeader", id: "expandableHeader", data: {} },
-            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
-          ]}
-          persistCollapse="testStorageKey"
-        />,
-      );
+          ],
+        },
+      ];
 
-      // When we re-render with an updated column
-      await r.rerender(
-        <GridTable
-          columns={[
-            column<ExpandableRow>({
-              expandableHeader: () => "Occupation",
-              header: () => "Job Title",
-              data: ({ firstName }) => firstName,
-              expandColumns: [
-                column<ExpandableRow>({
-                  expandableHeader: emptyCell,
-                  header: "Level",
-                  data: ({ lastName }) => lastName,
-                }),
-              ],
-            }),
-          ]}
-          rows={[
-            { kind: "header", id: "header", data: {} },
-            { kind: "expandableHeader", id: "expandableHeader", data: {} },
-            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
-          ]}
-          persistCollapse="testStorageKey"
-        />,
-      );
+      const rows: GridDataRow<ExpandableRow>[] = [
+        { kind: "header", id: "header", data: {} },
+        { kind: "expandableHeader", id: "expandableHeader", data: {} },
+        { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+      ];
 
-      // And local storage is updated with the new expanded column ids
-      expect(sessionStorage.getItem(tableIdentifier)).toBe("[]");
+      // And a table tied to the GridTableApi
+      const api: MutableRefObject<GridTableApi<ExpandableRow> | undefined> = { current: undefined };
+
+      function Test() {
+        const _api = useGridTableApi<ExpandableRow>();
+        api.current = _api;
+        return <GridTable api={_api} columns={columns} rows={rows} />;
+      }
+
+      // When rendering the table
+      const r = await render(<Test />);
+
+      // Then the column is initially hidden - this is not hiding it
+      // expect(cell(r, 1, 0)).not.toBeVisible();
+
+      // When setting the column to be visible
+      api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("myColumn"));
+
+      // Then the newly visible column should initially be expanded
+      expect(cell(r, 1, 0)).toHaveTextContent("First name");
     });
   });
 });

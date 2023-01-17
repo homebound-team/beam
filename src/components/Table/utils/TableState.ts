@@ -231,18 +231,20 @@ export class TableState {
           expandedColumnIds.push(c.id);
           expandedColumnIds.concat(localStorageColumns!);
           this.expandedColumns.replace(expandedColumnIds);
+        } else {
+          // subsequent load, ignoring initExpanded
+          // if its a new column or existing column then create new expanded column ids
+          // new expanded column ids merge with local storage
+          const newExpandedColumnIds = this.columns.filter((col) => col.initExpanded).map((c) => c.id);
+          newExpandedColumnIds.concat(localStorageColumns!);
+          console.log(newExpandedColumnIds);
+          console.log("subsequent");
         }
       });
 
-      // subsequent load, ignoring initExpanded
-      // if its a new column or existing column then create new expanded column ids
-      // new expanded column ids merge with local storage
-      const newExpandedColumnIds = this.columns.filter((col) => !col.initExpanded).map((c) => c.id);
-      newExpandedColumnIds.concat(localStorageColumns!);
-
       // Also update our persistCollapse if set
       if (this.persistCollapse) {
-        sessionStorage.setItem(this.persistCollapse, JSON.stringify(expandedColumnIds.concat(newExpandedColumnIds)));
+        sessionStorage.setItem(this.persistCollapse, JSON.stringify(expandedColumnIds));
       }
     }
   }
