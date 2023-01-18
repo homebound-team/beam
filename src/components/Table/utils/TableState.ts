@@ -229,20 +229,20 @@ export class TableState {
         // looks at initExpanded and reads localStorage
         if (isInitial && c.initExpanded) {
           expandedColumnIds.push(c.id);
-          expandedColumnIds.concat(localStorageColumns!);
-          this.expandedColumns.replace(expandedColumnIds);
+          // expandedColumnIds.concat(localStorageColumns!);
+          // this.expandedColumns.replace(expandedColumnIds);
         } else {
           // subsequent load, ignoring initExpanded
           // if its a new column or existing column then create new expanded column ids
           // new expanded column ids merge with local storage
-          const newExpandedColumnIds = this.columns.filter((col) => col.initExpanded).map((c) => c.id);
-          newExpandedColumnIds.concat(localStorageColumns!);
+          const newExpandedColumnIds = this.columns.filter((col) => !col.initExpanded).map((c) => c.id);
+          expandedColumnIds.concat(newExpandedColumnIds);
         }
       });
-
+      this.expandedColumns.replace(expandedColumnIds);
       // Also update our persistCollapse if set
       if (this.persistCollapse) {
-        sessionStorage.setItem(this.persistCollapse, JSON.stringify(expandedColumnIds));
+        sessionStorage.setItem(this.persistCollapse, JSON.stringify(expandedColumnIds.concat(localStorageColumns!)));
       }
     }
   }
@@ -278,7 +278,6 @@ export class TableState {
     return [...this.expandedColumns.values()];
   }
 
-  // handle localStorage - similar to how we update to rows - . look at toggleCollapsed local storage logic return existing row ids and newly defined expandedCOlumnisd
   toggleExpandedColumn(columnId: string) {
     if (this.expandedColumns.has(columnId)) {
       this.expandedColumns.delete(columnId);
