@@ -237,8 +237,6 @@ export class TableState {
           // new expanded column ids merge with local storage
           const newExpandedColumnIds = this.columns.filter((col) => col.initExpanded).map((c) => c.id);
           newExpandedColumnIds.concat(localStorageColumns!);
-          console.log(newExpandedColumnIds);
-          console.log("subsequent");
         }
       });
 
