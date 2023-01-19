@@ -1,6 +1,7 @@
 import { ReactNode, useMemo, useRef } from "react";
 import { useFocusRing, useHover, useRadio, useRadioGroup } from "react-aria";
 import { RadioGroupState, useRadioGroupState } from "react-stately";
+import { maybeTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { PresentationFieldProps } from "src/components/PresentationContext";
@@ -19,6 +20,10 @@ export interface RadioFieldOption<K extends string> {
   description?: string | (() => ReactNode);
   /** The undisplayed value, i.e. an id of some sort. */
   value: K;
+  /** Disable only specific options */
+  disabled?: boolean;
+  /** Optional message for the reason the option is disabled */
+  disabledTooltip?: string;
 }
 
 export interface RadioGroupFieldProps<K extends string> extends Pick<PresentationFieldProps, "labelStyle"> {
@@ -70,16 +75,22 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
     <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$}>
       <Label label={label} {...labelProps} {...tid.label} hidden={labelStyle === "hidden"} />
       <div {...radioGroupProps}>
-        {options.map((option) => (
-          <Radio
-            key={option.value}
-            parentId={name}
-            option={option}
-            state={state}
-            {...otherProps}
-            {...tid[option.value]}
-          />
-        ))}
+        {options.map((option) =>
+          maybeTooltip({
+            title: option.disabledTooltip,
+            placement: "bottom",
+            children: (
+              <Radio
+                key={option.value}
+                parentId={name}
+                option={option}
+                state={{ ...state, isDisabled: state.isDisabled || !!option.disabled }}
+                {...otherProps}
+                {...tid[option.value]}
+              />
+            ),
+          }),
+        )}
         {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
         {helperText && <HelperText helperText={helperText} />}
       </div>
