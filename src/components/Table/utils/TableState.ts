@@ -218,7 +218,6 @@ export class TableState {
   setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
     const isInitial = !this.columns || this.columns.length === 0;
     if (columns !== this.columns) {
-      this.columns = columns;
       this.visibleColumnsStorageKey = visibleColumnsStorageKey ?? camelCase(columns.map((c) => c.id).join());
       this.visibleColumns.replace(readOrSetLocalVisibleColumnState(columns, this.visibleColumnsStorageKey));
       // list of local storage columns
@@ -229,21 +228,24 @@ export class TableState {
         // looks at initExpanded and reads localStorage
         if (isInitial && c.initExpanded) {
           expandedColumnIds.push(c.id);
-          // expandedColumnIds.concat(localStorageColumns!);
-          // this.expandedColumns.replace(expandedColumnIds);
         } else {
           // subsequent load, ignoring initExpanded
           // if its a new column or existing column then create new expanded column ids
+          const newExpandedColumnIds = this.columns.filter((col) => !col.id.includes(c.id)).map((c) => c.id);
           // new expanded column ids merge with local storage
-          const newExpandedColumnIds = this.columns.filter((col) => !col.initExpanded).map((c) => c.id);
           expandedColumnIds.concat(newExpandedColumnIds);
         }
       });
-      this.expandedColumns.replace(expandedColumnIds);
+
+      this.expandedColumns.replace(expandedColumnIds.concat(localStorageColumns!));
+
       // Also update our persistCollapse if set
+      // get column helper get/set
       if (this.persistCollapse) {
-        sessionStorage.setItem(this.persistCollapse, JSON.stringify(expandedColumnIds.concat(localStorageColumns!)));
+        sessionStorage.setItem(`column_${this.persistCollapse}`, JSON.stringify(expandedColumnIds));
       }
+      // last step to replace existing columns
+      this.columns = columns;
     }
   }
 
@@ -266,7 +268,20 @@ export class TableState {
   }
 
   setVisibleColumns(ids: string[]) {
+    // check to see if we have newly visible columns
+    if (ids.length > this.visibleColumnIds.length) {
+      // grab the new ids
+      const newlyAddedIds = ids.filter((id) => !this.visibleColumnIds.includes(id));
+      // look through columns where we match ids to the new ids
+      const newExpanded = this.columns.filter((c) => newlyAddedIds.includes(c.id) && c.initExpanded);
+      newExpanded.forEach((col) => {
+        // add newlyExpanded columns to the expanded columns set
+        this.expandedColumns.add(col.id);
+      });
+    }
+    console.log(this.expandedColumnIds, ids);
     sessionStorage.setItem(this.visibleColumnsStorageKey, JSON.stringify(ids));
+    // replace w/current columnSet
     this.visibleColumns.replace(ids);
   }
 
@@ -278,6 +293,7 @@ export class TableState {
     return [...this.expandedColumns.values()];
   }
 
+  // handle localStorage - similar to how we update to rows - . look at toggleCollapsed local storage logic return existing row ids and newly defined expandedCOlumnisd
   toggleExpandedColumn(columnId: string) {
     if (this.expandedColumns.has(columnId)) {
       this.expandedColumns.delete(columnId);
