@@ -20,10 +20,8 @@ export interface RadioFieldOption<K extends string> {
   description?: string | (() => ReactNode);
   /** The undisplayed value, i.e. an id of some sort. */
   value: K;
-  /** Disable only specific options */
+  /** Disable only specific option, with an optional reason */
   disabled?: boolean | ReactNode;
-  /** Optional message for the reason the option is disabled */
-  // disabledTooltip?: string;
 }
 
 export interface RadioGroupFieldProps<K extends string> extends Pick<PresentationFieldProps, "labelStyle"> {
