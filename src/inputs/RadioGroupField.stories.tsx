@@ -245,7 +245,7 @@ export function Disabled() {
         value={"a"}
         onChange={() => {}}
         options={[
-          { label: "Asiago", value: "a", disabled: true, disabledTooltip: "This option is disabled by some reason" },
+          { label: "Asiago", value: "a", disabled: "This option is disabled by some reason" },
           { label: "Burratta", value: "b" },
           { label: "Camembert", value: "c", disabled: true },
           {
