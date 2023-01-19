@@ -228,23 +228,25 @@ export class TableState {
         // looks at initExpanded and reads localStorage
         if (isInitial && c.initExpanded) {
           expandedColumnIds.push(c.id);
+          // merge localStorage with expandedColumns
+          expandedColumnIds.concat(localStorageColumns!);
+        } else {
+          // subsequent load, ignoring initExpanded
+          // if its a new column or existing column then create new expanded column ids
+          const newExpandedColumnIds = this.columns.filter((col) => !col.id.includes(c.id)).map((col) => col.id);
+          newExpandedColumnIds.concat(localStorageColumns!);
+          expandedColumnIds.concat(newExpandedColumnIds);
         }
       });
-
-      // subsequent load, ignoring initExpanded
-      // if its a new column or existing column then create new expanded column ids
-      const newExpandedColumnIds = columns.filter((col) => !this.columns.includes(col)).map((c) => c.id);
-      expandedColumnIds.concat(newExpandedColumnIds);
-
-      if (isInitial) this.expandedColumns.replace(expandedColumnIds.concat(localStorageColumns!));
+      this.expandedColumns.replace(this.expandedColumnIds.concat(expandedColumnIds));
+      // last step to replace existing columns
+      this.columns = columns;
 
       // Also update our persistCollapse if set
       // get column helper get/set
       if (this.persistCollapse) {
         sessionStorage.setItem(`column_${this.persistCollapse}`, JSON.stringify(expandedColumnIds));
       }
-      // last step to replace existing columns
-      this.columns = columns;
     }
   }
 
@@ -274,11 +276,8 @@ export class TableState {
       // look through columns where we match ids to the new ids
       const newExpanded = this.columns.filter((c) => newlyAddedIds.includes(c.id) && c.initExpanded);
       newExpanded.forEach((col) => {
-        if (col.id) {
-          // add newlyExpanded columns to the expanded columns set
-          this.expandedColumns.add(col.id);
-          console.log(this.expandedColumnIds.length);
-        }
+        // add newlyExpanded columns to the expanded columns set
+        this.expandedColumns.add(col.id);
       });
     }
     sessionStorage.setItem(this.visibleColumnsStorageKey, JSON.stringify(ids));
