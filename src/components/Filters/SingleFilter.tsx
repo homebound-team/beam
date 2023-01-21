@@ -1,6 +1,7 @@
 import { Key } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
+import { defaultGetOptionLabel, defaultGetOptionValue } from "src/inputs/internal/SelectFieldBase";
 import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { TestIds } from "src/utils/useTestIds";
@@ -25,7 +26,14 @@ class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, 
     inModal: boolean,
     vertical: boolean,
   ) {
-    const { label, defaultValue, options: maybeOptions, getOptionLabel, getOptionValue, ...props } = this.props;
+    const {
+      label,
+      defaultValue,
+      options: maybeOptions,
+      getOptionLabel = defaultGetOptionLabel,
+      getOptionValue = defaultGetOptionValue,
+      ...props
+    } = this.props;
 
     const options = Array.isArray(maybeOptions)
       ? [allOption as O, ...maybeOptions]
@@ -35,8 +43,8 @@ class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, 
       <SelectField<O, V>
         {...props}
         options={options}
-        getOptionValue={(o) => (o === allOption ? (undefined as any as V) : getOptionValue(o))}
-        getOptionLabel={(o) => (o === allOption ? "All" : getOptionLabel(o))}
+        getOptionValue={(o) => (o === allOption ? (undefined as any as V) : getOptionValue(o as any))}
+        getOptionLabel={(o) => (o === allOption ? "All" : getOptionLabel(o as any))}
         compact={!vertical}
         value={value}
         label={this.label}

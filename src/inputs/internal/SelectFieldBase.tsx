@@ -15,8 +15,8 @@ import { areArraysEqual } from "src/utils";
 export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => string | ReactNode;
-  getOptionValue: (opt: O) => V;
-  getOptionLabel: (opt: O) => string;
+  getOptionValue?: (opt: O) => V;
+  getOptionLabel?: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
   onSelect: (values: V[], opts: O[]) => void;
@@ -79,11 +79,13 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
   const maybeOptions = useMemo(() => initializeOptions(options, unsetLabel), [options, unsetLabel]);
   // Memoize the callback functions and handle the `unset` option if provided.
   const getOptionLabel = useCallback(
-    (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : props.getOptionLabel(o)),
+    (o: O) =>
+      unsetLabel && o === unsetOption ? unsetLabel : (props.getOptionLabel ?? defaultGetOptionLabel)(o as any),
     [props.getOptionLabel, unsetLabel],
   );
   const getOptionValue = useCallback(
-    (o: O) => (unsetLabel && o === unsetOption ? (undefined as V) : props.getOptionValue(o)),
+    (o: O) =>
+      unsetLabel && o === unsetOption ? (undefined as V) : (props.getOptionValue ?? defaultGetOptionValue)(o as any),
     [props.getOptionValue, unsetLabel],
   );
   const getOptionMenuLabel = useCallback(
@@ -457,3 +459,31 @@ export function disabledOptionToKeyedTuple(
     return [valueToKey(disabledOption), undefined];
   }
 }
+
+type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
+
+type InferrableOptionValue = AtLeastOne<{
+  id: any;
+  value: any;
+}>;
+export const defaultGetOptionValue = (o: InferrableOptionValue) =>
+  o?.id ??
+  o?.value ??
+  (() => {
+    throw new Error("Unable to determine option value. Please provide a custom getOptionValue function");
+  })();
+
+type InferrableOptionLabel = AtLeastOne<{
+  displayName: any;
+  name: any;
+  label: any;
+  value: any;
+}>;
+export const defaultGetOptionLabel = (o: InferrableOptionLabel): string =>
+  o?.displayName ||
+  o?.name ||
+  o?.label ||
+  o?.value ||
+  (() => {
+    throw new Error("Unable to determine option label. Please provide a custom getOptionValue function");
+  })();
