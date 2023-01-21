@@ -15,7 +15,9 @@ import { areArraysEqual } from "src/utils";
 export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => string | ReactNode;
+  /** Defaults to `id ?? value` */
   getOptionValue?: (opt: O) => V;
+  /** Defaults to `displayName || label || name || value` */
   getOptionLabel?: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
@@ -481,8 +483,8 @@ type InferrableOptionLabel = AtLeastOne<{
 }>;
 export const defaultGetOptionLabel = (o: InferrableOptionLabel): string =>
   o?.displayName ||
-  o?.name ||
   o?.label ||
+  o?.name ||
   o?.value ||
   (() => {
     throw new Error("Unable to determine option label. Please provide a custom getOptionValue function");
