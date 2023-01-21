@@ -487,5 +487,5 @@ export const defaultGetOptionLabel = (o: InferrableOptionLabel): string =>
   o?.name ||
   o?.value ||
   (() => {
-    throw new Error("Unable to determine option label. Please provide a custom getOptionValue function");
+    throw new Error("Unable to determine option label. Please provide a custom getOptionLabel function");
   })();
