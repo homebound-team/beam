@@ -1,3 +1,4 @@
+export * from "./Autocomplete";
 export * from "./Checkbox";
 export * from "./CheckboxGroup";
 export * from "./ChipSelectField";
