@@ -243,6 +243,7 @@ export function PerfTest() {
       }}
       onBlur={action("onBlur")}
       onFocus={action("onFocus")}
+      onInputChange={(val) => console.log("to ", val)}
     />
   );
 }
@@ -265,6 +266,7 @@ export function LoadingState() {
           });
         },
       }}
+      onInputChange={(val) => console.log("to ", val)}
     />
   );
 }

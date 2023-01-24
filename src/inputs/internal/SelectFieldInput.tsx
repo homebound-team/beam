@@ -32,6 +32,7 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   tooltip?: ReactNode;
   resetField: VoidFunction;
   hideErrorMessage?: boolean;
+  onInputChange?: (value: string) => void;
 }
 
 export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
@@ -90,8 +91,12 @@ export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProp
           </button>
         )
       }
+      onChange={(value) => props.onInputChange && props.onInputChange(value ?? "")}
       inputProps={{
-        ...mergeProps(inputProps, { "aria-invalid": Boolean(errorMsg), onInput: () => state.open() }),
+        ...mergeProps(inputProps, {
+          "aria-invalid": Boolean(errorMsg),
+          onInput: () => state.open(),
+        }),
         // Not merging the following as we want them to overwrite existing events
         ...{
           onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
