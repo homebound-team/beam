@@ -54,6 +54,7 @@ export interface TextFieldBaseProps<X>
   textAreaMinHeight?: number;
   tooltip?: ReactNode;
   hideErrorMessage?: boolean;
+  alwaysShowHelperText?: boolean;
 }
 
 // Used by both TextField and TextArea
@@ -86,6 +87,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     visuallyDisabled = fieldProps?.visuallyDisabled ?? true,
     errorInTooltip = fieldProps?.errorInTooltip ?? false,
     hideErrorMessage = false,
+    alwaysShowHelperText = false,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
@@ -269,22 +271,26 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             </div>
           ),
         })}
-        {/* Compound fields will handle their own error and helper text. Do not show error or helper text when 'readOnly' or disabled */}
-        {labelStyle !== "left" && !compound && !inputProps.disabled && !inputProps.readOnly && (
-          <>
-            {errorMsg && !errorInTooltip && (
-              <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
-            )}
-            {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
-          </>
-        )}
+        {/* Compound fields will handle their own error and helper text.
+          * Do not show error or helper text when 'readOnly' or disabled
+          except if alwaysShowHelperText is provided */}
+        {labelStyle !== "left" &&
+          (alwaysShowHelperText || (!compound && !inputProps.disabled && !inputProps.readOnly)) && (
+            <>
+              {errorMsg && !errorInTooltip && (
+                <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
+              )}
+              {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+            </>
+          )}
       </div>
       {/* Error message and helper text for "left" labelStyle */}
       {labelStyle === "left" &&
-        !compound &&
-        !inputProps.disabled &&
-        !inputProps.readOnly &&
-        ((errorMsg && !errorInTooltip) || helperText) && (
+        (alwaysShowHelperText ||
+          (!compound &&
+            !inputProps.disabled &&
+            !inputProps.readOnly &&
+            ((errorMsg && !errorInTooltip) || helperText))) && (
           // Reduces the margin between the error/helper text and input field
           <div css={Css.mtPx(-8).$}>
             {errorMsg && !errorInTooltip && (

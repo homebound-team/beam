@@ -48,6 +48,8 @@ export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelSty
   // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
   borderless?: boolean;
   sizeToContent?: boolean;
+  // If set, the helper text will always be shown
+  alwaysShowHelperText?: boolean;
 }
 
 export function NumberField(props: NumberFieldProps) {
