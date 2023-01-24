@@ -54,6 +54,7 @@ export interface TextFieldBaseProps<X>
   textAreaMinHeight?: number;
   tooltip?: ReactNode;
   hideErrorMessage?: boolean;
+  // If set, the helper text will always be shown (usually we hide the helper text if read only)
   alwaysShowHelperText?: boolean;
 }
 

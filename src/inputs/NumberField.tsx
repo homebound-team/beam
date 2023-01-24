@@ -48,7 +48,7 @@ export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelSty
   // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
   borderless?: boolean;
   sizeToContent?: boolean;
-  // If set, the helper text will always be shown
+  // If set, the helper text will always be shown (usually we hide the helper text if read only)
   alwaysShowHelperText?: boolean;
 }
 
