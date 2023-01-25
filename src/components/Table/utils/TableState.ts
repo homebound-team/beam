@@ -222,30 +222,37 @@ export class TableState {
       this.visibleColumns.replace(readOrSetLocalVisibleColumnState(columns, this.visibleColumnsStorageKey));
       // list of local storage columns
       const localStorageColumns = this.persistCollapse ? readExpandedColumnsStorage(this.persistCollapse) : undefined;
-      const expandedColumnIds: string[] = [];
-
+      // expandedColumnIds initialized as localStorageColumns
+      const expandedColumnIds = localStorageColumns ?? [];
+      // list of all existing columns
+      const existingColumnIds = this.columns.map((c) => c.id);
+      // list of initial expanded columns
       columns.forEach((c) => {
-        // looks at initExpanded and reads localStorage
         if (isInitial && c.initExpanded) {
           expandedColumnIds.push(c.id);
-          // merge localStorage with expandedColumns
-          expandedColumnIds.concat(localStorageColumns!);
-        } else {
-          // subsequent load, ignoring initExpanded
-          // if its a new column or existing column then create new expanded column ids
-          const newExpandedColumnIds = this.columns.filter((col) => !col.id.includes(c.id)).map((col) => col.id);
-          newExpandedColumnIds.concat(localStorageColumns!);
-          expandedColumnIds.concat(newExpandedColumnIds);
         }
       });
-      this.expandedColumns.replace(this.expandedColumnIds.concat(expandedColumnIds));
+
+      // filter existing columns that are initExpanded to see which are new
+      const newExpandedColumnsIds = columns
+        .filter((c) => !existingColumnIds.includes(c.id) && c.initExpanded)
+        .map((c) => c.id);
+      console.log({ expandedColumnIds, newExpandedColumnsIds, existingColumnIds });
+
+      // difference between list of current expanded columns vs list we just created, if there is, then replace
+      const isDifference = expandedColumnIds.some((c) => !newExpandedColumnsIds.includes(c));
+      if (isDifference) {
+        // replace expandedColumns with the existing expanded columns and new columns
+        this.expandedColumns.replace(expandedColumnIds.concat(newExpandedColumnsIds));
+      }
+      this.expandedColumns.replace(expandedColumnIds);
       // last step to replace existing columns
       this.columns = columns;
 
-      // Also update our persistCollapse if set
-      // get column helper get/set
+      // update our persistCollapse if set
+      // todo: get column helper get/set
       if (this.persistCollapse) {
-        sessionStorage.setItem(`column_${this.persistCollapse}`, JSON.stringify(expandedColumnIds));
+        sessionStorage.setItem(`expandedColumn_${this.persistCollapse}`, JSON.stringify(expandedColumnIds));
       }
     }
   }
@@ -301,7 +308,7 @@ export class TableState {
     }
 
     if (this.persistCollapse) {
-      sessionStorage.setItem(this.persistCollapse, JSON.stringify(this.expandedColumnIds));
+      sessionStorage.setItem(`expandedColumn_${this.persistCollapse}`, JSON.stringify(this.expandedColumnIds));
     }
   }
 
@@ -482,8 +489,8 @@ function readCollapsedRowStorage(persistCollapse: string): string[] {
   return collapsedGridRowIds ? JSON.parse(collapsedGridRowIds) : [];
 }
 
-function readExpandedColumnsStorage(persistCollapse: string): string[] | undefined {
-  const expandedGridColumnIds = sessionStorage.getItem(`column_${persistCollapse}`);
+function readExpandedColumnsStorage(persistCollapse: string): string[] {
+  const expandedGridColumnIds = sessionStorage.getItem(`expandedColumn_${persistCollapse}`);
   return expandedGridColumnIds ? JSON.parse(expandedGridColumnIds) : [];
 }
 
