@@ -226,7 +226,7 @@ export class TableState {
       const expandedColumnIds = localStorageColumns ?? [];
       // list of all existing columns
       const existingColumnIds = this.columns.map((c) => c.id);
-      // list of initial expanded columns
+      // if the expandedColumn is initExpanded and it happens on initial load, push into expandedColumns array
       columns.forEach((c) => {
         if (isInitial && c.initExpanded) {
           expandedColumnIds.push(c.id);
@@ -239,18 +239,16 @@ export class TableState {
         .map((c) => c.id);
       console.log({ expandedColumnIds, newExpandedColumnsIds, existingColumnIds });
 
-      // difference between list of current expanded columns vs list we just created, if there is, then replace
-      const isDifference = expandedColumnIds.some((c) => !newExpandedColumnsIds.includes(c));
-      if (isDifference) {
-        // replace expandedColumns with the existing expanded columns and new columns
+      // if there is a difference between list of current expanded columns vs list we just created, then replace
+      const isDifferent = !expandedColumnIds.every((c) => newExpandedColumnsIds.includes(c));
+      if (isDifferent) {
         this.expandedColumns.replace(expandedColumnIds.concat(newExpandedColumnsIds));
       }
-      this.expandedColumns.replace(expandedColumnIds);
-      // last step to replace existing columns
+      if (isInitial) this.expandedColumns.replace(expandedColumnIds);
+
       this.columns = columns;
 
       // update our persistCollapse if set
-      // todo: get column helper get/set
       if (this.persistCollapse) {
         sessionStorage.setItem(`expandedColumn_${this.persistCollapse}`, JSON.stringify(expandedColumnIds));
       }
