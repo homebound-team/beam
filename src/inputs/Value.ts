@@ -26,8 +26,7 @@ export function keyToValue<V extends Value>(key: Key): V {
     } else if (key === "__VALUE:undefined") {
       return undefined as V;
     } else if (key.startsWith("__VALUE:boolean:")) {
-      // boolean values end with `;` (i.e. '__VALUE:boolean:true;').
-      return key.split(":")[2].startsWith("true") as V;
+      return (key.split(":")[2] === "true") as V;
     } else if (key.startsWith("__VALUE:number")) {
       return Number(key.split(":")[2]) as V;
     } else {
@@ -46,7 +45,7 @@ export function valueToKey(value: Value): Key {
     // so tag this value as really being a number.
     return `__VALUE:number:${value}`;
   } else if (typeof value === "boolean") {
-    return `__VALUE:boolean:${value};`;
+    return `__VALUE:boolean:${value}`;
   } else if (value === null) {
     return "__VALUE:null";
   } else if (value === undefined) {
