@@ -218,25 +218,47 @@ export function LabelsAndDescriptions() {
 
 export function Disabled() {
   return (
-    <RadioGroupField
-      label={"Favorite cheese"}
-      value={"a"}
-      onChange={() => {}}
-      disabled={true}
-      options={[
-        { label: "Asiago", value: "a" },
-        { label: "Burratta", value: "b" },
-        { label: "Camembert", value: "c" },
-        {
-          label: "Roquefort",
-          description:
-            "Roquefort is a sheep milk cheese from Southern France, and is one of the world's best known blue cheeses.",
-          value: "d",
-        },
-      ]}
-      onBlur={action("onBlur")}
-      onFocus={action("onFocus")}
-    />
+    <FormLines width="sm">
+      <p css={Css.mb1.$}>All options disabled</p>
+      <RadioGroupField
+        label={"Favorite cheese"}
+        value={"a"}
+        onChange={() => {}}
+        disabled={true}
+        options={[
+          { label: "Asiago", value: "a" },
+          { label: "Burratta", value: "b" },
+          { label: "Camembert", value: "c" },
+          {
+            label: "Roquefort",
+            description:
+              "Roquefort is a sheep milk cheese from Southern France, and is one of the world's best known blue cheeses.",
+            value: "d",
+          },
+        ]}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+      <p css={Css.mb1.$}>Only a few options disabled, with a tooltip</p>
+      <RadioGroupField
+        label={"Favorite cheese"}
+        value={"a"}
+        onChange={() => {}}
+        options={[
+          { label: "Asiago", value: "a", disabled: "This option is disabled by some reason" },
+          { label: "Burratta", value: "b" },
+          { label: "Camembert", value: "c", disabled: true },
+          {
+            label: "Roquefort",
+            description:
+              "Roquefort is a sheep milk cheese from Southern France, and is one of the world's best known blue cheeses.",
+            value: "d",
+          },
+        ]}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+    </FormLines>
   );
 }
 
