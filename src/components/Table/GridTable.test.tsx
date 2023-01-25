@@ -2623,7 +2623,6 @@ describe("GridTable", () => {
                   expandableHeader: emptyCell,
                   header: "Last name",
                   data: ({ lastName }) => lastName,
-                  initExpanded: true,
                 }),
               ],
             }),
@@ -2636,16 +2635,53 @@ describe("GridTable", () => {
           persistCollapse={tableIdentifier}
         />,
       );
-      // when we set localStorage
-      sessionStorage.setItem(tableIdentifier, JSON.stringify(["expandColumn1"]));
 
       // Then the column is initially expanded
       expect(cell(r, 1, 0)).toHaveTextContent("First name");
+      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
       // And the local storage value is updated with the current state
-      expect(sessionStorage.getItem(tableIdentifier)).toBe('["expandColumn1"]');
+      expect(sessionStorage.getItem(`expandedColumn_${tableIdentifier}`)).toBe('["beamColumn_0"]');
     });
 
-    it.skip("ignores init expanded, but respects new columns", async () => {
+    it("respects initially expands columns set in localstorage ", async () => {
+      const tableIdentifier = "persistCollapse";
+
+      sessionStorage.setItem(`expandedColumn_${tableIdentifier}`, JSON.stringify(["column1"]));
+
+      // Given a table with expandable columns that are initially expanded
+      // When initially rendered with the expandable column not initially collapsed
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              id: "column1",
+              expandableHeader: () => "Client name",
+              header: () => "First name",
+              data: ({ firstName }) => firstName,
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                }),
+              ],
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+          persistCollapse={tableIdentifier}
+        />,
+      );
+
+      // Then the column is initially expanded
+      expect(cell(r, 1, 0)).toHaveTextContent("First name");
+      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
+    });
+
+    it("ignores init expanded, but respects new columns", async () => {
       // Given a table with a column that is initially hidden, and initially expanded where the expanded columns are lazily loaded
       const columns: GridColumn<ExpandableRow>[] = [
         {
@@ -2662,27 +2698,20 @@ describe("GridTable", () => {
           header: "First",
           data: ({ firstName }) => firstName,
           expandableHeader: "name",
-          expandColumns: async () =>
-            await new Promise((resolve) =>
-              setTimeout(
-                () =>
-                  resolve([
-                    column<ExpandableRow>({
-                      expandableHeader: emptyCell,
-                      header: "Last Name",
-                      data: ({ lastName }) => lastName,
-                      w: "250px",
-                    }),
-                    column<ExpandableRow>({
-                      expandableHeader: emptyCell,
-                      header: "Age",
-                      data: ({ age }) => age,
-                      w: "80px",
-                    }),
-                  ]),
-                2000,
-              ),
-            ),
+          expandColumns: async () => [
+            column<ExpandableRow>({
+              expandableHeader: emptyCell,
+              header: "Last Name",
+              data: ({ lastName }) => lastName,
+              w: "250px",
+            }),
+            column<ExpandableRow>({
+              expandableHeader: emptyCell,
+              header: "Age",
+              data: ({ age }) => age,
+              w: "80px",
+            }),
+          ],
         },
       ];
 
