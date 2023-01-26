@@ -2497,6 +2497,7 @@ describe("GridTable", () => {
 
     it("can expand columns when `expandedWidth` defines a value", async () => {
       // Given a table with `expandedWidth` defined
+
       const r = await render(
         <GridTable
           columns={[
@@ -2741,6 +2742,7 @@ describe("GridTable", () => {
       expect(row(r, 1).childNodes).toHaveLength(2);
       // wait for promise to resolve
       await wait();
+
       // then expect 2 columns + 2 expandable columns to be visible
       expect(row(r, 1).childNodes).toHaveLength(4);
     });

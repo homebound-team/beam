@@ -229,7 +229,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         ) as GridColumnWithId<R>[],
     [tableState],
   );
-
   // Initialize the sort state. This will only happen on the first render.
   // Once the `TableState.sort` is defined, it will not re-initialize.
   tableState.initSortState(props.sorting, columns);

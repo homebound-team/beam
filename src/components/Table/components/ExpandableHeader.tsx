@@ -11,12 +11,13 @@ import { Loader } from "../../Loader";
 interface ExpandableHeaderProps<R extends Kinded> {
   title: string;
   column: GridColumnWithId<R>;
+  columns: GridColumnWithId<R>[];
   minStickyLeftOffset: number;
   as: RenderAs;
 }
 
 export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<R>) {
-  const { title, column, minStickyLeftOffset, as } = props;
+  const { title, column, columns, minStickyLeftOffset, as } = props;
   const { tableState } = useContext(TableStateContext);
   const expandedColumnIds = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const isExpanded = expandedColumnIds.includes(column.id);
@@ -35,6 +36,8 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
         if (isFunction(column.expandColumns)) {
           setIsLoading(true);
           await tableState.loadExpandedColumns(column);
+          // manually calling this as loadExpandedColumns does not do toggle
+          tableState.toggleExpandedColumn(column.id);
           setIsLoading(false);
         } else {
           tableState.toggleExpandedColumn(column.id);
