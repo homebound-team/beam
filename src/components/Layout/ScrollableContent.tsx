@@ -1,6 +1,6 @@
 import { ReactNode, ReactPortal, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { scrollContainerBottomPadding, useScrollableParent } from "src/components/Layout/ScrollableParent";
+import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 import { Css, Palette } from "src/Css";
 
 interface ScrollableContentProps {
@@ -49,3 +49,6 @@ export function ScrollableContent(props: ScrollableContentProps): ReactPortal | 
     scrollableEl,
   );
 }
+
+// Styles to wrap around the scrollable content in order to give padding beneath the content within the scrollable container.
+const scrollContainerBottomPadding = Css.addIn("&:after", Css.contentEmpty.db.h2.$).$;
