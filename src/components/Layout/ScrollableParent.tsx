@@ -61,7 +61,7 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
   const scrollableEl = useMemo(() => {
     const el = document.createElement("div");
     // Ensure this wrapping div takes up the full height of its container
-    el.style.flexGrow = "1";
+    el.style.height = "100%";
     return el;
   }, []);
   const [, setTick] = useState(0);
@@ -85,9 +85,16 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
        * Otherwise, the flex-item's min-height/width is based on the content of the flex-item, which maybe overflow the container.
        * See https://stackoverflow.com/questions/42130384/why-should-i-specify-height-0-even-if-i-specified-flex-basis-0-in-css3-flexbox */}
       <Tag css={{ ...Css.mh0.mw0.fg1.df.fdc.$, ...otherXss }}>
-        <div css={Css.pl(context.pl).pr(context.pr).if(!hasScrollableContent).overflowAuto.h100.$}>{children}</div>
+        <div
+          css={{
+            ...Css.pl(context.pl).pr(context.pr).$,
+            ...(!hasScrollableContent ? { ...Css.overflowAuto.h100.$, ...scrollContainerBottomPadding } : undefined),
+          }}
+        >
+          {children}
+        </div>
         {/* Set fg1 to take up the remaining space in the viewport.*/}
-        <div css={Css.fg1.overflowAuto.df.fdc.$} ref={scrollableRef} />
+        <div css={Css.fg1.overflowAuto.$} ref={scrollableRef} />
       </Tag>
     </ScrollableParentContext.Provider>
   );
@@ -96,3 +103,6 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
 export function useScrollableParent() {
   return useContext(ScrollableParentContext);
 }
+
+// Styles to wrap around the scrollable content in order to give padding beneath the content within the scrollable container.
+export const scrollContainerBottomPadding = Css.addIn("&:after", Css.contentEmpty.db.h2.$).$;
