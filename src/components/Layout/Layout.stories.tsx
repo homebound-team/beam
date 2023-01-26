@@ -173,7 +173,7 @@ function HistoryExample() {
     <>
       <div css={Css.lgSb.$}>History</div>
       <p>Demonstrates not utilizing ScrollableContent component. Expect this section of the layout to scroll</p>
-      <ul css={Css.df.fdc.gap2.mb0.pb1.$}>
+      <ul css={Css.df.fdc.gap2.$}>
         {zeroTo(20).map((i) => (
           <li key={i}>History Item {i + 1}</li>
         ))}
