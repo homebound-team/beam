@@ -172,7 +172,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           as,
           alignment,
           column,
-          columns,
           isExpandableHeader,
           isExpandable,
           minStickyLeftOffset,

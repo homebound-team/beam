@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { ReactNode, useContext, useState } from "react";
 import { Icon } from "src/components/Icon";
 import { GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -9,15 +9,14 @@ import { isFunction } from "src/utils";
 import { Loader } from "../../Loader";
 
 interface ExpandableHeaderProps<R extends Kinded> {
-  title: string;
+  title: string | ReactNode;
   column: GridColumnWithId<R>;
-  columns: GridColumnWithId<R>[];
   minStickyLeftOffset: number;
   as: RenderAs;
 }
 
 export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<R>) {
-  const { title, column, columns, minStickyLeftOffset, as } = props;
+  const { title, column, minStickyLeftOffset, as } = props;
   const { tableState } = useContext(TableStateContext);
   const expandedColumnIds = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const isExpanded = expandedColumnIds.includes(column.id);
@@ -36,7 +35,7 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
         if (isFunction(column.expandColumns)) {
           setIsLoading(true);
           await tableState.loadExpandedColumns(column);
-          // manually calling this as loadExpandedColumns does not do toggle
+          // manually calling this as loadExpandedColumns does not toggle
           tableState.toggleExpandedColumn(column.id);
           setIsLoading(false);
         } else {

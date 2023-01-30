@@ -113,6 +113,7 @@ export function calcColumnSizes(
   const { claimedPercentages, claimedPixels, totalFr } = columns.reduce(
     (acc, { id, w: _w, expandedWidth }) => {
       const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
+
       if (typeof w === "undefined") {
         return { ...acc, totalFr: acc.totalFr + 1 };
       } else if (typeof w === "number") {

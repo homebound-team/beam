@@ -260,19 +260,9 @@ export class TableState {
     }
   }
 
-  // load and trigger column to be expanded - only does single column at a time
-  // make load expanded columns handle multiple columns at once
-  // async loadExpandedColumns(column: GridColumnWithId<any>): Promise<void> {
-  //   // if we dont have anything in our cache and our expanded columns are a function
-  //   if (!this.loadedColumns.has(column.id) && isFunction(column.expandColumns)) {
-  //     // set our result to the function call of expandColumns
-  //     const result = await column.expandColumns();
-  //     // once we have the loaded columns, add result to local cache
-  //     this.loadedColumns.set(column.id, assignDefaultColumnIds(result));
-  //   }
-  // }
-
+  // load and trigger column to be expanded
   async loadExpandedColumns(column: GridColumnWithId<any>): Promise<void> {
+    // if we don't have anything in our cache and our expanded columns are a function
     if (!this.loadedColumns.has(column.id) && isFunction(column.expandColumns)) {
       // set our result to the function call of expandColumns
       const result = await column.expandColumns();
@@ -306,11 +296,6 @@ export class TableState {
         }),
       ).then(() => {
         const newExpandedIds = newExpanded.map((c) => c.id);
-        // newExpandedIds.forEach((id) => {
-        //   // manually toggle expanded column
-        //   this.toggleExpandedColumn(id);
-        // });
-
         if (newExpandedIds.length) {
           const newExpandedColumnIds = [...this.expandedColumnIds, ...newExpandedIds];
           this.expandedColumns.replace(newExpandedColumnIds);
@@ -321,7 +306,6 @@ export class TableState {
       });
     }
     sessionStorage.setItem(this.visibleColumnsStorageKey, JSON.stringify(ids));
-    // replace w/current columnSet
     this.visibleColumns.replace(ids);
   }
 

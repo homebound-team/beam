@@ -19,7 +19,6 @@ export function toContent(
   as: RenderAs,
   alignment: GridCellAlignment,
   column: GridColumnWithId<any>,
-  columns: GridColumnWithId<any>[],
   isExpandableHeader: boolean,
   isExpandable: boolean,
   minStickyLeftOffset: number,
@@ -59,15 +58,7 @@ export function toContent(
       />
     );
   } else if (content && typeof content === "string" && isExpandableHeader && isExpandable) {
-    return (
-      <ExpandableHeader
-        title={content}
-        column={column}
-        minStickyLeftOffset={minStickyLeftOffset}
-        as={as}
-        columns={columns}
-      />
-    );
+    return <ExpandableHeader title={content} column={column} minStickyLeftOffset={minStickyLeftOffset} as={as} />;
   } else if (content && typeof content === "string" && isExpandableHeader) {
     return <span css={Css.lineClamp2.$}>{content}</span>;
   } else if (!isContentEmpty(content) && isHeader && typeof content === "string") {
