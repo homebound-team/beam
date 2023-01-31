@@ -270,7 +270,7 @@ export class TableState {
       this.loadedColumns.set(column.id, assignDefaultColumnIds(result));
     }
     if (column.initExpanded) {
-      // manually toggle expanded column
+      // manually toggle expanded column if its already expanded
       this.toggleExpandedColumn(column.id);
     }
   }
