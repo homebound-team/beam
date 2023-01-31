@@ -1346,7 +1346,6 @@ export function ExpandableColumnsWithSetTimeout() {
       }),
       column<ExpandableRow>({
         expandableHeader: () => "Favorite Sports",
-        initExpanded: true,
         header: emptyCell,
         data: ({ favoriteSports = [] }, { expanded }) =>
           expanded ? <Chips values={favoriteSports} /> : favoriteSports.length,

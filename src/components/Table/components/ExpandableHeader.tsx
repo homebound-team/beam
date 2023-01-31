@@ -1,4 +1,4 @@
-import { ReactNode, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { Icon } from "src/components/Icon";
 import { GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -9,7 +9,7 @@ import { isFunction } from "src/utils";
 import { Loader } from "../../Loader";
 
 interface ExpandableHeaderProps<R extends Kinded> {
-  title: string | ReactNode;
+  title: string;
   column: GridColumnWithId<R>;
   minStickyLeftOffset: number;
   as: RenderAs;

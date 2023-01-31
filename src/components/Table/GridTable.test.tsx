@@ -2497,7 +2497,6 @@ describe("GridTable", () => {
 
     it("can expand columns when `expandedWidth` defines a value", async () => {
       // Given a table with `expandedWidth` defined
-
       const r = await render(
         <GridTable
           columns={[

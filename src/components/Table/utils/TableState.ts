@@ -238,14 +238,14 @@ export class TableState {
         existingExpandedColumnIds.push(...newExpandedColumnsIds);
       }
 
-      const test = columns.filter((c) => existingExpandedColumnIds.includes(c.id));
+      const newExpanded = columns.filter((c) => existingExpandedColumnIds.includes(c.id));
       // if we have existing expanded columns ids, then do a Promise.all() and execute column.expandColumns
       Promise.all(
-        test.map(async (c) => {
+        newExpanded.map(async (c) => {
           await this.loadExpandedColumns(c);
         }),
       ).then(() => {
-        const newIds = test.map((c) => c.id);
+        const newIds = newExpanded.map((c) => c.id);
         // if there is a difference between list of current expanded columns vs list we just created, then replace
 
         if (isInitial || isDifferent) {
