@@ -267,6 +267,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
 
         const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
+        const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
 
         const renderFn: RenderCellFn<any> =
           (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
@@ -277,7 +278,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);
 
-        return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick);
+        return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick, tooltip);
       })}
     </RowTag>
   );
