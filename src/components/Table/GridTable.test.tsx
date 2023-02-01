@@ -12,7 +12,7 @@ import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Checkbox, TextField } from "src/inputs";
-import { cell, cellAnd, cellOf, click, render, row, type, withRouter } from "src/utils/rtl";
+import { cell, cellAnd, cellOf, click, render, row, type, wait, withRouter } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
@@ -2732,10 +2732,8 @@ describe("GridTable", () => {
 
       // When rendering the table
       const r = await render(<Test />);
-
-      // Then the column is initially hidden - this is not hiding it
-      // expect(cell(r, 1, 0)).not.toBeVisible();
-
+      // Then the column is initially hidden
+      expect(row(r, 1).childNodes).toHaveLength(1);
       // When setting the column to be visible
       api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("myColumn2"));
       expect(row(r, 1).childNodes).toHaveLength(2);
@@ -2744,10 +2742,6 @@ describe("GridTable", () => {
 
       // then expect 2 columns + 2 expandable columns to be visible
       expect(row(r, 1).childNodes).toHaveLength(4);
-    });
-
-      // Then the newly visible column should initially be expanded
-      expect(cell(r, 1, 0)).toHaveTextContent("First name");
     });
   });
 });
