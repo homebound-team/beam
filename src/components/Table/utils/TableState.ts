@@ -218,6 +218,7 @@ export class TableState {
   setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
     const isInitial = !this.columns || this.columns.length === 0;
     if (columns !== this.columns) {
+      this.columns = columns;
       this.visibleColumnsStorageKey = visibleColumnsStorageKey ?? camelCase(columns.map((c) => c.id).join());
       this.visibleColumns.replace(readOrSetLocalVisibleColumnState(columns, this.visibleColumnsStorageKey));
       // list of local storage columns
