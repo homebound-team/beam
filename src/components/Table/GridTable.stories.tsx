@@ -1360,3 +1360,211 @@ export function ExpandableColumnsWithSetTimeout() {
     </div>
   );
 }
+
+type SimpleExpandableRow = ExpandHeader | Header | { id: string; kind: "data"; data: Data };
+export function Tooltips() {
+  const primitiveColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: () => ({
+      content: "Expandable header with tooltip",
+      tooltip: "Tooltip Text for Expandable Header",
+    }),
+    header: () => ({
+      content: "Primitive value - SortHeader with Tooltip",
+      tooltip: "This column demonstrates a tooltip on a cell that renders a primitive value (like a string)",
+    }),
+    data: ({ name, value }, { expanded }) => ({
+      content: expanded ? `Expanded - ${name}` : name,
+      tooltip: "Tooltip text for a primitive value",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "300px",
+    expandedWidth: "600px",
+  };
+  const withMarkupColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: () => ({
+      content: "Nothing to expand",
+      tooltip: "This demonstrates a tooltip on an expandable header cell that is not expandable",
+    }),
+    header: () => ({
+      content: () => <div>Cell with markup</div>,
+      tooltip: "This column demonstrates a tooltip on a cell that renders markup",
+    }),
+    data: ({ name, value }) => ({
+      content: () => <div>{name}</div>,
+      tooltip: "Cell tooltip for a value wrapped in markup",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    clientSideSort: false,
+    w: "220px",
+  };
+  const buttonColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: () => ({
+      content: "As button",
+      tooltip: "This column demonstrates a tooltip on a cell that renders a button element",
+    }),
+    data: ({ value }) => ({
+      content: "Trigger console log" + value,
+      onClick: () => console.log("clicked!"),
+      tooltip: "Cell tooltip for a button cell",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const linkColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: () => ({
+      content: "As link",
+      tooltip: "This column demonstrates a tooltip on a cell that renders a Link component",
+    }),
+    data: ({ value }) => ({
+      content: "Relative link: /",
+      onClick: "/",
+      tooltip: "Cell tooltip for a relative link / React Router Link component",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const externalLinkColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: () => ({
+      content: "As External link",
+      tooltip: "This column demonstrates a tooltip on a cell that renders an anchor element",
+    }),
+    data: ({ value }) => ({
+      content: "homebound.com",
+      onClick: "https://www.homebound.com",
+      tooltip: "Cell tooltip for an external link",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const truncatedColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: () => ({
+      content: "Truncated cells",
+      tooltip: "This column demonstrates a tooltip on a cell where the text should truncate",
+    }),
+    data: ({ name, value }) => ({
+      content: name!.repeat(2),
+      tooltip: "Tooltip for a truncated cell",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+    clientSideSort: false,
+  };
+
+  const primitiveColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: "Expandable header with tooltip",
+    header: "Primitive value - SortHeader with Tooltip",
+    data: ({ name, value }, { expanded }) => ({
+      content: expanded ? `Expanded - ${name}` : name,
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "300px",
+    expandedWidth: "600px",
+  };
+  const withMarkupColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: "Nothing to expand",
+    header: () => <div>Cell with markup</div>,
+    data: ({ name, value }) => ({
+      content: () => <div>{name}</div>,
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    clientSideSort: false,
+    w: "220px",
+  };
+  const buttonColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: "As button",
+    data: ({ value }) => ({
+      content: "Trigger console log" + value,
+      onClick: () => console.log("clicked!"),
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const linkColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: "As link",
+    data: ({ value }) => ({
+      content: "Relative link: /",
+      onClick: "/",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const externalLinkColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: "As External link",
+    data: ({ value }) => ({
+      content: "homebound.com",
+      onClick: "https://www.homebound.com",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const truncatedColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: "Truncated cells",
+    data: ({ name, value }) => ({
+      content: name!.repeat(2),
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+    clientSideSort: false,
+  };
+
+  return (
+    <div css={Css.bgGray100.p2.$}>
+      <h1 css={Css.xlMd.$}>Fixed Row Height</h1>
+      <GridTable
+        style={{ allWhite: true, rowHeight: "fixed" }}
+        columns={[primitiveColumn, withMarkupColumn, buttonColumn, linkColumn, externalLinkColumn, truncatedColumn]}
+        sorting={{ on: "client", initial: [buttonColumn.id!, "ASC"] }}
+        rows={[
+          { kind: "header", id: "header", data: {} },
+          { kind: "expandableHeader", id: "expandableHeader", data: {} },
+          { kind: "data", id: "1", data: { name: "Tony Stark, Iron Man", value: 1 } },
+          { kind: "data", id: "2", data: { name: "Natasha Romanova, Black Widow", value: 2 } },
+          { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
+        ]}
+      />
+      <h1 css={Css.xlMd.mt4.$}>Flexible Row Height</h1>
+      <GridTable
+        style={{ allWhite: true }}
+        columns={[primitiveColumn, withMarkupColumn, buttonColumn, linkColumn, externalLinkColumn, truncatedColumn]}
+        sorting={{ on: "client", initial: [buttonColumn.id!, "ASC"] }}
+        rows={[
+          { kind: "header", id: "header", data: {} },
+          { kind: "expandableHeader", id: "expandableHeader", data: {} },
+          { kind: "data", id: "1", data: { name: "Tony Stark, Iron Man", value: 1 } },
+          { kind: "data", id: "2", data: { name: "Natasha Romanova, Black Widow", value: 2 } },
+          { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
+        ]}
+      />
+      <h1 css={Css.xlMd.mt4.$}>
+        Without Tooltips - <span css={Css.base.$}>For visual comparison</span>
+      </h1>
+      <GridTable
+        style={{ allWhite: true }}
+        columns={[
+          primitiveColumnWoTt,
+          withMarkupColumnWoTt,
+          buttonColumnWoTt,
+          linkColumnWoTt,
+          externalLinkColumnWoTt,
+          truncatedColumnWoTt,
+        ]}
+        sorting={{ on: "client", initial: [buttonColumn.id!, "ASC"] }}
+        rows={[
+          { kind: "header", id: "header", data: {} },
+          { kind: "expandableHeader", id: "expandableHeader", data: {} },
+          { kind: "data", id: "1", data: { name: "Tony Stark, Iron Man", value: 1 } },
+          { kind: "data", id: "2", data: { name: "Natasha Romanova, Black Widow", value: 2 } },
+          { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
+        ]}
+      />
+    </div>
+  );
+}
