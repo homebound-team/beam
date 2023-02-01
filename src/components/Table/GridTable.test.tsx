@@ -2643,7 +2643,7 @@ describe("GridTable", () => {
       expect(sessionStorage.getItem(`expandedColumn_${tableIdentifier}`)).toBe('["beamColumn_0"]');
     });
 
-    it("respects initially expands columns set in localstorage ", async () => {
+    it("respects initially expands columns set in localstorage", async () => {
       const tableIdentifier = "persistCollapse";
 
       sessionStorage.setItem(`expandedColumn_${tableIdentifier}`, JSON.stringify(["column1"]));
@@ -2742,6 +2742,69 @@ describe("GridTable", () => {
 
       // then expect 2 columns + 2 expandable columns to be visible
       expect(row(r, 1).childNodes).toHaveLength(4);
+    });
+
+    it("ignores initExpanded for existing columns on rerender", async () => {
+      // Given a table with a column that is initially expanded
+      // And a table tied to the GridTableApi
+      const api: MutableRefObject<GridTableApi<ExpandableRow> | undefined> = { current: undefined };
+
+      function Test() {
+        const _api = useGridTableApi<ExpandableRow>();
+        api.current = _api;
+        return (
+          <GridTable
+            api={_api}
+            columns={[
+              column<ExpandableRow>({
+                id: "columnA",
+                expandableHeader: () => "Client name",
+                initExpanded: true,
+                header: (data, { expanded }) => (expanded ? "First name" : "Full name"),
+                data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+                expandColumns: [
+                  column<ExpandableRow>({
+                    expandableHeader: emptyCell,
+                    header: "Last name",
+                    data: ({ lastName }) => lastName,
+                  }),
+                ],
+              }),
+              column<ExpandableRow>({
+                id: "columnB",
+                initVisible: false,
+                canHide: true,
+                expandableHeader: () => "Age",
+                header: emptyCell,
+                data: ({ age }) => age,
+              }),
+            ]}
+            rows={[
+              { kind: "header", id: "header", data: {} },
+              { kind: "expandableHeader", id: "expandableHeader", data: {} },
+              { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+            ]}
+          />
+        );
+      }
+
+      // When rendering the table
+      const r = await render(<Test />);
+
+      // Then the column is initially expanded (1 column + 1 expanded column)
+      expect(row(r, 1).childNodes).toHaveLength(2);
+
+      //  When clicking to collapse `columnA`
+      click(r.expandableColumn);
+
+      // Then the column is collapsed
+      expect(row(r, 1).childNodes).toHaveLength(1);
+
+      // And when then triggering new `columnB` to be introduced
+      api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("columnB"));
+
+      // Then the `columnA` remains collapsed
+      expect(row(r, 1).childNodes).toHaveLength(2);
     });
   });
 });

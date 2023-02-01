@@ -228,7 +228,7 @@ export class TableState {
       // list of all existing columns
       const existingColumnIds = this.columns.map((c) => c.id);
 
-      // filter existing columns that are initExpanded to see which are new
+      // filter to find new columns that should be initially expanded
       const newExpandedColumnsIds = columns
         .filter((c) => !existingColumnIds.includes(c.id) && c.initExpanded)
         .map((c) => c.id);
@@ -253,7 +253,7 @@ export class TableState {
         }
         //  update our persistCollapse if set
         if (this.persistCollapse) {
-          sessionStorage.setItem(`expandedColumn_${this.persistCollapse}`, JSON.stringify(newIds));
+          sessionStorage.setItem(getColumnStorageKey(this.persistCollapse), JSON.stringify(newIds));
         }
       });
       this.columns = columns;
@@ -300,7 +300,7 @@ export class TableState {
           const newExpandedColumnIds = [...this.expandedColumnIds, ...newExpandedIds];
           this.expandedColumns.replace(newExpandedColumnIds);
           if (this.persistCollapse) {
-            sessionStorage.setItem(`expandedColumn_${this.persistCollapse}`, JSON.stringify(newExpandedColumnIds));
+            sessionStorage.setItem(getColumnStorageKey(this.persistCollapse), JSON.stringify(newExpandedColumnIds));
           }
         }
       });
@@ -325,7 +325,7 @@ export class TableState {
     }
 
     if (this.persistCollapse) {
-      sessionStorage.setItem(`expandedColumn_${this.persistCollapse}`, JSON.stringify(this.expandedColumnIds));
+      sessionStorage.setItem(getColumnStorageKey(this.persistCollapse), JSON.stringify(this.expandedColumnIds));
     }
   }
 
@@ -507,7 +507,7 @@ function readCollapsedRowStorage(persistCollapse: string): string[] {
 }
 
 function readExpandedColumnsStorage(persistCollapse: string): string[] {
-  const expandedGridColumnIds = sessionStorage.getItem(`expandedColumn_${persistCollapse}`);
+  const expandedGridColumnIds = sessionStorage.getItem(getColumnStorageKey(persistCollapse));
   return expandedGridColumnIds ? JSON.parse(expandedGridColumnIds) : [];
 }
 
@@ -563,6 +563,10 @@ function getCollapsedIdsFromRows(rows: GridDataRow<any>[]): string[] {
 function flattenRows(rows: GridDataRow<any>[]): GridDataRow<any>[] {
   const childRows = rows.flatMap((r) => (r.children ? flattenRows(r.children) : []));
   return [...rows, ...childRows];
+}
+
+function getColumnStorageKey(storageKey: string): string {
+  return `expandedColumn_${storageKey}`;
 }
 
 // Exported for testing purposes
