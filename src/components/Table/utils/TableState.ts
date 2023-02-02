@@ -222,42 +222,39 @@ export class TableState {
       this.visibleColumns.replace(readOrSetLocalVisibleColumnState(columns, this.visibleColumnsStorageKey));
       // list of local storage columns
       const localStorageColumns = this.persistCollapse ? readExpandedColumnsStorage(this.persistCollapse) : [];
-      // expandedColumnIds initialized as localStorageColumns
-      const existingExpandedColumnIds = isInitial ? localStorageColumns : this.expandedColumnIds;
+
+      // Keep track of which columns need to be expanded
+      const toExpandColumnIds = isInitial ? localStorageColumns : [];
+      // and which columns are already expanded.
+      const alreadyExpandedColumnIds = isInitial ? [] : this.expandedColumnIds;
 
       // list of all existing columns
       const existingColumnIds = this.columns.map((c) => c.id);
 
       // filter to find new columns that should be initially expanded
-      const newExpandedColumnsIds = columns
-        .filter((c) => !existingColumnIds.includes(c.id) && c.initExpanded)
-        .map((c) => c.id);
+      toExpandColumnIds.push(
+        ...columns.filter((c) => !existingColumnIds.includes(c.id) && c.initExpanded).map((c) => c.id),
+      );
 
-      const isDifferent = !newExpandedColumnsIds.every((c) => existingExpandedColumnIds.includes(c));
-      if (isDifferent) {
-        existingExpandedColumnIds.push(...newExpandedColumnsIds);
-      }
+      const columnsToExpand = columns.filter((c) => toExpandColumnIds.includes(c.id));
 
-      const newExpanded = columns.filter((c) => existingExpandedColumnIds.includes(c.id));
       // if we have existing expanded columns ids, then do a Promise.all() and execute column.expandColumns
       Promise.all(
-        newExpanded.map(async (c) => {
-          // if the column is initExpanded, manually toggle the column
-          if (c.initExpanded) {
-            this.toggleExpandedColumn(c.id);
-          }
+        columnsToExpand.map(async (c) => {
           await this.loadExpandedColumns(c);
         }),
       ).then(() => {
-        const newIds = newExpanded.map((c) => c.id);
-        // if there is a difference between list of current expanded columns vs list we just created, then replace
+        const allExpandedColumnIds = [...this.expandedColumnIds, ...columnsToExpand.map((c) => c.id)];
 
+        // if there is a difference between list of current expanded columns vs list we just created, then replace
+        const isDifferent = !alreadyExpandedColumnIds.every((c) => toExpandColumnIds.includes(c));
         if (isInitial || isDifferent) {
-          this.expandedColumns.replace(newIds);
+          this.expandedColumns.replace(allExpandedColumnIds);
         }
+
         //  update our persistCollapse if set
         if (this.persistCollapse) {
-          sessionStorage.setItem(getColumnStorageKey(this.persistCollapse), JSON.stringify(newIds));
+          sessionStorage.setItem(getColumnStorageKey(this.persistCollapse), JSON.stringify(allExpandedColumnIds));
         }
       });
       this.columns = columns;
@@ -290,10 +287,6 @@ export class TableState {
       // here do a Promise.all() and execute column.expandColumns if necessary.
       Promise.all(
         newExpanded.map(async (c) => {
-          // if the column is initExpanded, manually toggle the column
-          if (c.initExpanded) {
-            this.toggleExpandedColumn(c.id);
-          }
           await this.loadExpandedColumns(c);
         }),
       ).then(() => {
@@ -305,10 +298,11 @@ export class TableState {
             sessionStorage.setItem(getColumnStorageKey(this.persistCollapse), JSON.stringify(newExpandedColumnIds));
           }
         }
+
+        sessionStorage.setItem(this.visibleColumnsStorageKey, JSON.stringify(ids));
+        this.visibleColumns.replace(ids);
       });
     }
-    sessionStorage.setItem(this.visibleColumnsStorageKey, JSON.stringify(ids));
-    this.visibleColumns.replace(ids);
   }
 
   get visibleColumnIds(): string[] {
