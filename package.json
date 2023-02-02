@@ -30,7 +30,8 @@
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded --only-changed",
     "copy": "npx copyfiles -u 1 \"./src/**/*.css\" \"./dist/\"",
     "copy-to-internal-frontend": "cp -r dist/* ~/homebound/internal-frontend/node_modules/@homebound/beam/dist/",
-    "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\""
+    "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\"",
+    "type-check": "ttsc --noEmit"
   },
   "dependencies": {
     "@homebound/form-state": "^2.15.3",
