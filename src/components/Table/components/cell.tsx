@@ -31,7 +31,7 @@ export type GridCellContent = {
   css?: Properties;
   /** Allows cell to reveal content when the user hovers over a row. Content must be wrapped in an element in order to be hidden. IE <div>{value}</div>*/
   revealOnRowHover?: true;
-  /** Tooltip to add to a cell. **Only Works on Headers** */
+  /** Tooltip to add to a cell */
   tooltip?: ReactNode;
 };
 
