@@ -61,7 +61,13 @@ export function toContent(
     return <ExpandableHeader title={content} column={column} minStickyLeftOffset={minStickyLeftOffset} as={as} />;
   } else if (content && typeof content === "string" && isExpandableHeader) {
     return <span css={Css.lineClamp2.$}>{content}</span>;
-  } else if (content && style?.presentationSettings?.wrap === false && typeof content === "string") {
+  } else if (!isContentEmpty(content) && isHeader && typeof content === "string") {
+    return (
+      <span css={Css.lineClamp2.$} title={content}>
+        {content}
+      </span>
+    );
+  } else if (!isHeader && content && style?.presentationSettings?.wrap === false && typeof content === "string") {
     // In order to truncate the text properly, then we need to wrap it in another element
     // as our cell element is a flex container, which don't allow for applying truncation styles directly on it.
     return (

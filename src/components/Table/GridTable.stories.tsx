@@ -14,6 +14,7 @@ import {
   dateColumn,
   defaultStyle,
   emptyCell,
+  GridCellAlignment,
   GridColumn,
   GridDataRow,
   GridRowLookup,
@@ -1564,6 +1565,58 @@ export function Tooltips() {
           { kind: "data", id: "2", data: { name: "Natasha Romanova, Black Widow", value: 2 } },
           { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
         ]}
+      />
+    </div>
+  );
+}
+
+export function Headers() {
+  function makeColumn(
+    header: string | (() => JSX.Element),
+    clientSideSort: boolean = true,
+    align: GridCellAlignment = "left",
+  ) {
+    return column<Row>({ header, data: ({ value }) => value, w: "172px", clientSideSort, align });
+  }
+  const columns = [
+    makeColumn("Sortable"),
+    makeColumn("Sortable With multiple lines of text. ".repeat(2)),
+    makeColumn("Sortable aligned right", true, "right"),
+    makeColumn("Sortable aligned right With multiple lines of text. ".repeat(2), true, "right"),
+    makeColumn("Not Sortable", false),
+    makeColumn("Not Sortable with multiple lines of text. ".repeat(2), false),
+    makeColumn(() => <span>With Markup</span>),
+    makeColumn(() => (
+      <span css={Css.lineClamp2.$}>{`With Markup and multiple lines of that will also truncate`.repeat(2)}</span>
+    )),
+  ];
+  return (
+    <div css={Css.p2.$}>
+      <h1 css={Css.xlMd.$}>Default Style</h1>
+      <GridTable
+        columns={columns}
+        style={{}}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "B", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
+        ]}
+        sorting={{ on: "client" }}
+      />
+      <h1 css={Css.xlMd.mt4.$}>
+        <pre>rowHeight: fixed</pre>
+      </h1>
+      <GridTable
+        columns={columns}
+        style={{ rowHeight: "fixed" }}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "B", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
+        ]}
+        sorting={{ on: "client" }}
       />
     </div>
   );

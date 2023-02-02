@@ -52,7 +52,7 @@ export function SortHeader(props: SortHeaderProps) {
   return (
     <div {...tid} css={{ ...Css.df.aic.h100.cursorPointer.selectNone.$, ...xss }} {...hoverProps} onClick={toggleSort}>
       {iconOnLeft && icon}
-      {content}
+      <span css={Css.lineClamp2.$}>{content}</span>
       {!iconOnLeft && icon}
     </div>
   );
