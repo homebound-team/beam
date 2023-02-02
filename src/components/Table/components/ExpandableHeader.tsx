@@ -35,12 +35,10 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
         if (isFunction(column.expandColumns)) {
           setIsLoading(true);
           await tableState.loadExpandedColumns(column);
-          // manually calling this as loadExpandedColumns does not toggle
-          tableState.toggleExpandedColumn(column.id);
           setIsLoading(false);
-        } else {
-          tableState.toggleExpandedColumn(column.id);
         }
+        // manually calling this as loadExpandedColumns does not toggle
+        tableState.toggleExpandedColumn(column.id);
       }}
       data-testid="expandableColumn"
     >
