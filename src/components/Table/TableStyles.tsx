@@ -103,7 +103,9 @@ function memoizedTableStyles() {
         emptyCell: "-",
         firstRowMessageCss: Css.tc.py3.$,
         headerCellCss: {
-          ...Css.gray700.xsMd.bgGray200.aic.nowrap.pxPx(12).hPx(40).$,
+          // `unset`-ing the white-space: nowrap defined in `cellCss` below. Header's will add `lineClamp2` more locally in their renders.
+          // Not setting `lineClamp2` here as it sets `display: webkit-box`, which disables `align-items: center` (requires `display: flex/grid`)
+          ...Css.gray700.xsMd.bgGray200.aic.pxPx(12).whiteSpace("unset").hPx(40).$,
           ...(allWhite && Css.bgWhite.$),
         },
         totalsCellCss: Css.bgWhite.gray700.smMd.hPx(totalsRowHeight).pPx(12).boxShadow("none").$,
