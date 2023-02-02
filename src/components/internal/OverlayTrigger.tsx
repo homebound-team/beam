@@ -91,7 +91,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           endAdornment={!hideEndAdornment ? <Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} /> : null}
           disabled={disabled}
           tooltip={tooltip}
-          onClick={noop}
+          onClick={menuTriggerProps.onPress ?? noop}
           forceFocusStyles={showActiveBorder && state.isOpen}
           {...tid}
         />
@@ -113,7 +113,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           {...tid}
           disabled={disabled}
           tooltip={tooltip}
-          onClick={noop}
+          onClick={menuTriggerProps.onPress ?? noop}
           forceFocusStyles={showActiveBorder && state.isOpen}
         />
       ) : (
@@ -124,7 +124,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           {...tid}
           disabled={disabled}
           tooltip={tooltip}
-          onClick={noop}
+          onClick={menuTriggerProps.onPress ?? noop}
           forceFocusStyles={showActiveBorder && state.isOpen}
         />
       )}
