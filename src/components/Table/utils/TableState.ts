@@ -242,6 +242,10 @@ export class TableState {
       // if we have existing expanded columns ids, then do a Promise.all() and execute column.expandColumns
       Promise.all(
         newExpanded.map(async (c) => {
+          // if the column is initExpanded, manually toggle the column
+          if (c.initExpanded) {
+            this.toggleExpandedColumn(c.id);
+          }
           await this.loadExpandedColumns(c);
         }),
       ).then(() => {
@@ -269,10 +273,6 @@ export class TableState {
       // once we have the loaded columns, add result to local cache
       this.loadedColumns.set(column.id, assignDefaultColumnIds(result));
     }
-    if (column.initExpanded) {
-      // manually toggle expanded column
-      this.toggleExpandedColumn(column.id);
-    }
   }
 
   // if there is a promise, then load the expandable columns from the cache, if not then return the expandedColumns
@@ -290,9 +290,11 @@ export class TableState {
       // here do a Promise.all() and execute column.expandColumns if necessary.
       Promise.all(
         newExpanded.map(async (c) => {
+          // if the column is initExpanded, manually toggle the column
+          if (c.initExpanded) {
+            this.toggleExpandedColumn(c.id);
+          }
           await this.loadExpandedColumns(c);
-          // manually toggle expanded column
-          await this.toggleExpandedColumn(c.id);
         }),
       ).then(() => {
         const newExpandedIds = newExpanded.map((c) => c.id);
