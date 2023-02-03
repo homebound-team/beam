@@ -25,7 +25,15 @@ class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, 
     inModal: boolean,
     vertical: boolean,
   ) {
-    const { label, defaultValue, options: maybeOptions, getOptionLabel, getOptionValue, ...props } = this.props;
+    const {
+      label,
+      defaultValue,
+      options: maybeOptions,
+      getOptionLabel,
+      getOptionValue,
+      nothingSelectedText,
+      ...props
+    } = this.props;
 
     const options = Array.isArray(maybeOptions)
       ? [allOption as O, ...maybeOptions]
@@ -42,7 +50,7 @@ class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, 
         label={this.label}
         labelStyle={inModal ? "hidden" : !inModal && !vertical ? "inline" : "above"}
         sizeToContent={!inModal && !vertical}
-        nothingSelectedText="All"
+        nothingSelectedText={nothingSelectedText || "All"}
         onSelect={(value) => setValue(value || undefined)}
         {...this.testId(tid)}
       />
