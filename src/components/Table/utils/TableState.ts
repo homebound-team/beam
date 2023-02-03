@@ -311,7 +311,7 @@ export class TableState {
   }
 
   setVisibleColumns(ids: string[]) {
-    // check to see if we have newly visible columns
+    // If we have a new visible columns, then we need to check if some need to be initially expanded when made visible
     if (ids.length > this.visibleColumnIds.length) {
       // Get a list of columns that are just now being made visible.
       const newlyVisibleIds = ids.filter((id) => !this.visibleColumnIds.includes(id));
