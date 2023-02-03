@@ -235,10 +235,6 @@ export class TableState {
       columnIdsToExpand.push(
         ...columns.filter((c) => !existingColumnIds.includes(c.id) && c.initExpanded).map((c) => c.id),
       );
-      // we have to somehow load the already expanded columns - this logic is ignoring the refresh and is only looking at new expanded columns to load but what about subsequent loads?
-      const columnsToExpand = columns.filter(
-        (c) => columnIdsToExpand.includes(c.id) || columnIdsAlreadyExpanded.includes(c.id),
-      );
 
       // Send the new array of columns along to be parsed and expanded.
       this.parseAndUpdateExpandedColumns(columns.filter((c) => columnIdsToExpand.includes(c.id)));
