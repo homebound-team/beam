@@ -55,7 +55,7 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
       );
     }
 
-    const { defaultValue, ...props } = this.props;
+    const { defaultValue, nothingSelectedText, ...props } = this.props;
     return (
       <MultiSelectField<O, V>
         {...props}
@@ -67,7 +67,7 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
         onSelect={(values) => {
           setValue(values.length === 0 ? undefined : values);
         }}
-        nothingSelectedText="All"
+        nothingSelectedText={nothingSelectedText ?? "All"}
         {...this.testId(tid)}
       />
     );
