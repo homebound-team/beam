@@ -12,7 +12,7 @@ import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Checkbox, TextField } from "src/inputs";
-import { cell, cellAnd, cellOf, click, render, row, type, withRouter } from "src/utils/rtl";
+import { cell, cellAnd, cellOf, click, render, row, type, wait, withRouter } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
@@ -2603,6 +2603,208 @@ describe("GridTable", () => {
       // And the parent row should return to indeterminate,
       expect(cellAnd(r, 2, 1, "select")).toBePartiallyChecked();
       expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1gc2"]);
+    });
+
+    it("respects initExpand and updates localStorage", async () => {
+      const tableIdentifier = "persistCollapse";
+
+      // Given a table with expandable columns that are initially expanded
+      // When initially rendered with the expandable column set to `initExpanded: true`.
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              expandableHeader: () => "Client name",
+              initExpanded: true,
+              header: () => "First name",
+              data: ({ firstName }) => firstName,
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                }),
+              ],
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+          persistCollapse={tableIdentifier}
+        />,
+      );
+
+      // Then the column is initially expanded
+      expect(cell(r, 1, 0)).toHaveTextContent("First name");
+      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
+      // And the local storage value is updated with the current state
+      expect(sessionStorage.getItem(`expandedColumn_${tableIdentifier}`)).toBe('["beamColumn_0"]');
+    });
+
+    it("respects initially expands columns set in localstorage", async () => {
+      const tableIdentifier = "persistCollapse";
+
+      sessionStorage.setItem(`expandedColumn_${tableIdentifier}`, JSON.stringify(["column1"]));
+
+      // Given a table with expandable columns that are initially expanded
+      // When initially rendered with the expandable column not initially collapsed
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              id: "column1",
+              expandableHeader: () => "Client name",
+              header: () => "First name",
+              data: ({ firstName }) => firstName,
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                }),
+              ],
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+          persistCollapse={tableIdentifier}
+        />,
+      );
+
+      // Then the column is initially expanded
+      expect(cell(r, 1, 0)).toHaveTextContent("First name");
+      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
+    });
+
+    it("ignores init expanded, but respects new columns", async () => {
+      // Given a table with a column that is initially hidden, and initially expanded where the expanded columns are lazily loaded
+      const columns: GridColumn<ExpandableRow>[] = [
+        {
+          id: "myColumn",
+          header: emptyCell,
+          data: ({ firstName }) => firstName,
+          expandableHeader: "First Name",
+        },
+        {
+          id: "myColumn2",
+          initVisible: false,
+          initExpanded: true,
+          canHide: true,
+          header: "First",
+          data: ({ firstName }) => firstName,
+          expandableHeader: "name",
+          expandColumns: async () => [
+            column<ExpandableRow>({
+              expandableHeader: emptyCell,
+              header: "Last Name",
+              data: ({ lastName }) => lastName,
+              w: "250px",
+            }),
+            column<ExpandableRow>({
+              expandableHeader: emptyCell,
+              header: "Age",
+              data: ({ age }) => age,
+              w: "80px",
+            }),
+          ],
+        },
+      ];
+
+      const rows: GridDataRow<ExpandableRow>[] = [
+        { kind: "header", id: "header", data: {} },
+        { kind: "expandableHeader", id: "expandableHeader", data: {} },
+        { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+      ];
+
+      // And a table tied to the GridTableApi
+      const api: MutableRefObject<GridTableApi<ExpandableRow> | undefined> = { current: undefined };
+
+      function Test() {
+        const _api = useGridTableApi<ExpandableRow>();
+        api.current = _api;
+        return <GridTable api={_api} columns={columns} rows={rows} />;
+      }
+
+      // When rendering the table
+      const r = await render(<Test />);
+      // Then the column is initially hidden
+      expect(row(r, 1).childNodes).toHaveLength(1);
+      // When setting the column to be visible
+      api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("myColumn2"));
+      // wait for promise to resolve
+      await wait();
+
+      // then expect 2 columns + 2 expandable columns to be visible
+      expect(row(r, 1).childNodes).toHaveLength(4);
+    });
+
+    it("ignores initExpanded for existing columns on rerender", async () => {
+      // Given a table with a column that is initially expanded
+      // And a table tied to the GridTableApi
+      const api: MutableRefObject<GridTableApi<ExpandableRow> | undefined> = { current: undefined };
+
+      function Test() {
+        const _api = useGridTableApi<ExpandableRow>();
+        api.current = _api;
+        return (
+          <GridTable
+            api={_api}
+            columns={[
+              column<ExpandableRow>({
+                id: "columnA",
+                expandableHeader: () => "Client name",
+                initExpanded: true,
+                header: (data, { expanded }) => (expanded ? "First name" : "Full name"),
+                data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+                expandColumns: [
+                  column<ExpandableRow>({
+                    expandableHeader: emptyCell,
+                    header: "Last name",
+                    data: ({ lastName }) => lastName,
+                  }),
+                ],
+              }),
+              column<ExpandableRow>({
+                id: "columnB",
+                initVisible: false,
+                canHide: true,
+                expandableHeader: () => "Age",
+                header: emptyCell,
+                data: ({ age }) => age,
+              }),
+            ]}
+            rows={[
+              { kind: "header", id: "header", data: {} },
+              { kind: "expandableHeader", id: "expandableHeader", data: {} },
+              { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+            ]}
+          />
+        );
+      }
+
+      // When rendering the table
+      const r = await render(<Test />);
+
+      // Then the column is initially expanded (1 column + 1 expanded column)
+      expect(row(r, 1).childNodes).toHaveLength(2);
+
+      //  When clicking to collapse `columnA`
+      click(r.expandableColumn);
+
+      // Then the column is collapsed
+      expect(row(r, 1).childNodes).toHaveLength(1);
+
+      // And when then triggering new `columnB` to be introduced
+      api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("columnB"));
+      await wait();
+
+      // Then the `columnA` remains collapsed
+      expect(row(r, 1).childNodes).toHaveLength(2);
     });
   });
 });

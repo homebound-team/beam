@@ -196,7 +196,7 @@ export class TableState {
           (maybeNewRowId) =>
             !flattenedExistingIds.includes(maybeNewRowId) &&
             // Using `!` on `this.persistCollapse!` as `checkLocalStorage` ensures this.persistCollapse is truthy
-            (!checkLocalStorage || readLocalCollapseState(this.persistCollapse!).includes(maybeNewRowId)),
+            (!checkLocalStorage || readCollapsedRowStorage(this.persistCollapse!).includes(maybeNewRowId)),
         );
 
         // If there are new rows that should be collapsed then update the collapsedRows arrays
@@ -218,33 +218,103 @@ export class TableState {
   setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
     const isInitial = !this.columns || this.columns.length === 0;
     if (columns !== this.columns) {
-      this.columns = columns;
       this.visibleColumnsStorageKey = visibleColumnsStorageKey ?? camelCase(columns.map((c) => c.id).join());
       this.visibleColumns.replace(readOrSetLocalVisibleColumnState(columns, this.visibleColumnsStorageKey));
-      const expandedColumnIds = columns.filter((c) => c.initExpanded).map((c) => c.id);
-      if (isInitial) this.expandedColumns.replace(expandedColumnIds);
+
+      // Figure out which columns need to be expanded when rendering a new set of columns
+      const localStorageColumns = this.persistCollapse ? readExpandedColumnsStorage(this.persistCollapse) : [];
+      // On initial render the columns we start with is whatever is in local storage.
+      // On any subsequent render, we start with an empty array.
+      // (We'll add to this after figuring out which columns are new vs existing.)
+      const columnIdsToExpand = isInitial ? localStorageColumns : [];
+
+      // Create a list of all existing column ids. (We ignore the `initExpanded` property for existing columns)
+      const existingColumnIds = this.columns.map((c) => c.id);
+
+      // Add any columns to our array that are new columns that should be initially expanded.
+      columnIdsToExpand.push(
+        ...columns.filter((c) => !existingColumnIds.includes(c.id) && c.initExpanded).map((c) => c.id),
+      );
+
+      // Send the new array of columns along to be parsed and expanded.
+      this.parseAndUpdateExpandedColumns(columns.filter((c) => columnIdsToExpand.includes(c.id)));
+
+      this.columns = columns;
+    }
+  }
+
+  /** Determines which columns to expand immediately vs async */
+  parseAndUpdateExpandedColumns(columnsToExpand: GridColumnWithId<any>[]) {
+    // Separate out which columns need to be loaded async vs which can be loaded immediately.
+    const [localColumnsToExpand, asyncColumnsToExpand] = columnsToExpand.reduce(
+      (acc, c) => {
+        if (isFunction(c.expandColumns)) {
+          return [acc[0], acc[1].concat(c)];
+        }
+        return [acc[0].concat(c), acc[1]];
+      },
+      [[] as GridColumnWithId<any>[], [] as GridColumnWithId<any>[]],
+    );
+
+    // Handle all async expanding columns using a Promise.all.
+    // This will allow the table to render immediately, then cause a rerender with the new columns
+    if (asyncColumnsToExpand.length > 0) {
+      Promise.all(asyncColumnsToExpand.map(async (c) => await this.loadExpandedColumns(c))).then(() =>
+        this.updateExpandedColumns(asyncColumnsToExpand),
+      );
+    }
+
+    // For local columns, we skip the Promise in order to have the correct state on the initial load.
+    if (localColumnsToExpand.length > 0) {
+      this.updateExpandedColumns(localColumnsToExpand);
+    }
+  }
+
+  /** Updates the state of which columns are expanded */
+  updateExpandedColumns(newColumns: GridColumnWithId<any>[]) {
+    const newColumnIds = newColumns.map((c) => c.id);
+
+    // If there is a difference between list of current expanded columns vs list we just created, then replace
+    const isDifferent =
+      newColumnIds.length !== this.expandedColumnIds.length ||
+      !this.expandedColumnIds.every((c) => newColumnIds.includes(c));
+
+    if (isDifferent) {
+      // Note: `this.expandedColumns` is a Set, so it will take care of dedupe-ing.
+      this.expandedColumns.replace([...this.expandedColumnIds, ...newColumnIds]);
+
+      // Update session storage if necessary.
+      if (this.persistCollapse) {
+        sessionStorage.setItem(getColumnStorageKey(this.persistCollapse), JSON.stringify([...this.expandedColumns]));
+      }
     }
   }
 
   // load and trigger column to be expanded
   async loadExpandedColumns(column: GridColumnWithId<any>): Promise<void> {
-    // if we dont have anything in our cache and our expanded columns are a function
+    // if we don't have anything in our cache and our expanded columns are a function
     if (!this.loadedColumns.has(column.id) && isFunction(column.expandColumns)) {
       // set our result to the function call of expandColumns
       const result = await column.expandColumns();
       // once we have the loaded columns, add result to local cache
       this.loadedColumns.set(column.id, assignDefaultColumnIds(result));
     }
-    // once column is in local cache, then toggle
-    this.toggleExpandedColumn(column.id);
   }
 
-  // if there is a promise, then load the expandable columns from the cache, if not then return the expandedColumns
+  // if there is a promise, then grab the already loaded expandable columns from the cache, if not then return the expandedColumns property
   getExpandedColumns(column: GridColumnWithId<any>): GridColumnWithId<any>[] {
     return isFunction(column.expandColumns) ? this.loadedColumns.get(column.id) ?? [] : column.expandColumns ?? [];
   }
 
   setVisibleColumns(ids: string[]) {
+    // If we have a new visible columns, then we need to check if some need to be initially expanded when made visible
+    if (ids.length > this.visibleColumnIds.length) {
+      // Get a list of columns that are just now being made visible.
+      const newlyVisibleIds = ids.filter((id) => !this.visibleColumnIds.includes(id));
+      // Figure out if any of these newly visible columns needs to be initially expanded.
+      const columnsToExpand = this.columns.filter((c) => newlyVisibleIds.includes(c.id) && c.initExpanded);
+      this.parseAndUpdateExpandedColumns(columnsToExpand);
+    }
     sessionStorage.setItem(this.visibleColumnsStorageKey, JSON.stringify(ids));
     this.visibleColumns.replace(ids);
   }
@@ -262,6 +332,10 @@ export class TableState {
       this.expandedColumns.delete(columnId);
     } else {
       this.expandedColumns.add(columnId);
+    }
+
+    if (this.persistCollapse) {
+      sessionStorage.setItem(getColumnStorageKey(this.persistCollapse), JSON.stringify(this.expandedColumnIds));
     }
   }
 
@@ -437,10 +511,14 @@ export const TableStateContext = React.createContext<{ tableState: TableState }>
   },
 });
 
-// Get the rows that are already in the toggled state, so we can keep them toggled
-function readLocalCollapseState(persistCollapse: string): string[] {
+function readCollapsedRowStorage(persistCollapse: string): string[] {
   const collapsedGridRowIds = sessionStorage.getItem(persistCollapse);
   return collapsedGridRowIds ? JSON.parse(collapsedGridRowIds) : [];
+}
+
+function readExpandedColumnsStorage(persistCollapse: string): string[] {
+  const expandedGridColumnIds = sessionStorage.getItem(getColumnStorageKey(persistCollapse));
+  return expandedGridColumnIds ? JSON.parse(expandedGridColumnIds) : [];
 }
 
 // Get the columns that are already in the visible state so we keep them toggled.
@@ -495,6 +573,10 @@ function getCollapsedIdsFromRows(rows: GridDataRow<any>[]): string[] {
 function flattenRows(rows: GridDataRow<any>[]): GridDataRow<any>[] {
   const childRows = rows.flatMap((r) => (r.children ? flattenRows(r.children) : []));
   return [...rows, ...childRows];
+}
+
+function getColumnStorageKey(storageKey: string): string {
+  return `expandedColumn_${storageKey}`;
 }
 
 // Exported for testing purposes
