@@ -2495,7 +2495,7 @@ describe("GridTable", () => {
       expect(cell(r, 1, 1)).toHaveTextContent("Last name");
     });
 
-    it.skip("can expand columns when `expandedWidth` defines a value", async () => {
+    it("can expand columns when `expandedWidth` defines a value", async () => {
       // Given a table with `expandedWidth` defined
       const r = await render(
         <GridTable
