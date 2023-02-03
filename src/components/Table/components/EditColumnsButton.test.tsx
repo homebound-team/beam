@@ -5,7 +5,7 @@ import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi
 import { GridColumn } from "src/components/Table/types";
 import { column } from "src/components/Table/utils/columns";
 import { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
-import { click, render } from "src/utils/rtl";
+import { click, render, wait } from "src/utils/rtl";
 
 describe("EditColumnsButton", () => {
   const columns: GridColumn<Row>[] = [
@@ -105,9 +105,12 @@ describe("EditColumnsButton", () => {
       );
     }
     const r = await render(<Test />);
+
     expect(api.current!.getVisibleColumnIds()).toEqual(["name", "value"]);
+
     // When click on an option
     click(r.value);
+
     // Then setColumns should be called
     expect(api.current!.getVisibleColumnIds()).toEqual(["name"]);
   });
@@ -129,6 +132,7 @@ describe("EditColumnsButton", () => {
     expect(api.current!.getVisibleColumnIds()).toEqual(["name", "value"]);
     // When click clearSelections button
     click(r.clearSelections);
+    await wait();
     // Then setColumns should be called
     expect(api.current!.getVisibleColumnIds()).toEqual(["name"]);
   });
