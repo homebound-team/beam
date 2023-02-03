@@ -314,10 +314,9 @@ export class TableState {
       // Figure out if any of these newly visible columns needs to be initially expanded.
       const columnsToExpand = this.columns.filter((c) => newlyVisibleIds.includes(c.id) && c.initExpanded);
       this.parseAndUpdateExpandedColumns(columnsToExpand);
-
-      sessionStorage.setItem(this.visibleColumnsStorageKey, JSON.stringify(ids));
-      this.visibleColumns.replace(ids);
     }
+    sessionStorage.setItem(this.visibleColumnsStorageKey, JSON.stringify(ids));
+    this.visibleColumns.replace(ids);
   }
 
   get visibleColumnIds(): string[] {
