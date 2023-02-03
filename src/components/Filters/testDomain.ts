@@ -82,6 +82,13 @@ export const stageSingleFilter: StageSingleFilter = singleFilter({
   getOptionLabel: (s) => s.name,
 });
 
+export const stageFilterWithNothingSelectedText: StageSingleFilter = singleFilter({
+  options: stageOptions,
+  getOptionValue: (s) => s.code,
+  getOptionLabel: (s) => s.name,
+  nothingSelectedText: "All Stages",
+});
+
 export const taskDueFilter: DateFilter = dateFilter({
   operations: [
     { label: "On", value: "ON" },

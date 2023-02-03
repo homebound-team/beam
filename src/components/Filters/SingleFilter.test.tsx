@@ -2,7 +2,11 @@ import { click } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { FilterDefs, Filters } from "src/components/Filters";
-import { ProjectFilter, stageSingleFilter } from "src/components/Filters/testDomain";
+import {
+  ProjectFilter,
+  stageFilterWithNothingSelectedText,
+  stageSingleFilter,
+} from "src/components/Filters/testDomain";
 import { render } from "src/utils/rtl";
 
 describe("SingleSelectFilter", () => {
@@ -22,6 +26,11 @@ describe("SingleSelectFilter", () => {
     click(r.getByRole("option", { name: "All" }));
     // Then it is unset
     expect(r.filter_value()).toHaveTextContent(`{}`);
+  });
+
+  it("shows nothigSelectedText when no value is selected", async () => {
+    const r = await render(<TestFilters defs={{ stageSingle: stageFilterWithNothingSelectedText }} />);
+    expect(r.filter_stageSingle()).toHaveValue("All Stages");
   });
 });
 
