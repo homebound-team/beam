@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactElement } from "react";
+import { ReactElement, useEffect } from "react";
 import { Css, Palette } from "../../../Css";
 import { useRightPaneContext } from "./RightPaneContext";
 
@@ -12,8 +12,15 @@ export function RightPaneLayout({
   paneBgColor?: Palette;
   paneWidth?: number;
 }) {
-  const { isRightPaneOpen, rightPaneContent, clearPane } = useRightPaneContext();
+  const { isRightPaneOpen, rightPaneContent, clearPane, closePane } = useRightPaneContext();
 
+  // Close pane on page unmount
+  useEffect(() => {
+    return () => {
+      closePane();
+    };
+  }, []);
+  
   return (
     <div css={Css.h100.df.overflowXHidden.$}>
       <>
