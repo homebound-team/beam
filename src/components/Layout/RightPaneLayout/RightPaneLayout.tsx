@@ -14,7 +14,7 @@ export function RightPaneLayout({
 }) {
   const { isRightPaneOpen, rightPaneContent, clearPane, closePane } = useRightPaneContext();
 
-  // Close pane on page unmount because otherwise otherwise the next page that has a right pane will show our stale content
+  // Close pane on page unmount because otherwise the next page that has a right pane will show our stale content
   useEffect(() => {
     return () => {
       closePane();
