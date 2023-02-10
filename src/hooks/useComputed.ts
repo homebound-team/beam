@@ -49,7 +49,6 @@ export function useComputed<T>(fn: () => T, deps: readonly any[]): T {
         setTick((tick) => tick + 1);
       }
     });
-    return current.runner;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
