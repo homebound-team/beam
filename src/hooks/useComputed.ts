@@ -14,7 +14,7 @@ interface Current<T> {
 }
 
 /** Evaluates a computed function `fn` to a regular value and triggers a re-render whenever it changes. */
-export function useComputed<T>(fn: () => T, deps: readonly any[]): T {
+export function useComputed<T>(fn: (prev: T | undefined) => T, deps: readonly any[]): T {
   // We always return the useRef value, and use this just to trigger re-renders
   const [, setTick] = useState(0);
 
@@ -37,9 +37,9 @@ export function useComputed<T>(fn: () => T, deps: readonly any[]): T {
     // If deps has changed, we're already re-running, so don't trigger a 2nd one
     current.hasRan = false;
     current.runner = autorun(() => {
-      // Always eval fn() (even on 1st render) to register our observable.
-      const newValue = fn();
       const { value: oldValue, hasRan: oldHasRun } = current;
+      // Always eval fn() (even on 1st render) to register our observable.
+      const newValue = fn(oldValue);
       current.value = newValue;
       current.hasRan = true;
       // Only trigger a re-render if this is not the 1st autorun. Note
@@ -61,7 +61,7 @@ export function useComputed<T>(fn: () => T, deps: readonly any[]): T {
   // accept running the eval fn twice (here to get the value for the 1st render,
   // and again for mobx to watch what observables we touch).
   if (!ref.current.hasRan) {
-    ref.current.value = fn();
+    ref.current.value = fn(undefined);
   }
 
   // We can use `!` here b/c we know that `autorun` set current
