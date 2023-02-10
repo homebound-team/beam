@@ -1,6 +1,6 @@
 import equal from "fast-deep-equal";
 import { autorun, IReactionDisposer } from "mobx";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface Current<T> {
   // Track the mobx autorunner
@@ -49,8 +49,14 @@ export function useComputed<T>(fn: () => T, deps: readonly any[]): T {
         setTick((tick) => tick + 1);
       }
     });
+    return current.runner;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
+
+  // Tell unsubscribe the autorun when we're unmounted
+  useEffect(() => {
+    return ref.current.runner;
+  }, []);
 
   // Occasionally autorun will not have run yet, in which case we have to just
   // accept running the eval fn twice (here to get the value for the 1st render,
