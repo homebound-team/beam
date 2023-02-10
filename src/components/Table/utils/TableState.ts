@@ -244,7 +244,7 @@ export class TableState {
   }
 
   /** Determines which columns to expand immediately vs async */
-  parseAndUpdateExpandedColumns(columnsToExpand: GridColumnWithId<any>[]) {
+  async parseAndUpdateExpandedColumns(columnsToExpand: GridColumnWithId<any>[]) {
     // Separate out which columns need to be loaded async vs which can be loaded immediately.
     const [localColumnsToExpand, asyncColumnsToExpand] = columnsToExpand.reduce(
       (acc, c) => {
@@ -259,9 +259,17 @@ export class TableState {
     // Handle all async expanding columns using a Promise.all.
     // This will allow the table to render immediately, then cause a rerender with the new columns
     if (asyncColumnsToExpand.length > 0) {
-      Promise.all(asyncColumnsToExpand.map(async (c) => await this.loadExpandedColumns(c))).then(() =>
-        this.updateExpandedColumns(asyncColumnsToExpand),
-      );
+      // Note: Not using a Promise.all because there seems to be a bug in Apollo with applying TypePolicies when using Promise.all.
+      // TODO: Update comment with Apollo issue link.
+      // Promise.all(asyncColumnsToExpand.map(async (c) => await this.loadExpandedColumns(c))).then(() =>
+      //   this.updateExpandedColumns(asyncColumnsToExpand),
+      // );
+
+      // Instead, doing each async request in sequence for now.
+      for await (const column of asyncColumnsToExpand) {
+        await this.loadExpandedColumns(column);
+      }
+      this.updateExpandedColumns(asyncColumnsToExpand);
     }
 
     // For local columns, we skip the Promise in order to have the correct state on the initial load.
