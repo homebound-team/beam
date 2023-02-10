@@ -52,7 +52,7 @@ export function useComputed<T>(fn: () => T, deps: readonly any[]): T {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
-  // Tell unsubscribe the autorun when we're unmounted
+  // unsubscribe the autorun when we're unmounted
   useEffect(() => {
     return ref.current.runner;
   }, []);
