@@ -91,7 +91,7 @@ describe("TabsWithContent", () => {
     expect(r.tab_panel().textContent).toBe("Tab 1 Content");
   });
 
-  it("shows all the tabs if 'alwaysShowAllTabs' is defined, but only a single tab is enabled ", async () => {
+  it("shows all the tabs if 'alwaysShowAllTabs' is defined, but only a single tab is enabled", async () => {
     // Given only the 1st tab is enabled
     const testTabs: TabWithContent<TabValue>[] = [
       { name: "Tab 1", value: "tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
@@ -179,12 +179,12 @@ describe("TabsWithContent", () => {
       },
     ];
     const r = await render(<TabsWithContent tabs={testTabs} />, router);
-    //Then expect the first tab to have captured the param
+    // Then expect the first tab to have captured the param
     expect(r.ceId().textContent).toBe("ce:1");
 
     // When clicking the second tab
     click(r.tabs_tabB);
-    //Then expect the second tab to have captured both params
+    // Then expect the second tab to have captured both params
     expect(r.ceId().textContent).toBe("ce:2");
     expect(r.celiId().textContent).toBe("celi:2");
   });

@@ -58,5 +58,5 @@ export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFi
 
 // check for valid filter keys in the query params
 function hasValidFilterKeys<F>(queryParamsFilter: F, definedKeys: (keyof F)[]): queryParamsFilter is F {
-  return queryParamsFilter && safeKeys(queryParamsFilter).every((key) => definedKeys.includes(key));
+  return queryParamsFilter && safeKeys(queryParamsFilter).every((key) => definedKeys.includes(key as keyof F));
 }

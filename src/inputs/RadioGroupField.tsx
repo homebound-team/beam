@@ -1,8 +1,10 @@
-import React, { ReactNode, useMemo, useRef } from "react";
+import { Fragment, ReactNode, useMemo, useRef } from "react";
 import { useFocusRing, useHover, useRadio, useRadioGroup } from "react-aria";
 import { RadioGroupState, useRadioGroupState } from "react-stately";
+import { maybeTooltip, resolveTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
+import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -18,12 +20,13 @@ export interface RadioFieldOption<K extends string> {
   description?: string | (() => ReactNode);
   /** The undisplayed value, i.e. an id of some sort. */
   value: K;
+  /** Disable only specific option, with an optional reason */
+  disabled?: boolean | ReactNode;
 }
 
-export interface RadioGroupFieldProps<K extends string> {
+export interface RadioGroupFieldProps<K extends string> extends Pick<PresentationFieldProps, "labelStyle"> {
   /** The label for the choice itself, i.e. "Favorite Cheese". */
   label: string;
-  hideLabel?: boolean;
   /** The currently selected option value (i.e. an id). */
   value: K | undefined;
   /** Called when an option is selected. We don't support unselecting. */
@@ -45,7 +48,7 @@ export interface RadioGroupFieldProps<K extends string> {
  * TODO: Add hover (non selected and selected) styles
  */
 export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>) {
-  const { label, hideLabel, value, onChange, options, disabled = false, errorMsg, helperText, ...otherProps } = props;
+  const { label, labelStyle, value, onChange, options, disabled = false, errorMsg, helperText, ...otherProps } = props;
 
   // useRadioGroupState uses a random group name, so use our name
   const name = useMemo(() => `radio-group-${++nextNameId}`, []);
@@ -66,23 +69,33 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   const anyDescriptions = options.some((o) => !!o.description);
 
   return (
-    // width of `max-content` is used to limit invisible label clicking
-    <div css={Css.w("max-content").maxw(anyDescriptions ? "344px" : "320px").$}>
-      <Label label={label} {...labelProps} {...tid.label} hidden={hideLabel} />
+    // default styling to position `<Label />` above.
+    <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$}>
+      <Label label={label} {...labelProps} {...tid.label} hidden={labelStyle === "hidden"} />
       <div {...radioGroupProps}>
-        {options.map((option) => (
-          <Radio
-            key={option.value}
-            parentId={name}
-            option={option}
-            state={state}
-            {...otherProps}
-            {...tid[option.value]}
-          />
-        ))}
+        {options.map((option) => {
+          const isDisabled = state.isDisabled || !!option.disabled;
+          return (
+            <Fragment key={option.value}>
+              {maybeTooltip({
+                title: resolveTooltip(option.disabled),
+                placement: "bottom",
+                children: (
+                  <Radio
+                    parentId={name}
+                    option={option}
+                    state={{ ...state, isDisabled }}
+                    {...otherProps}
+                    {...tid[option.value]}
+                  />
+                ),
+              })}
+            </Fragment>
+          );
+        })}
+        {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
+        {helperText && <HelperText helperText={helperText} />}
       </div>
-      {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
-      {helperText && <HelperText helperText={helperText} />}
     </div>
   );
 }

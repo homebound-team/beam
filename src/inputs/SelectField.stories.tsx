@@ -13,12 +13,12 @@ import { withDimensions, zeroTo } from "src/utils/sb";
 export default {
   component: SelectField,
   title: "Workspace/Inputs/Select Fields",
-  parameters: { 
+  parameters: {
     layout: "fullscreen",
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=1287%3A789",
-    }
+    },
   },
   argTypes: {
     compact: { control: false },
@@ -166,7 +166,7 @@ function Template(args: SelectFieldProps<any, any>) {
         <TestSelectField
           {...args}
           label="Inline Label"
-          inlineLabel
+          labelStyle="inline"
           value={undefined}
           options={[{ id: undefined, name: "No Selection", icon: "x" }, ...options]}
           getOptionValue={(o) => o.id}
@@ -176,7 +176,7 @@ function Template(args: SelectFieldProps<any, any>) {
         <TestSelectField
           {...args}
           label="Hidden Label"
-          hideLabel
+          labelStyle="hidden"
           value={undefined}
           options={[{ id: undefined, name: "No Selection", icon: "x" }, ...options]}
           getOptionValue={(o) => o.id}
@@ -186,12 +186,21 @@ function Template(args: SelectFieldProps<any, any>) {
         <TestSelectField
           {...args}
           label="Hidden Label"
-          hideLabel
+          labelStyle="hidden"
           value={undefined}
           options={[{ id: undefined, name: "No Selection", icon: "x" }, ...options]}
           getOptionValue={(o) => o.id}
           getOptionLabel={(o) => o.name}
           hideErrorMessage
+        />
+
+        <TestSelectField
+          {...args}
+          label="Disabled Options"
+          value={options[2].id}
+          options={options}
+          disabledOptions={[options[0].id, { value: options[3].id, reason: "Example disabled tooltip" }]}
+          helperText="Disabled options can optionally have tooltip text"
         />
       </div>
 
@@ -296,7 +305,7 @@ const columns: GridColumn<Row>[] = [
     data: (data) => (
       <SelectField
         label="People"
-        hideLabel
+        labelStyle="hidden"
         getOptionValue={(iu) => iu.id}
         getOptionLabel={(iu) => iu.name}
         value={data.user.id}

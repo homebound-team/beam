@@ -22,6 +22,7 @@ export function BoundDateRangeField(props: BoundDateRangeFieldProps) {
     onBlur,
     onFocus,
     onEnter,
+    readOnly,
     ...others
   } = props;
   const testId = useTestIds(props, field.key);
@@ -49,6 +50,7 @@ export function BoundDateRangeField(props: BoundDateRangeFieldProps) {
             maybeCall(onEnter);
             field.maybeAutoSave();
           }}
+          readOnly={readOnly || field.readOnly}
           {...testId}
           {...others}
         />

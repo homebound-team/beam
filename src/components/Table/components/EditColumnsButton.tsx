@@ -4,7 +4,9 @@ import { useMenuTriggerState } from "react-stately";
 import { Button } from "src/components/Button";
 import {
   isIconButton,
+  isNavLinkButton,
   isTextButton,
+  labelOr,
   OverlayTrigger,
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
@@ -14,6 +16,7 @@ import { Css } from "src/Css";
 import { useComputed } from "src/hooks";
 import { CheckboxGroup, CheckboxGroupItemOption } from "src/inputs";
 import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 interface EditColumnsButtonProps<R extends Kinded>
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
@@ -31,7 +34,13 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? trigger.label : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger)
+      ? labelOr(trigger, "editColumnsButton")
+      : isNavLinkButton(trigger)
+      ? defaultTestId(trigger.navLabel)
+      : isIconButton(trigger)
+      ? trigger.icon
+      : trigger.name,
   );
 
   const { options } = useMemo(() => {
@@ -76,7 +85,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
           values={selectedValues}
           options={options}
           columns={2}
-          hideLabel
+          labelStyle="hidden"
         />
         <div css={Css.mt1.$}>
           <Button variant={"tertiary"} label={"Clear selections"} onClick={() => setSelectedValues([])} />

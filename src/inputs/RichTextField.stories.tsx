@@ -8,11 +8,11 @@ import { RichTextField as RichTextFieldComponent } from "./RichTextField";
 export default {
   component: RichTextFieldComponent,
   title: "Workspace/Inputs/Rich Text Field",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=6449%3A8821",
-    }
+    },
   },
 } as Meta;
 

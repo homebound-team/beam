@@ -4,7 +4,7 @@ import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-ari
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
-import { PresentationFieldProps } from "src/components/PresentationContext";
+import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, px } from "src/Css";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
@@ -21,7 +21,7 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
   values: V[] | undefined;
   onSelect: (values: V[], opts: O[]) => void;
   multiselect?: boolean;
-  disabledOptions?: V[];
+  disabledOptions?: (V | { value: V; reason: string })[];
   options: OptionsOrLoad<O>;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
@@ -32,8 +32,6 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
   fieldDecoration?: (opt: O) => ReactNode;
   /** Sets the form field label. */
   label: string;
-  /** Renders the label inside the input field, i.e. for filters. */
-  inlineLabel?: boolean;
   // Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip.
   readOnly?: boolean | ReactNode;
   onBlur?: () => void;
@@ -60,6 +58,7 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
  * and so we cannot easily change them.
  */
 export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBaseProps<O, V>): JSX.Element {
+  const { fieldProps } = usePresentationContext();
   const {
     disabled,
     readOnly,
@@ -74,6 +73,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     unsetLabel,
     ...otherProps
   } = props;
+  const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
 
   // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
   const maybeOptions = useMemo(() => initializeOptions(options, unsetLabel), [options, unsetLabel]);
@@ -231,9 +231,13 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
   const listBoxRef = useRef<HTMLDivElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
 
+  // `disabledKeys` from ComboBoxState does not support additional meta for showing a disabled reason to the user
+  // This lookup map helps us cleanly prune out the optional reason text, then access it further down the component tree
+  const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
+
   const comboBoxProps = {
     ...otherProps,
-    disabledKeys: disabledOptions?.map(valueToKey),
+    disabledKeys: Object.keys(disabledOptionsWithReasons),
     inputValue: fieldState.inputValue,
     items: fieldState.filteredOptions,
     isDisabled,
@@ -263,7 +267,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
     },
   });
 
-  //@ts-ignore - `selectionManager.state` exists, but not according to the types
+  // @ts-ignore - `selectionManager.state` exists, but not according to the types
   state.selectionManager.state = useMultipleSelectionState({
     selectionMode: multiselect ? "multiple" : "single",
     // Do not allow an empty selection if single select mode
@@ -355,7 +359,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
   };
 
   return (
-    <div css={Css.df.fdc.w100.maxw(px(550)).$} ref={comboBoxRef}>
+    <div css={Css.df.fdc.w100.maxw(px(550)).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
       <SelectFieldInput
         {...otherProps}
         buttonProps={buttonProps}
@@ -392,7 +396,9 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
+            horizontalLayout={labelStyle === "left"}
             loading={fieldState.optionsLoading}
+            disabledOptionsWithReasons={disabledOptionsWithReasons}
           />
         </Popover>
       )}
@@ -441,3 +447,13 @@ function getOptionsWithUnset<O>(unsetLabel: string, options: O[]): O[] {
 }
 
 export const unsetOption = {};
+
+export function disabledOptionToKeyedTuple(
+  disabledOption: Value | { value: Value; reason: string },
+): [React.Key, string | undefined] {
+  if (typeof disabledOption === "object" && disabledOption !== null) {
+    return [valueToKey(disabledOption.value), disabledOption.reason];
+  } else {
+    return [valueToKey(disabledOption), undefined];
+  }
+}

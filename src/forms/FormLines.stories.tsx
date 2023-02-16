@@ -181,6 +181,25 @@ export function WithFieldProps() {
   );
 }
 
+export function WithHorizontalLayout() {
+  return (
+    <FormLines width="lg" labelStyle="left">
+      <TextField label="First" value="first" onChange={noop} />
+      <SelectField<Options, number>
+        label="Second"
+        value={1}
+        options={[
+          { id: 1, name: "Each" },
+          { id: 2, name: "Square Feet" },
+        ]}
+        onSelect={noop}
+      />
+      <TextField label="Read only" readOnly value="read only" onChange={noop} />
+      <Switch label="Last" labelStyle="left" selected={true} onChange={noop} />
+    </FormLines>
+  );
+}
+
 type Options = {
   id: number;
   name: string;

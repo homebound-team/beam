@@ -8,6 +8,7 @@ import { Button, ButtonProps, ButtonVariant } from "src/components/Button";
 import { Icon } from "src/components/Icon";
 import { IconButton, IconButtonProps } from "src/components/IconButton";
 import { Popover } from "src/components/internal";
+import { NavLink, NavLinkProps } from "src/components/NavLink";
 import { Css } from "src/Css";
 import { noop, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -15,9 +16,12 @@ import { defaultTestId } from "src/utils/defaultTestId";
 interface TextButtonTriggerProps extends Pick<ButtonProps, "label" | "variant" | "size" | "icon"> {}
 interface IconButtonTriggerProps extends Pick<IconButtonProps, "icon" | "color" | "compact" | "contrast"> {}
 interface AvatarButtonTriggerProps extends Pick<AvatarButtonProps, "src" | "name" | "size"> {}
+interface NavLinkButtonTriggerProps extends Pick<NavLinkProps, "active" | "variant" | "icon"> {
+  navLabel: string;
+}
 
 export interface OverlayTriggerProps {
-  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps;
+  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps | NavLinkButtonTriggerProps;
   /** Defaults to "left" */
   placement?: "left" | "right";
   /** Whether the Button is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
@@ -36,6 +40,7 @@ export interface OverlayTriggerProps {
   variant?: ButtonVariant;
   hideEndAdornment?: boolean;
   showActiveBorder?: boolean;
+  contrast?: boolean;
 }
 
 export function OverlayTrigger(props: OverlayTriggerProps) {
@@ -51,6 +56,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     variant,
     hideEndAdornment,
     showActiveBorder = false,
+    contrast = false,
   } = props;
   const popoverRef = useRef(null);
   const { overlayProps: positionProps } = useOverlayPosition({
@@ -64,7 +70,13 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
   });
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? defaultTestId(trigger.label) : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger)
+      ? defaultTestId(labelOr(trigger, "overlayTrigger"))
+      : isNavLinkButton(trigger)
+      ? defaultTestId(trigger.navLabel)
+      : isIconButton(trigger)
+      ? trigger.icon
+      : trigger.name,
   );
 
   return (
@@ -72,14 +84,25 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
       {isTextButton(trigger) ? (
         <Button
           variant={variant ? variant : "secondary"}
+          contrast={contrast}
           {...trigger}
           menuTriggerProps={menuTriggerProps}
           buttonRef={buttonRef}
           endAdornment={!hideEndAdornment ? <Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} /> : null}
           disabled={disabled}
           tooltip={tooltip}
-          onClick={noop}
+          onClick={menuTriggerProps.onPress ?? noop}
           forceFocusStyles={showActiveBorder && state.isOpen}
+          {...tid}
+        />
+      ) : isNavLinkButton(trigger) ? (
+        <NavLink
+          {...trigger}
+          label={trigger.navLabel}
+          disabled={!!disabled}
+          contrast={contrast}
+          menuTriggerProps={menuTriggerProps}
+          buttonRef={buttonRef}
           {...tid}
         />
       ) : isIconButton(trigger) ? (
@@ -90,7 +113,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           {...tid}
           disabled={disabled}
           tooltip={tooltip}
-          onClick={noop}
+          onClick={menuTriggerProps.onPress ?? noop}
           forceFocusStyles={showActiveBorder && state.isOpen}
         />
       ) : (
@@ -101,7 +124,7 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           {...tid}
           disabled={disabled}
           tooltip={tooltip}
-          onClick={noop}
+          onClick={menuTriggerProps.onPress ?? noop}
           forceFocusStyles={showActiveBorder && state.isOpen}
         />
       )}
@@ -121,12 +144,22 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
 }
 
 export function isTextButton(
-  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps,
+  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps | NavLinkButtonTriggerProps,
 ): trigger is TextButtonTriggerProps {
   return trigger && typeof trigger === "object" && "label" in trigger;
 }
 export function isIconButton(
-  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps,
+  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps | NavLinkButtonTriggerProps,
 ): trigger is IconButtonTriggerProps {
   return trigger && typeof trigger === "object" && "icon" in trigger;
+}
+
+export function isNavLinkButton(
+  trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps | NavLinkButtonTriggerProps,
+): trigger is NavLinkButtonTriggerProps {
+  return trigger && typeof trigger === "object" && "navLabel" in trigger;
+}
+
+export function labelOr(trigger: { label: unknown }, fallback: string): string {
+  return typeof trigger.label === "string" ? trigger.label : fallback;
 }

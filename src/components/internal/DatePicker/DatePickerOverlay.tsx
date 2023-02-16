@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, PropsWithChildren } from "react";
+import { HTMLAttributes, PropsWithChildren } from "react";
 import { Css } from "src/Css";
 
 interface DatePickerOverlayProps {

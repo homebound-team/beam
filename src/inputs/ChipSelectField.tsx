@@ -1,5 +1,5 @@
 import { camelCase } from "change-case";
-import React, { Key, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { Key, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useButton, useFocus, useOverlayPosition, useSelect } from "react-aria";
 import { Item, Section, useListData, useSelectState } from "react-stately";
 import { Icon, maybeTooltip, resolveTooltip } from "src/components";
@@ -318,12 +318,12 @@ export function isPersistentKey(key: Key): boolean {
 
 type ListBoxSection<O> = { title: string; options: O[]; isPersistent?: boolean };
 export function isListBoxSection<O>(obj: O | ListBoxSection<O>): obj is ListBoxSection<O> {
-  return typeof obj === "object" && "options" in obj;
+  return obj && typeof obj === "object" && "options" in obj;
 }
 
 interface CreateNewFieldProps {
   onBlur: VoidFunction;
-  onEnter: (value: string) => {};
+  onEnter: (value: string) => void;
 }
 
 // Wrapper for the ChipTextField used in the "Create New" flow on ChipSelectField

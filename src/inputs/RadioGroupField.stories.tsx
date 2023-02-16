@@ -17,11 +17,11 @@ import {
 export default {
   component: RadioGroupField,
   title: "Workspace/Inputs/Radio Group",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36814%3A102223",
-    }
+    },
   },
 } as Meta;
 
@@ -131,7 +131,7 @@ export function BaseStates() {
 export function OnlyLabels() {
   const [state, setState] = useState<string | undefined>();
   return (
-    <FormLines>
+    <FormLines width="sm">
       <p css={Css.mb1.$}>With RadioGroupField label</p>
       <RadioGroupField
         label={"Favorite cheese"}
@@ -149,7 +149,22 @@ export function OnlyLabels() {
       <p css={Css.mb1.$}>With hidden RadioGroupField label</p>
       <RadioGroupField
         label={"Favorite cheese"}
-        hideLabel
+        labelStyle="hidden"
+        value={state}
+        onChange={setState}
+        options={[
+          { label: "Asiago", value: "a" },
+          { label: "Burratta", value: "b" },
+          { label: "Camembert", value: "c" },
+          { label: "Roquefort", value: "d" },
+        ]}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+      <p css={Css.mb1.$}>With a left RadioGroupField label</p>
+      <RadioGroupField
+        label={"Favorite cheese"}
+        labelStyle="left"
         value={state}
         onChange={setState}
         options={[
@@ -203,25 +218,47 @@ export function LabelsAndDescriptions() {
 
 export function Disabled() {
   return (
-    <RadioGroupField
-      label={"Favorite cheese"}
-      value={"a"}
-      onChange={() => {}}
-      disabled={true}
-      options={[
-        { label: "Asiago", value: "a" },
-        { label: "Burratta", value: "b" },
-        { label: "Camembert", value: "c" },
-        {
-          label: "Roquefort",
-          description:
-            "Roquefort is a sheep milk cheese from Southern France, and is one of the world's best known blue cheeses.",
-          value: "d",
-        },
-      ]}
-      onBlur={action("onBlur")}
-      onFocus={action("onFocus")}
-    />
+    <FormLines width="sm">
+      <p css={Css.mb1.$}>All options disabled</p>
+      <RadioGroupField
+        label={"Favorite cheese"}
+        value={"a"}
+        onChange={() => {}}
+        disabled={true}
+        options={[
+          { label: "Asiago", value: "a" },
+          { label: "Burratta", value: "b" },
+          { label: "Camembert", value: "c" },
+          {
+            label: "Roquefort",
+            description:
+              "Roquefort is a sheep milk cheese from Southern France, and is one of the world's best known blue cheeses.",
+            value: "d",
+          },
+        ]}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+      <p css={Css.mb1.$}>Only a few options disabled, with a tooltip</p>
+      <RadioGroupField
+        label={"Favorite cheese"}
+        value={"a"}
+        onChange={() => {}}
+        options={[
+          { label: "Asiago", value: "a", disabled: "This option is disabled by some reason" },
+          { label: "Burratta", value: "b" },
+          { label: "Camembert", value: "c", disabled: true },
+          {
+            label: "Roquefort",
+            description:
+              "Roquefort is a sheep milk cheese from Southern France, and is one of the world's best known blue cheeses.",
+            value: "d",
+          },
+        ]}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+    </FormLines>
   );
 }
 

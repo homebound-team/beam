@@ -7,6 +7,7 @@ import { TreeState } from "react-stately";
 import { Avatar } from "src/components/Avatar";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
 import { Icon } from "src/components/Icon";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette } from "src/Css";
 import { isAbsoluteUrl, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -15,12 +16,15 @@ interface MenuItemProps {
   item: Node<MenuItem>;
   state: TreeState<MenuItem>;
   onClose: VoidFunction;
+  contrast: boolean;
 }
 
 export function MenuItemImpl(props: MenuItemProps) {
-  const { item, state, onClose } = props;
+  const { item, state, onClose, contrast } = props;
   const menuItem = item.value;
-  const { disabled: isDisabled, onClick, label, destructive } = menuItem;
+  const { disabled, onClick, label, destructive } = menuItem;
+  const isDisabled = Boolean(disabled);
+  const isSelected = state.selectionManager.selectedKeys.has(label);
   const isFocused = state.selectionManager.focusedKey === item.key;
   const ref = useRef<HTMLLIElement>(null);
   const history = useHistory();
@@ -63,25 +67,53 @@ export function MenuItemImpl(props: MenuItemProps) {
       ref={ref}
       css={{
         ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").$,
-        ...(!isDisabled && isHovered ? Css.bgGray100.$ : {}),
+        ...(!isDisabled && isHovered ? (contrast ? Css.bgGray800.$ : Css.bgGray100.$) : {}),
         ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
         ...(isDisabled ? Css.gray500.cursorNotAllowed.$ : {}),
         ...(destructive ? Css.red600.$ : {}),
       }}
       {...tid[defaultTestId(menuItem.label)]}
     >
-      {maybeWrapInLink(
-        onClick,
-        isIconMenuItem(menuItem) ? (
-          <IconMenuItem {...menuItem} />
-        ) : isImageMenuItem(menuItem) ? (
-          <ImageMenuItem {...menuItem} />
-        ) : (
-          label
-        ),
-        isDisabled,
-      )}
+      {maybeTooltip({
+        title: resolveTooltip(disabled),
+        placement: "right",
+        children: renderMenuItem(menuItem, isSelected, isDisabled, contrast),
+      })}
     </li>
+  );
+}
+
+function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boolean, contrast: boolean) {
+  return (
+    <div css={Css.df.w100.aic.jcsb.gap2.$}>
+      <div css={Css.df.aic.$}>
+        {maybeWrapInLink(
+          menuItem.onClick,
+          isIconMenuItem(menuItem) ? (
+            <IconMenuItem {...menuItem} />
+          ) : isImageMenuItem(menuItem) ? (
+            <ImageMenuItem {...menuItem} />
+          ) : (
+            menuItem.label
+          ),
+          isDisabled,
+        )}
+      </div>
+      {isSelected && (
+        <Icon
+          icon="check"
+          color={
+            !contrast
+              ? isDisabled
+                ? Palette.Gray400
+                : Palette.LightBlue700
+              : isDisabled
+              ? Palette.Gray500
+              : Palette.White
+          }
+        />
+      )}
+    </div>
   );
 }
 

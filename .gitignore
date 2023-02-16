@@ -9,6 +9,7 @@ dist
 .eslintcache
 
 dist
+storybook-static
 
 test.html
 

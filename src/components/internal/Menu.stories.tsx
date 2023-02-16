@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react";
+import { useState } from "react";
 import { ButtonMenu } from "src/components/ButtonMenu";
 import { Menu } from "src/components/internal/Menu";
 import { noop } from "src/utils";
@@ -8,11 +9,11 @@ export default {
   component: Menu,
   title: "Workspace/Components/Menu",
   decorators: [withDimensions()],
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36062%3A105697",
-    }
+    },
   },
 } as Meta;
 
@@ -118,6 +119,25 @@ export function ImageMenuItems() {
           size: 48,
           onClick: noop,
         },
+      ]}
+    />
+  );
+}
+
+export function WithSelections() {
+  const [selected, setSelected] = useState("Captain Marvel");
+  return (
+    <ButtonMenu
+      defaultOpen
+      trigger={{ label: "Menu Trigger" }}
+      selectedItem={selected}
+      onChange={setSelected}
+      items={[
+        { label: "Iron man", src: "tony-stark.jpg", isAvatar: true, onClick: noop },
+        { label: "Captain Marvel", src: "captain-marvel.jpg", isAvatar: true, onClick: noop },
+        { label: "Captain America", src: "captain-america.jpg", isAvatar: true, onClick: noop },
+        { label: "Thor", src: "thor.jpg", isAvatar: true, onClick: noop },
+        { label: "Black Widow", src: "/black-widow.jpg", isAvatar: true, onClick: noop },
       ]}
     />
   );

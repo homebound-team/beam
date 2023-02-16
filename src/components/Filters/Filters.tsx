@@ -7,7 +7,7 @@ import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { safeEntries, safeKeys, useTestIds } from "src/utils";
 
-interface FilterProps<F, G extends Value = string> {
+interface FilterProps<F extends Record<string, unknown>, G extends Value = string> {
   /** List of filters */
   filterDefs: FilterDefs<F>;
   /** The current filter value. */
@@ -24,28 +24,29 @@ interface FilterProps<F, G extends Value = string> {
   };
   /** Specifies the layout of the filters. If not supplied it will use the default (horizontal) layout. Using the 'vertical' layout will also remove the "More Filters" button/modal */
   vertical?: boolean;
+  /** Specifies the number of in line filters before more filters modal  */
+  numberOfInlineFilters?: number;
 }
 
-function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
-  const { filter, onChange, filterDefs, groupBy, vertical = false } = props;
+function Filters<F extends Record<string, unknown>, G extends Value = string>(props: FilterProps<F, G>) {
+  const { filter, onChange, filterDefs, groupBy, vertical = false, numberOfInlineFilters = groupBy ? 3 : 4 } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
 
   const { openModal } = useModal();
-  const numberOfPageFilters = groupBy ? 2 : 3;
   const [pageFilters, modalFilters] = useMemo(() => {
     // Take the FilterDefs that have a `key => ...` factory and eval it
     const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)]);
-    // If we have more than 4 filters,
-    if (!vertical && impls.length > numberOfPageFilters + 1) {
-      // Then return the first three to show on the page, and the remainder for the modal.
+    // If we have more than numberOfInlineFilters depending on groupby,
+    if (!vertical && impls.length > numberOfInlineFilters) {
+      // Then return up to the numberOfInlineFilters, and the remainder in the modal.
       return [
-        Object.fromEntries(impls.slice(0, numberOfPageFilters)) as FilterImpls<F>,
-        Object.fromEntries(impls.slice(numberOfPageFilters)) as FilterImpls<F>,
+        Object.fromEntries(impls.slice(0, numberOfInlineFilters - 1)) as FilterImpls<F>,
+        Object.fromEntries(impls.slice(numberOfInlineFilters - 1)) as FilterImpls<F>,
       ];
     }
     // Otherwise, we don't have enough to show the modal, so only use page filter keys
     return [Object.fromEntries(impls) as FilterImpls<F>, {} as FilterImpls<F>];
-  }, [numberOfPageFilters, filterDefs]);
+  }, [numberOfInlineFilters, vertical, filterDefs]);
 
   const numModalFilters = safeKeys(modalFilters).filter((fk) => filter[fk] !== undefined).length;
 
@@ -54,7 +55,7 @@ function Filters<F, G extends Value = string>(props: FilterProps<F, G>) {
       <SelectField
         label="Group by"
         compact={!vertical}
-        inlineLabel={!vertical}
+        labelStyle={!vertical ? "inline" : "above"}
         sizeToContent={!vertical}
         options={groupBy.options}
         getOptionValue={(o) => o.id}

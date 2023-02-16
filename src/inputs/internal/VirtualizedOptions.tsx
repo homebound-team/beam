@@ -1,5 +1,5 @@
 import { Node } from "@react-types/shared";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { SelectState } from "react-stately";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";
@@ -14,11 +14,12 @@ interface VirtualizedOptionsProps<O> {
   scrollOnFocus?: boolean;
   // Adds 'Loading' footer to the list
   loading?: boolean | (() => JSX.Element);
+  disabledOptionsWithReasons: Record<string, string | undefined>;
 }
 
 // Displays ListBox options in a virtualized container for performance reasons
 export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
-  const { state, items, onListHeightChange, contrast, scrollOnFocus, loading } = props;
+  const { state, items, onListHeightChange, contrast, scrollOnFocus, loading, disabledOptionsWithReasons } = props;
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const focusedItem = state.collection.getItem(state.selectionManager.focusedKey);
   const selectedItem =
@@ -55,6 +56,7 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
               contrast={contrast}
               // Only send scrollToIndex functionality forward if we are not auto-scrolling on focus.
               scrollToIndex={scrollOnFocus ? undefined : virtuosoRef.current?.scrollToIndex}
+              disabledReason={disabledOptionsWithReasons[item.key]}
             />
           );
         }

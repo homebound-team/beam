@@ -1,11 +1,13 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { DatePicker, DatePickerProps } from "src/components/internal/DatePicker/DatePicker";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
 import {
   isIconButton,
+  isNavLinkButton,
   isTextButton,
+  labelOr,
   OverlayTrigger,
   OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
@@ -25,7 +27,13 @@ export function ButtonDatePicker(props: ButtonDatePickerProps) {
   const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
-    isTextButton(trigger) ? defaultTestId(trigger.label) : isIconButton(trigger) ? trigger.icon : trigger.name,
+    isTextButton(trigger)
+      ? defaultTestId(labelOr(trigger, "buttonDatePicker"))
+      : isNavLinkButton(trigger)
+      ? defaultTestId(trigger.navLabel)
+      : isIconButton(trigger)
+      ? trigger.icon
+      : trigger.name,
   );
 
   return (

@@ -23,29 +23,34 @@ import { usePersistedFilter } from "src/hooks";
 import { useGroupBy } from "src/hooks/useGroupBy";
 import { safeEntries } from "src/utils";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
+import { checkboxFilter } from "./CheckboxFilter";
 
 export default {
   component: Filters,
   title: "Workspace/Components/Filter",
   decorators: [withDimensions(), withRouter(), withBeamDecorator],
-  parameters: { 
+  parameters: {
     layout: "fullscreen",
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101334",
-    }
+    },
   },
 } as Meta;
 
-export function Filter() {
-  return <TestFilterPage />;
+export function Filter(args: { vertical: boolean | undefined; numberOfInlineFilters: number | undefined }) {
+  return <TestFilterPage {...args} />;
 }
+
+Filter.args = {
+  numberOfInlineFilters: 4,
+};
 
 export function Vertical() {
-  return <TestFilterPage vertical />;
+  return <TestFilterPage vertical={true} />;
 }
 
-export function GroupBy() {
+export function GroupBy(args: { vertical: boolean | undefined; numberOfInlineFilters: number | undefined }) {
   const groupBy = useGroupBy({ costCode: "Cost Code", tradeCategory: "Trade Category" });
   type Filter = ProjectFilter & { view: string };
   const filterDefs: FilterDefs<Filter> = useMemo(() => {
@@ -68,13 +73,23 @@ export function GroupBy() {
   });
   return (
     <div css={Css.df.fdc.gap2.$}>
-      <Filters groupBy={groupBy} filter={filter} onChange={setFilter} filterDefs={filterDefs} />
+      <Filters
+        groupBy={groupBy}
+        filter={filter}
+        onChange={setFilter}
+        filterDefs={filterDefs}
+        numberOfInlineFilters={args.numberOfInlineFilters}
+      />
       <strong>Applied Filter:</strong> {JSON.stringify(filter)}
     </div>
   );
 }
 
-function TestFilterPage({ vertical }: { vertical?: boolean }) {
+GroupBy.args = {
+  numberOfInlineFilters: 4,
+};
+
+function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
   const filterDefs: FilterDefs<ProjectFilter> = useMemo(() => {
     const marketId = multiFilter({
       options: markets,
@@ -136,6 +151,7 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
 
     const isTest = toggleFilter({ label: "Only show test projects" });
     const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", onValue: false });
+    const isStale = checkboxFilter({ label: "Stale" });
 
     return {
       marketId,
@@ -148,6 +164,7 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       dateRange,
       isTest,
       doNotUse,
+      isStale,
     };
   }, []);
 
@@ -165,7 +182,13 @@ function TestFilterPage({ vertical }: { vertical?: boolean }) {
       <div>
         <div css={Css.df.fdc.gap2.if(!!vertical).wPx(360).p2.bgGray100.br.bGray600.$}>
           <h1 css={Css.lg.$}>Filters</h1>
-          <Filters<ProjectFilter> filter={filter} onChange={setFilter} filterDefs={filterDefs} vertical={vertical} />
+          <Filters<ProjectFilter>
+            filter={filter}
+            onChange={setFilter}
+            filterDefs={filterDefs}
+            vertical={vertical}
+            numberOfInlineFilters={numberOfInlineFilters}
+          />
         </div>
       </div>
       <div css={Css.fg1.$}>
@@ -190,6 +213,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: true,
+    isStale: true,
   },
   {
     id: "2",
@@ -200,6 +224,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: true,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "3",
@@ -210,6 +235,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "4",
@@ -220,6 +246,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "5",
@@ -230,6 +257,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "6",
@@ -240,6 +268,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: true,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "7",
@@ -250,6 +279,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "8",
@@ -260,6 +290,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: false,
     doNotUse: true,
+    isStale: false,
   },
   {
     id: "9",
@@ -270,6 +301,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: true,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "10",
@@ -280,6 +312,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "11",
@@ -290,6 +323,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "12",
@@ -300,6 +334,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "13",
@@ -310,6 +345,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: true,
     doNotUse: true,
+    isStale: true,
   },
   {
     id: "14",
@@ -320,6 +356,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: true,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "15",
@@ -330,6 +367,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "16",
@@ -340,6 +378,7 @@ const tableData: Project[] = [
     status: statuses[1],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "17",
@@ -350,6 +389,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "18",
@@ -360,6 +400,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: false,
     doNotUse: false,
+    isStale: true,
   },
   {
     id: "19",
@@ -370,6 +411,7 @@ const tableData: Project[] = [
     status: statuses[2],
     isTest: false,
     doNotUse: false,
+    isStale: false,
   },
   {
     id: "20",
@@ -380,6 +422,7 @@ const tableData: Project[] = [
     status: statuses[0],
     isTest: true,
     doNotUse: false,
+    isStale: true,
   },
 ];
 
@@ -392,6 +435,7 @@ const columns: GridColumn<Row>[] = [
   { header: () => "Status", data: ({ status }) => status.name },
   { header: () => "Is Test", data: ({ isTest }) => (isTest ? "Yes" : "No") },
   { header: () => "Do not use", data: ({ doNotUse }) => (doNotUse ? "True" : "False") },
+  { header: () => "Is Stale", data: ({ isStale }) => (isStale ? "True" : "False") },
 ];
 
 function filterRows(data: Project[], filter: ProjectFilter): GridDataRow<Row>[] {
@@ -405,6 +449,7 @@ function filterRows(data: Project[], filter: ProjectFilter): GridDataRow<Row>[] 
       .filter((p) => (filter.favorite !== undefined ? filter.favorite === p.favorite : true))
       .filter((p) => (filter.isTest ? p.isTest : true))
       .filter((p) => (filter.doNotUse === undefined ? true : !p.doNotUse))
+      .filter((p) => (filter.isStale ? p.isStale : true))
       .map((p) => ({ kind: "data" as const, id: p.id, data: p })),
   ];
 }

@@ -193,3 +193,64 @@ export function WithTooltip() {
 
   return <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} tooltip="Tool tip text" />;
 }
+
+export function WithSearchListItems() {
+  const menuItems: MenuItem[] = [
+    { label: "Austin", onClick: action("Austin") },
+    { label: "Santa Rosa", onClick: action("Santa Rosa") },
+    { label: "Houston", onClick: action("Houston") },
+    { label: "Driftwood", onClick: action("Driftwood") },
+  ];
+
+  return (
+    <ButtonMenu
+      defaultOpen
+      trigger={{ label: "Select a cohort" }}
+      items={menuItems}
+      searchable
+      persistentItems={[{ label: "Persistent Action", onClick: action("Persistent action clicked") }]}
+    />
+  );
+}
+
+export function NavLinkButtonMenu() {
+  const menuItems: MenuItem[] = [
+    { label: "Page action", onClick: action("Test item clicked") },
+    { label: "Internal Link", onClick: "/fakeRoute" },
+    { label: "External Link - Homebound.com", onClick: "https://www.homebound.com" },
+  ];
+
+  return (
+    <div css={Css.mlPx(200).$}>
+      <h2 css={Css.lg.$}>Nav Link Button Menu</h2>
+      <ButtonMenu
+        trigger={{ navLabel: "Menu trigger", variant: "global" }}
+        items={menuItems}
+        persistentItems={[
+          { label: "Persistent Action", onClick: action("Persistent action clicked") },
+          { label: "Destructive Action", onClick: action("Destructive Action Clicked"), destructive: true },
+        ]}
+        defaultOpen
+        contrast={true}
+      />
+    </div>
+  );
+}
+
+export function SelectableMenuItems() {
+  const [selectedItem, setSelectedItem] = useState("Design doc");
+  const menuItems: MenuItem[] = [
+    { label: "Design doc", onClick: action("Design doc") },
+    { label: "Expense report", onClick: action("Expense report") },
+    { label: "Training plan", onClick: action("Training plan") },
+  ];
+
+  return (
+    <ButtonMenu
+      trigger={{ icon: "verticalDots" }}
+      items={menuItems}
+      selectedItem={selectedItem}
+      onChange={(key) => setSelectedItem(key)}
+    />
+  );
+}

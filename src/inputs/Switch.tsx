@@ -16,7 +16,7 @@ export interface SwitchProps {
   /** Input label */
   label: string;
   /** Where to put the label. */
-  labelStyle?: "form" | "inline" | "filter";
+  labelStyle?: "form" | "inline" | "filter" | "hidden" | "left"; // TODO: Update `labelStyle` to make consistent with other `labelStyle` properties in the library
   /** Whether or not to hide the label */
   hideLabel?: boolean;
   /** Handler when the interactive element state changes. */
@@ -57,14 +57,19 @@ export function Switch(props: SwitchProps) {
         css={{
           ...Css.relative.cursorPointer.df.w("max-content").smMd.selectNone.$,
           ...(labelStyle === "form" && Css.fdc.$),
+          ...(labelStyle === "left" && Css.w100.fdr.$),
           ...(labelStyle === "inline" && Css.gap2.aic.$),
-          ...(labelStyle === "filter" && Css.jcsb.gap1.aic.w("auto").sm.$),
+          ...(labelStyle === "filter" && Css.jcsb.gap1.aic.wa.sm.$),
           ...(isDisabled && Css.cursorNotAllowed.gray400.$),
         }}
         aria-label={label}
       >
-        {!hideLabel && labelStyle === "form" && <Label label={label} />}
-        {!hideLabel && labelStyle === "filter" && <span>{label}</span>}
+        {(labelStyle === "form" || labelStyle === "left") && (
+          <div css={Css.if(labelStyle === "left").w50.$}>
+            <Label label={label} />
+          </div>
+        )}
+        {labelStyle === "filter" && <span>{label}</span>}
         {/* Background */}
         <div
           aria-hidden="true"
@@ -93,7 +98,7 @@ export function Switch(props: SwitchProps) {
         </div>
         {/* Since we are using childGap, we must wrap the label in an element and
         match the height of the icon for horizontal alignment */}
-        {!hideLabel && labelStyle === "inline" && (
+        {labelStyle === "inline" && (
           <span
             css={{
               // LineHeight is conditionally applied to handle compact version text alignment

@@ -32,8 +32,23 @@ describe("BoundSwitchField", () => {
     // And auto save was triggered with the correct value
     expect(autoSave).toBeCalledWith(false);
   });
+
+  it("should be disabled when field is readOnly", async () => {
+    // Given a formState field marked as readOnly
+    const formState = createObjectState(formConfigReadOnly, { isAvailable: true });
+
+    // When rendered
+    const r = await render(<BoundSwitchField field={formState.isAvailable} />);
+
+    // Then the BoundSwitchField should be disabled
+    expect(r.isAvailable()).toBeDisabled();
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {
   isAvailable: { type: "value", rules: [required] },
+};
+
+const formConfigReadOnly: ObjectConfig<AuthorInput> = {
+  isAvailable: { type: "value", rules: [required], readOnly: true },
 };

@@ -29,6 +29,8 @@ import {
 } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
+import { AnyObject } from "src/types";
+import { isFunction } from "src/utils";
 import { shallowEqual } from "src/utils/shallowEqual";
 
 interface RowProps<R extends Kinded> {
@@ -104,13 +106,32 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   let currentExpandedColumnCount: number = 0;
   let firstContentColumnStylesApplied = false;
   let minStickyLeftOffset = 0;
+  let expandColumnHidden = false;
 
   return (
     <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
       {columns.map((column, columnIndex) => {
+        // If the expandable column was hidden, then we need to look at the previous column to format the `expandHeader` and 'header' kinds correctly.
+        const maybeExpandedColumn = expandColumnHidden ? columns[columnIndex - 1] : column;
+
+        // Figure out if this column should be considered 'expanded' or not. If the column is hidden on expand, then we need to look at the previous column to see if it's expanded.
+        const isExpanded = tableState.expandedColumnIds.includes(maybeExpandedColumn.id);
+        // If the column is hidden on expand, we don't want to render it. We'll flag that it was hidden, so on the next column we can render this column's "expandHeader" property.
+        if (column.hideOnExpand && isExpanded) {
+          expandColumnHidden = true;
+          return <></>;
+        }
+
         // Need to keep track of the expanded columns so we can add borders as expected for the header rows
-        const isExpanded = tableState.expandedColumnIds.includes(column.id);
-        const numExpandedColumns = isExpanded ? column.expandColumns?.length ?? 0 : 0;
+        const numExpandedColumns = isExpanded
+          ? tableState.getExpandedColumns(maybeExpandedColumn)?.length
+            ? // Subtract 1 if the column is hidden on expand, since we're not rendering it.
+              tableState.getExpandedColumns(maybeExpandedColumn).length - (maybeExpandedColumn.hideOnExpand ? 1 : 0)
+            : 0
+          : 0;
+
+        // If we're rendering the Expandable Header row, then we might need to render the previous column's `expandHeader` property in the case where the column is hidden on expand.
+        column = isExpandableHeader ? maybeExpandedColumn : column;
 
         const { wrapAction = true, isAction = false } = column;
 
@@ -137,6 +158,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           }
         }
 
+        // Reset the expandColumnHidden flag once done with logic based upon it.
+        expandColumnHidden = false;
+
         // Decrement colspan count and skip if greater than 1.
         if (currentColspan > 1) {
           currentColspan -= 1;
@@ -159,8 +183,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         const alignment = getAlignment(column, maybeContent);
         const justificationCss = getJustification(column, maybeContent, as, alignment);
         const isExpandable =
-          (column.expandColumns && column.expandColumns.length > 0) || column.expandedWidth !== undefined;
-
+          isFunction(column.expandColumns) ||
+          (column.expandColumns && column.expandColumns.length > 0) ||
+          column.expandedWidth !== undefined;
         const content = toContent(
           maybeContent,
           isHeader,
@@ -265,6 +290,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
 
         const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
+        const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
 
         const renderFn: RenderCellFn<any> =
           (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
@@ -275,7 +301,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ? rowClickRenderFn(as, api)
             : defaultRenderFn(as);
 
-        return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick);
+        return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick, tooltip);
       })}
     </RowTag>
   );
@@ -334,4 +360,6 @@ export type GridDataRow<R extends Kinded> = {
   initSelected?: boolean;
   /** Whether row can be selected */
   selectable?: false;
-} & IfAny<R, {}, DiscriminateUnion<R, "kind", R["kind"]>>;
+  /** Whether this row should infer its selected state based on its children's selected state */
+  inferSelectedState?: false;
+} & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;

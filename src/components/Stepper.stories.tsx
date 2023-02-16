@@ -8,11 +8,11 @@ import { noop } from "src/utils";
 export default {
   component: Stepper,
   title: "Workspace/Components/Stepper",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36152%3A101985",
-    }
+    },
   },
 } as Meta;
 

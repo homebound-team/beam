@@ -14,8 +14,10 @@ interface ListBoxProps<O, V extends Key> {
   getOptionLabel: (opt: O) => string;
   getOptionValue: (opt: O) => V;
   contrast?: boolean;
+  horizontalLayout?: boolean;
   positionProps: React.HTMLAttributes<Element>;
   loading?: boolean | (() => JSX.Element);
+  disabledOptionsWithReasons?: Record<string, string | undefined>;
 }
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
@@ -28,7 +30,9 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     getOptionValue,
     contrast = false,
     positionProps,
+    horizontalLayout = false,
     loading,
+    disabledOptionsWithReasons = {},
   } = props;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...props }, state, listBoxRef);
   const positionMaxHeight = positionProps.style?.maxHeight;
@@ -79,14 +83,19 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
   return (
     <div
       css={{
-        ...Css.bgWhite.br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(contrast).bgGray700.$,
+        // If `horizontalLayout`, then that means `labelStyle === "left"`. In this case the label the the field both take 50% of the horizontal space.
+        // Add `w50` in that case to ensure the ListBox is only the width of the field. If the width definitions ever change, we need to update here as well.
+        ...Css.bgWhite.br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(contrast).bgGray700.if(horizontalLayout).w50.$,
         "&:hover": Css.bshHover.$,
       }}
       ref={listBoxRef}
       {...listBoxProps}
     >
       {isMultiSelect && state.selectionManager.selectedKeys.size > 0 && (
-        <ul css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").$} ref={selectedList}>
+        <ul
+          css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").maxh("50%").overflowAuto.$}
+          ref={selectedList}
+        >
           {selectedOptions.map((o) => (
             <ListBoxToggleChip
               key={getOptionValue(o)}
@@ -112,6 +121,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
               popoverHeight={popoverHeight}
               // Only scroll on focus if using VirtualFocus (used for ComboBoxState (SelectField), but not SelectState (ChipSelectField))
               scrollOnFocus={(props as any).shouldUseVirtualFocus}
+              disabledOptionsWithReasons={disabledOptionsWithReasons}
             />
           ))
         ) : (
@@ -123,6 +133,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
             // Only scroll on focus if using VirtualFocus (used for ComboBoxState (SelectField), but not SelectState (ChipSelectField))
             scrollOnFocus={(props as any).shouldUseVirtualFocus}
             loading={loading}
+            disabledOptionsWithReasons={disabledOptionsWithReasons}
           />
         )}
       </ul>

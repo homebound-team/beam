@@ -33,7 +33,7 @@ The most concrete manifestation of this is that we want to _provide as few props
 Fewer props generally means:
 
 1. More consistent UX for users (the component cannot behave in N different ways, depending on the page the user sees it on)
-2. Easier usage for client applications (fewer props to know and understand "...should I set this? or not?")
+2. Easier usage for client applications (fewer props to know and understand "...should I set this or not?")
 3. Simpler implementation for Beam components and maintainers
 4. More flexibility to change the internal implementations of Beam components and roll out them relatively easily.
 

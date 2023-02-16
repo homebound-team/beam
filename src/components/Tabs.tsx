@@ -1,3 +1,4 @@
+import { InterpolationWithTheme } from "@emotion/core";
 import { camelCase } from "change-case";
 import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
@@ -7,6 +8,7 @@ import type { IconKey } from "src/components";
 import { FullBleed } from "src/components";
 import { Css, Margin, Only, Padding, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
+import { AnyObject } from "src/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { Icon } from "./Icon";
@@ -88,7 +90,7 @@ export function TabsWithContent<V extends string, X extends Only<TabsContentXss,
 }
 
 export function TabContent<V extends string>(
-  props: Omit<RequiredRenderTabs<V, {}>, "onChange"> | RequiredRenderRouteTabs<V, {}>,
+  props: Omit<RequiredRenderTabs<V, AnyObject>, "onChange"> | RequiredRenderRouteTabs<V, AnyObject>,
 ) {
   const tid = useTestIds(props, "tab");
   const { tabs, contentXss = {} } = props;
@@ -110,7 +112,7 @@ export function TabContent<V extends string>(
         role="tabpanel"
         tabIndex={0}
         {...tid.panel}
-        css={contentXss}
+        css={contentXss as InterpolationWithTheme<any>}
       >
         {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
       </div>
@@ -119,7 +121,7 @@ export function TabContent<V extends string>(
 }
 
 /** The top list of tabs. */
-export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<V, {}>) {
+export function Tabs<V extends string>(props: TabsProps<V, AnyObject> | RouteTabsProps<V, AnyObject>) {
   const { ariaLabel, tabs, includeBottomBorder, right, ...others } = props;
   const location = useLocation();
   const selected = isRouteTabs(props)
@@ -185,7 +187,7 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
         </div>
       )}
       {/* ref for actions specific to a tab. Targeting the immediate div (tabActionsEl) to set default styles */}
-      {right && <div css={Css.ml("auto").df.aic.gap1.pb1.$}>{right}</div>}
+      {right && <div css={Css.mla.df.aic.gap1.pb1.$}>{right}</div>}
     </div>
   );
 }
@@ -299,6 +301,6 @@ function uniqueTabValue(tab: Tab<any> | RouteTab<any>) {
 }
 
 // Determines whether we should hide the Tab panel. Returns true if there is only one enabled tab and `alwaysShowAllTabs` is falsey.
-function hideTabs(props: Omit<TabsProps<any, {}>, "onChange"> | RouteTabsProps<any, {}>) {
+function hideTabs(props: Omit<TabsProps<any, AnyObject>, "onChange"> | RouteTabsProps<any, AnyObject>) {
   return props.alwaysShowAllTabs ? false : (props.tabs as any[]).filter((t) => !t.disabled).length === 1;
 }

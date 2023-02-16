@@ -46,7 +46,7 @@ export function useSetupColumnSizes(
       setTableWidth(width);
       setColumnSizes(calcColumnSizes(columns, width, style.minWidthPx, expandedColumnIds));
     },
-    [setTableWidth, setColumnSizes, columns, style],
+    [setTableWidth, setColumnSizes, columns, style, expandedColumnIds],
   );
 
   // Used to recalculate our columns sizes when columns change
