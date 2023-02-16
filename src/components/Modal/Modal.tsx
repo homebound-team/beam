@@ -9,7 +9,7 @@ import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
-export type ModalSize = "sm" | "md" | "lg" | "xl";
+export type ModalSize = "sm" | "md" | "lg" | "xl" | "xxl";
 
 export interface ModalProps {
   /**
@@ -181,6 +181,7 @@ const widths: Record<ModalSize, number> = {
   md: 480,
   lg: 640,
   xl: 800,
+  xxl: 900,
 };
 
 const defaultMinHeight = 204;
