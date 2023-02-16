@@ -33,7 +33,7 @@
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\""
   },
   "dependencies": {
-    "@homebound/form-state": "^2.15.3",
+    "@homebound/form-state": "^2.16.0",
     "@internationalized/number": "^3.0.3",
     "@react-aria/utils": "^3.13.2",
     "@react-hook/resize-observer": "^1.2.2",
