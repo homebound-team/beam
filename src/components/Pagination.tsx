@@ -3,6 +3,7 @@ import { IconButton } from "src/components";
 import { Css, Palette } from "src/Css";
 import { SelectField } from "src/inputs";
 import { useTestIds } from "src/utils";
+import { zeroTo } from "src/utils/sb";
 
 export type PageSettings = {
   page: number;
@@ -16,12 +17,15 @@ type PaginationProps = {
   setSettings: Dispatch<SetStateAction<PageSettings>>;
 };
 
+// Make a list of 50/100/150/etc page sizes for the user to chose
+const pageOptions = zeroTo(5).map((n) => {
+  const option = n * 50;
+  return { id: option, name: option.toString() };
+});
+
 export function Pagination(props: PaginationProps) {
   const { hasNextPage, label, settings, setSettings } = props;
   const { perPage } = settings;
-  const pageOptions = Array(5)
-    .fill(0)
-    .map((_, i) => ({ id: (i + 1) * 50, name: ((i + 1) * 50).toString() }));
 
   const tid = useTestIds(props, "pagination");
   return (
