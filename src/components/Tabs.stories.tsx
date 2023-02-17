@@ -207,7 +207,7 @@ function getChildren(label: string) {
   return (
     <Fragment>
       {label}
-      <Icon icon="checkCircle" css={Css.ml1.$} />
+      <Icon icon="checkCircle" />
     </Fragment>
   );
 }

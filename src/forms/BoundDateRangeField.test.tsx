@@ -3,7 +3,7 @@ import { render } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { BoundDateRangeField } from "src/forms/BoundDateRangeField";
 import { AuthorInput, jan1, jan19, jan2 } from "src/forms/formStateDomain";
-import { click } from "src/utils/rtl";
+import { blur, click, focus } from "src/utils/rtl";
 
 describe(BoundDateRangeField, () => {
   it("trigger onFocus and onBlur callbacks", async () => {
@@ -14,12 +14,12 @@ describe(BoundDateRangeField, () => {
     const r = await render(<BoundDateRangeField field={author.saleDates} onBlur={onBlur} onFocus={onFocus} />);
 
     // When focus is triggered on a checkbox
-    r.saleDates().focus();
+    focus(r.saleDates);
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
 
     // When blur is triggered on a checkbox
-    r.saleDates().blur();
+    blur(r.saleDates);
     // Then the callback should be triggered
     expect(onBlur).toBeCalledTimes(1);
   });
@@ -36,7 +36,7 @@ describe(BoundDateRangeField, () => {
     const r = await render(<BoundDateRangeField field={author.saleDates} />);
 
     // When triggering the Date Picker
-    r.saleDates().focus();
+    focus(r.saleDates);
     // And when selecting a date - Choose the first of these, which should be `jan1`
     click(r.datePickerDay_0);
 

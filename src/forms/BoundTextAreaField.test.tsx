@@ -3,7 +3,7 @@ import { render } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { BoundTextAreaField } from "src/forms/BoundTextAreaField";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { type } from "src/utils/rtl";
+import { blur, focus, type } from "src/utils/rtl";
 
 describe("BoundTextAreaField", () => {
   it("shows the current value", async () => {
@@ -27,12 +27,12 @@ describe("BoundTextAreaField", () => {
     const r = await render(<BoundTextAreaField field={formState.firstName} onBlur={onBlur} onFocus={onFocus} />);
 
     // When focus is triggered
-    r.firstName().focus();
+    focus(r.firstName);
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
 
     // When blur is triggered
-    r.firstName().blur();
+    blur(r.firstName);
     // Then the callback should be triggered
     expect(onBlur).toBeCalledTimes(1);
   });

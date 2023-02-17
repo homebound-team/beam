@@ -1,10 +1,9 @@
 import { createObjectState, ObjectConfig, required, useFormState } from "@homebound/form-state";
-import { click } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { Observer } from "mobx-react";
 import { BoundSelectAndTextField } from "src";
 import { ScheduleTypes } from "src/components/Filters/testDomain";
-import { render, type } from "src/utils/rtl";
+import { click, render, type } from "src/utils/rtl";
 
 describe("BoundSelectAndTextField", () => {
   it("renders and updates values", async () => {
@@ -19,7 +18,7 @@ describe("BoundSelectAndTextField", () => {
     expect(r.nameValue()).toBeEmptyDOMElement();
 
     // When changing the values
-    fireEvent.click(r.type());
+    click(r.type);
     click(r.getByRole("option", { name: "Task" }));
     type(r.name, "Test Task Name");
 
@@ -87,7 +86,7 @@ describe("BoundSelectAndTextField", () => {
     );
 
     // When making a selection from the dropdown
-    r.type().click();
+    click(r.type);
     click(r.getByRole("option", { name: "Task" }));
     // Then autoSave should be called.
     expect(maybeAutoSave).toBeCalledTimes(1);

@@ -1,7 +1,7 @@
 import { fireEvent } from "@testing-library/react";
 import { ChipTextField } from "src/inputs/ChipTextField";
 import { noop } from "src/utils";
-import { render } from "src/utils/rtl";
+import { focus, render } from "src/utils/rtl";
 
 describe("ChipTextField", () => {
   it("renders", async () => {
@@ -25,7 +25,7 @@ describe("ChipTextField", () => {
     );
 
     // When firing the events on the input, then expect the callbacks to be invoked
-    fireEvent.focus(r.chipField());
+    focus(r.chipField());
     expect(onFocus).toBeCalledTimes(1);
 
     fireEvent.blur(r.chipField());
@@ -43,7 +43,7 @@ describe("ChipTextField", () => {
     // Given the Chip Input
     const r = await render(<ChipTextField label="Test Label" onChange={noop} onBlur={onBlur} />);
     // With focus
-    r.chipField().focus();
+    focus(r.chipField);
     expect(r.chipField()).toHaveFocus();
     // When pressing the escape key
     fireEvent.keyDown(r.chipField(), { key: "Escape" });
@@ -58,7 +58,7 @@ describe("ChipTextField", () => {
     // Given the Chip Input
     const r = await render(<ChipTextField label="Test Label" onChange={noop} blurOnEscape={false} onBlur={onBlur} />);
     // With focus
-    r.chipField().focus();
+    focus(r.chipField);
     expect(r.chipField()).toHaveFocus();
     // When pressing the escape key
     fireEvent.keyDown(r.chipField(), { key: "Escape" });

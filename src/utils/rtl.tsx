@@ -1,7 +1,9 @@
 import { newLocation as _newLocation, withRouter as _withRouter } from "@homebound/rtl-react-router-utils";
 import {
+  blur as _blur,
   change as _change,
   click as _click,
+  focus as _focus,
   getOptions as _getOptions,
   input as _input,
   render as rtlRender,
@@ -16,8 +18,10 @@ import { prettyDOM } from "@testing-library/react";
 import { ReactElement } from "react";
 import { BeamProvider } from "src/components";
 export {
+  _blur as blur,
   _change as change,
   _click as click,
+  _focus as focus,
   _getOptions as getOptions,
   _input as input,
   _select as select,

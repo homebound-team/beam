@@ -155,7 +155,7 @@ function Radio<K extends string>(props: {
         </div>
         {description && (
           <div id={descriptionId} css={Css.sm.gray700.if(disabled).gray400.$}>
-            {description}
+            {typeof description === "function" ? description() : description}
           </div>
         )}
       </div>

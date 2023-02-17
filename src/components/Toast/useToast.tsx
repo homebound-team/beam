@@ -7,7 +7,7 @@ export interface UseToastProps {
 export function useToast(): UseToastProps {
   const { setNotice } = useToastContext();
   const showToast = useCallback(
-    (props) => {
+    (props: any) => {
       setNotice(props);
     },
     [setNotice],

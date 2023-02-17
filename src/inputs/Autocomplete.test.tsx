@@ -1,6 +1,6 @@
 import { Autocomplete } from "src/inputs/Autocomplete";
 import { HasIdAndName } from "src/types";
-import { click, render, type } from "src/utils/rtl";
+import { click, focus, render, type } from "src/utils/rtl";
 
 describe("Autocomplete", () => {
   it("renders", async () => {
@@ -30,7 +30,7 @@ describe("Autocomplete", () => {
     expect(r.queryByRole("listbox")).toBeFalsy();
 
     // When the input is focused
-    r.search().focus();
+    focus(r.search);
     // Then the options are displayed and have the correct text
     expect(r.getAllByRole("option")[0]).toHaveTextContent("User 1");
     expect(r.getAllByRole("option")[1]).toHaveTextContent("User 2");
@@ -57,7 +57,7 @@ describe("Autocomplete", () => {
     expect(onChange).toHaveBeenCalledWith("User 1");
 
     // And when focusing the input to open the menu
-    r.search().focus();
+    focus(r.search);
     // and clicking on the option
     click(r.getByRole("option"));
     // Then the onSelect callback should be fired
@@ -80,7 +80,7 @@ describe("Autocomplete", () => {
     // Then the input should be disabled
     expect(r.search()).toBeDisabled();
     // And when the input is focused
-    r.search().focus();
+    focus(r.search);
     // Then the menu should not be displayed
     expect(r.queryByRole("listbox")).toBeFalsy();
   });
@@ -99,9 +99,9 @@ describe("Autocomplete", () => {
       />,
     );
     // When the input is focused
-    r.search().focus();
+    focus(r.search);
     // And the clear button is clicked
-    click(r.xCircle());
+    click(r.xCircle);
     // Then the input should be cleared
     expect(onChange).toHaveBeenCalledWith(undefined);
   });

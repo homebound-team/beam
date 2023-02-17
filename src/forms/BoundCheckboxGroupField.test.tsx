@@ -3,7 +3,7 @@ import { render } from "@homebound/rtl-utils";
 import { BoundCheckboxGroupField } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { CheckboxGroupItemOption } from "src/inputs";
-import { click } from "src/utils/rtl";
+import { blur, click, focus } from "src/utils/rtl";
 
 const colors: CheckboxGroupItemOption[] = [
   { value: "c:1", label: "Blue" },
@@ -28,12 +28,12 @@ describe("BoundCheckboxGroupField", () => {
     );
 
     // When focus is triggered on a checkbox
-    r.blue().focus();
+    focus(r.blue);
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
 
     // When blur is triggered on a checkbox
-    r.blue().blur();
+    blur(r.blue);
     // Then the callback should be triggered
     expect(onBlur).toBeCalledTimes(1);
   });
