@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { withBeamDecorator } from "src/utils/sb";
 import { FormLines, TextField } from "..";
@@ -39,12 +38,12 @@ function RenderPagination({ totalRows, label }: { totalRows: number; label?: str
   });
 
   return (
-    <div css={Css.w25.$}>
+    <>
       <FormLines labelStyle="left">
         <TextField label={"Number of items"} readOnly value={String(totalRows)} onChange={noop} />
         <TextField label={"Current page"} readOnly value={String(settings.page)} onChange={noop} />
       </FormLines>
       <Pagination totalCount={totalRows} label={label ?? "items"} setSettings={setSettings} settings={settings} />
-    </div>
+    </>
   );
 }

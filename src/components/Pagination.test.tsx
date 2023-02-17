@@ -72,9 +72,27 @@ describe("Pagination", () => {
     expect(r.pagination_nextIcon()).not.toBeDisabled();
   });
 
+  it("shows detailed navigation page info", async () => {
+    // Given a render pagination of 999 lines on page 4
+    const r = await render(
+      <Pagination totalCount={999} label="items" setSettings={jest.fn} settings={{ page: 4, perPage: 200 }} />,
+    );
+    // Then show the information about what is paginated
+    expect(r.pagination_pageInfoLabel()).toHaveTextContent("601 - 800 of 999 items"); // we're showing 601-800 from 999 items
+  });
+
+  it("shows detailed navigation page info on last page", async () => {
+    // Given a render pagination of 999 lines on last page
+    const r = await render(
+      <Pagination totalCount={999} label="" setSettings={jest.fn} settings={{ page: 5, perPage: 200 }} />,
+    );
+    // Then show the information about what is paginated
+    expect(r.pagination_pageInfoLabel()).toHaveTextContent("801 of 999"); // we're showing 801 of 999 items
+  });
+
   describe("pageOptions", () => {
     it("returns page options", () => {
-      const expected = [50, 100, 150, 200].map((n) => ({ id: n, name: String(n) }));
+      const expected = [50, 100, 150, 200, 250].map((n) => ({ id: n, name: String(n) }));
       expect(pageOptions).toEqual(expected);
     });
   });

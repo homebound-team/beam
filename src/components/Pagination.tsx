@@ -3,7 +3,6 @@ import { IconButton } from "src/components";
 import { Css, Palette } from "src/Css";
 import { SelectField } from "src/inputs";
 import { useTestIds } from "src/utils";
-import { zeroTo } from "src/utils/sb";
 
 export type PageSettings = {
   page: number;
@@ -18,10 +17,9 @@ type PaginationProps = {
 };
 
 // Make a list of 50/100/150/etc page sizes for the user to chose
-export const pageOptions = zeroTo(4).map((n) => {
-  const option = (n + 1) * 50;
-  return { id: option, name: option.toString() };
-});
+export const pageOptions = Array(5)
+  .fill(0)
+  .map((_, i) => ({ id: (i + 1) * 50, name: ((i + 1) * 50).toString() }));
 
 export function Pagination(props: PaginationProps) {
   const { label, settings, totalCount, setSettings } = props;
@@ -32,7 +30,7 @@ export function Pagination(props: PaginationProps) {
   const tid = useTestIds(props, "pagination");
   return (
     <div css={Css.df.bGray300.bt.xs.gray500.px1.ml2.pt2.$} {...tid}>
-      <div css={Css.df.mya.mr2.$} {...tid.label}>
+      <div css={Css.df.mya.mr2.$} {...tid.perPageLabel}>
         {label} per page:
       </div>
       <div css={Css.wPx(78).$}>
@@ -48,6 +46,9 @@ export function Pagination(props: PaginationProps) {
         />
       </div>
       <div css={Css.mla.mya.df.$}>
+        <div css={Css.df.mya.mr2.$} {...tid.pageInfoLabel}>
+          {perPage * (page - 1) + 1} {hasNextPage ? `- ${perPage * page}` : ""} of {totalCount} {label}
+        </div>
         <IconButton
           {...tid.previousIcon}
           icon="chevronLeft"
