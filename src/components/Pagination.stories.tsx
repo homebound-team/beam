@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { withBeamDecorator } from "src/utils/sb";
@@ -21,7 +21,7 @@ export default {
 } as Meta;
 
 export function WithPages() {
-  return <RenderPagination totalRows={1000} label="items" />;
+  return <RenderPagination totalRows={999} label="items" />;
 }
 
 export function NoPages() {
@@ -38,18 +38,13 @@ function RenderPagination({ totalRows, label }: { totalRows: number; label?: str
     perPage: initPageSettings.perPage,
   });
 
-  const hasNextPage = useMemo(
-    () => settings.page < totalRows / settings.perPage,
-    [settings.page, settings.perPage, totalRows],
-  );
-
   return (
     <div css={Css.w25.$}>
       <FormLines labelStyle="left">
         <TextField label={"Number of items"} readOnly value={String(totalRows)} onChange={noop} />
         <TextField label={"Current page"} readOnly value={String(settings.page)} onChange={noop} />
       </FormLines>
-      <Pagination hasNextPage={hasNextPage} label={"items"} setSettings={setSettings} settings={settings} />
+      <Pagination totalCount={totalRows} label={label ?? "items"} setSettings={setSettings} settings={settings} />
     </div>
   );
 }

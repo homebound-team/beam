@@ -1,17 +1,17 @@
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
-import { initPageSettings, Pagination, toFirstAndOffset } from "./Pagination";
+import { initPageSettings, pageOptions, Pagination, toFirstAndOffset } from "./Pagination";
 
 describe("Pagination", () => {
   it("can have a data-testid", async () => {
     const r = await render(
-      <Pagination hasNextPage={true} label="" setSettings={noop} settings={initPageSettings} data-testid="pag" />,
+      <Pagination totalCount={10} label="" setSettings={noop} settings={initPageSettings} data-testid="pag" />,
     );
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("pag");
   });
 
   it("defaults data-testid to pagination", async () => {
-    const r = await render(<Pagination hasNextPage={true} label="" setSettings={noop} settings={initPageSettings} />);
+    const r = await render(<Pagination totalCount={10} label="" setSettings={noop} settings={initPageSettings} />);
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("pagination");
   });
 
@@ -19,7 +19,7 @@ describe("Pagination", () => {
     // Given a pagination component on page 1 and per page 50
     const setSettings = jest.fn();
     const r = await render(
-      <Pagination hasNextPage={true} label="" setSettings={setSettings} settings={{ page: 1, perPage: 50 }} />,
+      <Pagination totalCount={100} label="" setSettings={setSettings} settings={{ page: 1, perPage: 50 }} />,
     );
     // When click to go to the next page
     click(r.pagination_nextIcon);
@@ -32,7 +32,7 @@ describe("Pagination", () => {
     // Given a pagination component on page 1 and per page 50
     const setSettings = jest.fn();
     const r = await render(
-      <Pagination hasNextPage={true} label="" setSettings={setSettings} settings={{ page: 1, perPage: 50 }} />,
+      <Pagination totalCount={10} label="" setSettings={setSettings} settings={{ page: 1, perPage: 50 }} />,
     );
     // Then perPage field have value of 50
     expect(r.pagination_perPage()).toHaveValue("50");
@@ -48,19 +48,35 @@ describe("Pagination", () => {
   it("cannot navigate to previous page when are in the first page", async () => {
     // Given a render pagination on page 1
     const r = await render(
-      <Pagination hasNextPage={false} label="" setSettings={jest.fn} settings={{ page: 1, perPage: 50 }} />,
+      <Pagination totalCount={10} label="" setSettings={jest.fn} settings={{ page: 1, perPage: 50 }} />,
     );
     // Then previous page button is disabled
     expect(r.pagination_previousIcon()).toBeDisabled();
   });
 
-  it("cannot navigate to next page when hasNextPage=false", async () => {
+  it("cannot navigate to next page when current page is minor than total count / per page", async () => {
     // Given a render pagination on page 1
     const r = await render(
-      <Pagination hasNextPage={true} label="" setSettings={jest.fn} settings={{ page: 1, perPage: 10 }} />,
+      <Pagination totalCount={999} label="" setSettings={jest.fn} settings={{ page: 5, perPage: 200 }} />,
+    );
+    // Then next page button is disabled
+    expect(r.pagination_nextIcon()).toBeDisabled();
+  });
+
+  it("can navigate to next page when current page is greater than total count / per page", async () => {
+    // Given a render pagination on page 1
+    const r = await render(
+      <Pagination totalCount={999} label="" setSettings={jest.fn} settings={{ page: 4, perPage: 200 }} />,
     );
     // Then next page button is not disabled
     expect(r.pagination_nextIcon()).not.toBeDisabled();
+  });
+
+  describe("pageOptions", () => {
+    it("returns page options", () => {
+      const expected = [50, 100, 150, 200].map((n) => ({ id: n, name: String(n) }));
+      expect(pageOptions).toEqual(expected);
+    });
   });
 
   describe("toFirstAndOffset", () => {

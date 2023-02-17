@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 import { IconButton } from "src/components";
 import { Css, Palette } from "src/Css";
 import { SelectField } from "src/inputs";
@@ -12,20 +12,22 @@ export type PageSettings = {
 
 type PaginationProps = {
   label: string;
-  hasNextPage: boolean;
+  totalCount: number;
   settings: PageSettings;
   setSettings: Dispatch<SetStateAction<PageSettings>>;
 };
 
 // Make a list of 50/100/150/etc page sizes for the user to chose
-const pageOptions = zeroTo(5).map((n) => {
-  const option = n * 50;
+export const pageOptions = zeroTo(4).map((n) => {
+  const option = (n + 1) * 50;
   return { id: option, name: option.toString() };
 });
 
 export function Pagination(props: PaginationProps) {
-  const { hasNextPage, label, settings, setSettings } = props;
-  const { perPage } = settings;
+  const { label, settings, totalCount, setSettings } = props;
+  const { perPage, page } = settings;
+
+  const hasNextPage = useMemo(() => page < totalCount / perPage, [page, perPage, totalCount]);
 
   const tid = useTestIds(props, "pagination");
   return (
