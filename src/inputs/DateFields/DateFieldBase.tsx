@@ -3,7 +3,7 @@ import { useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "
 import { isDateRange, Matcher } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
 import { Icon, IconButton, resolveTooltip } from "src/components";
-import { DatePicker, DateRangePicker, Popover } from "src/components/internal";
+import { DatePicker, DateRangePicker, Popover, YearPicker } from "src/components/internal";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
 import { Css, Palette, Properties } from "src/Css";
 import {
@@ -51,6 +51,7 @@ export interface DateFieldBaseProps
   mode: DateFieldMode;
   /** Range filters should only allow a full DateRange or nothing */
   isRangeFilterField?: boolean;
+  yearPicker?: YearPicker;
 }
 
 export interface DateSingleFieldBaseProps extends DateFieldBaseProps {
@@ -86,6 +87,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     defaultOpen,
     mode,
     isRangeFilterField = false,
+    yearPicker = "default",
     ...others
   } = props;
 
@@ -333,7 +335,8 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
                   setInputValue(formatDateRange(dr, dateFormats.short) ?? "");
                   onChange(dr);
                 }}
-                useYearPicker={isRangeFilterField}
+                // Allow the year picker to be overridden by the `yearPicker` prop, otherwise default to "skip" for range filters
+                yearPicker={yearPicker || (isRangeFilterField && "skip")}
                 {...tid.datePicker}
               />
             ) : (
@@ -345,6 +348,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
                   onChange(d);
                   state.close();
                 }}
+                yearPicker={yearPicker}
                 {...tid.datePicker}
               />
             )}

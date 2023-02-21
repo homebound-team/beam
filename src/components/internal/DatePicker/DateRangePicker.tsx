@@ -1,10 +1,11 @@
 import { DayPicker, Matcher } from "react-day-picker";
 import { Day } from "src/components/internal/DatePicker/Day";
-import { Header, YearSkipHeader } from "src/components/internal/DatePicker/Header";
+import { Header, PreciseDateHeader, YearSkipHeader } from "src/components/internal/DatePicker/Header";
 import { WeekHeader } from "src/components/internal/DatePicker/WeekHeader";
 import { Css } from "src/Css";
 import { DateRange } from "src/types";
 import { useTestIds } from "src/utils";
+import { YearPicker } from "./DatePicker";
 import "./DatePicker.css";
 
 export interface DateRangePickerProps {
@@ -12,11 +13,11 @@ export interface DateRangePickerProps {
   onSelect: (range: DateRange | undefined) => void;
   disabledDays?: Matcher | Matcher[];
   dottedDays?: Matcher[];
-  useYearPicker?: boolean;
+  yearPicker?: YearPicker;
 }
 
 export function DateRangePicker(props: DateRangePickerProps) {
-  const { range, onSelect, disabledDays, dottedDays, useYearPicker } = props;
+  const { range, onSelect, disabledDays, dottedDays, yearPicker = "default" } = props;
   const tid = useTestIds(props, "datePicker");
 
   return (
@@ -24,7 +25,12 @@ export function DateRangePicker(props: DateRangePickerProps) {
       <DayPicker
         mode="range"
         selected={range}
-        components={{ Caption: useYearPicker ? YearSkipHeader : Header, Head: WeekHeader, Day }}
+        components={{
+          Caption:
+            (yearPicker === "skip" && YearSkipHeader) || (yearPicker === "precise" && PreciseDateHeader) || Header,
+          Head: WeekHeader,
+          Day,
+        }}
         defaultMonth={range?.to ?? new Date()}
         onSelect={(selection, day, activeModifiers) => {
           // Disallow returning disabled dates.

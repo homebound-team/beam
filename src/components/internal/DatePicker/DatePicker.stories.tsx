@@ -18,3 +18,29 @@ export function Default() {
   const [date, setDate] = useState(jan1);
   return <DatePicker value={date} onSelect={setDate} dottedDays={[jan1, jan2, jan29]} disabledDays={[jan10]} />;
 }
+
+export function Skip() {
+  const [date, setDate] = useState(jan1);
+  return (
+    <DatePicker
+      value={date}
+      onSelect={setDate}
+      dottedDays={[jan1, jan2, jan29]}
+      disabledDays={[jan10]}
+      yearPicker={"skip"}
+    />
+  );
+}
+
+export function Precise() {
+  const [date, setDate] = useState(jan1);
+  return (
+    <DatePicker
+      value={date}
+      onSelect={setDate}
+      dottedDays={[jan1, jan2, jan29]}
+      disabledDays={[jan10]}
+      yearPicker={"precise"}
+    />
+  );
+}
