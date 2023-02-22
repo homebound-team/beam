@@ -82,6 +82,8 @@ export type GridColumn<R extends Kinded> = {
   expandColumns?: GridColumn<R>[] | (() => Promise<GridColumn<R>[]>);
   /** Determines whether the group should initially be expanded on load of the table */
   initExpanded?: boolean;
+  /** Determines whether this column should be hidden when expanded (only the 'expandColumns' would show) */
+  hideOnExpand?: boolean;
 };
 // export type ExpandColumnsFn<R extends Kinded> = () => Promise<GridColumn<R>[]>;
 // when you do a type, you have to do an intersection - it can be this type & this type = ampersand is telling is its an intersection

@@ -1213,6 +1213,7 @@ export function ExpandableColumns() {
         expandableHeader: () => "Employee",
         header: (data, { expanded }) => (expanded ? "First Name" : emptyCell),
         data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+        hideOnExpand: true,
         expandColumns: [
           column<ExpandableRow>({
             expandableHeader: emptyCell,
