@@ -96,6 +96,8 @@ function memoizedTableStyles() {
           firstContentColumn: { ...Css.smMd.$, ...(allWhite && Css.smBd.gray900.$) },
         },
         2: { firstContentColumn: Css.tiny.pl3.$ },
+        // Add 12 more pixels of padding for each level of nesting
+        3: { firstContentColumn: Css.tiny.plPx(36).$ },
       };
       const defaultLevels = { 1: { firstContentColumn: Css.tiny.pl3.$ } };
 
