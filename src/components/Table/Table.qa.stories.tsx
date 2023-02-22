@@ -412,15 +412,17 @@ function beamNestedRows(levels: 1 | 2 | 3 | 4 = 1): GridDataRow<BeamNestedRow>[]
     };
   });
 
+  const grandParents = greatGrandParents[0].children!;
+
   return [
     simpleHeader,
     ...(levels === 4
       ? greatGrandParents
       : levels === 3
-      ? greatGrandParents.flatMap((ggp) => ggp.children!)
+      ? grandParents
       : levels === 2
-      ? greatGrandParents.flatMap((ggp) => ggp.children!.flatMap((gp) => gp.children!))
-      : greatGrandParents.flatMap((ggp) => ggp.children!.flatMap((gp) => gp.children!.flatMap((p) => p.children!)))),
+      ? grandParents.flatMap((gp) => gp.children!)
+      : grandParents.flatMap((gp) => gp.children!.flatMap((p) => p.children!))),
   ];
 }
 
