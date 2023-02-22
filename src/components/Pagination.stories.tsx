@@ -3,7 +3,9 @@ import { useState } from "react";
 import { noop } from "src/utils";
 import { withBeamDecorator } from "src/utils/sb";
 import { FormLines, TextField } from "..";
-import { initPageSettings, PageSettings, Pagination } from "./Pagination";
+import { PageSettings, Pagination } from "./Pagination";
+
+const initPageSettings = { page: 1, perPage: 100 };
 
 export default {
   title: "Workspace/Components/Pagination",

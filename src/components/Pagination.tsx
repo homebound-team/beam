@@ -9,17 +9,12 @@ export type PageSettings = {
   perPage: number;
 };
 
-type PaginationProps = {
+interface PaginationProps {
   label: string;
   totalCount: number;
   settings: PageSettings;
   setSettings: Dispatch<SetStateAction<PageSettings>>;
-};
-
-// Make a list of 50/100/150/etc page sizes for the user to chose
-export const pageOptions = Array(5)
-  .fill(0)
-  .map((_, i) => ({ id: (i + 1) * 50, name: ((i + 1) * 50).toString() }));
+}
 
 export function Pagination(props: PaginationProps) {
   const { label, settings, totalCount, setSettings } = props;
@@ -35,6 +30,7 @@ export function Pagination(props: PaginationProps) {
       </div>
       <div css={Css.wPx(78).$}>
         <SelectField
+          compact
           {...tid.perPage}
           labelStyle="hidden"
           label={`${label} per page`}
@@ -68,8 +64,6 @@ export function Pagination(props: PaginationProps) {
   );
 }
 
-export const initPageSettings = { page: 1, perPage: 100 };
-
 export function toFirstAndOffset(page: number, perPage: number) {
   return {
     first: perPage,
@@ -77,3 +71,8 @@ export function toFirstAndOffset(page: number, perPage: number) {
     offset: (page - 1) * perPage,
   };
 }
+
+// Make a list of 50/100/150/etc page sizes for the user to chose
+export const pageOptions = Array(5)
+  .fill(0)
+  .map((_, i) => ({ id: (i + 1) * 50, name: ((i + 1) * 50).toString() }));

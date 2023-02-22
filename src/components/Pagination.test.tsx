@@ -1,6 +1,8 @@
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
-import { initPageSettings, pageOptions, Pagination, toFirstAndOffset } from "./Pagination";
+import { pageOptions, Pagination, toFirstAndOffset } from "./Pagination";
+
+const initPageSettings = { page: 1, perPage: 100 };
 
 describe("Pagination", () => {
   it("can have a data-testid", async () => {
