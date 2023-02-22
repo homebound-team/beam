@@ -236,7 +236,7 @@ export function NestedFlexible() {
       style={{ grouped: true }}
       sorting={{ on: "client" }}
       columns={nestedColumns}
-      rows={[...beamTotalsRows, ...getRows(3)]}
+      rows={[...beamTotalsRows, ...getRows(2)]}
       stickyHeader
     />
   );
