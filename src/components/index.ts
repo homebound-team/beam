@@ -26,6 +26,7 @@ export * from "./LoadingSkeleton";
 export * from "./Modal";
 export * from "./Modal/useModal";
 export { NavLink } from "./NavLink";
+export * from "./Pagination";
 export { PresentationProvider } from "./PresentationContext";
 export * from "./Snackbar";
 export * from "./Stepper";
