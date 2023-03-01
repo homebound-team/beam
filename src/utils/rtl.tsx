@@ -89,6 +89,26 @@ export function rowAnd(r: RenderResult, rowNum: number, testId: string): HTMLEle
   return e.querySelector(`[data-testid="${testId}"]`) || fail(`Element not found ${prettyDOM(e)}`);
 }
 
+/** Intended to be used to generate a human-readable text representation of a GridTable
+ * * Example Use: `expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+      "Name | Value
+      Row 1 | 200
+      Row 2 | 300
+      Row 3 | 1000"
+    `)`
+ * */
+export function tableSnapshot(r: RenderResult): string {
+  const tableEl = r.getByTestId("gridTable");
+  const dataRows = Array.from(tableEl.querySelectorAll("[data-gridrow]"));
+
+  return dataRows
+    .map((row) => {
+      const cellTextContent = Array.from(row.childNodes).map((cell) => cell.textContent);
+      return cellTextContent.join(" | ");
+    })
+    .join("\n");
+}
+
 /** RTL wrapper for Beam's SuperDrawer/Modal context. */
 export const withBeamRTL: Wrapper = {
   wrap: (c) => <BeamProvider>{c}</BeamProvider>,
