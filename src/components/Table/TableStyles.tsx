@@ -238,6 +238,7 @@ export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
     "allWhite",
     "bordered",
     "rowHover",
+    "vAlign",
   ];
   const keys = safeKeys(style);
   if (keys.length === 0 || keys.some((k) => defKeys.includes(k as keyof GridStyleDef))) {
