@@ -89,6 +89,89 @@ export function rowAnd(r: RenderResult, rowNum: number, testId: string): HTMLEle
   return e.querySelector(`[data-testid="${testId}"]`) || fail(`Element not found ${prettyDOM(e)}`);
 }
 
+/** Intended to be used to generate a human-readable text 
+ * representation of a GridTable using the markdown table syntax.
+ * * Example Use: expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+      "
+      | Name                     | Value |
+      | ------------------------ | ----- |
+      | Row 1                    | 200   |
+      | Row 2 with a longer name | 300   |
+      | Row 3                    | 1000  |
+      "
+    `);
+ * */
+export function tableSnapshot(r: RenderResult): string {
+  const tableEl = r.getByTestId("gridTable");
+  const dataRows = Array.from(tableEl.querySelectorAll("[data-gridrow]"));
+  const hasExpandableHeader = !!tableEl.querySelector(`[data-testid="expandableColumn"]`);
+
+  const tableDataAsStrings = dataRows.map((row) => {
+    return Array.from(row.childNodes).map(getTextFromTableCellNode);
+  });
+
+  return toMarkupTableString({ tableRows: tableDataAsStrings, hasExpandableHeader });
+}
+
+function toMarkupTableString({
+  tableRows,
+  hasExpandableHeader,
+}: {
+  tableRows: (string | null)[][];
+  hasExpandableHeader: boolean;
+}) {
+  // Find the largest width of each column to set a consistent width for each row
+  const columnWidths = tableRows.reduce((acc, row) => {
+    row.forEach((cell, columnIndex) => {
+      const cellWidth = cell?.length ?? 0;
+      const currentMaxWidth = acc.get(columnIndex) ?? 0;
+      if (cellWidth > currentMaxWidth || !currentMaxWidth) acc.set(columnIndex, cellWidth);
+    });
+
+    return acc;
+  }, new Map<number, number>());
+
+  const wrapTableRowEnds = (str: string) => `| ${str} |`;
+
+  const rowsWithPaddingAndDividers = tableRows.map((tableCells) => {
+    const formattedRow = tableCells
+      .map((cell, columnIndex) => {
+        const cellWidth = columnWidths.get(columnIndex) ?? 0;
+        return cell?.padEnd(cellWidth, " ") || "";
+      })
+      .join(" | ");
+    return wrapTableRowEnds(formattedRow);
+  });
+
+  const headerDivider = Array.from(columnWidths.values())
+    .map((width) => "-".repeat(width) ?? "")
+    .join(" | ");
+
+  const headerDividerRowNumber = hasExpandableHeader ? 2 : 1;
+  rowsWithPaddingAndDividers.splice(headerDividerRowNumber, 0, wrapTableRowEnds(headerDivider));
+
+  // Pad a newline on top and bottom for cleaner diffs
+  return `\n${rowsWithPaddingAndDividers.join("\n")}\n`;
+}
+
+/** Prefer showing a `value` from a mocked input vs. the combined text content from an inputs markup */
+function getTextFromTableCellNode(node: ChildNode) {
+  if (node.nodeType === Node.ELEMENT_NODE) {
+    const element = node as HTMLElement;
+
+    const maybeInput = element.getElementsByTagName("input")[0];
+    if (maybeInput) return maybeInput.value;
+
+    const maybeTextarea = element.getElementsByTagName("textarea")[0];
+    if (maybeTextarea) return maybeTextarea.value;
+
+    const maybeSelect = element.getElementsByTagName("select")[0];
+    if (maybeSelect) return maybeSelect.value;
+  }
+
+  return node.textContent;
+}
+
 /** RTL wrapper for Beam's SuperDrawer/Modal context. */
 export const withBeamRTL: Wrapper = {
   wrap: (c) => <BeamProvider>{c}</BeamProvider>,
