@@ -230,18 +230,19 @@ export function tableRowStyles(as: RenderAs, column?: GridColumn<any>) {
 }
 
 export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
-  const defKeys: (keyof GridStyleDef)[] = [
-    "inlineEditing",
-    "grouped",
-    "rowHeight",
-    "cellHighlight",
-    "allWhite",
-    "bordered",
-    "rowHover",
-    "vAlign",
-  ];
+  const defKeysRecord: Record<keyof GridStyleDef, boolean> = {
+    inlineEditing: true,
+    grouped: true,
+    rowHeight: true,
+    cellHighlight: true,
+    allWhite: true,
+    bordered: true,
+    rowHover: true,
+    vAlign: true,
+  };
   const keys = safeKeys(style);
-  if (keys.length === 0 || keys.some((k) => defKeys.includes(k as keyof GridStyleDef))) {
+  const defKeys = safeKeys(defKeysRecord);
+  if (keys.length === 0 || keys.some((k) => defKeys.includes(k))) {
     return getTableStyles(style as GridStyleDef);
   }
   return style as GridStyle;
