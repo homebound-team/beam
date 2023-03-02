@@ -35,6 +35,7 @@ export function ColoredChips() {
         <Chip text="warning" type={ChipTypes.warning} />
         <Chip text="success" type={ChipTypes.success} />
         <Chip text="light" type={ChipTypes.light} />
+        <Chip text="darkMode" type={ChipTypes.darkMode} />
         <Chip text="dark" type={ChipTypes.dark} />
       </div>
     </div>

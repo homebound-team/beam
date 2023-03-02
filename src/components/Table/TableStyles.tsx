@@ -66,6 +66,8 @@ export interface GridStyleDef {
   allWhite?: boolean;
   bordered?: boolean;
   rowHover?: boolean;
+  /** Defines the vertical alignment of the content of the cells for the whole table (not including the 'header' rows). Defaults to `center` */
+  vAlign?: "top" | "center" | "bottom";
 }
 
 // Returns a "blessed" style of GridTable
@@ -79,6 +81,7 @@ function memoizedTableStyles() {
       cellHighlight = false,
       allWhite = false,
       bordered = false,
+      vAlign = "center",
     } = props;
 
     const key = safeKeys(props)
@@ -87,6 +90,7 @@ function memoizedTableStyles() {
       .join("|");
 
     if (!cache[key]) {
+      const alignItems = vAlign === "center" ? "center" : vAlign === "top" ? "flex-start" : "flex-end";
       const groupedLevels = {
         0: {
           cellCss: {
@@ -119,7 +123,7 @@ function memoizedTableStyles() {
           .py0.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
           .addIn("&:not(:last-of-type)", Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$).$,
         cellCss: {
-          ...Css.gray900.xs.bgWhite.aic.pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+          ...Css.gray900.xs.bgWhite.ai(alignItems).pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
           ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
           ...(bordered && { "&:first-of-type": Css.bl.bGray200.$, "&:last-of-type": Css.br.bGray200.$ }),
