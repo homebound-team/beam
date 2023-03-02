@@ -89,13 +89,17 @@ export function rowAnd(r: RenderResult, rowNum: number, testId: string): HTMLEle
   return e.querySelector(`[data-testid="${testId}"]`) || fail(`Element not found ${prettyDOM(e)}`);
 }
 
-/** Intended to be used to generate a human-readable text representation of a GridTable
- * * Example Use: `expect(tableSnapshot(r)).toMatchInlineSnapshot(`
-      "Name | Value
-      Row 1 | 200
-      Row 2 | 300
-      Row 3 | 1000"
-    `)`
+/** Intended to be used to generate a human-readable text 
+ * representation of a GridTable using the markdown table syntax.
+ * * Example Use: expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+      "
+      | Name                     | Value |
+      | ------------------------ | ----- |
+      | Row 1                    | 200   |
+      | Row 2 with a longer name | 300   |
+      | Row 3                    | 1000  |
+      "
+    `);
  * */
 export function tableSnapshot(r: RenderResult): string {
   const tableEl = r.getByTestId("gridTable");
