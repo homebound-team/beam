@@ -2792,12 +2792,28 @@ describe("GridTable", () => {
 
       // Then the column is initially expanded (1 column + 1 expanded column)
       expect(row(r, 1).childNodes).toHaveLength(2);
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Client name |
+        | First name  | Last name |
+        | ----------- | --------- |
+        | Brandon     | Dow       |
+        "
+      `);
 
       //  When clicking to collapse `columnA`
       click(r.expandableColumn);
 
       // Then the column is collapsed
       expect(row(r, 1).childNodes).toHaveLength(1);
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+              "
+              | Client name |
+              | Full name   |
+              | ----------- |
+              | Brandon Dow |
+              "
+          `);
 
       // And when then triggering new `columnB` to be introduced
       api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("columnB"));
@@ -2805,6 +2821,14 @@ describe("GridTable", () => {
 
       // Then the `columnA` remains collapsed
       expect(row(r, 1).childNodes).toHaveLength(2);
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Client name | Age |
+        | Full name   |     |
+        | ----------- | --- |
+        | Brandon Dow | 36  |
+        "
+      `);
     });
   });
 
@@ -2817,7 +2841,7 @@ describe("GridTable", () => {
         rows={[
           simpleHeader,
           { kind: "data", id: "1", data: { name: "Row 1", value: 200 } },
-          { kind: "data", id: "2", data: { name: "Row 2", value: 300 } },
+          { kind: "data", id: "2", data: { name: "Row 2 with a longer name", value: 300 } },
           { kind: "data", id: "3", data: { name: "Row 3", value: 1000 } },
         ]}
       />,
@@ -2825,10 +2849,13 @@ describe("GridTable", () => {
 
     // Then a text snapshot should be generated when using `tableSnapshot`
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
-      "Name | Value
-      Row 1 | 200
-      Row 2 | 300
-      Row 3 | 1000"
+      "
+      | Name                     | Value |
+      | ------------------------ | ----- |
+      | Row 1                    | 200   |
+      | Row 2 with a longer name | 300   |
+      | Row 3                    | 1000  |
+      "
     `);
   });
 });
