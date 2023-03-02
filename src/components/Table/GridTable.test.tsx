@@ -2807,13 +2807,13 @@ describe("GridTable", () => {
       // Then the column is collapsed
       expect(row(r, 1).childNodes).toHaveLength(1);
       expect(tableSnapshot(r)).toMatchInlineSnapshot(`
-              "
-              | Client name |
-              | Full name   |
-              | ----------- |
-              | Brandon Dow |
-              "
-          `);
+        "
+        | Client name |
+        | Full name   |
+        | ----------- |
+        | Brandon Dow |
+        "
+      `);
 
       // And when then triggering new `columnB` to be introduced
       api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("columnB"));
