@@ -5,7 +5,7 @@ import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
 export type BoundCheckboxFieldProps = Omit<CheckboxProps, "selected" | "onChange" | "label"> & {
-  field: FieldState<any, boolean | null | undefined>;
+  field: FieldState<boolean | null | undefined>;
   /** Make optional so that callers can override if they want to. */
   onChange?: (values: boolean) => void;
   label?: string;

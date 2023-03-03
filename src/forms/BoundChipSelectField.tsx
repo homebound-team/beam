@@ -10,7 +10,7 @@ interface BoundChipSelectFieldProps<O, V extends Value>
   extends Omit<ChipSelectFieldProps<O, V>, "onSelect" | "label" | "value"> {
   // Allow `onSelect` to be overridden to do more than just `field.set`.
   onSelect?: (option: V | undefined) => void;
-  field: FieldState<any, V | null | undefined>;
+  field: FieldState<V | null | undefined>;
   label?: string;
 }
 

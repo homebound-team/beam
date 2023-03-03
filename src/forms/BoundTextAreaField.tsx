@@ -9,7 +9,7 @@ import { defaultLabel } from "src/utils/defaultLabel";
 export type BoundTextAreaFieldProps<X> = Omit<TextAreaFieldProps<X>, "value" | "onChange" | "label"> & {
   // Make optional as it'll create a label from the field's key if not present
   label?: string;
-  field: FieldState<any, string | null | undefined>;
+  field: FieldState<string | null | undefined>;
   // Optional in case the page wants extra behavior
   onChange?: (value: string | undefined) => void;
 };

@@ -33,7 +33,7 @@
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\""
   },
   "dependencies": {
-    "@homebound/form-state": "^2.16.0",
+    "@homebound/form-state": "^2.17.0",
     "@internationalized/number": "^3.0.3",
     "@react-aria/utils": "^3.13.2",
     "@react-hook/resize-observer": "^1.2.2",
@@ -77,7 +77,7 @@
     "@homebound/eslint-config": "1.5.1",
     "@homebound/rtl-react-router-utils": "^1.0.3",
     "@homebound/rtl-utils": "^2.59.3",
-    "@homebound/truss": "^1.122.1",
+    "@homebound/truss": "^1.123.0",
     "@homebound/tsconfig": "^1.0.3",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@semantic-release/exec": "^6.0.3",

@@ -7,7 +7,7 @@ import { defaultLabel } from "src/utils/defaultLabel";
 export type BoundNumberFieldProps = Omit<NumberFieldProps, "value" | "onChange" | "label"> & {
   // Make optional as it'll create a label from the field's key if not present
   label?: string;
-  field: FieldState<any, number | null | undefined>;
+  field: FieldState<number | null | undefined>;
   // Optional in case the page wants extra behavior
   onChange?: (value: number | undefined) => void;
 };

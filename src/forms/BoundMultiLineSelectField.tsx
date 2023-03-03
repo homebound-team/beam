@@ -12,7 +12,7 @@ export type BoundMultiLineSelectFieldProps<O, V extends Value> = Omit<
 > & {
   // Allow `onSelect` to be overridden to do more than just `field.set`.
   onSelect?: (values: V[], opts: O[]) => void;
-  field: FieldState<any, V[] | null | undefined>;
+  field: FieldState<V[] | null | undefined>;
   label?: string;
 };
 

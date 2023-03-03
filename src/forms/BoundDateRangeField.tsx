@@ -6,7 +6,7 @@ import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
 export type BoundDateRangeFieldProps = Omit<DateRangeFieldProps, "label" | "value" | "onChange"> & {
-  field: FieldState<any, DateRange | null | undefined>;
+  field: FieldState<DateRange | null | undefined>;
   // Make optional as it'll create a label from the field's key if not present
   label?: string;
   // Optional in case the page wants extra behavior
