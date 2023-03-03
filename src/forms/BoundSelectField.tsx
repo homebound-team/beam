@@ -9,7 +9,7 @@ import { useTestIds } from "src/utils/useTestIds";
 export type BoundSelectFieldProps<O, V extends Value> = Omit<SelectFieldProps<O, V>, "value" | "onSelect" | "label"> & {
   // Allow `onSelect` to be overridden to do more than just `field.set`.
   onSelect?: (value: V | undefined, opt: O | undefined) => void;
-  field: FieldState<any, V | null | undefined>;
+  field: FieldState<V | null | undefined>;
   label?: string;
 };
 
