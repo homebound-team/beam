@@ -13,7 +13,7 @@ export default {
 export function StaticField() {
   return (
     <FormLines>
-      <StaticFieldComponent label="First" value="Bob" />
+      <StaticFieldComponent label="Above" value="Bob" />
       <FieldGroup widths={["100px", "100px", "200px"]}>
         <StaticFieldComponent label="First" value="Bob" />
         <StaticFieldComponent label="First" value="Bob" />
@@ -33,6 +33,9 @@ export function StaticField() {
       <StaticFieldComponent label="First">
         <Chips values={["First", "Last"]} />
       </StaticFieldComponent>
+      <div css={Css.w25.$}>
+        <StaticFieldComponent label="Left" value="Bob" labelStyle="left" />
+      </div>
     </FormLines>
   );
 }
