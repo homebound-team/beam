@@ -22,7 +22,7 @@ export function StaticField(props: StaticFieldProps) {
       <label css={Css.db.sm.gray700.mbPx(4).$} htmlFor={id} {...tid.label}>
         {label}
       </label>
-      <div id={id} css={Css.smMd.gray900.$} {...tid}>
+      <div id={id} css={Css.smMd.gray900.if(labelStyle === "left").w50.$} {...tid}>
         {value || children}
       </div>
     </div>
