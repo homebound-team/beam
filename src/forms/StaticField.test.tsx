@@ -18,5 +18,6 @@ describe("StaticField", () => {
     expect(r.foo_container()).toHaveStyleRule("display", "flex");
     expect(r.foo_container()).toHaveStyleRule("justify-content", "space-between");
     expect(r.foo_container()).toHaveStyleRule("max-width", "100%");
+    expect(r.foo()).toHaveStyleRule("width", "50%");
   });
 });
