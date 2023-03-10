@@ -9,6 +9,7 @@ interface StaticFieldProps {
   label: ReactNode;
   value?: string;
   children?: ReactNode;
+  // Does not currently support "inline" or "hidden".
   labelStyle?: PresentationFieldProps["labelStyle"];
 }
 
