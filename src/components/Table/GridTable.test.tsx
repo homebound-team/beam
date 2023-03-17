@@ -2892,7 +2892,7 @@ describe("GridTable", () => {
 
   it("renders totals row in the correct order", async () => {
     type Row = SimpleHeaderAndData<Data> | TotalsRow;
-    // Given a table with simple header, totals, and parent row
+    // Given a table with simple header, totals, and data row
     const valueColumn: GridColumn<Row> = {
       totals: () => ({ content: "totals" }),
       header: () => ({ content: "header value" }),
@@ -2914,9 +2914,9 @@ describe("GridTable", () => {
     );
     // Then the first row is header
     expect(row(r, 0)).toHaveTextContent("header value");
-    // 2nd row is the totals
+    // And 2nd row is the totals
     expect(row(r, 1)).toHaveTextContent("totals");
-    // final row is the data
+    // And final row is the data
     expect(row(r, 2)).toHaveTextContent("data value");
   });
 });
