@@ -116,7 +116,8 @@ function memoizedTableStyles() {
           ...Css.gray700.xsMd.bgGray200.aic.pxPx(12).whiteSpace("unset").hPx(40).$,
           ...(allWhite && Css.bgWhite.$),
         },
-        totalsCellCss: Css.bgWhite.gray700.smMd.hPx(totalsRowHeight).pPx(12).boxShadow("none").$,
+        totalsCellCss: Css.bgWhite.gray700.bgGray100.xsMd.hPx(totalsRowHeight).pPx(12).boxShadow("none").bb.bl.bGray200
+          .$,
         expandableHeaderCss: Css.bgWhite.gray900.xsMd.wsNormal
           .hPx(expandableHeaderRowHeight)
           .pxPx(12)
@@ -153,7 +154,7 @@ function memoizedTableStyles() {
 
 export const getTableStyles = memoizedTableStyles();
 
-export const totalsRowHeight = 52;
+export const totalsRowHeight = 40;
 export const expandableHeaderRowHeight = 40;
 
 /** Defines row-specific styling for each given row `kind` in `R` */
