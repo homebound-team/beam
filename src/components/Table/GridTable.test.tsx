@@ -11,7 +11,8 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
-import { Checkbox, TextField } from "src/inputs";
+import { Checkbox, SelectField, TextField } from "src/inputs";
+import { noop } from "src/utils";
 import { cell, cellAnd, cellOf, click, render, row, tableSnapshot, type, wait, withRouter } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
@@ -135,6 +136,36 @@ describe("GridTable", () => {
     const r = await render(<GridTable columns={[valueColumn]} rows={rows} />);
     expect(cell(r, 1, 0)).toHaveTextContent("1");
     expect(cell(r, 2, 0)).toHaveTextContent("2");
+  });
+
+  it("does not truncate reaodnly select fields", async () => {
+    // Given a column with a select field
+    const longText = "Something very long that have to wrap here";
+    const selectColumn: GridColumn<Row> = {
+      header: "Select",
+      w: "150px",
+      data: (row) => ({
+        content: (
+          <SelectField
+            label="field"
+            getOptionLabel={(r) => r.name}
+            getOptionValue={(r) => r.id}
+            value={row.value}
+            onSelect={noop}
+            options={[{ id: row.value, name: row.name }]}
+            readOnly
+          />
+        ),
+      }),
+    };
+    const rows: GridDataRow<Row>[] = [simpleHeader, { kind: "data", id: "1", data: { name: longText, value: 1 } }];
+    // And it's rendered with row height flexible
+    const r = await render(<GridTable style={{ rowHeight: "flexible" }} columns={[selectColumn]} rows={rows} />);
+
+    // Then field do not have any Css.truncate styles
+    expect(r.field()).not.toHaveStyleRule("white-space", "nowrap");
+    expect(r.field()).not.toHaveStyleRule("overflow", "hidden");
+    expect(r.field()).not.toHaveStyleRule("textOverflow", "ellipsis");
   });
 
   it("can have per-row styles", async () => {
