@@ -138,7 +138,7 @@ describe("GridTable", () => {
     expect(cell(r, 2, 0)).toHaveTextContent("2");
   });
 
-  it("wraps readonly select field", async () => {
+  it("does not truncate reaodnly select fields", async () => {
     // Given a column with a select field
     const longText = "Something very long that have to wrap here";
     const selectColumn: GridColumn<Row> = {
