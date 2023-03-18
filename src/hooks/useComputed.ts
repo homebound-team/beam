@@ -51,7 +51,13 @@ export function useComputed<T>(fn: (prev: T | undefined) => T, deps: readonly an
       // Only trigger a re-render if this is not the 1st autorun. Note
       // that if deps has changed, we're inherently in a re-render so also
       // don't need to trigger an additional re-render.
-      if (hasRan) setTick((tick) => tick + 1);
+      if (hasRan) {
+        // This can cause 'Cannot update a component while rendering a different component'
+        // if one component (the mutator) is updating observable from directly
+        // within it's render method. Usually this is rare and can be avoided by
+        // only updating observables from within useEffect.
+        setTick((tick) => tick + 1);
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
