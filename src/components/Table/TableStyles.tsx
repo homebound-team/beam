@@ -116,8 +116,7 @@ function memoizedTableStyles() {
           ...Css.gray700.xsMd.bgGray200.aic.pxPx(12).whiteSpace("unset").hPx(40).$,
           ...(allWhite && Css.bgWhite.$),
         },
-        totalsCellCss: Css.bgWhite.gray700.bgGray100.xsMd.hPx(totalsRowHeight).pPx(12).boxShadow("none").bb.bl.bGray200
-          .$,
+        totalsCellCss: Css.bgWhite.gray700.bgGray100.xsMd.hPx(totalsRowHeight).pPx(12).bb.bl.bGray200.$,
         expandableHeaderCss: Css.bgWhite.gray900.xsMd.wsNormal
           .hPx(expandableHeaderRowHeight)
           .pxPx(12)
