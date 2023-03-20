@@ -2,7 +2,7 @@ import { Icon, IconKey } from "src/components";
 import { Css, Margin, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
-type TagXss = Margin;
+type TagXss = Margin | "backgroundColor";
 export type TagType = "info" | "caution" | "warning" | "success" | "neutral";
 interface TagProps<X> {
   text: string;
