@@ -19,8 +19,6 @@ describe("BoundDateField", () => {
 
     // When blur is triggered on a checkbox
     blur(r.birthday());
-    // r.birthday().blur();
-    // });
     // Then the callback should be triggered
     expect(onBlur).toBeCalledTimes(1);
   });

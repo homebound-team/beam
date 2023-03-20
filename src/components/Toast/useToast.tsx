@@ -6,12 +6,7 @@ export interface UseToastProps {
 }
 export function useToast(): UseToastProps {
   const { setNotice } = useToastContext();
-  const showToast = useCallback(
-    (props: any) => {
-      setNotice(props);
-    },
-    [setNotice],
-  );
+  const showToast = useCallback((props: ToastNoticeProps) => setNotice(props), [setNotice]);
 
   return { showToast };
 }
