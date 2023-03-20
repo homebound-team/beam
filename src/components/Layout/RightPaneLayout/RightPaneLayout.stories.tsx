@@ -55,6 +55,33 @@ export function GridTableWithRightPane() {
   );
 }
 
+export function RightPaneWithRightColumnContent() {
+  return (
+    <TestProjectLayout>
+      <DashboardExample />
+    </TestProjectLayout>
+  );
+}
+
+function RightColumnContent() {
+  return (
+    <div css={Css.df.fdc.h100.$}>
+      <div css={Css.bgWhite.w100.f1.br8.p3.$}>Right Column Content</div>
+      <div css={Css.bgWhite.w100.f1.mt3.br8.p3.$}>Right Column Content</div>
+    </div>
+  );
+}
+
+function DashboardExample({ numCols, numRows }: { numCols?: number; numRows?: number }) {
+  return (
+    <ScrollableContent virtualized>
+      <RightPaneLayout rightColumnContent={<RightColumnContent />}>
+        <TableExample numCols={numCols} numRows={numRows} />
+      </RightPaneLayout>
+    </ScrollableContent>
+  );
+}
+
 function ExamplePageComponent() {
   return (
     <>
