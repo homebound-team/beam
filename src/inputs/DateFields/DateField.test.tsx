@@ -1,8 +1,8 @@
-import { click, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { jan1, jan2 } from "src/forms/formStateDomain";
 import { DateField } from "src/inputs/DateFields/DateField";
 import { noop } from "src/utils";
+import { click, focus, render, type } from "src/utils/rtl";
 
 describe("DateField", () => {
   it("renders with date", async () => {
@@ -20,7 +20,7 @@ describe("DateField", () => {
     const r = await render(<DateField value={jan2} label="Date" onChange={onChange} onBlur={onBlur} />);
 
     // When triggering the Date Picker
-    fireEvent.focus(r.date());
+    focus(r.date);
     // Then the Date Picker should be shown
     expect(r.date_datePicker()).toBeTruthy();
 

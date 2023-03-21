@@ -1,10 +1,9 @@
-import { render } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { jan10, jan2 } from "src/forms/formStateDomain";
 import { DateFieldBase } from "src/inputs/DateFields/DateFieldBase";
 import { noop } from "src/utils";
-import { click } from "src/utils/rtl";
+import { blur, click, focus, render } from "src/utils/rtl";
 
 describe(DateFieldBase, () => {
   it("renders with placeholder", async () => {
@@ -56,9 +55,9 @@ describe(DateFieldBase, () => {
     const onBlur = jest.fn();
     const r = await render(<DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
     // Given focus set on the input element.
-    fireEvent.focus(r.date());
+    focus(r.date);
     // When setting focus to the Calendar Icon button
-    fireEvent.focus(r.date_calendarButton());
+    focus(r.date_calendarButton);
     // Then expect the focus to move back to the input element.
     expect(r.date()).toHaveFocus();
     // And firing blur event on the input with the `calendarButton` as the related target
@@ -71,7 +70,7 @@ describe(DateFieldBase, () => {
     const onBlur = jest.fn();
     const r = await render(<DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
     // Given focus set on the input element.
-    fireEvent.focus(r.date());
+    focus(r.date);
     // When "blur"ing the field with the overlay as the related target
     fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
     // Then `onBlur` should not have been called.
@@ -114,11 +113,11 @@ describe(DateFieldBase, () => {
       <DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onFocus={onFocus} onBlur={onBlur} />,
     );
     // When setting focus on the input element
-    fireEvent.focus(r.date());
+    focus(r.date);
     // Then focus should be called.
     expect(onFocus).toBeCalledTimes(1);
     // When firing the blur event
-    fireEvent.blur(r.date());
+    blur(r.date);
     // Then onBlur should be called
     expect(onBlur).toBeCalledTimes(1);
   });
@@ -131,7 +130,7 @@ describe(DateFieldBase, () => {
       <DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onEnter={onEnter} onBlur={onBlur} />,
     );
     // When changing the input value to an valid date
-    r.date().focus();
+    focus(r.date);
     expect(r.date()).toHaveFocus();
     // And when hitting the Enter key
     fireEvent.keyDown(r.date(), { key: "Enter" });
@@ -172,7 +171,7 @@ describe(DateFieldBase, () => {
     }
     const r = await render(<TestComponent />);
     // When focusing on the input
-    fireEvent.focus(r.date());
+    focus(r.date);
     // And changing the date from outside the component
     click(r.button);
     // Then the component should NOT have updated with the new date
@@ -192,10 +191,9 @@ describe(DateFieldBase, () => {
     }
     const r = await render(<TestComponent />);
     // When focusing on the input to open the date picker
-    fireEvent.focus(r.date());
+    focus(r.date);
     // And blurring with the date picker as the related target. Demonstrates that the input is not in focus, but the date picker is open
     fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
-
     // When changing the date from outside the component
     click(r.button);
     // Then the component should NOT have updated with the new date as the date picker was open

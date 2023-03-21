@@ -1,6 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { fireEvent, within } from "@storybook/testing-library";
+import { within } from "@storybook/testing-library";
 import { useState } from "react";
 import { GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndData } from "src/components";
 import { Css } from "src/Css";
@@ -274,7 +274,8 @@ LoadingState.parameters = {
 };
 LoadingState.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   const canvas = within(canvasElement);
-  await fireEvent.focus(canvas.getByTestId("project"));
+  canvas.getByTestId("project").focus();
+  canvas.getByTestId("project").click();
 };
 
 export function InTable() {

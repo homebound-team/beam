@@ -828,7 +828,7 @@ export function StickyColumns() {
             valueColumn,
             {
               header: "Actions (not sticky)",
-              data: () => ({ content: "Actions (sticky)", sticky: "right" }),
+              data: () => ({ content: "Actions (sticky)", sticky: "right" as const }),
               w: "200px",
             },
           ]}

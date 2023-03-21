@@ -1,6 +1,6 @@
 import { AutoSaveStatusProvider } from "@homebound/form-state";
-import useResizeObserver from "@react-hook/resize-observer";
-import { MutableRefObject, PropsWithChildren, ReactNode, useEffect, useRef, useState } from "react";
+import { useResizeObserver } from "@react-aria/utils";
+import { MutableRefObject, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { FocusScope, OverlayContainer, useDialog, useModal, useOverlay, usePreventScroll } from "react-aria";
 import { createPortal } from "react-dom";
 import { useBeamContext } from "src/components/BeamContext";
@@ -74,10 +74,14 @@ export function Modal(props: ModalProps) {
 
   const [hasScroll, setHasScroll] = useState(forceScrolling ?? false);
 
-  useResizeObserver(modalBodyRef, ({ target }) => {
-    if (forceScrolling === undefined && !isFixedHeight) {
-      setHasScroll(target.scrollHeight > target.clientHeight);
-    }
+  useResizeObserver({
+    ref: modalBodyRef,
+    onResize: useCallback(() => {
+      const target = modalBodyRef.current!;
+      if (forceScrolling === undefined && !isFixedHeight) {
+        setHasScroll(target.scrollHeight > target.clientHeight);
+      }
+    }, []),
   });
 
   // Even though we use raw-divs for the createPortal calls, we do actually need to

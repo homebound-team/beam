@@ -1,6 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta, StoryFn } from "@storybook/react";
-import { fireEvent, within } from "@storybook/testing-library";
+import { within } from "@storybook/testing-library";
 import { useState } from "react";
 import { useFilter } from "react-aria";
 import { Css } from "src/Css";
@@ -16,7 +16,7 @@ Example.parameters = { chromatic: { disableSnapshot: true } };
 export const MenuOpen: StoryFn = Template.bind({});
 MenuOpen.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   const canvas = within(canvasElement);
-  await fireEvent.focus(canvas.getByTestId("heroes"));
+  canvas.getByTestId("heroes").focus();
 };
 
 function Template() {

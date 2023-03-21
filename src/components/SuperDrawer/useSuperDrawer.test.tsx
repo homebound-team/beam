@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react-hooks";
+import { act, renderHook } from "@testing-library/react";
 import { ReactElement, useEffect } from "react";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { render, withBeamRTL } from "src/utils/rtl";
@@ -112,7 +112,7 @@ describe("useSuperDrawer", () => {
     act(() => hook.addCanCloseDrawerCheck(() => false));
 
     // Then expect the drawer to not close.
-    expect(hook.closeDrawer()).toBeFalsy();
+    expect(await act(() => hook.closeDrawer())).toBeFalsy();
   });
 
   it("should show ConfirmCloseModal when a canCloseDrawerDetailCheck fails", async () => {
