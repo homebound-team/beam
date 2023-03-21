@@ -2892,6 +2892,36 @@ describe("GridTable", () => {
       "
     `);
   });
+
+  it("renders totals row in the correct order", async () => {
+    type Row = SimpleHeaderAndData<Data> | TotalsRow;
+    // Given a table with simple header, totals, and data row
+    const valueColumn: GridColumn<Row> = {
+      totals: () => ({ content: "totals" }),
+      header: () => ({ content: "header value" }),
+      data: () => ({ content: "data value" }),
+    };
+    // When the table renders
+    const r = await render(
+      <GridTable
+        columns={[valueColumn]}
+        rows={[
+          {
+            kind: "totals",
+            id: "totals",
+            data: undefined,
+          },
+          ...rows,
+        ]}
+      />,
+    );
+    // Then the first row is header
+    expect(row(r, 0)).toHaveTextContent("header value");
+    // And 2nd row is the totals
+    expect(row(r, 1)).toHaveTextContent("totals");
+    // And final row is the data
+    expect(row(r, 2)).toHaveTextContent("data value");
+  });
 });
 
 function Collapse({ id }: { id: string }) {
