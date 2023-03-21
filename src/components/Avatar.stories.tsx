@@ -54,3 +54,19 @@ export function Examples() {
     </div>
   );
 }
+
+export function InFlexChild() {
+  return (
+    <div>
+      <div css={Css.mb2.$}>
+        Demonstrates Avatar will not squish when rendered within a flex child that allows flex-shrink
+      </div>
+      <div css={Css.df.gap2.wPx(250).br8.bgGray200.p1.$}>
+        <div>{"Testing string that will wrap. ".repeat(10)}</div>
+        <div>
+          <Avatar src="captain-marvel.jpg" size="lg" name="Carol Danvers" />
+        </div>
+      </div>
+    </div>
+  );
+}
