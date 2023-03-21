@@ -1,3 +1,4 @@
+import { act } from "@testing-library/react";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
@@ -1338,7 +1339,7 @@ describe("GridTable", () => {
     expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
     expectRenderedRows("p1", "p1c1", "p1c1g1");
     // When the child is collapsed
-    api.current!.toggleCollapsedRow(rows[0].children![0].id);
+    act(() => api.current!.toggleCollapsedRow(rows[0].children![0].id));
     // Then the parent and child rows are still shown
     expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
     expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
@@ -1376,7 +1377,7 @@ describe("GridTable", () => {
     expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
     expectRenderedRows("p1", "p1c1", "p1c1g1");
     // When the child is collapsed
-    api.current!.toggleCollapsedRow(rows[0].children![0].id);
+    act(() => api.current!.toggleCollapsedRow(rows[0].children![0].id));
     // Then isCollapsed for this row should be true
     expect(api.current!.isCollapsedRow(rows[0].children![0].id)).toBeTruthy();
     // And nothing needed to re-render
@@ -1589,16 +1590,16 @@ describe("GridTable", () => {
       return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
     }
 
-    const r = await render(<Test />);
+    await render(<Test />);
     // And the row is not selected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
     // When selecting the row via the API
-    api.current!.selectRow("p1");
+    act(() => api.current!.selectRow("p1"));
     // Then the row is now selected
     expect(api.current!.getSelectedRowIds()).toEqual(["p1"]);
 
     // And when deselecting the row via the API
-    api.current!.selectRow("p1", false);
+    act(() => api.current!.selectRow("p1", false));
     // Then the row is not selected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
@@ -1776,10 +1777,8 @@ describe("GridTable", () => {
     click(cellAnd(r, 0, 1, "select"));
     // Then expect all rows should selected
     expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c2", "p1c1"]);
-
     // When using the api to clear the selected rows
-    api.current!.clearSelections();
-
+    act(() => api.current!.clearSelections());
     // Then all rows should be deselected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
@@ -2766,9 +2765,11 @@ describe("GridTable", () => {
       // Then the column is initially hidden
       expect(row(r, 1).childNodes).toHaveLength(1);
       // When setting the column to be visible
-      api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("myColumn2"));
-      // wait for promise to resolve
-      await wait();
+      await act(async () => {
+        api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("myColumn2"));
+        // wait for promise to resolve
+        await wait();
+      });
 
       // then expect 2 columns + 2 expandable columns to be visible
       expect(row(r, 1).childNodes).toHaveLength(4);
@@ -2847,8 +2848,10 @@ describe("GridTable", () => {
       `);
 
       // And when then triggering new `columnB` to be introduced
-      api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("columnB"));
-      await wait();
+      await act(async () => {
+        api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("columnB"));
+        await wait();
+      });
 
       // Then the `columnA` remains collapsed
       expect(row(r, 1).childNodes).toHaveLength(2);

@@ -91,7 +91,7 @@ function compare<R extends Kinded>(
 /** Look at a row and get its sort value. */
 function sortValue(value: ReactNode | GridCellContent, caseSensitive: boolean): any {
   // Check sortValue and then fallback on value
-  let maybeFn = value;
+  let maybeFn: any = value;
   if (value && typeof value === "object") {
     // Look for GridCellContent.sortValue, then GridCellContent.value
     if ("sortValue" in value) {

@@ -181,7 +181,7 @@ export function getJustification(
 
 /** Look at a row and get its filter value. */
 function filterValue(value: ReactNode | GridCellContent): any {
-  let maybeFn = value;
+  let maybeFn: any = value;
   if (value && typeof value === "object") {
     if ("value" in value) {
       maybeFn = value.value;

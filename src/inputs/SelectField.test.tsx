@@ -1,9 +1,9 @@
-import { click, render } from "@homebound/rtl-utils";
+import { clickAndWait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
-import { wait } from "src/utils/rtl";
+import { blur, click, focus, render, wait } from "src/utils/rtl";
 
 describe("SelectFieldTest", () => {
   it("can set a value", async () => {
@@ -25,7 +25,7 @@ describe("SelectFieldTest", () => {
     // That initially has "One" selected
     expect(r.age()).toHaveValue("One");
     // When we click the field to open the menu
-    r.age().click();
+    click(r.age);
     // And we select the 3rd option
     click(r.getByRole("option", { name: "Three" }));
     // Then onSelect was called
@@ -37,7 +37,7 @@ describe("SelectFieldTest", () => {
   it("does not fire focus/blur when readOnly", async () => {
     const onFocus = jest.fn();
     const onBlur = jest.fn();
-    const { age } = await render(
+    const r = await render(
       <TestSelectField
         label="Age"
         value={"1"}
@@ -50,8 +50,8 @@ describe("SelectFieldTest", () => {
         data-testid="age"
       />,
     );
-    fireEvent.focus(age());
-    fireEvent.blur(age());
+    focus(r.age);
+    blur(r.age);
     expect(onBlur).not.toHaveBeenCalled();
     expect(onFocus).not.toHaveBeenCalled();
   });
@@ -89,7 +89,7 @@ describe("SelectFieldTest", () => {
 
   it("can initialize with an 'undefined' value", async () => {
     // Given a Select Field with an undefined value
-    const { age, getByRole } = await render(
+    const r = await render(
       <TestSelectField
         label="Age"
         value={undefined}
@@ -100,12 +100,12 @@ describe("SelectFieldTest", () => {
       />,
     );
     // Then expect the value to be that of the `undefined` entry
-    expect(age()).toHaveValue("Unassigned");
+    expect(r.age()).toHaveValue("Unassigned");
   });
 
   it("can select an 'undefined' value", async () => {
     // Given a Select Field with a value selected
-    const { age, getByRole } = await render(
+    const r = await render(
       <TestSelectField
         label="Age"
         value="1"
@@ -116,16 +116,16 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When selecting the option with an `undefined` value
-    fireEvent.click(age());
-    click(getByRole("option", { name: "Unassigned" }));
+    click(r.age);
+    click(r.getByRole("option", { name: "Unassigned" }));
     // Then expect the value to be that of the `undefined` entry
-    expect(age()).toHaveValue("Unassigned");
+    expect(r.age()).toHaveValue("Unassigned");
   });
 
   it("respects disabled options", async () => {
     const onSelect = jest.fn();
     // Given a Select Field with a disabled option
-    const { age, getByRole } = await render(
+    const r = await render(
       <SelectField
         label="Age"
         value="1"
@@ -138,8 +138,8 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    fireEvent.click(age());
-    const optionTwo = getByRole("option", { name: "Two" });
+    click(r.age());
+    const optionTwo = r.getByRole("option", { name: "Two" });
     // Then expect the disabled option to have the correct aria attributes
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
     // And when clicking on that option
@@ -151,7 +151,7 @@ describe("SelectFieldTest", () => {
   it("can disable options with tooltips", async () => {
     const onSelect = jest.fn();
     // Given a Select Field with a disabled option
-    const { age, getByRole } = await render(
+    const r = await render(
       <SelectField
         label="Age"
         value="1"
@@ -165,8 +165,8 @@ describe("SelectFieldTest", () => {
     );
 
     // When opening the menu
-    fireEvent.click(age());
-    const optionTwo = getByRole("option", { name: "Two" });
+    click(r.age);
+    const optionTwo = r.getByRole("option", { name: "Two" });
 
     // Then expect the disabled option to be wrapped in the tooltip text
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
@@ -191,7 +191,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    fireEvent.click(r.age());
+    click(r.age());
     // Then expect to see the initial option and loading state
     expect(r.getAllByRole("option")).toHaveLength(1);
     expect(r.loadingDots()).toBeTruthy();
@@ -215,7 +215,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    fireEvent.click(r.age());
+    click(r.age());
     // Then expect to see the initial option
     expect(r.getAllByRole("option")).toHaveLength(1);
     // And when changing the options
@@ -259,7 +259,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When we click the field to open the menu
-    r.age().click();
+    click(r.age);
     // And we select the 'unset' option
     click(r.getByRole("option", { name: "None" }));
     // Then onSelect was called
@@ -281,9 +281,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When we click the field to open the menu
-    r.age().click();
-    // Wait for the promise to finish
-    await wait();
+    await clickAndWait(r.age);
     // The 'unset' option is in the menu and we select it
     click(r.getByRole("option", { name: "None" }));
     // Then onSelect was called
@@ -320,10 +318,10 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When we click the field to open the menu
-    r.age().click();
+    click(r.age);
     // Then the `unset` option in the menu should reflect the custom value we passed in
     expect(r.getAllByRole("option").map((o) => o.textContent)).toMatchInlineSnapshot(`
-      Array [
+      [
         "Unset Label",
         "One",
         "Two",

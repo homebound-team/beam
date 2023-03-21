@@ -2,7 +2,7 @@ import { createObjectState, ObjectConfig, ObjectState, required } from "@homebou
 import { render } from "@homebound/rtl-utils";
 import { BoundMultiSelectField } from "src/forms/BoundMultiSelectField";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { click } from "src/utils/rtl";
+import { blur, click, focus } from "src/utils/rtl";
 
 const shapes = [
   { id: "sh:1", name: "Triangle" },
@@ -35,12 +35,12 @@ describe("BoundMultiSelectField", () => {
     );
 
     // When focus is triggered on a checkbox
-    r.favoriteShapes().focus();
+    focus(r.favoriteShapes);
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
 
     // When blur is triggered on a checkbox
-    r.favoriteShapes().blur();
+    blur(r.favoriteShapes);
     // Then the callback should be triggered
     expect(onBlur).toBeCalledTimes(1);
   });
@@ -55,7 +55,7 @@ describe("BoundMultiSelectField", () => {
     );
     const r = await render(<BoundMultiSelectField field={author.favoriteShapes} options={shapes} />);
 
-    r.favoriteShapes().click();
+    click(r.favoriteShapes);
     click(r.getByRole("option", { name: "Square" }));
 
     // Then the callback should be triggered with the current value

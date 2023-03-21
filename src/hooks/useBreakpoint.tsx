@@ -10,10 +10,10 @@ type BreakpointsType = Record<Breakpoint, boolean>;
  * A React hook to return a record of responsive breakpoints that updates on resize.
  *
  * @example
- * const { breakpoints } = useBreakpoint();
+ * const breakpoints = useBreakpoint();
  * if (breakpoints.mdAndDown) { ...do something cool }
  */
-export const useBreakpoint = (): BreakpointsType => {
+export function useBreakpoint(): BreakpointsType {
   const [breakpoints, setBreakpoints] = useState(matchMediaBreakpoints());
 
   const handleResize = useDebouncedCallback(() => {
@@ -30,7 +30,7 @@ export const useBreakpoint = (): BreakpointsType => {
   }, [handleResize]);
 
   return breakpoints;
-};
+}
 
 function matchMediaBreakpoints(): BreakpointsType {
   const bps = {} as BreakpointsType;

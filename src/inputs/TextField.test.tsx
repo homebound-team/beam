@@ -1,4 +1,4 @@
-import { render, type } from "@homebound/rtl-utils";
+import { blur, focus, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useRef, useState } from "react";
 import { Only } from "src/Css";
@@ -44,8 +44,8 @@ describe("TextFieldTest", () => {
     const onBlur = jest.fn();
     const r = await render(<TestTextField value="foo" readOnly={true} onBlur={onBlur} onFocus={onFocus} />);
     expect(r.name()).toHaveAttribute("data-readonly");
-    fireEvent.focus(r.name());
-    fireEvent.blur(r.name());
+    focus(r.name);
+    blur(r.name);
     expect(onFocus).not.toHaveBeenCalled();
     expect(onBlur).not.toHaveBeenCalled();
   });
@@ -56,7 +56,7 @@ describe("TextFieldTest", () => {
     // The "clear" button should not be shown until input is focused
     expect(r.queryByTestId("xCircle")).toBeFalsy();
     // When focused on the input
-    fireEvent.focus(r.name());
+    focus(r.name);
     // Then the clear button is shown.
     expect(r.xCircle()).toBeTruthy();
 
@@ -89,7 +89,7 @@ describe("TextFieldTest", () => {
     // Given a Textfield
     const r = await render(<TestTextField value="foo" onEnter={onEnter} onBlur={onBlur} />);
     // With focus
-    r.name().focus();
+    focus(r.name());
     expect(r.name()).toHaveFocus();
     // When hitting the Enter key
     fireEvent.keyDown(r.name(), { key: "Enter" });

@@ -5,7 +5,7 @@ const turbosnap = require("vite-plugin-turbosnap");
 
 module.exports = {
   core: { builder: "@storybook/builder-vite" },
-  stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.tsx"],
+  stories: ["../src/**/*.stories.tsx", "../src/**/*.stories.mdx"],
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
@@ -40,7 +40,10 @@ module.exports = {
         ...config.plugins.filter(
           (plugin) => !(Array.isArray(plugin) && plugin.some((p) => p.name === "vite:react-jsx")),
         ),
-        reactPlugin({ exclude: [/\.stories\.tsx?$/, /node_modules/], jsxImportSource: "@emotion/react" }),
+        reactPlugin({
+          exclude: [/\.stories\.tsx?$/, /node_modules/],
+          jsxImportSource: "@emotion/react",
+        }),
         ...(configType === "PRODUCTION" ? [turbosnap({ rootDir: config.root ?? process.cwd() })] : []),
       ],
       optimizeDeps: [
@@ -50,4 +53,5 @@ module.exports = {
     };
   },
   reactOptions: { fastRefresh: true, strictMode: false },
+  staticDirs: ["../storybookAssets"],
 };

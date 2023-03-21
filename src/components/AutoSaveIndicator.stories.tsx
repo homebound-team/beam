@@ -1,6 +1,5 @@
 import { AutoSaveStatus, AutoSaveStatusContext, AutoSaveStatusProvider } from "@homebound/form-state";
 import { Meta } from "@storybook/react";
-import { Css } from "..";
 import { AutoSaveIndicator } from "./AutoSaveIndicator";
 import { Button } from "./Button";
 
@@ -46,7 +45,6 @@ export const AutoSaveIndicatorInAction = () => (
             triggerAutoSave();
             setTimeout(resolveAutoSave, 1500);
           }}
-          css={Css.buttonBase.$}
         />
       )}
     </AutoSaveStatusContext.Consumer>

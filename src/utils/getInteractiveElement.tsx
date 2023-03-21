@@ -1,3 +1,4 @@
+import { Interpolation, Theme } from "@emotion/react";
 import { PressEvent } from "@react-types/shared";
 import { HTMLAttributes, ReactNode } from "react";
 import { Link } from "react-router-dom";
@@ -7,7 +8,7 @@ export function getButtonOrLink(
   content: ReactNode,
   // PressEvent set by React-Aria's `useButton`.
   onClick: ((e: PressEvent) => void) | VoidFunction | string | undefined,
-  attrs: HTMLAttributes<HTMLButtonElement | HTMLAnchorElement>,
+  attrs: HTMLAttributes<HTMLButtonElement | HTMLAnchorElement> & { css?: Interpolation<Theme> },
   openInNew: boolean = false,
   downloadLink: boolean = false,
 ): JSX.Element {
@@ -21,7 +22,7 @@ export function getButtonOrLink(
         {content}
       </a>
     ) : (
-      <Link {...attrs} to={onClick}>
+      <Link {...(attrs as any)} to={onClick}>
         {content}
       </Link>
     )

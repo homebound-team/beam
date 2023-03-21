@@ -65,9 +65,6 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   // TODO: Pass read only, required, error message to useRadioGroup
   const { labelProps, radioGroupProps } = useRadioGroup({ label, isDisabled: disabled }, state);
 
-  // max-width is dependent on having descriptions
-  const anyDescriptions = options.some((o) => !!o.description);
-
   return (
     // default styling to position `<Label />` above.
     <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$}>
@@ -155,7 +152,7 @@ function Radio<K extends string>(props: {
         </div>
         {description && (
           <div id={descriptionId} css={Css.sm.gray700.if(disabled).gray400.$}>
-            {description}
+            {typeof description === "function" ? description() : description}
           </div>
         )}
       </div>
