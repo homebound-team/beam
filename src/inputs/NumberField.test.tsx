@@ -13,6 +13,20 @@ describe("NumberFieldTest", () => {
     expect(r.age()).toHaveValue("2");
   });
 
+  it("can set a negative value", async () => {
+    const r = await render(<TestNumberField label="Age" value={1} />);
+    expect(r.age()).toHaveValue("1");
+    type(r.age, "-2");
+    expect(r.age()).toHaveValue("-2");
+  });
+
+  it("can not set a negative value if positiveOnly is set", async () => {
+    const r = await render(<TestNumberField label="Age" value={1} positiveOnly />);
+    expect(r.age()).toHaveValue("1");
+    type(r.age, "-2");
+    expect(r.age()).toHaveValue("2");
+  });
+
   it("can set a percentage value", async () => {
     const r = await render(<TestNumberField label="Complete" type="percent" value={12} />);
     expect(r.complete()).toHaveValue("12%");

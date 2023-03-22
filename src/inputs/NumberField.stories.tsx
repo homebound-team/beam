@@ -23,6 +23,7 @@ export function NumberFieldStyles() {
         <h1 css={Css.lg.$}>Regular</h1>
         <TestNumberField value={0} label="Age" labelStyle="hidden" />
         <TestNumberField label="Age" value={1000} />
+        <TestNumberField label="Age Positive Only" value={1000} positiveOnly />
         <TestNumberField label="Age Disabled" value={1000} disabled="Disabled reason tooltip" />
         <TestNumberField label="Age Read Only" value={1000} readOnly="Read only reason tooltip" />
         <TestNumberField
