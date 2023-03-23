@@ -2,6 +2,7 @@ import { createObjectState, ObjectConfig, ObjectState, required } from "@homebou
 import { click, render } from "@homebound/rtl-utils";
 import { BoundCheckboxField } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
+import { blur, focus } from "src/utils/rtl";
 
 const formConfig: ObjectConfig<AuthorInput> = {
   isAvailable: { type: "value", rules: [required] },
@@ -15,10 +16,8 @@ describe("BoundCheckboxField", () => {
   it("should be checked", async () => {
     // Given a formState with true boolean field
     const formState = createObjectState(formConfig, { isAvailable: true });
-
     // When rendered
     const r = await render(<BoundCheckboxField field={formState.isAvailable} />);
-
     // Then the BoundCheckboxField should be checked
     expect(r.isAvailable()).toBeChecked();
   });
@@ -27,10 +26,8 @@ describe("BoundCheckboxField", () => {
     // Given a rendered checked BoundCheckboxField
     const formState = createObjectState(formConfig, { isAvailable: true });
     const r = await render(<BoundCheckboxField field={formState.isAvailable} />);
-
     // When interacting with a BoundCheckboxField
     click(r.isAvailable);
-
     // Then expect the checkbox to be unchecked and the formState to reflect that state
     expect(r.isAvailable()).not.toBeChecked();
     expect(formState.isAvailable.value).toBeFalsy();
@@ -42,14 +39,12 @@ describe("BoundCheckboxField", () => {
     // Given a BoundCheckboxField with onFocus and onBlur methods
     const formState = createObjectState(formConfig, { isAvailable: true });
     const r = await render(<BoundCheckboxField field={formState.isAvailable} onBlur={onBlur} onFocus={onFocus} />);
-
     // When focus is triggered
-    r.isAvailable().focus();
+    focus(r.isAvailable);
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
-
     // When blur is triggered
-    r.isAvailable().blur();
+    blur(r.isAvailable);
     // Then the callback should be triggered
     expect(onBlur).toBeCalledTimes(1);
   });

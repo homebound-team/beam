@@ -104,7 +104,7 @@ function getChildren(label: string) {
   return (
     <Fragment>
       {label}
-      <Icon icon="linkExternal" css={Css.ml1.$} />
+      <Icon icon="linkExternal" />
     </Fragment>
   );
 }

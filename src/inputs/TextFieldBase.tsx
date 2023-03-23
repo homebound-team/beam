@@ -60,7 +60,7 @@ export interface TextFieldBaseProps<X>
 
 // Used by both TextField and TextArea
 export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldBaseProps<X>) {
-  const { fieldProps } = usePresentationContext();
+  const { fieldProps, wrap = false } = usePresentationContext();
   const {
     label,
     required,
@@ -194,7 +194,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               css={{
                 // Use input wrapper to get common styles, but then we need to override some
                 ...fieldStyles.inputWrapperReadOnly,
-                ...(multiline ? Css.fdc.aifs.gap2.$ : Css.truncate.$),
+                ...(multiline ? Css.fdc.aifs.gap2.$ : Css.if(wrap === false).truncate.$),
                 ...xss,
               }}
               data-readonly="true"

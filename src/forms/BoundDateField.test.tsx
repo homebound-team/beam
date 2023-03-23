@@ -1,9 +1,8 @@
 import { createObjectState, ObjectConfig, ObjectState } from "@homebound/form-state";
-import { render } from "@homebound/rtl-utils";
-import { fireEvent } from "@testing-library/react";
+import { act, fireEvent } from "@testing-library/react";
 import { BoundDateField } from "src/forms/BoundDateField";
 import { AuthorInput, jan1, jan2 } from "src/forms/formStateDomain";
-import { click } from "src/utils/rtl";
+import { blur, click, focus, render } from "src/utils/rtl";
 
 describe("BoundDateField", () => {
   it("trigger onFocus and onBlur callbacks", async () => {
@@ -14,12 +13,12 @@ describe("BoundDateField", () => {
     const r = await render(<BoundDateField field={author.birthday} onBlur={onBlur} onFocus={onFocus} />);
 
     // When focus is triggered on a checkbox
-    r.birthday().focus();
+    focus(r.birthday);
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
 
     // When blur is triggered on a checkbox
-    r.birthday().blur();
+    blur(r.birthday());
     // Then the callback should be triggered
     expect(onBlur).toBeCalledTimes(1);
   });
@@ -36,7 +35,7 @@ describe("BoundDateField", () => {
     const r = await render(<BoundDateField field={author.birthday} />);
 
     // When triggering the Date Picker
-    r.birthday().focus();
+    focus(r.birthday);
     // And when selecting a date - Choose the first of these, which should be `jan1`
     click(r.datePickerDay_0);
 
@@ -68,7 +67,9 @@ describe("BoundDateField", () => {
     const author: ObjectState<AuthorInput> = createObjectState(formConfig, { birthday: jan2 });
     const r = await render(<BoundDateField field={author.birthday} />);
     // When setting the form state to readOnly
-    author.readOnly = true;
+    act(() => {
+      author.readOnly = true;
+    });
 
     // Then the field should be read only
     expect(r.birthday()).toHaveAttribute("data-readonly", "true");

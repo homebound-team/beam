@@ -22,6 +22,7 @@ export const Icon = (props: IconProps) => {
     "x",
     "loader",
     "linkExternal",
+    "link",
     "upload",
     "download",
     "checkboxChecked",

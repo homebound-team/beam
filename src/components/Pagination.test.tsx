@@ -39,7 +39,7 @@ describe("Pagination", () => {
     // Then perPage field have value of 50
     expect(r.pagination_perPage()).toHaveValue("50");
     // When click it
-    r.pagination_perPage().click();
+    click(r.pagination_perPage);
     // And select option 100
     click(r.getByRole("option", { name: "100" }));
     // Then setSettings is called

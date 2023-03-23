@@ -3,6 +3,7 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MultiSelectField, MultiSelectFieldProps } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
+import { focus } from "src/utils/rtl";
 
 const options = [
   { id: "1", name: "One" },
@@ -210,7 +211,7 @@ describe("MultiSelectFieldTest", () => {
 
 function selectOption(r: RenderResult, name: string): void {
   const text = r.getByRole("combobox");
-  text.focus();
+  focus(text);
   fireEvent.input(text, { target: { value: "" } });
   click(r.getByRole("option", { name }));
 }

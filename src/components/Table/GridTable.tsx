@@ -351,7 +351,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   }, [as, api, filter, maybeSorted, columns, style, rowStyles, sortOn, columnSizes, collapsedIds, getCount]);
 
   // Once our header rows are created we can organize them in expected order.
-  const tableHeadRows = totalsRows.concat(expandableHeaderRows).concat(headerRows);
+  const tableHeadRows = expandableHeaderRows.concat(headerRows).concat(totalsRows);
 
   let tooManyClientSideRows = false;
   if (filterMaxRows && visibleDataRows.length > filterMaxRows) {

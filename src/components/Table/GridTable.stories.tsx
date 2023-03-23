@@ -30,6 +30,7 @@ import {
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
+import { SelectField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
 import { noop } from "src/utils";
 import { newStory, withRouter, zeroTo } from "src/utils/sb";
@@ -607,6 +608,52 @@ export function WrappedHeaders() {
   );
 }
 
+export function WrappedCells() {
+  const leftAlignedColumn = column<Row2>({
+    header: "Basic field header",
+    data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
+    w: "150px",
+  });
+  const centerAlignedColumn = actionColumn<Row2>({
+    header: "Readonly select field header",
+    data: ({ role }) => (
+      <SelectField label="role" value={role} onSelect={noop} options={[{ id: role, name: role }]} readOnly />
+    ),
+    w: "150px",
+  });
+
+  return (
+    <GridTable<Row2>
+      columns={[leftAlignedColumn, centerAlignedColumn]}
+      sorting={{ on: "client", initial: undefined }}
+      style={{ rowHeight: "flexible" }}
+      rows={[
+        simpleHeader,
+        {
+          kind: "data",
+          id: "1",
+          data: {
+            name: "Very long long name here",
+            role: "Something you can wrap",
+            date: "11/29/85",
+            priceInCents: 113_00,
+          },
+        },
+        {
+          kind: "data",
+          id: "3",
+          data: {
+            name: "Another very long long name here",
+            role: "A very long text herea very long text here",
+            date: "11/08/18",
+            priceInCents: 80_65,
+          },
+        },
+      ]}
+    />
+  );
+}
+
 type DataRow = { kind: "data"; id: string; data: { name: string; role: string; date: string; priceInCents: number } };
 type TotalsRow = { kind: "total"; data: { totalPriceInCents: number } };
 type ColspanRow = HeaderRow | DataRow | TotalsRow;
@@ -781,7 +828,7 @@ export function StickyColumns() {
             valueColumn,
             {
               header: "Actions (not sticky)",
-              data: () => ({ content: "Actions (sticky)", sticky: "right" }),
+              data: () => ({ content: "Actions (sticky)", sticky: "right" as const }),
               w: "200px",
             },
           ]}

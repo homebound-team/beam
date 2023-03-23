@@ -4,7 +4,7 @@ import { act, fireEvent } from "@testing-library/react";
 import { Observer } from "mobx-react";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { type } from "src/utils/rtl";
+import { blur, focus, type } from "src/utils/rtl";
 
 describe("BoundNumberField", () => {
   it("shows the current value", async () => {
@@ -88,12 +88,12 @@ describe("BoundNumberField", () => {
     const r = await render(<BoundNumberField field={author.heightInInches} onBlur={onBlur} onFocus={onFocus} />);
 
     // When focus is triggered on a checkbox
-    r.heightInInches().focus();
+    focus(r.heightInInches);
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
 
     // When blur is triggered on a checkbox
-    r.heightInInches().blur();
+    blur(r.heightInInches);
     // Then the callback should be triggered
     expect(onBlur).toBeCalledTimes(1);
   });

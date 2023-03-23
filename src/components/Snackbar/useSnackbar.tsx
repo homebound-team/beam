@@ -39,7 +39,7 @@ export function useSnackbar(): UseSnackbarHook {
   }, []);
 
   const triggerNotice = useCallback(
-    (props) => {
+    (props: TriggerNoticeProps) => {
       // Sets `noticeId` to the current value of `snackbarId` and then increments.
       const noticeId = props.id ?? `beamSnackbar:${snackbarId++}`;
       let maybeTimeout: number | undefined;

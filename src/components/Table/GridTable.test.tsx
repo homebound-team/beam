@@ -1,3 +1,4 @@
+import { act } from "@testing-library/react";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
@@ -11,7 +12,8 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
-import { Checkbox, TextField } from "src/inputs";
+import { Checkbox, SelectField, TextField } from "src/inputs";
+import { noop } from "src/utils";
 import { cell, cellAnd, cellOf, click, render, row, tableSnapshot, type, wait, withRouter } from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
@@ -135,6 +137,36 @@ describe("GridTable", () => {
     const r = await render(<GridTable columns={[valueColumn]} rows={rows} />);
     expect(cell(r, 1, 0)).toHaveTextContent("1");
     expect(cell(r, 2, 0)).toHaveTextContent("2");
+  });
+
+  it("does not truncate reaodnly select fields", async () => {
+    // Given a column with a select field
+    const longText = "Something very long that have to wrap here";
+    const selectColumn: GridColumn<Row> = {
+      header: "Select",
+      w: "150px",
+      data: (row) => ({
+        content: (
+          <SelectField
+            label="field"
+            getOptionLabel={(r) => r.name}
+            getOptionValue={(r) => r.id}
+            value={row.value}
+            onSelect={noop}
+            options={[{ id: row.value, name: row.name }]}
+            readOnly
+          />
+        ),
+      }),
+    };
+    const rows: GridDataRow<Row>[] = [simpleHeader, { kind: "data", id: "1", data: { name: longText, value: 1 } }];
+    // And it's rendered with row height flexible
+    const r = await render(<GridTable style={{ rowHeight: "flexible" }} columns={[selectColumn]} rows={rows} />);
+
+    // Then field do not have any Css.truncate styles
+    expect(r.field()).not.toHaveStyleRule("white-space", "nowrap");
+    expect(r.field()).not.toHaveStyleRule("overflow", "hidden");
+    expect(r.field()).not.toHaveStyleRule("textOverflow", "ellipsis");
   });
 
   it("can have per-row styles", async () => {
@@ -1307,7 +1339,7 @@ describe("GridTable", () => {
     expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
     expectRenderedRows("p1", "p1c1", "p1c1g1");
     // When the child is collapsed
-    api.current!.toggleCollapsedRow(rows[0].children![0].id);
+    act(() => api.current!.toggleCollapsedRow(rows[0].children![0].id));
     // Then the parent and child rows are still shown
     expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
     expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
@@ -1345,7 +1377,7 @@ describe("GridTable", () => {
     expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
     expectRenderedRows("p1", "p1c1", "p1c1g1");
     // When the child is collapsed
-    api.current!.toggleCollapsedRow(rows[0].children![0].id);
+    act(() => api.current!.toggleCollapsedRow(rows[0].children![0].id));
     // Then isCollapsed for this row should be true
     expect(api.current!.isCollapsedRow(rows[0].children![0].id)).toBeTruthy();
     // And nothing needed to re-render
@@ -1558,16 +1590,16 @@ describe("GridTable", () => {
       return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
     }
 
-    const r = await render(<Test />);
+    await render(<Test />);
     // And the row is not selected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
     // When selecting the row via the API
-    api.current!.selectRow("p1");
+    act(() => api.current!.selectRow("p1"));
     // Then the row is now selected
     expect(api.current!.getSelectedRowIds()).toEqual(["p1"]);
 
     // And when deselecting the row via the API
-    api.current!.selectRow("p1", false);
+    act(() => api.current!.selectRow("p1", false));
     // Then the row is not selected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
@@ -1745,10 +1777,8 @@ describe("GridTable", () => {
     click(cellAnd(r, 0, 1, "select"));
     // Then expect all rows should selected
     expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c2", "p1c1"]);
-
     // When using the api to clear the selected rows
-    api.current!.clearSelections();
-
+    act(() => api.current!.clearSelections());
     // Then all rows should be deselected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
@@ -2735,9 +2765,11 @@ describe("GridTable", () => {
       // Then the column is initially hidden
       expect(row(r, 1).childNodes).toHaveLength(1);
       // When setting the column to be visible
-      api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("myColumn2"));
-      // wait for promise to resolve
-      await wait();
+      await act(async () => {
+        api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("myColumn2"));
+        // wait for promise to resolve
+        await wait();
+      });
 
       // then expect 2 columns + 2 expandable columns to be visible
       expect(row(r, 1).childNodes).toHaveLength(4);
@@ -2816,8 +2848,10 @@ describe("GridTable", () => {
       `);
 
       // And when then triggering new `columnB` to be introduced
-      api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("columnB"));
-      await wait();
+      await act(async () => {
+        api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("columnB"));
+        await wait();
+      });
 
       // Then the `columnA` remains collapsed
       expect(row(r, 1).childNodes).toHaveLength(2);
@@ -2857,6 +2891,36 @@ describe("GridTable", () => {
       | Row 3                    | 1000  |
       "
     `);
+  });
+
+  it("renders totals row in the correct order", async () => {
+    type Row = SimpleHeaderAndData<Data> | TotalsRow;
+    // Given a table with simple header, totals, and data row
+    const valueColumn: GridColumn<Row> = {
+      totals: () => ({ content: "totals" }),
+      header: () => ({ content: "header value" }),
+      data: () => ({ content: "data value" }),
+    };
+    // When the table renders
+    const r = await render(
+      <GridTable
+        columns={[valueColumn]}
+        rows={[
+          {
+            kind: "totals",
+            id: "totals",
+            data: undefined,
+          },
+          ...rows,
+        ]}
+      />,
+    );
+    // Then the first row is header
+    expect(row(r, 0)).toHaveTextContent("header value");
+    // And 2nd row is the totals
+    expect(row(r, 1)).toHaveTextContent("totals");
+    // And final row is the data
+    expect(row(r, 2)).toHaveTextContent("data value");
   });
 });
 
