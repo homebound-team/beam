@@ -50,6 +50,8 @@ export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelSty
   sizeToContent?: boolean;
   // If set, the helper text will always be shown (usually we hide the helper text if read only)
   alwaysShowHelperText?: boolean;
+  // If set, the component will only accept positive values
+  positiveOnly?: boolean;
 }
 
 export function NumberField(props: NumberFieldProps) {
@@ -77,6 +79,7 @@ export function NumberField(props: NumberFieldProps) {
     numIntegerDigits,
     useGrouping = true,
     sizeToContent = false,
+    positiveOnly = false,
     ...otherProps
   } = props;
 
@@ -140,7 +143,7 @@ export function NumberField(props: NumberFieldProps) {
     value: valueRef.current.wip ? valueRef.current.value : value === undefined ? Number.NaN : value / factor,
     // // This is called on blur with the final/committed value.
     onChange: (value) => {
-      onChange(formatValue(value, factor, numFractionDigits, numIntegerDigits));
+      onChange(formatValue(value, factor, numFractionDigits, numIntegerDigits, positiveOnly));
     },
     onFocus: () => {
       valueRef.current = { wip: true, value: value === undefined ? Number.NaN : value / factor };
@@ -185,7 +188,7 @@ export function NumberField(props: NumberFieldProps) {
       // This is called on each DOM change, to push the latest value into the field
       onChange={(rawInputValue) => {
         const parsedValue = numberParser.parse(rawInputValue || "");
-        onChange(formatValue(parsedValue, factor, numFractionDigits, numIntegerDigits));
+        onChange(formatValue(parsedValue, factor, numFractionDigits, numIntegerDigits, positiveOnly));
       }}
       inputRef={inputRef}
       onBlur={onBlur}
@@ -203,6 +206,7 @@ export function formatValue(
   factor: number,
   numFractionDigits: number | undefined,
   numIntegerDigits: number | undefined,
+  positiveOnly: boolean = false,
 ): number | undefined {
   // We treat percents & cents as (mostly) integers, while useNumberField wants decimals, so
   // undo that via `* factor` and `Math.round`, but also keep any specifically-requested `numFractionDigits`,
@@ -211,7 +215,7 @@ export function formatValue(
   // Reverse the integer/decimal conversion
   const decimalAdjusted = Number.isNaN(value)
     ? undefined
-    : Math.round(value * factor * maybeAdjustForDecimals) / maybeAdjustForDecimals;
+    : Math.round((positiveOnly ? Math.abs(value) : value) * factor * maybeAdjustForDecimals) / maybeAdjustForDecimals;
 
   if (numIntegerDigits === undefined || decimalAdjusted === undefined) {
     return decimalAdjusted;
