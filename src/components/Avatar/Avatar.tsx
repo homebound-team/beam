@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Icon } from "src/components/Icon";
+import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Typography } from "src/Css";
 import { useTestIds } from "src/utils";
 
@@ -38,13 +39,13 @@ export function Avatar({ src, name, size = "md", showName = false, ...others }: 
       <span css={Css[sizeToTypeScale[size]].$}>{name}</span>
     </div>
   ) : (
-    img
+    maybeTooltip({ title: name, children: img, placement: "top" })
   );
 }
 
 export type AvatarSize = "sm" | "md" | "lg" | "xl";
 
-const sizeToPixel = {
+const sizeToPixel: Record<AvatarSize, number> = {
   sm: 24,
   md: 36,
   lg: 48,
@@ -58,7 +59,7 @@ const sizeToFallbackTypeScale: Record<AvatarSize, Typography> = {
   xl: "xl3",
 };
 
-const sizeToIconInc = {
+const sizeToIconInc: Record<AvatarSize, number> = {
   sm: 2.5,
   md: 4,
   lg: 5,
@@ -66,10 +67,10 @@ const sizeToIconInc = {
 };
 
 const sizeToTypeScale: Record<AvatarSize, Typography> = {
-  sm: "baseMd",
-  md: "baseMd",
-  lg: "lg",
-  xl: "xl3",
+  sm: "smMd",
+  md: "smMd",
+  lg: "base",
+  xl: "base",
 };
 
 function nameToInitials(name: string) {

@@ -1,4 +1,4 @@
-import { AvatarButton } from "src/components/AvatarButton";
+import { AvatarButton } from "src/components/Avatar/AvatarButton";
 import { click, render } from "src/utils/rtl";
 
 describe(AvatarButton, () => {

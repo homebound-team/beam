@@ -1,6 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { AvatarButton, AvatarButtonProps, hoverStyles, pressedStyles } from "src/components/AvatarButton";
+import { AvatarButton, AvatarButtonProps, hoverStyles, pressedStyles } from "src/components/Avatar/AvatarButton";
 import { Css } from "src/Css";
 
 export default {

@@ -3,7 +3,7 @@ import type { Placement } from "@react-types/overlays";
 import { MutableRefObject, ReactElement, ReactNode, useRef } from "react";
 import { useOverlayPosition } from "react-aria";
 import { MenuTriggerState } from "react-stately";
-import { AvatarButton, AvatarButtonProps } from "src/components/AvatarButton";
+import { AvatarButton, AvatarButtonProps } from "src/components/Avatar/AvatarButton";
 import { Button, ButtonProps, ButtonVariant } from "src/components/Button";
 import { Icon } from "src/components/Icon";
 import { IconButton, IconButtonProps } from "src/components/IconButton";

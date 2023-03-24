@@ -1,8 +1,8 @@
 import { AriaButtonProps } from "@react-types/button";
 import { RefObject, useMemo } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { maybeTooltip, navLink, resolveTooltip } from "src/components";
-import { Avatar, AvatarProps } from "src/components/Avatar";
+import { Avatar, AvatarProps } from "src/components/Avatar/Avatar";
+import { maybeTooltip, navLink, resolveTooltip } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
