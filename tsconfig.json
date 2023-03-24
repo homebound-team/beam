@@ -3,6 +3,7 @@
   "compilerOptions": {
     "lib": ["esnext", "dom"],
     "types": ["jest"],
+//    "module": "ESNext",
     // Use React 17 _jsx / automatic runtime support for nice emotion integration
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
