@@ -9,6 +9,7 @@ export default defineConfig({
       entry: ["src/index.ts", "src/mocks.ts"],
       name: "beam",
     },
+    minify: false,
     rollupOptions: {
       output: {
         preserveModules: true,
