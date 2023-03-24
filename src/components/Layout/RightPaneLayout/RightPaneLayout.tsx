@@ -36,7 +36,7 @@ export function RightPaneLayout({
           {children}
         </div>
 
-        <div css={Css.if(!!defaultPaneContent).wPx(paneWidth).position("relative").$}>
+        <div css={Css.position("relative").if(!!defaultPaneContent).wPx(paneWidth).$}>
           {defaultPaneContent && (
             <div
               css={
