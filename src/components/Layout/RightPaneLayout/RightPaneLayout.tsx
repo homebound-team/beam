@@ -7,12 +7,12 @@ export function RightPaneLayout({
   children,
   paneBgColor = Palette.White,
   paneWidth = 450,
-  rightColumnContent,
+  defaultPaneContent,
 }: {
   children: ReactElement;
   paneBgColor?: Palette;
   paneWidth?: number;
-  rightColumnContent?: ReactElement;
+  defaultPaneContent?: ReactElement;
 }) {
   const { isRightPaneOpen, rightPaneContent, clearPane, closePane } = useRightPaneContext();
 
@@ -30,14 +30,14 @@ export function RightPaneLayout({
           css={{
             ...Css.w(`calc(100% - ${paneWidth + 24}px)`).add("transition", "width .2s linear").h100.mr3.overflowXAuto.$,
             ...Css.if(!isRightPaneOpen).w100.mr0.$,
-            ...Css.if(!!rightColumnContent).w(`calc(100% - ${paneWidth + 24}px)`).mr3.$,
+            ...Css.if(!!defaultPaneContent).w(`calc(100% - ${paneWidth + 24}px)`).mr3.$,
           }}
         >
           {children}
         </div>
 
-        <div css={Css.if(!!rightColumnContent).wPx(paneWidth).position("relative").$}>
-          {rightColumnContent && (
+        <div css={Css.if(!!defaultPaneContent).wPx(paneWidth).position("relative").$}>
+          {defaultPaneContent && (
             <div
               css={
                 Css.h100
@@ -50,7 +50,7 @@ export function RightPaneLayout({
                   .left(100).$
               }
             >
-              {rightColumnContent}
+              {defaultPaneContent}
             </div>
           )}
 

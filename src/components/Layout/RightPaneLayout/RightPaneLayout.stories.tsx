@@ -55,7 +55,7 @@ export function GridTableWithRightPane() {
   );
 }
 
-export function RightPaneWithRightColumnContent() {
+export function RightPaneWithDefaultPaneContent() {
   return (
     <TestProjectLayout>
       <DashboardExample />
@@ -63,7 +63,7 @@ export function RightPaneWithRightColumnContent() {
   );
 }
 
-function RightColumnContent() {
+function DefaultPaneContent() {
   return (
     <div css={Css.df.fdc.h100.$}>
       <div css={Css.bgWhite.w100.f1.br8.p3.$}>Right Column Content</div>
@@ -75,7 +75,7 @@ function RightColumnContent() {
 function DashboardExample({ numCols, numRows }: { numCols?: number; numRows?: number }) {
   return (
     <ScrollableContent virtualized>
-      <RightPaneLayout rightColumnContent={<RightColumnContent />}>
+      <RightPaneLayout defaultPaneContent={<DefaultPaneContent />}>
         <TableExample numCols={numCols} numRows={numRows} />
       </RightPaneLayout>
     </ScrollableContent>
