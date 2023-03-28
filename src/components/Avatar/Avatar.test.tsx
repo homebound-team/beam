@@ -1,4 +1,4 @@
-import { Avatar } from "src/components/Avatar";
+import { Avatar } from "src/components/Avatar/Avatar";
 import { render } from "src/utils/rtl";
 
 describe(Avatar, () => {

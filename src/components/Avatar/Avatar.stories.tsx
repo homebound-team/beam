@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { Avatar, AvatarSize } from "src/components/Avatar";
+import { Avatar, AvatarSize } from "src/components/Avatar/Avatar";
 import { Css } from "src/Css";
 
 export default {
