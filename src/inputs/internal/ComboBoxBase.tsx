@@ -49,7 +49,7 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
 }
 
 /**
- * Provides a non-native select/dropdown widget.
+ * Provides a non-native select/dropdown widget that allows the user to type to filter the options.
  *
  * The `O` type is a list of options to show, the `V` is the primitive value of a
  * given `O` (i.e. it's id) that you want to use as the current/selected value.
@@ -377,6 +377,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         borderless={borderless}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         resetField={resetField}
+        // If there are 10 or fewer options and it is not the multiselect, then we disable the typeahead filter for a better UX.
+        typeToFilter={!(!multiselect && Array.isArray(options) && options.length <= 10)}
       />
       {state.isOpen && (
         <Popover
@@ -414,7 +416,7 @@ type FieldState<O> = {
   allOptions: O[];
   optionsLoading: boolean;
 };
-type OptionsOrLoad<O> = O[] | { initial: O[]; load: () => Promise<{ options: O[] }> };
+export type OptionsOrLoad<O> = O[] | { initial: O[]; load: () => Promise<{ options: O[] }> };
 type UnsetOption = { id: undefined; name: string };
 
 function getInputValue<O>(
