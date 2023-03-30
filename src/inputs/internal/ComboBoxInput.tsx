@@ -34,7 +34,7 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   hideErrorMessage?: boolean;
 }
 
-export function SelectFieldInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
+export function ComboBoxInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
   const {
     inputProps,
     buttonProps,

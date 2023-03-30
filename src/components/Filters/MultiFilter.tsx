@@ -1,7 +1,7 @@
 import { Key } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
-import { disabledOptionToKeyedTuple } from "src/inputs/internal/SelectFieldBase";
+import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 import { MultiSelectField, MultiSelectFieldProps } from "src/inputs/MultiSelectField";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 import { Value } from "src/inputs/Value";

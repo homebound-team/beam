@@ -6,13 +6,13 @@ import { resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, px } from "src/Css";
+import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
-import { SelectFieldInput } from "src/inputs/internal/SelectFieldInput";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { areArraysEqual } from "src/utils";
 
-export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
+export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => string | ReactNode;
   getOptionValue: (opt: O) => V;
@@ -57,7 +57,7 @@ export interface BeamSelectFieldBaseProps<O, V extends Value> extends BeamFocusa
  * Note that the `V extends Key` constraint come from react-aria,
  * and so we cannot easily change them.
  */
-export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBaseProps<O, V>): JSX.Element {
+export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>): JSX.Element {
   const { fieldProps } = usePresentationContext();
   const {
     disabled,
@@ -360,7 +360,7 @@ export function SelectFieldBase<O, V extends Value>(props: BeamSelectFieldBasePr
 
   return (
     <div css={Css.df.fdc.w100.maxw(px(550)).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
-      <SelectFieldInput
+      <ComboBoxInput
         {...otherProps}
         buttonProps={buttonProps}
         buttonRef={triggerRef}
