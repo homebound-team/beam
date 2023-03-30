@@ -4,7 +4,6 @@ import { navLink } from "src/components/CssReset";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyle, tableRowStyles } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnWithId, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
-import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Properties, Typography } from "src/Css";
 
 /**
@@ -53,7 +52,7 @@ export const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
     const Cell = as === "table" ? "td" : "div";
     return (
       <Cell key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames} onClick={onClick}>
-        {maybeTooltip({ title: tooltip, placement: "top", children: content })}
+        {content}
       </Cell>
     );
   };
@@ -72,7 +71,7 @@ export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSp
         className={classNames}
         {...(as === "table" && { colSpan })}
       >
-        {maybeTooltip({ title: tooltip, placement: "top", children: content })}
+        {content}
       </Cell>
     );
   };
@@ -84,32 +83,22 @@ export const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
     if (as === "table") {
       return (
         <td key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames}>
-          {maybeTooltip({
-            title: tooltip,
-            placement: "top",
-            children: (
-              <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
-                {content}
-              </Link>
-            ),
-          })}
+          <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
+            {content}
+          </Link>
         </td>
       );
     }
-    return maybeTooltip({
-      title: tooltip,
-      placement: "top",
-      children: (
-        <Link
-          key={key}
-          to={to}
-          css={{ ...Css.noUnderline.color("unset").$, ...css }}
-          className={`${navLink} ${classNames}`}
-        >
-          {content}
-        </Link>
-      ),
-    });
+    return (
+      <Link
+        key={key}
+        to={to}
+        css={{ ...Css.noUnderline.color("unset").$, ...css }}
+        className={`${navLink} ${classNames}`}
+      >
+        {content}
+      </Link>
+    );
   };
 
 /** Renders a cell that will fire the RowStyle.onClick. */
@@ -127,7 +116,7 @@ export const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>) => RenderC
           onClick && onClick();
         }}
       >
-        {maybeTooltip({ title: tooltip, placement: "top", children: content })}
+        {content}
       </Cell>
     );
   };
