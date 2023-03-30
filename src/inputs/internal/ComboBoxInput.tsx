@@ -32,6 +32,7 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   tooltip?: ReactNode;
   resetField: VoidFunction;
   hideErrorMessage?: boolean;
+  typeToFilter: boolean;
 }
 
 export function ComboBoxInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {

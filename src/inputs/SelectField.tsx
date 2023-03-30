@@ -2,7 +2,8 @@ import { Value } from "src/inputs";
 import { ComboBoxBase, ComboBoxBaseProps, unsetOption } from "src/inputs/internal/ComboBoxBase";
 import { HasIdAndName, Optional } from "src/types";
 
-export interface SelectFieldProps<O, V extends Value> extends Omit<ComboBoxBaseProps<O, V>, "values" | "onSelect"> {
+export interface SelectFieldProps<O, V extends Value>
+  extends Omit<ComboBoxBaseProps<O, V>, "values" | "onSelect" | "multiselect"> {
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   value: V | undefined;
   onSelect: (value: V | undefined, opt: O | undefined) => void;
