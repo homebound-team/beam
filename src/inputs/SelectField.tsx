@@ -1,9 +1,8 @@
 import { Value } from "src/inputs";
-import { BeamSelectFieldBaseProps, SelectFieldBase, unsetOption } from "src/inputs/internal/SelectFieldBase";
+import { ComboBoxBase, ComboBoxBaseProps, unsetOption } from "src/inputs/internal/ComboBoxBase";
 import { HasIdAndName, Optional } from "src/types";
 
-export interface SelectFieldProps<O, V extends Value>
-  extends Omit<BeamSelectFieldBaseProps<O, V>, "values" | "onSelect"> {
+export interface SelectFieldProps<O, V extends Value> extends Omit<ComboBoxBaseProps<O, V>, "values" | "onSelect"> {
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   value: V | undefined;
   onSelect: (value: V | undefined, opt: O | undefined) => void;
@@ -32,7 +31,7 @@ export function SelectField<O, V extends Value>(
   } = props;
 
   return (
-    <SelectFieldBase
+    <ComboBoxBase
       {...otherProps}
       options={options}
       getOptionLabel={getOptionLabel}

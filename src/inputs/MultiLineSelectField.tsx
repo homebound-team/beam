@@ -2,12 +2,11 @@ import { useState } from "react";
 import { Button } from "src/components/Button";
 import { Label } from "src/components/Label";
 import { SelectField, Value } from "src/inputs";
-import { BeamSelectFieldBaseProps } from "src/inputs/internal/SelectFieldBase";
+import { ComboBoxBaseProps } from "src/inputs/internal/ComboBoxBase";
 import { Optional } from "src/types";
 import { Css, useTestIds } from "..";
 
-export interface MultiLineSelectFieldProps<O, V extends Value>
-  extends Exclude<BeamSelectFieldBaseProps<O, V>, "unsetLabel"> {
+export interface MultiLineSelectFieldProps<O, V extends Value> extends Exclude<ComboBoxBaseProps<O, V>, "unsetLabel"> {
   values: V[];
   options: O[];
   getOptionValue: (opt: O) => V;
