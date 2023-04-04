@@ -17,4 +17,5 @@ export * from "./TextField";
 export type { TextFieldApi } from "./TextField";
 export * from "./ToggleButton";
 export * from "./ToggleChipGroup";
+export * from "./TreeSelectField";
 export type { Value } from "./Value";
