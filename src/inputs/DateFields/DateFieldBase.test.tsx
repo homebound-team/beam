@@ -86,9 +86,9 @@ describe(DateFieldBase, () => {
     fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
     // Then `onBlur` is not called because the user is now interacting with the overlay
     expect(onBlur).not.toBeCalled();
-    // And focus the date.
+    // When setting focus on the date.
     focus(r.date);
-    // And modify the date field to close the overlay - This should trigger an `onBlur` even due to the overlay closing and the field no longer having focus.
+    // And modify the date field to close the overlay - This should trigger an `onBlur` event due to the overlay closing and the field no longer having focus.
     fireEvent.input(r.date(), { target: { value: "01/29/20" } });
     // Then the overlay should close
     expect(r.queryByTestId("date_datePicker")).toBeFalsy();
