@@ -1,5 +1,5 @@
 import { click, render, RenderResult } from "@homebound/rtl-utils";
-import { fireEvent } from "@testing-library/react";
+import { act, fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MultiSelectField, MultiSelectFieldProps } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
@@ -48,9 +48,11 @@ describe("MultiSelectFieldTest", () => {
     expect(r.age()).toHaveValue("");
 
     // When blurring the field
-    fireEvent.blur(r.age());
+    // fireEvent.blur(r.age());
+    act(() => r.age().blur());
     // Calling blur twice - First blur closes menu and retains focus on input. Second blur actually blurs the input.
-    fireEvent.blur(r.age());
+    // fireEvent.blur(r.age());
+    // act(() => r.age().blur());
     // Then the field should populate with the selected option's value.
     expect(r.age()).toHaveValue("One");
   });
@@ -71,7 +73,7 @@ describe("MultiSelectFieldTest", () => {
     fireEvent.input(r.age(), "asdf");
 
     // And `blur`ing the field
-    fireEvent.blur(r.age());
+    // fireEvent.blur(r.age());
     // Calling blur twice - First blur closes menu and retains focus on input. Second blur actually blurs the input.
     fireEvent.blur(r.age());
     // Then expect the value to be reset to the selected option
@@ -84,7 +86,7 @@ describe("MultiSelectFieldTest", () => {
     // When changing the inputs value to no longer be empty, as expected for multiple options
     fireEvent.input(r.age(), "asdf");
     // And `blur`ing the field
-    fireEvent.blur(r.age());
+    act(() => r.age().blur());
     // Then expect the value to be reset to empty
     expect(r.age()).toHaveValue("");
   });

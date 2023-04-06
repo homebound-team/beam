@@ -36,12 +36,8 @@ describe("BoundNumberField", () => {
     fireEvent.focus(r.heightInInches());
     // And types an invalid, WIP value
     fireEvent.input(r.heightInInches(), { target: { value: "11," } });
-    // Then that value is technically in the DOM
-    expect(r.heightInInches()).toHaveValue("11,");
     // And we pass a sanitized value into the field state for rules to see
     expect(author.heightInInches.value).toEqual(11);
-    // And when the user blurs out
-    fireEvent.blur(r.heightInInches());
     // Then the DOM value is sanitized as well
     expect(r.heightInInches()).toHaveValue("11");
   });

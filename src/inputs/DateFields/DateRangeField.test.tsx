@@ -3,7 +3,7 @@ import { fireEvent } from "@testing-library/react";
 import { jan1, jan10, jan19, jan2 } from "src/forms/formStateDomain";
 import { DateRangeField } from "src/inputs/DateFields/DateRangeField";
 import { noop } from "src/utils";
-import { click } from "src/utils/rtl";
+import { click, focus } from "src/utils/rtl";
 
 describe(DateRangeField, () => {
   it("renders with date", async () => {
@@ -22,7 +22,8 @@ describe(DateRangeField, () => {
       <DateRangeField value={{ from: jan2, to: jan10 }} label="Date" onChange={onChange} onBlur={onBlur} />,
     );
     // And focus set on the input element.
-    fireEvent.focus(r.date());
+    focus(r.date());
+
     // When "blur"ing the field with the overlay as the related target
     fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
     // And clicking on a value in the date picker
@@ -50,7 +51,7 @@ describe(DateRangeField, () => {
       <DateRangeField value={{ from: jan2, to: jan10 }} label="Date" onChange={onChange} onBlur={onBlur} />,
     );
     // And focus set on the input element.
-    fireEvent.focus(r.date());
+    focus(r.date());
     // When "blur"ing the field with the overlay as the related target
     fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
     // And clicking on a value in the date picker
@@ -112,7 +113,7 @@ describe(DateRangeField, () => {
     expect(r.date()).toHaveValue("Thu, Jan 2 - Fri, Jan 10");
 
     // When focusing the element.
-    fireEvent.focus(r.date());
+    focus(r.date());
     // Then the format should change to "MM/DD/YY"
     expect(r.date()).toHaveValue("01/02/20 - 01/10/20");
 

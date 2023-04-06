@@ -94,9 +94,9 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
-  // Local focus state to conditionally call onBlur when the date picker closes.
+  // Local focus ref to conditionally call onBlur when the date picker closes. Using a ref instead of a state to have a reliable value between renders
   // E.g. If the picker closes due to focus going back to the input field then don't call onBlur. Also used to avoid updating WIP values
-  const [isFocused, setIsFocused] = useState(false);
+  const isFocused = useRef(false);
   const dateFormat = getDateFormat(format);
   // The `wipValue` allows the "range" mode to set the value to `undefined`, even if the `onChange` response cannot be undefined.
   // This makes working within the DateRangePicker much more user friendly.
@@ -118,20 +118,22 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   };
   const state = useOverlayTriggerState({
     onOpenChange: (isOpen) => {
-      // Handles calling `onBlur` for the case where the user interacts with the overlay, removing focus from the input field, and eventually closes the overlay (whether clicking away, or selecting a date)
-      if (!isOpen && !isFocused) {
+      // Handles avoiding calling `onBlur` for the case where the user closes the overlay by changing the DateField input value (TextFieldBase.onChange calls state.close()).
+      // Calls `onBlur` for the case where the user interacts with the overlay (!isFocused) and eventually closes the overlay (whether clicking away, or selecting a date) as focus is not returned to the field.
+      if (!isOpen && !isFocused.current) {
         maybeCall(onBlur);
       }
     },
     isOpen: defaultOpen,
   });
+
   const { labelProps, inputProps } = useTextField(
     {
       ...textFieldProps,
       onFocus: () => {
         // Open overlay on focus of the input.
+        isFocused.current = true;
         state.open();
-        setIsFocused(true);
         maybeCall(onFocus);
 
         if (wipValue && dateFormat !== dateFormats.short) {
@@ -144,7 +146,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         }
       },
       onBlur: (e) => {
-        setIsFocused(false);
+        isFocused.current = false;
 
         // If we are interacting any other part of `inputWrap` ref (such as the calendar button) return early as clicking anywhere within there will push focus to the input field.
         // Or if interacting with the DatePicker then also return early. The overlay will handle calling `onBlur` once it closes.
@@ -172,7 +174,10 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         }
 
         state.close();
-        maybeCall(onBlur);
+        // Only call `onBlur` if the overlay is closed. In other cases, the overlay's `onOpenChange` will handling calling `onBlur` when closing and the focus is not still on the input.
+        if (!state.isOpen) {
+          maybeCall(onBlur);
+        }
       },
       onKeyDown: (e) => {
         if (e.key === "Enter") {
@@ -209,7 +214,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   // Handle case where the input value is updated from outside the component.
   useEffect(() => {
     // Avoid updating any WIP values.
-    if (!isFocused && !state.isOpen) {
+    if (!isFocused.current && !state.isOpen) {
       setWipValue(value);
       setInputValue(
         (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",

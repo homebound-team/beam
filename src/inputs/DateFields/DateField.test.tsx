@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/react";
 import { jan1, jan2 } from "src/forms/formStateDomain";
 import { DateField } from "src/inputs/DateFields/DateField";
 import { noop } from "src/utils";
-import { click, focus, render, type } from "src/utils/rtl";
+import { blur, click, focus, render, type } from "src/utils/rtl";
 
 describe("DateField", () => {
   it("renders with date", async () => {
@@ -69,12 +69,12 @@ describe("DateField", () => {
     expect(r.date()).toHaveValue("Thu, Jan 2");
 
     // When focusing the element.
-    fireEvent.focus(r.date());
+    focus(r.date);
     // Then the format should change to "MM/DD/YY"
     expect(r.date()).toHaveValue("01/02/20");
 
     // And when blur-ing the element.
-    fireEvent.blur(r.date());
+    blur(r.date);
     // Then the format should reset to specified in props
     expect(r.date()).toHaveValue("Thu, Jan 2");
   });

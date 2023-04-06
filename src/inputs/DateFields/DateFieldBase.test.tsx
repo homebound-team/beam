@@ -81,20 +81,24 @@ describe(DateFieldBase, () => {
     const onBlur = jest.fn();
     const r = await render(<DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
     // Given focus set on the input element.
-    fireEvent.focus(r.date());
+    focus(r.date);
     // When "blur"ing the field with the overlay as the related target
     fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
-    // And set focus back on the input field
-    fireEvent.focus(r.date());
-    // And modify the date field to close the overlay
+    // Then `onBlur` is not called because the user is now interacting with the overlay
+    expect(onBlur).not.toBeCalled();
+    // And focus the date.
+    focus(r.date);
+    // And modify the date field to close the overlay - This should trigger an `onBlur` even due to the overlay closing and the field no longer having focus.
     fireEvent.input(r.date(), { target: { value: "01/29/20" } });
     // Then the overlay should close
     expect(r.queryByTestId("date_datePicker")).toBeFalsy();
-    // And `onBlur` should not have been called as the focus was returned to the input
-    expect(onBlur).not.toBeCalled();
+    // onBlur should have been called as the focus was removed from both the overlay calendar and the input field.
+    expect(onBlur).toBeCalledTimes(1);
 
     // Given focus set on the input element.
-    fireEvent.focus(r.date());
+    focus(r.date);
+    // And opening up the Date Picker
+    click(r.date_calendarButton);
     // When "blur"ing the field with the overlay as the related target
     fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
     // And closing the overlay with focus not on the input
@@ -102,7 +106,7 @@ describe(DateFieldBase, () => {
     // Then the overlay should close
     expect(r.queryByTestId("date_datePicker")).toBeFalsy();
     // Then `onBlur` should have been called
-    expect(onBlur).toBeCalledTimes(1);
+    expect(onBlur).toBeCalledTimes(2);
   });
 
   it("can fire onFocus and onBlur when interacting with the input field only", async () => {

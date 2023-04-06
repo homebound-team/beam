@@ -1663,8 +1663,8 @@ describe("GridTable", () => {
     click(cell(r, 3, 1).children[0] as any);
 
     // Then the Header and Parent rows should have the `indeterminate` checked value
-    expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked();
-    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+    expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+    expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
 
     // And when applying a filter to hide non-selected child rows
     type(r.filter, "p1 c2");
@@ -1707,9 +1707,9 @@ describe("GridTable", () => {
     type(r.filter, "");
 
     // Then expect the parent rows to have updated based on the row status
-    expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked(); // Header
-    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked(); // Parent
-    expect(cellAnd(r, 2, 1, "select")).toBePartiallyChecked(); // Child
+    expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true"); // Header
+    expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true"); // Parent
+    expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true"); // Child
     expect(cellAnd(r, 3, 1, "select")).not.toBeChecked(); // Grandchild - reintroduced by clearing filter.
     expect(cellAnd(r, 4, 1, "select")).toBeChecked(); // Grandchild
   });
@@ -1859,12 +1859,12 @@ describe("GridTable", () => {
     // Then expect only the selected row to be returned
     expect(api.current!.getSelectedRowIds()).toEqual(["p1c1"]);
     // And the group row to be partially checked
-    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+    expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
 
     // When collapsing all rows
     click(cellAnd(r, 0, 0, "collapse"));
     // Then expect each group row to persist the selected stated
-    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+    expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
 
     // When applying a filter
     type(r.filter, "filter");
@@ -1874,7 +1874,7 @@ describe("GridTable", () => {
     // When removing the filter
     type(r.filter, "");
     // Then the group row's selected state should be back to partially checked
-    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+    expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
   });
 
   describe("matchesFilter", () => {
@@ -2607,11 +2607,11 @@ describe("GridTable", () => {
       click(cellAnd(r, 3, 1, "select"));
 
       // Then the header row should be indeterminate
-      expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked();
+      expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
       // And the grand parent row to not be checked.
       expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
       // And the parent row should show indeterminate,
-      expect(cellAnd(r, 2, 1, "select")).toBePartiallyChecked();
+      expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true");
       expect(api.current!.getSelectedRowIds()).toEqual(["p1c1gc1"]);
 
       // When selecting the grand parent
@@ -2627,11 +2627,11 @@ describe("GridTable", () => {
       click(cellAnd(r, 3, 1, "select"));
 
       // Then the header row should return to indeterminate
-      expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked();
+      expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
       // And the grand parent row to remain checked.
       expect(cellAnd(r, 1, 1, "select")).toBeChecked();
       // And the parent row should return to indeterminate,
-      expect(cellAnd(r, 2, 1, "select")).toBePartiallyChecked();
+      expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true");
       expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1gc2"]);
     });
 

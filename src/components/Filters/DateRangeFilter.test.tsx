@@ -1,8 +1,7 @@
-import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { FilterDefs, Filters } from "src/components/Filters";
 import { ProjectFilter, taskCompleteFilter } from "src/components/Filters/testDomain";
-import { click, render, type } from "src/utils/rtl";
+import { click, focus, render, type } from "src/utils/rtl";
 
 describe("DateRangeFilter", () => {
   it("shows date placeholder text when not given an initial value", async () => {
@@ -43,7 +42,7 @@ describe("DateRangeFilter", () => {
 
     expect(r.xCircle()).toBeTruthy();
 
-    fireEvent.focus(dateField);
+    focus(dateField);
 
     expect(r.queryByTestId("xCircle")).toBeNull();
   });

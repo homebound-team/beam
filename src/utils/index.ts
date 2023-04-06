@@ -24,6 +24,9 @@ export function toGroupState<T extends string>(values: T[], onChange: (value: T[
     toggleValue: (value: T) => (values.includes(value) ? addValue(value) : removeValue(value)),
     isDisabled: false,
     isReadOnly: false,
+    // We do not use the validation state, as our Switch groups do not support error states. However, this field is required by the `CheckboxGroupState` so we need to include it.
+    // If we ever update our SwitchGroup component to support error states, we'll need to update this.
+    validationState: "valid",
   };
 }
 
