@@ -2,7 +2,7 @@ import { createObjectState, ObjectConfig, ObjectState, required } from "@homebou
 import { fireEvent } from "@testing-library/react";
 import { BoundChipSelectField } from "src";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { click, render, wait } from "src/utils/rtl";
+import { blur, click, focus, render, wait } from "src/utils/rtl";
 
 describe("BoundChipSelectField", () => {
   it("renders", async () => {
@@ -81,9 +81,9 @@ describe("BoundChipSelectField", () => {
     );
 
     // When firing the events, expect the callbacks to be fired
-    fireEvent.focus(r.favoriteSport());
+    focus(r.favoriteSport());
     expect(onFocus).toBeCalledTimes(1);
-    fireEvent.blur(r.favoriteSport());
+    blur(r.favoriteSport());
     expect(onBlur).toBeCalledTimes(1);
   });
 

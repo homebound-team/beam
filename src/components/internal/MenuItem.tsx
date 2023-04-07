@@ -22,6 +22,10 @@ interface MenuItemProps {
 export function MenuItemImpl(props: MenuItemProps) {
   const { item, state, onClose, contrast } = props;
   const menuItem = item.value;
+  if (!menuItem) {
+    return null;
+  }
+
   const { disabled, onClick, label, destructive } = menuItem;
   const isDisabled = Boolean(disabled);
   const isSelected = state.selectionManager.selectedKeys.has(label);

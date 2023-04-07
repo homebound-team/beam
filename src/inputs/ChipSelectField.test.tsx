@@ -4,7 +4,7 @@ import { ChipSelectField, ChipSelectFieldProps } from "src";
 import { Value } from "src/inputs/Value";
 import { Optional } from "src/types";
 import { maybeCall } from "src/utils";
-import { click, render, wait } from "src/utils/rtl";
+import { click, focus, render, wait } from "src/utils/rtl";
 
 describe("ChipSelectField", () => {
   it("renders", async () => {
@@ -76,7 +76,7 @@ describe("ChipSelectField", () => {
       <TestComponent label="Label" value="s:2" options={sports} onFocus={onFocus} onBlur={onBlur} />,
     );
     // When firing focus and blur events, then expect callbacks to be triggered
-    fireEvent.focus(r.chipSelectField());
+    focus(r.chipSelectField());
     expect(onFocus).toBeCalledTimes(1);
     fireEvent.blur(r.chipSelectField());
     expect(onBlur).toBeCalledTimes(1);

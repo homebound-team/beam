@@ -63,7 +63,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
       aria-label={label}
     >
       <VisuallyHidden>
-        <input ref={ref} {...mergeProps(inputProps, focusProps)} {...tid} />
+        <input ref={ref} {...mergeProps(inputProps, focusProps)} {...tid} data-indeterminate={isIndeterminate} />
       </VisuallyHidden>
       <span
         {...hoverProps}
