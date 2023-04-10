@@ -18,6 +18,8 @@ interface ListBoxProps<O, V extends Key> {
   positionProps: React.HTMLAttributes<Element>;
   loading?: boolean | (() => JSX.Element);
   disabledOptionsWithReasons?: Record<string, string | undefined>;
+  isTree?: boolean;
+  allowCollapsing?: boolean;
 }
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
@@ -33,6 +35,8 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     horizontalLayout = false,
     loading,
     disabledOptionsWithReasons = {},
+    isTree,
+    allowCollapsing,
   } = props;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...props }, state, listBoxRef);
   const positionMaxHeight = positionProps.style?.maxHeight;
@@ -91,7 +95,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
       ref={listBoxRef}
       {...listBoxProps}
     >
-      {isMultiSelect && state.selectionManager.selectedKeys.size > 0 && (
+      {isMultiSelect && !isTree && state.selectionManager.selectedKeys.size > 0 && (
         <ul
           css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").maxh("50%").overflowAuto.$}
           ref={selectedList}
@@ -134,6 +138,8 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
             scrollOnFocus={(props as any).shouldUseVirtualFocus}
             loading={loading}
             disabledOptionsWithReasons={disabledOptionsWithReasons}
+            isTree={isTree}
+            allowCollapsing={allowCollapsing}
           />
         )}
       </ul>

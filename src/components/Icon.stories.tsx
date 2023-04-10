@@ -82,6 +82,10 @@ export const Icon = (props: IconProps) => {
     "arrowFromLeft",
     "arrowFromRight",
     "arrowFromTop",
+    "triangleLeft",
+    "triangleRight",
+    "triangleUp",
+    "triangleDown",
   ];
   const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images", "openBook"];
   const miscIcons: IconProps["icon"][] = [
