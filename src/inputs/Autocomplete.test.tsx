@@ -105,4 +105,33 @@ describe("Autocomplete", () => {
     // Then the input should be cleared
     expect(onChange).toHaveBeenCalledWith(undefined);
   });
+
+  it("renders disabled options", async () => {
+    const options: HasIdAndName[] = [
+      { id: "u:1", name: "User 1" },
+      { id: "u:2", name: "User 2" },
+    ];
+    // Given an Autocomplete
+    const r = await render(
+      <Autocomplete<HasIdAndName>
+        label="Search"
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        disabledOptions={["u:1", { value: "u:2", reason: "foo" }]}
+        value={"Test"}
+        onInputChange={() => {}}
+        placeholder="Search placeholder..."
+        onSelect={() => {}}
+      />,
+    );
+
+    // When the input is focused
+    focus(r.search);
+    // Then both options are disabled
+    expect(r.getAllByRole("option")[0]).toHaveAttribute("aria-disabled", "true");
+    const optionTwo = r.getAllByRole("option")[1];
+    expect(optionTwo).toHaveAttribute("aria-disabled", "true");
+    expect(optionTwo.closest("[data-testid='tooltip']")).toHaveAttribute("title", "foo");
+  });
 });
