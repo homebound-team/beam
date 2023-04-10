@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { ReactNode, useContext, useState } from "react";
 import { Icon } from "src/components/Icon";
 import { GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -13,10 +13,11 @@ interface ExpandableHeaderProps<R extends Kinded> {
   column: GridColumnWithId<R>;
   minStickyLeftOffset: number;
   as: RenderAs;
+  tooltipEl?: ReactNode;
 }
 
 export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<R>) {
-  const { title, column, minStickyLeftOffset, as } = props;
+  const { title, column, minStickyLeftOffset, as, tooltipEl } = props;
   const { tableState } = useContext(TableStateContext);
   const expandedColumnIds = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const isExpanded = expandedColumnIds.includes(column.id);
@@ -44,15 +45,17 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
     >
       <span
         css={
-          Css.tl.lineClamp2
+          Css.df.aic
             .if(applyStickyStyles)
             .sticky.leftPx(minStickyLeftOffset + 12)
             .pr2.mr2.bgWhite.z(zIndices.expandableHeaderTitle)
             .if(isHovered).bgGray100.$
         }
       >
-        {title}
+        <span css={Css.tl.lineClamp2.$}>{title}</span>
+        {tooltipEl}
       </span>
+
       <span css={Css.if(applyStickyStyles).sticky.rightPx(12).z(zIndices.expandableHeaderIcon).$}>
         {isLoading ? <Loader size="xs" /> : <Icon icon={isExpanded ? "chevronLeft" : "chevronRight"} inc={2} />}
       </span>
