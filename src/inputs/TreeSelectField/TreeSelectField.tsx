@@ -40,7 +40,6 @@ export interface TreeSelectFieldProps<O, V extends Value> extends BeamFocusableP
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
   onSelect: (options: TreeSelectResponse<O, V>) => void;
-  // disabledOptions?: (V | { value: V; reason: string })[];
   options: NestedOptionsOrLoad<O>;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
@@ -102,7 +101,6 @@ export function TreeSelectField<O, V extends Value>(
         getOptionValue={getOptionValue}
         values={values}
         onSelect={({ all, leaf, root }) => {
-          console.log({ all, leaf, root });
           onSelect({ all, leaf, root });
         }}
       />
@@ -215,7 +213,6 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   useEffect(() => {
     // Do not run this effect on first render. Otherwise we'd be triggering a re-render on first render.
     if (reactToCollapse.current) {
-      console.log("setting field state based on clappsed keys!", { collapsedKeys });
       setFieldState(({ allOptions, inputValue, ...others }) => ({
         allOptions,
         inputValue,
@@ -278,7 +275,6 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   // Only on the first open of the listbox, we want to load the options if they haven't been loaded yet.
   const firstOpen = useRef(true);
   function onOpenChange(isOpen: boolean) {
-    if (!isOpen) debugger;
     if (firstOpen.current && isOpen) {
       maybeInitLoad(options, fieldState, setFieldState);
       firstOpen.current = false;
@@ -431,6 +427,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     },
   });
 
+  // Resets the TreeFieldState when the 'blur' event is triggered on the input.
   function resetField() {
     const { inputValue, selectedOptions } = fieldState;
     if (inputValue !== "" || (selectedOptions.length === 1 && inputValue !== getOptionLabel(selectedOptions[0]))) {

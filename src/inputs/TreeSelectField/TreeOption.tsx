@@ -23,7 +23,7 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
   if (!leveledOption) return null;
 
   const [option, level]: [NestedOption<O>, number] = leveledOption;
-  const ref = useRef<HTMLLIElement>(null);
+  const ref = useRef<HTMLElement>(null);
   const { hoverProps, isHovered } = useHover({});
   const tid = useTestIds(props, "treeOption");
 
@@ -36,6 +36,7 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
   );
 
   // If this item is not selected, then determine if some of its children are selected to show the indeterminate state.
+  // Note: If `isSelected` will be true if all of the children were selected. That auto-parent-selection happens in the `onSelect` callback in TreeSelectField.
   const isIndeterminate = !isSelected && option.children?.some((o) => hasSelectedChildren(o, state, getOptionValue));
 
   const listItemStyles = {
@@ -76,7 +77,7 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
           )}
         </span>
       )}
-      <span css={Css.df.aic.gap1.h100.fg1.py1.pr2.$} ref={ref as any} {...optionProps}>
+      <span css={Css.df.aic.gap1.h100.fg1.py1.pr2.$} ref={ref} {...optionProps}>
         <StyledCheckbox
           isDisabled={isDisabled}
           isSelected={isSelected}
