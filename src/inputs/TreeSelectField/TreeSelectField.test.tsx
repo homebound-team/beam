@@ -346,6 +346,62 @@ describe(TreeSelectField, () => {
     expect(r.getByRole("option", { name: "NBA" })).toBeVisible();
     expect(r.getByRole("option", { name: "WNBA" })).toBeVisible();
   });
+
+  it("shows the correct input text when selecting options", async () => {
+    // Given a TreeSelectField with nested options
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={getNestedOptions()}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    // When selecting a single option
+    click(r.favoriteLeague);
+    click(r.getByRole("option", { name: "NBA" }));
+    // Then the input value remains empty to allow the user to type to filter
+    expect(r.favoriteLeague()).toHaveValue("");
+    // When blur-ing the field
+    blur(r.favoriteLeague);
+    // Then the input text is the selected option's label
+    expect(r.favoriteLeague()).toHaveValue("NBA");
+    // When selecting multiple options
+    click(r.favoriteLeague);
+    // Then the input value is emptied to allow the user to immediately start typing to filter
+    expect(r.favoriteLeague()).toHaveValue("");
+    expect(r.favoriteLeague()).toHaveFocus();
+    click(r.getByRole("option", { name: "NFL" }));
+    // And the count of selected options is shown
+    expect(r.selectedOptionsCount()).toHaveTextContent("2");
+  });
+
+  it("supports nothingSelectedText", async () => {
+    // Given a TreeSelectField with the 'nothingSelectedText' defined
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={getNestedOptions()}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+        nothingSelectedText="Select a league"
+      />,
+    );
+    // Then the input text is the 'nothingSelectedText'
+    expect(r.favoriteLeague()).toHaveValue("Select a league");
+    // When opening the menu
+    click(r.favoriteLeague);
+    // Then the input value is emptied to allow the user to immediately start typing to filter
+    expect(r.favoriteLeague()).toHaveValue("");
+    // When blurring back out of the field
+    blur(r.favoriteLeague);
+    // Then the input text is the 'nothingSelectedText'
+    expect(r.favoriteLeague()).toHaveValue("Select a league");
+  });
 });
 
 function getNestedOptions(): NestedOption<HasIdAndName>[] {

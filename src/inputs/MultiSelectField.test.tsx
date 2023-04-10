@@ -183,6 +183,19 @@ describe("MultiSelectFieldTest", () => {
     );
   });
 
+  it("can remove options by clicking the chips", async () => {
+    // Given a MultiSelectField with a selected option
+    const r = await render(<TestMultiSelectField values={["1"]} options={options} />);
+    // When opening the menu
+    click(r.age());
+    // And clicking on the chip
+    click(r.chip());
+    // Then the menu remains open
+    expect(r.getByRole("listbox")).toBeInTheDocument();
+    // And `onSelect` is called with the correct values
+    expect(onSelect).toHaveBeenCalledWith([]);
+  });
+
   function TestMultiSelectField(
     props: Optional<
       MultiSelectFieldProps<HasIdAndName<string>, string>,
