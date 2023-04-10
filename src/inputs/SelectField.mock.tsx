@@ -66,7 +66,11 @@ export function SelectField<O extends object, V extends Key>(props: SelectFieldP
             <option
               key={i}
               value={`${getOptionValue(option)}`}
-              disabled={disabledOptions.includes(getOptionValue(option))}
+              disabled={disabledOptions.some((dOption) =>
+                typeof dOption === "object"
+                  ? dOption.value === getOptionValue(option)
+                  : dOption === getOptionValue(option),
+              )}
             >
               {getOptionLabel(option)}
             </option>

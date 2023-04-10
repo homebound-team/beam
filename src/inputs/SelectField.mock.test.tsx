@@ -83,6 +83,38 @@ describe("MockSelectField", () => {
     expect(r.getByText("four")).not.toBeDisabled();
   });
 
+  it("disables options that match disabledOptions with reason", async () => {
+    const options = [
+      { id: "1", name: "one" },
+      { id: "2", name: "two" },
+      { id: "3", name: "thr" },
+      { id: "4", name: "four" },
+    ];
+    const value = "1";
+    const onSelect = jest.fn();
+    // When disabledOptions with reason are provided
+    const r = await render(
+      <MockSelectField
+        label="test"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+        value={value}
+        onSelect={onSelect}
+        options={options}
+        disabledOptions={[
+          { value: "2", reason: "foo" },
+          { value: "3", reason: "bar" },
+        ]}
+      />,
+    );
+    // Then matching options are disabled
+    expect(r.getByText("two")).toBeDisabled();
+    expect(r.getByText("thr")).toBeDisabled();
+    // and unmatching options are not disabled
+    expect(r.getByText("one")).not.toBeDisabled();
+    expect(r.getByText("four")).not.toBeDisabled();
+  });
+
   it("can load options via options prop callback", async () => {
     const options = [
       { id: "1", name: "one" },
