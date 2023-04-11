@@ -216,11 +216,11 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       maybeInitLoad();
       firstOpen.current = false;
     }
-    setFieldState((prevState) => ({
-      ...prevState,
-      // When using the multiselect field, always empty the input upon open.
-      inputValue: multiselect && isOpen ? "" : prevState.inputValue,
-    }));
+
+    // When using the multiselect field, always empty the input upon open.
+    if (multiselect && isOpen) {
+      setFieldState((prevState) => ({ ...prevState, inputValue: "" }));
+    }
   }
 
   // Used to calculate the rendered width of the combo box (input + button)
@@ -254,6 +254,9 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   const state = useComboBoxState<any>({
     ...comboBoxProps,
     allowsEmptyCollection: true,
+    // We don't really allow custom values, as we reset the input value once a user `blur`s the input field.
+    // Though, setting `allowsCustomValue: true` prevents React-Aria/Stately from attempting to reset the input field's value when the menu closes.
+    allowsCustomValue: true,
     // useComboBoxState.onSelectionChange will be executed if a keyboard interaction (Enter key) is used to select an item
     onSelectionChange: (key) => {
       // ignore undefined/null keys - `null` can happen if input field's value is completely deleted after having a value assigned.
@@ -281,7 +284,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     if (!state.isOpen && !areArraysEqual(values, fieldState.selectedKeys)) {
       setFieldState((prevState) => {
         const selectedOptions = prevState.allOptions.filter((o) => values?.includes(getOptionValue(o)));
-
         return {
           ...prevState,
           selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
