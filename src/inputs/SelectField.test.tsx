@@ -34,6 +34,8 @@ describe("SelectFieldTest", () => {
     expect(onSelect).toHaveBeenCalledWith("3", options[2]);
     // And the field has not been blurred (regression test to prevent SelectField's list box from opening back up after selecting an option)
     expect(onBlur).not.toHaveBeenCalled();
+    // And the field has the correct value (regression test to ensure input field's value correctly updates when selecting an option, before `onBlur` is called)
+    expect(r.age()).toHaveValue("Three");
   });
 
   it("does not fire focus/blur when readOnly", async () => {
