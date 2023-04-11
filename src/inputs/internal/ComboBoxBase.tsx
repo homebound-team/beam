@@ -255,7 +255,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     ...comboBoxProps,
     allowsEmptyCollection: true,
     // We don't really allow custom values, as we reset the input value once a user `blur`s the input field.
-    // Though, setting `allowsCustomValue: true` prevents React-Aria/Stately from attempting to reset the input field's value as well.
+    // Though, setting `allowsCustomValue: true` prevents React-Aria/Stately from attempting to reset the input field's value when the menu closes.
     allowsCustomValue: true,
     // useComboBoxState.onSelectionChange will be executed if a keyboard interaction (Enter key) is used to select an item
     onSelectionChange: (key) => {
