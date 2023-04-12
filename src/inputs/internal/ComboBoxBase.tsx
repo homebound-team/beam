@@ -369,6 +369,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         inputProps={inputProps}
         inputRef={inputRef}
         inputWrapRef={inputWrapRef}
+        listBoxRef={listBoxRef}
         state={state}
         labelProps={labelProps}
         selectedOptions={fieldState.selectedOptions}

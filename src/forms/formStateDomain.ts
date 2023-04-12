@@ -29,6 +29,7 @@ export interface AuthorInput {
   animals?: string[] | null;
   bio?: string | null;
   saleDates?: DateRange | null;
+  favoriteGenres?: string[] | null;
 }
 
 export interface AuthorAddress {

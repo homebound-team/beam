@@ -199,7 +199,12 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
     return {
       selectedKeys,
-      inputValue: selectedOptions.length === 1 ? getOptionLabel(selectedOptions[0]) : "",
+      inputValue:
+        selectedOptions.length === 1
+          ? getOptionLabel(selectedOptions[0])
+          : selectedOptions.length === 0
+          ? nothingSelectedText
+          : "",
       filteredOptions,
       selectedOptions,
       allOptions: initialOptions,
@@ -279,6 +284,10 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
       maybeInitLoad(options, fieldState, setFieldState);
       firstOpen.current = false;
     }
+    if (isOpen) {
+      // reset the input field to allow the user to start typing to filter
+      setFieldState((prevState) => ({ ...prevState, inputValue: "" }));
+    }
   }
 
   // This is _always_ going to appear new. Maybe `useMemo`?
@@ -305,6 +314,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   const state = useComboBoxState<any>({
     ...comboBoxProps,
     allowsEmptyCollection: true,
+    allowsCustomValue: true,
   });
 
   // @ts-ignore - `selectionManager.state` exists, but not according to the types. We are tricking the ComboBox state to support multiple selections.
@@ -326,7 +336,12 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
       if (addedKeys.size > 0 || removedKeys.size > 0) {
         // Quickly return out of this if all selections are removed
         if (newKeys.size === 0) {
-          setFieldState((prevState) => ({ ...prevState, inputValue: "", selectedKeys: [], selectedOptions: [] }));
+          setFieldState((prevState) => ({
+            ...prevState,
+            inputValue: nothingSelectedText,
+            selectedKeys: [],
+            selectedOptions: [],
+          }));
           onSelect({
             all: { values: [], options: [] },
             leaf: { values: [], options: [] },
@@ -430,10 +445,18 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   // Resets the TreeFieldState when the 'blur' event is triggered on the input.
   function resetField() {
     const { inputValue, selectedOptions } = fieldState;
-    if (inputValue !== "" || (selectedOptions.length === 1 && inputValue !== getOptionLabel(selectedOptions[0]))) {
+    if (
+      inputValue !== nothingSelectedText ||
+      (selectedOptions.length === 1 && inputValue !== getOptionLabel(selectedOptions[0]))
+    ) {
       setFieldState((prevState) => ({
         ...prevState,
-        inputValue: selectedOptions.length === 1 ? getOptionLabel(selectedOptions[0]) : "",
+        inputValue:
+          selectedOptions.length === 1
+            ? getOptionLabel(selectedOptions[0])
+            : selectedOptions.length === 0
+            ? nothingSelectedText
+            : "",
         filteredOptions: initialOptions.flatMap((o) => levelOptions(o, 0)),
         allowCollapsing: true,
       }));

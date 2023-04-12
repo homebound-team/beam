@@ -58,7 +58,12 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
       // We don't really need to set this, but it's handy for tests, which would
       // otherwise render just 1 row. A better way to do this would be to jest.mock
       // out Virtuoso with an impl that just rendered everything, but doing this for now.
-      initialItemCount={10}
+      {...(process.env.NODE_ENV === "test"
+        ? {
+            initialItemCount: items.length,
+            key: items.length,
+          }
+        : {})}
       itemContent={(idx) => {
         const item = items[idx];
         if (item) {
