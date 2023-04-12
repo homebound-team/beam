@@ -67,6 +67,17 @@ describe("TreeFilter", () => {
     const r = await render(<TestFilter nothingSelectedText="All Projects" />);
     expect(r.filter_tree()).toHaveValue("All Projects");
   });
+
+  it("sets value to undefined if no options are selected.", async () => {
+    // Given the tree filter a single option selected
+    const r = await render(<TestFilter defaultValue={["child:0-0-1"]} />);
+    expect(r.value()).toHaveTextContent('{"tree":["child:0-0-1"]}');
+    // When clearing the selection
+    click(r.filter_tree());
+    click(r.getByRole("option", { name: "Child 0-0-1" }));
+    // Then the value is undefined
+    expect(r.value()).toHaveTextContent("{}");
+  });
 });
 
 function TestFilter(props: Partial<TreeFilterProps<HasIdAndName, string>>) {
