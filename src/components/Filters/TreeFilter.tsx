@@ -36,7 +36,10 @@ class TreeFilter<O, V extends Value> extends BaseFilter<V[], TreeFilterProps<O, 
         compact={!vertical}
         labelStyle={inModal ? "hidden" : !inModal && !vertical ? "inline" : "above"}
         sizeToContent={!inModal && !vertical}
-        onSelect={(options) => setValue(options[filterBy].values)}
+        onSelect={(options) => {
+          const values = options[filterBy].values;
+          setValue(values.length === 0 ? undefined : values);
+        }}
         nothingSelectedText={nothingSelectedText ?? "All"}
         {...this.testId(tid)}
       />
