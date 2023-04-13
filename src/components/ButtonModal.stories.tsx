@@ -91,3 +91,21 @@ export function ButtonModalWithChipAndTooltip() {
     />
   );
 }
+
+export function ButtonModalWithTextSecondary() {
+  return (
+    <ButtonModal
+      storybookDefaultOpen
+      title={"Modal Title"}
+      content={
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ipsum purus, bibendum sit amet vulputate eget, porta semper ligula."
+      }
+      trigger={{ label: "Button Modal trigger" }}
+      variant={"textSecondary"}
+    />
+  );
+}
+// disable chromatic snapshot for this story
+ButtonModalWithTextSecondary.parameters = {
+  chromatic: { disableSnapshot: true },
+};
