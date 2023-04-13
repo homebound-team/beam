@@ -92,7 +92,7 @@ export function ButtonModalWithChipAndTooltip() {
   );
 }
 
-export function ButtonModalWithSecondaryBorderless() {
+export function ButtonModalWithSecondaryText() {
   return (
     <ButtonModal
       storybookDefaultOpen
@@ -101,7 +101,7 @@ export function ButtonModalWithSecondaryBorderless() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ipsum purus, bibendum sit amet vulputate eget, porta semper ligula."
       }
       trigger={{ label: "Button Modal trigger" }}
-      variant={"secondaryBorderless"}
+      variant={"secondaryText"}
     />
   );
 }

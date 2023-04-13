@@ -189,7 +189,7 @@ const variantStyles: (contrast: boolean) => Record<
     disabledStyles: Css.lightBlue300.if(contrast).lightBlue700.$,
     focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
-  secondaryBorderless: {
+  secondaryText: {
     baseStyles: Css.gray900.add("fontSize", "inherit").$,
     hoverStyles: Css.bgGray100.$,
     pressedStyles: Css.gray900.$,
@@ -218,4 +218,4 @@ export type ButtonVariant =
   | "tertiaryDanger"
   | "danger"
   | "text"
-  | "secondaryBorderless";
+  | "secondaryText";
