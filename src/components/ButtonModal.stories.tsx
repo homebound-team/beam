@@ -92,7 +92,7 @@ export function ButtonModalWithChipAndTooltip() {
   );
 }
 
-export function ButtonModalWithSecondaryText() {
+export function ButtonModalWithTextSecondary() {
   return (
     <ButtonModal
       storybookDefaultOpen
@@ -101,7 +101,11 @@ export function ButtonModalWithSecondaryText() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ipsum purus, bibendum sit amet vulputate eget, porta semper ligula."
       }
       trigger={{ label: "Button Modal trigger" }}
-      variant={"secondaryText"}
+      variant={"textSecondary"}
     />
   );
 }
+// disable chromatic snapshot for this story
+ButtonModalWithTextSecondary.parameters = {
+  chromatic: { disableSnapshot: true },
+};
