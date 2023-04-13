@@ -4,7 +4,7 @@ import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { noop } from "src/utils";
-import { blur, click, focus, render, wait } from "src/utils/rtl";
+import { blur, click, focus, render, select, wait } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";
 
 describe("SelectFieldTest", () => {
@@ -26,10 +26,10 @@ describe("SelectFieldTest", () => {
     );
     // That initially has "One" selected
     expect(r.age()).toHaveValue("One");
-    // When we click the field to open the menu
-    click(r.age);
-    // And we select the 3rd option
-    click(r.getByRole("option", { name: "Three" }));
+
+    // When selecting the 3rd option
+    select(r.age, "3");
+
     // Then onSelect was called
     expect(onSelect).toHaveBeenCalledWith("3", options[2]);
     // And the field has not been blurred (regression test to prevent SelectField's list box from opening back up after selecting an option)
@@ -120,8 +120,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When selecting the option with an `undefined` value
-    click(r.age);
-    click(r.getByRole("option", { name: "Unassigned" }));
+    select(r.age, "Unassigned");
     // Then expect the value to be that of the `undefined` entry
     expect(r.age()).toHaveValue("Unassigned");
   });
@@ -142,6 +141,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When opening the menu
+    select(r.age, "Two");
     click(r.age());
     const optionTwo = r.getByRole("option", { name: "Two" });
     // Then expect the disabled option to have the correct aria attributes
@@ -262,10 +262,8 @@ describe("SelectFieldTest", () => {
         onSelect={onSelect}
       />,
     );
-    // When we click the field to open the menu
-    click(r.age);
-    // And we select the 'unset' option
-    click(r.getByRole("option", { name: "None" }));
+    // When we select the 'unset' option
+    select(r.age, "None");
     // Then onSelect was called
     expect(onSelect).toHaveBeenCalledWith(undefined, undefined);
   });
