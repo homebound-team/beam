@@ -41,6 +41,7 @@ export function Option<O>(props: OptionProps<O>) {
     children: (
       <li
         {...mergeProps(optionProps, hoverProps)}
+        data-label={item.textValue}
         ref={ref as any}
         css={{
           ...Css.df.aic.jcsb.py1.px2.mh("42px").outline0.cursorPointer.sm.$,

@@ -1,5 +1,6 @@
 import { newLocation as _newLocation, withRouter as _withRouter } from "@homebound/rtl-react-router-utils";
 import {
+  allowAndWaitForAsyncBehavior,
   blur as _blur,
   change as _change,
   click as _click,
@@ -22,9 +23,9 @@ export {
   _change as change,
   _click as click,
   _focus as focus,
-  _getOptions as getOptions,
+  _getOptions as rtlUtilGetOptions,
   _input as input,
-  _select as select,
+  _select as rtlUtilSelect,
   _type as type,
   _typeAndWait as typeAndWait,
   _wait as wait,
@@ -180,3 +181,117 @@ function getTextFromTableCellNode(node: ChildNode) {
 export const withBeamRTL: Wrapper = {
   wrap: (c) => <BeamProvider>{c}</BeamProvider>,
 };
+
+/** Selects an option from the Beam SelectField, MultiSelectField, and TreeSelectField components
+ * For select fields that support multiple selections, subsequent calls to this function will toggle the selection state of an option.
+ * @param value The value or label of the option.
+ * */
+export function select(element: HTMLElement, value: string | string[]) {
+  const select = resolveIfNeeded(element);
+  if (isSelectElement(select)) {
+    throw new Error("Beam select helper does not support <select> elements.");
+  }
+
+  if (!isInputElement(select)) {
+    throw new Error(`Expected element to be INPUT, but got ${select.nodeName}. This field may be read-only.`);
+  }
+
+  function maybeOpenAndSelect(optionValue: string) {
+    const expanded = select.getAttribute("aria-expanded") === "true";
+    if (!expanded) {
+      _click(select);
+    }
+
+    const body = select.closest("body") as HTMLElement;
+    const listboxId = select.getAttribute("aria-controls");
+    const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
+    const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
+    // Allow searching for options by their data-key (value) or textContent (label)
+    const optionToSelect = Array.from(options).find(
+      (o: HTMLElement) => o.dataset.key === optionValue || o.dataset.label === optionValue,
+    );
+    if (!optionToSelect) {
+      throw new Error(`Could not find option with value or text content of ${optionValue}`);
+    }
+    _click(optionToSelect);
+  }
+
+  const optionValues = Array.isArray(value) ? value : [value];
+  optionValues.forEach((optionValue) => {
+    maybeOpenAndSelect(optionValue);
+  });
+}
+
+export function selectAndWait(input: HTMLElement, value: string | string[]): Promise<void> {
+  return allowAndWaitForAsyncBehavior(() => select(input, value));
+}
+
+export function getSelected(element: HTMLElement): string[] | string | undefined {
+  const select = resolveIfNeeded(element);
+  if (isSelectElement(select)) {
+    throw new Error("Beam getSelected helper does not support <select> elements");
+  }
+
+  if (!isInputElement(select) && select.dataset.readonly === "true") {
+    // For read-only fields that render as a 'div'
+    return select.textContent ?? undefined;
+  }
+
+  const expanded = select.getAttribute("aria-expanded") === "true";
+  if (!expanded) {
+    _click(select);
+  }
+
+  const body = select.closest("body") as HTMLElement;
+  const listboxId = select.getAttribute("aria-controls");
+  const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
+  const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
+
+  const selections: string[] = Array.from(options)
+    .filter((o: HTMLElement) => o.getAttribute("aria-selected") === "true")
+    .map((o: HTMLElement) => o.dataset.label ?? o.dataset.key ?? "")
+    // Filter out empty strings
+    .filter((o) => !!o);
+
+  return selections.length > 0 ? (selections.length > 1 ? selections : selections[0]) : undefined;
+}
+
+export function getOptions(element: HTMLElement): string[] {
+  const select = resolveIfNeeded(element);
+  if (isSelectElement(select)) {
+    throw new Error("Beam getOptions helper does not support <select> elements");
+  }
+
+  if (!isInputElement(select)) {
+    throw new Error(
+      `Expected element to be INPUT, but got ${select.nodeName}. This field may be read-only. In that case we cannot get the list of options`,
+    );
+  }
+
+  const expanded = select.getAttribute("aria-expanded") === "true";
+  if (!expanded) {
+    _click(select);
+  }
+
+  const body = select.closest("body") as HTMLElement;
+  const listboxId = select.getAttribute("aria-controls");
+  const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
+  const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
+
+  return Array.from(options)
+    .map((o: HTMLElement) => o.dataset.label ?? o.dataset.key ?? "")
+    .filter((o) => !!o);
+}
+
+function resolveIfNeeded(element: HTMLElement): HTMLElement {
+  const maybeProxy = element as any;
+  return maybeProxy instanceof Function ? maybeProxy() : element;
+}
+
+function isSelectElement(element: HTMLElement): element is HTMLSelectElement {
+  return element.nodeName === "SELECT";
+}
+
+function isInputElement(element: HTMLElement): element is HTMLInputElement {
+  return element.nodeName === "INPUT";
+}

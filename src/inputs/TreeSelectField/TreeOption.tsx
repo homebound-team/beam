@@ -77,7 +77,7 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
           )}
         </span>
       )}
-      <span css={Css.df.aic.gap1.h100.fg1.py1.pr2.$} ref={ref} {...optionProps}>
+      <span css={Css.df.aic.gap1.h100.fg1.py1.pr2.$} ref={ref} {...optionProps} data-label={item.textValue}>
         <StyledCheckbox
           isDisabled={isDisabled}
           isSelected={isSelected}
