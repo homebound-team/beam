@@ -402,6 +402,30 @@ describe(TreeSelectField, () => {
     // Then the input text is the 'nothingSelectedText'
     expect(r.favoriteLeague()).toHaveValue("Select a league");
   });
+
+  it("does not auto-select parent if 'children' is an empty array", async () => {
+    // When rendering the TreeSelectField with a parent defined without any children and no values selected
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={[
+          {
+            id: "baseball",
+            name: "Baseball",
+            children: [],
+          },
+        ]}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    // Then the parent option is not selected
+    expect(r.favoriteLeague()).toHaveValue("");
+    click(r.favoriteLeague);
+    expect(r.getByRole("option", { name: "Baseball" })).toHaveAttribute("aria-selected", "false");
+  });
 });
 
 function getNestedOptions(): NestedOption<HasIdAndName>[] {

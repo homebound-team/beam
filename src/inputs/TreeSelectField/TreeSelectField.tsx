@@ -183,7 +183,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
       if (isSelected) return true;
 
       // If we do not have children, then return the state of this leaf node.
-      if (!maybeParent.children) return isSelected;
+      if (!maybeParent.children || maybeParent.children.length === 0) return isSelected;
 
       // If we do have children, then check if all children are selected.
       // if all are selected, then push this parent to the selectedKeys and selectedOptions
