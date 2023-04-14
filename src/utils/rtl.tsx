@@ -197,13 +197,15 @@ export function select(element: HTMLElement, value: string | string[]) {
   }
 
   function maybeOpenAndSelect(optionValue: string) {
-    const listboxId = select.getAttribute("aria-controls");
-    const body = select.closest("body") as HTMLElement;
-    const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
-    if (!listbox) {
+    const expanded = select.getAttribute("aria-expanded") === "true";
+    if (!expanded) {
       _click(select);
     }
-    const options: NodeListOf<HTMLElement> = body.querySelectorAll("[role=option]");
+
+    const body = select.closest("body") as HTMLElement;
+    const listboxId = select.getAttribute("aria-controls");
+    const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
+    const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
     // Allow searching for options by their data-key (value) or textContent (label)
     const optionToSelect = Array.from(options).find(
       (o: HTMLElement) => o.dataset.key === optionValue || o.dataset.label === optionValue,
@@ -235,13 +237,15 @@ export function getSelected(element: HTMLElement): string[] | string | undefined
     return select.textContent ?? undefined;
   }
 
-  const listboxId = select.getAttribute("aria-controls");
-  const body = select.closest("body") as HTMLElement;
-  const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
-  if (!listbox) {
+  const expanded = select.getAttribute("aria-expanded") === "true";
+  if (!expanded) {
     _click(select);
   }
-  const options: NodeListOf<HTMLElement> = body.querySelectorAll("[role=option]");
+
+  const body = select.closest("body") as HTMLElement;
+  const listboxId = select.getAttribute("aria-controls");
+  const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
+  const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
 
   const selections: string[] = Array.from(options)
     .filter((o: HTMLElement) => o.getAttribute("aria-selected") === "true")
@@ -264,13 +268,15 @@ export function getOptions(element: HTMLElement): string[] {
     );
   }
 
-  const listboxId = select.getAttribute("aria-controls");
-  const body = select.closest("body") as HTMLElement;
-  const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
-  if (!listbox) {
+  const expanded = select.getAttribute("aria-expanded") === "true";
+  if (!expanded) {
     _click(select);
   }
-  const options: NodeListOf<HTMLElement> = body.querySelectorAll("[role=option]");
+
+  const body = select.closest("body") as HTMLElement;
+  const listboxId = select.getAttribute("aria-controls");
+  const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
+  const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
 
   return Array.from(options)
     .map((o: HTMLElement) => o.dataset.label ?? o.dataset.key ?? "")

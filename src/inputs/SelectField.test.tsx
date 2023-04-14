@@ -142,9 +142,8 @@ describe("SelectFieldTest", () => {
     );
     // When opening the menu
     select(r.age, "Two");
-    click(r.age());
     const optionTwo = r.getByRole("option", { name: "Two" });
-    // Then expect the disabled option to have the correct aria attributes
+    // Then the disabled option to have the correct aria attributes
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
     // And when clicking on that option
     click(optionTwo);
