@@ -4,9 +4,10 @@ import { Item, useComboBoxState } from "react-stately";
 import { Icon } from "src/components";
 import { Popover } from "src/components/internal";
 import { PresentationFieldProps } from "src/components/PresentationContext";
+import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
-import { valueToKey } from "src/inputs/Value";
+import { Value, valueToKey } from "src/inputs/Value";
 
 interface AutocompleteProps<T>
   extends Pick<PresentationFieldProps, "labelStyle">,
@@ -28,6 +29,8 @@ interface AutocompleteProps<T>
   placeholder?: string;
   /** Whether the input is disabled */
   disabled?: boolean;
+  /** A list of options that are disabled. Can be either the option itself or an object with the option and a reason why it is disabled */
+  disabledOptions?: (Value | { value: Value; reason: string })[];
 }
 
 export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
@@ -40,11 +43,15 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
     value,
     options,
     disabled,
+    disabledOptions,
     ...others
   } = props;
 
+  const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
+
   const comboBoxProps = {
     isDisabled: !!disabled,
+    disabledKeys: Object.keys(disabledOptionsWithReasons),
     onInputChange: onInputChange,
     inputValue: value,
     items: options,
@@ -128,6 +135,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
             listBoxRef={listBoxRef}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             getOptionLabel={getOptionLabel}
+            disabledOptionsWithReasons={disabledOptionsWithReasons}
           />
         </Popover>
       )}
