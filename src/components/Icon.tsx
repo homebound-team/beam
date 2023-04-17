@@ -8,7 +8,8 @@ export interface IconProps extends AriaAttributes, DOMProps {
   icon: IconKey;
   /** Defaults to currentColor */
   color?: Palette | "inherit" | "currentColor";
-  secondColor?: Palette | "inherit" | "currentColor";
+  /** Secondary color */
+  secondaryColor?: Palette | "inherit" | "secondaryColor";
   /** The size of the icon in increments, i.e. 1 == 8px, default is 3 == 24px. */
   inc?: number;
   /** Styles overrides */
@@ -17,7 +18,7 @@ export interface IconProps extends AriaAttributes, DOMProps {
 }
 
 export const Icon = React.memo((props: IconProps) => {
-  const { icon, inc = 3, color = "currentColor", xss, tooltip, ...other } = props;
+  const { icon, inc = 3, color = "currentColor", xss, tooltip, secondaryColor, ...other } = props;
   const size = increment(inc);
   return maybeTooltip({
     title: tooltip,
@@ -29,7 +30,7 @@ export const Icon = React.memo((props: IconProps) => {
         height={size}
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
-        css={{ "path, rect": Css.fill(color).$, ...xss }}
+        css={{ "path, rect": Css.fill(color).$, "#secondary-color": Css.fill(secondaryColor).$ , ...xss }}
         data-icon={icon}
         {...other}
       >
@@ -474,8 +475,8 @@ export const Icons = {
     <>
       <path d="M6.40005 19.6H17.6C18.4824 19.6 19.2 18.8824 19.2 18V6C19.2 5.1176 18.4824 4.4 17.6 4.4H16C16 3.9576 15.6424 3.6 15.2 3.6H8.80005C8.35765 3.6 8.00005 3.9576 8.00005 4.4H6.40005C5.51765 4.4 4.80005 5.1176 4.80005 6V18C4.80005 18.8824 5.51765 19.6 6.40005 19.6ZM6.40005 6H8.00005V7.6H16V6H17.6V18H6.40005V6Z" />
       <path
+        id="secondary-color"
         d="M11.2 12.8688L9.7656 11.4344L8.6344 12.5656L11.2 15.1312L15.3656 10.9656L14.2344 9.83438L11.2 12.8688Z"
-        fill="#7E9C4F"
       />
     </>
   ),
