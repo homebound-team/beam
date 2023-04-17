@@ -37,6 +37,7 @@ function Template() {
       labelStyle="hidden"
       getOptionValue={(o) => o.label}
       getOptionLabel={(o) => o.label}
+      disabledOptions={[{ value: "Iron man", reason: "No heroes selected" }, "Thor"]}
       getOptionMenuLabel={(o) => (
         <div css={Css.df.aic.gap1.$}>
           <span css={Css.wPx(24).hPx(24).br100.overflowHidden.$}>
