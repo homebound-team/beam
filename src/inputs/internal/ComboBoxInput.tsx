@@ -1,19 +1,22 @@
-import React, { InputHTMLAttributes, LabelHTMLAttributes, MutableRefObject, ReactNode, useState } from "react";
+import React, { InputHTMLAttributes, Key, LabelHTMLAttributes, MutableRefObject, ReactNode, useState } from "react";
 import { mergeProps } from "react-aria";
 import { ComboBoxState } from "react-stately";
 import { Icon } from "src/components";
 import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
+import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
+import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
 import { Value } from "src/inputs/Value";
 import { maybeCall } from "src/utils";
 
-interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldProps {
+interface ComboBoxInputProps<O, V extends Value> extends PresentationFieldProps {
   buttonProps: any;
   buttonRef: MutableRefObject<HTMLButtonElement | null>;
   inputProps: InputHTMLAttributes<HTMLInputElement>;
   inputRef: MutableRefObject<HTMLInputElement | null>;
   inputWrapRef: MutableRefObject<HTMLDivElement | null>;
+  listBoxRef?: MutableRefObject<HTMLDivElement | null>;
   state: ComboBoxState<O>;
   fieldDecoration?: (opt: O) => ReactNode;
   errorMsg?: string;
@@ -33,9 +36,10 @@ interface SelectFieldInputProps<O, V extends Value> extends PresentationFieldPro
   resetField: VoidFunction;
   hideErrorMessage?: boolean;
   typeToFilter: boolean;
+  isTree?: boolean;
 }
 
-export function ComboBoxInput<O, V extends Value>(props: SelectFieldInputProps<O, V>) {
+export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V>) {
   const {
     inputProps,
     buttonProps,
@@ -52,8 +56,12 @@ export function ComboBoxInput<O, V extends Value>(props: SelectFieldInputProps<O
     contrast = false,
     nothingSelectedText,
     resetField,
+    isTree,
+    listBoxRef,
     ...otherProps
   } = props;
+
+  const { collapsedKeys, setCollapsedKeys } = useTreeSelectFieldProvider();
 
   const [isFocused, setIsFocused] = useState(false);
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
@@ -70,7 +78,10 @@ export function ComboBoxInput<O, V extends Value>(props: SelectFieldInputProps<O
       xss={otherProps.labelStyle !== "inline" && !inputProps.readOnly ? Css.fw5.$ : {}}
       startAdornment={
         (showNumSelection && (
-          <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinySb.df.aic.jcc.$}>
+          <span
+            css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinySb.df.aic.jcc.$}
+            data-testid="selectedOptionsCount"
+          >
             {state.selectionManager.selectedKeys.size}
           </span>
         )) ||
@@ -86,6 +97,7 @@ export function ComboBoxInput<O, V extends Value>(props: SelectFieldInputProps<O
               ...Css.br4.outline0.gray700.if(contrast).gray400.$,
               ...(inputProps.disabled ? Css.cursorNotAllowed.gray400.if(contrast).gray600.$ : {}),
             }}
+            data-testid="toggleListBox"
           >
             <Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} />
           </button>
@@ -98,6 +110,28 @@ export function ComboBoxInput<O, V extends Value>(props: SelectFieldInputProps<O
           onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
             // We need to do some custom logic when using MultiSelect, as react-aria/stately Combobox doesn't support multiselect out of the box.
             if (isMultiSelect) {
+              if (isTree) {
+                const item = state.collection.getItem(state.selectionManager.focusedKey);
+                if (item && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
+                  if (!isLeveledNode(item)) return;
+                  const leveledOption = item.value;
+
+                  if (!leveledOption) return;
+                  const [option] = leveledOption;
+
+                  e.stopPropagation();
+                  e.preventDefault();
+                  if (option && option.children && option.children.length > 0) {
+                    if (collapsedKeys.includes(item.key) && e.key === "ArrowRight") {
+                      setCollapsedKeys((prevKeys: Key[]) => prevKeys.filter((k) => k !== item.key));
+                    } else if (!collapsedKeys.includes(item.key) && e.key === "ArrowLeft") {
+                      setCollapsedKeys((prevKeys: Key[]) => [...prevKeys, item.key]);
+                    }
+                  }
+                  return;
+                }
+              }
+
               // Enter should toggle the focused item.
               if (e.key === "Enter") {
                 // Prevent form submissions if menu is open.
@@ -130,10 +164,11 @@ export function ComboBoxInput<O, V extends Value>(props: SelectFieldInputProps<O
             inputProps.onKeyDown && inputProps.onKeyDown(e);
           },
           onBlur: (e: React.FocusEvent) => {
-            // Do not call onBlur if readOnly or interacting within the input wrapper (such as the menu trigger button).
+            // Do not call onBlur if readOnly or interacting within the input wrapper (such as the menu trigger button), or anything within the listbox.
             if (
               inputProps.readOnly ||
-              (props.inputWrapRef.current && props.inputWrapRef.current.contains(e.relatedTarget as HTMLElement))
+              (props.inputWrapRef.current && props.inputWrapRef.current.contains(e.relatedTarget as HTMLElement)) ||
+              (props.listBoxRef?.current && props.listBoxRef.current.contains(e.relatedTarget as HTMLElement))
             ) {
               return;
             }
@@ -166,7 +201,7 @@ export function ComboBoxInput<O, V extends Value>(props: SelectFieldInputProps<O
             // 3. Use `nothingSelectedText`
             // 4. Default to "1"
             // And do not allow it to grow past a size of 20.
-            // TODO: Combine logic to determine the input's value. Similar logic is used in SelectFieldBase, though it is intertwined with other state logic. Such as when to open/close menu, or filter the options within that menu, etc...
+            // TODO: Combine logic to determine the input's value. Similar logic is used in ComboBoxBase, though it is intertwined with other state logic. Such as when to open/close menu, or filter the options within that menu, etc...
             sizeToContent
               ? Math.min(
                   String(

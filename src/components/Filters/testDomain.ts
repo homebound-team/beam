@@ -27,6 +27,7 @@ export type Status = {
 };
 
 export type Project = {
+  name: string;
   id: string;
   internalUser: InternalUser;
   market: Market;
@@ -36,6 +37,18 @@ export type Project = {
   isTest: boolean;
   doNotUse: boolean;
   isStale: boolean;
+};
+
+export type Cohort = {
+  id: string;
+  name: string;
+  projects: Project[];
+};
+
+export type Development = {
+  id: string;
+  name: string;
+  cohorts: Cohort[];
 };
 
 export type ProjectFilter = {
@@ -51,6 +64,7 @@ export type ProjectFilter = {
   dateRange?: DateRangeFilterValue<string>;
   numberRange?: NumberRangeFilterValue;
   isStale?: boolean | null;
+  projectCohortDevelopment?: string[];
 };
 
 export type StageFilter = NonNullable<FilterDefs<ProjectFilter>["stage"]>;

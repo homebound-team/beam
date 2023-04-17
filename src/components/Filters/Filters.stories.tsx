@@ -1,6 +1,15 @@
 import { Meta } from "@storybook/react";
 import { useMemo } from "react";
-import { InternalUser, Market, Project, ProjectFilter, Stage, Status } from "src/components/Filters/testDomain";
+import {
+  Development,
+  InternalUser,
+  Market,
+  Project,
+  ProjectFilter,
+  Stage,
+  Status,
+} from "src/components/Filters/testDomain";
+import { treeFilter } from "src/components/Filters/TreeFilter";
 import {
   booleanFilter,
   dateFilter,
@@ -21,6 +30,8 @@ import { Css } from "src/Css";
 import { jan1, jan19 } from "src/forms/formStateDomain";
 import { usePersistedFilter } from "src/hooks";
 import { useGroupBy } from "src/hooks/useGroupBy";
+import { NestedOption } from "src/inputs";
+import { HasIdAndName } from "src/types";
 import { safeEntries } from "src/utils";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 import { checkboxFilter } from "./CheckboxFilter";
@@ -153,11 +164,29 @@ function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
     const doNotUse = toggleFilter({ label: "Hide 'Do Not Show'", onValue: false });
     const isStale = checkboxFilter({ label: "Stale" });
 
+    const groupedProjects: NestedOption<HasIdAndName>[] = developments.map(({ id, name, cohorts }) => ({
+      id,
+      name,
+      children: cohorts.map(({ id, name, projects }) => ({
+        id,
+        name,
+        children: projects.map(({ id, name }) => ({ id, name })),
+      })),
+    }));
+
+    const projectCohortDevelopment = treeFilter({
+      label: "Project Cohort or Development",
+      options: groupedProjects,
+      getOptionValue: (o) => o.id,
+      getOptionLabel: (o) => o.name,
+    });
+
     return {
       marketId,
       internalUserId,
       numRangeFilter,
       favorite,
+      projectCohortDevelopment,
       stage,
       status,
       date,
@@ -193,7 +222,7 @@ function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
       </div>
       <div css={Css.fg1.$}>
         <strong>Applied Filter:</strong> {JSON.stringify(filter)}
-        <GridTable columns={columns} rows={filterRows(tableData, filter)} />
+        <GridTable columns={columns} rows={filterRows(projects, filter)} />
       </div>
     </div>
   );
@@ -203,231 +232,32 @@ const internalUsers: InternalUser[] = zeroTo(10).map((i) => ({ id: `${i + 1}`, n
 const markets: Market[] = zeroTo(5).map((i) => ({ code: `${i + 1}`, name: `Market ${i + 1}` }));
 const stages: Stage[] = [Stage.StageOne, Stage.StageTwo];
 const statuses: Status[] = zeroTo(4).map((i) => ({ code: `${i + 1}`, name: `Status ${i + 1}` }));
-const tableData: Project[] = [
-  {
-    id: "1",
-    market: markets[0],
-    internalUser: internalUsers[4],
-    favorite: true,
-    stage: stages[0],
-    status: statuses[0],
-    isTest: false,
-    doNotUse: true,
-    isStale: true,
-  },
-  {
-    id: "2",
-    market: markets[2],
-    internalUser: internalUsers[9],
-    favorite: true,
-    stage: stages[2],
-    status: statuses[1],
-    isTest: true,
-    doNotUse: false,
-    isStale: false,
-  },
-  {
-    id: "3",
-    market: markets[1],
-    internalUser: internalUsers[1],
-    favorite: false,
-    stage: stages[1],
-    status: statuses[1],
-    isTest: false,
-    doNotUse: false,
-    isStale: false,
-  },
-  {
-    id: "4",
-    market: markets[4],
-    internalUser: internalUsers[0],
-    favorite: true,
-    stage: stages[0],
-    status: statuses[0],
-    isTest: false,
-    doNotUse: false,
-    isStale: false,
-  },
-  {
-    id: "5",
-    market: markets[2],
-    internalUser: internalUsers[1],
-    favorite: true,
-    stage: stages[1],
-    status: statuses[2],
-    isTest: false,
-    doNotUse: false,
-    isStale: false,
-  },
-  {
-    id: "6",
-    market: markets[3],
-    internalUser: internalUsers[1],
-    favorite: false,
-    stage: stages[0],
-    status: statuses[2],
-    isTest: true,
-    doNotUse: false,
-    isStale: true,
-  },
-  {
-    id: "7",
-    market: markets[2],
-    internalUser: internalUsers[2],
-    favorite: true,
-    stage: stages[2],
-    status: statuses[0],
-    isTest: false,
-    doNotUse: false,
-    isStale: true,
-  },
-  {
-    id: "8",
-    market: markets[3],
-    internalUser: internalUsers[5],
-    favorite: true,
-    stage: stages[0],
-    status: statuses[2],
-    isTest: false,
-    doNotUse: true,
-    isStale: false,
-  },
-  {
-    id: "9",
-    market: markets[4],
-    internalUser: internalUsers[7],
-    favorite: false,
-    stage: stages[2],
-    status: statuses[1],
-    isTest: true,
-    doNotUse: false,
-    isStale: true,
-  },
-  {
-    id: "10",
-    market: markets[0],
-    internalUser: internalUsers[8],
-    favorite: false,
-    stage: stages[1],
-    status: statuses[1],
-    isTest: false,
-    doNotUse: false,
-    isStale: true,
-  },
-  {
-    id: "11",
-    market: markets[0],
-    internalUser: internalUsers[3],
-    favorite: true,
-    stage: stages[1],
-    status: statuses[0],
-    isTest: false,
-    doNotUse: false,
-    isStale: false,
-  },
-  {
-    id: "12",
-    market: markets[0],
-    internalUser: internalUsers[5],
-    favorite: false,
-    stage: stages[2],
-    status: statuses[0],
-    isTest: false,
-    doNotUse: false,
-    isStale: true,
-  },
-  {
-    id: "13",
-    market: markets[1],
-    internalUser: internalUsers[3],
-    favorite: true,
-    stage: stages[0],
-    status: statuses[2],
-    isTest: true,
-    doNotUse: true,
-    isStale: true,
-  },
-  {
-    id: "14",
-    market: markets[3],
-    internalUser: internalUsers[1],
-    favorite: false,
-    stage: stages[0],
-    status: statuses[1],
-    isTest: true,
-    doNotUse: false,
-    isStale: false,
-  },
-  {
-    id: "15",
-    market: markets[4],
-    internalUser: internalUsers[2],
-    favorite: true,
-    stage: stages[1],
-    status: statuses[0],
-    isTest: false,
-    doNotUse: false,
-    isStale: true,
-  },
-  {
-    id: "16",
-    market: markets[4],
-    internalUser: internalUsers[4],
-    favorite: false,
-    stage: stages[0],
-    status: statuses[1],
-    isTest: false,
-    doNotUse: false,
-    isStale: false,
-  },
-  {
-    id: "17",
-    market: markets[2],
-    internalUser: internalUsers[8],
-    favorite: false,
-    stage: stages[2],
-    status: statuses[2],
-    isTest: false,
-    doNotUse: false,
-    isStale: true,
-  },
-  {
-    id: "18",
-    market: markets[1],
-    internalUser: internalUsers[4],
-    favorite: false,
-    stage: stages[1],
-    status: statuses[0],
-    isTest: false,
-    doNotUse: false,
-    isStale: true,
-  },
-  {
-    id: "19",
-    market: markets[3],
-    internalUser: internalUsers[8],
-    favorite: false,
-    stage: stages[1],
-    status: statuses[2],
-    isTest: false,
-    doNotUse: false,
-    isStale: false,
-  },
-  {
-    id: "20",
-    market: markets[0],
-    internalUser: internalUsers[0],
-    favorite: false,
-    stage: stages[0],
-    status: statuses[0],
-    isTest: true,
-    doNotUse: false,
-    isStale: true,
-  },
-];
+const developments: Development[] = zeroTo(2).map((devIdx) => ({
+  id: `dev:${devIdx + 1}`,
+  name: `Development ${devIdx + 1}`,
+  cohorts: zeroTo(2).map((cohortIdx) => ({
+    id: `cohort:${cohortIdx + 1}:dev:${devIdx + 1}`,
+    name: `Cohort ${cohortIdx + 1}`,
+    projects: zeroTo(4).map((pIdx) => ({
+      id: `p:${pIdx + 1}:cohort:${cohortIdx + 1}:dev:${devIdx + 1}`,
+      name: `Project ${pIdx + 1}`,
+      market: markets[cohortIdx + devIdx],
+      internalUser: internalUsers[(pIdx + cohortIdx + devIdx) % internalUsers.length],
+      favorite: (pIdx + cohortIdx + devIdx) % 2 === 0,
+      stage: stages[pIdx % stages.length],
+      status: statuses[pIdx % statuses.length],
+      isTest: (pIdx + cohortIdx) % 2 === 0,
+      doNotUse: (pIdx + cohortIdx - devIdx) % 2 === 0,
+      isStale: (pIdx + cohortIdx + 1) % 2 === 0,
+    })),
+  })),
+}));
+
+const projects: Project[] = developments.flatMap((dev) => dev.cohorts.flatMap((cohort) => cohort.projects));
 
 type Row = SimpleHeaderAndData<Project>;
 const columns: GridColumn<Row>[] = [
+  { header: () => "Project", data: ({ name }) => name },
   { header: () => "Project Manager", data: ({ internalUser }) => internalUser.name },
   { header: () => "Market", data: ({ market }) => market.name },
   { header: () => "Favorite", data: ({ favorite }) => (favorite ? "Yes" : "No") },

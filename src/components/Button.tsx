@@ -189,6 +189,14 @@ const variantStyles: (contrast: boolean) => Record<
     disabledStyles: Css.lightBlue300.if(contrast).lightBlue700.$,
     focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
+  // Todo: handle contrast variant
+  textSecondary: {
+    baseStyles: Css.gray900.add("fontSize", "inherit").$,
+    hoverStyles: Css.bgGray100.$,
+    pressedStyles: Css.gray900.$,
+    disabledStyles: Css.bgWhite.gray400.$,
+    focusStyles: Css.gray900.$,
+  },
 });
 
 const sizeStyles: Record<ButtonSize, Properties> = {
@@ -204,4 +212,11 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
 };
 
 export type ButtonSize = "sm" | "md" | "lg";
-export type ButtonVariant = "primary" | "secondary" | "tertiary" | "tertiaryDanger" | "danger" | "text";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "tertiary"
+  | "tertiaryDanger"
+  | "danger"
+  | "text"
+  | "textSecondary";

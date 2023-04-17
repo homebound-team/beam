@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { Icon } from "src/components/Icon";
 import { GridCellContent } from "src/components/Table/components/cell";
 import { ExpandableHeader } from "src/components/Table/components/ExpandableHeader";
 import { GridDataRow } from "src/components/Table/components/Row";
@@ -6,7 +7,7 @@ import { SortHeader } from "src/components/Table/components/SortHeader";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridStyle, RowStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
-import { Css, Properties } from "src/Css";
+import { Css, Palette, Properties } from "src/Css";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
 /** If a column def return just string text for a given row, apply some default styling. */
@@ -41,6 +42,12 @@ export function toContent(
       "GridTables with as=virtual & sortable columns should use functions that return JSX, instead of JSX",
     );
   }
+  const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
+  const tooltipEl = tooltip ? (
+    <span css={Css.fs0.mlPx(4).$}>
+      <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Palette.Gray600} />
+    </span>
+  ) : null;
 
   content =
     isGridCellContent(maybeContent) && !!maybeContent.onClick
@@ -55,31 +62,56 @@ export function toContent(
         content={content}
         iconOnLeft={alignment === "right"}
         sortKey={column.serverSideSortKey ?? column.id}
+        tooltipEl={tooltipEl}
       />
     );
   } else if (content && typeof content === "string" && isExpandableHeader && isExpandable) {
-    return <ExpandableHeader title={content} column={column} minStickyLeftOffset={minStickyLeftOffset} as={as} />;
+    return (
+      <ExpandableHeader
+        title={content}
+        column={column}
+        minStickyLeftOffset={minStickyLeftOffset}
+        as={as}
+        tooltipEl={tooltipEl}
+      />
+    );
   } else if (content && typeof content === "string" && isExpandableHeader) {
-    return <span css={Css.lineClamp2.$}>{content}</span>;
+    return (
+      <>
+        <span css={Css.lineClamp2.$}>{content}</span>
+        {tooltipEl}
+      </>
+    );
   } else if (!isContentEmpty(content) && isHeader && typeof content === "string") {
     return (
-      <span css={Css.lineClamp2.$} title={content}>
-        {content}
-      </span>
+      <>
+        <span css={Css.lineClamp2.$} title={content}>
+          {content}
+        </span>
+        {tooltipEl}
+      </>
     );
   } else if (!isHeader && content && style?.presentationSettings?.wrap === false && typeof content === "string") {
     // In order to truncate the text properly, then we need to wrap it in another element
     // as our cell element is a flex container, which don't allow for applying truncation styles directly on it.
     return (
-      <span css={Css.truncate.mw0.$} title={content}>
-        {content}
-      </span>
+      <>
+        <span css={Css.truncate.mw0.$} title={content}>
+          {content}
+        </span>
+        {tooltipEl}
+      </>
     );
   } else if (style.emptyCell && isContentEmpty(content)) {
     // If the content is empty and the user specified an `emptyCell` node, return that.
     return style.emptyCell;
   }
-  return content;
+  return (
+    <>
+      {content}
+      {tooltipEl}
+    </>
+  );
 }
 
 export function isGridCellContent(content: ReactNode | GridCellContent): content is GridCellContent {

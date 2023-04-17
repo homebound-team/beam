@@ -294,6 +294,10 @@ export const Icons = {
   arrowRight: (
     <path d="M2.586 13L17.172 13L11.879 18.293L13.293 19.707L21 12L13.293 4.29303L11.879 5.70703L17.172 11L2.586 11L2.586 13Z" />
   ),
+  triangleLeft: <path d="M15 18L9 12L15 6L15 18Z" />,
+  triangleRight: <path d="M9 6L15 12L9 18L9 6Z" />,
+  triangleUp: <path d="M6 15L12 9L18 15L6 15Z" />,
+  triangleDown: <path d="M18 9L12 15L6 9H18Z" />,
   menuClose: (
     <>
       <path d="M8 6H24V8H8V6ZM8 11H24V13H8V11ZM8 16H24V18H8V16Z" />

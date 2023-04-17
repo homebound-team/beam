@@ -1,5 +1,5 @@
 import { Node } from "@react-types/shared";
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 import { mergeProps, useHover, useOption } from "react-aria";
 import { ListState, TreeState } from "react-stately";
 import { maybeTooltip } from "src/components";
@@ -35,38 +35,13 @@ export function Option<O>(props: OptionProps<O>) {
     ref,
   );
 
-  // Additional onKeyDown logic to ensure the  the virtualized list (in <VirtualizedOptions />) scrolls to keep the "focused" option in view
-  const onKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (!scrollToIndex || !(e.key === "ArrowDown" || e.key === "ArrowUp")) {
-        return;
-      }
-
-      const toKey = e.key === "ArrowDown" ? item.nextKey : item.prevKey;
-      if (!toKey) {
-        return;
-      }
-
-      const toItem = state.collection.getItem(toKey);
-      // Only scroll the "options" (`state.collection` is a flat list of sections and items - we want to avoid scrolling to a "section" as it is not shown in the UI)
-      if (
-        toItem &&
-        // Ensure we are only ever scrolling to an "option".
-        (toItem.parentKey === "options" || (!toItem.parentKey && toItem.type === "item")) &&
-        toItem.index !== undefined
-      ) {
-        scrollToIndex(toItem.index);
-      }
-    },
-    [scrollToIndex, state],
-  );
-
   return maybeTooltip({
     title: disabledReason,
     placement: "right",
     children: (
       <li
-        {...mergeProps(optionProps, hoverProps, { onKeyDown })}
+        {...mergeProps(optionProps, hoverProps)}
+        data-label={item.textValue}
         ref={ref as any}
         css={{
           ...Css.df.aic.jcsb.py1.px2.mh("42px").outline0.cursorPointer.sm.$,

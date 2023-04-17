@@ -46,8 +46,6 @@ export function CheckboxBase(props: CheckboxBaseProps) {
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const tid = useTestIds(props, defaultTestId(label));
 
-  const markIcon = isIndeterminate ? dashSmall : isSelected ? checkmarkSmall : "";
-
   return (
     <label
       css={
@@ -65,22 +63,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
       <VisuallyHidden>
         <input ref={ref} {...mergeProps(inputProps, focusProps)} {...tid} data-indeterminate={isIndeterminate} />
       </VisuallyHidden>
-      <span
-        {...hoverProps}
-        css={{
-          ...baseStyles,
-          ...(((isSelected && !isDisabled) || isIndeterminate) && filledBoxStyles),
-          ...(((isSelected && !isDisabled) || isIndeterminate) && isHovered && filledBoxHoverStyles),
-          ...(isDisabled && disabledBoxStyles),
-          ...(isDisabled && isSelected && disabledSelectedBoxStyles),
-          ...(isFocusVisible && focusRingStyles),
-          ...(isHovered && hoverBorderStyles),
-          ...markStyles,
-        }}
-        aria-hidden="true"
-      >
-        {markIcon}
-      </span>
+      <StyledCheckbox {...props} isFocusVisible={isFocusVisible} />
       {!checkboxOnly && (
         // Use a mtPx(-2) to better align the label with the checkbox.
         // Not using align-items: center as the checkbox would align with all content below, where we really want it to stay only aligned with the label
@@ -106,6 +89,40 @@ const hoverBorderStyles = Css.bLightBlue900.$;
 const markStyles = { svg: Css.absolute.topPx(-1).leftPx(-1).$ };
 const labelStyles = Css.smMd.$;
 const descStyles = Css.sm.gray700.$;
+
+interface StyledCheckboxProps {
+  isDisabled?: boolean;
+  isIndeterminate?: boolean;
+  isSelected?: boolean;
+  isFocusVisible?: boolean;
+}
+
+export function StyledCheckbox(props: StyledCheckboxProps) {
+  const { isDisabled = false, isIndeterminate = false, isSelected, isFocusVisible } = props;
+  const { hoverProps, isHovered } = useHover({ isDisabled });
+  const markIcon = isIndeterminate ? dashSmall : isSelected ? checkmarkSmall : "";
+  const tid = useTestIds(props);
+  return (
+    <span
+      {...hoverProps}
+      css={{
+        ...baseStyles,
+        ...(((isSelected && !isDisabled) || isIndeterminate) && filledBoxStyles),
+        ...(((isSelected && !isDisabled) || isIndeterminate) && isHovered && filledBoxHoverStyles),
+        ...(isDisabled && disabledBoxStyles),
+        ...(isDisabled && isSelected && disabledSelectedBoxStyles),
+        ...(isFocusVisible && focusRingStyles),
+        ...(isHovered && hoverBorderStyles),
+        ...markStyles,
+      }}
+      aria-hidden="true"
+      data-checked={isSelected ? true : isIndeterminate ? "mixed" : false}
+      {...tid.checkbox}
+    >
+      {markIcon}
+    </span>
+  );
+}
 
 const checkmarkSmall = (
   <svg width="16" height="16">

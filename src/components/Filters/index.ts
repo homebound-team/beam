@@ -5,6 +5,7 @@ export type { DateRangeFilterValue } from "src/components/Filters/DateRangeFilte
 export { multiFilter } from "src/components/Filters/MultiFilter";
 export { numberRangeFilter } from "src/components/Filters/NumberRangeFilter";
 export { singleFilter } from "src/components/Filters/SingleFilter";
+export { treeFilter } from "src/components/Filters/TreeFilter";
 export { booleanFilter } from "./BooleanFilter";
 export { checkboxFilter } from "./CheckboxFilter";
 export * from "./FilterModal";
