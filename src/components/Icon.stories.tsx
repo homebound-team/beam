@@ -183,7 +183,7 @@ export const Icon = (props: IconProps) => {
       <ul css={{ gap: 24, listStyle: "none", gridTemplateColumns: "repeat(4, 1fr)", ...Css.dg.p0.$ }}>
         {miscIcons.map((icon, i) => (
           <li css={{ gap: 8, ...Css.xsMd.df.aic.fdc.$ }} key={icon}>
-            <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} secondaryColor={Palette.Green600}/>
+            <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color}/>
             {icon}
           </li>
         ))}
