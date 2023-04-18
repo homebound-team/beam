@@ -51,7 +51,12 @@ export const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
   (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
     const Cell = as === "table" ? "td" : "div";
     return (
-      <Cell key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames} onClick={onClick}>
+      <Cell
+        key={key}
+        css={{ ...css, ...tableRowStyles(as), ...Css.cursor("default").$ }}
+        className={classNames}
+        onClick={onClick}
+      >
         {content}
       </Cell>
     );
