@@ -21,6 +21,8 @@ export interface AccordionProps {
    */
   index?: number;
   setExpandedIndex?: Dispatch<SetStateAction<number | undefined>>;
+  /** Used by Accordion list. Sets default padding to 0 for nested accordions */
+  parent?: boolean;
 }
 
 export function Accordion(props: AccordionProps) {
@@ -34,6 +36,7 @@ export function Accordion(props: AccordionProps) {
     bottomBorder = false,
     index,
     setExpandedIndex,
+    parent = false,
   } = props;
   const testIds = useTestIds(props, "accordion");
   const id = useId();
@@ -106,7 +109,7 @@ export function Accordion(props: AccordionProps) {
         css={Css.overflowHidden.h(contentHeight).add("transition", "height 250ms ease-in-out").$}
       >
         {expanded && (
-          <div css={Css.px2.pb2.pt1.$} ref={contentRef} {...testIds.content}>
+          <div css={Css.px2.pb2.pt1.if(parent).p0.$} ref={contentRef} {...testIds.content}>
             {children}
           </div>
         )}
