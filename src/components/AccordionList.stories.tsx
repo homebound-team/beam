@@ -61,7 +61,7 @@ export function AccordionListWithParentProp() {
           </tbody>
         </table>
       ),
-      parent: true,
+      omitPadding: true,
     },
   ];
   return <AccordionList accordions={accordions} />;
