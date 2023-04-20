@@ -53,17 +53,16 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
       ref={virtuosoRef}
       totalListHeightChanged={onListHeightChange}
       totalCount={items.length}
-      // Ensure the selected item is visible when the list renders
-      initialTopMostItemIndex={selectedItem ? selectedItem.index : 0}
-      // We don't really need to set this, but it's handy for tests, which would
-      // otherwise render just 1 row. A better way to do this would be to jest.mock
-      // out Virtuoso with an impl that just rendered everything, but doing this for now.
       {...(process.env.NODE_ENV === "test"
         ? {
             initialItemCount: items.length,
             key: items.length,
           }
-        : {})}
+        : {
+            // Ensure the selected item is visible when the list renders
+            // This seems to break tests, so only add in the non-test environment.
+            initialTopMostItemIndex: selectedItem ? selectedItem.index : 0,
+          })}
       itemContent={(idx) => {
         const item = items[idx];
         if (item) {
