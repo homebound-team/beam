@@ -87,18 +87,19 @@ export default {
     expandable: false,
   },
   argTypes: {
-    nestingDepth: { name: "Nesting Depth", control: { type: "select", options: [1, 2, 3, 4] } },
+    nestingDepth: { name: "Nesting Depth", options: [1, 2, 3, 4], control: { type: "select" } },
     grouped: { name: "Group styles", control: { type: "boolean" }, if: { arg: "nestingDepth", neq: 1 } },
     bordered: { name: "Bordered", control: { type: "boolean" } },
     allWhite: { name: "All White", control: { type: "boolean" } },
-    vAlign: { name: "Vertical Alignment", control: { type: "select", options: ["center", "top", "bottom"] } },
+    vAlign: { name: "Vertical Alignment", options: ["center", "top", "bottom"], control: { type: "select" } },
     rowHover: { name: "Row Hover styles", control: { type: "boolean" } },
     totals: { name: "Show Totals row", control: { type: "boolean" } },
     expandable: { name: "With Expandable Columns", control: { type: "boolean" } },
-    rowHeight: { name: "Row Height", control: { type: "select", options: ["flexible", "fixed"] } },
+    rowHeight: { name: "Row Height", options: ["flexible", "fixed"], control: { type: "select" } },
     displayAs: {
       name: "Implementation (may need to reload)",
-      control: { type: "select", options: ["default", "virtual", "table"] },
+      options: ["default", "virtual", "table"],
+      control: { type: "select" },
     },
   },
 } as Meta<TableStoryProps>;

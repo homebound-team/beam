@@ -11,6 +11,7 @@ interface SnackBarStoryProps extends Omit<SnackbarNoticeProps, "action"> {
   actionLabel?: string;
   actionVariant?: ButtonVariant;
   offset?: Offset;
+  notices: SnackbarNoticeProps[];
 }
 
 export default {
@@ -27,9 +28,10 @@ export default {
     offset: { bottom: 200 },
   },
   argTypes: {
-    icon: { control: { type: "select", options: [undefined, "error", "info", "success", "warning"] } },
+    icon: { control: { type: "select" }, options: [undefined, "error", "info", "success", "warning"] },
     actionVariant: {
-      control: { type: "select", options: ["primary", "secondary", "tertiary", "text", "danger"] },
+      options: ["primary", "secondary", "tertiary", "text", "danger"],
+      control: { type: "select" },
       name: "action.variant",
     },
     actionLabel: { name: "action.label" },

@@ -2,9 +2,7 @@ const { mergeConfig } = require("vite");
 const path = require("path");
 const reactPlugin = require("@vitejs/plugin-react");
 const turbosnap = require("vite-plugin-turbosnap");
-
 module.exports = {
-  core: { builder: "@storybook/builder-vite" },
   stories: ["../src/**/*.stories.tsx", "../src/**/*.stories.mdx"],
   addons: [
     "@storybook/addon-links",
@@ -12,6 +10,7 @@ module.exports = {
     "storybook-addon-performance/register",
     "@storybook/addon-interactions",
     "storybook-addon-designs",
+    "@storybook/addon-mdx-gfm",
   ],
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: { check: false },
@@ -30,7 +29,6 @@ module.exports = {
         },
       },
     });
-
     return {
       ...mergedConfig,
       plugins: [
@@ -52,6 +50,12 @@ module.exports = {
       ],
     };
   },
-  reactOptions: { fastRefresh: true, strictMode: false },
   staticDirs: ["../storybookAssets"],
+  framework: {
+    name: "@storybook/react-vite",
+    options: {
+      fastRefresh: true,
+      strictMode: false,
+    },
+  },
 };
