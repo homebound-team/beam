@@ -25,3 +25,44 @@ export function AccordionListWithOneSelection() {
   ];
   return <AccordionList accordions={accordions} allowMultipleExpanded={false} />;
 }
+
+export function AccordionListWithParentProp() {
+  const accordions: AccordionProps[] = [
+    {
+      title: "First accordion title",
+      children: (
+        <table>
+          <tbody>
+            <tr>
+              <th></th>
+              <th>Original</th>
+              <th>Revised</th>
+              <th>Delta</th>
+              <th></th>
+            </tr>
+            <tr>
+              <td>Contract:</td>
+              <td>$0</td>
+              <td>$0</td>
+              <td>$0</td>
+            </tr>
+            <tr>
+              <td>Budget:</td>
+              <td>$0</td>
+              <td>$0</td>
+              <td>$0</td>
+            </tr>
+            <tr>
+              <td>Margin:</td>
+              <td>$0</td>
+              <td>$0</td>
+              <td>$0</td>
+            </tr>
+          </tbody>
+        </table>
+      ),
+      omitPadding: true,
+    },
+  ];
+  return <AccordionList accordions={accordions} />;
+}
