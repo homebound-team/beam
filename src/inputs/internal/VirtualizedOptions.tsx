@@ -55,6 +55,9 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
       totalCount={items.length}
       {...(process.env.NODE_ENV === "test"
         ? {
+            // We don't really need to set this, but it's handy for tests, which would
+            // otherwise render just 1 row. A better way to do this would be to jest.mock
+            // out Virtuoso with an impl that just rendered everything, but doing this for now.
             initialItemCount: items.length,
             key: items.length,
           }
