@@ -76,13 +76,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
 
   // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
-  const maybeOptions = useMemo(() => {
-    const opts = initializeOptions(options, unsetLabel);
-    if (props.label === "Bid Item") {
-      console.log("use memo for " + props.label, opts);
-    }
-    return opts;
-  }, [options, unsetLabel]);
+  const maybeOptions = useMemo(() => initializeOptions(options, unsetLabel), [options, unsetLabel]);
   // Memoize the callback functions and handle the `unset` option if provided.
   const getOptionLabel = useCallback(
     (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : props.getOptionLabel(o)),
