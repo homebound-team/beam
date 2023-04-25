@@ -234,6 +234,7 @@ export function PerfTest() {
         onSelect={setSelectedValue}
         unsetLabel="-"
         // errorMsg={selectedValue !== undefined ? "" : "Select an option. Plus more error text to force it to wrap."}
+        errorMsg={selectedValue !== undefined ? "" : "Select an option. Plus more error text to force it to wrap."}
         options={{
           initial: [loadTestOptions.find((o) => o.id === selectedValue)!],
           load: async () => {
