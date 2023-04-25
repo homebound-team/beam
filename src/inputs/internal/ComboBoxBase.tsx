@@ -76,7 +76,13 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
 
   // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
-  const maybeOptions = useMemo(() => initializeOptions(options, unsetLabel), [options, unsetLabel]);
+  const maybeOptions = useMemo(() => {
+    const opts = initializeOptions(options, unsetLabel);
+    if (props.label === "Bid Item") {
+      console.log("use memo for " + props.label, opts);
+    }
+    return opts;
+  }, [options, unsetLabel]);
   // Memoize the callback functions and handle the `unset` option if provided.
   const getOptionLabel = useCallback(
     (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : props.getOptionLabel(o)),
@@ -300,11 +306,20 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   }, [values]);
 
   useEffect(() => {
+    // When options are an array, then use them as-is.
+    // If options are an object, then use the `initial` array if this is the first time the field is opened.
+    // Otherwise, use the current fieldState array options.
+    const maybeUpdatedOptions = Array.isArray(maybeOptions)
+      ? maybeOptions
+      : firstOpen.current === false
+      ? fieldState.allOptions
+      : maybeOptions.initial;
+
     // Only update the fieldset when options change, when options is an array.
     // Otherwise, if the options are passed in as an object, then we assume the caller is updating options via a Promise and not via updating props.
-    if (Array.isArray(maybeOptions) && maybeOptions !== fieldState.allOptions) {
+    if (maybeOptions !== fieldState.allOptions) {
       setFieldState((prevState) => {
-        const selectedOptions = maybeOptions.filter((o) => values?.includes(getOptionValue(o)));
+        const selectedOptions = maybeUpdatedOptions.filter((o) => values?.includes(getOptionValue(o)));
         return {
           ...prevState,
           selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
@@ -315,8 +330,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
               ? nothingSelectedText
               : "",
           selectedOptions: selectedOptions,
-          filteredOptions: maybeOptions,
-          allOptions: maybeOptions,
+          filteredOptions: maybeUpdatedOptions,
+          allOptions: maybeUpdatedOptions,
         };
       });
     }
@@ -419,7 +434,8 @@ type FieldState<O> = {
   allOptions: O[];
   optionsLoading: boolean;
 };
-export type OptionsOrLoad<O> = O[] | { initial: O[]; load: () => Promise<{ options: O[] }> };
+type LoadOption<O> = { initial: O[]; load: () => Promise<{ options: O[] }> };
+export type OptionsOrLoad<O> = O[] | LoadOption<O>;
 type UnsetOption = { id: undefined; name: string };
 
 function getInputValue<O>(
