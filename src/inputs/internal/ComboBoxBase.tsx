@@ -302,9 +302,12 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   useEffect(() => {
     // Only update the fieldset when options change, when options is an array.
     // Otherwise, if the options are passed in as an object, then we assume the caller is updating options via a Promise and not via updating props.
-    if (Array.isArray(maybeOptions) && maybeOptions !== fieldState.allOptions) {
+    if (maybeOptions !== fieldState.allOptions) {
       setFieldState((prevState) => {
-        const selectedOptions = maybeOptions.filter((o) => values?.includes(getOptionValue(o)));
+        const updatedOptions = Array.isArray(maybeOptions)
+          ? maybeOptions
+          : [...maybeOptions.initial, ...prevState.allOptions];
+        const selectedOptions = updatedOptions.filter((o) => values?.includes(getOptionValue(o)));
         return {
           ...prevState,
           selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
@@ -315,8 +318,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
               ? nothingSelectedText
               : "",
           selectedOptions: selectedOptions,
-          filteredOptions: maybeOptions,
-          allOptions: maybeOptions,
+          filteredOptions: updatedOptions,
+          allOptions: updatedOptions,
         };
       });
     }

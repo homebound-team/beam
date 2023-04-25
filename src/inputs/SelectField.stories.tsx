@@ -227,23 +227,43 @@ const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), 
 export function PerfTest() {
   const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);
   return (
-    <SelectField
-      label="Project"
-      value={selectedValue}
-      onSelect={setSelectedValue}
-      errorMsg={selectedValue !== undefined ? "" : "Select an option. Plus more error text to force it to wrap."}
-      options={{
-        initial: [loadTestOptions[2]],
-        load: async () => {
-          return new Promise((resolve) => {
-            // @ts-ignore - believes `options` should be of type `never[]`
-            setTimeout(() => resolve({ options: loadTestOptions }), 1500);
-          });
-        },
-      }}
-      onBlur={action("onBlur")}
-      onFocus={action("onFocus")}
-    />
+    <>
+      <SelectField
+        label="Project"
+        value={selectedValue}
+        onSelect={setSelectedValue}
+        errorMsg={selectedValue !== undefined ? "" : "Select an option. Plus more error text to force it to wrap."}
+        options={{
+          initial: [loadTestOptions.find((o) => o.id === selectedValue)!],
+          load: async () => {
+            return new Promise((resolve) => {
+              // @ts-ignore - believes `options` should be of type `never[]`
+              setTimeout(() => resolve({ options: loadTestOptions }), 1500);
+            });
+          },
+        }}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+      <div>second</div>
+      <SelectField
+        label="Project"
+        value={selectedValue}
+        onSelect={setSelectedValue}
+        errorMsg={selectedValue !== undefined ? "" : "Select an option. Plus more error text to force it to wrap."}
+        options={{
+          initial: [loadTestOptions.find((o) => o.id === selectedValue)!],
+          load: async () => {
+            return new Promise((resolve) => {
+              // @ts-ignore - believes `options` should be of type `never[]`
+              setTimeout(() => resolve({ options: loadTestOptions }), 1500);
+            });
+          },
+        }}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+    </>
   );
 }
 PerfTest.parameters = { chromatic: { disableSnapshot: true } };
