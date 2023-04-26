@@ -4,7 +4,7 @@ import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { noop } from "src/utils";
-import { blur, click, focus, render, select, wait } from "src/utils/rtl";
+import { blur, click, focus, getOptions, render, select, wait } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";
 
 describe("SelectFieldTest", () => {
@@ -227,6 +227,43 @@ describe("SelectFieldTest", () => {
     expect(r.getAllByRole("option")).toHaveLength(3);
   });
 
+  it("uses initial value when other input changes the state for lazy load options", async () => {
+    // Given two selectField with options that are lazy loaded
+    const selectedOption = options[0];
+    const r = await render(
+      <TestMultipleSelectField
+        label="Age"
+        value={selectedOption.id}
+        unsetLabel="-"
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        data-testid="age"
+      />,
+    );
+    // Then both have the same value
+    expect(r.age_0()).toHaveValue("One");
+    expect(r.age_1()).toHaveValue("One");
+    // When opening the first select menu
+    await clickAndWait(r.age_0());
+    // And all options is loaded
+    expect(getOptions(r.age_0())).toHaveLength(4);
+    // And change the value of the first select
+    select(r.age_0, "Two");
+    // Then expect the second select to have the same value
+    expect(r.age_0()).toHaveValue("Two");
+    expect(r.age_1()).toHaveValue("Two");
+    // When we open the second select menu
+    await clickAndWait(r.age_1);
+    // And all options is loaded
+    expect(getOptions(r.age_1())).toHaveLength(4);
+    // And unset the value of the second select
+    select(r.age_1, "-");
+    // Then expect the first select to have the same value
+    expect(r.age_0()).toHaveValue("-");
+    expect(r.age_1()).toHaveValue("-");
+  });
+
   it("can set value when options are loaded later", async () => {
     // Given a Select Field with options that are loaded lazily
     const r = await render(
@@ -428,6 +465,47 @@ describe("SelectFieldTest", () => {
           }}
         />
         <button data-testid="updateOptions" onClick={() => setOptions(options as any)} />
+      </>
+    );
+  }
+
+  function TestMultipleSelectField<O, V extends Value>(
+    props: Optional<SelectFieldProps<O, V>, "onSelect">,
+  ): JSX.Element {
+    const [selected, setSelected] = useState<V | undefined>(props.value);
+    const init = options.find((o) => o.id === selected) as O;
+    return (
+      <>
+        <SelectField<O, V>
+          {...props}
+          value={selected}
+          onSelect={setSelected}
+          unsetLabel={"-"}
+          options={{
+            initial: [init],
+            load: async () => {
+              return new Promise((resolve) => {
+                // @ts-ignore - believes `options` should be of type `never[]`
+                setTimeout(() => resolve({ options }), 1500);
+              });
+            },
+          }}
+        />
+        <SelectField<O, V>
+          {...props}
+          value={selected}
+          onSelect={setSelected}
+          unsetLabel={"-"}
+          options={{
+            initial: [init],
+            load: async () => {
+              return new Promise((resolve) => {
+                // @ts-ignore - believes `options` should be of type `never[]`
+                setTimeout(() => resolve({ options }), 1500);
+              });
+            },
+          }}
+        />
       </>
     );
   }

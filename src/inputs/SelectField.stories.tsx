@@ -248,6 +248,45 @@ export function PerfTest() {
 }
 PerfTest.parameters = { chromatic: { disableSnapshot: true } };
 
+export function LazyLoadStateFields() {
+  const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);
+  return (
+    <>
+      <SelectField
+        label="Project"
+        value={selectedValue}
+        onSelect={setSelectedValue}
+        unsetLabel={"-"}
+        options={{
+          initial: [loadTestOptions.find((o) => o.id === selectedValue)!],
+          load: async () => {
+            return new Promise((resolve) => {
+              // @ts-ignore - believes `options` should be of type `never[]`
+              setTimeout(() => resolve({ options: loadTestOptions }), 1500);
+            });
+          },
+        }}
+      />
+      <SelectField
+        label="Project 2 (i.e In a SuperDrawer)"
+        value={selectedValue}
+        onSelect={setSelectedValue}
+        unsetLabel={"-"}
+        options={{
+          initial: [loadTestOptions.find((o) => o.id === selectedValue)!],
+          load: async () => {
+            return new Promise((resolve) => {
+              // @ts-ignore - believes `options` should be of type `never[]`
+              setTimeout(() => resolve({ options: loadTestOptions }), 1500);
+            });
+          },
+        }}
+      />
+    </>
+  );
+}
+LazyLoadStateFields.parameters = { chromatic: { disableSnapshot: true } };
+
 export function LoadingState() {
   const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);
 
