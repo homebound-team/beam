@@ -285,7 +285,7 @@ export function LazyLoadStateFields() {
     </>
   );
 }
-PerfTest.parameters = { chromatic: { disableSnapshot: true } };
+LazyLoadStateFields.parameters = { chromatic: { disableSnapshot: true } };
 
 export function LoadingState() {
   const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);

@@ -301,7 +301,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   useEffect(() => {
     // When options are an array, then use them as-is.
-    // If options are an object, then use the `initial` array if this is the first time the field is opened.
+    // If options are an object, then use the `initial` array if the menu has not been opened
     // Otherwise, use the current fieldState array options.
     const maybeUpdatedOptions = Array.isArray(maybeOptions)
       ? maybeOptions
@@ -309,9 +309,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       ? fieldState.allOptions
       : maybeOptions.initial;
 
-    // Only update the fieldset when options change, when options is an array.
-    // Otherwise, if the options are passed in as an object, then we assume the caller is updating options via a Promise and not via updating props.
-    if (maybeOptions !== fieldState.allOptions) {
+    if (maybeUpdatedOptions !== fieldState.allOptions) {
       setFieldState((prevState) => {
         const selectedOptions = maybeUpdatedOptions.filter((o) => values?.includes(getOptionValue(o)));
         return {
@@ -428,8 +426,7 @@ type FieldState<O> = {
   allOptions: O[];
   optionsLoading: boolean;
 };
-type LoadOption<O> = { initial: O[]; load: () => Promise<{ options: O[] }> };
-export type OptionsOrLoad<O> = O[] | LoadOption<O>;
+export type OptionsOrLoad<O> = O[] | { initial: O[]; load: () => Promise<{ options: O[] }> };
 type UnsetOption = { id: undefined; name: string };
 
 function getInputValue<O>(
