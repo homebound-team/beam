@@ -23,7 +23,7 @@ export function MenuSectionImpl(props: MenuSectionProps) {
   return (
     <>
       {isPersistentSection && <li {...separatorProps} css={Css.bt.bGray200.$} />}
-      <li {...itemProps} css={Css.if(!isPersistentSection).overflowAuto.if(contrast).white.$}>
+      <li {...itemProps} css={Css.gray900.if(!isPersistentSection).overflowAuto.if(contrast).white.$}>
         <ul css={Css.listReset.$} {...groupProps} {...tid[isPersistentSection ? "persistentItems" : "menuItems"]}>
           {[...section.childNodes].map((item) => (
             <MenuItemImpl key={item.key} item={item} state={state} onClose={onClose} contrast={contrast} {...tid} />

@@ -80,7 +80,8 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
   );
 
   return (
-    <div css={Css.relative.dib.$}>
+    // Add `line-height: 0` to prevent the Icon button and Avatar buttons from inheriting the line-height, causing them to be taller than they should.
+    <div css={Css.dib.add("lineHeight", 0).$}>
       {isTextButton(trigger) ? (
         <Button
           variant={variant ? variant : "secondary"}
