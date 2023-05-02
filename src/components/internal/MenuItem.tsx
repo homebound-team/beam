@@ -70,11 +70,12 @@ export function MenuItemImpl(props: MenuItemProps) {
       {...hoverProps}
       ref={ref}
       css={{
-        ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").$,
+        ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").sm.$,
         ...(!isDisabled && isHovered ? (contrast ? Css.bgGray800.$ : Css.bgGray100.$) : {}),
         ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
         ...(isDisabled ? Css.gray500.cursorNotAllowed.$ : {}),
         ...(destructive ? Css.red600.$ : {}),
+        ...(isSelected ? Css.fw5.$ : {}),
       }}
       {...tid[defaultTestId(menuItem.label)]}
     >
@@ -159,7 +160,7 @@ function maybeWrapInLink(
   }
 
   return isAbsoluteUrl(onClick) ? (
-    <a href={onClick} target="_blank" rel="noopener noreferrer" className="navLink" css={Css.df.jcsb.w100.$}>
+    <a href={onClick} target="_blank" rel="noopener noreferrer" className="navLink" css={Css.df.aic.jcsb.w100.$}>
       {content}
       <span css={Css.fs0.ml2.$}>
         <Icon icon="linkExternal" />

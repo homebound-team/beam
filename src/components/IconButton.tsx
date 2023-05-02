@@ -24,6 +24,8 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   contrast?: boolean;
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
   download?: boolean;
+  /** Provides label for screen readers - Will become a required soon */
+  label?: string;
 }
 
 export function IconButton(props: IconButtonProps) {
@@ -42,6 +44,7 @@ export function IconButton(props: IconButtonProps) {
     contrast = false,
     download = false,
     forceFocusStyles = false,
+    label,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
@@ -78,6 +81,7 @@ export function IconButton(props: IconButtonProps) {
     className: typeof onPress === "string" ? navLink : undefined,
     ref: ref as any,
     css: styles,
+    "aria-label": label,
   };
   const buttonContent = (
     <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : iconColor)} inc={compact ? 2 : inc} />
