@@ -243,6 +243,11 @@ export class TableState {
     }
   }
 
+  refetchExpandedColumns() {
+    this.loadedColumns.clear();
+    this.parseAndUpdateExpandedColumns(this.columns.filter((c) => this.expandedColumnIds.includes(c.id)));
+  }
+
   /** Determines which columns to expand immediately vs async */
   async parseAndUpdateExpandedColumns(columnsToExpand: GridColumnWithId<any>[]) {
     // Separate out which columns need to be loaded async vs which can be loaded immediately.
