@@ -228,16 +228,16 @@ export class TableState {
       // (We'll add to this after figuring out which columns are new vs existing.)
       const columnIdsToExpand = isInitial ? localStorageColumns : [];
 
-      // Create a list of all existing column ids. (We ignore the `initExpanded` property for existing columns)
-      const existingColumnIds = this.columns.map((c) => c.id);
-
       // Add any columns to our array that are new columns that should be initially expanded.
-      columnIdsToExpand.push(
-        ...columns.filter((c) => !existingColumnIds.includes(c.id) && c.initExpanded).map((c) => c.id),
-      );
+      columnIdsToExpand.push(...columns.filter((c) => c.initExpanded).map((c) => c.id));
+
+      // Clear the cache to force to re-fetch the expanded columns.
+      this.loadedColumns.clear();
 
       // Send the new array of columns along to be parsed and expanded.
-      this.parseAndUpdateExpandedColumns(columns.filter((c) => columnIdsToExpand.includes(c.id)));
+      this.parseAndUpdateExpandedColumns(
+        columns.filter((c) => columnIdsToExpand.includes(c.id) || this.expandedColumnIds.includes(c.id)),
+      );
 
       this.columns = columns;
     }
