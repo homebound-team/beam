@@ -94,7 +94,7 @@ export function rowAnd(r: RenderResult, rowNum: number, testId: string): HTMLEle
   return e.querySelector(`[data-testid="${testId}"]`) || fail(`Element not found ${prettyDOM(e)}`);
 }
 
-/** Intended to be used to generate a human-readable text 
+/** Intended to be used to generate a human-readable text
  * representation of a GridTable using the markdown table syntax.
  * * Example Use: expect(tableSnapshot(r)).toMatchInlineSnapshot(`
       "
