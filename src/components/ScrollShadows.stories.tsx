@@ -6,7 +6,7 @@ export default {
   title: "Components/ScrollShadows",
 };
 
-export function Vertical() {
+export function Examples() {
   return (
     <>
       <h2 css={Css.mb1.lgSb.$}>Vertical scroll</h2>

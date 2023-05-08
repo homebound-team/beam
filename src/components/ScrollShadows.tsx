@@ -1,6 +1,6 @@
 import { useLayoutEffect } from "@react-aria/utils";
 import { ReactNode, useCallback, useRef, useState } from "react";
-import { Css, Palette, Properties } from "src";
+import { Css, Palette, Properties, useTestIds } from "src";
 
 interface ScrollShadowsProps {
   children: ReactNode;
@@ -14,38 +14,39 @@ interface ScrollShadowsProps {
 export function ScrollShadows(props: ScrollShadowsProps) {
   const { children, xss, horizontal = false, bgColor = Palette.White } = props;
   const { height = "auto", width = "auto" } = xss ?? {};
+  const tid = useTestIds(props);
+
   // This is admittedly extremely hacky. It expects the background color to be in the format "rgba(255, 255, 255, 1)".
   // If we ever change how we define our color palette in Beam, then this will break and will need to be fixed.
-  const transparentBgColor = bgColor.replace(/,1\)$/, ",0)");
+  if (!bgColor.includes("rgba")) {
+    throw new Error("ScrollShadows: bgColor prop must be in the format 'rgba(255, 255, 255, 1)'");
+  }
 
+  const transparentBgColor = bgColor.replace(/,1\)$/, ",0)");
   const startShadowStyles = !horizontal ? Css.top0.left0.right0.hPx(40).$ : Css.left0.top0.bottom0.wPx(25).$;
   const endShadowStyles = !horizontal ? Css.bottom0.left0.right0.hPx(40).$ : Css.right0.top0.bottom0.wPx(25).$;
   const startGradientDeg = !horizontal ? 180 : 90;
   const endGradientDeg = !horizontal ? 0 : 270;
 
-  const [scrollProps, setScrollProps] = useState<ScrollProps>({
-    scrollTop: 0,
-    scrollHeight: 0,
-    clientHeight: 0,
-    clientWidth: 0,
-    scrollLeft: 0,
-    scrollWidth: 0,
-  });
+  const [showStartShadow, setShowStartShadow] = useState(false);
+  const [showEndShadow, setShowEndShadow] = useState(false);
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const updateScrollProps = useCallback((el: HTMLDivElement) => {
     const { scrollTop, scrollHeight, clientHeight, scrollWidth, scrollLeft, clientWidth } = el;
-    setScrollProps({ scrollTop, scrollHeight, clientHeight, scrollWidth, scrollLeft, clientWidth });
+
+    const start = horizontal ? scrollLeft : scrollTop;
+    const end = horizontal ? scrollWidth : scrollHeight;
+    const boxSize = horizontal ? clientWidth : clientHeight;
+    setShowStartShadow(start > 0);
+    setShowEndShadow(start + boxSize < end);
   }, []);
 
   // Initially set the state dimensions on render to put the shadows in the correct position
   useLayoutEffect(() => {
     scrollRef.current && updateScrollProps(scrollRef.current);
   }, []);
-
-  const { scrollTop, scrollHeight, clientHeight, scrollWidth, scrollLeft, clientWidth } = scrollProps;
-  const showStartShadow = !horizontal ? scrollTop > 0 : scrollLeft > 0;
-  const showEndShadow = !horizontal ? scrollTop + clientHeight < scrollHeight : scrollLeft + clientWidth < scrollWidth;
 
   return (
     <div
@@ -55,6 +56,7 @@ export function ScrollShadows(props: ScrollShadowsProps) {
           .w(width)
           .df.fd(!horizontal ? "column" : "row").$
       }
+      {...tid}
     >
       {showStartShadow && (
         <div
@@ -92,12 +94,3 @@ export function ScrollShadows(props: ScrollShadowsProps) {
     </div>
   );
 }
-
-type ScrollProps = {
-  scrollTop: number;
-  scrollHeight: number;
-  clientHeight: number;
-  scrollWidth: number;
-  clientWidth: number;
-  scrollLeft: number;
-};
