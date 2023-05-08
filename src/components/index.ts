@@ -27,6 +27,7 @@ export * from "./Modal/useModal";
 export { NavLink } from "./NavLink";
 export * from "./Pagination";
 export { PresentationProvider } from "./PresentationContext";
+export * from "./ScrollShadows";
 export * from "./Snackbar";
 export * from "./Stepper";
 export type { Step, StepperProps } from "./Stepper";
