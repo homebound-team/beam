@@ -224,12 +224,16 @@ export class TableState {
       // Figure out which columns need to be expanded when rendering a new set of columns
       const localStorageColumns = this.persistCollapse ? readExpandedColumnsStorage(this.persistCollapse) : [];
       // On initial render the columns we start with is whatever is in local storage.
-      // On any subsequent render, we start with an empty array.
-      // (We'll add to this after figuring out which columns are new vs existing.)
+      // On subsequent renders we want to keep the columns that were previously expanded.
       const columnIdsToExpand = isInitial ? localStorageColumns : this.expandedColumnIds;
 
+      // Create a list of all existing column ids. (We ignore the `initExpanded` property for existing columns)
+      const existingColumnIds = this.columns.map((c) => c.id);
+
       // Add any columns to our array that are new columns that should be initially expanded.
-      columnIdsToExpand.push(...columns.filter((c) => c.initExpanded).map((c) => c.id));
+      columnIdsToExpand.push(
+        ...columns.filter((c) => !existingColumnIds.includes(c.id) && c.initExpanded).map((c) => c.id),
+      );
 
       // Clear the cache to force to re-fetch the expanded columns.
       this.loadedColumns.clear();
