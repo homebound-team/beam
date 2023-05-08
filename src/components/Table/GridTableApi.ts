@@ -54,7 +54,6 @@ export type GridTableApi<R extends Kinded> = {
   isCollapsedRow: (id: string) => boolean;
   setVisibleColumns: (ids: string[]) => void;
   getVisibleColumnIds: () => string[];
-  refetchExpandedColumns: () => void;
 };
 
 // Using `FooImpl`to keep the public GridTableApi definition separate.
@@ -124,9 +123,5 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public getVisibleColumnIds() {
     return this.tableState.visibleColumnIds;
-  }
-
-  public refetchExpandedColumns() {
-    this.tableState.refetchExpandedColumns();
   }
 }
