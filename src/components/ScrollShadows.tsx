@@ -1,4 +1,4 @@
-import { useLayoutEffect } from "@react-aria/utils";
+import { useResizeObserver } from "@react-aria/utils";
 import { ReactNode, useCallback, useRef, useState } from "react";
 import { Css, Palette, Properties, useTestIds } from "src";
 
@@ -43,10 +43,10 @@ export function ScrollShadows(props: ScrollShadowsProps) {
     setShowEndShadow(start + boxSize < end);
   }, []);
 
-  // Initially set the state dimensions on render to put the shadows in the correct position
-  useLayoutEffect(() => {
-    scrollRef.current && updateScrollProps(scrollRef.current);
-  }, []);
+  // Use a ResizeObserver to update the scroll props to determine if the shadows should be shown.
+  // This executes on render and subsequent resizes which could be due to content/`children` changes (such as responses from APIs).
+  const onResize = useCallback(() => scrollRef.current && updateScrollProps(scrollRef.current), []);
+  useResizeObserver({ ref: scrollRef, onResize });
 
   return (
     <div
