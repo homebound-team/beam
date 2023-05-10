@@ -1,5 +1,5 @@
 import { useResizeObserver } from "@react-aria/utils";
-import { ReactNode, useCallback, useRef, useState } from "react";
+import { ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { Css, Palette, Properties, useTestIds } from "src";
 
 interface ScrollShadowsProps {
@@ -22,16 +22,23 @@ export function ScrollShadows(props: ScrollShadowsProps) {
     throw new Error("ScrollShadows: bgColor prop must be in the format 'rgba(255, 255, 255, 1)'");
   }
 
-  const transparentBgColor = bgColor.replace(/,1\)$/, ",0)");
-  const startShadowStyles = !horizontal ? Css.top0.left0.right0.hPx(40).$ : Css.left0.top0.bottom0.wPx(25).$;
-  const endShadowStyles = !horizontal ? Css.bottom0.left0.right0.hPx(40).$ : Css.right0.top0.bottom0.wPx(25).$;
-  const startGradientDeg = !horizontal ? 180 : 90;
-  const endGradientDeg = !horizontal ? 0 : 270;
-
   const [showStartShadow, setShowStartShadow] = useState(false);
   const [showEndShadow, setShowEndShadow] = useState(false);
-
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const [startShadowStyles, endShadowStyles] = useMemo(() => {
+    const transparentBgColor = bgColor.replace(/,1\)$/, ",0)");
+    const commonStyles = Css.absolute.z3.$;
+    const startShadowStyles = !horizontal ? Css.top0.left0.right0.hPx(40).$ : Css.left0.top0.bottom0.wPx(25).$;
+    const endShadowStyles = !horizontal ? Css.bottom0.left0.right0.hPx(40).$ : Css.right0.top0.bottom0.wPx(25).$;
+    const startGradient = `linear-gradient(${!horizontal ? 180 : 90}deg, ${bgColor} 0%, ${transparentBgColor} 92%);`;
+    const endGradient = `linear-gradient(${!horizontal ? 0 : 270}deg, ${bgColor} 0%, ${transparentBgColor} 92%);`;
+
+    return [
+      { ...commonStyles, ...startShadowStyles, ...Css.add("background", startGradient).$ },
+      { ...commonStyles, ...endShadowStyles, ...Css.add("background", endGradient).$ },
+    ];
+  }, [horizontal, bgColor]);
 
   const updateScrollProps = useCallback((el: HTMLDivElement) => {
     const { scrollTop, scrollHeight, clientHeight, scrollWidth, scrollLeft, clientWidth } = el;
@@ -58,29 +65,8 @@ export function ScrollShadows(props: ScrollShadowsProps) {
       }
       {...tid}
     >
-      {showStartShadow && (
-        <div
-          css={{
-            ...startShadowStyles,
-            ...Css.absolute.add(
-              "background",
-              `linear-gradient(${startGradientDeg}deg, ${bgColor} 0%, ${transparentBgColor} 92%);`,
-            ).$,
-          }}
-        />
-      )}
-      {showEndShadow && (
-        <div
-          css={{
-            ...endShadowStyles,
-            ...Css.absolute.add(
-              "background",
-              `linear-gradient(${endGradientDeg}deg, ${bgColor} 0%, ${transparentBgColor} 92%)`,
-            ).$,
-          }}
-        />
-      )}
-
+      {showStartShadow && <div css={startShadowStyles} />}
+      {showEndShadow && <div css={endShadowStyles} />}
       <div
         css={{
           ...xss,
