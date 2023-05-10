@@ -26,6 +26,7 @@ export function ScrollShadows(props: ScrollShadowsProps) {
   const [showEndShadow, setShowEndShadow] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // The shadow styles will rarely every change. Memoize them to avoid recomputing them when we don't have to.
   const [startShadowStyles, endShadowStyles] = useMemo(() => {
     const transparentBgColor = bgColor.replace(/,1\)$/, ",0)");
     const commonStyles = Css.absolute.z3.$;
