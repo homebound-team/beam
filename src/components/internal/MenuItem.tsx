@@ -10,7 +10,7 @@ import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette } from "src/Css";
 import { isAbsoluteUrl, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { NavLink } from "../NavLink";
+import { Link } from "react-router-dom";
 
 interface MenuItemProps {
   item: Node<MenuItem>;
@@ -167,7 +167,7 @@ function maybeWrapInLink(
       </span>
     </a>
   ) : (
-    <NavLink href={onClick} label={content.toString()} variant="normal"/>
+    <Link className="navLink" to={onClick}>{content}</Link>
   );
 }
 

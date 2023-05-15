@@ -25,7 +25,7 @@ export interface NavLinkProps extends BeamFocusableProps {
   buttonRef?: RefObject<HTMLElement>;
 }
 
-type NavLinkVariant = "side" | "global" | "normal";
+type NavLinkVariant = "side" | "global";
 
 export function NavLink(props: NavLinkProps) {
   const {
@@ -84,7 +84,7 @@ export function getNavLinkStyles(variant: NavLinkVariant, contrast: boolean) {
   return navLinkVariantStyles(contrast)[variant];
 }
 
-const baseStyles = Css.df.aic.hPx(32).pyPx(6).br4.smMd.outline0.$;
+const baseStyles = Css.df.aic.hPx(32).pyPx(6).px1.br4.smMd.outline0.$;
 
 const navLinkVariantStyles: (contrast: boolean) => Record<
   NavLinkVariant,
@@ -98,7 +98,7 @@ const navLinkVariantStyles: (contrast: boolean) => Record<
   }
 > = (contrast) => ({
   side: {
-    baseStyles: { ...baseStyles, ...Css.gray700.if(contrast).gray600.px1.$ },
+    baseStyles: { ...baseStyles, ...Css.gray700.if(contrast).gray600.$ },
     activeStyles: Css.lightBlue700.bgLightBlue50.if(contrast).white.bgGray700.$,
     disabledStyles: Css.gray400.cursorNotAllowed.if(contrast).gray800.$,
     focusRingStyles: Css.bgLightBlue50.bshFocus.if(contrast).bgGray700.white.$,
@@ -106,7 +106,7 @@ const navLinkVariantStyles: (contrast: boolean) => Record<
     pressedStyles: Css.gray700.bgGray200.if(contrast).bgGray200.gray800.$,
   },
   global: {
-    baseStyles: { ...baseStyles, ...Css.add("width", "max-content").gray500.px1.$ },
+    baseStyles: { ...baseStyles, ...Css.add("width", "max-content").gray500.$ },
     activeStyles: Css.white.bgGray900.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
     focusRingStyles: Css.gray500.bgGray900.add(
@@ -116,12 +116,4 @@ const navLinkVariantStyles: (contrast: boolean) => Record<
     hoverStyles: Css.gray500.bgGray900.$,
     pressedStyles: Css.gray500.bgGray700.$,
   },
-  normal: {
-    baseStyles: { ...baseStyles, ...Css.gray700.if(contrast).gray600.$ },
-    activeStyles: Css.lightBlue700.bgLightBlue50.if(contrast).white.bgGray700.$,
-    disabledStyles: Css.gray400.cursorNotAllowed.if(contrast).gray800.$,
-    focusRingStyles: Css.bgLightBlue50.bshFocus.if(contrast).bgGray700.white.$,
-    hoverStyles: Css.gray700.bgGray100.if(contrast).bgGray800.gray600.$,
-    pressedStyles: Css.gray700.bgGray200.if(contrast).bgGray200.gray800.$,
-  }
 });
