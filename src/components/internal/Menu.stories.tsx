@@ -34,6 +34,21 @@ export function BasicMenuItems() {
   );
 }
 
+export function BasicMenuItemsClose() {
+  return (
+    <ButtonMenu
+      trigger={{ label: "Menu Trigger" }}
+      items={[
+        { label: "Menu item 1", onClick: "?test=true" },
+        { label: "Menu item 2", onClick: "https://google.com" },
+        { label: "Menu item 3", onClick: noop, disabled: true },
+        { label: "Menu item 4", onClick: noop },
+        { label: "Destructive menu item", onClick: noop, destructive: true },
+      ]}
+    />
+  );
+}
+
 export function IconMenuItems() {
   return (
     <ButtonMenu

@@ -78,6 +78,8 @@ export function MenuItemImpl(props: MenuItemProps) {
         ...(isSelected ? Css.fw5.$ : {}),
       }}
       {...tid[defaultTestId(menuItem.label)]}
+      onPointerUp={() => {}} 
+      onKeyDown={() => {}}
     >
       {maybeTooltip({
         title: resolveTooltip(disabled),
@@ -167,7 +169,7 @@ function maybeWrapInLink(
       </span>
     </a>
   ) : (
-    <Link className="navLink" to={onClick}>{content}</Link>
+    <Link className="navLink" to={onClick} onPointerUp={() => {}} onKeyDown={() => {}}>{content}</Link>
   );
 }
 
