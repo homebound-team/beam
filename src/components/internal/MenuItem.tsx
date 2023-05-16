@@ -2,7 +2,6 @@ import { Node } from "@react-types/shared";
 import { useRef } from "react";
 import { useHover, useMenuItem } from "react-aria";
 import { useHistory } from "react-router";
-import { NavLink } from "react-router-dom";
 import { TreeState } from "react-stately";
 import { Avatar } from "src/components/Avatar";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
@@ -11,6 +10,7 @@ import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette } from "src/Css";
 import { isAbsoluteUrl, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { Link } from "react-router-dom";
 
 interface MenuItemProps {
   item: Node<MenuItem>;
@@ -167,9 +167,7 @@ function maybeWrapInLink(
       </span>
     </a>
   ) : (
-    <NavLink to={onClick} className="navLink">
-      {content}
-    </NavLink>
+    <Link className="navLink" to={onClick}>{content}</Link>
   );
 }
 

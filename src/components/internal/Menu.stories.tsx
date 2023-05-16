@@ -3,12 +3,12 @@ import { useState } from "react";
 import { ButtonMenu } from "src/components/ButtonMenu";
 import { Menu } from "src/components/internal/Menu";
 import { noop } from "src/utils";
-import { withDimensions } from "src/utils/sb";
+import { withDimensions, withRouter } from "src/utils/sb";
 
 export default {
   component: Menu,
   title: "Workspace/Components/Menu",
-  decorators: [withDimensions()],
+  decorators: [withDimensions(), withRouter()],
   parameters: {
     design: {
       type: "figma",
@@ -17,14 +17,15 @@ export default {
   },
 } as Meta;
 
+
 export function BasicMenuItems() {
   return (
     <ButtonMenu
       defaultOpen
       trigger={{ label: "Menu Trigger" }}
       items={[
-        { label: "Menu item 1", onClick: noop },
-        { label: "Menu item 2", onClick: noop },
+        { label: "Menu item 1", onClick: "/"},
+        { label: "Menu item 2", onClick: "https://google.com" },
         { label: "Menu item 3", onClick: noop, disabled: true },
         { label: "Menu item 4", onClick: noop },
         { label: "Destructive menu item", onClick: noop, destructive: true },
