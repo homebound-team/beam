@@ -507,33 +507,26 @@ export const Icons = {
   ),
   sqFeet: (
     <>
-      <g clip-path="url(#clip0_2140_24662)">
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M0.958374 0.958328H6.95837V1.95833H1.95837V6.95833H0.958374V0.958328Z"
-        />
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M0.958374 23.0417L0.958374 17.0417L1.95837 17.0417L1.95837 22.0417L6.95837 22.0417L6.95837 23.0417L0.958374 23.0417Z"
-        />
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M23.0416 0.958328L23.0416 6.95833L22.0416 6.95833L22.0416 1.95833L17.0416 1.95833L17.0416 0.958328L23.0416 0.958328Z"
-        />
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M23.0416 23.0417L17.0416 23.0417L17.0416 22.0417L22.0416 22.0417L22.0416 17.0417L23.0416 17.0417L23.0416 23.0417Z"
-        />
-      </g>
-      <defs>
-        <clipPath id="clip0_2140_24662">
-          <rect width="24" height="24" fill="none" />
-        </clipPath>
-      </defs>
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M0.958374 0.958328H6.95837V1.95833H1.95837V6.95833H0.958374V0.958328Z"
+      />
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M0.958374 23.0417L0.958374 17.0417L1.95837 17.0417L1.95837 22.0417L6.95837 22.0417L6.95837 23.0417L0.958374 23.0417Z"
+      />
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M23.0416 0.958328L23.0416 6.95833L22.0416 6.95833L22.0416 1.95833L17.0416 1.95833L17.0416 0.958328L23.0416 0.958328Z"
+      />
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M23.0416 23.0417L17.0416 23.0417L17.0416 22.0417L22.0416 22.0417L22.0416 17.0417L23.0416 17.0417L23.0416 23.0417Z"
+      />
     </>
   ),
   // Navigation
