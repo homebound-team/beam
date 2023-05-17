@@ -118,7 +118,7 @@ export const Icon = (props: IconProps) => {
     "checklistComplete",
     "checklistNotComplete",
     "criticalPath",
-    "water",
+    "faucet",
     "bed",
     "sqFeet",
   ];

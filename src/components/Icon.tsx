@@ -484,7 +484,7 @@ export const Icons = {
   checklistNotComplete: (
     <path d="M6.40005 19.6H17.6C18.4824 19.6 19.2 18.8824 19.2 18V6C19.2 5.1176 18.4824 4.4 17.6 4.4H16C16 3.9576 15.6424 3.6 15.2 3.6H8.80005C8.35765 3.6 8.00005 3.9576 8.00005 4.4H6.40005C5.51765 4.4 4.80005 5.1176 4.80005 6V18C4.80005 18.8824 5.51765 19.6 6.40005 19.6ZM6.40005 6H8.00005V7.6H16V6H17.6V18H6.40005V6Z" />
   ),
-  water: (
+  faucet: (
     <>
       <path fill-rule="evenodd" clip-rule="evenodd" d="M19 2L11 2V1L19 1V2Z" />
       <path fill-rule="evenodd" clip-rule="evenodd" d="M14.5 7L14.5 2L15.5 2L15.5 7L14.5 7Z" />
