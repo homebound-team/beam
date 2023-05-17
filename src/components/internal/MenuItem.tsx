@@ -2,7 +2,6 @@ import { Node } from "@react-types/shared";
 import { useRef } from "react";
 import { useHover, useMenuItem } from "react-aria";
 import { useHistory } from "react-router";
-import { NavLink } from "react-router-dom";
 import { TreeState } from "react-stately";
 import { Avatar } from "src/components/Avatar";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
@@ -11,6 +10,7 @@ import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette } from "src/Css";
 import { isAbsoluteUrl, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { Link } from "react-router-dom";
 
 interface MenuItemProps {
   item: Node<MenuItem>;
@@ -18,6 +18,10 @@ interface MenuItemProps {
   onClose: VoidFunction;
   contrast: boolean;
 }
+
+// Note: Respect Ctrl-clicking pop-up elements to open a link in a new tab on a menu item
+// See https://github.com/adobe/react-spectrum/issues/1244#issuecomment-1125813249
+const noopWorkaround = () => {};
 
 export function MenuItemImpl(props: MenuItemProps) {
   const { item, state, onClose, contrast } = props;
@@ -78,6 +82,8 @@ export function MenuItemImpl(props: MenuItemProps) {
         ...(isSelected ? Css.fw5.$ : {}),
       }}
       {...tid[defaultTestId(menuItem.label)]}
+      onPointerUp={noopWorkaround} 
+      onKeyDown={noopWorkaround}
     >
       {maybeTooltip({
         title: resolveTooltip(disabled),
@@ -167,9 +173,7 @@ function maybeWrapInLink(
       </span>
     </a>
   ) : (
-    <NavLink to={onClick} className="navLink">
-      {content}
-    </NavLink>
+    <Link className="navLink" to={onClick} onPointerUp={noopWorkaround} onKeyDown={noopWorkaround}>{content}</Link>
   );
 }
 
