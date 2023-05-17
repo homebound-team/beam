@@ -4,7 +4,7 @@ import { Button } from "src/components/Button";
 import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
-import { click, render, type } from "src/utils/rtl";
+import { click, render, type, withRouter } from "src/utils/rtl";
 
 describe("ButtonMenu", () => {
   it("can update menu items", async () => {
@@ -145,6 +145,29 @@ describe("ButtonMenu", () => {
     expect(r.trigger_optionA()).toHaveAttribute("aria-checked", "false");
     expect(r.trigger_optionB()).toHaveAttribute("aria-checked", "true");
     expect(r.trigger_optionB().querySelector("[data-icon='check']")).toBeTruthy();
+  });
+
+  it("can execute menu item actions", async () => {
+    const onClick = jest.fn();
+    const router = withRouter("/");
+    // Given a Menu with various items...
+    const menuItems: MenuItem[] = [
+      { label: "Action Item", onClick },
+      { label: "Relative Url", onClick: "/url" },
+    ];
+    const r = await render(<ButtonMenu trigger={{ label: "Trigger" }} items={menuItems} />, router);
+    // When opening the menu
+    click(r.trigger);
+    // And clicking on the first item
+    click(r.trigger_actionItem);
+    // Then the action should have been called
+    expect(onClick).toHaveBeenCalled();
+
+    // When clicking on the second item
+    click(r.trigger);
+    click(r.trigger_relativeUrl);
+    // Then the URL should have changed
+    expect(router.history.location.pathname).toEqual("/url");
   });
 });
 

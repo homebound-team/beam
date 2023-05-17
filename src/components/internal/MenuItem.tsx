@@ -19,6 +19,10 @@ interface MenuItemProps {
   contrast: boolean;
 }
 
+// Note: Respect Ctrl-clicking pop-up elements to open a link in a new tab on a menu item
+// See https://github.com/adobe/react-spectrum/issues/1244#issuecomment-1125813249
+const noopWorkaround = () => {};
+
 export function MenuItemImpl(props: MenuItemProps) {
   const { item, state, onClose, contrast } = props;
   const menuItem = item.value;
@@ -78,6 +82,7 @@ export function MenuItemImpl(props: MenuItemProps) {
         ...(isSelected ? Css.fw5.$ : {}),
       }}
       {...tid[defaultTestId(menuItem.label)]}
+      {...(typeof onClick === "string" && { onPointerUp: noopWorkaround })}
     >
       {maybeTooltip({
         title: resolveTooltip(disabled),
@@ -167,7 +172,7 @@ function maybeWrapInLink(
       </span>
     </a>
   ) : (
-    <Link className="navLink" to={onClick}>{content}</Link>
+    <Link className="navLink" to={onClick} onPointerUp={noopWorkaround}>{content}</Link>
   );
 }
 
