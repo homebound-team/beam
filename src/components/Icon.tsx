@@ -486,24 +486,23 @@ export const Icons = {
   ),
   water: (
     <>
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M19 2L11 2V1L19 1V2Z" fill="#353535" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M14.5 7L14.5 2L15.5 2L15.5 7L14.5 7Z" fill="#353535" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M6 11H22V8H3V15H6V11ZM7 16H2V7H23V12H7V16Z" fill="#353535" />
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M19 2L11 2V1L19 1V2Z" />
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M14.5 7L14.5 2L15.5 2L15.5 7L14.5 7Z" />
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M6 11H22V8H3V15H6V11ZM7 16H2V7H23V12H7V16Z" />
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
         d="M5.24335 21.7762C5.35823 21.6723 5.5 21.4626 5.5 21C5.5 20.8857 5.4543 20.6946 5.30831 20.4252C5.16704 20.1646 4.96603 19.8932 4.74404 19.6368C4.66213 19.5423 4.5798 19.4525 4.5 19.369C4.4202 19.4525 4.33787 19.5423 4.25596 19.6368C4.03397 19.8932 3.83296 20.1646 3.69169 20.4252C3.5457 20.6946 3.5 20.8857 3.5 21C3.5 21.4626 3.64177 21.6723 3.75665 21.7762C3.88852 21.8955 4.12535 22 4.5 22C4.87465 22 5.11148 21.8955 5.24335 21.7762ZM4.5 23C5.60457 23 6.5 22.3807 6.5 21C6.5 19.6193 4.5 18 4.5 18C4.5 18 2.5 19.6193 2.5 21C2.5 22.3807 3.39543 23 4.5 23Z"
-        fill="#353535"
       />
     </>
   ),
   bed: (
     <>
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M22 12H2V18H22V12ZM1 11V19H23V11H1Z" fill="#353535" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M20 2H4V11H20V2ZM3 1V12H21V1H3Z" fill="#353535" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M15 7H9V11H15V7ZM8 6V12H16V6H8Z" fill="#353535" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M3.5 23V19H4.5V23H3.5Z" fill="#353535" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M19.5 23V19H20.5V23H19.5Z" fill="#353535" />
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M22 12H2V18H22V12ZM1 11V19H23V11H1Z" />
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M20 2H4V11H20V2ZM3 1V12H21V1H3Z" />
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M15 7H9V11H15V7ZM8 6V12H16V6H8Z" />
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M3.5 23V19H4.5V23H3.5Z" />
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M19.5 23V19H20.5V23H19.5Z" />
     </>
   ),
   sqFeet: (
@@ -513,30 +512,26 @@ export const Icons = {
           fill-rule="evenodd"
           clip-rule="evenodd"
           d="M0.958374 0.958328H6.95837V1.95833H1.95837V6.95833H0.958374V0.958328Z"
-          fill="#353535"
         />
         <path
           fill-rule="evenodd"
           clip-rule="evenodd"
           d="M0.958374 23.0417L0.958374 17.0417L1.95837 17.0417L1.95837 22.0417L6.95837 22.0417L6.95837 23.0417L0.958374 23.0417Z"
-          fill="#353535"
         />
         <path
           fill-rule="evenodd"
           clip-rule="evenodd"
           d="M23.0416 0.958328L23.0416 6.95833L22.0416 6.95833L22.0416 1.95833L17.0416 1.95833L17.0416 0.958328L23.0416 0.958328Z"
-          fill="#353535"
         />
         <path
           fill-rule="evenodd"
           clip-rule="evenodd"
           d="M23.0416 23.0417L17.0416 23.0417L17.0416 22.0417L22.0416 22.0417L22.0416 17.0417L23.0416 17.0417L23.0416 23.0417Z"
-          fill="#353535"
         />
       </g>
       <defs>
         <clipPath id="clip0_2140_24662">
-          <rect width="24" height="24" fill="white" />
+          <rect width="24" height="24" fill="none" />
         </clipPath>
       </defs>
     </>
