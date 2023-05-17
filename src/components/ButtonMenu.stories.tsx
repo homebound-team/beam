@@ -5,6 +5,8 @@ import { Button } from "src/components/Button";
 import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
 import { Css } from "src/Css";
 import { withDimensions, withRouter } from "src/utils/sb";
+import { useModal } from "./Modal";
+import { TestModalContent } from "./Modal/TestModalContent";
 
 export default {
   component: ButtonMenu,
@@ -52,8 +54,10 @@ export function MenuOpen() {
 }
 
 export function InteractiveMenu() {
+  const { openModal } = useModal();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([
     { label: "Page action", onClick: action("Test item clicked") },
+    { label: "Modal", onClick: () => openModal({ content: <TestModalContent />}) },
     { label: "Internal Link", onClick: "/fakeRoute" },
     { label: "External Link - Homebound.com", onClick: "https://www.homebound.com" },
   ]);
