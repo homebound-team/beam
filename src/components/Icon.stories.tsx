@@ -117,6 +117,9 @@ export const Icon = (props: IconProps) => {
     "task",
     "checklistComplete",
     "checklistNotComplete",
+    "water",
+    "bed",
+    "sqFeet",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
