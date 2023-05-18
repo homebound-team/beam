@@ -75,7 +75,9 @@ function GroupButton(props: GroupButtonProps) {
             }}
             {...tid[defaultTestId(text ?? icon ?? "button")]}
           >
-            {icon && <Icon xss={{ marginRight: "4px" }} icon={icon} color={iconColor} inc={iconInc} />}
+            {icon && (
+              <Icon xss={{ marginRight: "4px" }} icon={icon} color={disabled ? undefined : iconColor} inc={iconInc} />
+            )}
             {text}
           </button>
         ),
