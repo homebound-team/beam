@@ -27,6 +27,18 @@ describe("Pagination", () => {
     expect(setSettings).toHaveBeenCalledWith({ pageNumber: 2, pageSize: 50 });
   });
 
+  it("fires setSettings with offset/limit if used", async () => {
+    // Given a pagination component on page 1 and per page 50
+    const setSettings = jest.fn();
+    const page = [{ offset: 0, limit: 50 }, setSettings] as const;
+    const r = await render(<Pagination totalCount={100} page={page} />);
+    // When click to go to the next page
+    click(r.pagination_nextIcon);
+    // Then setSettings is called
+    expect(setSettings).toHaveBeenCalledTimes(1);
+    expect(setSettings).toHaveBeenCalledWith({ offset: 50, limit: 50 });
+  });
+
   it("fires setSettings on select pageSize option", async () => {
     // Given a pagination component on page 1 and per page 50
     const setSettings = jest.fn();
