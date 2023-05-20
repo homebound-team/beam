@@ -12,14 +12,14 @@ export type PageSettings = {
 export const defaultPage: PageSettings = { pageNumber: 1, pageSize: 100 };
 
 interface PaginationProps {
-  settings: PageSettings;
-  setSettings: Dispatch<SetStateAction<PageSettings>>;
+  page: PageSettings;
+  setPage: Dispatch<SetStateAction<PageSettings>>;
   totalCount: number;
 }
 
 export function Pagination(props: PaginationProps) {
-  const { settings, totalCount, setSettings } = props;
-  const { pageSize, pageNumber } = settings;
+  const { page, setPage, totalCount } = props;
+  const { pageSize, pageNumber } = page;
 
   const hasPrevPage = pageNumber > 1;
   const hasNextPage = pageNumber < totalCount / pageSize;
@@ -43,7 +43,7 @@ export function Pagination(props: PaginationProps) {
           options={pageOptions}
           value={pageSize}
           onSelect={(val) => {
-            setSettings({ pageNumber: 1, pageSize: val! });
+            setPage({ pageNumber: 1, pageSize: val! });
           }}
           {...tid.pageSize}
         />
@@ -55,14 +55,14 @@ export function Pagination(props: PaginationProps) {
         <IconButton
           icon="chevronLeft"
           color={hasPrevPage ? Palette.LightBlue700 : Palette.Gray200}
-          onClick={() => setSettings({ pageNumber: settings.pageNumber - 1, pageSize })}
+          onClick={() => setPage({ pageNumber: page.pageNumber - 1, pageSize })}
           disabled={!hasPrevPage}
           {...tid.previousIcon}
         />
         <IconButton
           icon="chevronRight"
           color={hasNextPage ? Palette.LightBlue700 : Palette.Gray200}
-          onClick={() => setSettings({ pageNumber: settings.pageNumber + 1, pageSize })}
+          onClick={() => setPage({ pageNumber: page.pageNumber + 1, pageSize })}
           disabled={!hasNextPage}
           {...tid.nextIcon}
         />

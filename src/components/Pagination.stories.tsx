@@ -1,7 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { noop } from "src/utils";
-import { defaultPage, FormLines, TextField } from "..";
+import { defaultPage, FormLines, StaticField } from "..";
 import { Pagination } from "./Pagination";
 
 export default {
@@ -34,10 +33,10 @@ function RenderPagination({ totalRows }: { totalRows: number }) {
   return (
     <>
       <FormLines labelStyle="left">
-        <TextField label={"Number of items"} readOnly value={String(totalRows)} onChange={noop} />
-        <TextField label={"Current page"} readOnly value={String(settings.pageNumber)} onChange={noop} />
+        <StaticField label="Number of items" value={String(totalRows)} />
+        <StaticField label="Current page" value={String(settings.pageNumber)} />
       </FormLines>
-      <Pagination totalCount={totalRows} setSettings={setSettings} settings={settings} />
+      <Pagination totalCount={totalRows} setPage={setSettings} page={settings} />
     </>
   );
 }
