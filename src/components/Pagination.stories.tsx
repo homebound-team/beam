@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { defaultPage, FormLines, StaticField } from "..";
+import { FormLines, StaticField } from "..";
 import { Pagination } from "./Pagination";
 
 export default {
@@ -29,7 +29,7 @@ export function OnlyOnePage() {
 }
 
 function RenderPagination({ totalRows }: { totalRows: number }) {
-  const page = useState(defaultPage);
+  const page = useState({ pageNumber: 1, pageSize: 100 });
   return (
     <>
       <FormLines labelStyle="left">
