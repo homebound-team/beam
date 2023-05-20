@@ -29,14 +29,14 @@ export function OnlyOnePage() {
 }
 
 function RenderPagination({ totalRows }: { totalRows: number }) {
-  const [settings, setSettings] = useState(defaultPage);
+  const page = useState(defaultPage);
   return (
     <>
       <FormLines labelStyle="left">
         <StaticField label="Number of items" value={String(totalRows)} />
-        <StaticField label="Current page" value={String(settings.pageNumber)} />
+        <StaticField label="Current page" value={String(page[0].pageNumber)} />
       </FormLines>
-      <Pagination totalCount={totalRows} setPage={setSettings} page={settings} />
+      <Pagination totalCount={totalRows} page={page} />
     </>
   );
 }

@@ -12,13 +12,15 @@ export type PageSettings = {
 export const defaultPage: PageSettings = { pageNumber: 1, pageSize: 100 };
 
 interface PaginationProps {
-  page: PageSettings;
-  setPage: Dispatch<SetStateAction<PageSettings>>;
+  page: readonly [PageSettings, Dispatch<SetStateAction<PageSettings>>];
   totalCount: number;
 }
 
 export function Pagination(props: PaginationProps) {
-  const { page, setPage, totalCount } = props;
+  const {
+    page: [page, setPage],
+    totalCount,
+  } = props;
   const { pageSize, pageNumber } = page;
 
   const hasPrevPage = pageNumber > 1;
