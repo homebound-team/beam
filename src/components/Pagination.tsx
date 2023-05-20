@@ -1,78 +1,83 @@
-import { Dispatch, SetStateAction, useMemo } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { IconButton } from "src/components";
 import { Css, Palette } from "src/Css";
 import { SelectField } from "src/inputs";
 import { useTestIds } from "src/utils";
 
 export type PageSettings = {
-  page: number;
-  perPage: number;
+  pageNumber: number;
+  pageSize: number;
 };
 
+export const defaultPage: PageSettings = { pageNumber: 1, pageSize: 100 };
+
 interface PaginationProps {
-  label: string;
-  totalCount: number;
   settings: PageSettings;
   setSettings: Dispatch<SetStateAction<PageSettings>>;
+  totalCount: number;
 }
 
 export function Pagination(props: PaginationProps) {
-  const { label, settings, totalCount, setSettings } = props;
-  const { perPage, page } = settings;
+  const { settings, totalCount, setSettings } = props;
+  const { pageSize, pageNumber } = settings;
 
-  const hasNextPage = useMemo(() => page < totalCount / perPage, [page, perPage, totalCount]);
+  const hasPrevPage = pageNumber > 1;
+  const hasNextPage = pageNumber < totalCount / pageSize;
+  // Create the `1 - 100 of 1000` or `0 of 0`
+  const first = pageSize * (pageNumber - 1) + (totalCount ? 1 : 0);
+  const last = Math.min(pageSize * pageNumber, totalCount);
+  // Don't both with `0 - 0 of 0`
+  const showLast = totalCount > 0;
 
   const tid = useTestIds(props, "pagination");
   return (
     <div css={Css.df.bGray300.bt.xs.gray500.px1.ml2.pt2.$} {...tid}>
-      <div css={Css.df.mya.mr2.$} {...tid.perPageLabel}>
-        {label} per page:
+      <div css={Css.df.mya.mr2.$} {...tid.pageSizeLabel}>
+        Page size:
       </div>
       <div css={Css.wPx(78).$}>
         <SelectField
           compact
-          {...tid.perPage}
+          label="Page Size"
           labelStyle="hidden"
-          label={`${label} per page`}
           options={pageOptions}
-          value={perPage}
+          value={pageSize}
           onSelect={(val) => {
-            setSettings({ page: 1, perPage: val! });
+            setSettings({ pageNumber: 1, pageSize: val! });
           }}
+          {...tid.pageSize}
         />
       </div>
       <div css={Css.mla.mya.df.$}>
         <div css={Css.df.mya.mr2.$} {...tid.pageInfoLabel}>
-          {perPage * (page - 1) + 1} {hasNextPage ? `- ${perPage * page}` : ""} of {totalCount} {label}
+          {first} {showLast ? `- ${last}` : ""} of {totalCount}
         </div>
         <IconButton
-          {...tid.previousIcon}
           icon="chevronLeft"
-          color={Palette.LightBlue700}
-          onClick={() => setSettings({ page: settings.page - 1, perPage })}
-          disabled={settings.page === 1}
+          color={hasPrevPage ? Palette.LightBlue700 : Palette.Gray200}
+          onClick={() => setSettings({ pageNumber: settings.pageNumber - 1, pageSize })}
+          disabled={!hasPrevPage}
+          {...tid.previousIcon}
         />
         <IconButton
-          {...tid.nextIcon}
           icon="chevronRight"
-          color={Palette.LightBlue700}
-          onClick={() => setSettings({ page: settings.page + 1, perPage })}
+          color={hasNextPage ? Palette.LightBlue700 : Palette.Gray200}
+          onClick={() => setSettings({ pageNumber: settings.pageNumber + 1, pageSize })}
           disabled={!hasNextPage}
+          {...tid.nextIcon}
         />
       </div>
     </div>
   );
 }
 
-export function toFirstAndOffset(page: number, perPage: number) {
+export function toFirstAndOffset(pageNumber: number, pageSize: number) {
   return {
-    first: perPage,
+    first: pageSize,
     // E.g. on first page the offset is 0, second page the offset is 100, then 200, etc.
-    offset: (page - 1) * perPage,
+    offset: (pageNumber - 1) * pageSize,
   };
 }
 
-// Make a list of 50/100/150/etc page sizes for the user to chose
-export const pageOptions = Array(5)
-  .fill(0)
-  .map((_, i) => ({ id: (i + 1) * 50, name: ((i + 1) * 50).toString() }));
+// Make a list of 100/500/1000 page sizes for the user to chose
+export const pageOptions = [100, 500, 1000].map((num) => ({ id: num, name: String(num) }));
