@@ -73,11 +73,11 @@ export function Pagination(props: PaginationProps) {
   );
 }
 
-export function toFirstAndOffset(pageNumber: number, pageSize: number) {
+export function toLimitAndOffset(page: PageSettings) {
   return {
-    first: pageSize,
     // E.g. on first page the offset is 0, second page the offset is 100, then 200, etc.
-    offset: (pageNumber - 1) * pageSize,
+    offset: (page.pageNumber - 1) * page.pageSize,
+    limit: page.pageSize,
   };
 }
 

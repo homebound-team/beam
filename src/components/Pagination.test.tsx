@@ -1,6 +1,6 @@
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
-import { pageOptions, PageSettings, Pagination, toFirstAndOffset } from "./Pagination";
+import { pageOptions, PageSettings, Pagination, toLimitAndOffset } from "./Pagination";
 
 const init: PageSettings = { pageNumber: 1, pageSize: 100 };
 
@@ -90,17 +90,17 @@ describe("Pagination", () => {
     });
   });
 
-  describe("toFirstAndOffset", () => {
+  describe("toLimitAndOffset", () => {
     it("returns offset 0 on first page", () => {
-      expect(toFirstAndOffset(init.pageNumber, init.pageSize)).toEqual({
-        first: 100,
+      expect(toLimitAndOffset({ pageNumber: 1, pageSize: 100 })).toEqual({
+        limit: 100,
         offset: 0,
       });
     });
 
     it("returns 100 offset on page 2", () => {
-      expect(toFirstAndOffset(init.pageNumber + 1, init.pageSize)).toEqual({
-        first: 100,
+      expect(toLimitAndOffset({ pageNumber: 2, pageSize: 100 })).toEqual({
+        limit: 100,
         offset: 100,
       });
     });
