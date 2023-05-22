@@ -45,11 +45,17 @@ export type RenderCellFn<R extends Kinded> = (
 ) => ReactNode;
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
-export const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
-  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
+export const defaultRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<any> =
+  (as: RenderAs, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
     const Cell = as === "table" ? "td" : "div";
     return (
-      <Cell key={key} css={{ ...css, ...Css.cursor("default").$ }} className={classNames} onClick={onClick}>
+      <Cell
+        key={key}
+        css={{ ...css, ...Css.cursor("default").$ }}
+        className={classNames}
+        onClick={onClick}
+        {...(as === "table" && { colSpan })}
+      >
         {content}
       </Cell>
     );
@@ -70,12 +76,12 @@ export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSp
   };
 
 /** Renders a cell element when a row link is in play. */
-export const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
-  (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
+export const rowLinkRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<any> =
+  (as: RenderAs, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
     const to = rowStyle!.rowLink!(row);
     if (as === "table") {
       return (
-        <td key={key} css={{ ...css }} className={classNames}>
+        <td key={key} css={{ ...css }} className={classNames} colSpan={colSpan}>
           <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
             {content}
           </Link>
@@ -95,8 +101,8 @@ export const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
   };
 
 /** Renders a cell that will fire the RowStyle.onClick. */
-export const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>) => RenderCellFn<any> =
-  (as: RenderAs, api: GridTableApi<any>) =>
+export const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>, colSpan: number) => RenderCellFn<any> =
+  (as: RenderAs, api: GridTableApi<any>, colSpan) =>
   (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
     const Cell = as === "table" ? "td" : "div";
     return (
@@ -108,6 +114,7 @@ export const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>) => RenderC
           rowStyle!.onClick!(row, api);
           onClick && onClick();
         }}
+        {...(as === "table" && { colSpan })}
       >
         {content}
       </Cell>

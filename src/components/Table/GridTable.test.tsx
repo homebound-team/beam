@@ -14,7 +14,19 @@ import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Checkbox, SelectField, TextField } from "src/inputs";
 import { noop } from "src/utils";
-import { cell, cellAnd, cellOf, click, render, row, tableSnapshot, type, wait, withRouter } from "src/utils/rtl";
+import {
+  cell,
+  cellAnd,
+  cellOf,
+  click,
+  render,
+  row,
+  tableSnapshot,
+  type,
+  typeAndWait,
+  wait,
+  withRouter,
+} from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
@@ -54,7 +66,7 @@ const nestedColumns: GridColumn<NestedRow>[] = [
     totals: emptyCell,
     header: (data, { row }) => <Collapse id={row.id} />,
     parent: (data, { row }) => <Collapse id={row.id} />,
-    child: (data, { row }) => (row.children ? <Collapse id={row.id} /> : ""),
+    child: (data, { row }) => (row.children?.length > 0 ? <Collapse id={row.id} /> : ""),
     grandChild: () => "",
   },
   selectColumn<NestedRow>({
@@ -1201,7 +1213,7 @@ describe("GridTable", () => {
     expect(cell(r, 0, 2)).toHaveTextContent("Name");
     // And the parent that matched the filter
     expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
-    // And the childs of the matched parent
+    // And the children of the matched parent
     expect(cell(r, 2, 2)).toHaveTextContent("filter child p1c1");
     expect(cell(r, 3, 2)).toHaveTextContent("filter child p1c2");
     // And that's it
@@ -1559,11 +1571,13 @@ describe("GridTable", () => {
     const r = await render(<Test rows={rows} />);
     click(r.select_1);
     // And selected rows is initially calc-d
-    expect(r.selectedNames()).toHaveTextContent("foo");
+    expect(r.selectedNames().textContent).toEqual("foo");
     // When we re-render with an updated row
     await r.rerender(<Test rows={[rows[0], { kind: "data", id: "1", data: { name: "foo2", value: 1 } }, rows[2]]} />);
     // Then selected computed sees the new value
-    expect(r.selectedNames()).toHaveTextContent("foo2");
+    expect(r.selectedNames().textContent).toEqual("foo2");
+    // And the table value is updated as expected
+    expect(cell(r, 1, 1)).toHaveTextContent("foo2");
   });
 
   it("can select rows via api", async () => {
@@ -1625,9 +1639,14 @@ describe("GridTable", () => {
 
     // And when applying a filter
     type(r.filter, "p1c1g2");
-    // Then expect only the visible rows selected are returned
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g2"]);
-    expect(api.current!.getSelectedRows()).toEqual([rows[1], rows[1].children![0], rows[1].children![0].children![1]]);
+    // Then expect all rows are still returned as selected
+    expect(api.current!.getSelectedRows()).toEqual([
+      rows[1],
+      rows[1].children![0],
+      rows[1].children![0].children![1],
+      rows[1].children![0].children![0],
+    ]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g2", "p1c1g1"]);
   });
 
   it("re-derives parent row selected state", async () => {
@@ -1817,12 +1836,12 @@ describe("GridTable", () => {
     // When applying a filter
     type(r.filter, "filter");
     // Then each group rows selected state should reflect the children that match the filter
-    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
     expect(cellAnd(r, 2, 1, "select")).toBeChecked();
-    // because the parent matches the filter, and the child was selected, the new behavior shows the nested childs of matched parent, child should keep selected
     expect(cellAnd(r, 3, 1, "select")).toBeChecked();
-    // And the API reflects the expected selected states of rows that match the filter
-    expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c1", "p1", "p1c2", "p1c1"]);
+    // because the parent matches the filter, and the child was selected, the new behavior shows the nested children of matched parent, child should keep selected
+    expect(cellAnd(r, 4, 1, "select")).toBeChecked();
+    // And the API reflects the expected selected states
+    expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c2", "p2c1", "p1", "p1c2", "p1c1"]);
   });
 
   // it can switch between partially checked to checked depending on applied filter
@@ -2674,7 +2693,7 @@ describe("GridTable", () => {
       const rows: GridDataRow<NestedRow>[] = [
         simpleHeader,
         {
-          // With one grand parent that sets `inferSelectedState: false`
+          // With one grandparent that sets `inferSelectedState: false`
           ...{ kind: "parent", id: "p1", inferSelectedState: false, data: { name: "parent 1" } },
           children: [
             {
@@ -2690,32 +2709,32 @@ describe("GridTable", () => {
       const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
       const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
 
-      // When selecting a grand child of the grand parent that sets `inferSelectedState: false`
+      // When selecting a grand child of the grandparent that sets `inferSelectedState: false`
       click(cellAnd(r, 3, 1, "select"));
 
       // Then the header row should be indeterminate
       expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
-      // And the grand parent row to not be checked.
+      // And the grandparent row to not be checked.
       expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
       // And the parent row should show indeterminate,
       expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true");
       expect(api.current!.getSelectedRowIds()).toEqual(["p1c1gc1"]);
 
-      // When selecting the grand parent
+      // When selecting the grandparent
       click(cellAnd(r, 1, 1, "select"));
 
       // Then all rows should be considered selected
       expect(cellAnd(r, 0, 1, "select")).toBeChecked();
       expect(cellAnd(r, 1, 1, "select")).toBeChecked();
       expect(cellAnd(r, 2, 1, "select")).toBeChecked();
-      expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1gc2", "p1c1gc1"]);
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1c1gc1", "p1", "p1c1", "p1c1gc2"]);
 
       // When unselecting a single grand child
       click(cellAnd(r, 3, 1, "select"));
 
       // Then the header row should return to indeterminate
       expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
-      // And the grand parent row to remain checked.
+      // And the grandparent row to remain checked.
       expect(cellAnd(r, 1, 1, "select")).toBeChecked();
       // And the parent row should return to indeterminate,
       expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true");
@@ -3008,6 +3027,330 @@ describe("GridTable", () => {
     expect(row(r, 1)).toHaveTextContent("totals");
     // And final row is the data
     expect(row(r, 2)).toHaveTextContent("data value");
+  });
+
+  describe("hidden selected rows", () => {
+    it("displays hidden selected rows when filtering server side", async () => {
+      // Given the table with the initial rows selected
+      // Using a "Test" component in order to be able to change the table rows via a state update
+      function Test() {
+        const columns = [nameColumn, valueColumn];
+        const initRows: GridDataRow<Row>[] = [
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+        ];
+        const [rows, setRows] = useState(initRows);
+
+        return (
+          <>
+            <button
+              onClick={() =>
+                setRows((rows) => [simpleHeader, { kind: "data", id: "2", data: { name: "bar", value: 2 } }])
+              }
+              data-testid="replace"
+            />
+            <GridTable columns={columns} rows={rows} />
+          </>
+        );
+      }
+
+      const r = await render(<Test />);
+      // Then the hidden selected group row is not displayed initially, as there is no filter applied
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name | Value |
+        | ---- | ----- |
+        | foo  | 1     |
+        "
+      `);
+      // When clicking the replace button to simulate server-side filtering
+      click(r.replace);
+      // Then the hidden selected group row is displayed with the missing row's data
+      click(r.chevronRight);
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                 | Value |
+        | ------------------------------------ | ----- |
+        | 1 selected row hidden due to filters |
+        | foo                                  | 1     |
+        | bar                                  | 2     |
+        "
+      `);
+    });
+
+    it("displays hidden selected rows when filtering client side", async () => {
+      // Given the table with a filter applied and rows selected
+      const columns = [nameColumn, valueColumn];
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+        { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
+        { kind: "data", id: "3", data: { name: "biz", value: 3 }, initSelected: true },
+      ];
+      const r = await render(<GridTable columns={columns} rows={rows} filter="foo" />);
+      // Then the hidden selected group row is displayed, and initially collapsed
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                  | Value |
+        | ------------------------------------- | ----- |
+        | 2 selected rows hidden due to filters |
+        | foo                                   | 1     |
+        "
+      `);
+
+      // When clicking the expand button
+      click(r.chevronRight);
+      // Then the hidden selected group row is expanded
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                  | Value |
+        | ------------------------------------- | ----- |
+        | 2 selected rows hidden due to filters |
+        | biz                                   | 3     |
+        | bar                                   | 2     |
+        | foo                                   | 1     |
+        "
+      `);
+    });
+
+    it("sorts hidden selected rows independently from visible rows", async () => {
+      // Given the table with a filter applied and rows selected
+      const columns = [nameColumn, valueColumn];
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+        { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
+        { kind: "data", id: "3", data: { name: "biz", value: 3 }, initSelected: true },
+      ];
+      const r = await render(
+        <GridTable columns={columns} rows={rows} filter="bar" sorting={{ on: "client", initial: ["value", "DESC"] }} />,
+      );
+
+      // When clicking the expand button
+      click(r.chevronRight);
+      // Then the hidden selected group row is sorted independently of visible rows
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                  | Value |
+        | ------------------------------------- | ----- |
+        | 2 selected rows hidden due to filters |
+        | biz                                   | 3     |
+        | foo                                   | 1     |
+        | bar                                   | 2     |
+        "
+      `);
+    });
+
+    it("reverts the hidden selected group collapse state once removed", async () => {
+      // Given a filterable table with rows selected
+      function Test() {
+        const columns = [nameColumn, valueColumn];
+        const rows: GridDataRow<Row>[] = [
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+          { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
+        ];
+        const [filter, setFilter] = useState("foo");
+        return (
+          <>
+            <input type="text" data-testid="filter" value={filter} onChange={(e) => setFilter(e.target.value)} />
+            <GridTable columns={columns} rows={rows} filter={filter} />
+          </>
+        );
+      }
+      const r = await render(<Test />);
+      // Then the hidden selected group row is initially collapsed
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                 | Value |
+        | ------------------------------------ | ----- |
+        | 1 selected row hidden due to filters |
+        | foo                                  | 1     |
+        "
+      `);
+      // When clicking the expand button
+      click(r.chevronRight);
+      // Then the hidden selected group row is expanded
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                 | Value |
+        | ------------------------------------ | ----- |
+        | 1 selected row hidden due to filters |
+        | bar                                  | 2     |
+        | foo                                  | 1     |
+        "
+      `);
+      // When removing the filter
+      type(r.filter, "");
+      // Then the hidden selected group row is removed
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name | Value |
+        | ---- | ----- |
+        | foo  | 1     |
+        | bar  | 2     |
+        "
+      `);
+      // When applying a filter again
+      await typeAndWait(r.filter, "bar");
+      // Then the hidden selected group row is reintroduced in its collapsed state
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                 | Value |
+        | ------------------------------------ | ----- |
+        | 1 selected row hidden due to filters |
+        | bar                                  | 2     |
+        "
+      `);
+    });
+
+    it("removes the hidden selected group row when all selected rows are removed", async () => {
+      // Given the table with a filter applied and rows selected
+      const columns = [selectColumn<Row>(), nameColumn, valueColumn];
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+        { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
+        { kind: "data", id: "3", data: { name: "biz", value: 3 }, initSelected: true },
+      ];
+      const r = await render(
+        <GridTable columns={columns} rows={rows} filter="bar" sorting={{ on: "client", initial: ["value", "DESC"] }} />,
+      );
+      // When deselecting the unmatched rows
+      click(r.chevronRight);
+      expect(cell(r, 1, 0)).toHaveTextContent("2 selected rows hidden due to filters");
+      click(r.select_1);
+      expect(cell(r, 1, 0)).toHaveTextContent("1 selected row hidden due to filters");
+      click(r.select_1);
+      // Then the hidden selected group row is removed
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | on | Name | Value |
+        | -- | ---- | ----- |
+        | on | bar  | 2     |
+        "
+      `);
+    });
+
+    it("updates the selected state of the header and parent rows when rows are hidden", async () => {
+      // Given the GridTable with nested rows
+      function Test() {
+        const rows: GridDataRow<NestedRow>[] = [
+          simpleHeader,
+          {
+            id: "p1",
+            kind: "parent",
+            data: { name: "p1" },
+            children: [
+              { id: "c1", kind: "child", data: { name: "c1" } },
+              { id: "c2", kind: "child", data: { name: "c2" } },
+              { id: "c3", kind: "child", data: { name: "c3" } },
+            ],
+          },
+        ];
+        const [filter, setFilter] = useState("");
+        return (
+          <>
+            <input type="text" data-testid="filter" value={filter} onChange={(e) => setFilter(e.target.value)} />
+            <GridTable columns={nestedColumns} rows={rows} filter={filter} />
+          </>
+        );
+      }
+
+      const r = await render(<Test />);
+      // When selecting two of the three children
+      click(r.select_2);
+      click(r.select_3);
+      // Then the header and parent row is partially selected
+      expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+      expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+
+      // When applying a filter to hide the unselected row
+      type(r.filter, "c1");
+      // Then the header and parent rows match the selected state of the visible rows
+      expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+      expect(cellAnd(r, 2, 1, "select")).toBeChecked();
+      // When deselecting the visible row
+      click(r.select_2);
+
+      // Then the parent row is now unchecked (respecting only the matched rows), but the header is still partially selected as it takes into consideration the unmatched selected rows
+      expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+      expect(cellAnd(r, 2, 1, "select")).not.toBeChecked();
+
+      // And when clearing the filter
+      type(r.filter, "");
+      // Then the parent row becomes partially selected now that the selected row is no longer "unmatched"
+      expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+    });
+
+    it("hides parent rows in the unmatched group unless they define inferSelected as false", async () => {
+      // Given nested rows with two parents - one that sets `inferSelectedState: false`.
+      // And all rows are selected, and a filter is applied that matches none of the rows
+      const rows: GridDataRow<NestedRow>[] = [
+        simpleHeader,
+        {
+          id: "p1",
+          kind: "parent",
+          data: { name: "p1" },
+          initSelected: true,
+          children: [{ id: "c1", kind: "child", data: { name: "c1" }, initSelected: true }],
+        },
+        {
+          id: "p2",
+          kind: "parent",
+          data: { name: "p2" },
+          inferSelectedState: false,
+          initSelected: true,
+          children: [{ id: "c2", kind: "child", data: { name: "c2" }, initSelected: true }],
+        },
+      ];
+      const r = await render(<GridTable columns={nestedColumns} rows={rows} filter="no-match" />);
+      // And expand the unmatched group
+      click(r.chevronRight);
+      // Then the unmatched group will contain `p2`, but not `p1`.
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | -                                     | on | Name |
+        | ------------------------------------- | -- | ---- |
+        | 3 selected rows hidden due to filters |
+        | -                                     | on | p2   |
+        | -                                     | on | c2   |
+        | -                                     | on | c1   |
+        | No rows found.                        |
+        "
+      `);
+    });
+
+    it("unselects all unmatched selected rows when deselecting the header", async () => {
+      // Given selected rows and a filter applied to show the unmatched selected group
+      const columns = [selectColumn<Row>(), nameColumn, valueColumn];
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+        { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
+      ];
+      const r = await render(<GridTable columns={columns} rows={rows} filter="bar" />);
+      // Then the unmatched selected group is shown
+      expect(cell(r, 1, 0)).toHaveTextContent("1 selected row hidden due to filters");
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | on                                   | Name | Value |
+        | ------------------------------------ | ---- | ----- |
+        | 1 selected row hidden due to filters |
+        | on                                   | bar  | 2     |
+        "
+      `);
+      // When deselecting the header
+      click(r.select_0);
+      // Then the unmatched selected group is hidden
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | on | Name | Value |
+        | -- | ---- | ----- |
+        | on | bar  | 2     |
+        "
+      `);
+    });
   });
 });
 
