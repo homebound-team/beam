@@ -89,3 +89,8 @@ export function isFunction(f: any): f is Function {
 export function isDefined<T extends any>(param: T | undefined | null): param is T {
   return param !== null && param !== undefined;
 }
+
+export function pluralize(count: number | unknown[], noun: string, pluralNoun?: string): string {
+  if ((Array.isArray(count) ? count.length : count) === 1) return noun;
+  return pluralNoun || `${noun}s`;
+}

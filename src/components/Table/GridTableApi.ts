@@ -3,7 +3,6 @@ import { VirtuosoHandle } from "react-virtuoso";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { DiscriminateUnion, Kinded } from "src/components/Table/types";
 import { TableState } from "src/components/Table/utils/TableState";
-import { visit } from "src/components/Table/utils/visitor";
 
 /**
  * Creates an `api` handle to drive a `GridTable`.
@@ -18,7 +17,7 @@ import { visit } from "src/components/Table/utils/visitor";
  * This is very similar to a `useRef`, except that the parent function has
  * immediate access to `api` and can use it for `useComputed`, instead of
  * having to wait for `ref.current` to be set after the child `GridTable`
- * has ran.
+ * has run.
  */
 export function useGridTableApi<R extends Kinded>(): GridTableApi<R> {
   return useMemo(() => new GridTableApiImpl<R>(), []);
@@ -81,16 +80,9 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     return this.getSelectedRows(kind).map((row: any) => row.id);
   }
 
-  // The any is not great, but getting the overload to handle the optional kind is annoying
+  // The `any` is not great, but getting the overload to handle the optional kind is annoying
   public getSelectedRows(kind?: string): any {
-    const ids = this.tableState.selectedIds;
-    const selected: GridDataRow<R>[] = [];
-    visit(this.tableState.rows, (row) => {
-      if (row.selectable !== false && ids.includes(row.id) && (!kind || row.kind === kind)) {
-        selected.push(row as any);
-      }
-    });
-    return selected;
+    return this.tableState.selectedRows.filter((row) => !kind || row.kind === kind);
   }
 
   public clearSelections(id?: string) {
