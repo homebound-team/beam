@@ -104,7 +104,8 @@ export function TabContent<V extends string>(
 
   return (
     // Using FullBleed to allow the tab's bgColor to extend to the edges of the <ScrollableContent /> element.
-    <FullBleed>
+    // Omit the padding from `FullBleed` if the caller passes in the `paddingLeft/Right` styles.
+    <FullBleed omitPadding={"paddingLeft" in contentXss || "paddingRight" in contentXss}>
       <div
         aria-labelledby={`${uniqueValue}-tab`}
         id={`${uniqueValue}-tabPanel`}
