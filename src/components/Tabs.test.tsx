@@ -1,9 +1,10 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { useParams } from "react-router";
-import { Palette } from "src/Css";
+import { ScrollableContent, ScrollableParent } from "src";
+import { Css, Palette } from "src/Css";
 import { click, render, withRouter } from "src/utils/rtl";
-import { getNextTabValue, RouteTabWithContent, TabsWithContent, TabWithContent } from "./Tabs";
+import { getNextTabValue, RouteTabWithContent, TabContent, TabsWithContent, TabWithContent } from "./Tabs";
 import { TabValue, TestTabContent, testTabs } from "./testData";
 
 describe("TabsWithContent", () => {
@@ -201,6 +202,21 @@ describe("TabsWithContent", () => {
 
     // Then the disabled tab should be rendered as a div
     expect(r.tabs_tabC().tagName).toBe("DIV");
+  });
+
+  it("supports setting horizontal padding on TabContent", async () => {
+    // Given the TabContent with horizontal padding defined via `contentXss`.
+    // And nested within the ScrollableContent which also has horizontal padding defined via `xss`.
+    const r = await render(
+      <ScrollableParent xss={Css.px1.$}>
+        <ScrollableContent>
+          <TabContent tabs={testTabs} selected={testTabs[0].value} contentXss={Css.px2.$} />
+        </ScrollableContent>
+      </ScrollableParent>,
+      withRouter(),
+    );
+    // Then expect the tab content to have the expected padding based on `contentXss`
+    expect(r.tab_panel()).toHaveStyle("padding-left: 16px");
   });
 });
 
