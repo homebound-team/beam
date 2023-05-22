@@ -32,7 +32,7 @@ export function Pagination(props: PaginationProps) {
   // Create the `1 - 100 of 1000` or `0 of 0`
   const first = pageSize * (pageNumber - 1) + (totalCount ? 1 : 0);
   const last = Math.min(pageSize * pageNumber, totalCount);
-  // Don't both with `0 - 0 of 0`
+  // When no rows, show '0 of 0' instead of '0 - 0 of 0'
   const showLast = totalCount > 0;
 
   // Convert the new page back to whatever format the caller wants
