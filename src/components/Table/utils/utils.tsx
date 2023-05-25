@@ -102,7 +102,7 @@ export function toContent(
         {tooltipEl}
       </>
     );
-  } else if (style.emptyCell && isContentEmpty(content)) {
+  } else if (!isHeader && !isExpandableHeader && style.emptyCell && isContentEmpty(content)) {
     // If the content is empty and the user specified an `emptyCell` node, return that.
     return style.emptyCell;
   }

@@ -243,8 +243,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         // In practice we've not seen any performance issues with this from our "large but
         // not Google spreadsheets" tables.
         const cellCss = {
-          // Adding display flex so we can align content within the cells
-          ...Css.df.$,
+          // Adding `display: flex` so we can align content within the cells, unless it is displayed as a `table`, then use `table-cell`.
+          ...Css.df.if(as === "table").dtc.$,
           // Apply sticky column/cell styles
           ...maybeStickyColumnStyles,
           // Apply any static/all-cell styling
