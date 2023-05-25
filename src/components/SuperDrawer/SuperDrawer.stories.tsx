@@ -273,7 +273,7 @@ export function TableWithPrevNextAndCloseCheck() {
   // Example of triggering the drawer when clicking on a row
   const rowStyles: RowStyles<Row> = {
     header: {},
-    data: { indent: 2, onClick: openRow },
+    data: { onClick: openRow },
   };
 
   return (
@@ -318,7 +318,7 @@ export function TableWithPrevNext() {
   // Example of triggering the drawer when clicking on a row
   const rowStyles: RowStyles<Row> = {
     header: {},
-    data: { indent: 2, onClick: openRow },
+    data: { onClick: openRow },
   };
 
   return (

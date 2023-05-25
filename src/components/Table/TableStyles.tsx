@@ -36,10 +36,6 @@ export interface GridStyle {
   firstCellCss?: Properties;
   /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
   lastCellCss?: Properties;
-  /** Applied to a cell div when `indent: 1` is used. */
-  indentOneCss?: Properties;
-  /** Applied to a cell div when `indent: 2` is used. */
-  indentTwoCss?: Properties;
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
@@ -179,8 +175,6 @@ export interface RowStyle<R extends Kinded> {
   cellCss?: Properties | ((row: R) => Properties);
   /** Renders the cell element, i.e. a link to get whole-row links. */
   renderCell?: RenderCellFn<R>;
-  /** Whether the row should be indented (via a style applied to the 1st cell). */
-  indent?: 1 | 2;
   /** Whether the row should be a link. */
   rowLink?: (row: R) => string;
   /** Fired when the row is clicked, similar to rowLink but for actions that aren't 'go to this link'. */

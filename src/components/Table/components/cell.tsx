@@ -18,8 +18,6 @@ export type GridCellContent = {
   value?: MaybeFn<number | string | Date | boolean | null | undefined>;
   /** The value to use specifically for sorting (i.e. if `value` is used for filtering); defaults to `value`. */
   sortValue?: MaybeFn<number | string | Date | boolean | null | undefined>;
-  /** Whether to indent the cell. */
-  indent?: 1 | 2;
   colspan?: number;
   typeScale?: Typography;
   /** Allows the cell to stay in place when the user scrolls horizontally, i.e. frozen columns. */

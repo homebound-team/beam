@@ -207,19 +207,6 @@ describe("GridTable", () => {
     expect(cell(r, 2, 0)).toHaveStyleRule("color", Palette.Red500);
   });
 
-  it("can indent rows", async () => {
-    // Given the data row is indented
-    const rowStyles: RowStyles<Row> = {
-      header: {},
-      data: { indent: 1 },
-    };
-    const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} rowStyles={rowStyles} />);
-    // Then the data row has the style added
-    expect(cell(r, 1, 0)).toHaveStyleRule("padding-left", "32px");
-    // But the header row does not
-    expect(cell(r, 0, 0)).toHaveStyleRule("padding-left", "8px");
-  });
-
   it("can apply cell-specific styling", async () => {
     // Given a column
     const nameColumn: GridColumn<Row> = {
