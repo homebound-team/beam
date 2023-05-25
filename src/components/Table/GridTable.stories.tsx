@@ -223,14 +223,6 @@ const rows = makeNestedRows(1);
 const rowsWithHeader: GridDataRow<NestedRow>[] = [simpleHeader, ...rows];
 
 export function NestedRows() {
-  const arrowColumn = actionColumn<NestedRow>({
-    header: (data, { row }) => <CollapseToggle row={row} />,
-    parent: (data, { row }) => <CollapseToggle row={row} />,
-    child: (data, { row }) => <CollapseToggle row={row} />,
-    grandChild: () => "",
-    add: () => "",
-    w: "60px",
-  });
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
     parent: (row) => ({
@@ -249,7 +241,7 @@ export function NestedRows() {
   };
   return (
     <GridTable
-      columns={[arrowColumn, nameColumn]}
+      columns={[collapseColumn<NestedRow>(), nameColumn]}
       {...{ rows: rowsWithHeader }}
       sorting={{ on: "client", initial: ["c1", "ASC"] }}
     />
@@ -502,7 +494,7 @@ export const AsTableWithRowLink = newStory(
     const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
     const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
     const rowStyles: RowStyles<Row> = {
-      data: { indent: 2, rowLink: () => "http://homebound.com" },
+      data: { rowLink: () => "http://homebound.com" },
       header: {},
     };
     return (

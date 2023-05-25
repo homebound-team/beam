@@ -17,7 +17,6 @@ import {
   EXPANDABLE_HEADER,
   getAlignment,
   getFirstOrLastCellCss,
-  getIndentationCss,
   getJustification,
   HEADER,
   isGridCellContent,
@@ -243,17 +242,16 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         // In practice we've not seen any performance issues with this from our "large but
         // not Google spreadsheets" tables.
         const cellCss = {
-          // Adding display flex so we can align content within the cells
-          ...Css.df.$,
+          // Adding `display: flex` so we can align content within the cells, unless it is displayed as a `table`, then use `table-cell`.
+          ...Css.df.if(as === "table").dtc.$,
           // Apply sticky column/cell styles
           ...maybeStickyColumnStyles,
           // Apply any static/all-cell styling
           ...style.cellCss,
           // Then override with first/last cell styling
           ...getFirstOrLastCellCss(style, columnIndex, columns),
-          // Then override with per-cell/per-row justification/indentation
+          // Then override with per-cell/per-row justification
           ...justificationCss,
-          ...getIndentationCss(style, rowStyle, columnIndex, maybeContent),
           // Then apply any header-specific override
           ...(isHeader && style.headerCellCss),
           // Then apply any totals-specific override

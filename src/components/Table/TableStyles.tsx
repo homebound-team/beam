@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import { PresentationContextProps, PresentationFieldProps } from "src/components/PresentationContext";
-import { DiscriminateUnion, GridColumn, GridDataRow, GridTableApi, RenderCellFn } from "src/components/Table/index";
-import { Kinded, RenderAs } from "src/components/Table/types";
-import { Css, Palette, Properties } from "src/Css";
+import { DiscriminateUnion, GridDataRow, GridTableApi, RenderCellFn } from "src/components/Table/index";
+import { Kinded } from "src/components/Table/types";
+import { Css, Palette, Properties, Typography } from "src/Css";
 import { safeKeys } from "src/utils";
 
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
@@ -36,10 +36,6 @@ export interface GridStyle {
   firstCellCss?: Properties;
   /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
   lastCellCss?: Properties;
-  /** Applied to a cell div when `indent: 1` is used. */
-  indentOneCss?: Properties;
-  /** Applied to a cell div when `indent: 2` is used. */
-  indentTwoCss?: Properties;
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
@@ -58,16 +54,24 @@ export interface GridStyle {
 
 // If adding a new `GridStyleDef`, ensure if it added to the `defKeys` in the `resolveStyles` function below
 export interface GridStyleDef {
+  /** Changes the height of the rows when `rowHeight: fixed` to provide more space between rows for input fields. */
   inlineEditing?: boolean;
+  /** Adds styling for grouped rows */
   grouped?: boolean;
+  /** 'fixed' height rows do not allow text to wrap. 'flexible' allows for wrapping. Defaults to `flexible` */
   rowHeight?: "fixed" | "flexible";
   /** Enables cells Highlight and hover */
   cellHighlight?: boolean;
+  /** Applies a white background to the whole table, including header and group rows. */
   allWhite?: boolean;
+  /** Whether to apply a border around the whole table */
   bordered?: boolean;
+  /** Whether to show a hover effect on rows. Defaults to true */
   rowHover?: boolean;
   /** Defines the vertical alignment of the content of the cells for the whole table (not including the 'header' rows). Defaults to `center` */
   vAlign?: "top" | "center" | "bottom";
+  /** Defines the Typography for the table body's cells (not the header). This only applies to rows that are not nested/grouped */
+  cellTypography?: Typography;
 }
 
 // Returns a "blessed" style of GridTable
@@ -82,6 +86,7 @@ function memoizedTableStyles() {
       allWhite = false,
       bordered = false,
       vAlign = "center",
+      cellTypography = "xs" as const,
     } = props;
 
     const key = safeKeys(props)
@@ -123,7 +128,8 @@ function memoizedTableStyles() {
           .py0.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
           .addIn("&:not(:last-of-type)", Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$).$,
         cellCss: {
-          ...Css.gray900.xs.bgWhite.ai(alignItems).pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+          ...Css[cellTypography].gray900.bgWhite.ai(alignItems).pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
+            .$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
           ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
           ...(bordered && { "&:first-of-type": Css.bl.bGray200.$, "&:last-of-type": Css.br.bGray200.$ }),
@@ -135,12 +141,13 @@ function memoizedTableStyles() {
           ).$,
           ...(bordered && Css.addIn("& > *", Css.bt.bGray200.$).$),
         },
-        ...(allWhite && {
-          lastRowCss: Css.addIn("& > *:first-of-type", Css.borderRadius("0 0 0 8px").$).addIn(
-            "& > *:last-of-type",
-            Css.borderRadius("0 0 8px 0").$,
-          ).$,
-        }),
+        // Only apply border radius styles to the last row when using the `bordered` style table.
+        lastRowCss: bordered
+          ? Css.addIn("& > *:first-of-type", Css.borderRadius("0 0 0 8px").$).addIn(
+              "& > *:last-of-type",
+              Css.borderRadius("0 0 8px 0").$,
+            ).$
+          : Css.addIn("> *", Css.bsh0.$).$,
         presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
         levels: grouped ? groupedLevels : defaultLevels,
         rowHoverColor: Palette.LightBlue100,
@@ -168,8 +175,6 @@ export interface RowStyle<R extends Kinded> {
   cellCss?: Properties | ((row: R) => Properties);
   /** Renders the cell element, i.e. a link to get whole-row links. */
   renderCell?: RenderCellFn<R>;
-  /** Whether the row should be indented (via a style applied to the 1st cell). */
-  indent?: 1 | 2;
   /** Whether the row should be a link. */
   rowLink?: (row: R) => string;
   /** Fired when the row is clicked, similar to rowLink but for actions that aren't 'go to this link'. */
@@ -177,30 +182,20 @@ export interface RowStyle<R extends Kinded> {
 }
 
 /** Our original table look & feel/style. */
-export const defaultStyle: GridStyle = {
-  rootCss: Css.gray700.$,
-  totalsCellCss: Css.bgWhite.$,
-  betweenRowsCss: Css.bt.bGray400.$,
-  firstNonHeaderRowCss: Css.add({ borderTopStyle: "none" }).$,
-  cellCss: Css.py2.px3.$,
-  firstCellCss: Css.pl1.$,
-  lastCellCss: Css.$,
-  indentOneCss: Css.pl4.$,
-  indentTwoCss: Css.pl7.$,
-  headerCellCss: Css.nowrap.py1.bgGray100.aife.$,
-  firstRowMessageCss: Css.tc.py3.$,
-};
+export const defaultStyle: GridStyle = getTableStyles({});
 
 /** Tightens up the padding of rows, great for rows that have form elements in them. */
 export const condensedStyle: GridStyle = {
-  ...defaultStyle,
-  headerCellCss: Css.bgGray100.tinySb.$,
-  cellCss: Css.aic.sm.py1.px2.$,
-  rootCss: Css.gray700.xs.$,
-  firstRowMessageCss: Css.tc.py2.$,
+  ...getTableStyles({ rowHeight: "fixed" }),
+  firstRowMessageCss: {
+    ...getTableStyles({ rowHeight: "fixed" }).firstRowMessageCss,
+    ...Css.xs.gray900.$,
+  },
 };
 
-/** Renders each row as a card. */
+/** Renders each row as a card.
+ * TODO: Add `cardStyle` option to `getTableStyles` and remove this.
+ * */
 export const cardStyle: GridStyle = {
   ...defaultStyle,
   betweenRowsCss: {},
@@ -218,17 +213,6 @@ export const cardStyle: GridStyle = {
   },
 };
 
-/** GridTable as Table utility to apply <tr> element override styles. */
-export function tableRowStyles(as: RenderAs, column?: GridColumn<any>) {
-  const thWidth = column?.w;
-  return as === "table"
-    ? {
-        ...Css.dtc.$,
-        ...(thWidth ? Css.w(thWidth).$ : {}),
-      }
-    : {};
-}
-
 export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
   const defKeysRecord: Record<keyof GridStyleDef, boolean> = {
     inlineEditing: true,
@@ -239,6 +223,7 @@ export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
     bordered: true,
     rowHover: true,
     vAlign: true,
+    cellTypography: true,
   };
   const keys = safeKeys(style);
   const defKeys = safeKeys(defKeysRecord);

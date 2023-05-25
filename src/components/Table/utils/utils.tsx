@@ -5,7 +5,7 @@ import { ExpandableHeader } from "src/components/Table/components/ExpandableHead
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
 import { GridTableApi } from "src/components/Table/GridTableApi";
-import { GridStyle, RowStyle } from "src/components/Table/TableStyles";
+import { GridStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { Css, Palette, Properties } from "src/Css";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
@@ -102,7 +102,7 @@ export function toContent(
         {tooltipEl}
       </>
     );
-  } else if (style.emptyCell && isContentEmpty(content)) {
+  } else if (!isHeader && !isExpandableHeader && style.emptyCell && isContentEmpty(content)) {
     // If the content is empty and the user specified an `emptyCell` node, return that.
     return style.emptyCell;
   }
@@ -145,22 +145,6 @@ export function applyRowFn<R extends Kinded>(
 export const ASC = "ASC" as const;
 export const DESC = "DESC" as const;
 export const emptyCell: GridCellContent = { content: () => <></>, value: "" };
-
-export function getIndentationCss<R extends Kinded>(
-  style: GridStyle,
-  rowStyle: RowStyle<R> | undefined,
-  columnIndex: number,
-  maybeContent: ReactNode | GridCellContent,
-): Properties {
-  // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
-  const indent = (isGridCellContent(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
-  if (typeof indent === "number" && style.levels !== undefined) {
-    throw new Error(
-      "The indent param is deprecated for new beam fixed & flexible styles, use beamNestedFixedStyle or beamNestedFlexibleStyle",
-    );
-  }
-  return indent === 1 ? style.indentOneCss || {} : indent === 2 ? style.indentTwoCss || {} : {};
-}
 
 export function getFirstOrLastCellCss<R extends Kinded>(
   style: GridStyle,

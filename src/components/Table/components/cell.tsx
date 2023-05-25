@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { navLink } from "src/components/CssReset";
 import { GridTableApi } from "src/components/Table/GridTableApi";
-import { RowStyle, tableRowStyles } from "src/components/Table/TableStyles";
+import { RowStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnWithId, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
 import { Css, Properties, Typography } from "src/Css";
 
@@ -18,8 +18,6 @@ export type GridCellContent = {
   value?: MaybeFn<number | string | Date | boolean | null | undefined>;
   /** The value to use specifically for sorting (i.e. if `value` is used for filtering); defaults to `value`. */
   sortValue?: MaybeFn<number | string | Date | boolean | null | undefined>;
-  /** Whether to indent the cell. */
-  indent?: 1 | 2;
   colspan?: number;
   typeScale?: Typography;
   /** Allows the cell to stay in place when the user scrolls horizontally, i.e. frozen columns. */
@@ -51,12 +49,7 @@ export const defaultRenderFn: (as: RenderAs) => RenderCellFn<any> =
   (as: RenderAs) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
     const Cell = as === "table" ? "td" : "div";
     return (
-      <Cell
-        key={key}
-        css={{ ...css, ...tableRowStyles(as), ...Css.cursor("default").$ }}
-        className={classNames}
-        onClick={onClick}
-      >
+      <Cell key={key} css={{ ...css, ...Css.cursor("default").$ }} className={classNames} onClick={onClick}>
         {content}
       </Cell>
     );
@@ -70,12 +63,7 @@ export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSp
   (column, as, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
     const Cell = as === "table" ? "th" : "div";
     return (
-      <Cell
-        key={key}
-        css={{ ...css, ...tableRowStyles(as, column) }}
-        className={classNames}
-        {...(as === "table" && { colSpan })}
-      >
+      <Cell key={key} css={{ ...css }} className={classNames} {...(as === "table" && { colSpan })}>
         {content}
       </Cell>
     );
@@ -87,7 +75,7 @@ export const rowLinkRenderFn: (as: RenderAs) => RenderCellFn<any> =
     const to = rowStyle!.rowLink!(row);
     if (as === "table") {
       return (
-        <td key={key} css={{ ...css, ...tableRowStyles(as) }} className={classNames}>
+        <td key={key} css={{ ...css }} className={classNames}>
           <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
             {content}
           </Link>
@@ -114,7 +102,7 @@ export const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>) => RenderC
     return (
       <Cell
         {...{ key }}
-        css={{ ...css, ...tableRowStyles(as) }}
+        css={{ ...css }}
         className={classNames}
         onClick={(e) => {
           rowStyle!.onClick!(row, api);
