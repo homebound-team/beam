@@ -45,3 +45,7 @@ export function ColoredChips() {
 export function ChipWithCustomTitle() {
   return <Chip text="Chip text content, hover me" title="Chip has a custom title, different than the content" />;
 }
+
+export function ChipWithCustomColor() {
+  return <Chip text="Chip with custom color" xss={Css.bgLightBlue100.$} />;
+}
