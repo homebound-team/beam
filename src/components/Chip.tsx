@@ -4,7 +4,7 @@ import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
-type ChipType = "caution" | "warning" | "success" | "light" | "dark" | "neutral" | "darkMode";
+export type ChipType = "caution" | "warning" | "success" | "light" | "dark" | "neutral" | "darkMode";
 
 // exporting for using in type prop as constant - this could be moved and become a global list for colors
 export const ChipTypes: Record<ChipType, ChipType> = {
