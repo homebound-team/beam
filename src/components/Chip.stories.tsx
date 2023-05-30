@@ -29,11 +29,12 @@ export function DefaultChip() {
 export function ColoredChips() {
   return (
     <div>
-      <div css={Css.df.gap1.wPx(500).$}>
+      <div css={Css.df.gap1.wPx(550).$}>
         <Chip text="default" />
         <Chip text="caution" type={ChipTypes.caution} />
         <Chip text="warning" type={ChipTypes.warning} />
         <Chip text="success" type={ChipTypes.success} />
+        <Chip text="info" type={ChipTypes.info} />
         <Chip text="light" type={ChipTypes.light} />
         <Chip text="darkMode" type={ChipTypes.darkMode} />
         <Chip text="dark" type={ChipTypes.dark} />
