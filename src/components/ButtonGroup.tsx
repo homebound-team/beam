@@ -1,4 +1,4 @@
-import React, { ReactNode, useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
@@ -17,7 +17,7 @@ export type ButtonGroupButton = {
   icon?: IconProps["icon"];
   iconColor?: IconProps["color"];
   iconInc?: IconProps["inc"];
-  text?: React.ReactNode;
+  text?: ReactNode;
   onClick?: VoidFunction;
   /** Disables the button. Pass a ReactNode to disable the button and show a tooltip */
   disabled?: boolean | ReactNode;
