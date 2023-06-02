@@ -37,13 +37,25 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
   onBlur?: () => void;
   onFocus?: () => void;
   sizeToContent?: boolean;
-  /** The text to show when nothing is selected, i.e. could be "All" for filters. */
+  /**
+   * The text to show when nothing is selected, i.e. could be "All" for filters.
+   *
+   * Unlike `unsetLabel`, this does not add an explicit option for the user to select.
+   */
   nothingSelectedText?: string;
   /** When set the SelectField is expected to be put on a darker background */
   contrast?: boolean;
   /** Placeholder content */
   placeholder?: string;
-  /** Only used for Single Select Fields. If set, prepends an option with a `undefined` value at the top of the list */
+  /**
+   * If set, prepends an option with an `undefined` value at the top of the list to allow
+   * unsetting the field.
+   *
+   * Unlike `nothingSelectedText`, which provides the label for empty value state, but doesn't
+   * add an option for the user to explicitly select the empty state.
+   *
+   * Only available for Single Select Fields.
+   */
   unsetLabel?: string;
   hideErrorMessage?: boolean;
 }
