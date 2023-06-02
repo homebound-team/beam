@@ -2,7 +2,7 @@ import { useId, useResizeObserver } from "@react-aria/utils";
 import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { useFocusRing } from "react-aria";
 import { Icon } from "src/components/Icon";
-import { Css, Palette } from "src/Css";
+import { Css, Padding, Palette, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export interface AccordionProps {
@@ -23,6 +23,8 @@ export interface AccordionProps {
   setExpandedIndex?: Dispatch<SetStateAction<number | undefined>>;
   /** Used by Accordion list. Sets default padding to 0 for nested accordions */
   omitPadding?: boolean;
+  /** Styles overrides for omit padding */
+  xss?: Xss<Padding>;
 }
 
 export function Accordion(props: AccordionProps) {
@@ -37,6 +39,7 @@ export function Accordion(props: AccordionProps) {
     index,
     setExpandedIndex,
     omitPadding = false,
+    xss,
   } = props;
   const testIds = useTestIds(props, "accordion");
   const id = useId();
@@ -86,6 +89,7 @@ export function Accordion(props: AccordionProps) {
           ...Css.df.jcsb.gap2.aic.w100.p2.baseMd.outline("none").addIn(":hover", Css.bgGray100.$).$,
           ...(disabled && Css.gray500.$),
           ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.LightBlue700}`).$),
+          ...(xss && xss),
         }}
         onClick={() => {
           setExpanded(!expanded);

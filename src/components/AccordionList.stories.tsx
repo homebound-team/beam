@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react";
 import { AccordionProps } from "./Accordion";
 import { AccordionList } from "./AccordionList";
+import { Css } from "src/Css";
 
 export default {
   component: AccordionList,
@@ -30,6 +31,7 @@ export function AccordionListWithParentProp() {
   const accordions: AccordionProps[] = [
     {
       title: "First accordion title",
+      xss: Css.pl0.pr0.$,
       children: (
         <table>
           <tbody>
