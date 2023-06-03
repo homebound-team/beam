@@ -17,7 +17,7 @@ export type ButtonGroupButton = {
   icon?: IconProps["icon"];
   iconColor?: IconProps["color"];
   iconInc?: IconProps["inc"];
-  text?: string;
+  text?: ReactNode;
   onClick?: VoidFunction;
   /** Disables the button. Pass a ReactNode to disable the button and show a tooltip */
   disabled?: boolean | ReactNode;
@@ -73,7 +73,7 @@ function GroupButton(props: GroupButtonProps) {
               ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
               ...(icon ? iconStyles[size] : {}),
             }}
-            {...tid[defaultTestId(text ?? icon ?? "button")]}
+            {...tid[defaultTestId((typeof text === "string" && text) || icon || "button")]}
           >
             {icon && (
               <Icon xss={Css.if(!!text).mrPx(4).$} icon={icon} color={disabled ? undefined : iconColor} inc={iconInc} />
