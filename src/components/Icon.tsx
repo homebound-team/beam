@@ -68,6 +68,7 @@ export const Icons = {
       <path d="M14 20C13.4477 20 13 19.5523 13 19L13 17C13 16.4477 13.4477 16 14 16L16 16C16.5523 16 17 16.4477 17 17L17 19C17 19.5523 16.5523 20 16 20L14 20Z" />
     </>
   ),
+  move: <path d="M18 11H13V6H16L12 2L8 6H11V11H6V8L2 12L6 16V13H11V18H8L12 22L16 18H13V13H18V16L22 12L18 8V11Z" />,
   x: (
     <path d="M16.192 6.34399L11.949 10.586L7.70697 6.34399L6.29297 7.75799L10.535 12L6.29297 16.242L7.70697 17.656L11.949 13.414L16.192 17.656L17.606 16.242L13.364 12L17.606 7.75799L16.192 6.34399Z" />
   ),
@@ -486,45 +487,45 @@ export const Icons = {
   ),
   faucet: (
     <>
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M19 2L11 2V1L19 1V2Z" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M14.5 7L14.5 2L15.5 2L15.5 7L14.5 7Z" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M6 11H22V8H3V15H6V11ZM7 16H2V7H23V12H7V16Z" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M19 2L11 2V1L19 1V2Z" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M14.5 7L14.5 2L15.5 2L15.5 7L14.5 7Z" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M6 11H22V8H3V15H6V11ZM7 16H2V7H23V12H7V16Z" />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M5.24335 21.7762C5.35823 21.6723 5.5 21.4626 5.5 21C5.5 20.8857 5.4543 20.6946 5.30831 20.4252C5.16704 20.1646 4.96603 19.8932 4.74404 19.6368C4.66213 19.5423 4.5798 19.4525 4.5 19.369C4.4202 19.4525 4.33787 19.5423 4.25596 19.6368C4.03397 19.8932 3.83296 20.1646 3.69169 20.4252C3.5457 20.6946 3.5 20.8857 3.5 21C3.5 21.4626 3.64177 21.6723 3.75665 21.7762C3.88852 21.8955 4.12535 22 4.5 22C4.87465 22 5.11148 21.8955 5.24335 21.7762ZM4.5 23C5.60457 23 6.5 22.3807 6.5 21C6.5 19.6193 4.5 18 4.5 18C4.5 18 2.5 19.6193 2.5 21C2.5 22.3807 3.39543 23 4.5 23Z"
       />
     </>
   ),
   bed: (
     <>
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M22 12H2V18H22V12ZM1 11V19H23V11H1Z" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M20 2H4V11H20V2ZM3 1V12H21V1H3Z" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M15 7H9V11H15V7ZM8 6V12H16V6H8Z" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M3.5 23V19H4.5V23H3.5Z" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M19.5 23V19H20.5V23H19.5Z" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M22 12H2V18H22V12ZM1 11V19H23V11H1Z" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M20 2H4V11H20V2ZM3 1V12H21V1H3Z" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M15 7H9V11H15V7ZM8 6V12H16V6H8Z" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M3.5 23V19H4.5V23H3.5Z" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M19.5 23V19H20.5V23H19.5Z" />
     </>
   ),
   sqFeet: (
     <>
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M0.958374 0.958328H6.95837V1.95833H1.95837V6.95833H0.958374V0.958328Z"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M0.958374 23.0417L0.958374 17.0417L1.95837 17.0417L1.95837 22.0417L6.95837 22.0417L6.95837 23.0417L0.958374 23.0417Z"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M23.0416 0.958328L23.0416 6.95833L22.0416 6.95833L22.0416 1.95833L17.0416 1.95833L17.0416 0.958328L23.0416 0.958328Z"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M23.0416 23.0417L17.0416 23.0417L17.0416 22.0417L22.0416 22.0417L22.0416 17.0417L23.0416 17.0417L23.0416 23.0417Z"
       />
     </>
@@ -673,8 +674,8 @@ export const Icons = {
   undoCircle: (
     <>
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M-0.000124931 11.9995C-0.000124931 5.3827 5.35788 -0.000488281 11.9435 -0.000488281C18.5914 -0.000488281 23.9999 5.3827 23.9999 11.9995C23.9999 18.6163 18.6166 23.9994 11.9999 23.9994C5.38308 23.9994 -0.000124931 18.6163 -0.000124931 11.9995ZM2.39988 11.9995C2.39988 17.2926 6.70667 21.5995 11.9999 21.5995C17.2931 21.5995 21.5999 17.2926 21.5999 11.9995C21.5999 6.70631 17.2691 2.39951 11.9435 2.39951C6.68028 2.39951 2.39988 6.70631 2.39988 11.9995ZM14.3997 10.7995H9.59969V12.7994L5.59968 9.59941L9.59969 6.39941V8.79941H14.3997C16.6054 8.79941 18.3997 10.5938 18.3997 12.7994C18.3997 15.005 16.6054 16.7994 14.3997 16.7994H11.9997V14.8795H14.3997C15.723 14.8795 16.5565 14.1227 16.5565 12.7994C16.5565 11.4762 15.723 10.7995 14.3997 10.7995Z"
       />
     </>
