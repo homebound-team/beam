@@ -7,7 +7,7 @@ import { useTestIds } from "src/utils";
 
 type AccordionXss = Xss<Padding>;
 
-export interface AccordionProps<X> {
+export interface AccordionProps<X = AccordionXss> {
   title: ReactNode;
   children: ReactNode;
   disabled?: boolean;
