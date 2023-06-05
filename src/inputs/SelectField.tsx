@@ -6,6 +6,11 @@ export interface SelectFieldProps<O, V extends Value>
   extends Omit<ComboBoxBaseProps<O, V>, "values" | "onSelect" | "multiselect"> {
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   value: V | undefined;
+  /**
+   * Called when a value is selected, or `undefined` if `unsetLabel` is being used.
+   *
+   * Ideally callers that didn't pass `unsetLabel` would not have to handle the ` | undefined` here.
+   */
   onSelect: (value: V | undefined, opt: O | undefined) => void;
 }
 
@@ -39,6 +44,7 @@ export function SelectField<O, V extends Value>(
       getOptionValue={getOptionValue}
       values={[value]}
       onSelect={(values, options) => {
+        // If the user used `unsetLabel`, then values will be `[undefined]` and options `[unsetOption]`
         if (values.length > 0 && options.length > 0) {
           const option = options[0];
           onSelect(values[0], option === unsetOption ? undefined : option);
