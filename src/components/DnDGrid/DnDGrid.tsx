@@ -73,11 +73,7 @@ export function DnDGrid(props: DnDGridProps) {
           const gridItems = getGridItems();
           const lastGridItem = gridItems[gridItems.length - 1];
           // If there is another sibling (meaning there is a non-`GridItem` element after the last `gridItem`), then insert before that.
-          if (lastGridItem.nextSibling) {
-            gridEl.current.insertBefore(dragEl.current, lastGridItem.nextSibling);
-          } else {
-            gridEl.current.appendChild(dragEl.current);
-          }
+          gridEl.current.insertBefore(dragEl.current, lastGridItem.nextSibling);
         } else {
           // If this GridItem was not the last item in the grid, then we need to insert it before the next GridItem.
           const nextSiblingIndex = initialOrder.current[initialIndex + 1];
@@ -114,12 +110,18 @@ export function DnDGrid(props: DnDGridProps) {
       const target = maybeTarget instanceof HTMLElement ? maybeTarget?.closest(`[${gridItemIdKey}]`) : undefined;
 
       // Figure out if we need to move the placeholder element based on the `dragEl`'s new position.
-      if (target instanceof HTMLElement) {
-        if (dragEl.current && target && target !== dragEl.current && target.hasAttribute(gridItemIdKey)) {
-          const targetPos = target.getBoundingClientRect();
-          const isHalfwayPassedTarget =
-            (clientY - targetPos.top) / (targetPos.bottom - targetPos.top) > 0.5 ||
-            (clientX - targetPos.left) / (targetPos.right - targetPos.left) > 0.5;
+      if (target instanceof HTMLElement && target !== cloneEl.current && target !== dragEl.current) {
+        const targetPos = target.getBoundingClientRect();
+        const isHalfwayPassedTarget =
+          (clientY - targetPos.top) / (targetPos.bottom - targetPos.top) > 0.5 ||
+          (clientX - targetPos.left) / (targetPos.right - targetPos.left) > 0.5;
+
+        // Only insert the placeholder if it's not already in the correct position.
+        const shouldInsert =
+          (isHalfwayPassedTarget && target.nextSibling !== cloneEl.current) ||
+          (!isHalfwayPassedTarget && target.previousSibling !== cloneEl.current);
+
+        if (shouldInsert) {
           gridEl.current.insertBefore(cloneEl.current, isHalfwayPassedTarget ? target.nextSibling : target);
         }
       }
@@ -129,7 +131,6 @@ export function DnDGrid(props: DnDGridProps) {
   /** Handles the initiation of the dragging process */
   const onDragStart = useCallback(
     (e: MouseOrTouchEvent) => {
-      e.preventDefault();
       if (!reorderViaKeyboard.current && dragEl.current && gridEl.current) {
         initReorder();
 
@@ -142,7 +143,7 @@ export function DnDGrid(props: DnDGridProps) {
         transformFrom.current = { x: clientX - rect.left, y: clientY - rect.top };
 
         // Duplicate the draggable element as a placeholder to show as a drop target
-        cloneEl.current = dragEl.current?.cloneNode() as HTMLElement;
+        cloneEl.current = dragEl.current.cloneNode() as HTMLElement;
         cloneEl.current?.setAttribute(
           "style",
           `border-width: 2px; border-color: ${Palette.Gray400}; border-style: dashed; width:${rect.width}px; height:${rect.height}px;`,
@@ -153,8 +154,8 @@ export function DnDGrid(props: DnDGridProps) {
         cloneEl.current.removeAttribute("id");
         // Ensure this element does not close the `active` styles as well.
         cloneEl.current?.classList.remove(activeGridItemClass);
-        // And finally place it in the DOM in front of the original element.
-        gridEl.current.insertBefore(cloneEl.current, dragEl.current);
+        // And finally place it in the DOM after the element being dragged. If there is no `nextSibling`, then it is appended to the grid element.
+        gridEl.current.insertBefore(cloneEl.current, dragEl.current.nextSibling);
 
         // Apply styles to the actual element to make it look like it's being dragged.
         // This will remove it from the normal flow of the page, allowing the clone above to take its place.
@@ -209,25 +210,35 @@ export function DnDGrid(props: DnDGridProps) {
         if (isSpaceKey && !reorderViaKeyboard.current) {
           e.preventDefault();
           reorderViaKeyboard.current = true;
+          document.addEventListener("pointerdown", cancelReorder);
           initReorder();
           return;
         }
 
+        if (!reorderViaKeyboard.current) {
+          return;
+        }
+
         const isEnterKey = e.key === "Enter";
+        const isTabKey = e.key === "Tab";
         // Use Enter or Space keys as a signal to commit the move
-        if ((isEnterKey || isSpaceKey) && reorderViaKeyboard.current) {
-          e.preventDefault();
+        if (isEnterKey || isSpaceKey || isTabKey) {
+          if (!isTabKey) {
+            e.preventDefault();
+          }
           commitReorder();
           if (isEnterKey) {
             moveHandle.blur();
           }
+          document.removeEventListener("pointerdown", cancelReorder);
           return;
         }
 
         // Use the Escape key to signal canceling the move
-        if (e.key === "Escape" && dragEl.current.classList.contains(activeGridItemClass)) {
+        if (e.key === "Escape") {
           e.preventDefault();
           cancelReorder();
+          document.removeEventListener("pointerdown", cancelReorder);
           return;
         }
 
@@ -235,7 +246,7 @@ export function DnDGrid(props: DnDGridProps) {
         const movingLeft = ["ArrowLeft", "ArrowUp"].includes(e.key);
         const movingRight = ["ArrowRight", "ArrowDown"].includes(e.key);
 
-        if (dragEl.current.classList.contains(activeGridItemClass) && (movingLeft || movingRight)) {
+        if (movingLeft || movingRight) {
           e.preventDefault();
 
           // Give the moveEl an "active" state to help identify which element is being moved
@@ -247,12 +258,9 @@ export function DnDGrid(props: DnDGridProps) {
 
           const newIndex = movingLeft ? currentIndex - 1 : currentIndex + 2;
           // If we are at the last GridItem, then check to see if there are any elements after it that may not be sortable, but we still want to insert before them.
-          const nextEl = gridItems[newIndex] ?? gridItems[gridItems.length - 1].nextSibling;
-          if (nextEl && ((movingLeft && currentIndex !== 0) || !movingLeft)) {
-            gridEl.current.insertBefore(dragEl.current, nextEl);
-          } else if (movingRight && currentIndex !== gridItems.length - 1) {
-            // if this is not the last element already, and we're moving to the right, then append to the end.
-            gridEl.current.appendChild(dragEl.current);
+          const insertBeforeElement = gridItems[newIndex] ?? gridItems[gridItems.length - 1].nextSibling;
+          if ((movingLeft && currentIndex > 0) || (movingRight && currentIndex < gridItems.length - 1)) {
+            gridEl.current.insertBefore(dragEl.current, insertBeforeElement);
           }
           // Put the focus back on the move handle in case it was moved
           moveHandle.focus();
@@ -297,7 +305,6 @@ type GridStyles = Pick<
 >;
 
 export const gridItemIdKey = "dndgrid-itemid";
-export const gridHandleKey = "dndgrid-draghandle";
 const gridCloneKey = "dndgrid-clone";
 const activeGridItemClass = "dndgrid-active";
 

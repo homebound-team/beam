@@ -1,5 +1,5 @@
 import React, { KeyboardEvent, useMemo } from "react";
-import { gridHandleKey, gridItemIdKey } from "src/components/DnDGrid/DnDGrid";
+import { gridItemIdKey } from "src/components/DnDGrid/DnDGrid";
 import { useDnDGridContext } from "src/components/DnDGrid/DnDGridContext";
 
 export interface useDnDGridItemProps {
@@ -28,7 +28,6 @@ export function useDnDGridItem(props: useDnDGridItemProps) {
           initDraggable();
           onDragHandleKeyDown(e);
         },
-        [gridHandleKey]: "true",
       },
     };
   }, [dragEl, id, itemRef]);
