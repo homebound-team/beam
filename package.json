@@ -33,7 +33,6 @@
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\""
   },
   "dependencies": {
-    "@homebound/activesupport": "^1.1.1",
     "@homebound/form-state": "^2.17.0",
     "@internationalized/number": "^3.0.3",
     "@popperjs/core": "^2.11.6",
