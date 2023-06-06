@@ -7,6 +7,7 @@ export interface useDnDGridItemProps {
   itemRef: React.RefObject<HTMLElement>;
 }
 
+/** Provides props for a GridItem to be draggable */
 export function useDnDGridItem(props: useDnDGridItemProps) {
   const { id, itemRef } = props;
   const { dragEl, onDragHandleKeyDown } = useDnDGridContext();

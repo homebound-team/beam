@@ -9,6 +9,7 @@ export interface DnDGridItemHandleProps {
   color?: Palette;
 }
 
+/** Provides a specific handle element for dragging a GridItem. Includes handling behaviors and interactions */
 export function DnDGridItemHandle(props: DnDGridItemHandleProps) {
   const { dragHandleProps, icon = "move", compact = false, color } = props;
   const { focusProps, isFocusVisible } = useFocusRing();

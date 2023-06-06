@@ -1,12 +1,13 @@
+import { Meta } from "@storybook/react";
 import { useRef } from "react";
-import { Css } from "src";
+import { Css, DnDGridProps } from "src";
 import { DnDGrid } from "src/components/DnDGrid/DnDGrid";
 import { DnDGridItemHandle } from "src/components/DnDGrid/DnDGridItemHandle";
 import { useDnDGridItem } from "src/components/DnDGrid/useDnDGridItem";
 
 export default {
-  title: "DragAndDropGrid",
-};
+  component: DnDGrid,
+} as Meta<DnDGridProps>;
 
 export function Example() {
   const gridItems: GridItem[] = [

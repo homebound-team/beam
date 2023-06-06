@@ -3161,6 +3161,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@homebound/activesupport@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@homebound/activesupport@npm:1.1.1"
+  checksum: 70d04ecbe661ae13a1ac530e0103c4eb36a6472d203dcc836842abd2bf26b7288e954d802dbaaad9cdc218283d8da64deaf3927f57ed67dbb00b1fc05e034c1b
+  languageName: node
+  linkType: hard
+
 "@homebound/beam@workspace:.":
   version: 0.0.0-use.local
   resolution: "@homebound/beam@workspace:."
@@ -3169,6 +3176,7 @@ __metadata:
     "@emotion/babel-preset-css-prop": ^11.10.0
     "@emotion/jest": ^11.10.5
     "@emotion/react": ^11.10.6
+    "@homebound/activesupport": ^1.1.1
     "@homebound/eslint-config": 1.6.1
     "@homebound/form-state": ^2.17.0
     "@homebound/rtl-react-router-utils": 1.0.3
