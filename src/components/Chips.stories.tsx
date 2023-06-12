@@ -44,3 +44,19 @@ export function ChipsWithCustomTitles() {
   ];
   return <Chips values={customChips} />;
 }
+
+export function ChipsWithCompactVariant() {
+  return (
+    <>
+      <h1 css={Css.mt3.$}>Chips with compact variant</h1>
+      <div css={Css.wPx(300).ba.$}>
+        <Chips values={["First Last", "Second Last", "Third Last", "Fourth Last"]} compact />
+      </div>
+
+      <h1 css={Css.mt3.$}>Chips without compact</h1>
+      <div css={Css.wPx(300).ba.$}>
+        <Chips values={["First Last", "Second Last", "Third Last", "Fourth Last"]} />
+      </div>
+    </>
+  );
+}

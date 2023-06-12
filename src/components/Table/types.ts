@@ -68,7 +68,7 @@ export type GridColumn<R extends Kinded> = {
   sticky?: "left" | "right";
   /** Prevent column from supporting RowStyle.onClick/rowLink in order to avoid nested interactivity. Defaults to true */
   wrapAction?: false;
-  /** Used as a signal to defer adding the 'indent' styling */
+  /** Used as a signal to defer adding the row's level indentation styling */
   isAction?: true;
   /** Column id that will be used to generate an unique identifier for every row cell */
   id?: string;

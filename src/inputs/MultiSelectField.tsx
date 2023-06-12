@@ -29,33 +29,7 @@ export function MultiSelectField<O, V extends Value>(
   const {
     getOptionValue = (opt: O) => (opt as any).id, // if unset, assume O implements HasId
     getOptionLabel = (opt: O) => (opt as any).name, // if unset, assume O implements HasName
-    options,
-    onSelect,
-    values,
     ...otherProps
   } = props;
-
-  return (
-    <ComboBoxBase
-      multiselect
-      {...otherProps}
-      options={options}
-      getOptionLabel={getOptionLabel}
-      getOptionValue={getOptionValue}
-      values={values}
-      onSelect={(values) => {
-        const [selectedValues, selectedOptions] = options
-          .filter((o) => values.includes(getOptionValue(o)))
-          .reduce(
-            (acc, o) => {
-              acc[0].push(getOptionValue(o));
-              acc[1].push(o);
-              return acc;
-            },
-            [[] as V[], [] as O[]],
-          );
-        onSelect(selectedValues, selectedOptions);
-      }}
-    />
-  );
+  return <ComboBoxBase multiselect getOptionLabel={getOptionLabel} getOptionValue={getOptionValue} {...otherProps} />;
 }

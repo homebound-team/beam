@@ -85,3 +85,7 @@ export function isPromise(obj: any | Promise<any>): obj is Promise<any> {
 export function isFunction(f: any): f is Function {
   return typeof f === "function";
 }
+
+export function isDefined<T extends any>(param: T | undefined | null): param is T {
+  return param !== null && param !== undefined;
+}

@@ -51,6 +51,9 @@ export const Icon = (props: IconProps) => {
     "kanban",
     "expand",
     "collapse",
+    "undoCircle",
+    "drag",
+    "move",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
@@ -121,6 +124,8 @@ export const Icon = (props: IconProps) => {
     "faucet",
     "bed",
     "sqFeet",
+    "ruler",
+    "palette",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",

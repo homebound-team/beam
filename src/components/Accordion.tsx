@@ -2,10 +2,12 @@ import { useId, useResizeObserver } from "@react-aria/utils";
 import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { useFocusRing } from "react-aria";
 import { Icon } from "src/components/Icon";
-import { Css, Palette } from "src/Css";
+import { Css, Only, Padding, Palette, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
-export interface AccordionProps {
+type AccordionXss = Xss<Padding>;
+
+export interface AccordionProps<X = AccordionXss> {
   title: ReactNode;
   children: ReactNode;
   disabled?: boolean;
@@ -23,9 +25,11 @@ export interface AccordionProps {
   setExpandedIndex?: Dispatch<SetStateAction<number | undefined>>;
   /** Used by Accordion list. Sets default padding to 0 for nested accordions */
   omitPadding?: boolean;
+  /** Styles overrides for padding */
+  xss?: X;
 }
 
-export function Accordion(props: AccordionProps) {
+export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps<X>) {
   const {
     title,
     children,
@@ -37,6 +41,7 @@ export function Accordion(props: AccordionProps) {
     index,
     setExpandedIndex,
     omitPadding = false,
+    xss,
   } = props;
   const testIds = useTestIds(props, "accordion");
   const id = useId();
@@ -86,6 +91,7 @@ export function Accordion(props: AccordionProps) {
           ...Css.df.jcsb.gap2.aic.w100.p2.baseMd.outline("none").addIn(":hover", Css.bgGray100.$).$,
           ...(disabled && Css.gray500.$),
           ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.LightBlue700}`).$),
+          ...xss,
         }}
         onClick={() => {
           setExpanded(!expanded);
