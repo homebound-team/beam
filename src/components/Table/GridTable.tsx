@@ -11,6 +11,7 @@ import {
   GridColumn,
   GridColumnWithId,
   GridTableXss,
+  InfiniteScroll,
   Kinded,
   ParentChildrenTuple,
   RenderAs,
@@ -157,6 +158,13 @@ export interface GridTableProps<R extends Kinded, X> {
    * This is beneficial when looking at the same table, but of a different subject (i.e. Project A's PreCon Schedule vs Project A's Construction schedule)
    */
   visibleColumnsStorageKey?: string;
+  /**
+   * Infinite scroll is only supported with `as=virtual` mode
+   *
+   ** `onEndReached` will be called when the user scrolls to the end of the list with the last item index as an argument.
+   ** `endOffsetPx` is the number of pixels from the bottom of the list to eagerly trigger `onEndReached`. The default is is 500px.
+   */
+  infiniteScroll?: InfiniteScroll;
 }
 
 /**
@@ -196,6 +204,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     activeRowId,
     activeCellId,
     visibleColumnsStorageKey,
+    infiniteScroll,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
@@ -414,6 +423,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           virtuosoRef,
           tableHeadRows,
           stickyOffset,
+          infiniteScroll,
         )}
       </PresentationProvider>
     </TableStateContext.Provider>
@@ -439,6 +449,7 @@ function renderDiv<R extends Kinded>(
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
   tableHeadRows: RowTuple<R>[],
   stickyOffset: number,
+  _infiniteScroll?: InfiniteScroll,
 ): ReactElement {
   return (
     <div
@@ -496,6 +507,7 @@ function renderTable<R extends Kinded>(
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
   tableHeadRows: RowTuple<R>[],
   stickyOffset: number,
+  _infiniteScroll?: InfiniteScroll,
 ): ReactElement {
   return (
     <table
@@ -561,6 +573,7 @@ function renderVirtual<R extends Kinded>(
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
   tableHeadRows: RowTuple<R>[],
   _stickyOffset: number,
+  infiniteScroll?: InfiniteScroll,
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
@@ -615,6 +628,18 @@ function renderVirtual<R extends Kinded>(
         return visibleDataRows[index][1];
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length}
+      // When implementing infinite scroll, default the bottom `increaseViewportBy` to 500px. This creates the "infinite"
+      // effect such that the next page of data is (hopefully) loaded before the user reaches the true bottom
+      // Spreading these props due to virtuoso erroring when `increaseViewportBy` is undefined
+      {...(infiniteScroll
+        ? {
+            increaseViewportBy: {
+              bottom: infiniteScroll.endOffsetPx ?? 500,
+              top: 0,
+            },
+            endReached: infiniteScroll.onEndReached,
+          }
+        : {})}
     />
   );
 }

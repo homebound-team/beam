@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { observable } from "mobx";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   actionColumn,
   Button,
@@ -199,6 +199,44 @@ export function VirtualFilteringWithFilterablePin() {
           filter={filter}
           stickyHeader={true}
           rows={rows}
+        />
+      </div>
+    </div>
+  );
+}
+
+export function InfiniteScroll() {
+  const loadRows = useCallback((offset: number) => {
+    return zeroTo(50).map((i) => ({
+      kind: "data" as const,
+      id: String(i + offset),
+      data: { name: `row ${i + offset}`, value: i + offset },
+    }));
+  }, []);
+
+  const [data, setData] = useState<GridDataRow<Row>[]>(loadRows(0));
+  const rows: GridDataRow<Row>[] = useMemo(() => [simpleHeader, ...data], [data]);
+  const columns: GridColumn<Row>[] = useMemo(
+    () => [
+      { header: "Name", data: ({ name }) => name, w: "200px" },
+      { header: "Value", data: ({ value }) => value },
+    ],
+    [],
+  );
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div css={Css.fg1.$}>
+        <GridTable
+          as="virtual"
+          columns={columns}
+          sorting={{ on: "client", initial: ["id", "ASC"] }}
+          stickyHeader={true}
+          rows={rows}
+          infiniteScroll={{
+            onEndReached(index) {
+              setData([...data, ...loadRows(index)]);
+            },
+          }}
         />
       </div>
     </div>
