@@ -7,7 +7,6 @@ import { withDimensions, withRouter } from "src/utils/sb";
 
 export default {
   component: Menu,
-  title: "Workspace/Components/Menu",
   decorators: [withDimensions(), withRouter()],
   parameters: {
     design: {
@@ -17,14 +16,13 @@ export default {
   },
 } as Meta;
 
-
 export function BasicMenuItems() {
   return (
     <ButtonMenu
       defaultOpen
       trigger={{ label: "Menu Trigger" }}
       items={[
-        { label: "Menu item 1", onClick: "/"},
+        { label: "Menu item 1", onClick: "/" },
         { label: "Menu item 2", onClick: "https://google.com" },
         { label: "Menu item 3", onClick: noop, disabled: true },
         { label: "Menu item 4", onClick: noop },

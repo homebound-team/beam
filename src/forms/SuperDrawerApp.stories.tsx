@@ -3,6 +3,7 @@ import { Meta } from "@storybook/react";
 import { useEffect } from "react";
 import { Button, SuperDrawerContent, useSuperDrawer } from "src/components";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
+import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { Css } from "src/Css";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { BoundDateField } from "./BoundDateField";
@@ -21,7 +22,7 @@ import { AuthorInput } from "./formStateDomain";
  * - When filling the form and successfully clicking "save", closing the form
  * does not show a confirmation message.
  */
-export default { title: "Workspace/Forms/Super Drawer App", decorators: [withBeamDecorator, withDimensions()] } as Meta;
+export default { component: SuperDrawer, decorators: [withBeamDecorator, withDimensions()] } as Meta;
 
 export function SuperDrawerApp() {
   const { openInDrawer } = useSuperDrawer();

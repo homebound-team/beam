@@ -7,7 +7,6 @@ import { Icon, Icons } from "./Icon";
 import { getNavLinkStyles, NavLink, NavLinkProps } from "./NavLink";
 
 export default {
-  title: "Workspace/Components/NavLinks",
   component: NavLink,
   args: {
     href: "",

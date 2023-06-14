@@ -38,7 +38,6 @@ import { checkboxFilter } from "./CheckboxFilter";
 
 export default {
   component: Filters,
-  title: "Workspace/Components/Filter",
   decorators: [withDimensions(), withRouter(), withBeamDecorator],
   parameters: {
     layout: "fullscreen",

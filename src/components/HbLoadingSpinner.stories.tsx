@@ -3,7 +3,6 @@ import { HbLoadingSpinner } from "./HbLoadingSpinner";
 
 export default {
   component: HbLoadingSpinner,
-  title: "Workspace/Components/Homebound Loading Spinner",
 } as Meta;
 
 export function DefaultSpinner() {

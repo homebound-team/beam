@@ -10,7 +10,6 @@ interface ToastStoryProps extends Omit<ToastNoticeProps, "action"> {}
 
 export default {
   component: Toast,
-  title: "Workspace/Components/Toast",
   decorators: [withBeamDecorator],
   args: {
     message: "This is a success message",

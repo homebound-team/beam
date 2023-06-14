@@ -3,7 +3,6 @@ import { Css } from "src/Css";
 import { Tag } from "./Tag";
 
 export default {
-  title: "Workspace/Components/Tags",
   component: Tag,
   parameters: {
     design: {

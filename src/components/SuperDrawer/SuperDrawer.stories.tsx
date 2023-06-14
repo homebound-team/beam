@@ -25,7 +25,6 @@ import { SuperDrawer as SuperDrawerComponent } from "./SuperDrawer";
 import { SuperDrawerWidth } from "./utils";
 
 export default {
-  title: "Workspace/Components/Super Drawer",
   component: SuperDrawerComponent,
   decorators: [withBeamDecorator, withDimensions()],
   parameters: {

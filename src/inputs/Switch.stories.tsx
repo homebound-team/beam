@@ -13,7 +13,6 @@ import { SwitchGroup, SwitchGroupProps } from "./SwitchGroup";
 
 export default {
   component: SwitchComponent,
-  title: "Workspace/Inputs/Switch",
   parameters: {
     design: {
       type: "figma",

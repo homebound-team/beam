@@ -3,7 +3,6 @@ import { ScrollShadows } from "src/components/ScrollShadows";
 
 export default {
   component: ScrollShadows,
-  title: "Components/ScrollShadows",
 };
 
 export function Examples() {

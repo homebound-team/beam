@@ -7,7 +7,6 @@ import { noop } from "src/utils";
 
 export default {
   component: Stepper,
-  title: "Workspace/Components/Stepper",
   parameters: {
     design: {
       type: "figma",

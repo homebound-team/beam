@@ -4,7 +4,6 @@ import { FormLines, StaticField } from "..";
 import { Pagination } from "./Pagination";
 
 export default {
-  title: "Workspace/Components/Pagination",
   component: Pagination,
   parameters: {
     // To better view the icon hover state

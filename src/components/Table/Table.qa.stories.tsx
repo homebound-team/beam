@@ -45,7 +45,6 @@ interface TableStoryProps extends GridTableProps<any, any> {
 
 export default {
   component: GridTable,
-  title: "Design QA/Table",
   parameters: {
     layout: "fullscreen",
     controls: {

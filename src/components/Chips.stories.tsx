@@ -5,7 +5,6 @@ import { Css } from "src/Css";
 
 export default {
   component: Chips,
-  title: "Workspace/Components/Chips",
   parameters: {
     design: {
       type: "figma",

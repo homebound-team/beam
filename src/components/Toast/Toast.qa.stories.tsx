@@ -7,7 +7,6 @@ import { useToast } from "./useToast";
 
 export default {
   component: Toast,
-  title: "Design QA/Toast",
   parameters: {
     layout: "fullscreen",
   },

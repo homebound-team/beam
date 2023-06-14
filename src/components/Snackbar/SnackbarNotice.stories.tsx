@@ -7,7 +7,6 @@ import { withBeamDecorator } from "src/utils/sb";
 
 export default {
   component: SnackbarNotice,
-  title: "Workspace/Components/Snackbar",
   decorators: [withBeamDecorator],
 } as Meta;
 

@@ -21,7 +21,6 @@ import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils
 
 export default {
   component: ScrollableParent,
-  title: "Workspace/Components/Layout",
   decorators: [withBeamDecorator, withDimensions(), withRouter()],
   parameters: { layout: "fullscreen" },
 } as Meta;

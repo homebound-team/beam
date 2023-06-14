@@ -16,7 +16,6 @@ import {
 
 export default {
   component: RadioGroupField,
-  title: "Workspace/Inputs/Radio Group",
   parameters: {
     design: {
       type: "figma",

@@ -6,7 +6,6 @@ import { ChipTextField } from "src/inputs/ChipTextField";
 
 export default {
   component: ChipTextField,
-  title: "Workspace/Inputs/ChipTextField",
   parameters: {
     design: {
       type: "figma",

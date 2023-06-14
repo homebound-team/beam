@@ -8,7 +8,6 @@ import { DateRange } from "src/types";
 
 export default {
   component: DateRangePicker,
-  title: "Workspace/Components/DateRangePicker",
   parameters: {
     design: {
       type: "figma",

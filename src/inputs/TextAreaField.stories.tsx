@@ -8,7 +8,6 @@ import { FormLines } from "..";
 
 export default {
   component: TextAreaField,
-  title: "Workspace/Inputs/Text Area",
   parameters: {
     design: {
       type: "figma",

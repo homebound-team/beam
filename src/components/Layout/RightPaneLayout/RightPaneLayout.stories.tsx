@@ -15,7 +15,6 @@ import { useRightPane } from "./useRightPane";
 
 export default {
   component: RightPaneLayout,
-  title: "Workspace/Components/Layout/RightPaneLayout",
   decorators: [withBeamDecorator],
 } as Meta;
 

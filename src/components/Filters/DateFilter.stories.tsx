@@ -6,7 +6,6 @@ import { jan2 } from "src/forms/formStateDomain";
 
 export default {
   component: Filters,
-  title: "Workspace/Components/Filter/DateFilters",
   decorators: [],
   parameters: {
     design: {

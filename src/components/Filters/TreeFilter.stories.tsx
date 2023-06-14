@@ -7,7 +7,6 @@ import { zeroTo } from "src/utils/sb";
 
 export default {
   component: Filters,
-  title: "Workspace/Components/Filter/TreeFilters",
 } as Meta;
 
 export function TreeFilterInPage() {
