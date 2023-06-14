@@ -9,9 +9,10 @@ export interface AvatarProps {
   name?: string;
   size?: AvatarSize;
   showName?: boolean;
+  disableTooltip?: boolean;
 }
 
-export function Avatar({ src, name, size = "md", showName = false, ...others }: AvatarProps) {
+export function Avatar({ src, name, size = "md", showName = false, disableTooltip = false, ...others }: AvatarProps) {
   const tid = useTestIds(others, "avatar");
   const px = sizeToPixel[size];
   const [showFallback, setShowFallback] = useState(src === undefined);
@@ -39,7 +40,7 @@ export function Avatar({ src, name, size = "md", showName = false, ...others }: 
       <span css={Css[sizeToTypeScale[size]].$}>{name}</span>
     </div>
   ) : (
-    maybeTooltip({ title: name, children: img, placement: "top" })
+    maybeTooltip({ title: disableTooltip ? undefined : name, children: img, placement: "top" })
   );
 }
 

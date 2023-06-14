@@ -1,8 +1,8 @@
 import { AriaButtonProps } from "@react-types/button";
 import { RefObject, useMemo } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
+import { maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Avatar, AvatarProps } from "src/components/Avatar/Avatar";
-import { maybeTooltip, navLink, resolveTooltip } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
@@ -50,7 +50,7 @@ export function AvatarButton(props: AvatarButtonProps) {
       ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
       ...(isDisabled && disabledStyles),
     }),
-    [isHovered, isFocusVisible, isDisabled, isPressed],
+    [isHovered, isFocusVisible, isDisabled, isPressed, forceFocusStyles],
   );
 
   const buttonAttrs = {
@@ -65,9 +65,11 @@ export function AvatarButton(props: AvatarButtonProps) {
 
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip
   return maybeTooltip({
-    title: resolveTooltip(disabled, tooltip),
+    // Default the tooltip to the avatar's name, if defined.
+    title: resolveTooltip(disabled, tooltip ?? avatarProps.name),
     placement: "top",
-    children: getButtonOrLink(<Avatar {...avatarProps} {...tid} />, onPress, buttonAttrs, openInNew),
+    // Disable the auto-tooltip in Avatar to prevent nested tooltips which can cause issues with interactions
+    children: getButtonOrLink(<Avatar {...avatarProps} {...tid} disableTooltip />, onPress, buttonAttrs, openInNew),
   });
 }
 
