@@ -9,7 +9,6 @@ import { noop } from "src/utils";
 import { samples, withDimensions } from "src/utils/sb";
 
 export default {
-  title: "Workspace/Inputs/Date Field",
   component: Button,
   decorators: [withDimensions()],
   parameters: {

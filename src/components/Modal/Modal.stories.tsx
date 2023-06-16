@@ -14,7 +14,6 @@ import { withBeamDecorator, withDimensions } from "src/utils/sb";
 
 export default {
   component: Modal,
-  title: "Workspace/Components/Modal",
   decorators: [withBeamDecorator, withDimensions()],
   parameters: {
     design: {

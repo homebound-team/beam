@@ -6,7 +6,6 @@ import { Checkbox, CheckboxGroup, CheckboxGroupProps } from "src/index";
 
 export default {
   component: Checkbox,
-  title: "Workspace/Inputs/Checkboxes",
   parameters: {
     design: {
       type: "figma",

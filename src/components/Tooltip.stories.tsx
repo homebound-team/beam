@@ -4,7 +4,6 @@ import { Placement, Tooltip } from "./Tooltip";
 
 export default {
   component: Tooltip,
-  title: "Workspace/Components/Tooltip",
   parameters: {
     design: {
       type: "figma",

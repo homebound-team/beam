@@ -6,7 +6,6 @@ import { Chip } from "./Chip";
 
 export default {
   component: ButtonModal,
-  title: "Workspace/Components/Button Modal",
   decorators: [withRouter(), withDimensions()],
 } as Meta;
 

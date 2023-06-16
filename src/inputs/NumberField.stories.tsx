@@ -6,7 +6,6 @@ import { TextField } from "src/inputs";
 import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
 
 export default {
-  title: "Workspace/Inputs/Number Field",
   component: NumberField,
   parameters: {
     design: {

@@ -9,7 +9,6 @@ import { HasIdAndName, Optional } from "src/types";
 
 export default {
   component: MultiSelectField,
-  title: "Workspace/Inputs/Multi Select Fields",
   parameters: {
     design: {
       type: "figma",

@@ -5,7 +5,6 @@ import { jan1, jan10, jan2, jan29 } from "src/forms/formStateDomain";
 
 export default {
   component: DatePicker,
-  title: "Workspace/Components/DatePicker",
   parameters: {
     design: {
       type: "figma",

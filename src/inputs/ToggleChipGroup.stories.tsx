@@ -4,7 +4,6 @@ import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 
 export default {
   component: ToggleChipGroup,
-  title: "Workspace/Inputs/Toggle Chip Groups",
   parameters: {
     design: {
       type: "figma",

@@ -5,7 +5,6 @@ import { Button } from "./Button";
 
 export default {
   component: AutoSaveIndicator,
-  title: "Workspace/Components/Auto Save Indicator",
   parameters: {
     design: {
       type: "figma",

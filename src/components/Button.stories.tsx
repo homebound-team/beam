@@ -6,7 +6,6 @@ import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 
 export default {
-  title: "Workspace/Components/Button",
   component: Button,
   decorators: [withRouter()],
   parameters: {

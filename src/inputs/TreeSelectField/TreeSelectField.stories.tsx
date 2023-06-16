@@ -11,7 +11,6 @@ import { zeroTo } from "src/utils/sb";
 
 export default {
   component: TreeSelectField,
-  title: "Workspace/Inputs/TreeSelectField",
 } as Meta<TreeSelectFieldProps<HasIdAndName, string>>;
 
 function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {

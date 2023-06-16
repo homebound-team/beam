@@ -4,7 +4,6 @@ import { Css, PresentationProvider, ToggleChip } from "src/index";
 
 export default {
   component: ToggleChip,
-  title: "Workspace/Components/ToggleChip",
   parameters: {
     design: {
       type: "figma",

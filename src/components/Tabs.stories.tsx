@@ -11,7 +11,6 @@ import { getTabStyles } from "./Tabs";
 import { TabValue, TestTabContent, testTabs } from "./testData";
 
 export default {
-  title: "Workspace/Components/Tabs",
   component: TabsWithContent,
   parameters: {
     // To better view the icon hover state

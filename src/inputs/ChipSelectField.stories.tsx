@@ -10,7 +10,6 @@ import { zeroTo } from "src/utils/sb";
 
 export default {
   component: ChipSelectField,
-  title: "Workspace/Inputs/ChipSelectField",
   parameters: {
     design: {
       type: "figma",

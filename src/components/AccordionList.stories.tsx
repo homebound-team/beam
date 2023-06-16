@@ -1,11 +1,10 @@
 import { Meta } from "@storybook/react";
+import { Css } from "src/Css";
 import { AccordionProps } from "./Accordion";
 import { AccordionList } from "./AccordionList";
-import { Css } from "src/Css";
 
 export default {
   component: AccordionList,
-  title: "Workspace/Components/Accordion",
   parameters: { backgrounds: { default: "white" } },
 } as Meta;
 

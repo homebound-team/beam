@@ -7,7 +7,6 @@ import { RichTextField as RichTextFieldComponent } from "./RichTextField";
 
 export default {
   component: RichTextFieldComponent,
-  title: "Workspace/Inputs/Rich Text Field",
   parameters: {
     design: {
       type: "figma",

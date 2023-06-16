@@ -3,7 +3,6 @@ import { Css } from "src/Css";
 
 export default {
   component: LoadingSkeleton,
-  title: "Workspace/Components/LoadingSkeleton",
 };
 
 export const Examples = () => (

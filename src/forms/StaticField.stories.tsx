@@ -7,7 +7,6 @@ import { ButtonModal, Css } from "..";
 
 export default {
   component: StaticFieldComponent,
-  title: "Workspace/Forms/Static Field",
 } as Meta;
 
 export function StaticField() {

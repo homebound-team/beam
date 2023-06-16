@@ -6,7 +6,6 @@ import { FormLines } from "..";
 
 export default {
   component: MultiLineSelectField,
-  title: "Workspace/Inputs/Multi Line Select Fields",
   parameters: { backgrounds: { default: "white" } },
 } as Meta;
 

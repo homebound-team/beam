@@ -3,14 +3,12 @@ const path = require("path");
 const reactPlugin = require("@vitejs/plugin-react");
 const turbosnap = require("vite-plugin-turbosnap");
 module.exports = {
-  stories: ["../src/**/*.stories.tsx", "../src/**/*.stories.mdx"],
+  stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.tsx"],
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
-    "storybook-addon-performance/register",
     "@storybook/addon-interactions",
     "storybook-addon-designs",
-    "@storybook/addon-mdx-gfm",
   ],
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: { check: false },

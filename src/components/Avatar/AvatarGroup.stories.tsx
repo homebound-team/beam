@@ -4,7 +4,6 @@ import { Css } from "src/Css";
 
 export default {
   component: AvatarGroup,
-  title: "Workspace/Components/Avatar Group",
 } as Meta<AvatarGroupProps>;
 
 export function Examples() {

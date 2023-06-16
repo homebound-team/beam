@@ -12,7 +12,6 @@ import { withDimensions, zeroTo } from "src/utils/sb";
 
 export default {
   component: SelectField,
-  title: "Workspace/Inputs/Select Fields",
   parameters: {
     layout: "fullscreen",
     design: {
