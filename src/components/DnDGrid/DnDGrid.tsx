@@ -177,8 +177,8 @@ export function DnDGrid(props: DnDGridProps) {
   /** Handles the end of the dragging process */
   const onDragEnd = useCallback(
     (e: MouseOrTouchEvent) => {
-      e.preventDefault();
       if (!reorderViaKeyboard.current && dragEl.current && cloneEl.current && gridEl.current) {
+        e.preventDefault();
         cloneEl.current.replaceWith(dragEl.current);
 
         // Remove any placeholder elements.
