@@ -1162,6 +1162,85 @@ export function SelectableRows() {
   );
 }
 
+export function SelectableChildrenRows() {
+  type HeaderRow = { kind: "header"; id: string; data: undefined };
+  type ParentRow = { kind: "parent"; id: string; data: { name: string } };
+  type ChildRow = { kind: "child"; id: string; data: { name: string } };
+  type GrandChildRow = { kind: "grandChild"; id: string; data: { name: string } };
+  type Row = HeaderRow | ParentRow | ChildRow | GrandChildRow;
+
+  const selectCol = selectColumn<Row>();
+
+  const nameCol: GridColumn<Row> = {
+    header: "Name",
+    parent: ({ name }) => name,
+    child: ({ name }) => name,
+    grandChild: ({ name }) => name,
+    mw: "160px",
+  };
+
+  return (
+    <>
+      <GridTable
+        columns={[collapseColumn<Row>(), selectCol, nameCol]}
+        style={{ rowHeight: "fixed" }}
+        rows={
+          [
+            simpleHeader,
+            {
+              kind: "parent",
+              id: "1",
+              data: { name: "Howard Stark" },
+              initCollapsed: false,
+              initSelected: true,
+              inferSelectedState: false,
+              children: [
+                {
+                  kind: "child" as const,
+                  id: "2",
+                  data: {
+                    name: "Tony Stark",
+                  },
+                  initSelected: false,
+                  pin: "first",
+                  children: [
+                    {
+                      kind: "grandChild" as const,
+                      id: "5",
+                      data: {
+                        name: "Morgan Stark",
+                      },
+                      initSelected: true,
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              kind: "parent",
+              id: "3",
+              data: { name: "Odin" },
+              initCollapsed: false,
+              initSelected: false,
+              inferSelectedState: false,
+              children: [
+                {
+                  kind: "child" as const,
+                  id: "4",
+                  data: {
+                    name: "Thor",
+                  },
+                  initSelected: true,
+                },
+              ],
+            },
+          ] as GridDataRow<Row>[]
+        }
+      />
+    </>
+  );
+}
+
 export function RevealOnRowHover() {
   const nameColumn: GridColumn<Row> = {
     header: "Name",
