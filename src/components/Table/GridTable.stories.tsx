@@ -1191,7 +1191,6 @@ export function SelectableChildrenRows() {
               kind: "parent",
               id: "1",
               data: { name: "Howard Stark" },
-              initCollapsed: false,
               initSelected: true,
               inferSelectedState: false,
               children: [
@@ -1202,7 +1201,6 @@ export function SelectableChildrenRows() {
                     name: "Tony Stark",
                   },
                   initSelected: false,
-                  pin: "first",
                   children: [
                     {
                       kind: "grandChild" as const,
@@ -1220,7 +1218,6 @@ export function SelectableChildrenRows() {
               kind: "parent",
               id: "3",
               data: { name: "Odin" },
-              initCollapsed: false,
               initSelected: false,
               inferSelectedState: false,
               children: [
@@ -1229,6 +1226,22 @@ export function SelectableChildrenRows() {
                   id: "4",
                   data: {
                     name: "Thor",
+                  },
+                  initSelected: true,
+                },
+                {
+                  kind: "child" as const,
+                  id: "6",
+                  data: {
+                    name: "Hela",
+                  },
+                  initSelected: true,
+                },
+                {
+                  kind: "child" as const,
+                  id: "7",
+                  data: {
+                    name: "Loki",
                   },
                   initSelected: true,
                 },
