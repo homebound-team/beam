@@ -1162,6 +1162,73 @@ export function SelectableRows() {
   );
 }
 
+export function SelectableChildrenRows() {
+  type ParentRow = { kind: "parent"; id: string; data: string };
+  type ChildRow = { kind: "child"; id: string; data: string };
+  type GrandChildRow = { kind: "grandChild"; id: string; data: string };
+  type Row = ParentRow | ChildRow | GrandChildRow;
+
+  const selectCol = selectColumn<Row>();
+
+  const nameCol: GridColumn<Row> = {
+    parent: (name) => name,
+    child: (name) => name,
+    grandChild: (name) => name,
+    mw: "160px",
+  };
+
+  return (
+    <>
+      <GridTable
+        columns={[collapseColumn<Row>(), selectCol, nameCol]}
+        rows={
+          [
+            simpleHeader,
+            {
+              kind: "parent",
+              id: "1",
+              data: "Howard Stark",
+              initSelected: true,
+              inferSelectedState: false,
+              children: [
+                {
+                  kind: "child" as const,
+                  id: "2",
+                  data: "Tony Stark",
+                  initSelected: false,
+                  children: [
+                    {
+                      kind: "grandChild" as const,
+                      id: "5",
+                      data: "Morgan Stark",
+                      initSelected: true,
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              kind: "parent",
+              id: "3",
+              data: "Odin",
+              initSelected: false,
+              inferSelectedState: false,
+              children: [
+                {
+                  kind: "child" as const,
+                  id: "4",
+                  data: "Thor",
+                  initSelected: true,
+                },
+              ],
+            },
+          ] as GridDataRow<Row>[]
+        }
+      />
+    </>
+  );
+}
+
 export function RevealOnRowHover() {
   const nameColumn: GridColumn<Row> = {
     header: "Name",
