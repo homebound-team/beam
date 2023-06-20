@@ -2421,6 +2421,138 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
 
+  it("can render with rows with initSelected defined include the children rows", async () => {
+    type HeaderRow = { kind: "header"; id: string; data: undefined };
+    type ParentRow = { kind: "parent"; id: string; data: { name: string } };
+    type ChildRow = { kind: "child"; id: string; data: { name: string } };
+    type GrandChildRow = { kind: "grandChild"; id: string; data: { name: string } };
+    type Row = HeaderRow | ParentRow | ChildRow | GrandChildRow;
+
+    const selectCol = selectColumn<Row>();
+    const nameCol: GridColumn<Row> = {
+      header: "Name",
+      parent: ({ name }) => name,
+      child: ({ name }) => name,
+      grandChild: ({ name }) => name,
+      mw: "160px",
+    };
+
+    // Given rows initially set as selected
+    const rows: GridDataRow<Row>[] = [
+      simpleHeader,
+      {
+        kind: "parent",
+        id: "1",
+        data: { name: "Howard Stark" },
+        initSelected: true,
+        inferSelectedState: false,
+        children: [
+          {
+            kind: "child" as const,
+            id: "2",
+            data: {
+              name: "Tony Stark",
+            },
+            initSelected: false,
+            children: [
+              {
+                kind: "grandChild" as const,
+                id: "5",
+                data: {
+                  name: "Morgan Stark",
+                },
+                initSelected: true,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        kind: "parent",
+        id: "3",
+        data: { name: "Odin" },
+        initSelected: false,
+        inferSelectedState: false,
+        children: [
+          {
+            kind: "child" as const,
+            id: "4",
+            data: {
+              name: "Thor",
+            },
+            initSelected: true,
+          },
+          {
+            kind: "child" as const,
+            id: "6",
+            data: {
+              name: "Hela",
+            },
+            initSelected: true,
+          },
+          {
+            kind: "child" as const,
+            id: "7",
+            data: {
+              name: "Loki",
+            },
+            initSelected: true,
+          },
+        ],
+      },
+    ] as GridDataRow<Row>[];
+
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+
+    function Test() {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      return <GridTable<Row> api={_api} columns={[selectCol, nameCol]} rows={rows} />;
+    }
+
+    // When rendering the table
+    const r = await render(<Test />);
+
+    expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+      "
+      | on | Name         |
+      | -- | ------------ |
+      | on | Howard Stark |
+      | on | Tony Stark   |
+      | on | Morgan Stark |
+      | on | Odin         |
+      | on | Thor         |
+      | on | Hela         |
+      | on | Loki         |
+      "
+    `);
+
+    // Then all rows are shown as selected
+    expect(cell(r, 1, 1)).toHaveTextContent("Howard Stark");
+    expect(cellAnd(r, 1, 0, "select")).toBeChecked();
+
+    expect(cell(r, 2, 1)).toHaveTextContent("Tony Stark");
+    expect(cellAnd(r, 2, 0, "select")).not.toBeChecked();
+
+    expect(cell(r, 3, 1)).toHaveTextContent("Morgan Stark");
+    expect(cellAnd(r, 3, 0, "select")).toBeChecked();
+
+    expect(cell(r, 4, 1)).toHaveTextContent("Odin");
+    expect(cellAnd(r, 4, 0, "select")).not.toBeChecked();
+
+    expect(cell(r, 5, 1)).toHaveTextContent("Thor");
+    expect(cellAnd(r, 5, 0, "select")).toBeChecked();
+
+    expect(cell(r, 6, 1)).toHaveTextContent("Hela");
+    expect(cellAnd(r, 6, 0, "select")).toBeChecked();
+
+    expect(cell(r, 7, 1)).toHaveTextContent("Loki");
+    expect(cellAnd(r, 7, 0, "select")).toBeChecked();
+
+    // And they can no longer be fetched by the api
+    expect(api.current!.getSelectedRowIds()).toEqual(["7", "6", "4", "1", "5"]);
+  });
+
   describe("expandable columns", () => {
     type ExpandHeader = { id: "expandableHeader"; kind: "expandableHeader" };
     type Header = { id: "header"; kind: "header" };
