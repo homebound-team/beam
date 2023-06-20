@@ -1163,19 +1163,17 @@ export function SelectableRows() {
 }
 
 export function SelectableChildrenRows() {
-  type HeaderRow = { kind: "header"; id: string; data: undefined };
-  type ParentRow = { kind: "parent"; id: string; data: { name: string } };
-  type ChildRow = { kind: "child"; id: string; data: { name: string } };
-  type GrandChildRow = { kind: "grandChild"; id: string; data: { name: string } };
-  type Row = HeaderRow | ParentRow | ChildRow | GrandChildRow;
+  type ParentRow = { kind: "parent"; id: string; data: string };
+  type ChildRow = { kind: "child"; id: string; data: string };
+  type GrandChildRow = { kind: "grandChild"; id: string; data: string };
+  type Row = ParentRow | ChildRow | GrandChildRow;
 
   const selectCol = selectColumn<Row>();
 
   const nameCol: GridColumn<Row> = {
-    header: "Name",
-    parent: ({ name }) => name,
-    child: ({ name }) => name,
-    grandChild: ({ name }) => name,
+    parent: (name) => name,
+    child: (name) => name,
+    grandChild: (name) => name,
     mw: "160px",
   };
 
@@ -1183,31 +1181,26 @@ export function SelectableChildrenRows() {
     <>
       <GridTable
         columns={[collapseColumn<Row>(), selectCol, nameCol]}
-        style={{ rowHeight: "fixed" }}
         rows={
           [
             simpleHeader,
             {
               kind: "parent",
               id: "1",
-              data: { name: "Howard Stark" },
+              data: "Howard Stark",
               initSelected: true,
               inferSelectedState: false,
               children: [
                 {
                   kind: "child" as const,
                   id: "2",
-                  data: {
-                    name: "Tony Stark",
-                  },
+                  data: "Tony Stark",
                   initSelected: false,
                   children: [
                     {
                       kind: "grandChild" as const,
                       id: "5",
-                      data: {
-                        name: "Morgan Stark",
-                      },
+                      data: "Morgan Stark",
                       initSelected: true,
                     },
                   ],
@@ -1217,32 +1210,14 @@ export function SelectableChildrenRows() {
             {
               kind: "parent",
               id: "3",
-              data: { name: "Odin" },
+              data: "Odin",
               initSelected: false,
               inferSelectedState: false,
               children: [
                 {
                   kind: "child" as const,
                   id: "4",
-                  data: {
-                    name: "Thor",
-                  },
-                  initSelected: true,
-                },
-                {
-                  kind: "child" as const,
-                  id: "6",
-                  data: {
-                    name: "Hela",
-                  },
-                  initSelected: true,
-                },
-                {
-                  kind: "child" as const,
-                  id: "7",
-                  data: {
-                    name: "Loki",
-                  },
+                  data: "Thor",
                   initSelected: true,
                 },
               ],

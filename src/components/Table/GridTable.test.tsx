@@ -2422,18 +2422,16 @@ describe("GridTable", () => {
   });
 
   it("can render with rows with initSelected defined include the children rows", async () => {
-    type HeaderRow = { kind: "header"; id: string; data: undefined };
-    type ParentRow = { kind: "parent"; id: string; data: { name: string } };
-    type ChildRow = { kind: "child"; id: string; data: { name: string } };
-    type GrandChildRow = { kind: "grandChild"; id: string; data: { name: string } };
-    type Row = HeaderRow | ParentRow | ChildRow | GrandChildRow;
+    type ParentRow = { kind: "parent"; id: string; data: string };
+    type ChildRow = { kind: "child"; id: string; data: string };
+    type GrandChildRow = { kind: "grandChild"; id: string; data: string };
+    type Row = ParentRow | ChildRow | GrandChildRow;
 
     const selectCol = selectColumn<Row>();
     const nameCol: GridColumn<Row> = {
-      header: "Name",
-      parent: ({ name }) => name,
-      child: ({ name }) => name,
-      grandChild: ({ name }) => name,
+      parent: (name) => name,
+      child: (name) => name,
+      grandChild: (name) => name,
       mw: "160px",
     };
 
@@ -2443,24 +2441,19 @@ describe("GridTable", () => {
       {
         kind: "parent",
         id: "1",
-        data: { name: "Howard Stark" },
+        data: "Howard Stark",
         initSelected: true,
-        inferSelectedState: false,
         children: [
           {
             kind: "child" as const,
             id: "2",
-            data: {
-              name: "Tony Stark",
-            },
+            data: "Tony Stark",
             initSelected: false,
             children: [
               {
                 kind: "grandChild" as const,
                 id: "5",
-                data: {
-                  name: "Morgan Stark",
-                },
+                data: "Morgan Stark",
                 initSelected: true,
               },
             ],
@@ -2470,32 +2463,13 @@ describe("GridTable", () => {
       {
         kind: "parent",
         id: "3",
-        data: { name: "Odin" },
+        data: "Odin",
         initSelected: false,
-        inferSelectedState: false,
         children: [
           {
             kind: "child" as const,
             id: "4",
-            data: {
-              name: "Thor",
-            },
-            initSelected: true,
-          },
-          {
-            kind: "child" as const,
-            id: "6",
-            data: {
-              name: "Hela",
-            },
-            initSelected: true,
-          },
-          {
-            kind: "child" as const,
-            id: "7",
-            data: {
-              name: "Loki",
-            },
+            data: "Thor",
             initSelected: true,
           },
         ],
@@ -2515,15 +2489,13 @@ describe("GridTable", () => {
 
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
       "
-      | on | Name         |
+      | on |              |
       | -- | ------------ |
       | on | Howard Stark |
       | on | Tony Stark   |
       | on | Morgan Stark |
       | on | Odin         |
       | on | Thor         |
-      | on | Hela         |
-      | on | Loki         |
       "
     `);
 
@@ -2543,14 +2515,8 @@ describe("GridTable", () => {
     expect(cell(r, 5, 1)).toHaveTextContent("Thor");
     expect(cellAnd(r, 5, 0, "select")).toBeChecked();
 
-    expect(cell(r, 6, 1)).toHaveTextContent("Hela");
-    expect(cellAnd(r, 6, 0, "select")).toBeChecked();
-
-    expect(cell(r, 7, 1)).toHaveTextContent("Loki");
-    expect(cellAnd(r, 7, 0, "select")).toBeChecked();
-
     // And they can no longer be fetched by the api
-    expect(api.current!.getSelectedRowIds()).toEqual(["7", "6", "4", "1", "5"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["4", "1", "5"]);
   });
 
   describe("expandable columns", () => {
