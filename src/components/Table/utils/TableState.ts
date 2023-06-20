@@ -105,8 +105,8 @@ export class TableState {
   }
 
   loadSelected(rows: GridDataRow<any>[]): void {
-    const childRows = rows.flatMap((r) => (r.children ? flattenRows(r.children) : []));
-    const selectedRows = [...rows, ...childRows].filter((row) => row.initSelected);
+    const allRows = flattenRows(rows);
+    const selectedRows = allRows.filter((row) => row.initSelected);
     // Initialize with selected rows as defined
     const map = new Map<string, SelectedState>();
     selectedRows.forEach((row) => {
