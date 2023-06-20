@@ -2442,6 +2442,7 @@ describe("GridTable", () => {
         kind: "parent",
         id: "1",
         data: "Howard Stark",
+        inferSelectedState: false,
         initSelected: true,
         children: [
           {
@@ -2464,6 +2465,7 @@ describe("GridTable", () => {
         kind: "parent",
         id: "3",
         data: "Odin",
+        inferSelectedState: false,
         initSelected: false,
         children: [
           {
