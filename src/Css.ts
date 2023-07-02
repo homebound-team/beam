@@ -943,6 +943,42 @@ class CssBuilder<T extends Properties> {
   pc(value: Properties["placeContent"]) {
     return this.add("placeContent", value);
   }
+  /** Sets `placeItems: "center"`. */
+  get pic() {
+    return this.add("placeItems", "center");
+  }
+  /** Sets `placeItems: "start"`. */
+  get pis() {
+    return this.add("placeItems", "start");
+  }
+  /** Sets `placeItems: "end"`. */
+  get pie() {
+    return this.add("placeItems", "end");
+  }
+  /** Sets `placeItems: "space-between"`. */
+  get pisb() {
+    return this.add("placeItems", "space-between");
+  }
+  /** Sets `placeItems: "space-around"`. */
+  get pisa() {
+    return this.add("placeItems", "space-around");
+  }
+  /** Sets `placeItems: "space-evenly"`. */
+  get pise() {
+    return this.add("placeItems", "space-evenly");
+  }
+  /** Sets `placeItems: "baseline"`. */
+  get pib() {
+    return this.add("placeItems", "baseline");
+  }
+  /** Sets `placeItems: "stretch"`. */
+  get piStretch() {
+    return this.add("placeItems", "stretch");
+  }
+  /** Sets `placeItems: value`. */
+  pi(value: Properties["placeItems"]) {
+    return this.add("placeItems", value);
+  }
   /** Sets `flexBasis: "100%"`. */
   get fb1() {
     return this.add("flexBasis", "100%");
@@ -1116,6 +1152,14 @@ class CssBuilder<T extends Properties> {
   /** Sets `gridColumn: value`. */
   gc(value: Properties["gridColumn"]) {
     return this.add("gridColumn", value);
+  }
+  /** Sets `gridAutoRows: value`. */
+  gar(value: Properties["gridAutoRows"]) {
+    return this.add("gridAutoRows", value);
+  }
+  /** Sets `gridAutoColumns: value`. */
+  gac(value: Properties["gridAutoColumns"]) {
+    return this.add("gridAutoColumns", value);
   }
   /** Sets `gap: "0px"`. */
   get gap0() {
@@ -1330,6 +1374,18 @@ class CssBuilder<T extends Properties> {
   /** Sets `height: "100vh"`. */
   get vh100() {
     return this.add("height", "100vh");
+  }
+  /** Sets `height: "fit-content"`. */
+  get hfc() {
+    return this.add("height", "fit-content");
+  }
+  /** Sets `height: "max-content"`. */
+  get hmaxc() {
+    return this.add("height", "max-content");
+  }
+  /** Sets `height: "min-content"`. */
+  get hminc() {
+    return this.add("height", "min-content");
   }
   /** Sets `minHeight: 0`. */
   get mh0() {
@@ -3369,6 +3425,30 @@ class CssBuilder<T extends Properties> {
   get wsNormal() {
     return this.add("whiteSpace", "normal");
   }
+  /** Sets `whiteSpace: "pre"`. */
+  get wsp() {
+    return this.add("whiteSpace", "pre");
+  }
+  /** Sets `whiteSpace: "normal"`. */
+  get wsn() {
+    return this.add("whiteSpace", "normal");
+  }
+  /** Sets `whiteSpace: "nowrap"`. */
+  get wsnw() {
+    return this.add("whiteSpace", "nowrap");
+  }
+  /** Sets `whiteSpace: "break-spaces"`. */
+  get wsbs() {
+    return this.add("whiteSpace", "break-spaces");
+  }
+  /** Sets `whiteSpace: "pre-wrap"`. */
+  get wspw() {
+    return this.add("whiteSpace", "pre-wrap");
+  }
+  /** Sets `whiteSpace: "pre-line"`. */
+  get wspl() {
+    return this.add("whiteSpace", "pre-line");
+  }
   /** Sets `whiteSpace: value`. */
   whiteSpace(value: Properties["whiteSpace"]) {
     return this.add("whiteSpace", value);
@@ -3390,6 +3470,18 @@ class CssBuilder<T extends Properties> {
   /** Sets `width: "100%"`. */
   get w100() {
     return this.add("width", "100%");
+  }
+  /** Sets `width: "fit-content"`. */
+  get wfc() {
+    return this.add("width", "fit-content");
+  }
+  /** Sets `width: "max-content"`. */
+  get wmaxc() {
+    return this.add("width", "max-content");
+  }
+  /** Sets `width: "min-content"`. */
+  get wminc() {
+    return this.add("width", "min-content");
   }
   /** Sets `minWidth: 0`. */
   get mw0() {
@@ -3628,11 +3720,14 @@ class CssBuilder<T extends Properties> {
 
   if(bp: Breakpoint): CssBuilder<T>;
   if(cond: boolean): CssBuilder<T>;
-  if(arg: boolean | Breakpoint): CssBuilder<T> {
-    if (typeof arg === "boolean") {
+  if(attr: string, value: boolean | string): CssBuilder<T>;
+  if(arg: boolean | Breakpoint | string, value?: boolean | string): CssBuilder<T> {
+    if (value !== undefined) {
+      return this.newCss({ selector: `[${arg}='${value}']` });
+    } else if (typeof arg === "boolean") {
       return this.newCss({ enabled: arg });
     } else {
-      return this.newCss({ selector: Breakpoints[arg] });
+      return this.newCss({ selector: Breakpoints[arg as Breakpoint] });
     }
   }
 
