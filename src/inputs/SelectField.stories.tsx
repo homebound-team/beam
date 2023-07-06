@@ -242,6 +242,7 @@ export function PerfTest() {
       }}
       onBlur={action("onBlur")}
       onFocus={action("onFocus")}
+      allowTypeToFilter
     />
   );
 }
