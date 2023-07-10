@@ -58,7 +58,6 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
    */
   unsetLabel?: string;
   hideErrorMessage?: boolean;
-  allowTypeToFilter?: boolean;
 }
 
 /**
@@ -84,7 +83,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     disabledOptions,
     borderless,
     unsetLabel,
-    allowTypeToFilter,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
@@ -401,8 +399,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         borderless={borderless}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         resetField={resetField}
-        // If allowTypeToFilter is not set and if there are 10 or fewer options and it is not the multiselect, then we disable the typeahead filter for a better UX.
-        typeToFilter={allowTypeToFilter || !(!multiselect && Array.isArray(options) && options.length <= 10)}
       />
       {state.isOpen && (
         <Popover

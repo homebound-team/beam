@@ -35,7 +35,6 @@ interface ComboBoxInputProps<O, V extends Value> extends PresentationFieldProps 
   tooltip?: ReactNode;
   resetField: VoidFunction;
   hideErrorMessage?: boolean;
-  typeToFilter: boolean;
   isTree?: boolean;
 }
 
