@@ -527,7 +527,6 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         resetField={resetField}
         nothingSelectedText={nothingSelectedText}
-        typeToFilter
         isTree
       />
       {state.isOpen && (
