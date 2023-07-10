@@ -2421,6 +2421,106 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
 
+  it("can render with rows with initSelected defined include the children rows", async () => {
+    type ParentRow = { kind: "parent"; id: string; data: string };
+    type ChildRow = { kind: "child"; id: string; data: string };
+    type GrandChildRow = { kind: "grandChild"; id: string; data: string };
+    type Row = ParentRow | ChildRow | GrandChildRow;
+
+    const selectCol = selectColumn<Row>();
+    const nameCol: GridColumn<Row> = {
+      parent: (name) => name,
+      child: (name) => name,
+      grandChild: (name) => name,
+      mw: "160px",
+    };
+
+    // Given rows initially set as selected
+    const rows: GridDataRow<Row>[] = [
+      simpleHeader,
+      {
+        kind: "parent",
+        id: "1",
+        data: "Howard Stark",
+        inferSelectedState: false,
+        initSelected: true,
+        children: [
+          {
+            kind: "child" as const,
+            id: "2",
+            data: "Tony Stark",
+            initSelected: false,
+            children: [
+              {
+                kind: "grandChild" as const,
+                id: "5",
+                data: "Morgan Stark",
+                initSelected: true,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        kind: "parent",
+        id: "3",
+        data: "Odin",
+        inferSelectedState: false,
+        initSelected: false,
+        children: [
+          {
+            kind: "child" as const,
+            id: "4",
+            data: "Thor",
+            initSelected: true,
+          },
+        ],
+      },
+    ] as GridDataRow<Row>[];
+
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+
+    function Test() {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      return <GridTable<Row> api={_api} columns={[selectCol, nameCol]} rows={rows} />;
+    }
+
+    // When rendering the table
+    const r = await render(<Test />);
+
+    expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+      "
+      | on |              |
+      | -- | ------------ |
+      | on | Howard Stark |
+      | on | Tony Stark   |
+      | on | Morgan Stark |
+      | on | Odin         |
+      | on | Thor         |
+      "
+    `);
+
+    // Then all rows are shown as selected
+    expect(cell(r, 1, 1)).toHaveTextContent("Howard Stark");
+    expect(cellAnd(r, 1, 0, "select")).toBeChecked();
+
+    expect(cell(r, 2, 1)).toHaveTextContent("Tony Stark");
+    expect(cellAnd(r, 2, 0, "select")).not.toBeChecked();
+
+    expect(cell(r, 3, 1)).toHaveTextContent("Morgan Stark");
+    expect(cellAnd(r, 3, 0, "select")).toBeChecked();
+
+    expect(cell(r, 4, 1)).toHaveTextContent("Odin");
+    expect(cellAnd(r, 4, 0, "select")).not.toBeChecked();
+
+    expect(cell(r, 5, 1)).toHaveTextContent("Thor");
+    expect(cellAnd(r, 5, 0, "select")).toBeChecked();
+
+    // And they can no longer be fetched by the api
+    expect(api.current!.getSelectedRowIds()).toEqual(["4", "1", "5"]);
+  });
+
   describe("expandable columns", () => {
     type ExpandHeader = { id: "expandableHeader"; kind: "expandableHeader" };
     type Header = { id: "header"; kind: "header" };
