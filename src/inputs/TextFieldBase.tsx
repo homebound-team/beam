@@ -56,10 +56,6 @@ export interface TextFieldBaseProps<X>
   hideErrorMessage?: boolean;
   // If set, the helper text will always be shown (usually we hide the helper text if read only)
   alwaysShowHelperText?: boolean;
-  /** Used by ComboBoxInput to decide whether we should allow the user to type to filter the options.
-   * This is admittedly a hack, as we really should not use a TextField at all in this instance. How we're currently implementing breaks all sorts of accessibility best practices.
-   * But for now it is the quickest way to get the desired behavior. Will updating to use a proper select field at another point. */
-  typeToFilter?: boolean;
 }
 
 // Used by both TextField and TextArea
@@ -93,7 +89,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     errorInTooltip = fieldProps?.errorInTooltip ?? false,
     hideErrorMessage = false,
     alwaysShowHelperText = false,
-    typeToFilter = true,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
@@ -171,7 +166,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   }
 
   const onFocusChained = chain((e: FocusEvent<HTMLInputElement> | FocusEvent<HTMLTextAreaElement>) => {
-    typeToFilter && e.target.select();
+    e.target.select();
   }, onFocus);
 
   const showFocus = (isFocused && !inputProps.readOnly) || forceFocus;
@@ -248,8 +243,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
                 ref={fieldRef as any}
                 rows={multiline ? 1 : undefined}
-                // Make the input field readOnly if the field explicitly sets it to `true`, otherwise base it on whether we should allow `typeToFilter`
-                readOnly={inputProps.readOnly || typeToFilter === false}
+                // Make the input field readOnly if the field explicitly sets it to `true`
+                readOnly={inputProps.readOnly}
                 css={{
                   ...fieldStyles.input,
                   ...(inputProps.disabled ? fieldStyles.disabled : {}),
