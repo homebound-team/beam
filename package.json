@@ -1,6 +1,6 @@
 {
   "name": "@homebound/beam",
-  "version": "2.289.2",
+  "version": "2.291.0",
   "author": "Homebound",
   "license": "MIT",
   "main": "dist/index.js",
@@ -77,7 +77,7 @@
     "@homebound/eslint-config": "1.6.1",
     "@homebound/rtl-react-router-utils": "1.0.3",
     "@homebound/rtl-utils": "^2.61.1",
-    "@homebound/truss": "^1.123.0",
+    "@homebound/truss": "^1.128.1",
     "@homebound/tsconfig": "^1.0.3",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
