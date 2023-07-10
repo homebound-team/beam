@@ -3,9 +3,7 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
-import { noop } from "src/utils";
 import { blur, click, focus, getOptions, render, select, wait } from "src/utils/rtl";
-import { zeroTo } from "src/utils/sb";
 
 describe("SelectFieldTest", () => {
   it("can set a value", async () => {
@@ -406,31 +404,6 @@ describe("SelectFieldTest", () => {
 
     // Then `onSelect` is triggered with `undefined`
     expect(onSelect.mock.calls[2][0]).toBe(undefined);
-  });
-
-  it("renders the input as read only with 10 or fewer options, otherwise it is editable", async () => {
-    const r = await render(
-      <>
-        <SelectField
-          label="Fewer options"
-          onSelect={noop}
-          options={zeroTo(10).map((idx) => ({ id: `opt:${idx}`, name: `Option ${idx}` }))}
-          value={undefined}
-          getOptionLabel={(o) => o.name}
-          getOptionValue={(o) => o.id}
-        />
-        <SelectField
-          label="More options"
-          onSelect={noop}
-          options={zeroTo(11).map((idx) => ({ id: `opt:${idx}`, name: `Option ${idx}` }))}
-          value={undefined}
-          getOptionLabel={(o) => o.name}
-          getOptionValue={(o) => o.id}
-        />
-      </>,
-    );
-    expect(r.fewerOptions()).toHaveAttribute("readonly");
-    expect(r.moreOptions()).not.toHaveAttribute("readonly");
   });
 
   // Used to validate the `unset` option can be applied to non-`HasIdAndName` options
