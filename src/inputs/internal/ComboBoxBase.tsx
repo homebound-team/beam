@@ -399,8 +399,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         borderless={borderless}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         resetField={resetField}
-        // If there are 10 or fewer options and it is not the multiselect, then we disable the typeahead filter for a better UX.
-        typeToFilter={!(!multiselect && Array.isArray(options) && options.length <= 10)}
       />
       {state.isOpen && (
         <Popover
