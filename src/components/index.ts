@@ -17,6 +17,7 @@ export * from "./Copy";
 export * from "./CssReset";
 export * from "./DnDGrid";
 export * from "./Filters";
+export * from "./Grid";
 export { HbLoadingSpinner, HbSpinnerProvider, HB_QUIPS_FLAVOR, HB_QUIPS_MISSION } from "./HbLoadingSpinner";
 export * from "./Icon";
 export * from "./IconButton";
