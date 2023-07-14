@@ -182,6 +182,10 @@ export interface GridTableProps<R extends Kinded, X> {
  * In a "kind" of cute way, headers are not modeled specially, i.e. they are just another
  * row `kind` along with the data rows. (Admittedly, out of pragmatism, we do apply some
  * special styling to the row that uses `kind: "header"`.)
+ *
+ * For some rationale of our current/historical rendering approaches, see the following doc:
+ *
+ * https://docs.google.com/document/d/1DFnlkDubK4nG_GLf_hB8yp0flnSNt_3IBh5iOicuaFM/edit#heading=h.9m9cpwgeqfc9
  */
 export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = any>(props: GridTableProps<R, X>) {
   const {

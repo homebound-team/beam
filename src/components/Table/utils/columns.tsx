@@ -50,6 +50,7 @@ export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>
     // Use any of the user's per-row kind methods if they have them.
     ...columnDef,
   };
+  // Use newMethodMissingProxy so the user can use whatever kinds they want, i.e. `myRowKind: () => ...Toggle... `
   return newMethodMissingProxy(base, (key) => {
     return (data: any, { row }: { row: GridDataRow<any> }) => ({
       content: <SelectToggle id={row.id} disabled={row.selectable === false} />,
@@ -80,6 +81,7 @@ export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<
     totals: emptyCell,
     ...columnDef,
   };
+  // Use newMethodMissingProxy so the user can use whatever kinds they want, i.e. `myRowKind: () => ...Collapse... `
   return newMethodMissingProxy(base, (key) => {
     return (data: any, { row, level }: { row: GridDataRow<any>; level: number }) => ({
       content: <CollapseToggle row={row} compact={level > 0} />,
