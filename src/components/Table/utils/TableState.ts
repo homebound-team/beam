@@ -4,7 +4,7 @@ import React from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridSortConfig } from "src/components/Table/GridTable";
 import { Direction, GridColumnWithId } from "src/components/Table/types";
-import { ASC, DESC, HEADER, reservedRowKinds, SELECTED_GROUP } from "src/components/Table/utils/utils";
+import { ASC, DESC, HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 import { visit } from "src/components/Table/utils/visitor";
 import { isFunction } from "src/utils";
 import { assignDefaultColumnIds } from "./columns";
@@ -38,7 +38,7 @@ export class TableState {
   // Set of just row ids. Keeps track of which rows match the filter. Used to filter rows from `selectedIds`
   private matchedRows = new ObservableSet<string>();
   // All fully selected data rows that do not match the applied filter, if any. Will not include group/parent rows unless they `inferSelectedState: false`
-  public unmatchedSelectedRows: GridDataRow<any>[] = [];
+  public keptSelectedRows: GridDataRow<any>[] = [];
   // The current list of rows, basically a useRef.current. Not reactive.
   public rows: GridDataRow<any>[] = [];
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
@@ -85,17 +85,17 @@ export class TableState {
     reaction(
       () => [...this.matchedRows.values()].sort(),
       () => {
-        const newlyUnmatchedRows = [...this.selectedDataRows.values()].filter((row) =>
-          unmatchedSelectionsFilter(row, this.matchedRows),
+        const newlyKeptRows = [...this.selectedDataRows.values()].filter((row) =>
+          keptSelectionsFilter(row, this.matchedRows),
         );
 
-        // If the unmatched rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
-        if (newlyUnmatchedRows.length > 0 && this.unmatchedSelectedRows.length === 0) {
-          this.collapsedRows.add(SELECTED_GROUP);
+        // If the kept rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
+        if (newlyKeptRows.length > 0 && this.keptSelectedRows.length === 0) {
+          this.collapsedRows.add(KEPT_GROUP);
         }
         // When filters are applied, we need to determine if there are any selected rows that are no longer matched.
-        if (!comparer.shallow(newlyUnmatchedRows, this.unmatchedSelectedRows)) {
-          this.unmatchedSelectedRows = newlyUnmatchedRows;
+        if (!comparer.shallow(newlyKeptRows, this.keptSelectedRows)) {
+          this.keptSelectedRows = newlyKeptRows;
         }
 
         // Re-derive the selected state for both the header and parent rows
@@ -103,7 +103,7 @@ export class TableState {
         map.set(
           "header",
           deriveParentSelected(
-            [...this.rows, ...this.unmatchedSelectedRows].flatMap((row) => this.setNestedSelectedStates(row, map)),
+            [...this.rows, ...this.keptSelectedRows].flatMap((row) => this.setNestedSelectedStates(row, map)),
           ),
         );
 
@@ -154,11 +154,11 @@ export class TableState {
     this.rowSelectedState.merge(selectedStateMap);
     this.selectedDataRows.merge(selectedRowMap);
 
-    // Determine if we need to initially display the unmatched selected group
-    const newlyUnmatchedRows = selectedRows.filter((row) => unmatchedSelectionsFilter(row, this.matchedRows));
-    if (!comparer.shallow(newlyUnmatchedRows, this.unmatchedSelectedRows)) {
-      this.collapsedRows.add(SELECTED_GROUP);
-      this.unmatchedSelectedRows = newlyUnmatchedRows;
+    // Determine if we need to initially display the kept selected group
+    const newlyKeptRows = selectedRows.filter((row) => keptSelectionsFilter(row, this.matchedRows));
+    if (!comparer.shallow(newlyKeptRows, this.keptSelectedRows)) {
+      this.collapsedRows.add(KEPT_GROUP);
+      this.keptSelectedRows = newlyKeptRows;
     }
   }
 
@@ -444,7 +444,7 @@ export class TableState {
         // Similarly "unmash" all rows + children.
         this.rowSelectedState.clear();
         this.selectedDataRows.clear();
-        this.unmatchedSelectedRows = [];
+        this.keptSelectedRows = [];
       }
     } else {
       // This is the regular/non-header behavior to just add/remove the individual row id,
@@ -497,22 +497,20 @@ export class TableState {
       // And do the header + top-level "children" as a final one-off
       selectedStateMap.set(
         "header",
-        deriveParentSelected(
-          this.getMatchedChildrenStates([...this.rows, ...this.unmatchedSelectedRows], selectedStateMap),
-        ),
+        deriveParentSelected(this.getMatchedChildrenStates([...this.rows, ...this.keptSelectedRows], selectedStateMap)),
       );
 
       // And merge the new selected state map into the existing one
       this.rowSelectedState.merge(selectedStateMap);
 
-      // Lastly, we need to update the `unmatchedSelectedRows` if the row was deselected.
-      // (If selected === true, then it's not possible for the row to be in `unmatchedSelectedRows` as you can only select rows that match the filter)
+      // Lastly, we need to update the `keptSelectedRows` if the row was deselected.
+      // (If selected === true, then it's not possible for the row to be in `keptSelectedRows` as you can only select rows that match the filter)
       if (!selected) {
-        const newlyUnmatchedRows = [...this.selectedDataRows.values()].filter((row) =>
-          unmatchedSelectionsFilter(row, this.matchedRows),
+        const newlyKeptRows = [...this.selectedDataRows.values()].filter((row) =>
+          keptSelectionsFilter(row, this.matchedRows),
         );
-        if (!comparer.shallow(newlyUnmatchedRows, this.unmatchedSelectedRows)) {
-          this.unmatchedSelectedRows = newlyUnmatchedRows;
+        if (!comparer.shallow(newlyKeptRows, this.keptSelectedRows)) {
+          this.keptSelectedRows = newlyKeptRows;
         }
       }
     }
@@ -538,7 +536,7 @@ export class TableState {
         collapsedIds.splice(0, collapsedIds.length);
       } else {
         // Otherwise push `header` and `selectedGroup` to the list as a hint that we're in the collapsed-all state
-        collapsedIds.push(HEADER, SELECTED_GROUP);
+        collapsedIds.push(HEADER, KEPT_GROUP);
         // Find all non-leaf rows so that toggling "all collapsed" -> "all not collapsed" opens
         // the parent rows of any level.
         const parentIds = new Set<string>();
@@ -562,7 +560,7 @@ export class TableState {
         collapsedIds.splice(i, 1);
       }
 
-      // TODO: Need to handle the unmatched selected group row.
+      // TODO: Need to handle the kept selected group row.
       // If all rows have been expanded individually, but the 'header' was collapsed, then remove the header from the collapsedIds so it reverts to the expanded state
       if (collapsedIds.length === 1 && collapsedIds[0] === "header") {
         collapsedIds.splice(0, 1);
@@ -618,6 +616,7 @@ function getChildrenForDerivingSelectState(row: GridDataRow<any>): GridDataRow<a
 /** Provides a context for rows to access their table's `TableState`. */
 export const TableStateContext = React.createContext<{ tableState: TableState }>({
   get tableState(): TableState {
+    console.log("wtf?");
     throw new Error("No TableStateContext provider");
   },
 });
@@ -741,7 +740,7 @@ export type SortState = {
 
 export type SortOn = "client" | "server" | undefined;
 
-function unmatchedSelectionsFilter(row: GridDataRow<any>, matchedRows: ObservableSet<string>) {
+function keptSelectionsFilter(row: GridDataRow<any>, matchedRows: ObservableSet<string>) {
   return (
     !matchedRows.has(row.id) &&
     row.selectable !== false &&

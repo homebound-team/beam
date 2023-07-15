@@ -1,12 +1,5 @@
 import { useContext } from "react";
-import {
-  GridDataRow,
-  HEADER,
-  IconButton,
-  IconButtonProps,
-  SELECTED_GROUP,
-  TableStateContext,
-} from "src/components/index";
+import { GridDataRow, HEADER, IconButton, IconButtonProps, KEPT_GROUP, TableStateContext } from "src/components/index";
 import { useComputed } from "src/hooks";
 
 export interface GridTableCollapseToggleProps extends Pick<IconButtonProps, "compact"> {
@@ -24,9 +17,9 @@ export function CollapseToggle(props: GridTableCollapseToggleProps) {
 
   // If we're not a header and not the selected group row, only render a toggle if we have child rows to actually collapse
   const isHeader = row.kind === HEADER;
-  const isSelectedGroup = row.kind === SELECTED_GROUP;
+  const isKeptGroup = row.kind === KEPT_GROUP;
   const hasChildren = row.children ? row.children.length > 0 : false;
-  if (!isHeader && !isSelectedGroup && !hasChildren) {
+  if (!isHeader && !isKeptGroup && !hasChildren) {
     return null;
   }
 

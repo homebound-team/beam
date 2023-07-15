@@ -3216,7 +3216,7 @@ describe("GridTable", () => {
       const r = await render(
         <GridTable columns={columns} rows={rows} filter="bar" sorting={{ on: "client", initial: ["value", "DESC"] }} />,
       );
-      // When deselecting the unmatched rows
+      // When deselecting the kept rows
       click(r.chevronRight);
       expect(cell(r, 1, 0)).toHaveTextContent("2 selected rows hidden due to filters");
       click(r.select_1);
@@ -3273,17 +3273,17 @@ describe("GridTable", () => {
       // When deselecting the visible row
       click(r.select_2);
 
-      // Then the parent row is now unchecked (respecting only the matched rows), but the header is still partially selected as it takes into consideration the unmatched selected rows
+      // Then the parent row is now unchecked (respecting only the matched rows), but the header is still partially selected as it takes into consideration the kept selected rows
       expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
       expect(cellAnd(r, 2, 1, "select")).not.toBeChecked();
 
       // And when clearing the filter
       type(r.filter, "");
-      // Then the parent row becomes partially selected now that the selected row is no longer "unmatched"
+      // Then the parent row becomes partially selected now that the selected row is no longer "kept"
       expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
     });
 
-    it("hides parent rows in the unmatched group unless they define inferSelected as false", async () => {
+    it("hides parent rows in the kept group unless they define inferSelected as false", async () => {
       // Given nested rows with two parents - one that sets `inferSelectedState: false`.
       // And all rows are selected, and a filter is applied that matches none of the rows
       const rows: GridDataRow<NestedRow>[] = [
@@ -3305,9 +3305,9 @@ describe("GridTable", () => {
         },
       ];
       const r = await render(<GridTable columns={nestedColumns} rows={rows} filter="no-match" />);
-      // And expand the unmatched group
+      // And expand the kept group
       click(r.chevronRight);
-      // Then the unmatched group will contain `p2`, but not `p1`.
+      // Then the kept group will contain `p2`, but not `p1`.
       expect(tableSnapshot(r)).toMatchInlineSnapshot(`
         "
         | -                                     | on | Name |
@@ -3321,8 +3321,8 @@ describe("GridTable", () => {
       `);
     });
 
-    it("unselects all unmatched selected rows when deselecting the header", async () => {
-      // Given selected rows and a filter applied to show the unmatched selected group
+    it("unselects all kept selected rows when deselecting the header", async () => {
+      // Given selected rows and a filter applied to show the kept selected group
       const columns = [selectColumn<Row>(), nameColumn, valueColumn];
       const rows: GridDataRow<Row>[] = [
         simpleHeader,
@@ -3330,7 +3330,7 @@ describe("GridTable", () => {
         { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
       ];
       const r = await render(<GridTable columns={columns} rows={rows} filter="bar" />);
-      // Then the unmatched selected group is shown
+      // Then the kept selected group is shown
       expect(cell(r, 1, 0)).toHaveTextContent("1 selected row hidden due to filters");
       expect(tableSnapshot(r)).toMatchInlineSnapshot(`
         "
@@ -3342,7 +3342,7 @@ describe("GridTable", () => {
       `);
       // When deselecting the header
       click(r.select_0);
-      // Then the unmatched selected group is hidden
+      // Then the kept selected group is hidden
       expect(tableSnapshot(r)).toMatchInlineSnapshot(`
         "
         | on | Name | Value |

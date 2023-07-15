@@ -24,10 +24,9 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   applyRowFn,
   EXPANDABLE_HEADER,
+  KEPT_GROUP,
   matchesFilter,
   reservedRowKinds,
-  SELECTED_GROUP,
-  unmatchedSelectionGroupRow,
   zIndices,
 } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
@@ -282,20 +281,18 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     return rows;
   }, [columns, rows, sortOn, sortState, caseSensitive]);
 
-  const unmatchedSelectedDataRows = useComputed(
-    () => tableState.unmatchedSelectedRows as GridDataRow<R>[],
-    [tableState],
-  );
-  // Sort the `unmatchedSelectedDataRows` separately
-  const sortedUnmatchedSelections = useMemo(() => {
-    if (sortOn === "client" && sortState && unmatchedSelectedDataRows.length > 0) {
-      return sortRows(columns, unmatchedSelectedDataRows, sortState, caseSensitive);
+  const keptSelectedDataRows = useComputed(() => tableState.keptSelectedRows as GridDataRow<R>[], [tableState]);
+  // Sort the `keptSelectedDataRows` separately because the current sorting logic sorts within groups and these "kept" rows are now displayed in a flat list.
+  // It could also be the case that some of these rows are no longer in the `props.rows` list, and so wouldn't be sorted by the `maybeSorted` logic above.
+  const sortedKeptSelections = useMemo(() => {
+    if (sortOn === "client" && sortState && keptSelectedDataRows.length > 0) {
+      return sortRows(columns, keptSelectedDataRows, sortState, caseSensitive);
     }
-    return unmatchedSelectedDataRows;
-  }, [columns, sortOn, sortState, caseSensitive, unmatchedSelectedDataRows]);
+    return keptSelectedDataRows;
+  }, [columns, sortOn, sortState, caseSensitive, keptSelectedDataRows]);
 
   // Flatten + component-ize the sorted rows.
-  let [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, unmatchedSelectedRows, filteredRowIds]: [
+  let [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, keptSelectedRows, filteredRowIds]: [
     RowTuple<R>[],
     RowTuple<R>[],
     RowTuple<R>[],
@@ -306,8 +303,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     function makeRowComponent(
       row: GridDataRow<R>,
       level: number,
-      isUnmatchedSelectedRow: boolean = false,
-      isLastUnmatchedSelectionRow: boolean = false,
+      isKeptSelectedRow: boolean = false,
+      isLastKeptSelectionRow: boolean = false,
     ): JSX.Element {
       return (
         <Row
@@ -326,8 +323,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
             sortOn,
             hasExpandableHeader,
-            isUnmatchedSelectedRow,
-            isLastUnmatchedSelectionRow,
+            isKeptSelectedRow,
+            isLastKeptSelectionRow,
           }}
         />
       );
@@ -338,7 +335,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     const expandableHeaderRows: RowTuple<R>[] = [];
     const totalsRows: RowTuple<R>[] = [];
     const visibleDataRows: RowTuple<R>[] = [];
-    const unmatchedSelectedRows: RowTuple<R>[] = [];
+    const keptSelectedRows: RowTuple<R>[] = [];
     const filteredRowIds: string[] = [];
 
     const hasExpandableHeader = rows.some((row) => row.id === EXPANDABLE_HEADER);
@@ -383,26 +380,28 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     // Check for any selected rows that are not displayed in the table because they don't match the current filter, or are no longer part of the `rows` prop.
     // We persist these selected rows and hoist them to the top of the table.
-    if (sortedUnmatchedSelections.length) {
-      const hsrTuples: RowTuple<R>[] = sortedUnmatchedSelections.map((row, idx) => [
-        row,
-        // This change in `isLastUnmatchedSelectionRow` gives the bottom border, but also causes the rows to re-render. Would be nice to find another way to do it.
-        makeRowComponent(row, 1, true, idx === sortedUnmatchedSelections.length - 1),
-      ]);
+    if (sortedKeptSelections.length) {
+      // The "group row" for selected rows that are hidden by filters and add the children
+      const keptSelectionGroupRow: GridDataRow<any> = {
+        id: KEPT_GROUP,
+        kind: KEPT_GROUP,
+        children: sortedKeptSelections,
+        initCollapsed: true,
+        data: undefined,
+      };
 
-      // Add the children to the group row
-      unmatchedSelectionGroupRow.children = sortedUnmatchedSelections;
-
-      unmatchedSelectedRows.push(
-        [
-          unmatchedSelectionGroupRow as GridDataRow<R>,
-          makeRowComponent(unmatchedSelectionGroupRow as GridDataRow<R>, 1),
-        ],
-        ...(collapsedIds.includes(SELECTED_GROUP) ? [] : hsrTuples),
+      keptSelectedRows.push(
+        [keptSelectionGroupRow as GridDataRow<R>, makeRowComponent(keptSelectionGroupRow as GridDataRow<R>, 1)],
+        ...(collapsedIds.includes(KEPT_GROUP)
+          ? []
+          : (sortedKeptSelections.map((row, idx) => [
+              row,
+              makeRowComponent(row, 1, true, idx === sortedKeptSelections.length - 1),
+            ]) satisfies RowTuple<R>[])),
       );
     }
 
-    return [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, unmatchedSelectedRows, filteredRowIds];
+    return [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, keptSelectedRows, filteredRowIds];
   }, [
     as,
     api,
@@ -415,7 +414,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     columnSizes,
     collapsedIds,
     getCount,
-    sortedUnmatchedSelections,
+    sortedKeptSelections,
   ]);
 
   // Once our header rows are created we can organize them in expected order.
@@ -424,7 +423,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   let tooManyClientSideRows = false;
   if (filterMaxRows && visibleDataRows.length > filterMaxRows) {
     tooManyClientSideRows = true;
-    visibleDataRows = visibleDataRows.slice(0, filterMaxRows + unmatchedSelectedRows.length);
+    visibleDataRows = visibleDataRows.slice(0, filterMaxRows + keptSelectedRows.length);
   }
 
   tableState.setMatchedRows(filteredRowIds);
@@ -476,7 +475,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           id,
           columns,
           visibleDataRows,
-          unmatchedSelectedRows,
+          keptSelectedRows,
           firstRowMessage,
           stickyHeader,
           xss,
@@ -503,7 +502,7 @@ function renderDiv<R extends Kinded>(
   id: string,
   columns: GridColumnWithId<R>[],
   visibleDataRows: RowTuple<R>[],
-  unmatchedSelectedRows: RowTuple<R>[],
+  keptSelectedRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
@@ -544,7 +543,7 @@ function renderDiv<R extends Kinded>(
           ...(style.lastRowCss && Css.addIn("& > div:last-of-type", style.lastRowCss).$),
         }}
       >
-        {unmatchedSelectedRows.map(([, node]) => node)}
+        {keptSelectedRows.map(([, node]) => node)}
         {/* Show an info message if it's set. */}
         {firstRowMessage && (
           <div css={{ ...style.firstRowMessageCss }} data-gridrow>
@@ -563,7 +562,7 @@ function renderTable<R extends Kinded>(
   id: string,
   columns: GridColumnWithId<R>[],
   visibleDataRows: RowTuple<R>[],
-  unmatchedSelectedRows: RowTuple<R>[],
+  keptSelectedRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
@@ -591,7 +590,7 @@ function renderTable<R extends Kinded>(
         {tableHeadRows.map(([, node]) => node)}
       </thead>
       <tbody>
-        {unmatchedSelectedRows.map(([, node]) => node)}
+        {keptSelectedRows.map(([, node]) => node)}
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
           <tr>
@@ -631,7 +630,7 @@ function renderVirtual<R extends Kinded>(
   id: string,
   columns: GridColumnWithId<R>[],
   visibleDataRows: RowTuple<R>[],
-  unmatchedSelectedRows: RowTuple<R>[],
+  keptSelectedRows: RowTuple<R>[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
@@ -665,7 +664,7 @@ function renderVirtual<R extends Kinded>(
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={stickyHeader ? tableHeadRows.length : 0}
       itemContent={(index) => {
-        // Since we have 3 arrays of rows: `tableHeadRows` and `visibleDataRows` and `unmatchedSelectedRows` we must determine which one to render.
+        // Since we have 3 arrays of rows: `tableHeadRows` and `visibleDataRows` and `keptSelectedRows` we must determine which one to render.
 
         if (index < tableHeadRows.length) {
           return tableHeadRows[index][1];
@@ -674,13 +673,13 @@ function renderVirtual<R extends Kinded>(
         // Reset index
         index -= tableHeadRows.length;
 
-        // Show unmatchedSelectedRows if there are any
-        if (index < unmatchedSelectedRows.length) {
-          return unmatchedSelectedRows[index][1];
+        // Show keptSelectedRows if there are any
+        if (index < keptSelectedRows.length) {
+          return keptSelectedRows[index][1];
         }
 
         // Reset index
-        index -= unmatchedSelectedRows.length;
+        index -= keptSelectedRows.length;
 
         // Show firstRowMessage as the first `filteredRow`
         if (firstRowMessage) {
@@ -700,9 +699,7 @@ function renderVirtual<R extends Kinded>(
         // Lastly render the table body rows
         return visibleDataRows[index][1];
       }}
-      totalCount={
-        tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + unmatchedSelectedRows.length
-      }
+      totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
       // When implementing infinite scroll, default the bottom `increaseViewportBy` to 500px. This creates the "infinite"
       // effect such that the next page of data is (hopefully) loaded before the user reaches the true bottom
       // Spreading these props due to virtuoso erroring when `increaseViewportBy` is undefined

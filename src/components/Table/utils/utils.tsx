@@ -23,10 +23,10 @@ export function toContent(
   isExpandableHeader: boolean,
   isExpandable: boolean,
   minStickyLeftOffset: number,
-  isUnmatchedSelectedRow: boolean,
+  isKeptSelectedRow: boolean,
 ): ReactNode {
-  // Rows within the unmatched selection group cannot be collapsed
-  if (isUnmatchedSelectedRow && column.id === "beamCollapseColumn") {
+  // Rows within the kept selection group cannot be collapsed
+  if (isKeptSelectedRow && column.id === "beamCollapseColumn") {
     return <></>;
   }
 
@@ -238,21 +238,12 @@ export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter:
 export const HEADER = "header";
 export const TOTALS = "totals";
 export const EXPANDABLE_HEADER = "expandableHeader";
-export const SELECTED_GROUP = "selectedGroup";
-export const reservedRowKinds = [HEADER, TOTALS, EXPANDABLE_HEADER, SELECTED_GROUP];
+export const KEPT_GROUP = "keptGroup";
+export const reservedRowKinds = [HEADER, TOTALS, EXPANDABLE_HEADER, KEPT_GROUP];
 
 export const zIndices = {
   stickyHeader: 4,
   stickyColumns: 3,
   expandableHeaderTitle: 2,
   expandableHeaderIcon: 1,
-};
-
-// The "group row" for selected rows that are hidden by filters.
-export const unmatchedSelectionGroupRow: GridDataRow<any> = {
-  id: SELECTED_GROUP,
-  kind: SELECTED_GROUP,
-  children: [],
-  initCollapsed: true,
-  data: undefined,
 };

@@ -1,6 +1,5 @@
 import { observer } from "mobx-react";
 import React, { ReactElement, useContext } from "react";
-import { CollapseToggle, Icon } from "src/components";
 import {
   defaultRenderFn,
   headerRenderFn,
@@ -8,6 +7,7 @@ import {
   rowClickRenderFn,
   rowLinkRenderFn,
 } from "src/components/Table/components/cell";
+import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
@@ -21,9 +21,9 @@ import {
   getJustification,
   HEADER,
   isGridCellContent,
+  KEPT_GROUP,
   maybeApplyFunction,
   reservedRowKinds,
-  SELECTED_GROUP,
   toContent,
   TOTALS,
   zIndices,
@@ -31,7 +31,7 @@ import {
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { AnyObject } from "src/types";
-import { isFunction, pluralize } from "src/utils";
+import { isFunction } from "src/utils";
 import { shallowEqual } from "src/utils/shallowEqual";
 
 interface RowProps<R extends Kinded> {
@@ -48,8 +48,8 @@ interface RowProps<R extends Kinded> {
   cellHighlight: boolean;
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
-  isUnmatchedSelectedRow: boolean;
-  isLastUnmatchedSelectionRow: boolean;
+  isKeptSelectedRow: boolean;
+  isLastKeptSelectionRow: boolean;
 }
 
 // We extract Row to its own mini-component primarily so we can React.memo'ize it.
@@ -68,8 +68,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     cellHighlight,
     omitRowHover,
     hasExpandableHeader,
-    isUnmatchedSelectedRow,
-    isLastUnmatchedSelectionRow,
+    isKeptSelectedRow,
+    isLastKeptSelectionRow,
     ...others
   } = props;
 
@@ -81,12 +81,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const isHeader = row.kind === HEADER;
   const isTotals = row.kind === TOTALS;
   const isExpandableHeader = row.kind === EXPANDABLE_HEADER;
-  const isSelectedGroupRow = row.kind === SELECTED_GROUP;
+  const isKeptGroupRow = row.kind === KEPT_GROUP;
   const rowStyle = rowStyles?.[row.kind];
   const RowTag = as === "table" ? "tr" : "div";
-  const CellTag = as === "table" ? "td" : "div";
-
-  const numHiddenSelectedRows: number = isSelectedGroupRow ? tableState.unmatchedSelectedRows.length : 0;
 
   const revealOnRowHoverClass = "revealOnRowHover";
 
@@ -108,7 +105,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [` > .${revealOnRowHoverClass} > *`]: Css.invisible.$,
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.visible.$,
     },
-    ...(isLastUnmatchedSelectionRow && Css.addIn("&>*", style.unmatchedSelectedLastRowCss).$),
+    ...(isLastKeptSelectionRow && Css.addIn("&>*", style.keptLastRowCss).$),
   };
 
   let currentColspan = 1;
@@ -120,27 +117,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   return (
     <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
-      {isSelectedGroupRow ? (
-        <CellTag
-          css={{
-            ...style.cellCss,
-            ...style.unmatchedSelectedGroupRowCss,
-            ...Css.pl0.w(`calc(${columnSizes.join(" + ")})`).$,
-          }}
-          {...(as === "table" ? { colSpan: columns.length } : {})}
-        >
-          <div css={Css.df.aic.gapPx(12).$}>
-            {/* Mimic the collapse column styles to make sure it lines up as expected */}
-            <div css={Css.wPx(38).df.jcc.$}>
-              <CollapseToggle row={row} compact />
-            </div>
-
-            <div css={Css.df.aic.gap1.$}>
-              <Icon icon="infoCircle" inc={2} />
-              {`${numHiddenSelectedRows} selected ${pluralize(numHiddenSelectedRows, "row")} hidden due to filters`}
-            </div>
-          </div>
-        </CellTag>
+      {isKeptGroupRow ? (
+        <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
       ) : (
         columns.map((column, columnIndex) => {
           // If the expandable column was hidden, then we need to look at the previous column to format the `expandHeader` and 'header' kinds correctly.
@@ -232,7 +210,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             isExpandableHeader,
             isExpandable,
             minStickyLeftOffset,
-            isUnmatchedSelectedRow,
+            isKeptSelectedRow,
           );
 
           ensureClientSideSortValueIsSortable(

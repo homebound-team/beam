@@ -50,10 +50,10 @@ export interface GridStyle {
   levels?: Record<number, { cellCss?: Properties; firstContentColumn?: Properties }>;
   /** Allows for customization of the background color used to denote an "active" row */
   activeBgColor?: Palette;
-  /** Defines styles for the group row which displays any "hidden selected" rows */
-  unmatchedSelectedGroupRowCss?: Properties;
-  /** Defines styles for the last row in the "hidden selected" group to provide separation from the rest of the table */
-  unmatchedSelectedLastRowCss?: Properties;
+  /** Defines styles for the group row which holds the selected rows that have been filtered out */
+  keptGroupRowCss?: Properties;
+  /** Defines styles for the last row `keptGroup` to provide separation from the rest of the table */
+  keptLastRowCss?: Properties;
 }
 
 // If adding a new `GridStyleDef`, ensure if it added to the `defKeys` in the `resolveStyles` function below
@@ -155,8 +155,8 @@ function memoizedTableStyles() {
         presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
         levels: grouped ? groupedLevels : defaultLevels,
         rowHoverColor: Palette.LightBlue100,
-        unmatchedSelectedGroupRowCss: Css.bgYellow100.gray900.xsMd.$,
-        unmatchedSelectedLastRowCss: Css.boxShadow("inset 0px -14px 8px -11px rgba(63,63,63,.18)").$,
+        keptGroupRowCss: Css.bgYellow100.gray900.xsMd.$,
+        keptLastRowCss: Css.boxShadow("inset 0px -14px 8px -11px rgba(63,63,63,.18)").$,
       };
     }
 
