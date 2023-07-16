@@ -5,7 +5,17 @@ import { Kinded } from "src/components/Table/types";
 import { Css, Palette, Properties, Typography } from "src/Css";
 import { safeKeys } from "src/utils";
 
-/** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
+/**
+ * Defines the look & feel of a table.
+ *
+ * This defines per-row/per-cell/etc. CSS, which our ~generally "headless"/style-less
+ * GridTable will use while rendering the table.
+ *
+ * Obviously we have some coupling between the GridTable's DOM output and what's possible
+ * to style, so this does not allow "styling anything you want", but it should still be
+ * pretty powerful/generic, and if not we can co-evolve this API with the GridTable DOM
+ * output to achieve new design asks.
+ */
 export interface GridStyle {
   /** Applied to the base div element. */
   rootCss?: Properties;
@@ -52,7 +62,20 @@ export interface GridStyle {
   activeBgColor?: Palette;
 }
 
-// If adding a new `GridStyleDef`, ensure if it added to the `defKeys` in the `resolveStyles` function below
+/**
+ * Lets users request a pre-defined style for a table.
+ *
+ * While `GridStyle` defines very detailed, low-level CSS that could be Homebound-agnostic, this
+ * `GridStyleDef` provides higher-level knobs/customizations that are specific to Homebound's
+ * design system.
+ *
+ * I.e. "I want a table for inline editing, with cell highlights on."
+ *
+ * We then map these knobs to a low-level `GridStyle` in `memoizedTableStyles` below.
+ *
+ * Note: If you add a new "knob" to this interface, ensure it's also added to the `defKeys` in the
+ * `resolveStyles` function below
+ */
 export interface GridStyleDef {
   /** Changes the height of the rows when `rowHeight: fixed` to provide more space between rows for input fields. */
   inlineEditing?: boolean;
@@ -74,86 +97,102 @@ export interface GridStyleDef {
   cellTypography?: Typography;
 }
 
+// We use this const in `resolveStyles` to detect GridStyle vs. GridStyleDef props.
+const defKeysRecord: Record<keyof GridStyleDef, boolean> = {
+  inlineEditing: true,
+  grouped: true,
+  rowHeight: true,
+  cellHighlight: true,
+  allWhite: true,
+  bordered: true,
+  rowHover: true,
+  vAlign: true,
+  cellTypography: true,
+};
+const defKeys = Object.keys(defKeysRecord);
+
+/** Maps the higher-level knobs of our `GridStyleDef` to a lower-level `GridStyle`. */
+function createGridStyle(def: GridStyleDef): GridStyle {
+  const {
+    inlineEditing = false,
+    grouped = false,
+    rowHeight = "flexible",
+    cellHighlight = false,
+    allWhite = false,
+    bordered = false,
+    vAlign = "center",
+    cellTypography = "xs" as const,
+  } = def;
+
+  const alignItems = vAlign === "center" ? "center" : vAlign === "top" ? "flex-start" : "flex-end";
+  const groupedLevels = {
+    0: {
+      cellCss: {
+        ...Css.xsMd.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+        ...(allWhite && Css.bgWhite.$),
+      },
+      firstContentColumn: { ...Css.smMd.$, ...(allWhite && Css.smBd.gray900.$) },
+    },
+    2: { firstContentColumn: Css.tiny.pl3.$ },
+    // Add 12 more pixels of padding for each level of nesting
+    3: { firstContentColumn: Css.tiny.plPx(36).$ },
+  };
+  const defaultLevels = { 1: { firstContentColumn: Css.tiny.pl3.$ } };
+
+  return {
+    emptyCell: "-",
+    firstRowMessageCss: Css.tc.py3.$,
+    headerCellCss: {
+      // We want to support headers having two lines of wrapped text, and could add a `lineClamp2` here, but
+      // lineClamp requires `display: webkit-box`, which disables `align-items: center` (requires `display: flex/grid`)
+      // Header's will add `lineClamp2` more locally in their renders.
+      // Also `unset`-ing the white-space: nowrap defined in `cellCss` below.
+      ...Css.gray700.xsMd.bgGray200.aic.pxPx(12).whiteSpace("unset").hPx(40).$,
+      ...(allWhite && Css.bgWhite.$),
+    },
+    totalsCellCss: Css.bgWhite.gray700.bgGray100.xsMd.hPx(totalsRowHeight).pPx(12).$,
+    expandableHeaderCss: Css.bgWhite.gray900.xsMd.wsNormal
+      .hPx(expandableHeaderRowHeight)
+      .pxPx(12)
+      .py0.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
+      .addIn("&:not(:last-of-type)", Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$).$,
+    cellCss: {
+      ...Css[cellTypography].gray900.bgWhite.ai(alignItems).pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+      ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
+      ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
+      ...(bordered && { "&:first-of-type": Css.bl.bGray200.$, "&:last-of-type": Css.br.bGray200.$ }),
+    },
+    firstRowCss: {
+      ...Css.addIn("& > *:first-of-type", Css.borderRadius("8px 0 0 0 ").$).addIn(
+        "& > *:last-of-type",
+        Css.borderRadius("0 8px 0 0").$,
+      ).$,
+      ...(bordered && Css.addIn("& > *", Css.bt.bGray200.$).$),
+    },
+    // Only apply border radius styles to the last row when using the `bordered` style table.
+    lastRowCss: bordered
+      ? Css.addIn("& > *:first-of-type", Css.borderRadius("0 0 0 8px").$).addIn(
+          "& > *:last-of-type",
+          Css.borderRadius("0 0 8px 0").$,
+        ).$
+      : Css.addIn("> *", Css.bsh0.$).$,
+    presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
+    levels: grouped ? groupedLevels : defaultLevels,
+    rowHoverColor: Palette.LightBlue100,
+  };
+}
+
 // Returns a "blessed" style of GridTable
 function memoizedTableStyles() {
   const cache: Record<string, GridStyle> = {};
-  return (props: GridStyleDef = {}) => {
-    const {
-      inlineEditing = false,
-      grouped = false,
-      rowHeight = "flexible",
-      cellHighlight = false,
-      allWhite = false,
-      bordered = false,
-      vAlign = "center",
-      cellTypography = "xs" as const,
-    } = props;
-
-    const key = safeKeys(props)
+  return (def: GridStyleDef = {}) => {
+    const key = safeKeys(def)
       .sort()
-      .map((k) => `${k}_${props[k]}`)
+      .map((k) => `${k}_${def[k]}`)
       .join("|");
-
     if (!cache[key]) {
-      const alignItems = vAlign === "center" ? "center" : vAlign === "top" ? "flex-start" : "flex-end";
-      const groupedLevels = {
-        0: {
-          cellCss: {
-            ...Css.xsMd.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
-            ...(allWhite && Css.bgWhite.$),
-          },
-          firstContentColumn: { ...Css.smMd.$, ...(allWhite && Css.smBd.gray900.$) },
-        },
-        2: { firstContentColumn: Css.tiny.pl3.$ },
-        // Add 12 more pixels of padding for each level of nesting
-        3: { firstContentColumn: Css.tiny.plPx(36).$ },
-      };
-      const defaultLevels = { 1: { firstContentColumn: Css.tiny.pl3.$ } };
-
-      cache[key] = {
-        emptyCell: "-",
-        firstRowMessageCss: Css.tc.py3.$,
-        headerCellCss: {
-          // We want to support headers having two lines of wrapped text, and could add a `lineClamp2` here, but
-          // lineClamp requires `display: webkit-box`, which disables `align-items: center` (requires `display: flex/grid`)
-          // Header's will add `lineClamp2` more locally in their renders.
-          // Also `unset`-ing the white-space: nowrap defined in `cellCss` below.
-          ...Css.gray700.xsMd.bgGray200.aic.pxPx(12).whiteSpace("unset").hPx(40).$,
-          ...(allWhite && Css.bgWhite.$),
-        },
-        totalsCellCss: Css.bgWhite.gray700.bgGray100.xsMd.hPx(totalsRowHeight).pPx(12).$,
-        expandableHeaderCss: Css.bgWhite.gray900.xsMd.wsNormal
-          .hPx(expandableHeaderRowHeight)
-          .pxPx(12)
-          .py0.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
-          .addIn("&:not(:last-of-type)", Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$).$,
-        cellCss: {
-          ...Css[cellTypography].gray900.bgWhite.ai(alignItems).pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
-            .$,
-          ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
-          ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
-          ...(bordered && { "&:first-of-type": Css.bl.bGray200.$, "&:last-of-type": Css.br.bGray200.$ }),
-        },
-        firstRowCss: {
-          ...Css.addIn("& > *:first-of-type", Css.borderRadius("8px 0 0 0 ").$).addIn(
-            "& > *:last-of-type",
-            Css.borderRadius("0 8px 0 0").$,
-          ).$,
-          ...(bordered && Css.addIn("& > *", Css.bt.bGray200.$).$),
-        },
-        // Only apply border radius styles to the last row when using the `bordered` style table.
-        lastRowCss: bordered
-          ? Css.addIn("& > *:first-of-type", Css.borderRadius("0 0 0 8px").$).addIn(
-              "& > *:last-of-type",
-              Css.borderRadius("0 0 8px 0").$,
-            ).$
-          : Css.addIn("> *", Css.bsh0.$).$,
-        presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
-        levels: grouped ? groupedLevels : defaultLevels,
-        rowHoverColor: Palette.LightBlue100,
-      };
+      cache[key] = createGridStyle(def);
     }
-
     return cache[key];
   };
 }
@@ -193,9 +232,11 @@ export const condensedStyle: GridStyle = {
   },
 };
 
-/** Renders each row as a card.
+/**
+ * Renders each row as a card.
+ *
  * TODO: Add `cardStyle` option to `getTableStyles` and remove this.
- * */
+ */
 export const cardStyle: GridStyle = {
   ...defaultStyle,
   betweenRowsCss: {},
@@ -213,20 +254,12 @@ export const cardStyle: GridStyle = {
   },
 };
 
+/**
+ * Detects whether the `GridTableProps.style` is either a low-level `GridStyle` or our
+ * newer `GridStyleDef` and maps them both to a `GridStyle`.
+ */
 export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
-  const defKeysRecord: Record<keyof GridStyleDef, boolean> = {
-    inlineEditing: true,
-    grouped: true,
-    rowHeight: true,
-    cellHighlight: true,
-    allWhite: true,
-    bordered: true,
-    rowHover: true,
-    vAlign: true,
-    cellTypography: true,
-  };
-  const keys = safeKeys(style);
-  const defKeys = safeKeys(defKeysRecord);
+  const keys = Object.keys(style);
   if (keys.length === 0 || keys.some((k) => defKeys.includes(k))) {
     return getTableStyles(style as GridStyleDef);
   }
