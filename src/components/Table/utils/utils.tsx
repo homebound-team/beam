@@ -23,7 +23,13 @@ export function toContent(
   isExpandableHeader: boolean,
   isExpandable: boolean,
   minStickyLeftOffset: number,
+  isKeptSelectedRow: boolean,
 ): ReactNode {
+  // Rows within the kept selection group cannot be collapsed
+  if (isKeptSelectedRow && column.id === "beamCollapseColumn") {
+    return <></>;
+  }
+
   let content = isGridCellContent(maybeContent) ? maybeContent.content : maybeContent;
   if (typeof content === "function") {
     // Actually create the JSX by calling `content()` here (which should be as late as
@@ -232,7 +238,8 @@ export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter:
 export const HEADER = "header";
 export const TOTALS = "totals";
 export const EXPANDABLE_HEADER = "expandableHeader";
-export const reservedRowKinds = [HEADER, TOTALS, EXPANDABLE_HEADER];
+export const KEPT_GROUP = "keptGroup";
+export const reservedRowKinds = [HEADER, TOTALS, EXPANDABLE_HEADER, KEPT_GROUP];
 
 export const zIndices = {
   stickyHeader: 4,

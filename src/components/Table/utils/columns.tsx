@@ -39,8 +39,8 @@ export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>
     id: "beamSelectColumn",
     clientSideSort: false,
     align: "center",
-    // Defining `w: 48px` to accommodate for the `16px` wide checkbox and `16px` of padding on either side.
-    w: "48px",
+    // Defining `w: 40px` to accommodate for the `16px` wide checkbox and `12px` of padding on either side.
+    w: "40px",
     wrapAction: false,
     isAction: true,
     expandColumns: undefined,

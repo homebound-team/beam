@@ -90,7 +90,6 @@ function ToggleButtonWrapper({ isHovered, isFocused, isPressed, onChange, ...pro
         onChange={
           onChange
             ? (value) => {
-                console.log("selected value = ", value);
                 const result = onChange(value);
                 setSelected(value);
                 if (isPromise(result)) {
