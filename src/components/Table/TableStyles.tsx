@@ -68,8 +68,6 @@ export interface GridStyleDef {
   bordered?: boolean;
   /** Whether to show a hover effect on rows. Defaults to true */
   rowHover?: boolean;
-  /** Defines the vertical alignment of the content of the cells for the whole table (not including the 'header' rows). Defaults to `center` */
-  vAlign?: "top" | "center" | "bottom";
   /** Defines the Typography for the table body's cells (not the header). This only applies to rows that are not nested/grouped */
   cellTypography?: Typography;
 }
@@ -85,7 +83,6 @@ function memoizedTableStyles() {
       cellHighlight = false,
       allWhite = false,
       bordered = false,
-      vAlign = "center",
       cellTypography = "xs" as const,
     } = props;
 
@@ -95,7 +92,7 @@ function memoizedTableStyles() {
       .join("|");
 
     if (!cache[key]) {
-      const alignItems = vAlign === "center" ? "center" : vAlign === "top" ? "flex-start" : "flex-end";
+      const alignItems = rowHeight === "fixed" ? "center" : "flex-start";
       const groupedLevels = {
         0: {
           cellCss: {
@@ -222,7 +219,6 @@ export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
     allWhite: true,
     bordered: true,
     rowHover: true,
-    vAlign: true,
     cellTypography: true,
   };
   const keys = safeKeys(style);

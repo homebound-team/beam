@@ -40,7 +40,6 @@ interface TableStoryProps extends GridTableProps<any, any> {
   displayAs?: "default" | "virtual" | "table";
   totals?: boolean;
   expandable?: boolean;
-  vAlign?: "top" | "center" | "bottom";
 }
 
 export default {
@@ -90,7 +89,6 @@ export default {
     grouped: { name: "Group styles", control: { type: "boolean" }, if: { arg: "nestingDepth", neq: 1 } },
     bordered: { name: "Bordered", control: { type: "boolean" } },
     allWhite: { name: "All White", control: { type: "boolean" } },
-    vAlign: { name: "Vertical Alignment", options: ["center", "top", "bottom"], control: { type: "select" } },
     rowHover: { name: "Row Hover styles", control: { type: "boolean" } },
     totals: { name: "Show Totals row", control: { type: "boolean" } },
     expandable: { name: "With Expandable Columns", control: { type: "boolean" } },
@@ -116,8 +114,7 @@ type BeamData = {
 type BeamRow = SimpleHeaderAndData<BeamData>;
 
 export function Table(props: TableStoryProps) {
-  const { nestingDepth, allWhite, vAlign, grouped, rowHeight, bordered, displayAs, totals, rowHover, expandable } =
-    props;
+  const { nestingDepth, allWhite, grouped, rowHeight, bordered, displayAs, totals, rowHover, expandable } = props;
   const [filter, setFilter] = useState<string>();
 
   const [rows, columns] = useMemo(() => {
@@ -158,7 +155,6 @@ export function Table(props: TableStoryProps) {
             rowHeight,
             bordered,
             rowHover,
-            vAlign,
           }}
           sorting={{ on: "client" }}
           columns={columns}
