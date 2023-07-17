@@ -31,9 +31,12 @@ export class TableState {
   // A set of just row ids, i.e. not row.kind+row.id
   private readonly collapsedRows = new ObservableSet<string>([]);
   private persistCollapse: string | undefined;
+  // This will include rows that are selected, are partially selected, or were at once selected but are now unchecked.
+  // Rows within this map may be in `this.rows` or removed from `this.rows`.
   private readonly rowSelectedState = new ObservableMap<string, SelectedState>();
   // Keep a copy of all the selected GridDataRows - Do not include custom row kinds such as `header`, `totals`, etc.
   // This allows us to keep track of rows that were selected, but may no longer be defined in `GridTable.rows`
+  // This will be used to determine which rows are considered "kept" rows when filtering is applied or `GridTableProp.rows` changes
   public selectedDataRows = new ObservableMap<string, GridDataRow<any>>();
   // Set of just row ids. Keeps track of which rows match the filter. Used to filter rows from `selectedIds`
   private matchedRows = new ObservableSet<string>();
