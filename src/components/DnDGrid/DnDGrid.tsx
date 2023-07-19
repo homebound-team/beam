@@ -135,12 +135,15 @@ export function DnDGrid(props: DnDGridProps) {
         initReorder();
 
         // Determine the position of the pointer relative to the element being dragged.
+        const gridRect = gridEl.current.getBoundingClientRect();
         const rect = dragEl.current.getBoundingClientRect();
         const clientX = "clientX" in e ? e.clientX : e.touches[0].clientX;
         const clientY = "clientY" in e ? e.clientY : e.touches[0].clientY;
+        const top = rect.top - gridRect.top;
+        const left = rect.left - gridRect.left;
 
         // Store the pointer's offset from the tile being moved to help correctly position the element as we drag it around.
-        transformFrom.current = { x: clientX - rect.left, y: clientY - rect.top };
+        transformFrom.current = { x: clientX - left, y: clientY - top };
 
         // Duplicate the draggable element as a placeholder to show as a drop target
         cloneEl.current = dragEl.current.cloneNode() as HTMLElement;
@@ -161,7 +164,7 @@ export function DnDGrid(props: DnDGridProps) {
         // This will remove it from the normal flow of the page, allowing the clone above to take its place.
         dragEl.current.setAttribute(
           "style",
-          `pointer-events: none; position:fixed; z-index: 9999; top:${rect.top}px; left:${rect.left}px; width:${rect.width}px; height:${rect.height}px;`,
+          `pointer-events: none; position:fixed; z-index: 9999; top:${top}px; left:${left}px; width:${rect.width}px; height:${rect.height}px;`,
         );
         // Applies cursor styling to the Grid element.
         gridEl.current.style.cursor = "grabbing";
@@ -275,7 +278,7 @@ export function DnDGrid(props: DnDGridProps) {
       <div
         ref={gridEl}
         css={{
-          ...Css.dg.addIn(`& .${activeGridItemClass}`, activeItemStyles ?? Css.bshModal.$).$,
+          ...Css.ctis.dg.addIn(`& .${activeGridItemClass}`, activeItemStyles ?? Css.bshModal.$).$,
           ...gridStyles,
         }}
         onTouchStart={onDragStart}
