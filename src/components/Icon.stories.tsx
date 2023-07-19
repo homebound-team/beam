@@ -63,6 +63,8 @@ export const Icon = (props: IconProps) => {
     "xCircle",
     "flag",
     "outlineFlag",
+    "circle",
+    "checkCircleFilled",
   ];
   const arrowIcons: IconProps["icon"][] = [
     "chevronsDown",
