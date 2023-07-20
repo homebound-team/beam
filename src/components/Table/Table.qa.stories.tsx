@@ -154,22 +154,32 @@ export function Table(props: TableStoryProps) {
     >
       <TableActions>
         <div css={Css.w("100vw").sm.$}>
-          <TextField
-            label="Filter"
-            labelStyle="hidden"
-            placeholder="Search"
-            value={filter}
-            onChange={setFilter}
-            startAdornment={<Icon icon="search" />}
-            clearable
-          />
+          <div css={Css.df.aic.gap1.$}>
+            <TextField
+              label="Filter"
+              labelStyle="hidden"
+              placeholder="Search"
+              value={filter}
+              onChange={setFilter}
+              startAdornment={<Icon icon="search" />}
+              clearable
+            />
+            <Button
+              label="Change Rows"
+              onClick={() => setRows((rows) => (rows.length === 4 ? nestedRows : newRows))}
+              tooltip="Simulates server side filtering"
+            />
+            <Button
+              label="Delete Rows"
+              onClick={() => {
+                setRows((rows) => rows.filter((r) => !api.getSelectedRowIds().includes(r.id)));
+                // api.deleteRows(api.getSelectedRowIds("child"));
+              }}
+            />
+          </div>
           <div>
             <span css={Css.smMd.mr1.$}>Selected Row Ids:</span>
             {selectedRows.length > 0 ? selectedRows.map((r) => r.id).join(", ") : "None"}
-          </div>
-          <div>
-            <span css={Css.smMd.mr1.$}>Simulate server side filtering:</span>
-            <Button label="Change Rows" onClick={() => setRows((rows) => (rows.length === 4 ? nestedRows : newRows))} />
           </div>
         </div>
       </TableActions>
