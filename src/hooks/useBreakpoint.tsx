@@ -21,7 +21,7 @@ export function useBreakpoint(): BreakpointsType {
     if (equal(breakpoints, newBps)) return;
 
     setBreakpoints(newBps);
-  }, 1000);
+  }, 250);
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
