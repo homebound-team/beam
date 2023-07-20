@@ -128,7 +128,7 @@ export const Icon = (props: IconProps) => {
     "ruler",
     "palette",
     "bath",
-    "garage",
+    "car",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
