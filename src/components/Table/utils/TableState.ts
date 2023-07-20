@@ -581,6 +581,18 @@ export class TableState {
     }
   }
 
+  deleteRows(ids: string[]): void {
+    this.rows = this.rows.filter((row) => !ids.includes(row.id));
+    this.keptSelectedRows = this.keptSelectedRows.filter((row) => !ids.includes(row.id));
+
+    ids.forEach((id) => {
+      this.selectedDataRows.delete(id);
+      this.rowSelectedState.delete(id);
+      this.collapsedRows.delete(id);
+      this.matchedRows.delete(id);
+    });
+  }
+
   private getMatchedChildrenStates(children: GridDataRow<any>[], map: Map<string, SelectedState>): SelectedState[] {
     const respectedChildren = children.flatMap(getChildrenForDerivingSelectState);
     // When determining the children selected states to base the parent's state from, then only base this off of rows that match the filter or are in the "hidden selected" group (via the `filter` below)

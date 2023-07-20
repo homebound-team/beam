@@ -48,6 +48,9 @@ export type GridTableApi<R extends Kinded> = {
   /** Set selected state of a row by id */
   selectRow: (id: string, selected?: boolean) => void;
 
+  /** Deletes a row from the table */
+  deleteRows: (ids: string[]) => void;
+
   /** Toggle collapse state of a row by id */
   toggleCollapsedRow: (id: string) => void;
   isCollapsedRow: (id: string) => boolean;
@@ -115,5 +118,9 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public getVisibleColumnIds() {
     return this.tableState.visibleColumnIds;
+  }
+
+  public deleteRows(ids: string[]) {
+    this.tableState.deleteRows(ids);
   }
 }

@@ -3352,6 +3352,56 @@ describe("GridTable", () => {
       `);
     });
   });
+
+  describe("deleting rows", () => {
+    it("deletes a row", async () => {
+      // Given a table with the ability to delete rows
+      const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+      function TestComponent() {
+        const _api = useGridTableApi<Row>();
+        api.current = _api;
+        const [rows, setRows] = useState<GridDataRow<Row>[]>([
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+          { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+        ]);
+        return (
+          <>
+            <button
+              onClick={() => {
+                setRows((rows) => rows.filter((r) => !_api.getSelectedRowIds().includes(r.id)));
+                _api.deleteRows(_api.getSelectedRowIds());
+              }}
+              data-testid="deleteRows"
+            />
+            <GridTable columns={[selectColumn<Row>(), ...columns]} rows={rows} api={_api} />
+          </>
+        );
+      }
+      const r = await render(<TestComponent />);
+      // The table has two rows and a header
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | on | Name | Value |
+        | -- | ---- | ----- |
+        | on | foo  | 1     |
+        | on | bar  | 2     |
+        "
+      `);
+      // When selecting a row
+      click(r.select_1);
+      // And clicking the delete button
+      click(r.deleteRows);
+      // Then it is removed from the table
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | on | Name | Value |
+        | -- | ---- | ----- |
+        | on | bar  | 2     |
+        "
+      `);
+    });
+  });
 });
 
 function Collapse({ id }: { id: string }) {
