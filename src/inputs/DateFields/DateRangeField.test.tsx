@@ -39,8 +39,6 @@ describe(DateRangeField, () => {
     const { from, to } = onChange.mock.calls[0][0];
     expect(new Date(from).toDateString()).toEqual(new Date("01/01/2020").toDateString());
     expect(new Date(to).toDateString()).toEqual(new Date("01/10/2020").toDateString());
-    // And `onBlur` should have been called
-    expect(onBlur).toBeCalledTimes(1);
   });
 
   it("can unset the input value while selecting dates", async () => {

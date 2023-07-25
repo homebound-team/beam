@@ -30,14 +30,12 @@ describe("DateField", () => {
 
     // And when selecting a date - Choose the first of these, which should be `jan1`
     click(r.datePickerDay_0);
-    // Then then Date Picker should close
+    // Then the Date Picker should close
     expect(r.queryByTestId("date_datePicker")).toBeFalsy();
     // And the input's value should reflect the new date.
     expect(r.date()).toHaveValue("01/01/20");
     expect(onChange).toBeCalledTimes(1);
     expect(new Date(onChange.mock.calls[0][0]).toDateString()).toEqual(jan1.toDateString());
-    // And the date picker closes
-    expect(onBlur).toBeCalledTimes(1);
   });
 
   it("resets to previous date if user enters invalid value", async () => {

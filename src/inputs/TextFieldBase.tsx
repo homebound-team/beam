@@ -56,6 +56,9 @@ export interface TextFieldBaseProps<X>
   hideErrorMessage?: boolean;
   // If set, the helper text will always be shown (usually we hide the helper text if read only)
   alwaysShowHelperText?: boolean;
+  // If set, the field will be treated as "read-only" in order to prevent the virtual keyboard on touch devices.
+  // It cannot be edited directly. It can be changed via other methods, though (i.e. DatePicker).
+  preventEdit?: boolean;
 }
 
 // Used by both TextField and TextArea
@@ -89,6 +92,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     errorInTooltip = fieldProps?.errorInTooltip ?? false,
     hideErrorMessage = false,
     alwaysShowHelperText = false,
+    preventEdit = false,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
@@ -243,8 +247,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
                 ref={fieldRef as any}
                 rows={multiline ? 1 : undefined}
-                // Make the input field readOnly if the field explicitly sets it to `true`
-                readOnly={inputProps.readOnly}
+                readOnly={preventEdit}
                 css={{
                   ...fieldStyles.input,
                   ...(inputProps.disabled ? fieldStyles.disabled : {}),

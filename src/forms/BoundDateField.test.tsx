@@ -12,12 +12,15 @@ describe("BoundDateField", () => {
     const author = createObjectState(formConfig, {});
     const r = await render(<BoundDateField field={author.birthday} onBlur={onBlur} onFocus={onFocus} />);
 
-    // When focus is triggered on a checkbox
+    // When focus is triggered
     focus(r.birthday);
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
 
-    // When blur is triggered on a checkbox
+    // When closing the overlay and putting focus back on the input
+    fireEvent.keyDown(r.birthday_datePicker(), { key: "Escape", code: "Escape" });
+
+    // When blur is triggered
     blur(r.birthday());
     // Then the callback should be triggered
     expect(onBlur).toBeCalledTimes(1);

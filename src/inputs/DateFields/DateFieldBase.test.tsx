@@ -57,7 +57,7 @@ describe(DateFieldBase, () => {
     // Given focus set on the input element.
     focus(r.date);
     // When setting focus to the Calendar Icon button
-    focus(r.date_calendarButton);
+    click(r.date_calendarButton);
     // Then expect the focus to move back to the input element.
     expect(r.date()).toHaveFocus();
     // And firing blur event on the input with the `calendarButton` as the related target
@@ -80,20 +80,17 @@ describe(DateFieldBase, () => {
   it("calls onBlur once the calendar overlay closes and focus is not returned to the input field", async () => {
     const onBlur = jest.fn();
     const r = await render(<DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
-    // Given focus set on the input element.
+    // When giving focus to the input element.
     focus(r.date);
-    // When "blur"ing the field with the overlay as the related target
-    fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
-    // Then `onBlur` is not called because the user is now interacting with the overlay
+    // Then the overlay should be opened
+    expect(r.date_datePicker()).toBeTruthy();
+    // expect(r.date()).not.toHaveFocus();
+    // Then `onBlur` is not called because the overlay is now open
     expect(onBlur).not.toBeCalled();
-    // When setting focus on the date.
-    focus(r.date);
     // And modify the date field to close the overlay - This should trigger an `onBlur` event due to the overlay closing and the field no longer having focus.
     fireEvent.input(r.date(), { target: { value: "01/29/20" } });
     // Then the overlay should close
     expect(r.queryByTestId("date_datePicker")).toBeFalsy();
-    // onBlur should have been called as the focus was removed from both the overlay calendar and the input field.
-    expect(onBlur).toBeCalledTimes(1);
 
     // Given focus set on the input element.
     focus(r.date);
@@ -105,8 +102,10 @@ describe(DateFieldBase, () => {
     fireEvent.keyDown(r.date_datePicker(), { key: "Escape", code: "Escape" });
     // Then the overlay should close
     expect(r.queryByTestId("date_datePicker")).toBeFalsy();
+    // When blur-ing the field with the overlay closed
+    blur(r.date);
     // Then `onBlur` should have been called
-    expect(onBlur).toBeCalledTimes(2);
+    expect(onBlur).toBeCalledTimes(1);
   });
 
   it("can fire onFocus and onBlur when interacting with the input field only", async () => {
@@ -120,7 +119,9 @@ describe(DateFieldBase, () => {
     focus(r.date);
     // Then focus should be called.
     expect(onFocus).toBeCalledTimes(1);
-    // When firing the blur event
+    // When closing the overlay
+    fireEvent.keyDown(r.date_datePicker(), { key: "Escape", code: "Escape" });
+    // And firing the blur event with the overlay closed
     blur(r.date);
     // Then onBlur should be called
     expect(onBlur).toBeCalledTimes(1);
@@ -133,9 +134,15 @@ describe(DateFieldBase, () => {
     const r = await render(
       <DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onEnter={onEnter} onBlur={onBlur} />,
     );
-    // When changing the input value to an valid date
+    // When focusing on the input
     focus(r.date);
-    expect(r.date()).toHaveFocus();
+    // Then the overlay should be opened
+    expect(r.chevronLeft()).toHaveFocus();
+    // When closing the overlay
+    fireEvent.keyDown(r.date_datePicker(), { key: "Escape", code: "Escape" });
+    expect(r.queryByTestId("date_datePicker")).toBeFalsy();
+    // And putting focus back on the input
+    focus(r.date);
     // And when hitting the Enter key
     fireEvent.keyDown(r.date(), { key: "Enter" });
     // And the onEnter and onBlur callbacks should be triggered

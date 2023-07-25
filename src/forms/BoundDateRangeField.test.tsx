@@ -18,6 +18,9 @@ describe(BoundDateRangeField, () => {
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
 
+    // When closing the overlay and putting focus back on the input
+    fireEvent.keyDown(r.saleDates_datePicker(), { key: "Escape", code: "Escape" });
+
     // When blur is triggered on a checkbox
     blur(r.saleDates);
     // Then the callback should be triggered

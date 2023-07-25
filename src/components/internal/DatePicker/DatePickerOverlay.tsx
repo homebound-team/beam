@@ -10,7 +10,7 @@ export function DatePickerOverlay({ overlayProps, children }: PropsWithChildren<
   return (
     // Adds `tabIndex` so clicking within the DatePicker will provide a `e.relatedTarget` on blur and focus events.
     // This allows for components such as the DateField to conditionally trigger their 'onBlur' prop. E.g. If the user leaves the field to interact with the DatePicker, then don't call onBlur
-    <div css={Css.br4.bshModal.$} {...overlayProps} tabIndex={0}>
+    <div css={Css.br4.bshModal.$} {...overlayProps}>
       {children}
     </div>
   );
