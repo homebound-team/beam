@@ -1,3 +1,4 @@
+export * from "src/components/AutoSaveStatus";
 export * from "src/components/Chip";
 export * from "src/components/Chips";
 export * from "src/components/Table/GridTable";
