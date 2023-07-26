@@ -291,7 +291,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     return keptSelectedDataRows;
   }, [columns, sortOn, sortState, caseSensitive, keptSelectedDataRows]);
 
-  // Flatten + component-ize the sorted rows.
+  // Flatten, hide-if-filtered, hide-if-collapsed, and component-ize the sorted rows.
   let [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, keptSelectedRows, filteredRowIds]: [
     RowTuple<R>[],
     RowTuple<R>[],
@@ -300,35 +300,33 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     RowTuple<R>[],
     string[],
   ] = useMemo(() => {
-    function makeRowComponent(
+    const hasExpandableHeader = maybeSorted.some((row) => row.id === EXPANDABLE_HEADER);
+    const makeRowComponent = (
       row: GridDataRow<R>,
       level: number,
       isKeptSelectedRow: boolean = false,
       isLastKeptSelectionRow: boolean = false,
-    ): JSX.Element {
-      return (
-        <Row
-          key={`${row.kind}-${row.id}`}
-          {...{
-            as,
-            columns,
-            row,
-            style,
-            rowStyles,
-            columnSizes,
-            level,
-            getCount,
-            api,
-            cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
-            omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
-            sortOn,
-            hasExpandableHeader,
-            isKeptSelectedRow,
-            isLastKeptSelectionRow,
-          }}
-        />
-      );
-    }
+    ) => (
+      <Row
+        key={`${row.kind}-${row.id}`}
+        {...{
+          as,
+          columns,
+          row,
+          style,
+          rowStyles,
+          columnSizes,
+          level,
+          getCount,
+          api,
+          cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
+          omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
+          hasExpandableHeader,
+          isKeptSelectedRow,
+          isLastKeptSelectionRow,
+        }}
+      />
+    );
 
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: RowTuple<R>[] = [];
@@ -336,50 +334,33 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     const totalsRows: RowTuple<R>[] = [];
     const visibleDataRows: RowTuple<R>[] = [];
     const keptSelectedRows: RowTuple<R>[] = [];
-    const filteredRowIds: string[] = [];
 
-    const hasExpandableHeader = rows.some((row) => row.id === EXPANDABLE_HEADER);
-
-    function visit([row, children]: ParentChildrenTuple<R>, level: number, visible: boolean): void {
-      visible && visibleDataRows.push([row, makeRowComponent(row, level)]);
-      // This row may be invisible (because it's parent is collapsed), but we still want
-      // to consider it matched if it or it's parent matched a filter.
-      filteredRowIds.push(row.id);
-
-      if (children.length) {
-        // Consider "isCollapsed" as true if the parent wasn't visible.
-        const isCollapsed = !visible || collapsedIds.includes(row.id);
-        visitRows(children, level + 1, !isCollapsed);
-      }
-    }
-
-    function visitRows(rows: ParentChildrenTuple<R>[], level: number, visible: boolean): void {
-      rows.forEach((row, i) => {
-        if (row[0].kind === "header") {
-          headerRows.push([row[0], makeRowComponent(row[0], level)]);
-          return;
+    // Flatten the tuple tree into lists of rows
+    function visitRows(tuples: ParentChildrenTuple<R>[], level: number): void {
+      tuples.forEach(([row, children]) => {
+        if (row.kind === "header") {
+          headerRows.push([row, makeRowComponent(row, level)]);
+        } else if (row.kind === "totals") {
+          totalsRows.push([row, makeRowComponent(row, level)]);
+        } else if (row.kind === "expandableHeader") {
+          expandableHeaderRows.push([row, makeRowComponent(row, level)]);
+        } else {
+          visibleDataRows.push([row, makeRowComponent(row, level)]);
+          // tuples has already been client-side filtered, so just check collapsed
+          if (children.length && !collapsedIds.includes(row.id)) {
+            visitRows(children, level + 1);
+          }
         }
-
-        if (row[0].kind === "totals") {
-          totalsRows.push([row[0], makeRowComponent(row[0], level)]);
-          return;
-        }
-
-        if (row[0].kind === "expandableHeader") {
-          expandableHeaderRows.push([row[0], makeRowComponent(row[0], level)]);
-          return;
-        }
-
-        visit(row, level, visible);
       });
     }
 
-    // Call `visitRows` with our a pre-filtered set list
-    const filteredRows = filterRows(api, columns, maybeSorted, filter);
-    visitRows(filteredRows, 0, true);
+    // Call `visitRows` with our post-filtered list
+    const [filteredRowIds, filteredRows] = filterRows(api, columns, maybeSorted, filter);
+    visitRows(filteredRows, 0);
 
-    // Check for any selected rows that are not displayed in the table because they don't match the current filter, or are no longer part of the `rows` prop.
-    // We persist these selected rows and hoist them to the top of the table.
+    // Check for any selected rows that are not displayed in the table because they don't
+    // match the current filter, or are no longer part of the `rows` prop. We persist these
+    // selected rows and hoist them to the top of the table.
     if (sortedKeptSelections.length) {
       // The "group row" for selected rows that are hidden by filters and add the children
       const keptSelectionGroupRow: GridDataRow<any> = {
@@ -410,7 +391,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     columns,
     style,
     rowStyles,
-    sortOn,
+    maybeStyle,
     columnSizes,
     collapsedIds,
     getCount,
@@ -420,9 +401,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // Once our header rows are created we can organize them in expected order.
   const tableHeadRows = expandableHeaderRows.concat(headerRows).concat(totalsRows);
 
-  let tooManyClientSideRows = false;
-  if (filterMaxRows && visibleDataRows.length > filterMaxRows) {
-    tooManyClientSideRows = true;
+  const tooManyClientSideRows = filterMaxRows && visibleDataRows.length > filterMaxRows;
+  if (tooManyClientSideRows) {
     visibleDataRows = visibleDataRows.slice(0, filterMaxRows + keptSelectedRows.length);
   }
 
@@ -435,6 +415,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     rowLookup.current = createRowLookup(columns, visibleDataRows, virtuosoRef);
   }
 
+  // TODO: Replace setRowCount with clients observing TableState via the API
   useEffect(() => {
     setRowCount && visibleDataRows?.length !== undefined && setRowCount(visibleDataRows.length);
   }, [visibleDataRows?.length, setRowCount]);
@@ -777,15 +758,19 @@ export function filterRows<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   rows: GridDataRow<R>[],
   filter: string | undefined,
-): ParentChildrenTuple<R>[] {
+): [string[], ParentChildrenTuple<R>[]] {
+  // Make a flat list of ids, in addition to the tuple tree
+  const filteredRowIds: string[] = [];
+  // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
+  const filters = (filter && filter.split(/ +/)) || [];
+
   // Make a functions to do recursion
   function acceptAll(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
+    filteredRowIds.push(row.id);
     return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
   }
 
   function filterFn(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
-    // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
-    const filters = (filter && filter.split(/ +/)) || [];
     const matches =
       reservedRowKinds.includes(row.kind) ||
       filters.length === 0 ||
@@ -793,14 +778,18 @@ export function filterRows<R extends Kinded>(
         columns.map((c) => applyRowFn(c, row, api, 0, false)).some((maybeContent) => matchesFilter(maybeContent, f)),
       );
     if (matches) {
+      filteredRowIds.push(row.id);
+      // A matched parent means show all it's children
       return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
     } else {
+      // An unmatched parent but with matched children means show the parent
       const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
       if (
         matchedChildren.length > 0 ||
         typeof row.pin === "string" ||
         (row.pin !== undefined && row.pin.filter !== true)
       ) {
+        filteredRowIds.push(row.id);
         return acc.concat([[row, matchedChildren]]);
       } else {
         return acc;
@@ -808,5 +797,5 @@ export function filterRows<R extends Kinded>(
     }
   }
 
-  return rows.reduce(filterFn, []);
+  return [filteredRowIds, rows.reduce(filterFn, [])];
 }

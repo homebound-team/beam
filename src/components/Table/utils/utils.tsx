@@ -237,6 +237,7 @@ export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter:
 
 export const HEADER = "header";
 export const TOTALS = "totals";
+/** Tables expandable columns get an extra header. */
 export const EXPANDABLE_HEADER = "expandableHeader";
 export const KEPT_GROUP = "keptGroup";
 export const reservedRowKinds = [HEADER, TOTALS, EXPANDABLE_HEADER, KEPT_GROUP];

@@ -1,5 +1,5 @@
 import { camelCase } from "change-case";
-import { comparer, makeAutoObservable, observable, ObservableMap, ObservableSet, reaction } from "mobx";
+import { comparer, makeAutoObservable, observable, ObservableMap, ObservableSet, reaction, runInAction } from "mobx";
 import React from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridSortConfig } from "src/components/Table/GridTable";
@@ -37,24 +37,26 @@ export class TableState {
   // Keep a copy of all the selected GridDataRows - Do not include custom row kinds such as `header`, `totals`, etc.
   // This allows us to keep track of rows that were selected, but may no longer be defined in `GridTable.rows`
   // This will be used to determine which rows are considered "kept" rows when filtering is applied or `GridTableProp.rows` changes
-  public selectedDataRows = new ObservableMap<string, GridDataRow<any>>();
+  private selectedDataRows = new ObservableMap<string, GridDataRow<any>>();
   // Set of just row ids. Keeps track of which rows match the filter. Used to filter rows from `selectedIds`
   private matchedRows = new ObservableSet<string>();
   // All fully selected data rows that do not match the applied filter, if any. Will not include group/parent rows unless they `inferSelectedState: false`
   public keptSelectedRows: GridDataRow<any>[] = [];
-  // The current list of rows, basically a useRef.current. Not reactive.
+  // The current list of rows, basically a useRef.current. Only shallow reactive.
   public rows: GridDataRow<any>[] = [];
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
   activeRowId: string | undefined = undefined;
   // Keeps track of the 'active' cell, formatted `${row.kind}_${row.id}_${column.name}`
   activeCellId: string | undefined = undefined;
 
-  // Keep a local copy of the `sortConfig` to ensure we only execute `initSortState` once, and determines if we should execute `setSortKey`
+  // Tracks the current `sortConfig`
   public sortConfig: GridSortConfig | undefined;
-  // Provide some defaults to get the sort state to properly work.
+  // Tracks the active sort column(s), so GridTable or SortHeaders can reactively
+  // re-render (for GridTable, only if client-side sorting)
   public sort: SortState = {};
   // Keep track of the `initialSortState` so we can (1) revert back to it, and (2) properly derive next sort state
   private initialSortState: SortState | undefined;
+  // The server-side `onSort` callback, if any.
   private onSort: ((orderBy: any | undefined, direction: Direction | undefined) => void) | undefined;
 
   // Non-reactive list of our columns
@@ -208,9 +210,7 @@ export class TableState {
   setSortKey(clickedColumnId: string) {
     if (this.sortConfig) {
       const newState = deriveSortState(this.sort, clickedColumnId, this.initialSortState);
-
       this.sort = newState ?? {};
-
       if (this.onSort) {
         const { columnId, direction } = newState?.current ?? {};
         this.onSort(columnId, direction);
@@ -336,16 +336,13 @@ export class TableState {
   /** Updates the state of which columns are expanded */
   updateExpandedColumns(newColumns: GridColumnWithId<any>[]) {
     const newColumnIds = newColumns.map((c) => c.id);
-
     // If there is a difference between list of current expanded columns vs list we just created, then replace
     const isDifferent =
       newColumnIds.length !== this.expandedColumnIds.length ||
       !this.expandedColumnIds.every((c) => newColumnIds.includes(c));
-
     if (isDifferent) {
       // Note: `this.expandedColumns` is a Set, so it will take care of dedupe-ing.
       this.expandedColumns.replace([...this.expandedColumnIds, ...newColumnIds]);
-
       // Update session storage if necessary.
       if (this.persistCollapse) {
         sessionStorage.setItem(getColumnStorageKey(this.persistCollapse), JSON.stringify([...this.expandedColumns]));
@@ -457,10 +454,7 @@ export class TableState {
       const curr: FoundRow | undefined =
         findRow(this.rows, id) ??
         (this.selectedDataRows.has(id) ? { row: this.selectedDataRows.get(id)!, parents: [] } : undefined);
-
-      if (!curr) {
-        return;
-      }
+      if (!curr) return;
 
       // Everything here & down is deterministically on/off
       const selectedStateMap = new Map<string, SelectedState>();
@@ -750,6 +744,7 @@ type ColumnSort = {
 
 export type SortState = {
   current?: ColumnSort;
+  /** The persistent sort is always applied first, i.e. for schedules, probably. */
   persistent?: ColumnSort;
 };
 
@@ -762,4 +757,81 @@ function keptSelectionsFilter(row: GridDataRow<any>, matchedRows: ObservableSet<
     !reservedRowKinds.includes(row.kind) &&
     (!row.children || row.inferSelectedState === false)
   );
+}
+
+export class RowState {
+  /** Our row, only ref observed, so we don't crawl into GraphQL fragments. */
+  row: GridDataRow<any>;
+  parent: RowState | undefined;
+  children: RowState[] = [];
+  /** Whether we match a client-side filter; true if no filter is in place. */
+  isMatched = true;
+  /** Our current selected state. */
+  selected: SelectedState = "unchecked";
+  /** Whether our `row` had been in `props.rows`, but was removed, i.e. probably server-side filters. */
+  wasRemoved = false;
+
+  // ...eventually...
+  // isDirectlyMatched = accept filters in the constructor and do match here
+  // isEffectiveMatched = isDirectlyMatched || hasMatchedChildren
+
+  constructor(parent: RowState | undefined, row: GridDataRow<any>) {
+    this.parent = parent;
+    this.row = row;
+    makeAutoObservable(this, { row: observable.ref });
+  }
+
+  get isKept(): boolean {
+    // this row is "kept" if it is selected, and:
+    // - it is not matched (hidden by filter) (being hidden by collapse is okay)
+    // - or it has (probably) been server-side filtered
+    return (
+      // Unselectable rows defacto cannot be kept
+      this.row.selectable !== false &&
+      // Headers, totals, etc., do not need keeping
+      !reservedRowKinds.includes(this.row.kind) &&
+      // Parents don't need keeping, unless they're actually real rows
+      (!this.row.children || this.row.inferSelectedState === false) &&
+      this.selected === "checked" &&
+      (!this.isMatched || this.wasRemoved)
+    );
+  }
+}
+
+class RowStates {
+  // A flat map of all row id -> RowState
+  private map = new ObservableMap<string, RowState>();
+
+  /** Merge a new set of `rows` prop into our state. */
+  setRows(rows: GridDataRow<any>[]) {
+    const existing = new Set(this.map.values());
+    const map = this.map;
+
+    function addRowAndChildren(parent: RowState | undefined, row: GridDataRow<any>): RowState {
+      const key = `${row.kind}-${row.id}`;
+      let state = map.get(key);
+      if (!state) {
+        state = new RowState(parent, row);
+        map.set(key, state);
+      } else {
+        state.row = row;
+        state.wasRemoved = false;
+        existing.delete(state);
+      }
+      if (row.children) {
+        state.children = row.children.map((child) => addRowAndChildren(state, child));
+      }
+      return state;
+    }
+
+    runInAction(() => {
+      for (const row of rows) {
+        addRowAndChildren(undefined, row);
+      }
+      // Now mark remaining has removed
+      for (const state of existing) {
+        state.wasRemoved = true;
+      }
+    });
+  }
 }
