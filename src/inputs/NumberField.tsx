@@ -86,7 +86,7 @@ export function NumberField(props: NumberFieldProps) {
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
   const factor = type === "percent" || type === "cents" ? 100 : type === "basisPoints" ? 10_000 : 1;
-  const signDisplay = displayDirection ? "exceptZero" : "auto";
+  const signDisplay = displayDirection ? "always" : "auto";
   const defaultFormatOptions: Intl.NumberFormatOptions = useMemo(
     () => ({
       [truncate ? "maximumFractionDigits" : "minimumFractionDigits"]: numFractionDigits,

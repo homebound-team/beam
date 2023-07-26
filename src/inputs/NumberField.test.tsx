@@ -2,6 +2,7 @@ import { change, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { formatValue, NumberField, NumberFieldProps } from "src/inputs/NumberField";
+import { focus } from "src/utils/rtl";
 
 let lastSet: any = undefined;
 
@@ -148,7 +149,7 @@ describe("NumberFieldTest", () => {
     expect(r.cost()).toHaveValue("$14.14");
   });
 
-  it("displays direction of positive values and no direction display for zero", async () => {
+  it("displays direction", async () => {
     const r = await render(
       <>
         <TestNumberField label="Days" type="days" value={123} displayDirection />
@@ -162,7 +163,7 @@ describe("NumberFieldTest", () => {
     expect(r.cents()).toHaveValue("+$4.56");
     expect(r.basisPoints()).toHaveValue("+7.89%");
     expect(r.percent()).toHaveValue("+123%");
-    expect(r.zeroPercent()).toHaveValue("0%");
+    expect(r.zeroPercent()).toHaveValue("+0%");
   });
 
   it("fires onEnter and blurs field", async () => {
@@ -171,7 +172,7 @@ describe("NumberFieldTest", () => {
     // Given a numberfield
     const r = await render(<TestNumberField label="Age" value={10} onBlur={onBlur} onEnter={onEnter} />);
     // With focus
-    r.age().focus();
+    focus(r.age());
     expect(r.age()).toHaveFocus();
     // When hitting the Enter key
     fireEvent.keyDown(r.age(), { key: "Enter" });

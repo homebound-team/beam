@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Only } from "src/Css";
 import { TextAreaField, TextAreaFieldProps } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
+import { focus } from "src/utils/rtl";
 
 let lastSet: any = undefined;
 
@@ -37,7 +38,7 @@ describe("TextAreaFieldTest", () => {
     const onEnter = jest.fn();
     const onBlur = jest.fn();
     const r = await render(<TestTextAreaField value="foo" onEnter={onEnter} onBlur={onBlur} preventNewLines />);
-    r.note().focus();
+    focus(r.note);
     expect(r.note()).toHaveFocus();
     fireEvent.keyDown(r.note(), { key: "Enter" });
     expect(onEnter).toBeCalledTimes(1);
