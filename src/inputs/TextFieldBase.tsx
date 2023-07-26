@@ -243,8 +243,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
                 ref={fieldRef as any}
                 rows={multiline ? 1 : undefined}
-                // Make the input field readOnly if the field explicitly sets it to `true`
-                readOnly={inputProps.readOnly}
                 css={{
                   ...fieldStyles.input,
                   ...(inputProps.disabled ? fieldStyles.disabled : {}),
