@@ -108,7 +108,6 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   const tid = useTestIds(props, defaultTestId(label));
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
-  const isTouchDevice = "ontouchstart" in window;
 
   const textFieldProps = {
     ...others,
@@ -129,6 +128,8 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   const { labelProps, inputProps } = useTextField(
     {
       ...textFieldProps,
+      // Setting `inputMode` to none. This disables the virtual keyboard from being triggered on touch devices
+      inputMode: "none",
       onFocus: () => {
         isFocused.current = true;
         // Open overlay on focus of the input, only if the focus is not triggered due to the overlay being closed.
@@ -306,7 +307,6 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         inputProps={{ ...inputProps, size: inputSize }}
         inputRef={inputRef}
         inputWrapRef={inputWrapRef}
-        preventEdit={isTouchDevice}
         onChange={(v) => {
           // hide the calendar if the user is manually entering the date
           onPickerClose();
