@@ -19,6 +19,7 @@ describe("BoundDateField", () => {
 
     // When closing the overlay and putting focus back on the input
     fireEvent.keyDown(r.birthday_datePicker(), { key: "Escape", code: "Escape" });
+    expect(onBlur).toBeCalledTimes(0);
 
     // When blur is triggered
     blur(r.birthday());
