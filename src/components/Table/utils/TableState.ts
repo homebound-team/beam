@@ -1,7 +1,8 @@
 import { camelCase } from "change-case";
-import { comparer, makeAutoObservable, observable, ObservableMap, ObservableSet, reaction, runInAction } from "mobx";
+import { comparer, makeAutoObservable, observable, ObservableSet, reaction } from "mobx";
 import React from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
+import { RowStates } from "src/components/Table/components/RowStates";
 import { GridSortConfig } from "src/components/Table/GridTable";
 import { Direction, GridColumnWithId } from "src/components/Table/types";
 import { ASC, DESC, HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
@@ -31,19 +32,9 @@ export class TableState {
   // A set of just row ids, i.e. not row.kind+row.id
   private readonly collapsedRows = new ObservableSet<string>([]);
   private persistCollapse: string | undefined;
-  // This will include rows that are selected, are partially selected, or were at once selected but are now unchecked.
-  // Rows within this map may be in `this.rows` or removed from `this.rows`.
-  private readonly rowSelectedState = new ObservableMap<string, SelectedState>();
-  // Keep a copy of all the selected GridDataRows - Do not include custom row kinds such as `header`, `totals`, etc.
-  // This allows us to keep track of rows that were selected, but may no longer be defined in `GridTable.rows`
-  // This will be used to determine which rows are considered "kept" rows when filtering is applied or `GridTableProp.rows` changes
-  private selectedDataRows = new ObservableMap<string, GridDataRow<any>>();
-  // Set of just row ids. Keeps track of which rows match the filter. Used to filter rows from `selectedIds`
-  private matchedRows = new ObservableSet<string>();
-  // All fully selected data rows that do not match the applied filter, if any. Will not include group/parent rows unless they `inferSelectedState: false`
-  public keptSelectedRows: GridDataRow<any>[] = [];
   // The current list of rows, basically a useRef.current. Only shallow reactive.
   public rows: GridDataRow<any>[] = [];
+  private readonly rowStates = new RowStates();
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
   activeRowId: string | undefined = undefined;
   // Keeps track of the 'active' cell, formatted `${row.kind}_${row.id}_${column.name}`
@@ -86,7 +77,9 @@ export class TableState {
       columns: false,
     });
 
-    // Whenever our `matchedRows` change (i.e. via filtering) then we need to re-derive header and parent rows' selected state.
+    // Whenever our `matchedRows` change (i.e. via filtering) then we need to re-derive header and parent rows'
+    // selected state, because we'll show a parent as fully-selected if only visible children are selected.
+    // (even if the children is collapsed).
     reaction(
       () => [...this.matchedRows.values()].sort(),
       () => {
@@ -226,6 +219,7 @@ export class TableState {
   setRows(rows: GridDataRow<any>[]): void {
     // If the set of rows are different
     if (rows !== this.rows) {
+      this.rowStates.setRows(rows);
       const currentCollapsedIds = this.collapsedIds;
       // Create a list of the (maybe) new rows that should be initially collapsed
       const maybeNewCollapsedRowIds = flattenRows(rows)
@@ -399,28 +393,19 @@ export class TableState {
     }
   }
 
+  /** Called with GridTable has re-calced the rows that pass the client-side filter, or all rows. */
   setMatchedRows(rowIds: string[]): void {
-    // ObservableSet doesn't seem to do a `diff` inside `replace` before firing
-    // observers/reactions that watch it, which can lead to render loops with the
-    // application page is observing `GridTableApi.getSelectedRows`, and merely
-    // the act of rendering GridTable (w/o row changes) causes it's `useComputed`
-    // to be triggered.
-    if (!comparer.shallow(rowIds, [...this.matchedRows.values()])) {
-      this.matchedRows.replace(rowIds);
-    }
+    this.rowStates.setMatchedRows(rowIds);
   }
 
-  /** Returns either all data rows (non-header, non-totals, etc) that are selected where `row.selectable !== false` */
+  /** Returns selected data rows (non-header, non-totals, etc.), ignoring rows that have `row.selectable !== false`. */
   get selectedRows(): GridDataRow<any>[] {
-    return [...this.selectedDataRows.values()].filter(
-      (row) => row.selectable !== false && !reservedRowKinds.includes(row.kind),
-    );
+    return this.rowStates.allStates.filter((rs) => rs.isSelected).map((rs) => rs.row);
   }
 
   // Should be called in an Observer/useComputed to trigger re-renders
   getSelected(id: string): SelectedState {
-    // Return the row's selected state if it's been explicitly set. If it is in the selectedDataRows set, then it's selected. Otherwise, it's unchecked.
-    return this.rowSelectedState.get(id) ?? (this.selectedDataRows.has(id) ? "checked" : "unchecked");
+    return this.rowStates.get(id).selected;
   }
 
   selectRow(id: string, selected: boolean): void {
@@ -577,13 +562,9 @@ export class TableState {
 
   deleteRows(ids: string[]): void {
     this.rows = this.rows.filter((row) => !ids.includes(row.id));
-    this.keptSelectedRows = this.keptSelectedRows.filter((row) => !ids.includes(row.id));
-
+    this.rowStates.delete(ids);
     ids.forEach((id) => {
-      this.selectedDataRows.delete(id);
-      this.rowSelectedState.delete(id);
       this.collapsedRows.delete(id);
-      this.matchedRows.delete(id);
     });
   }
 
@@ -757,81 +738,4 @@ function keptSelectionsFilter(row: GridDataRow<any>, matchedRows: ObservableSet<
     !reservedRowKinds.includes(row.kind) &&
     (!row.children || row.inferSelectedState === false)
   );
-}
-
-export class RowState {
-  /** Our row, only ref observed, so we don't crawl into GraphQL fragments. */
-  row: GridDataRow<any>;
-  parent: RowState | undefined;
-  children: RowState[] = [];
-  /** Whether we match a client-side filter; true if no filter is in place. */
-  isMatched = true;
-  /** Our current selected state. */
-  selected: SelectedState = "unchecked";
-  /** Whether our `row` had been in `props.rows`, but was removed, i.e. probably server-side filters. */
-  wasRemoved = false;
-
-  // ...eventually...
-  // isDirectlyMatched = accept filters in the constructor and do match here
-  // isEffectiveMatched = isDirectlyMatched || hasMatchedChildren
-
-  constructor(parent: RowState | undefined, row: GridDataRow<any>) {
-    this.parent = parent;
-    this.row = row;
-    makeAutoObservable(this, { row: observable.ref });
-  }
-
-  get isKept(): boolean {
-    // this row is "kept" if it is selected, and:
-    // - it is not matched (hidden by filter) (being hidden by collapse is okay)
-    // - or it has (probably) been server-side filtered
-    return (
-      // Unselectable rows defacto cannot be kept
-      this.row.selectable !== false &&
-      // Headers, totals, etc., do not need keeping
-      !reservedRowKinds.includes(this.row.kind) &&
-      // Parents don't need keeping, unless they're actually real rows
-      (!this.row.children || this.row.inferSelectedState === false) &&
-      this.selected === "checked" &&
-      (!this.isMatched || this.wasRemoved)
-    );
-  }
-}
-
-class RowStates {
-  // A flat map of all row id -> RowState
-  private map = new ObservableMap<string, RowState>();
-
-  /** Merge a new set of `rows` prop into our state. */
-  setRows(rows: GridDataRow<any>[]) {
-    const existing = new Set(this.map.values());
-    const map = this.map;
-
-    function addRowAndChildren(parent: RowState | undefined, row: GridDataRow<any>): RowState {
-      const key = `${row.kind}-${row.id}`;
-      let state = map.get(key);
-      if (!state) {
-        state = new RowState(parent, row);
-        map.set(key, state);
-      } else {
-        state.row = row;
-        state.wasRemoved = false;
-        existing.delete(state);
-      }
-      if (row.children) {
-        state.children = row.children.map((child) => addRowAndChildren(state, child));
-      }
-      return state;
-    }
-
-    runInAction(() => {
-      for (const row of rows) {
-        addRowAndChildren(undefined, row);
-      }
-      // Now mark remaining has removed
-      for (const state of existing) {
-        state.wasRemoved = true;
-      }
-    });
-  }
 }
