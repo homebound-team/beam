@@ -93,8 +93,6 @@ export class RowStates {
 
   setMatchedRows(ids: string[]): void {
     for (const rs of this.allStates) {
-      // const matched = ids.includes(rs.row.id);
-      // if (matched !== rs.isMatched) console.log(`Changing ${rs.row.id}.isMatched = ${matched}`);
       rs.isMatched = ids.includes(rs.row.id);
     }
   }
