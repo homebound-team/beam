@@ -2471,6 +2471,7 @@ describe("GridTable", () => {
             id: "2",
             data: "Tony Stark",
             initSelected: false,
+            inferSelectedState: false,
             children: [
               {
                 kind: "grandChild" as const,
@@ -2695,7 +2696,7 @@ describe("GridTable", () => {
       const rows: GridDataRow<NestedRow>[] = [
         simpleHeader,
         {
-          // With one grandparent that sets `inferSelectedState: false`
+          // With one parent that sets `inferSelectedState: false`
           ...{ kind: "parent", id: "p1", inferSelectedState: false, data: { name: "parent 1" } },
           children: [
             {
@@ -2716,29 +2717,29 @@ describe("GridTable", () => {
 
       // Then the header row should be indeterminate
       expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
-      // And the grandparent row to not be checked.
+      // And the parent row to not be checked.
       expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
-      // And the parent row should show indeterminate,
+      // And the child row should show indeterminate
       expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true");
       expect(api.current!.getSelectedRowIds()).toEqual(["p1c1gc1"]);
 
-      // When selecting the grandparent
+      // When selecting the parent
       click(cellAnd(r, 1, 1, "select"));
 
       // Then all rows should be considered selected
       expect(cellAnd(r, 0, 1, "select")).toBeChecked();
       expect(cellAnd(r, 1, 1, "select")).toBeChecked();
       expect(cellAnd(r, 2, 1, "select")).toBeChecked();
-      expect(api.current!.getSelectedRowIds()).toEqual(["p1c1gc1", "p1", "p1c1", "p1c1gc2"]);
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1gc1", "p1c1gc2"]);
 
       // When unselecting a single grand child
       click(cellAnd(r, 3, 1, "select"));
 
       // Then the header row should return to indeterminate
       expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
-      // And the grandparent row to remain checked.
+      // And the parent row to remain checked, b/c it does not infer selected
       expect(cellAnd(r, 1, 1, "select")).toBeChecked();
-      // And the parent row should return to indeterminate,
+      // And the child row should return to indeterminate, b/c it does infer selected
       expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true");
       expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1gc2"]);
     });

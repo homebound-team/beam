@@ -357,7 +357,8 @@ export class TableState {
 
   // Should be called in an Observer/useComputed to trigger re-renders
   getSelected(id: string): SelectedState {
-    return this.rowStates.get(id).selectedState;
+    const rs = this.rowStates.get(id);
+    return id === HEADER ? rs.selectedStateForHeader : rs.selectedState;
   }
 
   selectRow(id: string, selected: boolean): void {

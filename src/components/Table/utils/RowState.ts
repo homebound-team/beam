@@ -33,7 +33,7 @@ export class RowState {
   }
 
   /**
-   * Whether we are currently selected.
+   * Whether we are currently selected, for `GridTableApi.getSelectedRows`.
    *
    * Note that we don't use "I'm selected || my parent is selected" logic here, because whether a child is selected
    * is actually based on whether it was _visible at the time the parent was selected_. So, we can't just assume
@@ -41,6 +41,8 @@ export class RowState {
    * to their visible children explicitly.
    */
   get isSelected(): boolean {
+    // We consider group rows selected if all of their children are selected.
+    if (this.children && this.inferSelectedState) return this.selectedState === "checked";
     return this.selected;
   }
 
@@ -56,7 +58,33 @@ export class RowState {
       const allUnchecked = children.every((child) => child.selectedState === "unchecked");
       return children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
     }
-    return this.isSelected ? "checked" : "unchecked";
+    return this.selected ? "checked" : "unchecked";
+  }
+
+  /**
+   * A special SelectedState that "sees through"/ignores inferSelectedState, so the header works.
+   *
+   * I.e. a row might have `inferSelectedState: false`, so is showing unchecked, but the header
+   * wants to show partial-ness whenever any given child is selected.
+   */
+  get selectedStateForHeader(): SelectedState {
+    if (this.children) {
+      const children = this.visibleChildren;
+      const allChecked = children.every((child) => child.selectedStateForHeader === "checked");
+      const allUnchecked = children.every((child) => child.selectedStateForHeader === "unchecked");
+      // For the header purposes, if this is a selectable-row (i.e. not inferSelectedState) make sure
+      // both the row itself & all children are "all checked" or "not all checked", otherwise consider
+      // ourselves partially selected.
+      const me = this.inferSelectedState || this.selected;
+      if (allChecked && me) {
+        return "checked";
+      } else if (allUnchecked && !me) {
+        return "unchecked";
+      } else {
+        return "partial";
+      }
+    }
+    return this.selected ? "checked" : "unchecked";
   }
 
   /**
@@ -68,7 +96,9 @@ export class RowState {
   select(selected: boolean): void {
     if (this.row.selectable === false) return;
     this.selected = selected;
-    if (this.children && this.inferSelectedState) {
+    // We don't check inferSelectedState here, b/c even if the parent is considered selectable
+    // on its own, we still push down selected-ness to our visible children.
+    if (this.children) {
       for (const child of this.visibleChildren) {
         child.select(selected);
       }
@@ -92,7 +122,7 @@ export class RowState {
 
   /** If either us, or any parent, sets `inferSelectedState: false`, then don't infer it. */
   private get inferSelectedState(): boolean {
-    return this.row.inferSelectedState !== false && (this.parent === undefined || this.parent?.inferSelectedState);
+    return this.row.inferSelectedState !== false;
   }
 
   private get visibleChildren(): RowState[] {
