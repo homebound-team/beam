@@ -75,11 +75,10 @@ export class RowState {
       // For the header purposes, if this is a selectable-row (i.e. not inferSelectedState) make sure
       // both the row itself & all children are "all checked" or "not all checked", otherwise consider
       // ourselves partially selected.
-      const me = this.inferSelectedState || this.selected;
-      if (allChecked && me) {
-        return "checked";
-      } else if (allUnchecked && !me) {
+      if ((allUnchecked || children.length === 0) && (this.inferSelectedState || !this.selected)) {
         return "unchecked";
+      } else if (allChecked && (this.inferSelectedState || this.selected)) {
+        return "checked";
       } else {
         return "partial";
       }

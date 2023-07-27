@@ -1649,6 +1649,23 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g1", "p1c1g2"]);
   });
 
+  it("renders the header as checked", async () => {
+    // Given a parent
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    // When rendering a GridTable with filtering and selectable rows
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+    // Then the header should not be checked
+    expect(cellAnd(r, 0, 1, "select")).not.toBeChecked();
+    // Nor indeterminate
+    expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "false");
+  });
+
   it("re-derives parent row selected state", async () => {
     // Given a parent with children
     const rows: GridDataRow<NestedRow>[] = [

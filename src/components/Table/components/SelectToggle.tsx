@@ -14,8 +14,6 @@ export function SelectToggle({ id, disabled }: SelectToggleProps) {
   const state = useComputed(() => tableState.getSelected(id), [tableState]);
   const selected = state === "checked" ? true : state === "unchecked" ? false : "indeterminate";
 
-  console.log({ id, state, selected });
-
   return (
     <Checkbox
       checkboxOnly={true}
