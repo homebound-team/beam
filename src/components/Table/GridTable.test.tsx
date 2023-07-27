@@ -2537,7 +2537,7 @@ describe("GridTable", () => {
     expect(cellAnd(r, 5, 0, "select")).toBeChecked();
 
     // And they can no longer be fetched by the api
-    expect(api.current!.getSelectedRowIds()).toEqual(["4", "1", "5"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["1", "5", "4"]);
   });
 
   describe("expandable columns", () => {

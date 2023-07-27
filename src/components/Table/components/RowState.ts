@@ -31,14 +31,14 @@ export class RowState {
 
   /** Whether we are effectively selected (directly or via a parent/grandparent). */
   get isSelected(): boolean {
-    return this.selected || (!!this.parent?.isSelected && this.row.selectable !== false);
+    return this.selected || (this.inferSelectedState && !!this.parent?.isSelected && this.row.selectable !== false);
   }
 
   /** Whether we're selected (directly for via a parent) or a partially selected parent. */
   get selectedState(): SelectedState {
     if (this.isSelected) {
       return "checked";
-    } else if (this.children && this.row.inferSelectedState !== false) {
+    } else if (this.children && this.inferSelectedState) {
       // If filters are hiding some of our children, we still want to show fully selected
       const visibleChildren = this.children.filter((child) => child.isMatched);
       const allChecked = visibleChildren.every((child) => child.selectedState === "checked");
@@ -53,7 +53,7 @@ export class RowState {
   select(selected: boolean): void {
     if (this.row.selectable === false) return;
     this.selected = selected;
-    if (!selected && this.children) {
+    if (!selected && this.children && this.inferSelectedState) {
       for (const child of this.children) {
         // Kept rows are selected/unselected directly, and not implicitly from their old parent
         if (!child.isKept) {
@@ -78,5 +78,10 @@ export class RowState {
       this.selected &&
       (!this.isMatched || this.wasRemoved)
     );
+  }
+
+  /** If either us, or any parent, sets `inferSelectedState: false`, then don't infer it. */
+  private get inferSelectedState(): boolean {
+    return this.row.inferSelectedState !== false && (this.parent === undefined || this.parent?.inferSelectedState);
   }
 }
