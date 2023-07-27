@@ -371,13 +371,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         data: undefined,
       };
 
-      keptSelectedRows.push(
-        [keptGroupRow as GridDataRow<R>, makeRowComponent(keptGroupRow as GridDataRow<R>, 1)],
-        ...sortedKeptSelections.map((row, idx) => {
-          const isLast = idx === sortedKeptSelections.length - 1;
-          return [row, makeRowComponent(row, 1, true, isLast)] as RowTuple<R>;
-        }),
-      );
+      keptSelectedRows.push([keptGroupRow as GridDataRow<R>, makeRowComponent(keptGroupRow as GridDataRow<R>, 1)]);
+      if (!collapsedIds.includes(KEPT_GROUP)) {
+        keptSelectedRows.push(
+          ...sortedKeptSelections.map((row, idx) => {
+            const isLast = idx === sortedKeptSelections.length - 1;
+            return [row, makeRowComponent(row, 1, true, isLast)] as RowTuple<R>;
+          }),
+        );
+      }
     }
 
     return [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, keptSelectedRows, filteredRowIds];
