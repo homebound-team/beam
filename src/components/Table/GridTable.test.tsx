@@ -1632,10 +1632,10 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRows()).toEqual([
       rows[1],
       rows[1].children![0],
-      rows[1].children![0].children![1],
       rows[1].children![0].children![0],
+      rows[1].children![0].children![1],
     ]);
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g2", "p1c1g1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g1", "p1c1g2"]);
 
     // And when applying a filter
     type(r.filter, "p1c1g2");
@@ -1643,10 +1643,10 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRows()).toEqual([
       rows[1],
       rows[1].children![0],
-      rows[1].children![0].children![1],
       rows[1].children![0].children![0],
+      rows[1].children![0].children![1],
     ]);
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g2", "p1c1g1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g1", "p1c1g2"]);
   });
 
   it("re-derives parent row selected state", async () => {
