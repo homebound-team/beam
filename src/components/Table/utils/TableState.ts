@@ -140,26 +140,6 @@ export class TableState {
     }
   }
 
-  loadSelected(rows: GridDataRow<any>[]): void {
-    const selectedRows: GridDataRow<any>[] = [];
-    visit(rows, (row) => row.initSelected && selectedRows.push(row));
-    const selectedStateMap = new Map<string, SelectedState>();
-    const selectedRowMap = new Map<string, GridDataRow<any>>();
-    selectedRows.forEach((row) => {
-      selectedStateMap.set(row.id, "checked");
-      selectedRowMap.set(row.id, row);
-    });
-    this.rowSelectedState.merge(selectedStateMap);
-    this.selectedDataRows.merge(selectedRowMap);
-
-    // Determine if we need to initially display the kept selected group
-    const newlyKeptRows = selectedRows.filter((row) => keptSelectionsFilter(row, this.matchedRows));
-    if (!comparer.shallow(newlyKeptRows, this.keptSelectedRows)) {
-      this.collapsedRows.add(KEPT_GROUP);
-      this.keptSelectedRows = newlyKeptRows;
-    }
-  }
-
   initSortState(sortConfig: GridSortConfig | undefined, columns: GridColumnWithId<any>[]) {
     if (this.sortConfig) {
       return;

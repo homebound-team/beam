@@ -71,7 +71,6 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     rows: GridDataRow<R>[],
   ) {
     this.tableState.loadCollapse(persistCollapse, rows);
-    this.tableState.loadSelected(rows);
     this.virtuosoRef = virtuosoRef;
   }
 

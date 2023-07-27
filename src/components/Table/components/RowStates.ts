@@ -35,6 +35,7 @@ export class RowStates {
       let state = map.get(key);
       if (!state) {
         state = new RowState(parent, row);
+        state.selected = row.initSelected ? "checked" : "unchecked";
         map.set(key, state);
       } else {
         state.row = row;
