@@ -58,6 +58,9 @@ export class RowStates {
       headerState.children = children.filter((rs) => !reservedRowKinds.includes(rs.row.kind));
     }
 
+    // TODO: Detect if we have kept rows, and inject a kept RowState as the first child of the header.
+    // This should fix any select-all/un-select-all/partial-ness behavior.
+
     // Then mark any remaining as removed
     for (const state of existing) {
       state.wasRemoved = true;
