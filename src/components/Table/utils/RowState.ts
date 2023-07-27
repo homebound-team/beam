@@ -48,10 +48,11 @@ export class RowState {
     // but instead depends on the current visible children. I.e. a parent might be "selected", but then the
     // client-side filter changes, a child reappears, and we need to transition to partial-ness.
     if (this.children && this.inferSelectedState) {
-      // If filters are hiding some of our children, we still want to show fully selected
-      const allChecked = this.visibleChildren.every((child) => child.selectedState === "checked");
-      const allUnchecked = this.visibleChildren.every((child) => child.selectedState === "unchecked");
-      return this.children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
+      // Use visibleChildren b/c if filters are hiding some of our children, we still want to show fully selected
+      const children = this.visibleChildren;
+      const allChecked = children.every((child) => child.selectedState === "checked");
+      const allUnchecked = children.every((child) => child.selectedState === "unchecked");
+      return children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
     }
     return this.isSelected ? "checked" : "unchecked";
   }
