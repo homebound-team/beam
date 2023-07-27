@@ -41,8 +41,8 @@ export class RowState {
     } else if (this.children && this.row.inferSelectedState !== false) {
       // If filters are hiding some of our children, we still want to show fully selected
       const visibleChildren = this.children.filter((child) => child.isMatched);
-      const allChecked = visibleChildren.every((child) => child.selected);
-      const allUnchecked = visibleChildren.every((child) => !child.selected);
+      const allChecked = visibleChildren.every((child) => child.selectedState === "checked");
+      const allUnchecked = visibleChildren.every((child) => child.selectedState === "unchecked");
       return this.children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
     } else {
       return "unchecked";
