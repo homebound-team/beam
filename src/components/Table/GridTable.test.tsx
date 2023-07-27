@@ -1,4 +1,5 @@
 import { act } from "@testing-library/react";
+import { runInAction } from "mobx";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
@@ -1710,7 +1711,9 @@ describe("GridTable", () => {
     expect(cellAnd(r, 3, 1, "select")).toBeChecked(); // Grandchild
 
     // When removing the filter to show all rows.
-    type(r.filter, "");
+    runInAction(() => {
+      type(r.filter, "");
+    });
 
     // Then expect the parent rows to have updated based on the row status
     expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true"); // Header
