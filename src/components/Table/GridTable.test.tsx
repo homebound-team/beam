@@ -1759,9 +1759,9 @@ describe("GridTable", () => {
     click(r.select_0);
 
     // Then row id 2 is not selected as it's disabled
-    expect(api.current!.getSelectedRowIds()).toEqual(["3", "1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["1", "3"]);
     // and selected rows does not include row 2 as it's disabled
-    expect(r.selectedNames()).toHaveTextContent("Thor Odinson,Tony Stark");
+    expect(r.selectedNames()).toHaveTextContent("Tony Stark,Thor Odinson");
   });
 
   it("can deselect all rows via 'clearSelections' api method", async () => {

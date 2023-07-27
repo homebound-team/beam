@@ -5,7 +5,7 @@ import { GridDataRow } from "src/components/Table/components/Row";
 import { RowStates } from "src/components/Table/components/RowStates";
 import { GridSortConfig } from "src/components/Table/GridTable";
 import { Direction, GridColumnWithId } from "src/components/Table/types";
-import { ASC, DESC, HEADER, KEPT_GROUP } from "src/components/Table/utils/utils";
+import { ASC, DESC, HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 import { isFunction } from "src/utils";
 import { assignDefaultColumnIds } from "./columns";
 
@@ -340,7 +340,9 @@ export class TableState {
 
   /** Returns selected data rows (non-header, non-totals, etc.), ignoring rows that have `row.selectable !== false`. */
   get selectedRows(): GridDataRow<any>[] {
-    return this.rowStates.allStates.filter((rs) => rs.isSelected).map((rs) => rs.row);
+    return this.rowStates.allStates
+      .filter((rs) => rs.isSelected && !reservedRowKinds.includes(rs.row.kind))
+      .map((rs) => rs.row);
   }
 
   /** Returns kept rows, i.e. those that were user-selected but then client-side or server-side filtered. */

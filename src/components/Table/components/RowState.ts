@@ -31,7 +31,7 @@ export class RowState {
 
   /** Whether we are effectively selected (directly or via a parent/grandparent). */
   get isSelected(): boolean {
-    return this.selected || !!this.parent?.isSelected;
+    return this.selected || (!!this.parent?.isSelected && this.row.selectable !== false);
   }
 
   /** Whether we're selected (directly for via a parent) or a partially selected parent. */
@@ -51,6 +51,7 @@ export class RowState {
 
   /** Called to explicitly select/unselect this row, or unselect if our parent was unselected. */
   select(selected: boolean): void {
+    if (this.row.selectable === false) return;
     this.selected = selected;
     if (!selected && this.children) {
       for (const child of this.children) {
