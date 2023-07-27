@@ -31,7 +31,8 @@ export class RowStates {
     const map = this.map;
 
     function addRowAndChildren(parent: RowState | undefined, row: GridDataRow<any>): RowState {
-      const key = `${row.kind}-${row.id}`;
+      // This should really be kind+id, but a lot of our lookups just use id
+      const key = row.id;
       let state = map.get(key);
       if (!state) {
         state = new RowState(parent, row);
