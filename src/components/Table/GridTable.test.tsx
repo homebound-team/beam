@@ -3315,9 +3315,9 @@ describe("GridTable", () => {
         | -                                     | on | Name |
         | ------------------------------------- | -- | ---- |
         | 3 selected rows hidden due to filters |
+        | -                                     | on | c1   |
         | -                                     | on | p2   |
         | -                                     | on | c2   |
-        | -                                     | on | c1   |
         | No rows found.                        |
         "
       `);
