@@ -1,12 +1,11 @@
 import { camelCase } from "change-case";
-import { comparer, makeAutoObservable, observable, ObservableSet, reaction } from "mobx";
+import { makeAutoObservable, observable, ObservableSet } from "mobx";
 import React from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { RowStates } from "src/components/Table/components/RowStates";
 import { GridSortConfig } from "src/components/Table/GridTable";
 import { Direction, GridColumnWithId } from "src/components/Table/types";
-import { ASC, DESC, HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
-import { visit } from "src/components/Table/utils/visitor";
+import { ASC, DESC, HEADER, KEPT_GROUP } from "src/components/Table/utils/utils";
 import { isFunction } from "src/utils";
 import { assignDefaultColumnIds } from "./columns";
 
@@ -76,52 +75,6 @@ export class TableState {
       // Do not observe columns, expect this to be a non-reactive value for us to base our reactive values off of.
       columns: false,
     });
-
-    // Whenever our `matchedRows` change (i.e. via filtering) then we need to re-derive header and parent rows'
-    // selected state, because we'll show a parent as fully-selected if only visible children are selected.
-    // (even if the children is collapsed).
-    reaction(
-      () => [...this.matchedRows.values()].sort(),
-      () => {
-        const newlyKeptRows = [...this.selectedDataRows.values()].filter((row) =>
-          keptSelectionsFilter(row, this.matchedRows),
-        );
-
-        // If the kept rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
-        if (newlyKeptRows.length > 0 && this.keptSelectedRows.length === 0) {
-          this.collapsedRows.add(KEPT_GROUP);
-        }
-        // When filters are applied, we need to determine if there are any selected rows that are no longer matched.
-        if (!comparer.shallow(newlyKeptRows, this.keptSelectedRows)) {
-          this.keptSelectedRows = newlyKeptRows;
-        }
-
-        // Re-derive the selected state for both the header and parent rows
-        const map = new Map<string, SelectedState>();
-        map.set(
-          "header",
-          deriveParentSelected(
-            [...this.rows, ...this.keptSelectedRows].flatMap((row) => this.setNestedSelectedStates(row, map)),
-          ),
-        );
-
-        // Merge the changes back into the selected rows state
-        this.rowSelectedState.merge(map);
-
-        // Update the selectedDataRows to include those that are fully selected based on the filter changes
-        [...this.rowSelectedState.entries()].forEach(([id, state]) => {
-          if (this.selectedDataRows.has(id) && state !== "checked") {
-            this.selectedDataRows.delete(id);
-          } else if (!this.selectedDataRows.has(id) && state === "checked") {
-            const row = this.rows.find((row) => row.id === id);
-            if (row) {
-              this.selectedDataRows.set(id, row);
-            }
-          }
-        });
-      },
-      { equals: comparer.shallow },
-    );
   }
 
   loadCollapse(persistCollapse: string | undefined, rows: GridDataRow<any>[]): void {
@@ -200,6 +153,7 @@ export class TableState {
     // If the set of rows are different
     if (rows !== this.rows) {
       this.rowStates.setRows(rows);
+
       const currentCollapsedIds = this.collapsedIds;
       // Create a list of the (maybe) new rows that should be initially collapsed
       const maybeNewCollapsedRowIds = flattenRows(rows)
@@ -236,10 +190,6 @@ export class TableState {
     }
     // Finally replace our existing list of rows
     this.rows = rows;
-    // Update the selected rows map to include the rows' updated data
-    const selectedRows = new Map();
-    visit(this.rows, (row) => this.selectedDataRows.has(row.id) && selectedRows.set(row.id, row));
-    this.selectedDataRows.merge(selectedRows);
   }
 
   setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
@@ -373,7 +323,7 @@ export class TableState {
     }
   }
 
-  /** Called with GridTable has re-calced the rows that pass the client-side filter, or all rows. */
+  /** Called when GridTable has re-calced the rows that pass the client-side filter, or all rows. */
   setMatchedRows(rowIds: string[]): void {
     this.rowStates.setMatchedRows(rowIds);
   }
@@ -383,99 +333,18 @@ export class TableState {
     return this.rowStates.allStates.filter((rs) => rs.isSelected).map((rs) => rs.row);
   }
 
+  /** Returns kept rows, i.e. those that were user-selected but then client-side or server-side filtered. */
+  get keptRows(): GridDataRow<any>[] {
+    return this.rowStates.allStates.filter((rs) => rs.isKept).map((rs) => rs.row);
+  }
+
   // Should be called in an Observer/useComputed to trigger re-renders
   getSelected(id: string): SelectedState {
-    return this.rowStates.get(id).selected;
+    return this.rowStates.get(id).selectedState;
   }
 
   selectRow(id: string, selected: boolean): void {
-    if (id === "header") {
-      // Select/unselect all has special behavior
-      if (selected) {
-        // Just mash the header + all rows + children as selected
-        const selectedStateMap = new Map<string, SelectedState>();
-        const selectedRowMap = new Map<string, GridDataRow<any>>();
-        selectedStateMap.set("header", "checked");
-        visit(this.rows, (row) => {
-          if (!reservedRowKinds.includes(row.kind) && this.matchedRows.has(row.id)) {
-            selectedStateMap.set(row.id, "checked");
-            selectedRowMap.set(row.id, row);
-          }
-        });
-        this.rowSelectedState.replace(selectedStateMap);
-        // Use `merge` to ensure we don't lose any row that were selected, but no longer in `this.rows` (i.e. due to server-side filtering)
-        this.selectedDataRows.merge(selectedRowMap);
-      } else {
-        // Similarly "unmash" all rows + children.
-        this.rowSelectedState.clear();
-        this.selectedDataRows.clear();
-        this.keptSelectedRows = [];
-      }
-    } else {
-      // This is the regular/non-header behavior to just add/remove the individual row id,
-      // plus percolate the change down-to-child + up-to-parents.
-
-      // Find the clicked on row
-      const curr: FoundRow | undefined =
-        findRow(this.rows, id) ??
-        (this.selectedDataRows.has(id) ? { row: this.selectedDataRows.get(id)!, parents: [] } : undefined);
-      if (!curr) return;
-
-      // Everything here & down is deterministically on/off
-      const selectedStateMap = new Map<string, SelectedState>();
-      visit([curr.row], (row) => {
-        // The `visit` method walks through the selected row and all of its children, if any.
-        // Depending on whether we are determining the clicked row's state or its children, then we handle updating the selection differently.
-
-        // We can tell if we are determining a child row's selected state by checking against the row selected `id` and the row we're currently evaluating `row.id`.
-        const isClickedRow = row.id === id;
-
-        // Only update the selected states if we're updating the clicked row, or if we are checking a child row, then the row must match the filter.
-        // Meaning, rows that are filtered out and displayed in the "selectedGroup" can only change their selection state by interacting with them directly.
-        if (isClickedRow || this.matchedRows.has(row.id)) {
-          selectedStateMap.set(row.id, selected ? "checked" : "unchecked");
-          if (selected) {
-            this.selectedDataRows.set(row.id, row);
-          } else {
-            this.selectedDataRows.delete(row.id);
-          }
-        }
-      });
-
-      // Now walk up the parents and see if they are now-all-checked/now-all-unchecked/some-of-each
-      for (const parent of [...curr.parents].reverse()) {
-        // Only derive selected state of the parent row if `inferSelectedState` is not `false`
-        if (parent.children && parent.inferSelectedState !== false) {
-          const selectedState = deriveParentSelected(this.getMatchedChildrenStates(parent.children, selectedStateMap));
-          if (selectedState === "checked") {
-            this.selectedDataRows.set(parent.id, parent);
-          } else {
-            this.selectedDataRows.delete(parent.id);
-          }
-          selectedStateMap.set(parent.id, selectedState);
-        }
-      }
-
-      // And do the header + top-level "children" as a final one-off
-      selectedStateMap.set(
-        "header",
-        deriveParentSelected(this.getMatchedChildrenStates([...this.rows, ...this.keptSelectedRows], selectedStateMap)),
-      );
-
-      // And merge the new selected state map into the existing one
-      this.rowSelectedState.merge(selectedStateMap);
-
-      // Lastly, we need to update the `keptSelectedRows` if the row was deselected.
-      // (If selected === true, then it's not possible for the row to be in `keptSelectedRows` as you can only select rows that match the filter)
-      if (!selected) {
-        const newlyKeptRows = [...this.selectedDataRows.values()].filter((row) =>
-          keptSelectionsFilter(row, this.matchedRows),
-        );
-        if (!comparer.shallow(newlyKeptRows, this.keptSelectedRows)) {
-          this.keptSelectedRows = newlyKeptRows;
-        }
-      }
-    }
+    this.rowStates.get(id).select(selected);
   }
 
   get collapsedIds(): string[] {
@@ -547,40 +416,6 @@ export class TableState {
       this.collapsedRows.delete(id);
     });
   }
-
-  private getMatchedChildrenStates(children: GridDataRow<any>[], map: Map<string, SelectedState>): SelectedState[] {
-    const respectedChildren = children.flatMap(getChildrenForDerivingSelectState);
-    // When determining the children selected states to base the parent's state from, then only base this off of rows that match the filter or are in the "hidden selected" group (via the `filter` below)
-    return respectedChildren
-      .filter((row) => row.id !== "header" && (this.matchedRows.has(row.id) || this.selectedDataRows.has(row.id)))
-      .map((row) => map.get(row.id) || this.getSelected(row.id));
-  }
-
-  // Recursively traverse through rows to determine selected state of parent rows based on children
-  // Returns the selected states for the immediately children (if any) of the row passed in
-  private setNestedSelectedStates(row: GridDataRow<any>, map: Map<string, SelectedState>): SelectedState[] {
-    if (this.matchedRows.has(row.id) || this.selectedDataRows.has(row.id)) {
-      // do not derive selected state if there are no children, or if `inferSelectedState` is set to false
-      if (!row.children || row.inferSelectedState === false) {
-        return [this.getSelected(row.id)];
-      }
-
-      const childrenSelectedStates = row.children.flatMap((rc) => this.setNestedSelectedStates(rc, map));
-      const parentState = deriveParentSelected(childrenSelectedStates);
-      map.set(row.id, parentState);
-      return [parentState];
-    }
-    return [];
-  }
-}
-
-/** Returns the child rows needed for deriving the selected state of a parent/group row */
-function getChildrenForDerivingSelectState(row: GridDataRow<any>): GridDataRow<any>[] {
-  // Only look deeper if the parent row does not infer its selected state
-  if (row.children && row.inferSelectedState === false) {
-    return [row, ...row.children.flatMap(getChildrenForDerivingSelectState)];
-  }
-  return [row];
 }
 
 /** Provides a context for rows to access their table's `TableState`. */
@@ -612,40 +447,14 @@ function readOrSetLocalVisibleColumnState(columns: GridColumnWithId<any>[], stor
   return visibleColumnIds;
 }
 
-type FoundRow = { row: GridDataRow<any>; parents: GridDataRow<any>[] };
-
-/** Finds a row by id, and returns it + any parents. */
-function findRow(rows: GridDataRow<any>[], id: string): FoundRow | undefined {
-  // This is technically an array of "maybe FoundRow"
-  const todo: FoundRow[] = rows.map((row) => ({ row, parents: [] }));
-  while (todo.length > 0) {
-    const curr = todo.pop()!;
-    if (curr.row.id === id) {
-      return curr;
-    } else if (curr.row.children) {
-      // Search our children and pass along us as the parent
-      todo.push(...curr.row.children.map((child) => ({ row: child, parents: [...curr.parents, curr.row] })));
-    }
-  }
-  return undefined;
-}
-
-function deriveParentSelected(children: SelectedState[]): SelectedState {
-  const allChecked = children.every((child) => child === "checked");
-  const allUnchecked = children.every((child) => child === "unchecked");
-  return children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
-}
-
 function getCollapsedIdsFromRows(rows: GridDataRow<any>[]): string[] {
   return rows.reduce((acc, r) => {
     if (r.initCollapsed) {
       acc.push(r.id);
     }
-
     if (r.children) {
       acc.push(...getCollapsedIdsFromRows(r.children));
     }
-
     return acc;
   }, [] as string[]);
 }
@@ -710,12 +519,3 @@ export type SortState = {
 };
 
 export type SortOn = "client" | "server" | undefined;
-
-function keptSelectionsFilter(row: GridDataRow<any>, matchedRows: ObservableSet<string>) {
-  return (
-    !matchedRows.has(row.id) &&
-    row.selectable !== false &&
-    !reservedRowKinds.includes(row.kind) &&
-    (!row.children || row.inferSelectedState === false)
-  );
-}

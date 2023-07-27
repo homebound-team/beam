@@ -1,5 +1,5 @@
 import { ObservableMap } from "mobx";
-import { GridDataRow } from "src";
+import { GridDataRow, HEADER, reservedRowKinds } from "src";
 import { RowState } from "src/components/Table/components/RowState";
 
 /**
@@ -35,23 +35,29 @@ export class RowStates {
       let state = map.get(key);
       if (!state) {
         state = new RowState(parent, row);
-        state.selected = row.initSelected ? "checked" : "unchecked";
+        state.selected = !!row.initSelected;
         map.set(key, state);
       } else {
         state.row = row;
         state.wasRemoved = false;
         existing.delete(state);
       }
-      if (row.children) {
-        state.children = row.children.map((child) => addRowAndChildren(state, child));
-      }
+      state.children = row.children?.map((child) => addRowAndChildren(state, child));
       return state;
     }
 
-    for (const row of rows) {
-      addRowAndChildren(undefined, row);
+    // Probe for the header row, so we can create it as a root RowState, even
+    // though we don't require the user to model their GridDataRows that way.
+    const header = rows.find((r) => r.kind === HEADER);
+    const headerState = header ? addRowAndChildren(undefined, header) : undefined;
+    // Add the top-level rows
+    const children = rows.map((row) => addRowAndChildren(headerState, row));
+    // And attach them to the header for select-all/etc. to work
+    if (headerState) {
+      headerState.children = children.filter((rs) => !reservedRowKinds.includes(rs.row.kind));
     }
-    // Now mark remaining has removed
+
+    // Then mark any remaining as removed
     for (const state of existing) {
       state.wasRemoved = true;
     }
@@ -62,7 +68,7 @@ export class RowStates {
     for (const id of ids) {
       const rs = this.map.get(id);
       if (rs && rs.parent) {
-        rs.children = rs.children.filter((o) => o !== rs);
+        rs.parent.children = rs.parent.children?.filter((o) => o !== rs);
       }
       this.map.delete(id);
     }

@@ -11,11 +11,11 @@ export class RowState {
   /** Our row, only ref observed, so we don't crawl into GraphQL fragments. */
   row: GridDataRow<any>;
   parent: RowState | undefined;
-  children: RowState[] = [];
+  children: RowState[] | undefined = undefined;
   /** Whether we match a client-side filter; true if no filter is in place. */
   isMatched = true;
-  /** Our current selected state. */
-  selected: SelectedState = "unchecked";
+  /** Whether we are *directly* selected. */
+  selected = false;
   /** Whether our `row` had been in `props.rows`, but was removed, i.e. probably by server-side filters. */
   wasRemoved = false;
 
@@ -29,8 +29,37 @@ export class RowState {
     makeAutoObservable(this, { row: observable.ref });
   }
 
+  /** Whether we are effectively selected (directly or via a parent/grandparent). */
   get isSelected(): boolean {
-    return this.selected === "checked";
+    return this.selected || !!this.parent?.isSelected;
+  }
+
+  /** Whether we're selected (directly for via a parent) or a partially selected parent. */
+  get selectedState(): SelectedState {
+    if (this.isSelected) {
+      return "checked";
+    } else if (this.children && this.row.inferSelectedState !== false) {
+      // If filters are hiding some of our children, we still want to show fully selected
+      const visibleChildren = this.children.filter((child) => child.isMatched);
+      const allChecked = visibleChildren.every((child) => child.selected);
+      const allUnchecked = visibleChildren.every((child) => !child.selected);
+      return this.children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
+    } else {
+      return "unchecked";
+    }
+  }
+
+  /** Called to explicitly select/unselect this row, or unselect if our parent was unselected. */
+  select(selected: boolean): void {
+    this.selected = selected;
+    if (!selected && this.children) {
+      for (const child of this.children) {
+        // Kept rows are selected/unselected directly, and not implicitly from their old parent
+        if (!child.isKept) {
+          child.select(selected);
+        }
+      }
+    }
   }
 
   /** Whether this is a selected-but-filtered-out row that we should hoist to the top. */
@@ -45,7 +74,7 @@ export class RowState {
       !reservedRowKinds.includes(this.row.kind) &&
       // Parents don't need keeping, unless they're actually real rows
       (!this.row.children || this.row.inferSelectedState === false) &&
-      this.selected === "checked" &&
+      this.selected &&
       (!this.isMatched || this.wasRemoved)
     );
   }

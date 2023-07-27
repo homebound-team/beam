@@ -281,15 +281,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     return rows;
   }, [columns, rows, sortOn, sortState, caseSensitive]);
 
-  const keptSelectedDataRows = useComputed(() => tableState.keptSelectedRows as GridDataRow<R>[], [tableState]);
+  const keptDataRows = useComputed(() => tableState.keptRows as GridDataRow<R>[], [tableState]);
   // Sort the `keptSelectedDataRows` separately because the current sorting logic sorts within groups and these "kept" rows are now displayed in a flat list.
   // It could also be the case that some of these rows are no longer in the `props.rows` list, and so wouldn't be sorted by the `maybeSorted` logic above.
   const sortedKeptSelections = useMemo(() => {
-    if (sortOn === "client" && sortState && keptSelectedDataRows.length > 0) {
-      return sortRows(columns, keptSelectedDataRows, sortState, caseSensitive);
+    if (sortOn === "client" && sortState && keptDataRows.length > 0) {
+      return sortRows(columns, keptDataRows, sortState, caseSensitive);
     }
-    return keptSelectedDataRows;
-  }, [columns, sortOn, sortState, caseSensitive, keptSelectedDataRows]);
+    return keptDataRows;
+  }, [columns, sortOn, sortState, caseSensitive, keptDataRows]);
 
   // Flatten, hide-if-filtered, hide-if-collapsed, and component-ize the sorted rows.
   let [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, keptSelectedRows, filteredRowIds]: [
@@ -363,7 +363,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     // selected rows and hoist them to the top of the table.
     if (sortedKeptSelections.length) {
       // The "group row" for selected rows that are hidden by filters and add the children
-      const keptSelectionGroupRow: GridDataRow<any> = {
+      const keptGroupRow: GridDataRow<any> = {
         id: KEPT_GROUP,
         kind: KEPT_GROUP,
         children: sortedKeptSelections,
@@ -372,13 +372,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       };
 
       keptSelectedRows.push(
-        [keptSelectionGroupRow as GridDataRow<R>, makeRowComponent(keptSelectionGroupRow as GridDataRow<R>, 1)],
-        ...(collapsedIds.includes(KEPT_GROUP)
-          ? []
-          : (sortedKeptSelections.map((row, idx) => [
-              row,
-              makeRowComponent(row, 1, true, idx === sortedKeptSelections.length - 1),
-            ]) satisfies RowTuple<R>[])),
+        [keptGroupRow as GridDataRow<R>, makeRowComponent(keptGroupRow as GridDataRow<R>, 1)],
+        ...sortedKeptSelections.map((row, idx) => {
+          const isLast = idx === sortedKeptSelections.length - 1;
+          return [row, makeRowComponent(row, 1, true, isLast)] as RowTuple<R>;
+        }),
       );
     }
 
