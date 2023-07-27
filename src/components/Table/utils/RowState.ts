@@ -10,8 +10,9 @@ import { GridDataRow, reservedRowKinds, SelectedState } from "src";
 export class RowState {
   /** Our row, only ref observed, so we don't crawl into GraphQL fragments. */
   row: GridDataRow<any>;
+  /** Our parent RowState, or the `header` RowState if we're a top-level row. */
   parent: RowState | undefined;
-  /** Our children row state, as of the latest `props.rows`, without any filtering applied. */
+  /** Our children row states, as of the latest `props.rows`, without any filtering applied. */
   children: RowState[] | undefined = undefined;
   /** Whether we match a client-side filter; true if no filter is in place. */
   isMatched = true;
