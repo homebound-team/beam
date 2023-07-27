@@ -1,5 +1,4 @@
 import { act } from "@testing-library/react";
-import { runInAction } from "mobx";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
@@ -1711,7 +1710,7 @@ describe("GridTable", () => {
     expect(cellAnd(r, 3, 1, "select")).toBeChecked(); // Grandchild
 
     // When removing the filter to show all rows.
-    runInAction(() => {
+    act(() => {
       type(r.filter, "");
     });
 

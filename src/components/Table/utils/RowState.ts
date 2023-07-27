@@ -44,16 +44,16 @@ export class RowState {
 
   /** The UI state for checked/unchecked + "partially checked" for parents. */
   get selectedState(): SelectedState {
-    if (this.isSelected) {
-      return "checked";
-    } else if (this.children && this.inferSelectedState) {
+    // Parent `selectedState` is special b/c it does not directly depend on the parent's own selected-ness,
+    // but instead depends on the current visible children. I.e. a parent might be "selected", but then the
+    // client-side filter changes, a child reappears, and we need to transition to partial-ness.
+    if (this.children && this.inferSelectedState) {
       // If filters are hiding some of our children, we still want to show fully selected
       const allChecked = this.visibleChildren.every((child) => child.selectedState === "checked");
       const allUnchecked = this.visibleChildren.every((child) => child.selectedState === "unchecked");
       return this.children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
-    } else {
-      return "unchecked";
     }
+    return this.isSelected ? "checked" : "unchecked";
   }
 
   /**
@@ -101,7 +101,7 @@ export class RowState {
     return this.children?.filter((c) => c.isMatched === true) ?? [];
   }
 
-  /** Prtty toString. */
+  /** Pretty toString. */
   [Symbol.for("nodejs.util.inspect.custom")](): string {
     return `RowState ${this.row.kind}-${this.row.id}`;
   }
