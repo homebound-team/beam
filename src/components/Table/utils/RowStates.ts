@@ -1,6 +1,6 @@
 import { ObservableMap } from "mobx";
 import { GridDataRow, HEADER, reservedRowKinds } from "src";
-import { RowState } from "src/components/Table/components/RowState";
+import { RowState } from "src/components/Table/utils/RowState";
 
 /**
  * Manages our tree of observable RowStates that manage each GridDataRow's behavior.
