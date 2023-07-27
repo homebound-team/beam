@@ -3108,8 +3108,8 @@ describe("GridTable", () => {
         | Name                                  | Value |
         | ------------------------------------- | ----- |
         | 2 selected rows hidden due to filters |
-        | biz                                   | 3     |
         | bar                                   | 2     |
+        | biz                                   | 3     |
         | foo                                   | 1     |
         "
       `);
