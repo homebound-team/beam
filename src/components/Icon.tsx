@@ -552,6 +552,13 @@ export const Icons = {
       <path d="M17.5 16C18.3284 16 19 15.3284 19 14.5C19 13.6716 18.3284 13 17.5 13C16.6716 13 16 13.6716 16 14.5C16 15.3284 16.6716 16 17.5 16Z" />
     </>
   ),
+  basement: (
+    <>
+      <rect width="10" height="2" />
+      <rect x="6" y="5" width="10" height="2" />
+      <rect x="12" y="10" width="10" height="2" />
+    </>
+  ),
   // Navigation
   projects: (
     <path d="M4 6H6V8H4V6ZM4 11H6V13H4V11ZM4 16H6V18H4V16ZM20 8V6H18.8H9.2H8.023V8H9.2H18.8H20ZM8 11H20V13H8V11ZM8 16H20V18H8V16Z" />
