@@ -120,7 +120,6 @@ export class RowState {
     );
   }
 
-  /** If either us, or any parent, sets `inferSelectedState: false`, then don't infer it. */
   private get inferSelectedState(): boolean {
     return this.row.inferSelectedState !== false;
   }
