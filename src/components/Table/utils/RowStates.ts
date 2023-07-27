@@ -1,5 +1,5 @@
 import { ObservableMap } from "mobx";
-import { GridDataRow, HEADER, reservedRowKinds } from "src";
+import { GridDataRow, HEADER, KEPT_GROUP, reservedRowKinds } from "src";
 import { RowState } from "src/components/Table/utils/RowState";
 
 /**
@@ -8,6 +8,8 @@ import { RowState } from "src/components/Table/utils/RowState";
 export class RowStates {
   // A flat map of all row id -> RowState
   private map = new ObservableMap<string, RowState>();
+  // Pre-create our keptGroupRow for if/when we need it.
+  keptGroupRow: RowState = creatKeptGroupRow();
 
   /** Returns a flat list of all of our RowStates. */
   get allStates(): RowState[] {
@@ -38,6 +40,7 @@ export class RowStates {
         state = new RowState(parent, row);
         map.set(key, state);
       } else {
+        state.parent = parent;
         state.row = row;
         state.wasRemoved = false;
         existing.delete(state);
@@ -51,18 +54,29 @@ export class RowStates {
     const header = rows.find((r) => r.kind === HEADER);
     const headerState = header ? addRowAndChildren(undefined, header) : undefined;
     // Add the top-level rows
-    const children = rows.map((row) => addRowAndChildren(headerState, row));
+    const children = rows.filter((row) => row !== header).map((row) => addRowAndChildren(headerState, row));
     // And attach them to the header for select-all/etc. to work
     if (headerState) {
       headerState.children = children.filter((rs) => !reservedRowKinds.includes(rs.row.kind));
     }
 
-    // TODO: Detect if we have kept rows, and inject a kept RowState as the first child of the header.
-    // This should fix any select-all/un-select-all/partial-ness behavior.
-
     // Then mark any remaining as removed
     for (const state of existing) {
       state.wasRemoved = true;
+    }
+
+    const keptRows = this.keptRows;
+    if (keptRows.length > 0) {
+      // Stitch the current keptRows into the placeholder keptGroupRow
+      keptRows.forEach((rs) => (rs.parent = this.keptGroupRow));
+      this.keptGroupRow.children = keptRows;
+      this.keptGroupRow.row.children = keptRows.map((rs) => rs.row);
+      // And then stitch the keptGroupRow itself into the root header, so that the kept rows
+      // are treated as just another child for the header's select/unselect all to work.
+      if (headerState) {
+        this.keptGroupRow.parent = headerState;
+        headerState.children!.unshift(this.keptGroupRow);
+      }
     }
   }
 
@@ -89,4 +103,10 @@ export class RowStates {
   get keptRows(): RowState[] {
     return this.allStates.filter((rs) => rs.isKept);
   }
+}
+
+function creatKeptGroupRow(): RowState {
+  // The "group row" for selected rows that are hidden by filters and add the children
+  const keptGroupRow: GridDataRow<any> = { id: KEPT_GROUP, kind: KEPT_GROUP, initCollapsed: true, data: undefined };
+  return new RowState(undefined, keptGroupRow);
 }

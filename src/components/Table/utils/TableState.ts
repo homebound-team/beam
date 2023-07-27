@@ -345,6 +345,11 @@ export class TableState {
       .map((rs) => rs.row);
   }
 
+  /** Returns kept group row, with the latest kept children, if any. */
+  get keptRowGroup(): GridDataRow<any> {
+    return this.rowStates.keptGroupRow.row;
+  }
+
   /** Returns kept rows, i.e. those that were user-selected but then client-side or server-side filtered. */
   get keptRows(): GridDataRow<any>[] {
     return this.rowStates.keptRows.map((rs) => rs.row);
@@ -357,10 +362,6 @@ export class TableState {
 
   selectRow(id: string, selected: boolean): void {
     this.rowStates.get(id).select(selected);
-    // Unselecting the header also unselects all kept rows
-    if (id === HEADER && !selected) {
-      this.rowStates.keptRows.forEach((rs) => rs.select(false));
-    }
   }
 
   get collapsedIds(): string[] {

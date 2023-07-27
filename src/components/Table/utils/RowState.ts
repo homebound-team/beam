@@ -1,5 +1,5 @@
 import { makeAutoObservable, observable } from "mobx";
-import { GridDataRow, reservedRowKinds, SelectedState } from "src";
+import { GridDataRow, KEPT_GROUP, reservedRowKinds, SelectedState } from "src";
 
 /**
  * A reactive/observable state of each GridDataRow's current behavior.
@@ -96,6 +96,8 @@ export class RowState {
   }
 
   private get visibleChildren(): RowState[] {
+    // The keptGroup should treat all of its children as visible, as this makes select/unselect all work.
+    if (this.row.kind === KEPT_GROUP) return this.children ?? [];
     return this.children?.filter((c) => c.isMatched === true) ?? [];
   }
 

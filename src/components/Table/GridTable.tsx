@@ -281,7 +281,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     return rows;
   }, [columns, rows, sortOn, sortState, caseSensitive]);
 
-  const keptDataRows = useComputed(() => tableState.keptRows as GridDataRow<R>[], [tableState]);
+  const [keptGroupRow, keptDataRows] = useComputed(
+    () => [tableState.keptRowGroup, tableState.keptRows as GridDataRow<R>[]],
+    [tableState],
+  );
   // Sort the `keptSelectedDataRows` separately because the current sorting logic sorts within groups and these "kept" rows are now displayed in a flat list.
   // It could also be the case that some of these rows are no longer in the `props.rows` list, and so wouldn't be sorted by the `maybeSorted` logic above.
   const sortedKeptSelections = useMemo(() => {
@@ -362,15 +365,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     // match the current filter, or are no longer part of the `rows` prop. We persist these
     // selected rows and hoist them to the top of the table.
     if (sortedKeptSelections.length) {
-      // The "group row" for selected rows that are hidden by filters and add the children
-      const keptGroupRow: GridDataRow<any> = {
-        id: KEPT_GROUP,
-        kind: KEPT_GROUP,
-        children: sortedKeptSelections,
-        initCollapsed: true,
-        data: undefined,
-      };
-
       keptSelectedRows.push([keptGroupRow as GridDataRow<R>, makeRowComponent(keptGroupRow as GridDataRow<R>, 1)]);
       if (!collapsedIds.includes(KEPT_GROUP)) {
         keptSelectedRows.push(
@@ -395,6 +389,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     columnSizes,
     collapsedIds,
     getCount,
+    keptGroupRow,
     sortedKeptSelections,
   ]);
 
