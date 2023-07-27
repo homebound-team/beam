@@ -36,8 +36,8 @@ export class RowState {
    * Whether we are currently selected.
    *
    * Note that we don't use "I'm selected || my parent is selected" logic here, because whether a child is selected
-   * is actually based on whether it was _visible at the time the parent was selected_. So, we can just assume
-   * "a parent being selected means the child is selected", and instead parents have to push selected-ness down
+   * is actually based on whether it was _visible at the time the parent was selected_. So, we can't just assume
+   * "a parent being selected means the child is also selected", and instead parents have to push selected-ness down
    * to their visible children explicitly.
    */
   get isSelected(): boolean {
@@ -81,13 +81,11 @@ export class RowState {
     // - it is not matched (hidden by filter) (being hidden by collapse is okay)
     // - or it has (probably) been server-side filtered
     return (
-      // Unselectable rows defacto cannot be kept
-      this.row.selectable !== false &&
+      this.selected &&
       // Headers, totals, etc., do not need keeping
       !reservedRowKinds.includes(this.row.kind) &&
       // Parents don't need keeping, unless they're actually real rows
-      (!this.row.children || this.row.inferSelectedState === false) &&
-      this.selected &&
+      !(this.children && this.inferSelectedState) &&
       (!this.isMatched || this.wasRemoved)
     );
   }
