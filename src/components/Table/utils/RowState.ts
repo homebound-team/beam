@@ -67,10 +67,7 @@ export class RowState {
     this.selected = selected;
     if (this.children && this.inferSelectedState) {
       for (const child of this.visibleChildren) {
-        // Kept rows are selected/unselected directly, and not implicitly from their old parent
-        if (!child.isKept) {
-          child.select(selected);
-        }
+        child.select(selected);
       }
     }
   }
