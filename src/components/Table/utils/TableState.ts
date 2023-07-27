@@ -1,5 +1,5 @@
 import { camelCase } from "change-case";
-import { makeAutoObservable, observable, ObservableSet } from "mobx";
+import { makeAutoObservable, observable, ObservableSet, reaction } from "mobx";
 import React from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { RowStates } from "src/components/Table/components/RowStates";
@@ -75,6 +75,16 @@ export class TableState {
       // Do not observe columns, expect this to be a non-reactive value for us to base our reactive values off of.
       columns: false,
     });
+
+    // If the kept rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
+    reaction(
+      () => [...this.keptRows.values()],
+      (curr, prev) => {
+        if (prev.length === 0 && curr.length > 0) {
+          this.collapsedRows.add(KEPT_GROUP);
+        }
+      },
+    );
   }
 
   loadCollapse(persistCollapse: string | undefined, rows: GridDataRow<any>[]): void {
