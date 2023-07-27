@@ -77,7 +77,14 @@ export class RowStates {
 
   setMatchedRows(ids: string[]): void {
     for (const rs of this.allStates) {
+      // const matched = ids.includes(rs.row.id);
+      // if (matched !== rs.isMatched) console.log(`Changing ${rs.row.id}.isMatched = ${matched}`);
       rs.isMatched = ids.includes(rs.row.id);
     }
+  }
+
+  /** Returns kept rows, i.e. those that were user-selected but then client-side or server-side filtered. */
+  get keptRows(): RowState[] {
+    return this.allStates.filter((rs) => rs.isKept);
   }
 }

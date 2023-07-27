@@ -347,7 +347,7 @@ export class TableState {
 
   /** Returns kept rows, i.e. those that were user-selected but then client-side or server-side filtered. */
   get keptRows(): GridDataRow<any>[] {
-    return this.rowStates.allStates.filter((rs) => rs.isKept).map((rs) => rs.row);
+    return this.rowStates.keptRows.map((rs) => rs.row);
   }
 
   // Should be called in an Observer/useComputed to trigger re-renders
@@ -357,6 +357,10 @@ export class TableState {
 
   selectRow(id: string, selected: boolean): void {
     this.rowStates.get(id).select(selected);
+    // Unselecting the header also unselects all kept rows
+    if (id === HEADER && !selected) {
+      this.rowStates.keptRows.forEach((rs) => rs.select(false));
+    }
   }
 
   get collapsedIds(): string[] {
