@@ -28,6 +28,7 @@ export class RowState {
   constructor(parent: RowState | undefined, row: GridDataRow<any>) {
     this.parent = parent;
     this.row = row;
+    this.selected = !!row.initSelected;
     makeAutoObservable(this, { row: observable.ref });
   }
 
