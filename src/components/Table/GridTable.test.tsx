@@ -1727,9 +1727,7 @@ describe("GridTable", () => {
     expect(cellAnd(r, 3, 1, "select")).toBeChecked(); // Grandchild
 
     // When removing the filter to show all rows.
-    act(() => {
-      type(r.filter, "");
-    });
+    type(r.filter, "");
 
     // Then expect the parent rows to have updated based on the row status
     expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true"); // Header
