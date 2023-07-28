@@ -24,7 +24,7 @@ export function Option<O>(props: OptionProps<O>) {
     item: Css.gray900.if(contrast).white.$,
     hover: Css.bgGray100.if(contrast).bgGray600.$,
     disabled: Css.cursorNotAllowed.gray400.if(contrast).gray500.$,
-    focus: Css.add("boxShadow", `inset 0 0 0 1px ${!contrast ? Palette.LightBlue700 : Palette.LightBlue500}`).$,
+    focus: Css.add("boxShadow", `inset 0 0 0 1px ${!contrast ? Palette.Blue700 : Palette.Blue500}`).$,
   };
 
   // Get props for the option element.
@@ -62,7 +62,7 @@ export function Option<O>(props: OptionProps<O>) {
                 !contrast
                   ? isDisabled
                     ? Palette.Gray400
-                    : Palette.LightBlue700
+                    : Palette.Blue700
                   : isDisabled
                   ? Palette.Gray500
                   : Palette.White

@@ -2176,7 +2176,7 @@ describe("GridTable", () => {
     click(cell(r, 1, 1));
 
     // Then the first row/cell has the 'active' background color
-    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.LightBlue50);
+    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.Blue50);
   });
 
   it("does not shows cell border when 'cellHighlight' is not defined", async () => {
@@ -2187,7 +2187,7 @@ describe("GridTable", () => {
     click(cell(r, 1, 1));
 
     // Then the cell does not have the highlight color.
-    expect(cell(r, 1, 1)).not.toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.LightBlue700}`);
+    expect(cell(r, 1, 1)).not.toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.Blue700}`);
   });
 
   it("shows cell border when 'cellHighlight' is defined", async () => {
@@ -2198,7 +2198,7 @@ describe("GridTable", () => {
     click(cell(r, 1, 1));
 
     // Then the cell has the highlight color.
-    expect(cell(r, 1, 1)).toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.LightBlue700}`);
+    expect(cell(r, 1, 1)).toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.Blue700}`);
   });
 
   it("can render with rows with initCollapsed defined", async () => {

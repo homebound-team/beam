@@ -29,9 +29,7 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
   return (
     <button
       {...hoverProps}
-      css={
-        Css.df.xsMd.aic.jcsb.gap2.px1.hPx(32).mxPx(-8).w("calc(100% + 16px)").br4.lightBlue700.if(isHovered).bgGray100.$
-      }
+      css={Css.df.xsMd.aic.jcsb.gap2.px1.hPx(32).mxPx(-8).w("calc(100% + 16px)").br4.blue700.if(isHovered).bgGray100.$}
       onClick={async () => {
         if (isFunction(column.expandColumns)) {
           setIsLoading(true);

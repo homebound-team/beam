@@ -94,7 +94,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     // Optionally include the row hover styles, by default they should be turned on.
     ...(showRowHoverColor && {
       // Even though backgroundColor is set on the cellCss, the hover target is the row.
-      "&:hover > *": Css.bgColor(style.rowHoverColor ?? Palette.LightBlue100).$,
+      "&:hover > *": Css.bgColor(style.rowHoverColor ?? Palette.Blue100).$,
     }),
     // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `flexNone` to ensure they stay their defined widths
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.flexNone.$).$),
@@ -287,13 +287,13 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // The specific cell's css (if any from GridCellContent)
             ...rowStyleCellCss,
             // Apply active row styling for non-nested card styles.
-            ...(isActive ? Css.bgColor(style.activeBgColor ?? Palette.LightBlue50).$ : {}),
+            ...(isActive ? Css.bgColor(style.activeBgColor ?? Palette.Blue50).$ : {}),
             // Add any cell specific style overrides
             ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
             // And any cell specific css
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply cell highlight styles to active cell and hover
-            ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.LightBlue700}`).$,
+            ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
             // Define the width of the column on each cell. Supports col spans.
             width: `calc(${columnSizes.slice(columnIndex, columnIndex + currentColspan).join(" + ")})`,
             ...(typeof column.mw === "string" ? Css.mw(column.mw).$ : {}),

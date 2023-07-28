@@ -81,8 +81,8 @@ function ToggleChip(props: ToggleChipProps) {
           ...Css.relative.dib.br16.sm.px1.cursorPointer.pyPx(4).bgGray200.if(isDisabled).cursorNotAllowed.gray600.pr1.$,
           ...(isSelected
             ? {
-                ...Css.white.bgLightBlue700.$,
-                ":hover:not([data-disabled='true'])": Css.bgLightBlue800.$,
+                ...Css.white.bgBlue700.$,
+                ":hover:not([data-disabled='true'])": Css.bgBlue800.$,
               }
             : { ":hover:not([data-disabled='true'])": Css.bgGray300.$ }),
           ...(isFocusVisible ? Css.bshFocus.$ : {}),

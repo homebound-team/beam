@@ -168,7 +168,7 @@ function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
     // According to the Tribute Types, `original.value` should always be present.
     // However, we have received errors in DataDog for "Cannot read properties of undefined (reading 'original')", so we're adding some checks.
     selectTemplate: (item) =>
-      item?.original?.value ? `<span style="color: ${Palette.LightBlue700};">@${item.original.value}</span>` : "",
+      item?.original?.value ? `<span style="color: ${Palette.Blue700};">@${item.original.value}</span>` : "",
     values,
   });
   // In dev mode, this fails because jsdom doesn't support contentEditable. Note that
@@ -186,7 +186,7 @@ const trixCssOverrides = {
   // Some basic copy/paste from TextFieldBase
   "& trix-editor": Css.bgWhite.sm.gray900.bn.p1.$,
   // Highlight on focus
-  "&:focus-within": Css.bLightBlue700.$,
+  "&:focus-within": Css.bBlue700.$,
   "& trix-toolbar": Css.m1.$,
   // Make the buttons closer to ours
   "& .trix-button:not(:first-of-type)": Css.bn.$,
@@ -212,7 +212,7 @@ const trixCssOverrides = {
 // Style the @ mention box
 const tributeOverrides = {
   ".tribute-container": Css.add({ minWidth: "300px" }).$,
-  ".tribute-container > ul": Css.sm.bgWhite.ba.br4.bLightBlue700.overflowHidden.$,
+  ".tribute-container > ul": Css.sm.bgWhite.ba.br4.bBlue700.overflowHidden.$,
 };
 
 function extractIdsFromMentions(mergeTags: string[], content: string): string[] {

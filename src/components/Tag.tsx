@@ -38,7 +38,7 @@ export function Tag<X extends Only<Xss<TagXss>, X>>({ text, type, xss, ...otherP
 function getStyles(type?: TagType) {
   switch (type) {
     case "info":
-      return Css.bgLightBlue100.$;
+      return Css.bgBlue100.$;
     case "caution":
       return Css.bgYellow200.$;
     case "warning":

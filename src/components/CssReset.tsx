@@ -15,11 +15,11 @@ export const navLink = "navLink";
 
 const ourReset = css`
   a:not(.${navLink}) {
-    color: ${Palette.LightBlue700};
+    color: ${Palette.Blue700};
   }
 
   a:visited:not(.${navLink}) {
-    color: ${Palette.LightBlue500};
+    color: ${Palette.Blue500};
   }
 
   /**
