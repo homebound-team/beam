@@ -1196,6 +1196,7 @@ export function SelectableChildrenRows() {
                   id: "2",
                   data: "Tony Stark",
                   initSelected: false,
+                  inferSelectedState: false,
                   children: [
                     {
                       kind: "grandChild" as const,
