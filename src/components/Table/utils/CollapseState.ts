@@ -32,7 +32,8 @@ export class CollapseState {
     );
   }
 
-  clear() {
+  /** Once the first real-data load is done, we ignore historical ids so that we prefer any new data's `initCollapsed`. */
+  done() {
     this.historicalIds = undefined;
   }
 

@@ -91,7 +91,7 @@ export class RowStates {
     // After the first load of real data, we detach collapse state, to respect
     // any incoming initCollapsed.
     if (this.topRows.some((rs) => !reservedRowKinds.includes(rs.row.kind))) {
-      this.collapseState.clear();
+      this.collapseState.done();
     }
   }
 
