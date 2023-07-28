@@ -28,7 +28,6 @@ export type SelectedState = "checked" | "unchecked" | "partial";
  * changes.
  */
 export class TableState {
-  // A set of just row ids, i.e. not row.kind+row.id
   private persistCollapse: string | undefined;
   // The current list of rows, basically a useRef.current. Only shallow reactive.
   public rows: GridDataRow<any>[] = [];
