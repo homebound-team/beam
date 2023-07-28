@@ -34,3 +34,16 @@ expect.extend({
     }
   },
 });
+
+// Suppress warnings about prop changes causing observables in other components to re-render.
+const error = console.error.bind(console);
+console.error = function () {
+  if (
+    arguments.length > 0 &&
+    typeof arguments[0] === "string" &&
+    arguments[0].startsWith("Warning: Cannot update a component")
+  ) {
+    return;
+  }
+  error(...arguments);
+};

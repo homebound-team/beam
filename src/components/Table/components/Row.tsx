@@ -12,7 +12,7 @@ import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
-import { SortOn, TableStateContext } from "src/components/Table/utils/TableState";
+import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   applyRowFn,
   EXPANDABLE_HEADER,
@@ -40,7 +40,6 @@ interface RowProps<R extends Kinded> {
   row: GridDataRow<R>;
   style: GridStyle;
   rowStyles: RowStyles<R> | undefined;
-  sortOn: SortOn;
   columnSizes: string[];
   level: number;
   getCount: (id: string) => object;
@@ -60,7 +59,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     row,
     style,
     rowStyles,
-    sortOn,
     columnSizes,
     level,
     getCount,
@@ -74,6 +72,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   } = props;
 
   const { tableState } = useContext(TableStateContext);
+  const sortOn = tableState.sortConfig?.on;
   const rowId = `${row.kind}_${row.id}`;
   const isActive = useComputed(() => tableState.activeRowId === rowId, [rowId, tableState]);
 
@@ -360,11 +359,13 @@ export type GridDataRow<R extends Kinded> = {
   id: string;
   /** A list of parent/grand-parent ids for collapsing parent/child rows. */
   children?: GridDataRow<R>[];
-  /** * Whether to pin this sort to the first/last of its parent's children.
+  /**
+   * Whether to pin this sort to the first/last of its parent's children.
    *
    * By default, pinned rows are always shown/not filtered out, however providing
    * the pin `filter: true` property will allow pinned rows to be hidden
-   * while filtering.*/
+   * while filtering.
+   */
   pin?: "first" | "last" | Pin;
   data: unknown;
   /** Whether to have the row collapsed (children not visible) on initial load. This will be ignore in subsequent re-renders of the table */

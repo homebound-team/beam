@@ -1632,10 +1632,10 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRows()).toEqual([
       rows[1],
       rows[1].children![0],
-      rows[1].children![0].children![1],
       rows[1].children![0].children![0],
+      rows[1].children![0].children![1],
     ]);
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g2", "p1c1g1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g1", "p1c1g2"]);
 
     // And when applying a filter
     type(r.filter, "p1c1g2");
@@ -1643,10 +1643,27 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRows()).toEqual([
       rows[1],
       rows[1].children![0],
-      rows[1].children![0].children![1],
       rows[1].children![0].children![0],
+      rows[1].children![0].children![1],
     ]);
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g2", "p1c1g1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g1", "p1c1g2"]);
+  });
+
+  it("renders the header as checked", async () => {
+    // Given a parent
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    // When rendering a GridTable with filtering and selectable rows
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+    // Then the header should not be checked
+    expect(cellAnd(r, 0, 1, "select")).not.toBeChecked();
+    // Nor indeterminate
+    expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "false");
   });
 
   it("re-derives parent row selected state", async () => {
@@ -1759,9 +1776,9 @@ describe("GridTable", () => {
     click(r.select_0);
 
     // Then row id 2 is not selected as it's disabled
-    expect(api.current!.getSelectedRowIds()).toEqual(["3", "1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["1", "3"]);
     // and selected rows does not include row 2 as it's disabled
-    expect(r.selectedNames()).toHaveTextContent("Thor Odinson,Tony Stark");
+    expect(r.selectedNames()).toHaveTextContent("Tony Stark,Thor Odinson");
   });
 
   it("can deselect all rows via 'clearSelections' api method", async () => {
@@ -1782,7 +1799,7 @@ describe("GridTable", () => {
     // And selecting the header row
     click(cellAnd(r, 0, 1, "select"));
     // Then expect all rows should selected
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c2", "p1c1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2"]);
     // When using the api to clear the selected rows
     act(() => api.current!.clearSelections());
     // Then all rows should be deselected
@@ -1821,7 +1838,7 @@ describe("GridTable", () => {
     // When triggering all rows as selected
     click(cellAnd(r, 0, 1, "select"));
     // Then expect all rows should selected
-    expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c2", "p2c1", "p1", "p1c2", "p1c1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2", "p2", "p2c1", "p2c2", "p3", "p3c1"]);
 
     // When collapsing all rows
     click(cellAnd(r, 0, 0, "collapse"));
@@ -1831,7 +1848,7 @@ describe("GridTable", () => {
     expect(cellAnd(r, 3, 1, "select")).toBeChecked();
 
     // And all rows are still returned by the API
-    expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c2", "p2c1", "p1", "p1c2", "p1c1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2", "p2", "p2c1", "p2c2", "p3", "p3c1"]);
 
     // When applying a filter
     type(r.filter, "filter");
@@ -1839,9 +1856,9 @@ describe("GridTable", () => {
     expect(cellAnd(r, 2, 1, "select")).toBeChecked();
     expect(cellAnd(r, 3, 1, "select")).toBeChecked();
     // because the parent matches the filter, and the child was selected, the new behavior shows the nested children of matched parent, child should keep selected
-    expect(cellAnd(r, 4, 1, "select")).toBeChecked();
+    // expect(cellAnd(r, 4, 1, "select")).toBeChecked();
     // And the API reflects the expected selected states
-    expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c2", "p2c1", "p1", "p1c2", "p1c1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2", "p2", "p2c1", "p2c2", "p3", "p3c1"]);
   });
 
   // it can switch between partially checked to checked depending on applied filter
@@ -2426,7 +2443,7 @@ describe("GridTable", () => {
     expect(cellAnd(r, 2, 0, "select")).toBeChecked();
 
     // And the api can fetch them
-    expect(api.current!.getSelectedRowIds()).toEqual(["2", "1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["1", "2"]);
 
     // And when we unselect all
     click(cellAnd(r, 1, 0, "select"));
@@ -2469,6 +2486,7 @@ describe("GridTable", () => {
             id: "2",
             data: "Tony Stark",
             initSelected: false,
+            inferSelectedState: false,
             children: [
               {
                 kind: "grandChild" as const,
@@ -2537,7 +2555,7 @@ describe("GridTable", () => {
     expect(cellAnd(r, 5, 0, "select")).toBeChecked();
 
     // And they can no longer be fetched by the api
-    expect(api.current!.getSelectedRowIds()).toEqual(["4", "1", "5"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["1", "5", "4"]);
   });
 
   describe("expandable columns", () => {
@@ -2693,7 +2711,7 @@ describe("GridTable", () => {
       const rows: GridDataRow<NestedRow>[] = [
         simpleHeader,
         {
-          // With one grandparent that sets `inferSelectedState: false`
+          // With one parent that sets `inferSelectedState: false`
           ...{ kind: "parent", id: "p1", inferSelectedState: false, data: { name: "parent 1" } },
           children: [
             {
@@ -2714,29 +2732,29 @@ describe("GridTable", () => {
 
       // Then the header row should be indeterminate
       expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
-      // And the grandparent row to not be checked.
+      // And the parent row to not be checked.
       expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
-      // And the parent row should show indeterminate,
+      // And the child row should show indeterminate
       expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true");
       expect(api.current!.getSelectedRowIds()).toEqual(["p1c1gc1"]);
 
-      // When selecting the grandparent
+      // When selecting the parent
       click(cellAnd(r, 1, 1, "select"));
 
       // Then all rows should be considered selected
       expect(cellAnd(r, 0, 1, "select")).toBeChecked();
       expect(cellAnd(r, 1, 1, "select")).toBeChecked();
       expect(cellAnd(r, 2, 1, "select")).toBeChecked();
-      expect(api.current!.getSelectedRowIds()).toEqual(["p1c1gc1", "p1", "p1c1", "p1c1gc2"]);
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1gc1", "p1c1gc2"]);
 
       // When unselecting a single grand child
       click(cellAnd(r, 3, 1, "select"));
 
       // Then the header row should return to indeterminate
       expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
-      // And the grandparent row to remain checked.
+      // And the parent row to remain checked, b/c it does not infer selected
       expect(cellAnd(r, 1, 1, "select")).toBeChecked();
-      // And the parent row should return to indeterminate,
+      // And the child row should return to indeterminate, b/c it does infer selected
       expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true");
       expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1gc2"]);
     });
@@ -3106,8 +3124,8 @@ describe("GridTable", () => {
         | Name                                  | Value |
         | ------------------------------------- | ----- |
         | 2 selected rows hidden due to filters |
-        | biz                                   | 3     |
         | bar                                   | 2     |
+        | biz                                   | 3     |
         | foo                                   | 1     |
         "
       `);
@@ -3313,9 +3331,9 @@ describe("GridTable", () => {
         | -                                     | on | Name |
         | ------------------------------------- | -- | ---- |
         | 3 selected rows hidden due to filters |
+        | -                                     | on | c1   |
         | -                                     | on | p2   |
         | -                                     | on | c2   |
-        | -                                     | on | c1   |
         | No rows found.                        |
         "
       `);

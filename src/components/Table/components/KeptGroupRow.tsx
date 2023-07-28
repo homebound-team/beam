@@ -17,7 +17,7 @@ export function KeptGroupRow(props: KeptGroupRowProps) {
   const { as, columnSizes, style, row, colSpan } = props;
   const CellTag = as === "table" ? "td" : "div";
   const { tableState } = useContext(TableStateContext);
-  const numHiddenSelectedRows: number = useComputed(() => tableState.keptSelectedRows.length, [tableState]);
+  const numHiddenSelectedRows: number = useComputed(() => tableState.keptRows.length, [tableState]);
 
   return (
     <CellTag

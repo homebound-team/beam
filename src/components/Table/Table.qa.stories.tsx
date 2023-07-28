@@ -173,7 +173,7 @@ export function Table(props: TableStoryProps) {
               label="Delete Rows"
               onClick={() => {
                 setRows((rows) => rows.filter((r) => !api.getSelectedRowIds().includes(r.id)));
-                // api.deleteRows(api.getSelectedRowIds("child"));
+                api.deleteRows(api.getSelectedRowIds("child"));
               }}
             />
           </div>
