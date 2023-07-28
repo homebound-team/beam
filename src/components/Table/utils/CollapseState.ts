@@ -1,6 +1,17 @@
 import { reaction } from "mobx";
 import { RowStates } from "src/components/Table/utils/RowStates";
 
+/**
+ * Manages loading/saving our currently-collapsed rows to session storage.
+ *
+ * This is useful for pages that the user has to go in-out/out-of a lot, and
+ * want it to restore, as much as possible, like their previous visit. Granted,
+ * we try to superdrawer most of these experiences to avoid the user having to
+ * jump off-page.
+ *
+ * Unlike most of our other states, this is not directly reactive/an observable,
+ * although we do reactive to collapsedRows changing to persist the new state.
+ */
 export class CollapseState {
   private historicalIds: string[] | undefined;
 
