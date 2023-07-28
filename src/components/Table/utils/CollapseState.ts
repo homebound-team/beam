@@ -25,10 +25,8 @@ export class CollapseState {
     }
     // And store new collapsed rows going forward
     reaction(
-      () => [...this.states.collapsedRows],
-      (rows) => {
-        sessionStorage.setItem(persistCollapse, JSON.stringify(rows.map((rs) => rs.row.id)));
-      },
+      () => [...this.states.collapsedRows.map((rs) => rs.row.id)],
+      (rowIds) => sessionStorage.setItem(persistCollapse, JSON.stringify(rowIds)),
     );
   }
 
@@ -37,7 +35,12 @@ export class CollapseState {
     this.historicalIds = undefined;
   }
 
-  /** Returns undefined if there is no persisted state to vote first. */
+  /**
+   * Returns if this row had been collapsed.
+   *
+   * Technically we return `undefined` if a) there is no persisted state for this row, or b) we are
+   * past the first real-data load, and thus should prefer new incoming rows' `initCollapsed` flag.
+   */
   wasCollapsed(id: string): boolean | undefined {
     return this.historicalIds?.includes(id);
   }
