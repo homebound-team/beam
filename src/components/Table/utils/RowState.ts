@@ -1,5 +1,6 @@
 import { makeAutoObservable, observable } from "mobx";
 import { GridDataRow, KEPT_GROUP, reservedRowKinds, SelectedState } from "src";
+import { RowStates } from "src/components/Table/utils/RowStates";
 
 /**
  * A reactive/observable state of each GridDataRow's current behavior.
@@ -18,6 +19,8 @@ export class RowState {
   isMatched = true;
   /** Whether we are *directly* selected. */
   selected = false;
+  /** Whether we are collapsed. */
+  collapsed = false;
   /** Whether our `row` had been in `props.rows`, but was removed, i.e. probably by server-side filters. */
   wasRemoved = false;
 
@@ -25,15 +28,16 @@ export class RowState {
   // isDirectlyMatched = accept filters in the constructor and do match here
   // isEffectiveMatched = isDirectlyMatched || hasMatchedChildren
 
-  constructor(parent: RowState | undefined, row: GridDataRow<any>) {
+  constructor(states: RowStates, parent: RowState | undefined, row: GridDataRow<any>) {
     this.parent = parent;
     this.row = row;
     this.selected = !!row.initSelected;
+    this.collapsed = states.collapseState.wasCollapsed(row.id) ?? !!row.initCollapsed;
     makeAutoObservable(this, { row: observable.ref });
   }
 
   /**
-   * Whether we are currently selected, for `GridTableApi.getSelectedRows`.
+   * Whether we are effectively selected, for `GridTableApi.getSelectedRows`.
    *
    * Note that we don't use "I'm selected || my parent is selected" logic here, because whether a child is selected
    * is actually based on whether it was _visible at the time the parent was selected_. So, we can't just assume
@@ -102,6 +106,10 @@ export class RowState {
         child.select(selected);
       }
     }
+  }
+
+  toggleCollapsed(): void {
+    this.collapsed = !this.collapsed;
   }
 
   /** Whether this is a selected-but-filtered-out row that we should hoist to the top. */

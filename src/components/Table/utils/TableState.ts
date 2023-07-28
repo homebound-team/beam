@@ -29,7 +29,6 @@ export type SelectedState = "checked" | "unchecked" | "partial";
  */
 export class TableState {
   // A set of just row ids, i.e. not row.kind+row.id
-  private readonly collapsedRows = new ObservableSet<string>([]);
   private persistCollapse: string | undefined;
   // The current list of rows, basically a useRef.current. Only shallow reactive.
   public rows: GridDataRow<any>[] = [];
@@ -81,26 +80,14 @@ export class TableState {
       () => [...this.keptRows.values()],
       (curr, prev) => {
         if (prev.length === 0 && curr.length > 0) {
-          this.collapsedRows.add(KEPT_GROUP);
+          this.rowStates.get(KEPT_GROUP).collapsed = true;
         }
       },
     );
   }
 
-  loadCollapse(persistCollapse: string | undefined, rows: GridDataRow<any>[]): void {
-    this.persistCollapse = persistCollapse;
-    const sessionStorageIds = persistCollapse ? sessionStorage.getItem(persistCollapse) : null;
-    // Initialize with our collapsed rows based on what is in sessionStorage. Otherwise check if any rows have been defined as collapsed
-    const collapsedGridRowIds = sessionStorageIds ? JSON.parse(sessionStorageIds) : getCollapsedIdsFromRows(rows);
-
-    // If we have some initial rows to collapse, then set the internal prop
-    if (collapsedGridRowIds.length > 0) {
-      this.collapsedRows.replace(collapsedGridRowIds);
-      // If `persistCollapse` is set, but sessionStorageIds was not defined, then add them now.
-      if (this.persistCollapse && !sessionStorageIds) {
-        sessionStorage.setItem(this.persistCollapse, JSON.stringify(collapsedGridRowIds));
-      }
-    }
+  loadCollapse(persistCollapse: string): void {
+    this.rowStates.collapseState.load(persistCollapse);
   }
 
   initSortState(sortConfig: GridSortConfig | undefined, columns: GridColumnWithId<any>[]) {
@@ -160,46 +147,10 @@ export class TableState {
 
   // Updates the list of rows and regenerates the collapsedRows property if needed.
   setRows(rows: GridDataRow<any>[]): void {
-    // If the set of rows are different
     if (rows !== this.rows) {
       this.rowStates.setRows(rows);
-
-      const currentCollapsedIds = this.collapsedIds;
-      // Create a list of the (maybe) new rows that should be initially collapsed
-      const maybeNewCollapsedRowIds = flattenRows(rows)
-        .filter((r) => r.initCollapsed)
-        .map((r) => r.id);
-      // Check against local storage for collapsed state only if this is the first render of "data" (non-header or totals) rows.
-      const checkLocalStorage =
-        this.persistCollapse && !this.rows.some((r) => r.kind !== "totals" && r.kind !== "header");
-
-      // If the list of collapsed rows are different, then determine which are net-new rows and should be added to the newCollapsedIds array
-      if (
-        currentCollapsedIds.length !== maybeNewCollapsedRowIds.length ||
-        !currentCollapsedIds.every((id) => maybeNewCollapsedRowIds.includes(id))
-      ) {
-        // Flatten out the existing rows to make checking for new rows easier
-        const flattenedExistingIds = flattenRows(this.rows).map((r) => r.id);
-        const newCollapsedIds: string[] = maybeNewCollapsedRowIds.filter(
-          (maybeNewRowId) =>
-            !flattenedExistingIds.includes(maybeNewRowId) &&
-            // Using `!` on `this.persistCollapse!` as `checkLocalStorage` ensures this.persistCollapse is truthy
-            (!checkLocalStorage || readCollapsedRowStorage(this.persistCollapse!).includes(maybeNewRowId)),
-        );
-
-        // If there are new rows that should be collapsed then update the collapsedRows arrays
-        if (newCollapsedIds.length > 0) {
-          this.collapsedRows.replace(currentCollapsedIds.concat(newCollapsedIds));
-
-          // Also update our persistCollapse if set
-          if (this.persistCollapse) {
-            sessionStorage.setItem(this.persistCollapse, JSON.stringify(currentCollapsedIds.concat(newCollapsedIds)));
-          }
-        }
-      }
+      this.rows = rows;
     }
-    // Finally replace our existing list of rows
-    this.rows = rows;
   }
 
   setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
@@ -358,6 +309,7 @@ export class TableState {
   // Should be called in an Observer/useComputed to trigger re-renders
   getSelected(id: string): SelectedState {
     const rs = this.rowStates.get(id);
+    // The header has special behavior to "see through" selectable parents
     return id === HEADER ? rs.selectedStateForHeader : rs.selectedState;
   }
 
@@ -366,73 +318,21 @@ export class TableState {
   }
 
   get collapsedIds(): string[] {
-    return [...this.collapsedRows.values()];
+    return this.rowStates.collapsedRows.map((rs) => rs.row.id);
   }
 
   // Should be called in an Observer/useComputed to trigger re-renders
   isCollapsed(id: string): boolean {
-    return this.collapsedRows.has(id);
+    return this.rowStates.get(id).collapsed;
   }
 
   toggleCollapsed(id: string): void {
-    const collapsedIds = [...this.collapsedRows.values()];
-
-    // We have different behavior when going from expand/collapse all.
-    if (id === "header") {
-      const isAllCollapsed = collapsedIds.includes("header");
-      if (isAllCollapsed) {
-        // Expand all means keep `collapsedIds` empty
-        collapsedIds.splice(0, collapsedIds.length);
-      } else {
-        // Otherwise push `header` and `selectedGroup` to the list as a hint that we're in the collapsed-all state
-        collapsedIds.push(HEADER, KEPT_GROUP);
-        // Find all non-leaf rows so that toggling "all collapsed" -> "all not collapsed" opens
-        // the parent rows of any level.
-        const parentIds = new Set<string>();
-        const todo = [...this.rows];
-        while (todo.length > 0) {
-          const r = todo.pop()!;
-          if (r.children) {
-            parentIds.add(r.id);
-            todo.push(...r.children);
-          }
-        }
-        // And then mark all parent rows as collapsed.
-        collapsedIds.push(...parentIds);
-      }
-    } else {
-      // This is the regular/non-header behavior to just add/remove the individual row id
-      const i = collapsedIds.indexOf(id);
-      if (i === -1) {
-        collapsedIds.push(id);
-      } else {
-        collapsedIds.splice(i, 1);
-      }
-
-      // TODO: Need to handle the kept selected group row.
-      // If all rows have been expanded individually, but the 'header' was collapsed, then remove the header from the collapsedIds so it reverts to the expanded state
-      if (collapsedIds.length === 1 && collapsedIds[0] === "header") {
-        collapsedIds.splice(0, 1);
-      } else {
-        // If every top level child has been collapsed, then push "header" into the array to be considered collapsed as well.
-        if (this.rows.every((maybeParent) => (maybeParent.children ? collapsedIds.includes(maybeParent.id) : true))) {
-          collapsedIds.push("header");
-        }
-      }
-    }
-
-    this.collapsedRows.replace(collapsedIds);
-    if (this.persistCollapse) {
-      sessionStorage.setItem(this.persistCollapse, JSON.stringify(collapsedIds));
-    }
+    this.rowStates.toggleCollapsed(id);
   }
 
   deleteRows(ids: string[]): void {
     this.rows = this.rows.filter((row) => !ids.includes(row.id));
     this.rowStates.delete(ids);
-    ids.forEach((id) => {
-      this.collapsedRows.delete(id);
-    });
   }
 }
 
@@ -443,11 +343,6 @@ export const TableStateContext = React.createContext<{ tableState: TableState }>
     throw new Error("No TableStateContext provider");
   },
 });
-
-function readCollapsedRowStorage(persistCollapse: string): string[] {
-  const collapsedGridRowIds = sessionStorage.getItem(persistCollapse);
-  return collapsedGridRowIds ? JSON.parse(collapsedGridRowIds) : [];
-}
 
 function readExpandedColumnsStorage(persistCollapse: string): string[] {
   const expandedGridColumnIds = sessionStorage.getItem(getColumnStorageKey(persistCollapse));
@@ -463,23 +358,6 @@ function readOrSetLocalVisibleColumnState(columns: GridColumnWithId<any>[], stor
   const visibleColumnIds = columns.filter((c) => c.initVisible || !c.canHide).map((c) => c.id);
   sessionStorage.setItem(storageKey, JSON.stringify(visibleColumnIds));
   return visibleColumnIds;
-}
-
-function getCollapsedIdsFromRows(rows: GridDataRow<any>[]): string[] {
-  return rows.reduce((acc, r) => {
-    if (r.initCollapsed) {
-      acc.push(r.id);
-    }
-    if (r.children) {
-      acc.push(...getCollapsedIdsFromRows(r.children));
-    }
-    return acc;
-  }, [] as string[]);
-}
-
-function flattenRows(rows: GridDataRow<any>[]): GridDataRow<any>[] {
-  const childRows = rows.flatMap((r) => (r.children ? flattenRows(r.children) : []));
-  return [...rows, ...childRows];
 }
 
 function getColumnStorageKey(storageKey: string): string {
