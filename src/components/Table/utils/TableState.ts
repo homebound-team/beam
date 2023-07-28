@@ -299,7 +299,7 @@ export class TableState {
 
   /** Returns kept group row, with the latest kept children, if any. */
   get keptRowGroup(): GridDataRow<any> {
-    return this.rowStates.keptGroupRow.row;
+    return this.rowStates.get(KEPT_GROUP).row;
   }
 
   /** Returns kept rows, i.e. those that were user-selected but then client-side or server-side filtered. */

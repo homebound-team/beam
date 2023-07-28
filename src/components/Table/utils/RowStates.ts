@@ -12,10 +12,10 @@ export class RowStates {
   private map = new ObservableMap<string, RowState>();
   collapseState = new CollapseState(this);
   // Pre-create our keptGroupRow for if/when we need it.
-  keptGroupRow: RowState = this.creatKeptGroupRow();
-  header: RowState | undefined = undefined;
+  private keptGroupRow: RowState = this.creatKeptGroupRow();
+  private header: RowState | undefined = undefined;
   /** The first level of rows, i.e. not the header (or kept group), but the totals + top-level children. */
-  topRows: RowState[] = [];
+  private topRows: RowState[] = [];
 
   constructor() {
     this.map.set(this.keptGroupRow.row.id, this.keptGroupRow);
