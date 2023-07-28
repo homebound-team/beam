@@ -14,6 +14,7 @@ export class RowStates {
   // Pre-create our keptGroupRow for if/when we need it.
   keptGroupRow: RowState = this.creatKeptGroupRow();
   header: RowState | undefined = undefined;
+  /** The first level of rows, i.e. not the header (or kept group), but the totals + top-level children. */
   topRows: RowState[] = [];
 
   constructor() {
@@ -153,6 +154,7 @@ export class RowStates {
     return this.allStates.filter((rs) => rs.collapsed);
   }
 
+  /** Create our synthetic "group row" for kept rows, that users never pass in, but we self-inject as needed. */
   private creatKeptGroupRow(): RowState {
     // The "group row" for selected rows that are hidden by filters and add the children
     const keptGroupRow: GridDataRow<any> = { id: KEPT_GROUP, kind: KEPT_GROUP, initCollapsed: true, data: undefined };
