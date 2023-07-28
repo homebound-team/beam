@@ -87,6 +87,7 @@ export class TableState {
   }
 
   loadCollapse(persistCollapse: string): void {
+    this.persistCollapse = persistCollapse;
     this.rowStates.collapseState.load(persistCollapse);
   }
 
