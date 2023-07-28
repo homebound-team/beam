@@ -19,8 +19,8 @@ describe("DateField", () => {
     const onBlur = jest.fn();
     const r = await render(<DateField value={jan2} label="Date" onChange={onChange} onBlur={onBlur} />);
 
-    // When triggering the Date Picker
-    focus(r.date);
+    // When clicking input element to trigger the date picker
+    click(r.date);
     // Then the Date Picker should be shown
     expect(r.date_datePicker()).toBeTruthy();
 

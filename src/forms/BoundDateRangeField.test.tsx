@@ -18,6 +18,9 @@ describe(BoundDateRangeField, () => {
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
 
+    // When clicking the input element to trigger the date picker
+    click(r.saleDates);
+
     // When closing the overlay and putting focus back on the input
     fireEvent.keyDown(r.saleDates_datePicker(), { key: "Escape", code: "Escape" });
 
@@ -39,7 +42,7 @@ describe(BoundDateRangeField, () => {
     const r = await render(<BoundDateRangeField field={author.saleDates} />);
 
     // When triggering the Date Picker
-    focus(r.saleDates);
+    click(r.saleDates);
     // And when selecting a date - Choose the first of these, which should be `jan1`
     click(r.datePickerDay_0);
 
