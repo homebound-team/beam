@@ -141,10 +141,10 @@ const variantStyles: (contrast: boolean) => Record<
   }
 > = (contrast) => ({
   primary: {
-    baseStyles: Css.bgLightBlue700.white.if(contrast).bgLightBlue400.$,
-    hoverStyles: Css.bgLightBlue900.if(contrast).bgLightBlue500.$,
-    pressedStyles: Css.bgLightBlue500.if(contrast).bgLightBlue900.$,
-    disabledStyles: Css.bgLightBlue200.if(contrast).gray600.bgLightBlue900.$,
+    baseStyles: Css.bgBlue600.white.$,
+    hoverStyles: Css.bgBlue700.$,
+    pressedStyles: Css.bgBlue800.$,
+    disabledStyles: Css.bgBlue200.if(contrast).gray600.bgBlue900.$,
     focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
 
@@ -157,17 +157,17 @@ const variantStyles: (contrast: boolean) => Record<
   },
 
   tertiary: {
-    baseStyles: Css.bgTransparent.lightBlue700.if(contrast).white.$,
+    baseStyles: Css.bgTransparent.blue600.if(contrast).white.$,
     hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
-    pressedStyles: Css.lightBlue900.if(contrast).bgWhite.gray900.$,
+    pressedStyles: Css.blue800.if(contrast).bgWhite.gray900.$,
     disabledStyles: Css.gray400.if(contrast).gray700.$,
-    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.LightBlue400}`).bgGray700.white.$,
+    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.Blue400}`).bgGray700.white.$,
   },
 
   tertiaryDanger: {
-    baseStyles: Css.bgTransparent.red500.if(contrast).red500.$,
+    baseStyles: Css.bgTransparent.red600.if(contrast).red400.$,
     hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
-    pressedStyles: Css.red900.if(contrast).bgWhite.gray900.$,
+    pressedStyles: Css.red800.if(contrast).bgWhite.gray900.$,
     disabledStyles: Css.gray400.if(contrast).gray700.$,
     focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.White}, 0px 0px 0px 4px ${Palette.Red500}`)
       .if(contrast)
@@ -175,18 +175,18 @@ const variantStyles: (contrast: boolean) => Record<
   },
 
   danger: {
-    baseStyles: Css.bgRed900.white.if(contrast).bgRed800.$,
-    hoverStyles: Css.bgRed500.if(contrast).bgRed600.$,
-    pressedStyles: Css.bgRed900.if(contrast).bgRed800.$,
+    baseStyles: Css.bgRed600.white.$,
+    hoverStyles: Css.bgRed700.$,
+    pressedStyles: Css.bgRed800.$,
     disabledStyles: Css.bgRed200.if(contrast).bgRed900.gray600.$,
     focusStyles: Css.bshDanger.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
 
   text: {
-    baseStyles: Css.lightBlue700.add("fontSize", "inherit").if(contrast).lightBlue400.$,
-    hoverStyles: Css.lightBlue600.if(contrast).lightBlue300.$,
-    pressedStyles: Css.lightBlue700.if(contrast).lightBlue200.$,
-    disabledStyles: Css.lightBlue300.if(contrast).lightBlue700.$,
+    baseStyles: Css.blue700.add("fontSize", "inherit").if(contrast).blue400.$,
+    hoverStyles: Css.blue600.if(contrast).blue300.$,
+    pressedStyles: Css.blue700.if(contrast).blue200.$,
+    disabledStyles: Css.blue300.if(contrast).blue700.$,
     focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
   // Todo: handle contrast variant

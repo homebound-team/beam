@@ -2,6 +2,7 @@ import { Node } from "@react-types/shared";
 import { useRef } from "react";
 import { useHover, useMenuItem } from "react-aria";
 import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 import { TreeState } from "react-stately";
 import { Avatar } from "src/components/Avatar";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
@@ -10,7 +11,6 @@ import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette } from "src/Css";
 import { isAbsoluteUrl, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { Link } from "react-router-dom";
 
 interface MenuItemProps {
   item: Node<MenuItem>;
@@ -72,7 +72,7 @@ export function MenuItemImpl(props: MenuItemProps) {
       css={{
         ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").sm.$,
         ...(!isDisabled && isHovered ? (contrast ? Css.bgGray800.$ : Css.bgGray100.$) : {}),
-        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
+        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.Blue700}`).$ : {}),
         ...(isDisabled ? Css.gray500.cursorNotAllowed.$ : {}),
         ...(destructive ? Css.red600.$ : {}),
         ...(isSelected ? Css.fw5.$ : {}),
@@ -108,13 +108,7 @@ function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boo
         <Icon
           icon="check"
           color={
-            !contrast
-              ? isDisabled
-                ? Palette.Gray400
-                : Palette.LightBlue700
-              : isDisabled
-              ? Palette.Gray500
-              : Palette.White
+            !contrast ? (isDisabled ? Palette.Gray400 : Palette.Blue700) : isDisabled ? Palette.Gray500 : Palette.White
           }
         />
       )}
@@ -167,7 +161,9 @@ function maybeWrapInLink(
       </span>
     </a>
   ) : (
-    <Link className="navLink" to={onClick}>{content}</Link>
+    <Link className="navLink" to={onClick}>
+      {content}
+    </Link>
   );
 }
 

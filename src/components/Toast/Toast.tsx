@@ -40,7 +40,7 @@ const typeToIcon: Record<ToastTypes, IconKey> = {
 
 const variantStyles: Record<ToastTypes, Properties> = {
   success: Css.bgGreen100.gray900.$,
-  info: Css.bgLightBlue100.gray900.$,
+  info: Css.bgBlue100.gray900.$,
   warning: Css.bgYellow200.gray900.$,
   alert: Css.bgGray200.gray900.$,
   error: Css.bgRed100.gray900.$,

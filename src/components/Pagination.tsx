@@ -67,14 +67,14 @@ export function Pagination(props: PaginationProps) {
         </div>
         <IconButton
           icon="chevronLeft"
-          color={hasPrevPage ? Palette.LightBlue700 : Palette.Gray200}
+          color={hasPrevPage ? Palette.Blue700 : Palette.Gray200}
           onClick={() => set({ pageNumber: pageNumber - 1, pageSize })}
           disabled={!hasPrevPage}
           {...tid.previousIcon}
         />
         <IconButton
           icon="chevronRight"
-          color={hasNextPage ? Palette.LightBlue700 : Palette.Gray200}
+          color={hasNextPage ? Palette.Blue700 : Palette.Gray200}
           onClick={() => set({ pageNumber: pageNumber + 1, pageSize })}
           disabled={!hasNextPage}
           {...tid.nextIcon}

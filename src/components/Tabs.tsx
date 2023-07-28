@@ -265,11 +265,11 @@ export function getTabStyles() {
   return {
     baseStyles: Css.df.aic.hPx(32).pyPx(verticalPaddingPx).px1.outline0.gray700.add("width", "fit-content")
       .cursorPointer.sm.$,
-    activeStyles: Css.add(borderBottomStyles).bLightBlue700.smMd.gray900.$,
+    activeStyles: Css.add(borderBottomStyles).bBlue700.smMd.gray900.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
-    focusRingStyles: Css.bgLightBlue50.bshFocus.$,
+    focusRingStyles: Css.bgBlue50.bshFocus.$,
     hoverStyles: Css.add(borderBottomStyles).bGray400.$,
-    activeHoverStyles: Css.bgLightBlue50.add(borderBottomStyles).bLightBlue700.$,
+    activeHoverStyles: Css.bgBlue50.add(borderBottomStyles).bBlue700.$,
   };
 }
 

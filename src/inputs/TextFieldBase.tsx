@@ -147,7 +147,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...(contrast && Css.addIn("&::selection", Css.bgGray800.$).$),
     },
     hover: Css.bgColor(hoverBgColor).if(contrast).bGray600.$,
-    focus: Css.bLightBlue700.if(contrast).bLightBlue500.$,
+    focus: Css.bBlue700.if(contrast).bBlue500.$,
     disabled: visuallyDisabled
       ? Css.cursorNotAllowed.gray600.bgColor(disabledBgColor).if(contrast).gray500.$
       : Css.cursorNotAllowed.$,

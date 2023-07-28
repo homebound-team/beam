@@ -68,7 +68,7 @@ export function CheckboxGroups() {
     <div>
       <div css={Css.dg.gap1.$}>
         <h2>Checkbox Group</h2>
-        <div css={Css.sm.lightBlue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
+        <div css={Css.sm.blue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
         <CheckboxGroup
           label="Favorite Chairs"
           onChange={(values) => setSelectedValues(values)}
@@ -112,7 +112,7 @@ export function CheckboxGroups() {
 
       <div css={Css.mt4.dg.gap1.w50.$}>
         <h2>Checkbox Group with a left label</h2>
-        <div css={Css.sm.lightBlue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
+        <div css={Css.sm.blue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
         <CheckboxGroup
           label="Favorite Chairs"
           labelStyle="left"

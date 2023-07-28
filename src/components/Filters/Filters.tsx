@@ -87,9 +87,7 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
           label="More Filters"
           endAdornment={
             numModalFilters > 0 && (
-              <span css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinySb.df.aic.jcc.$}>
-                {numModalFilters}
-              </span>
+              <span css={Css.wPx(16).hPx(16).fs0.br100.bgBlue700.white.tinySb.df.aic.jcc.$}>{numModalFilters}</span>
             )
           }
           variant="secondary"

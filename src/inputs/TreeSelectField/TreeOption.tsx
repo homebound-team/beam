@@ -43,7 +43,7 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
     item: Css.gray900.if(contrast).white.$,
     hover: Css.bgGray100.if(contrast).bgGray600.$,
     disabled: Css.cursorNotAllowed.gray400.if(contrast).gray500.$,
-    focus: Css.add("boxShadow", `inset 0 0 0 1px ${!contrast ? Palette.LightBlue700 : Palette.LightBlue500}`).$,
+    focus: Css.add("boxShadow", `inset 0 0 0 1px ${!contrast ? Palette.Blue700 : Palette.Blue500}`).$,
   };
 
   return (

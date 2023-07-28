@@ -90,7 +90,7 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
         css={{
           ...Css.df.jcsb.gap2.aic.w100.p2.baseMd.outline("none").addIn(":hover", Css.bgGray100.$).$,
           ...(disabled && Css.gray500.$),
-          ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.LightBlue700}`).$),
+          ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.Blue700}`).$),
           ...xss,
         }}
         onClick={() => {
