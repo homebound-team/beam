@@ -135,7 +135,10 @@ export class RowStates {
 
   setMatchedRows(ids: string[]): void {
     for (const rs of this.allStates) {
-      rs.isMatched = ids.includes(rs.row.id);
+      // Don't mark headers, kept rows, etc. as unmatched
+      if (!reservedRowKinds.includes(rs.row.kind)) {
+        rs.isMatched = ids.includes(rs.row.id);
+      }
     }
   }
 
