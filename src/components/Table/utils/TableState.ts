@@ -32,7 +32,7 @@ export class TableState {
   private readonly collapsedRows = new ObservableSet<string>([]);
   private persistCollapse: string | undefined;
   // The current list of rows, basically a useRef.current. Only shallow reactive.
-  public rows: GridDataRow<any>[] = [];
+  private rows: GridDataRow<any>[] = [];
   private readonly rowStates = new RowStates();
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
   activeRowId: string | undefined = undefined;
@@ -74,7 +74,7 @@ export class TableState {
       rows: observable.shallow,
       // Do not observe columns, expect this to be a non-reactive value for us to base our reactive values off of.
       columns: false,
-    });
+    } as any);
 
     // If the kept rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
     reaction(
