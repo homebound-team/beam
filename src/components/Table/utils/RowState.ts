@@ -42,7 +42,7 @@ export class RowState {
    */
   get isSelected(): boolean {
     // We consider group rows selected if all of their children are selected.
-    if (this.children && this.inferSelectedState) return this.selectedState === "checked";
+    if (this.isParent) return this.selectedState === "checked";
     return this.selected;
   }
 
@@ -51,7 +51,7 @@ export class RowState {
     // Parent `selectedState` is special b/c it does not directly depend on the parent's own selected-ness,
     // but instead depends on the current visible children. I.e. a parent might be "selected", but then the
     // client-side filter changes, a child reappears, and we need to transition to partial-ness.
-    if (this.children && this.inferSelectedState) {
+    if (this.isParent) {
       // Use visibleChildren b/c if filters are hiding some of our children, we still want to show fully selected
       const children = this.visibleChildren;
       const allChecked = children.every((child) => child.selectedState === "checked");
@@ -113,8 +113,7 @@ export class RowState {
       this.selected &&
       // Headers, totals, etc., do not need keeping
       !reservedRowKinds.includes(this.row.kind) &&
-      // Parents don't need keeping, unless they're actually real rows
-      !(this.children && this.inferSelectedState) &&
+      !this.isParent &&
       (!this.isMatched || this.wasRemoved)
     );
   }
@@ -127,6 +126,21 @@ export class RowState {
     // The keptGroup should treat all of its children as visible, as this makes select/unselect all work.
     if (this.row.kind === KEPT_GROUP) return this.children ?? [];
     return this.children?.filter((c) => c.isMatched === true) ?? [];
+  }
+
+  /**
+   * Returns whether this row should act like a parent.
+   *
+   * This means "has children" and "does not have inferSelectedState: false"
+   * set. I.e. `inferSelectedState: false` allows a parent with children to
+   * still act as its own selectable identity.
+   *
+   * We also check `children.length > 0`, because sometimes pages will calc a
+   * row's children as `children = someList.map(...)`, and if the list is empty,
+   * they want the row to be selectable.
+   */
+  private get isParent(): boolean {
+    return !!this.children && this.children.length > 0 && this.inferSelectedState;
   }
 
   /** Pretty toString. */
