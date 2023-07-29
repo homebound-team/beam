@@ -358,11 +358,12 @@ export class TableState {
   // Should be called in an Observer/useComputed to trigger re-renders
   getSelected(id: string): SelectedState {
     const rs = this.rowStates.get(id);
+    if (!rs) return "unchecked";
     return id === HEADER ? rs.selectedStateForHeader : rs.selectedState;
   }
 
   selectRow(id: string, selected: boolean): void {
-    this.rowStates.get(id).select(selected);
+    this.rowStates.get(id)?.select(selected);
   }
 
   get collapsedIds(): string[] {

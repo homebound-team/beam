@@ -16,11 +16,14 @@ export class RowStates {
     return [...this.map.values()];
   }
 
-  /** Returns the `RowState` for the given `id`. We should probably require `kind`. */
-  get(id: string): RowState {
-    const rs = this.map.get(id);
-    if (!rs) throw new Error(`No RowState for ${id}`);
-    return rs;
+  /**
+   * Returns the `RowState` for the given `id`. We should probably require `kind`.
+   *
+   * It's common for tests to call `selectRow` w/o a fully-setup table, so callers
+   * should generally handle a missing RowState and treat it as a noop.
+   */
+  get(id: string): RowState | undefined {
+    return this.map.get(id);
   }
 
   /**
