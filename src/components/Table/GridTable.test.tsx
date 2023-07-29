@@ -1605,6 +1605,21 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
 
+  it("can select rows invalid row ids and not blow up", async () => {
+    // Given a table with no rows
+    const rows: GridDataRow<NestedRow>[] = [];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<NestedRow>();
+      api.current = _api;
+      return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
+    }
+    await render(<Test />);
+    // When we call selectRow with an invalid row id
+    act(() => api.current!.selectRow("p1"));
+    // Then it does not blow up
+  });
+
   it("only returns selected visible rows", async () => {
     // Given a parent with a child and grandchildren
     const rows: GridDataRow<NestedRow>[] = [
