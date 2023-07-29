@@ -401,7 +401,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     visibleDataRows = visibleDataRows.slice(0, filterMaxRows + keptSelectedRows.length);
   }
 
-  tableState.setMatchedRows(filteredRowIds);
+  useEffect(() => {
+    tableState.setMatchedRows(filteredRowIds);
+  }, [tableState, filteredRowIds]);
 
   // Push back to the caller a way to ask us where a row is.
   const { rowLookup } = props;
