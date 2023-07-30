@@ -230,7 +230,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const { tableState } = api;
 
   tableState.setRows(rows);
-  tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+
+  useEffect(() => {
+    tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+  }, [tableState, columnsWithIds, visibleColumnsStorageKey]);
+
   const columns: GridColumnWithId<R>[] = useComputed(() => {
     return tableState.visibleColumns as GridColumnWithId<R>[];
   }, [tableState]);
