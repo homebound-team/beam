@@ -71,14 +71,7 @@ export class RowStates {
     }
 
     // Then mark any remaining as removed
-    for (const state of existing) {
-      if (state !== this.keptGroupRow) {
-        // Keep selected rows just in case the user changed a server-side filtered,
-        // and they should become "kept" rows (...granted, a bulk-action to select
-        // then delete will also have the actually-deleted rows marked as selected).
-        state.removed = state.selected ? "soft" : "hard";
-      }
-    }
+    for (const state of existing) state.markRemoved();
 
     const keptRows = this.keptRows;
     if (keptRows.length > 0) {

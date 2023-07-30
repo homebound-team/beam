@@ -122,6 +122,13 @@ export class RowState {
     }
   }
 
+  /** Marks the row as removed from `props.rows`, to potentially become kept. */
+  markRemoved(): void {
+    // The kept group is never in `props.rows`, so ignore asks to delete it
+    if (this.row.kind === KEPT_GROUP) return;
+    this.removed = this.selected && this.removed !== "hard" ? "soft" : "hard";
+  }
+
   toggleCollapsed(): void {
     this.collapsed = !this.collapsed;
   }
