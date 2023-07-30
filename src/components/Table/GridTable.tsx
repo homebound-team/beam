@@ -223,6 +223,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     api.init(persistCollapse, virtuosoRef, rows);
     api.setActiveRowId(activeRowId);
     api.setActiveCellId(activeCellId);
+    // Push the initial columns directly into tableState, b/c that is what
+    // makes the tests pass, but then further updates we'll do through useEffect
+    // to avoid "Cannot update component during render" errors.
+    api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
     return api;
   }, [props.api]);
 
