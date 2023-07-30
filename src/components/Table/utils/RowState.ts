@@ -23,10 +23,11 @@ export class RowState {
    * Whether our `row` had been in `props.rows`, but then removed _while being
    * selected_, i.e. potentially by server-side filters.
    *
-   * We have had a large foot-gun for users "select a row", change the filters,
+   * We have had a large foot-gun where users "select a row", change the filters,
    * the row disappears (filtered out), and the user clicks "Go!", but the table
    * thinks their previously-selected row is gone (b/c it's not in view), and
-   * then the row is inappropriately deleted/unassociated/etc
+   * then the row is inappropriately deleted/unassociated/etc. (b/c in the user's
+   * head, it is "still selected").
    *
    * To avoid this, we by default keep selected rows, as "kept rows", to make
    * extra sure the user wants them to go away.
@@ -145,16 +146,13 @@ export class RowState {
   }
 
   private get visibleChildren(): RowState[] {
-    return (
-      this.children
-        // The keptGroup should treat all of its children as visible, as this makes select/unselect all work.
-        ?.filter((c) => this.row.kind === KEPT_GROUP || c.isMatched === true)
-        // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
-        // rows should be removed from `this.children` anyway, by a change to `props.rows`,
-        // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
-        // go away, go ahead and filter them out here.
-        ?.filter((c) => c.removed !== "hard") ?? []
-    );
+    // The keptGroup should treat all of its children as visible, as this makes select/unselect all work.
+    if (this.row.kind === KEPT_GROUP) return this.children ?? [];
+    // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
+    // rows should be removed from `this.children` anyway, by a change to `props.rows`,
+    // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
+    // go away, go ahead and filter them out here.
+    return this.children?.filter((c) => c.isMatched === true && c.removed !== "hard") ?? [];
   }
 
   /** Pretty toString. */
