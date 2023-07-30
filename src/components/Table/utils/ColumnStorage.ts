@@ -1,6 +1,6 @@
 import { autorun, reaction } from "mobx";
-import { loadArrayOrUndefined } from "src";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
+import { loadArrayOrUndefined } from "src/components/Table/utils/utils";
 
 /** Loads/saves the column state from sessionStorage. */
 export class ColumnStorage {
