@@ -11,8 +11,6 @@ import { RowStates } from "src/components/Table/utils/RowStates";
 export class RowState {
   /** Our row, only ref observed, so we don't crawl into GraphQL fragments. */
   row: GridDataRow<any>;
-  /** Our parent RowState, or the `header` RowState if we're a top-level row. */
-  parent: RowState | undefined;
   /** Our children row states, as of the latest `props.rows`, without any filtering applied. */
   children: RowState[] | undefined = undefined;
   /** Whether we match a client-side filter; true if no filter is in place. */
@@ -22,14 +20,13 @@ export class RowState {
   /** Whether we are collapsed. */
   collapsed = false;
   /** Whether our `row` had been in `props.rows`, but was removed, i.e. probably by server-side filters. */
-  wasRemoved = false;
+  removed: false | "soft" | "hard" = false;
 
   // ...eventually...
   // isDirectlyMatched = accept filters in the constructor and do match here
   // isEffectiveMatched = isDirectlyMatched || hasMatchedChildren
 
-  constructor(states: RowStates, parent: RowState | undefined, row: GridDataRow<any>) {
-    this.parent = parent;
+  constructor(states: RowStates, row: GridDataRow<any>) {
     this.row = row;
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
@@ -123,7 +120,7 @@ export class RowState {
       !reservedRowKinds.includes(this.row.kind) &&
       // Parents don't need keeping, unless they're actually real rows
       !(this.children && this.inferSelectedState) &&
-      (!this.isMatched || this.wasRemoved)
+      (!this.isMatched || this.removed === "soft")
     );
   }
 
@@ -132,9 +129,16 @@ export class RowState {
   }
 
   private get visibleChildren(): RowState[] {
-    // The keptGroup should treat all of its children as visible, as this makes select/unselect all work.
-    if (this.row.kind === KEPT_GROUP) return this.children ?? [];
-    return this.children?.filter((c) => c.isMatched === true) ?? [];
+    return (
+      this.children
+        // The keptGroup should treat all of its children as visible, as this makes select/unselect all work.
+        ?.filter((c) => this.row.kind === KEPT_GROUP || c.isMatched === true)
+        // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
+        // rows should be removed from `this.children` anyway, by a change to `props.rows`,
+        // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
+        // go away, go ahead and filter them out here.
+        ?.filter((c) => c.removed !== "hard") ?? []
+    );
   }
 
   /** Pretty toString. */

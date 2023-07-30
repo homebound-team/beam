@@ -43,29 +43,28 @@ export class RowStates {
     const states = this;
     const map = this.map;
 
-    function addRowAndChildren(parent: RowState | undefined, row: GridDataRow<any>): RowState {
+    function addRowAndChildren(row: GridDataRow<any>): RowState {
       // This should really be kind+id, but a lot of our lookups just use id
       const key = row.id;
       let state = map.get(key);
       if (!state) {
-        state = new RowState(states, parent, row);
+        state = new RowState(states, row);
         map.set(key, state);
       } else {
-        state.parent = parent;
         state.row = row;
-        state.wasRemoved = false;
+        state.removed = false;
         existing.delete(state);
       }
-      state.children = row.children?.map((child) => addRowAndChildren(state, child));
+      state.children = row.children?.map((child) => addRowAndChildren(child));
       return state;
     }
 
     // Probe for the header row, so we can create it as a root RowState, even
     // though we don't require the user to model their GridDataRows that way.
     const headerRow = rows.find((r) => r.kind === HEADER);
-    this.header = headerRow ? addRowAndChildren(undefined, headerRow) : undefined;
+    this.header = headerRow ? addRowAndChildren(headerRow) : undefined;
     // Add the top-level rows
-    this.topRows = rows.filter((row) => row !== headerRow).map((row) => addRowAndChildren(this.header, row));
+    this.topRows = rows.filter((row) => row !== headerRow).map((row) => addRowAndChildren(row));
     // And attach them to the header for select-all/etc. to work
     if (this.header) {
       this.header.children = this.topRows.filter((rs) => !reservedRowKinds.includes(rs.row.kind));
@@ -73,19 +72,17 @@ export class RowStates {
 
     // Then mark any remaining as removed
     for (const state of existing) {
-      state.wasRemoved = true;
+      state.removed = "soft";
     }
 
     const keptRows = this.keptRows;
     if (keptRows.length > 0) {
       // Stitch the current keptRows into the placeholder keptGroupRow
-      keptRows.forEach((rs) => (rs.parent = this.keptGroupRow));
       this.keptGroupRow.children = keptRows;
       this.keptGroupRow.row.children = keptRows.map((rs) => rs.row);
       // And then stitch the keptGroupRow itself into the root header, so that the kept rows
       // are treated as just another child for the header's select/unselect all to work.
       if (this.header) {
-        this.keptGroupRow.parent = this.header;
         this.header.children!.unshift(this.keptGroupRow);
       }
     }
@@ -101,9 +98,7 @@ export class RowStates {
   delete(ids: string[]) {
     for (const id of ids) {
       const rs = this.map.get(id);
-      if (rs && rs.parent) {
-        rs.parent.children = rs.parent.children?.filter((o) => o !== rs);
-      }
+      if (rs) rs.removed = "hard";
       this.map.delete(id);
     }
   }
@@ -158,6 +153,6 @@ export class RowStates {
   private creatKeptGroupRow(): RowState {
     // The "group row" for selected rows that are hidden by filters and add the children
     const keptGroupRow: GridDataRow<any> = { id: KEPT_GROUP, kind: KEPT_GROUP, initCollapsed: true, data: undefined };
-    return new RowState(this, undefined, keptGroupRow);
+    return new RowState(this, keptGroupRow);
   }
 }
