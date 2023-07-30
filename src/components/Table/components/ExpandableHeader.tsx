@@ -35,7 +35,7 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
       onClick={async () => {
         if (isFunction(column.expandColumns)) {
           setIsLoading(true);
-          await tableState.loadExpandedColumns(column);
+          await tableState.loadExpandedColumns(column.id);
           setIsLoading(false);
         }
         // manually calling this as loadExpandedColumns does not toggle

@@ -248,3 +248,9 @@ export const zIndices = {
   expandableHeaderTitle: 2,
   expandableHeaderIcon: 1,
 };
+
+/** Loads an array from sessionStorage, if it exists, or `undefined`. */
+export function loadArrayOrUndefined(key: string) {
+  const ids = sessionStorage.getItem(key);
+  return ids ? JSON.parse(ids) : undefined;
+}

@@ -32,6 +32,7 @@ export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends 
  * column being sorted, in which case we use the GridCellContent.value.
  */
 export type GridColumn<R extends Kinded> = {
+  /** Require a render function for each row `kind`. */
   [K in R["kind"]]:
     | string
     | GridCellContent
@@ -85,8 +86,13 @@ export type GridColumn<R extends Kinded> = {
   /** Determines whether this column should be hidden when expanded (only the 'expandColumns' would show) */
   hideOnExpand?: boolean;
 };
-// export type ExpandColumnsFn<R extends Kinded> = () => Promise<GridColumn<R>[]>;
-// when you do a type, you have to do an intersection - it can be this type & this type = ampersand is telling is its an intersection
+
+/**
+ * Adds an `id` to `GridColumn`, for use in storage/APIs.
+ *
+ * Ideally we'd require this on `GridColumn` itself, but that would be
+ * a large breaking change for a lot of tables that don't need column ids.
+ */
 export type GridColumnWithId<R extends Kinded> = GridColumn<R> & {
   id: string;
   expandColumns?: GridColumnWithId<R>[] | (() => Promise<GridColumn<R>[]>);
@@ -120,6 +126,6 @@ export type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
 export type InfiniteScroll = {
   /** will be called when the user scrolls to the end of the list with the last item index as an argument.  */
   onEndReached: (index: number) => void;
-  /** The number of pixels from the bottom of the list to eagerly trigger `onEndReached`. The default is is 500px. */
+  /** The number of pixels from the bottom of the list to eagerly trigger `onEndReached`. The default is 500px. */
   endOffsetPx?: number;
 };
