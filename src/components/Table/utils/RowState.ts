@@ -19,7 +19,23 @@ export class RowState {
   selected = false;
   /** Whether we are collapsed. */
   collapsed = false;
-  /** Whether our `row` had been in `props.rows`, but was removed, i.e. probably by server-side filters. */
+  /**
+   * Whether our `row` had been in `props.rows`, but then removed _while being
+   * selected_, i.e. potentially by server-side filters.
+   *
+   * We have had a large foot-gun for users "select a row", change the filters,
+   * the row disappears (filtered out), and the user clicks "Go!", but the table
+   * thinks their previously-selected row is gone (b/c it's not in view), and
+   * then the row is inappropriately deleted/unassociated/etc
+   *
+   * To avoid this, we by default keep selected rows, as "kept rows", to make
+   * extra sure the user wants them to go away.
+   *
+   * Soft-deleted rows are rows that were removed from `props.rows` (i.e. we
+   * suspect are just hidden by a changed server-side-filter), and hard-deleted
+   * rows are rows the page called `api.deleteRow` and confirmed it should be
+   * actively removed.
+   */
   removed: false | "soft" | "hard" = false;
 
   // ...eventually...
