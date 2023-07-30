@@ -1900,6 +1900,22 @@ describe("GridTable", () => {
     expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
   });
 
+  it("treats parents with no children as selectable", async () => {
+    // Given a parent
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      // And they define children as an empty list
+      { kind: "parent", id: "p1", data: { name: "parent 1" }, children: [] },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    // When rendering a GridTable with filtering and selectable rows
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+    // When we select the parent row
+    click(cellAnd(r, 1, 1, "select"));
+    // Then it's checked
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+  });
+
   describe("matchesFilter", () => {
     it("is case insensitive", () => {
       expect(matchesFilter("Foo", "foO")).toBeTruthy();
