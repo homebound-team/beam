@@ -32,7 +32,7 @@ export class RowState {
     this.parent = parent;
     this.row = row;
     this.selected = !!row.initSelected;
-    this.collapsed = states.collapseState.wasCollapsed(row.id) ?? !!row.initCollapsed;
+    this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
     makeAutoObservable(this, { row: observable.ref });
   }
 

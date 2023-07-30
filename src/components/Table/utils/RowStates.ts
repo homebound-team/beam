@@ -1,7 +1,7 @@
 import { ObservableMap } from "mobx";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { CollapseState } from "src/components/Table/utils/CollapseState";
 import { RowState } from "src/components/Table/utils/RowState";
+import { RowStorage } from "src/components/Table/utils/RowStorage";
 import { HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 
 /**
@@ -10,7 +10,7 @@ import { HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils
 export class RowStates {
   // A flat map of all row id -> RowState
   private map = new ObservableMap<string, RowState>();
-  collapseState = new CollapseState(this);
+  storage = new RowStorage(this);
   // Pre-create our keptGroupRow for if/when we need it.
   private keptGroupRow: RowState = this.creatKeptGroupRow();
   private header: RowState | undefined = undefined;
@@ -93,7 +93,7 @@ export class RowStates {
     // After the first load of real data, we detach collapse state, to respect
     // any incoming initCollapsed.
     if (this.topRows.some((rs) => !reservedRowKinds.includes(rs.row.kind))) {
-      this.collapseState.done();
+      this.storage.done();
     }
   }
 

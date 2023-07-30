@@ -12,7 +12,7 @@ import { RowStates } from "src/components/Table/utils/RowStates";
  * Unlike most of our other states, this is not directly reactive/an observable,
  * although we do reactive to collapsedRows changing to persist the new state.
  */
-export class CollapseState {
+export class RowStorage {
   private historicalIds: string[] | undefined;
 
   constructor(private states: RowStates) {}

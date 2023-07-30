@@ -87,7 +87,7 @@ export class TableState {
 
   loadCollapse(persistCollapse: string): void {
     this.persistCollapse = persistCollapse;
-    this.rowStates.collapseState.load(persistCollapse);
+    this.rowStates.storage.load(persistCollapse);
   }
 
   initSortState(sortConfig: GridSortConfig | undefined, columns: GridColumnWithId<any>[]) {
