@@ -42,6 +42,7 @@ export class ColumnStates {
       this.map.set(column.id, cs);
       return cs;
     } else {
+      existing.column = column;
       // Any time a column is re-added (i.e. props.columns changed), re-expand it
       if (existing.isExpanded) existing.doExpand(true);
       return existing;
