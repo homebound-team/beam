@@ -1,5 +1,6 @@
 import { makeAutoObservable, observable } from "mobx";
 import { GridDataRow, KEPT_GROUP, reservedRowKinds, SelectedState } from "src";
+import { RowStates } from "src/components/Table/utils/RowStates";
 
 /**
  * A reactive/observable state of each GridDataRow's current behavior.
@@ -10,30 +11,47 @@ import { GridDataRow, KEPT_GROUP, reservedRowKinds, SelectedState } from "src";
 export class RowState {
   /** Our row, only ref observed, so we don't crawl into GraphQL fragments. */
   row: GridDataRow<any>;
-  /** Our parent RowState, or the `header` RowState if we're a top-level row. */
-  parent: RowState | undefined;
   /** Our children row states, as of the latest `props.rows`, without any filtering applied. */
   children: RowState[] | undefined = undefined;
   /** Whether we match a client-side filter; true if no filter is in place. */
   isMatched = true;
   /** Whether we are *directly* selected. */
   selected = false;
-  /** Whether our `row` had been in `props.rows`, but was removed, i.e. probably by server-side filters. */
-  wasRemoved = false;
+  /** Whether we are collapsed. */
+  collapsed = false;
+  /**
+   * Whether our `row` had been in `props.rows`, but then removed _while being
+   * selected_, i.e. potentially by server-side filters.
+   *
+   * We have had a large foot-gun where users "select a row", change the filters,
+   * the row disappears (filtered out), and the user clicks "Go!", but the table
+   * thinks their previously-selected row is gone (b/c it's not in view), and
+   * then the row is inappropriately deleted/unassociated/etc. (b/c in the user's
+   * head, it is "still selected").
+   *
+   * To avoid this, we by default keep selected rows, as "kept rows", to make
+   * extra sure the user wants them to go away.
+   *
+   * Soft-deleted rows are rows that were removed from `props.rows` (i.e. we
+   * suspect are just hidden by a changed server-side-filter), and hard-deleted
+   * rows are rows the page called `api.deleteRow` and confirmed it should be
+   * actively removed.
+   */
+  removed: false | "soft" | "hard" = false;
 
   // ...eventually...
   // isDirectlyMatched = accept filters in the constructor and do match here
   // isEffectiveMatched = isDirectlyMatched || hasMatchedChildren
 
-  constructor(parent: RowState | undefined, row: GridDataRow<any>) {
-    this.parent = parent;
+  constructor(states: RowStates, row: GridDataRow<any>) {
     this.row = row;
     this.selected = !!row.initSelected;
+    this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
     makeAutoObservable(this, { row: observable.ref });
   }
 
   /**
-   * Whether we are currently selected, for `GridTableApi.getSelectedRows`.
+   * Whether we are effectively selected, for `GridTableApi.getSelectedRows`.
    *
    * Note that we don't use "I'm selected || my parent is selected" logic here, because whether a child is selected
    * is actually based on whether it was _visible at the time the parent was selected_. So, we can't just assume
@@ -104,6 +122,17 @@ export class RowState {
     }
   }
 
+  /** Marks the row as removed from `props.rows`, to potentially become kept. */
+  markRemoved(): void {
+    // The kept group is never in `props.rows`, so ignore asks to delete it
+    if (this.row.kind === KEPT_GROUP) return;
+    this.removed = this.selected && this.removed !== "hard" ? "soft" : "hard";
+  }
+
+  toggleCollapsed(): void {
+    this.collapsed = !this.collapsed;
+  }
+
   /** Whether this is a selected-but-filtered-out row that we should hoist to the top. */
   get isKept(): boolean {
     // this row is "kept" if it is selected, and:
@@ -114,7 +143,7 @@ export class RowState {
       // Headers, totals, etc., do not need keeping
       !reservedRowKinds.includes(this.row.kind) &&
       !this.isParent &&
-      (!this.isMatched || this.wasRemoved)
+      (!this.isMatched || this.removed === "soft")
     );
   }
 
@@ -125,7 +154,11 @@ export class RowState {
   private get visibleChildren(): RowState[] {
     // The keptGroup should treat all of its children as visible, as this makes select/unselect all work.
     if (this.row.kind === KEPT_GROUP) return this.children ?? [];
-    return this.children?.filter((c) => c.isMatched === true) ?? [];
+    // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
+    // rows should be removed from `this.children` anyway, by a change to `props.rows`,
+    // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
+    // go away, go ahead and filter them out here.
+    return this.children?.filter((c) => c.isMatched === true && c.removed !== "hard") ?? [];
   }
 
   /**

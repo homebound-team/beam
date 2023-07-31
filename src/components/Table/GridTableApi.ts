@@ -70,7 +70,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
     rows: GridDataRow<R>[],
   ) {
-    this.tableState.loadCollapse(persistCollapse, rows);
+    if (persistCollapse) this.tableState.loadCollapse(persistCollapse);
     this.virtuosoRef = virtuosoRef;
   }
 

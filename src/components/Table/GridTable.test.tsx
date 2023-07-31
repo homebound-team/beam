@@ -2291,7 +2291,7 @@ describe("GridTable", () => {
     expect(cell(r, 1, 2).textContent).toBe("parent 1");
 
     // And the local storage value is initially set with the current state
-    expect(sessionStorage.getItem(tableIdentifier)).toBe('["p1"]');
+    expect(sessionStorage.getItem(tableIdentifier)).toBe('["keptGroup","p1"]');
   });
 
   it("ignores initCollapsed on rows if persistCollapse is set and available in sessionStorage", async () => {
@@ -2392,7 +2392,7 @@ describe("GridTable", () => {
     expect(cell(r, 5, 0).textContent).toBe("+");
 
     // And the local storage value is updated with the current state
-    expect(sessionStorage.getItem(tableIdentifier)).toBe('["p2","p3"]');
+    expect(sessionStorage.getItem(tableIdentifier)).toBe('["keptGroup","p2","p3"]');
   });
 
   it("can lazily initialize table with collapsed rows", async () => {
