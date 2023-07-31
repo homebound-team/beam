@@ -14,7 +14,7 @@ import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridColumn, Kinded } from "src/components/Table/types";
 import { Css } from "src/Css";
 import { useComputed } from "src/hooks";
-import { CheckboxGroup, CheckboxGroupItemOption } from "src/inputs";
+import { CheckboxGroup } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -43,28 +43,30 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
       : trigger.name,
   );
 
-  const { options } = useMemo(() => {
-    return columns.reduce(
-      (acc, column) => {
-        // Only include options that can be hidden and have the `name` property defined.
-        if (!column.canHide) return acc;
-        if (!column.name || column.name.length === 0 || !column.id || column.id.length === 0) {
-          console.warn("Column is missing 'name' and/or 'id' property required by the Edit Columns button", column);
-          return acc;
-        }
-
-        // Add current column as an option
-        return { ...acc, options: acc.options.concat({ label: column.name!, value: column.id! }) };
-      },
-      { options: [] as CheckboxGroupItemOption[] },
-    );
-  }, [columns]);
+  const options = useMemo(
+    () =>
+      columns
+        // Only include options that can be hidden
+        .filter((column) => column.canHide)
+        // And have the `name` property defined
+        .filter((column) => {
+          if (!column.name || column.name.length === 0 || !column.id || column.id.length === 0) {
+            console.warn("Column is missing 'name' and/or 'id' property required by the Edit Columns button", column);
+            return false;
+          }
+          return true;
+        })
+        .map((column) => ({ label: column.name!, value: column.id! })),
+    [columns],
+  );
 
   const selectedValues = useComputed(() => api.getVisibleColumnIds(), [api]);
   const setSelectedValues = useCallback(
-    (values: string[]) => {
+    (ids: string[]) => {
+      // Doesn't `options` already filter us to non-hidden/valid-id columns? I.e. could we just do:
+      // api.setVisibleColumns(ids);
       api.setVisibleColumns(
-        columns.filter((column) => (column.canHide ? values.includes(column.id!) : true)).map((c) => c.id!),
+        columns.filter((column) => (column.canHide ? ids.includes(column.id!) : true)).map((c) => c.id!),
       );
     },
     [columns, api],

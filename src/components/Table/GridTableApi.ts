@@ -26,36 +26,35 @@ export function useGridTableApi<R extends Kinded>(): GridTableApi<R> {
 /** Provides an imperative API for an application page to interact with the table. */
 export type GridTableApi<R extends Kinded> = {
   /** Scrolls row `index` into view; only supported with `as=virtual` and after a `useEffect`. */
-  scrollToIndex: (index: number) => void;
+  scrollToIndex(index: number): void;
 
   /** Returns the ids of currently-selected rows. */
   getSelectedRowIds(): string[];
   getSelectedRowIds<K extends R["kind"]>(kind: K): string[];
-
   /** Returns the currently-selected rows. */
   getSelectedRows(): GridDataRow<R>[];
+  /** Returns the currently-selected rows of the given `kind`. */
   getSelectedRows<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
-
-  /** Deselects all rows */
+  /** Set selected state of a row by id. */
+  selectRow(id: string, selected?: boolean): void;
+  /** De-selects all selected rows. */
   clearSelections(): void;
 
+  /** Whether a row is currently collapsed. */
+  isCollapsedRow(id: string): boolean;
+  /** Toggle collapse state of a row by id. */
+  toggleCollapsedRow(id: string): void;
+
   /** Sets the internal state of 'activeRowId' */
-  setActiveRowId: (id: string | undefined) => void;
-
+  setActiveRowId(id: string | undefined): void;
   /** Sets the internal state of 'activeCellId' */
-  setActiveCellId: (id: string | undefined) => void;
+  setActiveCellId(id: string | undefined): void;
 
-  /** Set selected state of a row by id */
-  selectRow: (id: string, selected?: boolean) => void;
+  /** Deletes a row from the table, i.e. so it's not detected as kept. */
+  deleteRows(ids: string[]): void;
 
-  /** Deletes a row from the table */
-  deleteRows: (ids: string[]) => void;
-
-  /** Toggle collapse state of a row by id */
-  toggleCollapsedRow: (id: string) => void;
-  isCollapsedRow: (id: string) => boolean;
-  setVisibleColumns: (ids: string[]) => void;
-  getVisibleColumnIds: () => string[];
+  getVisibleColumnIds(): string[];
+  setVisibleColumns(ids: string[]): void;
 };
 
 // Using `FooImpl`to keep the public GridTableApi definition separate.
@@ -70,6 +69,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
     rows: GridDataRow<R>[],
   ) {
+    // Technically this drives both row-collapse and column-expanded
     if (persistCollapse) this.tableState.loadCollapse(persistCollapse);
     this.virtuosoRef = virtuosoRef;
   }

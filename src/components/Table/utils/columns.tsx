@@ -165,25 +165,28 @@ export function calcColumnSizes(
   return sizes;
 }
 
-/** Assign column ids if missing */
+/** Assign column ids if missing. */
 export function assignDefaultColumnIds<T extends Kinded>(columns: GridColumn<T>[]): GridColumnWithId<T>[] {
-  // Note: we are not _always_ spreading the `c` property as we need to be able to return the whole proxy object that
-  // exists as part of `selectColumn` and `collapseColumn`.
   return columns.map((c, idx) => {
     const { expandColumns } = c;
-
+    // If `expandColumns` is a function, we don't instrument it atm.
     const expandColumnsWithId = isFunction(expandColumns)
       ? expandColumns
       : expandColumns?.map((ec, ecIdx) => ({
           ...ec,
-          id: ec.id ?? (`${generateColumnId(idx)}_${ecIdx}` as string),
+          id: ec.id ?? `${generateColumnId(idx)}_${ecIdx}`,
           // Defining this as undefined to make TS happy for now.
           // If we do not explicitly set to `undefined`, TS thinks `expandColumns` could still be of type GridColumn<T> (not WithId).
           // We only support a single level of expanding columns, so this is safe to do.
           expandColumns: undefined,
         }));
-
-    return Object.assign(c, { id: c.id ?? generateColumnId(idx), expandColumns: expandColumnsWithId });
+    // We use `Object.assign` instead of spreading the `c` property to maintain
+    // the proxy objects if the user used selectColumn/collapseColumn, which have
+    // method-missing hooks that render empty cells for any non-header rows.
+    return Object.assign(c, {
+      id: c.id ?? generateColumnId(idx),
+      expandColumns: expandColumnsWithId,
+    });
   });
 }
 

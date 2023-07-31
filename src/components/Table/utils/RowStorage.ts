@@ -1,4 +1,5 @@
 import { reaction } from "mobx";
+import { loadArrayOrUndefined } from "src";
 import { RowStates } from "src/components/Table/utils/RowStates";
 
 /**
@@ -19,13 +20,10 @@ export class RowStorage {
 
   load(persistCollapse: string): void {
     // Load what our previously collapsed rows were
-    const ids = sessionStorage.getItem(persistCollapse);
-    if (ids) {
-      this.historicalIds = JSON.parse(ids);
-    }
+    this.historicalIds = loadArrayOrUndefined(persistCollapse);
     // And store new collapsed rows going forward
     reaction(
-      () => [...this.states.collapsedRows.map((rs) => rs.row.id)],
+      () => this.states.collapsedRows.map((rs) => rs.row.id),
       (rowIds) => sessionStorage.setItem(persistCollapse, JSON.stringify(rowIds)),
     );
   }

@@ -223,6 +223,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     api.init(persistCollapse, virtuosoRef, rows);
     api.setActiveRowId(activeRowId);
     api.setActiveCellId(activeCellId);
+    // Push the initial columns directly into tableState, b/c that is what
+    // makes the tests pass, but then further updates we'll do through useEffect
+    // to avoid "Cannot update component during render" errors.
+    api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
     return api;
   }, [props.api]);
 
@@ -230,18 +234,14 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const { tableState } = api;
 
   tableState.setRows(rows);
-  tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
-  const columns: GridColumnWithId<R>[] = useComputed(
-    () =>
-      tableState.columns
-        .filter((c) => tableState.visibleColumnIds.includes(c.id))
-        .flatMap((c) =>
-          c.expandColumns && tableState.expandedColumnIds.includes(c.id)
-            ? [c, ...tableState.getExpandedColumns(c)]
-            : [c],
-        ) as GridColumnWithId<R>[],
-    [tableState],
-  );
+
+  useEffect(() => {
+    tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+  }, [tableState, columnsWithIds, visibleColumnsStorageKey]);
+
+  const columns: GridColumnWithId<R>[] = useComputed(() => {
+    return tableState.visibleColumns as GridColumnWithId<R>[];
+  }, [tableState]);
 
   // Initialize the sort state. This will only happen on the first render.
   // Once the `TableState.sort` is defined, it will not re-initialize.
@@ -266,6 +266,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // here instead.
   const { getCount } = useRenderCount();
 
+  // Our column sizes use either `w` or `expandedWidth`, so see which columns are currently expanded
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
 

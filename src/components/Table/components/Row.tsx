@@ -124,7 +124,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const maybeExpandedColumn = expandColumnHidden ? columns[columnIndex - 1] : column;
 
           // Figure out if this column should be considered 'expanded' or not. If the column is hidden on expand, then we need to look at the previous column to see if it's expanded.
-          const isExpanded = tableState.expandedColumnIds.includes(maybeExpandedColumn.id);
+          const isExpanded = tableState.isExpandedColumn(maybeExpandedColumn.id);
           // If the column is hidden on expand, we don't want to render it. We'll flag that it was hidden, so on the next column we can render this column's "expandHeader" property.
           if (column.hideOnExpand && isExpanded) {
             expandColumnHidden = true;
@@ -133,9 +133,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
           // Need to keep track of the expanded columns so we can add borders as expected for the header rows
           const numExpandedColumns = isExpanded
-            ? tableState.getExpandedColumns(maybeExpandedColumn)?.length
+            ? tableState.numberOfExpandedChildren(maybeExpandedColumn.id)
               ? // Subtract 1 if the column is hidden on expand, since we're not rendering it.
-                tableState.getExpandedColumns(maybeExpandedColumn).length - (maybeExpandedColumn.hideOnExpand ? 1 : 0)
+                tableState.numberOfExpandedChildren(maybeExpandedColumn.id) - (maybeExpandedColumn.hideOnExpand ? 1 : 0)
               : 0
             : 0;
 
