@@ -12,8 +12,10 @@ describe("BoundDateField", () => {
     const author = createObjectState(formConfig, {});
     const r = await render(<BoundDateField field={author.birthday} onBlur={onBlur} onFocus={onFocus} />);
 
-    // When focus is triggered
+    // When setting focus on the input element
     focus(r.birthday);
+    // And clicking the input element to trigger the date picker
+    click(r.birthday);
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
 
@@ -38,8 +40,8 @@ describe("BoundDateField", () => {
     );
     const r = await render(<BoundDateField field={author.birthday} />);
 
-    // When triggering the Date Picker
-    focus(r.birthday);
+    // When clicking input element to trigger the date picker
+    click(r.birthday);
     // And when selecting a date - Choose the first of these, which should be `jan1`
     click(r.datePickerDay_0);
 

@@ -21,8 +21,8 @@ describe(DateRangeField, () => {
     const r = await render(
       <DateRangeField value={{ from: jan2, to: jan10 }} label="Date" onChange={onChange} onBlur={onBlur} />,
     );
-    // And focus set on the input element.
-    focus(r.date());
+    // And clicking input element to trigger the date picker
+    click(r.date());
 
     // When "blur"ing the field with the overlay as the related target
     fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
@@ -48,8 +48,8 @@ describe(DateRangeField, () => {
     const r = await render(
       <DateRangeField value={{ from: jan2, to: jan10 }} label="Date" onChange={onChange} onBlur={onBlur} />,
     );
-    // And focus set on the input element.
-    focus(r.date());
+    // And clicking input element to trigger the date picker
+    click(r.date());
     // When "blur"ing the field with the overlay as the related target
     fireEvent.blur(r.date(), { relatedTarget: r.date_datePicker() });
     // And clicking on a value in the date picker
