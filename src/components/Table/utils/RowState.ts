@@ -1,6 +1,8 @@
 import { makeAutoObservable, observable } from "mobx";
-import { GridDataRow, KEPT_GROUP, reservedRowKinds, SelectedState } from "src";
+import { GridDataRow } from "src/components/Table/components/Row";
 import { RowStates } from "src/components/Table/utils/RowStates";
+import { SelectedState } from "src/components/Table/utils/TableState";
+import { KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 
 /**
  * A reactive/observable state of each GridDataRow's current behavior.
