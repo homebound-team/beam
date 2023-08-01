@@ -55,12 +55,8 @@ export class TableState {
     // Make ourselves an observable so that mobx will do caching of .collapseIds so
     // that it'll be a stable identity for GridTable to useMemo against.
     makeAutoObservable(this, {
-      // We only shallow observe rows so that:
-      // a) we don't deeply/needlessly proxy-ize a large Apollo fragment cache, but
-      // b) if rows changes, we re-run computeds like getSelectedRows that may need to see the
-      // updated _contents_ of a given row, even if our other selected/matched row states don't change.
-      // (as any b/c rows is private, so the mapped type doesn't see it)
-      rows: observable.shallow,
+      // We use `ref`s so that observables can watch the immutable data change w/o deeply proxy-ifying Apollo fragments
+      rows: observable.ref,
       columns: observable.ref,
     } as any);
 
@@ -138,10 +134,6 @@ export class TableState {
 
   // Updates the list of rows and regenerates the collapsedRows property if needed.
   setRows(rows: GridDataRow<any>[]): void {
-    // Note that because of using `rows: observable.shallow` above, this is always
-    // false, and this logic runs on every render. We can eventually fix this, but it
-    // is convenient b/c it puts no-longer-kept rows back into the right spot in their
-    // parents.
     if (rows !== this.rows) {
       this.rowStates.setRows(rows);
       this.rows = rows;

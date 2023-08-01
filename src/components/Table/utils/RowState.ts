@@ -43,7 +43,7 @@ export class RowState {
   // isDirectlyMatched = accept filters in the constructor and do match here
   // isEffectiveMatched = isDirectlyMatched || hasMatchedChildren
 
-  constructor(states: RowStates, row: GridDataRow<any>) {
+  constructor(private states: RowStates, row: GridDataRow<any>) {
     this.row = row;
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
@@ -115,10 +115,8 @@ export class RowState {
     this.selected = selected;
     // We don't check inferSelectedState here, b/c even if the parent is considered selectable
     // on its own, we still push down selected-ness to our visible children.
-    if (this.children) {
-      for (const child of this.visibleChildren) {
-        child.select(selected);
-      }
+    for (const child of this.visibleChildren) {
+      child.select(selected);
     }
   }
 
@@ -152,8 +150,8 @@ export class RowState {
   }
 
   private get visibleChildren(): RowState[] {
-    // The keptGroup should treat all of its children as visible, as this makes select/unselect all work.
-    if (this.row.kind === KEPT_GROUP) return this.children ?? [];
+    // The keptGroup is special and it's children are the dynamically kept rows
+    if (this.row.kind === KEPT_GROUP) return this.states.keptRows;
     // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
     // rows should be removed from `this.children` anyway, by a change to `props.rows`,
     // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
