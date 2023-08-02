@@ -69,7 +69,7 @@ export class RowStates {
     if (this.header) {
       this.header.children = [
         // Always add the keptGroupRow, and we'll use keptGroupRow.isMatched=true/false to keep it
-        // from missing up "header is all selected" if its hidden/when there are no kept rows.
+        // from messing up "header is all selected" if its hidden/when there are no kept rows.
         this.keptGroupRow,
         ...this.topRows.filter((rs) => !reservedRowKinds.includes(rs.row.kind)),
       ];

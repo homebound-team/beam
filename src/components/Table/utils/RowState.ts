@@ -153,7 +153,7 @@ export class RowState {
   }
 
   private get visibleChildren(): RowState[] {
-    // The keptGroup is special and it's children are the dynamically kept rows
+    // The keptGroup is special and its children are the dynamically kept rows
     if (this.row.kind === KEPT_GROUP) return this.states.keptRows;
     // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
     // rows should be removed from `this.children` anyway, by a change to `props.rows`,
