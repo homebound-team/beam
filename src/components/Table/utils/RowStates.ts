@@ -12,7 +12,7 @@ export class RowStates {
   private map = new ObservableMap<string, RowState>();
   storage = new RowStorage(this);
   // Pre-create our keptGroupRow for if/when we need it.
-  private keptGroupRow: RowState = this.creatKeptGroupRow();
+  private keptGroupRow: RowState = this.createKeptGroupRow();
   private header: RowState | undefined = undefined;
   /** The first level of rows, i.e. not the header (or kept group), but the totals + top-level children. */
   private topRows: RowState[] = [];
@@ -146,17 +146,19 @@ export class RowStates {
   }
 
   /** Create our synthetic "group row" for kept rows, that users never pass in, but we self-inject as needed. */
-  private creatKeptGroupRow(): RowState {
+  private createKeptGroupRow(): RowState {
     // The "group row" for selected rows that are hidden by filters and add the children
     const keptGroupRow: GridDataRow<any> = {
       id: KEPT_GROUP,
       kind: KEPT_GROUP,
       initCollapsed: true,
-      // The kept group is basically always selected
-      initSelected: true,
+      selectable: false,
       data: undefined,
       children: [],
     };
-    return new RowState(this, keptGroupRow);
+    const rs = new RowState(this, keptGroupRow);
+    // Make the RowState behave like a parent, even though we calc its visibleChildren.
+    rs.children = [];
+    return rs;
   }
 }
