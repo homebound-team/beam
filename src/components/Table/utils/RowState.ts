@@ -1,6 +1,8 @@
 import { makeAutoObservable, observable } from "mobx";
-import { GridDataRow, KEPT_GROUP, reservedRowKinds, SelectedState } from "src";
+import { GridDataRow } from "src/components/Table/components/Row";
 import { RowStates } from "src/components/Table/utils/RowStates";
+import { SelectedState } from "src/components/Table/utils/TableState";
+import { KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 
 /**
  * A reactive/observable state of each GridDataRow's current behavior.
@@ -43,7 +45,7 @@ export class RowState {
   // isDirectlyMatched = accept filters in the constructor and do match here
   // isEffectiveMatched = isDirectlyMatched || hasMatchedChildren
 
-  constructor(states: RowStates, row: GridDataRow<any>) {
+  constructor(private states: RowStates, row: GridDataRow<any>) {
     this.row = row;
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
@@ -111,14 +113,13 @@ export class RowState {
    * child of a selected parent row.
    */
   select(selected: boolean): void {
-    if (this.row.selectable === false) return;
-    this.selected = selected;
+    if (this.row.selectable !== false) {
+      this.selected = selected;
+    }
     // We don't check inferSelectedState here, b/c even if the parent is considered selectable
     // on its own, we still push down selected-ness to our visible children.
-    if (this.children) {
-      for (const child of this.visibleChildren) {
-        child.select(selected);
-      }
+    for (const child of this.visibleChildren) {
+      child.select(selected);
     }
   }
 
@@ -152,8 +153,8 @@ export class RowState {
   }
 
   private get visibleChildren(): RowState[] {
-    // The keptGroup should treat all of its children as visible, as this makes select/unselect all work.
-    if (this.row.kind === KEPT_GROUP) return this.children ?? [];
+    // The keptGroup is special and its children are the dynamically kept rows
+    if (this.row.kind === KEPT_GROUP) return this.states.keptRows;
     // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
     // rows should be removed from `this.children` anyway, by a change to `props.rows`,
     // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
