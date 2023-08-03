@@ -1,7 +1,7 @@
-import { AutoSaveStatus, AutoSaveStatusContext } from "@homebound/form-state";
 import React from "react";
 import { noop } from "src/utils";
 import { render } from "src/utils/rtl";
+import { AutoSaveStatus, AutoSaveStatusContext } from ".";
 import { AutoSaveIndicator } from "./AutoSaveIndicator";
 
 describe(AutoSaveIndicator, () => {
