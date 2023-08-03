@@ -1,8 +1,7 @@
-import { AutoSaveStatus, useAutoSaveStatus } from "@homebound/form-state";
 import { useEffect } from "react";
 import { Css, Palette } from "src/Css";
 import { assertNever } from "src/types";
-import { IconProps, Tooltip } from ".";
+import { AutoSaveStatus, IconProps, Tooltip, useAutoSaveStatus } from ".";
 import { Icon } from "./Icon";
 
 interface AutoSaveIndicatorProps {
