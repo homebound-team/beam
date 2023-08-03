@@ -12,7 +12,7 @@ export class RowStates {
   private map = new ObservableMap<string, RowState>();
   storage = new RowStorage(this);
   // Pre-create our keptGroupRow for if/when we need it.
-  private keptGroupRow: RowState = this.creatKeptGroupRow();
+  private keptGroupRow: RowState = this.createKeptGroupRow();
   private header: RowState | undefined = undefined;
   /** The first level of rows, i.e. not the header (or kept group), but the totals + top-level children. */
   private topRows: RowState[] = [];
@@ -67,23 +67,16 @@ export class RowStates {
     this.topRows = rows.filter((row) => row !== headerRow).map((row) => addRowAndChildren(row));
     // And attach them to the header for select-all/etc. to work
     if (this.header) {
-      this.header.children = this.topRows.filter((rs) => !reservedRowKinds.includes(rs.row.kind));
+      this.header.children = [
+        // Always add the keptGroupRow, and we'll use keptGroupRow.isMatched=true/false to keep it
+        // from messing up "header is all selected" if its hidden/when there are no kept rows.
+        this.keptGroupRow,
+        ...this.topRows.filter((rs) => !reservedRowKinds.includes(rs.row.kind)),
+      ];
     }
 
     // Then mark any remaining as removed
     for (const state of existing) state.markRemoved();
-
-    const keptRows = this.keptRows;
-    if (keptRows.length > 0) {
-      // Stitch the current keptRows into the placeholder keptGroupRow
-      this.keptGroupRow.children = keptRows;
-      this.keptGroupRow.row.children = keptRows.map((rs) => rs.row);
-      // And then stitch the keptGroupRow itself into the root header, so that the kept rows
-      // are treated as just another child for the header's select/unselect all to work.
-      if (this.header) {
-        this.header.children!.unshift(this.keptGroupRow);
-      }
-    }
 
     // After the first load of real data, we detach collapse state, to respect
     // any incoming initCollapsed.
@@ -136,6 +129,11 @@ export class RowStates {
         rs.isMatched = ids.includes(rs.row.id);
       }
     }
+    // We cheat a little and pretend the "kept group matches the filter" not based on it itself
+    // literally matching the filter, or its children matching the filter (which is typically
+    // how the filter logic works), but if it just has any child rows at all (which actually means
+    // its children did _not_ match the filter, but are kept).
+    this.keptGroupRow.isMatched = this.keptRows.length > 0;
   }
 
   /** Returns kept rows, i.e. those that were user-selected but then client-side or server-side filtered. */
@@ -148,9 +146,19 @@ export class RowStates {
   }
 
   /** Create our synthetic "group row" for kept rows, that users never pass in, but we self-inject as needed. */
-  private creatKeptGroupRow(): RowState {
+  private createKeptGroupRow(): RowState {
     // The "group row" for selected rows that are hidden by filters and add the children
-    const keptGroupRow: GridDataRow<any> = { id: KEPT_GROUP, kind: KEPT_GROUP, initCollapsed: true, data: undefined };
-    return new RowState(this, keptGroupRow);
+    const keptGroupRow: GridDataRow<any> = {
+      id: KEPT_GROUP,
+      kind: KEPT_GROUP,
+      initCollapsed: true,
+      selectable: false,
+      data: undefined,
+      children: [],
+    };
+    const rs = new RowState(this, keptGroupRow);
+    // Make the RowState behave like a parent, even though we calc its visibleChildren.
+    rs.children = [];
+    return rs;
   }
 }

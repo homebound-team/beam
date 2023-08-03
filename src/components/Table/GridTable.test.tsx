@@ -3374,6 +3374,8 @@ describe("GridTable", () => {
         | on                                   | bar  | 2     |
         "
       `);
+      // Then the header is fully selected
+      expect(r.select_0()).toHaveAttribute("data-indeterminate", "false");
       // When deselecting the header
       click(r.select_0);
       // Then the kept selected group is hidden
