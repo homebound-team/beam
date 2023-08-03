@@ -176,7 +176,7 @@ export const radioDefault = {
   // By default we're a white circle with a gray border
   ...Css.bgWhite.bGray300.ba.$,
   // Set the "selected" color that will be used by background=currentColor + box shadow, but is initially ignored
-  ...Css.lightBlue700.$,
+  ...Css.blue700.$,
   // Apply our default transitions
   ...Css.transition.$,
 };
@@ -207,7 +207,7 @@ export const radioFocus = {
 
 export const radioHover = {
   // Change both the dot and the border to a darker blue
-  ...Css.lightBlue900.bLightBlue900.$,
+  ...Css.blue900.bBlue900.$,
 };
 
 export const radioDisabled = {

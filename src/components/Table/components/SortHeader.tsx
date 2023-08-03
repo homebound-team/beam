@@ -38,7 +38,7 @@ export function SortHeader(props: SortHeaderProps) {
     <span css={Css.fs0.$}>
       <Icon
         icon={sorted === "DESC" ? "sortDown" : "sortUp"}
-        color={sorted !== undefined ? Palette.LightBlue700 : Palette.Gray400}
+        color={sorted !== undefined ? Palette.Blue700 : Palette.Gray400}
         xss={{
           ...Css.ml1.if(iconOnLeft).mr1.ml0.$,
           ...Css.visibility("hidden")

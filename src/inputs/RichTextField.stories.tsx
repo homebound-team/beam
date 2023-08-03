@@ -75,7 +75,7 @@ export function ToggleReadOnly() {
         onBlur={noop}
         onFocus={noop}
       />
-      <button css={Css.mt2.p1.bgLightBlue700.white.$} onClick={() => setReadOnly(!readOnly)}>
+      <button css={Css.mt2.p1.bgBlue700.white.$} onClick={() => setReadOnly(!readOnly)}>
         Toggle ReadOnly
       </button>
     </>

@@ -1,7 +1,7 @@
 :root {
   /* Modified by Beam (40 -> 32) */
   --rdp-cell-size: 32px;
-  /* Modified by Beam (#0000ff -> LightBlue700) */
+  /* Modified by Beam (#0000ff -> Blue700) */
   --rdp-accent-color: rgba(3, 105, 161, 1);
   --rdp-background-color: #e7edff;
   /* Switch to dark colors for dark themes */
@@ -10,7 +10,7 @@
   /* Outline border for focused elements */
   --rdp-outline: 2px solid var(--rdp-accent-color);
   /* Outline border for focused and selected elements */
-  /* Modified by Beam (rgba(0, 0, 0, 0.75) -> LightBlue700) */
+  /* Modified by Beam (rgba(0, 0, 0, 0.75) -> Blue700) */
   --rdp-outline-selected: 2px solid rgba(3, 105, 161, 1);
 }
 

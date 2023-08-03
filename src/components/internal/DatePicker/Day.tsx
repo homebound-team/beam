@@ -50,7 +50,7 @@ export function Day(props: DayProps) {
             "&:hover:not(:active) > div": Css.bgGray100.$,
           }),
         ...(!disabled && { "&:active > div": Css.bgGray400.gray900.$ }),
-        "&:focus:not(:active) > div": Css.ba.bLightBlue700.if(selected).bLightBlue900.$,
+        "&:focus:not(:active) > div": Css.ba.bBlue700.if(selected).bBlue900.$,
         ...(showRangeStyles &&
           range_start &&
           Css.addIn(":after", { ...rangeBaseStyles, ...Css.rightPx(-2).wPx(8).$ }).$),
@@ -63,7 +63,7 @@ export function Day(props: DayProps) {
         css={{
           ...Css.overflowHidden.gray900.relative.z1.br4.df.aic.jcc.wPx(28).hPx(30).mtPx(2).br4.$,
           ...(today && !range_middle && Css.bgGray100.$),
-          ...(selected && !range_middle && Css.white.bgLightBlue700.$),
+          ...(selected && !range_middle && Css.white.bgBlue700.$),
           ...(disabled && Css.gray500.$),
         }}
       >
@@ -76,7 +76,7 @@ export function Day(props: DayProps) {
                 .bottomPx(4)
                 .wPx(4)
                 .hPx(4)
-                .bgLightBlue700.br4.if(selected && !range_middle).bgWhite.$
+                .bgBlue700.br4.if(selected && !range_middle).bgWhite.$
             }
             {...tid.indicatorDot}
           />
@@ -86,4 +86,4 @@ export function Day(props: DayProps) {
   );
 }
 
-const rangeBaseStyles = Css.absolute.topPx(2).contentEmpty.hPx(30).wPx(32).bgLightBlue100.$;
+const rangeBaseStyles = Css.absolute.topPx(2).contentEmpty.hPx(30).wPx(32).bgBlue100.$;

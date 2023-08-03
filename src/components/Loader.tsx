@@ -7,7 +7,7 @@ interface LoaderProps {
 
 export function Loader({ size = "lg", contrast = false }: LoaderProps) {
   const [dimensions, borderSize] = sizeToPixels[size];
-  const [bgColor, spinnerColor] = contrast ? [Palette.Gray600, Palette.Gray200] : [Palette.White, Palette.LightBlue700];
+  const [bgColor, spinnerColor] = contrast ? [Palette.Gray600, Palette.Gray200] : [Palette.White, Palette.Blue700];
 
   return (
     <div

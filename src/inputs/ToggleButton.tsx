@@ -52,7 +52,7 @@ export function ToggleButton(props: ToggleButtonProps) {
         .selectNone.$,
       ...(isHovered && toggleHoverStyles),
       ...(isPressed && togglePressStyles),
-      ...(isSelected && !isDisabled && Css.lightBlue700.$),
+      ...(isSelected && !isDisabled && Css.blue700.$),
       ...(isKeyboardFocus && toggleFocusStyles),
       ...(isDisabled && Css.gray300.cursorNotAllowed.$),
     },

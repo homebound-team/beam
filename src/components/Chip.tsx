@@ -54,12 +54,12 @@ export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X
 }
 
 const typeStyles: Record<ChipType, Properties> = {
-  caution: Css.bgYellow400.$,
-  warning: Css.bgRed100.$,
-  success: Css.bgGreen100.$,
+  caution: Css.bgYellow200.$,
+  warning: Css.bgRed200.$,
+  success: Css.bgGreen200.$,
   light: Css.bgWhite.$,
   dark: Css.bgGray900.white.$,
   neutral: Css.bgGray200.$,
   darkMode: Css.bgGray700.white.$,
-  info: Css.bgLightBlue100.$,
+  info: Css.bgBlue100.$,
 };

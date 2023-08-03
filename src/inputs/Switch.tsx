@@ -78,7 +78,7 @@ export function Switch(props: SwitchProps) {
             ...(isHovered && switchHoverStyles),
             ...(isKeyboardFocus && switchFocusStyles),
             ...(isDisabled && Css.bgGray300.$),
-            ...(isSelected && Css.bgLightBlue700.$),
+            ...(isSelected && Css.bgBlue700.$),
             ...(isSelected && isHovered && switchSelectedHoverStyles),
           }}
         >
@@ -92,7 +92,7 @@ export function Switch(props: SwitchProps) {
           >
             {/* Icon */}
             {withIcon && (
-              <Icon icon={isSelected ? "check" : "x"} color={isSelected ? Palette.LightBlue700 : Palette.Gray400} />
+              <Icon icon={isSelected ? "check" : "x"} color={isSelected ? Palette.Blue700 : Palette.Gray400} />
             )}
           </div>
         </div>
@@ -124,7 +124,7 @@ const circleDiameter = (isCompact: boolean) => (isCompact ? 12 : 20);
 // Switcher/Toggle element styles
 export const switchHoverStyles = Css.bgGray400.$;
 export const switchFocusStyles = Css.bshFocus.$;
-export const switchSelectedHoverStyles = Css.bgLightBlue900.$;
+export const switchSelectedHoverStyles = Css.bgBlue900.$;
 
 // Circle inside Switcher/Toggle element styles
 const switchCircleDefaultStyles = (isCompact: boolean) => ({

@@ -99,9 +99,9 @@ const navLinkVariantStyles: (contrast: boolean) => Record<
 > = (contrast) => ({
   side: {
     baseStyles: { ...baseStyles, ...Css.gray700.if(contrast).gray600.$ },
-    activeStyles: Css.lightBlue700.bgLightBlue50.if(contrast).white.bgGray700.$,
+    activeStyles: Css.blue700.bgBlue50.if(contrast).white.bgGray700.$,
     disabledStyles: Css.gray400.cursorNotAllowed.if(contrast).gray800.$,
-    focusRingStyles: Css.bgLightBlue50.bshFocus.if(contrast).bgGray700.white.$,
+    focusRingStyles: Css.bgBlue50.bshFocus.if(contrast).bgGray700.white.$,
     hoverStyles: Css.gray700.bgGray100.if(contrast).bgGray800.gray600.$,
     pressedStyles: Css.gray700.bgGray200.if(contrast).bgGray200.gray800.$,
   },

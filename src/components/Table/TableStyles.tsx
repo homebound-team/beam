@@ -154,7 +154,7 @@ function memoizedTableStyles() {
           : Css.addIn("> *", Css.bsh0.$).$,
         presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
         levels: grouped ? groupedLevels : defaultLevels,
-        rowHoverColor: Palette.LightBlue100,
+        rowHoverColor: Palette.Blue100,
         keptGroupRowCss: Css.bgYellow100.gray900.xsMd.$,
         keptLastRowCss: Css.boxShadow("inset 0px -14px 8px -11px rgba(63,63,63,.18)").$,
       };

@@ -78,7 +78,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       startAdornment={
         (showNumSelection && (
           <span
-            css={Css.wPx(16).hPx(16).fs0.br100.bgLightBlue700.white.tinySb.df.aic.jcc.$}
+            css={Css.wPx(16).hPx(16).fs0.br100.bgBlue700.white.tinySb.df.aic.jcc.$}
             data-testid="selectedOptionsCount"
           >
             {state.selectionManager.selectedKeys.size}

@@ -47,5 +47,5 @@ export function ChipWithCustomTitle() {
 }
 
 export function ChipWithCustomColor() {
-  return <Chip text="Chip with custom color" xss={Css.bgLightBlue100.$} />;
+  return <Chip text="Chip with custom color" xss={Css.bgBlue100.$} />;
 }

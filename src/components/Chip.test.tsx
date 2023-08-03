@@ -25,7 +25,7 @@ describe("Chip", () => {
   });
 
   it("can set background color and color with xss prop", async () => {
-    const r = await render(<Chip text="Chip" xss={Css.lightBlue100.bgLightBlue100.$} />);
-    expect(r.chip()).toHaveStyle(Css.lightBlue100.bgLightBlue100.$);
+    const r = await render(<Chip text="Chip" xss={Css.blue100.bgBlue100.$} />);
+    expect(r.chip()).toHaveStyle(Css.blue100.bgBlue100.$);
   });
 });

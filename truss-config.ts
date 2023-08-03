@@ -87,7 +87,7 @@ const sections: Sections = {
       bsh0: "none",
       bshBasic: "0px 4px 8px rgba(53, 53, 53, 0.08), 0px 2px 16px rgba(53, 53, 53, 0.03);",
       bshHover: "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08);",
-      bshFocus: `0px 0px 0px 2px ${palette.White}, 0px 0px 0px 4px ${palette.LightBlue700}`,
+      bshFocus: `0px 0px 0px 2px ${palette.White}, 0px 0px 0px 4px ${palette.Blue700}`,
       bshDanger: `0px 0px 0px 2px ${palette.White}, 0px 0px 0px 4px ${palette.Red800}`,
       bshModal: "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)",
     }),
