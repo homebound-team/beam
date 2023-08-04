@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react";
+import { Chip } from "src";
 import { Css } from "src/Css";
 import { Accordion } from "./Accordion";
 
@@ -33,6 +34,7 @@ export function AccordionVariations() {
     </>
   );
 }
+
 export function AccordionSizes() {
   return (
     <>
@@ -52,6 +54,27 @@ export function AccordionSizes() {
         </div>
       </Accordion>
       <Accordion title="Large" size="lg">
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
+    </>
+  );
+}
+
+export function Compact() {
+  return (
+    <>
+      <Accordion
+        title={
+          <div css={Css.df.w100.jcsb.aic.$}>
+            <span>Accordion Title</span>
+            <Chip text="$145.85" type="success" compact />
+          </div>
+        }
+        compact
+        size="sm"
+      >
         <div css={Css.sm.$}>
           Our modern approach to homebuilding makes the process easier and more personal than ever before.
         </div>

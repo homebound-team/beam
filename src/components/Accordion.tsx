@@ -27,6 +27,8 @@ export interface AccordionProps<X = AccordionXss> {
   omitPadding?: boolean;
   /** Styles overrides for padding */
   xss?: X;
+  /** Modifies the typography, padding, icon size and background color of the accordion header */
+  compact?: boolean;
 }
 
 export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps<X>) {
@@ -36,7 +38,8 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
     size,
     disabled = false,
     defaultExpanded = false,
-    topBorder = true,
+    compact = false,
+    topBorder = compact ? false : true,
     bottomBorder = false,
     index,
     setExpandedIndex,
@@ -88,7 +91,8 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
         aria-expanded={expanded}
         disabled={disabled}
         css={{
-          ...Css.df.jcsb.gap2.aic.w100.p2.baseMd.outline("none").addIn(":hover", Css.bgGray100.$).$,
+          ...Css.df.jcsb.gapPx(12).aic.w100.p2.baseMd.outline("none").onHover.bgGray100.$,
+          ...(compact && Css.smMd.pl2.prPx(10).py1.bgGray100.mbPx(4).br8.onHover.bgGray200.$),
           ...(disabled && Css.gray500.$),
           ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.Blue700}`).$),
           ...xss,
@@ -98,9 +102,10 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
           if (setExpandedIndex) setExpandedIndex(index);
         }}
       >
-        <span>{title}</span>
+        <span css={Css.fg1.tl.$}>{title}</span>
         <span
           css={{
+            ...Css.fs0.$,
             transition: "transform 250ms linear",
             transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
           }}

@@ -7,10 +7,12 @@ interface AccordionListProps {
   /** Allows multiple accordions to be expanded simultaneously (enabled by default) */
   allowMultipleExpanded?: boolean;
   size?: AccordionSize;
+  /** Modifies the typography, padding, icon size and background color of the accordion header */
+  compact?: boolean;
 }
 
 export function AccordionList(props: AccordionListProps) {
-  const { accordions, size, allowMultipleExpanded = true } = props;
+  const { accordions, size, allowMultipleExpanded = true, compact = false } = props;
   const [expandedIndex, setExpandedIndex] = useState<number | undefined>(
     accordions.findIndex((a) => a.defaultExpanded),
   );
@@ -22,9 +24,10 @@ export function AccordionList(props: AccordionListProps) {
         <Accordion
           {...accordionProps}
           {...tid}
+          compact={compact}
           key={index}
           size={size}
-          bottomBorder={index === arr.length - 1}
+          bottomBorder={compact ? false : index === arr.length - 1}
           defaultExpanded={!allowMultipleExpanded && expandedIndex === index}
           index={index}
           setExpandedIndex={setExpandedIndex}
