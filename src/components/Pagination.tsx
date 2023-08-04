@@ -46,7 +46,7 @@ export function Pagination(props: PaginationProps) {
 
   const tid = useTestIds(props, "pagination");
   return (
-    <div css={Css.df.bGray300.bt.xs.gray500.px1.ml2.pt2.$} {...tid}>
+    <div css={Css.df.bGray200.bt.xs.gray500.px2.pt2.$} {...tid}>
       <div css={Css.df.mya.mr2.$} {...tid.pageSizeLabel}>
         Page size:
       </div>
