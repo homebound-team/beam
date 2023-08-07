@@ -116,7 +116,11 @@ function memoizedTableStyles() {
 
       cache[key] = {
         emptyCell: "-",
-        firstRowMessageCss: Css.tc.py3.$,
+        firstRowMessageCss: {
+          ...Css.tc.py3.$,
+          ...(allWhite && Css.bgWhite.$),
+          ...(bordered && Css.bl.br.bGray200.$),
+        },
         headerCellCss: {
           // We want to support headers having two lines of wrapped text, and could add a `lineClamp2` here, but
           // lineClamp requires `display: webkit-box`, which disables `align-items: center` (requires `display: flex/grid`)
@@ -136,7 +140,7 @@ function memoizedTableStyles() {
             .$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
           ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
-          ...(bordered && { "&:first-of-type": Css.bl.bGray200.$, "&:last-of-type": Css.br.bGray200.$ }),
+          ...(bordered && { "&:first-child": Css.bl.bGray200.$, "&:last-child": Css.br.bGray200.$ }),
         },
         firstRowCss: {
           ...Css.addIn("& > *:first-of-type", Css.borderRadius("8px 0 0 0 ").$).addIn(
