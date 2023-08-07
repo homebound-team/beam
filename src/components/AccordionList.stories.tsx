@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react";
+import { Chip } from "src";
 import { Css } from "src/Css";
 import { AccordionProps } from "./Accordion";
 import { AccordionList } from "./AccordionList";
@@ -66,4 +67,38 @@ export function AccordionListWithParentProp() {
     },
   ];
   return <AccordionList accordions={accordions} />;
+}
+
+export function Compact() {
+  const accordions: AccordionProps[] = [
+    {
+      title: (
+        <div css={Css.df.w100.jcsb.aic.$}>
+          <span>First accordion title</span>
+          <Chip text="$145.85" type="success" compact />
+        </div>
+      ),
+      children: <div>Fisrt accordion description</div>,
+    },
+    {
+      title: (
+        <div css={Css.df.w100.jcsb.aic.$}>
+          <span>Second accordion title</span>
+          <Chip text="$145.85" type="success" compact />
+        </div>
+      ),
+      children: <div>Second accordion description</div>,
+      defaultExpanded: true,
+    },
+    {
+      title: (
+        <div css={Css.df.w100.jcsb.aic.$}>
+          <span>Third accordion title</span>
+          <Chip text="$145.85" type="success" compact />
+        </div>
+      ),
+      children: <div>Third accordion description</div>,
+    },
+  ];
+  return <AccordionList size="sm" accordions={accordions} allowMultipleExpanded={false} compact />;
 }
