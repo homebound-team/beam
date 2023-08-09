@@ -190,9 +190,11 @@ export class RowState {
     let rows = this.visibleChildren;
     const { sortState, sortConfig, visibleColumns } = this.states.table;
     if (sortConfig?.on === "client" && sortState) {
-      const fn = sortFn(visibleColumns, sortState, !!sortConfig.caseSensitive);
+      // sortRows.ts wants to sort based on the GridDataRow, so make a small `rowStateFn` adapter
+      const dataRowFn = sortFn(visibleColumns, sortState, !!sortConfig.caseSensitive);
+      const rowStateFn = (a: RowState, b: RowState) => dataRowFn(a.row, b.row);
       // We need to make a copy for mobx to see the sort as a change
-      rows = [...rows.sort(fn)];
+      rows = [...rows.sort(rowStateFn)];
     }
     // console.log(
     //   "sorted",
