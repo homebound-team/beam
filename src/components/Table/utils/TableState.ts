@@ -2,8 +2,10 @@ import { makeAutoObservable, observable, reaction } from "mobx";
 import React from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridSortConfig } from "src/components/Table/GridTable";
+import { GridTableApi } from "src/components/Table/GridTableApi";
 import { Direction, GridColumnWithId } from "src/components/Table/types";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
+import { RowState } from "src/components/Table/utils/RowState";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { ASC, DESC, HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 
@@ -31,7 +33,8 @@ export class TableState {
   private rows: GridDataRow<any>[] = [];
   // The current list of columns, basically a useRef.current. Only ref reactive.
   public columns: GridColumnWithId<any>[] = [];
-  private readonly rowStates = new RowStates();
+  public readonly api: GridTableApi<any>;
+  private readonly rowStates = new RowStates(this);
   private readonly columnStates = new ColumnStates();
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
   activeRowId: string | undefined = undefined;
@@ -51,7 +54,9 @@ export class TableState {
   /**
    * Creates the `RowState` for a given `GridTable`.
    */
-  constructor() {
+  constructor(api: GridTableApi<any>) {
+    this.api = api;
+
     // Make ourselves an observable so that mobx will do caching of .collapseIds so
     // that it'll be a stable identity for GridTable to useMemo against.
     makeAutoObservable(this, {
@@ -147,6 +152,14 @@ export class TableState {
     }
   }
 
+  setSearch(filter: string | undefined): void {
+    this.rowStates.search.setSearch(filter);
+  }
+
+  get visibleRows(): RowState[] {
+    return this.rowStates.visibleRows;
+  }
+
   /** Returns visible columns, i.e. those that are visible + any expanded children. */
   get visibleColumns(): GridColumnWithId<any>[] {
     return this.columnStates.allVisibleColumns.map((cs) => cs.column);
@@ -180,11 +193,6 @@ export class TableState {
 
   loadExpandedColumns(columnId: string): Promise<void> {
     return this.columnStates.get(columnId).doExpand();
-  }
-
-  /** Called when GridTable has re-calced the rows that pass the client-side filter, or all rows. */
-  setMatchedRows(rowIds: string[]): void {
-    this.rowStates.setMatchedRows(rowIds);
   }
 
   /** Returns selected data rows (non-header, non-totals, etc.), ignoring rows that have `row.selectable !== false`. */

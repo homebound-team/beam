@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridColumnWithId, Kinded, Pin } from "src/components/Table/types";
+import { RowState } from "src/components/Table/utils/RowState";
 import { SortOn, SortState } from "src/components/Table/utils/TableState";
 import { applyRowFn } from "src/components/Table/utils/utils";
 
@@ -60,6 +61,46 @@ function sortBatch<R extends Kinded>(
     }
     return column ? compare(column, a, b, invert, caseSensitive) : 0;
   });
+}
+
+export function sortFn<R extends Kinded>(
+  columns: GridColumnWithId<R>[],
+  sortState: SortState,
+  caseSensitive: boolean,
+): (a: RowState, b: RowState) => number {
+  // When client-side sort, the sort value is the column index
+  const { current, persistent } = sortState ?? {};
+  const { columnId, direction } = current ?? {};
+  const { columnId: persistentSortColumnId, direction: persistentSortDirection } = persistent ?? {};
+
+  const column = columns.find((c) => c.id! === columnId);
+  const invert = direction === "DESC";
+  const primaryInvert = persistentSortDirection === "DESC";
+  const primaryColumn = persistentSortColumnId && columns.find((c) => c.id! === persistentSortColumnId);
+
+  // Make a shallow copy for sorting to avoid mutating the original list
+  return (as, bs) => {
+    const a = as.row;
+    const b = bs.row;
+    if (a.pin || b.pin) {
+      // If both rows are pinned, we don't sort within them, because by pinning the page is taking
+      // explicit ownership over the order of the rows (and we also don't support "levels of pins",
+      // i.e. for change events putting "just added" rows `pin: last` and the "add new" row `pin: lastest`).
+      const aPin = getPin(a.pin);
+      const bPin = getPin(b.pin);
+      const ap = aPin === "first" ? -1 : aPin === "last" ? 1 : 0;
+      const bp = bPin === "first" ? -1 : bPin === "last" ? 1 : 0;
+      return ap === bp ? 0 : ap < bp ? -1 : 1;
+    } else if (primaryColumn) {
+      // When primary key exist sort that priority first
+      const primaryCompare = compare(primaryColumn, a, b, primaryInvert, caseSensitive);
+      // if both rows are not primary sort equivalent
+      if (primaryCompare !== 0) {
+        return primaryCompare;
+      }
+    }
+    return column ? compare(column, a, b, invert, caseSensitive) : 0;
+  };
 }
 
 function getPin(pin: string | Pin | undefined) {

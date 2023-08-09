@@ -1,8 +1,9 @@
 import { makeAutoObservable, observable } from "mobx";
+import { sortFn } from "src";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { SelectedState } from "src/components/Table/utils/TableState";
-import { KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
+import { applyRowFn, KEPT_GROUP, matchesFilter, reservedRowKinds } from "src/components/Table/utils/utils";
 
 /**
  * A reactive/observable state of each GridDataRow's current behavior.
@@ -15,8 +16,6 @@ export class RowState {
   row: GridDataRow<any>;
   /** Our children row states, as of the latest `props.rows`, without any filtering applied. */
   children: RowState[] | undefined = undefined;
-  /** Whether we match a client-side filter; true if no filter is in place. */
-  isMatched = true;
   /** Whether we are *directly* selected. */
   selected = false;
   /** Whether we are collapsed. */
@@ -41,15 +40,22 @@ export class RowState {
    */
   removed: false | "soft" | "hard" = false;
 
-  // ...eventually...
-  // isDirectlyMatched = accept filters in the constructor and do match here
-  // isEffectiveMatched = isDirectlyMatched || hasMatchedChildren
-
-  constructor(private states: RowStates, row: GridDataRow<any>) {
+  constructor(private states: RowStates, public parent: RowState | undefined, row: GridDataRow<any>) {
     this.row = row;
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
     makeAutoObservable(this, { row: observable.ref });
+  }
+
+  /** Whether we match a client-side filter; true if no filter is in place. */
+  get isMatched(): boolean {
+    return (
+      this.isDirectlyMatched ||
+      // A matched parent means show all it's children
+      (this.parent && this.parent.isDirectlyMatched) ||
+      // An unmatched parent but with matched children means show the parent
+      this.hasMatchedChildren
+    );
   }
 
   /**
@@ -142,7 +148,7 @@ export class RowState {
     return (
       this.selected &&
       // Headers, totals, etc., do not need keeping
-      !reservedRowKinds.includes(this.row.kind) &&
+      !this.isReservedKind &&
       !this.isParent &&
       (!this.isMatched || this.removed === "soft")
     );
@@ -152,14 +158,42 @@ export class RowState {
     return this.row.inferSelectedState !== false;
   }
 
+  /** Returns this column, if visible, and its children, if expanded. */
+  get maybeSelfAndChildren(): RowState[] {
+    if (this.children && !this.collapsed) {
+      return [this, ...this.visibleSortedChildren.flatMap((c) => c.maybeSelfAndChildren)];
+    } else {
+      return [this];
+    }
+  }
+
   private get visibleChildren(): RowState[] {
     // The keptGroup is special and its children are the dynamically kept rows
     if (this.row.kind === KEPT_GROUP) return this.states.keptRows;
-    // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
-    // rows should be removed from `this.children` anyway, by a change to `props.rows`,
-    // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
-    // go away, go ahead and filter them out here.
-    return this.children?.filter((c) => c.isMatched === true && c.removed !== "hard") ?? [];
+    return (
+      this.children?.filter(
+        (rs) =>
+          // Reserved rows are always visible, even though they're not considered matched
+          // ...except for the kept group
+          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) || rs.isMatched || rs.isPinned,
+      ) ?? []
+    );
+  }
+
+  private get visibleSortedChildren(): RowState[] {
+    let rows = this.visibleChildren;
+    const { sortState, sortConfig, visibleColumns } = this.states.table;
+    if (sortConfig?.on === "client" && sortState) {
+      const fn = sortFn(visibleColumns, sortState, !!sortConfig.caseSensitive);
+      // We need to make a copy for mobx to see the sort as a change
+      rows = [...rows.sort(fn)];
+    }
+    // console.log(
+    //   "sorted",
+    //   this.row.id,
+    //   rows.map((rs) => rs.row.id),
+    // );
+    return rows;
   }
 
   /**
@@ -175,6 +209,41 @@ export class RowState {
    */
   private get isParent(): boolean {
     return !!this.children && this.children.length > 0 && this.inferSelectedState;
+  }
+
+  private get isPinned(): boolean {
+    return typeof this.row.pin === "string" || (!!this.row.pin && this.row.pin.filter !== true);
+  }
+
+  public get isReservedKind(): boolean {
+    return reservedRowKinds.includes(this.row.kind);
+  }
+
+  /** A dedicated method to "looking down" recursively, to avoid loops in `isMatched`. */
+  private get hasMatchedChildren(): boolean {
+    // The keptGroup is special and its children are the dynamically kept rows
+    if (this.row.kind === KEPT_GROUP) return this.states.keptRows.length > 0;
+    // We include `isKept` because ironically the "kept group" having "visible children"
+    // means "children that are not visible" i.e. kept.
+    return !!this.children && this.children.some((c) => c.isDirectlyMatched || c.hasMatchedChildren);
+  }
+
+  private get isDirectlyMatched(): boolean {
+    // Reserved rows like the header can never be directly matched, throws off select all behavior
+    if (this.isReservedKind) return false;
+    // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
+    // rows should be removed from `this.children` anyway, by a change to `props.rows`,
+    // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
+    // go away, go ahead and filter them out here.
+    if (this.removed === "hard") return false;
+    // Reacts to either search state or visibleColumns state changing
+    const { search: filters } = this.states.search;
+    const { visibleColumns, api } = this.states.table;
+    return filters.every((f) =>
+      visibleColumns
+        .map((c) => applyRowFn(c, this.row, api, 0, false))
+        .some((maybeContent) => matchesFilter(maybeContent, f)),
+    );
   }
 
   /** Pretty toString. */
