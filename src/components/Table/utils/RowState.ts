@@ -1,5 +1,4 @@
 import { makeAutoObservable, observable } from "mobx";
-import { sortFn } from "src";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { SelectedState } from "src/components/Table/utils/TableState";
@@ -188,14 +187,10 @@ export class RowState {
   /** The `visibleChildren`, but with the current sort config applied. */
   private get visibleSortedChildren(): RowState[] {
     let rows = this.visibleChildren;
-    const { sortState, sortConfig, visibleColumns } = this.states.table;
-    if (sortConfig?.on === "client" && sortState) {
-      // sortRows.ts wants to sort based on the GridDataRow, so make a small `rowStateFn` adapter
-      const dataRowFn = sortFn(visibleColumns, sortState, !!sortConfig.caseSensitive);
-      const rowStateFn = (a: RowState, b: RowState) => dataRowFn(a.row, b.row);
-      // We need to make a copy for mobx to see the sort as a change
-      rows = [...rows.sort(rowStateFn)];
-    }
+    const { sortFn } = this.states.table;
+    // We need to make a copy for mobx to see the sort as a change, and also to not mutate
+    // the original/unsorted array if we need to revert to the original sort order.
+    if (sortFn) rows = [...rows].sort(sortFn);
     // console.log(
     //   "sorted",
     //   this.row.id,

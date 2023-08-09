@@ -1,6 +1,6 @@
 import { reaction } from "mobx";
-import { loadArrayOrUndefined } from "src";
 import { RowStates } from "src/components/Table/utils/RowStates";
+import { loadArrayOrUndefined } from "src/components/Table/utils/utils";
 
 /**
  * Manages loading/saving our currently-collapsed rows to session storage.

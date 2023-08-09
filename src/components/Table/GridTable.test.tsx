@@ -552,7 +552,7 @@ describe("GridTable", () => {
         <GridTable
           columns={[nameColumn, valueColumn]}
           // And there is an initial sort defined
-          sorting={{ on: "client", initial: [generateColumnId(0), "ASC"] }}
+          sorting={{ on: "client", initial: ["someInvalidId", "ASC"] }}
           rows={[
             simpleHeader,
             { kind: "data", id: "1", data: { name: "a", value: 2 } },
@@ -561,6 +561,7 @@ describe("GridTable", () => {
           ]}
         />,
       );
+      expect(cell(r, 1, 1)).toHaveTextContent("2");
       // When initializing sort on the "value" column
       click(r.sortHeader_1);
       // Then expect ASC order

@@ -55,9 +55,8 @@ export function sortFn<R extends Kinded>(
       // When primary key exist sort that priority first
       const primaryCompare = compare(primaryColumn, a, b, primaryInvert, caseSensitive);
       // if both rows are not primary sort equivalent
-      if (primaryCompare !== 0) {
-        return primaryCompare;
-      }
+      if (primaryCompare !== 0) return primaryCompare;
+      // Fall through to the secondary sort
     }
     return column ? compare(column, a, b, invert, caseSensitive) : 0;
   };

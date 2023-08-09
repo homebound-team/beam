@@ -1,5 +1,6 @@
 import { makeAutoObservable, observable, reaction } from "mobx";
 import React from "react";
+import { sortFn } from "src/components";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridSortConfig } from "src/components/Table/GridTable";
 import { GridTableApi } from "src/components/Table/GridTableApi";
@@ -138,6 +139,15 @@ export class TableState {
 
   get sortState(): SortState | undefined {
     return this.sort.current ? this.sort : undefined;
+  }
+
+  /** Returns a client-side sort function, if applicable. */
+  get sortFn(): ((a: RowState, b: RowState) => number) | undefined {
+    const { sortState, sortConfig, visibleColumns } = this;
+    if (!sortState || sortConfig?.on !== "client") return undefined;
+    // sortRows.ts wants to sort based on the GridDataRow, so make a small `rowStateFn` adapter
+    const dataRowFn = sortFn(visibleColumns, sortState, !!sortConfig.caseSensitive);
+    return (a: RowState, b: RowState) => dataRowFn(a.row, b.row);
   }
 
   // Updates the list of rows and regenerates the collapsedRows property if needed.
