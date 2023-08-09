@@ -40,6 +40,8 @@ export class TableState {
   activeRowId: string | undefined = undefined;
   // Keeps track of the 'active' cell, formatted `${row.kind}_${row.id}_${column.name}`
   activeCellId: string | undefined = undefined;
+  /** Stores the current client-side type-ahead search/filter. */
+  search: string[] = [];
 
   // Tracks the current `sortConfig`
   public sortConfig: GridSortConfig | undefined;
@@ -63,6 +65,7 @@ export class TableState {
       // We use `ref`s so that observables can watch the immutable data change w/o deeply proxy-ifying Apollo fragments
       rows: observable.ref,
       columns: observable.ref,
+      search: observable.ref,
     } as any);
 
     // If the kept rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
@@ -152,8 +155,9 @@ export class TableState {
     }
   }
 
-  setSearch(filter: string | undefined): void {
-    this.rowStates.search.setSearch(filter);
+  setSearch(search: string | undefined): void {
+    // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
+    this.search = (search && search.split(/ +/)) || [];
   }
 
   get visibleRows(): RowState[] {

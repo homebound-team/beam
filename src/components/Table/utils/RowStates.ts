@@ -2,7 +2,6 @@ import { ObservableMap } from "mobx";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { RowState } from "src/components/Table/utils/RowState";
 import { RowStorage } from "src/components/Table/utils/RowStorage";
-import { SearchState } from "src/components/Table/utils/SearchState";
 import { TableState } from "src/components/Table/utils/TableState";
 import { HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 
@@ -14,7 +13,6 @@ export class RowStates {
   private map = new ObservableMap<string, RowState>();
   readonly table: TableState;
   readonly storage = new RowStorage(this);
-  readonly search = new SearchState();
   // Pre-create our keptGroupRow for if/when we need it.
   private readonly header: RowState = this.createHeaderRow();
   private keptGroupRow: RowState = this.createKeptGroupRow(this.header);

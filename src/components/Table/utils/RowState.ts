@@ -185,6 +185,7 @@ export class RowState {
     );
   }
 
+  /** The `visibleChildren`, but with the current sort config applied. */
   private get visibleSortedChildren(): RowState[] {
     let rows = this.visibleChildren;
     const { sortState, sortConfig, visibleColumns } = this.states.table;
@@ -242,8 +243,7 @@ export class RowState {
     // go away, go ahead and filter them out here.
     if (this.removed === "hard") return false;
     // Reacts to either search state or visibleColumns state changing
-    const { search: filters } = this.states.search;
-    const { visibleColumns, api } = this.states.table;
+    const { visibleColumns, api, search: filters } = this.states.table;
     return filters.every((f) =>
       visibleColumns
         .map((c) => applyRowFn(c, this.row, api, 0, false))
