@@ -47,7 +47,12 @@ export class RowState {
     makeAutoObservable(this, { row: observable.ref });
   }
 
-  /** Whether we match a client-side filter; true if no filter is in place. */
+  /**
+   * Whether we match a client-side filter; true if no filter is in place.
+   *
+   * We should try and keep this based solely on "does/does not match the filter",
+   * and do any overrides for things like pinning/kept rows/etc. elsewhere.
+   */
   get isMatched(): boolean {
     return (
       this.isDirectlyMatched ||
@@ -159,9 +164,9 @@ export class RowState {
   }
 
   /** Returns this column, if visible, and its children, if expanded. */
-  get maybeSelfAndChildren(): RowState[] {
+  get selfAndMaybeChildren(): RowState[] {
     if (this.children && !this.collapsed) {
-      return [this, ...this.visibleSortedChildren.flatMap((c) => c.maybeSelfAndChildren)];
+      return [this, ...this.visibleSortedChildren.flatMap((c) => c.selfAndMaybeChildren)];
     } else {
       return [this];
     }

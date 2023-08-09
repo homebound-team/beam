@@ -123,7 +123,7 @@ export class RowStates {
   }
 
   get visibleRows(): RowState[] {
-    const rows = this.header.maybeSelfAndChildren;
+    const rows = this.header.selfAndMaybeChildren;
     if (this.header.row === missingHeader) {
       rows.splice(0, 1);
     }
