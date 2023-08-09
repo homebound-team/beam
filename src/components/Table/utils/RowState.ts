@@ -163,7 +163,7 @@ export class RowState {
     return this.row.inferSelectedState !== false;
   }
 
-  /** Returns this column, if visible, and its children, if expanded. */
+  /** Returns this row and, if we're not collapsed, our children. */
   get selfAndMaybeChildren(): RowState[] {
     if (this.children && !this.collapsed) {
       return [this, ...this.visibleSortedChildren.flatMap((c) => c.selfAndMaybeChildren)];
