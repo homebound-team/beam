@@ -489,7 +489,6 @@ describe("GridTable", () => {
       expect(cell(r, 6, 0)).toHaveTextContent("d");
 
       // And when sorted by column 2
-      console.log("clicking");
       click(r.sortHeader_1);
       // Then the `value: 1` row is first
       expect(cell(r, 6, 0)).toHaveTextContent("b");

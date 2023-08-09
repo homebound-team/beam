@@ -2,7 +2,7 @@ import { makeAutoObservable, observable } from "mobx";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { SelectedState } from "src/components/Table/utils/TableState";
-import { applyRowFn, KEPT_GROUP, matchesFilter, reservedRowKinds } from "src/components/Table/utils/utils";
+import { applyRowFn, HEADER, KEPT_GROUP, matchesFilter, reservedRowKinds } from "src/components/Table/utils/utils";
 
 /**
  * A reactive/observable state of each GridDataRow's current behavior.
@@ -164,7 +164,8 @@ export class RowState {
 
   /** Returns this row and, if we're not collapsed, our children. */
   get selfAndMaybeChildren(): RowState[] {
-    if (this.children && !this.collapsed) {
+    // The header always returns all children/top rows, even if collapsed
+    if (this.children && (!this.collapsed || this.row.kind === HEADER)) {
       return [this, ...this.visibleSortedChildren.flatMap((c) => c.selfAndMaybeChildren)];
     } else {
       return [this];

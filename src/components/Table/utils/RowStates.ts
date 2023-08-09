@@ -110,7 +110,7 @@ export class RowStates {
     } else {
       rs.toggleCollapsed();
       // Ignore the kept group
-      const topGroupRows = this.topRows.filter((rs) => !rs.isReservedKind && !rs.children);
+      const topGroupRows = this.topRows.filter((rs) => !rs.isReservedKind && rs.children);
       if (topGroupRows.length > 0) {
         // The header might still be collapsed, even though the user has opened all the top-level rows
         if (topGroupRows.every((rs) => !rs.collapsed)) this.header.collapsed = false;
