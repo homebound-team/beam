@@ -260,68 +260,72 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
 
   // Flatten, hide-if-filtered, hide-if-collapsed, and component-ize the sorted rows.
-  let [tableHeadRows, visibleDataRows, keptSelectedRows]: [RowTuple<R>[], RowTuple<R>[], RowTuple<R>[]] =
-    useComputed(() => {
-      const columns = tableState.visibleColumns;
+  const [tableHeadRows, visibleDataRows, keptSelectedRows, tooManyClientSideRows]: [
+    RowTuple<R>[],
+    RowTuple<R>[],
+    RowTuple<R>[],
+    boolean,
+  ] = useComputed(() => {
+    const columns = tableState.visibleColumns;
 
-      // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
-      const headerRows: RowTuple<R>[] = [];
-      const expandableHeaderRows: RowTuple<R>[] = [];
-      const totalsRows: RowTuple<R>[] = [];
-      const visibleDataRows: RowTuple<R>[] = [];
-      const keptSelectedRows: RowTuple<R>[] = [];
+    // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
+    const headerRows: RowTuple<R>[] = [];
+    const expandableHeaderRows: RowTuple<R>[] = [];
+    const totalsRows: RowTuple<R>[] = [];
+    const keptSelectedRows: RowTuple<R>[] = [];
+    let visibleDataRows: RowTuple<R>[] = [];
 
-      const { visibleRows, keptRows } = tableState;
-      const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
+    const { visibleRows, keptRows } = tableState;
+    const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
 
-      // Get the flat list or rows from the header down...
-      visibleRows.forEach((rs) => {
-        const row = rs.row;
-        const tuple = [
-          row,
-          <Row
-            key={`${row.kind}-${row.id}`}
-            {...{
-              as,
-              columns,
-              row,
-              style,
-              rowStyles,
-              columnSizes,
-              level: 1,
-              getCount,
-              api,
-              cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
-              omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
-              hasExpandableHeader,
-              isKeptSelectedRow: rs.isKept,
-              isLastKeptSelectionRow: keptRows[keptRows.length - 1] === rs.row,
-            }}
-          />,
-        ] as RowTuple<R>;
-        if (row.kind === "header") {
-          headerRows.push(tuple);
-        } else if (row.kind === "expandableHeader") {
-          expandableHeaderRows.push(tuple);
-        } else if (row.kind === "totals") {
-          totalsRows.push(tuple);
-        } else if (rs.isKept || row.kind === KEPT_GROUP) {
-          keptSelectedRows.push(tuple);
-        } else {
-          visibleDataRows.push(tuple);
-        }
-      });
+    // Get the flat list or rows from the header down...
+    visibleRows.forEach((rs) => {
+      const row = rs.row;
+      const tuple = [
+        row,
+        <Row
+          key={`${row.kind}-${row.id}`}
+          {...{
+            as,
+            columns,
+            row,
+            style,
+            rowStyles,
+            columnSizes,
+            level: 1,
+            getCount,
+            api,
+            cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
+            omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
+            hasExpandableHeader,
+            isKeptSelectedRow: rs.isKept,
+            isLastKeptSelectionRow: keptRows[keptRows.length - 1] === rs.row,
+          }}
+        />,
+      ] as RowTuple<R>;
+      if (row.kind === "header") {
+        headerRows.push(tuple);
+      } else if (row.kind === "expandableHeader") {
+        expandableHeaderRows.push(tuple);
+      } else if (row.kind === "totals") {
+        totalsRows.push(tuple);
+      } else if (rs.isKept || row.kind === KEPT_GROUP) {
+        keptSelectedRows.push(tuple);
+      } else {
+        visibleDataRows.push(tuple);
+      }
+    });
 
-      // Once our header rows are created we can organize them in expected order.
-      const tableHeadRows = expandableHeaderRows.concat(headerRows).concat(totalsRows);
+    // Once our header rows are created we can organize them in expected order.
+    const tableHeadRows = expandableHeaderRows.concat(headerRows).concat(totalsRows);
 
-      return [tableHeadRows, visibleDataRows, keptSelectedRows];
-    }, [as, api, style, rowStyles, maybeStyle, columnSizes, getCount]);
+    const tooManyClientSideRows = !!filterMaxRows && visibleDataRows.length > filterMaxRows;
+    if (tooManyClientSideRows) {
+      visibleDataRows = visibleDataRows.slice(0, filterMaxRows + keptSelectedRows.length);
+    }
 
-  const tooManyClientSideRows = filterMaxRows && visibleDataRows.length > filterMaxRows;
-  if (tooManyClientSideRows) {
-    visibleDataRows = visibleDataRows.slice(0, filterMaxRows + keptSelectedRows.length);
-  }
+    return [tableHeadRows, visibleDataRows, keptSelectedRows, tooManyClientSideRows];
+  }, [as, api, style, rowStyles, maybeStyle, columnSizes, getCount, filterMaxRows]);
 
   // Push back to the caller a way to ask us where a row is.
   const { rowLookup } = props;
