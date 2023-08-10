@@ -236,7 +236,8 @@ export class RowState {
   }
 
   private get isDirectlyMatched(): boolean {
-    // Reserved rows like the header can never be directly matched, throws off select all behavior
+    // Reserved rows like the header can never be directly matched, and treating them
+    // as matched currently throws off the header's select all/etc. behavior
     if (this.isReservedKind) return false;
     // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
     // rows should be removed from `this.children` anyway, by a change to `props.rows`,
@@ -244,11 +245,11 @@ export class RowState {
     // go away, go ahead and filter them out here.
     if (this.removed === "hard") return false;
     // Reacts to either search state or visibleColumns state changing
-    const { visibleColumns, api, search: filters } = this.states.table;
-    return filters.every((f) =>
+    const { visibleColumns, api, search } = this.states.table;
+    return search.every((term) =>
       visibleColumns
         .map((c) => applyRowFn(c, this.row, api, 0, false))
-        .some((maybeContent) => matchesFilter(maybeContent, f)),
+        .some((maybeContent) => matchesFilter(maybeContent, term)),
     );
   }
 

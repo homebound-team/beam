@@ -13,8 +13,10 @@ export class RowStates {
   private map = new ObservableMap<string, RowState>();
   readonly table: TableState;
   readonly storage = new RowStorage(this);
-  // Pre-create our keptGroupRow for if/when we need it.
+  // Pre-create the header to drive select-all/etc. behavior, even if the user
+  // doesn't pass an explicit `header` GridDataRow in `rows.props`
   private readonly header: RowState = this.createHeaderRow();
+  // Pre-create our keptGroupRow for if/when we need it.
   private keptGroupRow: RowState = this.createKeptGroupRow(this.header);
   /** The first level of rows, i.e. not the header (or kept group), but the totals + top-level children. */
   private topRows: RowState[] = [];
