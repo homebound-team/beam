@@ -183,8 +183,9 @@ export class RowState {
     return (
       this.children?.filter(
         (rs) =>
-          // Reserved rows are always visible, even though they're not considered matched
-          // ...except for the kept group
+          // Reserved rows are always visible, even though they're not considered matched.
+          // ...except for the kept group: its `isMatched` will become true whenever it has
+          // any kept row children, as they will cause its hasDirectlyMatchedChildren to be true.
           (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) || rs.isMatched || rs.isPinned,
       ) ?? []
     );
