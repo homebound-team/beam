@@ -56,9 +56,9 @@ export class RowState {
     return (
       this.isDirectlyMatched ||
       // A matched parent means show all it's children
-      (this.parent && this.parent.isDirectlyMatched) ||
+      this.hasDirectlyMatchedParent ||
       // An unmatched parent but with matched children means show the parent
-      this.hasMatchedChildren
+      this.hasDirectlyMatchedChildren
     );
   }
 
@@ -224,12 +224,15 @@ export class RowState {
   }
 
   /** A dedicated method to "looking down" recursively, to avoid loops in `isMatched`. */
-  private get hasMatchedChildren(): boolean {
+  private get hasDirectlyMatchedChildren(): boolean {
     // The keptGroup is special and its children are the dynamically kept rows
     if (this.row.kind === KEPT_GROUP) return this.states.keptRows.length > 0;
-    // We include `isKept` because ironically the "kept group" having "visible children"
-    // means "children that are not visible" i.e. kept.
-    return !!this.children && this.children.some((c) => c.isDirectlyMatched || c.hasMatchedChildren);
+    return !!this.children && this.children.some((c) => c.isDirectlyMatched || c.hasDirectlyMatchedChildren);
+  }
+
+  /** A dedicated method to "looking up" recursively, to avoid loops in `isMatched`. */
+  private get hasDirectlyMatchedParent(): boolean {
+    return !!this.parent && (this.parent.isDirectlyMatched || this.parent.hasDirectlyMatchedParent);
   }
 
   private get isDirectlyMatched(): boolean {
