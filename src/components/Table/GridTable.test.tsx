@@ -551,7 +551,7 @@ describe("GridTable", () => {
         <GridTable
           columns={[nameColumn, valueColumn]}
           // And there is an initial sort defined
-          sorting={{ on: "client", initial: ["someInvalidId", "ASC"] }}
+          sorting={{ on: "client", initial: ["someRandomId", "ASC"] }}
           rows={[
             simpleHeader,
             { kind: "data", id: "1", data: { name: "a", value: 2 } },
