@@ -292,7 +292,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             style,
             rowStyles,
             columnSizes,
-            level: 1,
+            level: rs.level,
             getCount,
             api,
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,

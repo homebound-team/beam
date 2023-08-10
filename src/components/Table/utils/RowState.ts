@@ -158,6 +158,11 @@ export class RowState {
     );
   }
 
+  get level(): number {
+    // Make the header level -1, so the top-level rows are level 0
+    return !this.parent ? -1 : this.parent.level + 1;
+  }
+
   private get inferSelectedState(): boolean {
     return this.row.inferSelectedState !== false;
   }
@@ -192,11 +197,6 @@ export class RowState {
     // We need to make a copy for mobx to see the sort as a change, and also to not mutate
     // the original/unsorted array if we need to revert to the original sort order.
     if (sortFn) rows = [...rows].sort(sortFn);
-    // console.log(
-    //   "sorted",
-    //   this.row.id,
-    //   rows.map((rs) => rs.row.id),
-    // );
     return rows;
   }
 
