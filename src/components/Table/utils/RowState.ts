@@ -2,7 +2,7 @@ import { makeAutoObservable, observable } from "mobx";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { SelectedState } from "src/components/Table/utils/TableState";
-import { KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
+import { applyRowFn, HEADER, KEPT_GROUP, matchesFilter, reservedRowKinds } from "src/components/Table/utils/utils";
 
 /**
  * A reactive/observable state of each GridDataRow's current behavior.
@@ -15,8 +15,6 @@ export class RowState {
   row: GridDataRow<any>;
   /** Our children row states, as of the latest `props.rows`, without any filtering applied. */
   children: RowState[] | undefined = undefined;
-  /** Whether we match a client-side filter; true if no filter is in place. */
-  isMatched = true;
   /** Whether we are *directly* selected. */
   selected = false;
   /** Whether we are collapsed. */
@@ -41,15 +39,27 @@ export class RowState {
    */
   removed: false | "soft" | "hard" = false;
 
-  // ...eventually...
-  // isDirectlyMatched = accept filters in the constructor and do match here
-  // isEffectiveMatched = isDirectlyMatched || hasMatchedChildren
-
-  constructor(private states: RowStates, row: GridDataRow<any>) {
+  constructor(private states: RowStates, public parent: RowState | undefined, row: GridDataRow<any>) {
     this.row = row;
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
     makeAutoObservable(this, { row: observable.ref });
+  }
+
+  /**
+   * Whether we match a client-side filter; true if no filter is in place.
+   *
+   * We should try and keep this based solely on "does/does not match the filter",
+   * and do any overrides for things like pinning/kept rows/etc. elsewhere.
+   */
+  get isMatched(): boolean {
+    return (
+      this.isDirectlyMatched ||
+      // A matched parent means show all it's children
+      this.hasDirectlyMatchedParent ||
+      // An unmatched parent but with matched children means show the parent
+      this.hasDirectlyMatchedChildren
+    );
   }
 
   /**
@@ -142,24 +152,53 @@ export class RowState {
     return (
       this.selected &&
       // Headers, totals, etc., do not need keeping
-      !reservedRowKinds.includes(this.row.kind) &&
+      !this.isReservedKind &&
       !this.isParent &&
       (!this.isMatched || this.removed === "soft")
     );
+  }
+
+  get level(): number {
+    // Make the header level -1, so the top-level rows are level 0
+    return !this.parent ? -1 : this.parent.level + 1;
   }
 
   private get inferSelectedState(): boolean {
     return this.row.inferSelectedState !== false;
   }
 
+  /** Returns this row and, if we're not collapsed, our children. */
+  get selfAndMaybeChildren(): RowState[] {
+    // The header always returns all children/top rows, even if collapsed
+    if (this.children && (!this.collapsed || this.row.kind === HEADER)) {
+      return [this, ...this.visibleSortedChildren.flatMap((c) => c.selfAndMaybeChildren)];
+    } else {
+      return [this];
+    }
+  }
+
   private get visibleChildren(): RowState[] {
     // The keptGroup is special and its children are the dynamically kept rows
     if (this.row.kind === KEPT_GROUP) return this.states.keptRows;
-    // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
-    // rows should be removed from `this.children` anyway, by a change to `props.rows`,
-    // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
-    // go away, go ahead and filter them out here.
-    return this.children?.filter((c) => c.isMatched === true && c.removed !== "hard") ?? [];
+    return (
+      this.children?.filter(
+        (rs) =>
+          // Reserved rows are always visible, even though they're not considered matched.
+          // ...except for the kept group: its `isMatched` will become true whenever it has
+          // any kept row children, as they will cause its hasDirectlyMatchedChildren to be true.
+          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) || rs.isMatched || rs.isPinned,
+      ) ?? []
+    );
+  }
+
+  /** The `visibleChildren`, but with the current sort config applied. */
+  private get visibleSortedChildren(): RowState[] {
+    let rows = this.visibleChildren;
+    const { sortFn } = this.states.table;
+    // We need to make a copy for mobx to see the sort as a change, and also to not mutate
+    // the original/unsorted array if we need to revert to the original sort order.
+    if (sortFn) rows = [...rows].sort(sortFn);
+    return rows;
   }
 
   /**
@@ -175,6 +214,44 @@ export class RowState {
    */
   private get isParent(): boolean {
     return !!this.children && this.children.length > 0 && this.inferSelectedState;
+  }
+
+  private get isPinned(): boolean {
+    return typeof this.row.pin === "string" || (!!this.row.pin && this.row.pin.filter !== true);
+  }
+
+  public get isReservedKind(): boolean {
+    return reservedRowKinds.includes(this.row.kind);
+  }
+
+  /** A dedicated method to "looking down" recursively, to avoid loops in `isMatched`. */
+  private get hasDirectlyMatchedChildren(): boolean {
+    // The keptGroup is special and its children are the dynamically kept rows
+    if (this.row.kind === KEPT_GROUP) return this.states.keptRows.length > 0;
+    return !!this.children && this.children.some((c) => c.isDirectlyMatched || c.hasDirectlyMatchedChildren);
+  }
+
+  /** A dedicated method to "looking up" recursively, to avoid loops in `isMatched`. */
+  private get hasDirectlyMatchedParent(): boolean {
+    return !!this.parent && (this.parent.isDirectlyMatched || this.parent.hasDirectlyMatchedParent);
+  }
+
+  private get isDirectlyMatched(): boolean {
+    // Reserved rows like the header can never be directly matched, and treating them
+    // as matched currently throws off the header's select all/etc. behavior
+    if (this.isReservedKind) return false;
+    // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
+    // rows should be removed from `this.children` anyway, by a change to `props.rows`,
+    // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
+    // go away, go ahead and filter them out here.
+    if (this.removed === "hard") return false;
+    // Reacts to either search state or visibleColumns state changing
+    const { visibleColumns, api, search } = this.states.table;
+    return search.every((term) =>
+      visibleColumns
+        .map((c) => applyRowFn(c, this.row, api, 0, false))
+        .some((maybeContent) => matchesFilter(maybeContent, term)),
+    );
   }
 
   /** Pretty toString. */

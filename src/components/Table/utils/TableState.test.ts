@@ -1,10 +1,11 @@
+import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { deriveSortState, TableState } from "src/components/Table/utils/TableState";
 import { ASC, DESC } from "src/components/Table/utils/utils";
 
 describe(TableState, () => {
   it("preserves expanded state", () => {
     // Given some column definitions and initial state
-    const state = new TableState();
+    const state = new GridTableApiImpl().tableState;
     const columns = [{ id: "one" }, { id: "two" }];
     state.setColumns(columns, undefined);
 

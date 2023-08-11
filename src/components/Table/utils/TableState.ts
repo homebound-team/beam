@@ -1,9 +1,12 @@
 import { makeAutoObservable, observable, reaction } from "mobx";
 import React from "react";
+import { sortFn } from "src/components";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridSortConfig } from "src/components/Table/GridTable";
+import { GridTableApi } from "src/components/Table/GridTableApi";
 import { Direction, GridColumnWithId } from "src/components/Table/types";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
+import { RowState } from "src/components/Table/utils/RowState";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { ASC, DESC, HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 
@@ -31,12 +34,15 @@ export class TableState {
   private rows: GridDataRow<any>[] = [];
   // The current list of columns, basically a useRef.current. Only ref reactive.
   public columns: GridColumnWithId<any>[] = [];
-  private readonly rowStates = new RowStates();
+  public readonly api: GridTableApi<any>;
+  private readonly rowStates = new RowStates(this);
   private readonly columnStates = new ColumnStates();
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
   activeRowId: string | undefined = undefined;
   // Keeps track of the 'active' cell, formatted `${row.kind}_${row.id}_${column.name}`
   activeCellId: string | undefined = undefined;
+  /** Stores the current client-side type-ahead search/filter. */
+  search: string[] = [];
 
   // Tracks the current `sortConfig`
   public sortConfig: GridSortConfig | undefined;
@@ -51,13 +57,16 @@ export class TableState {
   /**
    * Creates the `RowState` for a given `GridTable`.
    */
-  constructor() {
+  constructor(api: GridTableApi<any>) {
+    this.api = api;
+
     // Make ourselves an observable so that mobx will do caching of .collapseIds so
     // that it'll be a stable identity for GridTable to useMemo against.
     makeAutoObservable(this, {
       // We use `ref`s so that observables can watch the immutable data change w/o deeply proxy-ifying Apollo fragments
       rows: observable.ref,
       columns: observable.ref,
+      search: observable.ref,
     } as any);
 
     // If the kept rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
@@ -132,6 +141,15 @@ export class TableState {
     return this.sort.current ? this.sort : undefined;
   }
 
+  /** Returns a client-side sort function, if applicable. */
+  get sortFn(): ((a: RowState, b: RowState) => number) | undefined {
+    const { sortState, sortConfig, visibleColumns } = this;
+    if (!sortState || sortConfig?.on !== "client") return undefined;
+    // sortRows.ts wants to sort based on the GridDataRow, so make a small `rowStateFn` adapter
+    const dataRowFn = sortFn(visibleColumns, sortState, !!sortConfig.caseSensitive);
+    return (a: RowState, b: RowState) => dataRowFn(a.row, b.row);
+  }
+
   // Updates the list of rows and regenerates the collapsedRows property if needed.
   setRows(rows: GridDataRow<any>[]): void {
     if (rows !== this.rows) {
@@ -145,6 +163,15 @@ export class TableState {
       this.columnStates.setColumns(columns, visibleColumnsStorageKey);
       this.columns = columns;
     }
+  }
+
+  setSearch(search: string | undefined): void {
+    // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
+    this.search = (search && search.split(/ +/)) || [];
+  }
+
+  get visibleRows(): RowState[] {
+    return this.rowStates.visibleRows;
   }
 
   /** Returns visible columns, i.e. those that are visible + any expanded children. */
@@ -180,11 +207,6 @@ export class TableState {
 
   loadExpandedColumns(columnId: string): Promise<void> {
     return this.columnStates.get(columnId).doExpand();
-  }
-
-  /** Called when GridTable has re-calced the rows that pass the client-side filter, or all rows. */
-  setMatchedRows(rowIds: string[]): void {
-    this.rowStates.setMatchedRows(rowIds);
   }
 
   /** Returns selected data rows (non-header, non-totals, etc.), ignoring rows that have `row.selectable !== false`. */

@@ -1,5 +1,4 @@
 import memoizeOne from "memoize-one";
-import { toJS } from "mobx";
 import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef } from "react";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
@@ -13,22 +12,13 @@ import {
   GridTableXss,
   InfiniteScroll,
   Kinded,
-  ParentChildrenTuple,
   RenderAs,
   RowTuple,
 } from "src/components/Table/types";
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { createRowLookup, GridRowLookup } from "src/components/Table/utils/GridRowLookup";
-import { sortRows } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import {
-  applyRowFn,
-  EXPANDABLE_HEADER,
-  KEPT_GROUP,
-  matchesFilter,
-  reservedRowKinds,
-  zIndices,
-} from "src/components/Table/utils/utils";
+import { EXPANDABLE_HEADER, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
@@ -247,11 +237,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // Once the `TableState.sort` is defined, it will not re-initialize.
   tableState.initSortState(props.sorting, columns);
 
-  const [sortOn, caseSensitive] = useComputed(() => {
-    const { sortConfig } = tableState;
-    return [sortConfig?.on, sortConfig?.on === "client" ? !!sortConfig.caseSensitive : false];
-  }, [tableState]);
-
   useEffect(() => {
     tableState.activeRowId = activeRowId;
   }, [tableState, activeRowId]);
@@ -259,6 +244,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   useEffect(() => {
     tableState.activeCellId = activeCellId;
   }, [tableState, activeCellId]);
+
+  useEffect(() => {
+    tableState.setSearch(filter);
+  }, [tableState, filter]);
 
   // We track render count at the table level, which seems odd (we should be able to track this
   // internally within each GridRow using a useRef), but we have suspicions that react-virtuoso
@@ -270,141 +259,73 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
 
-  // Make a single copy of our current collapsed state, so we'll have a single observer.
-  const collapsedIds = useComputed(() => tableState.collapsedIds, [tableState]);
-  const sortState = useComputed(() => toJS(tableState.sortState), [tableState]);
-
-  const maybeSorted = useMemo(() => {
-    if (sortOn === "client" && sortState) {
-      // If using client-side sort, the sortState use S = number
-      return sortRows(columns, rows, sortState, caseSensitive);
-    }
-    return rows;
-  }, [columns, rows, sortOn, sortState, caseSensitive]);
-
-  const [keptGroupRow, keptDataRows] = useComputed(
-    () => [tableState.keptRowGroup, tableState.keptRows as GridDataRow<R>[]],
-    [tableState],
-  );
-  // Sort the `keptSelectedDataRows` separately because the current sorting logic sorts within groups and these "kept" rows are now displayed in a flat list.
-  // It could also be the case that some of these rows are no longer in the `props.rows` list, and so wouldn't be sorted by the `maybeSorted` logic above.
-  const sortedKeptSelections = useMemo(() => {
-    if (sortOn === "client" && sortState && keptDataRows.length > 0) {
-      return sortRows(columns, keptDataRows, sortState, caseSensitive);
-    }
-    return keptDataRows;
-  }, [columns, sortOn, sortState, caseSensitive, keptDataRows]);
-
   // Flatten, hide-if-filtered, hide-if-collapsed, and component-ize the sorted rows.
-  let [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, keptSelectedRows, filteredRowIds]: [
+  const [tableHeadRows, visibleDataRows, keptSelectedRows, tooManyClientSideRows]: [
     RowTuple<R>[],
     RowTuple<R>[],
     RowTuple<R>[],
-    RowTuple<R>[],
-    RowTuple<R>[],
-    string[],
-  ] = useMemo(() => {
-    const hasExpandableHeader = maybeSorted.some((row) => row.id === EXPANDABLE_HEADER);
-    const makeRowComponent = (
-      row: GridDataRow<R>,
-      level: number,
-      isKeptSelectedRow: boolean = false,
-      isLastKeptSelectionRow: boolean = false,
-    ) => (
-      <Row
-        key={`${row.kind}-${row.id}`}
-        {...{
-          as,
-          columns,
-          row,
-          style,
-          rowStyles,
-          columnSizes,
-          level,
-          getCount,
-          api,
-          cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
-          omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
-          hasExpandableHeader,
-          isKeptSelectedRow,
-          isLastKeptSelectionRow,
-        }}
-      />
-    );
+    boolean,
+  ] = useComputed(() => {
+    const columns = tableState.visibleColumns;
 
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: RowTuple<R>[] = [];
     const expandableHeaderRows: RowTuple<R>[] = [];
     const totalsRows: RowTuple<R>[] = [];
-    const visibleDataRows: RowTuple<R>[] = [];
     const keptSelectedRows: RowTuple<R>[] = [];
+    let visibleDataRows: RowTuple<R>[] = [];
 
-    // Flatten the tuple tree into lists of rows
-    function visitRows(tuples: ParentChildrenTuple<R>[], level: number): void {
-      tuples.forEach(([row, children]) => {
-        if (row.kind === "header") {
-          headerRows.push([row, makeRowComponent(row, level)]);
-        } else if (row.kind === "totals") {
-          totalsRows.push([row, makeRowComponent(row, level)]);
-        } else if (row.kind === "expandableHeader") {
-          expandableHeaderRows.push([row, makeRowComponent(row, level)]);
-        } else {
-          visibleDataRows.push([row, makeRowComponent(row, level)]);
-          // tuples has already been client-side filtered, so just check collapsed
-          if (children.length && !collapsedIds.includes(row.id)) {
-            visitRows(children, level + 1);
-          }
-        }
-      });
-    }
+    const { visibleRows, keptRows } = tableState;
+    const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
 
-    // Call `visitRows` with our post-filtered list
-    const [filteredRowIds, filteredRows] = filterRows(api, columns, maybeSorted, filter);
-    visitRows(filteredRows, 0);
-
-    // Check for any selected rows that are not displayed in the table because they don't
-    // match the current filter, or are no longer part of the `rows` prop. We persist these
-    // selected rows and hoist them to the top of the table.
-    if (sortedKeptSelections.length) {
-      keptSelectedRows.push([keptGroupRow as GridDataRow<R>, makeRowComponent(keptGroupRow as GridDataRow<R>, 1)]);
-      if (!collapsedIds.includes(KEPT_GROUP)) {
-        keptSelectedRows.push(
-          ...sortedKeptSelections.map((row, idx) => {
-            const isLast = idx === sortedKeptSelections.length - 1;
-            return [row, makeRowComponent(row, 1, true, isLast)] as RowTuple<R>;
-          }),
-        );
+    // Get the flat list or rows from the header down...
+    visibleRows.forEach((rs) => {
+      const row = rs.row;
+      const tuple = [
+        row,
+        <Row
+          key={`${row.kind}-${row.id}`}
+          {...{
+            as,
+            columns,
+            row,
+            style,
+            rowStyles,
+            columnSizes,
+            level: rs.level,
+            getCount,
+            api,
+            cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
+            omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
+            hasExpandableHeader,
+            isKeptSelectedRow: rs.isKept,
+            isLastKeptSelectionRow: keptRows[keptRows.length - 1] === rs.row,
+          }}
+        />,
+      ] as RowTuple<R>;
+      if (row.kind === "header") {
+        headerRows.push(tuple);
+      } else if (row.kind === "expandableHeader") {
+        expandableHeaderRows.push(tuple);
+      } else if (row.kind === "totals") {
+        totalsRows.push(tuple);
+      } else if (rs.isKept || row.kind === KEPT_GROUP) {
+        keptSelectedRows.push(tuple);
+      } else {
+        visibleDataRows.push(tuple);
       }
+    });
+
+    // Once our header rows are created we can organize them in expected order.
+    const tableHeadRows = expandableHeaderRows.concat(headerRows).concat(totalsRows);
+
+    const tooManyClientSideRows = !!filterMaxRows && visibleDataRows.length > filterMaxRows;
+    if (tooManyClientSideRows) {
+      visibleDataRows = visibleDataRows.slice(0, filterMaxRows + keptSelectedRows.length);
     }
 
-    return [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, keptSelectedRows, filteredRowIds];
-  }, [
-    as,
-    api,
-    filter,
-    maybeSorted,
-    columns,
-    style,
-    rowStyles,
-    maybeStyle,
-    columnSizes,
-    collapsedIds,
-    getCount,
-    keptGroupRow,
-    sortedKeptSelections,
-  ]);
-
-  // Once our header rows are created we can organize them in expected order.
-  const tableHeadRows = expandableHeaderRows.concat(headerRows).concat(totalsRows);
-
-  const tooManyClientSideRows = filterMaxRows && visibleDataRows.length > filterMaxRows;
-  if (tooManyClientSideRows) {
-    visibleDataRows = visibleDataRows.slice(0, filterMaxRows + keptSelectedRows.length);
-  }
-
-  useEffect(() => {
-    tableState.setMatchedRows(filteredRowIds);
-  }, [tableState, filteredRowIds]);
+    return [tableHeadRows, visibleDataRows, keptSelectedRows, tooManyClientSideRows];
+  }, [as, api, style, rowStyles, maybeStyle, columnSizes, getCount, filterMaxRows]);
 
   // Push back to the caller a way to ask us where a row is.
   const { rowLookup } = props;
@@ -743,57 +664,3 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
     });
   },
 );
-
-/**
- * Filters rows given a client-side text `filter.
- *
- * Ensures parent rows remain in the list if any children match the filter.
- *
- * We return a copy of `[Parent, [Child]]` tuples so that we don't modify the `GridDataRow.children`.
- */
-export function filterRows<R extends Kinded>(
-  api: GridTableApi<R>,
-  columns: GridColumnWithId<R>[],
-  rows: GridDataRow<R>[],
-  filter: string | undefined,
-): [string[], ParentChildrenTuple<R>[]] {
-  // Make a flat list of ids, in addition to the tuple tree
-  const filteredRowIds: string[] = [];
-  // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
-  const filters = (filter && filter.split(/ +/)) || [];
-
-  // Make a functions to do recursion
-  function acceptAll(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
-    filteredRowIds.push(row.id);
-    return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
-  }
-
-  function filterFn(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
-    const matches =
-      reservedRowKinds.includes(row.kind) ||
-      filters.length === 0 ||
-      filters.every((f) =>
-        columns.map((c) => applyRowFn(c, row, api, 0, false)).some((maybeContent) => matchesFilter(maybeContent, f)),
-      );
-    if (matches) {
-      filteredRowIds.push(row.id);
-      // A matched parent means show all it's children
-      return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
-    } else {
-      // An unmatched parent but with matched children means show the parent
-      const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
-      if (
-        matchedChildren.length > 0 ||
-        typeof row.pin === "string" ||
-        (row.pin !== undefined && row.pin.filter !== true)
-      ) {
-        filteredRowIds.push(row.id);
-        return acc.concat([[row, matchedChildren]]);
-      } else {
-        return acc;
-      }
-    }
-  }
-
-  return [filteredRowIds, rows.reduce(filterFn, [])];
-}

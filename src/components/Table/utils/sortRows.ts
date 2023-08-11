@@ -6,29 +6,31 @@ import { SortOn, SortState } from "src/components/Table/utils/TableState";
 import { applyRowFn } from "src/components/Table/utils/utils";
 
 // Returns a shallow copy of the `rows` parameter sorted based on `sortState`
+// We really only use this for tests; in production the RowState.visibleSortedChildren uses the sortFn
 export function sortRows<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   rows: GridDataRow<R>[],
   sortState: SortState,
   caseSensitive: boolean,
 ): GridDataRow<R>[] {
-  const sorted = sortBatch(columns, rows, sortState, caseSensitive);
+  const fn = sortFn(columns, sortState, caseSensitive);
+  // Sort this level first
+  const sorted = [...rows].sort(fn);
   // Recursively sort child rows
   sorted.forEach((row, i) => {
     if (row.children) {
       sorted[i].children = sortRows(columns, row.children, sortState, caseSensitive);
     }
   });
-
   return sorted;
 }
 
-function sortBatch<R extends Kinded>(
+/** Creates a comparator for two GridDataRows based on the current sortState. */
+export function sortFn<R extends Kinded>(
   columns: GridColumnWithId<R>[],
-  batch: GridDataRow<R>[],
   sortState: SortState,
   caseSensitive: boolean,
-): GridDataRow<R>[] {
+): (a: GridDataRow<R>, b: GridDataRow<R>) => number {
   // When client-side sort, the sort value is the column index
   const { current, persistent } = sortState ?? {};
   const { columnId, direction } = current ?? {};
@@ -39,8 +41,7 @@ function sortBatch<R extends Kinded>(
   const primaryInvert = persistentSortDirection === "DESC";
   const primaryColumn = persistentSortColumnId && columns.find((c) => c.id! === persistentSortColumnId);
 
-  // Make a shallow copy for sorting to avoid mutating the original list
-  return [...batch].sort((a, b) => {
+  return (a, b) => {
     if (a.pin || b.pin) {
       // If both rows are pinned, we don't sort within them, because by pinning the page is taking
       // explicit ownership over the order of the rows (and we also don't support "levels of pins",
@@ -54,12 +55,11 @@ function sortBatch<R extends Kinded>(
       // When primary key exist sort that priority first
       const primaryCompare = compare(primaryColumn, a, b, primaryInvert, caseSensitive);
       // if both rows are not primary sort equivalent
-      if (primaryCompare !== 0) {
-        return primaryCompare;
-      }
+      if (primaryCompare !== 0) return primaryCompare;
+      // Fall through to the secondary sort
     }
     return column ? compare(column, a, b, invert, caseSensitive) : 0;
-  });
+  };
 }
 
 function getPin(pin: string | Pin | undefined) {

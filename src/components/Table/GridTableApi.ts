@@ -60,7 +60,7 @@ export type GridTableApi<R extends Kinded> = {
 // Using `FooImpl`to keep the public GridTableApi definition separate.
 export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   // This is public to GridTable but not exported outside of Beam
-  readonly tableState: TableState = new TableState();
+  readonly tableState: TableState = new TableState(this);
   virtuosoRef: MutableRefObject<VirtuosoHandle | null> = { current: null };
 
   /** Called once by the GridTable when it takes ownership of this api instance. */

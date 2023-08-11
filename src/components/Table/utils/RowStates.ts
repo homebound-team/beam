@@ -2,6 +2,7 @@ import { ObservableMap } from "mobx";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { RowState } from "src/components/Table/utils/RowState";
 import { RowStorage } from "src/components/Table/utils/RowStorage";
+import { TableState } from "src/components/Table/utils/TableState";
 import { HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 
 /**
@@ -10,14 +11,19 @@ import { HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils
 export class RowStates {
   // A flat map of all row id -> RowState
   private map = new ObservableMap<string, RowState>();
-  storage = new RowStorage(this);
+  readonly table: TableState;
+  readonly storage = new RowStorage(this);
+  // Pre-create the header to drive select-all/etc. behavior, even if the user
+  // doesn't pass an explicit `header` GridDataRow in `rows.props`
+  private readonly header: RowState = this.createHeaderRow();
   // Pre-create our keptGroupRow for if/when we need it.
-  private keptGroupRow: RowState = this.createKeptGroupRow();
-  private header: RowState | undefined = undefined;
+  private keptGroupRow: RowState = this.createKeptGroupRow(this.header);
   /** The first level of rows, i.e. not the header (or kept group), but the totals + top-level children. */
   private topRows: RowState[] = [];
 
-  constructor() {
+  constructor(table: TableState) {
+    this.table = table;
+    this.map.set(this.header.row.id, this.header);
     this.map.set(this.keptGroupRow.row.id, this.keptGroupRow);
   }
 
@@ -43,37 +49,32 @@ export class RowStates {
     const states = this;
     const map = this.map;
 
-    function addRowAndChildren(row: GridDataRow<any>): RowState {
+    function addRowAndChildren(parent: RowState | undefined, row: GridDataRow<any>): RowState {
       // This should really be kind+id, but a lot of our lookups just use id
       const key = row.id;
       let state = map.get(key);
       if (!state) {
-        state = new RowState(states, row);
+        state = new RowState(states, parent, row);
         map.set(key, state);
       } else {
+        state.parent = parent;
         state.row = row;
         state.removed = false;
         existing.delete(state);
       }
-      state.children = row.children?.map((child) => addRowAndChildren(child));
+      state.children = row.children?.map((child) => addRowAndChildren(state, child));
       return state;
     }
 
     // Probe for the header row, so we can create it as a root RowState, even
     // though we don't require the user to model their GridDataRows that way.
     const headerRow = rows.find((r) => r.kind === HEADER);
-    this.header = headerRow ? addRowAndChildren(headerRow) : undefined;
+    this.header.row = headerRow || missingHeader;
     // Add the top-level rows
-    this.topRows = rows.filter((row) => row !== headerRow).map((row) => addRowAndChildren(row));
-    // And attach them to the header for select-all/etc. to work
-    if (this.header) {
-      this.header.children = [
-        // Always add the keptGroupRow, and we'll use keptGroupRow.isMatched=true/false to keep it
-        // from messing up "header is all selected" if its hidden/when there are no kept rows.
-        this.keptGroupRow,
-        ...this.topRows.filter((rs) => !reservedRowKinds.includes(rs.row.kind)),
-      ];
-    }
+    this.topRows = rows.filter((row) => row !== headerRow).map((row) => addRowAndChildren(this.header, row));
+    // Always add the keptGroupRow, and we'll use keptGroupRow.isMatched=true/false to keep it
+    // from messing up "header is all selected" if its hidden/when there are no kept rows.
+    this.header.children = [this.keptGroupRow, ...this.topRows];
 
     // Then mark any remaining as removed
     for (const state of existing) state.markRemoved();
@@ -110,30 +111,23 @@ export class RowStates {
       }
     } else {
       rs.toggleCollapsed();
-      // The header might still be collapsed, even though the user has opened all the top-level rows
-      if (this.topRows.every((rs) => !rs.children || !rs.collapsed) && this.header) {
-        this.header.collapsed = false;
-      }
-      // Alternatively, if the user has collapsed all top-level rows, then collapse the header as well.
-      if (this.topRows.every((rs) => !rs.children || rs.collapsed) && this.header) {
-        this.header.collapsed = true;
+      // Ignore the kept group
+      const topGroupRows = this.topRows.filter((rs) => !rs.isReservedKind && rs.children);
+      if (topGroupRows.length > 0) {
+        // The header might still be collapsed, even though the user has opened all the top-level rows
+        if (topGroupRows.every((rs) => !rs.collapsed)) this.header.collapsed = false;
+        // Alternatively, if the user has collapsed all top-level rows, then collapse the header as well.
+        if (topGroupRows.every((rs) => rs.collapsed)) this.header.collapsed = true;
       }
     }
   }
 
-  setMatchedRows(ids: string[]): void {
-    for (const rs of this.allStates) {
-      // Don't mark headers, kept rows, etc. as unmatched, b/c they will always be visible,
-      // i.e. the kept group row, if we've included it, is always matched.
-      if (!reservedRowKinds.includes(rs.row.kind)) {
-        rs.isMatched = ids.includes(rs.row.id);
-      }
+  get visibleRows(): RowState[] {
+    const rows = this.header.selfAndMaybeChildren;
+    if (this.header.row === missingHeader) {
+      rows.splice(0, 1);
     }
-    // We cheat a little and pretend the "kept group matches the filter" not based on it itself
-    // literally matching the filter, or its children matching the filter (which is typically
-    // how the filter logic works), but if it just has any child rows at all (which actually means
-    // its children did _not_ match the filter, but are kept).
-    this.keptGroupRow.isMatched = this.keptRows.length > 0;
+    return rows;
   }
 
   /** Returns kept rows, i.e. those that were user-selected but then client-side or server-side filtered. */
@@ -145,8 +139,13 @@ export class RowStates {
     return this.allStates.filter((rs) => rs.collapsed);
   }
 
+  private createHeaderRow(): RowState {
+    // We'll switch the rs.row from the `missingHeader` to the real header from the props.rows later
+    return new RowState(this, undefined, missingHeader);
+  }
+
   /** Create our synthetic "group row" for kept rows, that users never pass in, but we self-inject as needed. */
-  private createKeptGroupRow(): RowState {
+  private createKeptGroupRow(header: RowState): RowState {
     // The "group row" for selected rows that are hidden by filters and add the children
     const keptGroupRow: GridDataRow<any> = {
       id: KEPT_GROUP,
@@ -155,10 +154,13 @@ export class RowStates {
       selectable: false,
       data: undefined,
       children: [],
+      pin: { at: "first", filter: true },
     };
-    const rs = new RowState(this, keptGroupRow);
+    const rs = new RowState(this, header, keptGroupRow);
     // Make the RowState behave like a parent, even though we calc its visibleChildren.
     rs.children = [];
     return rs;
   }
 }
+
+const missingHeader = { kind: "header" as const, id: "header", data: undefined };
