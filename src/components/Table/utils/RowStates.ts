@@ -45,13 +45,26 @@ export class RowStates {
    * Any missing rows are marked as `wasRemoved` so we can consider them "kept" if they're also selected.
    */
   setRows(rows: GridDataRow<any>[]): void {
-    const existing = new Set(this.map.values());
     const states = this;
     const map = this.map;
+    // Keep track of ids as we add them, to detect duplicates
+    const seenIds = new Set<string>();
+    // Keep track of existing rows, so we can mark any that are missing as removed
+    const maybeKept = new Set(this.map.values());
 
     function addRowAndChildren(parent: RowState | undefined, row: GridDataRow<any>): RowState {
-      // This should really be kind+id, but a lot of our lookups just use id
+      // This should really be kind+id, but nearly all of our existing API uses just ids,
+      // b/c we assume our ids are tagged/unique across parent/child kinds anyway. So go
+      // ahead and enforce "row.id must be unique across kinds" b/c pragmatically that is
+      // baked into the current API signatures.
       const key = row.id;
+
+      if (seenIds.has(key)) {
+        throw new Error(`Duplicate row id ${key}`);
+      } else {
+        seenIds.add(key);
+      }
+
       let state = map.get(key);
       if (!state) {
         state = new RowState(states, parent, row);
@@ -60,7 +73,7 @@ export class RowStates {
         state.parent = parent;
         state.row = row;
         state.removed = false;
-        existing.delete(state);
+        maybeKept.delete(state);
       }
       state.children = row.children?.map((child) => addRowAndChildren(state, child));
       return state;
@@ -77,7 +90,7 @@ export class RowStates {
     this.header.children = [this.keptGroupRow, ...this.topRows];
 
     // Then mark any remaining as removed
-    for (const state of existing) state.markRemoved();
+    for (const state of maybeKept) state.markRemoved();
 
     // After the first load of real data, we detach collapse state, to respect
     // any incoming initCollapsed.

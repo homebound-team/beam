@@ -377,7 +377,7 @@ function beamNestedRows(levels: 1 | 2 | 3 | 4 = 1): GridDataRow<BeamNestedRow>[]
           const name = `${idx + 1}0${pIdx + 1}0.${cIdx + 1} - Project Item`;
           return {
             kind: "child" as const,
-            id: `row:${camelCase(name)}`,
+            id: `row:${camelCase(name)}:${ggpIdx}`,
             data: {
               name: `${name}${pIdx === 0 ? " with a longer name that will wrap" : ""}`,
               original: 1234_56 * valueMultiplier,
@@ -396,7 +396,7 @@ function beamNestedRows(levels: 1 | 2 | 3 | 4 = 1): GridDataRow<BeamNestedRow>[]
         const name = `${idx + 1}0${pIdx + 1}0 - Cost Code`;
         return {
           kind: "parent" as const,
-          id: camelCase(`row:${name}`),
+          id: camelCase(`row:${name}:${ggpIdx}`),
           children,
           data: {
             name: `${name}${pIdx === 1 ? " with a longer name that will wrap" : ""}`,
@@ -415,7 +415,7 @@ function beamNestedRows(levels: 1 | 2 | 3 | 4 = 1): GridDataRow<BeamNestedRow>[]
 
       const name = `${idx + 1}000 - Division`;
       return {
-        id: camelCase(`row:${name}`),
+        id: camelCase(`row:${name}:${ggpIdx}`),
         kind: "grandparent" as const,
         children: parents,
         data: {

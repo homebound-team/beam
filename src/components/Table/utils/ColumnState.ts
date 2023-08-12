@@ -25,7 +25,7 @@ export class ColumnState {
       this.expanded = true;
       this.doExpand();
     }
-    makeAutoObservable(this, { column: observable.ref });
+    makeAutoObservable(this, { column: observable.ref }, { name: `ColumnState@${column.id}` });
   }
 
   setVisible(visible: boolean): void {

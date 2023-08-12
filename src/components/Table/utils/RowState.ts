@@ -43,7 +43,7 @@ export class RowState {
     this.row = row;
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
-    makeAutoObservable(this, { row: observable.ref });
+    makeAutoObservable(this, { row: observable.ref }, { name: `RowState@${row.id}` });
   }
 
   /**
@@ -254,8 +254,8 @@ export class RowState {
     );
   }
 
-  /** Pretty toString. */
+  /** Used by node when doing `console.log(rs)`. */
   [Symbol.for("nodejs.util.inspect.custom")](): string {
-    return `RowState ${this.row.kind}-${this.row.id}`;
+    return `RowState@${this.row.id}`;
   }
 }
