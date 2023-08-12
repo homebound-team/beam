@@ -3439,6 +3439,41 @@ describe("GridTable", () => {
       `);
     });
   });
+
+  it("rejects cycles in rows", async () => {
+    // Given a parent that is its own child
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [{ kind: "parent", id: "p1", data: { name: "child p1c1" } }],
+      },
+    ];
+    // Then we reject it
+    const p = render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+    await expect(p).rejects.toThrow("Duplicate row id p1");
+  });
+
+  it("rejects duplicates in rows", async () => {
+    // Given an id that is duplicated within the same kind
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "parent", id: "p1", data: { name: "parent 1" } },
+      { kind: "parent", id: "p1", data: { name: "parent 1" } },
+    ];
+    // Then we reject it
+    const p = render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+    await expect(p).rejects.toThrow("Duplicate row id p1");
+  });
+
+  it("rejects duplicate ids even if different kinds", async () => {
+    // Given an id that is duplicated even across kinds
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "parent", id: "1", data: { name: "parent 1" } },
+      { kind: "child", id: "1", data: { name: "child 1" } },
+    ];
+    // Then we reject it
+    const p = render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+    await expect(p).rejects.toThrow("Duplicate row id p1");
+  });
 });
 
 function Collapse({ id }: { id: string }) {
