@@ -3472,7 +3472,7 @@ describe("GridTable", () => {
     ];
     // Then we reject it
     const p = render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
-    await expect(p).rejects.toThrow("Duplicate row id p1");
+    await expect(p).rejects.toThrow("Duplicate row id 1");
   });
 });
 
