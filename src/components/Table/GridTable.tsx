@@ -116,8 +116,6 @@ export interface GridTableProps<R extends Kinded, X> {
   filter?: string;
   /** Caps the client-side filter to a max number of rows. */
   filterMaxRows?: number;
-  /** Accepts the number of filtered rows (based on `filter`), for the caller to observe and display if they want. */
-  setRowCount?: (rowCount: number) => void;
   /** A combination of CSS settings to set the static look & feel (vs. rowStyles which is per-row styling). */
   style?: GridStyle | GridStyleDef;
   /**
@@ -192,7 +190,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     filterMaxRows,
     fallbackMessage = "No rows found.",
     infoMessage,
-    setRowCount,
     persistCollapse,
     resizeTarget,
     activeRowId,
@@ -333,11 +330,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     // Refs are cheap to assign to, so we don't bother doing this in a useEffect
     rowLookup.current = createRowLookup(columns, visibleDataRows, virtuosoRef);
   }
-
-  // TODO: Replace setRowCount with clients observing TableState via the API
-  useEffect(() => {
-    setRowCount && visibleDataRows?.length !== undefined && setRowCount(visibleDataRows.length);
-  }, [visibleDataRows?.length, setRowCount]);
 
   const noData = visibleDataRows.length === 0;
   const firstRowMessage =

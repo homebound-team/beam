@@ -64,7 +64,6 @@ export default {
         "infoMessage",
         "filter",
         "filterMaxRows",
-        "setRowCount",
         "style",
         "persistCollapse",
         "xss",
