@@ -23,6 +23,7 @@ import { EXPANDABLE_HEADER, KEPT_GROUP, zIndices } from "src/components/Table/ut
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
+import { Stable } from "src/hooks/useStable";
 import { GridDataRow, Row } from "./components/Row";
 
 let runningInJest = false;
@@ -104,7 +105,7 @@ export interface GridTableProps<R extends Kinded, X> {
    */
   as?: RenderAs;
   /** The column definitions i.e. how each column should render each row kind. */
-  columns: GridColumn<R>[];
+  columns: Stable<GridColumn<R>[]>;
   /** The rows of data (including any header/footer rows), to be rendered by the column definitions. */
   rows: GridDataRow<R>[];
   /** Optional row-kind-level styling / behavior like onClick/rowLinks. */
