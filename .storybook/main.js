@@ -4,15 +4,19 @@ const reactPlugin = require("@vitejs/plugin-react");
 const turbosnap = require("vite-plugin-turbosnap");
 module.exports = {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.tsx"],
+
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
     "storybook-addon-designs",
   ],
+
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: { check: false },
+
   features: { previewMdx2: true },
+
   async viteFinal(config, { configType }) {
     const mergedConfig = mergeConfig(config, {
       esbuild: {
@@ -48,7 +52,9 @@ module.exports = {
       ],
     };
   },
+
   staticDirs: ["../storybookAssets"],
+
   framework: {
     name: "@storybook/react-vite",
     options: {
@@ -56,4 +62,8 @@ module.exports = {
       strictMode: false,
     },
   },
+
+  docs: {
+    autodocs: true
+  }
 };
