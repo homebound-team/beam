@@ -2,6 +2,7 @@ import { act } from "@testing-library/react";
 import { observable } from "mobx";
 import { useState } from "react";
 import { useComputed } from "src/hooks/useComputed";
+import { objectId } from "src/utils/objectId";
 import { click, render } from "src/utils/rtl";
 
 let renderedCount = 0;
@@ -65,6 +66,28 @@ describe("useComputed", () => {
     expect(evaledCount).toEqual(2);
     // But didn't re-render b/c it was not deeply different
     expect(renderedCount).toEqual(1);
+  });
+
+  it("keeps a stable return value if shallow equal", async () => {
+    const obs = observable({ name: "foo" });
+    const objectIds: number[] = [];
+    function TestComponent() {
+      // Given a use computed that returns a shallow equal array each time
+      const chars = useComputed(() => [obs.name.charAt(0), obs.name.charAt(1)], [obs]);
+      objectIds.push(objectId(chars));
+      return <div>{chars}</div>;
+    }
+    const r = await render(<TestComponent />);
+    // When the proxy changes, but the return value is shallow equal
+    act(() => {
+      obs.name = "food";
+    });
+    // Then we don't even re-render
+    expect(objectIds).toEqual([1]);
+    // And when the component re-renders organically
+    r.rerender(<TestComponent />);
+    // We've kept the same object id
+    expect(objectIds).toEqual([1, 1]);
   });
 
   it("re-renders on other hook change", async () => {

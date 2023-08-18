@@ -37,21 +37,21 @@ export function useComputed<T>(fn: (prev: T | undefined) => T, deps: readonly an
     // If deps has changed, we're already re-running, so don't trigger a 2nd one
     current.hasRan = false;
     current.runner = autorun(() => {
-      const { value: oldValue, hasRan: oldHasRun } = current;
+      const { value: oldValue, hasRan } = current;
       // Always eval fn() (even on 1st render) to register our observable.
       const newValue = fn(oldValue);
+      // If we've already run and the value hasn't changed, don't trigger a re-render
+      //
+      // Also, we avoid a deep equality, b/c if a `useComputed` is returning something complicated/cyclic,
+      // like ReactElement, deep equality will crawl into the guts of React/ReactFiber and cycle/infinite loop.
+      if (hasRan && shallowEqual(newValue, oldValue)) return;
+      // Only change the identity of `current.value` after we've checked that it's not shallow equal
       current.value = newValue;
       current.hasRan = true;
       // Only trigger a re-render if this is not the 1st autorun. Note
       // that if deps has changed, we're inherently in a re-render so also
       // don't need to trigger an additional re-render.
-      //
-      // Also, we avoid a deep equality, b/c if a `useComputed` is returning something
-      // complicated/cyclic, like ReactElement, deep equality will crawl into the guts
-      // of React/ReactFiber and cycle/infinite loop.
-      if (oldHasRun && !shallowEqual(newValue, oldValue)) {
-        setTick((tick) => tick + 1);
-      }
+      if (hasRan) setTick((tick) => tick + 1);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
