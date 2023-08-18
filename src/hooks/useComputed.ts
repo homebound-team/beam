@@ -1,6 +1,6 @@
-import equal from "fast-deep-equal";
 import { autorun, IReactionDisposer } from "mobx";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { shallowEqual } from "src/utils/shallowEqual";
 
 interface Current<T> {
   // Track the mobx autorunner
@@ -45,7 +45,11 @@ export function useComputed<T>(fn: (prev: T | undefined) => T, deps: readonly an
       // Only trigger a re-render if this is not the 1st autorun. Note
       // that if deps has changed, we're inherently in a re-render so also
       // don't need to trigger an additional re-render.
-      if (oldHasRun && !equal(newValue, oldValue)) {
+      //
+      // Also, we avoid a deep equality, b/c if a `useComputed` is returning something
+      // complicated/cyclic, like ReactElement, deep equality will crawl into the guts
+      // of React/ReactFiber and cycle/infinite loop.
+      if (oldHasRun && !shallowEqual(newValue, oldValue)) {
         setTick((tick) => tick + 1);
       }
     });
