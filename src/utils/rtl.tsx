@@ -94,7 +94,7 @@ export function rowAnd(r: RenderResult, rowNum: number, testId: string): HTMLEle
   return e.querySelector(`[data-testid="${testId}"]`) || fail(`Element not found ${prettyDOM(e)}`);
 }
 
-/** Intended to be used to generate a human-readable text 
+/** Intended to be used to generate a human-readable text
  * representation of a GridTable using the markdown table syntax.
  * * Example Use: expect(tableSnapshot(r)).toMatchInlineSnapshot(`
       "
@@ -182,48 +182,52 @@ export const withBeamRTL: Wrapper = {
   wrap: (c) => <BeamProvider>{c}</BeamProvider>,
 };
 
-/** Selects an option from the Beam SelectField, MultiSelectField, and TreeSelectField components
+/**
+ * Selects an option from the Beam SelectField, MultiSelectField, and TreeSelectField components.
+ *
  * For select fields that support multiple selections, subsequent calls to this function will toggle the selection state of an option.
+ *
  * @param value The value or label of the option.
  * */
 export function select(element: HTMLElement, value: string | string[]) {
   const select = resolveIfNeeded(element);
-  if (isSelectElement(select)) {
-    throw new Error("Beam select helper does not support <select> elements.");
-  }
-
-  if (!isInputElement(select)) {
-    throw new Error(`Expected element to be INPUT, but got ${select.nodeName}. This field may be read-only.`);
-  }
-
-  function maybeOpenAndSelect(optionValue: string) {
-    const expanded = select.getAttribute("aria-expanded") === "true";
-    if (!expanded) {
-      _click(select);
-    }
-
-    const body = select.closest("body") as HTMLElement;
-    const listboxId = select.getAttribute("aria-controls");
-    const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
-    const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
-    // Allow searching for options by their data-key (value) or textContent (label)
-    const optionToSelect = Array.from(options).find(
-      (o: HTMLElement) => o.dataset.key === optionValue || o.dataset.label === optionValue,
-    );
-    if (!optionToSelect) {
-      throw new Error(`Could not find option with value or text content of ${optionValue}`);
-    }
-    _click(optionToSelect);
-  }
-
+  assertListBoxInput(select);
+  ensureListBoxOpen(select);
   const optionValues = Array.isArray(value) ? value : [value];
-  optionValues.forEach((optionValue) => {
-    maybeOpenAndSelect(optionValue);
+  optionValues.forEach((optionValue) => selectOption(select, optionValue));
+}
+
+export async function selectAndWait(input: HTMLElement, value: string | string[]): Promise<void> {
+  const select = resolveIfNeeded(input);
+  // To work with React 18, we need to execute these as separate steps, otherwise
+  // the `ensureListBoxOpen` async render won't flush, and the `selectOption` will fail.
+  await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
+  return allowAndWaitForAsyncBehavior(() => {
+    const optionValues = Array.isArray(value) ? value : [value];
+    optionValues.forEach((optionValue) => selectOption(select, optionValue));
   });
 }
 
-export function selectAndWait(input: HTMLElement, value: string | string[]): Promise<void> {
-  return allowAndWaitForAsyncBehavior(() => select(input, value));
+function ensureListBoxOpen(select: HTMLElement): void {
+  const expanded = select.getAttribute("aria-expanded") === "true";
+  if (!expanded) {
+    _click(select);
+  }
+}
+
+function selectOption(select: HTMLElement, optionValue: string) {
+  const body = select.closest("body") as HTMLElement;
+  const listboxId = select.getAttribute("aria-controls");
+  const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
+  const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
+  // Allow searching for options by their data-key (value) or textContent (label)
+  const optionToSelect = Array.from(options).find(
+    (o: HTMLElement) => o.dataset.key === optionValue || o.dataset.label === optionValue,
+  );
+  if (!optionToSelect) {
+    throw new Error(`Could not find option with value or text content of ${optionValue}`);
+  }
+  _click(optionToSelect);
 }
 
 export function getSelected(element: HTMLElement): string[] | string | undefined {
@@ -237,10 +241,7 @@ export function getSelected(element: HTMLElement): string[] | string | undefined
     return select.textContent ?? undefined;
   }
 
-  const expanded = select.getAttribute("aria-expanded") === "true";
-  if (!expanded) {
-    _click(select);
-  }
+  ensureListBoxOpen(select);
 
   const body = select.closest("body") as HTMLElement;
   const listboxId = select.getAttribute("aria-controls");
@@ -258,20 +259,8 @@ export function getSelected(element: HTMLElement): string[] | string | undefined
 
 export function getOptions(element: HTMLElement): string[] {
   const select = resolveIfNeeded(element);
-  if (isSelectElement(select)) {
-    throw new Error("Beam getOptions helper does not support <select> elements");
-  }
-
-  if (!isInputElement(select)) {
-    throw new Error(
-      `Expected element to be INPUT, but got ${select.nodeName}. This field may be read-only. In that case we cannot get the list of options`,
-    );
-  }
-
-  const expanded = select.getAttribute("aria-expanded") === "true";
-  if (!expanded) {
-    _click(select);
-  }
+  assertListBoxInput(select);
+  ensureListBoxOpen(select);
 
   const body = select.closest("body") as HTMLElement;
   const listboxId = select.getAttribute("aria-controls");
@@ -281,6 +270,18 @@ export function getOptions(element: HTMLElement): string[] {
   return Array.from(options)
     .map((o: HTMLElement) => o.dataset.label ?? o.dataset.key ?? "")
     .filter((o) => !!o);
+}
+
+function assertListBoxInput(select: HTMLElement): select is HTMLInputElement {
+  if (isSelectElement(select)) {
+    throw new Error("Beam getOptions helper does not support <select> elements");
+  }
+  if (!isInputElement(select)) {
+    throw new Error(
+      `Expected element to be INPUT, but got ${select.nodeName}. This field may be read-only. In that case we cannot get the list of options`,
+    );
+  }
+  return true;
 }
 
 function resolveIfNeeded(element: HTMLElement): HTMLElement {

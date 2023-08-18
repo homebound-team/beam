@@ -76,7 +76,7 @@
     "@emotion/react": "^11.10.6",
     "@homebound/eslint-config": "1.6.1",
     "@homebound/rtl-react-router-utils": "1.0.3",
-    "@homebound/rtl-utils": "^2.61.1",
+    "@homebound/rtl-utils": "^2.63.1",
     "@homebound/truss": "^1.129.0",
     "@homebound/tsconfig": "^1.0.3",
     "@semantic-release/exec": "^6.0.3",
