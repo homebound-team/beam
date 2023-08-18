@@ -78,10 +78,11 @@ describe("useComputed", () => {
       return <div>{chars}</div>;
     }
     const r = await render(<TestComponent />);
-    // When the proxy changes, but the return value is shallow equal, we don't even re-render
+    // When the proxy changes, but the return value is shallow equal
     act(() => {
       obs.name = "food";
     });
+    // Then we don't even re-render
     expect(objectIds).toEqual([1]);
     // And when the component re-renders organically
     r.rerender(<TestComponent />);
