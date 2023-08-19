@@ -2210,7 +2210,7 @@ describe("GridTable", () => {
     const row1_changed: GridDataRow<Row> = { kind: "data", id: row1.id, data: { name: "one", value: 3 } };
     r.rerender(<GridTable columns={columns} rows={[header, row1_changed, row2]} />);
     // And the original row re-rendered
-    expect(row(r, 1).getAttribute("data-render")).toEqual("2");
+    expect(row(r, 1).getAttribute("data-render")).toEqual("3");
     // But the 2nd added row did not
     expect(row(r, 2).getAttribute("data-render")).toEqual("1");
   });

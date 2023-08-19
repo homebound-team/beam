@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { ReactElement, useContext } from "react";
+import { ReactElement, useContext } from "react";
 import {
   defaultRenderFn,
   headerRenderFn,
@@ -8,9 +8,9 @@ import {
   rowLinkRenderFn,
 } from "src/components/Table/components/cell";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
-import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
-import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
+import { DiscriminateUnion, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
+import { RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
@@ -29,60 +29,49 @@ import {
   zIndices,
 } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
-import { useComputed } from "src/hooks";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
-import { shallowEqual } from "src/utils/shallowEqual";
 
 interface RowProps<R extends Kinded> {
   as: RenderAs;
-  columns: GridColumnWithId<R>[];
-  row: GridDataRow<R>;
+  rs: RowState<R>;
   style: GridStyle;
   rowStyles: RowStyles<R> | undefined;
   columnSizes: string[];
-  level: number;
   getCount: (id: string) => object;
-  api: GridTableApi<R>;
   cellHighlight: boolean;
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
-  isKeptSelectedRow: boolean;
-  isLastKeptSelectionRow: boolean;
 }
 
 // We extract Row to its own mini-component primarily so we can React.memo'ize it.
 function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const {
     as,
-    columns,
-    row,
+    rs,
     style,
     rowStyles,
     columnSizes,
-    level,
     getCount,
-    api,
     cellHighlight,
     omitRowHover,
     hasExpandableHeader,
-    isKeptSelectedRow,
-    isLastKeptSelectionRow,
     ...others
   } = props;
 
   const { tableState } = useContext(TableStateContext);
-  const sortOn = tableState.sortConfig?.on;
-  const rowId = `${row.kind}_${row.id}`;
-  const isActive = useComputed(() => tableState.activeRowId === rowId, [rowId, tableState]);
+  // We're wrapped in observer, so can access these without useComputeds
+  const { api, visibleColumns: columns } = tableState;
+  const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, level } = rs;
 
   // We treat the "header" and "totals" kind as special for "good defaults" styling
   const isHeader = row.kind === HEADER;
   const isTotals = row.kind === TOTALS;
   const isExpandableHeader = row.kind === EXPANDABLE_HEADER;
   const isKeptGroupRow = row.kind === KEPT_GROUP;
-  const rowStyle = rowStyles?.[row.kind];
+  const rowStyle = rowStyles?.[row.kind as R["kind"]];
   const RowTag = as === "table" ? "tr" : "div";
+  const sortOn = tableState.sortConfig?.on;
 
   const revealOnRowHoverClass = "revealOnRowHover";
 
@@ -104,7 +93,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [` > .${revealOnRowHoverClass} > *`]: Css.invisible.$,
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.visible.$,
     },
-    ...(isLastKeptSelectionRow && Css.addIn("&>*", style.keptLastRowCss).$),
+    ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
   };
 
   let currentColspan = 1;
@@ -176,7 +165,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             currentColspan -= 1;
             return null;
           }
-          const maybeContent = applyRowFn(column, row, api, level, isExpanded);
+          const maybeContent = applyRowFn(column, row, rowApi, level, isExpanded);
 
           // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
           currentColspan =
@@ -209,7 +198,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             isExpandableHeader,
             isExpandable,
             minStickyLeftOffset,
-            isKeptSelectedRow,
+            isKeptRow,
           );
 
           ensureClientSideSortValueIsSortable(
@@ -320,22 +309,17 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 }
 
 /**
- * Memoizes Rows so that re-rendering the table doesn't re-render every single row.
+ * Memoizes rows so that re-rendering the table doesn't re-render every single row.
  *
- * We use a custom `propsAreEqual` for the `RowProps.row` property, which we memoize
- * based on the `GridDataRow.data` prop, such that if a table re-renders (i.e. for a cache
- * updated) and technically creates new row instances, but a row's `row.data` points to the
- * same/unchanged Apollo cache fragment, then we won't re-render that row.
+ * We used to have a custom `propsAreEqual` method that would only compare `props.rows`
+ * on the `data` attribute, b/c our `createRows` methods do not create stable row identities;
+ * i.e. if one row changes, they all change.
  *
- * Note that if you're using virtualization, it can be surprising how unnoticeable broken row
- * memoization is.
+ * However, now RowState.row synthesizes a `row` that only reactively changes when
+ * that row's `data` explicitly changes, so we no longer need a custom `propsAreEqual` here.
  */
 // Declared as a const + `as typeof RowImpl` to work with generics, see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37087#issuecomment-656596623
-export const Row = React.memo(observer(RowImpl), (one, two) => {
-  const { row: row1, ...others1 } = one;
-  const { row: row2, ...others2 } = two;
-  return shallowEqual(row1, row2) && shallowEqual(others1, others2);
-}) as typeof RowImpl;
+export const Row = observer(RowImpl) as typeof RowImpl;
 
 /** A specific kind of row, including the GridDataRow props. */
 export type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUnion<R, "kind", P> & {

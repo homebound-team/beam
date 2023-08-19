@@ -1,7 +1,7 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { GridStyle } from "src/components/Table/TableStyles";
-import { GridColumnWithId } from "src/components/Table/types";
+import { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { calcColumnSizes } from "src/components/Table/utils/columns";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -24,9 +24,9 @@ import { useDebouncedCallback } from "use-debounce";
  *
  * Disclaimer that we roll our own `fr` b/c we're not in CSS grid anymore.
  */
-export function useSetupColumnSizes(
+export function useSetupColumnSizes<R extends Kinded>(
   style: GridStyle,
-  columns: GridColumnWithId<any>[],
+  columns: GridColumnWithId<R>[],
   resizeRef: MutableRefObject<HTMLElement | null>,
   expandedColumnIds: string[],
 ): string[] {

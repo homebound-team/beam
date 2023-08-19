@@ -1,14 +1,14 @@
 import { camelCase } from "change-case";
 import { makeAutoObservable } from "mobx";
-import { GridColumnWithId } from "src";
+import { GridColumnWithId, Kinded } from "src";
 import { ColumnState } from "src/components/Table/utils/ColumnState";
 import { ColumnStorage } from "src/components/Table/utils/ColumnStorage";
 
 /** A reactive/observable wrapper around our columns. */
-export class ColumnStates {
+export class ColumnStates<R extends Kinded> {
   // The top-level list of columns
-  private columns: ColumnState[] = [];
-  private map = new Map<string, ColumnState>();
+  private columns: ColumnState<R>[] = [];
+  private map = new Map<string, ColumnState<R>>();
   private storage = new ColumnStorage(this);
 
   constructor() {
@@ -23,7 +23,7 @@ export class ColumnStates {
    * So like you expand a column, and new columns show up, but we'll remember they
    * were hidden last time you looked at this specific expansion of columns.
    */
-  setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
+  setColumns(columns: GridColumnWithId<R>[], visibleColumnsStorageKey: string | undefined): void {
     if (columns.some((c) => c.canHide)) {
       // We optionally auto-calc visible columns based on the currently-_potentially_-visible columns
       visibleColumnsStorageKey ??= camelCase(columns.map((c) => c.id).join());
@@ -35,7 +35,7 @@ export class ColumnStates {
   }
 
   /** Adds a column to our state, i.e. maybe a dynamically loaded column. */
-  addColumn(column: GridColumnWithId<any>): ColumnState {
+  addColumn(column: GridColumnWithId<R>): ColumnState<R> {
     const existing = this.map.get(column.id);
     if (!existing) {
       const cs = new ColumnState(this, this.storage, column);
@@ -50,19 +50,19 @@ export class ColumnStates {
   }
 
   /** Returns the `ColumnState` for the given `id`. */
-  get(id: string): ColumnState {
+  get(id: string): ColumnState<R> {
     const cs = this.map.get(id);
     if (!cs) throw new Error(`No ColumnState for ${id}`);
     return cs;
   }
 
   /** Returns all currently-expanded columns. */
-  get expandedColumns(): ColumnState[] {
+  get expandedColumns(): ColumnState<R>[] {
     return this.columns.filter((cs) => cs.isExpanded);
   }
 
   /** Returns a flat list of all visible columns. */
-  get allVisibleColumns(): ColumnState[] {
+  get allVisibleColumns(): ColumnState<R>[] {
     return this.columns.flatMap((cs) => cs.maybeSelfAndChildren);
   }
 

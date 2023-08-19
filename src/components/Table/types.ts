@@ -1,14 +1,13 @@
 import { ReactElement, ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
 import { GridDataRow, GridRowKind } from "src/components/Table/components/Row";
-import { GridTableApi } from "src/components/Table/GridTableApi";
+import { GridRowApi } from "src/components/Table/GridTableApi";
 import { Margin, Xss } from "src/Css";
 
 export type Kinded = { kind: string };
 export type GridTableXss = Xss<Margin>;
 export type RenderAs = "div" | "table" | "virtual";
 export type RowTuple<R extends Kinded> = [GridDataRow<R>, ReactElement];
-export type ParentChildrenTuple<R extends Kinded> = [GridDataRow<R>, ParentChildrenTuple<R>[]];
 export type Direction = "ASC" | "DESC";
 
 export type MaybeFn<T> = T | (() => T);
@@ -20,6 +19,7 @@ export type GridCellAlignment = "left" | "right" | "center";
  * See https://stackoverflow.com/a/50125960/355031
  */
 export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<K, V> ? T : never;
+
 /**
  * Defines how a single column will render each given row `kind` in `R`.
  *
@@ -39,11 +39,11 @@ export type GridColumn<R extends Kinded> = {
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (
             data: D,
-            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number; expanded: boolean },
+            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean },
           ) => ReactNode | GridCellContent
         : (
             data: undefined,
-            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number; expanded: boolean },
+            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean },
           ) => ReactNode | GridCellContent);
 } & {
   /**

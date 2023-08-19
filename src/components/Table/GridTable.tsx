@@ -218,7 +218,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   const api = useMemo<GridTableApiImpl<R>>(() => {
     const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
-    api.init(persistCollapse, virtuosoRef, rows);
+    api.init(persistCollapse, virtuosoRef);
     api.setActiveRowId(activeRowId);
     api.setActiveCellId(activeCellId);
     // Push the initial columns directly into tableState, b/c that is what
@@ -232,6 +232,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const { tableState } = api;
 
   tableState.onRowSelect = onRowSelect;
+  // useEffect(() => {
+  // }, [tableState, rows]);
   tableState.setRows(rows);
 
   useEffect(() => {
@@ -275,8 +277,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     RowTuple<R>[],
     boolean,
   ] = useComputed(() => {
-    const columns = tableState.visibleColumns;
-
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: RowTuple<R>[] = [];
     const expandableHeaderRows: RowTuple<R>[] = [];
@@ -284,31 +284,26 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     const keptSelectedRows: RowTuple<R>[] = [];
     let visibleDataRows: RowTuple<R>[] = [];
 
-    const { visibleRows, keptRows } = tableState;
+    const { visibleRows } = tableState;
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
-      const row = rs.row;
+      const { row } = rs;
       const tuple = [
         row,
         <Row
           key={`${row.kind}-${row.id}`}
           {...{
             as,
-            columns,
-            row,
+            rs,
             style,
             rowStyles,
             columnSizes,
-            level: rs.level,
             getCount,
-            api,
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
             hasExpandableHeader,
-            isKeptSelectedRow: rs.isKept,
-            isLastKeptSelectionRow: keptRows[keptRows.length - 1] === rs.row,
           }}
         />,
       ] as RowTuple<R>;
@@ -562,7 +557,7 @@ function renderVirtual<R extends Kinded>(
             style={{ ...props.style, ...{ zIndex: zIndices.stickyHeader } }}
           />
         )),
-        List: VirtualRoot(listStyle, columns, id, xss),
+        List: VirtualRoot(listStyle, columns as any, id, xss),
         Footer: () => <div css={footerStyle} />,
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top

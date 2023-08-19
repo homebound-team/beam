@@ -1,6 +1,6 @@
 import { makeAutoObservable, observable, reaction } from "mobx";
 import React from "react";
-import { OnRowSelect, sortFn } from "src/components";
+import { Kinded, OnRowSelect, sortFn } from "src/components";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridSortConfig } from "src/components/Table/GridTable";
 import { GridTableApi } from "src/components/Table/GridTableApi";
@@ -28,15 +28,15 @@ export type SelectedState = "checked" | "unchecked" | "partial";
  * that need to change their toggle/select on/off in response to parent/child
  * changes.
  */
-export class TableState {
+export class TableState<R extends Kinded> {
   private persistCollapse: string | undefined;
   // The current list of rows, basically a useRef.current. Only shallow reactive.
-  private rows: GridDataRow<any>[] = [];
+  private rows: GridDataRow<R>[] = [];
   // The current list of columns, basically a useRef.current. Only ref reactive.
-  public columns: GridColumnWithId<any>[] = [];
-  public readonly api: GridTableApi<any>;
+  public columns: GridColumnWithId<R>[] = [];
+  public readonly api: GridTableApi<R>;
   private readonly rowStates = new RowStates(this);
-  private readonly columnStates = new ColumnStates();
+  private readonly columnStates = new ColumnStates<R>();
   // Keeps track of the 'active' row, formatted `${row.kind}_${row.id}`
   activeRowId: string | undefined = undefined;
   // Keeps track of the 'active' cell, formatted `${row.kind}_${row.id}_${column.name}`
@@ -87,7 +87,7 @@ export class TableState {
     this.columnStates.loadExpanded(persistCollapse);
   }
 
-  initSortState(sortConfig: GridSortConfig | undefined, columns: GridColumnWithId<any>[]) {
+  initSortState(sortConfig: GridSortConfig | undefined, columns: GridColumnWithId<R>[]) {
     if (this.sortConfig) {
       return;
     }
@@ -143,23 +143,23 @@ export class TableState {
   }
 
   /** Returns a client-side sort function, if applicable. */
-  get sortFn(): ((a: RowState, b: RowState) => number) | undefined {
+  get sortFn(): ((a: RowState<R>, b: RowState<R>) => number) | undefined {
     const { sortState, sortConfig, visibleColumns } = this;
     if (!sortState || sortConfig?.on !== "client") return undefined;
     // sortRows.ts wants to sort based on the GridDataRow, so make a small `rowStateFn` adapter
     const dataRowFn = sortFn(visibleColumns, sortState, !!sortConfig.caseSensitive);
-    return (a: RowState, b: RowState) => dataRowFn(a.row, b.row);
+    return (a: RowState<R>, b: RowState<R>) => dataRowFn(a.row as any, b.row as any);
   }
 
   // Updates the list of rows and regenerates the collapsedRows property if needed.
-  setRows(rows: GridDataRow<any>[]): void {
+  setRows(rows: GridDataRow<R>[]): void {
     if (rows !== this.rows) {
       this.rowStates.setRows(rows);
       this.rows = rows;
     }
   }
 
-  setColumns(columns: GridColumnWithId<any>[], visibleColumnsStorageKey: string | undefined): void {
+  setColumns(columns: GridColumnWithId<R>[], visibleColumnsStorageKey: string | undefined): void {
     if (columns !== this.columns) {
       this.columnStates.setColumns(columns, visibleColumnsStorageKey);
       this.columns = columns;
@@ -171,12 +171,12 @@ export class TableState {
     this.search = (search && search.split(/ +/)) || [];
   }
 
-  get visibleRows(): RowState[] {
+  get visibleRows(): RowState<R>[] {
     return this.rowStates.visibleRows;
   }
 
   /** Returns visible columns, i.e. those that are visible + any expanded children. */
-  get visibleColumns(): GridColumnWithId<any>[] {
+  get visibleColumns(): GridColumnWithId<R>[] {
     return this.columnStates.allVisibleColumns.map((cs) => cs.column);
   }
 
@@ -210,20 +210,23 @@ export class TableState {
     return this.columnStates.get(columnId).doExpand();
   }
 
-  /** Returns selected data rows (non-header, non-totals, etc.), ignoring rows that have `row.selectable !== false`. */
-  get selectedRows(): GridDataRow<any>[] {
+  /**
+   * Returns selected data rows (non-header, non-totals, etc.), ignoring rows that
+   * have `row.selectable !== false`.
+   */
+  get selectedRows(): GridDataRow<R>[] {
     return this.rowStates.allStates
       .filter((rs) => rs.isSelected && !reservedRowKinds.includes(rs.row.kind))
       .map((rs) => rs.row);
   }
 
   /** Returns kept group row, with the latest kept children, if any. */
-  get keptRowGroup(): GridDataRow<any> {
+  get keptRowGroup(): GridDataRow<R> {
     return this.rowStates.get(KEPT_GROUP).row;
   }
 
   /** Returns kept rows, i.e. those that were user-selected but then client-side or server-side filtered. */
-  get keptRows(): GridDataRow<any>[] {
+  get keptRows(): GridDataRow<R>[] {
     return this.rowStates.keptRows.map((rs) => rs.row);
   }
 
@@ -258,8 +261,8 @@ export class TableState {
 }
 
 /** Provides a context for rows to access their table's `TableState`. */
-export const TableStateContext = React.createContext<{ tableState: TableState }>({
-  get tableState(): TableState {
+export const TableStateContext = React.createContext<{ tableState: TableState<any> }>({
+  get tableState(): TableState<any> {
     throw new Error("No TableStateContext provider");
   },
 });
