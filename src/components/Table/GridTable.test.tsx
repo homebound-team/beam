@@ -1385,7 +1385,7 @@ describe("GridTable", () => {
   });
 
   it("can access visible child rows", async () => {
-    // Given a parent with a child
+    // Given a parent with two children
     const rows: GridDataRow<NestedRow>[] = [
       {
         ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
@@ -1395,7 +1395,7 @@ describe("GridTable", () => {
         ],
       },
     ];
-    // And a column where the parent counts the number
+    // And a column where the parent counts the number of visible children
     const columns: GridColumn<NestedRow>[] = [
       ...nestedColumns,
       {
@@ -1423,7 +1423,7 @@ describe("GridTable", () => {
   });
 
   it("can access selected child rows", async () => {
-    // Given a parent with a child
+    // Given a parent with two children
     const rows: GridDataRow<NestedRow>[] = [
       {
         ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
@@ -1449,7 +1449,7 @@ describe("GridTable", () => {
     expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
     expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
     expect(cell(r, 2, 2)).toHaveTextContent("child p1c2");
-    // Then we show the number of children
+    // Then we show no children are selected
     expect(cell(r, 0, 3)).toHaveTextContent("0");
     // When we select the 1st child
     click(r.select_1);
