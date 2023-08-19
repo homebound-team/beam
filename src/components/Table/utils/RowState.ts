@@ -244,6 +244,32 @@ export class RowState<R extends Kinded> {
     );
   }
 
+  // This is a copy/paste of visibleChildren, but using isDirectlyMatched instead of isMatched
+  // to avoid a cycle, i.e.:
+  //
+  // 1. A parent row evals its own isDirectlyMatched
+  // 2. The parent row has a cell that calculates "sum of visible children"
+  // 3. To know whether the sum cell matches the filter, "1234", we need to render the cell
+  // 4. If rendering the parent cell called `visibleChildren` directly, that method checks
+  //    "is the parent directly matched?" (so that child of matched parents are always shown),
+  //     but now we've looped--deciding the content of the parent cell itself requires knowing
+  //     if the parent cell matched (b/c that controls which children are visible).
+  //
+  // We side-step this by assuming that the `GridRowApi.getVisibleChildren` can use the
+  // slightly-less accurate "my children are visible if they're directly matched".
+  private get visibleDirectlyMatchedChildren(): RowState<R>[] {
+    if (this.row.kind === KEPT_GROUP) return this.states.keptRows;
+    return (
+      this.children?.filter(
+        (rs) =>
+          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) ||
+          rs.isDirectlyMatched ||
+          rs.hasDirectlyMatchedChildren ||
+          rs.isPinned,
+      ) ?? []
+    );
+  }
+
   /** The `visibleChildren`, but with the current sort config applied. */
   private get visibleSortedChildren(): RowState<R>[] {
     let rows = this.visibleChildren;
@@ -282,7 +308,7 @@ export class RowState<R extends Kinded> {
       // The caller can invoke this observable without their own useComputed,
       // b/c we wrap all rows in an observer
       getVisibleChildren(kind?: R["kind"]): GridDataRow<R>[] {
-        const children = rs.visibleChildren.map((cs) => cs.row);
+        const children = rs.visibleDirectlyMatchedChildren.map((cs) => cs.row);
         return !kind ? children : children.filter((r) => r.kind === kind);
       },
     } as any;

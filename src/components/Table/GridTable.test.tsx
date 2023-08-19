@@ -1384,6 +1384,44 @@ describe("GridTable", () => {
     expectRenderedRows();
   });
 
+  it("can access visible child rows", async () => {
+    // Given a parent with a child
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
+        ],
+      },
+    ];
+    // And a column where the parent counts the number
+    const columns: GridColumn<NestedRow>[] = [
+      ...nestedColumns,
+      {
+        totals: emptyCell,
+        header: emptyCell,
+        parent: (data, { api }) => api.getVisibleChildren("child").length,
+        child: emptyCell,
+        grandChild: emptyCell,
+      },
+    ];
+    const r = await render(<GridTable<NestedRow> columns={columns} rows={rows} />);
+    // And both child rows are initially rendered
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c2");
+    // Then we show the number of children
+    expect(cell(r, 0, 3)).toHaveTextContent("2");
+    // When the 1st child is filtered out
+    await r.rerender(<GridTable<NestedRow> columns={columns} rows={rows} filter="p1c2" />);
+    // Then the parent and child row are still shown
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c2");
+    // And the parent knows the number of visible children
+    expect(cell(r, 0, 3)).toHaveTextContent("1");
+  });
+
   it("persists collapse", async () => {
     const tableIdentifier = "gridTableTest";
     // Given that parent 2 is set to collapsed in local storage
