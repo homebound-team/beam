@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable } from "mobx";
+import { makeAutoObservable, observable, reaction } from "mobx";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { SelectedState } from "src/components/Table/utils/TableState";
@@ -44,6 +44,13 @@ export class RowState {
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
     makeAutoObservable(this, { row: observable.ref }, { name: `RowState@${row.id}` });
+    const onSelect = row.onSelect;
+    if (onSelect) {
+      reaction(
+        () => this.selectedState,
+        (state) => onSelect(state === "checked"),
+      );
+    }
   }
 
   /**
