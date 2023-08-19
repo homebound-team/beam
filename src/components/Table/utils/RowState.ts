@@ -311,6 +311,10 @@ export class RowState<R extends Kinded> {
         const children = rs.visibleDirectlyMatchedChildren.map((cs) => cs.row);
         return !kind ? children : children.filter((r) => r.kind === kind);
       },
+      getSelectedChildren(kind?: R["kind"]): GridDataRow<R>[] {
+        const children = (rs.children ?? []).filter((cs) => cs.isSelected).map((cs) => cs.row);
+        return !kind ? children : children.filter((r) => r.kind === kind);
+      },
     } as any;
   }
 

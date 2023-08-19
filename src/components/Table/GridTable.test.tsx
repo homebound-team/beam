@@ -1422,6 +1422,41 @@ describe("GridTable", () => {
     expect(cell(r, 0, 3)).toHaveTextContent("1");
   });
 
+  it("can access selected child rows", async () => {
+    // Given a parent with a child
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
+        ],
+      },
+    ];
+    // And a column where the parent counts the selected children
+    const columns: GridColumn<NestedRow>[] = [
+      ...nestedColumns,
+      {
+        totals: emptyCell,
+        header: emptyCell,
+        parent: (data, { api }) => api.getSelectedChildren("child").length,
+        child: emptyCell,
+        grandChild: emptyCell,
+      },
+    ];
+    const r = await render(<GridTable<NestedRow> columns={columns} rows={rows} />);
+    // And both child rows are initially rendered
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c2");
+    // Then we show the number of children
+    expect(cell(r, 0, 3)).toHaveTextContent("0");
+    // When we select the 1st child
+    click(r.select_1);
+    // Then the parent renders the number of selected children
+    expect(cell(r, 0, 3)).toHaveTextContent("1");
+  });
+
   it("persists collapse", async () => {
     const tableIdentifier = "gridTableTest";
     // Given that parent 2 is set to collapsed in local storage

@@ -62,6 +62,8 @@ export type GridTableApi<R extends Kinded> = {
 export type GridRowApi<R extends Kinded> = GridTableApi<R> & {
   getVisibleChildren(): GridDataRow<R>[];
   getVisibleChildren<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
+  getSelectedChildren(): GridDataRow<R>[];
+  getSelectedChildren<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
 };
 
 // Using `FooImpl`to keep the public GridTableApi definition separate.
