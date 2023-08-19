@@ -1618,6 +1618,51 @@ describe("GridTable", () => {
     expect(cell(r, 1, 1)).toHaveTextContent("foo2");
   });
 
+  it("getSelectedRows doesn't fire if data has not changed", async () => {
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+    const _columns = [selectColumn<Row>(), ...columns];
+    let computedCount = 0;
+
+    // Given a component using a useComputed against getSelectedRows
+    function Test({ rows }: { rows: GridDataRow<Row>[] }) {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      const selectedNames = useComputed(() => {
+        computedCount++;
+        return _api
+          .getSelectedRows("data")
+          .map((r) => r.data.name)
+          .join(",");
+      }, [_api]);
+      return (
+        <div>
+          <div data-testid="selectedNames">{selectedNames}</div>
+          <GridTable<Row> api={_api} columns={_columns} rows={rows} />
+        </div>
+      );
+    }
+    // And the initial render has computed
+    const r = await render(<Test rows={rows} />);
+    expect(computedCount).toBe(2);
+    // And the user has selected one row
+    click(r.select_1);
+    // And selected rows is initially calc-d
+    expect(r.selectedNames().textContent).toEqual("foo");
+    expect(computedCount).toBe(3);
+    // When we re-render with the different row literals, but stable data
+    await r.rerender(
+      <Test
+        rows={[
+          rows[0],
+          { kind: "data", id: "1", data: rows[1].data as any },
+          { kind: "data", id: "2", data: rows[2].data as any },
+        ]}
+      />,
+    );
+    // Then we didn't recompute
+    expect(computedCount).toBe(3);
+  });
+
   it("can select rows via api", async () => {
     // Given a table with selectable rows
     const rows: GridDataRow<NestedRow>[] = [simpleHeader, { kind: "parent", id: "p1", data: { name: "parent 1" } }];

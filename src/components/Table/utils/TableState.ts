@@ -60,7 +60,6 @@ export class TableState<R extends Kinded> {
    */
   constructor(api: GridTableApi<any>) {
     this.api = api;
-
     // Make ourselves an observable so that mobx will do caching of .collapseIds so
     // that it'll be a stable identity for GridTable to useMemo against.
     makeAutoObservable(this, {
@@ -69,7 +68,6 @@ export class TableState<R extends Kinded> {
       columns: observable.ref,
       search: observable.ref,
     } as any);
-
     // If the kept rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
     reaction(
       () => [...this.keptRows.values()],

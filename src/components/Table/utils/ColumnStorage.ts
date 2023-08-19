@@ -1,5 +1,5 @@
 import { autorun, reaction } from "mobx";
-import { Kinded } from "src";
+import { Kinded } from "src/components/Table/types";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
 import { loadArrayOrUndefined } from "src/components/Table/utils/utils";
 
