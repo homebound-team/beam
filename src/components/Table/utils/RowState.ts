@@ -51,7 +51,7 @@ export class RowState {
         // Go through `this.row.onSelect` to get the latest lambda
         const rowFn = this.row.onSelect;
         rowFn && rowFn(isSelected);
-        const tableFn = states.table.onSelect?.[this.row.kind];
+        const tableFn = states.table.onRowSelect?.[this.row.kind];
         tableFn && tableFn(this.row.data as any, isSelected, { row, api: states.table.api });
       },
     );

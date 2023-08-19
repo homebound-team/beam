@@ -1,7 +1,7 @@
 import { act } from "@testing-library/react";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { GridTable, OnSelect, setRunningInJest } from "src/components/Table/GridTable";
+import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyles } from "src/components/Table/TableStyles";
 import { GridColumn } from "src/components/Table/types";
@@ -1595,7 +1595,7 @@ describe("GridTable", () => {
       },
     ];
     function Test() {
-      const onSelect: OnSelect<NestedRow> = {
+      const onSelect: OnRowSelect<NestedRow> = {
         parent: (data, isSelected, { row }) => {
           actions.push(`${row.kind} ${data.name} ${isSelected}`);
         },
@@ -1603,7 +1603,7 @@ describe("GridTable", () => {
           actions.push(`${row.kind} ${data.name} ${isSelected}`);
         },
       };
-      return <GridTable<NestedRow> columns={nestedColumns} rows={rows} onSelect={onSelect} />;
+      return <GridTable<NestedRow> columns={nestedColumns} rows={rows} onRowSelect={onSelect} />;
     }
     const r = await render(<Test />);
     // When we select all

@@ -82,7 +82,7 @@ export type GridSortConfig =
     };
 
 /** Allows listening to per-kind row selection changes. */
-export type OnSelect<R extends Kinded> = {
+export type OnRowSelect<R extends Kinded> = {
   [K in R["kind"]]?: DiscriminateUnion<R, "kind", K> extends { data: infer D }
     ? (data: D, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void
     : (data: undefined, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void;
@@ -162,7 +162,7 @@ export interface GridTableProps<R extends Kinded, X> {
    */
   infiniteScroll?: InfiniteScroll;
   /** Callback for when a row is selected or unselected. */
-  onSelect?: OnSelect<R>;
+  onRowSelect?: OnRowSelect<R>;
 }
 
 /**
@@ -206,7 +206,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     activeCellId,
     visibleColumnsStorageKey,
     infiniteScroll,
-    onSelect,
+    onRowSelect,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
@@ -231,7 +231,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const style = resolveStyles(maybeStyle);
   const { tableState } = api;
 
-  tableState.onSelect = onSelect;
+  tableState.onRowSelect = onRowSelect;
   tableState.setRows(rows);
 
   useEffect(() => {
