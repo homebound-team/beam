@@ -44,14 +44,17 @@ export class RowState {
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
     makeAutoObservable(this, { row: observable.ref }, { name: `RowState@${row.id}` });
-    // Only conditionally set up the onSelect reaction
-    if (row.onSelect) {
-      reaction(
-        () => this.selectedState,
+    reaction(
+      () => this.selectedState,
+      (state) => {
+        const isSelected = state === "checked";
         // Go through `this.row.onSelect` to get the latest lambda
-        (state) => this.row.onSelect && this.row.onSelect(state === "checked"),
-      );
-    }
+        const rowFn = this.row.onSelect;
+        rowFn && rowFn(isSelected);
+        const tableFn = states.table.onSelect?.[this.row.kind];
+        tableFn && tableFn(this.row.data as any, isSelected, { row, api: states.table.api });
+      },
+    );
   }
 
   /**

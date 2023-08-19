@@ -15,14 +15,16 @@ export class RowStates {
   readonly storage = new RowStorage(this);
   // Pre-create the header to drive select-all/etc. behavior, even if the user
   // doesn't pass an explicit `header` GridDataRow in `rows.props`
-  private readonly header: RowState = this.createHeaderRow();
+  private readonly header: RowState;
   // Pre-create our keptGroupRow for if/when we need it.
-  private keptGroupRow: RowState = this.createKeptGroupRow(this.header);
+  private keptGroupRow: RowState;
   /** The first level of rows, i.e. not the header (or kept group), but the totals + top-level children. */
   private topRows: RowState[] = [];
 
   constructor(table: TableState) {
     this.table = table;
+    this.header = this.createHeaderRow();
+    this.keptGroupRow = this.createKeptGroupRow(this.header);
     this.map.set(this.header.row.id, this.header);
     this.map.set(this.keptGroupRow.row.id, this.keptGroupRow);
   }

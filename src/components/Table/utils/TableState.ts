@@ -1,6 +1,6 @@
 import { makeAutoObservable, observable, reaction } from "mobx";
 import React from "react";
-import { sortFn } from "src/components";
+import { OnSelect, sortFn } from "src/components";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridSortConfig } from "src/components/Table/GridTable";
 import { GridTableApi } from "src/components/Table/GridTableApi";
@@ -53,6 +53,7 @@ export class TableState {
   private initialSortState: SortState | undefined;
   // The server-side `onSort` callback, if any.
   private onSort: ((orderBy: any | undefined, direction: Direction | undefined) => void) | undefined;
+  onSelect: OnSelect<any> | undefined = undefined;
 
   /**
    * Creates the `RowState` for a given `GridTable`.
