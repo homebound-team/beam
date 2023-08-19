@@ -44,6 +44,9 @@ export class RowState {
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
     makeAutoObservable(this, { row: observable.ref }, { name: `RowState@${row.id}` });
+    // Ideally we could hook up this reaction conditionally, but for the header RowState,
+    // we're initialized by GridTableApiImpl, before TableState.onRowSelect has a chance
+    // to be set to GridTableProps.onRowSelect, so for now just always hook up this reaction.
     reaction(
       () => this.selectedState,
       (state) => {
