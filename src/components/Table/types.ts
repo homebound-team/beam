@@ -1,13 +1,12 @@
-import { ReactElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
-import { GridDataRow, GridRowKind } from "src/components/Table/components/Row";
+import { GridRowKind } from "src/components/Table/components/Row";
 import { GridRowApi } from "src/components/Table/GridTableApi";
 import { Margin, Xss } from "src/Css";
 
 export type Kinded = { kind: string };
 export type GridTableXss = Xss<Margin>;
 export type RenderAs = "div" | "table" | "virtual";
-export type RowTuple<R extends Kinded> = [GridDataRow<R>, ReactElement];
 export type Direction = "ASC" | "DESC";
 
 export type MaybeFn<T> = T | (() => T);

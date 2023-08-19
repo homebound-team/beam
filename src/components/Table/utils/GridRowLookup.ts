@@ -1,13 +1,8 @@
 import { MutableRefObject } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
 import { GridDataRow } from "src/components/Table/components/Row";
-import {
-  DiscriminateUnion,
-  GridColumnWithId,
-  Kinded,
-  nonKindGridColumnKeys,
-  RowTuple,
-} from "src/components/Table/types";
+import { GridTableApiImpl } from "src/components/Table/GridTableApi";
+import { DiscriminateUnion, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
 
 /**
  * Allows a caller to ask for the currently shown rows, given the current sorting/filtering.
@@ -37,8 +32,7 @@ interface NextPrev<R extends Kinded> {
 }
 
 export function createRowLookup<R extends Kinded>(
-  columns: GridColumnWithId<R>[],
-  filteredRows: RowTuple<R>[],
+  api: GridTableApiImpl<R>,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
 ): GridRowLookup<R> {
   return {
@@ -48,14 +42,15 @@ export function createRowLookup<R extends Kinded>(
         // element and calling .scrollIntoView, just not doing that yet.
         throw new Error("scrollTo is only supported for as=virtual");
       }
-      const index = filteredRows.findIndex(([r]) => r && r.kind === kind && r.id === id);
+      const index = api.tableState.visibleRows.findIndex((r) => r && r.kind === kind && r.row.id === id);
       virtuosoRef.current.scrollToIndex({ index, behavior: "smooth" });
     },
     currentList() {
-      return filteredRows.map((r) => r[0]) as GridDataRow<R>[];
+      return api.tableState.visibleRows.map((rs) => rs.row);
     },
     lookup(row, additionalFilter = () => true) {
-      const rows = filteredRows.map((r) => r[0] as GridDataRow<R>).filter(additionalFilter);
+      const rows = this.currentList().filter(additionalFilter);
+      const columns = api.tableState.visibleColumns;
       // Ensure we have `result.kind = {}` for each kind
       const result: any = Object.fromEntries(getKinds(columns).map((kind) => [kind, {}]));
       // This is an admittedly cute/fancy scan, instead of just `rows.findIndex`, but

@@ -14,10 +14,9 @@ import {
   InfiniteScroll,
   Kinded,
   RenderAs,
-  RowTuple,
 } from "src/components/Table/types";
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
-import { createRowLookup, GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { EXPANDABLE_HEADER, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
@@ -217,6 +216,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const resizeRef = useRef<HTMLDivElement>(null);
 
   const api = useMemo<GridTableApiImpl<R>>(() => {
+    // Let the user pass in their own api handle, otherwise make our own
     const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
     api.init(persistCollapse, virtuosoRef);
     api.setActiveRowId(activeRowId);
@@ -272,28 +272,26 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // Flatten, hide-if-filtered, hide-if-collapsed, and component-ize the sorted rows.
   const [tableHeadRows, visibleDataRows, keptSelectedRows, tooManyClientSideRows]: [
-    RowTuple<R>[],
-    RowTuple<R>[],
-    RowTuple<R>[],
+    ReactElement[],
+    ReactElement[],
+    ReactElement[],
     boolean,
   ] = useComputed(() => {
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
-    const headerRows: RowTuple<R>[] = [];
-    const expandableHeaderRows: RowTuple<R>[] = [];
-    const totalsRows: RowTuple<R>[] = [];
-    const keptSelectedRows: RowTuple<R>[] = [];
-    let visibleDataRows: RowTuple<R>[] = [];
+    const headerRows: ReactElement[] = [];
+    const expandableHeaderRows: ReactElement[] = [];
+    const totalsRows: ReactElement[] = [];
+    const keptSelectedRows: ReactElement[] = [];
+    let visibleDataRows: ReactElement[] = [];
 
     const { visibleRows } = tableState;
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
-      const { row } = rs;
-      const tuple = [
-        row,
+      const row = (
         <Row
-          key={`${row.kind}-${row.id}`}
+          key={rs.key}
           {...{
             as,
             rs,
@@ -305,18 +303,18 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
             hasExpandableHeader,
           }}
-        />,
-      ] as RowTuple<R>;
-      if (row.kind === "header") {
-        headerRows.push(tuple);
-      } else if (row.kind === "expandableHeader") {
-        expandableHeaderRows.push(tuple);
-      } else if (row.kind === "totals") {
-        totalsRows.push(tuple);
-      } else if (rs.isKept || row.kind === KEPT_GROUP) {
-        keptSelectedRows.push(tuple);
+        />
+      );
+      if (rs.kind === "header") {
+        headerRows.push(row);
+      } else if (rs.kind === "expandableHeader") {
+        expandableHeaderRows.push(row);
+      } else if (rs.kind === "totals") {
+        totalsRows.push(row);
+      } else if (rs.isKept || rs.kind === KEPT_GROUP) {
+        keptSelectedRows.push(row);
       } else {
-        visibleDataRows.push(tuple);
+        visibleDataRows.push(row);
       }
     });
 
@@ -332,11 +330,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   }, [as, api, style, rowStyles, maybeStyle, columnSizes, getCount, filterMaxRows]);
 
   // Push back to the caller a way to ask us where a row is.
-  const { rowLookup } = props;
-  if (rowLookup) {
-    // Refs are cheap to assign to, so we don't bother doing this in a useEffect
-    rowLookup.current = createRowLookup(columns, visibleDataRows, virtuosoRef);
-  }
+  // Refs are cheap to assign to, so we don't bother doing this in a useEffect
+  if (props.rowLookup) props.rowLookup.current = api.lookup;
 
   const noData = visibleDataRows.length === 0;
   const firstRowMessage =
@@ -400,13 +395,13 @@ function renderDiv<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumnWithId<R>[],
-  visibleDataRows: RowTuple<R>[],
-  keptSelectedRows: RowTuple<R>[],
+  visibleDataRows: ReactElement[],
+  keptSelectedRows: ReactElement[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
-  tableHeadRows: RowTuple<R>[],
+  tableHeadRows: ReactElement[],
   stickyOffset: number,
   _infiniteScroll?: InfiniteScroll,
 ): ReactElement {
@@ -431,7 +426,7 @@ function renderDiv<R extends Kinded>(
           ...Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$,
         }}
       >
-        {tableHeadRows.map(([, node]) => node)}
+        {tableHeadRows}
       </div>
 
       {/* Table Body */}
@@ -442,14 +437,14 @@ function renderDiv<R extends Kinded>(
           ...(style.lastRowCss && Css.addIn("& > div:last-of-type", style.lastRowCss).$),
         }}
       >
-        {keptSelectedRows.map(([, node]) => node)}
+        {keptSelectedRows}
         {/* Show an info message if it's set. */}
         {firstRowMessage && (
           <div css={{ ...style.firstRowMessageCss }} data-gridrow>
             {firstRowMessage}
           </div>
         )}
-        {visibleDataRows.map(([, node]) => node)}
+        {visibleDataRows}
       </div>
     </div>
   );
@@ -460,13 +455,13 @@ function renderTable<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumnWithId<R>[],
-  visibleDataRows: RowTuple<R>[],
-  keptSelectedRows: RowTuple<R>[],
+  visibleDataRows: ReactElement[],
+  keptSelectedRows: ReactElement[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
-  tableHeadRows: RowTuple<R>[],
+  tableHeadRows: ReactElement[],
   stickyOffset: number,
   _infiniteScroll?: InfiniteScroll,
 ): ReactElement {
@@ -485,11 +480,9 @@ function renderTable<R extends Kinded>(
       }}
       data-testid={id}
     >
-      <thead css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$}>
-        {tableHeadRows.map(([, node]) => node)}
-      </thead>
+      <thead css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$}>{tableHeadRows}</thead>
       <tbody>
-        {keptSelectedRows.map(([, node]) => node)}
+        {keptSelectedRows}
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
           <tr>
@@ -498,7 +491,7 @@ function renderTable<R extends Kinded>(
             </td>
           </tr>
         )}
-        {visibleDataRows.map(([, node]) => node)}
+        {visibleDataRows}
       </tbody>
     </table>
   );
@@ -528,13 +521,13 @@ function renderVirtual<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumnWithId<R>[],
-  visibleDataRows: RowTuple<R>[],
-  keptSelectedRows: RowTuple<R>[],
+  visibleDataRows: ReactElement[],
+  keptSelectedRows: ReactElement[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
-  tableHeadRows: RowTuple<R>[],
+  tableHeadRows: ReactElement[],
   _stickyOffset: number,
   infiniteScroll?: InfiniteScroll,
 ): ReactElement {
@@ -566,7 +559,7 @@ function renderVirtual<R extends Kinded>(
         // Since we have 3 arrays of rows: `tableHeadRows` and `visibleDataRows` and `keptSelectedRows` we must determine which one to render.
 
         if (index < tableHeadRows.length) {
-          return tableHeadRows[index][1];
+          return tableHeadRows[index];
         }
 
         // Reset index
@@ -574,7 +567,7 @@ function renderVirtual<R extends Kinded>(
 
         // Show keptSelectedRows if there are any
         if (index < keptSelectedRows.length) {
-          return keptSelectedRows[index][1];
+          return keptSelectedRows[index];
         }
 
         // Reset index
@@ -596,7 +589,7 @@ function renderVirtual<R extends Kinded>(
         }
 
         // Lastly render the table body rows
-        return visibleDataRows[index][1];
+        return visibleDataRows[index];
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
       // When implementing infinite scroll, default the bottom `increaseViewportBy` to 500px. This creates the "infinite"

@@ -1,5 +1,6 @@
 import { MutableRefObject, useMemo } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
+import { createRowLookup, GridRowLookup } from "src/components/index";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { DiscriminateUnion, Kinded } from "src/components/Table/types";
 import { TableState } from "src/components/Table/utils/TableState";
@@ -68,6 +69,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   // This is public to GridTable but not exported outside of Beam
   readonly tableState: TableState<R> = new TableState(this);
   virtuosoRef: MutableRefObject<VirtuosoHandle | null> = { current: null };
+  lookup!: GridRowLookup<R>;
 
   constructor() {
     // This instance gets spread into each row's GridRowApi, so bind the methods up-front
@@ -79,6 +81,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     // Technically this drives both row-collapse and column-expanded
     if (persistCollapse) this.tableState.loadCollapse(persistCollapse);
     this.virtuosoRef = virtuosoRef;
+    this.lookup = createRowLookup(this, virtuosoRef);
   }
 
   public scrollToIndex(index: number): void {

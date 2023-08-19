@@ -199,6 +199,14 @@ export class RowState<R extends Kinded> {
     return keptRows[keptRows.length - 1] === this;
   }
 
+  get key(): string {
+    return `${this.row.kind}-${this.row.id}`;
+  }
+
+  get kind(): string {
+    return this.row.kind;
+  }
+
   get isActive(): boolean {
     return this.states.table.activeRowId === `${this.row.kind}_${this.row.id}`;
   }
