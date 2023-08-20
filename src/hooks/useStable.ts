@@ -41,6 +41,11 @@ export function pretendStable<T>(value: T): Stable<T> {
   return value as Stable<T>;
 }
 
+/** Downgrades the given `Props` by removing the `Stable` wrapper from each key to ease migration. */
+export type UnstableProps<Props> = {
+  [K in keyof Props]: Props[K] extends Stable<infer T> ? T : Props[K];
+};
+
 /**
  * Allows creating "stable values", which is really just a dressed up `useMemo`.
  *

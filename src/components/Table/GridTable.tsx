@@ -23,7 +23,7 @@ import { EXPANDABLE_HEADER, KEPT_GROUP, zIndices } from "src/components/Table/ut
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
-import { Stable } from "src/hooks/useStable";
+import { Stable, UnstableProps } from "src/hooks/useStable";
 import { GridDataRow, Row } from "./components/Row";
 
 let runningInJest = false;
@@ -381,13 +381,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   );
 }
 
-/** Downgrades the GridTableProps by removing the Stable wrapper from each prop to ease migration. */
-export type GridTableUnsafeProps<R extends Kinded, X> = {
-  [K in keyof GridTableProps<R, X>]: GridTableProps<R, X>[K] extends Stable<infer T> ? T : GridTableProps<R, X>[K];
-};
-
+/** Downgrades the GridTable/GridTableProps by removing the Stable wrapper from each prop to ease migration. */
 export const GridTableUnsafe: <R extends Kinded, X extends Only<GridTableXss, X> = any>(
-  props: GridTableUnsafeProps<R, X>,
+  props: UnstableProps<GridTableProps<R, X>>,
 ) => ReactElement = GridTable as any;
 
 // Determine which HTML element to use to build the GridTable
