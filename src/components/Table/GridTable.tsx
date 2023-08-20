@@ -598,7 +598,10 @@ function renderVirtual<R extends Kinded>(
               bottom: infiniteScroll.endOffsetPx ?? 500,
               top: 0,
             },
-            endReached: infiniteScroll.onEndReached,
+            // Add a `index > 0` check b/c Virtuoso is calling this in storybook
+            // with `endReached(0)` at odd times, like on page unload/story load,
+            // which then causes our test data to have duplicate ids in it.
+            endReached: (index) => (index > 0 ? infiniteScroll.onEndReached(index) : 0),
           }
         : {})}
     />

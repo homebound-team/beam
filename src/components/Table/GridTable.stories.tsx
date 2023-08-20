@@ -213,7 +213,7 @@ export function InfiniteScroll() {
     }));
   }, []);
 
-  const [data, setData] = useState<GridDataRow<Row>[]>(loadRows(0));
+  const [data, setData] = useState<GridDataRow<Row>[]>(() => loadRows(0));
   const rows: GridDataRow<Row>[] = useMemo(() => [simpleHeader, ...data], [data]);
   const columns: GridColumn<Row>[] = useMemo(
     () => [
