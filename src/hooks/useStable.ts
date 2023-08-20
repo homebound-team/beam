@@ -18,7 +18,11 @@ const stable = Symbol("stable");
  */
 export type Stable<T> = T & { [stable]: true };
 
-export type StableDeps = Stable<any> | string | number | boolean | null | undefined;
+export type StableDep = Stable<unknown> | string | number | boolean | null | undefined;
+
+declare module "react" {
+  function useMemo<T>(factory: () => T, deps: ReadonlyArray<unknown> | undefined): Stable<T>;
+}
 
 /**
  * Marks a value as stable even though it's not.
@@ -32,7 +36,7 @@ export function pretendStable<T>(value: T): Stable<T> {
 }
 
 /** Allows creating "stable values", which is really just a dressed up `useMemo`. */
-export function useStable<T>(fn: () => T, deps: StableDeps): Stable<T> {
+export function useStable<T>(fn: () => T, deps: ReadonlyArray<StableDep> | undefined): Stable<T> {
   // We don't need the `fn` factory to be a dep
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(fn, deps) as Stable<T>;
