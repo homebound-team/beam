@@ -1,4 +1,5 @@
 import memoizeOne from "memoize-one";
+import { runInAction } from "mobx";
 import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef } from "react";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { DiscriminateUnion, GridRowKind } from "src/components/index";
@@ -232,13 +233,21 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const { tableState } = api;
 
   tableState.onRowSelect = onRowSelect;
-  // useEffect(() => {
-  // }, [tableState, rows]);
-  tableState.setRows(rows);
 
+  // Use a single useEffect to push props into the TableState observable, that
+  // way we avoid React warnings when the observable mutations cause downstream
+  // components to be marked for re-render. Mobx will ignore setter calls that
+  // don't actually change the value, so we can do this in a single useEffect.
   useEffect(() => {
-    tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
-  }, [tableState, columnsWithIds, visibleColumnsStorageKey]);
+    // Use runInAction so mobx delays any reactions until all the mutations happen
+    runInAction(() => {
+      tableState.setRows(rows);
+      tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+      tableState.setSearch(filter);
+      tableState.activeRowId = activeRowId;
+      tableState.activeCellId = activeCellId;
+    });
+  }, [tableState, rows, columnsWithIds, visibleColumnsStorageKey, activeRowId, activeCellId, filter]);
 
   const columns: GridColumnWithId<R>[] = useComputed(() => {
     return tableState.visibleColumns as GridColumnWithId<R>[];
@@ -247,18 +256,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // Initialize the sort state. This will only happen on the first render.
   // Once the `TableState.sort` is defined, it will not re-initialize.
   tableState.initSortState(props.sorting, columns);
-
-  useEffect(() => {
-    tableState.activeRowId = activeRowId;
-  }, [tableState, activeRowId]);
-
-  useEffect(() => {
-    tableState.activeCellId = activeCellId;
-  }, [tableState, activeCellId]);
-
-  useEffect(() => {
-    tableState.setSearch(filter);
-  }, [tableState, filter]);
 
   // We track render count at the table level, which seems odd (we should be able to track this
   // internally within each GridRow using a useRef), but we have suspicions that react-virtuoso

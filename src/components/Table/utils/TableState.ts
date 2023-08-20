@@ -151,10 +151,8 @@ export class TableState<R extends Kinded> {
 
   // Updates the list of rows and regenerates the collapsedRows property if needed.
   setRows(rows: GridDataRow<R>[]): void {
-    if (rows !== this.rows) {
-      this.rowStates.setRows(rows);
-      this.rows = rows;
-    }
+    this.rowStates.setRows(rows);
+    this.rows = rows;
   }
 
   setColumns(columns: GridColumnWithId<R>[], visibleColumnsStorageKey: string | undefined): void {
