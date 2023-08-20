@@ -12,7 +12,6 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
-import { pretendStable } from "src/hooks/useStable";
 import { Checkbox, SelectField, TextField } from "src/inputs";
 import { noop } from "src/utils";
 import {
@@ -104,8 +103,6 @@ const nestedColumns: GridColumn<NestedRow>[] = [
   },
 ];
 
-const s = pretendStable;
-
 describe("GridTable", () => {
   it("can align things", async () => {
     // Given a column that aligns center
@@ -113,7 +110,7 @@ describe("GridTable", () => {
       header: () => ({ content: "Value", alignment: "center" }),
       data: (row) => ({ content: row.value, alignment: "center" }),
     };
-    const r = await render(<GridTable columns={s([nameColumn, valueColumn])} rows={rows} />);
+    const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} />);
     // Then we add the center class
     expect(cell(r, 0, 1)).toHaveStyleRule("justify-content", "center");
     expect(cell(r, 1, 1)).toHaveStyleRule("justify-content", "center");
