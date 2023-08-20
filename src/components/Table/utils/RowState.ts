@@ -42,6 +42,7 @@ export class RowState<R extends Kinded> {
    * actively removed.
    */
   removed: false | "soft" | "hard" = false;
+  private isCalculatingDirectMatch = false;
 
   constructor(private states: RowStates<R>, public parent: RowState<R> | undefined, row: GridDataRow<R>) {
     this.row = row;
@@ -50,7 +51,11 @@ export class RowState<R extends Kinded> {
     makeAutoObservable(
       this,
       // 'as any' because the fields are private so don't show up in the type
-      { _row: false, _data: observable.ref } as any,
+      {
+        _row: false,
+        _data: observable.ref,
+        isCalculatingDirectMatch: false,
+      } as any,
       { name: `RowState@${row.id}` },
     );
     // Ideally we could hook up this reaction conditionally, but for the header RowState,
@@ -308,7 +313,10 @@ export class RowState<R extends Kinded> {
       // The caller can invoke this observable without their own useComputed,
       // b/c we wrap all rows in an observer
       getVisibleChildren(kind?: R["kind"]): GridDataRow<R>[] {
-        const children = rs.visibleDirectlyMatchedChildren.map((cs) => cs.row);
+        // Avoid infinite loop if a cell asks for getVisibleChildren while calculating isMatched
+        const children = rs.isCalculatingDirectMatch
+          ? rs.visibleDirectlyMatchedChildren.map((cs) => cs.row)
+          : rs.visibleChildren.map((cs) => cs.row);
         return !kind ? children : children.filter((r) => r.kind === kind);
       },
       getSelectedChildren(kind?: R["kind"]): GridDataRow<R>[] {
@@ -335,21 +343,26 @@ export class RowState<R extends Kinded> {
   }
 
   private get isDirectlyMatched(): boolean {
-    // Reserved rows like the header can never be directly matched, and treating them
-    // as matched currently throws off the header's select all/etc. behavior
-    if (this.isReservedKind) return false;
-    // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
-    // rows should be removed from `this.children` anyway, by a change to `props.rows`,
-    // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
-    // go away, go ahead and filter them out here.
-    if (this.removed === "hard") return false;
-    // Reacts to either search state or visibleColumns state changing
-    const { visibleColumns, search } = this.states.table;
-    return search.every((term) =>
-      visibleColumns
-        .map((c) => applyRowFn(c, this.row, this.api, 0, false))
-        .some((maybeContent) => matchesFilter(maybeContent, term)),
-    );
+    this.isCalculatingDirectMatch = true;
+    try {
+      // Reserved rows like the header can never be directly matched, and treating them
+      // as matched currently throws off the header's select all/etc. behavior
+      if (this.isReservedKind) return false;
+      // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
+      // rows should be removed from `this.children` anyway, by a change to `props.rows`,
+      // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
+      // go away, go ahead and filter them out here.
+      if (this.removed === "hard") return false;
+      // Reacts to either search state or visibleColumns state changing
+      const { visibleColumns, search } = this.states.table;
+      return search.every((term) =>
+        visibleColumns
+          .map((c) => applyRowFn(c, this.row, this.api, 0, false))
+          .some((maybeContent) => matchesFilter(maybeContent, term)),
+      );
+    } finally {
+      this.isCalculatingDirectMatch = false;
+    }
   }
 
   /** Used by node when doing `console.log(rs)`. */

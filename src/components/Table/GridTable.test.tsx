@@ -1420,6 +1420,10 @@ describe("GridTable", () => {
     expect(cell(r, 1, 2)).toHaveTextContent("child p1c2");
     // And the parent knows the number of visible children
     expect(cell(r, 0, 3)).toHaveTextContent("1");
+    // And when the parent matches the filter
+    await r.rerender(<GridTable<NestedRow> columns={columns} rows={rows} filter="parent" />);
+    // Then the parent knows both children are shown again
+    expect(cell(r, 0, 3)).toHaveTextContent("2");
   });
 
   it("can access selected child rows", async () => {
