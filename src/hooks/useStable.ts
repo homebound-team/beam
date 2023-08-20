@@ -31,7 +31,7 @@ export type StableDep = Stable<unknown> | string | number | boolean | null | und
  * system where we can more robustly enforce it.
  */
 export function useStable<T>(fn: () => T, deps: ReadonlyArray<StableDep> | undefined): Stable<T> {
-  // We don't need the `fn` factory to be a dep
+  // We don't need the `fn` factory to be a dep so disable eslint warning
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(fn, deps) as Stable<T>;
 }
@@ -47,7 +47,16 @@ export function pretendStable<T>(value: T): Stable<T> {
   return value as Stable<T>;
 }
 
-/** Downgrades the given `Props` by removing the `Stable` wrapper from each key to ease migration. */
+/**
+ * Downgrades the given `Props` by removing the `Stable` wrapper from each key to ease migration.
+ *
+ * I.e. a component can have its primary props type have the correct `Stable` marked types,
+ * but then provide a separate "unsafe" fallback/transition component:
+ *
+ * ```ts
+ * export const MyComponentUnsafe: (props: UnstableProps<MyComponentProps>) => ReactElement = MyComponent as any;
+ * ```
+ */
 export type UnstableProps<Props> = {
   [K in keyof Props]: Props[K] extends Stable<infer T> ? T : Props[K];
 };
