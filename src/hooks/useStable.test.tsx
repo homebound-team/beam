@@ -6,7 +6,9 @@ describe("useStable", () => {
   describe("list props", () => {
     it("fails on unstable lists", async () => {
       function Test() {
+        // Given an unstable prop value
         const unstable = [1, 2, 3];
+        // Then it's a compile error
         // @ts-expect-error
         return <TestComponent list={unstable} />;
       }
@@ -15,7 +17,9 @@ describe("useStable", () => {
 
     it("works on stable lists", async () => {
       function Test() {
+        // Given a stable prop value
         const stable = useStable(() => [1, 2, 3], []);
+        // Then it compiles
         return <TestComponent list={stable} />;
       }
       noop(<Test />);
@@ -23,7 +27,9 @@ describe("useStable", () => {
 
     it("works on memo-d lists", async () => {
       function Test() {
+        // Given a memo-d prop value
         const stable = useMemo(() => [1, 2, 3], []);
+        // Then it compiles
         return <TestComponent list={stable} />;
       }
       noop(<Test />);
@@ -33,7 +39,9 @@ describe("useStable", () => {
   describe("object props", () => {
     it("fails on unstable objects", async () => {
       function Test() {
+        // Given an unstable prop value
         const author = { firstName: "foo" };
+        // Then it doesn't compile
         // @ts-expect-error
         return <TestComponent author={author} />;
       }
@@ -42,7 +50,9 @@ describe("useStable", () => {
 
     it("works on stable objects", async () => {
       function Test() {
+        // Given an stable prop value
         const author = useStable(() => ({ firstName: "foo" }), []);
+        // Then it compiles
         return <TestComponent author={author} />;
       }
       noop(<Test />);
@@ -50,7 +60,9 @@ describe("useStable", () => {
 
     it("works on memo-d objects", async () => {
       function Test() {
+        // Given a memo-d prop value
         const author = useMemo(() => ({ firstName: "foo" }), []);
+        // Then it compiles
         return <TestComponent author={author} />;
       }
       noop(<Test />);
