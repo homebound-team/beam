@@ -107,7 +107,7 @@ export interface GridTableProps<R extends Kinded, X> {
   /** The column definitions i.e. how each column should render each row kind. */
   columns: Stable<GridColumn<R>[]>;
   /** The rows of data (including any header/footer rows), to be rendered by the column definitions. */
-  rows: GridDataRow<R>[];
+  rows: Stable<GridDataRow<R>[]>;
   /** Optional row-kind-level styling / behavior like onClick/rowLinks. */
   rowStyles?: RowStyles<R>;
   /** Allow looking up prev/next of a row i.e. for SuperDrawer navigation. */
@@ -380,6 +380,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     </TableStateContext.Provider>
   );
 }
+
+/** Downgrades the GridTableProps by removing the Stable wrapper from each prop to ease migration. */
+export type GridTableUnsafeProps<R extends Kinded, X> = {
+  [K in keyof GridTableProps<R, X>]: GridTableProps<R, X>[K] extends Stable<infer T> ? T : GridTableProps<R, X>[K];
+};
+
+export const GridTableUnsafe: <R extends Kinded, X extends Only<GridTableXss, X> = any>(
+  props: GridTableUnsafeProps<R, X>,
+) => ReactElement = GridTable as any;
 
 // Determine which HTML element to use to build the GridTable
 const renders: Record<RenderAs, typeof renderTable> = {
