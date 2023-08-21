@@ -101,12 +101,12 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   // The `any` is not great, but getting the overload to handle the optional kind is annoying
   public getSelectedRows(kind?: string): any {
-    return this.tableState.selectedRows.filter((row) => !kind || row.kind === kind);
+    return this.tableState.selectedRows.filter((rs) => !kind || rs.kind === kind).map((rs) => rs.row);
   }
 
   // The `any` is not great, but getting the overload to handle the optional kind is annoying
   public getVisibleRows(kind?: string): any {
-    return this.tableState.visibleRows.filter((row) => !kind || row.kind === kind);
+    return this.tableState.visibleRows.filter((row) => !kind || row.kind === kind).map((rs) => rs.row);
   }
 
   public clearSelections(id?: string) {

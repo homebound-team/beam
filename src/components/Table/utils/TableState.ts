@@ -210,10 +210,8 @@ export class TableState<R extends Kinded> {
    * Returns selected data rows (non-header, non-totals, etc.), ignoring rows that
    * have `row.selectable !== false`.
    */
-  get selectedRows(): GridDataRow<R>[] {
-    return this.rowStates.allStates
-      .filter((rs) => rs.isSelected && !reservedRowKinds.includes(rs.row.kind))
-      .map((rs) => rs.row);
+  get selectedRows(): RowState<R>[] {
+    return this.rowStates.allStates.filter((rs) => rs.isSelected && !reservedRowKinds.includes(rs.row.kind));
   }
 
   /** Returns kept group row, with the latest kept children, if any. */
