@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable } from "mobx";
+import { makeAutoObservable, observable, reaction } from "mobx";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { SelectedState } from "src/components/Table/utils/TableState";
@@ -44,6 +44,17 @@ export class RowState {
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
     makeAutoObservable(this, { row: observable.ref }, { name: `RowState@${row.id}` });
+    // Ideally we could hook up this reaction conditionally, but for the header RowState,
+    // we're initialized by GridTableApiImpl, before TableState.onRowSelect has a chance
+    // to be set to GridTableProps.onRowSelect, so for now just always hook up this reaction.
+    reaction(
+      () => this.selectedState,
+      (state) => {
+        const isSelected = state === "checked";
+        const tableFn = states.table.onRowSelect?.[this.row.kind];
+        tableFn && tableFn(this.row.data as any, isSelected, { row, api: states.table.api });
+      },
+    );
   }
 
   /**

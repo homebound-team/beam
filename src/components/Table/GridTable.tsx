@@ -1,6 +1,7 @@
 import memoizeOne from "memoize-one";
 import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef } from "react";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import { DiscriminateUnion, GridRowKind } from "src/components/index";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
@@ -80,6 +81,13 @@ export type GridSortConfig =
       onSort: (orderBy: string | undefined, direction: Direction | undefined) => void;
     };
 
+/** Allows listening to per-kind row selection changes. */
+export type OnRowSelect<R extends Kinded> = {
+  [K in R["kind"]]?: DiscriminateUnion<R, "kind", K> extends { data: infer D }
+    ? (data: D, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void
+    : (data: undefined, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void;
+};
+
 export interface GridTableProps<R extends Kinded, X> {
   id?: string;
   /**
@@ -153,6 +161,8 @@ export interface GridTableProps<R extends Kinded, X> {
    ** `endOffsetPx` is the number of pixels from the bottom of the list to eagerly trigger `onEndReached`. The default is is 500px.
    */
   infiniteScroll?: InfiniteScroll;
+  /** Callback for when a row is selected or unselected. */
+  onRowSelect?: OnRowSelect<R>;
 }
 
 /**
@@ -196,6 +206,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     activeCellId,
     visibleColumnsStorageKey,
     infiniteScroll,
+    onRowSelect,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
@@ -220,6 +231,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const style = resolveStyles(maybeStyle);
   const { tableState } = api;
 
+  tableState.onRowSelect = onRowSelect;
   tableState.setRows(rows);
 
   useEffect(() => {

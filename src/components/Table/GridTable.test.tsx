@@ -1,7 +1,7 @@
 import { act } from "@testing-library/react";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
+import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyles } from "src/components/Table/TableStyles";
 import { GridColumn } from "src/components/Table/types";
@@ -1545,6 +1545,43 @@ describe("GridTable", () => {
     expect(cellAnd(r, 3, 1, "select")).not.toBeChecked();
     // And they are no longer selected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
+  });
+
+  it("fires props.onSelect", async () => {
+    // Given a parent with a child
+    const actions: string[] = [];
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+    ];
+    function Test() {
+      const onSelect: OnRowSelect<NestedRow> = {
+        parent: (data, isSelected, { row }) => {
+          actions.push(`${row.kind} ${data.name} ${isSelected}`);
+        },
+        child: (data, isSelected, { row }) => {
+          actions.push(`${row.kind} ${data.name} ${isSelected}`);
+        },
+      };
+      return <GridTable<NestedRow> columns={nestedColumns} rows={rows} onRowSelect={onSelect} />;
+    }
+    const r = await render(<Test />);
+    // When we select all
+    click(cell(r, 0, 1).children[0] as any);
+    // Then all rows are shown as selected
+    expect(actions).toEqual(["parent parent 1 true", "child child p1c1 true"]);
+    // And when we unselect all
+    click(cell(r, 0, 1).children[0] as any);
+    // Then they are unselected
+    expect(actions).toEqual([
+      "parent parent 1 true",
+      "child child p1c1 true",
+      "parent parent 1 false",
+      "child child p1c1 false",
+    ]);
   });
 
   it("getSelectedRows can see update rows", async () => {
