@@ -6,13 +6,7 @@ import { ScrollableContent, ScrollableParent } from "src/components/Layout";
 import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
 import { useSnackbar } from "src/components/Snackbar";
-import {
-  GridColumn,
-  GridDataRow,
-  GridTableUnsafe as GridTable,
-  simpleHeader,
-  SimpleHeaderAndData,
-} from "src/components/Table";
+import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndData } from "src/components/Table";
 import { Tag } from "src/components/Tag";
 import { Css } from "src/Css";
 import { jan1 } from "src/forms/formStateDomain";

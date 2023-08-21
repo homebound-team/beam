@@ -186,7 +186,7 @@ export interface GridTableProps<R extends Kinded, X> {
  *
  * https://docs.google.com/document/d/1DFnlkDubK4nG_GLf_hB8yp0flnSNt_3IBh5iOicuaFM/edit#heading=h.9m9cpwgeqfc9
  */
-export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = any>(props: GridTableProps<R, X>) {
+export function Table<R extends Kinded, X extends Only<GridTableXss, X> = any>(props: GridTableProps<R, X>) {
   const {
     id = "gridTable",
     as = "div",
@@ -382,9 +382,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 }
 
 /** Downgrades the GridTable/GridTableProps by removing the Stable wrapper from each prop to ease migration. */
-export const GridTableUnsafe: <R extends Kinded, X extends Only<GridTableXss, X> = any>(
+export const GridTable: <R extends Kinded, X extends Only<GridTableXss, X> = any>(
   props: UnstableProps<GridTableProps<R, X>>,
-) => ReactElement = GridTable as any;
+) => ReactElement = Table as any;
 
 // Determine which HTML element to use to build the GridTable
 const renders: Record<RenderAs, typeof renderTable> = {

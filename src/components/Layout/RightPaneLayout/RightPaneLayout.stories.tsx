@@ -5,7 +5,7 @@ import { withBeamDecorator, zeroTo } from "src/utils/sb";
 import { Css } from "../../../Css";
 import { Button } from "../../Button";
 import { IconButton } from "../../IconButton";
-import { GridColumn, GridDataRow, GridTableUnsafe as GridTable, SimpleHeaderAndData } from "../../Table";
+import { GridColumn, GridDataRow, GridTable, SimpleHeaderAndData } from "../../Table";
 import { FullBleed } from "../FullBleed";
 import { PreventBrowserScroll } from "../PreventBrowserScroll";
 import { ScrollableContent } from "../ScrollableContent";

@@ -18,7 +18,7 @@ import {
   GridColumn,
   GridDataRow,
   GridRowLookup,
-  GridTableUnsafe as GridTable,
+  GridTable,
   Icon,
   IconButton,
   numericColumn,

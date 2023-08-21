@@ -18,7 +18,7 @@ import {
   Filters,
   GridColumn,
   GridDataRow,
-  GridTableUnsafe as GridTable,
+  GridTable,
   multiFilter,
   numberRangeFilter,
   simpleHeader,

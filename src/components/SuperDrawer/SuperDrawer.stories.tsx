@@ -3,7 +3,7 @@ import { ReactNode, useEffect, useRef } from "react";
 import {
   Button,
   GridColumn,
-  GridTableUnsafe as GridTable,
+  GridTable,
   ModalBody,
   ModalFooter,
   ModalHeader,
