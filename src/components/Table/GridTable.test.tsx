@@ -1547,43 +1547,6 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
 
-  it("fires row.onSelect", async () => {
-    // Given a parent with a child
-    const actions: string[] = [];
-    const rows: GridDataRow<NestedRow>[] = [
-      simpleHeader,
-      {
-        ...{
-          kind: "parent",
-          id: "p1",
-          data: { name: "parent 1" },
-          // And the rows are listening for selected
-          onSelect: (isSelected) => actions.push(`parent 1 ${isSelected}`),
-        },
-        children: [
-          {
-            kind: "child",
-            id: "p1c1",
-            data: { name: "child p1c1" },
-            onSelect: (isSelected) => actions.push(`child 1 ${isSelected}`),
-          },
-        ],
-      },
-    ];
-    function Test() {
-      return <GridTable<NestedRow> columns={nestedColumns} rows={rows} />;
-    }
-    const r = await render(<Test />);
-    // When we select all
-    click(cell(r, 0, 1).children[0] as any);
-    // Then all rows are shown as selected
-    expect(actions).toEqual(["parent 1 true", "child 1 true"]);
-    // And when we unselect all
-    click(cell(r, 0, 1).children[0] as any);
-    // Then they are unselected
-    expect(actions).toEqual(["parent 1 true", "child 1 true", "parent 1 false", "child 1 false"]);
-  });
-
   it("fires props.onSelect", async () => {
     // Given a parent with a child
     const actions: string[] = [];
