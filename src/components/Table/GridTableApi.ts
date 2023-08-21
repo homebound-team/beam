@@ -29,6 +29,11 @@ export type GridTableApi<R extends Kinded> = {
   /** Scrolls row `index` into view; only supported with `as=virtual` and after a `useEffect`. */
   scrollToIndex(index: number): void;
 
+  /** Returns the currently-visible rows. */
+  getVisibleRows(): GridDataRow<R>[];
+  /** Returns the currently-visible rows of the given `kind`. */
+  getVisibleRows<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
+
   /** Returns the ids of currently-selected rows. */
   getSelectedRowIds(): string[];
   getSelectedRowIds<K extends R["kind"]>(kind: K): string[];
@@ -97,6 +102,11 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   // The `any` is not great, but getting the overload to handle the optional kind is annoying
   public getSelectedRows(kind?: string): any {
     return this.tableState.selectedRows.filter((row) => !kind || row.kind === kind);
+  }
+
+  // The `any` is not great, but getting the overload to handle the optional kind is annoying
+  public getVisibleRows(kind?: string): any {
+    return this.tableState.visibleRows.filter((row) => !kind || row.kind === kind);
   }
 
   public clearSelections(id?: string) {
