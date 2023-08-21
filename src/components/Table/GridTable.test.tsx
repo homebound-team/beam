@@ -1384,6 +1384,31 @@ describe("GridTable", () => {
     expectRenderedRows();
   });
 
+  it("can access all visible rows", async () => {
+    // Given a header and two rows
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+    ];
+    // When we render them
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<NestedRow>();
+      api.current = _api;
+      return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
+    }
+    const r = await render(<Test />);
+    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
+    // Then the API get can get rows back
+    expect(api.current!.getVisibleRows()).toEqual([rows[0], rows[1], rows[1].children?.[0]]);
+    // And it can also return kinds
+    expect(api.current!.getVisibleRows("child")).toEqual([rows[1].children?.[0]]);
+  });
+
   it("can access visible child rows", async () => {
     // Given a parent with two children
     const rows: GridDataRow<NestedRow>[] = [
