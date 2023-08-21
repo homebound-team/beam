@@ -1,4 +1,5 @@
 import { reaction } from "mobx";
+import { Kinded } from "src";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { loadArrayOrUndefined } from "src/components/Table/utils/utils";
 
@@ -13,10 +14,10 @@ import { loadArrayOrUndefined } from "src/components/Table/utils/utils";
  * Unlike most of our other states, this is not directly reactive/an observable,
  * although we do reactive to collapsedRows changing to persist the new state.
  */
-export class RowStorage {
+export class RowStorage<R extends Kinded> {
   private historicalIds: string[] | undefined;
 
-  constructor(private states: RowStates) {}
+  constructor(private states: RowStates<R>) {}
 
   load(persistCollapse: string): void {
     // Load what our previously collapsed rows were

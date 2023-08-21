@@ -98,8 +98,8 @@ function nonKindDefaults() {
  * Calculates column widths using a flexible `calc()` definition that allows for consistent column alignment without the use of `<table />`, CSS Grid, etc layouts.
  * Enforces only fixed-sized units (% and px)
  */
-export function calcColumnSizes(
-  columns: GridColumnWithId<any>[],
+export function calcColumnSizes<R extends Kinded>(
+  columns: GridColumnWithId<R>[],
   tableWidth: number | undefined,
   tableMinWidthPx: number = 0,
   expandedColumnIds: string[],

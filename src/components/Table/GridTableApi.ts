@@ -1,5 +1,6 @@
 import { MutableRefObject, useMemo } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
+import { createRowLookup, GridRowLookup } from "src/components/index";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { DiscriminateUnion, Kinded } from "src/components/Table/types";
 import { TableState } from "src/components/Table/utils/TableState";
@@ -57,21 +58,32 @@ export type GridTableApi<R extends Kinded> = {
   setVisibleColumns(ids: string[]): void;
 };
 
+/** Adds per-row methods to the `api`, i.e. for getting currently-visible children. */
+export type GridRowApi<R extends Kinded> = GridTableApi<R> & {
+  getVisibleChildren(): GridDataRow<R>[];
+  getVisibleChildren<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
+  getSelectedChildren(): GridDataRow<R>[];
+  getSelectedChildren<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
+};
+
 // Using `FooImpl`to keep the public GridTableApi definition separate.
 export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   // This is public to GridTable but not exported outside of Beam
-  readonly tableState: TableState = new TableState(this);
+  readonly tableState: TableState<R> = new TableState(this);
   virtuosoRef: MutableRefObject<VirtuosoHandle | null> = { current: null };
+  lookup!: GridRowLookup<R>;
+
+  constructor() {
+    // This instance gets spread into each row's GridRowApi, so bind the methods up-front
+    bindMethods(this);
+  }
 
   /** Called once by the GridTable when it takes ownership of this api instance. */
-  init(
-    persistCollapse: string | undefined,
-    virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
-    rows: GridDataRow<R>[],
-  ) {
+  init(persistCollapse: string | undefined, virtuosoRef: MutableRefObject<VirtuosoHandle | null>) {
     // Technically this drives both row-collapse and column-expanded
     if (persistCollapse) this.tableState.loadCollapse(persistCollapse);
     this.virtuosoRef = virtuosoRef;
+    this.lookup = createRowLookup(this, virtuosoRef);
   }
 
   public scrollToIndex(index: number): void {
@@ -122,4 +134,10 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   public deleteRows(ids: string[]) {
     this.tableState.deleteRows(ids);
   }
+}
+
+function bindMethods(instance: any): void {
+  Object.getOwnPropertyNames(Object.getPrototypeOf(instance)).forEach((key) => {
+    if (instance[key] instanceof Function && key !== "constructor") instance[key] = instance[key].bind(instance);
+  });
 }

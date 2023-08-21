@@ -4,7 +4,7 @@ import { GridCellContent } from "src/components/Table/components/cell";
 import { ExpandableHeader } from "src/components/Table/components/ExpandableHeader";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
-import { GridTableApi } from "src/components/Table/GridTableApi";
+import { GridRowApi } from "src/components/Table/GridTableApi";
 import { GridStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { Css, Palette, Properties } from "src/Css";
@@ -134,7 +134,7 @@ function isContentEmpty(content: ReactNode): boolean {
 export function applyRowFn<R extends Kinded>(
   column: GridColumnWithId<R>,
   row: GridDataRow<R>,
-  api: GridTableApi<R>,
+  api: GridRowApi<R>,
   level: number,
   expanded: boolean,
 ): ReactNode | GridCellContent {

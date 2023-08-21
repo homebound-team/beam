@@ -1,5 +1,5 @@
 import { makeAutoObservable, observable } from "mobx";
-import { GridColumnWithId } from "src/components/Table/types";
+import { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
 import { ColumnStorage } from "src/components/Table/utils/ColumnStorage";
@@ -11,13 +11,13 @@ import { isFunction } from "src/utils/index";
  * This is primarily for tracking visible/expanded columns for tables
  * that use the expandable columns feature.
  */
-export class ColumnState {
-  column: GridColumnWithId<any>;
-  children: ColumnState[] | undefined = undefined;
+export class ColumnState<R extends Kinded> {
+  column: GridColumnWithId<R>;
+  children: ColumnState<R>[] | undefined = undefined;
   private visible = true;
   private expanded = false;
 
-  constructor(private states: ColumnStates, storage: ColumnStorage, column: GridColumnWithId<any>) {
+  constructor(private states: ColumnStates<R>, storage: ColumnStorage<R>, column: GridColumnWithId<R>) {
     this.column = column;
     // If the user sets `canHide: true`, we default to hidden unless they set `initVisible: true`
     this.visible = storage.wasVisible(column.id) ?? (column.canHide ? column.initVisible ?? false : true);
@@ -60,12 +60,12 @@ export class ColumnState {
       const ecs = await expandColumns();
       this.children = assignDefaultColumnIds(ecs).map((ec) => this.states.addColumn(ec));
     } else if (expandColumns) {
-      this.children = expandColumns.map((ec) => this.states.addColumn(ec as GridColumnWithId<any>));
+      this.children = expandColumns.map((ec) => this.states.addColumn(ec as GridColumnWithId<R>));
     }
   }
 
   /** Returns this column, if visible, and its children, if expanded. */
-  get maybeSelfAndChildren(): ColumnState[] {
+  get maybeSelfAndChildren(): ColumnState<R>[] {
     if (!this.visible) {
       return [];
     } else if (this.expanded && this.children) {

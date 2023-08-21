@@ -213,7 +213,7 @@ export function InfiniteScroll() {
     }));
   }, []);
 
-  const [data, setData] = useState<GridDataRow<Row>[]>(loadRows(0));
+  const [data, setData] = useState<GridDataRow<Row>[]>(() => loadRows(0));
   const rows: GridDataRow<Row>[] = useMemo(() => [simpleHeader, ...data], [data]);
   const columns: GridColumn<Row>[] = useMemo(
     () => [
@@ -901,9 +901,13 @@ export function StickyColumnsAndHeader() {
 
   // Scroll wrapping element's x & y coordinates to demonstrate proper z-indices for sticky header and columns.
   useEffect(() => {
-    if (scrollWrap.current) {
-      scrollWrap.current.scroll(45, 100);
-    }
+    // GridTable's rows have their own useEffect, so use a setTimeout to
+    // run after its useEffect has completed.
+    setTimeout(() => {
+      if (scrollWrap.current) {
+        scrollWrap.current.scroll(45, 100);
+      }
+    }, 1);
   }, []);
 
   return (

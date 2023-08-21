@@ -1384,6 +1384,83 @@ describe("GridTable", () => {
     expectRenderedRows();
   });
 
+  it("can access visible child rows", async () => {
+    // Given a parent with two children
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
+        ],
+      },
+    ];
+    // And a column where the parent counts the number of visible children
+    const columns: GridColumn<NestedRow>[] = [
+      ...nestedColumns,
+      {
+        totals: emptyCell,
+        header: emptyCell,
+        parent: (data, { api }) => api.getVisibleChildren("child").length,
+        child: emptyCell,
+        grandChild: emptyCell,
+      },
+    ];
+    const r = await render(<GridTable<NestedRow> columns={columns} rows={rows} />);
+    // And both child rows are initially rendered
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c2");
+    // Then we show the number of children
+    expect(cell(r, 0, 3)).toHaveTextContent("2");
+    // When the 1st child is filtered out
+    await r.rerender(<GridTable<NestedRow> columns={columns} rows={rows} filter="p1c2" />);
+    // Then the parent and child row are still shown
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c2");
+    // And the parent knows the number of visible children
+    expect(cell(r, 0, 3)).toHaveTextContent("1");
+    // And when the parent matches the filter
+    await r.rerender(<GridTable<NestedRow> columns={columns} rows={rows} filter="parent" />);
+    // Then the parent knows both children are shown again
+    expect(cell(r, 0, 3)).toHaveTextContent("2");
+  });
+
+  it("can access selected child rows", async () => {
+    // Given a parent with two children
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
+        ],
+      },
+    ];
+    // And a column where the parent counts the selected children
+    const columns: GridColumn<NestedRow>[] = [
+      ...nestedColumns,
+      {
+        totals: emptyCell,
+        header: emptyCell,
+        parent: (data, { api }) => api.getSelectedChildren("child").length,
+        child: emptyCell,
+        grandChild: emptyCell,
+      },
+    ];
+    const r = await render(<GridTable<NestedRow> columns={columns} rows={rows} />);
+    // And both child rows are initially rendered
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c2");
+    // Then we show no children are selected
+    expect(cell(r, 0, 3)).toHaveTextContent("0");
+    // When we select the 1st child
+    click(r.select_1);
+    // Then the parent renders the number of selected children
+    expect(cell(r, 0, 3)).toHaveTextContent("1");
+  });
+
   it("persists collapse", async () => {
     const tableIdentifier = "gridTableTest";
     // Given that parent 2 is set to collapsed in local storage
@@ -1616,6 +1693,51 @@ describe("GridTable", () => {
     expect(r.selectedNames().textContent).toEqual("foo2");
     // And the table value is updated as expected
     expect(cell(r, 1, 1)).toHaveTextContent("foo2");
+  });
+
+  it("getSelectedRows doesn't fire if data has not changed", async () => {
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+    const _columns = [selectColumn<Row>(), ...columns];
+    let computedCount = 0;
+
+    // Given a component using a useComputed against getSelectedRows
+    function Test({ rows }: { rows: GridDataRow<Row>[] }) {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      const selectedNames = useComputed(() => {
+        computedCount++;
+        return _api
+          .getSelectedRows("data")
+          .map((r) => r.data.name)
+          .join(",");
+      }, [_api]);
+      return (
+        <div>
+          <div data-testid="selectedNames">{selectedNames}</div>
+          <GridTable<Row> api={_api} columns={_columns} rows={rows} />
+        </div>
+      );
+    }
+    // And the initial render has computed
+    const r = await render(<Test rows={rows} />);
+    expect(computedCount).toBe(2);
+    // And the user has selected one row
+    click(r.select_1);
+    // And selected rows is initially calc-d
+    expect(r.selectedNames().textContent).toEqual("foo");
+    expect(computedCount).toBe(3);
+    // When we re-render with the different row literals, but stable data
+    await r.rerender(
+      <Test
+        rows={[
+          rows[0],
+          { kind: "data", id: "1", data: rows[1].data as any },
+          { kind: "data", id: "2", data: rows[2].data as any },
+        ]}
+      />,
+    );
+    // Then we didn't recompute
+    expect(computedCount).toBe(3);
   });
 
   it("can select rows via api", async () => {

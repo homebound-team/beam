@@ -1,5 +1,7 @@
 import { makeAutoObservable, observable, reaction } from "mobx";
+import { Kinded } from "src";
 import { GridDataRow } from "src/components/Table/components/Row";
+import { GridRowApi } from "src/components/Table/GridTableApi";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { SelectedState } from "src/components/Table/utils/TableState";
 import { applyRowFn, HEADER, KEPT_GROUP, matchesFilter, reservedRowKinds } from "src/components/Table/utils/utils";
@@ -10,11 +12,13 @@ import { applyRowFn, HEADER, KEPT_GROUP, matchesFilter, reservedRowKinds } from 
  * We set up the RowStates in a tree, just like GridDataRow, to make business logic
  * that uses parent/children easier to write, i.e. selected-ness and collapsed-ness.
  */
-export class RowState {
-  /** Our row, only ref observed, so we don't crawl into GraphQL fragments. */
-  row: GridDataRow<any>;
+export class RowState<R extends Kinded> {
+  /** Our row, not actually observed, b/c each `createRows` calc creates unstable rows. */
+  private _row!: GridDataRow<R>;
+  /** Our data, only ref observed, so we don't crawl into GraphQL fragments. */
+  private _data: unknown;
   /** Our children row states, as of the latest `props.rows`, without any filtering applied. */
-  children: RowState[] | undefined = undefined;
+  children: RowState<R>[] | undefined = undefined;
   /** Whether we are *directly* selected. */
   selected = false;
   /** Whether we are collapsed. */
@@ -38,12 +42,22 @@ export class RowState {
    * actively removed.
    */
   removed: false | "soft" | "hard" = false;
+  private isCalculatingDirectMatch = false;
 
-  constructor(private states: RowStates, public parent: RowState | undefined, row: GridDataRow<any>) {
+  constructor(private states: RowStates<R>, public parent: RowState<R> | undefined, row: GridDataRow<R>) {
     this.row = row;
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
-    makeAutoObservable(this, { row: observable.ref }, { name: `RowState@${row.id}` });
+    makeAutoObservable(
+      this,
+      // 'as any' because the fields are private so don't show up in the type
+      {
+        _row: false,
+        _data: observable.ref,
+        isCalculatingDirectMatch: false,
+      } as any,
+      { name: `RowState@${row.id}` },
+    );
     // Ideally we could hook up this reaction conditionally, but for the header RowState,
     // we're initialized by GridTableApiImpl, before TableState.onRowSelect has a chance
     // to be set to GridTableProps.onRowSelect, so for now just always hook up this reaction.
@@ -55,6 +69,21 @@ export class RowState {
         tableFn && tableFn(this.row.data as any, isSelected, { row, api: states.table.api });
       },
     );
+  }
+
+  /** Returns a stable-ish row identity that will only change if our `data` changes. */
+  get row(): GridDataRow<R> {
+    // This is a noop, but makes mobx see `_data` as a dependency
+    return Object.assign(this._row, { data: this._data });
+  }
+
+  /** Accepts a new unstable row, i.e. each `createRows` creates a new row literal. */
+  set row(row: GridDataRow<R>) {
+    // If `_data` is a stable GraphQL fragment, but row is just a new literal around
+    // it, this won't actually cause any reactivity changes. But once _data does change,
+    // then anyone watching `.row` will see the new row instance + new data.
+    this._row = row;
+    this._data = row.data;
   }
 
   /**
@@ -169,6 +198,24 @@ export class RowState {
     );
   }
 
+  get isLastKeptRow(): boolean {
+    if (!this.isKept) return false;
+    const { keptRows } = this.states.table;
+    return keptRows[keptRows.length - 1] === this;
+  }
+
+  get key(): string {
+    return `${this.row.kind}-${this.row.id}`;
+  }
+
+  get kind(): string {
+    return this.row.kind;
+  }
+
+  get isActive(): boolean {
+    return this.states.table.activeRowId === `${this.row.kind}_${this.row.id}`;
+  }
+
   get level(): number {
     // Make the header level -1, so the top-level rows are level 0
     return !this.parent ? -1 : this.parent.level + 1;
@@ -179,7 +226,7 @@ export class RowState {
   }
 
   /** Returns this row and, if we're not collapsed, our children. */
-  get selfAndMaybeChildren(): RowState[] {
+  get selfAndMaybeChildren(): RowState<R>[] {
     // The header always returns all children/top rows, even if collapsed
     if (this.children && (!this.collapsed || this.row.kind === HEADER)) {
       return [this, ...this.visibleSortedChildren.flatMap((c) => c.selfAndMaybeChildren)];
@@ -188,7 +235,7 @@ export class RowState {
     }
   }
 
-  private get visibleChildren(): RowState[] {
+  private get visibleChildren(): RowState<R>[] {
     // The keptGroup is special and its children are the dynamically kept rows
     if (this.row.kind === KEPT_GROUP) return this.states.keptRows;
     return (
@@ -202,8 +249,34 @@ export class RowState {
     );
   }
 
+  // This is a copy/paste of visibleChildren, but using isDirectlyMatched instead of isMatched
+  // to avoid a cycle, i.e.:
+  //
+  // 1. A parent row evals its own isDirectlyMatched
+  // 2. The parent row has a cell that calculates "sum of visible children"
+  // 3. To know whether the sum cell matches the filter, "1234", we need to render the cell
+  // 4. If rendering the parent cell called `visibleChildren` directly, that method checks
+  //    "is the parent directly matched?" (so that child of matched parents are always shown),
+  //     but now we've looped--deciding the content of the parent cell itself requires knowing
+  //     if the parent cell matched (b/c that controls which children are visible).
+  //
+  // We side-step this by assuming that the `GridRowApi.getVisibleChildren` can use the
+  // slightly-less accurate "my children are visible if they're directly matched".
+  private get visibleDirectlyMatchedChildren(): RowState<R>[] {
+    if (this.row.kind === KEPT_GROUP) return this.states.keptRows;
+    return (
+      this.children?.filter(
+        (rs) =>
+          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) ||
+          rs.isDirectlyMatched ||
+          rs.hasDirectlyMatchedChildren ||
+          rs.isPinned,
+      ) ?? []
+    );
+  }
+
   /** The `visibleChildren`, but with the current sort config applied. */
-  private get visibleSortedChildren(): RowState[] {
+  private get visibleSortedChildren(): RowState<R>[] {
     let rows = this.visibleChildren;
     const { sortFn } = this.states.table;
     // We need to make a copy for mobx to see the sort as a change, and also to not mutate
@@ -231,6 +304,28 @@ export class RowState {
     return typeof this.row.pin === "string" || (!!this.row.pin && this.row.pin.filter !== true);
   }
 
+  // mobx will cache this getter for us
+  public get api(): GridRowApi<R> {
+    const rs = this;
+    // Copy the GridTableApi + the getVisibleChildren GridRowApi method
+    return {
+      ...this.states.table.api,
+      // The caller can invoke this observable without their own useComputed,
+      // b/c we wrap all rows in an observer
+      getVisibleChildren(kind?: R["kind"]): GridDataRow<R>[] {
+        // Avoid infinite loop if a cell asks for getVisibleChildren while calculating isMatched
+        const children = rs.isCalculatingDirectMatch
+          ? rs.visibleDirectlyMatchedChildren.map((cs) => cs.row)
+          : rs.visibleChildren.map((cs) => cs.row);
+        return !kind ? children : children.filter((r) => r.kind === kind);
+      },
+      getSelectedChildren(kind?: R["kind"]): GridDataRow<R>[] {
+        const children = (rs.children ?? []).filter((cs) => cs.isSelected).map((cs) => cs.row);
+        return !kind ? children : children.filter((r) => r.kind === kind);
+      },
+    } as any;
+  }
+
   public get isReservedKind(): boolean {
     return reservedRowKinds.includes(this.row.kind);
   }
@@ -248,21 +343,26 @@ export class RowState {
   }
 
   private get isDirectlyMatched(): boolean {
-    // Reserved rows like the header can never be directly matched, and treating them
-    // as matched currently throws off the header's select all/etc. behavior
-    if (this.isReservedKind) return false;
-    // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
-    // rows should be removed from `this.children` anyway, by a change to `props.rows`,
-    // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
-    // go away, go ahead and filter them out here.
-    if (this.removed === "hard") return false;
-    // Reacts to either search state or visibleColumns state changing
-    const { visibleColumns, api, search } = this.states.table;
-    return search.every((term) =>
-      visibleColumns
-        .map((c) => applyRowFn(c, this.row, api, 0, false))
-        .some((maybeContent) => matchesFilter(maybeContent, term)),
-    );
+    this.isCalculatingDirectMatch = true;
+    try {
+      // Reserved rows like the header can never be directly matched, and treating them
+      // as matched currently throws off the header's select all/etc. behavior
+      if (this.isReservedKind) return false;
+      // Ignore hard-deleted rows, i.e. from `api.deleteRows`; in theory any hard-deleted
+      // rows should be removed from `this.children` anyway, by a change to `props.rows`,
+      // but just in case the user calls _only_ `api.deleteRows`, and expects the row to
+      // go away, go ahead and filter them out here.
+      if (this.removed === "hard") return false;
+      // Reacts to either search state or visibleColumns state changing
+      const { visibleColumns, search } = this.states.table;
+      return search.every((term) =>
+        visibleColumns
+          .map((c) => applyRowFn(c, this.row, this.api, 0, false))
+          .some((maybeContent) => matchesFilter(maybeContent, term)),
+      );
+    } finally {
+      this.isCalculatingDirectMatch = false;
+    }
   }
 
   /** Used by node when doing `console.log(rs)`. */

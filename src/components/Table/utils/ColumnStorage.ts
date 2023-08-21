@@ -1,13 +1,14 @@
 import { autorun, reaction } from "mobx";
+import { Kinded } from "src/components/Table/types";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
 import { loadArrayOrUndefined } from "src/components/Table/utils/utils";
 
 /** Loads/saves the column state from sessionStorage. */
-export class ColumnStorage {
+export class ColumnStorage<R extends Kinded> {
   private expandedIds: string[] | undefined;
   private visibleIds: string[] | undefined;
 
-  constructor(private states: ColumnStates) {}
+  constructor(private states: ColumnStates<R>) {}
 
   loadExpanded(persistCollapse: string): void {
     const key = `expandedColumn_${persistCollapse}`;
