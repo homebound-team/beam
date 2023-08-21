@@ -15,8 +15,11 @@ const stable = Symbol("stable");
  *   columns: Stable<Column[]>;
  * }
  * ```
+ *
+ * Note that we use a value type of `any` so that the `[stable]` key does not
+ * cause type mismatches on args that have index signatures.
  */
-export type Stable<T> = T & { [stable]: true };
+export type Stable<T> = T & { [stable]: any };
 
 /** Limits the dependencies of `useStable` to be themselves only stable values. */
 export type StableDep = Stable<unknown> | string | number | boolean | null | undefined;
