@@ -8,7 +8,7 @@ import {
   FullBleed,
   GridColumn,
   GridDataRow,
-  GridTable,
+  GridTableUnsafe as GridTable,
   PreventBrowserScroll,
   ScrollableContent,
   ScrollableParent,

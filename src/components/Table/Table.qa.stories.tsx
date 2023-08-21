@@ -6,7 +6,7 @@ import { Button } from "src";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { GridSortConfig, GridTable, GridTableProps } from "src/components/Table/GridTable";
+import { GridSortConfig, GridTableProps, GridTableUnsafe as GridTable } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { getTableStyles } from "src/components/Table/TableStyles";

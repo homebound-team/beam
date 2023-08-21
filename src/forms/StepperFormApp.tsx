@@ -2,15 +2,7 @@ import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/fo
 import { reaction } from "mobx";
 import { Observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  Button,
-  GridColumn,
-  GridDataRow,
-  GridTable,
-  IconButton,
-  simpleHeader,
-  SimpleHeaderAndData,
-} from "src/components";
+import { Button, GridColumn, GridTable, IconButton, simpleHeader, SimpleHeaderAndData } from "src/components";
 import { Step, Stepper } from "src/components/Stepper";
 import { Css } from "src/Css";
 import { BoundDateField } from "src/forms/BoundDateField";
@@ -126,7 +118,7 @@ function AuthorDetails({ formState, onNext }: { formState: FormValue; onNext: Vo
 
 function BookList({ formState, onNext, onBack }: { formState: FormValue; onNext: VoidFunction; onBack: VoidFunction }) {
   const columns = useMemo(() => createColumns(formState), [formState]);
-  const rows: GridDataRow<Row>[] = useComputed(
+  const rows = useComputed(
     () => [simpleHeader, ...formState.books.rows.map((data) => ({ kind: "data" as const, id: data.id.value!, data }))],
     [],
   );

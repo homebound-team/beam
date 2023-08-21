@@ -1,6 +1,6 @@
 import { MutableRefObject } from "react";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
-import { GridTable } from "src/components/Table/GridTable";
+import { GridTableUnsafe as GridTable } from "src/components/Table/GridTable";
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import { GridColumn } from "src/components/Table/types";
 import { column } from "src/components/Table/utils/columns";

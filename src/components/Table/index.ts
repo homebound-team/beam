@@ -28,5 +28,5 @@ export { TableState, TableStateContext } from "src/components/Table/utils/TableS
 export type { SelectedState, SortOn, SortState } from "src/components/Table/utils/TableState";
 export * from "src/components/Table/utils/utils";
 export * from "src/components/Table/utils/visitor";
-export { GridTable, setDefaultStyle, setGridTableDefaults } from "./GridTable";
+export { GridTable, GridTableUnsafe, setDefaultStyle, setGridTableDefaults } from "./GridTable";
 export type { GridSortConfig, GridTableDefaults, GridTableProps, setRunningInJest } from "./GridTable";
