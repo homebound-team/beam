@@ -1745,12 +1745,12 @@ describe("GridTable", () => {
     }
     // And the initial render has computed
     const r = await render(<Test rows={rows} />);
-    expect(computedCount).toBe(2);
+    expect(computedCount).toBe(1);
     // And the user has selected one row
     click(r.select_1);
     // And selected rows is initially calc-d
     expect(r.selectedNames().textContent).toEqual("foo");
-    expect(computedCount).toBe(3);
+    expect(computedCount).toBe(2);
     // When we re-render with the different row literals, but stable data
     await r.rerender(
       <Test
@@ -1762,7 +1762,50 @@ describe("GridTable", () => {
       />,
     );
     // Then we didn't recompute
-    expect(computedCount).toBe(3);
+    expect(computedCount).toBe(2);
+  });
+
+  it("getSelectedRowsId doesn't fire if data has changed but not ids", async () => {
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+    const _columns = [selectColumn<Row>(), ...columns];
+    let computedCount = 0;
+
+    // Given a component using a useComputed against getSelectedRowIds
+    function Test({ rows }: { rows: GridDataRow<Row>[] }) {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      const selectedIds = useComputed(() => {
+        computedCount++;
+        return _api.getSelectedRowIds("data").join(",");
+      }, [_api]);
+      return (
+        <div>
+          <div data-testid="selectedIds">{selectedIds}</div>
+          <GridTable<Row> api={_api} columns={_columns} rows={rows} />
+        </div>
+      );
+    }
+    // And the initial render has computed
+    const r = await render(<Test rows={rows} />);
+    expect(computedCount).toBe(1);
+    // And the user has selected one row
+    click(r.select_1);
+    // And selected rows is initially calc-d
+    expect(r.selectedIds().textContent).toEqual("1");
+    expect(computedCount).toBe(2);
+    // When we re-render with the different row literals and different data literals
+    await r.rerender(
+      <Test
+        rows={[
+          rows[0],
+          { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+          { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+        ]}
+      />,
+    );
+    // Then we didn't recompute
+    expect(r.selectedIds().textContent).toEqual("1");
+    expect(computedCount).toBe(2);
   });
 
   it("can select rows via api", async () => {
