@@ -108,7 +108,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   }
 
   // impl with required param for computedFn
-  public getSelectedRowIdsImpl(kind: string | undefined): string[] {
+  private getSelectedRowIdsImpl(kind: string | undefined): string[] {
     return this.tableState.selectedRows.filter((rs) => !kind || rs.kind === kind).map((rs) => rs.row.id);
   }
 
@@ -117,7 +117,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   }
 
   // impl with required param for computedFn
-  public getSelectedRowsImpl(kind: string | undefined): any {
+  private getSelectedRowsImpl(kind: string | undefined): any {
     return this.tableState.selectedRows.filter((rs) => !kind || rs.kind === kind).map((rs) => rs.row);
   }
 
