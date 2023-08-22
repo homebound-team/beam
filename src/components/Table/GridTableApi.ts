@@ -1,3 +1,5 @@
+import { comparer } from "mobx";
+import { computedFn } from "mobx-utils";
 import { MutableRefObject, useMemo } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
 import { createRowLookup, GridRowLookup } from "src/components/index";
@@ -81,6 +83,12 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   constructor() {
     // This instance gets spread into each row's GridRowApi, so bind the methods up-front
     bindMethods(this);
+    // Memoize these so that if the user is creating new `data` instances on every render, they
+    // can use `getSelectedRowIds` to observer a stable list of `[pi:1, pi:2]`, etc.
+    this.getVisibleRowsImpl = computedFn(this.getVisibleRowsImpl, { equals: comparer.shallow });
+    this.getVisibleRowIdsImpl = computedFn(this.getVisibleRowIdsImpl, { equals: comparer.shallow });
+    this.getSelectedRowsImpl = computedFn(this.getSelectedRowsImpl, { equals: comparer.shallow });
+    this.getSelectedRowIdsImpl = computedFn(this.getSelectedRowIdsImpl, { equals: comparer.shallow });
   }
 
   /** Called once by the GridTable when it takes ownership of this api instance. */
@@ -96,17 +104,40 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   }
 
   public getSelectedRowIds(kind?: string): string[] {
-    return this.getSelectedRows(kind).map((row: any) => row.id);
+    return this.getSelectedRowIdsImpl(kind ?? undefined);
   }
 
-  // The `any` is not great, but getting the overload to handle the optional kind is annoying
+  // impl with required param for computedFn
+  private getSelectedRowIdsImpl(kind: string | undefined): string[] {
+    return this.tableState.selectedRows.filter((rs) => !kind || rs.kind === kind).map((rs) => rs.row.id);
+  }
+
   public getSelectedRows(kind?: string): any {
+    return this.getSelectedRowsImpl(kind ?? undefined);
+  }
+
+  // impl with required param for computedFn
+  private getSelectedRowsImpl(kind: string | undefined): any {
     return this.tableState.selectedRows.filter((rs) => !kind || rs.kind === kind).map((rs) => rs.row);
   }
 
   // The `any` is not great, but getting the overload to handle the optional kind is annoying
   public getVisibleRows(kind?: string): any {
+    return this.getVisibleRowsImpl(kind ?? undefined);
+  }
+
+  // impl with required param for computedFn
+  private getVisibleRowsImpl(kind: string | undefined) {
     return this.tableState.visibleRows.filter((row) => !kind || row.kind === kind).map((rs) => rs.row);
+  }
+
+  public getVisibleRowIds(kind?: string): any {
+    return this.getVisibleRowIdsImpl(kind ?? undefined);
+  }
+
+  // impl with required param for computedFn
+  private getVisibleRowIdsImpl(kind: string | undefined) {
+    return this.tableState.visibleRows.filter((row) => !kind || row.kind === kind).map((rs) => rs.row.id);
   }
 
   public clearSelections(id?: string) {
