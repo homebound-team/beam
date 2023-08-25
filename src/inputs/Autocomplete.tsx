@@ -40,7 +40,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
     getOptionValue,
     getOptionMenuLabel,
     onInputChange,
-    value,
+    value = "",
     options,
     disabled,
     disabledOptions,
@@ -58,7 +58,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
     // Allow the user to type in a value that is not in the list. Allows for the text to stay in the input when the user clicks away
     allowsCustomValue: true,
     children: (item: T) => (
-      <Item key={getOptionValue(item)} textValue={getOptionValue(item)}>
+      <Item key={getOptionValue(item)} textValue={getOptionLabel(item)}>
         {getOptionMenuLabel ? getOptionMenuLabel(item) : getOptionLabel(item)}
       </Item>
     ),
