@@ -63,12 +63,3 @@ export function pretendStable<T>(value: T): Stable<T> {
 export type UnstableProps<Props> = {
   [K in keyof Props]: Props[K] extends Stable<infer T> ? T : Props[K];
 };
-
-declare module "react" {
-  // Extend useMemo's return values to be automatically considered stable.
-  //
-  // With this extension, we could almost get away without our own `useStable` hook,
-  // but we can't use the extension mechanism to restrict useMemo's `deps` to be
-  // `ReadonlyArray<StableDep>`.
-  function useMemo<T>(factory: () => T, deps: ReadonlyArray<unknown> | undefined): Stable<T>;
-}
