@@ -90,6 +90,7 @@ export const Icon = (props: IconProps) => {
     "triangleRight",
     "triangleUp",
     "triangleDown",
+    "subDirectoryRight",
   ];
   const mediaIcons: IconProps["icon"][] = [
     "camera",
@@ -139,6 +140,7 @@ export const Icon = (props: IconProps) => {
     "bath",
     "car",
     "basement",
+    "cube",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
