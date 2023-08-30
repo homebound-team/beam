@@ -251,17 +251,17 @@ export function InfiniteScrollWithLoader() {
     }));
   }, []);
 
-  const [loading, setLoading] = useState(false);
   const [data, setData] = useState<GridDataRow<Row>[]>(() => loadRows(0));
 
   // Simulate a slower network call that doesn't finish before the user reaches the end of the list
-  const fetchMoreDate = useCallback(
-    (index: number) => {
-      setLoading(true);
-      setTimeout(() => {
-        setData([...data, ...loadRows(index)]);
-        setLoading(false);
-      }, 1_500);
+  const fetchMoreData = useCallback(
+    async (index: number) => {
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          setData([...data, ...loadRows(index)]);
+          resolve();
+        }, 1_500);
+      });
     },
     [data, loadRows],
   );
@@ -284,10 +284,7 @@ export function InfiniteScrollWithLoader() {
           stickyHeader={true}
           rows={rows}
           infiniteScroll={{
-            onEndReached(index) {
-              fetchMoreDate(index);
-            },
-            nextPageLoading: loading,
+            onEndReached: fetchMoreData,
           }}
         />
       </div>
