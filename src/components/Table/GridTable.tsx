@@ -1,7 +1,8 @@
 import memoizeOne from "memoize-one";
 import { runInAction } from "mobx";
-import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef } from "react";
+import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import { Loader } from "src/components";
 import { DiscriminateUnion, GridRowKind } from "src/components/index";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -23,6 +24,7 @@ import { EXPANDABLE_HEADER, KEPT_GROUP, zIndices } from "src/components/Table/ut
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
+import { isPromise } from "src/utils";
 import { GridDataRow, Row } from "./components/Row";
 
 let runningInJest = false;
@@ -534,6 +536,9 @@ function renderVirtual<R extends Kinded>(
     return { footerStyle: { paddingBottom }, listStyle: { ...style, rootCss: otherRootStyles } };
   }, [style]);
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
+
   return (
     <Virtuoso
       overscan={5}
@@ -548,7 +553,17 @@ function renderVirtual<R extends Kinded>(
           />
         )),
         List: VirtualRoot(listStyle, columns as any, id, xss),
-        Footer: () => <div css={footerStyle} />,
+        Footer: () => {
+          return (
+            <div css={footerStyle}>
+              {fetchMoreInProgress && (
+                <div css={Css.h5.df.aic.jcc.$}>
+                  <Loader size={"xs"} />
+                </div>
+              )}
+            </div>
+          );
+        },
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={stickyHeader ? tableHeadRows.length : 0}
@@ -601,7 +616,15 @@ function renderVirtual<R extends Kinded>(
             // Add a `index > 0` check b/c Virtuoso is calling this in storybook
             // with `endReached(0)` at odd times, like on page unload/story load,
             // which then causes our test data to have duplicate ids in it.
-            endReached: (index) => (index > 0 ? infiniteScroll.onEndReached(index) : 0),
+            endReached: (index) => {
+              if (index === 0) return;
+
+              const result = infiniteScroll.onEndReached(index);
+              if (isPromise(result)) {
+                setFetchMoreInProgress(true);
+                result.finally(() => setFetchMoreInProgress(false));
+              }
+            },
           }
         : {})}
     />

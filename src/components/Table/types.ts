@@ -123,8 +123,8 @@ export type Pin = { at: "first" | "last"; filter?: boolean };
 export type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
 
 export type InfiniteScroll = {
-  /** will be called when the user scrolls to the end of the list with the last item index as an argument.  */
-  onEndReached: (index: number) => void;
+  /** will be called when the user scrolls to the end of the list with the last item index as an argument. Return a promise to automatically show a loading spinner.  */
+  onEndReached: (index: number) => void | Promise<void>;
   /** The number of pixels from the bottom of the list to eagerly trigger `onEndReached`. The default is 500px. */
   endOffsetPx?: number;
 };
