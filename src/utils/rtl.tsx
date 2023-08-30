@@ -16,6 +16,7 @@ import {
   Wrapper,
 } from "@homebound/rtl-utils";
 import { prettyDOM } from "@testing-library/react";
+import { fail } from "mobx-utils";
 import { ReactElement } from "react";
 import { BeamProvider } from "src/components";
 export {
@@ -216,9 +217,7 @@ function ensureListBoxOpen(select: HTMLElement): void {
 }
 
 function selectOption(select: HTMLElement, optionValue: string) {
-  const body = select.closest("body") as HTMLElement;
-  const listboxId = select.getAttribute("aria-controls");
-  const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
+  const listbox = findListBox(select);
   const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
   // Allow searching for options by their data-key (value) or textContent (label)
   const optionToSelect = Array.from(options).find(
@@ -243,9 +242,7 @@ export function getSelected(element: HTMLElement): string[] | string | undefined
 
   ensureListBoxOpen(select);
 
-  const body = select.closest("body") as HTMLElement;
-  const listboxId = select.getAttribute("aria-controls");
-  const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
+  const listbox = findListBox(select);
   const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
 
   const selections: string[] = Array.from(options)
@@ -262,14 +259,17 @@ export function getOptions(element: HTMLElement): string[] {
   assertListBoxInput(select);
   ensureListBoxOpen(select);
 
-  const body = select.closest("body") as HTMLElement;
-  const listboxId = select.getAttribute("aria-controls");
-  const listbox = body.querySelector(`#${listboxId}`) as HTMLElement;
+  const listbox = findListBox(select);
   const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
 
   return Array.from(options)
     .map((o: HTMLElement) => o.dataset.label ?? o.dataset.key ?? "")
     .filter((o) => !!o);
+}
+
+function findListBox(select: HTMLElement): HTMLElement {
+  const listboxId = select.getAttribute("aria-controls") || fail("aria-controls attribute not found");
+  return document.getElementById(listboxId) || fail("listbox not found");
 }
 
 function assertListBoxInput(select: HTMLElement): select is HTMLInputElement {
