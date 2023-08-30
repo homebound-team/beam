@@ -244,7 +244,7 @@ export function InfiniteScroll() {
 
 export function InfiniteScrollWithLoader() {
   const loadRows = useCallback((offset: number) => {
-    return zeroTo(10).map((i) => ({
+    return zeroTo(25).map((i) => ({
       kind: "data" as const,
       id: String(i + offset),
       data: { name: `row ${i + offset}`, value: i + offset },
