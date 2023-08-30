@@ -1,15 +1,7 @@
 import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { useMemo, useState } from "react";
-import {
-  Button,
-  GridColumn,
-  GridDataRow,
-  GridTable,
-  IconButton,
-  simpleHeader,
-  SimpleHeaderAndData,
-} from "src/components";
+import { Button, GridColumn, GridTable, IconButton, simpleHeader, SimpleHeaderAndData } from "src/components";
 import { Css } from "src/Css";
 import {
   BoundDateField,
@@ -58,7 +50,7 @@ export function FormStateApp() {
   });
 
   const columns = useMemo(() => createColumns(formState), [formState]);
-  const rows: GridDataRow<Row>[] = useComputed(
+  const rows = useComputed(
     () => [simpleHeader, ...formState.books.rows.map((data) => ({ kind: "data" as const, id: data.id.value!, data }))],
     [],
   );

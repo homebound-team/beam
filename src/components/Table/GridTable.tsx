@@ -23,6 +23,7 @@ import { EXPANDABLE_HEADER, KEPT_GROUP, zIndices } from "src/components/Table/ut
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
+import { Stable, UnstableProps } from "src/hooks/useStable";
 import { GridDataRow, Row } from "./components/Row";
 
 let runningInJest = false;
@@ -104,9 +105,9 @@ export interface GridTableProps<R extends Kinded, X> {
    */
   as?: RenderAs;
   /** The column definitions i.e. how each column should render each row kind. */
-  columns: GridColumn<R>[];
+  columns: Stable<GridColumn<R>[]>;
   /** The rows of data (including any header/footer rows), to be rendered by the column definitions. */
-  rows: GridDataRow<R>[];
+  rows: Stable<GridDataRow<R>[]>;
   /** Optional row-kind-level styling / behavior like onClick/rowLinks. */
   rowStyles?: RowStyles<R>;
   /** Allow looking up prev/next of a row i.e. for SuperDrawer navigation. */
@@ -185,7 +186,7 @@ export interface GridTableProps<R extends Kinded, X> {
  *
  * https://docs.google.com/document/d/1DFnlkDubK4nG_GLf_hB8yp0flnSNt_3IBh5iOicuaFM/edit#heading=h.9m9cpwgeqfc9
  */
-export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = any>(props: GridTableProps<R, X>) {
+export function Table<R extends Kinded, X extends Only<GridTableXss, X> = any>(props: GridTableProps<R, X>) {
   const {
     id = "gridTable",
     as = "div",
@@ -379,6 +380,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     </TableStateContext.Provider>
   );
 }
+
+/** Downgrades the GridTable/GridTableProps by removing the Stable wrapper from each prop to ease migration. */
+export const GridTable: <R extends Kinded, X extends Only<GridTableXss, X> = any>(
+  props: UnstableProps<GridTableProps<R, X>>,
+) => ReactElement = Table as any;
 
 // Determine which HTML element to use to build the GridTable
 const renders: Record<RenderAs, typeof renderTable> = {

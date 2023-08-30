@@ -1,5 +1,6 @@
 import { autorun, IReactionDisposer } from "mobx";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { pretendStable, Stable } from "src/hooks/useStable";
 import { shallowEqual } from "src/utils/shallowEqual";
 
 interface Current<T> {
@@ -14,7 +15,7 @@ interface Current<T> {
 }
 
 /** Evaluates a computed function `fn` to a regular value and triggers a re-render whenever it changes. */
-export function useComputed<T>(fn: (prev: T | undefined) => T, deps: readonly any[]): T {
+export function useComputed<T>(fn: (prev: T | undefined) => T, deps: readonly any[]): Stable<T> {
   // We always return the useRef value, and use this just to trigger re-renders
   const [, setTick] = useState(0);
 
@@ -69,5 +70,5 @@ export function useComputed<T>(fn: (prev: T | undefined) => T, deps: readonly an
   }
 
   // We can use `!` here b/c we know that `autorun` set current
-  return ref.current.value!;
+  return pretendStable(ref.current.value!);
 }
