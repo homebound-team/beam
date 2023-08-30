@@ -127,4 +127,6 @@ export type InfiniteScroll = {
   onEndReached: (index: number) => void;
   /** The number of pixels from the bottom of the list to eagerly trigger `onEndReached`. The default is 500px. */
   endOffsetPx?: number;
+  /** When true, will append a loading spinner footer to let the user know the next page is still loading */
+  nextPageLoading?: boolean;
 };

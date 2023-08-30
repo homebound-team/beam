@@ -2,6 +2,7 @@ import memoizeOne from "memoize-one";
 import { runInAction } from "mobx";
 import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef } from "react";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import { Loader } from "src/components";
 import { DiscriminateUnion, GridRowKind } from "src/components/index";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -548,7 +549,17 @@ function renderVirtual<R extends Kinded>(
           />
         )),
         List: VirtualRoot(listStyle, columns as any, id, xss),
-        Footer: () => <div css={footerStyle} />,
+        Footer: () => {
+          return (
+            <div css={footerStyle}>
+              {infiniteScroll?.nextPageLoading && (
+                <div css={Css.h5.df.aic.jcc.$}>
+                  <Loader size={"xs"} />
+                </div>
+              )}
+            </div>
+          );
+        },
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={stickyHeader ? tableHeadRows.length : 0}

@@ -242,6 +242,59 @@ export function InfiniteScroll() {
   );
 }
 
+export function InfiniteScrollWithLoader() {
+  const loadRows = useCallback((offset: number) => {
+    return zeroTo(10).map((i) => ({
+      kind: "data" as const,
+      id: String(i + offset),
+      data: { name: `row ${i + offset}`, value: i + offset },
+    }));
+  }, []);
+
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<GridDataRow<Row>[]>(() => loadRows(0));
+
+  // Simulate a slower network call that doesn't finish before the user reaches the end of the list
+  const fetchMoreDate = useCallback(
+    (index: number) => {
+      setLoading(true);
+      setTimeout(() => {
+        setData([...data, ...loadRows(index)]);
+        setLoading(false);
+      }, 1_500);
+    },
+    [data, loadRows],
+  );
+
+  const rows: GridDataRow<Row>[] = useMemo(() => [simpleHeader, ...data], [data]);
+  const columns: GridColumn<Row>[] = useMemo(
+    () => [
+      { header: "Name", data: ({ name }) => name, w: "200px" },
+      { header: "Value", data: ({ value }) => value },
+    ],
+    [],
+  );
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div css={Css.fg1.$}>
+        <GridTable
+          as="virtual"
+          columns={columns}
+          sorting={{ on: "client", initial: ["id", "ASC"] }}
+          stickyHeader={true}
+          rows={rows}
+          infiniteScroll={{
+            onEndReached(index) {
+              fetchMoreDate(index);
+            },
+            nextPageLoading: loading,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function NoRowsFallback() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
