@@ -18,7 +18,7 @@ describe("MultiSelectFieldTest", () => {
     // Given a MultiSelectField with 1 selected value
     const r = await render(<TestMultiSelectField values={["1"] as string[]} options={options} />);
     // That initially has "One" selected
-    expect(r.age()).toHaveValue("One");
+    expect(r.age).toHaveValue("One");
     // When we select the 3rd option
     selectOption(r, "Three");
     // Then onSelect was called
@@ -27,16 +27,16 @@ describe("MultiSelectFieldTest", () => {
 
   it("has an empty text box not set", async () => {
     // Given a MultiSelectField with no selected values
-    const { age } = await render(<TestMultiSelectField values={[]} options={options} />);
+    const r = await render(<TestMultiSelectField values={[]} options={options} />);
     // That initially has "One" selected
-    expect(age()).toHaveValue("");
+    expect(r.age).toHaveValue("");
   });
 
   it("can have custom an empty text", async () => {
     // Given a MultiSelectField with no selected values
-    const { age } = await render(<TestMultiSelectField values={[]} options={options} nothingSelectedText="All" />);
+    const r = await render(<TestMultiSelectField values={[]} options={options} nothingSelectedText="All" />);
     // Then expect the text input value to show the `nothingSelectedText` value
-    expect(age()).toHaveValue("All");
+    expect(r.age).toHaveValue("All");
   });
 
   it("only populates input field with selected single option on blur", async () => {
@@ -45,46 +45,46 @@ describe("MultiSelectFieldTest", () => {
     // And when we select the first option
     selectOption(r, "One");
     // Then the input field is still empty
-    expect(r.age()).toHaveValue("");
+    expect(r.age).toHaveValue("");
 
     // When blurring the field
-    fireEvent.blur(r.age());
+    fireEvent.blur(r.age);
     // Then the field should populate with the selected option's value.
-    expect(r.age()).toHaveValue("One");
+    expect(r.age).toHaveValue("One");
   });
 
   it("resets input value on blur if it does not match the selected option", async () => {
     // Given a MultiSelectField without a selected options
     const r = await render(<TestMultiSelectField values={[]} options={options} />);
     // When changing the inputs value, and not selecting an option
-    fireEvent.input(r.age(), "asdf");
+    fireEvent.input(r.age, "asdf");
     // And `blur`ing the field
-    fireEvent.blur(r.age());
+    fireEvent.blur(r.age);
     // Then expect the value to be reset to empty
-    expect(r.age()).toHaveValue("");
+    expect(r.age).toHaveValue("");
 
     // Given a selected option
     selectOption(r, "Three");
     // When changing the inputs value to no longer match the selected option
-    fireEvent.input(r.age(), "asdf");
+    fireEvent.input(r.age, "asdf");
 
     // And `blur`ing the field
-    // fireEvent.blur(r.age());
+    // fireEvent.blur(r.age);
     // Calling blur twice - First blur closes menu and retains focus on input. Second blur actually blurs the input.
-    fireEvent.blur(r.age());
+    fireEvent.blur(r.age);
     // Then expect the value to be reset to the selected option
-    expect(r.age()).toHaveValue("Three");
+    expect(r.age).toHaveValue("Three");
 
     // When selecting multiple options
     selectOption(r, "Two");
     // Then the input value should be empty
-    expect(r.age()).toHaveValue("");
+    expect(r.age).toHaveValue("");
     // When changing the inputs value to no longer be empty, as expected for multiple options
-    fireEvent.input(r.age(), "asdf");
+    fireEvent.input(r.age, "asdf");
     // And `blur`ing the field
-    act(() => r.age().blur());
+    act(() => r.age.blur());
     // Then expect the value to be reset to empty
-    expect(r.age()).toHaveValue("");
+    expect(r.age).toHaveValue("");
   });
 
   it("does not populate input field with multiple items selected", async () => {
@@ -106,7 +106,7 @@ describe("MultiSelectFieldTest", () => {
   it("respects disabled options", async () => {
     const onSelect = jest.fn();
     // Given a Select Field with a disabled option
-    const { age, getByRole } = await render(
+    const r = await render(
       <MultiSelectField
         label="Age"
         values={["1"]}
@@ -119,8 +119,8 @@ describe("MultiSelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    fireEvent.click(age());
-    const optionTwo = getByRole("option", { name: "Two" });
+    fireEvent.click(r.age);
+    const optionTwo = r.getByRole("option", { name: "Two" });
     // Then expect the disabled option to have the correct aria attributes
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
     // And when clicking on that option
@@ -132,7 +132,7 @@ describe("MultiSelectFieldTest", () => {
   it("sets chips to disabled for options that are already selected and disabled", async () => {
     const onSelect = jest.fn();
     // Given a Select Field with a selected disabled option
-    const { age, getByRole, chip } = await render(
+    const r = await render(
       <MultiSelectField
         label="Age"
         values={["1"]}
@@ -145,11 +145,11 @@ describe("MultiSelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    fireEvent.click(age());
+    fireEvent.click(r.age);
     // Then expect the chip to be disabled
-    expect(chip()).toHaveAttribute("disabled");
+    expect(r.chip).toHaveAttribute("disabled");
     // And when clicking on that chip
-    click(chip());
+    click(r.chip);
     // Then the `onSelect` callback is not called
     expect(onSelect).not.toHaveBeenCalled();
   });
@@ -157,7 +157,7 @@ describe("MultiSelectFieldTest", () => {
   it("retains state of disabled options that are already selected", async () => {
     const onSelect = jest.fn();
     // Given a Select Field with a disabled option that is a selected value
-    const { age, getByRole } = await render(
+    const r = await render(
       <MultiSelectField
         label="Age"
         values={["1"]}
@@ -169,8 +169,8 @@ describe("MultiSelectFieldTest", () => {
         onSelect={onSelect}
       />,
     );
-    fireEvent.click(age());
-    const optionTwo = getByRole("option", { name: "Two" });
+    fireEvent.click(r.age);
+    const optionTwo = r.getByRole("option", { name: "Two" });
     // When selecting another option
     click(optionTwo);
     // Then the `onSelect` is returned with both the new value and the disabled value.
@@ -187,9 +187,9 @@ describe("MultiSelectFieldTest", () => {
     // Given a MultiSelectField with a selected option
     const r = await render(<TestMultiSelectField values={["1"]} options={options} />);
     // When opening the menu
-    click(r.age());
+    click(r.age);
     // And clicking on the chip
-    click(r.chip());
+    click(r.chip);
     // Then the menu remains open
     expect(r.getByRole("listbox")).toBeInTheDocument();
     // And `onSelect` is called with the correct values

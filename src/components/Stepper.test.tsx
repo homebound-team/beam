@@ -16,15 +16,15 @@ describe(Stepper, () => {
     const r = await render(<Stepper steps={steps} currentStep={steps[1].value} onChange={onChange} />);
 
     // Then all three steps are displayed and have the proper `aria-current` attribute
-    expect(r.stepper_step_0()).toHaveAttribute("aria-current", "false");
-    expect(r.stepper_step_1()).toHaveAttribute("aria-current", "true");
-    expect(r.stepper_step_2()).toHaveAttribute("aria-current", "false");
+    expect(r.stepper_step_0).toHaveAttribute("aria-current", "false");
+    expect(r.stepper_step_1).toHaveAttribute("aria-current", "true");
+    expect(r.stepper_step_2).toHaveAttribute("aria-current", "false");
 
     // And the button elements for each step have the expected states
-    expect(r.stepper_stepButton_stepA()).toBeDisabled().toHaveTextContent("Step A");
-    expect(r.stepper_stepButton_stepB()).not.toBeDisabled().toHaveTextContent("Step B");
-    expect(r.stepper_stepButton_stepC()).not.toBeDisabled().toHaveTextContent("Step C");
-    expect(r.stepper_stepButton_stepC()).not.toBeDisabled().toHaveTextContent("Step C");
+    expect(r.stepper_stepButton_stepA).toBeDisabled().toHaveTextContent("Step A");
+    expect(r.stepper_stepButton_stepB).not.toBeDisabled().toHaveTextContent("Step B");
+    expect(r.stepper_stepButton_stepC).not.toBeDisabled().toHaveTextContent("Step C");
+    expect(r.stepper_stepButton_stepC).not.toBeDisabled().toHaveTextContent("Step C");
 
     // And when clicking Step 3
     click(r.stepper_stepButton_stepC);

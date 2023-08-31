@@ -8,7 +8,7 @@ describe("ChipTextField", () => {
     // Given the input
     const r = await render(<ChipTextField label="Test Label" value="Test value" required onChange={noop} />);
     // Then all fields should be properly set
-    expect(r.chipField())
+    expect(r.chipField)
       .toHaveTextContent("Test value")
       .toHaveAttribute("aria-label", "Test Label")
       .toHaveAttribute("aria-required", "true");
@@ -25,16 +25,16 @@ describe("ChipTextField", () => {
     );
 
     // When firing the events on the input, then expect the callbacks to be invoked
-    focus(r.chipField());
+    focus(r.chipField);
     expect(onFocus).toBeCalledTimes(1);
 
-    fireEvent.blur(r.chipField());
+    fireEvent.blur(r.chipField);
     expect(onBlur).toBeCalledTimes(1);
 
-    fireEvent.keyDown(r.chipField(), { key: "Enter" });
+    fireEvent.keyDown(r.chipField, { key: "Enter" });
     expect(onEnter).toBeCalledTimes(1);
 
-    fireEvent.input(r.chipField(), { target: { textContent: "New Value" } });
+    fireEvent.input(r.chipField, { target: { textContent: "New Value" } });
     expect(onChange).toBeCalledWith("New Value");
   });
 
@@ -44,11 +44,11 @@ describe("ChipTextField", () => {
     const r = await render(<ChipTextField label="Test Label" onChange={noop} onBlur={onBlur} />);
     // With focus
     focus(r.chipField);
-    expect(r.chipField()).toHaveFocus();
+    expect(r.chipField).toHaveFocus();
     // When pressing the escape key
-    fireEvent.keyDown(r.chipField(), { key: "Escape" });
+    fireEvent.keyDown(r.chipField, { key: "Escape" });
     // Then the element should no longer have focus
-    expect(r.chipField()).not.toHaveFocus();
+    expect(r.chipField).not.toHaveFocus();
     // And onBlur should have been called
     expect(onBlur).toBeCalledTimes(1);
   });
@@ -59,11 +59,11 @@ describe("ChipTextField", () => {
     const r = await render(<ChipTextField label="Test Label" onChange={noop} blurOnEscape={false} onBlur={onBlur} />);
     // With focus
     focus(r.chipField);
-    expect(r.chipField()).toHaveFocus();
+    expect(r.chipField).toHaveFocus();
     // When pressing the escape key
-    fireEvent.keyDown(r.chipField(), { key: "Escape" });
+    fireEvent.keyDown(r.chipField, { key: "Escape" });
     // Then the element should still have focus
-    expect(r.chipField()).toHaveFocus();
+    expect(r.chipField).toHaveFocus();
     // And onBlur should not be called
     expect(onBlur).not.toBeCalled();
   });

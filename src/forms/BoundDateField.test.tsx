@@ -20,11 +20,11 @@ describe("BoundDateField", () => {
     expect(onFocus).toBeCalledTimes(1);
 
     // When closing the overlay and putting focus back on the input
-    fireEvent.keyDown(r.birthday_datePicker(), { key: "Escape", code: "Escape" });
+    fireEvent.keyDown(r.birthday_datePicker, { key: "Escape", code: "Escape" });
     expect(onBlur).toBeCalledTimes(0);
 
     // When blur is triggered
-    blur(r.birthday());
+    blur(r.birthday);
     // Then the callback should be triggered
     expect(onBlur).toBeCalledTimes(1);
   });
@@ -61,7 +61,7 @@ describe("BoundDateField", () => {
     const r = await render(<BoundDateField field={author.birthday} />);
 
     // When hitting the enter key
-    fireEvent.keyDown(r.birthday(), { key: "Enter" });
+    fireEvent.keyDown(r.birthday, { key: "Enter" });
 
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith(jan2.toDateString());
@@ -78,7 +78,7 @@ describe("BoundDateField", () => {
     });
 
     // Then the field should be read only
-    expect(r.birthday()).toHaveAttribute("data-readonly", "true");
+    expect(r.birthday).toHaveAttribute("data-readonly", "true");
   });
 });
 

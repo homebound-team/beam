@@ -17,12 +17,12 @@ describe("PresentationContext", () => {
     );
 
     // Then overwritten values should be updated
-    expect(r.hideLabel().textContent).toBe("false");
-    expect(r.formLabelSuffix().textContent).toBe('{"required":"?"}');
+    expect(r.hideLabel.textContent).toBe("false");
+    expect(r.formLabelSuffix.textContent).toBe('{"required":"?"}');
 
     // Existing values should be passed through
-    expect(r.numberAlignment().textContent).toBe('"right"');
-    expect(r.gridTableStyle().textContent).toBe('{"emptyCell":"Test"}');
+    expect(r.numberAlignment.textContent).toBe('"right"');
+    expect(r.gridTableStyle.textContent).toBe('{"emptyCell":"Test"}');
   });
 
   it("can reset value to undefined", async () => {
@@ -37,7 +37,7 @@ describe("PresentationContext", () => {
     );
 
     // Then value is removed
-    expect(r.numberAlignment()).toBeEmptyDOMElement();
+    expect(r.numberAlignment).toBeEmptyDOMElement();
   });
 });
 

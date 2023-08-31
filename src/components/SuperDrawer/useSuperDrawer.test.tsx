@@ -8,8 +8,8 @@ import { useSuperDrawer } from "./index";
 describe("useSuperDrawer", () => {
   it("should allow `new` element to be added", async () => {
     const r = await render(<TestDrawerContent openInDrawer />);
-    expect(r.superDrawerHeader()).toHaveTextContent("Title");
-    expect(r.superDrawerContent()).toBeTruthy();
+    expect(r.superDrawerHeader).toHaveTextContent("Title");
+    expect(r.superDrawerContent).toBeTruthy();
   });
 
   it("should not allow `detail` element to be added", async () => {
@@ -20,12 +20,12 @@ describe("useSuperDrawer", () => {
 
   it("should allow `detail` element to be added when as least one `new` element is present", async () => {
     const r = await render(<TestDrawerContent openInDrawer openDrawerDetail />);
-    expect(r.superDrawerDetailContent()).toBeTruthy();
+    expect(r.superDrawerDetailContent).toBeTruthy();
   });
 
   it("should show `new` element after calling `closeDrawerDetail()`", async () => {
     const r = await render(<TestDrawerContent openInDrawer openDrawerDetail closeDrawerDetail />);
-    expect(r.superDrawerContent()).toBeTruthy();
+    expect(r.superDrawerContent).toBeTruthy();
   });
 
   it("should reset state when calling `closeDrawer()`", async () => {

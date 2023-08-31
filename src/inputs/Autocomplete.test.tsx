@@ -23,9 +23,9 @@ describe("Autocomplete", () => {
     );
 
     // Then it should render the static content
-    expect(r.search_label()).toHaveTextContent("Search");
-    expect(r.search()).toHaveAttribute("placeholder", "Search placeholder...");
-    expect(r.search()).toHaveValue("Test");
+    expect(r.search_label).toHaveTextContent("Search");
+    expect(r.search).toHaveAttribute("placeholder", "Search placeholder...");
+    expect(r.search).toHaveValue("Test");
     // And it should not render the menu
     expect(r.queryByRole("listbox")).toBeFalsy();
 
@@ -78,7 +78,7 @@ describe("Autocomplete", () => {
       />,
     );
     // Then the input should be disabled
-    expect(r.search()).toBeDisabled();
+    expect(r.search).toBeDisabled();
     // And when the input is focused
     focus(r.search);
     // Then the menu should not be displayed

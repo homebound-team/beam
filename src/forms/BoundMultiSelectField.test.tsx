@@ -14,15 +14,15 @@ describe("BoundMultiSelectField", () => {
   it("shows the current value and label", async () => {
     const author = createObjectState(formConfig, { favoriteShapes: ["sh:1"] });
     const r = await render(<BoundMultiSelectField field={author.favoriteShapes} options={shapes} />);
-    expect(r.favoriteShapes()).toHaveValue("Triangle");
-    expect(r.favoriteShapes_label()).toHaveTextContent("Favorite Shape");
+    expect(r.favoriteShapes).toHaveValue("Triangle");
+    expect(r.favoriteShapes_label).toHaveTextContent("Favorite Shape");
   });
 
   it("shows the error message", async () => {
     const author = createObjectState(formConfig, {});
     author.favoriteShapes.touched = true;
     const r = await render(<BoundMultiSelectField field={author.favoriteShapes} options={shapes} />);
-    expect(r.favoriteShapes_errorMsg()).toHaveTextContent("Required");
+    expect(r.favoriteShapes_errorMsg).toHaveTextContent("Required");
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {

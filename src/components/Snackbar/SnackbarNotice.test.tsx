@@ -6,9 +6,9 @@ describe("SnackbarNotice", () => {
   it("renders the default snackbar notice layout", async () => {
     const r = await render(<SnackbarNotice id="1" onClose={noop} message="message" />);
     expect(r.snackbar_icon).toNotBeInTheDom();
-    expect(r.snackbar_message()).toHaveTextContent("message");
+    expect(r.snackbar_message).toHaveTextContent("message");
     expect(r.snackbar_action).toNotBeInTheDom();
-    expect(r.snackbar_close()).toBeInTheDocument();
+    expect(r.snackbar_close).toBeInTheDocument();
   });
 
   it("fires onClose callback", async () => {
@@ -20,7 +20,7 @@ describe("SnackbarNotice", () => {
 
   it("does not hide the close button if notice is persistent", async () => {
     const r = await render(<SnackbarNotice id="1" onClose={noop} message="message" hideCloseButton persistent />);
-    expect(r.snackbar_close()).toBeInTheDocument();
+    expect(r.snackbar_close).toBeInTheDocument();
   });
 
   it("can hide the close button", async () => {
@@ -30,7 +30,7 @@ describe("SnackbarNotice", () => {
 
   it("can render the icon", async () => {
     const r = await render(<SnackbarNotice id="1" onClose={noop} message="message" icon="success" />);
-    expect(r.snackbar_icon()).toBeInTheDocument();
+    expect(r.snackbar_icon).toBeInTheDocument();
   });
 
   it("can render the action and fire the callback", async () => {
@@ -38,8 +38,8 @@ describe("SnackbarNotice", () => {
     const r = await render(
       <SnackbarNotice id="1" onClose={noop} message="message" action={{ label: "Action", onClick }} />,
     );
-    expect(r.snackbar_action()).toHaveTextContent("Action");
-    click(r.snackbar_action());
+    expect(r.snackbar_action).toHaveTextContent("Action");
+    click(r.snackbar_action);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 });

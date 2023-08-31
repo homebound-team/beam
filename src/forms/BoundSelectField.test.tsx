@@ -12,20 +12,20 @@ describe("BoundSelectField", () => {
   it("shows the current value", async () => {
     const author = createObjectState(formConfig, { favoriteSport: "s:1" });
     const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
-    expect(r.favoriteSport()).toHaveValue("Football");
+    expect(r.favoriteSport).toHaveValue("Football");
   });
 
   it("shows the error message", async () => {
     const author = createObjectState(formConfig, {});
     author.favoriteSport.touched = true;
     const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
-    expect(r.favoriteSport_errorMsg()).toHaveTextContent("Required");
+    expect(r.favoriteSport_errorMsg).toHaveTextContent("Required");
   });
 
   it("shows the label", async () => {
     const author = createObjectState(formConfig, { favoriteSport: "s:1" });
     const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
-    expect(r.favoriteSport_label()).toHaveTextContent("Favorite Sport");
+    expect(r.favoriteSport_label).toHaveTextContent("Favorite Sport");
   });
 
   it("can bind against boolean fields", async () => {
@@ -43,7 +43,7 @@ describe("BoundSelectField", () => {
         getOptionValue={(o) => o.value}
       />,
     );
-    expect(r.isAvailable()).toHaveValue("");
+    expect(r.isAvailable).toHaveValue("");
   });
 
   it("has the latest value when onChange is triggered", async () => {

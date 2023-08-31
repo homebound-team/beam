@@ -10,15 +10,15 @@ describe(BoundTreeSelectField, () => {
   it("shows the current value and label", async () => {
     const author = createObjectState(formConfig, { favoriteGenres: ["g:4"] });
     const r = await render(<BoundTreeSelectField field={author.favoriteGenres} options={genres} />);
-    expect(r.favoriteGenres_label()).toHaveTextContent("Favorite Genres");
-    expect(r.favoriteGenres()).toHaveValue("Action Comedy");
+    expect(r.favoriteGenres_label).toHaveTextContent("Favorite Genres");
+    expect(r.favoriteGenres).toHaveValue("Action Comedy");
   });
 
   it("shows the error message", async () => {
     const author = createObjectState(formConfig, {});
     author.favoriteGenres.touched = true;
     const r = await render(<BoundTreeSelectField field={author.favoriteGenres} options={genres} />);
-    expect(r.favoriteGenres_errorMsg()).toHaveTextContent("Required");
+    expect(r.favoriteGenres_errorMsg).toHaveTextContent("Required");
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {

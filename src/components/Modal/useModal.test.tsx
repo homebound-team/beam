@@ -25,7 +25,7 @@ describe("useModal", () => {
     // When opening the modal via the context method
     act(() => context!.openModal(modalProps));
     // Then expect modal to open
-    expect(r.modal()).toBeTruthy();
+    expect(r.modal).toBeTruthy();
 
     // When closing the modal via the context method
     act(() => context!.closeModal());
@@ -56,7 +56,7 @@ describe("useModal", () => {
     // Then expect the custom method to be called.
     expect(canClose).toBeCalled();
     // And the modal should not have closed since the canClose check is false.
-    expect(r.modal()).toBeTruthy();
+    expect(r.modal).toBeTruthy();
   });
 
   it("can close modal when checks pass", async () => {

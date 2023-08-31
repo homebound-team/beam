@@ -8,15 +8,15 @@ import { type } from "src/utils/rtl";
 describe("BoundTextField", () => {
   it("shows the current value", async () => {
     const author = createObjectState(formConfig, { firstName: "bob" });
-    const { firstName } = await render(<BoundTextField field={author.firstName} />);
-    expect(firstName()).toHaveValue("bob");
+    const r = await render(<BoundTextField field={author.firstName} />);
+    expect(r.firstName).toHaveValue("bob");
   });
 
   it("shows an error message", async () => {
     const author = createObjectState(formConfig, {});
     author.touched = true;
-    const { firstName_errorMsg } = await render(<BoundTextField field={author.firstName} />);
-    expect(firstName_errorMsg()).toHaveTextContent("Required");
+    const r = await render(<BoundTextField field={author.firstName} />);
+    expect(r.firstName_errorMsg).toHaveTextContent("Required");
   });
 
   it("can blur onEnter and call onEnter callback", async () => {
@@ -32,7 +32,7 @@ describe("BoundTextField", () => {
     // When entering a name
     type(r.firstName, "Brandon");
     // And hitting the Enter key
-    fireEvent.keyDown(r.firstName(), { key: "Enter" });
+    fireEvent.keyDown(r.firstName, { key: "Enter" });
     // Then onEnter should be called
     expect(onEnter).toHaveBeenCalledTimes(1);
     // And the Field State's autoSave should have been called.

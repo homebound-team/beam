@@ -11,39 +11,39 @@ let lastSet: any = undefined;
 describe("TextFieldTest", () => {
   it("can set a value", async () => {
     const r = await render(<TestTextField value="foo" />);
-    expect(r.name()).toHaveValue("foo");
+    expect(r.name).toHaveValue("foo");
     type(r.name, "bar");
-    expect(r.name()).toHaveValue("bar");
+    expect(r.name).toHaveValue("bar");
   });
 
   it("can set to undefined", async () => {
     const r = await render(<TestTextField value="foo" />);
     type(r.name, "");
-    fireEvent.blur(r.name());
-    expect(r.name()).toHaveValue("");
+    fireEvent.blur(r.name);
+    expect(r.name).toHaveValue("");
     expect(lastSet).toBeUndefined();
   });
 
   it("sets aria-required if required", async () => {
     const r = await render(<TestTextField value="foo" required={true} />);
-    expect(r.name()).toHaveAttribute("aria-required", "true");
+    expect(r.name).toHaveAttribute("aria-required", "true");
   });
 
   it("doesn't set aria-required if not required", async () => {
     const r = await render(<TestTextField value="foo" required={false} />);
-    expect(r.name()).not.toHaveAttribute("aria-required");
+    expect(r.name).not.toHaveAttribute("aria-required");
   });
 
   it("sets aria-validation if invalid", async () => {
     const r = await render(<TestTextField value="foo" errorMsg="Required" />);
-    expect(r.name()).toHaveAttribute("aria-invalid", "true");
+    expect(r.name).toHaveAttribute("aria-invalid", "true");
   });
 
   it("does not fire focus/blur when readOnly", async () => {
     const onFocus = jest.fn();
     const onBlur = jest.fn();
     const r = await render(<TestTextField value="foo" readOnly={true} onBlur={onBlur} onFocus={onFocus} />);
-    expect(r.name()).toHaveAttribute("data-readonly");
+    expect(r.name).toHaveAttribute("data-readonly");
     focus(r.name);
     blur(r.name);
     expect(onFocus).not.toHaveBeenCalled();
@@ -58,15 +58,15 @@ describe("TextFieldTest", () => {
     // When focused on the input
     focus(r.name);
     // Then the clear button is shown.
-    expect(r.xCircle()).toBeTruthy();
+    expect(r.xCircle).toBeTruthy();
 
-    expect(r.name()).toHaveValue("foo");
+    expect(r.name).toHaveValue("foo");
     // When clicking the clear button
     click(r.xCircle);
     // Then the value should be removed
-    expect(r.name()).toHaveValue("");
+    expect(r.name).toHaveValue("");
     // And the focus should return to the input element
-    expect(r.name()).toHaveFocus();
+    expect(r.name).toHaveFocus();
   });
 
   it("can use TextFielApi to focus input", async () => {
@@ -74,11 +74,11 @@ describe("TextFieldTest", () => {
     // Given a textfield
     const r = await render(<TestTextField value="foo" onFocus={onFocus} />);
     // With the field not in focus
-    expect(r.name()).not.toHaveFocus();
+    expect(r.name).not.toHaveFocus();
     // When clicking a button to use the TextFieldApi.focus method
     click(r.setFocus);
     // Then expect field to now be in focus
-    expect(r.name()).toHaveFocus();
+    expect(r.name).toHaveFocus();
     // And onFocus callback to be called
     expect(onFocus).toHaveBeenCalledTimes(1);
   });
@@ -89,14 +89,14 @@ describe("TextFieldTest", () => {
     // Given a Textfield
     const r = await render(<TestTextField value="foo" onEnter={onEnter} onBlur={onBlur} />);
     // With focus
-    focus(r.name());
-    expect(r.name()).toHaveFocus();
+    focus(r.name);
+    expect(r.name).toHaveFocus();
     // When hitting the Enter key
-    fireEvent.keyDown(r.name(), { key: "Enter" });
+    fireEvent.keyDown(r.name, { key: "Enter" });
     // Then onEnter and onBlur callbacks should be called
     expect(onEnter).toHaveBeenCalledTimes(1);
     expect(onBlur).toHaveBeenCalledTimes(1);
-    expect(r.name()).not.toHaveFocus();
+    expect(r.name).not.toHaveFocus();
   });
 });
 

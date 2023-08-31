@@ -14,24 +14,24 @@ describe("ButtonMenu", () => {
     // When opening the menu
     click(r.menuTrigger);
     // Then the initial items are set
-    expect(r.menuTrigger_menuItems().childNodes).toHaveLength(3);
+    expect(r.menuTrigger_menuItems.childNodes).toHaveLength(3);
 
     // With first item is not disabled
-    expect(r.menuTrigger_itemOne()).not.toHaveAttribute("aria-disabled");
+    expect(r.menuTrigger_itemOne).not.toHaveAttribute("aria-disabled");
     // When setting the disabled property on the first item
     click(r.disable);
     // Then expect the item to have disabled set
-    expect(r.menuTrigger_itemOne()).toHaveAttribute("aria-disabled", "true");
+    expect(r.menuTrigger_itemOne).toHaveAttribute("aria-disabled", "true");
 
     // When Adding a new item
     click(r.add);
     // Then a new item is added
-    expect(r.menuTrigger_menuItems().childNodes).toHaveLength(4);
+    expect(r.menuTrigger_menuItems.childNodes).toHaveLength(4);
 
     // When removing a new item
     click(r.delete);
     // Then an item is removed
-    expect(r.menuTrigger_menuItems().childNodes).toHaveLength(3);
+    expect(r.menuTrigger_menuItems.childNodes).toHaveLength(3);
   });
 
   it("can initialize with an empty list and load items afterwards", async () => {
@@ -40,12 +40,12 @@ describe("ButtonMenu", () => {
 
     // The menu items should initially be empty
     click(r.menuTrigger);
-    expect(r.menuTrigger_menuItems().childNodes).toHaveLength(0);
+    expect(r.menuTrigger_menuItems.childNodes).toHaveLength(0);
 
     // When loading in items
     click(r.load);
     // Then the menu list should populate
-    expect(r.menuTrigger_menuItems().childNodes).toHaveLength(3);
+    expect(r.menuTrigger_menuItems.childNodes).toHaveLength(3);
   });
 
   it("can accept testid", async () => {
@@ -55,9 +55,9 @@ describe("ButtonMenu", () => {
     // Then button should use that testid.
     click(r.example);
     // And all components with in should have the prefix
-    expect(r.example_menu()).toBeTruthy();
-    expect(r.example_menuItems()).toBeTruthy();
-    expect(r.example_itemOne()).toBeTruthy();
+    expect(r.example_menu).toBeTruthy();
+    expect(r.example_menuItems).toBeTruthy();
+    expect(r.example_itemOne).toBeTruthy();
   });
 
   it("properly sets disabled on the button menu", async () => {
@@ -73,11 +73,11 @@ describe("ButtonMenu", () => {
     );
 
     // Then ButtonMenu with disabled=true and disabled="Tooltip" are disabled
-    expect(r.disabled_0()).toBeDisabled();
-    expect(r.disabled_1()).toBeDisabled();
+    expect(r.disabled_0).toBeDisabled();
+    expect(r.disabled_1).toBeDisabled();
     // And ButtonMenu with disabled=false and undefined are not disabled
-    expect(r.enabled_0()).not.toBeDisabled();
-    expect(r.enabled_1()).not.toBeDisabled();
+    expect(r.enabled_0).not.toBeDisabled();
+    expect(r.enabled_1).not.toBeDisabled();
   });
 
   it("can filter menu items", async () => {
@@ -87,12 +87,12 @@ describe("ButtonMenu", () => {
     // When opening the menu
     click(r.menuTrigger);
     // Then the initial items are set
-    expect(r.menuTrigger_menuItems().childNodes).toHaveLength(3);
+    expect(r.menuTrigger_menuItems.childNodes).toHaveLength(3);
 
     // When filtering the menu items
-    type(r.menuTrigger_search(), "one");
+    type(r.menuTrigger_search, "one");
     // Then the menu items are filtered
-    expect(r.menuTrigger_menuItems().childNodes).toHaveLength(1);
+    expect(r.menuTrigger_menuItems.childNodes).toHaveLength(1);
   });
 
   it("supports tooltips on disabled menu items", async () => {
@@ -104,8 +104,8 @@ describe("ButtonMenu", () => {
     click(r.trigger);
 
     // Then the menu item should be disabled and have a tooltip
-    expect(r.trigger_disabled()).toHaveAttribute("aria-disabled", "true");
-    expect(r.tooltip()).toHaveAttribute("title", "Tooltip");
+    expect(r.trigger_disabled).toHaveAttribute("aria-disabled", "true");
+    expect(r.tooltip).toHaveAttribute("title", "Tooltip");
   });
 
   it("handles selecting button menu items", async () => {
@@ -133,18 +133,18 @@ describe("ButtonMenu", () => {
     click(r.trigger);
 
     // Then the first option should be selected
-    expect(r.trigger_optionA()).toHaveAttribute("aria-checked", "true");
-    expect(r.trigger_optionA().querySelector("[data-icon='check']")).toBeTruthy();
-    expect(r.trigger_optionB()).toHaveAttribute("aria-checked", "false");
+    expect(r.trigger_optionA).toHaveAttribute("aria-checked", "true");
+    expect(r.trigger_optionA.querySelector("[data-icon='check']")).toBeTruthy();
+    expect(r.trigger_optionB).toHaveAttribute("aria-checked", "false");
 
     // When clicking the second option
     click(r.trigger_optionB);
 
     // Then `onChange` should have been called to update the selection properly.
     click(r.trigger);
-    expect(r.trigger_optionA()).toHaveAttribute("aria-checked", "false");
-    expect(r.trigger_optionB()).toHaveAttribute("aria-checked", "true");
-    expect(r.trigger_optionB().querySelector("[data-icon='check']")).toBeTruthy();
+    expect(r.trigger_optionA).toHaveAttribute("aria-checked", "false");
+    expect(r.trigger_optionB).toHaveAttribute("aria-checked", "true");
+    expect(r.trigger_optionB.querySelector("[data-icon='check']")).toBeTruthy();
   });
 });
 

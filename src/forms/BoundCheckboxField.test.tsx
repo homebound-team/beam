@@ -19,7 +19,7 @@ describe("BoundCheckboxField", () => {
     // When rendered
     const r = await render(<BoundCheckboxField field={formState.isAvailable} />);
     // Then the BoundCheckboxField should be checked
-    expect(r.isAvailable()).toBeChecked();
+    expect(r.isAvailable).toBeChecked();
   });
 
   it("should uncheck when clicked", async () => {
@@ -29,7 +29,7 @@ describe("BoundCheckboxField", () => {
     // When interacting with a BoundCheckboxField
     click(r.isAvailable);
     // Then expect the checkbox to be unchecked and the formState to reflect that state
-    expect(r.isAvailable()).not.toBeChecked();
+    expect(r.isAvailable).not.toBeChecked();
     expect(formState.isAvailable.value).toBeFalsy();
   });
 
@@ -60,7 +60,7 @@ describe("BoundCheckboxField", () => {
     const r = await render(<BoundCheckboxField field={formState.isAvailable} />);
 
     // When toggling the checkbox off
-    click(r.isAvailable());
+    click(r.isAvailable);
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith(false);
   });
@@ -71,6 +71,6 @@ describe("BoundCheckboxField", () => {
     const r = await render(<BoundCheckboxField field={formState.isAvailable} />);
 
     // Then the checkbox should be disabled
-    expect(r.isAvailable()).toBeDisabled();
+    expect(r.isAvailable).toBeDisabled();
   });
 });

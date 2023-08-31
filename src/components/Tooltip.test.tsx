@@ -30,6 +30,6 @@ describe("Tooltip", () => {
 
   it("renders with title prop", async () => {
     const r = await render(<Tooltip title="Test tooltip">Text</Tooltip>);
-    expect(r.tooltip()).toHaveAttribute("title", "Test tooltip");
+    expect(r.tooltip).toHaveAttribute("title", "Test tooltip");
   });
 });

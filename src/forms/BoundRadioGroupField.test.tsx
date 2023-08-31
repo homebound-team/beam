@@ -14,7 +14,7 @@ describe("BoundRadioGroupField", () => {
   it("shows the label", async () => {
     const author = createObjectState(formConfig, {});
     const r = await render(<BoundRadioGroupField field={author.favoriteSport} options={sports} />);
-    expect(r.favoriteSport_label()).toHaveTextContent("Favorite Sport");
+    expect(r.favoriteSport_label).toHaveTextContent("Favorite Sport");
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {
@@ -47,7 +47,7 @@ describe("BoundRadioGroupField", () => {
     );
     const r = await render(<BoundRadioGroupField field={author.favoriteSport} options={sports} />);
 
-    click(r.favoriteSport_s3());
+    click(r.favoriteSport_s3);
 
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith("s:3");

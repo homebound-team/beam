@@ -6,15 +6,15 @@ describe("ToggleButton", () => {
     // Given a ToggleButton
     const r = await render(<ToggleButton label={"Toggle button"} onChange={() => {}} />);
     // Then it renders
-    expect(r.toggleButton().textContent).toBe("Toggle button");
-    expect(r.toggleButton_value()).not.toBeChecked();
+    expect(r.toggleButton.textContent).toBe("Toggle button");
+    expect(r.toggleButton_value).not.toBeChecked();
   });
 
   it("renders selected state", async () => {
     // Given a selected ToggleButton
     const r = await render(<ToggleButton label={"Toggle button"} selected onChange={() => {}} />);
     // Then it's checked
-    expect(r.toggleButton_value()).toBeChecked();
+    expect(r.toggleButton_value).toBeChecked();
   });
 
   it("fires onChange", async () => {
@@ -22,7 +22,7 @@ describe("ToggleButton", () => {
     const onChange = jest.fn();
     const r = await render(<ToggleButton label={"Toggle button"} onChange={onChange} />);
     // When we click the toggle button
-    click(r.toggleButton());
+    click(r.toggleButton);
     // Then it's called
     expect(onChange).toBeCalledTimes(1);
   });
@@ -32,7 +32,7 @@ describe("ToggleButton", () => {
     const onChange = jest.fn();
     const r = await render(<ToggleButton label={"Toggle button"} onChange={onChange} disabled />);
     // When we click the toggle button
-    click(r.toggleButton());
+    click(r.toggleButton);
     // Then it isn't called
     expect(onChange).toBeCalledTimes(0);
   });
@@ -42,9 +42,9 @@ describe("ToggleButton", () => {
       <ToggleButton label={"Toggle button"} onChange={async () => new Promise((resolve) => resolve())} />,
     );
     click(r.toggleButton, { allowAsync: true });
-    expect(r.toggleButton_value()).toBeDisabled();
+    expect(r.toggleButton_value).toBeDisabled();
     await wait();
-    expect(r.toggleButton_value()).not.toBeDisabled();
+    expect(r.toggleButton_value).not.toBeDisabled();
   });
 
   it("disables button while onChange is in flight and re-enables it after a failed promise", async () => {
@@ -57,14 +57,14 @@ describe("ToggleButton", () => {
     );
 
     click(r.toggleButton, { allowAsync: true });
-    expect(r.toggleButton_value()).toBeDisabled();
+    expect(r.toggleButton_value).toBeDisabled();
     await wait();
-    expect(r.toggleButton_value()).not.toBeDisabled();
+    expect(r.toggleButton_value).not.toBeDisabled();
     expect(onError).toBeCalledWith("Promise error");
   });
 
   it("can define a custom testid", async () => {
     const r = await render(<ToggleButton label="Not the test id" data-testid="customTestId" onChange={() => {}} />);
-    expect(r.customTestId()).toBeInTheDocument();
+    expect(r.customTestId).toBeInTheDocument();
   });
 });

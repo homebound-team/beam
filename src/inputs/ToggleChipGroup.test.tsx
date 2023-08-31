@@ -11,8 +11,8 @@ describe("ToggleGroupChip", () => {
     const r = await render(
       <ToggleChipGroup label="Market" options={options} values={["m:2"]} onChange={() => {}} data-testid="market" />,
     );
-    expect(r.market_m1()).toHaveAttribute("data-selected", "false");
-    expect(r.market_m2()).toHaveAttribute("data-selected", "true");
+    expect(r.market_m1).toHaveAttribute("data-selected", "false");
+    expect(r.market_m2).toHaveAttribute("data-selected", "true");
   });
 
   it("supports disabled options with tooltips", async () => {
@@ -25,9 +25,9 @@ describe("ToggleGroupChip", () => {
       <ToggleChipGroup label="Market" options={options} values={["m:2"]} onChange={() => {}} data-testid="market" />,
     );
 
-    expect(r.market_m2()).toHaveAttribute("data-disabled", "true");
+    expect(r.market_m2).toHaveAttribute("data-disabled", "true");
 
-    expect(r.market_m3()).toHaveAttribute("data-disabled", "true");
+    expect(r.market_m3).toHaveAttribute("data-disabled", "true");
     expect(r.getByTestId("tooltip")).toHaveAttribute("title", "No data");
   });
 });

@@ -19,8 +19,8 @@ describe("BoundMultiLineSelectField", () => {
     const r = await render(<BoundMultiLineSelectField field={author.favoriteShapes} options={shapes} />);
 
     // Then it shows the correct value and label
-    expect(r.favoriteShapes_selectField_0()).toHaveTextContent("Triangle");
-    expect(r.favoriteShapes_label()).toHaveTextContent("Favorite Shapes");
+    expect(r.favoriteShapes_selectField_0).toHaveTextContent("Triangle");
+    expect(r.favoriteShapes_label).toHaveTextContent("Favorite Shapes");
   });
 
   it("triggers 'maybeAutoSave' on change", async () => {
@@ -34,8 +34,8 @@ describe("BoundMultiLineSelectField", () => {
     const r = await render(<BoundMultiLineSelectField field={author.favoriteShapes} options={shapes} />);
 
     // When an option is selected
-    click(r.favoriteShapes_addAnother());
-    click(r.favoriteShapes_selectField_1());
+    click(r.favoriteShapes_addAnother);
+    click(r.favoriteShapes_selectField_1);
     click(r.getByRole("option", { name: "Square" }));
 
     // Then the callback should be triggered with the current value

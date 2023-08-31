@@ -15,7 +15,7 @@ describe("BoundCheckboxGroupField", () => {
   it("shows the label", async () => {
     const author = createObjectState(formConfig, {});
     const r = await render(<BoundCheckboxGroupField field={author.favoriteColors} options={colors} />);
-    expect(r.favoriteColors_label()).toHaveTextContent("Favorite Colors");
+    expect(r.favoriteColors_label).toHaveTextContent("Favorite Colors");
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {
@@ -49,7 +49,7 @@ describe("BoundCheckboxGroupField", () => {
     const r = await render(<BoundCheckboxGroupField field={author.favoriteColors} options={colors} />);
 
     // When toggling the checkbox off
-    click(r.blue());
+    click(r.blue);
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith(["c:1"]);
   });
@@ -60,11 +60,11 @@ describe("BoundCheckboxGroupField", () => {
     const r = await render(<BoundCheckboxGroupField field={author.favoriteColors} options={colors} />);
 
     // When deselecting the first option
-    click(r.blue());
+    click(r.blue);
     // Then the form should be dirty
     expect(author.dirty).toBe(true);
     // Then reselecting the option (which would push to the end of the array selected values, but BoundCheckboxGroupField sorts the values)
-    click(r.blue());
+    click(r.blue);
 
     // Then the form should no longer be dirty
     expect(author.dirty).toBe(false);

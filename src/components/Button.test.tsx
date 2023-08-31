@@ -28,21 +28,21 @@ describe("Button", () => {
   it("renders and can fires onClick", async () => {
     const onClick = jest.fn();
     const r = await render(<Button label="Button" onClick={onClick} />);
-    expect(r.button().tagName).toBe("BUTTON");
-    expect(r.button()).toHaveAttribute("type", "button");
+    expect(r.button.tagName).toBe("BUTTON");
+    expect(r.button).toHaveAttribute("type", "button");
     click(r.button);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   it("can render a specific button type", async () => {
     const r = await render(<Button label="Button" type="submit" onClick={noop} />);
-    expect(r.button()).toHaveAttribute("type", "submit");
+    expect(r.button).toHaveAttribute("type", "submit");
   });
 
   it("applies expected properties when rendering a link with an absolute url", async () => {
     const r = await render(<Button label="Button" onClick="https://www.homebound.com" />, {});
-    expect(r.button().tagName).toBe("A");
-    expect(r.button())
+    expect(r.button.tagName).toBe("A");
+    expect(r.button)
       .toHaveAttribute("href", "https://www.homebound.com")
       .toHaveAttribute("target", "_blank")
       .toHaveAttribute("rel", "noreferrer noopener")
@@ -51,8 +51,8 @@ describe("Button", () => {
 
   it("applies expected properties when rendering a link with a relative url", async () => {
     const r = await render(<Button label="Button" onClick="/testPath" />, {});
-    expect(r.button().tagName).toBe("A");
-    expect(r.button())
+    expect(r.button.tagName).toBe("A");
+    expect(r.button)
       .toHaveAttribute("href", "/testPath")
       .not.toHaveAttribute("target")
       .not.toHaveAttribute("rel")
@@ -61,8 +61,8 @@ describe("Button", () => {
 
   it("applies expected properties when rendering a link with a relative url to open in new tab", async () => {
     const r = await render(<Button label="Button" onClick="/testPath" openInNew />, {});
-    expect(r.button().tagName).toBe("A");
-    expect(r.button())
+    expect(r.button.tagName).toBe("A");
+    expect(r.button)
       .toHaveAttribute("href", "/testPath")
       .toHaveAttribute("target", "_blank")
       .toHaveAttribute("rel", "noreferrer noopener")
@@ -71,8 +71,8 @@ describe("Button", () => {
 
   it("applies expected properties when adding the 'download' prop", async () => {
     const r = await render(<Button label="Button" onClick="/testPath" download />, {});
-    expect(r.button().tagName).toBe("A");
-    expect(r.button())
+    expect(r.button.tagName).toBe("A");
+    expect(r.button)
       .toHaveAttribute("href", "/testPath")
       .toHaveAttribute("download")
       .not.toHaveAttribute("target", "_blank")
@@ -82,9 +82,9 @@ describe("Button", () => {
   it("disables button while onClick is in flight and re-enables it after a successful promise", async () => {
     const r = await render(<Button label="Button" onClick={async () => new Promise((resolve) => resolve())} />);
     click(r.button, { allowAsync: true });
-    expect(r.button()).toBeDisabled();
+    expect(r.button).toBeDisabled();
     await wait();
-    expect(r.button()).not.toBeDisabled();
+    expect(r.button).not.toBeDisabled();
   });
 
   it("disables button while onClick is in flight and re-enables it after a failed promise", async () => {
@@ -97,9 +97,9 @@ describe("Button", () => {
     );
 
     click(r.button);
-    expect(r.button()).toBeDisabled();
+    expect(r.button).toBeDisabled();
     await wait();
-    expect(r.button()).not.toBeDisabled();
+    expect(r.button).not.toBeDisabled();
     expect(onError).toBeCalledWith("Promise error");
   });
 
@@ -111,15 +111,15 @@ describe("Button", () => {
         onClick={async () => new Promise((resolve) => resolve())}
       />,
     );
-    expect(r.button()).toHaveTextContent("Button");
+    expect(r.button).toHaveTextContent("Button");
 
     click(r.button, { allowAsync: true });
-    expect(r.button()).toBeDisabled();
-    expect(r.button()).toHaveTextContent("Watch The Button Fly");
+    expect(r.button).toBeDisabled();
+    expect(r.button).toHaveTextContent("Watch The Button Fly");
 
     await wait();
 
-    expect(r.button()).not.toBeDisabled();
-    expect(r.button()).toHaveTextContent("Button");
+    expect(r.button).not.toBeDisabled();
+    expect(r.button).toHaveTextContent("Button");
   });
 });

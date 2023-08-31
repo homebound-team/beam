@@ -11,16 +11,16 @@ let lastSet: any = undefined;
 describe("TextAreaFieldTest", () => {
   it("can set a value", async () => {
     const r = await render(<TestTextAreaField value="foo" />);
-    expect(r.note()).toHaveValue("foo");
+    expect(r.note).toHaveValue("foo");
     type(r.note, "bar");
-    expect(r.note()).toHaveValue("bar");
+    expect(r.note).toHaveValue("bar");
   });
 
   it("can set to undefined", async () => {
     const r = await render(<TestTextAreaField value="foo" />);
     type(r.note, "");
-    fireEvent.blur(r.note());
-    expect(r.note()).toHaveValue("");
+    fireEvent.blur(r.note);
+    expect(r.note).toHaveValue("");
     expect(lastSet).toBeUndefined();
   });
 
@@ -28,8 +28,8 @@ describe("TextAreaFieldTest", () => {
     const onFocus = jest.fn();
     const onBlur = jest.fn();
     const r = await render(<TestTextAreaField value="foo" readOnly={true} onFocus={onFocus} onBlur={onBlur} />);
-    fireEvent.focus(r.note());
-    fireEvent.blur(r.note());
+    fireEvent.focus(r.note);
+    fireEvent.blur(r.note);
     expect(onFocus).not.toHaveBeenCalled();
     expect(onBlur).not.toHaveBeenCalled();
   });
@@ -39,11 +39,11 @@ describe("TextAreaFieldTest", () => {
     const onBlur = jest.fn();
     const r = await render(<TestTextAreaField value="foo" onEnter={onEnter} onBlur={onBlur} preventNewLines />);
     focus(r.note);
-    expect(r.note()).toHaveFocus();
-    fireEvent.keyDown(r.note(), { key: "Enter" });
+    expect(r.note).toHaveFocus();
+    fireEvent.keyDown(r.note, { key: "Enter" });
     expect(onEnter).toBeCalledTimes(1);
     expect(onBlur).toBeCalledTimes(1);
-    expect(r.note()).not.toHaveFocus();
+    expect(r.note).not.toHaveFocus();
   });
 });
 

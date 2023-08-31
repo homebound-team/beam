@@ -10,7 +10,7 @@ describe("BoundSwitchField", () => {
     // When rendered
     const r = await render(<BoundSwitchField field={formState.isAvailable} />);
     // Then the BoundSwitchField should be checked
-    expect(r.isAvailable()).toBeChecked();
+    expect(r.isAvailable).toBeChecked();
   });
 
   it("should uncheck when clicked", async () => {
@@ -24,10 +24,10 @@ describe("BoundSwitchField", () => {
     const r = await render(<BoundSwitchField field={formState.isAvailable} />);
 
     // When interacting with a BoundSwitchField
-    click(r.isAvailable());
+    click(r.isAvailable);
 
     // Then expect the checkbox to be unchecked and the formState to reflect that state
-    expect(r.isAvailable()).not.toBeChecked();
+    expect(r.isAvailable).not.toBeChecked();
     expect(formState.isAvailable.value).toBeFalsy();
     // And auto save was triggered with the correct value
     expect(autoSave).toBeCalledWith(false);
@@ -41,7 +41,7 @@ describe("BoundSwitchField", () => {
     const r = await render(<BoundSwitchField field={formState.isAvailable} />);
 
     // Then the BoundSwitchField should be disabled
-    expect(r.isAvailable()).toBeDisabled();
+    expect(r.isAvailable).toBeDisabled();
   });
 });
 

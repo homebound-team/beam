@@ -10,20 +10,20 @@ describe("BoundNumberField", () => {
   it("shows the current value", async () => {
     const author = createObjectState(formConfig, { heightInInches: 10 });
     const r = await render(<BoundNumberField field={author.heightInInches} />);
-    expect(r.heightInInches()).toHaveValue("10");
+    expect(r.heightInInches).toHaveValue("10");
   });
 
   it("can change the current value", async () => {
     const author = createObjectState(formConfig, { heightInInches: 10 });
     const r = await render(<BoundNumberField field={author.heightInInches} />);
     // Given the user types a valid WIP value
-    fireEvent.input(r.heightInInches(), { target: { value: "11" } });
+    fireEvent.input(r.heightInInches, { target: { value: "11" } });
     // Then that value is in the DOM (as controlled by react-aria)
-    expect(r.heightInInches()).toHaveValue("11");
+    expect(r.heightInInches).toHaveValue("11");
     // And also pushed immediately into the FieldState (i.e. w/o waiting for blur)
     expect(author.heightInInches.value).toEqual(11);
     // And when blur finally does happen
-    fireEvent.blur(r.heightInInches());
+    fireEvent.blur(r.heightInInches);
     // Then the value is still 11
     expect(author.heightInInches.value).toEqual(11);
   });
@@ -33,47 +33,47 @@ describe("BoundNumberField", () => {
     const author = createObjectState(formConfig, { heightInInches: 10 });
     const r = await render(<BoundNumberField field={author.heightInInches} />);
     // When the user focuses
-    fireEvent.focus(r.heightInInches());
+    fireEvent.focus(r.heightInInches);
     // And types an invalid, WIP value
-    fireEvent.input(r.heightInInches(), { target: { value: "11," } });
+    fireEvent.input(r.heightInInches, { target: { value: "11," } });
     // And we pass a sanitized value into the field state for rules to see
     expect(author.heightInInches.value).toEqual(11);
     // Then the DOM value is sanitized as well
-    expect(r.heightInInches()).toHaveValue("11");
+    expect(r.heightInInches).toHaveValue("11");
   });
 
   it("shows an error message", async () => {
     const author = createObjectState(formConfig, {});
     author.touched = true;
-    const { heightInInches_errorMsg } = await render(<BoundNumberField field={author.heightInInches} />);
-    expect(heightInInches_errorMsg()).toHaveTextContent("Required");
+    const r = await render(<BoundNumberField field={author.heightInInches} />);
+    expect(r.heightInInches_errorMsg).toHaveTextContent("Required");
   });
 
   it("drops the 'in cents' suffix from labels", async () => {
     const author = createObjectState(formConfig, { royaltiesInCents: 1_00 });
     const r = await render(<BoundNumberField field={author.royaltiesInCents} />);
-    expect(r.royalties_label()).toHaveTextContent("Royalties");
-    expect(r.royalties_label()).not.toHaveTextContent("Cents");
-    expect(r.royalties()).toHaveValue("$1.00");
+    expect(r.royalties_label).toHaveTextContent("Royalties");
+    expect(r.royalties_label).not.toHaveTextContent("Cents");
+    expect(r.royalties).toHaveValue("$1.00");
   });
 
   it("retains 0 value", async () => {
     const author = createObjectState(formConfig, { royaltiesInCents: 1_00 });
-    const { royalties } = await render(<BoundNumberField field={author.royaltiesInCents} />);
-    fireEvent.input(royalties(), { target: { value: "0" } });
-    fireEvent.blur(royalties());
-    expect(royalties()).toHaveValue("$0.00");
+    const r = await render(<BoundNumberField field={author.royaltiesInCents} />);
+    fireEvent.input(r.royalties, { target: { value: "0" } });
+    fireEvent.blur(r.royalties);
+    expect(r.royalties).toHaveValue("$0.00");
   });
 
   it("retains null value", async () => {
     const author = createObjectState(formConfig, { royaltiesInCents: 1_00 });
     const r = await render(<Observer>{() => <BoundNumberField field={author.royaltiesInCents} />}</Observer>);
-    expect(r.royalties()).toHaveValue("$1.00");
+    expect(r.royalties).toHaveValue("$1.00");
     act(() => {
       author.royaltiesInCents.value = undefined;
     });
     expect(author.royaltiesInCents.value).toBeNull();
-    expect(r.royalties()).toHaveValue("");
+    expect(r.royalties).toHaveValue("");
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {
@@ -107,7 +107,7 @@ describe("BoundNumberField", () => {
     // When typing in a new value
     type(r.heightInInches, "73");
     // And hitting the Enter key
-    fireEvent.keyDown(r.heightInInches(), { key: "Enter" });
+    fireEvent.keyDown(r.heightInInches, { key: "Enter" });
 
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith(73);

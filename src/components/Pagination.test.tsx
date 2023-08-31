@@ -45,7 +45,7 @@ describe("Pagination", () => {
     const page = [{ pageNumber: 1, pageSize: 100 }, setSettings] as const;
     const r = await render(<Pagination page={page} totalCount={10} />);
     // Then pageSize field have value of 100
-    expect(r.pagination_pageSize()).toHaveValue("100");
+    expect(r.pagination_pageSize).toHaveValue("100");
     // When click it
     click(r.pagination_pageSize);
     // And select option 100
@@ -60,7 +60,7 @@ describe("Pagination", () => {
     const page = [{ pageNumber: 1, pageSize: 50 }, jest.fn] as const;
     const r = await render(<Pagination totalCount={10} page={page} />);
     // Then previous page button is disabled
-    expect(r.pagination_previousIcon()).toBeDisabled();
+    expect(r.pagination_previousIcon).toBeDisabled();
   });
 
   it("cannot navigate to next page when current page is minor than total count / per page", async () => {
@@ -68,7 +68,7 @@ describe("Pagination", () => {
     const page = [{ pageNumber: 5, pageSize: 200 }, jest.fn] as const;
     const r = await render(<Pagination totalCount={999} page={page} />);
     // Then next page button is disabled
-    expect(r.pagination_nextIcon()).toBeDisabled();
+    expect(r.pagination_nextIcon).toBeDisabled();
   });
 
   it("can navigate to next page when current page is greater than total count / per page", async () => {
@@ -76,7 +76,7 @@ describe("Pagination", () => {
     const page = [{ pageNumber: 4, pageSize: 200 }, jest.fn] as const;
     const r = await render(<Pagination totalCount={999} page={page} />);
     // Then next page button is not disabled
-    expect(r.pagination_nextIcon()).not.toBeDisabled();
+    expect(r.pagination_nextIcon).not.toBeDisabled();
   });
 
   it("shows detailed navigation page info", async () => {
@@ -84,7 +84,7 @@ describe("Pagination", () => {
     const page = [{ pageNumber: 4, pageSize: 200 }, jest.fn] as const;
     const r = await render(<Pagination totalCount={999} page={page} />);
     // Then show the information about what is paginated
-    expect(r.pagination_pageInfoLabel()).toHaveTextContent("601 - 800 of 999"); // we're showing 601-800 from 999 items
+    expect(r.pagination_pageInfoLabel).toHaveTextContent("601 - 800 of 999"); // we're showing 601-800 from 999 items
   });
 
   it("shows detailed navigation page info on last page", async () => {
@@ -92,7 +92,7 @@ describe("Pagination", () => {
     const page = [{ pageNumber: 5, pageSize: 200 }, jest.fn] as const;
     const r = await render(<Pagination totalCount={999} page={page} />);
     // Then show the information about what is paginated
-    expect(r.pagination_pageInfoLabel()).toHaveTextContent("801 - 999 of 999");
+    expect(r.pagination_pageInfoLabel).toHaveTextContent("801 - 999 of 999");
   });
 
   describe("pageOptions", () => {
