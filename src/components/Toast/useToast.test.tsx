@@ -20,7 +20,7 @@ describe("useToast", () => {
     click(r.toastButton);
     click(r.toast_close);
     // Then expect it to be closed
-    expect(r.toast).toNotBeInTheDom();
+    expect(r.query.toast).not.toBeInTheDocument();
   });
 });
 

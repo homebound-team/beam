@@ -13,8 +13,8 @@ describe(TextFieldBase, () => {
       <TextFieldBase inputProps={{ readOnly: true }} label="Test" errorMsg="Error" helperText="Helper" />,
     );
     expect(r.test).toHaveAttribute("data-readonly", "true");
-    expect(r.test_errorMsg).toNotBeInTheDom();
-    expect(r.test_helperText).toNotBeInTheDom();
+    expect(r.query.test_errorMsg).not.toBeInTheDocument();
+    expect(r.query.test_helperText).not.toBeInTheDocument();
   });
 
   it("hides error and helper text when disabled", async () => {
@@ -22,7 +22,7 @@ describe(TextFieldBase, () => {
       <TextFieldBase inputProps={{ disabled: true }} label="Test" errorMsg="Error" helperText="Helper" />,
     );
     expect(r.test).toBeDisabled();
-    expect(r.test_errorMsg).toNotBeInTheDom();
-    expect(r.test_helperText).toNotBeInTheDom();
+    expect(r.query.test_errorMsg).not.toBeInTheDocument();
+    expect(r.query.test_helperText).not.toBeInTheDocument();
   });
 });

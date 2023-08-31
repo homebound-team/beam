@@ -18,7 +18,7 @@ describe("useSnackbar", () => {
     // And when waiting for the timeout
     await wait();
     // Then expect it to automatically close
-    expect(r.snackbar).toNotBeInTheDom();
+    expect(r.query.snackbar).not.toBeInTheDocument();
   });
 
   it("can close via 'closeNotice' method", async () => {
@@ -37,7 +37,7 @@ describe("useSnackbar", () => {
     // And when clicking the button to close the notice
     await clickAndWait(r.closeNotice);
     // Then expect it to have closed
-    expect(r.snackbar).toNotBeInTheDom();
+    expect(r.query.snackbar).not.toBeInTheDocument();
   });
 
   it("can close via 'onClose' callback", async () => {
@@ -51,7 +51,7 @@ describe("useSnackbar", () => {
     // And when clicking the close button in the notice
     await clickAndWait(r.snackbar_close);
     // Then expect it to have closed
-    expect(r.snackbar).toNotBeInTheDom();
+    expect(r.query.snackbar).not.toBeInTheDocument();
   });
 
   it("can use an offset", async () => {

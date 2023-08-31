@@ -191,7 +191,7 @@ describe(TreeSelectField, () => {
       />,
     );
     // Then the selected options are visible
-    expect(r.selectedOptionsCount).toNotBeInTheDom();
+    expect(r.query.selectedOptionsCount).not.toBeInTheDocument();
     expect(r.favoriteLeague).toHaveValue("NBA");
 
     // When opening the options

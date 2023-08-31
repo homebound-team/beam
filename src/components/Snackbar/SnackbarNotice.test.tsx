@@ -5,9 +5,9 @@ import { click, render } from "src/utils/rtl";
 describe("SnackbarNotice", () => {
   it("renders the default snackbar notice layout", async () => {
     const r = await render(<SnackbarNotice id="1" onClose={noop} message="message" />);
-    expect(r.snackbar_icon).toNotBeInTheDom();
+    expect(r.query.snackbar_icon).not.toBeInTheDocument();
     expect(r.snackbar_message).toHaveTextContent("message");
-    expect(r.snackbar_action).toNotBeInTheDom();
+    expect(r.query.snackbar_action).not.toBeInTheDocument();
     expect(r.snackbar_close).toBeInTheDocument();
   });
 
@@ -25,7 +25,7 @@ describe("SnackbarNotice", () => {
 
   it("can hide the close button", async () => {
     const r = await render(<SnackbarNotice id="1" onClose={noop} message="message" hideCloseButton />);
-    expect(r.snackbar_close).toNotBeInTheDom();
+    expect(r.query.snackbar_close).not.toBeInTheDocument();
   });
 
   it("can render the icon", async () => {

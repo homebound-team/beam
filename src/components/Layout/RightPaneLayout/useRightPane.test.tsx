@@ -20,8 +20,7 @@ describe("useRightPane", () => {
     click(r.closePaneBtn);
 
     await waitFor(() => {
-      const rightPaneContent = r.queryByTestId("rightPaneContent");
-      expect(rightPaneContent).toNotBeInTheDom();
+      expect(r.query.rightPaneContent).not.toBeInTheDocument();
     });
   });
 });

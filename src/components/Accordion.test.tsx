@@ -10,7 +10,7 @@ describe(Accordion, () => {
     // Then it shows the correct title
     expect(r.accordion_title).toHaveTextContent("Test title");
     // And the description will be hidden by default
-    expect(r.accordion_content).toNotBeInTheDom();
+    expect(r.query.accordion_content).not.toBeInTheDocument();
     // And the border bottom is not displayed by default
     expect(r.accordion_container).not.toHaveStyleRule("border-bottom-width", "1px");
     // And the dropdown button is enabled by default
@@ -70,6 +70,6 @@ describe(Accordion, () => {
     // Then the dropdown button is disabled
     expect(r.accordion_title).toBeDisabled();
     // And the content is not displayed
-    expect(r.accordion_content).toNotBeInTheDom();
+    expect(r.query.accordion_content).not.toBeInTheDocument();
   });
 });

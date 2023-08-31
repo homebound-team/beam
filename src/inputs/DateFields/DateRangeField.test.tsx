@@ -34,7 +34,7 @@ describe(DateRangeField, () => {
     // When triggering the overlay to close without returning focus to the input
     fireEvent.keyDown(r.date_datePicker, { key: "Escape", code: "Escape" });
     // Then the overlay should close
-    expect(r.date_datePicker).toNotBeInTheDom();
+    expect(r.query.date_datePicker).not.toBeInTheDocument();
     // And onChange should be called with the new range
     const { from, to } = onChange.mock.calls[0][0];
     expect(new Date(from).toDateString()).toEqual(new Date("01/01/2020").toDateString());
