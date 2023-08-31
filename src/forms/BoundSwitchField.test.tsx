@@ -21,13 +21,13 @@ describe("BoundSwitchField", () => {
       { isAvailable: true },
       { maybeAutoSave: () => autoSave(formState.isAvailable.value) },
     );
-    const { isAvailable } = await render(<BoundSwitchField field={formState.isAvailable} />);
+    const r = await render(<BoundSwitchField field={formState.isAvailable} />);
 
     // When interacting with a BoundSwitchField
-    click(isAvailable());
+    click(r.isAvailable());
 
     // Then expect the checkbox to be unchecked and the formState to reflect that state
-    expect(isAvailable()).not.toBeChecked();
+    expect(r.isAvailable()).not.toBeChecked();
     expect(formState.isAvailable.value).toBeFalsy();
     // And auto save was triggered with the correct value
     expect(autoSave).toBeCalledWith(false);
