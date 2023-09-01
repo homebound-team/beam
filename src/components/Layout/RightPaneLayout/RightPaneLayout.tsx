@@ -1,27 +1,19 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactElement, useEffect } from "react";
-import { Css, Palette } from "../../../Css";
+import { Css, Palette } from "src/Css";
 import { useRightPaneContext } from "./RightPaneContext";
 
-export function RightPaneLayout({
-  children,
-  paneBgColor = Palette.White,
-  paneWidth = 450,
-  defaultPaneContent,
-}: {
+export function RightPaneLayout(props: {
   children: ReactElement;
   paneBgColor?: Palette;
   paneWidth?: number;
   defaultPaneContent?: ReactElement;
 }) {
+  const { children, paneBgColor = Palette.White, paneWidth = 450, defaultPaneContent } = props;
   const { isRightPaneOpen, rightPaneContent, clearPane, closePane } = useRightPaneContext();
 
   // Close pane on page unmount because otherwise the next page that has a right pane will show our stale content
-  useEffect(() => {
-    return () => {
-      closePane();
-    };
-  }, []);
+  useEffect(() => closePane, [closePane]);
 
   return (
     <div css={Css.h100.df.overflowXHidden.$}>
@@ -36,15 +28,14 @@ export function RightPaneLayout({
           {children}
         </div>
 
-        <div css={Css.position("relative").if(!!defaultPaneContent).wPx(paneWidth).$}>
+        <div css={Css.relative.if(!!defaultPaneContent).wPx(paneWidth).$}>
           {defaultPaneContent && (
             <div
               css={
                 Css.h100
                   .wPx(paneWidth)
                   .left(0)
-                  .position("absolute")
-                  .add("transition", "all .3s ease-in-out")
+                  .absolute.add("transition", "all .3s ease-in-out")
                   .if(isRightPaneOpen)
                   .add("opacity", 0)
                   .left(100).$

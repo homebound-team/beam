@@ -32,7 +32,7 @@ export function RightPaneProvider({ children }: { children: ReactNode }) {
     },
     [setRightPaneContent],
   );
-  const closePane = useCallback(() => setIsRightPaneOpen(false), [setRightPaneContent]);
+  const closePane = useCallback(() => setIsRightPaneOpen(false), []);
   const clearPane = useCallback(() => setRightPaneContent(undefined), [setRightPaneContent]);
 
   const context = useMemo(
