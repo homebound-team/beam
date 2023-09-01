@@ -1,14 +1,13 @@
-import { clickAndWait } from "@homebound/rtl-utils";
-import { waitFor } from "@storybook/testing-library";
-import { click, render } from "../../../utils/rtl";
-import { Button } from "../../Button";
+import { waitFor } from "@homebound/rtl-utils";
+import { Button } from "src/components/Button";
+import { click, clickAndWait, render } from "src/utils/rtl";
 import { RightPaneLayout, RightPaneProvider, useRightPane } from "./index";
 
 describe("useRightPane", () => {
   it("should show right pane when calling openRightPane hook", async () => {
     const r = await render(<TestRightPaneLayoutContent />);
     await clickAndWait(r.openPaneBtn);
-    expect(r.rightPaneContent).toBeTruthy();
+    expect(r.rightPaneContent).toBeInTheDocument();
   });
 
   it("should close right pane when calling closeRightPane hook", async () => {
