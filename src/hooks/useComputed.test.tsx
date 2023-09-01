@@ -23,32 +23,32 @@ describe("useComputed", () => {
 
   it("re-renders on proxy change", async () => {
     const someProxy = observable({ name: "foo" });
-    const { name } = await render(<TestComponent someProxy={someProxy} />);
+    const r = await render(<TestComponent someProxy={someProxy} />);
     expect(renderedCount).toEqual(1);
     expect(evaledCount).toEqual(1);
-    expect(name()).toHaveTextContent("foo");
+    expect(r.name).toHaveTextContent("foo");
 
     act(() => {
       someProxy.name = "bar";
     });
     expect(renderedCount).toEqual(2);
     expect(evaledCount).toEqual(2);
-    expect(name()).toHaveTextContent("bar");
+    expect(r.name).toHaveTextContent("bar");
   });
 
   it("does not re-renders on proxy change that doesn't change return value", async () => {
     const someProxy = observable({ name: "foo" });
-    const { name } = await render(<TestComponent someProxy={someProxy} computedFn={(p) => p.name.substring(0, 1)} />);
+    const r = await render(<TestComponent someProxy={someProxy} computedFn={(p) => p.name.substring(0, 1)} />);
     expect(renderedCount).toEqual(1);
     expect(evaledCount).toEqual(1);
-    expect(name()).toHaveTextContent("f");
+    expect(r.name).toHaveTextContent("f");
 
     act(() => {
       someProxy.name = "food";
     });
     expect(renderedCount).toEqual(1);
     expect(evaledCount).toEqual(2);
-    expect(name()).toHaveTextContent("f");
+    expect(r.name).toHaveTextContent("f");
   });
 
   it("does not re-renders on proxy change that doesn't deeply change return value", async () => {
@@ -92,37 +92,37 @@ describe("useComputed", () => {
 
   it("re-renders on other hook change", async () => {
     const someProxy = observable({ name: "foo" });
-    const { name, color, makeBlue } = await render(<TestComponent someProxy={someProxy} />);
+    const r = await render(<TestComponent someProxy={someProxy} />);
     expect(renderedCount).toEqual(1);
     expect(evaledCount).toEqual(1);
-    expect(name()).toHaveTextContent("foo");
-    expect(color()).toHaveTextContent("red");
+    expect(r.name).toHaveTextContent("foo");
+    expect(r.color).toHaveTextContent("red");
 
-    click(makeBlue);
+    click(r.makeBlue);
     expect(renderedCount).toEqual(2);
     expect(evaledCount).toEqual(1);
-    expect(name()).toHaveTextContent("foo");
-    expect(color()).toHaveTextContent("blue");
+    expect(r.name).toHaveTextContent("foo");
+    expect(r.color).toHaveTextContent("blue");
   });
 
   it("re-renders on deps change", async () => {
     const someProxy = observable({ name: "foo" });
-    const { name, changeDep } = await render(<TestComponent someProxy={someProxy} />);
+    const r = await render(<TestComponent someProxy={someProxy} />);
     expect(renderedCount).toEqual(1);
     expect(evaledCount).toEqual(1);
-    expect(name()).toHaveTextContent("foo-dep1");
+    expect(r.name).toHaveTextContent("foo-dep1");
 
     act(() => {
       someProxy.name = "bar";
     });
     expect(renderedCount).toEqual(2);
     expect(evaledCount).toEqual(2);
-    expect(name()).toHaveTextContent("bar-dep1");
+    expect(r.name).toHaveTextContent("bar-dep1");
 
-    click(changeDep);
+    click(r.changeDep);
     expect(renderedCount).toEqual(3);
     expect(evaledCount).toEqual(3);
-    expect(name()).toHaveTextContent("bar-dep2");
+    expect(r.name).toHaveTextContent("bar-dep2");
   });
 });
 

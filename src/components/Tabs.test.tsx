@@ -11,44 +11,44 @@ describe("TabsWithContent", () => {
   it("should display content of selected tab", async () => {
     const r = await render(<TestTabs />, withRouter());
     // tab panel should initially display Tab 1 Content
-    expect(r.tab_panel()).toHaveTextContent("Tab 1 Content");
+    expect(r.tab_panel).toHaveTextContent("Tab 1 Content");
     // when we click on the 4th tab
     click(r.tabs_tab4);
     // then expect to see the 4th tab's content
-    expect(r.tab_panel()).toHaveTextContent("Tab 4 Content");
+    expect(r.tab_panel).toHaveTextContent("Tab 4 Content");
   });
 
   it("should update the active tab", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />, withRouter());
-    expect(r.tabs_tab1()).toHaveStyleRule("border-color", Palette.Blue700);
+    expect(r.tabs_tab1).toHaveStyleRule("border-color", Palette.Blue700);
     // when an external state change moves us to the 2nd tab
     click(r.goToTab2);
     // Then tab2 is now actively styled
-    expect(r.tabs_tab2()).toHaveStyleRule("border-color", Palette.Blue700);
+    expect(r.tabs_tab2).toHaveStyleRule("border-color", Palette.Blue700);
   });
 
   it("should reset the active tab on blur", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />, withRouter());
-    expect(r.tabs_tab1()).toHaveStyleRule("border-color", Palette.Blue700);
+    expect(r.tabs_tab1).toHaveStyleRule("border-color", Palette.Blue700);
     // And we've moved to the 2nd tab
-    fireEvent.keyUp(r.tabs_tab2(), { key: "ArrowRight" });
-    expect(r.tabs_tab2()).toHaveStyleRule("border-color", Palette.Blue700);
+    fireEvent.keyUp(r.tabs_tab2, { key: "ArrowRight" });
+    expect(r.tabs_tab2).toHaveStyleRule("border-color", Palette.Blue700);
     // When we blur away
-    fireEvent.blur(r.tabs_tab1());
+    fireEvent.blur(r.tabs_tab1);
     // Then the 1st tab goes back to highlighted
-    expect(r.tabs_tab1()).toHaveStyleRule("border-color", Palette.Blue700);
+    expect(r.tabs_tab1).toHaveStyleRule("border-color", Palette.Blue700);
   });
 
   it("cannot click on disabled tabs", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />, withRouter());
-    expect(r.tabs_tab1()).toHaveStyleRule("border-color", Palette.Blue700);
+    expect(r.tabs_tab1).toHaveStyleRule("border-color", Palette.Blue700);
     // And we try to click on the 3rd disabled tab
     click(r.tabs_tab3);
     // Then nothing happens
-    expect(r.tabs_tab1()).toHaveStyleRule("border-color", Palette.Blue700);
+    expect(r.tabs_tab1).toHaveStyleRule("border-color", Palette.Blue700);
   });
 
   describe("getNextTabValue function", () => {
@@ -87,9 +87,9 @@ describe("TabsWithContent", () => {
     ];
     const r = await render(<TabsWithContent tabs={testTabs} onChange={() => {}} selected="tab1" />, withRouter());
     // Then the tabs are not even in the dom
-    expect(() => r.tabs_tab1()).toThrow("Unable to find an element");
+    expect(() => r.tabs_tab1).toThrow("Unable to find an element");
     // But the selected tab's content is shown
-    expect(r.tab_panel().textContent).toBe("Tab 1 Content");
+    expect(r.tab_panel.textContent).toBe("Tab 1 Content");
   });
 
   it("shows all the tabs if 'alwaysShowAllTabs' is defined, but only a single tab is enabled", async () => {
@@ -117,10 +117,10 @@ describe("TabsWithContent", () => {
     const r = await render(<TabsWithContent tabs={testTabs} />, router);
 
     // Then the tab elements are links with expected `href` values
-    expect(r.tabs_tabA().tagName).toBe("A");
-    expect(r.tabs_tabA()).toHaveAttribute("href", "/tab1");
-    expect(r.tabs_tabB().tagName).toBe("A");
-    expect(r.tabs_tabB()).toHaveAttribute("href", "/tab2");
+    expect(r.tabs_tabA.tagName).toBe("A");
+    expect(r.tabs_tabA).toHaveAttribute("href", "/tab1");
+    expect(r.tabs_tabB.tagName).toBe("A");
+    expect(r.tabs_tabB).toHaveAttribute("href", "/tab2");
   });
 
   it("can match tab based on multiple paths", async () => {
@@ -144,7 +144,7 @@ describe("TabsWithContent", () => {
     const r = await render(<TabsWithContent tabs={testTabs} />, router);
 
     // Then expect the second tab to be active
-    expect(r.tab_panel().textContent).toBe("Tab 2 Content");
+    expect(r.tab_panel.textContent).toBe("Tab 2 Content");
   });
 
   it("can navigate between tabs when rendered as links", async () => {
@@ -157,14 +157,14 @@ describe("TabsWithContent", () => {
     const r = await render(<TabsWithContent tabs={testTabs} />, router);
 
     // Then expect the first tab to be active
-    expect(r.tab_panel().textContent).toBe("Tab 1 Content");
+    expect(r.tab_panel.textContent).toBe("Tab 1 Content");
 
     // When clicking the second tab
     click(r.tabs_tabB);
 
     // Then expect the URL to be updated and the tab panel to show the selected tab's content
     expect(router.history.location.pathname).toBe("/tab2");
-    expect(r.tab_panel().textContent).toBe("Tab 2 Content");
+    expect(r.tab_panel.textContent).toBe("Tab 2 Content");
   });
 
   it("captures path parameters within Route context", async () => {
@@ -181,13 +181,13 @@ describe("TabsWithContent", () => {
     ];
     const r = await render(<TabsWithContent tabs={testTabs} />, router);
     // Then expect the first tab to have captured the param
-    expect(r.ceId().textContent).toBe("ce:1");
+    expect(r.ceId.textContent).toBe("ce:1");
 
     // When clicking the second tab
     click(r.tabs_tabB);
     // Then expect the second tab to have captured both params
-    expect(r.ceId().textContent).toBe("ce:2");
-    expect(r.celiId().textContent).toBe("celi:2");
+    expect(r.ceId.textContent).toBe("ce:2");
+    expect(r.celiId.textContent).toBe("celi:2");
   });
 
   it("renders a disabled route tab as a div", async () => {
@@ -201,7 +201,7 @@ describe("TabsWithContent", () => {
     const r = await render(<TabsWithContent tabs={testTabs} />, withRouter("/a", ""));
 
     // Then the disabled tab should be rendered as a div
-    expect(r.tabs_tabC().tagName).toBe("DIV");
+    expect(r.tabs_tabC.tagName).toBe("DIV");
   });
 
   it("supports setting horizontal padding on TabContent", async () => {
@@ -216,7 +216,7 @@ describe("TabsWithContent", () => {
       withRouter(),
     );
     // Then expect the tab content to have the expected padding based on `contentXss`
-    expect(r.tab_panel()).toHaveStyle("padding-left: 16px");
+    expect(r.tab_panel).toHaveStyle("padding-left: 16px");
   });
 });
 

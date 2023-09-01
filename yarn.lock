@@ -5,10 +5,10 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@adobe/css-tools@npm:^4.0.1":
-  version: 4.1.0
-  resolution: "@adobe/css-tools@npm:4.1.0"
-  checksum: 50d0098461af146e112bdc700959fac473cce31ad25f5077b11c87bc66529c4aeb5a1e6f30f4a9646efe003c242f52f181f042e21f9cc137703ffde54a9d1fb5
+"@adobe/css-tools@npm:^4.3.0":
+  version: 4.3.1
+  resolution: "@adobe/css-tools@npm:4.3.1"
+  checksum: ad43456379ff391132aff687ece190cb23ea69395e23c9b96690eeabe2468da89a4aaf266e4f8b6eaab53db3d1064107ce0f63c3a974e864f4a04affc768da3f
   languageName: node
   linkType: hard
 
@@ -3965,7 +3965,7 @@ __metadata:
     "@homebound/eslint-config": 1.6.1
     "@homebound/form-state": ^2.17.0
     "@homebound/rtl-react-router-utils": 1.0.3
-    "@homebound/rtl-utils": ^2.63.1
+    "@homebound/rtl-utils": ^2.65.0
     "@homebound/truss": ^1.131.0
     "@homebound/tsconfig": ^1.0.3
     "@internationalized/number": ^3.0.3
@@ -3984,7 +3984,8 @@ __metadata:
     "@storybook/react": ^7.3.0
     "@storybook/react-vite": ^7.3.0
     "@storybook/testing-library": ^0.2.0
-    "@testing-library/jest-dom": ^5.16.5
+    "@testing-library/jest-dom": ^6.1.2
+    "@testing-library/react": ^14.0.0
     "@tsconfig/recommended": ^1.0.2
     "@types/dompurify": ^2.2.3
     "@types/jest": ^29.4.0
@@ -4118,14 +4119,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@homebound/rtl-utils@npm:^2.63.1":
-  version: 2.63.1
-  resolution: "@homebound/rtl-utils@npm:2.63.1"
-  dependencies:
-    "@testing-library/react": ^14.0.0
+"@homebound/rtl-utils@npm:^2.65.0":
+  version: 2.65.0
+  resolution: "@homebound/rtl-utils@npm:2.65.0"
   peerDependencies:
+    "@testing-library/react": ">=12 || >=13 || >=14"
     react: ">=16 || >=17 || >=18"
-  checksum: a4b62c8921570454a8c195d7dc696e5a05bf4cd0bf77046be587ad0484779a667f66509e81e97d50da7536ec63ec89cd4a0b906638b49c35e65a0952c560a866
+  checksum: 8f92716c84a5999d34f7d6dee09947b0aa99a88a453edd873bee93fe59568838fe4890c53f66799423702167433bb120a4051d248509d3b31805b325145605ac
   languageName: node
   linkType: hard
 
@@ -8398,20 +8398,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/jest-dom@npm:^5.16.5":
-  version: 5.16.5
-  resolution: "@testing-library/jest-dom@npm:5.16.5"
+"@testing-library/jest-dom@npm:^6.1.2":
+  version: 6.1.2
+  resolution: "@testing-library/jest-dom@npm:6.1.2"
   dependencies:
-    "@adobe/css-tools": ^4.0.1
+    "@adobe/css-tools": ^4.3.0
     "@babel/runtime": ^7.9.2
-    "@types/testing-library__jest-dom": ^5.9.1
     aria-query: ^5.0.0
     chalk: ^3.0.0
     css.escape: ^1.5.1
     dom-accessibility-api: ^0.5.6
     lodash: ^4.17.15
     redent: ^3.0.0
-  checksum: 94911f901a8031f3e489d04ac057cb5373621230f5d92bed80e514e24b069fb58a3166d1dd86963e55f078a1bd999da595e2ab96ed95f452d477e272937d792a
+  peerDependencies:
+    "@jest/globals": ">= 28"
+    "@types/jest": ">= 28"
+    jest: ">= 28"
+    vitest: ">= 0.32"
+  peerDependenciesMeta:
+    "@jest/globals":
+      optional: true
+    "@types/jest":
+      optional: true
+    jest:
+      optional: true
+    vitest:
+      optional: true
+  checksum: de6b7f98d1b42887192eb70fd917b2b98d92aab22a86801718de75e0ca4964589335efeb650b0f7b9859609446b20d2bd81bfc5755f1655885d5664d1c093a70
   languageName: node
   linkType: hard
 
@@ -8730,7 +8743,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:*, @types/jest@npm:^29.4.0":
+"@types/jest@npm:^29.4.0":
   version: 29.4.0
   resolution: "@types/jest@npm:29.4.0"
   dependencies:
@@ -8928,7 +8941,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.0.11":
+"@types/react-dom@npm:^18.0.0":
+  version: 18.2.7
+  resolution: "@types/react-dom@npm:18.2.7"
+  dependencies:
+    "@types/react": "*"
+  checksum: e02ea908289a7ad26053308248d2b87f6aeafd73d0e2de2a3d435947bcea0422599016ffd1c3e38ff36c42f5e1c87c7417f05b0a157e48649e4a02f21727d54f
+  languageName: node
+  linkType: hard
+
+"@types/react-dom@npm:^18.0.11":
   version: 18.0.11
   resolution: "@types/react-dom@npm:18.0.11"
   dependencies:
@@ -9013,15 +9035,6 @@ __metadata:
   version: 2.0.0
   resolution: "@types/stack-utils@npm:2.0.0"
   checksum: b3fbae25b073116977ecb5c67d22f14567b51a7792403b0bf46e5de8f29bde3bd4ec1626afb22065495ca7f1c699c8bd66720050c94b8f8f9bcefbee79d161fd
-  languageName: node
-  linkType: hard
-
-"@types/testing-library__jest-dom@npm:^5.9.1":
-  version: 5.9.5
-  resolution: "@types/testing-library__jest-dom@npm:5.9.5"
-  dependencies:
-    "@types/jest": "*"
-  checksum: f2ed81103acb52d54f992d826e3854551294618628997dc01f8955efd8c1d476d64715b79187371b09ec3e61e44cc10a7ffe1e427d1bda798552f83d18309056
   languageName: node
   linkType: hard
 

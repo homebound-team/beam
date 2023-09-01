@@ -13,12 +13,12 @@ describe("useSnackbar", () => {
     // When triggering the notice
     click(r.triggerNotice);
     // Then expect it to show
-    expect(r.snackbar()).toBeInTheDocument();
+    expect(r.snackbar).toBeInTheDocument();
 
     // And when waiting for the timeout
     await wait();
     // Then expect it to automatically close
-    expect(r.snackbar).toNotBeInTheDom();
+    expect(r.query.snackbar).not.toBeInTheDocument();
   });
 
   it("can close via 'closeNotice' method", async () => {
@@ -27,17 +27,17 @@ describe("useSnackbar", () => {
     // When triggering the persistent notice
     click(r.triggerNotice);
     // Then expect it to show
-    expect(r.snackbar()).toBeInTheDocument();
+    expect(r.snackbar).toBeInTheDocument();
 
     // And when waiting for the timeout, which shouldn't have bene set
     await wait();
     // Then expect it to still be in the DOM.
-    expect(r.snackbar()).toBeInTheDocument();
+    expect(r.snackbar).toBeInTheDocument();
 
     // And when clicking the button to close the notice
     await clickAndWait(r.closeNotice);
     // Then expect it to have closed
-    expect(r.snackbar).toNotBeInTheDom();
+    expect(r.query.snackbar).not.toBeInTheDocument();
   });
 
   it("can close via 'onClose' callback", async () => {
@@ -46,12 +46,12 @@ describe("useSnackbar", () => {
     // When triggering the persistent notice
     click(r.triggerNotice);
     // Then expect it to show
-    expect(r.snackbar()).toBeInTheDocument();
+    expect(r.snackbar).toBeInTheDocument();
 
     // And when clicking the close button in the notice
     await clickAndWait(r.snackbar_close);
     // Then expect it to have closed
-    expect(r.snackbar).toNotBeInTheDom();
+    expect(r.query.snackbar).not.toBeInTheDocument();
   });
 
   it("can use an offset", async () => {
@@ -61,7 +61,7 @@ describe("useSnackbar", () => {
     // When a notification spawns
     click(r.notify);
     // Then it's offset by 200px
-    expect(r.snackbarWrapper()).toHaveStyleRule("bottom", "200px");
+    expect(r.snackbarWrapper).toHaveStyleRule("bottom", "200px");
 
     // When its value changes to undefined
     r.rerender(<TestComponentWithOffset />);
@@ -70,7 +70,7 @@ describe("useSnackbar", () => {
     click(r.notify);
 
     // Then it reverted to a default offset
-    expect(r.snackbarWrapper()).toHaveStyleRule("bottom", "24px");
+    expect(r.snackbarWrapper).toHaveStyleRule("bottom", "24px");
   });
 
   it("reverts offset when dismounting", async () => {
@@ -85,13 +85,13 @@ describe("useSnackbar", () => {
     // When we trigger a notice
     click(r.triggerNotice);
     // Then the offset is 200
-    expect(r.snackbarWrapper()).toHaveStyleRule("bottom", "200px");
+    expect(r.snackbarWrapper).toHaveStyleRule("bottom", "200px");
 
     // When we drop the offset-caller from the DOM
     r.rerender(<TestComponent />);
 
     // Then snackbar reverts to a default offset
-    expect(r.snackbarWrapper()).toHaveStyleRule("bottom", "24px");
+    expect(r.snackbarWrapper).toHaveStyleRule("bottom", "24px");
   });
 });
 

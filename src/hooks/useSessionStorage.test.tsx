@@ -9,7 +9,7 @@ describe("useSessionStorage", () => {
     // Given a test component
     const r = await render(<TestComponent />);
     // Then expect text to have "default" value that was passed into useSessionStorage
-    expect(r.firstName()).toHaveValue("default");
+    expect(r.firstName).toHaveValue("default");
   });
 
   it("can get a value from session storage", async () => {
@@ -18,7 +18,7 @@ describe("useSessionStorage", () => {
     // And given a test component
     const r = await render(<TestComponent />);
     // Then expect firstName to have the "saved" value from session storage
-    expect(r.firstName()).toHaveValue("saved");
+    expect(r.firstName).toHaveValue("saved");
   });
 
   it("can set a value to session storage", async () => {
@@ -28,11 +28,11 @@ describe("useSessionStorage", () => {
     // Given a test component
     const r = await render(<TestComponent />);
     // When we type an update into the firstName field
-    type(r.firstName(), "update");
+    type(r.firstName, "update");
     // Then expect sessions storage to have been called with the update
     expect(sessionStorage.setItem).toHaveBeenLastCalledWith("test", '{"firstName":"update"}');
     // And expect firstName to have the updated value
-    expect(r.firstName()).toHaveValue("update");
+    expect(r.firstName).toHaveValue("update");
   });
 
   it("returns the default value if it cannot parse the stored string", async () => {
@@ -41,7 +41,7 @@ describe("useSessionStorage", () => {
     // Given a test component
     const r = await render(<TestComponent />);
     // Then expect the firstName to be the default value passed into `useSessionStorage` instead of erroring
-    expect(r.firstName()).toHaveValue("default");
+    expect(r.firstName).toHaveValue("default");
   });
 });
 

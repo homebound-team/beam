@@ -11,17 +11,17 @@ describe("ChipSelectField", () => {
     // Given a ChipSelectField
     const r = await render(<TestComponent label="Test Label" value="s:2" options={sports} />);
     // Then the initial value should display
-    expect(r.chipSelectField()).toHaveTextContent("Soccer").toHaveAttribute("title", "Soccer");
+    expect(r.chipSelectField).toHaveTextContent("Soccer").toHaveAttribute("title", "Soccer");
     // And the label should display
-    expect(r.chipSelectField_label()).toHaveTextContent("Test Label");
+    expect(r.chipSelectField_label).toHaveTextContent("Test Label");
   });
 
   it("can set custom testids", async () => {
     // Given a ChipSelectField with a custom test id
     const r = await render(<TestComponent label="Test Label" value="s:2" options={sports} data-testid="customId" />);
     // Then the testid is used for the component
-    expect(r.customId()).toBeTruthy();
-    expect(r.customId_label()).toBeTruthy();
+    expect(r.customId).toBeTruthy();
+    expect(r.customId_label).toBeTruthy();
   });
 
   it("displays custom placeholder", async () => {
@@ -30,7 +30,7 @@ describe("ChipSelectField", () => {
       <TestComponent label="Test Label" value={undefined} options={sports} placeholder="+ Task Status" />,
     );
     // Then the custom placeholder is shown
-    expect(r.chipSelectField()).toHaveTextContent("+ Task Status");
+    expect(r.chipSelectField).toHaveTextContent("+ Task Status");
   });
 
   it("is clearable", async () => {
@@ -41,11 +41,11 @@ describe("ChipSelectField", () => {
       <TestComponent label="Label" value="s:2" options={sports} clearable onSelect={onSelect} onBlur={onBlur} />,
     );
     // With an existing value
-    expect(r.chipSelectField()).toHaveTextContent("Soccer");
+    expect(r.chipSelectField).toHaveTextContent("Soccer");
     // When clicking the clear button
     click(r.chipSelectField_clearButton);
     // Then expect the default placeholder value to display
-    expect(r.chipSelectField()).toHaveTextContent("Select an option");
+    expect(r.chipSelectField).toHaveTextContent("Select an option");
     // And the clear button is removed when no value is selected
     expect(r.queryByTestId("chipSelectField_clearButton")).toBeFalsy();
     // And onSelect to be called
@@ -57,13 +57,13 @@ describe("ChipSelectField", () => {
     const onSelect = jest.fn();
     const r = await render(<TestComponent label="Label" value="s:2" options={sports} onSelect={onSelect} />);
     // With an existing value
-    expect(r.chipSelectField()).toHaveTextContent("Soccer");
+    expect(r.chipSelectField).toHaveTextContent("Soccer");
     // When selecting a new value
     click(r.chipSelectField);
     expect(r.getByRole("option", { name: "Basketball" }).firstChild).toHaveAttribute("title", "Basketball");
     click(r.getByRole("option", { name: "Basketball" }));
     // Then the field's value updates
-    expect(r.chipSelectField()).toHaveTextContent("Basketball");
+    expect(r.chipSelectField).toHaveTextContent("Basketball");
     // And onSelect is called
     expect(onSelect).toBeCalledWith(["s:3", sports[2]]);
   });
@@ -76,9 +76,9 @@ describe("ChipSelectField", () => {
       <TestComponent label="Label" value="s:2" options={sports} onFocus={onFocus} onBlur={onBlur} />,
     );
     // When firing focus and blur events, then expect callbacks to be triggered
-    focus(r.chipSelectField());
+    focus(r.chipSelectField);
     expect(onFocus).toBeCalledTimes(1);
-    fireEvent.blur(r.chipSelectField());
+    fireEvent.blur(r.chipSelectField);
     expect(onBlur).toBeCalledTimes(1);
   });
 
@@ -95,7 +95,7 @@ describe("ChipSelectField", () => {
     // And onFocus should have been called
     expect(onFocus).toBeCalledTimes(1);
     // And when firing the blur event with a related target being an element within the menu
-    fireEvent.blur(r.chipSelectField(), { relatedTarget: r.getByRole("option", { name: "Basketball" }) });
+    fireEvent.blur(r.chipSelectField, { relatedTarget: r.getByRole("option", { name: "Basketball" }) });
     // Then the onBlur event should not be called
     expect(onBlur).toBeCalledTimes(0);
 
@@ -107,7 +107,7 @@ describe("ChipSelectField", () => {
 
   it("can disable field", async () => {
     const r = await render(<TestComponent label="Label" value="s:2" options={sports} disabled="Disabled reason" />);
-    expect(r.chipSelectField()).toBeDisabled();
+    expect(r.chipSelectField).toBeDisabled();
   });
 
   it("handles onCreateNew flow", async () => {
@@ -130,12 +130,12 @@ describe("ChipSelectField", () => {
     // Then onBlur should not be called initially when the ChipInputField is shown
     expect(onBlur).not.toBeCalled();
     // Then expect the select field to be removed and input field to show
-    expect(r.chipSelectField_createNewField()).toBeTruthy();
+    expect(r.chipSelectField_createNewField).toBeTruthy();
     expect(r.queryByTestId("chipSelectField")).not.toBeVisible();
     // And when entering a new value
-    fireEvent.input(r.chipSelectField_createNewField(), { target: { textContent: newOpt.name } });
+    fireEvent.input(r.chipSelectField_createNewField, { target: { textContent: newOpt.name } });
     // And hitting the Enter key
-    fireEvent.keyDown(r.chipSelectField_createNewField(), { key: "Enter" });
+    fireEvent.keyDown(r.chipSelectField_createNewField, { key: "Enter" });
     // Wait for the async request to finish
     await wait();
     // Then expect the text field to be removed
@@ -151,11 +151,11 @@ describe("ChipSelectField", () => {
     click(r.chipSelectField);
     click(r.getByRole("option", { name: "Create new" }));
     // And when hitting the Escape key
-    fireEvent.keyDown(r.chipSelectField_createNewField(), { key: "Escape" });
+    fireEvent.keyDown(r.chipSelectField_createNewField, { key: "Escape" });
     // Then expect the text field to be removed
     expect(r.queryByTestId("chipSelectField_createNewField")).toBeFalsy();
     // And the previous selected value to still be shown
-    expect(r.chipSelectField()).toHaveTextContent("Soccer");
+    expect(r.chipSelectField).toHaveTextContent("Soccer");
   });
 });
 

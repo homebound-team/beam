@@ -5,13 +5,13 @@ import { Css } from "src/Css";
 describe("Tag", () => {
   it("renders", async () => {
     const r = await render(<Tag text="test" data-testid="testTag" />);
-    expect(r.testTag()).toHaveAttribute("title", "test");
-    expect(r.testTag().textContent).toBe("test");
+    expect(r.testTag).toHaveAttribute("title", "test");
+    expect(r.testTag.textContent).toBe("test");
   });
 
   it("can apply margin changes via xss", async () => {
     const r = await render(<Tag text="test" data-testid="testTag" xss={Css.mt1.$} />);
-    expect(r.testTag()).toHaveStyleRule("margin-top", "8px");
+    expect(r.testTag).toHaveStyleRule("margin-top", "8px");
   });
 
   it("renders with icon", async () => {

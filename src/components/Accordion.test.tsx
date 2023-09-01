@@ -8,13 +8,13 @@ describe(Accordion, () => {
     const r = await render(<Accordion title="Test title">Test description</Accordion>);
 
     // Then it shows the correct title
-    expect(r.accordion_title()).toHaveTextContent("Test title");
+    expect(r.accordion_title).toHaveTextContent("Test title");
     // And the description will be hidden by default
-    expect(r.accordion_content).toNotBeInTheDom();
+    expect(r.query.accordion_content).not.toBeInTheDocument();
     // And the border bottom is not displayed by default
-    expect(r.accordion_container()).not.toHaveStyleRule("border-bottom-width", "1px");
+    expect(r.accordion_container).not.toHaveStyleRule("border-bottom-width", "1px");
     // And the dropdown button is enabled by default
-    expect(r.accordion_title()).not.toBeDisabled();
+    expect(r.accordion_title).not.toBeDisabled();
   });
 
   it("can expand by default", async () => {
@@ -27,8 +27,8 @@ describe(Accordion, () => {
     );
 
     // Then it shows the correct title and description
-    expect(r.accordion_title()).toHaveTextContent("Test title");
-    expect(r.accordion_content()).toHaveTextContent("Test description");
+    expect(r.accordion_title).toHaveTextContent("Test title");
+    expect(r.accordion_content).toHaveTextContent("Test description");
   });
 
   it("can display the bottom border", async () => {
@@ -41,8 +41,8 @@ describe(Accordion, () => {
     );
 
     // Then it shows the bottom border
-    expect(r.accordion_container()).toHaveStyleRule("border-bottom-width", "1px");
-    expect(r.accordion_container()).toHaveStyleRule("border-bottom-style", "solid");
+    expect(r.accordion_container).toHaveStyleRule("border-bottom-width", "1px");
+    expect(r.accordion_container).toHaveStyleRule("border-bottom-style", "solid");
   });
 
   it("can hide the top border", async () => {
@@ -55,7 +55,7 @@ describe(Accordion, () => {
     );
 
     // Then it hides the top border
-    expect(r.accordion_container()).not.toHaveStyleRule("border-top-width", "1px");
+    expect(r.accordion_container).not.toHaveStyleRule("border-top-width", "1px");
   });
 
   it("can be disabled", async () => {
@@ -68,8 +68,8 @@ describe(Accordion, () => {
     );
 
     // Then the dropdown button is disabled
-    expect(r.accordion_title()).toBeDisabled();
+    expect(r.accordion_title).toBeDisabled();
     // And the content is not displayed
-    expect(r.accordion_content).toNotBeInTheDom();
+    expect(r.query.accordion_content).not.toBeInTheDocument();
   });
 });

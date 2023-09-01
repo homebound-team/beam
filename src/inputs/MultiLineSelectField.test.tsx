@@ -18,21 +18,21 @@ describe("MultiLineSelectField", () => {
     const r = await render(<TestMultiLineSelectField values={[]} options={options} />);
 
     // Then it doesn't have a value set
-    expect(r.selectField()).toHaveValue("");
+    expect(r.selectField).toHaveValue("");
 
     // And the "add another" button is disabled
-    expect(r.addAnother()).toBeDisabled();
+    expect(r.addAnother).toBeDisabled();
   });
 
   it("can set a second value", async () => {
     // Given a MultiLineSelectField with 1 selected value
     const r = await render(<TestMultiLineSelectField values={["1"]} options={options} />);
 
-    expect(r.selectField_0()).toHaveTextContent("Project one");
+    expect(r.selectField_0).toHaveTextContent("Project one");
 
     // When we select a second option
-    click(r.addAnother());
-    click(r.selectField_1());
+    click(r.addAnother);
+    click(r.selectField_1);
     click(r.getByRole("option", { name: "Project three" }));
 
     // Then onSelect is called with the correct values
@@ -43,10 +43,10 @@ describe("MultiLineSelectField", () => {
     // Given a MultiLineSelectField with 1 selected value
     const r = await render(<TestMultiLineSelectField values={["1"]} options={options} />);
 
-    expect(r.selectField_0()).toHaveTextContent("Project one");
+    expect(r.selectField_0).toHaveTextContent("Project one");
 
     // When click to select a new option
-    click(r.selectField_1());
+    click(r.selectField_1);
 
     // Then the already selected option doesn't appear on the list
     expect(r.queryByRole("option", { name: "Project one" })).toBeNull();
@@ -56,11 +56,11 @@ describe("MultiLineSelectField", () => {
     // Given a MultiLineSelectField with 2 selected values
     const r = await render(<TestMultiLineSelectField values={["1", "2"]} options={options} />);
 
-    expect(r.selectField_0()).toHaveTextContent("Project one");
-    expect(r.selectField_1()).toHaveTextContent("Project two");
+    expect(r.selectField_0).toHaveTextContent("Project one");
+    expect(r.selectField_1).toHaveTextContent("Project two");
 
     // When we deleted the second value
-    click(r.deleteSelected_1());
+    click(r.deleteSelected_1);
 
     // Then onSelect is called with the correct values
     expect(onSelect).toHaveBeenCalledWith(["1"]);

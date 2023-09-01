@@ -108,7 +108,7 @@ describe(AutoSaveIndicator, () => {
       </AutoSaveStatusContext.Provider>,
     );
 
-    expect(r.tooltip()).toHaveAttribute("title", "Error: Some error occurred");
+    expect(r.tooltip).toHaveAttribute("title", "Error: Some error occurred");
   });
 });
 

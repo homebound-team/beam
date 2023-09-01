@@ -10,9 +10,9 @@ describe("Modal", () => {
     // When rendered
     const r = await render(<TestModalApp content={<TestModalComponent />} />);
     // Then expect the content to match
-    expect(r.modal_title().textContent).toBe("Title");
-    expect(r.modal_titleClose()).toBeTruthy();
-    expect(r.modal_content()).toBeTruthy();
+    expect(r.modal_title.textContent).toBe("Title");
+    expect(r.modal_titleClose).toBeTruthy();
+    expect(r.modal_content).toBeTruthy();
   });
 
   it("invokes canClose", async () => {
@@ -22,7 +22,7 @@ describe("Modal", () => {
     // When invoking the `onClose` in various interactions
     click(r.modal_titleClose);
     expect(canClose).toBeCalledTimes(1);
-    fireEvent.keyDown(r.modal(), { key: "Escape", code: "Escape" });
+    fireEvent.keyDown(r.modal, { key: "Escape", code: "Escape" });
     expect(canClose).toBeCalledTimes(2);
   });
 
@@ -31,7 +31,7 @@ describe("Modal", () => {
       // When rendered
       const r = await render(<TestModalApp content={<TestModalComponent />} />);
       // Then expect the content to be displayed
-      expect(r.modal_content().textContent).toBe("Modal Body");
+      expect(r.modal_content.textContent).toBe("Modal Body");
     });
   });
 
@@ -40,7 +40,7 @@ describe("Modal", () => {
       // When rendered
       const r = await render(<TestModalApp content={<TestModalComponent />} />);
       // Then expect the footer content to be displayed
-      expect(r.modal_footer().textContent).toBe("Modal Footer");
+      expect(r.modal_footer.textContent).toBe("Modal Footer");
     });
   });
 
@@ -53,7 +53,7 @@ describe("Modal", () => {
       </OpenModal>,
     );
     // Then we can assert against it
-    expect(r.modal_footer().textContent).toBe("Modal Footer");
+    expect(r.modal_footer.textContent).toBe("Modal Footer");
   });
 });
 

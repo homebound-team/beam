@@ -22,7 +22,7 @@ describe(BoundDateRangeField, () => {
     click(r.saleDates);
 
     // When closing the overlay and putting focus back on the input
-    fireEvent.keyDown(r.saleDates_datePicker(), { key: "Escape", code: "Escape" });
+    fireEvent.keyDown(r.saleDates_datePicker, { key: "Escape", code: "Escape" });
 
     // When blur is triggered on a checkbox
     blur(r.saleDates);
@@ -62,7 +62,7 @@ describe(BoundDateRangeField, () => {
     const r = await render(<BoundDateRangeField field={author.saleDates} />);
 
     // When hitting the enter key
-    fireEvent.keyDown(r.saleDates(), { key: "Enter" });
+    fireEvent.keyDown(r.saleDates, { key: "Enter" });
 
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith({ from: jan2, to: jan19 });
@@ -76,7 +76,7 @@ describe(BoundDateRangeField, () => {
     const r = await render(<BoundDateRangeField field={author.saleDates} onBlur={onBlur} onFocus={onFocus} />);
 
     // Then the field should be disabled
-    expect(r.saleDates()).toHaveAttribute("data-readonly", "true");
+    expect(r.saleDates).toHaveAttribute("data-readonly", "true");
   });
 });
 

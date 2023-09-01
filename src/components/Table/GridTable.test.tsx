@@ -176,9 +176,9 @@ describe("GridTable", () => {
     const r = await render(<GridTable style={{ rowHeight: "flexible" }} columns={[selectColumn]} rows={rows} />);
 
     // Then field do not have any Css.truncate styles
-    expect(r.field()).not.toHaveStyleRule("white-space", "nowrap");
-    expect(r.field()).not.toHaveStyleRule("overflow", "hidden");
-    expect(r.field()).not.toHaveStyleRule("textOverflow", "ellipsis");
+    expect(r.field).not.toHaveStyleRule("white-space", "nowrap");
+    expect(r.field).not.toHaveStyleRule("overflow", "hidden");
+    expect(r.field).not.toHaveStyleRule("textOverflow", "ellipsis");
   });
 
   it("can have per-row styles", async () => {
@@ -402,10 +402,9 @@ describe("GridTable", () => {
           rows={[simpleHeader, { kind: "data", id: "2", data: { name: "b", value: 2 } }]}
         />,
       );
-      const { sortHeader_0, sortHeader_1 } = r;
       // Then we have only a single sort header in the dom
-      expect(sortHeader_0()).toBeDefined();
-      expect(sortHeader_1()).toBeUndefined();
+      expect(r.sortHeader_0).toBeDefined();
+      expect(r.sortHeader_1).toBeUndefined();
     });
 
     it("can sort primary rows", async () => {
@@ -768,32 +767,31 @@ describe("GridTable", () => {
           rows={rows}
         />,
       );
-      const { sortHeader_0, sortHeader_icon_0 } = r;
       // It is initially not sorted
-      expect(sortHeader_icon_0()).not.toBeVisible();
+      expect(r.sortHeader_icon_0).not.toBeVisible();
 
       // Then when sorted by the 1st column
-      click(sortHeader_0);
+      click(r.sortHeader_0);
       // Then the callback was called
       expect(onSort).toHaveBeenCalledWith("name", "ASC");
       // And we show the sort toggle
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortUp").toBeVisible();
       // And the data was not reordered (we defer to the server-side)
       expect(cell(r, 1, 0)).toHaveTextContent("foo");
 
       // And when we sort again
-      click(sortHeader_0);
+      click(r.sortHeader_0);
       // Then it was called again but desc
       expect(onSort).toHaveBeenCalledWith("name", "DESC");
       // And we flip the sort toggle
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortDown").toBeVisible();
 
       // And when we sort again
-      click(sortHeader_0);
+      click(r.sortHeader_0);
       // Then it was called again with undefined
       expect(onSort).toHaveBeenCalledWith(undefined, undefined);
       // And we hide the sort toggle (back to the initial sort)
-      expect(sortHeader_icon_0()).not.toBeVisible();
+      expect(r.sortHeader_icon_0).not.toBeVisible();
     });
 
     it("doesn't sort columns w/o onSort", async () => {
@@ -811,15 +809,14 @@ describe("GridTable", () => {
         />,
       );
       // Then there is only a single sort header
-      const { sortHeader_0, sortHeader_1 } = r;
-      expect(sortHeader_0).toBeDefined();
-      expect(sortHeader_1()).toBeUndefined();
+      expect(r.sortHeader_0).toBeDefined();
+      expect(r.sortHeader_1).toBeUndefined();
     });
 
     it("initializes with asc sorting", async () => {
       // Given the table is using server-side sorting
       const onSort = jest.fn();
-      const { sortHeader_icon_0 } = await render(
+      const r = await render(
         <GridTable
           // And the 1st column has a sort key
           columns={[{ ...nameColumn, serverSideSortKey: "name" }, valueColumn]}
@@ -833,13 +830,13 @@ describe("GridTable", () => {
         />,
       );
       // Then it is shown as initially sorted asc
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortUp").toBeVisible();
     });
 
     it("initializes with desc sorting", async () => {
       // Given the table is using server-side sorting
       const onSort = jest.fn();
-      const { sortHeader_icon_0 } = await render(
+      const r = await render(
         <GridTable
           // And the 1st column has a sort key
           columns={[{ ...nameColumn, serverSideSortKey: "name" }, valueColumn]}
@@ -853,7 +850,7 @@ describe("GridTable", () => {
         />,
       );
       // Then it is shown as initially sorted desc
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortDown").toBeVisible();
     });
 
     it("can pin rows first", async () => {
@@ -974,7 +971,7 @@ describe("GridTable", () => {
         rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 3 } }]}
       />,
     );
-    expect(r.gridTable()).toBeTruthy();
+    expect(r.gridTable).toBeTruthy();
   });
 
   it("accepts percentage values for column min-width definition", async () => {
@@ -985,7 +982,7 @@ describe("GridTable", () => {
         rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 3 } }]}
       />,
     );
-    expect(r.gridTable()).toBeTruthy();
+    expect(r.gridTable).toBeTruthy();
   });
 
   it("can handle onClick for rows", async () => {
@@ -1543,27 +1540,27 @@ describe("GridTable", () => {
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
 
     // Then the rows are all initially expanded state
-    expect(r.collapse_0().textContent).toBe("-");
-    expect(r.collapse_1().textContent).toBe("-");
-    expect(r.collapse_2().textContent).toBe("-");
+    expect(r.collapse_0.textContent).toBe("-");
+    expect(r.collapse_1.textContent).toBe("-");
+    expect(r.collapse_2.textContent).toBe("-");
 
     // When we close the parent rows
-    click(r.collapse_1());
-    click(r.collapse_2());
+    click(r.collapse_1);
+    click(r.collapse_2);
 
     // Then expect the header and parent row collapse toggles are in the 'collapsed' state
-    expect(r.collapse_0().textContent).toBe("+");
-    expect(r.collapse_1().textContent).toBe("+");
-    expect(r.collapse_2().textContent).toBe("+");
+    expect(r.collapse_0.textContent).toBe("+");
+    expect(r.collapse_1.textContent).toBe("+");
+    expect(r.collapse_2.textContent).toBe("+");
 
     // And when we open the parent rows back up
-    click(r.collapse_1());
-    click(r.collapse_2());
+    click(r.collapse_1);
+    click(r.collapse_2);
 
     // Then expect the header and parent row collapse toggles are in the 'expanded' state
-    expect(r.collapse_0().textContent).toBe("-");
-    expect(r.collapse_1().textContent).toBe("-");
-    expect(r.collapse_2().textContent).toBe("-");
+    expect(r.collapse_0.textContent).toBe("-");
+    expect(r.collapse_1.textContent).toBe("-");
+    expect(r.collapse_2.textContent).toBe("-");
   });
 
   it("can toggle the header state after parent rows have been collapsed", async () => {
@@ -1587,14 +1584,14 @@ describe("GridTable", () => {
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
 
     // When we close one of the parent rows
-    click(r.collapse_1());
+    click(r.collapse_1);
     // And then click the header collapse toggle
-    click(r.collapse_0());
+    click(r.collapse_0);
 
     // Then expect the header and parent row collapse toggles are in the 'collapsed' state
-    expect(r.collapse_0().textContent).toBe("+");
-    expect(r.collapse_1().textContent).toBe("+");
-    expect(r.collapse_2().textContent).toBe("+");
+    expect(r.collapse_0.textContent).toBe("+");
+    expect(r.collapse_1.textContent).toBe("+");
+    expect(r.collapse_2.textContent).toBe("+");
   });
 
   it("can select all", async () => {
@@ -1711,11 +1708,11 @@ describe("GridTable", () => {
     const r = await render(<Test rows={rows} />);
     click(r.select_1);
     // And selected rows is initially calc-d
-    expect(r.selectedNames().textContent).toEqual("foo");
+    expect(r.selectedNames.textContent).toEqual("foo");
     // When we re-render with an updated row
     await r.rerender(<Test rows={[rows[0], { kind: "data", id: "1", data: { name: "foo2", value: 1 } }, rows[2]]} />);
     // Then selected computed sees the new value
-    expect(r.selectedNames().textContent).toEqual("foo2");
+    expect(r.selectedNames.textContent).toEqual("foo2");
     // And the table value is updated as expected
     expect(cell(r, 1, 1)).toHaveTextContent("foo2");
   });
@@ -1749,7 +1746,7 @@ describe("GridTable", () => {
     // And the user has selected one row
     click(r.select_1);
     // And selected rows is initially calc-d
-    expect(r.selectedNames().textContent).toEqual("foo");
+    expect(r.selectedNames.textContent).toEqual("foo");
     expect(computedCount).toBe(2);
     // When we re-render with the different row literals, but stable data
     await r.rerender(
@@ -1791,7 +1788,7 @@ describe("GridTable", () => {
     // And the user has selected one row
     click(r.select_1);
     // And selected rows is initially calc-d
-    expect(r.selectedIds().textContent).toEqual("1");
+    expect(r.selectedIds.textContent).toEqual("1");
     expect(computedCount).toBe(2);
     // When we re-render with the different row literals and different data literals
     await r.rerender(
@@ -1804,7 +1801,7 @@ describe("GridTable", () => {
       />,
     );
     // Then we didn't recompute
-    expect(r.selectedIds().textContent).toEqual("1");
+    expect(r.selectedIds.textContent).toEqual("1");
     expect(computedCount).toBe(2);
   });
 
@@ -1998,7 +1995,7 @@ describe("GridTable", () => {
     const r = await render(<Test />);
 
     // Then select toggle for row 2 is disabled
-    expect(r.select_2()).toBeDisabled();
+    expect(r.select_2).toBeDisabled();
 
     // When selecting the header row select toggle
     click(r.select_0);
@@ -2006,7 +2003,7 @@ describe("GridTable", () => {
     // Then row id 2 is not selected as it's disabled
     expect(api.current!.getSelectedRowIds()).toEqual(["1", "3"]);
     // and selected rows does not include row 2 as it's disabled
-    expect(r.selectedNames()).toHaveTextContent("Tony Stark,Thor Odinson");
+    expect(r.selectedNames).toHaveTextContent("Tony Stark,Thor Odinson");
   });
 
   it("can deselect all rows via 'clearSelections' api method", async () => {
@@ -3138,7 +3135,6 @@ describe("GridTable", () => {
         // wait for promise to resolve
         await wait();
       });
-
       // then expect 2 columns + 2 expandable columns to be visible
       expect(row(r, 1).childNodes).toHaveLength(4);
     });
@@ -3603,7 +3599,7 @@ describe("GridTable", () => {
         "
       `);
       // Then the header is fully selected
-      expect(r.select_0()).toHaveAttribute("data-indeterminate", "false");
+      expect(r.select_0).toHaveAttribute("data-indeterminate", "false");
       // When deselecting the header
       click(r.select_0);
       // Then the kept selected group is hidden

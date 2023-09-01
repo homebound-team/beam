@@ -21,9 +21,9 @@ describe(TreeSelectField, () => {
       />,
     );
     // Then it renders based on the props.
-    expect(r.favoriteLeague()).toHaveAttribute("placeholder", "Select a sport");
-    expect(r.favoriteLeague_label()).toHaveTextContent("Favorite League");
-    expect(r.favoriteLeague_helperText()).toHaveTextContent("Choose any league you like.");
+    expect(r.favoriteLeague).toHaveAttribute("placeholder", "Select a sport");
+    expect(r.favoriteLeague_label).toHaveTextContent("Favorite League");
+    expect(r.favoriteLeague_helperText).toHaveTextContent("Choose any league you like.");
   });
 
   it("renders disabled", async () => {
@@ -40,9 +40,9 @@ describe(TreeSelectField, () => {
       />,
     );
     // Then it should be disabled.
-    expect(r.favoriteLeague()).toBeDisabled();
+    expect(r.favoriteLeague).toBeDisabled();
     // And the expand/collapse button should be disabled.
-    expect(r.toggleListBox()).toBeDisabled();
+    expect(r.toggleListBox).toBeDisabled();
   });
 
   it("renders readonly", async () => {
@@ -59,7 +59,7 @@ describe(TreeSelectField, () => {
       />,
     );
     // Then it should render as just text (no longer an input)
-    expect(r.favoriteLeague()).toHaveTextContent("One");
+    expect(r.favoriteLeague).toHaveTextContent("One");
   });
 
   it("triggers onBlur and onFocus callbacks", async () => {
@@ -143,7 +143,7 @@ describe(TreeSelectField, () => {
     click(r.favoriteLeague);
     // Then the initial option(s) is visible
     expect(r.getAllByRole("option")).toHaveLength(3);
-    expect(r.loadingDots()).toBeTruthy();
+    expect(r.loadingDots).toBeTruthy();
     // And when waiting for the promise to resolve
     await wait();
 
@@ -165,8 +165,8 @@ describe(TreeSelectField, () => {
       />,
     );
     // Then the selected options are visible
-    expect(r.selectedOptionsCount()).toHaveTextContent("2");
-    expect(r.favoriteLeague()).toHaveValue("");
+    expect(r.selectedOptionsCount).toHaveTextContent("2");
+    expect(r.favoriteLeague).toHaveValue("");
 
     // When opening the options
     click(r.favoriteLeague);
@@ -174,8 +174,8 @@ describe(TreeSelectField, () => {
     expect(r.getByRole("option", { name: "NBA" })).toHaveAttribute("aria-selected", "true");
     expect(r.getByRole("option", { name: "NFL" })).toHaveAttribute("aria-selected", "true");
     // And the parent options checkboxes are in the indeterminate state
-    expect(r.treeOption_basketball_checkbox()).toHaveAttribute("data-checked", "mixed");
-    expect(r.treeOption_football_checkbox()).toHaveAttribute("data-checked", "mixed");
+    expect(r.treeOption_basketball_checkbox).toHaveAttribute("data-checked", "mixed");
+    expect(r.treeOption_football_checkbox).toHaveAttribute("data-checked", "mixed");
   });
 
   it("renders with one option selected", async () => {
@@ -191,15 +191,15 @@ describe(TreeSelectField, () => {
       />,
     );
     // Then the selected options are visible
-    expect(r.selectedOptionsCount).toNotBeInTheDom();
-    expect(r.favoriteLeague()).toHaveValue("NBA");
+    expect(r.query.selectedOptionsCount).not.toBeInTheDocument();
+    expect(r.favoriteLeague).toHaveValue("NBA");
 
     // When opening the options
     click(r.favoriteLeague);
     // Then the selected options are checked
     expect(r.getByRole("option", { name: "NBA" })).toHaveAttribute("aria-selected", "true");
     // And the parent option's checkbox is in the indeterminate state
-    expect(r.treeOption_basketball_checkbox()).toHaveAttribute("data-checked", "mixed");
+    expect(r.treeOption_basketball_checkbox).toHaveAttribute("data-checked", "mixed");
   });
 
   it("can collapse and expand options", async () => {
@@ -219,20 +219,20 @@ describe(TreeSelectField, () => {
     // Then the child options are visible
     expect(r.getByRole("option", { name: "MLB" })).toBeVisible();
     // And the expand/collapse button has the correct icon
-    expect(r.treeOption_collapseToggle_baseball().firstChild).toHaveAttribute("data-icon", "triangleDown");
+    expect(r.treeOption_collapseToggle_baseball.firstChild).toHaveAttribute("data-icon", "triangleDown");
     // When collapsing the parent option
     click(r.treeOption_collapseToggle_baseball);
     // Then the child options are no longer visible
     expect(r.queryByRole("option", { name: "MLB" })).toBeFalsy();
     // And the expand/collapse button has the correct icon
-    expect(r.treeOption_collapseToggle_baseball().firstChild).toHaveAttribute("data-icon", "triangleRight");
+    expect(r.treeOption_collapseToggle_baseball.firstChild).toHaveAttribute("data-icon", "triangleRight");
 
     // When expanding the parent option
     click(r.treeOption_collapseToggle_baseball);
     // Then the child options are visible
     expect(r.getByRole("option", { name: "MLB" })).toBeVisible();
     // And the expand/collapse button has the correct icon again
-    expect(r.treeOption_collapseToggle_baseball().firstChild).toHaveAttribute("data-icon", "triangleDown");
+    expect(r.treeOption_collapseToggle_baseball.firstChild).toHaveAttribute("data-icon", "triangleDown");
   });
 
   it("can initially render with all options initially collapsed", async () => {
@@ -306,20 +306,20 @@ describe(TreeSelectField, () => {
     // When opening the options
     click(r.favoriteLeague);
     // And selecting the parent option
-    click(r.treeOption_basketball_checkbox());
+    click(r.treeOption_basketball_checkbox);
     // Then all children are selected
     expect(r.getByRole("option", { name: "NBA" })).toHaveAttribute("aria-selected", "true");
     expect(r.getByRole("option", { name: "WNBA" })).toHaveAttribute("aria-selected", "true");
     // And the parent option's checkbox is in the checked state
-    expect(r.treeOption_basketball_checkbox()).toHaveAttribute("data-checked", "true");
+    expect(r.treeOption_basketball_checkbox).toHaveAttribute("data-checked", "true");
 
     // When deselecting the parent option
-    click(r.treeOption_basketball_checkbox());
+    click(r.treeOption_basketball_checkbox);
     // Then all children are deselected
     expect(r.getByRole("option", { name: "NBA" })).toHaveAttribute("aria-selected", "false");
     expect(r.getByRole("option", { name: "WNBA" })).toHaveAttribute("aria-selected", "false");
     // And the parent option's checkbox is in the unchecked state
-    expect(r.treeOption_basketball_checkbox()).toHaveAttribute("data-checked", "false");
+    expect(r.treeOption_basketball_checkbox).toHaveAttribute("data-checked", "false");
   });
 
   it("can filter options", async () => {
@@ -339,8 +339,8 @@ describe(TreeSelectField, () => {
     // Then all options are visible
     expect(r.queryAllByRole("option")).toHaveLength(9);
     // And typing in the filter input
-    fireEvent.input(r.favoriteLeague(), { target: { value: "nba" } });
-    expect(r.favoriteLeague()).toHaveValue("nba");
+    fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
+    expect(r.favoriteLeague).toHaveValue("nba");
     // Then only the NBA option is visible
     expect(r.queryAllByRole("option")).toHaveLength(2);
     expect(r.getByRole("option", { name: "NBA" })).toBeVisible();
@@ -363,19 +363,19 @@ describe(TreeSelectField, () => {
     click(r.favoriteLeague);
     click(r.getByRole("option", { name: "NBA" }));
     // Then the input value remains empty to allow the user to type to filter
-    expect(r.favoriteLeague()).toHaveValue("");
+    expect(r.favoriteLeague).toHaveValue("");
     // When blur-ing the field
     blur(r.favoriteLeague);
     // Then the input text is the selected option's label
-    expect(r.favoriteLeague()).toHaveValue("NBA");
+    expect(r.favoriteLeague).toHaveValue("NBA");
     // When selecting multiple options
     click(r.favoriteLeague);
     // Then the input value is emptied to allow the user to immediately start typing to filter
-    expect(r.favoriteLeague()).toHaveValue("");
-    expect(r.favoriteLeague()).toHaveFocus();
+    expect(r.favoriteLeague).toHaveValue("");
+    expect(r.favoriteLeague).toHaveFocus();
     click(r.getByRole("option", { name: "NFL" }));
     // And the count of selected options is shown
-    expect(r.selectedOptionsCount()).toHaveTextContent("2");
+    expect(r.selectedOptionsCount).toHaveTextContent("2");
   });
 
   it("supports nothingSelectedText", async () => {
@@ -392,15 +392,15 @@ describe(TreeSelectField, () => {
       />,
     );
     // Then the input text is the 'nothingSelectedText'
-    expect(r.favoriteLeague()).toHaveValue("Select a league");
+    expect(r.favoriteLeague).toHaveValue("Select a league");
     // When opening the menu
     click(r.favoriteLeague);
     // Then the input value is emptied to allow the user to immediately start typing to filter
-    expect(r.favoriteLeague()).toHaveValue("");
+    expect(r.favoriteLeague).toHaveValue("");
     // When blurring back out of the field
     blur(r.favoriteLeague);
     // Then the input text is the 'nothingSelectedText'
-    expect(r.favoriteLeague()).toHaveValue("Select a league");
+    expect(r.favoriteLeague).toHaveValue("Select a league");
   });
 
   it("does not auto-select parent if 'children' is an empty array", async () => {
@@ -422,7 +422,7 @@ describe(TreeSelectField, () => {
       />,
     );
     // Then the parent option is not selected
-    expect(r.favoriteLeague()).toHaveValue("");
+    expect(r.favoriteLeague).toHaveValue("");
     click(r.favoriteLeague);
     expect(r.getByRole("option", { name: "Baseball" })).toHaveAttribute("aria-selected", "false");
   });

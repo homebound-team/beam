@@ -70,7 +70,7 @@ describe("EditColumnsButton", () => {
     }
     const r = await render(<Test />);
     // Then the button renders with the correct label
-    expect(r.columns().textContent).toBe("Columns");
+    expect(r.columns.textContent).toBe("Columns");
   });
 
   it("should render only hide-able columns", async () => {

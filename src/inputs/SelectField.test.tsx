@@ -23,7 +23,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // That initially has "One" selected
-    expect(r.age()).toHaveValue("One");
+    expect(r.age).toHaveValue("One");
 
     // When selecting the 3rd option
     select(r.age, "3");
@@ -33,7 +33,7 @@ describe("SelectFieldTest", () => {
     // And the field has not been blurred (regression test to prevent SelectField's list box from opening back up after selecting an option)
     expect(onBlur).not.toHaveBeenCalled();
     // And the field has the correct value (regression test to ensure input field's value correctly updates when selecting an option, before `onBlur` is called)
-    expect(r.age()).toHaveValue("Three");
+    expect(r.age).toHaveValue("Three");
   });
 
   it("does not fire focus/blur when readOnly", async () => {
@@ -60,7 +60,7 @@ describe("SelectFieldTest", () => {
 
   it("resets input value on blur if it does not match the selected option", async () => {
     // Given a Select Field without a selected option
-    const { age, getByRole } = await render(
+    const r = await render(
       <TestSelectField
         label="Age"
         value={undefined}
@@ -71,22 +71,22 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When changing the inputs value, and not selecting an option
-    fireEvent.input(age(), { target: { value: "asdf" } });
+    fireEvent.input(r.age, { target: { value: "asdf" } });
     // And `blur`ing the field
-    fireEvent.blur(age());
+    fireEvent.blur(r.age);
     // Then expect the value to be reset to empty
-    expect(age()).toHaveValue("");
+    expect(r.age).toHaveValue("");
 
     // Given a selected option
-    fireEvent.focus(age());
-    fireEvent.input(age(), { target: { value: "T" } });
-    click(getByRole("option", { name: "Three" }));
+    fireEvent.focus(r.age);
+    fireEvent.input(r.age, { target: { value: "T" } });
+    click(r.getByRole("option", { name: "Three" }));
     // When changing the inputs value to no longer match the selected option
-    fireEvent.input(age(), { target: { value: "asdf" } });
+    fireEvent.input(r.age, { target: { value: "asdf" } });
     // And `blur`ing the field
-    fireEvent.blur(age());
+    fireEvent.blur(r.age);
     // Then expect the value to be reset to the selected option
-    expect(age()).toHaveValue("Three");
+    expect(r.age).toHaveValue("Three");
   });
 
   it("can initialize with an 'undefined' value", async () => {
@@ -102,7 +102,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // Then expect the value to be that of the `undefined` entry
-    expect(r.age()).toHaveValue("Unassigned");
+    expect(r.age).toHaveValue("Unassigned");
   });
 
   it("can select an 'undefined' value", async () => {
@@ -120,7 +120,7 @@ describe("SelectFieldTest", () => {
     // When selecting the option with an `undefined` value
     select(r.age, "Unassigned");
     // Then expect the value to be that of the `undefined` entry
-    expect(r.age()).toHaveValue("Unassigned");
+    expect(r.age).toHaveValue("Unassigned");
   });
 
   it("respects disabled options", async () => {
@@ -192,10 +192,10 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    click(r.age());
+    click(r.age);
     // Then expect to see the initial option and loading state
     expect(r.getAllByRole("option")).toHaveLength(1);
-    expect(r.loadingDots()).toBeTruthy();
+    expect(r.loadingDots).toBeTruthy();
     // And when waiting for the promise to resolve
     await wait();
     // Then expect the rest of the options to be loaded in and the loading state to be removed
@@ -216,7 +216,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    click(r.age());
+    click(r.age);
     // Then expect to see the initial option
     expect(r.getAllByRole("option")).toHaveLength(1);
     // And when changing the options
@@ -240,26 +240,26 @@ describe("SelectFieldTest", () => {
       />,
     );
     // Then both have the same value
-    expect(r.age_0()).toHaveValue("One");
-    expect(r.age_1()).toHaveValue("One");
+    expect(r.age_0).toHaveValue("One");
+    expect(r.age_1).toHaveValue("One");
     // When opening the first select menu
-    await clickAndWait(r.age_0());
+    await clickAndWait(r.age_0);
     // And all options is loaded
-    expect(getOptions(r.age_0())).toHaveLength(4);
+    expect(getOptions(r.age_0)).toHaveLength(4);
     // And change the value of the first select
     select(r.age_0, "Two");
     // Then expect the second select to have the same value
-    expect(r.age_0()).toHaveValue("Two");
-    expect(r.age_1()).toHaveValue("Two");
+    expect(r.age_0).toHaveValue("Two");
+    expect(r.age_1).toHaveValue("Two");
     // When we open the second select menu
     await clickAndWait(r.age_1);
     // And all options is loaded
-    expect(getOptions(r.age_1())).toHaveLength(4);
+    expect(getOptions(r.age_1)).toHaveLength(4);
     // And unset the value of the second select
     select(r.age_1, "-");
     // Then expect the first select to have the same value
-    expect(r.age_0()).toHaveValue("-");
-    expect(r.age_1()).toHaveValue("-");
+    expect(r.age_0).toHaveValue("-");
+    expect(r.age_1).toHaveValue("-");
   });
 
   it("can set value when options are loaded later", async () => {
@@ -275,11 +275,11 @@ describe("SelectFieldTest", () => {
       />,
     );
     // The input value will initially be blank
-    expect(r.age()).toHaveValue("");
+    expect(r.age).toHaveValue("");
     // And when options are loaded
     click(r.updateOptions);
     // Then expect the input value to be updated based on field's value
-    expect(r.age()).toHaveValue("One");
+    expect(r.age).toHaveValue("One");
   });
 
   it("can define and select 'unsetLabel' when options are an array", async () => {
@@ -337,7 +337,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // The input value will be set to the `unsetLabel`
-    expect(r.age()).toHaveValue("None");
+    expect(r.age).toHaveValue("None");
   });
 
   it("can customize the unset value in the menu", async () => {

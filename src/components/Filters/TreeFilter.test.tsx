@@ -12,29 +12,29 @@ describe("TreeFilter", () => {
     // Given the tree filter filtering by root option values (default)
     const r = await render(<TestFilter />);
     // It's initially empty
-    expect(r.filter_tree()).toHaveValue("All");
-    expect(r.value()).toHaveTextContent("{}");
+    expect(r.filter_tree).toHaveValue("All");
+    expect(r.value).toHaveTextContent("{}");
     // When selecting some options
-    click(r.filter_tree());
+    click(r.filter_tree);
     click(r.getByRole("option", { name: "Grandparent 0" }));
     click(r.getByRole("option", { name: "Child 1-0-0" }));
     click(r.getByRole("option", { name: "Parent 1-1" }));
     // Then the filter's value is empty because multiple options are selected
-    expect(r.filter_tree()).toHaveValue("");
+    expect(r.filter_tree).toHaveValue("");
     // Then the filter is set to only return the "root" values that are selected.
-    expect(r.value()).toHaveTextContent('{"tree":["gp:0","child:1-0-0","parent:1-1"]}');
+    expect(r.value).toHaveTextContent('{"tree":["gp:0","child:1-0-0","parent:1-1"]}');
   });
 
   it("can select leaf values", async () => {
     // Given the tree filter filtering by leaf option values
     const r = await render(<TestFilter filterBy="leaf" />);
     // When selecting some options
-    click(r.filter_tree());
+    click(r.filter_tree);
     click(r.getByRole("option", { name: "Grandparent 0" }));
     click(r.getByRole("option", { name: "Child 1-0-0" }));
     click(r.getByRole("option", { name: "Parent 1-1" }));
     // Then the filter is set to only return the "root" values that are selected.
-    expect(r.value()).toHaveTextContent(
+    expect(r.value).toHaveTextContent(
       '{"tree":["child:0-0-0","child:0-0-1","child:0-1-0","child:0-1-1","child:1-0-0","child:1-1-0","child:1-1-1"]}',
     );
   });
@@ -43,12 +43,12 @@ describe("TreeFilter", () => {
     // Given the tree filter filtering by all option values
     const r = await render(<TestFilter filterBy="all" />);
     // When selecting some options
-    click(r.filter_tree());
+    click(r.filter_tree);
     click(r.getByRole("option", { name: "Grandparent 0" }));
     click(r.getByRole("option", { name: "Child 1-0-0" }));
     click(r.getByRole("option", { name: "Parent 1-1" }));
     // Then the filter is set to only return the "root" values that are selected.
-    expect(r.value()).toHaveTextContent(
+    expect(r.value).toHaveTextContent(
       '{"tree":["gp:0","parent:0-0","child:0-0-0","child:0-0-1","parent:0-1","child:0-1-0","child:0-1-1","child:1-0-0","parent:1-1","child:1-1-0","child:1-1-1"]}',
     );
   });
@@ -57,26 +57,26 @@ describe("TreeFilter", () => {
     // Given the tree filter with a default value set
     const r = await render(<TestFilter filterBy="all" defaultValue={["gp:0"]} />);
     // Then the filter is correctly initialized
-    expect(r.filter_tree()).toHaveValue("");
-    expect(r.selectedOptionsCount()).toHaveTextContent("7");
-    expect(r.value()).toHaveTextContent('{"tree":["gp:0"]}');
+    expect(r.filter_tree).toHaveValue("");
+    expect(r.selectedOptionsCount).toHaveTextContent("7");
+    expect(r.value).toHaveTextContent('{"tree":["gp:0"]}');
   });
 
   it("can customize nothingSelectedText", async () => {
     // Given the tree filter with nothingSelectedText set
     const r = await render(<TestFilter nothingSelectedText="All Projects" />);
-    expect(r.filter_tree()).toHaveValue("All Projects");
+    expect(r.filter_tree).toHaveValue("All Projects");
   });
 
   it("sets value to undefined if no options are selected.", async () => {
     // Given the tree filter a single option selected
     const r = await render(<TestFilter defaultValue={["child:0-0-1"]} />);
-    expect(r.value()).toHaveTextContent('{"tree":["child:0-0-1"]}');
+    expect(r.value).toHaveTextContent('{"tree":["child:0-0-1"]}');
     // When clearing the selection
-    click(r.filter_tree());
+    click(r.filter_tree);
     click(r.getByRole("option", { name: "Child 0-0-1" }));
     // Then the value is undefined
-    expect(r.value()).toHaveTextContent("{}");
+    expect(r.value).toHaveTextContent("{}");
   });
 });
 

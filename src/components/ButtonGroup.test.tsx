@@ -11,7 +11,7 @@ describe("ButtonGroup", () => {
       { text: "Last", onClick: lastButtonOnClick },
     ];
     const r = await render(<ButtonGroup buttons={textButtons} />);
-    expect(r.buttonGroup()).toBeTruthy();
+    expect(r.buttonGroup).toBeTruthy();
     click(r.buttonGroup_first);
     click(r.buttonGroup_last);
     expect(firstButtonOnClick).toBeCalledTimes(1);
@@ -20,28 +20,28 @@ describe("ButtonGroup", () => {
 
   it("sets testids based on icon name", async () => {
     const r = await render(<ButtonGroup buttons={[{ icon: "chevronLeft" }, { icon: "chevronRight" }]} />);
-    expect(r.buttonGroup_chevronLeft()).toBeTruthy();
-    expect(r.buttonGroup_chevronRight()).toBeTruthy();
+    expect(r.buttonGroup_chevronLeft).toBeTruthy();
+    expect(r.buttonGroup_chevronRight).toBeTruthy();
   });
 
   it("can set custom test ids", async () => {
     const r = await render(<ButtonGroup buttons={[{ text: "First" }, { text: "Last" }]} data-testid="actions" />);
 
-    expect(r.actions()).toBeTruthy();
-    expect(r.actions_first()).toBeTruthy();
-    expect(r.actions_last()).toBeTruthy();
+    expect(r.actions).toBeTruthy();
+    expect(r.actions_first).toBeTruthy();
+    expect(r.actions_last).toBeTruthy();
   });
 
   it("can disable buttons independently", async () => {
     const r = await render(<ButtonGroup buttons={[{ text: "First", disabled: true }, { text: "Last" }]} />);
-    expect(r.buttonGroup_first()).toBeDisabled();
-    expect(r.buttonGroup_last()).not.toBeDisabled();
+    expect(r.buttonGroup_first).toBeDisabled();
+    expect(r.buttonGroup_last).not.toBeDisabled();
   });
 
   it("can disable all buttons", async () => {
     const r = await render(<ButtonGroup buttons={[{ text: "First" }, { text: "Last" }]} disabled />);
-    expect(r.buttonGroup_first()).toBeDisabled();
-    expect(r.buttonGroup_last()).toBeDisabled();
+    expect(r.buttonGroup_first).toBeDisabled();
+    expect(r.buttonGroup_last).toBeDisabled();
   });
 
   it("can add tooltips", async () => {
@@ -53,10 +53,10 @@ describe("ButtonGroup", () => {
         ]}
       />,
     );
-    expect(r.buttonGroup_first()).toBeDisabled();
-    expect(r.buttonGroup_first().closest("[data-testid='tooltip']")).toHaveAttribute("title", "Tooltip");
-    expect(r.buttonGroup_last()).not.toBeDisabled();
-    expect(r.buttonGroup_last().closest("[data-testid='tooltip']")).toHaveAttribute("title", "Other Tooltip");
+    expect(r.buttonGroup_first).toBeDisabled();
+    expect(r.buttonGroup_first.closest("[data-testid='tooltip']")).toHaveAttribute("title", "Tooltip");
+    expect(r.buttonGroup_last).not.toBeDisabled();
+    expect(r.buttonGroup_last.closest("[data-testid='tooltip']")).toHaveAttribute("title", "Other Tooltip");
   });
 
   it("can render jsx", async () => {

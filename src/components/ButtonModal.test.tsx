@@ -29,7 +29,7 @@ describe("ButtonModal", () => {
     click(r.close);
 
     // Then the modal should now be closed.
-    expect(r.popup).toNotBeInTheDom();
+    expect(r.query.popup).not.toBeInTheDocument();
   });
 
   it("allows jsx as the button", async () => {

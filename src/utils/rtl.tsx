@@ -4,6 +4,7 @@ import {
   blur as _blur,
   change as _change,
   click as _click,
+  clickAndWait as _clickAndWait,
   focus as _focus,
   getOptions as _getOptions,
   input as _input,
@@ -23,6 +24,7 @@ export {
   _blur as blur,
   _change as change,
   _click as click,
+  _clickAndWait as clickAndWait,
   _focus as focus,
   _getOptions as rtlUtilGetOptions,
   _input as input,
@@ -42,16 +44,16 @@ export function render(
   component: ReactElement,
   withoutBeamProvider: RenderOpts,
   ...otherWrappers: Wrapper[]
-): Promise<RenderResult & Record<string, HTMLElement & Function>>;
+): Promise<RenderResult & Record<string, HTMLElement>>;
 export function render(
   component: ReactElement,
   ...otherWrappers: Wrapper[]
-): Promise<RenderResult & Record<string, HTMLElement & Function>>;
+): Promise<RenderResult & Record<string, HTMLElement>>;
 export function render(
   component: ReactElement,
   wrapperOrOpts: RenderOpts | Wrapper | undefined,
   ...otherWrappers: Wrapper[]
-): Promise<RenderResult & Record<string, HTMLElement & Function>> {
+): Promise<RenderResult & Record<string, HTMLElement>> {
   let wrappers: Wrapper[];
   if (wrapperOrOpts && "wrap" in wrapperOrOpts) {
     // They passed at least single wrapper + maybe more.
@@ -190,16 +192,14 @@ export const withBeamRTL: Wrapper = {
  *
  * @param value The value or label of the option.
  * */
-export function select(element: HTMLElement, value: string | string[]) {
-  const select = resolveIfNeeded(element);
+export function select(select: HTMLElement, value: string | string[]) {
   assertListBoxInput(select);
   ensureListBoxOpen(select);
   const optionValues = Array.isArray(value) ? value : [value];
   optionValues.forEach((optionValue) => selectOption(select, optionValue));
 }
 
-export async function selectAndWait(input: HTMLElement, value: string | string[]): Promise<void> {
-  const select = resolveIfNeeded(input);
+export async function selectAndWait(select: HTMLElement, value: string | string[]): Promise<void> {
   // To work with React 18, we need to execute these as separate steps, otherwise
   // the `ensureListBoxOpen` async render won't flush, and the `selectOption` will fail.
   await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
@@ -229,8 +229,7 @@ function selectOption(select: HTMLElement, optionValue: string) {
   _click(optionToSelect);
 }
 
-export function getSelected(element: HTMLElement): string[] | string | undefined {
-  const select = resolveIfNeeded(element);
+export function getSelected(select: HTMLElement): string[] | string | undefined {
   if (isSelectElement(select)) {
     throw new Error("Beam getSelected helper does not support <select> elements");
   }
@@ -254,8 +253,7 @@ export function getSelected(element: HTMLElement): string[] | string | undefined
   return selections.length > 0 ? (selections.length > 1 ? selections : selections[0]) : undefined;
 }
 
-export function getOptions(element: HTMLElement): string[] {
-  const select = resolveIfNeeded(element);
+export function getOptions(select: HTMLElement): string[] {
   assertListBoxInput(select);
   ensureListBoxOpen(select);
 
@@ -282,11 +280,6 @@ function assertListBoxInput(select: HTMLElement): select is HTMLInputElement {
     );
   }
   return true;
-}
-
-function resolveIfNeeded(element: HTMLElement): HTMLElement {
-  const maybeProxy = element as any;
-  return maybeProxy instanceof Function ? maybeProxy() : element;
 }
 
 function isSelectElement(element: HTMLElement): element is HTMLSelectElement {

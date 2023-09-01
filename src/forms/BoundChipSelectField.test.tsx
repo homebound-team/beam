@@ -11,8 +11,8 @@ describe("BoundChipSelectField", () => {
     const r = await render(<BoundChipSelectField field={formState.favoriteSport} options={sports} />);
 
     // Then expect it to render value and label
-    expect(r.favoriteSport()).toHaveTextContent("Soccer");
-    expect(r.favoriteSport_label()).toHaveTextContent("Favorite Sport");
+    expect(r.favoriteSport).toHaveTextContent("Soccer");
+    expect(r.favoriteSport_label).toHaveTextContent("Favorite Sport");
 
     // Should not have a Create New option
     click(r.favoriteSport);
@@ -29,12 +29,12 @@ describe("BoundChipSelectField", () => {
     );
     const r = await render(<BoundChipSelectField field={formState.favoriteSport} options={sports} />);
 
-    expect(r.favoriteSport()).toHaveTextContent("Select an option");
+    expect(r.favoriteSport).toHaveTextContent("Select an option");
     // When selecting an option
     click(r.favoriteSport);
     click(r.getByRole("option", { name: "Basketball" }));
     // Then expect it to update
-    expect(r.favoriteSport()).toHaveTextContent("Basketball");
+    expect(r.favoriteSport).toHaveTextContent("Basketball");
     // And expect auto save to be called with the new value
     expect(autoSave).toBeCalledWith("s:3");
   });
@@ -57,14 +57,14 @@ describe("BoundChipSelectField", () => {
       />,
     );
 
-    expect(r.favoriteSport()).toHaveTextContent("Select an option");
+    expect(r.favoriteSport).toHaveTextContent("Select an option");
     // When selecting an option
     click(r.favoriteSport);
     click(r.getByRole("option", { name: "Create new" }));
     // And when entering a new value
-    fireEvent.input(r.favoriteSport_createNewField(), { target: { textContent: "newId" } });
+    fireEvent.input(r.favoriteSport_createNewField, { target: { textContent: "newId" } });
     // And hitting the Enter key
-    fireEvent.keyDown(r.favoriteSport_createNewField(), { key: "Enter" });
+    fireEvent.keyDown(r.favoriteSport_createNewField, { key: "Enter" });
     // Wait for the async request to finish
     await wait();
     // And expect auto save to be called with the new value
@@ -81,9 +81,9 @@ describe("BoundChipSelectField", () => {
     );
 
     // When firing the events, expect the callbacks to be fired
-    focus(r.favoriteSport());
+    focus(r.favoriteSport);
     expect(onFocus).toBeCalledTimes(1);
-    blur(r.favoriteSport());
+    blur(r.favoriteSport);
     expect(onBlur).toBeCalledTimes(1);
   });
 
@@ -95,7 +95,7 @@ describe("BoundChipSelectField", () => {
     );
 
     // Then expect that testid to be set
-    expect(r.customTestId()).toBeTruthy();
+    expect(r.customTestId).toBeTruthy();
   });
 });
 
