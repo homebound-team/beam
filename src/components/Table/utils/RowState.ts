@@ -167,7 +167,7 @@ export class RowState<R extends Kinded> {
       this.selected = selected;
     }
 
-    if(!(this.isParent && this.inferSelectedState)) {
+    if(this.inferSelectedState) {
       for (const child of this.visibleChildren) {
         child.select(selected);
       }
