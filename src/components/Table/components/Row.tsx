@@ -360,6 +360,4 @@ export type GridDataRow<R extends Kinded> = {
   selectable?: false;
   /** Whether this row should infer its selected state based on its children's selected state */
   inferSelectedState?: false;
-  /** Whether this row should be selectable as a parent without pushing its selected-ness to its visible children */
-  independentParentSelect?: true;
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;
