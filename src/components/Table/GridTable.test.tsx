@@ -2982,11 +2982,15 @@ describe("GridTable", () => {
       // When selecting the parent
       click(cellAnd(r, 1, 1, "select"));
 
-      // Then all rows should be considered selected
-      expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+      // Then children should not be selected
+      expect(cellAnd(r, 0, 1, "select")).not.toBeChecked();
       expect(cellAnd(r, 1, 1, "select")).toBeChecked();
-      expect(cellAnd(r, 2, 1, "select")).toBeChecked();
-      expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1gc1", "p1c1gc2"]);
+      expect(cellAnd(r, 2, 1, "select")).not.toBeChecked();
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1gc1"]);
+
+      // select children
+      click(cellAnd(r, 0, 1, "select"));
+      click(cellAnd(r, 2, 1, "select"));
 
       // When unselecting a single grand child
       click(cellAnd(r, 3, 1, "select"));

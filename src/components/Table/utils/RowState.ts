@@ -166,10 +166,11 @@ export class RowState<R extends Kinded> {
     if (this.row.selectable !== false) {
       this.selected = selected;
     }
-    // We don't check inferSelectedState here, b/c even if the parent is considered selectable
-    // on its own, we still push down selected-ness to our visible children.
-    for (const child of this.visibleChildren) {
-      child.select(selected);
+
+    if(this.inferSelectedState) {
+      for (const child of this.visibleChildren) {
+        child.select(selected);
+      }
     }
   }
 
