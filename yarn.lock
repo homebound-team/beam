@@ -2645,8 +2645,8 @@ __metadata:
     jest-environment-jsdom: ^29.4.3
     jest-watch-typeahead: ^2.2.2
     memoize-one: ^5.2.1
-    mobx: ^6.8.0
-    mobx-react: ^7.6.0
+    mobx: ^6.10.2
+    mobx-react: ^9.0.1
     mobx-utils: ^6.0.8
     prettier: ^2.8.4
     prettier-plugin-organize-imports: ^3.2.2
@@ -15773,21 +15773,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mobx-react-lite@npm:^3.4.0":
-  version: 3.4.0
-  resolution: "mobx-react-lite@npm:3.4.0"
-  peerDependencies:
-    mobx: ^6.1.0
-    react: ^16.8.0 || ^17 || ^18
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-  checksum: 9294e127e281c8b37ec7bcaf17de479f50519e6ad485b58d7b991291900511541a5a718653759d3cf6503462c70325d025e1c2ed376d4584fb1b2d3aac9d9b48
-  languageName: node
-  linkType: hard
-
 "mobx-react-lite@npm:^4.0.4":
   version: 4.0.4
   resolution: "mobx-react-lite@npm:4.0.4"
@@ -15802,23 +15787,6 @@ __metadata:
     react-native:
       optional: true
   checksum: a0104357b8db5a4d208251401d6530d47fba0ebadd9ad19f24bd687165dc8776a0b11d9155b93b4aa7f050613d44e24e94cb5a2ef309b4fb1d6aa891552b1875
-  languageName: node
-  linkType: hard
-
-"mobx-react@npm:^7.6.0":
-  version: 7.6.0
-  resolution: "mobx-react@npm:7.6.0"
-  dependencies:
-    mobx-react-lite: ^3.4.0
-  peerDependencies:
-    mobx: ^6.1.0
-    react: ^16.8.0 || ^17 || ^18
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-  checksum: 07ce6eb297ddab2cc693df7350a3e2f730194cc6eb56bd912f80e28f9427237569e0bda6b30167154faf094e7c5e5ff360abd52acd2860d9a0d0e53320617ee8
   languageName: node
   linkType: hard
 
@@ -15848,7 +15816,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mobx@npm:^6.10.2, mobx@npm:^6.8.0":
+"mobx@npm:^6.10.2":
   version: 6.10.2
   resolution: "mobx@npm:6.10.2"
   checksum: 14d6f1db4e3a61c823510ea130229c96bd4958b77d81057ac1abc6a439703eaf3ea2289192ef205b4250d3adb1d83a439ad56d5e53f2b967c6e62a6bccc23d8a
