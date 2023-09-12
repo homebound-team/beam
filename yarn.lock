@@ -3963,7 +3963,7 @@ __metadata:
     "@emotion/jest": ^11.10.5
     "@emotion/react": ^11.10.6
     "@homebound/eslint-config": 1.6.1
-    "@homebound/form-state": ^2.17.0
+    "@homebound/form-state": ^2.20.0
     "@homebound/rtl-react-router-utils": 1.0.3
     "@homebound/rtl-utils": ^2.65.0
     "@homebound/truss": ^1.131.0
@@ -4091,17 +4091,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@homebound/form-state@npm:^2.17.0":
-  version: 2.17.0
-  resolution: "@homebound/form-state@npm:2.17.0"
+"@homebound/form-state@npm:^2.20.0":
+  version: 2.20.0
+  resolution: "@homebound/form-state@npm:2.20.0"
   dependencies:
     fast-deep-equal: ^3.1.3
     is-plain-object: ^5.0.0
-    mobx: ^6.3.2
-    mobx-react: ^7.2.0
+    mobx: ^6.10.2
+    mobx-react: ^9.0.1
   peerDependencies:
     react: ">=16"
-  checksum: 4732f4596053426030c1116fa4892e7f6dcaaf31eda2e792481c6b065f83728b1e9c066188b34777dd60cf0ef1b3a16fe7891ed746a1686019f668f679e825b1
+  checksum: d7ac047e40685c8b08e46b67fb47741e3979afe0f678ab93d47916bb107fbc29231d02a34b4a6ba3a085f5408a5f06f1180dbb12657807324874c831ed1c179f
   languageName: node
   linkType: hard
 
@@ -17431,7 +17431,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mobx-react@npm:^7.2.0, mobx-react@npm:^7.6.0":
+"mobx-react-lite@npm:^4.0.4":
+  version: 4.0.4
+  resolution: "mobx-react-lite@npm:4.0.4"
+  dependencies:
+    use-sync-external-store: ^1.2.0
+  peerDependencies:
+    mobx: ^6.9.0
+    react: ^16.8.0 || ^17 || ^18
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: a0104357b8db5a4d208251401d6530d47fba0ebadd9ad19f24bd687165dc8776a0b11d9155b93b4aa7f050613d44e24e94cb5a2ef309b4fb1d6aa891552b1875
+  languageName: node
+  linkType: hard
+
+"mobx-react@npm:^7.6.0":
   version: 7.6.0
   resolution: "mobx-react@npm:7.6.0"
   dependencies:
@@ -17448,6 +17465,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mobx-react@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "mobx-react@npm:9.0.1"
+  dependencies:
+    mobx-react-lite: ^4.0.4
+  peerDependencies:
+    mobx: ^6.9.0
+    react: ^16.8.0 || ^17 || ^18
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: b0677a6ca2f55ff5adc3b9052a511b2cd9f1f2484bd40a390f2c345936c00b1086631f2458e07efb782d2289b668dcfbbcfe84be56acf5283d95bfb9650efd98
+  languageName: node
+  linkType: hard
+
 "mobx-utils@npm:^6.0.8":
   version: 6.0.8
   resolution: "mobx-utils@npm:6.0.8"
@@ -17457,7 +17491,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mobx@npm:^6.3.2, mobx@npm:^6.8.0":
+"mobx@npm:^6.10.2":
+  version: 6.10.2
+  resolution: "mobx@npm:6.10.2"
+  checksum: 14d6f1db4e3a61c823510ea130229c96bd4958b77d81057ac1abc6a439703eaf3ea2289192ef205b4250d3adb1d83a439ad56d5e53f2b967c6e62a6bccc23d8a
+  languageName: node
+  linkType: hard
+
+"mobx@npm:^6.8.0":
   version: 6.8.0
   resolution: "mobx@npm:6.8.0"
   checksum: f09bb079292ea59023a7e35a9c73ed577e3de9a0175ec3d5a2adc8192e2e3a352b29ec0981ee06d1d63f701f81bb7fc6cc19fd9089edf84a754a8a75ef00ef7f
@@ -21992,6 +22033,15 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 925d1922f9853e516eaad526b6fed1be38008073067274f0ecc3f56b17bb8ab63480140dd7c271f94150027c996cea4efe83d3e3525e8f3eda22055f6a39220b
+  languageName: node
+  linkType: hard
+
+"use-sync-external-store@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "use-sync-external-store@npm:1.2.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 5c639e0f8da3521d605f59ce5be9e094ca772bd44a4ce7322b055a6f58eeed8dda3c94cabd90c7a41fb6fa852210092008afe48f7038792fd47501f33299116a
   languageName: node
   linkType: hard
 
