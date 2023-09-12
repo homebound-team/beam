@@ -2595,7 +2595,7 @@ __metadata:
     "@emotion/jest": ^11.10.5
     "@emotion/react": ^11.10.6
     "@homebound/eslint-config": 1.6.1
-    "@homebound/form-state": ^2.20.0
+    "@homebound/form-state": ^2.20.1
     "@homebound/rtl-react-router-utils": 1.0.3
     "@homebound/rtl-utils": ^2.65.0
     "@homebound/truss": ^1.131.0
@@ -2723,17 +2723,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@homebound/form-state@npm:^2.20.0":
-  version: 2.20.0
-  resolution: "@homebound/form-state@npm:2.20.0"
+"@homebound/form-state@npm:^2.20.1":
+  version: 2.20.1
+  resolution: "@homebound/form-state@npm:2.20.1"
   dependencies:
     fast-deep-equal: ^3.1.3
     is-plain-object: ^5.0.0
-    mobx: ^6.10.2
-    mobx-react: ^9.0.1
   peerDependencies:
+    mobx: ">=6"
     react: ">=16"
-  checksum: d7ac047e40685c8b08e46b67fb47741e3979afe0f678ab93d47916bb107fbc29231d02a34b4a6ba3a085f5408a5f06f1180dbb12657807324874c831ed1c179f
+  checksum: a2509821a2d5f1f9887a3410b22d7f6c4952547132ca60f251c0a26de7ef6792eadca57c271a90dee1517b550c1e7ec0a6a439259de7e7a136a520c97bd38b71
   languageName: node
   linkType: hard
 
