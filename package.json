@@ -33,7 +33,7 @@
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\""
   },
   "dependencies": {
-    "@homebound/form-state": "^2.17.0",
+    "@homebound/form-state": "^2.20.0",
     "@internationalized/number": "^3.0.3",
     "@popperjs/core": "^2.11.6",
     "@react-aria/utils": "^3.18.0",
@@ -116,8 +116,8 @@
     "jest-chain": "^1.1.6",
     "jest-environment-jsdom": "^29.4.3",
     "jest-watch-typeahead": "^2.2.2",
-    "mobx": "^6.8.0",
-    "mobx-react": "^7.6.0",
+    "mobx": "^6.10.2",
+    "mobx-react": "^9.0.1",
     "prettier": "^2.8.4",
     "prettier-plugin-organize-imports": "^3.2.2",
     "react": "^18.2.0",
