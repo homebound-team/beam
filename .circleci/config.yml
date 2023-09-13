@@ -38,18 +38,24 @@ workflows:
             - npm-readonly
             - dockerhub
 
-jobs:
-  build:
-    resource_class: "xlarge"
-    docker:
-      - <<: *node-image
+commands:
+  bootstrap:
     steps:
       - checkout
       - run:
           name: Login in NPM
           command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
       - node/install-packages:
-          pkg-manager: yarn
+          pkg-manager: yarn-berry
+          include-branch-in-cache-key: false
+
+jobs:
+  build:
+    resource_class: "xlarge"
+    docker:
+      - <<: *node-image
+    steps:
+      - bootstrap
       - run: yarn build
       - run: yarn test
 
@@ -57,10 +63,7 @@ jobs:
     docker:
       - <<: *node-image
     steps:
-      - checkout
-      - run:
-          name: Login in NPM
-          command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
+      - bootstrap
       - restore_cache:
           name: Restore ESLint Cache
           keys:
@@ -81,12 +84,7 @@ jobs:
     docker:
       - <<: *node-image
     steps:
-      - checkout
-      - run:
-          name: Login in NPM
-          command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
-      - node/install-packages:
-          pkg-manager: yarn
+      - bootstrap
       - run: yarn semantic-release
 
   chromatic:
@@ -99,12 +97,7 @@ jobs:
       - <<: *node-image
     working_directory: ~/project
     steps:
-      - checkout
-      - run:
-          name: Login in NPM
-          command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
-      - node/install-packages:
-          pkg-manager: yarn
+      - bootstrap
       - when:
           condition:
             equal: [main, <<pipeline.git.branch>>]
