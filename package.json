@@ -139,5 +139,5 @@
     "@types/react": "18.0.28",
     "react-router": "5.3.4"
   },
-  "packageManager": "yarn@3.3.0"
+  "packageManager": "yarn@3.6.3"
 }

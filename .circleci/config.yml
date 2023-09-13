@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@5.0.0
+  node: circleci/node@5.1.0
 
 node-image: &node-image
   image: cimg/node:18.13.0
