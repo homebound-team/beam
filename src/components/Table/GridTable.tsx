@@ -218,18 +218,23 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // Use this ref to watch for changes in the GridTable's container and resize columns accordingly.
   const resizeRef = useRef<HTMLDivElement>(null);
 
-  const api = useMemo<GridTableApiImpl<R>>(() => {
-    // Let the user pass in their own api handle, otherwise make our own
-    const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
-    api.init(persistCollapse, virtuosoRef);
-    api.setActiveRowId(activeRowId);
-    api.setActiveCellId(activeCellId);
-    // Push the initial columns directly into tableState, b/c that is what
-    // makes the tests pass, but then further updates we'll do through useEffect
-    // to avoid "Cannot update component during render" errors.
-    api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
-    return api;
-  }, [props.api]);
+  const api = useMemo<GridTableApiImpl<R>>(
+    () => {
+      // Let the user pass in their own api handle, otherwise make our own
+      const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
+      api.init(persistCollapse, virtuosoRef);
+      api.setActiveRowId(activeRowId);
+      api.setActiveCellId(activeCellId);
+      // Push the initial columns directly into tableState, b/c that is what
+      // makes the tests pass, but then further updates we'll do through useEffect
+      // to avoid "Cannot update component during render" errors.
+      api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+      return api;
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [props.api],
+  );
 
   const style = resolveStyles(maybeStyle);
   const { tableState } = api;

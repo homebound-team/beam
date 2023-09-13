@@ -12,14 +12,19 @@ interface AutoSaveIndicatorProps {
 export function AutoSaveIndicator({ hideOnIdle, doNotReset }: AutoSaveIndicatorProps) {
   const { status, resetStatus, errors } = useAutoSaveStatus();
 
-  useEffect(() => {
-    if (doNotReset) return;
-    /**
-     * Any time AutoSaveIndicator dismounts, most likely on Page Navigation,
-     * state should clear before the next Indicator mounts
-     */
-    return () => resetStatus();
-  }, []);
+  useEffect(
+    () => {
+      if (doNotReset) return;
+      /**
+       * Any time AutoSaveIndicator dismounts, most likely on Page Navigation,
+       * state should clear before the next Indicator mounts
+       */
+      return () => resetStatus();
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   switch (status) {
     case AutoSaveStatus.IDLE:

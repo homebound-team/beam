@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@5.0.0
+  node: circleci/node@5.1.0
 
 node-image: &node-image
   image: cimg/node:18.13.0
@@ -17,6 +17,10 @@ workflows:
           context:
             - npm-readonly
             - github
+            - dockerhub
+      - validate-code:
+          context:
+            - npm-readonly
             - dockerhub
       - publish:
           context:
@@ -34,32 +38,53 @@ workflows:
             - npm-readonly
             - dockerhub
 
+commands:
+  bootstrap:
+    steps:
+      - checkout
+      - run:
+          name: Login in NPM
+          command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
+      - node/install-packages:
+          pkg-manager: yarn-berry
+          include-branch-in-cache-key: false
+
 jobs:
   build:
     resource_class: "xlarge"
     docker:
       - <<: *node-image
     steps:
-      - checkout
-      - run:
-          name: Login in NPM
-          command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
-      - node/install-packages:
-          pkg-manager: yarn
+      - bootstrap
       - run: yarn build
       - run: yarn test
+
+  validate-code:
+    docker:
+      - <<: *node-image
+    steps:
+      - bootstrap
+      - restore_cache:
+          name: Restore ESLint Cache
+          keys:
+            - eslint-cache-{{ .Branch }}
+            # If this branch doesn't have a warm cache yet, fall back to main to try to speed up the initial build
+            - eslint-cache-main
+      - run:
+          name: Run ESLint
+          command: yarn lint --cache --cache-location .eslintcache --quiet
+      - save_cache:
+          name: Save ESLint Cache
+          key: eslint-cache-{{ .Branch }}
+          paths:
+            - .eslintcache
 
   publish:
     resource_class: "xlarge"
     docker:
       - <<: *node-image
     steps:
-      - checkout
-      - run:
-          name: Login in NPM
-          command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
-      - node/install-packages:
-          pkg-manager: yarn
+      - bootstrap
       - run: yarn semantic-release
 
   chromatic:
@@ -72,12 +97,7 @@ jobs:
       - <<: *node-image
     working_directory: ~/project
     steps:
-      - checkout
-      - run:
-          name: Login in NPM
-          command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
-      - node/install-packages:
-          pkg-manager: yarn
+      - bootstrap
       - when:
           condition:
             equal: [main, <<pipeline.git.branch>>]

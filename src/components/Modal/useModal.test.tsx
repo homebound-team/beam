@@ -36,6 +36,8 @@ describe("useModal", () => {
   it("can provide a custom canClose method", async () => {
     function TestApp(props: ModalProps) {
       const { openModal } = useModal();
+      // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       useEffect(() => openModal(props), []);
       return <div>App</div>;
     }
@@ -64,6 +66,8 @@ describe("useModal", () => {
     function TestApp(props: ModalProps) {
       beamContext = useBeamContext();
       const { openModal } = useModal();
+      // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       useEffect(() => openModal(props), []);
       return <div>App</div>;
     }

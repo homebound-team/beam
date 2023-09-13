@@ -76,21 +76,31 @@ export function Modal(props: ModalProps) {
 
   useResizeObserver({
     ref: modalBodyRef,
-    onResize: useCallback(() => {
-      const target = modalBodyRef.current!;
-      if (forceScrolling === undefined && !isFixedHeight) {
-        setHasScroll(target.scrollHeight > target.clientHeight);
-      }
-    }, []),
+    onResize: useCallback(
+      () => {
+        const target = modalBodyRef.current!;
+        if (forceScrolling === undefined && !isFixedHeight) {
+          setHasScroll(target.scrollHeight > target.clientHeight);
+        }
+      },
+      // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [],
+    ),
   });
 
   // Even though we use raw-divs for the createPortal calls, we do actually need to
   // use refs + useEffect to stitch those raw divs back into the React component tree.
-  useEffect(() => {
-    modalHeaderRef.current!.appendChild(modalHeaderDiv);
-    modalBodyRef.current!.appendChild(modalBodyDiv);
-    modalFooterRef.current!.appendChild(modalFooterDiv);
-  }, [modalBodyRef, modalFooterRef, modalHeaderRef]);
+  useEffect(
+    () => {
+      modalHeaderRef.current!.appendChild(modalHeaderDiv);
+      modalBodyRef.current!.appendChild(modalBodyDiv);
+      modalFooterRef.current!.appendChild(modalFooterDiv);
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [modalBodyRef, modalFooterRef, modalHeaderRef],
+  );
 
   return (
     <OverlayContainer>

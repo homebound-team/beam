@@ -117,8 +117,16 @@ Improve consistency of default fonts in all browsers. (https://github.com/sindre
 */
 
   body {
-    font-family: system-ui, -apple-system, /* Firefox supports this but not yet system-ui */ "Segoe UI", Roboto,
-      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    font-family:
+      system-ui,
+      -apple-system,
+      /* Firefox supports this but not yet system-ui */ "Segoe UI",
+      Roboto,
+      Helvetica,
+      Arial,
+      sans-serif,
+      "Apple Color Emoji",
+      "Segoe UI Emoji";
   }
 
   /*
@@ -376,8 +384,21 @@ const tailwindPreflightReset = css`
  *    to override it to ensure consistency even when using the default theme.
  */
   html {
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    font-family:
+      Inter,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      "Helvetica Neue",
+      Arial,
+      "Noto Sans",
+      sans-serif,
+      "Apple Color Emoji",
+      "Segoe UI Emoji",
+      "Segoe UI Symbol",
       "Noto Color Emoji"; /* 1 */
     line-height: 1.5; /* 2 */
   }

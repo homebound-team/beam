@@ -58,60 +58,65 @@ export function RichTextField(props: RichTextFieldProps) {
   onFocusRef.current = onFocus;
 
   // Generate a unique id to be used for matching `trix-initialize` event for this instance.
-  const id = useMemo(() => {
-    if (readOnly) return;
+  const id = useMemo(
+    () => {
+      if (readOnly) return;
 
-    const id = `trix-editor-${trixId}`;
-    trixId++;
+      const id = `trix-editor-${trixId}`;
+      trixId++;
 
-    function onEditorInit(e: Event) {
-      const targetEl = e.target as HTMLElement;
-      if (targetEl.id === id) {
-        editorElement.current = targetEl;
-        const editor = (editorElement.current as any).editor;
-        setEditor(editor);
-        if (mergeTags !== undefined) {
-          attachTributeJs(mergeTags, editorElement.current!);
-        }
-
-        currentHtml.current = value;
-        editor.loadHTML(value || "");
-        // Remove listener once we've initialized
-        window.removeEventListener("trix-initialize", onEditorInit);
-
-        function trixChange(e: ChangeEvent) {
-          const { textContent, innerHTML } = e.target;
-          const onChange = onChangeRef.current;
-          // If the user only types whitespace, treat that as undefined
-          if ((textContent || "").trim() === "") {
-            currentHtml.current = undefined;
-            onChange && onChange(undefined, undefined, []);
-          } else {
-            currentHtml.current = innerHTML;
-            const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
-            onChange && onChange(innerHTML, textContent || undefined, mentions);
+      function onEditorInit(e: Event) {
+        const targetEl = e.target as HTMLElement;
+        if (targetEl.id === id) {
+          editorElement.current = targetEl;
+          const editor = (editorElement.current as any).editor;
+          setEditor(editor);
+          if (mergeTags !== undefined) {
+            attachTributeJs(mergeTags, editorElement.current!);
           }
+
+          currentHtml.current = value;
+          editor.loadHTML(value || "");
+          // Remove listener once we've initialized
+          window.removeEventListener("trix-initialize", onEditorInit);
+
+          function trixChange(e: ChangeEvent) {
+            const { textContent, innerHTML } = e.target;
+            const onChange = onChangeRef.current;
+            // If the user only types whitespace, treat that as undefined
+            if ((textContent || "").trim() === "") {
+              currentHtml.current = undefined;
+              onChange && onChange(undefined, undefined, []);
+            } else {
+              currentHtml.current = innerHTML;
+              const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
+              onChange && onChange(innerHTML, textContent || undefined, mentions);
+            }
+          }
+
+          const trixBlur = () => maybeCall(onBlurRef.current);
+          const trixFocus = () => maybeCall(onFocusRef.current);
+
+          // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
+          // https://github.com/basecamp/trix#storing-attached-files
+          const preventDefault = (e: any) => e.preventDefault();
+          window.addEventListener("trix-file-accept", preventDefault);
+
+          editorElement.current.addEventListener("trix-change", trixChange as any);
+          editorElement.current.addEventListener("trix-blur", trixBlur);
+          editorElement.current.addEventListener("trix-focus", trixFocus);
         }
-
-        const trixBlur = () => maybeCall(onBlurRef.current);
-        const trixFocus = () => maybeCall(onFocusRef.current);
-
-        // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
-        // https://github.com/basecamp/trix#storing-attached-files
-        const preventDefault = (e: any) => e.preventDefault();
-        window.addEventListener("trix-file-accept", preventDefault);
-
-        editorElement.current.addEventListener("trix-change", trixChange as any);
-        editorElement.current.addEventListener("trix-blur", trixBlur);
-        editorElement.current.addEventListener("trix-focus", trixFocus);
       }
-    }
 
-    // Attaching listener to the `window` to we're listening prior to render.
-    // The <trix-editor /> web component's `trix-initialize` event may fire before a `useEffect` hook in the component is executed, making it difficult ot attach the event listener locally.
-    window.addEventListener("trix-initialize", onEditorInit);
-    return id;
-  }, []);
+      // Attaching listener to the `window` to we're listening prior to render.
+      // The <trix-editor /> web component's `trix-initialize` event may fire before a `useEffect` hook in the component is executed, making it difficult ot attach the event listener locally.
+      window.addEventListener("trix-initialize", onEditorInit);
+      return id;
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   useEffect(() => {
     // If our value prop changes (without the change coming from us), reload it

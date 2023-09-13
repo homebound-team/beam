@@ -44,7 +44,11 @@ export class RowState<R extends Kinded> {
   removed: false | "soft" | "hard" = false;
   private isCalculatingDirectMatch = false;
 
-  constructor(private states: RowStates<R>, public parent: RowState<R> | undefined, row: GridDataRow<R>) {
+  constructor(
+    private states: RowStates<R>,
+    public parent: RowState<R> | undefined,
+    row: GridDataRow<R>,
+  ) {
     this.row = row;
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
@@ -167,7 +171,7 @@ export class RowState<R extends Kinded> {
       this.selected = selected;
     }
 
-    if(this.inferSelectedState) {
+    if (this.inferSelectedState) {
       for (const child of this.visibleChildren) {
         child.select(selected);
       }

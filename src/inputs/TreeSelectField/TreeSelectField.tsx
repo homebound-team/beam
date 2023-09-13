@@ -89,6 +89,8 @@ export function TreeSelectField<O, V extends Value>(
   );
   const contextValue = useMemo<CollapsedChildrenState<O, V>>(
     () => ({ collapsedKeys, setCollapsedKeys, getOptionValue }),
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [collapsedKeys, setCollapsedKeys],
   );
 
@@ -121,7 +123,7 @@ interface CollapsedChildrenState<O, V extends Value> {
 export const CollapsedContext = React.createContext<CollapsedChildrenState<any, any>>({
   collapsedKeys: [],
   setCollapsedKeys: () => {},
-  getOptionValue: () => ({} as any),
+  getOptionValue: () => ({}) as any,
 });
 
 function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, V>) {
@@ -215,20 +217,27 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
   // React to collapsed keys and update the filtered options
   const reactToCollapse = useRef(false);
-  useEffect(() => {
-    // Do not run this effect on first render. Otherwise we'd be triggering a re-render on first render.
-    if (reactToCollapse.current) {
-      setFieldState(({ allOptions, inputValue, ...others }) => ({
-        allOptions,
-        inputValue,
-        ...others,
-        filteredOptions: allOptions.flatMap((o) =>
-          levelOptions(o, 0, inputValue.length > 0).filter(([option]) => contains(getOptionLabel(option), inputValue)),
-        ),
-      }));
-    }
-    reactToCollapse.current = true;
-  }, [collapsedKeys]);
+  useEffect(
+    () => {
+      // Do not run this effect on first render. Otherwise we'd be triggering a re-render on first render.
+      if (reactToCollapse.current) {
+        setFieldState(({ allOptions, inputValue, ...others }) => ({
+          allOptions,
+          inputValue,
+          ...others,
+          filteredOptions: allOptions.flatMap((o) =>
+            levelOptions(o, 0, inputValue.length > 0).filter(([option]) =>
+              contains(getOptionLabel(option), inputValue),
+            ),
+          ),
+        }));
+      }
+      reactToCollapse.current = true;
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [collapsedKeys],
+  );
 
   // Update the filtered options when the input value changes
   const onInputChange = useCallback(
@@ -246,6 +255,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         };
       });
     },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setFieldState],
   );
 
@@ -274,6 +285,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         }));
       }
     },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 

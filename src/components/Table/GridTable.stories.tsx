@@ -1057,6 +1057,8 @@ export function ActiveRow() {
     ],
     [],
   );
+  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const columns = useMemo(() => [nameColumn, valueColumn, actionColumn], []);
   return <GridTable columns={columns} activeRowId="data_2" rowStyles={rowStyles} rows={rows} />;
 }

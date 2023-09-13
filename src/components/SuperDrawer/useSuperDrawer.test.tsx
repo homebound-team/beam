@@ -166,28 +166,33 @@ function TestDrawerContent(props: {
   closeDrawer?: boolean;
 }) {
   const context = useSuperDrawer();
-  useEffect(() => {
-    if (props.openInDrawer) {
-      context.openInDrawer({
-        content: (
-          <>
-            <SuperDrawerHeader title="Title" />
-            <h2 data-testid="superDrawerContent">SuperDrawer Content</h2>
-          </>
-        ),
-      });
-    }
-    if (props.openDrawerDetail) {
-      context.openDrawerDetail({
-        content: <h2 data-testid="superDrawerDetailContent">SuperDrawer Content</h2>,
-      });
-    }
-    if (props.closeDrawerDetail) {
-      context.closeDrawerDetail();
-    }
-    if (props.closeDrawer) {
-      context.closeDrawer();
-    }
-  }, []);
+  useEffect(
+    () => {
+      if (props.openInDrawer) {
+        context.openInDrawer({
+          content: (
+            <>
+              <SuperDrawerHeader title="Title" />
+              <h2 data-testid="superDrawerContent">SuperDrawer Content</h2>
+            </>
+          ),
+        });
+      }
+      if (props.openDrawerDetail) {
+        context.openDrawerDetail({
+          content: <h2 data-testid="superDrawerDetailContent">SuperDrawer Content</h2>,
+        });
+      }
+      if (props.closeDrawerDetail) {
+        context.closeDrawerDetail();
+      }
+      if (props.closeDrawer) {
+        context.closeDrawer();
+      }
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
   return <h1>Page Content</h1>;
 }
