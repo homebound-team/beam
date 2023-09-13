@@ -23,12 +23,22 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
   if (!leveledOption) return null;
 
   const [option, level]: [NestedOption<O>, number] = leveledOption;
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const ref = useRef<HTMLElement>(null);
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { hoverProps, isHovered } = useHover({});
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const tid = useTestIds(props, "treeOption");
 
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { collapsedKeys, setCollapsedKeys, getOptionValue } = useTreeSelectFieldProvider<O, Value>();
 
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { optionProps, isDisabled, isFocused, isSelected } = useOption(
     { key: item.key, shouldSelectOnPressUp: true, shouldFocusOnHover: false },
     state,

@@ -30,10 +30,20 @@ export function MenuItemImpl(props: MenuItemProps) {
   const isDisabled = Boolean(disabled);
   const isSelected = state.selectionManager.selectedKeys.has(label);
   const isFocused = state.selectionManager.focusedKey === item.key;
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const ref = useRef<HTMLLIElement>(null);
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const history = useHistory();
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { hoverProps, isHovered } = useHover({});
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const tid = useTestIds(props);
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { menuItemProps } = useMenuItem(
     {
       key: item.key,

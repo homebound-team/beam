@@ -3134,6 +3134,8 @@ describe("GridTable", () => {
       // Then the column is initially hidden
       expect(row(r, 1).childNodes).toHaveLength(1);
       // When setting the column to be visible
+      // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+      // eslint-disable-next-line testing-library/no-unnecessary-act
       await act(async () => {
         api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("myColumn2"));
         // wait for promise to resolve
@@ -3216,6 +3218,8 @@ describe("GridTable", () => {
       `);
 
       // And when then triggering new `columnB` to be introduced
+      // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+      // eslint-disable-next-line testing-library/no-unnecessary-act
       await act(async () => {
         api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("columnB"));
         await wait();

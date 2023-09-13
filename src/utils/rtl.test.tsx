@@ -215,6 +215,8 @@ describe("rtl", () => {
     expect(getSelected(r.number)).toEqual("One One");
   });
 
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line jest/no-identical-title
   it("can select options via label on MultiSelectField", async () => {
     const onSelect = jest.fn();
     // Given the TreeSelectField
