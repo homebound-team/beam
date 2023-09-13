@@ -18,6 +18,10 @@ workflows:
             - npm-readonly
             - github
             - dockerhub
+      - validate-code:
+          context:
+            - npm-readonly
+            - dockerhub
       - publish:
           context:
             - npm-publish
@@ -48,6 +52,29 @@ jobs:
           pkg-manager: yarn
       - run: yarn build
       - run: yarn test
+
+  validate-code:
+    docker:
+      - <<: *node-image
+    steps:
+      - checkout
+      - run:
+          name: Login in NPM
+          command: 'echo "npmAuthToken: $NPM_TOKEN" >> ${HOME}/.yarnrc.yml'
+      - restore_cache:
+          name: Restore ESLint Cache
+          keys:
+            - eslint-cache-{{ .Branch }}
+            # If this branch doesn't have a warm cache yet, fall back to main to try to speed up the initial build
+            - eslint-cache-main
+      - run:
+          name: Run ESLint
+          command: yarn lint --cache --cache-location .eslintcache --quiet
+      - save_cache:
+          name: Save ESLint Cache
+          key: eslint-cache-{{ .Branch }}
+          paths:
+            - .eslintcache
 
   publish:
     resource_class: "xlarge"
