@@ -80,7 +80,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
 
   // Bulk updates of MenuItems below. If we find this to be of sluggish performance, then we can change to be more surgical in our updating.
   // If our list of items change, update the "items" menu section. (key is based on label in `getKey` above)
-  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => filteredTree.update("items", { label: "items", items } as MenuSection), [items]);
   return (

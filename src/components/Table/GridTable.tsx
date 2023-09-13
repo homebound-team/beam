@@ -231,7 +231,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
       return api;
     },
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [props.api],
   );

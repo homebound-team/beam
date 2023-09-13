@@ -83,7 +83,7 @@ export function Modal(props: ModalProps) {
           setHasScroll(target.scrollHeight > target.clientHeight);
         }
       },
-      // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+      // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [],
     ),
@@ -97,7 +97,7 @@ export function Modal(props: ModalProps) {
       modalBodyRef.current!.appendChild(modalBodyDiv);
       modalFooterRef.current!.appendChild(modalFooterDiv);
     },
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [modalBodyRef, modalFooterRef, modalHeaderRef],
   );

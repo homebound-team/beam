@@ -65,7 +65,7 @@ export const ButtonsInFooter = () => {
       ),
     });
   // Immediately open the modal for Chromatic snapshots
-  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(open, [openModal]);
   return <Button label="Open" onClick={open} />;
@@ -134,7 +134,7 @@ function ModalExample(props: ModalExampleProps) {
       drawHeaderBorder,
     });
   // Immediately open the modal for Chromatic snapshots
-  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(open, [openModal]);
   return <Button label="Open" onClick={open} />;
@@ -150,7 +150,7 @@ function ModalFilterTableExample({ size, forceScrolling }: Pick<ModalProps, "siz
 
   // Immediately open the modal for Chromatic snapshots
   const open = () => openModal(modalProps);
-  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(open, [openModal]);
 

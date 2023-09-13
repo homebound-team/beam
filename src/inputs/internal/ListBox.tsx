@@ -84,7 +84,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
       }
       firstRender.current = false;
     },
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.selectionManager.selectedKeys.size],
   );
