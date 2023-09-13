@@ -75,7 +75,7 @@
     "@emotion/babel-preset-css-prop": "^11.10.0",
     "@emotion/jest": "^11.10.5",
     "@emotion/react": "^11.10.6",
-    "@homebound/eslint-config": "1.6.1",
+    "@homebound/eslint-config": "^1.8.0",
     "@homebound/rtl-react-router-utils": "1.0.3",
     "@homebound/rtl-utils": "^2.65.0",
     "@homebound/truss": "^1.131.0",
