@@ -37,21 +37,26 @@ export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFi
 
   const setFilter = (filter: F) => setQueryParams({ filter });
 
-  useEffect(() => {
-    if (queryParamsFilter === undefined) {
-      // if there is no filter in the query params, use stored filter
-      // "replaceIn" replaces the url in history instead of creating a new history item
-      // back button will go to previous url
-      setQueryParams({ filter: storedFilter }, "replaceIn");
-    } else if (!isQueryParamFilterValid) {
-      // if there are invalid query params, fallback to the default filters
-      setQueryParams({ filter: defaultFilter }, "replaceIn");
-    } else if (JSON.stringify(queryParamsFilter) !== JSON.stringify(storedFilter)) {
-      // if there is a valid filter in query params and its different from the
-      // current storedFilter, use query params filter
-      setStoredFilter(queryParamsFilter);
-    }
-  }, [storedFilter, setStoredFilter, setQueryParams, queryParamsFilter]);
+  useEffect(
+    () => {
+      if (queryParamsFilter === undefined) {
+        // if there is no filter in the query params, use stored filter
+        // "replaceIn" replaces the url in history instead of creating a new history item
+        // back button will go to previous url
+        setQueryParams({ filter: storedFilter }, "replaceIn");
+      } else if (!isQueryParamFilterValid) {
+        // if there are invalid query params, fallback to the default filters
+        setQueryParams({ filter: defaultFilter }, "replaceIn");
+      } else if (JSON.stringify(queryParamsFilter) !== JSON.stringify(storedFilter)) {
+        // if there is a valid filter in query params and its different from the
+        // current storedFilter, use query params filter
+        setStoredFilter(queryParamsFilter);
+      }
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [storedFilter, setStoredFilter, setQueryParams, queryParamsFilter],
+  );
 
   return { setFilter, filter };
 }

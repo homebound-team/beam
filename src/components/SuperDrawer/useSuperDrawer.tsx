@@ -104,93 +104,103 @@ export function useSuperDrawer(): UseSuperDrawerHook {
   }
 
   // Separate close actions to reference then in actions
-  const closeActions = useMemo(() => {
-    return {
-      /** Attempts to close the drawer. If any checks fail, a confirmation modal will appear */
-      closeDrawer() {
-        /** Reset the contentStack, all checks and modalState */
-        function onClose() {
-          const first = contentStack.current[0];
-          if (first?.kind === "open" && first.opts.onClose) {
-            first.opts.onClose();
+  const closeActions = useMemo(
+    () => {
+      return {
+        /** Attempts to close the drawer. If any checks fail, a confirmation modal will appear */
+        closeDrawer() {
+          /** Reset the contentStack, all checks and modalState */
+          function onClose() {
+            const first = contentStack.current[0];
+            if (first?.kind === "open" && first.opts.onClose) {
+              first.opts.onClose();
+            }
+            contentStack.current = [];
+            canCloseChecks.current = [];
+            canCloseDetailsChecks.current = [];
           }
-          contentStack.current = [];
-          canCloseChecks.current = [];
-          canCloseDetailsChecks.current = [];
-        }
-        maybeChangeDrawer(onClose);
-        return;
-      },
-
-      closeDrawerDetail() {
-        if (contentStack.current.length < 2) return;
-
-        // Attempt to close the current drawer details
-        if (!canCloseDrawerDetails(contentStack.current.length - 2, onClose)) {
+          maybeChangeDrawer(onClose);
           return;
-        }
+        },
 
-        /** Pop an element from the contentStacks and details checks */
-        function onClose() {
-          // Pop contentStack and the current canCloseDrawerDetailsCheck
-          contentStack.current = contentStack.current.slice(0, -1);
-          canCloseDetailsChecks.current = canCloseDetailsChecks.current.slice(0, -1);
-          // Reset Modal state
-          modalState.current = undefined;
-        }
+        closeDrawerDetail() {
+          if (contentStack.current.length < 2) return;
 
-        onClose();
-      },
-    };
-  }, [canCloseChecks, canCloseDetailsChecks, contentStack, modalState, openModal]);
+          // Attempt to close the current drawer details
+          if (!canCloseDrawerDetails(contentStack.current.length - 2, onClose)) {
+            return;
+          }
+
+          /** Pop an element from the contentStacks and details checks */
+          function onClose() {
+            // Pop contentStack and the current canCloseDrawerDetailsCheck
+            contentStack.current = contentStack.current.slice(0, -1);
+            canCloseDetailsChecks.current = canCloseDetailsChecks.current.slice(0, -1);
+            // Reset Modal state
+            modalState.current = undefined;
+          }
+
+          onClose();
+        },
+      };
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [canCloseChecks, canCloseDetailsChecks, contentStack, modalState, openModal],
+  );
 
   // useMemo the actions separately from the dynamic isDrawerOpen value
-  const actions = useMemo(() => {
-    return {
-      // TODO: Maybe we should rename to openDrawer as a breaking change (to match openDrawerDetail)
-      openInDrawer(opts: OpenInDrawerOpts) {
-        // When opening a new SuperDrawer, check if we can close the previous
-        // SuperDrawer content. Bail if it fails
-        // TODO: There needs to be try again logic here...
-        maybeChangeDrawer(() => {
-          contentStack.current = [{ kind: "open", opts }];
-        });
-      },
-      openDrawerDetail(opts: OpenDetailOpts) {
-        // TODO: Check modal open?
-        if (!contentStack.current.length) {
-          throw new Error("openInDrawer was not called before openDrawerDetail");
-        }
-        contentStack.current = [...contentStack.current, { kind: "detail", opts }];
-      },
-      /** Add a new close check to SuperDrawer */
-      addCanCloseDrawerCheck(canCloseCheck: CanCloseCheck) {
-        // Check if we can add a canCloseDrawer check
-        const stackLength = contentStack.current.length;
-        if (!stackLength) {
-          console.error("Cannot add canCloseDrawerCheck when the SuperDrawer is not open");
-          return;
-        }
+  const actions = useMemo(
+    () => {
+      return {
+        // TODO: Maybe we should rename to openDrawer as a breaking change (to match openDrawerDetail)
+        openInDrawer(opts: OpenInDrawerOpts) {
+          // When opening a new SuperDrawer, check if we can close the previous
+          // SuperDrawer content. Bail if it fails
+          // TODO: There needs to be try again logic here...
+          maybeChangeDrawer(() => {
+            contentStack.current = [{ kind: "open", opts }];
+          });
+        },
+        openDrawerDetail(opts: OpenDetailOpts) {
+          // TODO: Check modal open?
+          if (!contentStack.current.length) {
+            throw new Error("openInDrawer was not called before openDrawerDetail");
+          }
+          contentStack.current = [...contentStack.current, { kind: "detail", opts }];
+        },
+        /** Add a new close check to SuperDrawer */
+        addCanCloseDrawerCheck(canCloseCheck: CanCloseCheck) {
+          // Check if we can add a canCloseDrawer check
+          const stackLength = contentStack.current.length;
+          if (!stackLength) {
+            console.error("Cannot add canCloseDrawerCheck when the SuperDrawer is not open");
+            return;
+          }
 
-        canCloseChecks.current = [...canCloseChecks.current, canCloseCheck];
-      },
-      /** Add a new close check to the current SuperDrawer detail */
-      addCanCloseDrawerDetailCheck(canCloseCheck: CanCloseCheck) {
-        // Check if we can add a canCloseDrawerDetailCheck
-        const stackLength = contentStack.current.length;
-        if (stackLength <= 1) {
-          console.error("Cannot add canCloseDrawerDetailCheck when no SuperDrawer details drawer is open");
-          return;
-        }
+          canCloseChecks.current = [...canCloseChecks.current, canCloseCheck];
+        },
+        /** Add a new close check to the current SuperDrawer detail */
+        addCanCloseDrawerDetailCheck(canCloseCheck: CanCloseCheck) {
+          // Check if we can add a canCloseDrawerDetailCheck
+          const stackLength = contentStack.current.length;
+          if (stackLength <= 1) {
+            console.error("Cannot add canCloseDrawerDetailCheck when no SuperDrawer details drawer is open");
+            return;
+          }
 
-        // Add canCloseDetails check to the current details content
-        canCloseDetailsChecks.current[stackLength - 2] = [
-          ...(canCloseDetailsChecks.current[stackLength - 2] ?? []),
-          canCloseCheck,
-        ];
-      },
-    };
-  }, [canCloseChecks, canCloseDetailsChecks, closeActions, contentStack]);
+          // Add canCloseDetails check to the current details content
+          canCloseDetailsChecks.current[stackLength - 2] = [
+            ...(canCloseDetailsChecks.current[stackLength - 2] ?? []),
+            canCloseCheck,
+          ];
+        },
+      };
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [canCloseChecks, canCloseDetailsChecks, closeActions, contentStack],
+  );
 
   return {
     ...actions,

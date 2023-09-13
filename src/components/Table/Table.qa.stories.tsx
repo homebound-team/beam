@@ -123,14 +123,19 @@ export function Table(props: TableStoryProps) {
   const api = useGridTableApi<BeamNestedRow>();
   const selectedRows: GridDataRow<BeamNestedRow>[] = useComputed(() => api.getSelectedRows(), [api]);
 
-  const [nestedRows, columns] = useMemo(() => {
-    // Make a copy of the `rows` as we may splice in the `expandableHeader` and we don't want to mutate the original rows array.
-    let rows = getRows(nestingDepth);
-    if (expandable) {
-      rows = [...rows, { kind: "expandableHeader", id: "expandableHeader" } as GridDataRow<BeamNestedRow>];
-    }
-    return [[...(totals ? beamTotalsRows : []), ...rows], beamNestedColumns(expandable)];
-  }, [nestingDepth, expandable]);
+  const [nestedRows, columns] = useMemo(
+    () => {
+      // Make a copy of the `rows` as we may splice in the `expandableHeader` and we don't want to mutate the original rows array.
+      let rows = getRows(nestingDepth);
+      if (expandable) {
+        rows = [...rows, { kind: "expandableHeader", id: "expandableHeader" } as GridDataRow<BeamNestedRow>];
+      }
+      return [[...(totals ? beamTotalsRows : []), ...rows], beamNestedColumns(expandable)];
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [nestingDepth, expandable],
+  );
 
   const [rows, setRows] = useState(nestedRows);
 

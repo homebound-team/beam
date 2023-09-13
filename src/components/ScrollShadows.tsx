@@ -41,18 +41,25 @@ export function ScrollShadows(props: ScrollShadowsProps) {
     ];
   }, [horizontal, bgColor]);
 
-  const updateScrollProps = useCallback((el: HTMLDivElement) => {
-    const { scrollTop, scrollHeight, clientHeight, scrollWidth, scrollLeft, clientWidth } = el;
+  const updateScrollProps = useCallback(
+    (el: HTMLDivElement) => {
+      const { scrollTop, scrollHeight, clientHeight, scrollWidth, scrollLeft, clientWidth } = el;
 
-    const start = horizontal ? scrollLeft : scrollTop;
-    const end = horizontal ? scrollWidth : scrollHeight;
-    const boxSize = horizontal ? clientWidth : clientHeight;
-    setShowStartShadow(start > 0);
-    setShowEndShadow(start + boxSize < end);
-  }, []);
+      const start = horizontal ? scrollLeft : scrollTop;
+      const end = horizontal ? scrollWidth : scrollHeight;
+      const boxSize = horizontal ? clientWidth : clientHeight;
+      setShowStartShadow(start > 0);
+      setShowEndShadow(start + boxSize < end);
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   // Use a ResizeObserver to update the scroll props to determine if the shadows should be shown.
   // This executes on render and subsequent resizes which could be due to content/`children` changes (such as responses from APIs).
+  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const onResize = useCallback(() => scrollRef.current && updateScrollProps(scrollRef.current), []);
   useResizeObserver({ ref: scrollRef, onResize });
 

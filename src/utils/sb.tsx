@@ -52,9 +52,8 @@ export const withBeamDecorator = (Story: () => JSX.Element) => (
  */
 export const withDimensions =
   (width: number | string = "100vw", height: number | string = "100vh", xss?: Properties) =>
-  (Story: () => JSX.Element) =>
-    (
-      <div css={{ ...Css.w(width).h(height).$, ...xss }}>
-        <Story />
-      </div>
-    );
+  (Story: () => JSX.Element) => (
+    <div css={{ ...Css.w(width).h(height).$, ...xss }}>
+      <Story />
+    </div>
+  );

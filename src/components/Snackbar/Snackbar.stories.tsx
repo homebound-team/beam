@@ -84,9 +84,14 @@ function CustomOffsetComponent(props: SnackBarStoryProps) {
   const { actionLabel, actionVariant, offset, ...noticeProps } = props;
 
   useSnackbarOffset(offset ?? {});
-  useEffect(() => {
-    triggerNotice({ message: "Initial notice for chromatic diff purposes to ensure proper placement." });
-  }, []);
+  useEffect(
+    () => {
+      triggerNotice({ message: "Initial notice for chromatic diff purposes to ensure proper placement." });
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   return (
     <Button
@@ -109,18 +114,23 @@ export function SystematicClose(args: SnackBarStoryProps) {
   const noticeId = "customId";
   const { actionLabel, actionVariant, ...noticeProps } = args;
 
-  const triggerOnClick = useCallback(() => {
-    triggerNotice({
-      ...noticeProps,
-      ...(actionLabel
-        ? { action: { label: actionLabel, variant: actionVariant, onClick: action(`${actionLabel} clicked`) } }
-        : undefined),
-      id: noticeId,
-      persistent: true,
-      onClose: () => setNoticeOpen(false),
-    });
-    setNoticeOpen(true);
-  }, [noticeId]);
+  const triggerOnClick = useCallback(
+    () => {
+      triggerNotice({
+        ...noticeProps,
+        ...(actionLabel
+          ? { action: { label: actionLabel, variant: actionVariant, onClick: action(`${actionLabel} clicked`) } }
+          : undefined),
+        id: noticeId,
+        persistent: true,
+        onClose: () => setNoticeOpen(false),
+      });
+      setNoticeOpen(true);
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [noticeId],
+  );
 
   const closeOnClick = useCallback(() => {
     closeNotice(noticeId);

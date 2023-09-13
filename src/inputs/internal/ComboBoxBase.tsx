@@ -92,10 +92,14 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   // Memoize the callback functions and handle the `unset` option if provided.
   const getOptionLabel = useCallback(
     (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : props.getOptionLabel(o)),
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [props.getOptionLabel, unsetLabel],
   );
   const getOptionValue = useCallback(
     (o: O) => (unsetLabel && o === unsetOption ? (undefined as V) : props.getOptionValue(o)),
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [props.getOptionValue, unsetLabel],
   );
   const getOptionMenuLabel = useCallback(
@@ -103,6 +107,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       props.getOptionMenuLabel
         ? props.getOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption)
         : getOptionLabel(o),
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [props.getOptionValue, unsetLabel, getOptionLabel],
   );
 
@@ -292,54 +298,64 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   });
 
   // Ensure we reset if the field's values change and the user is not actively selecting options.
-  useEffect(() => {
-    if (!state.isOpen && !areArraysEqual(values, fieldState.selectedKeys)) {
-      setFieldState((prevState) => {
-        const selectedOptions = prevState.allOptions.filter((o) => values?.includes(getOptionValue(o)));
-        return {
-          ...prevState,
-          selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
-          inputValue:
-            selectedOptions.length === 1
-              ? getOptionLabel(selectedOptions[0])
-              : multiselect && selectedOptions.length === 0
-              ? nothingSelectedText
-              : "",
-          selectedOptions: selectedOptions,
-        };
-      });
-    }
-  }, [values]);
+  useEffect(
+    () => {
+      if (!state.isOpen && !areArraysEqual(values, fieldState.selectedKeys)) {
+        setFieldState((prevState) => {
+          const selectedOptions = prevState.allOptions.filter((o) => values?.includes(getOptionValue(o)));
+          return {
+            ...prevState,
+            selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
+            inputValue:
+              selectedOptions.length === 1
+                ? getOptionLabel(selectedOptions[0])
+                : multiselect && selectedOptions.length === 0
+                ? nothingSelectedText
+                : "",
+            selectedOptions: selectedOptions,
+          };
+        });
+      }
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [values],
+  );
 
-  useEffect(() => {
-    // When options are an array, then use them as-is.
-    // If options are an object, then use the `initial` array if the menu has not been opened
-    // Otherwise, use the current fieldState array options.
-    const maybeUpdatedOptions = Array.isArray(maybeOptions)
-      ? maybeOptions
-      : firstOpen.current === false
-      ? fieldState.allOptions
-      : maybeOptions.initial;
+  useEffect(
+    () => {
+      // When options are an array, then use them as-is.
+      // If options are an object, then use the `initial` array if the menu has not been opened
+      // Otherwise, use the current fieldState array options.
+      const maybeUpdatedOptions = Array.isArray(maybeOptions)
+        ? maybeOptions
+        : firstOpen.current === false
+        ? fieldState.allOptions
+        : maybeOptions.initial;
 
-    if (maybeUpdatedOptions !== fieldState.allOptions) {
-      setFieldState((prevState) => {
-        const selectedOptions = maybeUpdatedOptions.filter((o) => values?.includes(getOptionValue(o)));
-        return {
-          ...prevState,
-          selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
-          inputValue:
-            selectedOptions.length === 1
-              ? getOptionLabel(selectedOptions[0])
-              : multiselect && selectedOptions.length === 0
-              ? nothingSelectedText
-              : "",
-          selectedOptions: selectedOptions,
-          filteredOptions: maybeUpdatedOptions,
-          allOptions: maybeUpdatedOptions,
-        };
-      });
-    }
-  }, [maybeOptions]);
+      if (maybeUpdatedOptions !== fieldState.allOptions) {
+        setFieldState((prevState) => {
+          const selectedOptions = maybeUpdatedOptions.filter((o) => values?.includes(getOptionValue(o)));
+          return {
+            ...prevState,
+            selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
+            inputValue:
+              selectedOptions.length === 1
+                ? getOptionLabel(selectedOptions[0])
+                : multiselect && selectedOptions.length === 0
+                ? nothingSelectedText
+                : "",
+            selectedOptions: selectedOptions,
+            filteredOptions: maybeUpdatedOptions,
+            allOptions: maybeUpdatedOptions,
+          };
+        });
+      }
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [maybeOptions],
+  );
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
   const {

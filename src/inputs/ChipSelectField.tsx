@@ -105,20 +105,25 @@ export function ChipSelectField<O, V extends Value>(
     getKey: (item) => (isListBoxSection(item) ? item.title : getOptionValue(item)),
   });
 
-  useEffect(() => {
-    // Avoid unnecessary update of `options` on first render. We define the initial set of items based on the options in the `useListData` hook.
-    if (!firstRender.current) {
-      if (onCreateNew) {
-        // if we have the options in a section, update that section
-        listData.update("Options", { title: "Options", options });
-      } else {
-        // otherwise, reset the list completely. We could traverse through the list and update/add/remove when needed, though this is simpler for now.
-        listData.remove(...state.collection.getKeys());
-        listData.append(...options);
+  useEffect(
+    () => {
+      // Avoid unnecessary update of `options` on first render. We define the initial set of items based on the options in the `useListData` hook.
+      if (!firstRender.current) {
+        if (onCreateNew) {
+          // if we have the options in a section, update that section
+          listData.update("Options", { title: "Options", options });
+        } else {
+          // otherwise, reset the list completely. We could traverse through the list and update/add/remove when needed, though this is simpler for now.
+          listData.remove(...state.collection.getKeys());
+          listData.append(...options);
+        }
       }
-    }
-    firstRender.current = false;
-  }, [options]);
+      firstRender.current = false;
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [options],
+  );
 
   const selectChildren = useMemo(
     () =>

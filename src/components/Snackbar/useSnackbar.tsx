@@ -20,23 +20,28 @@ export interface UseSnackbarHook {
 export function useSnackbar(): UseSnackbarHook {
   const { setNotices, setOffset } = useSnackbarContext();
 
-  const onClose = useCallback((noticeId: string) => {
-    setNotices((prev) => {
-      let returnValue = prev;
+  const onClose = useCallback(
+    (noticeId: string) => {
+      setNotices((prev) => {
+        let returnValue = prev;
 
-      // check to see if the notice is still in our existing stack, if so then remove it. Otherwise it was manually closed, so return the existing value.
-      if (prev.some(({ id }) => id === noticeId)) {
-        returnValue = prev.filter(({ id }) => id !== noticeId);
-      }
+        // check to see if the notice is still in our existing stack, if so then remove it. Otherwise it was manually closed, so return the existing value.
+        if (prev.some(({ id }) => id === noticeId)) {
+          returnValue = prev.filter(({ id }) => id !== noticeId);
+        }
 
-      // For good measure, reset the snackbarId when notices array is emptied.
-      if (returnValue.length === 0) {
-        snackbarId = 1;
-      }
+        // For good measure, reset the snackbarId when notices array is emptied.
+        if (returnValue.length === 0) {
+          snackbarId = 1;
+        }
 
-      return returnValue;
-    });
-  }, []);
+        return returnValue;
+      });
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const triggerNotice = useCallback(
     (props: TriggerNoticeProps) => {

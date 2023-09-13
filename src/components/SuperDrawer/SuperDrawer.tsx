@@ -44,11 +44,16 @@ export function SuperDrawer(): ReactPortal | null {
 
   const { width = SuperDrawerWidth.Normal } = firstContent ?? {};
 
-  useEffect(() => {
-    if (headerRef.current?.childNodes.length === 0 && content) {
-      headerRef.current.appendChild(sdHeaderDiv);
-    }
-  }, [headerRef, content]);
+  useEffect(
+    () => {
+      if (headerRef.current?.childNodes.length === 0 && content) {
+        headerRef.current.appendChild(sdHeaderDiv);
+      }
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [headerRef, content],
+  );
 
   return createPortal(
     <AnimatePresence>

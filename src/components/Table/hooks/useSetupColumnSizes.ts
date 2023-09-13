@@ -50,26 +50,36 @@ export function useSetupColumnSizes<R extends Kinded>(
   );
 
   // Used to recalculate our columns sizes when columns change
-  useEffect(() => {
-    if (!calculateImmediately.current) {
-      const width = resizeRef.current?.clientWidth;
-      width && setTableAndColumnWidths(width);
-    }
-  }, [columns, setTableAndColumnWidths]);
+  useEffect(
+    () => {
+      if (!calculateImmediately.current) {
+        const width = resizeRef.current?.clientWidth;
+        width && setTableAndColumnWidths(width);
+      }
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [columns, setTableAndColumnWidths],
+  );
 
   const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
 
-  const onResize = useCallback(() => {
-    const target = resizeRef.current;
-    if (target && target.clientWidth !== tableWidth) {
-      if (calculateImmediately.current) {
-        calculateImmediately.current = false;
-        setTableAndColumnWidths(target.clientWidth);
-      } else {
-        setTableAndColumnWidthsDebounced(target.clientWidth);
+  const onResize = useCallback(
+    () => {
+      const target = resizeRef.current;
+      if (target && target.clientWidth !== tableWidth) {
+        if (calculateImmediately.current) {
+          calculateImmediately.current = false;
+          setTableAndColumnWidths(target.clientWidth);
+        } else {
+          setTableAndColumnWidthsDebounced(target.clientWidth);
+        }
       }
-    }
-  }, [tableWidth, setTableAndColumnWidths, setTableAndColumnWidthsDebounced]);
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tableWidth, setTableAndColumnWidths, setTableAndColumnWidthsDebounced],
+  );
 
   useResizeObserver({ ref: resizeRef, onResize });
 

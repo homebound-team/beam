@@ -25,7 +25,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
   // by React-Aria to keep track of item states such as focus, and provide hooks for calling those actions.
   const tree = useTreeData({
     initialItems: [items, persistentItems ? persistentItems : []].map(
-      (i, idx) => ({ label: idx === 0 ? "items" : "persistent", items: i } as MenuSection),
+      (i, idx) => ({ label: idx === 0 ? "items" : "persistent", items: i }) as MenuSection,
     ),
     getKey: (item) => camelCase(item.label),
     getChildren: (item) => (item as MenuSection).items ?? [],
@@ -80,6 +80,8 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
 
   // Bulk updates of MenuItems below. If we find this to be of sluggish performance, then we can change to be more surgical in our updating.
   // If our list of items change, update the "items" menu section. (key is based on label in `getKey` above)
+  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => filteredTree.update("items", { label: "items", items } as MenuSection), [items]);
   return (
     <FocusScope>

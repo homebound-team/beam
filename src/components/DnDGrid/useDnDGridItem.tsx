@@ -12,25 +12,30 @@ export function useDnDGridItem(props: useDnDGridItemProps) {
   const { id, itemRef } = props;
   const { dragEl, onDragHandleKeyDown } = useDnDGridContext();
 
-  const { dragItemProps, dragHandleProps } = useMemo(() => {
-    function initDraggable() {
-      if (itemRef.current) {
-        dragEl.current = itemRef.current;
+  const { dragItemProps, dragHandleProps } = useMemo(
+    () => {
+      function initDraggable() {
+        if (itemRef.current) {
+          dragEl.current = itemRef.current;
+        }
       }
-    }
 
-    return {
-      dragItemProps: { [gridItemIdKey]: id },
-      dragHandleProps: {
-        onMouseDown: initDraggable,
-        onTouchStart: initDraggable,
-        onKeyDown: (e: KeyboardEvent) => {
-          initDraggable();
-          onDragHandleKeyDown(e);
+      return {
+        dragItemProps: { [gridItemIdKey]: id },
+        dragHandleProps: {
+          onMouseDown: initDraggable,
+          onTouchStart: initDraggable,
+          onKeyDown: (e: KeyboardEvent) => {
+            initDraggable();
+            onDragHandleKeyDown(e);
+          },
         },
-      },
-    };
-  }, [dragEl, id, itemRef]);
+      };
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dragEl, id, itemRef],
+  );
 
   return { dragHandleProps, dragItemProps };
 }

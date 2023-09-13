@@ -54,9 +54,14 @@ export function ChipTextField(props: ChipTextFieldProps) {
   const fieldRef = useRef<HTMLSpanElement>(null);
   const typeScale = fieldProps?.typeScale ?? "sm";
 
-  useEffect(() => {
-    autoFocus && fieldRef.current?.focus();
-  }, []);
+  useEffect(
+    () => {
+      autoFocus && fieldRef.current?.focus();
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   // React doesn't like contentEditable because it takes the children of the node out of React's scope. This is fine in this case as it is just a text value and we are managing it.
   return (

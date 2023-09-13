@@ -154,7 +154,11 @@ export function PerfTest() {
     zeroTo(100).map((i) => ({ id: `iu:${i}`, name: `Internal User ${i}` })),
   );
   const [createValue, setCreateValue] = useState<string>(internalUsers[0].id);
+  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const onFocus = useCallback(action("onFocus"), []);
+  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const onBlur = useCallback(action("onBlur"), []);
   return (
     <ChipSelectField

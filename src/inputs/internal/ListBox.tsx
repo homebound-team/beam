@@ -71,18 +71,23 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     );
   };
 
-  useEffect(() => {
-    // Reevaluate the list height when introducing or removing the MultiSelect's options list.
-    // Do not call `onListHeightChange` on the first render. Only when the selectedKeys size has actually changed between empty and not empty.
-    if (
-      !firstRender.current &&
-      isMultiSelect &&
-      (state.selectionManager.selectedKeys.size === 0 || state.selectionManager.selectedKeys.size === 1)
-    ) {
-      onListHeightChange(virtuosoListHeight.current);
-    }
-    firstRender.current = false;
-  }, [state.selectionManager.selectedKeys.size]);
+  useEffect(
+    () => {
+      // Reevaluate the list height when introducing or removing the MultiSelect's options list.
+      // Do not call `onListHeightChange` on the first render. Only when the selectedKeys size has actually changed between empty and not empty.
+      if (
+        !firstRender.current &&
+        isMultiSelect &&
+        (state.selectionManager.selectedKeys.size === 0 || state.selectionManager.selectedKeys.size === 1)
+      ) {
+        onListHeightChange(virtuosoListHeight.current);
+      }
+      firstRender.current = false;
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.selectionManager.selectedKeys.size],
+  );
 
   return (
     <div

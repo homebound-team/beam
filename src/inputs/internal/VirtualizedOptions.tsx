@@ -42,11 +42,16 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
       : undefined;
 
   // Handle scrolling to the item in focus when navigating options via Keyboard - this should only be applied when using a "virtual focus", such as a ComboBox where the browser's focus remains in the <input /> element.
-  useEffect(() => {
-    if (scrollOnFocus && virtuosoRef.current && focusedItem?.index) {
-      virtuosoRef.current.scrollToIndex({ index: focusedItem.index, align: "center" });
-    }
-  }, [focusedItem]);
+  useEffect(
+    () => {
+      if (scrollOnFocus && virtuosoRef.current && focusedItem?.index) {
+        virtuosoRef.current.scrollToIndex({ index: focusedItem.index, align: "center" });
+      }
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-internal-frontend
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [focusedItem],
+  );
 
   return (
     <Virtuoso

@@ -17,7 +17,11 @@ export class ColumnState<R extends Kinded> {
   private visible = true;
   private expanded = false;
 
-  constructor(private states: ColumnStates<R>, storage: ColumnStorage<R>, column: GridColumnWithId<R>) {
+  constructor(
+    private states: ColumnStates<R>,
+    storage: ColumnStorage<R>,
+    column: GridColumnWithId<R>,
+  ) {
     this.column = column;
     // If the user sets `canHide: true`, we default to hidden unless they set `initVisible: true`
     this.visible = storage.wasVisible(column.id) ?? (column.canHide ? column.initVisible ?? false : true);

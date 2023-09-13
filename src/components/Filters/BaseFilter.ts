@@ -11,7 +11,10 @@ import { TestIds } from "src/utils/useTestIds";
  * detail.
  */
 export class BaseFilter<V, P extends { label?: string; defaultValue?: V }> {
-  constructor(protected key: string, protected props: P) {}
+  constructor(
+    protected key: string,
+    protected props: P,
+  ) {}
 
   get label(): string {
     return this.props.label || defaultLabel(this.key);
