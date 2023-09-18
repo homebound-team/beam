@@ -55,6 +55,7 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
   const modalRef = useRef<ModalProps | undefined>();
   const modalHeaderDiv = useMemo(() => {
     const d = document.createElement("div");
+    // necessary to make modal header draggable
     d.id = "draggable";
     return d;
   }, []);
