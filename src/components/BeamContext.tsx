@@ -53,7 +53,11 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
   // So we use refs + a tick.
   const [, tick] = useReducer((prev) => prev + 1, 0);
   const modalRef = useRef<ModalProps | undefined>();
-  const modalHeaderDiv = useMemo(() => document.createElement("div"), []);
+  const modalHeaderDiv = useMemo(() => {
+    const d = document.createElement("div");
+    d.id = "draggable";
+    return d;
+  }, []);
   const modalBodyDiv = useMemo(() => {
     const el = document.createElement("div");
     // Ensure this wrapping div takes up the full height of its container in the case of a virtualized table within.

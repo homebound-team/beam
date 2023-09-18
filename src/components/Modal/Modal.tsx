@@ -2,6 +2,7 @@ import { useResizeObserver } from "@react-aria/utils";
 import { MutableRefObject, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { FocusScope, OverlayContainer, useDialog, useModal, useOverlay, usePreventScroll } from "react-aria";
 import { createPortal } from "react-dom";
+import Draggable, { DraggableEvent } from "react-draggable";
 import { AutoSaveStatusProvider } from "src/components";
 import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
@@ -102,44 +103,53 @@ export function Modal(props: ModalProps) {
     [modalBodyRef, modalFooterRef, modalHeaderRef],
   );
 
+  const event = (evt: DraggableEvent) => {
+    if ((evt.target as HTMLElement).id !== "draggable") {
+      return false;
+    }
+  };
+
   return (
     <OverlayContainer>
       <AutoSaveStatusProvider>
         <div css={Css.underlay.z4.$} {...underlayProps} {...testId.underlay}>
           <FocusScope contain restoreFocus autoFocus>
-            <div
-              css={
-                Css.br24.bgWhite.bshModal.overflowHidden
-                  .maxh("90vh")
-                  .df.fdc.wPx(width)
-                  .mhPx(defaultMinHeight)
-                  .if(isFixedHeight)
-                  .hPx(height).$
-              }
-              ref={ref}
-              {...overlayProps}
-              {...dialogProps}
-              {...modalProps}
-              {...testId}
-            >
-              {/* Setup three children (header, content, footer), and flex grow the content. */}
-              <header css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bGray200.$}>
-                <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
-                <span css={Css.fs0.pl1.$}>
-                  <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
-                </span>
-              </header>
-              <main
-                ref={modalBodyRef}
-                css={Css.fg1.overflowYAuto.if(hasScroll).bb.bGray200.if(!!forceScrolling).overflowYScroll.$}
+            <Draggable onDrag={event} onMouseDown={event} onStart={event} onStop={event}>
+              <div
+                id="draggable"
+                css={
+                  Css.br24.bgWhite.bshModal.overflowHidden
+                    .maxh("90vh")
+                    .df.fdc.wPx(width)
+                    .mhPx(defaultMinHeight)
+                    .if(isFixedHeight)
+                    .hPx(height).$
+                }
+                ref={ref}
+                {...overlayProps}
+                {...dialogProps}
+                {...modalProps}
+                {...testId}
               >
-                {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
-                {content}
-              </main>
-              <footer css={Css.fs0.$}>
-                <div ref={modalFooterRef} />
-              </footer>
-            </div>
+                {/* Setup three children (header, content, footer), and flex grow the content. */}
+                <header id="draggable" css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bGray200.$}>
+                  <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
+                  <span css={Css.fs0.pl1.$}>
+                    <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
+                  </span>
+                </header>
+                <main
+                  ref={modalBodyRef}
+                  css={Css.fg1.overflowYAuto.if(hasScroll).bb.bGray200.if(!!forceScrolling).overflowYScroll.$}
+                >
+                  {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
+                  {content}
+                </main>
+                <footer css={Css.fs0.$}>
+                  <div ref={modalFooterRef} />
+                </footer>
+              </div>
+            </Draggable>
           </FocusScope>
         </div>
       </AutoSaveStatusProvider>
