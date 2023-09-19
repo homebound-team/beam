@@ -104,7 +104,7 @@ export function Modal(props: ModalProps) {
   );
 
   const event = (evt: DraggableEvent) => {
-    if ((evt.target as HTMLElement).id !== "draggable") {
+    if ((evt.target as HTMLElement).id.includes("draggable")) {
       return false;
     }
   };
@@ -116,7 +116,7 @@ export function Modal(props: ModalProps) {
           <FocusScope contain restoreFocus autoFocus>
             <Draggable onDrag={event} onMouseDown={event} onStart={event} onStop={event}>
               <div
-                id="draggable"
+                id="draggable_container"
                 css={
                   Css.br24.bgWhite.bshModal.overflowHidden
                     .maxh("90vh")
@@ -130,9 +130,9 @@ export function Modal(props: ModalProps) {
                 {...dialogProps}
                 {...modalProps}
                 {...testId}
-              >
+              >/
                 {/* Setup three children (header, content, footer), and flex grow the content. */}
-                <header id="draggable" css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bGray200.$}>
+                <header id="draggable_header" css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bGray200.$}>
                   <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
                   <span css={Css.fs0.pl1.$}>
                     <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
