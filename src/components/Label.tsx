@@ -10,6 +10,7 @@ interface LabelProps {
   // If set, it is recommended to wrap in an element with `position: relative;` set, as the label will have an absolute position.
   hidden?: boolean;
   contrast?: boolean;
+  multiline?: boolean;
 }
 
 /** An internal helper component for rendering form labels. */
@@ -25,9 +26,14 @@ export const Label = React.memo((props: LabelProps) => {
 });
 
 /** Used for showing labels within text fields. */
-export function InlineLabel({ labelProps, label, contrast, ...others }: LabelProps) {
+export function InlineLabel({ labelProps, label, contrast, multiline = false, ...others }: LabelProps) {
+  console.log("multiline", multiline);
   return (
-    <label {...labelProps} {...others} css={Css.smMd.nowrap.gray900.prPx(4).add("color", "currentColor").$}>
+    <label
+      {...labelProps}
+      {...others}
+      css={Css.smMd.nowrap.gray900.prPx(4).add("color", "currentColor").asc.if(multiline).asfs.pt1.$}
+    >
       {label}:
     </label>
   );

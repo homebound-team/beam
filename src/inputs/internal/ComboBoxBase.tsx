@@ -58,6 +58,8 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
    */
   unsetLabel?: string;
   hideErrorMessage?: boolean;
+  /* Allows input to wrap to multiple lines */
+  multiline?: boolean;
 }
 
 /**

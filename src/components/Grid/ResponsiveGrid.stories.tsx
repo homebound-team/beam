@@ -161,6 +161,7 @@ function ResizableGridItem({ item, sortable }: { item: GridItem; sortable: boole
         placeholder="Add text to effect element's height"
         value={text}
         onChange={(v) => setText(v ?? "")}
+        labelStyle="hidden"
       />
     </div>
   );
