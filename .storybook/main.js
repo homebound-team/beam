@@ -10,6 +10,7 @@ module.exports = {
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
     "storybook-addon-designs",
+    "@storybook/addon-mdx-gfm",
   ],
 
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
@@ -62,8 +63,4 @@ module.exports = {
       strictMode: false,
     },
   },
-
-  docs: {
-    autodocs: true
-  }
 };
