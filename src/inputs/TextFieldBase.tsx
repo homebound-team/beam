@@ -200,8 +200,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               data-readonly="true"
               {...tid}
             >
-              {!multiline && labelStyle === "inline" && label && (
-                <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
+              {labelStyle === "inline" && label && (
+                <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
               {multiline
                 ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
@@ -225,15 +225,15 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 ...(showHover ? fieldStyles.hover : {}),
                 // Only show error styles if the field is not disabled, following the pattern that the error message is also hidden
                 ...(errorMsg && !inputProps.disabled ? fieldStyles.error : {}),
-                ...Css.if(multiline).aifs.px0.mhPx(textAreaMinHeight).$,
+                ...Css.if(multiline).aifs.mhPx(textAreaMinHeight).$,
               }}
               {...hoverProps}
               ref={inputWrapRef as any}
             >
-              {!multiline && labelStyle === "inline" && label && (
-                <InlineLabel labelProps={labelProps} label={label} {...tid.label} />
+              {labelStyle === "inline" && label && (
+                <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
-              {!multiline && startAdornment && <span css={Css.df.aic.fs0.br4.pr1.$}>{startAdornment}</span>}
+              {startAdornment && <span css={Css.df.aic.asc.fs0.br4.pr1.$}>{startAdornment}</span>}
               <ElementType
                 {...mergeProps(
                   inputProps,
@@ -247,7 +247,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   ...fieldStyles.input,
                   ...(inputProps.disabled ? fieldStyles.disabled : {}),
                   ...(showHover ? fieldStyles.hover : {}),
-                  ...(multiline ? Css.h100.p1.add("resize", "none").$ : Css.truncate.$),
+                  ...(multiline ? Css.h100.py1.add("resize", "none").$ : Css.truncate.$),
                   ...xss,
                 }}
                 {...tid}
@@ -264,11 +264,11 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 />
               )}
               {errorInTooltip && errorMsg && !hideErrorMessage && (
-                <span css={Css.df.aic.pl1.fs0.$}>
+                <span css={Css.df.aic.asc.pl1.fs0.$}>
                   <Icon icon="error" color={Palette.Red600} tooltip={errorMsg} />
                 </span>
               )}
-              {!multiline && endAdornment && <span css={Css.df.aic.pl1.fs0.$}>{endAdornment}</span>}
+              {endAdornment && <span css={Css.df.aic.asc.pl1.fs0.$}>{endAdornment}</span>}
             </div>
           ),
         })}

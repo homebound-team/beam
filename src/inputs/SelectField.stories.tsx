@@ -326,7 +326,7 @@ export function InTable() {
 }
 const people: InternalUser[] = zeroTo(10).map((i) => ({
   id: `iu:${i + 1}`,
-  name: `Test user ${i + 1}`.repeat((i % 2) + 1),
+  name: `Test user ${i + 1} `.repeat((i % 5) + 1),
 }));
 const rowData: Request[] = zeroTo(10).map((i) => ({
   id: `r:${i + 1}`,

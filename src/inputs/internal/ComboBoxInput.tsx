@@ -1,9 +1,18 @@
-import React, { InputHTMLAttributes, Key, LabelHTMLAttributes, MutableRefObject, ReactNode, useState } from "react";
+import React, {
+  ChangeEvent,
+  InputHTMLAttributes,
+  Key,
+  LabelHTMLAttributes,
+  MutableRefObject,
+  ReactNode,
+  useState,
+} from "react";
 import { mergeProps } from "react-aria";
 import { ComboBoxState } from "react-stately";
 import { Icon } from "src/components";
-import { PresentationFieldProps } from "src/components/PresentationContext";
+import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
+import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
 import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
@@ -36,6 +45,8 @@ interface ComboBoxInputProps<O, V extends Value> extends PresentationFieldProps 
   resetField: VoidFunction;
   hideErrorMessage?: boolean;
   isTree?: boolean;
+  /* Allows input to wrap to multiple lines */
+  multiline?: boolean;
 }
 
 export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V>) {
@@ -57,9 +68,16 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
     resetField,
     isTree,
     listBoxRef,
+    inputRef,
+    inputWrapRef,
+    multiline = false,
     ...otherProps
   } = props;
 
+  const { wrap = false } = usePresentationContext();
+
+  // Allow the field to wrap whether the caller has explicitly set `multiline=true` or the `PresentationContext.wrap=true`
+  const allowWrap = wrap || multiline;
   const { collapsedKeys, setCollapsedKeys } = useTreeSelectFieldProvider();
 
   const [isFocused, setIsFocused] = useState(false);
@@ -69,9 +87,15 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
   const showFieldDecoration =
     (!isMultiSelect || (isMultiSelect && !isFocused)) && fieldDecoration && selectedOptions.length === 1;
 
+  const multilineProps = allowWrap ? { textAreaMinHeight: 0, multiline: true } : {};
+  useGrowingTextField({ disabled: !allowWrap, inputRef, inputWrapRef, value: inputProps.value });
+
   return (
     <TextFieldBase
       {...otherProps}
+      {...multilineProps}
+      inputRef={inputRef}
+      inputWrapRef={inputWrapRef}
       errorMsg={errorMsg}
       contrast={contrast}
       xss={otherProps.labelStyle !== "inline" && !inputProps.readOnly ? Css.fw5.$ : {}}
@@ -161,6 +185,13 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
             }
 
             inputProps.onKeyDown && inputProps.onKeyDown(e);
+          },
+          onChange: (e: ChangeEvent<HTMLInputElement>) => {
+            // Prevent user from entering any content that has new line characters.
+            const target = e.target as unknown as HTMLTextAreaElement;
+            target.value = target.value.replace(/[\n\r]/g, "");
+            // Call existing onChange handler if any.
+            inputProps.onChange && inputProps.onChange(e);
           },
           onBlur: (e: React.FocusEvent) => {
             // Do not call onBlur if readOnly or interacting within the input wrapper (such as the menu trigger button), or anything within the listbox.
