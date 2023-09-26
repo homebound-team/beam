@@ -234,7 +234,7 @@ export function getSelected(select: HTMLElement): string[] | string | undefined 
     throw new Error("Beam getSelected helper does not support <select> elements");
   }
 
-  if (!isInputElement(select) && select.dataset.readonly === "true") {
+  if (!isInputOrTextAreaElement(select) && select.dataset.readonly === "true") {
     // For read-only fields that render as a 'div'
     return select.textContent ?? undefined;
   }
@@ -270,13 +270,13 @@ function findListBox(select: HTMLElement): HTMLElement {
   return document.getElementById(listboxId) || fail("listbox not found");
 }
 
-function assertListBoxInput(select: HTMLElement): select is HTMLInputElement {
+function assertListBoxInput(select: HTMLElement): select is HTMLInputElement | HTMLTextAreaElement {
   if (isSelectElement(select)) {
     throw new Error("Beam getOptions helper does not support <select> elements");
   }
-  if (!isInputElement(select)) {
+  if (!isInputOrTextAreaElement(select)) {
     throw new Error(
-      `Expected element to be INPUT, but got ${select.nodeName}. This field may be read-only. In that case we cannot get the list of options`,
+      `Expected element to be INPUT or TEXTAREA, but got ${select.nodeName}. This field may be read-only. In that case we cannot get the list of options`,
     );
   }
   return true;
@@ -286,6 +286,6 @@ function isSelectElement(element: HTMLElement): element is HTMLSelectElement {
   return element.nodeName === "SELECT";
 }
 
-function isInputElement(element: HTMLElement): element is HTMLInputElement {
-  return element.nodeName === "INPUT";
+function isInputOrTextAreaElement(element: HTMLElement): element is HTMLInputElement | HTMLTextAreaElement {
+  return element.nodeName === "INPUT" || element.nodeName === "TEXTAREA";
 }

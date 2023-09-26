@@ -281,4 +281,34 @@ describe("rtl", () => {
     // Then the onSelect handler is called with the correct value
     expect(onSelect).toHaveBeenCalledWith({ options: [{ id: "1.2", name: "One Two" }], values: ["1.2"] });
   });
+
+  it("can use select helpers on multiline SelectField", async () => {
+    const onSelect = jest.fn();
+    // Given the SelectField is multline
+    const r = await render(
+      <SelectField
+        label="Number"
+        value={undefined}
+        onSelect={onSelect}
+        options={[
+          { id: "1", name: "One" },
+          { id: "2", name: "Two" },
+          { id: "3", name: "Three" },
+        ]}
+        multiline
+      />,
+    );
+    // Then the getOptions helper returns the correct options
+    expect(getOptions(r.number)).toEqual(["One", "Two", "Three"]);
+    // When selecting an option
+    select(r.number, "2");
+    // Then the onSelect handler is called with the correct value
+    expect(onSelect).toHaveBeenCalledWith("2", { id: "2", name: "Two" });
+    // And the getSelected helper returns the correct value
+    expect(getSelected(r.number)).toBe("Two");
+    // When selecting that option again
+    select(r.number, "2");
+    // Then the onSelect handler is not called again - no changes occurred.
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
 });
