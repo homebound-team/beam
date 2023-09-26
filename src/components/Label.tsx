@@ -27,7 +27,6 @@ export const Label = React.memo((props: LabelProps) => {
 
 /** Used for showing labels within text fields. */
 export function InlineLabel({ labelProps, label, contrast, multiline = false, ...others }: LabelProps) {
-  console.log("multiline", multiline);
   return (
     <label
       {...labelProps}

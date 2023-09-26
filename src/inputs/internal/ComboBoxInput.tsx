@@ -74,7 +74,10 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
     ...otherProps
   } = props;
 
-  const { wrap = multiline } = usePresentationContext();
+  const { wrap = false } = usePresentationContext();
+
+  // Allow the field to wrap whether the caller has explicitly set `multiline=true` or the `PresentationContext.wrap=true`
+  const allowWrap = wrap || multiline;
   const { collapsedKeys, setCollapsedKeys } = useTreeSelectFieldProvider();
 
   const [isFocused, setIsFocused] = useState(false);
@@ -84,12 +87,8 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
   const showFieldDecoration =
     (!isMultiSelect || (isMultiSelect && !isFocused)) && fieldDecoration && selectedOptions.length === 1;
 
-  // To Discuss: Do we want to make `multiline = true` the default behavior?
-  // If we do, we can infer whether we allow wrapping or not based on the PresentationProp. This will currently only be set for "rowHeight: 'fixed'" GridTable styles.
-  // Or, we can keep our existing default behavior, and allow the user to set `multiline = true` if they want to allow wrapping.
-  // If we change the default then we could have unexpected text wrapping in places like Filters.
-  const multilineProps = wrap ? { textAreaMinHeight: 0, multiline: true } : {};
-  useGrowingTextField({ disabled: !wrap, inputRef, inputWrapRef, value: inputProps.value });
+  const multilineProps = allowWrap ? { textAreaMinHeight: 0, multiline: true } : {};
+  useGrowingTextField({ disabled: !allowWrap, inputRef, inputWrapRef, value: inputProps.value });
 
   return (
     <TextFieldBase
