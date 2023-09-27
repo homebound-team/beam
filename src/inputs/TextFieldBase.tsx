@@ -207,7 +207,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               )}
               {multiline
                 ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
-                    <p key={i}>
+                    <p key={i} css={Css.py1.$}>
                       {p.split("\n").map((sentence, j) => (
                         <span key={j}>
                           {sentence}
