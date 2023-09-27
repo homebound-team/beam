@@ -142,9 +142,11 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
           .mhPx(compactFieldHeight - maybeSmaller).$),
     },
     input: {
-      ...Css.w100.mw0.outline0.fg1.bgColor(bgColor).if(multiline).br4.$,
+      ...Css.w100.mw0.outline0.fg1.bgColor(bgColor).$,
       // Not using Truss's inline `if` statement here because `addIn` properties do not respect the if statement.
       ...(contrast && Css.addIn("&::selection", Css.bgGray800.$).$),
+      // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields
+      ...(multiline ? Css.br4.h100.pyPx(compact ? 7 : 11).add("resize", "none").$ : Css.truncate.$),
     },
     hover: Css.bgColor(hoverBgColor).if(contrast).bGray600.$,
     focus: Css.bBlue700.if(contrast).bBlue500.$,
@@ -205,7 +207,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               )}
               {multiline
                 ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
-                    <p key={i} css={Css.my1.$}>
+                    <p key={i}>
                       {p.split("\n").map((sentence, j) => (
                         <span key={j}>
                           {sentence}
@@ -247,7 +249,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   ...fieldStyles.input,
                   ...(inputProps.disabled ? fieldStyles.disabled : {}),
                   ...(showHover ? fieldStyles.hover : {}),
-                  ...(multiline ? Css.h100.py1.add("resize", "none").$ : Css.truncate.$),
                   ...xss,
                 }}
                 {...tid}
