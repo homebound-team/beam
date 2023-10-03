@@ -53,7 +53,7 @@ export function IconCard(props: IconCardProps) {
     title: resolveTooltip(isDisabled, tooltip),
     placement: "top",
     children: (
-      <button css={styles} {...hoverProps} onClick={isDisabled ? noop : toggleState.toggle} {...tid}>
+      <button css={styles} {...hoverProps} onClick={toggleState.toggle} disabled={isDisabled} {...tid}>
         <VisuallyHidden>
           <input ref={ref} {...inputProps} {...tid.value} />
         </VisuallyHidden>
