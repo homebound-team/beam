@@ -28,7 +28,6 @@ export interface IconCardGroupProps extends Pick<PresentationFieldProps, "labelS
   values: string[];
   errorMsg?: string;
   helperText?: string | ReactNode;
-  columns?: number;
   disabled?: boolean;
 }
 
@@ -41,7 +40,6 @@ export function IconCardGroup(props: IconCardGroupProps) {
     values,
     errorMsg,
     helperText,
-    columns = 1,
     disabled: isDisabled = false,
   } = props;
 
@@ -56,7 +54,7 @@ export function IconCardGroup(props: IconCardGroupProps) {
           <Label label={label} {...labelProps} {...tid.label} />
         </div>
       )}
-      <div css={Css.dg.gtc(`repeat(${columns}, 130px)`).gap2.$}>
+      <div css={Css.df.gap2.add({ flexWrap: "wrap" }).$}>
         {options.map((option) => {
           const { icon, label, disabled } = option;
           const isSelected = state.isSelected(option.value);

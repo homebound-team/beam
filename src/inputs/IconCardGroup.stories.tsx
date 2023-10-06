@@ -1,7 +1,8 @@
 import { Meta } from "@storybook/react";
 import { IconCardGroup, IconCardGroupItemOption, IconCardGroupProps } from "./IconCardGroup";
-import { Chips, IconProps } from "src/components";
+import { Chips } from "src/components";
 import { useState } from "react";
+import { Css } from "src/Css";
 
 export default {
   component: IconCardGroup,
@@ -22,19 +23,14 @@ export function Default() {
   return (
     <div>
       <Chips values={values} />
-      <IconCardGroup
-        label="Icon Card Group"
-        // options={Object.values(IconCardGroupValues).map((value, i) => ({
-        //   icon: valuesToIconMap[value],
-        //   label: value,
-        //   value,
-        //   disabled: i === 2, // disable the third option
-        // }))}
-        options={categories}
-        onChange={(values) => setValues(values)}
-        values={values}
-        columns={3}
-      />
+      <div css={Css.df.wPx(500).$}>
+        <IconCardGroup
+          label="Icon Card Group"
+          options={categories}
+          onChange={(values) => setValues(values)}
+          values={values}
+        />
+      </div>
     </div>
   );
 }
