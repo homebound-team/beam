@@ -14,6 +14,7 @@ export * from "./BoundSwitchField";
 export * from "./BoundTextAreaField";
 export * from "./BoundTextField";
 export * from "./BoundToggleChipGroupField";
+export * from "./BoundTreeSelectField";
 export * from "./FormHeading";
 export * from "./FormLines";
 export * from "./StaticField";
