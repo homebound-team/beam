@@ -115,7 +115,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   const isReadOnly = !!readOnly;
 
   const [fieldState, setFieldState] = useState<FieldState<O>>(() => {
-    const initOptions = Array.isArray(maybeOptions) ? maybeOptions : asArray(maybeOptions.initial);
+    const initOptions = Array.isArray(maybeOptions) ? maybeOptions : asArray(maybeOptions.current);
     const selectedOptions = initOptions.filter((o) => values.includes(getOptionValue(o)));
     return {
       selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
@@ -320,7 +320,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     ? maybeOptions
     : firstOpen.current === false && !fieldState.optionsLoading
     ? maybeOptions.options
-    : maybeOptions.initial;
+    : maybeOptions.current;
 
   useEffect(
     () => {
@@ -453,7 +453,7 @@ export type OptionsOrLoad<O> =
   | O[]
   | {
       /** The initial option to show before the user interacts with the dropdown. */
-      initial: O | undefined;
+      current: O | undefined;
       /** Fired when the user interacts with the dropdown, to load the real options. */
       load: () => Promise<unknown>;
       /** The full list of options, after load() has been fired. */

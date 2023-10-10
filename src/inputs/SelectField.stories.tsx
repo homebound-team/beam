@@ -233,7 +233,7 @@ export function PerfTest() {
       onSelect={setSelectedValue}
       errorMsg={selectedValue !== undefined ? "" : "Select an option. Plus more error text to force it to wrap."}
       options={{
-        initial: loadTestOptions[2],
+        current: loadTestOptions[2],
         load: async () => {
           await sleep(1500);
           setLoaded(loadTestOptions);
@@ -258,7 +258,7 @@ export function LazyLoadStateFields() {
         onSelect={setSelectedValue}
         unsetLabel={"-"}
         options={{
-          initial: loadTestOptions.find((o) => o.id === selectedValue)!,
+          current: loadTestOptions.find((o) => o.id === selectedValue)!,
           load: async () => {
             await sleep(1500);
             setLoaded(loadTestOptions);
@@ -272,7 +272,7 @@ export function LazyLoadStateFields() {
         onSelect={setSelectedValue}
         unsetLabel={"-"}
         options={{
-          initial: loadTestOptions.find((o) => o.id === selectedValue)!,
+          current: loadTestOptions.find((o) => o.id === selectedValue)!,
           load: async () => {
             await sleep(1500);
             setLoaded(loadTestOptions);
@@ -294,7 +294,7 @@ export function LoadingState() {
       value={selectedValue}
       onSelect={setSelectedValue}
       options={{
-        initial: loadTestOptions[2],
+        current: loadTestOptions[2],
         load: async () => {
           await sleep(5000);
           setLoaded(loadTestOptions);

@@ -188,7 +188,7 @@ describe("SelectFieldTest", () => {
           label="Age"
           value="1"
           options={{
-            initial: options[0],
+            current: options[0],
             load: async () => setLoaded(options),
             options: loaded,
           }}
@@ -322,7 +322,7 @@ describe("SelectFieldTest", () => {
           value="1"
           unsetLabel="None"
           options={{
-            initial: labelValueOptions[0],
+            current: labelValueOptions[0],
             load: async () => setLoaded(labelValueOptions),
             options: loaded,
           }}
@@ -473,7 +473,7 @@ describe("SelectFieldTest", () => {
           onSelect={setSelected}
           unsetLabel={"-"}
           options={{
-            initial: init,
+            current: init,
             load: async () => {
               await sleep(1500);
               setLoaded(props.options as O[]);
@@ -487,7 +487,7 @@ describe("SelectFieldTest", () => {
           onSelect={setSelected}
           unsetLabel={"-"}
           options={{
-            initial: init,
+            current: init,
             load: async () => {
               await sleep(1500);
               setLoaded(props.options as O[]);

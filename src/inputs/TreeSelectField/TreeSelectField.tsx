@@ -123,7 +123,7 @@ interface CollapsedChildrenState<O, V extends Value> {
 export const CollapsedContext = React.createContext<CollapsedChildrenState<any, any>>({
   collapsedKeys: [],
   setCollapsedKeys: () => {},
-  getOptionValue: () => ({}) as any,
+  getOptionValue: () => ({} as any),
 });
 
 function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, V>) {
@@ -147,7 +147,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
-  const initialOptions = Array.isArray(options) ? options : options.initial;
+  const initialOptions = Array.isArray(options) ? options : options.current;
   const { contains } = useFilter({ sensitivity: "base" });
 
   const { collapsedKeys } = useTreeSelectFieldProvider();
