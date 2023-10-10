@@ -189,7 +189,10 @@ describe("SelectFieldTest", () => {
           value="1"
           options={{
             current: options[0],
-            load: async () => setLoaded(options),
+            load: async () => {
+              await sleep(0);
+              setLoaded(options);
+            },
             options: loaded,
           }}
           onSelect={() => {}}
@@ -344,13 +347,27 @@ describe("SelectFieldTest", () => {
   it("can initially be set to the 'unsetLabel' option", async () => {
     // Given a Select Field with the value set to `undefined`
     const r = await render(
-      <TestSelectField
+      <SelectField
+        label="Age"
+        value={undefined as string | undefined}
+        unsetLabel="None"
+        options={options}
+        onSelect={() => {}}
+      />,
+    );
+    // The input value will be set to the `unsetLabel`
+    expect(r.age).toHaveValue("None");
+  });
+
+  it("can initially be set to the 'unsetLabel' option when lazy loading options", async () => {
+    // Given a Select Field with the value set to `undefined`
+    const r = await render(
+      <SelectField<HasIdAndName, string>
         label="Age"
         value={undefined}
         unsetLabel="None"
-        options={labelValueOptions}
-        getOptionLabel={(o) => o.label}
-        getOptionValue={(o) => o.value}
+        options={{ current: undefined, load: async () => {}, options: undefined }}
+        onSelect={() => {}}
       />,
     );
     // The input value will be set to the `unsetLabel`
