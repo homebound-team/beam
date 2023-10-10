@@ -115,7 +115,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   const isReadOnly = !!readOnly;
 
   const [fieldState, setFieldState] = useState<FieldState<O>>(() => {
-    const initOptions = Array.isArray(maybeOptions) ? maybeOptions : maybeOptions.initial ? [maybeOptions.initial] : [];
+    const initOptions = Array.isArray(maybeOptions) ? maybeOptions : asArray(maybeOptions.initial);
     const selectedOptions = initOptions.filter((o) => values.includes(getOptionValue(o)));
     return {
       selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
@@ -326,11 +326,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     () => {
       // We leave `maybeOptions.initial` as a non-array so that it's stable, but now that we're inside the
       // useEffect, array-ize it if needed.
-      const maybeUpdatedArray = Array.isArray(maybeUpdatedOptions)
-        ? maybeUpdatedOptions
-        : maybeUpdatedOptions
-        ? [maybeUpdatedOptions]
-        : [];
+      const maybeUpdatedArray = asArray(maybeUpdatedOptions);
       if (maybeUpdatedArray !== fieldState.allOptions) {
         setFieldState((prevState) => {
           const selectedOptions = maybeUpdatedArray.filter((o) => values?.includes(getOptionValue(o)));
@@ -461,7 +457,7 @@ export type OptionsOrLoad<O> =
       /** Fired when the user interacts with the dropdown, to load the real options. */
       load: () => Promise<unknown>;
       /** The full list of options, after load() has been fired. */
-      options: O[];
+      options: O[] | undefined;
     };
 
 type UnsetOption = { id: undefined; name: string };
@@ -489,8 +485,8 @@ export function initializeOptions<O>(options: OptionsOrLoad<O>, unsetLabel: stri
   return { ...options, options: getOptionsWithUnset(unsetLabel, options.options) };
 }
 
-function getOptionsWithUnset<O>(unsetLabel: string, options: O[]): O[] {
-  return [unsetOption as unknown as O, ...options];
+function getOptionsWithUnset<O>(unsetLabel: string, options: O[] | undefined): O[] {
+  return [unsetOption as unknown as O, ...(options ? options : [])];
 }
 
 /** A marker option to automatically add an "Unset" option to the start of options. */
@@ -504,4 +500,8 @@ export function disabledOptionToKeyedTuple(
   } else {
     return [valueToKey(disabledOption), undefined];
   }
+}
+
+function asArray<E>(arrayOrElement: E[] | E | undefined): E[] {
+  return Array.isArray(arrayOrElement) ? arrayOrElement : arrayOrElement ? [arrayOrElement] : [];
 }
