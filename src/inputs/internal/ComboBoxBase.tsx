@@ -12,6 +12,7 @@ import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { areArraysEqual } from "src/utils";
 
+/** Base props for either `SelectField` or `MultiSelectField`. */
 export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => string | ReactNode;
@@ -85,6 +86,9 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     disabledOptions,
     borderless,
     unsetLabel,
+    getOptionLabel: propOptionLabel,
+    getOptionValue: propOptionValue,
+    getOptionMenuLabel: propOptionMenuLabel,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
@@ -93,25 +97,17 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   const maybeOptions = useMemo(() => initializeOptions(options, unsetLabel), [options, unsetLabel]);
   // Memoize the callback functions and handle the `unset` option if provided.
   const getOptionLabel = useCallback(
-    (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : props.getOptionLabel(o)),
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.getOptionLabel, unsetLabel],
+    (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : propOptionLabel(o)),
+    [propOptionLabel, unsetLabel],
   );
   const getOptionValue = useCallback(
-    (o: O) => (unsetLabel && o === unsetOption ? (undefined as V) : props.getOptionValue(o)),
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.getOptionValue, unsetLabel],
+    (o: O) => (unsetLabel && o === unsetOption ? (undefined as V) : propOptionValue(o)),
+    [propOptionValue, unsetLabel],
   );
   const getOptionMenuLabel = useCallback(
     (o: O) =>
-      props.getOptionMenuLabel
-        ? props.getOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption)
-        : getOptionLabel(o),
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.getOptionValue, unsetLabel, getOptionLabel],
+      propOptionMenuLabel ? propOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption) : getOptionLabel(o),
+    [propOptionMenuLabel, unsetLabel, getOptionLabel],
   );
 
   const { contains } = useFilter({ sensitivity: "base" });
@@ -119,7 +115,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   const isReadOnly = !!readOnly;
 
   const [fieldState, setFieldState] = useState<FieldState<O>>(() => {
-    const initOptions = Array.isArray(maybeOptions) ? maybeOptions : maybeOptions.initial;
+    const initOptions = Array.isArray(maybeOptions) ? maybeOptions : asArray(maybeOptions.current);
     const selectedOptions = initOptions.filter((o) => values.includes(getOptionValue(o)));
     return {
       selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
@@ -218,15 +214,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   async function maybeInitLoad() {
     if (!Array.isArray(maybeOptions)) {
       setFieldState((prevState) => ({ ...prevState, optionsLoading: true }));
-      const loadedOptions = (await maybeOptions.load()).options;
-      // Ensure the `unset` option is prepended to the top of the list if `unsetLabel` was provided
-      const options = !unsetLabel ? loadedOptions : getOptionsWithUnset(unsetLabel, loadedOptions);
-      setFieldState((prevState) => ({
-        ...prevState,
-        filteredOptions: options,
-        allOptions: options,
-        optionsLoading: false,
-      }));
+      await maybeOptions.load();
+      setFieldState((prevState) => ({ ...prevState, optionsLoading: false }));
     }
   }
 
@@ -324,20 +313,23 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     [values],
   );
 
+  // When options are an array, then use them as-is.
+  // If options are an object, then use the `initial` array if the menu has not been opened
+  // Otherwise, use the current fieldState array options.
+  const maybeUpdatedOptions = Array.isArray(maybeOptions)
+    ? maybeOptions
+    : firstOpen.current === false && !fieldState.optionsLoading
+    ? maybeOptions.options
+    : maybeOptions.current;
+
   useEffect(
     () => {
-      // When options are an array, then use them as-is.
-      // If options are an object, then use the `initial` array if the menu has not been opened
-      // Otherwise, use the current fieldState array options.
-      const maybeUpdatedOptions = Array.isArray(maybeOptions)
-        ? maybeOptions
-        : firstOpen.current === false
-        ? fieldState.allOptions
-        : maybeOptions.initial;
-
-      if (maybeUpdatedOptions !== fieldState.allOptions) {
+      // We leave `maybeOptions.initial` as a non-array so that it's stable, but now that we're inside the
+      // useEffect, array-ize it if needed.
+      const maybeUpdatedArray = asArray(maybeUpdatedOptions);
+      if (maybeUpdatedArray !== fieldState.allOptions) {
         setFieldState((prevState) => {
-          const selectedOptions = maybeUpdatedOptions.filter((o) => values?.includes(getOptionValue(o)));
+          const selectedOptions = maybeUpdatedArray.filter((o) => values?.includes(getOptionValue(o)));
           return {
             ...prevState,
             selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
@@ -348,15 +340,16 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
                 ? nothingSelectedText
                 : "",
             selectedOptions: selectedOptions,
-            filteredOptions: maybeUpdatedOptions,
-            allOptions: maybeUpdatedOptions,
+            filteredOptions: maybeUpdatedArray,
+            allOptions: maybeUpdatedArray,
           };
         });
       }
     },
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // I started working on fixing this deps array, but seems like `getOptionLabel` & friends
+    // would very rarely be stable anyway, so going to hold off on further fixes for now...
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [maybeOptions],
+    [maybeUpdatedOptions, getOptionLabel, getOptionValue],
   );
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
@@ -454,7 +447,19 @@ type FieldState<O> = {
   allOptions: O[];
   optionsLoading: boolean;
 };
-export type OptionsOrLoad<O> = O[] | { initial: O[]; load: () => Promise<{ options: O[] }> };
+
+/** Allows lazy-loading select fields, which is useful for pages w/lots of fields the user may not actually use. */
+export type OptionsOrLoad<O> =
+  | O[]
+  | {
+      /** The initial option to show before the user interacts with the dropdown. */
+      current: O | undefined;
+      /** Fired when the user interacts with the dropdown, to load the real options. */
+      load: () => Promise<unknown>;
+      /** The full list of options, after load() has been fired. */
+      options: O[] | undefined;
+    };
+
 type UnsetOption = { id: undefined; name: string };
 
 function getInputValue<O>(
@@ -474,18 +479,17 @@ export function initializeOptions<O>(options: OptionsOrLoad<O>, unsetLabel: stri
   if (!unsetLabel) {
     return options;
   }
-
   if (Array.isArray(options)) {
     return getOptionsWithUnset(unsetLabel, options);
   }
-
-  return { ...options, initial: getOptionsWithUnset(unsetLabel, options.initial) };
+  return { ...options, options: getOptionsWithUnset(unsetLabel, options.options) };
 }
 
-function getOptionsWithUnset<O>(unsetLabel: string, options: O[]): O[] {
-  return [unsetOption as unknown as O, ...options];
+function getOptionsWithUnset<O>(unsetLabel: string, options: O[] | undefined): O[] {
+  return [unsetOption as unknown as O, ...(options ? options : [])];
 }
 
+/** A marker option to automatically add an "Unset" option to the start of options. */
 export const unsetOption = {};
 
 export function disabledOptionToKeyedTuple(
@@ -496,4 +500,8 @@ export function disabledOptionToKeyedTuple(
   } else {
     return [valueToKey(disabledOption), undefined];
   }
+}
+
+function asArray<E>(arrayOrElement: E[] | E | undefined): E[] {
+  return Array.isArray(arrayOrElement) ? arrayOrElement : arrayOrElement ? [arrayOrElement] : [];
 }

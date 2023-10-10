@@ -181,16 +181,25 @@ describe("SelectFieldTest", () => {
 
   it("can load options via options prop callback", async () => {
     // Given a Select Field with options that are loaded via a callback
-    const r = await render(
-      <TestSelectField
-        label="Age"
-        value="1"
-        options={{ initial: [options[0]], load: async () => ({ options }) }}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
-        data-testid="age"
-      />,
-    );
+    function Test() {
+      const [loaded, setLoaded] = useState<HasIdAndName[]>([]);
+      return (
+        <SelectField
+          label="Age"
+          value="1"
+          options={{
+            current: options[0],
+            load: async () => setLoaded(options),
+            options: loaded,
+          }}
+          onSelect={() => {}}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          data-testid="age"
+        />
+      );
+    }
+    const r = await render(<Test />);
     // When opening the menu
     click(r.age);
     // Then expect to see the initial option and loading state
@@ -305,17 +314,25 @@ describe("SelectFieldTest", () => {
   it("can define and select 'unsetLabel' when options are lazily loaded", async () => {
     const onSelect = jest.fn();
     // Given a Select Field with options that are loaded lazily
-    const r = await render(
-      <TestSelectField
-        label="Age"
-        value="1"
-        unsetLabel="None"
-        options={{ initial: [labelValueOptions[0]], load: async () => ({ options: labelValueOptions }) }}
-        getOptionLabel={(o) => o.label}
-        getOptionValue={(o) => o.value}
-        onSelect={onSelect}
-      />,
-    );
+    function Test() {
+      const [loaded, setLoaded] = useState<HasLabelAndValue[]>([]);
+      return (
+        <TestSelectField
+          label="Age"
+          value="1"
+          unsetLabel="None"
+          options={{
+            current: labelValueOptions[0],
+            load: async () => setLoaded(labelValueOptions),
+            options: loaded,
+          }}
+          getOptionLabel={(o) => o.label}
+          getOptionValue={(o) => o.value}
+          onSelect={onSelect}
+        />
+      );
+    }
+    const r = await render(<Test />);
     // When we click the field to open the menu
     await clickAndWait(r.age);
     // The 'unset' option is in the menu and we select it
@@ -442,11 +459,12 @@ describe("SelectFieldTest", () => {
     );
   }
 
-  function TestMultipleSelectField<O, V extends Value>(
+  function TestMultipleSelectField<O extends HasIdAndName, V extends Value>(
     props: Optional<SelectFieldProps<O, V>, "onSelect">,
   ): JSX.Element {
     const [selected, setSelected] = useState<V | undefined>(props.value);
     const init = options.find((o) => o.id === selected) as O;
+    const [loaded, setLoaded] = useState<O[]>([]);
     return (
       <>
         <SelectField<O, V>
@@ -455,13 +473,12 @@ describe("SelectFieldTest", () => {
           onSelect={setSelected}
           unsetLabel={"-"}
           options={{
-            initial: [init],
+            current: init,
             load: async () => {
-              return new Promise((resolve) => {
-                // @ts-ignore - believes `options` should be of type `never[]`
-                setTimeout(() => resolve({ options }), 1500);
-              });
+              await sleep(1500);
+              setLoaded(props.options as O[]);
             },
+            options: loaded,
           }}
         />
         <SelectField<O, V>
@@ -470,16 +487,17 @@ describe("SelectFieldTest", () => {
           onSelect={setSelected}
           unsetLabel={"-"}
           options={{
-            initial: [init],
+            current: init,
             load: async () => {
-              return new Promise((resolve) => {
-                // @ts-ignore - believes `options` should be of type `never[]`
-                setTimeout(() => resolve({ options }), 1500);
-              });
+              await sleep(1500);
+              setLoaded(props.options as O[]);
             },
+            options: loaded,
           }}
         />
       </>
     );
   }
 });
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
