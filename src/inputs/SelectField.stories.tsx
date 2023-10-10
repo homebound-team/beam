@@ -224,6 +224,7 @@ Contrast.args = { compact: true, contrast: true };
 const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
 
 export function PerfTest() {
+  const [loaded, setLoaded] = useState<TestOption[]>([]);
   const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);
   return (
     <SelectField
@@ -232,13 +233,12 @@ export function PerfTest() {
       onSelect={setSelectedValue}
       errorMsg={selectedValue !== undefined ? "" : "Select an option. Plus more error text to force it to wrap."}
       options={{
-        initial: [loadTestOptions[2]],
+        initial: loadTestOptions[2],
         load: async () => {
-          return new Promise((resolve) => {
-            // @ts-ignore - believes `options` should be of type `never[]`
-            setTimeout(() => resolve({ options: loadTestOptions }), 1500);
-          });
+          await sleep(1500);
+          setLoaded(loadTestOptions);
         },
+        options: loaded,
       }}
       onBlur={action("onBlur")}
       onFocus={action("onFocus")}
@@ -248,6 +248,7 @@ export function PerfTest() {
 PerfTest.parameters = { chromatic: { disableSnapshot: true } };
 
 export function LazyLoadStateFields() {
+  const [loaded, setLoaded] = useState<TestOption[]>([]);
   const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);
   return (
     <>
@@ -257,13 +258,12 @@ export function LazyLoadStateFields() {
         onSelect={setSelectedValue}
         unsetLabel={"-"}
         options={{
-          initial: [loadTestOptions.find((o) => o.id === selectedValue)!],
+          initial: loadTestOptions.find((o) => o.id === selectedValue)!,
           load: async () => {
-            return new Promise((resolve) => {
-              // @ts-ignore - believes `options` should be of type `never[]`
-              setTimeout(() => resolve({ options: loadTestOptions }), 1500);
-            });
+            await sleep(1500);
+            setLoaded(loadTestOptions);
           },
+          options: loaded,
         }}
       />
       <SelectField
@@ -272,13 +272,12 @@ export function LazyLoadStateFields() {
         onSelect={setSelectedValue}
         unsetLabel={"-"}
         options={{
-          initial: [loadTestOptions.find((o) => o.id === selectedValue)!],
+          initial: loadTestOptions.find((o) => o.id === selectedValue)!,
           load: async () => {
-            return new Promise((resolve) => {
-              // @ts-ignore - believes `options` should be of type `never[]`
-              setTimeout(() => resolve({ options: loadTestOptions }), 1500);
-            });
+            await sleep(1500);
+            setLoaded(loadTestOptions);
           },
+          options: loaded,
         }}
       />
     </>
@@ -287,21 +286,20 @@ export function LazyLoadStateFields() {
 LazyLoadStateFields.parameters = { chromatic: { disableSnapshot: true } };
 
 export function LoadingState() {
+  const [loaded, setLoaded] = useState<TestOption[]>([]);
   const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);
-
   return (
     <SelectField
       label="Project"
       value={selectedValue}
       onSelect={setSelectedValue}
       options={{
-        initial: [loadTestOptions[2]],
+        initial: loadTestOptions[2],
         load: async () => {
-          return new Promise((resolve) => {
-            // @ts-ignore - believes `options` should be of type `never[]`
-            setTimeout(() => resolve({ options: loadTestOptions }), 5000);
-          });
+          await sleep(5000);
+          setLoaded(loadTestOptions);
         },
+        options: loadTestOptions,
       }}
     />
   );
@@ -392,3 +390,5 @@ function TestSelectField<T extends object, V extends Value>(
     </div>
   );
 }
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

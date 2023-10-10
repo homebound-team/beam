@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Value } from "src/inputs";
 import { ComboBoxBase, ComboBoxBaseProps, unsetOption } from "src/inputs/internal/ComboBoxBase";
 import { HasIdAndName, Optional } from "src/types";
@@ -35,14 +36,14 @@ export function SelectField<O, V extends Value>(
     value,
     ...otherProps
   } = props;
-
+  const values = useMemo(() => [value], [value]);
   return (
     <ComboBoxBase
       {...otherProps}
       options={options}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
-      values={[value]}
+      values={values}
       onSelect={(values, options) => {
         // If the user used `unsetLabel`, then values will be `[undefined]` and options `[unsetOption]`
         if (values.length > 0 && options.length > 0) {
