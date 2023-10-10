@@ -78,7 +78,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     disabled,
     readOnly,
     onSelect,
-    options,
+    options: propOptions,
     multiselect = false,
     values = [],
     nothingSelectedText = "",
@@ -93,8 +93,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
 
-  // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
-  const maybeOptions = useMemo(() => initializeOptions(options, unsetLabel), [options, unsetLabel]);
   // Memoize the callback functions and handle the `unset` option if provided.
   const getOptionLabel = useCallback(
     (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : propOptionLabel(o)),
@@ -110,24 +108,33 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     [propOptionMenuLabel, unsetLabel, getOptionLabel],
   );
 
+  // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
+  const options = useMemo(
+    () => initializeOptions(propOptions, getOptionValue, unsetLabel),
+    // If the caller is using { current, load, options }, memoize on only `current` and `options` values.
+    // ...and don't bother on memoizing on getOptionValue b/c it's basically always a lambda
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    Array.isArray(propOptions) ? [propOptions, unsetLabel] : [propOptions.current, propOptions.options, unsetLabel],
+  );
+
   const { contains } = useFilter({ sensitivity: "base" });
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
 
+  // Do a one-time initialize of fieldState
   const [fieldState, setFieldState] = useState<FieldState<O>>(() => {
-    const initOptions = Array.isArray(maybeOptions) ? maybeOptions : asArray(maybeOptions.current);
-    const selectedOptions = initOptions.filter((o) => values.includes(getOptionValue(o)));
+    const selectedOptions = options.filter((o) => values.includes(getOptionValue(o)));
     return {
       selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
       inputValue: getInputValue(
-        initOptions.filter((o) => values?.includes(getOptionValue(o))),
+        options.filter((o) => values?.includes(getOptionValue(o))),
         getOptionLabel,
         multiselect,
         nothingSelectedText,
       ),
-      filteredOptions: initOptions,
-      allOptions: initOptions,
-      selectedOptions: selectedOptions,
+      filteredOptions: options,
+      allOptions: options,
+      selectedOptions,
       optionsLoading: false,
     };
   });
@@ -212,9 +219,9 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   }
 
   async function maybeInitLoad() {
-    if (!Array.isArray(maybeOptions)) {
+    if (!Array.isArray(propOptions)) {
       setFieldState((prevState) => ({ ...prevState, optionsLoading: true }));
-      await maybeOptions.load();
+      await propOptions.load();
       setFieldState((prevState) => ({ ...prevState, optionsLoading: false }));
     }
   }
@@ -313,43 +320,30 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     [values],
   );
 
-  // When options are an array, then use them as-is.
-  // If options are an object, then use the `initial` array if the menu has not been opened
-  // Otherwise, use the current fieldState array options.
-  const maybeUpdatedOptions = Array.isArray(maybeOptions)
-    ? maybeOptions
-    : firstOpen.current === false && !fieldState.optionsLoading
-    ? maybeOptions.options
-    : maybeOptions.current;
-
+  // Re-sync fieldState.allOptions
   useEffect(
     () => {
-      // We leave `maybeOptions.initial` as a non-array so that it's stable, but now that we're inside the
-      // useEffect, array-ize it if needed.
-      const maybeUpdatedArray = asArray(maybeUpdatedOptions);
-      if (maybeUpdatedArray !== fieldState.allOptions) {
-        setFieldState((prevState) => {
-          const selectedOptions = maybeUpdatedArray.filter((o) => values?.includes(getOptionValue(o)));
-          return {
-            ...prevState,
-            selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
-            inputValue:
-              selectedOptions.length === 1
-                ? getOptionLabel(selectedOptions[0])
-                : multiselect && selectedOptions.length === 0
-                ? nothingSelectedText
-                : "",
-            selectedOptions: selectedOptions,
-            filteredOptions: maybeUpdatedArray,
-            allOptions: maybeUpdatedArray,
-          };
-        });
-      }
+      setFieldState((prevState) => {
+        const selectedOptions = options.filter((o) => values?.includes(getOptionValue(o)));
+        return {
+          ...prevState,
+          selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
+          inputValue:
+            selectedOptions.length === 1
+              ? getOptionLabel(selectedOptions[0])
+              : multiselect && selectedOptions.length === 0
+              ? nothingSelectedText
+              : "",
+          selectedOptions: selectedOptions,
+          filteredOptions: options,
+          allOptions: options,
+        };
+      });
     },
-    // I started working on fixing this deps array, but seems like `getOptionLabel` & friends
-    // would very rarely be stable anyway, so going to hold off on further fixes for now...
+    // We're primarily only re-setting `allOptions`, and so recalc selected as well, but we don't
+    // want to depend on values/etc., b/c we'll defer to their useEffects to update their state
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [maybeUpdatedOptions, getOptionLabel, getOptionValue],
+    [options],
   );
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
@@ -475,18 +469,33 @@ function getInputValue<O>(
     : "";
 }
 
-export function initializeOptions<O>(options: OptionsOrLoad<O>, unsetLabel: string | undefined): OptionsOrLoad<O> {
-  if (!unsetLabel) {
-    return options;
+/** Transforms/simplifies `optionsOrLoad` into just options, with unsetLabel maybe added. */
+export function initializeOptions<O, V extends Value>(
+  optionsOrLoad: OptionsOrLoad<O>,
+  getOptionValue: (opt: O) => V,
+  unsetLabel: string | undefined,
+): O[] {
+  const opts: O[] = [];
+  if (unsetLabel) {
+    opts.push(unsetOption as unknown as O);
   }
-  if (Array.isArray(options)) {
-    return getOptionsWithUnset(unsetLabel, options);
+  if (Array.isArray(optionsOrLoad)) {
+    opts.push(...optionsOrLoad);
+  } else {
+    const { options, current } = optionsOrLoad;
+    if (options) {
+      opts.push(...options);
+    }
+    // Even if the SelectField has lazy-loaded options, make sure the current value is really in there
+    if (current) {
+      const value = getOptionValue(current);
+      const found = options && options.find((o) => getOptionValue(o) === value);
+      if (!found) {
+        opts.push(current);
+      }
+    }
   }
-  return { ...options, options: getOptionsWithUnset(unsetLabel, options.options) };
-}
-
-function getOptionsWithUnset<O>(unsetLabel: string, options: O[] | undefined): O[] {
-  return [unsetOption as unknown as O, ...(options ? options : [])];
+  return opts;
 }
 
 /** A marker option to automatically add an "Unset" option to the start of options. */
