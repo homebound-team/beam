@@ -29,7 +29,7 @@ export function ScrollShadows(props: ScrollShadowsProps) {
   // The shadow styles will rarely every change. Memoize them to avoid recomputing them when we don't have to.
   const [startShadowStyles, endShadowStyles] = useMemo(() => {
     const transparentBgColor = bgColor.replace(/,1\)$/, ",0)");
-    const commonStyles = Css.absolute.z3.$;
+    const commonStyles = Css.absolute.z3.add({ pointerEvents: "none" }).$;
     const startShadowStyles = !horizontal ? Css.top0.left0.right0.hPx(40).$ : Css.left0.top0.bottom0.wPx(25).$;
     const endShadowStyles = !horizontal ? Css.bottom0.left0.right0.hPx(40).$ : Css.right0.top0.bottom0.wPx(25).$;
     const startGradient = `linear-gradient(${!horizontal ? 180 : 90}deg, ${bgColor} 0%, ${transparentBgColor} 92%);`;
