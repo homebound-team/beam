@@ -469,34 +469,33 @@ function getInputValue<O>(
     : "";
 }
 
+/** Transforms/simplifies `optionsOrLoad` into just options, with unsetLabel maybe added. */
 export function initializeOptions<O, V extends Value>(
   optionsOrLoad: OptionsOrLoad<O>,
   getOptionValue: (opt: O) => V,
   unsetLabel: string | undefined,
 ): O[] {
+  const opts: O[] = [];
+  if (unsetLabel) {
+    opts.push(unsetOption as unknown as O);
+  }
   if (Array.isArray(optionsOrLoad)) {
-    const options = optionsOrLoad;
-    if (!unsetLabel) {
-      return options;
-    } else {
-      return getOptionsWithUnset(unsetLabel, options);
-    }
+    opts.push(...optionsOrLoad);
   } else {
     const { options, current } = optionsOrLoad;
-    const opts: O[] = [];
-    if (unsetLabel) opts.push(unsetOption as unknown as O);
-    if (options) opts.push(...options);
+    if (options) {
+      opts.push(...options);
+    }
     // Even if the SelectField has lazy-loaded options, make sure the current value is really in there
     if (current) {
-      const found = options && options.find((o) => getOptionValue(o) === getOptionValue(current));
-      if (!found) opts.push(current);
+      const value = getOptionValue(current);
+      const found = options && options.find((o) => getOptionValue(o) === value);
+      if (!found) {
+        opts.push(current);
+      }
     }
-    return opts;
   }
-}
-
-function getOptionsWithUnset<O>(unsetLabel: string, options: O[] | undefined): O[] {
-  return [unsetOption as unknown as O, ...asArray(options)];
+  return opts;
 }
 
 /** A marker option to automatically add an "Unset" option to the start of options. */
