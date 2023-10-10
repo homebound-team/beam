@@ -1,10 +1,7 @@
 import React, { createContext, ReactNode, useContext, useMemo, useState } from "react";
-import { ToastTypes } from "./Toast";
+import { BannerProps } from "src/components";
 
-export interface ToastNoticeProps {
-  type: ToastTypes;
-  message: ReactNode;
-}
+export interface ToastNoticeProps extends Omit<BannerProps, "onClose"> {}
 
 export type ToastContextProps = {
   notice: ToastNoticeProps | undefined;
