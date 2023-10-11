@@ -403,20 +403,28 @@ describe("SelectFieldTest", () => {
   it("supports boolean values properly", async () => {
     // Given a select field with boolean and an undefined values
     const onSelect = jest.fn();
-    const r = await render(
-      <SelectField
-        label="label"
-        value={true}
-        onSelect={onSelect}
-        options={[
-          { id: undefined, name: "Undefined" },
-          { id: false, name: "False" },
-          { id: true, name: "True" },
-        ]}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
-      />,
-    );
+    type Option = { id: undefined | boolean; name: string };
+    function Test() {
+      const [value, setValue] = useState<boolean | undefined>(true);
+      return (
+        <SelectField<Option, boolean | undefined>
+          label="label"
+          value={value}
+          onSelect={(value) => {
+            onSelect(value);
+            setValue(value);
+          }}
+          options={[
+            { id: undefined, name: "Undefined" },
+            { id: false, name: "False" },
+            { id: true, name: "True" },
+          ]}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />
+      );
+    }
+    const r = await render(<Test />);
 
     // When selecting the `false` option
     click(r.label);

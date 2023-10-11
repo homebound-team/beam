@@ -10,7 +10,6 @@ import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
-import { areArraysEqual } from "src/utils";
 
 /** Base props for either `SelectField` or `MultiSelectField`. */
 export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
@@ -80,7 +79,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     onSelect,
     options: propOptions,
     multiselect = false,
-    values = [],
+    values: propValues,
     nothingSelectedText = "",
     contrast,
     disabledOptions,
@@ -96,16 +95,22 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   // Memoize the callback functions and handle the `unset` option if provided.
   const getOptionLabel = useCallback(
     (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : propOptionLabel(o)),
-    [propOptionLabel, unsetLabel],
+    // propOptionLabel is basically always a lambda, so don't dep on it
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [unsetLabel],
   );
   const getOptionValue = useCallback(
     (o: O) => (unsetLabel && o === unsetOption ? (undefined as V) : propOptionValue(o)),
-    [propOptionValue, unsetLabel],
+    // propOptionValue is basically always a lambda, so don't dep on it
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [unsetLabel],
   );
   const getOptionMenuLabel = useCallback(
     (o: O) =>
       propOptionMenuLabel ? propOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption) : getOptionLabel(o),
-    [propOptionMenuLabel, unsetLabel, getOptionLabel],
+    // propOptionMenuLabel is basically always a lambda, so don't dep on it
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [unsetLabel, getOptionLabel],
   );
 
   // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
@@ -117,44 +122,33 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     Array.isArray(propOptions) ? [propOptions, unsetLabel] : [propOptions.current, propOptions.options, unsetLabel],
   );
 
+  const values = useMemo(() => propValues ?? [], [propValues]);
+
+  const selectedOptions = useMemo(() => {
+    return options.filter((o) => values.includes(getOptionValue(o)));
+  }, [options, values, getOptionValue]);
+
   const { contains } = useFilter({ sensitivity: "base" });
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
 
   // Do a one-time initialize of fieldState
-  const [fieldState, setFieldState] = useState<FieldState<O>>(() => {
-    const selectedOptions = options.filter((o) => values.includes(getOptionValue(o)));
+  const [fieldState, setFieldState] = useState<FieldState>(() => {
     return {
-      selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
-      inputValue: getInputValue(
-        options.filter((o) => values?.includes(getOptionValue(o))),
-        getOptionLabel,
-        multiselect,
-        nothingSelectedText,
-      ),
-      filteredOptions: options,
-      allOptions: options,
-      selectedOptions,
+      inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText),
+      searchValue: undefined,
       optionsLoading: false,
     };
   });
 
+  const { searchValue } = fieldState;
+  const filteredOptions = useMemo(() => {
+    return !searchValue ? options : options.filter((o) => contains(getOptionLabel(o), searchValue));
+  }, [options, searchValue, getOptionLabel, contains]);
+
   /** Resets field's input value and filtered options list for cases where the user exits the field without making changes (on Escape, or onBlur) */
   function resetField() {
-    const inputValue = getInputValue(
-      fieldState.allOptions.filter((o) => values?.includes(getOptionValue(o))),
-      getOptionLabel,
-      multiselect,
-      nothingSelectedText,
-    );
-    // Conditionally reset the value if the current inputValue doesn't match that of the passed in value, or we filtered the list
-    if (inputValue !== fieldState.inputValue || fieldState.filteredOptions.length !== fieldState.allOptions.length) {
-      setFieldState((prevState) => ({
-        ...prevState,
-        inputValue,
-        filteredOptions: prevState.allOptions,
-      }));
-    }
+    setFieldState((prevState) => ({ ...prevState, searchValue: undefined }));
   }
 
   function onSelectionChange(keys: Selection): void {
@@ -172,34 +166,12 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     );
 
     if (multiselect && keys.size === 0) {
-      setFieldState({
-        ...fieldState,
-        inputValue: state.isOpen ? "" : nothingSelectedText,
-        selectedKeys: [],
-        selectedOptions: [],
-      });
       selectionChanged && onSelect([], []);
       return;
     }
 
     const selectedKeys = [...keys.values()];
-    const selectedOptions = fieldState.allOptions.filter((o) => selectedKeys.includes(valueToKey(getOptionValue(o))));
-    const firstSelectedOption = selectedOptions[0];
-
-    setFieldState((prevState) => ({
-      ...prevState,
-      // If menu is open then reset inputValue to "". Otherwise set inputValue depending on number of options selected.
-      inputValue:
-        multiselect && (state.isOpen || selectedKeys.length > 1)
-          ? ""
-          : firstSelectedOption
-          ? getOptionLabel(firstSelectedOption!)
-          : "",
-      selectedKeys,
-      selectedOptions,
-      filteredOptions: fieldState.allOptions,
-    }));
-
+    const selectedOptions = options.filter((o) => selectedKeys.includes(valueToKey(getOptionValue(o))));
     selectionChanged && onSelect(selectedKeys.map(keyToValue) as V[], selectedOptions);
 
     if (!multiselect) {
@@ -210,11 +182,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   function onInputChange(value: string) {
     if (value !== fieldState.inputValue) {
-      setFieldState((prevState) => ({
-        ...prevState,
-        inputValue: value,
-        filteredOptions: fieldState.allOptions.filter((o) => contains(getOptionLabel(o), value)),
-      }));
+      setFieldState((prevState) => ({ ...prevState, inputValue: value, searchValue: value }));
     }
   }
 
@@ -232,7 +200,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       maybeInitLoad();
       firstOpen.current = false;
     }
-
     // When using the multiselect field, always empty the input upon open.
     if (multiselect && isOpen) {
       setFieldState((prevState) => ({ ...prevState, inputValue: "" }));
@@ -255,7 +222,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     ...otherProps,
     disabledKeys: Object.keys(disabledOptionsWithReasons),
     inputValue: fieldState.inputValue,
-    items: fieldState.filteredOptions,
+    items: filteredOptions,
     isDisabled,
     isReadOnly,
     onInputChange,
@@ -286,65 +253,34 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     },
   });
 
+  const selectedKeys = useMemo(() => {
+    return selectedOptions.map((o) => valueToKey(getOptionValue(o)));
+  }, [selectedOptions, getOptionValue]);
   // @ts-ignore - `selectionManager.state` exists, but not according to the types
   state.selectionManager.state = useMultipleSelectionState({
     selectionMode: multiselect ? "multiple" : "single",
     // Do not allow an empty selection if single select mode
     disallowEmptySelection: !multiselect,
-    selectedKeys: fieldState.selectedKeys,
+    selectedKeys,
     onSelectionChange,
   });
 
-  // Ensure we reset if the field's values change and the user is not actively selecting options.
-  useEffect(
-    () => {
-      if (!state.isOpen && !areArraysEqual(values, fieldState.selectedKeys)) {
-        setFieldState((prevState) => {
-          const selectedOptions = prevState.allOptions.filter((o) => values?.includes(getOptionValue(o)));
-          return {
-            ...prevState,
-            selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
-            inputValue:
-              selectedOptions.length === 1
-                ? getOptionLabel(selectedOptions[0])
-                : multiselect && selectedOptions.length === 0
-                ? nothingSelectedText
-                : "",
-            selectedOptions: selectedOptions,
-          };
-        });
-      }
-    },
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [values],
-  );
-
-  // Re-sync fieldState.allOptions
-  useEffect(
-    () => {
-      setFieldState((prevState) => {
-        const selectedOptions = options.filter((o) => values?.includes(getOptionValue(o)));
-        return {
-          ...prevState,
-          selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
-          inputValue:
-            selectedOptions.length === 1
-              ? getOptionLabel(selectedOptions[0])
-              : multiselect && selectedOptions.length === 0
-              ? nothingSelectedText
-              : "",
-          selectedOptions: selectedOptions,
-          filteredOptions: options,
-          allOptions: options,
-        };
-      });
-    },
-    // We're primarily only re-setting `allOptions`, and so recalc selected as well, but we don't
-    // want to depend on values/etc., b/c we'll defer to their useEffects to update their state
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [options],
-  );
+  // Reset inputValue when closed or selected changes
+  useEffect(() => {
+    if (state.isOpen && multiselect) {
+      // While the multiselect is open, let the user keep typing
+      setFieldState((prevState) => ({
+        ...prevState,
+        inputValue: "",
+        searchValue: "",
+      }));
+    } else {
+      setFieldState((prevState) => ({
+        ...prevState,
+        inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText),
+      }));
+    }
+  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText]);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
   const {
@@ -396,7 +332,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         listBoxRef={listBoxRef}
         state={state}
         labelProps={labelProps}
-        selectedOptions={fieldState.selectedOptions}
+        selectedOptions={selectedOptions}
         getOptionValue={getOptionValue}
         getOptionLabel={getOptionLabel}
         contrast={contrast}
@@ -419,7 +355,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
             positionProps={positionProps}
             state={state}
             listBoxRef={listBoxRef}
-            selectedOptions={fieldState.selectedOptions}
+            selectedOptions={selectedOptions}
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
@@ -433,12 +369,11 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   );
 }
 
-type FieldState<O> = {
-  selectedKeys: Key[];
+type FieldState = {
   inputValue: string;
-  filteredOptions: O[];
-  selectedOptions: O[];
-  allOptions: O[];
+  // We need separate `searchValue` vs. `inputValue` b/c we might be showing the
+  // currently-loaded option in the input, without the user having typed a filter yet.
+  searchValue: string | undefined;
   optionsLoading: boolean;
 };
 
@@ -509,8 +444,4 @@ export function disabledOptionToKeyedTuple(
   } else {
     return [valueToKey(disabledOption), undefined];
   }
-}
-
-function asArray<E>(arrayOrElement: E[] | E | undefined): E[] {
-  return Array.isArray(arrayOrElement) ? arrayOrElement : arrayOrElement ? [arrayOrElement] : [];
 }
