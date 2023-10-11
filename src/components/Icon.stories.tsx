@@ -103,6 +103,7 @@ export const Icon = (props: IconProps) => {
     "openBook",
   ];
   const miscIcons: IconProps["icon"][] = [
+    "inbox",
     "dollar",
     "userCircle",
     "calendar",
