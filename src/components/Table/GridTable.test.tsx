@@ -32,6 +32,7 @@ import {
 type Data = { name: string; value: number | undefined | null };
 type Row = SimpleHeaderAndData<Data>;
 
+const idColumn: GridColumn<Row> = { id: "id", header: () => "Id", data: (data, { row }) => row.id };
 const nameColumn: GridColumn<Row> = { id: "name", header: () => "Name", data: ({ name }) => name };
 const valueColumn: GridColumn<Row> = { id: "value", header: () => "Value", data: ({ value }) => value };
 const columns = [nameColumn, valueColumn];
@@ -3261,6 +3262,32 @@ describe("GridTable", () => {
       | Row 1                    | 200   |
       | Row 2 with a longer name | 300   |
       | Row 3                    | 1000  |
+      "
+    `);
+  });
+
+  it("tableSnapshot can use a subset of columns", async () => {
+    // Given a table with simple data
+    const r = await render(
+      <GridTable
+        columns={[idColumn, nameColumn, valueColumn]}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "Row 1", value: 200 } },
+          { kind: "data", id: "2", data: { name: "Row 2", value: 300 } },
+          { kind: "data", id: "3", data: { name: "Row 3", value: 1000 } },
+        ]}
+      />,
+    );
+
+    // Then a text snapshot should be generated when using `tableSnapshot`
+    expect(tableSnapshot(r, ["Id", "Value"])).toMatchInlineSnapshot(`
+      "
+      | Id | Value |
+      | -- | ----- |
+      | 1  | 200   |
+      | 2  | 300   |
+      | 3  | 1000  |
       "
     `);
   });
