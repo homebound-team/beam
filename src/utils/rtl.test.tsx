@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { MultiSelectField, NestedOption, SelectField, TreeSelectField } from "src/inputs";
 import { HasIdAndName } from "src/types";
 import { getOptions, getSelected, render, select, selectAndWait } from "src/utils/rtl";
@@ -6,18 +7,25 @@ describe("rtl", () => {
   it("can use select helpers and select an option via value on SelectField", async () => {
     const onSelect = jest.fn();
     // Given the SelectField
-    const r = await render(
-      <SelectField
-        label="Number"
-        value={undefined}
-        onSelect={onSelect}
-        options={[
-          { id: "1", name: "One" },
-          { id: "2", name: "Two" },
-          { id: "3", name: "Three" },
-        ]}
-      />,
-    );
+    function Test() {
+      const [value, setValue] = useState<string | undefined>();
+      return (
+        <SelectField
+          label="Number"
+          value={value}
+          onSelect={(value, option) => {
+            setValue(value);
+            onSelect(value, option);
+          }}
+          options={[
+            { id: "1", name: "One" },
+            { id: "2", name: "Two" },
+            { id: "3", name: "Three" },
+          ]}
+        />
+      );
+    }
+    const r = await render(<Test />);
     // Then the getOptions helper returns the correct options
     expect(getOptions(r.number)).toEqual(["One", "Two", "Three"]);
 
@@ -89,18 +97,25 @@ describe("rtl", () => {
   it("can use select helpers and select an option via value on MultiSelectField", async () => {
     const onSelect = jest.fn();
     // Given the MultiSelectField
-    const r = await render(
-      <MultiSelectField
-        label="Number"
-        values={undefined as any}
-        onSelect={onSelect}
-        options={[
-          { id: "1", name: "One" },
-          { id: "2", name: "Two" },
-          { id: "3", name: "Three" },
-        ]}
-      />,
-    );
+    function Test() {
+      const [values, setValues] = useState<string[]>([]);
+      return (
+        <MultiSelectField
+          label="Number"
+          values={values}
+          onSelect={(values, options) => {
+            setValues(values);
+            onSelect(values, options);
+          }}
+          options={[
+            { id: "1", name: "One" },
+            { id: "2", name: "Two" },
+            { id: "3", name: "Three" },
+          ]}
+        />
+      );
+    }
+    const r = await render(<Test />);
 
     // Then the getOptions helper returns the correct options
     expect(getOptions(r.number)).toEqual(["One", "Two", "Three"]);
@@ -127,18 +142,25 @@ describe("rtl", () => {
   it("can select options via label on MultiSelectField", async () => {
     const onSelect = jest.fn();
     // Given the MultiSelectField
-    const r = await render(
-      <MultiSelectField
-        label="Number"
-        values={undefined as any}
-        onSelect={onSelect}
-        options={[
-          { id: "1", name: "One" },
-          { id: "2", name: "Two" },
-          { id: "3", name: "Three" },
-        ]}
-      />,
-    );
+    function Test() {
+      const [values, setValues] = useState<string[]>([]);
+      return (
+        <MultiSelectField
+          label="Number"
+          values={values}
+          onSelect={(values, options) => {
+            setValues(values);
+            onSelect(values, options);
+          }}
+          options={[
+            { id: "1", name: "One" },
+            { id: "2", name: "Two" },
+            { id: "3", name: "Three" },
+          ]}
+        />
+      );
+    }
+    const r = await render(<Test />);
 
     // When selecting options by label
     select(r.number, ["One", "Three"]);
@@ -215,30 +237,35 @@ describe("rtl", () => {
     expect(getSelected(r.number)).toEqual("One One");
   });
 
-  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
-  // eslint-disable-next-line jest/no-identical-title
-  it("can select options via label on MultiSelectField", async () => {
+  it("can select options via label on TreeSelectField", async () => {
     const onSelect = jest.fn();
     // Given the TreeSelectField
-    const r = await render(
-      <TreeSelectField
-        label="Number"
-        values={[] as string[]}
-        onSelect={({ all }) => onSelect(all)}
-        options={
-          [
-            {
-              id: "1",
-              name: "One",
-              children: [
-                { id: "1.1", name: "One One" },
-                { id: "1.2", name: "One Two" },
-              ],
-            },
-          ] as NestedOption<HasIdAndName>[]
-        }
-      />,
-    );
+    function Test() {
+      const [values, setValues] = useState<string[]>([]);
+      return (
+        <TreeSelectField
+          label="Number"
+          values={values}
+          onSelect={({ all }) => {
+            setValues(all.values);
+            onSelect(all);
+          }}
+          options={
+            [
+              {
+                id: "1",
+                name: "One",
+                children: [
+                  { id: "1.1", name: "One One" },
+                  { id: "1.2", name: "One Two" },
+                ],
+              },
+            ] as NestedOption<HasIdAndName>[]
+          }
+        />
+      );
+    }
+    const r = await render(<Test />);
     // When selecting an option by its label
     select(r.number, ["One One"]);
     // Then the onSelect handler is called with the correct values
@@ -285,19 +312,26 @@ describe("rtl", () => {
   it("can use select helpers on multiline SelectField", async () => {
     const onSelect = jest.fn();
     // Given the SelectField is multline
-    const r = await render(
-      <SelectField
-        label="Number"
-        value={undefined}
-        onSelect={onSelect}
-        options={[
-          { id: "1", name: "One" },
-          { id: "2", name: "Two" },
-          { id: "3", name: "Three" },
-        ]}
-        multiline
-      />,
-    );
+    function Test() {
+      const [value, setValue] = useState<string | undefined>();
+      return (
+        <SelectField
+          label="Number"
+          value={value}
+          onSelect={(value, option) => {
+            setValue(value);
+            onSelect(value, option);
+          }}
+          options={[
+            { id: "1", name: "One" },
+            { id: "2", name: "Two" },
+            { id: "3", name: "Three" },
+          ]}
+          multiline
+        />
+      );
+    }
+    const r = await render(<Test />);
     // Then the getOptions helper returns the correct options
     expect(getOptions(r.number)).toEqual(["One", "Two", "Three"]);
     // When selecting an option
