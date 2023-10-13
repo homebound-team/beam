@@ -233,6 +233,9 @@ function selectOption(select: HTMLElement, optionValue: string) {
   if (!optionToSelect) {
     throw new Error(`Could not find option with value or text content of ${optionValue}`);
   }
+  if (optionToSelect.getAttribute("aria-disabled")) {
+    throw new Error(`Cannot select disabled option ${optionValue}`);
+  }
   _click(optionToSelect);
 }
 

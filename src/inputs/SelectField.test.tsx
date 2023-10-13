@@ -139,7 +139,7 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When opening the menu
-    select(r.age, "Two");
+    click(r.age);
     const optionTwo = r.getByRole("option", { name: "Two" });
     // Then the disabled option to have the correct aria attributes
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
@@ -147,6 +147,8 @@ describe("SelectFieldTest", () => {
     click(optionTwo);
     // Then the `onSelect` callback is not called
     expect(onSelect).not.toHaveBeenCalled();
+    // And using select would have failed
+    expect(() => select(r.age, "Two")).toThrow("Cannot select disabled option Two");
   });
 
   it("can disable options with tooltips", async () => {
