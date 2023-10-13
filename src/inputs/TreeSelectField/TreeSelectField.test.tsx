@@ -132,7 +132,7 @@ describe(TreeSelectField, () => {
     const r = await render(
       <TreeSelectField
         onSelect={noop}
-        options={{ initial: initialOption, load: async () => ({ options }) }}
+        options={{ current: initialOption, load: async () => ({ options }) }}
         label="Favorite League"
         values={[]}
         getOptionValue={(o) => o.id}

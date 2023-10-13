@@ -10,8 +10,8 @@ import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
-import { areArraysEqual } from "src/utils";
 
+/** Base props for either `SelectField` or `MultiSelectField`. */
 export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => string | ReactNode;
@@ -77,81 +77,78 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     disabled,
     readOnly,
     onSelect,
-    options,
+    options: propOptions,
     multiselect = false,
-    values = [],
+    values: propValues,
     nothingSelectedText = "",
     contrast,
     disabledOptions,
     borderless,
     unsetLabel,
+    getOptionLabel: propOptionLabel,
+    getOptionValue: propOptionValue,
+    getOptionMenuLabel: propOptionMenuLabel,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
 
-  // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
-  const maybeOptions = useMemo(() => initializeOptions(options, unsetLabel), [options, unsetLabel]);
   // Memoize the callback functions and handle the `unset` option if provided.
   const getOptionLabel = useCallback(
-    (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : props.getOptionLabel(o)),
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : propOptionLabel(o)),
+    // propOptionLabel is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.getOptionLabel, unsetLabel],
+    [unsetLabel],
   );
   const getOptionValue = useCallback(
-    (o: O) => (unsetLabel && o === unsetOption ? (undefined as V) : props.getOptionValue(o)),
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    (o: O) => (unsetLabel && o === unsetOption ? (undefined as V) : propOptionValue(o)),
+    // propOptionValue is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.getOptionValue, unsetLabel],
+    [unsetLabel],
   );
   const getOptionMenuLabel = useCallback(
     (o: O) =>
-      props.getOptionMenuLabel
-        ? props.getOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption)
-        : getOptionLabel(o),
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+      propOptionMenuLabel ? propOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption) : getOptionLabel(o),
+    // propOptionMenuLabel is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.getOptionValue, unsetLabel, getOptionLabel],
+    [unsetLabel, getOptionLabel],
   );
+
+  // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
+  const options = useMemo(
+    () => initializeOptions(propOptions, getOptionValue, unsetLabel),
+    // If the caller is using { current, load, options }, memoize on only `current` and `options` values.
+    // ...and don't bother on memoizing on getOptionValue b/c it's basically always a lambda
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    Array.isArray(propOptions) ? [propOptions, unsetLabel] : [propOptions.current, propOptions.options, unsetLabel],
+  );
+
+  const values = useMemo(() => propValues ?? [], [propValues]);
+
+  const selectedOptions = useMemo(() => {
+    return options.filter((o) => values.includes(getOptionValue(o)));
+  }, [options, values, getOptionValue]);
 
   const { contains } = useFilter({ sensitivity: "base" });
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
 
-  const [fieldState, setFieldState] = useState<FieldState<O>>(() => {
-    const initOptions = Array.isArray(maybeOptions) ? maybeOptions : maybeOptions.initial;
-    const selectedOptions = initOptions.filter((o) => values.includes(getOptionValue(o)));
+  // Do a one-time initialize of fieldState
+  const [fieldState, setFieldState] = useState<FieldState>(() => {
     return {
-      selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
-      inputValue: getInputValue(
-        initOptions.filter((o) => values?.includes(getOptionValue(o))),
-        getOptionLabel,
-        multiselect,
-        nothingSelectedText,
-      ),
-      filteredOptions: initOptions,
-      allOptions: initOptions,
-      selectedOptions: selectedOptions,
+      inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText),
+      searchValue: undefined,
       optionsLoading: false,
     };
   });
 
+  const { searchValue } = fieldState;
+  const filteredOptions = useMemo(() => {
+    return !searchValue ? options : options.filter((o) => contains(getOptionLabel(o), searchValue));
+  }, [options, searchValue, getOptionLabel, contains]);
+
   /** Resets field's input value and filtered options list for cases where the user exits the field without making changes (on Escape, or onBlur) */
   function resetField() {
-    const inputValue = getInputValue(
-      fieldState.allOptions.filter((o) => values?.includes(getOptionValue(o))),
-      getOptionLabel,
-      multiselect,
-      nothingSelectedText,
-    );
-    // Conditionally reset the value if the current inputValue doesn't match that of the passed in value, or we filtered the list
-    if (inputValue !== fieldState.inputValue || fieldState.filteredOptions.length !== fieldState.allOptions.length) {
-      setFieldState((prevState) => ({
-        ...prevState,
-        inputValue,
-        filteredOptions: prevState.allOptions,
-      }));
-    }
+    setFieldState((prevState) => ({ ...prevState, searchValue: undefined }));
   }
 
   function onSelectionChange(keys: Selection): void {
@@ -169,34 +166,12 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     );
 
     if (multiselect && keys.size === 0) {
-      setFieldState({
-        ...fieldState,
-        inputValue: state.isOpen ? "" : nothingSelectedText,
-        selectedKeys: [],
-        selectedOptions: [],
-      });
       selectionChanged && onSelect([], []);
       return;
     }
 
     const selectedKeys = [...keys.values()];
-    const selectedOptions = fieldState.allOptions.filter((o) => selectedKeys.includes(valueToKey(getOptionValue(o))));
-    const firstSelectedOption = selectedOptions[0];
-
-    setFieldState((prevState) => ({
-      ...prevState,
-      // If menu is open then reset inputValue to "". Otherwise set inputValue depending on number of options selected.
-      inputValue:
-        multiselect && (state.isOpen || selectedKeys.length > 1)
-          ? ""
-          : firstSelectedOption
-          ? getOptionLabel(firstSelectedOption!)
-          : "",
-      selectedKeys,
-      selectedOptions,
-      filteredOptions: fieldState.allOptions,
-    }));
-
+    const selectedOptions = options.filter((o) => selectedKeys.includes(valueToKey(getOptionValue(o))));
     selectionChanged && onSelect(selectedKeys.map(keyToValue) as V[], selectedOptions);
 
     if (!multiselect) {
@@ -207,26 +182,15 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   function onInputChange(value: string) {
     if (value !== fieldState.inputValue) {
-      setFieldState((prevState) => ({
-        ...prevState,
-        inputValue: value,
-        filteredOptions: fieldState.allOptions.filter((o) => contains(getOptionLabel(o), value)),
-      }));
+      setFieldState((prevState) => ({ ...prevState, inputValue: value, searchValue: value }));
     }
   }
 
   async function maybeInitLoad() {
-    if (!Array.isArray(maybeOptions)) {
+    if (!Array.isArray(propOptions)) {
       setFieldState((prevState) => ({ ...prevState, optionsLoading: true }));
-      const loadedOptions = (await maybeOptions.load()).options;
-      // Ensure the `unset` option is prepended to the top of the list if `unsetLabel` was provided
-      const options = !unsetLabel ? loadedOptions : getOptionsWithUnset(unsetLabel, loadedOptions);
-      setFieldState((prevState) => ({
-        ...prevState,
-        filteredOptions: options,
-        allOptions: options,
-        optionsLoading: false,
-      }));
+      await propOptions.load();
+      setFieldState((prevState) => ({ ...prevState, optionsLoading: false }));
     }
   }
 
@@ -236,7 +200,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       maybeInitLoad();
       firstOpen.current = false;
     }
-
     // When using the multiselect field, always empty the input upon open.
     if (multiselect && isOpen) {
       setFieldState((prevState) => ({ ...prevState, inputValue: "" }));
@@ -259,7 +222,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     ...otherProps,
     disabledKeys: Object.keys(disabledOptionsWithReasons),
     inputValue: fieldState.inputValue,
-    items: fieldState.filteredOptions,
+    items: filteredOptions,
     isDisabled,
     isReadOnly,
     onInputChange,
@@ -290,74 +253,34 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     },
   });
 
+  const selectedKeys = useMemo(() => {
+    return selectedOptions.map((o) => valueToKey(getOptionValue(o)));
+  }, [selectedOptions, getOptionValue]);
   // @ts-ignore - `selectionManager.state` exists, but not according to the types
   state.selectionManager.state = useMultipleSelectionState({
     selectionMode: multiselect ? "multiple" : "single",
     // Do not allow an empty selection if single select mode
     disallowEmptySelection: !multiselect,
-    selectedKeys: fieldState.selectedKeys,
+    selectedKeys,
     onSelectionChange,
   });
 
-  // Ensure we reset if the field's values change and the user is not actively selecting options.
-  useEffect(
-    () => {
-      if (!state.isOpen && !areArraysEqual(values, fieldState.selectedKeys)) {
-        setFieldState((prevState) => {
-          const selectedOptions = prevState.allOptions.filter((o) => values?.includes(getOptionValue(o)));
-          return {
-            ...prevState,
-            selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
-            inputValue:
-              selectedOptions.length === 1
-                ? getOptionLabel(selectedOptions[0])
-                : multiselect && selectedOptions.length === 0
-                ? nothingSelectedText
-                : "",
-            selectedOptions: selectedOptions,
-          };
-        });
-      }
-    },
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [values],
-  );
-
-  useEffect(
-    () => {
-      // When options are an array, then use them as-is.
-      // If options are an object, then use the `initial` array if the menu has not been opened
-      // Otherwise, use the current fieldState array options.
-      const maybeUpdatedOptions = Array.isArray(maybeOptions)
-        ? maybeOptions
-        : firstOpen.current === false
-        ? fieldState.allOptions
-        : maybeOptions.initial;
-
-      if (maybeUpdatedOptions !== fieldState.allOptions) {
-        setFieldState((prevState) => {
-          const selectedOptions = maybeUpdatedOptions.filter((o) => values?.includes(getOptionValue(o)));
-          return {
-            ...prevState,
-            selectedKeys: selectedOptions?.map((o) => valueToKey(getOptionValue(o))) ?? [],
-            inputValue:
-              selectedOptions.length === 1
-                ? getOptionLabel(selectedOptions[0])
-                : multiselect && selectedOptions.length === 0
-                ? nothingSelectedText
-                : "",
-            selectedOptions: selectedOptions,
-            filteredOptions: maybeUpdatedOptions,
-            allOptions: maybeUpdatedOptions,
-          };
-        });
-      }
-    },
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [maybeOptions],
-  );
+  // Reset inputValue when closed or selected changes
+  useEffect(() => {
+    if (state.isOpen && multiselect) {
+      // While the multiselect is open, let the user keep typing
+      setFieldState((prevState) => ({
+        ...prevState,
+        inputValue: "",
+        searchValue: "",
+      }));
+    } else {
+      setFieldState((prevState) => ({
+        ...prevState,
+        inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText),
+      }));
+    }
+  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText]);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
   const {
@@ -409,7 +332,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         listBoxRef={listBoxRef}
         state={state}
         labelProps={labelProps}
-        selectedOptions={fieldState.selectedOptions}
+        selectedOptions={selectedOptions}
         getOptionValue={getOptionValue}
         getOptionLabel={getOptionLabel}
         contrast={contrast}
@@ -432,7 +355,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
             positionProps={positionProps}
             state={state}
             listBoxRef={listBoxRef}
-            selectedOptions={fieldState.selectedOptions}
+            selectedOptions={selectedOptions}
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
@@ -446,15 +369,26 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   );
 }
 
-type FieldState<O> = {
-  selectedKeys: Key[];
+type FieldState = {
   inputValue: string;
-  filteredOptions: O[];
-  selectedOptions: O[];
-  allOptions: O[];
+  // We need separate `searchValue` vs. `inputValue` b/c we might be showing the
+  // currently-loaded option in the input, without the user having typed a filter yet.
+  searchValue: string | undefined;
   optionsLoading: boolean;
 };
-export type OptionsOrLoad<O> = O[] | { initial: O[]; load: () => Promise<{ options: O[] }> };
+
+/** Allows lazy-loading select fields, which is useful for pages w/lots of fields the user may not actually use. */
+export type OptionsOrLoad<O> =
+  | O[]
+  | {
+      /** The initial option to show before the user interacts with the dropdown. */
+      current: O | undefined;
+      /** Fired when the user interacts with the dropdown, to load the real options. */
+      load: () => Promise<unknown>;
+      /** The full list of options, after load() has been fired. */
+      options: O[] | undefined;
+    };
+
 type UnsetOption = { id: undefined; name: string };
 
 function getInputValue<O>(
@@ -470,22 +404,36 @@ function getInputValue<O>(
     : "";
 }
 
-export function initializeOptions<O>(options: OptionsOrLoad<O>, unsetLabel: string | undefined): OptionsOrLoad<O> {
-  if (!unsetLabel) {
-    return options;
+/** Transforms/simplifies `optionsOrLoad` into just options, with unsetLabel maybe added. */
+export function initializeOptions<O, V extends Value>(
+  optionsOrLoad: OptionsOrLoad<O>,
+  getOptionValue: (opt: O) => V,
+  unsetLabel: string | undefined,
+): O[] {
+  const opts: O[] = [];
+  if (unsetLabel) {
+    opts.push(unsetOption as unknown as O);
   }
-
-  if (Array.isArray(options)) {
-    return getOptionsWithUnset(unsetLabel, options);
+  if (Array.isArray(optionsOrLoad)) {
+    opts.push(...optionsOrLoad);
+  } else {
+    const { options, current } = optionsOrLoad;
+    if (options) {
+      opts.push(...options);
+    }
+    // Even if the SelectField has lazy-loaded options, make sure the current value is really in there
+    if (current) {
+      const value = getOptionValue(current);
+      const found = options && options.find((o) => getOptionValue(o) === value);
+      if (!found) {
+        opts.push(current);
+      }
+    }
   }
-
-  return { ...options, initial: getOptionsWithUnset(unsetLabel, options.initial) };
+  return opts;
 }
 
-function getOptionsWithUnset<O>(unsetLabel: string, options: O[]): O[] {
-  return [unsetOption as unknown as O, ...options];
-}
-
+/** A marker option to automatically add an "Unset" option to the start of options. */
 export const unsetOption = {};
 
 export function disabledOptionToKeyedTuple(

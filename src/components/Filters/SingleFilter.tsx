@@ -37,7 +37,7 @@ class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, 
 
     const options = Array.isArray(maybeOptions)
       ? [allOption as O, ...maybeOptions]
-      : { ...maybeOptions, initial: [allOption as O, ...maybeOptions.initial] };
+      : { ...maybeOptions, current: maybeOptions.current };
 
     return (
       <SelectField<O, V>

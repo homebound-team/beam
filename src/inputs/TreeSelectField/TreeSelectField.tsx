@@ -147,7 +147,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
-  const initialOptions = Array.isArray(options) ? options : options.initial;
+  const initialOptions = Array.isArray(options) ? options : options.current;
   const { contains } = useFilter({ sensitivity: "base" });
 
   const { collapsedKeys } = useTreeSelectFieldProvider();

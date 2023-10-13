@@ -8,6 +8,8 @@ export * from "./Accordion";
 export * from "./AccordionList";
 export * from "./AutoSaveIndicator";
 export * from "./Avatar";
+export * from "./Banner";
+export type { BannerProps } from "./Banner";
 export { BeamProvider } from "./BeamContext";
 export * from "./Button";
 export * from "./ButtonDatePicker";

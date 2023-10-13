@@ -187,7 +187,7 @@ export function AsyncOptions() {
     <TestTreeSelectField
       values={[]}
       options={{
-        initial: initialOption,
+        current: initialOption,
         load: async () => {
           return new Promise((resolve) => {
             // @ts-ignore - believes `options` should be of type `never[]`

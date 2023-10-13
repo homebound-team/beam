@@ -6,7 +6,7 @@ type FoundOption<O> = { option: NestedOption<O>; parents: NestedOption<O>[] };
 export type NestedOption<O> = O & { children?: NestedOption<O>[] };
 export type NestedOptionsOrLoad<O> =
   | NestedOption<O>[]
-  | { initial: NestedOption<O>[]; load: () => Promise<{ options: NestedOption<O>[] }> };
+  | { current: NestedOption<O>[]; load: () => Promise<{ options: NestedOption<O>[] }> };
 export type LeveledOption<O> = [NestedOption<O>, number];
 
 export type TreeFieldState<O> = {

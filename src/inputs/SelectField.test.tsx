@@ -181,16 +181,28 @@ describe("SelectFieldTest", () => {
 
   it("can load options via options prop callback", async () => {
     // Given a Select Field with options that are loaded via a callback
-    const r = await render(
-      <TestSelectField
-        label="Age"
-        value="1"
-        options={{ initial: [options[0]], load: async () => ({ options }) }}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
-        data-testid="age"
-      />,
-    );
+    function Test() {
+      const [loaded, setLoaded] = useState<HasIdAndName[]>([]);
+      return (
+        <SelectField
+          label="Age"
+          value="1"
+          options={{
+            current: options[0],
+            load: async () => {
+              await sleep(0);
+              setLoaded(options);
+            },
+            options: loaded,
+          }}
+          onSelect={() => {}}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          data-testid="age"
+        />
+      );
+    }
+    const r = await render(<Test />);
     // When opening the menu
     click(r.age);
     // Then expect to see the initial option and loading state
@@ -305,17 +317,25 @@ describe("SelectFieldTest", () => {
   it("can define and select 'unsetLabel' when options are lazily loaded", async () => {
     const onSelect = jest.fn();
     // Given a Select Field with options that are loaded lazily
-    const r = await render(
-      <TestSelectField
-        label="Age"
-        value="1"
-        unsetLabel="None"
-        options={{ initial: [labelValueOptions[0]], load: async () => ({ options: labelValueOptions }) }}
-        getOptionLabel={(o) => o.label}
-        getOptionValue={(o) => o.value}
-        onSelect={onSelect}
-      />,
-    );
+    function Test() {
+      const [loaded, setLoaded] = useState<HasLabelAndValue[]>([]);
+      return (
+        <TestSelectField
+          label="Age"
+          value="1"
+          unsetLabel="None"
+          options={{
+            current: labelValueOptions[0],
+            load: async () => setLoaded(labelValueOptions),
+            options: loaded,
+          }}
+          getOptionLabel={(o) => o.label}
+          getOptionValue={(o) => o.value}
+          onSelect={onSelect}
+        />
+      );
+    }
+    const r = await render(<Test />);
     // When we click the field to open the menu
     await clickAndWait(r.age);
     // The 'unset' option is in the menu and we select it
@@ -327,13 +347,27 @@ describe("SelectFieldTest", () => {
   it("can initially be set to the 'unsetLabel' option", async () => {
     // Given a Select Field with the value set to `undefined`
     const r = await render(
-      <TestSelectField
+      <SelectField
+        label="Age"
+        value={undefined as string | undefined}
+        unsetLabel="None"
+        options={options}
+        onSelect={() => {}}
+      />,
+    );
+    // The input value will be set to the `unsetLabel`
+    expect(r.age).toHaveValue("None");
+  });
+
+  it("can initially be set to the 'unsetLabel' option when lazy loading options", async () => {
+    // Given a Select Field with the value set to `undefined`
+    const r = await render(
+      <SelectField<HasIdAndName, string>
         label="Age"
         value={undefined}
         unsetLabel="None"
-        options={labelValueOptions}
-        getOptionLabel={(o) => o.label}
-        getOptionValue={(o) => o.value}
+        options={{ current: undefined, load: async () => {}, options: undefined }}
+        onSelect={() => {}}
       />,
     );
     // The input value will be set to the `unsetLabel`
@@ -369,20 +403,28 @@ describe("SelectFieldTest", () => {
   it("supports boolean values properly", async () => {
     // Given a select field with boolean and an undefined values
     const onSelect = jest.fn();
-    const r = await render(
-      <SelectField
-        label="label"
-        value={true}
-        onSelect={onSelect}
-        options={[
-          { id: undefined, name: "Undefined" },
-          { id: false, name: "False" },
-          { id: true, name: "True" },
-        ]}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
-      />,
-    );
+    type Option = { id: undefined | boolean; name: string };
+    function Test() {
+      const [value, setValue] = useState<boolean | undefined>(true);
+      return (
+        <SelectField<Option, boolean | undefined>
+          label="label"
+          value={value}
+          onSelect={(value) => {
+            onSelect(value);
+            setValue(value);
+          }}
+          options={[
+            { id: undefined, name: "Undefined" },
+            { id: false, name: "False" },
+            { id: true, name: "True" },
+          ]}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />
+      );
+    }
+    const r = await render(<Test />);
 
     // When selecting the `false` option
     click(r.label);
@@ -442,11 +484,12 @@ describe("SelectFieldTest", () => {
     );
   }
 
-  function TestMultipleSelectField<O, V extends Value>(
+  function TestMultipleSelectField<O extends HasIdAndName, V extends Value>(
     props: Optional<SelectFieldProps<O, V>, "onSelect">,
   ): JSX.Element {
     const [selected, setSelected] = useState<V | undefined>(props.value);
     const init = options.find((o) => o.id === selected) as O;
+    const [loaded, setLoaded] = useState<O[]>([]);
     return (
       <>
         <SelectField<O, V>
@@ -455,13 +498,12 @@ describe("SelectFieldTest", () => {
           onSelect={setSelected}
           unsetLabel={"-"}
           options={{
-            initial: [init],
+            current: init,
             load: async () => {
-              return new Promise((resolve) => {
-                // @ts-ignore - believes `options` should be of type `never[]`
-                setTimeout(() => resolve({ options }), 1500);
-              });
+              await sleep(1500);
+              setLoaded(props.options as O[]);
             },
+            options: loaded,
           }}
         />
         <SelectField<O, V>
@@ -470,16 +512,17 @@ describe("SelectFieldTest", () => {
           onSelect={setSelected}
           unsetLabel={"-"}
           options={{
-            initial: [init],
+            current: init,
             load: async () => {
-              return new Promise((resolve) => {
-                // @ts-ignore - believes `options` should be of type `never[]`
-                setTimeout(() => resolve({ options }), 1500);
-              });
+              await sleep(1500);
+              setLoaded(props.options as O[]);
             },
+            options: loaded,
           }}
         />
       </>
     );
   }
 });
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
