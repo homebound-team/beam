@@ -28,6 +28,8 @@ export interface RichTextFieldProps {
   onFocus?: () => void;
   /** For rendering formatted text */
   readOnly?: boolean;
+  /** Will set width to: 100% */
+  fullWidth?: boolean;
 }
 
 /**
@@ -38,7 +40,7 @@ export interface RichTextFieldProps {
  * We also integrate [tributejs]{@link https://github.com/zurb/tribute} for @ mentions.
  */
 export function RichTextField(props: RichTextFieldProps) {
-  const { mergeTags, label, value = "", onChange, onBlur = noop, onFocus = noop, readOnly } = props;
+  const { mergeTags, label, value = "", onChange, onBlur = noop, onFocus = noop, readOnly, fullWidth } = props;
 
   // We get a reference to the Editor instance after trix-init fires
   const [editor, setEditor] = useState<Editor>();
@@ -129,7 +131,7 @@ export function RichTextField(props: RichTextFieldProps) {
 
   if (!readOnly) {
     return (
-      <div css={Css.w100.maxw("550px").$}>
+      <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
         {/* TODO: Not sure what to pass to labelProps. */}
         {label && <Label labelProps={{}} label={label} />}
         <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }}>
@@ -148,7 +150,7 @@ export function RichTextField(props: RichTextFieldProps) {
     );
   } else {
     return (
-      <div css={Css.w100.maxw("550px").$}>
+      <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
         {label && <Label label={label} />}
         <div
           css={Css.mh("120px").bgWhite.sm.gray900.bn.p1.br4.bGray300.ba.$}

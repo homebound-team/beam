@@ -81,3 +81,20 @@ export function ToggleReadOnly() {
     </>
   );
 }
+
+export function FullWidth() {
+  const value =
+    "<div><!--block-->This is some content<br><br></div><ul><li><!--block-->this is a bullet</li><li><!--block--><em>another bullet here</em></li></ul><div><!--block--><br><strong>some really important content</strong></div>";
+
+  return (
+    <RichTextFieldComponent
+      label="Comment"
+      value={value}
+      onChange={noop}
+      fullWidth
+      placeholder="Enter Text"
+      onBlur={noop}
+      onFocus={noop}
+    />
+  );
+}
