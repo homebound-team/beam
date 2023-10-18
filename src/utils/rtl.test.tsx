@@ -33,6 +33,7 @@ describe("rtl", () => {
     select(r.number, "2");
     // Then the onSelect handler is called with the correct value
     expect(onSelect).toHaveBeenCalledWith("2", { id: "2", name: "Two" });
+    expect(r.number).toHaveValue("Two");
 
     // And the getSelected helper returns the correct value
     expect(getSelected(r.number)).toBe("Two");
@@ -46,22 +47,51 @@ describe("rtl", () => {
   it("can select options via label on SelectField", async () => {
     const onSelect = jest.fn();
     // Given the SelectField
+    function Test() {
+      const [value, setValue] = useState<string | undefined>();
+      return (
+        <SelectField
+          label="Number"
+          value={value}
+          onSelect={(value, opt) => {
+            setValue(value);
+            onSelect(value, opt);
+          }}
+          options={[
+            { id: "1", name: "One" },
+            { id: "2", name: "Two" },
+            { id: "3", name: "Three" },
+          ]}
+        />
+      );
+    }
+    const r = await render(<Test />);
+    // When selecting an option
+    select(r.number, "Two");
+    // Then the onSelect handler is called with the correct value
+    expect(onSelect).toHaveBeenCalledWith("2", { id: "2", name: "Two" });
+    expect(r.number).toHaveValue("Two");
+  });
+
+  it("fails when selecting disabled options", async () => {
+    const onSelect = jest.fn();
+    // Given a SelectField
     const r = await render(
       <SelectField
         label="Number"
-        value={undefined}
+        value={undefined as any}
         onSelect={onSelect}
         options={[
           { id: "1", name: "One" },
           { id: "2", name: "Two" },
           { id: "3", name: "Three" },
         ]}
+        // And the 1st option option is disabled
+        disabledOptions={["1"]}
       />,
     );
-    // When selecting an option
-    select(r.number, "Two");
-    // Then the onSelect handler is called with the correct value
-    expect(onSelect).toHaveBeenCalledWith("2", { id: "2", name: "Two" });
+    // When selecting it, it fails
+    expect(() => select(r.number, "One")).toThrow("Cannot select disabled option One");
   });
 
   it("can selectAndWait on SelectField", async () => {
