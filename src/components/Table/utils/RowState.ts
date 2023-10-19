@@ -127,7 +127,7 @@ export class RowState<R extends Kinded> {
     // client-side filter changes, a child reappears, and we need to transition to partial-ness.
     if (this.isParent) {
       // Use visibleChildren b/c if filters are hiding some of our children, we still want to show fully selected
-      const children = this.visibleChildren;
+      const children = this.visibleChildren.filter((c) => c.row.selectable !== false);
       const allChecked = children.every((child) => child.selectedState === "checked");
       const allUnchecked = children.every((child) => child.selectedState === "unchecked");
       return children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
@@ -143,7 +143,7 @@ export class RowState<R extends Kinded> {
    */
   get selectedStateForHeader(): SelectedState {
     if (this.children) {
-      const children = this.visibleChildren;
+      const children = this.visibleChildren.filter((c) => c.row.selectable !== false || c.isParent);
       const allChecked = children.every((child) => child.selectedStateForHeader === "checked");
       const allUnchecked = children.every((child) => child.selectedStateForHeader === "unchecked");
       // For the header purposes, if this is a selectable-row (i.e. not inferSelectedState) make sure
@@ -302,7 +302,8 @@ export class RowState<R extends Kinded> {
    * they want the row to be selectable.
    */
   private get isParent(): boolean {
-    return !!this.children && this.children.length > 0 && this.inferSelectedState;
+    // Check for KEPT_GROUP b/c it has `this.children = []` but we synthesize its children in `visibleChildren`
+    return !!this.children && (this.children.length > 0 || this.row.id === KEPT_GROUP) && this.inferSelectedState;
   }
 
   private get isPinned(): boolean {

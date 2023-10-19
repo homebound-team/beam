@@ -13,6 +13,11 @@ describe("Checkbox", () => {
     expect(r.customId).toBeTruthy();
   });
 
+  it("sets disabled", async () => {
+    const r = await render(<Checkbox label="Test" selected={false} onChange={noop} disabled={true} />);
+    expect(r.test).toBeDisabled();
+  });
+
   it("treats indeterminate as false", async () => {
     // Given an indeterminate checkbox
     const onChange = jest.fn();
