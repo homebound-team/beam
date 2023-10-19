@@ -19,9 +19,7 @@ export function SelectToggle({ id, disabled }: SelectToggleProps) {
       checkboxOnly={true}
       disabled={disabled}
       label="Select"
-      onChange={(selected) => {
-        tableState.selectRow(id, selected);
-      }}
+      onChange={(selected) => tableState.selectRow(id, selected)}
       selected={selected}
     />
   );

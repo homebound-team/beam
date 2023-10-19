@@ -63,7 +63,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
       <VisuallyHidden>
         <input ref={ref} {...mergeProps(inputProps, focusProps)} {...tid} data-indeterminate={isIndeterminate} />
       </VisuallyHidden>
-      <StyledCheckbox {...props} isFocusVisible={isFocusVisible} />
+      <StyledCheckbox {...props} isFocusVisible={isFocusVisible} {...tid} />
       {!checkboxOnly && (
         // Use a mtPx(-2) to better align the label with the checkbox.
         // Not using align-items: center as the checkbox would align with all content below, where we really want it to stay only aligned with the label

@@ -72,10 +72,6 @@ const nestedColumns: GridColumn<NestedRow>[] = [
   },
   selectColumn<NestedRow>({
     totals: emptyCell,
-    header: (data, { row }) => ({ content: <Select id={row.id} /> }),
-    parent: (data, { row }) => ({ content: <Select id={row.id} /> }),
-    child: (data, { row }) => ({ content: <Select id={row.id} /> }),
-    grandChild: (data, { row }) => ({ content: <Select id={row.id} /> }),
   }),
   {
     totals: emptyCell,
@@ -1643,6 +1639,57 @@ describe("GridTable", () => {
     expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
     expect(cellAnd(r, 2, 1, "select")).not.toBeChecked();
     expect(cellAnd(r, 3, 1, "select")).not.toBeChecked();
+    // And they are no longer selected
+    expect(api.current!.getSelectedRowIds()).toEqual([]);
+  });
+
+  it("can select all with disabled children", async () => {
+    // Given a parent with two children
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+          // And the 2nd one is disabled
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" }, selectable: false },
+        ],
+      },
+    ];
+
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<NestedRow>();
+      api.current = _api;
+      return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
+    }
+    const r = await render(<Test />);
+
+    // And all three rows are initially rendered
+    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 3, 2)).toHaveTextContent("child p1c2");
+
+    // When we select all
+    click(cell(r, 0, 1).children[0] as any);
+    // Then the 'All', Parent, and 1st child rows are shown as selected
+    expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 2, 1, "select")).toBeChecked();
+    // But the 2nd child is not
+    expect(cellAnd(r, 3, 1, "select")).toBeDisabled();
+    // And the api can fetch them
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1"]);
+    expect(api.current!.getSelectedRowIds("child")).toEqual(["p1c1"]);
+
+    // And when we unselect all
+    click(cell(r, 0, 1).children[0] as any);
+    // Then all rows are shown as unselected
+    expect(cellAnd(r, 0, 1, "select")).not.toBeChecked();
+    expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
+    expect(cellAnd(r, 2, 1, "select")).not.toBeChecked();
+    expect(cellAnd(r, 3, 1, "select")).not.toBeChecked();
+    expect(cellAnd(r, 3, 1, "select")).toBeDisabled();
     // And they are no longer selected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
@@ -3566,7 +3613,8 @@ describe("GridTable", () => {
       // When deselecting the visible row
       click(r.select_2);
 
-      // Then the parent row is now unchecked (respecting only the matched rows), but the header is still partially selected as it takes into consideration the kept selected rows
+      // Then the parent row is now unchecked (respecting only the matched rows), but the header is still partially
+      // selected as it takes into consideration the kept selected rows
       expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
       expect(cellAnd(r, 2, 1, "select")).not.toBeChecked();
 
