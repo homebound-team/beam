@@ -1,3 +1,5 @@
+[![npm](https://img.shields.io/npm/v/@homebound/beam)](https://www.npmjs.com/package/@homebound/beam)
+
 # 🪵 Beam Design System
 
 Homebound's React component design system.
