@@ -2638,7 +2638,7 @@ __metadata:
     "@emotion/babel-preset-css-prop": ^11.10.0
     "@emotion/jest": ^11.10.5
     "@emotion/react": ^11.10.6
-    "@homebound/eslint-config": ^1.10.0
+    "@homebound/eslint-config": ^1.10.2
     "@homebound/form-state": ^2.20.1
     "@homebound/rtl-react-router-utils": 1.0.3
     "@homebound/rtl-utils": ^2.65.0
@@ -2732,9 +2732,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@homebound/eslint-config@npm:^1.10.0":
-  version: 1.10.0
-  resolution: "@homebound/eslint-config@npm:1.10.0"
+"@homebound/eslint-config@npm:^1.10.2":
+  version: 1.10.2
+  resolution: "@homebound/eslint-config@npm:1.10.2"
   dependencies:
     "@graphql-eslint/eslint-plugin": ^3.20.1
     "@homebound/eslint-plugin": ^1.0.1
@@ -2752,7 +2752,7 @@ __metadata:
     prettier-plugin-organize-imports: ^3.2.3
   peerDependencies:
     eslint: ^8.12.0
-  checksum: 508039708f5bb31bc7dd7b87357c8b7315e2ddefa0f021973bd4ad02db19024185cb2f6be8a2ea65796e3c2aae4b5186c978551ed02c3e5d58e77b78fcf2dbc4
+  checksum: 83ad6bdb9a3b471b6b94a468d503e9b50d96e2387571391e41e69dcd2f629b34808ba2f543d3cc10e440c7d71bb9e520fe0081431845de017f94fa87421cb5c3
   languageName: node
   linkType: hard
 
