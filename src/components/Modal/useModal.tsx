@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useBeamContext } from "src/components/BeamContext";
 import { CheckFn } from "src/types";
-import { maybeCall } from "src/utils";
+import { isDefined, maybeCall } from "src/utils";
 import { ModalApi, ModalProps } from "./Modal";
 
 export interface UseModalHook {
@@ -9,6 +9,7 @@ export interface UseModalHook {
   closeModal: VoidFunction;
   addCanClose: (canClose: CheckFn) => void;
   setSize: (size: ModalProps["size"]) => void;
+  inModal: () => boolean;
 }
 
 export function useModal(): UseModalHook {
@@ -51,6 +52,7 @@ export function useModal(): UseModalHook {
           modalState.current.api.current.setSize(size);
         }
       },
+      inModal: () => isDefined(modalState.current),
     }),
     [modalState, modalCanCloseChecks],
   );

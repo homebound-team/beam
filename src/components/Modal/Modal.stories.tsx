@@ -8,6 +8,7 @@ import {
   TestModalFilterTable,
   VirtualizedTable,
 } from "src/components/Modal/TestModalContent";
+import { Css } from "src/Css";
 import { FormStateApp } from "src/forms/FormStateApp";
 import { noop } from "src/utils/index";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
@@ -108,6 +109,24 @@ export function ModalForm() {
         </ModalFooter>
       </>
     </OpenModal>
+  );
+}
+
+export function InModalState() {
+  const { openModal, inModal } = useModal();
+  const open = () =>
+    openModal({
+      content: <TestModalContent />,
+      size: { width: "md", height: 600 },
+    });
+
+  return (
+    <div css={Css.df.fdc.$}>
+      <div css={Css.mb3.$}>
+        <Button label="Open" onClick={open} />
+      </div>
+      <span css={Css.lgMd.$}>Open: {inModal() ? "YES" : "NO"}</span>
+    </div>
   );
 }
 

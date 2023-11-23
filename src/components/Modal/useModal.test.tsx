@@ -95,4 +95,33 @@ describe("useModal", () => {
     // And the BeamContext has been cleared
     expect(beamContext!.modalCanCloseChecks.current).toEqual([]);
   });
+
+  it("can identify when modal is open/closed", async () => {
+    // Given a ModalContext
+    let context: UseModalHook;
+    const modalProps = { title: "Test", content: <div>Test</div> };
+
+    function TestApp() {
+      context = useModal();
+      return <div />;
+    }
+
+    // When rendering a component without a modal defined
+    await render(<TestApp />);
+
+    const { openModal, closeModal, inModal } = context!;
+
+    // Then expect inModal returns false
+    expect(inModal()).toBeFalsy();
+
+    // When opening the modal via the context method
+    act(() => openModal(modalProps));
+    // Then expect inModal returns true
+    expect(inModal()).toBeTruthy();
+
+    // When closing the modal via the context method
+    act(() => closeModal());
+    // Then expect inModal returns false
+    expect(inModal()).toBeFalsy();
+  });
 });
