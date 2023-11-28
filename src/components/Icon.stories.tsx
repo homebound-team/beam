@@ -53,6 +53,8 @@ export const Icon = (props: IconProps) => {
     "undoCircle",
     "drag",
     "move",
+    "add",
+    "remove",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
@@ -142,6 +144,14 @@ export const Icon = (props: IconProps) => {
     "car",
     "basement",
     "cube",
+    "cart",
+    "programChange",
+    "architectural",
+    "structural",
+    "mep",
+    "designPackage",
+    "updateDesignPackage",
+    "exteriorStyle",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
