@@ -3,17 +3,20 @@ import { useBeamContext } from "src/components/BeamContext";
 import { CheckFn } from "src/types";
 import { isDefined, maybeCall } from "src/utils";
 import { ModalApi, ModalProps } from "./Modal";
+import { useModalContext } from "./ModalContext";
 
 export interface UseModalHook {
   openModal: (props: ModalProps) => void;
   closeModal: VoidFunction;
   addCanClose: (canClose: CheckFn) => void;
   setSize: (size: ModalProps["size"]) => void;
-  inModal: () => boolean;
+  inModal: boolean;
 }
 
 export function useModal(): UseModalHook {
   const { modalState, modalCanCloseChecks } = useBeamContext();
+  const { inModal } = useModalContext();
+  console.log("useModal", { inModal });
   const lastCanClose = useRef<CheckFn | undefined>();
   const api = useRef<ModalApi>();
   useEffect(() => {
@@ -52,8 +55,8 @@ export function useModal(): UseModalHook {
           modalState.current.api.current.setSize(size);
         }
       },
-      inModal: () => isDefined(modalState.current),
+      inModal,
     }),
-    [modalState, modalCanCloseChecks],
+    [inModal, modalState, modalCanCloseChecks],
   );
 }
