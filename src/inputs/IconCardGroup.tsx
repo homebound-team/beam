@@ -66,7 +66,7 @@ export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
         } else {
           newSelected = [...selected, value];
 
-          // Filter out any exclusive options that are now overridden.
+          // Filter out any exclusive options as a non-exclusive option was selected.
           newSelected = newSelected.filter((v) => !exclusiveOptions.some((o) => o.value === v));
         }
       }
