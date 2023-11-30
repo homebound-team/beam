@@ -53,10 +53,11 @@ export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
     (value: V) => {
       if (selected.includes(value)) {
         setSelected(selected.filter((v) => v !== value));
+        onChange(selected.filter((v) => v !== value));
       } else {
         setSelected([...selected, value]);
+        onChange([...selected, value]);
       }
-      onChange([...selected, value]);
     },
     [onChange, selected],
   );
