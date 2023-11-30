@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react";
 import { IconCardGroup, IconCardGroupItemOption, IconCardGroupProps } from "./IconCardGroup";
-import { Chips } from "src/components";
 import { useState } from "react";
 import { Css } from "src/Css";
 
@@ -15,6 +14,7 @@ enum Category {
   Engineering,
   Management,
   Media,
+  Na,
 }
 
 const categories: IconCardGroupItemOption<Category>[] = [
@@ -24,6 +24,7 @@ const categories: IconCardGroupItemOption<Category>[] = [
   { icon: "hardHat", label: "Engineering", value: Category.Engineering },
   { icon: "kanban", label: "Management", value: Category.Management },
   { icon: "camera", label: "Media", value: Category.Media },
+  { icon: "remove", label: "N/A", value: Category.Na, exclusive: true },
 ];
 
 export function Default() {

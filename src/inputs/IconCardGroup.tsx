@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useState } from "react";
+import { ReactNode, useCallback, useMemo, useState } from "react";
 import { Css } from "src/Css";
 import { IconProps } from "src/components/Icon";
 import { Label } from "src/components/Label";
@@ -48,26 +48,32 @@ export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
 
   const [selected, setSelected] = useState<V[]>(values);
 
+  const exclusiveOptions = useMemo(() => options.filter((o) => o.exclusive), [options]);
+
   const toggleValue = useCallback(
     (value: V) => {
       if (isDisabled) return;
+
       const option = options.find((o) => o.value === value);
       if (!option) return;
 
-      if (option.exclusive) {
-        setSelected([value]);
-        onChange([value]);
+      let newSelected: V[] = [];
+      if (selected.includes(value)) {
+        newSelected = selected.filter((v) => v !== value);
       } else {
-        if (selected.includes(value)) {
-          setSelected(selected.filter((v) => v !== value));
-          onChange(selected.filter((v) => v !== value));
+        if (option.exclusive) {
+          newSelected = [value];
         } else {
-          setSelected([...selected, value]);
-          onChange([...selected, value]);
+          newSelected = [...selected, value];
+
+          // Filter out any exclusive options that are now overridden.
+          newSelected = newSelected.filter((v) => !exclusiveOptions.some((o) => o.value === v));
         }
       }
+      setSelected(newSelected);
+      onChange(newSelected);
     },
-    [onChange, selected],
+    [exclusiveOptions, isDisabled, onChange, options, selected],
   );
 
   const tid = useTestIds(props);
