@@ -9,7 +9,6 @@ import { HelperText } from "src/components/HelperText";
 import { ErrorMessage } from "./ErrorMessage";
 import { Value } from "src/inputs";
 import { mergeProps, useField } from "react-aria";
-import { filterDOMProps } from "@react-aria/utils";
 
 export interface IconCardGroupItemOption<V extends Value> {
   icon: IconProps["icon"];
@@ -51,12 +50,21 @@ export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
 
   const toggleValue = useCallback(
     (value: V) => {
-      if (selected.includes(value)) {
-        setSelected(selected.filter((v) => v !== value));
-        onChange(selected.filter((v) => v !== value));
+      if (isDisabled) return;
+      const option = options.find((o) => o.value === value);
+      if (!option) return;
+
+      if (option.exclusive) {
+        setSelected([value]);
+        onChange([value]);
       } else {
-        setSelected([...selected, value]);
-        onChange([...selected, value]);
+        if (selected.includes(value)) {
+          setSelected(selected.filter((v) => v !== value));
+          onChange(selected.filter((v) => v !== value));
+        } else {
+          setSelected([...selected, value]);
+          onChange([...selected, value]);
+        }
       }
     },
     [onChange, selected],
