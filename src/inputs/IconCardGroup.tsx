@@ -1,6 +1,4 @@
-import { ReactNode } from "react";
-import { useCheckboxGroup } from "react-aria";
-import { useCheckboxGroupState } from "react-stately";
+import { ReactNode, useCallback, useState } from "react";
 import { Css } from "src/Css";
 import { IconProps } from "src/components/Icon";
 import { Label } from "src/components/Label";
@@ -9,29 +7,34 @@ import { useTestIds } from "src/utils";
 import { IconCard } from "src/inputs/IconCard";
 import { HelperText } from "src/components/HelperText";
 import { ErrorMessage } from "./ErrorMessage";
+import { Value } from "src/inputs";
+import { mergeProps, useField } from "react-aria";
+import { filterDOMProps } from "@react-aria/utils";
 
-export interface IconCardGroupItemOption {
+export interface IconCardGroupItemOption<V extends Value> {
   icon: IconProps["icon"];
   label: string;
   disabled?: boolean;
   /** The value of the IconCardGroup item, stored in value array in state. */
-  value: string;
+  value: V;
+  /** Exclusive: if true, this option will override all other options when selected. */
+  exclusive?: boolean;
 }
 
-export interface IconCardGroupProps extends Pick<PresentationFieldProps, "labelStyle"> {
+export interface IconCardGroupProps<V extends Value> extends Pick<PresentationFieldProps, "labelStyle"> {
   label: string;
   /** Called when a card is selected */
-  onChange: (values: string[]) => void;
+  onChange: (values: V[]) => void;
   /** Options for the cards contained within the IconCardGroup. */
-  options: IconCardGroupItemOption[];
+  options: IconCardGroupItemOption<V>[];
   /** The values currently selected. */
-  values: string[];
+  values: V[];
   errorMsg?: string;
   helperText?: string | ReactNode;
   disabled?: boolean;
 }
 
-export function IconCardGroup(props: IconCardGroupProps) {
+export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
   const { fieldProps } = usePresentationContext();
   const {
     options,
@@ -41,14 +44,35 @@ export function IconCardGroup(props: IconCardGroupProps) {
     errorMsg,
     helperText,
     disabled: isDisabled = false,
+    onChange,
   } = props;
 
-  const state = useCheckboxGroupState({ ...props, isDisabled, value: values });
-  const { groupProps, labelProps } = useCheckboxGroup(props, state);
+  const [selected, setSelected] = useState<V[]>(values);
+
+  const toggleValue = useCallback(
+    (value: V) => {
+      if (selected.includes(value)) {
+        setSelected(selected.filter((v) => v !== value));
+      } else {
+        setSelected([...selected, value]);
+      }
+      onChange([...selected, value]);
+    },
+    [onChange, selected],
+  );
+
   const tid = useTestIds(props);
 
+  const { labelProps, fieldProps: fieldPropsAria } = useField(props);
+
+  const groupProps = mergeProps(tid, {
+    role: "group",
+    "aria-disabled": isDisabled || undefined,
+    ...fieldPropsAria,
+  });
+
   return (
-    <div {...groupProps} {...tid}>
+    <div {...groupProps}>
       {labelStyle !== "hidden" && (
         <div css={Css.if(labelStyle === "left").w50.$}>
           <Label label={label} {...labelProps} {...tid.label} />
@@ -57,17 +81,16 @@ export function IconCardGroup(props: IconCardGroupProps) {
       <div css={Css.df.gap2.add({ flexWrap: "wrap" }).$}>
         {options.map((option) => {
           const { icon, label, disabled } = option;
-          const isSelected = state.isSelected(option.value);
-          const isDisabled = disabled || state.isDisabled;
+          const isSelected = selected.includes(option.value);
           return (
             <IconCard
-              key={option.value}
+              key={option.label}
               icon={icon}
               label={label}
               selected={isSelected}
-              disabled={isDisabled}
-              onChange={() => state.toggleValue(option.value)}
-              {...tid[option.value]}
+              disabled={disabled}
+              onChange={() => toggleValue(option.value)}
+              {...tid[option.label]}
             />
           );
         })}
