@@ -125,7 +125,7 @@ export function InModalState() {
       <div css={Css.mb3.$}>
         <Button label="Open" onClick={open} />
       </div>
-      <span css={Css.lgMd.$}>Open: {inModal ? "YES" : "NO"}</span>
+      <span css={Css.lgMd.$}>In Modal: {inModal ? "YES" : "NO"}</span>
     </div>
   );
 }

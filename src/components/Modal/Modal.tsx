@@ -8,6 +8,7 @@ import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
+import { ModalProvider } from "./ModalContext";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl" | "xxl";
 
@@ -103,47 +104,49 @@ export function Modal(props: ModalProps) {
   );
 
   return (
-    <OverlayContainer>
-      <AutoSaveStatusProvider>
-        <div css={Css.underlay.z4.$} {...underlayProps} {...testId.underlay}>
-          <FocusScope contain restoreFocus autoFocus>
-            <div
-              css={
-                Css.br24.bgWhite.bshModal.overflowHidden
-                  .maxh("90vh")
-                  .df.fdc.wPx(width)
-                  .mhPx(defaultMinHeight)
-                  .if(isFixedHeight)
-                  .hPx(height).$
-              }
-              ref={ref}
-              {...overlayProps}
-              {...dialogProps}
-              {...modalProps}
-              {...testId}
-            >
-              {/* Setup three children (header, content, footer), and flex grow the content. */}
-              <header css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bGray200.$}>
-                <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
-                <span css={Css.fs0.pl1.$}>
-                  <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
-                </span>
-              </header>
-              <main
-                ref={modalBodyRef}
-                css={Css.fg1.overflowYAuto.if(hasScroll).bb.bGray200.if(!!forceScrolling).overflowYScroll.$}
+    <ModalProvider>
+      <OverlayContainer>
+        <AutoSaveStatusProvider>
+          <div css={Css.underlay.z4.$} {...underlayProps} {...testId.underlay}>
+            <FocusScope contain restoreFocus autoFocus>
+              <div
+                css={
+                  Css.br24.bgWhite.bshModal.overflowHidden
+                    .maxh("90vh")
+                    .df.fdc.wPx(width)
+                    .mhPx(defaultMinHeight)
+                    .if(isFixedHeight)
+                    .hPx(height).$
+                }
+                ref={ref}
+                {...overlayProps}
+                {...dialogProps}
+                {...modalProps}
+                {...testId}
               >
-                {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
-                {content}
-              </main>
-              <footer css={Css.fs0.$}>
-                <div ref={modalFooterRef} />
-              </footer>
-            </div>
-          </FocusScope>
-        </div>
-      </AutoSaveStatusProvider>
-    </OverlayContainer>
+                {/* Setup three children (header, content, footer), and flex grow the content. */}
+                <header css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bGray200.$}>
+                  <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
+                  <span css={Css.fs0.pl1.$}>
+                    <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
+                  </span>
+                </header>
+                <main
+                  ref={modalBodyRef}
+                  css={Css.fg1.overflowYAuto.if(hasScroll).bb.bGray200.if(!!forceScrolling).overflowYScroll.$}
+                >
+                  {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
+                  {content}
+                </main>
+                <footer css={Css.fs0.$}>
+                  <div ref={modalFooterRef} />
+                </footer>
+              </div>
+            </FocusScope>
+          </div>
+        </AutoSaveStatusProvider>
+      </OverlayContainer>
+    </ModalProvider>
   );
 }
 
