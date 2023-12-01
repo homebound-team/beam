@@ -70,26 +70,21 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
 
   // We essentially expose the refs, but with our own getters/setters so that we can
   // have the setters call `tick` to re-render this Provider
-  const context = useMemo<BeamContextState>(
-    () => {
-      return {
-        // These two keys need to trigger re-renders on change
-        modalState: new PretendRefThatTicks(modalRef, tick),
-        drawerContentStack: new PretendRefThatTicks(drawerContentStackRef, tick),
-        // The rest we don't need to re-render when these are mutated, so just expose as-is
-        modalCanCloseChecks: modalCanCloseChecksRef,
-        modalHeaderDiv,
-        modalBodyDiv,
-        modalFooterDiv,
-        drawerCanCloseChecks,
-        drawerCanCloseDetailsChecks,
-        sdHeaderDiv,
-      };
-    },
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [modalBodyDiv, modalFooterDiv],
-  );
+  const context = useMemo<BeamContextState>(() => {
+    return {
+      // These two keys need to trigger re-renders on change
+      modalState: new PretendRefThatTicks(modalRef, tick),
+      drawerContentStack: new PretendRefThatTicks(drawerContentStackRef, tick),
+      // The rest we don't need to re-render when these are mutated, so just expose as-is
+      modalCanCloseChecks: modalCanCloseChecksRef,
+      modalHeaderDiv,
+      modalBodyDiv,
+      modalFooterDiv,
+      drawerCanCloseChecks,
+      drawerCanCloseDetailsChecks,
+      sdHeaderDiv,
+    };
+  }, [modalBodyDiv, modalFooterDiv, modalHeaderDiv, sdHeaderDiv]);
 
   return (
     <BeamContext.Provider value={{ ...context }}>

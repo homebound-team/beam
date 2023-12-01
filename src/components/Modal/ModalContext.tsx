@@ -1,6 +1,6 @@
 // ModalContext.tsx
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 import { Modal, ModalProps } from "./Modal";
 
 // Define the type for the modal context
@@ -17,16 +17,10 @@ interface ModalProviderProps {
 }
 
 export function ModalProvider({ modalProps }: ModalProviderProps) {
-  const [inModal, setInModal] = useState(true);
+  const value = useMemo(() => ({ inModal: true }), []);
   return (
-    <ModalContext.Provider value={{ inModal }}>
-      <Modal
-        {...modalProps}
-        onClose={() => {
-          setInModal(false);
-          modalProps.onClose?.();
-        }}
-      />
+    <ModalContext.Provider value={value}>
+      <Modal {...modalProps} />
     </ModalContext.Provider>
   );
 }

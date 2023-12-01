@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useBeamContext } from "src/components/BeamContext";
 import { CheckFn } from "src/types";
-import { isDefined, maybeCall } from "src/utils";
+import { maybeCall } from "src/utils";
 import { ModalApi, ModalProps } from "./Modal";
 import { useModalContext } from "./ModalContext";
 
@@ -16,7 +16,6 @@ export interface UseModalHook {
 export function useModal(): UseModalHook {
   const { modalState, modalCanCloseChecks } = useBeamContext();
   const { inModal } = useModalContext();
-  console.log("useModal", { inModal });
   const lastCanClose = useRef<CheckFn | undefined>();
   const api = useRef<ModalApi>();
   useEffect(() => {
