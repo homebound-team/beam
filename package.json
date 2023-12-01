@@ -46,6 +46,7 @@
     "mobx-utils": "^6.0.8",
     "react-aria": "^3.26.0",
     "react-day-picker": "8.0.7",
+    "react-draggable": "^4.4.5",
     "react-popper": "^2.3.0",
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
