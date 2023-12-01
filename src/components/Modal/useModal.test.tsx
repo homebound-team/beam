@@ -96,32 +96,26 @@ describe("useModal", () => {
     expect(beamContext!.modalCanCloseChecks.current).toEqual([]);
   });
 
-  it("can identify when modal is open/closed", async () => {
-    // Given a ModalContext
-    let context: UseModalHook;
-    const modalProps = { title: "Test", content: <div>Test</div> };
-
-    function TestApp() {
-      context = useModal();
-      return <div />;
+  it("can identify when component is In Modal", async () => {
+    // Given a test app that opens a modal with content that checks if it is in a modal
+    function TestApp(props: ModalProps) {
+      const { openModal, inModal } = useModal();
+      useEffect(() => openModal(props), [openModal, props]);
+      return <div data-testid="testApp">Behind Modal: InModal? {String(inModal)}</div>;
     }
 
-    // When rendering a component without a modal defined
-    await render(<TestApp />);
+    // And a modal content that checks if it is in a modal also
+    function TestModalContent() {
+      const { inModal } = useModal();
+      return <div data-testid="modalContent">Modal Content: InModal? {String(inModal)}</div>;
+    }
 
-    const { openModal, closeModal, inModal } = context!;
+    // When rendering the test app
+    const r = await render(<TestApp content={<TestModalContent />} />);
 
-    // Then expect inModal returns false
-    expect(inModal()).toBeFalsy();
-
-    // When opening the modal via the context method
-    act(() => openModal(modalProps));
-    // Then expect inModal returns true
-    expect(inModal()).toBeTruthy();
-
-    // When closing the modal via the context method
-    act(() => closeModal());
-    // Then expect inModal returns false
-    expect(inModal()).toBeFalsy();
+    // Then the test app should not be in a modal
+    expect(r.testApp).toHaveTextContent("Behind Modal: InModal? false");
+    // And the modal content should be in a modal
+    expect(r.modalContent).toHaveTextContent("Modal Content: InModal? true");
   });
 });
