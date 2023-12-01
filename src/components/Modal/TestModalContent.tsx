@@ -22,7 +22,7 @@ export interface TestModalContentProps {
 
 /** A fake modal content component that we share across the modal and superdrawer stories. */
 export function TestModalContent(props: TestModalContentProps) {
-  const { closeModal, inModal } = useModal();
+  const { closeModal } = useModal();
   const { initNumSentences = 1, showLeftAction, withDateField } = props;
   const [numSentences, setNumSentences] = useState(initNumSentences);
   const [primaryDisabled, setPrimaryDisabled] = useState(false);
@@ -66,7 +66,6 @@ export function TestModalContent(props: TestModalContentProps) {
             )}
           </div>
           <p>{"The body content of the modal. This content can be anything!".repeat(numSentences)}</p>
-          <p>In Modal? {inModal ? "YES" : "NO"}</p>
         </div>
         {withDateField && <DateField value={date} label="Date" onChange={setDate} />}
       </ModalBody>
