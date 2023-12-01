@@ -7,10 +7,9 @@ import { SnackbarProvider } from "src/components/Snackbar/SnackbarContext";
 import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
 import { CanCloseCheck, CheckFn } from "src/types";
-import { EmptyRef, isDefined } from "src/utils/index";
+import { EmptyRef } from "src/utils/index";
 import { RightPaneProvider } from "./Layout";
 import { ToastProvider } from "./Toast/ToastContext";
-import { ModalContext, ModalProvider } from "./Modal/ModalContext";
 
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */
 export interface BeamContextState {
