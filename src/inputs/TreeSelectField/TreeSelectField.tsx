@@ -528,6 +528,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     <div css={Css.df.fdc.w100.maxw(fieldMaxWidth).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
       <ComboBoxInput
         {...otherProps}
+        fullWidth={fullWidth}
         labelStyle={labelStyle}
         buttonProps={buttonProps}
         buttonRef={triggerRef}

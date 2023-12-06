@@ -127,9 +127,9 @@ export function FullFlatList() {
   );
 }
 
-export function SideBySideMedium() {
+export function SideBySideFull() {
   return (
-    <FormLines>
+    <FormLines width="full">
       <FieldGroup>
         <TextField label="First" value="first" onChange={() => {}} />
         <TextField label="Middle" value="middle" onChange={() => {}} />
@@ -170,7 +170,7 @@ export function SideBySideMedium() {
 }
 export function SideBySideLarge() {
   return (
-    <FormLines width="lg">
+    <FormLines>
       <FieldGroup>
         <TextField label="First" value="first" onChange={() => {}} />
         <TextField label="Middle" value="middle" onChange={() => {}} />
@@ -203,6 +203,48 @@ export function SideBySideLarge() {
         <TextField label="City" value="" onChange={noop} />
         <TextField label="State" value="" onChange={noop} />
         <TextField label="Postal Code" value="" onChange={noop} />
+      </FieldGroup>
+      <FieldGroup>
+        <NumberField label="Qty" value={1} onChange={() => {}} />
+        <SelectField<Options, number>
+          label="Unit of Measure"
+          value={1}
+          options={[
+            { id: 1, name: "Each" },
+            { id: 2, name: "Square Feet" },
+          ]}
+          onSelect={noop}
+        />
+      </FieldGroup>
+    </FormLines>
+  );
+}
+
+export function SideBySideMedium() {
+  return (
+    <FormLines width="md">
+      <FieldGroup>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
+      </FieldGroup>
+      <TextField label="Address" value="123 Main" onChange={() => {}} />
+      <FieldGroup>
+        <Switch label="Primary" labelStyle="form" selected={false} onChange={() => {}} />
+        <Switch label="Signatory" labelStyle="form" selected={true} onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="Title" value="Engineer" onChange={() => {}} />
+        <span />
+      </FieldGroup>
+      <FieldGroup>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="middle" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
+      </FieldGroup>
+      <FieldGroup widths={[2, 1, 2]}>
+        <TextField label="First" value="first" onChange={() => {}} />
+        <TextField label="Middle" value="M" onChange={() => {}} />
+        <TextField label="Last" value="last" onChange={() => {}} />
       </FieldGroup>
       <FieldGroup>
         <NumberField label="Qty" value={1} onChange={() => {}} />

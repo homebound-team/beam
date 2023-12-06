@@ -90,8 +90,6 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
   const multilineProps = allowWrap ? { textAreaMinHeight: 0, multiline: true } : {};
   useGrowingTextField({ disabled: !allowWrap, inputRef, inputWrapRef, value: inputProps.value });
 
-  console.log("otherProps", otherProps);
-
   return (
     <TextFieldBase
       {...otherProps}

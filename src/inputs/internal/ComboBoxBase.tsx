@@ -328,6 +328,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     <div css={Css.df.fdc.w100.maxw(fieldMaxWidth).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
       <ComboBoxInput
         {...otherProps}
+        fullWidth={fullWidth}
         buttonProps={buttonProps}
         buttonRef={triggerRef}
         inputProps={inputProps}

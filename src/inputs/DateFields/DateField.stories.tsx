@@ -6,7 +6,7 @@ import { Css } from "src/Css";
 import { jan1, jan10, jan2 } from "src/forms/formStateDomain";
 import { DateField, DateFieldProps, TextField } from "src/inputs/index";
 import { noop } from "src/utils";
-import { samples } from "src/utils/sb";
+import { samples, withDimensions } from "src/utils/sb";
 
 export default {
   component: Button,
@@ -79,6 +79,7 @@ export function DatePickerOpen() {
     </>
   );
 }
+DatePickerOpen.decorators = [withDimensions()];
 
 function TestDateField(props: Omit<DateFieldProps, "value" | "onChange" | "onBlur" | "onFocus">) {
   const [value, onChange] = useState<Date | undefined>(jan1);
