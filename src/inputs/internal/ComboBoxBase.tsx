@@ -5,11 +5,12 @@ import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately
 import { resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
-import { Css, px } from "src/Css";
+import { Css } from "src/Css";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
+import { getFieldWidth } from "src/inputs/utils";
 
 /** Base props for either `SelectField` or `MultiSelectField`. */
 export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
@@ -88,6 +89,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     getOptionLabel: propOptionLabel,
     getOptionValue: propOptionValue,
     getOptionMenuLabel: propOptionMenuLabel,
+    fullWidth = fieldProps?.fullWidth ?? false,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
@@ -320,8 +322,10 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     minWidth: 200,
   };
 
+  const fieldMaxWidth = getFieldWidth(fullWidth);
+
   return (
-    <div css={Css.df.fdc.w100.maxw(px(550)).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
+    <div css={Css.df.fdc.w100.maxw(fieldMaxWidth).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
       <ComboBoxInput
         {...otherProps}
         buttonProps={buttonProps}

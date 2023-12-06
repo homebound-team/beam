@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import { FieldGroup, FormDivider, FormLines } from "src/forms/FormLines";
-import { SelectField } from "src/inputs";
+import { DateField, MultiSelectField, RichTextField, SelectField, TextAreaField, TreeSelectField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
 import { Switch } from "src/inputs/Switch";
 import { TextField } from "src/inputs/TextField";
@@ -13,8 +13,38 @@ export default {
 export function FlatList() {
   return (
     <FormLines>
-      <TextField label="First" value="first" onChange={() => {}} />
-      <TextField label="Last" value="last" onChange={() => {}} />
+      <TextField label="Text Field" value="first" onChange={noop} />
+      <NumberField label="Number Field" value={1} onChange={noop} />
+      <DateField label="Date FIeld" value={undefined} onChange={noop} />
+      <SelectField<Options, number>
+        label="Single Select Field"
+        value={1}
+        options={[
+          { id: 1, name: "Green" },
+          { id: 2, name: "Red" },
+        ]}
+        onSelect={noop}
+      />
+      <MultiSelectField<Options, number>
+        label="Multiselect Field"
+        values={[1]}
+        options={[
+          { id: 1, name: "Soccer" },
+          { id: 2, name: "Basketball" },
+          { id: 3, name: "Football" },
+        ]}
+        onSelect={noop}
+      />
+      <TreeSelectField
+        values={[]}
+        onSelect={noop}
+        options={[{ id: "1", name: "One" }]}
+        label="Tree Select Field"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />
+      <TextAreaField label="Text Area Field" value="" onChange={noop} />
+      <RichTextField label="Rich Text Field" value="" onChange={noop} />
     </FormLines>
   );
 }
@@ -22,8 +52,38 @@ export function FlatList() {
 export function SmallFlatList() {
   return (
     <FormLines width="sm">
-      <TextField label="First" value="first" onChange={() => {}} />
-      <TextField label="Last" value="last" onChange={() => {}} />
+      <TextField label="Text Field" value="first" onChange={noop} />
+      <NumberField label="Number Field" value={1} onChange={noop} />
+      <DateField label="Date FIeld" value={undefined} onChange={noop} />
+      <SelectField<Options, number>
+        label="Single Select Field"
+        value={1}
+        options={[
+          { id: 1, name: "Green" },
+          { id: 2, name: "Red" },
+        ]}
+        onSelect={noop}
+      />
+      <MultiSelectField<Options, number>
+        label="Multiselect Field"
+        values={[1]}
+        options={[
+          { id: 1, name: "Soccer" },
+          { id: 2, name: "Basketball" },
+          { id: 3, name: "Football" },
+        ]}
+        onSelect={noop}
+      />
+      <TreeSelectField
+        values={[]}
+        onSelect={noop}
+        options={[{ id: "1", name: "One" }]}
+        label="Tree Select Field"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />
+      <TextAreaField label="Text Area Field" value="" onChange={noop} />
+      <RichTextField label="Rich Text Field" value="" onChange={noop} />
     </FormLines>
   );
 }
@@ -31,8 +91,38 @@ export function SmallFlatList() {
 export function FullFlatList() {
   return (
     <FormLines width="full">
-      <TextField label="First" value="first" onChange={() => {}} />
-      <TextField label="Last" value="last" onChange={() => {}} />
+      <TextField label="Text Field" value="first" onChange={noop} />
+      <NumberField label="Number Field" value={1} onChange={noop} />
+      <DateField label="Date FIeld" value={undefined} onChange={noop} />
+      <SelectField<Options, number>
+        label="Single Select Field"
+        value={1}
+        options={[
+          { id: 1, name: "Green" },
+          { id: 2, name: "Red" },
+        ]}
+        onSelect={noop}
+      />
+      <MultiSelectField<Options, number>
+        label="Multiselect Field"
+        values={[1]}
+        options={[
+          { id: 1, name: "Soccer" },
+          { id: 2, name: "Basketball" },
+          { id: 3, name: "Football" },
+        ]}
+        onSelect={noop}
+      />
+      <TreeSelectField
+        values={[]}
+        onSelect={noop}
+        options={[{ id: "1", name: "One" }]}
+        label="Tree Select Field"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />
+      <TextAreaField label="Text Area Field" value="" onChange={noop} />
+      <RichTextField label="Rich Text Field" value="" onChange={noop} />
     </FormLines>
   );
 }

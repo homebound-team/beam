@@ -8,8 +8,9 @@ import Tribute from "tributejs";
 import "tributejs/dist/tribute.css";
 import "trix/dist/trix";
 import "trix/dist/trix.css";
+import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 
-export interface RichTextFieldProps {
+export interface RichTextFieldProps extends Pick<PresentationFieldProps, "fullWidth"> {
   /** The initial html value to show in the trix editor. */
   value: string | undefined;
   onChange: (html: string | undefined, text: string | undefined, mergeTags: string[]) => void;
@@ -28,8 +29,6 @@ export interface RichTextFieldProps {
   onFocus?: () => void;
   /** For rendering formatted text */
   readOnly?: boolean;
-  /** Will set width to: 100% */
-  fullWidth?: boolean;
 }
 
 /**
@@ -40,7 +39,17 @@ export interface RichTextFieldProps {
  * We also integrate [tributejs]{@link https://github.com/zurb/tribute} for @ mentions.
  */
 export function RichTextField(props: RichTextFieldProps) {
-  const { mergeTags, label, value = "", onChange, onBlur = noop, onFocus = noop, readOnly, fullWidth } = props;
+  const { fieldProps } = usePresentationContext();
+  const {
+    mergeTags,
+    label,
+    value = "",
+    onChange,
+    onBlur = noop,
+    onFocus = noop,
+    readOnly,
+    fullWidth = fieldProps?.fullWidth ?? false,
+  } = props;
 
   // We get a reference to the Editor instance after trix-init fires
   const [editor, setEditor] = useState<Editor>();

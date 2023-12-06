@@ -11,7 +11,7 @@ import { TextFieldBase } from "./TextFieldBase";
 export type NumberFieldType = "cents" | "dollars" | "percent" | "basisPoints" | "days";
 
 // exported for testing purposes
-export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelStyle"> {
+export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelStyle" | "fullWidth"> {
   label: string;
   /** If set, the label will be defined as 'aria-label` on the input element */
   type?: NumberFieldType;

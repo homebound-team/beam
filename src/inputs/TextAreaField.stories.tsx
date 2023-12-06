@@ -40,6 +40,9 @@ export function TextAreaStyles() {
           <TextField label="Regular Field For Reference" value="value" onChange={() => {}} />
         </FormLines>
 
+        <h1 css={Css.lg.$}>Full Width</h1>
+        <TestTextArea label="Description" value="An example description text." fullWidth />
+
         <h1 css={Css.lg.$}>Modified for Blueprint To Do Title</h1>
         <TestTextArea
           label="Title"

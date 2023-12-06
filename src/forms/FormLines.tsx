@@ -28,7 +28,7 @@ export interface FormLinesProps {
  * (see the `FieldGroup` component), where they will be laid out side-by-side.
  */
 export function FormLines(props: FormLinesProps) {
-  const { children, width = "full", labelSuffix, labelStyle, compact } = props;
+  const { children, width = "lg", labelSuffix, labelStyle, compact } = props;
   let firstFormHeading = true;
 
   // Only overwrite `fieldProps` if new values are explicitly set. Ensures we only set to `undefined` if explicitly set.
@@ -36,6 +36,7 @@ export function FormLines(props: FormLinesProps) {
     ...("labelSuffix" in props ? { labelSuffix } : {}),
     ...("labelStyle" in props ? { labelStyle } : {}),
     ...("compact" in props ? { compact } : {}),
+    ...(width === "full" ? { fullWidth: true } : {}),
   };
 
   return (

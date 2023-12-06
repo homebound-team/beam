@@ -6,11 +6,10 @@ import { Css } from "src/Css";
 import { jan1, jan10, jan2 } from "src/forms/formStateDomain";
 import { DateField, DateFieldProps, TextField } from "src/inputs/index";
 import { noop } from "src/utils";
-import { samples, withDimensions } from "src/utils/sb";
+import { samples } from "src/utils/sb";
 
 export default {
   component: Button,
-  decorators: [withDimensions()],
   parameters: {
     design: {
       type: "figma",
@@ -61,6 +60,7 @@ export function DateFields() {
         disabledDays={[{ before: jan1 }, { after: jan10 }]}
       />,
     ],
+    ["Full Width", <TestDateField label="Date" fullWidth />],
   );
 }
 
