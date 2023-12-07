@@ -9,9 +9,9 @@ import { ListBox } from "src/inputs/internal/ListBox";
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { Value, valueToKey } from "src/inputs/Value";
 
-interface AutocompleteProps<T>
+export interface AutocompleteProps<T>
   extends Pick<PresentationFieldProps, "labelStyle">,
-    Pick<TextFieldBaseProps<any>, "label" | "clearable" | "startAdornment"> {
+    Pick<TextFieldBaseProps<any>, "label" | "clearable" | "startAdornment" | "fullWidth"> {
   onSelect: (item: T) => void;
   /** A function that returns how to render the an option in the menu. If not set, `getOptionLabel` will be used */
   getOptionMenuLabel?: (o: T) => ReactNode;

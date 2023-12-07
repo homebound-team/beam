@@ -17,6 +17,8 @@ export interface PresentationFieldProps {
   visuallyDisabled?: false;
   // If set error messages will be rendered as tooltips rather than below the field
   errorInTooltip?: true;
+  /** Allow the fields to grow to the width of its container. By default, fields will extend up to 550px */
+  fullWidth?: boolean;
 }
 
 export type PresentationContextProps = {

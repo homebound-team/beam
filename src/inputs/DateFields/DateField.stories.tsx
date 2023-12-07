@@ -10,7 +10,6 @@ import { samples, withDimensions } from "src/utils/sb";
 
 export default {
   component: Button,
-  decorators: [withDimensions()],
   parameters: {
     design: {
       type: "figma",
@@ -61,6 +60,7 @@ export function DateFields() {
         disabledDays={[{ before: jan1 }, { after: jan10 }]}
       />,
     ],
+    ["Full Width", <TestDateField label="Date" fullWidth />],
   );
 }
 
@@ -79,6 +79,7 @@ export function DatePickerOpen() {
     </>
   );
 }
+DatePickerOpen.decorators = [withDimensions()];
 
 function TestDateField(props: Omit<DateFieldProps, "value" | "onChange" | "onBlur" | "onFocus">) {
   const [value, onChange] = useState<Date | undefined>(jan1);

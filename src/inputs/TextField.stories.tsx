@@ -85,6 +85,11 @@ export function TextFieldStyles() {
           endAdornment={<Icon icon="star" />}
         />
       </div>
+
+      <div css={Css.df.fdc.gap2.$}>
+        <h1 css={Css.lg.$}>Full Width</h1>
+        <TestTextField fullWidth value="" label="Name" />
+      </div>
     </div>
   );
 }
