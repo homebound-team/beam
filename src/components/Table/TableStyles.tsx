@@ -15,6 +15,8 @@ export interface GridStyle {
   lastRowCss?: Properties;
   /** Applied on the first row of the table (could be the Header or Totals row). */
   firstRowCss?: Properties;
+  /** Applied to every non-header row of the table */
+  nonHeaderRowCss?: Properties;
   /** Applied to the first non-header row, i.e. if you want to cancel out `betweenRowsCss`. */
   firstNonHeaderRowCss?: Properties;
   /** Applied to all cell divs (via a selector off the base div). */
@@ -39,7 +41,9 @@ export interface GridStyle {
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
-  rowHoverColor?: Palette;
+  rowHoverColor?: Palette | "none";
+  /** Applied on hover of a row */
+  nonHeaderRowHoverCss?: Properties;
   /** Default content to put into an empty cell */
   emptyCell?: ReactNode;
   presentationSettings?: Pick<PresentationFieldProps, "borderless" | "typeScale"> &
@@ -209,18 +213,16 @@ export const condensedStyle: GridStyle = {
 export const cardStyle: GridStyle = {
   ...defaultStyle,
   betweenRowsCss: {},
-  firstNonHeaderRowCss: Css.mt2.$,
-  cellCss: Css.p2.my1.bt.bb.bGray400.$,
-  firstCellCss: Css.bl.add({ borderTopLeftRadius: "4px", borderBottomLeftRadius: "4px" }).$,
-  lastCellCss: Css.br.add({ borderTopRightRadius: "4px", borderBottomRightRadius: "4px" }).$,
+  nonHeaderRowCss: Css.br4.overflowHidden.ba.bGray400.mt2.add("transition", "all 240ms").$,
+  firstRowCss: Css.bl.br.bGray200.borderRadius("8px 8px 0 0").overflowHidden.$,
+  cellCss: Css.p2.$,
   // Undo the card look & feel for the header
   headerCellCss: {
     ...defaultStyle.headerCellCss,
-    ...Css.add({
-      border: "none",
-      borderRadius: "unset",
-    }).p1.m0.xsMd.gray700.$,
+    ...Css.p1.m0.xsMd.gray700.$,
   },
+  rowHoverColor: "none",
+  nonHeaderRowHoverCss: Css.bshHover.bGray700.$,
 };
 
 export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
