@@ -437,7 +437,7 @@ function renderDiv<R extends Kinded>(
       <div
         css={{
           ...(style.betweenRowsCss ? Css.addIn(`& > div > *`, style.betweenRowsCss).$ : {}),
-          ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:first-of-type > *`, style.firstNonHeaderRowCss).$ : {}),
+          ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:first-of-type`, style.firstNonHeaderRowCss).$ : {}),
           ...(style.lastRowCss && Css.addIn("& > div:last-of-type", style.lastRowCss).$),
         }}
       >
@@ -475,7 +475,7 @@ function renderTable<R extends Kinded>(
         ...Css.w100.add("borderCollapse", "separate").add("borderSpacing", "0").$,
         ...Css.addIn("& > tbody > tr > * ", style.betweenRowsCss || {})
           // removes border between header and second row
-          .addIn("& > tbody > tr:first-of-type > *", style.firstNonHeaderRowCss || {}).$,
+          .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss || {}).$,
         ...Css.addIn("& > tbody > tr:last-of-type", style.lastRowCss).$,
         ...Css.addIn("& > thead > tr:first-of-type", style.firstRowCss).$,
         ...style.rootCss,
@@ -669,7 +669,7 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
             ...(isHeader
               ? Css.addIn("& > div:first-of-type > *", gs.firstRowCss).$
               : {
-                  ...Css.addIn("& > div:first-of-type > *", gs.firstNonHeaderRowCss).$,
+                  ...Css.addIn("& > div:first-of-type", gs.firstNonHeaderRowCss).$,
                   ...Css.addIn("& > div:last-of-type > *", gs.lastRowCss).$,
                 }),
             ...gs.rootCss,

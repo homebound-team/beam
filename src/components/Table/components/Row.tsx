@@ -75,15 +75,21 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   const revealOnRowHoverClass = "revealOnRowHover";
 
-  const showRowHoverColor = !reservedRowKinds.includes(row.kind) && !omitRowHover;
+  const showRowHoverColor = !reservedRowKinds.includes(row.kind) && !omitRowHover && style.rowHoverColor !== "none";
 
   const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
   const rowCss = {
+    ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
     // Optionally include the row hover styles, by default they should be turned on.
     ...(showRowHoverColor && {
       // Even though backgroundColor is set on the cellCss, the hover target is the row.
       "&:hover > *": Css.bgColor(style.rowHoverColor ?? Palette.Blue100).$,
     }),
+    ...(!reservedRowKinds.includes(row.kind) &&
+      style.rowHoverCss && {
+        // Need to spread this to make TS happy.
+        ":hover": { ...style.rowHoverCss },
+      }),
     // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `flexNone` to ensure they stay their defined widths
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.flexNone.$).$),
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
