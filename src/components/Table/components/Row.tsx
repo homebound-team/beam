@@ -78,7 +78,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const showRowHoverColor = !reservedRowKinds.includes(row.kind) && !omitRowHover && style.rowHoverColor !== "none";
 
   const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
-  const levelIndent = (style.levels && style.levels[level]?.rowIndent) ?? 0;
+  const levelIndent = style.levels && style.levels[level]?.rowIndent;
 
   const rowCss = {
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
