@@ -90,6 +90,13 @@ export type OnRowSelect<R extends Kinded> = {
     : (data: undefined, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void;
 };
 
+export type OnRowDragEvent<R extends Kinded> = {
+  [K in R["kind"]]?:
+    DiscriminateUnion<R, "kind", K> extends { data: infer D }
+    ? (data: D, opts: { row: GridDataRow<R>; api: GridTableApi<R> }, event: React.DragEvent<HTMLTableRowElement>) => void
+    : (data: undefined, opts: { row: GridDataRow<R>; api: GridTableApi<R> }, event: React.DragEvent<HTMLTableRowElement>) => void;
+};
+
 export interface GridTableProps<R extends Kinded, X> {
   id?: string;
   /**
@@ -165,6 +172,15 @@ export interface GridTableProps<R extends Kinded, X> {
   infiniteScroll?: InfiniteScroll;
   /** Callback for when a row is selected or unselected. */
   onRowSelect?: OnRowSelect<R>;
+
+  /** Drag & drop Callbacks. */
+  onRowDragStart?: OnRowDragEvent<R>;
+  onRowDrag?: OnRowDragEvent<R>;
+  onRowDragEnd?: OnRowDragEvent<R>;
+  onRowDrop?: OnRowDragEvent<R>;
+  onRowDragEnter?: OnRowDragEvent<R>;
+  onRowDragOver?: OnRowDragEvent<R>;
+  onRowDragLeave?: OnRowDragEvent<R>;
 }
 
 /**
@@ -209,6 +225,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     visibleColumnsStorageKey,
     infiniteScroll,
     onRowSelect,
+    onRowDragStart,
+    onRowDrag,
+    onRowDragEnd,
+    onRowDrop,
+    onRowDragEnter,
+    onRowDragOver,
+    onRowDragLeave,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
@@ -216,7 +239,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   // Use this ref to watch for changes in the GridTable's container and resize columns accordingly.
-  const resizeRef = useRef<HTMLDivElement>(null);
+  const resizeRef = useRef<   HTMLDivElement>(null);
 
   const api = useMemo<GridTableApiImpl<R>>(
     () => {
@@ -293,9 +316,23 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
+      const dragEventHandler = (callback: OnRowDragEvent<R> | undefined) => (evt: React.DragEvent<HTMLTableRowElement>) => {
+        if(rs.row.draggable && callback) {
+          let fn = callback[rs.row.kind];
+          fn && fn(rs.row.data as any, { row: rs.row, api: rs.api}, evt);
+        }
+      };
+
       const row = (
         <Row
           key={rs.key}
+          onDragStart={dragEventHandler(onRowDragStart)}
+          onDrag={dragEventHandler(onRowDrag)}
+          onDragOver={dragEventHandler(onRowDragOver)}
+          onDragEnd={dragEventHandler(onRowDragEnd)}
+          onDrop={dragEventHandler(onRowDrop)}
+          onDragEnter={dragEventHandler(onRowDragEnter)}
+          onDragLeave={dragEventHandler(onRowDragLeave)}
           {...{
             as,
             rs,

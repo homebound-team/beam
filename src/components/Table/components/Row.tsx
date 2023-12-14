@@ -42,6 +42,13 @@ interface RowProps<R extends Kinded> {
   cellHighlight: boolean;
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
+  onDragStart?: (event: React.DragEvent<HTMLTableRowElement>) => void;
+  onDrag?: (event: React.DragEvent<HTMLTableRowElement>) => void;
+  onDragEnd?: (event: React.DragEvent<HTMLTableRowElement>) => void;
+  onDrop?: (event: React.DragEvent<HTMLTableRowElement>) => void;
+  onDragEnter?: (event: React.DragEvent<HTMLTableRowElement>) => void;
+  onDragOver?: (event: React.DragEvent<HTMLTableRowElement>) => void;
+  onDragLeave?: (event: React.DragEvent<HTMLTableRowElement>) => void;
 }
 
 // We extract Row to its own mini-component primarily so we can React.memo'ize it.
@@ -104,7 +111,13 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   let expandColumnHidden = false;
 
   return (
-    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
+    <RowTag
+      css={rowCss}
+      {...others}
+      data-gridrow
+      {...getCount(row.id)}
+      draggable={row.draggable}
+    >
       {isKeptGroupRow ? (
         <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
       ) : (
@@ -360,4 +373,6 @@ export type GridDataRow<R extends Kinded> = {
   selectable?: false;
   /** Whether this row should infer its selected state based on its children's selected state */
   inferSelectedState?: false;
+  /** Whether this row is draggable, usually to allow drag & drop reordering of rows */
+  draggable?: true;
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;
