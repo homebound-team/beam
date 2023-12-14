@@ -294,7 +294,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // Define the width of the column on each cell. Supports col spans.
             // If we have a 'levelIndent' defined, then subtract that amount from the first content column's width to ensure all columns will still line up properly
             width: `calc(${columnSizes.slice(columnIndex, columnIndex + currentColspan).join(" + ")}${
-              applyFirstContentColumnStyles ? ` - ${levelIndent}px` : ""
+              applyFirstContentColumnStyles && levelIndent ? ` - ${levelIndent}px` : ""
             })`,
             ...(typeof column.mw === "string" ? Css.mw(column.mw).$ : {}),
           };
