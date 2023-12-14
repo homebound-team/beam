@@ -214,14 +214,12 @@ export const cardStyle: GridStyle = {
   ...defaultStyle,
   betweenRowsCss: {},
   nonHeaderRowCss: Css.br4.overflowHidden.ba.bGray400.mt2.add("transition", "all 240ms").$,
+  firstRowCss: Css.bl.br.bGray200.borderRadius("8px 8px 0 0").overflowHidden.$,
   cellCss: Css.p2.$,
   // Undo the card look & feel for the header
   headerCellCss: {
     ...defaultStyle.headerCellCss,
-    ...Css.add({
-      border: "none",
-      borderRadius: "unset",
-    }).p1.m0.xsMd.gray700.$,
+    ...Css.p1.m0.xsMd.gray700.$,
   },
   rowHoverColor: "none",
   rowHoverCss: Css.bshHover.bGray700.$,
