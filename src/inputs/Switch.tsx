@@ -1,6 +1,6 @@
 import { ReactNode, useRef } from "react";
 import { useFocusRing, useHover, useSwitch, VisuallyHidden } from "react-aria";
-import { maybeTooltip, resolveTooltip } from "src/components";
+import { resolveTooltip } from "src/components";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
 import { Icon } from "../components/Icon";
@@ -16,7 +16,7 @@ export interface SwitchProps {
   /** Input label */
   label: string;
   /** Where to put the label. */
-  labelStyle?: "form" | "inline" | "filter" | "hidden" | "left"; // TODO: Update `labelStyle` to make consistent with other `labelStyle` properties in the library
+  labelStyle?: "form" | "inline" | "filter" | "hidden" | "left" | "centered"; // TODO: Update `labelStyle` to make consistent with other `labelStyle` properties in the library
   /** Whether or not to hide the label */
   hideLabel?: boolean;
   /** Handler when the interactive element state changes. */
@@ -25,6 +25,8 @@ export interface SwitchProps {
   selected: boolean;
   /** Whether to include icons like the check mark */
   withIcon?: boolean;
+  /** Adds tooltip for the switch */
+  tooltip?: ReactNode;
 }
 
 export function Switch(props: SwitchProps) {
@@ -46,74 +48,67 @@ export function Switch(props: SwitchProps) {
   const { inputProps } = useSwitch({ ...ariaProps, "aria-label": label }, state, ref);
   const { isFocusVisible: isKeyboardFocus, focusProps } = useFocusRing(otherProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
-  const tooltip = resolveTooltip(disabled);
+  const tooltip = resolveTooltip(disabled, props.tooltip);
 
-  return maybeTooltip({
-    title: tooltip,
-    placement: "top",
-    children: (
-      <label
-        {...hoverProps}
+  return (
+    <div
+      {...hoverProps}
+      css={{
+        ...Css.relative.cursorPointer.df.w("max-content").selectNone.$,
+        ...(labelStyle === "form" && Css.fdc.$),
+        ...(labelStyle === "left" && Css.w100.aic.$),
+        ...(labelStyle === "inline" && Css.gap2.aic.$),
+        ...(labelStyle === "filter" && Css.jcsb.gap1.aic.wa.sm.$),
+        ...(labelStyle === "centered" && Css.fdc.aic.$),
+        ...(isDisabled && Css.cursorNotAllowed.gray400.$),
+      }}
+    >
+      {labelStyle !== "inline" && labelStyle !== "hidden" && (
+        <div css={Css.if(labelStyle === "left").w50.$}>
+          <Label
+            label={label}
+            tooltip={tooltip}
+            xss={Css.if(labelStyle === "filter").gray900.$}
+            inline={labelStyle === "left" || labelStyle === "filter"}
+          />
+        </div>
+      )}
+      {/* Background */}
+      <div
+        aria-hidden="true"
         css={{
-          ...Css.relative.cursorPointer.df.w("max-content").smMd.selectNone.$,
-          ...(labelStyle === "form" && Css.fdc.$),
-          ...(labelStyle === "left" && Css.w100.fdr.$),
-          ...(labelStyle === "inline" && Css.gap2.aic.$),
-          ...(labelStyle === "filter" && Css.jcsb.gap1.aic.wa.sm.$),
-          ...(isDisabled && Css.cursorNotAllowed.gray400.$),
+          ...Css.wPx(40).hPx(toggleHeight(compact)).bgGray200.br12.relative.transition.$,
+          ...(isHovered && switchHoverStyles),
+          ...(isKeyboardFocus && switchFocusStyles),
+          ...(isDisabled && Css.bgGray300.$),
+          ...(isSelected && Css.bgBlue700.$),
+          ...(isSelected && isHovered && switchSelectedHoverStyles),
         }}
-        aria-label={label}
       >
-        {(labelStyle === "form" || labelStyle === "left") && (
-          <div css={Css.if(labelStyle === "left").w50.$}>
-            <Label label={label} />
-          </div>
-        )}
-        {labelStyle === "filter" && <span>{label}</span>}
-        {/* Background */}
+        {/* Circle */}
         <div
-          aria-hidden="true"
           css={{
-            ...Css.wPx(40).hPx(toggleHeight(compact)).bgGray200.br12.relative.transition.$,
-            ...(isHovered && switchHoverStyles),
-            ...(isKeyboardFocus && switchFocusStyles),
-            ...(isDisabled && Css.bgGray300.$),
-            ...(isSelected && Css.bgBlue700.$),
-            ...(isSelected && isHovered && switchSelectedHoverStyles),
+            ...switchCircleDefaultStyles(compact),
+            ...(isDisabled && Css.bgGray100.$),
+            ...(isSelected && switchCircleSelectedStyles(compact)),
           }}
         >
-          {/* Circle */}
-          <div
-            css={{
-              ...switchCircleDefaultStyles(compact),
-              ...(isDisabled && Css.bgGray100.$),
-              ...(isSelected && switchCircleSelectedStyles(compact)),
-            }}
-          >
-            {/* Icon */}
-            {withIcon && (
-              <Icon icon={isSelected ? "check" : "x"} color={isSelected ? Palette.Blue700 : Palette.Gray400} />
-            )}
-          </div>
+          {/* Icon */}
+          {withIcon && (
+            <Icon icon={isSelected ? "check" : "x"} color={isSelected ? Palette.Blue700 : Palette.Gray400} />
+          )}
         </div>
-        {/* Since we are using childGap, we must wrap the label in an element and
+      </div>
+      {/* Since we are using childGap, we must wrap the label in an element and
         match the height of the icon for horizontal alignment */}
-        {labelStyle === "inline" && (
-          <span
-            css={{
-              // LineHeight is conditionally applied to handle compact version text alignment
-              ...Css.if(compact).add("lineHeight", "1").$,
-            }}
-          >
-            {label}
-          </span>
-        )}
-        <VisuallyHidden>
-          <input ref={ref} {...inputProps} {...focusProps} />
-        </VisuallyHidden>
-      </label>
-    ),
-  });
+      {labelStyle === "inline" && (
+        <Label label={label} tooltip={tooltip} inline xss={Css.smMd.gray900.if(compact).add("lineHeight", "1").$} />
+      )}
+      <VisuallyHidden>
+        <input ref={ref} {...inputProps} {...focusProps} />
+      </VisuallyHidden>
+    </div>
+  );
 }
 
 /** Styles */
