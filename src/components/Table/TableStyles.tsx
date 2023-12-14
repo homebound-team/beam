@@ -43,7 +43,7 @@ export interface GridStyle {
   /** Applied on hover if a row has a rowLink/onClick set. */
   rowHoverColor?: Palette | "none";
   /** Applied on hover of a row */
-  rowHoverCss?: Properties;
+  nonHeaderRowHoverCss?: Properties;
   /** Default content to put into an empty cell */
   emptyCell?: ReactNode;
   presentationSettings?: Pick<PresentationFieldProps, "borderless" | "typeScale"> &
@@ -222,7 +222,7 @@ export const cardStyle: GridStyle = {
     ...Css.p1.m0.xsMd.gray700.$,
   },
   rowHoverColor: "none",
-  rowHoverCss: Css.bshHover.bGray700.$,
+  nonHeaderRowHoverCss: Css.bshHover.bGray700.$,
 };
 
 export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
