@@ -27,7 +27,7 @@ function LabelComponent<X extends Only<Xss<LabelXss>, X>>(props: LabelProps<X>) 
     <label
       {...labelProps}
       {...others}
-      css={{ ...Css.df.aic.gap1.sm.gray700.mbPx(inline ? 0 : 4).if(contrast).white.$, ...xss }}
+      css={{ ...Css.dif.aic.gap1.sm.gray700.mbPx(inline ? 0 : 4).if(contrast).white.$, ...xss }}
     >
       {label}
       {suffix && ` ${suffix}`}
