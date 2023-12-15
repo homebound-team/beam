@@ -120,13 +120,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   let expandColumnHidden = false;
 
   return (
-    <RowTag
-      css={rowCss}
-      {...others}
-      data-gridrow
-      {...getCount(row.id)}
-      draggable={row.draggable}
-    >
+    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)} draggable={row.draggable}>
       {isKeptGroupRow ? (
         <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
       ) : (

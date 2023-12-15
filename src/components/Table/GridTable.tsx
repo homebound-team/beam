@@ -91,10 +91,17 @@ export type OnRowSelect<R extends Kinded> = {
 };
 
 export type OnRowDragEvent<R extends Kinded> = {
-  [K in R["kind"]]?:
-    DiscriminateUnion<R, "kind", K> extends { data: infer D }
-    ? (data: D, opts: { row: GridDataRow<R>; api: GridTableApi<R> }, event: React.DragEvent<HTMLTableRowElement>) => void
-    : (data: undefined, opts: { row: GridDataRow<R>; api: GridTableApi<R> }, event: React.DragEvent<HTMLTableRowElement>) => void;
+  [K in R["kind"]]?: DiscriminateUnion<R, "kind", K> extends { data: infer D }
+    ? (
+        data: D,
+        opts: { row: GridDataRow<R>; api: GridTableApi<R> },
+        event: React.DragEvent<HTMLTableRowElement>,
+      ) => void
+    : (
+        data: undefined,
+        opts: { row: GridDataRow<R>; api: GridTableApi<R> },
+        event: React.DragEvent<HTMLTableRowElement>,
+      ) => void;
 };
 
 export interface GridTableProps<R extends Kinded, X> {
@@ -239,7 +246,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   // Use this ref to watch for changes in the GridTable's container and resize columns accordingly.
-  const resizeRef = useRef<   HTMLDivElement>(null);
+  const resizeRef = useRef<HTMLDivElement>(null);
 
   const api = useMemo<GridTableApiImpl<R>>(
     () => {
@@ -316,12 +323,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
-      const dragEventHandler = (callback: OnRowDragEvent<R> | undefined) => (evt: React.DragEvent<HTMLTableRowElement>) => {
-        if(rs.row.draggable && callback) {
-          let fn = callback[rs.row.kind];
-          fn && fn(rs.row.data as any, { row: rs.row, api: rs.api}, evt);
-        }
-      };
+      const dragEventHandler =
+        (callback: OnRowDragEvent<R> | undefined) => (evt: React.DragEvent<HTMLTableRowElement>) => {
+          if (rs.row.draggable && callback) {
+            const fn = callback[rs.row.kind];
+            fn && fn(rs.row.data as any, { row: rs.row, api: rs.api }, evt);
+          }
+        };
 
       const row = (
         <Row

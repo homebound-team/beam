@@ -44,7 +44,7 @@ export default {
 
 type Data = { name: string | undefined; value: number | undefined };
 type Row = SimpleHeaderAndData<Data>;
-type OrderedRow<T> = 
+type OrderedRow<T> =
   | { kind: "header"; order: number }
   | { kind: "spacer"; data: T; order: number }
   | { kind: "data"; data: T; id: string; order: number };
@@ -1862,41 +1862,54 @@ export function DraggableRows() {
   const nameColumn: GridColumn<OrderedRow<Data>> = {
     header: "Name",
     data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
-    spacer: ' ',
+    spacer: " ",
   };
-  const orderColumn: GridColumn<OrderedRow<Data>> = { id: "order", header: "Order", data: (data, { row }) => row.order, spacer: ' ' };
-  const actionColumn: GridColumn<OrderedRow<Data>> = { header: "Action", data: () => <div>Actions</div>, spacer: ' ', clientSideSort: false };
-  const spacerRow: GridDataRow<OrderedRow<Data>> = { kind: "spacer", id: "spacer", data: {name: "", value: -1}, order: -1, draggable: true };
+  const orderColumn: GridColumn<OrderedRow<Data>> = {
+    id: "order",
+    header: "Order",
+    data: (data, { row }) => row.order,
+    spacer: " ",
+  };
+  const actionColumn: GridColumn<OrderedRow<Data>> = {
+    header: "Action",
+    data: () => <div>Actions</div>,
+    spacer: " ",
+    clientSideSort: false,
+  };
+  const spacerRow: GridDataRow<OrderedRow<Data>> = {
+    kind: "spacer",
+    id: "spacer",
+    data: { name: "", value: -1 },
+    order: -1,
+    draggable: true,
+  };
 
-  let rowArray: GridDataRow<OrderedRow<Data>>[] = new Array(26).fill(0);;
+  let rowArray: GridDataRow<OrderedRow<Data>>[] = new Array(26).fill(0);
   rowArray = rowArray.map((elem, idx) => ({
     kind: "data",
     id: "" + (idx + 1),
-    order: (idx + 1),
-    data: { name: "" + (idx + 1), value: (idx + 1) },
-    draggable: true 
+    order: idx + 1,
+    data: { name: "" + (idx + 1), value: idx + 1 },
+    draggable: true,
   }));
 
-  const [rows, setRows]  = useState<GridDataRow<OrderedRow<Data>>[]>([
-    {...simpleHeader, order: 0},
-    ...rowArray
-  ]);
+  const [rows, setRows] = useState<GridDataRow<OrderedRow<Data>>[]>([{ ...simpleHeader, order: 0 }, ...rowArray]);
 
-  type DataType = { row: GridDataRow<OrderedRow<Data>>, api: GridTableApi<OrderedRow<Data>> };
+  type DataType = { row: GridDataRow<OrderedRow<Data>>; api: GridTableApi<OrderedRow<Data>> };
   type EventType = React.DragEvent<HTMLTableRowElement>;
 
   const onDragStart = (row: Data, data: DataType, evt: EventType) => {
     // evt.preventDefault();
     evt.dataTransfer.effectAllowed = "move";
     evt.dataTransfer.dropEffect = "move";
-    evt.dataTransfer.setData("text/plain", JSON.stringify({row: data.row}));
+    evt.dataTransfer.setData("text/plain", JSON.stringify({ row: data.row }));
   };
 
   const onDragEnd = (row: Data, data: DataType, evt: EventType) => {
     evt.preventDefault();
     evt.dataTransfer.clearData();
     // console.log("onRowDragEnd", evt);
-    let spacerIndex = rows.findIndex(r => r.id === spacerRow.id);
+    const spacerIndex = rows.findIndex((r) => r.id === spacerRow.id);
     if (spacerIndex > 0) {
       rows.splice(spacerIndex, 1);
       setRows([...rows]);
@@ -1908,46 +1921,50 @@ export function DraggableRows() {
     evt.dataTransfer.clearData();
 
     try {
-      let draggedRowData = JSON.parse(evt.dataTransfer.getData("text/plain")).row;
+      const draggedRowData = JSON.parse(evt.dataTransfer.getData("text/plain")).row;
 
       // make sure spacer is removed
-      let spacerIndex = rows.findIndex(r => r.id === spacerRow.id);
+      const spacerIndex = rows.findIndex((r) => r.id === spacerRow.id);
       const spacerOrder = rows[spacerIndex].order;
       if (spacerIndex > 0) {
         rows.splice(spacerIndex, 1);
       }
-      
+
       // get rows in order (index matches order)
-      let orderedRows = rows.sort((a,b) => a.order - b.order);
+      let orderedRows = rows.sort((a, b) => a.order - b.order);
 
       // remove dragged row
-      let draggedRow = orderedRows.splice(draggedRowData.order, 1)[0];
+      const draggedRow = orderedRows.splice(draggedRowData.order, 1)[0];
 
       // change the dragging row's order to ceil(spacer's order)
       draggedRow.order = Math.ceil(spacerOrder);
 
       // insert it at the index
-      orderedRows = [...orderedRows.slice(0, draggedRow.order), draggedRow, ...orderedRows.slice(draggedRow.order, orderedRows.length)];
+      orderedRows = [
+        ...orderedRows.slice(0, draggedRow.order),
+        draggedRow,
+        ...orderedRows.slice(draggedRow.order, orderedRows.length),
+      ];
       // set row order to index
-      orderedRows.forEach((r, idx) => r.order = idx);
+      orderedRows.forEach((r, idx) => (r.order = idx));
       setRows([...orderedRows]);
     } catch {}
   };
 
   const onDragEnter = (row: Data, data: DataType, evt: EventType) => {
     evt.preventDefault();
-    if(data.row.id === spacerRow.id) {
+    if (data.row.id === spacerRow.id) {
       return;
     }
 
-    let dir = evt.clientY > (evt.currentTarget.offsetTop + (0.5 * evt.currentTarget.clientHeight)) ? 1 : -1;
+    const dir = evt.clientY > evt.currentTarget.offsetTop + 0.5 * evt.currentTarget.clientHeight ? 1 : -1;
 
     // add a spacer above the row being dragged over
-    let spacerIndex = rows.findIndex(r => r.id === spacerRow.id);
+    const spacerIndex = rows.findIndex((r) => r.id === spacerRow.id);
     if (spacerIndex === -1) {
-      setRows([...rows, {...spacerRow, order: data.row.order + (dir * 0.1)}]);
+      setRows([...rows, { ...spacerRow, order: data.row.order + dir * 0.1 }]);
     } else {
-      rows[spacerIndex].order = data.row.order + (dir * 0.1);
+      rows[spacerIndex].order = data.row.order + dir * 0.1;
       setRows([...rows]);
     }
   };
@@ -1955,15 +1972,15 @@ export function DraggableRows() {
   const onDragOver = (row: Data, data: DataType, evt: EventType) => {
     evt.preventDefault();
 
-    if(data.row.id === spacerRow.id) {
+    if (data.row.id === spacerRow.id) {
       return;
     }
-    
-    let spacerIndex = rows.findIndex(r => r.id === spacerRow.id);
-    if(spacerIndex > 0) {
-      let dir = evt.clientY > (evt.currentTarget.offsetTop + (0.5 * evt.currentTarget.clientHeight)) ? 1 : -1;
 
-      rows[spacerIndex].order = data.row.order + (dir * 0.1);
+    const spacerIndex = rows.findIndex((r) => r.id === spacerRow.id);
+    if (spacerIndex > 0) {
+      const dir = evt.clientY > evt.currentTarget.offsetTop + 0.5 * evt.currentTarget.clientHeight ? 1 : -1;
+
+      rows[spacerIndex].order = data.row.order + dir * 0.1;
       setRows([...rows]);
     }
   };
@@ -1976,7 +1993,7 @@ export function DraggableRows() {
       onRowDrop={{ data: onDrop, spacer: onDrop }}
       onRowDragEnter={{ data: onDragEnter, spacer: onDragEnter }}
       onRowDragOver={{ data: onDragOver, spacer: onDragOver }}
-      rows={[...rows].sort((a,b) => a.order - b.order)}
+      rows={[...rows].sort((a, b) => a.order - b.order)}
     />
   );
 }
