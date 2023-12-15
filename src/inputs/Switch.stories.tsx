@@ -123,7 +123,6 @@ type SwitchWrapperProps = Omit<SwitchProps, "onChange" | "selected"> &
 
 function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchWrapperProps) {
   const [selected, setSelected] = useState<boolean>(props.selected || false);
-
   return (
     <div
       css={{
