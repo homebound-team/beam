@@ -4,13 +4,15 @@ import { Observer } from "mobx-react";
 import { BoundSelectAndTextField } from "src";
 import { ScheduleTypes } from "src/components/Filters/testDomain";
 import { Css } from "src/Css";
+import { useState } from "react";
 
 export default {
   component: BoundSelectAndTextField,
 } as Meta;
 
 export function Example() {
-  const formState = useFormState({ config, init: { type: ScheduleTypes.Task } });
+  const [input] = useState({ type: ScheduleTypes.Task });
+  const formState = useFormState({ config, init: { input } });
   const types = [
     { id: ScheduleTypes.Task, name: "Task" },
     { id: ScheduleTypes.Milestone, name: "Milestone" },

@@ -44,9 +44,10 @@ export function SuperDrawerApp() {
 }
 
 const initFormValue: AuthorInput = {};
+
 function SuperDrawerForm() {
   const { closeDrawer, addCanCloseDrawerCheck } = useSuperDrawer();
-  const formState = useFormState({ config: formConfig, init: initFormValue });
+  const formState = useFormState({ config: formConfig, init: { input: initFormValue } });
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => addCanCloseDrawerCheck(() => !formState.dirty), []);
