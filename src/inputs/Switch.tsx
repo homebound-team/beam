@@ -4,7 +4,7 @@ import { resolveTooltip } from "src/components";
 import { Label } from "src/components/Label";
 import { Css, Palette } from "src/Css";
 import { Icon } from "../components/Icon";
-import { toToggleState } from "../utils";
+import { toToggleState, useTestIds } from "../utils";
 
 export interface SwitchProps {
   /** Whether the element should receive focus on render. */
@@ -17,7 +17,7 @@ export interface SwitchProps {
   label: string;
   /** Where to put the label. */
   labelStyle?: "form" | "inline" | "filter" | "hidden" | "left" | "centered"; // TODO: Update `labelStyle` to make consistent with other `labelStyle` properties in the library
-  /** Whether or not to hide the label */
+  /** Whether to hide the label */
   hideLabel?: boolean;
   /** Handler when the interactive element state changes. */
   onChange: (value: boolean) => void;
@@ -49,12 +49,13 @@ export function Switch(props: SwitchProps) {
   const { isFocusVisible: isKeyboardFocus, focusProps } = useFocusRing(otherProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
   const tooltip = resolveTooltip(disabled, props.tooltip);
+  const tid = useTestIds(otherProps, label);
 
   return (
-    <div
+    <label
       {...hoverProps}
       css={{
-        ...Css.relative.cursorPointer.df.w("max-content").selectNone.$,
+        ...Css.relative.cursorPointer.df.wmaxc.selectNone.$,
         ...(labelStyle === "form" && Css.fdc.$),
         ...(labelStyle === "left" && Css.w100.aic.$),
         ...(labelStyle === "inline" && Css.gap2.aic.$),
@@ -105,9 +106,9 @@ export function Switch(props: SwitchProps) {
         <Label label={label} tooltip={tooltip} inline xss={Css.smMd.gray900.if(compact).add("lineHeight", "1").$} />
       )}
       <VisuallyHidden>
-        <input ref={ref} {...inputProps} {...focusProps} />
+        <input ref={ref} {...inputProps} {...focusProps} {...tid} />
       </VisuallyHidden>
-    </div>
+    </label>
   );
 }
 
@@ -122,22 +123,25 @@ export const switchFocusStyles = Css.bshFocus.$;
 export const switchSelectedHoverStyles = Css.bgBlue900.$;
 
 // Circle inside Switcher/Toggle element styles
-const switchCircleDefaultStyles = (isCompact: boolean) => ({
-  ...Css.wPx(circleDiameter(isCompact))
-    .hPx(circleDiameter(isCompact))
-    .br100.bgWhite.bshBasic.absolute.leftPx(2)
-    .topPx(2).transition.df.aic.jcc.$,
-  svg: Css.hPx(toggleHeight(isCompact) / 2).wPx(toggleHeight(isCompact) / 2).$,
-});
+function switchCircleDefaultStyles(isCompact: boolean) {
+  return {
+    ...Css.wPx(circleDiameter(isCompact))
+      .hPx(circleDiameter(isCompact))
+      .br100.bgWhite.bshBasic.absolute.leftPx(2)
+      .topPx(2).transition.df.aic.jcc.$,
+    svg: Css.hPx(toggleHeight(isCompact) / 2).wPx(toggleHeight(isCompact) / 2).$,
+  };
+}
 
 /**
  * Affecting the `left` property due to transitions only working when there is
  * a previous value to work from.
  *
- * Calculation is as follow:
+ * Calculation is as follows:
  * - `100%` is the toggle width
  * - `${circleDiameter(isCompact)}px` is the circle diameter
  * - `2px` is to keep 2px edge spacing.
  */
-const switchCircleSelectedStyles = (isCompact: boolean) =>
-  Css.left(`calc(100% - ${circleDiameter(isCompact)}px - 2px);`).$;
+function switchCircleSelectedStyles(isCompact: boolean) {
+  return Css.left(`calc(100% - ${circleDiameter(isCompact)}px - 2px);`).$;
+}
