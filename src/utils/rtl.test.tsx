@@ -109,6 +109,8 @@ describe("rtl", () => {
         label="Number"
         value={undefined as any}
         onSelect={(v, o) => {
+          // TODO: verify this eslint ignore
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           asyncSelect(v, o);
         }}
         options={[
@@ -219,6 +221,8 @@ describe("rtl", () => {
         label="Number"
         values={undefined as any}
         onSelect={(v, o) => {
+          // TODO: verify this eslint ignore
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           asyncSelect(v, o);
         }}
         options={[
@@ -317,6 +321,8 @@ describe("rtl", () => {
         label="Number"
         values={[] as string[]}
         onSelect={({ all }) => {
+          // TODO: verify this eslint ignore
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           asyncSelect(all);
         }}
         options={
