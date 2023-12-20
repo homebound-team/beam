@@ -9,11 +9,11 @@ export type SubmitButtonProps<T> = Omit<ButtonProps, "label"> & {
 /** Provides a Button that will auto-disable if `formState` is invalid. */
 export function SubmitButton<T>(props: SubmitButtonProps<T>) {
   const { form, disabled, onClick, label = "Submit", ...others } = props;
-  const valid = useComputed(() => form.valid, [form]);
+  const invalidAndTouched = useComputed(() => !form.valid && form.touched, [form]);
   return (
     <Button
       label={label}
-      disabled={!valid || disabled}
+      disabled={disabled || invalidAndTouched}
       onClick={(e) => {
         // canSave will touch any not-yet-keyed-in fields to show errors
         if (form.canSave()) {
