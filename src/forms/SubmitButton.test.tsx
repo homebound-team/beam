@@ -13,6 +13,15 @@ describe("SubmitButton", () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
+  it("disables if the form is valid but overridden via prop", async () => {
+    const onClick = jest.fn();
+    const author = createObjectState(formConfig, { firstName: "f1" });
+    const r = await render(<SubmitButton form={author} onClick={onClick} disabled={true} />);
+    expect(r.submit).not.toBeEnabled();
+    click(r.submit);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
   it("enables if the form is valid", async () => {
     const onClick = jest.fn();
     const author = createObjectState(formConfig, { firstName: "r1" });
