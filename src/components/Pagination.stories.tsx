@@ -31,7 +31,7 @@ function RenderPagination({ totalRows }: { totalRows: number }) {
   const page = useState({ pageNumber: 1, pageSize: 100 });
   return (
     <>
-      <FormLines labelStyle="left">
+      <FormLines labelStyle="left" width="full">
         <StaticField label="Number of items" value={String(totalRows)} />
         <StaticField label="Current page" value={String(page[0].pageNumber)} />
       </FormLines>

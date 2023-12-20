@@ -14,8 +14,8 @@ import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-ari
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
-import { PresentationFieldProps } from "src/components/PresentationContext";
-import { Css, px } from "src/Css";
+import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { Css } from "src/Css";
 import { Value } from "src/inputs/index";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
@@ -31,6 +31,7 @@ import {
 import { keyToValue, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { HasIdAndName, Optional } from "src/types";
+import { getFieldWidth } from "src/inputs/utils";
 
 export interface TreeSelectFieldProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
@@ -127,6 +128,7 @@ export const CollapsedContext = React.createContext<CollapsedChildrenState<any, 
 });
 
 function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, V>) {
+  const { fieldProps } = usePresentationContext();
   const {
     values,
     options,
@@ -142,6 +144,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     onSelect,
     defaultCollapsed = false,
     placeholder,
+    fullWidth = fieldProps?.fullWidth ?? false,
     ...otherProps
   } = props;
 
@@ -519,10 +522,13 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     minWidth: 200,
   };
 
+  const fieldMaxWidth = getFieldWidth(fullWidth);
+
   return (
-    <div css={Css.df.fdc.w100.maxw(px(550)).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
+    <div css={Css.df.fdc.w100.maxw(fieldMaxWidth).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
       <ComboBoxInput
         {...otherProps}
+        fullWidth={fullWidth}
         labelStyle={labelStyle}
         buttonProps={buttonProps}
         buttonRef={triggerRef}

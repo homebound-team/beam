@@ -517,6 +517,33 @@ export const StyleCard = newStory(() => {
   );
 }, {});
 
+export const LeveledStyleCard = newStory(() => {
+  const nameColumn: GridColumn<NestedRow> = {
+    header: () => "Name",
+    parent: (row) => row.name,
+    child: (row) => row.name,
+    grandChild: (row) => row.name,
+    add: () => "Add",
+  };
+  const valueColumn: GridColumn<NestedRow> = {
+    header: () => "Value",
+    parent: (row) => row.name,
+    child: (row) => row.name,
+    grandChild: (row) => row.name,
+    add: () => "Add",
+    w: "200px",
+  };
+  return (
+    <div css={Css.wPx(550).$}>
+      <GridTable
+        style={cardStyle}
+        columns={[collapseColumn<NestedRow>(), selectColumn<NestedRow>(), nameColumn, valueColumn]}
+        rows={rowsWithHeader}
+      />
+    </div>
+  );
+}, {});
+
 export const StyleCardWithOneColumn = newStory(() => {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   return (

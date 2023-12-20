@@ -4,22 +4,25 @@ import { within } from "@storybook/testing-library";
 import { useState } from "react";
 import { useFilter } from "react-aria";
 import { Css } from "src/Css";
-import { Autocomplete } from "src/inputs/Autocomplete";
+import { Autocomplete, AutocompleteProps } from "src/inputs/Autocomplete";
 
 export default {
   component: Autocomplete,
 } as Meta;
 
-export const Example: StoryFn = Template.bind({});
+export const Example: StoryFn<AutocompleteProps<any>> = Template.bind({});
 Example.parameters = { chromatic: { disableSnapshot: true } };
 
-export const MenuOpen: StoryFn = Template.bind({});
+export const FullWidth: StoryFn<AutocompleteProps<any>> = Template.bind({});
+FullWidth.args = { fullWidth: true };
+
+export const MenuOpen: StoryFn<AutocompleteProps<any>> = Template.bind({});
 MenuOpen.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   const canvas = within(canvasElement);
   canvas.getByTestId("heroes").focus();
 };
 
-function Template() {
+function Template(props: AutocompleteProps<any>) {
   const { contains } = useFilter({ sensitivity: "base" });
   const [value, setValue] = useState<string>();
   const allOptions = [
@@ -30,9 +33,10 @@ function Template() {
     { label: "Black Widow", imgSrc: "/black-widow.jpg" },
   ];
   const [options, setOptions] = useState(allOptions);
-
+  console.log("props", props);
   return (
     <Autocomplete<TestOption>
+      {...props}
       label="Heroes"
       labelStyle="hidden"
       getOptionValue={(o) => o.label}

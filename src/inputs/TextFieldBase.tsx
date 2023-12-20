@@ -14,13 +14,14 @@ import { Icon, IconButton, maybeTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
-import { Css, Only, Palette, px } from "src/Css";
+import { Css, Only, Palette } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
+import { getFieldWidth } from "src/inputs/utils";
 
 export interface TextFieldBaseProps<X>
   extends Pick<
@@ -37,6 +38,7 @@ export interface TextFieldBaseProps<X>
       | "compact"
       | "borderless"
       | "visuallyDisabled"
+      | "fullWidth"
       | "xss"
     >,
     Partial<Pick<BeamTextFieldProps<X>, "onChange">> {
@@ -89,6 +91,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     errorInTooltip = fieldProps?.errorInTooltip ?? false,
     hideErrorMessage = false,
     alwaysShowHelperText = false,
+    fullWidth = fieldProps?.fullWidth ?? false,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
@@ -113,8 +116,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
     : [Palette.White, Palette.Gray100, Palette.Gray100];
 
+  const fieldMaxWidth = getFieldWidth(fullWidth);
+
   const fieldStyles = {
-    container: Css.df.fdc.w100.maxw(px(550)).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
+    container: Css.df.fdc.w100.maxw(fieldMaxWidth).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
     inputWrapper: {
       ...Css[typeScale].df.aic.br4.px1.w100
         .hPx(fieldHeight - maybeSmaller)

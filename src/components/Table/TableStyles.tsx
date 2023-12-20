@@ -15,6 +15,8 @@ export interface GridStyle {
   lastRowCss?: Properties;
   /** Applied on the first row of the table (could be the Header or Totals row). */
   firstRowCss?: Properties;
+  /** Applied to every non-header row of the table */
+  nonHeaderRowCss?: Properties;
   /** Applied to the first non-header row, i.e. if you want to cancel out `betweenRowsCss`. */
   firstNonHeaderRowCss?: Properties;
   /** Applied to all cell divs (via a selector off the base div). */
@@ -39,7 +41,9 @@ export interface GridStyle {
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
-  rowHoverColor?: Palette;
+  rowHoverColor?: Palette | "none";
+  /** Applied on hover of a row */
+  nonHeaderRowHoverCss?: Properties;
   /** Default content to put into an empty cell */
   emptyCell?: ReactNode;
   presentationSettings?: Pick<PresentationFieldProps, "borderless" | "typeScale"> &
@@ -47,7 +51,15 @@ export interface GridStyle {
   /** Minimum table width in pixels. Used when calculating columns sizes */
   minWidthPx?: number;
   /** Css to apply at each level of a parent/child nested table. */
-  levels?: Record<number, { cellCss?: Properties; firstContentColumn?: Properties }>;
+  levels?: Record<
+    number,
+    {
+      /** Number of pixels to indent the row. This value will be subtracted from the "first content column" width. First content column is the first column that is not an 'action' column (i.e. non-checkbox or non-collapse button column) */
+      rowIndent?: number;
+      cellCss?: Properties;
+      firstContentColumn?: Properties;
+    }
+  >;
   /** Allows for customization of the background color used to denote an "active" row */
   activeBgColor?: Palette;
   /** Defines styles for the group row which holds the selected rows that have been filtered out */
@@ -209,17 +221,19 @@ export const condensedStyle: GridStyle = {
 export const cardStyle: GridStyle = {
   ...defaultStyle,
   betweenRowsCss: {},
-  firstNonHeaderRowCss: Css.mt2.$,
-  cellCss: Css.p2.my1.bt.bb.bGray400.$,
-  firstCellCss: Css.bl.add({ borderTopLeftRadius: "4px", borderBottomLeftRadius: "4px" }).$,
-  lastCellCss: Css.br.add({ borderTopRightRadius: "4px", borderBottomRightRadius: "4px" }).$,
+  nonHeaderRowCss: Css.br4.overflowHidden.ba.bGray400.mt2.add("transition", "all 240ms").$,
+  firstRowCss: Css.bl.br.bGray200.borderRadius("8px 8px 0 0").overflowHidden.$,
+  cellCss: Css.p2.$,
   // Undo the card look & feel for the header
   headerCellCss: {
     ...defaultStyle.headerCellCss,
-    ...Css.add({
-      border: "none",
-      borderRadius: "unset",
-    }).p1.m0.xsMd.gray700.$,
+    ...Css.p1.m0.xsMd.gray700.$,
+  },
+  rowHoverColor: "none",
+  nonHeaderRowHoverCss: Css.bshHover.bGray700.$,
+  levels: {
+    1: { rowIndent: 24 },
+    2: { rowIndent: 48 },
   },
 };
 

@@ -95,4 +95,27 @@ describe("useModal", () => {
     // And the BeamContext has been cleared
     expect(beamContext!.modalCanCloseChecks.current).toEqual([]);
   });
+
+  it("can identify when component is In Modal", async () => {
+    // Given a test app that opens a modal with content that checks if it is in a modal
+    function TestApp(props: ModalProps) {
+      const { openModal, inModal } = useModal();
+      useEffect(() => openModal(props), [openModal, props]);
+      return <div data-testid="testApp">Behind Modal: InModal? {String(inModal)}</div>;
+    }
+
+    // And a modal content that checks if it is in a modal also
+    function TestModalContent() {
+      const { inModal } = useModal();
+      return <div data-testid="modalContent">Modal Content: InModal? {String(inModal)}</div>;
+    }
+
+    // When rendering the test app
+    const r = await render(<TestApp content={<TestModalContent />} />);
+
+    // Then the test app should not be in a modal
+    expect(r.testApp).toHaveTextContent("Behind Modal: InModal? false");
+    // And the modal content should be in a modal
+    expect(r.modalContent).toHaveTextContent("Modal Content: InModal? true");
+  });
 });

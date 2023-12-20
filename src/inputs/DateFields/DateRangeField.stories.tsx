@@ -40,6 +40,7 @@ export function Example() {
         label="Error message"
         errorMsg={rangeInitUndefined ? undefined : "Required"}
       />
+      <DateRangeField {...commonProps} fullWidth label="Full Width Field" />
     </div>
   );
 }

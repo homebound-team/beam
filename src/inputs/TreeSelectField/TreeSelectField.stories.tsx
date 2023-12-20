@@ -119,6 +119,17 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
               placeholder="Hidden label"
             />
           </div>
+
+          <div>
+            <TestTreeSelectField
+              {...args}
+              fullWidth
+              values={[]}
+              options={options}
+              label="Full Width"
+              placeholder="Full Width"
+            />
+          </div>
         </div>
       </div>
     </div>

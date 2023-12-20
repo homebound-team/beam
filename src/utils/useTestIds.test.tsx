@@ -15,4 +15,19 @@ describe("useTestIds", () => {
     const tid = useTestIds({ "data-testid": "firstName" });
     expect({ ...tid }).toEqual({ "data-testid": "firstName" });
   });
+
+  it("can use a label as a default prefix", () => {
+    const tid = useTestIds({}, "First Name");
+    expect(tid.input).toEqual({ "data-testid": "firstName_input" });
+  });
+
+  it("can use an optional enum as a default prefix", () => {
+    enum Color {
+      Blue = "Blue",
+      Green = "Green",
+    }
+    const colorProp = Color.Blue as Color | undefined;
+    const tid = useTestIds({}, colorProp);
+    expect(tid.input).toEqual({ "data-testid": "blue_input" });
+  });
 });

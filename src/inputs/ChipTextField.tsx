@@ -80,9 +80,11 @@ export function ChipTextField(props: ChipTextFieldProps) {
         }
       }}
       onInput={(e: KeyboardEvent<HTMLElement>) => {
-        // Prevent user from pasting content that has new line characters and replace with empty space.
         const target = e.target as HTMLElement;
-        target.textContent = target.textContent?.replace(/[\n\r]/g, " ") ?? "";
+        if ("inputType" in e.nativeEvent && e.nativeEvent.inputType === "insertFromPaste") {
+          // Clean up any formatting from pasted text
+          target.innerHTML = target.textContent?.replace(/[A\n\r]/g, " ") ?? "";
+        }
         onChange(target.textContent ?? "");
       }}
       {...focusProps}

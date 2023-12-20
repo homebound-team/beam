@@ -1,6 +1,7 @@
 import { Children, cloneElement, ReactNode } from "react";
 import { LabelSuffixStyle, PresentationProvider } from "src/components/PresentationContext";
 import { Css } from "src/Css";
+import { useModal } from "src/components";
 
 export type FormWidth =
   /** 320px. */
@@ -28,7 +29,8 @@ export interface FormLinesProps {
  * (see the `FieldGroup` component), where they will be laid out side-by-side.
  */
 export function FormLines(props: FormLinesProps) {
-  const { children, width = "full", labelSuffix, labelStyle, compact } = props;
+  const { inModal } = useModal();
+  const { children, width = inModal ? "full" : "lg", labelSuffix, labelStyle, compact } = props;
   let firstFormHeading = true;
 
   // Only overwrite `fieldProps` if new values are explicitly set. Ensures we only set to `undefined` if explicitly set.
@@ -36,6 +38,7 @@ export function FormLines(props: FormLinesProps) {
     ...("labelSuffix" in props ? { labelSuffix } : {}),
     ...("labelStyle" in props ? { labelStyle } : {}),
     ...("compact" in props ? { compact } : {}),
+    ...(width === "full" ? { fullWidth: true } : {}),
   };
 
   return (

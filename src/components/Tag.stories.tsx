@@ -23,6 +23,7 @@ export function NoIcon() {
       <div css={Css.wPx(200).$}>
         <Tag text="Tag text that will truncate as it is too long." />
       </div>
+      <Tag text="Custom color" xss={Css.bgPurple200.$} />
     </div>
   );
 }

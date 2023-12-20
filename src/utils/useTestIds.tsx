@@ -1,7 +1,11 @@
+import { defaultTestId } from "src/utils/defaultTestId";
+
+export type TestIds = Record<string, object>;
+
 /**
  * Provides a way to easily generate `data-testid`s.
  *
- * The test ids are made of a `prefix` + `_` + `key`, where:
+ * The test ids are made of a `${prefix}_${key}`, where:
  *
  * - The prefix is the component name, like "profile", and
  * - The key is the specific DOM element that's being tagged, like "firstName"
@@ -12,9 +16,9 @@
  *
  * ```tsx
  * const { a, b } = props;
- * const testIds = useTestIds(props);
+ * const tid = useTestIds(props);
  *
- * return <Foo {...testIds.foo />;
+ * return <Foo {...tid.foo} />;
  * ```
  *
  * This allows components that embed the component to customize the prefix, i.e.
@@ -25,12 +29,10 @@
  * - `firstName_errors`
  * - `lastName_input`
  * - `lastName_errors`
- * - etc
+ *
+ * @param props the component's `props` object, which we'll scan for `data-testid` to use as the prefix
+ * @param defaultPrefix the default prefix to use if no `data-testid` is found on `props`
  */
-import { defaultTestId } from "src/utils/defaultTestId";
-
-export type TestIds = Record<string, object>;
-
 export function useTestIds(props: object, defaultPrefix?: string): Record<string, object> {
   const prefix: string | undefined =
     (props as any)["data-testid"] ||
