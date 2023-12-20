@@ -297,6 +297,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   const firstOpen = useRef(true);
   function onOpenChange(isOpen: boolean) {
     if (firstOpen.current && isOpen) {
+      // TODO: verify this eslint ignore
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       maybeInitLoad(options, fieldState, setFieldState);
       firstOpen.current = false;
     }

@@ -27,6 +27,8 @@ export class ColumnState<R extends Kinded> {
     this.visible = storage.wasVisible(column.id) ?? (column.canHide ? column.initVisible ?? false : true);
     if (this.visible && (storage.wasExpanded(column.id) ?? column.initExpanded)) {
       this.expanded = true;
+      // TODO: verify this eslint ignore
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       this.doExpand();
     }
     makeAutoObservable(this, { column: observable.ref }, { name: `ColumnState@${column.id}` });
@@ -38,6 +40,8 @@ export class ColumnState<R extends Kinded> {
     // If an expandable header is becoming visible for the 1st time, expand it
     if (!wasVisible && visible && this.column.initExpanded && this.children === undefined) {
       this.expanded = true;
+      // TODO: verify this eslint ignore
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       this.doExpand();
     }
   }
@@ -52,6 +56,8 @@ export class ColumnState<R extends Kinded> {
     // The first time we expand, fetch our children. Note that ExpandableHeader
     // technically pre-loads our children, so it can show a spinner while loading,
     // and only after loading is complete, tell our column to expand.
+    // TODO: verify this eslint ignore
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     if (!wasExpanded) this.doExpand();
   }
 
