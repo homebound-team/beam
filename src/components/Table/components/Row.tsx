@@ -380,5 +380,5 @@ export type GridDataRow<R extends Kinded> = {
   /** Whether this row should infer its selected state based on its children's selected state */
   inferSelectedState?: false;
   /** Whether this row is draggable, usually to allow drag & drop reordering of rows */
-  draggable?: true;
+  draggable?: boolean;
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;

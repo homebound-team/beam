@@ -20,7 +20,7 @@ import {
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { EXPANDABLE_HEADER, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
+import { EXPANDABLE_HEADER, KEPT_GROUP, insertAtIndex, zIndices } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
@@ -90,19 +90,27 @@ export type OnRowSelect<R extends Kinded> = {
     : (data: undefined, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void;
 };
 
-export type OnRowDragEvent<R extends Kinded> = {
-  [K in R["kind"]]?: DiscriminateUnion<R, "kind", K> extends { data: infer D }
-    ? (
-        data: D,
-        opts: { row: GridDataRow<R>; api: GridTableApi<R> },
-        event: React.DragEvent<HTMLTableRowElement>,
-      ) => void
-    : (
-        data: undefined,
-        opts: { row: GridDataRow<R>; api: GridTableApi<R> },
-        event: React.DragEvent<HTMLTableRowElement>,
-      ) => void;
-};
+/** Per-kind row drag events */
+// export type OnRowDragEvent<R extends Kinded> = {
+//   [K in R["kind"]]?: DiscriminateUnion<R, "kind", K> extends { data: infer D }
+//     ? (
+//         data: D,
+//         opts: { row: GridDataRow<R>; api: GridTableApi<R> },
+//         event: React.DragEvent<HTMLTableRowElement>,
+//       ) => void
+//     : (
+//         data: undefined,
+//         opts: { row: GridDataRow<R>; api: GridTableApi<R> },
+//         event: React.DragEvent<HTMLTableRowElement>,
+//       ) => void;
+// };
+
+type DragEventType = React.DragEvent<HTMLTableRowElement>;
+
+export type OnRowDragEvent<R extends Kinded> = (
+  draggedRow: GridDataRow<R>,
+  event: DragEventType,
+) => void;
 
 export interface GridTableProps<R extends Kinded, X> {
   id?: string;
@@ -181,13 +189,15 @@ export interface GridTableProps<R extends Kinded, X> {
   onRowSelect?: OnRowSelect<R>;
 
   /** Drag & drop Callbacks. */
-  onRowDragStart?: OnRowDragEvent<R>;
-  onRowDrag?: OnRowDragEvent<R>;
-  onRowDragEnd?: OnRowDragEvent<R>;
-  onRowDrop?: OnRowDragEvent<R>;
-  onRowDragEnter?: OnRowDragEvent<R>;
-  onRowDragOver?: OnRowDragEvent<R>;
-  onRowDragLeave?: OnRowDragEvent<R>;
+  // onRowDragStart?: OnRowDragEvent<R>;
+  // onRowDrag?: OnRowDragEvent<R>;
+  // onRowDragEnd?: OnRowDragEvent<R>;
+  // onRowDrop?: OnRowDragEvent<R>;
+  // onRowDragEnter?: OnRowDragEvent<R>;
+  // onRowDragOver?: OnRowDragEvent<R>;
+  // onRowDragLeave?: OnRowDragEvent<R>;
+
+  onRowDrop?: (draggedRow: GridDataRow<R>, droppedRow: GridDataRow<R>, indexOffset: number) => void
 }
 
 /**
@@ -232,13 +242,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     visibleColumnsStorageKey,
     infiniteScroll,
     onRowSelect,
-    onRowDragStart,
-    onRowDrag,
-    onRowDragEnd,
-    onRowDrop,
-    onRowDragEnter,
-    onRowDragOver,
-    onRowDragLeave,
+    // onRowDragStart,
+    // onRowDrag,
+    onRowDrop: droppedCallback,
+    // onRowDrop,
+    // onRowDragEnter,
+    // onRowDragOver,
+    // onRowDragLeave,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
@@ -320,27 +330,102 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     const { visibleRows } = tableState;
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
+    const spacerRow: GridDataRow<R> = {
+      kind: "spacer",
+      id: "spacer",
+      data: {} as R,
+      draggable: true,
+    };
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
+      
       const dragEventHandler =
-        (callback: OnRowDragEvent<R> | undefined) => (evt: React.DragEvent<HTMLTableRowElement>) => {
-          if (rs.row.draggable && callback) {
-            const fn = callback[rs.row.kind];
-            fn && fn(rs.row.data as any, { row: rs.row, api: rs.api }, evt);
+        (callback: OnRowDragEvent<R> | undefined) => (evt: DragEventType) => {
+          if (rs.row.draggable && droppedCallback && callback) {
+            callback(rs.row, evt);
           }
         };
+
+      const onDragStart = (row: GridDataRow<R>, evt: DragEventType) => {
+        evt.dataTransfer.effectAllowed = "move";
+        evt.dataTransfer.dropEffect = "move";
+        evt.dataTransfer.setData("text/plain", JSON.stringify({ row }));
+      };
+    
+      const onDragEnd = (row: GridDataRow<R>, evt: DragEventType) => {
+        evt.preventDefault();
+        evt.dataTransfer.clearData();
+        tableState.deleteRows([spacerRow.id]);
+      };
+    
+      const onDrop = (row: GridDataRow<R> & {index?: number}, evt: DragEventType) => {
+        evt.preventDefault();
+        evt.dataTransfer.clearData();
+        if(droppedCallback) {
+          try {
+            const draggedRowData = JSON.parse(evt.dataTransfer.getData("text/plain")).row;
+      
+            // make sure spacer is removed
+            tableState.deleteRows([spacerRow.id]);
+
+            // if row is the spacer we need to get the row at the index it was before we removed it
+            if (row.id === spacerRow.id && row.index !== undefined) {
+              row = {...rows[row.index], index: row.index};
+            }
+
+            const indexOffset = evt.clientY > evt.currentTarget.offsetTop + 0.5 * evt.currentTarget.clientHeight ? 1 : 0;
+
+            droppedCallback(draggedRowData, row, indexOffset);
+          } catch(e: any) {console.error(e.message, e.stack);}
+        }
+      };
+    
+      const onDragEnter = (row: GridDataRow<R>, evt: DragEventType) => {
+        evt.preventDefault();
+        if (row.id === spacerRow.id) {
+          return;
+        }
+    
+        const indexOffset = evt.clientY > evt.currentTarget.offsetTop + 0.5 * evt.currentTarget.clientHeight ? 1 : 0;
+    
+        // add a spacer above or below the row being dragged over
+        // showing where the dragged row will be when dropped
+        // since we don't have direct access to the TableState rows we're always adding to the
+        // prop rows which don't have a spacer, so we won't get duplicates
+        const rowIndex = rows.findIndex((r) => r.id === row.id);
+        tableState.setRows([...insertAtIndex(rows, { ...spacerRow, index: rowIndex + indexOffset }, rowIndex + indexOffset)]);
+      };
+    
+      const onDragOver = (row: GridDataRow<R>, evt: DragEventType) => {
+        evt.preventDefault();
+    
+        // if (row.id === spacerRow.id) {
+        //   return;
+        // }
+    
+        // const spacerIndex = rows.findIndex((r) => r.id === spacerRow.id);
+        // if (spacerIndex > 0) {
+        //   const indexOffset = evt.clientY > evt.currentTarget.offsetTop + 0.5 * evt.currentTarget.clientHeight ? 1 : 0;
+    
+        //   // remove spacer and insert at index
+        //   rows.splice(spacerIndex, 1);
+        //   // important to get index after splice otherwise it could be one-off
+        //   const rowIndex = rows.findIndex((r) => r.id === row.id);
+        //   tableState.setRows([...insertAtIndex(rows, { ...spacerRow }, rowIndex + indexOffset)]);
+        // }
+      };
 
       const row = (
         <Row
           key={rs.key}
-          onDragStart={dragEventHandler(onRowDragStart)}
-          onDrag={dragEventHandler(onRowDrag)}
-          onDragOver={dragEventHandler(onRowDragOver)}
-          onDragEnd={dragEventHandler(onRowDragEnd)}
-          onDrop={dragEventHandler(onRowDrop)}
-          onDragEnter={dragEventHandler(onRowDragEnter)}
-          onDragLeave={dragEventHandler(onRowDragLeave)}
+          onDragStart={dragEventHandler(onDragStart)}
+          // onDrag={dragEventHandler(onDrag)}
+          onDragOver={dragEventHandler(onDragOver)}
+          onDragEnd={dragEventHandler(onDragEnd)}
+          onDrop={dragEventHandler(onDrop)}
+          onDragEnter={dragEventHandler(onDragEnter)}
+          // onDragLeave={dragEventHandler(onDragLeave)}
           {...{
             as,
             rs,

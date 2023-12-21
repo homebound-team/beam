@@ -28,6 +28,7 @@ import {
   simpleHeader,
   SimpleHeaderAndData,
   useGridTableApi,
+  insertAtIndex,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -1876,13 +1877,6 @@ export function DraggableRows() {
     spacer: " ",
     clientSideSort: false,
   };
-  const spacerRow: GridDataRow<OrderedRow<Data>> = {
-    kind: "spacer",
-    id: "spacer",
-    data: { name: "", value: -1 },
-    order: -1,
-    draggable: true,
-  };
 
   let rowArray: GridDataRow<OrderedRow<Data>>[] = new Array(26).fill(0);
   rowArray = rowArray.map((elem, idx) => ({
@@ -1895,105 +1889,37 @@ export function DraggableRows() {
 
   const [rows, setRows] = useState<GridDataRow<OrderedRow<Data>>[]>([{ ...simpleHeader, order: 0 }, ...rowArray]);
 
-  type DataType = { row: GridDataRow<OrderedRow<Data>>; api: GridTableApi<OrderedRow<Data>> };
-  type EventType = React.DragEvent<HTMLTableRowElement>;
+  console.log('rows', rows);
 
-  const onDragStart = (row: Data, data: DataType, evt: EventType) => {
-    // evt.preventDefault();
-    evt.dataTransfer.effectAllowed = "move";
-    evt.dataTransfer.dropEffect = "move";
-    evt.dataTransfer.setData("text/plain", JSON.stringify({ row: data.row }));
-  };
-
-  const onDragEnd = (row: Data, data: DataType, evt: EventType) => {
-    evt.preventDefault();
-    evt.dataTransfer.clearData();
-    // console.log("onRowDragEnd", evt);
-    const spacerIndex = rows.findIndex((r) => r.id === spacerRow.id);
-    if (spacerIndex > 0) {
-      rows.splice(spacerIndex, 1);
-      setRows([...rows]);
-    }
-  };
-
-  const onDrop = (row: Data, data: DataType, evt: EventType) => {
-    evt.preventDefault();
-    evt.dataTransfer.clearData();
-
-    try {
-      const draggedRowData = JSON.parse(evt.dataTransfer.getData("text/plain")).row;
-
-      // make sure spacer is removed
-      const spacerIndex = rows.findIndex((r) => r.id === spacerRow.id);
-      const spacerOrder = rows[spacerIndex].order;
-      if (spacerIndex > 0) {
-        rows.splice(spacerIndex, 1);
-      }
-
-      // get rows in order (index matches order)
-      let orderedRows = rows.sort((a, b) => a.order - b.order);
-
-      // remove dragged row
-      const draggedRow = orderedRows.splice(draggedRowData.order, 1)[0];
-
-      // change the dragging row's order to ceil(spacer's order)
-      draggedRow.order = Math.ceil(spacerOrder);
-
-      // insert it at the index
-      orderedRows = [
-        ...orderedRows.slice(0, draggedRow.order),
-        draggedRow,
-        ...orderedRows.slice(draggedRow.order, orderedRows.length),
-      ];
-      // set row order to index
-      orderedRows.forEach((r, idx) => (r.order = idx));
-      setRows([...orderedRows]);
-    } catch {}
-  };
-
-  const onDragEnter = (row: Data, data: DataType, evt: EventType) => {
-    evt.preventDefault();
-    if (data.row.id === spacerRow.id) {
-      return;
-    }
-
-    const dir = evt.clientY > evt.currentTarget.offsetTop + 0.5 * evt.currentTarget.clientHeight ? 1 : -1;
-
-    // add a spacer above the row being dragged over
-    const spacerIndex = rows.findIndex((r) => r.id === spacerRow.id);
-    if (spacerIndex === -1) {
-      setRows([...rows, { ...spacerRow, order: data.row.order + dir * 0.1 }]);
-    } else {
-      rows[spacerIndex].order = data.row.order + dir * 0.1;
-      setRows([...rows]);
-    }
-  };
-
-  const onDragOver = (row: Data, data: DataType, evt: EventType) => {
-    evt.preventDefault();
-
-    if (data.row.id === spacerRow.id) {
-      return;
-    }
-
-    const spacerIndex = rows.findIndex((r) => r.id === spacerRow.id);
-    if (spacerIndex > 0) {
-      const dir = evt.clientY > evt.currentTarget.offsetTop + 0.5 * evt.currentTarget.clientHeight ? 1 : -1;
-
-      rows[spacerIndex].order = data.row.order + dir * 0.1;
-      setRows([...rows]);
-    }
-  };
-
+  // also works with as="table" and as="virtual"
   return (
     <GridTable
       columns={[nameColumn, orderColumn, actionColumn]}
-      onRowDragStart={{ data: onDragStart, spacer: onDragStart }}
-      onRowDragEnd={{ data: onDragEnd, spacer: onDragEnd }}
-      onRowDrop={{ data: onDrop, spacer: onDrop }}
-      onRowDragEnter={{ data: onDragEnter, spacer: onDragEnter }}
-      onRowDragOver={{ data: onDragOver, spacer: onDragOver }}
-      rows={[...rows].sort((a, b) => a.order - b.order)}
+      // onRowDragStart={{ data: onDragStart, spacer: onDragStart }}
+      // onRowDragEnd={{ data: onDragEnd, spacer: onDragEnd }}
+      onRowDrop={(draggedRow, droppedRow, indexOffset: number) => {
+        console.log("on drop");
+        
+        const draggedRowIndex = rows.findIndex((r) => r.id === draggedRow.id);
+        console.log('draggedRowIndex', draggedRowIndex);
+        if(draggedRowIndex === -1) {
+          console.log('draggedRow', draggedRow);
+        }
+        // remove dragged row
+        const reorderRow = rows.splice(draggedRowIndex, 1)[0];
+
+        console.log('droppedRow.id', droppedRow.id);
+        const droppedRowIndex = rows.findIndex((r) => r.id === droppedRow.id);
+        console.log('droppedRowIndex', droppedRowIndex);
+
+        console.log('inserted rows', [...insertAtIndex(rows, reorderRow, droppedRowIndex + indexOffset)]);
+  
+        // insert it at the index
+        setRows([...insertAtIndex(rows, reorderRow, droppedRowIndex + indexOffset)]);
+      }}//{ data: onDrop, spacer: onDrop }}
+      // onRowDragEnter={{ data: onDragEnter, spacer: onDragEnter }}
+      // onRowDragOver={{ data: onDragOver, spacer: onDragOver }}
+      rows={[...rows]}
     />
   );
 }

@@ -254,3 +254,11 @@ export function loadArrayOrUndefined(key: string) {
   const ids = sessionStorage.getItem(key);
   return ids ? JSON.parse(ids) : undefined;
 }
+
+export function insertAtIndex<T> (array: Array<T>, element: T, index: number):Array<T> {
+  return [
+    ...array.slice(0, index),
+    element,
+    ...array.slice(index, array.length),
+  ];
+}
