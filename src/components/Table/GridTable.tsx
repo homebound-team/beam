@@ -90,23 +90,7 @@ export type OnRowSelect<R extends Kinded> = {
     : (data: undefined, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void;
 };
 
-/** Per-kind row drag events */
-// export type OnRowDragEvent<R extends Kinded> = {
-//   [K in R["kind"]]?: DiscriminateUnion<R, "kind", K> extends { data: infer D }
-//     ? (
-//         data: D,
-//         opts: { row: GridDataRow<R>; api: GridTableApi<R> },
-//         event: React.DragEvent<HTMLTableRowElement>,
-//       ) => void
-//     : (
-//         data: undefined,
-//         opts: { row: GridDataRow<R>; api: GridTableApi<R> },
-//         event: React.DragEvent<HTMLTableRowElement>,
-//       ) => void;
-// };
-
 type DragEventType = React.DragEvent<HTMLTableRowElement>;
-// type PlusIndex<R extends Kinded> = GridDataRow<R> & Partial<{index?: number}>;
 
 export type OnRowDragEvent<R extends Kinded> = (draggedRow: GridDataRow<R>, event: DragEventType) => void;
 
