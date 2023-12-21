@@ -8,16 +8,27 @@ describe("SubmitButton", () => {
   it("disables if the form is clean", async () => {
     const onClick = jest.fn();
     // Given a submit button for an invalid form
-    const author = createObjectState(formConfig, { firstName: "" });
+    const author = createObjectState(formConfig, { firstName: "f1" });
     const r = await render(<SubmitButton form={author} onClick={onClick} />);
+
     // Then the submit button is initially disabled because nothing is dirty
     expect(r.submit).not.toBeEnabled();
     // And clicking submit doesn't call the onClick handler
     click(r.submit);
     expect(onClick).not.toHaveBeenCalled();
-    // But once we touch a field, it becomes enabled
-    act(() => author.firstName.set("f1"));
+
+    // But once we change a field, it becomes enabled
+    act(() => author.firstName.set(""));
     expect(r.submit).toBeEnabled();
+    // Even though it's invalid, so clicking submit still won't do anything
+    click(r.submit);
+    expect(onClick).not.toHaveBeenCalled();
+
+    // But once we make it valid
+    act(() => author.firstName.set("f2"));
+    // We can click and submit
+    click(r.submit);
+    expect(onClick).toHaveBeenCalled();
   });
 
   it("disables if the form is dirty but overridden via prop", async () => {
