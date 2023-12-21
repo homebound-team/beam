@@ -3,6 +3,7 @@ export * from "./Checkbox";
 export * from "./CheckboxGroup";
 export * from "./ChipSelectField";
 export * from "./DateFields";
+export * from "./ErrorMessage";
 export * from "./MultiLineSelectField";
 export * from "./MultiSelectField";
 export * from "./NumberField";
