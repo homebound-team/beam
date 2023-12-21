@@ -17,7 +17,6 @@ import {
   GridCellAlignment,
   GridColumn,
   GridDataRow,
-  GridTableApi,
   GridRowLookup,
   GridTable,
   Icon,
@@ -1860,25 +1859,18 @@ export function Headers() {
  * Shows how drag & drop reordering can be implemented with GridTable drag events
  */
 export function DraggableRows() {
-  const nameColumn: GridColumn<OrderedRow<Data>> = {
+  const nameColumn: GridColumn<Row> = {
     header: "Name",
     data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
-    spacer: " ",
   };
-  const orderColumn: GridColumn<OrderedRow<Data>> = {
-    id: "order",
-    header: "Order",
-    data: (data, { row }) => row.order,
-    spacer: " ",
-  };
-  const actionColumn: GridColumn<OrderedRow<Data>> = {
+
+  const actionColumn: GridColumn<Row> = {
     header: "Action",
     data: () => <div>Actions</div>,
-    spacer: " ",
     clientSideSort: false,
   };
 
-  let rowArray: GridDataRow<OrderedRow<Data>>[] = new Array(26).fill(0);
+  let rowArray: GridDataRow<Row>[] = new Array(26).fill(0);
   rowArray = rowArray.map((elem, idx) => ({
     kind: "data",
     id: "" + (idx + 1),
@@ -1887,38 +1879,22 @@ export function DraggableRows() {
     draggable: true,
   }));
 
-  const [rows, setRows] = useState<GridDataRow<OrderedRow<Data>>[]>([{ ...simpleHeader, order: 0 }, ...rowArray]);
-
-  console.log('rows', rows);
+  const [rows, setRows] = useState<GridDataRow<Row>[]>([simpleHeader, ...rowArray]);
 
   // also works with as="table" and as="virtual"
   return (
     <GridTable
-      columns={[nameColumn, orderColumn, actionColumn]}
-      // onRowDragStart={{ data: onDragStart, spacer: onDragStart }}
-      // onRowDragEnd={{ data: onDragEnd, spacer: onDragEnd }}
-      onRowDrop={(draggedRow, droppedRow, indexOffset: number) => {
-        console.log("on drop");
-        
-        const draggedRowIndex = rows.findIndex((r) => r.id === draggedRow.id);
-        console.log('draggedRowIndex', draggedRowIndex);
-        if(draggedRowIndex === -1) {
-          console.log('draggedRow', draggedRow);
-        }
+      columns={[nameColumn, actionColumn]}
+      onRowDrop={(draggedRow, droppedRow) => {
         // remove dragged row
+        const draggedRowIndex = rows.findIndex((r) => r.id === draggedRow.id);
         const reorderRow = rows.splice(draggedRowIndex, 1)[0];
 
-        console.log('droppedRow.id', droppedRow.id);
         const droppedRowIndex = rows.findIndex((r) => r.id === droppedRow.id);
-        console.log('droppedRowIndex', droppedRowIndex);
-
-        console.log('inserted rows', [...insertAtIndex(rows, reorderRow, droppedRowIndex + indexOffset)]);
   
-        // insert it at the index
-        setRows([...insertAtIndex(rows, reorderRow, droppedRowIndex + indexOffset)]);
-      }}//{ data: onDrop, spacer: onDrop }}
-      // onRowDragEnter={{ data: onDragEnter, spacer: onDragEnter }}
-      // onRowDragOver={{ data: onDragOver, spacer: onDragOver }}
+        // insert it at the dropped row index
+        setRows([...insertAtIndex(rows, reorderRow, droppedRowIndex)]);
+      }}
       rows={[...rows]}
     />
   );
