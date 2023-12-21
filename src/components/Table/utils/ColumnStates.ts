@@ -44,6 +44,8 @@ export class ColumnStates<R extends Kinded> {
     } else {
       existing.column = column;
       // Any time a column is re-added (i.e. props.columns changed), re-expand it
+      // TODO: verify this eslint ignore
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       if (existing.isExpanded) existing.doExpand(true);
       return existing;
     }
