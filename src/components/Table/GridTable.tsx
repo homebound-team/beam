@@ -301,6 +301,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
+      // only pass through events if the row is draggable and the user has provided a callback
       const dragEventHandler = (callback: OnRowDragEvent<R> | undefined) => (evt: DragEventType) => {
         if (rs.row.draggable && droppedCallback && callback) {
           callback({ ...rs.row }, evt);
