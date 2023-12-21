@@ -255,10 +255,6 @@ export function loadArrayOrUndefined(key: string) {
   return ids ? JSON.parse(ids) : undefined;
 }
 
-export function insertAtIndex<T> (array: Array<T>, element: T, index: number):Array<T> {
-  return [
-    ...array.slice(0, index),
-    element,
-    ...array.slice(index, array.length),
-  ];
+export function insertAtIndex<T>(array: Array<T>, element: T, index: number): Array<T> {
+  return [...array.slice(0, index), element, ...array.slice(index, array.length)];
 }

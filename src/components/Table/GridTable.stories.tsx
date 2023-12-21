@@ -44,10 +44,6 @@ export default {
 
 type Data = { name: string | undefined; value: number | undefined };
 type Row = SimpleHeaderAndData<Data>;
-type OrderedRow<T> =
-  | { kind: "header"; order: number }
-  | { kind: "spacer"; data: T; order: number }
-  | { kind: "data"; data: T; id: string; order: number };
 
 export function ClientSideSorting() {
   const nameColumn: GridColumn<Row> = {
@@ -1891,7 +1887,7 @@ export function DraggableRows() {
         const reorderRow = rows.splice(draggedRowIndex, 1)[0];
 
         const droppedRowIndex = rows.findIndex((r) => r.id === droppedRow.id);
-  
+
         // insert it at the dropped row index
         setRows([...insertAtIndex(rows, reorderRow, droppedRowIndex)]);
       }}

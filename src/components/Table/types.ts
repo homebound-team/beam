@@ -5,7 +5,6 @@ import { GridRowApi } from "src/components/Table/GridTableApi";
 import { Margin, Xss } from "src/Css";
 
 export type Kinded = { kind: string };
-export type Ordered = { order: number } & Kinded;
 export type GridTableXss = Xss<Margin>;
 export type RenderAs = "div" | "table" | "virtual";
 export type Direction = "ASC" | "DESC";

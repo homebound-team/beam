@@ -88,7 +88,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const levelIndent = style.levels && style.levels[level]?.rowIndent;
 
   const rowCss = {
-    ...(Css.add("transition", "padding-top 0.5s ease-in-out").$),
+    ...Css.add("transition", "padding-top 0.5s ease-in-out").$,
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
     // Optionally include the row hover styles, by default they should be turned on.
     ...(showRowHoverColor && {
@@ -111,7 +111,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.visible.$,
     },
     ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
-    ...(rs.row.isDraggedOver && Css.add("paddingTop","50px").$),
+    ...(rs.row.isDraggedOver && Css.add("paddingTop", "50px").$),
   };
 
   let currentColspan = 1;
@@ -383,6 +383,6 @@ export type GridDataRow<R extends Kinded> = {
   inferSelectedState?: false;
   /** Whether this row is draggable, usually to allow drag & drop reordering of rows */
   draggable?: boolean;
-  /**  */
+  /** Whether the user is currently dragging something over this row, used to create visual space using css */
   isDraggedOver?: boolean;
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;
