@@ -303,12 +303,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     visibleRows.forEach((rs) => {
       // only pass through events if the row is draggable and the user has provided a callback
       const dragEventHandler = (callback: OnRowDragEvent<R> | undefined) => {
-        return rs.row.draggable && callback ?
-          (evt: DragEventType) => {
-          if (rs.row.draggable && droppedCallback && callback) {
-            callback({ ...rs.row }, evt);
-          }
-        } : undefined
+        return rs.row.draggable && callback
+          ? (evt: DragEventType) => {
+              if (rs.row.draggable && droppedCallback && callback) {
+                callback({ ...rs.row }, evt);
+              }
+            }
+          : undefined;
       };
 
       const onDragStart = (row: GridDataRow<R>, evt: DragEventType) => {
