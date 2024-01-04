@@ -252,6 +252,11 @@ export class TableState<R extends Kinded> {
     this.rows = this.rows.filter((row) => !ids.includes(row.id));
     this.rowStates.delete(ids);
   }
+
+  setRowDraggedOver(index: number, draggedOver: boolean): void {
+    // if we do rowStates.setRows here all of the rows will re-render
+    this.rowStates.setRowDraggedOver(this.rows[index].id, draggedOver);
+  }
 }
 
 /** Provides a context for rows to access their table's `TableState`. */

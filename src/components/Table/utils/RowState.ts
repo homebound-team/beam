@@ -23,6 +23,8 @@ export class RowState<R extends Kinded> {
   selected = false;
   /** Whether we are collapsed. */
   collapsed = false;
+  /** Whether we are dragged over. */
+  isDraggedOver = false;
   /**
    * Whether our `row` had been in `props.rows`, but then removed _while being
    * selected_, i.e. potentially by server-side filters.
@@ -59,6 +61,7 @@ export class RowState<R extends Kinded> {
         _row: false,
         _data: observable.ref,
         isCalculatingDirectMatch: false,
+        isDraggedOver: observable.ref, // allows the table to re-render only this row when the dragged over state changes
       } as any,
       { name: `RowState@${row.id}` },
     );

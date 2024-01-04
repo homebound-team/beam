@@ -177,6 +177,12 @@ export class RowStates<R extends Kinded> {
     rs.children = [];
     return rs;
   }
+
+  setRowDraggedOver(id: string, draggedOver: boolean): void {
+    const rs = this.get(id);
+    // this allows a single-row re-render
+    rs.isDraggedOver = draggedOver;
+  }
 }
 
 const missingHeader = { kind: "header" as const, id: "header", data: "MISSING" };

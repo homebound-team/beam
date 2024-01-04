@@ -282,6 +282,73 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
 
+  function onDragStart (row: GridDataRow<R>, evt: DragEventType) {
+    if(!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.dataTransfer.effectAllowed = "move";
+    evt.dataTransfer.dropEffect = "move";
+    evt.dataTransfer.setData("text/plain", JSON.stringify({ row }));
+  };
+
+  const onDragEnd = (row: GridDataRow<R>, evt: DragEventType) => {
+    if(!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+    evt.dataTransfer.clearData();
+    rows.forEach((r, idx) => {
+      tableState.setRowDraggedOver(idx, false);
+    });
+  };
+
+  const onDrop = (row: GridDataRow<R>, evt: DragEventType) => {
+    if(!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+    evt.dataTransfer.clearData();
+    if (droppedCallback) {
+      rows.forEach((r, idx) => {r
+        tableState.setRowDraggedOver(idx, false);
+      });
+      try {
+        const draggedRowData = JSON.parse(evt.dataTransfer.getData("text/plain")).row;
+
+        droppedCallback(draggedRowData, row);
+      } catch (e: any) {
+        console.error(e.message, e.stack);
+      }
+    }
+  };
+
+  const onDragEnter = (row: GridDataRow<R>, evt: DragEventType) => {
+    if(!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+
+    // set flags for css spacer
+    const rowIndex = rows.findIndex((r) => r.id === row.id);
+    rows.forEach((r, idx) => {r
+      tableState.setRowDraggedOver(idx, false);
+    });
+
+    tableState.setRowDraggedOver(rowIndex, true);
+  };
+
+  const onDragOver = (row: GridDataRow<R>, evt: DragEventType) => {
+    if(!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+  };
+
   // Flatten, hide-if-filtered, hide-if-collapsed, and component-ize the sorted rows.
   const [tableHeadRows, visibleDataRows, keptSelectedRows, tooManyClientSideRows]: [
     ReactElement[],
@@ -301,67 +368,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
-      // only pass through events if the row is draggable and the user has provided a callback
-      const dragEventHandler = (callback: OnRowDragEvent<R> | undefined) => {
-        return rs.row.draggable && callback
-          ? (evt: DragEventType) => {
-              if (rs.row.draggable && droppedCallback && callback) {
-                callback({ ...rs.row }, evt);
-              }
-            }
-          : undefined;
-      };
-
-      const onDragStart = (row: GridDataRow<R>, evt: DragEventType) => {
-        evt.dataTransfer.effectAllowed = "move";
-        evt.dataTransfer.dropEffect = "move";
-        evt.dataTransfer.setData("text/plain", JSON.stringify({ row }));
-      };
-
-      const onDragEnd = (row: GridDataRow<R>, evt: DragEventType) => {
-        evt.preventDefault();
-        evt.dataTransfer.clearData();
-      };
-
-      const onDrop = (row: GridDataRow<R>, evt: DragEventType) => {
-        evt.preventDefault();
-        evt.dataTransfer.clearData();
-        if (droppedCallback) {
-          rows.forEach((r) => (r.isDraggedOver = false));
-          try {
-            const draggedRowData = JSON.parse(evt.dataTransfer.getData("text/plain")).row;
-
-            droppedCallback(draggedRowData, row);
-          } catch (e: any) {
-            console.error(e.message, e.stack);
-          }
-        }
-      };
-
-      const onDragEnter = (row: GridDataRow<R>, evt: DragEventType) => {
-        evt.preventDefault();
-
-        // set flags for css spacer
-        const rowIndex = rows.findIndex((r) => r.id === row.id);
-        rows.forEach((r) => (r.isDraggedOver = false));
-        rows[rowIndex].isDraggedOver = true;
-
-        // required to re-render
-        tableState.setRows([...rows]);
-      };
-
-      const onDragOver = (row: GridDataRow<R>, evt: DragEventType) => {
-        evt.preventDefault();
-      };
-
+      
       const row = (
         <Row
           key={rs.key}
-          onDragStart={dragEventHandler(onDragStart)}
-          onDragOver={dragEventHandler(onDragOver)}
-          onDragEnd={dragEventHandler(onDragEnd)}
-          onDrop={dragEventHandler(onDrop)}
-          onDragEnter={dragEventHandler(onDragEnter)}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
+          onDragEnter={onDragEnter}
           {...{
             as,
             rs,
