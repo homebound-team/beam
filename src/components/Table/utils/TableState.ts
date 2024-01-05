@@ -6,7 +6,7 @@ import { GridSortConfig } from "src/components/Table/GridTable";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { Direction, GridColumnWithId } from "src/components/Table/types";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
-import { RowState } from "src/components/Table/utils/RowState";
+import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { ASC, DESC, HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 
@@ -253,9 +253,11 @@ export class TableState<R extends Kinded> {
     this.rowStates.delete(ids);
   }
 
-  setRowDraggedOver(index: number, draggedOver: boolean): void {
+  setRowDraggedOver(id: string, draggedOver: DraggedOver): void {
     // if we do rowStates.setRows here all of the rows will re-render
-    this.rowStates.setRowDraggedOver(this.rows[index].id, draggedOver);
+
+    // this.rows[index] can be undefined here?
+    this.rowStates.setRowDraggedOver(id, draggedOver);
   }
 }
 

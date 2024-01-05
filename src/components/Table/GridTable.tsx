@@ -26,6 +26,7 @@ import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { isPromise } from "src/utils";
 import { GridDataRow, Row } from "./components/Row";
+import { DraggedOver } from "./utils/RowState";
 
 let runningInJest = false;
 
@@ -90,7 +91,7 @@ export type OnRowSelect<R extends Kinded> = {
     : (data: undefined, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void;
 };
 
-type DragEventType = React.DragEvent<HTMLTableRowElement>;
+type DragEventType = React.DragEvent<HTMLElement>;
 
 export type OnRowDragEvent<R extends Kinded> = (draggedRow: GridDataRow<R>, event: DragEventType) => void;
 
@@ -171,7 +172,7 @@ export interface GridTableProps<R extends Kinded, X> {
   onRowSelect?: OnRowSelect<R>;
 
   /** Drag & drop Callback. */
-  onRowDrop?: (draggedRow: GridDataRow<R>, droppedRow: GridDataRow<R>) => void;
+  onRowDrop?: (draggedRow: GridDataRow<R>, droppedRow: GridDataRow<R>, indexOffset: number) => void;
 }
 
 /**
@@ -282,6 +283,16 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
 
+  function isCursorBelowMidpoint (target: HTMLElement, clientY: number) {
+    const style = window.getComputedStyle(target);
+    const rect = target.getBoundingClientRect();
+
+    const pt = parseInt(style.getPropertyValue('padding-top')) / 2;
+    const pb = parseInt(style.getPropertyValue('padding-bottom'));
+
+    return clientY > rect.top + pt + ((rect.height - pb) / 2);
+  }
+
   function onDragStart (row: GridDataRow<R>, evt: DragEventType) {
     if(!row.draggable || !droppedCallback) {
       return;
@@ -299,8 +310,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     evt.preventDefault();
     evt.dataTransfer.clearData();
-    rows.forEach((r, idx) => {
-      tableState.setRowDraggedOver(idx, false);
+    rows.forEach((r) => {
+      tableState.setRowDraggedOver(r.id, DraggedOver.None);
     });
   };
 
@@ -312,13 +323,19 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     evt.preventDefault();
     evt.dataTransfer.clearData();
     if (droppedCallback) {
-      rows.forEach((r, idx) => {r
-        tableState.setRowDraggedOver(idx, false);
+      rows.forEach((r) => {r
+        tableState.setRowDraggedOver(r.id, DraggedOver.None);
       });
       try {
         const draggedRowData = JSON.parse(evt.dataTransfer.getData("text/plain")).row;
 
-        droppedCallback(draggedRowData, row);
+        if(draggedRowData.id === row.id) {
+          return;
+        }
+
+        const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+
+        droppedCallback(draggedRowData, row, isBelow ? 1 : 0);
       } catch (e: any) {
         console.error(e.message, e.stack);
       }
@@ -333,12 +350,14 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     evt.preventDefault();
 
     // set flags for css spacer
-    const rowIndex = rows.findIndex((r) => r.id === row.id);
-    rows.forEach((r, idx) => {r
-      tableState.setRowDraggedOver(idx, false);
+    rows.forEach((r) => {r
+      tableState.setRowDraggedOver(r.id, DraggedOver.None);
     });
 
-    tableState.setRowDraggedOver(rowIndex, true);
+    // determine above or below
+    const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+
+    tableState.setRowDraggedOver(row.id, isBelow ? DraggedOver.Below : DraggedOver.Above);
   };
 
   const onDragOver = (row: GridDataRow<R>, evt: DragEventType) => {
@@ -347,6 +366,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     }
 
     evt.preventDefault();
+
+    const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+    
+    tableState.setRowDraggedOver(row.id, isBelow ? DraggedOver.Below : DraggedOver.Above);
   };
 
   // Flatten, hide-if-filtered, hide-if-collapsed, and component-ize the sorted rows.

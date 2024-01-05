@@ -6,6 +6,12 @@ import { RowStates } from "src/components/Table/utils/RowStates";
 import { SelectedState } from "src/components/Table/utils/TableState";
 import { applyRowFn, HEADER, KEPT_GROUP, matchesFilter, reservedRowKinds } from "src/components/Table/utils/utils";
 
+export enum DraggedOver {
+  None,
+  Above, // In this case this means higher on the screen which means a lower y value and a lower row index
+  Below, // In this case this means lower on the screen which means a higher y value and a higher row index
+};
+
 /**
  * A reactive/observable state of each GridDataRow's current behavior.
  *
@@ -24,7 +30,7 @@ export class RowState<R extends Kinded> {
   /** Whether we are collapsed. */
   collapsed = false;
   /** Whether we are dragged over. */
-  isDraggedOver = false;
+  isDraggedOver: DraggedOver = DraggedOver.None;
   /**
    * Whether our `row` had been in `props.rows`, but then removed _while being
    * selected_, i.e. potentially by server-side filters.

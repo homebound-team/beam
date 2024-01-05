@@ -1,7 +1,7 @@
 import { ObservableMap } from "mobx";
 import { Kinded } from "src";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { RowState } from "src/components/Table/utils/RowState";
+import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { RowStorage } from "src/components/Table/utils/RowStorage";
 import { TableState } from "src/components/Table/utils/TableState";
 import { HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
@@ -178,7 +178,7 @@ export class RowStates<R extends Kinded> {
     return rs;
   }
 
-  setRowDraggedOver(id: string, draggedOver: boolean): void {
+  setRowDraggedOver(id: string, draggedOver: DraggedOver): void {
     const rs = this.get(id);
     // this allows a single-row re-render
     rs.isDraggedOver = draggedOver;
