@@ -253,11 +253,8 @@ export class TableState<R extends Kinded> {
     this.rowStates.delete(ids);
   }
 
-  setRowDraggedOver(id: string, draggedOver: DraggedOver): void {
-    // if we do rowStates.setRows here all of the rows will re-render
-
-    // this.rows[index] can be undefined here?
-    this.rowStates.setRowDraggedOver(id, draggedOver);
+  maybeSetRowDraggedOver(id: string, draggedOver: DraggedOver, requireSameParentRow: GridDataRow<R> | undefined = undefined): void {
+    this.rowStates.maybeSetRowDraggedOver(id, draggedOver, requireSameParentRow);
   }
 }
 

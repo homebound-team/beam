@@ -245,6 +245,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     [props.api],
   );
 
+  const [draggedRow, _setDraggedRow] = useState<GridDataRow<R> | undefined>(undefined);
+  const draggedRowRef = useRef(draggedRow);
+  const setDraggedRow = (row: GridDataRow<R> | undefined) => {
+    draggedRowRef.current = row;
+    _setDraggedRow(row);
+  };
+
   const style = resolveStyles(maybeStyle);
   const { tableState } = api;
 
@@ -293,14 +300,24 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     return clientY > rect.top + pt + ((rect.height - pb) / 2);
   }
 
+  // allows us to unset children and grandchildren, etc.
+  function recursiveSetDraggedOver(rows: GridDataRow<R>[], draggedOver: DraggedOver) {
+    rows.forEach((r) => {
+      tableState.maybeSetRowDraggedOver(r.id, draggedOver);
+      if(r.children) {
+        recursiveSetDraggedOver(r.children, draggedOver);
+      }
+    });
+  }
+
   function onDragStart (row: GridDataRow<R>, evt: DragEventType) {
     if(!row.draggable || !droppedCallback) {
       return;
     }
 
     evt.dataTransfer.effectAllowed = "move";
-    evt.dataTransfer.dropEffect = "move";
     evt.dataTransfer.setData("text/plain", JSON.stringify({ row }));
+    setDraggedRow(row);
   };
 
   const onDragEnd = (row: GridDataRow<R>, evt: DragEventType) => {
@@ -310,9 +327,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     evt.preventDefault();
     evt.dataTransfer.clearData();
-    rows.forEach((r) => {
-      tableState.setRowDraggedOver(r.id, DraggedOver.None);
-    });
+    recursiveSetDraggedOver(rows, DraggedOver.None);
   };
 
   const onDrop = (row: GridDataRow<R>, evt: DragEventType) => {
@@ -323,9 +338,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     evt.preventDefault();
     evt.dataTransfer.clearData();
     if (droppedCallback) {
-      rows.forEach((r) => {r
-        tableState.setRowDraggedOver(r.id, DraggedOver.None);
-      });
+      recursiveSetDraggedOver(rows, DraggedOver.None);
+
       try {
         const draggedRowData = JSON.parse(evt.dataTransfer.getData("text/plain")).row;
 
@@ -349,15 +363,21 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     evt.preventDefault();
 
+    evt.cancelable
+
     // set flags for css spacer
-    rows.forEach((r) => {r
-      tableState.setRowDraggedOver(r.id, DraggedOver.None);
-    });
+    recursiveSetDraggedOver(rows, DraggedOver.None);
 
-    // determine above or below
-    const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+    if(draggedRowRef.current) {
 
-    tableState.setRowDraggedOver(row.id, isBelow ? DraggedOver.Below : DraggedOver.Above);
+      if(draggedRowRef.current.id === row.id) {
+        return;
+      }
+
+      // determine above or below
+      const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+      tableState.maybeSetRowDraggedOver(row.id, isBelow ? DraggedOver.Below : DraggedOver.Above, draggedRowRef.current);
+    }
   };
 
   const onDragOver = (row: GridDataRow<R>, evt: DragEventType) => {
@@ -367,9 +387,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     evt.preventDefault();
 
-    const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
-    
-    tableState.setRowDraggedOver(row.id, isBelow ? DraggedOver.Below : DraggedOver.Above);
+    if(draggedRowRef.current) {
+      if(draggedRowRef.current.id === row.id) {
+        return;
+      }
+
+      // continuously determine above or below
+      const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+      tableState.maybeSetRowDraggedOver(row.id, isBelow ? DraggedOver.Below : DraggedOver.Above, draggedRowRef.current);
+    }
   };
 
   // Flatten, hide-if-filtered, hide-if-collapsed, and component-ize the sorted rows.
@@ -391,7 +417,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
-      
       const row = (
         <Row
           key={rs.key}

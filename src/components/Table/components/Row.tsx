@@ -29,7 +29,6 @@ import {
   zIndices,
 } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
-import { useBreakpoint } from "src/hooks";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
 import { Icon } from "src";
@@ -74,7 +73,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   } = props;
 
   const { tableState } = useContext(TableStateContext);
-  const { sm } = useBreakpoint();
   // We're wrapped in observer, so can access these without useComputeds
   const { api, visibleColumns: columns } = tableState;
   const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, level } = rs;
@@ -120,8 +118,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.visible.$,
     },
     ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
-    ...(rs.isDraggedOver === DraggedOver.Above && Css.add("paddingTop", "50px").$),
-    ...(rs.isDraggedOver === DraggedOver.Below && Css.add("paddingBottom", "50px").$),
+    ...(rs.isDraggedOver === DraggedOver.Above && Css.add("paddingTop", "35px").$),
+    ...(rs.isDraggedOver === DraggedOver.Below && Css.add("paddingBottom", "35px").$),
   };
 
   let currentColspan = 1;

@@ -178,8 +178,26 @@ export class RowStates<R extends Kinded> {
     return rs;
   }
 
-  setRowDraggedOver(id: string, draggedOver: DraggedOver): void {
+  maybeSetRowDraggedOver(id: string, draggedOver: DraggedOver, requireSameParentRow: GridDataRow<R> | undefined = undefined): void {
     const rs = this.get(id);
+
+    if(requireSameParentRow) {
+      const requireParentRowState = this.get(requireSameParentRow.id);
+      if(requireParentRowState.parent?.row?.id !== rs.parent?.row?.id) return;
+    }
+
+    // if this is an expanded parent and draggedOver is Below then we want to set this on this rows bottom-most child
+    if(!rs.collapsed && rs.children && rs.children?.length > 0 && draggedOver === DraggedOver.Below) {
+      let rowState = rs;
+      // recursively find the bottom-most child
+      while(rowState.children && rowState.children?.length > 0) {
+        rowState = rowState.children[rowState.children.length - 1];
+      }
+      
+      rowState.isDraggedOver = draggedOver;
+      return;
+    }
+
     // this allows a single-row re-render
     rs.isDraggedOver = draggedOver;
   }
