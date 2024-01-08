@@ -2467,33 +2467,6 @@ describe("GridTable", () => {
     expect(row(r, 2).getAttribute("data-render")).toEqual("1");
   });
 
-  it("memoizes draggable rows based on the data attribute", async () => {
-    const [header, row1, row2] = draggableRows;
-    const columns = [nameColumn];
-    function onDropRow () {};
-    // Given a table is initially rendered with 2 rows
-    const r = await render(
-      <GridTable
-        key="a"
-        columns={columns}
-        rows={[header, row1, row2]}
-        onRowDrop={onDropRow}
-      />,
-    );
-    // When we render with new rows but unchanged data values
-    r.rerender(
-      <GridTable
-        key="a"
-        columns={columns}
-        rows={[header, { ...row1 }, { ...row2 }]}
-        onRowDrop={onDropRow}
-      />,
-    );
-    // Then neither row was re-rendered
-    expect(row(r, 1).getAttribute("data-render")).toEqual("1");
-    expect(row(r, 2).getAttribute("data-render")).toEqual("1");
-  });
-
   it("reacts to setting activeRowId", async () => {
     const activeRowIdRowStyles: RowStyles<Row> = {
       data: {

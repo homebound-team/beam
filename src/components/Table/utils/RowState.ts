@@ -10,7 +10,7 @@ export enum DraggedOver {
   None,
   Above, // In this case this means higher on the screen which means a lower y value and a lower row index
   Below, // In this case this means lower on the screen which means a higher y value and a higher row index
-};
+}
 
 /**
  * A reactive/observable state of each GridDataRow's current behavior.

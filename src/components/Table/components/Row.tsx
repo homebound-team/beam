@@ -136,7 +136,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     <RowTag
       css={rowCss}
       {...others}
-      data-gridrow {...getCount(row.id)}
+      data-gridrow
+      {...getCount(row.id)}
       // these events are necessary to get the dragged-over row for the drop event
       // and spacer styling
       onDrop={(evt) => onDrop?.(row, evt)}

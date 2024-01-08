@@ -253,7 +253,11 @@ export class TableState<R extends Kinded> {
     this.rowStates.delete(ids);
   }
 
-  maybeSetRowDraggedOver(id: string, draggedOver: DraggedOver, requireSameParentRow: GridDataRow<R> | undefined = undefined): void {
+  maybeSetRowDraggedOver(
+    id: string,
+    draggedOver: DraggedOver,
+    requireSameParentRow: GridDataRow<R> | undefined = undefined,
+  ): void {
     this.rowStates.maybeSetRowDraggedOver(id, draggedOver, requireSameParentRow);
   }
 }

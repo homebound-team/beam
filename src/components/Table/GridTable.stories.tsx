@@ -847,14 +847,16 @@ function makeNestedRows(repeat: number = 1, draggable: boolean = false): GridDat
                 kind: "grandChild",
                 id: `${p1}c1g1`,
                 data: { name: `grandchild ${prefix}p1c1g1` + " foo".repeat(20) },
-                draggable
+                draggable,
               },
               { kind: "grandChild", id: `${p1}c1g2`, data: { name: `grandchild ${prefix}p1c1g2` }, draggable },
             ],
           },
           {
             ...{ kind: "child", id: `${p1}c2`, data: { name: `child ${prefix}p1c2` }, draggable },
-            children: [{ kind: "grandChild", id: `${p1}c2g1`, data: { name: `grandchild ${prefix}p1c2g1` }, draggable }],
+            children: [
+              { kind: "grandChild", id: `${p1}c2g1`, data: { name: `grandchild ${prefix}p1c2g1` }, draggable },
+            ],
           },
           // Put this "grandchild" in the 2nd level to show heterogeneous levels
           { kind: "grandChild", id: `${p1}g1`, data: { name: `grandchild ${prefix}p1g1` }, draggable },
@@ -1901,13 +1903,12 @@ export function DraggableRows() {
 
         // console.log("ondrop: " + draggedRow.id + " -> " + droppedRow.id);
 
-        if(draggedRowIndex === -1 || droppedRowIndex === -1) {
-          console.error ("draggedRowIndex or droppedRowIndex is -1");
+        if (draggedRowIndex === -1 || droppedRowIndex === -1) {
+          console.error("draggedRowIndex or droppedRowIndex is -1");
           console.log("draggedRow", draggedRow);
           console.log("draggedRowIndex", draggedRowIndex);
           console.log("droppedRow", droppedRow);
           console.log("droppedRowIndex", droppedRowIndex);
-          
         } else {
           // console.log("insert row at index " + droppedRowIndex);
           // console.log("indexOffset", indexOffset);

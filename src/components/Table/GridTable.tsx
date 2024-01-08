@@ -290,38 +290,38 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
 
-  function isCursorBelowMidpoint (target: HTMLElement, clientY: number) {
+  function isCursorBelowMidpoint(target: HTMLElement, clientY: number) {
     const style = window.getComputedStyle(target);
     const rect = target.getBoundingClientRect();
 
-    const pt = parseInt(style.getPropertyValue('padding-top')) / 2;
-    const pb = parseInt(style.getPropertyValue('padding-bottom'));
+    const pt = parseInt(style.getPropertyValue("padding-top")) / 2;
+    const pb = parseInt(style.getPropertyValue("padding-bottom"));
 
-    return clientY > rect.top + pt + ((rect.height - pb) / 2);
+    return clientY > rect.top + pt + (rect.height - pb) / 2;
   }
 
   // allows us to unset children and grandchildren, etc.
   function recursiveSetDraggedOver(rows: GridDataRow<R>[], draggedOver: DraggedOver) {
     rows.forEach((r) => {
       tableState.maybeSetRowDraggedOver(r.id, draggedOver);
-      if(r.children) {
+      if (r.children) {
         recursiveSetDraggedOver(r.children, draggedOver);
       }
     });
   }
 
-  function onDragStart (row: GridDataRow<R>, evt: DragEventType) {
-    if(!row.draggable || !droppedCallback) {
+  function onDragStart(row: GridDataRow<R>, evt: DragEventType) {
+    if (!row.draggable || !droppedCallback) {
       return;
     }
 
     evt.dataTransfer.effectAllowed = "move";
     evt.dataTransfer.setData("text/plain", JSON.stringify({ row }));
     setDraggedRow(row);
-  };
+  }
 
   const onDragEnd = (row: GridDataRow<R>, evt: DragEventType) => {
-    if(!row.draggable || !droppedCallback) {
+    if (!row.draggable || !droppedCallback) {
       return;
     }
 
@@ -331,7 +331,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   };
 
   const onDrop = (row: GridDataRow<R>, evt: DragEventType) => {
-    if(!row.draggable || !droppedCallback) {
+    if (!row.draggable || !droppedCallback) {
       return;
     }
 
@@ -343,7 +343,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       try {
         const draggedRowData = JSON.parse(evt.dataTransfer.getData("text/plain")).row;
 
-        if(draggedRowData.id === row.id) {
+        if (draggedRowData.id === row.id) {
           return;
         }
 
@@ -357,20 +357,17 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   };
 
   const onDragEnter = (row: GridDataRow<R>, evt: DragEventType) => {
-    if(!row.draggable || !droppedCallback) {
+    if (!row.draggable || !droppedCallback) {
       return;
     }
 
     evt.preventDefault();
 
-    evt.cancelable
-
     // set flags for css spacer
     recursiveSetDraggedOver(rows, DraggedOver.None);
 
-    if(draggedRowRef.current) {
-
-      if(draggedRowRef.current.id === row.id) {
+    if (draggedRowRef.current) {
+      if (draggedRowRef.current.id === row.id) {
         return;
       }
 
@@ -381,14 +378,14 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   };
 
   const onDragOver = (row: GridDataRow<R>, evt: DragEventType) => {
-    if(!row.draggable || !droppedCallback) {
+    if (!row.draggable || !droppedCallback) {
       return;
     }
 
     evt.preventDefault();
 
-    if(draggedRowRef.current) {
-      if(draggedRowRef.current.id === row.id) {
+    if (draggedRowRef.current) {
+      if (draggedRowRef.current.id === row.id) {
         return;
       }
 
