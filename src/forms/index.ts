@@ -20,3 +20,4 @@ export * from "./BoundIconCardGroupField";
 export * from "./FormHeading";
 export * from "./FormLines";
 export * from "./StaticField";
+export * from "./SubmitButton";
