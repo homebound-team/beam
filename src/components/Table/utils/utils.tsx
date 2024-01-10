@@ -279,7 +279,7 @@ export function isCursorBelowMidpoint(target: HTMLElement, clientY: number) {
   return clientY > rect.top + pt + (rect.height - pb) / 2;
 }
 
-function recursivelyGetContainingRow<R extends Kinded>(
+export function recursivelyGetContainingRow<R extends Kinded>(
   rowId: string,
   rowArray: GridDataRow<R>[],
   parent?: GridDataRow<R>,
