@@ -20,12 +20,13 @@ import {
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { EXPANDABLE_HEADER, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
+import { EXPANDABLE_HEADER, KEPT_GROUP, isCursorBelowMidpoint, zIndices } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { isPromise } from "src/utils";
 import { GridDataRow, Row } from "./components/Row";
+import { DraggedOver } from "./utils/RowState";
 
 let runningInJest = false;
 
@@ -89,6 +90,10 @@ export type OnRowSelect<R extends Kinded> = {
     ? (data: D, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void
     : (data: undefined, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void;
 };
+
+type DragEventType = React.DragEvent<HTMLElement>;
+
+export type OnRowDragEvent<R extends Kinded> = (draggedRow: GridDataRow<R>, event: DragEventType) => void;
 
 export interface GridTableProps<R extends Kinded, X> {
   id?: string;
@@ -165,6 +170,9 @@ export interface GridTableProps<R extends Kinded, X> {
   infiniteScroll?: InfiniteScroll;
   /** Callback for when a row is selected or unselected. */
   onRowSelect?: OnRowSelect<R>;
+
+  /** Drag & drop Callback. */
+  onRowDrop?: (draggedRow: GridDataRow<R>, droppedRow: GridDataRow<R>, indexOffset: number) => void;
 }
 
 /**
@@ -209,6 +217,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     visibleColumnsStorageKey,
     infiniteScroll,
     onRowSelect,
+    onRowDrop: droppedCallback,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
@@ -235,6 +244,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [props.api],
   );
+
+  const [draggedRow, _setDraggedRow] = useState<GridDataRow<R> | undefined>(undefined);
+  const draggedRowRef = useRef(draggedRow);
+  const setDraggedRow = (row: GridDataRow<R> | undefined) => {
+    draggedRowRef.current = row;
+    _setDraggedRow(row);
+  };
 
   const style = resolveStyles(maybeStyle);
   const { tableState } = api;
@@ -274,6 +290,99 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
 
+  // allows us to unset children and grandchildren, etc.
+  function recursiveSetDraggedOver(rows: GridDataRow<R>[], draggedOver: DraggedOver) {
+    rows.forEach((r) => {
+      tableState.maybeSetRowDraggedOver(r.id, draggedOver);
+      if (r.children) {
+        recursiveSetDraggedOver(r.children, draggedOver);
+      }
+    });
+  }
+
+  function onDragStart(row: GridDataRow<R>, evt: DragEventType) {
+    if (!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.dataTransfer.effectAllowed = "move";
+    evt.dataTransfer.setData("text/plain", JSON.stringify({ row }));
+    setDraggedRow(row);
+  }
+
+  const onDragEnd = (row: GridDataRow<R>, evt: DragEventType) => {
+    if (!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+    recursiveSetDraggedOver(rows, DraggedOver.None);
+  };
+
+  const onDrop = (row: GridDataRow<R>, evt: DragEventType) => {
+    if (!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+    if (droppedCallback) {
+      recursiveSetDraggedOver(rows, DraggedOver.None);
+
+      try {
+        const draggedRowData = JSON.parse(evt.dataTransfer.getData("text/plain")).row;
+
+        if (draggedRowData.id === row.id) {
+          return;
+        }
+
+        const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+
+        droppedCallback(draggedRowData, row, isBelow ? 1 : 0);
+      } catch (e: any) {
+        console.error(e.message, e.stack);
+      }
+    }
+  };
+
+  const onDragEnter = (row: GridDataRow<R>, evt: DragEventType) => {
+    if (!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+
+    // set flags for css spacer
+    recursiveSetDraggedOver(rows, DraggedOver.None);
+
+    if (draggedRowRef.current) {
+      if (draggedRowRef.current.id === row.id) {
+        return;
+      }
+
+      // determine above or below
+      const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+      tableState.maybeSetRowDraggedOver(row.id, isBelow ? DraggedOver.Below : DraggedOver.Above, draggedRowRef.current);
+    }
+  };
+
+  const onDragOver = (row: GridDataRow<R>, evt: DragEventType) => {
+    if (!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+
+    if (draggedRowRef.current) {
+      if (draggedRowRef.current.id === row.id) {
+        return;
+      }
+
+      // continuously determine above or below
+      const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+      tableState.maybeSetRowDraggedOver(row.id, isBelow ? DraggedOver.Below : DraggedOver.Above, draggedRowRef.current);
+    }
+  };
+
   // Flatten, hide-if-filtered, hide-if-collapsed, and component-ize the sorted rows.
   const [tableHeadRows, visibleDataRows, keptSelectedRows, tooManyClientSideRows]: [
     ReactElement[],
@@ -296,6 +405,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       const row = (
         <Row
           key={rs.key}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
+          onDragEnter={onDragEnter}
           {...{
             as,
             rs,

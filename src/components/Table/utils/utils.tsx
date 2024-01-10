@@ -130,6 +130,15 @@ function isContentEmpty(content: ReactNode): boolean {
   return emptyValues.includes(content);
 }
 
+export type DragData<R extends Kinded> = {
+  rowRenderRef: React.RefObject<HTMLTableRowElement>;
+  onDragStart?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDragEnd?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDrop?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDragEnter?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDragOver?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+};
+
 /** Return the content for a given column def applied to a given row. */
 export function applyRowFn<R extends Kinded>(
   column: GridColumnWithId<R>,
@@ -137,12 +146,13 @@ export function applyRowFn<R extends Kinded>(
   api: GridRowApi<R>,
   level: number,
   expanded: boolean,
+  dragData?: DragData<R>,
 ): ReactNode | GridCellContent {
   // Usually this is a function to apply against the row, but sometimes it's a hard-coded value, i.e. for headers
   const maybeContent = column[row.kind];
   if (typeof maybeContent === "function") {
     // Auto-destructure data
-    return (maybeContent as Function)((row as any)["data"], { row: row as any, api, level, expanded });
+    return (maybeContent as Function)((row as any)["data"], { row: row as any, api, level, expanded, dragData });
   } else {
     return maybeContent;
   }
@@ -253,4 +263,41 @@ export const zIndices = {
 export function loadArrayOrUndefined(key: string) {
   const ids = sessionStorage.getItem(key);
   return ids ? JSON.parse(ids) : undefined;
+}
+
+export function insertAtIndex<T>(array: Array<T>, element: T, index: number): Array<T> {
+  return [...array.slice(0, index), element, ...array.slice(index, array.length)];
+}
+
+export function isCursorBelowMidpoint(target: HTMLElement, clientY: number) {
+  const style = window.getComputedStyle(target);
+  const rect = target.getBoundingClientRect();
+
+  const pt = parseInt(style.getPropertyValue("padding-top")) / 2;
+  const pb = parseInt(style.getPropertyValue("padding-bottom"));
+
+  return clientY > rect.top + pt + (rect.height - pb) / 2;
+}
+
+export function recursivelyGetContainingRow<R extends Kinded>(
+  rowId: string,
+  rowArray: GridDataRow<R>[],
+  parent?: GridDataRow<R>,
+): { array: GridDataRow<R>[]; parent: GridDataRow<R> | undefined } | undefined {
+  if (rowArray.some((row) => row.id === rowId)) {
+    return { array: rowArray, parent };
+  }
+
+  for (let i = 0; i < rowArray.length; i++) {
+    if (!rowArray[i].children) {
+      continue;
+    }
+
+    const result = recursivelyGetContainingRow(rowId, rowArray[i].children!, rowArray[i]);
+    if (result) {
+      return result;
+    }
+  }
+
+  return undefined;
 }

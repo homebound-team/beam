@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { ReactElement, useContext } from "react";
+import { ReactElement, useContext, useRef } from "react";
 import {
   defaultRenderFn,
   headerRenderFn,
@@ -9,8 +9,8 @@ import {
 } from "src/components/Table/components/cell";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
-import { DiscriminateUnion, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
-import { RowState } from "src/components/Table/utils/RowState";
+import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
+import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
@@ -31,6 +31,7 @@ import {
 import { Css, Palette } from "src/Css";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
+import { Icon } from "src";
 
 interface RowProps<R extends Kinded> {
   as: RenderAs;
@@ -42,6 +43,13 @@ interface RowProps<R extends Kinded> {
   cellHighlight: boolean;
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
+  onDragStart?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDragEnd?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDrop?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDragEnter?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDragOver?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  // onDrag?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void; // currently unused
+  // onDragLeave?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void; // currently unused
 }
 
 // We extract Row to its own mini-component primarily so we can React.memo'ize it.
@@ -56,6 +64,11 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     cellHighlight,
     omitRowHover,
     hasExpandableHeader,
+    onDragStart,
+    onDragEnd,
+    onDrop,
+    onDragEnter,
+    onDragOver,
     ...others
   } = props;
 
@@ -81,6 +94,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const levelIndent = style.levels && style.levels[level]?.rowIndent;
 
   const rowCss = {
+    ...Css.add("transition", "padding 0.5s ease-in-out").$,
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
     // Optionally include the row hover styles, by default they should be turned on.
     ...(showRowHoverColor && {
@@ -103,6 +117,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.visible.$,
     },
     ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
+    ...(rs.isDraggedOver === DraggedOver.Above && Css.add("paddingTop", "35px").$),
+    ...(rs.isDraggedOver === DraggedOver.Below && Css.add("paddingBottom", "35px").$),
   };
 
   let currentColspan = 1;
@@ -112,8 +128,39 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   let minStickyLeftOffset = 0;
   let expandColumnHidden = false;
 
+  // used to render the whole row when dragging with the handle
+  const ref = useRef<HTMLTableRowElement>(null);
+
   return (
-    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
+    <RowTag
+      css={rowCss}
+      {...others}
+      data-gridrow
+      {...getCount(row.id)}
+      // these events are necessary to get the dragged-over row for the drop event
+      // and spacer styling
+      onDrop={(evt) => onDrop?.(row, evt)}
+      onDragEnter={(evt) => onDragEnter?.(row, evt)}
+      onDragOver={(evt) => onDragOver?.(row, evt)}
+      ref={ref}
+    >
+      {/* {row.draggable && (
+        <div
+          draggable={row.draggable}
+          onDragStart={(evt) => {
+            // show the whole row being dragged when dragging with the handle
+            ref.current && evt.dataTransfer.setDragImage(ref.current, 0, 0);
+            return onDragStart?.(row, evt);
+          }}
+          onDragEnd={(evt) => onDragEnd?.(row, evt)}
+          onDrop={(evt) => onDrop?.(row, evt)}
+          onDragEnter={(evt) => onDragEnter?.(row, evt)}
+          onDragOver={(evt) => onDragOver?.(row, evt)}
+          css={Css.mh100.ma.$}
+        >
+          <Icon icon="drag" />
+        </div>
+      )} */}
       {isKeptGroupRow ? (
         <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
       ) : (
@@ -174,7 +221,14 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             currentColspan -= 1;
             return null;
           }
-          const maybeContent = applyRowFn(column, row, rowApi, level, isExpanded);
+          const maybeContent = applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, {
+            rowRenderRef: ref,
+            onDragStart,
+            onDragEnd,
+            onDrop,
+            onDragEnter,
+            onDragOver,
+          });
 
           // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
           currentColspan =
@@ -372,4 +426,6 @@ export type GridDataRow<R extends Kinded> = {
   selectable?: false;
   /** Whether this row should infer its selected state based on its children's selected state */
   inferSelectedState?: false;
+  /** Whether this row is draggable, usually to allow drag & drop reordering of rows */
+  draggable?: boolean;
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;

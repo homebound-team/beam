@@ -42,6 +42,11 @@ const rows: GridDataRow<Row>[] = [
   { kind: "data", id: "1", data: { name: "foo", value: 1 } },
   { kind: "data", id: "2", data: { name: "bar", value: 2 } },
 ];
+const draggableRows: GridDataRow<Row>[] = [
+  simpleHeader,
+  { kind: "data", id: "1", data: { name: "foo", value: 1 }, draggable: true },
+  { kind: "data", id: "2", data: { name: "bar", value: 2 }, draggable: true },
+];
 
 // Make a `NestedRow` ADT for a table with a header + 3 levels of nesting
 type TotalsRow = { kind: "totals"; id: string; data: undefined };
@@ -2457,6 +2462,19 @@ describe("GridTable", () => {
     const r = await render(<GridTable key="a" columns={columns} rows={[header, row1, row2]} />);
     // When we render with new rows but unchanged data values
     r.rerender(<GridTable key="a" columns={columns} rows={[header, { ...row1 }, { ...row2 }]} />);
+    // Then neither row was re-rendered
+    expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+    expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+  });
+
+  it("memoizes draggable rows based on the data attribute", async () => {
+    const [header, row1, row2] = draggableRows;
+    const columns = [nameColumn];
+    function onDropRow() {}
+    // Given a table is initially rendered with 2 rows
+    const r = await render(<GridTable key="a" columns={columns} rows={[header, row1, row2]} onRowDrop={onDropRow} />);
+    // When we render with new rows but unchanged data values
+    r.rerender(<GridTable key="a" columns={columns} rows={[header, { ...row1 }, { ...row2 }]} onRowDrop={onDropRow} />);
     // Then neither row was re-rendered
     expect(row(r, 1).getAttribute("data-render")).toEqual("1");
     expect(row(r, 2).getAttribute("data-render")).toEqual("1");

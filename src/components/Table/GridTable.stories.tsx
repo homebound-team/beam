@@ -27,6 +27,9 @@ import {
   simpleHeader,
   SimpleHeaderAndData,
   useGridTableApi,
+  insertAtIndex,
+  dragHandleColumn,
+  recursivelyGetContainingRow,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -826,7 +829,7 @@ export function CustomEmptyCell() {
   );
 }
 
-function makeNestedRows(repeat: number = 1): GridDataRow<NestedRow>[] {
+function makeNestedRows(repeat: number = 1, draggable: boolean = false): GridDataRow<NestedRow>[] {
   let parentId = 0;
   return zeroTo(repeat).flatMap((i) => {
     // Make three unique parent ids for this iteration
@@ -837,36 +840,39 @@ function makeNestedRows(repeat: number = 1): GridDataRow<NestedRow>[] {
     const rows: GridDataRow<NestedRow>[] = [
       // a parent w/ two children, 1st child has 2 grandchild, 2nd child has 1 grandchild
       {
-        ...{ kind: "parent", id: p1, data: { name: `parent ${prefix}1` } },
+        ...{ kind: "parent", id: p1, data: { name: `parent ${prefix}1` }, draggable },
         children: [
           {
-            ...{ kind: "child", id: `${p1}c1`, data: { name: `child ${prefix}p1c1` } },
+            ...{ kind: "child", id: `${p1}c1`, data: { name: `child ${prefix}p1c1` }, draggable },
             children: [
               {
                 kind: "grandChild",
                 id: `${p1}c1g1`,
                 data: { name: `grandchild ${prefix}p1c1g1` + " foo".repeat(20) },
+                draggable,
               },
-              { kind: "grandChild", id: `${p1}c1g2`, data: { name: `grandchild ${prefix}p1c1g2` } },
+              { kind: "grandChild", id: `${p1}c1g2`, data: { name: `grandchild ${prefix}p1c1g2` }, draggable },
             ],
           },
           {
-            ...{ kind: "child", id: `${p1}c2`, data: { name: `child ${prefix}p1c2` } },
-            children: [{ kind: "grandChild", id: `${p1}c2g1`, data: { name: `grandchild ${prefix}p1c2g1` } }],
+            ...{ kind: "child", id: `${p1}c2`, data: { name: `child ${prefix}p1c2` }, draggable },
+            children: [
+              { kind: "grandChild", id: `${p1}c2g1`, data: { name: `grandchild ${prefix}p1c2g1` }, draggable },
+            ],
           },
           // Put this "grandchild" in the 2nd level to show heterogeneous levels
-          { kind: "grandChild", id: `${p1}g1`, data: { name: `grandchild ${prefix}p1g1` } },
+          { kind: "grandChild", id: `${p1}g1`, data: { name: `grandchild ${prefix}p1g1` }, draggable },
           // Put this "kind" into the 2nd level to show it doesn't have to be a card
-          { kind: "add", id: `${p1}add`, pin: "last", data: {} },
+          { kind: "add", id: `${p1}add`, pin: "last", data: {}, draggable },
         ],
       },
       // a parent with just a child
       {
-        ...{ kind: "parent", id: p2, data: { name: `parent ${prefix}2` } },
-        children: [{ kind: "child", id: `${p2}c1`, data: { name: `child ${prefix}p2c1` } }],
+        ...{ kind: "parent", id: p2, data: { name: `parent ${prefix}2` }, draggable },
+        children: [{ kind: "child", id: `${p2}c1`, data: { name: `child ${prefix}p2c1` }, draggable }],
       },
       // a parent with no children
-      { kind: "parent", id: p3, data: { name: `parent ${prefix}3` } },
+      { kind: "parent", id: p3, data: { name: `parent ${prefix}3` }, draggable },
     ];
     return rows;
   });
@@ -1847,5 +1853,170 @@ export function Headers() {
         sorting={{ on: "client" }}
       />
     </div>
+  );
+}
+
+/**
+ * Shows how drag & drop reordering can be implemented with GridTable drag events
+ */
+export function DraggableRows() {
+  const dragColumn = dragHandleColumn<Row>({});
+  const nameColumn: GridColumn<Row> = {
+    header: "Name",
+    data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
+  };
+
+  const actionColumn: GridColumn<Row> = {
+    header: "Action",
+    data: () => <div>Actions</div>,
+    clientSideSort: false,
+  };
+
+  let rowArray: GridDataRow<Row>[] = new Array(26).fill(0);
+  rowArray = rowArray.map((elem, idx) => ({
+    kind: "data",
+    id: "" + (idx + 1),
+    order: idx + 1,
+    data: { name: "" + (idx + 1), value: idx + 1 },
+    draggable: true,
+  }));
+
+  const [rows, setRows] = useState<GridDataRow<Row>[]>([simpleHeader, ...rowArray]);
+
+  // also works with as="table" and as="virtual"
+  return (
+    <GridTable
+      columns={[dragColumn, nameColumn, actionColumn]}
+      onRowDrop={(draggedRow, droppedRow, indexOffset) => {
+        const tempRows = [...rows];
+        // remove dragged row
+        const draggedRowIndex = tempRows.findIndex((r) => r.id === draggedRow.id);
+        const reorderRow = tempRows.splice(draggedRowIndex, 1)[0];
+
+        const droppedRowIndex = tempRows.findIndex((r) => r.id === droppedRow.id);
+
+        // insert it at the dropped row index
+        setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
+      }}
+      rows={[...rows]}
+    />
+  );
+}
+
+export const DraggableWithInputColumns = newStory(
+  () => {
+    const dragColumn = dragHandleColumn<Row2>({});
+    const nameCol = column<Row2>({ header: "Name", data: ({ name }) => name });
+    const priceCol = numericColumn<Row2>({
+      header: "Price",
+      data: ({ priceInCents }) => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
+    });
+    const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
+
+    const [rows, setRows] = useState<GridDataRow<Row2>[]>([
+      simpleHeader,
+      {
+        kind: "data",
+        id: "1",
+        data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
+        draggable: true,
+      },
+      {
+        kind: "data",
+        id: "2",
+        data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
+        draggable: true,
+      },
+      {
+        kind: "data",
+        id: "3",
+        data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
+        draggable: true,
+      },
+      {
+        kind: "data",
+        id: "4",
+        data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+        draggable: true,
+      },
+    ]);
+
+    return (
+      <GridTable<Row2>
+        columns={[dragColumn, nameCol, priceCol, actionCol]}
+        rows={rows}
+        onRowDrop={(draggedRow, droppedRow, indexOffset) => {
+          const tempRows = [...rows];
+          // remove dragged row
+          const draggedRowIndex = tempRows.findIndex((r) => r.id === draggedRow.id);
+          const reorderRow = tempRows.splice(draggedRowIndex, 1)[0];
+
+          const droppedRowIndex = tempRows.findIndex((r) => r.id === droppedRow.id);
+
+          // insert it at the dropped row index
+          setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
+        }}
+      />
+    );
+  },
+  { decorators: [withRouter()] },
+);
+
+const draggableRows = makeNestedRows(1, true);
+const draggableRowsWithHeader: GridDataRow<NestedRow>[] = [simpleHeader, ...draggableRows];
+export function DraggableNestedRows() {
+  const dragColumn = dragHandleColumn<NestedRow>({});
+  const nameColumn: GridColumn<NestedRow> = {
+    header: () => "Name",
+    parent: (row) => ({
+      content: <div>{row.name}</div>,
+      value: row.name,
+    }),
+    child: (row) => ({
+      content: <div css={Css.ml2.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    grandChild: (row) => ({
+      content: <div css={Css.ml4.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    add: () => "Add",
+  };
+
+  const [rows, setRows] = useState<GridDataRow<NestedRow>[]>(draggableRowsWithHeader);
+
+  return (
+    <GridTable
+      columns={[dragColumn, collapseColumn<NestedRow>(), nameColumn]}
+      rows={rows}
+      sorting={{ on: "client", initial: ["c1", "ASC"] }}
+      onRowDrop={(draggedRow, droppedRow, indexOffset) => {
+        const tempRows = [...rows];
+        const foundRowContainer = recursivelyGetContainingRow(draggedRow.id, tempRows)!;
+        if (!foundRowContainer) {
+          console.error("Could not find row array for row", draggedRow);
+          return;
+        }
+        if (!foundRowContainer.array.some((row) => row.id === droppedRow.id)) {
+          console.error("Could not find dropped row in row array", droppedRow);
+          return;
+        }
+        // remove dragged row
+        const draggedRowIndex = foundRowContainer.array.findIndex((r) => r.id === draggedRow.id);
+        const reorderRow = foundRowContainer.array.splice(draggedRowIndex, 1)[0];
+
+        const droppedRowIndex = foundRowContainer.array.findIndex((r) => r.id === droppedRow.id);
+
+        // we also need the parent row so we can set the newly inserted array
+        if (foundRowContainer.parent && foundRowContainer.parent?.children) {
+          foundRowContainer.parent.children = [
+            ...insertAtIndex(foundRowContainer.parent?.children, reorderRow, droppedRowIndex + indexOffset),
+          ];
+          setRows([...tempRows]);
+        } else {
+          setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
+        }
+      }}
+    />
   );
 }

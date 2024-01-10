@@ -6,7 +6,7 @@ import { GridSortConfig } from "src/components/Table/GridTable";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { Direction, GridColumnWithId } from "src/components/Table/types";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
-import { RowState } from "src/components/Table/utils/RowState";
+import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { ASC, DESC, HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 
@@ -251,6 +251,14 @@ export class TableState<R extends Kinded> {
   deleteRows(ids: string[]): void {
     this.rows = this.rows.filter((row) => !ids.includes(row.id));
     this.rowStates.delete(ids);
+  }
+
+  maybeSetRowDraggedOver(
+    id: string,
+    draggedOver: DraggedOver,
+    requireSameParentRow: GridDataRow<R> | undefined = undefined,
+  ): void {
+    this.rowStates.maybeSetRowDraggedOver(id, draggedOver, requireSameParentRow);
   }
 }
 

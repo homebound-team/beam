@@ -1,7 +1,7 @@
 import { ObservableMap } from "mobx";
 import { Kinded } from "src";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { RowState } from "src/components/Table/utils/RowState";
+import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { RowStorage } from "src/components/Table/utils/RowStorage";
 import { TableState } from "src/components/Table/utils/TableState";
 import { HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
@@ -176,6 +176,34 @@ export class RowStates<R extends Kinded> {
     // Make the RowState behave like a parent, even though we calc its visibleChildren.
     rs.children = [];
     return rs;
+  }
+
+  maybeSetRowDraggedOver(
+    id: string,
+    draggedOver: DraggedOver,
+    requireSameParentRow: GridDataRow<R> | undefined = undefined,
+  ): void {
+    const rs = this.get(id);
+
+    if (requireSameParentRow) {
+      const requireParentRowState = this.get(requireSameParentRow.id);
+      if (requireParentRowState.parent?.row?.id !== rs.parent?.row?.id) return;
+    }
+
+    // if this is an expanded parent and draggedOver is Below then we want to set this on this rows bottom-most child
+    if (!rs.collapsed && rs.children && rs.children?.length > 0 && draggedOver === DraggedOver.Below) {
+      let rowState = rs;
+      // recursively find the bottom-most child
+      while (rowState.children && rowState.children?.length > 0) {
+        rowState = rowState.children[rowState.children.length - 1];
+      }
+
+      rowState.isDraggedOver = draggedOver;
+      return;
+    }
+
+    // this allows a single-row re-render
+    rs.isDraggedOver = draggedOver;
   }
 }
 
