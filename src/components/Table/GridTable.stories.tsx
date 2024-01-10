@@ -1940,7 +1940,7 @@ export const DraggableWithInputColumns = newStory(
         draggable: true,
       },
     ]);
-    
+
     return (
       <GridTable<Row2>
         columns={[dragColumn, nameCol, priceCol, actionCol]}
@@ -1950,9 +1950,9 @@ export const DraggableWithInputColumns = newStory(
           // remove dragged row
           const draggedRowIndex = tempRows.findIndex((r) => r.id === draggedRow.id);
           const reorderRow = tempRows.splice(draggedRowIndex, 1)[0];
-  
+
           const droppedRowIndex = tempRows.findIndex((r) => r.id === droppedRow.id);
-  
+
           // insert it at the dropped row index
           setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
         }}
@@ -1991,14 +1991,13 @@ export function DraggableNestedRows() {
       rows={rows}
       sorting={{ on: "client", initial: ["c1", "ASC"] }}
       onRowDrop={(draggedRow, droppedRow, indexOffset) => {
-
         const tempRows = [...rows];
         const foundRowContainer = recursivelyGetContainingRow(draggedRow.id, tempRows)!;
         if (!foundRowContainer) {
           console.error("Could not find row array for row", draggedRow);
           return;
         }
-        if (!foundRowContainer.array.some(row => row.id === droppedRow.id)) {
+        if (!foundRowContainer.array.some((row) => row.id === droppedRow.id)) {
           console.error("Could not find dropped row in row array", droppedRow);
           return;
         }
@@ -2010,10 +2009,11 @@ export function DraggableNestedRows() {
 
         // we also need the parent row so we can set the newly inserted array
         if (foundRowContainer.parent && foundRowContainer.parent?.children) {
-          foundRowContainer.parent.children = [...insertAtIndex(foundRowContainer.parent?.children, reorderRow, droppedRowIndex + indexOffset)];
+          foundRowContainer.parent.children = [
+            ...insertAtIndex(foundRowContainer.parent?.children, reorderRow, droppedRowIndex + indexOffset),
+          ];
           setRows([...tempRows]);
-        }
-        else {
+        } else {
           setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
         }
       }}

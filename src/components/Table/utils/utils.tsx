@@ -137,7 +137,7 @@ export type DragData<R extends Kinded> = {
   onDrop?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDragEnter?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDragOver?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
-}
+};
 
 /** Return the content for a given column def applied to a given row. */
 export function applyRowFn<R extends Kinded>(
@@ -279,8 +279,12 @@ export function isCursorBelowMidpoint(target: HTMLElement, clientY: number) {
   return clientY > rect.top + pt + (rect.height - pb) / 2;
 }
 
-function recursivelyGetContainingRow<R extends Kinded> (rowId: string, rowArray: GridDataRow<R>[], parent?: GridDataRow<R>): { array: GridDataRow<R>[], parent: GridDataRow<R> | undefined } | undefined {
-  if (rowArray.some(row => row.id === rowId)) {
+function recursivelyGetContainingRow<R extends Kinded>(
+  rowId: string,
+  rowArray: GridDataRow<R>[],
+  parent?: GridDataRow<R>,
+): { array: GridDataRow<R>[]; parent: GridDataRow<R> | undefined } | undefined {
+  if (rowArray.some((row) => row.id === rowId)) {
     return { array: rowArray, parent };
   }
 

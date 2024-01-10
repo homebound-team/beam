@@ -217,20 +217,13 @@ export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColum
   //     content: <CollapseToggle row={row} compact={level > 0} />,
   //   });
   // }) as any;
-  
-  return newMethodMissingProxy(base, (key) => {
-    return (data: any, { row, dragData }: { row: GridDataRow<T>, dragData: DragData<T> }) => {
-      if (!dragData) return ;
-      const {
-        rowRenderRef: ref,
-        onDragStart,
-        onDragEnd,
-        onDrop,
-        onDragEnter,
-        onDragOver
-      } = dragData;
 
-      return ({      
+  return newMethodMissingProxy(base, (key) => {
+    return (data: any, { row, dragData }: { row: GridDataRow<T>; dragData: DragData<T> }) => {
+      if (!dragData) return;
+      const { rowRenderRef: ref, onDragStart, onDragEnd, onDrop, onDragEnter, onDragOver } = dragData;
+
+      return {
         // how do we get the callbacks and the ref here?
         // inject them into the row in the Row component?
         content: row.draggable ? (
@@ -250,7 +243,7 @@ export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColum
             <Icon icon="drag" />
           </div>
         ) : undefined,
-      });
-    }
+      };
+    };
   }) as any;
 }

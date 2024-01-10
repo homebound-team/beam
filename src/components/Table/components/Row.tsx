@@ -221,21 +221,14 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             currentColspan -= 1;
             return null;
           }
-          const maybeContent = applyRowFn(
-            column as GridColumnWithId<R>,
-            row,
-            rowApi,
-            level,
-            isExpanded,
-            {
-              rowRenderRef: ref,
-              onDragStart,
-              onDragEnd,
-              onDrop,
-              onDragEnter,
-              onDragOver,
-            }
-          );
+          const maybeContent = applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, {
+            rowRenderRef: ref,
+            onDragStart,
+            onDragEnd,
+            onDrop,
+            onDragEnter,
+            onDragOver,
+          });
 
           // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
           currentColspan =
