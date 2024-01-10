@@ -316,7 +316,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     }
 
     evt.preventDefault();
-    evt.dataTransfer.clearData();
     recursiveSetDraggedOver(rows, DraggedOver.None);
   };
 
@@ -326,7 +325,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     }
 
     evt.preventDefault();
-    evt.dataTransfer.clearData();
     if (droppedCallback) {
       recursiveSetDraggedOver(rows, DraggedOver.None);
 
