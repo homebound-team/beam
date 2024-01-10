@@ -20,7 +20,7 @@ import {
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { EXPANDABLE_HEADER, KEPT_GROUP, insertAtIndex, zIndices } from "src/components/Table/utils/utils";
+import { EXPANDABLE_HEADER, KEPT_GROUP, isCursorBelowMidpoint, zIndices } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
@@ -289,16 +289,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // Our column sizes use either `w` or `expandedWidth`, so see which columns are currently expanded
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
-
-  function isCursorBelowMidpoint(target: HTMLElement, clientY: number) {
-    const style = window.getComputedStyle(target);
-    const rect = target.getBoundingClientRect();
-
-    const pt = parseInt(style.getPropertyValue("padding-top")) / 2;
-    const pb = parseInt(style.getPropertyValue("padding-bottom"));
-
-    return clientY > rect.top + pt + (rect.height - pb) / 2;
-  }
 
   // allows us to unset children and grandchildren, etc.
   function recursiveSetDraggedOver(rows: GridDataRow<R>[], draggedOver: DraggedOver) {

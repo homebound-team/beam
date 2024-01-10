@@ -9,7 +9,7 @@ import {
 } from "src/components/Table/components/cell";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
-import { DiscriminateUnion, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
+import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -94,7 +94,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const levelIndent = style.levels && style.levels[level]?.rowIndent;
 
   const rowCss = {
-    // ...Css.add("transition", "padding-top 0.5s ease-in-out").$,
     ...Css.add("transition", "padding 0.5s ease-in-out").$,
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
     // Optionally include the row hover styles, by default they should be turned on.
@@ -145,7 +144,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       onDragOver={(evt) => onDragOver?.(row, evt)}
       ref={ref}
     >
-      {row.draggable && (
+      {/* {row.draggable && (
         <div
           draggable={row.draggable}
           onDragStart={(evt) => {
@@ -161,7 +160,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         >
           <Icon icon="drag" />
         </div>
-      )}
+      )} */}
       {isKeptGroupRow ? (
         <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
       ) : (
@@ -222,7 +221,21 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             currentColspan -= 1;
             return null;
           }
-          const maybeContent = applyRowFn(column, row, rowApi, level, isExpanded);
+          const maybeContent = applyRowFn(
+            column as GridColumnWithId<R>,
+            row,
+            rowApi,
+            level,
+            isExpanded,
+            {
+              rowRenderRef: ref,
+              onDragStart,
+              onDragEnd,
+              onDrop,
+              onDragEnter,
+              onDragOver,
+            }
+          );
 
           // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
           currentColspan =

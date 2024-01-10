@@ -28,6 +28,8 @@ import {
   SimpleHeaderAndData,
   useGridTableApi,
   insertAtIndex,
+  dragHandleColumn,
+  recursivelyGetContainingRow,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -1858,6 +1860,7 @@ export function Headers() {
  * Shows how drag & drop reordering can be implemented with GridTable drag events
  */
 export function DraggableRows() {
+  const dragColumn = dragHandleColumn<Row>({});
   const nameColumn: GridColumn<Row> = {
     header: "Name",
     data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
@@ -1883,38 +1886,17 @@ export function DraggableRows() {
   // also works with as="table" and as="virtual"
   return (
     <GridTable
-      columns={[nameColumn, actionColumn]}
+      columns={[dragColumn, nameColumn, actionColumn]}
       onRowDrop={(draggedRow, droppedRow, indexOffset) => {
         const tempRows = [...rows];
         // remove dragged row
-        // console.log("onRowDrop");
-        // console.log("rows", rows);
         const draggedRowIndex = tempRows.findIndex((r) => r.id === draggedRow.id);
-        if (draggedRowIndex === -1) {
-          console.error("draggedRowIndex is -1");
-          console.log("draggedRow", draggedRow);
-          console.log("draggedRowIndex", draggedRowIndex);
-          return;
-        }
         const reorderRow = tempRows.splice(draggedRowIndex, 1)[0];
-        // console.log("reorder row removed");
 
         const droppedRowIndex = tempRows.findIndex((r) => r.id === droppedRow.id);
 
-        // console.log("ondrop: " + draggedRow.id + " -> " + droppedRow.id);
-
-        if (draggedRowIndex === -1 || droppedRowIndex === -1) {
-          console.error("draggedRowIndex or droppedRowIndex is -1");
-          console.log("draggedRow", draggedRow);
-          console.log("draggedRowIndex", draggedRowIndex);
-          console.log("droppedRow", droppedRow);
-          console.log("droppedRowIndex", droppedRowIndex);
-        } else {
-          // console.log("insert row at index " + droppedRowIndex);
-          // console.log("indexOffset", indexOffset);
-          // insert it at the dropped row index
-          setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
-        }
+        // insert it at the dropped row index
+        setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
       }}
       rows={[...rows]}
     />
@@ -1923,43 +1905,57 @@ export function DraggableRows() {
 
 export const DraggableWithInputColumns = newStory(
   () => {
+    const dragColumn = dragHandleColumn<Row2>({});
     const nameCol = column<Row2>({ header: "Name", data: ({ name }) => name });
     const priceCol = numericColumn<Row2>({
       header: "Price",
       data: ({ priceInCents }) => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
     });
     const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
+
+    const [rows, setRows] = useState<GridDataRow<Row2>[]>([
+      simpleHeader,
+      {
+        kind: "data",
+        id: "1",
+        data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
+        draggable: true,
+      },
+      {
+        kind: "data",
+        id: "2",
+        data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
+        draggable: true,
+      },
+      {
+        kind: "data",
+        id: "3",
+        data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
+        draggable: true,
+      },
+      {
+        kind: "data",
+        id: "4",
+        data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+        draggable: true,
+      },
+    ]);
+    
     return (
       <GridTable<Row2>
-        columns={[nameCol, priceCol, actionCol]}
-        rows={[
-          simpleHeader,
-          {
-            kind: "data",
-            id: "1",
-            data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
-            draggable: true,
-          },
-          {
-            kind: "data",
-            id: "2",
-            data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
-            draggable: true,
-          },
-          {
-            kind: "data",
-            id: "3",
-            data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
-            draggable: true,
-          },
-          {
-            kind: "data",
-            id: "4",
-            data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
-            draggable: true,
-          },
-        ]}
-        onRowDrop={() => {}}
+        columns={[dragColumn, nameCol, priceCol, actionCol]}
+        rows={rows}
+        onRowDrop={(draggedRow, droppedRow, indexOffset) => {
+          const tempRows = [...rows];
+          // remove dragged row
+          const draggedRowIndex = tempRows.findIndex((r) => r.id === draggedRow.id);
+          const reorderRow = tempRows.splice(draggedRowIndex, 1)[0];
+  
+          const droppedRowIndex = tempRows.findIndex((r) => r.id === droppedRow.id);
+  
+          // insert it at the dropped row index
+          setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
+        }}
       />
     );
   },
@@ -1969,6 +1965,7 @@ export const DraggableWithInputColumns = newStory(
 const draggableRows = makeNestedRows(1, true);
 const draggableRowsWithHeader: GridDataRow<NestedRow>[] = [simpleHeader, ...draggableRows];
 export function DraggableNestedRows() {
+  const dragColumn = dragHandleColumn<NestedRow>({});
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
     parent: (row) => ({
@@ -1985,12 +1982,41 @@ export function DraggableNestedRows() {
     }),
     add: () => "Add",
   };
+
+  const [rows, setRows] = useState<GridDataRow<NestedRow>[]>(draggableRowsWithHeader);
+
   return (
     <GridTable
-      columns={[collapseColumn<NestedRow>(), nameColumn]}
-      {...{ rows: draggableRowsWithHeader }}
+      columns={[dragColumn, collapseColumn<NestedRow>(), nameColumn]}
+      rows={rows}
       sorting={{ on: "client", initial: ["c1", "ASC"] }}
-      onRowDrop={(draggedRow, droppedRow) => {}}
+      onRowDrop={(draggedRow, droppedRow, indexOffset) => {
+
+        const tempRows = [...rows];
+        const foundRowContainer = recursivelyGetContainingRow(draggedRow.id, tempRows)!;
+        if (!foundRowContainer) {
+          console.error("Could not find row array for row", draggedRow);
+          return;
+        }
+        if (!foundRowContainer.array.some(row => row.id === droppedRow.id)) {
+          console.error("Could not find dropped row in row array", droppedRow);
+          return;
+        }
+        // remove dragged row
+        const draggedRowIndex = foundRowContainer.array.findIndex((r) => r.id === draggedRow.id);
+        const reorderRow = foundRowContainer.array.splice(draggedRowIndex, 1)[0];
+
+        const droppedRowIndex = foundRowContainer.array.findIndex((r) => r.id === droppedRow.id);
+
+        // we also need the parent row so we can set the newly inserted array
+        if (foundRowContainer.parent && foundRowContainer.parent?.children) {
+          foundRowContainer.parent.children = [...insertAtIndex(foundRowContainer.parent?.children, reorderRow, droppedRowIndex + indexOffset)];
+          setRows([...tempRows]);
+        }
+        else {
+          setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
+        }
+      }}
     />
   );
 }

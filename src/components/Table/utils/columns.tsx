@@ -2,8 +2,10 @@ import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
 import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
-import { emptyCell } from "src/components/Table/utils/utils";
+import { DragData, emptyCell } from "src/components/Table/utils/utils";
 import { isFunction, newMethodMissingProxy } from "src/utils";
+import { Icon } from "src";
+import { Css, Palette } from "src/Css";
 
 /** Provides default styling for a GridColumn representing a Date. */
 export function column<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
@@ -191,3 +193,64 @@ export function assignDefaultColumnIds<T extends Kinded>(columns: GridColumn<T>[
 }
 
 export const generateColumnId = (columnIndex: number) => `beamColumn_${columnIndex}`;
+
+export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>): GridColumn<T> {
+  const base = {
+    ...nonKindDefaults(),
+    id: "beamDragHandleColumn",
+    clientSideSort: false,
+    align: "center",
+    // Defining `w: 40px` to accommodate for the `16px` wide checkbox and `12px` of padding on either side.
+    w: "40px",
+    wrapAction: false,
+    isAction: true,
+    expandColumns: undefined,
+    // Select Column should not display the select toggle for `expandableHeader` or `totals` row kinds
+    expandableHeader: emptyCell,
+    totals: emptyCell,
+    // Use any of the user's per-row kind methods if they have them.
+    ...columnDef,
+  };
+
+  // return newMethodMissingProxy(base, (key) => {
+  //   return (data: any, { row, level }: { row: GridDataRow<any>; level: number }) => ({
+  //     content: <CollapseToggle row={row} compact={level > 0} />,
+  //   });
+  // }) as any;
+  
+  return newMethodMissingProxy(base, (key) => {
+    return (data: any, { row, dragData }: { row: GridDataRow<T>, dragData: DragData<T> }) => {
+      if (!dragData) return ;
+      const {
+        rowRenderRef: ref,
+        onDragStart,
+        onDragEnd,
+        onDrop,
+        onDragEnter,
+        onDragOver
+      } = dragData;
+
+      return ({      
+        // how do we get the callbacks and the ref here?
+        // inject them into the row in the Row component?
+        content: row.draggable ? (
+          <div
+            draggable={row.draggable}
+            onDragStart={(evt) => {
+              // show the whole row being dragged when dragging with the handle
+              ref.current && evt.dataTransfer.setDragImage(ref.current, 0, 0);
+              return onDragStart?.(row, evt);
+            }}
+            onDragEnd={(evt) => onDragEnd?.(row, evt)}
+            onDrop={(evt) => onDrop?.(row, evt)}
+            onDragEnter={(evt) => onDragEnter?.(row, evt)}
+            onDragOver={(evt) => onDragOver?.(row, evt)}
+            css={Css.mh100.ma.$}
+          >
+            <Icon icon="drag" />
+          </div>
+        ) : undefined,
+      });
+    }
+  }) as any;
+}

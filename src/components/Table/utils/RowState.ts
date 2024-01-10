@@ -67,7 +67,6 @@ export class RowState<R extends Kinded> {
         _row: false,
         _data: observable.ref,
         isCalculatingDirectMatch: false,
-        isDraggedOver: observable.ref, // allows the table to re-render only this row when the dragged over state changes
       } as any,
       { name: `RowState@${row.id}` },
     );
