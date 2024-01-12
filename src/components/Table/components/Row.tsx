@@ -360,9 +360,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       {RowContent()}
     </div>
   ) : (
-    <>
-    {RowContent()}
-    </>
+    <>{RowContent()}</>
   );
 }
 
