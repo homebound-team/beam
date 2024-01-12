@@ -357,10 +357,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       onDragOver={(evt) => onDragOver?.(row, evt)}
       ref={ref}
     >
-      <RowContent />
+      {RowContent()}
     </div>
   ) : (
-    <RowContent />
+    <>
+    {RowContent()}
+    </>
   );
 }
 
