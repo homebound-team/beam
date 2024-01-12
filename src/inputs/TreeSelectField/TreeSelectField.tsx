@@ -209,14 +209,16 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
       return parents.some((parent) => selectedKeys.includes(valueToKey(getOptionValue(parent))));
     };
 
-    // For the input value, we want to show the label of the selected option(s).
-    const selectedOptionsLabels = selectedOptions.filter((o) => !isParentSelected(o)).map(getOptionLabel);
-
     return {
       selectedKeys,
       inputValue:
-        selectedOptions.length > 0
-          ? selectedOptionsLabels.join(", ")
+        selectedOptions.length === 1
+          ? getOptionLabel(selectedOptions[0])
+          : isReadOnly && selectedOptions.length > 0
+          ? selectedOptions
+              .filter((o) => !isParentSelected(o))
+              .map(getOptionLabel)
+              .join(", ")
           : selectedOptions.length === 0
           ? nothingSelectedText
           : "",
