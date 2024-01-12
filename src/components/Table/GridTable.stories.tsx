@@ -2020,3 +2020,48 @@ export function DraggableNestedRows() {
     />
   );
 }
+
+export function DraggableCardRows() {
+  const dragColumn = dragHandleColumn<Row>({});
+  const nameColumn: GridColumn<Row> = {
+    header: "Name",
+    data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
+  };
+
+  const actionColumn: GridColumn<Row> = {
+    header: "Action",
+    data: () => <div>Actions</div>,
+    clientSideSort: false,
+  };
+
+  let rowArray: GridDataRow<Row>[] = new Array(26).fill(0);
+  rowArray = rowArray.map((elem, idx) => ({
+    kind: "data",
+    id: "" + (idx + 1),
+    order: idx + 1,
+    data: { name: "" + (idx + 1), value: idx + 1 },
+    draggable: true,
+  }));
+
+  const [rows, setRows] = useState<GridDataRow<Row>[]>([simpleHeader, ...rowArray]);
+
+  // also works with as="table" and as="virtual"
+  return (
+    <GridTable
+      columns={[dragColumn, nameColumn, actionColumn]}
+      onRowDrop={(draggedRow, droppedRow, indexOffset) => {
+        const tempRows = [...rows];
+        // remove dragged row
+        const draggedRowIndex = tempRows.findIndex((r) => r.id === draggedRow.id);
+        const reorderRow = tempRows.splice(draggedRowIndex, 1)[0];
+
+        const droppedRowIndex = tempRows.findIndex((r) => r.id === droppedRow.id);
+
+        // insert it at the dropped row index
+        setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
+      }}
+      rows={[...rows]}
+      style={cardStyle}
+    />
+  );
+}
