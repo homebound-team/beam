@@ -93,9 +93,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const levelIndent = style.levels && style.levels[level]?.rowIndent;
 
   const containerCss = {
-    ...Css.add("transition", "padding 0.5s ease-in-out").$,
-    ...(rs.isDraggedOver === DraggedOver.Above && Css.add("paddingTop", "35px").$),
-    ...(rs.isDraggedOver === DraggedOver.Below && Css.add("paddingBottom", "35px").$),
+    ...Css.add("transition", "padding 0.25s ease-in-out").$,
+    ...(rs.isDraggedOver === DraggedOver.Above && Css.ptPx(35).$),
+    ...(rs.isDraggedOver === DraggedOver.Below && Css.pbPx(35).$),
   };
 
   const rowCss = {
