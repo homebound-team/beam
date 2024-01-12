@@ -146,12 +146,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       onDragOver={(evt) => onDragOver?.(row, evt)}
       ref={ref}
     >
-      <RowTag
-        css={rowCss}
-        {...others}
-        data-gridrow
-        {...getCount(row.id)}
-      >
+      <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
         {isKeptGroupRow ? (
           <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
         ) : (
@@ -171,7 +166,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             const numExpandedColumns = isExpanded
               ? tableState.numberOfExpandedChildren(maybeExpandedColumn.id)
                 ? // Subtract 1 if the column is hidden on expand, since we're not rendering it.
-                  tableState.numberOfExpandedChildren(maybeExpandedColumn.id) - (maybeExpandedColumn.hideOnExpand ? 1 : 0)
+                  tableState.numberOfExpandedChildren(maybeExpandedColumn.id) -
+                  (maybeExpandedColumn.hideOnExpand ? 1 : 0)
                 : 0
               : 0;
 
@@ -263,7 +259,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               maybeContent,
             );
 
-            const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
+            const maybeSticky =
+              ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
             const maybeStickyColumnStyles =
               maybeSticky && columnSizes
                 ? {
@@ -282,7 +279,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                 : {};
 
             // This relies on our column sizes being defined in pixel values, which is currently true as we calculate to pixel values in the `useSetupColumnSizes` hook
-            minStickyLeftOffset += maybeSticky === "left" ? parseInt(columnSizes[columnIndex].replace("px", ""), 10) : 0;
+            minStickyLeftOffset +=
+              maybeSticky === "left" ? parseInt(columnSizes[columnIndex].replace("px", ""), 10) : 0;
 
             const cellId = `${row.kind}_${row.id}_${column.id}`;
             const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
