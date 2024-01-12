@@ -73,17 +73,9 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
 
         <TestTreeSelectField
           {...args}
-          readOnly="Read-only parent reason tooltip text"
-          label="Read-only"
-          values={multipleValuesWithParents}
-          options={options}
-        />
-
-        <TestTreeSelectField
-          {...args}
           readOnly="Read-only reason tooltip text"
           label="Read-only"
-          values={singleValueId}
+          values={multipleValuesWithParents}
           options={options}
         />
 
