@@ -31,7 +31,6 @@ import {
 import { Css, Palette } from "src/Css";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
-import { Icon } from "src";
 
 interface RowProps<R extends Kinded> {
   as: RenderAs;
@@ -134,9 +133,224 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   // used to render the whole row when dragging with the handle
   const ref = useRef<HTMLTableRowElement>(null);
 
-  return (
-    // we need to use padding for the drag & drop spacing or else drop events don't fire
-    // and we need a containing element for padding to work correctly with the card style row
+  const RowContent =  () => (
+    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
+      {isKeptGroupRow ? (
+        <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
+      ) : (
+        columns.map((column, columnIndex) => {
+          // If the expandable column was hidden, then we need to look at the previous column to format the `expandHeader` and 'header' kinds correctly.
+          const maybeExpandedColumn = expandColumnHidden ? columns[columnIndex - 1] : column;
+
+          // Figure out if this column should be considered 'expanded' or not. If the column is hidden on expand, then we need to look at the previous column to see if it's expanded.
+          const isExpanded = tableState.isExpandedColumn(maybeExpandedColumn.id);
+          // If the column is hidden on expand, we don't want to render it. We'll flag that it was hidden, so on the next column we can render this column's "expandHeader" property.
+          if (column.hideOnExpand && isExpanded) {
+            expandColumnHidden = true;
+            return <></>;
+          }
+
+          // Need to keep track of the expanded columns so we can add borders as expected for the header rows
+          const numExpandedColumns = isExpanded
+            ? tableState.numberOfExpandedChildren(maybeExpandedColumn.id)
+              ? // Subtract 1 if the column is hidden on expand, since we're not rendering it.
+                tableState.numberOfExpandedChildren(maybeExpandedColumn.id) -
+                (maybeExpandedColumn.hideOnExpand ? 1 : 0)
+              : 0
+            : 0;
+
+          // If we're rendering the Expandable Header row, then we might need to render the previous column's `expandHeader` property in the case where the column is hidden on expand.
+          column = isExpandableHeader ? maybeExpandedColumn : column;
+
+          const { wrapAction = true, isAction = false } = column;
+
+          const isFirstContentColumn = !isAction && !foundFirstContentColumn;
+          const applyFirstContentColumnStyles = !isHeader && isFirstContentColumn;
+          foundFirstContentColumn ||= applyFirstContentColumnStyles;
+
+          if (column.mw) {
+            // Validate the column's minWidth definition if set.
+            if (!column.mw.endsWith("px") && !column.mw.endsWith("%")) {
+              throw new Error("Beam Table column min-width definition only supports px or percentage values");
+            }
+          }
+
+          // When using the variation of the table with an EXPANDABLE_HEADER, then our HEADER and TOTAL rows have special border styling
+          // Keep track of the when we get to the last expanded column so we can apply this styling properly.
+          if (hasExpandableHeader && (isHeader || isTotals)) {
+            // When the value of `currentExpandedColumnCount` is 0, then we have started over.
+            // If the current column `isExpanded`, then store the number of expandable columns.
+            if (currentExpandedColumnCount === 0 && isExpanded) {
+              currentExpandedColumnCount = numExpandedColumns;
+            } else if (currentExpandedColumnCount > 0) {
+              // If value is great than 0, then decrement. Once the value equals 0, then the special styling will be applied below.
+              currentExpandedColumnCount -= 1;
+            }
+          }
+
+          // Reset the expandColumnHidden flag once done with logic based upon it.
+          expandColumnHidden = false;
+
+          // Decrement colspan count and skip if greater than 1.
+          if (currentColspan > 1) {
+            currentColspan -= 1;
+            return null;
+          }
+          const maybeContent = applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, {
+            rowRenderRef: ref,
+            onDragStart,
+            onDragEnd,
+            onDrop,
+            onDragEnter,
+            onDragOver,
+          });
+
+          // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
+          currentColspan =
+            isGridCellContent(maybeContent) && typeof maybeContent.colspan === "number"
+              ? maybeContent.colspan
+              : isExpandableHeader
+              ? numExpandedColumns + 1
+              : 1;
+          const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
+
+          const canSortColumn =
+            (sortOn === "client" && column.clientSideSort !== false) ||
+            (sortOn === "server" && !!column.serverSideSortKey);
+          const alignment = getAlignment(column, maybeContent);
+          const justificationCss = getJustification(column, maybeContent, as, alignment);
+          const isExpandable =
+            isFunction(column.expandColumns) ||
+            (column.expandColumns && column.expandColumns.length > 0) ||
+            column.expandedWidth !== undefined;
+
+          const content = toContent(
+            maybeContent,
+            isHeader,
+            canSortColumn,
+            sortOn === "client",
+            style,
+            as,
+            alignment,
+            column,
+            isExpandableHeader,
+            isExpandable,
+            minStickyLeftOffset,
+            isKeptRow,
+          );
+
+          ensureClientSideSortValueIsSortable(
+            sortOn,
+            isHeader || isTotals || isExpandableHeader,
+            column,
+            columnIndex,
+            maybeContent,
+          );
+
+          const maybeSticky =
+            ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
+          const maybeStickyColumnStyles =
+            maybeSticky && columnSizes
+              ? {
+                  ...Css.sticky.z(zIndices.stickyColumns).bgWhite.$,
+                  ...(maybeSticky === "left"
+                    ? Css.left(columnIndex === 0 ? 0 : `calc(${columnSizes.slice(0, columnIndex).join(" + ")})`).$
+                    : {}),
+                  ...(maybeSticky === "right"
+                    ? Css.right(
+                        columnIndex + 1 === columnSizes.length
+                          ? 0
+                          : `calc(${columnSizes.slice(columnIndex + 1 - columnSizes.length).join(" + ")})`,
+                      ).$
+                    : {}),
+                }
+              : {};
+
+          // This relies on our column sizes being defined in pixel values, which is currently true as we calculate to pixel values in the `useSetupColumnSizes` hook
+          minStickyLeftOffset +=
+            maybeSticky === "left" ? parseInt(columnSizes[columnIndex].replace("px", ""), 10) : 0;
+
+          const cellId = `${row.kind}_${row.id}_${column.id}`;
+          const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
+          const isCellActive = tableState.activeCellId === cellId;
+
+          // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
+          // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
+          // a few descendent selectors. However, that approach means the root grid-applied
+          // CSS has a high-specificity and so its harder for per-page/per-cell business logic
+          // to override it. So, we just calc the combined table-wide+per-cell-overridden CSS here,
+          // in a very CSS-in-JS idiomatic manner.
+          //
+          // In practice we've not seen any performance issues with this from our "large but
+          // not Google spreadsheets" tables.
+          const cellCss = {
+            // Adding `display: flex` so we can align content within the cells, unless it is displayed as a `table`, then use `table-cell`.
+            ...Css.df.if(as === "table").dtc.$,
+            // Apply sticky column/cell styles
+            ...maybeStickyColumnStyles,
+            // Apply any static/all-cell styling
+            ...style.cellCss,
+            // Then override with first/last cell styling
+            ...getFirstOrLastCellCss(style, columnIndex, columns),
+            // Then override with per-cell/per-row justification
+            ...justificationCss,
+            // Then apply any header-specific override
+            ...(isHeader && style.headerCellCss),
+            // Then apply any totals-specific override
+            ...(isTotals && style.totalsCellCss),
+            ...(isTotals && hasExpandableHeader && Css.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$),
+            // Then apply any expandable header specific override
+            ...(isExpandableHeader && style.expandableHeaderCss),
+            // Conditionally apply the right border styling for the header or totals row when using expandable tables
+            // Only apply if not the last column in the table AND when this column is the last column in the group of expandable column or not expanded AND
+            ...(hasExpandableHeader &&
+              columns.length - 1 !== columnIndex &&
+              (isHeader || isTotals) &&
+              currentExpandedColumnCount === 0 &&
+              Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$),
+            // Or level-specific styling
+            ...(!isHeader && !isTotals && !isExpandableHeader && !!style.levels && style.levels[level]?.cellCss),
+            // Level specific styling for the first content column
+            ...(applyFirstContentColumnStyles && !!style.levels && style.levels[level]?.firstContentColumn),
+            // The specific cell's css (if any from GridCellContent)
+            ...rowStyleCellCss,
+            // Apply active row styling for non-nested card styles.
+            ...(isActive ? Css.bgColor(style.activeBgColor ?? Palette.Blue50).$ : {}),
+            // Add any cell specific style overrides
+            ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
+            // And any cell specific css
+            ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
+            // Apply cell highlight styles to active cell and hover
+            ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
+            // Define the width of the column on each cell. Supports col spans.
+            // If we have a 'levelIndent' defined, then subtract that amount from the first content column's width to ensure all columns will still line up properly
+            width: `calc(${columnSizes.slice(columnIndex, columnIndex + currentColspan).join(" + ")}${
+              applyFirstContentColumnStyles && levelIndent ? ` - ${levelIndent}px` : ""
+            })`,
+            ...(typeof column.mw === "string" ? Css.mw(column.mw).$ : {}),
+          };
+
+          const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
+
+          const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
+          const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
+
+          const renderFn: RenderCellFn<any> =
+            (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
+              ? rowLinkRenderFn(as, currentColspan)
+              : isHeader || isTotals || isExpandableHeader
+              ? headerRenderFn(column, as, currentColspan)
+              : rowStyle?.onClick && wrapAction
+              ? rowClickRenderFn(as, api, currentColspan)
+              : defaultRenderFn(as, currentColspan);
+
+          return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick, tooltip);
+        })
+      )}
+    </RowTag>
+  );
+
+  return row.draggable ? (
     <div
       css={containerCss}
       // these events are necessary to get the dragged-over row for the drop event
@@ -146,222 +360,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       onDragOver={(evt) => onDragOver?.(row, evt)}
       ref={ref}
     >
-      <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
-        {isKeptGroupRow ? (
-          <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
-        ) : (
-          columns.map((column, columnIndex) => {
-            // If the expandable column was hidden, then we need to look at the previous column to format the `expandHeader` and 'header' kinds correctly.
-            const maybeExpandedColumn = expandColumnHidden ? columns[columnIndex - 1] : column;
-
-            // Figure out if this column should be considered 'expanded' or not. If the column is hidden on expand, then we need to look at the previous column to see if it's expanded.
-            const isExpanded = tableState.isExpandedColumn(maybeExpandedColumn.id);
-            // If the column is hidden on expand, we don't want to render it. We'll flag that it was hidden, so on the next column we can render this column's "expandHeader" property.
-            if (column.hideOnExpand && isExpanded) {
-              expandColumnHidden = true;
-              return <></>;
-            }
-
-            // Need to keep track of the expanded columns so we can add borders as expected for the header rows
-            const numExpandedColumns = isExpanded
-              ? tableState.numberOfExpandedChildren(maybeExpandedColumn.id)
-                ? // Subtract 1 if the column is hidden on expand, since we're not rendering it.
-                  tableState.numberOfExpandedChildren(maybeExpandedColumn.id) -
-                  (maybeExpandedColumn.hideOnExpand ? 1 : 0)
-                : 0
-              : 0;
-
-            // If we're rendering the Expandable Header row, then we might need to render the previous column's `expandHeader` property in the case where the column is hidden on expand.
-            column = isExpandableHeader ? maybeExpandedColumn : column;
-
-            const { wrapAction = true, isAction = false } = column;
-
-            const isFirstContentColumn = !isAction && !foundFirstContentColumn;
-            const applyFirstContentColumnStyles = !isHeader && isFirstContentColumn;
-            foundFirstContentColumn ||= applyFirstContentColumnStyles;
-
-            if (column.mw) {
-              // Validate the column's minWidth definition if set.
-              if (!column.mw.endsWith("px") && !column.mw.endsWith("%")) {
-                throw new Error("Beam Table column min-width definition only supports px or percentage values");
-              }
-            }
-
-            // When using the variation of the table with an EXPANDABLE_HEADER, then our HEADER and TOTAL rows have special border styling
-            // Keep track of the when we get to the last expanded column so we can apply this styling properly.
-            if (hasExpandableHeader && (isHeader || isTotals)) {
-              // When the value of `currentExpandedColumnCount` is 0, then we have started over.
-              // If the current column `isExpanded`, then store the number of expandable columns.
-              if (currentExpandedColumnCount === 0 && isExpanded) {
-                currentExpandedColumnCount = numExpandedColumns;
-              } else if (currentExpandedColumnCount > 0) {
-                // If value is great than 0, then decrement. Once the value equals 0, then the special styling will be applied below.
-                currentExpandedColumnCount -= 1;
-              }
-            }
-
-            // Reset the expandColumnHidden flag once done with logic based upon it.
-            expandColumnHidden = false;
-
-            // Decrement colspan count and skip if greater than 1.
-            if (currentColspan > 1) {
-              currentColspan -= 1;
-              return null;
-            }
-            const maybeContent = applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, {
-              rowRenderRef: ref,
-              onDragStart,
-              onDragEnd,
-              onDrop,
-              onDragEnter,
-              onDragOver,
-            });
-
-            // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
-            currentColspan =
-              isGridCellContent(maybeContent) && typeof maybeContent.colspan === "number"
-                ? maybeContent.colspan
-                : isExpandableHeader
-                ? numExpandedColumns + 1
-                : 1;
-            const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
-
-            const canSortColumn =
-              (sortOn === "client" && column.clientSideSort !== false) ||
-              (sortOn === "server" && !!column.serverSideSortKey);
-            const alignment = getAlignment(column, maybeContent);
-            const justificationCss = getJustification(column, maybeContent, as, alignment);
-            const isExpandable =
-              isFunction(column.expandColumns) ||
-              (column.expandColumns && column.expandColumns.length > 0) ||
-              column.expandedWidth !== undefined;
-
-            const content = toContent(
-              maybeContent,
-              isHeader,
-              canSortColumn,
-              sortOn === "client",
-              style,
-              as,
-              alignment,
-              column,
-              isExpandableHeader,
-              isExpandable,
-              minStickyLeftOffset,
-              isKeptRow,
-            );
-
-            ensureClientSideSortValueIsSortable(
-              sortOn,
-              isHeader || isTotals || isExpandableHeader,
-              column,
-              columnIndex,
-              maybeContent,
-            );
-
-            const maybeSticky =
-              ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
-            const maybeStickyColumnStyles =
-              maybeSticky && columnSizes
-                ? {
-                    ...Css.sticky.z(zIndices.stickyColumns).bgWhite.$,
-                    ...(maybeSticky === "left"
-                      ? Css.left(columnIndex === 0 ? 0 : `calc(${columnSizes.slice(0, columnIndex).join(" + ")})`).$
-                      : {}),
-                    ...(maybeSticky === "right"
-                      ? Css.right(
-                          columnIndex + 1 === columnSizes.length
-                            ? 0
-                            : `calc(${columnSizes.slice(columnIndex + 1 - columnSizes.length).join(" + ")})`,
-                        ).$
-                      : {}),
-                  }
-                : {};
-
-            // This relies on our column sizes being defined in pixel values, which is currently true as we calculate to pixel values in the `useSetupColumnSizes` hook
-            minStickyLeftOffset +=
-              maybeSticky === "left" ? parseInt(columnSizes[columnIndex].replace("px", ""), 10) : 0;
-
-            const cellId = `${row.kind}_${row.id}_${column.id}`;
-            const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
-            const isCellActive = tableState.activeCellId === cellId;
-
-            // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
-            // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
-            // a few descendent selectors. However, that approach means the root grid-applied
-            // CSS has a high-specificity and so its harder for per-page/per-cell business logic
-            // to override it. So, we just calc the combined table-wide+per-cell-overridden CSS here,
-            // in a very CSS-in-JS idiomatic manner.
-            //
-            // In practice we've not seen any performance issues with this from our "large but
-            // not Google spreadsheets" tables.
-            const cellCss = {
-              // Adding `display: flex` so we can align content within the cells, unless it is displayed as a `table`, then use `table-cell`.
-              ...Css.df.if(as === "table").dtc.$,
-              // Apply sticky column/cell styles
-              ...maybeStickyColumnStyles,
-              // Apply any static/all-cell styling
-              ...style.cellCss,
-              // Then override with first/last cell styling
-              ...getFirstOrLastCellCss(style, columnIndex, columns),
-              // Then override with per-cell/per-row justification
-              ...justificationCss,
-              // Then apply any header-specific override
-              ...(isHeader && style.headerCellCss),
-              // Then apply any totals-specific override
-              ...(isTotals && style.totalsCellCss),
-              ...(isTotals && hasExpandableHeader && Css.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$),
-              // Then apply any expandable header specific override
-              ...(isExpandableHeader && style.expandableHeaderCss),
-              // Conditionally apply the right border styling for the header or totals row when using expandable tables
-              // Only apply if not the last column in the table AND when this column is the last column in the group of expandable column or not expanded AND
-              ...(hasExpandableHeader &&
-                columns.length - 1 !== columnIndex &&
-                (isHeader || isTotals) &&
-                currentExpandedColumnCount === 0 &&
-                Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$),
-              // Or level-specific styling
-              ...(!isHeader && !isTotals && !isExpandableHeader && !!style.levels && style.levels[level]?.cellCss),
-              // Level specific styling for the first content column
-              ...(applyFirstContentColumnStyles && !!style.levels && style.levels[level]?.firstContentColumn),
-              // The specific cell's css (if any from GridCellContent)
-              ...rowStyleCellCss,
-              // Apply active row styling for non-nested card styles.
-              ...(isActive ? Css.bgColor(style.activeBgColor ?? Palette.Blue50).$ : {}),
-              // Add any cell specific style overrides
-              ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
-              // And any cell specific css
-              ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
-              // Apply cell highlight styles to active cell and hover
-              ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
-              // Define the width of the column on each cell. Supports col spans.
-              // If we have a 'levelIndent' defined, then subtract that amount from the first content column's width to ensure all columns will still line up properly
-              width: `calc(${columnSizes.slice(columnIndex, columnIndex + currentColspan).join(" + ")}${
-                applyFirstContentColumnStyles && levelIndent ? ` - ${levelIndent}px` : ""
-              })`,
-              ...(typeof column.mw === "string" ? Css.mw(column.mw).$ : {}),
-            };
-
-            const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
-
-            const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
-            const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
-
-            const renderFn: RenderCellFn<any> =
-              (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
-                ? rowLinkRenderFn(as, currentColspan)
-                : isHeader || isTotals || isExpandableHeader
-                ? headerRenderFn(column, as, currentColspan)
-                : rowStyle?.onClick && wrapAction
-                ? rowClickRenderFn(as, api, currentColspan)
-                : defaultRenderFn(as, currentColspan);
-
-            return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick, tooltip);
-          })
-        )}
-      </RowTag>
+      <RowContent />
     </div>
-  );
+  ) : <RowContent />;
 }
 
 /**
