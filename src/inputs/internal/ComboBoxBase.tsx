@@ -404,8 +404,8 @@ function getInputValue<O>(
   multiselect: boolean,
   nothingSelectedText: string,
 ) {
-  return selectedOptions.length === 1
-    ? getOptionLabel(selectedOptions[0])
+  return selectedOptions.length > 0
+    ? selectedOptions.map(getOptionLabel).join(", ")
     : multiselect && selectedOptions.length === 0
     ? nothingSelectedText
     : "";

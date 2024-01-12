@@ -202,11 +202,21 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
     initialOptions.forEach(areAllChildrenSelected);
 
+    // Given a child option, determine if the parent is selected.
+    const isParentSelected = (option: NestedOption<O>): boolean => {
+      const parents = findOption(initialOptions, valueToKey(getOptionValue(option)), getOptionValue)?.parents;
+      if (!parents) return false;
+      return parents.some((parent) => selectedKeys.includes(valueToKey(getOptionValue(parent))));
+    };
+
+    // For the input value, we want to show the label of the selected option(s).
+    const selectedOptionsLabels = selectedOptions.filter((o) => !isParentSelected(o)).map(getOptionLabel);
+
     return {
       selectedKeys,
       inputValue:
-        selectedOptions.length === 1
-          ? getOptionLabel(selectedOptions[0])
+        selectedOptions.length > 0
+          ? selectedOptionsLabels.join(", ")
           : selectedOptions.length === 0
           ? nothingSelectedText
           : "",

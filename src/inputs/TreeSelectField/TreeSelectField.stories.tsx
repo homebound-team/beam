@@ -27,13 +27,19 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
     })),
   }));
 
+  const multipleValuesWithParents = [
+    options[0]!.id, // Development:0
+    options[0]!.children![0]!.id, // Cohort:0
+    options[1]!.children![1]!.id, // Cohort:1
+    options[2]!.children![0]!.children![2]!.id, // Project:3
+  ];
   const singleValueId = [options[0]!.children![0]!.children![0].id];
   const multipleValueIds = [...singleValueId, options[0]!.children![0].children![1].id];
 
   return (
     <div css={Css.df.fdc.gap5.p2.if(args.contrast === true).white.bgGray800.$}>
       <div css={Css.df.fdc.gap3.$}>
-        <TestTreeSelectField
+        {/* <TestTreeSelectField
           {...args}
           values={["c:1:d:0"]}
           options={options}
@@ -63,9 +69,17 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
           label="Disabled"
           values={singleValueId}
           options={options}
-        />
+        /> */}
 
         <TestTreeSelectField
+          {...args}
+          readOnly="Read-only parent reason tooltip text"
+          label="Read-only"
+          values={multipleValuesWithParents}
+          options={options}
+        />
+
+        {/* <TestTreeSelectField
           {...args}
           readOnly="Read-only reason tooltip text"
           label="Read-only"
@@ -129,8 +143,8 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
               label="Full Width"
               placeholder="Full Width"
             />
-          </div>
-        </div>
+          </div> */}
+        {/* </div> */}
       </div>
     </div>
   );
