@@ -39,7 +39,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
   return (
     <div css={Css.df.fdc.gap5.p2.if(args.contrast === true).white.bgGray800.$}>
       <div css={Css.df.fdc.gap3.$}>
-        {/* <TestTreeSelectField
+        <TestTreeSelectField
           {...args}
           values={["c:1:d:0"]}
           options={options}
@@ -69,7 +69,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
           label="Disabled"
           values={singleValueId}
           options={options}
-        /> */}
+        />
 
         <TestTreeSelectField
           {...args}
@@ -79,7 +79,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
           options={options}
         />
 
-        {/* <TestTreeSelectField
+        <TestTreeSelectField
           {...args}
           readOnly="Read-only reason tooltip text"
           label="Read-only"
@@ -143,8 +143,8 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
               label="Full Width"
               placeholder="Full Width"
             />
-          </div> */}
-        {/* </div> */}
+          </div>
+        </div>
       </div>
     </div>
   );
