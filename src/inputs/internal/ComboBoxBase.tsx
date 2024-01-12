@@ -137,7 +137,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   // Do a one-time initialize of fieldState
   const [fieldState, setFieldState] = useState<FieldState>(() => {
     return {
-      inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText),
+      inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly),
       searchValue: undefined,
       optionsLoading: false,
     };
@@ -281,10 +281,10 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     } else {
       setFieldState((prevState) => ({
         ...prevState,
-        inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText),
+        inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly),
       }));
     }
-  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText]);
+  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly]);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
   const {
@@ -403,9 +403,12 @@ function getInputValue<O>(
   getOptionLabel: (o: O) => string,
   multiselect: boolean,
   nothingSelectedText: string,
+  readOnly?: boolean,
 ) {
   return selectedOptions.length === 1
     ? getOptionLabel(selectedOptions[0])
+    : readOnly && selectedOptions.length > 0
+    ? selectedOptions.map(getOptionLabel).join(", ")
     : multiselect && selectedOptions.length === 0
     ? nothingSelectedText
     : "";

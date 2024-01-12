@@ -27,6 +27,12 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
     })),
   }));
 
+  const multipleValuesWithParents = [
+    options[0]!.id, // Development:0
+    options[0]!.children![0]!.id, // Cohort:0
+    options[1]!.children![1]!.id, // Cohort:1
+    options[2]!.children![0]!.children![2]!.id, // Project:3
+  ];
   const singleValueId = [options[0]!.children![0]!.children![0].id];
   const multipleValueIds = [...singleValueId, options[0]!.children![0].children![1].id];
 
@@ -69,7 +75,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
           {...args}
           readOnly="Read-only reason tooltip text"
           label="Read-only"
-          values={singleValueId}
+          values={multipleValuesWithParents}
           options={options}
         />
 
