@@ -352,7 +352,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     evt.preventDefault();
 
     // set flags for css spacer
-    recursiveSetDraggedOver(rows, DraggedOver.None);
+    // don't set none for the row we are entering
+    recursiveSetDraggedOver(
+      rows.filter((r) => r.id !== row.id),
+      DraggedOver.None,
+    );
 
     if (draggedRowRef.current) {
       if (draggedRowRef.current.id === row.id) {
@@ -373,7 +377,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     evt.preventDefault();
 
     if (draggedRowRef.current) {
-      if (draggedRowRef.current.id === row.id) {
+      if (draggedRowRef.current.id === row.id || !evt.currentTarget) {
+        tableState.maybeSetRowDraggedOver(row.id, DraggedOver.None, draggedRowRef.current);
         return;
       }
 

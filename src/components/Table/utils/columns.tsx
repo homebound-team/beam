@@ -200,23 +200,15 @@ export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColum
     id: "beamDragHandleColumn",
     clientSideSort: false,
     align: "center",
-    // Defining `w: 40px` to accommodate for the `16px` wide checkbox and `12px` of padding on either side.
     w: "40px",
     wrapAction: false,
     isAction: true,
     expandColumns: undefined,
-    // Select Column should not display the select toggle for `expandableHeader` or `totals` row kinds
     expandableHeader: emptyCell,
     totals: emptyCell,
     // Use any of the user's per-row kind methods if they have them.
     ...columnDef,
   };
-
-  // return newMethodMissingProxy(base, (key) => {
-  //   return (data: any, { row, level }: { row: GridDataRow<any>; level: number }) => ({
-  //     content: <CollapseToggle row={row} compact={level > 0} />,
-  //   });
-  // }) as any;
 
   return newMethodMissingProxy(base, (key) => {
     return (data: any, { row, dragData }: { row: GridDataRow<T>; dragData: DragData<T> }) => {
@@ -224,8 +216,6 @@ export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColum
       const { rowRenderRef: ref, onDragStart, onDragEnd, onDrop, onDragEnter, onDragOver } = dragData;
 
       return {
-        // how do we get the callbacks and the ref here?
-        // inject them into the row in the Row component?
         content: row.draggable ? (
           <div
             draggable={row.draggable}
