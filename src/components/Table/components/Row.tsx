@@ -136,8 +136,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   // debounce drag over callback to avoid excessive re-renders
   const dragOverCallback = useCallback(
-    onDragOver ?? (() => {}),
-    [row],
+    (row: GridDataRow<R>, evt: React.DragEvent<HTMLElement>) => onDragOver?.(row, evt),
+    [onDragOver],
   );
   // when the event is not called, we still need to call preventDefault
   const onDragOverDebounced = useDebouncedCallback(dragOverCallback, 100);
@@ -364,7 +364,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       onDrop={(evt) => onDrop?.(row, evt)}
       onDragEnter={(evt) => onDragEnter?.(row, evt)}
       onDragOver={(evt) => {
-        // when the event isn't called due to debounce, we still need to 
+        // when the event isn't called due to debounce, we still need to
         // call preventDefault for the drop event to fire
         evt.preventDefault();
         onDragOverDebounced(row, evt);

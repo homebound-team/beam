@@ -273,7 +273,7 @@ export function isCursorBelowMidpoint(target: HTMLElement, clientY: number) {
   const style = window.getComputedStyle(target);
   const rect = target.getBoundingClientRect();
 
-  let pt = parseFloat(style.getPropertyValue("padding-top"));
+  const pt = parseFloat(style.getPropertyValue("padding-top"));
   const pb = parseFloat(style.getPropertyValue("padding-bottom"));
 
   return clientY > rect.top + pt + (rect.height - pb) / 2;

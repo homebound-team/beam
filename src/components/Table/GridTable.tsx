@@ -353,7 +353,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     // set flags for css spacer
     // don't set none for the row we are entering
-    recursiveSetDraggedOver(rows.filter((r) => r.id !== row.id), DraggedOver.None);
+    recursiveSetDraggedOver(
+      rows.filter((r) => r.id !== row.id),
+      DraggedOver.None,
+    );
 
     if (draggedRowRef.current) {
       if (draggedRowRef.current.id === row.id) {

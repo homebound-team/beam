@@ -203,7 +203,7 @@ export class RowStates<R extends Kinded> {
     }
 
     // this allows a single-row re-render
-    if(rs.isDraggedOver === draggedOver) return;
+    if (rs.isDraggedOver === draggedOver) return;
     rs.isDraggedOver = draggedOver;
   }
 }
