@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { ReactElement, useContext, useRef } from "react";
+import { ReactElement, useContext, useRef, useCallback } from "react";
 import {
   defaultRenderFn,
   headerRenderFn,
@@ -31,6 +31,7 @@ import {
 import { Css, Palette } from "src/Css";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
+import { useDebouncedCallback } from "use-debounce";
 
 interface RowProps<R extends Kinded> {
   as: RenderAs;
@@ -94,8 +95,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   const containerCss = {
     ...Css.add("transition", "padding 0.25s ease-in-out").$,
-    ...(rs.isDraggedOver === DraggedOver.Above && Css.ptPx(35).$),
-    ...(rs.isDraggedOver === DraggedOver.Below && Css.pbPx(35).$),
+    ...(rs.isDraggedOver === DraggedOver.Above && Css.ptPx(25).$),
+    ...(rs.isDraggedOver === DraggedOver.Below && Css.pbPx(25).$),
   };
 
   const rowCss = {
@@ -132,6 +133,14 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   // used to render the whole row when dragging with the handle
   const ref = useRef<HTMLTableRowElement>(null);
+
+  // debounce drag over callback to avoid excessive re-renders
+  const dragOverCallback = useCallback(
+    onDragOver ?? (() => {}),
+    [row],
+  );
+  // when the event is not called, we still need to call preventDefault
+  const onDragOverDebounced = useDebouncedCallback(dragOverCallback, 100);
 
   const RowContent = () => (
     <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
@@ -201,7 +210,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             onDragEnd,
             onDrop,
             onDragEnter,
-            onDragOver,
+            onDragOver: onDragOverDebounced,
           });
 
           // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
@@ -354,7 +363,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       // and spacer styling
       onDrop={(evt) => onDrop?.(row, evt)}
       onDragEnter={(evt) => onDragEnter?.(row, evt)}
-      onDragOver={(evt) => onDragOver?.(row, evt)}
+      onDragOver={(evt) => {
+        // when the event isn't called due to debounce, we still need to 
+        // call preventDefault for the drop event to fire
+        evt.preventDefault();
+        onDragOverDebounced(row, evt);
+      }}
       ref={ref}
     >
       {RowContent()}
