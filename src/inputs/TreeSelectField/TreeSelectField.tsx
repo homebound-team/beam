@@ -459,6 +459,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
         setFieldState((prevState) => ({
           ...prevState,
+          inputValue: nothingSelectedText,
+          filteredOptions: initialOptions.flatMap((o) => levelOptions(o, 0)),
           selectedKeys: [...selectedKeys],
           selectedOptions,
         }));
