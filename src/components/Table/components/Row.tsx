@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { ReactElement, useContext, useRef } from "react";
+import { ReactElement, useContext, useRef, useCallback } from "react";
 import {
   defaultRenderFn,
   headerRenderFn,
@@ -31,7 +31,7 @@ import {
 import { Css, Palette } from "src/Css";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
-import { Icon } from "src";
+import { useDebouncedCallback } from "use-debounce";
 
 interface RowProps<R extends Kinded> {
   as: RenderAs;
@@ -93,8 +93,13 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
   const levelIndent = style.levels && style.levels[level]?.rowIndent;
 
+  const containerCss = {
+    ...Css.add("transition", "padding 0.25s ease-in-out").$,
+    ...(rs.isDraggedOver === DraggedOver.Above && Css.ptPx(25).$),
+    ...(rs.isDraggedOver === DraggedOver.Below && Css.pbPx(25).$),
+  };
+
   const rowCss = {
-    ...Css.add("transition", "padding 0.5s ease-in-out").$,
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
     // Optionally include the row hover styles, by default they should be turned on.
     ...(showRowHoverColor && {
@@ -117,8 +122,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.visible.$,
     },
     ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
-    ...(rs.isDraggedOver === DraggedOver.Above && Css.add("paddingTop", "35px").$),
-    ...(rs.isDraggedOver === DraggedOver.Below && Css.add("paddingBottom", "35px").$),
   };
 
   let currentColspan = 1;
@@ -131,36 +134,16 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   // used to render the whole row when dragging with the handle
   const ref = useRef<HTMLTableRowElement>(null);
 
-  return (
-    <RowTag
-      css={rowCss}
-      {...others}
-      data-gridrow
-      {...getCount(row.id)}
-      // these events are necessary to get the dragged-over row for the drop event
-      // and spacer styling
-      onDrop={(evt) => onDrop?.(row, evt)}
-      onDragEnter={(evt) => onDragEnter?.(row, evt)}
-      onDragOver={(evt) => onDragOver?.(row, evt)}
-      ref={ref}
-    >
-      {/* {row.draggable && (
-        <div
-          draggable={row.draggable}
-          onDragStart={(evt) => {
-            // show the whole row being dragged when dragging with the handle
-            ref.current && evt.dataTransfer.setDragImage(ref.current, 0, 0);
-            return onDragStart?.(row, evt);
-          }}
-          onDragEnd={(evt) => onDragEnd?.(row, evt)}
-          onDrop={(evt) => onDrop?.(row, evt)}
-          onDragEnter={(evt) => onDragEnter?.(row, evt)}
-          onDragOver={(evt) => onDragOver?.(row, evt)}
-          css={Css.mh100.ma.$}
-        >
-          <Icon icon="drag" />
-        </div>
-      )} */}
+  // debounce drag over callback to avoid excessive re-renders
+  const dragOverCallback = useCallback(
+    (row: GridDataRow<R>, evt: React.DragEvent<HTMLElement>) => onDragOver?.(row, evt),
+    [onDragOver],
+  );
+  // when the event is not called, we still need to call preventDefault
+  const onDragOverDebounced = useDebouncedCallback(dragOverCallback, 100);
+
+  const RowContent = () => (
+    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
       {isKeptGroupRow ? (
         <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
       ) : (
@@ -227,7 +210,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             onDragEnd,
             onDrop,
             onDragEnter,
-            onDragOver,
+            onDragOver: onDragOverDebounced,
           });
 
           // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
@@ -371,6 +354,27 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         })
       )}
     </RowTag>
+  );
+
+  return row.draggable ? (
+    <div
+      css={containerCss}
+      // these events are necessary to get the dragged-over row for the drop event
+      // and spacer styling
+      onDrop={(evt) => onDrop?.(row, evt)}
+      onDragEnter={(evt) => onDragEnter?.(row, evt)}
+      onDragOver={(evt) => {
+        // when the event isn't called due to debounce, we still need to
+        // call preventDefault for the drop event to fire
+        evt.preventDefault();
+        onDragOverDebounced(row, evt);
+      }}
+      ref={ref}
+    >
+      {RowContent()}
+    </div>
+  ) : (
+    <>{RowContent()}</>
   );
 }
 
