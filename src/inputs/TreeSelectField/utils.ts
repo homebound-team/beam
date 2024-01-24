@@ -14,6 +14,7 @@ export type TreeFieldState<O> = {
   filteredOptions: LeveledOption<O>[];
   selectedKeys: Key[];
   selectedOptions: NestedOption<O>[];
+  selectedOptionsLabels: string[];
   allOptions: NestedOption<O>[];
   optionsLoading: boolean;
   allowCollapsing: boolean;
