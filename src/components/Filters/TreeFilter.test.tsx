@@ -58,7 +58,7 @@ describe("TreeFilter", () => {
     const r = await render(<TestFilter filterBy="all" defaultValue={["gp:0"]} />);
     // Then the filter is correctly initialized
     expect(r.filter_tree).toHaveValue("");
-    expect(r.selectedOptionsCount).toHaveTextContent("7");
+    expect(r.selectedOptionsCount).toHaveTextContent("1");
     expect(r.value).toHaveTextContent('{"tree":["gp:0"]}');
   });
 
