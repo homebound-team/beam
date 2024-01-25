@@ -36,6 +36,7 @@ interface ComboBoxInputProps<O, V extends Value> extends PresentationFieldProps 
   labelProps: LabelHTMLAttributes<HTMLLabelElement>;
   label: string;
   selectedOptions: O[];
+  selectedOptionsLabels?: string[];
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
   sizeToContent?: boolean;
@@ -60,6 +61,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
     onBlur,
     onFocus,
     selectedOptions,
+    selectedOptionsLabels,
     getOptionValue,
     getOptionLabel,
     sizeToContent = false,
@@ -105,7 +107,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
             css={Css.wPx(16).hPx(16).fs0.br100.bgBlue700.white.tinySb.df.aic.jcc.$}
             data-testid="selectedOptionsCount"
           >
-            {state.selectionManager.selectedKeys.size}
+            {isTree ? selectedOptionsLabels?.length : state.selectionManager.selectedKeys.size}
           </span>
         )) ||
         (showFieldDecoration && fieldDecoration(selectedOptions[0]))

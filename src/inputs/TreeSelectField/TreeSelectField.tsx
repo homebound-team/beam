@@ -209,22 +209,22 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
       return parents.some((parent) => selectedKeys.includes(valueToKey(getOptionValue(parent))));
     };
 
+    const selectedOptionsLabels = selectedOptions.filter((o) => !isParentSelected(o)).map(getOptionLabel);
+
     return {
       selectedKeys,
       inputValue:
         selectedOptions.length === 1
           ? getOptionLabel(selectedOptions[0])
           : isReadOnly && selectedOptions.length > 0
-          ? selectedOptions
-              .filter((o) => !isParentSelected(o))
-              .map(getOptionLabel)
-              .join(", ")
+          ? selectedOptionsLabels.join(", ")
           : selectedOptions.length === 0
           ? nothingSelectedText
           : "",
       filteredOptions,
       selectedOptions,
       allOptions: initialOptions,
+      selectedOptionsLabels,
       optionsLoading: false,
       allowCollapsing: true,
     };
@@ -463,6 +463,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
           filteredOptions: initialOptions.flatMap((o) => levelOptions(o, 0)),
           selectedKeys: [...selectedKeys],
           selectedOptions,
+          selectedOptionsLabels: rootOptions.map(getOptionLabel),
         }));
 
         onSelect({
@@ -555,6 +556,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         state={state}
         labelProps={labelProps}
         selectedOptions={fieldState.selectedOptions}
+        selectedOptionsLabels={fieldState.selectedOptionsLabels}
         getOptionValue={getOptionValue}
         getOptionLabel={getOptionLabel}
         contrast={contrast}

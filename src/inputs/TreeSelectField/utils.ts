@@ -14,6 +14,10 @@ export type TreeFieldState<O> = {
   filteredOptions: LeveledOption<O>[];
   selectedKeys: Key[];
   selectedOptions: NestedOption<O>[];
+  /** These are the labels of the top-level selected values
+   * (e.g. ["d1c1", "d1c1p1", "d2c2p1"] will be ["d1c1", "d2c2p1"]).
+   */
+  selectedOptionsLabels: string[];
   allOptions: NestedOption<O>[];
   optionsLoading: boolean;
   allowCollapsing: boolean;

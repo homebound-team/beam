@@ -426,6 +426,22 @@ describe(TreeSelectField, () => {
     click(r.favoriteLeague);
     expect(r.getByRole("option", { name: "Baseball" })).toHaveAttribute("aria-selected", "false");
   });
+
+  it("shows the number of top-level options selected", async () => {
+    // Given a TreeSelectField with nested options
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={getNestedOptions()}
+        label="Favorite League"
+        values={["nba", "nfl", "xfl"]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    // As all the options for "Football" are selected it should only count as one option selected
+    expect(r.selectedOptionsCount).toHaveTextContent("2");
+  });
 });
 
 function getNestedOptions(): NestedOption<HasIdAndName>[] {
