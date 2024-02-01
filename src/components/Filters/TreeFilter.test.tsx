@@ -19,8 +19,8 @@ describe("TreeFilter", () => {
     click(r.getByRole("option", { name: "Grandparent 0" }));
     click(r.getByRole("option", { name: "Child 1-0-0" }));
     click(r.getByRole("option", { name: "Parent 1-1" }));
-    // Then the filter's value is empty because multiple options are selected
-    expect(r.filter_tree).toHaveValue("");
+    // Then the filter's value is not empty because filter has persisted
+    expect(r.filter_tree).toHaveValue("All");
     // Then the filter is set to only return the "root" values that are selected.
     expect(r.value).toHaveTextContent('{"tree":["gp:0","child:1-0-0","parent:1-1"]}');
   });
@@ -58,7 +58,7 @@ describe("TreeFilter", () => {
     const r = await render(<TestFilter filterBy="all" defaultValue={["gp:0"]} />);
     // Then the filter is correctly initialized
     expect(r.filter_tree).toHaveValue("");
-    expect(r.selectedOptionsCount).toHaveTextContent("7");
+    expect(r.selectedOptionsCount).toHaveTextContent("1");
     expect(r.value).toHaveTextContent('{"tree":["gp:0"]}');
   });
 
