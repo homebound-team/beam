@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { ReactElement, useContext, useRef, useCallback } from "react";
+import { ReactElement, useContext, useRef, useCallback, RefObject } from "react";
 import {
   defaultRenderFn,
   headerRenderFn,
@@ -143,7 +143,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const onDragOverDebounced = useDebouncedCallback(dragOverCallback, 100);
 
   const RowContent = () => (
-    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)}>
+    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)} ref={ref}>
       {isKeptGroupRow ? (
         <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
       ) : (
@@ -369,7 +369,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         evt.preventDefault();
         onDragOverDebounced(row, evt);
       }}
-      ref={ref}
     >
       {RowContent()}
     </div>
