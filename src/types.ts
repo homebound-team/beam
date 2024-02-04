@@ -3,7 +3,10 @@ import React from "react";
 import { DateRange as _DateRange } from "react-day-picker";
 export type { _DateRange as DateRange };
 
+export type HasIdIsh<V = string> = { id: V } | { code: V };
+export type HasNameIsh = { name: string } | { displayName: string } | { label: string };
 export type HasIdAndName<V = string> = { id: V; name: string };
+
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 export type CheckFn = () => boolean;
 export type CanCloseCheck = { check: CheckFn; discardText?: string; continueText?: string } | CheckFn;
