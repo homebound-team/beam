@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { blur, click, focus, getOptions, render, select, wait } from "src/utils/rtl";
+import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 
 describe("SelectFieldTest", () => {
   it("can set a value", async () => {
@@ -15,8 +16,6 @@ describe("SelectFieldTest", () => {
         label="Age"
         value={"1"}
         options={options}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
         data-testid="age"
         onBlur={onBlur}
         onSelect={onSelect}
@@ -42,11 +41,9 @@ describe("SelectFieldTest", () => {
     const r = await render(
       <TestSelectField
         label="Age"
-        value={"1"}
+        value={"1" as string}
         readOnly={true}
         options={options}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
         onFocus={onFocus}
         onBlur={onBlur}
         data-testid="age"
@@ -60,16 +57,7 @@ describe("SelectFieldTest", () => {
 
   it("resets input value on blur if it does not match the selected option", async () => {
     // Given a Select Field without a selected option
-    const r = await render(
-      <TestSelectField
-        label="Age"
-        value={undefined}
-        options={options}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
-        data-testid="age"
-      />,
-    );
+    const r = await render(<TestSelectField label="Age" value={undefined} options={options} data-testid="age" />);
     // When changing the inputs value, and not selecting an option
     fireEvent.input(r.age, { target: { value: "asdf" } });
     // And `blur`ing the field
@@ -96,8 +84,6 @@ describe("SelectFieldTest", () => {
         label="Age"
         value={undefined}
         options={[{ id: undefined, name: "Unassigned" }, ...options]}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
         data-testid="age"
       />,
     );
@@ -112,8 +98,6 @@ describe("SelectFieldTest", () => {
         label="Age"
         value="1"
         options={[{ id: undefined, name: "Unassigned" }, ...options]}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
         data-testid="age"
       />,
     );
@@ -468,11 +452,14 @@ describe("SelectFieldTest", () => {
   ];
 
   function TestSelectField<O, V extends Value>(props: Optional<SelectFieldProps<O, V>, "onSelect">): JSX.Element {
+    // Treat props.value as the initial value, so each test doesn't need its own useState
     const [selected, setSelected] = useState<V | undefined>(props.value);
     const [initOptions, setOptions] = useState(props.options);
     return (
       <>
         <SelectField<O, V>
+          getOptionLabel={defaultOptionLabel}
+          getOptionValue={defaultOptionValue}
           {...props}
           options={initOptions}
           value={selected}
@@ -489,12 +476,15 @@ describe("SelectFieldTest", () => {
   function TestMultipleSelectField<O extends HasIdAndName, V extends Value>(
     props: Optional<SelectFieldProps<O, V>, "onSelect">,
   ): JSX.Element {
+    // Treat props.value as the initial value, so each test doesn't need its own useState
     const [selected, setSelected] = useState<V | undefined>(props.value);
     const init = options.find((o) => o.id === selected) as O;
     const [loaded, setLoaded] = useState<O[]>([]);
     return (
       <>
         <SelectField<O, V>
+          getOptionValue={defaultOptionValue}
+          getOptionLabel={defaultOptionLabel}
           {...props}
           value={selected}
           onSelect={setSelected}
@@ -509,6 +499,8 @@ describe("SelectFieldTest", () => {
           }}
         />
         <SelectField<O, V>
+          getOptionValue={defaultOptionValue}
+          getOptionLabel={defaultOptionLabel}
           {...props}
           value={selected}
           onSelect={setSelected}

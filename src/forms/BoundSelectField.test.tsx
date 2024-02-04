@@ -34,7 +34,7 @@ describe("BoundSelectField", () => {
       { label: "Yes", value: true },
       { label: "No", value: false },
       { label: "", value: undefined },
-    ];
+    ] as Array<{ label: string; value: boolean | undefined }>;
     const r = await render(
       <BoundSelectField
         field={author.isAvailable}

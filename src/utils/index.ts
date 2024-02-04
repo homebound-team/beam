@@ -1,6 +1,9 @@
 import { MutableRefObject } from "react";
 import type { CheckboxGroupState, ToggleState } from "react-stately";
 
+/** Short way of doing an omit + union to override keys in a type. */
+export type Overwrite<T, U> = Omit<T, keyof U> & U;
+
 /** Adapts our state to what useToggleState returns in a stateless manner. */
 export function toToggleState(isSelected: boolean, onChange: (value: boolean) => void): ToggleState {
   return {

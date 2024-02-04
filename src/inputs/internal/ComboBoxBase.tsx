@@ -11,17 +11,12 @@ import { ListBox } from "src/inputs/internal/ListBox";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { getFieldWidth } from "src/inputs/utils";
+import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 
 /** Base props for either `SelectField` or `MultiSelectField`. */
 export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => string | ReactNode;
-  getOptionValue: (opt: O) => V;
-  getOptionLabel: (opt: O) => string;
-  /** The current value; it can be `undefined`, even if `V` cannot be. */
-  values: V[] | undefined;
-  onSelect: (values: V[], opts: O[]) => void;
-  multiselect?: boolean;
   disabledOptions?: (V | { value: V; reason: string })[];
   options: OptionsOrLoad<O>;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
@@ -63,6 +58,24 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
   multiline?: boolean;
 }
 
+export type GetOptionValue<O, V> = { getOptionValue(opt: O): V };
+
+export type GetOptionLabel<O> = { getOptionLabel(opt: O): string };
+
+export type MaybeGetOptionValue<O, V> = O extends { id: V } ? Partial<GetOptionValue<O, V>> : GetOptionValue<O, V>;
+
+export type MaybeGetOptionLabel<O> = O extends { name: string } ? Partial<GetOptionLabel<O>> : GetOptionLabel<O>;
+
+/** Props that should be set by our SelectField/MultiSelectField wrappers. */
+export type ComboBoxBaseInternalProps<O, V extends Value> = {
+  /** The current value; it can be `undefined`, even if `V` cannot be. */
+  values: V[] | undefined;
+  onSelect: (values: V[], opts: O[]) => void;
+  multiselect?: boolean;
+  getOptionValue?: (opt: O) => V;
+  getOptionLabel?: (opt: O) => string;
+};
+
 /**
  * Provides a non-native select/dropdown widget that allows the user to type to filter the options.
  *
@@ -72,7 +85,9 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
  * Note that the `V extends Key` constraint come from react-aria,
  * and so we cannot easily change them.
  */
-export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>): JSX.Element {
+export function ComboBoxBase<O, V extends Value>(
+  props: ComboBoxBaseProps<O, V> & ComboBoxBaseInternalProps<O, V>,
+): JSX.Element {
   const { fieldProps } = usePresentationContext();
   const {
     disabled,
@@ -86,8 +101,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     disabledOptions,
     borderless,
     unsetLabel,
-    getOptionLabel: propOptionLabel,
-    getOptionValue: propOptionValue,
+    getOptionLabel: propOptionLabel = defaultOptionLabel,
+    getOptionValue: propOptionValue = defaultOptionValue,
     getOptionMenuLabel: propOptionMenuLabel,
     fullWidth = fieldProps?.fullWidth ?? false,
     ...otherProps

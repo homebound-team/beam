@@ -1,10 +1,17 @@
 import { useMemo } from "react";
 import { Value } from "src/inputs";
-import { ComboBoxBase, ComboBoxBaseProps, unsetOption } from "src/inputs/internal/ComboBoxBase";
-import { HasIdAndName, Optional } from "src/types";
+import {
+  ComboBoxBase,
+  ComboBoxBaseProps,
+  GetOptionLabel,
+  GetOptionValue,
+  MaybeGetOptionLabel,
+  MaybeGetOptionValue,
+  unsetOption,
+} from "src/inputs/internal/ComboBoxBase";
+import { isDefined } from "src/utils";
 
-export interface SelectFieldProps<O, V extends Value>
-  extends Omit<ComboBoxBaseProps<O, V>, "values" | "onSelect" | "multiselect"> {
+export type SelectFieldProps<O, V extends Value> = ComboBoxBaseProps<O, V> & {
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   value: V | undefined;
   /**
@@ -13,7 +20,7 @@ export interface SelectFieldProps<O, V extends Value>
    * Ideally callers that didn't pass `unsetLabel` would not have to handle the ` | undefined` here.
    */
   onSelect: (value: V | undefined, opt: O | undefined) => void;
-}
+} & ((MaybeGetOptionLabel<O> & MaybeGetOptionValue<O, V>) | (GetOptionLabel<O> & GetOptionValue<O, V>));
 
 /**
  * Provides a non-native select/dropdown widget.
@@ -21,28 +28,12 @@ export interface SelectFieldProps<O, V extends Value>
  * The `O` type is a list of options to show, the `V` is the primitive value of a
  * given `O` (i.e. it's id) that you want to use as the current/selected value.
  */
-export function SelectField<O, V extends Value>(props: SelectFieldProps<O, V>): JSX.Element;
-export function SelectField<O extends HasIdAndName<V>, V extends Value>(
-  props: Optional<SelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
-): JSX.Element;
-export function SelectField<O, V extends Value>(
-  props: Optional<SelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,
-): JSX.Element {
-  const {
-    getOptionValue = (opt: O) => (opt as any).id, // if unset, assume O implements HasId
-    getOptionLabel = (opt: O) => (opt as any).name, // if unset, assume O implements HasName
-    options,
-    onSelect,
-    value,
-    ...otherProps
-  } = props;
-  const values = useMemo(() => [value], [value]);
+export function SelectField<O, V extends Value>(props: SelectFieldProps<O, V>): JSX.Element {
+  const { options, onSelect, value, ...otherProps } = props;
+  const values = useMemo(() => (isDefined(value) ? [value] : value), [value]);
   return (
-    <ComboBoxBase
-      {...otherProps}
+    <ComboBoxBase<O, V>
       options={options}
-      getOptionLabel={getOptionLabel}
-      getOptionValue={getOptionValue}
       values={values}
       onSelect={(values, options) => {
         // If the user used `unsetLabel`, then values will be `[undefined]` and options `[unsetOption]`
@@ -51,6 +42,7 @@ export function SelectField<O, V extends Value>(
           onSelect(values[0], option === unsetOption ? undefined : option);
         }
       }}
+      {...otherProps}
     />
   );
 }

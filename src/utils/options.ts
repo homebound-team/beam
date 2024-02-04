@@ -1,2 +1,7 @@
-export const defaultOptionValue = <O>(opt: O) => (opt as any).id;
-export const defaultOptionLabel = <O>(opt: O) => (opt as any).name;
+export function defaultOptionValue<O, V>(opt: O): V {
+  return (opt as any).id;
+}
+
+export function defaultOptionLabel<O>(opt: O): string {
+  return (opt as any).name;
+}
