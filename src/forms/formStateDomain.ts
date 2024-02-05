@@ -12,8 +12,14 @@ export const jan29 = new Date(2020, 0, 29);
 export const dd100: DeweyDecimalClassification = { number: "100", category: "Philosophy" };
 export const dd200: DeweyDecimalClassification = { number: "200", category: "Religion" };
 
+export enum AuthorHeight {
+  SHORT,
+  TALL,
+}
+
 export interface AuthorInput {
   id?: string | null;
+  height?: AuthorHeight | null;
   firstName?: string | null;
   middleInitial?: string | null;
   lastName?: string | null;

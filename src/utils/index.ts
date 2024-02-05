@@ -1,6 +1,10 @@
 import { MutableRefObject } from "react";
 import type { CheckboxGroupState, ToggleState } from "react-stately";
 
+export function fail(message?: string): never {
+  throw new Error(message || "Failed");
+}
+
 /** Adapts our state to what useToggleState returns in a stateless manner. */
 export function toToggleState(isSelected: boolean, onChange: (value: boolean) => void): ToggleState {
   return {
@@ -52,7 +56,7 @@ export function safeKeys<T>(instance: T): (keyof T)[] {
 // Returns object with specified key removed
 export const omitKey = <T, K extends keyof T>(key: K, { [key]: _, ...obj }: T) => obj as T;
 
-export const noop = () => {};
+export const noop = (...args: any) => {};
 
 type Entries<T> = {
   [K in keyof T]: [K, T[K]];

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { blur, click, focus, getOptions, render, select, wait } from "src/utils/rtl";
+import { AuthorHeight } from "src/forms/formStateDomain";
 
 describe("SelectFieldTest", () => {
   it("can set a value", async () => {
@@ -17,7 +18,6 @@ describe("SelectFieldTest", () => {
         options={options}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
         onBlur={onBlur}
         onSelect={onSelect}
       />,
@@ -49,7 +49,6 @@ describe("SelectFieldTest", () => {
         getOptionValue={(o) => o.id}
         onFocus={onFocus}
         onBlur={onBlur}
-        data-testid="age"
       />,
     );
     focus(r.age);
@@ -67,7 +66,6 @@ describe("SelectFieldTest", () => {
         options={options}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // When changing the inputs value, and not selecting an option
@@ -98,7 +96,6 @@ describe("SelectFieldTest", () => {
         options={[{ id: undefined, name: "Unassigned" }, ...options]}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // Then expect the value to be that of the `undefined` entry
@@ -114,13 +111,44 @@ describe("SelectFieldTest", () => {
         options={[{ id: undefined, name: "Unassigned" }, ...options]}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // When selecting the option with an `undefined` value
     select(r.age, "Unassigned");
     // Then expect the value to be that of the `undefined` entry
     expect(r.age).toHaveValue("Unassigned");
+  });
+
+  it("can use option codes", async () => {
+    const options = [
+      { code: AuthorHeight.SHORT, name: "Shortish" },
+      { code: AuthorHeight.TALL, name: "Tallish" },
+    ];
+    const value = AuthorHeight.TALL as AuthorHeight;
+    const r = await render(<SelectField label="Age" value={value} options={options} onSelect={() => {}} />);
+    expect(r.age).toHaveValue("Tallish");
+  });
+
+  it("can use option displayNames", async () => {
+    const options = [
+      { id: "1", displayName: "One" },
+      { id: "2", displayName: "Two" },
+      { id: "3", displayName: "Three" },
+    ];
+    const value = "2" as string;
+    const r = await render(<SelectField label="Age" value={value} options={options} onSelect={() => {}} />);
+    expect(r.age).toHaveValue("Two");
+  });
+
+  it("can use option labels", async () => {
+    const options = [
+      { id: "1", label: "One" },
+      { id: "2", label: "Two" },
+      { id: "3", label: "Three" },
+    ];
+    const value = "2" as string;
+    const r = await render(<SelectField label="Age" value={value} options={options} onSelect={() => {}} />);
+    expect(r.age).toHaveValue("Two");
   });
 
   it("respects disabled options", async () => {
@@ -133,7 +161,6 @@ describe("SelectFieldTest", () => {
         options={options}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
         disabledOptions={["2"]}
         onSelect={onSelect}
       />,
@@ -161,7 +188,6 @@ describe("SelectFieldTest", () => {
         options={options}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
         disabledOptions={[{ value: "2", reason: "Example Tooltip" }]}
         onSelect={onSelect}
       />,
@@ -200,7 +226,6 @@ describe("SelectFieldTest", () => {
           onSelect={() => {}}
           getOptionLabel={(o) => o.name}
           getOptionValue={(o) => o.id}
-          data-testid="age"
         />
       );
     }
@@ -226,7 +251,6 @@ describe("SelectFieldTest", () => {
         options={[options[0]]}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // When opening the menu
@@ -250,7 +274,6 @@ describe("SelectFieldTest", () => {
         options={options}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // Then both have the same value
@@ -285,7 +308,6 @@ describe("SelectFieldTest", () => {
         options={[] as HasIdAndName[]}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // The input value will initially be blank
