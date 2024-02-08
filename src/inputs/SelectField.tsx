@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { Value } from "src/inputs";
 import { ComboBoxBase, ComboBoxBaseProps, unsetOption } from "src/inputs/internal/ComboBoxBase";
-import { HasIdAndName, Optional } from "src/types";
+import { HasIdAndName, HasIdIsh, HasNameIsh, Optional } from "src/types";
+import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 
 export interface SelectFieldProps<O, V extends Value>
   extends Omit<ComboBoxBaseProps<O, V>, "values" | "onSelect" | "multiselect"> {
@@ -21,16 +22,22 @@ export interface SelectFieldProps<O, V extends Value>
  * The `O` type is a list of options to show, the `V` is the primitive value of a
  * given `O` (i.e. it's id) that you want to use as the current/selected value.
  */
-export function SelectField<O, V extends Value>(props: SelectFieldProps<O, V>): JSX.Element;
-export function SelectField<O extends HasIdAndName<V>, V extends Value>(
+export function SelectField<O extends HasIdIsh<V> & HasNameIsh, V extends Value>(
   props: Optional<SelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element;
+export function SelectField<O extends HasIdIsh<V>, V extends Value>(
+  props: Optional<SelectFieldProps<O, V>, "getOptionValue">,
+): JSX.Element;
+export function SelectField<O extends HasNameIsh, V extends Value>(
+  props: Optional<SelectFieldProps<O, V>, "getOptionLabel">,
+): JSX.Element;
+export function SelectField<O, V extends Value>(props: SelectFieldProps<O, V>): JSX.Element;
 export function SelectField<O, V extends Value>(
   props: Optional<SelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,
 ): JSX.Element {
   const {
-    getOptionValue = (opt: O) => (opt as any).id, // if unset, assume O implements HasId
-    getOptionLabel = (opt: O) => (opt as any).name, // if unset, assume O implements HasName
+    getOptionValue = defaultOptionValue,
+    getOptionLabel = defaultOptionLabel,
     options,
     onSelect,
     value,

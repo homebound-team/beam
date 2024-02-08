@@ -37,7 +37,7 @@ export function keyToValue<V extends Value>(key: Key): V {
   }
 }
 
-export function valueToKey(value: Value): Key {
+export function valueToKey(value: Value): string {
   if (typeof value === "string") {
     return value;
   } else if (typeof value === "number") {

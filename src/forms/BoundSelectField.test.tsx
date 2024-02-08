@@ -1,7 +1,8 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { click, render } from "@homebound/rtl-utils";
 import { BoundSelectField } from "src/forms/BoundSelectField";
-import { AuthorInput } from "src/forms/formStateDomain";
+import { AuthorHeight, AuthorInput } from "src/forms/formStateDomain";
+import { noop } from "src/utils";
 
 const sports = [
   { id: "s:1", name: "Football" },
@@ -26,6 +27,43 @@ describe("BoundSelectField", () => {
     const author = createObjectState(formConfig, { favoriteSport: "s:1" });
     const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
     expect(r.favoriteSport_label).toHaveTextContent("Favorite Sport");
+  });
+
+  it("binds to options with displayNames", async () => {
+    const sports = [
+      { id: "s:1", displayName: "Football" },
+      { id: "s:2", displayName: "Soccer" },
+    ];
+    const author = createObjectState(formConfig, { favoriteSport: "s:1" });
+    const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
+    expect(r.favoriteSport).toHaveValue("Football");
+  });
+
+  it("binds to options with labels", async () => {
+    const sports = [
+      { id: "s:1", label: "Football" },
+      { id: "s:2", label: "Soccer" },
+    ];
+    const author = createObjectState(formConfig, { favoriteSport: "s:1" });
+    const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
+    expect(r.favoriteSport).toHaveValue("Football");
+  });
+
+  it("binds to options with codes", async () => {
+    const heights = [
+      { code: AuthorHeight.SHORT, name: "Shortish" },
+      { code: AuthorHeight.TALL, name: "Tallish" },
+    ];
+    const author = createObjectState(formConfig, { height: AuthorHeight.TALL });
+    const r = await render(<BoundSelectField field={author.height} options={heights} />);
+    expect(r.height).toHaveValue("Tallish");
+  });
+
+  it("requires getOptionValue if no name-ish key", async () => {
+    const sports = [{ id: "s:1" }, { id: "s:2" }];
+    const author = createObjectState(formConfig, { favoriteSport: "s:1" });
+    // @ts-expect-error
+    noop(<BoundSelectField field={author.favoriteSport} options={sports} />);
   });
 
   it("can bind against boolean fields", async () => {
@@ -66,5 +104,6 @@ describe("BoundSelectField", () => {
 
 const formConfig: ObjectConfig<AuthorInput> = {
   favoriteSport: { type: "value", rules: [required] },
+  height: { type: "value" },
   isAvailable: { type: "value" },
 };
