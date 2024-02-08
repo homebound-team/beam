@@ -228,7 +228,7 @@ export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColum
             onDrop={(evt) => onDrop?.(row, evt)}
             onDragEnter={(evt) => onDragEnter?.(row, evt)}
             onDragOver={(evt) => onDragOver?.(row, evt)}
-            css={Css.ma.$}
+            css={Css.ma.cursorPointer.$}
           >
             <Icon icon="drag" />
           </div>
