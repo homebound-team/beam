@@ -15,7 +15,25 @@ export default {
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36923%3A102347",
     },
   },
-} as Meta;
+} as Meta<TextFieldProps<any>>;
+
+export const ForFigma = {
+  argTypes: {
+    errorMsg: { control: "text" },
+    labelStyle: { control: "select", options: ["above", "left", "inline", "hidden"] },
+  },
+  args: {
+    label: "First Name",
+    errorMsg: undefined,
+    helperText: "Helper text",
+    value: "John",
+    disabled: false,
+    readOnly: false,
+    compact: false,
+    labelStyle: "above",
+    clearable: false,
+  },
+};
 
 export function TextFieldStyles() {
   return (
