@@ -1,11 +1,11 @@
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { FocusScope, useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
 import { isDateRange, Matcher } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
 import { Icon, IconButton, resolveTooltip } from "src/components";
 import { DatePicker, DateRangePicker, Popover } from "src/components/internal";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Properties } from "src/Css";
 import {
   DateFieldMode,
   dateFormats,
@@ -22,7 +22,10 @@ import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 export interface DateFieldBaseProps
-  extends Pick<TextFieldBaseProps<{}>, "borderless" | "visuallyDisabled" | "labelStyle" | "compact"> {
+  extends Pick<
+    TextFieldBaseProps<Properties>,
+    "borderless" | "visuallyDisabled" | "labelStyle" | "compact" | "fullWidth"
+  > {
   label: string;
   /** Called when the component loses focus */
   onBlur?: () => void;
@@ -94,12 +97,11 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
-  // Local focus state to conditionally call onBlur when the date picker closes.
-  // E.g. If the picker closes due to focus going back to the input field then don't call onBlur. Also used to avoid updating WIP values
-  const [isFocused, setIsFocused] = useState(false);
+  // Local focus ref used to avoid updating WIP values
+  const isFocused = useRef(false);
   const dateFormat = getDateFormat(format);
   // The `wipValue` allows the "range" mode to set the value to `undefined`, even if the `onChange` response cannot be undefined.
-  // This makes working within the DateRangePicker much more user friendly.
+  // This makes working within the DateRangePicker much more user-friendly.
   const [wipValue, setWipValue] = useState(value);
   const [inputValue, setInputValue] = useState(
     (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
@@ -116,22 +118,16 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     "aria-haspopup": "dialog" as const,
     value: inputValue,
   };
-  const state = useOverlayTriggerState({
-    onOpenChange: (isOpen) => {
-      // Handles calling `onBlur` for the case where the user interacts with the overlay, removing focus from the input field, and eventually closes the overlay (whether clicking away, or selecting a date)
-      if (!isOpen && !isFocused) {
-        maybeCall(onBlur);
-      }
-    },
-    isOpen: defaultOpen,
-  });
+
+  const state = useOverlayTriggerState({ isOpen: defaultOpen });
+
   const { labelProps, inputProps } = useTextField(
     {
       ...textFieldProps,
+      // Setting `inputMode` to none. This disables the virtual keyboard from being triggered on touch devices
+      inputMode: "none",
       onFocus: () => {
-        // Open overlay on focus of the input.
-        state.open();
-        setIsFocused(true);
+        isFocused.current = true;
         maybeCall(onFocus);
 
         if (wipValue && dateFormat !== dateFormats.short) {
@@ -144,10 +140,10 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         }
       },
       onBlur: (e) => {
-        setIsFocused(false);
+        // Resets the ref variables when the input loses focus.
+        isFocused.current = false;
 
-        // If we are interacting any other part of `inputWrap` ref (such as the calendar button) return early as clicking anywhere within there will push focus to the input field.
-        // Or if interacting with the DatePicker then also return early. The overlay will handle calling `onBlur` once it closes.
+        // If interacting with the overlay or the input, then assume the user is still working within the DatePicker and return early to not trigger onBlur functionality.
         if (
           (inputWrapRef.current && inputWrapRef.current.contains(e.relatedTarget as Node)) ||
           (overlayRef.current && overlayRef.current.contains(e.relatedTarget as Node))
@@ -155,6 +151,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           return;
         }
 
+        // Otherwise, if we are actually leaving the DatePicker component, then
         const parsedDate = isRangeMode
           ? parseDateRange(inputValue, dateFormats.short)
           : parseDate(inputValue, dateFormats.short);
@@ -171,8 +168,10 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           );
         }
 
-        state.close();
-        maybeCall(onBlur);
+        // Only call `onBlur` if the DatePicker is closed, meaning the user has actually left the DateField component.
+        if (!state.isOpen) {
+          maybeCall(onBlur);
+        }
       },
       onKeyDown: (e) => {
         if (e.key === "Enter") {
@@ -185,13 +184,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   );
   const { triggerProps, overlayProps } = useOverlayTrigger({ type: "dialog" }, state, buttonRef);
   const { buttonProps } = useButton(
-    {
-      ...triggerProps,
-      isDisabled: isDisabled || isReadOnly,
-      // When pressed or focused then move focus the input, which will select the text and trigger the DatePicker to open
-      onPress: () => inputRef?.current?.focus(),
-      onFocus: () => inputRef?.current?.focus(),
-    },
+    { ...triggerProps, isDisabled: isDisabled || isReadOnly, onPress: state.open },
     buttonRef,
   );
 
@@ -209,14 +202,14 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   // Handle case where the input value is updated from outside the component.
   useEffect(() => {
     // Avoid updating any WIP values.
-    if (!isFocused && !state.isOpen) {
+    if (!isFocused.current && !state.isOpen) {
       setWipValue(value);
       setInputValue(
         (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     // We don't want to update the internal `wipValue` or `inputValue` back to `value` just because focus state changes or the overlay opens
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, dateFormat]);
 
   // Create a type safe `onChange` to handle both Single and Range date fields.
@@ -238,6 +231,8 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         return;
       }
     },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isRangeMode, props.onChange],
   );
 
@@ -271,7 +266,6 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
       {...buttonProps}
       disabled={isDisabled}
       css={Css.if(isDisabled).cursorNotAllowed.$}
-      tabIndex={-1}
       {...tid.calendarButton}
     >
       <Icon icon="calendar" color={isDisabled ? Palette.Gray400 : Palette.Gray700} />
@@ -289,11 +283,13 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     <>
       <TextFieldBase
         {...textFieldProps}
+        // Display focus styles while the Picker is open
+        {...{ internalProps: { forceFocus: state.isOpen } }}
         errorMsg={errorMsg}
         helperText={helperText}
         required={required}
         labelProps={labelProps}
-        inputProps={{ ...inputProps, size: inputSize }}
+        inputProps={{ ...inputProps, size: inputSize, onClick: state.open }}
         inputRef={inputRef}
         inputWrapRef={inputWrapRef}
         onChange={(v) => {
@@ -323,32 +319,34 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           onClose={state.close}
           isOpen={state.isOpen}
         >
-          <DatePickerOverlay overlayProps={overlayProps}>
-            {isRangeMode ? (
-              <DateRangePicker
-                range={wipValue as DateRange | undefined}
-                disabledDays={disabledDays}
-                onSelect={(dr) => {
-                  // Note: Do not close date range picker on select to allow the user to select multiple dates at a time
-                  setInputValue(formatDateRange(dr, dateFormats.short) ?? "");
-                  onChange(dr);
-                }}
-                useYearPicker={isRangeFilterField}
-                {...tid.datePicker}
-              />
-            ) : (
-              <DatePicker
-                value={wipValue as Date | undefined}
-                disabledDays={disabledDays}
-                onSelect={(d) => {
-                  setInputValue(formatDate(d, dateFormats.short) ?? "");
-                  onChange(d);
-                  state.close();
-                }}
-                {...tid.datePicker}
-              />
-            )}
-          </DatePickerOverlay>
+          <FocusScope autoFocus contain restoreFocus>
+            <DatePickerOverlay overlayProps={overlayProps}>
+              {isRangeMode ? (
+                <DateRangePicker
+                  range={wipValue as DateRange | undefined}
+                  disabledDays={disabledDays}
+                  onSelect={(dr) => {
+                    // Note: Do not close date range picker on select to allow the user to select multiple dates at a time
+                    setInputValue(formatDateRange(dr, dateFormats.short) ?? "");
+                    onChange(dr);
+                  }}
+                  useYearPicker={isRangeFilterField}
+                  {...tid.datePicker}
+                />
+              ) : (
+                <DatePicker
+                  value={wipValue as Date | undefined}
+                  disabledDays={disabledDays}
+                  onSelect={(d) => {
+                    state.close();
+                    setInputValue(formatDate(d, dateFormats.short) ?? "");
+                    onChange(d);
+                  }}
+                  {...tid.datePicker}
+                />
+              )}
+            </DatePickerOverlay>
+          </FocusScope>
         </Popover>
       )}
     </>

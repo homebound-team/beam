@@ -29,6 +29,17 @@ describe("ButtonModal", () => {
     click(r.close);
 
     // Then the modal should now be closed.
-    expect(r.popup).toNotBeInTheDom();
+    expect(r.query.popup).not.toBeInTheDocument();
+  });
+
+  it("allows jsx as the button", async () => {
+    const r = await render(
+      <ButtonModal
+        trigger={{ label: <div>Button Modal Trigger</div> }}
+        content={(close) => <div onClick={close}>close</div>}
+      />,
+    );
+
+    expect(r.container).toHaveTextContent("Button Modal Trigger");
   });
 });

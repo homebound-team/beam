@@ -17,6 +17,8 @@ export interface PresentationFieldProps {
   visuallyDisabled?: false;
   // If set error messages will be rendered as tooltips rather than below the field
   errorInTooltip?: true;
+  /** Allow the fields to grow to the width of its container. By default, fields will extend up to 550px */
+  fullWidth?: boolean;
 }
 
 export type PresentationContextProps = {
@@ -36,10 +38,14 @@ export function PresentationProvider(props: PropsWithChildren<PresentationContex
   // Check to see if we are nested within another PresentationContext. If so, make sure values already above us are passed through if not overwritten (except baseContext)
   const existingContext = usePresentationContext();
 
-  const context: PresentationContextProps = useMemo(() => {
-    const fieldProps = { ...existingContext.fieldProps, ...presentationProps.fieldProps };
-    return { ...existingContext, ...presentationProps, fieldProps };
-  }, [presentationProps, existingContext]);
+  const context: PresentationContextProps = useMemo(
+    () => {
+      const fieldProps = { ...existingContext.fieldProps, ...presentationProps.fieldProps };
+      return { ...existingContext, ...presentationProps, fieldProps };
+    },
+    // Isn't this `presentationProps` always a new instance due to the `...` above?
+    [presentationProps, existingContext],
+  );
 
   return <PresentationContext.Provider value={context}>{children}</PresentationContext.Provider>;
 }

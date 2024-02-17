@@ -8,7 +8,7 @@ export type BoundRadioGroupFieldProps<K extends string> = Omit<
   RadioGroupFieldProps<K>,
   "value" | "onChange" | "label"
 > & {
-  field: FieldState<any, K | null | undefined>;
+  field: FieldState<K | null | undefined>;
   /** Make optional so that callers can override if they want to. */
   onChange?: (value: K) => void;
   label?: string;

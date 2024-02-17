@@ -9,7 +9,6 @@ export interface UseRightPaneHook {
 
 export function useRightPane(): UseRightPaneHook {
   const { openInPane, closePane } = useRightPaneContext();
-
   return {
     openRightPane: openInPane,
     closeRightPane: closePane,

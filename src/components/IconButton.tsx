@@ -1,8 +1,9 @@
 import { AriaButtonProps } from "@react-types/button";
-import { RefObject, useMemo, useRef } from "react";
+import { RefObject, useMemo } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Css, Palette } from "src/Css";
+import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
@@ -23,6 +24,8 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   contrast?: boolean;
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
   download?: boolean;
+  /** Provides label for screen readers - Will become a required soon */
+  label?: string;
 }
 
 export function IconButton(props: IconButtonProps) {
@@ -41,11 +44,11 @@ export function IconButton(props: IconButtonProps) {
     contrast = false,
     download = false,
     forceFocusStyles = false,
+    label,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const ref = buttonRef || useRef(null);
+  const ref = useGetRef(buttonRef);
   const { buttonProps } = useButton(
     {
       ...ariaProps,
@@ -66,6 +69,8 @@ export function IconButton(props: IconButtonProps) {
       ...(isFocusVisible || forceFocusStyles ? iconButtonStylesFocus : {}),
       ...(isDisabled && iconButtonStylesDisabled),
     }),
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isHovered, isFocusVisible, isDisabled, compact],
   );
   const iconColor = contrast ? contrastIconColor : defaultIconColor;
@@ -78,6 +83,7 @@ export function IconButton(props: IconButtonProps) {
     className: typeof onPress === "string" ? navLink : undefined,
     ref: ref as any,
     css: styles,
+    "aria-label": label,
   };
   const buttonContent = (
     <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : iconColor)} inc={compact ? 2 : inc} />
@@ -98,5 +104,5 @@ const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
 const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
 export const iconButtonStylesHover = Css.bgGray200.$;
 export const iconButtonContrastStylesHover = Css.bgGray700.$;
-const iconButtonStylesFocus = Css.bLightBlue700.$;
+const iconButtonStylesFocus = Css.bBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;

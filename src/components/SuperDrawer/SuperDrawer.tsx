@@ -1,9 +1,8 @@
 import { Global } from "@emotion/react";
-import { AutoSaveStatusProvider } from "@homebound/form-state";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactPortal, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
+import { AutoSaveStatusProvider, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
 import { useBeamContext } from "src/components/BeamContext";
 import { Css, px } from "src/Css";
 import { useTestIds } from "src/utils";
@@ -45,11 +44,16 @@ export function SuperDrawer(): ReactPortal | null {
 
   const { width = SuperDrawerWidth.Normal } = firstContent ?? {};
 
-  useEffect(() => {
-    if (headerRef.current?.childNodes.length === 0 && content) {
-      headerRef.current.appendChild(sdHeaderDiv);
-    }
-  }, [headerRef, content]);
+  useEffect(
+    () => {
+      if (headerRef.current?.childNodes.length === 0 && content) {
+        headerRef.current.appendChild(sdHeaderDiv);
+      }
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [headerRef, content],
+  );
 
   return createPortal(
     <AnimatePresence>

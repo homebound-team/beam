@@ -7,12 +7,11 @@ import { RichTextField as RichTextFieldComponent } from "./RichTextField";
 
 export default {
   component: RichTextFieldComponent,
-  title: "Workspace/Inputs/Rich Text Field",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=6449%3A8821",
-    }
+    },
   },
 } as Meta;
 
@@ -76,9 +75,26 @@ export function ToggleReadOnly() {
         onBlur={noop}
         onFocus={noop}
       />
-      <button css={Css.mt2.p1.bgLightBlue700.white.$} onClick={() => setReadOnly(!readOnly)}>
+      <button css={Css.mt2.p1.bgBlue700.white.$} onClick={() => setReadOnly(!readOnly)}>
         Toggle ReadOnly
       </button>
     </>
+  );
+}
+
+export function FullWidth() {
+  const value =
+    "<div><!--block-->This is some content<br><br></div><ul><li><!--block-->this is a bullet</li><li><!--block--><em>another bullet here</em></li></ul><div><!--block--><br><strong>some really important content</strong></div>";
+
+  return (
+    <RichTextFieldComponent
+      label="Comment"
+      value={value}
+      onChange={noop}
+      fullWidth
+      placeholder="Enter Text"
+      onBlur={noop}
+      onFocus={noop}
+    />
   );
 }

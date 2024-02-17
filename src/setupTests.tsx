@@ -3,7 +3,7 @@ import "@testing-library/jest-dom";
 import "jest-chain";
 import { configure } from "mobx";
 
-beforeEach(() => jest.useFakeTimers("modern"));
+beforeEach(() => jest.useFakeTimers());
 afterEach(() => jest.useRealTimers());
 
 // formState doesn't use actions
@@ -21,16 +21,16 @@ jest.mock("@react-aria/ssr", () => {
   };
 });
 
+// Make framer-motion animations happen immediately for easier testing
+// https://github.com/framer/motion/issues/285#issuecomment-1252290924
+jest.mock("framer-motion", () => {
+  const actual = jest.requireActual("framer-motion");
+  return {
+    __esModule: true,
+    ...actual,
+    AnimatePresence: (props: any) => <div {...props} />,
+  };
+});
+
 // Add toHaveStyleRule
 expect.extend(matchers);
-
-expect.extend({
-  toNotBeInTheDom(rtlElement) {
-    try {
-      rtlElement();
-      return { pass: false, message: () => "Should not have been in the dom" };
-    } catch (e) {
-      return { pass: true, message: () => "" };
-    }
-  },
-});

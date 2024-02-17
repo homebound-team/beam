@@ -4,7 +4,6 @@ import { Filters } from "src/components/index";
 
 export default {
   component: Filters,
-  title: "Workspace/Components/Filter/SingleFilters",
   decorators: [],
 } as Meta;
 

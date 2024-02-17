@@ -1,19 +1,16 @@
-import { AutoSaveStatus, AutoSaveStatusContext, AutoSaveStatusProvider } from "@homebound/form-state";
 import { Meta } from "@storybook/react";
-import { Css } from "..";
+import { AutoSaveStatus, AutoSaveStatusContext, AutoSaveStatusProvider } from ".";
 import { AutoSaveIndicator } from "./AutoSaveIndicator";
 import { Button } from "./Button";
 
 export default {
   component: AutoSaveIndicator,
-  title: "Workspace/Components/Auto Save Indicator",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31572%3A99609",
-    }
+    },
   },
-  
 } as Meta;
 
 export const AutoSaveIndicatorStatuses = () => (
@@ -47,7 +44,6 @@ export const AutoSaveIndicatorInAction = () => (
             triggerAutoSave();
             setTimeout(resolveAutoSave, 1500);
           }}
-          css={Css.buttonBase.$}
         />
       )}
     </AutoSaveStatusContext.Consumer>

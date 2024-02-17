@@ -7,13 +7,12 @@ import { DateRangeField } from "src/inputs/DateFields/DateRangeField";
 import { DateRange } from "src/types";
 
 export default {
-  title: "Workspace/Inputs/DateRangeField",
   component: DateRangeField,
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31699%3A99554",
-    }
+    },
   },
 } as Meta;
 
@@ -41,6 +40,7 @@ export function Example() {
         label="Error message"
         errorMsg={rangeInitUndefined ? undefined : "Required"}
       />
+      <DateRangeField {...commonProps} fullWidth label="Full Width Field" />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { ReactElement, ReactNode, useRef, useState } from "react";
+import React, { ReactNode, useRef, useState } from "react";
 import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
 import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
@@ -23,7 +23,7 @@ export function Tooltip(props: TooltipProps) {
   const { placement, children, title, disabled, delay = 0 } = props;
 
   const state = useTooltipTriggerState({ delay, isDisabled: disabled });
-  const triggerRef = React.useRef(null);
+  const triggerRef = useRef<HTMLElement>(null);
   const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger({ isDisabled: disabled }, state, triggerRef);
   const { tooltipProps } = useTooltip(_tooltipProps, state);
   const tid = useTestIds(props, "tooltip");
@@ -35,6 +35,8 @@ export function Tooltip(props: TooltipProps) {
         {...triggerProps}
         {...(!state.isOpen && typeof title === "string" ? { title } : {})}
         {...tid}
+        // Add display contents to prevent the tooltip wrapping element from short-circuiting inherited styles (i.e. flex item positioning)
+        css={Css.display("contents").$}
         // Adding `draggable` as a hack to allow focus to continue through this element and into its children.
         // This is due to some code in React-Aria that prevents default due ot mobile browser inconsistencies,
         // and the only way they don't prevent default is if the element is draggable.
@@ -61,7 +63,7 @@ export function Tooltip(props: TooltipProps) {
 export type Placement = "top" | "bottom" | "left" | "right" | "auto";
 
 interface PopperProps {
-  triggerRef: React.MutableRefObject<null>;
+  triggerRef: React.MutableRefObject<HTMLElement | null>;
   content: ReactNode;
   placement?: Placement;
 }
@@ -69,8 +71,12 @@ interface PopperProps {
 function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
   const popperRef = useRef(null);
   const [arrowRef, setArrowRef] = useState<HTMLDivElement | null>(null);
+  // Since we use `display: contents;` on the `triggerRef`, then the element.offsetTop/Left/etc all equal `0`. This would make
+  // the tooltip show in the top left of the document. So instead, we target either the first child, if available, or the parent element as the tooltip target.
+  // It is possible there are no children if the element only has text content, which is the reasoning for the parentElement fallback.
+  const targetElement = triggerRef.current ? triggerRef.current.children[0] ?? triggerRef.current.parentElement : null;
 
-  const { styles, attributes } = usePopper(triggerRef.current, popperRef.current, {
+  const { styles, attributes } = usePopper(targetElement, popperRef.current, {
     modifiers: [
       { name: "arrow", options: { element: arrowRef } },
       { name: "offset", options: { offset: [0, 5] } },
@@ -93,9 +99,8 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
 }
 
 // Helper function to conditionally wrap component with Tooltip if necessary.
-// `maybeTooltip` requires that the `children` prop be a ReactElement, even though <Tooltip /> allows for ReactNode.
-export function maybeTooltip(props: Omit<TooltipProps, "children"> & { children: ReactElement }) {
-  return props.title ? <Tooltip {...props} /> : props.children;
+export function maybeTooltip(props: Omit<TooltipProps, "children"> & { children: ReactNode }) {
+  return props.title ? <Tooltip {...props} /> : <>{props.children}</>;
 }
 
 // Helper function for resolving showing the Tooltip text via a 'disabled' prop, or the 'tooltip' prop.

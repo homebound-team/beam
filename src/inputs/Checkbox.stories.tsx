@@ -6,12 +6,11 @@ import { Checkbox, CheckboxGroup, CheckboxGroupProps } from "src/index";
 
 export default {
   component: Checkbox,
-  title: "Workspace/Inputs/Checkboxes",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36894%3A102260",
-    }
+    },
   },
 } as Meta;
 
@@ -69,7 +68,7 @@ export function CheckboxGroups() {
     <div>
       <div css={Css.dg.gap1.$}>
         <h2>Checkbox Group</h2>
-        <div css={Css.sm.lightBlue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
+        <div css={Css.sm.blue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
         <CheckboxGroup
           label="Favorite Chairs"
           onChange={(values) => setSelectedValues(values)}
@@ -113,7 +112,7 @@ export function CheckboxGroups() {
 
       <div css={Css.mt4.dg.gap1.w50.$}>
         <h2>Checkbox Group with a left label</h2>
-        <div css={Css.sm.lightBlue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
+        <div css={Css.sm.blue800.mb1.$}>{`Selected values: [ ${selectedValues.join(", ")} ]`}</div>
         <CheckboxGroup
           label="Favorite Chairs"
           labelStyle="left"

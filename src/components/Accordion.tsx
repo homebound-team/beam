@@ -2,10 +2,12 @@ import { useId, useResizeObserver } from "@react-aria/utils";
 import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { useFocusRing } from "react-aria";
 import { Icon } from "src/components/Icon";
-import { Css, Palette } from "src/Css";
+import { Css, Only, Padding, Palette, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
-export interface AccordionProps {
+type AccordionXss = Xss<Padding>;
+
+export interface AccordionProps<X = AccordionXss> {
   title: ReactNode;
   children: ReactNode;
   disabled?: boolean;
@@ -21,19 +23,28 @@ export interface AccordionProps {
    */
   index?: number;
   setExpandedIndex?: Dispatch<SetStateAction<number | undefined>>;
+  /** Used by Accordion list. Sets default padding to 0 for nested accordions */
+  omitPadding?: boolean;
+  /** Styles overrides for padding */
+  xss?: X;
+  /** Modifies the typography, padding, icon size and background color of the accordion header */
+  compact?: boolean;
 }
 
-export function Accordion(props: AccordionProps) {
+export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps<X>) {
   const {
     title,
     children,
     size,
     disabled = false,
     defaultExpanded = false,
-    topBorder = true,
+    compact = false,
+    topBorder = compact ? false : true,
     bottomBorder = false,
     index,
     setExpandedIndex,
+    omitPadding = false,
+    xss,
   } = props;
   const testIds = useTestIds(props, "accordion");
   const id = useId();
@@ -80,18 +91,21 @@ export function Accordion(props: AccordionProps) {
         aria-expanded={expanded}
         disabled={disabled}
         css={{
-          ...Css.df.jcsb.gap2.aic.w100.p2.baseMd.outline("none").addIn(":hover", Css.bgGray100.$).$,
+          ...Css.df.jcsb.gapPx(12).aic.w100.p2.baseMd.outline("none").onHover.bgGray100.$,
+          ...(compact && Css.smMd.pl2.prPx(10).py1.bgGray100.mbPx(4).br8.onHover.bgGray200.$),
           ...(disabled && Css.gray500.$),
-          ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.LightBlue700}`).$),
+          ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.Blue700}`).$),
+          ...xss,
         }}
         onClick={() => {
           setExpanded(!expanded);
           if (setExpandedIndex) setExpandedIndex(index);
         }}
       >
-        <span>{title}</span>
+        <span css={Css.fg1.tl.$}>{title}</span>
         <span
           css={{
+            ...Css.fs0.$,
             transition: "transform 250ms linear",
             transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
           }}
@@ -106,7 +120,7 @@ export function Accordion(props: AccordionProps) {
         css={Css.overflowHidden.h(contentHeight).add("transition", "height 250ms ease-in-out").$}
       >
         {expanded && (
-          <div css={Css.px2.pb2.pt1.$} ref={contentRef} {...testIds.content}>
+          <div css={Css.px2.pb2.pt1.if(omitPadding).p0.$} ref={contentRef} {...testIds.content}>
             {children}
           </div>
         )}

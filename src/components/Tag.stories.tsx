@@ -3,7 +3,6 @@ import { Css } from "src/Css";
 import { Tag } from "./Tag";
 
 export default {
-  title: "Workspace/Components/Tags",
   component: Tag,
   parameters: {
     design: {
@@ -24,6 +23,7 @@ export function NoIcon() {
       <div css={Css.wPx(200).$}>
         <Tag text="Tag text that will truncate as it is too long." />
       </div>
+      <Tag text="Custom color" xss={Css.bgPurple200.$} />
     </div>
   );
 }

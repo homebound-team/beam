@@ -18,8 +18,8 @@ describe("usePersistedFilter", () => {
     });
     const r = await render(<TestPage filterDefs={{ stageSingle: stage }} />, withRouter());
     // Then the filter is initially empty
-    expect(r.filter_stageSingle()).toHaveValue("All");
-    expect(r.applied().textContent).toEqual("{}");
+    expect(r.filter_stageSingle).toHaveValue("All");
+    expect(r.applied.textContent).toEqual("{}");
   });
 
   it("uses default filter", async () => {
@@ -34,8 +34,8 @@ describe("usePersistedFilter", () => {
     const r = await render(<TestPage filterDefs={{ stageSingle: stage }} />, withRouter());
     await wait();
     // Then the filter renders with one
-    expect(r.filter_stageSingle()).toHaveValue("One");
-    expect(r.applied().textContent).toEqual(`{"stageSingle":"ONE"}`);
+    expect(r.filter_stageSingle).toHaveValue("One");
+    expect(r.applied.textContent).toEqual(`{"stageSingle":"ONE"}`);
   });
 
   it("uses default filter for booleans", async () => {
@@ -45,7 +45,7 @@ describe("usePersistedFilter", () => {
     const r = await render(<TestPage filterDefs={{ favorite }} />, withRouter());
     await wait();
     // Then the filter renders with one
-    expect(r.applied().textContent).toEqual(`{"favorite":true}`);
+    expect(r.applied.textContent).toEqual(`{"favorite":true}`);
   });
 });
 

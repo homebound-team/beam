@@ -1,5 +1,4 @@
 import { addMonths, addYears, format } from "date-fns";
-import React from "react";
 import { CaptionProps, useNavigation } from "react-day-picker";
 import { IconButton } from "src/components/IconButton";
 import { Css, Palette } from "src/Css";

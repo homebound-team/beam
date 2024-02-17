@@ -1,10 +1,10 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
-type ChipType = "caution" | "warning" | "success" | "light" | "dark" | "neutral";
+export type ChipType = "caution" | "warning" | "success" | "light" | "dark" | "neutral" | "darkMode" | "info";
 
 // exporting for using in type prop as constant - this could be moved and become a global list for colors
 export const ChipTypes: Record<ChipType, ChipType> = {
@@ -14,6 +14,8 @@ export const ChipTypes: Record<ChipType, ChipType> = {
   light: "light",
   dark: "dark",
   neutral: "neutral",
+  darkMode: "darkMode",
+  info: "info",
 };
 
 export interface ChipProps<X> {
@@ -25,7 +27,10 @@ export interface ChipProps<X> {
 }
 
 /** Kinda like a chip, but read-only, so no `onClick` or `hover`. */
-export function Chip<X extends Only<Xss<Margin>, X>>({ type = ChipTypes.neutral, ...props }: ChipProps<X>) {
+export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X>>({
+  type = ChipTypes.neutral,
+  ...props
+}: ChipProps<X>) {
   const { fieldProps } = usePresentationContext();
   const { text, title, xss = {}, compact = fieldProps?.compact } = props;
   const tid = useTestIds(props, "chip");
@@ -49,10 +54,12 @@ export function Chip<X extends Only<Xss<Margin>, X>>({ type = ChipTypes.neutral,
 }
 
 const typeStyles: Record<ChipType, Properties> = {
-  caution: Css.bgYellow400.$,
-  warning: Css.bgRed100.$,
-  success: Css.bgGreen100.$,
+  caution: Css.bgYellow200.$,
+  warning: Css.bgRed200.$,
+  success: Css.bgGreen200.$,
   light: Css.bgWhite.$,
   dark: Css.bgGray900.white.$,
   neutral: Css.bgGray200.$,
+  darkMode: Css.bgGray700.white.$,
+  info: Css.bgBlue100.$,
 };

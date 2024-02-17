@@ -5,7 +5,7 @@ import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
 export type BoundRichTextFieldProps = Omit<RichTextFieldProps, "value" | "onChange"> & {
-  field: FieldState<any, string | null | undefined>;
+  field: FieldState<string | null | undefined>;
   // Optional in case the page wants extra behavior
   onChange?: (value: string | undefined) => void;
 };

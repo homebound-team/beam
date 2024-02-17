@@ -1,15 +1,16 @@
-import { AutoSaveStatusProvider } from "@homebound/form-state";
-import useResizeObserver from "@react-hook/resize-observer";
-import { MutableRefObject, PropsWithChildren, ReactNode, useEffect, useRef, useState } from "react";
+import { useResizeObserver } from "@react-aria/utils";
+import { MutableRefObject, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { FocusScope, OverlayContainer, useDialog, useModal, useOverlay, usePreventScroll } from "react-aria";
 import { createPortal } from "react-dom";
+import { AutoSaveStatusProvider } from "src/components";
 import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
+import { ModalProvider } from "./ModalContext";
 
-export type ModalSize = "sm" | "md" | "lg" | "xl";
+export type ModalSize = "sm" | "md" | "lg" | "xl" | "xxl";
 
 export interface ModalProps {
   /**
@@ -74,62 +75,78 @@ export function Modal(props: ModalProps) {
 
   const [hasScroll, setHasScroll] = useState(forceScrolling ?? false);
 
-  useResizeObserver(modalBodyRef, ({ target }) => {
-    if (forceScrolling === undefined && !isFixedHeight) {
-      setHasScroll(target.scrollHeight > target.clientHeight);
-    }
+  useResizeObserver({
+    ref: modalBodyRef,
+    onResize: useCallback(
+      () => {
+        const target = modalBodyRef.current!;
+        if (forceScrolling === undefined && !isFixedHeight) {
+          setHasScroll(target.scrollHeight > target.clientHeight);
+        }
+      },
+      // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [],
+    ),
   });
 
   // Even though we use raw-divs for the createPortal calls, we do actually need to
   // use refs + useEffect to stitch those raw divs back into the React component tree.
-  useEffect(() => {
-    modalHeaderRef.current!.appendChild(modalHeaderDiv);
-    modalBodyRef.current!.appendChild(modalBodyDiv);
-    modalFooterRef.current!.appendChild(modalFooterDiv);
-  }, [modalBodyRef, modalFooterRef, modalHeaderRef]);
+  useEffect(
+    () => {
+      modalHeaderRef.current!.appendChild(modalHeaderDiv);
+      modalBodyRef.current!.appendChild(modalBodyDiv);
+      modalFooterRef.current!.appendChild(modalFooterDiv);
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [modalBodyRef, modalFooterRef, modalHeaderRef],
+  );
 
   return (
-    <OverlayContainer>
-      <AutoSaveStatusProvider>
-        <div css={Css.underlay.z4.$} {...underlayProps} {...testId.underlay}>
-          <FocusScope contain restoreFocus autoFocus>
-            <div
-              css={
-                Css.br24.bgWhite.bshModal.overflowHidden
-                  .maxh("90vh")
-                  .df.fdc.wPx(width)
-                  .mhPx(defaultMinHeight)
-                  .if(isFixedHeight)
-                  .hPx(height).$
-              }
-              ref={ref}
-              {...overlayProps}
-              {...dialogProps}
-              {...modalProps}
-              {...testId}
-            >
-              {/* Setup three children (header, content, footer), and flex grow the content. */}
-              <header css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bGray200.$}>
-                <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
-                <span css={Css.fs0.pl1.$}>
-                  <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
-                </span>
-              </header>
-              <main
-                ref={modalBodyRef}
-                css={Css.fg1.overflowYAuto.if(hasScroll).bb.bGray200.if(!!forceScrolling).overflowYScroll.$}
+    <ModalProvider>
+      <OverlayContainer>
+        <AutoSaveStatusProvider>
+          <div css={Css.underlay.z4.$} {...underlayProps} {...testId.underlay}>
+            <FocusScope contain restoreFocus autoFocus>
+              <div
+                css={
+                  Css.br24.bgWhite.bshModal.overflowHidden
+                    .maxh("90vh")
+                    .df.fdc.wPx(width)
+                    .mhPx(defaultMinHeight)
+                    .if(isFixedHeight)
+                    .hPx(height).$
+                }
+                ref={ref}
+                {...overlayProps}
+                {...dialogProps}
+                {...modalProps}
+                {...testId}
               >
-                {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
-                {content}
-              </main>
-              <footer css={Css.fs0.$}>
-                <div ref={modalFooterRef} />
-              </footer>
-            </div>
-          </FocusScope>
-        </div>
-      </AutoSaveStatusProvider>
-    </OverlayContainer>
+                {/* Setup three children (header, content, footer), and flex grow the content. */}
+                <header css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bGray200.$}>
+                  <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
+                  <span css={Css.fs0.pl1.$}>
+                    <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
+                  </span>
+                </header>
+                <main
+                  ref={modalBodyRef}
+                  css={Css.fg1.overflowYAuto.if(hasScroll).bb.bGray200.if(!!forceScrolling).overflowYScroll.$}
+                >
+                  {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
+                  {content}
+                </main>
+                <footer css={Css.fs0.$}>
+                  <div ref={modalFooterRef} />
+                </footer>
+              </div>
+            </FocusScope>
+          </div>
+        </AutoSaveStatusProvider>
+      </OverlayContainer>
+    </ModalProvider>
   );
 }
 
@@ -181,6 +198,7 @@ const widths: Record<ModalSize, number> = {
   md: 480,
   lg: 640,
   xl: 800,
+  xxl: 900,
 };
 
 const defaultMinHeight = 204;

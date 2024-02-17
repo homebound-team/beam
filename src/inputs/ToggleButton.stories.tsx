@@ -13,13 +13,12 @@ import {
 
 export default {
   component: ToggleButtonComponent,
-  title: "Workspace/Inputs/ToggleButton",
-  parameters: { 
+  parameters: {
     backgrounds: { default: "white" },
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31580%3A99845",
-    }
+    },
   },
 } as Meta<ToggleButtonProps>;
 
@@ -91,7 +90,6 @@ function ToggleButtonWrapper({ isHovered, isFocused, isPressed, onChange, ...pro
         onChange={
           onChange
             ? (value) => {
-                console.log("selected value = ", value);
                 const result = onChange(value);
                 setSelected(value);
                 if (isPromise(result)) {

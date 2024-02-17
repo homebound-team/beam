@@ -3,7 +3,6 @@ import { Css } from "src/Css";
 
 export default {
   component: Loader,
-  title: "Workspace/Components/Loader",
 };
 
 function Loaders(contrast: boolean = false) {

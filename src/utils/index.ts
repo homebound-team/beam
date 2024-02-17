@@ -1,6 +1,10 @@
 import { MutableRefObject } from "react";
 import type { CheckboxGroupState, ToggleState } from "react-stately";
 
+export function fail(message?: string): never {
+  throw new Error(message || "Failed");
+}
+
 /** Adapts our state to what useToggleState returns in a stateless manner. */
 export function toToggleState(isSelected: boolean, onChange: (value: boolean) => void): ToggleState {
   return {
@@ -24,6 +28,9 @@ export function toGroupState<T extends string>(values: T[], onChange: (value: T[
     toggleValue: (value: T) => (values.includes(value) ? addValue(value) : removeValue(value)),
     isDisabled: false,
     isReadOnly: false,
+    // We do not use the validation state, as our Switch groups do not support error states. However, this field is required by the `CheckboxGroupState` so we need to include it.
+    // If we ever update our SwitchGroup component to support error states, we'll need to update this.
+    validationState: "valid",
   };
 }
 
@@ -49,7 +56,7 @@ export function safeKeys<T>(instance: T): (keyof T)[] {
 // Returns object with specified key removed
 export const omitKey = <T, K extends keyof T>(key: K, { [key]: _, ...obj }: T) => obj as T;
 
-export const noop = () => {};
+export const noop = (...args: any) => {};
 
 type Entries<T> = {
   [K in keyof T]: [K, T[K]];
@@ -63,6 +70,7 @@ export class EmptyRef<T> implements MutableRefObject<T> {
   get current(): T {
     throw new Error("BeamProvider is missing");
   }
+
   set current(value) {
     throw new Error("BeamProvider is missing");
   }
@@ -74,6 +82,19 @@ export function areArraysEqual(a: any[], b: any[]): boolean {
   return a.length === b.length && a.every((val, idx) => val === b[idx]);
 }
 
-export function isPromise(obj: void | Promise<void>): obj is Promise<void> {
+export function isPromise(obj: any | Promise<any>): obj is Promise<any> {
   return typeof obj === "object" && "then" in obj && typeof obj.then === "function";
+}
+
+export function isFunction(f: any): f is Function {
+  return typeof f === "function";
+}
+
+export function isDefined<T extends any>(param: T | undefined | null): param is T {
+  return param !== null && param !== undefined;
+}
+
+export function pluralize(count: number | unknown[], noun: string, pluralNoun?: string): string {
+  if ((Array.isArray(count) ? count.length : count) === 1) return noun;
+  return pluralNoun || `${noun}s`;
 }

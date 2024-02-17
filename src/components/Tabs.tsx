@@ -1,12 +1,13 @@
 import { camelCase } from "change-case";
 import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
-import { matchPath, Route, useLocation } from "react-router";
-import { Link } from "react-router-dom";
+import { matchPath, Route } from "react-router";
+import { Link, useLocation } from "react-router-dom";
 import type { IconKey } from "src/components";
 import { FullBleed } from "src/components";
 import { Css, Margin, Only, Padding, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
+import { AnyObject } from "src/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { Icon } from "./Icon";
@@ -88,7 +89,7 @@ export function TabsWithContent<V extends string, X extends Only<TabsContentXss,
 }
 
 export function TabContent<V extends string>(
-  props: Omit<RequiredRenderTabs<V, {}>, "onChange"> | RequiredRenderRouteTabs<V, {}>,
+  props: Omit<RequiredRenderTabs<V, AnyObject>, "onChange"> | RequiredRenderRouteTabs<V, AnyObject>,
 ) {
   const tid = useTestIds(props, "tab");
   const { tabs, contentXss = {} } = props;
@@ -96,21 +97,22 @@ export function TabContent<V extends string>(
   const selectedTab = isRouteTabs(props)
     ? props.tabs.find((t) => {
         const paths = Array.isArray(t.path) ? t.path : [t.path];
-        return paths.some((p) => !!matchPath(location.pathname, { path: t.path, exact: true }));
+        return paths.some((p) => !!matchPath(location.pathname, { path: p, exact: true }));
       }) || tabs[0]
     : props.tabs.find((tab) => tab.value === props.selected) || tabs[0];
   const uniqueValue = uniqueTabValue(selectedTab);
 
   return (
     // Using FullBleed to allow the tab's bgColor to extend to the edges of the <ScrollableContent /> element.
-    <FullBleed>
+    // Omit the padding from `FullBleed` if the caller passes in the `paddingLeft/Right` styles.
+    <FullBleed omitPadding={"paddingLeft" in contentXss || "paddingRight" in contentXss}>
       <div
         aria-labelledby={`${uniqueValue}-tab`}
         id={`${uniqueValue}-tabPanel`}
         role="tabpanel"
         tabIndex={0}
         {...tid.panel}
-        css={contentXss}
+        css={contentXss as any}
       >
         {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
       </div>
@@ -119,7 +121,7 @@ export function TabContent<V extends string>(
 }
 
 /** The top list of tabs. */
-export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<V, {}>) {
+export function Tabs<V extends string>(props: TabsProps<V, AnyObject> | RouteTabsProps<V, AnyObject>) {
   const { ariaLabel, tabs, includeBottomBorder, right, ...others } = props;
   const location = useLocation();
   const selected = isRouteTabs(props)
@@ -185,7 +187,7 @@ export function Tabs<V extends string>(props: TabsProps<V, {}> | RouteTabsProps<
         </div>
       )}
       {/* ref for actions specific to a tab. Targeting the immediate div (tabActionsEl) to set default styles */}
-      {right && <div css={Css.ml("auto").df.aic.gap1.pb1.$}>{right}</div>}
+      {right && <div css={Css.mla.df.aic.gap1.pb1.$}>{right}</div>}
     </div>
   );
 }
@@ -263,11 +265,11 @@ export function getTabStyles() {
   return {
     baseStyles: Css.df.aic.hPx(32).pyPx(verticalPaddingPx).px1.outline0.gray700.add("width", "fit-content")
       .cursorPointer.sm.$,
-    activeStyles: Css.add(borderBottomStyles).bLightBlue700.smMd.gray900.$,
+    activeStyles: Css.add(borderBottomStyles).bBlue700.smMd.gray900.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
-    focusRingStyles: Css.bgLightBlue50.bshFocus.$,
+    focusRingStyles: Css.bgBlue50.bshFocus.$,
     hoverStyles: Css.add(borderBottomStyles).bGray400.$,
-    activeHoverStyles: Css.bgLightBlue50.add(borderBottomStyles).bLightBlue700.$,
+    activeHoverStyles: Css.bgBlue50.add(borderBottomStyles).bBlue700.$,
   };
 }
 
@@ -299,6 +301,6 @@ function uniqueTabValue(tab: Tab<any> | RouteTab<any>) {
 }
 
 // Determines whether we should hide the Tab panel. Returns true if there is only one enabled tab and `alwaysShowAllTabs` is falsey.
-function hideTabs(props: Omit<TabsProps<any, {}>, "onChange"> | RouteTabsProps<any, {}>) {
+function hideTabs(props: Omit<TabsProps<any, AnyObject>, "onChange"> | RouteTabsProps<any, AnyObject>) {
   return props.alwaysShowAllTabs ? false : (props.tabs as any[]).filter((t) => !t.disabled).length === 1;
 }

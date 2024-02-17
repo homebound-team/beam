@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { observable } from "mobx";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   actionColumn,
   Button,
@@ -14,6 +14,7 @@ import {
   dateColumn,
   defaultStyle,
   emptyCell,
+  GridCellAlignment,
   GridColumn,
   GridDataRow,
   GridRowLookup,
@@ -26,16 +27,19 @@ import {
   simpleHeader,
   SimpleHeaderAndData,
   useGridTableApi,
+  insertAtIndex,
+  dragHandleColumn,
+  recursivelyGetContainingRow,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
+import { SelectField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
 import { noop } from "src/utils";
 import { newStory, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
   component: GridTable,
-  title: "Workspace/Components/GridTable",
   parameters: { layout: "fullscreen", backgrounds: { default: "white" } },
   decorators: [withRouter()],
 } as Meta;
@@ -203,6 +207,94 @@ export function VirtualFilteringWithFilterablePin() {
   );
 }
 
+export function InfiniteScroll() {
+  const loadRows = useCallback((offset: number) => {
+    return zeroTo(50).map((i) => ({
+      kind: "data" as const,
+      id: String(i + offset),
+      data: { name: `row ${i + offset}`, value: i + offset },
+    }));
+  }, []);
+
+  const [data, setData] = useState<GridDataRow<Row>[]>(() => loadRows(0));
+  const rows: GridDataRow<Row>[] = useMemo(() => [simpleHeader, ...data], [data]);
+  const columns: GridColumn<Row>[] = useMemo(
+    () => [
+      { header: "Name", data: ({ name }) => name, w: "200px" },
+      { header: "Value", data: ({ value }) => value },
+    ],
+    [],
+  );
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div css={Css.fg1.$}>
+        <GridTable
+          as="virtual"
+          columns={columns}
+          sorting={{ on: "client", initial: ["id", "ASC"] }}
+          stickyHeader={true}
+          rows={rows}
+          infiniteScroll={{
+            onEndReached(index) {
+              setData([...data, ...loadRows(index)]);
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+export function InfiniteScrollWithLoader() {
+  const loadRows = useCallback((offset: number) => {
+    return zeroTo(25).map((i) => ({
+      kind: "data" as const,
+      id: String(i + offset),
+      data: { name: `row ${i + offset}`, value: i + offset },
+    }));
+  }, []);
+
+  const [data, setData] = useState<GridDataRow<Row>[]>(() => loadRows(0));
+
+  // Simulate a slower network call that doesn't finish before the user reaches the end of the list
+  const fetchMoreData = useCallback(
+    async (index: number) => {
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          setData([...data, ...loadRows(index)]);
+          resolve();
+        }, 1_500);
+      });
+    },
+    [data, loadRows],
+  );
+
+  const rows: GridDataRow<Row>[] = useMemo(() => [simpleHeader, ...data], [data]);
+  const columns: GridColumn<Row>[] = useMemo(
+    () => [
+      { header: "Name", data: ({ name }) => name, w: "200px" },
+      { header: "Value", data: ({ value }) => value },
+    ],
+    [],
+  );
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div css={Css.fg1.$}>
+        <GridTable
+          as="virtual"
+          columns={columns}
+          sorting={{ on: "client", initial: ["id", "ASC"] }}
+          stickyHeader={true}
+          rows={rows}
+          infiniteScroll={{
+            onEndReached: fetchMoreData,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function NoRowsFallback() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
@@ -221,14 +313,6 @@ const rows = makeNestedRows(1);
 const rowsWithHeader: GridDataRow<NestedRow>[] = [simpleHeader, ...rows];
 
 export function NestedRows() {
-  const arrowColumn = actionColumn<NestedRow>({
-    header: (data, { row }) => <CollapseToggle row={row} />,
-    parent: (data, { row }) => <CollapseToggle row={row} />,
-    child: (data, { row }) => <CollapseToggle row={row} />,
-    grandChild: () => "",
-    add: () => "",
-    w: "60px",
-  });
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
     parent: (row) => ({
@@ -247,7 +331,7 @@ export function NestedRows() {
   };
   return (
     <GridTable
-      columns={[arrowColumn, nameColumn]}
+      columns={[collapseColumn<NestedRow>(), nameColumn]}
       {...{ rows: rowsWithHeader }}
       sorting={{ on: "client", initial: ["c1", "ASC"] }}
     />
@@ -330,7 +414,11 @@ export function StickyHeader() {
         stickyHeader={true}
         rows={[
           simpleHeader,
-          ...zeroTo(200).map((i) => ({ kind: "data" as const, id: `${i}`, data: { name: `row ${i}`, value: i } })),
+          ...zeroTo(200).map((i) => ({
+            kind: "data" as const,
+            id: `${i}`,
+            data: { name: `row ${i}`, value: i },
+          })),
         ]}
       />
     </div>
@@ -432,6 +520,33 @@ export const StyleCard = newStory(() => {
   );
 }, {});
 
+export const LeveledStyleCard = newStory(() => {
+  const nameColumn: GridColumn<NestedRow> = {
+    header: () => "Name",
+    parent: (row) => row.name,
+    child: (row) => row.name,
+    grandChild: (row) => row.name,
+    add: () => "Add",
+  };
+  const valueColumn: GridColumn<NestedRow> = {
+    header: () => "Value",
+    parent: (row) => row.name,
+    child: (row) => row.name,
+    grandChild: (row) => row.name,
+    add: () => "Add",
+    w: "200px",
+  };
+  return (
+    <div css={Css.wPx(550).$}>
+      <GridTable
+        style={cardStyle}
+        columns={[collapseColumn<NestedRow>(), selectColumn<NestedRow>(), nameColumn, valueColumn]}
+        rows={rowsWithHeader}
+      />
+    </div>
+  );
+}, {});
+
 export const StyleCardWithOneColumn = newStory(() => {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   return (
@@ -496,7 +611,7 @@ export const AsTableWithRowLink = newStory(
     const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
     const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
     const rowStyles: RowStyles<Row> = {
-      data: { indent: 2, rowLink: () => "http://homebound.com" },
+      data: { rowLink: () => "http://homebound.com" },
       header: {},
     };
     return (
@@ -539,9 +654,17 @@ export const DataTypeColumns = newStory(
         columns={[nameCol, detailCol, dateCol, priceCol, readOnlyPriceCol, actionCol]}
         rows={[
           simpleHeader,
-          { kind: "data", id: "1", data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 } },
+          {
+            kind: "data",
+            id: "1",
+            data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
+          },
           { kind: "data", id: "2", data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 } },
-          { kind: "data", id: "3", data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 } },
+          {
+            kind: "data",
+            id: "3",
+            data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
+          },
           {
             kind: "data",
             id: "4",
@@ -584,7 +707,57 @@ export function WrappedHeaders() {
         { kind: "data", id: "1", data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 } },
         { kind: "data", id: "2", data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 } },
         { kind: "data", id: "3", data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 } },
-        { kind: "data", id: "4", data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 } },
+        {
+          kind: "data",
+          id: "4",
+          data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+        },
+      ]}
+    />
+  );
+}
+
+export function WrappedCells() {
+  const leftAlignedColumn = column<Row2>({
+    header: "Basic field header",
+    data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
+    w: "150px",
+  });
+  const centerAlignedColumn = actionColumn<Row2>({
+    header: "Readonly select field header",
+    data: ({ role }) => (
+      <SelectField label="role" value={role} onSelect={noop} options={[{ id: role, name: role }]} readOnly />
+    ),
+    w: "150px",
+  });
+
+  return (
+    <GridTable<Row2>
+      columns={[leftAlignedColumn, centerAlignedColumn]}
+      sorting={{ on: "client", initial: undefined }}
+      style={{ rowHeight: "flexible" }}
+      rows={[
+        simpleHeader,
+        {
+          kind: "data",
+          id: "1",
+          data: {
+            name: "Very long long name here",
+            role: "Something you can wrap",
+            date: "11/29/85",
+            priceInCents: 113_00,
+          },
+        },
+        {
+          kind: "data",
+          id: "3",
+          data: {
+            name: "Another very long long name here",
+            role: "A very long text herea very long text here",
+            date: "11/08/18",
+            priceInCents: 80_65,
+          },
+        },
       ]}
     />
   );
@@ -593,6 +766,7 @@ export function WrappedHeaders() {
 type DataRow = { kind: "data"; id: string; data: { name: string; role: string; date: string; priceInCents: number } };
 type TotalsRow = { kind: "total"; data: { totalPriceInCents: number } };
 type ColspanRow = HeaderRow | DataRow | TotalsRow;
+
 export function ColSpan() {
   const idCol = column<ColspanRow>({
     header: "ID",
@@ -625,7 +799,11 @@ export function ColSpan() {
         { kind: "data", id: "1", data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 } },
         { kind: "data", id: "2", data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 } },
         { kind: "data", id: "3", data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 } },
-        { kind: "data", id: "4", data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 } },
+        {
+          kind: "data",
+          id: "4",
+          data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+        },
         { kind: "total", id: "total", data: { totalPriceInCents: 14_083_64 } },
       ]}
     />
@@ -651,7 +829,7 @@ export function CustomEmptyCell() {
   );
 }
 
-function makeNestedRows(repeat: number = 1): GridDataRow<NestedRow>[] {
+function makeNestedRows(repeat: number = 1, draggable: boolean = false): GridDataRow<NestedRow>[] {
   let parentId = 0;
   return zeroTo(repeat).flatMap((i) => {
     // Make three unique parent ids for this iteration
@@ -662,32 +840,39 @@ function makeNestedRows(repeat: number = 1): GridDataRow<NestedRow>[] {
     const rows: GridDataRow<NestedRow>[] = [
       // a parent w/ two children, 1st child has 2 grandchild, 2nd child has 1 grandchild
       {
-        ...{ kind: "parent", id: p1, data: { name: `parent ${prefix}1` } },
+        ...{ kind: "parent", id: p1, data: { name: `parent ${prefix}1` }, draggable },
         children: [
           {
-            ...{ kind: "child", id: `${p1}c1`, data: { name: `child ${prefix}p1c1` } },
+            ...{ kind: "child", id: `${p1}c1`, data: { name: `child ${prefix}p1c1` }, draggable },
             children: [
-              { kind: "grandChild", id: `${p1}c1g1`, data: { name: `grandchild ${prefix}p1c1g1` + " foo".repeat(20) } },
-              { kind: "grandChild", id: `${p1}c1g2`, data: { name: `grandchild ${prefix}p1c1g2` } },
+              {
+                kind: "grandChild",
+                id: `${p1}c1g1`,
+                data: { name: `grandchild ${prefix}p1c1g1` + " foo".repeat(20) },
+                draggable,
+              },
+              { kind: "grandChild", id: `${p1}c1g2`, data: { name: `grandchild ${prefix}p1c1g2` }, draggable },
             ],
           },
           {
-            ...{ kind: "child", id: `${p1}c2`, data: { name: `child ${prefix}p1c2` } },
-            children: [{ kind: "grandChild", id: `${p1}c2g1`, data: { name: `grandchild ${prefix}p1c2g1` } }],
+            ...{ kind: "child", id: `${p1}c2`, data: { name: `child ${prefix}p1c2` }, draggable },
+            children: [
+              { kind: "grandChild", id: `${p1}c2g1`, data: { name: `grandchild ${prefix}p1c2g1` }, draggable },
+            ],
           },
           // Put this "grandchild" in the 2nd level to show heterogeneous levels
-          { kind: "grandChild", id: `${p1}g1`, data: { name: `grandchild ${prefix}p1g1` } },
+          { kind: "grandChild", id: `${p1}g1`, data: { name: `grandchild ${prefix}p1g1` }, draggable },
           // Put this "kind" into the 2nd level to show it doesn't have to be a card
-          { kind: "add", id: `${p1}add`, pin: "last", data: {} },
+          { kind: "add", id: `${p1}add`, pin: "last", data: {}, draggable },
         ],
       },
       // a parent with just a child
       {
-        ...{ kind: "parent", id: p2, data: { name: `parent ${prefix}2` } },
-        children: [{ kind: "child", id: `${p2}c1`, data: { name: `child ${prefix}p2c1` } }],
+        ...{ kind: "parent", id: p2, data: { name: `parent ${prefix}2` }, draggable },
+        children: [{ kind: "child", id: `${p2}c1`, data: { name: `child ${prefix}p2c1` }, draggable }],
       },
       // a parent with no children
-      { kind: "parent", id: p3, data: { name: `parent ${prefix}3` } },
+      { kind: "parent", id: p3, data: { name: `parent ${prefix}3` }, draggable },
     ];
     return rows;
   });
@@ -755,7 +940,7 @@ export function StickyColumns() {
             valueColumn,
             {
               header: "Actions (not sticky)",
-              data: () => ({ content: "Actions (sticky)", sticky: "right" }),
+              data: () => ({ content: "Actions (sticky)", sticky: "right" as const }),
               w: "200px",
             },
           ]}
@@ -799,9 +984,13 @@ export function StickyColumnsAndHeader() {
 
   // Scroll wrapping element's x & y coordinates to demonstrate proper z-indices for sticky header and columns.
   useEffect(() => {
-    if (scrollWrap.current) {
-      scrollWrap.current.scroll(45, 100);
-    }
+    // GridTable's rows have their own useEffect, so use a setTimeout to
+    // run after its useEffect has completed.
+    setTimeout(() => {
+      if (scrollWrap.current) {
+        scrollWrap.current.scroll(45, 100);
+      }
+    }, 1);
   }, []);
 
   return (
@@ -901,6 +1090,8 @@ export function ActiveRow() {
     ],
     [],
   );
+  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const columns = useMemo(() => [nameColumn, valueColumn, actionColumn], []);
   return <GridTable columns={columns} activeRowId="data_2" rowStyles={rowStyles} rows={rows} />;
 }
@@ -983,6 +1174,7 @@ export function InteractiveCellAlignment() {
     />
   );
 }
+
 type AlignmentData = { name: string | undefined; alignment: "left" | "right" | "center" };
 type AlignmentRow = SimpleHeaderAndData<AlignmentData>;
 
@@ -1002,7 +1194,6 @@ export function PrimaryColumnSorting() {
     clientSideSort: false,
   };
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [filter, setFilter] = useState<string | undefined>();
   return (
     <div>
@@ -1056,6 +1247,74 @@ export function SelectableRows() {
       <div>
         <strong>Selected Row Ids:</strong> {selectedIds.length > 0 ? selectedIds.join(", ") : "None"}
       </div>
+    </>
+  );
+}
+
+export function SelectableChildrenRows() {
+  type ParentRow = { kind: "parent"; id: string; data: string };
+  type ChildRow = { kind: "child"; id: string; data: string };
+  type GrandChildRow = { kind: "grandChild"; id: string; data: string };
+  type Row = ParentRow | ChildRow | GrandChildRow;
+
+  const selectCol = selectColumn<Row>();
+
+  const nameCol: GridColumn<Row> = {
+    parent: (name) => name,
+    child: (name) => name,
+    grandChild: (name) => name,
+    mw: "160px",
+  };
+
+  return (
+    <>
+      <GridTable
+        columns={[collapseColumn<Row>(), selectCol, nameCol]}
+        rows={
+          [
+            simpleHeader,
+            {
+              kind: "parent",
+              id: "1",
+              data: "Howard Stark",
+              initSelected: true,
+              inferSelectedState: false,
+              children: [
+                {
+                  kind: "child" as const,
+                  id: "2",
+                  data: "Tony Stark",
+                  initSelected: false,
+                  inferSelectedState: false,
+                  children: [
+                    {
+                      kind: "grandChild" as const,
+                      id: "5",
+                      data: "Morgan Stark",
+                      initSelected: true,
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              kind: "parent",
+              id: "3",
+              data: "Odin",
+              initSelected: false,
+              inferSelectedState: false,
+              children: [
+                {
+                  kind: "child" as const,
+                  id: "4",
+                  data: "Thor",
+                  initSelected: true,
+                },
+              ],
+            },
+          ] as GridDataRow<Row>[]
+        }
+      />
     </>
   );
 }
@@ -1187,6 +1446,7 @@ export function ExpandableColumns() {
         expandableHeader: () => "Employee",
         header: (data, { expanded }) => (expanded ? "First Name" : emptyCell),
         data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+        hideOnExpand: true,
         expandColumns: [
           column<ExpandableRow>({
             expandableHeader: emptyCell,
@@ -1232,10 +1492,576 @@ export function ExpandableColumns() {
     ],
     [],
   );
-
   return (
     <div css={Css.df.fdc.bgGray100.p2.h("100vh").mw("fit-content").$}>
       <GridTable stickyHeader columns={columns} rows={rows} style={{ allWhite: true }} as="div" />
     </div>
+  );
+}
+
+export function ExpandableColumnsWithSetTimeout() {
+  const rows: GridDataRow<ExpandableRow>[] = useMemo(
+    () => [
+      // New reserved 'kind' "groupHeader" property for GridTable to position row correctly
+      { kind: "header", id: "header", data: {} },
+      { kind: "expandableHeader", id: "expandableHeader", data: {} },
+      {
+        kind: "data" as const,
+        id: `user:1`,
+        data: {
+          firstName: "Brandon",
+          lastName: "Dow",
+          birthdate: "Jan 29, 1986",
+          age: 36,
+          favoriteSports: ["Basketball", "Football"],
+          occupation: "Software Engineer",
+          manager: "Steve Thompson",
+        },
+      },
+    ],
+    [],
+  );
+
+  const columns: GridColumn<ExpandableRow>[] = useMemo(
+    () => [
+      selectColumn<ExpandableRow>({ sticky: "left" }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Address",
+        header: emptyCell,
+        data: () => "123 Sesame St",
+        w: "200px",
+        sticky: "left",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Employee",
+        header: (data, { expanded }) => (expanded ? "First Name" : emptyCell),
+        data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+        expandColumns: async () =>
+          await new Promise((resolve) =>
+            setTimeout(
+              () =>
+                resolve([
+                  column<ExpandableRow>({
+                    expandableHeader: emptyCell,
+                    header: "Last Name",
+                    data: ({ lastName }) => lastName,
+                    w: "250px",
+                  }),
+                  column<ExpandableRow>({
+                    expandableHeader: emptyCell,
+                    header: "Birthdate",
+                    data: ({ birthdate }) => birthdate,
+                    w: "150px",
+                  }),
+                  column<ExpandableRow>({
+                    expandableHeader: emptyCell,
+                    header: "Age",
+                    data: ({ age }) => age,
+                    w: "80px",
+                  }),
+                ]),
+              2000,
+            ),
+          ),
+        w: "250px",
+      }),
+
+      column<ExpandableRow>({
+        expandableHeader: () => "Occupation",
+        header: emptyCell,
+        data: ({ occupation }) => occupation,
+        w: "280px",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Manager",
+        header: emptyCell,
+        data: ({ manager }) => manager,
+        w: "280px",
+      }),
+      column<ExpandableRow>({
+        expandableHeader: () => "Favorite Sports",
+        header: emptyCell,
+        data: ({ favoriteSports = [] }, { expanded }) =>
+          expanded ? <Chips values={favoriteSports} /> : favoriteSports.length,
+        w: "160px",
+        expandedWidth: "280px",
+      }),
+    ],
+    [],
+  );
+  return (
+    <div css={Css.df.fdc.bgGray100.p2.h("100vh").mw("fit-content").$}>
+      <GridTable stickyHeader columns={columns} rows={rows} style={{ allWhite: true }} as="div" />
+    </div>
+  );
+}
+
+type SimpleExpandableRow = ExpandHeader | Header | { id: string; kind: "data"; data: Data };
+export function Tooltips() {
+  const primitiveColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: () => ({
+      content: "Expandable header with tooltip",
+      tooltip: "Tooltip Text for Expandable Header",
+    }),
+    header: () => ({
+      content: "Primitive value - SortHeader with Tooltip",
+      tooltip: "This column demonstrates a tooltip on a cell that renders a primitive value (like a string)",
+    }),
+    data: ({ name, value }, { expanded }) => ({
+      content: expanded ? `Expanded - ${name}` : name,
+      tooltip: "Tooltip text for a primitive value",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "300px",
+    expandedWidth: "600px",
+  };
+  const withMarkupColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: () => ({
+      content: "Nothing to expand",
+      tooltip: "This demonstrates a tooltip on an expandable header cell that is not expandable",
+    }),
+    header: () => ({
+      content: () => <div>Cell with markup</div>,
+      tooltip: "This column demonstrates a tooltip on a cell that renders markup",
+    }),
+    data: ({ name, value }) => ({
+      content: () => <div>{name}</div>,
+      tooltip: "Cell tooltip for a value wrapped in markup",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    clientSideSort: false,
+    w: "220px",
+  };
+  const buttonColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: () => ({
+      content: "As button",
+      tooltip: "This column demonstrates a tooltip on a cell that renders a button element",
+    }),
+    data: ({ value }) => ({
+      content: "Trigger console log" + value,
+      onClick: () => console.log("clicked!"),
+      tooltip: "Cell tooltip for a button cell",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const linkColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: () => ({
+      content: "As link",
+      tooltip: "This column demonstrates a tooltip on a cell that renders a Link component",
+    }),
+    data: ({ value }) => ({
+      content: "Relative link: /",
+      onClick: "/",
+      tooltip: "Cell tooltip for a relative link / React Router Link component",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const externalLinkColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: () => ({
+      content: "As External link",
+      tooltip: "This column demonstrates a tooltip on a cell that renders an anchor element",
+    }),
+    data: ({ value }) => ({
+      content: "homebound.com",
+      onClick: "https://www.homebound.com",
+      tooltip: "Cell tooltip for an external link",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const truncatedColumn: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: () => ({
+      content: "Truncated cells",
+      tooltip: "This column demonstrates a tooltip on a cell where the text should truncate",
+    }),
+    data: ({ name, value }) => ({
+      content: name!.repeat(2),
+      tooltip: "Tooltip for a truncated cell",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+    clientSideSort: false,
+  };
+
+  const primitiveColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: "Expandable header with tooltip",
+    header: "Primitive value - SortHeader with Tooltip",
+    data: ({ name, value }, { expanded }) => ({
+      content: expanded ? `Expanded - ${name}` : name,
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "300px",
+    expandedWidth: "600px",
+  };
+  const withMarkupColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: "Nothing to expand",
+    header: () => <div>Cell with markup</div>,
+    data: ({ name, value }) => ({
+      content: () => <div>{name}</div>,
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    clientSideSort: false,
+    w: "220px",
+  };
+  const buttonColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: "As button",
+    data: ({ value }) => ({
+      content: "Trigger console log" + value,
+      onClick: () => console.log("clicked!"),
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const linkColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: "As link",
+    data: ({ value }) => ({
+      content: "Relative link: /",
+      onClick: "/",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const externalLinkColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: "As External link",
+    data: ({ value }) => ({
+      content: "homebound.com",
+      onClick: "https://www.homebound.com",
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+  };
+  const truncatedColumnWoTt: GridColumn<SimpleExpandableRow> = {
+    expandableHeader: emptyCell,
+    header: "Truncated cells",
+    data: ({ name, value }) => ({
+      content: name!.repeat(2),
+      alignment: value === 1 ? "left" : value === 2 ? "center" : "right",
+    }),
+    w: "200px",
+    clientSideSort: false,
+  };
+
+  return (
+    <div css={Css.bgGray100.p2.$}>
+      <h1 css={Css.xlMd.$}>Fixed Row Height</h1>
+      <GridTable
+        style={{ allWhite: true, rowHeight: "fixed" }}
+        columns={[primitiveColumn, withMarkupColumn, buttonColumn, linkColumn, externalLinkColumn, truncatedColumn]}
+        sorting={{ on: "client", initial: [buttonColumn.id!, "ASC"] }}
+        rows={[
+          { kind: "header", id: "header", data: {} },
+          { kind: "expandableHeader", id: "expandableHeader", data: {} },
+          { kind: "data", id: "1", data: { name: "Tony Stark, Iron Man", value: 1 } },
+          { kind: "data", id: "2", data: { name: "Natasha Romanova, Black Widow", value: 2 } },
+          { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
+        ]}
+      />
+      <h1 css={Css.xlMd.mt4.$}>Flexible Row Height</h1>
+      <GridTable
+        style={{ allWhite: true }}
+        columns={[primitiveColumn, withMarkupColumn, buttonColumn, linkColumn, externalLinkColumn, truncatedColumn]}
+        sorting={{ on: "client", initial: [buttonColumn.id!, "ASC"] }}
+        rows={[
+          { kind: "header", id: "header", data: {} },
+          { kind: "expandableHeader", id: "expandableHeader", data: {} },
+          { kind: "data", id: "1", data: { name: "Tony Stark, Iron Man", value: 1 } },
+          { kind: "data", id: "2", data: { name: "Natasha Romanova, Black Widow", value: 2 } },
+          { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
+        ]}
+      />
+      <h1 css={Css.xlMd.mt4.$}>
+        Without Tooltips - <span css={Css.base.$}>For visual comparison</span>
+      </h1>
+      <GridTable
+        style={{ allWhite: true }}
+        columns={[
+          primitiveColumnWoTt,
+          withMarkupColumnWoTt,
+          buttonColumnWoTt,
+          linkColumnWoTt,
+          externalLinkColumnWoTt,
+          truncatedColumnWoTt,
+        ]}
+        sorting={{ on: "client", initial: [buttonColumn.id!, "ASC"] }}
+        rows={[
+          { kind: "header", id: "header", data: {} },
+          { kind: "expandableHeader", id: "expandableHeader", data: {} },
+          { kind: "data", id: "1", data: { name: "Tony Stark, Iron Man", value: 1 } },
+          { kind: "data", id: "2", data: { name: "Natasha Romanova, Black Widow", value: 2 } },
+          { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
+        ]}
+      />
+    </div>
+  );
+}
+
+export function Headers() {
+  function makeColumn(
+    header: string | (() => JSX.Element),
+    clientSideSort: boolean = true,
+    align: GridCellAlignment = "left",
+  ) {
+    return column<Row>({ header, data: ({ value }) => value, w: "172px", clientSideSort, align });
+  }
+  const columns = [
+    makeColumn("Sortable"),
+    makeColumn("Sortable With multiple lines of text. ".repeat(2)),
+    makeColumn("Sortable aligned right", true, "right"),
+    makeColumn("Sortable aligned right With multiple lines of text. ".repeat(2), true, "right"),
+    makeColumn("Not Sortable", false),
+    makeColumn("Not Sortable with multiple lines of text. ".repeat(2), false),
+    makeColumn(() => <span>With Markup</span>),
+    makeColumn(() => (
+      <span css={Css.lineClamp2.$}>{`With Markup and multiple lines of that will also truncate`.repeat(2)}</span>
+    )),
+  ];
+  return (
+    <div css={Css.p2.$}>
+      <h1 css={Css.xlMd.$}>Default Style</h1>
+      <GridTable
+        columns={columns}
+        style={{}}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "B", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
+        ]}
+        sorting={{ on: "client" }}
+      />
+      <h1 css={Css.xlMd.mt4.$}>
+        <pre>rowHeight: fixed</pre>
+      </h1>
+      <GridTable
+        columns={columns}
+        style={{ rowHeight: "fixed" }}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "B", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
+        ]}
+        sorting={{ on: "client" }}
+      />
+    </div>
+  );
+}
+
+/**
+ * Shows how drag & drop reordering can be implemented with GridTable drag events
+ */
+export function DraggableRows() {
+  const dragColumn = dragHandleColumn<Row>({});
+  const nameColumn: GridColumn<Row> = {
+    header: "Name",
+    data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
+  };
+
+  const actionColumn: GridColumn<Row> = {
+    header: "Action",
+    data: () => <div>Actions</div>,
+    clientSideSort: false,
+  };
+
+  let rowArray: GridDataRow<Row>[] = new Array(26).fill(0);
+  rowArray = rowArray.map((elem, idx) => ({
+    kind: "data",
+    id: "" + (idx + 1),
+    order: idx + 1,
+    data: { name: "" + (idx + 1), value: idx + 1 },
+    draggable: true,
+  }));
+
+  const [rows, setRows] = useState<GridDataRow<Row>[]>([simpleHeader, ...rowArray]);
+
+  // also works with as="table" and as="virtual"
+  return (
+    <GridTable
+      columns={[dragColumn, nameColumn, actionColumn]}
+      onRowDrop={(draggedRow, droppedRow, indexOffset) => {
+        const tempRows = [...rows];
+        // remove dragged row
+        const draggedRowIndex = tempRows.findIndex((r) => r.id === draggedRow.id);
+        const reorderRow = tempRows.splice(draggedRowIndex, 1)[0];
+
+        const droppedRowIndex = tempRows.findIndex((r) => r.id === droppedRow.id);
+
+        // insert it at the dropped row index
+        setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
+      }}
+      rows={[...rows]}
+    />
+  );
+}
+
+export const DraggableWithInputColumns = newStory(
+  () => {
+    const dragColumn = dragHandleColumn<Row2>({});
+    const nameCol = column<Row2>({ header: "Name", data: ({ name }) => name });
+    const priceCol = numericColumn<Row2>({
+      header: "Price",
+      data: ({ priceInCents }) => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
+    });
+    const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
+
+    const [rows, setRows] = useState<GridDataRow<Row2>[]>([
+      simpleHeader,
+      {
+        kind: "data",
+        id: "1",
+        data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
+        draggable: true,
+      },
+      {
+        kind: "data",
+        id: "2",
+        data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
+        draggable: true,
+      },
+      {
+        kind: "data",
+        id: "3",
+        data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
+        draggable: true,
+      },
+      {
+        kind: "data",
+        id: "4",
+        data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+        draggable: true,
+      },
+    ]);
+
+    return (
+      <GridTable<Row2>
+        columns={[dragColumn, nameCol, priceCol, actionCol]}
+        rows={rows}
+        onRowDrop={(draggedRow, droppedRow, indexOffset) => {
+          const tempRows = [...rows];
+          // remove dragged row
+          const draggedRowIndex = tempRows.findIndex((r) => r.id === draggedRow.id);
+          const reorderRow = tempRows.splice(draggedRowIndex, 1)[0];
+
+          const droppedRowIndex = tempRows.findIndex((r) => r.id === droppedRow.id);
+
+          // insert it at the dropped row index
+          setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
+        }}
+      />
+    );
+  },
+  { decorators: [withRouter()] },
+);
+
+const draggableRows = makeNestedRows(1, true);
+const draggableRowsWithHeader: GridDataRow<NestedRow>[] = [simpleHeader, ...draggableRows];
+export function DraggableNestedRows() {
+  const dragColumn = dragHandleColumn<NestedRow>({});
+  const nameColumn: GridColumn<NestedRow> = {
+    header: () => "Name",
+    parent: (row) => ({
+      content: <div>{row.name}</div>,
+      value: row.name,
+    }),
+    child: (row) => ({
+      content: <div css={Css.ml2.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    grandChild: (row) => ({
+      content: <div css={Css.ml4.$}>{row.name}</div>,
+      value: row.name,
+    }),
+    add: () => "Add",
+  };
+
+  const [rows, setRows] = useState<GridDataRow<NestedRow>[]>(draggableRowsWithHeader);
+
+  return (
+    <GridTable
+      columns={[dragColumn, collapseColumn<NestedRow>(), nameColumn]}
+      rows={rows}
+      sorting={{ on: "client", initial: ["c1", "ASC"] }}
+      onRowDrop={(draggedRow, droppedRow, indexOffset) => {
+        const tempRows = [...rows];
+        const foundRowContainer = recursivelyGetContainingRow(draggedRow.id, tempRows)!;
+        if (!foundRowContainer) {
+          console.error("Could not find row array for row", draggedRow);
+          return;
+        }
+        if (!foundRowContainer.array.some((row) => row.id === droppedRow.id)) {
+          console.error("Could not find dropped row in row array", droppedRow);
+          return;
+        }
+        // remove dragged row
+        const draggedRowIndex = foundRowContainer.array.findIndex((r) => r.id === draggedRow.id);
+        const reorderRow = foundRowContainer.array.splice(draggedRowIndex, 1)[0];
+
+        const droppedRowIndex = foundRowContainer.array.findIndex((r) => r.id === droppedRow.id);
+
+        // we also need the parent row so we can set the newly inserted array
+        if (foundRowContainer.parent && foundRowContainer.parent?.children) {
+          foundRowContainer.parent.children = [
+            ...insertAtIndex(foundRowContainer.parent?.children, reorderRow, droppedRowIndex + indexOffset),
+          ];
+          setRows([...tempRows]);
+        } else {
+          setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
+        }
+      }}
+    />
+  );
+}
+
+export function DraggableCardRows() {
+  const dragColumn = dragHandleColumn<Row>({});
+  const nameColumn: GridColumn<Row> = {
+    header: "Name",
+    data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }),
+  };
+
+  const actionColumn: GridColumn<Row> = {
+    header: "Action",
+    data: () => <div>Actions</div>,
+    clientSideSort: false,
+  };
+
+  let rowArray: GridDataRow<Row>[] = new Array(26).fill(0);
+  rowArray = rowArray.map((elem, idx) => ({
+    kind: "data",
+    id: "" + (idx + 1),
+    order: idx + 1,
+    data: { name: "" + (idx + 1), value: idx + 1 },
+    draggable: true,
+  }));
+
+  const [rows, setRows] = useState<GridDataRow<Row>[]>([simpleHeader, ...rowArray]);
+
+  // also works with as="table" and as="virtual"
+  return (
+    <GridTable
+      columns={[dragColumn, nameColumn, actionColumn]}
+      onRowDrop={(draggedRow, droppedRow, indexOffset) => {
+        const tempRows = [...rows];
+        // remove dragged row
+        const draggedRowIndex = tempRows.findIndex((r) => r.id === draggedRow.id);
+        const reorderRow = tempRows.splice(draggedRowIndex, 1)[0];
+
+        const droppedRowIndex = tempRows.findIndex((r) => r.id === droppedRow.id);
+
+        // insert it at the dropped row index
+        setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
+      }}
+      rows={[...rows]}
+      style={cardStyle}
+    />
   );
 }

@@ -3,7 +3,6 @@ import { StepperFormApp as StepperFormAppComponent } from "src/forms/StepperForm
 
 export default {
   component: StepperFormAppComponent,
-  title: "Workspace/Forms/Stepper Form App",
 } as Meta;
 
 export function StepperFormApp() {

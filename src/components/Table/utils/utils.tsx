@@ -1,12 +1,13 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
+import { Icon } from "src/components/Icon";
 import { GridCellContent } from "src/components/Table/components/cell";
 import { ExpandableHeader } from "src/components/Table/components/ExpandableHeader";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
-import { GridTableApi } from "src/components/Table/GridTableApi";
-import { GridStyle, RowStyle } from "src/components/Table/TableStyles";
+import { GridRowApi } from "src/components/Table/GridTableApi";
+import { GridStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
-import { Css, Properties } from "src/Css";
+import { Css, Palette, Properties } from "src/Css";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
 /** If a column def return just string text for a given row, apply some default styling. */
@@ -22,7 +23,13 @@ export function toContent(
   isExpandableHeader: boolean,
   isExpandable: boolean,
   minStickyLeftOffset: number,
+  isKeptSelectedRow: boolean,
 ): ReactNode {
+  // Rows within the kept selection group cannot be collapsed
+  if (isKeptSelectedRow && column.id === "beamCollapseColumn") {
+    return <></>;
+  }
+
   let content = isGridCellContent(maybeContent) ? maybeContent.content : maybeContent;
   if (typeof content === "function") {
     // Actually create the JSX by calling `content()` here (which should be as late as
@@ -41,11 +48,17 @@ export function toContent(
       "GridTables with as=virtual & sortable columns should use functions that return JSX, instead of JSX",
     );
   }
+  const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
+  const tooltipEl = tooltip ? (
+    <span css={Css.fs0.mlPx(4).$}>
+      <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Palette.Gray600} />
+    </span>
+  ) : null;
 
   content =
     isGridCellContent(maybeContent) && !!maybeContent.onClick
       ? getButtonOrLink(content, maybeContent.onClick, {
-          css: Css.maxw100.lightBlue700.ta("inherit").if(style?.presentationSettings?.wrap === false).truncate.$,
+          css: Css.maxw100.blue700.ta("inherit").if(style?.presentationSettings?.wrap === false).truncate.$,
         })
       : content;
 
@@ -55,25 +68,56 @@ export function toContent(
         content={content}
         iconOnLeft={alignment === "right"}
         sortKey={column.serverSideSortKey ?? column.id}
+        tooltipEl={tooltipEl}
       />
     );
   } else if (content && typeof content === "string" && isExpandableHeader && isExpandable) {
-    return <ExpandableHeader title={content} column={column} minStickyLeftOffset={minStickyLeftOffset} as={as} />;
+    return (
+      <ExpandableHeader
+        title={content}
+        column={column}
+        minStickyLeftOffset={minStickyLeftOffset}
+        as={as}
+        tooltipEl={tooltipEl}
+      />
+    );
   } else if (content && typeof content === "string" && isExpandableHeader) {
-    return <span css={Css.lineClamp2.$}>{content}</span>;
-  } else if (content && style?.presentationSettings?.wrap === false && typeof content === "string") {
+    return (
+      <>
+        <span css={Css.lineClamp2.$}>{content}</span>
+        {tooltipEl}
+      </>
+    );
+  } else if (!isContentEmpty(content) && isHeader && typeof content === "string") {
+    return (
+      <>
+        <span css={Css.lineClamp2.$} title={content}>
+          {content}
+        </span>
+        {tooltipEl}
+      </>
+    );
+  } else if (!isHeader && content && style?.presentationSettings?.wrap === false && typeof content === "string") {
     // In order to truncate the text properly, then we need to wrap it in another element
     // as our cell element is a flex container, which don't allow for applying truncation styles directly on it.
     return (
-      <span css={Css.truncate.mw0.$} title={content}>
-        {content}
-      </span>
+      <>
+        <span css={Css.truncate.mw0.$} title={content}>
+          {content}
+        </span>
+        {tooltipEl}
+      </>
     );
-  } else if (style.emptyCell && isContentEmpty(content)) {
+  } else if (!isHeader && !isExpandableHeader && style.emptyCell && isContentEmpty(content)) {
     // If the content is empty and the user specified an `emptyCell` node, return that.
     return style.emptyCell;
   }
-  return content;
+  return (
+    <>
+      {content}
+      {tooltipEl}
+    </>
+  );
 }
 
 export function isGridCellContent(content: ReactNode | GridCellContent): content is GridCellContent {
@@ -81,23 +125,34 @@ export function isGridCellContent(content: ReactNode | GridCellContent): content
 }
 
 const emptyValues = ["", null, undefined] as any[];
+
 function isContentEmpty(content: ReactNode): boolean {
   return emptyValues.includes(content);
 }
+
+export type DragData<R extends Kinded> = {
+  rowRenderRef: React.RefObject<HTMLTableRowElement>;
+  onDragStart?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDragEnd?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDrop?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDragEnter?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+  onDragOver?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
+};
 
 /** Return the content for a given column def applied to a given row. */
 export function applyRowFn<R extends Kinded>(
   column: GridColumnWithId<R>,
   row: GridDataRow<R>,
-  api: GridTableApi<R>,
+  api: GridRowApi<R>,
   level: number,
   expanded: boolean,
+  dragData?: DragData<R>,
 ): ReactNode | GridCellContent {
   // Usually this is a function to apply against the row, but sometimes it's a hard-coded value, i.e. for headers
   const maybeContent = column[row.kind];
   if (typeof maybeContent === "function") {
     // Auto-destructure data
-    return (maybeContent as Function)((row as any)["data"], { row: row as any, api, level, expanded });
+    return (maybeContent as Function)((row as any)["data"], { row: row as any, api, level, expanded, dragData });
   } else {
     return maybeContent;
   }
@@ -106,22 +161,6 @@ export function applyRowFn<R extends Kinded>(
 export const ASC = "ASC" as const;
 export const DESC = "DESC" as const;
 export const emptyCell: GridCellContent = { content: () => <></>, value: "" };
-
-export function getIndentationCss<R extends Kinded>(
-  style: GridStyle,
-  rowStyle: RowStyle<R> | undefined,
-  columnIndex: number,
-  maybeContent: ReactNode | GridCellContent,
-): Properties {
-  // Look for cell-specific indent or row-specific indent (row-specific is only one the first column)
-  const indent = (isGridCellContent(maybeContent) && maybeContent.indent) || (columnIndex === 0 && rowStyle?.indent);
-  if (typeof indent === "number" && style.levels !== undefined) {
-    throw new Error(
-      "The indent param is deprecated for new beam fixed & flexible styles, use beamNestedFixedStyle or beamNestedFlexibleStyle",
-    );
-  }
-  return indent === 1 ? style.indentOneCss || {} : indent === 2 ? style.indentTwoCss || {} : {};
-}
 
 export function getFirstOrLastCellCss<R extends Kinded>(
   style: GridStyle,
@@ -174,7 +213,7 @@ export function getJustification(
 
 /** Look at a row and get its filter value. */
 function filterValue(value: ReactNode | GridCellContent): any {
-  let maybeFn = value;
+  let maybeFn: any = value;
   if (value && typeof value === "object") {
     if ("value" in value) {
       maybeFn = value.value;
@@ -197,7 +236,7 @@ export function maybeApplyFunction<T>(
 }
 
 export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter: string): boolean {
-  let value = filterValue(maybeContent);
+  const value = filterValue(maybeContent);
   if (typeof value === "string") {
     return value.toLowerCase().includes(filter.toLowerCase());
   } else if (typeof value === "number") {
@@ -208,8 +247,10 @@ export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter:
 
 export const HEADER = "header";
 export const TOTALS = "totals";
+/** Tables expandable columns get an extra header. */
 export const EXPANDABLE_HEADER = "expandableHeader";
-export const reservedRowKinds = [HEADER, TOTALS, EXPANDABLE_HEADER];
+export const KEPT_GROUP = "keptGroup";
+export const reservedRowKinds = [HEADER, TOTALS, EXPANDABLE_HEADER, KEPT_GROUP];
 
 export const zIndices = {
   stickyHeader: 4,
@@ -217,3 +258,46 @@ export const zIndices = {
   expandableHeaderTitle: 2,
   expandableHeaderIcon: 1,
 };
+
+/** Loads an array from sessionStorage, if it exists, or `undefined`. */
+export function loadArrayOrUndefined(key: string) {
+  const ids = sessionStorage.getItem(key);
+  return ids ? JSON.parse(ids) : undefined;
+}
+
+export function insertAtIndex<T>(array: Array<T>, element: T, index: number): Array<T> {
+  return [...array.slice(0, index), element, ...array.slice(index, array.length)];
+}
+
+export function isCursorBelowMidpoint(target: HTMLElement, clientY: number) {
+  const style = window.getComputedStyle(target);
+  const rect = target.getBoundingClientRect();
+
+  const pt = parseFloat(style.getPropertyValue("padding-top"));
+  const pb = parseFloat(style.getPropertyValue("padding-bottom"));
+
+  return clientY > rect.top + pt + (rect.height - pb) / 2;
+}
+
+export function recursivelyGetContainingRow<R extends Kinded>(
+  rowId: string,
+  rowArray: GridDataRow<R>[],
+  parent?: GridDataRow<R>,
+): { array: GridDataRow<R>[]; parent: GridDataRow<R> | undefined } | undefined {
+  if (rowArray.some((row) => row.id === rowId)) {
+    return { array: rowArray, parent };
+  }
+
+  for (let i = 0; i < rowArray.length; i++) {
+    if (!rowArray[i].children) {
+      continue;
+    }
+
+    const result = recursivelyGetContainingRow(rowId, rowArray[i].children!, rowArray[i]);
+    if (result) {
+      return result;
+    }
+  }
+
+  return undefined;
+}

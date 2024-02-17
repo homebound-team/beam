@@ -6,7 +6,6 @@ import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 
 export default {
-  title: "Workspace/Components/Button",
   component: Button,
   decorators: [withRouter()],
   parameters: {
@@ -16,7 +15,7 @@ export default {
 } as Meta;
 
 const sizes: ButtonSize[] = ["sm", "md", "lg"];
-const variants: ButtonVariant[] = ["primary", "secondary", "tertiary", "tertiaryDanger", "danger"];
+const variants: ButtonVariant[] = ["primary", "secondary", "tertiary", "tertiaryDanger", "danger", "textSecondary"];
 
 export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
   return (

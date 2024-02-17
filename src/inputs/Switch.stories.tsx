@@ -13,7 +13,6 @@ import { SwitchGroup, SwitchGroupProps } from "./SwitchGroup";
 
 export default {
   component: SwitchComponent,
-  title: "Workspace/Inputs/Switch",
   parameters: {
     design: {
       type: "figma",
@@ -99,6 +98,14 @@ export const LabelStyles = () => {
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="hidden" />
       <h2 css={Css.baseMd.mb1.mt3.pt2.bt.bGray200.$}>Left</h2>
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="left" />
+      <h2 css={Css.baseMd.mb1.mt3.pt2.bt.bGray200.$}>Centered</h2>
+      <SwitchComponent
+        label="Example Label"
+        tooltip="Tooltip example"
+        onChange={setSelected}
+        selected={selected}
+        labelStyle="centered"
+      />
     </div>
   );
 };
@@ -116,7 +123,6 @@ type SwitchWrapperProps = Omit<SwitchProps, "onChange" | "selected"> &
 
 function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchWrapperProps) {
   const [selected, setSelected] = useState<boolean>(props.selected || false);
-
   return (
     <div
       css={{

@@ -12,16 +12,18 @@ export const Color = () => {
       <h1>Extended Palette</h1>
       <h2>Gray</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Gray"))} />
-      <h2>Light blue</h2>
-      <ListColors palette={paletteEntries.filter(([name]) => name.includes("LightBlue"))} />
+      <h2>Blue</h2>
+      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Blue"))} />
       <h2>Red</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Red"))} />
       <h2>Yellow</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Yellow"))} />
       <h2>Green</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Green"))} />
-      <h2>Violet</h2>
-      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Violet"))} />
+      <h2>Purple</h2>
+      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Purple"))} />
+      <h2>Orange</h2>
+      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Orange"))} />
     </div>
   );
 };

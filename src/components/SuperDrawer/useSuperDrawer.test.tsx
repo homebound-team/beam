@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react-hooks";
+import { act, renderHook } from "@testing-library/react";
 import { ReactElement, useEffect } from "react";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { render, withBeamRTL } from "src/utils/rtl";
@@ -8,8 +8,8 @@ import { useSuperDrawer } from "./index";
 describe("useSuperDrawer", () => {
   it("should allow `new` element to be added", async () => {
     const r = await render(<TestDrawerContent openInDrawer />);
-    expect(r.superDrawerHeader()).toHaveTextContent("Title");
-    expect(r.superDrawerContent()).toBeTruthy();
+    expect(r.superDrawerHeader).toHaveTextContent("Title");
+    expect(r.superDrawerContent).toBeTruthy();
   });
 
   it("should not allow `detail` element to be added", async () => {
@@ -20,12 +20,12 @@ describe("useSuperDrawer", () => {
 
   it("should allow `detail` element to be added when as least one `new` element is present", async () => {
     const r = await render(<TestDrawerContent openInDrawer openDrawerDetail />);
-    expect(r.superDrawerDetailContent()).toBeTruthy();
+    expect(r.superDrawerDetailContent).toBeTruthy();
   });
 
   it("should show `new` element after calling `closeDrawerDetail()`", async () => {
     const r = await render(<TestDrawerContent openInDrawer openDrawerDetail closeDrawerDetail />);
-    expect(r.superDrawerContent()).toBeTruthy();
+    expect(r.superDrawerContent).toBeTruthy();
   });
 
   it("should reset state when calling `closeDrawer()`", async () => {
@@ -112,7 +112,7 @@ describe("useSuperDrawer", () => {
     act(() => hook.addCanCloseDrawerCheck(() => false));
 
     // Then expect the drawer to not close.
-    expect(hook.closeDrawer()).toBeFalsy();
+    expect(await act(() => hook.closeDrawer())).toBeFalsy();
   });
 
   it("should show ConfirmCloseModal when a canCloseDrawerDetailCheck fails", async () => {
@@ -166,28 +166,33 @@ function TestDrawerContent(props: {
   closeDrawer?: boolean;
 }) {
   const context = useSuperDrawer();
-  useEffect(() => {
-    if (props.openInDrawer) {
-      context.openInDrawer({
-        content: (
-          <>
-            <SuperDrawerHeader title="Title" />
-            <h2 data-testid="superDrawerContent">SuperDrawer Content</h2>
-          </>
-        ),
-      });
-    }
-    if (props.openDrawerDetail) {
-      context.openDrawerDetail({
-        content: <h2 data-testid="superDrawerDetailContent">SuperDrawer Content</h2>,
-      });
-    }
-    if (props.closeDrawerDetail) {
-      context.closeDrawerDetail();
-    }
-    if (props.closeDrawer) {
-      context.closeDrawer();
-    }
-  }, []);
+  useEffect(
+    () => {
+      if (props.openInDrawer) {
+        context.openInDrawer({
+          content: (
+            <>
+              <SuperDrawerHeader title="Title" />
+              <h2 data-testid="superDrawerContent">SuperDrawer Content</h2>
+            </>
+          ),
+        });
+      }
+      if (props.openDrawerDetail) {
+        context.openDrawerDetail({
+          content: <h2 data-testid="superDrawerDetailContent">SuperDrawer Content</h2>,
+        });
+      }
+      if (props.closeDrawerDetail) {
+        context.closeDrawerDetail();
+      }
+      if (props.closeDrawer) {
+        context.closeDrawer();
+      }
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
   return <h1>Page Content</h1>;
 }

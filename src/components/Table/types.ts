@@ -1,14 +1,12 @@
-import { ReactElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
-import { GridDataRow, GridRowKind } from "src/components/Table/components/Row";
-import { GridTableApi } from "src/components/Table/GridTableApi";
+import { GridRowKind } from "src/components/Table/components/Row";
+import { GridRowApi } from "src/components/Table/GridTableApi";
 import { Margin, Xss } from "src/Css";
 
 export type Kinded = { kind: string };
 export type GridTableXss = Xss<Margin>;
 export type RenderAs = "div" | "table" | "virtual";
-export type RowTuple<R extends Kinded> = [GridDataRow<R>, ReactElement];
-export type ParentChildrenTuple<R extends Kinded> = [GridDataRow<R>, ParentChildrenTuple<R>[]];
 export type Direction = "ASC" | "DESC";
 
 export type MaybeFn<T> = T | (() => T);
@@ -33,17 +31,18 @@ export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends 
  * column being sorted, in which case we use the GridCellContent.value.
  */
 export type GridColumn<R extends Kinded> = {
+  /** Require a render function for each row `kind`. */
   [K in R["kind"]]:
     | string
     | GridCellContent
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (
             data: D,
-            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number; expanded: boolean },
+            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean },
           ) => ReactNode | GridCellContent
         : (
             data: undefined,
-            opts: { row: GridRowKind<R, K>; api: GridTableApi<R>; level: number; expanded: boolean },
+            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean },
           ) => ReactNode | GridCellContent);
 } & {
   /**
@@ -69,7 +68,7 @@ export type GridColumn<R extends Kinded> = {
   sticky?: "left" | "right";
   /** Prevent column from supporting RowStyle.onClick/rowLink in order to avoid nested interactivity. Defaults to true */
   wrapAction?: false;
-  /** Used as a signal to defer adding the 'indent' styling */
+  /** Used as a signal to defer adding the row's level indentation styling */
   isAction?: true;
   /** Column id that will be used to generate an unique identifier for every row cell */
   id?: string;
@@ -80,14 +79,22 @@ export type GridColumn<R extends Kinded> = {
   /** Flag that will allow to know which hide-able columns are visible on initial load */
   initVisible?: boolean;
   /** A list of columns that should only be shown when this column is "expanded" */
-  expandColumns?: GridColumn<R>[];
+  expandColumns?: GridColumn<R>[] | (() => Promise<GridColumn<R>[]>);
   /** Determines whether the group should initially be expanded on load of the table */
   initExpanded?: boolean;
+  /** Determines whether this column should be hidden when expanded (only the 'expandColumns' would show) */
+  hideOnExpand?: boolean;
 };
 
+/**
+ * Adds an `id` to `GridColumn`, for use in storage/APIs.
+ *
+ * Ideally we'd require this on `GridColumn` itself, but that would be
+ * a large breaking change for a lot of tables that don't need column ids.
+ */
 export type GridColumnWithId<R extends Kinded> = GridColumn<R> & {
   id: string;
-  expandColumns?: GridColumnWithId<R>[];
+  expandColumns?: GridColumnWithId<R>[] | (() => Promise<GridColumn<R>[]>);
 };
 
 export const nonKindGridColumnKeys = [
@@ -114,3 +121,10 @@ export type Pin = { at: "first" | "last"; filter?: boolean };
 
 // Use IfAny so that GridDataRow<any> doesn't devolve into any
 export type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
+
+export type InfiniteScroll = {
+  /** will be called when the user scrolls to the end of the list with the last item index as an argument. Return a promise to automatically show a loading spinner.  */
+  onEndReached: (index: number) => void | Promise<void>;
+  /** The number of pixels from the bottom of the list to eagerly trigger `onEndReached`. The default is 500px. */
+  endOffsetPx?: number;
+};

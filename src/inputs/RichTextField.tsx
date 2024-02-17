@@ -8,8 +8,9 @@ import Tribute from "tributejs";
 import "tributejs/dist/tribute.css";
 import "trix/dist/trix";
 import "trix/dist/trix.css";
+import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 
-export interface RichTextFieldProps {
+export interface RichTextFieldProps extends Pick<PresentationFieldProps, "fullWidth"> {
   /** The initial html value to show in the trix editor. */
   value: string | undefined;
   onChange: (html: string | undefined, text: string | undefined, mergeTags: string[]) => void;
@@ -38,7 +39,17 @@ export interface RichTextFieldProps {
  * We also integrate [tributejs]{@link https://github.com/zurb/tribute} for @ mentions.
  */
 export function RichTextField(props: RichTextFieldProps) {
-  const { mergeTags, label, value = "", onChange, onBlur = noop, onFocus = noop, readOnly } = props;
+  const { fieldProps } = usePresentationContext();
+  const {
+    mergeTags,
+    label,
+    value = "",
+    onChange,
+    onBlur = noop,
+    onFocus = noop,
+    readOnly,
+    fullWidth = fieldProps?.fullWidth ?? false,
+  } = props;
 
   // We get a reference to the Editor instance after trix-init fires
   const [editor, setEditor] = useState<Editor>();
@@ -58,60 +69,65 @@ export function RichTextField(props: RichTextFieldProps) {
   onFocusRef.current = onFocus;
 
   // Generate a unique id to be used for matching `trix-initialize` event for this instance.
-  const id = useMemo(() => {
-    if (readOnly) return;
+  const id = useMemo(
+    () => {
+      if (readOnly) return;
 
-    const id = `trix-editor-${trixId}`;
-    trixId++;
+      const id = `trix-editor-${trixId}`;
+      trixId++;
 
-    function onEditorInit(e: Event) {
-      const targetEl = e.target as HTMLElement;
-      if (targetEl.id === id) {
-        editorElement.current = targetEl;
-        const editor = (editorElement.current as any).editor;
-        setEditor(editor);
-        if (mergeTags !== undefined) {
-          attachTributeJs(mergeTags, editorElement.current!);
-        }
-
-        currentHtml.current = value;
-        editor.loadHTML(value || "");
-        // Remove listener once we've initialized
-        window.removeEventListener("trix-initialize", onEditorInit);
-
-        function trixChange(e: ChangeEvent) {
-          const { textContent, innerHTML } = e.target;
-          const onChange = onChangeRef.current;
-          // If the user only types whitespace, treat that as undefined
-          if ((textContent || "").trim() === "") {
-            currentHtml.current = undefined;
-            onChange && onChange(undefined, undefined, []);
-          } else {
-            currentHtml.current = innerHTML;
-            const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
-            onChange && onChange(innerHTML, textContent || undefined, mentions);
+      function onEditorInit(e: Event) {
+        const targetEl = e.target as HTMLElement;
+        if (targetEl.id === id) {
+          editorElement.current = targetEl;
+          const editor = (editorElement.current as any).editor;
+          setEditor(editor);
+          if (mergeTags !== undefined) {
+            attachTributeJs(mergeTags, editorElement.current!);
           }
+
+          currentHtml.current = value;
+          editor.loadHTML(value || "");
+          // Remove listener once we've initialized
+          window.removeEventListener("trix-initialize", onEditorInit);
+
+          function trixChange(e: ChangeEvent) {
+            const { textContent, innerHTML } = e.target;
+            const onChange = onChangeRef.current;
+            // If the user only types whitespace, treat that as undefined
+            if ((textContent || "").trim() === "") {
+              currentHtml.current = undefined;
+              onChange && onChange(undefined, undefined, []);
+            } else {
+              currentHtml.current = innerHTML;
+              const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
+              onChange && onChange(innerHTML, textContent || undefined, mentions);
+            }
+          }
+
+          const trixBlur = () => maybeCall(onBlurRef.current);
+          const trixFocus = () => maybeCall(onFocusRef.current);
+
+          // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
+          // https://github.com/basecamp/trix#storing-attached-files
+          const preventDefault = (e: any) => e.preventDefault();
+          window.addEventListener("trix-file-accept", preventDefault);
+
+          editorElement.current.addEventListener("trix-change", trixChange as any);
+          editorElement.current.addEventListener("trix-blur", trixBlur);
+          editorElement.current.addEventListener("trix-focus", trixFocus);
         }
-
-        const trixBlur = () => maybeCall(onBlurRef.current);
-        const trixFocus = () => maybeCall(onFocusRef.current);
-
-        // We don't want to allow file attachment for now.  In addition to hiding the button, also disable drag-and-drop
-        // https://github.com/basecamp/trix#storing-attached-files
-        const preventDefault = (e: any) => e.preventDefault();
-        window.addEventListener("trix-file-accept", preventDefault);
-
-        editorElement.current.addEventListener("trix-change", trixChange as any);
-        editorElement.current.addEventListener("trix-blur", trixBlur);
-        editorElement.current.addEventListener("trix-focus", trixFocus);
       }
-    }
 
-    // Attaching listener to the `window` to we're listening prior to render.
-    // The <trix-editor /> web component's `trix-initialize` event may fire before a `useEffect` hook in the component is executed, making it difficult ot attach the event listener locally.
-    window.addEventListener("trix-initialize", onEditorInit);
-    return id;
-  }, []);
+      // Attaching listener to the `window` to we're listening prior to render.
+      // The <trix-editor /> web component's `trix-initialize` event may fire before a `useEffect` hook in the component is executed, making it difficult ot attach the event listener locally.
+      window.addEventListener("trix-initialize", onEditorInit);
+      return id;
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   useEffect(() => {
     // If our value prop changes (without the change coming from us), reload it
@@ -124,7 +140,7 @@ export function RichTextField(props: RichTextFieldProps) {
 
   if (!readOnly) {
     return (
-      <div css={Css.w100.maxw("550px").$}>
+      <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
         {/* TODO: Not sure what to pass to labelProps. */}
         {label && <Label labelProps={{}} label={label} />}
         <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }}>
@@ -143,7 +159,7 @@ export function RichTextField(props: RichTextFieldProps) {
     );
   } else {
     return (
-      <div css={Css.w100.maxw("550px").$}>
+      <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
         {label && <Label label={label} />}
         <div
           css={Css.mh("120px").bgWhite.sm.gray900.bn.p1.br4.bGray300.ba.$}
@@ -168,7 +184,7 @@ function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
     // According to the Tribute Types, `original.value` should always be present.
     // However, we have received errors in DataDog for "Cannot read properties of undefined (reading 'original')", so we're adding some checks.
     selectTemplate: (item) =>
-      item?.original?.value ? `<span style="color: ${Palette.LightBlue700};">@${item.original.value}</span>` : "",
+      item?.original?.value ? `<span style="color: ${Palette.Blue700};">@${item.original.value}</span>` : "",
     values,
   });
   // In dev mode, this fails because jsdom doesn't support contentEditable. Note that
@@ -186,7 +202,7 @@ const trixCssOverrides = {
   // Some basic copy/paste from TextFieldBase
   "& trix-editor": Css.bgWhite.sm.gray900.bn.p1.$,
   // Highlight on focus
-  "&:focus-within": Css.bLightBlue700.$,
+  "&:focus-within": Css.bBlue700.$,
   "& trix-toolbar": Css.m1.$,
   // Make the buttons closer to ours
   "& .trix-button:not(:first-of-type)": Css.bn.$,
@@ -212,7 +228,7 @@ const trixCssOverrides = {
 // Style the @ mention box
 const tributeOverrides = {
   ".tribute-container": Css.add({ minWidth: "300px" }).$,
-  ".tribute-container > ul": Css.sm.bgWhite.ba.br4.bLightBlue700.overflowHidden.$,
+  ".tribute-container > ul": Css.sm.bgWhite.ba.br4.bBlue700.overflowHidden.$,
 };
 
 function extractIdsFromMentions(mergeTags: string[], content: string): string[] {

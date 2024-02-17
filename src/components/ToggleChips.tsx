@@ -1,4 +1,3 @@
-import React from "react";
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css, Margin, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";

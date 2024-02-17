@@ -9,7 +9,6 @@ import { HasIdAndName, Optional } from "src/types";
 
 export default {
   component: MultiSelectField,
-  title: "Workspace/Inputs/Multi Select Fields",
   parameters: {
     design: {
       type: "figma",
@@ -173,6 +172,11 @@ export function MultiSelectFields() {
             </div>
           )}
         />
+      </div>
+
+      <div css={Css.df.fdc.gap2.$}>
+        <h1 css={Css.lg.$}>Full Width</h1>
+        <TestMultiSelectField fullWidth label="Favorite Icon" values={[options[2].id]} options={options} />
       </div>
     </div>
   );

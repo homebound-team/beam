@@ -54,9 +54,14 @@ export function ChipTextField(props: ChipTextFieldProps) {
   const fieldRef = useRef<HTMLSpanElement>(null);
   const typeScale = fieldProps?.typeScale ?? "sm";
 
-  useEffect(() => {
-    autoFocus && fieldRef.current?.focus();
-  }, []);
+  useEffect(
+    () => {
+      autoFocus && fieldRef.current?.focus();
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   // React doesn't like contentEditable because it takes the children of the node out of React's scope. This is fine in this case as it is just a text value and we are managing it.
   return (
@@ -75,9 +80,11 @@ export function ChipTextField(props: ChipTextFieldProps) {
         }
       }}
       onInput={(e: KeyboardEvent<HTMLElement>) => {
-        // Prevent user from pasting content that has new line characters and replace with empty space.
         const target = e.target as HTMLElement;
-        target.textContent = target.textContent?.replace(/[\n\r]/g, " ") ?? "";
+        if ("inputType" in e.nativeEvent && e.nativeEvent.inputType === "insertFromPaste") {
+          // Clean up any formatting from pasted text
+          target.innerHTML = target.textContent?.replace(/[A\n\r]/g, " ") ?? "";
+        }
         onChange(target.textContent ?? "");
       }}
       {...focusProps}

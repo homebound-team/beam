@@ -5,7 +5,7 @@ import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
 export type BoundToggleChipGroupFieldProps = Omit<ToggleChipGroupProps, "values" | "onChange" | "label"> & {
-  field: FieldState<any, string[] | null | undefined>;
+  field: FieldState<string[] | null | undefined>;
   /** Make optional so that callers can override if they want to. */
   onChange?: (values: string[]) => void;
   label?: string;

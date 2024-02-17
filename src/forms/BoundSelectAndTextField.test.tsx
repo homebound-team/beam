@@ -1,10 +1,9 @@
 import { createObjectState, ObjectConfig, required, useFormState } from "@homebound/form-state";
-import { click } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { Observer } from "mobx-react";
 import { BoundSelectAndTextField } from "src";
 import { ScheduleTypes } from "src/components/Filters/testDomain";
-import { render, type } from "src/utils/rtl";
+import { click, render, type } from "src/utils/rtl";
 
 describe("BoundSelectAndTextField", () => {
   it("renders and updates values", async () => {
@@ -12,23 +11,23 @@ describe("BoundSelectAndTextField", () => {
     const r = await render(<TestComponent />);
 
     // Then it is initially empty
-    expect(r.type()).not.toHaveValue();
-    expect(r.typeValue()).toBeEmptyDOMElement();
+    expect(r.type).not.toHaveValue();
+    expect(r.typeValue).toBeEmptyDOMElement();
 
-    expect(r.name()).not.toHaveValue();
-    expect(r.nameValue()).toBeEmptyDOMElement();
+    expect(r.name).not.toHaveValue();
+    expect(r.nameValue).toBeEmptyDOMElement();
 
     // When changing the values
-    fireEvent.click(r.type());
+    click(r.type);
     click(r.getByRole("option", { name: "Task" }));
     type(r.name, "Test Task Name");
 
     // Then the values should update
-    expect(r.type()).toHaveValue("Task");
-    expect(r.typeValue().textContent).toBe("TASK");
+    expect(r.type).toHaveValue("Task");
+    expect(r.typeValue.textContent).toBe("TASK");
 
-    expect(r.name()).toHaveValue("Test Task Name");
-    expect(r.nameValue().textContent).toBe("Test Task Name");
+    expect(r.name).toHaveValue("Test Task Name");
+    expect(r.nameValue.textContent).toBe("Test Task Name");
   });
 
   it("can set custom testid", async () => {
@@ -36,8 +35,8 @@ describe("BoundSelectAndTextField", () => {
     const r = await render(<TestComponent data-testid="custom" />);
 
     // Then expect it to prefix the default field testids
-    expect(r.custom_type()).toBeTruthy();
-    expect(r.custom_name()).toBeTruthy();
+    expect(r.custom_type).toBeTruthy();
+    expect(r.custom_name).toBeTruthy();
   });
 
   it("can fire onBlur and onFocus for fields", async () => {
@@ -59,10 +58,10 @@ describe("BoundSelectAndTextField", () => {
     );
 
     // When firing the focus and blur events on both fields
-    fireEvent.focus(r.type());
-    fireEvent.blur(r.type());
-    fireEvent.focus(r.name());
-    fireEvent.blur(r.name());
+    fireEvent.focus(r.type);
+    fireEvent.blur(r.type);
+    fireEvent.focus(r.name);
+    fireEvent.blur(r.name);
 
     // Then the callback functions should each have been fired.
     expect(selectOnFocus).toBeCalledTimes(1);
@@ -87,13 +86,13 @@ describe("BoundSelectAndTextField", () => {
     );
 
     // When making a selection from the dropdown
-    r.type().click();
+    click(r.type);
     click(r.getByRole("option", { name: "Task" }));
     // Then autoSave should be called.
     expect(maybeAutoSave).toBeCalledTimes(1);
 
     // And when using the "Enter" key on the text field
-    fireEvent.keyDown(r.name(), { key: "Enter" });
+    fireEvent.keyDown(r.name, { key: "Enter" });
     // Then autoSave should be called.
     expect(maybeAutoSave).toBeCalledTimes(2);
   });

@@ -1,7 +1,9 @@
 import memoizeOne from "memoize-one";
-import { toJS } from "mobx";
-import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef } from "react";
+import { runInAction } from "mobx";
+import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import { Loader } from "src/components";
+import { DiscriminateUnion, GridRowKind } from "src/components/index";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
@@ -11,27 +13,20 @@ import {
   GridColumn,
   GridColumnWithId,
   GridTableXss,
+  InfiniteScroll,
   Kinded,
-  ParentChildrenTuple,
   RenderAs,
-  RowTuple,
 } from "src/components/Table/types";
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
-import { createRowLookup, GridRowLookup } from "src/components/Table/utils/GridRowLookup";
-import { sortRows } from "src/components/Table/utils/sortRows";
+import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import {
-  applyRowFn,
-  EXPANDABLE_HEADER,
-  matchesFilter,
-  reservedRowKinds,
-  TOTALS,
-  zIndices,
-} from "src/components/Table/utils/utils";
+import { EXPANDABLE_HEADER, KEPT_GROUP, isCursorBelowMidpoint, zIndices } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
+import { isPromise } from "src/utils";
 import { GridDataRow, Row } from "./components/Row";
+import { DraggedOver } from "./utils/RowState";
 
 let runningInJest = false;
 
@@ -89,6 +84,17 @@ export type GridSortConfig =
       onSort: (orderBy: string | undefined, direction: Direction | undefined) => void;
     };
 
+/** Allows listening to per-kind row selection changes. */
+export type OnRowSelect<R extends Kinded> = {
+  [K in R["kind"]]?: DiscriminateUnion<R, "kind", K> extends { data: infer D }
+    ? (data: D, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void
+    : (data: undefined, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void;
+};
+
+type DragEventType = React.DragEvent<HTMLElement>;
+
+export type OnRowDragEvent<R extends Kinded> = (draggedRow: GridDataRow<R>, event: DragEventType) => void;
+
 export interface GridTableProps<R extends Kinded, X> {
   id?: string;
   /**
@@ -125,8 +131,6 @@ export interface GridTableProps<R extends Kinded, X> {
   filter?: string;
   /** Caps the client-side filter to a max number of rows. */
   filterMaxRows?: number;
-  /** Accepts the number of filtered rows (based on `filter`), for the caller to observe and display if they want. */
-  setRowCount?: (rowCount: number) => void;
   /** A combination of CSS settings to set the static look & feel (vs. rowStyles which is per-row styling). */
   style?: GridStyle | GridStyleDef;
   /**
@@ -157,6 +161,18 @@ export interface GridTableProps<R extends Kinded, X> {
    * This is beneficial when looking at the same table, but of a different subject (i.e. Project A's PreCon Schedule vs Project A's Construction schedule)
    */
   visibleColumnsStorageKey?: string;
+  /**
+   * Infinite scroll is only supported with `as=virtual` mode
+   *
+   ** `onEndReached` will be called when the user scrolls to the end of the list with the last item index as an argument.
+   ** `endOffsetPx` is the number of pixels from the bottom of the list to eagerly trigger `onEndReached`. The default is is 500px.
+   */
+  infiniteScroll?: InfiniteScroll;
+  /** Callback for when a row is selected or unselected. */
+  onRowSelect?: OnRowSelect<R>;
+
+  /** Drag & drop Callback. */
+  onRowDrop?: (draggedRow: GridDataRow<R>, droppedRow: GridDataRow<R>, indexOffset: number) => void;
 }
 
 /**
@@ -174,8 +190,12 @@ export interface GridTableProps<R extends Kinded, X> {
  * In a "kind" of cute way, headers are not modeled specially, i.e. they are just another
  * row `kind` along with the data rows. (Admittedly, out of pragmatism, we do apply some
  * special styling to the row that uses `kind: "header"`.)
+ *
+ * For some rationale of our current/historical rendering approaches, see the following doc:
+ *
+ * https://docs.google.com/document/d/1DFnlkDubK4nG_GLf_hB8yp0flnSNt_3IBh5iOicuaFM/edit#heading=h.9m9cpwgeqfc9
  */
-export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}>(props: GridTableProps<R, X>) {
+export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = any>(props: GridTableProps<R, X>) {
   const {
     id = "gridTable",
     as = "div",
@@ -190,12 +210,14 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
     filterMaxRows,
     fallbackMessage = "No rows found.",
     infoMessage,
-    setRowCount,
     persistCollapse,
     resizeTarget,
     activeRowId,
     activeCellId,
     visibleColumnsStorageKey,
+    infiniteScroll,
+    onRowSelect,
+    onRowDrop: droppedCallback,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
@@ -205,45 +227,58 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
   // Use this ref to watch for changes in the GridTable's container and resize columns accordingly.
   const resizeRef = useRef<HTMLDivElement>(null);
 
-  const api = useMemo<GridTableApiImpl<R>>(() => {
-    const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
-    api.init(persistCollapse, virtuosoRef, rows);
-    api.setActiveRowId(activeRowId);
-    api.setActiveCellId(activeCellId);
-    return api;
-  }, [props.api]);
+  const api = useMemo<GridTableApiImpl<R>>(
+    () => {
+      // Let the user pass in their own api handle, otherwise make our own
+      const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
+      api.init(persistCollapse, virtuosoRef);
+      api.setActiveRowId(activeRowId);
+      api.setActiveCellId(activeCellId);
+      // Push the initial columns directly into tableState, b/c that is what
+      // makes the tests pass, but then further updates we'll do through useEffect
+      // to avoid "Cannot update component during render" errors.
+      api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+      return api;
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [props.api],
+  );
+
+  const [draggedRow, _setDraggedRow] = useState<GridDataRow<R> | undefined>(undefined);
+  const draggedRowRef = useRef(draggedRow);
+  const setDraggedRow = (row: GridDataRow<R> | undefined) => {
+    draggedRowRef.current = row;
+    _setDraggedRow(row);
+  };
 
   const style = resolveStyles(maybeStyle);
   const { tableState } = api;
 
-  tableState.setRows(rows);
-  tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
-  const columns: GridColumnWithId<R>[] = useComputed(
-    () =>
-      tableState.columns
-        .filter((c) => tableState.visibleColumnIds.includes(c.id))
-        .flatMap((c) =>
-          c.expandColumns && tableState.expandedColumnIds.includes(c.id) ? [c, ...c.expandColumns] : [c],
-        ) as GridColumnWithId<R>[],
-    [tableState],
-  );
+  tableState.onRowSelect = onRowSelect;
+
+  // Use a single useEffect to push props into the TableState observable, that
+  // way we avoid React warnings when the observable mutations cause downstream
+  // components to be marked for re-render. Mobx will ignore setter calls that
+  // don't actually change the value, so we can do this in a single useEffect.
+  useEffect(() => {
+    // Use runInAction so mobx delays any reactions until all the mutations happen
+    runInAction(() => {
+      tableState.setRows(rows);
+      tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+      tableState.setSearch(filter);
+      tableState.activeRowId = activeRowId;
+      tableState.activeCellId = activeCellId;
+    });
+  }, [tableState, rows, columnsWithIds, visibleColumnsStorageKey, activeRowId, activeCellId, filter]);
+
+  const columns: GridColumnWithId<R>[] = useComputed(() => {
+    return tableState.visibleColumns as GridColumnWithId<R>[];
+  }, [tableState]);
 
   // Initialize the sort state. This will only happen on the first render.
   // Once the `TableState.sort` is defined, it will not re-initialize.
   tableState.initSortState(props.sorting, columns);
-
-  const [sortOn, caseSensitive] = useComputed(() => {
-    const { sortConfig } = tableState;
-    return [sortConfig?.on, sortConfig?.on === "client" ? !!sortConfig.caseSensitive : false];
-  }, [tableState]);
-
-  useEffect(() => {
-    tableState.activeRowId = activeRowId;
-  }, [tableState, activeRowId]);
-
-  useEffect(() => {
-    tableState.activeCellId = activeCellId;
-  }, [tableState, activeCellId]);
 
   // We track render count at the table level, which seems odd (we should be able to track this
   // internally within each GridRow using a useRef), but we have suspicions that react-virtuoso
@@ -251,124 +286,175 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
   // here instead.
   const { getCount } = useRenderCount();
 
+  // Our column sizes use either `w` or `expandedWidth`, so see which columns are currently expanded
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const columnSizes = useSetupColumnSizes(style, columns, resizeTarget ?? resizeRef, expandedColumnIds);
 
-  // Make a single copy of our current collapsed state, so we'll have a single observer.
-  const collapsedIds = useComputed(() => tableState.collapsedIds, [tableState]);
-  const sortState = useComputed(() => toJS(tableState.sortState), [tableState]);
+  // allows us to unset children and grandchildren, etc.
+  function recursiveSetDraggedOver(rows: GridDataRow<R>[], draggedOver: DraggedOver) {
+    rows.forEach((r) => {
+      tableState.maybeSetRowDraggedOver(r.id, draggedOver);
+      if (r.children) {
+        recursiveSetDraggedOver(r.children, draggedOver);
+      }
+    });
+  }
 
-  const maybeSorted = useMemo(() => {
-    if (sortOn === "client" && sortState) {
-      // If using client-side sort, the sortState use S = number
-      return sortRows(columns, rows, sortState, caseSensitive);
+  function onDragStart(row: GridDataRow<R>, evt: DragEventType) {
+    if (!row.draggable || !droppedCallback) {
+      return;
     }
-    return rows;
-  }, [columns, rows, sortOn, sortState, caseSensitive]);
 
-  // Flatten + component-ize the sorted rows.
-  let [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, filteredRowIds]: [
-    RowTuple<R>[],
-    RowTuple<R>[],
-    RowTuple<R>[],
-    RowTuple<R>[],
-    string[],
-  ] = useMemo(() => {
-    function makeRowComponent(row: GridDataRow<R>, level: number): JSX.Element {
-      return (
+    evt.dataTransfer.effectAllowed = "move";
+    evt.dataTransfer.setData("text/plain", JSON.stringify({ row }));
+    setDraggedRow(row);
+  }
+
+  const onDragEnd = (row: GridDataRow<R>, evt: DragEventType) => {
+    if (!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+    recursiveSetDraggedOver(rows, DraggedOver.None);
+  };
+
+  const onDrop = (row: GridDataRow<R>, evt: DragEventType) => {
+    if (!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+    if (droppedCallback) {
+      recursiveSetDraggedOver(rows, DraggedOver.None);
+
+      try {
+        const draggedRowData = JSON.parse(evt.dataTransfer.getData("text/plain")).row;
+
+        if (draggedRowData.id === row.id) {
+          return;
+        }
+
+        const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+
+        droppedCallback(draggedRowData, row, isBelow ? 1 : 0);
+      } catch (e: any) {
+        console.error(e.message, e.stack);
+      }
+    }
+  };
+
+  const onDragEnter = (row: GridDataRow<R>, evt: DragEventType) => {
+    if (!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+
+    // set flags for css spacer
+    // don't set none for the row we are entering
+    recursiveSetDraggedOver(
+      rows.filter((r) => r.id !== row.id),
+      DraggedOver.None,
+    );
+
+    if (draggedRowRef.current) {
+      if (draggedRowRef.current.id === row.id) {
+        return;
+      }
+
+      // determine above or below
+      const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+      tableState.maybeSetRowDraggedOver(row.id, isBelow ? DraggedOver.Below : DraggedOver.Above, draggedRowRef.current);
+    }
+  };
+
+  const onDragOver = (row: GridDataRow<R>, evt: DragEventType) => {
+    if (!row.draggable || !droppedCallback) {
+      return;
+    }
+
+    evt.preventDefault();
+
+    if (draggedRowRef.current) {
+      if (draggedRowRef.current.id === row.id || !evt.currentTarget) {
+        tableState.maybeSetRowDraggedOver(row.id, DraggedOver.None, draggedRowRef.current);
+        return;
+      }
+
+      // continuously determine above or below
+      const isBelow = isCursorBelowMidpoint(evt.currentTarget, evt.clientY);
+      tableState.maybeSetRowDraggedOver(row.id, isBelow ? DraggedOver.Below : DraggedOver.Above, draggedRowRef.current);
+    }
+  };
+
+  // Flatten, hide-if-filtered, hide-if-collapsed, and component-ize the sorted rows.
+  const [tableHeadRows, visibleDataRows, keptSelectedRows, tooManyClientSideRows]: [
+    ReactElement[],
+    ReactElement[],
+    ReactElement[],
+    boolean,
+  ] = useComputed(() => {
+    // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
+    const headerRows: ReactElement[] = [];
+    const expandableHeaderRows: ReactElement[] = [];
+    const totalsRows: ReactElement[] = [];
+    const keptSelectedRows: ReactElement[] = [];
+    let visibleDataRows: ReactElement[] = [];
+
+    const { visibleRows } = tableState;
+    const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
+
+    // Get the flat list or rows from the header down...
+    visibleRows.forEach((rs) => {
+      const row = (
         <Row
-          key={`${row.kind}-${row.id}`}
+          key={rs.key}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
+          onDragEnter={onDragEnter}
           {...{
             as,
-            columns,
-            row,
+            rs,
             style,
             rowStyles,
             columnSizes,
-            level,
             getCount,
-            api,
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
-            sortOn,
             hasExpandableHeader,
           }}
         />
       );
-    }
-
-    // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
-    const headerRows: RowTuple<R>[] = [];
-    const expandableHeaderRows: RowTuple<R>[] = [];
-    const totalsRows: RowTuple<R>[] = [];
-    const visibleDataRows: RowTuple<R>[] = [];
-    const filteredRowIds: string[] = [];
-
-    const hasTotalsRow = rows.some((row) => row.id === TOTALS);
-    const hasExpandableHeader = rows.some((row) => row.id === EXPANDABLE_HEADER);
-
-    function visit([row, children]: ParentChildrenTuple<R>, level: number, visible: boolean): void {
-      visible && visibleDataRows.push([row, makeRowComponent(row, level)]);
-      // This row may be invisible (because it's parent is collapsed), but we still want
-      // to consider it matched if it or it's parent matched a filter.
-      filteredRowIds.push(row.id);
-
-      if (children.length) {
-        // Consider "isCollapsed" as true if the parent wasn't visible.
-        const isCollapsed = !visible || collapsedIds.includes(row.id);
-        visitRows(children, level + 1, !isCollapsed);
+      if (rs.kind === "header") {
+        headerRows.push(row);
+      } else if (rs.kind === "expandableHeader") {
+        expandableHeaderRows.push(row);
+      } else if (rs.kind === "totals") {
+        totalsRows.push(row);
+      } else if (rs.isKept || rs.kind === KEPT_GROUP) {
+        keptSelectedRows.push(row);
+      } else {
+        visibleDataRows.push(row);
       }
+    });
+
+    // Once our header rows are created we can organize them in expected order.
+    const tableHeadRows = expandableHeaderRows.concat(headerRows).concat(totalsRows);
+
+    const tooManyClientSideRows = !!filterMaxRows && visibleDataRows.length > filterMaxRows;
+    if (tooManyClientSideRows) {
+      visibleDataRows = visibleDataRows.slice(0, filterMaxRows + keptSelectedRows.length);
     }
 
-    function visitRows(rows: ParentChildrenTuple<R>[], level: number, visible: boolean): void {
-      rows.forEach((row, i) => {
-        if (row[0].kind === "header") {
-          headerRows.push([row[0], makeRowComponent(row[0], level)]);
-          return;
-        }
-
-        if (row[0].kind === "totals") {
-          totalsRows.push([row[0], makeRowComponent(row[0], level)]);
-          return;
-        }
-
-        if (row[0].kind === "expandableHeader") {
-          expandableHeaderRows.push([row[0], makeRowComponent(row[0], level)]);
-          return;
-        }
-
-        visit(row, level, visible);
-      });
-    }
-
-    // Call `visitRows` with our a pre-filtered set list
-    const filteredRows = filterRows(api, columns, maybeSorted, filter);
-    visitRows(filteredRows, 0, true);
-
-    return [headerRows, visibleDataRows, totalsRows, expandableHeaderRows, filteredRowIds];
-  }, [as, api, filter, maybeSorted, columns, style, rowStyles, sortOn, columnSizes, collapsedIds, getCount]);
-
-  // Once our header rows are created we can organize them in expected order.
-  const tableHeadRows = totalsRows.concat(expandableHeaderRows).concat(headerRows);
-
-  let tooManyClientSideRows = false;
-  if (filterMaxRows && visibleDataRows.length > filterMaxRows) {
-    tooManyClientSideRows = true;
-    visibleDataRows = visibleDataRows.slice(0, filterMaxRows);
-  }
-
-  tableState.setMatchedRows(filteredRowIds);
+    return [tableHeadRows, visibleDataRows, keptSelectedRows, tooManyClientSideRows];
+  }, [as, api, style, rowStyles, maybeStyle, columnSizes, getCount, filterMaxRows]);
 
   // Push back to the caller a way to ask us where a row is.
-  const { rowLookup } = props;
-  if (rowLookup) {
-    // Refs are cheap to assign to, so we don't bother doing this in a useEffect
-    rowLookup.current = createRowLookup(columns, visibleDataRows, virtuosoRef);
-  }
-
-  useEffect(() => {
-    setRowCount && visibleDataRows?.length !== undefined && setRowCount(visibleDataRows.length);
-  }, [visibleDataRows?.length, setRowCount]);
+  // Refs are cheap to assign to, so we don't bother doing this in a useEffect
+  if (props.rowLookup) props.rowLookup.current = api.lookup;
 
   const noData = visibleDataRows.length === 0;
   const firstRowMessage =
@@ -406,12 +492,14 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = {}
           id,
           columns,
           visibleDataRows,
+          keptSelectedRows,
           firstRowMessage,
           stickyHeader,
           xss,
           virtuosoRef,
           tableHeadRows,
           stickyOffset,
+          infiniteScroll,
         )}
       </PresentationProvider>
     </TableStateContext.Provider>
@@ -430,13 +518,15 @@ function renderDiv<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumnWithId<R>[],
-  visibleDataRows: RowTuple<R>[],
+  visibleDataRows: ReactElement[],
+  keptSelectedRows: ReactElement[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
-  tableHeadRows: RowTuple<R>[],
+  tableHeadRows: ReactElement[],
   stickyOffset: number,
+  _infiniteScroll?: InfiniteScroll,
 ): ReactElement {
   return (
     <div
@@ -459,24 +549,25 @@ function renderDiv<R extends Kinded>(
           ...Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$,
         }}
       >
-        {tableHeadRows.map(([, node]) => node)}
+        {tableHeadRows}
       </div>
 
       {/* Table Body */}
       <div
         css={{
           ...(style.betweenRowsCss ? Css.addIn(`& > div > *`, style.betweenRowsCss).$ : {}),
-          ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:first-of-type > *`, style.firstNonHeaderRowCss).$ : {}),
+          ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:first-of-type`, style.firstNonHeaderRowCss).$ : {}),
           ...(style.lastRowCss && Css.addIn("& > div:last-of-type", style.lastRowCss).$),
         }}
       >
+        {keptSelectedRows}
         {/* Show an info message if it's set. */}
         {firstRowMessage && (
           <div css={{ ...style.firstRowMessageCss }} data-gridrow>
             {firstRowMessage}
           </div>
         )}
-        {visibleDataRows.map(([, node]) => node)}
+        {visibleDataRows}
       </div>
     </div>
   );
@@ -487,13 +578,15 @@ function renderTable<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumnWithId<R>[],
-  visibleDataRows: RowTuple<R>[],
+  visibleDataRows: ReactElement[],
+  keptSelectedRows: ReactElement[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
-  tableHeadRows: RowTuple<R>[],
+  tableHeadRows: ReactElement[],
   stickyOffset: number,
+  _infiniteScroll?: InfiniteScroll,
 ): ReactElement {
   return (
     <table
@@ -501,7 +594,7 @@ function renderTable<R extends Kinded>(
         ...Css.w100.add("borderCollapse", "separate").add("borderSpacing", "0").$,
         ...Css.addIn("& > tbody > tr > * ", style.betweenRowsCss || {})
           // removes border between header and second row
-          .addIn("& > tbody > tr:first-of-type > *", style.firstNonHeaderRowCss || {}).$,
+          .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss || {}).$,
         ...Css.addIn("& > tbody > tr:last-of-type", style.lastRowCss).$,
         ...Css.addIn("& > thead > tr:first-of-type", style.firstRowCss).$,
         ...style.rootCss,
@@ -510,10 +603,9 @@ function renderTable<R extends Kinded>(
       }}
       data-testid={id}
     >
-      <thead css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$}>
-        {tableHeadRows.map(([, node]) => node)}
-      </thead>
+      <thead css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$}>{tableHeadRows}</thead>
       <tbody>
+        {keptSelectedRows}
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
           <tr>
@@ -522,7 +614,7 @@ function renderTable<R extends Kinded>(
             </td>
           </tr>
         )}
-        {visibleDataRows.map(([, node]) => node)}
+        {visibleDataRows}
       </tbody>
     </table>
   );
@@ -552,19 +644,24 @@ function renderVirtual<R extends Kinded>(
   style: GridStyle,
   id: string,
   columns: GridColumnWithId<R>[],
-  visibleDataRows: RowTuple<R>[],
+  visibleDataRows: ReactElement[],
+  keptSelectedRows: ReactElement[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
-  tableHeadRows: RowTuple<R>[],
+  tableHeadRows: ReactElement[],
   _stickyOffset: number,
+  infiniteScroll?: InfiniteScroll,
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
     const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
     return { footerStyle: { paddingBottom }, listStyle: { ...style, rootCss: otherRootStyles } };
   }, [style]);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
 
   return (
     <Virtuoso
@@ -579,20 +676,38 @@ function renderVirtual<R extends Kinded>(
             style={{ ...props.style, ...{ zIndex: zIndices.stickyHeader } }}
           />
         )),
-        List: VirtualRoot(listStyle, columns, id, xss),
-        Footer: () => <div css={footerStyle} />,
+        List: VirtualRoot(listStyle, columns as any, id, xss),
+        Footer: () => {
+          return (
+            <div css={footerStyle}>
+              {fetchMoreInProgress && (
+                <div css={Css.h5.df.aic.jcc.$}>
+                  <Loader size={"xs"} />
+                </div>
+              )}
+            </div>
+          );
+        },
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
-      topItemCount={(stickyHeader ? tableHeadRows.length : 0) + (firstRowMessage ? 1 : 0)}
+      topItemCount={stickyHeader ? tableHeadRows.length : 0}
       itemContent={(index) => {
-        // Since we have 2 arrays of rows: `tableHeadRows`, and `filteredRow` we must determine which one to render.
+        // Since we have 3 arrays of rows: `tableHeadRows` and `visibleDataRows` and `keptSelectedRows` we must determine which one to render.
 
         if (index < tableHeadRows.length) {
-          return tableHeadRows[index][1];
+          return tableHeadRows[index];
         }
 
         // Reset index
         index -= tableHeadRows.length;
+
+        // Show keptSelectedRows if there are any
+        if (index < keptSelectedRows.length) {
+          return keptSelectedRows[index];
+        }
+
+        // Reset index
+        index -= keptSelectedRows.length;
 
         // Show firstRowMessage as the first `filteredRow`
         if (firstRowMessage) {
@@ -609,10 +724,33 @@ function renderVirtual<R extends Kinded>(
           index--;
         }
 
-        // Lastly render `filteredRow`
-        return visibleDataRows[index][1];
+        // Lastly render the table body rows
+        return visibleDataRows[index];
       }}
-      totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length}
+      totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
+      // When implementing infinite scroll, default the bottom `increaseViewportBy` to 500px. This creates the "infinite"
+      // effect such that the next page of data is (hopefully) loaded before the user reaches the true bottom
+      // Spreading these props due to virtuoso erroring when `increaseViewportBy` is undefined
+      {...(infiniteScroll
+        ? {
+            increaseViewportBy: {
+              bottom: infiniteScroll.endOffsetPx ?? 500,
+              top: 0,
+            },
+            // Add a `index > 0` check b/c Virtuoso is calling this in storybook
+            // with `endReached(0)` at odd times, like on page unload/story load,
+            // which then causes our test data to have duplicate ids in it.
+            endReached: (index) => {
+              if (index === 0) return;
+
+              const result = infiniteScroll.onEndReached(index);
+              if (isPromise(result)) {
+                setFetchMoreInProgress(true);
+                result.finally(() => setFetchMoreInProgress(false));
+              }
+            },
+          }
+        : {})}
     />
   );
 }
@@ -650,7 +788,7 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
             ...(isHeader
               ? Css.addIn("& > div:first-of-type > *", gs.firstRowCss).$
               : {
-                  ...Css.addIn("& > div:first-of-type > *", gs.firstNonHeaderRowCss).$,
+                  ...Css.addIn("& > div:first-of-type", gs.firstNonHeaderRowCss).$,
                   ...Css.addIn("& > div:last-of-type > *", gs.lastRowCss).$,
                 }),
             ...gs.rootCss,
@@ -665,48 +803,3 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
     });
   },
 );
-
-/**
- * Filters rows given a client-side text `filter.
- *
- * Ensures parent rows remain in the list if any children match the filter.
- *
- * We return a copy of `[Parent, [Child]]` tuples so that we don't modify the `GridDataRow.children`.
- */
-export function filterRows<R extends Kinded>(
-  api: GridTableApi<R>,
-  columns: GridColumnWithId<R>[],
-  rows: GridDataRow<R>[],
-  filter: string | undefined,
-): ParentChildrenTuple<R>[] {
-  // Make a functions to do recursion
-  function acceptAll(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
-    return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
-  }
-
-  function filterFn(acc: ParentChildrenTuple<R>[], row: GridDataRow<R>): ParentChildrenTuple<R>[] {
-    // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
-    const filters = (filter && filter.split(/ +/)) || [];
-    const matches =
-      reservedRowKinds.includes(row.kind) ||
-      filters.length === 0 ||
-      filters.every((f) =>
-        columns.map((c) => applyRowFn(c, row, api, 0, false)).some((maybeContent) => matchesFilter(maybeContent, f)),
-      );
-    if (matches) {
-      return acc.concat([[row, row.children?.reduce(acceptAll, []) ?? []]]);
-    } else {
-      const matchedChildren = row.children?.reduce(filterFn, []) ?? [];
-      if (
-        matchedChildren.length > 0 ||
-        typeof row.pin === "string" ||
-        (row.pin !== undefined && row.pin.filter !== true)
-      ) {
-        return acc.concat([[row, matchedChildren]]);
-      } else {
-        return acc;
-      }
-    }
-  }
-  return rows.reduce(filterFn, []);
-}

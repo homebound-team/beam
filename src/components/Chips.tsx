@@ -1,4 +1,3 @@
-import React from "react";
 import { Chip } from "src/components/Chip";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Margin, Only, Xss } from "src/Css";
@@ -13,12 +12,13 @@ export interface ChipValue {
 export interface ChipsProps<X> {
   values: string[] | ChipValue[];
   xss?: X;
+  compact?: boolean;
 }
 
 /** Renders a list of `Chip`s, with wrapping & appropriate margin between each `Chip`. */
 export function Chips<X extends Only<ChipsXss, X>>(props: ChipsProps<X>) {
   const { wrap } = usePresentationContext();
-  const { values, xss = {} } = props;
+  const { values, compact, xss = {} } = props;
   return (
     <div
       css={{
@@ -29,7 +29,7 @@ export function Chips<X extends Only<ChipsXss, X>>(props: ChipsProps<X>) {
     >
       {values.map((value, i) => {
         const { text, title } = (value.hasOwnProperty("text") ? value : { text: value }) as ChipValue;
-        return <Chip key={i} text={text} title={title} />;
+        return <Chip key={i} text={text} title={title} compact={compact} />;
       })}
     </div>
   );

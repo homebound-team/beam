@@ -25,7 +25,7 @@ describe("useModal", () => {
     // When opening the modal via the context method
     act(() => context!.openModal(modalProps));
     // Then expect modal to open
-    expect(r.modal()).toBeTruthy();
+    expect(r.modal).toBeTruthy();
 
     // When closing the modal via the context method
     act(() => context!.closeModal());
@@ -36,6 +36,8 @@ describe("useModal", () => {
   it("can provide a custom canClose method", async () => {
     function TestApp(props: ModalProps) {
       const { openModal } = useModal();
+      // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       useEffect(() => openModal(props), []);
       return <div>App</div>;
     }
@@ -56,7 +58,7 @@ describe("useModal", () => {
     // Then expect the custom method to be called.
     expect(canClose).toBeCalled();
     // And the modal should not have closed since the canClose check is false.
-    expect(r.modal()).toBeTruthy();
+    expect(r.modal).toBeTruthy();
   });
 
   it("can close modal when checks pass", async () => {
@@ -64,6 +66,8 @@ describe("useModal", () => {
     function TestApp(props: ModalProps) {
       beamContext = useBeamContext();
       const { openModal } = useModal();
+      // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       useEffect(() => openModal(props), []);
       return <div>App</div>;
     }
@@ -90,5 +94,28 @@ describe("useModal", () => {
 
     // And the BeamContext has been cleared
     expect(beamContext!.modalCanCloseChecks.current).toEqual([]);
+  });
+
+  it("can identify when component is In Modal", async () => {
+    // Given a test app that opens a modal with content that checks if it is in a modal
+    function TestApp(props: ModalProps) {
+      const { openModal, inModal } = useModal();
+      useEffect(() => openModal(props), [openModal, props]);
+      return <div data-testid="testApp">Behind Modal: InModal? {String(inModal)}</div>;
+    }
+
+    // And a modal content that checks if it is in a modal also
+    function TestModalContent() {
+      const { inModal } = useModal();
+      return <div data-testid="modalContent">Modal Content: InModal? {String(inModal)}</div>;
+    }
+
+    // When rendering the test app
+    const r = await render(<TestApp content={<TestModalContent />} />);
+
+    // Then the test app should not be in a modal
+    expect(r.testApp).toHaveTextContent("Behind Modal: InModal? false");
+    // And the modal content should be in a modal
+    expect(r.modalContent).toHaveTextContent("Modal Content: InModal? true");
   });
 });

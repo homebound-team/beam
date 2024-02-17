@@ -1,6 +1,7 @@
-import React, { MutableRefObject, useContext, useMemo, useState } from "react";
+import { act } from "@testing-library/react";
+import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { GridTable, setRunningInJest } from "src/components/Table/GridTable";
+import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyles } from "src/components/Table/TableStyles";
 import { GridColumn } from "src/components/Table/types";
@@ -11,13 +12,27 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
-import { Checkbox, TextField } from "src/inputs";
-import { cell, cellAnd, cellOf, click, render, row, type, withRouter } from "src/utils/rtl";
+import { Checkbox, SelectField, TextField } from "src/inputs";
+import { noop } from "src/utils";
+import {
+  cell,
+  cellAnd,
+  cellOf,
+  click,
+  render,
+  row,
+  tableSnapshot,
+  type,
+  typeAndWait,
+  wait,
+  withRouter,
+} from "src/utils/rtl";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
 type Row = SimpleHeaderAndData<Data>;
 
+const idColumn: GridColumn<Row> = { id: "id", header: () => "Id", data: (data, { row }) => row.id };
 const nameColumn: GridColumn<Row> = { id: "name", header: () => "Name", data: ({ name }) => name };
 const valueColumn: GridColumn<Row> = { id: "value", header: () => "Value", data: ({ value }) => value };
 const columns = [nameColumn, valueColumn];
@@ -26,6 +41,11 @@ const rows: GridDataRow<Row>[] = [
   simpleHeader,
   { kind: "data", id: "1", data: { name: "foo", value: 1 } },
   { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+];
+const draggableRows: GridDataRow<Row>[] = [
+  simpleHeader,
+  { kind: "data", id: "1", data: { name: "foo", value: 1 }, draggable: true },
+  { kind: "data", id: "2", data: { name: "bar", value: 2 }, draggable: true },
 ];
 
 // Make a `NestedRow` ADT for a table with a header + 3 levels of nesting
@@ -52,15 +72,11 @@ const nestedColumns: GridColumn<NestedRow>[] = [
     totals: emptyCell,
     header: (data, { row }) => <Collapse id={row.id} />,
     parent: (data, { row }) => <Collapse id={row.id} />,
-    child: (data, { row }) => (row.children ? <Collapse id={row.id} /> : ""),
+    child: (data, { row }) => (row.children?.length > 0 ? <Collapse id={row.id} /> : ""),
     grandChild: () => "",
   },
   selectColumn<NestedRow>({
     totals: emptyCell,
-    header: (data, { row }) => ({ content: <Select id={row.id} /> }),
-    parent: (data, { row }) => ({ content: <Select id={row.id} /> }),
-    child: (data, { row }) => ({ content: <Select id={row.id} /> }),
-    grandChild: (data, { row }) => ({ content: <Select id={row.id} /> }),
   }),
   {
     totals: emptyCell,
@@ -137,6 +153,36 @@ describe("GridTable", () => {
     expect(cell(r, 2, 0)).toHaveTextContent("2");
   });
 
+  it("does not truncate reaodnly select fields", async () => {
+    // Given a column with a select field
+    const longText = "Something very long that have to wrap here";
+    const selectColumn: GridColumn<Row> = {
+      header: "Select",
+      w: "150px",
+      data: (row) => ({
+        content: (
+          <SelectField
+            label="field"
+            getOptionLabel={(r) => r.name}
+            getOptionValue={(r) => r.id}
+            value={row.value}
+            onSelect={noop}
+            options={[{ id: row.value, name: row.name }]}
+            readOnly
+          />
+        ),
+      }),
+    };
+    const rows: GridDataRow<Row>[] = [simpleHeader, { kind: "data", id: "1", data: { name: longText, value: 1 } }];
+    // And it's rendered with row height flexible
+    const r = await render(<GridTable style={{ rowHeight: "flexible" }} columns={[selectColumn]} rows={rows} />);
+
+    // Then field do not have any Css.truncate styles
+    expect(r.field).not.toHaveStyleRule("white-space", "nowrap");
+    expect(r.field).not.toHaveStyleRule("overflow", "hidden");
+    expect(r.field).not.toHaveStyleRule("textOverflow", "ellipsis");
+  });
+
   it("can have per-row styles", async () => {
     // Given the data row has specific row and cell styling
     const rowStyles: RowStyles<Row> = {
@@ -173,19 +219,6 @@ describe("GridTable", () => {
     // And the cellCss also styles the 1st row and 2nd are differently
     expect(cell(r, 1, 0)).toHaveStyleRule("color", Palette.Green500);
     expect(cell(r, 2, 0)).toHaveStyleRule("color", Palette.Red500);
-  });
-
-  it("can indent rows", async () => {
-    // Given the data row is indented
-    const rowStyles: RowStyles<Row> = {
-      header: {},
-      data: { indent: 1 },
-    };
-    const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} rowStyles={rowStyles} />);
-    // Then the data row has the style added
-    expect(cell(r, 1, 0)).toHaveStyleRule("padding-left", "32px");
-    // But the header row does not
-    expect(cell(r, 0, 0)).toHaveStyleRule("padding-left", "8px");
   });
 
   it("can apply cell-specific styling", async () => {
@@ -371,10 +404,9 @@ describe("GridTable", () => {
           rows={[simpleHeader, { kind: "data", id: "2", data: { name: "b", value: 2 } }]}
         />,
       );
-      const { sortHeader_0, sortHeader_1 } = r;
       // Then we have only a single sort header in the dom
-      expect(sortHeader_0()).toBeDefined();
-      expect(sortHeader_1()).toBeUndefined();
+      expect(r.sortHeader_0).toBeDefined();
+      expect(r.sortHeader_1).toBeUndefined();
     });
 
     it("can sort primary rows", async () => {
@@ -520,7 +552,7 @@ describe("GridTable", () => {
         <GridTable
           columns={[nameColumn, valueColumn]}
           // And there is an initial sort defined
-          sorting={{ on: "client", initial: [generateColumnId(0), "ASC"] }}
+          sorting={{ on: "client", initial: ["someRandomId", "ASC"] }}
           rows={[
             simpleHeader,
             { kind: "data", id: "1", data: { name: "a", value: 2 } },
@@ -529,6 +561,7 @@ describe("GridTable", () => {
           ]}
         />,
       );
+      expect(cell(r, 1, 1)).toHaveTextContent("2");
       // When initializing sort on the "value" column
       click(r.sortHeader_1);
       // Then expect ASC order
@@ -634,6 +667,7 @@ describe("GridTable", () => {
           </div>
         );
       }
+
       const r = await render(<TestComponent />);
 
       // Then the data is sorted by 1 (1 2) then 2 (1 2)
@@ -735,32 +769,31 @@ describe("GridTable", () => {
           rows={rows}
         />,
       );
-      const { sortHeader_0, sortHeader_icon_0 } = r;
       // It is initially not sorted
-      expect(sortHeader_icon_0()).not.toBeVisible();
+      expect(r.sortHeader_icon_0).not.toBeVisible();
 
       // Then when sorted by the 1st column
-      click(sortHeader_0);
+      click(r.sortHeader_0);
       // Then the callback was called
       expect(onSort).toHaveBeenCalledWith("name", "ASC");
       // And we show the sort toggle
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortUp").toBeVisible();
       // And the data was not reordered (we defer to the server-side)
       expect(cell(r, 1, 0)).toHaveTextContent("foo");
 
       // And when we sort again
-      click(sortHeader_0);
+      click(r.sortHeader_0);
       // Then it was called again but desc
       expect(onSort).toHaveBeenCalledWith("name", "DESC");
       // And we flip the sort toggle
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortDown").toBeVisible();
 
       // And when we sort again
-      click(sortHeader_0);
+      click(r.sortHeader_0);
       // Then it was called again with undefined
       expect(onSort).toHaveBeenCalledWith(undefined, undefined);
       // And we hide the sort toggle (back to the initial sort)
-      expect(sortHeader_icon_0()).not.toBeVisible();
+      expect(r.sortHeader_icon_0).not.toBeVisible();
     });
 
     it("doesn't sort columns w/o onSort", async () => {
@@ -778,15 +811,14 @@ describe("GridTable", () => {
         />,
       );
       // Then there is only a single sort header
-      const { sortHeader_0, sortHeader_1 } = r;
-      expect(sortHeader_0).toBeDefined();
-      expect(sortHeader_1()).toBeUndefined();
+      expect(r.sortHeader_0).toBeDefined();
+      expect(r.sortHeader_1).toBeUndefined();
     });
 
     it("initializes with asc sorting", async () => {
       // Given the table is using server-side sorting
       const onSort = jest.fn();
-      const { sortHeader_icon_0 } = await render(
+      const r = await render(
         <GridTable
           // And the 1st column has a sort key
           columns={[{ ...nameColumn, serverSideSortKey: "name" }, valueColumn]}
@@ -800,13 +832,13 @@ describe("GridTable", () => {
         />,
       );
       // Then it is shown as initially sorted asc
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortUp").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortUp").toBeVisible();
     });
 
     it("initializes with desc sorting", async () => {
       // Given the table is using server-side sorting
       const onSort = jest.fn();
-      const { sortHeader_icon_0 } = await render(
+      const r = await render(
         <GridTable
           // And the 1st column has a sort key
           columns={[{ ...nameColumn, serverSideSortKey: "name" }, valueColumn]}
@@ -820,7 +852,7 @@ describe("GridTable", () => {
         />,
       );
       // Then it is shown as initially sorted desc
-      expect(sortHeader_icon_0()).toHaveAttribute("data-icon", "sortDown").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortDown").toBeVisible();
     });
 
     it("can pin rows first", async () => {
@@ -889,7 +921,7 @@ describe("GridTable", () => {
       );
     });
 
-    it("as=virtual accepts percentages ", () => {
+    it("as=virtual accepts percentages", () => {
       expect(calcColumnSizes([{ w: "10%" }, { w: 2 }] as any, undefined, undefined, []).join(" ")).toEqual(
         "10% ((100% - 10% - 0px) * (2 / 2))",
       );
@@ -941,7 +973,7 @@ describe("GridTable", () => {
         rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 3 } }]}
       />,
     );
-    expect(r.gridTable()).toBeTruthy();
+    expect(r.gridTable).toBeTruthy();
   });
 
   it("accepts percentage values for column min-width definition", async () => {
@@ -952,7 +984,7 @@ describe("GridTable", () => {
         rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 3 } }]}
       />,
     );
-    expect(r.gridTable()).toBeTruthy();
+    expect(r.gridTable).toBeTruthy();
   });
 
   it("can handle onClick for rows", async () => {
@@ -1181,7 +1213,7 @@ describe("GridTable", () => {
     expect(cell(r, 0, 2)).toHaveTextContent("Name");
     // And the parent that matched the filter
     expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
-    // And the childs of the matched parent
+    // And the children of the matched parent
     expect(cell(r, 2, 2)).toHaveTextContent("filter child p1c1");
     expect(cell(r, 3, 2)).toHaveTextContent("filter child p1c2");
     // And that's it
@@ -1292,11 +1324,13 @@ describe("GridTable", () => {
       },
     ];
     const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+
     function Test() {
       const _api = useGridTableApi<NestedRow>();
       api.current = _api;
       return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
     }
+
     const r = await render(<Test />);
     // And all three rows are initially rendered
     expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
@@ -1304,7 +1338,7 @@ describe("GridTable", () => {
     expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
     expectRenderedRows("p1", "p1c1", "p1c1g1");
     // When the child is collapsed
-    api.current!.toggleCollapsedRow(rows[0].children![0].id);
+    act(() => api.current!.toggleCollapsedRow(rows[0].children![0].id));
     // Then the parent and child rows are still shown
     expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
     expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
@@ -1328,11 +1362,13 @@ describe("GridTable", () => {
       },
     ];
     const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+
     function Test() {
       const _api = useGridTableApi<NestedRow>();
       api.current = _api;
       return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
     }
+
     const r = await render(<Test />);
     // And all three rows are initially rendered
     expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
@@ -1340,11 +1376,113 @@ describe("GridTable", () => {
     expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
     expectRenderedRows("p1", "p1c1", "p1c1g1");
     // When the child is collapsed
-    api.current!.toggleCollapsedRow(rows[0].children![0].id);
+    act(() => api.current!.toggleCollapsedRow(rows[0].children![0].id));
     // Then isCollapsed for this row should be true
     expect(api.current!.isCollapsedRow(rows[0].children![0].id)).toBeTruthy();
     // And nothing needed to re-render
     expectRenderedRows();
+  });
+
+  it("can access all visible rows", async () => {
+    // Given a header and two rows
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+    ];
+    // When we render them
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<NestedRow>();
+      api.current = _api;
+      return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
+    }
+    const r = await render(<Test />);
+    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
+    // Then the API get can get rows back
+    expect(api.current!.getVisibleRows()).toEqual([rows[0], rows[1], rows[1].children?.[0]]);
+    // And it can also return kinds
+    expect(api.current!.getVisibleRows("child")).toEqual([rows[1].children?.[0]]);
+  });
+
+  it("can access visible child rows", async () => {
+    // Given a parent with two children
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
+        ],
+      },
+    ];
+    // And a column where the parent counts the number of visible children
+    const columns: GridColumn<NestedRow>[] = [
+      ...nestedColumns,
+      {
+        totals: emptyCell,
+        header: emptyCell,
+        parent: (data, { api }) => api.getVisibleChildren("child").length,
+        child: emptyCell,
+        grandChild: emptyCell,
+      },
+    ];
+    const r = await render(<GridTable<NestedRow> columns={columns} rows={rows} />);
+    // And both child rows are initially rendered
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c2");
+    // Then we show the number of children
+    expect(cell(r, 0, 3)).toHaveTextContent("2");
+    // When the 1st child is filtered out
+    await r.rerender(<GridTable<NestedRow> columns={columns} rows={rows} filter="p1c2" />);
+    // Then the parent and child row are still shown
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c2");
+    // And the parent knows the number of visible children
+    expect(cell(r, 0, 3)).toHaveTextContent("1");
+    // And when the parent matches the filter
+    await r.rerender(<GridTable<NestedRow> columns={columns} rows={rows} filter="parent" />);
+    // Then the parent knows both children are shown again
+    expect(cell(r, 0, 3)).toHaveTextContent("2");
+  });
+
+  it("can access selected child rows", async () => {
+    // Given a parent with two children
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
+        ],
+      },
+    ];
+    // And a column where the parent counts the selected children
+    const columns: GridColumn<NestedRow>[] = [
+      ...nestedColumns,
+      {
+        totals: emptyCell,
+        header: emptyCell,
+        parent: (data, { api }) => api.getSelectedChildren("child").length,
+        child: emptyCell,
+        grandChild: emptyCell,
+      },
+    ];
+    const r = await render(<GridTable<NestedRow> columns={columns} rows={rows} />);
+    // And both child rows are initially rendered
+    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c2");
+    // Then we show no children are selected
+    expect(cell(r, 0, 3)).toHaveTextContent("0");
+    // When we select the 1st child
+    click(r.select_1);
+    // Then the parent renders the number of selected children
+    expect(cell(r, 0, 3)).toHaveTextContent("1");
   });
 
   it("persists collapse", async () => {
@@ -1404,27 +1542,27 @@ describe("GridTable", () => {
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
 
     // Then the rows are all initially expanded state
-    expect(r.collapse_0().textContent).toBe("-");
-    expect(r.collapse_1().textContent).toBe("-");
-    expect(r.collapse_2().textContent).toBe("-");
+    expect(r.collapse_0.textContent).toBe("-");
+    expect(r.collapse_1.textContent).toBe("-");
+    expect(r.collapse_2.textContent).toBe("-");
 
     // When we close the parent rows
-    click(r.collapse_1());
-    click(r.collapse_2());
+    click(r.collapse_1);
+    click(r.collapse_2);
 
     // Then expect the header and parent row collapse toggles are in the 'collapsed' state
-    expect(r.collapse_0().textContent).toBe("+");
-    expect(r.collapse_1().textContent).toBe("+");
-    expect(r.collapse_2().textContent).toBe("+");
+    expect(r.collapse_0.textContent).toBe("+");
+    expect(r.collapse_1.textContent).toBe("+");
+    expect(r.collapse_2.textContent).toBe("+");
 
     // And when we open the parent rows back up
-    click(r.collapse_1());
-    click(r.collapse_2());
+    click(r.collapse_1);
+    click(r.collapse_2);
 
     // Then expect the header and parent row collapse toggles are in the 'expanded' state
-    expect(r.collapse_0().textContent).toBe("-");
-    expect(r.collapse_1().textContent).toBe("-");
-    expect(r.collapse_2().textContent).toBe("-");
+    expect(r.collapse_0.textContent).toBe("-");
+    expect(r.collapse_1.textContent).toBe("-");
+    expect(r.collapse_2.textContent).toBe("-");
   });
 
   it("can toggle the header state after parent rows have been collapsed", async () => {
@@ -1448,14 +1586,14 @@ describe("GridTable", () => {
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
 
     // When we close one of the parent rows
-    click(r.collapse_1());
+    click(r.collapse_1);
     // And then click the header collapse toggle
-    click(r.collapse_0());
+    click(r.collapse_0);
 
     // Then expect the header and parent row collapse toggles are in the 'collapsed' state
-    expect(r.collapse_0().textContent).toBe("+");
-    expect(r.collapse_1().textContent).toBe("+");
-    expect(r.collapse_2().textContent).toBe("+");
+    expect(r.collapse_0.textContent).toBe("+");
+    expect(r.collapse_1.textContent).toBe("+");
+    expect(r.collapse_2.textContent).toBe("+");
   });
 
   it("can select all", async () => {
@@ -1473,11 +1611,13 @@ describe("GridTable", () => {
       },
     ];
     const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+
     function Test() {
       const _api = useGridTableApi<NestedRow>();
       api.current = _api;
       return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
     }
+
     const r = await render(<Test />);
     // And all three rows are initially rendered
     expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
@@ -1508,9 +1648,98 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
 
+  it("can select all with disabled children", async () => {
+    // Given a parent with two children
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+          // And the 2nd one is disabled
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" }, selectable: false },
+        ],
+      },
+    ];
+
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<NestedRow>();
+      api.current = _api;
+      return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
+    }
+    const r = await render(<Test />);
+
+    // And all three rows are initially rendered
+    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 3, 2)).toHaveTextContent("child p1c2");
+
+    // When we select all
+    click(cell(r, 0, 1).children[0] as any);
+    // Then the 'All', Parent, and 1st child rows are shown as selected
+    expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+    expect(cellAnd(r, 2, 1, "select")).toBeChecked();
+    // But the 2nd child is not
+    expect(cellAnd(r, 3, 1, "select")).toBeDisabled();
+    // And the api can fetch them
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1"]);
+    expect(api.current!.getSelectedRowIds("child")).toEqual(["p1c1"]);
+
+    // And when we unselect all
+    click(cell(r, 0, 1).children[0] as any);
+    // Then all rows are shown as unselected
+    expect(cellAnd(r, 0, 1, "select")).not.toBeChecked();
+    expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
+    expect(cellAnd(r, 2, 1, "select")).not.toBeChecked();
+    expect(cellAnd(r, 3, 1, "select")).not.toBeChecked();
+    expect(cellAnd(r, 3, 1, "select")).toBeDisabled();
+    // And they are no longer selected
+    expect(api.current!.getSelectedRowIds()).toEqual([]);
+  });
+
+  it("fires props.onSelect", async () => {
+    // Given a parent with a child
+    const actions: string[] = [];
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+    ];
+    function Test() {
+      const onSelect: OnRowSelect<NestedRow> = {
+        parent: (data, isSelected, { row }) => {
+          actions.push(`${row.kind} ${data.name} ${isSelected}`);
+        },
+        child: (data, isSelected, { row }) => {
+          actions.push(`${row.kind} ${data.name} ${isSelected}`);
+        },
+      };
+      return <GridTable<NestedRow> columns={nestedColumns} rows={rows} onRowSelect={onSelect} />;
+    }
+    const r = await render(<Test />);
+    // When we select all
+    click(cell(r, 0, 1).children[0] as any);
+    // Then all rows are shown as selected
+    expect(actions).toEqual(["parent parent 1 true", "child child p1c1 true"]);
+    // And when we unselect all
+    click(cell(r, 0, 1).children[0] as any);
+    // Then they are unselected
+    expect(actions).toEqual([
+      "parent parent 1 true",
+      "child child p1c1 true",
+      "parent parent 1 false",
+      "child child p1c1 false",
+    ]);
+  });
+
   it("getSelectedRows can see update rows", async () => {
     const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
     const _columns = [selectColumn<Row>(), ...columns];
+
     // Given a component using a useComputed against getSelectedRows
     function Test({ rows }: { rows: GridDataRow<Row>[] }) {
       const _api = useGridTableApi<Row>();
@@ -1528,35 +1757,128 @@ describe("GridTable", () => {
         </div>
       );
     }
+
     const r = await render(<Test rows={rows} />);
     click(r.select_1);
     // And selected rows is initially calc-d
-    expect(r.selectedNames()).toHaveTextContent("foo");
+    expect(r.selectedNames.textContent).toEqual("foo");
     // When we re-render with an updated row
     await r.rerender(<Test rows={[rows[0], { kind: "data", id: "1", data: { name: "foo2", value: 1 } }, rows[2]]} />);
     // Then selected computed sees the new value
-    expect(r.selectedNames()).toHaveTextContent("foo2");
+    expect(r.selectedNames.textContent).toEqual("foo2");
+    // And the table value is updated as expected
+    expect(cell(r, 1, 1)).toHaveTextContent("foo2");
+  });
+
+  it("getSelectedRows doesn't fire if data has not changed", async () => {
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+    const _columns = [selectColumn<Row>(), ...columns];
+    let computedCount = 0;
+
+    // Given a component using a useComputed against getSelectedRows
+    function Test({ rows }: { rows: GridDataRow<Row>[] }) {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      const selectedNames = useComputed(() => {
+        computedCount++;
+        return _api
+          .getSelectedRows("data")
+          .map((r) => r.data.name)
+          .join(",");
+      }, [_api]);
+      return (
+        <div>
+          <div data-testid="selectedNames">{selectedNames}</div>
+          <GridTable<Row> api={_api} columns={_columns} rows={rows} />
+        </div>
+      );
+    }
+    // And the initial render has computed
+    const r = await render(<Test rows={rows} />);
+    expect(computedCount).toBe(1);
+    // And the user has selected one row
+    click(r.select_1);
+    // And selected rows is initially calc-d
+    expect(r.selectedNames.textContent).toEqual("foo");
+    expect(computedCount).toBe(2);
+    // When we re-render with the different row literals, but stable data
+    await r.rerender(
+      <Test
+        rows={[
+          rows[0],
+          { kind: "data", id: "1", data: rows[1].data as any },
+          { kind: "data", id: "2", data: rows[2].data as any },
+        ]}
+      />,
+    );
+    // Then we didn't recompute
+    expect(computedCount).toBe(2);
+  });
+
+  it("getSelectedRowsId doesn't fire if data has changed but not ids", async () => {
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+    const _columns = [selectColumn<Row>(), ...columns];
+    let computedCount = 0;
+
+    // Given a component using a useComputed against getSelectedRowIds
+    function Test({ rows }: { rows: GridDataRow<Row>[] }) {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      const selectedIds = useComputed(() => {
+        computedCount++;
+        return _api.getSelectedRowIds("data").join(",");
+      }, [_api]);
+      return (
+        <div>
+          <div data-testid="selectedIds">{selectedIds}</div>
+          <GridTable<Row> api={_api} columns={_columns} rows={rows} />
+        </div>
+      );
+    }
+    // And the initial render has computed
+    const r = await render(<Test rows={rows} />);
+    expect(computedCount).toBe(1);
+    // And the user has selected one row
+    click(r.select_1);
+    // And selected rows is initially calc-d
+    expect(r.selectedIds.textContent).toEqual("1");
+    expect(computedCount).toBe(2);
+    // When we re-render with the different row literals and different data literals
+    await r.rerender(
+      <Test
+        rows={[
+          rows[0],
+          { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+          { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+        ]}
+      />,
+    );
+    // Then we didn't recompute
+    expect(r.selectedIds.textContent).toEqual("1");
+    expect(computedCount).toBe(2);
   });
 
   it("can select rows via api", async () => {
     // Given a table with selectable rows
     const rows: GridDataRow<NestedRow>[] = [simpleHeader, { kind: "parent", id: "p1", data: { name: "parent 1" } }];
     const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+
     function Test() {
       const _api = useGridTableApi<NestedRow>();
       api.current = _api;
       return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
     }
-    const r = await render(<Test />);
+
+    await render(<Test />);
     // And the row is not selected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
     // When selecting the row via the API
-    api.current!.selectRow("p1");
+    act(() => api.current!.selectRow("p1"));
     // Then the row is now selected
     expect(api.current!.getSelectedRowIds()).toEqual(["p1"]);
 
     // And when deselecting the row via the API
-    api.current!.selectRow("p1", false);
+    act(() => api.current!.selectRow("p1", false));
     // Then the row is not selected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
@@ -1588,16 +1910,38 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRows()).toEqual([
       rows[1],
       rows[1].children![0],
-      rows[1].children![0].children![1],
       rows[1].children![0].children![0],
+      rows[1].children![0].children![1],
     ]);
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g2", "p1c1g1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g1", "p1c1g2"]);
 
     // And when applying a filter
     type(r.filter, "p1c1g2");
-    // Then expect only the visible rows selected are returned
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g2"]);
-    expect(api.current!.getSelectedRows()).toEqual([rows[1], rows[1].children![0], rows[1].children![0].children![1]]);
+    // Then expect all rows are still returned as selected
+    expect(api.current!.getSelectedRows()).toEqual([
+      rows[1],
+      rows[1].children![0],
+      rows[1].children![0].children![0],
+      rows[1].children![0].children![1],
+    ]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c1g1", "p1c1g2"]);
+  });
+
+  it("renders the header as checked", async () => {
+    // Given a parent
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    // When rendering a GridTable with filtering and selectable rows
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+    // Then the header should not be checked
+    expect(cellAnd(r, 0, 1, "select")).not.toBeChecked();
+    // Nor indeterminate
+    expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "false");
   });
 
   it("re-derives parent row selected state", async () => {
@@ -1620,8 +1964,8 @@ describe("GridTable", () => {
     click(cell(r, 3, 1).children[0] as any);
 
     // Then the Header and Parent rows should have the `indeterminate` checked value
-    expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked();
-    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+    expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+    expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
 
     // And when applying a filter to hide non-selected child rows
     type(r.filter, "p1 c2");
@@ -1664,9 +2008,9 @@ describe("GridTable", () => {
     type(r.filter, "");
 
     // Then expect the parent rows to have updated based on the row status
-    expect(cellAnd(r, 0, 1, "select")).toBePartiallyChecked(); // Header
-    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked(); // Parent
-    expect(cellAnd(r, 2, 1, "select")).toBePartiallyChecked(); // Child
+    expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true"); // Header
+    expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true"); // Parent
+    expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true"); // Child
     expect(cellAnd(r, 3, 1, "select")).not.toBeChecked(); // Grandchild - reintroduced by clearing filter.
     expect(cellAnd(r, 4, 1, "select")).toBeChecked(); // Grandchild
   });
@@ -1704,15 +2048,15 @@ describe("GridTable", () => {
     const r = await render(<Test />);
 
     // Then select toggle for row 2 is disabled
-    expect(r.select_2()).toBeDisabled();
+    expect(r.select_2).toBeDisabled();
 
     // When selecting the header row select toggle
     click(r.select_0);
 
     // Then row id 2 is not selected as it's disabled
-    expect(api.current!.getSelectedRowIds()).toEqual(["3", "1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["1", "3"]);
     // and selected rows does not include row 2 as it's disabled
-    expect(r.selectedNames()).toHaveTextContent("Thor Odinson,Tony Stark");
+    expect(r.selectedNames).toHaveTextContent("Tony Stark,Thor Odinson");
   });
 
   it("can deselect all rows via 'clearSelections' api method", async () => {
@@ -1733,11 +2077,9 @@ describe("GridTable", () => {
     // And selecting the header row
     click(cellAnd(r, 0, 1, "select"));
     // Then expect all rows should selected
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c2", "p1c1"]);
-
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2"]);
     // When using the api to clear the selected rows
-    api.current!.clearSelections();
-
+    act(() => api.current!.clearSelections());
     // Then all rows should be deselected
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
@@ -1774,7 +2116,7 @@ describe("GridTable", () => {
     // When triggering all rows as selected
     click(cellAnd(r, 0, 1, "select"));
     // Then expect all rows should selected
-    expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c2", "p2c1", "p1", "p1c2", "p1c1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2", "p2", "p2c1", "p2c2", "p3", "p3c1"]);
 
     // When collapsing all rows
     click(cellAnd(r, 0, 0, "collapse"));
@@ -1784,17 +2126,17 @@ describe("GridTable", () => {
     expect(cellAnd(r, 3, 1, "select")).toBeChecked();
 
     // And all rows are still returned by the API
-    expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c2", "p2c1", "p1", "p1c2", "p1c1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2", "p2", "p2c1", "p2c2", "p3", "p3c1"]);
 
     // When applying a filter
     type(r.filter, "filter");
     // Then each group rows selected state should reflect the children that match the filter
-    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
     expect(cellAnd(r, 2, 1, "select")).toBeChecked();
-    // because the parent matches the filter, and the child was selected, the new behavior shows the nested childs of matched parent, child should keep selected
     expect(cellAnd(r, 3, 1, "select")).toBeChecked();
-    // And the API reflects the expected selected states of rows that match the filter
-    expect(api.current!.getSelectedRowIds()).toEqual(["p3", "p3c1", "p2", "p2c1", "p1", "p1c2", "p1c1"]);
+    // because the parent matches the filter, and the child was selected, the new behavior shows the nested children of matched parent, child should keep selected
+    // expect(cellAnd(r, 4, 1, "select")).toBeChecked();
+    // And the API reflects the expected selected states
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2", "p2", "p2c1", "p2c2", "p3", "p3c1"]);
   });
 
   // it can switch between partially checked to checked depending on applied filter
@@ -1818,12 +2160,12 @@ describe("GridTable", () => {
     // Then expect only the selected row to be returned
     expect(api.current!.getSelectedRowIds()).toEqual(["p1c1"]);
     // And the group row to be partially checked
-    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+    expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
 
     // When collapsing all rows
     click(cellAnd(r, 0, 0, "collapse"));
     // Then expect each group row to persist the selected stated
-    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+    expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
 
     // When applying a filter
     type(r.filter, "filter");
@@ -1833,7 +2175,23 @@ describe("GridTable", () => {
     // When removing the filter
     type(r.filter, "");
     // Then the group row's selected state should be back to partially checked
-    expect(cellAnd(r, 1, 1, "select")).toBePartiallyChecked();
+    expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+  });
+
+  it("treats parents with no children as selectable", async () => {
+    // Given a parent
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      // And they define children as an empty list
+      { kind: "parent", id: "p1", data: { name: "parent 1" }, children: [] },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    // When rendering a GridTable with filtering and selectable rows
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+    // When we select the parent row
+    click(cellAnd(r, 1, 1, "select"));
+    // Then it's checked
+    expect(cellAnd(r, 1, 1, "select")).toBeChecked();
   });
 
   describe("matchesFilter", () => {
@@ -2072,7 +2430,7 @@ describe("GridTable", () => {
     await render(<GridTable rows={[row1]} columns={columns} />);
   });
 
-  it("provides a per-row render count ", async () => {
+  it("provides a per-row render count", async () => {
     const [header, row1, row2] = rows;
     const columns = [nameColumn];
 
@@ -2109,6 +2467,19 @@ describe("GridTable", () => {
     expect(row(r, 2).getAttribute("data-render")).toEqual("1");
   });
 
+  it("memoizes draggable rows based on the data attribute", async () => {
+    const [header, row1, row2] = draggableRows;
+    const columns = [nameColumn];
+    function onDropRow() {}
+    // Given a table is initially rendered with 2 rows
+    const r = await render(<GridTable key="a" columns={columns} rows={[header, row1, row2]} onRowDrop={onDropRow} />);
+    // When we render with new rows but unchanged data values
+    r.rerender(<GridTable key="a" columns={columns} rows={[header, { ...row1 }, { ...row2 }]} onRowDrop={onDropRow} />);
+    // Then neither row was re-rendered
+    expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+    expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+  });
+
   it("reacts to setting activeRowId", async () => {
     const activeRowIdRowStyles: RowStyles<Row> = {
       data: {
@@ -2129,7 +2500,7 @@ describe("GridTable", () => {
     click(cell(r, 1, 1));
 
     // Then the first row/cell has the 'active' background color
-    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.LightBlue50);
+    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.Blue50);
   });
 
   it("does not shows cell border when 'cellHighlight' is not defined", async () => {
@@ -2140,7 +2511,7 @@ describe("GridTable", () => {
     click(cell(r, 1, 1));
 
     // Then the cell does not have the highlight color.
-    expect(cell(r, 1, 1)).not.toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.LightBlue700}`);
+    expect(cell(r, 1, 1)).not.toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.Blue700}`);
   });
 
   it("shows cell border when 'cellHighlight' is defined", async () => {
@@ -2151,7 +2522,7 @@ describe("GridTable", () => {
     click(cell(r, 1, 1));
 
     // Then the cell has the highlight color.
-    expect(cell(r, 1, 1)).toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.LightBlue700}`);
+    expect(cell(r, 1, 1)).toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.Blue700}`);
   });
 
   it("can render with rows with initCollapsed defined", async () => {
@@ -2211,7 +2582,7 @@ describe("GridTable", () => {
     expect(cell(r, 1, 2).textContent).toBe("parent 1");
 
     // And the local storage value is initially set with the current state
-    expect(sessionStorage.getItem(tableIdentifier)).toBe('["p1"]');
+    expect(sessionStorage.getItem(tableIdentifier)).toBe('["keptGroup","p1"]');
   });
 
   it("ignores initCollapsed on rows if persistCollapse is set and available in sessionStorage", async () => {
@@ -2312,7 +2683,7 @@ describe("GridTable", () => {
     expect(cell(r, 5, 0).textContent).toBe("+");
 
     // And the local storage value is updated with the current state
-    expect(sessionStorage.getItem(tableIdentifier)).toBe('["p2","p3"]');
+    expect(sessionStorage.getItem(tableIdentifier)).toBe('["keptGroup","p2","p3"]');
   });
 
   it("can lazily initialize table with collapsed rows", async () => {
@@ -2364,11 +2735,13 @@ describe("GridTable", () => {
     ];
 
     const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+
     function Test() {
       const _api = useGridTableApi<Row>();
       api.current = _api;
       return <GridTable<Row> api={_api} columns={[selectCol, nameCol]} rows={rows} />;
     }
+
     // When rendering the table
     const r = await render(<Test />);
 
@@ -2377,7 +2750,7 @@ describe("GridTable", () => {
     expect(cellAnd(r, 2, 0, "select")).toBeChecked();
 
     // And the api can fetch them
-    expect(api.current!.getSelectedRowIds()).toEqual(["2", "1"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["1", "2"]);
 
     // And when we unselect all
     click(cellAnd(r, 1, 0, "select"));
@@ -2389,6 +2762,107 @@ describe("GridTable", () => {
 
     // And they can no longer be fetched by the api
     expect(api.current!.getSelectedRowIds()).toEqual([]);
+  });
+
+  it("can render with rows with initSelected defined include the children rows", async () => {
+    type ParentRow = { kind: "parent"; id: string; data: string };
+    type ChildRow = { kind: "child"; id: string; data: string };
+    type GrandChildRow = { kind: "grandChild"; id: string; data: string };
+    type Row = ParentRow | ChildRow | GrandChildRow;
+
+    const selectCol = selectColumn<Row>();
+    const nameCol: GridColumn<Row> = {
+      parent: (name) => name,
+      child: (name) => name,
+      grandChild: (name) => name,
+      mw: "160px",
+    };
+
+    // Given rows initially set as selected
+    const rows: GridDataRow<Row>[] = [
+      simpleHeader,
+      {
+        kind: "parent",
+        id: "1",
+        data: "Howard Stark",
+        inferSelectedState: false,
+        initSelected: true,
+        children: [
+          {
+            kind: "child" as const,
+            id: "2",
+            data: "Tony Stark",
+            initSelected: false,
+            inferSelectedState: false,
+            children: [
+              {
+                kind: "grandChild" as const,
+                id: "5",
+                data: "Morgan Stark",
+                initSelected: true,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        kind: "parent",
+        id: "3",
+        data: "Odin",
+        inferSelectedState: false,
+        initSelected: false,
+        children: [
+          {
+            kind: "child" as const,
+            id: "4",
+            data: "Thor",
+            initSelected: true,
+          },
+        ],
+      },
+    ] as GridDataRow<Row>[];
+
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+
+    function Test() {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      return <GridTable<Row> api={_api} columns={[selectCol, nameCol]} rows={rows} />;
+    }
+
+    // When rendering the table
+    const r = await render(<Test />);
+
+    expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+      "
+      | on |              |
+      | -- | ------------ |
+      | on | Howard Stark |
+      | on | Tony Stark   |
+      | on | Morgan Stark |
+      | on | Odin         |
+      | on | Thor         |
+      "
+    `);
+
+    // Then all rows are shown as selected
+    expect(cell(r, 1, 1)).toHaveTextContent("Howard Stark");
+    expect(cellAnd(r, 1, 0, "select")).toBeChecked();
+
+    expect(cell(r, 2, 1)).toHaveTextContent("Tony Stark");
+    expect(cellAnd(r, 2, 0, "select")).not.toBeChecked();
+
+    expect(cell(r, 3, 1)).toHaveTextContent("Morgan Stark");
+    expect(cellAnd(r, 3, 0, "select")).toBeChecked();
+
+    expect(cell(r, 4, 1)).toHaveTextContent("Odin");
+    expect(cellAnd(r, 4, 0, "select")).not.toBeChecked();
+
+    expect(cell(r, 5, 1)).toHaveTextContent("Thor");
+    expect(cellAnd(r, 5, 0, "select")).toBeChecked();
+
+    // And they can no longer be fetched by the api
+    expect(api.current!.getSelectedRowIds()).toEqual(["1", "5", "4"]);
   });
 
   describe("expandable columns", () => {
@@ -2538,6 +3012,791 @@ describe("GridTable", () => {
       // Then the visible column session storage is defined using the `visibleColumnsStorageKey` prop
       expect(sessionStorage.setItem).toHaveBeenLastCalledWith("testStorageKey", '["name"]');
     });
+
+    it("respects setting inferSelectState to false", async () => {
+      // Given nested rows
+      const rows: GridDataRow<NestedRow>[] = [
+        simpleHeader,
+        {
+          // With one parent that sets `inferSelectedState: false`
+          ...{ kind: "parent", id: "p1", inferSelectedState: false, data: { name: "parent 1" } },
+          children: [
+            {
+              ...{ kind: "child", id: "p1c1", data: { name: "child 1" } },
+              children: [
+                { kind: "grandChild", id: "p1c1gc1", data: { name: "grandChild p1c1gc1" } },
+                { kind: "grandChild", id: "p1c1gc2", data: { name: "grandChild p1c1gc2" } },
+              ],
+            },
+          ],
+        },
+      ];
+      const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+      const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+
+      // When selecting a grand child of the grandparent that sets `inferSelectedState: false`
+      click(cellAnd(r, 3, 1, "select"));
+
+      // Then the header row should be indeterminate
+      expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+      // And the parent row to not be checked.
+      expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
+      // And the child row should show indeterminate
+      expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1c1gc1"]);
+
+      // When selecting the parent
+      click(cellAnd(r, 1, 1, "select"));
+
+      // Then children should not be selected
+      expect(cellAnd(r, 0, 1, "select")).not.toBeChecked();
+      expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+      expect(cellAnd(r, 2, 1, "select")).not.toBeChecked();
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1gc1"]);
+
+      // select children
+      click(cellAnd(r, 0, 1, "select"));
+      click(cellAnd(r, 2, 1, "select"));
+
+      // When unselecting a single grand child
+      click(cellAnd(r, 3, 1, "select"));
+
+      // Then the header row should return to indeterminate
+      expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+      // And the parent row to remain checked, b/c it does not infer selected
+      expect(cellAnd(r, 1, 1, "select")).toBeChecked();
+      // And the child row should return to indeterminate, b/c it does infer selected
+      expect(cellAnd(r, 2, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1gc2"]);
+    });
+
+    it("respects initExpand and updates localStorage", async () => {
+      const tableIdentifier = "persistCollapse";
+
+      // Given a table with expandable columns that are initially expanded
+      // When initially rendered with the expandable column set to `initExpanded: true`.
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              expandableHeader: () => "Client name",
+              initExpanded: true,
+              header: () => "First name",
+              data: ({ firstName }) => firstName,
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                }),
+              ],
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+          persistCollapse={tableIdentifier}
+        />,
+      );
+
+      // Then the column is initially expanded
+      expect(cell(r, 1, 0)).toHaveTextContent("First name");
+      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
+      // And the local storage value is updated with the current state
+      expect(sessionStorage.getItem(`expandedColumn_${tableIdentifier}`)).toBe('["beamColumn_0"]');
+    });
+
+    it("respects initially expands columns set in localstorage", async () => {
+      const tableIdentifier = "persistCollapse";
+
+      sessionStorage.setItem(`expandedColumn_${tableIdentifier}`, JSON.stringify(["column1"]));
+
+      // Given a table with expandable columns that are initially expanded
+      // When initially rendered with the expandable column not initially collapsed
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              id: "column1",
+              expandableHeader: () => "Client name",
+              header: () => "First name",
+              data: ({ firstName }) => firstName,
+              expandColumns: [
+                column<ExpandableRow>({
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                }),
+              ],
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+          persistCollapse={tableIdentifier}
+        />,
+      );
+
+      // Then the column is initially expanded
+      expect(cell(r, 1, 0)).toHaveTextContent("First name");
+      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
+    });
+
+    it("ignores init expanded, but respects new columns", async () => {
+      // Given a table with a column that is initially hidden, and initially expanded where the expanded columns are lazily loaded
+      const columns: GridColumn<ExpandableRow>[] = [
+        {
+          id: "myColumn",
+          header: emptyCell,
+          data: ({ firstName }) => firstName,
+          expandableHeader: "First Name",
+        },
+        {
+          id: "myColumn2",
+          initVisible: false,
+          initExpanded: true,
+          canHide: true,
+          header: "First",
+          data: ({ firstName }) => firstName,
+          expandableHeader: "name",
+          expandColumns: async () => [
+            column<ExpandableRow>({
+              expandableHeader: emptyCell,
+              header: "Last Name",
+              data: ({ lastName }) => lastName,
+              w: "250px",
+            }),
+            column<ExpandableRow>({
+              expandableHeader: emptyCell,
+              header: "Age",
+              data: ({ age }) => age,
+              w: "80px",
+            }),
+          ],
+        },
+      ];
+
+      const rows: GridDataRow<ExpandableRow>[] = [
+        { kind: "header", id: "header", data: {} },
+        { kind: "expandableHeader", id: "expandableHeader", data: {} },
+        { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+      ];
+
+      // And a table tied to the GridTableApi
+      const api: MutableRefObject<GridTableApi<ExpandableRow> | undefined> = { current: undefined };
+
+      function Test() {
+        const _api = useGridTableApi<ExpandableRow>();
+        api.current = _api;
+        return <GridTable api={_api} columns={columns} rows={rows} />;
+      }
+
+      // When rendering the table
+      const r = await render(<Test />);
+      // Then the column is initially hidden
+      expect(row(r, 1).childNodes).toHaveLength(1);
+      // When setting the column to be visible
+      // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+      // eslint-disable-next-line testing-library/no-unnecessary-act
+      await act(async () => {
+        api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("myColumn2"));
+        // wait for promise to resolve
+        await wait();
+      });
+      // then expect 2 columns + 2 expandable columns to be visible
+      expect(row(r, 1).childNodes).toHaveLength(4);
+    });
+
+    it("ignores initExpanded for existing columns on rerender", async () => {
+      // Given a table with a column that is initially expanded
+      // And a table tied to the GridTableApi
+      const api: MutableRefObject<GridTableApi<ExpandableRow> | undefined> = { current: undefined };
+
+      function Test() {
+        const _api = useGridTableApi<ExpandableRow>();
+        api.current = _api;
+        return (
+          <GridTable
+            api={_api}
+            columns={[
+              column<ExpandableRow>({
+                id: "columnA",
+                expandableHeader: () => "Client name",
+                initExpanded: true,
+                header: (data, { expanded }) => (expanded ? "First name" : "Full name"),
+                data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+                expandColumns: [
+                  column<ExpandableRow>({
+                    expandableHeader: emptyCell,
+                    header: "Last name",
+                    data: ({ lastName }) => lastName,
+                  }),
+                ],
+              }),
+              column<ExpandableRow>({
+                id: "columnB",
+                initVisible: false,
+                canHide: true,
+                expandableHeader: () => "Age",
+                header: emptyCell,
+                data: ({ age }) => age,
+              }),
+            ]}
+            rows={[
+              { kind: "header", id: "header", data: {} },
+              { kind: "expandableHeader", id: "expandableHeader", data: {} },
+              { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+            ]}
+          />
+        );
+      }
+
+      // When rendering the table
+      const r = await render(<Test />);
+
+      // Then the column is initially expanded (1 column + 1 expanded column)
+      expect(row(r, 1).childNodes).toHaveLength(2);
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Client name |
+        | First name  | Last name |
+        | ----------- | --------- |
+        | Brandon     | Dow       |
+        "
+      `);
+
+      //  When clicking to collapse `columnA`
+      click(r.expandableColumn);
+
+      // Then the column is collapsed
+      expect(row(r, 1).childNodes).toHaveLength(1);
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Client name |
+        | Full name   |
+        | ----------- |
+        | Brandon Dow |
+        "
+      `);
+
+      // And when then triggering new `columnB` to be introduced
+      // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+      // eslint-disable-next-line testing-library/no-unnecessary-act
+      await act(async () => {
+        api.current?.setVisibleColumns(api.current.getVisibleColumnIds().concat("columnB"));
+        await wait();
+      });
+
+      // Then the `columnA` remains collapsed
+      expect(row(r, 1).childNodes).toHaveLength(2);
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Client name | Age |
+        | Full name   |     |
+        | ----------- | --- |
+        | Brandon Dow | 36  |
+        "
+      `);
+    });
+  });
+
+  it("can be tested with a human readable inlineSnapshot using tableSnapshot()", async () => {
+    // Given a table with simple data
+    const r = await render(
+      <GridTable
+        columns={[nameColumn, valueColumn]}
+        sorting={{ on: "client" }}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "Row 1", value: 200 } },
+          { kind: "data", id: "2", data: { name: "Row 2 with a longer name", value: 300 } },
+          { kind: "data", id: "3", data: { name: "Row 3", value: 1000 } },
+        ]}
+      />,
+    );
+
+    // Then a text snapshot should be generated when using `tableSnapshot`
+    expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+      "
+      | Name                     | Value |
+      | ------------------------ | ----- |
+      | Row 1                    | 200   |
+      | Row 2 with a longer name | 300   |
+      | Row 3                    | 1000  |
+      "
+    `);
+  });
+
+  it("tableSnapshot can use a subset of columns", async () => {
+    // Given a table with simple data
+    const r = await render(
+      <GridTable
+        columns={[idColumn, nameColumn, valueColumn]}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "Row 1", value: 200 } },
+          { kind: "data", id: "2", data: { name: "Row 2", value: 300 } },
+          { kind: "data", id: "3", data: { name: "Row 3", value: 1000 } },
+        ]}
+      />,
+    );
+
+    // Then a text snapshot should be generated when using `tableSnapshot`
+    expect(tableSnapshot(r, ["Id", "Value"])).toMatchInlineSnapshot(`
+      "
+      | Id | Value |
+      | -- | ----- |
+      | 1  | 200   |
+      | 2  | 300   |
+      | 3  | 1000  |
+      "
+    `);
+  });
+
+  it("renders totals row in the correct order", async () => {
+    type Row = SimpleHeaderAndData<Data> | TotalsRow;
+    // Given a table with simple header, totals, and data row
+    const valueColumn: GridColumn<Row> = {
+      totals: () => ({ content: "totals" }),
+      header: () => ({ content: "header value" }),
+      data: () => ({ content: "data value" }),
+    };
+    // When the table renders
+    const r = await render(
+      <GridTable
+        columns={[valueColumn]}
+        rows={[
+          {
+            kind: "totals",
+            id: "totals",
+            data: undefined,
+          },
+          ...rows,
+        ]}
+      />,
+    );
+    // Then the first row is header
+    expect(row(r, 0)).toHaveTextContent("header value");
+    // And 2nd row is the totals
+    expect(row(r, 1)).toHaveTextContent("totals");
+    // And final row is the data
+    expect(row(r, 2)).toHaveTextContent("data value");
+  });
+
+  describe("hidden selected rows", () => {
+    it("displays hidden selected rows when filtering server side", async () => {
+      // Given the table with the initial rows selected
+      // Using a "Test" component in order to be able to change the table rows via a state update
+      function Test() {
+        const columns = [nameColumn, valueColumn];
+        const initRows: GridDataRow<Row>[] = [
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+        ];
+        const [rows, setRows] = useState(initRows);
+
+        return (
+          <>
+            <button
+              onClick={() =>
+                setRows((rows) => [simpleHeader, { kind: "data", id: "2", data: { name: "bar", value: 2 } }])
+              }
+              data-testid="replace"
+            />
+            <GridTable columns={columns} rows={rows} />
+          </>
+        );
+      }
+
+      const r = await render(<Test />);
+      // Then the hidden selected group row is not displayed initially, as there is no filter applied
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name | Value |
+        | ---- | ----- |
+        | foo  | 1     |
+        "
+      `);
+      // When clicking the replace button to simulate server-side filtering
+      click(r.replace);
+      // Then the hidden selected group row is displayed with the missing row's data
+      click(r.chevronRight);
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                 | Value |
+        | ------------------------------------ | ----- |
+        | 1 selected row hidden due to filters |
+        | foo                                  | 1     |
+        | bar                                  | 2     |
+        "
+      `);
+    });
+
+    it("displays hidden selected rows when filtering client side", async () => {
+      // Given the table with a filter applied and rows selected
+      const columns = [nameColumn, valueColumn];
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+        { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
+        { kind: "data", id: "3", data: { name: "biz", value: 3 }, initSelected: true },
+      ];
+      const r = await render(<GridTable columns={columns} rows={rows} filter="foo" />);
+      // Then the hidden selected group row is displayed, and initially collapsed
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                  | Value |
+        | ------------------------------------- | ----- |
+        | 2 selected rows hidden due to filters |
+        | foo                                   | 1     |
+        "
+      `);
+
+      // When clicking the expand button
+      click(r.chevronRight);
+      // Then the hidden selected group row is expanded
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                  | Value |
+        | ------------------------------------- | ----- |
+        | 2 selected rows hidden due to filters |
+        | bar                                   | 2     |
+        | biz                                   | 3     |
+        | foo                                   | 1     |
+        "
+      `);
+    });
+
+    it("sorts hidden selected rows independently from visible rows", async () => {
+      // Given the table with a filter applied and rows selected
+      const columns = [nameColumn, valueColumn];
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+        { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
+        { kind: "data", id: "3", data: { name: "biz", value: 3 }, initSelected: true },
+      ];
+      const r = await render(
+        <GridTable columns={columns} rows={rows} filter="bar" sorting={{ on: "client", initial: ["value", "DESC"] }} />,
+      );
+
+      // When clicking the expand button
+      click(r.chevronRight);
+      // Then the hidden selected group row is sorted independently of visible rows
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                  | Value |
+        | ------------------------------------- | ----- |
+        | 2 selected rows hidden due to filters |
+        | biz                                   | 3     |
+        | foo                                   | 1     |
+        | bar                                   | 2     |
+        "
+      `);
+    });
+
+    it("reverts the hidden selected group collapse state once removed", async () => {
+      // Given a filterable table with rows selected
+      function Test() {
+        const columns = [nameColumn, valueColumn];
+        const rows: GridDataRow<Row>[] = [
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+          { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
+        ];
+        const [filter, setFilter] = useState("foo");
+        return (
+          <>
+            <input type="text" data-testid="filter" value={filter} onChange={(e) => setFilter(e.target.value)} />
+            <GridTable columns={columns} rows={rows} filter={filter} />
+          </>
+        );
+      }
+      const r = await render(<Test />);
+      // Then the hidden selected group row is initially collapsed
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                 | Value |
+        | ------------------------------------ | ----- |
+        | 1 selected row hidden due to filters |
+        | foo                                  | 1     |
+        "
+      `);
+      // When clicking the expand button
+      click(r.chevronRight);
+      // Then the hidden selected group row is expanded
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                 | Value |
+        | ------------------------------------ | ----- |
+        | 1 selected row hidden due to filters |
+        | bar                                  | 2     |
+        | foo                                  | 1     |
+        "
+      `);
+      // When removing the filter
+      type(r.filter, "");
+      // Then the hidden selected group row is removed
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name | Value |
+        | ---- | ----- |
+        | foo  | 1     |
+        | bar  | 2     |
+        "
+      `);
+      // When applying a filter again
+      await typeAndWait(r.filter, "bar");
+      // Then the hidden selected group row is reintroduced in its collapsed state
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name                                 | Value |
+        | ------------------------------------ | ----- |
+        | 1 selected row hidden due to filters |
+        | bar                                  | 2     |
+        "
+      `);
+    });
+
+    it("removes the hidden selected group row when all selected rows are removed", async () => {
+      // Given the table with a filter applied and rows selected
+      const columns = [selectColumn<Row>(), nameColumn, valueColumn];
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+        { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
+        { kind: "data", id: "3", data: { name: "biz", value: 3 }, initSelected: true },
+      ];
+      const r = await render(
+        <GridTable columns={columns} rows={rows} filter="bar" sorting={{ on: "client", initial: ["value", "DESC"] }} />,
+      );
+      // When deselecting the kept rows
+      click(r.chevronRight);
+      expect(cell(r, 1, 0)).toHaveTextContent("2 selected rows hidden due to filters");
+      click(r.select_1);
+      expect(cell(r, 1, 0)).toHaveTextContent("1 selected row hidden due to filters");
+      click(r.select_1);
+      // Then the hidden selected group row is removed
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | on | Name | Value |
+        | -- | ---- | ----- |
+        | on | bar  | 2     |
+        "
+      `);
+    });
+
+    it("updates the selected state of the header and parent rows when rows are hidden", async () => {
+      // Given the GridTable with nested rows
+      function Test() {
+        const rows: GridDataRow<NestedRow>[] = [
+          simpleHeader,
+          {
+            id: "p1",
+            kind: "parent",
+            data: { name: "p1" },
+            children: [
+              { id: "c1", kind: "child", data: { name: "c1" } },
+              { id: "c2", kind: "child", data: { name: "c2" } },
+              { id: "c3", kind: "child", data: { name: "c3" } },
+            ],
+          },
+        ];
+        const [filter, setFilter] = useState("");
+        return (
+          <>
+            <input type="text" data-testid="filter" value={filter} onChange={(e) => setFilter(e.target.value)} />
+            <GridTable columns={nestedColumns} rows={rows} filter={filter} />
+          </>
+        );
+      }
+
+      const r = await render(<Test />);
+      // When selecting two of the three children
+      click(r.select_2);
+      click(r.select_3);
+      // Then the header and parent row is partially selected
+      expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+      expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+
+      // When applying a filter to hide the unselected row
+      type(r.filter, "c1");
+      // Then the header and parent rows match the selected state of the visible rows
+      expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+      expect(cellAnd(r, 2, 1, "select")).toBeChecked();
+      // When deselecting the visible row
+      click(r.select_2);
+
+      // Then the parent row is now unchecked (respecting only the matched rows), but the header is still partially
+      // selected as it takes into consideration the kept selected rows
+      expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+      expect(cellAnd(r, 2, 1, "select")).not.toBeChecked();
+
+      // And when clearing the filter
+      type(r.filter, "");
+      // Then the parent row becomes partially selected now that the selected row is no longer "kept"
+      expect(cellAnd(r, 1, 1, "select")).toHaveAttribute("data-indeterminate", "true");
+    });
+
+    it("hides parent rows in the kept group unless they define inferSelected as false", async () => {
+      // Given nested rows with two parents - one that sets `inferSelectedState: false`.
+      // And all rows are selected, and a filter is applied that matches none of the rows
+      const rows: GridDataRow<NestedRow>[] = [
+        simpleHeader,
+        {
+          id: "p1",
+          kind: "parent",
+          data: { name: "p1" },
+          initSelected: true,
+          children: [{ id: "c1", kind: "child", data: { name: "c1" }, initSelected: true }],
+        },
+        {
+          id: "p2",
+          kind: "parent",
+          data: { name: "p2" },
+          inferSelectedState: false,
+          initSelected: true,
+          children: [{ id: "c2", kind: "child", data: { name: "c2" }, initSelected: true }],
+        },
+      ];
+      const r = await render(<GridTable columns={nestedColumns} rows={rows} filter="no-match" />);
+      // And expand the kept group
+      click(r.chevronRight);
+      // Then the kept group will contain `p2`, but not `p1`.
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | -                                     | on | Name |
+        | ------------------------------------- | -- | ---- |
+        | 3 selected rows hidden due to filters |
+        | -                                     | on | c1   |
+        | -                                     | on | p2   |
+        | -                                     | on | c2   |
+        | No rows found.                        |
+        "
+      `);
+    });
+
+    it("unselects all kept selected rows when deselecting the header", async () => {
+      // Given selected rows and a filter applied to show the kept selected group
+      const columns = [selectColumn<Row>(), nameColumn, valueColumn];
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, initSelected: true },
+        { kind: "data", id: "2", data: { name: "bar", value: 2 }, initSelected: true },
+      ];
+      const r = await render(<GridTable columns={columns} rows={rows} filter="bar" />);
+      // Then the kept selected group is shown
+      expect(cell(r, 1, 0)).toHaveTextContent("1 selected row hidden due to filters");
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | on                                   | Name | Value |
+        | ------------------------------------ | ---- | ----- |
+        | 1 selected row hidden due to filters |
+        | on                                   | bar  | 2     |
+        "
+      `);
+      // Then the header is fully selected
+      expect(r.select_0).toHaveAttribute("data-indeterminate", "false");
+      // When deselecting the header
+      click(r.select_0);
+      // Then the kept selected group is hidden
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | on | Name | Value |
+        | -- | ---- | ----- |
+        | on | bar  | 2     |
+        "
+      `);
+    });
+  });
+
+  describe("deleting rows", () => {
+    it("deletes a row", async () => {
+      // Given a table with the ability to delete rows
+      const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+      function TestComponent() {
+        const _api = useGridTableApi<Row>();
+        api.current = _api;
+        const [rows, setRows] = useState<GridDataRow<Row>[]>([
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+          { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+        ]);
+        return (
+          <>
+            <button
+              onClick={() => {
+                setRows((rows) => rows.filter((r) => !_api.getSelectedRowIds().includes(r.id)));
+                _api.deleteRows(_api.getSelectedRowIds());
+              }}
+              data-testid="deleteRows"
+            />
+            <GridTable columns={[selectColumn<Row>(), ...columns]} rows={rows} api={_api} />
+          </>
+        );
+      }
+      const r = await render(<TestComponent />);
+      // The table has two rows and a header
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | on | Name | Value |
+        | -- | ---- | ----- |
+        | on | foo  | 1     |
+        | on | bar  | 2     |
+        "
+      `);
+      // When selecting a row
+      click(r.select_1);
+      // And clicking the delete button
+      click(r.deleteRows);
+      // Then it is removed from the table
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | on | Name | Value |
+        | -- | ---- | ----- |
+        | on | bar  | 2     |
+        "
+      `);
+    });
+  });
+
+  it("rejects cycles in rows", async () => {
+    // Given a parent that is its own child
+    const rows: GridDataRow<NestedRow>[] = [
+      {
+        ...{ kind: "parent", id: "p1", data: { name: "parent 1" } },
+        children: [{ kind: "parent", id: "p1", data: { name: "child p1c1" } }],
+      },
+    ];
+    // Then we reject it
+    const p = render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+    await expect(p).rejects.toThrow("Duplicate row id p1");
+  });
+
+  it("rejects duplicates in rows", async () => {
+    // Given an id that is duplicated within the same kind
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "parent", id: "p1", data: { name: "parent 1" } },
+      { kind: "parent", id: "p1", data: { name: "parent 1" } },
+    ];
+    // Then we reject it
+    const p = render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+    await expect(p).rejects.toThrow("Duplicate row id p1");
+  });
+
+  it("rejects duplicate ids even if different kinds", async () => {
+    // Given an id that is duplicated even across kinds
+    const rows: GridDataRow<NestedRow>[] = [
+      { kind: "parent", id: "1", data: { name: "parent 1" } },
+      { kind: "child", id: "1", data: { name: "child 1" } },
+    ];
+    // Then we reject it
+    const p = render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+    await expect(p).rejects.toThrow("Duplicate row id 1");
   });
 });
 

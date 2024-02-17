@@ -14,14 +14,14 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
     <div
       css={{
         ...Css.df.$,
-        "&:focus-within > div:nth-of-type(2)": Css.bgLightBlue700.$, // Separation line when inputs are focused
+        "&:focus-within > div:nth-of-type(2)": Css.bgBlue700.$, // Separation line when inputs are focused
       }}
     >
       <div
         css={{
           ...commonStyles,
           ...Css.bl.borderRadius("4px 0 0 4px").$,
-          "&:focus-within": Css.bLightBlue700.$,
+          "&:focus-within": Css.bBlue700.$,
         }}
       >
         {cloneElement(children[0], {
@@ -35,7 +35,7 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
         css={{
           ...commonStyles,
           ...Css.fg1.br.borderRadius("0 4px 4px 0").$,
-          "&:focus-within": Css.bLightBlue700.$,
+          "&:focus-within": Css.bBlue700.$,
         }}
       >
         {cloneElement(children[1], {

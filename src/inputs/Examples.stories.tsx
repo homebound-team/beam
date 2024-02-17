@@ -11,7 +11,7 @@ import { TextAreaField } from "./TextAreaField";
 import { TextField } from "./TextField";
 
 export default {
-  title: "Workspace/Inputs/Examples",
+  title: "Inputs/SuperDrawerInputs",
   decorators: [withBeamDecorator],
 } as Meta;
 

@@ -11,11 +11,11 @@ interface SnackBarStoryProps extends Omit<SnackbarNoticeProps, "action"> {
   actionLabel?: string;
   actionVariant?: ButtonVariant;
   offset?: Offset;
+  notices: SnackbarNoticeProps[];
 }
 
 export default {
   component: Snackbar,
-  title: "Workspace/Components/Snackbar",
   decorators: [withBeamDecorator],
   args: {
     icon: undefined,
@@ -27,9 +27,10 @@ export default {
     offset: { bottom: 200 },
   },
   argTypes: {
-    icon: { control: { type: "select", options: [undefined, "error", "info", "success", "warning"] } },
+    icon: { control: { type: "select" }, options: [undefined, "error", "info", "success", "warning"] },
     actionVariant: {
-      control: { type: "select", options: ["primary", "secondary", "tertiary", "text", "danger"] },
+      options: ["primary", "secondary", "tertiary", "text", "danger"],
+      control: { type: "select" },
       name: "action.variant",
     },
     actionLabel: { name: "action.label" },
@@ -40,7 +41,7 @@ export default {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36152%3A102047",
-    }
+    },
   },
 } as Meta<SnackBarStoryProps>;
 
@@ -83,9 +84,14 @@ function CustomOffsetComponent(props: SnackBarStoryProps) {
   const { actionLabel, actionVariant, offset, ...noticeProps } = props;
 
   useSnackbarOffset(offset ?? {});
-  useEffect(() => {
-    triggerNotice({ message: "Initial notice for chromatic diff purposes to ensure proper placement." });
-  }, []);
+  useEffect(
+    () => {
+      triggerNotice({ message: "Initial notice for chromatic diff purposes to ensure proper placement." });
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   return (
     <Button
@@ -108,18 +114,23 @@ export function SystematicClose(args: SnackBarStoryProps) {
   const noticeId = "customId";
   const { actionLabel, actionVariant, ...noticeProps } = args;
 
-  const triggerOnClick = useCallback(() => {
-    triggerNotice({
-      ...noticeProps,
-      ...(actionLabel
-        ? { action: { label: actionLabel, variant: actionVariant, onClick: action(`${actionLabel} clicked`) } }
-        : undefined),
-      id: noticeId,
-      persistent: true,
-      onClose: () => setNoticeOpen(false),
-    });
-    setNoticeOpen(true);
-  }, [noticeId]);
+  const triggerOnClick = useCallback(
+    () => {
+      triggerNotice({
+        ...noticeProps,
+        ...(actionLabel
+          ? { action: { label: actionLabel, variant: actionVariant, onClick: action(`${actionLabel} clicked`) } }
+          : undefined),
+        id: noticeId,
+        persistent: true,
+        onClose: () => setNoticeOpen(false),
+      });
+      setNoticeOpen(true);
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [noticeId],
+  );
 
   const closeOnClick = useCallback(() => {
     closeNotice(noticeId);

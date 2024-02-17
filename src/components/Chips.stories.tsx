@@ -5,12 +5,11 @@ import { Css } from "src/Css";
 
 export default {
   component: Chips,
-  title: "Workspace/Components/Chips",
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101241",
-    }
+    },
   },
 } as Meta;
 
@@ -43,4 +42,20 @@ export function ChipsWithCustomTitles() {
     { text: "Chip 2 Content", title: "Custom title 2" },
   ];
   return <Chips values={customChips} />;
+}
+
+export function ChipsWithCompactVariant() {
+  return (
+    <>
+      <h1 css={Css.mt3.$}>Chips with compact variant</h1>
+      <div css={Css.wPx(300).ba.$}>
+        <Chips values={["First Last", "Second Last", "Third Last", "Fourth Last"]} compact />
+      </div>
+
+      <h1 css={Css.mt3.$}>Chips without compact</h1>
+      <div css={Css.wPx(300).ba.$}>
+        <Chips values={["First Last", "Second Last", "Third Last", "Fourth Last"]} />
+      </div>
+    </>
+  );
 }

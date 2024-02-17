@@ -8,19 +8,19 @@ describe("useToast", () => {
     // Given an app that can trigger a toast
     const r = await render(<TestToastComponent />);
     // When triggering the toast
-    click(r.toastButton());
+    click(r.toastButton);
     // Then expect it to show
-    expect(r.toast()).toBeInTheDocument();
+    expect(r.toast).toBeInTheDocument();
   });
 
   it("can close a toast notice", async () => {
     // Given an app that can trigger a toast
     const r = await render(<TestToastComponent />);
     // When triggering the toast and clicking on the close button
-    click(r.toastButton());
-    click(r.toast_close());
+    click(r.toastButton);
+    click(r.toast_close);
     // Then expect it to be closed
-    expect(r.toast).toNotBeInTheDom();
+    expect(r.query.toast).not.toBeInTheDocument();
   });
 });
 

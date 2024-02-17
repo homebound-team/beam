@@ -64,9 +64,9 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
 
 const typeToIcon: Record<SnackbarNoticeTypes, Pick<IconProps, "icon" | "color">> = {
   // Can change to a Tupple with IconKey and color?
-  error: { icon: "xCircle", color: Palette.Red300 },
+  error: { icon: "xCircle", color: Palette.Red400 },
   warning: { icon: "error", color: Palette.Yellow300 },
   success: { icon: "checkCircle", color: Palette.Green300 },
-  info: { icon: "infoCircle", color: Palette.LightBlue200 },
+  info: { icon: "infoCircle", color: Palette.Blue300 },
   alert: { icon: "errorCircle", color: Palette.White },
 };

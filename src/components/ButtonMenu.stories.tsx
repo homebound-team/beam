@@ -8,7 +8,6 @@ import { withDimensions, withRouter } from "src/utils/sb";
 
 export default {
   component: ButtonMenu,
-  title: "Workspace/Components/Button Menus",
   decorators: [withRouter(), withDimensions()],
 } as Meta;
 
@@ -213,12 +212,44 @@ export function WithSearchListItems() {
   );
 }
 
-export function IconMenuWtihSearchableList() {
+export function NavLinkButtonMenu() {
   const menuItems: MenuItem[] = [
-    { label: "Design doc", onClick: action("Austin") },
+    { label: "Page action", onClick: action("Test item clicked") },
+    { label: "Internal Link", onClick: "/fakeRoute" },
+    { label: "External Link - Homebound.com", onClick: "https://www.homebound.com" },
+  ];
+
+  return (
+    <div css={Css.mlPx(200).$}>
+      <h2 css={Css.lg.$}>Nav Link Button Menu</h2>
+      <ButtonMenu
+        trigger={{ navLabel: "Menu trigger", variant: "global" }}
+        items={menuItems}
+        persistentItems={[
+          { label: "Persistent Action", onClick: action("Persistent action clicked") },
+          { label: "Destructive Action", onClick: action("Destructive Action Clicked"), destructive: true },
+        ]}
+        defaultOpen
+        contrast={true}
+      />
+    </div>
+  );
+}
+
+export function SelectableMenuItems() {
+  const [selectedItem, setSelectedItem] = useState("Design doc");
+  const menuItems: MenuItem[] = [
+    { label: "Design doc", onClick: action("Design doc") },
     { label: "Expense report", onClick: action("Expense report") },
     { label: "Training plan", onClick: action("Training plan") },
   ];
 
-  return <ButtonMenu defaultOpen trigger={{ icon: "archive" }} items={menuItems} searchable />;
+  return (
+    <ButtonMenu
+      trigger={{ icon: "verticalDots" }}
+      items={menuItems}
+      selectedItem={selectedItem}
+      onChange={(key) => setSelectedItem(key)}
+    />
+  );
 }

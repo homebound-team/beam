@@ -1,6 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { fireEvent, within } from "@storybook/testing-library";
+import { within } from "@storybook/testing-library";
 import { useState } from "react";
 import { GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndData } from "src/components";
 import { Css } from "src/Css";
@@ -12,7 +12,6 @@ import { withDimensions, zeroTo } from "src/utils/sb";
 
 export default {
   component: SelectField,
-  title: "Workspace/Inputs/Select Fields",
   parameters: {
     layout: "fullscreen",
     design: {
@@ -202,6 +201,8 @@ function Template(args: SelectFieldProps<any, any>) {
           disabledOptions={[options[0].id, { value: options[3].id, reason: "Example disabled tooltip" }]}
           helperText="Disabled options can optionally have tooltip text"
         />
+
+        <TestSelectField {...args} fullWidth label="Full Width" value={options[2].id} options={options} />
       </div>
 
       <div css={Css.df.fdc.gap2.$}>
@@ -225,6 +226,7 @@ Contrast.args = { compact: true, contrast: true };
 const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
 
 export function PerfTest() {
+  const [loaded, setLoaded] = useState<TestOption[]>([]);
   const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);
   return (
     <SelectField
@@ -233,13 +235,12 @@ export function PerfTest() {
       onSelect={setSelectedValue}
       errorMsg={selectedValue !== undefined ? "" : "Select an option. Plus more error text to force it to wrap."}
       options={{
-        initial: [loadTestOptions[2]],
+        current: loadTestOptions[2],
         load: async () => {
-          return new Promise((resolve) => {
-            // @ts-ignore - believes `options` should be of type `never[]`
-            setTimeout(() => resolve({ options: loadTestOptions }), 1500);
-          });
+          await sleep(1500);
+          setLoaded(loadTestOptions);
         },
+        options: loaded,
       }}
       onBlur={action("onBlur")}
       onFocus={action("onFocus")}
@@ -248,22 +249,59 @@ export function PerfTest() {
 }
 PerfTest.parameters = { chromatic: { disableSnapshot: true } };
 
-export function LoadingState() {
+export function LazyLoadStateFields() {
+  const [loaded, setLoaded] = useState<TestOption[]>([]);
   const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);
+  return (
+    <>
+      <SelectField
+        label="Project"
+        value={selectedValue}
+        onSelect={setSelectedValue}
+        unsetLabel={"-"}
+        options={{
+          current: loadTestOptions.find((o) => o.id === selectedValue)!,
+          load: async () => {
+            await sleep(1500);
+            setLoaded(loadTestOptions);
+          },
+          options: loaded,
+        }}
+      />
+      <SelectField
+        label="Project 2 (i.e In a SuperDrawer)"
+        value={selectedValue}
+        onSelect={setSelectedValue}
+        unsetLabel={"-"}
+        options={{
+          current: loadTestOptions.find((o) => o.id === selectedValue)!,
+          load: async () => {
+            await sleep(1500);
+            setLoaded(loadTestOptions);
+          },
+          options: loaded,
+        }}
+      />
+    </>
+  );
+}
+LazyLoadStateFields.parameters = { chromatic: { disableSnapshot: true } };
 
+export function LoadingState() {
+  const [loaded, setLoaded] = useState<TestOption[]>([]);
+  const [selectedValue, setSelectedValue] = useState<string | undefined>(loadTestOptions[2].id);
   return (
     <SelectField
       label="Project"
       value={selectedValue}
       onSelect={setSelectedValue}
       options={{
-        initial: [loadTestOptions[2]],
+        current: loadTestOptions[2],
         load: async () => {
-          return new Promise((resolve) => {
-            // @ts-ignore - believes `options` should be of type `never[]`
-            setTimeout(() => resolve({ options: loadTestOptions }), 5000);
-          });
+          await sleep(5000);
+          setLoaded(loadTestOptions);
         },
+        options: loadTestOptions,
       }}
     />
   );
@@ -274,7 +312,8 @@ LoadingState.parameters = {
 };
 LoadingState.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   const canvas = within(canvasElement);
-  await fireEvent.focus(canvas.getByTestId("project"));
+  canvas.getByTestId("project").focus();
+  canvas.getByTestId("project").click();
 };
 
 export function InTable() {
@@ -287,7 +326,7 @@ export function InTable() {
 }
 const people: InternalUser[] = zeroTo(10).map((i) => ({
   id: `iu:${i + 1}`,
-  name: `Test user ${i + 1}`.repeat((i % 2) + 1),
+  name: `Test user ${i + 1} `.repeat((i % 5) + 1),
 }));
 const rowData: Request[] = zeroTo(10).map((i) => ({
   id: `r:${i + 1}`,
@@ -353,3 +392,5 @@ function TestSelectField<T extends object, V extends Value>(
     </div>
   );
 }
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

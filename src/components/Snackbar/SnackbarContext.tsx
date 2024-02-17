@@ -1,5 +1,6 @@
-import React, { createContext, PropsWithChildren, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 import { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
+import { ChildrenOnly } from "src/types";
 import { Offset, Snackbar } from "./Snackbar";
 
 export type SnackbarContextProps = {
@@ -9,7 +10,7 @@ export type SnackbarContextProps = {
 
 export const SnackbarContext = createContext<SnackbarContextProps>({ setNotices: () => {}, setOffset: () => {} });
 
-export function SnackbarProvider(props: PropsWithChildren<{}>) {
+export function SnackbarProvider(props: ChildrenOnly) {
   const [notices, setNotices] = useState<SnackbarNoticeProps[]>([]);
   const [offset, setOffset] = useState<Offset>({});
   const contextValue = useMemo(() => ({ setNotices, setOffset }), []);

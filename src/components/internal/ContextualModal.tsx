@@ -4,7 +4,7 @@ import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export interface ContextualModalProps {
-  content: ReactNode;
+  content: ReactNode | ((close: () => void) => ReactNode);
   title?: string;
   close: () => void;
 }

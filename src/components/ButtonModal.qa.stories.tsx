@@ -2,7 +2,6 @@ import { ButtonModal, ButtonModalProps } from "./ButtonModal";
 
 export default {
   component: ButtonModal,
-  title: "Design QA/ButtonModal",
 };
 
 export function ButtonModalForQa(props: ButtonModalProps) {

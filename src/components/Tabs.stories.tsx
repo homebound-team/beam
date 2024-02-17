@@ -11,7 +11,6 @@ import { getTabStyles } from "./Tabs";
 import { TabValue, TestTabContent, testTabs } from "./testData";
 
 export default {
-  title: "Workspace/Components/Tabs",
   component: TabsWithContent,
   parameters: {
     // To better view the icon hover state
@@ -19,7 +18,7 @@ export default {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36087%3A106217",
-    }
+    },
   },
   decorators: [withRouter(), withBeamDecorator],
 } as Meta;
@@ -207,7 +206,7 @@ function getChildren(label: string) {
   return (
     <Fragment>
       {label}
-      <Icon icon="checkCircle" css={Css.ml1.$} />
+      <Icon icon="checkCircle" />
     </Fragment>
   );
 }

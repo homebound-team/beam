@@ -1,8 +1,11 @@
-import React, { LabelHTMLAttributes } from "react";
+import React, { LabelHTMLAttributes, ReactNode } from "react";
 import { VisuallyHidden } from "react-aria";
-import { Css } from "src/Css";
+import { Css, Font, Only, Palette, Xss } from "src/Css";
+import { Icon } from "src";
 
-interface LabelProps {
+type LabelXss = Font | "color";
+
+interface LabelProps<X> {
   // We don't usually have `fooProps`-style props, but this is for/from react-aria
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   label: string;
@@ -10,24 +13,45 @@ interface LabelProps {
   // If set, it is recommended to wrap in an element with `position: relative;` set, as the label will have an absolute position.
   hidden?: boolean;
   contrast?: boolean;
+  multiline?: boolean;
+  tooltip?: ReactNode;
+  // Removes margin bottom if true - This is different from InlineLabel. InlineLabel expects to be rendered visually within the field element. Rather just on the same line.
+  inline?: boolean;
+  xss?: X;
 }
 
 /** An internal helper component for rendering form labels. */
-export const Label = React.memo((props: LabelProps) => {
-  const { labelProps, label, hidden, suffix, contrast = false, ...others } = props;
+function LabelComponent<X extends Only<Xss<LabelXss>, X>>(props: LabelProps<X>) {
+  const { labelProps, label, hidden, suffix, contrast = false, tooltip, inline, xss, ...others } = props;
   const labelEl = (
-    <label {...labelProps} {...others} css={Css.dib.sm.gray700.mbPx(4).if(contrast).white.$}>
+    <label
+      {...labelProps}
+      {...others}
+      css={{ ...Css.dif.aic.gap1.sm.gray700.mbPx(inline ? 0 : 4).if(contrast).white.$, ...xss }}
+    >
       {label}
       {suffix && ` ${suffix}`}
+      {tooltip && (
+        <span css={Css.fs0.$}>
+          <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={contrast ? Palette.White : Palette.Gray700} />
+        </span>
+      )}
     </label>
   );
   return hidden ? <VisuallyHidden>{labelEl}</VisuallyHidden> : labelEl;
-});
+}
 
+export const Label = React.memo(LabelComponent) as typeof LabelComponent;
+
+type InlineLabelProps = Omit<LabelProps<unknown>, "xss" | "inline">;
 /** Used for showing labels within text fields. */
-export function InlineLabel({ labelProps, label, contrast, ...others }: LabelProps) {
+export function InlineLabel({ labelProps, label, contrast, multiline = false, ...others }: InlineLabelProps) {
   return (
-    <label {...labelProps} {...others} css={Css.smMd.nowrap.gray900.prPx(4).add("color", "currentColor").$}>
+    <label
+      {...labelProps}
+      {...others}
+      css={Css.smMd.nowrap.gray900.prPx(4).add("color", "currentColor").asc.if(multiline).asfs.pt1.$}
+    >
       {label}:
     </label>
   );

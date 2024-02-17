@@ -4,7 +4,6 @@ import { ButtonGroup } from "src/index";
 
 export default {
   component: ButtonGroup,
-  title: "Workspace/Components/Button Groups",
   parameters: {
     design: {
       type: "figma",

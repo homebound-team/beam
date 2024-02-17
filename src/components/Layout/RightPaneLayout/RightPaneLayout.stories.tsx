@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react";
-import { PropsWithChildren, useMemo } from "react";
+import { useMemo } from "react";
+import { ChildrenOnly } from "src/types";
 import { withBeamDecorator, zeroTo } from "src/utils/sb";
 import { Css } from "../../../Css";
 import { Button } from "../../Button";
@@ -14,7 +15,6 @@ import { useRightPane } from "./useRightPane";
 
 export default {
   component: RightPaneLayout,
-  title: "Workspace/Components/Layout/RightPaneLayout",
   decorators: [withBeamDecorator],
 } as Meta;
 
@@ -54,6 +54,33 @@ export function GridTableWithRightPane() {
   );
 }
 
+export function RightPaneWithDefaultPaneContent() {
+  return (
+    <TestProjectLayout>
+      <DashboardExample />
+    </TestProjectLayout>
+  );
+}
+
+function DefaultPaneContent() {
+  return (
+    <div css={Css.df.fdc.h100.$}>
+      <div css={Css.bgWhite.w100.f1.br8.p3.$}>Right Column Content</div>
+      <div css={Css.bgWhite.w100.f1.mt3.br8.p3.$}>Right Column Content</div>
+    </div>
+  );
+}
+
+function DashboardExample({ numCols, numRows }: { numCols?: number; numRows?: number }) {
+  return (
+    <ScrollableContent virtualized>
+      <RightPaneLayout defaultPaneContent={<DefaultPaneContent />}>
+        <TableExample numCols={numCols} numRows={numRows} />
+      </RightPaneLayout>
+    </ScrollableContent>
+  );
+}
+
 function ExamplePageComponent() {
   return (
     <>
@@ -67,7 +94,7 @@ function ExamplePageComponent() {
   );
 }
 
-function TestProjectLayout({ children }: PropsWithChildren<{}>) {
+function TestProjectLayout({ children }: ChildrenOnly) {
   return (
     <PreventBrowserScroll>
       <div css={Css.df.h100.overflowHidden.$}>
@@ -120,6 +147,8 @@ function TableExample({ numCols = 10, numRows = 100 }: { numCols?: number; numRo
         w: "200px",
         sticky: i === 0 ? "left" : undefined,
       })),
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [numCols],
   );
 

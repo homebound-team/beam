@@ -59,7 +59,7 @@ function parseDateString(str: string, format: string): Date | undefined {
   }
   const month = parseInt(split[0], 10) - 1;
   const day = parseInt(split[1], 10);
-  let year = parseInt(split[2], 10);
+  const year = parseInt(split[2], 10);
   // This is also ~verbatim copy/pasted from react-day-picker
   if (
     isNaN(year) ||

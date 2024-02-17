@@ -2,7 +2,7 @@ import { createObjectState, ObjectConfig, ObjectState, required } from "@homebou
 import { render } from "@homebound/rtl-utils";
 import { BoundRadioGroupField } from "src/forms/BoundRadioGroupField";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { click } from "src/utils/rtl";
+import { blur, click, focus } from "src/utils/rtl";
 
 const sports = [
   { value: "s:1", label: "Football" },
@@ -14,7 +14,7 @@ describe("BoundRadioGroupField", () => {
   it("shows the label", async () => {
     const author = createObjectState(formConfig, {});
     const r = await render(<BoundRadioGroupField field={author.favoriteSport} options={sports} />);
-    expect(r.favoriteSport_label()).toHaveTextContent("Favorite Sport");
+    expect(r.favoriteSport_label).toHaveTextContent("Favorite Sport");
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {
@@ -27,12 +27,12 @@ describe("BoundRadioGroupField", () => {
     );
 
     // When focus is triggered on a checkbox
-    r.favoriteSport_s1().focus();
+    focus(r.favoriteSport_s1);
     // Then the callback should be triggered
     expect(onFocus).toBeCalledTimes(1);
 
     // When blur is triggered on a checkbox
-    r.favoriteSport_s1().blur();
+    blur(r.favoriteSport_s1);
     // Then the callback should be triggered
     expect(onBlur).toBeCalledTimes(1);
   });
@@ -47,7 +47,7 @@ describe("BoundRadioGroupField", () => {
     );
     const r = await render(<BoundRadioGroupField field={author.favoriteSport} options={sports} />);
 
-    click(r.favoriteSport_s3());
+    click(r.favoriteSport_s3);
 
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith("s:3");

@@ -16,12 +16,12 @@ describe(AccordionList, () => {
     const r = await render(<AccordionList accordions={accordions} />);
 
     // Then it shows the correct title for all
-    expect(r.accordionList_title_0()).toHaveTextContent("First accordion title");
-    expect(r.accordionList_title_1()).toHaveTextContent("Second accordion title");
-    expect(r.accordionList_title_2()).toHaveTextContent("Third accordion title");
+    expect(r.accordionList_title_0).toHaveTextContent("First accordion title");
+    expect(r.accordionList_title_1).toHaveTextContent("Second accordion title");
+    expect(r.accordionList_title_2).toHaveTextContent("Third accordion title");
 
     // And the border bottom is displayed by default
-    expect(r.accordionList_container_2()).toHaveStyleRule("border-bottom-width", "1px");
+    expect(r.accordionList_container_2).toHaveStyleRule("border-bottom-width", "1px");
   });
 
   it("can have multiple accordions expanded", async () => {
@@ -29,8 +29,8 @@ describe(AccordionList, () => {
     const r = await render(<AccordionList accordions={accordions} />);
 
     // When the multiple accordions are selected
-    click(r.accordionList_title_0());
-    click(r.accordionList_title_1());
+    click(r.accordionList_title_0);
+    click(r.accordionList_title_1);
 
     // Then both accordions are be expanded
     expect(r.getAllByTestId("accordionList_content")).toHaveLength(2);
@@ -41,13 +41,13 @@ describe(AccordionList, () => {
     const r = await render(<AccordionList accordions={accordions} allowMultipleExpanded={false} />);
 
     // When the first accordions is selected
-    click(r.accordionList_title_0());
+    click(r.accordionList_title_0);
     // Then one accordion's content is shown
-    expect(r.accordionList_content()).toHaveTextContent("First accordion description");
+    expect(r.accordionList_content).toHaveTextContent("First accordion description");
 
     // And when a second accordion is selected
-    click(r.accordionList_title_1());
+    click(r.accordionList_title_1);
     // Then, still, only one accordion's content is shown.
-    expect(r.accordionList_content()).toHaveTextContent("Second accordion description");
+    expect(r.accordionList_content).toHaveTextContent("Second accordion description");
   });
 });

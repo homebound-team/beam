@@ -1,6 +1,6 @@
-import { AutoSaveStatusProvider } from "@homebound/form-state";
 import { createContext, MutableRefObject, PropsWithChildren, useContext, useMemo, useReducer, useRef } from "react";
 import { OverlayProvider } from "react-aria";
+import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/index";
 import { Modal, ModalProps } from "src/components/Modal/Modal";
 import { PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
 import { SnackbarProvider } from "src/components/Snackbar/SnackbarContext";
@@ -83,7 +83,7 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
       drawerCanCloseDetailsChecks,
       sdHeaderDiv,
     };
-  }, [modalBodyDiv, modalFooterDiv]);
+  }, [modalBodyDiv, modalFooterDiv, modalHeaderDiv, sdHeaderDiv]);
 
   return (
     <BeamContext.Provider value={{ ...context }}>
@@ -109,7 +109,10 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
 
 /** Looks like a ref, but invokes a re-render on set (w/o changing the setter identity). */
 class PretendRefThatTicks<T> implements MutableRefObject<T> {
-  constructor(private ref: MutableRefObject<T>, private tick: () => void) {}
+  constructor(
+    private ref: MutableRefObject<T>,
+    private tick: () => void,
+  ) {}
   get current(): T {
     return this.ref.current;
   }

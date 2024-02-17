@@ -2,11 +2,12 @@ import { Node } from "@react-types/shared";
 import { useRef } from "react";
 import { useHover, useMenuItem } from "react-aria";
 import { useHistory } from "react-router";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { TreeState } from "react-stately";
 import { Avatar } from "src/components/Avatar";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
 import { Icon } from "src/components/Icon";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette } from "src/Css";
 import { isAbsoluteUrl, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -15,17 +16,34 @@ interface MenuItemProps {
   item: Node<MenuItem>;
   state: TreeState<MenuItem>;
   onClose: VoidFunction;
+  contrast: boolean;
 }
 
 export function MenuItemImpl(props: MenuItemProps) {
-  const { item, state, onClose } = props;
+  const { item, state, onClose, contrast } = props;
   const menuItem = item.value;
-  const { disabled: isDisabled, onClick, label, destructive } = menuItem;
+  if (!menuItem) {
+    return null;
+  }
+
+  const { disabled, onClick, label, destructive } = menuItem;
+  const isDisabled = Boolean(disabled);
+  const isSelected = state.selectionManager.selectedKeys.has(label);
   const isFocused = state.selectionManager.focusedKey === item.key;
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const ref = useRef<HTMLLIElement>(null);
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const history = useHistory();
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { hoverProps, isHovered } = useHover({});
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const tid = useTestIds(props);
+  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { menuItemProps } = useMenuItem(
     {
       key: item.key,
@@ -62,26 +80,49 @@ export function MenuItemImpl(props: MenuItemProps) {
       {...hoverProps}
       ref={ref}
       css={{
-        ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").$,
-        ...(!isDisabled && isHovered ? Css.bgGray100.$ : {}),
-        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.LightBlue700}`).$ : {}),
+        ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").sm.$,
+        ...(!isDisabled && isHovered ? (contrast ? Css.bgGray800.$ : Css.bgGray100.$) : {}),
+        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.Blue700}`).$ : {}),
         ...(isDisabled ? Css.gray500.cursorNotAllowed.$ : {}),
         ...(destructive ? Css.red600.$ : {}),
+        ...(isSelected ? Css.fw5.$ : {}),
       }}
       {...tid[defaultTestId(menuItem.label)]}
     >
-      {maybeWrapInLink(
-        onClick,
-        isIconMenuItem(menuItem) ? (
-          <IconMenuItem {...menuItem} />
-        ) : isImageMenuItem(menuItem) ? (
-          <ImageMenuItem {...menuItem} />
-        ) : (
-          label
-        ),
-        isDisabled,
-      )}
+      {maybeTooltip({
+        title: resolveTooltip(disabled),
+        placement: "right",
+        children: renderMenuItem(menuItem, isSelected, isDisabled, contrast),
+      })}
     </li>
+  );
+}
+
+function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boolean, contrast: boolean) {
+  return (
+    <div css={Css.df.w100.aic.jcsb.gap2.$}>
+      <div css={Css.df.aic.$}>
+        {maybeWrapInLink(
+          menuItem.onClick,
+          isIconMenuItem(menuItem) ? (
+            <IconMenuItem {...menuItem} />
+          ) : isImageMenuItem(menuItem) ? (
+            <ImageMenuItem {...menuItem} />
+          ) : (
+            menuItem.label
+          ),
+          isDisabled,
+        )}
+      </div>
+      {isSelected && (
+        <Icon
+          icon="check"
+          color={
+            !contrast ? (isDisabled ? Palette.Gray400 : Palette.Blue700) : isDisabled ? Palette.Gray500 : Palette.White
+          }
+        />
+      )}
+    </div>
   );
 }
 
@@ -123,16 +164,16 @@ function maybeWrapInLink(
   }
 
   return isAbsoluteUrl(onClick) ? (
-    <a href={onClick} target="_blank" rel="noopener noreferrer" className="navLink" css={Css.df.jcsb.w100.$}>
+    <a href={onClick} target="_blank" rel="noopener noreferrer" className="navLink" css={Css.df.aic.jcsb.w100.$}>
       {content}
       <span css={Css.fs0.ml2.$}>
         <Icon icon="linkExternal" />
       </span>
     </a>
   ) : (
-    <NavLink to={onClick} className="navLink">
+    <Link className="navLink" to={onClick}>
       {content}
-    </NavLink>
+    </Link>
   );
 }
 

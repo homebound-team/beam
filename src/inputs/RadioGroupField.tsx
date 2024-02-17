@@ -1,6 +1,7 @@
-import React, { ReactNode, useMemo, useRef } from "react";
+import { Fragment, ReactNode, useMemo, useRef } from "react";
 import { useFocusRing, useHover, useRadio, useRadioGroup } from "react-aria";
 import { RadioGroupState, useRadioGroupState } from "react-stately";
+import { maybeTooltip, resolveTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { PresentationFieldProps } from "src/components/PresentationContext";
@@ -19,6 +20,8 @@ export interface RadioFieldOption<K extends string> {
   description?: string | (() => ReactNode);
   /** The undisplayed value, i.e. an id of some sort. */
   value: K;
+  /** Disable only specific option, with an optional reason */
+  disabled?: boolean | ReactNode;
 }
 
 export interface RadioGroupFieldProps<K extends string> extends Pick<PresentationFieldProps, "labelStyle"> {
@@ -62,24 +65,31 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   // TODO: Pass read only, required, error message to useRadioGroup
   const { labelProps, radioGroupProps } = useRadioGroup({ label, isDisabled: disabled }, state);
 
-  // max-width is dependent on having descriptions
-  const anyDescriptions = options.some((o) => !!o.description);
-
   return (
     // default styling to position `<Label />` above.
     <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$}>
       <Label label={label} {...labelProps} {...tid.label} hidden={labelStyle === "hidden"} />
       <div {...radioGroupProps}>
-        {options.map((option) => (
-          <Radio
-            key={option.value}
-            parentId={name}
-            option={option}
-            state={state}
-            {...otherProps}
-            {...tid[option.value]}
-          />
-        ))}
+        {options.map((option) => {
+          const isDisabled = state.isDisabled || !!option.disabled;
+          return (
+            <Fragment key={option.value}>
+              {maybeTooltip({
+                title: resolveTooltip(option.disabled),
+                placement: "bottom",
+                children: (
+                  <Radio
+                    parentId={name}
+                    option={option}
+                    state={{ ...state, isDisabled }}
+                    {...otherProps}
+                    {...tid[option.value]}
+                  />
+                ),
+              })}
+            </Fragment>
+          );
+        })}
         {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
         {helperText && <HelperText helperText={helperText} />}
       </div>
@@ -142,7 +152,7 @@ function Radio<K extends string>(props: {
         </div>
         {description && (
           <div id={descriptionId} css={Css.sm.gray700.if(disabled).gray400.$}>
-            {description}
+            {typeof description === "function" ? description() : description}
           </div>
         )}
       </div>
@@ -166,7 +176,7 @@ export const radioDefault = {
   // By default we're a white circle with a gray border
   ...Css.bgWhite.bGray300.ba.$,
   // Set the "selected" color that will be used by background=currentColor + box shadow, but is initially ignored
-  ...Css.lightBlue700.$,
+  ...Css.blue700.$,
   // Apply our default transitions
   ...Css.transition.$,
 };
@@ -197,7 +207,7 @@ export const radioFocus = {
 
 export const radioHover = {
   // Change both the dot and the border to a darker blue
-  ...Css.lightBlue900.bLightBlue900.$,
+  ...Css.blue900.bBlue900.$,
 };
 
 export const radioDisabled = {

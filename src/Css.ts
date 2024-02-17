@@ -95,253 +95,293 @@ class CssBuilder<T extends Properties> {
   }
 
   // borderColor
-  /** Sets `borderColor: "rgba(254,254,254,1)"`. */
+  /** Sets `borderColor: "rgba(255,255,255,1)"`. */
   get bWhite() {
-    return this.add("borderColor", "rgba(254,254,254,1)");
+    return this.add("borderColor", "rgba(255,255,255,1)");
   }
   /** Sets `borderColor: "rgba(0,0,0,0)"`. */
   get bTransparent() {
     return this.add("borderColor", "rgba(0,0,0,0)");
   }
-  /** Sets `borderColor: "rgba(255,253,253,1)"`. */
+  /** Sets `borderColor: "rgba(255, 253, 253, 1)"`. */
   get bGray50() {
-    return this.add("borderColor", "rgba(255,253,253,1)");
+    return this.add("borderColor", "rgba(255, 253, 253, 1)");
   }
-  /** Sets `borderColor: "rgba(247,245,245,1)"`. */
+  /** Sets `borderColor: "rgba(247, 245, 245, 1)"`. */
   get bGray100() {
-    return this.add("borderColor", "rgba(247,245,245,1)");
+    return this.add("borderColor", "rgba(247, 245, 245, 1)");
   }
-  /** Sets `borderColor: "rgba(236,235,235,1)"`. */
+  /** Sets `borderColor: "rgba(236, 235, 235, 1)"`. */
   get bGray200() {
-    return this.add("borderColor", "rgba(236,235,235,1)");
+    return this.add("borderColor", "rgba(236, 235, 235, 1)");
   }
-  /** Sets `borderColor: "rgba(221,220,220,1)"`. */
+  /** Sets `borderColor: "rgba(221, 220, 220, 1)"`. */
   get bGray300() {
-    return this.add("borderColor", "rgba(221,220,220,1)");
+    return this.add("borderColor", "rgba(221, 220, 220, 1)");
   }
-  /** Sets `borderColor: "rgba(201,201,201,1)"`. */
+  /** Sets `borderColor: "rgba(201, 201, 201, 1)"`. */
   get bGray400() {
-    return this.add("borderColor", "rgba(201,201,201,1)");
+    return this.add("borderColor", "rgba(201, 201, 201, 1)");
   }
-  /** Sets `borderColor: "rgba(175,175,175,1)"`. */
+  /** Sets `borderColor: "rgba(175, 175, 175, 1)"`. */
   get bGray500() {
-    return this.add("borderColor", "rgba(175,175,175,1)");
+    return this.add("borderColor", "rgba(175, 175, 175, 1)");
   }
-  /** Sets `borderColor: "rgba(141,141,141,1)"`. */
+  /** Sets `borderColor: "rgba(141, 141, 141, 1)"`. */
   get bGray600() {
-    return this.add("borderColor", "rgba(141,141,141,1)");
+    return this.add("borderColor", "rgba(141, 141, 141, 1)");
   }
-  /** Sets `borderColor: "rgba(100,100,100,1)"`. */
+  /** Sets `borderColor: "rgba(100, 100, 100, 1)"`. */
   get bGray700() {
-    return this.add("borderColor", "rgba(100,100,100,1)");
+    return this.add("borderColor", "rgba(100, 100, 100, 1)");
   }
-  /** Sets `borderColor: "rgba(53,53,53,1)"`. */
+  /** Sets `borderColor: "rgba(53, 53, 53, 1)"`. */
   get bGray800() {
-    return this.add("borderColor", "rgba(53,53,53,1)");
+    return this.add("borderColor", "rgba(53, 53, 53, 1)");
   }
-  /** Sets `borderColor: "rgba(36,36,36,1)"`. */
+  /** Sets `borderColor: "rgba(36, 36, 36, 1)"`. */
   get bGray900() {
-    return this.add("borderColor", "rgba(36,36,36,1)");
+    return this.add("borderColor", "rgba(36, 36, 36, 1)");
   }
-  /** Sets `borderColor: "rgba(240,249,255,1)"`. */
-  get bLightBlue50() {
-    return this.add("borderColor", "rgba(240,249,255,1)");
+  /** Sets `borderColor: "rgba(239, 246, 255, 1)"`. */
+  get bBlue50() {
+    return this.add("borderColor", "rgba(239, 246, 255, 1)");
   }
-  /** Sets `borderColor: "rgba(224,242,254,1)"`. */
-  get bLightBlue100() {
-    return this.add("borderColor", "rgba(224,242,254,1)");
+  /** Sets `borderColor: "rgba(219, 234, 254, 1)"`. */
+  get bBlue100() {
+    return this.add("borderColor", "rgba(219, 234, 254, 1)");
   }
-  /** Sets `borderColor: "rgba(186,230,253,1)"`. */
-  get bLightBlue200() {
-    return this.add("borderColor", "rgba(186,230,253,1)");
+  /** Sets `borderColor: "rgba(191, 219, 254, 1)"`. */
+  get bBlue200() {
+    return this.add("borderColor", "rgba(191, 219, 254, 1)");
   }
-  /** Sets `borderColor: "rgba(125,211,252,1)"`. */
-  get bLightBlue300() {
-    return this.add("borderColor", "rgba(125,211,252,1)");
+  /** Sets `borderColor: "rgba(147, 197, 253, 1)"`. */
+  get bBlue300() {
+    return this.add("borderColor", "rgba(147, 197, 253, 1)");
   }
-  /** Sets `borderColor: "rgba(56,189,248,1)"`. */
-  get bLightBlue400() {
-    return this.add("borderColor", "rgba(56,189,248,1)");
+  /** Sets `borderColor: "rgba(96, 165, 250, 1)"`. */
+  get bBlue400() {
+    return this.add("borderColor", "rgba(96, 165, 250, 1)");
   }
-  /** Sets `borderColor: "rgba(14,165,233,1)"`. */
-  get bLightBlue500() {
-    return this.add("borderColor", "rgba(14,165,233,1)");
+  /** Sets `borderColor: "rgba(59, 130, 246, 1)"`. */
+  get bBlue500() {
+    return this.add("borderColor", "rgba(59, 130, 246, 1)");
   }
-  /** Sets `borderColor: "rgba(2,143,199,1)"`. */
-  get bLightBlue600() {
-    return this.add("borderColor", "rgba(2,143,199,1)");
+  /** Sets `borderColor: "rgba(37, 99, 235, 1)"`. */
+  get bBlue600() {
+    return this.add("borderColor", "rgba(37, 99, 235, 1)");
   }
-  /** Sets `borderColor: "rgba(3,105,161,1)"`. */
-  get bLightBlue700() {
-    return this.add("borderColor", "rgba(3,105,161,1)");
+  /** Sets `borderColor: "rgba(29, 78, 216, 1)"`. */
+  get bBlue700() {
+    return this.add("borderColor", "rgba(29, 78, 216, 1)");
   }
-  /** Sets `borderColor: "rgba(7,89,133,1)"`. */
-  get bLightBlue800() {
-    return this.add("borderColor", "rgba(7,89,133,1)");
+  /** Sets `borderColor: "rgba(30, 64, 175, 1)"`. */
+  get bBlue800() {
+    return this.add("borderColor", "rgba(30, 64, 175, 1)");
   }
-  /** Sets `borderColor: "rgba(12,74,110,1)"`. */
-  get bLightBlue900() {
-    return this.add("borderColor", "rgba(12,74,110,1)");
+  /** Sets `borderColor: "rgba(30, 58, 138, 1)"`. */
+  get bBlue900() {
+    return this.add("borderColor", "rgba(30, 58, 138, 1)");
   }
-  /** Sets `borderColor: "rgba(255,242,242,1)"`. */
+  /** Sets `borderColor: "rgba(254, 242, 242, 1)"`. */
   get bRed50() {
-    return this.add("borderColor", "rgba(255,242,242,1)");
+    return this.add("borderColor", "rgba(254, 242, 242, 1)");
   }
-  /** Sets `borderColor: "rgba(253,210,209,1)"`. */
+  /** Sets `borderColor: "rgba(254, 226, 226, 1)"`. */
   get bRed100() {
-    return this.add("borderColor", "rgba(253,210,209,1)");
+    return this.add("borderColor", "rgba(254, 226, 226, 1)");
   }
-  /** Sets `borderColor: "rgba(249,181,177,1)"`. */
+  /** Sets `borderColor: "rgba(254, 202, 202, 1)"`. */
   get bRed200() {
-    return this.add("borderColor", "rgba(249,181,177,1)");
+    return this.add("borderColor", "rgba(254, 202, 202, 1)");
   }
-  /** Sets `borderColor: "rgba(242,155,148,1)"`. */
+  /** Sets `borderColor: "rgba(252, 165, 165, 1)"`. */
   get bRed300() {
-    return this.add("borderColor", "rgba(242,155,148,1)");
+    return this.add("borderColor", "rgba(252, 165, 165, 1)");
   }
-  /** Sets `borderColor: "rgba(232,133,122,1)"`. */
+  /** Sets `borderColor: "rgba(248, 113, 113, 1)"`. */
   get bRed400() {
-    return this.add("borderColor", "rgba(232,133,122,1)");
+    return this.add("borderColor", "rgba(248, 113, 113, 1)");
   }
-  /** Sets `borderColor: "rgba(218,114,100,1)"`. */
+  /** Sets `borderColor: "rgba(239, 68, 68, 1)"`. */
   get bRed500() {
-    return this.add("borderColor", "rgba(218,114,100,1)");
+    return this.add("borderColor", "rgba(239, 68, 68, 1)");
   }
-  /** Sets `borderColor: "rgba(200,98,81,1)"`. */
+  /** Sets `borderColor: "rgba(220, 38, 38, 1)"`. */
   get bRed600() {
-    return this.add("borderColor", "rgba(200,98,81,1)");
+    return this.add("borderColor", "rgba(220, 38, 38, 1)");
   }
-  /** Sets `borderColor: "rgba(176,83,73,1)"`. */
+  /** Sets `borderColor: "rgba(185, 28, 28, 1)"`. */
   get bRed700() {
-    return this.add("borderColor", "rgba(176,83,73,1)");
+    return this.add("borderColor", "rgba(185, 28, 28, 1)");
   }
-  /** Sets `borderColor: "rgba(149,68,64,1)"`. */
+  /** Sets `borderColor: "rgba(153, 27, 27, 1)"`. */
   get bRed800() {
-    return this.add("borderColor", "rgba(149,68,64,1)");
+    return this.add("borderColor", "rgba(153, 27, 27, 1)");
   }
-  /** Sets `borderColor: "rgba(120,54,54,1)"`. */
+  /** Sets `borderColor: "rgba(127, 29, 29, 1)"`. */
   get bRed900() {
-    return this.add("borderColor", "rgba(120,54,54,1)");
+    return this.add("borderColor", "rgba(127, 29, 29, 1)");
   }
-  /** Sets `borderColor: "rgba(255,254,242,1)"`. */
+  /** Sets `borderColor: "rgba(254, 252, 232, 1)"`. */
   get bYellow50() {
-    return this.add("borderColor", "rgba(255,254,242,1)");
+    return this.add("borderColor", "rgba(254, 252, 232, 1)");
   }
-  /** Sets `borderColor: "rgba(255,254,212,1)"`. */
+  /** Sets `borderColor: "rgba(254, 249, 195, 1)"`. */
   get bYellow100() {
-    return this.add("borderColor", "rgba(255,254,212,1)");
+    return this.add("borderColor", "rgba(254, 249, 195, 1)");
   }
-  /** Sets `borderColor: "rgba(255,250,180,1)"`. */
+  /** Sets `borderColor: "rgba(254, 240, 138, 1)"`. */
   get bYellow200() {
-    return this.add("borderColor", "rgba(255,250,180,1)");
+    return this.add("borderColor", "rgba(254, 240, 138, 1)");
   }
-  /** Sets `borderColor: "rgba(255,240,150,1)"`. */
+  /** Sets `borderColor: "rgba(253, 224, 71, 1)"`. */
   get bYellow300() {
-    return this.add("borderColor", "rgba(255,240,150,1)");
+    return this.add("borderColor", "rgba(253, 224, 71, 1)");
   }
-  /** Sets `borderColor: "rgba(255,225,123,1)"`. */
+  /** Sets `borderColor: "rgba(250, 204, 21, 1)"`. */
   get bYellow400() {
-    return this.add("borderColor", "rgba(255,225,123,1)");
+    return this.add("borderColor", "rgba(250, 204, 21, 1)");
   }
-  /** Sets `borderColor: "rgba(255,204,99,1)"`. */
+  /** Sets `borderColor: "rgba(234, 179, 8, 1)"`. */
   get bYellow500() {
-    return this.add("borderColor", "rgba(255,204,99,1)");
+    return this.add("borderColor", "rgba(234, 179, 8, 1)");
   }
-  /** Sets `borderColor: "rgba(246,177,78,1)"`. */
+  /** Sets `borderColor: "rgba(202, 138, 4, 1)"`. */
   get bYellow600() {
-    return this.add("borderColor", "rgba(246,177,78,1)");
+    return this.add("borderColor", "rgba(202, 138, 4, 1)");
   }
-  /** Sets `borderColor: "rgba(207,150,73,1)"`. */
+  /** Sets `borderColor: "rgba(161, 98, 7, 1)"`. */
   get bYellow700() {
-    return this.add("borderColor", "rgba(207,150,73,1)");
+    return this.add("borderColor", "rgba(161, 98, 7, 1)");
   }
-  /** Sets `borderColor: "rgba(164,120,66,1)"`. */
+  /** Sets `borderColor: "rgba(133, 77, 14, 1)"`. */
   get bYellow800() {
-    return this.add("borderColor", "rgba(164,120,66,1)");
+    return this.add("borderColor", "rgba(133, 77, 14, 1)");
   }
-  /** Sets `borderColor: "rgba(120,89,54,1)"`. */
+  /** Sets `borderColor: "rgba(113, 63, 18, 1)"`. */
   get bYellow900() {
-    return this.add("borderColor", "rgba(120,89,54,1)");
+    return this.add("borderColor", "rgba(113, 63, 18, 1)");
   }
-  /** Sets `borderColor: "rgba(250,255,250,1)"`. */
+  /** Sets `borderColor: "rgba(236, 253, 245, 1)"`. */
   get bGreen50() {
-    return this.add("borderColor", "rgba(250,255,250,1)");
+    return this.add("borderColor", "rgba(236, 253, 245, 1)");
   }
-  /** Sets `borderColor: "rgba(223,248,216,1)"`. */
+  /** Sets `borderColor: "rgba(209, 250, 229, 1)"`. */
   get bGreen100() {
-    return this.add("borderColor", "rgba(223,248,216,1)");
+    return this.add("borderColor", "rgba(209, 250, 229, 1)");
   }
-  /** Sets `borderColor: "rgba(199,239,183,1)"`. */
+  /** Sets `borderColor: "rgba(167, 243, 208, 1)"`. */
   get bGreen200() {
-    return this.add("borderColor", "rgba(199,239,183,1)");
+    return this.add("borderColor", "rgba(167, 243, 208, 1)");
   }
-  /** Sets `borderColor: "rgba(179,226,153,1)"`. */
+  /** Sets `borderColor: "rgba(110, 231, 183, 1)"`. */
   get bGreen300() {
-    return this.add("borderColor", "rgba(179,226,153,1)");
+    return this.add("borderColor", "rgba(110, 231, 183, 1)");
   }
-  /** Sets `borderColor: "rgba(163,208,126,1)"`. */
+  /** Sets `borderColor: "rgba(52, 211, 153, 1)"`. */
   get bGreen400() {
-    return this.add("borderColor", "rgba(163,208,126,1)");
+    return this.add("borderColor", "rgba(52, 211, 153, 1)");
   }
-  /** Sets `borderColor: "rgba(146,185,101,1)"`. */
+  /** Sets `borderColor: "rgba(16, 185, 129, 1)"`. */
   get bGreen500() {
-    return this.add("borderColor", "rgba(146,185,101,1)");
+    return this.add("borderColor", "rgba(16, 185, 129, 1)");
   }
-  /** Sets `borderColor: "rgba(126,156,79,1)"`. */
+  /** Sets `borderColor: "rgba(5, 150, 105, 1)"`. */
   get bGreen600() {
-    return this.add("borderColor", "rgba(126,156,79,1)");
+    return this.add("borderColor", "rgba(5, 150, 105, 1)");
   }
-  /** Sets `borderColor: "rgba(101,120,57,1)"`. */
+  /** Sets `borderColor: "rgba(4, 120, 87, 1)"`. */
   get bGreen700() {
-    return this.add("borderColor", "rgba(101,120,57,1)");
+    return this.add("borderColor", "rgba(4, 120, 87, 1)");
   }
-  /** Sets `borderColor: "rgba(64,93,44,1)"`. */
+  /** Sets `borderColor: "rgba(6, 95, 70, 1)"`. */
   get bGreen800() {
-    return this.add("borderColor", "rgba(64,93,44,1)");
+    return this.add("borderColor", "rgba(6, 95, 70, 1)");
   }
-  /** Sets `borderColor: "rgba(34,64,31,1)"`. */
+  /** Sets `borderColor: "rgba(6, 78, 59, 1)"`. */
   get bGreen900() {
-    return this.add("borderColor", "rgba(34,64,31,1)");
+    return this.add("borderColor", "rgba(6, 78, 59, 1)");
   }
-  /** Sets `borderColor: "rgba(245,243,255,1)"`. */
-  get bViolet50() {
-    return this.add("borderColor", "rgba(245,243,255,1)");
+  /** Sets `borderColor: "rgba(245, 243, 255, 1)"`. */
+  get bPurple50() {
+    return this.add("borderColor", "rgba(245, 243, 255, 1)");
   }
-  /** Sets `borderColor: "rgba(238,234,253,1)"`. */
-  get bViolet100() {
-    return this.add("borderColor", "rgba(238,234,253,1)");
+  /** Sets `borderColor: "rgba(237, 233, 254, 1)"`. */
+  get bPurple100() {
+    return this.add("borderColor", "rgba(237, 233, 254, 1)");
   }
-  /** Sets `borderColor: "rgba(232,225,252,1)"`. */
-  get bViolet200() {
-    return this.add("borderColor", "rgba(232,225,252,1)");
+  /** Sets `borderColor: "rgba(221, 214, 254, 1)"`. */
+  get bPurple200() {
+    return this.add("borderColor", "rgba(221, 214, 254, 1)");
   }
-  /** Sets `borderColor: "rgba(218,205,246,1)"`. */
-  get bViolet300() {
-    return this.add("borderColor", "rgba(218,205,246,1)");
+  /** Sets `borderColor: "rgba(196, 181, 253, 1)"`. */
+  get bPurple300() {
+    return this.add("borderColor", "rgba(196, 181, 253, 1)");
   }
-  /** Sets `borderColor: "rgba(204,186,236,1)"`. */
-  get bViolet400() {
-    return this.add("borderColor", "rgba(204,186,236,1)");
+  /** Sets `borderColor: "rgba(167, 139, 250, 1)"`. */
+  get bPurple400() {
+    return this.add("borderColor", "rgba(167, 139, 250, 1)");
   }
-  /** Sets `borderColor: "rgba(190,167,223,1)"`. */
-  get bViolet500() {
-    return this.add("borderColor", "rgba(190,167,223,1)");
+  /** Sets `borderColor: "rgba(139, 92, 246, 1)"`. */
+  get bPurple500() {
+    return this.add("borderColor", "rgba(139, 92, 246, 1)");
   }
-  /** Sets `borderColor: "rgba(173,147,205,1)"`. */
-  get bViolet600() {
-    return this.add("borderColor", "rgba(173,147,205,1)");
+  /** Sets `borderColor: "rgba(124, 58, 237, 1)"`. */
+  get bPurple600() {
+    return this.add("borderColor", "rgba(124, 58, 237, 1)");
   }
-  /** Sets `borderColor: "rgba(153,126,181,1)"`. */
-  get bViolet700() {
-    return this.add("borderColor", "rgba(153,126,181,1)");
+  /** Sets `borderColor: "rgba(109, 40, 217, 1)"`. */
+  get bPurple700() {
+    return this.add("borderColor", "rgba(109, 40, 217, 1)");
   }
-  /** Sets `borderColor: "rgba(128,103,151,1)"`. */
-  get bViolet800() {
-    return this.add("borderColor", "rgba(128,103,151,1)");
+  /** Sets `borderColor: "rgba(91, 33, 182, 1)"`. */
+  get bPurple800() {
+    return this.add("borderColor", "rgba(91, 33, 182, 1)");
   }
-  /** Sets `borderColor: "rgba(100,78,116,1)"`. */
-  get bViolet900() {
-    return this.add("borderColor", "rgba(100,78,116,1)");
+  /** Sets `borderColor: "rgba(76, 29, 149, 1)"`. */
+  get bPurple900() {
+    return this.add("borderColor", "rgba(76, 29, 149, 1)");
+  }
+  /** Sets `borderColor: "rgba(255, 247, 237, 1)"`. */
+  get bOrange50() {
+    return this.add("borderColor", "rgba(255, 247, 237, 1)");
+  }
+  /** Sets `borderColor: "rgba(255, 237, 213, 1)"`. */
+  get bOrange100() {
+    return this.add("borderColor", "rgba(255, 237, 213, 1)");
+  }
+  /** Sets `borderColor: "rgba(254, 215, 170, 1)"`. */
+  get bOrange200() {
+    return this.add("borderColor", "rgba(254, 215, 170, 1)");
+  }
+  /** Sets `borderColor: "rgba(253, 186, 116, 1)"`. */
+  get bOrange300() {
+    return this.add("borderColor", "rgba(253, 186, 116, 1)");
+  }
+  /** Sets `borderColor: "rgba(251, 146, 60, 1)"`. */
+  get bOrange400() {
+    return this.add("borderColor", "rgba(251, 146, 60, 1)");
+  }
+  /** Sets `borderColor: "rgba(249, 115, 22, 1)"`. */
+  get bOrange500() {
+    return this.add("borderColor", "rgba(249, 115, 22, 1)");
+  }
+  /** Sets `borderColor: "rgba(234, 88, 12, 1)"`. */
+  get bOrange600() {
+    return this.add("borderColor", "rgba(234, 88, 12, 1)");
+  }
+  /** Sets `borderColor: "rgba(194, 65, 12, 1)"`. */
+  get bOrange700() {
+    return this.add("borderColor", "rgba(194, 65, 12, 1)");
+  }
+  /** Sets `borderColor: "rgba(154, 52, 18, 1)"`. */
+  get bOrange800() {
+    return this.add("borderColor", "rgba(154, 52, 18, 1)");
+  }
+  /** Sets `borderColor: "rgba(124, 45, 18, 1)"`. */
+  get bOrange900() {
+    return this.add("borderColor", "rgba(124, 45, 18, 1)");
   }
   /** Sets `borderColor: value`. */
   bc(value: Properties["borderColor"]) {
@@ -439,13 +479,13 @@ class CssBuilder<T extends Properties> {
   get bshHover() {
     return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08);");
   }
-  /** Sets `boxShadow: "0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px rgba(3,105,161,1)"`. */
+  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(29, 78, 216, 1)"`. */
   get bshFocus() {
-    return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px rgba(3,105,161,1)");
+    return this.add("boxShadow", "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(29, 78, 216, 1)");
   }
-  /** Sets `boxShadow: "0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px rgba(149,68,64,1)"`. */
+  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(153, 27, 27, 1)"`. */
   get bshDanger() {
-    return this.add("boxShadow", "0px 0px 0px 2px rgba(254,254,254,1), 0px 0px 0px 4px rgba(149,68,64,1)");
+    return this.add("boxShadow", "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(153, 27, 27, 1)");
   }
   /** Sets `boxShadow: "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)"`. */
   get bshModal() {
@@ -456,182 +496,204 @@ class CssBuilder<T extends Properties> {
     return this.add("boxShadow", value);
   }
 
+  // container
+  /** Sets `containerType: "size"`. */
+  get cts() {
+    return this.add("containerType", "size");
+  }
+  /** Sets `containerType: "inline-size"`. */
+  get ctis() {
+    return this.add("containerType", "inline-size");
+  }
+  /** Sets `containerType: "normal"`. */
+  get ctn() {
+    return this.add("containerType", "normal");
+  }
+  /** Sets `containerType: value`. */
+  ct(value: Properties["containerType"]) {
+    return this.add("containerType", value);
+  }
+  /** Sets `containerName: value`. */
+  cn(value: Properties["containerName"]) {
+    return this.add("containerName", value);
+  }
+
   // coordinates
   /** Sets `top: "0px"`. */
   get top0() {
-    return this.top(0);
+    return this.add("top", "0px");
   }
   /** Sets `top: "8px"`. */
   get top1() {
-    return this.top(1);
+    return this.add("top", "8px");
   }
   /** Sets `top: "16px"`. */
   get top2() {
-    return this.top(2);
+    return this.add("top", "16px");
   }
   /** Sets `top: "24px"`. */
   get top3() {
-    return this.top(3);
+    return this.add("top", "24px");
   }
   /** Sets `top: "32px"`. */
   get top4() {
-    return this.top(4);
+    return this.add("top", "32px");
   }
   /** Sets `top: "40px"`. */
   get top5() {
-    return this.top(5);
+    return this.add("top", "40px");
   }
   /** Sets `top: "48px"`. */
   get top6() {
-    return this.top(6);
+    return this.add("top", "48px");
   }
   /** Sets `top: "56px"`. */
   get top7() {
-    return this.top(7);
+    return this.add("top", "56px");
   }
   /** Sets `top: "64px"`. */
   get top8() {
-    return this.top(8);
+    return this.add("top", "64px");
   }
-  /** Sets `top: inc`. */
-  top(inc: number | string) {
-    return this.add("top", maybeInc(inc));
+  /** Sets `top: "v"`. */
+  top(v: number | string) {
+    return this.add("top", maybeInc(v));
   }
   /** Sets `top: px`. */
   topPx(px: number) {
-    return this.top(`${px}px`);
+    return this.add("top", `${px}px`);
   }
   /** Sets `right: "0px"`. */
   get right0() {
-    return this.right(0);
+    return this.add("right", "0px");
   }
   /** Sets `right: "8px"`. */
   get right1() {
-    return this.right(1);
+    return this.add("right", "8px");
   }
   /** Sets `right: "16px"`. */
   get right2() {
-    return this.right(2);
+    return this.add("right", "16px");
   }
   /** Sets `right: "24px"`. */
   get right3() {
-    return this.right(3);
+    return this.add("right", "24px");
   }
   /** Sets `right: "32px"`. */
   get right4() {
-    return this.right(4);
+    return this.add("right", "32px");
   }
   /** Sets `right: "40px"`. */
   get right5() {
-    return this.right(5);
+    return this.add("right", "40px");
   }
   /** Sets `right: "48px"`. */
   get right6() {
-    return this.right(6);
+    return this.add("right", "48px");
   }
   /** Sets `right: "56px"`. */
   get right7() {
-    return this.right(7);
+    return this.add("right", "56px");
   }
   /** Sets `right: "64px"`. */
   get right8() {
-    return this.right(8);
+    return this.add("right", "64px");
   }
-  /** Sets `right: inc`. */
-  right(inc: number | string) {
-    return this.add("right", maybeInc(inc));
+  /** Sets `right: "v"`. */
+  right(v: number | string) {
+    return this.add("right", maybeInc(v));
   }
   /** Sets `right: px`. */
   rightPx(px: number) {
-    return this.right(`${px}px`);
+    return this.add("right", `${px}px`);
   }
   /** Sets `bottom: "0px"`. */
   get bottom0() {
-    return this.bottom(0);
+    return this.add("bottom", "0px");
   }
   /** Sets `bottom: "8px"`. */
   get bottom1() {
-    return this.bottom(1);
+    return this.add("bottom", "8px");
   }
   /** Sets `bottom: "16px"`. */
   get bottom2() {
-    return this.bottom(2);
+    return this.add("bottom", "16px");
   }
   /** Sets `bottom: "24px"`. */
   get bottom3() {
-    return this.bottom(3);
+    return this.add("bottom", "24px");
   }
   /** Sets `bottom: "32px"`. */
   get bottom4() {
-    return this.bottom(4);
+    return this.add("bottom", "32px");
   }
   /** Sets `bottom: "40px"`. */
   get bottom5() {
-    return this.bottom(5);
+    return this.add("bottom", "40px");
   }
   /** Sets `bottom: "48px"`. */
   get bottom6() {
-    return this.bottom(6);
+    return this.add("bottom", "48px");
   }
   /** Sets `bottom: "56px"`. */
   get bottom7() {
-    return this.bottom(7);
+    return this.add("bottom", "56px");
   }
   /** Sets `bottom: "64px"`. */
   get bottom8() {
-    return this.bottom(8);
+    return this.add("bottom", "64px");
   }
-  /** Sets `bottom: inc`. */
-  bottom(inc: number | string) {
-    return this.add("bottom", maybeInc(inc));
+  /** Sets `bottom: "v"`. */
+  bottom(v: number | string) {
+    return this.add("bottom", maybeInc(v));
   }
   /** Sets `bottom: px`. */
   bottomPx(px: number) {
-    return this.bottom(`${px}px`);
+    return this.add("bottom", `${px}px`);
   }
   /** Sets `left: "0px"`. */
   get left0() {
-    return this.left(0);
+    return this.add("left", "0px");
   }
   /** Sets `left: "8px"`. */
   get left1() {
-    return this.left(1);
+    return this.add("left", "8px");
   }
   /** Sets `left: "16px"`. */
   get left2() {
-    return this.left(2);
+    return this.add("left", "16px");
   }
   /** Sets `left: "24px"`. */
   get left3() {
-    return this.left(3);
+    return this.add("left", "24px");
   }
   /** Sets `left: "32px"`. */
   get left4() {
-    return this.left(4);
+    return this.add("left", "32px");
   }
   /** Sets `left: "40px"`. */
   get left5() {
-    return this.left(5);
+    return this.add("left", "40px");
   }
   /** Sets `left: "48px"`. */
   get left6() {
-    return this.left(6);
+    return this.add("left", "48px");
   }
   /** Sets `left: "56px"`. */
   get left7() {
-    return this.left(7);
+    return this.add("left", "56px");
   }
   /** Sets `left: "64px"`. */
   get left8() {
-    return this.left(8);
+    return this.add("left", "64px");
   }
-  /** Sets `left: inc`. */
-  left(inc: number | string) {
-    return this.add("left", maybeInc(inc));
+  /** Sets `left: "v"`. */
+  left(v: number | string) {
+    return this.add("left", maybeInc(v));
   }
   /** Sets `left: px`. */
   leftPx(px: number) {
-    return this.left(`${px}px`);
+    return this.add("left", `${px}px`);
   }
 
   // cursor
@@ -771,6 +833,26 @@ class CssBuilder<T extends Properties> {
   jc(value: Properties["justifyContent"]) {
     return this.add("justifyContent", value);
   }
+  /** Sets `justifySelf: "auto"`. */
+  get jsa() {
+    return this.add("justifySelf", "auto");
+  }
+  /** Sets `justifySelf: "center"`. */
+  get jsc() {
+    return this.add("justifySelf", "center");
+  }
+  /** Sets `justifySelf: "start"`. */
+  get jss() {
+    return this.add("justifySelf", "start");
+  }
+  /** Sets `justifySelf: "end"`. */
+  get jse() {
+    return this.add("justifySelf", "end");
+  }
+  /** Sets `justifySelf: value`. */
+  js(value: Properties["justifySelf"]) {
+    return this.add("justifySelf", value);
+  }
   /** Sets `justifyItems: "flex-start"`. */
   get jifs() {
     return this.add("justifyItems", "flex-start");
@@ -831,6 +913,14 @@ class CssBuilder<T extends Properties> {
   get aife() {
     return this.add("alignItems", "flex-end");
   }
+  /** Sets `alignItems: "start"`. */
+  get ais() {
+    return this.add("alignItems", "start");
+  }
+  /** Sets `alignItems: "end"`. */
+  get aie() {
+    return this.add("alignItems", "end");
+  }
   /** Sets `alignItems: "center"`. */
   get aic() {
     return this.add("alignItems", "center");
@@ -840,12 +930,116 @@ class CssBuilder<T extends Properties> {
     return this.add("alignItems", "baseline");
   }
   /** Sets `alignItems: "stretch"`. */
-  get ais() {
+  get aiStretch() {
     return this.add("alignItems", "stretch");
   }
   /** Sets `alignItems: value`. */
   ai(value: Properties["alignItems"]) {
     return this.add("alignItems", value);
+  }
+  /** Sets `placeSelf: "auto"`. */
+  get psa() {
+    return this.add("placeSelf", "auto");
+  }
+  /** Sets `placeSelf: "center"`. */
+  get psc() {
+    return this.add("placeSelf", "center");
+  }
+  /** Sets `placeSelf: "start"`. */
+  get pss() {
+    return this.add("placeSelf", "start");
+  }
+  /** Sets `placeSelf: "end"`. */
+  get pse() {
+    return this.add("placeSelf", "end");
+  }
+  /** Sets `placeSelf: "flex-start"`. */
+  get psfs() {
+    return this.add("placeSelf", "flex-start");
+  }
+  /** Sets `placeSelf: "flex-end"`. */
+  get psfe() {
+    return this.add("placeSelf", "flex-end");
+  }
+  /** Sets `placeSelf: "stretch"`. */
+  get psStretch() {
+    return this.add("placeSelf", "stretch");
+  }
+  /** Sets `placeSelf: value`. */
+  ps(value: Properties["placeSelf"]) {
+    return this.add("placeSelf", value);
+  }
+  /** Sets `placeContent: "center"`. */
+  get pcc() {
+    return this.add("placeContent", "center");
+  }
+  /** Sets `placeContent: "start"`. */
+  get pcs() {
+    return this.add("placeContent", "start");
+  }
+  /** Sets `placeContent: "end"`. */
+  get pce() {
+    return this.add("placeContent", "end");
+  }
+  /** Sets `placeContent: "space-between"`. */
+  get pcsb() {
+    return this.add("placeContent", "space-between");
+  }
+  /** Sets `placeContent: "space-around"`. */
+  get pcsa() {
+    return this.add("placeContent", "space-around");
+  }
+  /** Sets `placeContent: "space-evenly"`. */
+  get pcse() {
+    return this.add("placeContent", "space-evenly");
+  }
+  /** Sets `placeContent: "baseline"`. */
+  get pcb() {
+    return this.add("placeContent", "baseline");
+  }
+  /** Sets `placeContent: "stretch"`. */
+  get pcStretch() {
+    return this.add("placeContent", "stretch");
+  }
+  /** Sets `placeContent: value`. */
+  pc(value: Properties["placeContent"]) {
+    return this.add("placeContent", value);
+  }
+  /** Sets `placeItems: "center"`. */
+  get pic() {
+    return this.add("placeItems", "center");
+  }
+  /** Sets `placeItems: "start"`. */
+  get pis() {
+    return this.add("placeItems", "start");
+  }
+  /** Sets `placeItems: "end"`. */
+  get pie() {
+    return this.add("placeItems", "end");
+  }
+  /** Sets `placeItems: "space-between"`. */
+  get pisb() {
+    return this.add("placeItems", "space-between");
+  }
+  /** Sets `placeItems: "space-around"`. */
+  get pisa() {
+    return this.add("placeItems", "space-around");
+  }
+  /** Sets `placeItems: "space-evenly"`. */
+  get pise() {
+    return this.add("placeItems", "space-evenly");
+  }
+  /** Sets `placeItems: "baseline"`. */
+  get pib() {
+    return this.add("placeItems", "baseline");
+  }
+  /** Sets `placeItems: "stretch"`. */
+  get piStretch() {
+    return this.add("placeItems", "stretch");
+  }
+  /** Sets `placeItems: value`. */
+  pi(value: Properties["placeItems"]) {
+    return this.add("placeItems", value);
   }
   /** Sets `flexBasis: "100%"`. */
   get fb1() {
@@ -939,6 +1133,22 @@ class CssBuilder<T extends Properties> {
   fd(value: Properties["flexDirection"]) {
     return this.add("flexDirection", value);
   }
+  /** Sets `flexWrap: "wrap"`. */
+  get fww() {
+    return this.add("flexWrap", "wrap");
+  }
+  /** Sets `flexWrap: "wrap-reverse"`. */
+  get fwr() {
+    return this.add("flexWrap", "wrap-reverse");
+  }
+  /** Sets `flexWrap: "nowrap"`. */
+  get fwnw() {
+    return this.add("flexWrap", "nowrap");
+  }
+  /** Sets `flexWrap: value`. */
+  flexWrap(value: Properties["flexWrap"]) {
+    return this.add("flexWrap", value);
+  }
 
   // float
   /** Sets `float: "left"`. */
@@ -1021,183 +1231,195 @@ class CssBuilder<T extends Properties> {
   gc(value: Properties["gridColumn"]) {
     return this.add("gridColumn", value);
   }
+  /** Sets `gridAutoRows: value`. */
+  gar(value: Properties["gridAutoRows"]) {
+    return this.add("gridAutoRows", value);
+  }
+  /** Sets `gridAutoColumns: value`. */
+  gac(value: Properties["gridAutoColumns"]) {
+    return this.add("gridAutoColumns", value);
+  }
   /** Sets `gap: "0px"`. */
   get gap0() {
-    return this.gap(0);
+    return this.add("gap", "0px");
   }
   /** Sets `gap: "8px"`. */
   get gap1() {
-    return this.gap(1);
+    return this.add("gap", "8px");
   }
   /** Sets `gap: "16px"`. */
   get gap2() {
-    return this.gap(2);
+    return this.add("gap", "16px");
   }
   /** Sets `gap: "24px"`. */
   get gap3() {
-    return this.gap(3);
+    return this.add("gap", "24px");
   }
   /** Sets `gap: "32px"`. */
   get gap4() {
-    return this.gap(4);
+    return this.add("gap", "32px");
   }
   /** Sets `gap: "40px"`. */
   get gap5() {
-    return this.gap(5);
+    return this.add("gap", "40px");
   }
   /** Sets `gap: "48px"`. */
   get gap6() {
-    return this.gap(6);
+    return this.add("gap", "48px");
   }
   /** Sets `gap: "56px"`. */
   get gap7() {
-    return this.gap(7);
+    return this.add("gap", "56px");
   }
   /** Sets `gap: "64px"`. */
   get gap8() {
-    return this.gap(8);
+    return this.add("gap", "64px");
   }
-  /** Sets `gap: inc`. */
-  gap(inc: number | string) {
-    return this.add("gap", maybeInc(inc));
+  /** Sets `gap: "v"`. */
+  gap(v: number | string) {
+    return this.add("gap", maybeInc(v));
   }
   /** Sets `gap: px`. */
   gapPx(px: number) {
-    return this.gap(`${px}px`);
+    return this.add("gap", `${px}px`);
   }
   /** Sets `rowGap: "0px"`. */
   get rg0() {
-    return this.rg(0);
+    return this.add("rowGap", "0px");
   }
   /** Sets `rowGap: "8px"`. */
   get rg1() {
-    return this.rg(1);
+    return this.add("rowGap", "8px");
   }
   /** Sets `rowGap: "16px"`. */
   get rg2() {
-    return this.rg(2);
+    return this.add("rowGap", "16px");
   }
   /** Sets `rowGap: "24px"`. */
   get rg3() {
-    return this.rg(3);
+    return this.add("rowGap", "24px");
   }
   /** Sets `rowGap: "32px"`. */
   get rg4() {
-    return this.rg(4);
+    return this.add("rowGap", "32px");
   }
   /** Sets `rowGap: "40px"`. */
   get rg5() {
-    return this.rg(5);
+    return this.add("rowGap", "40px");
   }
   /** Sets `rowGap: "48px"`. */
   get rg6() {
-    return this.rg(6);
+    return this.add("rowGap", "48px");
   }
   /** Sets `rowGap: "56px"`. */
   get rg7() {
-    return this.rg(7);
+    return this.add("rowGap", "56px");
   }
   /** Sets `rowGap: "64px"`. */
   get rg8() {
-    return this.rg(8);
+    return this.add("rowGap", "64px");
   }
-  /** Sets `rowGap: inc`. */
-  rg(inc: number | string) {
-    return this.add("rowGap", maybeInc(inc));
+  /** Sets `rowGap: "v"`. */
+  rg(v: number | string) {
+    return this.add("rowGap", maybeInc(v));
   }
   /** Sets `rowGap: px`. */
   rgPx(px: number) {
-    return this.rg(`${px}px`);
+    return this.add("rowGap", `${px}px`);
   }
   /** Sets `columnGap: "0px"`. */
   get cg0() {
-    return this.cg(0);
+    return this.add("columnGap", "0px");
   }
   /** Sets `columnGap: "8px"`. */
   get cg1() {
-    return this.cg(1);
+    return this.add("columnGap", "8px");
   }
   /** Sets `columnGap: "16px"`. */
   get cg2() {
-    return this.cg(2);
+    return this.add("columnGap", "16px");
   }
   /** Sets `columnGap: "24px"`. */
   get cg3() {
-    return this.cg(3);
+    return this.add("columnGap", "24px");
   }
   /** Sets `columnGap: "32px"`. */
   get cg4() {
-    return this.cg(4);
+    return this.add("columnGap", "32px");
   }
   /** Sets `columnGap: "40px"`. */
   get cg5() {
-    return this.cg(5);
+    return this.add("columnGap", "40px");
   }
   /** Sets `columnGap: "48px"`. */
   get cg6() {
-    return this.cg(6);
+    return this.add("columnGap", "48px");
   }
   /** Sets `columnGap: "56px"`. */
   get cg7() {
-    return this.cg(7);
+    return this.add("columnGap", "56px");
   }
   /** Sets `columnGap: "64px"`. */
   get cg8() {
-    return this.cg(8);
+    return this.add("columnGap", "64px");
   }
-  /** Sets `columnGap: inc`. */
-  cg(inc: number | string) {
-    return this.add("columnGap", maybeInc(inc));
+  /** Sets `columnGap: "v"`. */
+  cg(v: number | string) {
+    return this.add("columnGap", maybeInc(v));
   }
   /** Sets `columnGap: px`. */
   cgPx(px: number) {
-    return this.cg(`${px}px`);
+    return this.add("columnGap", `${px}px`);
   }
 
   // height
   /** Sets `height: "0px"`. */
   get h0() {
-    return this.h(0);
+    return this.add("height", "0px");
   }
   /** Sets `height: "8px"`. */
   get h1() {
-    return this.h(1);
+    return this.add("height", "8px");
   }
   /** Sets `height: "16px"`. */
   get h2() {
-    return this.h(2);
+    return this.add("height", "16px");
   }
   /** Sets `height: "24px"`. */
   get h3() {
-    return this.h(3);
+    return this.add("height", "24px");
   }
   /** Sets `height: "32px"`. */
   get h4() {
-    return this.h(4);
+    return this.add("height", "32px");
   }
   /** Sets `height: "40px"`. */
   get h5() {
-    return this.h(5);
+    return this.add("height", "40px");
   }
   /** Sets `height: "48px"`. */
   get h6() {
-    return this.h(6);
+    return this.add("height", "48px");
   }
   /** Sets `height: "56px"`. */
   get h7() {
-    return this.h(7);
+    return this.add("height", "56px");
   }
   /** Sets `height: "64px"`. */
   get h8() {
-    return this.h(8);
+    return this.add("height", "64px");
   }
-  /** Sets `height: inc`. */
-  h(inc: number | string) {
-    return this.add("height", maybeInc(inc));
+  /** Sets `height: "auto"`. */
+  get ha() {
+    return this.add("height", "auto");
+  }
+  /** Sets `height: "v"`. */
+  h(v: number | string) {
+    return this.add("height", maybeInc(v));
   }
   /** Sets `height: px`. */
   hPx(px: number) {
-    return this.h(`${px}px`);
+    return this.add("height", `${px}px`);
   }
   /** Sets `height: "25%"`. */
   get h25() {
@@ -1230,6 +1452,18 @@ class CssBuilder<T extends Properties> {
   /** Sets `height: "100vh"`. */
   get vh100() {
     return this.add("height", "100vh");
+  }
+  /** Sets `height: "fit-content"`. */
+  get hfc() {
+    return this.add("height", "fit-content");
+  }
+  /** Sets `height: "max-content"`. */
+  get hmaxc() {
+    return this.add("height", "max-content");
+  }
+  /** Sets `height: "min-content"`. */
+  get hminc() {
+    return this.add("height", "min-content");
   }
   /** Sets `minHeight: 0`. */
   get mh0() {
@@ -1478,757 +1712,877 @@ class CssBuilder<T extends Properties> {
   }
 
   // skins
-  /** Sets `color: "rgba(254,254,254,1)"`. */
+  /** Sets `color: "rgba(255,255,255,1)"`. */
   get white() {
-    return this.add("color", "rgba(254,254,254,1)");
+    return this.add("color", "rgba(255,255,255,1)");
   }
   /** Sets `color: "rgba(0,0,0,0)"`. */
   get transparent() {
     return this.add("color", "rgba(0,0,0,0)");
   }
-  /** Sets `color: "rgba(255,253,253,1)"`. */
+  /** Sets `color: "rgba(255, 253, 253, 1)"`. */
   get gray50() {
-    return this.add("color", "rgba(255,253,253,1)");
+    return this.add("color", "rgba(255, 253, 253, 1)");
   }
-  /** Sets `color: "rgba(247,245,245,1)"`. */
+  /** Sets `color: "rgba(247, 245, 245, 1)"`. */
   get gray100() {
-    return this.add("color", "rgba(247,245,245,1)");
+    return this.add("color", "rgba(247, 245, 245, 1)");
   }
-  /** Sets `color: "rgba(236,235,235,1)"`. */
+  /** Sets `color: "rgba(236, 235, 235, 1)"`. */
   get gray200() {
-    return this.add("color", "rgba(236,235,235,1)");
+    return this.add("color", "rgba(236, 235, 235, 1)");
   }
-  /** Sets `color: "rgba(221,220,220,1)"`. */
+  /** Sets `color: "rgba(221, 220, 220, 1)"`. */
   get gray300() {
-    return this.add("color", "rgba(221,220,220,1)");
+    return this.add("color", "rgba(221, 220, 220, 1)");
   }
-  /** Sets `color: "rgba(201,201,201,1)"`. */
+  /** Sets `color: "rgba(201, 201, 201, 1)"`. */
   get gray400() {
-    return this.add("color", "rgba(201,201,201,1)");
+    return this.add("color", "rgba(201, 201, 201, 1)");
   }
-  /** Sets `color: "rgba(175,175,175,1)"`. */
+  /** Sets `color: "rgba(175, 175, 175, 1)"`. */
   get gray500() {
-    return this.add("color", "rgba(175,175,175,1)");
+    return this.add("color", "rgba(175, 175, 175, 1)");
   }
-  /** Sets `color: "rgba(141,141,141,1)"`. */
+  /** Sets `color: "rgba(141, 141, 141, 1)"`. */
   get gray600() {
-    return this.add("color", "rgba(141,141,141,1)");
+    return this.add("color", "rgba(141, 141, 141, 1)");
   }
-  /** Sets `color: "rgba(100,100,100,1)"`. */
+  /** Sets `color: "rgba(100, 100, 100, 1)"`. */
   get gray700() {
-    return this.add("color", "rgba(100,100,100,1)");
+    return this.add("color", "rgba(100, 100, 100, 1)");
   }
-  /** Sets `color: "rgba(53,53,53,1)"`. */
+  /** Sets `color: "rgba(53, 53, 53, 1)"`. */
   get gray800() {
-    return this.add("color", "rgba(53,53,53,1)");
+    return this.add("color", "rgba(53, 53, 53, 1)");
   }
-  /** Sets `color: "rgba(36,36,36,1)"`. */
+  /** Sets `color: "rgba(36, 36, 36, 1)"`. */
   get gray900() {
-    return this.add("color", "rgba(36,36,36,1)");
+    return this.add("color", "rgba(36, 36, 36, 1)");
   }
-  /** Sets `color: "rgba(240,249,255,1)"`. */
-  get lightBlue50() {
-    return this.add("color", "rgba(240,249,255,1)");
+  /** Sets `color: "rgba(239, 246, 255, 1)"`. */
+  get blue50() {
+    return this.add("color", "rgba(239, 246, 255, 1)");
   }
-  /** Sets `color: "rgba(224,242,254,1)"`. */
-  get lightBlue100() {
-    return this.add("color", "rgba(224,242,254,1)");
+  /** Sets `color: "rgba(219, 234, 254, 1)"`. */
+  get blue100() {
+    return this.add("color", "rgba(219, 234, 254, 1)");
   }
-  /** Sets `color: "rgba(186,230,253,1)"`. */
-  get lightBlue200() {
-    return this.add("color", "rgba(186,230,253,1)");
+  /** Sets `color: "rgba(191, 219, 254, 1)"`. */
+  get blue200() {
+    return this.add("color", "rgba(191, 219, 254, 1)");
   }
-  /** Sets `color: "rgba(125,211,252,1)"`. */
-  get lightBlue300() {
-    return this.add("color", "rgba(125,211,252,1)");
+  /** Sets `color: "rgba(147, 197, 253, 1)"`. */
+  get blue300() {
+    return this.add("color", "rgba(147, 197, 253, 1)");
   }
-  /** Sets `color: "rgba(56,189,248,1)"`. */
-  get lightBlue400() {
-    return this.add("color", "rgba(56,189,248,1)");
+  /** Sets `color: "rgba(96, 165, 250, 1)"`. */
+  get blue400() {
+    return this.add("color", "rgba(96, 165, 250, 1)");
   }
-  /** Sets `color: "rgba(14,165,233,1)"`. */
-  get lightBlue500() {
-    return this.add("color", "rgba(14,165,233,1)");
+  /** Sets `color: "rgba(59, 130, 246, 1)"`. */
+  get blue500() {
+    return this.add("color", "rgba(59, 130, 246, 1)");
   }
-  /** Sets `color: "rgba(2,143,199,1)"`. */
-  get lightBlue600() {
-    return this.add("color", "rgba(2,143,199,1)");
+  /** Sets `color: "rgba(37, 99, 235, 1)"`. */
+  get blue600() {
+    return this.add("color", "rgba(37, 99, 235, 1)");
   }
-  /** Sets `color: "rgba(3,105,161,1)"`. */
-  get lightBlue700() {
-    return this.add("color", "rgba(3,105,161,1)");
+  /** Sets `color: "rgba(29, 78, 216, 1)"`. */
+  get blue700() {
+    return this.add("color", "rgba(29, 78, 216, 1)");
   }
-  /** Sets `color: "rgba(7,89,133,1)"`. */
-  get lightBlue800() {
-    return this.add("color", "rgba(7,89,133,1)");
+  /** Sets `color: "rgba(30, 64, 175, 1)"`. */
+  get blue800() {
+    return this.add("color", "rgba(30, 64, 175, 1)");
   }
-  /** Sets `color: "rgba(12,74,110,1)"`. */
-  get lightBlue900() {
-    return this.add("color", "rgba(12,74,110,1)");
+  /** Sets `color: "rgba(30, 58, 138, 1)"`. */
+  get blue900() {
+    return this.add("color", "rgba(30, 58, 138, 1)");
   }
-  /** Sets `color: "rgba(255,242,242,1)"`. */
+  /** Sets `color: "rgba(254, 242, 242, 1)"`. */
   get red50() {
-    return this.add("color", "rgba(255,242,242,1)");
+    return this.add("color", "rgba(254, 242, 242, 1)");
   }
-  /** Sets `color: "rgba(253,210,209,1)"`. */
+  /** Sets `color: "rgba(254, 226, 226, 1)"`. */
   get red100() {
-    return this.add("color", "rgba(253,210,209,1)");
+    return this.add("color", "rgba(254, 226, 226, 1)");
   }
-  /** Sets `color: "rgba(249,181,177,1)"`. */
+  /** Sets `color: "rgba(254, 202, 202, 1)"`. */
   get red200() {
-    return this.add("color", "rgba(249,181,177,1)");
+    return this.add("color", "rgba(254, 202, 202, 1)");
   }
-  /** Sets `color: "rgba(242,155,148,1)"`. */
+  /** Sets `color: "rgba(252, 165, 165, 1)"`. */
   get red300() {
-    return this.add("color", "rgba(242,155,148,1)");
+    return this.add("color", "rgba(252, 165, 165, 1)");
   }
-  /** Sets `color: "rgba(232,133,122,1)"`. */
+  /** Sets `color: "rgba(248, 113, 113, 1)"`. */
   get red400() {
-    return this.add("color", "rgba(232,133,122,1)");
+    return this.add("color", "rgba(248, 113, 113, 1)");
   }
-  /** Sets `color: "rgba(218,114,100,1)"`. */
+  /** Sets `color: "rgba(239, 68, 68, 1)"`. */
   get red500() {
-    return this.add("color", "rgba(218,114,100,1)");
+    return this.add("color", "rgba(239, 68, 68, 1)");
   }
-  /** Sets `color: "rgba(200,98,81,1)"`. */
+  /** Sets `color: "rgba(220, 38, 38, 1)"`. */
   get red600() {
-    return this.add("color", "rgba(200,98,81,1)");
+    return this.add("color", "rgba(220, 38, 38, 1)");
   }
-  /** Sets `color: "rgba(176,83,73,1)"`. */
+  /** Sets `color: "rgba(185, 28, 28, 1)"`. */
   get red700() {
-    return this.add("color", "rgba(176,83,73,1)");
+    return this.add("color", "rgba(185, 28, 28, 1)");
   }
-  /** Sets `color: "rgba(149,68,64,1)"`. */
+  /** Sets `color: "rgba(153, 27, 27, 1)"`. */
   get red800() {
-    return this.add("color", "rgba(149,68,64,1)");
+    return this.add("color", "rgba(153, 27, 27, 1)");
   }
-  /** Sets `color: "rgba(120,54,54,1)"`. */
+  /** Sets `color: "rgba(127, 29, 29, 1)"`. */
   get red900() {
-    return this.add("color", "rgba(120,54,54,1)");
+    return this.add("color", "rgba(127, 29, 29, 1)");
   }
-  /** Sets `color: "rgba(255,254,242,1)"`. */
+  /** Sets `color: "rgba(254, 252, 232, 1)"`. */
   get yellow50() {
-    return this.add("color", "rgba(255,254,242,1)");
+    return this.add("color", "rgba(254, 252, 232, 1)");
   }
-  /** Sets `color: "rgba(255,254,212,1)"`. */
+  /** Sets `color: "rgba(254, 249, 195, 1)"`. */
   get yellow100() {
-    return this.add("color", "rgba(255,254,212,1)");
+    return this.add("color", "rgba(254, 249, 195, 1)");
   }
-  /** Sets `color: "rgba(255,250,180,1)"`. */
+  /** Sets `color: "rgba(254, 240, 138, 1)"`. */
   get yellow200() {
-    return this.add("color", "rgba(255,250,180,1)");
+    return this.add("color", "rgba(254, 240, 138, 1)");
   }
-  /** Sets `color: "rgba(255,240,150,1)"`. */
+  /** Sets `color: "rgba(253, 224, 71, 1)"`. */
   get yellow300() {
-    return this.add("color", "rgba(255,240,150,1)");
+    return this.add("color", "rgba(253, 224, 71, 1)");
   }
-  /** Sets `color: "rgba(255,225,123,1)"`. */
+  /** Sets `color: "rgba(250, 204, 21, 1)"`. */
   get yellow400() {
-    return this.add("color", "rgba(255,225,123,1)");
+    return this.add("color", "rgba(250, 204, 21, 1)");
   }
-  /** Sets `color: "rgba(255,204,99,1)"`. */
+  /** Sets `color: "rgba(234, 179, 8, 1)"`. */
   get yellow500() {
-    return this.add("color", "rgba(255,204,99,1)");
+    return this.add("color", "rgba(234, 179, 8, 1)");
   }
-  /** Sets `color: "rgba(246,177,78,1)"`. */
+  /** Sets `color: "rgba(202, 138, 4, 1)"`. */
   get yellow600() {
-    return this.add("color", "rgba(246,177,78,1)");
+    return this.add("color", "rgba(202, 138, 4, 1)");
   }
-  /** Sets `color: "rgba(207,150,73,1)"`. */
+  /** Sets `color: "rgba(161, 98, 7, 1)"`. */
   get yellow700() {
-    return this.add("color", "rgba(207,150,73,1)");
+    return this.add("color", "rgba(161, 98, 7, 1)");
   }
-  /** Sets `color: "rgba(164,120,66,1)"`. */
+  /** Sets `color: "rgba(133, 77, 14, 1)"`. */
   get yellow800() {
-    return this.add("color", "rgba(164,120,66,1)");
+    return this.add("color", "rgba(133, 77, 14, 1)");
   }
-  /** Sets `color: "rgba(120,89,54,1)"`. */
+  /** Sets `color: "rgba(113, 63, 18, 1)"`. */
   get yellow900() {
-    return this.add("color", "rgba(120,89,54,1)");
+    return this.add("color", "rgba(113, 63, 18, 1)");
   }
-  /** Sets `color: "rgba(250,255,250,1)"`. */
+  /** Sets `color: "rgba(236, 253, 245, 1)"`. */
   get green50() {
-    return this.add("color", "rgba(250,255,250,1)");
+    return this.add("color", "rgba(236, 253, 245, 1)");
   }
-  /** Sets `color: "rgba(223,248,216,1)"`. */
+  /** Sets `color: "rgba(209, 250, 229, 1)"`. */
   get green100() {
-    return this.add("color", "rgba(223,248,216,1)");
+    return this.add("color", "rgba(209, 250, 229, 1)");
   }
-  /** Sets `color: "rgba(199,239,183,1)"`. */
+  /** Sets `color: "rgba(167, 243, 208, 1)"`. */
   get green200() {
-    return this.add("color", "rgba(199,239,183,1)");
+    return this.add("color", "rgba(167, 243, 208, 1)");
   }
-  /** Sets `color: "rgba(179,226,153,1)"`. */
+  /** Sets `color: "rgba(110, 231, 183, 1)"`. */
   get green300() {
-    return this.add("color", "rgba(179,226,153,1)");
+    return this.add("color", "rgba(110, 231, 183, 1)");
   }
-  /** Sets `color: "rgba(163,208,126,1)"`. */
+  /** Sets `color: "rgba(52, 211, 153, 1)"`. */
   get green400() {
-    return this.add("color", "rgba(163,208,126,1)");
+    return this.add("color", "rgba(52, 211, 153, 1)");
   }
-  /** Sets `color: "rgba(146,185,101,1)"`. */
+  /** Sets `color: "rgba(16, 185, 129, 1)"`. */
   get green500() {
-    return this.add("color", "rgba(146,185,101,1)");
+    return this.add("color", "rgba(16, 185, 129, 1)");
   }
-  /** Sets `color: "rgba(126,156,79,1)"`. */
+  /** Sets `color: "rgba(5, 150, 105, 1)"`. */
   get green600() {
-    return this.add("color", "rgba(126,156,79,1)");
+    return this.add("color", "rgba(5, 150, 105, 1)");
   }
-  /** Sets `color: "rgba(101,120,57,1)"`. */
+  /** Sets `color: "rgba(4, 120, 87, 1)"`. */
   get green700() {
-    return this.add("color", "rgba(101,120,57,1)");
+    return this.add("color", "rgba(4, 120, 87, 1)");
   }
-  /** Sets `color: "rgba(64,93,44,1)"`. */
+  /** Sets `color: "rgba(6, 95, 70, 1)"`. */
   get green800() {
-    return this.add("color", "rgba(64,93,44,1)");
+    return this.add("color", "rgba(6, 95, 70, 1)");
   }
-  /** Sets `color: "rgba(34,64,31,1)"`. */
+  /** Sets `color: "rgba(6, 78, 59, 1)"`. */
   get green900() {
-    return this.add("color", "rgba(34,64,31,1)");
+    return this.add("color", "rgba(6, 78, 59, 1)");
   }
-  /** Sets `color: "rgba(245,243,255,1)"`. */
-  get violet50() {
-    return this.add("color", "rgba(245,243,255,1)");
+  /** Sets `color: "rgba(245, 243, 255, 1)"`. */
+  get purple50() {
+    return this.add("color", "rgba(245, 243, 255, 1)");
   }
-  /** Sets `color: "rgba(238,234,253,1)"`. */
-  get violet100() {
-    return this.add("color", "rgba(238,234,253,1)");
+  /** Sets `color: "rgba(237, 233, 254, 1)"`. */
+  get purple100() {
+    return this.add("color", "rgba(237, 233, 254, 1)");
   }
-  /** Sets `color: "rgba(232,225,252,1)"`. */
-  get violet200() {
-    return this.add("color", "rgba(232,225,252,1)");
+  /** Sets `color: "rgba(221, 214, 254, 1)"`. */
+  get purple200() {
+    return this.add("color", "rgba(221, 214, 254, 1)");
   }
-  /** Sets `color: "rgba(218,205,246,1)"`. */
-  get violet300() {
-    return this.add("color", "rgba(218,205,246,1)");
+  /** Sets `color: "rgba(196, 181, 253, 1)"`. */
+  get purple300() {
+    return this.add("color", "rgba(196, 181, 253, 1)");
   }
-  /** Sets `color: "rgba(204,186,236,1)"`. */
-  get violet400() {
-    return this.add("color", "rgba(204,186,236,1)");
+  /** Sets `color: "rgba(167, 139, 250, 1)"`. */
+  get purple400() {
+    return this.add("color", "rgba(167, 139, 250, 1)");
   }
-  /** Sets `color: "rgba(190,167,223,1)"`. */
-  get violet500() {
-    return this.add("color", "rgba(190,167,223,1)");
+  /** Sets `color: "rgba(139, 92, 246, 1)"`. */
+  get purple500() {
+    return this.add("color", "rgba(139, 92, 246, 1)");
   }
-  /** Sets `color: "rgba(173,147,205,1)"`. */
-  get violet600() {
-    return this.add("color", "rgba(173,147,205,1)");
+  /** Sets `color: "rgba(124, 58, 237, 1)"`. */
+  get purple600() {
+    return this.add("color", "rgba(124, 58, 237, 1)");
   }
-  /** Sets `color: "rgba(153,126,181,1)"`. */
-  get violet700() {
-    return this.add("color", "rgba(153,126,181,1)");
+  /** Sets `color: "rgba(109, 40, 217, 1)"`. */
+  get purple700() {
+    return this.add("color", "rgba(109, 40, 217, 1)");
   }
-  /** Sets `color: "rgba(128,103,151,1)"`. */
-  get violet800() {
-    return this.add("color", "rgba(128,103,151,1)");
+  /** Sets `color: "rgba(91, 33, 182, 1)"`. */
+  get purple800() {
+    return this.add("color", "rgba(91, 33, 182, 1)");
   }
-  /** Sets `color: "rgba(100,78,116,1)"`. */
-  get violet900() {
-    return this.add("color", "rgba(100,78,116,1)");
+  /** Sets `color: "rgba(76, 29, 149, 1)"`. */
+  get purple900() {
+    return this.add("color", "rgba(76, 29, 149, 1)");
+  }
+  /** Sets `color: "rgba(255, 247, 237, 1)"`. */
+  get orange50() {
+    return this.add("color", "rgba(255, 247, 237, 1)");
+  }
+  /** Sets `color: "rgba(255, 237, 213, 1)"`. */
+  get orange100() {
+    return this.add("color", "rgba(255, 237, 213, 1)");
+  }
+  /** Sets `color: "rgba(254, 215, 170, 1)"`. */
+  get orange200() {
+    return this.add("color", "rgba(254, 215, 170, 1)");
+  }
+  /** Sets `color: "rgba(253, 186, 116, 1)"`. */
+  get orange300() {
+    return this.add("color", "rgba(253, 186, 116, 1)");
+  }
+  /** Sets `color: "rgba(251, 146, 60, 1)"`. */
+  get orange400() {
+    return this.add("color", "rgba(251, 146, 60, 1)");
+  }
+  /** Sets `color: "rgba(249, 115, 22, 1)"`. */
+  get orange500() {
+    return this.add("color", "rgba(249, 115, 22, 1)");
+  }
+  /** Sets `color: "rgba(234, 88, 12, 1)"`. */
+  get orange600() {
+    return this.add("color", "rgba(234, 88, 12, 1)");
+  }
+  /** Sets `color: "rgba(194, 65, 12, 1)"`. */
+  get orange700() {
+    return this.add("color", "rgba(194, 65, 12, 1)");
+  }
+  /** Sets `color: "rgba(154, 52, 18, 1)"`. */
+  get orange800() {
+    return this.add("color", "rgba(154, 52, 18, 1)");
+  }
+  /** Sets `color: "rgba(124, 45, 18, 1)"`. */
+  get orange900() {
+    return this.add("color", "rgba(124, 45, 18, 1)");
   }
   /** Sets `color: value`. */
   color(value: Properties["color"]) {
     return this.add("color", value);
   }
-  /** Sets `backgroundColor: "rgba(254,254,254,1)"`. */
+  /** Sets `backgroundColor: "rgba(255,255,255,1)"`. */
   get bgWhite() {
-    return this.add("backgroundColor", "rgba(254,254,254,1)");
+    return this.add("backgroundColor", "rgba(255,255,255,1)");
   }
   /** Sets `backgroundColor: "rgba(0,0,0,0)"`. */
   get bgTransparent() {
     return this.add("backgroundColor", "rgba(0,0,0,0)");
   }
-  /** Sets `backgroundColor: "rgba(255,253,253,1)"`. */
+  /** Sets `backgroundColor: "rgba(255, 253, 253, 1)"`. */
   get bgGray50() {
-    return this.add("backgroundColor", "rgba(255,253,253,1)");
+    return this.add("backgroundColor", "rgba(255, 253, 253, 1)");
   }
-  /** Sets `backgroundColor: "rgba(247,245,245,1)"`. */
+  /** Sets `backgroundColor: "rgba(247, 245, 245, 1)"`. */
   get bgGray100() {
-    return this.add("backgroundColor", "rgba(247,245,245,1)");
+    return this.add("backgroundColor", "rgba(247, 245, 245, 1)");
   }
-  /** Sets `backgroundColor: "rgba(236,235,235,1)"`. */
+  /** Sets `backgroundColor: "rgba(236, 235, 235, 1)"`. */
   get bgGray200() {
-    return this.add("backgroundColor", "rgba(236,235,235,1)");
+    return this.add("backgroundColor", "rgba(236, 235, 235, 1)");
   }
-  /** Sets `backgroundColor: "rgba(221,220,220,1)"`. */
+  /** Sets `backgroundColor: "rgba(221, 220, 220, 1)"`. */
   get bgGray300() {
-    return this.add("backgroundColor", "rgba(221,220,220,1)");
+    return this.add("backgroundColor", "rgba(221, 220, 220, 1)");
   }
-  /** Sets `backgroundColor: "rgba(201,201,201,1)"`. */
+  /** Sets `backgroundColor: "rgba(201, 201, 201, 1)"`. */
   get bgGray400() {
-    return this.add("backgroundColor", "rgba(201,201,201,1)");
+    return this.add("backgroundColor", "rgba(201, 201, 201, 1)");
   }
-  /** Sets `backgroundColor: "rgba(175,175,175,1)"`. */
+  /** Sets `backgroundColor: "rgba(175, 175, 175, 1)"`. */
   get bgGray500() {
-    return this.add("backgroundColor", "rgba(175,175,175,1)");
+    return this.add("backgroundColor", "rgba(175, 175, 175, 1)");
   }
-  /** Sets `backgroundColor: "rgba(141,141,141,1)"`. */
+  /** Sets `backgroundColor: "rgba(141, 141, 141, 1)"`. */
   get bgGray600() {
-    return this.add("backgroundColor", "rgba(141,141,141,1)");
+    return this.add("backgroundColor", "rgba(141, 141, 141, 1)");
   }
-  /** Sets `backgroundColor: "rgba(100,100,100,1)"`. */
+  /** Sets `backgroundColor: "rgba(100, 100, 100, 1)"`. */
   get bgGray700() {
-    return this.add("backgroundColor", "rgba(100,100,100,1)");
+    return this.add("backgroundColor", "rgba(100, 100, 100, 1)");
   }
-  /** Sets `backgroundColor: "rgba(53,53,53,1)"`. */
+  /** Sets `backgroundColor: "rgba(53, 53, 53, 1)"`. */
   get bgGray800() {
-    return this.add("backgroundColor", "rgba(53,53,53,1)");
+    return this.add("backgroundColor", "rgba(53, 53, 53, 1)");
   }
-  /** Sets `backgroundColor: "rgba(36,36,36,1)"`. */
+  /** Sets `backgroundColor: "rgba(36, 36, 36, 1)"`. */
   get bgGray900() {
-    return this.add("backgroundColor", "rgba(36,36,36,1)");
+    return this.add("backgroundColor", "rgba(36, 36, 36, 1)");
   }
-  /** Sets `backgroundColor: "rgba(240,249,255,1)"`. */
-  get bgLightBlue50() {
-    return this.add("backgroundColor", "rgba(240,249,255,1)");
+  /** Sets `backgroundColor: "rgba(239, 246, 255, 1)"`. */
+  get bgBlue50() {
+    return this.add("backgroundColor", "rgba(239, 246, 255, 1)");
   }
-  /** Sets `backgroundColor: "rgba(224,242,254,1)"`. */
-  get bgLightBlue100() {
-    return this.add("backgroundColor", "rgba(224,242,254,1)");
+  /** Sets `backgroundColor: "rgba(219, 234, 254, 1)"`. */
+  get bgBlue100() {
+    return this.add("backgroundColor", "rgba(219, 234, 254, 1)");
   }
-  /** Sets `backgroundColor: "rgba(186,230,253,1)"`. */
-  get bgLightBlue200() {
-    return this.add("backgroundColor", "rgba(186,230,253,1)");
+  /** Sets `backgroundColor: "rgba(191, 219, 254, 1)"`. */
+  get bgBlue200() {
+    return this.add("backgroundColor", "rgba(191, 219, 254, 1)");
   }
-  /** Sets `backgroundColor: "rgba(125,211,252,1)"`. */
-  get bgLightBlue300() {
-    return this.add("backgroundColor", "rgba(125,211,252,1)");
+  /** Sets `backgroundColor: "rgba(147, 197, 253, 1)"`. */
+  get bgBlue300() {
+    return this.add("backgroundColor", "rgba(147, 197, 253, 1)");
   }
-  /** Sets `backgroundColor: "rgba(56,189,248,1)"`. */
-  get bgLightBlue400() {
-    return this.add("backgroundColor", "rgba(56,189,248,1)");
+  /** Sets `backgroundColor: "rgba(96, 165, 250, 1)"`. */
+  get bgBlue400() {
+    return this.add("backgroundColor", "rgba(96, 165, 250, 1)");
   }
-  /** Sets `backgroundColor: "rgba(14,165,233,1)"`. */
-  get bgLightBlue500() {
-    return this.add("backgroundColor", "rgba(14,165,233,1)");
+  /** Sets `backgroundColor: "rgba(59, 130, 246, 1)"`. */
+  get bgBlue500() {
+    return this.add("backgroundColor", "rgba(59, 130, 246, 1)");
   }
-  /** Sets `backgroundColor: "rgba(2,143,199,1)"`. */
-  get bgLightBlue600() {
-    return this.add("backgroundColor", "rgba(2,143,199,1)");
+  /** Sets `backgroundColor: "rgba(37, 99, 235, 1)"`. */
+  get bgBlue600() {
+    return this.add("backgroundColor", "rgba(37, 99, 235, 1)");
   }
-  /** Sets `backgroundColor: "rgba(3,105,161,1)"`. */
-  get bgLightBlue700() {
-    return this.add("backgroundColor", "rgba(3,105,161,1)");
+  /** Sets `backgroundColor: "rgba(29, 78, 216, 1)"`. */
+  get bgBlue700() {
+    return this.add("backgroundColor", "rgba(29, 78, 216, 1)");
   }
-  /** Sets `backgroundColor: "rgba(7,89,133,1)"`. */
-  get bgLightBlue800() {
-    return this.add("backgroundColor", "rgba(7,89,133,1)");
+  /** Sets `backgroundColor: "rgba(30, 64, 175, 1)"`. */
+  get bgBlue800() {
+    return this.add("backgroundColor", "rgba(30, 64, 175, 1)");
   }
-  /** Sets `backgroundColor: "rgba(12,74,110,1)"`. */
-  get bgLightBlue900() {
-    return this.add("backgroundColor", "rgba(12,74,110,1)");
+  /** Sets `backgroundColor: "rgba(30, 58, 138, 1)"`. */
+  get bgBlue900() {
+    return this.add("backgroundColor", "rgba(30, 58, 138, 1)");
   }
-  /** Sets `backgroundColor: "rgba(255,242,242,1)"`. */
+  /** Sets `backgroundColor: "rgba(254, 242, 242, 1)"`. */
   get bgRed50() {
-    return this.add("backgroundColor", "rgba(255,242,242,1)");
+    return this.add("backgroundColor", "rgba(254, 242, 242, 1)");
   }
-  /** Sets `backgroundColor: "rgba(253,210,209,1)"`. */
+  /** Sets `backgroundColor: "rgba(254, 226, 226, 1)"`. */
   get bgRed100() {
-    return this.add("backgroundColor", "rgba(253,210,209,1)");
+    return this.add("backgroundColor", "rgba(254, 226, 226, 1)");
   }
-  /** Sets `backgroundColor: "rgba(249,181,177,1)"`. */
+  /** Sets `backgroundColor: "rgba(254, 202, 202, 1)"`. */
   get bgRed200() {
-    return this.add("backgroundColor", "rgba(249,181,177,1)");
+    return this.add("backgroundColor", "rgba(254, 202, 202, 1)");
   }
-  /** Sets `backgroundColor: "rgba(242,155,148,1)"`. */
+  /** Sets `backgroundColor: "rgba(252, 165, 165, 1)"`. */
   get bgRed300() {
-    return this.add("backgroundColor", "rgba(242,155,148,1)");
+    return this.add("backgroundColor", "rgba(252, 165, 165, 1)");
   }
-  /** Sets `backgroundColor: "rgba(232,133,122,1)"`. */
+  /** Sets `backgroundColor: "rgba(248, 113, 113, 1)"`. */
   get bgRed400() {
-    return this.add("backgroundColor", "rgba(232,133,122,1)");
+    return this.add("backgroundColor", "rgba(248, 113, 113, 1)");
   }
-  /** Sets `backgroundColor: "rgba(218,114,100,1)"`. */
+  /** Sets `backgroundColor: "rgba(239, 68, 68, 1)"`. */
   get bgRed500() {
-    return this.add("backgroundColor", "rgba(218,114,100,1)");
+    return this.add("backgroundColor", "rgba(239, 68, 68, 1)");
   }
-  /** Sets `backgroundColor: "rgba(200,98,81,1)"`. */
+  /** Sets `backgroundColor: "rgba(220, 38, 38, 1)"`. */
   get bgRed600() {
-    return this.add("backgroundColor", "rgba(200,98,81,1)");
+    return this.add("backgroundColor", "rgba(220, 38, 38, 1)");
   }
-  /** Sets `backgroundColor: "rgba(176,83,73,1)"`. */
+  /** Sets `backgroundColor: "rgba(185, 28, 28, 1)"`. */
   get bgRed700() {
-    return this.add("backgroundColor", "rgba(176,83,73,1)");
+    return this.add("backgroundColor", "rgba(185, 28, 28, 1)");
   }
-  /** Sets `backgroundColor: "rgba(149,68,64,1)"`. */
+  /** Sets `backgroundColor: "rgba(153, 27, 27, 1)"`. */
   get bgRed800() {
-    return this.add("backgroundColor", "rgba(149,68,64,1)");
+    return this.add("backgroundColor", "rgba(153, 27, 27, 1)");
   }
-  /** Sets `backgroundColor: "rgba(120,54,54,1)"`. */
+  /** Sets `backgroundColor: "rgba(127, 29, 29, 1)"`. */
   get bgRed900() {
-    return this.add("backgroundColor", "rgba(120,54,54,1)");
+    return this.add("backgroundColor", "rgba(127, 29, 29, 1)");
   }
-  /** Sets `backgroundColor: "rgba(255,254,242,1)"`. */
+  /** Sets `backgroundColor: "rgba(254, 252, 232, 1)"`. */
   get bgYellow50() {
-    return this.add("backgroundColor", "rgba(255,254,242,1)");
+    return this.add("backgroundColor", "rgba(254, 252, 232, 1)");
   }
-  /** Sets `backgroundColor: "rgba(255,254,212,1)"`. */
+  /** Sets `backgroundColor: "rgba(254, 249, 195, 1)"`. */
   get bgYellow100() {
-    return this.add("backgroundColor", "rgba(255,254,212,1)");
+    return this.add("backgroundColor", "rgba(254, 249, 195, 1)");
   }
-  /** Sets `backgroundColor: "rgba(255,250,180,1)"`. */
+  /** Sets `backgroundColor: "rgba(254, 240, 138, 1)"`. */
   get bgYellow200() {
-    return this.add("backgroundColor", "rgba(255,250,180,1)");
+    return this.add("backgroundColor", "rgba(254, 240, 138, 1)");
   }
-  /** Sets `backgroundColor: "rgba(255,240,150,1)"`. */
+  /** Sets `backgroundColor: "rgba(253, 224, 71, 1)"`. */
   get bgYellow300() {
-    return this.add("backgroundColor", "rgba(255,240,150,1)");
+    return this.add("backgroundColor", "rgba(253, 224, 71, 1)");
   }
-  /** Sets `backgroundColor: "rgba(255,225,123,1)"`. */
+  /** Sets `backgroundColor: "rgba(250, 204, 21, 1)"`. */
   get bgYellow400() {
-    return this.add("backgroundColor", "rgba(255,225,123,1)");
+    return this.add("backgroundColor", "rgba(250, 204, 21, 1)");
   }
-  /** Sets `backgroundColor: "rgba(255,204,99,1)"`. */
+  /** Sets `backgroundColor: "rgba(234, 179, 8, 1)"`. */
   get bgYellow500() {
-    return this.add("backgroundColor", "rgba(255,204,99,1)");
+    return this.add("backgroundColor", "rgba(234, 179, 8, 1)");
   }
-  /** Sets `backgroundColor: "rgba(246,177,78,1)"`. */
+  /** Sets `backgroundColor: "rgba(202, 138, 4, 1)"`. */
   get bgYellow600() {
-    return this.add("backgroundColor", "rgba(246,177,78,1)");
+    return this.add("backgroundColor", "rgba(202, 138, 4, 1)");
   }
-  /** Sets `backgroundColor: "rgba(207,150,73,1)"`. */
+  /** Sets `backgroundColor: "rgba(161, 98, 7, 1)"`. */
   get bgYellow700() {
-    return this.add("backgroundColor", "rgba(207,150,73,1)");
+    return this.add("backgroundColor", "rgba(161, 98, 7, 1)");
   }
-  /** Sets `backgroundColor: "rgba(164,120,66,1)"`. */
+  /** Sets `backgroundColor: "rgba(133, 77, 14, 1)"`. */
   get bgYellow800() {
-    return this.add("backgroundColor", "rgba(164,120,66,1)");
+    return this.add("backgroundColor", "rgba(133, 77, 14, 1)");
   }
-  /** Sets `backgroundColor: "rgba(120,89,54,1)"`. */
+  /** Sets `backgroundColor: "rgba(113, 63, 18, 1)"`. */
   get bgYellow900() {
-    return this.add("backgroundColor", "rgba(120,89,54,1)");
+    return this.add("backgroundColor", "rgba(113, 63, 18, 1)");
   }
-  /** Sets `backgroundColor: "rgba(250,255,250,1)"`. */
+  /** Sets `backgroundColor: "rgba(236, 253, 245, 1)"`. */
   get bgGreen50() {
-    return this.add("backgroundColor", "rgba(250,255,250,1)");
+    return this.add("backgroundColor", "rgba(236, 253, 245, 1)");
   }
-  /** Sets `backgroundColor: "rgba(223,248,216,1)"`. */
+  /** Sets `backgroundColor: "rgba(209, 250, 229, 1)"`. */
   get bgGreen100() {
-    return this.add("backgroundColor", "rgba(223,248,216,1)");
+    return this.add("backgroundColor", "rgba(209, 250, 229, 1)");
   }
-  /** Sets `backgroundColor: "rgba(199,239,183,1)"`. */
+  /** Sets `backgroundColor: "rgba(167, 243, 208, 1)"`. */
   get bgGreen200() {
-    return this.add("backgroundColor", "rgba(199,239,183,1)");
+    return this.add("backgroundColor", "rgba(167, 243, 208, 1)");
   }
-  /** Sets `backgroundColor: "rgba(179,226,153,1)"`. */
+  /** Sets `backgroundColor: "rgba(110, 231, 183, 1)"`. */
   get bgGreen300() {
-    return this.add("backgroundColor", "rgba(179,226,153,1)");
+    return this.add("backgroundColor", "rgba(110, 231, 183, 1)");
   }
-  /** Sets `backgroundColor: "rgba(163,208,126,1)"`. */
+  /** Sets `backgroundColor: "rgba(52, 211, 153, 1)"`. */
   get bgGreen400() {
-    return this.add("backgroundColor", "rgba(163,208,126,1)");
+    return this.add("backgroundColor", "rgba(52, 211, 153, 1)");
   }
-  /** Sets `backgroundColor: "rgba(146,185,101,1)"`. */
+  /** Sets `backgroundColor: "rgba(16, 185, 129, 1)"`. */
   get bgGreen500() {
-    return this.add("backgroundColor", "rgba(146,185,101,1)");
+    return this.add("backgroundColor", "rgba(16, 185, 129, 1)");
   }
-  /** Sets `backgroundColor: "rgba(126,156,79,1)"`. */
+  /** Sets `backgroundColor: "rgba(5, 150, 105, 1)"`. */
   get bgGreen600() {
-    return this.add("backgroundColor", "rgba(126,156,79,1)");
+    return this.add("backgroundColor", "rgba(5, 150, 105, 1)");
   }
-  /** Sets `backgroundColor: "rgba(101,120,57,1)"`. */
+  /** Sets `backgroundColor: "rgba(4, 120, 87, 1)"`. */
   get bgGreen700() {
-    return this.add("backgroundColor", "rgba(101,120,57,1)");
+    return this.add("backgroundColor", "rgba(4, 120, 87, 1)");
   }
-  /** Sets `backgroundColor: "rgba(64,93,44,1)"`. */
+  /** Sets `backgroundColor: "rgba(6, 95, 70, 1)"`. */
   get bgGreen800() {
-    return this.add("backgroundColor", "rgba(64,93,44,1)");
+    return this.add("backgroundColor", "rgba(6, 95, 70, 1)");
   }
-  /** Sets `backgroundColor: "rgba(34,64,31,1)"`. */
+  /** Sets `backgroundColor: "rgba(6, 78, 59, 1)"`. */
   get bgGreen900() {
-    return this.add("backgroundColor", "rgba(34,64,31,1)");
+    return this.add("backgroundColor", "rgba(6, 78, 59, 1)");
   }
-  /** Sets `backgroundColor: "rgba(245,243,255,1)"`. */
-  get bgViolet50() {
-    return this.add("backgroundColor", "rgba(245,243,255,1)");
+  /** Sets `backgroundColor: "rgba(245, 243, 255, 1)"`. */
+  get bgPurple50() {
+    return this.add("backgroundColor", "rgba(245, 243, 255, 1)");
   }
-  /** Sets `backgroundColor: "rgba(238,234,253,1)"`. */
-  get bgViolet100() {
-    return this.add("backgroundColor", "rgba(238,234,253,1)");
+  /** Sets `backgroundColor: "rgba(237, 233, 254, 1)"`. */
+  get bgPurple100() {
+    return this.add("backgroundColor", "rgba(237, 233, 254, 1)");
   }
-  /** Sets `backgroundColor: "rgba(232,225,252,1)"`. */
-  get bgViolet200() {
-    return this.add("backgroundColor", "rgba(232,225,252,1)");
+  /** Sets `backgroundColor: "rgba(221, 214, 254, 1)"`. */
+  get bgPurple200() {
+    return this.add("backgroundColor", "rgba(221, 214, 254, 1)");
   }
-  /** Sets `backgroundColor: "rgba(218,205,246,1)"`. */
-  get bgViolet300() {
-    return this.add("backgroundColor", "rgba(218,205,246,1)");
+  /** Sets `backgroundColor: "rgba(196, 181, 253, 1)"`. */
+  get bgPurple300() {
+    return this.add("backgroundColor", "rgba(196, 181, 253, 1)");
   }
-  /** Sets `backgroundColor: "rgba(204,186,236,1)"`. */
-  get bgViolet400() {
-    return this.add("backgroundColor", "rgba(204,186,236,1)");
+  /** Sets `backgroundColor: "rgba(167, 139, 250, 1)"`. */
+  get bgPurple400() {
+    return this.add("backgroundColor", "rgba(167, 139, 250, 1)");
   }
-  /** Sets `backgroundColor: "rgba(190,167,223,1)"`. */
-  get bgViolet500() {
-    return this.add("backgroundColor", "rgba(190,167,223,1)");
+  /** Sets `backgroundColor: "rgba(139, 92, 246, 1)"`. */
+  get bgPurple500() {
+    return this.add("backgroundColor", "rgba(139, 92, 246, 1)");
   }
-  /** Sets `backgroundColor: "rgba(173,147,205,1)"`. */
-  get bgViolet600() {
-    return this.add("backgroundColor", "rgba(173,147,205,1)");
+  /** Sets `backgroundColor: "rgba(124, 58, 237, 1)"`. */
+  get bgPurple600() {
+    return this.add("backgroundColor", "rgba(124, 58, 237, 1)");
   }
-  /** Sets `backgroundColor: "rgba(153,126,181,1)"`. */
-  get bgViolet700() {
-    return this.add("backgroundColor", "rgba(153,126,181,1)");
+  /** Sets `backgroundColor: "rgba(109, 40, 217, 1)"`. */
+  get bgPurple700() {
+    return this.add("backgroundColor", "rgba(109, 40, 217, 1)");
   }
-  /** Sets `backgroundColor: "rgba(128,103,151,1)"`. */
-  get bgViolet800() {
-    return this.add("backgroundColor", "rgba(128,103,151,1)");
+  /** Sets `backgroundColor: "rgba(91, 33, 182, 1)"`. */
+  get bgPurple800() {
+    return this.add("backgroundColor", "rgba(91, 33, 182, 1)");
   }
-  /** Sets `backgroundColor: "rgba(100,78,116,1)"`. */
-  get bgViolet900() {
-    return this.add("backgroundColor", "rgba(100,78,116,1)");
+  /** Sets `backgroundColor: "rgba(76, 29, 149, 1)"`. */
+  get bgPurple900() {
+    return this.add("backgroundColor", "rgba(76, 29, 149, 1)");
+  }
+  /** Sets `backgroundColor: "rgba(255, 247, 237, 1)"`. */
+  get bgOrange50() {
+    return this.add("backgroundColor", "rgba(255, 247, 237, 1)");
+  }
+  /** Sets `backgroundColor: "rgba(255, 237, 213, 1)"`. */
+  get bgOrange100() {
+    return this.add("backgroundColor", "rgba(255, 237, 213, 1)");
+  }
+  /** Sets `backgroundColor: "rgba(254, 215, 170, 1)"`. */
+  get bgOrange200() {
+    return this.add("backgroundColor", "rgba(254, 215, 170, 1)");
+  }
+  /** Sets `backgroundColor: "rgba(253, 186, 116, 1)"`. */
+  get bgOrange300() {
+    return this.add("backgroundColor", "rgba(253, 186, 116, 1)");
+  }
+  /** Sets `backgroundColor: "rgba(251, 146, 60, 1)"`. */
+  get bgOrange400() {
+    return this.add("backgroundColor", "rgba(251, 146, 60, 1)");
+  }
+  /** Sets `backgroundColor: "rgba(249, 115, 22, 1)"`. */
+  get bgOrange500() {
+    return this.add("backgroundColor", "rgba(249, 115, 22, 1)");
+  }
+  /** Sets `backgroundColor: "rgba(234, 88, 12, 1)"`. */
+  get bgOrange600() {
+    return this.add("backgroundColor", "rgba(234, 88, 12, 1)");
+  }
+  /** Sets `backgroundColor: "rgba(194, 65, 12, 1)"`. */
+  get bgOrange700() {
+    return this.add("backgroundColor", "rgba(194, 65, 12, 1)");
+  }
+  /** Sets `backgroundColor: "rgba(154, 52, 18, 1)"`. */
+  get bgOrange800() {
+    return this.add("backgroundColor", "rgba(154, 52, 18, 1)");
+  }
+  /** Sets `backgroundColor: "rgba(124, 45, 18, 1)"`. */
+  get bgOrange900() {
+    return this.add("backgroundColor", "rgba(124, 45, 18, 1)");
   }
   /** Sets `backgroundColor: value`. */
   bgColor(value: Properties["backgroundColor"]) {
     return this.add("backgroundColor", value);
   }
-  /** Sets `fill: "rgba(254,254,254,1)"`. */
+  /** Sets `fill: "rgba(255,255,255,1)"`. */
   get fWhite() {
-    return this.add("fill", "rgba(254,254,254,1)");
+    return this.add("fill", "rgba(255,255,255,1)");
   }
   /** Sets `fill: "rgba(0,0,0,0)"`. */
   get fTransparent() {
     return this.add("fill", "rgba(0,0,0,0)");
   }
-  /** Sets `fill: "rgba(255,253,253,1)"`. */
+  /** Sets `fill: "rgba(255, 253, 253, 1)"`. */
   get fGray50() {
-    return this.add("fill", "rgba(255,253,253,1)");
+    return this.add("fill", "rgba(255, 253, 253, 1)");
   }
-  /** Sets `fill: "rgba(247,245,245,1)"`. */
+  /** Sets `fill: "rgba(247, 245, 245, 1)"`. */
   get fGray100() {
-    return this.add("fill", "rgba(247,245,245,1)");
+    return this.add("fill", "rgba(247, 245, 245, 1)");
   }
-  /** Sets `fill: "rgba(236,235,235,1)"`. */
+  /** Sets `fill: "rgba(236, 235, 235, 1)"`. */
   get fGray200() {
-    return this.add("fill", "rgba(236,235,235,1)");
+    return this.add("fill", "rgba(236, 235, 235, 1)");
   }
-  /** Sets `fill: "rgba(221,220,220,1)"`. */
+  /** Sets `fill: "rgba(221, 220, 220, 1)"`. */
   get fGray300() {
-    return this.add("fill", "rgba(221,220,220,1)");
+    return this.add("fill", "rgba(221, 220, 220, 1)");
   }
-  /** Sets `fill: "rgba(201,201,201,1)"`. */
+  /** Sets `fill: "rgba(201, 201, 201, 1)"`. */
   get fGray400() {
-    return this.add("fill", "rgba(201,201,201,1)");
+    return this.add("fill", "rgba(201, 201, 201, 1)");
   }
-  /** Sets `fill: "rgba(175,175,175,1)"`. */
+  /** Sets `fill: "rgba(175, 175, 175, 1)"`. */
   get fGray500() {
-    return this.add("fill", "rgba(175,175,175,1)");
+    return this.add("fill", "rgba(175, 175, 175, 1)");
   }
-  /** Sets `fill: "rgba(141,141,141,1)"`. */
+  /** Sets `fill: "rgba(141, 141, 141, 1)"`. */
   get fGray600() {
-    return this.add("fill", "rgba(141,141,141,1)");
+    return this.add("fill", "rgba(141, 141, 141, 1)");
   }
-  /** Sets `fill: "rgba(100,100,100,1)"`. */
+  /** Sets `fill: "rgba(100, 100, 100, 1)"`. */
   get fGray700() {
-    return this.add("fill", "rgba(100,100,100,1)");
+    return this.add("fill", "rgba(100, 100, 100, 1)");
   }
-  /** Sets `fill: "rgba(53,53,53,1)"`. */
+  /** Sets `fill: "rgba(53, 53, 53, 1)"`. */
   get fGray800() {
-    return this.add("fill", "rgba(53,53,53,1)");
+    return this.add("fill", "rgba(53, 53, 53, 1)");
   }
-  /** Sets `fill: "rgba(36,36,36,1)"`. */
+  /** Sets `fill: "rgba(36, 36, 36, 1)"`. */
   get fGray900() {
-    return this.add("fill", "rgba(36,36,36,1)");
+    return this.add("fill", "rgba(36, 36, 36, 1)");
   }
-  /** Sets `fill: "rgba(240,249,255,1)"`. */
-  get fLightBlue50() {
-    return this.add("fill", "rgba(240,249,255,1)");
+  /** Sets `fill: "rgba(239, 246, 255, 1)"`. */
+  get fBlue50() {
+    return this.add("fill", "rgba(239, 246, 255, 1)");
   }
-  /** Sets `fill: "rgba(224,242,254,1)"`. */
-  get fLightBlue100() {
-    return this.add("fill", "rgba(224,242,254,1)");
+  /** Sets `fill: "rgba(219, 234, 254, 1)"`. */
+  get fBlue100() {
+    return this.add("fill", "rgba(219, 234, 254, 1)");
   }
-  /** Sets `fill: "rgba(186,230,253,1)"`. */
-  get fLightBlue200() {
-    return this.add("fill", "rgba(186,230,253,1)");
+  /** Sets `fill: "rgba(191, 219, 254, 1)"`. */
+  get fBlue200() {
+    return this.add("fill", "rgba(191, 219, 254, 1)");
   }
-  /** Sets `fill: "rgba(125,211,252,1)"`. */
-  get fLightBlue300() {
-    return this.add("fill", "rgba(125,211,252,1)");
+  /** Sets `fill: "rgba(147, 197, 253, 1)"`. */
+  get fBlue300() {
+    return this.add("fill", "rgba(147, 197, 253, 1)");
   }
-  /** Sets `fill: "rgba(56,189,248,1)"`. */
-  get fLightBlue400() {
-    return this.add("fill", "rgba(56,189,248,1)");
+  /** Sets `fill: "rgba(96, 165, 250, 1)"`. */
+  get fBlue400() {
+    return this.add("fill", "rgba(96, 165, 250, 1)");
   }
-  /** Sets `fill: "rgba(14,165,233,1)"`. */
-  get fLightBlue500() {
-    return this.add("fill", "rgba(14,165,233,1)");
+  /** Sets `fill: "rgba(59, 130, 246, 1)"`. */
+  get fBlue500() {
+    return this.add("fill", "rgba(59, 130, 246, 1)");
   }
-  /** Sets `fill: "rgba(2,143,199,1)"`. */
-  get fLightBlue600() {
-    return this.add("fill", "rgba(2,143,199,1)");
+  /** Sets `fill: "rgba(37, 99, 235, 1)"`. */
+  get fBlue600() {
+    return this.add("fill", "rgba(37, 99, 235, 1)");
   }
-  /** Sets `fill: "rgba(3,105,161,1)"`. */
-  get fLightBlue700() {
-    return this.add("fill", "rgba(3,105,161,1)");
+  /** Sets `fill: "rgba(29, 78, 216, 1)"`. */
+  get fBlue700() {
+    return this.add("fill", "rgba(29, 78, 216, 1)");
   }
-  /** Sets `fill: "rgba(7,89,133,1)"`. */
-  get fLightBlue800() {
-    return this.add("fill", "rgba(7,89,133,1)");
+  /** Sets `fill: "rgba(30, 64, 175, 1)"`. */
+  get fBlue800() {
+    return this.add("fill", "rgba(30, 64, 175, 1)");
   }
-  /** Sets `fill: "rgba(12,74,110,1)"`. */
-  get fLightBlue900() {
-    return this.add("fill", "rgba(12,74,110,1)");
+  /** Sets `fill: "rgba(30, 58, 138, 1)"`. */
+  get fBlue900() {
+    return this.add("fill", "rgba(30, 58, 138, 1)");
   }
-  /** Sets `fill: "rgba(255,242,242,1)"`. */
+  /** Sets `fill: "rgba(254, 242, 242, 1)"`. */
   get fRed50() {
-    return this.add("fill", "rgba(255,242,242,1)");
+    return this.add("fill", "rgba(254, 242, 242, 1)");
   }
-  /** Sets `fill: "rgba(253,210,209,1)"`. */
+  /** Sets `fill: "rgba(254, 226, 226, 1)"`. */
   get fRed100() {
-    return this.add("fill", "rgba(253,210,209,1)");
+    return this.add("fill", "rgba(254, 226, 226, 1)");
   }
-  /** Sets `fill: "rgba(249,181,177,1)"`. */
+  /** Sets `fill: "rgba(254, 202, 202, 1)"`. */
   get fRed200() {
-    return this.add("fill", "rgba(249,181,177,1)");
+    return this.add("fill", "rgba(254, 202, 202, 1)");
   }
-  /** Sets `fill: "rgba(242,155,148,1)"`. */
+  /** Sets `fill: "rgba(252, 165, 165, 1)"`. */
   get fRed300() {
-    return this.add("fill", "rgba(242,155,148,1)");
+    return this.add("fill", "rgba(252, 165, 165, 1)");
   }
-  /** Sets `fill: "rgba(232,133,122,1)"`. */
+  /** Sets `fill: "rgba(248, 113, 113, 1)"`. */
   get fRed400() {
-    return this.add("fill", "rgba(232,133,122,1)");
+    return this.add("fill", "rgba(248, 113, 113, 1)");
   }
-  /** Sets `fill: "rgba(218,114,100,1)"`. */
+  /** Sets `fill: "rgba(239, 68, 68, 1)"`. */
   get fRed500() {
-    return this.add("fill", "rgba(218,114,100,1)");
+    return this.add("fill", "rgba(239, 68, 68, 1)");
   }
-  /** Sets `fill: "rgba(200,98,81,1)"`. */
+  /** Sets `fill: "rgba(220, 38, 38, 1)"`. */
   get fRed600() {
-    return this.add("fill", "rgba(200,98,81,1)");
+    return this.add("fill", "rgba(220, 38, 38, 1)");
   }
-  /** Sets `fill: "rgba(176,83,73,1)"`. */
+  /** Sets `fill: "rgba(185, 28, 28, 1)"`. */
   get fRed700() {
-    return this.add("fill", "rgba(176,83,73,1)");
+    return this.add("fill", "rgba(185, 28, 28, 1)");
   }
-  /** Sets `fill: "rgba(149,68,64,1)"`. */
+  /** Sets `fill: "rgba(153, 27, 27, 1)"`. */
   get fRed800() {
-    return this.add("fill", "rgba(149,68,64,1)");
+    return this.add("fill", "rgba(153, 27, 27, 1)");
   }
-  /** Sets `fill: "rgba(120,54,54,1)"`. */
+  /** Sets `fill: "rgba(127, 29, 29, 1)"`. */
   get fRed900() {
-    return this.add("fill", "rgba(120,54,54,1)");
+    return this.add("fill", "rgba(127, 29, 29, 1)");
   }
-  /** Sets `fill: "rgba(255,254,242,1)"`. */
+  /** Sets `fill: "rgba(254, 252, 232, 1)"`. */
   get fYellow50() {
-    return this.add("fill", "rgba(255,254,242,1)");
+    return this.add("fill", "rgba(254, 252, 232, 1)");
   }
-  /** Sets `fill: "rgba(255,254,212,1)"`. */
+  /** Sets `fill: "rgba(254, 249, 195, 1)"`. */
   get fYellow100() {
-    return this.add("fill", "rgba(255,254,212,1)");
+    return this.add("fill", "rgba(254, 249, 195, 1)");
   }
-  /** Sets `fill: "rgba(255,250,180,1)"`. */
+  /** Sets `fill: "rgba(254, 240, 138, 1)"`. */
   get fYellow200() {
-    return this.add("fill", "rgba(255,250,180,1)");
+    return this.add("fill", "rgba(254, 240, 138, 1)");
   }
-  /** Sets `fill: "rgba(255,240,150,1)"`. */
+  /** Sets `fill: "rgba(253, 224, 71, 1)"`. */
   get fYellow300() {
-    return this.add("fill", "rgba(255,240,150,1)");
+    return this.add("fill", "rgba(253, 224, 71, 1)");
   }
-  /** Sets `fill: "rgba(255,225,123,1)"`. */
+  /** Sets `fill: "rgba(250, 204, 21, 1)"`. */
   get fYellow400() {
-    return this.add("fill", "rgba(255,225,123,1)");
+    return this.add("fill", "rgba(250, 204, 21, 1)");
   }
-  /** Sets `fill: "rgba(255,204,99,1)"`. */
+  /** Sets `fill: "rgba(234, 179, 8, 1)"`. */
   get fYellow500() {
-    return this.add("fill", "rgba(255,204,99,1)");
+    return this.add("fill", "rgba(234, 179, 8, 1)");
   }
-  /** Sets `fill: "rgba(246,177,78,1)"`. */
+  /** Sets `fill: "rgba(202, 138, 4, 1)"`. */
   get fYellow600() {
-    return this.add("fill", "rgba(246,177,78,1)");
+    return this.add("fill", "rgba(202, 138, 4, 1)");
   }
-  /** Sets `fill: "rgba(207,150,73,1)"`. */
+  /** Sets `fill: "rgba(161, 98, 7, 1)"`. */
   get fYellow700() {
-    return this.add("fill", "rgba(207,150,73,1)");
+    return this.add("fill", "rgba(161, 98, 7, 1)");
   }
-  /** Sets `fill: "rgba(164,120,66,1)"`. */
+  /** Sets `fill: "rgba(133, 77, 14, 1)"`. */
   get fYellow800() {
-    return this.add("fill", "rgba(164,120,66,1)");
+    return this.add("fill", "rgba(133, 77, 14, 1)");
   }
-  /** Sets `fill: "rgba(120,89,54,1)"`. */
+  /** Sets `fill: "rgba(113, 63, 18, 1)"`. */
   get fYellow900() {
-    return this.add("fill", "rgba(120,89,54,1)");
+    return this.add("fill", "rgba(113, 63, 18, 1)");
   }
-  /** Sets `fill: "rgba(250,255,250,1)"`. */
+  /** Sets `fill: "rgba(236, 253, 245, 1)"`. */
   get fGreen50() {
-    return this.add("fill", "rgba(250,255,250,1)");
+    return this.add("fill", "rgba(236, 253, 245, 1)");
   }
-  /** Sets `fill: "rgba(223,248,216,1)"`. */
+  /** Sets `fill: "rgba(209, 250, 229, 1)"`. */
   get fGreen100() {
-    return this.add("fill", "rgba(223,248,216,1)");
+    return this.add("fill", "rgba(209, 250, 229, 1)");
   }
-  /** Sets `fill: "rgba(199,239,183,1)"`. */
+  /** Sets `fill: "rgba(167, 243, 208, 1)"`. */
   get fGreen200() {
-    return this.add("fill", "rgba(199,239,183,1)");
+    return this.add("fill", "rgba(167, 243, 208, 1)");
   }
-  /** Sets `fill: "rgba(179,226,153,1)"`. */
+  /** Sets `fill: "rgba(110, 231, 183, 1)"`. */
   get fGreen300() {
-    return this.add("fill", "rgba(179,226,153,1)");
+    return this.add("fill", "rgba(110, 231, 183, 1)");
   }
-  /** Sets `fill: "rgba(163,208,126,1)"`. */
+  /** Sets `fill: "rgba(52, 211, 153, 1)"`. */
   get fGreen400() {
-    return this.add("fill", "rgba(163,208,126,1)");
+    return this.add("fill", "rgba(52, 211, 153, 1)");
   }
-  /** Sets `fill: "rgba(146,185,101,1)"`. */
+  /** Sets `fill: "rgba(16, 185, 129, 1)"`. */
   get fGreen500() {
-    return this.add("fill", "rgba(146,185,101,1)");
+    return this.add("fill", "rgba(16, 185, 129, 1)");
   }
-  /** Sets `fill: "rgba(126,156,79,1)"`. */
+  /** Sets `fill: "rgba(5, 150, 105, 1)"`. */
   get fGreen600() {
-    return this.add("fill", "rgba(126,156,79,1)");
+    return this.add("fill", "rgba(5, 150, 105, 1)");
   }
-  /** Sets `fill: "rgba(101,120,57,1)"`. */
+  /** Sets `fill: "rgba(4, 120, 87, 1)"`. */
   get fGreen700() {
-    return this.add("fill", "rgba(101,120,57,1)");
+    return this.add("fill", "rgba(4, 120, 87, 1)");
   }
-  /** Sets `fill: "rgba(64,93,44,1)"`. */
+  /** Sets `fill: "rgba(6, 95, 70, 1)"`. */
   get fGreen800() {
-    return this.add("fill", "rgba(64,93,44,1)");
+    return this.add("fill", "rgba(6, 95, 70, 1)");
   }
-  /** Sets `fill: "rgba(34,64,31,1)"`. */
+  /** Sets `fill: "rgba(6, 78, 59, 1)"`. */
   get fGreen900() {
-    return this.add("fill", "rgba(34,64,31,1)");
+    return this.add("fill", "rgba(6, 78, 59, 1)");
   }
-  /** Sets `fill: "rgba(245,243,255,1)"`. */
-  get fViolet50() {
-    return this.add("fill", "rgba(245,243,255,1)");
+  /** Sets `fill: "rgba(245, 243, 255, 1)"`. */
+  get fPurple50() {
+    return this.add("fill", "rgba(245, 243, 255, 1)");
   }
-  /** Sets `fill: "rgba(238,234,253,1)"`. */
-  get fViolet100() {
-    return this.add("fill", "rgba(238,234,253,1)");
+  /** Sets `fill: "rgba(237, 233, 254, 1)"`. */
+  get fPurple100() {
+    return this.add("fill", "rgba(237, 233, 254, 1)");
   }
-  /** Sets `fill: "rgba(232,225,252,1)"`. */
-  get fViolet200() {
-    return this.add("fill", "rgba(232,225,252,1)");
+  /** Sets `fill: "rgba(221, 214, 254, 1)"`. */
+  get fPurple200() {
+    return this.add("fill", "rgba(221, 214, 254, 1)");
   }
-  /** Sets `fill: "rgba(218,205,246,1)"`. */
-  get fViolet300() {
-    return this.add("fill", "rgba(218,205,246,1)");
+  /** Sets `fill: "rgba(196, 181, 253, 1)"`. */
+  get fPurple300() {
+    return this.add("fill", "rgba(196, 181, 253, 1)");
   }
-  /** Sets `fill: "rgba(204,186,236,1)"`. */
-  get fViolet400() {
-    return this.add("fill", "rgba(204,186,236,1)");
+  /** Sets `fill: "rgba(167, 139, 250, 1)"`. */
+  get fPurple400() {
+    return this.add("fill", "rgba(167, 139, 250, 1)");
   }
-  /** Sets `fill: "rgba(190,167,223,1)"`. */
-  get fViolet500() {
-    return this.add("fill", "rgba(190,167,223,1)");
+  /** Sets `fill: "rgba(139, 92, 246, 1)"`. */
+  get fPurple500() {
+    return this.add("fill", "rgba(139, 92, 246, 1)");
   }
-  /** Sets `fill: "rgba(173,147,205,1)"`. */
-  get fViolet600() {
-    return this.add("fill", "rgba(173,147,205,1)");
+  /** Sets `fill: "rgba(124, 58, 237, 1)"`. */
+  get fPurple600() {
+    return this.add("fill", "rgba(124, 58, 237, 1)");
   }
-  /** Sets `fill: "rgba(153,126,181,1)"`. */
-  get fViolet700() {
-    return this.add("fill", "rgba(153,126,181,1)");
+  /** Sets `fill: "rgba(109, 40, 217, 1)"`. */
+  get fPurple700() {
+    return this.add("fill", "rgba(109, 40, 217, 1)");
   }
-  /** Sets `fill: "rgba(128,103,151,1)"`. */
-  get fViolet800() {
-    return this.add("fill", "rgba(128,103,151,1)");
+  /** Sets `fill: "rgba(91, 33, 182, 1)"`. */
+  get fPurple800() {
+    return this.add("fill", "rgba(91, 33, 182, 1)");
   }
-  /** Sets `fill: "rgba(100,78,116,1)"`. */
-  get fViolet900() {
-    return this.add("fill", "rgba(100,78,116,1)");
+  /** Sets `fill: "rgba(76, 29, 149, 1)"`. */
+  get fPurple900() {
+    return this.add("fill", "rgba(76, 29, 149, 1)");
+  }
+  /** Sets `fill: "rgba(255, 247, 237, 1)"`. */
+  get fOrange50() {
+    return this.add("fill", "rgba(255, 247, 237, 1)");
+  }
+  /** Sets `fill: "rgba(255, 237, 213, 1)"`. */
+  get fOrange100() {
+    return this.add("fill", "rgba(255, 237, 213, 1)");
+  }
+  /** Sets `fill: "rgba(254, 215, 170, 1)"`. */
+  get fOrange200() {
+    return this.add("fill", "rgba(254, 215, 170, 1)");
+  }
+  /** Sets `fill: "rgba(253, 186, 116, 1)"`. */
+  get fOrange300() {
+    return this.add("fill", "rgba(253, 186, 116, 1)");
+  }
+  /** Sets `fill: "rgba(251, 146, 60, 1)"`. */
+  get fOrange400() {
+    return this.add("fill", "rgba(251, 146, 60, 1)");
+  }
+  /** Sets `fill: "rgba(249, 115, 22, 1)"`. */
+  get fOrange500() {
+    return this.add("fill", "rgba(249, 115, 22, 1)");
+  }
+  /** Sets `fill: "rgba(234, 88, 12, 1)"`. */
+  get fOrange600() {
+    return this.add("fill", "rgba(234, 88, 12, 1)");
+  }
+  /** Sets `fill: "rgba(194, 65, 12, 1)"`. */
+  get fOrange700() {
+    return this.add("fill", "rgba(194, 65, 12, 1)");
+  }
+  /** Sets `fill: "rgba(154, 52, 18, 1)"`. */
+  get fOrange800() {
+    return this.add("fill", "rgba(154, 52, 18, 1)");
+  }
+  /** Sets `fill: "rgba(124, 45, 18, 1)"`. */
+  get fOrange900() {
+    return this.add("fill", "rgba(124, 45, 18, 1)");
   }
   /** Sets `fill: value`. */
   fill(value: Properties["fill"]) {
@@ -2238,607 +2592,710 @@ class CssBuilder<T extends Properties> {
   // spacing
   /** Sets `marginTop: "0px"`. */
   get mt0() {
-    return this.mt(0);
+    return this.add("marginTop", "0px");
   }
   /** Sets `marginTop: "8px"`. */
   get mt1() {
-    return this.mt(1);
+    return this.add("marginTop", "8px");
   }
   /** Sets `marginTop: "16px"`. */
   get mt2() {
-    return this.mt(2);
+    return this.add("marginTop", "16px");
   }
   /** Sets `marginTop: "24px"`. */
   get mt3() {
-    return this.mt(3);
+    return this.add("marginTop", "24px");
   }
   /** Sets `marginTop: "32px"`. */
   get mt4() {
-    return this.mt(4);
+    return this.add("marginTop", "32px");
   }
   /** Sets `marginTop: "40px"`. */
   get mt5() {
-    return this.mt(5);
+    return this.add("marginTop", "40px");
   }
   /** Sets `marginTop: "48px"`. */
   get mt6() {
-    return this.mt(6);
+    return this.add("marginTop", "48px");
   }
   /** Sets `marginTop: "56px"`. */
   get mt7() {
-    return this.mt(7);
+    return this.add("marginTop", "56px");
   }
   /** Sets `marginTop: "64px"`. */
   get mt8() {
-    return this.mt(8);
+    return this.add("marginTop", "64px");
   }
-  /** Sets `marginTop: inc`. */
-  mt(inc: number | string) {
-    return this.add("marginTop", maybeInc(inc));
+  /** Sets `marginTop: "auto"`. */
+  get mta() {
+    return this.add("marginTop", "auto");
+  }
+  /** Sets `marginTop: "v"`. */
+  mt(v: number | string) {
+    return this.add("marginTop", maybeInc(v));
   }
   /** Sets `marginTop: px`. */
   mtPx(px: number) {
-    return this.mt(`${px}px`);
+    return this.add("marginTop", `${px}px`);
   }
   /** Sets `marginRight: "0px"`. */
   get mr0() {
-    return this.mr(0);
+    return this.add("marginRight", "0px");
   }
   /** Sets `marginRight: "8px"`. */
   get mr1() {
-    return this.mr(1);
+    return this.add("marginRight", "8px");
   }
   /** Sets `marginRight: "16px"`. */
   get mr2() {
-    return this.mr(2);
+    return this.add("marginRight", "16px");
   }
   /** Sets `marginRight: "24px"`. */
   get mr3() {
-    return this.mr(3);
+    return this.add("marginRight", "24px");
   }
   /** Sets `marginRight: "32px"`. */
   get mr4() {
-    return this.mr(4);
+    return this.add("marginRight", "32px");
   }
   /** Sets `marginRight: "40px"`. */
   get mr5() {
-    return this.mr(5);
+    return this.add("marginRight", "40px");
   }
   /** Sets `marginRight: "48px"`. */
   get mr6() {
-    return this.mr(6);
+    return this.add("marginRight", "48px");
   }
   /** Sets `marginRight: "56px"`. */
   get mr7() {
-    return this.mr(7);
+    return this.add("marginRight", "56px");
   }
   /** Sets `marginRight: "64px"`. */
   get mr8() {
-    return this.mr(8);
+    return this.add("marginRight", "64px");
   }
-  /** Sets `marginRight: inc`. */
-  mr(inc: number | string) {
-    return this.add("marginRight", maybeInc(inc));
+  /** Sets `marginRight: "auto"`. */
+  get mra() {
+    return this.add("marginRight", "auto");
+  }
+  /** Sets `marginRight: "v"`. */
+  mr(v: number | string) {
+    return this.add("marginRight", maybeInc(v));
   }
   /** Sets `marginRight: px`. */
   mrPx(px: number) {
-    return this.mr(`${px}px`);
+    return this.add("marginRight", `${px}px`);
   }
   /** Sets `marginBottom: "0px"`. */
   get mb0() {
-    return this.mb(0);
+    return this.add("marginBottom", "0px");
   }
   /** Sets `marginBottom: "8px"`. */
   get mb1() {
-    return this.mb(1);
+    return this.add("marginBottom", "8px");
   }
   /** Sets `marginBottom: "16px"`. */
   get mb2() {
-    return this.mb(2);
+    return this.add("marginBottom", "16px");
   }
   /** Sets `marginBottom: "24px"`. */
   get mb3() {
-    return this.mb(3);
+    return this.add("marginBottom", "24px");
   }
   /** Sets `marginBottom: "32px"`. */
   get mb4() {
-    return this.mb(4);
+    return this.add("marginBottom", "32px");
   }
   /** Sets `marginBottom: "40px"`. */
   get mb5() {
-    return this.mb(5);
+    return this.add("marginBottom", "40px");
   }
   /** Sets `marginBottom: "48px"`. */
   get mb6() {
-    return this.mb(6);
+    return this.add("marginBottom", "48px");
   }
   /** Sets `marginBottom: "56px"`. */
   get mb7() {
-    return this.mb(7);
+    return this.add("marginBottom", "56px");
   }
   /** Sets `marginBottom: "64px"`. */
   get mb8() {
-    return this.mb(8);
+    return this.add("marginBottom", "64px");
   }
-  /** Sets `marginBottom: inc`. */
-  mb(inc: number | string) {
-    return this.add("marginBottom", maybeInc(inc));
+  /** Sets `marginBottom: "auto"`. */
+  get mba() {
+    return this.add("marginBottom", "auto");
+  }
+  /** Sets `marginBottom: "v"`. */
+  mb(v: number | string) {
+    return this.add("marginBottom", maybeInc(v));
   }
   /** Sets `marginBottom: px`. */
   mbPx(px: number) {
-    return this.mb(`${px}px`);
+    return this.add("marginBottom", `${px}px`);
   }
   /** Sets `marginLeft: "0px"`. */
   get ml0() {
-    return this.ml(0);
+    return this.add("marginLeft", "0px");
   }
   /** Sets `marginLeft: "8px"`. */
   get ml1() {
-    return this.ml(1);
+    return this.add("marginLeft", "8px");
   }
   /** Sets `marginLeft: "16px"`. */
   get ml2() {
-    return this.ml(2);
+    return this.add("marginLeft", "16px");
   }
   /** Sets `marginLeft: "24px"`. */
   get ml3() {
-    return this.ml(3);
+    return this.add("marginLeft", "24px");
   }
   /** Sets `marginLeft: "32px"`. */
   get ml4() {
-    return this.ml(4);
+    return this.add("marginLeft", "32px");
   }
   /** Sets `marginLeft: "40px"`. */
   get ml5() {
-    return this.ml(5);
+    return this.add("marginLeft", "40px");
   }
   /** Sets `marginLeft: "48px"`. */
   get ml6() {
-    return this.ml(6);
+    return this.add("marginLeft", "48px");
   }
   /** Sets `marginLeft: "56px"`. */
   get ml7() {
-    return this.ml(7);
+    return this.add("marginLeft", "56px");
   }
   /** Sets `marginLeft: "64px"`. */
   get ml8() {
-    return this.ml(8);
+    return this.add("marginLeft", "64px");
   }
-  /** Sets `marginLeft: inc`. */
-  ml(inc: number | string) {
-    return this.add("marginLeft", maybeInc(inc));
+  /** Sets `marginLeft: "auto"`. */
+  get mla() {
+    return this.add("marginLeft", "auto");
+  }
+  /** Sets `marginLeft: "v"`. */
+  ml(v: number | string) {
+    return this.add("marginLeft", maybeInc(v));
   }
   /** Sets `marginLeft: px`. */
   mlPx(px: number) {
-    return this.ml(`${px}px`);
+    return this.add("marginLeft", `${px}px`);
   }
-  /** Sets `ml: "0px"; mr: "0px"`. */
+  /** Sets `marginLeft: "0px"; marginRight: "0px"`. */
   get mx0() {
-    return this.mx(0);
+    return this.add("marginLeft", "0px").add("marginRight", "0px");
   }
-  /** Sets `ml: "8px"; mr: "8px"`. */
+  /** Sets `marginLeft: "8px"; marginRight: "8px"`. */
   get mx1() {
-    return this.mx(1);
+    return this.add("marginLeft", "8px").add("marginRight", "8px");
   }
-  /** Sets `ml: "16px"; mr: "16px"`. */
+  /** Sets `marginLeft: "16px"; marginRight: "16px"`. */
   get mx2() {
-    return this.mx(2);
+    return this.add("marginLeft", "16px").add("marginRight", "16px");
   }
-  /** Sets `ml: "24px"; mr: "24px"`. */
+  /** Sets `marginLeft: "24px"; marginRight: "24px"`. */
   get mx3() {
-    return this.mx(3);
+    return this.add("marginLeft", "24px").add("marginRight", "24px");
   }
-  /** Sets `ml: "32px"; mr: "32px"`. */
+  /** Sets `marginLeft: "32px"; marginRight: "32px"`. */
   get mx4() {
-    return this.mx(4);
+    return this.add("marginLeft", "32px").add("marginRight", "32px");
   }
-  /** Sets `ml: "40px"; mr: "40px"`. */
+  /** Sets `marginLeft: "40px"; marginRight: "40px"`. */
   get mx5() {
-    return this.mx(5);
+    return this.add("marginLeft", "40px").add("marginRight", "40px");
   }
-  /** Sets `ml: "48px"; mr: "48px"`. */
+  /** Sets `marginLeft: "48px"; marginRight: "48px"`. */
   get mx6() {
-    return this.mx(6);
+    return this.add("marginLeft", "48px").add("marginRight", "48px");
   }
-  /** Sets `ml: "56px"; mr: "56px"`. */
+  /** Sets `marginLeft: "56px"; marginRight: "56px"`. */
   get mx7() {
-    return this.mx(7);
+    return this.add("marginLeft", "56px").add("marginRight", "56px");
   }
-  /** Sets `ml: "64px"; mr: "64px"`. */
+  /** Sets `marginLeft: "64px"; marginRight: "64px"`. */
   get mx8() {
-    return this.mx(8);
+    return this.add("marginLeft", "64px").add("marginRight", "64px");
   }
-  mx(inc: number | string) {
-    return this.ml(inc).mr(inc);
+  /** Sets `marginLeft: "auto"; marginRight: "auto"`. */
+  get mxa() {
+    return this.add("marginLeft", "auto").add("marginRight", "auto");
   }
+  /** Sets `marginLeft: "v"; marginRight: "v"`. */
+  mx(v: number | string) {
+    return this.add("marginLeft", maybeInc(v)).add("marginRight", maybeInc(v));
+  }
+  /** Sets `marginLeft: px; marginRight: px`. */
   mxPx(px: number) {
-    return this.mlPx(px).mrPx(px);
+    return this.add("marginLeft", `${px}px`).add("marginRight", `${px}px`);
   }
-  /** Sets `mt: "0px"; mb: "0px"`. */
+  /** Sets `marginTop: "0px"; marginBottom: "0px"`. */
   get my0() {
-    return this.my(0);
+    return this.add("marginTop", "0px").add("marginBottom", "0px");
   }
-  /** Sets `mt: "8px"; mb: "8px"`. */
+  /** Sets `marginTop: "8px"; marginBottom: "8px"`. */
   get my1() {
-    return this.my(1);
+    return this.add("marginTop", "8px").add("marginBottom", "8px");
   }
-  /** Sets `mt: "16px"; mb: "16px"`. */
+  /** Sets `marginTop: "16px"; marginBottom: "16px"`. */
   get my2() {
-    return this.my(2);
+    return this.add("marginTop", "16px").add("marginBottom", "16px");
   }
-  /** Sets `mt: "24px"; mb: "24px"`. */
+  /** Sets `marginTop: "24px"; marginBottom: "24px"`. */
   get my3() {
-    return this.my(3);
+    return this.add("marginTop", "24px").add("marginBottom", "24px");
   }
-  /** Sets `mt: "32px"; mb: "32px"`. */
+  /** Sets `marginTop: "32px"; marginBottom: "32px"`. */
   get my4() {
-    return this.my(4);
+    return this.add("marginTop", "32px").add("marginBottom", "32px");
   }
-  /** Sets `mt: "40px"; mb: "40px"`. */
+  /** Sets `marginTop: "40px"; marginBottom: "40px"`. */
   get my5() {
-    return this.my(5);
+    return this.add("marginTop", "40px").add("marginBottom", "40px");
   }
-  /** Sets `mt: "48px"; mb: "48px"`. */
+  /** Sets `marginTop: "48px"; marginBottom: "48px"`. */
   get my6() {
-    return this.my(6);
+    return this.add("marginTop", "48px").add("marginBottom", "48px");
   }
-  /** Sets `mt: "56px"; mb: "56px"`. */
+  /** Sets `marginTop: "56px"; marginBottom: "56px"`. */
   get my7() {
-    return this.my(7);
+    return this.add("marginTop", "56px").add("marginBottom", "56px");
   }
-  /** Sets `mt: "64px"; mb: "64px"`. */
+  /** Sets `marginTop: "64px"; marginBottom: "64px"`. */
   get my8() {
-    return this.my(8);
+    return this.add("marginTop", "64px").add("marginBottom", "64px");
   }
-  my(inc: number | string) {
-    return this.mt(inc).mb(inc);
+  /** Sets `marginTop: "auto"; marginBottom: "auto"`. */
+  get mya() {
+    return this.add("marginTop", "auto").add("marginBottom", "auto");
   }
+  /** Sets `marginTop: "v"; marginBottom: "v"`. */
+  my(v: number | string) {
+    return this.add("marginTop", maybeInc(v)).add("marginBottom", maybeInc(v));
+  }
+  /** Sets `marginTop: px; marginBottom: px`. */
   myPx(px: number) {
-    return this.mtPx(px).mbPx(px);
+    return this.add("marginTop", `${px}px`).add("marginBottom", `${px}px`);
   }
-  /** Sets `mt: "0px"; mb: "0px"; mr: "0px"; ml: "0px"`. */
+  /** Sets `marginTop: "0px"; marginBottom: "0px"; marginRight: "0px"; marginLeft: "0px"`. */
   get m0() {
-    return this.m(0);
+    return this.add("marginTop", "0px").add("marginBottom", "0px").add("marginRight", "0px").add("marginLeft", "0px");
   }
-  /** Sets `mt: "8px"; mb: "8px"; mr: "8px"; ml: "8px"`. */
+  /** Sets `marginTop: "8px"; marginBottom: "8px"; marginRight: "8px"; marginLeft: "8px"`. */
   get m1() {
-    return this.m(1);
+    return this.add("marginTop", "8px").add("marginBottom", "8px").add("marginRight", "8px").add("marginLeft", "8px");
   }
-  /** Sets `mt: "16px"; mb: "16px"; mr: "16px"; ml: "16px"`. */
+  /** Sets `marginTop: "16px"; marginBottom: "16px"; marginRight: "16px"; marginLeft: "16px"`. */
   get m2() {
-    return this.m(2);
+    return this.add("marginTop", "16px").add("marginBottom", "16px").add("marginRight", "16px").add(
+      "marginLeft",
+      "16px",
+    );
   }
-  /** Sets `mt: "24px"; mb: "24px"; mr: "24px"; ml: "24px"`. */
+  /** Sets `marginTop: "24px"; marginBottom: "24px"; marginRight: "24px"; marginLeft: "24px"`. */
   get m3() {
-    return this.m(3);
+    return this.add("marginTop", "24px").add("marginBottom", "24px").add("marginRight", "24px").add(
+      "marginLeft",
+      "24px",
+    );
   }
-  /** Sets `mt: "32px"; mb: "32px"; mr: "32px"; ml: "32px"`. */
+  /** Sets `marginTop: "32px"; marginBottom: "32px"; marginRight: "32px"; marginLeft: "32px"`. */
   get m4() {
-    return this.m(4);
+    return this.add("marginTop", "32px").add("marginBottom", "32px").add("marginRight", "32px").add(
+      "marginLeft",
+      "32px",
+    );
   }
-  /** Sets `mt: "40px"; mb: "40px"; mr: "40px"; ml: "40px"`. */
+  /** Sets `marginTop: "40px"; marginBottom: "40px"; marginRight: "40px"; marginLeft: "40px"`. */
   get m5() {
-    return this.m(5);
+    return this.add("marginTop", "40px").add("marginBottom", "40px").add("marginRight", "40px").add(
+      "marginLeft",
+      "40px",
+    );
   }
-  /** Sets `mt: "48px"; mb: "48px"; mr: "48px"; ml: "48px"`. */
+  /** Sets `marginTop: "48px"; marginBottom: "48px"; marginRight: "48px"; marginLeft: "48px"`. */
   get m6() {
-    return this.m(6);
+    return this.add("marginTop", "48px").add("marginBottom", "48px").add("marginRight", "48px").add(
+      "marginLeft",
+      "48px",
+    );
   }
-  /** Sets `mt: "56px"; mb: "56px"; mr: "56px"; ml: "56px"`. */
+  /** Sets `marginTop: "56px"; marginBottom: "56px"; marginRight: "56px"; marginLeft: "56px"`. */
   get m7() {
-    return this.m(7);
+    return this.add("marginTop", "56px").add("marginBottom", "56px").add("marginRight", "56px").add(
+      "marginLeft",
+      "56px",
+    );
   }
-  /** Sets `mt: "64px"; mb: "64px"; mr: "64px"; ml: "64px"`. */
+  /** Sets `marginTop: "64px"; marginBottom: "64px"; marginRight: "64px"; marginLeft: "64px"`. */
   get m8() {
-    return this.m(8);
+    return this.add("marginTop", "64px").add("marginBottom", "64px").add("marginRight", "64px").add(
+      "marginLeft",
+      "64px",
+    );
   }
-  m(inc: number | string) {
-    return this.mt(inc).mb(inc).mr(inc).ml(inc);
+  /** Sets `marginTop: "auto"; marginBottom: "auto"; marginRight: "auto"; marginLeft: "auto"`. */
+  get ma() {
+    return this.add("marginTop", "auto").add("marginBottom", "auto").add("marginRight", "auto").add(
+      "marginLeft",
+      "auto",
+    );
   }
+  /** Sets `marginTop: "v"; marginBottom: "v"; marginRight: "v"; marginLeft: "v"`. */
+  m(v: number | string) {
+    return this.add("marginTop", maybeInc(v)).add("marginBottom", maybeInc(v)).add("marginRight", maybeInc(v)).add(
+      "marginLeft",
+      maybeInc(v),
+    );
+  }
+  /** Sets `marginTop: px; marginBottom: px; marginRight: px; marginLeft: px`. */
   mPx(px: number) {
-    return this.mtPx(px).mbPx(px).mrPx(px).mlPx(px);
+    return this.add("marginTop", `${px}px`).add("marginBottom", `${px}px`).add("marginRight", `${px}px`).add(
+      "marginLeft",
+      `${px}px`,
+    );
   }
   /** Sets `paddingTop: "0px"`. */
   get pt0() {
-    return this.pt(0);
+    return this.add("paddingTop", "0px");
   }
   /** Sets `paddingTop: "8px"`. */
   get pt1() {
-    return this.pt(1);
+    return this.add("paddingTop", "8px");
   }
   /** Sets `paddingTop: "16px"`. */
   get pt2() {
-    return this.pt(2);
+    return this.add("paddingTop", "16px");
   }
   /** Sets `paddingTop: "24px"`. */
   get pt3() {
-    return this.pt(3);
+    return this.add("paddingTop", "24px");
   }
   /** Sets `paddingTop: "32px"`. */
   get pt4() {
-    return this.pt(4);
+    return this.add("paddingTop", "32px");
   }
   /** Sets `paddingTop: "40px"`. */
   get pt5() {
-    return this.pt(5);
+    return this.add("paddingTop", "40px");
   }
   /** Sets `paddingTop: "48px"`. */
   get pt6() {
-    return this.pt(6);
+    return this.add("paddingTop", "48px");
   }
   /** Sets `paddingTop: "56px"`. */
   get pt7() {
-    return this.pt(7);
+    return this.add("paddingTop", "56px");
   }
   /** Sets `paddingTop: "64px"`. */
   get pt8() {
-    return this.pt(8);
+    return this.add("paddingTop", "64px");
   }
-  /** Sets `paddingTop: inc`. */
-  pt(inc: number | string) {
-    return this.add("paddingTop", maybeInc(inc));
+  /** Sets `paddingTop: "v"`. */
+  pt(v: number | string) {
+    return this.add("paddingTop", maybeInc(v));
   }
   /** Sets `paddingTop: px`. */
   ptPx(px: number) {
-    return this.pt(`${px}px`);
+    return this.add("paddingTop", `${px}px`);
   }
   /** Sets `paddingRight: "0px"`. */
   get pr0() {
-    return this.pr(0);
+    return this.add("paddingRight", "0px");
   }
   /** Sets `paddingRight: "8px"`. */
   get pr1() {
-    return this.pr(1);
+    return this.add("paddingRight", "8px");
   }
   /** Sets `paddingRight: "16px"`. */
   get pr2() {
-    return this.pr(2);
+    return this.add("paddingRight", "16px");
   }
   /** Sets `paddingRight: "24px"`. */
   get pr3() {
-    return this.pr(3);
+    return this.add("paddingRight", "24px");
   }
   /** Sets `paddingRight: "32px"`. */
   get pr4() {
-    return this.pr(4);
+    return this.add("paddingRight", "32px");
   }
   /** Sets `paddingRight: "40px"`. */
   get pr5() {
-    return this.pr(5);
+    return this.add("paddingRight", "40px");
   }
   /** Sets `paddingRight: "48px"`. */
   get pr6() {
-    return this.pr(6);
+    return this.add("paddingRight", "48px");
   }
   /** Sets `paddingRight: "56px"`. */
   get pr7() {
-    return this.pr(7);
+    return this.add("paddingRight", "56px");
   }
   /** Sets `paddingRight: "64px"`. */
   get pr8() {
-    return this.pr(8);
+    return this.add("paddingRight", "64px");
   }
-  /** Sets `paddingRight: inc`. */
-  pr(inc: number | string) {
-    return this.add("paddingRight", maybeInc(inc));
+  /** Sets `paddingRight: "v"`. */
+  pr(v: number | string) {
+    return this.add("paddingRight", maybeInc(v));
   }
   /** Sets `paddingRight: px`. */
   prPx(px: number) {
-    return this.pr(`${px}px`);
+    return this.add("paddingRight", `${px}px`);
   }
   /** Sets `paddingBottom: "0px"`. */
   get pb0() {
-    return this.pb(0);
+    return this.add("paddingBottom", "0px");
   }
   /** Sets `paddingBottom: "8px"`. */
   get pb1() {
-    return this.pb(1);
+    return this.add("paddingBottom", "8px");
   }
   /** Sets `paddingBottom: "16px"`. */
   get pb2() {
-    return this.pb(2);
+    return this.add("paddingBottom", "16px");
   }
   /** Sets `paddingBottom: "24px"`. */
   get pb3() {
-    return this.pb(3);
+    return this.add("paddingBottom", "24px");
   }
   /** Sets `paddingBottom: "32px"`. */
   get pb4() {
-    return this.pb(4);
+    return this.add("paddingBottom", "32px");
   }
   /** Sets `paddingBottom: "40px"`. */
   get pb5() {
-    return this.pb(5);
+    return this.add("paddingBottom", "40px");
   }
   /** Sets `paddingBottom: "48px"`. */
   get pb6() {
-    return this.pb(6);
+    return this.add("paddingBottom", "48px");
   }
   /** Sets `paddingBottom: "56px"`. */
   get pb7() {
-    return this.pb(7);
+    return this.add("paddingBottom", "56px");
   }
   /** Sets `paddingBottom: "64px"`. */
   get pb8() {
-    return this.pb(8);
+    return this.add("paddingBottom", "64px");
   }
-  /** Sets `paddingBottom: inc`. */
-  pb(inc: number | string) {
-    return this.add("paddingBottom", maybeInc(inc));
+  /** Sets `paddingBottom: "v"`. */
+  pb(v: number | string) {
+    return this.add("paddingBottom", maybeInc(v));
   }
   /** Sets `paddingBottom: px`. */
   pbPx(px: number) {
-    return this.pb(`${px}px`);
+    return this.add("paddingBottom", `${px}px`);
   }
   /** Sets `paddingLeft: "0px"`. */
   get pl0() {
-    return this.pl(0);
+    return this.add("paddingLeft", "0px");
   }
   /** Sets `paddingLeft: "8px"`. */
   get pl1() {
-    return this.pl(1);
+    return this.add("paddingLeft", "8px");
   }
   /** Sets `paddingLeft: "16px"`. */
   get pl2() {
-    return this.pl(2);
+    return this.add("paddingLeft", "16px");
   }
   /** Sets `paddingLeft: "24px"`. */
   get pl3() {
-    return this.pl(3);
+    return this.add("paddingLeft", "24px");
   }
   /** Sets `paddingLeft: "32px"`. */
   get pl4() {
-    return this.pl(4);
+    return this.add("paddingLeft", "32px");
   }
   /** Sets `paddingLeft: "40px"`. */
   get pl5() {
-    return this.pl(5);
+    return this.add("paddingLeft", "40px");
   }
   /** Sets `paddingLeft: "48px"`. */
   get pl6() {
-    return this.pl(6);
+    return this.add("paddingLeft", "48px");
   }
   /** Sets `paddingLeft: "56px"`. */
   get pl7() {
-    return this.pl(7);
+    return this.add("paddingLeft", "56px");
   }
   /** Sets `paddingLeft: "64px"`. */
   get pl8() {
-    return this.pl(8);
+    return this.add("paddingLeft", "64px");
   }
-  /** Sets `paddingLeft: inc`. */
-  pl(inc: number | string) {
-    return this.add("paddingLeft", maybeInc(inc));
+  /** Sets `paddingLeft: "v"`. */
+  pl(v: number | string) {
+    return this.add("paddingLeft", maybeInc(v));
   }
   /** Sets `paddingLeft: px`. */
   plPx(px: number) {
-    return this.pl(`${px}px`);
+    return this.add("paddingLeft", `${px}px`);
   }
-  /** Sets `pl: "0px"; pr: "0px"`. */
+  /** Sets `paddingLeft: "0px"; paddingRight: "0px"`. */
   get px0() {
-    return this.px(0);
+    return this.add("paddingLeft", "0px").add("paddingRight", "0px");
   }
-  /** Sets `pl: "8px"; pr: "8px"`. */
+  /** Sets `paddingLeft: "8px"; paddingRight: "8px"`. */
   get px1() {
-    return this.px(1);
+    return this.add("paddingLeft", "8px").add("paddingRight", "8px");
   }
-  /** Sets `pl: "16px"; pr: "16px"`. */
+  /** Sets `paddingLeft: "16px"; paddingRight: "16px"`. */
   get px2() {
-    return this.px(2);
+    return this.add("paddingLeft", "16px").add("paddingRight", "16px");
   }
-  /** Sets `pl: "24px"; pr: "24px"`. */
+  /** Sets `paddingLeft: "24px"; paddingRight: "24px"`. */
   get px3() {
-    return this.px(3);
+    return this.add("paddingLeft", "24px").add("paddingRight", "24px");
   }
-  /** Sets `pl: "32px"; pr: "32px"`. */
+  /** Sets `paddingLeft: "32px"; paddingRight: "32px"`. */
   get px4() {
-    return this.px(4);
+    return this.add("paddingLeft", "32px").add("paddingRight", "32px");
   }
-  /** Sets `pl: "40px"; pr: "40px"`. */
+  /** Sets `paddingLeft: "40px"; paddingRight: "40px"`. */
   get px5() {
-    return this.px(5);
+    return this.add("paddingLeft", "40px").add("paddingRight", "40px");
   }
-  /** Sets `pl: "48px"; pr: "48px"`. */
+  /** Sets `paddingLeft: "48px"; paddingRight: "48px"`. */
   get px6() {
-    return this.px(6);
+    return this.add("paddingLeft", "48px").add("paddingRight", "48px");
   }
-  /** Sets `pl: "56px"; pr: "56px"`. */
+  /** Sets `paddingLeft: "56px"; paddingRight: "56px"`. */
   get px7() {
-    return this.px(7);
+    return this.add("paddingLeft", "56px").add("paddingRight", "56px");
   }
-  /** Sets `pl: "64px"; pr: "64px"`. */
+  /** Sets `paddingLeft: "64px"; paddingRight: "64px"`. */
   get px8() {
-    return this.px(8);
+    return this.add("paddingLeft", "64px").add("paddingRight", "64px");
   }
-  px(inc: number | string) {
-    return this.pl(inc).pr(inc);
+  /** Sets `paddingLeft: "v"; paddingRight: "v"`. */
+  px(v: number | string) {
+    return this.add("paddingLeft", maybeInc(v)).add("paddingRight", maybeInc(v));
   }
+  /** Sets `paddingLeft: px; paddingRight: px`. */
   pxPx(px: number) {
-    return this.plPx(px).prPx(px);
+    return this.add("paddingLeft", `${px}px`).add("paddingRight", `${px}px`);
   }
-  /** Sets `pt: "0px"; pb: "0px"`. */
+  /** Sets `paddingTop: "0px"; paddingBottom: "0px"`. */
   get py0() {
-    return this.py(0);
+    return this.add("paddingTop", "0px").add("paddingBottom", "0px");
   }
-  /** Sets `pt: "8px"; pb: "8px"`. */
+  /** Sets `paddingTop: "8px"; paddingBottom: "8px"`. */
   get py1() {
-    return this.py(1);
+    return this.add("paddingTop", "8px").add("paddingBottom", "8px");
   }
-  /** Sets `pt: "16px"; pb: "16px"`. */
+  /** Sets `paddingTop: "16px"; paddingBottom: "16px"`. */
   get py2() {
-    return this.py(2);
+    return this.add("paddingTop", "16px").add("paddingBottom", "16px");
   }
-  /** Sets `pt: "24px"; pb: "24px"`. */
+  /** Sets `paddingTop: "24px"; paddingBottom: "24px"`. */
   get py3() {
-    return this.py(3);
+    return this.add("paddingTop", "24px").add("paddingBottom", "24px");
   }
-  /** Sets `pt: "32px"; pb: "32px"`. */
+  /** Sets `paddingTop: "32px"; paddingBottom: "32px"`. */
   get py4() {
-    return this.py(4);
+    return this.add("paddingTop", "32px").add("paddingBottom", "32px");
   }
-  /** Sets `pt: "40px"; pb: "40px"`. */
+  /** Sets `paddingTop: "40px"; paddingBottom: "40px"`. */
   get py5() {
-    return this.py(5);
+    return this.add("paddingTop", "40px").add("paddingBottom", "40px");
   }
-  /** Sets `pt: "48px"; pb: "48px"`. */
+  /** Sets `paddingTop: "48px"; paddingBottom: "48px"`. */
   get py6() {
-    return this.py(6);
+    return this.add("paddingTop", "48px").add("paddingBottom", "48px");
   }
-  /** Sets `pt: "56px"; pb: "56px"`. */
+  /** Sets `paddingTop: "56px"; paddingBottom: "56px"`. */
   get py7() {
-    return this.py(7);
+    return this.add("paddingTop", "56px").add("paddingBottom", "56px");
   }
-  /** Sets `pt: "64px"; pb: "64px"`. */
+  /** Sets `paddingTop: "64px"; paddingBottom: "64px"`. */
   get py8() {
-    return this.py(8);
+    return this.add("paddingTop", "64px").add("paddingBottom", "64px");
   }
-  py(inc: number | string) {
-    return this.pt(inc).pb(inc);
+  /** Sets `paddingTop: "v"; paddingBottom: "v"`. */
+  py(v: number | string) {
+    return this.add("paddingTop", maybeInc(v)).add("paddingBottom", maybeInc(v));
   }
+  /** Sets `paddingTop: px; paddingBottom: px`. */
   pyPx(px: number) {
-    return this.ptPx(px).pbPx(px);
+    return this.add("paddingTop", `${px}px`).add("paddingBottom", `${px}px`);
   }
-  /** Sets `pt: "0px"; pb: "0px"; pr: "0px"; pl: "0px"`. */
+  /** Sets `paddingTop: "0px"; paddingBottom: "0px"; paddingRight: "0px"; paddingLeft: "0px"`. */
   get p0() {
-    return this.p(0);
+    return this.add("paddingTop", "0px").add("paddingBottom", "0px").add("paddingRight", "0px").add(
+      "paddingLeft",
+      "0px",
+    );
   }
-  /** Sets `pt: "8px"; pb: "8px"; pr: "8px"; pl: "8px"`. */
+  /** Sets `paddingTop: "8px"; paddingBottom: "8px"; paddingRight: "8px"; paddingLeft: "8px"`. */
   get p1() {
-    return this.p(1);
+    return this.add("paddingTop", "8px").add("paddingBottom", "8px").add("paddingRight", "8px").add(
+      "paddingLeft",
+      "8px",
+    );
   }
-  /** Sets `pt: "16px"; pb: "16px"; pr: "16px"; pl: "16px"`. */
+  /** Sets `paddingTop: "16px"; paddingBottom: "16px"; paddingRight: "16px"; paddingLeft: "16px"`. */
   get p2() {
-    return this.p(2);
+    return this.add("paddingTop", "16px").add("paddingBottom", "16px").add("paddingRight", "16px").add(
+      "paddingLeft",
+      "16px",
+    );
   }
-  /** Sets `pt: "24px"; pb: "24px"; pr: "24px"; pl: "24px"`. */
+  /** Sets `paddingTop: "24px"; paddingBottom: "24px"; paddingRight: "24px"; paddingLeft: "24px"`. */
   get p3() {
-    return this.p(3);
+    return this.add("paddingTop", "24px").add("paddingBottom", "24px").add("paddingRight", "24px").add(
+      "paddingLeft",
+      "24px",
+    );
   }
-  /** Sets `pt: "32px"; pb: "32px"; pr: "32px"; pl: "32px"`. */
+  /** Sets `paddingTop: "32px"; paddingBottom: "32px"; paddingRight: "32px"; paddingLeft: "32px"`. */
   get p4() {
-    return this.p(4);
+    return this.add("paddingTop", "32px").add("paddingBottom", "32px").add("paddingRight", "32px").add(
+      "paddingLeft",
+      "32px",
+    );
   }
-  /** Sets `pt: "40px"; pb: "40px"; pr: "40px"; pl: "40px"`. */
+  /** Sets `paddingTop: "40px"; paddingBottom: "40px"; paddingRight: "40px"; paddingLeft: "40px"`. */
   get p5() {
-    return this.p(5);
+    return this.add("paddingTop", "40px").add("paddingBottom", "40px").add("paddingRight", "40px").add(
+      "paddingLeft",
+      "40px",
+    );
   }
-  /** Sets `pt: "48px"; pb: "48px"; pr: "48px"; pl: "48px"`. */
+  /** Sets `paddingTop: "48px"; paddingBottom: "48px"; paddingRight: "48px"; paddingLeft: "48px"`. */
   get p6() {
-    return this.p(6);
+    return this.add("paddingTop", "48px").add("paddingBottom", "48px").add("paddingRight", "48px").add(
+      "paddingLeft",
+      "48px",
+    );
   }
-  /** Sets `pt: "56px"; pb: "56px"; pr: "56px"; pl: "56px"`. */
+  /** Sets `paddingTop: "56px"; paddingBottom: "56px"; paddingRight: "56px"; paddingLeft: "56px"`. */
   get p7() {
-    return this.p(7);
+    return this.add("paddingTop", "56px").add("paddingBottom", "56px").add("paddingRight", "56px").add(
+      "paddingLeft",
+      "56px",
+    );
   }
-  /** Sets `pt: "64px"; pb: "64px"; pr: "64px"; pl: "64px"`. */
+  /** Sets `paddingTop: "64px"; paddingBottom: "64px"; paddingRight: "64px"; paddingLeft: "64px"`. */
   get p8() {
-    return this.p(8);
+    return this.add("paddingTop", "64px").add("paddingBottom", "64px").add("paddingRight", "64px").add(
+      "paddingLeft",
+      "64px",
+    );
   }
-  p(inc: number | string) {
-    return this.pt(inc).pb(inc).pr(inc).pl(inc);
+  /** Sets `paddingTop: "v"; paddingBottom: "v"; paddingRight: "v"; paddingLeft: "v"`. */
+  p(v: number | string) {
+    return this.add("paddingTop", maybeInc(v)).add("paddingBottom", maybeInc(v)).add("paddingRight", maybeInc(v)).add(
+      "paddingLeft",
+      maybeInc(v),
+    );
   }
+  /** Sets `paddingTop: px; paddingBottom: px; paddingRight: px; paddingLeft: px`. */
   pPx(px: number) {
-    return this.ptPx(px).pbPx(px).prPx(px).plPx(px);
+    return this.add("paddingTop", `${px}px`).add("paddingBottom", `${px}px`).add("paddingRight", `${px}px`).add(
+      "paddingLeft",
+      `${px}px`,
+    );
   }
 
   // textAlign
@@ -3166,6 +3623,30 @@ class CssBuilder<T extends Properties> {
   get wsNormal() {
     return this.add("whiteSpace", "normal");
   }
+  /** Sets `whiteSpace: "pre"`. */
+  get wsp() {
+    return this.add("whiteSpace", "pre");
+  }
+  /** Sets `whiteSpace: "normal"`. */
+  get wsn() {
+    return this.add("whiteSpace", "normal");
+  }
+  /** Sets `whiteSpace: "nowrap"`. */
+  get wsnw() {
+    return this.add("whiteSpace", "nowrap");
+  }
+  /** Sets `whiteSpace: "break-spaces"`. */
+  get wsbs() {
+    return this.add("whiteSpace", "break-spaces");
+  }
+  /** Sets `whiteSpace: "pre-wrap"`. */
+  get wspw() {
+    return this.add("whiteSpace", "pre-wrap");
+  }
+  /** Sets `whiteSpace: "pre-line"`. */
+  get wspl() {
+    return this.add("whiteSpace", "pre-line");
+  }
   /** Sets `whiteSpace: value`. */
   whiteSpace(value: Properties["whiteSpace"]) {
     return this.add("whiteSpace", value);
@@ -3188,6 +3669,18 @@ class CssBuilder<T extends Properties> {
   get w100() {
     return this.add("width", "100%");
   }
+  /** Sets `width: "fit-content"`. */
+  get wfc() {
+    return this.add("width", "fit-content");
+  }
+  /** Sets `width: "max-content"`. */
+  get wmaxc() {
+    return this.add("width", "max-content");
+  }
+  /** Sets `width: "min-content"`. */
+  get wminc() {
+    return this.add("width", "min-content");
+  }
   /** Sets `minWidth: 0`. */
   get mw0() {
     return this.add("minWidth", 0);
@@ -3207,6 +3700,18 @@ class CssBuilder<T extends Properties> {
   /** Sets `minWidth: "100%"`. */
   get mw100() {
     return this.add("minWidth", "100%");
+  }
+  /** Sets `minWidth: "fit-content"`. */
+  get mwfc() {
+    return this.add("minWidth", "fit-content");
+  }
+  /** Sets `minWidth: "min-content"`. */
+  get mwminc() {
+    return this.add("minWidth", "min-content");
+  }
+  /** Sets `minWidth: "max-content"`. */
+  get mwmaxc() {
+    return this.add("minWidth", "max-content");
   }
   /** Sets `minWidth: value`. */
   mw(value: Properties["minWidth"]) {
@@ -3236,6 +3741,18 @@ class CssBuilder<T extends Properties> {
   get maxw100() {
     return this.add("maxWidth", "100%");
   }
+  /** Sets `maxWidth: "fit-content"`. */
+  get maxwfc() {
+    return this.add("maxWidth", "fit-content");
+  }
+  /** Sets `maxWidth: "min-content"`. */
+  get maxwminc() {
+    return this.add("maxWidth", "min-content");
+  }
+  /** Sets `maxWidth: "max-content"`. */
+  get maxwmaxc() {
+    return this.add("maxWidth", "max-content");
+  }
   /** Sets `maxWidth: value`. */
   maxw(value: Properties["maxWidth"]) {
     return this.add("maxWidth", value);
@@ -3246,47 +3763,51 @@ class CssBuilder<T extends Properties> {
   }
   /** Sets `width: "0px"`. */
   get w0() {
-    return this.w(0);
+    return this.add("width", "0px");
   }
   /** Sets `width: "8px"`. */
   get w1() {
-    return this.w(1);
+    return this.add("width", "8px");
   }
   /** Sets `width: "16px"`. */
   get w2() {
-    return this.w(2);
+    return this.add("width", "16px");
   }
   /** Sets `width: "24px"`. */
   get w3() {
-    return this.w(3);
+    return this.add("width", "24px");
   }
   /** Sets `width: "32px"`. */
   get w4() {
-    return this.w(4);
+    return this.add("width", "32px");
   }
   /** Sets `width: "40px"`. */
   get w5() {
-    return this.w(5);
+    return this.add("width", "40px");
   }
   /** Sets `width: "48px"`. */
   get w6() {
-    return this.w(6);
+    return this.add("width", "48px");
   }
   /** Sets `width: "56px"`. */
   get w7() {
-    return this.w(7);
+    return this.add("width", "56px");
   }
   /** Sets `width: "64px"`. */
   get w8() {
-    return this.w(8);
+    return this.add("width", "64px");
   }
-  /** Sets `width: inc`. */
-  w(inc: number | string) {
-    return this.add("width", maybeInc(inc));
+  /** Sets `width: "auto"`. */
+  get wa() {
+    return this.add("width", "auto");
+  }
+  /** Sets `width: "v"`. */
+  w(v: number | string) {
+    return this.add("width", maybeInc(v));
   }
   /** Sets `width: px`. */
   wPx(px: number) {
-    return this.w(`${px}px`);
+    return this.add("width", `${px}px`);
   }
 
   // wordBreak
@@ -3421,16 +3942,23 @@ class CssBuilder<T extends Properties> {
 
   if(bp: Breakpoint): CssBuilder<T>;
   if(cond: boolean): CssBuilder<T>;
-  if(arg: boolean | Breakpoint): CssBuilder<T> {
-    if (typeof arg === "boolean") {
+  if(attr: string, value: boolean | string): CssBuilder<T>;
+  if(arg: boolean | Breakpoint | string, value?: boolean | string): CssBuilder<T> {
+    if (value !== undefined) {
+      return this.newCss({ selector: `[${arg}='${value}']` });
+    } else if (typeof arg === "boolean") {
       return this.newCss({ enabled: arg });
     } else {
-      return this.newCss({ selector: Breakpoints[arg] });
+      return this.newCss({ selector: Breakpoints[arg as Breakpoint] });
     }
   }
 
   get onHover() {
     return this.newCss({ selector: ":hover" });
+  }
+
+  ifContainer(props: ContainerProps) {
+    return this.newCss({ selector: Container(props) });
   }
 
   get ifPrint() {
@@ -3545,68 +4073,78 @@ export function px(pixels: number): string {
 }
 
 export enum Palette {
-  White = "rgba(254,254,254,1)",
+  White = "rgba(255,255,255,1)",
   Transparent = "rgba(0,0,0,0)",
-  Gray50 = "rgba(255,253,253,1)",
-  Gray100 = "rgba(247,245,245,1)",
-  Gray200 = "rgba(236,235,235,1)",
-  Gray300 = "rgba(221,220,220,1)",
-  Gray400 = "rgba(201,201,201,1)",
-  Gray500 = "rgba(175,175,175,1)",
-  Gray600 = "rgba(141,141,141,1)",
-  Gray700 = "rgba(100,100,100,1)",
-  Gray800 = "rgba(53,53,53,1)",
-  Gray900 = "rgba(36,36,36,1)",
-  LightBlue50 = "rgba(240,249,255,1)",
-  LightBlue100 = "rgba(224,242,254,1)",
-  LightBlue200 = "rgba(186,230,253,1)",
-  LightBlue300 = "rgba(125,211,252,1)",
-  LightBlue400 = "rgba(56,189,248,1)",
-  LightBlue500 = "rgba(14,165,233,1)",
-  LightBlue600 = "rgba(2,143,199,1)",
-  LightBlue700 = "rgba(3,105,161,1)",
-  LightBlue800 = "rgba(7,89,133,1)",
-  LightBlue900 = "rgba(12,74,110,1)",
-  Red50 = "rgba(255,242,242,1)",
-  Red100 = "rgba(253,210,209,1)",
-  Red200 = "rgba(249,181,177,1)",
-  Red300 = "rgba(242,155,148,1)",
-  Red400 = "rgba(232,133,122,1)",
-  Red500 = "rgba(218,114,100,1)",
-  Red600 = "rgba(200,98,81,1)",
-  Red700 = "rgba(176,83,73,1)",
-  Red800 = "rgba(149,68,64,1)",
-  Red900 = "rgba(120,54,54,1)",
-  Yellow50 = "rgba(255,254,242,1)",
-  Yellow100 = "rgba(255,254,212,1)",
-  Yellow200 = "rgba(255,250,180,1)",
-  Yellow300 = "rgba(255,240,150,1)",
-  Yellow400 = "rgba(255,225,123,1)",
-  Yellow500 = "rgba(255,204,99,1)",
-  Yellow600 = "rgba(246,177,78,1)",
-  Yellow700 = "rgba(207,150,73,1)",
-  Yellow800 = "rgba(164,120,66,1)",
-  Yellow900 = "rgba(120,89,54,1)",
-  Green50 = "rgba(250,255,250,1)",
-  Green100 = "rgba(223,248,216,1)",
-  Green200 = "rgba(199,239,183,1)",
-  Green300 = "rgba(179,226,153,1)",
-  Green400 = "rgba(163,208,126,1)",
-  Green500 = "rgba(146,185,101,1)",
-  Green600 = "rgba(126,156,79,1)",
-  Green700 = "rgba(101,120,57,1)",
-  Green800 = "rgba(64,93,44,1)",
-  Green900 = "rgba(34,64,31,1)",
-  Violet50 = "rgba(245,243,255,1)",
-  Violet100 = "rgba(238,234,253,1)",
-  Violet200 = "rgba(232,225,252,1)",
-  Violet300 = "rgba(218,205,246,1)",
-  Violet400 = "rgba(204,186,236,1)",
-  Violet500 = "rgba(190,167,223,1)",
-  Violet600 = "rgba(173,147,205,1)",
-  Violet700 = "rgba(153,126,181,1)",
-  Violet800 = "rgba(128,103,151,1)",
-  Violet900 = "rgba(100,78,116,1)",
+  Gray50 = "rgba(255, 253, 253, 1)",
+  Gray100 = "rgba(247, 245, 245, 1)",
+  Gray200 = "rgba(236, 235, 235, 1)",
+  Gray300 = "rgba(221, 220, 220, 1)",
+  Gray400 = "rgba(201, 201, 201, 1)",
+  Gray500 = "rgba(175, 175, 175, 1)",
+  Gray600 = "rgba(141, 141, 141, 1)",
+  Gray700 = "rgba(100, 100, 100, 1)",
+  Gray800 = "rgba(53, 53, 53, 1)",
+  Gray900 = "rgba(36, 36, 36, 1)",
+  Blue50 = "rgba(239, 246, 255, 1)",
+  Blue100 = "rgba(219, 234, 254, 1)",
+  Blue200 = "rgba(191, 219, 254, 1)",
+  Blue300 = "rgba(147, 197, 253, 1)",
+  Blue400 = "rgba(96, 165, 250, 1)",
+  Blue500 = "rgba(59, 130, 246, 1)",
+  Blue600 = "rgba(37, 99, 235, 1)",
+  Blue700 = "rgba(29, 78, 216, 1)",
+  Blue800 = "rgba(30, 64, 175, 1)",
+  Blue900 = "rgba(30, 58, 138, 1)",
+  Red50 = "rgba(254, 242, 242, 1)",
+  Red100 = "rgba(254, 226, 226, 1)",
+  Red200 = "rgba(254, 202, 202, 1)",
+  Red300 = "rgba(252, 165, 165, 1)",
+  Red400 = "rgba(248, 113, 113, 1)",
+  Red500 = "rgba(239, 68, 68, 1)",
+  Red600 = "rgba(220, 38, 38, 1)",
+  Red700 = "rgba(185, 28, 28, 1)",
+  Red800 = "rgba(153, 27, 27, 1)",
+  Red900 = "rgba(127, 29, 29, 1)",
+  Yellow50 = "rgba(254, 252, 232, 1)",
+  Yellow100 = "rgba(254, 249, 195, 1)",
+  Yellow200 = "rgba(254, 240, 138, 1)",
+  Yellow300 = "rgba(253, 224, 71, 1)",
+  Yellow400 = "rgba(250, 204, 21, 1)",
+  Yellow500 = "rgba(234, 179, 8, 1)",
+  Yellow600 = "rgba(202, 138, 4, 1)",
+  Yellow700 = "rgba(161, 98, 7, 1)",
+  Yellow800 = "rgba(133, 77, 14, 1)",
+  Yellow900 = "rgba(113, 63, 18, 1)",
+  Green50 = "rgba(236, 253, 245, 1)",
+  Green100 = "rgba(209, 250, 229, 1)",
+  Green200 = "rgba(167, 243, 208, 1)",
+  Green300 = "rgba(110, 231, 183, 1)",
+  Green400 = "rgba(52, 211, 153, 1)",
+  Green500 = "rgba(16, 185, 129, 1)",
+  Green600 = "rgba(5, 150, 105, 1)",
+  Green700 = "rgba(4, 120, 87, 1)",
+  Green800 = "rgba(6, 95, 70, 1)",
+  Green900 = "rgba(6, 78, 59, 1)",
+  Purple50 = "rgba(245, 243, 255, 1)",
+  Purple100 = "rgba(237, 233, 254, 1)",
+  Purple200 = "rgba(221, 214, 254, 1)",
+  Purple300 = "rgba(196, 181, 253, 1)",
+  Purple400 = "rgba(167, 139, 250, 1)",
+  Purple500 = "rgba(139, 92, 246, 1)",
+  Purple600 = "rgba(124, 58, 237, 1)",
+  Purple700 = "rgba(109, 40, 217, 1)",
+  Purple800 = "rgba(91, 33, 182, 1)",
+  Purple900 = "rgba(76, 29, 149, 1)",
+  Orange50 = "rgba(255, 247, 237, 1)",
+  Orange100 = "rgba(255, 237, 213, 1)",
+  Orange200 = "rgba(254, 215, 170, 1)",
+  Orange300 = "rgba(253, 186, 116, 1)",
+  Orange400 = "rgba(251, 146, 60, 1)",
+  Orange500 = "rgba(249, 115, 22, 1)",
+  Orange600 = "rgba(234, 88, 12, 1)",
+  Orange700 = "rgba(194, 65, 12, 1)",
+  Orange800 = "rgba(154, 52, 18, 1)",
+  Orange900 = "rgba(124, 45, 18, 1)",
 }
 
 /** A shortcut for defining Xss types. */
@@ -3631,4 +4169,24 @@ export enum Breakpoints {
   mdAndDown = "@media screen and (max-width:1024px)",
   lg = "@media screen and (min-width:1025px)",
   mdOrLg = "@media screen and (min-width:600px)",
+}
+
+/**
+ * Utility to help write `@container` queries
+ *
+ * @param name - The name of the container.
+ * @param lt - The maximum width of the container inclusive.
+ * @param gt - The minimum width of the container exclusive.
+ */
+type ContainerProps = { name?: string } & ({ lt: number } | { gt: number } | { lt: number; gt: number });
+export function Container(props: ContainerProps) {
+  const { name = "" } = props;
+  const lt = "lt" in props ? props.lt : undefined;
+  const gt = "gt" in props ? props.gt : undefined;
+
+  const ltQuery = lt !== undefined ? `(max-width: ${lt}px)` : "";
+  const gtQuery = gt !== undefined ? `(min-width: ${gt + 1}px)` : "";
+  const query = [ltQuery, gtQuery].filter(Boolean).join(" and ");
+
+  return `@container ${name} ${query}`;
 }

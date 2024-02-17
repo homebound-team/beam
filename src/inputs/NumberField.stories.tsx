@@ -6,7 +6,6 @@ import { TextField } from "src/inputs";
 import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
 
 export default {
-  title: "Workspace/Inputs/Number Field",
   component: NumberField,
   parameters: {
     design: {
@@ -23,6 +22,7 @@ export function NumberFieldStyles() {
         <h1 css={Css.lg.$}>Regular</h1>
         <TestNumberField value={0} label="Age" labelStyle="hidden" />
         <TestNumberField label="Age" value={1000} />
+        <TestNumberField label="Age Positive Only" value={1000} positiveOnly />
         <TestNumberField label="Age Disabled" value={1000} disabled="Disabled reason tooltip" />
         <TestNumberField label="Age Read Only" value={1000} readOnly="Read only reason tooltip" />
         <TestNumberField
@@ -62,6 +62,11 @@ export function NumberFieldStyles() {
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Without grouping</h1>
         <TestNumberField value={123456789} label="No grouping" useGrouping={false} />
+      </div>
+
+      <div css={Css.df.fdc.gap2.$}>
+        <h1 css={Css.lg.$}>Full Width</h1>
+        <TestNumberField value={0} label="Age" fullWidth />
       </div>
     </div>
   );

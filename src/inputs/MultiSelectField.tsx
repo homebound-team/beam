@@ -1,10 +1,9 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { Value } from "src/inputs";
-import { BeamSelectFieldBaseProps, SelectFieldBase } from "src/inputs/internal/SelectFieldBase";
+import { ComboBoxBase, ComboBoxBaseProps } from "src/inputs/internal/ComboBoxBase";
 import { HasIdAndName, Optional } from "src/types";
 
-export interface MultiSelectFieldProps<O, V extends Value>
-  extends Exclude<BeamSelectFieldBaseProps<O, V>, "unsetLabel"> {
+export interface MultiSelectFieldProps<O, V extends Value> extends Exclude<ComboBoxBaseProps<O, V>, "unsetLabel"> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
@@ -30,33 +29,7 @@ export function MultiSelectField<O, V extends Value>(
   const {
     getOptionValue = (opt: O) => (opt as any).id, // if unset, assume O implements HasId
     getOptionLabel = (opt: O) => (opt as any).name, // if unset, assume O implements HasName
-    options,
-    onSelect,
-    values,
     ...otherProps
   } = props;
-
-  return (
-    <SelectFieldBase
-      multiselect
-      {...otherProps}
-      options={options}
-      getOptionLabel={getOptionLabel}
-      getOptionValue={getOptionValue}
-      values={values}
-      onSelect={(values) => {
-        const [selectedValues, selectedOptions] = options
-          .filter((o) => values.includes(getOptionValue(o)))
-          .reduce(
-            (acc, o) => {
-              acc[0].push(getOptionValue(o));
-              acc[1].push(o);
-              return acc;
-            },
-            [[] as V[], [] as O[]],
-          );
-        onSelect(selectedValues, selectedOptions);
-      }}
-    />
-  );
+  return <ComboBoxBase multiselect getOptionLabel={getOptionLabel} getOptionValue={getOptionValue} {...otherProps} />;
 }

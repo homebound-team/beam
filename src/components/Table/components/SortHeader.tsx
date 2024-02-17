@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from "react";
+import { ReactNode, useCallback, useContext } from "react";
 import { Icon } from "src/components/Icon";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css, Palette, Properties } from "src/Css";
@@ -10,6 +10,7 @@ interface SortHeaderProps {
   xss?: Properties;
   iconOnLeft?: boolean;
   sortKey: string;
+  tooltipEl?: ReactNode;
 }
 
 /**
@@ -24,7 +25,7 @@ interface SortHeaderProps {
  *   current sort state + `toggleSort` function
  */
 export function SortHeader(props: SortHeaderProps) {
-  const { content, xss, iconOnLeft = false, sortKey } = props;
+  const { content, xss, iconOnLeft = false, sortKey, tooltipEl } = props;
   const { isHovered, hoverProps } = useHover({});
   const { tableState } = useContext(TableStateContext);
   const current = useComputed(() => tableState.sortState?.current, [tableState]);
@@ -37,7 +38,7 @@ export function SortHeader(props: SortHeaderProps) {
     <span css={Css.fs0.$}>
       <Icon
         icon={sorted === "DESC" ? "sortDown" : "sortUp"}
-        color={sorted !== undefined ? Palette.LightBlue700 : Palette.Gray400}
+        color={sorted !== undefined ? Palette.Blue700 : Palette.Gray400}
         xss={{
           ...Css.ml1.if(iconOnLeft).mr1.ml0.$,
           ...Css.visibility("hidden")
@@ -52,7 +53,8 @@ export function SortHeader(props: SortHeaderProps) {
   return (
     <div {...tid} css={{ ...Css.df.aic.h100.cursorPointer.selectNone.$, ...xss }} {...hoverProps} onClick={toggleSort}>
       {iconOnLeft && icon}
-      {content}
+      <span css={Css.lineClamp2.$}>{content}</span>
+      {tooltipEl}
       {!iconOnLeft && icon}
     </div>
   );

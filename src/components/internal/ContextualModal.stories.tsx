@@ -5,7 +5,6 @@ import { ContextualModal } from "./ContextualModal";
 
 export default {
   component: ContextualModal,
-  title: "Workspace/Components/ContextualModal",
   decorators: [withDimensions()],
   parameters: {
     // To better view the hover state

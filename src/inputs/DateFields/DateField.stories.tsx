@@ -9,14 +9,12 @@ import { noop } from "src/utils";
 import { samples, withDimensions } from "src/utils/sb";
 
 export default {
-  title: "Workspace/Inputs/Date Field",
   component: Button,
-  decorators: [withDimensions()],
-  parameters: { 
+  parameters: {
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31699%3A99566",
-    }
+    },
   },
 } as Meta;
 
@@ -62,6 +60,7 @@ export function DateFields() {
         disabledDays={[{ before: jan1 }, { after: jan10 }]}
       />,
     ],
+    ["Full Width", <TestDateField label="Date" fullWidth />],
   );
 }
 
@@ -80,6 +79,7 @@ export function DatePickerOpen() {
     </>
   );
 }
+DatePickerOpen.decorators = [withDimensions()];
 
 function TestDateField(props: Omit<DateFieldProps, "value" | "onChange" | "onBlur" | "onFocus">) {
   const [value, onChange] = useState<Date | undefined>(jan1);

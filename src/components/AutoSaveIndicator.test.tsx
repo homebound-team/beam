@@ -1,7 +1,7 @@
-import { AutoSaveStatus, AutoSaveStatusContext } from "@homebound/form-state";
 import React from "react";
 import { noop } from "src/utils";
 import { render } from "src/utils/rtl";
+import { AutoSaveStatus, AutoSaveStatusContext } from ".";
 import { AutoSaveIndicator } from "./AutoSaveIndicator";
 
 describe(AutoSaveIndicator, () => {
@@ -19,6 +19,7 @@ describe(AutoSaveIndicator, () => {
 
     const iconElement = r.container.querySelector(`[data-icon=${iconName}]`)!;
     expect(iconElement).toBeInTheDocument();
+    // eslint-disable-next-line jest/no-conditional-expect
     if (helperText) expect(iconElement.nextSibling?.textContent).toMatch(helperText);
   });
 
@@ -107,7 +108,7 @@ describe(AutoSaveIndicator, () => {
       </AutoSaveStatusContext.Provider>,
     );
 
-    expect(r.tooltip()).toHaveAttribute("title", "Error: Some error occurred");
+    expect(r.tooltip).toHaveAttribute("title", "Error: Some error occurred");
   });
 });
 

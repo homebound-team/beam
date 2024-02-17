@@ -2,8 +2,10 @@ import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
 import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
-import { emptyCell } from "src/components/Table/utils/utils";
-import { newMethodMissingProxy } from "src/utils";
+import { DragData, emptyCell } from "src/components/Table/utils/utils";
+import { isFunction, newMethodMissingProxy } from "src/utils";
+import { Icon } from "src";
+import { Css, Palette } from "src/Css";
 
 /** Provides default styling for a GridColumn representing a Date. */
 export function column<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
@@ -39,8 +41,8 @@ export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>
     id: "beamSelectColumn",
     clientSideSort: false,
     align: "center",
-    // Defining `w: 48px` to accommodate for the `16px` wide checkbox and `16px` of padding on either side.
-    w: "48px",
+    // Defining `w: 40px` to accommodate for the `16px` wide checkbox and `12px` of padding on either side.
+    w: "40px",
     wrapAction: false,
     isAction: true,
     expandColumns: undefined,
@@ -50,6 +52,7 @@ export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>
     // Use any of the user's per-row kind methods if they have them.
     ...columnDef,
   };
+  // Use newMethodMissingProxy so the user can use whatever kinds they want, i.e. `myRowKind: () => ...Toggle... `
   return newMethodMissingProxy(base, (key) => {
     return (data: any, { row }: { row: GridDataRow<any> }) => ({
       content: <SelectToggle id={row.id} disabled={row.selectable === false} />,
@@ -80,6 +83,7 @@ export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<
     totals: emptyCell,
     ...columnDef,
   };
+  // Use newMethodMissingProxy so the user can use whatever kinds they want, i.e. `myRowKind: () => ...Collapse... `
   return newMethodMissingProxy(base, (key) => {
     return (data: any, { row, level }: { row: GridDataRow<any>; level: number }) => ({
       content: <CollapseToggle row={row} compact={level > 0} />,
@@ -96,8 +100,8 @@ function nonKindDefaults() {
  * Calculates column widths using a flexible `calc()` definition that allows for consistent column alignment without the use of `<table />`, CSS Grid, etc layouts.
  * Enforces only fixed-sized units (% and px)
  */
-export function calcColumnSizes(
-  columns: GridColumnWithId<any>[],
+export function calcColumnSizes<R extends Kinded>(
+  columns: GridColumnWithId<R>[],
   tableWidth: number | undefined,
   tableMinWidthPx: number = 0,
   expandedColumnIds: string[],
@@ -142,7 +146,7 @@ export function calcColumnSizes(
     return `((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
-  let sizes = columns.map(({ id, expandedWidth, w: _w }) => {
+  const sizes = columns.map(({ id, expandedWidth, w: _w }) => {
     const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
 
     if (typeof w === "undefined") {
@@ -163,23 +167,73 @@ export function calcColumnSizes(
   return sizes;
 }
 
-/** Assign column ids if missing */
+/** Assign column ids if missing. */
 export function assignDefaultColumnIds<T extends Kinded>(columns: GridColumn<T>[]): GridColumnWithId<T>[] {
-  // Note: we are not _always_ spreading the `c` property as we need to be able to return the whole proxy object that
-  // exists as part of `selectColumn` and `collapseColumn`.
   return columns.map((c, idx) => {
     const { expandColumns } = c;
-    const expandColumnsWithId: GridColumnWithId<T>[] | undefined = expandColumns?.map((ec, ecIdx) => ({
-      ...ec,
-      id: ec.id ?? (`${generateColumnId(idx)}_${ecIdx}` as string),
-      // Defining this as undefined to make TS happy for now.
-      // If we do not explicitly set to `undefined`, TS thinks `expandColumns` could still be of type GridColumn<T> (not WithId).
-      // We only support a single level of expanding columns, so this is safe to do.
-      expandColumns: undefined,
-    }));
-
-    return Object.assign(c, { id: c.id ?? generateColumnId(idx), expandColumns: expandColumnsWithId });
+    // If `expandColumns` is a function, we don't instrument it atm.
+    const expandColumnsWithId = isFunction(expandColumns)
+      ? expandColumns
+      : expandColumns?.map((ec, ecIdx) => ({
+          ...ec,
+          id: ec.id ?? `${generateColumnId(idx)}_${ecIdx}`,
+          // Defining this as undefined to make TS happy for now.
+          // If we do not explicitly set to `undefined`, TS thinks `expandColumns` could still be of type GridColumn<T> (not WithId).
+          // We only support a single level of expanding columns, so this is safe to do.
+          expandColumns: undefined,
+        }));
+    // We use `Object.assign` instead of spreading the `c` property to maintain
+    // the proxy objects if the user used selectColumn/collapseColumn, which have
+    // method-missing hooks that render empty cells for any non-header rows.
+    return Object.assign(c, {
+      id: c.id ?? generateColumnId(idx),
+      expandColumns: expandColumnsWithId,
+    });
   });
 }
 
 export const generateColumnId = (columnIndex: number) => `beamColumn_${columnIndex}`;
+
+export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>): GridColumn<T> {
+  const base = {
+    ...nonKindDefaults(),
+    id: "beamDragHandleColumn",
+    clientSideSort: false,
+    align: "center",
+    w: "40px",
+    wrapAction: false,
+    isAction: true,
+    expandColumns: undefined,
+    expandableHeader: emptyCell,
+    totals: emptyCell,
+    // Use any of the user's per-row kind methods if they have them.
+    ...columnDef,
+  };
+
+  return newMethodMissingProxy(base, (key) => {
+    return (data: any, { row, dragData }: { row: GridDataRow<T>; dragData: DragData<T> }) => {
+      if (!dragData) return;
+      const { rowRenderRef: ref, onDragStart, onDragEnd, onDrop, onDragEnter, onDragOver } = dragData;
+
+      return {
+        content: row.draggable ? (
+          <div
+            draggable={row.draggable}
+            onDragStart={(evt) => {
+              // show the whole row being dragged when dragging with the handle
+              ref.current && evt.dataTransfer.setDragImage(ref.current, 0, 0);
+              return onDragStart?.(row, evt);
+            }}
+            onDragEnd={(evt) => onDragEnd?.(row, evt)}
+            onDrop={(evt) => onDrop?.(row, evt)}
+            onDragEnter={(evt) => onDragEnter?.(row, evt)}
+            onDragOver={(evt) => onDragOver?.(row, evt)}
+            css={Css.ma.cursorPointer.$}
+          >
+            <Icon icon="drag" />
+          </div>
+        ) : undefined,
+      };
+    };
+  }) as any;
+}

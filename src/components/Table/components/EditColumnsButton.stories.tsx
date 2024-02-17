@@ -7,7 +7,6 @@ import { simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/si
 import { Css } from "src/Css";
 
 export default {
-  title: "Workspace/Components/EditColumnsButton",
   component: EditColumnsButton,
 } as Meta;
 

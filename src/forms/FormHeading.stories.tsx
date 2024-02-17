@@ -5,7 +5,6 @@ import { TextField } from "src/inputs/TextField";
 
 export default {
   component: FormHeading,
-  title: "Workspace/Forms/Form Heading",
 } as Meta;
 
 export function Headings() {

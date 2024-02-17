@@ -9,6 +9,6 @@ describe("MockRichTextField", () => {
     const r = await render(<MockRichTextField value={""} onChange={onChange} onBlur={noop} onFocus={noop} />);
     type(r.richTextField, text);
     expect(onChange).toHaveBeenCalledWith(text, text, []);
-    expect(r.richTextField()).toHaveValue(text);
+    expect(r.richTextField).toHaveValue(text);
   });
 });

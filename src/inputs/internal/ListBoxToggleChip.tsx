@@ -1,4 +1,4 @@
-import React, { Key } from "react";
+import { Key } from "react";
 import { SelectState } from "react-stately";
 import { ToggleChip } from "src/components";
 import { Css } from "src/Css";

@@ -5,7 +5,7 @@ import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
 export type BoundSwitchFieldProps = Omit<SwitchProps, "selected" | "onChange" | "label"> & {
-  field: FieldState<any, boolean | null | undefined>;
+  field: FieldState<boolean | null | undefined>;
   /** Make optional so that callers can override if they want to. */
   onChange?: (value: boolean) => void;
   label?: string;

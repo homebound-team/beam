@@ -5,12 +5,17 @@ import { click, render } from "src/utils/rtl";
 describe("Checkbox", () => {
   it("can set default test ids", async () => {
     const r = await render(<Checkbox label="Test Label" selected={false} onChange={noop} />);
-    expect(r.testLabel()).toBeTruthy();
+    expect(r.testLabel).toBeTruthy();
   });
 
   it("can set explicit test ids", async () => {
     const r = await render(<Checkbox label="Test Label" selected={false} onChange={noop} data-testid="customId" />);
-    expect(r.customId()).toBeTruthy();
+    expect(r.customId).toBeTruthy();
+  });
+
+  it("sets disabled", async () => {
+    const r = await render(<Checkbox label="Test" selected={false} onChange={noop} disabled={true} />);
+    expect(r.test).toBeDisabled();
   });
 
   it("treats indeterminate as false", async () => {

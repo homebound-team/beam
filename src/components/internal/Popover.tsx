@@ -28,7 +28,7 @@ export function Popover(props: PopoverProps) {
         if (triggerRef.current?.contains(e)) {
           return true;
         }
-        //Do not close the Popover if the user is interacting with a tribute menu, dialog or alert on top of it, otherwise close it.
+        // Do not close the Popover if the user is interacting with a tribute menu, dialog or alert on top of it, otherwise close it.
         return !(e.closest(".tribute-container") || e.closest("[role='dialog']") || e.closest("[role='alert']"));
       },
       ...others,

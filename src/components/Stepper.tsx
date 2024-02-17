@@ -59,9 +59,8 @@ export function Stepper(props: StepperProps) {
       >
         <div
           css={
-            Css.bgLightBlue600
-              .add("transition", "width 200ms")
-              .h100.w(`${((lastCompletedStep + 1) / steps.length) * 100}%`).$
+            Css.bgBlue600.add("transition", "width 200ms").h100.w(`${((lastCompletedStep + 1) / steps.length) * 100}%`)
+              .$
           }
         />
       </div>
@@ -93,9 +92,9 @@ function StepButton(props: StepButtonProps) {
       css={{
         ...Css.buttonBase.$,
         ...Css.tl.w100.h100.sm.gray700.add("whiteSpace", "initial").if(state === "error").red600.$,
-        ...(isCurrent ? Css.lightBlue700.if(state === "error").red800.$ : {}),
-        ...(isHovered && !isPressed ? Css.lightBlue800.if(state === "error").red500.$ : {}),
-        ...(isPressed ? Css.lightBlue500.if(state === "error").red900.$ : {}),
+        ...(isCurrent ? Css.blue700.if(state === "error").red800.$ : {}),
+        ...(isHovered && !isPressed ? Css.blue800.if(state === "error").red500.$ : {}),
+        ...(isPressed ? Css.blue500.if(state === "error").red900.$ : {}),
         ...(disabled ? Css.gray400.cursorNotAllowed.if(state === "error").red200.$ : {}),
         ...(isFocusVisible ? focusRingStyles : {}),
       }}

@@ -1,7 +1,7 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { GridStyle } from "src/components/Table/TableStyles";
-import { GridColumnWithId } from "src/components/Table/types";
+import { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { calcColumnSizes } from "src/components/Table/utils/columns";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -24,9 +24,9 @@ import { useDebouncedCallback } from "use-debounce";
  *
  * Disclaimer that we roll our own `fr` b/c we're not in CSS grid anymore.
  */
-export function useSetupColumnSizes(
+export function useSetupColumnSizes<R extends Kinded>(
   style: GridStyle,
-  columns: GridColumnWithId<any>[],
+  columns: GridColumnWithId<R>[],
   resizeRef: MutableRefObject<HTMLElement | null>,
   expandedColumnIds: string[],
 ): string[] {
@@ -46,30 +46,40 @@ export function useSetupColumnSizes(
       setTableWidth(width);
       setColumnSizes(calcColumnSizes(columns, width, style.minWidthPx, expandedColumnIds));
     },
-    [setTableWidth, setColumnSizes, columns, style],
+    [setTableWidth, setColumnSizes, columns, style, expandedColumnIds],
   );
 
   // Used to recalculate our columns sizes when columns change
-  useEffect(() => {
-    if (!calculateImmediately.current) {
-      const width = resizeRef.current?.clientWidth;
-      width && setTableAndColumnWidths(width);
-    }
-  }, [columns, setTableAndColumnWidths]);
+  useEffect(
+    () => {
+      if (!calculateImmediately.current) {
+        const width = resizeRef.current?.clientWidth;
+        width && setTableAndColumnWidths(width);
+      }
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [columns, setTableAndColumnWidths],
+  );
 
   const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
 
-  const onResize = useCallback(() => {
-    const target = resizeRef.current;
-    if (target && target.clientWidth !== tableWidth) {
-      if (calculateImmediately.current) {
-        calculateImmediately.current = false;
-        setTableAndColumnWidths(target.clientWidth);
-      } else {
-        setTableAndColumnWidthsDebounced(target.clientWidth);
+  const onResize = useCallback(
+    () => {
+      const target = resizeRef.current;
+      if (target && target.clientWidth !== tableWidth) {
+        if (calculateImmediately.current) {
+          calculateImmediately.current = false;
+          setTableAndColumnWidths(target.clientWidth);
+        } else {
+          setTableAndColumnWidthsDebounced(target.clientWidth);
+        }
       }
-    }
-  }, [tableWidth, setTableAndColumnWidths, setTableAndColumnWidthsDebounced]);
+    },
+    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tableWidth, setTableAndColumnWidths, setTableAndColumnWidthsDebounced],
+  );
 
   useResizeObserver({ ref: resizeRef, onResize });
 

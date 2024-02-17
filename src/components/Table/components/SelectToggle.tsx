@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { useComputed } from "src/hooks";
 import { Checkbox } from "src/inputs";
@@ -19,9 +19,7 @@ export function SelectToggle({ id, disabled }: SelectToggleProps) {
       checkboxOnly={true}
       disabled={disabled}
       label="Select"
-      onChange={(selected) => {
-        tableState.selectRow(id, selected);
-      }}
+      onChange={(selected) => tableState.selectRow(id, selected)}
       selected={selected}
     />
   );

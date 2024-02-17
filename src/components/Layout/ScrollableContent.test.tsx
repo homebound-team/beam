@@ -11,7 +11,7 @@ describe("ScrollableContent", () => {
       </ScrollableParent>,
     );
 
-    expect(r.pageContent()).toBeTruthy();
+    expect(r.pageContent).toBeTruthy();
   });
 
   it("renders ScrollableContent children inline if not wrapped in ScrollableParent", async () => {
@@ -23,6 +23,6 @@ describe("ScrollableContent", () => {
       </div>,
     );
 
-    expect(r.pageContent()).toBeTruthy();
+    expect(r.pageContent).toBeTruthy();
   });
 });

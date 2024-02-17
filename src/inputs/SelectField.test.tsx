@@ -1,9 +1,10 @@
-import { click, render } from "@homebound/rtl-utils";
+import { clickAndWait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
-import { wait } from "src/utils/rtl";
+import { blur, click, focus, getOptions, render, select, wait } from "src/utils/rtl";
+import { AuthorHeight } from "src/forms/formStateDomain";
 
 describe("SelectFieldTest", () => {
   it("can set a value", async () => {
@@ -17,27 +18,28 @@ describe("SelectFieldTest", () => {
         options={options}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
         onBlur={onBlur}
         onSelect={onSelect}
       />,
     );
     // That initially has "One" selected
-    expect(r.age()).toHaveValue("One");
-    // When we click the field to open the menu
-    r.age().click();
-    // And we select the 3rd option
-    click(r.getByRole("option", { name: "Three" }));
+    expect(r.age).toHaveValue("One");
+
+    // When selecting the 3rd option
+    select(r.age, "3");
+
     // Then onSelect was called
     expect(onSelect).toHaveBeenCalledWith("3", options[2]);
     // And the field has not been blurred (regression test to prevent SelectField's list box from opening back up after selecting an option)
     expect(onBlur).not.toHaveBeenCalled();
+    // And the field has the correct value (regression test to ensure input field's value correctly updates when selecting an option, before `onBlur` is called)
+    expect(r.age).toHaveValue("Three");
   });
 
   it("does not fire focus/blur when readOnly", async () => {
     const onFocus = jest.fn();
     const onBlur = jest.fn();
-    const { age } = await render(
+    const r = await render(
       <TestSelectField
         label="Age"
         value={"1"}
@@ -47,126 +49,153 @@ describe("SelectFieldTest", () => {
         getOptionValue={(o) => o.id}
         onFocus={onFocus}
         onBlur={onBlur}
-        data-testid="age"
       />,
     );
-    fireEvent.focus(age());
-    fireEvent.blur(age());
+    focus(r.age);
+    blur(r.age);
     expect(onBlur).not.toHaveBeenCalled();
     expect(onFocus).not.toHaveBeenCalled();
   });
 
   it("resets input value on blur if it does not match the selected option", async () => {
     // Given a Select Field without a selected option
-    const { age, getByRole } = await render(
+    const r = await render(
       <TestSelectField
         label="Age"
         value={undefined}
         options={options}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // When changing the inputs value, and not selecting an option
-    fireEvent.input(age(), { target: { value: "asdf" } });
+    fireEvent.input(r.age, { target: { value: "asdf" } });
     // And `blur`ing the field
-    fireEvent.blur(age());
+    fireEvent.blur(r.age);
     // Then expect the value to be reset to empty
-    expect(age()).toHaveValue("");
+    expect(r.age).toHaveValue("");
 
     // Given a selected option
-    fireEvent.focus(age());
-    fireEvent.input(age(), { target: { value: "T" } });
-    click(getByRole("option", { name: "Three" }));
+    fireEvent.focus(r.age);
+    fireEvent.input(r.age, { target: { value: "T" } });
+    click(r.getByRole("option", { name: "Three" }));
     // When changing the inputs value to no longer match the selected option
-    fireEvent.input(age(), { target: { value: "asdf" } });
+    fireEvent.input(r.age, { target: { value: "asdf" } });
     // And `blur`ing the field
-    fireEvent.blur(age());
+    fireEvent.blur(r.age);
     // Then expect the value to be reset to the selected option
-    expect(age()).toHaveValue("Three");
+    expect(r.age).toHaveValue("Three");
   });
 
   it("can initialize with an 'undefined' value", async () => {
     // Given a Select Field with an undefined value
-    const { age, getByRole } = await render(
+    const r = await render(
       <TestSelectField
         label="Age"
         value={undefined}
         options={[{ id: undefined, name: "Unassigned" }, ...options]}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // Then expect the value to be that of the `undefined` entry
-    expect(age()).toHaveValue("Unassigned");
+    expect(r.age).toHaveValue("Unassigned");
   });
 
   it("can select an 'undefined' value", async () => {
     // Given a Select Field with a value selected
-    const { age, getByRole } = await render(
+    const r = await render(
       <TestSelectField
         label="Age"
         value="1"
         options={[{ id: undefined, name: "Unassigned" }, ...options]}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // When selecting the option with an `undefined` value
-    fireEvent.click(age());
-    click(getByRole("option", { name: "Unassigned" }));
+    select(r.age, "Unassigned");
     // Then expect the value to be that of the `undefined` entry
-    expect(age()).toHaveValue("Unassigned");
+    expect(r.age).toHaveValue("Unassigned");
+  });
+
+  it("can use option codes", async () => {
+    const options = [
+      { code: AuthorHeight.SHORT, name: "Shortish" },
+      { code: AuthorHeight.TALL, name: "Tallish" },
+    ];
+    const value = AuthorHeight.TALL as AuthorHeight;
+    const r = await render(<SelectField label="Age" value={value} options={options} onSelect={() => {}} />);
+    expect(r.age).toHaveValue("Tallish");
+  });
+
+  it("can use option displayNames", async () => {
+    const options = [
+      { id: "1", displayName: "One" },
+      { id: "2", displayName: "Two" },
+      { id: "3", displayName: "Three" },
+    ];
+    const value = "2" as string;
+    const r = await render(<SelectField label="Age" value={value} options={options} onSelect={() => {}} />);
+    expect(r.age).toHaveValue("Two");
+  });
+
+  it("can use option labels", async () => {
+    const options = [
+      { id: "1", label: "One" },
+      { id: "2", label: "Two" },
+      { id: "3", label: "Three" },
+    ];
+    const value = "2" as string;
+    const r = await render(<SelectField label="Age" value={value} options={options} onSelect={() => {}} />);
+    expect(r.age).toHaveValue("Two");
   });
 
   it("respects disabled options", async () => {
     const onSelect = jest.fn();
     // Given a Select Field with a disabled option
-    const { age, getByRole } = await render(
+    const r = await render(
       <SelectField
         label="Age"
         value="1"
         options={options}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
         disabledOptions={["2"]}
         onSelect={onSelect}
       />,
     );
     // When opening the menu
-    fireEvent.click(age());
-    const optionTwo = getByRole("option", { name: "Two" });
-    // Then expect the disabled option to have the correct aria attributes
+    click(r.age);
+    const optionTwo = r.getByRole("option", { name: "Two" });
+    // Then the disabled option to have the correct aria attributes
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
     // And when clicking on that option
     click(optionTwo);
     // Then the `onSelect` callback is not called
     expect(onSelect).not.toHaveBeenCalled();
+    // And using select would have failed
+    expect(() => select(r.age, "Two")).toThrow("Cannot select disabled option Two");
   });
 
   it("can disable options with tooltips", async () => {
     const onSelect = jest.fn();
     // Given a Select Field with a disabled option
-    const { age, getByRole } = await render(
+    const r = await render(
       <SelectField
         label="Age"
         value="1"
         options={options}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
         disabledOptions={[{ value: "2", reason: "Example Tooltip" }]}
         onSelect={onSelect}
       />,
     );
 
     // When opening the menu
-    fireEvent.click(age());
-    const optionTwo = getByRole("option", { name: "Two" });
+    click(r.age);
+    const optionTwo = r.getByRole("option", { name: "Two" });
 
     // Then expect the disabled option to be wrapped in the tooltip text
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
@@ -180,21 +209,32 @@ describe("SelectFieldTest", () => {
 
   it("can load options via options prop callback", async () => {
     // Given a Select Field with options that are loaded via a callback
-    const r = await render(
-      <TestSelectField
-        label="Age"
-        value="1"
-        options={{ initial: [options[0]], load: async () => ({ options }) }}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
-        data-testid="age"
-      />,
-    );
+    function Test() {
+      const [loaded, setLoaded] = useState<HasIdAndName[]>([]);
+      return (
+        <SelectField
+          label="Age"
+          value="1"
+          options={{
+            current: options[0],
+            load: async () => {
+              await sleep(0);
+              setLoaded(options);
+            },
+            options: loaded,
+          }}
+          onSelect={() => {}}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />
+      );
+    }
+    const r = await render(<Test />);
     // When opening the menu
-    fireEvent.click(r.age());
+    click(r.age);
     // Then expect to see the initial option and loading state
     expect(r.getAllByRole("option")).toHaveLength(1);
-    expect(r.loadingDots()).toBeTruthy();
+    expect(r.loadingDots).toBeTruthy();
     // And when waiting for the promise to resolve
     await wait();
     // Then expect the rest of the options to be loaded in and the loading state to be removed
@@ -211,17 +251,52 @@ describe("SelectFieldTest", () => {
         options={[options[0]]}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // When opening the menu
-    fireEvent.click(r.age());
+    click(r.age);
     // Then expect to see the initial option
     expect(r.getAllByRole("option")).toHaveLength(1);
     // And when changing the options
     click(r.updateOptions);
     // Then expect the rest of the options to be loaded in
     expect(r.getAllByRole("option")).toHaveLength(3);
+  });
+
+  it("uses initial value when other input changes the state for lazy load options", async () => {
+    // Given two selectField with options that are lazy loaded
+    const selectedOption = options[0];
+    const r = await render(
+      <TestMultipleSelectField
+        label="Age"
+        value={selectedOption.id}
+        unsetLabel="-"
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+      />,
+    );
+    // Then both have the same value
+    expect(r.age_0).toHaveValue("One");
+    expect(r.age_1).toHaveValue("One");
+    // When opening the first select menu
+    await clickAndWait(r.age_0);
+    // And all options is loaded
+    expect(getOptions(r.age_0)).toHaveLength(4);
+    // And change the value of the first select
+    select(r.age_0, "Two");
+    // Then expect the second select to have the same value
+    expect(r.age_0).toHaveValue("Two");
+    expect(r.age_1).toHaveValue("Two");
+    // When we open the second select menu
+    await clickAndWait(r.age_1);
+    // And all options is loaded
+    expect(getOptions(r.age_1)).toHaveLength(4);
+    // And unset the value of the second select
+    select(r.age_1, "-");
+    // Then expect the first select to have the same value
+    expect(r.age_0).toHaveValue("-");
+    expect(r.age_1).toHaveValue("-");
   });
 
   it("can set value when options are loaded later", async () => {
@@ -233,15 +308,14 @@ describe("SelectFieldTest", () => {
         options={[] as HasIdAndName[]}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        data-testid="age"
       />,
     );
     // The input value will initially be blank
-    expect(r.age()).toHaveValue("");
+    expect(r.age).toHaveValue("");
     // And when options are loaded
     click(r.updateOptions);
     // Then expect the input value to be updated based on field's value
-    expect(r.age()).toHaveValue("One");
+    expect(r.age).toHaveValue("One");
   });
 
   it("can define and select 'unsetLabel' when options are an array", async () => {
@@ -258,10 +332,8 @@ describe("SelectFieldTest", () => {
         onSelect={onSelect}
       />,
     );
-    // When we click the field to open the menu
-    r.age().click();
-    // And we select the 'unset' option
-    click(r.getByRole("option", { name: "None" }));
+    // When we select the 'unset' option
+    select(r.age, "None");
     // Then onSelect was called
     expect(onSelect).toHaveBeenCalledWith(undefined, undefined);
   });
@@ -269,21 +341,27 @@ describe("SelectFieldTest", () => {
   it("can define and select 'unsetLabel' when options are lazily loaded", async () => {
     const onSelect = jest.fn();
     // Given a Select Field with options that are loaded lazily
-    const r = await render(
-      <TestSelectField
-        label="Age"
-        value="1"
-        unsetLabel="None"
-        options={{ initial: [labelValueOptions[0]], load: async () => ({ options: labelValueOptions }) }}
-        getOptionLabel={(o) => o.label}
-        getOptionValue={(o) => o.value}
-        onSelect={onSelect}
-      />,
-    );
+    function Test() {
+      const [loaded, setLoaded] = useState<HasLabelAndValue[]>([]);
+      return (
+        <TestSelectField
+          label="Age"
+          value="1"
+          unsetLabel="None"
+          options={{
+            current: labelValueOptions[0],
+            load: async () => setLoaded(labelValueOptions),
+            options: loaded,
+          }}
+          getOptionLabel={(o) => o.label}
+          getOptionValue={(o) => o.value}
+          onSelect={onSelect}
+        />
+      );
+    }
+    const r = await render(<Test />);
     // When we click the field to open the menu
-    r.age().click();
-    // Wait for the promise to finish
-    await wait();
+    await clickAndWait(r.age);
     // The 'unset' option is in the menu and we select it
     click(r.getByRole("option", { name: "None" }));
     // Then onSelect was called
@@ -293,17 +371,31 @@ describe("SelectFieldTest", () => {
   it("can initially be set to the 'unsetLabel' option", async () => {
     // Given a Select Field with the value set to `undefined`
     const r = await render(
-      <TestSelectField
+      <SelectField
         label="Age"
-        value={undefined}
+        value={undefined as string | undefined}
         unsetLabel="None"
-        options={labelValueOptions}
-        getOptionLabel={(o) => o.label}
-        getOptionValue={(o) => o.value}
+        options={options}
+        onSelect={() => {}}
       />,
     );
     // The input value will be set to the `unsetLabel`
-    expect(r.age()).toHaveValue("None");
+    expect(r.age).toHaveValue("None");
+  });
+
+  it("can initially be set to the 'unsetLabel' option when lazy loading options", async () => {
+    // Given a Select Field with the value set to `undefined`
+    const r = await render(
+      <SelectField<HasIdAndName, string>
+        label="Age"
+        value={undefined}
+        unsetLabel="None"
+        options={{ current: undefined, load: async () => {}, options: undefined }}
+        onSelect={() => {}}
+      />,
+    );
+    // The input value will be set to the `unsetLabel`
+    expect(r.age).toHaveValue("None");
   });
 
   it("can customize the unset value in the menu", async () => {
@@ -320,16 +412,64 @@ describe("SelectFieldTest", () => {
       />,
     );
     // When we click the field to open the menu
-    r.age().click();
+    click(r.age);
     // Then the `unset` option in the menu should reflect the custom value we passed in
     expect(r.getAllByRole("option").map((o) => o.textContent)).toMatchInlineSnapshot(`
-      Array [
+      [
         "Unset Label",
         "One",
         "Two",
         "Three",
       ]
     `);
+  });
+
+  it("supports boolean values properly", async () => {
+    // Given a select field with boolean and an undefined values
+    const onSelect = jest.fn();
+    type Option = { id: undefined | boolean; name: string };
+    function Test() {
+      const [value, setValue] = useState<boolean | undefined>(true);
+      return (
+        <SelectField<Option, boolean | undefined>
+          label="label"
+          value={value}
+          onSelect={(value) => {
+            onSelect(value);
+            setValue(value);
+          }}
+          options={[
+            { id: undefined, name: "Undefined" },
+            { id: false, name: "False" },
+            { id: true, name: "True" },
+          ]}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />
+      );
+    }
+    const r = await render(<Test />);
+
+    // When selecting the `false` option
+    click(r.label);
+    click(r.getByRole("option", { name: "False" }));
+
+    // Then `onSelect` is triggered with `false`
+    expect(onSelect.mock.calls[0][0]).toBe(false);
+
+    // When selecting the `true` option
+    click(r.label);
+    click(r.getByRole("option", { name: "True" }));
+
+    // Then `onSelect` is triggered with `true`
+    expect(onSelect.mock.calls[1][0]).toBe(true);
+
+    // When selecting the `undefined` option
+    click(r.label);
+    click(r.getByRole("option", { name: "Undefined" }));
+
+    // Then `onSelect` is triggered with `undefined`
+    expect(onSelect.mock.calls[2][0]).toBe(undefined);
   });
 
   // Used to validate the `unset` option can be applied to non-`HasIdAndName` options
@@ -367,4 +507,46 @@ describe("SelectFieldTest", () => {
       </>
     );
   }
+
+  function TestMultipleSelectField<O extends HasIdAndName, V extends Value>(
+    props: Optional<SelectFieldProps<O, V>, "onSelect">,
+  ): JSX.Element {
+    const [selected, setSelected] = useState<V | undefined>(props.value);
+    const init = options.find((o) => o.id === selected) as O;
+    const [loaded, setLoaded] = useState<O[]>([]);
+    return (
+      <>
+        <SelectField<O, V>
+          {...props}
+          value={selected}
+          onSelect={setSelected}
+          unsetLabel={"-"}
+          options={{
+            current: init,
+            load: async () => {
+              await sleep(1500);
+              setLoaded(props.options as O[]);
+            },
+            options: loaded,
+          }}
+        />
+        <SelectField<O, V>
+          {...props}
+          value={selected}
+          onSelect={setSelected}
+          unsetLabel={"-"}
+          options={{
+            current: init,
+            load: async () => {
+              await sleep(1500);
+              setLoaded(props.options as O[]);
+            },
+            options: loaded,
+          }}
+        />
+      </>
+    );
+  }
 });
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

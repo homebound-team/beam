@@ -27,6 +27,7 @@ export type Status = {
 };
 
 export type Project = {
+  name: string;
   id: string;
   internalUser: InternalUser;
   market: Market;
@@ -36,6 +37,18 @@ export type Project = {
   isTest: boolean;
   doNotUse: boolean;
   isStale: boolean;
+};
+
+export type Cohort = {
+  id: string;
+  name: string;
+  projects: Project[];
+};
+
+export type Development = {
+  id: string;
+  name: string;
+  cohorts: Cohort[];
 };
 
 export type ProjectFilter = {
@@ -51,6 +64,7 @@ export type ProjectFilter = {
   dateRange?: DateRangeFilterValue<string>;
   numberRange?: NumberRangeFilterValue;
   isStale?: boolean | null;
+  projectCohortDevelopment?: string[];
 };
 
 export type StageFilter = NonNullable<FilterDefs<ProjectFilter>["stage"]>;
@@ -69,10 +83,24 @@ export const stageFilter: StageFilter = multiFilter({
   getOptionLabel: (s) => s.name,
 });
 
+export const stageFilterDisabledOptions: StageFilter = multiFilter({
+  options: stageOptions,
+  getOptionValue: (s) => s.code,
+  getOptionLabel: (s) => s.name,
+  disabledOptions: [{ value: Stage.StageOne, reason: "I have a reason to be disabled." }, Stage.StageTwo],
+});
+
 export const stageSingleFilter: StageSingleFilter = singleFilter({
   options: stageOptions,
   getOptionValue: (s) => s.code,
   getOptionLabel: (s) => s.name,
+});
+
+export const stageFilterWithNothingSelectedText: StageSingleFilter = singleFilter({
+  options: stageOptions,
+  getOptionValue: (s) => s.code,
+  getOptionLabel: (s) => s.name,
+  nothingSelectedText: "All Stages",
 });
 
 export const taskDueFilter: DateFilter = dateFilter({

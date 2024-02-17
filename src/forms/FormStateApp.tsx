@@ -24,10 +24,12 @@ import {
   StaticField,
 } from "src/forms";
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
+import { BoundTreeSelectField } from "src/forms/BoundTreeSelectField";
 import { FormLines } from "src/forms/FormLines";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
-import { CheckboxGroupItemOption } from "src/inputs";
+import { CheckboxGroupItemOption, NestedOption } from "src/inputs";
+import { HasIdAndName } from "src/types";
 
 export function FormStateApp() {
   // Simulate getting the initial form state back from a server call
@@ -87,6 +89,22 @@ export function FormStateApp() {
     { value: "a:5", label: "Turtle" },
   ];
 
+  const genres: NestedOption<HasIdAndName>[] = [
+    {
+      id: "g:1",
+      name: "Action",
+      children: [
+        {
+          id: "g:2",
+          name: "Action Adventure",
+          children: [{ id: "g:3", name: "Action Adventure Comedy" }],
+        },
+        { id: "g:4", name: "Action Comedy" },
+      ],
+    },
+    { id: "g:5", name: "Comedy", children: [{ id: "g:6", name: "Comedy Drama" }] },
+  ];
+
   return (
     <Observer>
       {() => (
@@ -108,6 +126,8 @@ export function FormStateApp() {
               <FormDivider />
               <BoundSelectField field={formState.favoriteSport} options={sports} />
               <BoundMultiSelectField field={formState.favoriteShapes} options={shapes} />
+              <BoundTreeSelectField field={formState.favoriteGenres} options={genres} />
+              <FormDivider />
               <BoundCheckboxGroupField field={formState.favoriteColors} options={colors} />
               <BoundToggleChipGroupField field={formState.animals} options={animals} />
               <FormDivider />
@@ -181,6 +201,7 @@ export const formConfig: ObjectConfig<AuthorInput> = {
   favoriteSport: { type: "value" },
   favoriteColors: { type: "value", rules: [required] },
   favoriteShapes: { type: "value", rules: [required] },
+  favoriteGenres: { type: "value", rules: [required] },
   books: {
     type: "list",
     rules: [({ value }) => ((value || []).length === 0 ? "Empty" : undefined)],

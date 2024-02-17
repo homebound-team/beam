@@ -7,7 +7,6 @@ import { withDimensions } from "src/utils/sb";
 
 export default {
   component: ButtonDatePicker,
-  title: "Workspace/Components/Button Date Picker",
   decorators: [withDimensions()],
 } as Meta;
 

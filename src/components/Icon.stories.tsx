@@ -3,7 +3,6 @@ import { Icon as IconComponent, IconProps } from "src";
 import { Css, Palette } from "src/Css";
 
 export default {
-  title: "Workspace/Components/Icon",
   component: IconComponent,
   args: { color: "currentColor" },
   argTypes: {
@@ -22,6 +21,7 @@ export const Icon = (props: IconProps) => {
     "x",
     "loader",
     "linkExternal",
+    "link",
     "upload",
     "download",
     "checkboxChecked",
@@ -50,6 +50,11 @@ export const Icon = (props: IconProps) => {
     "kanban",
     "expand",
     "collapse",
+    "undoCircle",
+    "drag",
+    "move",
+    "add",
+    "remove",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
@@ -60,6 +65,8 @@ export const Icon = (props: IconProps) => {
     "xCircle",
     "flag",
     "outlineFlag",
+    "circle",
+    "checkCircleFilled",
   ];
   const arrowIcons: IconProps["icon"][] = [
     "chevronsDown",
@@ -81,9 +88,24 @@ export const Icon = (props: IconProps) => {
     "arrowFromLeft",
     "arrowFromRight",
     "arrowFromTop",
+    "triangleLeft",
+    "triangleRight",
+    "triangleUp",
+    "triangleDown",
+    "subDirectoryRight",
   ];
-  const mediaIcons: IconProps["icon"][] = ["camera", "fileBlank", "folder", "image", "file", "images", "openBook"];
+  const mediaIcons: IconProps["icon"][] = [
+    "camera",
+    "email",
+    "fileBlank",
+    "folder",
+    "image",
+    "file",
+    "images",
+    "openBook",
+  ];
   const miscIcons: IconProps["icon"][] = [
+    "inbox",
     "dollar",
     "userCircle",
     "calendar",
@@ -110,6 +132,26 @@ export const Icon = (props: IconProps) => {
     "abacus",
     "hardHat",
     "task",
+    "checklistComplete",
+    "checklistNotComplete",
+    "criticalPath",
+    "faucet",
+    "bed",
+    "sqFeet",
+    "ruler",
+    "palette",
+    "bath",
+    "car",
+    "basement",
+    "cube",
+    "cart",
+    "programChange",
+    "architectural",
+    "structural",
+    "mep",
+    "designPackage",
+    "updateDesignPackage",
+    "exteriorStyle",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",

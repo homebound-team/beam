@@ -8,7 +8,6 @@ import { FormLines } from "..";
 
 export default {
   component: TextAreaField,
-  title: "Workspace/Inputs/Text Area",
   parameters: {
     design: {
       type: "figma",
@@ -38,8 +37,11 @@ export function TextAreaStyles() {
             helperText="Some really long helper text that we expect to wrap."
           />
           <ValidationTextArea value="Not enough characters" />
-          <TextField label="Regular Field For Reference" value="value" onChange={() => { }} />
+          <TextField label="Regular Field For Reference" value="value" onChange={() => {}} />
         </FormLines>
+
+        <h1 css={Css.lg.$}>Full Width</h1>
+        <TestTextArea label="Description" value="An example description text." fullWidth />
 
         <h1 css={Css.lg.$}>Modified for Blueprint To Do Title</h1>
         <TestTextArea

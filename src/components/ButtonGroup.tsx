@@ -1,8 +1,8 @@
-import React, { ReactNode, useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
-import { Css } from "src/Css";
+import { Css, Properties } from "src/Css";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -15,7 +15,9 @@ export interface ButtonGroupProps {
 
 export type ButtonGroupButton = {
   icon?: IconProps["icon"];
-  text?: string;
+  iconColor?: IconProps["color"];
+  iconInc?: IconProps["inc"];
+  text?: ReactNode;
   onClick?: VoidFunction;
   /** Disables the button. Pass a ReactNode to disable the button and show a tooltip */
   disabled?: boolean | ReactNode;
@@ -30,7 +32,7 @@ export function ButtonGroup(props: ButtonGroupProps) {
   const tid = useTestIds(props, "buttonGroup");
   return (
     // Adding `line-height: 0` prevent inheriting line-heights that might throw off sizing within the button group.
-    <div {...tid} css={Css.df.lh(0).add(sizeStyles[size]).$}>
+    <div {...tid} css={Css.df.lh(0).add({ ...sizeStyles[size] }).$}>
       {buttons.map(({ disabled: buttonDisabled, ...buttonProps }, i) => (
         // Disable the button if the ButtonGroup is disabled or if the current button is disabled.
         <GroupButton key={i} {...buttonProps} disabled={disabled || buttonDisabled} size={size} {...tid} />
@@ -44,7 +46,7 @@ interface GroupButtonProps extends ButtonGroupButton {
 }
 
 function GroupButton(props: GroupButtonProps) {
-  const { icon, text, active, onClick: onPress, disabled, size, tooltip, ...otherProps } = props;
+  const { icon, iconInc, iconColor, text, active, onClick: onPress, disabled, size, tooltip, ...otherProps } = props;
   const ariaProps = { onPress, isDisabled: !!disabled, ...otherProps };
   const ref = useRef(null);
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
@@ -71,9 +73,11 @@ function GroupButton(props: GroupButtonProps) {
               ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
               ...(icon ? iconStyles[size] : {}),
             }}
-            {...tid[defaultTestId(text ?? icon ?? "button")]}
+            {...tid[defaultTestId((typeof text === "string" && text) || icon || "button")]}
           >
-            {icon && <Icon icon={icon} />}
+            {icon && (
+              <Icon xss={Css.if(!!text).mrPx(4).$} icon={icon} color={disabled ? undefined : iconColor} inc={iconInc} />
+            )}
             {text}
           </button>
         ),
@@ -99,13 +103,13 @@ function getButtonStyles() {
   };
 }
 
-const sizeStyles: Record<ButtonGroupSize, {}> = {
+const sizeStyles: Record<ButtonGroupSize, Properties> = {
   xs: Css.hPx(28).$,
   sm: Css.hPx(32).$,
   md: Css.hPx(40).$,
 };
 
-const iconStyles: Record<ButtonGroupSize, {}> = {
+const iconStyles: Record<ButtonGroupSize, Properties> = {
   xs: Css.pxPx(2).$,
   sm: Css.pxPx(4).$,
   md: Css.px1.$,

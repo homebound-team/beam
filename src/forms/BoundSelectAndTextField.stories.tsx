@@ -7,7 +7,6 @@ import { Css } from "src/Css";
 
 export default {
   component: BoundSelectAndTextField,
-  title: "Workspace/Inputs/BoundSelectAndTextField",
 } as Meta;
 
 export function Example() {

@@ -1,4 +1,3 @@
-import React from "react";
 import { DayPicker, Matcher } from "react-day-picker";
 import { Day } from "src/components/internal/DatePicker/Day";
 import { Header, YearSkipHeader } from "src/components/internal/DatePicker/Header";
