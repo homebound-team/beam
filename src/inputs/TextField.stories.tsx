@@ -17,24 +17,6 @@ export default {
   },
 } as Meta<TextFieldProps<any>>;
 
-export const ForFigma = {
-  argTypes: {
-    errorMsg: { control: "text" },
-    labelStyle: { control: "select", options: ["above", "left", "inline", "hidden"] },
-  },
-  args: {
-    label: "First Name",
-    errorMsg: undefined,
-    helperText: "Helper text",
-    value: "John",
-    disabled: false,
-    readOnly: false,
-    compact: false,
-    labelStyle: "above",
-    clearable: false,
-  },
-};
-
 export function TextFieldStyles() {
   return (
     <div css={Css.df.fdc.gap5.$}>
