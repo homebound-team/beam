@@ -281,6 +281,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     } else {
       setFieldState((prevState) => ({
         ...prevState,
+        searchValue: "",
         inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly),
       }));
     }
