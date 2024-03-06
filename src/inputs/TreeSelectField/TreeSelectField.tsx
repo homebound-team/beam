@@ -316,7 +316,11 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     }
     if (isOpen) {
       // reset the input field to allow the user to start typing to filter
-      setFieldState((prevState) => ({ ...prevState, inputValue: "" }));
+      setFieldState((prevState) => ({
+        ...prevState,
+        inputValue: "",
+        filteredOptions: initialOptions.flatMap((o) => levelOptions(o, 0)),
+      }));
     }
   }
 
