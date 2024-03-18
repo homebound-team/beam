@@ -11,6 +11,7 @@ import { ListBox } from "src/inputs/internal/ListBox";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { getFieldWidth } from "src/inputs/utils";
+import { useDebounce } from "use-debounce";
 
 /** Base props for either `SelectField` or `MultiSelectField`. */
 export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
@@ -272,6 +273,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     onSelectionChange,
   });
 
+  const [debouncedSearch] = useDebounce(searchValue, 300);
+
   // Reset inputValue when closed or selected changes
   useEffect(() => {
     if (state.isOpen && multiselect && !onSearch) {
@@ -292,8 +295,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   // Call on search callback when the user types in the input field
   useEffect(() => {
-    onSearch?.(fieldState.searchValue ?? "");
-  }, [onSearch, fieldState.searchValue]);
+    onSearch?.(debouncedSearch ?? "");
+  }, [onSearch, debouncedSearch]);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
   const {
