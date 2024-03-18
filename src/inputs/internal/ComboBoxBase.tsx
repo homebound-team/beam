@@ -61,6 +61,8 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
   hideErrorMessage?: boolean;
   /* Allows input to wrap to multiple lines */
   multiline?: boolean;
+  /* Callback for user searches */
+  onSearch?: (search: string) => void;
 }
 
 /**
@@ -90,6 +92,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     getOptionValue: propOptionValue,
     getOptionMenuLabel: propOptionMenuLabel,
     fullWidth = fieldProps?.fullWidth ?? false,
+    onSearch,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
@@ -271,7 +274,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   // Reset inputValue when closed or selected changes
   useEffect(() => {
-    if (state.isOpen && multiselect) {
+    if (state.isOpen && multiselect && !onSearch) {
       // While the multiselect is open, let the user keep typing
       setFieldState((prevState) => ({
         ...prevState,
@@ -285,7 +288,12 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly),
       }));
     }
-  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly]);
+  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly, onSearch]);
+
+  // Call on search callback when the user types in the input field
+  useEffect(() => {
+    onSearch?.(fieldState.searchValue ?? "");
+  }, [onSearch, fieldState.searchValue]);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
   const {
