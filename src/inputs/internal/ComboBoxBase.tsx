@@ -11,6 +11,7 @@ import { ListBox } from "src/inputs/internal/ListBox";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { getFieldWidth } from "src/inputs/utils";
+import { useDebounce } from "use-debounce";
 
 /** Base props for either `SelectField` or `MultiSelectField`. */
 export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
@@ -61,6 +62,8 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
   hideErrorMessage?: boolean;
   /* Allows input to wrap to multiple lines */
   multiline?: boolean;
+  /* Callback for user searches */
+  onSearch?: (search: string) => void;
 }
 
 /**
@@ -90,6 +93,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     getOptionValue: propOptionValue,
     getOptionMenuLabel: propOptionMenuLabel,
     fullWidth = fieldProps?.fullWidth ?? false,
+    onSearch,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
@@ -269,8 +273,11 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     onSelectionChange,
   });
 
+  const [debouncedSearch] = useDebounce(searchValue, 300);
+
   // Reset inputValue when closed or selected changes
   useEffect(() => {
+    if (debouncedSearch) return;
     if (state.isOpen && multiselect) {
       // While the multiselect is open, let the user keep typing
       setFieldState((prevState) => ({
@@ -285,7 +292,12 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly),
       }));
     }
-  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly]);
+  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly, debouncedSearch]);
+
+  // Call on search callback when the user types in the input field
+  useEffect(() => {
+    onSearch?.(debouncedSearch ?? "");
+  }, [onSearch, debouncedSearch]);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
   const {
