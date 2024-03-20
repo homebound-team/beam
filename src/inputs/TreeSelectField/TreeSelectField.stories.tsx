@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { within } from "@storybook/testing-library";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Css } from "src/Css";
 import { Value } from "src/inputs/index";
 import { TreeSelectField, TreeSelectFieldProps } from "src/inputs/TreeSelectField/TreeSelectField";
@@ -215,6 +215,41 @@ export function AsyncOptions() {
       label="Favorite League"
       placeholder="Select a league"
     />
+  );
+}
+export function OptionsChangeAfterFirstRenderExample() {
+  const [options, setOptions] = useState<any[]>(["1"]);
+  const [selectedOptions, setSelectedOptions] = useState<string[] | undefined>([]);
+  useEffect(() => {
+    setOptions([
+      {
+        id: "1",
+        name: "Parent 1",
+        children: [
+          { id: "1.1", name: "Child 1.1" },
+          { id: "1.2", name: "Child 1.2" },
+        ],
+      },
+      {
+        id: "2",
+        name: "Parent 2",
+        children: [
+          { id: "2.1", name: "Child 2.1" },
+          { id: "2.2", name: "Child 2.2" },
+        ],
+      },
+    ]);
+  }, []);
+
+  return (
+    <>
+      <TreeSelectField
+        values={selectedOptions}
+        label="Example"
+        options={options}
+        onSelect={(option) => setSelectedOptions(option.all.values)}
+      />
+    </>
   );
 }
 
