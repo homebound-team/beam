@@ -31,3 +31,25 @@ export function Default() {
     </div>
   );
 }
+
+export function WithYearControlHeader() {
+  const [range, setRange] = useState<DateRange | undefined>({ from: jan1, to: jan19 });
+  return (
+    <div>
+      <DateRangePicker
+        useYearPicker
+        range={range}
+        onSelect={setRange}
+        dottedDays={[jan1, jan2, jan29]}
+        disabledDays={[jan10]}
+      />
+      <div css={Css.mt1.$}>
+        <strong>Selected Range:</strong>
+        <span css={Css.ml1.$}>
+          {range?.from && format(new Date(range?.from), "MM/dd/yyyy")} -{" "}
+          {range?.to && format(new Date(range?.to), "MM/dd/yyyy")}
+        </span>
+      </div>
+    </div>
+  );
+}

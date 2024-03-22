@@ -54,6 +54,8 @@ export interface DateFieldBaseProps
   mode: DateFieldMode;
   /** Range filters should only allow a full DateRange or nothing */
   isRangeFilterField?: boolean;
+  /** Render header that skips years in addition to months */
+  useYearPicker?: boolean;
 }
 
 export interface DateSingleFieldBaseProps extends DateFieldBaseProps {
@@ -89,6 +91,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     defaultOpen,
     mode,
     isRangeFilterField = false,
+    useYearPicker = false,
     ...others
   } = props;
 
@@ -330,7 +333,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
                     setInputValue(formatDateRange(dr, dateFormats.short) ?? "");
                     onChange(dr);
                   }}
-                  useYearPicker={isRangeFilterField}
+                  useYearPicker={isRangeFilterField || useYearPicker}
                   {...tid.datePicker}
                 />
               ) : (
@@ -342,6 +345,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
                     setInputValue(formatDate(d, dateFormats.short) ?? "");
                     onChange(d);
                   }}
+                  useYearPicker={useYearPicker}
                   {...tid.datePicker}
                 />
               )}
