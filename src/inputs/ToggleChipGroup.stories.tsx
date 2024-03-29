@@ -24,7 +24,26 @@ export function ToggleChipGroups() {
   return (
     <ToggleChipGroup
       label="Select Markets"
-      hideLabel
+      options={options}
+      values={selectedValues}
+      onChange={setSelectedValues}
+    />
+  );
+}
+
+export function ToggleChipGroupsLeft() {
+  const [selectedValues, setSelectedValues] = useState<string[]>(["m:2"]);
+  const options = [
+    { label: "Bahamas", value: "m:1" },
+    { label: "Southern California", value: "m:2" },
+    { label: "Northern California", value: "m:3" },
+    { label: "South Bay CA", value: "m:4" },
+    { label: "Austin", value: "m:5" },
+  ];
+  return (
+    <ToggleChipGroup
+      label="Select Markets"
+      labelStyle="left"
       options={options}
       values={selectedValues}
       onChange={setSelectedValues}
