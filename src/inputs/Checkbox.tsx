@@ -5,6 +5,11 @@ import { CheckboxBase } from "src/inputs/CheckboxBase";
 
 export interface CheckboxProps {
   label: string;
+  /** If false this will be wrap in a div element instead of the label
+   * Expects implementer to wrap within a label element to work properly
+   * @default true
+   */
+  withLabelElement?: boolean;
   checkboxOnly?: boolean;
   selected: boolean | "indeterminate";
   /** Handler that is called when the element's selection state changes. */
