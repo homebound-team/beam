@@ -22,12 +22,7 @@ export function ToggleChipGroups() {
     { label: "Austin", value: "m:5" },
   ];
   return (
-    <ToggleChipGroup
-      label="Select Markets"
-      options={options}
-      values={selectedValues}
-      onChange={setSelectedValues}
-    />
+    <ToggleChipGroup label="Select Markets" options={options} values={selectedValues} onChange={setSelectedValues} />
   );
 }
 
