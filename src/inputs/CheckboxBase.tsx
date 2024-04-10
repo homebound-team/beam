@@ -26,6 +26,11 @@ export interface CheckboxBaseProps extends BeamFocusableProps {
   checkboxOnly?: boolean;
   errorMsg?: string;
   helperText?: string | ReactNode;
+  /** If false this will be wrap in a div element instead of the label
+   * Expects implementer to wrap within a label element to work properly
+   * @default true
+   */
+  withLabelElement?: boolean;
 }
 
 export function CheckboxBase(props: CheckboxBaseProps) {
@@ -34,20 +39,21 @@ export function CheckboxBase(props: CheckboxBaseProps) {
     description,
     isDisabled = false,
     isIndeterminate = false,
-    isSelected,
     inputProps,
     label,
     errorMsg,
     helperText,
     checkboxOnly = false,
+    withLabelElement = true,
   } = props;
   const ref = useRef(null);
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
-  const { hoverProps, isHovered } = useHover({ isDisabled });
   const tid = useTestIds(props, defaultTestId(label));
 
+  const Tag = withLabelElement ? "label" : "div";
+
   return (
-    <label
+    <Tag
       css={
         Css.df.cursorPointer.relative
           // Prevents accidental checkbox clicks due to label width being longer
@@ -74,7 +80,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
           {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
         </div>
       )}
-    </label>
+    </Tag>
   );
 }
 
