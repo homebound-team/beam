@@ -24,10 +24,10 @@ export function ToggleChipGroups() {
   ];
   return (
     <>
-      <p css={Css.mt2.mb2.$} >Label Above Style:</p>
+      <p css={Css.mt2.mb2.$}>Label Above Style:</p>
       <ToggleChipGroup label="Select Markets" options={options} values={selectedValues} onChange={setSelectedValues} />
       <div css={Css.m2.$} />
-      <p css={Css.mt2.mb2.$} >Label Left Style:</p>
+      <p css={Css.mt2.mb2.$}>Label Left Style:</p>
       <ToggleChipGroup
         label="Select Markets"
         labelStyle="left"
