@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
+import { Css } from "..";
 
 export default {
   component: ToggleChipGroup,
@@ -22,26 +23,18 @@ export function ToggleChipGroups() {
     { label: "Austin", value: "m:5" },
   ];
   return (
-    <ToggleChipGroup label="Select Markets" options={options} values={selectedValues} onChange={setSelectedValues} />
-  );
-}
-
-export function ToggleChipGroupsLeft() {
-  const [selectedValues, setSelectedValues] = useState<string[]>(["m:2"]);
-  const options = [
-    { label: "Bahamas", value: "m:1" },
-    { label: "Southern California", value: "m:2" },
-    { label: "Northern California", value: "m:3" },
-    { label: "South Bay CA", value: "m:4" },
-    { label: "Austin", value: "m:5" },
-  ];
-  return (
-    <ToggleChipGroup
-      label="Select Markets"
-      labelStyle="left"
-      options={options}
-      values={selectedValues}
-      onChange={setSelectedValues}
-    />
+    <>
+      <p css={Css.mt2.mb2.$} >Label Above Style:</p>
+      <ToggleChipGroup label="Select Markets" options={options} values={selectedValues} onChange={setSelectedValues} />
+      <div css={Css.m2.$} />
+      <p css={Css.mt2.mb2.$} >Label Left Style:</p>
+      <ToggleChipGroup
+        label="Select Markets"
+        labelStyle="left"
+        options={options}
+        values={selectedValues}
+        onChange={setSelectedValues}
+      />
+    </>
   );
 }
