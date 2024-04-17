@@ -19,6 +19,7 @@ type ToggleChipItemProps = {
 
 export interface ToggleChipGroupProps {
   label: string;
+  labelStyle?: "above" | "left";
   options: ToggleChipItemProps[];
   values: string[];
   onChange: (values: string[]) => void;
@@ -26,15 +27,15 @@ export interface ToggleChipGroupProps {
 }
 
 export function ToggleChipGroup(props: ToggleChipGroupProps) {
-  const { values, label, options, hideLabel } = props;
+  const { values, label, labelStyle, options, hideLabel } = props;
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
   const tid = useTestIds(props, "toggleChip");
 
   return (
-    <div {...groupProps} css={Css.relative.$}>
+    <div {...groupProps} css={Css.relative.df.fdc.if(labelStyle === "left").fdr.maxw100.$}>
       <Label label={label} {...labelProps} hidden={hideLabel} />
-      <div css={Css.df.gap1.add("flexWrap", "wrap").$}>
+      <div css={Css.df.gap1.add("flexWrap", "wrap").if(labelStyle === "left").ml2.$}>
         {options.map((o) => (
           <ToggleChip
             key={o.value}

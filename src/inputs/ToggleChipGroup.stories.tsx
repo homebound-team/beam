@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react";
 import { useState } from "react";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
+import { Css } from "..";
 
 export default {
   component: ToggleChipGroup,
@@ -22,12 +23,18 @@ export function ToggleChipGroups() {
     { label: "Austin", value: "m:5" },
   ];
   return (
-    <ToggleChipGroup
-      label="Select Markets"
-      hideLabel
-      options={options}
-      values={selectedValues}
-      onChange={setSelectedValues}
-    />
+    <>
+      <p css={Css.mt2.mb2.$}>Label Above Style:</p>
+      <ToggleChipGroup label="Select Markets" options={options} values={selectedValues} onChange={setSelectedValues} />
+      <div css={Css.m2.$} />
+      <p css={Css.mt2.mb2.$}>Label Left Style:</p>
+      <ToggleChipGroup
+        label="Select Markets"
+        labelStyle="left"
+        options={options}
+        values={selectedValues}
+        onChange={setSelectedValues}
+      />
+    </>
   );
 }
