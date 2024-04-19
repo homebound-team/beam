@@ -164,7 +164,7 @@ export function Tabs<V extends string>(props: TabsProps<V, AnyObject> | RouteTab
   }
 
   return (
-    <div css={{ ...Css.df.aic.$, ...(includeBottomBorder ? { ...Css.bb.bGray200.$ } : {}) }}>
+    <div css={{ ...Css.df.aic.overflowAuto.nowrap.gap1.$, ...(includeBottomBorder ? { ...Css.bb.bGray200.$ } : {}) }}>
       {/* Do not show if we should hide the tabs */}
       {!hideTabs(props) && (
         <div ref={ref} css={Css.dif.gap1.asfe.$} aria-label={ariaLabel} role="tablist" {...tid}>

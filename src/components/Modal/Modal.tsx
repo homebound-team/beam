@@ -9,6 +9,7 @@ import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 import { ModalProvider } from "./ModalContext";
+import { useBreakpoint } from "src/hooks";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl" | "xxl";
 
@@ -68,6 +69,7 @@ export function Modal(props: ModalProps) {
   const modalHeaderRef = useRef<HTMLHeadingElement | null>(null);
   const testId = useTestIds({}, testIdPrefix);
   usePreventScroll();
+  const { sm } = useBreakpoint();
 
   if (api) {
     api.current = { setSize: (size = "md") => setSize(getSize(size)) };
@@ -116,7 +118,10 @@ export function Modal(props: ModalProps) {
                     .df.fdc.wPx(width)
                     .mhPx(defaultMinHeight)
                     .if(isFixedHeight)
-                    .hPx(height).$
+                    .hPx(height)
+                    .if(sm)
+                    .vh100.add("width", "100vw")
+                    .maxh("none").br0.$
                 }
                 ref={ref}
                 {...overlayProps}
