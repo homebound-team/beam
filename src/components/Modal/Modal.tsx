@@ -120,7 +120,8 @@ export function Modal(props: ModalProps) {
                     .if(isFixedHeight)
                     .hPx(height)
                     .if(sm)
-                    .vh100.add("width", "100vw").$
+                    .vh100.add("width", "100vw")
+                    .maxh("none").br0.$
                 }
                 ref={ref}
                 {...overlayProps}
