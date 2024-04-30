@@ -138,7 +138,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     // Though, it is possible that the `options` prop has changed, which is a dependency on this `useMemo`.
     // That could trigger an unnecessary new reference for `selectedOptions`, and cause additional renders or unexpected state changes.
     // We should avoid updating `selectedOptions` unless `values` has actually changed.
-    if (!equal(values.sort(), selectedOptionsRef.current.map(getOptionValue).sort())) {
+    if (!equal([...values].sort(), selectedOptionsRef.current.map(getOptionValue).sort())) {
       selectedOptionsRef.current = options.filter((o) => values.includes(getOptionValue(o)));
     }
 
