@@ -69,6 +69,7 @@ export const Icon = (props: IconProps) => {
     "checkCircleFilled",
     "loaderCircle",
     "circleOutline",
+    "bxTime",
   ];
   const arrowIcons: IconProps["icon"][] = [
     "chevronsDown",
@@ -154,6 +155,7 @@ export const Icon = (props: IconProps) => {
     "designPackage",
     "updateDesignPackage",
     "exteriorStyle",
+    "bxLockOpenAlt",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",

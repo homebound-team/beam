@@ -63,6 +63,33 @@ describe("BoundCheckboxField", () => {
     click(r.isAvailable);
     // Then the callback should be triggered with the current value
     expect(autoSave).toBeCalledWith(false);
+    expect(autoSave).toBeCalledTimes(1);
+    // And when blur is triggered
+    blur(r.isAvailable);
+    // Then the callback should not be triggered with the current value
+    expect(autoSave).toBeCalledTimes(1);
+  });
+
+  it("fires onChange callback instead of triggering autosave", async () => {
+    const onChange = jest.fn();
+    const autoSave = jest.fn();
+    // Given a BoundCheckboxField with auto save
+    const formState: ObjectState<AuthorInput> = createObjectState(
+      formConfig,
+      { isAvailable: true },
+      { maybeAutoSave: () => autoSave(formState.isAvailable.value) },
+    );
+    const r = await render(<BoundCheckboxField field={formState.isAvailable} onChange={onChange} />);
+    // When the input is clicked
+    click(r.isAvailable);
+    // Then only the onChange callback should be triggered
+    expect(onChange).toBeCalledTimes(1);
+    expect(autoSave).toBeCalledTimes(1);
+    // When the input is blurred
+    blur(r.isAvailable);
+    // Then neither callback should not be triggered
+    expect(onChange).toBeCalledTimes(1);
+    expect(autoSave).toBeCalledTimes(1);
   });
 
   it("disables when field is readonly", async () => {
