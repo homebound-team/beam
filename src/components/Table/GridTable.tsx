@@ -484,8 +484,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   return (
     <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
-        {/* If virtualized take some pixels off the width to accommodate when virtuoso's scrollbar is introduced. */}
-        {/* Otherwise a horizontal scrollbar will _always_ appear once the vertical scrollbar is needed */}
         <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual")} />
         {renders[_as](
           style,
