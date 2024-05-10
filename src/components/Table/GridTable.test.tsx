@@ -953,7 +953,7 @@ describe("GridTable", () => {
     });
   });
 
-  it("throws error if column min-width definition is set with a non-px/percentage value", async () => {
+  it("throws error if column min-width definition is set with a non-px value", async () => {
     // Given a column with an invalid `mw` value, then the render will fail
     await expect(
       render(
@@ -962,7 +962,7 @@ describe("GridTable", () => {
           rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 3 } }]}
         />,
       ),
-    ).rejects.toThrow("Beam Table column min-width definition only supports px or percentage values");
+    ).rejects.toThrow("Beam Table column minWidth definition only supports pixel units");
   });
 
   it("accepts pixel values for column min-width definition", async () => {
@@ -970,17 +970,6 @@ describe("GridTable", () => {
     const r = await render(
       <GridTable
         columns={[{ header: () => "Name", data: "Test", mw: "100px" }]}
-        rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 3 } }]}
-      />,
-    );
-    expect(r.gridTable).toBeTruthy();
-  });
-
-  it("accepts percentage values for column min-width definition", async () => {
-    // Given a column with an valid `mw` percentage value, then the render will succeed.
-    const r = await render(
-      <GridTable
-        columns={[{ header: () => "Name", data: "Test", mw: "100%" }]}
         rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 3 } }]}
       />,
     );

@@ -5,7 +5,7 @@ import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src
 import { DragData, emptyCell } from "src/components/Table/utils/utils";
 import { isFunction, newMethodMissingProxy } from "src/utils";
 import { Icon } from "src";
-import { Css, Palette } from "src/Css";
+import { Css } from "src/Css";
 
 /** Provides default styling for a GridColumn representing a Date. */
 export function column<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
@@ -135,32 +135,71 @@ export function calcColumnSizes<R extends Kinded>(
     { claimedPercentages: 0, claimedPixels: 0, totalFr: 0 },
   );
 
+  function getFrUnit(w: string | number | undefined): number | undefined {
+    return typeof w === "number"
+      ? w
+      : typeof w === "undefined"
+      ? 1
+      : typeof w === "string" && w.endsWith("fr")
+      ? Number(w.replace("fr", ""))
+      : undefined;
+  }
+
+  // In the event a column defines a fractional unit (fr) as the `w` value and a `mw` value in pixels,
+  // it is possible that the min-width value will kick in and throw off our claimedPixel and totalFr calculations.
+  // Once a `tableWidth` is defined, then we can adjust the claimedPixels and totalFr based on minWidth being present for any columns
+  let adjustedClaimedPixels = claimedPixels;
+  let adjustedTotalFr = totalFr;
+  if (tableWidth) {
+    columns.forEach(({ w, mw }) => {
+      const frUnit = getFrUnit(w);
+      if (mw === undefined || frUnit === undefined) return;
+
+      const mwPx = Number(mw.replace("px", ""));
+      const calcedWidth =
+        (tableWidth - (claimedPercentages / 100) * tableWidth - adjustedClaimedPixels) * (frUnit / adjustedTotalFr);
+      // If the calculated width is less than the minWidth, then adjust the claimedPixels and totalFr accordingly
+      if (calcedWidth < mwPx) {
+        adjustedClaimedPixels += mwPx;
+        adjustedTotalFr -= frUnit;
+      }
+    });
+  }
+
   // This is our "fake but for some reason it lines up better" fr calc
-  function fr(myFr: number): string {
+  function fr(myFr: number, mw: number): string {
     // If the tableWidth, then return a pixel value
     if (tableWidth) {
       const widthBasis = Math.max(tableWidth, tableMinWidthPx);
-      return `(${(widthBasis - (claimedPercentages / 100) * widthBasis - claimedPixels) * (myFr / totalFr)}px)`;
+      const calcedWidth =
+        (widthBasis - (claimedPercentages / 100) * widthBasis - adjustedClaimedPixels) * (myFr / adjustedTotalFr);
+
+      return `${Math.max(calcedWidth, mw)}px`;
     }
     // Otherwise return the `calc()` value
     return `((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
-  const sizes = columns.map(({ id, expandedWidth, w: _w }) => {
+  const sizes = columns.map(({ id, expandedWidth, w: _w, mw: _mw }) => {
+    // Ensure `mw` is a pixel value if defined
+    if (_mw !== undefined && !_mw.endsWith("px")) {
+      throw new Error("Beam Table column minWidth definition only supports pixel units");
+    }
+    const mw = _mw ? Number(_mw.replace("px", "")) : 0;
     const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
 
     if (typeof w === "undefined") {
-      return fr(1);
+      return fr(1, mw);
     } else if (typeof w === "string") {
       if (w.endsWith("%") || w.endsWith("px")) {
         return w;
       } else if (w.endsWith("fr")) {
-        return fr(Number(w.replace("fr", "")));
+        return fr(Number(w.replace("fr", "")), mw);
       } else {
         throw new Error("Beam Table column width definition only supports px, percentage, or fr units");
       }
     } else {
-      return fr(w);
+      return fr(w, mw);
     }
   });
 

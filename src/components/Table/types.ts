@@ -56,7 +56,7 @@ export type GridColumn<R extends Kinded> = {
    *  Example: Collapsed state shows number of books. Expanded state shows titles of books.
    */
   expandedWidth?: number | string;
-  /** The minimum width the column can shrink to */
+  /** The minimum width the column can shrink to. This must be defined in pixels */
   mw?: string;
   /** The column's default alignment for each cell. */
   align?: GridCellAlignment;
