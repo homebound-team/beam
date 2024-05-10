@@ -2,7 +2,7 @@ import memoizeOne from "memoize-one";
 import { runInAction } from "mobx";
 import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
-import { Loader } from "src/components";
+import { getTableRefWidthStyles, Loader } from "src/components";
 import { DiscriminateUnion, GridRowKind } from "src/components/index";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -20,7 +20,7 @@ import {
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { EXPANDABLE_HEADER, KEPT_GROUP, isCursorBelowMidpoint, zIndices } from "src/components/Table/utils/utils";
+import { EXPANDABLE_HEADER, isCursorBelowMidpoint, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
@@ -486,7 +486,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
         {/* If virtualized take some pixels off the width to accommodate when virtuoso's scrollbar is introduced. */}
         {/* Otherwise a horizontal scrollbar will _always_ appear once the vertical scrollbar is needed */}
-        <div ref={resizeRef} css={Css.w100.if(as === "virtual").w("calc(100% - 20px)").$} />
+        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual")} />
         {renders[_as](
           style,
           id,
@@ -713,7 +713,8 @@ function renderVirtual<R extends Kinded>(
         if (firstRowMessage) {
           if (index === 0) {
             return (
-              <div css={Css.add("gridColumn", `${columns.length} span`).$}>
+              // Ensure the fallback message is the same width as the table
+              <div css={getTableRefWidthStyles(true)}>
                 <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
               </div>
             );

@@ -301,3 +301,7 @@ export function recursivelyGetContainingRow<R extends Kinded>(
 
   return undefined;
 }
+
+export function getTableRefWidthStyles(isVirtual: boolean) {
+  return Css.w100.if(isVirtual).w("calc(100% - 20px)").$;
+}

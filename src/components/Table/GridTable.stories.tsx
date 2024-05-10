@@ -298,7 +298,17 @@ export function InfiniteScrollWithLoader() {
 export function NoRowsFallback() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-  return <GridTable columns={[nameColumn, valueColumn]} rows={[simpleHeader]} fallbackMessage="There were no rows." />;
+  return (
+    <div css={Css.wPx(500).hPx(500).$}>
+      <GridTable
+        columns={[nameColumn, valueColumn]}
+        as={"virtual"}
+        style={{ bordered: true, allWhite: true }}
+        rows={[simpleHeader]}
+        fallbackMessage="There were no rows."
+      />
+    </div>
+  );
 }
 
 // Make a `Row` ADT for a table with a header + 3 levels of nesting
