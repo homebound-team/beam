@@ -135,16 +135,6 @@ export function calcColumnSizes<R extends Kinded>(
     { claimedPercentages: 0, claimedPixels: 0, totalFr: 0 },
   );
 
-  function getFrUnit(w: string | number | undefined): number | undefined {
-    return typeof w === "number"
-      ? w
-      : typeof w === "undefined"
-      ? 1
-      : typeof w === "string" && w.endsWith("fr")
-      ? Number(w.replace("fr", ""))
-      : undefined;
-  }
-
   // In the event a column defines a fractional unit (fr) as the `w` value and a `mw` value in pixels,
   // it is possible that the min-width value will kick in and throw off our claimedPixel and totalFr calculations.
   // Once a `tableWidth` is defined, then we can adjust the claimedPixels and totalFr based on minWidth being present for any columns
@@ -152,14 +142,15 @@ export function calcColumnSizes<R extends Kinded>(
   let adjustedTotalFr = totalFr;
   if (tableWidth) {
     columns.forEach(({ w, mw }) => {
-      const frUnit = getFrUnit(w);
+      const frUnit = parseFr(w);
       if (mw === undefined || frUnit === undefined) return;
 
       const mwPx = Number(mw.replace("px", ""));
       const calcedWidth =
         (tableWidth - (claimedPercentages / 100) * tableWidth - adjustedClaimedPixels) * (frUnit / adjustedTotalFr);
-      // If the calculated width is less than the minWidth, then adjust the claimedPixels and totalFr accordingly
+      // If the calculated width is less than the minWidth, then this column will be sized via pixels instead of `fr` units.
       if (calcedWidth < mwPx) {
+        // Adjust the claimedPixels and totalFr accordingly
         adjustedClaimedPixels += mwPx;
         adjustedTotalFr -= frUnit;
       }
@@ -275,4 +266,14 @@ export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColum
       };
     };
   }) as any;
+}
+
+function parseFr(w: string | number | undefined): number | undefined {
+  return typeof w === "number"
+    ? w
+    : typeof w === "undefined"
+    ? 1
+    : typeof w === "string" && w.endsWith("fr")
+    ? Number(w.replace("fr", ""))
+    : undefined;
 }
