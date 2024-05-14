@@ -188,6 +188,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             labelProps={labelProps}
             hidden={labelStyle === "hidden" || compound}
             label={label}
+            inline={labelStyle !== "above"}
             suffix={labelSuffix}
             contrast={contrast}
             {...tid.label}
