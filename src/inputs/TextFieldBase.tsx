@@ -3,6 +3,7 @@ import React, {
   ChangeEvent,
   FocusEvent,
   InputHTMLAttributes,
+  Key,
   LabelHTMLAttributes,
   MutableRefObject,
   ReactNode,
@@ -22,8 +23,12 @@ import { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/in
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 import { getFieldWidth } from "src/inputs/utils";
+import { ListBoxToggleChip } from "./internal/ListBoxToggleChip";
+import { Value } from "./Value";
+import { ComboBoxState } from "react-stately";
+import { ComboBoxInputProps } from "./internal/ComboBoxInput";
 
-export interface TextFieldBaseProps<X>
+export interface TextFieldBaseProps<X, O>
   extends Pick<
       BeamTextFieldProps<X>,
       | "label"
@@ -58,10 +63,11 @@ export interface TextFieldBaseProps<X>
   hideErrorMessage?: boolean;
   // If set, the helper text will always be shown (usually we hide the helper text if read only)
   alwaysShowHelperText?: boolean;
+  state?: ComboBoxState<O>;
 }
 
 // Used by both TextField and TextArea
-export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldBaseProps<X>) {
+export function TextFieldBase<X, O>(props: TextFieldBaseProps<X, O>) {
   const { fieldProps, wrap = false } = usePresentationContext();
   const {
     label,
@@ -92,6 +98,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     hideErrorMessage = false,
     alwaysShowHelperText = false,
     fullWidth = fieldProps?.fullWidth ?? false,
+    state,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
@@ -241,7 +248,40 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
               {startAdornment && <span css={Css.df.aic.asc.fs0.br4.pr1.$}>{startAdornment}</span>}
-              <ElementType
+              <ul css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.$}>
+                {inputProps.value
+                  ?.toString()
+                  .split(",")
+                  .map((o) => (
+                    <ListBoxToggleChip
+                      key={String(o)}
+                      state={state}
+                      option={o as any}
+                      getOptionValue={() => o}
+                      getOptionLabel={() => String(o)}
+                      {...mergeProps(
+                        inputProps,
+                        { onBlur, onFocus: onFocusChained, onChange: onDomChange },
+                        {
+                          "aria-invalid": Boolean(errorMsg),
+                          ...(labelStyle === "hidden" ? { "aria-label": label } : {}),
+                        },
+                      )}
+                      {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
+                      ref={fieldRef as any}
+                      rows={multiline ? 1 : undefined}
+                      css={{
+                        ...fieldStyles.input,
+                        ...(inputProps.disabled ? fieldStyles.disabled : {}),
+                        ...(showHover ? fieldStyles.hover : {}),
+                        ...xss,
+                      }}
+                      {...tid}
+                      // disabled={state.disabledKeys.has(getOptionValue(o))}
+                    />
+                  ))}
+              </ul>
+              {/* <ElementType
                 {...mergeProps(
                   inputProps,
                   { onBlur, onFocus: onFocusChained, onChange: onDomChange },
@@ -257,7 +297,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   ...xss,
                 }}
                 {...tid}
-              />
+              /> */}
               {isFocused && clearable && onChange && inputProps.value && (
                 <IconButton
                   icon="xCircle"

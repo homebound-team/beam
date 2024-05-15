@@ -424,6 +424,8 @@ function getInputValue<O>(
     ? selectedOptions.map(getOptionLabel).join(", ")
     : multiselect && selectedOptions.length === 0
     ? nothingSelectedText
+    : multiselect && selectedOptions.length > 1
+    ? selectedOptions.map(getOptionLabel).join(", ")
     : "";
 }
 
