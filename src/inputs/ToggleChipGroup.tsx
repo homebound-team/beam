@@ -34,7 +34,7 @@ export function ToggleChipGroup(props: ToggleChipGroupProps) {
 
   return (
     <div {...groupProps} css={Css.relative.df.fdc.if(labelStyle === "left").fdr.maxw100.$}>
-      <Label label={label} {...labelProps} hidden={hideLabel} />
+      <Label label={label} {...labelProps} hidden={hideLabel} inline={labelStyle === "left"} />
       <div css={Css.df.gap1.add("flexWrap", "wrap").if(labelStyle === "left").ml2.$}>
         {options.map((o) => (
           <ToggleChip

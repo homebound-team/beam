@@ -69,6 +69,7 @@ export const Icon = (props: IconProps) => {
     "checkCircleFilled",
     "loaderCircle",
     "circleOutline",
+    "time",
   ];
   const arrowIcons: IconProps["icon"][] = [
     "chevronsDown",
@@ -154,6 +155,7 @@ export const Icon = (props: IconProps) => {
     "designPackage",
     "updateDesignPackage",
     "exteriorStyle",
+    "lockOpen",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",

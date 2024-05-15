@@ -301,3 +301,9 @@ export function recursivelyGetContainingRow<R extends Kinded>(
 
   return undefined;
 }
+
+export function getTableRefWidthStyles(isVirtual: boolean) {
+  // If virtualized take some pixels off the width to accommodate when virtuoso's scrollbar is introduced.
+  // Otherwise a horizontal scrollbar will _always_ appear once the vertical scrollbar is needed
+  return Css.w100.if(isVirtual).w("calc(100% - 20px)").$;
+}

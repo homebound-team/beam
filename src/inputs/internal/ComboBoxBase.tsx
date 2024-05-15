@@ -12,6 +12,7 @@ import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { getFieldWidth } from "src/inputs/utils";
 import { useDebounce } from "use-debounce";
+import equal from "fast-deep-equal";
 
 /** Base props for either `SelectField` or `MultiSelectField`. */
 export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
@@ -130,8 +131,18 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   const values = useMemo(() => propValues ?? [], [propValues]);
 
+  const selectedOptionsRef = useRef(options.filter((o) => values.includes(getOptionValue(o))));
   const selectedOptions = useMemo(() => {
-    return options.filter((o) => values.includes(getOptionValue(o)));
+    // `selectedOptions` should only ever update if the `values` prop actually change.
+    // Assuming `values` is a state variable, then it should hold its identity until it _really_ changes.
+    // Though, it is possible that the `options` prop has changed, which is a dependency on this `useMemo`.
+    // That could trigger an unnecessary new reference for `selectedOptions`, and cause additional renders or unexpected state changes.
+    // We should avoid updating `selectedOptions` unless `values` has actually changed.
+    if (!equal([...values].sort(), selectedOptionsRef.current.map(getOptionValue).sort())) {
+      selectedOptionsRef.current = options.filter((o) => values.includes(getOptionValue(o)));
+    }
+
+    return selectedOptionsRef.current;
   }, [options, values, getOptionValue]);
 
   const { contains } = useFilter({ sensitivity: "base" });
@@ -277,7 +288,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   // Reset inputValue when closed or selected changes
   useEffect(() => {
-    if (debouncedSearch) return;
     if (state.isOpen && multiselect) {
       // While the multiselect is open, let the user keep typing
       setFieldState((prevState) => ({
@@ -292,7 +302,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly),
       }));
     }
-  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly, debouncedSearch]);
+  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly]);
 
   // Call on search callback when the user types in the input field
   useEffect(() => {

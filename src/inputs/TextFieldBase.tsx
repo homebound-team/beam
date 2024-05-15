@@ -195,6 +195,7 @@ export function TextFieldBase<X, O>(props: TextFieldBaseProps<X, O>) {
             labelProps={labelProps}
             hidden={labelStyle === "hidden" || compound}
             label={label}
+            inline={labelStyle !== "above"}
             suffix={labelSuffix}
             contrast={contrast}
             {...tid.label}

@@ -13,6 +13,7 @@ import {
   condensedStyle,
   dateColumn,
   defaultStyle,
+  dragHandleColumn,
   emptyCell,
   GridCellAlignment,
   GridColumn,
@@ -21,15 +22,14 @@ import {
   GridTable,
   Icon,
   IconButton,
+  insertAtIndex,
   numericColumn,
+  recursivelyGetContainingRow,
   RowStyles,
   selectColumn,
   simpleHeader,
   SimpleHeaderAndData,
   useGridTableApi,
-  insertAtIndex,
-  dragHandleColumn,
-  recursivelyGetContainingRow,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -298,7 +298,17 @@ export function InfiniteScrollWithLoader() {
 export function NoRowsFallback() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-  return <GridTable columns={[nameColumn, valueColumn]} rows={[simpleHeader]} fallbackMessage="There were no rows." />;
+  return (
+    <div css={Css.wPx(500).hPx(500).$}>
+      <GridTable
+        columns={[nameColumn, valueColumn]}
+        as={"virtual"}
+        style={{ bordered: true, allWhite: true }}
+        rows={[simpleHeader]}
+        fallbackMessage="There were no rows."
+      />
+    </div>
+  );
 }
 
 // Make a `Row` ADT for a table with a header + 3 levels of nesting
@@ -2063,5 +2073,45 @@ export function DraggableCardRows() {
       rows={[...rows]}
       style={cardStyle}
     />
+  );
+}
+
+export function MinColumnWidths() {
+  const nameColumn: GridColumn<Row> = {
+    header: "Name",
+    data: ({ name }) => ({
+      content: name === "group" ? "Col-spans across all!" : `Width: 2fr; Min-width: 300px`,
+      colspan: name === "group" ? 3 : 1,
+    }),
+    w: 2,
+    mw: "300px",
+  };
+  const valueColumn: GridColumn<Row> = {
+    id: "value",
+    header: "Value",
+    data: ({ value }) => `Width: 1fr; Min-width: 200px`,
+    w: 1,
+    mw: "200px",
+  };
+  const actionColumn: GridColumn<Row> = {
+    header: "Action",
+    data: () => `Width: 1fr; Min-width: 150px`,
+    w: 1,
+    mw: "150px",
+  };
+  return (
+    <div css={Css.mx2.$}>
+      <GridTable
+        columns={[nameColumn, valueColumn, actionColumn]}
+        style={{ bordered: true, allWhite: true }}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "group", data: { name: "group", value: 0 } },
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "B", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
+        ]}
+      />
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { ReactElement, useContext, useRef, useCallback, RefObject } from "react";
+import { ReactElement, useCallback, useContext, useRef } from "react";
 import {
   defaultRenderFn,
   headerRenderFn,
@@ -176,13 +176,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const applyFirstContentColumnStyles = !isHeader && isFirstContentColumn;
           foundFirstContentColumn ||= applyFirstContentColumnStyles;
 
-          if (column.mw) {
-            // Validate the column's minWidth definition if set.
-            if (!column.mw.endsWith("px") && !column.mw.endsWith("%")) {
-              throw new Error("Beam Table column min-width definition only supports px or percentage values");
-            }
-          }
-
           // When using the variation of the table with an EXPANDABLE_HEADER, then our HEADER and TOTAL rows have special border styling
           // Keep track of the when we get to the last expanded column so we can apply this styling properly.
           if (hasExpandableHeader && (isHeader || isTotals)) {
@@ -333,7 +326,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             width: `calc(${columnSizes.slice(columnIndex, columnIndex + currentColspan).join(" + ")}${
               applyFirstContentColumnStyles && levelIndent ? ` - ${levelIndent}px` : ""
             })`,
-            ...(typeof column.mw === "string" ? Css.mw(column.mw).$ : {}),
           };
 
           const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
