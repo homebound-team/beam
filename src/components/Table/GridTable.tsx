@@ -424,6 +424,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             getCount,
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
+            isFlexible: !("rowHeight" in maybeStyle) || maybeStyle.rowHeight !== "fixed",
             hasExpandableHeader,
           }}
         />

@@ -1,10 +1,7 @@
 import { ReactNode } from "react";
-import { Link } from "react-router-dom";
-import { navLink } from "src/components/CssReset";
-import { GridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyle } from "src/components/Table/TableStyles";
-import { GridCellAlignment, GridColumnWithId, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
-import { Css, Properties, Typography } from "src/Css";
+import { GridCellAlignment, Kinded, MaybeFn } from "src/components/Table/types";
+import { Properties, Typography } from "src/Css";
 
 /**
  * Allows a cell to be more than just a RectNode, i.e. declare its alignment or
@@ -30,6 +27,7 @@ export type GridCellContent = {
   revealOnRowHover?: true;
   /** Tooltip to add to a cell */
   tooltip?: ReactNode;
+  lineClamp?: 1 | 2 | 3 | 4 | 5;
 };
 
 /** Allows rendering a specific cell. */
@@ -43,80 +41,3 @@ export type RenderCellFn<R extends Kinded> = (
   onClick: VoidFunction | undefined,
   tooltip: ReactNode | undefined,
 ) => ReactNode;
-
-/** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
-export const defaultRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<any> =
-  (as: RenderAs, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
-    const Cell = as === "table" ? "td" : "div";
-    return (
-      <Cell
-        key={key}
-        css={{ ...css, ...Css.cursor("default").$ }}
-        className={classNames}
-        onClick={onClick}
-        {...(as === "table" && { colSpan })}
-      >
-        {content}
-      </Cell>
-    );
-  };
-
-/**
- * Sets up the `GridContext` so that header cells can access the current sort settings.
- * Used for the Header, Totals, and Expanded Header row's cells.
- * */
-export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSpan: number) => RenderCellFn<any> =
-  (column, as, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
-    const Cell = as === "table" ? "th" : "div";
-    return (
-      <Cell key={key} css={{ ...css }} className={classNames} {...(as === "table" && { colSpan })}>
-        {content}
-      </Cell>
-    );
-  };
-
-/** Renders a cell element when a row link is in play. */
-export const rowLinkRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<any> =
-  (as: RenderAs, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
-    const to = rowStyle!.rowLink!(row);
-    if (as === "table") {
-      return (
-        <td key={key} css={{ ...css }} className={classNames} colSpan={colSpan}>
-          <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
-            {content}
-          </Link>
-        </td>
-      );
-    }
-    return (
-      <Link
-        key={key}
-        to={to}
-        css={{ ...Css.noUnderline.color("unset").$, ...css }}
-        className={`${navLink} ${classNames}`}
-      >
-        {content}
-      </Link>
-    );
-  };
-
-/** Renders a cell that will fire the RowStyle.onClick. */
-export const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>, colSpan: number) => RenderCellFn<any> =
-  (as: RenderAs, api: GridTableApi<any>, colSpan) =>
-  (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
-    const Cell = as === "table" ? "td" : "div";
-    return (
-      <Cell
-        {...{ key }}
-        css={{ ...css }}
-        className={classNames}
-        onClick={(e) => {
-          rowStyle!.onClick!(row, api);
-          onClick && onClick();
-        }}
-        {...(as === "table" && { colSpan })}
-      >
-        {content}
-      </Cell>
-    );
-  };

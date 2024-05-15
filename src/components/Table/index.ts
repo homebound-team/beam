@@ -1,9 +1,3 @@
-export {
-  defaultRenderFn,
-  headerRenderFn,
-  rowClickRenderFn,
-  rowLinkRenderFn,
-} from "src/components/Table/components/cell";
 export type { GridCellContent, RenderCellFn } from "src/components/Table/components/cell";
 export * from "src/components/Table/components/CollapseToggle";
 export { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";

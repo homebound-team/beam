@@ -1,12 +1,5 @@
 import { observer } from "mobx-react";
 import { ReactElement, useCallback, useContext, useRef } from "react";
-import {
-  defaultRenderFn,
-  headerRenderFn,
-  RenderCellFn,
-  rowClickRenderFn,
-  rowLinkRenderFn,
-} from "src/components/Table/components/cell";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
@@ -18,13 +11,16 @@ import {
   EXPANDABLE_HEADER,
   getAlignment,
   getFirstOrLastCellCss,
+  getGridCellContentProp,
   getJustification,
+  getTooltipIcon,
   HEADER,
+  isContentEmpty,
   isGridCellContent,
+  isJSX,
   KEPT_GROUP,
   maybeApplyFunction,
   reservedRowKinds,
-  toContent,
   TOTALS,
   zIndices,
 } from "src/components/Table/utils/utils";
@@ -32,6 +28,9 @@ import { Css, Palette } from "src/Css";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
 import { useDebouncedCallback } from "use-debounce";
+import { HeaderCell } from "src/components/Table/components/HeaderCell";
+import { getButtonOrLink } from "src/utils/getInteractiveElement";
+import { BodyCell } from "src/components/Table/components/BodyCell";
 
 interface RowProps<R extends Kinded> {
   as: RenderAs;
@@ -50,6 +49,7 @@ interface RowProps<R extends Kinded> {
   onDragOver?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   // onDrag?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void; // currently unused
   // onDragLeave?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void; // currently unused
+  isFlexible: boolean;
 }
 
 // We extract Row to its own mini-component primarily so we can React.memo'ize it.
@@ -69,6 +69,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     onDrop,
     onDragEnter,
     onDragOver,
+    isFlexible,
     ...others
   } = props;
 
@@ -170,7 +171,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           // If we're rendering the Expandable Header row, then we might need to render the previous column's `expandHeader` property in the case where the column is hidden on expand.
           column = isExpandableHeader ? maybeExpandedColumn : column;
 
-          const { wrapAction = true, isAction = false } = column;
+          const { isAction = false } = column;
 
           const isFirstContentColumn = !isAction && !foundFirstContentColumn;
           const applyFirstContentColumnStyles = !isHeader && isFirstContentColumn;
@@ -207,13 +208,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           });
 
           // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
-          currentColspan =
-            isGridCellContent(maybeContent) && typeof maybeContent.colspan === "number"
-              ? maybeContent.colspan
-              : isExpandableHeader
-              ? numExpandedColumns + 1
-              : 1;
-          const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
+          const cellColSpan = getGridCellContentProp(maybeContent, "colspan");
+          currentColspan = cellColSpan ?? isExpandableHeader ? numExpandedColumns + 1 : 1;
+          const revealOnRowHover = getGridCellContentProp(maybeContent, "revealOnRowHover") ?? false;
 
           const canSortColumn =
             (sortOn === "client" && column.clientSideSort !== false) ||
@@ -225,21 +222,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             (column.expandColumns && column.expandColumns.length > 0) ||
             column.expandedWidth !== undefined;
 
-          const content = toContent(
-            maybeContent,
-            isHeader,
-            canSortColumn,
-            sortOn === "client",
-            style,
-            as,
-            alignment,
-            column,
-            isExpandableHeader,
-            isExpandable,
-            minStickyLeftOffset,
-            isKeptRow,
-          );
-
           ensureClientSideSortValueIsSortable(
             sortOn,
             isHeader || isTotals || isExpandableHeader,
@@ -248,7 +230,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             maybeContent,
           );
 
-          const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
+          const maybeSticky = (getGridCellContentProp(maybeContent, "sticky") || column.sticky) ?? undefined;
           const maybeStickyColumnStyles =
             maybeSticky && columnSizes
               ? {
@@ -272,6 +254,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const cellId = `${row.kind}_${row.id}_${column.id}`;
           const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
           const isCellActive = tableState.activeCellId === cellId;
+          console.log({ activeCell: tableState.activeCellId, cellId, isCellActive });
 
           // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
           // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
@@ -318,7 +301,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // Add any cell specific style overrides
             ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
             // And any cell specific css
-            ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
+            ...(getGridCellContentProp(maybeContent, "css") ?? {}),
             // Apply cell highlight styles to active cell and hover
             ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
             // Define the width of the column on each cell. Supports col spans.
@@ -328,21 +311,83 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             })`,
           };
 
+          console.log("applyCellHighlight", applyCellHighlight);
           const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
-
           const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
-          const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
+          const lineClamp = getGridCellContentProp(maybeContent, "lineClamp");
 
-          const renderFn: RenderCellFn<any> =
-            (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
-              ? rowLinkRenderFn(as, currentColspan)
-              : isHeader || isTotals || isExpandableHeader
-              ? headerRenderFn(column, as, currentColspan)
-              : rowStyle?.onClick && wrapAction
-              ? rowClickRenderFn(as, api, currentColspan)
-              : defaultRenderFn(as, currentColspan);
+          let cellContent = isGridCellContent(maybeContent) ? maybeContent.content : maybeContent;
+          if (typeof cellContent === "function") {
+            // Actually create the JSX by calling `content()` here (which should be as late as
+            // possible, i.e. only for visible rows if we're in a virtual table).
+            cellContent = cellContent();
+          } else if (as === "virtual" && canSortColumn && sortOn === "client" && isJSX(cellContent)) {
+            // When using client-side sorting, we call `applyRowFn` not only during rendering, but
+            // up-front against all rows (for the currently sorted column) to determine their
+            // sort values.
+            //
+            // Pedantically this means that any table using client-side sorting should not
+            // build JSX directly in its GridColumn functions, but this overhead is especially
+            // noticeable for large/virtualized tables, so we only enforce using functions
+            // for those tables.
+            throw new Error(
+              "GridTables with as=virtual & sortable columns should use functions that return JSX, instead of JSX",
+            );
+          }
 
-          return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick, tooltip);
+          const gridCellOnClick = getGridCellContentProp(maybeContent, "onClick");
+          cellContent = gridCellOnClick
+            ? getButtonOrLink(cellContent, gridCellOnClick, {
+                css: Css.maxw100.blue700.ta("inherit").if(style?.presentationSettings?.wrap === false).truncate.$,
+              })
+            : cellContent;
+
+          if (!isHeader && !isExpandableHeader && style.emptyCell && isContentEmpty(cellContent)) {
+            // If the content is empty and the user specified an `emptyCell` node, return that.
+            cellContent = style.emptyCell;
+          }
+
+          const tooltipEl = getTooltipIcon(maybeContent);
+
+          if (isHeader || isTotals || isExpandableHeader) {
+            return (
+              <HeaderCell
+                as={as}
+                key={column.id}
+                cellCss={cellCss}
+                classNames={cellClassNames}
+                colspan={currentColspan}
+                tooltip={tooltipEl}
+                content={cellContent}
+                isHeader={isHeader}
+                isExpandableHeader={isExpandableHeader}
+                isExpandable={isExpandable}
+                column={column}
+                canSortColumn={canSortColumn}
+                minStickyLeftOffset={minStickyLeftOffset}
+                alignment={alignment}
+              />
+            );
+          }
+
+          return (
+            <BodyCell
+              api={api}
+              column={column}
+              as={as}
+              key={column.id}
+              cellCss={cellCss}
+              content={cellContent}
+              row={row}
+              rowStyle={rowStyle as any}
+              classNames={cellClassNames}
+              onClick={cellOnClick}
+              tooltip={tooltipEl}
+              colSpan={currentColspan}
+              lineClamp={lineClamp}
+              isFlexible={isFlexible}
+            />
+          );
         })
       )}
     </RowTag>

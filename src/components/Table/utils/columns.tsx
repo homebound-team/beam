@@ -87,6 +87,7 @@ export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<
   return newMethodMissingProxy(base, (key) => {
     return (data: any, { row, level }: { row: GridDataRow<any>; level: number }) => ({
       content: <CollapseToggle row={row} compact={level > 0} />,
+      css: Css.px0.$,
     });
   }) as any;
 }

@@ -41,13 +41,13 @@ export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X
     children: (
       <span
         css={{
-          ...Css[compact ? "xs" : "sm"].dif.aic.br16.pl1.px1.pyPx(2).gray900.$,
+          ...Css[compact ? "xs" : "sm"].dif.aic.br16.pl1.px1.pyPx(2).fs0.gray900.$,
           ...typeStyles[type],
           ...xss,
         }}
         {...tid}
       >
-        <span css={Css.lineClamp1.breakAll.$}>{text}</span>
+        {text}
       </span>
     ),
   });

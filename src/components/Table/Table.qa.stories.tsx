@@ -855,8 +855,11 @@ function beamStyleColumns() {
   });
   const nameCol = column<BeamRow>({
     header: "Commitment Name",
-    data: ({ commitmentName }) => commitmentName,
-    w: "220px",
+    data: ({ commitmentName }) => ({
+      content: commitmentName,
+      lineClamp: 3,
+    }),
+    mw: "220px",
   });
   const tradeCol = column<BeamRow>({
     header: "Trade Categories",
@@ -864,6 +867,7 @@ function beamStyleColumns() {
       content: () => <Chips values={tradeCategories.sort()} />,
       sortValue: tradeCategories.sort().join(" "),
     }),
+    mw: "200px",
   });
   const dateCol = dateColumn<BeamRow>({ header: "Date", data: ({ date }) => date });
   const locationCol = column<BeamRow>({
@@ -899,7 +903,10 @@ const flatRows: GridDataRow<BeamRow>[] = [
     data: {
       id: `r:${idx + 1}`,
       favorite: idx < 5,
-      commitmentName: idx === 2 ? "A longer name that will truncate with an ellipsis" : `Commitment ${idx + 1}`,
+      commitmentName:
+        idx === 2
+          ? "A longer name that will truncate with an ellipsis. It is expected to also truncate at three lines when using flexible row height"
+          : `Commitment ${idx + 1}`,
       date: `01/${idx + 1 > 9 ? idx + 1 : `0${idx + 1}`}/2020`,
       status: "Success",
       tradeCategories: ["Roofing", "Architecture", "Plumbing"],

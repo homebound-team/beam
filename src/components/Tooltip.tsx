@@ -90,7 +90,9 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
       ref={popperRef}
       style={styles.popper}
       {...attributes.popper}
-      css={Css.maxw("320px").bgGray900.white.px1.py("4px").br4.xs.add("zIndex", 999999).$}
+      // Add `flex-wrap: wrap` to the first child element in the event we have a flex container as the content of the tooltip.
+      // We want to ensure the content can wrap as we have a max-width set on the tooltip.
+      css={Css.maxw("320px").bgGray900.white.px1.py("4px").br4.xs.add("zIndex", 999999).addIn(" > *", Css.fww.$).$}
     >
       <div ref={setArrowRef} style={{ ...styles.arrow }} id="arrow" />
       {content}

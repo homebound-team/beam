@@ -1,123 +1,21 @@
 import { ReactNode } from "react";
 import { Icon } from "src/components/Icon";
 import { GridCellContent } from "src/components/Table/components/cell";
-import { ExpandableHeader } from "src/components/Table/components/ExpandableHeader";
 import { GridDataRow } from "src/components/Table/components/Row";
-import { SortHeader } from "src/components/Table/components/SortHeader";
 import { GridRowApi } from "src/components/Table/GridTableApi";
 import { GridStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { Css, Palette, Properties } from "src/Css";
-import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
-/** If a column def return just string text for a given row, apply some default styling. */
-export function toContent(
-  maybeContent: ReactNode | GridCellContent,
-  isHeader: boolean,
-  canSortColumn: boolean,
-  isClientSideSorting: boolean,
-  style: GridStyle,
-  as: RenderAs,
-  alignment: GridCellAlignment,
-  column: GridColumnWithId<any>,
-  isExpandableHeader: boolean,
-  isExpandable: boolean,
-  minStickyLeftOffset: number,
-  isKeptSelectedRow: boolean,
-): ReactNode {
-  // Rows within the kept selection group cannot be collapsed
-  if (isKeptSelectedRow && column.id === "beamCollapseColumn") {
-    return <></>;
+export function getGridCellContentProp<K extends keyof GridCellContent>(
+  content: ReactNode | GridCellContent,
+  prop: K,
+  defaultValue?: GridCellContent[K],
+): GridCellContent[K] | undefined {
+  if (isGridCellContent(content)) {
+    return content[prop];
   }
-
-  let content = isGridCellContent(maybeContent) ? maybeContent.content : maybeContent;
-  if (typeof content === "function") {
-    // Actually create the JSX by calling `content()` here (which should be as late as
-    // possible, i.e. only for visible rows if we're in a virtual table).
-    content = content();
-  } else if (as === "virtual" && canSortColumn && isClientSideSorting && isJSX(content)) {
-    // When using client-side sorting, we call `applyRowFn` not only during rendering, but
-    // up-front against all rows (for the currently sorted column) to determine their
-    // sort values.
-    //
-    // Pedantically this means that any table using client-side sorting should not
-    // build JSX directly in its GridColumn functions, but this overhead is especially
-    // noticeable for large/virtualized tables, so we only enforce using functions
-    // for those tables.
-    throw new Error(
-      "GridTables with as=virtual & sortable columns should use functions that return JSX, instead of JSX",
-    );
-  }
-  const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
-  const tooltipEl = tooltip ? (
-    <span css={Css.fs0.mlPx(4).$}>
-      <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Palette.Gray600} />
-    </span>
-  ) : null;
-
-  content =
-    isGridCellContent(maybeContent) && !!maybeContent.onClick
-      ? getButtonOrLink(content, maybeContent.onClick, {
-          css: Css.maxw100.blue700.ta("inherit").if(style?.presentationSettings?.wrap === false).truncate.$,
-        })
-      : content;
-
-  if (content && typeof content === "string" && isHeader && canSortColumn) {
-    return (
-      <SortHeader
-        content={content}
-        iconOnLeft={alignment === "right"}
-        sortKey={column.serverSideSortKey ?? column.id}
-        tooltipEl={tooltipEl}
-      />
-    );
-  } else if (content && typeof content === "string" && isExpandableHeader && isExpandable) {
-    return (
-      <ExpandableHeader
-        title={content}
-        column={column}
-        minStickyLeftOffset={minStickyLeftOffset}
-        as={as}
-        tooltipEl={tooltipEl}
-      />
-    );
-  } else if (content && typeof content === "string" && isExpandableHeader) {
-    return (
-      <>
-        <span css={Css.lineClamp2.$}>{content}</span>
-        {tooltipEl}
-      </>
-    );
-  } else if (!isContentEmpty(content) && isHeader && typeof content === "string") {
-    return (
-      <>
-        <span css={Css.lineClamp2.$} title={content}>
-          {content}
-        </span>
-        {tooltipEl}
-      </>
-    );
-  } else if (!isHeader && content && style?.presentationSettings?.wrap === false && typeof content === "string") {
-    // In order to truncate the text properly, then we need to wrap it in another element
-    // as our cell element is a flex container, which don't allow for applying truncation styles directly on it.
-    return (
-      <>
-        <span css={Css.truncate.mw0.$} title={content}>
-          {content}
-        </span>
-        {tooltipEl}
-      </>
-    );
-  } else if (!isHeader && !isExpandableHeader && style.emptyCell && isContentEmpty(content)) {
-    // If the content is empty and the user specified an `emptyCell` node, return that.
-    return style.emptyCell;
-  }
-  return (
-    <>
-      {content}
-      {tooltipEl}
-    </>
-  );
+  return defaultValue ?? undefined;
 }
 
 export function isGridCellContent(content: ReactNode | GridCellContent): content is GridCellContent {
@@ -126,8 +24,17 @@ export function isGridCellContent(content: ReactNode | GridCellContent): content
 
 const emptyValues = ["", null, undefined] as any[];
 
-function isContentEmpty(content: ReactNode): boolean {
+export function isContentEmpty(content: ReactNode): boolean {
   return emptyValues.includes(content);
+}
+
+export function getTooltipIcon(maybeContent: ReactNode | GridCellContent) {
+  const tooltip = getGridCellContentProp(maybeContent, "tooltip");
+  return tooltip ? (
+    <span css={Css.fs0.mlPx(4).$}>
+      <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Palette.Gray600} />
+    </span>
+  ) : null;
 }
 
 export type DragData<R extends Kinded> = {
@@ -174,7 +81,7 @@ export function getFirstOrLastCellCss<R extends Kinded>(
 }
 
 /** A heuristic to detect the result of `React.createElement` / i.e. JSX. */
-function isJSX(content: any): boolean {
+export function isJSX(content: any): boolean {
   return typeof content === "object" && content && "type" in content && "props" in content;
 }
 
