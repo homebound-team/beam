@@ -25,6 +25,20 @@ describe("MultiSelectFieldTest", () => {
     expect(onSelect).toHaveBeenCalledWith(["1", "3"]);
   });
 
+  it("renders a chip for each selected item", async () => {
+    // Given a MultiSelectField with 3 selected value
+    const r = await render(<TestMultiSelectField values={["1", "2", "3"] as string[]} options={options} />);
+
+    // Then we can see 3 chips rendered
+    const selectionChips = r.queryAllByTestId("chip");
+    expect(selectionChips).toHaveLength(3);
+
+    // And they are rendered with names of the selected options
+    expect(selectionChips[0]).toHaveTextContent("One");
+    expect(selectionChips[1]).toHaveTextContent("Two");
+    expect(selectionChips[2]).toHaveTextContent("Three");
+  });
+
   it("has an empty text box not set", async () => {
     // Given a MultiSelectField with no selected values
     const r = await render(<TestMultiSelectField values={[]} options={options} />);

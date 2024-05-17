@@ -58,6 +58,7 @@ export interface TextFieldBaseProps<X>
   hideErrorMessage?: boolean;
   // If set, the helper text will always be shown (usually we hide the helper text if read only)
   alwaysShowHelperText?: boolean;
+  unfocusedPlaceholder?: ReactNode;
 }
 
 // Used by both TextField and TextArea
@@ -92,6 +93,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     hideErrorMessage = false,
     alwaysShowHelperText = false,
     fullWidth = fieldProps?.fullWidth ?? false,
+    unfocusedPlaceholder,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
@@ -176,6 +178,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     e.target.select();
   }, onFocus);
 
+  // Simulate clicking `ElementType` when using an unfocused placeholder
+  function handleUnfocusedPlaceholderClick(e: React.MouseEvent<HTMLDivElement>) {
+    e.stopPropagation();
+    fieldRef.current?.click();
+  }
+
   const showFocus = (isFocused && !inputProps.readOnly) || forceFocus;
   const showHover = (isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused) || forceHover;
 
@@ -237,11 +245,23 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               }}
               {...hoverProps}
               ref={inputWrapRef as any}
+              onClick={unfocusedPlaceholder ? handleUnfocusedPlaceholderClick : undefined}
             >
               {labelStyle === "inline" && label && (
                 <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
               {startAdornment && <span css={Css.df.aic.asc.fs0.br4.pr1.$}>{startAdornment}</span>}
+              {unfocusedPlaceholder && (
+                <div
+                  {...tid.unfocusedPlaceholderContainer}
+                  css={{
+                    ...Css.df.fdc.w100.pyPx(2).maxh100.overflowAuto.$,
+                    ...(isFocused && visuallyHidden),
+                  }}
+                >
+                  {unfocusedPlaceholder}
+                </div>
+              )}
               <ElementType
                 {...mergeProps(
                   inputProps,
@@ -255,6 +275,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   ...fieldStyles.input,
                   ...(inputProps.disabled ? fieldStyles.disabled : {}),
                   ...(showHover ? fieldStyles.hover : {}),
+                  ...(unfocusedPlaceholder && !isFocused && visuallyHidden),
                   ...xss,
                 }}
                 {...tid}
@@ -310,3 +331,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     </>
   );
 }
+
+// Css that would be applied if using react-aria <VisuallyHidden />
+const visuallyHidden = Css.add("clip", "inset(50%)").add("clipPath", "").add("border", 0).hPx(1).mPx(-1).wPx(1).nowrap
+  .p0.overflowHidden.absolute.$;

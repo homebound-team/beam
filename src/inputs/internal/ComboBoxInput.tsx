@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { mergeProps } from "react-aria";
 import { ComboBoxState } from "react-stately";
-import { Icon } from "src/components";
+import { Chips, Icon, Tooltip } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
@@ -92,10 +92,13 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
   const multilineProps = allowWrap ? { textAreaMinHeight: 0, multiline: true } : {};
   useGrowingTextField({ disabled: !allowWrap, inputRef, inputWrapRef, value: inputProps.value });
 
+  const chipLabels = isTree ? selectedOptionsLabels || [] : selectedOptions.map((o) => getOptionLabel(o));
+
   return (
     <TextFieldBase
       {...otherProps}
       {...multilineProps}
+      unfocusedPlaceholder={showNumSelection && <Chips compact={otherProps.compact} values={chipLabels} />}
       inputRef={inputRef}
       inputWrapRef={inputWrapRef}
       errorMsg={errorMsg}
@@ -103,12 +106,14 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       xss={otherProps.labelStyle !== "inline" && !inputProps.readOnly ? Css.fw5.$ : {}}
       startAdornment={
         (showNumSelection && (
-          <span
-            css={Css.wPx(16).hPx(16).fs0.br100.bgBlue700.white.tinySb.df.aic.jcc.$}
-            data-testid="selectedOptionsCount"
-          >
-            {isTree ? selectedOptionsLabels?.length : state.selectionManager.selectedKeys.size}
-          </span>
+          <Tooltip title={<SelectedOptionBullets labels={chipLabels} />}>
+            <span
+              css={Css.wPx(16).hPx(16).fs0.br100.bgBlue700.white.tinySb.df.aic.jcc.$}
+              data-testid="selectedOptionsCount"
+            >
+              {isTree ? selectedOptionsLabels?.length : state.selectionManager.selectedKeys.size}
+            </span>
+          </Tooltip>
         )) ||
         (showFieldDecoration && fieldDecoration(selectedOptions[0]))
       }
@@ -249,4 +254,8 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       }}
     />
   );
+}
+
+function SelectedOptionBullets({ labels = [] }: { labels: string[] | undefined }) {
+  return <div>{labels?.map((label) => <li key={label}>{label}</li>)}</div>;
 }
