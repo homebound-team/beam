@@ -36,6 +36,7 @@ export function BoundTextAreaField<X extends Only<TextFieldXss, X>>(props: Bound
           onChange={onChange}
           readOnly={readOnly ?? field.readOnly}
           errorMsg={field.touched ? field.errors.join(" ") : undefined}
+          required={field.required}
           onBlur={() => {
             field.blur();
             maybeCall(onBlur);
