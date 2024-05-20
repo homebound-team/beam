@@ -1,6 +1,5 @@
 import { TextFieldBase } from "src/inputs/TextFieldBase";
-import { render } from "src/utils/rtl";
-import { act } from "@testing-library/react";
+import { render, focus } from "src/utils/rtl";
 
 describe(TextFieldBase, () => {
   it("shows error and helper text", async () => {
@@ -45,9 +44,7 @@ describe(TextFieldBase, () => {
     expect(r.test_unfocusedPlaceholderContainer).not.toHaveStyleRule("position", "absolute");
 
     // And when we focus the field
-    act(() => {
-      r.test.focus();
-    });
+    focus(r.test);
 
     // Then the unfocused placeholder container is visually hidden
     expect(r.test_unfocusedPlaceholderContainer).toHaveStyleRule("position", "absolute");

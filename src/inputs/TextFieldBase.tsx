@@ -58,6 +58,8 @@ export interface TextFieldBaseProps<X>
   hideErrorMessage?: boolean;
   // If set, the helper text will always be shown (usually we hide the helper text if read only)
   alwaysShowHelperText?: boolean;
+  // Replaces empty input field and placeholder with node
+  // IE: Multiselect renders list of selected items in the input field
   unfocusedPlaceholder?: ReactNode;
 }
 
@@ -256,7 +258,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   {...tid.unfocusedPlaceholderContainer}
                   css={{
                     ...Css.df.fdc.w100.pyPx(2).maxh100.overflowAuto.$,
-                    ...(isFocused && visuallyHidden),
+                    ...(isFocused && Css.visuallyHidden.$),
                   }}
                 >
                   {unfocusedPlaceholder}
@@ -275,7 +277,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   ...fieldStyles.input,
                   ...(inputProps.disabled ? fieldStyles.disabled : {}),
                   ...(showHover ? fieldStyles.hover : {}),
-                  ...(unfocusedPlaceholder && !isFocused && visuallyHidden),
+                  ...(unfocusedPlaceholder && !isFocused && Css.visuallyHidden.$),
                   ...xss,
                 }}
                 {...tid}
@@ -331,7 +333,3 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     </>
   );
 }
-
-// Css that would be applied if using react-aria <VisuallyHidden />
-const visuallyHidden = Css.add("clip", "inset(50%)").add("clipPath", "").add("border", 0).hPx(1).mPx(-1).wPx(1).nowrap
-  .p0.overflowHidden.absolute.$;
