@@ -11,7 +11,7 @@ import { mergeProps } from "react-aria";
 import { ComboBoxState } from "react-stately";
 import { Icon } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
@@ -19,7 +19,7 @@ import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
 import { Value } from "src/inputs/Value";
 import { maybeCall } from "src/utils";
 
-interface ComboBoxInputProps<O, V extends Value> extends PresentationFieldProps {
+export interface ComboBoxInputProps<O, V extends Value> extends PresentationFieldProps {
   buttonProps: any;
   buttonRef: MutableRefObject<HTMLButtonElement | null>;
   inputProps: InputHTMLAttributes<HTMLInputElement>;
@@ -96,6 +96,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
     <TextFieldBase
       {...otherProps}
       {...multilineProps}
+      state={state}
       inputRef={inputRef}
       inputWrapRef={inputWrapRef}
       errorMsg={errorMsg}
