@@ -161,9 +161,10 @@ describe("MultiSelectFieldTest", () => {
     // When opening the menu
     fireEvent.click(r.age);
     // Then expect the chip to be disabled
-    expect(r.chip).toHaveAttribute("disabled");
+    const chips = r.queryAllByTestId("chip");
+    expect(chips[1]).toHaveAttribute("disabled");
     // And when clicking on that chip
-    click(r.chip);
+    click(chips[1]);
     // Then the `onSelect` callback is not called
     expect(onSelect).not.toHaveBeenCalled();
   });
@@ -203,7 +204,8 @@ describe("MultiSelectFieldTest", () => {
     // When opening the menu
     click(r.age);
     // And clicking on the chip
-    click(r.chip);
+    const chips = r.queryAllByTestId("chip");
+    click(chips[1]);
     // Then the menu remains open
     expect(r.getByRole("listbox")).toBeInTheDocument();
     // And `onSelect` is called with the correct values
