@@ -85,12 +85,13 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
   const [isFocused, setIsFocused] = useState(false);
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
   const showNumSelection = isMultiSelect && state.selectionManager.selectedKeys.size > 1;
+  // Show selections as chips
+  const hasSelection = state.selectionManager.selectedKeys.size > 0;
   // For MultiSelect only show the `fieldDecoration` when input is not in focus.
   const showFieldDecoration =
     (!isMultiSelect || (isMultiSelect && !isFocused)) && fieldDecoration && selectedOptions.length === 1;
 
   const multilineProps = allowWrap ? { textAreaMinHeight: 0, multiline: true } : {};
-  useGrowingTextField({ disabled: !allowWrap, inputRef, inputWrapRef, value: inputProps.value });
 
   const chipLabels = isTree ? selectedOptionsLabels || [] : selectedOptions.map((o) => getOptionLabel(o));
 
@@ -98,7 +99,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
     <TextFieldBase
       {...otherProps}
       {...multilineProps}
-      unfocusedPlaceholder={showNumSelection && <Chips compact={otherProps.compact} values={chipLabels} />}
+      unfocusedPlaceholder={hasSelection && <Chips compact={otherProps.compact} values={chipLabels} />}
       inputRef={inputRef}
       inputWrapRef={inputWrapRef}
       errorMsg={errorMsg}
