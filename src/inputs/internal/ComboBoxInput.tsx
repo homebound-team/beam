@@ -12,7 +12,6 @@ import { ComboBoxState } from "react-stately";
 import { Chips, Icon, Tooltip } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
-import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
 import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
@@ -85,8 +84,8 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
   const [isFocused, setIsFocused] = useState(false);
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
   const showNumSelection = isMultiSelect && state.selectionManager.selectedKeys.size > 1;
-  // Show selections as chips
-  const hasSelection = state.selectionManager.selectedKeys.size > 0;
+  // Show selections as chips when using multiselect when unfocused
+  const showChipSelection = isMultiSelect && state.selectionManager.selectedKeys.size > 0;
   // For MultiSelect only show the `fieldDecoration` when input is not in focus.
   const showFieldDecoration =
     (!isMultiSelect || (isMultiSelect && !isFocused)) && fieldDecoration && selectedOptions.length === 1;
@@ -99,7 +98,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
     <TextFieldBase
       {...otherProps}
       {...multilineProps}
-      unfocusedPlaceholder={hasSelection && <Chips compact={otherProps.compact} values={chipLabels} />}
+      unfocusedPlaceholder={showChipSelection && <Chips compact={otherProps.compact} values={chipLabels} />}
       inputRef={inputRef}
       inputWrapRef={inputWrapRef}
       errorMsg={errorMsg}

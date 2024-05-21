@@ -50,7 +50,7 @@ export function Pagination(props: PaginationProps) {
       <div css={Css.df.mya.mr2.$} {...tid.pageSizeLabel}>
         Page size:
       </div>
-      <div css={Css.wPx(95).$}>
+      <div css={Css.wPx(78).$}>
         <SelectField
           compact
           label="Page Size"
