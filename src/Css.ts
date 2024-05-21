@@ -3966,12 +3966,15 @@ class CssBuilder<T extends Properties> {
   }
 
   // visuallyHidden
-  /** Sets `position: "absolute"; overflow: "hidden"; clip: "inset(50%)"; clipPath: ""; border: 0; height: "1px"; margin: "-1px"; width: "1px"; padding: 0; whiteSpace: "nowrap"`. */
+  /** Sets `position: "absolute"; overflow: "hidden"; clip: "inset(50%)"; clipPath: ""; border: 0; height: "1px"; margin: "-1px"; width: "1px"; padding: 0; whiteSpace: "nowrap"; opacity: 0`. */
   get visuallyHidden() {
     return this.add("position", "absolute").add("overflow", "hidden").add("clip", "inset(50%)").add("clipPath", "").add(
       "border",
       0,
-    ).add("height", "1px").add("margin", "-1px").add("width", "1px").add("padding", 0).add("whiteSpace", "nowrap");
+    ).add("height", "1px").add("margin", "-1px").add("width", "1px").add("padding", 0).add("whiteSpace", "nowrap").add(
+      "opacity",
+      0,
+    );
   }
 
   // contentEmpty

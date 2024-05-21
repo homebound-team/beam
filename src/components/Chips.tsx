@@ -13,12 +13,13 @@ export interface ChipsProps<X> {
   values: string[] | ChipValue[];
   xss?: X;
   compact?: boolean;
+  wrap?: boolean;
 }
 
 /** Renders a list of `Chip`s, with wrapping & appropriate margin between each `Chip`. */
 export function Chips<X extends Only<ChipsXss, X>>(props: ChipsProps<X>) {
-  const { wrap } = usePresentationContext();
-  const { values, compact, xss = {} } = props;
+  const { wrap: presentationWrap } = usePresentationContext();
+  const { values, compact, xss = {}, wrap = presentationWrap } = props;
   return (
     <div
       css={{
