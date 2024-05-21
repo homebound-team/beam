@@ -58,6 +58,9 @@ export interface TextFieldBaseProps<X>
   hideErrorMessage?: boolean;
   // If set, the helper text will always be shown (usually we hide the helper text if read only)
   alwaysShowHelperText?: boolean;
+  // Replaces empty input field and placeholder with node
+  // IE: Multiselect renders list of selected items in the input field
+  unfocusedPlaceholder?: ReactNode;
 }
 
 // Used by both TextField and TextArea
@@ -92,6 +95,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     hideErrorMessage = false,
     alwaysShowHelperText = false,
     fullWidth = fieldProps?.fullWidth ?? false,
+    unfocusedPlaceholder,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
@@ -151,7 +155,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       // Not using Truss's inline `if` statement here because `addIn` properties do not respect the if statement.
       ...(contrast && Css.addIn("&::selection", Css.bgGray800.$).$),
       // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields
-      ...(multiline ? Css.br4.h100.pyPx(compact ? 7 : 11).add("resize", "none").$ : Css.truncate.$),
+      ...(multiline ? Css.br4.pyPx(compact ? 7 : 11).add("resize", "none").$ : Css.truncate.$),
     },
     hover: Css.bgColor(hoverBgColor).if(contrast).bGray600.$,
     focus: Css.bBlue700.if(contrast).bBlue500.$,
@@ -175,6 +179,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const onFocusChained = chain((e: FocusEvent<HTMLInputElement> | FocusEvent<HTMLTextAreaElement>) => {
     e.target.select();
   }, onFocus);
+
+  // Simulate clicking `ElementType` when using an unfocused placeholder
+  function handleUnfocusedPlaceholderClick(e: React.MouseEvent<HTMLDivElement>) {
+    e.stopPropagation();
+    fieldRef.current?.click();
+  }
 
   const showFocus = (isFocused && !inputProps.readOnly) || forceFocus;
   const showHover = (isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused) || forceHover;
@@ -233,15 +243,27 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 ...(showHover ? fieldStyles.hover : {}),
                 // Only show error styles if the field is not disabled, following the pattern that the error message is also hidden
                 ...(errorMsg && !inputProps.disabled ? fieldStyles.error : {}),
-                ...Css.if(multiline).aifs.mhPx(textAreaMinHeight).$,
+                ...Css.if(multiline).aifs.overflowHidden.mhPx(textAreaMinHeight).$,
               }}
               {...hoverProps}
               ref={inputWrapRef as any}
+              onClick={unfocusedPlaceholder ? handleUnfocusedPlaceholderClick : undefined}
             >
               {labelStyle === "inline" && label && (
                 <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
               {startAdornment && <span css={Css.df.aic.asc.fs0.br4.pr1.$}>{startAdornment}</span>}
+              {unfocusedPlaceholder && (
+                <div
+                  {...tid.unfocusedPlaceholderContainer}
+                  css={{
+                    ...Css.df.asc.w100.maxh100.overflowAuto.$,
+                    ...(isFocused && Css.visuallyHidden.$),
+                  }}
+                >
+                  {unfocusedPlaceholder}
+                </div>
+              )}
               <ElementType
                 {...mergeProps(
                   inputProps,
@@ -255,6 +277,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   ...fieldStyles.input,
                   ...(inputProps.disabled ? fieldStyles.disabled : {}),
                   ...(showHover ? fieldStyles.hover : {}),
+                  ...(unfocusedPlaceholder && !isFocused && Css.visuallyHidden.$),
                   ...xss,
                 }}
                 {...tid}

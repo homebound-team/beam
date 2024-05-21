@@ -3965,6 +3965,15 @@ class CssBuilder<T extends Properties> {
     ).add("alignItems", "center").add("justifyContent", "center").add("backgroundColor", "rgba(36,36,36,0.2)");
   }
 
+  // visuallyHidden
+  /** Sets `position: "absolute"; overflow: "hidden"; clip: "inset(50%)"; clipPath: ""; border: 0; height: "1px"; margin: "-1px"; width: "1px"; padding: 0; whiteSpace: "nowrap"`. */
+  get visuallyHidden() {
+    return this.add("position", "absolute").add("overflow", "hidden").add("clip", "inset(50%)").add("clipPath", "").add(
+      "border",
+      0,
+    ).add("height", "1px").add("margin", "-1px").add("width", "1px").add("padding", 0).add("whiteSpace", "nowrap");
+  }
+
   // contentEmpty
   /** Sets `content: "''"`. */
   get contentEmpty() {

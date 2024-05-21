@@ -116,6 +116,21 @@ const sections: Sections = {
       backgroundColor: "rgba(36,36,36,0.2)",
     }),
   ],
+  // Css that would be applied if using react-aria <VisuallyHidden />
+  visuallyHidden: () => [
+    newMethod("visuallyHidden", {
+      position: "absolute",
+      overflow: "hidden",
+      clip: "inset(50%)",
+      clipPath: "",
+      border: 0,
+      height: "1px",
+      margin: "-1px",
+      width: "1px",
+      padding: 0,
+      whiteSpace: "nowrap",
+    }),
+  ],
   contentEmpty: () => [newMethod("contentEmpty", { content: "''" })],
 };
 
