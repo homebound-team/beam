@@ -129,6 +129,7 @@ const sections: Sections = {
       width: "1px",
       padding: 0,
       whiteSpace: "nowrap",
+      opacity: 0,
     }),
   ],
   contentEmpty: () => [newMethod("contentEmpty", { content: "''" })],

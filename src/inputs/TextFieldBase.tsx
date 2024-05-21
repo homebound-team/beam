@@ -126,10 +126,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     container: Css.df.fdc.w100.maxw(fieldMaxWidth).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
     inputWrapper: {
       ...Css[typeScale].df.aic.br4.px1.w100
-        .hPx(fieldHeight - maybeSmaller)
-        .if(compact)
-        .hPx(compactFieldHeight - maybeSmaller).$,
-      ...Css.bgColor(bgColor)
+        .bgColor(bgColor)
         .gray900.if(contrast)
         .white.if(labelStyle === "left").w50.$,
       // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
@@ -141,6 +138,15 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         : Css.bGray300.if(contrast).bGray700.$),
       // Do not add borders to compound fields. A compound field is responsible for drawing its own borders
       ...(!compound ? Css.ba.$ : {}),
+      // When multiline is true, then we want to allow the field to grow to the height of the content, but not shrink below the minHeight
+      // Otherwise, set fixed heights values accordingly.
+      ...(multiline
+        ? Css.mhPx(fieldHeight - maybeSmaller)
+            .if(compact)
+            .mhPx(compactFieldHeight - maybeSmaller).$
+        : Css.hPx(fieldHeight - maybeSmaller)
+            .if(compact)
+            .hPx(compactFieldHeight - maybeSmaller).$),
     },
     inputWrapperReadOnly: {
       ...Css[typeScale].df.aic.w100.gray900.if(contrast).white.if(labelStyle === "left").w50.$,
@@ -255,9 +261,15 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               {startAdornment && <span css={Css.df.aic.asc.fs0.br4.pr1.$}>{startAdornment}</span>}
               {unfocusedPlaceholder && (
                 <div
+                  // Setting -1 tabIndex as this is a scrollable container, which is focusable by default.
+                  // However, we want the user's focus to move to the field element, which will hide this container.
+                  tabIndex={-1}
                   {...tid.unfocusedPlaceholderContainer}
                   css={{
-                    ...Css.df.asc.w100.maxh100.overflowAuto.$,
+                    ...Css.df.asc.w100.maxhPx(74).overflowAuto.$,
+                    ...fieldStyles.input,
+                    ...(showHover ? fieldStyles.hover : {}),
+                    ...(inputProps.disabled ? fieldStyles.disabled : {}),
                     ...(isFocused && Css.visuallyHidden.$),
                   }}
                 >

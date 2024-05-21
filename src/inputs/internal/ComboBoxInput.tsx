@@ -17,6 +17,7 @@ import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelec
 import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
 import { Value } from "src/inputs/Value";
 import { maybeCall } from "src/utils";
+import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 
 interface ComboBoxInputProps<O, V extends Value> extends PresentationFieldProps {
   buttonProps: any;
@@ -94,11 +95,22 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
 
   const chipLabels = isTree ? selectedOptionsLabels || [] : selectedOptions.map((o) => getOptionLabel(o));
 
+  useGrowingTextField({
+    // This says: When using a multiselect, then only enable the growing textfield when we are focused on it.
+    // Because otherwise, we're not displaying the input element that dictates the height (we're displaying <Chips/>). This would cause incorrect calculations
+    disabled: (isMultiSelect && (!allowWrap || !isFocused)) || (!isMultiSelect && !allowWrap),
+    inputRef,
+    inputWrapRef,
+    value: inputProps.value,
+  });
+
   return (
     <TextFieldBase
       {...otherProps}
       {...multilineProps}
-      unfocusedPlaceholder={showChipSelection && <Chips compact={otherProps.compact} values={chipLabels} />}
+      unfocusedPlaceholder={
+        showChipSelection && <Chips compact={otherProps.compact} values={chipLabels} wrap={allowWrap} />
+      }
       inputRef={inputRef}
       inputWrapRef={inputWrapRef}
       errorMsg={errorMsg}
