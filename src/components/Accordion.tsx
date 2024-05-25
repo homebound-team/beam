@@ -79,11 +79,6 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
   }, [expanded, setContentHeight]);
   useResizeObserver({ ref: contentRef, onResize });
 
-  const expandOrCollapse = useCallback(() => {
-    setExpanded((prior) => !prior);
-    if (setExpandedIndex) setExpandedIndex(index);
-  }, [index, setExpandedIndex]);
-
   return (
     <div
       {...testIds.container}
@@ -105,7 +100,10 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
           ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.Blue700}`).$),
           ...xss,
         }}
-        onClick={expandOrCollapse}
+        onClick={() => {
+          setExpanded((prior) => !prior);
+          if (setExpandedIndex) setExpandedIndex(index);
+        }}
       >
         {titleOnClick ? (
           <button
