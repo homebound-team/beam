@@ -23,6 +23,8 @@ export interface AccordionProps<X = AccordionXss> {
    */
   index?: number;
   setExpandedIndex?: Dispatch<SetStateAction<number | undefined>>;
+  /** Turns the title into a button. If provided, disables expand/collapse on title text */
+  titleOnClick?: VoidFunction;
   /** Used by Accordion list. Sets default padding to 0 for nested accordions */
   omitPadding?: boolean;
   /** Styles overrides for padding */
@@ -43,6 +45,7 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
     bottomBorder = false,
     index,
     setExpandedIndex,
+    titleOnClick,
     omitPadding = false,
     xss,
   } = props;
@@ -76,6 +79,11 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
   }, [expanded, setContentHeight]);
   useResizeObserver({ ref: contentRef, onResize });
 
+  const expandOrCollapse = useCallback(() => {
+    setExpanded((prior) => !prior);
+    if (setExpandedIndex) setExpandedIndex(index);
+  }, [index, setExpandedIndex]);
+
   return (
     <div
       {...testIds.container}
@@ -97,12 +105,22 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
           ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.Blue700}`).$),
           ...xss,
         }}
-        onClick={() => {
-          setExpanded(!expanded);
-          if (setExpandedIndex) setExpandedIndex(index);
-        }}
+        onClick={expandOrCollapse}
       >
-        <span css={Css.fg1.tl.$}>{title}</span>
+        {titleOnClick ? (
+          <button
+            {...testIds.titleText}
+            css={Css.fg0.tl.$}
+            onClick={(e) => {
+              e.stopPropagation();
+              titleOnClick();
+            }}
+          >
+            {title}
+          </button>
+        ) : (
+          <span css={Css.fg1.tl.$}>{title}</span>
+        )}
         <span
           css={{
             ...Css.fs0.$,
