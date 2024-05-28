@@ -84,7 +84,7 @@ describe(Accordion, () => {
     );
 
     // Then the titleOnClick function is called when the title is clicked
-    click(r.accordion_titleText);
+    click(r.accordion_title);
     expect(titleOnClick).toHaveBeenCalled();
   });
 
@@ -96,12 +96,14 @@ describe(Accordion, () => {
       </Accordion>,
     );
 
-    click(r.accordion_titleText);
-    // And the content is not displayed
+    // when the title is clicked
+    click(r.accordion_title);
+    // then the content is not displayed
     expect(r.query.accordion_content).not.toBeInTheDocument();
 
-    // Then the content is displayed when the title is clicked
-    click(r.accordion_title);
+    // when bar is clicked
+    click(r.accordion_toggle);
+    // then the content is displayed
     expect(r.accordion_content).toHaveTextContent("Test description");
   });
 });
