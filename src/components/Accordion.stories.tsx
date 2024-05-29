@@ -31,6 +31,21 @@ export function AccordionVariations() {
           Our modern approach to homebuilding makes the process easier and more personal than ever before.
         </div>
       </Accordion>
+      <Accordion title="Clickable Title" titleOnClick={() => {}}>
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
+      <Accordion title="Compact" compact>
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
+      <Accordion title="Clickable Title + Compact" titleOnClick={() => {}} compact>
+        <div css={Css.sm.$}>
+          Our modern approach to homebuilding makes the process easier and more personal than ever before.
+        </div>
+      </Accordion>
     </>
   );
 }
