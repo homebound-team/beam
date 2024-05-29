@@ -105,7 +105,7 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
       }}
     >
       {titleOnClick ? (
-        <div {...focusProps} aria-controls={id} aria-expanded={expanded} css={Css.df.jcsb.$}>
+        <div {...focusProps} aria-controls={id} aria-expanded={expanded} css={Css.df.$}>
           <button {...tid.title} disabled={disabled} css={{ ...touchableStyle, ...Css.fg0.$ }} onClick={titleOnClick}>
             {title}
           </button>
