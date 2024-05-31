@@ -1,6 +1,6 @@
 import { noop } from "src/utils";
-import { click, render } from "src/utils/rtl";
-import { pageOptions, PageSettings, Pagination, toLimitAndOffset } from "./Pagination";
+import { click, getOptions, render } from "src/utils/rtl";
+import { PageSettings, Pagination, toLimitAndOffset } from "./Pagination";
 
 const init: PageSettings = { pageNumber: 1, pageSize: 100 };
 
@@ -96,9 +96,22 @@ describe("Pagination", () => {
   });
 
   describe("pageOptions", () => {
-    it("returns page options", () => {
-      const expected = [100, 500, 1000].map((n) => ({ id: n, name: String(n) }));
-      expect(pageOptions).toEqual(expected);
+    it("returns default page options", async () => {
+      // Given the component without setting pageSizes
+      const page = [{ pageNumber: 5, pageSize: 200 }, jest.fn] as const;
+      const r = await render(<Pagination totalCount={999} page={page} />);
+
+      // Then the available page options are the default values
+      expect(getOptions(r.pagination_pageSize)).toEqual(["100", "500", "1000"]);
+    });
+
+    it("sets custom page size options", async () => {
+      // Given the component with pageSizes set
+      const page = [{ pageNumber: 5, pageSize: 25 }, jest.fn] as const;
+      const r = await render(<Pagination totalCount={999} page={page} pageSizes={[10, 25, 50]} />);
+
+      // Then the available page options are based on the set values
+      expect(getOptions(r.pagination_pageSize)).toEqual(["10", "25", "50"]);
     });
   });
 
