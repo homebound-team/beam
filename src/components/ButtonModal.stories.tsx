@@ -83,7 +83,7 @@ export function ButtonModalWithChipAndTooltip() {
       content={
         <Chip
           text="Chip text content, hover me"
-          title={<p css={Css.tc.$}>Obiligation document must besigned and all templates set to active</p>}
+          title={<p css={Css.tac.$}>Obiligation document must besigned and all templates set to active</p>}
         />
       }
       trigger={{ label: "Button Modal trigger" }}

@@ -23,8 +23,8 @@ export function DnDGridItemHandle(props: DnDGridItemHandleProps) {
     <button
       css={{
         ...(compact ? iconButtonCompact : iconButtonNormal),
-        ...Css.cursor("grab").bTransparent.bsSolid.bgTransparent.outline0.dif.aic.jcc.transition.if(isFocusVisible)
-          .bBlue700.$,
+        ...Css.cursor("grab").bcTransparent.bss.bgTransparent.outline0.dif.aic.jcc.transition.if(isFocusVisible)
+          .bcBlue700.$,
         ...(isHovered && Css.bgGray200.$),
       }}
       {...mergeProps(dragHandleProps, focusProps, hoverProps)}

@@ -10,7 +10,7 @@ export function ListBoxChip({ label }: ListBoxChipProps) {
 
   return (
     <span
-      css={Css[fieldProps?.typeScale ?? "sm"].tl.bgGray300.gray900.br16.pxPx(10).pyPx(2).lineClamp1.breakAll.$}
+      css={Css[fieldProps?.typeScale ?? "sm"].tal.bgGray300.gray900.br16.pxPx(10).pyPx(2).lineClamp1.breakAll.$}
       title={label}
     >
       {label}

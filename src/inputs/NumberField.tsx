@@ -57,7 +57,7 @@ export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelSty
 export function NumberField(props: NumberFieldProps) {
   // Determine default alignment based on presentation context
   const { fieldProps } = usePresentationContext();
-  const alignment = fieldProps?.numberAlignment === "right" ? Css.tr.jcfe.$ : Css.tl.jcfs.$;
+  const alignment = fieldProps?.numberAlignment === "right" ? Css.tar.jcfe.$ : Css.tal.jcfs.$;
   const {
     disabled,
     required,

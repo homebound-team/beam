@@ -24,8 +24,8 @@ export class ColumnState<R extends Kinded> {
   ) {
     this.column = column;
     // If the user sets `canHide: true`, we default to hidden unless they set `initVisible: true`
-    this.visible = storage.wasVisible(column.id) ?? (column.canHide ? column.initVisible ?? false : true);
-    if (this.visible && (storage.wasExpanded(column.id) ?? column.initExpanded)) {
+    this.invisible = storage.wasVisible(column.id) ?? (column.canHide ? column.initVisible ?? false : true);
+    if (this.invisible && (storage.wasExpanded(column.id) ?? column.initExpanded)) {
       this.expanded = true;
       // TODO: verify this eslint ignore
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -35,8 +35,8 @@ export class ColumnState<R extends Kinded> {
   }
 
   setVisible(visible: boolean): void {
-    const wasVisible = this.visible;
-    this.visible = visible;
+    const wasVisible = this.invisible;
+    this.invisible = visible;
     // If an expandable header is becoming visible for the 1st time, expand it
     if (!wasVisible && visible && this.column.initExpanded && this.children === undefined) {
       this.expanded = true;
@@ -76,7 +76,7 @@ export class ColumnState<R extends Kinded> {
 
   /** Returns this column, if visible, and its children, if expanded. */
   get maybeSelfAndChildren(): ColumnState<R>[] {
-    if (!this.visible) {
+    if (!this.invisible) {
       return [];
     } else if (this.expanded && this.children) {
       // Maybe do the `hideOnExpand` thing here? Seems cute, but the Row rendering still

@@ -168,13 +168,13 @@ const whiteCircle =
 // -webkit-print-color-adjust: exact;
 
 export const radioReset = {
-  ...Css.add("appearance", "none").p0.dib.vMid.add("userSelect", "none").fs0.h2.w2.br100.$,
+  ...Css.add("appearance", "none").p0.dib.vam.add("userSelect", "none").fs0.h2.w2.br100.$,
   ...Css.add("outline", "0px solid transparent").$,
 };
 
 export const radioDefault = {
   // By default we're a white circle with a gray border
-  ...Css.bgWhite.bGray300.ba.$,
+  ...Css.bgWhite.bcGray300.ba.$,
   // Set the "selected" color that will be used by background=currentColor + box shadow, but is initially ignored
   ...Css.blue700.$,
   // Apply our default transitions
@@ -182,7 +182,7 @@ export const radioDefault = {
 };
 
 // Unchecked means a gray border
-export const radioUnchecked = Css.cursorPointer.bGray300.$;
+export const radioUnchecked = Css.cursorPointer.bcGray300.$;
 
 // Checked means a blue circle (achieved by a blue background + white dot background image)
 export const radioChecked = {
@@ -207,7 +207,7 @@ export const radioFocus = {
 
 export const radioHover = {
   // Change both the dot and the border to a darker blue
-  ...Css.blue900.bBlue900.$,
+  ...Css.blue900.bcBlue900.$,
 };
 
 export const radioDisabled = {

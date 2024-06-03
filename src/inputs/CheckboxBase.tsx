@@ -84,14 +84,14 @@ export function CheckboxBase(props: CheckboxBaseProps) {
   );
 }
 
-const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bGray300.br4.bgWhite.transition.$;
-const filledBoxStyles = Css.bBlue700.bgBlue700.$;
+const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bcGray300.br4.bgWhite.transition.$;
+const filledBoxStyles = Css.bcBlue700.bgBlue700.$;
 const filledBoxHoverStyles = Css.bgBlue900.$;
-const disabledBoxStyles = Css.bgGray50.bGray100.$;
-const disabledSelectedBoxStyles = Css.bgGray400.bGray400.$;
+const disabledBoxStyles = Css.bgGray50.bcGray100.$;
+const disabledSelectedBoxStyles = Css.bgGray400.bcGray400.$;
 const disabledColor = Css.gray300.$;
 const focusRingStyles = Css.bshFocus.$;
-const hoverBorderStyles = Css.bBlue900.$;
+const hoverBorderStyles = Css.bcBlue900.$;
 const markStyles = { svg: Css.absolute.topPx(-1).leftPx(-1).$ };
 const labelStyles = Css.smMd.$;
 const descStyles = Css.sm.gray700.$;

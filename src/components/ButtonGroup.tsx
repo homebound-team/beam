@@ -67,7 +67,7 @@ function GroupButton(props: GroupButtonProps) {
             {...hoverProps}
             css={{
               ...Css.buttonBase.px2.br0.h100.$,
-              "&:disabled": Css.gray400.cursorNotAllowed.bGray300.$,
+              "&:disabled": Css.gray400.cursorNotAllowed.bcGray300.$,
               ...(isFocusVisible ? defaultFocusRingStyles : {}),
               ...(active ? activeStyles : {}),
               ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
@@ -93,7 +93,7 @@ const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 
 function getButtonStyles() {
   return {
-    ...Css.z1.bgWhite.bGray300.bw1.ba.gray900.br0.overflowHidden.$,
+    ...Css.z1.bgWhite.bcGray300.bw1.ba.gray900.br0.oh.$,
     // Our first button should have a rounded left border
     "&:first-of-type": Css.add("borderRadius", "4px 0 0 4px").$,
     // Our last button should have a rounded right border

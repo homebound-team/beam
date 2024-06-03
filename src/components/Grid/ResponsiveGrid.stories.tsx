@@ -39,7 +39,7 @@ export function Example() {
 
   return (
     <PresentationProvider fieldProps={{ labelStyle: "inline", compact: true }}>
-      <div css={Css.df.gap3.aic.jcfs.pb2.mb2.bb.bGray400.$}>
+      <div css={Css.df.gap3.aic.jcfs.pb2.mb2.bb.bcGray400.$}>
         <NumberField label="Columns" value={columns} onChange={(v) => v && setColumns(v)} />
         <NumberField label="Min Column Width" value={minColumnWidth} onChange={(v) => v && setMinColumnWidth(v)} />
         <NumberField label="Gap" value={gap} onChange={(v) => v && setGap(v)} />
@@ -54,7 +54,7 @@ export function Example() {
         />
       </div>
       <div css={Css.df.$}>
-        <div css={Css.add("resize", "horizontal").mwPx(120).hPx(150).bshBasic.ba.bGray400.p1.overflowAuto.mr2.$}>
+        <div css={Css.add("resize", "horizontal").mwPx(120).hPx(150).bshBasic.ba.bcGray400.p1.oa.mr2.$}>
           Resize Me
         </div>
         {sortable ? (
@@ -91,7 +91,7 @@ function ResizableGridItem({ item, sortable }: { item: GridItem; sortable: boole
     <div
       ref={ref}
       css={{
-        ...Css.br8.ba.bshBasic.bGray400.bgWhite.p2.df.aic.fdc.sm.gr(`span ${rowSpan}`).if(!stretch).asfs.$,
+        ...Css.br8.ba.bshBasic.bcGray400.bgWhite.p2.df.aic.fdc.sm.gr(`span ${rowSpan}`).if(!stretch).asfs.$,
         ...(pin ? Css.sticky.top0.$ : {}),
       }}
       {...gridItemProps}
@@ -198,7 +198,7 @@ const { dragItemProps, dragHandleProps } = useDnDGridItem({ id: item.id, itemRef
 
 return (
 <div
-  css={Css.br8.ba.bshBasic.bGray400.bgWhite.p1.sm.${sortable ? "relative." : ""}${
+  css={Css.br8.ba.bshBasic.bcGray400.bgWhite.p1.sm.${sortable ? "relative." : ""}${
     rowSpan !== 1 ? `gr("span ${rowSpan}").` : ""
   }${pin ? `sticky.top0.` : ""}${!stretch ? "asfs." : ""}$}
   {...gridItemProps} ${

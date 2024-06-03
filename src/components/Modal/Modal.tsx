@@ -113,7 +113,7 @@ export function Modal(props: ModalProps) {
             <FocusScope contain restoreFocus autoFocus>
               <div
                 css={
-                  Css.br24.bgWhite.bshModal.overflowHidden
+                  Css.br24.bgWhite.bshModal.oh
                     .maxh("90vh")
                     .df.fdc.wPx(width)
                     .mhPx(defaultMinHeight)
@@ -131,7 +131,7 @@ export function Modal(props: ModalProps) {
                 {...testId}
               >
                 {/* Setup three children (header, content, footer), and flex grow the content. */}
-                <header css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bGray200.$}>
+                <header css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bcGray200.$}>
                   <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
                   <span css={Css.fs0.pl1.$}>
                     <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
@@ -139,7 +139,7 @@ export function Modal(props: ModalProps) {
                 </header>
                 <main
                   ref={modalBodyRef}
-                  css={Css.fg1.overflowYAuto.if(hasScroll).bb.bGray200.if(!!forceScrolling).overflowYScroll.$}
+                  css={Css.fg1.oya.if(hasScroll).bb.bcGray200.if(!!forceScrolling).oys.$}
                 >
                   {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
                   {content}
@@ -170,7 +170,7 @@ export function ModalBody({
   const testId = useTestIds({}, testIdPrefix);
   return createPortal(
     // If `virtualized`, then we are expecting the `children` will handle their own scrollbar, so have the overflow hidden and adjust padding
-    <div css={Css.h100.if(virtualized).overflowHidden.pl3.else.px3.$} {...testId.content}>
+    <div css={Css.h100.if(virtualized).oh.pl3.else.px3.$} {...testId.content}>
       {children}
     </div>,
     modalBodyDiv,

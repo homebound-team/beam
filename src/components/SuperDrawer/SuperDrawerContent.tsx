@@ -37,7 +37,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
   function wrapWithMotionAndMaybeBack(children: ReactNode): ReactNode {
     if (kind === "open") {
       return (
-        <motion.div key="content" css={Css.p3.fg1.overflowAuto.$}>
+        <motion.div key="content" css={Css.p3.fg1.oa.$}>
           {children}
         </motion.div>
       );
@@ -74,7 +74,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
       {wrapWithMotionAndMaybeBack(children)}
       {/* Optionally render footer section with row of given footer buttons */}
       {actions && (
-        <footer css={Css.bt.bGray200.p3.df.aic.jcfe.$}>
+        <footer css={Css.bt.bcGray200.p3.df.aic.jcfe.$}>
           <div css={Css.df.gap1.$}>
             {actions.map((buttonProps, i) => (
               <Button key={i} {...buttonProps} />

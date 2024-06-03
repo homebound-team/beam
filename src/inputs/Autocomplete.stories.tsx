@@ -44,7 +44,7 @@ function Template(props: AutocompleteProps<any>) {
       disabledOptions={[{ value: "Iron man", reason: "No heroes selected" }, "Thor"]}
       getOptionMenuLabel={(o) => (
         <div css={Css.df.aic.gap1.$}>
-          <span css={Css.wPx(24).hPx(24).br100.overflowHidden.$}>
+          <span css={Css.wPx(24).hPx(24).br100.oh.$}>
             <img src={o.imgSrc} alt={o.label} css={Css.w100.h100.objectCover.$} />
           </span>
           {o.label}

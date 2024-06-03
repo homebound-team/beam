@@ -7,7 +7,7 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
   if (children?.length !== 2) {
     throw global.Error("CompoundField requires two children components");
   }
-  const commonStyles = Css.df.aic.fs1.maxwPx(550).bt.bb.bGray300.$;
+  const commonStyles = Css.df.aic.fs1.maxwPx(550).bt.bb.bcGray300.$;
   const internalProps: TextFieldInternalProps = { compound: true };
 
   return (
@@ -21,7 +21,7 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
         css={{
           ...commonStyles,
           ...Css.bl.borderRadius("4px 0 0 4px").$,
-          "&:focus-within": Css.bBlue700.$,
+          "&:focus-within": Css.bcBlue700.$,
         }}
       >
         {cloneElement(children[0], {
@@ -35,7 +35,7 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
         css={{
           ...commonStyles,
           ...Css.fg1.br.borderRadius("0 4px 4px 0").$,
-          "&:focus-within": Css.bBlue700.$,
+          "&:focus-within": Css.bcBlue700.$,
         }}
       >
         {cloneElement(children[1], {

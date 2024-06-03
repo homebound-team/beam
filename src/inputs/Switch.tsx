@@ -55,7 +55,7 @@ export function Switch(props: SwitchProps) {
     <label
       {...hoverProps}
       css={{
-        ...Css.relative.cursorPointer.df.wmaxc.selectNone.$,
+        ...Css.relative.cursorPointer.df.wmaxc.usn.$,
         ...(labelStyle === "form" && Css.fdc.$),
         ...(labelStyle === "left" && Css.w100.aic.$),
         ...(labelStyle === "inline" && Css.gap2.aic.$),

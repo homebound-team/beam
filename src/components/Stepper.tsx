@@ -91,7 +91,7 @@ function StepButton(props: StepButtonProps) {
       {...hoverProps}
       css={{
         ...Css.buttonBase.$,
-        ...Css.tl.w100.h100.sm.gray700.add("whiteSpace", "initial").if(state === "error").red600.$,
+        ...Css.tal.w100.h100.sm.gray700.add("whiteSpace", "initial").if(state === "error").red600.$,
         ...(isCurrent ? Css.blue700.if(state === "error").red800.$ : {}),
         ...(isHovered && !isPressed ? Css.blue800.if(state === "error").red500.$ : {}),
         ...(isPressed ? Css.blue500.if(state === "error").red900.$ : {}),

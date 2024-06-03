@@ -50,7 +50,7 @@ export function Day(props: DayProps) {
             "&:hover:not(:active) > div": Css.bgGray100.$,
           }),
         ...(!disabled && { "&:active > div": Css.bgGray400.gray900.$ }),
-        "&:focus:not(:active) > div": Css.ba.bBlue700.if(selected).bBlue900.$,
+        "&:focus:not(:active) > div": Css.ba.bcBlue700.if(selected).bcBlue900.$,
         ...(showRangeStyles &&
           range_start &&
           Css.addIn(":after", { ...rangeBaseStyles, ...Css.rightPx(-2).wPx(8).$ }).$),
@@ -61,7 +61,7 @@ export function Day(props: DayProps) {
     >
       <div
         css={{
-          ...Css.overflowHidden.gray900.relative.z1.br4.df.aic.jcc.wPx(28).hPx(30).mtPx(2).br4.$,
+          ...Css.oh.gray900.relative.z1.br4.df.aic.jcc.wPx(28).hPx(30).mtPx(2).br4.$,
           ...(today && !range_middle && Css.bgGray100.$),
           ...(selected && !range_middle && Css.white.bgBlue700.$),
           ...(disabled && Css.gray500.$),

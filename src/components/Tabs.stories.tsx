@@ -138,7 +138,7 @@ function TestComponent() {
   ];
   return (
     <div>
-      <div css={Css.bb.bGray200.py1.mb2.$}>
+      <div css={Css.bb.bcGray200.py1.mb2.$}>
         <div>
           <strong>Current URL:</strong> <pre css={Css.dib.$}>{location?.pathname}</pre>
         </div>
@@ -165,12 +165,12 @@ export const TabWithRightContent = () => {
     {
       name: "Tab 1",
       value: "tab1",
-      render: () => <div css={Css.bgGray100.bt.bGray800.p2.$}>Tab 1 Content</div>,
+      render: () => <div css={Css.bgGray100.bt.bcGray800.p2.$}>Tab 1 Content</div>,
     },
     {
       name: "Tab 2",
       value: "tab2",
-      render: () => <div css={Css.bgGray100.bt.bGray800.p2.$}>Tab 2 Content</div>,
+      render: () => <div css={Css.bgGray100.bt.bcGray800.p2.$}>Tab 2 Content</div>,
     },
   ];
   const right = (

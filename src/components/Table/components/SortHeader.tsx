@@ -51,7 +51,7 @@ export function SortHeader(props: SortHeaderProps) {
     </span>
   );
   return (
-    <div {...tid} css={{ ...Css.df.aic.h100.cursorPointer.selectNone.$, ...xss }} {...hoverProps} onClick={toggleSort}>
+    <div {...tid} css={{ ...Css.df.aic.h100.cursorPointer.usn.$, ...xss }} {...hoverProps} onClick={toggleSort}>
       {iconOnLeft && icon}
       <span css={Css.lineClamp2.$}>{content}</span>
       {tooltipEl}

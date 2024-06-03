@@ -46,7 +46,7 @@ export function Option<O>(props: OptionProps<O>) {
         css={{
           ...Css.df.aic.jcsb.py1.px2.mh("42px").outline0.cursorPointer.sm.$,
           // Assumes only one Persistent Item per list - will need to change to utilize Sections if that assumption is incorrect.
-          ...(isPersistentKey(item.key) ? Css.bt.bGray200.$ : {}),
+          ...(isPersistentKey(item.key) ? Css.bt.bcGray200.$ : {}),
           ...themeStyles.item,
           ...(isHovered && !isDisabled ? themeStyles.hover : {}),
           ...(isFocused ? themeStyles.focus : {}),
