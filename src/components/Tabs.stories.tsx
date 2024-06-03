@@ -132,7 +132,7 @@ function TestComponent() {
       name: "Disabled Tab",
       href: "/ce:2/disabled",
       path: "/:ceId/disabled",
-      disabled: true,
+      disabled: "Disabled reason",
       render: () => <TestTabContent content="Disabled Tab" />,
     },
   ];

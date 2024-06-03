@@ -3,8 +3,7 @@ import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, u
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { matchPath, Route } from "react-router";
 import { Link, useLocation } from "react-router-dom";
-import type { IconKey } from "src/components";
-import { FullBleed } from "src/components";
+import { FullBleed, IconKey, maybeTooltip, resolveTooltip } from "src/components";
 import { Css, Margin, Only, Padding, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { AnyObject } from "src/types";
@@ -19,7 +18,8 @@ export interface Tab<V extends string = string> {
   icon?: IconKey;
   // Suffixes label with specified node. Expected to be used for cases where the decoration is not just an icon.
   endAdornment?: ReactNode;
-  disabled?: boolean;
+  /** Whether the Tab is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
+  disabled?: boolean | ReactNode;
 }
 
 type TabsContentXss = Xss<Margin | Padding | "backgroundColor">;
@@ -205,7 +205,8 @@ interface TabImplProps<V extends string> extends BeamFocusableProps {
 
 function TabImpl<V extends string>(props: TabImplProps<V>) {
   const { tab, onClick, active, onKeyUp, onBlur, focusProps, isFocusVisible = false, ...others } = props;
-  const { disabled: isDisabled = false, name: label, icon, endAdornment } = tab;
+  const { disabled = false, name: label, icon, endAdornment } = tab;
+  const isDisabled = !!disabled;
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
     () => getTabStyles(),
@@ -244,7 +245,11 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
   );
 
   return isDisabled ? (
-    <div {...tabProps}>{tabLabel}</div>
+    maybeTooltip({
+      title: resolveTooltip(disabled),
+      placement: "top",
+      children: <div {...tabProps}>{tabLabel}</div>,
+    })
   ) : isRouteTab(tab) ? (
     <Link {...{ ...tabProps, ...interactiveProps }} className="navLink" to={tab.href}>
       {tabLabel}
