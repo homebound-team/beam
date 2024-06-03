@@ -29,7 +29,7 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
         })}
       </div>
       {/* Separation line */}
-      <div css={Css.wPx(1).flexNone.bgGray300.$} />
+      <div css={Css.wPx(1).fn.bgGray300.$} />
 
       <div
         css={{

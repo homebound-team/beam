@@ -112,8 +112,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         ":hover": { ...style.nonHeaderRowHoverCss },
       }),
     ...(levelIndent && Css.mlPx(levelIndent).$),
-    // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `flexNone` to ensure they stay their defined widths
-    ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.flexNone.$).$),
+    // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `fn` to ensure they stay their defined widths
+    ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.fn.$).$),
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
     ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
