@@ -156,6 +156,7 @@ export const Icon = (props: IconProps) => {
     "updateDesignPackage",
     "exteriorStyle",
     "lockOpen",
+    "map",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
