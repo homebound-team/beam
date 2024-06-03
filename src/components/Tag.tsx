@@ -30,7 +30,7 @@ export function Tag<X extends Only<Xss<TagXss>, X>>({ text, type, xss, ...otherP
           <Icon icon={otherProps.icon} inc={1.5} />
         </span>
       )}
-      <span css={Css.lineClamp1.breakAll.$}>{text}</span>
+      <span css={Css.lineClamp1.wbba.$}>{text}</span>
     </span>
   );
 }

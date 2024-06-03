@@ -249,7 +249,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 ...(showHover ? fieldStyles.hover : {}),
                 // Only show error styles if the field is not disabled, following the pattern that the error message is also hidden
                 ...(errorMsg && !inputProps.disabled ? fieldStyles.error : {}),
-                ...Css.if(multiline).aifs.overflowHidden.mhPx(textAreaMinHeight).$,
+                ...Css.if(multiline).aifs.oh.mhPx(textAreaMinHeight).$,
               }}
               {...hoverProps}
               ref={inputWrapRef as any}
@@ -266,7 +266,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   tabIndex={-1}
                   {...tid.unfocusedPlaceholderContainer}
                   css={{
-                    ...Css.df.asc.w100.maxhPx(74).overflowAuto.$,
+                    ...Css.df.asc.w100.maxhPx(74).oa.$,
                     ...fieldStyles.input,
                     ...(showHover ? fieldStyles.hover : {}),
                     ...(inputProps.disabled ? fieldStyles.disabled : {}),

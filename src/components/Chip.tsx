@@ -47,7 +47,7 @@ export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X
         }}
         {...tid}
       >
-        <span css={Css.lineClamp1.breakAll.$}>{text}</span>
+        <span css={Css.lineClamp1.wbba.$}>{text}</span>
       </span>
     ),
   });

@@ -25,13 +25,13 @@ export function Examples() {
       </div>
 
       <h2 css={Css.mt8.mb1.lgSb.$}>Horizontal scroll</h2>
-      <ScrollShadows xss={Css.wPx(200).bgWhite.p1.ba.bcGray200.nowrap.$} horizontal>
+      <ScrollShadows xss={Css.wPx(200).bgWhite.p1.ba.bcGray200.wsnw.$} horizontal>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc
       </ScrollShadows>
 
       <div css={Css.mt3.df.gap1.aic.bgWhite.ba.bcGray200.br4.p1.oh.wPx(400).$}>
         <div css={Css.df.aic.fs0.fw6.$}>Fixed Label:</div>
-        <ScrollShadows xss={Css.nowrap.fg1.$} horizontal>
+        <ScrollShadows xss={Css.wsnw.fg1.$} horizontal>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc
         </ScrollShadows>
       </div>

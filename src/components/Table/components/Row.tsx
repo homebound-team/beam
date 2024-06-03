@@ -118,8 +118,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     ...{
-      [` > .${revealOnRowHoverClass} > *`]: Css.invisible.$,
-      [`:hover > .${revealOnRowHoverClass} > *`]: Css.invisible.$,
+      [` > .${revealOnRowHoverClass} > *`]: Css.vh.$,
+      [`:hover > .${revealOnRowHoverClass} > *`]: Css.vh.$,
     },
     ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
   };

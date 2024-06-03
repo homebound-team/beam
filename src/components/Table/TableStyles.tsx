@@ -142,7 +142,7 @@ function memoizedTableStyles() {
           ...(allWhite && Css.bgWhite.$),
         },
         totalsCellCss: Css.bgWhite.gray700.bgGray100.xsMd.hPx(totalsRowHeight).pPx(12).$,
-        expandableHeaderCss: Css.bgWhite.gray900.xsMd.wsNormal
+        expandableHeaderCss: Css.bgWhite.gray900.xsMd.wsn
           .hPx(expandableHeaderRowHeight)
           .pxPx(12)
           .py0.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
@@ -150,7 +150,7 @@ function memoizedTableStyles() {
         cellCss: {
           ...Css[cellTypography].gray900.bgWhite.ai(alignItems).pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
             .$,
-          ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
+          ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.wsnw.hPx(inlineEditing ? 48 : 36).$),
           ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
           ...(bordered && { "&:first-child": Css.bl.bcGray200.$, "&:last-child": Css.br.bcGray200.$ }),
         },

@@ -258,7 +258,7 @@ export function ChipSelectField<O, V extends Value>(
               title={state.selectedItem ? state.selectedItem.textValue : placeholder}
               {...tid}
             >
-              <span {...valueProps} css={Css.lineClamp1.breakAll.$}>
+              <span {...valueProps} css={Css.lineClamp1.wbba.$}>
                 {state.selectedItem ? state.selectedItem.textValue : placeholder}
               </span>
             </button>
