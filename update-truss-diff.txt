@@ -205,6 +205,7 @@ vat
 vBottom
 vaBottom
 visible
+vv
 invisible
 vh
 breakNormal
@@ -215,3 +216,9 @@ breakKeepAll
 wbka
 breakWord
 wbbw
+nowrap
+wsnw
+pre
+wsp
+wsNormal
+wsn
