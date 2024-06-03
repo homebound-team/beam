@@ -54,9 +54,7 @@ export function Example() {
         />
       </div>
       <div css={Css.df.$}>
-        <div css={Css.add("resize", "horizontal").mwPx(120).hPx(150).bshBasic.ba.bcGray400.p1.oa.mr2.$}>
-          Resize Me
-        </div>
+        <div css={Css.add("resize", "horizontal").mwPx(120).hPx(150).bshBasic.ba.bcGray400.p1.oa.mr2.$}>Resize Me</div>
         {sortable ? (
           <DnDGrid onReorder={(items) => console.log("onReorder:", { items })} gridStyles={styles}>
             {gridItemElements}

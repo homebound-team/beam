@@ -137,10 +137,7 @@ export function Modal(props: ModalProps) {
                     <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
                   </span>
                 </header>
-                <main
-                  ref={modalBodyRef}
-                  css={Css.fg1.oya.if(hasScroll).bb.bcGray200.if(!!forceScrolling).oys.$}
-                >
+                <main ref={modalBodyRef} css={Css.fg1.oya.if(hasScroll).bb.bcGray200.if(!!forceScrolling).oys.$}>
                   {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
                   {content}
                 </main>
