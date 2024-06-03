@@ -222,3 +222,7 @@ pre
 wsp
 wsNormal
 wsn
+flexAuto
+fa
+flexNone
+fn
