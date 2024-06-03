@@ -284,7 +284,7 @@ export function TableWithPrevNextAndCloseCheck() {
         columns={[titleColumn, authorColumn]}
         rowStyles={rowStyles}
         rowLookup={rowLookup}
-        rows={simpleDataRows(Books.map((b, idx) => ({ id: `${idx}`, ...fwb })))}
+        rows={simpleDataRows(Books.map((b, idx) => ({ id: `${idx}`, ...b })))}
       />
     </div>
   );
