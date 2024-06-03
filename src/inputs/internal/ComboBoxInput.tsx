@@ -9,15 +9,15 @@ import React, {
 } from "react";
 import { mergeProps } from "react-aria";
 import { ComboBoxState } from "react-stately";
-import { Icon } from "src/components";
+import { Chips, Icon, Tooltip } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
-import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
 import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
 import { Value } from "src/inputs/Value";
 import { maybeCall } from "src/utils";
+import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 
 interface ComboBoxInputProps<O, V extends Value> extends PresentationFieldProps {
   buttonProps: any;
@@ -85,17 +85,32 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
   const [isFocused, setIsFocused] = useState(false);
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
   const showNumSelection = isMultiSelect && state.selectionManager.selectedKeys.size > 1;
+  // Show selections as chips when using multiselect when unfocused
+  const showChipSelection = isMultiSelect && state.selectionManager.selectedKeys.size > 0;
   // For MultiSelect only show the `fieldDecoration` when input is not in focus.
   const showFieldDecoration =
     (!isMultiSelect || (isMultiSelect && !isFocused)) && fieldDecoration && selectedOptions.length === 1;
 
   const multilineProps = allowWrap ? { textAreaMinHeight: 0, multiline: true } : {};
-  useGrowingTextField({ disabled: !allowWrap, inputRef, inputWrapRef, value: inputProps.value });
+
+  const chipLabels = isTree ? selectedOptionsLabels || [] : selectedOptions.map((o) => getOptionLabel(o));
+
+  useGrowingTextField({
+    // This says: When using a multiselect, then only enable the growing textfield when we are focused on it.
+    // Because otherwise, we're not displaying the input element that dictates the height (we're displaying <Chips/>). This would cause incorrect calculations
+    disabled: (isMultiSelect && (!allowWrap || !isFocused)) || (!isMultiSelect && !allowWrap),
+    inputRef,
+    inputWrapRef,
+    value: inputProps.value,
+  });
 
   return (
     <TextFieldBase
       {...otherProps}
       {...multilineProps}
+      unfocusedPlaceholder={
+        showChipSelection && <Chips compact={otherProps.compact} values={chipLabels} wrap={allowWrap} />
+      }
       inputRef={inputRef}
       inputWrapRef={inputWrapRef}
       errorMsg={errorMsg}
@@ -103,12 +118,14 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       xss={otherProps.labelStyle !== "inline" && !inputProps.readOnly ? Css.fw5.$ : {}}
       startAdornment={
         (showNumSelection && (
-          <span
-            css={Css.wPx(16).hPx(16).fs0.br100.bgBlue700.white.tinySb.df.aic.jcc.$}
-            data-testid="selectedOptionsCount"
-          >
-            {isTree ? selectedOptionsLabels?.length : state.selectionManager.selectedKeys.size}
-          </span>
+          <Tooltip title={<SelectedOptionBullets labels={chipLabels} />}>
+            <span
+              css={Css.wPx(16).hPx(16).fs0.br100.bgBlue700.white.tinySb.df.aic.jcc.$}
+              data-testid="selectedOptionsCount"
+            >
+              {isTree ? selectedOptionsLabels?.length : state.selectionManager.selectedKeys.size}
+            </span>
+          </Tooltip>
         )) ||
         (showFieldDecoration && fieldDecoration(selectedOptions[0]))
       }
@@ -249,4 +266,8 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       }}
     />
   );
+}
+
+function SelectedOptionBullets({ labels = [] }: { labels: string[] | undefined }) {
+  return <div>{labels?.map((label) => <li key={label}>{label}</li>)}</div>;
 }

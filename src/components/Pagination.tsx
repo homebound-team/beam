@@ -20,12 +20,14 @@ export const defaultPage: OffsetAndLimit = { offset: 0, limit: 100 };
 interface PaginationProps {
   page: readonly [PageNumberAndSize, Dispatch<PageNumberAndSize>] | readonly [OffsetAndLimit, Dispatch<OffsetAndLimit>];
   totalCount: number;
+  pageSizes?: number[];
 }
 
 export function Pagination(props: PaginationProps) {
-  const { totalCount } = props;
+  const { totalCount, pageSizes = [100, 500, 1000] } = props;
   const [page, setPage] = props.page;
   const { pageSize, pageNumber } = toPageNumberSize(page);
+  const pageOptions = pageSizes.map((size) => ({ id: size, name: String(size) }));
 
   const hasPrevPage = pageNumber > 1;
   const hasNextPage = pageNumber < totalCount / pageSize;
@@ -102,6 +104,3 @@ export function toPageNumberSize(page: PageSettings): PageNumberAndSize {
         pageSize: page.limit,
       };
 }
-
-// Make a list of 100/500/1000 for the user to choose
-export const pageOptions = [100, 500, 1000].map((num) => ({ id: num, name: String(num) }));

@@ -27,7 +27,13 @@ export function useGrowingTextField({ inputRef, inputWrapRef, value, disabled }:
   }, [inputRef, disabled, inputWrapRef]);
 
   useLayoutEffect(() => {
-    if (disabled) return;
+    if (disabled) {
+      // reset the height property if it was flipped to disabled
+      if (inputWrapRef.current) {
+        inputWrapRef.current.style.removeProperty("height");
+      }
+      return;
+    }
 
     if (inputRef.current) {
       // Temp hack until we can figure out a better way to ensure proper measurements when rendered through a portal (i.e. Modals)
@@ -37,5 +43,5 @@ export function useGrowingTextField({ inputRef, inputWrapRef, value, disabled }:
       }
       onHeightChange();
     }
-  }, [onHeightChange, value, inputRef, disabled]);
+  }, [onHeightChange, value, inputRef, disabled, inputWrapRef]);
 }

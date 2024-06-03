@@ -27,6 +27,7 @@ export * from "./IconButton";
 export * from "./Layout";
 export * from "./Loader";
 export * from "./LoadingSkeleton";
+export * from "./MaxLines";
 export * from "./Modal";
 export * from "./Modal/useModal";
 export { NavLink } from "./NavLink";

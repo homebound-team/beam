@@ -1,4 +1,4 @@
-import { render } from "src/utils/rtl";
+import { click, render } from "src/utils/rtl";
 import { Accordion } from "./Accordion";
 
 describe(Accordion, () => {
@@ -71,5 +71,39 @@ describe(Accordion, () => {
     expect(r.accordion_title).toBeDisabled();
     // And the content is not displayed
     expect(r.query.accordion_content).not.toBeInTheDocument();
+  });
+
+  it("calls the titleOnClick function when the title is clicked", async () => {
+    // Given an accordion component with titleOnClick set
+    const titleOnClick = jest.fn();
+    // When rendered
+    const r = await render(
+      <Accordion title="Test title" titleOnClick={titleOnClick}>
+        Test description
+      </Accordion>,
+    );
+
+    // Then the titleOnClick function is called when the title is clicked
+    click(r.accordion_title);
+    expect(titleOnClick).toHaveBeenCalled();
+  });
+
+  it("alters expando behavior when titleOnClick is provided", async () => {
+    // When rendered with a titleOnClick set
+    const r = await render(
+      <Accordion title="Test title" titleOnClick={() => {}}>
+        Test description
+      </Accordion>,
+    );
+
+    // when the title is clicked
+    click(r.accordion_title);
+    // then the content is not displayed
+    expect(r.query.accordion_content).not.toBeInTheDocument();
+
+    // when bar is clicked
+    click(r.accordion_toggle);
+    // then the content is displayed
+    expect(r.accordion_content).toHaveTextContent("Test description");
   });
 });

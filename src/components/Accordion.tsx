@@ -1,5 +1,5 @@
 import { useId, useResizeObserver } from "@react-aria/utils";
-import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFocusRing } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css, Only, Padding, Palette, Xss } from "src/Css";
@@ -23,6 +23,8 @@ export interface AccordionProps<X = AccordionXss> {
    */
   index?: number;
   setExpandedIndex?: Dispatch<SetStateAction<number | undefined>>;
+  /** Turns the title into a button. If provided, disables expand/collapse on title text */
+  titleOnClick?: VoidFunction;
   /** Used by Accordion list. Sets default padding to 0 for nested accordions */
   omitPadding?: boolean;
   /** Styles overrides for padding */
@@ -43,10 +45,11 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
     bottomBorder = false,
     index,
     setExpandedIndex,
+    titleOnClick,
     omitPadding = false,
     xss,
   } = props;
-  const testIds = useTestIds(props, "accordion");
+  const tid = useTestIds(props, "accordion");
   const id = useId();
   const [expanded, setExpanded] = useState(defaultExpanded && !disabled);
   const { isFocusVisible, focusProps } = useFocusRing();
@@ -76,56 +79,81 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
   }, [expanded, setContentHeight]);
   useResizeObserver({ ref: contentRef, onResize });
 
+  const toggle = useCallback(() => {
+    setExpanded((prev) => !prev);
+    if (setExpandedIndex) setExpandedIndex(index);
+  }, [index, setExpandedIndex]);
+
+  const touchableStyle = useMemo(
+    () => ({
+      ...Css.df.jcsb.gapPx(12).aic.p2.baseMd.outline("none").onHover.bgGray100.if(!!titleOnClick).baseSb.$,
+      ...(compact && Css.smMd.pl2.prPx(10).py1.bgGray100.mbPx(4).br8.onHover.bgGray200.$),
+      ...(compact && !!titleOnClick && Css.br0.$),
+      ...(disabled && Css.gray500.$),
+      ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.Blue700}`).$),
+      ...xss,
+    }),
+    [compact, disabled, isFocusVisible, titleOnClick, xss],
+  );
+
   return (
     <div
-      {...testIds.container}
+      {...tid.container}
       css={{
         ...Css.bcGray300.if(topBorder).bt.if(bottomBorder).bb.$,
         ...(size ? Css.wPx(accordionSizes[size]).$ : {}),
       }}
     >
-      <button
-        {...testIds.title}
-        {...focusProps}
-        aria-controls={id}
-        aria-expanded={expanded}
-        disabled={disabled}
-        css={{
-          ...Css.df.jcsb.gapPx(12).aic.w100.p2.baseMd.outline("none").onHover.bgGray100.$,
-          ...(compact && Css.smMd.pl2.prPx(10).py1.bgGray100.mbPx(4).br8.onHover.bgGray200.$),
-          ...(disabled && Css.gray500.$),
-          ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.Blue700}`).$),
-          ...xss,
-        }}
-        onClick={() => {
-          setExpanded(!expanded);
-          if (setExpandedIndex) setExpandedIndex(index);
-        }}
-      >
-        <span css={Css.fg1.tal.$}>{title}</span>
-        <span
-          css={{
-            ...Css.fs0.$,
-            transition: "transform 250ms linear",
-            transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
-          }}
+      {titleOnClick ? (
+        <div {...focusProps} aria-controls={id} aria-expanded={expanded} css={Css.df.$}>
+          <button {...tid.title} disabled={disabled} css={{ ...touchableStyle, ...Css.fg0.$ }} onClick={titleOnClick}>
+            {title}
+          </button>
+          <button {...tid.toggle} disabled={disabled} css={{ ...touchableStyle, ...Css.fg1.jcfe.$ }} onClick={toggle}>
+            <RotatingChevronIcon expanded={expanded} />
+          </button>
+        </div>
+      ) : (
+        <button
+          {...tid.title}
+          {...focusProps}
+          aria-controls={id}
+          aria-expanded={expanded}
+          disabled={disabled}
+          css={{ ...Css.w100.$, ...touchableStyle }}
+          onClick={toggle}
         >
-          <Icon icon="chevronDown" />
-        </span>
-      </button>
+          <span css={Css.fg1.tal.$}>{title}</span>
+          <RotatingChevronIcon expanded={expanded} />
+        </button>
+      )}
       <div
-        {...testIds.details}
+        {...tid.details}
         id={id}
         aria-hidden={!expanded}
         css={Css.oh.h(contentHeight).add("transition", "height 250ms ease-in-out").$}
       >
         {expanded && (
-          <div css={Css.px2.pb2.pt1.if(omitPadding).p0.$} ref={contentRef} {...testIds.content}>
+          <div css={Css.px2.pb2.pt1.if(omitPadding).p0.$} ref={contentRef} {...tid.content}>
             {children}
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+function RotatingChevronIcon(props: { expanded: boolean }) {
+  return (
+    <span
+      css={{
+        ...Css.fs0.$,
+        transition: "transform 250ms linear",
+        transform: props.expanded ? "rotate(180deg)" : "rotate(0deg)",
+      }}
+    >
+      <Icon icon="chevronDown" />
+    </span>
   );
 }
 
