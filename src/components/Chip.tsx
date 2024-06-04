@@ -3,6 +3,7 @@ import { usePresentationContext } from "src/components/PresentationContext";
 import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
+import { Icon, IconKey } from "src/components/Icon";
 
 export type ChipType = "caution" | "warning" | "success" | "light" | "dark" | "neutral" | "darkMode" | "info";
 
@@ -24,6 +25,7 @@ export interface ChipProps<X> {
   xss?: X;
   type?: ChipType;
   compact?: boolean;
+  icon?: IconKey;
 }
 
 /** Kinda like a chip, but read-only, so no `onClick` or `hover`. */
@@ -32,7 +34,7 @@ export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X
   ...props
 }: ChipProps<X>) {
   const { fieldProps } = usePresentationContext();
-  const { text, title, xss = {}, compact = fieldProps?.compact } = props;
+  const { text, title, xss = {}, compact = fieldProps?.compact, icon } = props;
   const tid = useTestIds(props, "chip");
 
   return maybeTooltip({
@@ -41,12 +43,13 @@ export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X
     children: (
       <span
         css={{
-          ...Css[compact ? "xs" : "sm"].dif.aic.br16.pl1.px1.pyPx(2).gray900.$,
+          ...Css[compact ? "xs" : "sm"].dif.aic.gapPx(4).br16.pl1.px1.pyPx(2).gray900.$,
           ...typeStyles[type],
           ...xss,
         }}
         {...tid}
       >
+        {icon && <Icon icon={icon} inc={2} xss={Css.fs0.$} />}
         <span css={Css.lineClamp1.breakAll.$}>{text}</span>
       </span>
     ),
