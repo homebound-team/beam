@@ -106,10 +106,15 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
     >
       {titleOnClick ? (
         <div {...focusProps} aria-controls={id} aria-expanded={expanded} css={Css.df.$}>
-          <button {...tid.title} disabled={disabled} css={{ ...touchableStyle, ...Css.fg0.$ }} onClick={titleOnClick}>
+          <button {...tid.title} disabled={disabled} css={{ ...touchableStyle, ...Css.fg1.$ }} onClick={titleOnClick}>
             {title}
           </button>
-          <button {...tid.toggle} disabled={disabled} css={{ ...touchableStyle, ...Css.fg1.jcfe.$ }} onClick={toggle}>
+          <button
+            {...tid.toggle}
+            disabled={disabled}
+            css={{ ...touchableStyle, ...Css.px2.jcfe.if(compact).pxPx(10).$ }}
+            onClick={toggle}
+          >
             <RotatingChevronIcon expanded={expanded} />
           </button>
         </div>

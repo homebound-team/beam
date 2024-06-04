@@ -49,3 +49,12 @@ export function ChipWithCustomTitle() {
 export function ChipWithCustomColor() {
   return <Chip text="Chip with custom color" xss={Css.bgBlue100.$} />;
 }
+
+export function WithIcon() {
+  return (
+    <div css={Css.wPx(200).$}>
+      <Chip icon="map" text="Kitchen" />
+      <Chip icon="map" text="A very long chip name that will eventually truncate" />
+    </div>
+  );
+}
