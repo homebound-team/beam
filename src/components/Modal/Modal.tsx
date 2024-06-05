@@ -130,7 +130,12 @@ export function Modal(props: ModalProps) {
                 {...modalProps}
                 {...testId}
               >
-                {/* Setup three children (header, content, footer), and flex grow the content. */}
+                {/*
+                  Setup three children (header, content, footer), and flex grow the content.
+
+                  Use `fdrr` so that the close icon won't sit between "modal header search field"
+                  and the modal body results in the DOM focus order, i.e. in our global search modal.
+                */}
                 <header css={Css.df.fdrr.p3.fs0.if(drawHeaderBorder).bb.bcGray200.$}>
                   <span css={Css.fs0.pl1.$}>
                     <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
