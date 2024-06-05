@@ -120,8 +120,8 @@ export function Modal(props: ModalProps) {
                     .if(isFixedHeight)
                     .hPx(height)
                     .if(sm)
-                    .add("height", "100dvh")
-                    .add("width", "100dvw")
+                    .h("100dvh")
+                    .w("100dvw")
                     .maxh("none").br0.$
                 }
                 ref={ref}
@@ -136,7 +136,7 @@ export function Modal(props: ModalProps) {
                   Use `fdrr` so that the close icon won't sit between "modal header search field"
                   and the modal body results in the DOM focus order, i.e. in our global search modal.
                 */}
-                <header css={Css.df.fdrr.p3.fs0.if(drawHeaderBorder).bb.bcGray200.$}>
+                <header css={Css.df.fdrr.p3.fs0.aic.if(drawHeaderBorder).bb.bcGray200.$}>
                   <span css={Css.fs0.pl1.$}>
                     <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
                   </span>

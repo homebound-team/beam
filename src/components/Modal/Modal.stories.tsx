@@ -116,15 +116,7 @@ interface ModalExampleProps
     TestModalContentProps {}
 
 function ModalExample(props: ModalExampleProps) {
-  const {
-    size,
-    showLeftAction,
-    initNumSentences = 1,
-    forceScrolling,
-    withTag,
-    withDateField,
-    drawHeaderBorder = false,
-  } = props;
+  const { size, forceScrolling, drawHeaderBorder = false } = props;
   const { openModal } = useModal();
   const open = () =>
     openModal({
