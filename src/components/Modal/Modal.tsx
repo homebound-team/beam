@@ -130,12 +130,17 @@ export function Modal(props: ModalProps) {
                 {...modalProps}
                 {...testId}
               >
-                {/* Setup three children (header, content, footer), and flex grow the content. */}
-                <header css={Css.df.p3.fs0.if(drawHeaderBorder).bb.bcGray200.$}>
-                  <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
+                {/*
+                  Setup three children (header, content, footer), and flex grow the content.
+
+                  Use `fdrr` so that the close icon won't sit between "modal header search field"
+                  and the modal body results in the DOM focus order, i.e. in our global search modal.
+                */}
+                <header css={Css.df.fdrr.p3.fs0.if(drawHeaderBorder).bb.bcGray200.$}>
                   <span css={Css.fs0.pl1.$}>
                     <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
                   </span>
+                  <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
                 </header>
                 <main ref={modalBodyRef} css={Css.fg1.oya.if(hasScroll).bb.bcGray200.if(!!forceScrolling).oys.$}>
                   {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
