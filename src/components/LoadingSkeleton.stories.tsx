@@ -7,7 +7,7 @@ export default {
 
 export const Examples = () => (
   <div>
-    <h1 css={Css.xl2Sb.mb1.bb.bGray400.$}>Sizes</h1>
+    <h1 css={Css.xl2Sb.mb1.bb.bcGray400.$}>Sizes</h1>
     <h2 css={Css.xl.$}>Small</h2>
     <LoadingSkeleton size="sm" />
     <h2 css={Css.xl.$}>Medium</h2>
@@ -15,20 +15,20 @@ export const Examples = () => (
     <h2 css={Css.xl.$}>Large</h2>
     <LoadingSkeleton size="lg" />
 
-    <h1 css={Css.xl2Sb.mb1.mt4.bb.bGray400.$}>Multiple Rows</h1>
+    <h1 css={Css.xl2Sb.mb1.mt4.bb.bcGray400.$}>Multiple Rows</h1>
     <LoadingSkeleton rows={3} />
 
-    <h1 css={Css.xl2Sb.mb1.mt4.bb.bGray400.$}>Multiple Rows with Randomized Widths</h1>
+    <h1 css={Css.xl2Sb.mb1.mt4.bb.bcGray400.$}>Multiple Rows with Randomized Widths</h1>
     <LoadingSkeleton rows={6} randomizeWidths />
 
-    <h1 css={Css.xl2Sb.mb1.mt4.bb.bGray400.$}>Rows and Columns</h1>
+    <h1 css={Css.xl2Sb.mb1.mt4.bb.bcGray400.$}>Rows and Columns</h1>
     <LoadingSkeleton rows={3} columns={5} />
   </div>
 );
 
 const Template = (args: LoadingSkeletonProps) => (
   <div>
-    <h1 css={Css.xl2Sb.mb1.bb.bGray400.$}>Use Control Panel to Set Properties</h1>
+    <h1 css={Css.xl2Sb.mb1.bb.bcGray400.$}>Use Control Panel to Set Properties</h1>
     <LoadingSkeleton {...args} />
   </div>
 );
@@ -44,7 +44,7 @@ InteractiveExample.args = {
 
 export const Contrast = () => (
   <div>
-    <h1 css={Css.xl2Sb.mb1.bb.bGray400.gray400.$}>Contrast Background Example</h1>
+    <h1 css={Css.xl2Sb.mb1.bb.bcGray400.gray400.$}>Contrast Background Example</h1>
     <LoadingSkeleton rows={5} contrast />
   </div>
 );

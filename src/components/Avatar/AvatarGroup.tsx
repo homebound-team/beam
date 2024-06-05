@@ -22,7 +22,7 @@ export function AvatarGroup(props: AvatarGroupProps) {
           <div
             key={avatar.src ?? idx}
             css={
-              Css.br100.ba.bWhite
+              Css.br100.ba.bcWhite
                 .add("borderWidth", "3px")
                 .if(idx > 0)
                 .mlPx(-1 * sizeToOverlap[size]).$

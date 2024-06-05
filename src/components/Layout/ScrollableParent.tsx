@@ -88,13 +88,13 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
         <div
           css={{
             ...Css.pl(context.pl).pr(context.pr).$,
-            ...(!hasScrollableContent ? { ...Css.overflowAuto.h100.$, ...scrollContainerBottomPadding } : undefined),
+            ...(!hasScrollableContent ? { ...Css.oa.h100.$, ...scrollContainerBottomPadding } : undefined),
           }}
         >
           {children}
         </div>
         {/* Set fg1 to take up the remaining space in the viewport.*/}
-        <div css={Css.fg1.overflowAuto.$} ref={scrollableRef} />
+        <div css={Css.fg1.oa.$} ref={scrollableRef} />
       </Tag>
     </ScrollableParentContext.Provider>
   );

@@ -281,7 +281,7 @@ function TestProjectLayout({ children }: ChildrenOnly) {
       <TestTopNav />
       {/* Required to use `overflowHidden` to prevent the `PreventBrowserScroll`'s scrollbar from kicking in,
           which would scroll both the side nav and the main content at the same time. */}
-      <div css={Css.df.overflowHidden.h100.$}>
+      <div css={Css.df.oh.h100.$}>
         <TestSideNav />
         <ScrollableParent xss={Css.px3.$}>{children}</ScrollableParent>
       </div>
@@ -296,7 +296,7 @@ function TestTopNav() {
 function TestSideNav() {
   const [showNav, setShowNav] = useState(true);
   return (
-    <ScrollableParent xss={Css.transition.br.bGray200.fg0.fs0.wPx(224).px2.if(!showNav).mlPx(-186).$}>
+    <ScrollableParent xss={Css.transition.br.bcGray200.fg0.fs0.wPx(224).px2.if(!showNav).mlPx(-186).$}>
       <div css={Css.relative.$}>
         <div css={Css.absolute.top1.rightPx(-12).bgGray50.df.aic.jcc.$}>
           <IconButton icon={showNav ? "menuClose" : "menuOpen"} onClick={() => setShowNav(!showNav)} />
@@ -304,7 +304,7 @@ function TestSideNav() {
         {showNav && (
           <>
             <FullBleed>
-              <h2 css={Css.bb.bGray200.py3.$}>Scrollable Side Navigation</h2>
+              <h2 css={Css.bb.bcGray200.py3.$}>Scrollable Side Navigation</h2>
             </FullBleed>
             <ScrollableContent>
               <nav>
@@ -326,7 +326,7 @@ function TestSideNav() {
 function TestHeader({ title }: { title: ReactNode }) {
   return (
     <FullBleed>
-      <header css={{ ...Css.py2.bb.bGray200.$ }}>
+      <header css={{ ...Css.py2.bb.bcGray200.$ }}>
         <h1 css={Css.xlSb.$}>{title}</h1>
       </header>
     </FullBleed>

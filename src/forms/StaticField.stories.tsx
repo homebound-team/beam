@@ -42,13 +42,13 @@ export function StaticField() {
 export function StaticFieldsGrouped() {
   return (
     <div css={Css.w50.$}>
-      <div css={Css.br8.ba.bGray300.bgWhite.$}>
+      <div css={Css.br8.ba.bcGray300.bgWhite.$}>
         <div css={Css.df.gap4.m3.$}>
           <StaticFieldComponent label="Item code">
             <div css={Css.dib.red600.$}>1010</div>
           </StaticFieldComponent>
           <StaticFieldComponent label="Item description">
-            <div css={Css.nowrap.overflowHidden.add("textOverflow", "ellipsis").w("230px").$}>
+            <div css={Css.wsnw.oh.add("textOverflow", "ellipsis").w("230px").$}>
               <div css={Css.dib.$}>intacctVendorName- description</div>
             </div>
           </StaticFieldComponent>

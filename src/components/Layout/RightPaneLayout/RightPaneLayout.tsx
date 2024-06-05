@@ -16,11 +16,11 @@ export function RightPaneLayout(props: {
   useEffect(() => closePane, [closePane]);
 
   return (
-    <div css={Css.h100.df.overflowXHidden.$}>
+    <div css={Css.h100.df.oxh.$}>
       <>
         <div
           css={{
-            ...Css.w(`calc(100% - ${paneWidth + 24}px)`).add("transition", "width .2s linear").h100.mr3.overflowXAuto.$,
+            ...Css.w(`calc(100% - ${paneWidth + 24}px)`).add("transition", "width .2s linear").h100.mr3.oxa.$,
             ...Css.if(!isRightPaneOpen).w100.mr0.$,
             ...Css.if(!!defaultPaneContent).w(`calc(100% - ${paneWidth + 24}px)`).mr3.$,
           }}

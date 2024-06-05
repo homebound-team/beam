@@ -15,7 +15,7 @@ interface ScrollableContentProps {
  *
  * See the docs on `ScrollableParent.
  *
- * Note that you should not use this "just to get a scrollbar", instead just use `Css.overflowAuto.$`
+ * Note that you should not use this "just to get a scrollbar", instead just use `Css.oa.$`
  * or what not; this is only for implementing page-level patterns that need multiple stickied
  * components (page header, tab bar, table filter & actions).
  */

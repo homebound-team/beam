@@ -66,7 +66,7 @@ export function ScrollShadows(props: ScrollShadowsProps) {
   return (
     <div
       css={
-        Css.relative.overflowHidden
+        Css.relative.oh
           .h(height)
           .w(width)
           .df.fd(!horizontal ? "column" : "row").$
@@ -78,7 +78,7 @@ export function ScrollShadows(props: ScrollShadowsProps) {
       <div
         css={{
           ...xss,
-          ...Css.overflowAuto.fg1.addIn("&::-webkit-scrollbar", { display: "none" }).add("scrollbarWidth", "none").$,
+          ...Css.oa.fg1.addIn("&::-webkit-scrollbar", { display: "none" }).add("scrollbarWidth", "none").$,
         }}
         onScroll={(e) => updateScrollProps(e.currentTarget)}
         ref={scrollRef}

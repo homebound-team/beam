@@ -18,8 +18,8 @@ export function TooltipPlacements() {
     <div css={Css.w25.ml("25%").$}>
       {placements.map((placement, i) => (
         <Tooltip title="Tooltip Info" placement={placement} key={i}>
-          <span css={Css.db.tc.my5.bgGray400.br4.$}>
-            This tooltip is positioned at: <span css={Css.b.$}>{placement}</span>
+          <span css={Css.db.tac.my5.bgGray400.br4.$}>
+            This tooltip is positioned at: <span css={Css.fwb.$}>{placement}</span>
           </span>
         </Tooltip>
       ))}
@@ -30,7 +30,7 @@ export function TooltipPlacements() {
 export function TooltipDisabled() {
   return (
     <Tooltip title="Tooltip Info" disabled={true}>
-      <span css={Css.db.tc.my5.bgGray400.br4.$}>Content</span>
+      <span css={Css.db.tac.my5.bgGray400.br4.$}>Content</span>
     </Tooltip>
   );
 }

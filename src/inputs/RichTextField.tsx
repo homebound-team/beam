@@ -162,7 +162,7 @@ export function RichTextField(props: RichTextFieldProps) {
       <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
         {label && <Label label={label} />}
         <div
-          css={Css.mh("120px").bgWhite.sm.gray900.bn.p1.br4.bGray300.ba.$}
+          css={Css.mh("120px").bgWhite.sm.gray900.bn.p1.br4.bcGray300.ba.$}
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value) || placeholder || "" }}
           data-readonly="true"
         ></div>
@@ -196,13 +196,13 @@ function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
 }
 
 const trixCssOverrides = {
-  ...Css.relative.add({ wordBreak: "break-word" }).br4.bGray300.ba.$,
+  ...Css.relative.add({ wordBreak: "break-word" }).br4.bcGray300.ba.$,
   // Put the toolbar on the bottom
   ...Css.df.fdcr.gap1.$,
   // Some basic copy/paste from TextFieldBase
   "& trix-editor": Css.bgWhite.sm.gray900.bn.p1.$,
   // Highlight on focus
-  "&:focus-within": Css.bBlue700.$,
+  "&:focus-within": Css.bcBlue700.$,
   "& trix-toolbar": Css.m1.$,
   // Make the buttons closer to ours
   "& .trix-button:not(:first-of-type)": Css.bn.$,
@@ -228,7 +228,7 @@ const trixCssOverrides = {
 // Style the @ mention box
 const tributeOverrides = {
   ".tribute-container": Css.add({ minWidth: "300px" }).$,
-  ".tribute-container > ul": Css.sm.bgWhite.ba.br4.bBlue700.overflowHidden.$,
+  ".tribute-container > ul": Css.sm.bgWhite.ba.br4.bcBlue700.oh.$,
 };
 
 function extractIdsFromMentions(mergeTags: string[], content: string): string[] {

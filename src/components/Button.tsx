@@ -149,7 +149,7 @@ const variantStyles: (contrast: boolean) => Record<
   },
 
   secondary: {
-    baseStyles: Css.bgWhite.bGray300.bw1.ba.gray800.$,
+    baseStyles: Css.bgWhite.bcGray300.bw1.ba.gray800.$,
     hoverStyles: Css.bgGray100.if(contrast).bgGray300.$,
     pressedStyles: Css.bgGray200.if(contrast).bgGray100.$,
     disabledStyles: Css.bgWhite.gray400.$,

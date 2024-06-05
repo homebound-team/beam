@@ -134,8 +134,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       // To remedy this perceived misalignment then we increase the width by the horizontal padding applied (16px), and set a negative margin left margin to re-center the field.
       // Note: Do not modify width and position of 'compound' fields.
       ...(borderless && !compound
-        ? Css.bTransparent.w("calc(100% + 16px)").ml(-1).$
-        : Css.bGray300.if(contrast).bGray700.$),
+        ? Css.bcTransparent.w("calc(100% + 16px)").ml(-1).$
+        : Css.bcGray300.if(contrast).bcGray700.$),
       // Do not add borders to compound fields. A compound field is responsible for drawing its own borders
       ...(!compound ? Css.ba.$ : {}),
       // When multiline is true, then we want to allow the field to grow to the height of the content, but not shrink below the minHeight
@@ -163,12 +163,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields
       ...(multiline ? Css.br4.pyPx(compact ? 7 : 11).add("resize", "none").$ : Css.truncate.$),
     },
-    hover: Css.bgColor(hoverBgColor).if(contrast).bGray600.$,
-    focus: Css.bBlue700.if(contrast).bBlue500.$,
+    hover: Css.bgColor(hoverBgColor).if(contrast).bcGray600.$,
+    focus: Css.bcBlue700.if(contrast).bcBlue500.$,
     disabled: visuallyDisabled
       ? Css.cursorNotAllowed.gray600.bgColor(disabledBgColor).if(contrast).gray500.$
       : Css.cursorNotAllowed.$,
-    error: Css.bRed600.if(contrast).bRed400.$,
+    error: Css.bcRed600.if(contrast).bcRed400.$,
   };
 
   // Watch for each WIP change, convert empty to undefined, and call the user's onChange
@@ -249,7 +249,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 ...(showHover ? fieldStyles.hover : {}),
                 // Only show error styles if the field is not disabled, following the pattern that the error message is also hidden
                 ...(errorMsg && !inputProps.disabled ? fieldStyles.error : {}),
-                ...Css.if(multiline).aifs.overflowHidden.mhPx(textAreaMinHeight).$,
+                ...Css.if(multiline).aifs.oh.mhPx(textAreaMinHeight).$,
               }}
               {...hoverProps}
               ref={inputWrapRef as any}
@@ -266,7 +266,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   tabIndex={-1}
                   {...tid.unfocusedPlaceholderContainer}
                   css={{
-                    ...Css.df.asc.w100.maxhPx(74).overflowAuto.$,
+                    ...Css.df.asc.w100.maxhPx(74).oa.$,
                     ...fieldStyles.input,
                     ...(showHover ? fieldStyles.hover : {}),
                     ...(inputProps.disabled ? fieldStyles.disabled : {}),

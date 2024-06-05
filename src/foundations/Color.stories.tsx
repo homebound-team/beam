@@ -30,7 +30,7 @@ export const Color = () => {
 
 function ListColors({ palette }: { palette: string[][] }) {
   return (
-    <ul css={{ listStyle: "none", ...Css.df.tc.$ }}>
+    <ul css={{ listStyle: "none", ...Css.df.tac.$ }}>
       {palette.map(([name, color]) => (
         <ColorSquare {...{ name, color }} key={name} />
       ))}
@@ -41,7 +41,7 @@ function ListColors({ palette }: { palette: string[][] }) {
 function ColorSquare({ name, color }: any) {
   const size = 100;
   return (
-    <li css={Css.sm.mb5.tl.$}>
+    <li css={Css.sm.mb5.tal.$}>
       <div css={Css.h(px(size)).w(px(size)).bgColor(color).$} />
       <em>{name}</em>
     </li>

@@ -96,291 +96,291 @@ class CssBuilder<T extends Properties> {
 
   // borderColor
   /** Sets `borderColor: "rgba(255,255,255,1)"`. */
-  get bWhite() {
+  get bcWhite() {
     return this.add("borderColor", "rgba(255,255,255,1)");
   }
   /** Sets `borderColor: "rgba(0,0,0,0)"`. */
-  get bTransparent() {
+  get bcTransparent() {
     return this.add("borderColor", "rgba(0,0,0,0)");
   }
   /** Sets `borderColor: "rgba(255, 253, 253, 1)"`. */
-  get bGray50() {
+  get bcGray50() {
     return this.add("borderColor", "rgba(255, 253, 253, 1)");
   }
   /** Sets `borderColor: "rgba(247, 245, 245, 1)"`. */
-  get bGray100() {
+  get bcGray100() {
     return this.add("borderColor", "rgba(247, 245, 245, 1)");
   }
   /** Sets `borderColor: "rgba(236, 235, 235, 1)"`. */
-  get bGray200() {
+  get bcGray200() {
     return this.add("borderColor", "rgba(236, 235, 235, 1)");
   }
   /** Sets `borderColor: "rgba(221, 220, 220, 1)"`. */
-  get bGray300() {
+  get bcGray300() {
     return this.add("borderColor", "rgba(221, 220, 220, 1)");
   }
   /** Sets `borderColor: "rgba(201, 201, 201, 1)"`. */
-  get bGray400() {
+  get bcGray400() {
     return this.add("borderColor", "rgba(201, 201, 201, 1)");
   }
   /** Sets `borderColor: "rgba(175, 175, 175, 1)"`. */
-  get bGray500() {
+  get bcGray500() {
     return this.add("borderColor", "rgba(175, 175, 175, 1)");
   }
   /** Sets `borderColor: "rgba(141, 141, 141, 1)"`. */
-  get bGray600() {
+  get bcGray600() {
     return this.add("borderColor", "rgba(141, 141, 141, 1)");
   }
   /** Sets `borderColor: "rgba(100, 100, 100, 1)"`. */
-  get bGray700() {
+  get bcGray700() {
     return this.add("borderColor", "rgba(100, 100, 100, 1)");
   }
   /** Sets `borderColor: "rgba(53, 53, 53, 1)"`. */
-  get bGray800() {
+  get bcGray800() {
     return this.add("borderColor", "rgba(53, 53, 53, 1)");
   }
   /** Sets `borderColor: "rgba(36, 36, 36, 1)"`. */
-  get bGray900() {
+  get bcGray900() {
     return this.add("borderColor", "rgba(36, 36, 36, 1)");
   }
   /** Sets `borderColor: "rgba(239, 246, 255, 1)"`. */
-  get bBlue50() {
+  get bcBlue50() {
     return this.add("borderColor", "rgba(239, 246, 255, 1)");
   }
   /** Sets `borderColor: "rgba(219, 234, 254, 1)"`. */
-  get bBlue100() {
+  get bcBlue100() {
     return this.add("borderColor", "rgba(219, 234, 254, 1)");
   }
   /** Sets `borderColor: "rgba(191, 219, 254, 1)"`. */
-  get bBlue200() {
+  get bcBlue200() {
     return this.add("borderColor", "rgba(191, 219, 254, 1)");
   }
   /** Sets `borderColor: "rgba(147, 197, 253, 1)"`. */
-  get bBlue300() {
+  get bcBlue300() {
     return this.add("borderColor", "rgba(147, 197, 253, 1)");
   }
   /** Sets `borderColor: "rgba(96, 165, 250, 1)"`. */
-  get bBlue400() {
+  get bcBlue400() {
     return this.add("borderColor", "rgba(96, 165, 250, 1)");
   }
   /** Sets `borderColor: "rgba(59, 130, 246, 1)"`. */
-  get bBlue500() {
+  get bcBlue500() {
     return this.add("borderColor", "rgba(59, 130, 246, 1)");
   }
   /** Sets `borderColor: "rgba(37, 99, 235, 1)"`. */
-  get bBlue600() {
+  get bcBlue600() {
     return this.add("borderColor", "rgba(37, 99, 235, 1)");
   }
   /** Sets `borderColor: "rgba(29, 78, 216, 1)"`. */
-  get bBlue700() {
+  get bcBlue700() {
     return this.add("borderColor", "rgba(29, 78, 216, 1)");
   }
   /** Sets `borderColor: "rgba(30, 64, 175, 1)"`. */
-  get bBlue800() {
+  get bcBlue800() {
     return this.add("borderColor", "rgba(30, 64, 175, 1)");
   }
   /** Sets `borderColor: "rgba(30, 58, 138, 1)"`. */
-  get bBlue900() {
+  get bcBlue900() {
     return this.add("borderColor", "rgba(30, 58, 138, 1)");
   }
   /** Sets `borderColor: "rgba(254, 242, 242, 1)"`. */
-  get bRed50() {
+  get bcRed50() {
     return this.add("borderColor", "rgba(254, 242, 242, 1)");
   }
   /** Sets `borderColor: "rgba(254, 226, 226, 1)"`. */
-  get bRed100() {
+  get bcRed100() {
     return this.add("borderColor", "rgba(254, 226, 226, 1)");
   }
   /** Sets `borderColor: "rgba(254, 202, 202, 1)"`. */
-  get bRed200() {
+  get bcRed200() {
     return this.add("borderColor", "rgba(254, 202, 202, 1)");
   }
   /** Sets `borderColor: "rgba(252, 165, 165, 1)"`. */
-  get bRed300() {
+  get bcRed300() {
     return this.add("borderColor", "rgba(252, 165, 165, 1)");
   }
   /** Sets `borderColor: "rgba(248, 113, 113, 1)"`. */
-  get bRed400() {
+  get bcRed400() {
     return this.add("borderColor", "rgba(248, 113, 113, 1)");
   }
   /** Sets `borderColor: "rgba(239, 68, 68, 1)"`. */
-  get bRed500() {
+  get bcRed500() {
     return this.add("borderColor", "rgba(239, 68, 68, 1)");
   }
   /** Sets `borderColor: "rgba(220, 38, 38, 1)"`. */
-  get bRed600() {
+  get bcRed600() {
     return this.add("borderColor", "rgba(220, 38, 38, 1)");
   }
   /** Sets `borderColor: "rgba(185, 28, 28, 1)"`. */
-  get bRed700() {
+  get bcRed700() {
     return this.add("borderColor", "rgba(185, 28, 28, 1)");
   }
   /** Sets `borderColor: "rgba(153, 27, 27, 1)"`. */
-  get bRed800() {
+  get bcRed800() {
     return this.add("borderColor", "rgba(153, 27, 27, 1)");
   }
   /** Sets `borderColor: "rgba(127, 29, 29, 1)"`. */
-  get bRed900() {
+  get bcRed900() {
     return this.add("borderColor", "rgba(127, 29, 29, 1)");
   }
   /** Sets `borderColor: "rgba(254, 252, 232, 1)"`. */
-  get bYellow50() {
+  get bcYellow50() {
     return this.add("borderColor", "rgba(254, 252, 232, 1)");
   }
   /** Sets `borderColor: "rgba(254, 249, 195, 1)"`. */
-  get bYellow100() {
+  get bcYellow100() {
     return this.add("borderColor", "rgba(254, 249, 195, 1)");
   }
   /** Sets `borderColor: "rgba(254, 240, 138, 1)"`. */
-  get bYellow200() {
+  get bcYellow200() {
     return this.add("borderColor", "rgba(254, 240, 138, 1)");
   }
   /** Sets `borderColor: "rgba(253, 224, 71, 1)"`. */
-  get bYellow300() {
+  get bcYellow300() {
     return this.add("borderColor", "rgba(253, 224, 71, 1)");
   }
   /** Sets `borderColor: "rgba(250, 204, 21, 1)"`. */
-  get bYellow400() {
+  get bcYellow400() {
     return this.add("borderColor", "rgba(250, 204, 21, 1)");
   }
   /** Sets `borderColor: "rgba(234, 179, 8, 1)"`. */
-  get bYellow500() {
+  get bcYellow500() {
     return this.add("borderColor", "rgba(234, 179, 8, 1)");
   }
   /** Sets `borderColor: "rgba(202, 138, 4, 1)"`. */
-  get bYellow600() {
+  get bcYellow600() {
     return this.add("borderColor", "rgba(202, 138, 4, 1)");
   }
   /** Sets `borderColor: "rgba(161, 98, 7, 1)"`. */
-  get bYellow700() {
+  get bcYellow700() {
     return this.add("borderColor", "rgba(161, 98, 7, 1)");
   }
   /** Sets `borderColor: "rgba(133, 77, 14, 1)"`. */
-  get bYellow800() {
+  get bcYellow800() {
     return this.add("borderColor", "rgba(133, 77, 14, 1)");
   }
   /** Sets `borderColor: "rgba(113, 63, 18, 1)"`. */
-  get bYellow900() {
+  get bcYellow900() {
     return this.add("borderColor", "rgba(113, 63, 18, 1)");
   }
   /** Sets `borderColor: "rgba(236, 253, 245, 1)"`. */
-  get bGreen50() {
+  get bcGreen50() {
     return this.add("borderColor", "rgba(236, 253, 245, 1)");
   }
   /** Sets `borderColor: "rgba(209, 250, 229, 1)"`. */
-  get bGreen100() {
+  get bcGreen100() {
     return this.add("borderColor", "rgba(209, 250, 229, 1)");
   }
   /** Sets `borderColor: "rgba(167, 243, 208, 1)"`. */
-  get bGreen200() {
+  get bcGreen200() {
     return this.add("borderColor", "rgba(167, 243, 208, 1)");
   }
   /** Sets `borderColor: "rgba(110, 231, 183, 1)"`. */
-  get bGreen300() {
+  get bcGreen300() {
     return this.add("borderColor", "rgba(110, 231, 183, 1)");
   }
   /** Sets `borderColor: "rgba(52, 211, 153, 1)"`. */
-  get bGreen400() {
+  get bcGreen400() {
     return this.add("borderColor", "rgba(52, 211, 153, 1)");
   }
   /** Sets `borderColor: "rgba(16, 185, 129, 1)"`. */
-  get bGreen500() {
+  get bcGreen500() {
     return this.add("borderColor", "rgba(16, 185, 129, 1)");
   }
   /** Sets `borderColor: "rgba(5, 150, 105, 1)"`. */
-  get bGreen600() {
+  get bcGreen600() {
     return this.add("borderColor", "rgba(5, 150, 105, 1)");
   }
   /** Sets `borderColor: "rgba(4, 120, 87, 1)"`. */
-  get bGreen700() {
+  get bcGreen700() {
     return this.add("borderColor", "rgba(4, 120, 87, 1)");
   }
   /** Sets `borderColor: "rgba(6, 95, 70, 1)"`. */
-  get bGreen800() {
+  get bcGreen800() {
     return this.add("borderColor", "rgba(6, 95, 70, 1)");
   }
   /** Sets `borderColor: "rgba(6, 78, 59, 1)"`. */
-  get bGreen900() {
+  get bcGreen900() {
     return this.add("borderColor", "rgba(6, 78, 59, 1)");
   }
   /** Sets `borderColor: "rgba(245, 243, 255, 1)"`. */
-  get bPurple50() {
+  get bcPurple50() {
     return this.add("borderColor", "rgba(245, 243, 255, 1)");
   }
   /** Sets `borderColor: "rgba(237, 233, 254, 1)"`. */
-  get bPurple100() {
+  get bcPurple100() {
     return this.add("borderColor", "rgba(237, 233, 254, 1)");
   }
   /** Sets `borderColor: "rgba(221, 214, 254, 1)"`. */
-  get bPurple200() {
+  get bcPurple200() {
     return this.add("borderColor", "rgba(221, 214, 254, 1)");
   }
   /** Sets `borderColor: "rgba(196, 181, 253, 1)"`. */
-  get bPurple300() {
+  get bcPurple300() {
     return this.add("borderColor", "rgba(196, 181, 253, 1)");
   }
   /** Sets `borderColor: "rgba(167, 139, 250, 1)"`. */
-  get bPurple400() {
+  get bcPurple400() {
     return this.add("borderColor", "rgba(167, 139, 250, 1)");
   }
   /** Sets `borderColor: "rgba(139, 92, 246, 1)"`. */
-  get bPurple500() {
+  get bcPurple500() {
     return this.add("borderColor", "rgba(139, 92, 246, 1)");
   }
   /** Sets `borderColor: "rgba(124, 58, 237, 1)"`. */
-  get bPurple600() {
+  get bcPurple600() {
     return this.add("borderColor", "rgba(124, 58, 237, 1)");
   }
   /** Sets `borderColor: "rgba(109, 40, 217, 1)"`. */
-  get bPurple700() {
+  get bcPurple700() {
     return this.add("borderColor", "rgba(109, 40, 217, 1)");
   }
   /** Sets `borderColor: "rgba(91, 33, 182, 1)"`. */
-  get bPurple800() {
+  get bcPurple800() {
     return this.add("borderColor", "rgba(91, 33, 182, 1)");
   }
   /** Sets `borderColor: "rgba(76, 29, 149, 1)"`. */
-  get bPurple900() {
+  get bcPurple900() {
     return this.add("borderColor", "rgba(76, 29, 149, 1)");
   }
   /** Sets `borderColor: "rgba(255, 247, 237, 1)"`. */
-  get bOrange50() {
+  get bcOrange50() {
     return this.add("borderColor", "rgba(255, 247, 237, 1)");
   }
   /** Sets `borderColor: "rgba(255, 237, 213, 1)"`. */
-  get bOrange100() {
+  get bcOrange100() {
     return this.add("borderColor", "rgba(255, 237, 213, 1)");
   }
   /** Sets `borderColor: "rgba(254, 215, 170, 1)"`. */
-  get bOrange200() {
+  get bcOrange200() {
     return this.add("borderColor", "rgba(254, 215, 170, 1)");
   }
   /** Sets `borderColor: "rgba(253, 186, 116, 1)"`. */
-  get bOrange300() {
+  get bcOrange300() {
     return this.add("borderColor", "rgba(253, 186, 116, 1)");
   }
   /** Sets `borderColor: "rgba(251, 146, 60, 1)"`. */
-  get bOrange400() {
+  get bcOrange400() {
     return this.add("borderColor", "rgba(251, 146, 60, 1)");
   }
   /** Sets `borderColor: "rgba(249, 115, 22, 1)"`. */
-  get bOrange500() {
+  get bcOrange500() {
     return this.add("borderColor", "rgba(249, 115, 22, 1)");
   }
   /** Sets `borderColor: "rgba(234, 88, 12, 1)"`. */
-  get bOrange600() {
+  get bcOrange600() {
     return this.add("borderColor", "rgba(234, 88, 12, 1)");
   }
   /** Sets `borderColor: "rgba(194, 65, 12, 1)"`. */
-  get bOrange700() {
+  get bcOrange700() {
     return this.add("borderColor", "rgba(194, 65, 12, 1)");
   }
   /** Sets `borderColor: "rgba(154, 52, 18, 1)"`. */
-  get bOrange800() {
+  get bcOrange800() {
     return this.add("borderColor", "rgba(154, 52, 18, 1)");
   }
   /** Sets `borderColor: "rgba(124, 45, 18, 1)"`. */
-  get bOrange900() {
+  get bcOrange900() {
     return this.add("borderColor", "rgba(124, 45, 18, 1)");
   }
   /** Sets `borderColor: value`. */
@@ -440,11 +440,11 @@ class CssBuilder<T extends Properties> {
     return this.add("borderStyle", "dotted");
   }
   /** Sets `borderStyle: "none"`. */
-  get bsNone() {
+  get bsn() {
     return this.add("borderStyle", "none");
   }
   /** Sets `borderStyle: "solid"`. */
-  get bsSolid() {
+  get bss() {
     return this.add("borderStyle", "solid");
   }
   /** Sets `borderStyle: value`. */
@@ -1077,18 +1077,6 @@ class CssBuilder<T extends Properties> {
   fb(value: Properties["flexBasis"]) {
     return this.add("flexBasis", value);
   }
-  /** Sets `flex: "auto"`. */
-  get flexAuto() {
-    return this.add("flex", "auto");
-  }
-  /** Sets `flex: "none"`. */
-  get flexNone() {
-    return this.add("flex", "none");
-  }
-  /** Sets `flex: value`. */
-  flex(value: Properties["flex"]) {
-    return this.add("flex", value);
-  }
   /** Sets `flexGrow: 0`. */
   get fg0() {
     return this.add("flexGrow", 0);
@@ -1170,11 +1158,11 @@ class CssBuilder<T extends Properties> {
 
   // fontWeight
   /** Sets `fontWeight: "normal"`. */
-  get normal() {
+  get fwn() {
     return this.add("fontWeight", "normal");
   }
   /** Sets `fontWeight: "bold"`. */
-  get b() {
+  get fwb() {
     return this.add("fontWeight", "bold");
   }
   /** Sets `fontWeight: 100`. */
@@ -1662,19 +1650,19 @@ class CssBuilder<T extends Properties> {
 
   // overflow
   /** Sets `overflow: "visible"`. */
-  get overflowVisible() {
+  get ov() {
     return this.add("overflow", "visible");
   }
   /** Sets `overflow: "hidden"`. */
-  get overflowHidden() {
+  get oh() {
     return this.add("overflow", "hidden");
   }
   /** Sets `overflow: "scroll"`. */
-  get overflowScroll() {
+  get os() {
     return this.add("overflow", "scroll");
   }
   /** Sets `overflow: "auto"`. */
-  get overflowAuto() {
+  get oa() {
     return this.add("overflow", "auto");
   }
   /** Sets `overflow: value`. */
@@ -1682,19 +1670,19 @@ class CssBuilder<T extends Properties> {
     return this.add("overflow", value);
   }
   /** Sets `overflowY: "visible"`. */
-  get overflowYVisible() {
+  get oyv() {
     return this.add("overflowY", "visible");
   }
   /** Sets `overflowY: "hidden"`. */
-  get overflowYHidden() {
+  get oyh() {
     return this.add("overflowY", "hidden");
   }
   /** Sets `overflowY: "scroll"`. */
-  get overflowYScroll() {
+  get oys() {
     return this.add("overflowY", "scroll");
   }
   /** Sets `overflowY: "auto"`. */
-  get overflowYAuto() {
+  get oya() {
     return this.add("overflowY", "auto");
   }
   /** Sets `overflowY: value`. */
@@ -1702,19 +1690,19 @@ class CssBuilder<T extends Properties> {
     return this.add("overflowY", value);
   }
   /** Sets `overflowX: "visible"`. */
-  get overflowXVisible() {
+  get oxv() {
     return this.add("overflowX", "visible");
   }
   /** Sets `overflowX: "hidden"`. */
-  get overflowXHidden() {
+  get oxh() {
     return this.add("overflowX", "hidden");
   }
   /** Sets `overflowX: "scroll"`. */
-  get overflowXScroll() {
+  get oxs() {
     return this.add("overflowX", "scroll");
   }
   /** Sets `overflowX: "auto"`. */
-  get overflowXAuto() {
+  get oxa() {
     return this.add("overflowX", "auto");
   }
   /** Sets `overflowX: value`. */
@@ -3337,19 +3325,19 @@ class CssBuilder<T extends Properties> {
 
   // textAlign
   /** Sets `textAlign: "left"`. */
-  get tl() {
+  get tal() {
     return this.add("textAlign", "left");
   }
   /** Sets `textAlign: "center"`. */
-  get tc() {
+  get tac() {
     return this.add("textAlign", "center");
   }
   /** Sets `textAlign: "right"`. */
-  get tr() {
+  get tar() {
     return this.add("textAlign", "right");
   }
   /** Sets `textAlign: "justify"`. */
-  get tj() {
+  get taj() {
     return this.add("textAlign", "justify");
   }
   /** Sets `textAlign: value`. */
@@ -3359,15 +3347,15 @@ class CssBuilder<T extends Properties> {
 
   // textDecoration
   /** Sets `textDecoration: "none"`. */
-  get noUnderline() {
+  get tdn() {
     return this.add("textDecoration", "none");
   }
   /** Sets `textDecoration: "line-through"`. */
-  get strike() {
+  get tdlt() {
     return this.add("textDecoration", "line-through");
   }
   /** Sets `textDecoration: "underline"`. */
-  get underline() {
+  get tdu() {
     return this.add("textDecoration", "underline");
   }
   /** Sets `textDecoration: value`. */
@@ -3591,19 +3579,19 @@ class CssBuilder<T extends Properties> {
 
   // userSelect
   /** Sets `userSelect: "none"`. */
-  get selectNone() {
+  get usn() {
     return this.add("userSelect", "none");
   }
   /** Sets `userSelect: "text"`. */
-  get selectText() {
+  get ust() {
     return this.add("userSelect", "text");
   }
   /** Sets `userSelect: "all"`. */
-  get selectAll() {
+  get usAll() {
     return this.add("userSelect", "all");
   }
   /** Sets `userSelect: "auto"`. */
-  get selectAuto() {
+  get usAuto() {
     return this.add("userSelect", "auto");
   }
   /** Sets `userSelect: value`. */
@@ -3613,19 +3601,19 @@ class CssBuilder<T extends Properties> {
 
   // verticalAlign
   /** Sets `verticalAlign: "baseline"`. */
-  get vBase() {
+  get vaBaseline() {
     return this.add("verticalAlign", "baseline");
   }
   /** Sets `verticalAlign: "middle"`. */
-  get vMid() {
+  get vam() {
     return this.add("verticalAlign", "middle");
   }
   /** Sets `verticalAlign: "top"`. */
-  get vTop() {
+  get vat() {
     return this.add("verticalAlign", "top");
   }
   /** Sets `verticalAlign: "bottom"`. */
-  get vBottom() {
+  get vaBottom() {
     return this.add("verticalAlign", "bottom");
   }
   /** Sets `verticalAlign: value`. */
@@ -3635,11 +3623,11 @@ class CssBuilder<T extends Properties> {
 
   // visibility
   /** Sets `visibility: "visible"`. */
-  get visible() {
+  get vv() {
     return this.add("visibility", "visible");
   }
   /** Sets `visibility: "hidden"`. */
-  get invisible() {
+  get vh() {
     return this.add("visibility", "hidden");
   }
   /** Sets `visibility: value`. */
@@ -3648,18 +3636,6 @@ class CssBuilder<T extends Properties> {
   }
 
   // whitespace
-  /** Sets `whiteSpace: "nowrap"`. */
-  get nowrap() {
-    return this.add("whiteSpace", "nowrap");
-  }
-  /** Sets `whiteSpace: "pre"`. */
-  get pre() {
-    return this.add("whiteSpace", "pre");
-  }
-  /** Sets `whiteSpace: "normal"`. */
-  get wsNormal() {
-    return this.add("whiteSpace", "normal");
-  }
   /** Sets `whiteSpace: "pre"`. */
   get wsp() {
     return this.add("whiteSpace", "pre");
@@ -3849,19 +3825,19 @@ class CssBuilder<T extends Properties> {
 
   // wordBreak
   /** Sets `wordBreak: "normal"`. */
-  get breakNormal() {
+  get wbn() {
     return this.add("wordBreak", "normal");
   }
   /** Sets `wordBreak: "break-all"`. */
-  get breakAll() {
+  get wbba() {
     return this.add("wordBreak", "break-all");
   }
   /** Sets `wordBreak: "keep-all"`. */
-  get breakKeepAll() {
+  get wbka() {
     return this.add("wordBreak", "keep-all");
   }
   /** Sets `wordBreak: "break-word"`. */
-  get breakWord() {
+  get wbbw() {
     return this.add("wordBreak", "break-word");
   }
   /** Sets `wordBreak: value`. */

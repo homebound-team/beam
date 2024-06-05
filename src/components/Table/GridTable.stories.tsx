@@ -152,7 +152,7 @@ export function VirtualFiltering() {
   return (
     <div css={Css.df.fdc.vh100.$}>
       <div>
-        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
+        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bcGray900.$} />
         <Button label="goto 500" onClick={() => rowLookup.current!.scrollTo("data", "500")} />
       </div>
       <div css={Css.fg1.$}>
@@ -191,7 +191,7 @@ export function VirtualFilteringWithFilterablePin() {
   return (
     <div css={Css.df.fdc.vh100.$}>
       <div>
-        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
+        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bcGray900.$} />
       </div>
       <div css={Css.fg1.$}>
         <GridTable
@@ -360,7 +360,7 @@ export function OneOffInlineTable() {
         ...Css.dig.gtc("auto auto auto").rg1.cg3.gray700.bgGray300.br4.p1.$,
         "& > div:nth-of-type(-n+3)": Css.tinySb.$,
         "& > div:nth-of-type(n+4)": Css.xs.$,
-        "& > div:nth-of-type(3n)": Css.tr.$,
+        "& > div:nth-of-type(3n)": Css.tar.$,
       }}
     >
       <div>Code</div>
@@ -895,7 +895,7 @@ export function StickyColumns() {
   return (
     <div>
       <h1 css={Css.lgSb.$}>First column sticky left</h1>
-      <div css={Css.wPx(500).overflowAuto.$}>
+      <div css={Css.wPx(500).oa.$}>
         <GridTable
           columns={[{ ...nameColumn, sticky: "left" }, valueColumn, actionColumn]}
           rows={[
@@ -907,7 +907,7 @@ export function StickyColumns() {
       </div>
 
       <h1 css={Css.lgSb.mt3.$}>Last column sticky right</h1>
-      <div css={Css.wPx(500).overflowAuto.$}>
+      <div css={Css.wPx(500).oa.$}>
         <GridTable
           columns={[nameColumn, valueColumn, { ...actionColumn, sticky: "right" }]}
           rows={[
@@ -919,7 +919,7 @@ export function StickyColumns() {
       </div>
 
       <h1 css={Css.lgSb.mt3.$}>Center column sticky left</h1>
-      <div css={Css.wPx(500).overflowAuto.$}>
+      <div css={Css.wPx(500).oa.$}>
         <GridTable
           columns={[nameColumn, { ...valueColumn, sticky: "left" }, actionColumn]}
           rows={[
@@ -931,7 +931,7 @@ export function StickyColumns() {
       </div>
 
       <h1 css={Css.lgSb.mt3.$}>Center column sticky right</h1>
-      <div css={Css.wPx(500).overflowAuto.$}>
+      <div css={Css.wPx(500).oa.$}>
         <GridTable
           columns={[nameColumn, { ...valueColumn, sticky: "right" }, actionColumn]}
           rows={[
@@ -943,7 +943,7 @@ export function StickyColumns() {
       </div>
 
       <h1 css={Css.lgSb.mt3.$}>Last column non-header cells sticky</h1>
-      <div css={Css.wPx(500).overflowAuto.$}>
+      <div css={Css.wPx(500).oa.$}>
         <GridTable
           columns={[
             nameColumn,
@@ -1004,7 +1004,7 @@ export function StickyColumnsAndHeader() {
   }, []);
 
   return (
-    <div ref={scrollWrap} css={Css.wPx(500).hPx(500).overflowAuto.$}>
+    <div ref={scrollWrap} css={Css.wPx(500).hPx(500).oa.$}>
       <GridTable
         columns={[
           nameColumn,
@@ -1208,7 +1208,7 @@ export function PrimaryColumnSorting() {
   return (
     <div>
       <div>
-        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bGray900.$} />
+        <input type="text" value={filter || ""} onChange={(e) => setFilter(e.target.value)} css={Css.ba.bcGray900.$} />
       </div>
       <GridTable
         filter={filter}

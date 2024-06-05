@@ -41,7 +41,7 @@ export function SuperDrawerHeader(props: SuperDrawerHeaderProps | SuperDrawerHea
         <div css={Css.fg1.$}>{props.children}</div>
       )}
       {!hideControls && (
-        <div css={Css.fs0.if(isDetail).invisible.$}>
+        <div css={Css.fs0.if(isDetail).vh.$}>
           <ButtonGroup
             buttons={[
               { icon: "chevronLeft", onClick: () => onPrevClick && onPrevClick(), disabled: !onPrevClick },

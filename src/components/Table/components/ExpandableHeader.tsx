@@ -50,7 +50,7 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
             .if(isHovered).bgGray100.$
         }
       >
-        <span css={Css.tl.lineClamp2.$}>{title}</span>
+        <span css={Css.tal.lineClamp2.$}>{title}</span>
         {tooltipEl}
       </span>
 

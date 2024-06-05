@@ -62,7 +62,7 @@ export function ChipSelectField<O, V extends Value>(
   const typeScale = fieldProps?.typeScale ?? "sm";
   const isDisabled = !!disabled;
   const showClearButton = !disabled && clearable && !!value;
-  const chipStyles = useMemo(() => Css[typeScale].tl.bgGray300.gray900.br16.pxPx(10).pyPx(2).$, [typeScale]);
+  const chipStyles = useMemo(() => Css[typeScale].tal.bgGray300.gray900.br16.pxPx(10).pyPx(2).$, [typeScale]);
   // Controls showing the focus border styles.
   const [visualFocus, setVisualFocus] = useState(false);
   const [isClearFocused, setIsClearFocused] = useState(false);
@@ -251,14 +251,14 @@ export function ChipSelectField<O, V extends Value>(
               {...mergeProps(focusProps, buttonProps)}
               ref={buttonRef}
               css={{
-                ...Css.tl.br16.pxPx(10).pyPx(2).outline0.if(showClearButton).prPx(4).borderRadius("16px 0 0 16px").$,
+                ...Css.tal.br16.pxPx(10).pyPx(2).outline0.if(showClearButton).prPx(4).borderRadius("16px 0 0 16px").$,
                 ...(isDisabled ? Css.cursorNotAllowed.gray700.$ : {}),
                 "&:hover:not(:disabled)": Css.bgGray400.if(!value).bgGray300.$,
               }}
               title={state.selectedItem ? state.selectedItem.textValue : placeholder}
               {...tid}
             >
-              <span {...valueProps} css={Css.lineClamp1.breakAll.$}>
+              <span {...valueProps} css={Css.lineClamp1.wbba.$}>
                 {state.selectedItem ? state.selectedItem.textValue : placeholder}
               </span>
             </button>

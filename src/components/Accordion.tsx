@@ -100,7 +100,7 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
     <div
       {...tid.container}
       css={{
-        ...Css.bGray300.if(topBorder).bt.if(bottomBorder).bb.$,
+        ...Css.bcGray300.if(topBorder).bt.if(bottomBorder).bb.$,
         ...(size ? Css.wPx(accordionSizes[size]).$ : {}),
       }}
     >
@@ -128,7 +128,7 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
           css={{ ...Css.w100.$, ...touchableStyle }}
           onClick={toggle}
         >
-          <span css={Css.fg1.tl.$}>{title}</span>
+          <span css={Css.fg1.tal.$}>{title}</span>
           <RotatingChevronIcon expanded={expanded} />
         </button>
       )}
@@ -136,7 +136,7 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
         {...tid.details}
         id={id}
         aria-hidden={!expanded}
-        css={Css.overflowHidden.h(contentHeight).add("transition", "height 250ms ease-in-out").$}
+        css={Css.oh.h(contentHeight).add("transition", "height 250ms ease-in-out").$}
       >
         {expanded && (
           <div css={Css.px2.pb2.pt1.if(omitPadding).p0.$} ref={contentRef} {...tid.content}>

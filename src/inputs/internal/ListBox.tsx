@@ -102,7 +102,7 @@ export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
     >
       {isMultiSelect && !isTree && state.selectionManager.selectedKeys.size > 0 && (
         <ul
-          css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bGray200.add("flexWrap", "wrap").maxh("50%").overflowAuto.$}
+          css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bcGray200.add("flexWrap", "wrap").maxh("50%").oa.$}
           ref={selectedList}
         >
           {selectedOptions.map((o) => (

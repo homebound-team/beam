@@ -21,7 +21,7 @@ export function Text() {
         />
         <Button onClick={() => setWidth((prev) => (prev === 350 ? 600 : 350))} label="Change width" />
       </div>
-      <div css={Css.p1.ba.bGray400.bshBasic.br8.wPx(width).$}>
+      <div css={Css.p1.ba.bcGray400.bshBasic.br8.wPx(width).$}>
         <MaxLines maxLines={3}>{content}</MaxLines>
       </div>
     </div>
@@ -62,7 +62,7 @@ export function WithElements() {
         />
         <Button onClick={() => setWidth((prev) => (prev === 350 ? 600 : 350))} label="Change width" />
       </div>
-      <div css={Css.p1.ba.bGray400.bshBasic.br8.wPx(width).$}>
+      <div css={Css.p1.ba.bcGray400.bshBasic.br8.wPx(width).$}>
         <MaxLines maxLines={3}>{content}</MaxLines>
       </div>
     </div>

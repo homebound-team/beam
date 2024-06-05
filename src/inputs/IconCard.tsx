@@ -64,7 +64,7 @@ export function IconCard(props: IconCardProps) {
   });
 }
 
-const baseStyles = Css.df.fdc.aic.jcc.wPx(130).hPx(114).ba.br8.bGray300.bgWhite.gap("12px").p2.tc.$;
-export const selectedStyles = Css.bw2.bBlue500.bgBlue50.$;
-const disabledStyles = Css.bGray200.bgGray50.$;
+const baseStyles = Css.df.fdc.aic.jcc.wPx(130).hPx(114).ba.br8.bcGray300.bgWhite.gap("12px").p2.tac.$;
+export const selectedStyles = Css.bw2.bcBlue500.bgBlue50.$;
+const disabledStyles = Css.bcGray200.bgGray50.$;
 export const iconCardStylesHover = Css.bgGray100.$;

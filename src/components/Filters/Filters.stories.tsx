@@ -208,7 +208,7 @@ function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
       }}
     >
       <div>
-        <div css={Css.df.fdc.gap2.if(!!vertical).wPx(360).p2.bgGray100.br.bGray600.$}>
+        <div css={Css.df.fdc.gap2.if(!!vertical).wPx(360).p2.bgGray100.br.bcGray600.$}>
           <h1 css={Css.lg.$}>Filters</h1>
           <Filters<ProjectFilter>
             filter={filter}

@@ -56,7 +56,7 @@ export function InlineLabel({ labelProps, label, contrast, multiline = false, ..
     <label
       {...labelProps}
       {...others}
-      css={Css.smMd.nowrap.gray900.prPx(4).add("color", "currentColor").asc.if(multiline).asfs.pt1.$}
+      css={Css.smMd.wsnw.gray900.prPx(4).add("color", "currentColor").asc.if(multiline).asfs.pt1.$}
     >
       {label}:
     </label>

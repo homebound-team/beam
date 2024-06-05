@@ -28,8 +28,8 @@ export function ListBoxSection<O>(props: ListBoxSectionProps<O>) {
 
   return (
     <>
-      {isPersistentSection && <li {...separatorProps} css={Css.bt.bGray200.$} />}
-      <li {...itemProps} css={Css.if(!isPersistentSection).overflowAuto.$}>
+      {isPersistentSection && <li {...separatorProps} css={Css.bt.bcGray200.$} />}
+      <li {...itemProps} css={Css.if(!isPersistentSection).oa.$}>
         {/* Styles assume only one Persistent Item is ever shown. Will need to adjust if that ever changes */}
         <ul
           css={

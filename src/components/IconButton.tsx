@@ -99,10 +99,10 @@ export function IconButton(props: IconButtonProps) {
 
 const defaultIconColor = Palette.Gray900;
 const contrastIconColor = Palette.White;
-const iconButtonStylesReset = Css.bTransparent.bsSolid.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
+const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
 const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
 const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
 export const iconButtonStylesHover = Css.bgGray200.$;
 export const iconButtonContrastStylesHover = Css.bgGray700.$;
-const iconButtonStylesFocus = Css.bBlue700.$;
+const iconButtonStylesFocus = Css.bcBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;

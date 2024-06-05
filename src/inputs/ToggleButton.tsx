@@ -48,8 +48,8 @@ export function ToggleButton(props: ToggleButtonProps) {
     ...hoverProps,
     ...pressProps,
     css: {
-      ...Css.br4.dif.aic.gap1.bgTransparent.gray500.hPx(32).plPx(4).pr1.relative.cursorPointer.w("max-content").smMd
-        .selectNone.$,
+      ...Css.br4.dif.aic.gap1.bgTransparent.gray500.hPx(32).plPx(4).pr1.relative.cursorPointer.w("max-content").smMd.usn
+        .$,
       ...(isHovered && toggleHoverStyles),
       ...(isPressed && togglePressStyles),
       ...(isSelected && !isDisabled && Css.blue700.$),

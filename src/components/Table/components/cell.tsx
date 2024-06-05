@@ -82,19 +82,14 @@ export const rowLinkRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<an
     if (as === "table") {
       return (
         <td key={key} css={{ ...css }} className={classNames} colSpan={colSpan}>
-          <Link to={to} css={Css.noUnderline.color("unset").db.$} className={navLink}>
+          <Link to={to} css={Css.tdn.color("unset").db.$} className={navLink}>
             {content}
           </Link>
         </td>
       );
     }
     return (
-      <Link
-        key={key}
-        to={to}
-        css={{ ...Css.noUnderline.color("unset").$, ...css }}
-        className={`${navLink} ${classNames}`}
-      >
+      <Link key={key} to={to} css={{ ...Css.tdn.color("unset").$, ...css }} className={`${navLink} ${classNames}`}>
         {content}
       </Link>
     );

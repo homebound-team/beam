@@ -85,7 +85,7 @@ function ExamplePageComponent() {
   return (
     <>
       <FullBleed>
-        <header css={{ ...Css.py2.bb.bGray200.$ }}>
+        <header css={{ ...Css.py2.bb.bcGray200.$ }}>
           <h1 css={Css.xlSb.$}>Page content fixed to top</h1>
         </header>
       </FullBleed>
@@ -97,7 +97,7 @@ function ExamplePageComponent() {
 function TestProjectLayout({ children }: ChildrenOnly) {
   return (
     <PreventBrowserScroll>
-      <div css={Css.df.h100.overflowHidden.$}>
+      <div css={Css.df.h100.oh.$}>
         <ScrollableParent>{children}</ScrollableParent>
       </div>
     </PreventBrowserScroll>

@@ -129,9 +129,9 @@ function memoizedTableStyles() {
       cache[key] = {
         emptyCell: "-",
         firstRowMessageCss: {
-          ...Css.tc.py3.$,
+          ...Css.tac.py3.$,
           ...(allWhite && Css.bgWhite.$),
-          ...(bordered && Css.bl.br.bGray200.$),
+          ...(bordered && Css.bl.br.bcGray200.$),
         },
         headerCellCss: {
           // We want to support headers having two lines of wrapped text, and could add a `lineClamp2` here, but
@@ -142,7 +142,7 @@ function memoizedTableStyles() {
           ...(allWhite && Css.bgWhite.$),
         },
         totalsCellCss: Css.bgWhite.gray700.bgGray100.xsMd.hPx(totalsRowHeight).pPx(12).$,
-        expandableHeaderCss: Css.bgWhite.gray900.xsMd.wsNormal
+        expandableHeaderCss: Css.bgWhite.gray900.xsMd.wsn
           .hPx(expandableHeaderRowHeight)
           .pxPx(12)
           .py0.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
@@ -150,16 +150,16 @@ function memoizedTableStyles() {
         cellCss: {
           ...Css[cellTypography].gray900.bgWhite.ai(alignItems).pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
             .$,
-          ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.nowrap.hPx(inlineEditing ? 48 : 36).$),
+          ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.wsnw.hPx(inlineEditing ? 48 : 36).$),
           ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
-          ...(bordered && { "&:first-child": Css.bl.bGray200.$, "&:last-child": Css.br.bGray200.$ }),
+          ...(bordered && { "&:first-child": Css.bl.bcGray200.$, "&:last-child": Css.br.bcGray200.$ }),
         },
         firstRowCss: {
           ...Css.addIn("& > *:first-of-type", Css.borderRadius("8px 0 0 0 ").$).addIn(
             "& > *:last-of-type",
             Css.borderRadius("0 8px 0 0").$,
           ).$,
-          ...(bordered && Css.addIn("& > *", Css.bt.bGray200.$).$),
+          ...(bordered && Css.addIn("& > *", Css.bt.bcGray200.$).$),
         },
         // Only apply border radius styles to the last row when using the `bordered` style table.
         lastRowCss: bordered
@@ -221,8 +221,8 @@ export const condensedStyle: GridStyle = {
 export const cardStyle: GridStyle = {
   ...defaultStyle,
   betweenRowsCss: {},
-  nonHeaderRowCss: Css.br4.overflowHidden.ba.bGray400.mt2.add("transition", "all 240ms").$,
-  firstRowCss: Css.bl.br.bGray200.borderRadius("8px 8px 0 0").overflowHidden.$,
+  nonHeaderRowCss: Css.br4.oh.ba.bcGray400.mt2.add("transition", "all 240ms").$,
+  firstRowCss: Css.bl.br.bcGray200.borderRadius("8px 8px 0 0").oh.$,
   cellCss: Css.p2.$,
   // Undo the card look & feel for the header
   headerCellCss: {
@@ -230,7 +230,7 @@ export const cardStyle: GridStyle = {
     ...Css.p1.m0.xsMd.gray700.$,
   },
   rowHoverColor: "none",
-  nonHeaderRowHoverCss: Css.bshHover.bGray700.$,
+  nonHeaderRowHoverCss: Css.bshHover.bcGray700.$,
   levels: {
     1: { rowIndent: 24 },
     2: { rowIndent: 48 },
