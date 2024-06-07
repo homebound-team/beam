@@ -2,12 +2,17 @@ import { Meta } from "@storybook/react";
 import { ContainerGrid, ContainerGridProps } from "src/components/ContainerGrid/ContainerGrid";
 import { Button } from "src/components";
 import { useCallback, useRef, useState } from "react";
-import { ContainerGridItem, ContainerGridItemProps } from "src/components/ContainerGrid/ContainerGridItem";
+import {
+  ContainerBreakpointDef,
+  ContainerGridItem,
+  ContainerGridItemProps,
+} from "src/components/ContainerGrid/ContainerGridItem";
 import { useResizeObserver } from "@react-aria/utils";
 import { useContainerBreakpoint } from "src/components/ContainerGrid/useContainerBreakpoint";
 import { ContainerBreakpoint } from "src/components/ContainerGrid/utils";
 import { Css } from "src/Css";
 import { NumberField } from "src/inputs";
+import { Unstable_Grid2 as Grid } from "@mui/material";
 
 export default {
   component: ContainerGrid,
@@ -18,9 +23,7 @@ export function Example() {
   return (
     <div css={Css.maxwPx(2000).mx("auto").$}>
       <div css={Css.df.ais.$}>
-        <div css={Css.add("resize", "horizontal").mwPx(120).hPx(150).bshBasic.ba.bGray400.p1.overflowAuto.mr2.$}>
-          Resize Me
-        </div>
+        <div css={Css.add("resize", "horizontal").mwPx(120).hPx(150).bshBasic.ba.bcGray400.p1.oa.mr2.$}>Resize Me</div>
         <div css={Css.mx1.fg1.$}>
           <ContainerGrid xss={Css.aifs.$}>
             <ContainerGridItem xss={Css.jcsb.df.gap2.my3.flexWrap("wrap").$}>
@@ -43,6 +46,53 @@ export function Example() {
             </ContainerGridItem>
           </ContainerGrid>
         </div>
+      </div>
+    </div>
+  );
+}
+
+export function MuiGrid() {
+  const [num, setNum] = useState(0);
+  const [expanded, setExpanded] = useState(false);
+  const toggleSize = () => setExpanded((prev) => !prev);
+  return (
+    <div css={Css.df.ais.$}>
+      <div
+        css={
+          Css.add("resize", "horizontal")
+            .mwPx(expanded ? 800 : 160)
+            .hPx(150).bshBasic.ba.bcGray400.p1.oa.mr2.df.gap1.fdc.ais.$
+        }
+      >
+        Resize Me
+        <Button label="Toggle" onClick={toggleSize} variant="secondary" />
+      </div>
+      <div css={Css.fg1.$}>
+        <Grid container spacing={2} mx={2}>
+          <Grid xs={12}>
+            <div css={Css.jcsb.df.gap2.my3.flexWrap("wrap").$}>
+              <h1 css={Css.xl3Md.$}>Title of the Page</h1>
+              <Button label={`Clicked: ${num} times`} onClick={() => setNum((prevState) => (prevState += 1))} />
+            </div>
+          </Grid>
+          <Grid xs={12} lg={3}>
+            <div css={Css.df.fdc.gap2.$}>
+              <RailItem left />
+              <RailItem left />
+            </div>
+          </Grid>
+          <Grid lg={6}>
+            <div css={Css.br8.bgWhite.bshBasic.p2.sm.$}>
+              <MainContent />
+            </div>
+          </Grid>
+          <Grid xs={12} lg={3}>
+            <div css={Css.df.fdc.gap2.$}>
+              <RailItem />
+              <RailItem />
+            </div>
+          </Grid>
+        </Grid>
       </div>
     </div>
   );
@@ -107,9 +157,7 @@ export function Playground() {
       </div>
 
       <div css={Css.df.ais.$}>
-        <div css={Css.add("resize", "horizontal").mwPx(120).hPx(150).bshBasic.ba.bGray400.p1.overflowAuto.mr2.$}>
-          Resize Me
-        </div>
+        <div css={Css.add("resize", "horizontal").mwPx(120).hPx(150).bshBasic.ba.bcGray400.p1.oa.mr2.$}>Resize Me</div>
         <div css={Css.fg1.$}>
           <GridHeader />
           <ContainerGrid sm={sm} md={md} lg={lg} columns={columns} gap={gap}>
@@ -125,10 +173,13 @@ export function Playground() {
 }
 
 function GridItemCard(props: Omit<ContainerGridItemProps, "children">) {
-  const [sm, setSm] = useState<number | undefined>(props.sm);
-  const [md, setMd] = useState<number | undefined>(props.md);
-  const [lg, setLg] = useState<number | undefined>(props.lg);
-  const [xl, setXl] = useState<number | undefined>(props.xl);
+  function resolveColumnSize(bp: ContainerBreakpointDef | undefined): number | undefined {
+    return typeof bp === "number" ? bp : bp?.columns;
+  }
+  const [sm, setSm] = useState<number | undefined>(resolveColumnSize(props.sm));
+  const [md, setMd] = useState<number | undefined>(resolveColumnSize(props.md));
+  const [lg, setLg] = useState<number | undefined>(resolveColumnSize(props.lg));
+  const [xl, setXl] = useState<number | undefined>(resolveColumnSize(props.xl));
   const matchedBreakpoint = useContainerBreakpoint();
   const fields: { bp: ContainerBreakpoint; value: number | undefined; onChange: (v: number | undefined) => void }[] = [
     { bp: "sm", value: sm, onChange: setSm },
@@ -142,7 +193,7 @@ function GridItemCard(props: Omit<ContainerGridItemProps, "children">) {
         <h2 css={Css.smBd.$}>Breakpoint Definition</h2>
         {fields.map(({ bp, value, onChange }) => {
           return (
-            <div key={bp} css={Css.if(matchedBreakpoint === bp).bGreen600.ba.bw2.br4.bshBasic.$}>
+            <div key={bp} css={Css.if(matchedBreakpoint === bp).bcGreen600.ba.bw2.br4.bshBasic.$}>
               <NumberField
                 labelStyle="inline"
                 compact

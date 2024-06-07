@@ -45,4 +45,4 @@ export function ContainerGridItem(props: ContainerGridItemProps) {
   return <div css={styles}>{children}</div>;
 }
 
-type ContainerBreakpointDef = number | { columns?: number; xss?: Properties };
+export type ContainerBreakpointDef = number | { columns?: number; xss?: Properties };
