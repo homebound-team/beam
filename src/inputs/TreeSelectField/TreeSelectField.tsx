@@ -66,6 +66,8 @@ export interface TreeSelectFieldProps<O, V extends Value> extends BeamFocusableP
   /** Whether to have all groups collapsed on initial load. Can also be configured individually, which overrides this behavior.
    * @default false */
   defaultCollapsed?: boolean;
+  /** Allow the field's height to grow up to a predefined height (currently 72px), then scroll. */
+  multiline?: boolean;
 }
 
 export function TreeSelectField<O, V extends Value>(props: TreeSelectFieldProps<O, V>): JSX.Element;

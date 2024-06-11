@@ -57,6 +57,15 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
 
         <TestTreeSelectField
           {...args}
+          multiline
+          values={multipleValueIds}
+          options={options}
+          placeholder="Select a project"
+          label="Multiple options selected - multiline prop"
+        />
+
+        <TestTreeSelectField
+          {...args}
           values={[]}
           options={options}
           placeholder="Select a project"
