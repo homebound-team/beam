@@ -119,7 +119,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     ...{
       [` > .${revealOnRowHoverClass} > *`]: Css.vh.$,
-      [`:hover > .${revealOnRowHoverClass} > *`]: Css.vh.$,
+      [`:hover > .${revealOnRowHoverClass} > *`]: Css.vv.$,
     },
     ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
   };
