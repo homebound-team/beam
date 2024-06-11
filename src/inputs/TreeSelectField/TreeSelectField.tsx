@@ -32,6 +32,7 @@ import { keyToValue, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { HasIdAndName, Optional } from "src/types";
 import { getFieldWidth } from "src/inputs/utils";
+import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 
 export interface TreeSelectFieldProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
@@ -68,6 +69,10 @@ export interface TreeSelectFieldProps<O, V extends Value> extends BeamFocusableP
   defaultCollapsed?: boolean;
   /** Allow the field's height to grow up to a predefined height (currently 72px), then scroll. */
   multiline?: boolean;
+  /** Which selected options to display as chips in the input field when not focused.
+   * @default root */
+  chipDisplay?: "all" | "leaf" | "root";
+  disabledOptions?: (V | { value: V; reason: string })[];
 }
 
 export function TreeSelectField<O, V extends Value>(props: TreeSelectFieldProps<O, V>): JSX.Element;
@@ -147,6 +152,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     defaultCollapsed = false,
     placeholder,
     fullWidth = fieldProps?.fullWidth ?? false,
+    chipDisplay = "root",
+    disabledOptions,
     ...otherProps
   } = props;
 
@@ -157,29 +164,53 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
   const { collapsedKeys } = useTreeSelectFieldProvider();
 
-  function levelOptions(o: NestedOption<O>, level: number, filtering?: boolean): LeveledOption<O>[] {
-    // If a user is filtering, then do not provide level to the options as the various paddings may look quite odd.
-    const actualLevel = filtering ? 0 : level;
-    return [
-      [o, actualLevel],
-      ...(o.children?.length && !collapsedKeys.includes(valueToKey(getOptionValue(o)))
-        ? o.children.flatMap((oc: NestedOption<O>) => levelOptions(oc, actualLevel + 1, filtering))
-        : []),
-    ];
-  }
+  const levelOptions = useCallback(
+    (o: NestedOption<O>, level: number, filtering?: boolean): LeveledOption<O>[] => {
+      // If a user is filtering, then do not provide level to the options as the various paddings may look quite odd.
+      const actualLevel = filtering ? 0 : level;
+      return [
+        [o, actualLevel],
+        ...(o.children?.length && !collapsedKeys.includes(valueToKey(getOptionValue(o)))
+          ? o.children.flatMap((oc: NestedOption<O>) => levelOptions(oc, actualLevel + 1, filtering))
+          : []),
+      ];
+    },
+    [collapsedKeys, getOptionValue],
+  );
 
-  // Initialize the TreeFieldState
-  const [fieldState, setFieldState] = useState<TreeFieldState<O>>(() => {
+  // Given an option and the selected keys, it will return the top most selected option in the option's tree.
+  // This could be a parent of the option, or the option itself.
+  const getTopLevelSelections = useCallback(
+    (o: NestedOption<O>, selectedKeys: Set<Key>): NestedOption<O>[] => {
+      // If this element is already selected, return early. Do not bother looking through children.
+      if (selectedKeys.has(valueToKey(getOptionValue(o)))) return [o];
+      // If this element has no children, then look through the children for top level selected options.
+      if (o.children) return [...o.children.flatMap((c) => getTopLevelSelections(c, selectedKeys))];
+      return [];
+    },
+    [getOptionValue],
+  );
+
+  // `disabledKeys` from ComboBoxState does not support additional meta for showing a disabled reason to the user
+  // This lookup map helps us cleanly prune out the optional reason text, then access it further down the component tree
+  const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
+
+  const initTreeFieldState = useCallback(() => {
     const filteredOptions = initialOptions.flatMap((o) => levelOptions(o, 0));
-    const selectedOptions: NestedOption<O>[] =
+    const maybeDuplicatedSelectedOptions: NestedOption<O>[] =
       values?.flatMap((v) => {
         const maybeOption = findOption(initialOptions, valueToKey(v), getOptionValue);
-        if (!maybeOption) return [];
-
-        const { option } = maybeOption;
-        // If the selected key has children then all children should also be considered selected.
-        return [option, ...(option.children?.flatMap(flattenOptions) ?? [])];
+        if (maybeOption.length === 0) return [];
+        const options: NestedOption<O>[] = [];
+        for (const { option } of maybeOption) {
+          options.push(option, ...(option.children?.flatMap(flattenOptions) ?? []));
+        }
+        return options;
       }) ?? [];
+    // Dedupe selectedOptions
+    const selectedOptions: NestedOption<O>[] = maybeDuplicatedSelectedOptions.filter(
+      (o, idx, self) => idx === self.findIndex((t) => getOptionValue(o) === getOptionValue(t)),
+    );
     const selectedKeys = selectedOptions.map((o) => valueToKey(getOptionValue(o)));
 
     // It is possible that all the children of a parent were considered selected `values`, but the parent wasn't.
@@ -204,14 +235,20 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
     initialOptions.forEach(areAllChildrenSelected);
 
-    // Given a child option, determine if the parent is selected.
-    const isParentSelected = (option: NestedOption<O>): boolean => {
-      const parents = findOption(initialOptions, valueToKey(getOptionValue(option)), getOptionValue)?.parents;
-      if (!parents) return false;
-      return parents.some((parent) => selectedKeys.includes(valueToKey(getOptionValue(parent))));
-    };
+    const allRootOptions: NestedOption<O>[] = initialOptions.flatMap((o) =>
+      getTopLevelSelections(o, new Set(selectedKeys)),
+    );
+    // dedupe selected root options
+    const rootOptions = allRootOptions.filter(
+      (o, idx, self) => idx === self.findIndex((t) => getOptionValue(o) === getOptionValue(t)),
+    );
 
-    const selectedOptionsLabels = selectedOptions.filter((o) => !isParentSelected(o)).map(getOptionLabel);
+    const selectedOptionsLabels =
+      chipDisplay === "root"
+        ? rootOptions.map(getOptionLabel)
+        : chipDisplay === "leaf"
+        ? selectedOptions.filter((o) => !o.children || o.children.length === 0).map(getOptionLabel)
+        : selectedOptions.map(getOptionLabel);
 
     return {
       selectedKeys,
@@ -230,7 +267,33 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
       optionsLoading: false,
       allowCollapsing: true,
     };
-  });
+  }, [
+    initialOptions,
+    values,
+    chipDisplay,
+    getOptionLabel,
+    isReadOnly,
+    nothingSelectedText,
+    levelOptions,
+    getOptionValue,
+    getTopLevelSelections,
+  ]);
+
+  // Initialize the TreeFieldState
+  const [fieldState, setFieldState] = useState<TreeFieldState<O>>(() => initTreeFieldState());
+
+  // Reset the TreeFieldState if the values array changes and doesn't match the selectedOptions
+  useEffect(() => {
+    // if the values does not match the values in the fieldState, then update the fieldState
+    const selectedKeys = fieldState.selectedOptions.map((o) => valueToKey(getOptionValue(o)));
+    if (
+      values &&
+      (values.length !== selectedKeys.length || !values.every((v) => selectedKeys.includes(valueToKey(v))))
+    ) {
+      setFieldState(initTreeFieldState());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values]);
 
   // React to collapsed keys and update the filtered options
   const reactToCollapse = useRef(false);
@@ -329,6 +392,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   // This is _always_ going to appear new. Maybe `useMemo`?
   const comboBoxProps = {
     ...otherProps,
+    disabledKeys: Object.keys(disabledOptionsWithReasons),
     placeholder: !values || values.length === 0 ? placeholder : "",
     label: props.label,
     inputValue: fieldState.inputValue,
@@ -340,7 +404,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     onInputChange,
     onOpenChange,
     children: ([item]: LeveledOption<O>) => (
-      // what we're telling it to render. look at padding here - dont have to pass down to tree option - filtered options is where we're flat mapping
+      // what we're telling it to render. look at padding here - don't have to pass down to tree option - filtered options is where we're flat mapping
       <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
         {getOptionMenuLabel(item)}
       </Item>
@@ -392,26 +456,32 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
         // For added keys, we need to see if any other options should be added as well.
         [...addedKeys].forEach((key) => {
-          const maybeOption = findOption(fieldState.allOptions, key, getOptionValue);
-          if (!maybeOption) return;
+          const maybeOptions = findOption(fieldState.allOptions, key, getOptionValue);
+          if (maybeOptions.length === 0) return;
 
-          const { option, parents } = maybeOption;
+          for (const { option, parents } of maybeOptions) {
+            // If the newly added option has children, then consider the children to be newly added keys as well.
+            if (option && option.children && option.children.length > 0) {
+              const childrenKeys = option.children
+                .flatMap(flattenOptions)
+                .map((o) => valueToKey(getOptionValue(o)))
+                .filter((childKey) => {
+                  // remove children that are disabled
+                  return !state.disabledKeys.has(childKey);
+                });
+              [key, ...childrenKeys].forEach(addedKeys.add, addedKeys);
+            }
 
-          // If the newly added option has children, then consider the children to be newly added keys as well.
-          if (option && option.children && option.children.length > 0) {
-            const childrenKeys = option.children.flatMap(flattenOptions).map((o) => valueToKey(getOptionValue(o)));
-            [key, ...childrenKeys].forEach(addedKeys.add, addedKeys);
-          }
-
-          // If this was a child that was selected, then see if every other child is also selected, and if so, consider the parent selected.
-          // Walk up the parents and determine their state.
-          for (const parent of parents.reverse()) {
-            const allChecked = parent.children?.every((child) => {
-              const childKey = valueToKey(getOptionValue(child));
-              return addedKeys.has(childKey) || existingKeys.has(childKey);
-            });
-            if (allChecked) {
-              addedKeys.add(valueToKey(getOptionValue(parent)));
+            // If this was a child that was selected, then see if every other child is also selected, and if so, consider the parent selected.
+            // Walk up the parents and determine their state.
+            for (const parent of parents.reverse()) {
+              const allChecked = parent.children?.every((child) => {
+                const childKey = valueToKey(getOptionValue(child));
+                return addedKeys.has(childKey) || existingKeys.has(childKey) || state.disabledKeys.has(childKey);
+              });
+              if (allChecked) {
+                addedKeys.add(valueToKey(getOptionValue(parent)));
+              }
             }
           }
         });
@@ -419,29 +489,34 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         // For removed keys, we need to also unselect any children and parents of the removed key
         [...removedKeys].forEach((key) => {
           // Grab the option and parents of the option that was removed
-          const maybeOption = findOption(fieldState.allOptions, key, getOptionValue);
-          if (!maybeOption) return;
+          const maybeOptions = findOption(fieldState.allOptions, key, getOptionValue);
+          if (maybeOptions.length === 0) return;
 
-          const { option, parents } = maybeOption;
+          for (const { option, parents } of maybeOptions) {
+            // If the option has children, then we need to unselect those children as well
+            if (option.children && option.children.length > 0) {
+              // Ensure we do not impact children that are disabled. They should be able to toggled on/off
+              const childrenKeys = option.children
+                .flatMap(flattenOptions)
+                .map((o) => valueToKey(getOptionValue(o)))
+                .filter((key) => !state.disabledKeys.has(key));
+              [key, ...childrenKeys].forEach(removedKeys.add, removedKeys);
+            }
 
-          // If the option has children, then we need to unselect those children as well
-          if (option.children && option.children.length > 0) {
-            const childrenKeys = option.children.flatMap(flattenOptions).map((o) => valueToKey(getOptionValue(o)));
-            [key, ...childrenKeys].forEach(removedKeys.add, removedKeys);
-          }
-
-          // If the option has parents, then we need to unselect those parents as well
-          if (parents.length > 0) {
-            const parentKeys = parents.map((o) => valueToKey(getOptionValue(o)));
-            [key, ...parentKeys].forEach(removedKeys.add, removedKeys);
+            // If the option has parents, then we need to unselect those parents as well
+            if (parents.length > 0) {
+              const parentKeys = parents.map((o) => valueToKey(getOptionValue(o)));
+              [key, ...parentKeys].forEach(removedKeys.add, removedKeys);
+            }
           }
         });
 
         // Create the lists to update our TreeState with
         const selectedKeys = new Set([...existingKeys, ...addedKeys].filter((x) => !removedKeys.has(x)));
-        const selectedOptions = fieldState.allOptions
-          .flatMap(flattenOptions)
-          .filter((o) => selectedKeys.has(valueToKey(getOptionValue(o))));
+        const selectedOptions = [...selectedKeys]
+          // We get the first option here because it could be duplicated, but we only want one of them. We'd need to dedupe the list otherwise.
+          .map((key) => findOption(fieldState.allOptions, key, getOptionValue)[0]?.option)
+          .filter((o) => o) as NestedOption<O>[]; // filter out undefined
 
         // Our `onSelect` callback provides three things:
         // 1. ALL selected values + options
@@ -449,14 +524,18 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         // 3. Only the leaf selected values + options
 
         // For the top level and leaf selections, we need to do some extra work to determine which options are the top level and leaf.
-        function getTopLevelSelections(o: NestedOption<O>): NestedOption<O>[] {
-          // If this element is already selected, return early. Do not bother looking through children.
-          if (selectedKeys.has(valueToKey(getOptionValue(o)))) return [o];
-          // If this element has no children, then look through the children for top level selected options.
-          if (o.children) return [...o.children.flatMap(getTopLevelSelections)];
-          return [];
-        }
-        const rootOptions = fieldState.allOptions.flatMap(getTopLevelSelections);
+        // function getTopLevelSelections(o: NestedOption<O>): NestedOption<O>[] {
+        //   // If this element is already selected, return early. Do not bother looking through children.
+        //   if (selectedKeys.has(valueToKey(getOptionValue(o)))) return [o];
+        //   // If this element has no children, then look through the children for top level selected options.
+        //   if (o.children) return [...o.children.flatMap(getTopLevelSelections)];
+        //   return [];
+        // }
+        const allRootOptions = fieldState.allOptions.flatMap((o) => getTopLevelSelections(o, selectedKeys));
+        // dedupe selected root options
+        const rootOptions = allRootOptions.filter(
+          (o, idx, self) => idx === self.findIndex((t) => getOptionValue(o) === getOptionValue(t)),
+        );
         const rootValues = rootOptions.map(getOptionValue);
 
         // Finally get the list of options that are just the "leaf" options, meaning they have no children.
@@ -469,7 +548,12 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
           filteredOptions: initialOptions.flatMap((o) => levelOptions(o, 0)),
           selectedKeys: [...selectedKeys],
           selectedOptions,
-          selectedOptionsLabels: rootOptions.map(getOptionLabel),
+          selectedOptionsLabels:
+            chipDisplay === "root"
+              ? rootOptions.map(getOptionLabel)
+              : chipDisplay === "leaf"
+              ? leafOptions.map(getOptionLabel)
+              : selectedOptions.map(getOptionLabel),
         }));
 
         onSelect({

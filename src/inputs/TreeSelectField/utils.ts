@@ -34,19 +34,20 @@ export function findOption<O, V extends Value>(
   options: NestedOption<O>[],
   key: Key,
   getOptionValue: (o: O) => V,
-): FoundOption<O> | undefined {
-  // This is technically an array of "maybe FoundRow"
+): FoundOption<O>[] {
+  // This is technically an array of "maybe FoundOption"
   const todo: FoundOption<O>[] = options.map((option) => ({ option, parents: [] }));
+  const found = [];
   while (todo.length > 0) {
     const curr = todo.pop()!;
     if (getOptionValue(curr.option) === key) {
-      return curr;
+      found.push(curr);
     } else if (curr.option.children) {
       // Search our children and pass along us as the parent
       todo.push(...curr.option.children.map((option) => ({ option, parents: [...curr.parents, curr.option] })));
     }
   }
-  return undefined;
+  return found;
 }
 
 export function flattenOptions<O>(o: NestedOption<O>): NestedOption<O>[] {
