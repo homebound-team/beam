@@ -272,7 +272,7 @@ function TestTreeSelectField<T extends HasIdAndName, V extends Value>(
     <TreeSelectField<T, V>
       {...(props as any)}
       values={selectedOptions}
-      onSelect={setSelectedOptions}
+      onSelect={({ all }) => setSelectedOptions(all.values)}
       onBlur={action("onBlur")}
       onFocus={action("onFocus")}
       getOptionLabel={(o) => o.name}
