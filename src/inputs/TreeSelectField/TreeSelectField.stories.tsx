@@ -8,6 +8,7 @@ import { TreeSelectField, TreeSelectFieldProps } from "src/inputs/TreeSelectFiel
 import { NestedOption } from "src/inputs/TreeSelectField/utils";
 import { HasIdAndName } from "src/types";
 import { zeroTo } from "src/utils/sb";
+import { Button } from "src/components";
 
 export default {
   component: TreeSelectField,
@@ -227,6 +228,42 @@ export function AsyncOptions() {
   );
 }
 
+export function Interactive() {
+  const options: NestedOption<HasIdAndName>[] = zeroTo(3).map((dIdx) => ({
+    id: `d:${dIdx}`,
+    name: `Development ${dIdx}`,
+    children: zeroTo(2).map((cIdx) => ({
+      id: `c:${cIdx}`,
+      name: `Cohort ${cIdx}`,
+      children: zeroTo(3).map((pIdx) => ({
+        id: `p:${pIdx}`,
+        name: `Project ${pIdx}`,
+      })),
+    })),
+  }));
+
+  const [values, setValues] = useState<string[]>(["p:0"]);
+
+  return (
+    <div css={Css.df.fdc.gap2.aifs.$}>
+      <div css={Css.df.gap2.$}>
+        <Button label="Clear selections" onClick={() => setValues([])} />
+        <Button label="Select Project 1" onClick={() => setValues(["p:1"])} />
+      </div>
+      <TreeSelectField
+        multiline
+        disabledOptions={["p:0"]}
+        chipDisplay="leaf"
+        values={values}
+        options={options}
+        onSelect={(newValues) => setValues(newValues.leaf.values)}
+        label="Favorite League"
+        placeholder="Select a league"
+      />
+    </div>
+  );
+}
+
 function TestTreeSelectField<T extends HasIdAndName, V extends Value>(
   props: Omit<TreeSelectFieldProps<T, V>, "onSelect" | "getOptionValue" | "getOptionLabel">,
 ): JSX.Element {
@@ -235,7 +272,7 @@ function TestTreeSelectField<T extends HasIdAndName, V extends Value>(
     <TreeSelectField<T, V>
       {...(props as any)}
       values={selectedOptions}
-      onSelect={setSelectedOptions}
+      onSelect={({ all }) => setSelectedOptions(all.values)}
       onBlur={action("onBlur")}
       onFocus={action("onFocus")}
       getOptionLabel={(o) => o.name}

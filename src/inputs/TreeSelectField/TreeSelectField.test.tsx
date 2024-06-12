@@ -4,6 +4,7 @@ import { NestedOption } from "src/inputs/TreeSelectField/utils";
 import { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
 import { blur, click, focus, render, wait } from "src/utils/rtl";
+import { useState } from "react";
 
 describe(TreeSelectField, () => {
   it("renders", async () => {
@@ -43,6 +44,52 @@ describe(TreeSelectField, () => {
     expect(r.favoriteLeague).toBeDisabled();
     // And the expand/collapse button should be disabled.
     expect(r.toggleListBox).toBeDisabled();
+  });
+
+  it("doesn't select disabled options when the parent is selected", async () => {
+    // Given a TreeSelect field with no options select, and a disabled option
+    const onSelect = jest.fn();
+    const r = await render(
+      <TreeSelectField
+        onSelect={onSelect}
+        options={getNestedOptions()}
+        disabledOptions={["nba"]}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When selecting the Basketball option
+    click(r.favoriteLeague);
+    click(r.getByRole("option", { name: "Basketball" }));
+
+    // Then only the WNBA option is selected
+    expect(onSelect.mock.calls[0][0].leaf.values).toEqual(["wnba"]);
+  });
+
+  it("doesn't deselect disabled options when the parent is deselected", async () => {
+    // Given a TreeSelect field with all basketball options select, and a "NBA" is disabled
+    const onSelect = jest.fn();
+    const r = await render(
+      <TreeSelectField
+        onSelect={onSelect}
+        options={getNestedOptions()}
+        disabledOptions={["nba"]}
+        label="Favorite League"
+        values={["nba", "wnba"]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When de-selecting the Basketball option
+    click(r.favoriteLeague);
+    click(r.getByRole("option", { name: "Basketball" }));
+
+    // Then only the WNBA option is de-selected
+    expect(onSelect.mock.calls[0][0].leaf.values).toEqual(["nba"]);
   });
 
   it("renders readonly", async () => {
@@ -441,6 +488,199 @@ describe(TreeSelectField, () => {
     );
     // As all the options for "Football" are selected it should only count as one option selected
     expect(r.selectedOptionsCount).toHaveTextContent("2");
+  });
+
+  it("can disable options", async () => {
+    // Given a TreeSelectField with disabled options
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        values={[]}
+        options={getNestedOptions()}
+        disabledOptions={["nba"]}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    // When opening the options
+    click(r.favoriteLeague);
+    // Then the disabled option is disabled
+    expect(r.getByRole("option", { name: "NBA" })).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("selects all matching options when there are duplicates and only the child is passed as values", async () => {
+    // Given the multiple parents with duplicate children
+    const options: NestedOption<HasIdAndName>[] = [
+      { id: "p:1", name: "Parent 1", children: [{ id: "c:1", name: "Child 1" }] },
+      { id: "p:2", name: "Parent 2", children: [{ id: "c:1", name: "Child 1" }] },
+    ];
+    // And the TreeSelectField with just the one child set as the value.
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        values={["c:1"]}
+        options={options}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When we open the menu
+    click(r.favoriteLeague);
+    // Then all matching options are selected
+    expect(r.getAllByRole("option", { name: "Child 1" })[0]).toHaveAttribute("aria-selected", "true");
+    expect(r.getAllByRole("option", { name: "Child 1" })[1]).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("selects all matching options when there are duplicates and only the parent is passed as the value", async () => {
+    // Given the multiple parents with duplicate children
+    const options: NestedOption<HasIdAndName>[] = [
+      { id: "p:1", name: "Parent 1", children: [{ id: "c:1", name: "Child 1" }] },
+      { id: "p:2", name: "Parent 2", children: [{ id: "c:1", name: "Child 1" }] },
+    ];
+    // And the TreeSelectField with just the one child set as the value.
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        values={["p:1"]}
+        options={options}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When we open the menu
+    click(r.favoriteLeague);
+    // Then all matching options are selected
+    expect(r.getAllByRole("option", { name: "Child 1" })[0]).toHaveAttribute("aria-selected", "true");
+    expect(r.getAllByRole("option", { name: "Child 1" })[1]).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("returns a deduped list when selecting duplicate options", async () => {
+    // Given the multiple parents with duplicate children
+    const options: NestedOption<HasIdAndName>[] = [
+      { id: "p:1", name: "Parent 1", children: [{ id: "c:1", name: "Child 1" }] },
+      { id: "p:2", name: "Parent 2", children: [{ id: "c:1", name: "Child 1" }] },
+    ];
+    // With a mocked onSelect
+    const onSelect = jest.fn();
+    // And the TreeSelectField
+    const r = await render(
+      <TreeSelectField
+        onSelect={onSelect}
+        values={[]}
+        options={options}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When we open the menu
+    click(r.favoriteLeague);
+    // And selecting the first child
+    click(r.getAllByRole("option", { name: "Child 1" })[0]);
+
+    // Then all matching options are selected
+    expect(r.getAllByRole("option", { name: "Child 1" })[0]).toHaveAttribute("aria-selected", "true");
+    expect(r.getAllByRole("option", { name: "Child 1" })[1]).toHaveAttribute("aria-selected", "true");
+
+    // And only the one child option is returned along with both parents
+    expect(onSelect.mock.calls[0][0].all.values).toEqual(["c:1", "p:2", "p:1"]);
+    expect(onSelect.mock.calls[0][0].leaf.values).toEqual(["c:1"]);
+    expect(onSelect.mock.calls[0][0].root.values).toEqual(["p:1", "p:2"]);
+  });
+
+  it("respects chipDisplay for 'root' (default)", async () => {
+    // Given the TreeSelectField with top level options selected and no chipDisplay set
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        values={["baseball", "basketball"]}
+        options={getNestedOptions()}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // Then the selected options display only Baseball and Basketball
+    expect(r.selectedOptionsCount).toHaveTextContent("2");
+    expect(r.favoriteLeague_unfocusedPlaceholderContainer).toHaveTextContent("BaseballBasketball");
+  });
+
+  it("respects chipDisplay for 'leaf'", async () => {
+    // Given the TreeSelectField with top level options selected and chipDisplay of 'leaf'
+    const r = await render(
+      <TreeSelectField
+        chipDisplay="leaf"
+        onSelect={noop}
+        values={["baseball", "basketball"]}
+        options={getNestedOptions()}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // Then the selected options display as (both baseball and basketball leagues).
+    expect(r.selectedOptionsCount).toHaveTextContent("4");
+    expect(r.favoriteLeague_unfocusedPlaceholderContainer).toHaveTextContent("MLBMinor League BaseballNBAWNBA");
+  });
+
+  it("respects chipDisplay for 'all'", async () => {
+    // Given the TreeSelectField with top level options selected and chipDisplay of 'all'
+    const r = await render(
+      <TreeSelectField
+        chipDisplay="all"
+        onSelect={noop}
+        values={["baseball", "basketball"]}
+        options={getNestedOptions()}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // Then the selected options displays all
+    expect(r.selectedOptionsCount).toHaveTextContent("6");
+    expect(r.favoriteLeague_unfocusedPlaceholderContainer).toHaveTextContent(
+      "BaseballMLBMinor League BaseballBasketballNBAWNBA",
+    );
+  });
+
+  it("updates values when the caller modifies them", async () => {
+    // Given a stateful component that has initial values set, and a button to clear the options
+    function Test() {
+      const [values, setValues] = useState<string[]>(["baseball", "basketball"]);
+      return (
+        <>
+          <button data-testid="update" onClick={() => setValues(["baseball"])} />
+          <TreeSelectField
+            onSelect={({ all }) => setValues(all.values)}
+            values={values}
+            options={getNestedOptions()}
+            label="Favorite League"
+            getOptionValue={(o) => o.id}
+            getOptionLabel={(o) => o.name}
+          />
+        </>
+      );
+    }
+    const r = await render(<Test />);
+
+    // Then the options are initially selected
+    expect(r.selectedOptionsCount).toHaveTextContent("2");
+
+    // When clicking the update button to remove Basketball from the values
+    click(r.update);
+
+    // Then the only remaining option is Baseball
+    expect(r.selectedOptionsCount).toHaveTextContent("1");
+    expect(r.favoriteLeague_unfocusedPlaceholderContainer).toHaveTextContent("Baseball");
   });
 });
 
