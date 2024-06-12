@@ -6,7 +6,7 @@ import { Css } from "src/Css";
 import { Value } from "src/inputs/index";
 import { TreeSelectField, TreeSelectFieldProps } from "src/inputs/TreeSelectField/TreeSelectField";
 import { NestedOption } from "src/inputs/TreeSelectField/utils";
-import { HasIdAndName, Optional } from "src/types";
+import { HasIdAndName } from "src/types";
 import { zeroTo } from "src/utils/sb";
 import { Button } from "src/components";
 
@@ -165,24 +165,16 @@ export function OpenMenu() {
     id: `d:${dIdx}`,
     name: `Development ${dIdx}`,
     children: zeroTo(2).map((cIdx) => ({
-      id: `c:${cIdx}`,
+      id: `c:${cIdx}:d:${dIdx}`,
       name: `Cohort ${cIdx}`,
       children: zeroTo(2).map((pIdx) => ({
-        id: `p:${pIdx}`,
+        id: `p:${pIdx}:c:${cIdx}:d:${dIdx}`,
         name: `Project ${pIdx}`,
       })),
     })),
   }));
 
-  return (
-    <TestTreeSelectField
-      chipDisplay="leaf"
-      values={["p:0", "p:1"]}
-      options={options}
-      label="Nested options"
-      placeholder="Select a project"
-    />
-  );
+  return <TestTreeSelectField values={[]} options={options} label="Nested options" placeholder="Select a project" />;
 }
 OpenMenu.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   const canvas = within(canvasElement);
@@ -273,7 +265,7 @@ export function Interactive() {
 }
 
 function TestTreeSelectField<T extends HasIdAndName, V extends Value>(
-  props: Optional<TreeSelectFieldProps<T, V>, "onSelect" | "getOptionValue" | "getOptionLabel">,
+  props: Omit<TreeSelectFieldProps<T, V>, "onSelect" | "getOptionValue" | "getOptionLabel">,
 ): JSX.Element {
   const [selectedOptions, setSelectedOptions] = useState<V[] | undefined>(props.values);
   return (
