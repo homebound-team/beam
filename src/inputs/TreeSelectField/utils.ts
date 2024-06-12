@@ -29,8 +29,28 @@ export type TreeSelectResponse<O, V extends Value> = {
   root: { values: V[]; options: O[] };
 };
 
-/** Finds an option by Key, and returns it + any parents. */
+/** Finds first option by Key, and returns it + any parents. */
 export function findOption<O, V extends Value>(
+  options: NestedOption<O>[],
+  key: Key,
+  getOptionValue: (o: O) => V,
+): FoundOption<O> | undefined {
+  // This is technically an array of "maybe FoundOption"
+  const todo: FoundOption<O>[] = options.map((option) => ({ option, parents: [] }));
+  while (todo.length > 0) {
+    const curr = todo.pop()!;
+    if (getOptionValue(curr.option) === key) {
+      return curr;
+    } else if (curr.option.children) {
+      // Search our children and pass along us as the parent
+      todo.push(...curr.option.children.map((option) => ({ option, parents: [...curr.parents, curr.option] })));
+    }
+  }
+  return undefined;
+}
+
+/** Finds all options by Key, and returns it + any parents. */
+export function findOptions<O, V extends Value>(
   options: NestedOption<O>[],
   key: Key,
   getOptionValue: (o: O) => V,
