@@ -544,7 +544,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
         setFieldState((prevState) => ({
           ...prevState,
-          inputValue: nothingSelectedText,
+          // Since we reset the list of options upon selection changes, then set the `inputValue` to empty string to reflect that.
+          inputValue: "",
           filteredOptions: initialOptions.flatMap((o) => levelOptions(o, 0)),
           selectedKeys: [...selectedKeys],
           selectedOptions,
