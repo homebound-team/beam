@@ -464,7 +464,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
           for (const { option, parents } of maybeOptions) {
             // If the option has children, then we need to unselect those children as well
             if (option.children && option.children.length > 0) {
-              // Ensure we do not impact children that are disabled. They should be able to toggled on/off
+              // Ensure we do not impact children that are disabled. They shouldn't be able to toggled on/off
               const childrenKeys = option.children
                 .flatMap(flattenOptions)
                 .map((o) => valueToKey(getOptionValue(o)))

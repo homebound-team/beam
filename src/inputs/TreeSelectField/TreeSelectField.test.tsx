@@ -46,6 +46,52 @@ describe(TreeSelectField, () => {
     expect(r.toggleListBox).toBeDisabled();
   });
 
+  it("doesn't select disabled options when the parent is selected", async () => {
+    // Given a TreeSelect field with no options select, and a disabled option
+    const onSelect = jest.fn();
+    const r = await render(
+      <TreeSelectField
+        onSelect={onSelect}
+        options={getNestedOptions()}
+        disabledOptions={["nba"]}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When selecting the Basketball option
+    click(r.favoriteLeague);
+    click(r.getByRole("option", { name: "Basketball" }));
+
+    // Then only the WNBA option is selected
+    expect(onSelect.mock.calls[0][0].leaf.values).toEqual(["wnba"]);
+  });
+
+  it("doesn't deselect disabled options when the parent is deselected", async () => {
+    // Given a TreeSelect field with all basketball options select, and a "NBA" is disabled
+    const onSelect = jest.fn();
+    const r = await render(
+      <TreeSelectField
+        onSelect={onSelect}
+        options={getNestedOptions()}
+        disabledOptions={["nba"]}
+        label="Favorite League"
+        values={["nba", "wnba"]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When de-selecting the Basketball option
+    click(r.favoriteLeague);
+    click(r.getByRole("option", { name: "Basketball" }));
+
+    // Then only the WNBA option is de-selected
+    expect(onSelect.mock.calls[0][0].leaf.values).toEqual(["nba"]);
+  });
+
   it("renders readonly", async () => {
     // Given a readonly TreeSelectField
     const r = await render(
