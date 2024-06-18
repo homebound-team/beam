@@ -113,7 +113,7 @@ const sections: Sections = {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "rgba(36,36,36,0.2)",
+      backgroundColor: "rgba(36,36,36,0.6)",
     }),
   ],
   // Css that would be applied if using react-aria <VisuallyHidden />
