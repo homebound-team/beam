@@ -231,10 +231,16 @@ export const cardStyle: GridStyle = {
   },
   rowHoverColor: "none",
   nonHeaderRowHoverCss: Css.bshHover.bcGray700.$,
-  levels: {
-    1: { rowIndent: 24 },
-    2: { rowIndent: 48 },
-  },
+  // this will allow having N amount of nested childs without having to define each level margin
+  levels: new Proxy({} as Record<string, { rowIndent: number }>, {
+    get(_target, level: string) {
+      const parsedLevel = parseInt(level);
+      if (Number.isNaN(parsedLevel)) return undefined;
+
+      const rowIndent = 24 * parsedLevel;
+      return { rowIndent };
+    },
+  }),
 };
 
 export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
