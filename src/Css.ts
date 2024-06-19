@@ -3945,12 +3945,12 @@ class CssBuilder<T extends Properties> {
   }
 
   // underlay
-  /** Sets `position: "fixed"; top: 0; bottom: 0; left: 0; right: 0; display: "flex"; alignItems: "center"; justifyContent: "center"; backgroundColor: "rgba(36,36,36,0.2)"`. */
+  /** Sets `position: "fixed"; top: 0; bottom: 0; left: 0; right: 0; display: "flex"; alignItems: "center"; justifyContent: "center"; backgroundColor: "rgba(36,36,36,0.6)"`. */
   get underlay() {
     return this.add("position", "fixed").add("top", 0).add("bottom", 0).add("left", 0).add("right", 0).add(
       "display",
       "flex",
-    ).add("alignItems", "center").add("justifyContent", "center").add("backgroundColor", "rgba(36,36,36,0.2)");
+    ).add("alignItems", "center").add("justifyContent", "center").add("backgroundColor", "rgba(36,36,36,0.6)");
   }
 
   // visuallyHidden
