@@ -51,15 +51,17 @@ export interface GridStyle {
   /** Minimum table width in pixels. Used when calculating columns sizes */
   minWidthPx?: number;
   /** Css to apply at each level of a parent/child nested table. */
-  levels?: Record<
-    number,
-    {
-      /** Number of pixels to indent the row. This value will be subtracted from the "first content column" width. First content column is the first column that is not an 'action' column (i.e. non-checkbox or non-collapse button column) */
-      rowIndent?: number;
-      cellCss?: Properties;
-      firstContentColumn?: Properties;
-    }
-  >;
+  levels?:
+    | Record<
+        number,
+        {
+          /** Number of pixels to indent the row. This value will be subtracted from the "first content column" width. First content column is the first column that is not an 'action' column (i.e. non-checkbox or non-collapse button column) */
+          rowIndent?: number;
+          cellCss?: Properties;
+          firstContentColumn?: Properties;
+        }
+      >
+    | ((level: number) => { rowIndent?: number; cellCss?: Properties; firstContentColumn?: Properties });
   /** Allows for customization of the background color used to denote an "active" row */
   activeBgColor?: Palette;
   /** Defines styles for the group row which holds the selected rows that have been filtered out */
@@ -232,16 +234,7 @@ export const cardStyle: GridStyle = {
   rowHoverColor: "none",
   nonHeaderRowHoverCss: Css.bshHover.bcGray700.$,
   // this will allow having N amount of nested childs without having to define each level margin
-  levels: new Proxy({} as Record<string, { rowIndent: number }>, {
-    get(_target, level: string) {
-      const parsedLevel = parseInt(level);
-      // NaN check to prevent incorrect calculation, and the possitive check to prevent negative margin (header usually has -1 level)
-      if (Number.isNaN(parsedLevel) || parsedLevel < 0) return undefined;
-
-      const rowIndent = 24 * parsedLevel;
-      return { rowIndent };
-    },
-  }),
+  levels: (level) => ({ rowIndent: level > 0 ? 24 * level : undefined }),
 };
 
 export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
