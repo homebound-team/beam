@@ -91,7 +91,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const showRowHoverColor = !reservedRowKinds.includes(row.kind) && !omitRowHover && style.rowHoverColor !== "none";
 
   const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
-  const levelIndent = style.levels && style.levels[level]?.rowIndent;
+  const levelStyle = style.levels && (typeof style.levels === "function" ? style.levels(level) : style.levels[level]);
+  const levelIndent = levelStyle?.rowIndent;
 
   const containerCss = {
     ...Css.add("transition", "padding 0.25s ease-in-out").$,
@@ -308,9 +309,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               currentExpandedColumnCount === 0 &&
               Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$),
             // Or level-specific styling
-            ...(!isHeader && !isTotals && !isExpandableHeader && !!style.levels && style.levels[level]?.cellCss),
+            ...(!isHeader && !isTotals && !isExpandableHeader && levelStyle?.cellCss),
             // Level specific styling for the first content column
-            ...(applyFirstContentColumnStyles && !!style.levels && style.levels[level]?.firstContentColumn),
+            ...(applyFirstContentColumnStyles && levelStyle?.firstContentColumn),
             // The specific cell's css (if any from GridCellContent)
             ...rowStyleCellCss,
             // Apply active row styling for non-nested card styles.
