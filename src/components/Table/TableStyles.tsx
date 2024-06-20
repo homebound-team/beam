@@ -235,7 +235,8 @@ export const cardStyle: GridStyle = {
   levels: new Proxy({} as Record<string, { rowIndent: number }>, {
     get(_target, level: string) {
       const parsedLevel = parseInt(level);
-      if (Number.isNaN(parsedLevel)) return undefined;
+      // NaN check to prevent incorrect calculation, and the possitive check to prevent negative margin (header usually has -1 level)
+      if (Number.isNaN(parsedLevel) || parsedLevel < 0) return undefined;
 
       const rowIndent = 24 * parsedLevel;
       return { rowIndent };
