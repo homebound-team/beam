@@ -3,7 +3,7 @@ import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
 import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 import { useTooltipTriggerState } from "react-stately";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { useTestIds } from "src/utils";
 
 // We combine react-popper and aria-tooltip to makeup the tooltip component for the following reasons:
@@ -17,10 +17,11 @@ interface TooltipProps {
   placement?: Placement;
   delay?: number;
   disabled?: boolean;
+  bgColor?: Palette;
 }
 
 export function Tooltip(props: TooltipProps) {
-  const { placement, children, title, disabled, delay = 0 } = props;
+  const { placement, children, title, disabled, delay = 0, bgColor } = props;
 
   const state = useTooltipTriggerState({ delay, isDisabled: disabled });
   const triggerRef = useRef<HTMLElement>(null);
@@ -53,6 +54,7 @@ export function Tooltip(props: TooltipProps) {
           triggerRef={triggerRef}
           content={title}
           placement={placement}
+          bgColor={bgColor}
         />
       )}
     </>
@@ -67,9 +69,10 @@ interface PopperProps {
   triggerRef: React.MutableRefObject<HTMLElement | null>;
   content: ReactNode;
   placement?: Placement;
+  bgColor: Palette | undefined;
 }
 
-function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
+function Popper({ triggerRef, content, placement = "auto", bgColor = Palette.Gray900 }: PopperProps) {
   const popperRef = useRef(null);
   const [arrowRef, setArrowRef] = useState<HTMLDivElement | null>(null);
   // Since we use `display: contents;` on the `triggerRef`, then the element.offsetTop/Left/etc all equal `0`. This would make
@@ -90,7 +93,7 @@ function Popper({ triggerRef, content, placement = "auto" }: PopperProps) {
       ref={popperRef}
       style={styles.popper}
       {...attributes.popper}
-      css={Css.maxw("320px").bgGray900.white.px1.py("4px").br4.xs.add("zIndex", 999999).$}
+      css={Css.maxw("320px").bgColor(bgColor).bshBasic.white.px1.py("4px").br4.xs.add("zIndex", 999999).$}
     >
       <div ref={setArrowRef} style={{ ...styles.arrow }} id="arrow" />
       {content}
