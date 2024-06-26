@@ -590,6 +590,7 @@ function renderTable<R extends Kinded>(
     <table
       css={{
         ...Css.w100.add("borderCollapse", "separate").add("borderSpacing", "0").$,
+        ...Css.addIn("& tr ", { pageBreakAfter: "auto", pageBreakInside: "avoid" }).$,
         ...Css.addIn("& > tbody > tr > * ", style.betweenRowsCss || {})
           // removes border between header and second row
           .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss || {}).$,
