@@ -6,6 +6,7 @@ import { Icon } from "src/components";
 import { Css } from "src/Css";
 import { MultiSelectField, MultiSelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
+import { zeroTo } from "src/utils/sb";
 
 export default {
   component: MultiSelectField,
@@ -179,6 +180,27 @@ export function MultiSelectFields() {
         <TestMultiSelectField fullWidth label="Favorite Icon" values={[options[2].id]} options={options} />
       </div>
     </div>
+  );
+}
+
+export function Loading() {
+  const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
+  const [loaded, setLoaded] = useState<TestOption[]>([]);
+  const [selectedValues, setSelectedValues] = useState<Value[]>([loadTestOptions[2].id, loadTestOptions[4].id]);
+  return (
+    <MultiSelectField
+      values={selectedValues}
+      onSelect={setSelectedValues}
+      label="Projects"
+      options={{
+        current: [loadTestOptions[2], loadTestOptions[4]],
+        load: async () => {
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+          setLoaded(loadTestOptions);
+        },
+        options: loaded,
+      }}
+    />
   );
 }
 
