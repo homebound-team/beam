@@ -28,7 +28,9 @@ export type PresentationContextProps = {
   wrap?: boolean;
 };
 
-export const PresentationContext = createContext<PresentationContextProps>({});
+export const PresentationContext = createContext<PresentationContextProps>({
+  fieldProps: { labelSuffix: { required: "*" } },
+});
 
 export function PresentationProvider(props: PropsWithChildren<PresentationContextProps>) {
   const { children, ...presentationProps } = props;
