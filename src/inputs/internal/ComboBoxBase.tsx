@@ -411,8 +411,8 @@ type FieldState = {
 export type OptionsOrLoad<O> =
   | O[]
   | {
-      /** The initial option to show before the user interacts with the dropdown. */
-      current: O | undefined;
+      /** The initial option(s) to show before the user interacts with the dropdown. */
+      current: O | O[] | undefined;
       /** Fired when the user interacts with the dropdown, to load the real options. */
       load: () => Promise<unknown>;
       /** The full list of options, after load() has been fired. */
@@ -454,13 +454,16 @@ export function initializeOptions<O, V extends Value>(
     if (options) {
       opts.push(...options);
     }
-    // Even if the SelectField has lazy-loaded options, make sure the current value is really in there
+    // Add the `current` to the list of options in the event it is not already there.
     if (current) {
-      const value = getOptionValue(current);
-      const found = options && options.find((o) => getOptionValue(o) === value);
-      if (!found) {
-        opts.push(current);
-      }
+      const toCheck = Array.isArray(current) ? current : [current];
+      toCheck.forEach((current) => {
+        const value = getOptionValue(current);
+        const found = options && options.find((o) => getOptionValue(o) === value);
+        if (!found) {
+          opts.push(current);
+        }
+      });
     }
   }
   return opts;
