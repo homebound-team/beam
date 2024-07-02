@@ -1,6 +1,14 @@
 import { Meta } from "@storybook/react";
 import { FieldGroup, FormDivider, FormLines } from "src/forms/FormLines";
-import { DateField, MultiSelectField, RichTextField, SelectField, TextAreaField, TreeSelectField } from "src/inputs";
+import {
+  DateField,
+  MultiSelectField,
+  RichTextField,
+  SelectField,
+  TextAreaField,
+  ToggleChipGroup,
+  TreeSelectField,
+} from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
 import { Switch } from "src/inputs/Switch";
 import { TextField } from "src/inputs/TextField";
@@ -313,8 +321,15 @@ export function WithFieldProps() {
 }
 
 export function WithHorizontalLayout() {
+  const chipOptions = [
+    { label: "Bahamas", value: "m:1" },
+    { label: "Southern California", value: "m:2" },
+    { label: "Northern California", value: "m:3" },
+    { label: "South Bay CA", value: "m:4" },
+    { label: "Austin", value: "m:5" },
+  ];
   return (
-    <FormLines width="lg" labelStyle="left">
+    <FormLines width="lg" labelStyle="left" labelLeftFieldWidth="70%">
       <TextField label="First" value="first" onChange={noop} />
       <SelectField<Options, number>
         label="Second"
@@ -327,6 +342,7 @@ export function WithHorizontalLayout() {
       />
       <TextField label="Read only" readOnly value="read only" onChange={noop} />
       <Switch label="Last" labelStyle="left" selected={true} onChange={noop} />
+      <ToggleChipGroup label="Market" options={chipOptions} values={[]} onChange={noop} />
     </FormLines>
   );
 }

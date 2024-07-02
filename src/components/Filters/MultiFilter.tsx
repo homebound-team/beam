@@ -54,7 +54,7 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
             setValue(values.length === 0 ? undefined : (values as V[]));
           }}
           values={(value as string[]) || []}
-          hideLabel={true}
+          labelStyle="hidden"
           {...tid[defaultTestId(this.label)]}
         />
       );
