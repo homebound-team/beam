@@ -66,6 +66,7 @@ export interface TextFieldBaseProps<X>
 // Used by both TextField and TextArea
 export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldBaseProps<X>) {
   const { fieldProps, wrap = false } = usePresentationContext();
+  const { labelLeftFieldWidth = "50%" } = fieldProps ?? {};
   const {
     label,
     required,
@@ -128,7 +129,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...Css[typeScale].df.aic.br4.px1.w100
         .bgColor(bgColor)
         .gray900.if(contrast)
-        .white.if(labelStyle === "left").w50.$,
+        .white.if(labelStyle === "left")
+        .w(labelLeftFieldWidth).$,
       // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
       // This typically happens in tables when a column has a mix of static text (i.e. "roll up" rows and table headers) and input fields.
       // To remedy this perceived misalignment then we increase the width by the horizontal padding applied (16px), and set a negative margin left margin to re-center the field.
@@ -149,7 +151,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             .hPx(compactFieldHeight - maybeSmaller).$),
     },
     inputWrapperReadOnly: {
-      ...Css[typeScale].df.aic.w100.gray900.if(contrast).white.if(labelStyle === "left").w50.$,
+      ...Css[typeScale].df.aic.w100.gray900
+        .if(contrast)
+        .white.if(labelStyle === "left")
+        .w(labelLeftFieldWidth).$,
       // If we are hiding the label, then we are typically in a table. Keep the `mh` in this case to ensure editable and non-editable fields in a single table row line up properly
       ...(labelStyle === "hidden" &&
         Css.mhPx(fieldHeight - maybeSmaller)

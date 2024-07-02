@@ -5,6 +5,7 @@ import { maybeTooltip, resolveTooltip } from "src/components";
 import { Label } from "src/components/Label";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
+import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 
 type ToggleChipItemProps = {
   label: string;
@@ -17,25 +18,32 @@ type ToggleChipItemProps = {
   disabled?: boolean | ReactNode;
 };
 
-export interface ToggleChipGroupProps {
+export interface ToggleChipGroupProps extends Pick<PresentationFieldProps, "labelStyle"> {
   label: string;
-  labelStyle?: "above" | "left";
   options: ToggleChipItemProps[];
   values: string[];
   onChange: (values: string[]) => void;
-  hideLabel?: boolean;
 }
 
 export function ToggleChipGroup(props: ToggleChipGroupProps) {
-  const { values, label, labelStyle, options, hideLabel } = props;
+  const { fieldProps } = usePresentationContext();
+  const { labelLeftFieldWidth = "50%" } = fieldProps ?? {};
+  const { values, label, labelStyle = fieldProps?.labelStyle ?? "above", options } = props;
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
   const tid = useTestIds(props, "toggleChip");
 
   return (
-    <div {...groupProps} css={Css.relative.df.fdc.if(labelStyle === "left").fdr.maxw100.$}>
-      <Label label={label} {...labelProps} hidden={hideLabel} inline={labelStyle === "left"} />
-      <div css={Css.df.gap1.add("flexWrap", "wrap").if(labelStyle === "left").ml2.$}>
+    <div {...groupProps} css={Css.relative.df.fdc.if(labelStyle === "left").fdr.gap2.maxw100.jcsb.$}>
+      <Label label={label} {...labelProps} hidden={labelStyle === "hidden"} inline={labelStyle !== "above"} />
+      <div
+        css={
+          Css.df.gap1
+            .add("flexWrap", "wrap")
+            .if(labelStyle === "left")
+            .w(labelLeftFieldWidth).$
+        }
+      >
         {options.map((o) => (
           <ToggleChip
             key={o.value}

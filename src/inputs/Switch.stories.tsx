@@ -126,7 +126,7 @@ function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchWrapperProps) {
   return (
     <div
       css={{
-        "label > div:nth-of-type(1)": {
+        "label > div:nth-of-type(1) > div": {
           ...(isHovered && switchHoverStyles),
           ...(props.selected && isHovered && switchSelectedHoverStyles),
           ...(isFocused && switchFocusStyles),
