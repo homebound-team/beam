@@ -47,6 +47,22 @@ export function IconMenuItems() {
   );
 }
 
+export function DividerMenuItems() {
+  return (
+    <ButtonMenu
+      defaultOpen
+      contrast
+      trigger={{ label: "Menu Trigger" }}
+      items={[
+        { label: "Edit", hasDivider: true, onClick: noop },
+        { label: "Like", onClick: noop },
+        { label: "Favorite", hasDivider: true, onClick: noop },
+        { label: "Delete", onClick: noop },
+      ]}
+    />
+  );
+}
+
 export function AvatarMenuItems() {
   return (
     <ButtonMenu

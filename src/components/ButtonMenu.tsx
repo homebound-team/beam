@@ -84,6 +84,7 @@ type MenuItemBase = {
   /** Whether the interactive element is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
   destructive?: boolean;
+  hasDivider?: boolean;
 };
 
 export type IconMenuItemType = MenuItemBase & {
@@ -96,7 +97,11 @@ export type ImageMenuItemType = MenuItemBase & {
   isAvatar?: boolean;
 };
 
-export type MenuItem = MenuItemBase | IconMenuItemType | ImageMenuItemType;
+export type DividerMenuItemType = MenuItemBase & {
+  hasDivider: boolean;
+};
+
+export type MenuItem = MenuItemBase | IconMenuItemType | ImageMenuItemType | DividerMenuItemType;
 // This is done just to adapt to the React-Aria API for generating Sectioned lists of Menu Items.
 export type MenuSection = MenuItem & { items?: MenuItem[] };
 
