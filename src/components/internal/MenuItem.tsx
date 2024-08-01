@@ -81,7 +81,7 @@ export function MenuItemImpl(props: MenuItemProps) {
       ref={ref}
       css={{
         ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").sm.$,
-        ...(menuItem.hasDivider ? Css.bb.bcGray400.$ : {}),
+        ...(menuItem.hasDivider ? Css.bb.bcGray700.$ : {}),
         ...(!isDisabled && isHovered ? (contrast ? Css.bgGray800.$ : Css.bgGray100.$) : {}),
         ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.Blue700}`).$ : {}),
         ...(isDisabled ? Css.gray500.cursorNotAllowed.$ : {}),
