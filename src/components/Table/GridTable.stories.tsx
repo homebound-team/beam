@@ -99,7 +99,16 @@ export const Hovering = newStory(
 export const ActiveCell = newStory(
   () => {
     const nameColumn: GridColumn<Row> = { id: "name", header: "Name", data: ({ name }) => name };
-    const valueColumn: GridColumn<Row> = { id: "value", header: "Value", data: ({ value }) => value };
+    const valueColumn: GridColumn<Row> = {
+      id: "value",
+      header: "Value",
+      data: ({ value }) => ({
+        content: () => {
+          return <div css={Css.pxPx(12).df.w100.h100.aic.bgRed500.if(value === 2).bgGreen500.$}>{value}</div>;
+        },
+        css: Css.p0.$,
+      }),
+    };
     const actionColumn: GridColumn<Row> = { id: "actions", header: "Action", data: () => <div>Actions</div> };
     const rowStyles: RowStyles<Row> = useMemo(
       () => ({
