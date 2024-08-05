@@ -3,9 +3,11 @@ import { useCheckboxGroup, useCheckboxGroupItem, useFocusRing, VisuallyHidden } 
 import { CheckboxGroupState, useCheckboxGroupState } from "react-stately";
 import { maybeTooltip, resolveTooltip } from "src/components";
 import { Label } from "src/components/Label";
-import { Css } from "src/Css";
+import { Css, Palette, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+
+type ToggleChipXss = Xss<"color" | "backgroundColor">;
 
 type ToggleChipItemProps = {
   label: string;
@@ -23,12 +25,13 @@ export interface ToggleChipGroupProps extends Pick<PresentationFieldProps, "labe
   options: ToggleChipItemProps[];
   values: string[];
   onChange: (values: string[]) => void;
+  xss?: ToggleChipXss;
 }
 
 export function ToggleChipGroup(props: ToggleChipGroupProps) {
   const { fieldProps } = usePresentationContext();
   const { labelLeftFieldWidth = "50%" } = fieldProps ?? {};
-  const { values, label, labelStyle = fieldProps?.labelStyle ?? "above", options } = props;
+  const { values, label, labelStyle = fieldProps?.labelStyle ?? "above", options, xss } = props;
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
   const tid = useTestIds(props, "toggleChip");
@@ -52,6 +55,7 @@ export function ToggleChipGroup(props: ToggleChipGroupProps) {
             selected={state.value.includes(o.value)}
             label={o.label}
             disabled={o.disabled}
+            xss={xss}
             {...tid[o.value]}
           />
         ))}
@@ -71,10 +75,11 @@ interface ToggleChipProps {
    * If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
    */
   disabled?: boolean | ReactNode;
+  xss?: ToggleChipXss;
 }
 
 function ToggleChip(props: ToggleChipProps) {
-  const { label, value, groupState, selected: isSelected, disabled = false, ...others } = props;
+  const { label, value, groupState, selected: isSelected, disabled = false, xss, ...others } = props;
   const isDisabled = !!disabled;
   const ref = useRef(null);
   const { inputProps } = useCheckboxGroupItem({ value, "aria-label": label, isDisabled }, groupState, ref);
@@ -90,8 +95,8 @@ function ToggleChip(props: ToggleChipProps) {
           ...Css.relative.dib.br16.sm.px1.cursorPointer.pyPx(4).bgGray200.if(isDisabled).cursorNotAllowed.gray600.pr1.$,
           ...(isSelected
             ? {
-                ...Css.white.bgBlue700.$,
-                ":hover:not([data-disabled='true'])": Css.bgBlue800.$,
+                ...Css.color(xss?.color ?? Palette.White).bgColor(xss?.backgroundColor ?? Palette.Blue700).$,
+                ":hover:not([data-disabled='true'])": Css.bgColor(xss?.backgroundColor ?? Palette.Blue800).$,
               }
             : { ":hover:not([data-disabled='true'])": Css.bgGray300.$ }),
           ...(isFocusVisible ? Css.bshFocus.$ : {}),
