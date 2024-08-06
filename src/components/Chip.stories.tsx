@@ -58,3 +58,15 @@ export function WithIcon() {
     </div>
   );
 }
+
+export function WithStartAdorment() {
+  return (
+    <div css={Css.wPx(200).$}>
+      <Chip startAdornment={<span css={Css.smBd.$}>K</span>} text="Kitchen" />
+      <Chip
+        startAdornment={<span css={Css.smBd.$}>A</span>}
+        text="A very long chip name that will eventually truncate"
+      />
+    </div>
+  );
+}
