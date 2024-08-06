@@ -20,9 +20,8 @@ export const ChipTypes: Record<ChipType, ChipType> = {
 };
 
 export interface ChipProps<X> {
-  text: string;
+  text: ReactNode;
   title?: ReactNode;
-  startAdornment?: ReactNode;
   xss?: X;
   type?: ChipType;
   compact?: boolean;
@@ -35,7 +34,7 @@ export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X
   ...props
 }: ChipProps<X>) {
   const { fieldProps } = usePresentationContext();
-  const { text, title, xss = {}, compact = fieldProps?.compact, icon, startAdornment } = props;
+  const { text, title, xss = {}, compact = fieldProps?.compact, icon } = props;
   const tid = useTestIds(props, "chip");
 
   return maybeTooltip({
@@ -51,7 +50,6 @@ export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X
         {...tid}
       >
         {icon && <Icon icon={icon} inc={2} xss={Css.fs0.$} />}
-        {startAdornment}
         <span css={Css.lineClamp1.wbba.$}>{text}</span>
       </span>
     ),

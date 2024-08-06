@@ -59,13 +59,24 @@ export function WithIcon() {
   );
 }
 
-export function WithStartAdorment() {
+export function WithCustomLabel() {
   return (
-    <div css={Css.wPx(200).$}>
-      <Chip startAdornment={<span css={Css.smBd.$}>K</span>} text="Kitchen" />
+    <div css={Css.wPx(200).df.gap1.$}>
       <Chip
-        startAdornment={<span css={Css.smBd.$}>A</span>}
-        text="A very long chip name that will eventually truncate"
+        text={
+          <span css={Css.sm.df.gap1.$}>
+            <span css={Css.smBd.$}>K</span>
+            Kitchen
+          </span>
+        }
+      />
+      <Chip
+        text={
+          <span css={Css.sm.df.gap1.$}>
+            <span css={Css.smBd.$}>B</span>
+            Bedroom
+          </span>
+        }
       />
     </div>
   );
