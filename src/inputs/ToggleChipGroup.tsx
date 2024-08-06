@@ -12,6 +12,7 @@ type ToggleChipXss = Xss<"color" | "backgroundColor">;
 type ToggleChipItemProps = {
   label: string;
   value: string;
+  startAdornment?: ReactNode;
   /**
    * Whether the interactive element is disabled.
    *
@@ -55,6 +56,7 @@ export function ToggleChipGroup(props: ToggleChipGroupProps) {
             selected={state.value.includes(o.value)}
             label={o.label}
             disabled={o.disabled}
+            startAdornment={o.startAdornment}
             xss={xss}
             {...tid[o.value]}
           />
@@ -75,11 +77,12 @@ interface ToggleChipProps {
    * If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
    */
   disabled?: boolean | ReactNode;
+  startAdornment?: ReactNode;
   xss?: ToggleChipXss;
 }
 
 function ToggleChip(props: ToggleChipProps) {
-  const { label, value, groupState, selected: isSelected, disabled = false, xss, ...others } = props;
+  const { label, value, groupState, selected: isSelected, disabled = false, startAdornment, xss, ...others } = props;
   const isDisabled = !!disabled;
   const ref = useRef(null);
   const { inputProps } = useCheckboxGroupItem({ value, "aria-label": label, isDisabled }, groupState, ref);
@@ -109,7 +112,10 @@ function ToggleChip(props: ToggleChipProps) {
         <VisuallyHidden>
           <input {...inputProps} {...focusProps} />
         </VisuallyHidden>
-        {label}
+        <div css={Css.df.gap1.$}>
+          {startAdornment}
+          {label}
+        </div>
       </label>
     ),
   });
