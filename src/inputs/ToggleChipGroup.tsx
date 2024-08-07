@@ -95,7 +95,8 @@ function ToggleChip(props: ToggleChipProps) {
     children: (
       <label
         css={{
-          ...Css.relative.dib.br16.sm.px1.cursorPointer.pyPx(4).bgGray200.if(isDisabled).cursorNotAllowed.gray600.pr1.$,
+          ...Css.relative.dif.gap1.aic.br16.sm.px1.cursorPointer.pyPx(4).bgGray200.if(isDisabled).cursorNotAllowed
+            .gray600.pr1.$,
           ...(isSelected
             ? {
                 ...Css.color(xss?.color ?? Palette.White).bgColor(xss?.backgroundColor ?? Palette.Blue700).$,
@@ -112,10 +113,8 @@ function ToggleChip(props: ToggleChipProps) {
         <VisuallyHidden>
           <input {...inputProps} {...focusProps} />
         </VisuallyHidden>
-        <div css={Css.df.gap1.$}>
-          {startAdornment}
-          {label}
-        </div>
+        {startAdornment}
+        {label}
       </label>
     ),
   });
