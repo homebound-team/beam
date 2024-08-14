@@ -158,6 +158,8 @@ export const Icon = (props: IconProps) => {
     "exteriorStyle",
     "lockOpen",
     "map",
+    "union",
+    "truck",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
