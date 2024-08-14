@@ -20,7 +20,7 @@ export const ChipTypes: Record<ChipType, ChipType> = {
 };
 
 export interface ChipProps<X> {
-  text: string;
+  text: ReactNode;
   title?: ReactNode;
   xss?: X;
   type?: ChipType;
