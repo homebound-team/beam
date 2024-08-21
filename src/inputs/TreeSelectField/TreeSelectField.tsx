@@ -94,8 +94,16 @@ export function TreeSelectField<O, V extends Value>(
   } = props;
 
   const [collapsedKeys, setCollapsedKeys] = useState<Key[]>(
-    Array.isArray(options) && defaultCollapsed ? options.map((o) => getOptionValue(o)) : [],
+    !Array.isArray(options)
+      ? []
+      : defaultCollapsed
+      ? options.map((o) => getOptionValue(o))
+      : options
+          .flatMap(flattenOptions)
+          .filter((o) => o.defaultCollapsed)
+          .map((o) => getOptionValue(o)),
   );
+
   const contextValue = useMemo<CollapsedChildrenState<O, V>>(
     () => ({ collapsedKeys, setCollapsedKeys, getOptionValue }),
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
@@ -248,8 +256,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     getOptionLabel,
     isReadOnly,
     nothingSelectedText,
-    collapsedKeys,
     getOptionValue,
+    collapsedKeys,
   ]);
 
   // Initialize the TreeFieldState
@@ -260,9 +268,12 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     // if the values does not match the values in the fieldState, then update the fieldState
     const selectedKeys = fieldState.selectedOptions.map((o) => valueToKey(getOptionValue(o)));
     if (
-      values &&
-      (values.length !== selectedKeys.length || !values.every((v) => selectedKeys.includes(valueToKey(v))))
+      // If the values were cleared
+      (values === undefined && selectedKeys.length !== 0) ||
+      // Or values were set, but they don't match the selected keys
+      (values && (values.length !== selectedKeys.length || !values.every((v) => selectedKeys.includes(valueToKey(v)))))
     ) {
+      // Then reinitialize
       setFieldState(initTreeFieldState());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

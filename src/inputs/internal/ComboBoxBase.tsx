@@ -344,7 +344,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     ...positionProps.style,
     width: comboBoxRef?.current?.clientWidth,
     // Ensures the menu never gets too small.
-    minWidth: 200,
+    minWidth: 320,
   };
 
   const fieldMaxWidth = getFieldWidth(fullWidth);
@@ -378,7 +378,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
           positionProps={positionProps}
           onClose={() => state.close()}
           isOpen={state.isOpen}
-          minWidth={200}
+          minWidth={320}
         >
           <ListBox
             {...listBoxProps}
