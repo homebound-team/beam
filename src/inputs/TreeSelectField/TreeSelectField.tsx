@@ -93,9 +93,23 @@ export function TreeSelectField<O, V extends Value>(
     ...otherProps
   } = props;
 
-  const [collapsedKeys, setCollapsedKeys] = useState<Key[]>(
-    Array.isArray(options) && defaultCollapsed ? options.map((o) => getOptionValue(o)) : [],
-  );
+  const [collapsedKeys, setCollapsedKeys] = useState<Key[]>([]);
+
+  useEffect(() => {
+    setCollapsedKeys(
+      !Array.isArray(options)
+        ? []
+        : defaultCollapsed
+        ? options.map((o) => getOptionValue(o))
+        : options
+            .flatMap(flattenOptions)
+            .filter((o) => o.defaultCollapsed)
+            .map((o) => getOptionValue(o)),
+    );
+    // Explicitly ignoring `getOptionValue` as it typically isn't memo'd
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options, defaultCollapsed]);
+
   const contextValue = useMemo<CollapsedChildrenState<O, V>>(
     () => ({ collapsedKeys, setCollapsedKeys, getOptionValue }),
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
@@ -181,12 +195,18 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         // Find the options that matches the value. These could be parents or a children.
         const foundOptions = findOptions(initialOptions, valueToKey(v), getOptionValue);
         // Go through the `foundOptions` and get the keys of the options and its children if it has any.
-        return foundOptions.flatMap(({ option }) => [
-          valueToKey(getOptionValue(option)),
-          ...(option.children?.flatMap((o) => valueToKey(getOptionValue(o))) ?? []),
-        ]);
+        return foundOptions.flatMap(({ option }) => selectOptionAndAllChildren(option));
       }),
     );
+
+    function selectOptionAndAllChildren(maybeParent: NestedOption<O>): string[] {
+      // Check if the maybeParent has children, if so, return those as selected keys
+      // Do in a recursive way so that children may have children
+      return [
+        valueToKey(getOptionValue(maybeParent)),
+        ...(maybeParent.children?.flatMap(selectOptionAndAllChildren) ?? []),
+      ];
+    }
 
     // It is possible that all the children of a parent were considered selected `values`, but the parent wasn't included in the `values` array.
     // In this case, the parent also should be considered a selected option.
@@ -248,21 +268,31 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     getOptionLabel,
     isReadOnly,
     nothingSelectedText,
-    collapsedKeys,
     getOptionValue,
+    collapsedKeys,
   ]);
 
   // Initialize the TreeFieldState
   const [fieldState, setFieldState] = useState<TreeFieldState<O>>(() => initTreeFieldState());
+
+  useEffect(() => {
+    // We don't want to do this if initialOptions is not an array, because we would be lazy loading `allOptions`
+    if (Array.isArray(options)) {
+      setFieldState((prevState) => ({ ...prevState, allOptions: options }));
+    }
+  }, [options]);
 
   // Reset the TreeFieldState if the values array changes and doesn't match the selectedOptions
   useEffect(() => {
     // if the values does not match the values in the fieldState, then update the fieldState
     const selectedKeys = fieldState.selectedOptions.map((o) => valueToKey(getOptionValue(o)));
     if (
-      values &&
-      (values.length !== selectedKeys.length || !values.every((v) => selectedKeys.includes(valueToKey(v))))
+      // If the values were cleared
+      (values === undefined && selectedKeys.length !== 0) ||
+      // Or values were set, but they don't match the selected keys
+      (values && (values.length !== selectedKeys.length || !values.every((v) => selectedKeys.includes(valueToKey(v)))))
     ) {
+      // Then reinitialize
       setFieldState(initTreeFieldState());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -353,7 +383,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
       setFieldState((prevState) => ({
         ...prevState,
         inputValue: "",
-        filteredOptions: initialOptions.flatMap((o) => levelOptions(o, 0, false, collapsedKeys, getOptionValue)),
+        filteredOptions: prevState.allOptions.flatMap((o) => levelOptions(o, 0, false, collapsedKeys, getOptionValue)),
       }));
     }
   }
@@ -591,7 +621,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     ...positionProps.style,
     width: comboBoxRef?.current?.clientWidth,
     // Ensures the menu never gets too small.
-    minWidth: 200,
+    minWidth: 320,
   };
 
   const fieldMaxWidth = getFieldWidth(fullWidth);
@@ -628,7 +658,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
           positionProps={positionProps}
           onClose={() => state.close()}
           isOpen={state.isOpen}
-          minWidth={200}
+          minWidth={320}
         >
           <ListBox
             {...listBoxProps}
