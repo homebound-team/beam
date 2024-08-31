@@ -18,6 +18,7 @@ export interface TestModalContentProps {
   withTag?: boolean;
   withDateField?: boolean;
   withTextArea?: boolean;
+  withTextField?: boolean;
 }
 
 /** A fake modal content component that we share across the modal and superdrawer stories. */
@@ -39,6 +40,17 @@ export function TestModalContent(props: TestModalContentProps) {
             <span>Modal Title with Tag</span>
             <Tag text="In progress" type="info" xss={Css.ml1.$} />
           </div>
+        ) : props.withTextField ? (
+          <TextField
+            label="Title"
+            placeholder="Test title"
+            value={internalValue}
+            onChange={(v) => setValue(v)}
+            labelStyle="hidden"
+            onEscapeBubble
+            borderless
+            xss={Css.xl.$}
+          />
         ) : props.withTextArea ? (
           <TextAreaField
             label="Title"
