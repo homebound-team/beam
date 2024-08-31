@@ -68,6 +68,35 @@ export function ClientSideSorting() {
   );
 }
 
+export function ClientSideCsv() {
+  const api = useGridTableApi<Row>();
+  const columns: GridColumn<Row>[] = [
+    // Given column one returns JSX, but defines a `sortValue`
+    { header: "Name", data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }) },
+    // And column two returns a number
+    { header: "Value", data: ({ value }) => value },
+    // And column three returns a string
+    { header: "Value", data: ({ value }) => String(value) },
+    // And column four returns JSX with nothing else
+    { header: "Action", data: () => <div>Actions</div> },
+  ];
+  return (
+    <div>
+      <GridTable
+        api={api}
+        columns={columns}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "c", value: 1 } },
+          { kind: "data", id: "2", data: { name: "B", value: 2 } },
+          { kind: "data", id: "3", data: { name: "a", value: 3 } },
+        ]}
+      />
+      <Button label="Download" onClick={() => api.downloadToCsv("test.csv")} />
+    </div>
+  );
+}
+
 export const Hovering = newStory(
   () => {
     const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };

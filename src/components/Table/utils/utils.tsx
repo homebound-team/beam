@@ -174,7 +174,7 @@ export function getFirstOrLastCellCss<R extends Kinded>(
 }
 
 /** A heuristic to detect the result of `React.createElement` / i.e. JSX. */
-function isJSX(content: any): boolean {
+export function isJSX(content: any): boolean {
   return typeof content === "object" && content && "type" in content && "props" in content;
 }
 

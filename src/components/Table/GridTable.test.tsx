@@ -2,7 +2,7 @@ import { act } from "@testing-library/react";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
-import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
+import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyles } from "src/components/Table/TableStyles";
 import { GridColumn } from "src/components/Table/types";
 import { calcColumnSizes, column, generateColumnId, selectColumn } from "src/components/Table/utils/columns";
@@ -27,6 +27,7 @@ import {
   wait,
   withRouter,
 } from "src/utils/rtl";
+import { Button } from "src";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
@@ -3787,6 +3788,31 @@ describe("GridTable", () => {
     const p = render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
     await expect(p).rejects.toThrow("Duplicate row id 1");
   });
+
+  it("can download csvs", async () => {
+    let api: GridTableApi<Row> | undefined;
+
+    const columns: GridColumn<Row>[] = [
+      // Given column one returns JSX, but defines a `sortValue`
+      { header: "Name", data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }) },
+      // And column two returns a number
+      { header: "Value", data: ({ value }) => value },
+      // And column three returns a string
+      { header: "Value", data: ({ value }) => String(value) },
+      // And column four returns JSX with nothing else
+      { header: "Action", data: () => <div>Actions</div>, isAction: true },
+    ];
+
+    function Test() {
+      const _api = useGridTableApi<Row>();
+      api = _api;
+      return <GridTable<Row> api={_api} columns={columns} rows={rows} />;
+    }
+
+    await render(<Test />);
+
+    expect((api as GridTableApiImpl<Row>).generateCsvContent()).toEqual(["Name,Value,Value", "foo,1,1", "bar,2,2"]);
+  });
 });
 
 function Collapse({ id }: { id: string }) {
@@ -3796,22 +3822,6 @@ function Collapse({ id }: { id: string }) {
     <div onClick={() => tableState.toggleCollapsed(id)} data-testid="collapse">
       {icon}
     </div>
-  );
-}
-
-function Select({ id }: { id: string }) {
-  const { tableState } = useContext(TableStateContext);
-  const state = useComputed(() => tableState.getSelected(id), [tableState]);
-  const selected = state === "checked" ? true : state === "unchecked" ? false : "indeterminate";
-  return (
-    <Checkbox
-      label="Select"
-      checkboxOnly={true}
-      selected={selected}
-      onChange={(selected) => {
-        tableState.selectRow(id, selected);
-      }}
-    />
   );
 }
 
