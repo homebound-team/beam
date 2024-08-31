@@ -12,6 +12,16 @@ export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
   clearable?: boolean;
   api?: MutableRefObject<TextFieldApi | undefined>;
   onEnter?: VoidFunction;
+  /**
+   * Allows a TextField to opt-in to bubbling up the escape key event to its parent.
+   *
+   * Usually this is a bad idea, because escape-in-a-modal might lose the user's WIP (without
+   * sufficient "are you sure" checking), and so instead we let callers opt-in to this.
+   *
+   * Note that react-aria's `useSearchField` / `useComboBox` seems to have this built-in:
+   * https://github.com/adobe/react-spectrum/issues/5480
+   */
+  onEscapeBubble?: boolean;
   endAdornment?: ReactNode;
   startAdornment?: ReactNode;
   hideErrorMessage?: boolean;
@@ -28,6 +38,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     onFocus,
     api,
     onEnter,
+    onEscapeBubble,
     hideErrorMessage,
     ...otherProps
   } = props;
@@ -50,6 +61,9 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
         if (e.key === "Enter") {
           maybeCall(onEnter);
           inputRef.current?.blur();
+        } else if (e.key === "Escape" && onEscapeBubble) {
+          // Allow closing modals from within text fields...
+          e.continuePropagation();
         }
       },
     },
