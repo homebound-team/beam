@@ -98,6 +98,20 @@ describe("TextFieldTest", () => {
     expect(onBlur).toHaveBeenCalledTimes(1);
     expect(r.name).not.toHaveFocus();
   });
+
+  it("can bubble escape", async () => {
+    const onEscape = jest.fn();
+    // Given a TextField
+    const r = await render(
+      <div onKeyDown={onEscape}>
+        <TestTextField value="foo" onEscapeBubble />
+      </div>,
+    );
+    // When hitting the Escape key
+    fireEvent.keyDown(r.name, { key: "Escape" });
+    // Then onEscape callback should be called
+    expect(onEscape).toHaveBeenCalledTimes(1);
+  });
 });
 
 function TestTextField<X extends Only<TextFieldXss, X>>(props: Omit<TextFieldProps<X>, "onChange" | "label">) {
