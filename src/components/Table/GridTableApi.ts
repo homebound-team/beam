@@ -210,6 +210,8 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   }
 
   // visibleForTesting, not part of the GridTableApi
+  // ...although maybe it could be public someday, to allow getting the raw the CSV content
+  // and then sending it somewhere else, like directly to a gsheet.
   public generateCsvContent(): string[] {
     // Convert the array of rows into CSV format
     return this.tableState.visibleRows.map((rs) => {
@@ -230,7 +232,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
             return isJSX(maybeContent) ? "-" : maybeContent;
           }
         });
-      return values.map(toCsvString).map(escapeCSVField).join(",");
+      return values.map(toCsvString).map(escapeCsvValue).join(",");
     });
   }
 }
@@ -243,14 +245,12 @@ function toCsvString(value: any): string {
   return String(value);
 }
 
-function escapeCSVField(field: string): string {
-  if (field.includes('"') || field.includes(",") || field.includes("\n")) {
-    // Escape quotes by doubling them
-    field = field.replace(/"/g, '""');
-    // Wrap the field in double quotes
-    return `"${field}"`;
+function escapeCsvValue(value: string): string {
+  // Wrap values with special chars in quotes, and double quotes themselves
+  if (value.includes('"') || value.includes(",") || value.includes("\n")) {
+    return `"${value.replace(/"/g, '""')}"`;
   }
-  return field;
+  return value;
 }
 
 function bindMethods(instance: any): void {
