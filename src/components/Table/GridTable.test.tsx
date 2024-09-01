@@ -3809,9 +3809,8 @@ describe("GridTable", () => {
     ];
 
     function Test() {
-      const _api = useGridTableApi<Row>();
-      api = _api;
-      return <GridTable<Row> api={_api} columns={columns} rows={rows} />;
+      api = useGridTableApi<Row>();
+      return <GridTable<Row> api={api} columns={columns} rows={rows} />;
     }
 
     await render(<Test />);
