@@ -12,7 +12,7 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
-import { Checkbox, SelectField, TextField } from "src/inputs";
+import { SelectField, TextField } from "src/inputs";
 import { noop } from "src/utils";
 import {
   cell,
@@ -27,7 +27,6 @@ import {
   wait,
   withRouter,
 } from "src/utils/rtl";
-import { Button } from "src";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
