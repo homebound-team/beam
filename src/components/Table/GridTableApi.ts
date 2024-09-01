@@ -80,6 +80,13 @@ export type GridTableApi<R extends Kinded> = {
    * This currently assumes client-side pagination/sorting, i.e. we have the full dataset in memory.
    */
   downloadToCsv(fileName: string): void;
+
+  /**
+   * Copies the table's current content to the clipboard.
+   *
+   * This currently assumes client-side pagination/sorting, i.e. we have the full dataset in memory.
+   */
+  copyToClipboard(): Promise<void>;
 };
 
 /** Adds per-row methods to the `api`, i.e. for getting currently-visible children. */
@@ -207,6 +214,11 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  public copyToClipboard(): Promise<void> {
+    // Copy the CSV content to the clipboard
+    return navigator.clipboard.writeText(this.generateCsvContent().join("\n"));
   }
 
   // visibleForTesting, not part of the GridTableApi
