@@ -230,9 +230,27 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
             return isJSX(maybeContent) ? "-" : maybeContent;
           }
         });
-      return values.join(",");
+      return values.map(toCsvString).map(escapeCSVField).join(",");
     });
   }
+}
+
+function toCsvString(value: any): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return value.toString();
+  if (typeof value === "boolean") return value ? "true" : "false";
+  return String(value);
+}
+
+function escapeCSVField(field: string): string {
+  if (field.includes('"') || field.includes(",") || field.includes("\n")) {
+    // Escape quotes by doubling them
+    field = field.replace(/"/g, '""');
+    // Wrap the field in double quotes
+    return `"${field}"`;
+  }
+  return field;
 }
 
 function bindMethods(instance: any): void {

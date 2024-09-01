@@ -3793,13 +3793,19 @@ describe("GridTable", () => {
     let api: GridTableApi<Row> | undefined;
 
     const columns: GridColumn<Row>[] = [
-      // Given column one returns JSX, but defines a `sortValue`
+      // Given a column returns JSX, but defines a `sortValue`
       { header: "Name", data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }) },
-      // And column two returns a number
+      // And a column returns a number
       { header: "Value", data: ({ value }) => value },
-      // And column three returns a string
+      // And a column returns a string
       { header: "Value", data: ({ value }) => String(value) },
-      // And column four returns JSX with nothing else
+      // And a column returns a string with a comma in it
+      { header: "Value", data: ({ value }) => `${value},${value}` },
+      // And a column returns a string with a quote in it
+      { header: "Value", data: ({ value }) => `a quoted "${value}" value` },
+      // And a column returns undefined
+      { header: "Value", data: () => undefined },
+      // And a column returns JSX with nothing else
       { header: "Action", data: () => <div>Actions</div>, isAction: true },
     ];
 
@@ -3811,7 +3817,11 @@ describe("GridTable", () => {
 
     await render(<Test />);
 
-    expect((api as GridTableApiImpl<Row>).generateCsvContent()).toEqual(["Name,Value,Value", "foo,1,1", "bar,2,2"]);
+    expect((api as GridTableApiImpl<Row>).generateCsvContent()).toEqual([
+      "Name,Value,Value,Value,Value,Value",
+      `foo,1,1,"1,1","a quoted ""1"" value",`,
+      `bar,2,2,"2,2","a quoted ""2"" value",`,
+    ]);
   });
 });
 
