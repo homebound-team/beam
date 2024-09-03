@@ -3821,6 +3821,26 @@ describe("GridTable", () => {
       `bar,2,2,"2,2","a quoted ""2"" value",`,
     ]);
   });
+
+  it("can download csvs with extra rows", async () => {
+    let api: GridTableApi<Row> | undefined;
+    // Given a table with 1 column
+    const columns: GridColumn<Row>[] = [{ header: "Value", data: ({ value }) => value }];
+    // And just 1 extra csv rows that adds a header
+    const extraCsvRows: string[][] = [["Report Title", "From: here", `To: "there"...`]];
+    function Test() {
+      api = useGridTableApi<Row>();
+      return <GridTable<Row> api={api} columns={columns} rows={rows} csvPrefixRows={extraCsvRows} />;
+    }
+    await render(<Test />);
+    // When we generate the csv, then the extra rows are included
+    expect((api as GridTableApiImpl<Row>).generateCsvContent()).toEqual([
+      `Report Title,From: here,"To: ""there""..."`,
+      "Value",
+      "1",
+      "2",
+    ]);
+  });
 });
 
 function Collapse({ id }: { id: string }) {

@@ -230,8 +230,9 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   // ...although maybe it could be public someday, to allow getting the raw the CSV content
   // and then sending it somewhere else, like directly to a gsheet.
   public generateCsvContent(): string[] {
+    const csvPrefixRows = this.tableState.csvPrefixRows?.map((row) => row.map(escapeCsvValue).join(",")) ?? [];
     // Convert the array of rows into CSV format
-    return this.tableState.visibleRows.map((rs) => {
+    const dataRows = this.tableState.visibleRows.map((rs) => {
       const values = this.tableState.visibleColumns
         .filter((c) => !c.isAction)
         .map((c) => {
@@ -251,6 +252,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
         });
       return values.map(toCsvString).map(escapeCsvValue).join(",");
     });
+    return [...csvPrefixRows, ...dataRows];
   }
 }
 
