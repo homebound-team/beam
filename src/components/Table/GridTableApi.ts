@@ -218,7 +218,12 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public copyToClipboard(): Promise<void> {
     // Copy the CSV content to the clipboard
-    return navigator.clipboard.writeText(this.generateCsvContent().join("\n"));
+    const content = this.generateCsvContent().join("\n");
+    return navigator.clipboard.writeText(content).catch((err) => {
+      // Let the user know the copy failed...
+      window.alert("Failed to copy to clipboard, probably due to browser restrictions.");
+      throw err;
+    });
   }
 
   // visibleForTesting, not part of the GridTableApi
