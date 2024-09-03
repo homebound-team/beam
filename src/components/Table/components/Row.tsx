@@ -15,6 +15,7 @@ import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   applyRowFn,
+  DragData,
   EXPANDABLE_HEADER,
   getAlignment,
   getFirstOrLastCellCss,
@@ -198,14 +199,18 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             currentColspan -= 1;
             return null;
           }
-          const maybeContent = applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, {
+
+          // Combine all our drag stuff into a mini-context/parameter object...
+          const dragData: DragData<R> = {
             rowRenderRef: ref,
             onDragStart,
             onDragEnd,
             onDrop,
             onDragEnter,
             onDragOver: onDragOverDebounced,
-          });
+          };
+
+          const maybeContent = applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, dragData);
 
           // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
           currentColspan =
