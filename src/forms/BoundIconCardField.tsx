@@ -30,7 +30,6 @@ export function BoundIconCardField(props: BoundIconCardFieldProps) {
             field.maybeAutoSave();
           }}
           disabled={field.readOnly}
-          // required={field.required}
           {...testId}
           {...others}
         />

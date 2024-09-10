@@ -4,7 +4,7 @@ import { useToggleState } from "react-stately";
 import { Icon, IconProps, maybeTooltip, resolveTooltip } from "src/components";
 import { Css, Palette } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
-import { useTestIds } from "src/utils";
+import { noop, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 export interface IconCardProps {
@@ -28,7 +28,6 @@ export function IconCard(props: IconCardProps) {
     cardRef,
     label,
     tooltip,
-    required,
     ...otherProps
   } = props;
   const ref = useGetRef(cardRef);
