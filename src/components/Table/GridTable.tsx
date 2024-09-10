@@ -170,7 +170,13 @@ export interface GridTableProps<R extends Kinded, X> {
   infiniteScroll?: InfiniteScroll;
   /** Callback for when a row is selected or unselected. */
   onRowSelect?: OnRowSelect<R>;
-
+  /**
+   * Custom prefix rows for any CSV output, i.e. a header like "Report X as of date Y with filter Z".
+   *
+   * We except the `string[][]` to be an array of cells, and `copyToClipboard` and `downloadToCsv` will drop them into
+   * the csv output basically unchanged, albeit we will escape any special chars like double quotes and newlines.
+   */
+  csvPrefixRows?: string[][];
   /** Drag & drop Callback. */
   onRowDrop?: (draggedRow: GridDataRow<R>, droppedRow: GridDataRow<R>, indexOffset: number) => void;
 }
@@ -218,6 +224,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     infiniteScroll,
     onRowSelect,
     onRowDrop: droppedCallback,
+    csvPrefixRows,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
@@ -267,10 +274,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       tableState.setRows(rows);
       tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
       tableState.setSearch(filter);
+      tableState.setCsvPrefixRows(csvPrefixRows);
       tableState.activeRowId = activeRowId;
       tableState.activeCellId = activeCellId;
     });
-  }, [tableState, rows, columnsWithIds, visibleColumnsStorageKey, activeRowId, activeCellId, filter]);
+  }, [tableState, rows, columnsWithIds, visibleColumnsStorageKey, activeRowId, activeCellId, filter, csvPrefixRows]);
 
   const columns: GridColumnWithId<R>[] = useComputed(() => {
     return tableState.visibleColumns as GridColumnWithId<R>[];

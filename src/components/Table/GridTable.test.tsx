@@ -2,7 +2,7 @@ import { act } from "@testing-library/react";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
-import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
+import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyles } from "src/components/Table/TableStyles";
 import { GridColumn } from "src/components/Table/types";
 import { calcColumnSizes, column, generateColumnId, selectColumn } from "src/components/Table/utils/columns";
@@ -12,7 +12,7 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
-import { Checkbox, SelectField, TextField } from "src/inputs";
+import { SelectField, TextField } from "src/inputs";
 import { noop } from "src/utils";
 import {
   cell,
@@ -3787,6 +3787,60 @@ describe("GridTable", () => {
     const p = render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
     await expect(p).rejects.toThrow("Duplicate row id 1");
   });
+
+  it("can download csvs", async () => {
+    let api: GridTableApi<Row> | undefined;
+
+    const columns: GridColumn<Row>[] = [
+      // Given a column returns JSX, but defines a `sortValue`
+      { header: "Name", data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }) },
+      // And a column returns a number
+      { header: "Value", data: ({ value }) => value },
+      // And a column returns a string
+      { header: "Value", data: ({ value }) => String(value) },
+      // And a column returns a string with a comma in it
+      { header: "Value", data: ({ value }) => `${value},${value}` },
+      // And a column returns a string with a quote in it
+      { header: "Value", data: ({ value }) => `a quoted "${value}" value` },
+      // And a column returns undefined
+      { header: "Value", data: () => undefined },
+      // And a column returns JSX with nothing else
+      { header: "Action", data: () => <div>Actions</div>, isAction: true },
+    ];
+
+    function Test() {
+      api = useGridTableApi<Row>();
+      return <GridTable<Row> api={api} columns={columns} rows={rows} />;
+    }
+
+    await render(<Test />);
+
+    expect((api as GridTableApiImpl<Row>).generateCsvContent()).toEqual([
+      "Name,Value,Value,Value,Value,Value",
+      `foo,1,1,"1,1","a quoted ""1"" value",`,
+      `bar,2,2,"2,2","a quoted ""2"" value",`,
+    ]);
+  });
+
+  it("can download csvs with extra rows", async () => {
+    let api: GridTableApi<Row> | undefined;
+    // Given a table with 1 column
+    const columns: GridColumn<Row>[] = [{ header: "Value", data: ({ value }) => value }];
+    // And just 1 extra csv rows that adds a header
+    const extraCsvRows: string[][] = [["Report Title", "From: here", `To: "there"...`]];
+    function Test() {
+      api = useGridTableApi<Row>();
+      return <GridTable<Row> api={api} columns={columns} rows={rows} csvPrefixRows={extraCsvRows} />;
+    }
+    await render(<Test />);
+    // When we generate the csv, then the extra rows are included
+    expect((api as GridTableApiImpl<Row>).generateCsvContent()).toEqual([
+      `Report Title,From: here,"To: ""there""..."`,
+      "Value",
+      "1",
+      "2",
+    ]);
+  });
 });
 
 function Collapse({ id }: { id: string }) {
@@ -3796,22 +3850,6 @@ function Collapse({ id }: { id: string }) {
     <div onClick={() => tableState.toggleCollapsed(id)} data-testid="collapse">
       {icon}
     </div>
-  );
-}
-
-function Select({ id }: { id: string }) {
-  const { tableState } = useContext(TableStateContext);
-  const state = useComputed(() => tableState.getSelected(id), [tableState]);
-  const selected = state === "checked" ? true : state === "unchecked" ? false : "indeterminate";
-  return (
-    <Checkbox
-      label="Select"
-      checkboxOnly={true}
-      selected={selected}
-      onChange={(selected) => {
-        tableState.selectRow(id, selected);
-      }}
-    />
   );
 }
 

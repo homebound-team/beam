@@ -3,7 +3,7 @@ import { TreeSelectField } from "src/inputs";
 import { NestedOption } from "src/inputs/TreeSelectField/utils";
 import { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
-import { blur, click, focus, render, wait } from "src/utils/rtl";
+import { blur, click, focus, getSelected, render, wait } from "src/utils/rtl";
 import { useState } from "react";
 
 describe(TreeSelectField, () => {
@@ -681,6 +681,38 @@ describe(TreeSelectField, () => {
     // Then the only remaining option is Baseball
     expect(r.selectedOptionsCount).toHaveTextContent("1");
     expect(r.favoriteLeague_unfocusedPlaceholderContainer).toHaveTextContent("Baseball");
+  });
+
+  it("can reset values to undefined", async () => {
+    // Given a TreeSelectField with values set
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        values={["nba", "mlb"]}
+        options={getNestedOptions()}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    // Then the options are initially selected
+    expect(getSelected(r.favoriteLeague)).toEqual(["MLB", "NBA"]);
+
+    // When we re-render with values set to undefined (simulating an outside component's "clear" action, i.e. Filters)
+    r.rerender(
+      <TreeSelectField
+        chipDisplay="all"
+        onSelect={noop}
+        values={undefined}
+        options={getNestedOptions()}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // Then the values are reset
+    expect(getSelected(r.favoriteLeague)).toEqual(undefined);
   });
 });
 

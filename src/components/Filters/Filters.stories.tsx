@@ -169,6 +169,7 @@ function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
       children: cohorts.map(({ id, name, projects }) => ({
         id,
         name,
+        defaultCollapsed: true,
         children: projects.map(({ id, name }) => ({ id, name })),
       })),
     }));

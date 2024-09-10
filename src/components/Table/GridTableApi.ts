@@ -2,10 +2,20 @@ import { comparer } from "mobx";
 import { computedFn } from "mobx-utils";
 import { MutableRefObject, useMemo } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
-import { createRowLookup, GridRowLookup } from "src/components/index";
+import {
+  applyRowFn,
+  createRowLookup,
+  GridRowLookup,
+  isGridCellContent,
+  isJSX,
+  maybeApplyFunction,
+  MaybeFn,
+} from "src/components/index";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { DiscriminateUnion, Kinded } from "src/components/Table/types";
 import { TableState } from "src/components/Table/utils/TableState";
+import { maybeCall } from "src/utils";
+import { Properties } from "src/Css";
 
 /**
  * Creates an `api` handle to drive a `GridTable`.
@@ -63,6 +73,20 @@ export type GridTableApi<R extends Kinded> = {
 
   getVisibleColumnIds(): string[];
   setVisibleColumns(ids: string[]): void;
+
+  /**
+   * Triggers the table's current content to be downloaded as a CSV file.
+   *
+   * This currently assumes client-side pagination/sorting, i.e. we have the full dataset in memory.
+   */
+  downloadToCsv(fileName: string): void;
+
+  /**
+   * Copies the table's current content to the clipboard.
+   *
+   * This currently assumes client-side pagination/sorting, i.e. we have the full dataset in memory.
+   */
+  copyToClipboard(): Promise<void>;
 };
 
 /** Adds per-row methods to the `api`, i.e. for getting currently-visible children. */
@@ -175,10 +199,85 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   public deleteRows(ids: string[]) {
     this.tableState.deleteRows(ids);
   }
+
+  public downloadToCsv(fileName: string): void {
+    // Create a link element, set the download attribute with the provided filename
+    const link = document.createElement("a");
+    if (link.download === undefined) throw new Error("This browser does not support the download attribute.");
+    // Create a Blob from the CSV content
+    const url = URL.createObjectURL(
+      new Blob([this.generateCsvContent().join("\n")], { type: "text/csv;charset=utf-8;" }),
+    );
+    link.setAttribute("href", url);
+    link.setAttribute("download", fileName);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  public copyToClipboard(): Promise<void> {
+    // Copy the CSV content to the clipboard
+    const content = this.generateCsvContent().join("\n");
+    return navigator.clipboard.writeText(content).catch((err) => {
+      // Let the user know the copy failed...
+      window.alert("Failed to copy to clipboard, probably due to browser restrictions.");
+      throw err;
+    });
+  }
+
+  // visibleForTesting, not part of the GridTableApi
+  // ...although maybe it could be public someday, to allow getting the raw the CSV content
+  // and then sending it somewhere else, like directly to a gsheet.
+  public generateCsvContent(): string[] {
+    const csvPrefixRows = this.tableState.csvPrefixRows?.map((row) => row.map(escapeCsvValue).join(",")) ?? [];
+    // Convert the array of rows into CSV format
+    const dataRows = this.tableState.visibleRows.map((rs) => {
+      const values = this.tableState.visibleColumns
+        .filter((c) => !c.isAction)
+        .map((c) => {
+          // Just guessing for level=1
+          const maybeContent = applyRowFn(c, rs.row, this as any as GridRowApi<R>, 1, true, undefined);
+          if (isGridCellContent(maybeContent)) {
+            const cell = maybeContent;
+            const content = maybeApply(cell.content);
+            // Anything not isJSX (like a string) we can put into the CSV directly
+            if (!isJSX(content)) return content;
+            // Otherwise use the value/sortValue values
+            return cell.value ? maybeApply(cell.value) : cell.sortValue ? maybeApply(cell.sortValue) : "-";
+          } else {
+            // ReactNode
+            return isJSX(maybeContent) ? "-" : maybeContent;
+          }
+        });
+      return values.map(toCsvString).map(escapeCsvValue).join(",");
+    });
+    return [...csvPrefixRows, ...dataRows];
+  }
+}
+
+function toCsvString(value: any): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return value.toString();
+  if (typeof value === "boolean") return value ? "true" : "false";
+  return String(value);
+}
+
+function escapeCsvValue(value: string): string {
+  // Wrap values with special chars in quotes, and double quotes themselves
+  if (value.includes('"') || value.includes(",") || value.includes("\n")) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
 }
 
 function bindMethods(instance: any): void {
   Object.getOwnPropertyNames(Object.getPrototypeOf(instance)).forEach((key) => {
     if (instance[key] instanceof Function && key !== "constructor") instance[key] = instance[key].bind(instance);
   });
+}
+
+export function maybeApply<T>(maybeFn: MaybeFn<T>): T {
+  return typeof maybeFn === "function" ? (maybeFn as any)() : maybeFn;
 }

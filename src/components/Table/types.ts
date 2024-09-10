@@ -33,8 +33,9 @@ export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends 
 export type GridColumn<R extends Kinded> = {
   /** Require a render function for each row `kind`. */
   [K in R["kind"]]:
-    | string
-    | GridCellContent
+    | string // static data, i.e. `firstNameColumn = { header: "First Name" }`
+    | GridCellContent // static-ish cell, i.e. `firstNameColumn = { header: { content: ... } }`
+    // Functions for dynamic data, i.e. `firstNameColumn = { header: (data) => data.firstName }`
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (
             data: D,

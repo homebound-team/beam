@@ -9,10 +9,14 @@ import { Css, Properties, Typography } from "src/Css";
 /**
  * Allows a cell to be more than just a RectNode, i.e. declare its alignment or
  * primitive value for filtering and sorting.
+ *
+ * For a given column, the `GridColumn` can either return a static `GridCellContent`, or
+ * more likely use a function that returns a per-column/per-row `GridCellContent` that defines
+ * the value (and it's misc alignment/css/etc) for this specific cell.
  */
 export type GridCellContent = {
   /** The JSX content of the cell. Virtual tables that client-side sort should use a function to avoid perf overhead. */
-  content: ReactNode | (() => ReactNode);
+  content: MaybeFn<ReactNode>;
   alignment?: GridCellAlignment;
   /** Allow value to be a function in case it's a dynamic value i.e. reading from an inline-edited proxy. */
   value?: MaybeFn<number | string | Date | boolean | null | undefined>;

@@ -43,6 +43,8 @@ export class TableState<R extends Kinded> {
   activeCellId: string | undefined = undefined;
   /** Stores the current client-side type-ahead search/filter. */
   search: string[] = [];
+  /** Stores whether CSVs should have some prefix rows. */
+  csvPrefixRows: string[][] | undefined = undefined;
 
   // Tracks the current `sortConfig`
   public sortConfig: GridSortConfig | undefined;
@@ -165,6 +167,10 @@ export class TableState<R extends Kinded> {
   setSearch(search: string | undefined): void {
     // Break up "foo bar" into `[foo, bar]` and a row must match both `foo` and `bar`
     this.search = (search && search.split(/ +/)) || [];
+  }
+
+  setCsvPrefixRows(csvPrefixRows: string[][] | undefined): void {
+    this.csvPrefixRows = csvPrefixRows;
   }
 
   get visibleRows(): RowState<R>[] {
