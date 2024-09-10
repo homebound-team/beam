@@ -31,6 +31,7 @@ export interface IconCardGroupProps<V extends Value> extends Pick<PresentationFi
   errorMsg?: string;
   helperText?: string | ReactNode;
   disabled?: boolean;
+  required?: boolean;
 }
 
 export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
@@ -40,6 +41,7 @@ export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
     label,
     labelStyle = fieldProps?.labelStyle ?? "above",
     values,
+    required,
     errorMsg,
     helperText,
     disabled: isDisabled = false,
@@ -105,6 +107,7 @@ export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
               selected={isSelected}
               disabled={disabled}
               onChange={() => toggleValue(option.value)}
+              required={required}
               {...tid[option.label]}
             />
           );

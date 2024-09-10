@@ -43,3 +43,21 @@ export function Default() {
     </div>
   );
 }
+
+export function Required() {
+  const [values, setValues] = useState<Category[]>([Category.Math]);
+
+  return (
+    <div>
+      <div css={Css.df.wPx(500).$}>
+        <IconCardGroup
+          label="Icon Card Group"
+          options={categories}
+          onChange={(values) => setValues(values)}
+          values={values}
+          errorMsg="Required"
+        />
+      </div>
+    </div>
+  );
+}

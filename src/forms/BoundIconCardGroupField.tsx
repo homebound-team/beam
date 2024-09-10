@@ -31,6 +31,7 @@ export function BoundIconCardGroupField<V extends Value>(props: BoundIconCardGro
             field.maybeAutoSave();
           }}
           disabled={field.readOnly}
+          required={field.required}
           {...testId}
           {...others}
         />
