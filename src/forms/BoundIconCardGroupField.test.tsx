@@ -49,7 +49,9 @@ describe("BoundIconCardGroupField", () => {
   it("shows an error message", async () => {
     // Given a readOnly BoundIconCardField
     const author = createObjectState(formConfig, { favoriteGenres: [Category.Math] });
-    const r = await render(<BoundIconCardGroupField field={author.favoriteGenres} options={categories} errorMsg="Required" />);
+    const r = await render(
+      <BoundIconCardGroupField field={author.favoriteGenres} options={categories} errorMsg="Required" />,
+    );
 
     // Then the icon card should show an error message
     expect(r.favoriteGenres_errorMsg).toHaveTextContent("Required");
