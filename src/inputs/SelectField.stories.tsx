@@ -301,7 +301,7 @@ export function LoadingState() {
           await sleep(5000);
           setLoaded(loadTestOptions);
         },
-        options: loadTestOptions,
+        options: loaded,
       }}
     />
   );

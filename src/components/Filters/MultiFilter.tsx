@@ -28,7 +28,12 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
     inModal: boolean,
     vertical: boolean,
   ): JSX.Element {
-    if (inModal && this.props.options.length > 0 && this.props.options.length <= 8) {
+    if (
+      inModal &&
+      Array.isArray(this.props.options) &&
+      this.props.options.length > 0 &&
+      this.props.options.length <= 8
+    ) {
       const { disabledOptions } = this.props;
       const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
       const disabledKeys = Object.keys(disabledOptionsWithReasons);
@@ -49,7 +54,7 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
             setValue(values.length === 0 ? undefined : (values as V[]));
           }}
           values={(value as string[]) || []}
-          hideLabel={true}
+          labelStyle="hidden"
           {...tid[defaultTestId(this.label)]}
         />
       );

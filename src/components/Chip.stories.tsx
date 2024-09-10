@@ -58,3 +58,26 @@ export function WithIcon() {
     </div>
   );
 }
+
+export function WithCustomLabel() {
+  return (
+    <div css={Css.wPx(200).df.gap1.$}>
+      <Chip
+        text={
+          <span css={Css.sm.df.gap1.$}>
+            <span css={Css.smBd.$}>K</span>
+            Kitchen
+          </span>
+        }
+      />
+      <Chip
+        text={
+          <span css={Css.sm.df.gap1.$}>
+            <span css={Css.smBd.$}>B</span>
+            Bedroom
+          </span>
+        }
+      />
+    </div>
+  );
+}

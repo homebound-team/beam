@@ -1,5 +1,5 @@
 import { Children, cloneElement, ReactNode } from "react";
-import { LabelSuffixStyle, PresentationProvider } from "src/components/PresentationContext";
+import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { useModal } from "src/components";
 
@@ -13,13 +13,13 @@ export type FormWidth =
   /** 100%, works well for showing full width fields, or deferring to the parent width. */
   | "full";
 
-export interface FormLinesProps {
+export interface FormLinesProps
+  extends Pick<PresentationFieldProps, "labelStyle" | "labelLeftFieldWidth" | "labelSuffix" | "compact"> {
   /** Let the user interleave group-less lines and grouped lines. */
   children: ReactNode;
-  labelSuffix?: LabelSuffixStyle;
-  labelStyle?: "inline" | "hidden" | "above" | "left";
   width?: FormWidth;
-  compact?: boolean;
+  /** Increment property (e.g. 1 = 8px). Defines space between form fields */
+  gap?: number;
 }
 
 /**
@@ -30,7 +30,15 @@ export interface FormLinesProps {
  */
 export function FormLines(props: FormLinesProps) {
   const { inModal } = useModal();
-  const { children, width = inModal ? "full" : "lg", labelSuffix, labelStyle, compact } = props;
+  const {
+    children,
+    width = inModal ? "full" : "lg",
+    labelSuffix,
+    labelStyle,
+    compact,
+    gap = 2,
+    labelLeftFieldWidth,
+  } = props;
   let firstFormHeading = true;
 
   // Only overwrite `fieldProps` if new values are explicitly set. Ensures we only set to `undefined` if explicitly set.
@@ -38,6 +46,7 @@ export function FormLines(props: FormLinesProps) {
     ...("labelSuffix" in props ? { labelSuffix } : {}),
     ...("labelStyle" in props ? { labelStyle } : {}),
     ...("compact" in props ? { compact } : {}),
+    ...("labelLeftFieldWidth" in props ? { labelLeftFieldWidth } : {}),
     ...(width === "full" ? { fullWidth: true } : {}),
   };
 
@@ -48,7 +57,7 @@ export function FormLines(props: FormLinesProps) {
           // Note that we're purposefully not using display:flex so that our children's margins will collapse.
           ...Css.w(sizes[width]).$,
           // Purposefully use this instead of childGap3 to put margin-bottom on the last line
-          "& > *": Css.mb2.$,
+          "& > *": Css.mb(gap).$,
         }}
       >
         {Children.map(children, (child) => {

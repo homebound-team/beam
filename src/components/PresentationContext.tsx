@@ -6,6 +6,8 @@ export interface PresentationFieldProps {
   numberAlignment?: "left" | "right";
   /** Sets the label position or visibility. Defaults to "above" */
   labelStyle?: "inline" | "hidden" | "above" | "left";
+  /** Defines the width property of the input field wrapper when using `labelStyle="left"`. */
+  labelLeftFieldWidth?: number | string;
   labelSuffix?: LabelSuffixStyle;
   // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
   borderless?: boolean;

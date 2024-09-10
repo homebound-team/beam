@@ -36,6 +36,7 @@ export const FilterableStaticHeight = () => (
 export const HeaderWithComponents = () => <ModalExample size="lg" withTag />;
 export const WithDatePicker = () => <ModalExample withDateField />;
 export const WithFieldInHeader = () => <ModalExample withTextArea />;
+export const WithTextFieldInHeader = () => <ModalExample withTextField />;
 export const WithDrawHeaderBorder = () => <ModalExample drawHeaderBorder={true} />;
 export const VirtualizedTableInBody = () => {
   const { openModal } = useModal();

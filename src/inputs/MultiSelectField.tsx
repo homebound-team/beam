@@ -10,7 +10,6 @@ export interface MultiSelectFieldProps<O, V extends Value> extends Exclude<Combo
   getOptionLabel: (opt: O) => string;
   values: V[];
   onSelect: (values: V[], opts: O[]) => void;
-  options: O[];
 }
 
 /**
