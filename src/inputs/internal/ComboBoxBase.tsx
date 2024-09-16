@@ -17,7 +17,7 @@ import equal from "fast-deep-equal";
 /** Base props for either `SelectField` or `MultiSelectField`. */
 export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
-  getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => string | ReactNode;
+  getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean, isAddNewOption?: boolean) => string | ReactNode;
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
@@ -65,6 +65,8 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
   multiline?: boolean;
   /* Callback for user searches */
   onSearch?: (search: string) => void;
+  /* Only supported on single Select fields */
+  onAddNew?: (v: string) => void;
 }
 
 /**
@@ -95,26 +97,39 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     getOptionMenuLabel: propOptionMenuLabel,
     fullWidth = fieldProps?.fullWidth ?? false,
     onSearch,
+    onAddNew,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
 
   // Memoize the callback functions and handle the `unset` option if provided.
   const getOptionLabel = useCallback(
-    (o: O) => (unsetLabel && o === unsetOption ? unsetLabel : propOptionLabel(o)),
+    (o: O) =>
+      unsetLabel && o === unsetOption
+        ? unsetLabel
+        : onAddNew && o === addNewOption
+        ? addNewOption.name
+        : propOptionLabel(o),
     // propOptionLabel is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [unsetLabel],
   );
   const getOptionValue = useCallback(
-    (o: O) => (unsetLabel && o === unsetOption ? (undefined as V) : propOptionValue(o)),
+    (o: O) =>
+      unsetLabel && o === unsetOption
+        ? (undefined as V)
+        : onAddNew && o === addNewOption
+        ? (addNewOption.id as V)
+        : propOptionValue(o),
     // propOptionValue is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [unsetLabel],
   );
   const getOptionMenuLabel = useCallback(
     (o: O) =>
-      propOptionMenuLabel ? propOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption) : getOptionLabel(o),
+      propOptionMenuLabel
+        ? propOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption, Boolean(onAddNew) && o === addNewOption)
+        : getOptionLabel(o),
     // propOptionMenuLabel is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [unsetLabel, getOptionLabel],
@@ -122,11 +137,13 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
   const options = useMemo(
-    () => initializeOptions(propOptions, getOptionValue, unsetLabel),
+    () => initializeOptions(propOptions, getOptionValue, unsetLabel, !!onAddNew),
     // If the caller is using { current, load, options }, memoize on only `current` and `options` values.
     // ...and don't bother on memoizing on getOptionValue b/c it's basically always a lambda
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    Array.isArray(propOptions) ? [propOptions, unsetLabel] : [propOptions.current, propOptions.options, unsetLabel],
+    Array.isArray(propOptions)
+      ? [propOptions, unsetLabel, onAddNew]
+      : [propOptions.current, propOptions.options, unsetLabel, onAddNew],
   );
 
   const values = useMemo(() => propValues ?? [], [propValues]);
@@ -160,7 +177,9 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   const { searchValue } = fieldState;
   const filteredOptions = useMemo(() => {
-    return !searchValue ? options : options.filter((o) => contains(getOptionLabel(o), searchValue));
+    return !searchValue
+      ? options
+      : options.filter((o) => contains(getOptionLabel(o), searchValue) || o === addNewOption);
   }, [options, searchValue, getOptionLabel, contains]);
 
   /** Resets field's input value and filtered options list for cases where the user exits the field without making changes (on Escape, or onBlur) */
@@ -189,6 +208,13 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
     const selectedKeys = [...keys.values()];
     const selectedOptions = options.filter((o) => selectedKeys.includes(valueToKey(getOptionValue(o))));
+
+    if (!multiselect && selectedOptions[0] === addNewOption && onAddNew) {
+      onAddNew(fieldState.inputValue);
+      state.close();
+      return;
+    }
+
     selectionChanged && onSelect(selectedKeys.map(keyToValue) as V[], selectedOptions);
 
     if (!multiselect) {
@@ -442,6 +468,7 @@ export function initializeOptions<O, V extends Value>(
   optionsOrLoad: OptionsOrLoad<O>,
   getOptionValue: (opt: O) => V,
   unsetLabel: string | undefined,
+  addNew: boolean,
 ): O[] {
   const opts: O[] = [];
   if (unsetLabel) {
@@ -466,11 +493,15 @@ export function initializeOptions<O, V extends Value>(
       });
     }
   }
+  if (addNew) {
+    opts.push(addNewOption as unknown as O);
+  }
   return opts;
 }
 
 /** A marker option to automatically add an "Unset" option to the start of options. */
 export const unsetOption = {};
+export const addNewOption = { id: "new", name: "Add New" };
 
 export function disabledOptionToKeyedTuple(
   disabledOption: Value | { value: Value; reason: string },

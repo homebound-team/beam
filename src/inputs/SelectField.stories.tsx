@@ -75,6 +75,7 @@ function Template(args: SelectFieldProps<any, any>) {
               {o.name ?? "None"}
             </div>
           )}
+          onAddNew={(v) => alert("Got " + v)}
         />
         <TestSelectField
           {...args}
