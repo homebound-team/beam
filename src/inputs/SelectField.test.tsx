@@ -1,4 +1,4 @@
-import { clickAndWait } from "@homebound/rtl-utils";
+import { clickAndWait, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
@@ -470,6 +470,25 @@ describe("SelectFieldTest", () => {
 
     // Then `onSelect` is triggered with `undefined`
     expect(onSelect.mock.calls[2][0]).toBe(undefined);
+  });
+
+  it("allows to add a new option", async () => {
+    // Given a SelectField
+    const onAddNew = jest.fn();
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value={undefined}
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        onAddNew={onAddNew}
+      />,
+    );
+    // When we select Add New option
+    select(r.age, "Add New");
+    // Then onAddNew was called
+    expect(onAddNew).toHaveBeenCalledTimes(1);
   });
 
   // Used to validate the `unset` option can be applied to non-`HasIdAndName` options
