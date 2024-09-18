@@ -312,6 +312,11 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   const [debouncedSearch] = useDebounce(searchValue, 300);
 
+  useEffect(() => {
+    if (!debouncedSearch || !onAddNew) return;
+    if (filteredOptions.length === 1 && filteredOptions[0] === addNewOption) onAddNew(debouncedSearch);
+  }, [debouncedSearch, filteredOptions, onAddNew]);
+
   // Reset inputValue when closed or selected changes
   useEffect(() => {
     if (state.isOpen && multiselect) {
