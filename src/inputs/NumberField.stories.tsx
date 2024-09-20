@@ -45,6 +45,7 @@ export function NumberFieldStyles() {
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Unit Types</h1>
         <TestNumberField label="Percent" type="percent" value={12.55} numFractionDigits={2} truncate />
+        <TestNumberField label="Mills" type="mills" value={1000} />
         <TestNumberField label="Cents" type="cents" value={1000} />
         <TestNumberField label="Dollars" type="dollars" value={1000} />
         <TestNumberField label="Margin" type="basisPoints" value={1275} />
@@ -80,6 +81,7 @@ export function NumberFieldReadOnly() {
         <TextField label="First Name" value="first" onChange={() => {}} readOnly={true} />
         <TestNumberField label="Name" value={100} readOnly={true} />
         <TestNumberField label="Name" value={100} labelStyle="hidden" readOnly={true} />
+        <TestNumberField label="Name" value={100} readOnly={true} type="mills" />
         <TestNumberField label="Name" value={100} readOnly={true} type="cents" />
         <TestNumberField label="Name" value={100} readOnly={true} type="percent" />
       </div>
