@@ -61,7 +61,7 @@ export interface TextFieldBaseProps<X>
   // Replaces empty input field and placeholder with node
   // IE: Multiselect renders list of selected items in the input field
   unfocusedPlaceholder?: ReactNode;
-  // Allow to disabled select onfocus, so the field can be auto-focus without selecting all text
+  /** Allow focusing without selecting, i.e. to let the user keep typing after we've pre-filled text + called focus, like the Add New component. */
   selectOnFocus?: boolean;
 }
 

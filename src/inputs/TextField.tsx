@@ -25,6 +25,7 @@ export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
   endAdornment?: ReactNode;
   startAdornment?: ReactNode;
   hideErrorMessage?: boolean;
+  /** Allow focusing without selecting, i.e. to let the user keep typing after we've pre-filled text + called focus, like the Add New component. */
   selectOnFocus?: boolean;
 }
 
