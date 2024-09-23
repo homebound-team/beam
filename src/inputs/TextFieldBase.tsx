@@ -61,6 +61,8 @@ export interface TextFieldBaseProps<X>
   // Replaces empty input field and placeholder with node
   // IE: Multiselect renders list of selected items in the input field
   unfocusedPlaceholder?: ReactNode;
+  /** Allow focusing without selecting, i.e. to let the user keep typing after we've pre-filled text + called focus, like the Add New component. */
+  selectOnFocus?: boolean;
 }
 
 // Used by both TextField and TextArea
@@ -97,6 +99,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     alwaysShowHelperText = false,
     fullWidth = fieldProps?.fullWidth ?? false,
     unfocusedPlaceholder,
+    selectOnFocus = true,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
@@ -188,7 +191,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   }
 
   const onFocusChained = chain((e: FocusEvent<HTMLInputElement> | FocusEvent<HTMLTextAreaElement>) => {
-    e.target.select();
+    if (selectOnFocus) e.target.select();
   }, onFocus);
 
   // Simulate clicking `ElementType` when using an unfocused placeholder

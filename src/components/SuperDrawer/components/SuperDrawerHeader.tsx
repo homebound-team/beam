@@ -12,7 +12,7 @@ interface SuperDrawerHeaderProps {
 }
 
 interface SuperDrawerHeaderStructuredProps {
-  title: string;
+  title: string | ReactNode;
   left?: ReactNode;
   right?: ReactNode;
   hideControls?: boolean;
@@ -32,7 +32,7 @@ export function SuperDrawerHeader(props: SuperDrawerHeaderProps | SuperDrawerHea
       {isStructuredProps(props) ? (
         <div css={Css.df.jcsb.aic.gap2.fg1.$}>
           <div css={Css.fg1.df.aic.gap2.$}>
-            <h1>{props.title}</h1>
+            {typeof props.title === "string" ? <h1>{props.title}</h1> : props.title}
             {props.left}
           </div>
           {props.right && <div css={Css.fs0.$}>{props.right}</div>}
