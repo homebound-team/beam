@@ -25,6 +25,7 @@ export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
   endAdornment?: ReactNode;
   startAdornment?: ReactNode;
   hideErrorMessage?: boolean;
+  selectOnFocus?: boolean;
 }
 
 export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
