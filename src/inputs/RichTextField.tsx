@@ -122,6 +122,7 @@ export function RichTextField(props: RichTextFieldProps) {
     // The <trix-editor /> web component's `trix-initialize` event may fire before a `useEffect` hook in the component is executed, making it difficult ot attach the event listener locally.
     window.addEventListener("trix-initialize", onEditorInit);
     return id;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readOnly]);
 
   useEffect(() => {

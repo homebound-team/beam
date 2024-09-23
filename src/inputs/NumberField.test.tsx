@@ -60,6 +60,14 @@ describe("NumberFieldTest", () => {
     expect(onChange).toBeCalledTimes(2); // change and blur
   });
 
+  it("can set mills as dollars", async () => {
+    const r = await render(<TestNumberField label="Cost" type="mills" value={1200} />);
+    expect(r.cost).toHaveValue("$1.200");
+    type(r.cost, "14");
+    expect(r.cost).toHaveValue("$14.000");
+    expect(lastSet).toEqual(14000);
+  });
+
   it("can set cents as dollars", async () => {
     const r = await render(<TestNumberField label="Cost" type="cents" value={1200} />);
     expect(r.cost).toHaveValue("$12.00");
@@ -90,6 +98,14 @@ describe("NumberFieldTest", () => {
     change(r.cost, "23.45");
     expect(onChange).toBeCalledWith(2345);
     expect(onChange).toBeCalledTimes(2); // change and blur
+  });
+
+  it("can set mills as mills", async () => {
+    const r = await render(<TestNumberField label="Cost" type="mills" value={12000} />);
+    expect(r.cost).toHaveValue("$12.000");
+    type(r.cost, ".145");
+    expect(r.cost).toHaveValue("$0.145");
+    expect(lastSet).toEqual(145);
   });
 
   it("can set cents as cents", async () => {
@@ -153,6 +169,7 @@ describe("NumberFieldTest", () => {
     const r = await render(
       <>
         <TestNumberField label="Days" type="days" value={123} displayDirection />
+        <TestNumberField label="Mills" type="mills" value={456} displayDirection />
         <TestNumberField label="Cents" type="cents" value={456} displayDirection />
         <TestNumberField label="Basis Points" type="basisPoints" value={789} displayDirection />
         <TestNumberField label="Percent" type="percent" value={123} displayDirection />
@@ -160,6 +177,7 @@ describe("NumberFieldTest", () => {
       </>,
     );
     expect(r.days).toHaveValue("+123 days");
+    expect(r.mills).toHaveValue("+$0.456");
     expect(r.cents).toHaveValue("+$4.56");
     expect(r.basisPoints).toHaveValue("+7.89%");
     expect(r.percent).toHaveValue("+123%");

@@ -26,6 +26,7 @@ export interface AuthorInput {
   birthday?: Date | null;
   heightInInches?: number | null;
   royaltiesInCents?: number | null;
+  royaltiesInMills?: number | null;
   books?: BookInput[] | null;
   address?: AuthorAddress | null;
   favoriteSport?: string | null;
