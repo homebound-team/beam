@@ -57,6 +57,14 @@ describe("BoundNumberField", () => {
     expect(r.royalties).toHaveValue("$1.00");
   });
 
+  it("drops the 'in mills' suffix from labels", async () => {
+    const author = createObjectState(formConfig, { royaltiesInMills: 1_00 });
+    const r = await render(<BoundNumberField field={author.royaltiesInMills} />);
+    expect(r.royalties_label).toHaveTextContent("Royalties");
+    expect(r.royalties_label).not.toHaveTextContent("Cents");
+    expect(r.royalties).toHaveValue("$0.100");
+  });
+
   it("retains 0 value", async () => {
     const author = createObjectState(formConfig, { royaltiesInCents: 1_00 });
     const r = await render(<BoundNumberField field={author.royaltiesInCents} />);
@@ -117,4 +125,5 @@ describe("BoundNumberField", () => {
 const formConfig: ObjectConfig<AuthorInput> = {
   heightInInches: { type: "value", rules: [required] },
   royaltiesInCents: { type: "value" },
+  royaltiesInMills: { type: "value" },
 };

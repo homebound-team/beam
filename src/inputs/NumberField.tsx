@@ -8,7 +8,7 @@ import { Css, Xss } from "src/Css";
 import { maybeCall } from "src/utils";
 import { TextFieldBase } from "./TextFieldBase";
 
-export type NumberFieldType = "cents" | "dollars" | "percent" | "basisPoints" | "days";
+export type NumberFieldType = "cents" | "dollars" | "percent" | "basisPoints" | "days" | "mills";
 
 // exported for testing purposes
 export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelStyle" | "fullWidth"> {
@@ -85,7 +85,9 @@ export function NumberField(props: NumberFieldProps) {
 
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
-  const factor = type === "percent" || type === "cents" ? 100 : type === "basisPoints" ? 10_000 : 1;
+  const factor =
+    type === "percent" ? 100 : type === "cents" ? 100 : type === "mills" ? 1_000 : type === "basisPoints" ? 10_000 : 1;
+
   const signDisplay = displayDirection ? "always" : "auto";
   const defaultFormatOptions: Intl.NumberFormatOptions = useMemo(
     () => ({
@@ -111,6 +113,8 @@ export function NumberField(props: NumberFieldProps) {
         ? { style: "percent", minimumFractionDigits: 2 }
         : type === "cents"
         ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
+        : type === "mills"
+        ? { style: "currency", currency: "USD", minimumFractionDigits: 3 }
         : type === "dollars"
         ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2 }
         : type === "days"

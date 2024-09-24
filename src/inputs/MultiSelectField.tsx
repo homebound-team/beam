@@ -3,7 +3,8 @@ import { Value } from "src/inputs";
 import { ComboBoxBase, ComboBoxBaseProps } from "src/inputs/internal/ComboBoxBase";
 import { HasIdAndName, Optional } from "src/types";
 
-export interface MultiSelectFieldProps<O, V extends Value> extends Exclude<ComboBoxBaseProps<O, V>, "unsetLabel"> {
+export interface MultiSelectFieldProps<O, V extends Value>
+  extends Exclude<ComboBoxBaseProps<O, V>, "unsetLabel" | "addNew"> {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
