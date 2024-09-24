@@ -321,7 +321,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         inputValue: "",
         searchValue: "",
       }));
-    } else {
+    } else if (!state.isOpen) {
       setFieldState((prevState) => ({
         ...prevState,
         searchValue: "",
