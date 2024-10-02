@@ -40,15 +40,11 @@ function TestToastComponent() {
     showToast({ message: "Test Toast", type: "error" });
   };
 
-  const clearToast = () => {
-    clear();
-  };
-
   return (
     <>
       <Toast />
       <Button label="toastButton" onClick={showToastOnClick} />
-      <Button label="clearToast" onClick={clearToast} />
+      <Button label="clearToast" onClick={clear} />
     </>
   );
 }
