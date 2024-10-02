@@ -22,10 +22,20 @@ describe("useToast", () => {
     // Then expect it to be closed
     expect(r.query.toast).not.toBeInTheDocument();
   });
+
+  it("can clear a toast", async () => {
+    // Given an app that can trigger a toast
+    const r = await render(<TestToastComponent />);
+    // When triggering the toast and clicking on the clear button
+    click(r.toastButton);
+    click(r.clearToast);
+    // Then expect it to be cleared
+    expect(r.query.toast).not.toBeInTheDocument();
+  });
 });
 
 function TestToastComponent() {
-  const { showToast } = useToast();
+  const { showToast, clear } = useToast();
   const showToastOnClick = () => {
     showToast({ message: "Test Toast", type: "error" });
   };
@@ -34,6 +44,7 @@ function TestToastComponent() {
     <>
       <Toast />
       <Button label="toastButton" onClick={showToastOnClick} />
+      <Button label="clearToast" onClick={clear} />
     </>
   );
 }
