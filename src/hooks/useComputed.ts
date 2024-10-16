@@ -34,6 +34,11 @@ interface Current<T> {
  *   return formState.firstName.value;
  * }, [formState]);
  *
+ * // Good, watching an observable `formState` + a POJO/immutable `items` which is not an observable
+ * const item = useComputed(() => {
+ *   return items.find((i) => i.id === formState.itemId.value);
+ * }, [formState, items]);
+ *
  * // Bad, fn and deps are "watching the same thing".
  * const firstName = useComputed(() => {
  *   return formState.firstName.value;
