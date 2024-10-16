@@ -13,7 +13,43 @@ interface Current<T> {
   hasRan: boolean;
 }
 
-/** Evaluates a computed function `fn` to a regular value and triggers a re-render whenever it changes. */
+/**
+ * Evaluates a computed function `fn` to a regular value and triggers a re-render whenever it changes.
+ *
+ * Some examples:
+ *
+ * ```ts
+ * // Good, watching a single value
+ * const firstName = useComputed(() => author.firstName, [author]);
+ *
+ * // Good, watching multiple values in a single `useComputed`
+ * const { firstName, lastName } = useComputed(() => {
+ *   // Make sure to read the values
+ *   const { firstName, lastName } = author;
+ *   return { firstName, lastName };
+ * }, [author]);
+ *
+ * // Good, watching a form-state field
+ * const firstName = useComputed(() => {
+ *   return formState.firstName.value;
+ * }, [formState]);
+ *
+ * // Bad, fn and deps are "watching the same thing".
+ * const firstName = useComputed(() => {
+ *   return formState.firstName.value;
+ * }, [formState.firstName.value]);
+ * ```
+ *
+ * Note that the difference between the `fn` and the `deps` is:
+ *
+ * - `fn` is "which values we are watching in the observable" (i.e. store or `formState`), and
+ * - `deps` is "which observable we're watching" (i.e. store or `formState`)
+ *
+ * So the `deps` array shouldn't overlap with any of the "watched values" of the `fn` lambda,
+ * other than the root observer itself (which admittedly should rarely change, i.e. our stores
+ * are generally global-ish/very stable, but can change if the user switches pages i.e. "from
+ * editing author:1 t editing author:2").
+ */
 export function useComputed<T>(fn: (prev: T | undefined) => T, deps: readonly any[]): T {
   // We always return the useRef value, and use this just to trigger re-renders
   const [, setTick] = useState(0);
