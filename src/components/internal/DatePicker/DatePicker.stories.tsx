@@ -1,9 +1,9 @@
 import { Meta } from "@storybook/react";
+import { format } from "date-fns";
 import { useState } from "react";
+import { Css } from "src";
 import { DatePicker } from "src/components/internal/DatePicker";
 import { jan1, jan10, jan2, jan29 } from "src/forms/formStateDomain";
-import { Css } from "src";
-import { format } from "date-fns";
 
 export default {
   component: DatePicker,

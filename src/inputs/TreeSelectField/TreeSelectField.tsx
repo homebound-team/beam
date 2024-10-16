@@ -17,6 +17,7 @@ import { Popover } from "src/components/internal";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { Value } from "src/inputs/index";
+import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
 import {
@@ -29,11 +30,10 @@ import {
   TreeFieldState,
   TreeSelectResponse,
 } from "src/inputs/TreeSelectField/utils";
+import { getFieldWidth } from "src/inputs/utils";
 import { keyToValue, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { HasIdAndName, Optional } from "src/types";
-import { getFieldWidth } from "src/inputs/utils";
-import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 
 export interface TreeSelectFieldProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
@@ -100,11 +100,11 @@ export function TreeSelectField<O, V extends Value>(
       !Array.isArray(options)
         ? []
         : defaultCollapsed
-        ? options.map((o) => getOptionValue(o))
-        : options
-            .flatMap(flattenOptions)
-            .filter((o) => o.defaultCollapsed)
-            .map((o) => getOptionValue(o)),
+          ? options.map((o) => getOptionValue(o))
+          : options
+              .flatMap(flattenOptions)
+              .filter((o) => o.defaultCollapsed)
+              .map((o) => getOptionValue(o)),
     );
     // Explicitly ignoring `getOptionValue` as it typically isn't memo'd
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -239,8 +239,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
       chipDisplay === "root"
         ? initialOptions.flatMap((o) => getTopLevelSelections(o, selectedKeys, getOptionValue)).map(getOptionLabel)
         : chipDisplay === "leaf"
-        ? selectedOptions.filter((o) => !o.children || o.children.length === 0).map(getOptionLabel)
-        : selectedOptions.map(getOptionLabel);
+          ? selectedOptions.filter((o) => !o.children || o.children.length === 0).map(getOptionLabel)
+          : selectedOptions.map(getOptionLabel);
 
     const filteredOptions = initialOptions.flatMap((o) => levelOptions(o, 0, false, collapsedKeys, getOptionValue));
 
@@ -250,10 +250,10 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         selectedOptions.length === 1
           ? getOptionLabel([...selectedOptions][0])
           : isReadOnly && selectedOptions.length > 0
-          ? selectedOptionsLabels.join(", ")
-          : selectedOptions.length === 0
-          ? nothingSelectedText
-          : "",
+            ? selectedOptionsLabels.join(", ")
+            : selectedOptions.length === 0
+              ? nothingSelectedText
+              : "",
       filteredOptions,
       selectedOptions,
       allOptions: initialOptions,
@@ -547,8 +547,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
             chipDisplay === "root"
               ? rootOptions.map(getOptionLabel)
               : chipDisplay === "leaf"
-              ? leafOptions.map(getOptionLabel)
-              : selectedOptions.map(getOptionLabel),
+                ? leafOptions.map(getOptionLabel)
+                : selectedOptions.map(getOptionLabel),
         }));
 
         onSelect({
@@ -573,8 +573,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
           selectedOptions.length === 1
             ? getOptionLabel(selectedOptions[0])
             : selectedOptions.length === 0
-            ? nothingSelectedText
-            : "",
+              ? nothingSelectedText
+              : "",
         filteredOptions: initialOptions.flatMap((o) => levelOptions(o, 0, false, collapsedKeys, getOptionValue)),
         allowCollapsing: true,
       }));

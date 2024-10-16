@@ -2,20 +2,10 @@ import { comparer } from "mobx";
 import { computedFn } from "mobx-utils";
 import { MutableRefObject, useMemo } from "react";
 import { VirtuosoHandle } from "react-virtuoso";
-import {
-  applyRowFn,
-  createRowLookup,
-  GridRowLookup,
-  isGridCellContent,
-  isJSX,
-  maybeApplyFunction,
-  MaybeFn,
-} from "src/components/index";
+import { applyRowFn, createRowLookup, GridRowLookup, isGridCellContent, isJSX, MaybeFn } from "src/components/index";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { DiscriminateUnion, Kinded } from "src/components/Table/types";
 import { TableState } from "src/components/Table/utils/TableState";
-import { maybeCall } from "src/utils";
-import { Properties } from "src/Css";
 
 /**
  * Creates an `api` handle to drive a `GridTable`.

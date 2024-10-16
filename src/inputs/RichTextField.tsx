@@ -2,13 +2,13 @@ import { Global } from "@emotion/react";
 import DOMPurify from "dompurify";
 import { ChangeEvent, createElement, useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "src/components/Label";
+import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Palette } from "src/Css";
 import { maybeCall, noop } from "src/utils";
 import Tribute from "tributejs";
 import "tributejs/dist/tribute.css";
 import "trix/dist/trix";
 import "trix/dist/trix.css";
-import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 
 export interface RichTextFieldProps extends Pick<PresentationFieldProps, "fullWidth"> {
   /** The initial html value to show in the trix editor. */

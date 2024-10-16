@@ -7,9 +7,9 @@ import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
+import { useBreakpoint } from "src/hooks";
 import { useTestIds } from "src/utils";
 import { ModalProvider } from "./ModalContext";
-import { useBreakpoint } from "src/hooks";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl" | "xxl";
 

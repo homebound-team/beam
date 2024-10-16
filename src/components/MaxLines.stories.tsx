@@ -1,6 +1,6 @@
-import { MaxLines } from "src/components/MaxLines";
-import { Button, Css } from "src";
 import { useMemo, useState } from "react";
+import { Button, Css } from "src";
+import { MaxLines } from "src/components/MaxLines";
 
 export default {
   component: MaxLines,

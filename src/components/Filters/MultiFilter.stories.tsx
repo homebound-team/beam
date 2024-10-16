@@ -1,9 +1,9 @@
 import { Meta } from "@storybook/react";
+import { useState } from "react";
 import { stageFilter, stageFilterDisabledOptions } from "src/components/Filters/testDomain";
 import { Filters, multiFilter } from "src/components/index";
 import { HasIdAndName } from "src/types";
 import { zeroTo } from "src/utils/sb";
-import { useState } from "react";
 
 export default {
   component: Filters,

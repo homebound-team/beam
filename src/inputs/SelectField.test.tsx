@@ -1,10 +1,10 @@
-import { clickAndWait, type } from "@homebound/rtl-utils";
+import { clickAndWait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
+import { AuthorHeight } from "src/forms/formStateDomain";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { blur, click, focus, getOptions, render, select, wait } from "src/utils/rtl";
-import { AuthorHeight } from "src/forms/formStateDomain";
 
 describe("SelectFieldTest", () => {
   it("can set a value", async () => {

@@ -110,16 +110,16 @@ export function NumberField(props: NumberFieldProps) {
       type === "percent"
         ? { style: "percent" }
         : type === "basisPoints"
-        ? { style: "percent", minimumFractionDigits: 2 }
-        : type === "cents"
-        ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
-        : type === "mills"
-        ? { style: "currency", currency: "USD", minimumFractionDigits: 3 }
-        : type === "dollars"
-        ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2 }
-        : type === "days"
-        ? { style: "unit", unit: "day", unitDisplay: "long" as const, maximumFractionDigits: 0 }
-        : {};
+          ? { style: "percent", minimumFractionDigits: 2 }
+          : type === "cents"
+            ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
+            : type === "mills"
+              ? { style: "currency", currency: "USD", minimumFractionDigits: 3 }
+              : type === "dollars"
+                ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2 }
+                : type === "days"
+                  ? { style: "unit", unit: "day", unitDisplay: "long" as const, maximumFractionDigits: 0 }
+                  : {};
 
     return { ...defaultFormatOptions, ...typeFormat };
   }, [type, numberFormatOptions, defaultFormatOptions, numFractionDigits]);

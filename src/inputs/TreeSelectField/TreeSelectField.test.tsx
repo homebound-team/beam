@@ -1,10 +1,10 @@
 import { fireEvent } from "@testing-library/react";
+import { useState } from "react";
 import { TreeSelectField } from "src/inputs";
 import { NestedOption } from "src/inputs/TreeSelectField/utils";
 import { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
 import { blur, click, focus, getSelected, render, wait } from "src/utils/rtl";
-import { useState } from "react";
 
 describe(TreeSelectField, () => {
   it("renders", async () => {

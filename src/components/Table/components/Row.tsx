@@ -217,8 +217,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             isGridCellContent(maybeContent) && typeof maybeContent.colspan === "number"
               ? maybeContent.colspan
               : isExpandableHeader
-              ? numExpandedColumns + 1
-              : 1;
+                ? numExpandedColumns + 1
+                : 1;
           const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
 
           const canSortColumn =
@@ -343,10 +343,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
               ? rowLinkRenderFn(as, currentColspan)
               : isHeader || isTotals || isExpandableHeader
-              ? headerRenderFn(column, as, currentColspan)
-              : rowStyle?.onClick && wrapAction
-              ? rowClickRenderFn(as, api, currentColspan)
-              : defaultRenderFn(as, currentColspan);
+                ? headerRenderFn(column, as, currentColspan)
+                : rowStyle?.onClick && wrapAction
+                  ? rowClickRenderFn(as, api, currentColspan)
+                  : defaultRenderFn(as, currentColspan);
 
           return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick, tooltip);
         })

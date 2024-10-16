@@ -73,10 +73,10 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     isTextButton(trigger)
       ? defaultTestId(labelOr(trigger, "overlayTrigger"))
       : isNavLinkButton(trigger)
-      ? defaultTestId(trigger.navLabel)
-      : isIconButton(trigger)
-      ? trigger.icon
-      : trigger.name,
+        ? defaultTestId(trigger.navLabel)
+        : isIconButton(trigger)
+          ? trigger.icon
+          : trigger.name,
   );
 
   return (

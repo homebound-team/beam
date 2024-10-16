@@ -37,10 +37,10 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
     isTextButton(trigger)
       ? labelOr(trigger, "editColumnsButton")
       : isNavLinkButton(trigger)
-      ? defaultTestId(trigger.navLabel)
-      : isIconButton(trigger)
-      ? trigger.icon
-      : trigger.name,
+        ? defaultTestId(trigger.navLabel)
+        : isIconButton(trigger)
+          ? trigger.icon
+          : trigger.name,
   );
 
   const options = useMemo(

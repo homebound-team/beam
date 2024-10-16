@@ -1,9 +1,9 @@
 import { ReactNode } from "react";
+import { Icon, IconKey } from "src/components/Icon";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Margin, Only, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
-import { Icon, IconKey } from "src/components/Icon";
 
 export type ChipType = "caution" | "warning" | "success" | "light" | "dark" | "neutral" | "darkMode" | "info";
 

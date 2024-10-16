@@ -47,10 +47,10 @@ export function ButtonMenu(props: ButtonMenuBaseProps | SelectionButtonMenuProps
     isTextButton(trigger)
       ? labelOr(trigger, "buttonMenu")
       : isNavLinkButton(trigger)
-      ? defaultTestId(trigger.navLabel)
-      : isIconButton(trigger)
-      ? trigger.icon
-      : trigger.name,
+        ? defaultTestId(trigger.navLabel)
+        : isIconButton(trigger)
+          ? trigger.icon
+          : trigger.name,
   );
 
   return (
