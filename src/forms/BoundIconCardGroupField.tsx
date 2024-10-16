@@ -1,9 +1,9 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
+import { Value } from "src/inputs";
 import { IconCardGroup, IconCardGroupProps } from "src/inputs/IconCardGroup";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
-import { Value } from "src/inputs";
 
 export type BoundIconCardGroupFieldProps<V extends Value> = Omit<
   IconCardGroupProps<V>,

@@ -2,7 +2,7 @@ import { Matcher } from "react-day-picker";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
 import { Label } from "src/components/Label";
-import { DateRangeField, Value } from "src/inputs";
+import { DateRangeField } from "src/inputs";
 import { DateRange } from "src/types";
 import { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";

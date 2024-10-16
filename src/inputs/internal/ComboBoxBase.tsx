@@ -1,4 +1,5 @@
 import { Selection } from "@react-types/shared";
+import equal from "fast-deep-equal";
 import React, { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
@@ -8,11 +9,10 @@ import { PresentationFieldProps, usePresentationContext } from "src/components/P
 import { Css } from "src/Css";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
+import { getFieldWidth } from "src/inputs/utils";
 import { keyToValue, Value, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
-import { getFieldWidth } from "src/inputs/utils";
 import { useDebounce } from "use-debounce";
-import equal from "fast-deep-equal";
 
 /** Base props for either `SelectField` or `MultiSelectField`. */
 export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
@@ -108,8 +108,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       unsetLabel && o === unsetOption
         ? unsetLabel
         : onAddNew && o === addNewOption
-        ? addNewOption.name
-        : propOptionLabel(o),
+          ? addNewOption.name
+          : propOptionLabel(o),
     // propOptionLabel is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [unsetLabel],
@@ -119,8 +119,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       unsetLabel && o === unsetOption
         ? (undefined as V)
         : onAddNew && o === addNewOption
-        ? (addNewOption.id as V)
-        : propOptionValue(o),
+          ? (addNewOption.id as V)
+          : propOptionValue(o),
     // propOptionValue is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [unsetLabel],
@@ -457,10 +457,10 @@ function getInputValue<O>(
   return selectedOptions.length === 1
     ? getOptionLabel(selectedOptions[0])
     : readOnly && selectedOptions.length > 0
-    ? selectedOptions.map(getOptionLabel).join(", ")
-    : multiselect && selectedOptions.length === 0
-    ? nothingSelectedText
-    : "";
+      ? selectedOptions.map(getOptionLabel).join(", ")
+      : multiselect && selectedOptions.length === 0
+        ? nothingSelectedText
+        : "";
 }
 
 /** Transforms/simplifies `optionsOrLoad` into just options, with unsetLabel maybe added. */

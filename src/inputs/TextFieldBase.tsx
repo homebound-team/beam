@@ -18,10 +18,10 @@ import { Css, Only, Palette } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
+import { getFieldWidth } from "src/inputs/utils";
 import { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
-import { getFieldWidth } from "src/inputs/utils";
 
 export interface TextFieldBaseProps<X>
   extends Pick<
@@ -121,8 +121,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const [bgColor, hoverBgColor, disabledBgColor] = contrast
     ? [Palette.Gray700, Palette.Gray600, Palette.Gray700]
     : borderless && !compound
-    ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
-    : [Palette.White, Palette.Gray100, Palette.Gray100];
+      ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
+      : [Palette.White, Palette.Gray100, Palette.Gray100];
 
   const fieldMaxWidth = getFieldWidth(fullWidth);
 

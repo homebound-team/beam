@@ -4,8 +4,8 @@ import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdIsh, HasNameIsh, Optional } from "src/types";
 import { maybeCall } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
-import { useTestIds } from "src/utils/useTestIds";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type BoundSelectFieldProps<O, V extends Value> = Omit<SelectFieldProps<O, V>, "value" | "onSelect" | "label"> & {
   /** Optional, to allow `onSelect` to be overridden to do more than just `field.set`. */

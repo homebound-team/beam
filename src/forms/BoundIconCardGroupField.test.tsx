@@ -1,8 +1,8 @@
+import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { IconCardGroupItemOption } from "src/inputs/IconCardGroup";
-import { AuthorInput } from "./formStateDomain";
-import { ObjectConfig, ObjectState, createObjectState, required } from "@homebound/form-state";
-import { BoundIconCardGroupField } from "./BoundIconCardGroupField";
 import { click, render } from "src/utils/rtl";
+import { BoundIconCardGroupField } from "./BoundIconCardGroupField";
+import { AuthorInput } from "./formStateDomain";
 
 enum Category {
   Math,

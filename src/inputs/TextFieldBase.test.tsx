@@ -1,5 +1,5 @@
 import { TextFieldBase } from "src/inputs/TextFieldBase";
-import { render, focus } from "src/utils/rtl";
+import { focus, render } from "src/utils/rtl";
 
 describe(TextFieldBase, () => {
   it("shows error and helper text", async () => {

@@ -121,7 +121,7 @@ export function ensureClientSideSortValueIsSortable(
   if (process.env.NODE_ENV !== "production" && !isHeader && sortOn === "client" && column.clientSideSort !== false) {
     const value = sortValue(maybeContent, false);
     if (!canClientSideSort(value)) {
-      const columnIdentifier = !column.id.startsWith("beamColumn_") ? column.id : column.name ?? idx;
+      const columnIdentifier = !column.id.startsWith("beamColumn_") ? column.id : (column.name ?? idx);
       throw new Error(
         `Column ${columnIdentifier} passed an unsortable value, use GridCellContent or clientSideSort=false`,
       );

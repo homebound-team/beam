@@ -2,10 +2,10 @@ import { ReactNode, useRef } from "react";
 import { useFocusRing, useHover, useSwitch, VisuallyHidden } from "react-aria";
 import { resolveTooltip } from "src/components";
 import { Label } from "src/components/Label";
+import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Palette } from "src/Css";
 import { Icon } from "../components/Icon";
 import { toToggleState, useTestIds } from "../utils";
-import { usePresentationContext } from "src/components/PresentationContext";
 
 export interface SwitchProps {
   /** Whether the element should receive focus on render. */

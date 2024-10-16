@@ -78,7 +78,9 @@ function Popper({ triggerRef, content, placement = "auto", bgColor = Palette.Gra
   // Since we use `display: contents;` on the `triggerRef`, then the element.offsetTop/Left/etc all equal `0`. This would make
   // the tooltip show in the top left of the document. So instead, we target either the first child, if available, or the parent element as the tooltip target.
   // It is possible there are no children if the element only has text content, which is the reasoning for the parentElement fallback.
-  const targetElement = triggerRef.current ? triggerRef.current.children[0] ?? triggerRef.current.parentElement : null;
+  const targetElement = triggerRef.current
+    ? (triggerRef.current.children[0] ?? triggerRef.current.parentElement)
+    : null;
 
   const { styles, attributes } = usePopper(targetElement, popperRef.current, {
     modifiers: [
@@ -117,6 +119,6 @@ export function resolveTooltip(
   return typeof disabled !== "boolean" && disabled
     ? disabled
     : typeof readOnly !== "boolean" && readOnly
-    ? readOnly
-    : tooltip ?? undefined;
+      ? readOnly
+      : (tooltip ?? undefined);
 }

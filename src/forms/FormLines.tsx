@@ -1,7 +1,7 @@
 import { Children, cloneElement, ReactNode } from "react";
+import { useModal } from "src/components";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { Css } from "src/Css";
-import { useModal } from "src/components";
 
 export type FormWidth =
   /** 320px. */

@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useContext, useMemo } from "react";
+import { createContext, ReactNode, useContext, useMemo } from "react";
 
 interface ModalContextState {
   inModal: boolean;

@@ -1,7 +1,7 @@
 import React, { LabelHTMLAttributes, ReactNode } from "react";
 import { VisuallyHidden } from "react-aria";
-import { Css, Font, Only, Palette, Xss } from "src/Css";
 import { Icon } from "src";
+import { Css, Font, Only, Palette, Xss } from "src/Css";
 
 type LabelXss = Font | "color";
 
