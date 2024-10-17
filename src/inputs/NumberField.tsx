@@ -121,7 +121,7 @@ export function NumberField(props: NumberFieldProps) {
                   ? { style: "unit", unit: "day", unitDisplay: "long" as const, maximumFractionDigits: 0 }
                   : {};
 
-    return { ...defaultFormatOptions, ...typeFormat };
+    return { ...defaultFormatOptions, ...typeFormat } as any;
   }, [type, numberFormatOptions, defaultFormatOptions, numFractionDigits]);
   const numberParser = useMemo(() => new NumberParser(locale, formatOptions), [locale, formatOptions]);
 

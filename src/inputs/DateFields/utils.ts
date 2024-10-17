@@ -1,4 +1,4 @@
-import { format as dateFnsFormat, isDate, parse as dateFnsParse } from "date-fns";
+import { format as dateFnsFormat, parse as dateFnsParse, isDate } from "date-fns";
 import { DateRange } from "src/types";
 
 export type DateFieldModeTuple = readonly ["range", DateRange] | readonly ["single", Date];

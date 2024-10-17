@@ -104,7 +104,7 @@ export function TabsAsLinks() {
   return <TestComponent />;
 }
 // Use `/` as the root path in order to ensure the Tab's component provides a <Route /> wrapper for matching.
-TabsAsLinks.decorators = [withRouter("/ce:2", "/")];
+TabsAsLinks.decorators = [withRouter("/ce:2")];
 
 function TestComponent() {
   const location = useLocation();

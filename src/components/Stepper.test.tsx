@@ -2,7 +2,7 @@ import { Step, Stepper } from "src/components/Stepper";
 import { click, render } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";
 
-describe(Stepper, () => {
+describe("Stepper", () => {
   it("renders and invokes onChange", async () => {
     const onChange = jest.fn();
     // Given the stepper with 3 steps. The first disabled and complete, the second incomplete, and the third in error state.
