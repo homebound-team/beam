@@ -12,24 +12,8 @@ describe("useSuperDrawer", () => {
     expect(r.superDrawerContent).toBeTruthy();
   });
 
-  it("should not allow `detail` element to be added", async () => {
-    await expect(render(<TestDrawerContent openDrawerDetail />)).rejects.toThrow(
-      "openInDrawer was not called before openDrawerDetail",
-    );
-  });
-
-  it("should allow `detail` element to be added when as least one `new` element is present", async () => {
-    const r = await render(<TestDrawerContent openInDrawer openDrawerDetail />);
-    expect(r.superDrawerDetailContent).toBeTruthy();
-  });
-
-  it("should show `new` element after calling `closeDrawerDetail()`", async () => {
-    const r = await render(<TestDrawerContent openInDrawer openDrawerDetail closeDrawerDetail />);
-    expect(r.superDrawerContent).toBeTruthy();
-  });
-
   it("should reset state when calling `closeDrawer()`", async () => {
-    const r = await render(<TestDrawerContent openInDrawer openDrawerDetail closeDrawer />);
+    const r = await render(<TestDrawerContent openInDrawer closeDrawer />);
     expect(r.queryByTestId("superDrawer")).toBeFalsy();
   });
 
@@ -65,43 +49,6 @@ describe("useSuperDrawer", () => {
     expect(beamHook.drawerCanCloseChecks.current).toHaveLength(0);
   });
 
-  it("should add canCloseDrawerCheckDetail when SuperDrawer details is opened", () => {
-    const canCloseDrawerDetailCheck = jest.fn(() => true);
-
-    // Given the useSuperDrawer hook
-    const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
-    // And a opened SuperDrawer with a detail content
-    act(() => {
-      hook.openInDrawer({ content: "content" });
-      hook.openDrawerDetail({ content: "detail content" });
-    });
-
-    // When adding a canCloseDrawerDetailCheck
-    act(() => hook.addCanCloseDrawerDetailCheck(canCloseDrawerDetailCheck));
-
-    // Then expect the canCloseDrawerDetail check to be called when closing the drawer
-    act(() => {
-      hook.closeDrawer();
-    });
-    expect(canCloseDrawerDetailCheck).toHaveBeenCalledTimes(1);
-  });
-
-  it("should not add canCloseDrawerCheckDetail when SuperDrawer details is closed", () => {
-    // Given the useSuperDrawer and beamContent hook
-    const superDrawerHook = renderHook(useSuperDrawer, { wrapper }).result.current;
-    const beamHook = renderHook(() => useBeamContext(), { wrapper }).result.current;
-    // And a opened SuperDrawer with no detail content
-    act(() => {
-      superDrawerHook.openInDrawer({ content: "content" });
-    });
-
-    // When adding a canCloseDrawerDetailCheck
-    act(() => superDrawerHook.addCanCloseDrawerDetailCheck(() => true));
-
-    // Then expect the canCloseDrawerDetailChecks to be empty
-    expect(beamHook.drawerCanCloseDetailsChecks.current).toHaveLength(0);
-  });
-
   it("should show ConfirmCloseModal when a canCloseDrawerCheck fails", async () => {
     // Given a useSuperDrawer and BeamContext hook
     const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
@@ -113,22 +60,6 @@ describe("useSuperDrawer", () => {
 
     // Then expect the drawer to not close.
     expect(await act(() => hook.closeDrawer())).toBeFalsy();
-  });
-
-  it("should show ConfirmCloseModal when a canCloseDrawerDetailCheck fails", async () => {
-    // Given a useSuperDrawer and BeamContext hook
-    const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
-    // And a opened SuperDrawer
-    act(() => {
-      hook.openInDrawer({ content: "content" });
-      hook.openDrawerDetail({ content: "drawer detail" });
-    });
-
-    // When adding a failing canCloseDrawerCheck
-    act(() => hook.addCanCloseDrawerDetailCheck(() => false));
-
-    // Then expect the drawer to not close.
-    expect(hook.closeDrawer()).toBeFalsy();
   });
 
   it("calls onClose when closed", () => {
@@ -159,12 +90,7 @@ describe("useSuperDrawer", () => {
   });
 });
 
-function TestDrawerContent(props: {
-  openInDrawer?: boolean;
-  openDrawerDetail?: boolean;
-  closeDrawerDetail?: boolean;
-  closeDrawer?: boolean;
-}) {
+function TestDrawerContent(props: { openInDrawer?: boolean; closeDrawer?: boolean }) {
   const context = useSuperDrawer();
   useEffect(
     () => {
@@ -177,14 +103,6 @@ function TestDrawerContent(props: {
             </>
           ),
         });
-      }
-      if (props.openDrawerDetail) {
-        context.openDrawerDetail({
-          content: <h2 data-testid="superDrawerDetailContent">SuperDrawer Content</h2>,
-        });
-      }
-      if (props.closeDrawerDetail) {
-        context.closeDrawerDetail();
       }
       if (props.closeDrawer) {
         context.closeDrawer();

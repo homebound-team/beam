@@ -18,7 +18,6 @@ import { useModal } from "src/components/Modal/useModal";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { GridDataRow, GridRowLookup } from "src/components/Table";
 import { Css } from "src/Css";
-import { noop } from "src/utils";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 import { SuperDrawerContent, useSuperDrawer } from "./index";
 import { SuperDrawer as SuperDrawerComponent } from "./SuperDrawer";
@@ -108,49 +107,6 @@ export function CanCloseDrawerChecks() {
   return (
     <>
       <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open With CanClose Checks</h1>
-      <Button label="Show SuperDrawer" onClick={open} />
-    </>
-  );
-}
-
-export function OpenAtDetail() {
-  const { openInDrawer, openDrawerDetail } = useSuperDrawer();
-
-  function open() {
-    openInDrawer({ content: <TestDrawerContent book={Books[0]} title="Drawer Title" /> });
-    openDrawerDetail({ content: <TestDetailContent book={Books[0]} title="Drawer Title" /> });
-  }
-  useEffect(open, [openInDrawer, openDrawerDetail]);
-  return (
-    <>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open at Detail</h1>
-      <Button label="Show SuperDrawer" onClick={open} />
-    </>
-  );
-}
-
-/**
- * Example showing how to add a canClose check for SuperDrawer details. When
- * attempting to close the details page, this actions should trigger a fail
- * canClose check and when trying to close the SuperDrawer this will also
- * trigger a failing check.
- * */
-export function CanCloseDrawerDetailsChecks() {
-  const { openInDrawer, openDrawerDetail, addCanCloseDrawerCheck, addCanCloseDrawerDetailCheck } = useSuperDrawer();
-
-  function open() {
-    openInDrawer({ content: <TestDrawerContent book={Books[0]} title="Drawer Title" /> });
-    openDrawerDetail({ content: <TestDetailContent book={Books[0]} title="Drawer Title" /> });
-    // Add failing checks for both drawer and drawer details
-    addCanCloseDrawerCheck(() => false);
-    addCanCloseDrawerDetailCheck(() => false);
-  }
-
-  useEffect(open, [openInDrawer, openDrawerDetail, addCanCloseDrawerCheck, addCanCloseDrawerDetailCheck]);
-
-  return (
-    <>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open at Detail</h1>
       <Button label="Show SuperDrawer" onClick={open} />
     </>
   );
@@ -364,7 +320,7 @@ interface TestDrawerContentProps {
 /** Example component to render inside the SuperDrawer */
 function TestDrawerContent(props: TestDrawerContentProps) {
   const { book, hasActions = true, title, leftContent, rightContent, hideControls } = props;
-  const { openDrawerDetail, closeDrawer } = useSuperDrawer();
+  const { closeDrawer } = useSuperDrawer();
   const { openModal } = useModal();
 
   function handlePurchase() {
@@ -393,37 +349,7 @@ function TestDrawerContent(props: TestDrawerContentProps) {
           <p>
             <strong>Author:</strong> {book.authorName}
           </p>
-          <Button
-            variant="tertiary"
-            label={`Learn more about ${book.authorName.split(" ")[0]}`}
-            onClick={() =>
-              openDrawerDetail({
-                content: <TestDetailContent book={book} onPurchase={handlePurchase} title={title} />,
-              })
-            }
-          />
         </div>
-      </SuperDrawerContent>
-    </>
-  );
-}
-
-/** Example component to render inside the SuperDrawer */
-function TestDetailContent({ book, onPurchase, title }: { book: Book; onPurchase?: () => void; title: string }) {
-  const { closeDrawerDetail } = useSuperDrawer();
-  return (
-    <>
-      <SuperDrawerHeader title={title} />
-      <SuperDrawerContent
-        actions={[
-          { label: `Back to "${book.bookTitle}"`, onClick: closeDrawerDetail, variant: "tertiary" },
-          { label: `Purchase "${book.bookTitle}"`, onClick: onPurchase ?? noop, disabled: !onPurchase },
-        ]}
-      >
-        <h2 css={Css.xlSb.mb1.$}>{book.authorName}</h2>
-        <p css={Css.base.$}>
-          <strong>Description:</strong> {book.authorDescription}
-        </p>
       </SuperDrawerContent>
     </>
   );

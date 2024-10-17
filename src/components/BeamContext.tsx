@@ -25,8 +25,6 @@ export interface BeamContextState {
   drawerContentStack: MutableRefObject<readonly ContentStack[]>;
   /** Checks when closing SuperDrawer, for the main/non-detail drawer content. */
   drawerCanCloseChecks: MutableRefObject<CanCloseCheck[]>;
-  /** Checks when closing SuperDrawer Details, a double array to keep per-detail lists. */
-  drawerCanCloseDetailsChecks: MutableRefObject<CanCloseCheck[][]>;
   /** The div for SuperDrawerHeader to portal into. */
   sdHeaderDiv: HTMLDivElement;
 }
@@ -40,7 +38,6 @@ export const BeamContext = createContext<BeamContextState>({
   modalFooterDiv: undefined!,
   drawerContentStack: new EmptyRef(),
   drawerCanCloseChecks: new EmptyRef(),
-  drawerCanCloseDetailsChecks: new EmptyRef(),
   sdHeaderDiv: undefined!,
 });
 
@@ -64,7 +61,6 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
   const modalFooterDiv = useMemo(() => document.createElement("div"), []);
   const drawerContentStackRef = useRef<ContentStack[]>([]);
   const drawerCanCloseChecks = useRef<CanCloseCheck[]>([]);
-  const drawerCanCloseDetailsChecks = useRef<CanCloseCheck[][]>([]);
   const sdHeaderDiv = useMemo(() => document.createElement("div"), []);
 
   // We essentially expose the refs, but with our own getters/setters so that we can
@@ -80,7 +76,6 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
       modalBodyDiv,
       modalFooterDiv,
       drawerCanCloseChecks,
-      drawerCanCloseDetailsChecks,
       sdHeaderDiv,
     };
   }, [modalBodyDiv, modalFooterDiv, modalHeaderDiv, sdHeaderDiv]);
