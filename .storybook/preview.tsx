@@ -37,6 +37,7 @@ const preview: Preview = {
     },
     docs: { theme: beamTheme },
   },
+
   decorators: [
     (Story) => {
       return (
@@ -47,6 +48,8 @@ const preview: Preview = {
       );
     },
   ],
+
+  tags: ["autodocs"]
 };
 
 export default preview;
