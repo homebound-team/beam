@@ -1,0 +1,2 @@
+# Ignore diffs from yarn.lock
+yarn.lock -diff

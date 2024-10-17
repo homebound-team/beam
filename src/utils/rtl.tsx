@@ -64,7 +64,7 @@ export function render(
     wrappers = [
       ...otherWrappers,
       ...(!omitBeamContext ? [withBeamRTL] : []),
-      ...(at ? [_withRouter(at.url, at.route)] : [_withRouter()]),
+      ...(at ? [_withRouter(at.url)] : [_withRouter()]),
     ];
   } else {
     wrappers = [withBeamRTL];

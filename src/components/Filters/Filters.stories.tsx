@@ -126,7 +126,7 @@ function TestFilterPage({ vertical = false, numberOfInlineFilters = 4 }) {
       options: safeEntries(stages),
       label: "Stage",
       // Getting odd types back from safeEntries, can be a `number | [number | Stage] | () => some iterator... soo kind of hacky here.
-      getOptionValue: (o) => (typeof o === "object" ? o[1] : Stage.StageOne),
+      getOptionValue: (o) => (typeof o === "object" ? o[1] : Stage.StageOne) as any,
       getOptionLabel: (o) => (typeof o === "object" ? (o[1] === Stage.StageOne ? "One" : "Two") : Stage.StageOne),
     });
     const status = multiFilter({

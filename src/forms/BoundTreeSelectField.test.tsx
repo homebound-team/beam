@@ -6,7 +6,7 @@ import { NestedOption } from "src/inputs";
 import { HasIdAndName } from "src/types";
 import { blur, click, focus, render } from "src/utils/rtl";
 
-describe(BoundTreeSelectField, () => {
+describe("BoundTreeSelectField", () => {
   it("shows the current value and label", async () => {
     const author = createObjectState(formConfig, { favoriteGenres: ["g:4"] });
     const r = await render(<BoundTreeSelectField field={author.favoriteGenres} options={genres} />);

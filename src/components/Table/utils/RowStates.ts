@@ -93,7 +93,7 @@ export class RowStates<R extends Kinded> {
     this.header.children = [this.keptGroupRow, ...this.topRows];
 
     // Then mark any remaining as removed
-    for (const state of maybeKept) state.markRemoved();
+    for (const state of maybeKept) (state as any).markRemoved();
 
     // After the first load of real data, we detach collapse state, to respect
     // any incoming initCollapsed.
