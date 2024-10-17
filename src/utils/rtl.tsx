@@ -1,6 +1,5 @@
 import { newLocation as _newLocation, withRouter as _withRouter } from "@homebound/rtl-react-router-utils";
 import {
-  allowAndWaitForAsyncBehavior,
   blur as _blur,
   change as _change,
   click as _click,
@@ -8,12 +7,13 @@ import {
   focus as _focus,
   getOptions as _getOptions,
   input as _input,
-  render as rtlRender,
-  RenderResult,
   select as _select,
   type as _type,
   typeAndWait as _typeAndWait,
   wait as _wait,
+  allowAndWaitForAsyncBehavior,
+  RenderResult,
+  render as rtlRender,
   Wrapper,
 } from "@homebound/rtl-utils";
 import { prettyDOM } from "@testing-library/react";
@@ -26,14 +26,15 @@ export {
   _click as click,
   _clickAndWait as clickAndWait,
   _focus as focus,
-  _getOptions as rtlUtilGetOptions,
   _input as input,
+  _newLocation as newLocation,
+  _getOptions as rtlUtilGetOptions,
   _select as rtlUtilSelect,
   _type as type,
   _typeAndWait as typeAndWait,
   _wait as wait,
+  _withRouter as withRouter,
 };
-export { _newLocation as newLocation, _withRouter as withRouter };
 
 interface RenderOpts {
   at?: { url: string; route?: string };
