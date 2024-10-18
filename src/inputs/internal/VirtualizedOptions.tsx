@@ -56,6 +56,7 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
   return (
     <Virtuoso
       ref={virtuosoRef}
+      key={items.length}
       totalListHeightChanged={onListHeightChange}
       totalCount={items.length}
       {...(process.env.NODE_ENV === "test"
@@ -64,7 +65,6 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
             // otherwise render just 1 row. A better way to do this would be to jest.mock
             // out Virtuoso with an impl that just rendered everything, but doing this for now.
             initialItemCount: items.length,
-            key: items.length,
           }
         : {
             // Ensure the selected item is visible when the list renders
