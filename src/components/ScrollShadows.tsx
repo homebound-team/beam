@@ -1,5 +1,5 @@
 import { useResizeObserver } from "@react-aria/utils";
-import { ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import { ReactNode, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Css, Palette, Properties, useTestIds } from "src";
 
 interface ScrollShadowsProps {
@@ -62,6 +62,11 @@ export function ScrollShadows(props: ScrollShadowsProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const onResize = useCallback(() => scrollRef.current && updateScrollProps(scrollRef.current), []);
   useResizeObserver({ ref: scrollRef, onResize });
+
+  // Hack for sizing more complicated components that might not be fully drawn on initial paint (such as a GridTable)
+  useLayoutEffect(() => {
+    setTimeout(() => onResize(), 0);
+  }, [onResize]);
 
   return (
     <div
