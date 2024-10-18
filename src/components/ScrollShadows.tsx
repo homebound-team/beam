@@ -63,8 +63,12 @@ export function ScrollShadows(props: ScrollShadowsProps) {
   const onResize = useCallback(() => scrollRef.current && updateScrollProps(scrollRef.current), []);
   useResizeObserver({ ref: scrollRef, onResize });
 
-  // Hack for sizing more complicated components that might not be fully drawn on initial render (such as a GridTable)
-  useEffect(() => void onResize());
+  // Hack for sizing more complicated components that might not be fully drawn on initial paint (such as a GridTable)
+  useEffect(() => {
+    // This setTimeout (without a delay) allows the current execution thread to complete (DOM is painted with the latest render)
+    // by placing the callback into the async event queue to ensure the fully rendered DOM is used for the resize calculations.
+    setTimeout(() => onResize(), 0);
+  }, [onResize]);
 
   return (
     <div
