@@ -5,6 +5,7 @@ import { zeroTo } from "src/utils/sb";
 
 export default {
   component: ScrollShadows,
+  parameters: { delay: 1_000 },
 };
 
 export function Examples() {
