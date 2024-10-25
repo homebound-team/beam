@@ -6,13 +6,12 @@ import { withRouter, zeroTo } from "src/utils/sb";
 import { SelectField } from "../SelectField";
 
 export default {
-  component: GridTable,
   parameters: { layout: "fullscreen", backgrounds: { default: "white" } },
   decorators: [withRouter()],
 } as Meta;
 
 export function InVirtualizedTable() {
-  const [extraColumn, setExtraColumn] = useState(false);
+  const [extraColumn, setExtraColumn] = useState(true);
   const loadRows = useCallback((offset: number) => {
     return zeroTo(50).map((i) => ({
       kind: "data" as const,
@@ -66,6 +65,12 @@ export function InVirtualizedTable() {
     </div>
   );
 }
+
+InVirtualizedTable.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const button = canvasElement.querySelector("button");
+  // When we toggle the extra column, the table will re-render
+  button?.click();
+};
 
 type HeaderRow = { kind: "header"; data: undefined };
 type ChildRow = { kind: "data"; id: string; data: { name: string; value: number } };
