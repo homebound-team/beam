@@ -19,6 +19,7 @@ export interface TestModalContentProps {
   withDateField?: boolean;
   withTextArea?: boolean;
   withTextField?: boolean;
+  allowClosing?: boolean;
 }
 
 /** A fake modal content component that we share across the modal and superdrawer stories. */
@@ -89,7 +90,14 @@ export function TestModalContent(props: TestModalContentProps) {
         )}
         <div css={Css.df.gap1.$}>
           <Button label="Cancel" onClick={closeModal} variant="tertiary" />
-          <Button label="Apply" onClick={action("Primary action")} disabled={primaryDisabled} />
+          <Button
+            label="Apply"
+            onClick={() => {
+              action("Primary action");
+              !props?.allowClosing && closeModal();
+            }}
+            disabled={primaryDisabled}
+          />
         </div>
       </ModalFooter>
     </>
