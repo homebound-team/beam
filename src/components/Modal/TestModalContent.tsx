@@ -19,7 +19,7 @@ export interface TestModalContentProps {
   withDateField?: boolean;
   withTextArea?: boolean;
   withTextField?: boolean;
-  forceModalInteraction?: boolean;
+  allowClosing?: boolean;
 }
 
 /** A fake modal content component that we share across the modal and superdrawer stories. */
@@ -94,7 +94,7 @@ export function TestModalContent(props: TestModalContentProps) {
             label="Apply"
             onClick={() => {
               action("Primary action");
-              props?.forceModalInteraction && closeModal();
+              !props?.allowClosing && closeModal();
             }}
             disabled={primaryDisabled}
           />

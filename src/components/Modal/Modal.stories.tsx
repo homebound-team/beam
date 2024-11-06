@@ -28,7 +28,7 @@ export const Medium = () => <ModalExample />;
 export const Large = () => <ModalExample size="lg" />;
 export const LargeFixedHeight = () => <ModalExample size={{ width: "lg", height: 300 }} forceScrolling={true} />;
 export const WithScroll = () => <ModalExample initNumSentences={50} />;
-export const ForceModalInteraction = () => <ModalExample forceModalInteraction />;
+export const ForceModalInteraction = () => <ModalExample allowClosing={false} />;
 export const LeftAction = () => <ModalExample showLeftAction />;
 export const FilterableDynamicHeight = () => <ModalFilterTableExample />;
 export const FilterableStaticHeight = () => (
@@ -114,7 +114,7 @@ export function ModalForm() {
 }
 
 interface ModalExampleProps
-  extends Pick<ModalProps, "size" | "forceScrolling" | "drawHeaderBorder" | "forceModalInteraction">,
+  extends Pick<ModalProps, "size" | "forceScrolling" | "drawHeaderBorder" | "allowClosing">,
     TestModalContentProps {}
 
 function ModalExample(props: ModalExampleProps) {
@@ -126,7 +126,7 @@ function ModalExample(props: ModalExampleProps) {
     withTag,
     withDateField,
     drawHeaderBorder = false,
-    forceModalInteraction = false,
+    allowClosing = true,
   } = props;
   const { openModal } = useModal();
   const open = () =>
@@ -135,7 +135,7 @@ function ModalExample(props: ModalExampleProps) {
       forceScrolling,
       content: <TestModalContent {...props} />,
       drawHeaderBorder,
-      forceModalInteraction,
+      allowClosing,
     });
   // Immediately open the modal for Chromatic snapshots
   // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
