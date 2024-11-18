@@ -371,7 +371,7 @@ export class RowState<R extends Kinded> {
       const { visibleColumns, search } = this.states.table;
       return search.every((term) =>
         visibleColumns
-          .map((c) => applyRowFn(c, this.row, this.api, 0, false))
+          .map((c) => applyRowFn(c, this.row, this.api, 0, false, false))
           .some((maybeContent) => matchesFilter(maybeContent, term)),
       );
     } finally {
