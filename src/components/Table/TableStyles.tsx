@@ -42,6 +42,8 @@ export interface GridStyle {
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
   rowHoverColor?: Palette | "none";
+  /** Applied on hover to a cell TextFieldBase */
+  rowEditableCellBorderColor?: Palette;
   /** Applied on hover of a row */
   nonHeaderRowHoverCss?: Properties;
   /** Default content to put into an empty cell */

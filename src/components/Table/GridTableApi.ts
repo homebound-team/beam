@@ -227,7 +227,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
         .filter((c) => !c.isAction)
         .map((c) => {
           // Just guessing for level=1
-          const maybeContent = applyRowFn(c, rs.row, this as any as GridRowApi<R>, 1, true, undefined);
+          const maybeContent = applyRowFn(c, rs.row, this as any as GridRowApi<R>, 1, true, false, undefined);
           if (isGridCellContent(maybeContent)) {
             const cell = maybeContent;
             const content = maybeApply(cell.content);

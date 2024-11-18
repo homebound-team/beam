@@ -88,6 +88,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const sortOn = tableState.sortConfig?.on;
 
   const revealOnRowHoverClass = "revealOnRowHover";
+  const editableOnRowHoverClass = "editableOnRowHover";
 
   const showRowHoverColor = !reservedRowKinds.includes(row.kind) && !omitRowHover && style.rowHoverColor !== "none";
 
@@ -122,6 +123,11 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...{
       [` > .${revealOnRowHoverClass} > *`]: Css.vh.$,
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.vv.$,
+    },
+    ...{
+      [`:hover > .${editableOnRowHoverClass} .textFieldBaseWrapper`]: Css.px1.br4.ba.bc(
+        style.rowEditableCellBorderColor ?? Palette.Blue300,
+      ).$,
     },
     ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
   };
@@ -210,7 +216,19 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             onDragOver: onDragOverDebounced,
           };
 
-          const maybeContent = applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, dragData);
+          const cellId = `${row.kind}_${row.id}_${column.id}`;
+          const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
+          const isCellActive = tableState.activeCellId === cellId;
+
+          const maybeContent = applyRowFn(
+            column as GridColumnWithId<R>,
+            row,
+            rowApi,
+            level,
+            isExpanded,
+            isCellActive,
+            dragData,
+          );
 
           // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
           currentColspan =
@@ -220,6 +238,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                 ? numExpandedColumns + 1
                 : 1;
           const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
+          const editableOnRowHover = isGridCellContent(maybeContent) ? maybeContent.editableOnHover : false;
 
           const canSortColumn =
             (sortOn === "client" && column.clientSideSort !== false) ||
@@ -274,11 +293,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
           // This relies on our column sizes being defined in pixel values, which is currently true as we calculate to pixel values in the `useSetupColumnSizes` hook
           minStickyLeftOffset += maybeSticky === "left" ? parseInt(columnSizes[columnIndex].replace("px", ""), 10) : 0;
-
-          const cellId = `${row.kind}_${row.id}_${column.id}`;
-          const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
-          const isCellActive = tableState.activeCellId === cellId;
-
           // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
           // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
           // a few descendent selectors. However, that approach means the root grid-applied
@@ -334,8 +348,15 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             })`,
           };
 
-          const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
+          const cellClassNames = [
+            ...(revealOnRowHover ? [revealOnRowHoverClass] : []),
+            ...(editableOnRowHover && (isCellActive || !tableState.activeCellId) ? [editableOnRowHoverClass] : []),
+          ].join(" ");
 
+          const cellOnHover =
+            isGridCellContent(maybeContent) && maybeContent.editableOnHover
+              ? (enter: boolean) => (enter ? api.setActiveCellId(cellId) : api.setActiveCellId(undefined))
+              : undefined;
           const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
           const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
 
@@ -348,7 +369,17 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                   ? rowClickRenderFn(as, api, currentColspan)
                   : defaultRenderFn(as, currentColspan);
 
-          return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick, tooltip);
+          return renderFn(
+            columnIndex,
+            cellCss,
+            content,
+            row,
+            rowStyle,
+            cellClassNames,
+            cellOnClick,
+            cellOnHover,
+            tooltip,
+          );
         })
       )}
     </RowTag>

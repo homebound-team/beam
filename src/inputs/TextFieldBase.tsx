@@ -229,6 +229,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 ...(multiline ? Css.fdc.aifs.gap2.$ : Css.if(wrap === false).truncate.$),
                 ...xss,
               }}
+              className="textFieldBaseWrapper"
               data-readonly="true"
               {...tid}
             >
@@ -259,6 +260,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 ...(errorMsg && !inputProps.disabled ? fieldStyles.error : {}),
                 ...Css.if(multiline).aifs.oh.mhPx(textAreaMinHeight).$,
               }}
+              className="textFieldBaseWrapper"
               {...hoverProps}
               ref={inputWrapRef as any}
               onClick={unfocusedPlaceholder ? handleUnfocusedPlaceholderClick : undefined}

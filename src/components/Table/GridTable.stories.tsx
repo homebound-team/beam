@@ -32,8 +32,9 @@ import {
   useGridTableApi,
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
+import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
-import { SelectField } from "src/inputs";
+import { DateField, SelectField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
 import { noop } from "src/utils";
 import { newStory, withRouter, zeroTo } from "src/utils/sb";
@@ -2142,5 +2143,89 @@ export function MinColumnWidths() {
         ]}
       />
     </div>
+  );
+}
+
+enum EditableRowStatus {
+  Active = "Active",
+  Inactive = "Inactive",
+}
+
+type EditableRowData = {
+  kind: "data";
+  id: string;
+  data: { id: string; name: string; status: EditableRowStatus; value: number; date?: Date };
+};
+type EditableRow = EditableRowData | HeaderRow;
+
+export function EditableRows() {
+  const [rows, setRows] = useState<GridDataRow<EditableRow>[]>([
+    simpleHeader,
+    {
+      kind: "data" as const,
+      id: "1",
+      data: { id: "1", name: "Tony Stark", status: EditableRowStatus.Active, value: 1, date: jan1 },
+    },
+    {
+      kind: "data" as const,
+      id: "2",
+      data: { id: "2", name: "Natasha Romanova", status: EditableRowStatus.Active, value: 2, date: jan2 },
+    },
+    {
+      kind: "data" as const,
+      id: "3",
+      data: { id: "3", name: "Thor Odinson", status: EditableRowStatus.Active, value: 3, date: jan29 },
+    },
+  ]);
+
+  const nameColumn: GridColumn<EditableRow> = {
+    header: "Name",
+    data: ({ name }) => name,
+  };
+
+  const selectColumn: GridColumn<EditableRow> = {
+    header: "Status",
+    data: (row) => ({
+      content: (
+        <SelectField
+          label=""
+          options={Object.values(EditableRowStatus).map((status) => ({ label: status, code: status }))}
+          value={row.status}
+          onSelect={noop}
+        />
+      ),
+      editableOnHover: true,
+    }),
+    w: "100px",
+  };
+
+  const date1Column: GridColumn<EditableRow> = {
+    header: "Date",
+    data: (row, { editable }) => ({
+      content: (
+        <DateField label="" value={row.date} onChange={noop} readOnly={!editable} hideCalendarIcon format="medium" />
+      ),
+      editableOnHover: true,
+    }),
+    w: "120px",
+  };
+
+  const date2Column: GridColumn<EditableRow> = {
+    header: "Date",
+    data: (row, { editable }) => ({
+      content: (
+        <DateField label="" value={row.date} onChange={noop} readOnly={!editable} hideCalendarIcon format="medium" />
+      ),
+      editableOnHover: true,
+    }),
+    w: "120px",
+  };
+
+  return (
+    <GridTable
+      columns={[nameColumn, selectColumn, date1Column, date2Column]}
+      rows={rows}
+      style={{ bordered: true, allWhite: true, rowHoverColor: Palette.Blue50 }}
+    />
   );
 }

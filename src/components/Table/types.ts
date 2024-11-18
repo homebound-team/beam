@@ -39,11 +39,11 @@ export type GridColumn<R extends Kinded> = {
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (
             data: D,
-            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean },
+            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean; editable: boolean },
           ) => ReactNode | GridCellContent
         : (
             data: undefined,
-            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean },
+            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean; editable: boolean },
           ) => ReactNode | GridCellContent);
 } & {
   /**
@@ -85,6 +85,8 @@ export type GridColumn<R extends Kinded> = {
   initExpanded?: boolean;
   /** Determines whether this column should be hidden when expanded (only the 'expandColumns' would show) */
   hideOnExpand?: boolean;
+  /** Flag that changes the field behavior to be editable on hover */
+  editableOnHover?: boolean;
 };
 
 /**
