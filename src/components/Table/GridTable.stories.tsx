@@ -2178,6 +2178,14 @@ export function EditableRows() {
     },
   ]);
 
+  const handleCellChange = (rowId: string, field: keyof EditableRowData["data"], value: any) => {
+    setRows((rows) =>
+      rows.map((row) =>
+        row.kind === "data" && row.id === rowId ? { ...row, data: { ...row.data, [field]: value } } : row,
+      ),
+    );
+  };
+
   const nameColumn: GridColumn<EditableRow> = {
     header: "Name",
     data: ({ name }) => name,
@@ -2191,7 +2199,7 @@ export function EditableRows() {
           label=""
           options={Object.values(EditableRowStatus).map((status) => ({ label: status, code: status }))}
           value={row.status}
-          onSelect={noop}
+          onSelect={(status) => handleCellChange(row.id, "status", status)}
         />
       ),
       editableOnHover: true,
@@ -2203,7 +2211,14 @@ export function EditableRows() {
     header: "Date",
     data: (row, { editable }) => ({
       content: (
-        <DateField label="" value={row.date} onChange={noop} readOnly={!editable} hideCalendarIcon format="medium" />
+        <DateField
+          label=""
+          value={row.date}
+          onChange={(date) => handleCellChange(row.id, "date", date)}
+          readOnly={!editable}
+          hideCalendarIcon
+          format="medium"
+        />
       ),
       editableOnHover: true,
     }),
@@ -2214,7 +2229,14 @@ export function EditableRows() {
     header: "Date",
     data: (row, { editable }) => ({
       content: (
-        <DateField label="" value={row.date} onChange={noop} readOnly={!editable} hideCalendarIcon format="medium" />
+        <DateField
+          label=""
+          value={row.date}
+          onChange={(date) => handleCellChange(row.id, "date", date)}
+          readOnly={!editable}
+          hideCalendarIcon
+          format="medium"
+        />
       ),
       editableOnHover: true,
     }),
