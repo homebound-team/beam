@@ -125,7 +125,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.vv.$,
     },
     ...{
-      [`.textFieldBaseWrapper`]: Css.px1.br4.mlPx(-8).ba.bcTransparent.$,
+      [`.textFieldBaseWrapper`]: Css.pl1.mlPx(-8).br4.ba.bcTransparent.$,
       [`:hover > .${editableOnRowHoverClass} .textFieldBaseWrapper`]: Css.ba.bc(
         style.rowEditableCellBorderColor ?? Palette.Blue300,
       ).$,
@@ -221,15 +221,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
           const isCellActive = tableState.activeCellId === cellId;
 
-          const maybeContent = applyRowFn(
-            column as GridColumnWithId<R>,
-            row,
-            rowApi,
-            level,
-            isExpanded,
-            isCellActive,
-            dragData,
-          );
+          const maybeContent = applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, dragData);
 
           // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
           currentColspan =

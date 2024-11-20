@@ -2209,13 +2209,12 @@ export function EditableRows() {
 
   const date1Column: GridColumn<EditableRow> = {
     header: "Date",
-    data: (row, { editable }) => ({
+    data: (row) => ({
       content: (
         <DateField
           label=""
           value={row.date}
           onChange={(date) => handleCellChange(row.id, "date", date)}
-          readOnly={!editable}
           hideCalendarIcon
           format="medium"
         />
@@ -2227,13 +2226,12 @@ export function EditableRows() {
 
   const date2Column: GridColumn<EditableRow> = {
     header: "Date",
-    data: (row, { editable }) => ({
+    data: (row) => ({
       content: (
         <DateField
           label=""
           value={row.date}
           onChange={(date) => handleCellChange(row.id, "date", date)}
-          readOnly={!editable}
           hideCalendarIcon
           format="medium"
         />

@@ -146,7 +146,6 @@ export function applyRowFn<R extends Kinded>(
   api: GridRowApi<R>,
   level: number,
   expanded: boolean,
-  editable: boolean,
   dragData?: DragData<R>,
 ): ReactNode | GridCellContent {
   // Usually this is a function to apply against the row, but sometimes it's a hard-coded value, i.e. for headers
@@ -158,7 +157,6 @@ export function applyRowFn<R extends Kinded>(
       api,
       level,
       expanded,
-      editable,
       dragData,
     });
   } else {
