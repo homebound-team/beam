@@ -125,8 +125,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.vv.$,
     },
     ...{
-      [`.textFieldBaseWrapper`]: Css.pl1.mlPx(-8).br4.ba.bcTransparent.bgTransparent.$,
-      [`.textFieldBaseWrapper > *`]: Css.bgTransparent.$,
+      [`.${editableOnRowHoverClass} .textFieldBaseWrapper`]: Css.pl1.mlPx(-8).br4.ba.bcTransparent.bgTransparent.$,
+      [`.${editableOnRowHoverClass} .textFieldBaseWrapper > *`]: Css.bgTransparent.$,
       [`.${editableOnRowHoverClass}:hover .textFieldBaseWrapper`]: Css.bgBlue100.$,
       [`:hover:not(:has(.${editableOnRowHoverClass}:hover)) > .${editableOnRowHoverClass} .textFieldBaseWrapper, .${editableOnRowHoverClass}:hover .textFieldBaseWrapper`]:
         Css.ba.bc(style.rowEditableCellBorderColor ?? Palette.Blue300).$,
