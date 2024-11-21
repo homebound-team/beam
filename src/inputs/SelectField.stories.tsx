@@ -350,6 +350,7 @@ const columns: GridColumn<Row>[] = [
         value={data.user.id}
         onSelect={noop}
         options={people}
+        multiline
       />
     ),
   },
