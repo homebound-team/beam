@@ -15,6 +15,7 @@ import {
   defaultStyle,
   dragHandleColumn,
   emptyCell,
+  getTableStyles,
   GridCellAlignment,
   GridColumn,
   GridDataRow,
@@ -2204,7 +2205,7 @@ export function EditableRows() {
       ),
       editableOnHover: true,
     }),
-    w: "100px",
+    w: "120px",
   };
 
   const date1Column: GridColumn<EditableRow> = {
@@ -2241,11 +2242,17 @@ export function EditableRows() {
     w: "120px",
   };
 
+  const style = getTableStyles({ bordered: true, allWhite: true });
+
   return (
     <GridTable
       columns={[nameColumn, selectColumn, date1Column, date2Column]}
       rows={rows}
-      style={{ bordered: true, allWhite: true, rowHoverColor: Palette.Blue50 }}
+      style={{
+        ...style,
+        rowHoverColor: Palette.Blue50,
+        rowEditableCellBorderColor: Palette.Blue300,
+      }}
     />
   );
 }

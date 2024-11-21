@@ -47,14 +47,12 @@ export type RenderCellFn<R extends Kinded> = (
   rowStyle: RowStyle<R> | undefined,
   classNames: string | undefined,
   onClick: VoidFunction | undefined,
-  onHover: ((enter: boolean) => void) | undefined,
   tooltip: ReactNode | undefined,
 ) => ReactNode;
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
 export const defaultRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<any> =
-  (as: RenderAs, colSpan) =>
-  (key, css, content, row, rowStyle, classNames: string | undefined, onClick, onHover, tooltip) => {
+  (as: RenderAs, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
     const Cell = as === "table" ? "td" : "div";
     return (
       <Cell
@@ -62,8 +60,6 @@ export const defaultRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<an
         css={{ ...css, ...Css.cursor("default").$ }}
         className={classNames}
         onClick={onClick}
-        onMouseEnter={() => onHover?.(true)}
-        onMouseLeave={() => onHover?.(false)}
         {...(as === "table" && { colSpan })}
       >
         {content}
