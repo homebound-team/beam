@@ -64,8 +64,8 @@ export function Option<O>(props: OptionProps<O>) {
                     ? Palette.Gray400
                     : Palette.Blue700
                   : isDisabled
-                  ? Palette.Gray500
-                  : Palette.White
+                    ? Palette.Gray500
+                    : Palette.White
               }
             />
           </span>

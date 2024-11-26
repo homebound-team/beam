@@ -1,11 +1,11 @@
+import { Icon } from "src";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
 import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
 import { DragData, emptyCell } from "src/components/Table/utils/utils";
-import { isFunction, newMethodMissingProxy } from "src/utils";
-import { Icon } from "src";
 import { Css } from "src/Css";
+import { isFunction, newMethodMissingProxy } from "src/utils";
 
 /** Provides default styling for a GridColumn representing a Date. */
 export function column<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
@@ -272,8 +272,8 @@ function parseFr(w: string | number | undefined): number | undefined {
   return typeof w === "number"
     ? w
     : typeof w === "undefined"
-    ? 1
-    : typeof w === "string" && w.endsWith("fr")
-    ? Number(w.replace("fr", ""))
-    : undefined;
+      ? 1
+      : typeof w === "string" && w.endsWith("fr")
+        ? Number(w.replace("fr", ""))
+        : undefined;
 }

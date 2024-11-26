@@ -7,9 +7,9 @@ import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
+import { useBreakpoint } from "src/hooks";
 import { useTestIds } from "src/utils";
 import { ModalProvider } from "./ModalContext";
-import { useBreakpoint } from "src/hooks";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl" | "xxl";
 
@@ -31,6 +31,14 @@ export interface ModalProps {
   api?: MutableRefObject<ModalApi | undefined>;
   /** Adds a border for the header. */
   drawHeaderBorder?: boolean;
+  /**
+   * Defaults to `true`
+   * Renders `x` icon and closes modal when users click outside of it.
+   *
+   * When false, relies on you to provide a way to close the modal, i.e. a cancel or confirm button.
+   * Useful if you definitely need to force the user to make a choice.
+   * */
+  allowClosing?: boolean;
 }
 
 export type ModalApi = {
@@ -43,7 +51,7 @@ export type ModalApi = {
  * Provides underlay, modal container, and header. Will disable scrolling of page under the modal.
  */
 export function Modal(props: ModalProps) {
-  const { size = "md", content, forceScrolling, api, drawHeaderBorder = false } = props;
+  const { size = "md", content, forceScrolling, api, drawHeaderBorder = false, allowClosing = true } = props;
   const isFixedHeight = typeof size !== "string";
   const ref = useRef(null);
   const { modalBodyDiv, modalFooterDiv, modalHeaderDiv } = useBeamContext();
@@ -56,7 +64,10 @@ export function Modal(props: ModalProps) {
       isDismissable: true,
       shouldCloseOnInteractOutside: (el) => {
         // Do not close the Modal if the user is interacting with the Tribute mentions dropdown (via RichTextField) or with another 3rd party dialog (such as a lightbox) on top of it.
-        return !(el.closest(".tribute-container") || el.closest("[role='dialog']") || el.closest("[role='alert']"));
+        return (
+          allowClosing &&
+          !(el.closest(".tribute-container") || el.closest("[role='dialog']") || el.closest("[role='alert']"))
+        );
       },
     },
     ref,
@@ -138,7 +149,7 @@ export function Modal(props: ModalProps) {
                 */}
                 <header css={Css.df.fdrr.p3.fs0.if(drawHeaderBorder).bb.bcGray200.$}>
                   <span css={Css.fs0.pl1.$}>
-                    <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />
+                    {allowClosing && <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />}
                   </span>
                   <h1 css={Css.fg1.xl2Sb.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
                 </header>

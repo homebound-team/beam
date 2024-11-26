@@ -13,8 +13,8 @@ export function defaultOptionLabel<O>(opt: O): any {
   return "name" in opt
     ? opt.name
     : "displayName" in opt
-    ? opt.displayName
-    : "label" in opt
-    ? opt.label
-    : fail(`Option ${JSON.stringify(opt)} has no displayName, label, or name`);
+      ? opt.displayName
+      : "label" in opt
+        ? opt.label
+        : fail(`Option ${JSON.stringify(opt)} has no displayName, label, or name`);
 }

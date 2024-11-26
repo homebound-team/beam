@@ -3,10 +3,11 @@ import { ToastNoticeProps, useToastContext } from "./ToastContext";
 
 export interface UseToastProps {
   showToast: (props: ToastNoticeProps) => void;
+  clear: () => void;
 }
 export function useToast(): UseToastProps {
-  const { setNotice } = useToastContext();
+  const { setNotice, clear } = useToastContext();
   const showToast = useCallback((props: ToastNoticeProps) => setNotice(props), [setNotice]);
 
-  return { showToast };
+  return { showToast, clear };
 }

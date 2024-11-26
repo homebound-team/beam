@@ -1,6 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta, StoryFn } from "@storybook/react";
-import { within } from "@storybook/testing-library";
+import { within } from "@storybook/test";
 import { useState } from "react";
 import { useFilter } from "react-aria";
 import { Css } from "src/Css";

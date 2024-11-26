@@ -1,11 +1,11 @@
-import { DecoratorFn } from "@storybook/react";
+import { Decorator } from "@storybook/react";
 import { ReactNode } from "react";
 import { BeamProvider } from "src/components";
 import { Css, Properties } from "src/Css";
 import { withRouter as rtlWithRouter } from "src/utils/rtl";
 
-export function withRouter(url?: string, path?: string): DecoratorFn {
-  return (Story: () => JSX.Element) => rtlWithRouter(url, path).wrap(<Story />);
+export function withRouter(url?: string): Decorator {
+  return (Story: () => JSX.Element) => rtlWithRouter(url).wrap(<Story />);
 }
 
 /* Models our currently used parameters. */
@@ -16,7 +16,7 @@ export function newStory(
   storyFn: Function,
   opts: {
     parameters?: StoryParameters;
-    decorators?: DecoratorFn[];
+    decorators?: Decorator[];
   },
 ): Function {
   Object.assign(storyFn, opts);

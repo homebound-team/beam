@@ -1,39 +1,35 @@
-import { newLocation as _newLocation, withRouter as _withRouter } from "@homebound/rtl-react-router-utils";
+import { withRouter as _withRouter } from "@homebound/rtl-react-router-utils";
 import {
-  allowAndWaitForAsyncBehavior,
   blur as _blur,
   change as _change,
   click as _click,
   clickAndWait as _clickAndWait,
   focus as _focus,
-  getOptions as _getOptions,
   input as _input,
-  render as rtlRender,
-  RenderResult,
-  select as _select,
   type as _type,
   typeAndWait as _typeAndWait,
   wait as _wait,
+  allowAndWaitForAsyncBehavior,
+  RenderResult,
+  render as rtlRender,
   Wrapper,
 } from "@homebound/rtl-utils";
 import { prettyDOM } from "@testing-library/react";
-import { fail } from "mobx-utils";
 import { ReactElement } from "react";
 import { BeamProvider } from "src/components";
+import { fail } from "src/utils/index";
 export {
   _blur as blur,
   _change as change,
   _click as click,
   _clickAndWait as clickAndWait,
   _focus as focus,
-  _getOptions as rtlUtilGetOptions,
   _input as input,
-  _select as rtlUtilSelect,
   _type as type,
   _typeAndWait as typeAndWait,
   _wait as wait,
+  _withRouter as withRouter,
 };
-export { _newLocation as newLocation, _withRouter as withRouter };
 
 interface RenderOpts {
   at?: { url: string; route?: string };
@@ -64,7 +60,7 @@ export function render(
     wrappers = [
       ...otherWrappers,
       ...(!omitBeamContext ? [withBeamRTL] : []),
-      ...(at ? [_withRouter(at.url, at.route)] : [_withRouter()]),
+      ...(at ? [_withRouter(at.url)] : [_withRouter()]),
     ];
   } else {
     wrappers = [withBeamRTL];
@@ -276,7 +272,10 @@ export function getOptions(select: HTMLElement): string[] {
 }
 
 function findListBox(select: HTMLElement): HTMLElement {
-  const listboxId = select.getAttribute("aria-controls") || fail("aria-controls attribute not found");
+  if (select.tagName === "DIV") fail("SelectField is readOnly");
+  const listboxId =
+    select.getAttribute("aria-controls") ||
+    fail("aria-controls attribute not found, the SelectField is probably readOnly");
   return document.getElementById(listboxId) || fail("listbox not found");
 }
 

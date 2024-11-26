@@ -33,10 +33,10 @@ export function ButtonModal(props: ButtonModalProps) {
     isTextButton(trigger)
       ? labelOr(trigger, "buttonModal")
       : isNavLinkButton(trigger)
-      ? defaultTestId(trigger.navLabel)
-      : isIconButton(trigger)
-      ? trigger.icon
-      : trigger.name,
+        ? defaultTestId(trigger.navLabel)
+        : isIconButton(trigger)
+          ? trigger.icon
+          : trigger.name,
   );
 
   return (

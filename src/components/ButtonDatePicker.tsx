@@ -30,10 +30,10 @@ export function ButtonDatePicker(props: ButtonDatePickerProps) {
     isTextButton(trigger)
       ? defaultTestId(labelOr(trigger, "buttonDatePicker"))
       : isNavLinkButton(trigger)
-      ? defaultTestId(trigger.navLabel)
-      : isIconButton(trigger)
-      ? trigger.icon
-      : trigger.name,
+        ? defaultTestId(trigger.navLabel)
+        : isIconButton(trigger)
+          ? trigger.icon
+          : trigger.name,
   );
 
   return (

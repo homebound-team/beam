@@ -464,10 +464,10 @@ function beamNestedRows(levels: 1 | 2 | 3 | 4 = 1): GridDataRow<BeamNestedRow>[]
     ...(levels === 4
       ? greatGrandParents
       : levels === 3
-      ? grandParents
-      : levels === 2
-      ? grandParents.flatMap((gp) => gp.children!)
-      : grandParents.flatMap((gp) => gp.children!.flatMap((p) => p.children!))),
+        ? grandParents
+        : levels === 2
+          ? grandParents.flatMap((gp) => gp.children!)
+          : grandParents.flatMap((gp) => gp.children!.flatMap((p) => p.children!))),
   ];
 }
 

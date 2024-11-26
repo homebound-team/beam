@@ -42,6 +42,9 @@ export function useGrowingTextField({ inputRef, inputWrapRef, value, disabled }:
         return;
       }
       onHeightChange();
+      // This is a hack to re-measure the height of the textarea after all the content has been rendered (i.e. after multiple GridTable children have been rendered)
+      // See the InVirtualizedTable storybook for reproducing this behavior
+      setTimeout(() => onHeightChange(), 200);
     }
   }, [onHeightChange, value, inputRef, disabled, inputWrapRef]);
 }

@@ -39,7 +39,7 @@ describe("useSuperDrawer", () => {
     const canCloseDrawerCheck = jest.fn(() => true);
 
     // Given the useSuperDrawer hook
-    const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
+    const hook = renderHook(useSuperDrawer, { wrapper: wrapper as any }).result.current;
     // And a opened SuperDrawer
     act(() => hook.openInDrawer({ content: "content" }));
 
@@ -55,8 +55,8 @@ describe("useSuperDrawer", () => {
 
   it("should not add canCloseDrawerCheck when SuperDrawer is closed", () => {
     // Given the useSuperDrawer hook
-    const superDrawerHook = renderHook(useSuperDrawer, { wrapper }).result.current;
-    const beamHook = renderHook(() => useBeamContext(), { wrapper }).result.current;
+    const superDrawerHook = renderHook(useSuperDrawer, { wrapper: wrapper as any }).result.current;
+    const beamHook = renderHook(() => useBeamContext(), { wrapper: wrapper as any }).result.current;
 
     // When adding a canCloseDrawerCheck
     act(() => superDrawerHook.addCanCloseDrawerCheck(() => true));
@@ -69,7 +69,7 @@ describe("useSuperDrawer", () => {
     const canCloseDrawerDetailCheck = jest.fn(() => true);
 
     // Given the useSuperDrawer hook
-    const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
+    const hook = renderHook(useSuperDrawer, { wrapper: wrapper as any }).result.current;
     // And a opened SuperDrawer with a detail content
     act(() => {
       hook.openInDrawer({ content: "content" });
@@ -88,8 +88,8 @@ describe("useSuperDrawer", () => {
 
   it("should not add canCloseDrawerCheckDetail when SuperDrawer details is closed", () => {
     // Given the useSuperDrawer and beamContent hook
-    const superDrawerHook = renderHook(useSuperDrawer, { wrapper }).result.current;
-    const beamHook = renderHook(() => useBeamContext(), { wrapper }).result.current;
+    const superDrawerHook = renderHook(useSuperDrawer, { wrapper: wrapper as any }).result.current;
+    const beamHook = renderHook(() => useBeamContext(), { wrapper: wrapper as any }).result.current;
     // And a opened SuperDrawer with no detail content
     act(() => {
       superDrawerHook.openInDrawer({ content: "content" });
@@ -104,7 +104,7 @@ describe("useSuperDrawer", () => {
 
   it("should show ConfirmCloseModal when a canCloseDrawerCheck fails", async () => {
     // Given a useSuperDrawer and BeamContext hook
-    const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
+    const hook = renderHook(useSuperDrawer, { wrapper: wrapper as any }).result.current;
     // And a opened SuperDrawer
     act(() => hook.openInDrawer({ content: "content" }));
 
@@ -117,7 +117,7 @@ describe("useSuperDrawer", () => {
 
   it("should show ConfirmCloseModal when a canCloseDrawerDetailCheck fails", async () => {
     // Given a useSuperDrawer and BeamContext hook
-    const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
+    const hook = renderHook(useSuperDrawer, { wrapper: wrapper as any }).result.current;
     // And a opened SuperDrawer
     act(() => {
       hook.openInDrawer({ content: "content" });
@@ -135,7 +135,7 @@ describe("useSuperDrawer", () => {
     const onClose = jest.fn();
 
     // Given the useSuperDrawer hook
-    const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
+    const hook = renderHook(useSuperDrawer, { wrapper: wrapper as any }).result.current;
 
     // When the drawer is opened and closed
     act(() => hook.openInDrawer({ content: "content", onClose }));
@@ -149,7 +149,7 @@ describe("useSuperDrawer", () => {
 
   it("should not throw when attempting to closeDrawer with an empty content stack", () => {
     // Given a useSuperDrawer and BeamContext hook
-    const hook = renderHook(useSuperDrawer, { wrapper }).result.current;
+    const hook = renderHook(useSuperDrawer, { wrapper: wrapper as any }).result.current;
     // And a closed SuperDrawer
     // When we call onClose
     // Then we do not expect to have an error thrown

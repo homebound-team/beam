@@ -33,7 +33,7 @@ export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFi
   const [{ filter: queryParamsFilter }, setQueryParams] = useQueryParams({ filter: JsonParam });
   const [storedFilter, setStoredFilter] = useSessionStorage<F>(storageKey, queryParamsFilter ?? defaultFilter);
   const isQueryParamFilterValid = hasValidFilterKeys(queryParamsFilter, filterKeys);
-  const filter: F = isQueryParamFilterValid ? queryParamsFilter : storedFilter ?? defaultFilter;
+  const filter: F = isQueryParamFilterValid ? queryParamsFilter : (storedFilter ?? defaultFilter);
 
   const setFilter = (filter: F) => setQueryParams({ filter });
 

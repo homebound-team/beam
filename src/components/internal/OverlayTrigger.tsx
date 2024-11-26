@@ -14,7 +14,7 @@ import { noop, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 interface TextButtonTriggerProps extends Pick<ButtonProps, "label" | "variant" | "size" | "icon"> {}
-interface IconButtonTriggerProps extends Pick<IconButtonProps, "icon" | "color" | "compact" | "contrast"> {}
+interface IconButtonTriggerProps extends Pick<IconButtonProps, "icon" | "color" | "compact" | "contrast" | "inc"> {}
 interface AvatarButtonTriggerProps extends Pick<AvatarButtonProps, "src" | "name" | "size"> {}
 interface NavLinkButtonTriggerProps extends Pick<NavLinkProps, "active" | "variant" | "icon"> {
   navLabel: string;
@@ -73,10 +73,10 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     isTextButton(trigger)
       ? defaultTestId(labelOr(trigger, "overlayTrigger"))
       : isNavLinkButton(trigger)
-      ? defaultTestId(trigger.navLabel)
-      : isIconButton(trigger)
-      ? trigger.icon
-      : trigger.name,
+        ? defaultTestId(trigger.navLabel)
+        : isIconButton(trigger)
+          ? trigger.icon
+          : trigger.name,
   );
 
   return (

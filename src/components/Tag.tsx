@@ -1,8 +1,8 @@
+import { useResizeObserver } from "@react-aria/utils";
+import { ReactNode, useRef, useState } from "react";
 import { Icon, IconKey, maybeTooltip } from "src/components";
 import { Css, Margin, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
-import { ReactNode, useRef, useState } from "react";
-import { useResizeObserver } from "@react-aria/utils";
 
 type TagXss = Margin | "backgroundColor" | "color";
 export type TagType = "info" | "caution" | "warning" | "success" | "neutral";

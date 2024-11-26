@@ -1,6 +1,6 @@
-import { ObjectConfig, ObjectState, createObjectState, required } from "@homebound/form-state";
-import { BoundIconCardField } from "./BoundIconCardField";
+import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { click, render } from "src/utils/rtl";
+import { BoundIconCardField } from "./BoundIconCardField";
 import { AuthorInput } from "./formStateDomain";
 
 const formConfig: ObjectConfig<AuthorInput> = {

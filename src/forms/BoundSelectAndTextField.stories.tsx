@@ -10,7 +10,7 @@ export default {
 } as Meta;
 
 export function Example() {
-  const formState = useFormState({ config, init: { type: ScheduleTypes.Task } });
+  const formState = useFormState({ config, init: { input: { type: ScheduleTypes.Task } } });
   const types = [
     { id: ScheduleTypes.Task, name: "Task" },
     { id: ScheduleTypes.Milestone, name: "Milestone" },

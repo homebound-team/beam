@@ -12,12 +12,12 @@ import { ComboBoxState } from "react-stately";
 import { Chips, Icon, Tooltip } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
+import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
 import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
 import { Value } from "src/inputs/Value";
 import { maybeCall } from "src/utils";
-import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 
 interface ComboBoxInputProps<O, V extends Value> extends PresentationFieldProps {
   buttonProps: any;
