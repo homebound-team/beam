@@ -34,8 +34,6 @@ export type GridCellContent = {
   revealOnRowHover?: true;
   /** Tooltip to add to a cell */
   tooltip?: ReactNode;
-  /** Allows cell to be editable when hovering, and also highlights the field on hover */
-  editableOnHover?: true;
 };
 
 /** Allows rendering a specific cell. */

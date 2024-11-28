@@ -85,8 +85,6 @@ export type GridColumn<R extends Kinded> = {
   initExpanded?: boolean;
   /** Determines whether this column should be hidden when expanded (only the 'expandColumns' would show) */
   hideOnExpand?: boolean;
-  /** Flag that changes the field behavior to be editable on hover */
-  editableOnHover?: boolean;
 };
 
 /**

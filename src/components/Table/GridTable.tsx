@@ -471,6 +471,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   const borderless = style?.presentationSettings?.borderless;
   const typeScale = style?.presentationSettings?.typeScale;
+  const borderOnHover = style?.presentationSettings?.borderOnHover;
   const fieldProps: PresentationFieldProps = useMemo(
     () => ({
       labelStyle: "hidden",
@@ -480,8 +481,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       // Avoid passing `undefined` as it will unset existing PresentationContext settings
       ...(borderless !== undefined ? { borderless } : {}),
       ...(typeScale !== undefined ? { typeScale } : {}),
+      ...(borderOnHover !== undefined ? { borderOnHover } : {}),
     }),
-    [borderless, typeScale],
+    [borderOnHover, borderless, typeScale],
   );
 
   // If we're running in Jest, force using `as=div` b/c jsdom doesn't support react-virtuoso.

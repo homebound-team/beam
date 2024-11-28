@@ -2203,7 +2203,6 @@ export function EditableRows() {
           onSelect={(status) => handleCellChange(row.id, "status", status)}
         />
       ),
-      editableOnHover: true,
     }),
     w: "120px",
   };
@@ -2220,7 +2219,6 @@ export function EditableRows() {
           format="medium"
         />
       ),
-      editableOnHover: true,
     }),
     w: "120px",
   };
@@ -2237,22 +2235,23 @@ export function EditableRows() {
           format="medium"
         />
       ),
-      editableOnHover: true,
     }),
     w: "120px",
   };
 
-  const style = getTableStyles({ bordered: true, allWhite: true });
+  const style = getTableStyles({ bordered: true, allWhite: true, highlightOnHover: true });
 
   return (
-    <GridTable
-      columns={[nameColumn, selectColumn, date1Column, date2Column]}
-      rows={rows}
-      style={{
-        ...style,
-        rowHoverColor: Palette.Blue50,
-        rowEditableCellBorderColor: Palette.Blue300,
-      }}
-    />
+    <div css={Css.m2.$}>
+      <GridTable
+        columns={[nameColumn, selectColumn, date1Column, date2Column]}
+        rows={rows}
+        style={{
+          ...style,
+          rowHoverColor: Palette.Blue50,
+          rowEditableCellBorderColor: Palette.Blue300,
+        }}
+      />
+    </div>
   );
 }

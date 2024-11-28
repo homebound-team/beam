@@ -125,10 +125,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.vv.$,
     },
     ...{
-      [`.${editableOnRowHoverClass} .textFieldBaseWrapper`]: Css.pl1.mlPx(-8).br4.ba.bcTransparent.bgTransparent.$,
-      [`.${editableOnRowHoverClass} .textFieldBaseWrapper > *`]: Css.bgTransparent.$,
       [`.${editableOnRowHoverClass}:hover .textFieldBaseWrapper`]: Css.bgBlue100.$,
-      [`:hover:not(:has(.${editableOnRowHoverClass}:hover)) > .${editableOnRowHoverClass} .textFieldBaseWrapper, .${editableOnRowHoverClass}:hover .textFieldBaseWrapper`]:
+      [`:hover:not(:has(.textFieldBaseWrapper:hover)) > .${editableOnRowHoverClass} .textFieldBaseWrapper, .${editableOnRowHoverClass}:hover .textFieldBaseWrapper`]:
         Css.ba.bc(style.rowEditableCellBorderColor ?? Palette.Blue300).$,
     },
     ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
@@ -232,7 +230,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                 ? numExpandedColumns + 1
                 : 1;
           const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
-          const editableOnRowHover = isGridCellContent(maybeContent) && !!maybeContent.editableOnHover;
+          const borderOnHover = style.presentationSettings?.borderOnHover ?? false;
 
           const canSortColumn =
             (sortOn === "client" && column.clientSideSort !== false) ||
@@ -335,8 +333,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply cell highlight styles to active cell and hover
             ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
-            ...Css.if(editableOnRowHover && isCellActive).addIn("& .textFieldBaseWrapper", Css.bgBlue50.ba.bcBlue500.$)
-              .$,
+            // Apply cell hover styles when the row is hovered
+            ...Css.if(borderOnHover && isCellActive).addIn("& .textFieldBaseWrapper", Css.bgBlue50.ba.bcBlue500.$).$,
             // Define the width of the column on each cell. Supports col spans.
             // If we have a 'levelIndent' defined, then subtract that amount from the first content column's width to ensure all columns will still line up properly
             width: `calc(${columnSizes.slice(columnIndex, columnIndex + currentColspan).join(" + ")}${
@@ -346,10 +344,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
           const cellClassNames = [
             ...(revealOnRowHover ? [revealOnRowHoverClass] : []),
-            ...(editableOnRowHover ? [editableOnRowHoverClass] : []),
+            ...(borderOnHover ? [editableOnRowHoverClass] : []),
           ].join(" ");
 
-          const cellOnClick = applyCellHighlight || editableOnRowHover ? () => api.setActiveCellId(cellId) : undefined;
+          const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
           const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
 
           const renderFn: RenderCellFn<any> =
