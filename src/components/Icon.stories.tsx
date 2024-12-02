@@ -29,6 +29,7 @@ export const Icon = (props: IconProps) => {
     "check",
     "search",
     "comment",
+    "commentFilled",
     "plus",
     "minus",
     "pencil",
