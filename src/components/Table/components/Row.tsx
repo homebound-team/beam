@@ -88,7 +88,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const sortOn = tableState.sortConfig?.on;
 
   const revealOnRowHoverClass = "revealOnRowHover";
-  const editableOnRowHoverClass = "editableOnRowHover";
 
   const showRowHoverColor = !reservedRowKinds.includes(row.kind) && !omitRowHover && style.rowHoverColor !== "none";
 
@@ -124,11 +123,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [` > .${revealOnRowHoverClass} > *`]: Css.vh.$,
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.vv.$,
     },
-    ...{
-      [`.${editableOnRowHoverClass}:hover .textFieldBaseWrapper`]: Css.bgBlue100.$,
-      [`:hover:not(:has(.textFieldBaseWrapper:hover)) > .${editableOnRowHoverClass} .textFieldBaseWrapper, .${editableOnRowHoverClass}:hover .textFieldBaseWrapper`]:
-        Css.ba.bc(style.rowEditableCellBorderColor ?? Palette.Blue300).$,
-    },
     ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
   };
 
@@ -151,7 +145,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const onDragOverDebounced = useDebouncedCallback(dragOverCallback, 100);
 
   const RowContent = () => (
-    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)} ref={ref}>
+    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)} ref={ref} className={ROW_CSS_SELECTOR}>
       {isKeptGroupRow ? (
         <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
       ) : (
@@ -333,8 +327,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply cell highlight styles to active cell and hover
             ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
-            // Apply cell hover styles when the row is hovered
-            ...Css.if(borderOnHover && isCellActive).addIn("& .textFieldBaseWrapper", Css.bgBlue50.ba.bcBlue500.$).$,
             // Define the width of the column on each cell. Supports col spans.
             // If we have a 'levelIndent' defined, then subtract that amount from the first content column's width to ensure all columns will still line up properly
             width: `calc(${columnSizes.slice(columnIndex, columnIndex + currentColspan).join(" + ")}${
@@ -342,10 +334,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             })`,
           };
 
-          const cellClassNames = [
-            ...(revealOnRowHover ? [revealOnRowHoverClass] : []),
-            ...(borderOnHover ? [editableOnRowHoverClass] : []),
-          ].join(" ");
+          const cellClassNames = [CELL_CSS_SELECTOR, ...(revealOnRowHover ? [revealOnRowHoverClass] : [])].join(" ");
 
           const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
           const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
@@ -441,3 +430,6 @@ export type GridDataRow<R extends Kinded> = {
   /** Whether this row is draggable, usually to allow drag & drop reordering of rows */
   draggable?: boolean;
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;
+
+export const ROW_CSS_SELECTOR = "Row";
+export const CELL_CSS_SELECTOR = "Cell";
