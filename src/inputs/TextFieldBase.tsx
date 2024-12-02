@@ -14,7 +14,7 @@ import { Icon, IconButton, maybeTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
-import { CELL_CSS_SELECTOR, ROW_CSS_SELECTOR } from "src/components/Table/components/Row";
+import { ROW_CSS_SELECTOR } from "src/components/Table/components/Row";
 import { Css, Only, Palette } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
@@ -125,7 +125,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     ? [Palette.Gray700, Palette.Gray600, Palette.Gray700]
     : borderOnHover
       ? // Use transparent backgrounds to blend with the table row hover color
-        [Palette.Transparent, Palette.Transparent, Palette.Gray100]
+        [Palette.Transparent, Palette.Blue100, Palette.Gray100]
       : borderless && !compound
         ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
         : [Palette.White, Palette.Gray100, Palette.Gray100];
@@ -154,7 +154,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...{
         // Highlight the field when hovering over the row in a table
         [`.${ROW_CSS_SELECTOR}:hover:not(:has(.textFieldBaseWrapper:hover)) &`]: Css.ba.bcBlue300.$,
-        [`.${CELL_CSS_SELECTOR}:hover &`]: Css.bgBlue100.$,
       },
       // When multiline is true, then we want to allow the field to grow to the height of the content, but not shrink below the minHeight
       // Otherwise, set fixed heights values accordingly.

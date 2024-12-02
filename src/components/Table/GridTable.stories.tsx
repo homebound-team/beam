@@ -2148,8 +2148,8 @@ export function MinColumnWidths() {
 }
 
 enum EditableRowStatus {
-  Active = "Active",
-  Inactive = "Inactive",
+  Foo = "Foo",
+  Bar = "Bar",
 }
 
 type EditableRowData = {
@@ -2159,33 +2159,33 @@ type EditableRowData = {
 };
 type EditableRow = EditableRowData | HeaderRow;
 
-export function EditableRows() {
+export function HighlightFields() {
   const [rows, setRows] = useState<GridDataRow<EditableRow>[]>([
     simpleHeader,
     {
       kind: "data" as const,
       id: "1",
-      data: { id: "1", name: "Tony Stark", status: EditableRowStatus.Active, value: 1, date: jan1 },
+      data: { id: "1", name: "Tony Stark", status: EditableRowStatus.Foo, value: 1, date: jan1 },
     },
     {
       kind: "data" as const,
       id: "2",
-      data: { id: "2", name: "Natasha Romanova", status: EditableRowStatus.Active, value: 2, date: jan2 },
+      data: { id: "2", name: "Natasha Romanova", status: EditableRowStatus.Foo, value: 2, date: jan2 },
     },
     {
       kind: "data" as const,
       id: "3",
-      data: { id: "3", name: "Thor Odinson", status: EditableRowStatus.Active, value: 3, date: jan29 },
+      data: { id: "3", name: "Thor Odinson", status: EditableRowStatus.Bar, value: 3, date: jan29 },
     },
   ]);
 
-  const handleCellChange = (rowId: string, field: keyof EditableRowData["data"], value: any) => {
+  const setRow = useCallback((rowId: string, field: keyof EditableRowData["data"], value: any) => {
     setRows((rows) =>
       rows.map((row) =>
         row.kind === "data" && row.id === rowId ? { ...row, data: { ...row.data, [field]: value } } : row,
       ),
     );
-  };
+  }, []);
 
   const nameColumn: GridColumn<EditableRow> = {
     header: "Name",
@@ -2200,7 +2200,7 @@ export function EditableRows() {
           label=""
           options={Object.values(EditableRowStatus).map((status) => ({ label: status, code: status }))}
           value={row.status}
-          onSelect={(status) => handleCellChange(row.id, "status", status)}
+          onSelect={(status) => setRow(row.id, "status", status)}
         />
       ),
     }),
@@ -2214,7 +2214,7 @@ export function EditableRows() {
         <DateField
           label=""
           value={row.date}
-          onChange={(date) => handleCellChange(row.id, "date", date)}
+          onChange={(date) => setRow(row.id, "date", date)}
           hideCalendarIcon
           format="medium"
         />
@@ -2230,7 +2230,7 @@ export function EditableRows() {
         <DateField
           label=""
           value={row.date}
-          onChange={(date) => handleCellChange(row.id, "date", date)}
+          onChange={(date) => setRow(row.id, "date", date)}
           hideCalendarIcon
           format="medium"
         />
