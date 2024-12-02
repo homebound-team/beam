@@ -2249,7 +2249,6 @@ export function EditableRows() {
         style={{
           ...style,
           rowHoverColor: Palette.Blue50,
-          rowEditableCellBorderColor: Palette.Blue300,
         }}
       />
     </div>

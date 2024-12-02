@@ -42,8 +42,6 @@ export interface GridStyle {
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
   rowHoverColor?: Palette | "none";
-  /** Applied on hover to a cell TextFieldBase */
-  rowEditableCellBorderColor?: Palette;
   /** Applied on hover of a row */
   nonHeaderRowHoverCss?: Properties;
   /** Default content to put into an empty cell */
@@ -92,7 +90,7 @@ export interface GridStyleDef {
   vAlign?: "top" | "center" | "bottom";
   /** Defines the Typography for the table body's cells (not the header). This only applies to rows that are not nested/grouped */
   cellTypography?: Typography;
-  /**  */
+  /** Defines if the table should highlight the row on hover. Defaults to true */
   highlightOnHover?: boolean;
 }
 
@@ -183,7 +181,6 @@ function memoizedTableStyles() {
         },
         levels: grouped ? groupedLevels : defaultLevels,
         rowHoverColor: Palette.Blue50,
-        rowEditableCellBorderColor: Palette.Blue300,
         keptGroupRowCss: Css.bgYellow100.gray900.xsMd.df.aic.$,
         keptLastRowCss: Css.boxShadow("inset 0px -14px 8px -11px rgba(63,63,63,.18)").$,
       };

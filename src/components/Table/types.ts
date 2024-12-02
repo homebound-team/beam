@@ -39,11 +39,11 @@ export type GridColumn<R extends Kinded> = {
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (
             data: D,
-            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean; editable: boolean },
+            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean },
           ) => ReactNode | GridCellContent
         : (
             data: undefined,
-            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean; editable: boolean },
+            opts: { row: GridRowKind<R, K>; api: GridRowApi<R>; level: number; expanded: boolean },
           ) => ReactNode | GridCellContent);
 } & {
   /**
