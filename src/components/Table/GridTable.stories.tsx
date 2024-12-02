@@ -15,7 +15,6 @@ import {
   defaultStyle,
   dragHandleColumn,
   emptyCell,
-  getTableStyles,
   GridCellAlignment,
   GridColumn,
   GridDataRow,
@@ -2239,18 +2238,9 @@ export function HighlightFields() {
     w: "120px",
   };
 
-  const style = getTableStyles({ bordered: true, allWhite: true, highlightOnHover: true });
-
   return (
     <div css={Css.m2.$}>
-      <GridTable
-        columns={[nameColumn, selectColumn, date1Column, date2Column]}
-        rows={rows}
-        style={{
-          ...style,
-          rowHoverColor: Palette.Blue50,
-        }}
-      />
+      <GridTable columns={[nameColumn, selectColumn, date1Column, date2Column]} rows={rows} />
     </div>
   );
 }
