@@ -260,7 +260,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   };
 
   const style = resolveStyles(maybeStyle);
-  console.log(style);
   const { tableState } = api;
 
   tableState.onRowSelect = onRowSelect;
