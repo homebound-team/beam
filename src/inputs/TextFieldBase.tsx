@@ -149,7 +149,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         : Css.bcGray300.if(contrast).bcGray700.$),
       // Do not add borders to compound fields. A compound field is responsible for drawing its own borders
       ...(!compound ? Css.ba.$ : {}),
-      ...(borderOnHover && Css.br4.ba.bcTransparent.$),
+      ...(borderOnHover && Css.br4.ba.bcTransparent.add("transition", "border-color 200ms").$),
       ...(borderOnHover && Css.if(isHovered).bgBlue100.ba.bcBlue300.$),
       ...{
         // Highlight the field when hovering over the row in a table, unless some other edit component (including ourselves) is hovered
