@@ -145,7 +145,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const onDragOverDebounced = useDebouncedCallback(dragOverCallback, 100);
 
   const RowContent = () => (
-    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)} ref={ref} className={ROW_CSS_SELECTOR}>
+    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)} ref={ref} className={BorderHoverParent}>
       {isKeptGroupRow ? (
         <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
       ) : (
@@ -220,7 +220,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                 ? numExpandedColumns + 1
                 : 1;
           const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
-          const borderOnHover = style.presentationSettings?.borderOnHover ?? false;
 
           const canSortColumn =
             (sortOn === "client" && column.clientSideSort !== false) ||
@@ -335,7 +334,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             })`,
           };
 
-          const cellClassNames = [CELL_CSS_SELECTOR, ...(revealOnRowHover ? [revealOnRowHoverClass] : [])].join(" ");
+          const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
 
           const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
           const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
@@ -432,5 +431,6 @@ export type GridDataRow<R extends Kinded> = {
   draggable?: boolean;
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;
 
-export const ROW_CSS_SELECTOR = "Row";
-export const CELL_CSS_SELECTOR = "Cell";
+// Used by TextFieldBase to set a border when the row is being hovered over
+export const BorderHoverParent = "BorderHoverParent";
+export const BorderHoverChild = "BorderHoverChild";
