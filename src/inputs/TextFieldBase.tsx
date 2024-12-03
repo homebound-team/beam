@@ -14,6 +14,7 @@ import { Icon, IconButton, maybeTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
+import { BorderHoverChild, BorderHoverParent } from "src/components/Table/components/Row";
 import { Css, Only, Palette } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
@@ -37,6 +38,7 @@ export interface TextFieldBaseProps<X>
       | "placeholder"
       | "compact"
       | "borderless"
+      | "borderOnHover"
       | "visuallyDisabled"
       | "fullWidth"
       | "xss"
@@ -90,6 +92,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     labelStyle = fieldProps?.labelStyle ?? "above",
     contrast = false,
     borderless = fieldProps?.borderless ?? false,
+    borderOnHover = fieldProps?.borderOnHover ?? false,
     textAreaMinHeight = 96,
     clearable = false,
     tooltip,
@@ -120,9 +123,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
 
   const [bgColor, hoverBgColor, disabledBgColor] = contrast
     ? [Palette.Gray700, Palette.Gray600, Palette.Gray700]
-    : borderless && !compound
-      ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
-      : [Palette.White, Palette.Gray100, Palette.Gray100];
+    : borderOnHover
+      ? // Use transparent backgrounds to blend with the table row hover color
+        [Palette.Transparent, Palette.Blue100, Palette.Gray100]
+      : borderless && !compound
+        ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
+        : [Palette.White, Palette.Gray100, Palette.Gray100];
 
   const fieldMaxWidth = getFieldWidth(fullWidth);
 
@@ -143,6 +149,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         : Css.bcGray300.if(contrast).bcGray700.$),
       // Do not add borders to compound fields. A compound field is responsible for drawing its own borders
       ...(!compound ? Css.ba.$ : {}),
+      ...(borderOnHover && Css.br4.ba.bcTransparent.add("transition", "border-color 200ms").$),
+      ...(borderOnHover && Css.if(isHovered).bgBlue100.ba.bcBlue300.$),
+      ...{
+        // Highlight the field when hovering over the row in a table, unless some other edit component (including ourselves) is hovered
+        [`.${BorderHoverParent}:hover:not(:has(.${BorderHoverChild}:hover)) &`]: Css.ba.bcBlue300.$,
+      },
       // When multiline is true, then we want to allow the field to grow to the height of the content, but not shrink below the minHeight
       // Otherwise, set fixed heights values accordingly.
       ...(multiline
@@ -168,11 +180,13 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...Css.w100.mw0.outline0.fg1.bgColor(bgColor).$,
       // Not using Truss's inline `if` statement here because `addIn` properties do not respect the if statement.
       ...(contrast && Css.addIn("&::selection", Css.bgGray800.$).$),
+      // Make the background transparent when highlighting the field on hover
+      ...(borderOnHover && Css.bgTransparent.$),
       // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields
       ...(multiline ? Css.br4.pyPx(compact ? 7 : 11).add("resize", "none").$ : Css.truncate.$),
     },
     hover: Css.bgColor(hoverBgColor).if(contrast).bcGray600.$,
-    focus: Css.bcBlue700.if(contrast).bcBlue500.$,
+    focus: Css.bcBlue700.if(contrast).bcBlue500.if(borderOnHover).bgBlue100.bcBlue500.$,
     disabled: visuallyDisabled
       ? Css.cursorNotAllowed.gray600.bgColor(disabledBgColor).if(contrast).gray500.$
       : Css.cursorNotAllowed.$,
@@ -229,6 +243,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 ...(multiline ? Css.fdc.aifs.gap2.$ : Css.if(wrap === false).truncate.$),
                 ...xss,
               }}
+              className={BorderHoverChild}
               data-readonly="true"
               {...tid}
             >
@@ -259,6 +274,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 ...(errorMsg && !inputProps.disabled ? fieldStyles.error : {}),
                 ...Css.if(multiline).aifs.oh.mhPx(textAreaMinHeight).$,
               }}
+              // Class name used for the grid table on row hover for highlighting
+              className={BorderHoverChild}
               {...hoverProps}
               ref={inputWrapRef as any}
               onClick={unfocusedPlaceholder ? handleUnfocusedPlaceholderClick : undefined}

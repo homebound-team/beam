@@ -11,6 +11,8 @@ export interface PresentationFieldProps {
   labelSuffix?: LabelSuffixStyle;
   // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
   borderless?: boolean;
+  // Typically used for highlighting editable fields in a table. Adds a border on hover.
+  borderOnHover?: boolean;
   // Defines height of the field
   compact?: boolean;
   // Changes default font styles for input fields and Chips

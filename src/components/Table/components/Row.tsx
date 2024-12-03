@@ -145,7 +145,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const onDragOverDebounced = useDebouncedCallback(dragOverCallback, 100);
 
   const RowContent = () => (
-    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)} ref={ref}>
+    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)} ref={ref} className={BorderHoverParent}>
       {isKeptGroupRow ? (
         <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
       ) : (
@@ -430,3 +430,7 @@ export type GridDataRow<R extends Kinded> = {
   /** Whether this row is draggable, usually to allow drag & drop reordering of rows */
   draggable?: boolean;
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;
+
+// Used by TextFieldBase to set a border when the row is being hovered over
+export const BorderHoverParent = "BorderHoverParent";
+export const BorderHoverChild = "BorderHoverChild";

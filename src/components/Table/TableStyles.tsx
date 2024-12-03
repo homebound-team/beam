@@ -46,7 +46,7 @@ export interface GridStyle {
   nonHeaderRowHoverCss?: Properties;
   /** Default content to put into an empty cell */
   emptyCell?: ReactNode;
-  presentationSettings?: Pick<PresentationFieldProps, "borderless" | "typeScale"> &
+  presentationSettings?: Pick<PresentationFieldProps, "borderless" | "borderOnHover" | "typeScale"> &
     Pick<PresentationContextProps, "wrap">;
   /** Minimum table width in pixels. Used when calculating columns sizes */
   minWidthPx?: number;
@@ -90,6 +90,8 @@ export interface GridStyleDef {
   vAlign?: "top" | "center" | "bottom";
   /** Defines the Typography for the table body's cells (not the header). This only applies to rows that are not nested/grouped */
   cellTypography?: Typography;
+  /** Defines if the table should highlight the row on hover. Defaults to true */
+  highlightOnHover?: boolean;
 }
 
 // Returns a "blessed" style of GridTable
@@ -105,6 +107,7 @@ function memoizedTableStyles() {
       bordered = false,
       vAlign = "center",
       cellTypography = "xs" as const,
+      highlightOnHover = true,
     } = props;
 
     const key = safeKeys(props)
@@ -170,9 +173,14 @@ function memoizedTableStyles() {
               Css.borderRadius("0 0 8px 0").$,
             ).$
           : Css.addIn("> *", Css.bsh0.$).$,
-        presentationSettings: { borderless: true, typeScale: "xs", wrap: rowHeight === "flexible" },
+        presentationSettings: {
+          borderless: true,
+          typeScale: "xs",
+          wrap: rowHeight === "flexible",
+          borderOnHover: highlightOnHover,
+        },
         levels: grouped ? groupedLevels : defaultLevels,
-        rowHoverColor: Palette.Blue100,
+        rowHoverColor: Palette.Blue50,
         keptGroupRowCss: Css.bgYellow100.gray900.xsMd.df.aic.$,
         keptLastRowCss: Css.boxShadow("inset 0px -14px 8px -11px rgba(63,63,63,.18)").$,
       };
@@ -248,6 +256,7 @@ export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
     rowHover: true,
     vAlign: true,
     cellTypography: true,
+    highlightOnHover: true,
   };
   const keys = safeKeys(style);
   const defKeys = safeKeys(defKeysRecord);
