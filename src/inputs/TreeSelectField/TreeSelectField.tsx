@@ -325,7 +325,6 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   // Update the filtered options when the input value changes
   const onInputChange = useCallback(
     (inputValue: string) => {
-      console.log({ inputValue });
       setFieldState((prevState) => {
         return {
           ...prevState,
