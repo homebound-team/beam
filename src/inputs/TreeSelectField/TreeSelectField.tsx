@@ -325,6 +325,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   // Update the filtered options when the input value changes
   const onInputChange = useCallback(
     (inputValue: string) => {
+      console.log({ inputValue });
       setFieldState((prevState) => {
         return {
           ...prevState,
@@ -691,7 +692,8 @@ function levelOptions<O, V extends Value>(
   const actualLevel = filtering ? 0 : level;
   return [
     [o, actualLevel],
-    ...(o.children?.length && !collapsedKeys.includes(valueToKey(getOptionValue(o)))
+    // Flat map the children if the parent is not collapsed or if we are filtering (for the search results)
+    ...(o.children?.length && (!collapsedKeys.includes(valueToKey(getOptionValue(o))) || filtering)
       ? o.children.flatMap((oc: NestedOption<O>) =>
           levelOptions(oc, actualLevel + 1, filtering, collapsedKeys, getOptionValue),
         )
