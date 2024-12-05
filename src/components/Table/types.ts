@@ -12,6 +12,19 @@ export type Direction = "ASC" | "DESC";
 export type MaybeFn<T> = T | (() => T);
 export type GridCellAlignment = "left" | "right" | "center";
 
+export type GridTableScrollIndex = number | "LAST";
+export type GridTableScrollOptions =
+  | GridTableScrollIndex
+  | {
+      /** The index of the row to scroll to */
+      index: GridTableScrollIndex;
+      behavior?: "auto" | "smooth";
+      /**
+       * How to position the row in the viewport
+       */
+      align?: "start" | "center" | "end";
+    };
+
 /**
  * Given an ADT of type T, performs a look up and returns the type of kind K.
  *

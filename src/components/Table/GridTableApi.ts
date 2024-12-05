@@ -1,8 +1,16 @@
 import { comparer } from "mobx";
 import { computedFn } from "mobx-utils";
 import { MutableRefObject, useMemo } from "react";
-import { FlatIndexLocationWithAlign, VirtuosoHandle } from "react-virtuoso";
-import { applyRowFn, createRowLookup, GridRowLookup, isGridCellContent, isJSX, MaybeFn } from "src/components/index";
+import { VirtuosoHandle } from "react-virtuoso";
+import {
+  applyRowFn,
+  createRowLookup,
+  GridRowLookup,
+  GridTableScrollOptions,
+  isGridCellContent,
+  isJSX,
+  MaybeFn,
+} from "src/components/index";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { DiscriminateUnion, Kinded } from "src/components/Table/types";
 import { TableState } from "src/components/Table/utils/TableState";
@@ -29,7 +37,7 @@ export function useGridTableApi<R extends Kinded>(): GridTableApi<R> {
 /** Provides an imperative API for an application page to interact with the table. */
 export type GridTableApi<R extends Kinded> = {
   /** Scrolls row `index` into view; Defaults "smooth" behavior; only supported with `as=virtual` and after a `useEffect`. */
-  scrollToIndex(index: number | FlatIndexLocationWithAlign): void;
+  scrollToIndex(index: GridTableScrollOptions): void;
 
   /** Returns the currently-visible rows. */
   getVisibleRows(): GridDataRow<R>[];
@@ -113,9 +121,11 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     this.lookup = createRowLookup(this, virtuosoRef);
   }
 
-  public scrollToIndex(index: number | FlatIndexLocationWithAlign): void {
+  public scrollToIndex(index: GridTableScrollOptions): void {
     this.virtuosoRef.current &&
-      this.virtuosoRef.current.scrollToIndex(typeof index === "number" ? { index, behavior: "smooth" } : index);
+      this.virtuosoRef.current.scrollToIndex(
+        typeof index === "number" || index === "LAST" ? { index, behavior: "smooth" } : index,
+      );
   }
 
   public getSelectedRowIds(kind?: string): string[] {
