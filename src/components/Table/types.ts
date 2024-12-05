@@ -12,12 +12,11 @@ export type Direction = "ASC" | "DESC";
 export type MaybeFn<T> = T | (() => T);
 export type GridCellAlignment = "left" | "right" | "center";
 
-export type GridTableScrollIndex = number | "LAST";
 export type GridTableScrollOptions =
-  | GridTableScrollIndex
+  | number
   | {
       /** The index of the row to scroll to */
-      index: GridTableScrollIndex;
+      index: number;
       behavior?: "auto" | "smooth";
       /**
        * How to position the row in the viewport

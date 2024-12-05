@@ -123,9 +123,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public scrollToIndex(index: GridTableScrollOptions): void {
     this.virtuosoRef.current &&
-      this.virtuosoRef.current.scrollToIndex(
-        typeof index === "number" || index === "LAST" ? { index, behavior: "smooth" } : index,
-      );
+      this.virtuosoRef.current.scrollToIndex(typeof index === "number" ? { index, behavior: "smooth" } : index);
   }
 
   public getSelectedRowIds(kind?: string): string[] {
