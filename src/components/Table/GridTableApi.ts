@@ -36,7 +36,10 @@ export function useGridTableApi<R extends Kinded>(): GridTableApi<R> {
 
 /** Provides an imperative API for an application page to interact with the table. */
 export type GridTableApi<R extends Kinded> = {
-  /** Scrolls row `index` into view; Defaults "smooth" behavior; only supported with `as=virtual` and after a `useEffect`. */
+  /** Scrolls row `index` into view;  only supported with `as=virtual` and after a `useEffect`.
+   *
+   * Defaults "smooth" behavior; Use {index, behavior: "auto"} for instant scroll in cases where grid table has many, many records and the scroll effect is undesirable.
+   * */
   scrollToIndex(index: GridTableScrollOptions): void;
 
   /** Returns the currently-visible rows. */
