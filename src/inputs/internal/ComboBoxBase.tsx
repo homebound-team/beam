@@ -20,8 +20,7 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean, isAddNewOption?: boolean) => string | ReactNode;
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
-  // TODO: explain yourself
-  // updates input style based on the option(s) selected if `PresentationFieldProps.inputStylePalette` is not set
+  /** Sets an input style based on the option(s) selected if `inputStylePalette` is not set */
   getInputStylePalette?: (values: V[]) => InputStylePalette;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
