@@ -394,6 +394,32 @@ describe(TreeSelectField, () => {
     expect(r.getByRole("option", { name: "WNBA" })).toBeVisible();
   });
 
+  it("can filter options even if parent if collapsed", async () => {
+    // Given a TreeSelectField with nested options
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={getNestedOptions()}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    // When opening the options
+    click(r.favoriteLeague);
+    // Then the child options are visible
+    expect(r.getByRole("option", { name: "MLB" })).toBeVisible();
+    // When we collapse the parent option
+    click(r.treeOption_collapseToggle_basketball);
+    // And typing in the filter input
+    fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
+    // Then only the options that match the filter are visible
+    expect(r.queryAllByRole("option")).toHaveLength(2);
+    expect(r.getByRole("option", { name: "NBA" })).toBeVisible();
+    expect(r.getByRole("option", { name: "WNBA" })).toBeVisible();
+  });
+
   it("shows the correct input text when selecting options", async () => {
     // Given a TreeSelectField with nested options
     const r = await render(
