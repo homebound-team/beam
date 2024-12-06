@@ -31,12 +31,20 @@ type TestOption = {
   icon?: IconKey;
 };
 
-const options: TestOption[] = [
+const standardOptions: TestOption[] = [
   { id: "1", name: "Download", icon: "download" },
   { id: "2", name: "Camera", icon: "camera" },
   { id: "3", name: "Info Circle", icon: "infoCircle" },
   { id: "4", name: "Calendar", icon: "calendar" },
   { id: "5", name: "Dollar dollar bill, ya'll! ".repeat(5), icon: "dollar" },
+];
+
+const coloredOptions: TestOption[] = [
+  { id: "1", name: "Download (SUCCESS style palette when selected)", icon: "download" },
+  { id: "2", name: "Camera (CAUTION style palette when selected)", icon: "camera" },
+  { id: "3", name: "Info Circle (WARNING style palette when selected)", icon: "infoCircle" },
+  { id: "4", name: "Calendar (INFO style palette when selected)", icon: "calendar" },
+  { id: "5", name: "Dollar dollar bill, ya'll!  (NO EXTRA style palette when selected)", icon: "dollar" },
 ];
 
 const optionsWithNumericIds: { id: number; name: string }[] = [
@@ -54,6 +62,7 @@ const booleanOptions = [
 
 function Template(args: SelectFieldProps<any, any>) {
   const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
+  const options = (args?.options as TestOption[]) ?? standardOptions;
 
   return (
     <div css={Css.df.fdc.gap5.p2.if(args.contrast === true).white.bgGray800.$}>
@@ -222,6 +231,39 @@ Compact.args = { compact: true };
 export const Contrast = Template.bind({});
 // @ts-ignore
 Contrast.args = { compact: true, contrast: true };
+
+// @ts-ignore
+function getInputStylePalette(v) {
+  if (v?.includes(1) || v?.includes("1")) return "success";
+  if (v?.includes(2) || v?.includes("2")) return "caution";
+  if (v?.includes(3) || v?.includes("3")) return "warning";
+  if (v?.includes(4) || v?.includes("4")) return "info";
+  return undefined;
+}
+
+const standardColoredSelectArgs = {
+  options: coloredOptions,
+  // @ts-ignore
+  getInputStylePalette,
+};
+
+export const Colored = Template.bind({});
+// @ts-ignore
+Colored.args = standardColoredSelectArgs;
+
+export const ColoredContrast = Template.bind({});
+// @ts-ignore
+ColoredContrast.args = {
+  contrast: true,
+  ...standardColoredSelectArgs,
+};
+
+export const ColoredCompact = Template.bind({});
+// @ts-ignore
+ColoredCompact.args = {
+  compact: true,
+  ...standardColoredSelectArgs,
+};
 
 const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
 
