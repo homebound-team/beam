@@ -691,7 +691,8 @@ function levelOptions<O, V extends Value>(
   const actualLevel = filtering ? 0 : level;
   return [
     [o, actualLevel],
-    ...(o.children?.length && !collapsedKeys.includes(valueToKey(getOptionValue(o)))
+    // Flat map the children if the parent is not collapsed or if we are filtering (for the search results)
+    ...(o.children?.length && (!collapsedKeys.includes(valueToKey(getOptionValue(o))) || filtering)
       ? o.children.flatMap((oc: NestedOption<O>) =>
           levelOptions(oc, actualLevel + 1, filtering, collapsedKeys, getOptionValue),
         )
