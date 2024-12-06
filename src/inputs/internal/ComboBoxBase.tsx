@@ -21,7 +21,7 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
   /** Sets an input style based on the option(s) selected if `inputStylePalette` is not set */
-  getInputStylePalette?: (values: V[]) => InputStylePalette;
+  getInputStylePalette?: (values: V[] | undefined) => InputStylePalette;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
   onSelect: (values: V[], opts: O[]) => void;
