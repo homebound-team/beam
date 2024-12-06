@@ -13,7 +13,7 @@ import { chain, mergeProps, useFocusWithin, useHover } from "react-aria";
 import { Icon, IconButton, maybeTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
-import { usePresentationContext } from "src/components/PresentationContext";
+import { InputStylePalette, usePresentationContext } from "src/components/PresentationContext";
 import { BorderHoverChild, BorderHoverParent } from "src/components/Table/components/Row";
 import { Css, Only, Palette } from "src/Css";
 import { getLabelSuffix } from "src/forms/labelUtils";
@@ -42,6 +42,7 @@ export interface TextFieldBaseProps<X>
       | "visuallyDisabled"
       | "fullWidth"
       | "xss"
+      | "inputStylePalette"
     >,
     Partial<Pick<BeamTextFieldProps<X>, "onChange">> {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
@@ -103,6 +104,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     fullWidth = fieldProps?.fullWidth ?? false,
     unfocusedPlaceholder,
     selectOnFocus = true,
+    inputStylePalette,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
@@ -121,14 +123,16 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const fieldHeight = 40;
   const compactFieldHeight = 32;
 
-  const [bgColor, hoverBgColor, disabledBgColor] = contrast
-    ? [Palette.Gray700, Palette.Gray600, Palette.Gray700]
-    : borderOnHover
-      ? // Use transparent backgrounds to blend with the table row hover color
-        [Palette.Transparent, Palette.Blue100, Palette.Gray100]
-      : borderless && !compound
-        ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
-        : [Palette.White, Palette.Gray100, Palette.Gray100];
+  const [bgColor, hoverBgColor, disabledBgColor] = inputStylePalette
+    ? getInputStylePalette(inputStylePalette)
+    : contrast
+      ? [Palette.Gray700, Palette.Gray600, Palette.Gray700]
+      : borderOnHover
+        ? // Use transparent backgrounds to blend with the table row hover color
+          [Palette.Transparent, Palette.Blue100, Palette.Gray100]
+        : borderless && !compound
+          ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
+          : [Palette.White, Palette.Gray100, Palette.Gray100];
 
   const fieldMaxWidth = getFieldWidth(fullWidth);
 
@@ -137,7 +141,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     inputWrapper: {
       ...Css[typeScale].df.aic.br4.px1.w100
         .bgColor(bgColor)
-        .gray900.if(contrast)
+        .gray900.if(contrast && !inputStylePalette)
         .white.if(labelStyle === "left")
         .w(labelLeftFieldWidth).$,
       // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
@@ -150,7 +154,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       // Do not add borders to compound fields. A compound field is responsible for drawing its own borders
       ...(!compound ? Css.ba.$ : {}),
       ...(borderOnHover && Css.br4.ba.bcTransparent.add("transition", "border-color 200ms").$),
-      ...(borderOnHover && Css.if(isHovered).bgBlue100.ba.bcBlue300.$),
+      ...(borderOnHover && Css.if(isHovered).bgColor(hoverBgColor).ba.bcBlue300.$),
       ...{
         // Highlight the field when hovering over the row in a table, unless some other edit component (including ourselves) is hovered
         [`.${BorderHoverParent}:hover:not(:has(.${BorderHoverChild}:hover)) &`]: Css.ba.bcBlue300.$,
@@ -167,7 +171,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     },
     inputWrapperReadOnly: {
       ...Css[typeScale].df.aic.w100.gray900
-        .if(contrast)
+        .if(contrast && !inputStylePalette)
         .white.if(labelStyle === "left")
         .w(labelLeftFieldWidth).$,
       // If we are hiding the label, then we are typically in a table. Keep the `mh` in this case to ensure editable and non-editable fields in a single table row line up properly
@@ -179,14 +183,14 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     input: {
       ...Css.w100.mw0.outline0.fg1.bgColor(bgColor).$,
       // Not using Truss's inline `if` statement here because `addIn` properties do not respect the if statement.
-      ...(contrast && Css.addIn("&::selection", Css.bgGray800.$).$),
+      ...(contrast && !inputStylePalette && Css.addIn("&::selection", Css.bgGray800.$).$),
       // Make the background transparent when highlighting the field on hover
       ...(borderOnHover && Css.bgTransparent.$),
       // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields
       ...(multiline ? Css.br4.pyPx(compact ? 7 : 11).add("resize", "none").$ : Css.truncate.$),
     },
     hover: Css.bgColor(hoverBgColor).if(contrast).bcGray600.$,
-    focus: Css.bcBlue700.if(contrast).bcBlue500.if(borderOnHover).bgBlue100.bcBlue500.$,
+    focus: Css.bcBlue700.if(contrast).bcBlue500.if(borderOnHover).bgColor(hoverBgColor).bcBlue500.$,
     disabled: visuallyDisabled
       ? Css.cursorNotAllowed.gray600.bgColor(disabledBgColor).if(contrast).gray500.$
       : Css.cursorNotAllowed.$,
@@ -369,4 +373,19 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         )}
     </>
   );
+}
+
+function getInputStylePalette(inputStylePalette: InputStylePalette): [Palette, Palette, Palette] {
+  switch (inputStylePalette) {
+    case "success":
+      return [Palette.Green50, Palette.Green100, Palette.Green50];
+    case "caution":
+      return [Palette.Yellow50, Palette.Yellow100, Palette.Yellow50];
+    case "warning":
+      return [Palette.Red50, Palette.Red100, Palette.Red50];
+    case "info":
+      return [Palette.Blue50, Palette.Blue100, Palette.Blue50];
+    default:
+      return [Palette.White, Palette.Gray100, Palette.Gray100];
+  }
 }

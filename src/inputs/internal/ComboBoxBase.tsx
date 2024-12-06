@@ -5,7 +5,7 @@ import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-ari
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
-import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { InputStylePalette, PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
@@ -20,6 +20,8 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean, isAddNewOption?: boolean) => string | ReactNode;
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
+  /** Sets an input style based on the option(s) selected if `inputStylePalette` is not set */
+  getInputStylePalette?: (values: V[] | undefined) => InputStylePalette | undefined;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
   onSelect: (values: V[], opts: O[]) => void;
@@ -92,6 +94,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     disabledOptions,
     borderless,
     unsetLabel,
+    inputStylePalette: propsInputStylePalette,
+    getInputStylePalette,
     getOptionLabel: propOptionLabel,
     getOptionValue: propOptionValue,
     getOptionMenuLabel: propOptionMenuLabel,
@@ -147,6 +151,14 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   );
 
   const values = useMemo(() => propValues ?? [], [propValues]);
+  const inputStylePalette = useMemo(() => {
+    if (propsInputStylePalette) {
+      return propsInputStylePalette;
+    } else if (getInputStylePalette) {
+      return getInputStylePalette(values);
+    }
+    return undefined;
+  }, [propsInputStylePalette, getInputStylePalette, values]);
 
   const selectedOptionsRef = useRef(options.filter((o) => values.includes(getOptionValue(o))));
   const selectedOptions = useMemo(() => {
@@ -379,6 +391,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     <div css={Css.df.fdc.w100.maxw(fieldMaxWidth).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
       <ComboBoxInput
         {...otherProps}
+        inputStylePalette={inputStylePalette}
         fullWidth={fullWidth}
         buttonProps={buttonProps}
         buttonRef={triggerRef}
