@@ -92,6 +92,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     disabledOptions,
     borderless,
     unsetLabel,
+    inputStylePalette: propsInputStylePalette,
     getOptionLabel: propOptionLabel,
     getOptionValue: propOptionValue,
     getOptionMenuLabel: propOptionMenuLabel,
@@ -147,6 +148,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   );
 
   const values = useMemo(() => propValues ?? [], [propValues]);
+  const inputStylePalette = useMemo(() => propsInputStylePalette, [propsInputStylePalette]);
 
   const selectedOptionsRef = useRef(options.filter((o) => values.includes(getOptionValue(o))));
   const selectedOptions = useMemo(() => {
@@ -379,6 +381,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     <div css={Css.df.fdc.w100.maxw(fieldMaxWidth).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
       <ComboBoxInput
         {...otherProps}
+        inputStylePalette={inputStylePalette}
         fullWidth={fullWidth}
         buttonProps={buttonProps}
         buttonRef={triggerRef}

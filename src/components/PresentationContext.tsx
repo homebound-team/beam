@@ -2,6 +2,8 @@ import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 import { GridStyle } from "src/components/Table";
 import { Typography } from "src/Css";
 
+export type InputStylePalette = "success" | "warning" | "caution" | "info";
+
 export interface PresentationFieldProps {
   numberAlignment?: "left" | "right";
   /** Sets the label position or visibility. Defaults to "above" */
@@ -23,10 +25,13 @@ export interface PresentationFieldProps {
   errorInTooltip?: true;
   /** Allow the fields to grow to the width of its container. By default, fields will extend up to 550px */
   fullWidth?: boolean;
+  /** Changes bg and hoverBg; Takes priority over `contrast`; Useful when showing many fields w/in a table that require user attention; In no way should be used as a replacement for error/focus state */
+  inputStylePalette?: InputStylePalette;
 }
 
 export type PresentationContextProps = {
-  fieldProps?: PresentationFieldProps;
+  /** `inputStylePalette` omitted because it is too dependent on the individual field use case to be controlled at this level  */
+  fieldProps?: Omit<PresentationFieldProps, "inputStylePalette">;
   gridTableStyle?: GridStyle;
   // Defines whether content should be allowed to wrap or not. `undefined` is treated as true.
   wrap?: boolean;

@@ -3,6 +3,7 @@ import { Meta } from "@storybook/react";
 import { within } from "@storybook/test";
 import { useState } from "react";
 import { GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndData } from "src/components";
+import { InputStylePalette } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
@@ -31,12 +32,20 @@ type TestOption = {
   icon?: IconKey;
 };
 
-const options: TestOption[] = [
+const standardOptions: TestOption[] = [
   { id: "1", name: "Download", icon: "download" },
   { id: "2", name: "Camera", icon: "camera" },
   { id: "3", name: "Info Circle", icon: "infoCircle" },
   { id: "4", name: "Calendar", icon: "calendar" },
   { id: "5", name: "Dollar dollar bill, ya'll! ".repeat(5), icon: "dollar" },
+];
+
+const coloredOptions: TestOption[] = [
+  { id: "1", name: "Download (SUCCESS style palette when selected)", icon: "download" },
+  { id: "2", name: "Camera (CAUTION style palette when selected)", icon: "camera" },
+  { id: "3", name: "Info Circle (WARNING style palette when selected)", icon: "infoCircle" },
+  { id: "4", name: "Calendar (INFO style palette when selected)", icon: "calendar" },
+  { id: "5", name: "Dollar dollar bill, ya'll!  (NO EXTRA style palette when selected)", icon: "dollar" },
 ];
 
 const optionsWithNumericIds: { id: number; name: string }[] = [
@@ -54,6 +63,7 @@ const booleanOptions = [
 
 function Template(args: SelectFieldProps<any, any>) {
   const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
+  const options = (args?.options as TestOption[]) ?? standardOptions;
 
   return (
     <div css={Css.df.fdc.gap5.p2.if(args.contrast === true).white.bgGray800.$}>
@@ -223,6 +233,33 @@ export const Contrast = Template.bind({});
 // @ts-ignore
 Contrast.args = { compact: true, contrast: true };
 
+// @ts-ignore
+function getInputStylePalette(v): InputStylePalette | undefined {
+  if (v?.includes(1) || v?.includes("1")) return "success";
+  if (v?.includes(2) || v?.includes("2")) return "caution";
+  if (v?.includes(3) || v?.includes("3")) return "warning";
+  if (v?.includes(4) || v?.includes("4")) return "info";
+  return undefined;
+}
+
+export const Colored = Template.bind({});
+// @ts-ignore
+Colored.args = { options: coloredOptions };
+
+export const ColoredContrast = Template.bind({});
+// @ts-ignore
+ColoredContrast.args = {
+  contrast: true,
+  options: coloredOptions,
+};
+
+export const ColoredCompact = Template.bind({});
+// @ts-ignore
+ColoredCompact.args = {
+  compact: true,
+  options: coloredOptions,
+};
+
 const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
 
 export function PerfTest() {
@@ -371,6 +408,10 @@ function TestSelectField<T extends object, V extends Value>(
   props: Optional<Omit<SelectFieldProps<T, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element {
   const [selectedOption, setSelectedOption] = useState<V | undefined>(props.value);
+  const [inputStylePalette, setInputStylePalette] = useState<InputStylePalette | undefined>();
+
+  // @ts-ignore: Hacking around type props within the testSelectField instead of the SB Template
+  const shouldUseStylePalette: boolean = props.options === coloredOptions;
 
   return (
     <div css={Css.df.$}>
@@ -378,8 +419,12 @@ function TestSelectField<T extends object, V extends Value>(
         // The `as any` is due to something related to https://github.com/emotion-js/emotion/issues/2169
         // We may have to redo the conditional getOptionValue/getOptionLabel
         {...(props as any)}
+        inputStylePalette={shouldUseStylePalette ? inputStylePalette : undefined}
         value={selectedOption}
-        onSelect={setSelectedOption}
+        onSelect={(v, opt) => {
+          setSelectedOption(v);
+          setInputStylePalette(getInputStylePalette(v));
+        }}
         errorMsg={
           selectedOption !== undefined || props.disabled
             ? ""
