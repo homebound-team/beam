@@ -411,7 +411,7 @@ function TestSelectField<T extends object, V extends Value>(
   const [inputStylePalette, setInputStylePalette] = useState<InputStylePalette | undefined>();
 
   // @ts-ignore: Hacking around type props within the testSelectField instead of the SB Template
-  const shouldUseStylePalette: boolean = !!props.options?.some((o) => o.name.includes("style palette when selected"));
+  const shouldUseStylePalette: boolean = props.options === coloredOptions;
 
   return (
     <div css={Css.df.$}>
