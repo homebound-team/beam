@@ -3,6 +3,7 @@ import { Meta } from "@storybook/react";
 import { within } from "@storybook/test";
 import { useState } from "react";
 import { GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndData } from "src/components";
+import { InputStylePalette } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
@@ -233,7 +234,7 @@ export const Contrast = Template.bind({});
 Contrast.args = { compact: true, contrast: true };
 
 // @ts-ignore
-function getInputStylePalette(v) {
+function getInputStylePalette(v): InputStylePalette | undefined {
   if (v?.includes(1) || v?.includes("1")) return "success";
   if (v?.includes(2) || v?.includes("2")) return "caution";
   if (v?.includes(3) || v?.includes("3")) return "warning";
@@ -241,28 +242,22 @@ function getInputStylePalette(v) {
   return undefined;
 }
 
-const standardColoredSelectArgs = {
-  options: coloredOptions,
-  // @ts-ignore
-  getInputStylePalette,
-};
-
 export const Colored = Template.bind({});
 // @ts-ignore
-Colored.args = standardColoredSelectArgs;
+Colored.args = { options: coloredOptions };
 
 export const ColoredContrast = Template.bind({});
 // @ts-ignore
 ColoredContrast.args = {
   contrast: true,
-  ...standardColoredSelectArgs,
+  options: coloredOptions,
 };
 
 export const ColoredCompact = Template.bind({});
 // @ts-ignore
 ColoredCompact.args = {
   compact: true,
-  ...standardColoredSelectArgs,
+  options: coloredOptions,
 };
 
 const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
@@ -413,6 +408,10 @@ function TestSelectField<T extends object, V extends Value>(
   props: Optional<Omit<SelectFieldProps<T, V>, "onSelect">, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element {
   const [selectedOption, setSelectedOption] = useState<V | undefined>(props.value);
+  const [inputStylePalette, setInputStylePalette] = useState<InputStylePalette | undefined>();
+
+  // @ts-ignore: Hacking around type props within the testSelectField instead of the SB Template
+  const shouldUseStylePalette: boolean = !!props.options?.some((o) => o.name.includes("style palette when selected"));
 
   return (
     <div css={Css.df.$}>
@@ -420,8 +419,12 @@ function TestSelectField<T extends object, V extends Value>(
         // The `as any` is due to something related to https://github.com/emotion-js/emotion/issues/2169
         // We may have to redo the conditional getOptionValue/getOptionLabel
         {...(props as any)}
+        inputStylePalette={shouldUseStylePalette ? inputStylePalette : undefined}
         value={selectedOption}
-        onSelect={setSelectedOption}
+        onSelect={(v, opt) => {
+          setSelectedOption(v);
+          setInputStylePalette(getInputStylePalette(v));
+        }}
         errorMsg={
           selectedOption !== undefined || props.disabled
             ? ""

@@ -30,6 +30,7 @@ export interface PresentationFieldProps {
 }
 
 export type PresentationContextProps = {
+  /** `inputStylePalette` omitted because it is too dependent on the individual field use case to be controlled at this level  */
   fieldProps?: Omit<PresentationFieldProps, "inputStylePalette">;
   gridTableStyle?: GridStyle;
   // Defines whether content should be allowed to wrap or not. `undefined` is treated as true.
