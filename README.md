@@ -25,7 +25,9 @@ _To see the latest designs, check out the [Figma](https://www.figma.com/file/aWU
 
 ## Beam's API Design Approach
 
-Beam is specifically "Homebound's Design System". Given this extremely narrow purpose, we can lean into the simplicity of:
+tldr: **Consistency & Brevity** over **Power & Flexibility**.
+
+Beam is "_Homebound's_ Design System". Given this extremely narrow purpose, we can lean into the simplicity of:
 
 - We don't need to support everything for everyone
 - We can prefer API/UX consistency & simplicity over configuration & complexity
