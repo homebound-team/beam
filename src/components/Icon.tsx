@@ -8,6 +8,7 @@ export interface IconProps extends AriaAttributes, DOMProps {
   icon: IconKey;
   /** Defaults to currentColor */
   color?: Palette | "inherit" | "currentColor";
+  bgColor?: Palette;
   /** The size of the icon in increments, i.e. 1 == 8px, default is 3 == 24px. */
   inc?: number;
   /** Styles overrides */
@@ -16,7 +17,7 @@ export interface IconProps extends AriaAttributes, DOMProps {
 }
 
 export const Icon = React.memo((props: IconProps) => {
-  const { icon, inc = 3, color = "currentColor", xss, tooltip, ...other } = props;
+  const { icon, inc = 3, color = "currentColor", bgColor, xss, tooltip, ...other } = props;
   const size = increment(inc);
   return maybeTooltip({
     title: tooltip,
@@ -28,7 +29,7 @@ export const Icon = React.memo((props: IconProps) => {
         height={size}
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
-        css={{ "path, rect": Css.fill(color).$, ...xss }}
+        css={{ "path, rect": Css.fill(color).$, ...(bgColor && Css.bgColor(bgColor).$), ...xss }}
         data-icon={icon}
         {...other}
       >
