@@ -13,6 +13,7 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   /** The icon to use within the button. */
   icon: IconProps["icon"];
   color?: Palette;
+  bgColor?: Palette;
   /** The size of the icon, in increments, defaults to 3 which is 24px. */
   inc?: number;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
@@ -33,6 +34,7 @@ export function IconButton(props: IconButtonProps) {
     onClick: onPress,
     disabled,
     color,
+    bgColor,
     icon,
     autoFocus,
     inc,
@@ -68,6 +70,7 @@ export function IconButton(props: IconButtonProps) {
       ...(isHovered && (contrast ? iconButtonContrastStylesHover : iconButtonStylesHover)),
       ...(isFocusVisible || forceFocusStyles ? iconButtonStylesFocus : {}),
       ...(isDisabled && iconButtonStylesDisabled),
+      ...(bgColor && Css.bgColor(bgColor).$),
     }),
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -86,7 +89,12 @@ export function IconButton(props: IconButtonProps) {
     "aria-label": label,
   };
   const buttonContent = (
-    <Icon icon={icon} color={color || (isDisabled ? Palette.Gray400 : iconColor)} inc={compact ? 2 : inc} />
+    <Icon
+      icon={icon}
+      color={color || (isDisabled ? Palette.Gray400 : iconColor)}
+      bgColor={bgColor}
+      inc={compact ? 2 : inc}
+    />
   );
 
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip
