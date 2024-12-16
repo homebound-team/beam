@@ -13,7 +13,7 @@ import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { SelectField, TextField } from "src/inputs";
-import { noop } from "src/utils";
+import { isDefined, noop } from "src/utils";
 import {
   cell,
   cellAnd,
@@ -27,6 +27,7 @@ import {
   wait,
   withRouter,
 } from "src/utils/rtl";
+import { GridCellContent } from "./components/cell";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };
@@ -3791,6 +3792,13 @@ describe("GridTable", () => {
   it("can download csvs", async () => {
     let api: GridTableApi<Row> | undefined;
 
+    function amountGridCellContent(amount: number): GridCellContent {
+      return {
+        content: <div />,
+        value: amount,
+      };
+    }
+
     const columns: GridColumn<Row>[] = [
       // Given a column returns JSX, but defines a `sortValue`
       { header: "Name", data: ({ name }) => ({ content: <div>{name}</div>, sortValue: name }) },
@@ -3802,23 +3810,37 @@ describe("GridTable", () => {
       { header: "Value", data: ({ value }) => `${value},${value}` },
       // And a column returns a string with a quote in it
       { header: "Value", data: ({ value }) => `a quoted "${value}" value` },
+      // And a column returns when it's a grid cell contect
+      { header: "GridCellValue", data: ({ value }) => (isDefined(value) ? amountGridCellContent(value) : value) },
       // And a column returns undefined
       { header: "Value", data: () => undefined },
       // And a column returns JSX with nothing else
       { header: "Action", data: () => <div>Actions</div>, isAction: true },
     ];
 
+    const csvRows: GridDataRow<Row>[] = [
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+      { kind: "data", id: "3", data: { name: "zeroname", value: 0 } },
+      { kind: "data", id: "4", data: { name: "nullname", value: null } },
+      { kind: "data", id: "5", data: { name: "undefname", value: undefined } },
+    ];
+
     function Test() {
       api = useGridTableApi<Row>();
-      return <GridTable<Row> api={api} columns={columns} rows={rows} />;
+      return <GridTable<Row> api={api} columns={columns} rows={csvRows} />;
     }
 
     await render(<Test />);
 
     expect((api as GridTableApiImpl<Row>).generateCsvContent()).toEqual([
-      "Name,Value,Value,Value,Value,Value",
-      `foo,1,1,"1,1","a quoted ""1"" value",`,
-      `bar,2,2,"2,2","a quoted ""2"" value",`,
+      "Name,Value,Value,Value,Value,GridCellValue,Value",
+      `foo,1,1,"1,1","a quoted ""1"" value",1,`,
+      `bar,2,2,"2,2","a quoted ""2"" value",2,`,
+      `zeroname,0,0,"0,0","a quoted ""0"" value",0,`,
+      `nullname,,null,"null,null","a quoted ""null"" value",-,`,
+      `undefname,,undefined,"undefined,undefined","a quoted ""undefined"" value",-,`,
     ]);
   });
 

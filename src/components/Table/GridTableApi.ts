@@ -14,6 +14,7 @@ import {
 import { GridDataRow } from "src/components/Table/components/Row";
 import { DiscriminateUnion, Kinded } from "src/components/Table/types";
 import { TableState } from "src/components/Table/utils/TableState";
+import { isDefined } from "src/utils";
 
 /**
  * Creates an `api` handle to drive a `GridTable`.
@@ -246,7 +247,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
             // Anything not isJSX (like a string) we can put into the CSV directly
             if (!isJSX(content)) return content;
             // Otherwise use the value/sortValue values
-            return cell.value ? maybeApply(cell.value) : cell.sortValue ? maybeApply(cell.sortValue) : "-";
+            return isDefined(cell.value) ? maybeApply(cell.value) : cell.sortValue ? maybeApply(cell.sortValue) : "-";
           } else {
             // ReactNode
             return isJSX(maybeContent) ? "-" : maybeContent;
