@@ -247,7 +247,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
             // Anything not isJSX (like a string) we can put into the CSV directly
             if (!isJSX(content)) return content;
             // Otherwise use the value/sortValue values
-            return isDefined(cell.value) ? maybeApply(cell.value) : cell.sortValue ? maybeApply(cell.sortValue) : "-";
+            return isDefined(cell.value) ? maybeApply(cell.value) : cell.sortValue ? maybeApply(cell.sortValue) : "-"; // Do we need the "-" handling unclear if we use it ever
           } else {
             // ReactNode
             return isJSX(maybeContent) ? "-" : maybeContent;

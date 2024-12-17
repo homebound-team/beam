@@ -3839,8 +3839,8 @@ describe("GridTable", () => {
       `foo,1,1,"1,1","a quoted ""1"" value",1,`,
       `bar,2,2,"2,2","a quoted ""2"" value",2,`,
       `zeroname,0,0,"0,0","a quoted ""0"" value",0,`,
-      `nullname,,null,"null,null","a quoted ""null"" value",-,`,
-      `undefname,,undefined,"undefined,undefined","a quoted ""undefined"" value",-,`,
+      `nullname,,null,"null,null","a quoted ""null"" value",,`,
+      `undefname,,undefined,"undefined,undefined","a quoted ""undefined"" value",,`,
     ]);
   });
 
