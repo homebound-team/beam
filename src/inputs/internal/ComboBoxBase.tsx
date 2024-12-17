@@ -1,5 +1,4 @@
 import { Selection } from "@react-types/shared";
-import equal from "fast-deep-equal";
 import React, { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
@@ -150,19 +149,10 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   const values = useMemo(() => propValues ?? [], [propValues]);
   const inputStylePalette = useMemo(() => propsInputStylePalette, [propsInputStylePalette]);
 
-  const selectedOptionsRef = useRef(options.filter((o) => values.includes(getOptionValue(o))));
-  const selectedOptions = useMemo(() => {
-    // `selectedOptions` should only ever update if the `values` prop actually change.
-    // Assuming `values` is a state variable, then it should hold its identity until it _really_ changes.
-    // Though, it is possible that the `options` prop has changed, which is a dependency on this `useMemo`.
-    // That could trigger an unnecessary new reference for `selectedOptions`, and cause additional renders or unexpected state changes.
-    // We should avoid updating `selectedOptions` unless `values` has actually changed.
-    if (!equal([...values].sort(), selectedOptionsRef.current.map(getOptionValue).sort())) {
-      selectedOptionsRef.current = options.filter((o) => values.includes(getOptionValue(o)));
-    }
-
-    return selectedOptionsRef.current;
-  }, [options, values, getOptionValue]);
+  const selectedOptions = useMemo(
+    () => options.filter((o) => values.includes(getOptionValue(o))),
+    [options, values, getOptionValue],
+  );
 
   const { contains } = useFilter({ sensitivity: "base" });
   const isDisabled = !!disabled;
