@@ -101,10 +101,10 @@ export function shouldSkipScrollTo(
   if (!virtuosoRangeRef.current || forceRescroll) return false;
 
   const isAlreadyInView =
-    // Add 1 on each end to account for "overscan" where the next out of view row is usually already rendered
+    // Add 1 on each end to account for "overscan" where the next out of view row is usually already rendered. This isn't a perfect solution,
+    // but our current "overscan" is only set to 50px, so it should be close enough and the library recommended alternative of adding an
+    // intersection observer to each row seems like a not worth it performance hit (https://github.com/petyosi/react-virtuoso/issues/118)
     index >= virtuosoRangeRef.current.startIndex - 1 && index <= virtuosoRangeRef.current.endIndex + 1;
-
-  console.log({ index, virtuosoRangeRef: virtuosoRangeRef.current, isAlreadyInView });
 
   return isAlreadyInView;
 }
