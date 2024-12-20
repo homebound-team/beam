@@ -1,5 +1,5 @@
 import { MutableRefObject } from "react";
-import { VirtuosoHandle } from "react-virtuoso";
+import { ListRange, VirtuosoHandle } from "react-virtuoso";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { DiscriminateUnion, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
@@ -22,8 +22,11 @@ export interface GridRowLookup<R extends Kinded> {
   /** Returns the list of currently filtered/sorted rows, without headers. */
   currentList(): readonly GridDataRow<R>[];
 
-  /** Scroll's to the row with the given kind + id. Requires using `as=virtual`. */
-  scrollTo(kind: R["kind"], id: string): void;
+  /**
+   * Scroll's to the row with the given kind + id. Requires using `as=virtual`.
+   * `forceRescroll` controls if an element should be re-scrolled to the top even if it's already visible. (Default false)
+   */
+  scrollTo(kind: R["kind"], id: string, forceRescroll?: boolean): void;
 }
 
 interface NextPrev<R extends Kinded> {
@@ -34,15 +37,20 @@ interface NextPrev<R extends Kinded> {
 export function createRowLookup<R extends Kinded>(
   api: GridTableApiImpl<R>,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  virtuosoRangeRef: MutableRefObject<ListRange | null>,
 ): GridRowLookup<R> {
   return {
-    scrollTo(kind, id) {
+    scrollTo(kind, id, forceRescroll = true) {
       if (virtuosoRef.current === null) {
         // In theory we could support as=div and as=table by finding the DOM
         // element and calling .scrollIntoView, just not doing that yet.
         throw new Error("scrollTo is only supported for as=virtual");
       }
+
       const index = api.tableState.visibleRows.findIndex((r) => r && r.kind === kind && r.row.id === id);
+
+      if (shouldSkipScrollTo(index, virtuosoRangeRef, forceRescroll)) return;
+
       virtuosoRef.current.scrollToIndex({ index, behavior: "smooth" });
     },
     currentList() {
@@ -82,4 +90,21 @@ export function getKinds<R extends Kinded>(columns: GridColumnWithId<R>[]): R[] 
   return Object.keys(columns.find((c) => !c.isAction) || {}).filter(
     (key) => !nonKindGridColumnKeys.includes(key),
   ) as any;
+}
+
+/** Optionally takes into consideration if a row is already in view before attempting to scroll to it. */
+export function shouldSkipScrollTo(
+  index: number,
+  virtuosoRangeRef: MutableRefObject<ListRange | null>,
+  forceRescroll: boolean,
+) {
+  if (!virtuosoRangeRef.current || forceRescroll) return false;
+
+  const isAlreadyInView =
+    // Add 1 on each end to account for "overscan" where the next out of view row is usually already rendered
+    index >= virtuosoRangeRef.current.startIndex - 1 && index <= virtuosoRangeRef.current.endIndex + 1;
+
+  console.log({ index, virtuosoRangeRef: virtuosoRangeRef.current, isAlreadyInView });
+
+  return isAlreadyInView;
 }

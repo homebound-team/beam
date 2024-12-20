@@ -22,6 +22,8 @@ export type GridTableScrollOptions =
        * How to position the row in the viewport
        */
       align?: "start" | "center" | "end";
+      /** Determines if the row should be re-scrolled to even if it's already in view (scrolled to top) */
+      forceRescroll?: boolean;
     };
 
 /**
