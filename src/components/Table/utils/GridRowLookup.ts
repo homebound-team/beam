@@ -1,5 +1,5 @@
 import { MutableRefObject } from "react";
-import { VirtuosoHandle } from "react-virtuoso";
+import { ListRange, VirtuosoHandle } from "react-virtuoso";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { DiscriminateUnion, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
@@ -22,7 +22,10 @@ export interface GridRowLookup<R extends Kinded> {
   /** Returns the list of currently filtered/sorted rows, without headers. */
   currentList(): readonly GridDataRow<R>[];
 
-  /** Scroll's to the row with the given kind + id. Requires using `as=virtual`. */
+  /**
+   * Scroll's to the row with the given kind + id. Requires using `as=virtual`.
+   * Will skip re-scrolling to a row if it's already visible.
+   */
   scrollTo(kind: R["kind"], id: string): void;
 }
 
@@ -34,6 +37,7 @@ interface NextPrev<R extends Kinded> {
 export function createRowLookup<R extends Kinded>(
   api: GridTableApiImpl<R>,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  virtuosoRangeRef: MutableRefObject<ListRange | null>,
 ): GridRowLookup<R> {
   return {
     scrollTo(kind, id) {
@@ -42,7 +46,11 @@ export function createRowLookup<R extends Kinded>(
         // element and calling .scrollIntoView, just not doing that yet.
         throw new Error("scrollTo is only supported for as=virtual");
       }
+
       const index = api.tableState.visibleRows.findIndex((r) => r && r.kind === kind && r.row.id === id);
+
+      if (shouldSkipScrollTo(index, virtuosoRangeRef)) return;
+
       virtuosoRef.current.scrollToIndex({ index, behavior: "smooth" });
     },
     currentList() {
@@ -82,4 +90,17 @@ export function getKinds<R extends Kinded>(columns: GridColumnWithId<R>[]): R[] 
   return Object.keys(columns.find((c) => !c.isAction) || {}).filter(
     (key) => !nonKindGridColumnKeys.includes(key),
   ) as any;
+}
+
+/** Optionally takes into consideration if a row is already in view before attempting to scroll to it. */
+export function shouldSkipScrollTo(index: number, virtuosoRangeRef: MutableRefObject<ListRange | null>) {
+  if (!virtuosoRangeRef.current) return false;
+
+  const isAlreadyInView =
+    // Add 1 on each end to account for "overscan" where the next out of view row is usually already rendered. This isn't a perfect solution,
+    // but our current "overscan" is only set to 50px, so it should be close enough and the library recommended alternative of adding an
+    // intersection observer to each row seems like a not worth it performance hit (https://github.com/petyosi/react-virtuoso/issues/118)
+    index >= virtuosoRangeRef.current.startIndex - 1 && index <= virtuosoRangeRef.current.endIndex + 1;
+
+  return isAlreadyInView;
 }

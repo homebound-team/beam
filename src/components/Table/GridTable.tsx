@@ -1,7 +1,7 @@
 import memoizeOne from "memoize-one";
 import { runInAction } from "mobx";
 import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef, useState } from "react";
-import { Components, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import { Components, ListRange, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { getTableRefWidthStyles, Loader } from "src/components";
 import { DiscriminateUnion, GridRowKind } from "src/components/index";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
@@ -231,6 +231,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
+  // Stores the current rendered range of rows from virtuoso (used for determining if we can skip re-scrolling to a row if already in view)
+  const virtuosoRangeRef = useRef<ListRange | null>(null);
   // Use this ref to watch for changes in the GridTable's container and resize columns accordingly.
   const resizeRef = useRef<HTMLDivElement>(null);
 
@@ -238,7 +240,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     () => {
       // Let the user pass in their own api handle, otherwise make our own
       const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
-      api.init(persistCollapse, virtuosoRef);
+      api.init(persistCollapse, virtuosoRef, virtuosoRangeRef);
       api.setActiveRowId(activeRowId);
       api.setActiveCellId(activeCellId);
       // Push the initial columns directly into tableState, b/c that is what
@@ -505,6 +507,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           stickyHeader,
           xss,
           virtuosoRef,
+          virtuosoRangeRef,
           tableHeadRows,
           stickyOffset,
           infiniteScroll,
@@ -532,6 +535,7 @@ function renderDiv<R extends Kinded>(
   stickyHeader: boolean,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  _virtuosoRangeRef: MutableRefObject<ListRange | null>,
   tableHeadRows: ReactElement[],
   stickyOffset: number,
   _infiniteScroll?: InfiniteScroll,
@@ -592,6 +596,7 @@ function renderTable<R extends Kinded>(
   stickyHeader: boolean,
   xss: any,
   _virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  _virtuosoRangeRef: MutableRefObject<ListRange | null>,
   tableHeadRows: ReactElement[],
   stickyOffset: number,
   _infiniteScroll?: InfiniteScroll,
@@ -659,6 +664,7 @@ function renderVirtual<R extends Kinded>(
   stickyHeader: boolean,
   xss: any,
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+  virtuosoRangeRef: MutableRefObject<ListRange | null>,
   tableHeadRows: ReactElement[],
   _stickyOffset: number,
   infiniteScroll?: InfiniteScroll,
@@ -736,6 +742,9 @@ function renderVirtual<R extends Kinded>(
 
         // Lastly render the table body rows
         return visibleDataRows[index];
+      }}
+      rangeChanged={(newRange) => {
+        virtuosoRangeRef.current = newRange;
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
       // When implementing infinite scroll, default the bottom `increaseViewportBy` to 500px. This creates the "infinite"

@@ -1,7 +1,7 @@
 import { comparer } from "mobx";
 import { computedFn } from "mobx-utils";
 import { MutableRefObject, useMemo } from "react";
-import { VirtuosoHandle } from "react-virtuoso";
+import { ListRange, VirtuosoHandle } from "react-virtuoso";
 import {
   applyRowFn,
   createRowLookup,
@@ -10,6 +10,7 @@ import {
   isGridCellContent,
   isJSX,
   MaybeFn,
+  shouldSkipScrollTo,
 } from "src/components/index";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { DiscriminateUnion, Kinded } from "src/components/Table/types";
@@ -104,6 +105,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   // This is public to GridTable but not exported outside of Beam
   readonly tableState: TableState<R> = new TableState(this);
   virtuosoRef: MutableRefObject<VirtuosoHandle | null> = { current: null };
+  virtuosoRangeRef: MutableRefObject<ListRange | null> = { current: null };
   lookup!: GridRowLookup<R>;
 
   constructor() {
@@ -118,16 +120,27 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   }
 
   /** Called once by the GridTable when it takes ownership of this api instance. */
-  init(persistCollapse: string | undefined, virtuosoRef: MutableRefObject<VirtuosoHandle | null>) {
+  init(
+    persistCollapse: string | undefined,
+    virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
+    virtuosoRangeRef: MutableRefObject<ListRange | null>,
+  ) {
     // Technically this drives both row-collapse and column-expanded
     if (persistCollapse) this.tableState.loadCollapse(persistCollapse);
     this.virtuosoRef = virtuosoRef;
-    this.lookup = createRowLookup(this, virtuosoRef);
+    this.virtuosoRangeRef = virtuosoRangeRef;
+    this.lookup = createRowLookup(this, virtuosoRef, virtuosoRangeRef);
   }
 
-  public scrollToIndex(index: GridTableScrollOptions): void {
-    this.virtuosoRef.current &&
-      this.virtuosoRef.current.scrollToIndex(typeof index === "number" ? { index, behavior: "smooth" } : index);
+  public scrollToIndex(indexOrOptions: GridTableScrollOptions): void {
+    if (!this.virtuosoRef.current) return;
+
+    const scrollToOpts =
+      typeof indexOrOptions === "number" ? { index: indexOrOptions, behavior: "smooth" as const } : indexOrOptions;
+
+    if (shouldSkipScrollTo(scrollToOpts.index, this.virtuosoRangeRef)) return;
+
+    this.virtuosoRef.current.scrollToIndex(scrollToOpts);
   }
 
   public getSelectedRowIds(kind?: string): string[] {

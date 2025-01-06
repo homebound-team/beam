@@ -19,7 +19,7 @@ export { cardStyle, condensedStyle, defaultStyle, getTableStyles } from "src/com
 export type { GridStyle, RowStyle, RowStyles } from "src/components/Table/TableStyles";
 export * from "src/components/Table/types";
 export * from "src/components/Table/utils/columns";
-export { createRowLookup } from "src/components/Table/utils/GridRowLookup";
+export { createRowLookup, shouldSkipScrollTo } from "src/components/Table/utils/GridRowLookup";
 export type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 export { simpleDataRows, simpleHeader } from "src/components/Table/utils/simpleHelpers";
 export type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
