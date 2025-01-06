@@ -24,9 +24,9 @@ export interface GridRowLookup<R extends Kinded> {
 
   /**
    * Scroll's to the row with the given kind + id. Requires using `as=virtual`.
-   * `forceRescroll` controls if an element should be re-scrolled to the top even if it's already visible. (Default false)
+   * Will skip re-scrolling to a row if it's already visible.
    */
-  scrollTo(kind: R["kind"], id: string, forceRescroll?: boolean): void;
+  scrollTo(kind: R["kind"], id: string): void;
 }
 
 interface NextPrev<R extends Kinded> {
@@ -40,7 +40,7 @@ export function createRowLookup<R extends Kinded>(
   virtuosoRangeRef: MutableRefObject<ListRange | null>,
 ): GridRowLookup<R> {
   return {
-    scrollTo(kind, id, forceRescroll = true) {
+    scrollTo(kind, id) {
       if (virtuosoRef.current === null) {
         // In theory we could support as=div and as=table by finding the DOM
         // element and calling .scrollIntoView, just not doing that yet.
@@ -49,7 +49,7 @@ export function createRowLookup<R extends Kinded>(
 
       const index = api.tableState.visibleRows.findIndex((r) => r && r.kind === kind && r.row.id === id);
 
-      if (shouldSkipScrollTo(index, virtuosoRangeRef, forceRescroll)) return;
+      if (shouldSkipScrollTo(index, virtuosoRangeRef)) return;
 
       virtuosoRef.current.scrollToIndex({ index, behavior: "smooth" });
     },
@@ -93,12 +93,8 @@ export function getKinds<R extends Kinded>(columns: GridColumnWithId<R>[]): R[] 
 }
 
 /** Optionally takes into consideration if a row is already in view before attempting to scroll to it. */
-export function shouldSkipScrollTo(
-  index: number,
-  virtuosoRangeRef: MutableRefObject<ListRange | null>,
-  forceRescroll: boolean,
-) {
-  if (!virtuosoRangeRef.current || forceRescroll) return false;
+export function shouldSkipScrollTo(index: number, virtuosoRangeRef: MutableRefObject<ListRange | null>) {
+  if (!virtuosoRangeRef.current) return false;
 
   const isAlreadyInView =
     // Add 1 on each end to account for "overscan" where the next out of view row is usually already rendered. This isn't a perfect solution,

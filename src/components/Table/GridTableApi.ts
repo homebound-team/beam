@@ -135,12 +135,10 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   public scrollToIndex(indexOrOptions: GridTableScrollOptions): void {
     if (!this.virtuosoRef.current) return;
 
-    const { forceRescroll = true, ...scrollToOpts } =
-      typeof indexOrOptions === "number"
-        ? { index: indexOrOptions, behavior: "smooth" as const, forceRescroll: false }
-        : indexOrOptions;
+    const scrollToOpts =
+      typeof indexOrOptions === "number" ? { index: indexOrOptions, behavior: "smooth" as const } : indexOrOptions;
 
-    if (shouldSkipScrollTo(scrollToOpts.index, this.virtuosoRangeRef, forceRescroll)) return;
+    if (shouldSkipScrollTo(scrollToOpts.index, this.virtuosoRangeRef)) return;
 
     this.virtuosoRef.current.scrollToIndex(scrollToOpts);
   }
