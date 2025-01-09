@@ -322,7 +322,16 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly),
       }));
     }
-  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly, onSearch, debouncedSearch]);
+  }, [
+    state.isOpen,
+    selectedOptions,
+    getOptionLabel,
+    multiselect,
+    nothingSelectedText,
+    isReadOnly,
+    onSearch,
+    debouncedSearch,
+  ]);
 
   // Call on search callback when the user types in the input field
   useEffect(() => {
