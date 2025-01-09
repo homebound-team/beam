@@ -327,7 +327,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   // Call on search callback when the user types in the input field
   useEffect(() => {
     onSearch?.(debouncedSearch ?? "");
-    console.log("debouncedSearch", debouncedSearch);
   }, [onSearch, debouncedSearch]);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
