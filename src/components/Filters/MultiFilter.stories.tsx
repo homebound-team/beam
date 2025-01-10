@@ -1,5 +1,4 @@
 import { Meta } from "@storybook/react";
-import { screen, userEvent } from "@storybook/test";
 import { useState } from "react";
 import { stageFilter, stageFilterDisabledOptions } from "src/components/Filters/testDomain";
 import { Filters, multiFilter } from "src/components/index";

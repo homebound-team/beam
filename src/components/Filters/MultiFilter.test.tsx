@@ -1,4 +1,3 @@
-import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { FilterDefs, Filters } from "src/components/Filters";
 import { ProjectFilter, stageOnSearch } from "src/components/Filters/testDomain";
