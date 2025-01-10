@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react";
+import { screen, userEvent } from "@storybook/test";
 import { useState } from "react";
 import { stageFilter, stageFilterDisabledOptions } from "src/components/Filters/testDomain";
 import { Filters, multiFilter } from "src/components/index";
@@ -72,4 +73,17 @@ export function LazyLoading() {
     getOptionLabel: (s) => s.name,
   })("key");
   return filter.render([loadTestOptions[2].id, loadTestOptions[4].id], () => {}, {}, true, false);
+}
+
+export function OnSearch() {
+  const [_, setProjectSearch] = useState<string>();
+  const testOptions: HasIdAndName[] = zeroTo(10).map((i) => ({ id: String(i), name: `Project ${i}` }));
+
+  const filter = multiFilter({
+    options: testOptions,
+    getOptionValue: (s) => s.id,
+    getOptionLabel: (s) => s.name,
+    onSearch: (search) => setProjectSearch(search),
+  })("key");
+  return filter.render(undefined, () => {}, {}, true, false);
 }

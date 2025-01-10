@@ -90,6 +90,13 @@ export const stageFilterDisabledOptions: StageFilter = multiFilter({
   disabledOptions: [{ value: Stage.StageOne, reason: "I have a reason to be disabled." }, Stage.StageTwo],
 });
 
+export const stageOnSearch: StageFilter = multiFilter({
+  options: stageOptions,
+  getOptionValue: (s) => s.code,
+  getOptionLabel: (s) => s.name,
+  onSearch: () => {},
+});
+
 export const stageSingleFilter: StageSingleFilter = singleFilter({
   options: stageOptions,
   getOptionValue: (s) => s.code,
