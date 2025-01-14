@@ -111,14 +111,3 @@ function TestFilterSearch(props: Partial<MultiFilterProps<HasIdAndName, string>>
     </div>
   );
 }
-
-// export function MyComponent({ onSearch }: { onSearch: (value: string) => void }) {
-//   const [searchValue, setSearchValue] = useState("");
-//   const [debouncedSearchValue] = useDebounce(searchValue, 300);
-
-//   useEffect(() => {
-//     onSearch(debouncedSearchValue);
-//   }, [debouncedSearchValue, onSearch]);
-
-//   return <input data-testid="search-input" onChange={(e) => setSearchValue(e.target.value)} />;
-// }
