@@ -73,3 +73,15 @@ export function LazyLoading() {
   })("key");
   return filter.render([loadTestOptions[2].id, loadTestOptions[4].id], () => {}, {}, true, false);
 }
+
+export function OnSearch() {
+  const [_, setProjectSearch] = useState<string>();
+  const testOptions: HasIdAndName[] = zeroTo(10).map((i) => ({ id: String(i), name: `Project ${i}` }));
+  const filter = multiFilter({
+    options: testOptions,
+    getOptionValue: (s) => s.id,
+    getOptionLabel: (s) => s.name,
+    onSearch: (search) => setProjectSearch(search),
+  })("key");
+  return filter.render(undefined, () => {}, {}, true, false);
+}
