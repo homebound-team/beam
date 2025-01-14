@@ -309,7 +309,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     if (state.isOpen && multiselect) {
       // While the multiselect is open, let the user keep typing unless they are using a debounce, then we need to
       // early return to avoid resetting the input value
-      if (debouncedSearch) return;
+      // if (debouncedSearch) return;
 
       setFieldState((prevState) => ({
         ...prevState,
@@ -323,11 +323,13 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly),
       }));
     }
-  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly, debouncedSearch]);
+  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly]);
 
   // Call on search callback when the user types in the input field
   useEffect(() => {
-    onSearch?.(debouncedSearch ?? "");
+    if (onSearch && debouncedSearch) {
+      onSearch(debouncedSearch);
+    }
   }, [onSearch, debouncedSearch]);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
