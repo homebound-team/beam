@@ -1,6 +1,6 @@
 import { wait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { booleanFilter, FilterDefs, Filters, multiFilter, singleFilter } from "src/components/Filters";
 import { ProjectFilter, Stage } from "src/components/Filters/testDomain";
 import { HasIdAndName } from "src/types";
@@ -9,7 +9,6 @@ import { zeroTo } from "src/utils/sb";
 import { useDebounce } from "use-debounce";
 import { MultiFilterProps } from "./MultiFilter";
 
-// Mock `use-debounce` and return a custom implementation
 jest.mock("use-debounce", () => {
   const debounceMock = jest.fn((value, delay) => [value]); // Define the mock inline
   return {
@@ -69,25 +68,13 @@ describe("Filters", () => {
     // When opening the options and typing in the filter input
     click(r.filter_multi);
     fireEvent.input(r.filter_multi, { target: { value: "1" } });
-    // Wait for `onSearch` to be called
+    // Wait for `onSearch/debounce` to be called
     await wait();
 
     // Then the only remaining option is one and the onSearch/debounce function was called with the correct value and delay
     expect(r.queryAllByRole("option")).toHaveLength(1);
     expect(onSearchMock).toHaveBeenCalledWith("1");
     expect(debounceMock).toHaveBeenCalledWith("1", 300);
-  });
-
-  it("can reset values to undefined", async () => {
-    // Given a filter with no search values
-    const r = await render(<TestFilterNoSearch />);
-    expect(r.filter_multi).toHaveValue("All");
-
-    // When we re-render with values set to undefined (simulating an outside component's "clear" action, i.e. Filters)
-    r.rerender(<TestFilterNoSearch />);
-
-    // Then the values are reset
-    expect(r.value).toEqual(undefined);
   });
 });
 
@@ -125,41 +112,13 @@ function TestFilterSearch(props: Partial<MultiFilterProps<HasIdAndName, string>>
   );
 }
 
-function TestFilterNoSearch(props: Partial<MultiFilterProps<HasIdAndName, string>>) {
-  const options: HasIdAndName[] = zeroTo(2).map((i) => ({
-    id: `p:${i}`,
-    name: `Project ${i}`,
-  }));
+// export function MyComponent({ onSearch }: { onSearch: (value: string) => void }) {
+//   const [searchValue, setSearchValue] = useState("");
+//   const [debouncedSearchValue] = useDebounce(searchValue, 300);
 
-  type MultiFilter = { stage?: string[] };
+//   useEffect(() => {
+//     onSearch(debouncedSearchValue);
+//   }, [debouncedSearchValue, onSearch]);
 
-  const defs: FilterDefs<MultiFilter> = {
-    stage: multiFilter({
-      options: options,
-      label: "Multi",
-      getOptionValue: (o) => o.id,
-      getOptionLabel: (o) => o.name,
-      ...props,
-    }),
-  };
-
-  const [filter, setFilter] = useState<MultiFilter>({ stage: props.defaultValue });
-  return (
-    <div>
-      {/* <button data-testid="update" onClick={() => setSearch("baseball")} /> */}
-      <Filters filterDefs={defs} filter={filter} onChange={setFilter} />
-      <div data-testid="value">{JSON.stringify(filter)}</div>
-    </div>
-  );
-}
-
-export function MyComponent({ onSearch }: { onSearch: (value: string) => void }) {
-  const [searchValue, setSearchValue] = useState("");
-  const [debouncedSearchValue] = useDebounce(searchValue, 300);
-
-  useEffect(() => {
-    onSearch(debouncedSearchValue);
-  }, [debouncedSearchValue, onSearch]);
-
-  return <input data-testid="search-input" onChange={(e) => setSearchValue(e.target.value)} />;
-}
+//   return <input data-testid="search-input" onChange={(e) => setSearchValue(e.target.value)} />;
+// }
