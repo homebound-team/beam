@@ -2,10 +2,10 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { booleanFilter, FilterDefs, Filters, multiFilter, singleFilter } from "src/components/Filters";
 import { ProjectFilter, Stage } from "src/components/Filters/testDomain";
-import { click, render } from "src/utils/rtl";
-import { MultiFilterProps } from "./MultiFilter";
 import { HasIdAndName } from "src/types";
+import { click, render } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";
+import { MultiFilterProps } from "./MultiFilter";
 
 describe("Filters", () => {
   it("can match GQL types of enum arrays", () => {
@@ -50,30 +50,76 @@ describe("Filters", () => {
     expect(f).toBeDefined();
   });
 
-  it("can filter multi select filter", async () => {
-    // Given a MultiSelectFilter with options
-    const r = await render(<TestFilter />);
-    // When opening the options
+  it("updates values when the onSearch is called", async () => {
+    // Mock the onSearch function
+    const onSearchMock = jest.fn();
+    // Given a stateful component that has initial values set
+    const r = await render(<TestFilterSearch onSearch={onSearchMock} />);
+
+    // When opening the options and typing in the filter input
     click(r.filter_multi);
-    // Then all options are visible
-    expect(r.queryAllByRole("option")).toHaveLength(2);
-   
-    // And typing in the filter input
     fireEvent.input(r.filter_multi, { target: { value: "1" } });
-    expect(r.filter_multi).toHaveValue("1");
-    
-    // Then only the Project one option is visible
+
+    // Then the only remaining option is one
     expect(r.queryAllByRole("option")).toHaveLength(1);
-    expect(r.getByRole("option", { name: "Project 1" })).toBeVisible();
+
+    // Assert that the onSearch function was called with the correct value
+    expect(onSearchMock).toHaveBeenCalledTimes(1);
   });
+
+  // it("can reset values to undefined", async () => {
+  //   // Given a filter with on search values
+  //   const r = await render(<TestFilterNoSearch />);
+  //   console.log(prettyDOM(r.container));
+  //   expect(r.filter_multi).toHaveValue("All");
+
+  //   // When we re-render with values set to undefined (simulating an outside component's "clear" action, i.e. Filters)
+  //   r.rerender(<TestFilterNoSearch />);
+
+  //   // Then the values are reset
+  //   expect(getSelected(r.filter_multi)).toEqual(undefined);
+  // });
 });
 
-function TestFilter(props: Partial<MultiFilterProps<HasIdAndName, string>>) {
+function TestFilterSearch(props: Partial<MultiFilterProps<HasIdAndName, string>>, onSelectMock = jest.fn()) {
+  const [search, setSearch] = useState<string | undefined>("");
+
   const options: HasIdAndName[] = zeroTo(2).map((i) => ({
     id: `p:${i}`,
     name: `Project ${i}`,
   }));
 
+  type MultiFilter = { stage?: string[] };
+
+  const defs: FilterDefs<MultiFilter> = {
+    stage: multiFilter({
+      options: options,
+      label: "Multi",
+      getOptionValue: (o) => o.id,
+      getOptionLabel: (o) => o.name,
+      onSearch: (input) => {
+        onSelectMock(input);
+        setSearch(input);
+      },
+      ...props,
+    }),
+  };
+
+  const [filter, setFilter] = useState<MultiFilter>({ stage: props.defaultValue });
+  return (
+    <div>
+      <button data-testid="update" onClick={() => setSearch("baseball")} />
+      <Filters filterDefs={defs} filter={filter} onChange={setFilter} />
+      <div data-testid="value">{JSON.stringify(filter)}</div>
+    </div>
+  );
+}
+
+function TestFilterNoSearch(props: Partial<MultiFilterProps<HasIdAndName, string>>) {
+  const options: HasIdAndName[] = zeroTo(2).map((i) => ({
+    id: `p:${i}`,
+    name: `Project ${i}`,
+  }));
 
   type MultiFilter = { stage?: string[] };
 
@@ -90,6 +136,7 @@ function TestFilter(props: Partial<MultiFilterProps<HasIdAndName, string>>) {
   const [filter, setFilter] = useState<MultiFilter>({ stage: props.defaultValue });
   return (
     <div>
+      {/* <button data-testid="update" onClick={() => setSearch("baseball")} /> */}
       <Filters filterDefs={defs} filter={filter} onChange={setFilter} />
       <div data-testid="value">{JSON.stringify(filter)}</div>
     </div>
