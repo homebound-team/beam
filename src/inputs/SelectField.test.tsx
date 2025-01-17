@@ -511,7 +511,7 @@ describe("SelectFieldTest", () => {
     await typeAndWait(r.age, "One");
     // expect onSearch to called
     expect(onSearchMock).toHaveBeenCalled();
-   
+
     // And type in "" (clearing the search)
     await typeAndWait(r.age, "");
     // expect onSearch to called
