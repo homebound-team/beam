@@ -1,4 +1,4 @@
-import { clickAndWait } from "@homebound/rtl-utils";
+import { clickAndWait, typeAndWait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { AuthorHeight } from "src/forms/formStateDomain";
@@ -491,6 +491,33 @@ describe("SelectFieldTest", () => {
     expect(onAddNew).toHaveBeenCalledTimes(1);
   });
 
+  it("calls onSearch when searching in a select field", async () => {
+    // Given a mutliSelectField with options
+    const onSearchMock = jest.fn();
+    const selectedOption = options[0];
+    const r = await render(
+      <TestMultipleSelectFieldOnSearch
+        label="Age"
+        value={selectedOption.id}
+        unsetLabel="-"
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        onSearch={onSearchMock}
+      />,
+    );
+
+    // When we type in the input
+    await typeAndWait(r.age, "One");
+    // expect onSearch to called
+    expect(onSearchMock).toHaveBeenCalled();
+   
+    // And type in "" (clearing the search)
+    await typeAndWait(r.age, "");
+    // expect onSearch to called
+    expect(onSearchMock).toHaveBeenCalled();
+  });
+
   // Used to validate the `unset` option can be applied to non-`HasIdAndName` options
   type HasLabelAndValue = {
     label: string;
@@ -567,5 +594,28 @@ describe("SelectFieldTest", () => {
     );
   }
 });
+
+function TestMultipleSelectFieldOnSearch<O extends HasIdAndName, V extends Value>(
+  props: Optional<SelectFieldProps<O, V>, "onSelect" | "onSearch">,
+): JSX.Element {
+  const [selected, setSelected] = useState<V | undefined>(props.value);
+  const [search, setSearch] = useState<string | undefined>("");
+
+  return (
+    <>
+      <SelectField<O, V>
+        {...props}
+        value={selected}
+        onSelect={setSelected}
+        unsetLabel={"-"}
+        options={props.options}
+        onSearch={(input) => {
+          props.onSearch?.(input);
+          setSearch(input);
+        }}
+      />
+    </>
+  );
+}
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -306,9 +306,18 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   // Reset inputValue when closed or selected changes
   useEffect(() => {
-    if (state.isOpen && multiselect) {
-      // While the multiselect is open, let the user keep typing unless they are using a debounce, then we need to
-      // early return to avoid resetting the input value
+    if (state.isOpen && multiselect && !debouncedSearch) {
+      // When a single-select is open, with "inputValue=Blue", when "Blue" is actually
+      // selected (our value changes), the box will close immediately, so the inputValue
+      // will get reset in the `!isOpen` case.
+      //
+      // When a multi-select is open, with "inputValue=Blue", when "Blue" is actually
+      // selected (our value changes), we leave the box open, and we want to reset
+      // the "inputValue=(empty) so the user can now type "inputType=Green".
+      //
+      // ...unless the multi-select is using onSearch, in which case we want to let them
+      // only explicitly trigger a new `onSearch` by changing the existing inputValue,
+      // i.e. they might want to keep typing "Blueish".
       if (debouncedSearch) return;
 
       setFieldState((prevState) => ({
@@ -327,9 +336,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   // Call on search callback when the user types in the input field
   useEffect(() => {
-    if (onSearch && debouncedSearch) {
-      onSearch(debouncedSearch);
-    }
+    onSearch?.(debouncedSearch ?? "");
   }, [onSearch, debouncedSearch]);
 
   // For the most part, the returned props contain `aria-*` and `id` attributes for accessibility purposes.
