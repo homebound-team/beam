@@ -318,8 +318,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       // ...unless the multi-select is using onSearch, in which case we want to let them
       // only explicitly trigger a new `onSearch` by changing the existing inputValue,
       // i.e. they might want to keep typing "Blueish".
-      if (debouncedSearch) return;
-
       setFieldState((prevState) => ({
         ...prevState,
         inputValue: "",
