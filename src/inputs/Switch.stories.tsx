@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { useState } from "react";
-import { Css } from "../Css";
+import { Css } from "src/Css";
 import {
   Switch as SwitchComponent,
   switchFocusStyles,
@@ -23,7 +23,7 @@ export default {
 
 export const Switch = () => {
   return (
-    <div css={{ h1: Css.xl4Sb.mb4.$, h2: Css.xl2Sb.$ }}>
+    <div css={{ "& h1": Css.xl4Sb.mb4.$, "& h2": Css.xl2Sb.$ }}>
       <h1>Switch</h1>
       <div css={Css.df.gap4.fdc.$}>
         <h2>Switch</h2>
@@ -126,7 +126,7 @@ function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchWrapperProps) {
   return (
     <div
       css={{
-        "label > div:nth-of-type(1) > div": {
+        "& label > div:nth-of-type(1) > div": {
           ...(isHovered && switchHoverStyles),
           ...(props.selected && isHovered && switchSelectedHoverStyles),
           ...(isFocused && switchFocusStyles),

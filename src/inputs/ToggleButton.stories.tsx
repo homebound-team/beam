@@ -24,7 +24,7 @@ export default {
 
 export const ToggleButton = () => {
   return (
-    <div css={{ h1: Css.xl4Sb.mb4.$, h2: Css.xl2Sb.$ }}>
+    <div css={{ "& h1": Css.xl4Sb.mb4.$, "& h2": Css.xl2Sb.$ }}>
       <h1>Toggle Button</h1>
       <div css={Css.df.gap4.fdc.aifs.$}>
         <ToggleButtonWrapper label="Inactive" />
@@ -41,7 +41,7 @@ export const ToggleButton = () => {
 
 export const AsyncToggleButton = () => {
   return (
-    <div css={{ h1: Css.xl4Sb.mb4.$, h2: Css.xl2Sb.$ }}>
+    <div css={{ "& h1": Css.xl4Sb.mb4.$, "& h2": Css.xl2Sb.$ }}>
       <h1>Toggle Button</h1>
       <div css={Css.df.gap4.fdc.$}>
         <h3>Resolved (2s)</h3>
@@ -76,7 +76,7 @@ function ToggleButtonWrapper({ isHovered, isFocused, isPressed, onChange, ...pro
   return (
     <div
       css={{
-        label: {
+        "& label": {
           ...(isHovered && toggleHoverStyles),
           ...(isPressed && togglePressStyles),
           ...(isFocused && toggleFocusStyles),

@@ -11,7 +11,7 @@ export default {
 
 export function AccordionListWithMultipleSelections() {
   const accordions: AccordionProps[] = [
-    { title: "First accordion title", children: <div>Fisrt accordion description</div> },
+    { title: "First accordion title", children: <div>First accordion description</div> },
     { title: "Second accordion title", children: <div>Second accordion description</div> },
     { title: "Third accordion title", children: <div>Third accordion description</div> },
   ];

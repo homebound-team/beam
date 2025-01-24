@@ -29,7 +29,15 @@ export const Icon = React.memo((props: IconProps) => {
         height={size}
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
-        css={{ "path, rect": Css.fill(color).$, ...(bgColor && Css.bgColor(bgColor).$), ...xss }}
+        css={{
+          // Spread these in b/c they don't type-check for some reason...
+          ...({
+            "& > path": Css.fill(color).$,
+            "& > rect": Css.fill(color).$,
+          } as any),
+          ...(bgColor && Css.bgColor(bgColor).$),
+          ...xss,
+        }}
         data-icon={icon}
         {...other}
       >

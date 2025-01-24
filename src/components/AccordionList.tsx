@@ -22,10 +22,10 @@ export function AccordionList(props: AccordionListProps) {
     <>
       {accordions.map((accordionProps, index, arr) => (
         <Accordion
+          key={index}
           {...accordionProps}
           {...tid}
           compact={compact}
-          key={index}
           size={size}
           bottomBorder={compact ? false : index === arr.length - 1}
           defaultExpanded={!allowMultipleExpanded && expandedIndex === index}

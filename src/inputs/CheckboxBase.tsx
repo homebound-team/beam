@@ -92,7 +92,7 @@ const disabledSelectedBoxStyles = Css.bgGray400.bcGray400.$;
 const disabledColor = Css.gray300.$;
 const focusRingStyles = Css.bshFocus.$;
 const hoverBorderStyles = Css.bcBlue900.$;
-const markStyles = { svg: Css.absolute.topPx(-1).leftPx(-1).$ };
+const markStyles = { ">svg": Css.absolute.topPx(-1).leftPx(-1).$ };
 const labelStyles = Css.smMd.$;
 const descStyles = Css.sm.gray700.$;
 

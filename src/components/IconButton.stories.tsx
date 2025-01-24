@@ -121,7 +121,7 @@ export function IconButtonLink() {
 /** Hover styled version of the IconButton */
 function HoveredIconButton(args: IconButtonProps) {
   return (
-    <div css={{ button: args.contrast ? iconButtonContrastStylesHover : iconButtonStylesHover }}>
+    <div css={{ "& button": args.contrast ? iconButtonContrastStylesHover : iconButtonStylesHover }}>
       <IconButton {...args} />
     </div>
   );

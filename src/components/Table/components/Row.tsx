@@ -120,7 +120,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     ...{
-      [` > .${revealOnRowHoverClass} > *`]: Css.vh.$,
+      [`> .${revealOnRowHoverClass} > *`]: Css.vh.$,
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.vv.$,
     },
     ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
