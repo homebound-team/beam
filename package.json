@@ -73,9 +73,10 @@
   "devDependencies": {
     "@emotion/react": "^11.10.6",
     "@homebound/eslint-config": "^1.10.2",
+    "@homebound/fast-css-prop": "^1.137.4",
     "@homebound/rtl-react-router-utils": "1.2.0",
     "@homebound/rtl-utils": "^2.66.2",
-    "@homebound/truss": "^1.136.0",
+    "@homebound/truss": "^1.137.4",
     "@homebound/tsconfig": "^1.1.1",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
@@ -99,6 +100,7 @@
     "@types/react-dom": "^18.3.1",
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^4.3.2",
+    "@vitejs/plugin-react-swc": "^3.7.2",
     "array-move": "^4.0.0",
     "chromatic": "^11.12.6",
     "conventional-changelog-conventionalcommits": "^5.0.0",
@@ -123,8 +125,8 @@
     "ts-patch": "^3.2.1",
     "typescript": "5.5.4",
     "typescript-transform-paths": "^3.5.1",
-    "vite": "^5.4.9",
-    "vite-tsconfig-paths": "^5.0.1",
+    "vite": "^6.0.11",
+    "vite-tsconfig-paths": "^5.1.4",
     "watch": "^1.0.2"
   },
   "resolutions": {

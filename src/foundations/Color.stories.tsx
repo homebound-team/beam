@@ -32,7 +32,7 @@ function ListColors({ palette }: { palette: string[][] }) {
   return (
     <ul css={{ listStyle: "none", ...Css.df.tac.$ }}>
       {palette.map(([name, color]) => (
-        <ColorSquare {...{ name, color }} key={name} />
+        <ColorSquare key={name} {...{ name, color }} />
       ))}
     </ul>
   );

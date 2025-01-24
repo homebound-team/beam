@@ -63,9 +63,9 @@ export function SuperDrawer(): ReactPortal | null {
           <Global styles={{ body: Css.oh.$ }} />
           {/* Overlay */}
           <motion.div
-            {...testId}
             // Key is required for framer-motion animations
             key="superDrawer"
+            {...testId}
             // TODO: Should this color be part of the Palette?
             // z-index of 3 is used to give flexibility for future overlapping content
             // Not using `inset` due to Safari 14.0.x not supporting this CSS property.

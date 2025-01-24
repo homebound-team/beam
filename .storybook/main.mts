@@ -19,7 +19,6 @@ const config: StorybookConfig = {
       },
       // Add aliasing to resolve absolute paths for imports
       resolve: { alias: { src: path.resolve(__dirname, "../src") } },
-      optimizeDeps: ["@emotion/react/jsx-dev-runtime"],
     });
   },
 
