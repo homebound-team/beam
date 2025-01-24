@@ -2,7 +2,7 @@
   "extends": "@homebound/tsconfig/tsconfig.json",
   "compilerOptions": {
     "lib": ["ESNext", "DOM"],
-    "types": ["jest"],
+    "types": ["jest", "node"],
     // Use React 17 _jsx / automatic runtime support for nice emotion integration
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
