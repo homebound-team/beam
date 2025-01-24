@@ -2543,7 +2543,7 @@ __metadata:
     "@homebound/rtl-react-router-utils": 1.2.0
     "@homebound/rtl-utils": ^2.66.2
     "@homebound/truss": ^1.136.0
-    "@homebound/tsconfig": ^1.0.3
+    "@homebound/tsconfig": ^1.1.1
     "@internationalized/number": ^3.0.3
     "@popperjs/core": ^2.11.6
     "@react-aria/utils": ^3.18.0
@@ -2564,6 +2564,7 @@ __metadata:
     "@tsconfig/recommended": ^1.0.2
     "@types/dompurify": ^2.2.3
     "@types/jest": ^29.4.0
+    "@types/node": ^22.10.10
     "@types/react": ^18.3.11
     "@types/react-beautiful-dnd": ^13.1.3
     "@types/react-dom": ^18.3.1
@@ -2712,12 +2713,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@homebound/tsconfig@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "@homebound/tsconfig@npm:1.0.3"
+"@homebound/tsconfig@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@homebound/tsconfig@npm:1.1.1"
   dependencies:
     "@tsconfig/recommended": ^1.0.1
-  checksum: c3e88c96591a8d9ad330b4814da7e2838dc25df61f60838dcb6ed7e13c731278e32465aed55dc9252e0113ea93506031fd93648eddfd0d1317f361e589475bd8
+  checksum: 2094f178c6116f4729c5980b633858f1150d5ca54d9dc25a1179d4f35ee4904b8e9bc19d7f8b4f14cbcf2c528aa68b1b3f0cbfabd535116e568b84f714d77e58
   languageName: node
   linkType: hard
 
@@ -6053,6 +6054,15 @@ __metadata:
   dependencies:
     undici-types: ~6.19.2
   checksum: 6afe2a1bd70ee0afa76c904ffdb04c634366987103bb2bef2d5b036f3bb49a4e828bb5e9fc64af442a76aaac4896df9277e725c843d85375d135aa71eb2fe3d9
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^22.10.10":
+  version: 22.10.10
+  resolution: "@types/node@npm:22.10.10"
+  dependencies:
+    undici-types: ~6.20.0
+  checksum: 4906f63dd1dcee6acc096b3336353e04a15746b639bbf4f585e3093851a17852a9ea0e302caef2d782c836adb3812e6eb3305b8783809320013a1d77798816b3
   languageName: node
   linkType: hard
 
@@ -15821,6 +15831,13 @@ __metadata:
   version: 6.19.8
   resolution: "undici-types@npm:6.19.8"
   checksum: de51f1b447d22571cf155dfe14ff6d12c5bdaec237c765085b439c38ca8518fc360e88c70f99469162bf2e14188a7b0bcb06e1ed2dc031042b984b0bb9544017
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~6.20.0":
+  version: 6.20.0
+  resolution: "undici-types@npm:6.20.0"
+  checksum: b7bc50f012dc6afbcce56c9fd62d7e86b20a62ff21f12b7b5cbf1973b9578d90f22a9c7fe50e638e96905d33893bf2f9f16d98929c4673c2480de05c6c96ea8b
   languageName: node
   linkType: hard
 

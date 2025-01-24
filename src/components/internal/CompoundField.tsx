@@ -5,7 +5,7 @@ import { TextFieldInternalProps } from "src/interfaces";
 /** Internal component to help create compound fields */
 export function CompoundField({ children }: { children: JSX.Element[] }) {
   if (children?.length !== 2) {
-    throw global.Error("CompoundField requires two children components");
+    throw new Error("CompoundField requires two children components");
   }
   const commonStyles = Css.df.aic.fs1.maxwPx(550).bt.bb.bcGray300.$;
   const internalProps: TextFieldInternalProps = { compound: true };
