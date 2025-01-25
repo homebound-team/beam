@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { SnackbarNotice } from "src/components/Snackbar/SnackbarNotice";
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
