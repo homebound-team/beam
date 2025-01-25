@@ -1,7 +1,10 @@
 import type { Config } from "@jest/types";
+import { createDefaultEsmPreset } from "ts-jest";
+
+const presetConfig = createDefaultEsmPreset({ isolatedModules: true });
 
 const config: Config.InitialOptions = {
-  preset: "ts-jest",
+  ...presetConfig,
   testEnvironment: "jsdom",
   moduleNameMapper: {
     "^src(.*)": "<rootDir>/src$1",

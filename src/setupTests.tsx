@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import "@testing-library/jest-dom";
 import "jest-chain";
 import { configure } from "mobx";
@@ -9,9 +10,9 @@ afterEach(() => jest.useRealTimers());
 configure({ enforceActions: "never" });
 
 // Use deterministic ids. Note that `@react-aria/utils` / `useId` goes through this useSSRSafeId.
-jest.mock("@react-aria/ssr", () => {
+jest.unstable_mockModule("@react-aria/ssr", () => {
   let id = 0;
-  const react = jest.requireActual("react");
+  const react = jest.requireActual("react") as any;
   return {
     ...(jest.requireActual("@react-aria/ssr") as any),
     useSSRSafeId: (defaultId?: string) => {
@@ -22,8 +23,8 @@ jest.mock("@react-aria/ssr", () => {
 
 // Make framer-motion animations happen immediately for easier testing
 // https://github.com/framer/motion/issues/285#issuecomment-1252290924
-jest.mock("framer-motion", () => {
-  const actual = jest.requireActual("framer-motion");
+jest.unstable_mockModule("framer-motion", () => {
+  const actual = jest.requireActual("framer-motion") as any;
   return {
     __esModule: true,
     ...actual,

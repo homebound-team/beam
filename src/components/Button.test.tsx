@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { Button } from "src/components/Button";
 import { noop } from "src/utils";
 import { click, render, wait } from "src/utils/rtl";

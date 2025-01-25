@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { act } from "@testing-library/react";
 import { useEffect } from "react";
 import { BeamContextState, useBeamContext } from "src/components/BeamContext";

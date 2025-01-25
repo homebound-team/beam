@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useEffect } from "react";
 import { ModalBody, ModalFooter, ModalProps, useModal } from "src/components/Modal";

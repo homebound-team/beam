@@ -1,5 +1,4 @@
-import { StorybookConfig } from "@storybook/react-vite";
-import path from "path";
+import { type StorybookConfig } from "@storybook/react-vite";
 import { mergeConfig } from "vite";
 
 const config: StorybookConfig = {
@@ -17,9 +16,12 @@ const config: StorybookConfig = {
         // See https://github.com/vitejs/vite/issues/8644#issuecomment-1159308803
         logOverride: { "this-is-undefined-in-esm": "silent" },
       },
-      // Add aliasing to resolve absolute paths for imports
-      resolve: { alias: { src: path.resolve(__dirname, "../src") } },
-      optimizeDeps: ["@emotion/react/jsx-dev-runtime"],
+      // If you see weird errors around `createElement is undefined`, it is likely because of
+      // React now wanting the `key` prop to always come first:
+      //
+      // - https://github.com/facebook/react/pull/25697/files?diff=unified&w=1
+      // - https://github.com/vitejs/vite/issues/6215
+      // - https://github.com/mui/material-ui/issues/39833
     });
   },
 
