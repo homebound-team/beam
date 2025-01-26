@@ -1,4 +1,3 @@
-import { action } from "@storybook/addon-actions";
 import { useState } from "react";
 import { Button } from "src/components/Button";
 import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
@@ -170,7 +169,7 @@ function TestButtonMenu({ empty = false, searchable = false, ...others }: { empt
           onClick={() =>
             setMenuItems((prevItems) => [
               ...prevItems,
-              { label: `Item ${prevItems.length + 1}`, onClick: action(`Item ${prevItems.length + 1}`) },
+              { label: `Item ${prevItems.length + 1}`, onClick: () => console.log(`Item ${prevItems.length + 1}`) },
             ])
           }
         />
