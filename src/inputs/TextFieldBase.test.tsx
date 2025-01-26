@@ -1,7 +1,7 @@
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { focus, render } from "src/utils/rtl";
 
-describe(TextFieldBase, () => {
+describe("TextFieldBase", () => {
   it("shows error and helper text", async () => {
     const r = await render(<TextFieldBase inputProps={{}} label="Test" errorMsg="Error" helperText="Helper" />);
     expect(r.test_errorMsg).toHaveTextContent("Error");
@@ -41,12 +41,12 @@ describe(TextFieldBase, () => {
     // The unfocused placeholder container is rendered
     expect(r.test_unfocusedPlaceholderContainer).toBeInTheDocument();
     // And is visible
-    expect(r.test_unfocusedPlaceholderContainer).not.toHaveStyleRule("position", "absolute");
+    expect(r.test_unfocusedPlaceholderContainer).not.toHaveStyle({ position: "absolute" });
 
     // And when we focus the field
     focus(r.test);
 
     // Then the unfocused placeholder container is visually hidden
-    expect(r.test_unfocusedPlaceholderContainer).toHaveStyleRule("position", "absolute");
+    expect(r.test_unfocusedPlaceholderContainer).toHaveStyle({ position: "absolute" });
   });
 });

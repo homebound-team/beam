@@ -115,8 +115,8 @@ describe("GridTable", () => {
     };
     const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} />);
     // Then we add the center class
-    expect(cell(r, 0, 1)).toHaveStyleRule("justify-content", "center");
-    expect(cell(r, 1, 1)).toHaveStyleRule("justify-content", "center");
+    expect(cell(r, 0, 1)).toHaveStyle({ justifyContent: "center" });
+    expect(cell(r, 1, 1)).toHaveStyle({ justifyContent: "center" });
   });
 
   it("can align a column", async () => {
@@ -130,9 +130,9 @@ describe("GridTable", () => {
     };
     const r = await render(<GridTable columns={[nameColumn, valueColumn]} rows={rows} />);
     // Then we applied the default of right aligned
-    expect(cell(r, 0, 1)).toHaveStyleRule("justify-content", "flex-end");
+    expect(cell(r, 0, 1)).toHaveStyle({ justifyContent: "flex-end" });
     // And also the override of center aligned
-    expect(cell(r, 1, 1)).toHaveStyleRule("justify-content", "center");
+    expect(cell(r, 1, 1)).toHaveStyle({ justifyContent: "center" });
   });
 
   it("unwraps rows with a data key", async () => {
@@ -179,9 +179,9 @@ describe("GridTable", () => {
     const r = await render(<GridTable style={{ rowHeight: "flexible" }} columns={[selectColumn]} rows={rows} />);
 
     // Then field do not have any Css.truncate styles
-    expect(r.field).not.toHaveStyleRule("white-space", "nowrap");
-    expect(r.field).not.toHaveStyleRule("overflow", "hidden");
-    expect(r.field).not.toHaveStyleRule("textOverflow", "ellipsis");
+    expect(r.field).not.toHaveStyle({ whiteSpace: "nowrap" });
+    expect(r.field).not.toHaveStyle({ overflow: "hidden" });
+    expect(r.field).not.toHaveStyle({ textOverflow: "ellipsis" });
   });
 
   it("can have per-row styles", async () => {
@@ -192,16 +192,16 @@ describe("GridTable", () => {
     };
     const r = await render(<GridTable {...{ columns, rows, rowStyles }} />);
     // Then the data row has the style added
-    expect(row(r, 1)).toHaveStyleRule("background-color", Palette.Red500);
+    expect(row(r, 1)).toHaveStyle({ backgroundColor: Palette.Red500 });
     // TODO Ideally assert against the maybeDarken'd but the target isn't working on our fancy hover + child selector
     // expect(row(r, 1)).toHaveStyleRule("background-color", Palette.Primary, { target: ":hover>*" });
     // And the cell style is added to both cells
-    expect(cell(r, 1, 0)).toHaveStyleRule("color", Palette.Red500);
-    expect(cell(r, 1, 1)).toHaveStyleRule("color", Palette.Red500);
+    expect(cell(r, 1, 0)).toHaveStyle({ color: Palette.Red500 });
+    expect(cell(r, 1, 1)).toHaveStyle({ color: Palette.Red500 });
     // But the header row does not have any of these
-    expect(row(r, 0)).not.toHaveStyleRule("background-color", Palette.Red500);
-    expect(cell(r, 0, 0)).not.toHaveStyleRule("color", Palette.Red500);
-    expect(cell(r, 0, 1)).not.toHaveStyleRule("color", Palette.Red500);
+    expect(row(r, 0)).not.toHaveStyle({ backgroundColor: Palette.Red500 });
+    expect(cell(r, 0, 0)).not.toHaveStyle({ color: Palette.Red500 });
+    expect(cell(r, 0, 1)).not.toHaveStyle({ color: Palette.Red500 });
   });
 
   it("can have dynamic per-row styles", async () => {
@@ -215,11 +215,11 @@ describe("GridTable", () => {
     };
     const r = await render(<GridTable {...{ columns, rows, rowStyles }} />);
     // Then the rowCss styles the 1st row and 2nd are differently
-    expect(row(r, 1)).toHaveStyleRule("background-color", Palette.Red500);
-    expect(row(r, 2)).toHaveStyleRule("background-color", Palette.Green500);
+    expect(row(r, 1)).toHaveStyle({ backgroundColor: Palette.Red500 });
+    expect(row(r, 2)).toHaveStyle({ backgroundColor: Palette.Green500 });
     // And the cellCss also styles the 1st row and 2nd are differently
-    expect(cell(r, 1, 0)).toHaveStyleRule("color", Palette.Green500);
-    expect(cell(r, 2, 0)).toHaveStyleRule("color", Palette.Red500);
+    expect(cell(r, 1, 0)).toHaveStyle({ color: Palette.Green500 });
+    expect(cell(r, 2, 0)).toHaveStyle({ color: Palette.Red500 });
   });
 
   it("can apply cell-specific styling", async () => {
@@ -239,8 +239,8 @@ describe("GridTable", () => {
     ];
     const r = await render(<GridTable columns={[nameColumn]} rows={rows} />);
     // Then the rows are styled appropriately
-    expect(cell(r, 0, 0)).toHaveStyleRule("background-color", Palette.Red500);
-    expect(cell(r, 1, 0)).toHaveStyleRule("background-color", Palette.Red100);
+    expect(cell(r, 0, 0)).toHaveStyle({ backgroundColor: Palette.Red500 });
+    expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: Palette.Red100 });
   });
 
   describe("client-side sorting", () => {
@@ -2484,13 +2484,13 @@ describe("GridTable", () => {
       <GridTable columns={columns} rows={rows} rowStyles={activeRowIdRowStyles} style={{ cellCss: Css.bgWhite.$ }} />,
     );
     // And the first row/cell has the default background color
-    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.White);
+    expect(cell(r, 1, 1)).toHaveStyle({ backgroundColor: Palette.White });
 
     // When clicking the cell
     click(cell(r, 1, 1));
 
     // Then the first row/cell has the 'active' background color
-    expect(cell(r, 1, 1)).toHaveStyleRule("background-color", Palette.Blue50);
+    expect(cell(r, 1, 1)).toHaveStyle({ backgroundColor: Palette.Blue50 });
   });
 
   it("does not shows cell border when 'cellHighlight' is not defined", async () => {
@@ -2501,7 +2501,7 @@ describe("GridTable", () => {
     click(cell(r, 1, 1));
 
     // Then the cell does not have the highlight color.
-    expect(cell(r, 1, 1)).not.toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.Blue700}`);
+    expect(cell(r, 1, 1)).not.toHaveStyle({ boxShadow: `inset 0 0 0 1px ${Palette.Blue700}` });
   });
 
   it("shows cell border when 'cellHighlight' is defined", async () => {
@@ -2512,7 +2512,7 @@ describe("GridTable", () => {
     click(cell(r, 1, 1));
 
     // Then the cell has the highlight color.
-    expect(cell(r, 1, 1)).toHaveStyleRule("box-shadow", `inset 0 0 0 1px ${Palette.Blue700}`);
+    expect(cell(r, 1, 1)).toHaveStyle({ boxShadow: `inset 0 0 0 1px ${Palette.Blue700}` });
   });
 
   it("can render with rows with initCollapsed defined", async () => {
@@ -2969,7 +2969,7 @@ describe("GridTable", () => {
       );
 
       // Then the column's width is initially set to the `column.expandColumns` property
-      expect(cell(r, 0, 0)).toHaveStyleRule("width", "calc(300px)");
+      expect(cell(r, 0, 0)).toHaveStyle({ width: "calc(300px)" });
     });
 
     it("auto assigns 'visibleColumnsStorageKey'", async () => {

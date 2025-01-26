@@ -15,9 +15,10 @@ describe("Chips", () => {
 
   it("can set compact to change size to xs", async () => {
     const r = await render(<Chips values={values} compact />);
-    expect(r.chip_0)
-      .toHaveStyleRule("font-size", "12px")
-      .toHaveStyleRule("font-weight", "400")
-      .toHaveStyleRule("line-height", "16px");
+    expect(r.chip_0).toHaveStyle({
+      fontSize: "12px",
+      fontWeight: "400",
+      lineHeight: "16px",
+    });
   });
 });
