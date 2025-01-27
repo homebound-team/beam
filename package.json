@@ -71,7 +71,6 @@
     }
   },
   "devDependencies": {
-    "@emotion/jest": "^11.10.5",
     "@emotion/react": "^11.10.6",
     "@homebound/eslint-config": "^1.10.2",
     "@homebound/rtl-react-router-utils": "1.2.0",

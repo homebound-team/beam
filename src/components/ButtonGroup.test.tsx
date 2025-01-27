@@ -61,6 +61,6 @@ describe("ButtonGroup", () => {
 
   it("can render jsx", async () => {
     const r = await render(<ButtonGroup buttons={[{ text: <div css={Css.red500.$}>Hello World</div> }]} />);
-    expect(r.getByText("Hello World")).toHaveStyleRule("color", Css.red500.$.color);
+    expect(r.getByText("Hello World")).toHaveStyle({ color: Css.red500.$.color });
   });
 });

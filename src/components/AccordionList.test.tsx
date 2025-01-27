@@ -3,7 +3,7 @@ import { render } from "src/utils/rtl";
 import { AccordionProps } from "./Accordion";
 import { AccordionList } from "./AccordionList";
 
-describe(AccordionList, () => {
+describe("AccordionList", () => {
   const accordions: AccordionProps[] = [
     { title: "First accordion title", children: <div>First accordion description</div> },
     { title: "Second accordion title", children: <div>Second accordion description</div> },
@@ -21,7 +21,7 @@ describe(AccordionList, () => {
     expect(r.accordionList_title_2).toHaveTextContent("Third accordion title");
 
     // And the border bottom is displayed by default
-    expect(r.accordionList_container_2).toHaveStyleRule("border-bottom-width", "1px");
+    expect(r.accordionList_container_2).toHaveStyle({ borderBottomWidth: "1px" });
   });
 
   it("can have multiple accordions expanded", async () => {
