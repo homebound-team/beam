@@ -1,4 +1,3 @@
-import { matchers } from "@emotion/jest";
 import "@testing-library/jest-dom";
 import "jest-chain";
 import { configure } from "mobx";
@@ -31,9 +30,6 @@ jest.mock("framer-motion", () => {
     AnimatePresence: (props: any) => <div {...props} />,
   };
 });
-
-// Add toHaveStyleRule
-expect.extend(matchers);
 
 // Adding a media matcher to avoid errors in tests
 Object.defineProperty(window, "matchMedia", {
