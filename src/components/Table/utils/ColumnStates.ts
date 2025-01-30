@@ -64,8 +64,11 @@ export class ColumnStates<R extends Kinded> {
   }
 
   /** Returns a flat list of all visible columns. */
-  get allVisibleColumns(): ColumnState<R>[] {
-    return this.columns.flatMap((cs) => cs.maybeSelfAndChildren);
+  allVisibleColumns(showIn: "web" | "csv"): ColumnState<R>[] {
+    return this.columns
+      .flatMap((cs) => cs.maybeSelfAndChildren)
+      .filter((cs) => !cs.column.showIn || cs.column.showIn === showIn)
+      .filter((cs) => (showIn === "csv" ? !cs.column.isAction : true));
   }
 
   setVisibleColumns(ids: string[]): void {

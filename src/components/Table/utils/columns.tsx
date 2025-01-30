@@ -49,6 +49,7 @@ export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>
     // Select Column should not display the select toggle for `expandableHeader` or `totals` row kinds
     expandableHeader: emptyCell,
     totals: emptyCell,
+    showIn: undefined,
     // Use any of the user's per-row kind methods if they have them.
     ...columnDef,
   };
