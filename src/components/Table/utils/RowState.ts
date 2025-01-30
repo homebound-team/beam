@@ -133,7 +133,8 @@ export class RowState<R extends Kinded> {
     // Parent `selectedState` is special b/c it does not directly depend on the parent's own selected-ness,
     // but instead depends on the current visible children. I.e. a parent might be "selected", but then the
     // client-side filter changes, a child reappears, and we need to transition to partial-ness.
-    if (this.isParent) {
+    // If there are no selectable children, we should return "checked" if the parent is selected.
+    if (this.isParent && this.hasSelectableChildren) {
       // Use visibleChildren b/c if filters are hiding some of our children, we still want to show fully selected
       const children = this.visibleChildren.filter((c) => c.row.selectable !== false);
       const allChecked = children.every((child) => child.selectedState === "checked");
@@ -150,7 +151,8 @@ export class RowState<R extends Kinded> {
    * wants to show partial-ness whenever any given child is selected.
    */
   get selectedStateForHeader(): SelectedState {
-    if (this.children) {
+    // If there are no selectable children, we should return "checked" if the parent is selected.
+    if (this.children && this.hasSelectableChildren) {
       const children = this.visibleChildren.filter((c) => c.row.selectable !== false || c.isParent);
       const allChecked = children.every((child) => child.selectedStateForHeader === "checked");
       const allUnchecked = children.every((child) => child.selectedStateForHeader === "unchecked");
@@ -296,6 +298,10 @@ export class RowState<R extends Kinded> {
     // the original/unsorted array if we need to revert to the original sort order.
     if (sortFn) rows = [...rows].sort(sortFn);
     return rows;
+  }
+
+  private get hasSelectableChildren(): boolean {
+    return this.visibleChildren.some((c) => c.row.selectable !== false);
   }
 
   /**
