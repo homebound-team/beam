@@ -3956,9 +3956,10 @@ describe("GridTable", () => {
 
   it("can download csvs with extra columns", async () => {
     let api: GridTableApi<Row> | undefined;
-    // Given a table with 1 column
+    // Given a table with two columns
     const columns: GridColumn<Row>[] = [
       { header: "Value", data: ({ value }) => value },
+      // And the 2nd wants to be shown only in the csv download
       { header: "CSVOnly", data: ({ value }) => `${(value ?? 0) * 2}`, showIn: "csv" },
     ];
     function Test() {
@@ -3968,7 +3969,7 @@ describe("GridTable", () => {
     const r = await render(<Test />);
     // When we generate the csv, then the extra rows are included
     expect((api as GridTableApiImpl<Row>).generateCsvContent()).toEqual(["Value,CSVOnly", "1,2", "2,4"]);
-    // But it's not shown in the UI
+    // But the 2nd column is not shown in the UI
     expect(cell(r, 1, 0)).toHaveTextContent("1");
     expect(cell(r, 1, 1)).toBeUndefined();
   });
