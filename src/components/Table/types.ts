@@ -97,6 +97,8 @@ export type GridColumn<R extends Kinded> = {
   initExpanded?: boolean;
   /** Determines whether this column should be hidden when expanded (only the 'expandColumns' would show) */
   hideOnExpand?: boolean;
+  /** Determines whether a column is csv-only or web-only. */
+  showIn?: "csv" | "web";
 };
 
 /**
@@ -124,6 +126,8 @@ export const nonKindGridColumnKeys = [
   "initVisible",
   "expandColumns",
   "initExpanded",
+  "hideOnExpand",
+  "showIn",
 ];
 
 /**

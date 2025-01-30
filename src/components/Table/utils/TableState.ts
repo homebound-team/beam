@@ -179,7 +179,12 @@ export class TableState<R extends Kinded> {
 
   /** Returns visible columns, i.e. those that are visible + any expanded children. */
   get visibleColumns(): GridColumnWithId<R>[] {
-    return this.columnStates.allVisibleColumns.map((cs) => cs.column);
+    return this.columnStates.allVisibleColumns("web").map((cs) => cs.column);
+  }
+
+  /** Returns visible columns, i.e. those that are visible + any expanded children. */
+  get visibleCsvColumns(): GridColumnWithId<R>[] {
+    return this.columnStates.allVisibleColumns("csv").map((cs) => cs.column);
   }
 
   /** Implements GridTableApi.visibleColumnIds. */

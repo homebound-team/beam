@@ -45,7 +45,6 @@ export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>
     w: "40px",
     wrapAction: false,
     isAction: true,
-    expandColumns: undefined,
     // Select Column should not display the select toggle for `expandableHeader` or `totals` row kinds
     expandableHeader: emptyCell,
     totals: emptyCell,
@@ -77,7 +76,6 @@ export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<
     w: "38px",
     wrapAction: false,
     isAction: true,
-    expandColumns: undefined,
     // Collapse Column should not display the collapse toggle for `expandableHeader` or `totals` row kinds
     expandableHeader: emptyCell,
     totals: emptyCell,
@@ -233,7 +231,6 @@ export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColum
     w: "40px",
     wrapAction: false,
     isAction: true,
-    expandColumns: undefined,
     expandableHeader: emptyCell,
     totals: emptyCell,
     // Use any of the user's per-row kind methods if they have them.

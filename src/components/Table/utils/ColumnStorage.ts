@@ -24,7 +24,7 @@ export class ColumnStorage<R extends Kinded> {
     // Unlike the others, where we only store the value on change, we immediately
     // store this value (but I'm not sure why...), hence using `autorun`.
     autorun(() => {
-      const columnIds = this.states.allVisibleColumns.map((cs) => cs.column.id);
+      const columnIds = this.states.allVisibleColumns("web").map((cs) => cs.column.id);
       sessionStorage.setItem(storageKey, JSON.stringify(columnIds));
     });
   }

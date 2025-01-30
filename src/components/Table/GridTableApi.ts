@@ -249,23 +249,21 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     const csvPrefixRows = this.tableState.csvPrefixRows?.map((row) => row.map(escapeCsvValue).join(",")) ?? [];
     // Convert the array of rows into CSV format
     const dataRows = this.tableState.visibleRows.map((rs) => {
-      const values = this.tableState.visibleColumns
-        .filter((c) => !c.isAction)
-        .map((c) => {
-          // Just guessing for level=1
-          const maybeContent = applyRowFn(c, rs.row, this as any as GridRowApi<R>, 1, true, undefined);
-          if (isGridCellContent(maybeContent)) {
-            const cell = maybeContent;
-            const content = maybeApply(cell.content);
-            // Anything not isJSX (like a string) we can put into the CSV directly
-            if (!isJSX(content)) return content;
-            // Otherwise use the value/sortValue values
-            return isDefined(cell.value) ? maybeApply(cell.value) : cell.sortValue ? maybeApply(cell.sortValue) : "-"; // Do we need the "-" handling unclear if we use it ever
-          } else {
-            // ReactNode
-            return isJSX(maybeContent) ? "-" : maybeContent;
-          }
-        });
+      const values = this.tableState.visibleCsvColumns.map((c) => {
+        // Just guessing for level=1
+        const maybeContent = applyRowFn(c, rs.row, this as any as GridRowApi<R>, 1, true, undefined);
+        if (isGridCellContent(maybeContent)) {
+          const cell = maybeContent;
+          const content = maybeApply(cell.content);
+          // Anything not isJSX (like a string) we can put into the CSV directly
+          if (!isJSX(content)) return content;
+          // Otherwise use the value/sortValue values
+          return isDefined(cell.value) ? maybeApply(cell.value) : cell.sortValue ? maybeApply(cell.sortValue) : "-"; // Do we need the "-" handling unclear if we use it ever
+        } else {
+          // ReactNode
+          return isJSX(maybeContent) ? "-" : maybeContent;
+        }
+      });
       return values.map(toCsvString).map(escapeCsvValue).join(",");
     });
     return [...csvPrefixRows, ...dataRows];
