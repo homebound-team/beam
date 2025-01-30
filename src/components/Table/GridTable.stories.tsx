@@ -1359,6 +1359,66 @@ export function SelectableChildrenRows() {
   );
 }
 
+export function MixedSelectableChildrenRows() {
+  type ParentRow = { kind: "parent"; id: string; data: string };
+  type ChildRow = { kind: "child"; id: string; data: string };
+  type Row = ParentRow | ChildRow;
+
+  const selectCol = selectColumn<Row>();
+
+  const nameCol: GridColumn<Row> = {
+    parent: (name) => name,
+    child: (name) => name,
+    mw: "160px",
+  };
+
+  return (
+    <>
+      <GridTable
+        columns={[collapseColumn<Row>(), selectCol, nameCol]}
+        rows={
+          [
+            simpleHeader,
+            {
+              kind: "parent",
+              id: "1",
+              data: "Howard Stark",
+              children: [
+                // Unselectable child
+                {
+                  kind: "child" as const,
+                  id: "2",
+                  data: "Tony Stark",
+                  selectable: false,
+                },
+              ],
+            },
+            {
+              kind: "parent",
+              id: "3",
+              data: "Odin",
+              children: [
+                // Mixed selectable/unselectable children
+                {
+                  kind: "child" as const,
+                  id: "4",
+                  data: "Thor",
+                },
+                {
+                  kind: "child" as const,
+                  id: "5",
+                  data: "Loki",
+                  selectable: false,
+                },
+              ],
+            },
+          ] as GridDataRow<Row>[]
+        }
+      />
+    </>
+  );
+}
+
 export function RevealOnRowHover() {
   const nameColumn: GridColumn<Row> = {
     header: "Name",
