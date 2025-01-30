@@ -126,6 +126,8 @@ export const nonKindGridColumnKeys = [
   "initVisible",
   "expandColumns",
   "initExpanded",
+  "hideOnExpand",
+  "showIn",
 ];
 
 /**
