@@ -3923,7 +3923,7 @@ describe("GridTable", () => {
       click(cellAnd(r, 0, 1, "select"));
       // Then expect the header row to be checked
       expect(cellAnd(r, 0, 1, "select")).toBeChecked();
-      // And expect the both parent rows to be selected, along with the selectable child row
+      // And expect both parent rows to be selected, along with the selectable child row
       expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p2", "p2c1"]);
     });
 
