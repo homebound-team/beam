@@ -2129,6 +2129,98 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2", "p2", "p2c1", "p2c2", "p3", "p3c1"]);
   });
 
+  describe("Select All", () => {
+    it("sets the selected state of the parent row as checked when all children are not selectable", async () => {
+      // Given a table that has a parent row and two non-selectable children rows
+      const rows: GridDataRow<NestedRow>[] = [
+        simpleHeader,
+        {
+          kind: "parent",
+          id: "p1",
+          data: { name: "Group 1" },
+          children: [
+            { kind: "child", id: "p1c1", selectable: false, data: { name: "Non-Selectable Child 1" } },
+            { kind: "child", id: "p1c2", selectable: false, data: { name: "Non-Selectable Child 2" } },
+          ],
+        },
+      ];
+      const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+      const r = await render(<TestFilterAndSelect rows={rows} api={api} />);
+
+      // When triggering all rows as selected
+      click(cellAnd(r, 0, 1, "select"));
+      // Then expect the header row to be checked
+      expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+      // And expect the parent row to be the only row selected since all children are not selectable
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1"]);
+    });
+
+    it("selects parent rows and selectable children when some children are not selectable", async () => {
+      // Given a table that has two parent rows
+      // - One with no selectable children rows and one with selectable and non-selectable children rows
+      const rows: GridDataRow<NestedRow>[] = [
+        simpleHeader,
+        {
+          kind: "parent",
+          id: "p1",
+          data: { name: "Group 1" },
+          children: [
+            // Parent with non-selectable children
+            { kind: "child", id: "p1c1", selectable: false, data: { name: "Non-Selectable Child 1" } },
+            { kind: "child", id: "p1c2", selectable: false, data: { name: "Non-Selectable Child 2" } },
+          ],
+        },
+        {
+          kind: "parent",
+          id: "p2",
+          data: { name: "Group 2" },
+          children: [
+            // Parent with selectable and non-selectable children
+            { kind: "child", id: "p2c1", data: { name: "Selectable Child 1" } },
+            { kind: "child", id: "p2c2", selectable: false, data: { name: "Non-Selectable Child 3" } },
+          ],
+        },
+      ];
+      const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+      const r = await render(<TestFilterAndSelect rows={rows} api={api} />);
+
+      // When triggering all rows as selected
+      click(cellAnd(r, 0, 1, "select"));
+      // Then expect the header row to be checked
+      expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+      // And expect the both parent rows to be selected, along with the selectable child row
+      expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p2", "p2c1"]);
+    });
+
+    it("sets the selected state of the header row as checked when all children are not selectable", async () => {
+      // Given a table that has a header row and two non-selectable children rows
+      const rows: GridDataRow<NestedRow>[] = [
+        simpleHeader,
+        {
+          kind: "child",
+          id: "c1",
+          data: { name: "Child 1" },
+          selectable: false,
+        },
+        {
+          kind: "child",
+          id: "c2",
+          data: { name: "Child 2" },
+          selectable: false,
+        },
+      ];
+      const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+      const r = await render(<TestFilterAndSelect rows={rows} api={api} />);
+
+      // When triggering all rows as selected
+      click(cellAnd(r, 0, 1, "select"));
+      // Then expect the header row to be checked
+      expect(cellAnd(r, 0, 1, "select")).toBeChecked();
+      // And expect there to be no selected rows since all children are not selectable
+      expect(api.current!.getSelectedRowIds()).toEqual([]);
+    });
+  });
+
   // it can switch between partially checked to checked depending on applied filter
   it("can switch between partially checked to checked depending on applied filter", async () => {
     // Given a table that can apply a filter and a parent row with one child will match the filter
