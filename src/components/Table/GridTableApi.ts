@@ -225,7 +225,10 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
       new Blob([this.generateCsvContent().join("\n")], { type: "text/csv;charset=utf-8;" }),
     );
     link.setAttribute("href", url);
-    link.setAttribute("download", fileName);
+    // Strip .csv so we can replace `.`s and then add it back...
+    // (We replace dots to prevent them from messing up the file name extension.)
+    const downloadName = fileName.replace(/\.csv$/, "").replace(/\./g, "_") + ".csv";
+    link.setAttribute("download", downloadName);
     link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
