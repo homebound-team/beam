@@ -1,2 +1,1 @@
-export { useSnackbar } from "./useSnackbar";
-export type { TriggerNoticeProps } from "./useSnackbar";
+export { useSnackbar, type TriggerNoticeProps, type UseSnackbarHook } from "./useSnackbar";
