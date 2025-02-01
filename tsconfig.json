@@ -5,11 +5,11 @@
     "types": ["jest", "node"],
     // Use React 17 _jsx / automatic runtime support for nice emotion integration
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react",
-    "skipLibCheck": true,
-    "plugins": [
-      { "transform": "typescript-transform-paths" },
-      { "transform": "typescript-transform-paths", "afterDeclarations": true }
-    ]
+    "jsxImportSource": "@homebound/fast-css-prop",
+    "module": "Preserve",
+    // Let tsup rewrite path-less imports
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "skipLibCheck": true
   }
 }

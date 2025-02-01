@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { MutableRefObject } from "react";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable } from "src/components/Table/GridTable";

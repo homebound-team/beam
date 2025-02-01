@@ -1,10 +1,9 @@
 {
   "name": "@homebound/beam",
   "version": "2.378.1",
+  "type": "module",
   "author": "Homebound",
   "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/homebound-team/beam"
@@ -14,23 +13,39 @@
     "!dist/**/*.{stories,test}.*",
     "!dist/setupTests.*"
   ],
+  "exports": {
+    ".": {
+      "import": "dist/index.js",
+      "typings": "dist/index.d.ts",
+      "style": "dist/index.css"
+    },
+    "./rtl": {
+      "import": "dist/utils/rtl.js",
+      "typings": "dist/utils/rtl.d.ts"
+    },
+    "./sb": {
+      "import": "dist/utils/sb.js",
+      "typings": "dist/utils/sb.d.ts"
+    }
+  },
   "engines": {
     "node": "~20.9.0"
   },
   "scripts": {
     "start": "yarn storybook",
-    "build": "yarn copy && tspc",
+    "build": "yarn tsup-node src/index.ts src/utils/rtl.tsx src/utils/sb.tsx --format esm --dts --clean --sourcemap",
     "build:truss": "truss",
     "build-storybook": "NODE_OPTIONS=--openssl-legacy-provider storybook build",
-    "test": "jest --maxWorkers 4",
-    "test:watch": "jest --watch",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --maxWorkers 4",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "lint": "eslint --ext js,ts,tsx src",
     "lint:fix": "eslint --ext js,ts,tsx --fix src",
     "storybook": "NODE_OPTIONS=--openssl-legacy-provider storybook dev -p 9000",
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded --only-changed",
     "copy": "npx copyfiles -u 1 \"./src/**/*.css\" \"./dist/\"",
     "copy-to-internal-frontend": "cp -r dist/* ~/homebound/internal-frontend/node_modules/@homebound/beam/dist/",
-    "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\""
+    "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\"",
+    "type-check": "yarn tsc"
   },
   "dependencies": {
     "@homebound/form-state": "^2.25.2",
@@ -53,7 +68,7 @@
     "react-virtuoso": "^4.2.2",
     "tributejs": "^5.1.3",
     "trix": "^1.3.1",
-    "use-debounce": "^7.0.1",
+    "use-debounce": "^10.0.4",
     "use-query-params": "^1.2.2"
   },
   "peerDependencies": {
@@ -73,9 +88,10 @@
   "devDependencies": {
     "@emotion/react": "^11.10.6",
     "@homebound/eslint-config": "^1.10.2",
+    "@homebound/fast-css-prop": "^1.137.4",
     "@homebound/rtl-react-router-utils": "1.2.0",
     "@homebound/rtl-utils": "^2.66.2",
-    "@homebound/truss": "^1.136.0",
+    "@homebound/truss": "^1.137.4",
     "@homebound/tsconfig": "^1.1.1",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
@@ -98,7 +114,6 @@
     "@types/react-beautiful-dnd": "^13.1.3",
     "@types/react-dom": "^18.3.1",
     "@types/react-router-dom": "^5.3.3",
-    "@vitejs/plugin-react": "^4.3.2",
     "array-move": "^4.0.0",
     "chromatic": "^11.12.6",
     "conventional-changelog-conventionalcommits": "^5.0.0",
@@ -120,16 +135,18 @@
     "storybook": "^8.5.1",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "ts-patch": "^3.2.1",
+    "tsup": "^8.3.6",
     "typescript": "5.5.4",
-    "typescript-transform-paths": "^3.5.1",
-    "vite": "^5.4.9",
-    "vite-tsconfig-paths": "^5.0.1",
+    "vite": "^6.0.11",
+    "vite-tsconfig-paths": "^5.1.4",
     "watch": "^1.0.2"
   },
   "resolutions": {
     "@types/react": "18.0.28",
     "react-router": "5.3.4"
+  },
+  "imports": {
+    "src/*": "./src/*"
   },
   "packageManager": "yarn@3.6.3"
 }

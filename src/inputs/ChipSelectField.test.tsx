@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { ChipSelectField, ChipSelectFieldProps } from "src";

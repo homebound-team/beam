@@ -139,11 +139,9 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const fieldStyles = {
     container: Css.df.fdc.w100.maxw(fieldMaxWidth).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
     inputWrapper: {
-      ...Css[typeScale].df.aic.br4.px1.w100
-        .bgColor(bgColor)
-        .gray900.if(contrast && !inputStylePalette)
-        .white.if(labelStyle === "left")
-        .w(labelLeftFieldWidth).$,
+      ...Css[typeScale].df.aic.br4.px1.w100.$,
+      ...Css.bgColor(bgColor).gray900.if(contrast && !inputStylePalette).white.$,
+      ...Css.if(labelStyle === "left").w(labelLeftFieldWidth).$,
       // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
       // This typically happens in tables when a column has a mix of static text (i.e. "roll up" rows and table headers) and input fields.
       // To remedy this perceived misalignment then we increase the width by the horizontal padding applied (16px), and set a negative margin left margin to re-center the field.

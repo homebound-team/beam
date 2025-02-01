@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { noop } from "src/utils";
 import { click, getOptions, render } from "src/utils/rtl";
 import { PageSettings, Pagination, toLimitAndOffset } from "./Pagination";

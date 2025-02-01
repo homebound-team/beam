@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { AvatarButton } from "src/components/Avatar/AvatarButton";
 import { click, render } from "src/utils/rtl";
 

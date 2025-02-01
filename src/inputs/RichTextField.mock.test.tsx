@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { noop } from "src/utils";
 import { render, type } from "src/utils/rtl";
 import { RichTextField as MockRichTextField } from "./RichTextField.mock";
