@@ -2517,7 +2517,6 @@ __metadata:
     "@react-aria/utils": ^3.18.0
     "@semantic-release/exec": ^6.0.3
     "@semantic-release/git": ^10.0.1
-    "@storybook/addon-docs": ^8.5.1
     "@storybook/addon-essentials": ^8.5.1
     "@storybook/addon-interactions": ^8.5.1
     "@storybook/addon-links": ^8.5.1
@@ -5364,7 +5363,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@storybook/addon-docs@npm:8.5.1, @storybook/addon-docs@npm:^8.5.1":
+"@storybook/addon-docs@npm:8.5.1":
   version: 8.5.1
   resolution: "@storybook/addon-docs@npm:8.5.1"
   dependencies:
@@ -6016,16 +6015,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
-  version: 22.7.6
-  resolution: "@types/node@npm:22.7.6"
-  dependencies:
-    undici-types: ~6.19.2
-  checksum: 6afe2a1bd70ee0afa76c904ffdb04c634366987103bb2bef2d5b036f3bb49a4e828bb5e9fc64af442a76aaac4896df9277e725c843d85375d135aa71eb2fe3d9
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^22.10.10":
+"@types/node@npm:*, @types/node@npm:^22.10.10":
   version: 22.10.10
   resolution: "@types/node@npm:22.10.10"
   dependencies:
@@ -15783,13 +15773,6 @@ __metadata:
     has-symbols: ^1.0.3
     which-boxed-primitive: ^1.0.2
   checksum: b7a1cf5862b5e4b5deb091672ffa579aa274f648410009c81cca63fed3b62b610c4f3b773f912ce545bb4e31edc3138975b5bc777fc6e4817dca51affb6380e9
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:~6.19.2":
-  version: 6.19.8
-  resolution: "undici-types@npm:6.19.8"
-  checksum: de51f1b447d22571cf155dfe14ff6d12c5bdaec237c765085b439c38ca8518fc360e88c70f99469162bf2e14188a7b0bcb06e1ed2dc031042b984b0bb9544017
   languageName: node
   linkType: hard
 

@@ -79,7 +79,6 @@
     "@homebound/tsconfig": "^1.1.1",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@storybook/addon-docs": "^8.5.1",
     "@storybook/addon-essentials": "^8.5.1",
     "@storybook/addon-interactions": "^8.5.1",
     "@storybook/addon-links": "^8.5.1",
