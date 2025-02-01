@@ -12,7 +12,7 @@ export const Typography = () => {
       <table
         css={{
           "& > tr": Css.add("verticalAlign", "top").$,
-          "& > td:nth-of-type(1)": Css.pr4.$,
+          "& > tr > td:nth-of-type(1)": Css.pr4.$,
         }}
       >
         <tr css={Css.tiny.$}>
