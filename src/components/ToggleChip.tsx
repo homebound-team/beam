@@ -28,8 +28,8 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
           .pyPx(2)
           .gray900.bgGray200.if(disabled)
           .gray600.pr1.mhPx(compact ? 20 : 28).$,
-        ":hover:not(:disabled)": Css.bgGray300.$,
-        ":disabled": Css.cursorNotAllowed.$,
+        "&:hover:not(:disabled)": Css.bgGray300.$,
+        "&:disabled": Css.cursorNotAllowed.$,
         ...xss,
       }}
       disabled={disabled}

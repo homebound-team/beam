@@ -32,7 +32,7 @@ export function Default() {
 /** Hover styled version of the IconButton */
 function HoveredIconCard(args: IconCardProps) {
   return (
-    <div css={{ button: iconCardStylesHover }}>
+    <div css={{ "& button": iconCardStylesHover }}>
       <IconCard {...args} />
     </div>
   );

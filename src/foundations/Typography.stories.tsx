@@ -11,8 +11,8 @@ export const Typography = () => {
       <h1 css={Css.xl2Sb.mb3.$}>Typography</h1>
       <table
         css={{
-          tr: Css.add("verticalAlign", "top").$,
-          "td:nth-of-type(1)": Css.pr4.$,
+          "& > tr": Css.add("verticalAlign", "top").$,
+          "& > tr > td:nth-of-type(1)": Css.pr4.$,
         }}
       >
         <tr css={Css.tiny.$}>

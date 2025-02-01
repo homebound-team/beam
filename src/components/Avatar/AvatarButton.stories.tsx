@@ -63,7 +63,7 @@ export function Examples(props: AvatarButtonProps) {
 /** Hover styled version of the AvatarButton */
 function HoveredAvatarButton(props: AvatarButtonProps) {
   return (
-    <div css={{ button: hoverStyles }}>
+    <div css={{ "& button": hoverStyles }}>
       <AvatarButton {...props} />
     </div>
   );
@@ -72,7 +72,7 @@ function HoveredAvatarButton(props: AvatarButtonProps) {
 /** Pressed styled version of the AvatarButton */
 function PressedAvatarButton(props: AvatarButtonProps) {
   return (
-    <div css={{ button: pressedStyles }}>
+    <div css={{ "& button": pressedStyles }}>
       <AvatarButton {...props} />
     </div>
   );
