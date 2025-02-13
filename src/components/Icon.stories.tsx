@@ -57,6 +57,7 @@ export const Icon = (props: IconProps) => {
     "add",
     "remove",
     "pin",
+    "undo",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
