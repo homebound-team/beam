@@ -1,5 +1,6 @@
 import { act } from "@testing-library/react";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
+import { IconButton } from "src/components/IconButton";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
@@ -1005,11 +1006,9 @@ describe("GridTable", () => {
     // Given rowStyles that specify an action for each row
     const rowStyles: RowStyles<Row> = {
       header: {},
-      data: {
-        rowLink: () => "https://www.homebound.com",
-      },
+      data: { rowLink: () => "https://www.homebound.com" },
     };
-    // And a table where one columns omits wrapping the action
+    // And a table where one column omits wrapping the action
     const r = await render(
       <GridTable {...{ columns: [{ ...columns[0], wrapAction: false }, columns[1]], rows, rowStyles }} />,
       withRouter(),
@@ -1017,6 +1016,30 @@ describe("GridTable", () => {
     // Then expect that only one column is wrapped in an anchor tag
     expect(cell(r, 1, 0).tagName).toBe("DIV");
     expect(cell(r, 1, 1).tagName).toBe("A");
+  });
+
+  it("rowLink is not triggered when IconButtons are clicked", async () => {
+    // Given rowStyles that specify an action for each row
+    const rowStyles: RowStyles<Row> = {
+      header: {},
+      data: { rowLink: () => "/bar" },
+    };
+    const columnWithIcon: GridColumn<Row> = {
+      id: "value",
+      header: () => "Value",
+      data: () => (
+        <div>
+          some other text <IconButton icon="add" onClick="/foo" />
+        </div>
+      ),
+    };
+    // And a table where one column omits wrapping the action
+    const router = withRouter();
+    router.history.push = jest.fn();
+    const r = await render(<GridTable columns={[columnWithIcon]} rows={rows} rowStyles={rowStyles} />, router);
+    click(r.add_0);
+    expect(router.history.push).toHaveBeenCalledTimes(1);
+    // expect(router.history.location.pathname).toBe("/foo");
   });
 
   it("can handle onClick for GridCellContent", async () => {

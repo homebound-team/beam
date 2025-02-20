@@ -28,6 +28,30 @@ describe("IconButton", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it("does not propagate clicks with onClick=lambda", async () => {
+    const parentOnClick = jest.fn();
+    const iconOnClick = jest.fn();
+    const r = await render(
+      <div onClick={parentOnClick}>
+        <IconButton icon="trash" onClick={iconOnClick} />
+      </div>,
+    );
+    click(r.trash);
+    expect(iconOnClick).toHaveBeenCalledTimes(1);
+    expect(parentOnClick).toHaveBeenCalledTimes(0);
+  });
+
+  it("does not propagate clicks with onClick=string", async () => {
+    const parentOnClick = jest.fn();
+    const r = await render(
+      <div onClick={parentOnClick}>
+        <IconButton icon="trash" onClick="http://foo.com" />
+      </div>,
+    );
+    click(r.trash);
+    expect(parentOnClick).toHaveBeenCalledTimes(0);
+  });
+
   it("applies expected properties when rendering a link with an absolute url", async () => {
     const r = await render(<IconButton icon="trash" onClick="https://www.homebound.com" />, withRouter());
     expect(r.trash.tagName).toBe("A");
