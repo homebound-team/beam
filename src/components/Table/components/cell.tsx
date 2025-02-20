@@ -44,20 +44,21 @@ export type RenderCellFn<R extends Kinded> = (
   row: R,
   rowStyle: RowStyle<R> | undefined,
   classNames: string | undefined,
-  onClick: VoidFunction | undefined,
+  cellOnClick: VoidFunction | undefined,
   tooltip: ReactNode | undefined,
 ) => ReactNode;
 
 /** Renders our default cell element, i.e. if no row links and no custom renderCell are used. */
 export const defaultRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<any> =
-  (as: RenderAs, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
+  (as: RenderAs, colSpan) =>
+  (key, css, content, row, rowStyle, classNames: string | undefined, cellOnClick, tooltip) => {
     const Cell = as === "table" ? "td" : "div";
     return (
       <Cell
         key={key}
         css={{ ...css, ...Css.cursor("default").$ }}
         className={classNames}
-        onClick={onClick}
+        onClick={cellOnClick}
         {...(as === "table" && { colSpan })}
       >
         {content}
@@ -70,7 +71,7 @@ export const defaultRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<an
  * Used for the Header, Totals, and Expanded Header row's cells.
  * */
 export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSpan: number) => RenderCellFn<any> =
-  (column, as, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
+  (column, as, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, cellOnClick, tooltip) => {
     const Cell = as === "table" ? "th" : "div";
     return (
       <Cell key={key} css={{ ...css }} className={classNames} {...(as === "table" && { colSpan })}>
@@ -81,7 +82,8 @@ export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSp
 
 /** Renders a cell element when a row link is in play. */
 export const rowLinkRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<any> =
-  (as: RenderAs, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
+  (as: RenderAs, colSpan) =>
+  (key, css, content, row, rowStyle, classNames: string | undefined, cellOnClick, tooltip) => {
     const to = rowStyle!.rowLink!(row);
     if (as === "table") {
       return (
@@ -93,7 +95,18 @@ export const rowLinkRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<an
       );
     }
     return (
-      <Link key={key} to={to} css={{ ...Css.tdn.color("unset").$, ...css }} className={`${navLink} ${classNames}`}>
+      <Link
+        key={key}
+        to={to}
+        css={{ ...Css.tdn.color("unset").$, ...css }}
+        onClick={(e) => {
+          if (e.target !== e.currentTarget) {
+            debugger;
+          }
+          // outer link logic
+        }}
+        className={`${navLink} ${classNames}`}
+      >
         {content}
       </Link>
     );
@@ -102,16 +115,16 @@ export const rowLinkRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<an
 /** Renders a cell that will fire the RowStyle.onClick. */
 export const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>, colSpan: number) => RenderCellFn<any> =
   (as: RenderAs, api: GridTableApi<any>, colSpan) =>
-  (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
+  (key, css, content, row, rowStyle, classNames: string | undefined, cellOnClick, tooltip) => {
     const Cell = as === "table" ? "td" : "div";
     return (
       <Cell
         {...{ key }}
         css={{ ...css }}
         className={classNames}
-        onClick={(e) => {
+        onClick={() => {
           rowStyle!.onClick!(row, api);
-          onClick && onClick();
+          cellOnClick && cellOnClick();
         }}
         {...(as === "table" && { colSpan })}
       >
