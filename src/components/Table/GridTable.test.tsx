@@ -408,7 +408,7 @@ describe("GridTable", () => {
       );
       // Then we have only a single sort header in the dom
       expect(r.sortHeader_0).toBeDefined();
-      expect(r.sortHeader_1).toBeUndefined();
+      expect(r.query.sortHeader_1).toBeNull();
     });
 
     it("can sort primary rows", async () => {
@@ -814,7 +814,7 @@ describe("GridTable", () => {
       );
       // Then there is only a single sort header
       expect(r.sortHeader_0).toBeDefined();
-      expect(r.sortHeader_1).toBeUndefined();
+      expect(r.query.sortHeader_1).toBeNull();
     });
 
     it("initializes with asc sorting", async () => {

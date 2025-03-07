@@ -13,9 +13,10 @@ export function setUseMockComponents(value: boolean) {
 }
 
 // HOC that conditionally swaps components
-export function withTestMock<P extends object>(Component: ComponentType<P>, MockComponent: ComponentType<P>) {
+export function withTestMock<P>(Component: ComponentType<P>, MockComponent: ComponentType<P>) {
   return (props: P) => {
     const SelectedComponent = useMock ? MockComponent : Component;
+    // @ts-ignore something about emotion causes an error with the `P` generic
     return <SelectedComponent {...props} />;
   };
 }
