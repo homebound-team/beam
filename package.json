@@ -21,19 +21,14 @@
       "require": "./dist/index.cjs"
     },
     "./rtl": {
-      "types": "./dist/utils/rtl.d.ts",
-      "import": "./dist/utils/rtl.js",
-      "require": "./dist/utils/rtl.cjs"
-    },
-    "./sb": {
-      "types": "./dist/utils/sb.d.ts",
-      "import": "./dist/utils/sb.js",
-      "require": "./dist/utils/sb.cjs"
+      "types": "./dist/utils/rtlUtils.d.ts",
+      "import": "./dist/utils/rtlUtils.js",
+      "require": "./dist/utils/rtlUtils.cjs"
     }
   },
   "scripts": {
     "start": "yarn storybook",
-    "build": "yarn tsup-node src/index.ts src/utils/rtl.tsx src/utils/sb.tsx --format esm,cjs --dts --clean --sourcemap",
+    "build": "yarn tsup-node src/index.ts src/utils/rtlUtils.tsx --format esm,cjs --dts --clean --sourcemap",
     "build:truss": "truss",
     "build-storybook": "NODE_OPTIONS=--openssl-legacy-provider storybook build",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --maxWorkers 4",
