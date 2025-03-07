@@ -57,6 +57,7 @@ jobs:
     steps:
       - bootstrap
       - run: yarn build
+      - run: yarn type-check
       - run: yarn test
 
   validate-code:
