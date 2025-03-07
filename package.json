@@ -18,7 +18,6 @@
   },
   "exports": {
     ".": {
-      "style": "./dist/index.css",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
@@ -27,7 +26,8 @@
       "types": "./dist/utils/rtlUtils.d.ts",
       "import": "./dist/utils/rtlUtils.js",
       "require": "./dist/utils/rtlUtils.cjs"
-    }
+    },
+    "./index.css": "./dist/index.css"
   },
   "scripts": {
     "start": "yarn storybook",
