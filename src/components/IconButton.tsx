@@ -5,7 +5,6 @@ import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/comp
 import { Css, Palette } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
-import { noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -54,7 +53,13 @@ export function IconButton(props: IconButtonProps) {
   const { buttonProps } = useButton(
     {
       ...ariaProps,
-      onPress: typeof onPress === "string" ? noop : onPress,
+      onPress:
+        typeof onPress === "string"
+          ? (e) => {
+              debugger;
+              console.log("HERE");
+            }
+          : onPress,
       elementType: typeof onPress === "string" ? "a" : "button",
     },
     ref,
@@ -94,6 +99,7 @@ export function IconButton(props: IconButtonProps) {
       color={color || (isDisabled ? Palette.Gray400 : iconColor)}
       bgColor={bgColor}
       inc={compact ? 2 : inc}
+      {...testIds.svg}
     />
   );
 
