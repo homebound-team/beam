@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { jan1, jan2 } from "src/forms/formStateDomain";
-import { DateField } from "src/inputs/DateFields/DateField";
+import { DateFieldImpl as DateField } from "src/inputs/DateFields/DateField";
 import { noop } from "src/utils";
 import { blur, click, focus, render, type } from "src/utils/rtl";
 

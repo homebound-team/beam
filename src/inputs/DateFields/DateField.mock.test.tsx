@@ -1,10 +1,10 @@
 import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
-import { DateField as MockDateField } from "src/inputs/DateFields/DateField.mock";
+import { DateFieldMock as MockDateField } from "src/inputs/DateFields/DateField.mock";
 import { noop } from "src/utils";
 import { render, type } from "src/utils/rtl";
 
-describe("MockDateField", () => {
+describe("DateFieldMock", () => {
   it("formats date value when provided", async () => {
     const r = await render(<MockDateField label="Start Date" value={new Date(2020, 0, 1)} onChange={noop} />);
     expect(r.date).toHaveValue("01/01/20");
