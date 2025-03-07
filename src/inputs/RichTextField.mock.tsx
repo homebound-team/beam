@@ -4,7 +4,7 @@ import { useTestIds } from "src/utils";
 import { RichTextFieldProps } from "./RichTextField";
 
 /** Mocks out `RichTextField` as a text `<input>` field. */
-export function RichTextField(props: RichTextFieldProps) {
+export function RichTextFieldMock(props: RichTextFieldProps) {
   const { onBlur = () => {}, onFocus = () => {}, readOnly } = props;
   const [value, setValue] = useState(props.value || "");
   const tid = useTestIds(props, defaultTestId(props.label || "richTextField"));

@@ -4,7 +4,7 @@ orbs:
   node: circleci/node@5.1.0
 
 node-image: &node-image
-  image: cimg/node:20.9.0
+  image: cimg/node:22.14.0
   auth:
     username: $DOCKERHUB_USERNAME
     password: $DOCKERHUB_ACCESS_TOKEN
@@ -57,6 +57,7 @@ jobs:
     steps:
       - bootstrap
       - run: yarn build
+      - run: yarn type-check
       - run: yarn test
 
   validate-code:

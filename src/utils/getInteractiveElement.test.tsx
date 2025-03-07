@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { click, render } from "src/utils/rtl";
 

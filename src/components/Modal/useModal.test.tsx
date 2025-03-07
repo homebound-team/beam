@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { act } from "@testing-library/react";
 import { useEffect } from "react";
 import { BeamContextState, useBeamContext } from "src/components/BeamContext";
@@ -49,7 +50,7 @@ describe("useModal", () => {
       return <div>Content</div>;
     }
     const canClose = jest.fn().mockReturnValue(false);
-    const modalProps = { title: "Test", content: <TestModalContent canClose={canClose} /> };
+    const modalProps = { title: "Test", content: <TestModalContent canClose={canClose as any} /> };
 
     const r = await render(<TestApp {...modalProps} />);
 
@@ -80,7 +81,7 @@ describe("useModal", () => {
     }
     const canClose = jest.fn().mockReturnValue(true);
     const onClose = jest.fn();
-    const modalProps = { title: "Test", content: <TestModalContent canClose={canClose} />, onClose };
+    const modalProps = { title: "Test", content: <TestModalContent canClose={canClose as any} />, onClose };
 
     const r = await render(<TestApp {...modalProps} />);
 

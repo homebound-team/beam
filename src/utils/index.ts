@@ -56,7 +56,7 @@ export function safeKeys<T>(instance: T): (keyof T)[] {
 // Returns object with specified key removed
 export const omitKey = <T, K extends keyof T>(key: K, { [key]: _, ...obj }: T) => obj as T;
 
-export const noop = (...args: any) => {};
+export const noop = (..._: any) => {};
 
 type Entries<T> = {
   [K in keyof T]: [K, T[K]];
@@ -71,7 +71,7 @@ export class EmptyRef<T> implements MutableRefObject<T> {
     throw new Error("BeamProvider is missing");
   }
 
-  set current(value) {
+  set current(_) {
     throw new Error("BeamProvider is missing");
   }
 }

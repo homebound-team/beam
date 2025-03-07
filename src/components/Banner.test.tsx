@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { Banner } from "src";
 import { click, render } from "src/utils/rtl";
 

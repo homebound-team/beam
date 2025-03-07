@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { Checkbox } from "src/inputs/Checkbox";
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
