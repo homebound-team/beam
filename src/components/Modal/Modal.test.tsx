@@ -19,7 +19,7 @@ describe("Modal", () => {
   it("invokes canClose", async () => {
     // Given mocked actions
     const canClose = jest.fn().mockReturnValue(false);
-    const r = await render(<TestModalApp canClose={canClose} content={<TestModalComponent />} />);
+    const r = await render(<TestModalApp canClose={canClose as any} content={<TestModalComponent />} />);
     // When invoking the `onClose` in various interactions
     click(r.modal_titleClose);
     expect(canClose).toBeCalledTimes(1);

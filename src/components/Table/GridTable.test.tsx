@@ -979,7 +979,7 @@ describe("GridTable", () => {
   });
 
   it("can handle onClick for rows", async () => {
-    const onClick = jest.fn();
+    const onClick = jest.fn() as any;
     const rowStyles: RowStyles<Row> = { header: {}, data: { onClick } };
     const r = await render(<GridTable {...{ columns, rows, rowStyles }} />);
     click(cell(r, 1, 0));
@@ -3483,9 +3483,7 @@ describe("GridTable", () => {
         return (
           <>
             <button
-              onClick={() =>
-                setRows((rows) => [simpleHeader, { kind: "data", id: "2", data: { name: "bar", value: 2 } }])
-              }
+              onClick={() => setRows(() => [simpleHeader, { kind: "data", id: "2", data: { name: "bar", value: 2 } }])}
               data-testid="replace"
             />
             <GridTable columns={columns} rows={rows} />
