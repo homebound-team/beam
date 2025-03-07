@@ -13,6 +13,9 @@
     "!dist/**/*.{stories,test}.*",
     "!dist/setupTests.*"
   ],
+  "engines": {
+    "node": "~22.14.0"
+  },
   "exports": {
     ".": {
       "style": "./dist/index.css",
