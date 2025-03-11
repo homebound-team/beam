@@ -13,17 +13,18 @@ import {
   textAreaField,
   textField,
 } from "src/forms/BoundForm";
+import { withBeamDecorator } from "src/utils/sb";
 import { AuthorInput } from "./formStateDomain";
 
 export default {
   component: BoundFormComponent,
+  decorators: [withBeamDecorator],
 } as Meta;
 
 export function BoundForm() {
   const formState = useFormState({
     config: formConfig,
     init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
-    loading: true,
   });
 
   return (
