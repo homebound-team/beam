@@ -1,5 +1,6 @@
 import { ObjectConfig, required, useFormState } from "@homebound/form-state";
 import { Meta } from "@storybook/react";
+import { useEffect, useState } from "react";
 import { Css } from "src/Css";
 import {
   BoundForm as BoundFormComponent,
@@ -22,6 +23,7 @@ export function BoundForm() {
   const formState = useFormState({
     config: formConfig,
     init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
+    loading: true,
   });
 
   return (
@@ -36,6 +38,37 @@ export function SingleSectionBoundForm() {
     config: formConfig,
     init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
   });
+
+  return (
+    <div css={Css.bgWhite.p3.py5.$}>
+      <BoundFormComponent
+        inputConfig={{
+          rows: [
+            { firstName: textField(), middleInitial: textField(), lastName: textField() },
+            { bio: textAreaField() },
+          ],
+        }}
+        formState={formState}
+      />
+    </div>
+  );
+}
+
+export function LoadingBoundForm() {
+  const [loadedData, setLoadedData] = useState<AuthorInput | undefined>(undefined);
+
+  const formState = useFormState({
+    config: formConfig,
+    init: { input: loadedData, map: (a) => a },
+  });
+
+  useEffect(() => {
+    if (loadedData) return;
+
+    setTimeout(() => {
+      setLoadedData({ firstName: "John", middleInitial: "C", lastName: "Doe", bio: "Some bio" });
+    }, 1000);
+  }, [loadedData]);
 
   return (
     <div css={Css.bgWhite.p3.py5.$}>

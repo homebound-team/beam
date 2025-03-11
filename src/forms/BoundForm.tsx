@@ -1,7 +1,8 @@
 import { FieldState, ObjectState } from "@homebound/form-state";
 import { Fragment, ReactNode } from "react";
-import { IconKey } from "src/components";
+import { IconKey, LoadingSkeleton } from "src/components";
 import { Only } from "src/Css";
+import { useComputed } from "src/hooks";
 import { Value } from "src/inputs/Value";
 import { TextFieldXss } from "src/interfaces";
 import { fail, safeEntries } from "src/utils";
@@ -50,12 +51,18 @@ export function BoundForm<F>(props: BoundFormProps<F>) {
 function Section<F>({ formSection, formState }: { formSection: BoundFormSection<F>; formState: ObjectState<F> }) {
   const { title, icon } = formSection;
 
+  // Maybe not an MVP thing, but we can hook into the formState loading state
+  // and show a skeleton from that matches the real forms layout
+  const isLoading = useComputed(() => formState.loading, [formState]);
+
   return (
     <>
       {title && <FormHeading title={title} icon={icon} />}
       {formSection.rows.map((row, i) => (
         <FieldGroup key={`fieldGroup-${Object.keys(row).join("-")}`}>
           {safeEntries(row).map(([key, fieldFnOrCustomNode]) => {
+            if (isLoading) return <LoadingSkeleton size="lg" key={key.toString()} />;
+
             // Pass the `field` from formState to wrapping bound component function
             if (typeof fieldFnOrCustomNode === "function") {
               const field = formState[key] ?? fail(`Field ${key.toString()} not found in formState`);
@@ -71,6 +78,12 @@ function Section<F>({ formSection, formState }: { formSection: BoundFormSection<
   );
 }
 
+/**
+ * These field component functions are thin wrappers around the `BoundFoo` components which omit
+ * certain props that the caller doesn't need to pass or we specifically want to restrict to drive UX consistency.
+ */
+
+// Potential TODO: add type overloads for the different HasIdIsh/HasNameIsh combinations, maybe there's a generic way to introspect those types?
 export function selectField<O, V extends Value>(props: Omit<BoundSelectFieldProps<O, V>, "field">) {
   return (field: FieldState<any>) => <BoundSelectField field={field} {...props} />;
 }
@@ -98,3 +111,5 @@ export function dateField(props?: Omit<BoundDateFieldProps, "field">) {
 export function checkboxField(props?: Omit<BoundCheckboxFieldProps, "field">) {
   return (field: FieldState<any>) => <BoundCheckboxField field={field} {...props} />;
 }
+
+// TODO: add the remaining `BoundFoo*` components here
