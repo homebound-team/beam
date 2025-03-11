@@ -6,6 +6,7 @@ import {
   BoundForm as BoundFormComponent,
   BoundFormInputConfig,
   checkboxField,
+  checkboxGroupField,
   dateField,
   multiSelectField,
   numberField,
@@ -101,6 +102,12 @@ const colorOptions = [
   { id: "c:3", name: "Green" },
 ];
 
+const shapesOptions = [
+  { value: "shape:1", label: "Triangle" },
+  { value: "shape:2", label: "Square" },
+  { value: "shape:3", label: "Circle" },
+];
+
 const inputConfig: BoundFormInputConfig<AuthorInput> = [
   {
     title: "Author Overview",
@@ -131,6 +138,7 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
         birthday: dateField(),
       },
       { isAvailable: checkboxField({ label: "Is Retired" }) },
+      { favoriteShapes: checkboxGroupField({ options: shapesOptions }) },
     ],
   },
 ];
@@ -145,4 +153,5 @@ const formConfig: ObjectConfig<AuthorInput> = {
   favoriteColors: { type: "value" },
   bio: { type: "value" },
   isAvailable: { type: "value" },
+  favoriteShapes: { type: "value" },
 };

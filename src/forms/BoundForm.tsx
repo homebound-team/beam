@@ -7,6 +7,7 @@ import { Value } from "src/inputs/Value";
 import { TextFieldXss } from "src/interfaces";
 import { fail, safeEntries } from "src/utils";
 import { BoundCheckboxField, BoundCheckboxFieldProps } from "./BoundCheckboxField";
+import { BoundCheckboxGroupField, BoundCheckboxGroupFieldProps } from "./BoundCheckboxGroupField";
 import { BoundDateField, BoundDateFieldProps } from "./BoundDateField";
 import { BoundMultiSelectField, BoundMultiSelectFieldProps } from "./BoundMultiSelectField";
 import { BoundNumberField, BoundNumberFieldProps } from "./BoundNumberField";
@@ -16,7 +17,7 @@ import { BoundTextField, BoundTextFieldProps } from "./BoundTextField";
 import { FormHeading } from "./FormHeading";
 import { FormLines } from "./FormLines";
 
-type BoundFieldInputFn<F> = (field: ObjectState<F>[keyof F]) => { component: ReactNode; mwPx?: number };
+type BoundFieldInputFn<F> = (field: ObjectState<F>[keyof F]) => { component: ReactNode; minWith?: string };
 
 type BoundFormSectionInputs<F> = {
   [K in keyof F]: BoundFieldInputFn<F> | ReactNode;
@@ -69,9 +70,9 @@ function FormRow<F>({ row, formState }: { row: BoundFormSectionInputs<F>; formSt
     return safeEntries(row).map(([key, fieldFnOrCustomNode]) => {
       if (typeof fieldFnOrCustomNode === "function") {
         const field = formState[key] ?? fail(`Field ${key.toString()} not found in formState`);
-        const { component, mwPx } = fieldFnOrCustomNode(field);
+        const { component, minWith } = fieldFnOrCustomNode(field);
 
-        return { component, key, mwPx };
+        return { component, key, minWith };
       }
 
       return { component: fieldFnOrCustomNode as ReactNode, key };
@@ -88,8 +89,8 @@ function FormRow<F>({ row, formState }: { row: BoundFormSectionInputs<F>; formSt
 
   return (
     <div css={Css.df.fww.gap2.$}>
-      {componentsWithConfig.map(({ component, key, mwPx }) => (
-        <div css={Css.mwPx(mwPx ?? 100).fb(`${itemFlexBasis}%`).fg1.$} key={key.toString()}>
+      {componentsWithConfig.map(({ component, key, minWith }) => (
+        <div css={Css.mw(minWith ?? "100px").fb(`${itemFlexBasis}%`).fg1.$} key={key.toString()}>
           {isLoading ? <LoadingSkeleton size="lg" /> : component}
         </div>
       ))}
@@ -104,31 +105,41 @@ function FormRow<F>({ row, formState }: { row: BoundFormSectionInputs<F>; formSt
 
 // Potential TODO: add type overloads for the different HasIdIsh/HasNameIsh combinations, maybe there's a generic way to introspect those types?
 export function selectField<O, V extends Value>(props: Omit<BoundSelectFieldProps<O, V>, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundSelectField field={field} {...props} />, mwPx: 200 });
+  return (field: FieldState<any>) => ({ component: <BoundSelectField field={field} {...props} />, minWith: "200px" });
 }
 
 export function multiSelectField<O, V extends Value>(props: Omit<BoundMultiSelectFieldProps<O, V>, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundMultiSelectField field={field} {...props} />, mwPx: 200 });
+  return (field: FieldState<any>) => ({
+    component: <BoundMultiSelectField field={field} {...props} />,
+    minWith: "200",
+  });
 }
 
 export function textField<X extends Only<TextFieldXss, X>>(props?: Omit<BoundTextFieldProps<X>, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundTextField field={field} {...props} />, mwPx: 150 });
+  return (field: FieldState<any>) => ({ component: <BoundTextField field={field} {...props} />, minWith: "150px" });
 }
 
 export function textAreaField<X extends Only<TextFieldXss, X>>(props?: Omit<BoundTextAreaFieldProps<X>, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundTextAreaField field={field} {...props} />, mwPx: 200 });
+  return (field: FieldState<any>) => ({ component: <BoundTextAreaField field={field} {...props} />, minWith: "200px" });
 }
 
 export function numberField(props?: Omit<BoundNumberFieldProps, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundNumberField field={field} {...props} />, mwPx: 150 });
+  return (field: FieldState<any>) => ({ component: <BoundNumberField field={field} {...props} />, minWith: "150px" });
 }
 
 export function dateField(props?: Omit<BoundDateFieldProps, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundDateField field={field} {...props} />, mwPx: 150 });
+  return (field: FieldState<any>) => ({ component: <BoundDateField field={field} {...props} />, minWith: "150px" });
 }
 
 export function checkboxField(props?: Omit<BoundCheckboxFieldProps, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundCheckboxField field={field} {...props} />, mwPx: 100 });
+  return (field: FieldState<any>) => ({ component: <BoundCheckboxField field={field} {...props} />, minWith: "100px" });
+}
+
+export function checkboxGroupField(props: Omit<BoundCheckboxGroupFieldProps, "field">) {
+  return (field: FieldState<any>) => ({
+    component: <BoundCheckboxGroupField field={field} {...props} />,
+    minWith: "200px",
+  });
 }
 
 // TODO: add the remaining `BoundFoo*` components here
