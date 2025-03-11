@@ -1,7 +1,7 @@
 import { FieldState, ObjectState } from "@homebound/form-state";
-import { Fragment, ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { IconKey, LoadingSkeleton } from "src/components";
-import { Only } from "src/Css";
+import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Value } from "src/inputs/Value";
 import { TextFieldXss } from "src/interfaces";
@@ -14,10 +14,12 @@ import { BoundSelectField, BoundSelectFieldProps } from "./BoundSelectField";
 import { BoundTextAreaField, BoundTextAreaFieldProps } from "./BoundTextAreaField";
 import { BoundTextField, BoundTextFieldProps } from "./BoundTextField";
 import { FormHeading } from "./FormHeading";
-import { FieldGroup, FormLines } from "./FormLines";
+import { FormLines } from "./FormLines";
+
+type BoundFieldInputFn<F> = (field: ObjectState<F>[keyof F]) => { component: ReactNode; mwPx?: number };
 
 type BoundFormSectionInputs<F> = {
-  [K in keyof F]: ((field: ObjectState<F>[keyof F]) => ReactNode) | ReactNode;
+  [K in keyof F]: BoundFieldInputFn<F> | ReactNode;
 };
 
 type BoundFormSection<F> = {
@@ -51,30 +53,47 @@ export function BoundForm<F>(props: BoundFormProps<F>) {
 function Section<F>({ formSection, formState }: { formSection: BoundFormSection<F>; formState: ObjectState<F> }) {
   const { title, icon } = formSection;
 
+  return (
+    <>
+      {title && <FormHeading title={title} icon={icon} />}
+      {formSection.rows.map((row) => (
+        <FormRow key={`fieldGroup-${Object.keys(row).join("-")}`} row={row} formState={formState} />
+      ))}
+    </>
+  );
+}
+
+function FormRow<F>({ row, formState }: { row: BoundFormSectionInputs<F>; formState: ObjectState<F> }) {
+  /**  Extract the bound input components with their sizing config or render any "custom" JSX node as-is */
+  const componentsWithConfig = useMemo(() => {
+    return safeEntries(row).map(([key, fieldFnOrCustomNode]) => {
+      if (typeof fieldFnOrCustomNode === "function") {
+        const field = formState[key] ?? fail(`Field ${key.toString()} not found in formState`);
+        const { component, mwPx } = fieldFnOrCustomNode(field);
+
+        return { component, key, mwPx };
+      }
+
+      return { component: fieldFnOrCustomNode as ReactNode, key };
+    });
+  }, [row, formState]);
+
   // Maybe not an MVP thing, but we can hook into the formState loading state
   // and show a skeleton from that matches the real forms layout
   const isLoading = useComputed(() => formState.loading, [formState]);
 
+  // Prefer to evenly distribute the available space to each item, but leave some room for the "gap" padding
+  // Then fall back to each item's "min-width" to allow for input-specific sizing when the available space is small
+  const itemFlexBasis = 100 / componentsWithConfig.length - 3;
+
   return (
-    <>
-      {title && <FormHeading title={title} icon={icon} />}
-      {formSection.rows.map((row, i) => (
-        <FieldGroup key={`fieldGroup-${Object.keys(row).join("-")}`}>
-          {safeEntries(row).map(([key, fieldFnOrCustomNode]) => {
-            if (isLoading) return <LoadingSkeleton size="lg" key={key.toString()} />;
-
-            // Pass the `field` from formState to wrapping bound component function
-            if (typeof fieldFnOrCustomNode === "function") {
-              const field = formState[key] ?? fail(`Field ${key.toString()} not found in formState`);
-              return <Fragment key={key.toString()}>{fieldFnOrCustomNode(field)}</Fragment>;
-            }
-
-            // Otherwise, render the custom node directly
-            return <Fragment key={key.toString()}>{fieldFnOrCustomNode}</Fragment>;
-          })}
-        </FieldGroup>
+    <div css={Css.df.fww.gap2.$}>
+      {componentsWithConfig.map(({ component, key, mwPx }) => (
+        <div css={Css.mwPx(mwPx ?? 100).fb(`${itemFlexBasis}%`).fg1.$} key={key.toString()}>
+          {isLoading ? <LoadingSkeleton size="lg" /> : component}
+        </div>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -85,31 +104,31 @@ function Section<F>({ formSection, formState }: { formSection: BoundFormSection<
 
 // Potential TODO: add type overloads for the different HasIdIsh/HasNameIsh combinations, maybe there's a generic way to introspect those types?
 export function selectField<O, V extends Value>(props: Omit<BoundSelectFieldProps<O, V>, "field">) {
-  return (field: FieldState<any>) => <BoundSelectField field={field} {...props} />;
+  return (field: FieldState<any>) => ({ component: <BoundSelectField field={field} {...props} />, mwPx: 200 });
 }
 
 export function multiSelectField<O, V extends Value>(props: Omit<BoundMultiSelectFieldProps<O, V>, "field">) {
-  return (field: FieldState<any>) => <BoundMultiSelectField field={field} {...props} />;
+  return (field: FieldState<any>) => ({ component: <BoundMultiSelectField field={field} {...props} />, mwPx: 200 });
 }
 
 export function textField<X extends Only<TextFieldXss, X>>(props?: Omit<BoundTextFieldProps<X>, "field">) {
-  return (field: FieldState<any>) => <BoundTextField field={field} {...props} />;
+  return (field: FieldState<any>) => ({ component: <BoundTextField field={field} {...props} />, mwPx: 150 });
 }
 
 export function textAreaField<X extends Only<TextFieldXss, X>>(props?: Omit<BoundTextAreaFieldProps<X>, "field">) {
-  return (field: FieldState<any>) => <BoundTextAreaField field={field} {...props} />;
+  return (field: FieldState<any>) => ({ component: <BoundTextAreaField field={field} {...props} />, mwPx: 200 });
 }
 
 export function numberField(props?: Omit<BoundNumberFieldProps, "field">) {
-  return (field: FieldState<any>) => <BoundNumberField field={field} {...props} />;
+  return (field: FieldState<any>) => ({ component: <BoundNumberField field={field} {...props} />, mwPx: 150 });
 }
 
 export function dateField(props?: Omit<BoundDateFieldProps, "field">) {
-  return (field: FieldState<any>) => <BoundDateField field={field} {...props} />;
+  return (field: FieldState<any>) => ({ component: <BoundDateField field={field} {...props} />, mwPx: 150 });
 }
 
 export function checkboxField(props?: Omit<BoundCheckboxFieldProps, "field">) {
-  return (field: FieldState<any>) => <BoundCheckboxField field={field} {...props} />;
+  return (field: FieldState<any>) => ({ component: <BoundCheckboxField field={field} {...props} />, mwPx: 100 });
 }
 
 // TODO: add the remaining `BoundFoo*` components here

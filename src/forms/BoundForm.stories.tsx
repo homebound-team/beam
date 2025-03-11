@@ -86,6 +86,10 @@ export function LoadingBoundForm() {
   );
 }
 
+// function CustomComponent() {
+//   return <div>Custom Component</div>;
+// }
+
 const sportsOptions = [
   { id: "s:1", name: "Basketball" },
   { id: "s:2", name: "Baseball" },
@@ -105,7 +109,7 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
       { firstName: textField(), middleInitial: textField(), lastName: textField() },
       { bio: textAreaField() },
       // We can support any custom JSX node, TODO to come up with a better example
-      // { height: <div>Example custom component</div> },
+      // { height: <CustomComponent /> },
     ],
   },
   {
