@@ -1,11 +1,25 @@
+import { ObjectConfig, required, useFormState } from "@homebound/form-state";
 import { Meta } from "@storybook/react";
 import { ReactNode, useMemo, useState } from "react";
 import { IconButton } from "src/components/IconButton";
 import { TabsWithContent, TabWithContent } from "src/components/Tabs";
 import { Css, Palette } from "src/Css";
-import { FormLines } from "src/forms";
 import {
+  BoundFormInputConfig,
+  checkboxField,
+  dateField,
+  FormLines,
+  multiSelectField,
+  numberField,
+  selectField,
+  textAreaField,
+  textField,
+} from "src/forms";
+import { AuthorInput } from "src/forms/formStateDomain";
+import {
+  Button,
   FullBleed,
+  FullPageForm as FullPageFormComponent,
   GridColumn,
   GridDataRow,
   GridTable,
@@ -17,6 +31,7 @@ import {
 } from "src/index";
 import { NumberField } from "src/inputs/NumberField";
 import { ChildrenOnly } from "src/types";
+import { noop } from "src/utils";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
@@ -149,6 +164,84 @@ function ExamplePageComponent() {
     </>
   );
 }
+
+export function FullPageForm() {
+  const formState = useFormState({
+    config: formConfig,
+    init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
+  });
+
+  return (
+    <FullPageFormComponent
+      pageTitle="Detail Title"
+      actionButtons={
+        <>
+          <Button onClick={noop} label="Cancel" variant="secondary" />
+          <Button onClick={noop} label="Save" />
+        </>
+      }
+      breadCrumbs={<span>Breadcrumb A / Breadcrumb B</span>}
+      boundFormProps={{ formState, inputConfig }}
+    />
+  );
+}
+
+const sportsOptions = [
+  { id: "s:1", name: "Basketball" },
+  { id: "s:2", name: "Baseball" },
+];
+
+const colorOptions = [
+  { id: "c:1", name: "Red" },
+  { id: "c:2", name: "Blue" },
+  { id: "c:3", name: "Green" },
+];
+
+const inputConfig: BoundFormInputConfig<AuthorInput> = [
+  {
+    title: "Author Overview",
+    icon: "userCircle",
+    rows: [
+      { firstName: textField(), middleInitial: textField(), lastName: textField() },
+      { bio: textAreaField() },
+      // We can support any custom JSX node, TODO to come up with a better example
+      // { height: <CustomComponent /> },
+    ],
+  },
+  {
+    title: "More Details",
+    icon: "openBook",
+    rows: [
+      {
+        favoriteSport: selectField({
+          options: sportsOptions,
+          getOptionLabel: (o) => o.name,
+          getOptionValue: (o) => o.id,
+        }),
+        favoriteColors: multiSelectField({
+          options: colorOptions,
+          getOptionLabel: (o) => o.name,
+          getOptionValue: (o) => o.id,
+        }),
+      },
+      { heightInInches: numberField({ label: "Height (in inches)" }), birthday: dateField() },
+      { isAvailable: checkboxField({ label: "Is Retired" }) },
+    ],
+  },
+];
+
+const formConfig: ObjectConfig<AuthorInput> = {
+  firstName: { type: "value", rules: [required] },
+  middleInitial: { type: "value" },
+  lastName: { type: "value", rules: [required] },
+  birthday: { type: "value", rules: [required] },
+  heightInInches: { type: "value" },
+  favoriteSport: { type: "value" },
+  favoriteColors: { type: "value" },
+  bio: { type: "value" },
+  isAvailable: { type: "value" },
+  favoriteShapes: { type: "value" },
+};
 
 function OverviewExample({ bgColor }: { bgColor?: Palette }) {
   return (

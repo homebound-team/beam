@@ -31,7 +31,7 @@ type BoundFormSection<F> = {
 
 export type BoundFormInputConfig<F> = BoundFormSection<F> | BoundFormSection<F>[];
 
-type BoundFormProps<F> = {
+export type BoundFormProps<F> = {
   /** Either a single "section" config object, or a list of sections */
   inputConfig: BoundFormInputConfig<F>;
   formState: ObjectState<F>;
