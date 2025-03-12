@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 import { Css } from "src/Css";
 import { BoundForm, BoundFormProps } from "src/forms";
@@ -26,20 +27,27 @@ export function FullPageForm<F>(props: FullPageFormProps<F>) {
   return (
     <div css={Css.vh100.add("width", "100vw").bgWhite.$}>
       {/* Though the grid layout should manage the full page, we want to contain it within a max width for very wide screens */}
-      <div css={Css.dg.gtc("repeat(12, 1fr)").gtr("auto 1fr").cg2.maxwPx(1800).h100.ma.$}>
-        <header css={Css.gr(1).gc("1 / 13").py2.px3.df.jcsb.aic.$}>
+      <div
+        css={
+          Css.dg
+            .gtc(sideBarIsOpen ? "220px 1fr 400px" : "220px 3fr 1fr")
+            .gtr("auto 1fr")
+            .cg2.maxwPx(1800).h100.ma.$
+        }
+      >
+        <header css={Css.gr(1).gc("1 / 4").py2.px3.df.jcsb.aic.$}>
           <div>
             {breadCrumbs && breadCrumbs}
             <h1 css={Css.xl3Sb.$}>{pageTitle}</h1>
           </div>
           <div css={Css.df.gap1.$}>{actionButtons}</div>
         </header>
-        <aside css={Css.gr(2).gc("1 / 3").px3.py2.df.fdc.gap1.$}>
+        <aside css={Css.gr(2).gc("1 / 2").px3.py2.df.fdc.gap1.$}>
           <Button onClick="" label="Link A" variant="tertiary" />
           <Button onClick="" label="Link B" variant="tertiary" />
           <Button onClick="" label="Link C" variant="tertiary" />
         </aside>
-        <article css={Css.gr(2).gc(sideBarIsOpen ? "4 / 9" : "4 / 10").oa.pr1.$}>
+        <article css={Css.gr(2).gc("2 / 3").oa.pr1.$}>
           <BoundForm formState={boundFormProps.formState} inputConfig={boundFormProps.inputConfig} />
         </article>
         <SidebarContent sideBarIsOpen={sideBarIsOpen} setSideBarIsOpen={setSideBarIsOpen} />
@@ -58,7 +66,7 @@ function SidebarContent({
 }) {
   if (!sideBarIsOpen)
     return (
-      <aside css={Css.gr(2).gc("10 / 13").py2.$}>
+      <aside css={Css.gr(2).gc("3 / 4").py2.$}>
         <div css={Css.br100.wPx(50).hPx(50).bcGray100.ba.df.jcc.aic.$}>
           <IconButton onClick={() => setSideBarIsOpen(true)} icon="comment" inc={3} />
         </div>
@@ -66,22 +74,39 @@ function SidebarContent({
     );
 
   return (
-    <aside css={Css.gr(2).gc("9 / 13").py2.$}>
-      <div css={Css.dg.gtc("3fr 1fr").gtr("auto").gap1.$}>
-        <div>
-          <h3 css={Css.lgSb.$}>Comments</h3>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-            anim id est laborum.
-          </p>
-        </div>
-        <div css={Css.br100.wPx(50).hPx(50).bcGray100.ba.df.jcc.aic.$}>
-          <IconButton onClick={() => setSideBarIsOpen(false)} icon="x" inc={3} />
-        </div>
-      </div>
+    <aside css={Css.gr(2).gc("3 / 4").py2.$}>
+      <AnimatePresence>
+        {sideBarIsOpen && (
+          <motion.div
+            layout="position"
+            key="rightPane"
+            data-testid="rightPaneContent"
+            initial={{ x: 350, position: "absolute" }}
+            animate={{ x: 0 }}
+            transition={{ ease: "linear", duration: 0.2 }}
+            exit={{ transition: { ease: "linear", duration: 0.2 }, x: 350 }}
+          >
+            <div css={Css.dg.gtc("3fr 1fr").gtr("auto").gap1.maxh("calc(100vh - 150px)").oa.$}>
+              <div>
+                <h3 css={Css.lgSb.mb2.$}>Comments</h3>
+                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+              </div>
+              <div css={Css.br100.wPx(50).hPx(50).bcGray100.ba.df.jcc.aic.$}>
+                <IconButton onClick={() => setSideBarIsOpen(false)} icon="x" inc={3} />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </aside>
   );
 }
