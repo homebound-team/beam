@@ -35,7 +35,6 @@ type BoundFormRowInputs<F> = {
 export type BoundFormInputConfig<F> = BoundFormRowInputs<F>[];
 
 export type BoundFormProps<F> = {
-  /** Either a single "section" config object, or a list of sections */
   inputRows: BoundFormInputConfig<F>;
   formState: ObjectState<F>;
 };
@@ -71,6 +70,8 @@ export function BoundForm<F>(props: BoundFormProps<F>) {
 }
 
 function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState: ObjectState<F> }) {
+  const tid = useTestIds({}, "boundFormRow");
+
   /**  Extract the bound input components with their sizing config or render any "custom" JSX node as-is */
   const componentsWithConfig = useMemo(() => {
     return safeEntries(row).map(([key, fieldFnOrCustomNode]) => {
@@ -93,7 +94,7 @@ function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState:
   const itemFlexBasis = 100 / componentsWithConfig.length - 3;
 
   return (
-    <div css={Css.df.fww.gap2.$}>
+    <div css={Css.df.fww.gap2.$} {...tid}>
       {componentsWithConfig.map(({ component, key, minWith }) => (
         <div css={Css.mw(minWith).fb(`${itemFlexBasis}%`).fg1.$} key={key.toString()}>
           {isLoading ? <LoadingSkeleton size="lg" /> : component}
