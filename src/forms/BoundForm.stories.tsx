@@ -66,6 +66,26 @@ export function SmallFormExample() {
   );
 }
 
+export function ReadOnlyForm() {
+  const formState = useFormState({
+    config: formConfig,
+    init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe", bio: "A bio for this author" } },
+    readOnly: true,
+  });
+
+  return (
+    <div css={Css.bgWhite.p3.py5.$}>
+      <BoundFormComponent
+        inputRows={[
+          { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
+          { bio: boundTextAreaField() },
+        ]}
+        formState={formState}
+      />
+    </div>
+  );
+}
+
 export function LoadingBoundForm() {
   const [loadedData, setLoadedData] = useState<AuthorInput | undefined>(undefined);
 

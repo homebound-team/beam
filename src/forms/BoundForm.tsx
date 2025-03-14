@@ -5,7 +5,7 @@ import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Value } from "src/inputs/Value";
 import { TextFieldXss } from "src/interfaces";
-import { fail, safeEntries } from "src/utils";
+import { fail, safeEntries, useTestIds } from "src/utils";
 import { BoundCheckboxField, BoundCheckboxFieldProps } from "./BoundCheckboxField";
 import { BoundCheckboxGroupField, BoundCheckboxGroupFieldProps } from "./BoundCheckboxGroupField";
 import { BoundDateField, BoundDateFieldProps } from "./BoundDateField";
@@ -40,15 +40,33 @@ export type BoundFormProps<F> = {
   formState: ObjectState<F>;
 };
 
+/**
+ * A wrapper around the "Bound" form components for the form-state library to render a standard (and responsive) form layout.
+ * * Each row is an object of bound input components keyed by their formState key, which are rendered in a responsive flex layout.
+ * * Example usage:
+ * ```tsx
+ *    <BoundFormComponent
+        inputRows={[
+          { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
+          { bio: boundTextAreaField() },
+        ]}
+        formState={formState}
+      />
+ * ```
+ */
 export function BoundForm<F>(props: BoundFormProps<F>) {
   const { inputRows, formState } = props;
 
+  const tid = useTestIds({}, "boundForm");
+
   return (
-    <FormLines labelSuffix={{ required: "*" }} width="full" gap={4}>
-      {inputRows.map((row) => (
-        <FormRow key={`fieldGroup-${Object.keys(row).join("-")}`} row={row} formState={formState} />
-      ))}
-    </FormLines>
+    <div {...tid}>
+      <FormLines labelSuffix={{ required: "*" }} width="full" gap={4}>
+        {inputRows.map((row) => (
+          <FormRow key={`fieldGroup-${Object.keys(row).join("-")}`} row={row} formState={formState} />
+        ))}
+      </FormLines>
+    </div>
   );
 }
 
@@ -67,8 +85,7 @@ function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState:
     });
   }, [row, formState]);
 
-  // Maybe not an MVP thing, but we can hook into the formState loading state
-  // and show a skeleton from that matches the real forms layout
+  // We can hook into the formState loading state and show a skeleton from that matches the real forms layout
   const isLoading = useComputed(() => formState.loading, [formState]);
 
   // Prefer to evenly distribute the available space to each item, but leave some room for the "gap" padding
