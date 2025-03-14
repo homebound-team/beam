@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { TreeSelectField } from "src/inputs";
@@ -6,7 +7,7 @@ import { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
 import { blur, click, focus, getSelected, render, wait } from "src/utils/rtl";
 
-describe(TreeSelectField, () => {
+describe("TreeSelectField", () => {
   it("renders", async () => {
     // Given a TreeSelectField
     const r = await render(
@@ -48,7 +49,7 @@ describe(TreeSelectField, () => {
 
   it("doesn't select disabled options when the parent is selected", async () => {
     // Given a TreeSelect field with no options select, and a disabled option
-    const onSelect = jest.fn();
+    const onSelect = jest.fn() as any;
     const r = await render(
       <TreeSelectField
         onSelect={onSelect}
@@ -71,7 +72,7 @@ describe(TreeSelectField, () => {
 
   it("doesn't deselect disabled options when the parent is deselected", async () => {
     // Given a TreeSelect field with all basketball options select, and a "NBA" is disabled
-    const onSelect = jest.fn();
+    const onSelect = jest.fn() as any;
     const r = await render(
       <TreeSelectField
         onSelect={onSelect}
@@ -592,7 +593,7 @@ describe(TreeSelectField, () => {
       { id: "p:2", name: "Parent 2", children: [{ id: "c:1", name: "Child 1" }] },
     ];
     // With a mocked onSelect
-    const onSelect = jest.fn();
+    const onSelect = jest.fn() as any;
     // And the TreeSelectField
     const r = await render(
       <TreeSelectField

@@ -4,7 +4,9 @@ import { ChangeEvent, createElement, useEffect, useMemo, useRef, useState } from
 import { Label } from "src/components/Label";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Palette } from "src/Css";
+import { RichTextFieldMock } from "src/inputs/RichTextField.mock";
 import { maybeCall, noop } from "src/utils";
+import { withTestMock } from "src/utils/withTestMock";
 import Tribute from "tributejs";
 import "tributejs/dist/tribute.css";
 import "trix/dist/trix";
@@ -31,6 +33,8 @@ export interface RichTextFieldProps extends Pick<PresentationFieldProps, "fullWi
   readOnly?: boolean;
 }
 
+export const RichTextField = withTestMock(RichTextFieldImpl, RichTextFieldMock);
+
 /**
  * Provides a simple rich text editor based on trix.
  *
@@ -38,7 +42,7 @@ export interface RichTextFieldProps extends Pick<PresentationFieldProps, "fullWi
  *
  * We also integrate [tributejs]{@link https://github.com/zurb/tribute} for @ mentions.
  */
-export function RichTextField(props: RichTextFieldProps) {
+export function RichTextFieldImpl(props: RichTextFieldProps) {
   const { fieldProps } = usePresentationContext();
   const {
     mergeTags,

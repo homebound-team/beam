@@ -40,7 +40,7 @@ export function zeroTo(n: number): number[] {
 }
 
 /** Storybook decorator utility to wrap a story with a SuperDrawer context */
-export const withBeamDecorator = (Story: () => JSX.Element) => (
+export const withBeamDecorator: Decorator = (Story) => (
   <BeamProvider>
     <Story />
   </BeamProvider>

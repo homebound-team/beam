@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { useState } from "react";
 import { Switch as SwitchComponent, SwitchProps } from "src/inputs";
 import { click, render } from "src/utils/rtl";

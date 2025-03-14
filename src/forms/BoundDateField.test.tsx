@@ -1,8 +1,14 @@
 import { createObjectState, ObjectConfig, ObjectState } from "@homebound/form-state";
+import { jest } from "@jest/globals";
 import { act, fireEvent } from "@testing-library/react";
 import { BoundDateField } from "src/forms/BoundDateField";
 import { AuthorInput, jan1, jan2 } from "src/forms/formStateDomain";
 import { blur, click, focus, render } from "src/utils/rtl";
+import { setUseMockComponents } from "src/utils/withTestMock";
+
+beforeAll(() => {
+  setUseMockComponents(false);
+});
 
 describe("BoundDateField", () => {
   it("trigger onFocus and onBlur callbacks", async () => {

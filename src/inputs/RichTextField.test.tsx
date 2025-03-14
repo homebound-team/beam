@@ -1,8 +1,8 @@
 import { render } from "@homebound/rtl-utils";
 import { noop } from "src/utils";
-import { RichTextField } from "./RichTextField";
+import { RichTextFieldImpl as RichTextField } from "./RichTextField";
 
-describe(RichTextField, () => {
+describe("RichTextField", () => {
   it("renders", async () => {
     const r = await render(<RichTextField value="<div>test</div>" onChange={noop} />);
     expect(r.getByText("test")).toBeInTheDocument();

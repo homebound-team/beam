@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { act } from "@testing-library/react";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
@@ -407,7 +408,7 @@ describe("GridTable", () => {
       );
       // Then we have only a single sort header in the dom
       expect(r.sortHeader_0).toBeDefined();
-      expect(r.sortHeader_1).toBeUndefined();
+      expect(r.query.sortHeader_1).toBeNull();
     });
 
     it("can sort primary rows", async () => {
@@ -813,7 +814,7 @@ describe("GridTable", () => {
       );
       // Then there is only a single sort header
       expect(r.sortHeader_0).toBeDefined();
-      expect(r.sortHeader_1).toBeUndefined();
+      expect(r.query.sortHeader_1).toBeNull();
     });
 
     it("initializes with asc sorting", async () => {
@@ -978,7 +979,7 @@ describe("GridTable", () => {
   });
 
   it("can handle onClick for rows", async () => {
-    const onClick = jest.fn();
+    const onClick = jest.fn() as any;
     const rowStyles: RowStyles<Row> = { header: {}, data: { onClick } };
     const r = await render(<GridTable {...{ columns, rows, rowStyles }} />);
     click(cell(r, 1, 0));
@@ -3482,9 +3483,7 @@ describe("GridTable", () => {
         return (
           <>
             <button
-              onClick={() =>
-                setRows((rows) => [simpleHeader, { kind: "data", id: "2", data: { name: "bar", value: 2 } }])
-              }
+              onClick={() => setRows(() => [simpleHeader, { kind: "data", id: "2", data: { name: "bar", value: 2 } }])}
               data-testid="replace"
             />
             <GridTable columns={columns} rows={rows} />
