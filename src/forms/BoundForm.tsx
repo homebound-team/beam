@@ -1,6 +1,6 @@
 import { FieldState, ObjectState } from "@homebound/form-state";
 import { ReactNode, useMemo } from "react";
-import { IconKey, LoadingSkeleton } from "src/components";
+import { LoadingSkeleton } from "src/components";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Value } from "src/inputs/Value";
@@ -9,62 +9,50 @@ import { fail, safeEntries } from "src/utils";
 import { BoundCheckboxField, BoundCheckboxFieldProps } from "./BoundCheckboxField";
 import { BoundCheckboxGroupField, BoundCheckboxGroupFieldProps } from "./BoundCheckboxGroupField";
 import { BoundDateField, BoundDateFieldProps } from "./BoundDateField";
+import { BoundDateRangeField, BoundDateRangeFieldProps } from "./BoundDateRangeField";
+import { BoundIconCardField, BoundIconCardFieldProps } from "./BoundIconCardField";
+import { BoundIconCardGroupField, BoundIconCardGroupFieldProps } from "./BoundIconCardGroupField";
+import { BoundMultiLineSelectField, BoundMultiLineSelectFieldProps } from "./BoundMultiLineSelectField";
 import { BoundMultiSelectField, BoundMultiSelectFieldProps } from "./BoundMultiSelectField";
 import { BoundNumberField, BoundNumberFieldProps } from "./BoundNumberField";
+import { BoundRadioGroupField, BoundRadioGroupFieldProps } from "./BoundRadioGroupField";
+import { BoundRichTextField, BoundRichTextFieldProps } from "./BoundRichTextField";
 import { BoundSelectField, BoundSelectFieldProps } from "./BoundSelectField";
+import { BoundSwitchField, BoundSwitchFieldProps } from "./BoundSwitchField";
 import { BoundTextAreaField, BoundTextAreaFieldProps } from "./BoundTextAreaField";
 import { BoundTextField, BoundTextFieldProps } from "./BoundTextField";
-import { FormHeading } from "./FormHeading";
+import { BoundToggleChipGroupField, BoundToggleChipGroupFieldProps } from "./BoundToggleChipGroupField";
+import { BoundTreeSelectField, BoundTreeSelectFieldProps } from "./BoundTreeSelectField";
 import { FormLines } from "./FormLines";
 
-type BoundFieldInputFn<F> = (field: ObjectState<F>[keyof F]) => { component: ReactNode; minWith?: string };
+type BoundFieldInputFnReturn = { component: ReactNode; minWith: string };
+type BoundFieldInputFn<F> = (field: ObjectState<F>[keyof F]) => BoundFieldInputFnReturn;
 
-type BoundFormSectionInputs<F> = {
+type BoundFormRowInputs<F> = {
   [K in keyof F]: BoundFieldInputFn<F> | ReactNode;
 };
 
-type BoundFormSection<F> = {
-  title?: string;
-  icon?: IconKey;
-  rows: BoundFormSectionInputs<F>[];
-};
+export type BoundFormInputConfig<F> = BoundFormRowInputs<F>[];
 
-export type BoundFormInputConfig<F> = BoundFormSection<F> | BoundFormSection<F>[];
-
-type BoundFormProps<F> = {
+export type BoundFormProps<F> = {
   /** Either a single "section" config object, or a list of sections */
-  inputConfig: BoundFormInputConfig<F>;
+  inputRows: BoundFormInputConfig<F>;
   formState: ObjectState<F>;
 };
 
 export function BoundForm<F>(props: BoundFormProps<F>) {
-  const { inputConfig, formState } = props;
-
-  const inputConfigAsArray = Array.isArray(inputConfig) ? inputConfig : [inputConfig];
+  const { inputRows, formState } = props;
 
   return (
     <FormLines labelSuffix={{ required: "*" }} width="full" gap={4}>
-      {inputConfigAsArray.map((section, i) => {
-        return <Section key={`section-${i}`} formSection={section} formState={formState} />;
-      })}
+      {inputRows.map((row) => (
+        <FormRow key={`fieldGroup-${Object.keys(row).join("-")}`} row={row} formState={formState} />
+      ))}
     </FormLines>
   );
 }
 
-function Section<F>({ formSection, formState }: { formSection: BoundFormSection<F>; formState: ObjectState<F> }) {
-  const { title, icon } = formSection;
-
-  return (
-    <>
-      {title && <FormHeading title={title} icon={icon} />}
-      {formSection.rows.map((row) => (
-        <FormRow key={`fieldGroup-${Object.keys(row).join("-")}`} row={row} formState={formState} />
-      ))}
-    </>
-  );
-}
-
-function FormRow<F>({ row, formState }: { row: BoundFormSectionInputs<F>; formState: ObjectState<F> }) {
+function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState: ObjectState<F> }) {
   /**  Extract the bound input components with their sizing config or render any "custom" JSX node as-is */
   const componentsWithConfig = useMemo(() => {
     return safeEntries(row).map(([key, fieldFnOrCustomNode]) => {
@@ -90,7 +78,7 @@ function FormRow<F>({ row, formState }: { row: BoundFormSectionInputs<F>; formSt
   return (
     <div css={Css.df.fww.gap2.$}>
       {componentsWithConfig.map(({ component, key, minWith }) => (
-        <div css={Css.mw(minWith ?? "100px").fb(`${itemFlexBasis}%`).fg1.$} key={key.toString()}>
+        <div css={Css.mw(minWith).fb(`${itemFlexBasis}%`).fg1.$} key={key.toString()}>
           {isLoading ? <LoadingSkeleton size="lg" /> : component}
         </div>
       ))}
@@ -103,43 +91,129 @@ function FormRow<F>({ row, formState }: { row: BoundFormSectionInputs<F>; formSt
  * certain props that the caller doesn't need to pass or we specifically want to restrict to drive UX consistency.
  */
 
-// Potential TODO: add type overloads for the different HasIdIsh/HasNameIsh combinations, maybe there's a generic way to introspect those types?
-export function selectField<O, V extends Value>(props: Omit<BoundSelectFieldProps<O, V>, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundSelectField field={field} {...props} />, minWith: "200px" });
-}
+// We map the `field` to the bound component automatically for the caller.
+type KeysToOmit = "field";
 
-export function multiSelectField<O, V extends Value>(props: Omit<BoundMultiSelectFieldProps<O, V>, "field">) {
-  return (field: FieldState<any>) => ({
-    component: <BoundMultiSelectField field={field} {...props} />,
-    minWith: "200",
+// Potential TODO: add type overloads for the different HasIdIsh/HasNameIsh combinations, maybe there's a generic way to introspect those types?
+export function boundSelectField<O, V extends Value>(props: Omit<BoundSelectFieldProps<O, V>, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundSelectField field={field} {...props} />,
+    minWith: "200px",
   });
 }
 
-export function textField<X extends Only<TextFieldXss, X>>(props?: Omit<BoundTextFieldProps<X>, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundTextField field={field} {...props} />, minWith: "150px" });
+export function boundMultiSelectField<O, V extends Value>(props: Omit<BoundMultiSelectFieldProps<O, V>, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundMultiSelectField field={field} {...props} />,
+    minWith: "200px",
+  });
 }
 
-export function textAreaField<X extends Only<TextFieldXss, X>>(props?: Omit<BoundTextAreaFieldProps<X>, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundTextAreaField field={field} {...props} />, minWith: "200px" });
+export function boundMultilineSelectField<O, V extends Value>(
+  props: Omit<BoundMultiLineSelectFieldProps<O, V>, KeysToOmit>,
+) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundMultiLineSelectField field={field} {...props} />,
+    minWith: "200px",
+  });
 }
 
-export function numberField(props?: Omit<BoundNumberFieldProps, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundNumberField field={field} {...props} />, minWith: "150px" });
+export function boundTextField<X extends Only<TextFieldXss, X>>(props?: Omit<BoundTextFieldProps<X>, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundTextField field={field} {...props} />,
+    minWith: "150px",
+  });
 }
 
-export function dateField(props?: Omit<BoundDateFieldProps, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundDateField field={field} {...props} />, minWith: "150px" });
+export function boundTextAreaField<X extends Only<TextFieldXss, X>>(
+  props?: Omit<BoundTextAreaFieldProps<X>, KeysToOmit>,
+) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundTextAreaField field={field} {...props} />,
+    minWith: "200px",
+  });
 }
 
-export function checkboxField(props?: Omit<BoundCheckboxFieldProps, "field">) {
-  return (field: FieldState<any>) => ({ component: <BoundCheckboxField field={field} {...props} />, minWith: "100px" });
+export function boundNumberField(props?: Omit<BoundNumberFieldProps, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundNumberField field={field} {...props} />,
+    minWith: "150px",
+  });
 }
 
-export function checkboxGroupField(props: Omit<BoundCheckboxGroupFieldProps, "field">) {
-  return (field: FieldState<any>) => ({
+export function boundDateField(props?: Omit<BoundDateFieldProps, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundDateField field={field} {...props} />,
+    minWith: "150px",
+  });
+}
+
+export function boundDateRangeField(props?: Omit<BoundDateRangeFieldProps, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundDateRangeField field={field} {...props} />,
+    minWith: "150px",
+  });
+}
+
+export function boundCheckboxField(props?: Omit<BoundCheckboxFieldProps, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundCheckboxField field={field} {...props} />,
+    minWith: "100px",
+  });
+}
+
+export function boundCheckboxGroupField(props: Omit<BoundCheckboxGroupFieldProps, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundCheckboxGroupField field={field} {...props} />,
     minWith: "200px",
   });
 }
 
-// TODO: add the remaining `BoundFoo*` components here
+export function boundIconCardField(props: Omit<BoundIconCardFieldProps, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundIconCardField field={field} {...props} />,
+    minWith: "150px",
+  });
+}
+
+export function boundIconCardGroupField<V extends Value>(props: Omit<BoundIconCardGroupFieldProps<V>, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundIconCardGroupField field={field} {...props} />,
+    minWith: "100%",
+  });
+}
+
+export function boundRadioGroupField<K extends string>(props: Omit<BoundRadioGroupFieldProps<K>, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundRadioGroupField field={field} {...props} />,
+    minWith: "200px",
+  });
+}
+
+export function boundRichTextField(props?: Omit<BoundRichTextFieldProps, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundRichTextField field={field} {...props} />,
+    minWith: "200px",
+  });
+}
+
+export function boundSwitchField(props?: Omit<BoundSwitchFieldProps, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundSwitchField field={field} {...props} />,
+    minWith: "100px",
+  });
+}
+
+export function boundToggleChipGroupField(props: Omit<BoundToggleChipGroupFieldProps, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundToggleChipGroupField field={field} {...props} />,
+    minWith: "100%",
+  });
+}
+
+export function boundTreeSelectField<O, V extends Value>(props: Omit<BoundTreeSelectFieldProps<O, V>, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundTreeSelectField field={field} {...props} />,
+    minWith: "200px",
+  });
+}

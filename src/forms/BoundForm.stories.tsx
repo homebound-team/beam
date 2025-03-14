@@ -3,19 +3,31 @@ import { Meta } from "@storybook/react";
 import { useEffect, useState } from "react";
 import { Css } from "src/Css";
 import {
+  boundCheckboxField,
+  boundCheckboxGroupField,
+  boundDateField,
+  boundDateRangeField,
   BoundForm as BoundFormComponent,
   BoundFormInputConfig,
-  checkboxField,
-  checkboxGroupField,
-  dateField,
-  multiSelectField,
-  numberField,
-  selectField,
-  textAreaField,
-  textField,
+  boundIconCardField,
+  boundIconCardGroupField,
+  boundMultilineSelectField,
+  boundMultiSelectField,
+  boundNumberField,
+  boundRadioGroupField,
+  boundRichTextField,
+  boundSelectField,
+  boundSwitchField,
+  boundTextAreaField,
+  boundTextField,
+  boundToggleChipGroupField,
+  boundTreeSelectField,
 } from "src/forms/BoundForm";
+import { NestedOption } from "src/inputs";
+import { IconCardGroupItemOption } from "src/inputs/IconCardGroup";
+import { HasIdAndName } from "src/types";
 import { withBeamDecorator } from "src/utils/sb";
-import { AuthorInput } from "./formStateDomain";
+import { AuthorInput as BaseAuthorInput } from "./formStateDomain";
 
 export default {
   component: BoundFormComponent,
@@ -25,17 +37,17 @@ export default {
 export function BoundForm() {
   const formState = useFormState({
     config: formConfig,
-    init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
+    init: { input: { firstName: "John", lastName: "Doe" } },
   });
 
   return (
     <div css={Css.bgWhite.p3.py5.$}>
-      <BoundFormComponent inputConfig={inputConfig} formState={formState} />
+      <BoundFormComponent inputRows={inputConfig} formState={formState} />
     </div>
   );
 }
 
-export function SingleSectionBoundForm() {
+export function SmallFormExample() {
   const formState = useFormState({
     config: formConfig,
     init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
@@ -44,12 +56,10 @@ export function SingleSectionBoundForm() {
   return (
     <div css={Css.bgWhite.p3.py5.$}>
       <BoundFormComponent
-        inputConfig={{
-          rows: [
-            { firstName: textField(), middleInitial: textField(), lastName: textField() },
-            { bio: textAreaField() },
-          ],
-        }}
+        inputRows={[
+          { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
+          { bio: boundTextAreaField() },
+        ]}
         formState={formState}
       />
     </div>
@@ -75,21 +85,19 @@ export function LoadingBoundForm() {
   return (
     <div css={Css.bgWhite.p3.py5.$}>
       <BoundFormComponent
-        inputConfig={{
-          rows: [
-            { firstName: textField(), middleInitial: textField(), lastName: textField() },
-            { bio: textAreaField() },
-          ],
-        }}
+        inputRows={[
+          { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
+          { bio: boundTextAreaField() },
+        ]}
         formState={formState}
       />
     </div>
   );
 }
 
-// function CustomComponent() {
-//   return <div>Custom Component</div>;
-// }
+function CustomComponent() {
+  return <div css={Css.p4.br4.ba.bcGray200.$}>Example Custom Component</div>;
+}
 
 const sportsOptions = [
   { id: "s:1", name: "Basketball" },
@@ -108,39 +116,86 @@ const shapesOptions = [
   { value: "shape:3", label: "Circle" },
 ];
 
-const inputConfig: BoundFormInputConfig<AuthorInput> = [
+const categories: IconCardGroupItemOption<string>[] = [
+  { icon: "abacus", label: "Math", value: "math" },
+  { icon: "archive", label: "History", value: "history" },
+  { icon: "dollar", label: "Finance", value: "finance" },
+  { icon: "hardHat", label: "Engineering", value: "engineering" },
+  { icon: "kanban", label: "Management", value: "management" },
+  { icon: "camera", label: "Media", value: "media" },
+];
+
+const genres: NestedOption<HasIdAndName>[] = [
   {
-    title: "Author Overview",
-    icon: "userCircle",
-    rows: [
-      { firstName: textField(), middleInitial: textField(), lastName: textField() },
-      { bio: textAreaField() },
-      // We can support any custom JSX node, TODO to come up with a better example
-      // { height: <CustomComponent /> },
-    ],
-  },
-  {
-    title: "More Details",
-    icon: "openBook",
-    rows: [
+    id: "g:1",
+    name: "Action",
+    children: [
       {
-        favoriteSport: selectField({
-          options: sportsOptions,
-          getOptionLabel: (o) => o.name,
-          getOptionValue: (o) => o.id,
-        }),
-        favoriteColors: multiSelectField({
-          options: colorOptions,
-          getOptionLabel: (o) => o.name,
-          getOptionValue: (o) => o.id,
-        }),
-        heightInInches: numberField({ label: "Height (in inches)" }),
-        birthday: dateField(),
+        id: "g:2",
+        name: "Action Adventure",
+        children: [{ id: "g:3", name: "Action Adventure Comedy" }],
       },
-      { isAvailable: checkboxField({ label: "Is Retired" }) },
-      { favoriteShapes: checkboxGroupField({ options: shapesOptions }) },
+      { id: "g:4", name: "Action Comedy" },
     ],
   },
+  { id: "g:5", name: "Comedy", children: [{ id: "g:6", name: "Comedy Drama" }] },
+];
+
+type AuthorInput = BaseAuthorInput & {
+  iconCardSelection?: boolean | null;
+  iconCardGroupExample?: string[] | null;
+  multiLineSelectExample?: string[] | null;
+  radioGroupExample?: string | null;
+  richTextExample?: string | null;
+  switchFieldExample1?: boolean | null;
+  switchFieldExample2?: boolean | null;
+  toggleChipGroupField?: string[] | null;
+  treeSelectExample?: string[] | null;
+};
+
+const inputConfig: BoundFormInputConfig<AuthorInput> = [
+  { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
+  { bio: boundTextAreaField() },
+  {
+    favoriteSport: boundSelectField({
+      options: sportsOptions,
+      getOptionLabel: (o) => o.name,
+      getOptionValue: (o) => o.id,
+    }),
+    favoriteColors: boundMultiSelectField({
+      options: colorOptions,
+      getOptionLabel: (o) => o.name,
+      getOptionValue: (o) => o.id,
+    }),
+    heightInInches: boundNumberField({ label: "Height (in inches)" }),
+    birthday: boundDateField(),
+  },
+  { isAvailable: boundCheckboxField({ label: "Is Retired" }) },
+  { saleDates: boundDateRangeField() },
+  { favoriteShapes: boundCheckboxGroupField({ options: shapesOptions, label: "Checkbox Group" }) },
+  { iconCardSelection: boundIconCardField({ icon: "abacus" }) },
+  { iconCardGroupExample: boundIconCardGroupField({ options: categories }) },
+  {
+    multiLineSelectExample: boundMultilineSelectField({
+      options: colorOptions,
+      getOptionLabel: (o) => o.name,
+      getOptionValue: (o) => o.id,
+    }),
+  },
+  { radioGroupExample: boundRadioGroupField({ options: shapesOptions }) },
+  { richTextExample: boundRichTextField({ placeholder: "Example placeholder..." }) },
+  { switchFieldExample1: boundSwitchField(), switchFieldExample2: boundSwitchField() },
+  { toggleChipGroupField: boundToggleChipGroupField({ options: shapesOptions }) },
+  {
+    treeSelectExample: boundTreeSelectField({
+      options: genres,
+      getOptionLabel: (o) => o.name,
+      getOptionValue: (o) => o.id,
+    }),
+  },
+
+  // We can support any custom JSX node
+  { height: <CustomComponent /> },
 ];
 
 const formConfig: ObjectConfig<AuthorInput> = {
@@ -154,4 +209,14 @@ const formConfig: ObjectConfig<AuthorInput> = {
   bio: { type: "value" },
   isAvailable: { type: "value" },
   favoriteShapes: { type: "value" },
+  saleDates: { type: "value" },
+  iconCardSelection: { type: "value" },
+  iconCardGroupExample: { type: "value" },
+  multiLineSelectExample: { type: "value" },
+  radioGroupExample: { type: "value" },
+  richTextExample: { type: "value" },
+  switchFieldExample1: { type: "value" },
+  switchFieldExample2: { type: "value" },
+  toggleChipGroupField: { type: "value" },
+  treeSelectExample: { type: "value" },
 };
