@@ -1,4 +1,3 @@
-import { Icon, IconKey } from "src/components";
 import { Css, Margin, Xss } from "src/Css";
 
 export interface FormHeadingProps {
@@ -6,22 +5,20 @@ export interface FormHeadingProps {
   xss?: Xss<Margin>;
   // This is passed automatically by FormLines
   isFirst?: boolean;
-  icon?: IconKey;
 }
 
 export function FormHeading(props: FormHeadingProps) {
-  const { title, xss, isFirst = false, icon, ...others } = props;
+  const { title, xss, isFirst = false, ...others } = props;
   return (
     <h3
       css={{
-        ...Css.baseMd.df.gap1.$,
+        ...Css.baseMd.$,
         // Add space before the heading, but only if it's not first.
         ...(!isFirst && Css.mt4.$),
         ...xss,
       }}
       {...others}
     >
-      {icon && <Icon icon={icon} />}
       {title}
     </h3>
   );

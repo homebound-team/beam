@@ -14,8 +14,6 @@ export function Headings() {
       <TextField label="First" value="first" onChange={() => {}} />
       <FormHeading title="Second Heading" />
       <TextField label="Last" value="last" onChange={() => {}} />
-      <FormHeading title="Icon Heading" icon="userCircle" />
-      <TextField label="Initial" value="initial" onChange={() => {}} />
     </FormLines>
   );
 }
