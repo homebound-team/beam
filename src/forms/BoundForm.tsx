@@ -1,7 +1,7 @@
 import { FieldState, ObjectState } from "@homebound/form-state";
 import { ReactNode, useMemo } from "react";
 import { LoadingSkeleton } from "src/components";
-import { Css, Only } from "src/Css";
+import { Css, Only, Properties } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Value } from "src/inputs/Value";
 import { TextFieldXss } from "src/interfaces";
@@ -25,7 +25,7 @@ import { BoundToggleChipGroupField, BoundToggleChipGroupFieldProps } from "./Bou
 import { BoundTreeSelectField, BoundTreeSelectFieldProps } from "./BoundTreeSelectField";
 import { FormLines } from "./FormLines";
 
-type BoundFieldInputFnReturn = { component: ReactNode; minWith: string };
+type BoundFieldInputFnReturn = { component: ReactNode; minWith: Properties["minWidth"] };
 type BoundFieldInputFn<F> = (field: ObjectState<F>[keyof F]) => BoundFieldInputFnReturn;
 
 // To aid in discoverability of the optional override via IntelliSense, we can enumerate each form key `foo`
@@ -199,7 +199,7 @@ export function boundDateRangeField(props?: Omit<BoundDateRangeFieldProps, KeysT
 export function boundCheckboxField(props?: Omit<BoundCheckboxFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundCheckboxField field={field} {...props} />,
-    minWith: "100px",
+    minWith: "min-content",
   });
 }
 
@@ -240,8 +240,8 @@ export function boundRichTextField(props?: Omit<BoundRichTextFieldProps, KeysToO
 
 export function boundSwitchField(props?: Omit<BoundSwitchFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
-    component: <BoundSwitchField field={field} {...props} />,
-    minWith: "100px",
+    component: <BoundSwitchField field={field} labelStyle="inline" {...props} />,
+    minWith: "min-content",
   });
 }
 
