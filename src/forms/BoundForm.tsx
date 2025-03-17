@@ -28,13 +28,22 @@ import { FormLines } from "./FormLines";
 type BoundFieldInputFnReturn = { component: ReactNode; minWith: string };
 type BoundFieldInputFn<F> = (field: ObjectState<F>[keyof F]) => BoundFieldInputFnReturn;
 
-const reactNodePrefix = "reactNode" as const;
+// To aid in discoverability of the optional override via IntelliSense, we can enumerate each form key `foo`
+// as `reactNodeFoo` as well as allow for any non-form key related `reactNodeBar` to be rendered as-is.
+type CapitalizeFirstLetter<S extends string> = S extends `${infer First}${infer Rest}`
+  ? `${Uppercase<First>}${Rest}`
+  : S;
+const reactNodePrefix = "reactNode";
+type TReactNodePrefix<S extends string> = `${typeof reactNodePrefix}${CapitalizeFirstLetter<S>}`;
+
 type CustomReactNodeKey = `${typeof reactNodePrefix}${string}`;
 
 type BoundFormRowInputs<F> = Partial<{
   [K in keyof F]: BoundFieldInputFn<F>;
 }> & {
   [K in CustomReactNodeKey]: ReactNode;
+} & {
+  [K in keyof F as TReactNodePrefix<K & string>]: ReactNode;
 };
 
 export type BoundFormInputConfig<F> = BoundFormRowInputs<F>[];
