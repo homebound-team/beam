@@ -1,18 +1,28 @@
+import { ObjectState } from "@homebound/form-state";
 import { AnimatePresence, motion } from "framer-motion";
-import { Dispatch, ReactNode, SetStateAction, useState } from "react";
+import { Dispatch, Fragment, ReactNode, SetStateAction, useState } from "react";
 import { Css } from "src/Css";
 import { BoundForm, BoundFormProps } from "src/forms";
 import { Button } from "../Button";
+import { IconKey } from "../Icon";
 import { IconButton } from "../IconButton";
+
+export type FormSectionConfig<F> = {
+  title?: string;
+  icon?: IconKey;
+  rows: BoundFormProps<F>["inputRows"];
+}[];
 
 type FullPageFormProps<F> = {
   pageTitle: string;
   breadCrumbs?: ReactNode;
   actionButtons: ReactNode;
+  formState: ObjectState<F>;
+  formSections: FormSectionConfig<F>;
   // It may make sense to have this page level own the top-level "Sections" (rather than BoundForm rendering them)
   // since we need to do the sidebar links (and probably do an intersection observer for the top most section in view?)
   // so we'd render multiple `BoundForm` instances for each section
-  boundFormProps: BoundFormProps<F>;
+  // boundFormProps: BoundFormProps<F>;
   // Will have to decide how much of this component is composable via react nodes, vs how much we can constrain
   // for the submit actions, the figma points to 3 possible buttons: Primary/Submit, Cancel/Secondary, and Text/Tertiary
   // we could just expose the bare minimum props for these buttons
@@ -20,7 +30,7 @@ type FullPageFormProps<F> = {
 };
 
 export function FullPageForm<F>(props: FullPageFormProps<F>) {
-  const { pageTitle, breadCrumbs, actionButtons, boundFormProps } = props;
+  const { pageTitle, breadCrumbs, actionButtons, formSections, formState } = props;
 
   const [sideBarIsOpen, setSideBarIsOpen] = useState(false);
 
@@ -48,7 +58,12 @@ export function FullPageForm<F>(props: FullPageFormProps<F>) {
           <Button onClick="" label="Link C" variant="tertiary" />
         </aside>
         <article css={Css.gr(2).gc("2 / 3").oa.pr1.$}>
-          <BoundForm formState={boundFormProps.formState} inputConfig={boundFormProps.inputConfig} />
+          {formSections.map((section, i) => (
+            <Fragment key={`section-${i}`}>
+              {section.title && <h2 css={Css.xlSb.mb3.$}>{section.title}</h2>}
+              <BoundForm formState={formState} inputRows={section.rows} />
+            </Fragment>
+          ))}
         </article>
         <SidebarContent sideBarIsOpen={sideBarIsOpen} setSideBarIsOpen={setSideBarIsOpen} />
       </div>

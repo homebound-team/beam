@@ -5,19 +5,19 @@ import { IconButton } from "src/components/IconButton";
 import { TabsWithContent, TabWithContent } from "src/components/Tabs";
 import { Css, Palette } from "src/Css";
 import {
-  BoundFormInputConfig,
-  checkboxField,
-  dateField,
+  boundCheckboxField,
+  boundDateField,
+  boundMultiSelectField,
+  boundNumberField,
+  boundSelectField,
+  boundTextAreaField,
+  boundTextField,
   FormLines,
-  multiSelectField,
-  numberField,
-  selectField,
-  textAreaField,
-  textField,
 } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
 import {
   Button,
+  FormSectionConfig,
   FullBleed,
   FullPageForm as FullPageFormComponent,
   GridColumn,
@@ -181,7 +181,8 @@ export function FullPageForm() {
         </>
       }
       breadCrumbs={<span>Breadcrumb A / Breadcrumb B</span>}
-      boundFormProps={{ formState, inputConfig }}
+      formSections={formSections}
+      formState={formState}
     />
   );
 }
@@ -197,13 +198,13 @@ const colorOptions = [
   { id: "c:3", name: "Green" },
 ];
 
-const inputConfig: BoundFormInputConfig<AuthorInput> = [
+const formSections: FormSectionConfig<AuthorInput> = [
   {
     title: "Author Overview",
     icon: "userCircle",
     rows: [
-      { firstName: textField(), middleInitial: textField(), lastName: textField() },
-      { bio: textAreaField() },
+      { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
+      { bio: boundTextAreaField() },
       // We can support any custom JSX node, TODO to come up with a better example
       // { height: <CustomComponent /> },
     ],
@@ -213,19 +214,19 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
     icon: "openBook",
     rows: [
       {
-        favoriteSport: selectField({
+        favoriteSport: boundSelectField({
           options: sportsOptions,
           getOptionLabel: (o) => o.name,
           getOptionValue: (o) => o.id,
         }),
-        favoriteColors: multiSelectField({
+        favoriteColors: boundMultiSelectField({
           options: colorOptions,
           getOptionLabel: (o) => o.name,
           getOptionValue: (o) => o.id,
         }),
       },
-      { heightInInches: numberField({ label: "Height (in inches)" }), birthday: dateField() },
-      { isAvailable: checkboxField({ label: "Is Retired" }) },
+      { heightInInches: boundNumberField({ label: "Height (in inches)" }), birthday: boundDateField() },
+      { isAvailable: boundCheckboxField({ label: "Is Retired" }) },
     ],
   },
 ];
