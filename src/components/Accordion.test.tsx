@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { click, render } from "src/utils/rtl";
 import { Accordion } from "./Accordion";
 

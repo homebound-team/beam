@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { ChipSelectField, ChipSelectFieldProps } from "src";
@@ -113,8 +114,8 @@ describe("ChipSelectField", () => {
   it("handles onCreateNew flow", async () => {
     // Given a ChipSelectField with the onCreateNew prop
     const newOpt = { id: "s:100", name: "New Sport" };
-    const onCreateNew = jest.fn();
-    const onBlur = jest.fn();
+    const onCreateNew = jest.fn() as any;
+    const onBlur = jest.fn() as any;
     const r = await render(
       <TestComponent
         label="Label"

@@ -4,7 +4,7 @@ import { DateFieldProps } from "src/inputs";
 import { maybeCall, useTestIds } from "src/utils";
 
 /** Mocks out `DateField` as a text `<input>` field. */
-export function DateField(props: DateFieldProps) {
+export function DateFieldMock(props: DateFieldProps) {
   const { onChange = () => {}, errorMsg, onBlur, onFocus } = props;
   const [value, setValue] = useState(props.value ? format(props.value, "MM/dd/yy") : "");
   const tid = useTestIds(props, "date");

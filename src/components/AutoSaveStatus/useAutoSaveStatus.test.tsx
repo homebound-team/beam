@@ -1,8 +1,9 @@
+import { jest } from "@jest/globals";
 import { act, renderHook } from "@testing-library/react";
 import { AutoSaveStatus, AutoSaveStatusProvider } from "./AutoSaveStatusProvider";
 import { useAutoSaveStatus } from "./useAutoSaveStatus";
 
-describe(useAutoSaveStatus, () => {
+describe("useAutoSaveStatus", () => {
   /** The internal setTimeout running after tests is spamming the console, so cancel them all here */
   afterEach(() => {
     jest.clearAllTimers();
