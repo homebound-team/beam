@@ -40,32 +40,36 @@ export function FullPageForm<F>(props: FullPageFormProps<F>) {
       <div
         css={
           Css.dg
-            .gtc(sideBarIsOpen ? "220px 1fr 400px" : "220px 3fr 1fr")
+            // .gtc(sideBarIsOpen ? "220px 1fr 400px" : "220px 3fr 1fr")
+            .gtc("auto")
             .gtr("auto 1fr")
             .cg2.maxwPx(1800).h100.ma.$
         }
       >
-        <header css={Css.gr(1).gc("1 / 4").py2.px3.df.jcsb.aic.$}>
+        <header css={Css.gr(1).gc("1 / 2").py2.px3.df.jcsb.aic.$}>
           <div>
             {breadCrumbs && breadCrumbs}
             <h1 css={Css.xl3Sb.$}>{pageTitle}</h1>
           </div>
           <div css={Css.df.gap1.$}>{actionButtons}</div>
         </header>
-        <aside css={Css.gr(2).gc("1 / 2").px3.py2.df.fdc.gap1.$}>
-          <Button onClick="" label="Link A" variant="tertiary" />
-          <Button onClick="" label="Link B" variant="tertiary" />
-          <Button onClick="" label="Link C" variant="tertiary" />
-        </aside>
-        <article css={Css.gr(2).gc("2 / 3").oa.pr1.$}>
-          {formSections.map((section, i) => (
-            <Fragment key={`section-${i}`}>
-              {section.title && <h2 css={Css.xlSb.mb3.$}>{section.title}</h2>}
-              <BoundForm formState={formState} inputRows={section.rows} />
-            </Fragment>
-          ))}
+        {/* Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars */}
+        <article css={Css.dg.gtc(sideBarIsOpen ? "220px 1fr 400px" : "220px 3fr 1fr").gc("1 /2 ").oa.ais.$}>
+          <aside css={Css.gr(1).gc("1 / 2").sticky.top0.px3.py2.df.fdc.gap1.$}>
+            <Button onClick="" label="Link A" variant="tertiary" />
+            <Button onClick="" label="Link B" variant="tertiary" />
+            <Button onClick="" label="Link C" variant="tertiary" />
+          </aside>
+          <article css={Css.gr(1).gc("2 / 3").mr2.pr1.$}>
+            {formSections.map((section, i) => (
+              <Fragment key={`section-${i}`}>
+                {section.title && <h2 css={Css.xlSb.mb3.$}>{section.title}</h2>}
+                <BoundForm formState={formState} inputRows={section.rows} />
+              </Fragment>
+            ))}
+          </article>
+          <SidebarContent sideBarIsOpen={sideBarIsOpen} setSideBarIsOpen={setSideBarIsOpen} />
         </article>
-        <SidebarContent sideBarIsOpen={sideBarIsOpen} setSideBarIsOpen={setSideBarIsOpen} />
       </div>
     </div>
   );
@@ -81,7 +85,7 @@ function SidebarContent({
 }) {
   if (!sideBarIsOpen)
     return (
-      <aside css={Css.gr(2).gc("3 / 4").py2.$}>
+      <aside css={Css.gr(1).gc("3 / 4").sticky.top0.py2.$}>
         <div css={Css.br100.wPx(50).hPx(50).bcGray100.ba.df.jcc.aic.$}>
           <IconButton onClick={() => setSideBarIsOpen(true)} icon="comment" inc={3} />
         </div>
@@ -89,7 +93,7 @@ function SidebarContent({
     );
 
   return (
-    <aside css={Css.gr(2).gc("3 / 4").py2.$}>
+    <aside css={Css.gr(1).gc("3 / 4").sticky.top0.py2.$}>
       <AnimatePresence>
         {sideBarIsOpen && (
           <motion.div
