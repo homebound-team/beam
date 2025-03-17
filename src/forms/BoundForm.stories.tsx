@@ -214,8 +214,8 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
     }),
   },
 
-  // We can support any custom JSX node
-  { height: <CustomComponent /> },
+  // We can support any custom JSX node using the key `reactNode*`
+  { reactNodeA: <CustomComponent /> },
 ];
 
 const formConfig: ObjectConfig<AuthorInput> = {

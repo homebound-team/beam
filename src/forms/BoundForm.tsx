@@ -28,8 +28,13 @@ import { FormLines } from "./FormLines";
 type BoundFieldInputFnReturn = { component: ReactNode; minWith: string };
 type BoundFieldInputFn<F> = (field: ObjectState<F>[keyof F]) => BoundFieldInputFnReturn;
 
-type BoundFormRowInputs<F> = {
-  [K in keyof F]: BoundFieldInputFn<F> | ReactNode;
+const reactNodePrefix = "reactNode" as const;
+type CustomReactNodeKey = `${typeof reactNodePrefix}${string}`;
+
+type BoundFormRowInputs<F> = Partial<{
+  [K in keyof F]: BoundFieldInputFn<F>;
+}> & {
+  [K in CustomReactNodeKey]: ReactNode;
 };
 
 export type BoundFormInputConfig<F> = BoundFormRowInputs<F>[];
@@ -42,12 +47,14 @@ export type BoundFormProps<F> = {
 /**
  * A wrapper around the "Bound" form components for the form-state library to render a standard (and responsive) form layout.
  * * Each row is an object of bound input components keyed by their formState key, which are rendered in a responsive flex layout.
+ * * Alternatively keys can be prefixed with "reactNode" to render any custom JSX node as-is.
  * * Example usage:
  * ```tsx
  *    <BoundFormComponent
         inputRows={[
           { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
           { bio: boundTextAreaField() },
+          { reactNodeExample: <div>Custom JSX node</div> },
         ]}
         formState={formState}
       />
@@ -75,9 +82,12 @@ function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState:
   /**  Extract the bound input components with their sizing config or render any "custom" JSX node as-is */
   const componentsWithConfig = useMemo(() => {
     return safeEntries(row).map(([key, fieldFnOrCustomNode]) => {
-      if (typeof fieldFnOrCustomNode === "function") {
+      if (typeof fieldFnOrCustomNode === "function" && !isCustomReactNodeKey(key)) {
         const field = formState[key] ?? fail(`Field ${key.toString()} not found in formState`);
-        const { component, minWith } = fieldFnOrCustomNode(field);
+        const fieldFn =
+          (fieldFnOrCustomNode as BoundFormRowInputs<F>[keyof F]) ??
+          fail(`Field function not defined for key ${key.toLocaleString()}`);
+        const { component, minWith } = fieldFn(field);
 
         return { component, key, minWith };
       }
@@ -102,6 +112,10 @@ function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState:
       ))}
     </div>
   );
+}
+
+function isCustomReactNodeKey(key: string | number | symbol): key is CustomReactNodeKey {
+  return key.toString().startsWith(reactNodePrefix);
 }
 
 /**
