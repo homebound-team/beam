@@ -42,7 +42,7 @@ export function BoundForm() {
 
   return (
     <div css={Css.bgWhite.p3.py5.$}>
-      <BoundFormComponent inputRows={inputConfig} formState={formState} />
+      <BoundFormComponent rows={inputConfig} formState={formState} />
     </div>
   );
 }
@@ -56,7 +56,7 @@ export function SmallFormExample() {
   return (
     <div css={Css.bgWhite.p3.py5.$}>
       <BoundFormComponent
-        inputRows={[
+        rows={[
           { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
           { bio: boundTextAreaField() },
         ]}
@@ -76,7 +76,7 @@ export function ReadOnlyForm() {
   return (
     <div css={Css.bgWhite.p3.py5.$}>
       <BoundFormComponent
-        inputRows={[
+        rows={[
           { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
           { bio: boundTextAreaField() },
         ]}
@@ -105,7 +105,7 @@ export function LoadingBoundForm() {
   return (
     <div css={Css.bgWhite.p3.py5.$}>
       <BoundFormComponent
-        inputRows={[
+        rows={[
           { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
           { bio: boundTextAreaField() },
         ]}

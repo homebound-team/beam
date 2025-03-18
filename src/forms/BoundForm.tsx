@@ -49,7 +49,7 @@ type BoundFormRowInputs<F> = Partial<{
 export type BoundFormInputConfig<F> = BoundFormRowInputs<F>[];
 
 export type BoundFormProps<F> = {
-  inputRows: BoundFormInputConfig<F>;
+  rows: BoundFormInputConfig<F>;
   formState: ObjectState<F>;
 };
 
@@ -60,7 +60,7 @@ export type BoundFormProps<F> = {
  * * Example usage:
  * ```tsx
  *    <BoundFormComponent
-        inputRows={[
+        rows={[
           { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
           { bio: boundTextAreaField() },
           { reactNodeExample: <div>Custom JSX node</div> },
@@ -70,14 +70,14 @@ export type BoundFormProps<F> = {
  * ```
  */
 export function BoundForm<F>(props: BoundFormProps<F>) {
-  const { inputRows, formState } = props;
+  const { rows, formState } = props;
 
   const tid = useTestIds({}, "boundForm");
 
   return (
     <div {...tid}>
       <FormLines labelSuffix={{ required: "*" }} width="full" gap={4}>
-        {inputRows.map((row) => (
+        {rows.map((row) => (
           <FormRow key={`fieldGroup-${Object.keys(row).join("-")}`} row={row} formState={formState} />
         ))}
       </FormLines>
