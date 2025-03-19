@@ -3,6 +3,7 @@ export * from "./BoundCheckboxGroupField";
 export * from "./BoundChipSelectField";
 export * from "./BoundDateField";
 export * from "./BoundDateRangeField";
+export * from "./BoundForm";
 export * from "./BoundIconCardField";
 export * from "./BoundIconCardGroupField";
 export * from "./BoundMultiLineSelectField";
