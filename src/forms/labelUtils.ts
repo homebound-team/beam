@@ -1,9 +1,9 @@
 import { usePresentationContext } from "src/components/PresentationContext";
 
-export function getLabelSuffix(required: boolean | undefined): string | undefined {
-  // We promise to always call `getLabelSuffix` deterministically
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+// We promise to always call `getLabelSuffix` deterministically
+export function useLabelSuffix(required: boolean | undefined, readOnly: boolean | undefined): string | undefined {
   const { fieldProps } = usePresentationContext();
+  if (readOnly) return undefined;
   if (required === true) {
     return fieldProps?.labelSuffix?.required;
   } else if (required === false) {
