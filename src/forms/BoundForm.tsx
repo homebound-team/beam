@@ -25,7 +25,7 @@ import { BoundToggleChipGroupField, BoundToggleChipGroupFieldProps } from "./Bou
 import { BoundTreeSelectField, BoundTreeSelectFieldProps } from "./BoundTreeSelectField";
 import { FormLines } from "./FormLines";
 
-type BoundFieldInputFnReturn = { component: ReactNode; minWith: Properties["minWidth"] };
+type BoundFieldInputFnReturn = { component: ReactNode; minWidth: Properties["minWidth"] };
 type BoundFieldInputFn<F> = (field: ObjectState<F>[keyof F]) => BoundFieldInputFnReturn;
 
 // To aid in discoverability of the optional override via IntelliSense, we can enumerate each form key `foo`
@@ -49,7 +49,7 @@ type BoundFormRowInputs<F> = Partial<{
 export type BoundFormInputConfig<F> = BoundFormRowInputs<F>[];
 
 export type BoundFormProps<F> = {
-  inputRows: BoundFormInputConfig<F>;
+  rows: BoundFormInputConfig<F>;
   formState: ObjectState<F>;
 };
 
@@ -60,7 +60,7 @@ export type BoundFormProps<F> = {
  * * Example usage:
  * ```tsx
  *    <BoundFormComponent
-        inputRows={[
+        rows={[
           { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
           { bio: boundTextAreaField() },
           { reactNodeExample: <div>Custom JSX node</div> },
@@ -70,14 +70,14 @@ export type BoundFormProps<F> = {
  * ```
  */
 export function BoundForm<F>(props: BoundFormProps<F>) {
-  const { inputRows, formState } = props;
+  const { rows, formState } = props;
 
   const tid = useTestIds({}, "boundForm");
 
   return (
     <div {...tid}>
       <FormLines labelSuffix={{ required: "*" }} width="full" gap={4}>
-        {inputRows.map((row) => (
+        {rows.map((row) => (
           <FormRow key={`fieldGroup-${Object.keys(row).join("-")}`} row={row} formState={formState} />
         ))}
       </FormLines>
@@ -96,9 +96,9 @@ function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState:
         const fieldFn =
           (fieldFnOrCustomNode as BoundFormRowInputs<F>[keyof F]) ??
           fail(`Field function not defined for key ${key.toLocaleString()}`);
-        const { component, minWith } = fieldFn(field);
+        const { component, minWidth } = fieldFn(field);
 
-        return { component, key, minWith };
+        return { component, key, minWidth };
       }
 
       return { component: fieldFnOrCustomNode as ReactNode, key };
@@ -114,8 +114,8 @@ function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState:
 
   return (
     <div css={Css.df.fww.gap2.$} {...tid}>
-      {componentsWithConfig.map(({ component, key, minWith }) => (
-        <div css={Css.mw(minWith).fb(`${itemFlexBasis}%`).fg1.$} key={key.toString()}>
+      {componentsWithConfig.map(({ component, key, minWidth }) => (
+        <div css={Css.mw(minWidth).fb(`${itemFlexBasis}%`).fg1.$} key={key.toString()}>
           {isLoading ? <LoadingSkeleton size="lg" /> : component}
         </div>
       ))}
@@ -139,14 +139,14 @@ type KeysToOmit = "field";
 export function boundSelectField<O, V extends Value>(props: Omit<BoundSelectFieldProps<O, V>, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundSelectField field={field} {...props} />,
-    minWith: "200px",
+    minWidth: "200px",
   });
 }
 
 export function boundMultiSelectField<O, V extends Value>(props: Omit<BoundMultiSelectFieldProps<O, V>, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundMultiSelectField field={field} {...props} />,
-    minWith: "200px",
+    minWidth: "200px",
   });
 }
 
@@ -155,14 +155,14 @@ export function boundMultilineSelectField<O, V extends Value>(
 ) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundMultiLineSelectField field={field} {...props} />,
-    minWith: "200px",
+    minWidth: "200px",
   });
 }
 
 export function boundTextField<X extends Only<TextFieldXss, X>>(props?: Omit<BoundTextFieldProps<X>, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundTextField field={field} {...props} />,
-    minWith: "150px",
+    minWidth: "150px",
   });
 }
 
@@ -171,90 +171,90 @@ export function boundTextAreaField<X extends Only<TextFieldXss, X>>(
 ) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundTextAreaField field={field} {...props} />,
-    minWith: "200px",
+    minWidth: "200px",
   });
 }
 
 export function boundNumberField(props?: Omit<BoundNumberFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundNumberField field={field} {...props} />,
-    minWith: "150px",
+    minWidth: "150px",
   });
 }
 
 export function boundDateField(props?: Omit<BoundDateFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundDateField field={field} {...props} />,
-    minWith: "150px",
+    minWidth: "150px",
   });
 }
 
 export function boundDateRangeField(props?: Omit<BoundDateRangeFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundDateRangeField field={field} {...props} />,
-    minWith: "150px",
+    minWidth: "150px",
   });
 }
 
 export function boundCheckboxField(props?: Omit<BoundCheckboxFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundCheckboxField field={field} {...props} />,
-    minWith: "min-content",
+    minWidth: "min-content",
   });
 }
 
 export function boundCheckboxGroupField(props: Omit<BoundCheckboxGroupFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundCheckboxGroupField field={field} {...props} />,
-    minWith: "200px",
+    minWidth: "200px",
   });
 }
 
 export function boundIconCardField(props: Omit<BoundIconCardFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundIconCardField field={field} {...props} />,
-    minWith: "150px",
+    minWidth: "150px",
   });
 }
 
 export function boundIconCardGroupField<V extends Value>(props: Omit<BoundIconCardGroupFieldProps<V>, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundIconCardGroupField field={field} {...props} />,
-    minWith: "100%",
+    minWidth: "100%",
   });
 }
 
 export function boundRadioGroupField<K extends string>(props: Omit<BoundRadioGroupFieldProps<K>, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundRadioGroupField field={field} {...props} />,
-    minWith: "200px",
+    minWidth: "200px",
   });
 }
 
 export function boundRichTextField(props?: Omit<BoundRichTextFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundRichTextField field={field} {...props} />,
-    minWith: "200px",
+    minWidth: "200px",
   });
 }
 
 export function boundSwitchField(props?: Omit<BoundSwitchFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundSwitchField field={field} labelStyle="inline" {...props} />,
-    minWith: "min-content",
+    minWidth: "min-content",
   });
 }
 
 export function boundToggleChipGroupField(props: Omit<BoundToggleChipGroupFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundToggleChipGroupField field={field} {...props} />,
-    minWith: "100%",
+    minWidth: "100%",
   });
 }
 
 export function boundTreeSelectField<O, V extends Value>(props: Omit<BoundTreeSelectFieldProps<O, V>, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundTreeSelectField field={field} {...props} />,
-    minWith: "200px",
+    minWidth: "200px",
   });
 }

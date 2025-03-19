@@ -18,7 +18,7 @@ describe("BoundForm", () => {
     const r = await render(
       <BoundForm
         formState={formState}
-        inputRows={[{ firstName: boundTextField(), lastName: boundTextField() }, { isAvailable: boundCheckboxField() }]}
+        rows={[{ firstName: boundTextField(), lastName: boundTextField() }, { isAvailable: boundCheckboxField() }]}
       />,
     );
 
