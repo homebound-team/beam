@@ -16,7 +16,7 @@ import { InlineLabel, Label } from "src/components/Label";
 import { InputStylePalette, usePresentationContext } from "src/components/PresentationContext";
 import { BorderHoverChild, BorderHoverParent } from "src/components/Table/components/Row";
 import { Css, Only, Palette } from "src/Css";
-import { getLabelSuffix } from "src/forms/labelUtils";
+import { useLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { getFieldWidth } from "src/inputs/utils";
@@ -111,7 +111,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
   const { compound = false, forceFocus = false, forceHover = false } = internalProps;
   const errorMessageId = `${inputProps.id}-error`;
-  const labelSuffix = getLabelSuffix(required);
+  const labelSuffix = useLabelSuffix(required, inputProps.readOnly);
   const ElementType: React.ElementType = multiline ? "textarea" : "input";
   const tid = useTestIds(props, defaultTestId(label));
   const [isFocused, setIsFocused] = useState(false);

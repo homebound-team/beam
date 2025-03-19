@@ -72,6 +72,7 @@ function Template(args: SelectFieldProps<any, any>) {
         <TestSelectField
           {...args}
           label="Favorite Icon"
+          required={true}
           value={options[2].id}
           options={options}
           unsetLabel="N/A"
@@ -115,6 +116,7 @@ function Template(args: SelectFieldProps<any, any>) {
           label="Favorite Icon - Read Only"
           options={options}
           value={options[2].id}
+          required={true}
           readOnly="Read only reason"
         />
         <TestSelectField
