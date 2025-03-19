@@ -2,7 +2,7 @@ import { ObjectState } from "@homebound/form-state";
 import { AnimatePresence, motion } from "framer-motion";
 import { Dispatch, Fragment, ReactNode, SetStateAction, useState } from "react";
 import { Css } from "src/Css";
-import { BoundForm, BoundFormProps } from "src/forms";
+import { BoundForm, BoundFormInputConfig } from "src/forms";
 import { Button } from "../Button";
 import { IconKey } from "../Icon";
 import { IconButton } from "../IconButton";
@@ -10,7 +10,7 @@ import { IconButton } from "../IconButton";
 export type FormSectionConfig<F> = {
   title?: string;
   icon?: IconKey;
-  rows: BoundFormProps<F>["inputRows"];
+  rows: BoundFormInputConfig<F>;
 }[];
 
 type FullPageFormProps<F> = {
@@ -29,49 +29,56 @@ type FullPageFormProps<F> = {
   // submitBtnProps: ButtonProps;
 };
 
+/** In order to make the multiple stacked sticky elements work (Header, then sidebar below) we need to set the header height.
+ * The alternate solution was to have multiple defined grid areas for the fixed header vs body below, but this becomes more complex
+ * to manage when adding in a max content width container for the page while keeping the page scrollbar to the far right of the page.
+ * Rather than wrapping the page in a max-width div, we use "gutter" columns `minMax(0, auto)` that kick in when all other columns have met their max widths.
+ */
+const headerHeightPx = 120;
+
 export function FullPageForm<F>(props: FullPageFormProps<F>) {
   const { pageTitle, breadCrumbs, actionButtons, formSections, formState } = props;
 
   const [sideBarIsOpen, setSideBarIsOpen] = useState(false);
 
+  const rightSidebarCol = sideBarIsOpen ? "400px" : "minMax(100px, 300px)";
+  const gridColumns = `minMax(0, auto) minMax(min-content, 250px) minMax(250px, 1000px) ${rightSidebarCol} minMax(0, auto)`;
+
   return (
-    <div css={Css.vh100.add("width", "100vw").bgWhite.$}>
-      {/* Though the grid layout should manage the full page, we want to contain it within a max width for very wide screens */}
-      <div
-        css={
-          Css.dg
-            // .gtc(sideBarIsOpen ? "220px 1fr 400px" : "220px 3fr 1fr")
-            .gtc("auto")
-            .gtr("auto 1fr")
-            .cg2.maxwPx(1800).h100.ma.$
-        }
-      >
-        <header css={Css.gr(1).gc("1 / 2").py2.px3.df.jcsb.aic.$}>
-          <div>
-            {breadCrumbs && breadCrumbs}
-            <h1 css={Css.xl3Sb.$}>{pageTitle}</h1>
-          </div>
-          <div css={Css.df.gap1.$}>{actionButtons}</div>
-        </header>
-        {/* Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars */}
-        <article css={Css.dg.gtc(sideBarIsOpen ? "220px 1fr 400px" : "220px 3fr 1fr").gc("1 /2 ").oa.ais.$}>
-          <aside css={Css.gr(1).gc("1 / 2").sticky.top0.px3.py2.df.fdc.gap1.$}>
-            <Button onClick="" label="Link A" variant="tertiary" />
-            <Button onClick="" label="Link B" variant="tertiary" />
-            <Button onClick="" label="Link C" variant="tertiary" />
-          </aside>
-          <article css={Css.gr(1).gc("2 / 3").mr2.pr1.$}>
-            {formSections.map((section, i) => (
-              <Fragment key={`section-${i}`}>
-                {section.title && <h2 css={Css.xlSb.mb3.$}>{section.title}</h2>}
-                <BoundForm formState={formState} inputRows={section.rows} />
-              </Fragment>
-            ))}
-          </article>
-          <SidebarContent sideBarIsOpen={sideBarIsOpen} setSideBarIsOpen={setSideBarIsOpen} />
-        </article>
-      </div>
+    // Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars
+    <div css={Css.mvh100.w100.bgWhite.dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}>
+      <PageHeader pageTitle={pageTitle} breadCrumbs={breadCrumbs} actionButtons={actionButtons} />
+      <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$}>
+        <Button onClick="" label="Link A" variant="tertiary" />
+        <Button onClick="" label="Link B" variant="tertiary" />
+        <Button onClick="" label="Link C" variant="tertiary" />
+      </aside>
+      <article css={Css.gr(2).gc("3 / 4").$}>
+        {formSections.map((section, i) => (
+          <Fragment key={`section-${i}`}>
+            {section.title && <h2 css={Css.xlSb.mb3.$}>{section.title}</h2>}
+            <BoundForm formState={formState} rows={section.rows} />
+          </Fragment>
+        ))}
+      </article>
+      <SidebarContent sideBarIsOpen={sideBarIsOpen} setSideBarIsOpen={setSideBarIsOpen} />
     </div>
+  );
+}
+
+function PageHeader<F>(props: Pick<FullPageFormProps<F>, "pageTitle" | "breadCrumbs" | "actionButtons">) {
+  const { pageTitle, breadCrumbs, actionButtons } = props;
+
+  return (
+    <header css={Css.gr(1).gc("2 / 5").sticky.top0.hPx(headerHeightPx).bgWhite.z5.$}>
+      <div css={Css.py2.px3.df.jcsb.aic.$}>
+        <div>
+          {breadCrumbs && breadCrumbs}
+          <h1 css={Css.xl3Sb.$}>{pageTitle}</h1>
+        </div>
+        <div css={Css.df.gap1.$}>{actionButtons}</div>
+      </div>
+    </header>
   );
 }
 
@@ -85,7 +92,7 @@ function SidebarContent({
 }) {
   if (!sideBarIsOpen)
     return (
-      <aside css={Css.gr(1).gc("3 / 4").sticky.top0.py2.$}>
+      <aside css={Css.gr(2).gc("4 / 5").sticky.topPx(headerHeightPx).$}>
         <div css={Css.br100.wPx(50).hPx(50).bcGray100.ba.df.jcc.aic.$}>
           <IconButton onClick={() => setSideBarIsOpen(true)} icon="comment" inc={3} />
         </div>
@@ -93,7 +100,7 @@ function SidebarContent({
     );
 
   return (
-    <aside css={Css.gr(1).gc("3 / 4").sticky.top0.py2.$}>
+    <aside css={Css.gr(2).gc("4 / 5").sticky.topPx(headerHeightPx).$}>
       <AnimatePresence>
         {sideBarIsOpen && (
           <motion.div
