@@ -1,9 +1,9 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
-import { click, render } from "@homebound/rtl-utils";
 import { jest } from "@jest/globals";
 import { BoundSelectField } from "src/forms/BoundSelectField";
 import { AuthorHeight, AuthorInput } from "src/forms/formStateDomain";
 import { noop } from "src/utils";
+import { click, render } from "src/utils/rtl";
 
 const sports = [
   { id: "s:1", name: "Football" },
@@ -27,7 +27,13 @@ describe("BoundSelectField", () => {
   it("shows the label", async () => {
     const author = createObjectState(formConfig, { favoriteSport: "s:1" });
     const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} />);
-    expect(r.favoriteSport_label).toHaveTextContent("Favorite Sport");
+    expect(r.favoriteSport_label.textContent).toBe("Favorite Sport *");
+  });
+
+  it("hides asterisk if required & readonly", async () => {
+    const author = createObjectState(formConfig, { favoriteSport: "s:1" });
+    const r = await render(<BoundSelectField field={author.favoriteSport} options={sports} readOnly />);
+    expect(r.favoriteSport_label.textContent).toBe("Favorite Sport");
   });
 
   it("binds to options with displayNames", async () => {
