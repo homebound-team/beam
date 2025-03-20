@@ -43,7 +43,10 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
   return (
     // This page is `fixed` to the full screen to allow it to act as a full screen modal while content is mounted below
     // Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars
-    <div css={Css.fixed.top0.bottom0.left0.right0.oya.bgWhite.dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$} {...tids}>
+    <div
+      css={Css.fixed.top0.bottom0.left0.right0.z(1000).oya.bgWhite.dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}
+      {...tids}
+    >
       <PageHeader {...props} {...tids.pageHeader} />
       <LeftNav formSections={formSections} {...tids.nav} />
       <FormSections formSections={formSections} formState={formState} {...tids} />
