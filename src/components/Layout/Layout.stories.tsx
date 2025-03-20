@@ -16,9 +16,9 @@ import {
 } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
 import {
+  FormPageLayout as FormPageLayoutComponent,
   FormSectionConfig,
   FullBleed,
-  FullPageForm as FullPageFormComponent,
   GridColumn,
   GridDataRow,
   GridTable,
@@ -164,19 +164,22 @@ function ExamplePageComponent() {
   );
 }
 
-export function FullPageForm() {
+export function FormPageLayout() {
   const formState = useFormState({
     config: formConfig,
     init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
   });
 
   return (
-    <FullPageFormComponent
+    <FormPageLayoutComponent
       pageTitle="Detail Title"
       submitAction={{ label: "Save", onClick: noop }}
       cancelAction={{ label: "Cancel", onClick: noop }}
       tertiaryAction={{ label: "Tertiary Test", onClick: noop }}
-      breadCrumbs={<span>Breadcrumb A / Breadcrumb B</span>}
+      breadCrumb={[
+        { label: "Breadcrumb A", href: "/breadcrumb-a" },
+        { label: "Breadcrumb B", href: "/breadcrumb-b" },
+      ]}
       formSections={formSections}
       formState={formState}
     />
@@ -201,8 +204,6 @@ const formSections: FormSectionConfig<AuthorInput> = [
     rows: [
       { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
       { bio: boundTextAreaField() },
-      // We can support any custom JSX node, TODO to come up with a better example
-      // { height: <CustomComponent /> },
     ],
   },
   {
