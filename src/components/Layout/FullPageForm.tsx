@@ -1,10 +1,10 @@
 import { ObjectState } from "@homebound/form-state";
 import { AnimatePresence, motion } from "framer-motion";
-import { Dispatch, Fragment, ReactNode, SetStateAction, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 import { Css } from "src/Css";
 import { BoundForm, BoundFormInputConfig } from "src/forms";
 import { Button } from "../Button";
-import { IconKey } from "../Icon";
+import { Icon, IconKey } from "../Icon";
 import { IconButton } from "../IconButton";
 
 export type FormSectionConfig<F> = {
@@ -45,22 +45,16 @@ export function FullPageForm<F>(props: FullPageFormProps<F>) {
   const gridColumns = `minMax(0, auto) minMax(min-content, 250px) minMax(250px, 1000px) ${rightSidebarCol} minMax(0, auto)`;
 
   return (
+    // This page is `fixed` to the full screen to allow it to act as a full screen modal while content is mounted below
     // Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars
-    <div css={Css.mvh100.w100.bgWhite.dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}>
+    <div css={Css.fixed.top0.bottom0.left0.right0.oya.bgWhite.dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}>
       <PageHeader pageTitle={pageTitle} breadCrumbs={breadCrumbs} actionButtons={actionButtons} />
       <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$}>
         <Button onClick="" label="Link A" variant="tertiary" />
         <Button onClick="" label="Link B" variant="tertiary" />
         <Button onClick="" label="Link C" variant="tertiary" />
       </aside>
-      <article css={Css.gr(2).gc("3 / 4").$}>
-        {formSections.map((section, i) => (
-          <Fragment key={`section-${i}`}>
-            {section.title && <h2 css={Css.xlSb.mb3.$}>{section.title}</h2>}
-            <BoundForm formState={formState} rows={section.rows} />
-          </Fragment>
-        ))}
-      </article>
+      <FormSections formSections={formSections} formState={formState} />
       <SidebarContent sideBarIsOpen={sideBarIsOpen} setSideBarIsOpen={setSideBarIsOpen} />
     </div>
   );
@@ -79,6 +73,25 @@ function PageHeader<F>(props: Pick<FullPageFormProps<F>, "pageTitle" | "breadCru
         <div css={Css.df.gap1.$}>{actionButtons}</div>
       </div>
     </header>
+  );
+}
+
+function FormSections<F>(props: Pick<FullPageFormProps<F>, "formSections" | "formState">) {
+  const { formSections, formState } = props;
+
+  return (
+    <article css={Css.gr(2).gc("3 / 4").$}>
+      {formSections.map((section, i) => (
+        // Subgrid here allows for icon placement to the left of the section content
+        <section key={`section-${section.title ?? i}`} css={Css.dg.gtc("50px 1fr").gtr("auto").$}>
+          <div css={Css.gc(1).$}>{section.icon && <Icon icon={section.icon} inc={4.5} />}</div>
+          <div css={Css.gc(2).$}>
+            {section.title && <h2 css={Css.xlSb.mb3.$}>{section.title}</h2>}
+            <BoundForm formState={formState} rows={section.rows} />
+          </div>
+        </section>
+      ))}
+    </article>
   );
 }
 
