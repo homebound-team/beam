@@ -1,9 +1,9 @@
 import { ObjectState } from "@homebound/form-state";
-import { AnimatePresence, motion } from "framer-motion";
-import { Dispatch, ReactNode, SetStateAction, useState } from "react";
+import { Observer } from "mobx-react";
+import { ReactNode, useState } from "react";
 import { Css } from "src/Css";
 import { BoundForm, BoundFormInputConfig } from "src/forms";
-import { Button } from "../Button";
+import { Button, ButtonProps } from "../Button";
 import { Icon, IconKey } from "../Icon";
 import { IconButton } from "../IconButton";
 
@@ -13,20 +13,16 @@ export type FormSectionConfig<F> = {
   rows: BoundFormInputConfig<F>;
 }[];
 
+type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
+
 type FullPageFormProps<F> = {
   pageTitle: string;
   breadCrumbs?: ReactNode;
-  actionButtons: ReactNode;
   formState: ObjectState<F>;
   formSections: FormSectionConfig<F>;
-  // It may make sense to have this page level own the top-level "Sections" (rather than BoundForm rendering them)
-  // since we need to do the sidebar links (and probably do an intersection observer for the top most section in view?)
-  // so we'd render multiple `BoundForm` instances for each section
-  // boundFormProps: BoundFormProps<F>;
-  // Will have to decide how much of this component is composable via react nodes, vs how much we can constrain
-  // for the submit actions, the figma points to 3 possible buttons: Primary/Submit, Cancel/Secondary, and Text/Tertiary
-  // we could just expose the bare minimum props for these buttons
-  // submitBtnProps: ButtonProps;
+  submitAction?: ActionButtonProps;
+  cancelAction?: ActionButtonProps;
+  tertiaryAction?: ActionButtonProps;
 };
 
 /** In order to make the multiple stacked sticky elements work (Header, then sidebar below) we need to set the header height.
@@ -37,31 +33,24 @@ type FullPageFormProps<F> = {
 const headerHeightPx = 120;
 
 export function FullPageForm<F>(props: FullPageFormProps<F>) {
-  const { pageTitle, breadCrumbs, actionButtons, formSections, formState } = props;
+  const { formSections, formState } = props;
 
-  const [sideBarIsOpen, setSideBarIsOpen] = useState(false);
-
-  const rightSidebarCol = sideBarIsOpen ? "400px" : "minMax(100px, 300px)";
-  const gridColumns = `minMax(0, auto) minMax(min-content, 250px) minMax(250px, 1000px) ${rightSidebarCol} minMax(0, auto)`;
+  const gridColumns = `minMax(0, auto) minMax(min-content, 250px) minMax(250px, 1000px) minMax(min-content, 300px) minMax(0, auto)`;
 
   return (
     // This page is `fixed` to the full screen to allow it to act as a full screen modal while content is mounted below
     // Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars
     <div css={Css.fixed.top0.bottom0.left0.right0.oya.bgWhite.dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}>
-      <PageHeader pageTitle={pageTitle} breadCrumbs={breadCrumbs} actionButtons={actionButtons} />
-      <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$}>
-        <Button onClick="" label="Link A" variant="tertiary" />
-        <Button onClick="" label="Link B" variant="tertiary" />
-        <Button onClick="" label="Link C" variant="tertiary" />
-      </aside>
+      <PageHeader {...props} />
+      <LeftNav />
       <FormSections formSections={formSections} formState={formState} />
-      <SidebarContent sideBarIsOpen={sideBarIsOpen} setSideBarIsOpen={setSideBarIsOpen} />
+      <SidebarContent />
     </div>
   );
 }
 
-function PageHeader<F>(props: Pick<FullPageFormProps<F>, "pageTitle" | "breadCrumbs" | "actionButtons">) {
-  const { pageTitle, breadCrumbs, actionButtons } = props;
+function PageHeader<F>(props: FullPageFormProps<F>) {
+  const { pageTitle, breadCrumbs, submitAction, cancelAction, tertiaryAction, formState } = props;
 
   return (
     <header css={Css.gr(1).gc("2 / 5").sticky.top0.hPx(headerHeightPx).bgWhite.z5.$}>
@@ -70,7 +59,39 @@ function PageHeader<F>(props: Pick<FullPageFormProps<F>, "pageTitle" | "breadCru
           {breadCrumbs && breadCrumbs}
           <h1 css={Css.xl3Sb.$}>{pageTitle}</h1>
         </div>
-        <div css={Css.df.gap1.$}>{actionButtons}</div>
+        <Observer>
+          {() => (
+            <div css={Css.df.gap1.$}>
+              {tertiaryAction && (
+                <Button
+                  label={tertiaryAction.label}
+                  onClick={tertiaryAction.onClick}
+                  variant="tertiary"
+                  disabled={tertiaryAction.disabled}
+                  tooltip={tertiaryAction.tooltip}
+                />
+              )}
+              {cancelAction && (
+                <Button
+                  label={cancelAction.label}
+                  onClick={cancelAction.onClick}
+                  variant="secondary"
+                  disabled={cancelAction.disabled}
+                  tooltip={cancelAction.tooltip}
+                />
+              )}
+              {submitAction && (
+                <Button
+                  label={submitAction.label}
+                  onClick={submitAction.onClick}
+                  variant="primary"
+                  disabled={!formState.valid || submitAction.disabled}
+                  tooltip={submitAction.tooltip}
+                />
+              )}
+            </div>
+          )}
+        </Observer>
       </div>
     </header>
   );
@@ -95,14 +116,20 @@ function FormSections<F>(props: Pick<FullPageFormProps<F>, "formSections" | "for
   );
 }
 
+function LeftNav() {
+  return (
+    <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$}>
+      <Button onClick="" label="Link A" variant="tertiary" />
+      <Button onClick="" label="Link B" variant="tertiary" />
+      <Button onClick="" label="Link C" variant="tertiary" />
+    </aside>
+  );
+}
+
 // The real sidebar will need to account for multiple possible components such as history and comments
-function SidebarContent({
-  sideBarIsOpen,
-  setSideBarIsOpen,
-}: {
-  sideBarIsOpen: boolean;
-  setSideBarIsOpen: Dispatch<SetStateAction<boolean>>;
-}) {
+function SidebarContent() {
+  const [sideBarIsOpen, setSideBarIsOpen] = useState(false);
+
   if (!sideBarIsOpen)
     return (
       <aside css={Css.gr(2).gc("4 / 5").sticky.topPx(headerHeightPx).$}>
@@ -114,38 +141,24 @@ function SidebarContent({
 
   return (
     <aside css={Css.gr(2).gc("4 / 5").sticky.topPx(headerHeightPx).$}>
-      <AnimatePresence>
-        {sideBarIsOpen && (
-          <motion.div
-            layout="position"
-            key="rightPane"
-            data-testid="rightPaneContent"
-            initial={{ x: 350, position: "absolute" }}
-            animate={{ x: 0 }}
-            transition={{ ease: "linear", duration: 0.2 }}
-            exit={{ transition: { ease: "linear", duration: 0.2 }, x: 350 }}
-          >
-            <div css={Css.dg.gtc("3fr 1fr").gtr("auto").gap1.maxh("calc(100vh - 150px)").oa.$}>
-              <div>
-                <h3 css={Css.lgSb.mb2.$}>Comments</h3>
-                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
-                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
-                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
-                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
-                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
-                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
-                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
-                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
-                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
-                <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
-              </div>
-              <div css={Css.br100.wPx(50).hPx(50).bcGray100.ba.df.jcc.aic.$}>
-                <IconButton onClick={() => setSideBarIsOpen(false)} icon="x" inc={3} />
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div css={Css.dg.gtc("3fr 1fr").gtr("auto").gap1.maxh("calc(100vh - 150px)").oa.$}>
+        <div>
+          <h3 css={Css.lgSb.mb2.$}>Comments</h3>
+          <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+          <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+          <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+          <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+          <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+          <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+          <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+          <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+          <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+          <div css={Css.w100.hPx(50).bgGray200.mt3.br4.$} />
+        </div>
+        <div css={Css.br100.wPx(50).hPx(50).bcGray100.ba.df.jcc.aic.$}>
+          <IconButton onClick={() => setSideBarIsOpen(false)} icon="x" inc={3} />
+        </div>
+      </div>
     </aside>
   );
 }

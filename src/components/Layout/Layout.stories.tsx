@@ -16,7 +16,6 @@ import {
 } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
 import {
-  Button,
   FormSectionConfig,
   FullBleed,
   FullPageForm as FullPageFormComponent,
@@ -174,12 +173,9 @@ export function FullPageForm() {
   return (
     <FullPageFormComponent
       pageTitle="Detail Title"
-      actionButtons={
-        <>
-          <Button onClick={noop} label="Cancel" variant="secondary" />
-          <Button onClick={noop} label="Save" />
-        </>
-      }
+      submitAction={{ label: "Save", onClick: noop }}
+      cancelAction={{ label: "Cancel", onClick: noop }}
+      tertiaryAction={{ label: "Tertiary Test", onClick: noop }}
       breadCrumbs={<span>Breadcrumb A / Breadcrumb B</span>}
       formSections={formSections}
       formState={formState}
