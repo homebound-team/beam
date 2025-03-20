@@ -46,7 +46,7 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
     <div css={Css.fixed.top0.bottom0.left0.right0.oya.bgWhite.dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$} {...tids}>
       <PageHeader {...props} {...tids.pageHeader} />
       <LeftNav formSections={formSections} {...tids.nav} />
-      <FormSections formSections={formSections} formState={formState} />
+      <FormSections formSections={formSections} formState={formState} {...tids} />
       <SidebarContent />
     </div>
   );
@@ -62,7 +62,9 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
       <div css={Css.py2.px3.df.jcsb.aic.$}>
         <div>
           {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} />}
-          <h1 css={Css.xl3Sb.$}>{pageTitle}</h1>
+          <h1 css={Css.xl3Sb.$} {...tids.pageTitle}>
+            {pageTitle}
+          </h1>
         </div>
         <Observer>
           {() => (
@@ -74,6 +76,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
                   variant="tertiary"
                   disabled={tertiaryAction.disabled}
                   tooltip={tertiaryAction.tooltip}
+                  {...tids.tertiaryAction}
                 />
               )}
               {cancelAction && (
@@ -83,6 +86,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
                   variant="secondary"
                   disabled={cancelAction.disabled}
                   tooltip={cancelAction.tooltip}
+                  {...tids.cancelAction}
                 />
               )}
               {submitAction && (
@@ -92,6 +96,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
                   variant="primary"
                   disabled={!formState.valid || submitAction.disabled}
                   tooltip={submitAction.tooltip}
+                  {...tids.submitAction}
                 />
               )}
             </div>
@@ -105,11 +110,17 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
 function FormSections<F>(props: Pick<FormPageLayoutProps<F>, "formSections" | "formState">) {
   const { formSections, formState } = props;
 
+  const tids = useTestIds(props);
+
   return (
     <article css={Css.gr(2).gc("3 / 4").$}>
       {formSections.map((section, i) => (
         // Subgrid here allows for icon placement to the left of the section content
-        <section key={`section-${section.title ?? i}`} css={Css.dg.gtc("50px 1fr").gtr("auto").mb3.$}>
+        <section
+          key={`section-${section.title ?? i}`}
+          css={Css.dg.gtc("50px 1fr").gtr("auto").mb3.$}
+          {...tids.formSection}
+        >
           <div css={Css.gc(1).$}>{section.icon && <Icon icon={section.icon} inc={3.5} />}</div>
           <div css={Css.gc(2).$}>
             {section.title && <h2 css={Css.xlSb.mb3.$}>{section.title}</h2>}
