@@ -1,5 +1,6 @@
 import { ObjectState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
+import { createRef, RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { Css } from "src/Css";
 import { BoundForm, BoundFormInputConfig } from "src/forms";
 import { useTestIds } from "src/utils";
@@ -7,11 +8,13 @@ import { Button, ButtonProps } from "../Button";
 import { Icon, IconKey } from "../Icon";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "./PageHeaderBreadcrumbs";
 
-export type FormSectionConfig<F> = {
+type FormSection<F> = {
   title?: string;
   icon?: IconKey;
   rows: BoundFormInputConfig<F>;
-}[];
+};
+
+export type FormSectionConfig<F> = FormSection<F>[];
 
 type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
 
@@ -37,8 +40,46 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
 
   const tids = useTestIds(props, "formPageLayout");
 
+  const sectionsWithRefs = useMemo(
+    () =>
+      formSections.map((section) => ({
+        section,
+        ref: createRef<HTMLElement>(),
+      })),
+    [formSections],
+  );
+
   const gridColumns =
     "minMax(0, auto) minMax(100px, 250px) minMax(350px, 1000px) minMax(min-content, 300px) minMax(0, auto)";
+
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: `-${headerHeightPx}px 0px 0px 0px`, threshold: 0.1 },
+    );
+
+    sectionsWithRefs.forEach(({ ref }) => {
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+    });
+
+    return () => {
+      sectionsWithRefs.forEach(({ ref }) => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      });
+    };
+  }, [sectionsWithRefs]);
 
   return (
     // This page is `fixed` to the full screen to allow it to act as a full screen modal while content is mounted below
@@ -48,8 +89,8 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
       {...tids}
     >
       <PageHeader {...props} {...tids.pageHeader} />
-      <LeftNav formSections={formSections} {...tids.nav} />
-      <FormSections formSections={formSections} formState={formState} {...tids} />
+      <LeftNav sectionsWithRefs={sectionsWithRefs} activeSection={activeSection} {...tids.nav} />
+      <FormSections sectionsWithRefs={sectionsWithRefs} formState={formState} {...tids} />
       <SidebarContent />
     </div>
   );
@@ -110,18 +151,30 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
   );
 }
 
-function FormSections<F>(props: Pick<FormPageLayoutProps<F>, "formSections" | "formState">) {
-  const { formSections, formState } = props;
+type SectionWithRefs<F> = {
+  ref: RefObject<HTMLElement>;
+  section: FormSection<F>;
+};
+
+type FormSectionsProps<F> = {
+  formState: ObjectState<F>;
+  sectionsWithRefs: SectionWithRefs<F>[];
+};
+
+function FormSections<F>(props: FormSectionsProps<F>) {
+  const { sectionsWithRefs, formState } = props;
 
   const tids = useTestIds(props);
 
   return (
     <article css={Css.gr(2).gc("3 / 4").$}>
-      {formSections.map((section, i) => (
+      {sectionsWithRefs.map(({ section, ref }, i) => (
         // Subgrid here allows for icon placement to the left of the section content
         <section
           key={`section-${section.title ?? i}`}
-          css={Css.dg.gtc("50px 1fr").gtr("auto").mb3.$}
+          id={`section-${section.title ?? i}`}
+          ref={ref}
+          css={Css.dg.gtc("50px 1fr").gtr("auto").mb3.add("scrollMarginTop", `${headerHeightPx}px`).$}
           {...tids.formSection}
         >
           <div css={Css.gc(1).$}>{section.icon && <Icon icon={section.icon} inc={3.5} />}</div>
@@ -135,12 +188,26 @@ function FormSections<F>(props: Pick<FormPageLayoutProps<F>, "formSections" | "f
   );
 }
 
-function LeftNav<F>(props: Pick<FormPageLayoutProps<F>, "formSections">) {
+function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[]; activeSection: string | null }) {
+  const { sectionsWithRefs, activeSection } = props;
   const tids = useTestIds(props);
+
+  const handleNavClick = useCallback((ref: RefObject<HTMLElement>) => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
 
   return (
     <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$} {...tids}>
-      {/* Content TODO here: [SC-67747] to implement new NavLink component and section scroll-to behavior */}
+      {sectionsWithRefs.map(({ section, ref }, i) => (
+        <div
+          key={`nav-${section.title ?? i}`}
+          css={Css.cursorPointer.$}
+          onClick={() => handleNavClick(ref)}
+          style={{ fontWeight: activeSection === `section-${section.title ?? i}` ? "bold" : "normal" }}
+        >
+          {section.title}
+        </div>
+      ))}
     </aside>
   );
 }
