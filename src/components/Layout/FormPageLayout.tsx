@@ -220,6 +220,9 @@ function useActiveSection<F>(sectionsWithRefs: SectionWithRefs<F>[]) {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   useEffect(() => {
+    // Ensure the browser supports the Intersection Observer API (and skip in tests where it's not available)
+    if (!("IntersectionObserver" in window)) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
