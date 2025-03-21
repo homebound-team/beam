@@ -42,44 +42,17 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
 
   const sectionsWithRefs = useMemo(
     () =>
-      formSections.map((section) => ({
+      formSections.map((section, id) => ({
         section,
         ref: createRef<HTMLElement>(),
+        // Unique key for each section to use in the observer
+        sectionKey: `section-${section.title ?? id}`,
       })),
     [formSections],
   );
 
   const gridColumns =
     "minMax(0, auto) minMax(100px, 250px) minMax(350px, 1000px) minMax(min-content, 300px) minMax(0, auto)";
-
-  const [activeSection, setActiveSection] = useState<string | null>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: `-${headerHeightPx}px 0px 0px 0px`, threshold: 0.1 },
-    );
-
-    sectionsWithRefs.forEach(({ ref }) => {
-      if (ref.current) {
-        observer.observe(ref.current);
-      }
-    });
-
-    return () => {
-      sectionsWithRefs.forEach(({ ref }) => {
-        if (ref.current) {
-          observer.unobserve(ref.current);
-        }
-      });
-    };
-  }, [sectionsWithRefs]);
 
   return (
     // This page is `fixed` to the full screen to allow it to act as a full screen modal while content is mounted below
@@ -89,7 +62,7 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
       {...tids}
     >
       <PageHeader {...props} {...tids.pageHeader} />
-      <LeftNav sectionsWithRefs={sectionsWithRefs} activeSection={activeSection} {...tids.nav} />
+      <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids.nav} />
       <FormSections sectionsWithRefs={sectionsWithRefs} formState={formState} {...tids} />
       <SidebarContent />
     </div>
@@ -154,6 +127,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
 type SectionWithRefs<F> = {
   ref: RefObject<HTMLElement>;
   section: FormSection<F>;
+  sectionKey: string;
 };
 
 type FormSectionsProps<F> = {
@@ -168,11 +142,11 @@ function FormSections<F>(props: FormSectionsProps<F>) {
 
   return (
     <article css={Css.gr(2).gc("3 / 4").$}>
-      {sectionsWithRefs.map(({ section, ref }, i) => (
+      {sectionsWithRefs.map(({ section, ref, sectionKey }, i) => (
         // Subgrid here allows for icon placement to the left of the section content
         <section
-          key={`section-${section.title ?? i}`}
-          id={`section-${section.title ?? i}`}
+          key={sectionKey}
+          id={sectionKey}
           ref={ref}
           css={Css.dg.gtc("50px 1fr").gtr("auto").mb3.add("scrollMarginTop", `${headerHeightPx}px`).$}
           {...tids.formSection}
@@ -188,9 +162,11 @@ function FormSections<F>(props: FormSectionsProps<F>) {
   );
 }
 
-function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[]; activeSection: string | null }) {
-  const { sectionsWithRefs, activeSection } = props;
+function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[] }) {
+  const { sectionsWithRefs } = props;
   const tids = useTestIds(props);
+
+  const activeSection = useActiveSection(sectionsWithRefs);
 
   const handleNavClick = useCallback((ref: RefObject<HTMLElement>) => {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -198,12 +174,11 @@ function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[]; activeSecti
 
   return (
     <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$} {...tids}>
-      {sectionsWithRefs.map(({ section, ref }, i) => (
+      {sectionsWithRefs.map(({ section, ref, sectionKey }, i) => (
         <div
           key={`nav-${section.title ?? i}`}
-          css={Css.cursorPointer.$}
+          css={Css.cursorPointer.baseSb.gray900.if(activeSection === sectionKey).blue700.$}
           onClick={() => handleNavClick(ref)}
-          style={{ fontWeight: activeSection === `section-${section.title ?? i}` ? "bold" : "normal" }}
         >
           {section.title}
         </div>
@@ -239,4 +214,37 @@ function SidebarContent() {
   //     </div>
   //   </aside>
   // );
+}
+
+function useActiveSection<F>(sectionsWithRefs: SectionWithRefs<F>[]) {
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: `-${headerHeightPx}px 0px 0px 0px`, threshold: 0.5 },
+    );
+
+    sectionsWithRefs.forEach(({ ref }) => {
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+    });
+
+    return () => {
+      sectionsWithRefs.forEach(({ ref }) => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      });
+    };
+  }, [sectionsWithRefs]);
+
+  return activeSection;
 }
