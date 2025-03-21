@@ -1,5 +1,6 @@
 import { ObjectState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
+import { createRef, RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { Css } from "src/Css";
 import { BoundForm, BoundFormInputConfig } from "src/forms";
 import { useTestIds } from "src/utils";
@@ -7,11 +8,13 @@ import { Button, ButtonProps } from "../Button";
 import { Icon, IconKey } from "../Icon";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "./PageHeaderBreadcrumbs";
 
-export type FormSectionConfig<F> = {
+type FormSection<F> = {
   title?: string;
   icon?: IconKey;
   rows: BoundFormInputConfig<F>;
-}[];
+};
+
+export type FormSectionConfig<F> = FormSection<F>[];
 
 type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
 
@@ -37,6 +40,17 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
 
   const tids = useTestIds(props, "formPageLayout");
 
+  const sectionsWithRefs = useMemo(
+    () =>
+      formSections.map((section, id) => ({
+        section,
+        ref: createRef<HTMLElement>(),
+        // Unique key for each section to use in the observer
+        sectionKey: `section-${section.title ?? id}`,
+      })),
+    [formSections],
+  );
+
   const gridColumns =
     "minMax(0, auto) minMax(100px, 250px) minMax(350px, 1000px) minMax(min-content, 300px) minMax(0, auto)";
 
@@ -48,8 +62,8 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
       {...tids}
     >
       <PageHeader {...props} {...tids.pageHeader} />
-      <LeftNav formSections={formSections} {...tids.nav} />
-      <FormSections formSections={formSections} formState={formState} {...tids} />
+      <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids.nav} />
+      <FormSections sectionsWithRefs={sectionsWithRefs} formState={formState} {...tids} />
       <SidebarContent />
     </div>
   );
@@ -110,18 +124,31 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
   );
 }
 
-function FormSections<F>(props: Pick<FormPageLayoutProps<F>, "formSections" | "formState">) {
-  const { formSections, formState } = props;
+type SectionWithRefs<F> = {
+  ref: RefObject<HTMLElement>;
+  section: FormSection<F>;
+  sectionKey: string;
+};
+
+type FormSectionsProps<F> = {
+  formState: ObjectState<F>;
+  sectionsWithRefs: SectionWithRefs<F>[];
+};
+
+function FormSections<F>(props: FormSectionsProps<F>) {
+  const { sectionsWithRefs, formState } = props;
 
   const tids = useTestIds(props);
 
   return (
     <article css={Css.gr(2).gc("3 / 4").$}>
-      {formSections.map((section, i) => (
+      {sectionsWithRefs.map(({ section, ref, sectionKey }, i) => (
         // Subgrid here allows for icon placement to the left of the section content
         <section
-          key={`section-${section.title ?? i}`}
-          css={Css.dg.gtc("50px 1fr").gtr("auto").mb3.$}
+          key={sectionKey}
+          id={sectionKey}
+          ref={ref}
+          css={Css.dg.gtc("50px 1fr").gtr("auto").mb3.add("scrollMarginTop", `${headerHeightPx}px`).$}
           {...tids.formSection}
         >
           <div css={Css.gc(1).$}>{section.icon && <Icon icon={section.icon} inc={3.5} />}</div>
@@ -135,12 +162,27 @@ function FormSections<F>(props: Pick<FormPageLayoutProps<F>, "formSections" | "f
   );
 }
 
-function LeftNav<F>(props: Pick<FormPageLayoutProps<F>, "formSections">) {
+function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[] }) {
+  const { sectionsWithRefs } = props;
   const tids = useTestIds(props);
+
+  const activeSection = useActiveSection(sectionsWithRefs);
+
+  const handleNavClick = useCallback((ref: RefObject<HTMLElement>) => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
 
   return (
     <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$} {...tids}>
-      {/* Content TODO here: [SC-67747] to implement new NavLink component and section scroll-to behavior */}
+      {sectionsWithRefs.map(({ section, ref, sectionKey }, i) => (
+        <div
+          key={`nav-${section.title ?? i}`}
+          css={Css.cursorPointer.baseSb.gray900.if(activeSection === sectionKey).blue700.$}
+          onClick={() => handleNavClick(ref)}
+        >
+          {section.title}
+        </div>
+      ))}
     </aside>
   );
 }
@@ -172,4 +214,40 @@ function SidebarContent() {
   //     </div>
   //   </aside>
   // );
+}
+
+function useActiveSection<F>(sectionsWithRefs: SectionWithRefs<F>[]) {
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Ensure the browser supports the Intersection Observer API (and skip in tests where it's not available)
+    if (!("IntersectionObserver" in window)) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: `-${headerHeightPx}px 0px 0px 0px`, threshold: 0.5 },
+    );
+
+    sectionsWithRefs.forEach(({ ref }) => {
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+    });
+
+    return () => {
+      sectionsWithRefs.forEach(({ ref }) => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      });
+    };
+  }, [sectionsWithRefs]);
+
+  return activeSection;
 }

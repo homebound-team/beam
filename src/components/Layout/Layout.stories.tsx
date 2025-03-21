@@ -202,7 +202,9 @@ const formSections: FormSectionConfig<AuthorInput> = [
     title: "Author Overview",
     icon: "userCircle",
     rows: [
-      { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
+      { firstName: boundTextField() },
+      { middleInitial: boundTextField() },
+      { lastName: boundTextField() },
       { bio: boundTextAreaField() },
     ],
   },
@@ -216,14 +218,27 @@ const formSections: FormSectionConfig<AuthorInput> = [
           getOptionLabel: (o) => o.name,
           getOptionValue: (o) => o.id,
         }),
+      },
+      {
         favoriteColors: boundMultiSelectField({
           options: colorOptions,
           getOptionLabel: (o) => o.name,
           getOptionValue: (o) => o.id,
         }),
       },
-      { heightInInches: boundNumberField({ label: "Height (in inches)" }), birthday: boundDateField() },
+      { heightInInches: boundNumberField({ label: "Height (in inches)" }) },
+      { birthday: boundDateField() },
       { isAvailable: boundCheckboxField({ label: "Is Retired" }) },
+    ],
+  },
+  {
+    title: "Third Section",
+    icon: "abacus",
+    rows: [
+      { firstName: boundTextField() },
+      { middleInitial: boundTextField() },
+      { lastName: boundTextField() },
+      { bio: boundTextAreaField() },
     ],
   },
 ];
@@ -239,6 +254,7 @@ const formConfig: ObjectConfig<AuthorInput> = {
   bio: { type: "value" },
   isAvailable: { type: "value" },
   favoriteShapes: { type: "value" },
+  address: { type: "value" },
 };
 
 function OverviewExample({ bgColor }: { bgColor?: Palette }) {
