@@ -67,7 +67,7 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
       {...tids}
     >
       <PageHeader {...props} {...tids.pageHeader} />
-      <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids.nav} />
+      <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids} />
       <FormSections sectionsWithRefs={sectionsWithRefs} formState={formState} {...tids} />
       <SidebarContent />
     </div>
@@ -182,12 +182,13 @@ function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[] }) {
   const activeSection = useActiveSection(sectionWithTitles);
 
   return (
-    <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$} {...tids}>
+    <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$} {...tids.nav}>
       {sectionWithTitles.map((sectionWithRef) => (
         <SectionNavLink
           key={`nav-${sectionWithRef.sectionKey}`}
           sectionWithRef={sectionWithRef}
           activeSection={activeSection}
+          {...tids}
         />
       ))}
     </aside>
@@ -195,8 +196,8 @@ function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[] }) {
 }
 
 // Use inset box shadow rather than thick border to avoid the button text reflowing when the border is applied
-const activeStyles = Css.baseBd.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue600}`).$;
-const hoverStyles = Css.bgBlue50.baseBd.blue900.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue900}`).$;
+const activeStyles = Css.smBd.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue600}`).$;
+const hoverStyles = Css.bgBlue50.smBd.blue900.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue900}`).$;
 const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 
 function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSection: string | null }) {
@@ -208,6 +209,8 @@ function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSe
   const handleNavClick = useCallback(() => {
     sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [sectionRef]);
+
+  const tids = useTestIds(props);
 
   const buttonRef = useRef(null);
   const { buttonProps, isPressed } = useButton({ onPress: handleNavClick }, buttonRef);
@@ -221,11 +224,12 @@ function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSe
       {...focusProps}
       {...hoverProps}
       css={{
-        ...Css.buttonBase.wsn.tal.baseMd.blue600.px2.py1.br0.h100.$,
+        ...Css.buttonBase.wsn.tal.smMd.blue600.px2.py1.br0.h100.$,
         ...(isFocusVisible ? defaultFocusRingStyles : {}),
         ...(active ? activeStyles : {}),
         ...(isPressed ? activeStyles : isHovered ? hoverStyles : {}),
       }}
+      {...tids.sectionNavLink}
     >
       {section.title}
     </button>

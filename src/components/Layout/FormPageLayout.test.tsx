@@ -55,5 +55,9 @@ describe("FormPageLayout", () => {
     expect(r.lastName).toHaveValue("Doe");
     expect(r.formPageLayout_formSection_1).toHaveTextContent("Settings");
     expect(r.isAvailable).toBeChecked();
+
+    // And each of the sections to have a nav link
+    expect(r.formPageLayout_sectionNavLink_0).toHaveTextContent("About");
+    expect(r.formPageLayout_sectionNavLink_1).toHaveTextContent("Settings");
   });
 });
