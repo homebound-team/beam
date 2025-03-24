@@ -1,6 +1,6 @@
 import { ObjectState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { createRef, RefObject, useCallback, useEffect, useMemo, useState } from "react";
+import React, { createRef, RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { Css } from "src/Css";
 import { BoundForm, BoundFormInputConfig } from "src/forms";
 import { useTestIds } from "src/utils";
@@ -35,7 +35,7 @@ type FormPageLayoutProps<F> = {
  */
 const headerHeightPx = 120;
 
-export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
+function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
   const { formSections, formState } = props;
 
   const tids = useTestIds(props, "formPageLayout");
@@ -51,11 +51,14 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
     [formSections],
   );
 
+  // The grid columns are defined as: "left-gutter, left-nav, form-content, right-sidebar, right-gutter"
   const gridColumns =
     "minMax(0, auto) minMax(100px, 250px) minMax(350px, 1000px) minMax(min-content, 300px) minMax(0, auto)";
 
   return (
     // This page is `fixed` to the full screen to allow it to act as a full screen modal while content is mounted below
+    // since this layout will be replacing most superdrawers/sidebars, we keep the listing mounted below to preserve the users's
+    // scroll position & filters
     // Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars
     <div
       css={Css.fixed.top0.bottom0.left0.right0.z(1000).oya.bgWhite.dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}
@@ -68,6 +71,8 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
     </div>
   );
 }
+
+export const FormPageLayout = React.memo(FormPageLayoutComponent) as typeof FormPageLayoutComponent;
 
 function PageHeader<F>(props: FormPageLayoutProps<F>) {
   const { pageTitle, breadCrumb, submitAction, cancelAction, tertiaryAction, formState } = props;

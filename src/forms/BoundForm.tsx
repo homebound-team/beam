@@ -76,7 +76,7 @@ export function BoundForm<F>(props: BoundFormProps<F>) {
 
   return (
     <div {...tid}>
-      <FormLines labelSuffix={{ required: "*" }} width="full" gap={3.5}>
+      <FormLines width="full" gap={3.5}>
         {rows.map((row) => (
           <FormRow key={`fieldGroup-${Object.keys(row).join("-")}`} row={row} formState={formState} />
         ))}
