@@ -1,8 +1,10 @@
 import { ObjectState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import React, { createRef, RefObject, useCallback, useEffect, useMemo, useState } from "react";
-import { Css } from "src/Css";
+import React, { createRef, RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useButton, useFocusRing } from "react-aria";
+import { Css, Palette } from "src/Css";
 import { BoundForm, BoundFormInputConfig } from "src/forms";
+import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils";
 import { Button, ButtonProps } from "../Button";
 import { Icon, IconKey } from "../Icon";
@@ -171,24 +173,62 @@ function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[] }) {
   const { sectionsWithRefs } = props;
   const tids = useTestIds(props);
 
-  const activeSection = useActiveSection(sectionsWithRefs);
+  // Ignore sections that don't have titles defined
+  const sectionWithTitles = useMemo(
+    () => sectionsWithRefs.filter(({ section }) => !!section.title),
+    [sectionsWithRefs],
+  );
 
-  const handleNavClick = useCallback((ref: RefObject<HTMLElement>) => {
-    ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
+  const activeSection = useActiveSection(sectionWithTitles);
 
   return (
     <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$} {...tids}>
-      {sectionsWithRefs.map(({ section, ref, sectionKey }, i) => (
-        <div
-          key={`nav-${section.title ?? i}`}
-          css={Css.cursorPointer.baseSb.gray900.if(activeSection === sectionKey).blue700.$}
-          onClick={() => handleNavClick(ref)}
-        >
-          {section.title}
-        </div>
+      {sectionWithTitles.map((sectionWithRef) => (
+        <SectionNavLink
+          key={`nav-${sectionWithRef.sectionKey}`}
+          sectionWithRef={sectionWithRef}
+          activeSection={activeSection}
+        />
       ))}
     </aside>
+  );
+}
+
+// Use inset box shadow rather than thick border to avoid the button text reflowing when the border is applied
+const activeStyles = Css.baseBd.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue600}`).$;
+const hoverStyles = Css.bgBlue50.baseBd.blue900.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue900}`).$;
+const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
+
+function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSection: string | null }) {
+  const { sectionWithRef, activeSection } = props;
+  const { section, ref: sectionRef } = sectionWithRef;
+
+  const active = activeSection === sectionWithRef.sectionKey;
+
+  const handleNavClick = useCallback(() => {
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [sectionRef]);
+
+  const buttonRef = useRef(null);
+  const { buttonProps, isPressed } = useButton({ onPress: handleNavClick }, buttonRef);
+  const { isFocusVisible, focusProps } = useFocusRing();
+  const { hoverProps, isHovered } = useHover({});
+
+  return (
+    <button
+      ref={buttonRef}
+      {...buttonProps}
+      {...focusProps}
+      {...hoverProps}
+      css={{
+        ...Css.buttonBase.wsn.tal.baseMd.blue600.px2.py1.br0.h100.$,
+        ...(isFocusVisible ? defaultFocusRingStyles : {}),
+        ...(active ? activeStyles : {}),
+        ...(isPressed ? activeStyles : isHovered ? hoverStyles : {}),
+      }}
+    >
+      {section.title}
+    </button>
   );
 }
 
@@ -230,13 +270,17 @@ function useActiveSection<F>(sectionsWithRefs: SectionWithRefs<F>[]) {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
+        // In the event of multiple sections being in view, choose the one with the most visible area
+        const sectionsInView = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        if (sectionsInView[0]) {
+          setActiveSection(sectionsInView[0].target.id);
+        }
       },
-      { rootMargin: `-${headerHeightPx}px 0px 0px 0px`, threshold: 0.5 },
+      // Threshold defines when the observer callback should be triggered, we may need to refine this based on more real word layouts
+      { rootMargin: `-${headerHeightPx}px 0px 0px 0px`, threshold: 0.4 },
     );
 
     sectionsWithRefs.forEach(({ ref }) => {

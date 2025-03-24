@@ -42,6 +42,28 @@ export function FormPageLayout() {
   );
 }
 
+export function SingleColumn() {
+  const formState = useFormState({
+    config: formConfig,
+    init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
+  });
+
+  return (
+    <FormPageLayoutComponent
+      pageTitle="Detail Title"
+      submitAction={{ label: "Save", onClick: noop }}
+      cancelAction={{ label: "Cancel", onClick: noop }}
+      tertiaryAction={{ label: "Tertiary Test", onClick: noop }}
+      breadCrumb={[
+        { label: "Breadcrumb A", href: "/breadcrumb-a" },
+        { label: "Breadcrumb B", href: "/breadcrumb-b" },
+      ]}
+      formSections={singleColumnConfig}
+      formState={formState}
+    />
+  );
+}
+
 const sportsOptions = [
   { id: "s:1", name: "Basketball" },
   { id: "s:2", name: "Baseball" },
@@ -96,3 +118,50 @@ const formConfig: ObjectConfig<AuthorInput> = {
   isAvailable: { type: "value" },
   favoriteShapes: { type: "value" },
 };
+
+const singleColumnConfig: FormSectionConfig<AuthorInput> = [
+  {
+    title: "Author Overview",
+    icon: "userCircle",
+    rows: [
+      { firstName: boundTextField() },
+      { middleInitial: boundTextField() },
+      { lastName: boundTextField() },
+      { bio: boundTextAreaField() },
+    ],
+  },
+  {
+    title: "More Details",
+    icon: "openBook",
+    rows: [
+      {
+        favoriteSport: boundSelectField({
+          options: sportsOptions,
+          getOptionLabel: (o) => o.name,
+          getOptionValue: (o) => o.id,
+        }),
+      },
+      {
+        favoriteColors: boundMultiSelectField({
+          options: colorOptions,
+          getOptionLabel: (o) => o.name,
+          getOptionValue: (o) => o.id,
+        }),
+      },
+      { heightInInches: boundNumberField({ label: "Height (in inches)" }) },
+      { birthday: boundDateField() },
+      { isAvailable: boundCheckboxField({ label: "Is Retired" }) },
+    ],
+  },
+  {
+    title: "Third Section With Long Title",
+    icon: "abacus",
+    rows: [
+      { firstName: boundTextField() },
+      { middleInitial: boundTextField() },
+      { lastName: boundTextField() },
+      { bio: boundTextAreaField() },
+    ],
+  },
+  { rows: [{ firstName: boundTextField() }] },
+];
