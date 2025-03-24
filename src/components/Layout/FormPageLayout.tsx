@@ -37,11 +37,14 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
 
   const tids = useTestIds(props, "formPageLayout");
 
+  // The grid columns are defined as: "left-gutter, left-nav, form-content, right-sidebar, right-gutter"
   const gridColumns =
     "minMax(0, auto) minMax(100px, 250px) minMax(350px, 1000px) minMax(min-content, 300px) minMax(0, auto)";
 
   return (
     // This page is `fixed` to the full screen to allow it to act as a full screen modal while content is mounted below
+    // since this layout will be replacing most superdrawers/sidebars, we keep the listing mounted below to preserve the users's
+    // scroll position & filters
     // Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars
     <div
       css={Css.fixed.top0.bottom0.left0.right0.z(1000).oya.bgWhite.dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}
