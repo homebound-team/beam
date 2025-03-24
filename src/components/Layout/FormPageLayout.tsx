@@ -1,5 +1,6 @@
 import { ObjectState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
+import React from "react";
 import { Css } from "src/Css";
 import { BoundForm, BoundFormInputConfig } from "src/forms";
 import { useTestIds } from "src/utils";
@@ -32,7 +33,7 @@ type FormPageLayoutProps<F> = {
  */
 const headerHeightPx = 120;
 
-export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
+function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
   const { formSections, formState } = props;
 
   const tids = useTestIds(props, "formPageLayout");
@@ -57,6 +58,8 @@ export function FormPageLayout<F>(props: FormPageLayoutProps<F>) {
     </div>
   );
 }
+
+export const FormPageLayout = React.memo(FormPageLayoutComponent) as typeof FormPageLayoutComponent;
 
 function PageHeader<F>(props: FormPageLayoutProps<F>) {
   const { pageTitle, breadCrumb, submitAction, cancelAction, tertiaryAction, formState } = props;

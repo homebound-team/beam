@@ -3,8 +3,8 @@ import { ReactNode, useMemo, useState } from "react";
 import { IconButton } from "src/components/IconButton";
 import { TabsWithContent, TabWithContent } from "src/components/Tabs";
 import { Css, Palette } from "src/Css";
+import { FormLines } from "src/forms";
 import {
-  FormLines,
   FullBleed,
   GridColumn,
   GridDataRow,
