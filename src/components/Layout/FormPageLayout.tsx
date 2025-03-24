@@ -42,6 +42,8 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
 
   const tids = useTestIds(props, "formPageLayout");
 
+  // Create a ref for each section here so we can coordinate both the `scrollIntoView`
+  // and the `IntersectionObserver` behaviors between the `LeftNav` and `FormSections` children
   const sectionsWithRefs = useMemo(
     () =>
       formSections.map((section, id) => ({
@@ -153,8 +155,10 @@ function FormSections<F>(props: FormSectionsProps<F>) {
         // Subgrid here allows for icon placement to the left of the section content
         <section
           key={sectionKey}
+          // `sectionKey` as the `id` is used by the IntersectionObserver to determine which section is currently in view
           id={sectionKey}
           ref={ref}
+          // scrollMarginTop here ensures the top of the section is properly aligned when calling `scrollIntoView`
           css={Css.dg.gtc("50px 1fr").gtr("auto").mb3.add("scrollMarginTop", `${headerHeightPx}px`).$}
           {...tids.formSection}
         >
@@ -265,6 +269,9 @@ function SidebarContent() {
   // );
 }
 
+/**
+ * Hook that wraps the browser `IntersectionObserver` API with a setState
+ * in order to display the currently in-view section via the sidebar nav */
 function useActiveSection<F>(sectionsWithRefs: SectionWithRefs<F>[]) {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
