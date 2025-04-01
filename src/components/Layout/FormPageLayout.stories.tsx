@@ -10,7 +10,7 @@ import {
   boundTextField,
 } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { FormPageLayout as FormPageLayoutComponent, FormSectionConfig } from "src/index";
+import { Css, FormPageLayout as FormPageLayoutComponent, FormSectionConfig, TextField } from "src/index";
 import { noop } from "src/utils";
 import { withBeamDecorator, withDimensions, withRouter } from "src/utils/sb";
 
@@ -39,7 +39,15 @@ export function FormPageLayout() {
       formSections={formSections}
       formState={formState}
       rightSideBarContent={[
-        { icon: "comment", render: () => <div>Comments</div> },
+        {
+          icon: "comment",
+          render: () => (
+            <>
+              <div css={Css.mb2.$}>Comments</div>
+              <TextField placeholder="Add a comment" labelStyle="hidden" label="comment" value="" onChange={() => {}} />
+            </>
+          ),
+        },
         { icon: "time", render: () => <div>History</div> },
       ]}
     />
