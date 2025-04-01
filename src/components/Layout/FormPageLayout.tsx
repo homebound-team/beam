@@ -8,6 +8,7 @@ import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils";
 import { Button, ButtonProps } from "../Button";
 import { Icon, IconKey } from "../Icon";
+import { RightSidebar, SidebarProps } from "../RightSidebar";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "./PageHeaderBreadcrumbs";
 
 type FormSection<F> = {
@@ -28,6 +29,7 @@ type FormPageLayoutProps<F> = {
   submitAction?: ActionButtonProps;
   cancelAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
+  rightSideBarContent?: SidebarProps[];
 };
 
 /** In order to make the multiple stacked sticky elements work (Header, then sidebar below) we need to set the header height.
@@ -35,10 +37,10 @@ type FormPageLayoutProps<F> = {
  * to manage when adding in a max content width container for the page while keeping the page scrollbar to the far right of the page.
  * Rather than wrapping the page in a max-width div, we use "gutter" columns `minMax(0, auto)` that kick in when all other columns have met their max widths.
  */
-const headerHeightPx = 120;
+export const headerHeightPx = 120;
 
 function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
-  const { formSections, formState } = props;
+  const { formSections, formState, rightSideBarContent } = props;
 
   const tids = useTestIds(props, "formPageLayout");
 
@@ -71,7 +73,7 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
       <PageHeader {...props} {...tids.pageHeader} />
       <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids} />
       <FormSections sectionsWithRefs={sectionsWithRefs} formState={formState} {...tids} />
-      <SidebarContent />
+      {rightSideBarContent && <RightSidebar content={rightSideBarContent} />}
     </div>
   );
 }
@@ -238,35 +240,6 @@ function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSe
       {section.title}
     </button>
   );
-}
-
-/**
- * TODO: [SC-67748] Leaving the markup here for the grid alignment for the next ticket, however the real sidebar
- * will need to account for multiple possible content sections similar to the existing `Tab` component.
- */
-function SidebarContent() {
-  return null;
-  // const [sideBarIsOpen, setSideBarIsOpen] = useState(false);
-
-  // if (!sideBarIsOpen)
-  //   return (
-  //     <aside css={Css.gr(2).gc("4 / 5").sticky.topPx(headerHeightPx).$}>
-  //       <div css={Css.br100.wPx(50).hPx(50).bcGray300.ba.df.jcc.aic.$}>
-  //         <IconButton onClick={() => setSideBarIsOpen(true)} icon="comment" inc={3.5} />
-  //       </div>
-  //     </aside>
-  //   );
-
-  // return (
-  //   <aside css={Css.gr(2).gc("4 / 5").sticky.topPx(headerHeightPx).$}>
-  //     <div css={Css.dg.gtc("3fr 1fr").gtr("auto").gap1.maxh("calc(100vh - 150px)").oa.$}>
-  //       <div></div>
-  //       <div css={Css.br100.wPx(50).hPx(50).bcGray300.ba.df.jcc.aic.$}>
-  //         <IconButton onClick={() => setSideBarIsOpen(false)} icon="x" inc={3.5} />
-  //       </div>
-  //     </div>
-  //   </aside>
-  // );
 }
 
 /**

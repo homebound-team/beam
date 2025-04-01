@@ -38,6 +38,10 @@ export function FormPageLayout() {
       ]}
       formSections={formSections}
       formState={formState}
+      rightSideBarContent={[
+        { icon: "comment", render: () => <div>Comments</div> },
+        { icon: "time", render: () => <div>History</div> },
+      ]}
     />
   );
 }
@@ -60,6 +64,10 @@ export function SingleColumn() {
       ]}
       formSections={singleColumnConfig}
       formState={formState}
+      rightSideBarContent={[
+        { icon: "comment", render: () => <div>Comments</div> },
+        { icon: "time", render: () => <div>History</div> },
+      ]}
     />
   );
 }
