@@ -73,7 +73,11 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
       <PageHeader {...props} {...tids.pageHeader} />
       <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids} />
       <FormSections sectionsWithRefs={sectionsWithRefs} formState={formState} {...tids} />
-      {rightSideBarContent && <RightSidebar content={rightSideBarContent} />}
+      {rightSideBarContent && (
+        <aside css={Css.gr(2).gc("4 / 5").sticky.topPx(headerHeightPx).$}>
+          <RightSidebar content={rightSideBarContent} />
+        </aside>
+      )}
     </div>
   );
 }
