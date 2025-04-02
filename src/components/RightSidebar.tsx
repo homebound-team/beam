@@ -1,5 +1,6 @@
 import { ReactNode, useState } from "react";
 import { Css } from "src/Css";
+import { useTestIds } from "src/utils";
 import { IconKey } from "./Icon";
 import { IconButton } from "./IconButton";
 
@@ -12,15 +13,15 @@ export type RightSidebarProps = {
   content: SidebarContentProps[];
 };
 
-export function RightSidebar({ content }: RightSidebarProps) {
+export function RightSidebar(props: RightSidebarProps) {
   const [selectedIcon, setSelectedIcon] = useState<IconKey | undefined>(undefined);
+  const { content } = props;
+  const tids = useTestIds(props, "rightSidebar");
   const iconCircleStyle = Css.br100.wPx(50).hPx(50).bcGray300.ba.df.jcc.aic.onHover.bgGray200.$;
-  const iconCircleSelectedStyle = {
-    ...iconCircleStyle,
-    ...Css.bgGray200.$,
-  };
+  const iconCircleSelectedStyle = { ...iconCircleStyle, ...Css.bgGray200.$ };
 
   if (!selectedIcon)
+    // display closed state
     return (
       <div css={Css.dg.mtPx(92).mx3.gap2.$}>
         {content.map(({ icon }) => (
@@ -31,6 +32,7 @@ export function RightSidebar({ content }: RightSidebarProps) {
       </div>
     );
 
+  // display open state
   return (
     <div css={Css.maxwPx(380).mr3.$}>
       <div css={Css.df.jcsb.aic.$}>
@@ -49,7 +51,9 @@ export function RightSidebar({ content }: RightSidebarProps) {
           ))}
         </div>
       </div>
-      <div css={Css.mt3.ml4.$}>{content.find((sidebar) => sidebar.icon === selectedIcon)?.render()}</div>
+      <div css={Css.mt3.ml4.$} {...tids.content}>
+        {content.find((sidebar) => sidebar.icon === selectedIcon)?.render()}
+      </div>
     </div>
   );
 }
