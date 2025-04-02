@@ -13,20 +13,17 @@ export type RightSidebarProps = {
   content: SidebarContentProps[];
 };
 
-export function RightSidebar(props: RightSidebarProps) {
+export function RightSidebar({ content }: RightSidebarProps) {
   const [selectedIcon, setSelectedIcon] = useState<IconKey | undefined>(undefined);
-  const { content } = props;
-  const tids = useTestIds(props, "rightSidebar");
-  const iconCircleStyle = Css.br100.wPx(50).hPx(50).bcGray300.ba.df.jcc.aic.onHover.bgGray200.$;
-  const iconCircleSelectedStyle = { ...iconCircleStyle, ...Css.bgGray200.$ };
+  const tid = useTestIds({}, "rightSidebar");
 
   if (!selectedIcon)
     // display closed state
     return (
       <div css={Css.dg.mtPx(92).mx3.gap2.$}>
         {content.map(({ icon }) => (
-          <div key={icon} css={{ ...iconCircleStyle, ...Css.jse.$ }}>
-            <IconButton onClick={() => setSelectedIcon(icon)} icon={icon} inc={3.5} />
+          <div key={icon} css={Css.jse.$}>
+            <IconButton circle onClick={() => setSelectedIcon(icon)} icon={icon} inc={3.5} />
           </div>
         ))}
       </div>
@@ -37,21 +34,24 @@ export function RightSidebar(props: RightSidebarProps) {
     <div css={Css.maxwPx(380).mr3.$}>
       <div css={Css.df.jcsb.aic.$}>
         <div css={Css.mlPx(-18).$}>
-          <div css={iconCircleStyle}>
-            <IconButton onClick={() => setSelectedIcon(undefined)} icon="x" inc={3.5} />
-          </div>
+          <IconButton circle onClick={() => setSelectedIcon(undefined)} icon="x" inc={3.5} />
           {/* vertical line */}
           <div css={Css.absolute.topPx(50).leftPx(6).h("calc(100vh - 50px)").wPx(1).bgGray300.$} />
         </div>
         <div css={Css.df.gap2.$}>
           {content.map(({ icon }) => (
-            <div key={icon} css={icon === selectedIcon ? iconCircleSelectedStyle : iconCircleStyle}>
-              <IconButton onClick={() => setSelectedIcon(icon)} icon={icon} inc={3.5} />
-            </div>
+            <IconButton
+              key={`${icon}-${selectedIcon}`}
+              circle
+              active={icon === selectedIcon}
+              onClick={() => setSelectedIcon(icon)}
+              icon={icon}
+              inc={3.5}
+            />
           ))}
         </div>
       </div>
-      <div css={Css.mt3.ml4.$} {...tids.content}>
+      <div css={Css.mt3.ml4.$} {...tid.content}>
         {content.find((sidebar) => sidebar.icon === selectedIcon)?.render()}
       </div>
     </div>
