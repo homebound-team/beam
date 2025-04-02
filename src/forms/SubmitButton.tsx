@@ -15,11 +15,13 @@ export function SubmitButton<T>(props: SubmitButtonProps<T>) {
   // Enable the button whenever the form is dirty, even if the form is partially invalid,
   // because submitting will then force-touch all fields and show all errors instead of
   // just errors-so-far.
-  const dirty = useComputed(() => form.dirty, [form]);
+  const canSubmit = useComputed(() => {
+    return form.dirty || form.isNewEntity;
+  }, [form]);
   return (
     <Button
       label={label}
-      disabled={disabled || !dirty}
+      disabled={disabled || !canSubmit}
       onClick={(e) => {
         // canSave will touch any not-yet-keyed-in fields to show errors
         if (form.canSave()) {

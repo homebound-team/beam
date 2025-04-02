@@ -8,8 +8,8 @@ import { SubmitButton } from "src/forms/SubmitButton";
 describe("SubmitButton", () => {
   it("disables if the form is clean", async () => {
     const onClick = jest.fn();
-    // Given a submit button for an invalid form
-    const author = createObjectState(formConfig, { firstName: "f1" });
+    // Given a submit button for a valid form
+    const author = createObjectState(formConfig, { id: "a:1", firstName: "f1" });
     const r = await render(<SubmitButton form={author} onClick={onClick} />);
 
     // Then the submit button is initially disabled because nothing is dirty
@@ -18,7 +18,7 @@ describe("SubmitButton", () => {
     click(r.submit);
     expect(onClick).not.toHaveBeenCalled();
 
-    // But once we change a field, it becomes enabled
+    // But once we change a field, it becomes enabled (even though its invalid)
     act(() => author.firstName.set(""));
     expect(r.submit).toBeEnabled();
     // Even though it's invalid, so clicking submit still won't do anything
@@ -46,8 +46,20 @@ describe("SubmitButton", () => {
     click(r.submit);
     expect(onClick).not.toHaveBeenCalled();
   });
+
+  it("enables for new entities", async () => {
+    const onClick = jest.fn();
+    // Given a submit button for a valid form
+    const author = createObjectState(formConfig, { firstName: "f1" });
+    const r = await render(<SubmitButton form={author} onClick={onClick} />);
+    // Then the submit button is enabled because we might be duplicating
+    expect(r.submit).toBeEnabled();
+    click(r.submit);
+    expect(onClick).toHaveBeenCalled();
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {
+  id: { type: "value" },
   firstName: { type: "value", rules: [required] },
 };
