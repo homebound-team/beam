@@ -1,5 +1,6 @@
 import { ObjectConfig, required, useFormState } from "@homebound/form-state";
 import { Meta } from "@storybook/react";
+import { useState } from "react";
 import {
   boundCheckboxField,
   boundDateField,
@@ -39,15 +40,7 @@ export function FormPageLayout() {
       formSections={formSections}
       formState={formState}
       rightSideBarContent={[
-        {
-          icon: "comment",
-          render: () => (
-            <>
-              <div css={Css.mb2.$}>Comments</div>
-              <TextField placeholder="Add a comment" labelStyle="hidden" label="comment" value="" onChange={() => {}} />
-            </>
-          ),
-        },
+        { icon: "comment", render: () => <CommentComponent /> },
         { icon: "time", render: () => <div>History</div> },
       ]}
     />
@@ -72,10 +65,7 @@ export function SingleColumn() {
       ]}
       formSections={singleColumnConfig}
       formState={formState}
-      rightSideBarContent={[
-        { icon: "comment", render: () => <div>Comments</div> },
-        { icon: "time", render: () => <div>History</div> },
-      ]}
+      rightSideBarContent={[{ icon: "comment", render: () => <CommentComponent /> }]}
     />
   );
 }
@@ -181,3 +171,20 @@ const singleColumnConfig: FormSectionConfig<AuthorInput> = [
   },
   { rows: [{ firstName: boundTextField() }] },
 ];
+
+function CommentComponent() {
+  const [comment, setComment] = useState<string | undefined>(undefined);
+
+  return (
+    <div css={Css.df.fdc.gap1.$}>
+      <div>Comments</div>
+      <TextField
+        placeholder="Add a comment"
+        labelStyle="hidden"
+        label="comment"
+        value={comment}
+        onChange={setComment}
+      />
+    </div>
+  );
+}

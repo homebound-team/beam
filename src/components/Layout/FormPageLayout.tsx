@@ -8,7 +8,7 @@ import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils";
 import { Button, ButtonProps } from "../Button";
 import { Icon, IconKey } from "../Icon";
-import { RightSidebar, SidebarProps } from "../RightSidebar";
+import { RightSidebar, SidebarContentProps } from "../RightSidebar";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "./PageHeaderBreadcrumbs";
 
 type FormSection<F> = {
@@ -29,7 +29,7 @@ type FormPageLayoutProps<F> = {
   submitAction?: ActionButtonProps;
   cancelAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
-  rightSideBarContent?: SidebarProps[];
+  rightSideBarContent?: SidebarContentProps[];
 };
 
 /** In order to make the multiple stacked sticky elements work (Header, then sidebar below) we need to set the header height.

@@ -3,13 +3,13 @@ import { Css } from "src/Css";
 import { IconKey } from "./Icon";
 import { IconButton } from "./IconButton";
 
-export type SidebarProps = {
+export type SidebarContentProps = {
   icon: IconKey;
   render: () => ReactNode;
 };
 
 export type RightSidebarProps = {
-  content: SidebarProps[];
+  content: SidebarContentProps[];
 };
 
 export function RightSidebar({ content }: RightSidebarProps) {
@@ -22,7 +22,7 @@ export function RightSidebar({ content }: RightSidebarProps) {
 
   if (!selectedIcon)
     return (
-      <div css={Css.mtPx(92).mr3.gap2.dg.$}>
+      <div css={Css.dg.mtPx(92).mx3.gap2.$}>
         {content.map(({ icon }) => (
           <div key={icon} css={{ ...iconCircleStyle, ...Css.jse.$ }}>
             <IconButton onClick={() => setSelectedIcon(icon)} icon={icon} inc={3.5} />
@@ -38,6 +38,7 @@ export function RightSidebar({ content }: RightSidebarProps) {
           <div css={iconCircleStyle}>
             <IconButton onClick={() => setSelectedIcon(undefined)} icon="x" inc={3.5} />
           </div>
+          {/* vertical line */}
           <div css={Css.absolute.topPx(50).leftPx(6).h("calc(100vh - 50px)").wPx(1).bgGray300.$} />
         </div>
         <div css={Css.df.gap2.$}>
