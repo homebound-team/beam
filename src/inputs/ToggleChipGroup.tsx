@@ -5,6 +5,7 @@ import { maybeTooltip, resolveTooltip } from "src/components";
 import { Label } from "src/components/Label";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Palette, Xss } from "src/Css";
+import { useLabelSuffix } from "src/forms/labelUtils";
 import { useTestIds } from "src/utils/useTestIds";
 
 type ToggleChipXss = Xss<"color" | "backgroundColor">;
@@ -25,6 +26,7 @@ export interface ToggleChipGroupProps extends Pick<PresentationFieldProps, "labe
   label: string;
   options: ToggleChipItemProps[];
   values: string[];
+  required?: boolean;
   onChange: (values: string[]) => void;
   xss?: ToggleChipXss;
 }
@@ -32,14 +34,21 @@ export interface ToggleChipGroupProps extends Pick<PresentationFieldProps, "labe
 export function ToggleChipGroup(props: ToggleChipGroupProps) {
   const { fieldProps } = usePresentationContext();
   const { labelLeftFieldWidth = "50%" } = fieldProps ?? {};
-  const { values, label, labelStyle = fieldProps?.labelStyle ?? "above", options, xss } = props;
+  const { values, label, labelStyle = fieldProps?.labelStyle ?? "above", options, required, xss } = props;
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
   const tid = useTestIds(props, "toggleChip");
+  const labelSuffix = useLabelSuffix(required, false);
 
   return (
     <div {...groupProps} css={Css.relative.df.fdc.if(labelStyle === "left").fdr.gap2.maxw100.jcsb.$}>
-      <Label label={label} {...labelProps} hidden={labelStyle === "hidden"} inline={labelStyle !== "above"} />
+      <Label
+        label={label}
+        {...labelProps}
+        hidden={labelStyle === "hidden"}
+        inline={labelStyle !== "above"}
+        suffix={labelSuffix}
+      />
       <div
         css={
           Css.df.gap1
