@@ -39,7 +39,7 @@ export function FormPageLayout() {
       ]}
       formSections={formSections}
       formState={formState}
-      rightSideBarContent={[
+      rightSideBar={[
         { icon: "comment", render: () => <CommentComponent /> },
         { icon: "time", render: () => <div>History</div> },
       ]}
@@ -65,7 +65,7 @@ export function SingleColumn() {
       ]}
       formSections={singleColumnConfig}
       formState={formState}
-      rightSideBarContent={[{ icon: "comment", render: () => <CommentComponent /> }]}
+      rightSideBar={[{ icon: "comment", render: () => <CommentComponent /> }]}
     />
   );
 }

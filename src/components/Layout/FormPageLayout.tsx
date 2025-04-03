@@ -29,7 +29,7 @@ type FormPageLayoutProps<F> = {
   submitAction?: ActionButtonProps;
   cancelAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
-  rightSideBarContent?: SidebarContentProps[];
+  rightSideBar?: SidebarContentProps[];
 };
 
 /** In order to make the multiple stacked sticky elements work (Header, then sidebar below) we need to set the header height.
@@ -37,10 +37,10 @@ type FormPageLayoutProps<F> = {
  * to manage when adding in a max content width container for the page while keeping the page scrollbar to the far right of the page.
  * Rather than wrapping the page in a max-width div, we use "gutter" columns `minMax(0, auto)` that kick in when all other columns have met their max widths.
  */
-export const headerHeightPx = 120;
+const headerHeightPx = 120;
 
 function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
-  const { formSections, formState, rightSideBarContent } = props;
+  const { formSections, formState, rightSideBar } = props;
 
   const tids = useTestIds(props, "formPageLayout");
 
@@ -73,9 +73,9 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
       <PageHeader {...props} {...tids.pageHeader} />
       <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids} />
       <FormSections sectionsWithRefs={sectionsWithRefs} formState={formState} {...tids} />
-      {rightSideBarContent && (
+      {rightSideBar && (
         <aside css={Css.gr(2).gc("4 / 5").sticky.topPx(headerHeightPx).$}>
-          <RightSidebar content={rightSideBarContent} />
+          <RightSidebar content={rightSideBar} />
         </aside>
       )}
     </div>

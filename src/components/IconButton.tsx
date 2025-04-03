@@ -73,7 +73,8 @@ export function IconButton(props: IconButtonProps) {
     () => ({
       ...iconButtonStylesReset,
       ...(circle ? iconButtonCircle : compact ? iconButtonCompact : iconButtonNormal),
-      ...(isHovered && (contrast ? iconButtonContrastStylesHover : iconButtonStylesHover)),
+      ...(isHovered &&
+        (contrast ? iconButtonContrastStylesHover : circle ? iconButtonCircleStylesHover : iconButtonStylesHover)),
       ...(isFocusVisible || forceFocusStyles ? (circle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
       ...(active ? (contrast ? iconButtonContrastStylesHover : activeStyles) : {}),
       ...(isDisabled && iconButtonStylesDisabled),
@@ -125,7 +126,7 @@ const circleIconColor = Palette.Gray700;
 const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
 const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
 const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
-const iconButtonCircle = Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.onHover.bgBlue100.bcBlue200.$;
+const iconButtonCircle = Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.$;
 export const iconButtonStylesHover = Css.bgGray200.$;
 export const iconButtonContrastStylesHover = Css.bgGray700.$;
 export const iconButtonCircleStylesHover = Css.bgBlue100.bcBlue200.$;

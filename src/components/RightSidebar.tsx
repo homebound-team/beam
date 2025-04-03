@@ -25,6 +25,7 @@ export function RightSidebar({ content }: RightSidebarProps) {
         <div css={Css.df.gap2.z1.$}>
           {content.map(({ icon }) => (
             <IconButton
+              // selectedIcon is added to key to reset the active state
               key={`${icon}-${selectedIcon}`}
               circle
               active={icon === selectedIcon}
@@ -42,7 +43,6 @@ export function RightSidebar({ content }: RightSidebarProps) {
             layout="position"
             key="rightSidebar"
             data-testid="rightSidebarContent"
-            css={Css.h100.wPx(width).$}
             initial={{ x: width, position: "absolute" }}
             animate={{ x: 0 }}
             transition={{ ease: "linear", duration: 0.2 }}
