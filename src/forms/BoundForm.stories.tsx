@@ -27,7 +27,7 @@ import { NestedOption } from "src/inputs";
 import { IconCardGroupItemOption } from "src/inputs/IconCardGroup";
 import { HasIdAndName } from "src/types";
 import { withBeamDecorator } from "src/utils/sb";
-import { AuthorInput as BaseAuthorInput } from "./formStateDomain";
+import { AuthorInput as BaseAuthorInput, BookInput } from "./formStateDomain";
 
 export default {
   component: BoundFormComponent,
@@ -46,6 +46,13 @@ export function BoundForm() {
     </div>
   );
 }
+
+// export function SubFormExample() {
+//   const formState = useFormState({
+//     config: formConfig,
+//     init: { input: { firstName: "John", lastName: "Doe" } },
+//   });
+// }
 
 export function SmallFormExample() {
   const formState = useFormState({
@@ -171,6 +178,7 @@ type AuthorInput = BaseAuthorInput & {
   switchFieldExample2?: boolean | null;
   toggleChipGroupField?: string[] | null;
   treeSelectExample?: string[] | null;
+  subFormExample?: AuthorInput[] | null;
 };
 
 const inputConfig: BoundFormInputConfig<AuthorInput> = [
@@ -216,7 +224,28 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
 
   // We can support any custom JSX node using the key `reactNode*`
   { reactNodeA: <CustomComponent /> },
+
+  {
+    subformBooks: {
+      title: "Books",
+      subSections: [
+        {
+          title: "Book 1",
+          rows: [{ title: boundTextField(), isPublished: boundCheckboxField() }],
+        },
+        {
+          title: "Book 2",
+          rows: [{ title: boundTextField(), isPublished: boundCheckboxField() }],
+        },
+      ],
+    },
+  },
 ];
+
+const bookConfig: ObjectConfig<BookInput> = {
+  title: { type: "value", rules: [required] },
+  isPublished: { type: "value" },
+};
 
 const formConfig: ObjectConfig<AuthorInput> = {
   firstName: { type: "value", rules: [required] },
@@ -239,4 +268,5 @@ const formConfig: ObjectConfig<AuthorInput> = {
   switchFieldExample2: { type: "value" },
   toggleChipGroupField: { type: "value" },
   treeSelectExample: { type: "value" },
+  books: { type: "list", config: bookConfig },
 };

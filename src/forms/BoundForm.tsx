@@ -1,4 +1,4 @@
-import { FieldState, ObjectState } from "@homebound/form-state";
+import { FieldState, ListFieldState, ObjectState } from "@homebound/form-state";
 import { ReactNode, useMemo } from "react";
 import { LoadingSkeleton } from "src/components";
 import { Css, Only, Properties } from "src/Css";
@@ -6,6 +6,7 @@ import { useComputed } from "src/hooks";
 import { Value } from "src/inputs/Value";
 import { TextFieldXss } from "src/interfaces";
 import { fail, safeEntries, useTestIds } from "src/utils";
+import { Button, ButtonProps } from "../components";
 import { BoundCheckboxField, BoundCheckboxFieldProps } from "./BoundCheckboxField";
 import { BoundCheckboxGroupField, BoundCheckboxGroupFieldProps } from "./BoundCheckboxGroupField";
 import { BoundDateField, BoundDateFieldProps } from "./BoundDateField";
@@ -46,7 +47,7 @@ type BoundFormRowInputs<F> = Partial<{
   [K in keyof F as TReactNodePrefix<K & string>]: ReactNode;
 };
 
-export type BoundFormInputConfig<F> = BoundFormRowInputs<F>[];
+export type BoundFormInputConfig<F> = (BoundFormRowInputs<F> | SubformRowInput<F>)[];
 
 export type BoundFormProps<F> = {
   rows: BoundFormInputConfig<F>;
@@ -77,9 +78,13 @@ export function BoundForm<F>(props: BoundFormProps<F>) {
   return (
     <div {...tid}>
       <FormLines width="full" gap={3.5}>
-        {rows.map((row) => (
-          <FormRow key={`fieldGroup-${Object.keys(row).join("-")}`} row={row} formState={formState} />
-        ))}
+        {rows.map((row) => {
+          return isSubFormRowInput(row) ? (
+            <div></div>
+          ) : (
+            <FormRow key={`fieldGroup-${Object.keys(row).join("-")}`} row={row} formState={formState} />
+          );
+        })}
       </FormLines>
     </div>
   );
@@ -90,6 +95,8 @@ function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState:
 
   /**  Extract the bound input components with their sizing config or render any "custom" JSX node as-is */
   const componentsWithConfig = useMemo(() => {
+    // This is where the form state is "bound" to the input components
+    // and where we can find the get the listfield for the subform
     return safeEntries(row).map(([key, fieldFnOrCustomNode]) => {
       if (typeof fieldFnOrCustomNode === "function" && !isCustomReactNodeKey(key)) {
         const field = formState[key] ?? fail(`Field ${key.toString()} not found in formState`);
@@ -257,4 +264,85 @@ export function boundTreeSelectField<O, V extends Value>(props: Omit<BoundTreeSe
     component: <BoundTreeSelectField field={field} {...props} />,
     minWidth: "200px",
   });
+}
+
+/**
+ * A "SubForm" is also a valid row that expects another series of BoundFormRowInputs to be passed in
+ *
+ * Question: Should the the SubForm have a generic add way to add a group of inputs? IE: A listfield subsection? Maybe these are different functions programmed to the same API
+ * - Assuming the above, options would be:
+ *   - An object with a title and a list of rows
+ *   - An object with a title and a list of rows and a function to add / remove more row groups (ListFields)
+ *
+ * The Form "Row" is a Subform
+ * A Subform has a list of Subsections and an optional add subsection callback
+ * A Subsection has a
+ * - title
+ * - list of rows
+ * - A delete / remove callback
+ *
+ */
+const subformPrefix = "subform";
+type TSubformPrefix<S extends string> = `${typeof subformPrefix}${CapitalizeFirstLetter<S>}`;
+
+// type BoundObjectStateSubformInputFn<S> = (subformState: ObjectState<S>) => BoundFormInputConfig<S>;
+// type BoundListStateSubformInputFn<S> = (subformState: ListFieldState<S>) => BoundFormInputConfig<S>;
+
+type BoundListStateSubformConfig<S> = {
+  title: string;
+  subSections: {
+    title: string;
+    rows: BoundFormInputConfig<S>;
+  }[];
+};
+type BoundSubformConfig<S> = BoundListStateSubformConfig<S>; // || BoundObjectStateSubformInputFn<S> |;
+
+// TODO: follow Reactnode pattern for subForm property name typing
+type SubformRowInput<F> = { [K in keyof F as TSubformPrefix<K & string>]: BoundSubformConfig<F[K]> };
+
+type BoundSubSectionProps<F> = BoundFormProps<F> & {
+  title: string;
+  onDelete?: VoidFunction;
+};
+
+export function boundListFieldSubForm<F>(props: Omit<BoundSubSectionProps<F>, "formState">) {
+  return (field: ListFieldState<F>): BoundFieldInputFnReturn => {
+    const { rows, title, onDelete } = props;
+    // const subformState = field.listFieldState;
+    // const subformInputConfig = subform(subformState);
+    const subsections: BoundSubSectionProps<F> = field.rows.map((row) => {
+      return {};
+    });
+    return {
+      component: <SubForm subSections={[]} />,
+      minWidth: "100%",
+    };
+  };
+}
+
+type BoundSubFormProps<F> = {
+  subSections: BoundSubSectionProps<F>[];
+  onAdd?: Pick<ButtonProps, "label" | "onClick">;
+};
+
+export function SubForm<F>(props: BoundSubFormProps<F>) {
+  const { subSections, onAdd } = props;
+  const tid = useTestIds(props, "boundSubForm");
+  return (
+    <div {...tid}>
+      <FormLines width="full" gap={3.5}>
+        {subSections.map((subSection, index) => (
+          <div key={`subSection-${index}`}>
+            <h3>{subSection.title}</h3>
+            <BoundForm {...subSection} />
+          </div>
+        ))}
+      </FormLines>
+      {onAdd && <Button {...onAdd} />}
+    </div>
+  );
+}
+
+function isSubFormRowInput<F>(row: BoundFormRowInputs<F> | SubformRowInput<F>): row is SubformRowInput<F> {
+  return "subform" in row;
 }
