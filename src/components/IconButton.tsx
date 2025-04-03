@@ -72,8 +72,7 @@ export function IconButton(props: IconButtonProps) {
   const styles = useMemo(
     () => ({
       ...iconButtonStylesReset,
-      ...(compact ? iconButtonCompact : iconButtonNormal),
-      ...(circle ? iconButtonCircle : iconButtonNormal),
+      ...(circle ? iconButtonCircle : compact ? iconButtonCompact : iconButtonNormal),
       ...(isHovered && (contrast ? iconButtonContrastStylesHover : iconButtonStylesHover)),
       ...(isFocusVisible || forceFocusStyles ? (circle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
       ...(active ? (contrast ? iconButtonContrastStylesHover : activeStyles) : {}),
