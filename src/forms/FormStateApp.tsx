@@ -35,7 +35,6 @@ import { HasIdAndName } from "src/types";
 export function FormStateApp() {
   const [readOnly, setReadOnly] = useState(false);
   const [isNew, setIsNew] = useState(false);
-  const [enableOn, setEnableOn] = useState<"valid" | "dirty">("dirty");
   // Simulate getting the initial form state back from a server call
   const queryResponse = useMemo(() => {
     return isNew
@@ -115,7 +114,6 @@ export function FormStateApp() {
           <Button variant="secondary" onClick={() => formState.revertChanges()} label="Cancel" />
           <SubmitButton
             form={formState}
-            enableOn={enableOn}
             onClick={() => {
               if (formState.canSave()) {
                 formState.commitChanges();
@@ -123,7 +121,6 @@ export function FormStateApp() {
             }}
             label="Save"
           />
-          (using {enableOn})
         </div>
 
         <Observer>
@@ -143,11 +140,6 @@ export function FormStateApp() {
         <div css={Css.df.gap2.$}>
           <Button variant="text" label="Read Only" onClick={() => setReadOnly(!readOnly)} />
           <Button variant="text" label={isNew ? "Existing" : "New"} onClick={() => setIsNew(!isNew)} />
-          <Button
-            variant="text"
-            label={enableOn === "valid" ? "Dirty" : "Valid"}
-            onClick={() => setEnableOn(enableOn === "valid" ? "dirty" : "valid")}
-          />
         </div>
       </div>
     </div>
