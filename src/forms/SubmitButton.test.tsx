@@ -28,7 +28,7 @@ describe("SubmitButton", () => {
     click(r.submit);
     expect(onClick).not.toHaveBeenCalled();
 
-    // ANd once we make it valid
+    // And once we make it valid
     act(() => author.firstName.set("f2"));
     // We can click and submit
     click(r.submit);

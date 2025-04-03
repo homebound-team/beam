@@ -30,7 +30,7 @@ export function SubmitButton<T>(props: SubmitButtonProps<T>) {
         // canSave will touch any not-yet-keyed-in fields to show errors
         state.clicked = true;
         if (form.canSave()) {
-          void onClick(e);
+          return onClick(e);
         }
       }}
       {...others}
