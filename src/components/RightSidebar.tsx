@@ -45,7 +45,7 @@ export function RightSidebar({ content }: RightSidebarProps) {
             <div css={Css.absolute.leftPx(-24).top0.$}>
               <IconButton circle onClick={() => setSelectedIcon(undefined)} icon="x" inc={3.5} />
               {/* vertical line */}
-              <div css={Css.absolute.topPx(48).leftPx(23).h("calc(100vh - 168px)").wPx(2).bgGray300.$} />
+              <div css={Css.absolute.topPx(48).leftPx(23).h("calc(100vh - 168px)").wPx(1).bgGray300.$} />
             </div>
             <div css={Css.ptPx(78).px3.$} {...tid.content}>
               {content.find((sidebar) => sidebar.icon === selectedIcon)?.render()}
