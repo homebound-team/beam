@@ -4,35 +4,50 @@ import { jest } from "@jest/globals";
 import { act } from "@testing-library/react";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { SubmitButton } from "src/forms/SubmitButton";
+import { clickAndWait } from "src/utils/rtlUtils";
 
 describe("SubmitButton", () => {
-  it("disables if the form is clean", async () => {
+  it("when editing, disables if the form is clean", async () => {
     const onClick = jest.fn();
-    // Given a submit button for an invalid form
-    const author = createObjectState(formConfig, { firstName: "f1" });
+    // Given a submit button for an existing entity (id is set)
+    const author = createObjectState(formConfig, { id: "a:1", firstName: "f1" });
     const r = await render(<SubmitButton form={author} onClick={onClick} />);
 
     // Then the submit button is initially disabled because nothing is dirty
     expect(r.submit).not.toBeEnabled();
+
     // And clicking submit doesn't call the onClick handler
     click(r.submit);
     expect(onClick).not.toHaveBeenCalled();
 
-    // But once we change a field, it becomes enabled
+    // And if we change a field to invalid
     act(() => author.firstName.set(""));
-    expect(r.submit).toBeEnabled();
+    // Then we stay disabled
+    expect(r.submit).not.toBeEnabled();
     // Even though it's invalid, so clicking submit still won't do anything
     click(r.submit);
     expect(onClick).not.toHaveBeenCalled();
 
-    // But once we make it valid
+    // And once we make it valid
     act(() => author.firstName.set("f2"));
     // We can click and submit
     click(r.submit);
     expect(onClick).toHaveBeenCalled();
   });
 
-  it("disables if the form is dirty but overridden via prop", async () => {
+  it("when creating, enables for initial click", async () => {
+    const onClick = jest.fn();
+    // Given a submit button for a new entity (no id set)
+    const author = createObjectState(formConfig, { firstName: "f1" });
+    const r = await render(<SubmitButton form={author} onClick={onClick} />);
+    // Then the submit button is enabled (to show validation errors)
+    expect(r.submit).toBeEnabled();
+    // This is not an async call, but it makes the re-render-without-act error to go away :thinking:
+    await clickAndWait(r.submit);
+    expect(onClick).toHaveBeenCalled();
+  });
+
+  it("disables if the form is dirty but disabled via prop", async () => {
     const onClick = jest.fn();
     // Given a form is dirty so saveable to formState
     const author = createObjectState(formConfig, { firstName: "f1" });
@@ -49,5 +64,6 @@ describe("SubmitButton", () => {
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {
+  id: { type: "value" },
   firstName: { type: "value", rules: [required] },
 };

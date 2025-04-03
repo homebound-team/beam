@@ -28,6 +28,7 @@ export function BoundCheckboxGroupField(props: BoundCheckboxGroupFieldProps) {
       {() => (
         <CheckboxGroup
           label={label}
+          required={field.required}
           values={field.value || []}
           onChange={(values) => {
             onChange(values);

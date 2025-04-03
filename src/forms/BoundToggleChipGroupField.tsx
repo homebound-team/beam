@@ -17,7 +17,16 @@ export function BoundToggleChipGroupField(props: BoundToggleChipGroupFieldProps)
   const testId = useTestIds(props, field.key);
   return (
     <Observer>
-      {() => <ToggleChipGroup label={label} values={field.value || []} onChange={onChange} {...testId} {...others} />}
+      {() => (
+        <ToggleChipGroup
+          label={label}
+          required={field.required}
+          values={field.value || []}
+          onChange={onChange}
+          {...testId}
+          {...others}
+        />
+      )}
     </Observer>
   );
 }

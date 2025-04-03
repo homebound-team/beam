@@ -5,6 +5,7 @@ import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
+import { useLabelSuffix } from "src/forms/labelUtils";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { useTestIds } from "src/utils";
@@ -20,6 +21,7 @@ export interface CheckboxGroupItemOption {
 
 export interface CheckboxGroupProps extends Pick<PresentationFieldProps, "labelStyle"> {
   label: string;
+  required?: boolean;
   /** Called when a checkbox is selected or deselected */
   onChange: (values: string[]) => void;
   /** Options for the checkboxes contained within the CheckboxGroup. */
@@ -48,17 +50,19 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
     onBlur,
     onFocus,
     columns = 1,
+    required,
   } = props;
 
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
   const tid = useTestIds(props);
+  const labelSuffix = useLabelSuffix(required, false);
 
   return (
     <div {...groupProps} css={Css.if(labelStyle === "left").df.fdr.$} onBlur={onBlur} onFocus={onFocus} {...tid}>
       {labelStyle !== "hidden" && (
         <div css={Css.if(labelStyle === "left").w50.$}>
-          <Label label={label} {...labelProps} {...tid.label} />
+          <Label label={label} {...labelProps} {...tid.label} suffix={labelSuffix} />
         </div>
       )}
       <div css={Css.dg.gtc(`repeat(${columns}, auto)`).gap2.$}>

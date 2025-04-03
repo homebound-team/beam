@@ -1,4 +1,5 @@
 import { ObjectState } from "@homebound/form-state";
+import { useLocalObservable } from "mobx-react";
 import { Button, ButtonProps, useComputed } from "src";
 
 export type SubmitButtonProps<T> = Omit<ButtonProps, "label"> & {
@@ -12,18 +13,24 @@ export function SubmitButton<T>(props: SubmitButtonProps<T>) {
   if (typeof onClick === "string") {
     throw new Error("SubmitButton.onClick doesn't support strings yet");
   }
-  // Enable the button whenever the form is dirty, even if the form is partially invalid,
-  // because submitting will then force-touch all fields and show all errors instead of
-  // just errors-so-far.
-  const dirty = useComputed(() => form.dirty, [form]);
+
+  const state = useLocalObservable(() => ({ clicked: false }));
+
+  const canSubmit = useComputed(() => {
+    // We generally prefer to "enable when dirty && valid", *but* when creating new entities,
+    // showing Save as enabled can be a good way for the user to "try and save" and get all the
+    // previously-hidden error messages to show up (b/c `canSave` touches the form fields).
+    return form.isNewEntity && !state.clicked ? true : form.dirty && form.valid;
+  }, [form]);
   return (
     <Button
       label={label}
-      disabled={disabled || !dirty}
+      disabled={disabled || !canSubmit}
       onClick={(e) => {
         // canSave will touch any not-yet-keyed-in fields to show errors
+        state.clicked = true;
         if (form.canSave()) {
-          void onClick(e);
+          return onClick(e);
         }
       }}
       {...others}
