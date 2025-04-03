@@ -1,4 +1,4 @@
-import { FieldState, ListFieldState, ObjectState } from "@homebound/form-state";
+import { FieldState, ObjectState } from "@homebound/form-state";
 import { ReactNode, useMemo } from "react";
 import { LoadingSkeleton } from "src/components";
 import { Css, Only, Properties } from "src/Css";
@@ -269,11 +269,6 @@ export function boundTreeSelectField<O, V extends Value>(props: Omit<BoundTreeSe
 /**
  * A "SubForm" is also a valid row that expects another series of BoundFormRowInputs to be passed in
  *
- * Question: Should the the SubForm have a generic add way to add a group of inputs? IE: A listfield subsection? Maybe these are different functions programmed to the same API
- * - Assuming the above, options would be:
- *   - An object with a title and a list of rows
- *   - An object with a title and a list of rows and a function to add / remove more row groups (ListFields)
- *
  * The Form "Row" is a Subform
  * A Subform has a list of Subsections and an optional add subsection callback
  * A Subsection has a
@@ -285,9 +280,6 @@ export function boundTreeSelectField<O, V extends Value>(props: Omit<BoundTreeSe
 const subformPrefix = "subform";
 type TSubformPrefix<S extends string> = `${typeof subformPrefix}${CapitalizeFirstLetter<S>}`;
 
-// type BoundObjectStateSubformInputFn<S> = (subformState: ObjectState<S>) => BoundFormInputConfig<S>;
-// type BoundListStateSubformInputFn<S> = (subformState: ListFieldState<S>) => BoundFormInputConfig<S>;
-
 type BoundListStateSubformConfig<S> = {
   title: string;
   subSections: {
@@ -297,28 +289,12 @@ type BoundListStateSubformConfig<S> = {
 };
 type BoundSubformConfig<S> = BoundListStateSubformConfig<S>; // || BoundObjectStateSubformInputFn<S> |;
 
-// TODO: follow Reactnode pattern for subForm property name typing
 type SubformRowInput<F> = { [K in keyof F as TSubformPrefix<K & string>]: BoundSubformConfig<F[K]> };
 
 type BoundSubSectionProps<F> = BoundFormProps<F> & {
   title: string;
   onDelete?: VoidFunction;
 };
-
-export function boundListFieldSubForm<F>(props: Omit<BoundSubSectionProps<F>, "formState">) {
-  return (field: ListFieldState<F>): BoundFieldInputFnReturn => {
-    const { rows, title, onDelete } = props;
-    // const subformState = field.listFieldState;
-    // const subformInputConfig = subform(subformState);
-    const subsections: BoundSubSectionProps<F> = field.rows.map((row) => {
-      return {};
-    });
-    return {
-      component: <SubForm subSections={[]} />,
-      minWidth: "100%",
-    };
-  };
-}
 
 type BoundSubFormProps<F> = {
   subSections: BoundSubSectionProps<F>[];
