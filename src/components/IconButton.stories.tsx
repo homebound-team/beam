@@ -3,6 +3,7 @@ import { Meta } from "@storybook/react";
 import {
   Css,
   IconButton,
+  iconButtonCircleStylesHover,
   iconButtonContrastStylesHover,
   IconButtonProps,
   iconButtonStylesHover,
@@ -51,6 +52,10 @@ function Template(args: IconButtonProps) {
           <IconButton {...args} autoFocus />
         </div>
         <div>
+          <h2>Active</h2>
+          <IconButton {...args} active />
+        </div>
+        <div>
           <h2>Disabled</h2>
           <IconButton {...args} disabled="Disabled reason" />
         </div>
@@ -71,6 +76,10 @@ Compact.args = { compact: true };
 export const Contrast = Template.bind({});
 // @ts-ignore
 Contrast.args = { contrast: true };
+
+export const Circle = Template.bind({});
+// @ts-ignore
+Circle.args = { circle: true };
 
 export function WithTooltip() {
   return (
@@ -121,8 +130,16 @@ export function IconButtonLink() {
 /** Hover styled version of the IconButton */
 function HoveredIconButton(args: IconButtonProps) {
   return (
-    <div css={{ "& button": args.contrast ? iconButtonContrastStylesHover : iconButtonStylesHover }}>
-      <IconButton {...args} />
+    <div
+      css={{
+        "& button": args.contrast
+          ? iconButtonContrastStylesHover
+          : args.circle
+            ? iconButtonCircleStylesHover
+            : iconButtonStylesHover,
+      }}
+    >
+      <IconButton {...args} active={args.circle} />
     </div>
   );
 }

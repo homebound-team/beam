@@ -23,6 +23,10 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   compact?: boolean;
   /** Whether to display the contrast variant */
   contrast?: boolean;
+  /** Whether to display the circle variant */
+  circle?: boolean;
+  /** Indicates that the button is active/selected */
+  active?: boolean;
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
   download?: boolean;
   /** Provides label for screen readers - Will become a required soon */
@@ -42,8 +46,10 @@ export function IconButton(props: IconButtonProps) {
     tooltip,
     menuTriggerProps,
     openInNew,
+    active = false,
     compact = false,
     contrast = false,
+    circle = false,
     download = false,
     forceFocusStyles = false,
     label,
@@ -66,9 +72,11 @@ export function IconButton(props: IconButtonProps) {
   const styles = useMemo(
     () => ({
       ...iconButtonStylesReset,
-      ...(compact ? iconButtonCompact : iconButtonNormal),
-      ...(isHovered && (contrast ? iconButtonContrastStylesHover : iconButtonStylesHover)),
-      ...(isFocusVisible || forceFocusStyles ? iconButtonStylesFocus : {}),
+      ...(circle ? iconButtonCircle : compact ? iconButtonCompact : iconButtonNormal),
+      ...(isHovered &&
+        (contrast ? iconButtonContrastStylesHover : circle ? iconButtonCircleStylesHover : iconButtonStylesHover)),
+      ...(isFocusVisible || forceFocusStyles ? (circle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
+      ...(active ? (contrast ? iconButtonContrastStylesHover : activeStyles) : {}),
       ...(isDisabled && iconButtonStylesDisabled),
       ...(bgColor && Css.bgColor(bgColor).$),
     }),
@@ -76,7 +84,7 @@ export function IconButton(props: IconButtonProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [isHovered, isFocusVisible, isDisabled, compact],
   );
-  const iconColor = contrast ? contrastIconColor : defaultIconColor;
+  const iconColor = contrast ? contrastIconColor : circle ? circleIconColor : defaultIconColor;
 
   const buttonAttrs = {
     ...testIds,
@@ -91,9 +99,16 @@ export function IconButton(props: IconButtonProps) {
   const buttonContent = (
     <Icon
       icon={icon}
-      color={color || (isDisabled ? Palette.Gray400 : iconColor)}
+      color={
+        color ||
+        (isDisabled
+          ? Palette.Gray400
+          : circle && (isHovered || active || isFocusVisible)
+            ? defaultIconColor
+            : iconColor)
+      }
       bgColor={bgColor}
-      inc={compact ? 2 : inc}
+      inc={compact ? 2 : circle ? 2.5 : inc}
     />
   );
 
@@ -107,10 +122,15 @@ export function IconButton(props: IconButtonProps) {
 
 const defaultIconColor = Palette.Gray900;
 const contrastIconColor = Palette.White;
+const circleIconColor = Palette.Gray700;
 const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
 const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
 const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
+const iconButtonCircle = Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.$;
 export const iconButtonStylesHover = Css.bgGray200.$;
 export const iconButtonContrastStylesHover = Css.bgGray700.$;
+export const iconButtonCircleStylesHover = Css.bgBlue100.bcBlue200.$;
 const iconButtonStylesFocus = Css.bcBlue700.$;
+const iconButtonCircleStylesFocus = Css.bgBlue100.bcBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;
+const activeStyles = Css.bgGray200.bcGray200.$;
