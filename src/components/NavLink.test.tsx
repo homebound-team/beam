@@ -13,4 +13,12 @@ describe("NavLink", () => {
     const r = await render(<NavLink href="/projects" label="Link" variant="global" data-testid="link" />, withRouter());
     expect(r.link).not.toHaveAttribute("target").not.toHaveAttribute("rel");
   });
+
+  it("can render jsx for a label", async () => {
+    const r = await render(
+      <NavLink href="/projects" label={<div>Navlink button</div>} variant="global" data-testid="link" />,
+      withRouter(),
+    );
+    expect(r.link).toHaveTextContent("Navlink button");
+  });
 });
