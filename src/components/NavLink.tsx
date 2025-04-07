@@ -1,5 +1,5 @@
 import { AriaButtonProps } from "@react-types/button";
-import { RefObject, useMemo } from "react";
+import { ReactNode, RefObject, useMemo } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
 import type { IconKey } from "src/components";
 import { navLink } from "src/components";
@@ -15,7 +15,7 @@ export interface NavLinkProps extends BeamFocusableProps {
   disabled?: boolean;
   /** if `href` isn't provided, it is treated as a <button> */
   href?: string;
-  label: string;
+  label: ReactNode;
   icon?: IconKey;
   variant: NavLinkVariant;
   openInNew?: boolean;
