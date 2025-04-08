@@ -26,7 +26,7 @@ type FormPageLayoutProps<F> = {
   breadCrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   formState: ObjectState<F>;
   formSections: FormSectionConfig<F>;
-  submitAction?: ActionButtonProps;
+  submitAction: ActionButtonProps;
   cancelAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
   rightSideBar?: SidebarContentProps[];
