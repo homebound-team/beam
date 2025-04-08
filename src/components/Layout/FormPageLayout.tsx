@@ -1,9 +1,8 @@
 import { ObjectState } from "@homebound/form-state";
-import { Observer } from "mobx-react";
 import React, { createRef, RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useButton, useFocusRing } from "react-aria";
 import { Css, Palette } from "src/Css";
-import { BoundForm, BoundFormInputConfig } from "src/forms";
+import { BoundForm, BoundFormInputConfig, SubmitButton } from "src/forms";
 import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils";
 import { Button, ButtonProps } from "../Button";
@@ -98,42 +97,28 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
             {pageTitle}
           </h1>
         </div>
-        <Observer>
-          {() => (
-            <div css={Css.df.gap1.$}>
-              {tertiaryAction && (
-                <Button
-                  label={tertiaryAction.label}
-                  onClick={tertiaryAction.onClick}
-                  variant="tertiary"
-                  disabled={tertiaryAction.disabled}
-                  tooltip={tertiaryAction.tooltip}
-                  {...tids.tertiaryAction}
-                />
-              )}
-              {cancelAction && (
-                <Button
-                  label={cancelAction.label}
-                  onClick={cancelAction.onClick}
-                  variant="secondary"
-                  disabled={cancelAction.disabled}
-                  tooltip={cancelAction.tooltip}
-                  {...tids.cancelAction}
-                />
-              )}
-              {submitAction && (
-                <Button
-                  label={submitAction.label}
-                  onClick={submitAction.onClick}
-                  variant="primary"
-                  disabled={!formState.valid || submitAction.disabled}
-                  tooltip={submitAction.tooltip}
-                  {...tids.submitAction}
-                />
-              )}
-            </div>
+
+        <div css={Css.df.gap1.$}>
+          {tertiaryAction && (
+            <Button
+              label={tertiaryAction.label}
+              onClick={tertiaryAction.onClick}
+              variant="tertiary"
+              disabled={tertiaryAction.disabled}
+              tooltip={tertiaryAction.tooltip}
+            />
           )}
-        </Observer>
+          {cancelAction && (
+            <Button
+              label={cancelAction.label}
+              onClick={cancelAction.onClick}
+              variant="secondary"
+              disabled={cancelAction.disabled}
+              tooltip={cancelAction.tooltip}
+            />
+          )}
+          <SubmitButton form={formState} {...submitAction} />
+        </div>
       </div>
     </header>
   );
