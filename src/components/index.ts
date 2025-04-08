@@ -35,6 +35,7 @@ export { NavLink } from "./NavLink";
 export * from "./Pagination";
 export { PresentationProvider } from "./PresentationContext";
 export type { InputStylePalette, PresentationFieldProps } from "./PresentationContext";
+export * from "./RightSidebar";
 export * from "./ScrollShadows";
 export * from "./Snackbar";
 export * from "./Stepper";
