@@ -1,6 +1,6 @@
 import { InputHTMLAttributes, ReactNode, useRef } from "react";
 import { mergeProps, useFocusRing, useHover, VisuallyHidden } from "react-aria";
-import { HelperText } from "src/components/HelperText";
+import { HelperText, maybeTooltip } from "src/components";
 import { Css, Palette, px } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamFocusableProps } from "src/interfaces";
@@ -31,6 +31,8 @@ export interface CheckboxBaseProps extends BeamFocusableProps {
    * @default true
    */
   withLabelElement?: boolean;
+  /** Tooltip content is set when disabled prop is a ReactNode via `Checkbox` component */
+  tooltip?: ReactNode;
 }
 
 export function CheckboxBase(props: CheckboxBaseProps) {
@@ -45,6 +47,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
     helperText,
     checkboxOnly = false,
     withLabelElement = true,
+    tooltip,
   } = props;
   const ref = useRef(null);
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
@@ -52,36 +55,40 @@ export function CheckboxBase(props: CheckboxBaseProps) {
 
   const Tag = withLabelElement ? "label" : "div";
 
-  return (
-    <Tag
-      css={
-        Css.df.cursorPointer.relative
-          // Prevents accidental checkbox clicks due to label width being longer
-          // than the content.
-          .w("max-content")
-          .maxw(px(320))
-          .if(description !== undefined)
-          .maxw(px(344))
-          .if(isDisabled).cursorNotAllowed.$
-      }
-      aria-label={label}
-    >
-      <VisuallyHidden>
-        <input ref={ref} {...mergeProps(inputProps, focusProps)} {...tid} data-indeterminate={isIndeterminate} />
-      </VisuallyHidden>
-      <StyledCheckbox {...props} isFocusVisible={isFocusVisible} {...tid} />
-      {!checkboxOnly && (
-        // Use a mtPx(-2) to better align the label with the checkbox.
-        // Not using align-items: center as the checkbox would align with all content below, where we really want it to stay only aligned with the label
-        <div css={Css.ml1.mtPx(-2).$}>
-          {label && <div css={{ ...labelStyles, ...(isDisabled && disabledColor) }}>{label}</div>}
-          {description && <div css={{ ...descStyles, ...(isDisabled && disabledColor) }}>{description}</div>}
-          {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
-          {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
-        </div>
-      )}
-    </Tag>
-  );
+  return maybeTooltip({
+    title: tooltip,
+    placement: "top",
+    children: (
+      <Tag
+        css={
+          Css.df.cursorPointer.relative
+            // Prevents accidental checkbox clicks due to label width being longer
+            // than the content.
+            .w("max-content")
+            .maxw(px(320))
+            .if(description !== undefined)
+            .maxw(px(344))
+            .if(isDisabled).cursorNotAllowed.$
+        }
+        aria-label={label}
+      >
+        <VisuallyHidden>
+          <input ref={ref} {...mergeProps(inputProps, focusProps)} {...tid} data-indeterminate={isIndeterminate} />
+        </VisuallyHidden>
+        <StyledCheckbox {...props} isFocusVisible={isFocusVisible} {...tid} />
+        {!checkboxOnly && (
+          // Use a mtPx(-2) to better align the label with the checkbox.
+          // Not using align-items: center as the checkbox would align with all content below, where we really want it to stay only aligned with the label
+          <div css={Css.ml1.mtPx(-2).$}>
+            {label && <div css={{ ...labelStyles, ...(isDisabled && disabledColor) }}>{label}</div>}
+            {description && <div css={{ ...descStyles, ...(isDisabled && disabledColor) }}>{description}</div>}
+            {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
+            {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+          </div>
+        )}
+      </Tag>
+    ),
+  });
 }
 
 const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bcGray300.br4.bgWhite.transition.$;

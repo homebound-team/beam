@@ -1,6 +1,7 @@
 import { ReactNode, useRef } from "react";
 import { useCheckbox } from "react-aria";
 import { useToggleState } from "react-stately";
+import { resolveTooltip } from "src/components";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
 
 export interface CheckboxProps {
@@ -16,7 +17,8 @@ export interface CheckboxProps {
   onChange: (selected: boolean) => void;
   /** Additional text displayed below label */
   description?: string;
-  disabled?: boolean;
+  /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
+  disabled?: boolean | ReactNode;
   errorMsg?: string;
   helperText?: string | ReactNode;
   /** Callback fired when focus removes from the component */
@@ -26,11 +28,11 @@ export interface CheckboxProps {
 }
 
 export function Checkbox(props: CheckboxProps) {
-  const { label, disabled: isDisabled = false, selected, ...otherProps } = props;
+  const { label, disabled = false, selected, ...otherProps } = props;
   // Treat indeterminate as false so that clicking on indeterminate always goes --> true.
   const isSelected = selected === true;
   const isIndeterminate = selected === "indeterminate";
-  const ariaProps = { isSelected, isDisabled, isIndeterminate, ...otherProps };
+  const ariaProps = { isSelected, isDisabled: !!disabled, isIndeterminate, ...otherProps };
   const checkboxProps = { ...ariaProps, "aria-label": label };
   const ref = useRef(null);
   const toggleState = useToggleState(ariaProps);
@@ -39,11 +41,12 @@ export function Checkbox(props: CheckboxProps) {
   return (
     <CheckboxBase
       ariaProps={ariaProps}
-      isDisabled={isDisabled}
+      isDisabled={ariaProps.isDisabled}
       isIndeterminate={isIndeterminate}
       isSelected={isSelected}
       inputProps={inputProps}
       label={label}
+      tooltip={resolveTooltip(disabled)}
       {...otherProps}
     />
   );
