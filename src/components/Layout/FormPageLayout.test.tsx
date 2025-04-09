@@ -3,7 +3,7 @@ import { FormPageLayout } from "src/components/Layout";
 import { boundCheckboxField, boundTextField } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { noop } from "src/utils";
-import { render, withRouter } from "src/utils/rtl";
+import { render, type, withRouter } from "src/utils/rtl";
 
 const formConfig: ObjectConfig<AuthorInput> = {
   isAvailable: { type: "value", rules: [required] },
@@ -42,16 +42,22 @@ describe("FormPageLayout", () => {
     expect(r.pageHeaderBreadcrumbs_navLink_1).toHaveTextContent("Users");
 
     // And the action buttons to be rendered with the correct labels and states
-    expect(r.formPageLayout_pageHeader_submitAction).toHaveTextContent("Save");
-    expect(r.formPageLayout_pageHeader_submitAction).not.toBeDisabled();
-    expect(r.formPageLayout_pageHeader_cancelAction).toHaveTextContent("Cancel");
-    expect(r.formPageLayout_pageHeader_cancelAction).not.toBeDisabled();
-    expect(r.formPageLayout_pageHeader_tertiaryAction).toHaveTextContent("Delete");
-    expect(r.formPageLayout_pageHeader_tertiaryAction).toBeDisabled();
+    expect(r.save).toHaveTextContent("Save");
+    expect(r.cancel).toHaveTextContent("Cancel");
+    expect(r.cancel).not.toBeDisabled();
+    expect(r.delete).toHaveTextContent("Delete");
+    expect(r.delete).toBeDisabled();
+
+    // Where the save button is initially disabled for the untouched form
+    expect(r.save).toBeDisabled();
+
+    // And when we change a field, the save button is enabled
+    type(r.firstName, "Jane");
+    expect(r.save).not.toBeDisabled();
 
     // And each of the form sections to be rendered with their fields and titles
     expect(r.formPageLayout_formSection_0).toHaveTextContent("About");
-    expect(r.firstName).toHaveValue("John");
+    expect(r.firstName).toHaveValue("Jane");
     expect(r.lastName).toHaveValue("Doe");
     expect(r.formPageLayout_formSection_1).toHaveTextContent("Settings");
     expect(r.isAvailable).toBeChecked();

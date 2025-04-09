@@ -98,7 +98,13 @@ export function LoadingBoundForm() {
     if (loadedData) return;
 
     setTimeout(() => {
-      setLoadedData({ firstName: "John", middleInitial: "C", lastName: "Doe", bio: "Some bio" });
+      setLoadedData({
+        firstName: "John",
+        middleInitial: "C",
+        lastName: "Doe",
+        bio: "Some bio",
+        iconCardSelection: true,
+      });
     }, 1000);
   }, [loadedData]);
 
@@ -162,7 +168,8 @@ const genres: NestedOption<HasIdAndName>[] = [
 ];
 
 type AuthorInput = BaseAuthorInput & {
-  iconCardSelection?: boolean | null;
+  // iconCardSelection is required to test against a mapped type regression on `BoundFormRowInputs`
+  iconCardSelection: boolean | null;
   iconCardGroupExample?: string[] | null;
   multiLineSelectExample?: string[] | null;
   radioGroupExample?: string | null;

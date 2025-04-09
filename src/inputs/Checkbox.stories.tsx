@@ -31,6 +31,12 @@ export function Checkboxes() {
           <Checkbox onChange={action("onChange")} selected="indeterminate" label="Indeterminate" />
           <Checkbox onChange={action("onChange")} selected={false} disabled label="Disabled while unselected" />
           <Checkbox onChange={action("onChange")} selected={true} disabled label="Disabled while selected" />
+          <Checkbox
+            onChange={action("onChange")}
+            selected={true}
+            disabled="Reason for disabled..."
+            label="Disabled with tooltip while selected"
+          />
         </div>
       </div>
       <div>

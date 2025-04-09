@@ -1,6 +1,7 @@
 import { ObjectState } from "@homebound/form-state";
 import { useLocalObservable } from "mobx-react";
-import { Button, ButtonProps, useComputed } from "src";
+import { useComputed } from "src";
+import { Button, ButtonProps } from "src/components/Button";
 
 export type SubmitButtonProps<T> = Omit<ButtonProps, "label"> & {
   label?: ButtonProps["label"];

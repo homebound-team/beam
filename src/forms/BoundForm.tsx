@@ -5,7 +5,7 @@ import { Css, Only, Properties } from "src/Css";
 import { useComputed } from "src/hooks";
 import { Value } from "src/inputs/Value";
 import { TextFieldXss } from "src/interfaces";
-import { fail, safeEntries, useTestIds } from "src/utils";
+import { fail, useTestIds } from "src/utils";
 import { BoundCheckboxField, BoundCheckboxFieldProps } from "./BoundCheckboxField";
 import { BoundCheckboxGroupField, BoundCheckboxGroupFieldProps } from "./BoundCheckboxGroupField";
 import { BoundDateField, BoundDateFieldProps } from "./BoundDateField";
@@ -38,13 +38,15 @@ type TReactNodePrefix<S extends string> = `${typeof reactNodePrefix}${Capitalize
 
 type CustomReactNodeKey = `${typeof reactNodePrefix}${string}`;
 
-type BoundFormRowInputs<F> = Partial<{
-  [K in keyof F]: BoundFieldInputFn<F>;
-}> & {
-  [K in CustomReactNodeKey]: ReactNode;
-} & {
-  [K in keyof F as TReactNodePrefix<K & string>]: ReactNode;
-};
+type BoundFormRowInputs<F> = Partial<
+  {
+    [K in keyof F]: BoundFieldInputFn<F>;
+  } & {
+    [K in CustomReactNodeKey]: ReactNode;
+  } & {
+    [K in keyof F as TReactNodePrefix<K & string>]: ReactNode;
+  }
+>;
 
 export type BoundFormInputConfig<F> = BoundFormRowInputs<F>[];
 
@@ -90,9 +92,9 @@ function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState:
 
   /**  Extract the bound input components with their sizing config or render any "custom" JSX node as-is */
   const componentsWithConfig = useMemo(() => {
-    return safeEntries(row).map(([key, fieldFnOrCustomNode]) => {
+    return Object.entries(row).map(([key, fieldFnOrCustomNode]) => {
       if (typeof fieldFnOrCustomNode === "function" && !isCustomReactNodeKey(key)) {
-        const field = formState[key] ?? fail(`Field ${key.toString()} not found in formState`);
+        const field = formState[key as keyof F] ?? fail(`Field ${key.toString()} not found in formState`);
         const fieldFn =
           (fieldFnOrCustomNode as BoundFormRowInputs<F>[keyof F]) ??
           fail(`Field function not defined for key ${key.toLocaleString()}`);
