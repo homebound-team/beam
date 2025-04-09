@@ -168,6 +168,7 @@ const genres: NestedOption<HasIdAndName>[] = [
 ];
 
 type AuthorInput = BaseAuthorInput & {
+  // iconCardSelection is required to test against a mapped type regression on `BoundFormRowInputs`
   iconCardSelection: boolean | null;
   iconCardGroupExample?: string[] | null;
   multiLineSelectExample?: string[] | null;
