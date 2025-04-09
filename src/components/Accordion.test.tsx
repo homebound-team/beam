@@ -89,6 +89,23 @@ describe(Accordion, () => {
     expect(titleOnClick).toHaveBeenCalled();
   });
 
+  it("calls the onToggle function when the accordion is expanded/collapsed", async () => {
+    // Given an accordion component with onToggle set
+    const onToggle = jest.fn();
+    // When rendered
+    const r = await render(
+      <Accordion title="Test title" titleOnClick={onToggle}>
+        Test description
+      </Accordion>,
+    );
+    // Then the onToggle function is called when the accordion is expanded
+    click(r.accordion_title);
+    expect(onToggle).toHaveBeenCalledTimes(1);
+    // And when it's collapsed
+    click(r.accordion_title);
+    expect(onToggle).toHaveBeenCalledTimes(2);
+  });
+
   it("alters expando behavior when titleOnClick is provided", async () => {
     // When rendered with a titleOnClick set
     const r = await render(
