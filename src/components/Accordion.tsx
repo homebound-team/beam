@@ -22,6 +22,7 @@ export interface AccordionProps<X = AccordionXss> {
    * Allows multiple accordions to be expanded simultaneously (enabled by default)
    */
   index?: number;
+  onToggle?: VoidFunction;
   setExpandedIndex?: Dispatch<SetStateAction<number | undefined>>;
   /** Turns the title into a button. If provided, disables expand/collapse on title text */
   titleOnClick?: VoidFunction;
@@ -46,6 +47,7 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
     index,
     setExpandedIndex,
     titleOnClick,
+    onToggle,
     omitPadding = false,
     xss,
   } = props;
@@ -82,7 +84,8 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
   const toggle = useCallback(() => {
     setExpanded((prev) => !prev);
     if (setExpandedIndex) setExpandedIndex(index);
-  }, [index, setExpandedIndex]);
+    if (onToggle) onToggle();
+  }, [index, setExpandedIndex, onToggle]);
 
   const touchableStyle = useMemo(
     () => ({
