@@ -6,7 +6,7 @@ export default {
   component: TableCardComponent,
 } as Meta;
 
-// TODO: show states in a single story
+// TODO: show states in a single story, i.e. hovver, disabled, menu open, etc.
 export function PlanCard() {
   return (
     <TableCardComponent
@@ -14,7 +14,7 @@ export function PlanCard() {
       subtitle="SFH-001"
       metadata={planMetadataComponent}
       type="card"
-      image="src/images/plan.png"
+      image="plan.png"
       imageFit="cover"
       tag={{ text: "Active", type: "success" }}
     />
@@ -29,7 +29,7 @@ export function BorderlessCard() {
       metadata={metadataComponent}
       type="card"
       bordered={false}
-      image="src/images/card-image.png"
+      image="card-image.png"
       buttonMenuItems={buttonMenuItems}
     />
   );
@@ -43,7 +43,7 @@ export function BorderedCard() {
       metadata={metadataComponent}
       type="card"
       bordered={true}
-      image="src/images/card-image.png"
+      image="card-image.png"
       buttonMenuItems={buttonMenuItems}
     />
   );
@@ -58,7 +58,7 @@ export function BorderedCardDisabled() {
       type="card"
       bordered={true}
       disabled={true}
-      image="src/images/card-image.png"
+      image="card-image.png"
       buttonMenuItems={buttonMenuItems}
     />
   );
@@ -72,7 +72,7 @@ export function BorderedlessListCard() {
       metadata={metadataComponent}
       type="list"
       bordered={false}
-      image="src/images/card-image.png"
+      image="card-image.png"
       buttonMenuItems={buttonMenuItems}
     />
   );
@@ -86,7 +86,7 @@ export function BorderedListCard() {
       metadata={metadataComponent}
       type="list"
       bordered={true}
-      image="src/images/card-image.png"
+      image="card-image.png"
       buttonMenuItems={buttonMenuItems}
     />
   );
