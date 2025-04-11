@@ -225,7 +225,9 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
     listFieldBooks: {
       name: "Book",
       rows: [{ title: boundTextField() }, { isPublished: boundSwitchField() }],
-      defaultValues: { isPublished: false, title: undefined },
+      onNew: (objectState) => {
+        objectState.add({ title: undefined, isPublished: false });
+      },
       onDelete: (field, objectState) => {
         if (objectState.id.value) {
           objectState.set({ delete: true });
