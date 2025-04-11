@@ -224,10 +224,9 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
   {
     listFieldBooks: {
       name: "Book",
-      rows: [{ title: boundTextField(), isPublished: boundSwitchField() }],
+      rows: [{ title: boundTextField() }, { isPublished: boundSwitchField() }],
       defaultValues: { isPublished: false, title: undefined },
       onDelete: (field, objectState) => {
-        console.log(objectState.id.value);
         if (objectState.id.value) {
           objectState.set({ delete: true });
         } else {
@@ -268,7 +267,7 @@ const formConfig: ObjectConfig<AuthorInput> = {
     config: {
       id: { type: "value" },
       isPublished: { type: "value" },
-      title: { type: "value" },
+      title: { type: "value", rules: [required] },
       delete: { type: "value" },
     },
   },

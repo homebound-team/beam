@@ -154,7 +154,7 @@ function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState:
   const itemFlexBasis = 100 / componentsWithConfig.length - 3;
 
   return (
-    <div css={Css.df.fww.gap2.$} {...tid}>
+    <div css={Css.df.fww.aic.gap2.$} {...tid}>
       {componentsWithConfig.map(({ component, key, minWidth }) => (
         <div css={Css.mw(minWidth).fb(`${itemFlexBasis}%`).fg1.$} key={key.toString()}>
           {isLoading ? <LoadingSkeleton size="lg" /> : component}
@@ -184,6 +184,13 @@ function ListField<F>({ row, formState }: { row: BoundFormRowInputs<F>; formStat
     [filterDeleted],
   );
 
+  // Ensure all list rows are valid (satisfied rules) before allowing the user to add a new row
+  const listIsValid = useComputed(() => listFieldObjectState.valid, [filteredRows]);
+
+  const onAdd = useCallback(() => {
+    listFieldObjectState.add(Object.assign({}, listFieldConfig.defaultValues));
+  }, [listFieldObjectState, listFieldConfig]);
+
   return (
     <Observer>
       {() => (
@@ -202,8 +209,9 @@ function ListField<F>({ row, formState }: { row: BoundFormRowInputs<F>; formStat
             <Button
               icon="plus"
               label={`Add ${listFieldConfig.name}`}
-              onClick={() => listFieldObjectState.add(Object.assign({}, listFieldConfig.defaultValues))}
+              onClick={onAdd}
               variant="secondary"
+              disabled={!listIsValid}
             />
           </div>
         </div>
