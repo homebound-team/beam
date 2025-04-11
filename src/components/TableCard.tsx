@@ -55,8 +55,9 @@ export function TableCard(props: TableCardProps) {
 
   return (
     <div css={styles} {...hoverProps}>
+      {/* Image */}
       <div css={Css.wPx(imageSize).hPx(imageSize).ba.br8.bcGray300.overflow("hidden").df.asc.jsc.relative.$}>
-        {/* Dark image overlay on hover */}
+        {/* overlay on hover */}
         <div
           css={{
             ...Css.absolute.top0.left0.w100.h100.add("opacity", 0).$,
@@ -65,6 +66,7 @@ export function TableCard(props: TableCardProps) {
         />
         <img css={Css.w100.h100.objectFit(imageFit).$} src={image} alt={title} />
       </div>
+      {/* Vertical Dots Button Menu */}
       {isHovered && buttonMenuItems && (
         <div css={Css.absolute.right1.top1.if(bordered && !isList).right3.top3.$}>
           <ButtonMenu
@@ -73,11 +75,13 @@ export function TableCard(props: TableCardProps) {
           />
         </div>
       )}
+      {/* Tag */}
       {tag && (
         <div css={Css.absolute.left1.top1.$}>
           <Tag type={tag?.type} text={tag?.text} />
         </div>
       )}
+      {/* Titles and metadata */}
       <div css={Css.df.fdc.aifs.gap1.$}>
         <div>
           <div css={Css.xsMd.gray700.$}>{subtitle}</div>
