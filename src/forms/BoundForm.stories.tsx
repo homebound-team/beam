@@ -37,7 +37,7 @@ export default {
 export function BoundForm() {
   const formState = useFormState({
     config: formConfig,
-    init: { input: { firstName: "John", lastName: "Doe" } },
+    init: { input: { firstName: "John", lastName: "Doe", books: [{ id: "b:1", title: "Book 1", isPublished: true }] } },
   });
 
   return (
@@ -221,6 +221,23 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
     }),
   },
 
+  {
+    listFieldBooks: {
+      name: "Book",
+      rows: [{ title: boundTextField(), isPublished: boundSwitchField() }],
+      defaultValues: { isPublished: false, title: undefined },
+      onDelete: (field, objectState) => {
+        console.log(objectState.id.value);
+        if (objectState.id.value) {
+          objectState.set({ delete: true });
+        } else {
+          field.remove(objectState.value);
+        }
+      },
+      filterDeleted: (objectState) => !objectState.delete?.value,
+    },
+  },
+
   // We can support any custom JSX node using the key `reactNode*`
   { reactNodeA: <CustomComponent /> },
 ];
@@ -246,4 +263,13 @@ const formConfig: ObjectConfig<AuthorInput> = {
   switchFieldExample2: { type: "value" },
   toggleChipGroupField: { type: "value" },
   treeSelectExample: { type: "value" },
+  books: {
+    type: "list",
+    config: {
+      id: { type: "value" },
+      isPublished: { type: "value" },
+      title: { type: "value" },
+      delete: { type: "value" },
+    },
+  },
 };
