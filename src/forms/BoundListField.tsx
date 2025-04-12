@@ -52,7 +52,7 @@ export function ListField<F>({ row, formState }: { row: BoundFormRowInputs<F>; f
   return (
     <Observer>
       {() => (
-        <div css={Css.df.fdc.gap3.ba.bcGray300.br4.p2.$}>
+        <div css={Css.df.fdc.gap3.$}>
           {filteredRows.map((rowState: ObjectState<ListSubFields<F, keyof F>>, index: number) => (
             <ListFieldRowInputs
               key={`listFieldRowInputs-${listFieldKey}-${index}`}
@@ -95,7 +95,7 @@ function ListFieldRowInputs<F>({
 
   return (
     <>
-      <div css={Css.df.jcsb.pb1.bb.bcGray300.$}>
+      <div css={Css.df.jcsb.$}>
         <span css={Css.baseSb.$}>
           {listFieldConfig.name} {rowNumber}
         </span>
