@@ -1,5 +1,5 @@
 import { FieldState, ObjectState } from "@homebound/form-state";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useCallback, useMemo } from "react";
 import { LoadingSkeleton } from "src/components";
 import { Css, Only, Properties } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -38,7 +38,7 @@ const reactNodePrefix = "reactNode";
 type TReactNodePrefix<S extends string> = `${typeof reactNodePrefix}${CapitalizeFirstLetter<S>}`;
 type CustomReactNodeKey = `${typeof reactNodePrefix}${string}`;
 
-const listFieldPrefix = "listField";
+export const listFieldPrefix = "listField";
 type TListFieldPrefix<S extends string> = `${typeof listFieldPrefix}${CapitalizeFirstLetter<S>}`;
 
 export type BoundFormRowInputs<F> = Partial<
@@ -81,6 +81,10 @@ export function BoundForm<F>(props: BoundFormProps<F>) {
 
   const tid = useTestIds({}, "boundForm");
 
+  const getRowKey = useCallback((row: BoundFormRowInputs<F>, rowType: string) => {
+    return `${rowType}-${Object.keys(row).join("-")}`;
+  }, []);
+
   return (
     <div {...tid}>
       <FormLines width="full" gap={3.5}>
@@ -94,10 +98,6 @@ export function BoundForm<F>(props: BoundFormProps<F>) {
       </FormLines>
     </div>
   );
-}
-
-function getRowKey<F>(row: BoundFormRowInputs<F>, rowType: string) {
-  return `${rowType}-${Object.keys(row).join("-")}`;
 }
 
 export function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState: ObjectState<F> }) {

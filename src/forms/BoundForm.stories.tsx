@@ -228,11 +228,11 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
       onNew: (objectState) => {
         objectState.add({ title: undefined, isPublished: false });
       },
-      onDelete: (field, objectState) => {
-        if (objectState.id.value) {
-          objectState.set({ delete: true });
+      onDelete: (listFieldState, rowObjectState) => {
+        if (rowObjectState.id.value) {
+          rowObjectState.set({ delete: true });
         } else {
-          field.remove(objectState.value);
+          listFieldState.remove(rowObjectState.value);
         }
       },
       filterDeleted: (objectState) => !objectState.delete?.value,

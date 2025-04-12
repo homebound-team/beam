@@ -1,11 +1,10 @@
 import { ListFieldState, ObjectState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { useCallback } from "react";
 import { Button, ButtonMenu } from "src/components";
 import { Css } from "src/Css";
 import { useComputed } from "src/hooks";
 import { fail } from "src/utils";
-import { BoundFormInputConfig, BoundFormRowInputs, FormRow } from "./BoundForm";
+import { BoundFormInputConfig, BoundFormRowInputs, FormRow, listFieldPrefix } from "./BoundForm";
 
 // Helper type to identify array type fields in the input type that contain objects
 // Where books: Books[] would be a valid listField, but bookIds: string[] would not
@@ -20,7 +19,10 @@ export type ListFieldConfig<F, K extends keyof F> = {
   name: string;
   onNew: (objectState: ListFieldState<ListSubFields<F, K>>) => void;
   rows: BoundFormInputConfig<ListSubFields<F, K>>;
-  onDelete?: (field: ObjectState<F>[K], objectState: ObjectState<ListSubFields<F, K>>) => void;
+  /** `onDelete` combined with `filterDeleted` specifies how to handle the deletion of a listField row.
+   * it is passed the both the top-level `listFieldState` as well as the individual row/record `objectState`.
+   * If left blank, the delete action menu will not be shown. */
+  onDelete?: (listFieldState: ObjectState<F>[K], rowObjectState: ObjectState<ListSubFields<F, K>>) => void;
   filterDeleted?: (objectState: ObjectState<ListSubFields<F, K>>) => boolean;
 };
 
@@ -91,11 +93,6 @@ function ListFieldRowInputs<F>({
 }) {
   const { onDelete } = listFieldConfig;
 
-  const onRowDelete = useCallback(() => {
-    if (!onDelete) return;
-    onDelete(formState[listFieldKey], rowState);
-  }, [onDelete, formState, listFieldKey, rowState]);
-
   return (
     <>
       <div css={Css.df.jcsb.pb1.bb.bcGray300.$}>
@@ -103,7 +100,10 @@ function ListFieldRowInputs<F>({
           {listFieldConfig.name} {rowNumber}
         </span>
         {onDelete && (
-          <ButtonMenu trigger={{ icon: "verticalDots" }} items={[{ label: "Delete", onClick: onRowDelete }]} />
+          <ButtonMenu
+            trigger={{ icon: "verticalDots" }}
+            items={[{ label: "Delete", onClick: () => onDelete(formState[listFieldKey], rowState) }]}
+          />
         )}
       </div>
       {listFieldConfig.rows.map((row, rowIndex) => (
@@ -114,7 +114,7 @@ function ListFieldRowInputs<F>({
 }
 
 export function isListFieldKey(key: string | number | symbol): key is ListFieldKey<unknown> {
-  return key.toString().startsWith("listField");
+  return key.toString().startsWith(listFieldPrefix);
 }
 
 export function isListFieldRow<F>(row: BoundFormRowInputs<F>) {
