@@ -12,9 +12,9 @@ export function PlanCard() {
     <TableCardComponent
       title="The Conroy"
       subtitle="SFH-001"
-      metadata={planMetadataComponent}
+      detailContent={planDetailsComponent}
       type="card"
-      image="plan.png"
+      imgSrc="plan-exterior.png"
       imageFit="cover"
       tag={{ text: "Active", type: "success" }}
     />
@@ -26,10 +26,10 @@ export function BorderlessCard() {
     <TableCardComponent
       title="Badger 5 Garbage Disposal 1/2 HP with Power Cord"
       subtitle="Insinkerator"
-      metadata={metadataComponent}
+      detailContent={detailsComponent}
       type="card"
       bordered={false}
-      image="card-image.png"
+      imgSrc="disposal.png"
       buttonMenuItems={buttonMenuItems}
     />
   );
@@ -40,10 +40,10 @@ export function BorderedCard() {
     <TableCardComponent
       title="Badger 5 Garbage Disposal 1/2 HP with Power Cord"
       subtitle="Insinkerator"
-      metadata={metadataComponent}
+      detailContent={detailsComponent}
       type="card"
       bordered={true}
-      image="card-image.png"
+      imgSrc="disposal.png"
       buttonMenuItems={buttonMenuItems}
     />
   );
@@ -54,11 +54,11 @@ export function BorderedCardDisabled() {
     <TableCardComponent
       title="Badger 5 Garbage Disposal 1/2 HP with Power Cord"
       subtitle="Insinkerator"
-      metadata={metadataComponent}
+      detailContent={detailsComponent}
       type="card"
       bordered={true}
       disabled={true}
-      image="card-image.png"
+      imgSrc="disposal.png"
       buttonMenuItems={buttonMenuItems}
     />
   );
@@ -69,10 +69,10 @@ export function BorderedlessListCard() {
     <TableCardComponent
       title="Badger 5 Garbage Disposal 1/2 HP with Power Cord"
       subtitle="Insinkerator"
-      metadata={metadataComponent}
+      detailContent={detailsComponent}
       type="list"
       bordered={false}
-      image="card-image.png"
+      imgSrc="disposal.png"
       buttonMenuItems={buttonMenuItems}
     />
   );
@@ -83,16 +83,16 @@ export function BorderedListCard() {
     <TableCardComponent
       title="Badger 5 Garbage Disposal 1/2 HP with Power Cord"
       subtitle="Insinkerator"
-      metadata={metadataComponent}
+      detailContent={detailsComponent}
       type="list"
       bordered={true}
-      image="card-image.png"
+      imgSrc="disposal.png"
       buttonMenuItems={buttonMenuItems}
     />
   );
 }
 
-const planMetadataComponent = (
+const planDetailsComponent = (
   <div css={Css.gray700.sm.$}>
     <div>4,000 - 5,000sf</div>
     <div>5-6bd / 5.5ba</div>
@@ -101,7 +101,7 @@ const planMetadataComponent = (
   </div>
 );
 
-const metadataComponent = (
+const detailsComponent = (
   <div css={Css.gray700.tiny.$}>
     <div>Model: VR12</div>
     <div>Code: PL-AIRSW-INSN-7900</div>
@@ -109,7 +109,7 @@ const metadataComponent = (
 );
 
 const buttonMenuItems = [
+  { label: "View", onClick: () => console.log("View") },
   { label: "Edit", onClick: () => console.log("Edit") },
   { label: "Delete", onClick: () => console.log("Delete") },
-  { label: "View", onClick: () => console.log("View") },
 ];
