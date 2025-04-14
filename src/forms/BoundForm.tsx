@@ -117,11 +117,10 @@ export function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; for
         return { component, key, minWidth };
       }
 
-      console.log(isCustomReactNodeKey(key), formState);
-      // Handle reactNode fields that are callbacks
+      // Handle reactNode fields that are functions (to get access to nested formState list rows)
       if (isCustomReactNodeKey(key) && typeof fieldFnOrCustomNode === "function") {
-        const nodeCallback = fieldFnOrCustomNode as (formState: ObjectState<F>) => ReactNode;
-        return { component: nodeCallback(formState), key };
+        const nodeAsFunction = fieldFnOrCustomNode as (formState: ObjectState<F>) => ReactNode;
+        return { component: nodeAsFunction(formState), key };
       }
 
       return { component: fieldFnOrCustomNode as ReactNode, key };
