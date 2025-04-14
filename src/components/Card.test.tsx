@@ -4,13 +4,13 @@ import { click, render } from "src/utils/rtl";
 import { Card, CardProps } from "./Card";
 
 describe("Card Component", () => {
-  const defaultProps = {
+  const defaultProps: CardProps = {
     title: "Test Card",
     subtitle: "Test Subtitle",
     imgSrc: "plan-exterior.png",
     detailContent: <div>Detail Content</div>,
     tag: { text: "Active", type: "success" },
-  } as CardProps;
+  };
 
   it("can render", async () => {
     // Given a card component
