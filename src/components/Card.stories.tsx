@@ -3,10 +3,10 @@ import { userEvent, waitFor, within } from "@storybook/test";
 import { PlayFunction } from "@storybook/types";
 import { Css, Properties } from "src/Css";
 import { newStory } from "src/utils/sb";
-import { TableCard as TableCardComponent, TableCardProps } from "./TableCard";
+import { Card as CardComponent, CardProps } from "./Card";
 
 export default {
-  component: TableCardComponent,
+  component: CardComponent,
 } as Meta;
 
 const planDetailsComponent = (
@@ -87,21 +87,21 @@ function hoverPlayFn({ click: shouldClick }: { click: boolean }): PlayFunction {
   };
 }
 
-function createCardStory(args: TableCardProps, hoverPlayFn?: PlayFunction, css?: Properties) {
+function createCardStory(args: CardProps, hoverPlayFn?: PlayFunction, css?: Properties) {
   return newStory(
     () => (
       <div css={{ ...Css.df.gap5.$, ...css }}>
         <div>
           <h2>Default</h2>
-          <TableCardComponent {...args} />
+          <CardComponent {...args} />
         </div>
         <div data-testid="hover">
           <h2>Hovered and Menu Clicked</h2>
-          <TableCardComponent {...args} />
+          <CardComponent {...args} />
         </div>
         <div data-testid="disabled">
           <h2>Disabled</h2>
-          <TableCardComponent {...args} disabled />
+          <CardComponent {...args} disabled />
         </div>
       </div>
     ),

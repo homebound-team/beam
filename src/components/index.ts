@@ -42,7 +42,7 @@ export * from "./Stepper";
 export type { Step, StepperProps } from "./Stepper";
 export * from "./SuperDrawer";
 export * from "./Table";
-export * from "./TableCard";
+export * from "./Card";
 export { TabContent, Tabs, TabsWithContent } from "./Tabs";
 export type { RouteTab, RouteTabWithContent, Tab, TabWithContent } from "./Tabs";
 export * from "./Tag";

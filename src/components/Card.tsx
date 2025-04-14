@@ -5,28 +5,28 @@ import { useTestIds } from "src/utils";
 import { ButtonMenu, MenuItem } from "./ButtonMenu";
 import { Tag, TagType } from "./Tag";
 
-export type TableCardType = "card" | "list";
+export type CardType = "card" | "list";
 export type ImageFitType = "contain" | "cover";
 export type CardTag = {
   text: string;
   type?: TagType;
 };
 
-export interface TableCardProps {
+export interface CardProps {
   title: string;
   subtitle: string;
   detailContent?: ReactNode;
   imgSrc: string;
   // contain displays entire image, cover fills the space
   imageFit?: ImageFitType;
-  type?: TableCardType;
+  type?: CardType;
   bordered?: boolean;
   disabled?: boolean;
   buttonMenuItems?: MenuItem[];
   tag?: CardTag;
 }
 
-export function TableCard(props: TableCardProps) {
+export function Card(props: CardProps) {
   const {
     title,
     subtitle,
@@ -94,7 +94,7 @@ export function TableCard(props: TableCardProps) {
 }
 
 const width = { card: 256, list: 520 };
-const baseStyles = (type: TableCardType) => Css.wPx(width[type]).bgWhite.df.fdc.gap1.relative.$;
+const baseStyles = (type: CardType) => Css.wPx(width[type]).bgWhite.df.fdc.gap1.relative.$;
 const listStyles = Css.df.fdr.gap2.$;
 const borderedStyles = Css.ba.br8.bcGray300.p2.$;
 const disabledStyles = Css.add("opacity", 0.5).add("transition", "opacity 0.3s ease").$;
