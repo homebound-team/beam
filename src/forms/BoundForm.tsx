@@ -37,6 +37,7 @@ type CapitalizeFirstLetter<S extends string> = S extends `${infer First}${infer 
 const reactNodePrefix = "reactNode";
 type TReactNodePrefix<S extends string> = `${typeof reactNodePrefix}${CapitalizeFirstLetter<S>}`;
 type CustomReactNodeKey = `${typeof reactNodePrefix}${string}`;
+type ReactNodeOrFn<F> = ReactNode | ((formState: ObjectState<F>) => ReactNode);
 
 export const listFieldPrefix = "listField";
 type TListFieldPrefix<S extends string> = `${typeof listFieldPrefix}${CapitalizeFirstLetter<S>}`;
@@ -45,9 +46,9 @@ export type BoundFormRowInputs<F> = Partial<
   {
     [K in keyof F]: BoundFieldInputFn<F>;
   } & {
-    [K in CustomReactNodeKey]: ReactNode;
+    [K in CustomReactNodeKey]: ReactNodeOrFn<F>;
   } & {
-    [K in keyof F as TReactNodePrefix<K & string>]: ReactNode;
+    [K in keyof F as TReactNodePrefix<K & string>]: ReactNodeOrFn<F>;
   } & {
     [K in ListFieldKey<F> as TListFieldPrefix<K & string>]: ListFieldConfig<F, K>;
   }
@@ -114,6 +115,13 @@ export function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; for
         const { component, minWidth } = fieldFn(field);
 
         return { component, key, minWidth };
+      }
+
+      console.log(isCustomReactNodeKey(key), formState);
+      // Handle reactNode fields that are callbacks
+      if (isCustomReactNodeKey(key) && typeof fieldFnOrCustomNode === "function") {
+        const nodeCallback = fieldFnOrCustomNode as (formState: ObjectState<F>) => ReactNode;
+        return { component: nodeCallback(formState), key };
       }
 
       return { component: fieldFnOrCustomNode as ReactNode, key };
