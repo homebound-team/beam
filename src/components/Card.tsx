@@ -64,7 +64,7 @@ export function Card(props: CardProps) {
           ...(isHovered && !isList && imageHoverStyles),
         }}
       >
-        <img css={Css.w100.h100.objectFit(imageFit).$} src={imgSrc} alt={title} />
+        <img css={Css.w100.h100.objectFit(imageFit).$} src={imgSrc} alt={title} {...tid.img} />
       </div>
       {/* Vertical Dots Button Menu */}
       {isHovered && buttonMenuItems && (
@@ -78,16 +78,20 @@ export function Card(props: CardProps) {
       {/* Tag */}
       {tag && (
         <div css={Css.absolute.left1.topPx(4).$}>
-          <Tag type={tag?.type} text={tag?.text} />
+          <Tag type={tag?.type} text={tag?.text} {...tid.tag} />
         </div>
       )}
       {/* Titles and detailContent */}
       <div css={Css.df.fdc.aifs.gap1.$}>
         <div>
-          <div css={Css.xsMd.gray700.$}>{subtitle}</div>
-          <div css={Css.smMd.gray900.if(isHovered).blue700.$}>{title}</div>
+          <div css={Css.xsMd.gray700.$} {...tid.subtitle}>
+            {subtitle}
+          </div>
+          <div css={Css.smMd.gray900.if(isHovered).blue700.$} {...tid.title}>
+            {title}
+          </div>
         </div>
-        {detailContent}
+        <div {...tid.details}>{detailContent}</div>
       </div>
     </div>
   );
