@@ -3,7 +3,7 @@ import { Observer } from "mobx-react";
 import { Button, ButtonMenu } from "src/components";
 import { Css } from "src/Css";
 import { useComputed } from "src/hooks";
-import { fail } from "src/utils";
+import { fail, useTestIds } from "src/utils";
 import { BoundFormInputConfig, BoundFormRowInputs, FormRow, listFieldPrefix } from "./BoundForm";
 
 // Helper type to identify array type fields in the input type that contain objects
@@ -37,6 +37,7 @@ export function ListField<F>({ row, formState }: { row: BoundFormRowInputs<F>; f
   const listFieldObjectState = formState[listFieldKey] as unknown as ListFieldState<ListSubFields<F, keyof F>>;
 
   const { filterDeleted, onNew } = listFieldConfig;
+  const tid = useTestIds({}, "listField");
 
   const filteredRows = useComputed(
     () =>
@@ -52,7 +53,7 @@ export function ListField<F>({ row, formState }: { row: BoundFormRowInputs<F>; f
   return (
     <Observer>
       {() => (
-        <div css={Css.df.fdc.gap3.$}>
+        <div css={Css.df.fdc.gap3.$} {...tid}>
           {filteredRows.map((rowState: ObjectState<ListSubFields<F, keyof F>>, index: number) => (
             <ListFieldRowInputs
               key={`listFieldRowInputs-${listFieldKey}-${index}`}
@@ -92,17 +93,19 @@ function ListFieldRowInputs<F>({
   listFieldKey: ListFieldKey<F>;
 }) {
   const { onDelete } = listFieldConfig;
+  const tid = useTestIds({}, "listFieldRow");
 
   return (
     <>
-      <div css={Css.df.jcsb.$}>
-        <span css={Css.baseSb.$}>
+      <div css={Css.df.jcsb.$} {...tid}>
+        <span css={Css.baseSb.$} {...tid.name}>
           {listFieldConfig.name} {rowNumber}
         </span>
         {onDelete && (
           <ButtonMenu
             trigger={{ icon: "verticalDots" }}
             items={[{ label: "Delete", onClick: () => onDelete(formState[listFieldKey], rowState) }]}
+            {...tid.menu}
           />
         )}
       </div>
