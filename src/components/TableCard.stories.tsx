@@ -1,96 +1,13 @@
 import { Meta } from "@storybook/react";
-import { Css } from "src/Css";
-import { TableCard as TableCardComponent } from "./TableCard";
+import { userEvent, waitFor, within } from "@storybook/test";
+import { PlayFunction } from "@storybook/types";
+import { Css, Properties } from "src/Css";
+import { newStory } from "src/utils/sb";
+import { TableCard as TableCardComponent, TableCardProps } from "./TableCard";
 
 export default {
   component: TableCardComponent,
 } as Meta;
-
-// TODO: show states in a single story, i.e. hovver, disabled, menu open, etc.
-export function PlanCard() {
-  return (
-    <TableCardComponent
-      title="The Conroy"
-      subtitle="SFH-001"
-      detailContent={planDetailsComponent}
-      type="card"
-      imgSrc="plan-exterior.png"
-      imageFit="cover"
-      tag={{ text: "Active", type: "success" }}
-    />
-  );
-}
-
-export function BorderlessCard() {
-  return (
-    <TableCardComponent
-      title="Badger 5 Garbage Disposal 1/2 HP with Power Cord"
-      subtitle="Insinkerator"
-      detailContent={detailsComponent}
-      type="card"
-      bordered={false}
-      imgSrc="disposal.png"
-      buttonMenuItems={buttonMenuItems}
-    />
-  );
-}
-
-export function BorderedCard() {
-  return (
-    <TableCardComponent
-      title="Badger 5 Garbage Disposal 1/2 HP with Power Cord"
-      subtitle="Insinkerator"
-      detailContent={detailsComponent}
-      type="card"
-      bordered={true}
-      imgSrc="disposal.png"
-      buttonMenuItems={buttonMenuItems}
-    />
-  );
-}
-
-export function BorderedCardDisabled() {
-  return (
-    <TableCardComponent
-      title="Badger 5 Garbage Disposal 1/2 HP with Power Cord"
-      subtitle="Insinkerator"
-      detailContent={detailsComponent}
-      type="card"
-      bordered={true}
-      disabled={true}
-      imgSrc="disposal.png"
-      buttonMenuItems={buttonMenuItems}
-    />
-  );
-}
-
-export function BorderedlessListCard() {
-  return (
-    <TableCardComponent
-      title="Badger 5 Garbage Disposal 1/2 HP with Power Cord"
-      subtitle="Insinkerator"
-      detailContent={detailsComponent}
-      type="list"
-      bordered={false}
-      imgSrc="disposal.png"
-      buttonMenuItems={buttonMenuItems}
-    />
-  );
-}
-
-export function BorderedListCard() {
-  return (
-    <TableCardComponent
-      title="Badger 5 Garbage Disposal 1/2 HP with Power Cord"
-      subtitle="Insinkerator"
-      detailContent={detailsComponent}
-      type="list"
-      bordered={true}
-      imgSrc="disposal.png"
-      buttonMenuItems={buttonMenuItems}
-    />
-  );
-}
 
 const planDetailsComponent = (
   <div css={Css.gray700.sm.$}>
@@ -113,3 +30,81 @@ const buttonMenuItems = [
   { label: "Edit", onClick: () => console.log("Edit") },
   { label: "Delete", onClick: () => console.log("Delete") },
 ];
+
+const baseArgs = {
+  title: "Badger 5 Garbage Disposal 1/2 HP with Power Cord",
+  subtitle: "Insinkerator",
+  detailContent: detailsComponent,
+  imgSrc: "disposal.png",
+  buttonMenuItems: buttonMenuItems,
+};
+
+export const PlanCard = createCardStory(
+  {
+    title: "The Conroy",
+    subtitle: "SFH-001",
+    detailContent: planDetailsComponent,
+    type: "card",
+    imgSrc: "plan-exterior.png",
+    imageFit: "cover",
+    tag: { text: "Active", type: "success" },
+  },
+  hoverPlayFn({ click: false }),
+);
+
+export const BorderlessCard = createCardStory(
+  { ...baseArgs, type: "card", bordered: false },
+  hoverPlayFn({ click: true }),
+);
+
+export const BorderedCard = createCardStory(
+  { ...baseArgs, type: "card", bordered: true },
+  hoverPlayFn({ click: true }),
+);
+
+export const BorderlessListCard = createCardStory(
+  { ...baseArgs, type: "list", bordered: false },
+  hoverPlayFn({ click: true }),
+  { ...Css.fdc.$ },
+);
+
+export const BorderedListCard = createCardStory(
+  { ...baseArgs, type: "list", bordered: true },
+  hoverPlayFn({ click: true }),
+  { ...Css.fdc.$ },
+);
+
+function hoverPlayFn({ click: shouldClick }: { click: boolean }): PlayFunction {
+  return async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const hoverElement = canvas.getByTestId("hover");
+    return waitFor(async () => {
+      await userEvent.hover(within(hoverElement).getByTestId("card"));
+      if (shouldClick) {
+        await userEvent.click(canvas.getByTestId("verticalDots"));
+      }
+    });
+  };
+}
+
+function createCardStory(args: TableCardProps, hoverPlayFn?: PlayFunction, css?: Properties) {
+  return newStory(
+    () => (
+      <div css={{ ...Css.df.gap5.$, ...css }}>
+        <div>
+          <h2>Default</h2>
+          <TableCardComponent {...args} />
+        </div>
+        <div data-testid="hover">
+          <h2>Hovered and Menu Clicked</h2>
+          <TableCardComponent {...args} />
+        </div>
+        <div data-testid="disabled">
+          <h2>Disabled</h2>
+          <TableCardComponent {...args} disabled />
+        </div>
+      </div>
+    ),
+    { play: hoverPlayFn },
+  );
+}

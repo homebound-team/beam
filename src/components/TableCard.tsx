@@ -1,12 +1,13 @@
 import { ReactNode, useMemo } from "react";
 import { useHover } from "react-aria";
 import { Css, Palette } from "src/Css";
+import { useTestIds } from "src/utils";
 import { ButtonMenu, MenuItem } from "./ButtonMenu";
 import { Tag, TagType } from "./Tag";
 
 export type TableCardType = "card" | "list";
-
-type CardTag = {
+export type ImageFitType = "contain" | "cover";
+export type CardTag = {
   text: string;
   type?: TagType;
 };
@@ -17,7 +18,7 @@ export interface TableCardProps {
   detailContent?: ReactNode;
   imgSrc: string;
   // contain displays entire image, cover fills the space
-  imageFit?: "contain" | "cover";
+  imageFit?: ImageFitType;
   type?: TableCardType;
   bordered?: boolean;
   disabled?: boolean;
@@ -38,6 +39,7 @@ export function TableCard(props: TableCardProps) {
     buttonMenuItems,
     tag,
   } = props;
+  const tid = useTestIds(props, "card");
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const isList = type === "list";
   const imgHeight = isList ? 96 : bordered ? 224 : 256;
@@ -54,7 +56,7 @@ export function TableCard(props: TableCardProps) {
   );
 
   return (
-    <div css={styles} {...hoverProps}>
+    <div css={styles} {...hoverProps} {...tid}>
       {/* Image */}
       <div
         css={{
