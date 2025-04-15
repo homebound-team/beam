@@ -1,4 +1,4 @@
-import { ObjectConfig, required, useFormState } from "@homebound/form-state";
+import { FieldState, ObjectConfig, required, useFormState } from "@homebound/form-state";
 import { Meta } from "@storybook/react";
 import { useEffect, useState } from "react";
 import { Css } from "src/Css";
@@ -27,6 +27,7 @@ import { NestedOption } from "src/inputs";
 import { IconCardGroupItemOption } from "src/inputs/IconCardGroup";
 import { HasIdAndName } from "src/types";
 import { withBeamDecorator } from "src/utils/sb";
+import { BoundTextAreaField } from "./BoundTextAreaField";
 import { AuthorInput as BaseAuthorInput } from "./formStateDomain";
 
 export default {
@@ -37,7 +38,13 @@ export default {
 export function BoundForm() {
   const formState = useFormState({
     config: formConfig,
-    init: { input: { firstName: "John", lastName: "Doe" } },
+    init: {
+      input: {
+        firstName: "John",
+        lastName: "Doe",
+        books: [{ id: "b:1", title: "Book 1", isPublished: true, summary: "Example summary" }],
+      },
+    },
   });
 
   return (
@@ -123,6 +130,16 @@ export function LoadingBoundForm() {
 
 function CustomComponent() {
   return <div css={Css.p4.br4.ba.bcGray200.$}>Example Custom Component</div>;
+}
+
+// Wrapper around the BoundTextAreaField to test the `reactNode: (rowState) => ReactNode`
+// works for getting access to "row" level object states for list fields
+function CustomSummaryField({ field }: { field: FieldState<string | null | undefined> }) {
+  return (
+    <div>
+      <BoundTextAreaField label="Summary" field={field} />
+    </div>
+  );
 }
 
 const sportsOptions = [
@@ -221,6 +238,28 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
     }),
   },
 
+  {
+    listFieldBooks: {
+      name: "Book",
+      rows: [
+        { title: boundTextField() },
+        { isPublished: boundSwitchField() },
+        { reactNodeSummary: (rowState) => <CustomSummaryField field={rowState.summary} /> },
+      ],
+      onNew: (objectState) => {
+        objectState.add({ title: undefined, isPublished: false, summary: undefined });
+      },
+      onDelete: (listFieldState, rowObjectState) => {
+        if (rowObjectState.id.value) {
+          rowObjectState.set({ delete: true });
+        } else {
+          listFieldState.remove(rowObjectState.value);
+        }
+      },
+      filterDeleted: (rowObjectState) => !rowObjectState.delete?.value,
+    },
+  },
+
   // We can support any custom JSX node using the key `reactNode*`
   { reactNodeA: <CustomComponent /> },
 ];
@@ -246,4 +285,14 @@ const formConfig: ObjectConfig<AuthorInput> = {
   switchFieldExample2: { type: "value" },
   toggleChipGroupField: { type: "value" },
   treeSelectExample: { type: "value" },
+  books: {
+    type: "list",
+    config: {
+      id: { type: "value" },
+      isPublished: { type: "value" },
+      title: { type: "value", rules: [required] },
+      delete: { type: "value" },
+      summary: { type: "value" },
+    },
+  },
 };

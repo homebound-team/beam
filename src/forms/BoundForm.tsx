@@ -1,5 +1,5 @@
 import { FieldState, ObjectState } from "@homebound/form-state";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useCallback, useMemo } from "react";
 import { LoadingSkeleton } from "src/components";
 import { Css, Only, Properties } from "src/Css";
 import { useComputed } from "src/hooks";
@@ -12,6 +12,7 @@ import { BoundDateField, BoundDateFieldProps } from "./BoundDateField";
 import { BoundDateRangeField, BoundDateRangeFieldProps } from "./BoundDateRangeField";
 import { BoundIconCardField, BoundIconCardFieldProps } from "./BoundIconCardField";
 import { BoundIconCardGroupField, BoundIconCardGroupFieldProps } from "./BoundIconCardGroupField";
+import { isListFieldRow, ListField, ListFieldConfig, ListFieldKey } from "./BoundListField";
 import { BoundMultiLineSelectField, BoundMultiLineSelectFieldProps } from "./BoundMultiLineSelectField";
 import { BoundMultiSelectField, BoundMultiSelectFieldProps } from "./BoundMultiSelectField";
 import { BoundNumberField, BoundNumberFieldProps } from "./BoundNumberField";
@@ -35,16 +36,21 @@ type CapitalizeFirstLetter<S extends string> = S extends `${infer First}${infer 
   : S;
 const reactNodePrefix = "reactNode";
 type TReactNodePrefix<S extends string> = `${typeof reactNodePrefix}${CapitalizeFirstLetter<S>}`;
-
 type CustomReactNodeKey = `${typeof reactNodePrefix}${string}`;
+type ReactNodeOrFn<F> = ReactNode | ((formState: ObjectState<F>) => ReactNode);
 
-type BoundFormRowInputs<F> = Partial<
+export const listFieldPrefix = "listField";
+type TListFieldPrefix<S extends string> = `${typeof listFieldPrefix}${CapitalizeFirstLetter<S>}`;
+
+export type BoundFormRowInputs<F> = Partial<
   {
     [K in keyof F]: BoundFieldInputFn<F>;
   } & {
-    [K in CustomReactNodeKey]: ReactNode;
+    [K in CustomReactNodeKey]: ReactNodeOrFn<F>;
   } & {
-    [K in keyof F as TReactNodePrefix<K & string>]: ReactNode;
+    [K in keyof F as TReactNodePrefix<K & string>]: ReactNodeOrFn<F>;
+  } & {
+    [K in ListFieldKey<F> as TListFieldPrefix<K & string>]: ListFieldConfig<F, K>;
   }
 >;
 
@@ -76,21 +82,29 @@ export function BoundForm<F>(props: BoundFormProps<F>) {
 
   const tid = useTestIds({}, "boundForm");
 
+  const getRowKey = useCallback((row: BoundFormRowInputs<F>, rowType: string) => {
+    return `${rowType}-${Object.keys(row).join("-")}`;
+  }, []);
+
   return (
     <div {...tid}>
       <FormLines width="full" gap={3.5}>
-        {rows.map((row) => (
-          <FormRow key={`fieldGroup-${Object.keys(row).join("-")}`} row={row} formState={formState} />
-        ))}
+        {rows.map((row) =>
+          isListFieldRow(row) ? (
+            <ListField key={getRowKey(row, "listField")} row={row} formState={formState} />
+          ) : (
+            <FormRow key={getRowKey(row, "fieldGroup")} row={row} formState={formState} />
+          ),
+        )}
       </FormLines>
     </div>
   );
 }
 
-function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState: ObjectState<F> }) {
+export function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState: ObjectState<F> }) {
   const tid = useTestIds({}, "boundFormRow");
 
-  /**  Extract the bound input components with their sizing config or render any "custom" JSX node as-is */
+  /** Extract the bound input components with their sizing config or render any "custom" JSX node as-is */
   const componentsWithConfig = useMemo(() => {
     return Object.entries(row).map(([key, fieldFnOrCustomNode]) => {
       if (typeof fieldFnOrCustomNode === "function" && !isCustomReactNodeKey(key)) {
@@ -101,6 +115,12 @@ function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState:
         const { component, minWidth } = fieldFn(field);
 
         return { component, key, minWidth };
+      }
+
+      // Handle reactNode fields that are functions (to get access to nested formState list rows)
+      if (isCustomReactNodeKey(key) && typeof fieldFnOrCustomNode === "function") {
+        const nodeAsFunction = fieldFnOrCustomNode as (formState: ObjectState<F>) => ReactNode;
+        return { component: nodeAsFunction(formState), key };
       }
 
       return { component: fieldFnOrCustomNode as ReactNode, key };
@@ -115,7 +135,7 @@ function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState:
   const itemFlexBasis = 100 / componentsWithConfig.length - 3;
 
   return (
-    <div css={Css.df.fww.gap2.$} {...tid}>
+    <div css={Css.df.fww.aic.gap2.$} {...tid}>
       {componentsWithConfig.map(({ component, key, minWidth }) => (
         <div css={Css.mw(minWidth).fb(`${itemFlexBasis}%`).fg1.$} key={key.toString()}>
           {isLoading ? <LoadingSkeleton size="lg" /> : component}

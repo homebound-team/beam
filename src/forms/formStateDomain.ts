@@ -47,6 +47,7 @@ export interface AuthorAddress {
 export interface BookInput {
   id?: string | null | undefined;
   title?: string | null | undefined;
+  summary?: string | null | undefined;
   classification?: DeweyDecimalClassification;
   delete?: boolean | null | undefined;
   isPublished?: boolean;
