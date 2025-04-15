@@ -51,16 +51,12 @@ export function ScrollShadows(props: ScrollShadowsProps) {
       setShowStartShadow(start > 0);
       setShowEndShadow(start + boxSize < end);
     },
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [horizontal],
   );
 
   // Use a ResizeObserver to update the scroll props to determine if the shadows should be shown.
   // This executes on render and subsequent resizes which could be due to content/`children` changes (such as responses from APIs).
-  // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const onResize = useCallback(() => scrollRef.current && updateScrollProps(scrollRef.current), []);
+  const onResize = useCallback(() => scrollRef.current && updateScrollProps(scrollRef.current), [updateScrollProps]);
   useResizeObserver({ ref: scrollRef, onResize });
 
   return (
@@ -73,8 +69,8 @@ export function ScrollShadows(props: ScrollShadowsProps) {
       }
       {...tid}
     >
-      {showStartShadow && <div css={startShadowStyles} />}
-      {showEndShadow && <div css={endShadowStyles} />}
+      <div css={{ ...startShadowStyles, opacity: showStartShadow ? 1 : 0 }} data-chromatic="ignore" />
+      <div css={{ ...endShadowStyles, opacity: showEndShadow ? 1 : 0 }} data-chromatic="ignore" />
       <div
         css={{
           ...xss,
