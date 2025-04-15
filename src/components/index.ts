@@ -16,6 +16,7 @@ export * from "./ButtonDatePicker";
 export * from "./ButtonGroup";
 export * from "./ButtonMenu";
 export * from "./ButtonModal";
+export * from "./Card";
 export * from "./Copy";
 export * from "./CssReset";
 export * from "./DnDGrid";
