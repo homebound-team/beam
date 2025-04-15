@@ -23,7 +23,7 @@ export type ListFieldConfig<F, K extends keyof F> = {
    * it is passed the both the top-level `listFieldState` as well as the individual row/record `objectState`.
    * If left blank, the delete action menu will not be shown. */
   onDelete?: (listFieldState: ObjectState<F>[K], rowObjectState: ObjectState<ListSubFields<F, K>>) => void;
-  filterDeleted?: (objectState: ObjectState<ListSubFields<F, K>>) => boolean;
+  filterDeleted?: (rowObjectState: ObjectState<ListSubFields<F, K>>) => boolean;
 };
 
 export function ListField<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState: ObjectState<F> }) {

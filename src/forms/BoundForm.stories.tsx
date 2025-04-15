@@ -256,7 +256,7 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
           listFieldState.remove(rowObjectState.value);
         }
       },
-      filterDeleted: (objectState) => !objectState.delete?.value,
+      filterDeleted: (rowObjectState) => !rowObjectState.delete?.value,
     },
   },
 
