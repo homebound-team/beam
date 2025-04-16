@@ -2,11 +2,18 @@ import { camelCase } from "change-case";
 import { Key, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useButton, useFocus, useOverlayPosition, useSelect } from "react-aria";
 import { Item, Section, useListData, useSelectState } from "react-stately";
-import { Icon, maybeTooltip, resolveTooltip } from "src/components";
+import {
+  chipBaseStyles,
+  chipDisabledStyles,
+  chipHoverStyles,
+  Icon,
+  maybeTooltip,
+  resolveTooltip,
+} from "src/components";
 import { Popover } from "src/components/internal";
 import { Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { ChipTextField } from "src/inputs/ChipTextField";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { ListBoxChip } from "src/inputs/internal/ListBoxChip";
@@ -62,7 +69,7 @@ export function ChipSelectField<O, V extends Value>(
   const typeScale = fieldProps?.typeScale ?? "sm";
   const isDisabled = !!disabled;
   const showClearButton = !disabled && clearable && !!value;
-  const chipStyles = useMemo(() => Css[typeScale].tal.bgGray300.gray900.br16.pxPx(10).pyPx(2).$, [typeScale]);
+  const chipStyles = { ...chipBaseStyles(), ...Css.pyPx(2).gap0.aiStretch.$ };
   // Controls showing the focus border styles.
   const [visualFocus, setVisualFocus] = useState(false);
   const [isClearFocused, setIsClearFocused] = useState(false);
@@ -241,7 +248,7 @@ export function ChipSelectField<O, V extends Value>(
             ref={wrapperRef}
             css={{
               ...chipStyles,
-              ...Css.dif.relative.p0.mwPx(32).if(!value).bgGray200.$,
+              ...Css.relative.p0.mwPx(32).$,
               ...(visualFocus ? Css.bshFocus.$ : {}),
               ...(showInput ? Css.dn.$ : {}),
             }}
@@ -252,8 +259,8 @@ export function ChipSelectField<O, V extends Value>(
               ref={buttonRef}
               css={{
                 ...Css.tal.br16.pxPx(10).pyPx(2).outline0.if(showClearButton).prPx(4).borderRadius("16px 0 0 16px").$,
-                ...(isDisabled ? Css.cursorNotAllowed.gray700.$ : {}),
-                "&:hover:not(:disabled)": Css.bgGray400.if(!value).bgGray300.$,
+                ...(isDisabled ? chipDisabledStyles : {}),
+                "&:hover:not(:disabled)": chipHoverStyles,
               }}
               title={state.selectedItem ? state.selectedItem.textValue : placeholder}
               {...tid}
@@ -267,7 +274,7 @@ export function ChipSelectField<O, V extends Value>(
                 {...clearFocusProps}
                 css={{
                   ...Css.prPx(4).borderRadius("0 16px 16px 0").outline0.$,
-                  "&:hover": Css.bgGray400.$,
+                  "&:hover": chipHoverStyles,
                   ...(isClearFocused ? Css.boxShadow(`0px 0px 0px 2px rgba(3,105,161,1)`).$ : {}),
                 }}
                 onClick={() => {
@@ -277,7 +284,7 @@ export function ChipSelectField<O, V extends Value>(
                 aria-label="Remove"
                 {...tid.clearButton}
               >
-                <Icon icon="x" inc={typeScale === "xs" ? 2 : undefined} />
+                <Icon icon="x" color={Palette.Gray600} inc={typeScale === "xs" ? 2 : undefined} />
               </button>
             )}
           </div>

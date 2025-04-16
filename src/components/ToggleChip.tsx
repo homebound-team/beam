@@ -30,11 +30,11 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
       type="button"
       css={{
         ...chipBaseStyles(compact),
-        ...(isHovered && !disabled && hoverStyles),
+        ...(isHovered && !disabled && chipHoverStyles),
         ...(active && activeStyles),
         // Use a lower right-padding to get closer to the `X` circle when clearable
         ...(clearable && Css.prPx(4).$),
-        ...(disabled && disabledStyles),
+        ...(disabled && { ...chipDisabledStyles, ...Css.pr1.$ }),
         ...xss,
       }}
       disabled={disabled}
@@ -51,7 +51,7 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
         {text}
       </span>
       {!disabled && clearable && (
-        <span css={{ ...Css.fs0.br16.bgGray100.$, ...(isHovered && !disabled && hoverStyles) }} {...tid.x}>
+        <span css={{ ...Css.fs0.br16.bgGray100.$, ...(isHovered && !disabled && chipHoverStyles) }} {...tid.x}>
           <Icon icon="x" color={Palette.Gray600} inc={2} />
         </span>
       )}
@@ -59,6 +59,6 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
   );
 }
 
-const hoverStyles = Css.bgGray200.$;
-const disabledStyles = Css.gray600.cursorNotAllowed.pr1.$;
+export const chipHoverStyles = Css.bgGray200.$;
+export const chipDisabledStyles = Css.gray600.cursorNotAllowed.$;
 const activeStyles = Css.bgBlue600.white.$;
