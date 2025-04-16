@@ -49,7 +49,7 @@ export const DefaultToggleChip = newStory(
   {
     play: async ({ canvasElement }) => {
       const canvas = within(canvasElement);
-      const chip = canvas.getByText("Hovered chip");
+      const chip = canvas.getByText("Hovered");
       return waitFor(async () => {
         await userEvent.hover(chip);
       });
