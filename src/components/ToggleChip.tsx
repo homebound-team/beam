@@ -43,7 +43,7 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
       {...tid}
     >
       {icon && (
-        <span css={Css.fs0.$}>
+        <span css={Css.fs0.$} {...tid.icon}>
           <Icon icon={icon} color={Palette.Gray900} inc={2} />
         </span>
       )}
@@ -51,7 +51,7 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
         {text}
       </span>
       {!disabled && clearable && (
-        <span css={{ ...Css.fs0.br16.bgGray100.$, ...(isHovered && !disabled && hoverStyles) }}>
+        <span css={{ ...Css.fs0.br16.bgGray100.$, ...(isHovered && !disabled && hoverStyles) }} {...tid.x}>
           <Icon icon="x" color={Palette.Gray600} inc={2} />
         </span>
       )}
