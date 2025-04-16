@@ -1,9 +1,9 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
 import { waitFor, within } from "@storybook/test";
-import { useState } from "react";
 import { Css } from "src/Css";
 import { ChipTextField } from "src/inputs/ChipTextField";
+import { noop } from "src/utils";
 import { newStory } from "src/utils/sb";
 
 export default {
@@ -18,22 +18,20 @@ export default {
 
 export const DefaultChip = newStory(
   () => {
-    const [value, setValue] = useState("Add new");
-
     return (
       <div css={Css.df.gap1.bgWhite.p2.$}>
         <ChipTextField
-          value={value}
+          value="Add new"
           label="Chip Field"
-          onChange={setValue}
+          onChange={noop}
           onFocus={action("onFocus")}
           onBlur={action("onBlur")}
           required
         />
         <ChipTextField
-          value={value}
+          value={"Focused"}
           label="Focused"
-          onChange={setValue}
+          onChange={noop}
           onFocus={action("onFocus")}
           onBlur={action("onBlur")}
           autoFocus
