@@ -1,7 +1,9 @@
-import { Icon } from "src/components/Icon";
+import { Icon, IconKey } from "src/components/Icon";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Margin, Only, Palette, Xss } from "src/Css";
+import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils/useTestIds";
+import { chipBaseStyles } from "./Chip";
 
 type ToggleChipXss = Xss<Margin>;
 
@@ -10,11 +12,16 @@ export interface ToggleChipProps<X> {
   onClick: () => void;
   xss?: X;
   disabled?: boolean;
+  icon?: IconKey;
+  clearable?: boolean;
+  active?: boolean;
 }
 
 export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipProps<X>) {
-  const { text, onClick, xss = {}, disabled = false } = props;
+  const { text, onClick, xss = {}, disabled = false, icon, clearable = true, active = false } = props;
   const { fieldProps } = usePresentationContext();
+  const { hoverProps, isHovered } = useHover({});
+
   // If compact, then use a smaller type scale
   const compact = fieldProps?.compact;
   const tid = useTestIds(props, "chip");
@@ -22,28 +29,36 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
     <button
       type="button"
       css={{
-        ...Css[compact ? "xs" : "sm"].dif.aic.br16.pl1
-          // Use a lower right-padding to get closer to the `X` circle when not disabled
-          .prPx(2)
-          .pyPx(2)
-          .gray900.bgGray200.if(disabled)
-          .gray600.pr1.mhPx(compact ? 20 : 28).$,
-        "&:hover:not(:disabled)": Css.bgGray300.$,
-        "&:disabled": Css.cursorNotAllowed.$,
+        ...chipBaseStyles(compact),
+        ...(isHovered && !disabled && hoverStyles),
+        ...(active && activeStyles),
+        // Use a lower right-padding to get closer to the `X` circle when clearable
+        ...(clearable && Css.prPx(4).$),
+        ...(disabled && disabledStyles),
         ...xss,
       }}
       disabled={disabled}
       onClick={onClick}
+      {...hoverProps}
       {...tid}
     >
-      <span css={Css.prPx(6).tal.lineClamp1.wbba.if(disabled).pr0.$} title={text}>
+      {icon && (
+        <span css={Css.fs0.$}>
+          <Icon icon={icon} color={Palette.Gray900} inc={2} />
+        </span>
+      )}
+      <span css={Css.tal.lineClamp1.wbba.if(disabled).pr0.$} title={text}>
         {text}
       </span>
-      {!disabled && (
-        <span css={Css.fs0.br16.bgGray400.$}>
-          <Icon icon="x" color={Palette.Gray700} inc={compact ? 2 : undefined} />
+      {!disabled && clearable && (
+        <span css={{ ...Css.fs0.br16.bgGray100.$, ...(isHovered && !disabled && hoverStyles) }}>
+          <Icon icon="x" color={Palette.Gray600} inc={2} />
         </span>
       )}
     </button>
   );
 }
+
+const hoverStyles = Css.bgGray200.$;
+const disabledStyles = Css.gray600.cursorNotAllowed.pr1.$;
+const activeStyles = Css.bgBlue600.white.$;

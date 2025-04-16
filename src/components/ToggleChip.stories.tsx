@@ -14,20 +14,25 @@ export default {
 
 export function DefaultToggleChip() {
   return (
-    <div css={Css.df.fdc.gap4.$}>
+    <div css={Css.df.fdc.gap4.bgWhite.p2.$}>
       <div css={Css.wPx(300).df.fdc.aifs.gap2.$}>
-        <ToggleChip text="First Last" onClick={action("click")} />
-        <ToggleChip text="Disabled Chip" disabled onClick={action("click")} />
-        <ToggleChip text={"First Last ".repeat(10)} onClick={action("click")} />
+        <ToggleChip text="Input chip" onClick={action("click")} />
+        <ToggleChip text="Input chip" icon="attachment" onClick={action("click")} />
+        <ToggleChip text="Disabled chip" disabled onClick={action("click")} />
+        <ToggleChip text="Filter chip" clearable={false} onClick={action("click")} />
+        <ToggleChip text="Filter chip" clearable={false} active={true} onClick={action("click")} />
+        <ToggleChip text="+2 more" clearable={false} active={true} onClick={action("click")} />
+        <ToggleChip text={"Input chip ".repeat(10)} icon="attachment" onClick={action("click")} />
       </div>
 
       <div>
         <h2 css={Css.mb1.$}>Compact</h2>
         <div css={Css.wPx(300).df.fdc.aifs.gap2.$}>
           <PresentationProvider fieldProps={{ compact: true }}>
-            <ToggleChip text="First Last" onClick={action("click")} />
+            <ToggleChip text="Input chip" onClick={action("click")} />
+            <ToggleChip text="Input chip" icon="attachment" onClick={action("click")} />
             <ToggleChip text="Disabled Chip" disabled onClick={action("click")} />
-            <ToggleChip text={"First Last ".repeat(10)} onClick={action("click")} />
+            <ToggleChip text={"Input chip ".repeat(10)} icon="attachment" onClick={action("click")} />
           </PresentationProvider>
         </div>
       </div>
