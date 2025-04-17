@@ -10,7 +10,7 @@ export function ListBoxChip({ label }: ListBoxChipProps) {
   const { fieldProps } = usePresentationContext();
 
   return (
-    <span css={{ ...chipBaseStyles(fieldProps?.compact), ...Css.lineClamp1.wbba.$ }} title={label}>
+    <span css={{ ...chipBaseStyles(fieldProps?.compact), ...Css.truncate.dib.$ }} title={label}>
       {label}
     </span>
   );
