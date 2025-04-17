@@ -49,7 +49,7 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
       </span>
       {/* x icon is not displayed when chip is disabled */}
       {!disabled && (
-        <span css={{ ...Css.fs0.br16.bgGray100.$, ...(isHovered && !disabled && chipHoverStyles) }} {...tid.x}>
+        <span css={{ ...Css.fs0.br16.bgGray100.$, ...(isHovered && chipHoverStyles) }} {...tid.x}>
           <Icon icon="x" color={Palette.Gray600} inc={2} />
         </span>
       )}
