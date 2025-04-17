@@ -37,6 +37,7 @@ type FormPageLayoutProps<F> = {
  * Rather than wrapping the page in a max-width div, we use "gutter" columns `minMax(0, auto)` that kick in when all other columns have met their max widths.
  */
 const headerHeightPx = 120;
+const maxContentWidthPx = 1600;
 
 function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
   const { formSections, formState, rightSideBar } = props;
@@ -56,27 +57,25 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
     [formSections],
   );
 
-  // The grid columns are defined as: "left-gutter, left-nav, form-content, right-sidebar, right-gutter"
-  const gridColumns =
-    "minMax(0, auto) minMax(100px, 250px) minMax(350px, 1000px) minMax(min-content, 300px) minMax(0, auto)";
+  // The grid columns are defined as: "left-nav, form-content, right-sidebar"
+  const gridColumns = "minMax(100px, 250px) minMax(350px, 1000px) minMax(min-content, 300px)";
 
   return (
     // This page is `fixed` to the full screen to allow it to act as a full screen modal while content is mounted below
     // since this layout will be replacing most superdrawers/sidebars, we keep the listing mounted below to preserve the users's
     // scroll position & filters
     // Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars
-    <div
-      css={Css.fixed.top0.bottom0.left0.right0.z(1000).oya.bgWhite.dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}
-      {...tids}
-    >
-      <PageHeader {...props} {...tids.pageHeader} />
-      <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids} />
-      <FormSections sectionsWithRefs={sectionsWithRefs} formState={formState} {...tids} />
-      {rightSideBar && (
-        <aside css={Css.gr(2).gc("4 / 5").sticky.topPx(headerHeightPx).$}>
-          <RightSidebar content={rightSideBar} />
-        </aside>
-      )}
+    <div css={Css.fixed.top0.bottom0.left0.right0.z(1000).oya.bgWhite.df.jcc.aic.$} {...tids}>
+      <div css={Css.w100.maxwPx(maxContentWidthPx).dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}>
+        <PageHeader {...props} {...tids.pageHeader} />
+        <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids} />
+        <FormSections sectionsWithRefs={sectionsWithRefs} formState={formState} {...tids} />
+        {rightSideBar && (
+          <aside css={Css.gr(2).gc("3 / 4").sticky.topPx(headerHeightPx).$}>
+            <RightSidebar content={rightSideBar} />
+          </aside>
+        )}
+      </div>
     </div>
   );
 }
@@ -89,7 +88,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
   const tids = useTestIds(props);
 
   return (
-    <header css={Css.gr(1).gc("2 / 5").sticky.top0.hPx(headerHeightPx).bgWhite.z5.$} {...tids}>
+    <header css={Css.gr(1).gc("1 / 4").sticky.top0.hPx(headerHeightPx).bgWhite.z5.$} {...tids}>
       <div css={Css.py2.px3.df.jcsb.aic.$}>
         <div>
           {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} />}
@@ -141,7 +140,7 @@ function FormSections<F>(props: FormSectionsProps<F>) {
   const tids = useTestIds(props);
 
   return (
-    <article css={Css.gr(2).gc("3 / 4").$}>
+    <article css={Css.gr(2).gc("2 / 3").$}>
       {sectionsWithRefs.map(({ section, ref, sectionKey }, i) => (
         // Subgrid here allows for icon placement to the left of the section content
         <section
@@ -177,7 +176,7 @@ function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[] }) {
   const activeSection = useActiveSection(sectionWithTitles);
 
   return (
-    <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$} {...tids.nav}>
+    <aside css={Css.gr(2).gc("1 / 2").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$} {...tids.nav}>
       {sectionWithTitles.map((sectionWithRef) => (
         <SectionNavLink
           key={`nav-${sectionWithRef.sectionKey}`}
