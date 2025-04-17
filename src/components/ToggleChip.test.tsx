@@ -32,10 +32,4 @@ describe("ToggleChip", () => {
 
     expect(r.chip_icon).toBeInTheDocument();
   });
-
-  it("can be rendered without the x icon", async () => {
-    const r = await render(<ToggleChip text="Without x icon" onClick={noop} clearable={false} />);
-
-    expect(r.query.chip_x).not.toBeInTheDocument();
-  });
 });

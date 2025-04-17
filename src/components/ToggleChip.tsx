@@ -13,12 +13,10 @@ export interface ToggleChipProps<X> {
   xss?: X;
   disabled?: boolean;
   icon?: IconKey;
-  clearable?: boolean;
-  active?: boolean;
 }
 
 export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipProps<X>) {
-  const { text, onClick, xss = {}, disabled = false, icon, clearable = true, active = false } = props;
+  const { text, onClick, xss = {}, disabled = false, icon } = props;
   const { fieldProps } = usePresentationContext();
   const { hoverProps, isHovered } = useHover({});
 
@@ -31,9 +29,8 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
       css={{
         ...chipBaseStyles(compact),
         ...(isHovered && !disabled && chipHoverStyles),
-        ...(active && activeStyles),
-        // Use a lower right-padding to get closer to the `X` circle when clearable
-        ...(clearable && Css.prPx(4).$),
+        // Use a lower right-padding to get closer to the `X` circle when clearable, i.e. not disabled
+        ...(!disabled && Css.prPx(4).$),
         ...(disabled && { ...chipDisabledStyles, ...Css.pr1.$ }),
         ...xss,
       }}
@@ -50,7 +47,8 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
       <span css={Css.tal.lineClamp1.wbba.if(disabled).pr0.$} title={text}>
         {text}
       </span>
-      {!disabled && clearable && (
+      {/* x icon is not displayed when chip is disabled */}
+      {!disabled && (
         <span css={{ ...Css.fs0.br16.bgGray100.$, ...(isHovered && !disabled && chipHoverStyles) }} {...tid.x}>
           <Icon icon="x" color={Palette.Gray600} inc={2} />
         </span>
@@ -61,4 +59,3 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
 
 export const chipHoverStyles = Css.bgGray200.$;
 export const chipDisabledStyles = Css.gray600.cursorNotAllowed.$;
-const activeStyles = Css.bgBlue600.white.$;

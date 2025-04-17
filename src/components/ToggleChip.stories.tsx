@@ -46,11 +46,9 @@ function ExampleToggleChips() {
   return (
     <>
       <ToggleChip text="Default" onClick={action("click")} />
-      <ToggleChip text="Icon" icon="attachment" onClick={action("click")} />
+      <ToggleChip text="With Icon" icon="attachment" onClick={action("click")} />
       <ToggleChip text="Disabled" disabled onClick={action("click")} />
       <ToggleChip text="Hovered" onClick={action("click")} />
-      <ToggleChip text="No x chip" clearable={false} onClick={action("click")} />
-      <ToggleChip text="Active" clearable={false} active={true} onClick={action("click")} />
       <ToggleChip text={"Long text ".repeat(5)} icon="attachment" onClick={action("click")} />
     </>
   );
