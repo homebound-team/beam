@@ -65,7 +65,7 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
     // since this layout will be replacing most superdrawers/sidebars, we keep the listing mounted below to preserve the users's
     // scroll position & filters
     // Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars
-    <div css={Css.fixed.top0.bottom0.left0.right0.z(1000).oya.bgWhite.df.jcc.aic.$} {...tids}>
+    <div css={Css.fixed.top0.bottom0.left0.right0.z(1000).oya.bgWhite.df.jcc.aifs.$} {...tids}>
       <div css={Css.w100.maxwPx(maxContentWidthPx).dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}>
         <PageHeader {...props} {...tids.pageHeader} />
         <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids} />
