@@ -62,13 +62,13 @@ const typeStyles: Record<ChipType, Properties> = {
   success: Css.bgGreen100.$,
   light: Css.bgWhite.$,
   dark: Css.bgGray900.white.$,
-  neutral: Css.bgGray100.$,
+  neutral: Css.bgGray200.$,
   darkMode: Css.bgGray700.white.$,
   info: Css.bgBlue100.$,
 };
 
 export const chipBaseStyles = (compact?: boolean) =>
-  Css.xsMd.dif.aic.br16.px1.gapPx(4).pyPx(pyHeight(compact)).mhPx(minhPx(compact)).gray900.bgGray100.$;
+  Css.xsMd.dif.aic.br16.px1.gapPx(4).pyPx(pyHeight(compact)).mhPx(minhPx(compact)).gray900.bgGray200.$;
 
 const pyHeight = (compact?: boolean) => (compact ? 2 : 4);
 const minhPx = (compact?: boolean) => (compact ? 20 : 24);
