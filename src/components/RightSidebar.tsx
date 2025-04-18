@@ -14,40 +14,45 @@ export type RightSidebarProps = {
   content: SidebarContentProps[];
 };
 
+/** Exporting this value allows layout components to coordinate responsive column sizing
+ * while avoiding layout shift when the sidebar is opened */
+export const RIGHT_SIDEBAR_MIN_WIDTH = "250px";
+
 export function RightSidebar({ content }: RightSidebarProps) {
   const [selectedIcon, setSelectedIcon] = useState<IconKey | undefined>(undefined);
   const tid = useTestIds({}, "rightSidebar");
-  const width = 380;
 
   return (
     <>
-      <div css={Css.df.jcfe.relative.pr3.$}>
-        <div css={Css.df.gap2.z1.$}>
-          {content.map(({ icon }) => (
-            <IconButton
-              // selectedIcon is added to key to reset the active state
-              key={`${icon}-${selectedIcon}`}
-              circle
-              active={icon === selectedIcon}
-              onClick={() => setSelectedIcon(icon)}
-              icon={icon}
-              inc={3.5}
-            />
-          ))}
-        </div>
+      {/* Vertical icons when closed, positioned absolutely to avoid layout shift when the sidebar is opened */}
+      <div css={Css.df.jcfe.absolute.right0.pr3.$}>
+        <AnimatePresence>
+          {!selectedIcon && (
+            <motion.div
+              css={Css.df.fdc.gap2.z1.$}
+              initial={{ x: "100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "100%", opacity: 0 }}
+              transition={{ ease: [0.51, 0.92, 0.24, 1], duration: 0.3, delay: 0.2 }}
+            >
+              <IconButtonList content={content} selectedIcon={selectedIcon} onIconClick={setSelectedIcon} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       <AnimatePresence>
         {selectedIcon && (
           <motion.div
             key="rightSidebar"
-            initial={{ x: width, opacity: 0 }}
+            initial={{ x: "100%", opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2, ease: "linear", duration: 0.2 }}
-            exit={{ transition: { ease: "linear", duration: 0.2 }, x: width }}
-            css={Css.wPx(width).z0.$}
+            transition={{ delay: 0.2, ease: [0.51, 0.92, 0.24, 1], duration: 0.3 }}
+            exit={{ transition: { ease: "linear", duration: 0.2 }, x: "100%" }}
+            css={Css.w100.mw(RIGHT_SIDEBAR_MIN_WIDTH).z0.$}
           >
-            <div css={Css.relative.topPx(-48).z0.px3.$}>
-              <div css={Css.absolute.leftPx(-24).$}>
+            <div css={Css.relative.z0.px3.$}>
+              {/* Close button */}
+              <div css={Css.absolute.leftPx(-24).top0.$}>
                 <IconButton
                   bgColor={Palette.White}
                   circle
@@ -58,15 +63,45 @@ export function RightSidebar({ content }: RightSidebarProps) {
                 {/* vertical line */}
                 <div css={Css.absolute.topPx(48).leftPx(23).h("calc(100vh - 168px)").wPx(1).bgGray300.$} />
               </div>
+
+              {/* Horizontal icons when opened */}
+              <div css={Css.df.aic.jcfe.gap2.mb3.$}>
+                <IconButtonList content={content} selectedIcon={selectedIcon} onIconClick={setSelectedIcon} />
+              </div>
+
+              {/* Content area */}
               {selectedIcon && (
-                <div {...tid.content} css={Css.ptPx(72).$}>
-                  {content.find((sidebar) => sidebar.icon === selectedIcon)?.render()}
-                </div>
+                <div {...tid.content}>{content.find((sidebar) => sidebar.icon === selectedIcon)?.render()}</div>
               )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+    </>
+  );
+}
+
+type IconButtonListProps = {
+  content: SidebarContentProps[];
+  selectedIcon: IconKey | undefined;
+  onIconClick: (icon: IconKey) => void;
+};
+
+/** Shared component for rendering the list of icon buttons */
+function IconButtonList({ content, selectedIcon, onIconClick }: IconButtonListProps) {
+  return (
+    <>
+      {content.map(({ icon }) => (
+        <IconButton
+          // selectedIcon is added to key to reset the active state
+          key={`${icon}-${selectedIcon}`}
+          circle
+          active={icon === selectedIcon}
+          onClick={() => onIconClick(icon)}
+          icon={icon}
+          inc={3.5}
+        />
+      ))}
     </>
   );
 }

@@ -8,7 +8,7 @@ import { useTestIds } from "src/utils";
 import { useDebouncedCallback } from "use-debounce";
 import { Button, ButtonProps } from "../Button";
 import { Icon, IconKey } from "../Icon";
-import { RightSidebar, SidebarContentProps } from "../RightSidebar";
+import { RIGHT_SIDEBAR_MIN_WIDTH, RightSidebar, SidebarContentProps } from "../RightSidebar";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "./PageHeaderBreadcrumbs";
 
 type FormSection<F> = {
@@ -59,7 +59,7 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
   );
 
   // The grid columns are defined as: "left-nav, form-content, right-sidebar"
-  const gridColumns = "minMax(100px, 250px) minMax(350px, 1000px) minMax(min-content, 300px)";
+  const gridColumns = `minMax(100px, 250px) minMax(350px, 1000px) minMax(${RIGHT_SIDEBAR_MIN_WIDTH}, 380px)`;
 
   return (
     // This page is `fixed` to the full screen to allow it to act as a full screen modal while content is mounted below
@@ -143,7 +143,7 @@ function FormSections<F>(props: FormSectionsProps<F>) {
   const bottomPaddingPx = sectionsWithRefs.length > 1 ? 200 : 0;
 
   return (
-    <article css={Css.gr(2).gc("2 / 3").pbPx(bottomPaddingPx).$}>
+    <article css={Css.gr(2).gc("2 / 3").pbPx(bottomPaddingPx).pr2.$}>
       {sectionsWithRefs.map(({ section, ref, sectionKey }, i) => (
         // Subgrid here allows for icon placement to the left of the section content
         <section
