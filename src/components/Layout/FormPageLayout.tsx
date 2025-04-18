@@ -5,9 +5,10 @@ import { Css, Palette } from "src/Css";
 import { BoundForm, BoundFormInputConfig, SubmitButton } from "src/forms";
 import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils";
+import { useDebouncedCallback } from "use-debounce";
 import { Button, ButtonProps } from "../Button";
 import { Icon, IconKey } from "../Icon";
-import { RightSidebar, SidebarContentProps } from "../RightSidebar";
+import { RIGHT_SIDEBAR_MIN_WIDTH, RightSidebar, SidebarContentProps } from "../RightSidebar";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "./PageHeaderBreadcrumbs";
 
 type FormSection<F> = {
@@ -37,6 +38,7 @@ type FormPageLayoutProps<F> = {
  * Rather than wrapping the page in a max-width div, we use "gutter" columns `minMax(0, auto)` that kick in when all other columns have met their max widths.
  */
 const headerHeightPx = 120;
+const maxContentWidthPx = 1600;
 
 function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
   const { formSections, formState, rightSideBar } = props;
@@ -56,27 +58,25 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
     [formSections],
   );
 
-  // The grid columns are defined as: "left-gutter, left-nav, form-content, right-sidebar, right-gutter"
-  const gridColumns =
-    "minMax(0, auto) minMax(100px, 250px) minMax(350px, 1000px) minMax(min-content, 300px) minMax(0, auto)";
+  // The grid columns are defined as: "left-nav, form-content, right-sidebar"
+  const gridColumns = `minMax(100px, 250px) minMax(350px, 1000px) minMax(${RIGHT_SIDEBAR_MIN_WIDTH}, 380px)`;
 
   return (
     // This page is `fixed` to the full screen to allow it to act as a full screen modal while content is mounted below
     // since this layout will be replacing most superdrawers/sidebars, we keep the listing mounted below to preserve the users's
     // scroll position & filters
     // Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars
-    <div
-      css={Css.fixed.top0.bottom0.left0.right0.z(1000).oya.bgWhite.dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}
-      {...tids}
-    >
-      <PageHeader {...props} {...tids.pageHeader} />
-      <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids} />
-      <FormSections sectionsWithRefs={sectionsWithRefs} formState={formState} {...tids} />
-      {rightSideBar && (
-        <aside css={Css.gr(2).gc("4 / 5").sticky.topPx(headerHeightPx).$}>
-          <RightSidebar content={rightSideBar} />
-        </aside>
-      )}
+    <div css={Css.fixed.top0.bottom0.left0.right0.z(1000).oya.bgWhite.df.jcc.aifs.$} {...tids}>
+      <div css={Css.w100.maxwPx(maxContentWidthPx).dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}>
+        <PageHeader {...props} {...tids.pageHeader} />
+        <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids} />
+        <FormSections sectionsWithRefs={sectionsWithRefs} formState={formState} {...tids} />
+        {rightSideBar && (
+          <aside css={Css.gr(2).gc("3 / 4").sticky.topPx(headerHeightPx).$}>
+            <RightSidebar content={rightSideBar} />
+          </aside>
+        )}
+      </div>
     </div>
   );
 }
@@ -89,7 +89,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
   const tids = useTestIds(props);
 
   return (
-    <header css={Css.gr(1).gc("2 / 5").sticky.top0.hPx(headerHeightPx).bgWhite.z5.$} {...tids}>
+    <header css={Css.gr(1).gc("1 / 4").sticky.top0.hPx(headerHeightPx).bgWhite.z5.$} {...tids}>
       <div css={Css.py2.px3.df.jcsb.aic.$}>
         <div>
           {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} />}
@@ -139,9 +139,11 @@ function FormSections<F>(props: FormSectionsProps<F>) {
   const { sectionsWithRefs, formState } = props;
 
   const tids = useTestIds(props);
+  // Adding extra bottom padding for multi-section forms allows the scroll-to behavior to get more of the bottom section in view
+  const bottomPaddingPx = sectionsWithRefs.length > 1 ? 200 : 0;
 
   return (
-    <article css={Css.gr(2).gc("3 / 4").$}>
+    <article css={Css.gr(2).gc("2 / 3").pbPx(bottomPaddingPx).pr2.$}>
       {sectionsWithRefs.map(({ section, ref, sectionKey }, i) => (
         // Subgrid here allows for icon placement to the left of the section content
         <section
@@ -150,7 +152,7 @@ function FormSections<F>(props: FormSectionsProps<F>) {
           id={sectionKey}
           ref={ref}
           // scrollMarginTop here ensures the top of the section is properly aligned when calling `scrollIntoView`
-          css={Css.dg.gtc("50px 1fr").gtr("auto").mb3.add("scrollMarginTop", `${headerHeightPx}px`).$}
+          css={Css.dg.gtc("50px 1fr").gtr("auto").mbPx(72).add("scrollMarginTop", `${headerHeightPx}px`).$}
           {...tids.formSection}
         >
           <div css={Css.gc(1).$}>{section.icon && <Icon icon={section.icon} inc={3.5} />}</div>
@@ -177,7 +179,7 @@ function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[] }) {
   const activeSection = useActiveSection(sectionWithTitles);
 
   return (
-    <aside css={Css.gr(2).gc("2 / 3").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$} {...tids.nav}>
+    <aside css={Css.gr(2).gc("1 / 2").sticky.topPx(headerHeightPx).px3.df.fdc.gap1.$} {...tids.nav}>
       {sectionWithTitles.map((sectionWithRef) => (
         <SectionNavLink
           key={`nav-${sectionWithRef.sectionKey}`}
@@ -237,24 +239,48 @@ function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSe
 function useActiveSection<F>(sectionsWithRefs: SectionWithRefs<F>[]) {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
+  // Use debounced callback to prevent rapid processing of intersection events during scrolling
+  // This also prevents flickering when the user is scrolling slowly next to a section boundary
+  const debouncedIntersectionCallback = useDebouncedCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      // Filter to only sections that are intersecting and have a significant portion visible
+      const sectionsInView = entries
+        .filter((entry) => entry.isIntersecting && entry.intersectionRatio > 0.2)
+        .sort((a, b) => {
+          // First sort by how much of the section is visible
+          const ratioDiff = b.intersectionRatio - a.intersectionRatio;
+          if (Math.abs(ratioDiff) > 0.05) return ratioDiff;
+
+          // If visibility is similar, prefer the section closer to the top of the viewport
+          const aTop = a.boundingClientRect.top;
+          const bTop = b.boundingClientRect.top;
+          return aTop - bTop;
+        });
+
+      if (sectionsInView[0]) {
+        setActiveSection(sectionsInView[0].target.id);
+      }
+    },
+    200,
+    { maxWait: 500 },
+  );
+
   useEffect(() => {
     // Ensure the browser supports the Intersection Observer API (and skip in tests where it's not available)
     if (!("IntersectionObserver" in window)) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // In the event of multiple sections being in view, choose the one with the most visible area
-        const sectionsInView = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-
-        if (sectionsInView[0]) {
-          setActiveSection(sectionsInView[0].target.id);
-        }
-      },
-      // Threshold defines when the observer callback should be triggered, we may need to refine this based on more real word layouts
-      { rootMargin: `-${headerHeightPx}px 0px 0px 0px`, threshold: 0.4 },
-    );
+    const observer = new IntersectionObserver((entries) => debouncedIntersectionCallback(entries), {
+      /**
+       * Creating rules to determine when a section is "in view" is a real challenge given the section sizes
+       * are unknown and will likely be mixed (optimizing for large sections makes tracking small sections
+       * more difficult and vice versa). This approach attempts to solve for this by creating a narrowed
+       * "focus zone" trying to approximate where a users attention is likely to be. In this case, blocking
+       * out the top 25% and bottom 35% of the viewport to focus on the middle-top 40%.
+       */
+      rootMargin: "-25% 0px -35% 0px",
+      // Multiple threshold points allow for more granular detection of section visibility
+      threshold: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+    });
 
     sectionsWithRefs.forEach(({ ref }) => {
       if (ref.current) {
@@ -269,7 +295,7 @@ function useActiveSection<F>(sectionsWithRefs: SectionWithRefs<F>[]) {
         }
       });
     };
-  }, [sectionsWithRefs]);
+  }, [sectionsWithRefs, debouncedIntersectionCallback]);
 
   return activeSection;
 }

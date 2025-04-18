@@ -1,0 +1,53 @@
+---
+description: 
+globs: *.test.ts,*.test.tsx
+alwaysApply: false
+---
+# Guidelines for writing tests
+- This project uses Jest and a custom wrapper around `react-testing-library` that is imported via [rtl.tsx](mdc:src/utils/rtl.tsx) with additional helpers within [rtlUtils.tsx](mdc:src/utils/rtlUtils.tsx)
+
+## Test Structure
+- Follow the Given/When/Then pattern with clear comments for each section
+- Each test should focus on a single piece of functionality
+- Test both happy path and error/edge cases
+- Use descriptive test names that explain what is being tested
+
+## Test Selectors
+- Always prefer `data-testid` for DOM selection
+- Use the `useTestIds` hook from [useTestIds.tsx](mdc:src/utils/useTestIds.tsx) to generate test IDs if none are found
+- Test IDs should be descriptive and follow a consistent naming pattern
+- Avoid using text content, classes, or other brittle selectors
+
+## Interactions
+- Use the following (non-inclusive list of) functions from `@homebound/rtl-utils` for interactions:
+  - `click(r.save)` - for clicking elements
+  - `type(r.name, "value")` - for typing into inputs
+  - `blur(r.name)` - for blurring inputs
+  - `focus(r.name)` - for focusing inputs
+  - `input(r.name, "value")` - for input events
+- Only `await` methods that return a `Promise` or equivalent
+- The following functions are NOT async and should NOT be awaited:
+  - `click`
+  - `type`
+  - `blur`
+  - `focus`
+  - `input`
+  - `change`
+- The following functions ARE async and should be awaited:
+  - `render`
+  - `clickAndWait`
+  - `typeAndWait`
+  - `changeAndWait`
+  - `wait`
+
+
+## Examples
+
+
+## Common Patterns
+- Use `expect().toHaveTextContent()` for text content checks
+- Use `expect().toBeInTheDocument()` for presence checks
+- Use `expect().not.toBeDisabled()` for enabled/disabled checks
+- Use `expect().toHaveValue()` for input value checks
+- Prefer `toBe` / `toBeDefined` / `toBeUndefined` over `toEqual` / `toBeTruthy` / `toBeFalsy`
+

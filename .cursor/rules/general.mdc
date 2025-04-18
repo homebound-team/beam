@@ -1,0 +1,42 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Overview
+- This is a React component library repository written in Typescript
+- The [README.md](mdc:README.md) specifies component design approach philosophy
+- This codebase makes use of hooks from `react-aria` V3 for accesible form behavior
+
+## Styles
+- Styles are generated via the `@homebound/truss` library
+- Style properties are defined in the generated @Css.ts file
+  - ALWAYS check [Css.ts](mdc:src/Css.ts) for the correct property names and available methods
+
+## Type Safety
+- Utilize TypeScript's features to ensure type safety.
+- Prefer types over interfaces when defining object shapes.
+- Use generics to create reusable components and functions.
+- Enforce strict typing and avoid 'any' type as much as possible.
+
+## Rendering Optimization
+- Implement proper dependency arrays in hooks
+- Use `useCallback` and `useMemo` for expensive computations
+- Avoid unnecessary re-renders
+
+## Forms & Inputs
+- The preferred form state library is `@homebound/form-state` a mobx based form state implemenation
+- Input components within this library gennerally have a `Bound*` version that wraps the boilerplate code for plugging into a `formState`
+
+## Storybook
+- The primary method of developing features is via storybook
+- Utils for storybook are found within [sb.tsx](mdc:src/utils/sb.tsx)
+- All component features should have coverage via at least one story
+- Utilizie `PlayFunction` functions to mock various states that require user interaction such as `hover` or `focus`
+- Snapshots of storybook files are taken via `chromatic` to spot visual regressions
+
+## Testing
+- Always consult the [tests.mdc](mdc:.cursor/rules/tests.mdc) Cursor Rules when creating or modifying tests
+- When implemeting features, add test ids to elements that need to be targeted in testing with the `useTestIds` hook from [useTestIds.tsx](mdc:src/utils/useTestIds.tsx)
+  - See [SnackbarNotice.tsx](mdc:src/components/Snackbar/SnackbarNotice.tsx) as an example for `useTestIds` usage
