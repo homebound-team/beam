@@ -1,7 +1,9 @@
-import { Icon } from "src/components/Icon";
+import { Icon, IconKey } from "src/components/Icon";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Margin, Only, Palette, Xss } from "src/Css";
+import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils/useTestIds";
+import { chipBaseStyles } from "./Chip";
 
 type ToggleChipXss = Xss<Margin>;
 
@@ -10,11 +12,14 @@ export interface ToggleChipProps<X> {
   onClick: () => void;
   xss?: X;
   disabled?: boolean;
+  icon?: IconKey;
 }
 
 export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipProps<X>) {
-  const { text, onClick, xss = {}, disabled = false } = props;
+  const { text, onClick, xss = {}, disabled = false, icon } = props;
   const { fieldProps } = usePresentationContext();
+  const { hoverProps, isHovered } = useHover({});
+
   // If compact, then use a smaller type scale
   const compact = fieldProps?.compact;
   const tid = useTestIds(props, "chip");
@@ -22,28 +27,35 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
     <button
       type="button"
       css={{
-        ...Css[compact ? "xs" : "sm"].dif.aic.br16.pl1
-          // Use a lower right-padding to get closer to the `X` circle when not disabled
-          .prPx(2)
-          .pyPx(2)
-          .gray900.bgGray200.if(disabled)
-          .gray600.pr1.mhPx(compact ? 20 : 28).$,
-        "&:hover:not(:disabled)": Css.bgGray300.$,
-        "&:disabled": Css.cursorNotAllowed.$,
+        ...chipBaseStyles(compact),
+        ...(isHovered && !disabled && chipHoverStyles),
+        // Use a lower right-padding to get closer to the `X` circle when clearable, i.e. not disabled
+        ...(!disabled && Css.prPx(4).$),
+        ...(disabled && { ...chipDisabledStyles, ...Css.pr1.$ }),
         ...xss,
       }}
       disabled={disabled}
       onClick={onClick}
+      {...hoverProps}
       {...tid}
     >
-      <span css={Css.prPx(6).tal.lineClamp1.wbba.if(disabled).pr0.$} title={text}>
+      {icon && (
+        <span css={Css.fs0.$} {...tid.icon}>
+          <Icon icon={icon} color={Palette.Gray900} inc={2} />
+        </span>
+      )}
+      <span css={Css.tal.lineClamp1.wbba.if(disabled).pr0.$} title={text}>
         {text}
       </span>
+      {/* x icon is not displayed when chip is disabled */}
       {!disabled && (
-        <span css={Css.fs0.br16.bgGray400.$}>
-          <Icon icon="x" color={Palette.Gray700} inc={compact ? 2 : undefined} />
+        <span css={{ ...Css.fs0.br16.bgGray200.$, ...(isHovered && chipHoverStyles) }} {...tid.x}>
+          <Icon icon="x" color={Palette.Gray600} inc={2} />
         </span>
       )}
     </button>
   );
 }
+
+export const chipHoverStyles = Css.bgGray300.$;
+export const chipDisabledStyles = Css.gray600.cursorNotAllowed.$;

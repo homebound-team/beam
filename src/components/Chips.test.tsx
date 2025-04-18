@@ -6,19 +6,23 @@ describe("Chips", () => {
     { text: "123", title: "tooltip" },
     { text: "abc", title: "" },
   ];
+
   it("renders", async () => {
     const r = await render(<Chips values={values} />);
+
     expect(r.chip_0.textContent).toBe("123");
     expect(r.chip_1.textContent).toBe("abc");
     expect(r.tooltip).toHaveAttribute("title", "tooltip");
+    expect(r.chip_0).toHaveStyle({
+      "min-height": "24px",
+    });
   });
 
-  it("can set compact to change size to xs", async () => {
+  it("can set compact to change size", async () => {
     const r = await render(<Chips values={values} compact />);
+
     expect(r.chip_0).toHaveStyle({
-      fontSize: "12px",
-      fontWeight: "400",
-      lineHeight: "16px",
+      "min-height": "20px",
     });
   });
 });

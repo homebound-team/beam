@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { Icon, IconKey } from "src/components/Icon";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { maybeTooltip } from "src/components/Tooltip";
@@ -23,32 +23,32 @@ export interface ChipProps<X> {
   text: ReactNode;
   title?: ReactNode;
   xss?: X;
+  // Defaults to "neutral"
   type?: ChipType;
   compact?: boolean;
   icon?: IconKey;
 }
 
 /** Kinda like a chip, but read-only, so no `onClick` or `hover`. */
-export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X>>({
-  type = ChipTypes.neutral,
-  ...props
-}: ChipProps<X>) {
+export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X>>(props: ChipProps<X>) {
   const { fieldProps } = usePresentationContext();
-  const { text, title, xss = {}, compact = fieldProps?.compact, icon } = props;
+  const { text, title, xss = {}, compact = fieldProps?.compact, icon, type = ChipTypes.neutral } = props;
   const tid = useTestIds(props, "chip");
+
+  const styles = useMemo(
+    () => ({
+      ...chipBaseStyles(compact),
+      ...typeStyles[type],
+      ...xss,
+    }),
+    [type, xss, compact],
+  );
 
   return maybeTooltip({
     title,
     placement: "bottom",
     children: (
-      <span
-        css={{
-          ...Css[compact ? "xs" : "sm"].dif.aic.gapPx(4).br16.pl1.px1.pyPx(2).gray900.$,
-          ...typeStyles[type],
-          ...xss,
-        }}
-        {...tid}
-      >
+      <span css={styles} {...tid}>
         {icon && <Icon icon={icon} inc={2} xss={Css.fs0.$} />}
         <span css={Css.lineClamp1.wbba.$}>{text}</span>
       </span>
@@ -58,11 +58,17 @@ export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X
 
 const typeStyles: Record<ChipType, Properties> = {
   caution: Css.bgYellow200.$,
-  warning: Css.bgRed200.$,
-  success: Css.bgGreen200.$,
+  warning: Css.bgRed100.$,
+  success: Css.bgGreen100.$,
   light: Css.bgWhite.$,
   dark: Css.bgGray900.white.$,
   neutral: Css.bgGray200.$,
   darkMode: Css.bgGray700.white.$,
   info: Css.bgBlue100.$,
 };
+
+export const chipBaseStyles = (compact?: boolean) =>
+  Css.xsMd.dif.aic.br16.px1.gapPx(4).pyPx(pyHeight(compact)).mhPx(minhPx(compact)).gray900.bgGray200.$;
+
+const pyHeight = (compact?: boolean) => (compact ? 2 : 4);
+const minhPx = (compact?: boolean) => (compact ? 20 : 24);

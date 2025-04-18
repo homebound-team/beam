@@ -1,5 +1,6 @@
 import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useFocus } from "react-aria";
+import { chipBaseStyles } from "src/components";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { maybeCall, useTestIds } from "src/utils";
@@ -52,7 +53,6 @@ export function ChipTextField(props: ChipTextFieldProps) {
   });
 
   const fieldRef = useRef<HTMLSpanElement>(null);
-  const typeScale = fieldProps?.typeScale ?? "sm";
 
   useEffect(
     () => {
@@ -89,8 +89,9 @@ export function ChipTextField(props: ChipTextFieldProps) {
       }}
       {...focusProps}
       css={{
-        ...Css[typeScale].dib.br16.pl1.pxPx(10).pyPx(2).gray900.bgGray300.outline0.mwPx(32).$,
-        ...(isFocused ? Css.bshFocus.$ : {}),
+        ...chipBaseStyles(fieldProps?.compact),
+        ...Css.mwPx(32).outline0.$,
+        ...(isFocused && Css.bshFocus.$),
       }}
       {...tid}
     >

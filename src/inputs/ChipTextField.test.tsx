@@ -27,16 +27,16 @@ describe("ChipTextField", () => {
 
     // When firing the events on the input, then expect the callbacks to be invoked
     focus(r.chipField);
-    expect(onFocus).toBeCalledTimes(1);
+    expect(onFocus).toHaveBeenCalledTimes(1);
 
     fireEvent.blur(r.chipField);
-    expect(onBlur).toBeCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledTimes(1);
 
     fireEvent.keyDown(r.chipField, { key: "Enter" });
-    expect(onEnter).toBeCalledTimes(1);
+    expect(onEnter).toHaveBeenCalledTimes(1);
 
     fireEvent.input(r.chipField, { target: { textContent: "New Value" } });
-    expect(onChange).toBeCalledWith("New Value");
+    expect(onChange).toHaveBeenCalledWith("New Value");
   });
 
   it("removes focus from input and calls onBlur when pressing escape", async () => {
@@ -51,7 +51,7 @@ describe("ChipTextField", () => {
     // Then the element should no longer have focus
     expect(r.chipField).not.toHaveFocus();
     // And onBlur should have been called
-    expect(onBlur).toBeCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledTimes(1);
   });
 
   it("does not removes focus or call onBlur from input when pressing escape disabled", async () => {
@@ -66,6 +66,6 @@ describe("ChipTextField", () => {
     // Then the element should still have focus
     expect(r.chipField).toHaveFocus();
     // And onBlur should not be called
-    expect(onBlur).not.toBeCalled();
+    expect(onBlur).not.toHaveBeenCalled();
   });
 });
