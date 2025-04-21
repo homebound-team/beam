@@ -26,8 +26,8 @@ alwaysApply: true
 - Avoid unnecessary re-renders
 
 ## Forms & Inputs
-- The preferred form state library is `@homebound/form-state` a mobx based form state implemenation
-- Input components within this library gennerally have a `Bound*` version that wraps the boilerplate code for plugging into a `formState`
+- The preferred form state library is `@homebound/form-state` a mobx based form state implementation
+- Input components within this library generally have a `Bound*` version that wraps the boilerplate code for plugging into a `formState`
 
 ## Storybook
 - The primary method of developing features is via storybook

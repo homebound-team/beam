@@ -42,6 +42,9 @@ alwaysApply: false
 
 
 ## Examples
+- An example of a base input component test is [DateField.test.tsx](mdc:src/inputs/DateFields/DateField.test.tsx)
+- An example of a bound input component test is [BoundDateField.test.tsx](mdc:src/forms/BoundDateField.test.tsx)
+- Examples of a util or hook test are [useTestIds.test.tsx](mdc:src/utils/useTestIds.test.tsx) and [useFilter.test.tsx](mdc:src/hooks/useFilter.test.tsx)
 
 
 ## Common Patterns
