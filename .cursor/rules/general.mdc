@@ -33,7 +33,7 @@ alwaysApply: true
 - The primary method of developing features is via storybook
 - Utils for storybook are found within [sb.tsx](mdc:src/utils/sb.tsx)
 - All component features should have coverage via at least one story
-- Utilizie `PlayFunction` functions to mock various states that require user interaction such as `hover` or `focus`
+- Utilize `PlayFunction` functions to mock various states that require user interaction such as `hover` or `focus`
 - Snapshots of storybook files are taken via `chromatic` to spot visual regressions
 
 ## Testing
