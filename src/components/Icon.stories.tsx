@@ -160,6 +160,7 @@ export const Icon = (props: IconProps) => {
     "exteriorStyle",
     "lockOpen",
     "map",
+    "history",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
