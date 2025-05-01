@@ -7,8 +7,9 @@ import { withBeamDecorator, withRouter } from "src/utils/sb";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";
 
 export default {
-  component: GridTableLayout,
+  component: GridTableLayoutComponent,
   decorators: [withBeamDecorator, withRouter()],
+  parameters: { layout: "fullscreen" },
 } satisfies Meta;
 
 type Data = { name: string | undefined; value: number | undefined };

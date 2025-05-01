@@ -36,21 +36,27 @@ export function GridTableLayout<F extends Record<string, unknown>, R extends Kin
   const tids = useTestIds({}, "gridTableLayout");
 
   return (
-    <div>
+    <>
       <Header pageTitle={pageTitle} breadcrumb={breadcrumb} {...tids} />
-      {showTableActions && (
-        <TableActions>
-          {searchState && <SearchBox onSearch={searchState.setSearchString} />}
+      <div css={Css.px2.$}>
+        {showTableActions && (
+          <TableActions>
+            {searchState && <SearchBox onSearch={searchState.setSearchString} />}
 
-          {filterState && (
-            <Filters filterDefs={filterState.filterDefs} filter={filterState.filter} onChange={filterState.setFilter} />
-          )}
-        </TableActions>
-      )}
-      <ScrollableContent virtualized={gridTableProps.as === "virtual"}>
-        <GridTable {...gridTableProps} filter={clientSearch} style={{ allWhite: true }} />
-      </ScrollableContent>
-    </div>
+            {filterState && (
+              <Filters
+                filterDefs={filterState.filterDefs}
+                filter={filterState.filter}
+                onChange={filterState.setFilter}
+              />
+            )}
+          </TableActions>
+        )}
+        <ScrollableContent virtualized={gridTableProps.as === "virtual"}>
+          <GridTable {...gridTableProps} filter={clientSearch} style={{ allWhite: true }} />
+        </ScrollableContent>
+      </div>
+    </>
   );
 }
 
