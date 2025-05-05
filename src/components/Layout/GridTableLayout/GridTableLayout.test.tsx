@@ -51,7 +51,7 @@ describe("GridTableLayout", () => {
               },
               storageKey: "test",
             },
-            useSearch: "client",
+            search: "client",
           }}
           pageTitle="Grid Table Layout Example"
           breadcrumb={[

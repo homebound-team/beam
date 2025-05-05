@@ -30,7 +30,7 @@ export function GridTableLayout() {
       filterDefs,
       storageKey: "grid-table-layout",
     },
-    useSearch: "client",
+    search: "client",
   });
 
   return (
@@ -63,7 +63,7 @@ export function QueryTableLayout() {
       filterDefs,
       storageKey: "grid-table-layout",
     },
-    useSearch: "server",
+    search: "server",
   });
 
   // In this example, we set up a server-side search that uses the `searchString` from the layout state.

@@ -91,8 +91,8 @@ function GridTableLayoutComponent<
 >(props: GridTableLayoutProps<F, R, X, QData>) {
   const { pageTitle, breadcrumb, tableProps, layoutState, primaryAction, secondaryAction, tertiaryAction } = props;
 
-  const clientSearch = layoutState?.useSearch === "client" ? layoutState.searchString : undefined;
-  const showTableActions = layoutState?.filterDefs || layoutState?.useSearch;
+  const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
+  const showTableActions = layoutState?.filterDefs || layoutState?.search;
   const isVirtualized = tableProps.as === "virtual";
 
   const breakpoints = useBreakpoint();
@@ -107,8 +107,8 @@ function GridTableLayoutComponent<
         tertiaryAction={tertiaryAction}
       />
       {showTableActions && (
-        <TableActions onlyRight={!layoutState?.useSearch}>
-          {layoutState?.useSearch && <SearchBox onSearch={layoutState.setSearchString} />}
+        <TableActions onlyRight={!layoutState?.search}>
+          {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
           {layoutState?.filterDefs && (
             <Filters
               filterDefs={layoutState.filterDefs}
@@ -145,11 +145,11 @@ export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof Gr
  */
 export function useGridTableLayoutState<F extends Record<string, unknown>>({
   persistedFilter,
-  useSearch,
+  search,
   groupBy: maybeGroupBy,
 }: {
   persistedFilter?: UsePersistedFilterProps<F>;
-  useSearch?: "client" | "server";
+  search?: "client" | "server";
   groupBy?: Record<string, string>;
 }) {
   // Because we can't conditionally render a hook, we still call it with a fallback value.
@@ -165,7 +165,7 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     filterDefs: persistedFilter?.filterDefs,
     searchString,
     setSearchString,
-    useSearch,
+    search,
     groupBy: maybeGroupBy ? groupBy : undefined,
   };
 }
