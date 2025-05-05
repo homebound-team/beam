@@ -275,7 +275,7 @@ function TestLayout({ children }: ChildrenOnly) {
   );
 }
 
-function TestProjectLayout({ children }: ChildrenOnly) {
+export function TestProjectLayout({ children }: ChildrenOnly) {
   return (
     <PreventBrowserScroll>
       <TestTopNav />
