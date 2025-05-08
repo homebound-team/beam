@@ -4,7 +4,7 @@ import { useSessionStorage } from "src/hooks";
 import { safeEntries, safeKeys } from "src/utils";
 import { JsonParam, useQueryParams } from "use-query-params";
 
-interface UsePersistedFilterProps<F> {
+export interface UsePersistedFilterProps<F> {
   filterDefs: FilterDefs<F>;
   storageKey: string;
 }
