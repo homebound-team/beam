@@ -120,7 +120,7 @@ export function Switch(props: SwitchProps) {
 /** Styles */
 // Element sizes
 const toggleHeight = (isCompact: boolean) => (isCompact ? 16 : 24);
-const toggleWidth = (isCompact: boolean) => (isCompact ? 32 : 44);
+const toggleWidth = (isCompact: boolean) => (isCompact ? 32 : 40);
 const circleDiameter = (isCompact: boolean) => (isCompact ? 12 : 20);
 
 // Switcher/Toggle element styles
