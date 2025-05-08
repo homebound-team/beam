@@ -1,3 +1,4 @@
+import { waitFor } from "@homebound/rtl-utils";
 import { click, render } from "src/utils/rtl";
 import { RightSidebar, SidebarContentProps } from "./RightSidebar";
 
@@ -9,7 +10,7 @@ describe("RightSidebar", () => {
     ] as SidebarContentProps[];
 
     // Given a right sidebar component with content
-    const r = await render(<RightSidebar content={content} />);
+    const r = await render(<RightSidebar content={content} headerHeightPx={120} />);
 
     // Expect the sidebar to render the icons and not render content initially
     expect(r.comment).toBeInTheDocument();
@@ -20,6 +21,11 @@ describe("RightSidebar", () => {
     click(r.comment);
     expect(r.rightSidebar_content).toHaveTextContent("Comments");
     expect(r.rightSidebar_content).not.toHaveTextContent("History");
+
+    // wait for transition to finish
+    await waitFor(() => {
+      expect(r.queryAllByTestId("time")).toHaveLength(1);
+    });
 
     click(r.time);
     expect(r.rightSidebar_content).toHaveTextContent("History");
