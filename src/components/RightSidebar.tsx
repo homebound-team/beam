@@ -48,32 +48,36 @@ export function RightSidebar({ content }: RightSidebarProps) {
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.2, ease: [0.51, 0.92, 0.24, 1], duration: 0.3 }}
             exit={{ transition: { ease: "linear", duration: 0.2 }, x: "100%" }}
-            css={Css.w100.mw(RIGHT_SIDEBAR_MIN_WIDTH).z0.$}
+            css={Css.w100.mw(RIGHT_SIDEBAR_MIN_WIDTH).z0.maxh("calc(100vh - 120px)").oya.pl4.pr3.$}
           >
-            <div css={Css.relative.z0.px3.$}>
-              {/* Close button */}
-              <div css={Css.absolute.leftPx(-24).top0.$}>
-                <IconButton
-                  bgColor={Palette.White}
-                  circle
-                  onClick={() => setSelectedIcon(undefined)}
-                  icon="x"
-                  inc={3.5}
-                />
-                {/* vertical line */}
-                <div css={Css.absolute.topPx(48).leftPx(23).h("calc(100vh - 168px)").wPx(1).bgGray300.$} />
-              </div>
-
-              {/* Horizontal icons when opened */}
-              <div css={Css.df.aic.jcfe.gap2.mb3.$}>
-                <IconButtonList content={content} selectedIcon={selectedIcon} onIconClick={setSelectedIcon} />
+            <>
+              {/* Sticky header section */}
+              <div css={Css.sticky.top0.bgWhite.z999.$}>
+                {/* Close button */}
+                <div css={Css.absolute.leftPx(-24).top0.df.fdc.aic.$}>
+                  <IconButton
+                    bgColor={Palette.White}
+                    circle
+                    onClick={() => setSelectedIcon(undefined)}
+                    icon="x"
+                    inc={3.5}
+                  />
+                  {/* vertical line */}
+                  <div css={Css.absolute.topPx(48).h("calc(100vh - 168px)").wPx(1).bgGray300.$} />
+                </div>
+                {/* Horizontal icons when opened */}
+                <div css={Css.df.aic.jcfe.gap2.mb3.$}>
+                  <IconButtonList content={content} selectedIcon={selectedIcon} onIconClick={setSelectedIcon} />
+                </div>
               </div>
 
               {/* Content area */}
               {selectedIcon && (
-                <div {...tid.content}>{content.find((sidebar) => sidebar.icon === selectedIcon)?.render()}</div>
+                <div {...tid.content} css={Css.pl3.$}>
+                  {content.find((sidebar) => sidebar.icon === selectedIcon)?.render()}
+                </div>
               )}
-            </div>
+            </>
           </motion.div>
         )}
       </AnimatePresence>
@@ -105,3 +109,37 @@ function IconButtonList({ content, selectedIcon, onIconClick }: IconButtonListPr
     </>
   );
 }
+
+// <motion.div
+// key="rightSidebar"
+// initial={{ x: "100%", opacity: 0 }}
+// animate={{ x: 0, opacity: 1 }}
+// transition={{ delay: 0.2, ease: [0.51, 0.92, 0.24, 1], duration: 0.3 }}
+// exit={{ transition: { ease: "linear", duration: 0.2 }, x: "100%" }}
+// css={Css.w100.mw(RIGHT_SIDEBAR_MIN_WIDTH).h("calc(100vh - 120px)").z0.px3.oya.$}
+// >
+// {/* <div css={Css.relative.z0.px3.$}> */}
+//   {/* Close button */}
+//   {/* <div css={Css.sticky.top0.$}> */}
+//   <div css={Css.sticky.topPx(0).bgWhite.z999.pt3.df.jcsb.aic.mb3.$}>
+//     <IconButton
+//       bgColor={Palette.White}
+//       circle
+//       onClick={() => setSelectedIcon(undefined)}
+//       icon="x"
+//       inc={3.5}
+//     />
+//     {/* vertical line */}
+//     <div css={Css.absolute.topPx(48).leftPx(-23).h("calc(100vh - 168px)").wPx(1).bgGray300.$} />
+//     {/* Horizontal icons when opened */}
+//   <div css={Css.df.aic.jcfe.gap2.mb3.$}>
+//     <IconButtonList content={content} selectedIcon={selectedIcon} onIconClick={setSelectedIcon} />
+//   </div>
+//   </div>
+
+//   {/* Content area */}
+//   {selectedIcon && (
+//     <div {...tid.content}>{content.find((sidebar) => sidebar.icon === selectedIcon)?.render()}</div>
+//   )}
+// {/* </div> */}
+// </motion.div>
