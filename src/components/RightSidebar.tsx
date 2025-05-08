@@ -12,13 +12,14 @@ export type SidebarContentProps = {
 
 export type RightSidebarProps = {
   content: SidebarContentProps[];
+  headerHeightPx: number;
 };
 
 /** Exporting this value allows layout components to coordinate responsive column sizing
  * while avoiding layout shift when the sidebar is opened */
 export const RIGHT_SIDEBAR_MIN_WIDTH = "250px";
 
-export function RightSidebar({ content }: RightSidebarProps) {
+export function RightSidebar({ content, headerHeightPx }: RightSidebarProps) {
   const [selectedIcon, setSelectedIcon] = useState<IconKey | undefined>(undefined);
   const tid = useTestIds({}, "rightSidebar");
 
@@ -48,7 +49,7 @@ export function RightSidebar({ content }: RightSidebarProps) {
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.2, ease: [0.51, 0.92, 0.24, 1], duration: 0.3 }}
             exit={{ transition: { ease: "linear", duration: 0.2 }, x: "100%" }}
-            css={Css.w100.mw(RIGHT_SIDEBAR_MIN_WIDTH).z0.maxh("calc(100vh - 120px)").oya.pl4.pr3.$}
+            css={Css.w100.mw(RIGHT_SIDEBAR_MIN_WIDTH).z0.maxh(`calc(100vh - ${headerHeightPx}px)`).oya.pl4.pr3.$}
           >
             <>
               {/* Sticky header section */}
