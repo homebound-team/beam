@@ -10,6 +10,7 @@ import { Button, ButtonProps } from "../Button";
 import { Icon, IconKey } from "../Icon";
 import { RIGHT_SIDEBAR_MIN_WIDTH, RightSidebar, SidebarContentProps } from "../RightSidebar";
 import { Toast } from "../Toast/Toast";
+import { useToastContext } from "../Toast/ToastContext";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "./PageHeaderBreadcrumbs";
 
 type FormSection<F> = {
@@ -85,11 +86,11 @@ export const FormPageLayout = React.memo(FormPageLayoutComponent) as typeof Form
 
 function PageHeader<F>(props: FormPageLayoutProps<F>) {
   const { pageTitle, breadCrumb, submitAction, cancelAction, tertiaryAction, formState } = props;
-
+  const { notice } = useToastContext();
   const tids = useTestIds(props);
 
   return (
-    <header css={Css.gr(1).gc("1 / 4").sticky.top0.bgWhite.z5.$} {...tids}>
+    <header css={Css.gr(1).gc("1 / 4").sticky.top0.bgWhite.z5.if(!notice).hPx(headerHeightPx).$} {...tids}>
       <Toast />
       <div css={Css.py2.px3.df.jcsb.aic.$}>
         <div>
