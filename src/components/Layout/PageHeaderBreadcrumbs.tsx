@@ -1,28 +1,74 @@
-import { Fragment } from "react";
+import { Fragment, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Css } from "src/Css";
+import { Css, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
+import { Icon } from "../Icon";
 
 export type HeaderBreadcrumb = {
   href: string;
   label: string;
+  right?: ReactNode;
 };
 
-export function PageHeaderBreadcrumbs({ breadcrumb }: { breadcrumb: HeaderBreadcrumb | HeaderBreadcrumb[] }) {
-  const tids = useTestIds({}, "pageHeaderBreadcrumbs");
+type PageHeaderBreadcrumbsProps = {
+  breadcrumb: HeaderBreadcrumb | HeaderBreadcrumb[];
+  linkXss?: Xss<"color" | "cursor">;
+  collapsible?: boolean;
+};
 
-  const breadcrumbs = Array.isArray(breadcrumb) ? breadcrumb : [breadcrumb];
+export function PageHeaderBreadcrumbs({ breadcrumb, linkXss, collapsible }: PageHeaderBreadcrumbsProps) {
+  const tids = useTestIds({}, "pageHeaderBreadcrumbs");
+  const breadcrumbs = useMemo(() => (Array.isArray(breadcrumb) ? breadcrumb : [breadcrumb]), [breadcrumb]);
+  const [collapsed, setCollapsed] = useState(breadcrumbs.length > 3);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (breadcrumbs.length === 0 || !collapsible || collapsed) return;
+    // Collapse when clicking outside of the container
+    const onClick = (e: MouseEvent) =>
+      containerRef.current && !containerRef.current.contains(e.target as Node) && setCollapsed(true);
+    document.addEventListener("mousedown", onClick);
+    // Cleanup the event listener on component unmount
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [collapsed, collapsible, setCollapsed, breadcrumbs]);
+
+  const renderBreadcrumb = (bc: HeaderBreadcrumb, i: number, hideDivisor?: boolean) => (
+    <Fragment key={`${bc.label}-${i}`}>
+      {i > 0 &&
+        !hideDivisor &&
+        (collapsible ? (
+          <span css={Css.gray700.pxPx(4).$}>/</span>
+        ) : (
+          <span css={Css.mr1.ml1.$}>
+            <Icon icon="chevronRight" />
+          </span>
+        ))}
+      <Link
+        {...tids.navLink}
+        to={bc.href}
+        css={{ ...Css.xsMd.gray700.addIn("&:hover", Css.gray800.$).$, ...linkXss }}
+        className="navLink"
+      >
+        {bc.label}
+      </Link>
+      {bc.right}
+    </Fragment>
+  );
 
   return (
-    <div css={Css.df.aic.mbPx(4).$} {...tids}>
-      {breadcrumbs.map((breadcrumb, i) => (
-        <Fragment key={`bc-${breadcrumb.label}`}>
-          {i > 0 && <span css={Css.smMd.gray700.mr1.ml1.$}>/</span>}
-          <Link to={breadcrumb.href} css={Css.smMd.gray700.onHover.gray900.$} className="navLink" {...tids.navLink}>
-            {breadcrumb.label}
-          </Link>
-        </Fragment>
-      ))}
+    <div ref={containerRef} css={Css.df.aic.mbPx(4).$}>
+      {breadcrumbs.length > 3 && collapsed ? (
+        <>
+          {renderBreadcrumb(breadcrumbs[0], 0)}
+          <button {...tids.expand} css={Css.gray700.pxPx(8).$} onClick={() => setCollapsed(false)}>
+            ...
+          </button>
+          {renderBreadcrumb(breadcrumbs[breadcrumbs.length - 2], breadcrumbs.length - 2, true)}
+          {renderBreadcrumb(breadcrumbs[breadcrumbs.length - 1], breadcrumbs.length - 1)}
+        </>
+      ) : (
+        breadcrumbs.map((bc, i) => renderBreadcrumb(bc, i))
+      )}
     </div>
   );
 }

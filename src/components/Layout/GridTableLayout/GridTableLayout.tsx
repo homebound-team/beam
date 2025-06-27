@@ -51,6 +51,7 @@ export type GridTableLayoutProps<
   pageTitle: string;
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
   breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
+  collapsibleBreadcrumbs?: boolean;
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
@@ -89,7 +90,16 @@ function GridTableLayoutComponent<
   X extends Only<GridTableXss, X>,
   QData,
 >(props: GridTableLayoutProps<F, R, X, QData>) {
-  const { pageTitle, breadcrumb, tableProps, layoutState, primaryAction, secondaryAction, tertiaryAction } = props;
+  const {
+    pageTitle,
+    breadcrumb,
+    collapsibleBreadcrumbs,
+    tableProps,
+    layoutState,
+    primaryAction,
+    secondaryAction,
+    tertiaryAction,
+  } = props;
 
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
   const showTableActions = layoutState?.filterDefs || layoutState?.search;
@@ -102,6 +112,7 @@ function GridTableLayoutComponent<
       <Header
         pageTitle={pageTitle}
         breadcrumb={breadcrumb}
+        collapsibleBreadcrumbs={collapsibleBreadcrumbs}
         primaryAction={primaryAction}
         secondaryAction={secondaryAction}
         tertiaryAction={tertiaryAction}
@@ -176,17 +187,18 @@ type HeaderProps = {
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
+  collapsibleBreadcrumbs?: boolean;
 };
 
 function Header(props: HeaderProps) {
-  const { pageTitle, breadcrumb, primaryAction, secondaryAction, tertiaryAction } = props;
+  const { pageTitle, breadcrumb, collapsibleBreadcrumbs, primaryAction, secondaryAction, tertiaryAction } = props;
   const tids = useTestIds(props);
 
   return (
     <FullBleed>
       <header css={{ ...Css.p3.mb3.mhPx(50).bgWhite.df.jcsb.aic.$ }} {...tids.header}>
         <div>
-          {breadcrumb && <PageHeaderBreadcrumbs breadcrumb={breadcrumb} />}
+          {breadcrumb && <PageHeaderBreadcrumbs breadcrumb={breadcrumb} collapsible={collapsibleBreadcrumbs} />}
           <h1 css={Css.xl2Sb.mt1.$} {...tids.pageTitle}>
             {pageTitle}
           </h1>

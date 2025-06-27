@@ -77,8 +77,13 @@ export function QueryTableLayout() {
         pageTitle="Query Table Layout Example"
         breadcrumb={[
           { href: "/", label: "Home" },
-          { href: "/", label: "Sub Page" },
+          { href: "/", label: "Sub Page A" },
+          { href: "/", label: "Sub Page B" },
+          { href: "/", label: "Sub Page C" },
+          { href: "/", label: "Sub Page D" },
+          { href: "/", label: "Sub Page E" },
         ]}
+        collapsibleBreadcrumbs={true}
         layoutState={layoutState}
         tableProps={{
           columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
