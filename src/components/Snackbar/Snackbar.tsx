@@ -12,7 +12,7 @@ export function Snackbar({ notices, offset }: SnackbarProps) {
   return (
     <div
       {...tid.snackbarWrapper}
-      css={Css.fixed.z999.bottomPx(offset.bottom ?? defaultOffset.bottom).left3.df.fdc.aifs.gapPx(12).$}
+      css={Css.fixed.z9999.bottomPx(offset.bottom ?? defaultOffset.bottom).left3.df.fdc.aifs.gapPx(12).$}
     >
       {notices.map((data) => (
         <SnackbarNotice key={data.id} {...data} />

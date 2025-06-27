@@ -11,7 +11,14 @@ import {
   boundTextField,
 } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { Css, FormPageLayout as FormPageLayoutComponent, FormSectionConfig, TextField } from "src/index";
+import {
+  Css,
+  FormPageLayout as FormPageLayoutComponent,
+  FormSectionConfig,
+  TextField,
+  useSnackbar,
+  useToast,
+} from "src/index";
 import { noop } from "src/utils";
 import { withBeamDecorator, withDimensions, withRouter } from "src/utils/sb";
 
@@ -26,13 +33,21 @@ export function FormPageLayout() {
     config: formConfig,
     init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
   });
+  const { showToast } = useToast();
+  const { triggerNotice } = useSnackbar();
 
   return (
     <FormPageLayoutComponent
       pageTitle="Detail Title"
       submitAction={{ label: "Save", onClick: noop }}
-      cancelAction={{ label: "Cancel", onClick: noop }}
-      tertiaryAction={{ label: "Tertiary Test", onClick: noop }}
+      cancelAction={{
+        label: "Cancel",
+        onClick: () => showToast({ message: "Cancel Action Triggered", type: "warning" }),
+      }}
+      tertiaryAction={{
+        label: "Tertiary Test",
+        onClick: () => triggerNotice({ message: "Tertiary Action Triggered" }),
+      }}
       breadCrumb={[
         { label: "Breadcrumb A", href: "/breadcrumb-a" },
         { label: "Breadcrumb B", href: "/breadcrumb-b" },
@@ -52,13 +67,21 @@ export function SingleColumn() {
     config: formConfig,
     init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
   });
+  const { showToast } = useToast();
+  const { triggerNotice } = useSnackbar();
 
   return (
     <FormPageLayoutComponent
       pageTitle="Detail Title"
       submitAction={{ label: "Save", onClick: noop }}
-      cancelAction={{ label: "Cancel", onClick: noop }}
-      tertiaryAction={{ label: "Tertiary Test", onClick: noop }}
+      cancelAction={{
+        label: "Cancel",
+        onClick: () => showToast({ message: "Cancel Action Triggered", type: "warning" }),
+      }}
+      tertiaryAction={{
+        label: "Tertiary Test",
+        onClick: () => triggerNotice({ message: "Tertiary Action Triggered" }),
+      }}
       breadCrumb={[
         { label: "Breadcrumb A", href: "/breadcrumb-a" },
         { label: "Breadcrumb B", href: "/breadcrumb-b" },
