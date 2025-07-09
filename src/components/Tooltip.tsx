@@ -3,12 +3,14 @@ import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
 import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 import { useTooltipTriggerState } from "react-stately";
-import { Css, Palette } from "src/Css";
+import { Css, Padding, Palette, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 // We combine react-popper and aria-tooltip to makeup the tooltip component for the following reasons:
 // Aria can handle all aspects of the tooltip accessibility and rendering it except handling the dynamic positioning aspect
 // Popper provides the functionality for positioning the tooltip wrt the trigger element
+
+type TooltipXss = Xss<Padding | "borderRadius">;
 
 interface TooltipProps {
   /** The content that shows up when hovered */
@@ -18,10 +20,11 @@ interface TooltipProps {
   delay?: number;
   disabled?: boolean;
   bgColor?: Palette;
+  xss?: TooltipXss;
 }
 
 export function Tooltip(props: TooltipProps) {
-  const { placement, children, title, disabled, delay = 0, bgColor } = props;
+  const { placement, children, title, disabled, delay = 0, bgColor, xss } = props;
 
   const state = useTooltipTriggerState({ delay, isDisabled: disabled });
   const triggerRef = useRef<HTMLElement>(null);
@@ -55,6 +58,7 @@ export function Tooltip(props: TooltipProps) {
           content={title}
           placement={placement}
           bgColor={bgColor}
+          xss={xss}
         />
       )}
     </>
@@ -70,9 +74,10 @@ interface PopperProps {
   content: ReactNode;
   placement?: Placement;
   bgColor: Palette | undefined;
+  xss?: TooltipXss;
 }
 
-function Popper({ triggerRef, content, placement = "auto", bgColor = Palette.Gray900 }: PopperProps) {
+function Popper({ triggerRef, content, placement = "auto", xss, bgColor = Palette.Gray900 }: PopperProps) {
   const popperRef = useRef(null);
   const [arrowRef, setArrowRef] = useState<HTMLDivElement | null>(null);
   // Since we use `display: contents;` on the `triggerRef`, then the element.offsetTop/Left/etc all equal `0`. This would make
@@ -95,7 +100,10 @@ function Popper({ triggerRef, content, placement = "auto", bgColor = Palette.Gra
       ref={popperRef}
       style={styles.popper}
       {...attributes.popper}
-      css={Css.maxw("320px").bgColor(bgColor).bshBasic.white.px1.py("4px").br4.xs.add("zIndex", 999999).$}
+      css={{
+        ...Css.maxw("320px").bgColor(bgColor).bshBasic.white.px1.py("4px").br4.xs.z(999999).$,
+        ...xss,
+      }}
     >
       <div ref={setArrowRef} style={{ ...styles.arrow }} id="arrow" />
       {content}
