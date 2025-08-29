@@ -63,6 +63,10 @@ function Template(args: IconButtonProps) {
           <h2>Colored</h2>
           <IconButton {...args} color={Palette.Red700} />
         </div>
+        <div>
+          <h2>Labeled</h2>
+          <IconButton {...args} label="Download" />
+        </div>
       </div>
     </div>
   );

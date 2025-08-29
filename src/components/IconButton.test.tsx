@@ -5,6 +5,11 @@ import { click, render, withRouter } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
 
 describe("IconButton", () => {
+  it("can add tooltips", async () => {
+    const r = await render(<IconButton icon="trash" label="Move to trash" onClick={noop} />);
+    expect(r.tooltip).toHaveAttribute("title", "Move to trash");
+  });
+
   it("can have a data-testid", async () => {
     const r = await render(<IconButton icon="trash" data-testid="remove" onClick={noop} />);
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("remove");
