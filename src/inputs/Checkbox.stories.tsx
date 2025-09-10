@@ -64,6 +64,41 @@ export function Checkboxes() {
           />
         </div>
       </div>
+      <div css={Css.df.fdc.gap2.$}>
+        <h2 css={Css.mb1.$}>Checkboxes that extend full width of container</h2>
+        <div>
+          <Checkbox
+            fullWidth
+            selected={false}
+            onChange={action("onChange")}
+            label="Comments"
+            description="Get notified when someone posts a comment on a posting"
+            data-testid="checkbox"
+          />
+        </div>
+        <div>
+          <Checkbox
+            fullWidth
+            selected={false}
+            onChange={action("onChange")}
+            label="Comments"
+            description="Get notified when someone posts a comment on a posting. Get notified when someone posts a comment on a posting. Get notified when someone posts a comment on a posting."
+            errorMsg="An error has occurred. An error has occurred. An error has occurred. An error has occurred. An error has occurred."
+            helperText="This is helper text. This is helper text. This is helper text. This is helper text."
+            data-testid="checkbox"
+          />
+        </div>
+        <div>
+          <Checkbox
+            fullWidth
+            selected={false}
+            onChange={action("onChange")}
+            label=""
+            description="Get notified when someone posts a comment on a posting. Get notified when someone posts a comment on a posting. Get notified when someone posts a comment on a posting."
+            data-testid="checkbox"
+          />
+        </div>
+      </div>
     </div>
   );
 }
