@@ -108,6 +108,10 @@ export function WithTooltip() {
         <h2>Tooltip provided via 'tooltip' property</h2>
         <IconButton icon="arrowBack" tooltip="Back to previous page" onClick={noop} />
       </div>
+      <div>
+        <h2>Tooltip provided via 'tooltip' property wrapping an anchor tag</h2>
+        <IconButton icon="arrowBack" tooltip="Visit Homebound" onClick="https://www.homebound.com" />
+      </div>
     </div>
   );
 }
