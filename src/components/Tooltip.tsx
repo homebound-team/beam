@@ -12,21 +12,32 @@ import { useTestIds } from "src/utils";
 
 type TooltipXss = Xss<Padding | "borderRadius">;
 
+/** Note: Only 1 tooltip is ever on screen at a time */
 interface TooltipProps {
   /** The content that shows up when hovered */
   title: ReactNode;
   children: ReactNode;
   placement?: Placement;
+  /**
+   * The delay for the tooltip to appear.
+   *
+   * Note: If tooltip `A` is still showing when tooltip `B` is triggered, tooltip `B`'s `delay` property will be ignored and it will render immediately.
+   * @default 0
+   */
   delay?: number;
+  /** The delay time for the tooltip to disappear.
+   * @default 500
+   */
+  closeDelay?: number;
   disabled?: boolean;
   bgColor?: Palette;
   xss?: TooltipXss;
 }
 
 export function Tooltip(props: TooltipProps) {
-  const { placement, children, title, disabled, delay = 0, bgColor, xss } = props;
+  const { placement, children, title, disabled, delay = 0, closeDelay = 500, bgColor, xss } = props;
 
-  const state = useTooltipTriggerState({ delay, isDisabled: disabled });
+  const state = useTooltipTriggerState({ delay, closeDelay, isDisabled: disabled });
   const triggerRef = useRef<HTMLElement>(null);
   const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger({ isDisabled: disabled }, state, triggerRef);
   const { tooltipProps } = useTooltip(_tooltipProps, state);
