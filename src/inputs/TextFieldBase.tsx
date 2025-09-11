@@ -15,7 +15,7 @@ import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { InputStylePalette, usePresentationContext } from "src/components/PresentationContext";
 import { BorderHoverChild, BorderHoverParent } from "src/components/Table/components/Row";
-import { Css, Only, Palette } from "src/Css";
+import { Css, increment, Only, Palette } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
@@ -139,8 +139,9 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const fieldStyles = {
     container: Css.df.fdc.w100.maxw(fieldMaxWidth).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
     inputWrapper: {
-      ...Css[typeScale].df.aic.br4.px1.w100
-        .bgColor(bgColor)
+      ...Css[typeScale].df.aic.br4
+        .pxPx(TextFieldBasePaddingIncrement)
+        .w100.bgColor(bgColor)
         .gray900.if(contrast && !inputStylePalette)
         .white.if(labelStyle === "left")
         .w(labelLeftFieldWidth).$,
@@ -389,3 +390,6 @@ function getInputStylePalette(inputStylePalette: InputStylePalette): [Palette, P
       return [Palette.White, Palette.Gray100, Palette.Gray100];
   }
 }
+
+// Used in `useGrowingTextField` when `maxLines` adds/removes scrollbar
+export const TextFieldBasePaddingIncrement = increment(1);

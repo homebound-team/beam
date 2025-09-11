@@ -26,6 +26,7 @@ export function TextAreaStyles() {
           <TestTextArea value="" label="Description" labelStyle="left" />
           <TestTextArea label="Description" value="" />
           <TestTextArea label="Description" value="An example description text." autoFocus />
+          <TestTextArea label="Description (maxLines=5)" value={longText} maxLines={5} />
           <TestTextArea
             label="Description"
             value="This is a description that can no longer be edited."
@@ -131,3 +132,12 @@ function ValidationTextArea({ value }: { value: string }) {
     />
   );
 }
+
+const longText = `This is a long text that will span multiple lines to demonstrate the maxLines functionality.
+Each line represents a new line of text that the user might type.
+When the content exceeds the maximum number of lines specified, the textarea will stop growing and enable scrolling.
+This provides a better user experience by preventing the textarea from taking up too much vertical space.
+Line 5: Additional content to test scrolling behavior.
+Line 6: Even more content to ensure scrolling works properly.
+Line 7: Testing that scrolling maintains good usability.
+Line 8: Final line to complete the demonstration.`;
