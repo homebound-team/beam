@@ -1,6 +1,6 @@
 import { useLayoutEffect } from "@react-aria/utils";
 import { MutableRefObject, useCallback } from "react";
-import { TextFieldBaseMultilineTopPadding, TextFieldBasePadding } from "../TextFieldBase";
+import { textFieldBaseMultilineTopPadding, textFieldBasePadding } from "../TextFieldBase";
 
 interface GrowingTextFieldProps {
   inputRef: MutableRefObject<HTMLTextAreaElement | HTMLInputElement | null>;
@@ -46,18 +46,18 @@ export function useGrowingTextField({ inputRef, inputWrapRef, value, disabled, m
         // +2 for border compensation
         const maxHeight = maxLines * lineHeight + 2;
         // + TextFieldBaseMultilineTopPadding to prevent text from being cutoff when displaying max lines
-        finalHeight = Math.min(naturalHeight, maxHeight) + TextFieldBaseMultilineTopPadding;
+        finalHeight = Math.min(naturalHeight, maxHeight) + textFieldBaseMultilineTopPadding;
 
         // Enable/disable scrolling based on whether content exceeds limit
         // Swap padding from parentwrapper to input so scrollbar is flush with border
         if (naturalHeight > maxHeight) {
           input.style.overflowY = "auto";
-          input.style.paddingRight = `${TextFieldBasePadding}px`;
+          input.style.paddingRight = `${textFieldBasePadding}px`;
           inputWrap.style.paddingRight = "0px";
         } else {
           input.style.overflowY = "hidden";
           input.style.paddingRight = "0px";
-          inputWrap.style.paddingRight = `${TextFieldBasePadding}px`;
+          inputWrap.style.paddingRight = `${textFieldBasePadding}px`;
         }
       }
 
