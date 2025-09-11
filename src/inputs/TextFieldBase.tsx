@@ -140,7 +140,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     container: Css.df.fdc.w100.maxw(fieldMaxWidth).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
     inputWrapper: {
       ...Css[typeScale].df.aic.br4
-        .pxPx(TextFieldBasePaddingIncrement)
+        .pxPx(TextFieldBasePadding)
         .w100.bgColor(bgColor)
         .gray900.if(contrast && !inputStylePalette)
         .white.if(labelStyle === "left")
@@ -188,7 +188,9 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       // Make the background transparent when highlighting the field on hover
       ...(borderOnHover && Css.bgTransparent.$),
       // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields
-      ...(multiline ? Css.br4.pyPx(compact ? 7 : 11).add("resize", "none").$ : Css.truncate.$),
+      ...(multiline
+        ? Css.br4.pyPx(compact ? 7 : TextFieldBaseMultilineTopPadding).add("resize", "none").$
+        : Css.truncate.$),
     },
     hover: Css.bgColor(hoverBgColor).if(contrast).bcGray600.$,
     focus: Css.bcBlue700.if(contrast).bcBlue500.if(borderOnHover).bgColor(hoverBgColor).bcBlue500.$,
@@ -392,4 +394,7 @@ function getInputStylePalette(inputStylePalette: InputStylePalette): [Palette, P
 }
 
 // Used in `useGrowingTextField` when `maxLines` adds/removes scrollbar
-export const TextFieldBasePaddingIncrement = increment(1);
+export const TextFieldBasePadding = increment(1);
+// Prevents text from being cutoff
+// We don't care about `compact` using 7 because we have no `compact` TextAreaField
+export const TextFieldBaseMultilineTopPadding = 11;
