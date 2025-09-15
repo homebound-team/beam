@@ -149,10 +149,10 @@ const variantStyles: (contrast: boolean) => Record<
   },
 
   secondary: {
-    baseStyles: Css.bgWhite.bcGray300.bw1.ba.gray800.$,
+    baseStyles: Css.bgWhite.bcGray300.bw1.ba.blue600.$,
     hoverStyles: Css.bgGray100.if(contrast).bgGray300.$,
     pressedStyles: Css.bgGray200.if(contrast).bgGray100.$,
-    disabledStyles: Css.bgWhite.gray400.$,
+    disabledStyles: Css.bgWhite.blue300.$,
     focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
 
@@ -164,21 +164,21 @@ const variantStyles: (contrast: boolean) => Record<
     focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.Blue400}`).bgGray700.white.$,
   },
 
-  tertiaryDanger: {
-    baseStyles: Css.bgTransparent.red600.if(contrast).red400.$,
+  tertiaryQuaternary: {
+    baseStyles: Css.bgTransparent.gray900.if(contrast).gray400.$,
     hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
-    pressedStyles: Css.red800.if(contrast).bgWhite.gray900.$,
+    pressedStyles: Css.gray900.if(contrast).bgWhite.gray900.$,
     disabledStyles: Css.gray400.if(contrast).gray700.$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.White}, 0px 0px 0px 4px ${Palette.Red500}`)
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.White}, 0px 0px 0px 4px ${Palette.Gray900}`)
       .if(contrast)
-      .boxShadow(`0px 0px 0px 2px ${Palette.Red500}`).$,
+      .boxShadow(`0px 0px 0px 2px ${Palette.Gray500}`).$,
   },
 
-  danger: {
-    baseStyles: Css.bgRed600.white.$,
-    hoverStyles: Css.bgRed700.$,
-    pressedStyles: Css.bgRed800.$,
-    disabledStyles: Css.bgRed200.if(contrast).bgRed900.gray600.$,
+  quaternary: {
+    baseStyles: Css.bgGray900.white.$,
+    hoverStyles: Css.bgGray700.$,
+    pressedStyles: Css.bgGray800.$,
+    disabledStyles: Css.bgGray200.if(contrast).bgGray900.gray600.$,
     focusStyles: Css.bshDanger.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
   },
 
@@ -199,11 +199,11 @@ const variantStyles: (contrast: boolean) => Record<
   },
   // Todo: handle contrast variant
   textSecondary: {
-    baseStyles: Css.gray900.add("fontSize", "inherit").$,
+    baseStyles: Css.blue600.add("fontSize", "inherit").$,
     hoverStyles: Css.bgGray100.$,
-    pressedStyles: Css.gray900.$,
-    disabledStyles: Css.bgWhite.gray400.$,
-    focusStyles: Css.gray900.$,
+    pressedStyles: Css.blue600.$,
+    disabledStyles: Css.bgWhite.blue300.$,
+    focusStyles: Css.blue600.$,
   },
 });
 
@@ -224,8 +224,8 @@ export type ButtonVariant =
   | "primary"
   | "secondary"
   | "tertiary"
-  | "tertiaryDanger"
+  | "tertiaryQuaternary"
   | "caution"
-  | "danger"
+  | "quaternary"
   | "text"
   | "textSecondary";
