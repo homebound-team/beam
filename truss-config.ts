@@ -95,7 +95,7 @@ const sections: Sections = {
     newMethod("buttonBase", {
       ...fonts.smMd,
       outline: 0,
-      borderRadius: "4px",
+      borderRadius: "8px",
       display: "inline-flex",
       alignItems: "center",
       whiteSpace: "nowrap",

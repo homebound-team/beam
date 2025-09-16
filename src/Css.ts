@@ -3927,11 +3927,11 @@ class CssBuilder<T extends Properties> {
   }
 
   // buttonBase
-  /** Sets `fontWeight: 500; fontSize: "14px"; lineHeight: "20px"; outline: 0; borderRadius: "4px"; display: "inline-flex"; alignItems: "center"; whiteSpace: "nowrap"; transition: "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms"`. */
+  /** Sets `fontWeight: 500; fontSize: "14px"; lineHeight: "20px"; outline: 0; borderRadius: "8px"; display: "inline-flex"; alignItems: "center"; whiteSpace: "nowrap"; transition: "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms"`. */
   get buttonBase() {
     return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px").add("outline", 0).add(
       "borderRadius",
-      "4px",
+      "8px",
     ).add("display", "inline-flex").add("alignItems", "center").add("whiteSpace", "nowrap").add(
       "transition",
       "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms",

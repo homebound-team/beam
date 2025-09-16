@@ -15,7 +15,16 @@ export default {
 } as Meta;
 
 const sizes: ButtonSize[] = ["sm", "md", "lg"];
-const variants: ButtonVariant[] = ["primary", "secondary", "tertiary", "tertiaryDanger", "danger", "textSecondary"];
+const variants: ButtonVariant[] = [
+  "primary",
+  "secondary",
+  "tertiary",
+  "tertiaryQuaternary",
+  "quaternary",
+  "danger",
+  "tertiaryDanger",
+  "textSecondary",
+];
 
 export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
   return (
