@@ -164,6 +164,22 @@ const variantStyles: (contrast: boolean) => Record<
     focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.Blue400}`).bgGray700.white.$,
   },
 
+  danger: {
+    baseStyles: Css.bgRed600.white.$,
+    hoverStyles: Css.bgRed700.$,
+    pressedStyles: Css.bgRed800.$,
+    disabledStyles: Css.bgRed200.if(contrast).bgRed900.gray600.$,
+    focusStyles: Css.bshDanger.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
+  },
+
+  tertiaryDanger: {
+    baseStyles: Css.bgTransparent.red600.if(contrast).red400.$,
+    hoverStyles: Css.bgRed100.if(contrast).bgRed900.white.$,
+    pressedStyles: Css.red800.if(contrast).bgWhite.red200.$,
+    disabledStyles: Css.red300.if(contrast).red700.$,
+    focusStyles: Css.bshDanger.if(contrast).boxShadow(`0 0 0 2px ${Palette.Red400}`).bgRed900.white.$,
+  },
+
   tertiaryQuaternary: {
     baseStyles: Css.bgTransparent.gray900.if(contrast).gray400.$,
     hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
@@ -180,22 +196,6 @@ const variantStyles: (contrast: boolean) => Record<
     pressedStyles: Css.bgGray800.$,
     disabledStyles: Css.bgGray200.if(contrast).bgGray900.gray600.$,
     focusStyles: Css.bshDanger.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
-  },
-
-  danger: {
-    baseStyles: Css.bgRed600.white.$,
-    hoverStyles: Css.bgRed700.$,
-    pressedStyles: Css.bgRed800.$,
-    disabledStyles: Css.bgRed200.if(contrast).bgRed900.white.$,
-    focusStyles: Css.bshDanger.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
-  },
-
-  tertiaryDanger: {
-    baseStyles: Css.bgTransparent.red600.if(contrast).red400.$,
-    hoverStyles: Css.bgRed100.if(contrast).bgRed900.white.$,
-    pressedStyles: Css.red800.if(contrast).bgWhite.red200.$,
-    disabledStyles: Css.red300.if(contrast).red700.$,
-    focusStyles: Css.bshDanger.if(contrast).boxShadow(`0 0 0 2px ${Palette.Red400}`).bgRed900.white.$,
   },
 
   caution: {
@@ -240,10 +240,10 @@ export type ButtonVariant =
   | "primary"
   | "secondary"
   | "tertiary"
+  | "tertiaryDanger"
   | "tertiaryQuaternary"
   | "caution"
-  | "quaternary"
   | "danger"
-  | "tertiaryDanger"
+  | "quaternary"
   | "text"
   | "textSecondary";
