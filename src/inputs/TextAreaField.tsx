@@ -13,6 +13,8 @@ export interface TextAreaFieldProps<X> extends BeamTextFieldProps<X> {
   preventNewLines?: boolean;
   // `onEnter` is only triggered when `preventNewLines` is set to `true`
   onEnter?: VoidFunction;
+  // Maximum number of lines before scrolling is enabled, must be >= 5 to take effect; If not provided, the textarea will grow indefinitely.
+  maxLines?: number;
 }
 
 /** Returns a <textarea /> element that auto-adjusts height based on the field's value */
@@ -25,6 +27,7 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
     onFocus,
     preventNewLines,
     onEnter,
+    maxLines,
     ...otherProps
   } = props;
   const isDisabled = !!disabled;
@@ -33,7 +36,7 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
 
-  useGrowingTextField({ inputRef, inputWrapRef, value });
+  useGrowingTextField({ inputRef, inputWrapRef, value, maxLines });
 
   const { labelProps, inputProps } = useTextField(
     {
