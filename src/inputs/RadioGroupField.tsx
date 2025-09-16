@@ -38,8 +38,8 @@ export interface RadioGroupFieldProps<K extends string> extends Pick<Presentatio
   helperText?: string | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
-  /** The group name for the radio group. */
-  name?: string;
+  /** The group name for the radio group. Only for legacy pages with custom layouts - avoid using this. */
+  unsupportedNameHack?: string;
 }
 
 /**
@@ -59,12 +59,12 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
     disabled = false,
     errorMsg,
     helperText,
-    name,
+    unsupportedNameHack,
     ...otherProps
   } = props;
   // We use a group name so that the radio group is logically grouped together
   // Allows for externally grouped radios when `name` is provided multiple times
-  const groupName = useMemo(() => name ?? `radio-group-${++nextNameId}`, [name]);
+  const groupName = useMemo(() => unsupportedNameHack ?? `radio-group-${++nextNameId}`, [unsupportedNameHack]);
   const state = useRadioGroupState({
     name: groupName,
     value,

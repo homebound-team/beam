@@ -50,18 +50,18 @@ describe("RadioGroupField", () => {
     expect(tooltip).toHaveAttribute("title", "some reason");
   });
 
-  it("can have a group name", async () => {
+  it("can provide a custom group name", async () => {
     const r = await render(
       <>
         <RadioGroupField
-          name="favorite-cheese-group"
+          unsupportedNameHack="favorite-cheese-group"
           label="cheese option 1"
           value="a"
           onChange={() => {}}
           options={[{ value: "a", label: "Asiago" }]}
         />
         <RadioGroupField
-          name="favorite-cheese-group"
+          unsupportedNameHack="favorite-cheese-group"
           label="cheese option 2"
           value="b"
           onChange={() => {}}
