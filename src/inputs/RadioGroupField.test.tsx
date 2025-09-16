@@ -50,7 +50,7 @@ describe("RadioGroupField", () => {
     expect(tooltip).toHaveAttribute("title", "some reason");
   });
 
-  it("should have a group name", async () => {
+  it("can have a group name", async () => {
     const r = await render(
       <>
         <RadioGroupField
