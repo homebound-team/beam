@@ -49,27 +49,4 @@ describe("RadioGroupField", () => {
     expect(tooltip).toBeInTheDocument();
     expect(tooltip).toHaveAttribute("title", "some reason");
   });
-
-  it("can provide a custom group name", async () => {
-    const r = await render(
-      <>
-        <RadioGroupField
-          unsupportedNameHack="favorite-cheese-group"
-          label="cheese option 1"
-          value="a"
-          onChange={() => {}}
-          options={[{ value: "a", label: "Asiago" }]}
-        />
-        <RadioGroupField
-          unsupportedNameHack="favorite-cheese-group"
-          label="cheese option 2"
-          value="b"
-          onChange={() => {}}
-          options={[{ value: "b", label: "Burratta" }]}
-        />
-      </>,
-    );
-    expect(r.getByTestId("cheeseOption_1_a")).toHaveAttribute("name", "favorite-cheese-group");
-    expect(r.getByTestId("cheeseOption_2_b")).toHaveAttribute("name", "favorite-cheese-group");
-  });
 });

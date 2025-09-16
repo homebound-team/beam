@@ -38,8 +38,6 @@ export interface RadioGroupFieldProps<K extends string> extends Pick<Presentatio
   helperText?: string | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
-  /** The group name for the radio group. Only for legacy pages with custom layouts - avoid using this. */
-  unsupportedNameHack?: string;
 }
 
 /**
@@ -50,23 +48,12 @@ export interface RadioGroupFieldProps<K extends string> extends Pick<Presentatio
  * TODO: Add hover (non selected and selected) styles
  */
 export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>) {
-  const {
-    label,
-    labelStyle,
-    value,
-    onChange,
-    options,
-    disabled = false,
-    errorMsg,
-    helperText,
-    unsupportedNameHack,
-    ...otherProps
-  } = props;
-  // We use a group name so that the radio group is logically grouped together
-  // Allows for externally grouped radios when `name` is provided multiple times
-  const groupName = useMemo(() => unsupportedNameHack ?? `radio-group-${++nextNameId}`, [unsupportedNameHack]);
+  const { label, labelStyle, value, onChange, options, disabled = false, errorMsg, helperText, ...otherProps } = props;
+
+  // useRadioGroupState uses a random group name, so use our name
+  const name = useMemo(() => `radio-group-${++nextNameId}`, []);
   const state = useRadioGroupState({
-    name: groupName,
+    name,
     value,
     onChange: (value) => onChange(value as K),
     isDisabled: disabled,
@@ -76,7 +63,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
 
   // We use useRadioGroup b/c it does neat keyboard up/down stuff
   // TODO: Pass read only, required, error message to useRadioGroup
-  const { labelProps, radioGroupProps } = useRadioGroup({ label, isDisabled: disabled, name: groupName }, state);
+  const { labelProps, radioGroupProps } = useRadioGroup({ label, isDisabled: disabled }, state);
 
   return (
     // default styling to position `<Label />` above.
@@ -92,7 +79,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
                 placement: "bottom",
                 children: (
                   <Radio
-                    parentId={groupName}
+                    parentId={name}
                     option={option}
                     state={{ ...state, isDisabled }}
                     {...otherProps}
@@ -151,8 +138,6 @@ function Radio<K extends string>(props: {
         disabled={disabled}
         aria-labelledby={labelId}
         {...inputProps}
-        // inputProps could have a name, so we need to override it
-        name={parentId}
         {...focusProps}
         // Put others here b/c it could have data-testid in it or onX events.
         {...others}
