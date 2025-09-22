@@ -27,7 +27,7 @@ export function ConfirmCloseModal(props: ConfirmCloseModalProps) {
       </ModalBody>
       <ModalFooter>
         <Button
-          variant="tertiary"
+          variant="tertiaryQuaternary"
           label={discardText}
           onClick={() => {
             // The order of these calls doesn't really matter; close this modal and tell the call to do their close

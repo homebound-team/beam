@@ -54,7 +54,7 @@ function SuperDrawerForm() {
   return (
     <SuperDrawerContent
       actions={[
-        { label: "Cancel", onClick: closeDrawer },
+        { label: "Cancel", onClick: closeDrawer, variant: "tertiaryQuaternary" },
         {
           label: "Save",
           onClick: () => {

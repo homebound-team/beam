@@ -114,7 +114,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
             <Button
               label={cancelAction.label}
               onClick={cancelAction.onClick}
-              variant="secondary"
+              variant="tertiaryQuaternary"
               disabled={cancelAction.disabled}
               tooltip={cancelAction.tooltip}
             />

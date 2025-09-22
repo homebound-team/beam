@@ -440,7 +440,7 @@ function TestSimpleModalContent({ book, onPrimaryClick }: { book: Book; onPrimar
       </ModalBody>
       <ModalFooter>
         <Button label="Purchase" onClick={onPrimaryClick} />
-        <Button variant="tertiary" label="Cancel" onClick={() => closeModal()} />
+        <Button variant="tertiaryQuaternary" label="Cancel" onClick={() => closeModal()} />
       </ModalFooter>
     </>
   );
