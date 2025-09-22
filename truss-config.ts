@@ -6,56 +6,24 @@ const numberOfIncrements = 8;
 
 // prettier-ignore
 const fonts: Record<string, { fontWeight: 400 | 500 | 600 | 700, fontSize: string; lineHeight: string }> = {
-  tiny:   { fontWeight: 400, fontSize: "10px", lineHeight: "14px" },
-  tinyMd: { fontWeight: 500, fontSize: "10px", lineHeight: "14px" },
-  tinySb: { fontWeight: 600, fontSize: "10px", lineHeight: "14px" },
-  tinyBd: { fontWeight: 700, fontSize: "10px", lineHeight: "14px" },
+  xs2:   { fontWeight: 400, fontSize: "10px", lineHeight: "14px" },
+  xs2Md: { fontWeight: 500, fontSize: "10px", lineHeight: "14px" },
 
   xs:     { fontWeight: 400, fontSize: "12px", lineHeight: "16px" },
-  xsMd:   { fontWeight: 500, fontSize: "12px", lineHeight: "16px" },
   xsSb:   { fontWeight: 600, fontSize: "12px", lineHeight: "16px" },
-  xsBd:   { fontWeight: 700, fontSize: "12px", lineHeight: "16px" },
 
   sm:     { fontWeight: 400, fontSize: "14px", lineHeight: "20px" },
-  smMd:   { fontWeight: 500, fontSize: "14px", lineHeight: "20px" },
   smSb:   { fontWeight: 600, fontSize: "14px", lineHeight: "20px" },
-  smBd:   { fontWeight: 700, fontSize: "14px", lineHeight: "20px" },
 
   base:   { fontWeight: 400, fontSize: "16px", lineHeight: "24px" },
-  baseMd: { fontWeight: 500, fontSize: "16px", lineHeight: "24px" },
   baseSb: { fontWeight: 600, fontSize: "16px", lineHeight: "24px" },
-  baseBd: { fontWeight: 700, fontSize: "16px", lineHeight: "24px" },
 
-  lg:     { fontWeight: 400, fontSize: "18px", lineHeight: "28px" },
-  lgMd:   { fontWeight: 500, fontSize: "18px", lineHeight: "28px" },
-  lgSb:   { fontWeight: 600, fontSize: "18px", lineHeight: "28px" },
-  lgBd:   { fontWeight: 700, fontSize: "18px", lineHeight: "28px" },
+  lg:   { fontWeight: 600, fontSize: "18px", lineHeight: "28px" },
 
-  xl:     { fontWeight: 400, fontSize: "20px", lineHeight: "28px" },
-  xlMd:   { fontWeight: 500, fontSize: "20px", lineHeight: "28px" },
-  xlSb:   { fontWeight: 600, fontSize: "20px", lineHeight: "28px" },
-  xlBd:   { fontWeight: 700, fontSize: "20px", lineHeight: "28px" },
+  xl:   { fontWeight: 600, fontSize: "20px", lineHeight: "28px" },
 
   // Using xl2 vs 2xl so that we can use it via Css.xl2 vs Css['2xl']
-  xl2:    { fontWeight: 400, fontSize: "24px", lineHeight: "32px" },
-  xl2Md:  { fontWeight: 500, fontSize: "24px", lineHeight: "32px" },
-  xl2Sb:  { fontWeight: 600, fontSize: "24px", lineHeight: "32px" },
-  xl2Bd:  { fontWeight: 700, fontSize: "24px", lineHeight: "32px" },
-
-  xl3:    { fontWeight: 400, fontSize: "30px", lineHeight: "36px" },
-  xl3Md:  { fontWeight: 500, fontSize: "30px", lineHeight: "36px" },
-  xl3Sb:  { fontWeight: 600, fontSize: "30px", lineHeight: "36px" },
-  xl3Bd:  { fontWeight: 700, fontSize: "30px", lineHeight: "36px" },
-
-  xl4:    { fontWeight: 400, fontSize: "36px", lineHeight: "40px" },
-  xl4Md:  { fontWeight: 500, fontSize: "36px", lineHeight: "40px" },
-  xl4Sb:  { fontWeight: 600, fontSize: "36px", lineHeight: "40px" },
-  xl4Bd:  { fontWeight: 700, fontSize: "36px", lineHeight: "40px" },
-
-  xl5:    { fontWeight: 400, fontSize: "48px", lineHeight: "48px" },
-  xl5Md:  { fontWeight: 500, fontSize: "48px", lineHeight: "48px" },
-  xl5Sb:  { fontWeight: 600, fontSize: "48px", lineHeight: "48px" },
-  xl5Bd:  { fontWeight: 700, fontSize: "48px", lineHeight: "48px" },
+  xl2:  { fontWeight: 600, fontSize: "30px", lineHeight: "36px" },
 };
 
 const transition: string = ["background-color", "border-color", "box-shadow", "left", "right", "margin"]
