@@ -8,47 +8,7 @@ export type Only<X, T> = X & Record<Exclude<keyof T, keyof X>, never>;
 
 export type Properties = Properties1<string | 0, string>;
 
-export type Typography =
-  | "tiny"
-  | "tinyMd"
-  | "tinySb"
-  | "tinyBd"
-  | "xs"
-  | "xsMd"
-  | "xsSb"
-  | "xsBd"
-  | "sm"
-  | "smMd"
-  | "smSb"
-  | "smBd"
-  | "base"
-  | "baseMd"
-  | "baseSb"
-  | "baseBd"
-  | "lg"
-  | "lgMd"
-  | "lgSb"
-  | "lgBd"
-  | "xl"
-  | "xlMd"
-  | "xlSb"
-  | "xlBd"
-  | "xl2"
-  | "xl2Md"
-  | "xl2Sb"
-  | "xl2Bd"
-  | "xl3"
-  | "xl3Md"
-  | "xl3Sb"
-  | "xl3Bd"
-  | "xl4"
-  | "xl4Md"
-  | "xl4Sb"
-  | "xl4Bd"
-  | "xl5"
-  | "xl5Md"
-  | "xl5Sb"
-  | "xl5Bd";
+export type Typography = "xs2" | "xs2Md" | "xs" | "xsSb" | "sm" | "smSb" | "base" | "baseSb" | "lg" | "xl" | "xl2";
 
 type Opts<T> = { rules: T; enabled: boolean; important: boolean; selector: string | undefined };
 
@@ -3387,164 +3347,48 @@ class CssBuilder<T extends Properties> {
 
   // typeScale
   /** Sets `fontWeight: 400; fontSize: "10px"; lineHeight: "14px"`. */
-  get tiny() {
+  get xs2() {
     return this.add("fontWeight", 400).add("fontSize", "10px").add("lineHeight", "14px");
   }
   /** Sets `fontWeight: 500; fontSize: "10px"; lineHeight: "14px"`. */
-  get tinyMd() {
+  get xs2Md() {
     return this.add("fontWeight", 500).add("fontSize", "10px").add("lineHeight", "14px");
-  }
-  /** Sets `fontWeight: 600; fontSize: "10px"; lineHeight: "14px"`. */
-  get tinySb() {
-    return this.add("fontWeight", 600).add("fontSize", "10px").add("lineHeight", "14px");
-  }
-  /** Sets `fontWeight: 700; fontSize: "10px"; lineHeight: "14px"`. */
-  get tinyBd() {
-    return this.add("fontWeight", 700).add("fontSize", "10px").add("lineHeight", "14px");
   }
   /** Sets `fontWeight: 400; fontSize: "12px"; lineHeight: "16px"`. */
   get xs() {
     return this.add("fontWeight", 400).add("fontSize", "12px").add("lineHeight", "16px");
   }
-  /** Sets `fontWeight: 500; fontSize: "12px"; lineHeight: "16px"`. */
-  get xsMd() {
-    return this.add("fontWeight", 500).add("fontSize", "12px").add("lineHeight", "16px");
-  }
   /** Sets `fontWeight: 600; fontSize: "12px"; lineHeight: "16px"`. */
   get xsSb() {
     return this.add("fontWeight", 600).add("fontSize", "12px").add("lineHeight", "16px");
-  }
-  /** Sets `fontWeight: 700; fontSize: "12px"; lineHeight: "16px"`. */
-  get xsBd() {
-    return this.add("fontWeight", 700).add("fontSize", "12px").add("lineHeight", "16px");
   }
   /** Sets `fontWeight: 400; fontSize: "14px"; lineHeight: "20px"`. */
   get sm() {
     return this.add("fontWeight", 400).add("fontSize", "14px").add("lineHeight", "20px");
   }
-  /** Sets `fontWeight: 500; fontSize: "14px"; lineHeight: "20px"`. */
-  get smMd() {
-    return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px");
-  }
   /** Sets `fontWeight: 600; fontSize: "14px"; lineHeight: "20px"`. */
   get smSb() {
     return this.add("fontWeight", 600).add("fontSize", "14px").add("lineHeight", "20px");
-  }
-  /** Sets `fontWeight: 700; fontSize: "14px"; lineHeight: "20px"`. */
-  get smBd() {
-    return this.add("fontWeight", 700).add("fontSize", "14px").add("lineHeight", "20px");
   }
   /** Sets `fontWeight: 400; fontSize: "16px"; lineHeight: "24px"`. */
   get base() {
     return this.add("fontWeight", 400).add("fontSize", "16px").add("lineHeight", "24px");
   }
-  /** Sets `fontWeight: 500; fontSize: "16px"; lineHeight: "24px"`. */
-  get baseMd() {
-    return this.add("fontWeight", 500).add("fontSize", "16px").add("lineHeight", "24px");
-  }
   /** Sets `fontWeight: 600; fontSize: "16px"; lineHeight: "24px"`. */
   get baseSb() {
     return this.add("fontWeight", 600).add("fontSize", "16px").add("lineHeight", "24px");
   }
-  /** Sets `fontWeight: 700; fontSize: "16px"; lineHeight: "24px"`. */
-  get baseBd() {
-    return this.add("fontWeight", 700).add("fontSize", "16px").add("lineHeight", "24px");
-  }
-  /** Sets `fontWeight: 400; fontSize: "18px"; lineHeight: "28px"`. */
-  get lg() {
-    return this.add("fontWeight", 400).add("fontSize", "18px").add("lineHeight", "28px");
-  }
-  /** Sets `fontWeight: 500; fontSize: "18px"; lineHeight: "28px"`. */
-  get lgMd() {
-    return this.add("fontWeight", 500).add("fontSize", "18px").add("lineHeight", "28px");
-  }
   /** Sets `fontWeight: 600; fontSize: "18px"; lineHeight: "28px"`. */
-  get lgSb() {
+  get lg() {
     return this.add("fontWeight", 600).add("fontSize", "18px").add("lineHeight", "28px");
   }
-  /** Sets `fontWeight: 700; fontSize: "18px"; lineHeight: "28px"`. */
-  get lgBd() {
-    return this.add("fontWeight", 700).add("fontSize", "18px").add("lineHeight", "28px");
-  }
-  /** Sets `fontWeight: 400; fontSize: "20px"; lineHeight: "28px"`. */
-  get xl() {
-    return this.add("fontWeight", 400).add("fontSize", "20px").add("lineHeight", "28px");
-  }
-  /** Sets `fontWeight: 500; fontSize: "20px"; lineHeight: "28px"`. */
-  get xlMd() {
-    return this.add("fontWeight", 500).add("fontSize", "20px").add("lineHeight", "28px");
-  }
   /** Sets `fontWeight: 600; fontSize: "20px"; lineHeight: "28px"`. */
-  get xlSb() {
+  get xl() {
     return this.add("fontWeight", 600).add("fontSize", "20px").add("lineHeight", "28px");
   }
-  /** Sets `fontWeight: 700; fontSize: "20px"; lineHeight: "28px"`. */
-  get xlBd() {
-    return this.add("fontWeight", 700).add("fontSize", "20px").add("lineHeight", "28px");
-  }
-  /** Sets `fontWeight: 400; fontSize: "24px"; lineHeight: "32px"`. */
-  get xl2() {
-    return this.add("fontWeight", 400).add("fontSize", "24px").add("lineHeight", "32px");
-  }
-  /** Sets `fontWeight: 500; fontSize: "24px"; lineHeight: "32px"`. */
-  get xl2Md() {
-    return this.add("fontWeight", 500).add("fontSize", "24px").add("lineHeight", "32px");
-  }
-  /** Sets `fontWeight: 600; fontSize: "24px"; lineHeight: "32px"`. */
-  get xl2Sb() {
-    return this.add("fontWeight", 600).add("fontSize", "24px").add("lineHeight", "32px");
-  }
-  /** Sets `fontWeight: 700; fontSize: "24px"; lineHeight: "32px"`. */
-  get xl2Bd() {
-    return this.add("fontWeight", 700).add("fontSize", "24px").add("lineHeight", "32px");
-  }
-  /** Sets `fontWeight: 400; fontSize: "30px"; lineHeight: "36px"`. */
-  get xl3() {
-    return this.add("fontWeight", 400).add("fontSize", "30px").add("lineHeight", "36px");
-  }
-  /** Sets `fontWeight: 500; fontSize: "30px"; lineHeight: "36px"`. */
-  get xl3Md() {
-    return this.add("fontWeight", 500).add("fontSize", "30px").add("lineHeight", "36px");
-  }
   /** Sets `fontWeight: 600; fontSize: "30px"; lineHeight: "36px"`. */
-  get xl3Sb() {
+  get xl2() {
     return this.add("fontWeight", 600).add("fontSize", "30px").add("lineHeight", "36px");
-  }
-  /** Sets `fontWeight: 700; fontSize: "30px"; lineHeight: "36px"`. */
-  get xl3Bd() {
-    return this.add("fontWeight", 700).add("fontSize", "30px").add("lineHeight", "36px");
-  }
-  /** Sets `fontWeight: 400; fontSize: "36px"; lineHeight: "40px"`. */
-  get xl4() {
-    return this.add("fontWeight", 400).add("fontSize", "36px").add("lineHeight", "40px");
-  }
-  /** Sets `fontWeight: 500; fontSize: "36px"; lineHeight: "40px"`. */
-  get xl4Md() {
-    return this.add("fontWeight", 500).add("fontSize", "36px").add("lineHeight", "40px");
-  }
-  /** Sets `fontWeight: 600; fontSize: "36px"; lineHeight: "40px"`. */
-  get xl4Sb() {
-    return this.add("fontWeight", 600).add("fontSize", "36px").add("lineHeight", "40px");
-  }
-  /** Sets `fontWeight: 700; fontSize: "36px"; lineHeight: "40px"`. */
-  get xl4Bd() {
-    return this.add("fontWeight", 700).add("fontSize", "36px").add("lineHeight", "40px");
-  }
-  /** Sets `fontWeight: 400; fontSize: "48px"; lineHeight: "48px"`. */
-  get xl5() {
-    return this.add("fontWeight", 400).add("fontSize", "48px").add("lineHeight", "48px");
-  }
-  /** Sets `fontWeight: 500; fontSize: "48px"; lineHeight: "48px"`. */
-  get xl5Md() {
-    return this.add("fontWeight", 500).add("fontSize", "48px").add("lineHeight", "48px");
-  }
-  /** Sets `fontWeight: 600; fontSize: "48px"; lineHeight: "48px"`. */
-  get xl5Sb() {
-    return this.add("fontWeight", 600).add("fontSize", "48px").add("lineHeight", "48px");
-  }
-  /** Sets `fontWeight: 700; fontSize: "48px"; lineHeight: "48px"`. */
-  get xl5Bd() {
-    return this.add("fontWeight", 700).add("fontSize", "48px").add("lineHeight", "48px");
   }
 
   // typography
@@ -3927,15 +3771,13 @@ class CssBuilder<T extends Properties> {
   }
 
   // buttonBase
-  /** Sets `fontWeight: 500; fontSize: "14px"; lineHeight: "20px"; outline: 0; borderRadius: "8px"; display: "inline-flex"; alignItems: "center"; whiteSpace: "nowrap"; transition: "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms"`. */
+  /** Sets `outline: 0; borderRadius: "8px"; display: "inline-flex"; alignItems: "center"; whiteSpace: "nowrap"; transition: "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms"`. */
   get buttonBase() {
-    return this.add("fontWeight", 500).add("fontSize", "14px").add("lineHeight", "20px").add("outline", 0).add(
-      "borderRadius",
-      "8px",
-    ).add("display", "inline-flex").add("alignItems", "center").add("whiteSpace", "nowrap").add(
-      "transition",
-      "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms",
-    );
+    return this.add("outline", 0).add("borderRadius", "8px").add("display", "inline-flex").add("alignItems", "center")
+      .add("whiteSpace", "nowrap").add(
+        "transition",
+        "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms",
+      );
   }
 
   // listReset
