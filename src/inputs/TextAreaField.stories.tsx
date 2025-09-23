@@ -45,14 +45,7 @@ export function TextAreaStyles() {
         <TestTextArea label="Description" value="An example description text." fullWidth />
 
         <h1 css={Css.lg.$}>Modified for Blueprint To Do Title</h1>
-        <TestTextArea
-          label="Title"
-          value="Test title"
-          preventNewLines
-          labelStyle="hidden"
-          borderless
-          xss={Css.xl2Sb.$}
-        />
+        <TestTextArea label="Title" value="Test title" preventNewLines labelStyle="hidden" borderless xss={Css.xl2.$} />
       </div>
     </div>
   );

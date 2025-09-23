@@ -19,7 +19,7 @@ export const Typography = () => {
           <td>2XS</td>
           <td>
             <p>Regular</p>
-            <p css={Css.xs2Md.$}>Medium</p>
+            <p css={Css.xs2Sb.$}>Semibold</p>
           </td>
         </tr>
 

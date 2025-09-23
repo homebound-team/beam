@@ -187,7 +187,7 @@ function Header(props: HeaderProps) {
       <header css={{ ...Css.p3.mb3.mhPx(50).bgWhite.df.jcsb.aic.$ }} {...tids.header}>
         <div>
           {breadcrumb && <PageHeaderBreadcrumbs breadcrumb={breadcrumb} />}
-          <h1 css={Css.xl2Sb.mt1.$} {...tids.pageTitle}>
+          <h1 css={Css.xl2.mt1.$} {...tids.pageTitle}>
             {pageTitle}
           </h1>
         </div>

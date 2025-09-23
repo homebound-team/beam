@@ -46,7 +46,7 @@ export function Open() {
   return (
     // Purposely set height to validate no scrolling behaviour
     <div css={Css.hPx(5000).$}>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open</h1>
+      <h1 css={Css.xl2.mb1.$}>SuperDrawer Open</h1>
       <Button label={isDrawerOpen ? "SuperDrawer is open" : "Show SuperDrawer"} onClick={open} />
     </div>
   );
@@ -64,7 +64,7 @@ export function SmallDrawer() {
   return (
     // Purposely set height to validate no scrolling behaviour
     <div css={Css.hPx(5000).$}>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open</h1>
+      <h1 css={Css.xl2.mb1.$}>SuperDrawer Open</h1>
       <Button label={isDrawerOpen ? "SuperDrawer is open" : "Show SuperDrawer"} onClick={open} />
     </div>
   );
@@ -80,7 +80,7 @@ export function OpenWithNoActions() {
   useEffect(open, [openInDrawer]);
   return (
     <>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open</h1>
+      <h1 css={Css.xl2.mb1.$}>SuperDrawer Open</h1>
       <Button label="Show SuperDrawer" onClick={open} />
     </>
   );
@@ -107,7 +107,7 @@ export function CanCloseDrawerChecks() {
 
   return (
     <>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open With CanClose Checks</h1>
+      <h1 css={Css.xl2.mb1.$}>SuperDrawer Open With CanClose Checks</h1>
       <Button label="Show SuperDrawer" onClick={open} />
     </>
   );
@@ -123,7 +123,7 @@ export function OpenAtDetail() {
   useEffect(open, [openInDrawer, openDrawerDetail]);
   return (
     <>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open at Detail</h1>
+      <h1 css={Css.xl2.mb1.$}>SuperDrawer Open at Detail</h1>
       <Button label="Show SuperDrawer" onClick={open} />
     </>
   );
@@ -150,7 +150,7 @@ export function CanCloseDrawerDetailsChecks() {
 
   return (
     <>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open at Detail</h1>
+      <h1 css={Css.xl2.mb1.$}>SuperDrawer Open at Detail</h1>
       <Button label="Show SuperDrawer" onClick={open} />
     </>
   );
@@ -166,7 +166,7 @@ export function OpenWithModal() {
   useEffect(open, [openInDrawer, openModal]);
   return (
     <>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open at Modal</h1>
+      <h1 css={Css.xl2.mb1.$}>SuperDrawer Open at Modal</h1>
       <Button label="Show SuperDrawer" onClick={open} />
     </>
   );
@@ -189,7 +189,7 @@ export function OpenWithTitleRightContent() {
   useEffect(open, [openInDrawer]);
   return (
     <>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open at Modal</h1>
+      <h1 css={Css.xl2.mb1.$}>SuperDrawer Open at Modal</h1>
       <Button label="Show SuperDrawer" onClick={open} />
     </>
   );
@@ -212,7 +212,7 @@ export function LongTitle() {
   useEffect(open, [openInDrawer]);
   return (
     <>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open at Modal</h1>
+      <h1 css={Css.xl2.mb1.$}>SuperDrawer Open at Modal</h1>
       <Button label="Show SuperDrawer" onClick={open} />
     </>
   );
@@ -277,7 +277,7 @@ export function TableWithPrevNextAndCloseCheck() {
 
   return (
     <div>
-      <h1 css={Css.xl3Sb.mb5.$}>Books</h1>
+      <h1 css={Css.xl2.mb5.$}>Books</h1>
       <p css={Css.md.mb3.$}>List of books from various authors</p>
       <GridTable<Row>
         as="table"
@@ -322,7 +322,7 @@ export function TableWithPrevNext() {
 
   return (
     <div>
-      <h1 css={Css.xl3Sb.mb5.$}>Books</h1>
+      <h1 css={Css.xl2.mb5.$}>Books</h1>
       <p css={Css.md.mb3.$}>List of books from various authors</p>
       <GridTable<Row>
         as="table"
@@ -346,7 +346,7 @@ export function HiddenControls() {
   return (
     // Purposely set height to validate no scrolling behaviour
     <div css={Css.hPx(5000).$}>
-      <h1 css={Css.xl3Sb.mb1.$}>SuperDrawer Open</h1>
+      <h1 css={Css.xl2.mb1.$}>SuperDrawer Open</h1>
       <Button label={isDrawerOpen ? "SuperDrawer is open" : "Show SuperDrawer"} onClick={open} />
     </div>
   );
