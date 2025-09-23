@@ -19,7 +19,6 @@ const variants: ButtonVariant[] = [
   "primary",
   "secondary",
   "tertiary",
-  "tertiaryQuaternary",
   "quaternary",
   "danger",
   "tertiaryDanger",

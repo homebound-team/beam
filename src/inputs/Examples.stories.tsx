@@ -29,7 +29,7 @@ function DrawerWithInputs() {
   return (
     <SuperDrawerContent
       actions={[
-        { label: "Cancel", onClick: noop },
+        { label: "Cancel", onClick: noop, variant: "quaternary" },
         { label: "Save", onClick: noop },
       ]}
     >
