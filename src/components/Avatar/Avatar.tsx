@@ -57,7 +57,7 @@ const sizeToFallbackTypeScale: Record<AvatarSize, Typography> = {
   sm: "xs2",
   md: "sm",
   lg: "lg",
-  xl: "xl3",
+  xl: "xl2",
 };
 
 const sizeToIconInc: Record<AvatarSize, number> = {

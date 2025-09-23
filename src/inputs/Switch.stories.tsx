@@ -23,7 +23,7 @@ export default {
 
 export const Switch = () => {
   return (
-    <div css={{ "& h1": Css.xl4Sb.mb4.$, "& h2": Css.xl2Sb.$ }}>
+    <div css={{ "& h1": Css.xl2.mb4.$, "& h2": Css.xl.mb4.$ }}>
       <h1>Switch</h1>
       <div css={Css.df.gap4.fdc.$}>
         <h2>Switch</h2>

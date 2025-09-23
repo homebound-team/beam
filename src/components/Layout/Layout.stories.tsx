@@ -153,7 +153,7 @@ function ExamplePageComponent() {
 function OverviewExample({ bgColor }: { bgColor?: Palette }) {
   return (
     <ScrollableContent bgColor={bgColor}>
-      <h1 css={Css.lgSb.mb3.$}>Detail</h1>
+      <h1 css={Css.lg.mb3.$}>Detail</h1>
       {zeroTo(10).map((i) => (
         <p key={i} css={Css.mb3.$}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
@@ -170,7 +170,7 @@ function OverviewExample({ bgColor }: { bgColor?: Palette }) {
 function HistoryExample() {
   return (
     <>
-      <div css={Css.lgSb.$}>History</div>
+      <div css={Css.lg.$}>History</div>
       <p>Demonstrates not utilizing ScrollableContent component. Expect this section of the layout to scroll</p>
       <ul css={Css.df.fdc.gap2.$}>
         {zeroTo(20).map((i) => (
@@ -327,7 +327,7 @@ function TestHeader({ title }: { title: ReactNode }) {
   return (
     <FullBleed>
       <header css={{ ...Css.py2.bb.bcGray200.$ }}>
-        <h1 css={Css.xlSb.$}>{title}</h1>
+        <h1 css={Css.xl.$}>{title}</h1>
       </header>
     </FullBleed>
   );

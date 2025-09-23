@@ -95,7 +95,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
       <div css={Css.py2.px3.df.jcsb.aic.$}>
         <div>
           {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} />}
-          <h1 css={Css.xl3Sb.$} {...tids.pageTitle}>
+          <h1 css={Css.xl2.$} {...tids.pageTitle}>
             {pageTitle}
           </h1>
         </div>
@@ -159,7 +159,7 @@ function FormSections<F>(props: FormSectionsProps<F>) {
         >
           <div css={Css.gc(1).$}>{section.icon && <Icon icon={section.icon} inc={3.5} />}</div>
           <div css={Css.gc(2).$}>
-            {section.title && <h2 css={Css.xlSb.mb3.$}>{section.title}</h2>}
+            {section.title && <h2 css={Css.xl.mb3.$}>{section.title}</h2>}
             <BoundForm formState={formState} rows={section.rows} />
           </div>
         </section>

@@ -384,7 +384,7 @@ function TestDrawerContent(props: TestDrawerContentProps) {
             : undefined
         }
       >
-        <h2 css={Css.xlSb.mb1.$}>{book.bookTitle}</h2>
+        <h2 css={Css.xl.mb1.$}>{book.bookTitle}</h2>
         <p css={Css.base.$}>
           <strong>Description:</strong> {book.bookDescription}
         </p>
@@ -420,7 +420,7 @@ function TestDetailContent({ book, onPurchase, title }: { book: Book; onPurchase
           { label: `Purchase "${book.bookTitle}"`, onClick: onPurchase ?? noop, disabled: !onPurchase },
         ]}
       >
-        <h2 css={Css.xlSb.mb1.$}>{book.authorName}</h2>
+        <h2 css={Css.xl.mb1.$}>{book.authorName}</h2>
         <p css={Css.base.$}>
           <strong>Description:</strong> {book.authorDescription}
         </p>
