@@ -60,7 +60,7 @@ export const ButtonsInFooter = () => {
           <ModalHeader>Add</ModalHeader>
           <ModalFooter>
             <Button label="Change Size" onClick={() => setSize("sm")} />
-            <Button variant="tertiaryQuaternary" label="Cancel" onClick={noop} />
+            <Button variant="quaternary" label="Cancel" onClick={noop} />
             <Button variant="primary" label="Add" onClick={noop} />
           </ModalFooter>
         </>

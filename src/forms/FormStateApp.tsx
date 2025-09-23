@@ -111,7 +111,7 @@ export function FormStateApp() {
       </header>
       <div>
         <div css={Css.df.gap1.$}>
-          <Button variant="tertiaryQuaternary" onClick={() => formState.revertChanges()} label="Cancel" />
+          <Button variant="quaternary" onClick={() => formState.revertChanges()} label="Cancel" />
           <SubmitButton
             form={formState}
             onClick={() => {

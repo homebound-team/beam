@@ -89,7 +89,7 @@ export function TestModalContent(props: TestModalContentProps) {
           </div>
         )}
         <div css={Css.df.gap1.$}>
-          <Button label="Cancel" onClick={closeModal} variant="tertiaryQuaternary" />
+          <Button label="Cancel" onClick={closeModal} variant="quaternary" />
           <Button
             label="Apply"
             onClick={() => {
@@ -115,7 +115,7 @@ export function TestModalFilterTable() {
         <GridTable columns={columns} rows={rows} filter={filter} xss={Css.mt1.$} />
       </ModalBody>
       <ModalFooter>
-        <Button label="Cancel" onClick={closeModal} variant="tertiaryQuaternary" />
+        <Button label="Cancel" onClick={closeModal} variant="quaternary" />
       </ModalFooter>
     </>
   );
@@ -152,7 +152,7 @@ export function VirtualizedTable() {
         </ScrollableParent>
       </ModalBody>
       <ModalFooter>
-        <Button label="Cancel" onClick={closeModal} variant="tertiaryQuaternary" />
+        <Button label="Cancel" onClick={closeModal} variant="quaternary" />
       </ModalFooter>
     </>
   );
