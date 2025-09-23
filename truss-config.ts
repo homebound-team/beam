@@ -7,7 +7,7 @@ const numberOfIncrements = 8;
 // prettier-ignore
 const fonts: Record<string, { fontWeight: 400 | 500 | 600 | 700, fontSize: string; lineHeight: string }> = {
   xs2:   { fontWeight: 400, fontSize: "10px", lineHeight: "14px" },
-  xs2Md: { fontWeight: 500, fontSize: "10px", lineHeight: "14px" },
+  xs2Sb: { fontWeight: 600, fontSize: "10px", lineHeight: "14px" },
 
   xs:     { fontWeight: 400, fontSize: "12px", lineHeight: "16px" },
   xsSb:   { fontWeight: 600, fontSize: "12px", lineHeight: "16px" },
