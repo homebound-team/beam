@@ -48,7 +48,7 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
           {...testId.modalClear}
         />
         <div css={Css.df.gap1.$}>
-          <Button label="Cancel" variant="tertiary" onClick={closeModal} {...testId.modalClose} />
+          <Button label="Cancel" variant="quaternary" onClick={closeModal} {...testId.modalClose} />
           <Button
             label="Apply"
             onClick={() => {

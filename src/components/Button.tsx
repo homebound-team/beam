@@ -174,16 +174,6 @@ const variantStyles: (contrast: boolean) => Record<
       .boxShadow(`0px 0px 0px 2px ${Palette.Red500}`).$,
   },
 
-  tertiaryQuaternary: {
-    baseStyles: Css.bgTransparent.gray900.if(contrast).gray400.$,
-    hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
-    pressedStyles: Css.gray900.if(contrast).bgWhite.gray900.$,
-    disabledStyles: Css.gray400.if(contrast).gray700.$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.White}, 0px 0px 0px 4px ${Palette.Gray900}`)
-      .if(contrast)
-      .boxShadow(`0px 0px 0px 2px ${Palette.Gray500}`).$,
-  },
-
   danger: {
     baseStyles: Css.bgRed600.white.$,
     hoverStyles: Css.bgRed700.$,
@@ -193,11 +183,13 @@ const variantStyles: (contrast: boolean) => Record<
   },
 
   quaternary: {
-    baseStyles: Css.bgGray900.white.$,
-    hoverStyles: Css.bgGray700.$,
-    pressedStyles: Css.bgGray800.$,
-    disabledStyles: Css.bgGray200.if(contrast).bgGray900.gray600.$,
-    focusStyles: Css.bshDanger.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
+    baseStyles: Css.bgTransparent.gray900.if(contrast).gray400.$,
+    hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
+    pressedStyles: Css.gray900.if(contrast).bgWhite.gray900.$,
+    disabledStyles: Css.gray400.if(contrast).gray700.$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.White}, 0px 0px 0px 4px ${Palette.Gray900}`)
+      .if(contrast)
+      .boxShadow(`0px 0px 0px 2px ${Palette.Gray500}`).$,
   },
 
   caution: {
@@ -243,7 +235,6 @@ export type ButtonVariant =
   | "secondary"
   | "tertiary"
   | "tertiaryDanger"
-  | "tertiaryQuaternary"
   | "caution"
   | "danger"
   | "quaternary"
