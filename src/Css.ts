@@ -8,7 +8,7 @@ export type Only<X, T> = X & Record<Exclude<keyof T, keyof X>, never>;
 
 export type Properties = Properties1<string | 0, string>;
 
-export type Typography = "xs2" | "xs2Sb" | "xs" | "xsSb" | "sm" | "smSb" | "base" | "baseSb" | "lg" | "xl" | "xl2";
+export type Typography = "xs2" | "xs2Sb" | "xs" | "xsSb" | "sm" | "smSb" | "md" | "mdSb" | "lg" | "xl" | "xl2";
 
 type Opts<T> = { rules: T; enabled: boolean; important: boolean; selector: string | undefined };
 
@@ -3371,11 +3371,11 @@ class CssBuilder<T extends Properties> {
     return this.add("fontWeight", 600).add("fontSize", "14px").add("lineHeight", "20px");
   }
   /** Sets `fontWeight: 400; fontSize: "16px"; lineHeight: "24px"`. */
-  get base() {
+  get md() {
     return this.add("fontWeight", 400).add("fontSize", "16px").add("lineHeight", "24px");
   }
   /** Sets `fontWeight: 600; fontSize: "16px"; lineHeight: "24px"`. */
-  get baseSb() {
+  get mdSb() {
     return this.add("fontWeight", 600).add("fontSize", "16px").add("lineHeight", "24px");
   }
   /** Sets `fontWeight: 600; fontSize: "18px"; lineHeight: "28px"`. */
