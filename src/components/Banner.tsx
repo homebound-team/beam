@@ -15,7 +15,7 @@ export function Banner(props: BannerProps) {
   const { type, message, onClose = false, showIcon = true, ...others } = props;
   const tid = useTestIds(others, "banner");
   return (
-    <div css={{ ...variantStyles[type], ...Css.df.aic.w100.gap1.p2.gray900.base.bshBasic.$ }} {...tid} role="alert">
+    <div css={{ ...variantStyles[type], ...Css.df.aic.w100.gap1.p2.gray900.md.bshBasic.$ }} {...tid} role="alert">
       {showIcon && (
         <span css={Css.fs0.$}>
           <Icon icon={typeToIcon[type]} {...tid.type} color={Palette.Gray900} />

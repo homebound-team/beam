@@ -9,7 +9,7 @@ export function Header(props: CaptionProps) {
 
   return (
     <div css={Css.df.jcsb.aic.mlPx(12).mrPx(2).hPx(32).$}>
-      <h1 css={Css.base.$}>{format(displayMonth, "MMMM yyyy")}</h1>
+      <h1 css={Css.md.$}>{format(displayMonth, "MMMM yyyy")}</h1>
       <div>
         <IconButton color={Palette.Gray700} icon="chevronLeft" onClick={() => goToMonth(addMonths(displayMonth, -1))} />
         <IconButton color={Palette.Gray700} icon="chevronRight" onClick={() => goToMonth(addMonths(displayMonth, 1))} />
@@ -27,12 +27,12 @@ export function YearSkipHeader(props: CaptionProps) {
     <div css={Css.df.jcsb.aic.mlPx(12).mrPx(12).hPx(32).$}>
       <div css={Css.df.fdr.jcsb.$}>
         <IconButton color={Palette.Gray700} icon="chevronLeft" onClick={() => goToMonth(addMonths(displayMonth, -1))} />
-        <h1 css={Css.base.$}>{format(displayMonth, "MMM")}</h1>
+        <h1 css={Css.md.$}>{format(displayMonth, "MMM")}</h1>
         <IconButton color={Palette.Gray700} icon="chevronRight" onClick={() => goToMonth(addMonths(displayMonth, 1))} />
       </div>
       <div css={Css.df.fdr.jcsb.$}>
         <IconButton color={Palette.Gray700} icon="chevronLeft" onClick={() => goToMonth(addYears(displayMonth, -1))} />
-        <h1 css={Css.base.$}>{format(displayMonth, "yyyy")}</h1>
+        <h1 css={Css.md.$}>{format(displayMonth, "yyyy")}</h1>
         <IconButton color={Palette.Gray700} icon="chevronRight" onClick={() => goToMonth(addYears(displayMonth, 1))} />
       </div>
     </div>

@@ -278,7 +278,7 @@ export function TableWithPrevNextAndCloseCheck() {
   return (
     <div>
       <h1 css={Css.xl3Sb.mb5.$}>Books</h1>
-      <p css={Css.base.mb3.$}>List of books from various authors</p>
+      <p css={Css.md.mb3.$}>List of books from various authors</p>
       <GridTable<Row>
         as="table"
         columns={[titleColumn, authorColumn]}
@@ -323,7 +323,7 @@ export function TableWithPrevNext() {
   return (
     <div>
       <h1 css={Css.xl3Sb.mb5.$}>Books</h1>
-      <p css={Css.base.mb3.$}>List of books from various authors</p>
+      <p css={Css.md.mb3.$}>List of books from various authors</p>
       <GridTable<Row>
         as="table"
         columns={[titleColumn, authorColumn]}
@@ -385,7 +385,7 @@ function TestDrawerContent(props: TestDrawerContentProps) {
         }
       >
         <h2 css={Css.xl.mb1.$}>{book.bookTitle}</h2>
-        <p css={Css.base.$}>
+        <p css={Css.md.$}>
           <strong>Description:</strong> {book.bookDescription}
         </p>
         <hr css={Css.my1.$} />
@@ -421,7 +421,7 @@ function TestDetailContent({ book, onPurchase, title }: { book: Book; onPurchase
         ]}
       >
         <h2 css={Css.xl.mb1.$}>{book.authorName}</h2>
-        <p css={Css.base.$}>
+        <p css={Css.md.$}>
           <strong>Description:</strong> {book.authorDescription}
         </p>
       </SuperDrawerContent>

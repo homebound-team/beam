@@ -39,11 +39,11 @@ export const Typography = () => {
           </td>
         </tr>
 
-        <tr css={Css.base.$}>
+        <tr css={Css.md.$}>
           <td>Base</td>
           <td>
             <p>Regular</p>
-            <p css={Css.baseSb.$}>Semibold</p>
+            <p css={Css.mdSb.$}>Semibold</p>
           </td>
         </tr>
 

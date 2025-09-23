@@ -1879,7 +1879,7 @@ export function Tooltips() {
         ]}
       />
       <h1 css={Css.xl.fw5.mt4.$}>
-        Without Tooltips - <span css={Css.base.$}>For visual comparison</span>
+        Without Tooltips - <span css={Css.md.$}>For visual comparison</span>
       </h1>
       <GridTable
         style={{ allWhite: true }}
