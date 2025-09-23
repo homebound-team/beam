@@ -15,8 +15,8 @@ const fonts: Record<string, { fontWeight: 400 | 500 | 600 | 700, fontSize: strin
   sm:     { fontWeight: 400, fontSize: "14px", lineHeight: "20px" },
   smSb:   { fontWeight: 600, fontSize: "14px", lineHeight: "20px" },
 
-  base:   { fontWeight: 400, fontSize: "16px", lineHeight: "24px" },
-  baseSb: { fontWeight: 600, fontSize: "16px", lineHeight: "24px" },
+  md:   { fontWeight: 400, fontSize: "16px", lineHeight: "24px" },
+  mdSb: { fontWeight: 600, fontSize: "16px", lineHeight: "24px" },
 
   lg:   { fontWeight: 600, fontSize: "18px", lineHeight: "28px" },
 
