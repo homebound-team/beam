@@ -39,7 +39,7 @@ export function ToggleChipGroups() {
       <ToggleChipGroup
         label="Select Markets"
         labelStyle="left"
-        options={options.map((o) => ({ ...o, startAdornment: <span css={Css.smBd.$}>{o.label.slice(0, 2)}</span> }))}
+        options={options.map((o) => ({ ...o, startAdornment: <span css={Css.sm.$}>{o.label.slice(0, 2)}</span> }))}
         values={selectedValues}
         onChange={setSelectedValues}
       />
