@@ -43,6 +43,15 @@ export function ToggleChipGroups() {
         values={selectedValues}
         onChange={setSelectedValues}
       />
+      <p css={Css.mt2.mb2.$}>Readonly:</p>
+      <ToggleChipGroup
+        label="Select Markets"
+        labelStyle="left"
+        options={options}
+        values={selectedValues}
+        readonly
+        onChange={setSelectedValues}
+      />
     </>
   );
 }
