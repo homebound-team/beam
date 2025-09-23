@@ -54,7 +54,7 @@ const sizeToPixel: Record<AvatarSize, number> = {
 };
 
 const sizeToFallbackTypeScale: Record<AvatarSize, Typography> = {
-  sm: "tiny",
+  sm: "xs2",
   md: "sm",
   lg: "lg",
   xl: "xl3",

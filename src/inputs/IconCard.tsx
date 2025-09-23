@@ -58,7 +58,7 @@ export function IconCard(props: IconCardProps) {
           <input ref={ref} {...inputProps} {...tid.value} />
         </VisuallyHidden>
         <Icon icon={icon} inc={4} color={isDisabled ? Palette.Gray300 : Palette.Gray900} />
-        <span css={Css.xsMd.if(isDisabled).gray300.$}>{label}</span>
+        <span css={Css.xs.if(isDisabled).gray300.$}>{label}</span>
       </button>
     ),
   });

@@ -388,7 +388,7 @@ export function OneOffInlineTable() {
     <div
       css={{
         ...Css.dig.gtc("auto auto auto").rg1.cg3.gray700.bgGray300.br4.p1.$,
-        "& > div:nth-of-type(-n+3)": Css.tinySb.$,
+        "& > div:nth-of-type(-n+3)": Css.xs2Sb.$,
         "& > div:nth-of-type(n+4)": Css.xs.$,
         "& > div:nth-of-type(3n)": Css.tar.$,
       }}
@@ -1145,7 +1145,7 @@ export function TruncatingCells() {
   const elCol: GridColumn<Row> = {
     header: "Truncated locally",
     data: ({ name }) => ({
-      content: <span css={Css.green800.xsMd.truncate.$}>{name}</span>,
+      content: <span css={Css.green800.xsSb.truncate.$}>{name}</span>,
     }),
     w: "160px",
   };
