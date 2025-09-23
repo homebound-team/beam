@@ -512,7 +512,7 @@ export const StyleCondensedWithNoPadding = newStory(() => {
         columns={[nameColumn, valueColumn, actionColumn]}
         style={{
           ...condensedStyle,
-          headerCellCss: Css.smMd.$,
+          headerCellCss: Css.smSb.$,
           firstCellCss: Css.pl0.$,
         }}
         rows={[

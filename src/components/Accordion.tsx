@@ -89,8 +89,8 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
 
   const touchableStyle = useMemo(
     () => ({
-      ...Css.df.jcsb.gapPx(12).aic.p2.baseMd.outline("none").onHover.bgGray100.if(!!titleOnClick).baseSb.$,
-      ...(compact && Css.smMd.pl2.prPx(10).py1.bgGray100.mbPx(4).br8.onHover.bgGray200.$),
+      ...Css.df.jcsb.gapPx(12).aic.p2.base.outline("none").onHover.bgGray100.if(!!titleOnClick).baseSb.$,
+      ...(compact && Css.sm.pl2.prPx(10).py1.bgGray100.mbPx(4).br8.onHover.bgGray200.$),
       ...(compact && !!titleOnClick && Css.br0.$),
       ...(disabled && Css.gray500.$),
       ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.Blue700}`).$),

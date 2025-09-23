@@ -107,7 +107,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     inputStylePalette,
   } = props;
 
-  const typeScale = fieldProps?.typeScale ?? (inputProps.readOnly && labelStyle !== "hidden" ? "smMd" : "sm");
+  const typeScale = fieldProps?.typeScale ?? "sm";
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
   const { compound = false, forceFocus = false, forceHover = false } = internalProps;
   const errorMessageId = `${inputProps.id}-error`;

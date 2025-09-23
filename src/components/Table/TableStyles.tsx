@@ -123,7 +123,7 @@ function memoizedTableStyles() {
             ...Css.xsSb.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
             ...(allWhite && Css.bgWhite.$),
           },
-          firstContentColumn: { ...Css.smMd.$, ...(allWhite && Css.smBd.gray900.$) },
+          firstContentColumn: { ...Css.sm.$, ...(allWhite && Css.smSb.gray900.$) },
         },
         2: { firstContentColumn: Css.xs2.pl3.$ },
         // Add 12 more pixels of padding for each level of nesting

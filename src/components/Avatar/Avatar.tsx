@@ -68,8 +68,8 @@ const sizeToIconInc: Record<AvatarSize, number> = {
 };
 
 const sizeToTypeScale: Record<AvatarSize, Typography> = {
-  sm: "smMd",
-  md: "smMd",
+  sm: "smSb",
+  md: "smSb",
   lg: "base",
   xl: "base",
 };

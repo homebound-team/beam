@@ -223,7 +223,7 @@ function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSe
       {...focusProps}
       {...hoverProps}
       css={{
-        ...Css.buttonBase.wsn.tal.smMd.blue600.px2.py1.br0.h100.$,
+        ...Css.buttonBase.wsn.tal.smSb.blue600.px2.py1.br0.h100.$,
         ...(isFocusVisible ? defaultFocusRingStyles : {}),
         ...(active ? activeStyles : {}),
         ...(isPressed ? activeStyles : isHovered ? hoverStyles : {}),
