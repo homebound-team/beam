@@ -70,8 +70,8 @@ const sizeToIconInc: Record<AvatarSize, number> = {
 const sizeToTypeScale: Record<AvatarSize, Typography> = {
   sm: "smSb",
   md: "smSb",
-  lg: "base",
-  xl: "base",
+  lg: "md",
+  xl: "md",
 };
 
 function nameToInitials(name: string) {
