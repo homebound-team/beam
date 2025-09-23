@@ -30,4 +30,23 @@ describe("ToggleGroupChip", () => {
     expect(r.market_m3).toHaveAttribute("data-disabled", "true");
     expect(r.getByTestId("tooltip")).toHaveAttribute("title", "No data");
   });
+
+  it("supports readonly options", async () => {
+    const options = [
+      { label: "Bahamas", value: "m:1" },
+      { label: "Southern California", value: "m:2" },
+      { label: "Northern California", value: "m:3" },
+    ];
+    const r = await render(
+      <ToggleChipGroup
+        label="Market"
+        options={options}
+        values={["m:2"]}
+        onChange={() => {}}
+        data-testid="market"
+        readonly
+      />,
+    );
+    expect(r.getByLabelText("Southern California")).toHaveAttribute("aria-readonly", "true");
+  });
 });
