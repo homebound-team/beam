@@ -3771,13 +3771,15 @@ class CssBuilder<T extends Properties> {
   }
 
   // buttonBase
-  /** Sets `outline: 0; borderRadius: "8px"; display: "inline-flex"; alignItems: "center"; whiteSpace: "nowrap"; transition: "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms"`. */
+  /** Sets `fontWeight: 600; fontSize: "14px"; lineHeight: "20px"; outline: 0; borderRadius: "8px"; display: "inline-flex"; alignItems: "center"; whiteSpace: "nowrap"; transition: "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms"`. */
   get buttonBase() {
-    return this.add("outline", 0).add("borderRadius", "8px").add("display", "inline-flex").add("alignItems", "center")
-      .add("whiteSpace", "nowrap").add(
-        "transition",
-        "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms",
-      );
+    return this.add("fontWeight", 600).add("fontSize", "14px").add("lineHeight", "20px").add("outline", 0).add(
+      "borderRadius",
+      "8px",
+    ).add("display", "inline-flex").add("alignItems", "center").add("whiteSpace", "nowrap").add(
+      "transition",
+      "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms",
+    );
   }
 
   // listReset
