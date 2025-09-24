@@ -40,7 +40,7 @@ export const Typography = () => {
         </tr>
 
         <tr css={Css.md.$}>
-          <td>Base</td>
+          <td>MD</td>
           <td>
             <p>Regular</p>
             <p css={Css.mdSb.$}>Semibold</p>
