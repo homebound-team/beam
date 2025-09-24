@@ -1,5 +1,5 @@
 export default {
-  branches: ["main"],
+  branches: ["main", { name: "alpha", prerelease: true }, "next-major"],
   plugins: [
     ["@semantic-release/commit-analyzer", { preset: "conventionalcommits" }],
     ["@semantic-release/release-notes-generator", { preset: "conventionalcommits" }],
