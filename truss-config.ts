@@ -61,7 +61,7 @@ const sections: Sections = {
     }),
   buttonBase: () => [
     newMethod("buttonBase", {
-      ...fonts.smMd,
+      ...fonts.smSb,
       outline: 0,
       borderRadius: "8px",
       display: "inline-flex",
