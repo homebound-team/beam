@@ -65,7 +65,7 @@ export function WithCustomLabel() {
       <Chip
         text={
           <span css={Css.sm.df.gap1.$}>
-            <span css={Css.smBd.$}>K</span>
+            <span css={Css.sm.fw6.$}>K</span>
             Kitchen
           </span>
         }
@@ -73,7 +73,7 @@ export function WithCustomLabel() {
       <Chip
         text={
           <span css={Css.sm.df.gap1.$}>
-            <span css={Css.smBd.$}>B</span>
+            <span css={Css.sm.fw6.$}>B</span>
             Bedroom
           </span>
         }

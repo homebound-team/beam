@@ -23,7 +23,7 @@ export default {
 
 export const Switch = () => {
   return (
-    <div css={{ "& h1": Css.xl4Sb.mb4.$, "& h2": Css.xl2Sb.$ }}>
+    <div css={{ "& h1": Css.xl2.mb4.$, "& h2": Css.xl.mb4.$ }}>
       <h1>Switch</h1>
       <div css={Css.df.gap4.fdc.$}>
         <h2>Switch</h2>
@@ -85,20 +85,20 @@ export const LabelStyles = () => {
   const [selected, setSelected] = useState(false);
   return (
     <div css={Css.wPx(300).$}>
-      <h2 css={Css.baseMd.mb1.$}>Inline (default)</h2>
+      <h2 css={Css.md.mb1.$}>Inline (default)</h2>
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} />
-      <h2 css={Css.baseMd.mb1.mt3.pt2.bt.bcGray200.$}>Filter</h2>
+      <h2 css={Css.md.mb1.mt3.pt2.bt.bcGray200.$}>Filter</h2>
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="filter" />
       <div css={Css.df.jcfe.$}>
         <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="filter" />
       </div>
-      <h2 css={Css.baseMd.mb1.mt3.pt2.bt.bcGray200.$}>Form</h2>
+      <h2 css={Css.md.mb1.mt3.pt2.bt.bcGray200.$}>Form</h2>
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="form" />
-      <h2 css={Css.baseMd.mb1.mt3.pt2.bt.bcGray200.$}>Hidden</h2>
+      <h2 css={Css.md.mb1.mt3.pt2.bt.bcGray200.$}>Hidden</h2>
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="hidden" />
-      <h2 css={Css.baseMd.mb1.mt3.pt2.bt.bcGray200.$}>Left</h2>
+      <h2 css={Css.md.mb1.mt3.pt2.bt.bcGray200.$}>Left</h2>
       <SwitchComponent label="Example Label" onChange={setSelected} selected={selected} labelStyle="left" />
-      <h2 css={Css.baseMd.mb1.mt3.pt2.bt.bcGray200.$}>Centered</h2>
+      <h2 css={Css.md.mb1.mt3.pt2.bt.bcGray200.$}>Centered</h2>
       <SwitchComponent
         label="Example Label"
         tooltip="Tooltip example"

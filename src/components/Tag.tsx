@@ -36,7 +36,7 @@ export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
   return maybeTooltip({
     title: !preventTooltip && showTooltip ? text : undefined,
     children: (
-      <span {...tid} css={{ ...Css.dif.tinySb.ttu.aic.gapPx(4).pxPx(6).pyPx(2).gray900.br4.$, ...typeStyles, ...xss }}>
+      <span {...tid} css={{ ...Css.dif.xs2Sb.ttu.aic.gapPx(4).pxPx(6).pyPx(2).gray900.br4.$, ...typeStyles, ...xss }}>
         {/* Nesting `lineClamp` styles as the padding bottom set would expose the remainder of the text if applied on the same element */}
         {/* Using `lineClamp1` instead of `truncate` as `truncate` requires a width set to properly truncate and `lineClamp` can smartly do it based on the parent's width */}
         {otherProps.icon && (

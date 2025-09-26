@@ -120,7 +120,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
         (showNumSelection && (
           <Tooltip title={<SelectedOptionBullets labels={chipLabels} />}>
             <span
-              css={Css.wPx(16).hPx(16).fs0.br100.bgBlue700.white.tinySb.df.aic.jcc.$}
+              css={Css.wPx(16).hPx(16).fs0.br100.bgBlue700.white.xs2Sb.df.aic.jcc.$}
               data-testid="selectedOptionsCount"
             >
               {isTree ? selectedOptionsLabels?.length : state.selectionManager.selectedKeys.size}

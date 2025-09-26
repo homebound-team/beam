@@ -17,8 +17,8 @@ export function PageHeaderBreadcrumbs({ breadcrumb }: { breadcrumb: HeaderBreadc
     <div css={Css.df.aic.mbPx(4).$} {...tids}>
       {breadcrumbs.map((breadcrumb, i) => (
         <Fragment key={`bc-${breadcrumb.label}`}>
-          {i > 0 && <span css={Css.smMd.gray700.mr1.ml1.$}>/</span>}
-          <Link to={breadcrumb.href} css={Css.smMd.gray700.onHover.gray900.$} className="navLink" {...tids.navLink}>
+          {i > 0 && <span css={Css.smSb.gray700.mr1.ml1.$}>/</span>}
+          <Link to={breadcrumb.href} css={Css.smSb.gray700.onHover.gray900.$} className="navLink" {...tids.navLink}>
             {breadcrumb.label}
           </Link>
         </Fragment>

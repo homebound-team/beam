@@ -12,7 +12,7 @@ export function FormHeading(props: FormHeadingProps) {
   return (
     <h3
       css={{
-        ...Css.baseMd.$,
+        ...Css.md.$,
         // Add space before the heading, but only if it's not first.
         ...(!isFirst && Css.mt4.$),
         ...xss,

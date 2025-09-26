@@ -98,7 +98,7 @@ function ListFieldRowInputs<F>({
   return (
     <>
       <div css={Css.df.jcsb.$} {...tid}>
-        <span css={Css.baseSb.$} {...tid.name}>
+        <span css={Css.mdSb.$} {...tid.name}>
           {listFieldConfig.name} {rowNumber}
         </span>
         {onDelete && (

@@ -182,7 +182,7 @@ export function Table(props: TableStoryProps) {
             />
           </div>
           <div>
-            <span css={Css.smMd.mr1.$}>Selected Row Ids:</span>
+            <span css={Css.smSb.mr1.$}>Selected Row Ids:</span>
             {selectedRows.length > 0 ? selectedRows.map((r) => r.id).join(", ") : "None"}
           </div>
         </div>

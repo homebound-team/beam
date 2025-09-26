@@ -14,12 +14,12 @@ const planDetailsComponent = (
     <div>4,000 - 5,000sf</div>
     <div>5-6bd / 5.5ba</div>
     <div>3 Elevations / 18 Options</div>
-    <div css={Css.tiny.pt1.$}>Last Update 08/14/24</div>
+    <div css={Css.xs2.pt1.$}>Last Update 08/14/24</div>
   </div>
 );
 
 const detailsComponent = (
-  <div css={Css.gray700.tiny.$}>
+  <div css={Css.gray700.xs2.$}>
     <div>Model: VR12</div>
     <div>Code: PL-AIRSW-INSN-7900</div>
   </div>
