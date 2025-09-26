@@ -125,11 +125,11 @@ function memoizedTableStyles() {
           },
           firstContentColumn: { ...Css.sm.$, ...(allWhite && Css.smSb.gray900.$) },
         },
-        2: { firstContentColumn: Css.xs.pl3.$ },
+        2: { firstContentColumn: Css.xs2.pl3.$ },
         // Add 12 more pixels of padding for each level of nesting
-        3: { firstContentColumn: Css.xs.plPx(36).$ },
+        3: { firstContentColumn: Css.xs2.plPx(36).$ },
       };
-      const defaultLevels = { 1: { firstContentColumn: Css.xs.pl3.$ } };
+      const defaultLevels = { 1: { firstContentColumn: Css.xs2.pl3.$ } };
 
       cache[key] = {
         emptyCell: "-",
