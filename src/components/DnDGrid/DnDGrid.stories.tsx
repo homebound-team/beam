@@ -28,11 +28,11 @@ export function Example() {
       onReorder={(items) => console.log("onReorder:", { items })}
       gridStyles={Css.gtc(`repeat(4, minmax(280px, 1fr))`).add("gridAutoRows", "120px").gap2.$}
     >
-      <div css={Css.br8.bgGray100.ba.bcGray400.df.aic.jcc.baseSb.$}>Non-Sortable Grid Item</div>
+      <div css={Css.br8.bgGray100.ba.bcGray400.df.aic.jcc.mdSb.$}>Non-Sortable Grid Item</div>
       {gridItems.map((item) => (
         <DraggableItem key={item.id} item={item} />
       ))}
-      <div css={Css.br8.bgGray100.ba.bcGray400.df.aic.jcc.baseSb.$}>Non-Sortable Grid Item</div>
+      <div css={Css.br8.bgGray100.ba.bcGray400.df.aic.jcc.mdSb.$}>Non-Sortable Grid Item</div>
     </DnDGrid>
   );
 }

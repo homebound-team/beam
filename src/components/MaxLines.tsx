@@ -42,7 +42,7 @@ export function MaxLines({ maxLines, children }: MaxLinesProps) {
       </div>
 
       {hasMore && (
-        <button css={Css.db.smMd.$} onClick={() => setExpanded((prev) => !prev)}>
+        <button css={Css.db.sm.$} onClick={() => setExpanded((prev) => !prev)}>
           {expanded ? "Show Less" : "Show More"}
         </button>
       )}

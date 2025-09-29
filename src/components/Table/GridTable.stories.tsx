@@ -388,7 +388,7 @@ export function OneOffInlineTable() {
     <div
       css={{
         ...Css.dig.gtc("auto auto auto").rg1.cg3.gray700.bgGray300.br4.p1.$,
-        "& > div:nth-of-type(-n+3)": Css.tinySb.$,
+        "& > div:nth-of-type(-n+3)": Css.xs2Sb.$,
         "& > div:nth-of-type(n+4)": Css.xs.$,
         "& > div:nth-of-type(3n)": Css.tar.$,
       }}
@@ -512,7 +512,7 @@ export const StyleCondensedWithNoPadding = newStory(() => {
         columns={[nameColumn, valueColumn, actionColumn]}
         style={{
           ...condensedStyle,
-          headerCellCss: Css.smMd.$,
+          headerCellCss: Css.smSb.$,
           firstCellCss: Css.pl0.$,
         }}
         rows={[
@@ -924,7 +924,7 @@ export function StickyColumns() {
   const actionColumn: GridColumn<Row> = { header: "Actions", data: "Actions", w: "200px" };
   return (
     <div>
-      <h1 css={Css.lgSb.$}>First column sticky left</h1>
+      <h1 css={Css.lg.$}>First column sticky left</h1>
       <div css={Css.wPx(500).oa.$}>
         <GridTable
           columns={[{ ...nameColumn, sticky: "left" }, valueColumn, actionColumn]}
@@ -936,7 +936,7 @@ export function StickyColumns() {
         />
       </div>
 
-      <h1 css={Css.lgSb.mt3.$}>Last column sticky right</h1>
+      <h1 css={Css.lg.mt3.$}>Last column sticky right</h1>
       <div css={Css.wPx(500).oa.$}>
         <GridTable
           columns={[nameColumn, valueColumn, { ...actionColumn, sticky: "right" }]}
@@ -948,7 +948,7 @@ export function StickyColumns() {
         />
       </div>
 
-      <h1 css={Css.lgSb.mt3.$}>Center column sticky left</h1>
+      <h1 css={Css.lg.mt3.$}>Center column sticky left</h1>
       <div css={Css.wPx(500).oa.$}>
         <GridTable
           columns={[nameColumn, { ...valueColumn, sticky: "left" }, actionColumn]}
@@ -960,7 +960,7 @@ export function StickyColumns() {
         />
       </div>
 
-      <h1 css={Css.lgSb.mt3.$}>Center column sticky right</h1>
+      <h1 css={Css.lg.mt3.$}>Center column sticky right</h1>
       <div css={Css.wPx(500).oa.$}>
         <GridTable
           columns={[nameColumn, { ...valueColumn, sticky: "right" }, actionColumn]}
@@ -972,7 +972,7 @@ export function StickyColumns() {
         />
       </div>
 
-      <h1 css={Css.lgSb.mt3.$}>Last column non-header cells sticky</h1>
+      <h1 css={Css.lg.mt3.$}>Last column non-header cells sticky</h1>
       <div css={Css.wPx(500).oa.$}>
         <GridTable
           columns={[
@@ -1145,7 +1145,7 @@ export function TruncatingCells() {
   const elCol: GridColumn<Row> = {
     header: "Truncated locally",
     data: ({ name }) => ({
-      content: <span css={Css.green800.xsMd.truncate.$}>{name}</span>,
+      content: <span css={Css.green800.xsSb.truncate.$}>{name}</span>,
     }),
     w: "160px",
   };
@@ -1852,7 +1852,7 @@ export function Tooltips() {
 
   return (
     <div css={Css.bgGray100.p2.$}>
-      <h1 css={Css.xlMd.$}>Fixed Row Height</h1>
+      <h1 css={Css.xl.fw5.$}>Fixed Row Height</h1>
       <GridTable
         style={{ allWhite: true, rowHeight: "fixed" }}
         columns={[primitiveColumn, withMarkupColumn, buttonColumn, linkColumn, externalLinkColumn, truncatedColumn]}
@@ -1865,7 +1865,7 @@ export function Tooltips() {
           { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
         ]}
       />
-      <h1 css={Css.xlMd.mt4.$}>Flexible Row Height</h1>
+      <h1 css={Css.xl.fw5.mt4.$}>Flexible Row Height</h1>
       <GridTable
         style={{ allWhite: true }}
         columns={[primitiveColumn, withMarkupColumn, buttonColumn, linkColumn, externalLinkColumn, truncatedColumn]}
@@ -1878,8 +1878,8 @@ export function Tooltips() {
           { kind: "data", id: "3", data: { name: "Thor Odinson, God of Thunder", value: 3 } },
         ]}
       />
-      <h1 css={Css.xlMd.mt4.$}>
-        Without Tooltips - <span css={Css.base.$}>For visual comparison</span>
+      <h1 css={Css.xl.fw5.mt4.$}>
+        Without Tooltips - <span css={Css.md.$}>For visual comparison</span>
       </h1>
       <GridTable
         style={{ allWhite: true }}
@@ -1926,7 +1926,7 @@ export function Headers() {
   ];
   return (
     <div css={Css.p2.$}>
-      <h1 css={Css.xlMd.$}>Default Style</h1>
+      <h1 css={Css.xl.fw5.$}>Default Style</h1>
       <GridTable
         columns={columns}
         style={{}}
@@ -1938,7 +1938,7 @@ export function Headers() {
         ]}
         sorting={{ on: "client" }}
       />
-      <h1 css={Css.xlMd.mt4.$}>
+      <h1 css={Css.xl.fw5.mt4.$}>
         <pre>rowHeight: fixed</pre>
       </h1>
       <GridTable

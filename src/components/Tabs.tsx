@@ -270,7 +270,7 @@ export function getTabStyles() {
   return {
     baseStyles: Css.df.aic.hPx(32).pyPx(verticalPaddingPx).px1.outline0.gray700.add("width", "fit-content")
       .cursorPointer.sm.$,
-    activeStyles: Css.add(borderBottomStyles).bcBlue700.smMd.gray900.$,
+    activeStyles: Css.add(borderBottomStyles).bcBlue700.smSb.gray900.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
     focusRingStyles: Css.bgBlue50.bshFocus.$,
     hoverStyles: Css.add(borderBottomStyles).bcGray400.$,

@@ -84,10 +84,10 @@ export function Card(props: CardProps) {
       {/* Titles and detailContent */}
       <div css={Css.df.fdc.aifs.gap1.$}>
         <div>
-          <div css={Css.xsMd.gray700.$} {...tid.subtitle}>
+          <div css={Css.xsSb.gray700.$} {...tid.subtitle}>
             {subtitle}
           </div>
-          <div css={Css.smMd.gray900.if(isHovered).blue700.$} {...tid.title}>
+          <div css={Css.smSb.gray900.if(isHovered).blue700.$} {...tid.title}>
             {title}
           </div>
         </div>

@@ -33,7 +33,7 @@ export function WithElements() {
     () => (
       <div css={Css.sm.$}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        <span css={Css.baseSb.$}>
+        <span css={Css.mdSb.$}>
           Vivamus a velit laoreet, ultricies lacus at, volutpat est.
           <span css={Css.blue600.$}>
             Vestibulum vel eleifend felis. In rhoncus elit id velit mattis, non dictum odio tincidunt.

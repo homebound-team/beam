@@ -97,7 +97,7 @@ function ResizableGridItem({ item, sortable }: { item: GridItem; sortable: boole
     >
       <div css={Css.df.aic.jcsb.w100.gap2.$}>
         <div css={Css.df.aic.gap1.$}>
-          <div css={Css.br100.wPx(12).hPx(12).df.aic.jcc.bgGray200.gray900.p1.tinyMd.$}>{item.id}</div>
+          <div css={Css.br100.wPx(12).hPx(12).df.aic.jcc.bgGray200.gray900.p1.xs2Sb.$}>{item.id}</div>
           <ButtonGroup
             size="xs"
             buttons={[
@@ -128,7 +128,7 @@ function ResizableGridItem({ item, sortable }: { item: GridItem; sortable: boole
         </div>
 
         <div css={Css.df.aic.gap1.$}>
-          <div css={Css.tinyMd.gray700.$}>{width}</div>
+          <div css={Css.xs2Sb.gray700.$}>{width}</div>
           {sortable && <DnDGridItemHandle dragHandleProps={dragHandleProps} />}
         </div>
       </div>

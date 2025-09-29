@@ -8,7 +8,7 @@ export default {
 export function Examples() {
   return (
     <>
-      <h2 css={Css.mb1.lgSb.$}>Vertical scroll</h2>
+      <h2 css={Css.mb1.lg.$}>Vertical scroll</h2>
       <ScrollShadows xss={Css.hPx(200).wPx(400).bgWhite.p1.ba.bcGray200.$}>
         {"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc ".repeat(
           20,
@@ -24,7 +24,7 @@ export function Examples() {
         </ScrollShadows>
       </div>
 
-      <h2 css={Css.mt8.mb1.lgSb.$}>Horizontal scroll</h2>
+      <h2 css={Css.mt8.mb1.lg.$}>Horizontal scroll</h2>
       <ScrollShadows xss={Css.wPx(200).bgWhite.p1.ba.bcGray200.wsnw.$} horizontal>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc
       </ScrollShadows>
