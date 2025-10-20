@@ -14,6 +14,11 @@ export interface SelectFieldProps<O, V extends Value>
    * Ideally callers that didn't pass `unsetLabel` would not have to handle the ` | undefined` here.
    */
   onSelect: (value: V | undefined, opt: O | undefined) => void;
+  /**
+   * When true (default), options are sorted alphabetically by their label.
+   * Set to false to maintain the original order of options.
+   */
+  autoSort?: boolean;
 }
 
 /**
@@ -41,6 +46,7 @@ export function SelectField<O, V extends Value>(
     options,
     onSelect,
     value,
+    autoSort,
     ...otherProps
   } = props;
   const values = useMemo(() => [value], [value]);
@@ -51,6 +57,7 @@ export function SelectField<O, V extends Value>(
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
       values={values}
+      autoSort={autoSort}
       onSelect={(values, options) => {
         // If the user used `unsetLabel`, then values will be `[undefined]` and options `[unsetOption]`
         if (values.length > 0 && options.length > 0) {

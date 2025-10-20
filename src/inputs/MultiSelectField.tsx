@@ -11,6 +11,7 @@ export interface MultiSelectFieldProps<O, V extends Value>
   getOptionLabel: (opt: O) => string;
   values: V[];
   onSelect: (values: V[], opts: O[]) => void;
+  autoSort?: boolean;
 }
 
 /**
@@ -29,7 +30,16 @@ export function MultiSelectField<O, V extends Value>(
   const {
     getOptionValue = (opt: O) => (opt as any).id, // if unset, assume O implements HasId
     getOptionLabel = (opt: O) => (opt as any).name, // if unset, assume O implements HasName
+    autoSort,
     ...otherProps
   } = props;
-  return <ComboBoxBase multiselect getOptionLabel={getOptionLabel} getOptionValue={getOptionValue} {...otherProps} />;
+  return (
+    <ComboBoxBase
+      multiselect
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      autoSort={autoSort}
+      {...otherProps}
+    />
+  );
 }
