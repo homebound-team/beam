@@ -490,20 +490,20 @@ export function initializeOptions<O, V extends Value>(
   addNew: boolean,
   autoSort: boolean = true,
 ): O[] {
-  const allOptions: O[] = [];
+  const result: O[] = [];
   if (unsetLabel) {
-    allOptions.push(unsetOption as unknown as O);
+    result.push(unsetOption as unknown as O);
   }
 
-  // Collect regular options in a separate array so we can sort them independently
+  // Collect user options in a separate array so we can sort them independently
   // while keeping special options (unsetOption, addNewOption) at their fixed positions
-  const regularOptions: O[] = [];
+  const userOptions: O[] = [];
   if (Array.isArray(optionsOrLoad)) {
-    regularOptions.push(...optionsOrLoad);
+    userOptions.push(...optionsOrLoad);
   } else {
     const { options, current } = optionsOrLoad;
     if (options) {
-      regularOptions.push(...options);
+      userOptions.push(...options);
     }
     // Add the `current` to the list of options in the event it is not already there.
     if (current) {
@@ -512,19 +512,19 @@ export function initializeOptions<O, V extends Value>(
         const value = getOptionValue(current);
         const found = options && options.find((o) => getOptionValue(o) === value);
         if (!found) {
-          regularOptions.push(current);
+          userOptions.push(current);
         }
       });
     }
   }
 
-  // Sort regular options if autoSort is enabled
-  allOptions.push(...(autoSort ? sortOptions(regularOptions, getOptionLabel) : regularOptions));
+  // Sort user options if autoSort is enabled
+  result.push(...(autoSort ? sortOptions(userOptions, getOptionLabel) : userOptions));
 
   if (addNew) {
-    allOptions.push(addNewOption as unknown as O);
+    result.push(addNewOption as unknown as O);
   }
-  return allOptions;
+  return result;
 }
 
 /** A marker option to automatically add an "Unset" option to the start of options. */
