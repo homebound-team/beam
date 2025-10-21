@@ -60,6 +60,7 @@ export function Pagination(props: PaginationProps) {
           options={pageOptions}
           value={pageSize}
           onSelect={(val) => set({ pageNumber: 1, pageSize: val! })}
+          autoSort={false}
           {...tid.pageSize}
         />
       </div>
