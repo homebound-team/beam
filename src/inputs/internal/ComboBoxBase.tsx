@@ -490,9 +490,9 @@ export function initializeOptions<O, V extends Value>(
   addNew: boolean,
   autoSort: boolean = true,
 ): O[] {
-  const opts: O[] = [];
+  const allOptions: O[] = [];
   if (unsetLabel) {
-    opts.push(unsetOption as unknown as O);
+    allOptions.push(unsetOption as unknown as O);
   }
 
   // Collect regular options in a separate array so we can sort them independently
@@ -519,13 +519,12 @@ export function initializeOptions<O, V extends Value>(
   }
 
   // Sort regular options if autoSort is enabled
-  const finalRegularOptions = autoSort ? sortOptions(regularOptions, getOptionLabel) : regularOptions;
-  opts.push(...finalRegularOptions);
+  allOptions.push(...(autoSort ? sortOptions(regularOptions, getOptionLabel) : regularOptions));
 
   if (addNew) {
-    opts.push(addNewOption as unknown as O);
+    allOptions.push(addNewOption as unknown as O);
   }
-  return opts;
+  return allOptions;
 }
 
 /** A marker option to automatically add an "Unset" option to the start of options. */
