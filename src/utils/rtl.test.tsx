@@ -27,8 +27,8 @@ describe("rtl", () => {
       );
     }
     const r = await render(<Test />);
-    // Then the getOptions helper returns the correct options
-    expect(getOptions(r.number)).toEqual(["One", "Two", "Three"]);
+    // Then the getOptions helper returns the correct options (sorted alphabetically)
+    expect(getOptions(r.number)).toEqual(["One", "Three", "Two"]);
 
     // When selecting an option
     select(r.number, "2");
@@ -150,21 +150,21 @@ describe("rtl", () => {
     }
     const r = await render(<Test />);
 
-    // Then the getOptions helper returns the correct options
-    expect(getOptions(r.number)).toEqual(["One", "Two", "Three"]);
+    // Then the getOptions helper returns the correct options (sorted alphabetically)
+    expect(getOptions(r.number)).toEqual(["One", "Three", "Two"]);
 
     // When selecting options
     select(r.number, ["2", "3"]);
-    // Then the onSelect handler is called with the correct values
+    // Then the onSelect handler is called with the correct values (options in sorted order)
     expect(onSelect).toHaveBeenCalledWith(
       ["2", "3"],
       [
-        { id: "2", name: "Two" },
         { id: "3", name: "Three" },
+        { id: "2", name: "Two" },
       ],
     );
-    // And the getSelected helper returns the correct values
-    expect(getSelected(r.number)).toEqual(["Two", "Three"]);
+    // And the getSelected helper returns the correct values (in sorted order)
+    expect(getSelected(r.number)).toEqual(["Three", "Two"]);
 
     // When selecting one of those options again to unselect it
     select(r.number, ["2"]);
@@ -369,8 +369,8 @@ describe("rtl", () => {
       );
     }
     const r = await render(<Test />);
-    // Then the getOptions helper returns the correct options
-    expect(getOptions(r.number)).toEqual(["One", "Two", "Three"]);
+    // Then the getOptions helper returns the correct options (sorted alphabetically)
+    expect(getOptions(r.number)).toEqual(["One", "Three", "Two"]);
     // When selecting an option
     select(r.number, "2");
     // Then the onSelect handler is called with the correct value
