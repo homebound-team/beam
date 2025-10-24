@@ -12,6 +12,13 @@ const options = [
   { id: "3", name: "Three" },
 ];
 
+const unsortedOptions: HasIdAndName[] = [
+  { id: "1", name: "Zebra" },
+  { id: "2", name: "Apple" },
+  { id: "3", name: "Mango" },
+  { id: "4", name: "Banana" },
+];
+
 describe("MultiSelectFieldTest", () => {
   const onSelect = jest.fn();
 
@@ -34,10 +41,10 @@ describe("MultiSelectFieldTest", () => {
     const selectionChips = r.queryAllByTestId("chip");
     expect(selectionChips).toHaveLength(3);
 
-    // And they are rendered with names of the selected options
+    // And they are rendered with names of the selected options in alphabetical order (autoSort=true by default)
     expect(selectionChips[0]).toHaveTextContent("One");
-    expect(selectionChips[1]).toHaveTextContent("Two");
-    expect(selectionChips[2]).toHaveTextContent("Three");
+    expect(selectionChips[1]).toHaveTextContent("Three");
+    expect(selectionChips[2]).toHaveTextContent("Two");
   });
 
   it("has an empty text box not set", async () => {
@@ -211,6 +218,42 @@ describe("MultiSelectFieldTest", () => {
     expect(r.getByRole("listbox")).toBeInTheDocument();
     // And `onSelect` is called with the correct values
     expect(onSelect).toHaveBeenCalledWith([]);
+  });
+
+  describe("autoSort", () => {
+    it("sorts options alphabetically by default", async () => {
+      // Given a MultiSelectField with unsorted options
+      const r = await render(<TestMultiSelectField values={[]} options={unsortedOptions} />);
+      // When opening the menu
+      click(r.age);
+      // Then expect the options to be in alphabetical order
+      const opts = r.queryAllByRole("option");
+      expect(opts.map((o) => o.textContent)).toEqual(["Apple", "Banana", "Mango", "Zebra"]);
+    });
+
+    it("maintains original order when autoSort is false", async () => {
+      // Given a MultiSelectField with autoSort disabled
+      const r = await render(<TestMultiSelectField values={[]} options={unsortedOptions} autoSort={false} />);
+      // When opening the menu
+      click(r.age);
+      // Then options should maintain their original order
+      const opts = r.queryAllByRole("option");
+      expect(opts.map((o) => o.textContent)).toEqual(["Zebra", "Apple", "Mango", "Banana"]);
+    });
+
+    it("works correctly with selected values after sorting", async () => {
+      // Given a MultiSelectField with pre-selected values and unsorted options
+      const r = await render(<TestMultiSelectField values={["1", "2"]} options={unsortedOptions} />);
+      // When opening the menu
+      click(r.age);
+      // Then the options should be sorted
+      const opts = r.queryAllByRole("option");
+      expect(opts.map((o) => o.textContent)).toEqual(["Apple", "Banana", "Mango", "Zebra"]);
+
+      // And the correct items should be checked
+      expect(opts[0]).toHaveAttribute("aria-selected", "true"); // Zebra
+      expect(opts[3]).toHaveAttribute("aria-selected", "true"); // Apple
+    });
   });
 
   function TestMultiSelectField(

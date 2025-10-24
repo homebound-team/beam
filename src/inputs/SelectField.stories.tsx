@@ -61,6 +61,14 @@ const booleanOptions = [
   { label: "Unset", value: undefined },
 ];
 
+const autoSortOptions: TestOption[] = [
+  { id: "1", name: "Apple" },
+  { id: "2", name: "Cherry" },
+  { id: "3", name: "Date" },
+  { id: "4", name: "Elderberry" },
+  { id: "5", name: "Banana" },
+];
+
 function Template(args: SelectFieldProps<any, any>) {
   const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
   const options = (args?.options as TestOption[]) ?? standardOptions;
@@ -69,6 +77,23 @@ function Template(args: SelectFieldProps<any, any>) {
     <div css={Css.df.fdc.gap5.p2.if(args.contrast === true).white.bgGray800.$}>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>{args.compact ? "Compact" : "Regular"}</h1>
+        <TestSelectField
+          {...args}
+          label="Auto Sort - Default"
+          required={true}
+          value={autoSortOptions[0].id}
+          options={autoSortOptions}
+          unsetLabel="N/A"
+        />
+        <TestSelectField
+          {...args}
+          label="Auto Sort - False"
+          required={true}
+          value={autoSortOptions[2].id}
+          options={autoSortOptions}
+          unsetLabel="N/A"
+          autoSort={false}
+        />
         <TestSelectField
           {...args}
           label="Favorite Icon"
