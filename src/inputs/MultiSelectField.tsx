@@ -11,7 +11,6 @@ export interface MultiSelectFieldProps<O, V extends Value>
   getOptionLabel: (opt: O) => string;
   values: V[];
   onSelect: (values: V[], opts: O[]) => void;
-  autoSort?: boolean;
 }
 
 /**

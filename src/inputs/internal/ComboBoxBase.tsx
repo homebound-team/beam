@@ -18,6 +18,7 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean, isAddNewOption?: boolean) => string | ReactNode;
   getOptionValue: (opt: O) => V;
+  /** Returns the display label for an option. Used for rendering and for sorting when `autoSort` is enabled. */
   getOptionLabel: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
@@ -103,7 +104,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     fullWidth = fieldProps?.fullWidth ?? false,
     onSearch,
     onAddNew,
-    autoSort,
+    autoSort = true,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
@@ -143,7 +144,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
   const options = useMemo(
-    () => initializeOptions(propOptions, getOptionValue, getOptionLabel, unsetLabel, !!onAddNew, autoSort ?? true),
+    () => initializeOptions(propOptions, getOptionValue, getOptionLabel, unsetLabel, !!onAddNew, autoSort),
     // If the caller is using { current, load, options }, memoize on only `current` and `options` values.
     // ...and don't bother on memoizing on getOptionValue b/c it's basically always a lambda
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -472,15 +473,6 @@ function getInputValue<O>(
         : "";
 }
 
-/** Sorts options alphabetically using getOptionLabel, case-insensitive */
-function sortOptions<O>(options: O[], getOptionLabel: (opt: O) => string): O[] {
-  return [...options].sort((a, b) => {
-    const labelA = getOptionLabel(a).toLowerCase();
-    const labelB = getOptionLabel(b).toLowerCase();
-    return labelA.localeCompare(labelB);
-  });
-}
-
 /** Transforms/simplifies `optionsOrLoad` into just options, with unsetLabel maybe added. */
 export function initializeOptions<O, V extends Value>(
   optionsOrLoad: OptionsOrLoad<O>,
@@ -488,7 +480,7 @@ export function initializeOptions<O, V extends Value>(
   getOptionLabel: (opt: O) => string,
   unsetLabel: string | undefined,
   addNew: boolean,
-  autoSort: boolean = true,
+  autoSort: boolean,
 ): O[] {
   const result: O[] = [];
   if (unsetLabel) {
@@ -525,6 +517,15 @@ export function initializeOptions<O, V extends Value>(
     result.push(addNewOption as unknown as O);
   }
   return result;
+}
+
+/** Sorts options alphabetically using getOptionLabel, case-insensitive */
+function sortOptions<O>(options: O[], getOptionLabel: (opt: O) => string): O[] {
+  return [...options].sort((a, b) => {
+    const labelA = getOptionLabel(a).toLowerCase();
+    const labelB = getOptionLabel(b).toLowerCase();
+    return labelA.localeCompare(labelB);
+  });
 }
 
 /** A marker option to automatically add an "Unset" option to the start of options. */
