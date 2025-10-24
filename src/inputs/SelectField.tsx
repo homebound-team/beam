@@ -41,7 +41,6 @@ export function SelectField<O, V extends Value>(
     options,
     onSelect,
     value,
-    autoSort,
     ...otherProps
   } = props;
   const values = useMemo(() => [value], [value]);
@@ -52,7 +51,6 @@ export function SelectField<O, V extends Value>(
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
       values={values}
-      autoSort={autoSort}
       onSelect={(values, options) => {
         // If the user used `unsetLabel`, then values will be `[undefined]` and options `[unsetOption]`
         if (values.length > 0 && options.length > 0) {
