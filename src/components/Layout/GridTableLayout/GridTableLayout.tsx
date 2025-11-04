@@ -112,6 +112,10 @@ function GridTableLayoutComponent<
   } = props;
 
   const columns = tableProps.columns;
+
+  !hideEditColumns && validateColumns(columns);
+
+  // TODO: Not sure about this
   const hasHideableColumns = useMemo(() => columns.some((c) => c.canHide), [columns]);
 
   const api = useGridTableApi<R>();
@@ -183,6 +187,38 @@ function GridTableLayoutComponent<
 }
 
 export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof GridTableLayoutComponent;
+
+function validateColumns(columns: readonly { id?: string; name?: string }[]): void {
+  // Single pass validation - collect invalid columns
+  const columnsWithoutIds: number[] = [];
+  const columnsWithoutNames: number[] = [];
+
+  for (let i = 0; i < columns.length; i++) {
+    const column = columns[i];
+    if (!column.id || column.id.length === 0) {
+      columnsWithoutIds.push(i);
+    }
+    if (!column.name || column.name.length === 0) {
+      columnsWithoutNames.push(i);
+    }
+  }
+
+  if (columnsWithoutIds.length > 0) {
+    throw new Error(
+      `GridTableLayout requires all columns to have an explicit 'id' property when EditColumnsButton is enabled. ` +
+        `Columns without IDs: ${columnsWithoutIds.map((idx) => `column[${idx}]`).join(", ")}. ` +
+        `Please add an 'id' property to each column definition.`,
+    );
+  }
+
+  if (columnsWithoutNames.length > 0) {
+    throw new Error(
+      `GridTableLayout requires all columns to have an explicit 'name' property when EditColumnsButton is enabled. ` +
+        `Columns without names: ${columnsWithoutNames.map((idx) => `column[${idx}]`).join(", ")}. ` +
+        `Please add a 'name' property to each column definition.`,
+    );
+  }
+}
 
 /**
  * A wrapper around standard filter, grouping and search state hooks.
