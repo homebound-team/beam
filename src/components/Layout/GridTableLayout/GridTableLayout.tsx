@@ -1,13 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button, ButtonProps } from "src/components/Button";
 import { Filters } from "src/components/Filters/Filters";
 import { Icon } from "src/components/Icon";
 import { GridDataRow } from "src/components/Table";
+import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable, GridTableProps } from "src/components/Table/GridTable";
+import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
-import { useBreakpoint, useGroupBy, usePersistedFilter, UsePersistedFilterProps } from "src/hooks";
+import {
+  useBreakpoint,
+  useComputed,
+  useGroupBy,
+  usePersistedColumns,
+  UsePersistedColumnsProps,
+  usePersistedFilter,
+  UsePersistedFilterProps,
+} from "src/hooks";
 import { TextField } from "src/inputs/TextField";
 import { useTestIds } from "src/utils";
 import { useDebounce } from "use-debounce";
@@ -55,6 +65,7 @@ export type GridTableLayoutProps<
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
+  hideEditColumns?: boolean;
 };
 
 /**
@@ -89,13 +100,36 @@ function GridTableLayoutComponent<
   X extends Only<GridTableXss, X>,
   QData,
 >(props: GridTableLayoutProps<F, R, X, QData>) {
-  const { pageTitle, breadcrumb, tableProps, layoutState, primaryAction, secondaryAction, tertiaryAction } = props;
+  const {
+    pageTitle,
+    breadcrumb,
+    tableProps,
+    layoutState,
+    primaryAction,
+    secondaryAction,
+    tertiaryAction,
+    hideEditColumns = false,
+  } = props;
 
+  const columns = tableProps.columns;
+  const hasHideableColumns = useMemo(() => columns.some((c) => c.canHide), [columns]);
+
+  const api = useGridTableApi<R>();
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
-  const showTableActions = layoutState?.filterDefs || layoutState?.search;
+  const showTableActions = layoutState?.filterDefs || layoutState?.search || (!hideEditColumns && hasHideableColumns);
   const isVirtualized = tableProps.as === "virtual";
 
   const breakpoints = useBreakpoint();
+
+  // Sync API changes back to persisted state when persistedColumns is provided
+  const visibleColumnIds = useComputed(() => api.getVisibleColumnIds(), [api]);
+  useEffect(() => {
+    if (layoutState?.setVisibleColumnIds) {
+      layoutState.setVisibleColumnIds(visibleColumnIds);
+    }
+  }, [visibleColumnIds, layoutState]);
+
+  const visibleColumnsStorageKey = layoutState?.persistedColumnsStorageKey;
 
   return (
     <>
@@ -107,7 +141,7 @@ function GridTableLayoutComponent<
         tertiaryAction={tertiaryAction}
       />
       {showTableActions && (
-        <TableActions onlyRight={!layoutState?.search}>
+        <TableActions onlyRight={!layoutState?.search && !hideEditColumns && hasHideableColumns}>
           {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
           {layoutState?.filterDefs && (
             <Filters
@@ -118,17 +152,29 @@ function GridTableLayoutComponent<
               numberOfInlineFilters={breakpoints.mdAndDown ? 2 : undefined}
             />
           )}
+          {!hideEditColumns && hasHideableColumns && (
+            <EditColumnsButton columns={columns} api={api} trigger={{ label: "Columns" }} />
+          )}
         </TableActions>
       )}
       <ScrollableContent virtualized={isVirtualized}>
         {isGridTableProps(tableProps) ? (
-          <GridTable {...tableProps} filter={clientSearch} style={{ allWhite: true }} stickyHeader />
-        ) : (
-          <QueryTable
-            {...(tableProps as QueryTableProps<R, QData, X>)}
+          <GridTable
+            {...tableProps}
+            api={api}
             filter={clientSearch}
             style={{ allWhite: true }}
             stickyHeader
+            visibleColumnsStorageKey={visibleColumnsStorageKey}
+          />
+        ) : (
+          <QueryTable
+            {...(tableProps as QueryTableProps<R, QData, X>)}
+            api={api}
+            filter={clientSearch}
+            style={{ allWhite: true }}
+            stickyHeader
+            visibleColumnsStorageKey={visibleColumnsStorageKey}
           />
         )}
       </ScrollableContent>
@@ -145,10 +191,12 @@ export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof Gr
  */
 export function useGridTableLayoutState<F extends Record<string, unknown>>({
   persistedFilter,
+  persistedColumns,
   search,
   groupBy: maybeGroupBy,
 }: {
   persistedFilter?: UsePersistedFilterProps<F>;
+  persistedColumns?: UsePersistedColumnsProps;
   search?: "client" | "server";
   groupBy?: Record<string, string>;
 }) {
@@ -159,6 +207,9 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
 
   const [searchString, setSearchString] = useState<string | undefined>("");
 
+  const columnsFallback = { storageKey: "unset-columns" };
+  const { visibleColumnIds, setVisibleColumnIds } = usePersistedColumns(persistedColumns ?? columnsFallback);
+
   return {
     filter,
     setFilter,
@@ -167,6 +218,9 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     setSearchString,
     search,
     groupBy: maybeGroupBy ? groupBy : undefined,
+    visibleColumnIds: persistedColumns ? visibleColumnIds : undefined,
+    setVisibleColumnIds: persistedColumns ? setVisibleColumnIds : undefined,
+    persistedColumnsStorageKey: persistedColumns?.storageKey,
   };
 }
 
