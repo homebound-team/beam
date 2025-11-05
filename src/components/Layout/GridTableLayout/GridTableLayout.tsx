@@ -115,10 +115,11 @@ function GridTableLayoutComponent<
 
   !hideEditColumns && validateColumns(columns);
 
-  // TODO: Not sure about this
   const hasHideableColumns = useMemo(() => columns.some((c) => c.canHide), [columns]);
 
-  const api = useGridTableApi<R>();
+  // Use user-provided API if available, otherwise create our own
+  const defaultApi = useGridTableApi<R>();
+  const api = tableProps.api ?? defaultApi;
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
   const showTableActions = layoutState?.filterDefs || layoutState?.search || (!hideEditColumns && hasHideableColumns);
   const isVirtualized = tableProps.as === "virtual";
