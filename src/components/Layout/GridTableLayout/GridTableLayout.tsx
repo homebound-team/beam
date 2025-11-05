@@ -147,16 +147,18 @@ function GridTableLayoutComponent<
       />
       {showTableActions && (
         <TableActions onlyRight={!layoutState?.search && !hideEditColumns && hasHideableColumns}>
-          {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
-          {layoutState?.filterDefs && (
-            <Filters
-              filterDefs={layoutState.filterDefs}
-              filter={layoutState.filter}
-              onChange={layoutState.setFilter}
-              groupBy={layoutState.groupBy}
-              numberOfInlineFilters={breakpoints.mdAndDown ? 2 : undefined}
-            />
-          )}
+          <div css={Css.df.gap1.$}>
+            {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
+            {layoutState?.filterDefs && (
+              <Filters
+                filterDefs={layoutState.filterDefs}
+                filter={layoutState.filter}
+                onChange={layoutState.setFilter}
+                groupBy={layoutState.groupBy}
+                numberOfInlineFilters={breakpoints.mdAndDown ? 2 : undefined}
+              />
+            )}
+          </div>
           {!hideEditColumns && hasHideableColumns && (
             <EditColumnsButton
               columns={columns}
