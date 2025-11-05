@@ -158,7 +158,11 @@ function GridTableLayoutComponent<
             />
           )}
           {!hideEditColumns && hasHideableColumns && (
-            <EditColumnsButton columns={columns} api={api} trigger={{ label: "Columns" }} />
+            <EditColumnsButton
+              columns={columns}
+              api={api}
+              trigger={{ icon: "kanban", label: "", variant: "quaternaryBordered" }}
+            />
           )}
         </TableActions>
       )}

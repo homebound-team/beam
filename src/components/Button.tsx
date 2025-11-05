@@ -192,6 +192,16 @@ const variantStyles: (contrast: boolean) => Record<
       .boxShadow(`0px 0px 0px 2px ${Palette.Gray500}`).$,
   },
 
+  quaternaryBordered: {
+    baseStyles: Css.bgWhite.bcGray300.bw1.ba.gray900.$,
+    hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
+    pressedStyles: Css.gray900.if(contrast).bgWhite.gray900.$,
+    disabledStyles: Css.gray400.if(contrast).gray700.$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.White}, 0px 0px 0px 4px ${Palette.Gray900}`)
+      .if(contrast)
+      .boxShadow(`0px 0px 0px 2px ${Palette.Gray500}`).$,
+  },
+
   caution: {
     baseStyles: Css.bgYellow200.gray900.$,
     hoverStyles: Css.bgYellow300.$,
@@ -238,5 +248,6 @@ export type ButtonVariant =
   | "caution"
   | "danger"
   | "quaternary"
+  | "quaternaryBordered"
   | "text"
   | "textSecondary";
