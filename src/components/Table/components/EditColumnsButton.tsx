@@ -1,7 +1,6 @@
-import { useCallback, useMemo, useRef } from "react";
+import { Fragment, useCallback, useMemo, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
-import { Button } from "src/components/Button";
 import {
   isIconButton,
   isNavLinkButton,
@@ -14,21 +13,20 @@ import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridColumn, Kinded } from "src/components/Table/types";
 import { Css } from "src/Css";
 import { useComputed } from "src/hooks";
-import { CheckboxGroup } from "src/inputs";
+import { Switch } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 interface EditColumnsButtonProps<R extends Kinded>
   extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
   columns: GridColumn<R>[];
-  title?: string;
   api: GridTableApi<R>;
   // for storybook purposes
   defaultOpen?: boolean;
 }
 
 export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProps<R>) {
-  const { defaultOpen, disabled, columns, trigger, title, api } = props;
+  const { defaultOpen, disabled, columns, trigger, api } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -76,22 +74,26 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
     <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
       <div
         css={{
-          ...Css.bgWhite.py5.px3.maxwPx(380).bshBasic.$,
+          ...Css.dg.gtc("1fr auto").gap2.bgWhite.p2.maxwPx(326).$,
           "&:hover": Css.bshHover.$,
         }}
       >
-        <div css={Css.gray500.xsSb.mb1.ttu.$}>{title || "Select columns to show"}</div>
-        <CheckboxGroup
-          label={title || "Select columns to show"}
-          onChange={(values) => setSelectedValues(values)}
-          values={selectedValues}
-          options={options}
-          columns={2}
-          labelStyle="hidden"
-        />
-        <div css={Css.mt1.$}>
-          <Button variant={"tertiary"} label={"Clear selections"} onClick={() => setSelectedValues([])} />
-        </div>
+        {options.map((option) => (
+          <Fragment key={option.value}>
+            <div css={Css.sm.truncate.pr1.$}>{option.label}</div>
+            <Switch
+              compact
+              selected={selectedValues.includes(option.value)}
+              onChange={(value) =>
+                setSelectedValues(
+                  value ? [...selectedValues, option.value] : selectedValues.filter((v) => v !== option.value),
+                )
+              }
+              labelStyle="hidden"
+              label={""}
+            />
+          </Fragment>
+        ))}
       </div>
     </OverlayTrigger>
   );

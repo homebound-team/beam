@@ -161,6 +161,7 @@ function GridTableLayoutComponent<
             <EditColumnsButton
               columns={columns}
               api={api}
+              tooltip="Display columns"
               trigger={{ icon: "kanban", label: "", variant: "quaternaryBordered" }}
             />
           )}
