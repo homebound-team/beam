@@ -262,7 +262,14 @@ export const zIndices = {
 /** Loads an array from sessionStorage, if it exists, or `undefined`. */
 export function loadArrayOrUndefined(key: string) {
   const ids = sessionStorage.getItem(key);
-  return ids ? JSON.parse(ids) : undefined;
+  if (!ids) return undefined;
+  // Handle case where "undefined" string might be stored
+  if (ids === "undefined") return undefined;
+  try {
+    return JSON.parse(ids);
+  } catch {
+    return undefined;
+  }
 }
 
 export function insertAtIndex<T>(array: Array<T>, element: T, index: number): Array<T> {

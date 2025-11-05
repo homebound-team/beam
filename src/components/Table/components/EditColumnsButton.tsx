@@ -91,6 +91,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
               }
               labelStyle="hidden"
               label={""}
+              {...tid[`option${option.value}`]}
             />
           </Fragment>
         ))}

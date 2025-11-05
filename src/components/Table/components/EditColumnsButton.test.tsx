@@ -4,7 +4,7 @@ import { EditColumnsButton } from "src/components/Table/components/EditColumnsBu
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import { GridColumn } from "src/components/Table/types";
-import { column } from "src/components/Table/utils/columns";
+import { actionColumn, column } from "src/components/Table/utils/columns";
 import { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { click, render, wait } from "src/utils/rtl";
 
@@ -15,11 +15,9 @@ describe("EditColumnsButton", () => {
       id: "value",
       name: "Value",
       header: "Value",
-      canHide: true,
-      initVisible: true,
       data: ({ value }) => value,
     }),
-    column<Row>({ id: "actions", name: "Actions", header: "Action", canHide: true, data: () => <div>Actions</div> }),
+    actionColumn<Row>({ id: "actions", name: "Actions", header: "Action", data: () => <div>Actions</div> }),
   ];
 
   // This component updates session storage as the selected columns change. Ensure the session storage is reset as needed
@@ -27,7 +25,7 @@ describe("EditColumnsButton", () => {
   afterAll(() => sessionStorage.clear());
 
   it("should ignore columns that are missing ids and warn", async () => {
-    // Given an edit columns button, where the columns do not have the name but do have "canHide: true"
+    // Given an edit columns button, where a column with canHide: true is missing the name property
     const warnSpy = jest.spyOn(console, "warn");
     const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
     function Test() {
@@ -37,8 +35,7 @@ describe("EditColumnsButton", () => {
         <>
           <EditColumnsButton
             trigger={{ label: "Columns" }}
-            // Remove `name` prop from the Actions column for this test
-            columns={columns.map(({ name, ...c }) => (name === "Actions" ? c : { name, ...c }))}
+            columns={columns.map(({ name, ...c }) => (name === "Value" ? c : { name, ...c }))}
             defaultOpen={true}
             api={_api}
           />
@@ -51,9 +48,9 @@ describe("EditColumnsButton", () => {
     expect(warnSpy.mock.calls[0][0]).toBe(
       "Column is missing 'name' and/or 'id' property required by the Edit Columns button",
     );
-    // And the list does not include the Action column
-    expect(r.getAllByRole("checkbox")).toHaveLength(1);
-    expect(r.queryByText("Actions")).toBeFalsy();
+    // And the list does not include the column with missing name
+    expect(r.getAllByRole("switch")).toHaveLength(1);
+    expect(r.queryByText("Value")).toBeFalsy();
   });
 
   it("should render EditColumnsButton", async () => {
@@ -89,7 +86,7 @@ describe("EditColumnsButton", () => {
     }
     const r = await render(<Test />);
     // Then only hide-able columns should be render
-    expect(r.getAllByRole("checkbox")).toHaveLength(2);
+    expect(r.getAllByRole("switch")).toHaveLength(2);
   });
 
   it("should call setColumns when an option is clicked", async () => {
@@ -107,16 +104,16 @@ describe("EditColumnsButton", () => {
     }
     const r = await render(<Test />);
 
-    expect(api.current!.getVisibleColumnIds()).toEqual(["name", "value"]);
+    expect(api.current!.getVisibleColumnIds()).toEqual(["name", "value", "actions"]);
 
-    // When click on an option
-    click(r.value);
+    // When click on an option (deselect value)
+    click(r.columns_optionvalue);
 
-    // Then setColumns should be called
-    expect(api.current!.getVisibleColumnIds()).toEqual(["name"]);
+    // Then setColumns should be called (actions column always visible since canHide: false)
+    expect(api.current!.getVisibleColumnIds()).toEqual(["name", "actions"]);
   });
 
-  it("should call setColumns when clear selections is clicked", async () => {
+  it("should hide columns when all hideable columns are deselected", async () => {
     // Given an edit columns button
     const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
     function Test() {
@@ -130,12 +127,14 @@ describe("EditColumnsButton", () => {
       );
     }
     const r = await render(<Test />);
-    expect(api.current!.getVisibleColumnIds()).toEqual(["name", "value"]);
-    // When click clearSelections button
-    click(r.clearSelections);
+    expect(api.current!.getVisibleColumnIds()).toEqual(["name", "value", "actions"]);
+    // When deselect all hideable columns via the switches
+    click(r.columns_optionname);
     await wait();
-    // Then setColumns should be called
-    expect(api.current!.getVisibleColumnIds()).toEqual(["name"]);
+    click(r.columns_optionvalue);
+    await wait();
+    // Then only non-hideable columns remain visible (actions column always visible since canHide: false)
+    expect(api.current!.getVisibleColumnIds()).toEqual(["actions"]);
   });
 });
 

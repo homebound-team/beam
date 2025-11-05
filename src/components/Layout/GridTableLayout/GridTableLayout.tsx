@@ -13,10 +13,9 @@ import {
   useBreakpoint,
   useComputed,
   useGroupBy,
-  usePersistedColumns,
-  UsePersistedColumnsProps,
   usePersistedFilter,
   UsePersistedFilterProps,
+  useSessionStorage,
 } from "src/hooks";
 import { TextField } from "src/inputs/TextField";
 import { useTestIds } from "src/utils";
@@ -111,6 +110,7 @@ function GridTableLayoutComponent<
     hideEditColumns = false,
   } = props;
 
+  const tid = useTestIds(props);
   const columns = tableProps.columns;
 
   !hideEditColumns && validateColumns(columns);
@@ -163,6 +163,7 @@ function GridTableLayoutComponent<
               api={api}
               tooltip="Display columns"
               trigger={{ icon: "kanban", label: "", variant: "quaternaryBordered" }}
+              {...tid.editColumnsButton}
             />
           )}
         </TableActions>
@@ -194,6 +195,7 @@ function GridTableLayoutComponent<
 
 export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof GridTableLayoutComponent;
 
+// Force columns to have a name and id property for all our table layouts
 function validateColumns(columns: readonly { id?: string; name?: string }[]): void {
   // Single pass validation - collect invalid columns
   const columnsWithoutIds: number[] = [];
@@ -238,7 +240,7 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
   groupBy: maybeGroupBy,
 }: {
   persistedFilter?: UsePersistedFilterProps<F>;
-  persistedColumns?: UsePersistedColumnsProps;
+  persistedColumns?: { storageKey: string };
   search?: "client" | "server";
   groupBy?: Record<string, string>;
 }) {
@@ -249,8 +251,11 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
 
   const [searchString, setSearchString] = useState<string | undefined>("");
 
-  const columnsFallback = { storageKey: "unset-columns" };
-  const { visibleColumnIds, setVisibleColumnIds } = usePersistedColumns(persistedColumns ?? columnsFallback);
+  const columnsFallback = "unset-columns";
+  const [visibleColumnIds, setVisibleColumnIds] = useSessionStorage<string[] | undefined>(
+    persistedColumns?.storageKey ?? columnsFallback,
+    undefined,
+  );
 
   return {
     filter,
