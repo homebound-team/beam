@@ -55,6 +55,7 @@ export type GridTableLayoutProps<
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
+  noColumnResizing?: boolean;
 };
 
 /**
@@ -89,8 +90,16 @@ function GridTableLayoutComponent<
   X extends Only<GridTableXss, X>,
   QData,
 >(props: GridTableLayoutProps<F, R, X, QData>) {
-  const { pageTitle, breadcrumb, tableProps, layoutState, primaryAction, secondaryAction, tertiaryAction } = props;
-
+  const {
+    pageTitle,
+    breadcrumb,
+    tableProps,
+    layoutState,
+    primaryAction,
+    secondaryAction,
+    tertiaryAction,
+    noColumnResizing = false,
+  } = props;
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
   const showTableActions = layoutState?.filterDefs || layoutState?.search;
   const isVirtualized = tableProps.as === "virtual";
@@ -122,13 +131,20 @@ function GridTableLayoutComponent<
       )}
       <ScrollableContent virtualized={isVirtualized}>
         {isGridTableProps(tableProps) ? (
-          <GridTable {...tableProps} filter={clientSearch} style={{ allWhite: true }} stickyHeader />
+          <GridTable
+            {...tableProps}
+            filter={clientSearch}
+            style={{ allWhite: true }}
+            stickyHeader
+            noColumnResizing={noColumnResizing}
+          />
         ) : (
           <QueryTable
             {...(tableProps as QueryTableProps<R, QData, X>)}
             filter={clientSearch}
             style={{ allWhite: true }}
             stickyHeader
+            noColumnResizing={noColumnResizing}
           />
         )}
       </ScrollableContent>

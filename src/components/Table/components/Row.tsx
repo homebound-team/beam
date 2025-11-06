@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { ReactElement, useCallback, useContext, useRef } from "react";
+import React, { ReactElement, useCallback, useContext, useRef } from "react";
 import {
   defaultRenderFn,
   headerRenderFn,
@@ -7,6 +7,7 @@ import {
   rowClickRenderFn,
   rowLinkRenderFn,
 } from "src/components/Table/components/cell";
+import { ColumnResizeHandle } from "src/components/Table/components/ColumnResizeHandle";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
@@ -44,6 +45,12 @@ interface RowProps<R extends Kinded> {
   cellHighlight: boolean;
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
+  /* column resizers */
+  resizedWidths?: Record<string, number>;
+  setResizedWidth?: (columnId: string, width: number, columnIndex: number) => void;
+  noColumnResizing?: boolean;
+  tableWidth?: number;
+  /* Drag handlers */
   onDragStart?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDragEnd?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDrop?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
@@ -65,6 +72,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     cellHighlight,
     omitRowHover,
     hasExpandableHeader,
+    resizedWidths,
+    setResizedWidth,
+    noColumnResizing = true,
+    tableWidth,
     onDragStart,
     onDragEnd,
     onDrop,
@@ -348,7 +359,75 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                   ? rowClickRenderFn(as, api, currentColspan)
                   : defaultRenderFn(as, currentColspan);
 
-          return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick, tooltip);
+          const cellElement = renderFn(
+            columnIndex,
+            cellCss,
+            content,
+            row,
+            rowStyle,
+            cellClassNames,
+            cellOnClick,
+            tooltip,
+          );
+
+          // Add resize handle for header rows when resizing is enabled
+          // Only add handle on the right border (not for the last column)
+          // Skip action columns (selectColumn, collapseColumn, actionColumn) as they should not be resizable
+          if (
+            !noColumnResizing &&
+            isHeader &&
+            setResizedWidth &&
+            columnIndex < columns.length - 1 &&
+            currentColspan === 1 &&
+            !column.isAction &&
+            column.id !== "beamSelectColumn" &&
+            column.id !== "beamCollapseColumn"
+          ) {
+            // Parse current width - if not in pixels, use a fallback or skip resize handle
+            const currentSizeStr = columnSizes[columnIndex];
+            const currentWidthPx = currentSizeStr.endsWith("px")
+              ? parseInt(currentSizeStr.replace("px", ""), 10)
+              : resizedWidths?.[column.id] || 100; // Fallback to resized width or default
+            const minWidthPx = column.mw ? parseInt(column.mw.replace("px", ""), 10) : 0;
+
+            // Calculate min widths of columns to the right for max width calculation
+            const rightColumnsMinWidths: number[] = [];
+            for (let i = columnIndex + 1; i < columns.length; i++) {
+              const rightCol = columns[i];
+              // Skip action columns (selectColumn, collapseColumn, actionColumn)
+              if (rightCol.isAction || rightCol.id === "beamSelectColumn" || rightCol.id === "beamCollapseColumn") {
+                continue;
+              }
+              const rightColMinWidth = rightCol.mw ? parseInt(rightCol.mw.replace("px", ""), 10) : 0;
+              rightColumnsMinWidths.push(rightColMinWidth);
+            }
+
+            // Add resize handle to header cells by cloning the cell element and adding relative positioning
+            const cellElementWithHandle = React.cloneElement(cellElement as React.ReactElement, {
+              css: {
+                ...((cellElement as React.ReactElement).props.css || {}),
+                ...Css.relative.$,
+              },
+              children: (
+                <>
+                  {(cellElement as React.ReactElement).props.children}
+                  <ColumnResizeHandle
+                    columnId={column.id}
+                    columnIndex={columnIndex}
+                    currentWidth={currentWidthPx}
+                    minWidth={minWidthPx}
+                    onResize={(colId, width) => setResizedWidth?.(colId, width, columnIndex)}
+                    tableWidth={tableWidth}
+                    columnSizes={columnSizes}
+                    rightColumnsMinWidths={rightColumnsMinWidths}
+                  />
+                </>
+              ),
+            });
+            return cellElementWithHandle;
+          }
+
+          return cellElement;
         })
       )}
     </RowTag>

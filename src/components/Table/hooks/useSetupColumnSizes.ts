@@ -29,7 +29,8 @@ export function useSetupColumnSizes<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   resizeRef: MutableRefObject<HTMLElement | null>,
   expandedColumnIds: string[],
-): string[] {
+  resizedWidths?: Record<string, number>,
+): { columnSizes: string[]; tableWidth: number | undefined } {
   // Calculate the column sizes immediately rather than via the `debounce` method.
   // We do this for Storybook integrations that may use MockDate. MockDate changes the behavior of `new Date()`,
   // which is used internally by `useDebounce`, so the frozen clock means the callback is never called.
@@ -38,18 +39,18 @@ export function useSetupColumnSizes<R extends Kinded>(
 
   // Calc our initial/first render sizes where we won't have a width yet
   const [columnSizes, setColumnSizes] = useState<string[]>(
-    calcColumnSizes(columns, tableWidth, style.minWidthPx, expandedColumnIds),
+    calcColumnSizes(columns, tableWidth, style.minWidthPx, expandedColumnIds, resizedWidths),
   );
 
   const setTableAndColumnWidths = useCallback(
     (width: number) => {
       setTableWidth(width);
-      setColumnSizes(calcColumnSizes(columns, width, style.minWidthPx, expandedColumnIds));
+      setColumnSizes(calcColumnSizes(columns, width, style.minWidthPx, expandedColumnIds, resizedWidths));
     },
-    [setTableWidth, setColumnSizes, columns, style, expandedColumnIds],
+    [setTableWidth, setColumnSizes, columns, style, expandedColumnIds, resizedWidths],
   );
 
-  // Used to recalculate our columns sizes when columns change
+  // Used to recalculate our columns sizes when columns or resized widths change
   useEffect(
     () => {
       if (!calculateImmediately.current) {
@@ -59,7 +60,7 @@ export function useSetupColumnSizes<R extends Kinded>(
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [columns, setTableAndColumnWidths],
+    [columns, resizedWidths, setTableAndColumnWidths],
   );
 
   const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
@@ -83,5 +84,5 @@ export function useSetupColumnSizes<R extends Kinded>(
 
   useResizeObserver({ ref: resizeRef, onResize });
 
-  return columnSizes;
+  return { columnSizes, tableWidth };
 }

@@ -103,6 +103,7 @@ export function calcColumnSizes<R extends Kinded>(
   tableWidth: number | undefined,
   tableMinWidthPx: number = 0,
   expandedColumnIds: string[],
+  resizedWidths?: Record<string, number>,
 ): string[] {
   // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
   // calc((100% - allOtherPercent - allOtherPx) * ((myFr / totalFr))`
@@ -114,7 +115,14 @@ export function calcColumnSizes<R extends Kinded>(
   // will resolve every slightly differently, where as this approach they will match exactly.
   const { claimedPercentages, claimedPixels, totalFr } = columns.reduce(
     (acc, { id, w: _w, expandedWidth }) => {
-      const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
+      // Use resized width if available, otherwise use expanded width or original width
+      const resizedWidth = resizedWidths?.[id];
+      const w =
+        resizedWidth !== undefined
+          ? `${resizedWidth}px`
+          : expandedColumnIds.includes(id) && expandedWidth !== undefined
+            ? expandedWidth
+            : _w;
 
       if (typeof w === "undefined") {
         return { ...acc, totalFr: acc.totalFr + 1 };
@@ -175,7 +183,14 @@ export function calcColumnSizes<R extends Kinded>(
       throw new Error("Beam Table column minWidth definition only supports pixel units");
     }
     const mw = _mw ? Number(_mw.replace("px", "")) : 0;
-    const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
+    // Use resized width if available, otherwise use expanded width or original width
+    const resizedWidth = resizedWidths?.[id];
+    const w =
+      resizedWidth !== undefined
+        ? `${resizedWidth}px`
+        : expandedColumnIds.includes(id) && expandedWidth !== undefined
+          ? expandedWidth
+          : _w;
 
     if (typeof w === "undefined") {
       return fr(1, mw);
