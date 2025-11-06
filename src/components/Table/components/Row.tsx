@@ -50,6 +50,7 @@ interface RowProps<R extends Kinded> {
   setResizedWidth?: (columnId: string, width: number, columnIndex: number) => void;
   noColumnResizing?: boolean;
   tableWidth?: number;
+  calculatePreviewWidth?: (columnId: string, newWidth: number, columnIndex: number) => number;
   /* Drag handlers */
   onDragStart?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDragEnd?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
@@ -76,6 +77,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     setResizedWidth,
     noColumnResizing = true,
     tableWidth,
+    calculatePreviewWidth,
     onDragStart,
     onDragEnd,
     onDrop,
@@ -420,6 +422,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                     tableWidth={tableWidth}
                     columnSizes={columnSizes}
                     rightColumnsMinWidths={rightColumnsMinWidths}
+                    calculatePreviewWidth={calculatePreviewWidth}
                   />
                 </>
               ),

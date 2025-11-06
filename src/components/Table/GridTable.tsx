@@ -239,6 +239,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const virtuosoRangeRef = useRef<ListRange | null>(null);
   // Use this ref to watch for changes in the GridTable's container and resize columns accordingly.
   const resizeRef = useRef<HTMLDivElement>(null);
+  // Ref to the table container element (for column resize guide line)
+  const tableContainerRef = useRef<HTMLElement | null>(null);
 
   const api = useMemo<GridTableApiImpl<R>>(
     () => {
@@ -428,6 +430,118 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     [],
   );
 
+  // Calculate what the final width would be for a column resize (without applying it)
+  const calculatePreviewWidth = useCallback(
+    (columnId: string, newWidth: number, columnIndex: number): number => {
+      if (!tableWidth || !columnSizes || columnSizes.length === 0) {
+        return newWidth;
+      }
+
+      // Get current width of the column being resized
+      const currentSizeStr = columnSizes[columnIndex];
+      const currentWidth = currentSizeStr.endsWith("px") ? parseInt(currentSizeStr.replace("px", ""), 10) : 0;
+
+      // Calculate the delta (change in width)
+      const delta = newWidth - currentWidth;
+
+      // If no change, return current width
+      if (delta === 0) {
+        return currentWidth;
+      }
+
+      const currentTotalWidth = calculateTotalWidth();
+      const { columns: rightColumns, totalWidth: totalRightWidth } = findRightColumns(columnIndex);
+
+      // If no resizable columns to the right, just return the new width
+      if (rightColumns.length === 0) {
+        return newWidth;
+      }
+
+      // Calculate the new total width after resizing this column
+      const newTotalWidth = currentTotalWidth + delta;
+      const adjustmentNeeded = tableWidth - newTotalWidth;
+
+      // Distribute the adjustment among columns to the right
+      const updates: Record<string, number> = { [columnId]: newWidth };
+
+      if (adjustmentNeeded !== 0) {
+        // Distribute adjustment to ensure table width equals container width
+        Object.assign(updates, distributeAdjustment(rightColumns, totalRightWidth, adjustmentNeeded));
+      } else {
+        // No adjustment needed, but still distribute delta among right columns
+        Object.assign(updates, distributeDelta(rightColumns, totalRightWidth, delta));
+      }
+
+      // Safety check: Calculate the final total width and ensure it doesn't exceed container
+      // If it does, reduce the resized column and right columns proportionally
+      let finalTotalWidth = 0;
+      const allColumnWidths: Array<{ id: string; width: number; minWidth: number; hasUpdate: boolean }> = [];
+
+      columnSizes.forEach((size, idx) => {
+        const col = columns[idx];
+        let width: number;
+        if (idx === columnIndex) {
+          width = updates[columnId] || (size.endsWith("px") ? parseInt(size.replace("px", ""), 10) : 0);
+        } else {
+          const updatedWidth = updates[col.id];
+          width =
+            updatedWidth !== undefined ? updatedWidth : size.endsWith("px") ? parseInt(size.replace("px", ""), 10) : 0;
+        }
+        const colMinWidth = col.mw ? parseInt(col.mw.replace("px", ""), 10) : 0;
+        allColumnWidths.push({
+          id: col.id,
+          width,
+          minWidth: colMinWidth,
+          hasUpdate: updates[col.id] !== undefined || idx === columnIndex,
+        });
+        finalTotalWidth += width;
+      });
+
+      // If total exceeds container, reduce columns that were updated (resized column + right columns)
+      if (finalTotalWidth > tableWidth) {
+        const excess = finalTotalWidth - tableWidth;
+        let remainingExcess = excess;
+
+        // Calculate total reducible space from updated columns
+        const updatedColumns = allColumnWidths.filter((col) => col.hasUpdate);
+        let totalReducible = 0;
+        updatedColumns.forEach((col) => {
+          totalReducible += Math.max(0, col.width - col.minWidth);
+        });
+
+        if (totalReducible > 0) {
+          // Distribute the excess reduction proportionally among updated columns
+          updatedColumns.forEach((col) => {
+            const reducible = col.width - col.minWidth;
+            if (reducible > 0 && remainingExcess > 0) {
+              const proportion = reducible / totalReducible;
+              const reduction = Math.min(remainingExcess * proportion, reducible);
+              if (updates[col.id] !== undefined) {
+                updates[col.id] = Math.max(col.minWidth, updates[col.id] - reduction);
+              } else if (col.id === columnId) {
+                updates[columnId] = Math.max(col.minWidth, updates[columnId] - reduction);
+              }
+              remainingExcess -= reduction;
+            }
+          });
+        }
+
+        // If we still have excess after reducing all updated columns to their min widths,
+        // clamp the resized column to prevent overflow (this should be rare)
+        if (remainingExcess > 0 && updates[columnId] !== undefined) {
+          const resizedCol = allColumnWidths.find((c) => c.id === columnId);
+          if (resizedCol) {
+            updates[columnId] = Math.max(resizedCol.minWidth, updates[columnId] - remainingExcess);
+          }
+        }
+      }
+
+      // Return the final width for this column
+      return updates[columnId] ?? newWidth;
+    },
+    [tableWidth, columnSizes, columns, calculateTotalWidth, findRightColumns, distributeAdjustment, distributeDelta],
+  );
+
   // Wrapper function to handle column resizing with redistribution to right columns
   const handleColumnResize = useCallback(
     (columnId: string, newWidth: number, columnIndex: number) => {
@@ -544,6 +658,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     [
       tableWidth,
       columnSizes,
+      columns,
       setResizedWidth,
       calculateTotalWidth,
       findRightColumns,
@@ -691,6 +806,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             setResizedWidth: handleColumnResize,
             noColumnResizing,
             tableWidth,
+            calculatePreviewWidth,
           }}
         />
       );
@@ -748,7 +864,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // just trust the GridTable impl that, at runtime, `as=virtual` will (other than being virtualized)
   // behave semantically the same as `as=div` did for its tests.
   const _as = as === "virtual" && runningInJest ? "div" : as;
-  const rowStateContext = useMemo(() => ({ tableState: tableState }), [tableState]);
+  const rowStateContext = useMemo(
+    () => ({ tableState: tableState, tableContainerRef }),
+    [tableState, tableContainerRef],
+  );
 
   return (
     <TableStateContext.Provider value={rowStateContext}>
@@ -768,6 +887,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           tableHeadRows,
           stickyOffset,
           infiniteScroll,
+          tableContainerRef,
         )}
       </PresentationProvider>
     </TableStateContext.Provider>
@@ -796,9 +916,11 @@ function renderDiv<R extends Kinded>(
   tableHeadRows: ReactElement[],
   stickyOffset: number,
   _infiniteScroll?: InfiniteScroll,
+  tableContainerRef?: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
   return (
     <div
+      ref={tableContainerRef as MutableRefObject<HTMLDivElement | null>}
       css={{
         // Use `fit-content` to ensure the width of the table takes up the full width of its content.
         // Otherwise, the table's width would be that of its container, which may not be as wide as the table itself.
@@ -857,9 +979,11 @@ function renderTable<R extends Kinded>(
   tableHeadRows: ReactElement[],
   stickyOffset: number,
   _infiniteScroll?: InfiniteScroll,
+  tableContainerRef?: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
   return (
     <table
+      ref={tableContainerRef as MutableRefObject<HTMLTableElement | null>}
       css={{
         ...Css.w100.add("borderCollapse", "separate").add("borderSpacing", "0").$,
         ...Css.addIn("& tr ", { pageBreakAfter: "auto", pageBreakInside: "avoid" }).$,
@@ -925,6 +1049,7 @@ function renderVirtual<R extends Kinded>(
   tableHeadRows: ReactElement[],
   _stickyOffset: number,
   infiniteScroll?: InfiniteScroll,
+  _tableContainerRef?: MutableRefObject<HTMLElement | null>,
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
