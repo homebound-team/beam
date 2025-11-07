@@ -1,4 +1,4 @@
-import { Css, Palette } from "src/Css";
+import { Palette } from "src/Css";
 import { render } from "src/utils/rtl";
 import { CountBadge } from "./CountBadge";
 
@@ -33,8 +33,8 @@ describe("CountBadge", () => {
     expect(r.countBadge).toHaveStyle({ backgroundColor: Palette.Red600 });
   });
 
-  it("can apply color changes via xss", async () => {
-    const r = await render(<CountBadge count={5} xss={Css.gray900.$} />);
+  it("can apply color changes via color prop", async () => {
+    const r = await render(<CountBadge count={5} color={Palette.Gray900} />);
     expect(r.countBadge).toHaveStyle({ color: Palette.Gray900 });
   });
 
@@ -71,5 +71,15 @@ describe("CountBadge", () => {
   it("combines opacity with custom background color", async () => {
     const r = await render(<CountBadge count={12} bgColor={Palette.Red600} opacity={0.75} />);
     expect(r.countBadge).toHaveStyle({ backgroundColor: Palette.Red600, opacity: "0.75" });
+  });
+
+  it("hides if count is 0 and hideIfZero is true", async () => {
+    const r = await render(<CountBadge count={0} hideIfZero />);
+    expect(r.queryByTestId("countBadge")).not.toBeInTheDocument();
+  });
+
+  it("shows if count is not 0 and hideIfZero is true", async () => {
+    const r = await render(<CountBadge count={1} hideIfZero />);
+    expect(r.countBadge).toBeTruthy();
   });
 });

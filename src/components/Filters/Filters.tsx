@@ -86,7 +86,7 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
       {Object.keys(modalFilters).length > 0 && (
         <Button
           label="More Filters"
-          endAdornment={numModalFilters > 0 && <CountBadge count={numModalFilters} />}
+          endAdornment={<CountBadge count={numModalFilters} hideIfZero />}
           variant="secondary"
           onClick={() =>
             openModal({
