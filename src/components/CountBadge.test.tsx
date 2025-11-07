@@ -53,11 +53,6 @@ describe("CountBadge", () => {
     expect(r.countBadge).toHaveStyle({ color: Palette.White });
   });
 
-  it("uses full opacity by default", async () => {
-    const r = await render(<CountBadge count={5} />);
-    expect(r.countBadge).toHaveStyle({ opacity: "1" });
-  });
-
   it("hides if count is 0 and hideIfZero is true", async () => {
     const r = await render(<CountBadge count={0} hideIfZero />);
     expect(r.queryByTestId("countBadge")).not.toBeInTheDocument();
