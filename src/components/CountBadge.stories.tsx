@@ -82,3 +82,34 @@ export function InContext() {
     </div>
   );
 }
+
+export function WithOpacity() {
+  return (
+    <div css={Css.df.fdc.gap2.$}>
+      <div css={Css.df.aic.gap1.$}>
+        <span>Full opacity (default):</span>
+        <CountBadge count={5} />
+      </div>
+      <div css={Css.df.aic.gap1.$}>
+        <span>75% opacity:</span>
+        <CountBadge count={5} opacity={0.75} />
+      </div>
+      <div css={Css.df.aic.gap1.$}>
+        <span>50% opacity:</span>
+        <CountBadge count={5} opacity={0.5} />
+      </div>
+      <div css={Css.df.aic.gap1.$}>
+        <span>25% opacity:</span>
+        <CountBadge count={5} opacity={0.25} />
+      </div>
+      <div css={Css.df.aic.gap1.$}>
+        <span>Custom color with opacity:</span>
+        <CountBadge count={12} bgColor={Palette.Red600} opacity={0.5} />
+      </div>
+      <div css={Css.df.aic.gap1.$}>
+        <span>Large count with opacity:</span>
+        <CountBadge count={150} opacity={0.75} />
+      </div>
+    </div>
+  );
+}
