@@ -7,8 +7,6 @@ export interface CountBadgeProps<X> {
   count: number;
   /** Background color of the badge. Defaults to Blue700. */
   bgColor?: Palette;
-  /** Opacity of the badge (0-1). Defaults to 1 (fully opaque). */
-  opacity?: number;
   color?: Palette;
   hideIfZero?: boolean;
 }
@@ -18,14 +16,7 @@ export interface CountBadgeProps<X> {
  * Automatically adjusts size for counts > 100 (increases from 16px to 18px).
  */
 export function CountBadge<X extends Only<Xss<CountBadgeXss>, X>>(props: CountBadgeProps<X>) {
-  const {
-    count,
-    bgColor = Palette.Blue700,
-    opacity = 1,
-    color = Palette.White,
-    hideIfZero = false,
-    ...otherProps
-  } = props;
+  const { count, bgColor = Palette.Blue700, color = Palette.White, hideIfZero = false, ...otherProps } = props;
   const tid = useTestIds(otherProps, "countBadge");
 
   if (hideIfZero && count === 0) return null;
@@ -35,7 +26,7 @@ export function CountBadge<X extends Only<Xss<CountBadgeXss>, X>>(props: CountBa
       {...tid}
       css={{
         ...Css.sqPx(count > 100 ? 18 : 16).$, // Use larger size for counts > 100
-        ...Css.fs0.br100.xs2Sb.df.aic.jcc.bgColor(bgColor).o(opacity).$,
+        ...Css.fs0.br100.xs2Sb.df.aic.jcc.bgColor(bgColor).$,
         ...Css.color(color).$,
       }}
     >

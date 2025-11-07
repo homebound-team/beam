@@ -58,21 +58,6 @@ describe("CountBadge", () => {
     expect(r.countBadge).toHaveStyle({ opacity: "1" });
   });
 
-  it("can set custom opacity", async () => {
-    const r = await render(<CountBadge count={5} opacity={0.5} />);
-    expect(r.countBadge).toHaveStyle({ opacity: "0.5" });
-  });
-
-  it("can set low opacity", async () => {
-    const r = await render(<CountBadge count={5} opacity={0.25} />);
-    expect(r.countBadge).toHaveStyle({ opacity: "0.25" });
-  });
-
-  it("combines opacity with custom background color", async () => {
-    const r = await render(<CountBadge count={12} bgColor={Palette.Red600} opacity={0.75} />);
-    expect(r.countBadge).toHaveStyle({ backgroundColor: Palette.Red600, opacity: "0.75" });
-  });
-
   it("hides if count is 0 and hideIfZero is true", async () => {
     const r = await render(<CountBadge count={0} hideIfZero />);
     expect(r.queryByTestId("countBadge")).not.toBeInTheDocument();
