@@ -1,5 +1,6 @@
 import { memo, useMemo } from "react";
 import { Button } from "src/components/Button";
+import { CountBadge } from "src/components/CountBadge";
 import { Filter, FilterDefs, FilterImpls, FilterModal, filterTestIdPrefix, updateFilter } from "src/components/Filters";
 import { useModal } from "src/components/Modal";
 import { Css } from "src/Css";
@@ -85,11 +86,7 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
       {Object.keys(modalFilters).length > 0 && (
         <Button
           label="More Filters"
-          endAdornment={
-            numModalFilters > 0 && (
-              <span css={Css.wPx(16).hPx(16).fs0.br100.bgBlue700.white.xs2Sb.df.aic.jcc.$}>{numModalFilters}</span>
-            )
-          }
+          endAdornment={numModalFilters > 0 && <CountBadge count={numModalFilters} />}
           variant="secondary"
           onClick={() =>
             openModal({

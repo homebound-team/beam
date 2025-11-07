@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { mergeProps } from "react-aria";
 import { ComboBoxState } from "react-stately";
-import { Chips, Icon, Tooltip } from "src/components";
+import { Chips, CountBadge, Icon, Tooltip } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
@@ -119,12 +119,10 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       startAdornment={
         (showNumSelection && (
           <Tooltip title={<SelectedOptionBullets labels={chipLabels} />}>
-            <span
-              css={Css.wPx(16).hPx(16).fs0.br100.bgBlue700.white.xs2Sb.df.aic.jcc.$}
+            <CountBadge
+              count={isTree ? (selectedOptionsLabels?.length ?? 0) : state.selectionManager.selectedKeys.size}
               data-testid="selectedOptionsCount"
-            >
-              {isTree ? selectedOptionsLabels?.length : state.selectionManager.selectedKeys.size}
-            </span>
+            />
           </Tooltip>
         )) ||
         (showFieldDecoration && fieldDecoration(selectedOptions[0]))
