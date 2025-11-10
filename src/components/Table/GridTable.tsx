@@ -350,24 +350,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     [columns, columnSizes],
   );
 
-  // Helper to calculate total width of all columns
-  const calculateTotalWidth = useCallback((): number => {
-    let total = 0;
-    columnSizes.forEach((size) => {
-      if (size.endsWith("px")) {
-        total += parseInt(size.replace("px", ""), 10);
-      }
-    });
-    return total;
-  }, [columnSizes]);
-
   // Helper to distribute adjustment proportionally among right columns
   const distributeAdjustment = useCallback(
     (
       rightColumns: Array<{ id: string; currentWidth: number; minWidth: number }>,
       totalRightWidth: number,
       adjustment: number,
-    ): Record<string, number> => {
+    ): { updates: Record<string, number>; actualAdjustment: number } => {
       const updates: Record<string, number> = {};
       let remainingAdjustment = adjustment;
 
@@ -383,49 +372,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         remainingAdjustment -= actualAdjustment;
       }
 
-      return updates;
-    },
-    [],
-  );
-
-  // Helper to distribute delta (shrink/grow) among right columns
-  const distributeDelta = useCallback(
-    (
-      rightColumns: Array<{ id: string; currentWidth: number; minWidth: number }>,
-      totalRightWidth: number,
-      delta: number,
-    ): Record<string, number> => {
-      const updates: Record<string, number> = {};
-
-      if (delta < 0) {
-        // Shrinking: distribute the reduction among right columns proportionally
-        const reduction = Math.abs(delta);
-        let remainingReduction = reduction;
-
-        for (let i = 0; i < rightColumns.length && remainingReduction > 0.1; i++) {
-          const col = rightColumns[i];
-          const proportion = totalRightWidth > 0 ? col.currentWidth / totalRightWidth : 1 / rightColumns.length;
-          const colReduction = Math.min(remainingReduction * proportion, col.currentWidth - col.minWidth);
-          const newColWidth = Math.max(col.minWidth, col.currentWidth - colReduction);
-          updates[col.id] = newColWidth;
-          remainingReduction -= colReduction;
-        }
-      } else {
-        // Growing: distribute the increase among right columns proportionally
-        const increase = delta;
-        let remainingIncrease = increase;
-
-        for (let i = 0; i < rightColumns.length && remainingIncrease > 0.1; i++) {
-          const col = rightColumns[i];
-          const proportion = totalRightWidth > 0 ? col.currentWidth / totalRightWidth : 1 / rightColumns.length;
-          const colIncrease = remainingIncrease * proportion;
-          const newColWidth = col.currentWidth + colIncrease;
-          updates[col.id] = newColWidth;
-          remainingIncrease -= colIncrease;
-        }
-      }
-
-      return updates;
+      // Return both the updates and how much adjustment was actually applied
+      return { updates, actualAdjustment: adjustment - remainingAdjustment };
     },
     [],
   );
@@ -441,108 +389,64 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         return null;
       }
 
+      // First, "freeze" all columns to their current pixel widths to prevent fr columns from shifting
+      const updates: Record<string, number> = {};
+      columnSizes.forEach((sizeStr, idx) => {
+        const col = columns[idx];
+        // Skip columns that already have resized widths (they're already frozen)
+        if (resizedWidths?.[col.id] !== undefined) {
+          return;
+        }
+        // Freeze this column to its current calculated pixel width
+        if (sizeStr.endsWith("px")) {
+          updates[col.id] = parseInt(sizeStr.replace("px", ""), 10);
+        }
+      });
+
       // Get current width of the column being resized
       const currentSizeStr = columnSizes[columnIndex];
       const currentWidth = currentSizeStr.endsWith("px") ? parseInt(currentSizeStr.replace("px", ""), 10) : 0;
 
-      // Calculate the delta (change in width)
-      const delta = newWidth - currentWidth;
+      // Enforce the resized column's own minWidth
+      const resizedColumn = columns[columnIndex];
+      const resizedColMinWidth = resizedColumn.mw ? parseInt(resizedColumn.mw.replace("px", ""), 10) : 0;
+      const clampedNewWidth = Math.max(resizedColMinWidth, newWidth);
 
-      // If no change, return empty updates
+      // Calculate the delta (change in width)
+      const delta = clampedNewWidth - currentWidth;
+
+      // If no change, return the frozen widths
       if (delta === 0) {
-        return { updates: {}, hasRightColumns: false };
+        return { updates, hasRightColumns: false };
       }
 
-      const currentTotalWidth = calculateTotalWidth();
       const { columns: rightColumns, totalWidth: totalRightWidth } = findRightColumns(columnIndex);
 
       // If no resizable columns to the right, just update this column
       if (rightColumns.length === 0) {
-        return { updates: { [columnId]: newWidth }, hasRightColumns: false };
+        updates[columnId] = clampedNewWidth;
+        return { updates, hasRightColumns: false };
       }
 
-      // Calculate the new total width after resizing this column
-      const newTotalWidth = currentTotalWidth + delta;
-      const adjustmentNeeded = tableWidth - newTotalWidth;
+      // Distribute the opposite of the delta to right columns to keep table width constant
+      // If we shrink by 30, right columns grow by 30. If we grow by 30, right columns shrink by 30.
+      const distributionResult = distributeAdjustment(rightColumns, totalRightWidth, -delta);
+      Object.assign(updates, distributionResult.updates);
 
-      // Distribute the adjustment among columns to the right
-      const updates: Record<string, number> = { [columnId]: newWidth };
-
-      if (adjustmentNeeded !== 0) {
-        // Distribute adjustment to ensure table width equals container width
-        Object.assign(updates, distributeAdjustment(rightColumns, totalRightWidth, adjustmentNeeded));
+      // If right columns couldn't accommodate the full adjustment (hit min widths),
+      // clamp the resized column so table doesn't overflow
+      const actualDelta = -distributionResult.actualAdjustment;
+      if (Math.abs(actualDelta) < Math.abs(delta)) {
+        // Right columns couldn't shrink/grow as much as we wanted
+        // Adjust the resized column to match what was actually distributed
+        updates[columnId] = Math.max(resizedColMinWidth, currentWidth + actualDelta);
       } else {
-        // No adjustment needed, but still distribute delta among right columns
-        Object.assign(updates, distributeDelta(rightColumns, totalRightWidth, delta));
-      }
-
-      // Safety check: Calculate the final total width and ensure it doesn't exceed container
-      // If it does, reduce the resized column and right columns proportionally
-      let finalTotalWidth = 0;
-      const allColumnWidths: Array<{ id: string; width: number; minWidth: number; hasUpdate: boolean }> = [];
-
-      columnSizes.forEach((size, idx) => {
-        const col = columns[idx];
-        let width: number;
-        if (idx === columnIndex) {
-          width = updates[columnId] || (size.endsWith("px") ? parseInt(size.replace("px", ""), 10) : 0);
-        } else {
-          const updatedWidth = updates[col.id];
-          width =
-            updatedWidth !== undefined ? updatedWidth : size.endsWith("px") ? parseInt(size.replace("px", ""), 10) : 0;
-        }
-        const colMinWidth = col.mw ? parseInt(col.mw.replace("px", ""), 10) : 0;
-        allColumnWidths.push({
-          id: col.id,
-          width,
-          minWidth: colMinWidth,
-          hasUpdate: updates[col.id] !== undefined || idx === columnIndex,
-        });
-        finalTotalWidth += width;
-      });
-
-      // If total exceeds container, reduce columns that were updated (resized column + right columns)
-      if (finalTotalWidth > tableWidth) {
-        const excess = finalTotalWidth - tableWidth;
-        let remainingExcess = excess;
-
-        // Calculate total reducible space from updated columns
-        const updatedColumns = allColumnWidths.filter((col) => col.hasUpdate);
-        let totalReducible = 0;
-        updatedColumns.forEach((col) => {
-          totalReducible += Math.max(0, col.width - col.minWidth);
-        });
-
-        if (totalReducible > 0) {
-          // Distribute the excess reduction proportionally among updated columns
-          updatedColumns.forEach((col) => {
-            const reducible = col.width - col.minWidth;
-            if (reducible > 0 && remainingExcess > 0) {
-              const proportion = reducible / totalReducible;
-              const reduction = Math.min(remainingExcess * proportion, reducible);
-              if (updates[col.id] !== undefined) {
-                updates[col.id] = Math.max(col.minWidth, updates[col.id] - reduction);
-              } else if (col.id === columnId) {
-                updates[columnId] = Math.max(col.minWidth, updates[columnId] - reduction);
-              }
-              remainingExcess -= reduction;
-            }
-          });
-        }
-
-        // If we still have excess after reducing all updated columns to their min widths,
-        // clamp the resized column to prevent overflow (this should be rare)
-        if (remainingExcess > 0 && updates[columnId] !== undefined) {
-          const resizedCol = allColumnWidths.find((c) => c.id === columnId);
-          if (resizedCol) {
-            updates[columnId] = Math.max(resizedCol.minWidth, updates[columnId] - remainingExcess);
-          }
-        }
+        updates[columnId] = clampedNewWidth;
       }
 
       return { updates, hasRightColumns: true };
     },
-    [tableWidth, columnSizes, columns, calculateTotalWidth, findRightColumns, distributeAdjustment, distributeDelta],
+    [tableWidth, columnSizes, columns, resizedWidths, findRightColumns, distributeAdjustment],
   );
 
   // Calculate what the final width would be for a column resize (without applying it)
