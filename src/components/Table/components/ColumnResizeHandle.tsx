@@ -15,6 +15,33 @@ type ColumnResizeHandleProps = {
 };
 
 /**
+ * Find the nearest scrollable ancestor element
+ */
+// TODO: This feels gross. Its got a window call and evertthing.
+function findScrollableParent(element: HTMLElement | null): HTMLElement | null {
+  if (!element) return null;
+
+  let parent = element.parentElement;
+  while (parent) {
+    const style = window.getComputedStyle(parent);
+    const overflowY = style.overflowY;
+    const overflow = style.overflow;
+
+    // Check if this element is scrollable
+    if (overflowY === "auto" || overflowY === "scroll" || overflow === "auto" || overflow === "scroll") {
+      // Verify it actually has scrollable content
+      if (parent.scrollHeight > parent.clientHeight) {
+        return parent;
+      }
+    }
+
+    parent = parent.parentElement;
+  }
+
+  return null;
+}
+
+/**
  * Resize handle component that appears on column borders.
  * Allows users to drag to resize columns.
  */
@@ -41,6 +68,7 @@ export function ColumnResizeHandle({
   const handleRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const pendingMouseXRef = useRef<number | null>(null);
+  const scrollableParentRef = useRef<HTMLElement | null>(null);
   const tid = useTestIds({}, "columnResizeHandle");
 
   // Calculate max width for this column based on available space in columns to the right
@@ -82,11 +110,25 @@ export function ColumnResizeHandle({
         setGuideLineX(rect.right);
       }
 
-      // Calculate table container bounds using the ref
+      // Find the scrollable parent container
+      scrollableParentRef.current = tableContainerRef?.current ? findScrollableParent(tableContainerRef.current) : null;
+
+      // Calculate bounds - use intersection of scrollable parent and table
       if (tableContainerRef?.current) {
         const tableRect = tableContainerRef.current.getBoundingClientRect();
-        setGuideLineTop(tableRect.top);
-        setGuideLineHeight(tableRect.height);
+
+        if (scrollableParentRef.current) {
+          const scrollRect = scrollableParentRef.current.getBoundingClientRect();
+          // Use the intersection of both rectangles
+          const top = Math.max(tableRect.top, scrollRect.top);
+          const bottom = Math.min(tableRect.bottom, scrollRect.bottom);
+          setGuideLineTop(top);
+          setGuideLineHeight(Math.max(0, bottom - top));
+        } else {
+          // No scrollable parent, just use table bounds
+          setGuideLineTop(tableRect.top);
+          setGuideLineHeight(tableRect.height);
+        }
       } else {
         // Fallback: use viewport
         setGuideLineTop(0);
@@ -125,9 +167,27 @@ export function ColumnResizeHandle({
     const widthChange = finalWidth - startWidthRef.current;
     setGuideLineX(startHandleRightRef.current + widthChange);
 
+    // Update guide line bounds if scrollable parent has scrolled
+    if (tableContainerRef?.current) {
+      const tableRect = tableContainerRef.current.getBoundingClientRect();
+
+      if (scrollableParentRef.current) {
+        const scrollRect = scrollableParentRef.current.getBoundingClientRect();
+        // Use the intersection of both rectangles
+        const top = Math.max(tableRect.top, scrollRect.top);
+        const bottom = Math.min(tableRect.bottom, scrollRect.bottom);
+        setGuideLineTop(top);
+        setGuideLineHeight(Math.max(0, bottom - top));
+      } else {
+        // No scrollable parent, just use table bounds
+        setGuideLineTop(tableRect.top);
+        setGuideLineHeight(tableRect.height);
+      }
+    }
+
     pendingMouseXRef.current = null;
     rafRef.current = null;
-  }, [minWidth, calculateMaxWidth, calculatePreviewWidth, columnId, columnIndex]);
+  }, [minWidth, calculateMaxWidth, calculatePreviewWidth, columnId, columnIndex, tableContainerRef]);
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
