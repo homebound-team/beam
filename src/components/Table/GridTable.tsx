@@ -314,42 +314,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   );
 
   // ---------resizable column helpers------
-  // Helper to find resizable columns to the right of a given column index
-  const findRightColumns = useCallback(
-    (
-      columnIndex: number,
-    ): {
-      columns: Array<{ id: string; index: number; currentWidth: number; minWidth: number }>;
-      totalWidth: number;
-    } => {
-      const rightColumns: Array<{ id: string; index: number; currentWidth: number; minWidth: number }> = [];
-      let totalRightWidth = 0;
-
-      for (let i = columnIndex + 1; i < columns.length; i++) {
-        const col = columns[i];
-        // Skip action columns (selectColumn, collapseColumn, actionColumn)
-        if (col.isAction || col.id === "beamSelectColumn" || col.id === "beamCollapseColumn") {
-          continue;
-        }
-
-        const sizeStr = columnSizes[i];
-        const width = sizeStr.endsWith("px") ? parseInt(sizeStr.replace("px", ""), 10) : 0;
-        const minWidth = col.mw ? parseInt(col.mw.replace("px", ""), 10) : 0;
-
-        rightColumns.push({
-          id: col.id,
-          index: i,
-          currentWidth: width,
-          minWidth,
-        });
-        totalRightWidth += width;
-      }
-
-      return { columns: rightColumns, totalWidth: totalRightWidth };
-    },
-    [columns, columnSizes],
-  );
-
   // Helper to distribute adjustment proportionally among right columns
   const distributeAdjustment = useCallback(
     (
@@ -360,17 +324,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       const updates: Record<string, number> = {};
       let remainingAdjustment = adjustment;
 
-      for (let i = 0; i < rightColumns.length && Math.abs(remainingAdjustment) > 0.1; i++) {
-        const col = rightColumns[i];
+      // Distribute the adjustment across all right columns proportionally
+      rightColumns.forEach((col) => {
         const proportion = totalRightWidth > 0 ? col.currentWidth / totalRightWidth : 1 / rightColumns.length;
-        const colAdjustment = remainingAdjustment * proportion;
+        const colAdjustment = adjustment * proportion;
         const newColWidth = Math.max(col.minWidth, col.currentWidth + colAdjustment);
 
-        // If we hit the min width, use that and continue with remaining adjustment
-        const actualAdjustment = newColWidth - col.currentWidth;
         updates[col.id] = newColWidth;
-        remainingAdjustment -= actualAdjustment;
-      }
+        remainingAdjustment -= newColWidth - col.currentWidth;
+      });
 
       // Return both the updates and how much adjustment was actually applied
       return { updates, actualAdjustment: adjustment - remainingAdjustment };
@@ -389,64 +351,64 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         return null;
       }
 
-      // First, "freeze" all columns to their current pixel widths to prevent fr columns from shifting
-      const updates: Record<string, number> = {};
-      columnSizes.forEach((sizeStr, idx) => {
-        const col = columns[idx];
-        // Skip columns that already have resized widths (they're already frozen)
-        if (resizedWidths?.[col.id] !== undefined) {
-          return;
-        }
-        // Freeze this column to its current calculated pixel width
-        if (sizeStr.endsWith("px")) {
-          updates[col.id] = parseInt(sizeStr.replace("px", ""), 10);
-        }
-      });
-
       // Get current width of the column being resized
       const currentSizeStr = columnSizes[columnIndex];
       const currentWidth = currentSizeStr.endsWith("px") ? parseInt(currentSizeStr.replace("px", ""), 10) : 0;
 
-      // Enforce the resized column's own minWidth
-      const resizedColumn = columns[columnIndex];
-      const resizedColMinWidth = resizedColumn.mw ? parseInt(resizedColumn.mw.replace("px", ""), 10) : 0;
-      const clampedNewWidth = Math.max(resizedColMinWidth, newWidth);
-
       // Calculate the delta (change in width)
-      const delta = clampedNewWidth - currentWidth;
+      const delta = newWidth - currentWidth;
 
-      // If no change, return the frozen widths
+      // If no change, return empty updates
       if (delta === 0) {
-        return { updates, hasRightColumns: false };
+        return { updates: {}, hasRightColumns: false };
       }
 
-      const { columns: rightColumns, totalWidth: totalRightWidth } = findRightColumns(columnIndex);
+      // Find right columns and calculate how much they can shrink
+      const rightColumns: Array<{ id: string; currentWidth: number; minWidth: number }> = [];
+      let totalRightWidth = 0;
+
+      for (let i = columnIndex + 1; i < columns.length; i++) {
+        const col = columns[i];
+        // Skip action columns
+        if (col.isAction || col.id === "beamSelectColumn" || col.id === "beamCollapseColumn") {
+          continue;
+        }
+
+        const sizeStr = columnSizes[i];
+        const width = sizeStr.endsWith("px") ? parseInt(sizeStr.replace("px", ""), 10) : 0;
+        const minWidth = col.mw ? parseInt(col.mw.replace("px", ""), 10) : 0;
+
+        rightColumns.push({
+          id: col.id,
+          currentWidth: width,
+          minWidth,
+        });
+        totalRightWidth += width;
+      }
 
       // If no resizable columns to the right, just update this column
       if (rightColumns.length === 0) {
-        updates[columnId] = clampedNewWidth;
-        return { updates, hasRightColumns: false };
+        return { updates: { [columnId]: newWidth }, hasRightColumns: false };
       }
 
       // Distribute the opposite of the delta to right columns to keep table width constant
       // If we shrink by 30, right columns grow by 30. If we grow by 30, right columns shrink by 30.
       const distributionResult = distributeAdjustment(rightColumns, totalRightWidth, -delta);
-      Object.assign(updates, distributionResult.updates);
 
-      // If right columns couldn't accommodate the full adjustment (hit min widths),
-      // clamp the resized column so table doesn't overflow
-      const actualDelta = -distributionResult.actualAdjustment;
-      if (Math.abs(actualDelta) < Math.abs(delta)) {
-        // Right columns couldn't shrink/grow as much as we wanted
-        // Adjust the resized column to match what was actually distributed
-        updates[columnId] = Math.max(resizedColMinWidth, currentWidth + actualDelta);
-      } else {
-        updates[columnId] = clampedNewWidth;
-      }
+      // Always use the actual distributed amount to ensure table width stays constant
+      // actualAdjustment is the amount that was successfully distributed to right columns
+      // We adjust the resized column by the opposite of this to maintain constant table width
+      const actualAdjustment = distributionResult.actualAdjustment;
+      const finalResizedWidth = currentWidth - actualAdjustment;
+
+      const updates: Record<string, number> = {
+        [columnId]: finalResizedWidth,
+        ...distributionResult.updates,
+      };
 
       return { updates, hasRightColumns: true };
     },
-    [tableWidth, columnSizes, columns, resizedWidths, findRightColumns, distributeAdjustment],
+    [tableWidth, columnSizes, columns, distributeAdjustment],
   );
 
   // Calculate what the final width would be for a column resize (without applying it)
@@ -477,12 +439,27 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         return;
       }
 
-      // Apply all updates
+      // Check if this is the first resize (no columns have been locked yet)
+      const hasResizedColumns = resizedWidths && Object.keys(resizedWidths).length > 0;
+
+      if (!hasResizedColumns) {
+        // First resize: Lock ALL columns to their current pixel widths
+        // This ensures consistent calculations for subsequent resizes
+        columnSizes.forEach((sizeStr, idx) => {
+          const col = columns[idx];
+          if (sizeStr.endsWith("px")) {
+            const currentWidth = parseInt(sizeStr.replace("px", ""), 10);
+            setResizedWidth(col.id, currentWidth);
+          }
+        });
+      }
+
+      // Apply all updates from the resize (these will overwrite the locked values for participating columns)
       Object.entries(result.updates).forEach(([id, width]) => {
         setResizedWidth(id, width);
       });
     },
-    [calculateResizeUpdates, setResizedWidth],
+    [calculateResizeUpdates, setResizedWidth, resizedWidths, columnSizes, columns],
   );
 
   // allows us to unset children and grandchildren, etc.
