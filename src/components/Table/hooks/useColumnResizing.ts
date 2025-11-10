@@ -9,6 +9,7 @@ type ResizedWidths = Record<string, number>;
 export function useColumnResizing(storageKey: string | undefined): {
   resizedWidths: ResizedWidths;
   setResizedWidth: (columnId: string, width: number) => void;
+  setResizedWidths: (widths: Record<string, number>) => void;
   getResizedWidth: (columnId: string) => number | undefined;
 } {
   const [resizedWidths, setResizedWidths] = useState<ResizedWidths>(() => {
@@ -43,6 +44,13 @@ export function useColumnResizing(storageKey: string | undefined): {
     }));
   }, []);
 
+  const batchSetResizedWidths = useCallback((widths: Record<string, number>) => {
+    setResizedWidths((prev) => ({
+      ...prev,
+      ...widths,
+    }));
+  }, []);
+
   const getResizedWidth = useCallback(
     (columnId: string): number | undefined => {
       return resizedWidths[columnId];
@@ -53,6 +61,7 @@ export function useColumnResizing(storageKey: string | undefined): {
   return {
     resizedWidths,
     setResizedWidth,
+    setResizedWidths: batchSetResizedWidths,
     getResizedWidth,
   };
 }
