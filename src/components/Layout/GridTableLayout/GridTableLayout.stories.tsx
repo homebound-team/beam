@@ -95,6 +95,83 @@ export function QueryTableLayout() {
   );
 }
 
+/**
+ * Story to demonstrate column resizing behavior when sessionStorage already contains column widths.
+ * This simulates the scenario where a user has previously resized columns, refreshed the page,
+ * and then resizes again. The fix ensures that columns are locked to pixel widths on the first
+ * resize of the session, preventing fr units from shifting unexpectedly.
+ */
+export function GridTableLayoutWithSessionStorage() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(), []);
+  const storageKey = "with-session-storage-test";
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey,
+    },
+    search: "client",
+  });
+
+  // Pre-populate sessionStorage with column widths to simulate a returning user
+  // This runs once on mount to set up the test scenario
+  useEffect(() => {
+    const columnWidthsKey = `columnWidths_${storageKey}`;
+    const existingData = sessionStorage.getItem(columnWidthsKey);
+
+    // Only set if not already present (to avoid overwriting during hot reload)
+    if (!existingData) {
+      const presetColumnWidths = {
+        "name-col": 300, // Name column resized to 300px
+        "value-col": 150, // Value column resized to 150px
+        "status-col": 120, // Status column resized to 120px
+        "priority-col": 120, // Priority column resized to 120px
+        "action-col": 100, // Action column at 100px
+      };
+      sessionStorage.setItem(columnWidthsKey, JSON.stringify(presetColumnWidths));
+    }
+  }, [storageKey]);
+
+  return (
+    <TestProjectLayout>
+      <div css={Css.p2.ba.bcGray300.mb2.bgGray100.$}>
+        <h3 css={Css.mb1.sm.$}>Test Scenario: Pre-populated SessionStorage</h3>
+        <p css={Css.xs.gray700.mb1.$}>
+          This table has pre-existing column widths in sessionStorage (Name: 300px, Value: 150px, Status: 120px,
+          Priority: 120px, Action: 100px).
+        </p>
+        <p css={Css.xs.gray700.mb1.$}>
+          <strong>Expected behavior:</strong> When you resize any column, all columns should lock to their current pixel
+          widths to prevent fr units from shifting. This should work correctly even though sessionStorage already
+          contains column widths from a "previous session".
+        </p>
+        <p css={Css.xs.gray700.$}>
+          <strong>Test:</strong> Try resizing the Name column. Other columns should not shift unexpectedly. The resize
+          should behave consistently whether it's your first resize or subsequent resizes.
+        </p>
+      </div>
+      <GridTableLayoutComponent
+        pageTitle="Grid Table Layout with SessionStorage"
+        breadcrumb={[
+          { href: "/", label: "Home" },
+          { href: "/", label: "Sub Page" },
+        ]}
+        layoutState={layoutState}
+        tableProps={{
+          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
+          rows: [simpleHeader, ...makeNestedRows(3)],
+          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+          visibleColumnsStorageKey: storageKey,
+        }}
+        primaryAction={{ label: "Primary Action", onClick: noop }}
+        secondaryAction={{ label: "Secondary Action", onClick: noop }}
+        tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
+      />
+    </TestProjectLayout>
+  );
+}
+
 function useExampleQuery({ filter }: { filter: Record<string, unknown> }) {
   const filterString = JSON.stringify(filter);
 

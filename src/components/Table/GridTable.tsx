@@ -6,7 +6,7 @@ import { getTableRefWidthStyles, Loader } from "src/components";
 import { DiscriminateUnion, GridRowKind } from "src/components/index";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
-import { useColumnResizing } from "src/components/Table/hooks/useColumnResizing";
+import { ResizedWidths, useColumnResizing } from "src/components/Table/hooks/useColumnResizing";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
 import { defaultStyle, GridStyle, GridStyleDef, resolveStyles, RowStyles } from "src/components/Table/TableStyles";
 import {
@@ -318,35 +318,49 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // Track previous table width to detect container resize
   const prevTableWidthRef = useRef<number | undefined>(tableWidth);
 
+  // Track whether columns have been locked to pixel widths in this session
+  // This is separate from checking resizedWidths.length because resizedWidths
+  // can be populated from sessionStorage on page load without locking all columns
+  const hasLockedColumnsRef = useRef<boolean>(false);
+
   // When container width changes, proportionally scale all resized column widths
+  // Note: Only depends on tableWidth changes, not resizedWidths, to avoid circular updates
   useEffect(() => {
-    if (!tableWidth || !prevTableWidthRef.current || !resizedWidths || Object.keys(resizedWidths).length === 0) {
+    // Initialize on first render
+    if (!prevTableWidthRef.current) {
       prevTableWidthRef.current = tableWidth;
       return;
     }
 
+    if (!tableWidth) return;
+
     const prevWidth = prevTableWidthRef.current;
-    const widthChanged = Math.abs(tableWidth - prevWidth) > 1; // Allow 1px tolerance for rounding
+    const RESIZE_TOLERANCE_PX = 1; // Allow 1px tolerance for subpixel rounding
+    const widthChanged = Math.abs(tableWidth - prevWidth) > RESIZE_TOLERANCE_PX;
 
     if (widthChanged) {
-      // Calculate total of current resized widths
-      const totalResizedWidth = Object.values(resizedWidths).reduce((sum, width) => sum + width, 0);
+      const scale = tableWidth / prevWidth;
 
-      // If resized columns exist, scale them proportionally to the new container width
-      if (totalResizedWidth > 0) {
-        const scale = tableWidth / prevWidth;
+      // Use functional update to avoid depending on resizedWidths in deps array
+      // This prevents infinite loop: tableWidth changes → update resizedWidths → tableWidth recalculates → loop
+      setResizedWidths((currentResizedWidths: ResizedWidths): ResizedWidths => {
+        // Don't scale if no columns have been resized yet
+        if (!currentResizedWidths || Object.keys(currentResizedWidths).length === 0) {
+          return currentResizedWidths;
+        }
 
         // Scale all resized widths proportionally (batch update for performance)
-        const scaledWidths: Record<string, number> = {};
-        Object.entries(resizedWidths).forEach(([id, width]) => {
+        const scaledWidths: ResizedWidths = {};
+        Object.entries(currentResizedWidths).forEach(([id, width]) => {
           scaledWidths[id] = Math.round(width * scale);
         });
-        setResizedWidths(scaledWidths);
-      }
+
+        return scaledWidths;
+      });
 
       prevTableWidthRef.current = tableWidth;
     }
-  }, [tableWidth, resizedWidths, setResizedWidths]);
+  }, [tableWidth, setResizedWidths]);
 
   // ---------resizable column helpers------
   // Helper to distribute adjustment proportionally among right columns
@@ -474,13 +488,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         return;
       }
 
-      // Check if this is the first resize (no columns have been locked yet)
-      const hasResizedColumns = resizedWidths && Object.keys(resizedWidths).length > 0;
-
-      if (!hasResizedColumns) {
-        // First resize: Lock ALL columns to their current pixel widths
-        // This ensures consistent calculations for subsequent resizes
-        const lockedWidths: Record<string, number> = {};
+      // Check if this is the first manual resize in this session
+      // We need to lock ALL columns to pixel widths to prevent fr units from shifting
+      // Note: resizedWidths might have values from sessionStorage, but columns may not be locked yet
+      if (!hasLockedColumnsRef.current) {
+        // First resize of this session: Lock ALL columns to their current pixel widths
+        // This ensures consistent calculations for subsequent resizes and prevents fr units from recalculating
+        const lockedWidths: ResizedWidths = {};
         columnSizes.forEach((sizeStr, idx) => {
           const col = columns[idx];
           if (sizeStr.endsWith("px")) {
@@ -490,12 +504,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         });
         // Batch update for performance
         setResizedWidths(lockedWidths);
+        hasLockedColumnsRef.current = true;
       }
 
       // Apply all updates from the resize (batch update for performance)
       setResizedWidths(result.updates);
     },
-    [calculateResizeUpdates, setResizedWidths, resizedWidths, columnSizes, columns, setResizedWidth],
+    [calculateResizeUpdates, setResizedWidths, columnSizes, columns, setResizedWidth],
   );
 
   // allows us to unset children and grandchildren, etc.
