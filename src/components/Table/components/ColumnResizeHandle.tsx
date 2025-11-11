@@ -71,30 +71,6 @@ export function ColumnResizeHandle({
   const scrollableParentRef = useRef<HTMLElement | null>(null);
   const tid = useTestIds({}, "columnResizeHandle");
 
-  // Calculate max width for this column based on available space in columns to the right
-  const calculateMaxWidth = useCallback(() => {
-    if (!tableWidth || !columnSizes) return Infinity;
-
-    // Calculate width of columns to the left (excluding current column)
-    let leftWidth = 0;
-    for (let i = 0; i < columnIndex; i++) {
-      const size = columnSizes[i];
-      if (size.endsWith("px")) {
-        leftWidth += parseInt(size.replace("px", ""), 10);
-      }
-    }
-
-    // Calculate sum of minimum widths of columns to the right
-    // If rightColumnsMinWidths is provided, use it; otherwise assume 0
-    const rightColumnsMinSum = rightColumnsMinWidths ? rightColumnsMinWidths.reduce((sum, min) => sum + min, 0) : 0;
-
-    // Max width = container width - left columns width - right columns min widths
-    // This ensures the table never exceeds the container width
-    const maxWidth = tableWidth - leftWidth - rightColumnsMinSum;
-
-    return Math.max(minWidth, maxWidth);
-  }, [tableWidth, columnSizes, columnIndex, minWidth, rightColumnsMinWidths]);
-
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -142,17 +118,14 @@ export function ColumnResizeHandle({
   );
 
   // Update guide line position using requestAnimationFrame for smooth performance
-  // Use a simplified calculation that's fast enough for real-time updates
   const updateGuideLine = useCallback(() => {
     if (pendingMouseXRef.current === null) return;
 
     const deltaX = pendingMouseXRef.current - startXRef.current;
-    const maxWidth = calculateMaxWidth();
-    const requestedWidth = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
+    const requestedWidth = Math.max(minWidth, startWidthRef.current + deltaX);
 
-    // Use the preview function if available, but with a fallback to requested width
-    // The preview function accounts for adjustments, but we'll use it directly
-    // If it's too slow, we can optimize it further
+    // Calculate the accurate final width using the preview function
+    // This accounts for distribution to right columns and all constraints
     let finalWidth = requestedWidth;
     if (calculatePreviewWidth) {
       try {
@@ -187,7 +160,7 @@ export function ColumnResizeHandle({
 
     pendingMouseXRef.current = null;
     rafRef.current = null;
-  }, [minWidth, calculateMaxWidth, calculatePreviewWidth, columnId, columnIndex, tableContainerRef]);
+  }, [minWidth, calculatePreviewWidth, columnId, columnIndex, tableContainerRef]);
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -209,8 +182,8 @@ export function ColumnResizeHandle({
       if (!isDragging) return;
 
       const deltaX = e.clientX - startXRef.current;
-      const maxWidth = calculateMaxWidth();
-      const newWidth = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
+      const newWidth = Math.max(minWidth, startWidthRef.current + deltaX);
+      // Note: onResize (handleColumnResize) will enforce actual constraints via calculateResizeUpdates
       onResize(columnId, newWidth, columnIndex);
 
       setIsDragging(false);
@@ -218,7 +191,7 @@ export function ColumnResizeHandle({
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
     },
-    [isDragging, columnId, minWidth, onResize, calculateMaxWidth, columnIndex],
+    [isDragging, columnId, minWidth, onResize, columnIndex],
   );
 
   useEffect(() => {

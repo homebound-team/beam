@@ -400,12 +400,17 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         return null;
       }
 
-      // Get current width of the column being resized
+      // Get current width and minWidth of the column being resized
       const currentSizeStr = columnSizes[columnIndex];
       const currentWidth = currentSizeStr.endsWith("px") ? parseInt(currentSizeStr.replace("px", ""), 10) : 0;
+      const resizedColumn = columns[columnIndex];
+      const resizedColumnMinWidth = resizedColumn.mw ? parseInt(resizedColumn.mw.replace("px", ""), 10) : 0;
+
+      // Enforce minWidth on the requested new width
+      const clampedNewWidth = Math.max(resizedColumnMinWidth, newWidth);
 
       // Calculate the delta (change in width)
-      const delta = newWidth - currentWidth;
+      const delta = clampedNewWidth - currentWidth;
 
       // If no change, return empty updates
       if (delta === 0) {
@@ -437,7 +442,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
       // If no resizable columns to the right, just update this column
       if (rightColumns.length === 0) {
-        return { updates: { [columnId]: newWidth }, hasRightColumns: false };
+        return { updates: { [columnId]: clampedNewWidth }, hasRightColumns: false };
       }
 
       // Distribute the opposite of the delta to right columns to keep table width constant
@@ -450,8 +455,12 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       const actualAdjustment = distributionResult.actualAdjustment;
       const finalResizedWidth = currentWidth - actualAdjustment;
 
+      // Enforce minWidth on the final resized width as well
+      // This ensures we never shrink below the column's minimum width
+      const clampedFinalWidth = Math.max(resizedColumnMinWidth, finalResizedWidth);
+
       const updates: Record<string, number> = {
-        [columnId]: finalResizedWidth,
+        [columnId]: clampedFinalWidth,
         ...distributionResult.updates,
       };
 
