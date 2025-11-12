@@ -1,13 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button, ButtonProps } from "src/components/Button";
 import { Filters } from "src/components/Filters/Filters";
 import { Icon } from "src/components/Icon";
 import { GridDataRow } from "src/components/Table";
+import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable, GridTableProps } from "src/components/Table/GridTable";
+import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
-import { useBreakpoint, useGroupBy, usePersistedFilter, UsePersistedFilterProps } from "src/hooks";
+import {
+  useBreakpoint,
+  useComputed,
+  useGroupBy,
+  usePersistedFilter,
+  UsePersistedFilterProps,
+  useSessionStorage,
+} from "src/hooks";
 import { TextField } from "src/inputs/TextField";
 import { useTestIds } from "src/utils";
 import { useDebounce } from "use-debounce";
@@ -55,6 +64,7 @@ export type GridTableLayoutProps<
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
+  hideEditColumns?: boolean;
 };
 
 /**
@@ -89,13 +99,42 @@ function GridTableLayoutComponent<
   X extends Only<GridTableXss, X>,
   QData,
 >(props: GridTableLayoutProps<F, R, X, QData>) {
-  const { pageTitle, breadcrumb, tableProps, layoutState, primaryAction, secondaryAction, tertiaryAction } = props;
+  const {
+    pageTitle,
+    breadcrumb,
+    tableProps,
+    layoutState,
+    primaryAction,
+    secondaryAction,
+    tertiaryAction,
+    hideEditColumns = false,
+  } = props;
 
+  const tid = useTestIds(props);
+  const columns = tableProps.columns;
+
+  !hideEditColumns && validateColumns(columns);
+
+  const hasHideableColumns = useMemo(() => columns.some((c) => c.canHide), [columns]);
+
+  // Use user-provided API if available, otherwise create our own
+  const defaultApi = useGridTableApi<R>();
+  const api = tableProps.api ?? defaultApi;
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
-  const showTableActions = layoutState?.filterDefs || layoutState?.search;
+  const showTableActions = layoutState?.filterDefs || layoutState?.search || (!hideEditColumns && hasHideableColumns);
   const isVirtualized = tableProps.as === "virtual";
 
   const breakpoints = useBreakpoint();
+
+  // Sync API changes back to persisted state when persistedColumns is provided
+  const visibleColumnIds = useComputed(() => api.getVisibleColumnIds(), [api]);
+  useEffect(() => {
+    if (layoutState?.setVisibleColumnIds) {
+      layoutState.setVisibleColumnIds(visibleColumnIds);
+    }
+  }, [visibleColumnIds, layoutState]);
+
+  const visibleColumnsStorageKey = layoutState?.persistedColumnsStorageKey;
 
   return (
     <>
@@ -107,28 +146,48 @@ function GridTableLayoutComponent<
         tertiaryAction={tertiaryAction}
       />
       {showTableActions && (
-        <TableActions onlyRight={!layoutState?.search}>
-          {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
-          {layoutState?.filterDefs && (
-            <Filters
-              filterDefs={layoutState.filterDefs}
-              filter={layoutState.filter}
-              onChange={layoutState.setFilter}
-              groupBy={layoutState.groupBy}
-              numberOfInlineFilters={breakpoints.mdAndDown ? 2 : undefined}
+        <TableActions onlyRight={!layoutState?.search && !hideEditColumns && hasHideableColumns}>
+          <div css={Css.df.gap1.$}>
+            {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
+            {layoutState?.filterDefs && (
+              <Filters
+                filterDefs={layoutState.filterDefs}
+                filter={layoutState.filter}
+                onChange={layoutState.setFilter}
+                groupBy={layoutState.groupBy}
+                numberOfInlineFilters={breakpoints.mdAndDown ? 2 : undefined}
+              />
+            )}
+          </div>
+          {!hideEditColumns && hasHideableColumns && (
+            <EditColumnsButton
+              columns={columns}
+              api={api}
+              tooltip="Display columns"
+              trigger={{ icon: "kanban", label: "", variant: "quaternaryBordered" }}
+              {...tid.editColumnsButton}
             />
           )}
         </TableActions>
       )}
       <ScrollableContent virtualized={isVirtualized}>
         {isGridTableProps(tableProps) ? (
-          <GridTable {...tableProps} filter={clientSearch} style={{ allWhite: true }} stickyHeader />
-        ) : (
-          <QueryTable
-            {...(tableProps as QueryTableProps<R, QData, X>)}
+          <GridTable
+            {...tableProps}
+            api={api}
             filter={clientSearch}
             style={{ allWhite: true }}
             stickyHeader
+            visibleColumnsStorageKey={visibleColumnsStorageKey}
+          />
+        ) : (
+          <QueryTable
+            {...(tableProps as QueryTableProps<R, QData, X>)}
+            api={api}
+            filter={clientSearch}
+            style={{ allWhite: true }}
+            stickyHeader
+            visibleColumnsStorageKey={visibleColumnsStorageKey}
           />
         )}
       </ScrollableContent>
@@ -138,6 +197,39 @@ function GridTableLayoutComponent<
 
 export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof GridTableLayoutComponent;
 
+// Force columns to have a name and id property for all our table layouts
+function validateColumns(columns: readonly { id?: string; name?: string }[]): void {
+  // Single pass validation - collect invalid columns
+  const columnsWithoutIds: number[] = [];
+  const columnsWithoutNames: number[] = [];
+
+  for (let i = 0; i < columns.length; i++) {
+    const column = columns[i];
+    if (!column.id || column.id.length === 0) {
+      columnsWithoutIds.push(i);
+    }
+    if (!column.name || column.name.length === 0) {
+      columnsWithoutNames.push(i);
+    }
+  }
+
+  if (columnsWithoutIds.length > 0) {
+    throw new Error(
+      `GridTableLayout requires all columns to have an explicit 'id' property when EditColumnsButton is enabled. ` +
+        `Columns without IDs: ${columnsWithoutIds.map((idx) => `column[${idx}]`).join(", ")}. ` +
+        `Please add an 'id' property to each column definition.`,
+    );
+  }
+
+  if (columnsWithoutNames.length > 0) {
+    throw new Error(
+      `GridTableLayout requires all columns to have an explicit 'name' property when EditColumnsButton is enabled. ` +
+        `Columns without names: ${columnsWithoutNames.map((idx) => `column[${idx}]`).join(", ")}. ` +
+        `Please add a 'name' property to each column definition.`,
+    );
+  }
+}
+
 /**
  * A wrapper around standard filter, grouping and search state hooks.
  * * `client` search will use the built-in grid table search functionality.
@@ -145,10 +237,12 @@ export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof Gr
  */
 export function useGridTableLayoutState<F extends Record<string, unknown>>({
   persistedFilter,
+  persistedColumns,
   search,
   groupBy: maybeGroupBy,
 }: {
   persistedFilter?: UsePersistedFilterProps<F>;
+  persistedColumns?: { storageKey: string };
   search?: "client" | "server";
   groupBy?: Record<string, string>;
 }) {
@@ -159,6 +253,12 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
 
   const [searchString, setSearchString] = useState<string | undefined>("");
 
+  const columnsFallback = "unset-columns";
+  const [visibleColumnIds, setVisibleColumnIds] = useSessionStorage<string[] | undefined>(
+    persistedColumns?.storageKey ?? columnsFallback,
+    undefined,
+  );
+
   return {
     filter,
     setFilter,
@@ -167,6 +267,9 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     setSearchString,
     search,
     groupBy: maybeGroupBy ? groupBy : undefined,
+    visibleColumnIds: persistedColumns ? visibleColumnIds : undefined,
+    setVisibleColumnIds: persistedColumns ? setVisibleColumnIds : undefined,
+    persistedColumnsStorageKey: persistedColumns?.storageKey,
   };
 }
 

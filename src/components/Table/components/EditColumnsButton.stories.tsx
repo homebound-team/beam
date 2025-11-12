@@ -46,7 +46,6 @@ export function EditColumnButton() {
           trigger={{ label: "Columns" }}
           placement="right"
           columns={[nameColumn, valueColumn, actionColumn]}
-          title="Select columns to show"
           defaultOpen
         />
       </div>
@@ -61,13 +60,7 @@ export function EditColumnButtonInAction() {
     <div>
       <h2 css={Css.lg.$}>Edit Columns Button In Action</h2>
       <div css={Css.mlPx(200).mb4.$}>
-        <EditColumnsButton
-          api={api}
-          trigger={{ label: "Columns" }}
-          placement="right"
-          columns={tableColumns}
-          title="Select columns to show"
-        />
+        <EditColumnsButton api={api} trigger={{ label: "Columns" }} placement="right" columns={tableColumns} />
       </div>
       <GridTable<Row>
         columns={tableColumns}

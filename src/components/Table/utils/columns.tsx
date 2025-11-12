@@ -9,18 +9,18 @@ import { isFunction, newMethodMissingProxy } from "src/utils";
 
 /** Provides default styling for a GridColumn representing a Date. */
 export function column<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
-  return { ...columnDef };
+  return { canHide: true, initVisible: true, ...columnDef };
 }
 
 /** Provides default styling for a GridColumn representing a Date. */
 export function dateColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
-  return { ...columnDef, align: "left" };
+  return { canHide: true, initVisible: true, ...columnDef, align: "left" };
 }
 
 /**
  * Provides default styling for a GridColumn representing a Numeric value (Price, percentage, PO #, etc.). */
 export function numericColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
-  return { ...columnDef, align: "right" };
+  return { canHide: true, initVisible: true, ...columnDef, align: "right" };
 }
 
 /** Provides default styling for a GridColumn representing an Action. */
