@@ -98,6 +98,7 @@ function GridTableLayoutComponent<
     primaryAction,
     secondaryAction,
     tertiaryAction,
+    // TODO: When we implement the kebab menu, this prop should trigger a `reset columns` button to appear
     noColumnResizing = false,
   } = props;
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;

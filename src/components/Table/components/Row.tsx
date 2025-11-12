@@ -381,9 +381,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             setResizedWidth &&
             columnIndex < columns.length - 1 &&
             currentColspan === 1 &&
-            !column.isAction &&
-            column.id !== "beamSelectColumn" &&
-            column.id !== "beamCollapseColumn"
+            !column.isAction
           ) {
             // Parse current width - if not in pixels, use a fallback or skip resize handle
             const currentSizeStr = columnSizes[columnIndex];
@@ -396,8 +394,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             const rightColumnsMinWidths: number[] = [];
             for (let i = columnIndex + 1; i < columns.length; i++) {
               const rightCol = columns[i];
-              // Skip action columns (selectColumn, collapseColumn, actionColumn)
-              if (rightCol.isAction || rightCol.id === "beamSelectColumn" || rightCol.id === "beamCollapseColumn") {
+              // Skip action columns
+              if (rightCol.isAction) {
                 continue;
               }
               const rightColMinWidth = rightCol.mw ? parseInt(rightCol.mw.replace("px", ""), 10) : 0;

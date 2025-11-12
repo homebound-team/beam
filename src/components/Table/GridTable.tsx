@@ -318,9 +318,27 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // Track previous table width to detect container resize
   const prevTableWidthRef = useRef<number | undefined>(tableWidth);
 
-  // Track whether columns have been locked to pixel widths in this session
-  // This is separate from checking resizedWidths.length because resizedWidths
-  // can be populated from sessionStorage on page load without locking all columns
+  /**
+   * Track whether columns have been locked to pixel widths in this session.
+   *
+   * IMPORTANT: This is separate from checking resizedWidths.length because:
+   * - resizedWidths can be populated from sessionStorage on page load
+   * - But those persisted widths don't trigger the "lock all columns" behavior
+   * - We only lock columns when the user manually resizes in THIS session
+   *
+   * Why do we lock ALL columns on first resize?
+   * - Columns can use flexible units (fr) that recalculate based on available space
+   * - When you resize one column to a fixed pixel width, other fr columns would shift unexpectedly
+   * - Example: Column A (1fr) = 200px, Column B (2fr) = 400px, Column C (1fr) = 200px
+   *   - User resizes B to 300px
+   *   - Without locking: A would recalculate to 250px (unwanted side effect!)
+   *   - With locking: A stays at 200px (expected behavior)
+   *
+   * Tradeoff: Once locked, columns lose their responsive (fr) behavior and become fixed-width.
+   * This is intentional - manual resizing indicates the user wants precise control.
+   *
+   * Future: Could add a "Reset Column Widths" button to clear resizedWidths and unlock.
+   */
   const hasLockedColumnsRef = useRef<boolean>(false);
 
   // When container width changes, proportionally scale all resized column widths
@@ -424,7 +442,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       for (let i = columnIndex + 1; i < columns.length; i++) {
         const col = columns[i];
         // Skip action columns
-        if (col.isAction || col.id === "beamSelectColumn" || col.id === "beamCollapseColumn") {
+        if (col.isAction) {
           continue;
         }
 
@@ -497,12 +515,34 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         return;
       }
 
-      // Check if this is the first manual resize in this session
-      // We need to lock ALL columns to pixel widths to prevent fr units from shifting
-      // Note: resizedWidths might have values from sessionStorage, but columns may not be locked yet
+      /**
+       * FIRST RESIZE IN SESSION: Lock all columns to prevent fractional unit shifting.
+       *
+       * This is the "lock all columns" mechanism. On the very first manual resize in this
+       * browser session, we convert ALL columns from their original definitions (which may
+       * include fr units) to fixed pixel widths.
+       *
+       * Why lock ALL columns, not just the resized one?
+       * - The resize calculation logic distributes width changes to columns on the right
+       * - If those columns are still using fr units, they would recalculate unpredictably
+       * - Locking everything ensures stable, predictable behavior
+       *
+       * Why check hasLockedColumnsRef instead of resizedWidths.length?
+       * - On page load, resizedWidths may be populated from sessionStorage
+       * - But the user hasn't manually resized anything in THIS session yet
+       * - We want to lock columns only once per session, not on every page load
+       *
+       * Side Effect: This triggers TWO state updates on first resize:
+       * 1. Lock all columns (this block)
+       * 2. Apply the actual resize (below)
+       *
+       * This is acceptable because:
+       * - Only happens once per session
+       * - Both updates are batched via setResizedWidths
+       * - Performance impact is negligible
+       */
       if (!hasLockedColumnsRef.current) {
-        // First resize of this session: Lock ALL columns to their current pixel widths
-        // This ensures consistent calculations for subsequent resizes and prevents fr units from recalculating
+        // Convert all currently rendered columns to fixed pixel widths
         const lockedWidths: ResizedWidths = {};
         columnSizes.forEach((sizeStr, idx) => {
           const col = columns[idx];
@@ -511,7 +551,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             lockedWidths[col.id] = currentWidth;
           }
         });
-        // Batch update for performance
+
+        // Batch update to minimize re-renders
         setResizedWidths(lockedWidths);
         hasLockedColumnsRef.current = true;
       }

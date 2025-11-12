@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 import { TableStateContext } from "src/components/Table";
 import { useTestIds } from "src/utils";
 
@@ -15,9 +16,9 @@ type ColumnResizeHandleProps = {
 };
 
 /**
- * Find the nearest scrollable ancestor element
+ * Fallback: Find the nearest scrollable ancestor element via DOM traversal.
+ * Only used when ScrollableParent context is not available.
  */
-// TODO: This feels gross. Its got a window call and evertthing.
 function findScrollableParent(element: HTMLElement | null): HTMLElement | null {
   if (!element) return null;
 
@@ -57,6 +58,7 @@ export function ColumnResizeHandle({
   calculatePreviewWidth,
 }: ColumnResizeHandleProps) {
   const { tableContainerRef } = useContext(TableStateContext);
+  const { scrollableEl } = useScrollableParent(); // Get scrollable element from context
   const [isDragging, setIsDragging] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [guideLineX, setGuideLineX] = useState<number | null>(null);
@@ -87,7 +89,12 @@ export function ColumnResizeHandle({
       }
 
       // Find the scrollable parent container
-      scrollableParentRef.current = tableContainerRef?.current ? findScrollableParent(tableContainerRef.current) : null;
+      // Prefer scrollableEl from ScrollableParent context (avoids expensive DOM traversal)
+      // Fall back to findScrollableParent for tables not wrapped in ScrollableParent
+      // This sounds bad but resizable columns was built with GridTableLayout in mind which always gets used
+      // within a ScrollableParent because it is wrapped in a ScrollableContent
+      scrollableParentRef.current =
+        scrollableEl || (tableContainerRef?.current ? findScrollableParent(tableContainerRef.current) : null);
 
       // Calculate bounds - use intersection of scrollable parent and table
       if (tableContainerRef?.current) {
@@ -114,7 +121,7 @@ export function ColumnResizeHandle({
       document.body.style.cursor = "col-resize";
       document.body.style.userSelect = "none";
     },
-    [currentWidth, tableContainerRef],
+    [currentWidth, tableContainerRef, scrollableEl],
   );
 
   // Update guide line position using requestAnimationFrame for smooth performance
