@@ -1,6 +1,7 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 import { TableStateContext } from "src/components/Table";
+import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
 
 type ColumnResizeHandleProps = {
@@ -233,41 +234,29 @@ export function ColumnResizeHandle({
         onMouseDown={handleMouseDown}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => !isDragging && setIsHovering(false)}
-        css={{
-          position: "absolute",
-          top: 0,
-          bottom: 0,
-          right: 0,
-          width: "4px",
-          cursor: "col-resize",
-          zIndex: 10,
-          marginRight: "-2px",
-          ...(isHovering || isDragging
-            ? {
-                backgroundColor: "rgba(59, 130, 246, 0.5)",
-              }
-            : {}),
-          "&:hover": {
-            backgroundColor: "rgba(59, 130, 246, 0.3)",
-          },
-        }}
+        css={
+          Css.absolute.top0.bottom0.right0
+            .wPx(4)
+            .mrPx(-2)
+            .z(10)
+            .cursor("col-resize")
+            .onHover.bgGray700.if(isHovering || isDragging).bgGray700.$
+        }
         {...tid.handle}
         data-column-id={columnId}
         data-column-index={columnIndex}
       />
       {isDragging && guideLineX !== null && (
         <div
-          css={{
-            position: "fixed",
-            top: `${guideLineTop}px`,
-            height: `${guideLineHeight}px`,
-            left: `${guideLineX}px`,
-            width: "2px",
-            backgroundColor: "rgba(59, 130, 246, 0.8)",
-            pointerEvents: "none",
-            zIndex: 9998,
-            transform: "translateX(-50%)",
-          }}
+          css={
+            Css.fixed
+              .topPx(guideLineTop)
+              .hPx(guideLineHeight)
+              .leftPx(guideLineX)
+              .wPx(4)
+              .bgGray700.add("pointerEvents", "none")
+              .z9999.add("transform", "translateX(-50%)").$
+          }
           {...tid.guideLine}
         />
       )}
