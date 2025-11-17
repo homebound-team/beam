@@ -192,7 +192,7 @@ describe("GridTableLayout", () => {
           </QueryParamProvider>,
           withRouter(),
         ),
-      ).rejects.toThrow("GridTableLayout requires all columns to have an explicit 'id' property");
+      ).rejects.toThrow("Columns must have id and name properties when EditColumnsButtons is enabled");
     });
 
     it("throws error when columns missing name and hideEditColumns is false", async () => {
@@ -214,7 +214,7 @@ describe("GridTableLayout", () => {
           </QueryParamProvider>,
           withRouter(),
         ),
-      ).rejects.toThrow("GridTableLayout requires all columns to have an explicit 'name' property");
+      ).rejects.toThrow("Columns must have id and name properties when EditColumnsButtons is enabled");
     });
 
     it("does not throw error when columns missing id/name and hideEditColumns is true", async () => {
