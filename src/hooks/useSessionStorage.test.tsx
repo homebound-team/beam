@@ -4,8 +4,6 @@ import { render, type } from "src/utils/rtl";
 import { useSessionStorage } from "./useSessionStorage";
 
 describe("useSessionStorage", () => {
-  beforeEach(() => sessionStorage.clear());
-
   it("should initially use default if nothing is stored in session storage", async () => {
     // Given a test component
     const r = await render(<TestComponent />);

@@ -37,8 +37,6 @@ const rows: Row[] = [
 ];
 
 describe("GridTableLayout", () => {
-  beforeEach(() => sessionStorage.clear());
-
   it("renders with static rows", async () => {
     // Given a GridTableLayout with static rows and search and filter config
     const r = await render(

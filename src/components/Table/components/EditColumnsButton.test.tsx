@@ -20,10 +20,6 @@ describe("EditColumnsButton", () => {
     actionColumn<Row>({ id: "actions", name: "Actions", header: "Action", data: () => <div>Actions</div> }),
   ];
 
-  // This component updates session storage as the selected columns change. Ensure the session storage is reset as needed
-  beforeEach(() => sessionStorage.clear());
-  afterAll(() => sessionStorage.clear());
-
   it("should ignore columns that are missing ids and warn", async () => {
     // Given an edit columns button, where a column with canHide: true is missing the name property
     const warnSpy = jest.spyOn(console, "warn");

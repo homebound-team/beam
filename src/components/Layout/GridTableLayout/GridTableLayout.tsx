@@ -5,7 +5,7 @@ import { Icon } from "src/components/Icon";
 import { GridDataRow } from "src/components/Table";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable, GridTableProps } from "src/components/Table/GridTable";
-import { useGridTableApi } from "src/components/Table/GridTableApi";
+import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
@@ -113,15 +113,19 @@ function GridTableLayoutComponent<
   const tid = useTestIds(props);
   const columns = tableProps.columns;
 
-  !hideEditColumns && validateColumns(columns);
-
-  const hasHideableColumns = useMemo(() => columns.some((c) => c.canHide), [columns]);
+  const hasHideableColumns = useMemo(() => {
+    if (hideEditColumns) return false;
+    validateColumns(columns);
+    return columns.some((c) => c.canHide);
+  }, [columns, hideEditColumns]);
 
   // Use user-provided API if available, otherwise create our own
-  const defaultApi = useGridTableApi<R>();
-  const api = tableProps.api ?? defaultApi;
+  const api = useMemo<GridTableApiImpl<R>>(
+    () => (tableProps.api as GridTableApiImpl<R>) ?? new GridTableApiImpl(),
+    [tableProps.api],
+  );
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
-  const showTableActions = layoutState?.filterDefs || layoutState?.search || (!hideEditColumns && hasHideableColumns);
+  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns;
   const isVirtualized = tableProps.as === "virtual";
 
   const breakpoints = useBreakpoint();
@@ -146,7 +150,7 @@ function GridTableLayoutComponent<
         tertiaryAction={tertiaryAction}
       />
       {showTableActions && (
-        <TableActions onlyRight={!layoutState?.search && !hideEditColumns && hasHideableColumns}>
+        <TableActions onlyRight={!layoutState?.search && hasHideableColumns}>
           <div css={Css.df.gap1.$}>
             {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
             {layoutState?.filterDefs && (
@@ -159,7 +163,7 @@ function GridTableLayoutComponent<
               />
             )}
           </div>
-          {!hideEditColumns && hasHideableColumns && (
+          {hasHideableColumns && (
             <EditColumnsButton
               columns={columns}
               api={api}
@@ -199,34 +203,10 @@ export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof Gr
 
 // Force columns to have a name and id property for all our table layouts
 function validateColumns(columns: readonly { id?: string; name?: string }[]): void {
-  // Single pass validation - collect invalid columns
-  const columnsWithoutIds: number[] = [];
-  const columnsWithoutNames: number[] = [];
-
-  for (let i = 0; i < columns.length; i++) {
-    const column = columns[i];
-    if (!column.id || column.id.length === 0) {
-      columnsWithoutIds.push(i);
+  for (const col of columns) {
+    if (!col.id || !col.name) {
+      throw new Error("Columns must have id and name properties when EditColumnsButtons is enabled");
     }
-    if (!column.name || column.name.length === 0) {
-      columnsWithoutNames.push(i);
-    }
-  }
-
-  if (columnsWithoutIds.length > 0) {
-    throw new Error(
-      `GridTableLayout requires all columns to have an explicit 'id' property when EditColumnsButton is enabled. ` +
-        `Columns without IDs: ${columnsWithoutIds.map((idx) => `column[${idx}]`).join(", ")}. ` +
-        `Please add an 'id' property to each column definition.`,
-    );
-  }
-
-  if (columnsWithoutNames.length > 0) {
-    throw new Error(
-      `GridTableLayout requires all columns to have an explicit 'name' property when EditColumnsButton is enabled. ` +
-        `Columns without names: ${columnsWithoutNames.map((idx) => `column[${idx}]`).join(", ")}. ` +
-        `Please add a 'name' property to each column definition.`,
-    );
   }
 }
 
