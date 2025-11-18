@@ -15,7 +15,6 @@ export function useColumnResizing(storageKey: string | undefined): {
   setResizedWidths: (widths: ResizedWidths | ((prev: ResizedWidths) => ResizedWidths)) => void;
   getResizedWidth: (columnId: string) => number | undefined;
 } {
-  // TODO: Do we REALLY wanna store this?
   const [resizedWidths, setResizedWidths] = useState<ResizedWidths>(() => {
     if (!storageKey) return {};
     try {

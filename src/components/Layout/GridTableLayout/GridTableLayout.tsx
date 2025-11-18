@@ -55,7 +55,7 @@ export type GridTableLayoutProps<
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
-  noColumnResizing?: boolean;
+  disableColumnResizing?: boolean;
 };
 
 /**
@@ -99,7 +99,7 @@ function GridTableLayoutComponent<
     secondaryAction,
     tertiaryAction,
     // TODO: When we implement the kebab menu, this prop should trigger a `reset columns` button to appear
-    noColumnResizing = false,
+    disableColumnResizing = false,
   } = props;
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
   const showTableActions = layoutState?.filterDefs || layoutState?.search;
@@ -137,7 +137,7 @@ function GridTableLayoutComponent<
             filter={clientSearch}
             style={{ allWhite: true }}
             stickyHeader
-            noColumnResizing={noColumnResizing}
+            disableColumnResizing={disableColumnResizing}
           />
         ) : (
           <QueryTable
@@ -145,7 +145,7 @@ function GridTableLayoutComponent<
             filter={clientSearch}
             style={{ allWhite: true }}
             stickyHeader
-            noColumnResizing={noColumnResizing}
+            disableColumnResizing={disableColumnResizing}
           />
         )}
       </ScrollableContent>

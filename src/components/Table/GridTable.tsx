@@ -192,7 +192,7 @@ export interface GridTableProps<R extends Kinded, X> {
   /** Drag & drop Callback. */
   onRowDrop?: (draggedRow: GridDataRow<R>, droppedRow: GridDataRow<R>, indexOffset: number) => void;
   /** Disable column resizing functionality. */
-  noColumnResizing?: boolean;
+  disableColumnResizing?: boolean;
 }
 
 /**
@@ -239,7 +239,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     onRowSelect,
     onRowDrop: droppedCallback,
     csvPrefixRows,
-    noColumnResizing = true,
+    disableColumnResizing = true,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
@@ -316,7 +316,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // Our column sizes use either `w` or `expandedWidth`, so see which columns are currently expanded
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
   const { resizedWidths, setResizedWidth, setResizedWidths } = useColumnResizing(
-    noColumnResizing ? undefined : visibleColumnsStorageKey,
+    disableColumnResizing ? undefined : visibleColumnsStorageKey,
   );
   const { columnSizes, tableWidth } = useSetupColumnSizes(
     style,
@@ -651,7 +651,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             hasExpandableHeader,
             resizedWidths,
             setResizedWidth: handleColumnResize,
-            noColumnResizing,
+            disableColumnResizing,
             calculatePreviewWidth,
           }}
         />

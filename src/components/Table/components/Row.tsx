@@ -12,6 +12,7 @@ import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
+import { parseWidthToPx } from "src/components/Table/utils/columns";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -49,7 +50,7 @@ interface RowProps<R extends Kinded> {
   /* column resizers */
   resizedWidths: ResizedWidths;
   setResizedWidth: (columnId: string, width: number, columnIndex: number) => void;
-  noColumnResizing: boolean;
+  disableColumnResizing: boolean;
   calculatePreviewWidth: (columnId: string, newWidth: number, columnIndex: number) => number;
   /* Drag handlers */
   onDragStart?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
@@ -75,7 +76,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     hasExpandableHeader,
     resizedWidths,
     setResizedWidth,
-    noColumnResizing = true,
+    disableColumnResizing = true,
     calculatePreviewWidth,
     onDragStart,
     onDragEnd,
@@ -375,18 +376,21 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           // Only add handle on the right border (not for the last column)
           // Skip action columns (selectColumn, collapseColumn, actionColumn) as they should not be resizable
           if (
-            !noColumnResizing &&
+            !disableColumnResizing &&
             isHeader &&
-            setResizedWidth &&
             columnIndex < columns.length - 1 &&
             currentColspan === 1 &&
             !column.isAction
           ) {
             // Parse current width - if not in pixels, use a fallback or skip resize handle
             const currentSizeStr = columnSizes[columnIndex];
-            const currentWidthPx = currentSizeStr.endsWith("px")
-              ? parseInt(currentSizeStr.replace("px", ""), 10)
-              : resizedWidths?.[column.id] || 100; // Fallback to resized width or default
+            // This fallback shouldn't happen in practice: columns are locked to pixel widths on first resize,
+            // and resizedWidths should always contain the current width after that point. However, we handle
+            // the edge case of initial render with percentage/calc() columns before any resize has occurred.
+            const currentWidthPx =
+              parseWidthToPx(currentSizeStr, undefined) ??
+              resizedWidths?.[column.id] ??
+              (column.mw ? parseInt(column.mw.replace("px", ""), 10) : 100);
             const minWidthPx = column.mw ? parseInt(column.mw.replace("px", ""), 10) : 0;
 
             // Add resize handle to header cells by cloning the cell element and adding relative positioning
