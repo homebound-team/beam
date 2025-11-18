@@ -388,18 +388,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               : resizedWidths?.[column.id] || 100; // Fallback to resized width or default
             const minWidthPx = column.mw ? parseInt(column.mw.replace("px", ""), 10) : 0;
 
-            // Calculate min widths of columns to the right for max width calculation
-            const rightColumnsMinWidths: number[] = [];
-            for (let i = columnIndex + 1; i < columns.length; i++) {
-              const rightCol = columns[i];
-              // Skip action columns
-              if (rightCol.isAction) {
-                continue;
-              }
-              const rightColMinWidth = rightCol.mw ? parseInt(rightCol.mw.replace("px", ""), 10) : 0;
-              rightColumnsMinWidths.push(rightColMinWidth);
-            }
-
             // Add resize handle to header cells by cloning the cell element and adding relative positioning
             const cellElementWithHandle = React.cloneElement(cellElement as React.ReactElement, {
               css: {
