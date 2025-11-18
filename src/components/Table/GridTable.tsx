@@ -554,9 +554,14 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           lockedWidths[col.id] = currentWidth;
         });
 
-        // Batch update to minimize re-renders
-        setResizedWidths(lockedWidths);
+        // Combine locking and resize updates into a single state update to avoid double render
+        setResizedWidths((prev) => ({
+          ...prev,
+          ...lockedWidths,
+          ...result.updates,
+        }));
         hasLockedColumnsRef.current = true;
+        return;
       }
 
       // Apply all updates from the resize (batch update for performance)
