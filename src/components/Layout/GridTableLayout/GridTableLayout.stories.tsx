@@ -4,6 +4,7 @@ import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { GridDataRow } from "src/components/Table";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "../Layout.stories";
@@ -23,7 +24,7 @@ type Row = HeaderRow | ParentRow | DataRow;
 
 export function GridTableLayout() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
-  const columns = useMemo(() => getColumns(), []);
+  const columns = useMemo(() => getColumns(false), []);
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -69,7 +70,7 @@ export function QueryTableLayout() {
   // In this example, we set up a server-side search that uses the `searchString` from the layout state.
   // in combination with the "QueryTable" behavior for loading/error states.
   const query = useExampleQuery({ filter: { ...layoutState.filter, search: layoutState.searchString } });
-  const columns = useMemo(() => getColumns(), []);
+  const columns = useMemo(() => getColumns(false), []);
 
   return (
     <TestProjectLayout>
@@ -97,7 +98,7 @@ export function QueryTableLayout() {
 
 export function GridTableLayoutWithSessionStorage() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
-  const columns = useMemo(() => getColumns(), []);
+  const columns = useMemo(() => getColumns(true), []);
   const storageKey = "with-session-storage-test";
 
   const layoutState = useGridTableLayoutState({
@@ -108,22 +109,19 @@ export function GridTableLayoutWithSessionStorage() {
     search: "client",
   });
 
-  // Pre-populate sessionStorage with column widths to simulate a returning user
-  // This runs once on mount to set up the test scenario
   useEffect(() => {
     const columnWidthsKey = `columnWidths_${storageKey}`;
-    const existingData = sessionStorage.getItem(columnWidthsKey);
-
-    // Only set if not already present (to avoid overwriting during hot reload)
-    if (!existingData) {
-      const presetColumnWidths = {
-        "name-col": 300, // Name column resized to 300px
-        "value-col": 150, // Value column resized to 150px
-        "status-col": 120, // Status column resized to 120px
-        "priority-col": 120, // Priority column resized to 120px
-        "action-col": 100, // Action column at 100px
-      };
-      sessionStorage.setItem(columnWidthsKey, JSON.stringify(presetColumnWidths));
+    if (!sessionStorage.getItem(columnWidthsKey)) {
+      sessionStorage.setItem(
+        columnWidthsKey,
+        JSON.stringify({
+          "name-col": 300,
+          "value-col": 150,
+          "status-col": 120,
+          "priority-col": 120,
+          "action-col": 100,
+        }),
+      );
     }
   }, [storageKey]);
 
@@ -131,18 +129,9 @@ export function GridTableLayoutWithSessionStorage() {
     <TestProjectLayout>
       <div css={Css.p2.ba.bcGray300.mb2.bgGray100.$}>
         <h3 css={Css.mb1.sm.$}>Test Scenario: Pre-populated SessionStorage</h3>
-        <p css={Css.xs.gray700.mb1.$}>
-          This table has pre-existing column widths in sessionStorage (Name: 300px, Value: 150px, Status: 120px,
-          Priority: 120px, Action: 100px).
-        </p>
-        <p css={Css.xs.gray700.mb1.$}>
-          <strong>Expected behavior:</strong> When you resize any column, all columns should lock to their current pixel
-          widths to prevent fr units from shifting. This should work correctly even though sessionStorage already
-          contains column widths from a "previous session".
-        </p>
         <p css={Css.xs.gray700.$}>
-          <strong>Test:</strong> Try resizing the Name column. Other columns should not shift unexpectedly. The resize
-          should behave consistently whether it's your first resize or subsequent resizes.
+          This table has pre-existing column widths in sessionStorage. When resizing columns, they should lock to pixel
+          widths and behave consistently.
         </p>
       </div>
       <GridTableLayoutComponent
@@ -219,37 +208,49 @@ function getFilterDefs() {
   };
 }
 
-function getColumns() {
+function getColumns(showColor: boolean = false) {
   const nameColumn = column<Row>({
-    header: () => "Name",
-    parent: (row) => ({ content: row.name, value: row.name }),
-    data: (row) => row.name,
+    id: "name-col",
+    name: "Name",
+    header: () => ({ content: "Name", css: Css.if(showColor).bgRed500.$ }),
+    parent: (row) => ({ content: row.name, value: row.name, css: Css.if(showColor).bgRed500.$ }),
+    data: (row) => ({ content: row.name, css: Css.if(showColor).bgRed500.$ }),
     mw: "200px",
   });
   const valueColumn = numericColumn<Row>({
-    header: () => "Value",
-    parent: (row) => ({ content: row.value, value: row.value }),
-    data: (row) => row.value,
+    id: "value-col",
+    name: "Value",
+    header: () => ({ content: "Value", css: Css.if(showColor).bgBlue500.$ }),
+    parent: (row) => ({ content: row.value, value: row.value, css: Css.if(showColor).bgBlue500.$ }),
+    data: (row) => ({ content: row.value, css: Css.if(showColor).bgBlue500.$ }),
     mw: "100px",
   });
   const statusColumn = column<Row>({
-    header: () => "Status",
-    parent: (row) => ({ content: row.status, value: row.status }),
-    data: (row) => row.status,
+    id: "status-col",
+    name: "Status",
+    header: () => ({ content: "Status", css: Css.if(showColor).bgGreen500.$ }),
+    parent: (row) => ({ content: row.status, value: row.status, css: Css.if(showColor).bgGreen500.$ }),
+    data: (row) => ({ content: row.status, css: Css.if(showColor).bgGreen500.$ }),
+    w: "20%",
     mw: "100px",
   });
   const priorityColumn = numericColumn<Row>({
-    header: () => "Priority",
-    parent: (row) => ({ content: row.priority, value: row.priority }),
-    data: (row) => row.priority,
-    mw: "100px",
+    id: "priority-col",
+    name: "Priority",
+    header: () => ({ content: "Priority", css: Css.if(showColor).bgYellow500.$ }),
+    parent: (row) => ({ content: row.priority, value: row.priority, css: Css.if(showColor).bgYellow500.$ }),
+    data: (row) => ({ content: row.priority, css: Css.if(showColor).bgYellow500.$ }),
+    mw: "80px",
   });
   const actionColumn = column<Row>({
-    header: () => "Action",
-    parent: () => ({ content: <div>Actions</div>, value: "" }),
-    data: () => <div>Actions</div>,
+    id: "action-col",
+    name: "Action",
+    header: () => ({ content: "Action", css: Css.if(showColor).bgPurple500.$ }),
+    parent: () => ({ content: <div>Actions</div>, value: "", css: Css.if(showColor).bgPurple500.$ }),
+    data: () => ({ content: <div>Actions</div>, css: Css.if(showColor).bgPurple500.$ }),
     clientSideSort: false,
     w: "100px",
+    mw: "80px",
   });
 
   return [nameColumn, valueColumn, statusColumn, priorityColumn, actionColumn];
