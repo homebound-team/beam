@@ -94,6 +94,25 @@ function nonKindDefaults() {
   return Object.fromEntries(nonKindGridColumnKeys.map((key) => [key, undefined]));
 }
 
+// TODO: can we get rid of the `undefinded` tableWidth.
+export function parseWidthToPx(widthStr: string, tableWidth: number | undefined): number | null {
+  if (widthStr.endsWith("px")) {
+    const parsed = parseInt(widthStr.replace("px", ""), 10);
+    return isNaN(parsed) ? null : parsed;
+  }
+
+  if (widthStr.endsWith("%") && tableWidth) {
+    const percent = parseFloat(widthStr.replace("%", ""));
+    if (isNaN(percent)) return null;
+    return Math.round((percent / 100) * tableWidth);
+  }
+
+  // For calc() or other complex expressions, return null
+  // These should never happen since we've run calcColumnSizes already resolved to px
+  // by the time resizing happens
+  return null;
+}
+
 /**
  * Calculates column widths using a flexible `calc()` definition that allows for consistent column alignment without the use of `<table />`, CSS Grid, etc layouts.
  * Enforces only fixed-sized units (% and px)

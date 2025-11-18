@@ -18,7 +18,7 @@ import {
   Kinded,
   RenderAs,
 } from "src/components/Table/types";
-import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
+import { assignDefaultColumnIds, parseWidthToPx } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { EXPANDABLE_HEADER, isCursorBelowMidpoint, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
@@ -420,7 +420,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
       // Get current width and minWidth of the column being resized
       const currentSizeStr = columnSizes[columnIndex];
-      const currentWidth = currentSizeStr.endsWith("px") ? parseInt(currentSizeStr.replace("px", ""), 10) : 0;
+      const currentWidth = parseWidthToPx(currentSizeStr, tableWidth) ?? 0;
       const resizedColumn = columns[columnIndex];
       const resizedColumnMinWidth = resizedColumn.mw ? parseInt(resizedColumn.mw.replace("px", ""), 10) : 0;
 
@@ -447,7 +447,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         }
 
         const sizeStr = columnSizes[i];
-        const width = sizeStr.endsWith("px") ? parseInt(sizeStr.replace("px", ""), 10) : 0;
+        const width = parseWidthToPx(sizeStr, tableWidth) ?? 0;
         const minWidth = col.mw ? parseInt(col.mw.replace("px", ""), 10) : 0;
 
         rightColumns.push({
@@ -546,10 +546,12 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         const lockedWidths: ResizedWidths = {};
         columnSizes.forEach((sizeStr, idx) => {
           const col = columns[idx];
-          if (sizeStr.endsWith("px")) {
-            const currentWidth = parseInt(sizeStr.replace("px", ""), 10);
-            lockedWidths[col.id] = currentWidth;
-          }
+
+          // Skip action columns as they shouldn't be resized
+          if (col.isAction) return;
+
+          const currentWidth = parseWidthToPx(sizeStr, tableWidth) ?? 0;
+          lockedWidths[col.id] = currentWidth;
         });
 
         // Batch update to minimize re-renders
@@ -560,7 +562,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       // Apply all updates from the resize (batch update for performance)
       setResizedWidths(result.updates);
     },
-    [calculateResizeUpdates, setResizedWidths, columnSizes, columns, setResizedWidth],
+    [calculateResizeUpdates, setResizedWidths, columnSizes, columns, setResizedWidth, tableWidth],
   );
 
   // allows us to unset children and grandchildren, etc.
