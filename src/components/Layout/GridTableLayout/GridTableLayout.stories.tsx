@@ -95,12 +95,6 @@ export function QueryTableLayout() {
   );
 }
 
-/**
- * Story to demonstrate column resizing behavior when sessionStorage already contains column widths.
- * This simulates the scenario where a user has previously resized columns, refreshed the page,
- * and then resizes again. The fix ensures that columns are locked to pixel widths on the first
- * resize of the session, preventing fr units from shifting unexpectedly.
- */
 export function GridTableLayoutWithSessionStorage() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
   const columns = useMemo(() => getColumns(), []);

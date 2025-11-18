@@ -104,7 +104,7 @@ function memoizedTableStyles() {
       rowHeight = "flexible",
       cellHighlight = false,
       allWhite = false,
-      bordered = true, // TODO: made this true so i can test a lil easeier
+      bordered = false,
       vAlign = "center",
       cellTypography = "xs" as const,
       highlightOnHover = true,
