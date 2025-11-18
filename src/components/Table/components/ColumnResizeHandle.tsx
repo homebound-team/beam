@@ -85,11 +85,18 @@ export function ColumnResizeHandle({
 
       // Find the scrollable parent container
       // Prefer scrollableEl from ScrollableParent context (avoids expensive DOM traversal)
+      // Note: scrollableEl is a portal element, so the actual scrollable container is its parent
       // Fall back to findScrollableParent for tables not wrapped in ScrollableParent
       // This sounds bad but resizable columns was built with GridTableLayout in mind which always gets used
       // within a ScrollableParent because it is wrapped in a ScrollableContent
-      scrollableParentRef.current =
-        scrollableEl || (tableContainerRef?.current ? findScrollableParent(tableContainerRef.current) : null);
+      if (scrollableEl?.parentElement) {
+        // scrollableEl is a portal element, its parent is the actual scrollable container
+        scrollableParentRef.current = scrollableEl.parentElement;
+      } else {
+        scrollableParentRef.current = tableContainerRef?.current
+          ? findScrollableParent(tableContainerRef.current)
+          : null;
+      }
 
       // Calculate bounds - use intersection of scrollable parent and table
       if (tableContainerRef?.current) {
@@ -119,23 +126,8 @@ export function ColumnResizeHandle({
     [currentWidth, tableContainerRef, scrollableEl],
   );
 
-  // Update guide line position using requestAnimationFrame for smooth performance
-  const updateGuideLine = useCallback(() => {
-    if (pendingMouseXRef.current === null) return;
-
-    const deltaX = pendingMouseXRef.current - startXRef.current;
-    const requestedWidth = Math.max(minWidth, startWidthRef.current + deltaX);
-
-    // Calculate the accurate final width using the preview function
-    // This accounts for distribution to right columns and all constraints
-    let finalWidth = requestedWidth;
-    finalWidth = calculatePreviewWidth(columnId, requestedWidth, columnIndex);
-
-    // Calculate where the guide line should be based on the final width
-    const widthChange = finalWidth - startWidthRef.current;
-    setGuideLineX(startHandleRightRef.current + widthChange);
-
-    // Update guide line bounds if scrollable parent has scrolled
+  // Update guide line bounds based on current scroll position
+  const updateGuideLineBounds = useCallback(() => {
     if (tableContainerRef?.current) {
       const tableRect = tableContainerRef.current.getBoundingClientRect();
 
@@ -152,10 +144,34 @@ export function ColumnResizeHandle({
         setGuideLineHeight(tableRect.height);
       }
     }
+  }, [tableContainerRef]);
+
+  // Update guide line position using requestAnimationFrame for smooth performance
+  const updateGuideLine = useCallback(() => {
+    if (pendingMouseXRef.current === null) {
+      // Even if there's no mouse movement, update bounds in case of scroll
+      updateGuideLineBounds();
+      return;
+    }
+
+    const deltaX = pendingMouseXRef.current - startXRef.current;
+    const requestedWidth = Math.max(minWidth, startWidthRef.current + deltaX);
+
+    // Calculate the accurate final width using the preview function
+    // This accounts for distribution to right columns and all constraints
+    let finalWidth = requestedWidth;
+    finalWidth = calculatePreviewWidth(columnId, requestedWidth, columnIndex);
+
+    // Calculate where the guide line should be based on the final width
+    const widthChange = finalWidth - startWidthRef.current;
+    setGuideLineX(startHandleRightRef.current + widthChange);
+
+    // Update guide line bounds if scrollable parent has scrolled
+    updateGuideLineBounds();
 
     pendingMouseXRef.current = null;
     rafRef.current = null;
-  }, [minWidth, calculatePreviewWidth, columnId, columnIndex, tableContainerRef]);
+  }, [minWidth, calculatePreviewWidth, columnId, columnIndex, updateGuideLineBounds]);
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -171,6 +187,17 @@ export function ColumnResizeHandle({
     },
     [isDragging, updateGuideLine],
   );
+
+  // Update guide line bounds when scrolling occurs during drag
+  const handleScroll = useCallback(() => {
+    if (!isDragging) return;
+    // Schedule bounds update using requestAnimationFrame to batch scroll events
+    // This avoids expensive getBoundingClientRect() calls on every scroll event
+    // Reuse the same rafRef as mouse move - updateGuideLine handles both cases
+    if (rafRef.current === null) {
+      rafRef.current = requestAnimationFrame(updateGuideLine);
+    }
+  }, [isDragging, updateGuideLine]);
 
   const handleMouseUp = useCallback(
     (e: MouseEvent) => {
@@ -193,9 +220,17 @@ export function ColumnResizeHandle({
     if (isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
+      // Listen for scroll events on the scrollable parent container
+      const scrollableEl = scrollableParentRef.current;
+      if (scrollableEl) {
+        scrollableEl.addEventListener("scroll", handleScroll, { passive: true });
+      }
       return () => {
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
+        if (scrollableEl) {
+          scrollableEl.removeEventListener("scroll", handleScroll);
+        }
         // Cancel any pending animation frame
         if (rafRef.current !== null) {
           cancelAnimationFrame(rafRef.current);
@@ -204,7 +239,7 @@ export function ColumnResizeHandle({
         pendingMouseXRef.current = null;
       };
     }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+  }, [isDragging, handleMouseMove, handleMouseUp, handleScroll]);
 
   // Cleanup on unmount
   useEffect(() => {
