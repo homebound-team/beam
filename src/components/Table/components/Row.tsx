@@ -9,6 +9,7 @@ import {
 } from "src/components/Table/components/cell";
 import { ColumnResizeHandle } from "src/components/Table/components/ColumnResizeHandle";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
+import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
@@ -46,7 +47,7 @@ interface RowProps<R extends Kinded> {
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
   /* column resizers */
-  resizedWidths: Record<string, number>;
+  resizedWidths: ResizedWidths;
   setResizedWidth: (columnId: string, width: number, columnIndex: number) => void;
   noColumnResizing: boolean;
   calculatePreviewWidth: (columnId: string, newWidth: number, columnIndex: number) => number;

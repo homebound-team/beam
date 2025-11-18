@@ -1,6 +1,7 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { GridStyle } from "src/components/Table/TableStyles";
+import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { calcColumnSizes } from "src/components/Table/utils/columns";
 import { useDebouncedCallback } from "use-debounce";
@@ -29,7 +30,7 @@ export function useSetupColumnSizes<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   resizeRef: MutableRefObject<HTMLElement | null>,
   expandedColumnIds: string[],
-  resizedWidths?: Record<string, number>,
+  resizedWidths?: ResizedWidths,
 ): { columnSizes: string[]; tableWidth: number | undefined } {
   // Calculate the column sizes immediately rather than via the `debounce` method.
   // We do this for Storybook integrations that may use MockDate. MockDate changes the behavior of `new Date()`,

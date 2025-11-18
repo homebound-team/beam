@@ -29,6 +29,17 @@ import { isPromise } from "src/utils";
 import { GridDataRow, Row } from "./components/Row";
 import { DraggedOver } from "./utils/RowState";
 
+type ColumnWidthInfo = {
+  id: string;
+  currentWidth: number;
+  minWidth: number;
+};
+
+type DistributionResult = {
+  updates: ResizedWidths;
+  actualAdjustment: number;
+};
+
 let runningInJest = false;
 
 /** Tells GridTable we're running in Jest, which forces as=virtual to be as=div, to work in jsdom. */
@@ -333,8 +344,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     if (!tableWidth) return;
 
     const prevWidth = prevTableWidthRef.current;
-    const RESIZE_TOLERANCE_PX = 1; // Allow 1px tolerance for subpixel rounding
-    const widthChanged = Math.abs(tableWidth - prevWidth) > RESIZE_TOLERANCE_PX;
+    const widthChanged = Math.abs(tableWidth - prevWidth) > 1; // Allow 1px tolerance for subpixel rounding
 
     if (widthChanged) {
       const scale = tableWidth / prevWidth;
@@ -359,12 +369,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // ---------resizable column helpers------
   // Helper to distribute adjustment proportionally among right columns
   const distributeAdjustment = useCallback(
-    (
-      rightColumns: Array<{ id: string; currentWidth: number; minWidth: number }>,
-      totalRightWidth: number,
-      adjustment: number,
-    ): { updates: Record<string, number>; actualAdjustment: number } => {
-      const updates: Record<string, number> = {};
+    (rightColumns: Array<ColumnWidthInfo>, totalRightWidth: number, adjustment: number): DistributionResult => {
+      const updates: ResizedWidths = {};
       let remainingAdjustment = adjustment;
 
       // Distribute the adjustment across all right columns proportionally
@@ -387,7 +393,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       columnId: string,
       newWidth: number,
       columnIndex: number,
-    ): { updates: Record<string, number>; hasRightColumns: boolean } | null => {
+    ): { updates: ResizedWidths; hasRightColumns: boolean } | null => {
       if (!tableWidth || !columnSizes || columnSizes.length === 0) {
         return null;
       }
@@ -404,7 +410,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       }
 
       // Find right columns and calculate how much they can shrink
-      const rightColumns: Array<{ id: string; currentWidth: number; minWidth: number }> = [];
+      const rightColumns: Array<ColumnWidthInfo> = [];
       let totalRightWidth = 0;
 
       for (let i = columnIndex + 1; i < columns.length; i++) {
@@ -445,7 +451,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       // This ensures we never shrink below the column's minimum width
       const clampedFinalWidth = Math.max(resizedColumnMinWidth, finalResizedWidth);
 
-      const updates: Record<string, number> = {
+      const updates: ResizedWidths = {
         [columnId]: clampedFinalWidth,
         ...distributionResult.updates,
       };

@@ -2,6 +2,7 @@ import { Icon } from "src";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
+import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
 import { DragData, emptyCell } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
@@ -122,7 +123,7 @@ export function calcColumnSizes<R extends Kinded>(
   tableWidth: number | undefined,
   tableMinWidthPx: number = 0,
   expandedColumnIds: string[],
-  resizedWidths?: Record<string, number>,
+  resizedWidths?: ResizedWidths,
 ): string[] {
   // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
   // calc((100% - allOtherPercent - allOtherPx) * ((myFr / totalFr))`
