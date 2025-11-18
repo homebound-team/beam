@@ -46,11 +46,10 @@ interface RowProps<R extends Kinded> {
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
   /* column resizers */
-  resizedWidths?: Record<string, number>;
-  setResizedWidth?: (columnId: string, width: number, columnIndex: number) => void;
-  noColumnResizing?: boolean;
-  tableWidth?: number;
-  calculatePreviewWidth?: (columnId: string, newWidth: number, columnIndex: number) => number;
+  resizedWidths: Record<string, number>;
+  setResizedWidth: (columnId: string, width: number, columnIndex: number) => void;
+  noColumnResizing: boolean;
+  calculatePreviewWidth: (columnId: string, newWidth: number, columnIndex: number) => number;
   /* Drag handlers */
   onDragStart?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDragEnd?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
@@ -76,7 +75,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     resizedWidths,
     setResizedWidth,
     noColumnResizing = true,
-    tableWidth,
     calculatePreviewWidth,
     onDragStart,
     onDragEnd,
@@ -417,9 +415,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                     currentWidth={currentWidthPx}
                     minWidth={minWidthPx}
                     onResize={(colId, width) => setResizedWidth?.(colId, width, columnIndex)}
-                    tableWidth={tableWidth}
-                    columnSizes={columnSizes}
-                    rightColumnsMinWidths={rightColumnsMinWidths}
                     calculatePreviewWidth={calculatePreviewWidth}
                   />
                 </>

@@ -708,7 +708,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             resizedWidths,
             setResizedWidth: handleColumnResize,
             noColumnResizing,
-            tableWidth,
             calculatePreviewWidth,
           }}
         />

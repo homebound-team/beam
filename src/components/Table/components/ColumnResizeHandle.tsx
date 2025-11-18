@@ -10,10 +10,7 @@ type ColumnResizeHandleProps = {
   currentWidth: number;
   minWidth: number;
   onResize: (columnId: string, newWidth: number, columnIndex: number) => void;
-  tableWidth?: number;
-  columnSizes?: string[];
-  rightColumnsMinWidths?: number[];
-  calculatePreviewWidth?: (columnId: string, newWidth: number, columnIndex: number) => number;
+  calculatePreviewWidth: (columnId: string, newWidth: number, columnIndex: number) => number;
 };
 
 /**
@@ -53,9 +50,6 @@ export function ColumnResizeHandle({
   currentWidth,
   minWidth,
   onResize,
-  tableWidth,
-  columnSizes,
-  rightColumnsMinWidths,
   calculatePreviewWidth,
 }: ColumnResizeHandleProps) {
   const { tableContainerRef } = useContext(TableStateContext);
@@ -135,14 +129,7 @@ export function ColumnResizeHandle({
     // Calculate the accurate final width using the preview function
     // This accounts for distribution to right columns and all constraints
     let finalWidth = requestedWidth;
-    if (calculatePreviewWidth) {
-      try {
-        finalWidth = calculatePreviewWidth(columnId, requestedWidth, columnIndex);
-      } catch (e) {
-        // Fallback to requested width if calculation fails
-        finalWidth = requestedWidth;
-      }
-    }
+    finalWidth = calculatePreviewWidth(columnId, requestedWidth, columnIndex);
 
     // Calculate where the guide line should be based on the final width
     const widthChange = finalWidth - startWidthRef.current;
