@@ -318,33 +318,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // Track previous table width to detect container resize
   const prevTableWidthRef = useRef<number | undefined>(tableWidth);
 
-  /**
-   * Track whether columns have been locked to pixel widths in this session.
-   *
-   * IMPORTANT: This is separate from checking resizedWidths.length because:
-   * - resizedWidths can be populated from sessionStorage on page load
-   * - But those persisted widths don't trigger the "lock all columns" behavior
-   * - We only lock columns when the user manually resizes in THIS session
-   *
-   * Why do we lock ALL columns on first resize?
-   * - Columns can use flexible units (fr) that recalculate based on available space
-   * - When you resize one column to a fixed pixel width, other fr columns would shift unexpectedly
-   * - Example: Column A (1fr) = 200px, Column B (2fr) = 400px, Column C (1fr) = 200px
-   *   - User resizes B to 300px
-   *   - Without locking: A would recalculate to 250px (unwanted side effect!)
-   *   - With locking: A stays at 200px (expected behavior)
-   *
-   * Tradeoff: Once locked, columns lose their responsive (fr) behavior and become fixed-width.
-   * This is intentional - manual resizing indicates the user wants precise control.
-   *
-   * Future: Could add a "Reset Column Widths" button to clear resizedWidths and unlock.
-   */
+  // Track whether columns have been locked to pixel widths in this session.
+  // Separate from resizedWidths.length because persisted widths don't trigger locking.
+  // TODO: Could add a "Reset Column Widths" button to clear resizedWidths and unlock.
   const hasLockedColumnsRef = useRef<boolean>(false);
 
-  // When container width changes, proportionally scale all resized column widths
-  // Note: Only depends on tableWidth changes, not resizedWidths, to avoid circular updates
+  // Scale resized column widths when container width changes
   useEffect(() => {
-    // Initialize on first render
     if (!prevTableWidthRef.current) {
       prevTableWidthRef.current = tableWidth;
       return;
@@ -359,15 +339,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     if (widthChanged) {
       const scale = tableWidth / prevWidth;
 
-      // Use functional update to avoid depending on resizedWidths in deps array
-      // This prevents infinite loop: tableWidth changes → update resizedWidths → tableWidth recalculates → loop
       setResizedWidths((currentResizedWidths: ResizedWidths): ResizedWidths => {
-        // Don't scale if no columns have been resized yet
         if (!currentResizedWidths || Object.keys(currentResizedWidths).length === 0) {
           return currentResizedWidths;
         }
 
-        // Scale all resized widths proportionally (batch update for performance)
         const scaledWidths: ResizedWidths = {};
         Object.entries(currentResizedWidths).forEach(([id, width]) => {
           scaledWidths[id] = Math.round(width * scale);
@@ -401,13 +377,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         remainingAdjustment -= newColWidth - col.currentWidth;
       });
 
-      // Return both the updates and how much adjustment was actually applied
       return { updates, actualAdjustment: adjustment - remainingAdjustment };
     },
     [],
   );
 
-  // Pure function to calculate all column width updates for a resize operation
   const calculateResizeUpdates = useCallback(
     (
       columnId: string,
@@ -418,19 +392,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         return null;
       }
 
-      // Get current width and minWidth of the column being resized
       const currentSizeStr = columnSizes[columnIndex];
       const currentWidth = parseWidthToPx(currentSizeStr, tableWidth) ?? 0;
       const resizedColumn = columns[columnIndex];
       const resizedColumnMinWidth = resizedColumn.mw ? parseInt(resizedColumn.mw.replace("px", ""), 10) : 0;
-
-      // Enforce minWidth on the requested new width
       const clampedNewWidth = Math.max(resizedColumnMinWidth, newWidth);
-
-      // Calculate the delta (change in width)
       const delta = clampedNewWidth - currentWidth;
 
-      // If no change, return empty updates
       if (delta === 0) {
         return { updates: {}, hasRightColumns: false };
       }
@@ -487,7 +455,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     [tableWidth, columnSizes, columns, distributeAdjustment],
   );
 
-  // Calculate what the final width would be for a column resize (without applying it)
+  // Calculate the preview width for a column resize (without applying it) so our guide line is accurate
   const calculatePreviewWidth = useCallback(
     (columnId: string, newWidth: number, columnIndex: number): number => {
       const result = calculateResizeUpdates(columnId, newWidth, columnIndex);
@@ -499,62 +467,33 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     [calculateResizeUpdates],
   );
 
-  // Wrapper function to handle column resizing with redistribution to right columns
   const handleColumnResize = useCallback(
     (columnId: string, newWidth: number, columnIndex: number) => {
       const result = calculateResizeUpdates(columnId, newWidth, columnIndex);
 
-      // Fallback if we couldn't calculate updates
       if (!result) {
         setResizedWidth(columnId, newWidth);
         return;
       }
 
-      // If no changes, do nothing
       if (Object.keys(result.updates).length === 0) {
         return;
       }
 
-      /**
-       * FIRST RESIZE IN SESSION: Lock all columns to prevent fractional unit shifting.
-       *
-       * This is the "lock all columns" mechanism. On the very first manual resize in this
-       * browser session, we convert ALL columns from their original definitions (which may
-       * include fr units) to fixed pixel widths.
-       *
-       * Why lock ALL columns, not just the resized one?
-       * - The resize calculation logic distributes width changes to columns on the right
-       * - If those columns are still using fr units, they would recalculate unpredictably
-       * - Locking everything ensures stable, predictable behavior
-       *
-       * Why check hasLockedColumnsRef instead of resizedWidths.length?
-       * - On page load, resizedWidths may be populated from sessionStorage
-       * - But the user hasn't manually resized anything in THIS session yet
-       * - We want to lock columns only once per session, not on every page load
-       *
-       * Side Effect: This triggers TWO state updates on first resize:
-       * 1. Lock all columns (this block)
-       * 2. Apply the actual resize (below)
-       *
-       * This is acceptable because:
-       * - Only happens once per session
-       * - Both updates are batched via setResizedWidths
-       * - Performance impact is negligible
-       */
+      // On first manual resize, lock all columns to pixel widths to prevent fr unit shifting.
+      // We check hasLockedColumnsRef instead of resizedWidths.length because persisted widths
+      // from sessionStorage don't count as manual resizes in this session.
       if (!hasLockedColumnsRef.current) {
-        // Convert all currently rendered columns to fixed pixel widths
         const lockedWidths: ResizedWidths = {};
         columnSizes.forEach((sizeStr, idx) => {
           const col = columns[idx];
 
-          // Skip action columns as they shouldn't be resized
+          // Don't resize action col
           if (col.isAction) return;
-
           const currentWidth = parseWidthToPx(sizeStr, tableWidth) ?? 0;
           lockedWidths[col.id] = currentWidth;
         });
 
-        // Combine locking and resize updates into a single state update to avoid double render
         setResizedWidths((prev) => ({
           ...prev,
           ...lockedWidths,
@@ -564,7 +503,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         return;
       }
 
-      // Apply all updates from the resize (batch update for performance)
       setResizedWidths(result.updates);
     },
     [calculateResizeUpdates, setResizedWidths, columnSizes, columns, setResizedWidth, tableWidth],
