@@ -96,7 +96,7 @@ export function QueryTableLayout() {
   );
 }
 
-export function GridTableLayoutWithSessionStorage() {
+export function GridTableLayoutWithColor() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
   const columns = useMemo(() => getColumns(true), []);
   const storageKey = "with-session-storage-test";
@@ -127,15 +127,8 @@ export function GridTableLayoutWithSessionStorage() {
 
   return (
     <TestProjectLayout>
-      <div css={Css.p2.ba.bcGray300.mb2.bgGray100.$}>
-        <h3 css={Css.mb1.sm.$}>Test Scenario: Pre-populated SessionStorage</h3>
-        <p css={Css.xs.gray700.$}>
-          This table has pre-existing column widths in sessionStorage. When resizing columns, they should lock to pixel
-          widths and behave consistently.
-        </p>
-      </div>
       <GridTableLayoutComponent
-        pageTitle="Grid Table Layout with SessionStorage"
+        pageTitle="Grid Table Layout with Color for clearer column manipulation"
         breadcrumb={[
           { href: "/", label: "Home" },
           { href: "/", label: "Sub Page" },
