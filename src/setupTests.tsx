@@ -3,7 +3,10 @@ import "@testing-library/jest-dom";
 import "jest-chain";
 import { configure } from "mobx";
 
-beforeEach(() => jest.useFakeTimers());
+beforeEach(() => {
+  jest.useFakeTimers();
+  sessionStorage.clear();
+});
 afterEach(() => jest.useRealTimers());
 
 // formState doesn't use actions

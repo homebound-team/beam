@@ -25,9 +25,9 @@ function TestWrapper(props: TestWrapperProps) {
 }
 
 const columns = [
-  column<Row>({ header: () => "Name", data: (row) => row.name, id: "name" }),
-  numericColumn<Row>({ header: () => "Value", data: (row) => row.value, id: "value" }),
-  actionColumn<Row>({ header: () => "Action", data: () => <div>Actions</div>, id: "action" }),
+  column<Row>({ header: () => "Name", data: (row) => row.name, id: "name", name: "Name" }),
+  numericColumn<Row>({ header: () => "Value", data: (row) => row.value, id: "value", name: "Value" }),
+  actionColumn<Row>({ header: () => "Action", data: () => <div>Actions</div>, id: "action", name: "Action" }),
 ];
 
 const rows: Row[] = [
@@ -149,5 +149,95 @@ describe("GridTableLayout", () => {
       | Epsilon | 200   | Actions |
       "
     `);
+  });
+
+  describe("column visibility", () => {
+    it("does not render EditColumnsButton when hideEditColumns is true", async () => {
+      // Given GridTableLayout with hideEditColumns=true
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{}}
+            pageTitle="Test"
+            hideEditColumns={true}
+            tableProps={{
+              columns,
+              rows: [simpleHeader, ...rows],
+            }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+
+      // Then EditColumnsButton is not rendered
+      expect(r.query.editColumnsButton).not.toBeInTheDocument();
+    });
+
+    it("throws error when columns missing id and hideEditColumns is false", async () => {
+      // Given columns without id property
+      const columnsWithoutId = [column<Row>({ header: () => "Name", data: (row) => row.name, name: "Name" })];
+
+      // Then it throws an error
+      await expect(
+        render(
+          <QueryParamProvider>
+            <TestWrapper
+              layoutStateProps={{}}
+              pageTitle="Test"
+              tableProps={{
+                columns: columnsWithoutId,
+                rows: [simpleHeader, ...rows],
+              }}
+            />
+          </QueryParamProvider>,
+          withRouter(),
+        ),
+      ).rejects.toThrow("Columns must have id and name properties when EditColumnsButtons is enabled");
+    });
+
+    it("throws error when columns missing name and hideEditColumns is false", async () => {
+      // Given columns without name property
+      const columnsWithoutName = [column<Row>({ header: () => "Name", data: (row) => row.name, id: "name" })];
+
+      // Then it throws an error
+      await expect(
+        render(
+          <QueryParamProvider>
+            <TestWrapper
+              layoutStateProps={{}}
+              pageTitle="Test"
+              tableProps={{
+                columns: columnsWithoutName,
+                rows: [simpleHeader, ...rows],
+              }}
+            />
+          </QueryParamProvider>,
+          withRouter(),
+        ),
+      ).rejects.toThrow("Columns must have id and name properties when EditColumnsButtons is enabled");
+    });
+
+    it("does not throw error when columns missing id/name and hideEditColumns is true", async () => {
+      // Given columns without id/name but hideEditColumns=true
+      const columnsWithoutId = [column<Row>({ header: () => "Name", data: (row) => row.name })];
+
+      // Then it does not throw
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{}}
+            pageTitle="Test"
+            hideEditColumns={true}
+            tableProps={{
+              columns: columnsWithoutId,
+              rows: [simpleHeader, ...rows],
+            }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+
+      expect(r.pageTitle).toBeInTheDocument();
+    });
   });
 });
