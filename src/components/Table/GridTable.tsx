@@ -315,9 +315,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // Our column sizes use either `w` or `expandedWidth`, so see which columns are currently expanded
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
-  const { resizedWidths, setResizedWidth, setResizedWidths } = useColumnResizing(
+  const { resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths } = useColumnResizing(
     disableColumnResizing ? undefined : visibleColumnsStorageKey,
   );
+
+  // Store resetColumnWidths on the API instance so it can be called from EditColumnsButton
+  useEffect(() => {
+    api.resetColumnWidthsFn = !disableColumnResizing ? resetColumnWidths : undefined;
+  }, [api, resetColumnWidths, disableColumnResizing]);
+
   const { columnSizes, tableWidth } = useSetupColumnSizes(
     style,
     columns,

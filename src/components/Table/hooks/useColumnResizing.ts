@@ -13,7 +13,7 @@ export function useColumnResizing(storageKey: string | undefined): {
   resizedWidths: ResizedWidths;
   setResizedWidth: (columnId: string, width: number) => void;
   setResizedWidths: (widths: ResizedWidths | ((prev: ResizedWidths) => ResizedWidths)) => void;
-  getResizedWidth: (columnId: string) => number | undefined;
+  resetColumnWidths: () => void;
 } {
   const [resizedWidths, setResizedWidths] = useState<ResizedWidths>(() => {
     if (!storageKey) return {};
@@ -62,17 +62,14 @@ export function useColumnResizing(storageKey: string | undefined): {
     }
   }, []);
 
-  const getResizedWidth = useCallback(
-    (columnId: string): number | undefined => {
-      return resizedWidths[columnId];
-    },
-    [resizedWidths],
-  );
+  const resetColumnWidths = useCallback(() => {
+    setResizedWidths({});
+  }, []);
 
   return {
     resizedWidths,
     setResizedWidth,
     setResizedWidths: batchSetResizedWidths,
-    getResizedWidth,
+    resetColumnWidths,
   };
 }
