@@ -6,8 +6,6 @@ import { usePersistedFilter } from "src/hooks/usePersistedFilter";
 import { render, wait } from "src/utils/rtl";
 
 describe("usePersistedFilter", () => {
-  beforeEach(() => sessionStorage.clear());
-
   it("initializes with no default values", async () => {
     // Given a singleFilter with no default value
     type StageFilter = FilterDefs<ProjectFilter>["stageSingle"];

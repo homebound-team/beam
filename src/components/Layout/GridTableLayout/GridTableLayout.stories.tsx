@@ -352,30 +352,40 @@ function getManyFilterDefs() {
 
 function getColumns() {
   const nameColumn = column<Row>({
+    id: "name-col",
+    name: "Name",
     header: () => "Name",
     parent: (row) => ({ content: row.name, value: row.name }),
     data: (row) => row.name,
     mw: "200px",
   });
   const valueColumn = numericColumn<Row>({
+    id: "value-col",
+    name: "Value",
     header: () => "Value",
     parent: (row) => ({ content: row.value, value: row.value }),
     data: (row) => row.value,
     mw: "100px",
   });
   const statusColumn = column<Row>({
+    id: "status-col",
+    name: "Status",
     header: () => "Status",
     parent: (row) => ({ content: row.status, value: row.status }),
     data: (row) => row.status,
     mw: "100px",
   });
   const priorityColumn = numericColumn<Row>({
+    id: "priority-col",
+    name: "Priority",
     header: () => "Priority",
     parent: (row) => ({ content: row.priority, value: row.priority }),
     data: (row) => row.priority,
     mw: "100px",
   });
   const actionColumn = column<Row>({
+    id: "action-col",
+    name: "Action",
     header: () => "Action",
     parent: () => ({ content: <div>Actions</div>, value: "" }),
     data: () => <div>Actions</div>,
