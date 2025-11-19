@@ -274,10 +274,14 @@ export class TableState<R extends Kinded> {
 }
 
 /** Provides a context for rows to access their table's `TableState`. */
-export const TableStateContext = React.createContext<{ tableState: TableState<any> }>({
+export const TableStateContext = React.createContext<{
+  tableState: TableState<any>;
+  tableContainerRef?: React.MutableRefObject<HTMLElement | null>;
+}>({
   get tableState(): TableState<any> {
     throw new Error("No TableStateContext provider");
   },
+  tableContainerRef: undefined,
 });
 
 // Exported for testing purposes
