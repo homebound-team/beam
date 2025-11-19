@@ -9,15 +9,7 @@ import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
-import { useGroupBy, usePersistedFilter, UsePersistedFilterProps } from "src/hooks";
-import {
-  useBreakpoint,
-  useComputed,
-  useGroupBy,
-  usePersistedFilter,
-  UsePersistedFilterProps,
-  useSessionStorage,
-} from "src/hooks";
+import { useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
 import { TextField } from "src/inputs/TextField";
 import { useTestIds } from "src/utils";
 import { useDebounce } from "use-debounce";
@@ -129,8 +121,6 @@ function GridTableLayoutComponent<
   const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns;
   const isVirtualized = tableProps.as === "virtual";
 
-  const breakpoints = useBreakpoint();
-
   // Sync API changes back to persisted state when persistedColumns is provided
   const visibleColumnIds = useComputed(() => api.getVisibleColumnIds(), [api]);
   useEffect(() => {
@@ -159,19 +149,8 @@ function GridTableLayoutComponent<
               filter={layoutState.filter}
               onChange={layoutState.setFilter}
               groupBy={layoutState.groupBy}
-        <TableActions onlyRight={!layoutState?.search && hasHideableColumns}>
-          <div css={Css.df.gap1.$}>
-            {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
-            {layoutState?.filterDefs && (
-              <Filters
-                filterDefs={layoutState.filterDefs}
-                filter={layoutState.filter}
-                onChange={layoutState.setFilter}
-                groupBy={layoutState.groupBy}
-                numberOfInlineFilters={breakpoints.mdAndDown ? 2 : undefined}
-              />
-            )}
-          </div>
+            />
+          )}
           {hasHideableColumns && (
             <EditColumnsButton
               columns={columns}
