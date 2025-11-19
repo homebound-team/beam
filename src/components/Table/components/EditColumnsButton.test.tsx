@@ -6,7 +6,7 @@ import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi
 import { GridColumn } from "src/components/Table/types";
 import { actionColumn, column } from "src/components/Table/utils/columns";
 import { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
-import { click, render, wait } from "src/utils/rtl";
+import { click, render } from "src/utils/rtl";
 
 describe("EditColumnsButton", () => {
   const columns: GridColumn<Row>[] = [
@@ -126,9 +126,7 @@ describe("EditColumnsButton", () => {
     expect(api.current!.getVisibleColumnIds()).toEqual(["name", "value", "actions"]);
     // When deselect all hideable columns via the switches
     click(r.columns_optionname);
-    await wait();
     click(r.columns_optionvalue);
-    await wait();
     // Then only non-hideable columns remain visible (actions column always visible since canHide: false)
     expect(api.current!.getVisibleColumnIds()).toEqual(["actions"]);
   });
