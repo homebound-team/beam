@@ -14,3 +14,4 @@ export * from "./Filters";
 export { toggleFilter } from "./ToggleFilter";
 export * from "./types";
 export * from "./utils";
+export { FilterDropdownMenu } from "./FilterDropdownMenu";

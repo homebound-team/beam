@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, ButtonProps } from "src/components/Button";
-import { Filters } from "src/components/Filters/Filters";
+import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
 import { Icon } from "src/components/Icon";
 import { GridDataRow } from "src/components/Table";
 import { GridTable, GridTableProps } from "src/components/Table/GridTable";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
-import { useBreakpoint, useGroupBy, usePersistedFilter, UsePersistedFilterProps } from "src/hooks";
+import { useGroupBy, usePersistedFilter, UsePersistedFilterProps } from "src/hooks";
 import { TextField } from "src/inputs/TextField";
 import { useTestIds } from "src/utils";
 import { useDebounce } from "use-debounce";
@@ -95,8 +95,6 @@ function GridTableLayoutComponent<
   const showTableActions = layoutState?.filterDefs || layoutState?.search;
   const isVirtualized = tableProps.as === "virtual";
 
-  const breakpoints = useBreakpoint();
-
   return (
     <>
       <Header
@@ -107,15 +105,14 @@ function GridTableLayoutComponent<
         tertiaryAction={tertiaryAction}
       />
       {showTableActions && (
-        <TableActions onlyRight={!layoutState?.search}>
+        <TableActions onlyLeft={!!(layoutState?.search && layoutState?.filterDefs)} onlyRight={!layoutState?.search}>
           {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
           {layoutState?.filterDefs && (
-            <Filters
+            <FilterDropdownMenu
               filterDefs={layoutState.filterDefs}
               filter={layoutState.filter}
               onChange={layoutState.setFilter}
               groupBy={layoutState.groupBy}
-              numberOfInlineFilters={breakpoints.mdAndDown ? 2 : undefined}
             />
           )}
         </TableActions>
