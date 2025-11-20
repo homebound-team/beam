@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Button, ButtonProps } from "src/components/Button";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
 import { Icon } from "src/components/Icon";
-import { GridDataRow } from "src/components/Table";
-import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
+import { EditColumnsButton, GridDataRow } from "src/components/Table";
 import { GridTable, GridTableProps } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
@@ -141,25 +140,28 @@ function GridTableLayoutComponent<
         tertiaryAction={tertiaryAction}
       />
       {showTableActions && (
-        <TableActions onlyLeft={!!(layoutState?.search && layoutState?.filterDefs)} onlyRight={!layoutState?.search}>
-          {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
-          {layoutState?.filterDefs && (
-            <FilterDropdownMenu
-              filterDefs={layoutState.filterDefs}
-              filter={layoutState.filter}
-              onChange={layoutState.setFilter}
-              groupBy={layoutState.groupBy}
-            />
-          )}
-          {hasHideableColumns && (
-            <EditColumnsButton
-              columns={columns}
-              api={api}
-              tooltip="Display columns"
-              trigger={{ icon: "kanban", label: "", variant: "secondaryBlack" }}
-              {...tid.editColumnsButton}
-            />
-          )}
+        <TableActions onlyLeft={!hasHideableColumns}>
+          <div css={Css.df.gap1.aic.fww.$}>
+            {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
+            {layoutState?.filterDefs && (
+              <FilterDropdownMenu
+                filterDefs={layoutState.filterDefs}
+                filter={layoutState.filter}
+                onChange={layoutState.setFilter}
+                groupBy={layoutState.groupBy}
+              />
+            )}
+
+            {hasHideableColumns && (
+              <EditColumnsButton
+                columns={columns}
+                api={api}
+                tooltip="Display columns"
+                trigger={{ icon: "kanban", label: "", variant: "secondaryBlack" }}
+                {...tid.editColumnsButton}
+              />
+            )}
+          </div>
         </TableActions>
       )}
       <ScrollableContent virtualized={isVirtualized}>

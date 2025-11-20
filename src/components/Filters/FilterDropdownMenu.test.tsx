@@ -83,7 +83,7 @@ describe("FilterDropdownMenu", () => {
     expect(r.filterValue).toHaveTextContent("{}");
   });
 
-  it("shows expand button when more than 6 chips", async () => {
+  it("shows all chips with wrapping", async () => {
     type TestFilter = { tags?: string[] };
     const r = await render(
       <TestFilterDropdownMenu<TestFilter>
@@ -107,20 +107,15 @@ describe("FilterDropdownMenu", () => {
       />,
     );
 
-    // Should show first 6 chips
+    // All chips should be visible
     expect(r.filterDropdown_chip_tags_one).toBeInTheDocument();
     expect(r.filterDropdown_chip_tags_two).toBeInTheDocument();
     expect(r.filterDropdown_chip_tags_three).toBeInTheDocument();
     expect(r.filterDropdown_chip_tags_four).toBeInTheDocument();
     expect(r.filterDropdown_chip_tags_five).toBeInTheDocument();
     expect(r.filterDropdown_chip_tags_six).toBeInTheDocument();
-
-    // Seventh and eighth chips should not be visible
-    expect(r.queryByTestId("filterDropdown_chip_tags_seven")).not.toBeInTheDocument();
-    expect(r.queryByTestId("filterDropdown_chip_tags_eight")).not.toBeInTheDocument();
-
-    // Should show expand button
-    expect(r.filterDropdown_showMoreChips).toBeInTheDocument();
+    expect(r.filterDropdown_chip_tags_seven).toBeInTheDocument();
+    expect(r.filterDropdown_chip_tags_eight).toBeInTheDocument();
   });
 
   it("renders checkbox filters after non-checkbox filters", async () => {

@@ -11,7 +11,6 @@ import {
   updateFilter,
 } from "src/components/Filters";
 import { Icon } from "src/components/Icon";
-import { IconButton } from "src/components/IconButton";
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
 import { Value } from "src/inputs/Value";
@@ -34,7 +33,6 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
   const testId = useTestIds(props, "filterDropdown");
 
   const [isOpen, setIsOpen] = useState(false);
-  const [showAllChips, setShowAllChips] = useState(false);
 
   // Calculate the number of active filters for badge count
   const activeFilterCount = useMemo(() => getActiveFilterCount(filter), [filter]);
@@ -101,29 +99,12 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
 
     if (chips.length === 0) return null;
 
-    // Show only first 6 chips if not expanded
-    const MAX_VISIBLE_CHIPS = 6;
-    const hasMoreChips = chips.length > MAX_VISIBLE_CHIPS;
-    const visibleChips = showAllChips || !hasMoreChips ? chips : chips.slice(0, MAX_VISIBLE_CHIPS);
-
-    return (
-      <div css={Css.w100.df.gap1.mt1.add("flexWrap", "wrap").$}>
-        {visibleChips}
-        {hasMoreChips && (
-          <IconButton
-            icon={showAllChips ? "chevronUp" : "chevronDown"}
-            onClick={() => setShowAllChips(!showAllChips)}
-            {...testId.showMoreChips}
-          />
-        )}
-      </div>
-    );
+    return <div css={Css.w100.df.gap1.fww.order(1).$}>{chips}</div>;
   };
 
   return (
     <>
-      {/* Filter button with badge */}
-      <div {...testId}>
+      <div>
         <Button
           label="Filter"
           icon="filter"
@@ -142,7 +123,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
 
       {/* When open, show all filter controls in a new row below */}
       {isOpen && (
-        <div css={Css.w100.df.aic.fww.gap1.$}>
+        <div css={Css.w100.df.aic.fww.gap1.order(1).$}>
           {renderGroupByField(groupBy)}
 
           {/* Render all filters (non-checkbox first, then checkbox) */}
