@@ -9,6 +9,7 @@ export { treeFilter } from "src/components/Filters/TreeFilter";
 export { BaseFilter } from "./BaseFilter";
 export { booleanFilter } from "./BooleanFilter";
 export { checkboxFilter } from "./CheckboxFilter";
+export { FilterDropdownMenu } from "./FilterDropdownMenu";
 export * from "./FilterModal";
 export * from "./Filters";
 export { toggleFilter } from "./ToggleFilter";

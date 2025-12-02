@@ -1,10 +1,19 @@
 import { memo, useMemo } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
-import { Filter, FilterDefs, FilterImpls, FilterModal, filterTestIdPrefix, updateFilter } from "src/components/Filters";
+import {
+  buildFilterImpls,
+  Filter,
+  FilterDefs,
+  FilterImpls,
+  FilterModal,
+  filterTestIdPrefix,
+  GroupByConfig,
+  renderGroupByField,
+  updateFilter,
+} from "src/components/Filters";
 import { useModal } from "src/components/Modal";
 import { Css } from "src/Css";
-import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { safeEntries, safeKeys, useTestIds } from "src/utils";
 
@@ -15,14 +24,7 @@ interface FilterProps<F extends Record<string, unknown>, G extends Value = strin
   filter: F;
   /** Called when the filters have changed. */
   onChange: (filter: F) => void;
-  groupBy?: {
-    /** The current group by value. */
-    value: G;
-    /** Called when the group by have changed. */
-    setValue: (groupBy: G) => void;
-    /** The list of group by options. */
-    options: Array<{ id: G; name: string }>;
-  };
+  groupBy?: GroupByConfig<G>;
   /** Specifies the layout of the filters. If not supplied it will use the default (horizontal) layout. Using the 'vertical' layout will also remove the "More Filters" button/modal */
   vertical?: boolean;
   /** Specifies the number of in line filters before more filters modal  */
@@ -35,8 +37,8 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
 
   const { openModal } = useModal();
   const [pageFilters, modalFilters] = useMemo(() => {
-    // Take the FilterDefs that have a `key => ...` factory and eval it
-    const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)]);
+    // Build all filter implementations
+    const impls = safeEntries(buildFilterImpls(filterDefs));
     // If we have more than numberOfInlineFilters depending on groupby,
     if (!vertical && impls.length > numberOfInlineFilters) {
       // Then return up to the numberOfInlineFilters, and the remainder in the modal.
@@ -51,22 +53,6 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
 
   const numModalFilters = safeKeys(modalFilters).filter((fk) => filter[fk] !== undefined).length;
 
-  const maybeGroupByField = groupBy ? (
-    <div>
-      <SelectField
-        label="Group by"
-        compact={!vertical}
-        labelStyle={!vertical ? "inline" : "above"}
-        sizeToContent={!vertical}
-        options={groupBy.options}
-        getOptionValue={(o) => o.id}
-        getOptionLabel={(o) => o.name}
-        value={groupBy.value}
-        onSelect={(g) => g && groupBy.setValue(g)}
-      />
-    </div>
-  ) : null;
-
   // Return list of filter components. `onSelect` should update the `filter`
   return (
     <div
@@ -75,7 +61,7 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
       }}
       {...testId}
     >
-      {maybeGroupByField}
+      {renderGroupByField(groupBy, vertical)}
 
       {safeEntries(pageFilters).map(([key, f]: [keyof F, Filter<any>]) => (
         <div key={key as string}>

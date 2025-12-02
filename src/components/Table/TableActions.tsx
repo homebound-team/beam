@@ -14,5 +14,5 @@ interface TableActionsProps<X> {
 export function TableActions<X extends Only<TableActionsXss, X>>(props: TableActionsProps<X>) {
   const { xss, children, onlyLeft, onlyRight } = props;
   const alignmentStyles = onlyLeft ? Css.jcfs.$ : onlyRight ? Css.jcfe.$ : Css.jcsb.$;
-  return <div css={{ ...Css.df.aic.pb2.gap1.$, ...xss, ...alignmentStyles }}>{children}</div>;
+  return <div css={{ ...Css.df.aic.fww.pb2.gap1.$, ...xss, ...alignmentStyles }}>{children}</div>;
 }
