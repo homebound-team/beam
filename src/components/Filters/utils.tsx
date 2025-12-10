@@ -31,7 +31,7 @@ export function getActiveFilterCount<F extends Record<string, unknown>>(filter: 
 }
 
 /** Render the Group By select field */
-export function renderGroupByField<G extends Value = string>(
+export function maybeRenderGroupByField<G extends Value = string>(
   groupBy: GroupByConfig<G> | undefined,
   vertical: boolean = false,
 ): JSX.Element | null {

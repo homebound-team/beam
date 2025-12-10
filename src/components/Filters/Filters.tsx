@@ -9,7 +9,7 @@ import {
   FilterModal,
   filterTestIdPrefix,
   GroupByConfig,
-  renderGroupByField,
+  maybeRenderGroupByField,
   updateFilter,
 } from "src/components/Filters";
 import { useModal } from "src/components/Modal";
@@ -61,7 +61,7 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
       }}
       {...testId}
     >
-      {renderGroupByField(groupBy, vertical)}
+      {maybeRenderGroupByField(groupBy, vertical)}
 
       {safeEntries(pageFilters).map(([key, f]: [keyof F, Filter<any>]) => (
         <div key={key as string}>
