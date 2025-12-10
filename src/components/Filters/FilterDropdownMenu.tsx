@@ -145,12 +145,11 @@ function FilterChips<F extends Record<string, unknown>>({
     onChange(updateFilter(filter, key, newArray.length > 0 ? (newArray as any) : undefined));
   };
 
-  const chips = safeEntries(filterImpls).flatMap(([key, filterImpl]) => {
+  const chips = safeEntries(filterImpls).flatMap(([key]) => {
     const value = filter[key];
     if (value === undefined || value === null) return [];
 
-    // Use getValueLabel if available, otherwise fall back to string conversion
-    const getLabel = (v: unknown) => filterImpl.getValueLabel?.(v) ?? String(v);
+    const getLabel = (v: unknown) => String(v);
 
     if (Array.isArray(value)) {
       return value.map((item) => {
