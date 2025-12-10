@@ -8,11 +8,11 @@ import {
   FilterModal,
   filterTestIdPrefix,
   GroupByConfig,
-  maybeRenderGroupByField,
   updateFilter,
 } from "src/components/Filters";
 import { useModal } from "src/components/Modal";
 import { Css } from "src/Css";
+import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { safeEntries, safeKeys, useTestIds } from "src/utils";
 
@@ -36,8 +36,8 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
 
   const { openModal } = useModal();
   const [pageFilters, modalFilters] = useMemo(() => {
-    // Build filter implementations as entries directly
-    const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)] as const);
+    // Take the FilterDefs that have a `key => ...` factory and eval it
+    const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)]);
     // If we have more than numberOfInlineFilters depending on groupby,
     if (!vertical && impls.length > numberOfInlineFilters) {
       // Then return up to the numberOfInlineFilters, and the remainder in the modal.
@@ -52,6 +52,22 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
 
   const numModalFilters = safeKeys(modalFilters).filter((fk) => filter[fk] !== undefined).length;
 
+  const maybeGroupByField = groupBy ? (
+    <div>
+      <SelectField
+        label="Group by"
+        compact={!vertical}
+        labelStyle={!vertical ? "inline" : "above"}
+        sizeToContent={!vertical}
+        options={groupBy.options}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+        value={groupBy.value}
+        onSelect={(g) => g && groupBy.setValue(g)}
+      />
+    </div>
+  ) : null;
+
   // Return list of filter components. `onSelect` should update the `filter`
   return (
     <div
@@ -60,7 +76,7 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
       }}
       {...testId}
     >
-      {maybeRenderGroupByField(groupBy, vertical)}
+      {maybeGroupByField}
 
       {safeEntries(pageFilters).map(([key, f]: [keyof F, Filter<any>]) => (
         <div key={key as string}>

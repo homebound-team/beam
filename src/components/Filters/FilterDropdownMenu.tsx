@@ -7,12 +7,12 @@ import {
   FilterDefs,
   getActiveFilterCount,
   GroupByConfig,
-  maybeRenderGroupByField,
   updateFilter,
 } from "src/components/Filters";
 import { Icon } from "src/components/Icon";
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
+import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { safeEntries, useTestIds } from "src/utils";
 
@@ -83,7 +83,19 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
       {/* When open, show all filter controls in a new row below */}
       {isOpen && (
         <div css={Css.df.aic.fww.gap1.order(1).$}>
-          {maybeRenderGroupByField(groupBy)}
+          {groupBy && (
+            <SelectField
+              label="Group by"
+              compact
+              labelStyle="inline"
+              sizeToContent
+              options={groupBy.options}
+              getOptionValue={(o) => o.id}
+              getOptionLabel={(o) => o.name}
+              value={groupBy.value}
+              onSelect={(g) => g && groupBy.setValue(g)}
+            />
+          )}
 
           {/* Render all filters (non-checkbox first, then checkbox) */}
           {renderFilters()}
@@ -133,40 +145,36 @@ function FilterChips<F extends Record<string, unknown>>({
     onChange(updateFilter(filter, key, newArray.length > 0 ? (newArray as any) : undefined));
   };
 
-  const chips = safeEntries(filter)
-    .filter(([_, value]) => value !== undefined && value !== null)
-    .flatMap(([key]) => {
-      const filterImpl = filterImpls[key as keyof F];
-      if (!filterImpl) return [];
+  const chips = safeEntries(filterImpls).flatMap(([key, filterImpl]) => {
+    const value = filter[key];
+    if (value === undefined || value === null) return [];
 
-      const value = filter[key];
+    // Use getValueLabel if available, otherwise fall back to string conversion
+    const getLabel = (v: unknown) => filterImpl.getValueLabel?.(v) ?? String(v);
 
-      // Use getValueLabel if available, otherwise fall back to string conversion
-      const getLabel = (v: unknown) => filterImpl.getValueLabel?.(v) ?? String(v);
+    if (Array.isArray(value)) {
+      return value.map((item) => {
+        const chipKey = `${String(key)}_${item}`;
+        return (
+          <ToggleChip
+            key={chipKey}
+            text={getLabel(item)}
+            onClick={() => removeArrayFilterItem(key, item)}
+            {...testId[`chip_${chipKey}`]}
+          />
+        );
+      });
+    }
 
-      if (Array.isArray(value)) {
-        return value.map((item) => {
-          const chipKey = `${String(key)}_${item}`;
-          return (
-            <ToggleChip
-              key={chipKey}
-              text={getLabel(item)}
-              onClick={() => removeArrayFilterItem(key as keyof F, item)}
-              {...testId[`chip_${chipKey}`]}
-            />
-          );
-        });
-      }
-
-      return (
-        <ToggleChip
-          key={String(key)}
-          text={getLabel(value)}
-          onClick={() => removeSingleFilter(key as keyof F)}
-          {...testId[`chip_${String(key)}`]}
-        />
-      );
-    });
+    return (
+      <ToggleChip
+        key={String(key)}
+        text={getLabel(value)}
+        onClick={() => removeSingleFilter(key)}
+        {...testId[`chip_${String(key)}`]}
+      />
+    );
+  });
 
   if (chips.length === 0) return null;
 
