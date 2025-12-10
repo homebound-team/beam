@@ -82,7 +82,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
 
       {/* When open, show all filter controls in a new row below */}
       {isOpen && (
-        <div css={Css.df.aic.fww.gap1.order(1).$}>
+        <div css={Css.df.aic.fww.gap1.order(1).w100.$}>
           {groupBy && (
             <SelectField
               label="Group by"
@@ -168,7 +168,7 @@ function FilterChips<F extends Record<string, unknown>>({
   if (chips.length === 0) return null;
 
   return (
-    <div css={Css.df.gap1.fww.aic.order(1).w100.$}>
+    <div css={Css.df.gap1.fww.aic.order(1).$}>
       {chips}
       <Button label="Clear" variant="tertiary" onClick={onClear} {...testId.clearBtn} />
     </div>
