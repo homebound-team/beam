@@ -326,9 +326,9 @@ function getManyFilterDefs() {
     }),
     assignee: multiFilter({
       options: [
-        { label: "John Doe", value: "john" },
-        { label: "Jane Smith", value: "jane" },
-        { label: "Bob Johnson", value: "bob" },
+        { label: "John Doe", value: "john doe" },
+        { label: "Jane Smith", value: "jane smith" },
+        { label: "Bob Johnson", value: "bob johnson" },
       ],
       getOptionLabel: (a) => a.label,
       getOptionValue: (a) => a.value,

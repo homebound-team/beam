@@ -7,7 +7,7 @@ import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
 import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
-import { safeEntries, safeKeys, useTestIds } from "src/utils";
+import { isDefined, safeEntries, safeKeys, useTestIds } from "src/utils";
 
 /**
  * FilterDropdownMenu is a newer filter UI pattern that shows a "Filter" button
@@ -138,7 +138,7 @@ function FilterChips<F extends Record<string, unknown>>({
 }: FilterChipsProps<F>) {
   const chips = safeEntries(filterImpls).flatMap(([key]) => {
     const value = filter[key];
-    if (value === undefined || value === null) return [];
+    if (!isDefined(value)) return [];
 
     if (Array.isArray(value)) {
       return value.map((item) => {
@@ -147,7 +147,7 @@ function FilterChips<F extends Record<string, unknown>>({
         return (
           <ToggleChip
             key={chipKey}
-            text={String(item)}
+            text={titleCase(String(item))}
             onClick={() => onChange(updateFilter(filter, key, newArray.length > 0 ? (newArray as any) : undefined))}
             {...testId[`chip_${chipKey}`]}
           />
@@ -158,7 +158,7 @@ function FilterChips<F extends Record<string, unknown>>({
     return (
       <ToggleChip
         key={String(key)}
-        text={String(value)}
+        text={titleCase(String(value))}
         onClick={() => onChange(updateFilter(filter, key, undefined))}
         {...testId[`chip_${String(key)}`]}
       />
@@ -178,6 +178,14 @@ function FilterChips<F extends Record<string, unknown>>({
 /** Convert FilterDefs to FilterImpls by evaluating the factory functions */
 function buildFilterImpls<F extends Record<string, unknown>>(filterDefs: FilterDefs<F>): FilterImpls<F> {
   return Object.fromEntries(safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)])) as FilterImpls<F>;
+}
+
+/** Capitalize the first letter of each word */
+function titleCase(str: string): string {
+  return str
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 /** Calculate the number of active (non-undefined) filters */
