@@ -1,20 +1,31 @@
 import { memo, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
-import {
-  buildFilterImpls,
-  Filter,
-  FilterDefs,
-  getActiveFilterCount,
-  GroupByConfig,
-  updateFilter,
-} from "src/components/Filters";
+import { Filter, FilterDefs, FilterImpls } from "src/components/Filters";
 import { Icon } from "src/components/Icon";
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
 import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
-import { safeEntries, useTestIds } from "src/utils";
+import { omitKey, safeEntries, safeKeys, useTestIds } from "src/utils";
+
+function updateFilter<F, K extends keyof F>(currentFilter: F, key: K, value: F[K] | undefined): F {
+  if (value === undefined) {
+    return omitKey(key, currentFilter);
+  } else {
+    return { ...currentFilter, [key]: value };
+  }
+}
+
+/** Convert FilterDefs to FilterImpls by evaluating the factory functions */
+function buildFilterImpls<F extends Record<string, unknown>>(filterDefs: FilterDefs<F>): FilterImpls<F> {
+  return Object.fromEntries(safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)])) as FilterImpls<F>;
+}
+
+/** Calculate the number of active (non-undefined) filters */
+function getActiveFilterCount<F extends Record<string, unknown>>(filter: F): number {
+  return safeKeys(filter).filter((key) => filter[key] !== undefined).length;
+}
 
 /**
  * FilterDropdownMenu is a newer filter UI pattern that shows a "Filter" button
@@ -31,7 +42,14 @@ interface FilterDropdownMenuProps<F extends Record<string, unknown>, G extends V
   filter: F;
   /** Called when the filters have changed. */
   onChange: (filter: F) => void;
-  groupBy?: GroupByConfig<G>;
+  groupBy?: {
+    /** The current group by value. */
+    value: G;
+    /** Called when the group by have changed. */
+    setValue: (groupBy: G) => void;
+    /** The list of group by options. */
+    options: Array<{ id: G; name: string }>;
+  };
 }
 
 function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value = string>(

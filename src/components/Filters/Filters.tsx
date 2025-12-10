@@ -1,15 +1,7 @@
 import { memo, useMemo } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
-import {
-  Filter,
-  FilterDefs,
-  FilterImpls,
-  FilterModal,
-  filterTestIdPrefix,
-  GroupByConfig,
-  updateFilter,
-} from "src/components/Filters";
+import { Filter, FilterDefs, FilterImpls, FilterModal, filterTestIdPrefix, updateFilter } from "src/components/Filters";
 import { useModal } from "src/components/Modal";
 import { Css } from "src/Css";
 import { SelectField } from "src/inputs/SelectField";
@@ -23,7 +15,14 @@ interface FilterProps<F extends Record<string, unknown>, G extends Value = strin
   filter: F;
   /** Called when the filters have changed. */
   onChange: (filter: F) => void;
-  groupBy?: GroupByConfig<G>;
+  groupBy?: {
+    /** The current group by value. */
+    value: G;
+    /** Called when the group by have changed. */
+    setValue: (groupBy: G) => void;
+    /** The list of group by options. */
+    options: Array<{ id: G; name: string }>;
+  };
   /** Specifies the layout of the filters. If not supplied it will use the default (horizontal) layout. Using the 'vertical' layout will also remove the "More Filters" button/modal */
   vertical?: boolean;
   /** Specifies the number of in line filters before more filters modal  */

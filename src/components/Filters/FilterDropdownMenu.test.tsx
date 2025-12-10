@@ -3,7 +3,6 @@ import { click, render } from "src/utils/rtl";
 import { FilterDropdownMenu } from "./FilterDropdownMenu";
 import { singleFilter } from "./SingleFilter";
 import { FilterDefs } from "./types";
-import { GroupByConfig } from "./utils";
 
 describe("FilterDropdownMenu", () => {
   it("shows filters when button is clicked", async () => {
@@ -53,7 +52,7 @@ describe("FilterDropdownMenu", () => {
 
     // Chip should be visible when dropdown is closed
     expect(r.filter_chip_status).toBeInTheDocument();
-    expect(r.filter_chip_status).toHaveTextContent("Active");
+    expect(r.filter_chip_status).toHaveTextContent("active");
   });
 
   it("removes filter when chip is clicked", async () => {
@@ -85,7 +84,11 @@ describe("FilterDropdownMenu", () => {
 function TestFilterDropdownMenu<F extends Record<string, unknown>>(props: {
   filterDefs: FilterDefs<F>;
   initialFilter?: F;
-  groupBy?: GroupByConfig;
+  groupBy?: {
+    value: string;
+    setValue: (groupBy: string) => void;
+    options: Array<{ id: string; name: string }>;
+  };
 }) {
   const [filter, setFilter] = useState<F>(props.initialFilter || ({} as F));
   return (
