@@ -46,13 +46,13 @@ describe("FilterDropdownMenu", () => {
             getOptionLabel: (o) => o.name,
           }),
         }}
-        initialFilter={{ status: "active" }}
+        initialFilter={{ status: "Active" }}
       />,
     );
 
     // Chip should be visible when dropdown is closed
     expect(r.filter_chip_status).toBeInTheDocument();
-    expect(r.filter_chip_status).toHaveTextContent("active");
+    expect(r.filter_chip_status).toHaveTextContent("Active");
   });
 
   it("removes filter when chip is clicked", async () => {
