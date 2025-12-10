@@ -43,9 +43,9 @@ export function GridTableLayout() {
         ]}
         layoutState={layoutState}
         tableProps={{
-          columns,
+          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
           rows: [simpleHeader, ...makeNestedRows(3)],
-          sorting: { on: "client", initial: [columns[3].id!, "ASC"] },
+          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
         }}
         primaryAction={{ label: "Primary Action", onClick: noop }}
         secondaryAction={{ label: "Secondary Action", onClick: noop }}
@@ -145,13 +145,13 @@ export function QueryTableLayout() {
         ]}
         layoutState={layoutState}
         tableProps={{
-          columns,
+          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
           query,
           createRows: (data) => [
             simpleHeader,
             ...(data?.map((row) => ({ kind: "data" as const, id: row.id, data: row })) ?? []),
           ],
-          sorting: { on: "client", initial: [columns[3].id!, "ASC"] },
+          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
         }}
         primaryAction={{ label: "Primary Action", onClick: noop }}
       />
@@ -393,15 +393,7 @@ function getColumns() {
     w: "100px",
   });
 
-  return [
-    collapseColumn<Row>(),
-    selectColumn<Row>(),
-    nameColumn,
-    valueColumn,
-    statusColumn,
-    priorityColumn,
-    actionColumn,
-  ];
+  return [nameColumn, valueColumn, statusColumn, priorityColumn, actionColumn];
 }
 
 function makeNestedRows(repeat: number = 1): GridDataRow<Row>[] {
