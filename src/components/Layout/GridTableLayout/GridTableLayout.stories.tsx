@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react";
 import { useEffect, useMemo, useState } from "react";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { GridDataRow } from "src/components/Table";
-import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
+import { column, numericColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { noop } from "src/utils";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
@@ -43,7 +43,7 @@ export function GridTableLayout() {
         ]}
         layoutState={layoutState}
         tableProps={{
-          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
+          columns,
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
         }}
@@ -145,7 +145,7 @@ export function QueryTableLayout() {
         ]}
         layoutState={layoutState}
         tableProps={{
-          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
+          columns,
           query,
           createRows: (data) => [
             simpleHeader,
