@@ -1,31 +1,13 @@
 import { memo, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
-import { Filter, FilterDefs, FilterImpls } from "src/components/Filters";
+import { Filter, FilterDefs, FilterImpls, filterTestIdPrefix, updateFilter } from "src/components/Filters";
 import { Icon } from "src/components/Icon";
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
 import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
-import { omitKey, safeEntries, safeKeys, useTestIds } from "src/utils";
-
-function updateFilter<F, K extends keyof F>(currentFilter: F, key: K, value: F[K] | undefined): F {
-  if (value === undefined) {
-    return omitKey(key, currentFilter);
-  } else {
-    return { ...currentFilter, [key]: value };
-  }
-}
-
-/** Convert FilterDefs to FilterImpls by evaluating the factory functions */
-function buildFilterImpls<F extends Record<string, unknown>>(filterDefs: FilterDefs<F>): FilterImpls<F> {
-  return Object.fromEntries(safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)])) as FilterImpls<F>;
-}
-
-/** Calculate the number of active (non-undefined) filters */
-function getActiveFilterCount<F extends Record<string, unknown>>(filter: F): number {
-  return safeKeys(filter).filter((key) => filter[key] !== undefined).length;
-}
+import { safeEntries, safeKeys, useTestIds } from "src/utils";
 
 /**
  * FilterDropdownMenu is a newer filter UI pattern that shows a "Filter" button
@@ -56,7 +38,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
   props: FilterDropdownMenuProps<F, G>,
 ) {
   const { filter, onChange, filterDefs, groupBy } = props;
-  const testId = useTestIds(props, "filter");
+  const testId = useTestIds(props, filterTestIdPrefix);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -154,29 +136,19 @@ function FilterChips<F extends Record<string, unknown>>({
   onClear,
   testId,
 }: FilterChipsProps<F>) {
-  const removeSingleFilter = (key: keyof F) => {
-    onChange(updateFilter(filter, key, undefined));
-  };
-
-  const removeArrayFilterItem = (key: keyof F, itemToRemove: unknown) => {
-    const newArray = (filter[key] as any[]).filter((v) => v !== itemToRemove);
-    onChange(updateFilter(filter, key, newArray.length > 0 ? (newArray as any) : undefined));
-  };
-
   const chips = safeEntries(filterImpls).flatMap(([key]) => {
     const value = filter[key];
     if (value === undefined || value === null) return [];
 
-    const getLabel = (v: unknown) => String(v);
-
     if (Array.isArray(value)) {
       return value.map((item) => {
         const chipKey = `${String(key)}_${item}`;
+        const newArray = value.filter((v) => v !== item);
         return (
           <ToggleChip
             key={chipKey}
-            text={getLabel(item)}
-            onClick={() => removeArrayFilterItem(key, item)}
+            text={String(item)}
+            onClick={() => onChange(updateFilter(filter, key, newArray.length > 0 ? (newArray as any) : undefined))}
             {...testId[`chip_${chipKey}`]}
           />
         );
@@ -186,8 +158,8 @@ function FilterChips<F extends Record<string, unknown>>({
     return (
       <ToggleChip
         key={String(key)}
-        text={getLabel(value)}
-        onClick={() => removeSingleFilter(key)}
+        text={String(value)}
+        onClick={() => onChange(updateFilter(filter, key, undefined))}
         {...testId[`chip_${String(key)}`]}
       />
     );
@@ -201,6 +173,16 @@ function FilterChips<F extends Record<string, unknown>>({
       <Button label="Clear" variant="tertiary" onClick={onClear} {...testId.clearBtn} />
     </div>
   );
+}
+
+/** Convert FilterDefs to FilterImpls by evaluating the factory functions */
+function buildFilterImpls<F extends Record<string, unknown>>(filterDefs: FilterDefs<F>): FilterImpls<F> {
+  return Object.fromEntries(safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)])) as FilterImpls<F>;
+}
+
+/** Calculate the number of active (non-undefined) filters */
+function getActiveFilterCount<F extends Record<string, unknown>>(filter: F): number {
+  return safeKeys(filter).filter((key) => filter[key] !== undefined).length;
 }
 
 // memo doesn't support generic parameters, so cast the result to the correct type
