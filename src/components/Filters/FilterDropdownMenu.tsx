@@ -88,24 +88,23 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
           {/* Render all filters (non-checkbox first, then checkbox) */}
           {renderFilters()}
 
+          {/* Clear button at end of filter controls */}
           {activeFilterCount > 0 && (
-            <div>
-              <Button
-                label="Clear"
-                variant="tertiary"
-                onClick={() => {
-                  onChange({} as F);
-                  setIsOpen(false);
-                }}
-                {...testId.clearBtn}
-              />
-            </div>
+            <Button label="Clear" variant="tertiary" onClick={() => onChange({} as F)} {...testId.clearBtn} />
           )}
         </div>
       )}
 
-      {/* Filter chips shown below when dropdown is closed */}
-      {!isOpen && <FilterChips filter={filter} filterImpls={filterImpls} onChange={onChange} testId={testId} />}
+      {/* Filter chips (and clear button) shown when dropdown is closed */}
+      {!isOpen && (
+        <FilterChips
+          filter={filter}
+          filterImpls={filterImpls}
+          onChange={onChange}
+          onClear={() => onChange({} as F)}
+          testId={testId}
+        />
+      )}
     </>
   );
 }
@@ -114,6 +113,7 @@ interface FilterChipsProps<F extends Record<string, unknown>> {
   filter: F;
   filterImpls: ReturnType<typeof buildFilterImpls<F>>;
   onChange: (filter: F) => void;
+  onClear: () => void;
   testId: ReturnType<typeof useTestIds>;
 }
 
@@ -121,13 +121,14 @@ function FilterChips<F extends Record<string, unknown>>({
   filter,
   filterImpls,
   onChange,
+  onClear,
   testId,
 }: FilterChipsProps<F>) {
   const removeSingleFilter = (key: keyof F) => {
     onChange(updateFilter(filter, key, undefined));
   };
 
-  const removeArrayFilterItem = (key: keyof F, itemToRemove: any) => {
+  const removeArrayFilterItem = (key: keyof F, itemToRemove: unknown) => {
     const newArray = (filter[key] as any[]).filter((v) => v !== itemToRemove);
     onChange(updateFilter(filter, key, newArray.length > 0 ? (newArray as any) : undefined));
   };
@@ -140,13 +141,16 @@ function FilterChips<F extends Record<string, unknown>>({
 
       const value = filter[key];
 
+      // Use getValueLabel if available, otherwise fall back to string conversion
+      const getLabel = (v: unknown) => filterImpl.getValueLabel?.(v) ?? String(v);
+
       if (Array.isArray(value)) {
         return value.map((item) => {
           const chipKey = `${String(key)}_${item}`;
           return (
             <ToggleChip
               key={chipKey}
-              text={String(item).charAt(0).toUpperCase() + String(item).slice(1)}
+              text={getLabel(item)}
               onClick={() => removeArrayFilterItem(key as keyof F, item)}
               {...testId[`chip_${chipKey}`]}
             />
@@ -157,7 +161,7 @@ function FilterChips<F extends Record<string, unknown>>({
       return (
         <ToggleChip
           key={String(key)}
-          text={String(value).charAt(0).toUpperCase() + String(value).slice(1)}
+          text={getLabel(value)}
           onClick={() => removeSingleFilter(key as keyof F)}
           {...testId[`chip_${String(key)}`]}
         />
@@ -166,7 +170,12 @@ function FilterChips<F extends Record<string, unknown>>({
 
   if (chips.length === 0) return null;
 
-  return <div css={Css.df.gap1.fww.order(1).w100.$}>{chips}</div>;
+  return (
+    <div css={Css.df.gap1.fww.aic.order(1).w100.$}>
+      {chips}
+      <Button label="Clear" variant="tertiary" onClick={onClear} {...testId.clearBtn} />
+    </div>
+  );
 }
 
 // memo doesn't support generic parameters, so cast the result to the correct type

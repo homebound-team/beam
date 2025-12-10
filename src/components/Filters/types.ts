@@ -37,4 +37,7 @@ export interface Filter<V> {
     inModal: boolean,
     vertical: boolean,
   ): JSX.Element;
+
+  /** Returns a display label for a given filter value. Used for chips. */
+  getValueLabel?(value: unknown): string;
 }

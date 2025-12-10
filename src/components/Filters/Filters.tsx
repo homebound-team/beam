@@ -2,7 +2,6 @@ import { memo, useMemo } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
 import {
-  buildFilterImpls,
   Filter,
   FilterDefs,
   FilterImpls,
@@ -37,8 +36,8 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
 
   const { openModal } = useModal();
   const [pageFilters, modalFilters] = useMemo(() => {
-    // Build all filter implementations
-    const impls = safeEntries(buildFilterImpls(filterDefs));
+    // Build filter implementations as entries directly
+    const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)] as const);
     // If we have more than numberOfInlineFilters depending on groupby,
     if (!vertical && impls.length > numberOfInlineFilters) {
       // Then return up to the numberOfInlineFilters, and the remainder in the modal.

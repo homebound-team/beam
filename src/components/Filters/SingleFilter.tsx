@@ -18,6 +18,13 @@ export function singleFilter<O, V extends Key>(props: SingleFilterProps<O, V>): 
 const allOption = {} as any;
 
 class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, V>> implements Filter<V> {
+  getValueLabel(value: unknown): string {
+    const { options, getOptionValue, getOptionLabel } = this.props;
+    if (!Array.isArray(options)) return String(value);
+    const option = options.find((o) => getOptionValue(o) === value);
+    return option ? getOptionLabel(option) : String(value);
+  }
+
   render(
     value: V | undefined,
     setValue: (value: V | undefined) => void,

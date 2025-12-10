@@ -21,6 +21,13 @@ export function multiFilter<O, V extends Key>(props: MultiFilterProps<O, V>): (k
 }
 
 class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O, V>> implements Filter<V[]> {
+  getValueLabel(value: unknown): string {
+    const { options, getOptionValue, getOptionLabel } = this.props;
+    if (!Array.isArray(options)) return String(value);
+    const option = options.find((o) => getOptionValue(o) === value);
+    return option ? getOptionLabel(option) : String(value);
+  }
+
   render(
     value: V[] | undefined,
     setValue: (value: V[] | undefined) => void,
