@@ -1,4 +1,5 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
+import { useOverlay } from "react-aria";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
 import { Filter, FilterDefs, FilterImpls, filterTestIdPrefix, updateFilter } from "src/components/Filters";
@@ -41,6 +42,23 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
   const testId = useTestIds(props, filterTestIdPrefix);
 
   const [isOpen, setIsOpen] = useState(false);
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const filterContentRef = useRef<HTMLDivElement>(null);
+
+  // Handle click-outside to close the filter dropdown
+  const { overlayProps } = useOverlay(
+    {
+      isOpen,
+      onClose: () => setIsOpen(false),
+      isDismissable: true,
+      shouldCloseOnInteractOutside: (element) => {
+        // Don't close if clicking the trigger button (it handles toggle itself)
+        if (buttonRef.current?.contains(element)) return false;
+        return true;
+      },
+    },
+    filterContentRef,
+  );
 
   // Calculate the number of active filters for badge count
   const activeFilterCount = useMemo(() => getActiveFilterCount(filter), [filter]);
@@ -63,7 +81,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
 
   return (
     <>
-      <div>
+      <div ref={buttonRef}>
         <Button
           label="Filter"
           icon="filter"
@@ -74,7 +92,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
               <Icon icon={isOpen ? "chevronUp" : "chevronDown"} />
             </div>
           }
-          variant="secondary"
+          variant="secondaryBlack"
           onClick={() => setIsOpen(!isOpen)}
           {...testId.button}
         />
@@ -82,7 +100,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
 
       {/* When open, show all filter controls in a new row below */}
       {isOpen && (
-        <div css={Css.df.aic.fww.gap1.order(1).w100.$}>
+        <div ref={filterContentRef} {...overlayProps} css={Css.df.aic.fww.gap1.order(1).w100.$}>
           {groupBy && (
             <SelectField
               label="Group by"
