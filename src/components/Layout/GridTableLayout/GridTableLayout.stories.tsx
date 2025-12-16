@@ -95,6 +95,94 @@ export function QueryTableLayout() {
   );
 }
 
+export function WithPagination() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(), []);
+
+  // Pagination is always on by default - just pass totalCount to enable the bar
+  // Use pagination config only to customize page sizes or storage key
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey: "grid-table-layout-pagination",
+    },
+    search: "client",
+    pagination: {
+      pageSizes: [25, 50, 100, 500],
+      storageKey: "pagination-demo-pagesize",
+    },
+  });
+
+  return (
+    <TestProjectLayout>
+      <GridTableLayoutComponent
+        pageTitle="Grid Table With Pagination"
+        breadcrumb={[
+          { href: "/", label: "Home" },
+          { href: "/", label: "Product Offerings" },
+        ]}
+        layoutState={layoutState}
+        totalCount={543}
+        tableProps={{
+          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
+          rows: [simpleHeader, ...makeNestedRows(10)],
+          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+        }}
+        primaryAction={{ label: "Add Product", onClick: noop }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+export function QueryTableWithPagination() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(), []);
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey: "query-table-pagination",
+    },
+    search: "server",
+    pagination: {
+      pageSizes: [25, 50, 100],
+      storageKey: "query-pagination-pagesize",
+    },
+  });
+
+  // Simulate server-side pagination - in real usage, you'd pass layoutState.page to your query
+  const query = useExampleQuery({
+    filter: { ...layoutState.filter, search: layoutState.searchString, page: layoutState.page },
+  });
+
+  // In real usage, totalCount would come from your query response: data?.entities.pageInfo.totalCount
+  const totalCount = 250;
+
+  return (
+    <TestProjectLayout>
+      <GridTableLayoutComponent
+        pageTitle="Query Table With Pagination"
+        breadcrumb={[
+          { href: "/", label: "Home" },
+          { href: "/", label: "Server Data" },
+        ]}
+        layoutState={layoutState}
+        totalCount={totalCount}
+        tableProps={{
+          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
+          query,
+          createRows: (data) => [
+            simpleHeader,
+            ...(data?.map((row) => ({ kind: "data" as const, id: row.id, data: row })) ?? []),
+          ],
+          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+        }}
+        primaryAction={{ label: "Add Item", onClick: noop }}
+      />
+    </TestProjectLayout>
+  );
+}
+
 function useExampleQuery({ filter }: { filter: Record<string, unknown> }) {
   const filterString = JSON.stringify(filter);
 
