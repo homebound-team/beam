@@ -50,6 +50,7 @@ export function GridTableLayout() {
         primaryAction={{ label: "Primary Action", onClick: noop }}
         secondaryAction={{ label: "Secondary Action", onClick: noop }}
         tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
+        totalCount={100}
       />
     </TestProjectLayout>
   );
@@ -90,6 +91,7 @@ export function QueryTableLayout() {
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
         }}
         primaryAction={{ label: "Primary Action", onClick: noop }}
+        totalCount={100}
       />
     </TestProjectLayout>
   );
