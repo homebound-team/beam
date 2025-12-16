@@ -61,13 +61,13 @@ export type GridTableLayoutProps<
   pageTitle: string;
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
   breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
-  layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
+  layoutState: ReturnType<typeof useGridTableLayoutState<F>>;
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
-  /** Total count for pagination (from PageInfo.totalCount). When provided, the pagination bar is shown. */
-  totalCount?: number;
+  /** Total count for pagination (from PageInfo.totalCount). */
+  totalCount: number;
 };
 
 /**
@@ -154,8 +154,8 @@ function GridTableLayoutComponent<
     () => (tableProps.api as GridTableApiImpl<R>) ?? new GridTableApiImpl(),
     [tableProps.api],
   );
-  const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
-  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns;
+  const clientSearch = layoutState.search === "client" ? layoutState.searchString : undefined;
+  const showTableActions = layoutState.filterDefs || layoutState.search || hasHideableColumns;
   const isVirtualized = tableProps.as === "virtual";
 
   const breakpoints = useBreakpoint();
@@ -163,15 +163,12 @@ function GridTableLayoutComponent<
   // Sync API changes back to persisted state when persistedColumns is provided
   const visibleColumnIds = useComputed(() => api.getVisibleColumnIds(), [api]);
   useEffect(() => {
-    if (layoutState?.setVisibleColumnIds) {
+    if (layoutState.setVisibleColumnIds) {
       layoutState.setVisibleColumnIds(visibleColumnIds);
     }
   }, [visibleColumnIds, layoutState]);
 
-  const visibleColumnsStorageKey = layoutState?.persistedColumnsStorageKey;
-
-  // Show pagination when layoutState is provided and totalCount is available
-  const showPagination = layoutState && totalCount !== undefined;
+  const visibleColumnsStorageKey = layoutState.persistedColumnsStorageKey;
 
   return (
     <>
@@ -183,10 +180,10 @@ function GridTableLayoutComponent<
         tertiaryAction={tertiaryAction}
       />
       {showTableActions && (
-        <TableActions onlyRight={!layoutState?.search && hasHideableColumns}>
+        <TableActions onlyRight={!layoutState.search && hasHideableColumns}>
           <div css={Css.df.gap1.$}>
-            {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
-            {layoutState?.filterDefs && (
+            {layoutState.search && <SearchBox onSearch={layoutState.setSearchString} />}
+            {layoutState.filterDefs && (
               <Filters
                 filterDefs={layoutState.filterDefs}
                 filter={layoutState.filter}
@@ -227,14 +224,12 @@ function GridTableLayoutComponent<
             visibleColumnsStorageKey={visibleColumnsStorageKey}
           />
         )}
-        {showPagination && (
-          <Pagination
-            page={[layoutState.page, layoutState.setPage]}
-            totalCount={totalCount}
-            pageSizes={layoutState.pageSizes}
-            {...tid.pagination}
-          />
-        )}
+        <Pagination
+          page={[layoutState.page, layoutState.setPage]}
+          totalCount={totalCount}
+          pageSizes={layoutState.pageSizes}
+          {...tid.pagination}
+        />
       </ScrollableContent>
     </>
   );

@@ -62,6 +62,7 @@ describe("GridTableLayout", () => {
             columns,
             rows: [simpleHeader, ...rows],
           }}
+          totalCount={100}
           primaryAction={{ label: "Primary Action", onClick: noop }}
           secondaryAction={{ label: "Secondary Action", onClick: noop }}
           tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
@@ -129,6 +130,7 @@ describe("GridTableLayout", () => {
               ...(data?.map((row: Data & { id: string }) => ({ kind: "data", id: row.id, data: row })) ?? []),
             ],
           }}
+          totalCount={100}
           primaryAction={{ label: "Primary Action", onClick: noop }}
         />
       </QueryParamProvider>,
@@ -160,6 +162,7 @@ describe("GridTableLayout", () => {
             layoutStateProps={{}}
             pageTitle="Test"
             hideEditColumns={true}
+            totalCount={100}
             tableProps={{
               columns,
               rows: [simpleHeader, ...rows],
@@ -184,6 +187,7 @@ describe("GridTableLayout", () => {
             <TestWrapper
               layoutStateProps={{}}
               pageTitle="Test"
+              totalCount={100}
               tableProps={{
                 columns: columnsWithoutId,
                 rows: [simpleHeader, ...rows],
@@ -206,6 +210,7 @@ describe("GridTableLayout", () => {
             <TestWrapper
               layoutStateProps={{}}
               pageTitle="Test"
+              totalCount={100}
               tableProps={{
                 columns: columnsWithoutName,
                 rows: [simpleHeader, ...rows],
@@ -228,6 +233,7 @@ describe("GridTableLayout", () => {
             layoutStateProps={{}}
             pageTitle="Test"
             hideEditColumns={true}
+            totalCount={100}
             tableProps={{
               columns: columnsWithoutId,
               rows: [simpleHeader, ...rows],
@@ -267,27 +273,6 @@ describe("GridTableLayout", () => {
       // Then the pagination component is rendered
       expect(r.pagination).toBeInTheDocument();
       expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 100 of 500");
-    });
-
-    it("does not render pagination when totalCount is not provided", async () => {
-      // Given a GridTableLayout without totalCount
-      const r = await render(
-        <QueryParamProvider>
-          <TestWrapper
-            layoutStateProps={{}}
-            pageTitle="Test Without Pagination"
-            hideEditColumns
-            tableProps={{
-              columns,
-              rows: [simpleHeader, ...rows],
-            }}
-          />
-        </QueryParamProvider>,
-        withRouter(),
-      );
-
-      // Then the pagination component is not rendered
-      expect(r.query.pagination).not.toBeInTheDocument();
     });
 
     it("updates page state when clicking next", async () => {
