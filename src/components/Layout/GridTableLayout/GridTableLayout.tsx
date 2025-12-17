@@ -231,7 +231,12 @@ export type PaginationConfig = {
   storageKey?: string;
 };
 
-/** Manages filter, grouping, search, and pagination state for GridTableLayout. */
+/**
+ * A wrapper around standard filter, grouping, search, and pagination state hooks.
+ * * `client` search will use the built-in grid table search functionality.
+ * * `server` search will return `searchString` as a debounced search string to query the server.
+ * * Pagination is always enabled by default. Use `pagination` config to customize page sizes or storage key.
+ */
 export function useGridTableLayoutState<F extends Record<string, unknown>>({
   persistedFilter,
   persistedColumns,
@@ -243,7 +248,7 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
   persistedColumns?: { storageKey: string };
   search?: "client" | "server";
   groupBy?: Record<string, string>;
-  /** Optional configuration for pagination (page sizes, storage key). Pagination is always on by default. */
+  /** Customize pagination page sizes or storage key. Pagination is always enabled. */
   pagination?: PaginationConfig;
 }) {
   // Because we can't conditionally render a hook, we still call it with a fallback value.
@@ -271,18 +276,12 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     limit: persistedPageSize,
   });
 
-  // Update persisted page size when limit changes
-  useEffect(() => {
-    if (page.limit !== persistedPageSize) {
-      setPersistedPageSize(page.limit);
-    }
-  }, [page.limit, persistedPageSize, setPersistedPageSize]);
-
-  // Reset to first page when filters or search change
+  // Persist page size and reset to first page when filters/search change
   const filterString = JSON.stringify(filter);
   useEffect(() => {
+    if (page.limit !== persistedPageSize) setPersistedPageSize(page.limit);
     setPage((prev) => ({ ...prev, offset: 0 }));
-  }, [filterString, searchString]);
+  }, [page.limit, persistedPageSize, setPersistedPageSize, filterString, searchString]);
 
   return {
     filter,
