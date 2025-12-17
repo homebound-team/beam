@@ -63,7 +63,7 @@ export function QueryTableLayout() {
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
       filterDefs,
-      storageKey: "query-table-layout",
+      storageKey: "grid-table-layout",
     },
     search: "server",
     pagination: {
@@ -72,7 +72,8 @@ export function QueryTableLayout() {
     },
   });
 
-  // Server-side search and pagination - pass layoutState.page to your query
+  // In this example, we set up server-side search and pagination using the `searchString` and `page` from the layout state,
+  // in combination with the "QueryTable" behavior for loading/error states.
   const query = useExampleQuery({
     filter: { ...layoutState.filter, search: layoutState.searchString, page: layoutState.page },
   });
@@ -87,13 +88,13 @@ export function QueryTableLayout() {
         ]}
         layoutState={layoutState}
         tableProps={{
-          columns,
+          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
           query,
           createRows: (data) => [
             simpleHeader,
             ...(data?.map((row) => ({ kind: "data" as const, id: row.id, data: row })) ?? []),
           ],
-          sorting: { on: "client", initial: [columns[0].id!, "ASC"] },
+          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
         }}
         primaryAction={{ label: "Primary Action", onClick: noop }}
         totalCount={100}
