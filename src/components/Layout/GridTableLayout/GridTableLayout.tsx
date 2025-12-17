@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button, ButtonProps } from "src/components/Button";
+import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { Filters } from "src/components/Filters/Filters";
 import { Icon } from "src/components/Icon";
 import { GridDataRow } from "src/components/Table";
@@ -26,7 +27,9 @@ import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumb
 import { ScrollableContent } from "../ScrollableContent";
 import { QueryResult, QueryTable, QueryTableProps } from "./QueryTable";
 
-type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
+type ActionButtonMenuProps = { label: string } & Pick<ButtonMenuProps, "items" | "disabled" | "tooltip">;
+
+type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip"> | ActionButtonMenuProps;
 
 type OmittedTableProps = "filter" | "stickyHeader" | "style" | "rows";
 
@@ -276,13 +279,32 @@ function Header(props: HeaderProps) {
         </div>
         {/* Flex wrap reverse and justify flex end allows the buttons to wrap naturally/responsively on smaller screens */}
         <div css={Css.df.fwr.jcfe.gap1.$}>
-          {tertiaryAction && <Button {...tertiaryAction} variant="tertiary" />}
-          {secondaryAction && <Button {...secondaryAction} variant="secondary" />}
-          {primaryAction && <Button {...primaryAction} />}
+          {tertiaryAction &&
+            (isButtonMenuProps(tertiaryAction) ? (
+              <ButtonMenu {...tertiaryAction} trigger={{ label: tertiaryAction.label, variant: "tertiary" }} />
+            ) : (
+              <Button {...tertiaryAction} variant="tertiary" />
+            ))}
+          {secondaryAction &&
+            (isButtonMenuProps(secondaryAction) ? (
+              <ButtonMenu {...secondaryAction} trigger={{ label: secondaryAction.label, variant: "secondary" }} />
+            ) : (
+              <Button {...secondaryAction} variant="secondary" />
+            ))}
+          {primaryAction &&
+            (isButtonMenuProps(primaryAction) ? (
+              <ButtonMenu {...primaryAction} trigger={{ label: primaryAction.label, variant: "primary" }} />
+            ) : (
+              <Button {...primaryAction} />
+            ))}
         </div>
       </header>
     </FullBleed>
   );
+}
+
+function isButtonMenuProps(action: ActionButtonProps): action is ActionButtonMenuProps {
+  return "items" in action;
 }
 
 function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
