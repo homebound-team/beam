@@ -66,14 +66,35 @@ export type GridTableLayoutProps<
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
-  /** Total count for pagination (from PageInfo.totalCount). */
   totalCount: number;
 };
 
 /**
  * A layout component that combines a table with a header, actions buttons, filters, and pagination.
  *
- * Use `tableProps.rows` for static data, or `tableProps.query` + `tableProps.createRows` for Apollo queries.
+ * This component can render either a `GridTable` or wrapped `QueryTable` based on the provided props:
+ *
+ * - For static data or custom handled loading states, use `rows` to pass in the data directly:
+ * ```tsx
+ * <GridTableLayout
+ *   tableProps={{
+ *     rows: [...],
+ *     columns: [...],
+ *   }}
+ * />
+ * ```
+ *
+ * - To take advantage of data/loading/error states directly from an Apollo query, use `query` and `createRows`:
+ * ```tsx
+ * <GridTableLayout
+ *   tableProps={{
+ *     query,
+ *     createRows: (data) => [...],
+ *     columns: [...],
+ *   }}
+ * />
+ * ```
+ *
  * Pagination is always enabled - use `layoutState.page` for query variables.
  */
 function GridTableLayoutComponent<
@@ -274,7 +295,6 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     visibleColumnIds: persistedColumns ? visibleColumnIds : undefined,
     setVisibleColumnIds: persistedColumns ? setVisibleColumnIds : undefined,
     persistedColumnsStorageKey: persistedColumns?.storageKey,
-    // Pagination state - always available
     page,
     setPage,
     pageSizes: pagination?.pageSizes,

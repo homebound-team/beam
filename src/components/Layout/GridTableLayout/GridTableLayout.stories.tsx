@@ -58,19 +58,24 @@ export function GridTableLayout() {
 
 export function QueryTableLayout() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(), []);
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
       filterDefs,
-      storageKey: "grid-table-layout",
+      storageKey: "query-table-layout",
     },
     search: "server",
+    pagination: {
+      pageSizes: [25, 50, 100],
+      storageKey: "query-table-pagination",
+    },
   });
 
-  // In this example, we set up a server-side search that uses the `searchString` from the layout state.
-  // in combination with the "QueryTable" behavior for loading/error states.
-  const query = useExampleQuery({ filter: { ...layoutState.filter, search: layoutState.searchString } });
-  const columns = useMemo(() => getColumns(), []);
+  // Server-side search and pagination - pass layoutState.page to your query
+  const query = useExampleQuery({
+    filter: { ...layoutState.filter, search: layoutState.searchString, page: layoutState.page },
+  });
 
   return (
     <TestProjectLayout>
@@ -82,13 +87,13 @@ export function QueryTableLayout() {
         ]}
         layoutState={layoutState}
         tableProps={{
-          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
+          columns,
           query,
           createRows: (data) => [
             simpleHeader,
             ...(data?.map((row) => ({ kind: "data" as const, id: row.id, data: row })) ?? []),
           ],
-          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+          sorting: { on: "client", initial: [columns[0].id!, "ASC"] },
         }}
         primaryAction={{ label: "Primary Action", onClick: noop }}
         totalCount={100}
@@ -101,17 +106,15 @@ export function WithPagination() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
   const columns = useMemo(() => getColumns(), []);
 
-  // Pagination is always on by default - just pass totalCount to enable the bar
-  // Use pagination config only to customize page sizes or storage key
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
       filterDefs,
-      storageKey: "grid-table-layout-pagination",
+      storageKey: "grid-table-layout",
     },
     search: "client",
     pagination: {
       pageSizes: [25, 50, 100, 500],
-      storageKey: "pagination-demo-pagesize",
+      storageKey: "grid-table-pagination",
     },
   });
 
@@ -126,60 +129,11 @@ export function WithPagination() {
         layoutState={layoutState}
         totalCount={543}
         tableProps={{
-          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
+          columns,
           rows: [simpleHeader, ...makeNestedRows(10)],
-          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+          sorting: { on: "client", initial: [columns[0].id!, "ASC"] },
         }}
         primaryAction={{ label: "Add Product", onClick: noop }}
-      />
-    </TestProjectLayout>
-  );
-}
-
-export function QueryTableWithPagination() {
-  const filterDefs = useMemo(() => getFilterDefs(), []);
-  const columns = useMemo(() => getColumns(), []);
-
-  const layoutState = useGridTableLayoutState({
-    persistedFilter: {
-      filterDefs,
-      storageKey: "query-table-pagination",
-    },
-    search: "server",
-    pagination: {
-      pageSizes: [25, 50, 100],
-      storageKey: "query-pagination-pagesize",
-    },
-  });
-
-  // Simulate server-side pagination - in real usage, you'd pass layoutState.page to your query
-  const query = useExampleQuery({
-    filter: { ...layoutState.filter, search: layoutState.searchString, page: layoutState.page },
-  });
-
-  // In real usage, totalCount would come from your query response: data?.entities.pageInfo.totalCount
-  const totalCount = 250;
-
-  return (
-    <TestProjectLayout>
-      <GridTableLayoutComponent
-        pageTitle="Query Table With Pagination"
-        breadcrumb={[
-          { href: "/", label: "Home" },
-          { href: "/", label: "Server Data" },
-        ]}
-        layoutState={layoutState}
-        totalCount={totalCount}
-        tableProps={{
-          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
-          query,
-          createRows: (data) => [
-            simpleHeader,
-            ...(data?.map((row) => ({ kind: "data" as const, id: row.id, data: row })) ?? []),
-          ],
-          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
-        }}
-        primaryAction={{ label: "Add Item", onClick: noop }}
       />
     </TestProjectLayout>
   );
