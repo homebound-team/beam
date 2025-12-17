@@ -61,7 +61,7 @@ export type GridTableLayoutProps<
   pageTitle: string;
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
   breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
-  layoutState: ReturnType<typeof useGridTableLayoutState<F>>;
+  layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
@@ -73,54 +73,8 @@ export type GridTableLayoutProps<
 /**
  * A layout component that combines a table with a header, actions buttons, filters, and pagination.
  *
- * This component can render either a `GridTable` or wrapped `QueryTable` based on the provided props:
- *
- * - For static data or custom handled loading states, use `rows` to pass in the data directly:
- * ```tsx
- * <GridTableLayout
- *   tableProps={{
- *     rows: [...],
- *     columns: [...],
- *   }}
- * />
- * ```
- *
- * - To take advantage of data/loading/error states directly from an Apollo query, use `query` and `createRows`:
- * ```tsx
- * <GridTableLayout
- *   tableProps={{
- *     query,
- *     createRows: (data) => [...],
- *     columns: [...],
- *   }}
- * />
- * ```
- *
- * - Pagination is always on by default. Pass `totalCount` to enable the pagination bar:
- * ```tsx
- * const layoutState = useGridTableLayoutState({ ... });
- *
- * // Use layoutState.page for your query variables
- * const { data } = useMyQuery({
- *   variables: { page: layoutState.page } // { offset: 0, limit: 100 }
- * });
- *
- * <GridTableLayout
- *   layoutState={layoutState}
- *   totalCount={data?.myEntities.pageInfo.totalCount}
- *   tableProps={{ query, createRows, columns }}
- * />
- * ```
- *
- * - To customize page sizes or storage key, use the `pagination` config:
- * ```tsx
- * const layoutState = useGridTableLayoutState({
- *   pagination: {
- *     pageSizes: [25, 50, 100],
- *     storageKey: "my-table-pagination",
- *   },
- * });
- * ```
+ * Use `tableProps.rows` for static data, or `tableProps.query` + `tableProps.createRows` for Apollo queries.
+ * Pagination is always enabled - use `layoutState.page` for query variables.
  */
 function GridTableLayoutComponent<
   F extends Record<string, unknown>,
@@ -154,8 +108,8 @@ function GridTableLayoutComponent<
     () => (tableProps.api as GridTableApiImpl<R>) ?? new GridTableApiImpl(),
     [tableProps.api],
   );
-  const clientSearch = layoutState.search === "client" ? layoutState.searchString : undefined;
-  const showTableActions = layoutState.filterDefs || layoutState.search || hasHideableColumns;
+  const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
+  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns;
   const isVirtualized = tableProps.as === "virtual";
 
   const breakpoints = useBreakpoint();
@@ -163,12 +117,12 @@ function GridTableLayoutComponent<
   // Sync API changes back to persisted state when persistedColumns is provided
   const visibleColumnIds = useComputed(() => api.getVisibleColumnIds(), [api]);
   useEffect(() => {
-    if (layoutState.setVisibleColumnIds) {
+    if (layoutState?.setVisibleColumnIds) {
       layoutState.setVisibleColumnIds(visibleColumnIds);
     }
   }, [visibleColumnIds, layoutState]);
 
-  const visibleColumnsStorageKey = layoutState.persistedColumnsStorageKey;
+  const visibleColumnsStorageKey = layoutState?.persistedColumnsStorageKey;
 
   return (
     <>
@@ -180,10 +134,10 @@ function GridTableLayoutComponent<
         tertiaryAction={tertiaryAction}
       />
       {showTableActions && (
-        <TableActions onlyRight={!layoutState.search && hasHideableColumns}>
+        <TableActions onlyRight={!layoutState?.search && hasHideableColumns}>
           <div css={Css.df.gap1.$}>
-            {layoutState.search && <SearchBox onSearch={layoutState.setSearchString} />}
-            {layoutState.filterDefs && (
+            {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
+            {layoutState?.filterDefs && (
               <Filters
                 filterDefs={layoutState.filterDefs}
                 filter={layoutState.filter}
@@ -224,12 +178,14 @@ function GridTableLayoutComponent<
             visibleColumnsStorageKey={visibleColumnsStorageKey}
           />
         )}
-        <Pagination
-          page={[layoutState.page, layoutState.setPage]}
-          totalCount={totalCount}
-          pageSizes={layoutState.pageSizes}
-          {...tid.pagination}
-        />
+        {layoutState && (
+          <Pagination
+            page={[layoutState.page, layoutState.setPage]}
+            totalCount={totalCount}
+            pageSizes={layoutState.pageSizes}
+            {...tid.pagination}
+          />
+        )}
       </ScrollableContent>
     </>
   );
@@ -248,18 +204,13 @@ function validateColumns(columns: readonly { id?: string; name?: string }[]): vo
 
 /** Configuration for pagination in GridTableLayout */
 export type PaginationConfig = {
-  /** Available page size options. Defaults to [100, 500, 1000] */
+  /** Available page size options */
   pageSizes?: number[];
   /** Storage key for persisting page size preference */
   storageKey?: string;
 };
 
-/**
- * A wrapper around standard filter, grouping, search, and pagination state hooks.
- * * `client` search will use the built-in grid table search functionality.
- * * `server` search will return `searchString` as a debounced search string to query the server.
- * * Pagination is always enabled by default. Use `pagination` config to customize page sizes or storage key.
- */
+/** Manages filter, grouping, search, and pagination state for GridTableLayout. */
 export function useGridTableLayoutState<F extends Record<string, unknown>>({
   persistedFilter,
   persistedColumns,
