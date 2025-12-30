@@ -18,6 +18,7 @@ export * from "./ButtonMenu";
 export * from "./ButtonModal";
 export * from "./Card";
 export * from "./Copy";
+export * from "./CountBadge";
 export * from "./CssReset";
 export * from "./DnDGrid";
 export * from "./Filters";

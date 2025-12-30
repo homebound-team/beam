@@ -34,11 +34,11 @@ export function PageHeaderBreadcrumbs({ breadcrumb, linkXss, collapsible }: Page
   const renderBreadcrumb = (bc: HeaderBreadcrumb, index: number, hideDivisor?: boolean) => (
     // Adding index to key to prevent rendering issues when multiple items have the same label
     <Fragment key={`${bc.label}-${index}`}>
-      {index > 0 && !hideDivisor && <span css={Css.smMd.gray700.mx1.myPx(2).$}>/</span>}
+      {index > 0 && !hideDivisor && <span css={Css.smSb.gray700.mx1.myPx(2).$}>/</span>}
       <Link
         {...tids.navLink}
         to={bc.href}
-        css={{ ...Css.xsMd.gray700.addIn("&:hover", Css.gray800.$).$, ...linkXss }}
+        css={{ ...Css.smSb.gray700.addIn("&:hover", Css.gray800.$).$, ...linkXss }}
         className="navLink"
       >
         {bc.label}

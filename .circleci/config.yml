@@ -9,6 +9,13 @@ node-image: &node-image
     username: $DOCKERHUB_USERNAME
     password: $DOCKERHUB_ACCESS_TOKEN
 
+only-run-on-release-branches: &only-run-on-release-branches
+  branches:
+    only:
+      - main
+      - alpha
+      - next-major
+
 workflows:
   version: 2
   workflow:
@@ -30,9 +37,7 @@ workflows:
           requires:
             - build
           filters:
-            branches:
-              only:
-                - main
+            <<: *only-run-on-release-branches
       - chromatic:
           context:
             - npm-readonly

@@ -120,16 +120,16 @@ function memoizedTableStyles() {
       const groupedLevels = {
         0: {
           cellCss: {
-            ...Css.xsMd.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+            ...Css.xsSb.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
             ...(allWhite && Css.bgWhite.$),
           },
-          firstContentColumn: { ...Css.smMd.$, ...(allWhite && Css.smBd.gray900.$) },
+          firstContentColumn: { ...Css.sm.$, ...(allWhite && Css.smSb.gray900.$) },
         },
-        2: { firstContentColumn: Css.tiny.pl3.$ },
+        2: { firstContentColumn: Css.xs.pl3.$ },
         // Add 12 more pixels of padding for each level of nesting
-        3: { firstContentColumn: Css.tiny.plPx(36).$ },
+        3: { firstContentColumn: Css.xs.plPx(36).$ },
       };
-      const defaultLevels = { 1: { firstContentColumn: Css.tiny.pl3.$ } };
+      const defaultLevels = { 1: { firstContentColumn: Css.xs.pl3.$ } };
 
       cache[key] = {
         emptyCell: "-",
@@ -143,11 +143,11 @@ function memoizedTableStyles() {
           // lineClamp requires `display: webkit-box`, which disables `align-items: center` (requires `display: flex/grid`)
           // Header's will add `lineClamp2` more locally in their renders.
           // Also `unset`-ing the white-space: nowrap defined in `cellCss` below.
-          ...Css.gray700.xsMd.bgGray200.aic.pxPx(12).whiteSpace("unset").hPx(40).$,
+          ...Css.gray700.xsSb.bgGray200.aic.pxPx(12).whiteSpace("unset").hPx(40).$,
           ...(allWhite && Css.bgWhite.$),
         },
-        totalsCellCss: Css.bgWhite.gray700.bgGray100.xsMd.hPx(totalsRowHeight).pPx(12).$,
-        expandableHeaderCss: Css.bgWhite.gray900.xsMd.wsn
+        totalsCellCss: Css.bgWhite.gray700.bgGray100.xsSb.hPx(totalsRowHeight).pPx(12).$,
+        expandableHeaderCss: Css.bgWhite.gray900.xsSb.wsn
           .hPx(expandableHeaderRowHeight)
           .pxPx(12)
           .py0.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
@@ -181,7 +181,7 @@ function memoizedTableStyles() {
         },
         levels: grouped ? groupedLevels : defaultLevels,
         rowHoverColor: Palette.Blue50,
-        keptGroupRowCss: Css.bgYellow100.gray900.xsMd.df.aic.$,
+        keptGroupRowCss: Css.bgYellow100.gray900.xsSb.df.aic.$,
         keptLastRowCss: Css.boxShadow("inset 0px -14px 8px -11px rgba(63,63,63,.18)").$,
       };
     }
@@ -237,7 +237,7 @@ export const cardStyle: GridStyle = {
   // Undo the card look & feel for the header
   headerCellCss: {
     ...defaultStyle.headerCellCss,
-    ...Css.p1.m0.xsMd.gray700.$,
+    ...Css.p1.m0.xsSb.gray700.$,
   },
   rowHoverColor: "none",
   nonHeaderRowHoverCss: Css.bshHover.bcGray700.$,

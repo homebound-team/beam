@@ -84,7 +84,7 @@ export function getNavLinkStyles(variant: NavLinkVariant, contrast: boolean) {
   return navLinkVariantStyles(contrast)[variant];
 }
 
-const baseStyles = Css.df.aic.hPx(32).pyPx(6).px1.br4.smMd.outline0.$;
+const baseStyles = Css.df.aic.hPx(32).pyPx(6).px1.br4.smSb.outline0.$;
 
 const navLinkVariantStyles: (contrast: boolean) => Record<
   NavLinkVariant,

@@ -33,6 +33,12 @@ export interface CheckboxBaseProps extends BeamFocusableProps {
   withLabelElement?: boolean;
   /** Tooltip content is set when disabled prop is a ReactNode via `Checkbox` component */
   tooltip?: ReactNode;
+  /**
+   * Removes maxwidth restrictions on the checkbox container
+   * label, helperText, errorMsg, description props extend full width of the checkbox container as necessary
+   * @default false
+   */
+  fullWidth?: boolean;
 }
 
 export function CheckboxBase(props: CheckboxBaseProps) {
@@ -48,11 +54,13 @@ export function CheckboxBase(props: CheckboxBaseProps) {
     checkboxOnly = false,
     withLabelElement = true,
     tooltip,
+    fullWidth = false,
   } = props;
   const ref = useRef(null);
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const tid = useTestIds(props, defaultTestId(label));
 
+  const maxWidth = fullWidth ? "none" : description !== undefined ? px(344) : px(320);
   const Tag = withLabelElement ? "label" : "div";
 
   return maybeTooltip({
@@ -65,9 +73,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
             // Prevents accidental checkbox clicks due to label width being longer
             // than the content.
             .w("max-content")
-            .maxw(px(320))
-            .if(description !== undefined)
-            .maxw(px(344))
+            .maxw(maxWidth)
             .if(isDisabled).cursorNotAllowed.$
         }
         aria-label={label}
@@ -100,7 +106,7 @@ const disabledColor = Css.gray300.$;
 const focusRingStyles = Css.bshFocus.$;
 const hoverBorderStyles = Css.bcBlue900.$;
 const markStyles = { ">svg": Css.absolute.topPx(-1).leftPx(-1).$ };
-const labelStyles = Css.smMd.$;
+const labelStyles = Css.sm.$;
 const descStyles = Css.sm.gray700.$;
 
 interface StyledCheckboxProps {

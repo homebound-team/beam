@@ -13,14 +13,20 @@ export interface CheckboxProps {
   withLabelElement?: boolean;
   checkboxOnly?: boolean;
   selected: boolean | "indeterminate";
-  /** Handler that is called when the element's selection state changes. */
-  onChange: (selected: boolean) => void;
   /** Additional text displayed below label */
   description?: string;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
   errorMsg?: string;
   helperText?: string | ReactNode;
+  /**
+   * Removes maxwidth restrictions on the checkbox container
+   * label, helperText, errorMsg, description props extend full width of the checkbox container as necessary
+   * @default false
+   */
+  fullWidth?: boolean;
+  /** Handler that is called when the element's selection state changes. */
+  onChange: (selected: boolean) => void;
   /** Callback fired when focus removes from the component */
   onBlur?: () => void;
   /** Callback fired when focus is set to the component */

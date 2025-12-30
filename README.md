@@ -47,6 +47,16 @@ For them, a MUI application in Company A shouldn't have to look & behave exactly
 
 But for Beam at Homebound, we specifically _want_ a component that behaves in our App A to look & behave the same as it does in our App B.
 
+## Adding Props Checklist
+
+When designers have new Figmas, or give UX feedback, that would require adding new stylistic props to Beam components (i.e. props to change color, size, layout, etc), we should:
+
+- Let them know their change doesn't match the existing Beam style, and confirm they really meant for this to be a non-standard change (discouraged).
+
+- Ask them if they want this change to be rolled out app-wide, which would be fine & means we can avoid adding the per-page props (preferred).
+
+- If they insist this is both a necessary change, but not app-wide, can we describe this ask as a "variant" or "style" or other "high-level knob", that is not making pages pick individual, low-level pixels and color values (fine now & then).
+
 ## Beam and Open Source
 
 As we open source Beam, this vision of "as few props as possible", "components must look _the same_ in every app" doesn't seem like something that other companies/projects would adopt (i.e. surely they want different colors, slightly different behavior to suit their user base, etc.).

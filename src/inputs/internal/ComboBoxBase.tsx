@@ -18,6 +18,7 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean, isAddNewOption?: boolean) => string | ReactNode;
   getOptionValue: (opt: O) => V;
+  /** Returns the display label for an option. Used for rendering and for sorting when `autoSort` is enabled. */
   getOptionLabel: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
@@ -66,6 +67,11 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
   onSearch?: (search: string) => void;
   /* Only supported on single Select fields */
   onAddNew?: (v: string) => void;
+  /**
+   * When true (default), options are sorted alphabetically by their label.
+   * Set to false to maintain the original order of options.
+   */
+  autoSort?: boolean;
 }
 
 /**
@@ -98,6 +104,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     fullWidth = fieldProps?.fullWidth ?? false,
     onSearch,
     onAddNew,
+    autoSort = true,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
@@ -137,13 +144,13 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
 
   // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
   const options = useMemo(
-    () => initializeOptions(propOptions, getOptionValue, unsetLabel, !!onAddNew),
+    () => initializeOptions(propOptions, getOptionValue, getOptionLabel, unsetLabel, !!onAddNew, autoSort),
     // If the caller is using { current, load, options }, memoize on only `current` and `options` values.
     // ...and don't bother on memoizing on getOptionValue b/c it's basically always a lambda
     // eslint-disable-next-line react-hooks/exhaustive-deps
     Array.isArray(propOptions)
-      ? [propOptions, unsetLabel, onAddNew]
-      : [propOptions.current, propOptions.options, unsetLabel, onAddNew],
+      ? [propOptions, unsetLabel, onAddNew, autoSort]
+      : [propOptions.current, propOptions.options, unsetLabel, onAddNew, autoSort],
   );
 
   const values = useMemo(() => propValues ?? [], [propValues]);
@@ -470,19 +477,25 @@ function getInputValue<O>(
 export function initializeOptions<O, V extends Value>(
   optionsOrLoad: OptionsOrLoad<O>,
   getOptionValue: (opt: O) => V,
+  getOptionLabel: (opt: O) => string,
   unsetLabel: string | undefined,
   addNew: boolean,
+  autoSort: boolean,
 ): O[] {
-  const opts: O[] = [];
+  const result: O[] = [];
   if (unsetLabel) {
-    opts.push(unsetOption as unknown as O);
+    result.push(unsetOption as unknown as O);
   }
+
+  // Collect user options in a separate array so we can sort them independently
+  // while keeping special options (unsetOption, addNewOption) at their fixed positions
+  const userOptions: O[] = [];
   if (Array.isArray(optionsOrLoad)) {
-    opts.push(...optionsOrLoad);
+    userOptions.push(...optionsOrLoad);
   } else {
     const { options, current } = optionsOrLoad;
     if (options) {
-      opts.push(...options);
+      userOptions.push(...options);
     }
     // Add the `current` to the list of options in the event it is not already there.
     if (current) {
@@ -491,15 +504,28 @@ export function initializeOptions<O, V extends Value>(
         const value = getOptionValue(current);
         const found = options && options.find((o) => getOptionValue(o) === value);
         if (!found) {
-          opts.push(current);
+          userOptions.push(current);
         }
       });
     }
   }
+
+  // Sort user options if autoSort is enabled
+  result.push(...(autoSort ? sortOptions(userOptions, getOptionLabel) : userOptions));
+
   if (addNew) {
-    opts.push(addNewOption as unknown as O);
+    result.push(addNewOption as unknown as O);
   }
-  return opts;
+  return result;
+}
+
+/** Sorts options alphabetically using getOptionLabel, case-insensitive */
+function sortOptions<O>(options: O[], getOptionLabel: (opt: O) => string): O[] {
+  return [...options].sort((a, b) => {
+    const labelA = getOptionLabel(a).toLowerCase();
+    const labelB = getOptionLabel(b).toLowerCase();
+    return labelA.localeCompare(labelB);
+  });
 }
 
 /** A marker option to automatically add an "Unset" option to the start of options. */

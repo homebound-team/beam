@@ -106,7 +106,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
         />
 
         <div css={Css.df.fdc.gap4.$}>
-          <h2 css={Css.lgMd.$}>Other Label Styles</h2>
+          <h2 css={Css.lg.$}>Other Label Styles</h2>
           <TestTreeSelectField
             {...args}
             values={multipleValueIds}

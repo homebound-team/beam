@@ -48,7 +48,7 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
           {...testId.modalClear}
         />
         <div css={Css.df.gap1.$}>
-          <Button label="Cancel" variant="tertiary" onClick={closeModal} {...testId.modalClose} />
+          <Button label="Cancel" variant="quaternary" onClick={closeModal} {...testId.modalClose} />
           <Button
             label="Apply"
             onClick={() => {
@@ -67,7 +67,7 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
 export function ModalFilterItem({ label, children }: { label?: string; children: ReactNode }) {
   return (
     <div css={Css.mb4.if(!label).bt.bcGray200.$}>
-      {label && <h2 css={Css.baseMd.mb2.$}>{label}</h2>}
+      {label && <h2 css={Css.md.mb2.$}>{label}</h2>}
       <div css={Css.if(!label).pt3.$}>{children}</div>
     </div>
   );

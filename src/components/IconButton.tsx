@@ -114,7 +114,7 @@ export function IconButton(props: IconButtonProps) {
 
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip
   return maybeTooltip({
-    title: resolveTooltip(disabled, tooltip),
+    title: resolveTooltip(disabled ?? label, tooltip),
     placement: "top",
     children: getButtonOrLink(buttonContent, onPress, buttonAttrs, openInNew, download),
   });

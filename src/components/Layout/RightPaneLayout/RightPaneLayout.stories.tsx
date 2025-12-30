@@ -86,7 +86,7 @@ function ExamplePageComponent() {
     <>
       <FullBleed>
         <header css={{ ...Css.py2.bb.bcGray200.$ }}>
-          <h1 css={Css.xlSb.$}>Page content fixed to top</h1>
+          <h1 css={Css.xl.$}>Page content fixed to top</h1>
         </header>
       </FullBleed>
       <ScrollableTableExample />

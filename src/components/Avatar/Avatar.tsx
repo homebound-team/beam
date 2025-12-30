@@ -54,10 +54,10 @@ const sizeToPixel: Record<AvatarSize, number> = {
 };
 
 const sizeToFallbackTypeScale: Record<AvatarSize, Typography> = {
-  sm: "tiny",
+  sm: "xs2",
   md: "sm",
   lg: "lg",
-  xl: "xl3",
+  xl: "xl2",
 };
 
 const sizeToIconInc: Record<AvatarSize, number> = {
@@ -68,10 +68,10 @@ const sizeToIconInc: Record<AvatarSize, number> = {
 };
 
 const sizeToTypeScale: Record<AvatarSize, Typography> = {
-  sm: "smMd",
-  md: "smMd",
-  lg: "base",
-  xl: "base",
+  sm: "smSb",
+  md: "smSb",
+  lg: "md",
+  xl: "md",
 };
 
 function nameToInitials(name: string) {

@@ -98,7 +98,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
       <div css={Css.py2.px3.df.jcsb.aic.$}>
         <div>
           {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} collapsible={collapsibleBreadcrumbs} />}
-          <h1 css={Css.xl3Sb.$} {...tids.pageTitle}>
+          <h1 css={Css.xl2.$} {...tids.pageTitle}>
             {pageTitle}
           </h1>
         </div>
@@ -117,7 +117,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
             <Button
               label={cancelAction.label}
               onClick={cancelAction.onClick}
-              variant="secondary"
+              variant="quaternary"
               disabled={cancelAction.disabled}
               tooltip={cancelAction.tooltip}
             />
@@ -162,7 +162,7 @@ function FormSections<F>(props: FormSectionsProps<F>) {
         >
           <div css={Css.gc(1).$}>{section.icon && <Icon icon={section.icon} inc={3.5} />}</div>
           <div css={Css.gc(2).$}>
-            {section.title && <h2 css={Css.xlSb.mb3.$}>{section.title}</h2>}
+            {section.title && <h2 css={Css.xl.mb3.$}>{section.title}</h2>}
             <BoundForm formState={formState} rows={section.rows} />
           </div>
         </section>
@@ -198,8 +198,8 @@ function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[] }) {
 }
 
 // Use inset box shadow rather than thick border to avoid the button text reflowing when the border is applied
-const activeStyles = Css.smBd.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue600}`).$;
-const hoverStyles = Css.bgBlue50.smBd.blue900.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue900}`).$;
+const activeStyles = Css.smSb.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue600}`).$;
+const hoverStyles = Css.bgBlue50.smSb.blue900.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue900}`).$;
 const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 
 function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSection: string | null }) {
@@ -226,7 +226,7 @@ function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSe
       {...focusProps}
       {...hoverProps}
       css={{
-        ...Css.buttonBase.wsn.tal.smMd.blue600.px2.py1.br0.h100.$,
+        ...Css.buttonBase.wsn.tal.smSb.blue600.px2.py1.br0.h100.$,
         ...(isFocusVisible ? defaultFocusRingStyles : {}),
         ...(active ? activeStyles : {}),
         ...(isPressed ? activeStyles : isHovered ? hoverStyles : {}),

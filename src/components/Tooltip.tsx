@@ -3,27 +3,41 @@ import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
 import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 import { useTooltipTriggerState } from "react-stately";
-import { Css, Palette } from "src/Css";
+import { Css, Padding, Palette, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 // We combine react-popper and aria-tooltip to makeup the tooltip component for the following reasons:
 // Aria can handle all aspects of the tooltip accessibility and rendering it except handling the dynamic positioning aspect
 // Popper provides the functionality for positioning the tooltip wrt the trigger element
 
+type TooltipXss = Xss<Padding | "borderRadius">;
+
+/** Note: Only 1 tooltip is ever on screen at a time */
 interface TooltipProps {
   /** The content that shows up when hovered */
   title: ReactNode;
   children: ReactNode;
   placement?: Placement;
+  /**
+   * The delay for the tooltip to appear.
+   *
+   * Note: If tooltip `A` is still showing when tooltip `B` is triggered, tooltip `B`'s `delay` property will be ignored and it will render immediately.
+   * @default 0
+   */
   delay?: number;
+  /** The delay time for the tooltip to disappear.
+   * @default 500
+   */
+  closeDelay?: number;
   disabled?: boolean;
   bgColor?: Palette;
+  xss?: TooltipXss;
 }
 
 export function Tooltip(props: TooltipProps) {
-  const { placement, children, title, disabled, delay = 0, bgColor } = props;
+  const { placement, children, title, disabled, delay = 0, closeDelay = 500, bgColor, xss } = props;
 
-  const state = useTooltipTriggerState({ delay, isDisabled: disabled });
+  const state = useTooltipTriggerState({ delay, closeDelay, isDisabled: disabled });
   const triggerRef = useRef<HTMLElement>(null);
   const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger({ isDisabled: disabled }, state, triggerRef);
   const { tooltipProps } = useTooltip(_tooltipProps, state);
@@ -38,7 +52,8 @@ export function Tooltip(props: TooltipProps) {
         {...tid}
         // Add display contents to prevent the tooltip wrapping element from short-circuiting inherited styles (i.e. flex item positioning)
         // Once the element is `:active`, allow pointer events (i.e. click events) to pass through to the children.
-        css={Css.display("contents").addIn(":active", Css.add("pointerEvents", "none").$).$}
+        // Exception: Don't disable pointer events when wrapping anchor tags to preserve click functionality
+        css={Css.display("contents").addIn(":active:not(:has(a))", Css.add("pointerEvents", "none").$).$}
         // Adding `draggable` as a hack to allow focus to continue through this element and into its children.
         // This is due to some code in React-Aria that prevents default due ot mobile browser inconsistencies,
         // and the only way they don't prevent default is if the element is draggable.
@@ -55,6 +70,7 @@ export function Tooltip(props: TooltipProps) {
           content={title}
           placement={placement}
           bgColor={bgColor}
+          xss={xss}
         />
       )}
     </>
@@ -70,9 +86,10 @@ interface PopperProps {
   content: ReactNode;
   placement?: Placement;
   bgColor: Palette | undefined;
+  xss?: TooltipXss;
 }
 
-function Popper({ triggerRef, content, placement = "auto", bgColor = Palette.Gray900 }: PopperProps) {
+function Popper({ triggerRef, content, placement = "auto", xss, bgColor = Palette.Gray900 }: PopperProps) {
   const popperRef = useRef(null);
   const [arrowRef, setArrowRef] = useState<HTMLDivElement | null>(null);
   // Since we use `display: contents;` on the `triggerRef`, then the element.offsetTop/Left/etc all equal `0`. This would make
@@ -95,7 +112,10 @@ function Popper({ triggerRef, content, placement = "auto", bgColor = Palette.Gra
       ref={popperRef}
       style={styles.popper}
       {...attributes.popper}
-      css={Css.maxw("320px").bgColor(bgColor).bshBasic.white.px1.py("4px").br4.xs.add("zIndex", 999999).$}
+      css={{
+        ...Css.maxw("320px").bgColor(bgColor).bshBasic.white.px1.py("4px").br4.xs.z(999999).$,
+        ...xss,
+      }}
     >
       <div ref={setArrowRef} style={{ ...styles.arrow }} id="arrow" />
       {content}

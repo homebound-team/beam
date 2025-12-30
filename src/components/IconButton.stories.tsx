@@ -37,7 +37,7 @@ export default {
 function Template(args: IconButtonProps) {
   return (
     <div css={Css.if(!!args.contrast).bgGray800.white.$}>
-      <h1 css={Css.xl2Sb.mbPx(30).$}>Icon Only Button</h1>
+      <h1 css={Css.xl2.mbPx(30).$}>Icon Only Button</h1>
       <div css={Css.df.gapPx(90).$}>
         <div>
           <h2>Default</h2>
@@ -62,6 +62,10 @@ function Template(args: IconButtonProps) {
         <div>
           <h2>Colored</h2>
           <IconButton {...args} color={Palette.Red700} />
+        </div>
+        <div>
+          <h2>Labeled</h2>
+          <IconButton {...args} label="Download" />
         </div>
       </div>
     </div>
@@ -103,6 +107,10 @@ export function WithTooltip() {
       <div>
         <h2>Tooltip provided via 'tooltip' property</h2>
         <IconButton icon="arrowBack" tooltip="Back to previous page" onClick={noop} />
+      </div>
+      <div>
+        <h2>Tooltip provided via 'tooltip' property wrapping an anchor tag</h2>
+        <IconButton icon="arrowBack" tooltip="Visit Homebound" onClick="https://www.homebound.com" />
       </div>
     </div>
   );

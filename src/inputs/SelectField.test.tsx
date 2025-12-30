@@ -419,8 +419,8 @@ describe("SelectFieldTest", () => {
       [
         "Unset Label",
         "One",
-        "Two",
         "Three",
+        "Two",
       ]
     `);
   });
@@ -519,6 +519,61 @@ describe("SelectFieldTest", () => {
     expect(onSearchMock).toHaveBeenCalled();
   });
 
+  describe("autoSort", () => {
+    it("sorts options alphabetically by default", async () => {
+      // Given a SelectField with options that are not sorted
+      const r = await render(
+        <TestSelectField
+          label="Fruit"
+          value={undefined}
+          options={unsortedOptions}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />,
+      );
+      // When opening the menu
+      click(r.fruit);
+      // Then expect the options to be in alphabetical order
+      expect(r.getAllByRole("option").map((o) => o.textContent)).toEqual(["Apple", "Banana", "Mango", "Zebra"]);
+    });
+
+    it("maintains original order when autoSort is false", async () => {
+      // Given a SelectField with autoSort disabled
+      const r = await render(
+        <TestSelectField
+          label="Fruit"
+          value={undefined}
+          options={unsortedOptions}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          autoSort={false}
+        />,
+      );
+      // When opening the menu
+      click(r.fruit);
+      // Then expect the options to maintain their original order
+      expect(r.getAllByRole("option").map((o) => o.textContent)).toEqual(["Zebra", "Apple", "Mango", "Banana"]);
+    });
+
+    it("keeps unsetLabel at the top when sorting", async () => {
+      // Given a SelectField with unsetLabel and unsorted options
+      const r = await render(
+        <TestSelectField
+          label="Fruit"
+          value={undefined}
+          options={unsortedOptions}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          unsetLabel="None"
+        />,
+      );
+      // When opening the menu
+      click(r.fruit);
+      // Then unsetLabel should be first, followed by sorted options
+      expect(r.getAllByRole("option").map((o) => o.textContent)).toEqual(["None", "Apple", "Banana", "Mango", "Zebra"]);
+    });
+  });
+
   // Used to validate the `unset` option can be applied to non-`HasIdAndName` options
   type HasLabelAndValue = {
     label: string;
@@ -534,6 +589,13 @@ describe("SelectFieldTest", () => {
     { id: "1", name: "One" },
     { id: "2", name: "Two" },
     { id: "3", name: "Three" },
+  ];
+
+  const unsortedOptions: HasIdAndName[] = [
+    { id: "1", name: "Zebra" },
+    { id: "2", name: "Apple" },
+    { id: "3", name: "Mango" },
+    { id: "4", name: "Banana" },
   ];
 
   function TestSelectField<O, V extends Value>(props: Optional<SelectFieldProps<O, V>, "onSelect">): JSX.Element {

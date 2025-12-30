@@ -108,7 +108,7 @@ export function Switch(props: SwitchProps) {
       {/* Since we are using childGap, we must wrap the label in an element and
         match the height of the icon for horizontal alignment */}
       {labelStyle === "inline" && (
-        <Label label={label} tooltip={tooltip} inline xss={Css.smMd.gray900.if(compact).add("lineHeight", "1").$} />
+        <Label label={label} tooltip={tooltip} inline xss={Css.sm.gray900.if(compact).add("lineHeight", "1").$} />
       )}
       <VisuallyHidden>
         <input ref={ref} {...inputProps} {...focusProps} {...tid} />

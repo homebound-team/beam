@@ -32,11 +32,26 @@ const options: TestOption[] = [
   { id: "5", name: "Dollar dollar bill, ya'll! ".repeat(5), icon: "dollar" },
 ];
 
+const autoSortOptions: TestOption[] = [
+  { id: "1", name: "Apple" },
+  { id: "2", name: "Cherry" },
+  { id: "3", name: "Date" },
+  { id: "4", name: "Elderberry" },
+  { id: "5", name: "Banana" },
+];
+
 export function MultiSelectFields() {
   return (
     <div css={Css.df.fdc.gap5.$}>
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Regular</h1>
+        <TestMultiSelectField label="Auto Sort - Default" values={[autoSortOptions[0].id]} options={autoSortOptions} />
+        <TestMultiSelectField
+          label="Auto Sort - False"
+          values={[autoSortOptions[2].id]}
+          options={autoSortOptions}
+          autoSort={false}
+        />
         <TestMultiSelectField
           label="Favorite Icons"
           values={[options[2].id]}

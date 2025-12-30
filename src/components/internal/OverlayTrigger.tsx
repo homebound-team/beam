@@ -43,6 +43,9 @@ export interface OverlayTriggerProps {
   contrast?: boolean;
 }
 
+// FIXME: The `popover` doesn't automatically get focus in all use cases so we cant tab through inputs/buttons immediately without
+// a second click on the popover
+// - EX: EditColumnsButton
 export function OverlayTrigger(props: OverlayTriggerProps) {
   const {
     trigger,
