@@ -1,6 +1,6 @@
 import { Fragment, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Css, Xss } from "src/Css";
+import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export type HeaderBreadcrumb = {
@@ -11,11 +11,10 @@ export type HeaderBreadcrumb = {
 
 type PageHeaderBreadcrumbsProps = {
   breadcrumb: HeaderBreadcrumb | HeaderBreadcrumb[];
-  linkXss?: Xss<"color" | "cursor">;
   collapsible?: boolean;
 };
 
-export function PageHeaderBreadcrumbs({ breadcrumb, linkXss, collapsible }: PageHeaderBreadcrumbsProps) {
+export function PageHeaderBreadcrumbs({ breadcrumb, collapsible }: PageHeaderBreadcrumbsProps) {
   const tids = useTestIds({}, "pageHeaderBreadcrumbs");
   const breadcrumbs = useMemo(() => (Array.isArray(breadcrumb) ? breadcrumb : [breadcrumb]), [breadcrumb]);
   const [collapsed, setCollapsed] = useState(breadcrumbs.length > 3);
@@ -31,21 +30,18 @@ export function PageHeaderBreadcrumbs({ breadcrumb, linkXss, collapsible }: Page
     return () => document.removeEventListener("mousedown", onClick);
   }, [collapsed, collapsible, setCollapsed, breadcrumbs]);
 
-  const renderBreadcrumb = (bc: HeaderBreadcrumb, index: number, hideDivisor?: boolean) => (
-    // Adding index to key to prevent rendering issues when multiple items have the same label
-    <Fragment key={`${bc.label}-${index}`}>
-      {index > 0 && !hideDivisor && <span css={Css.smSb.gray700.mx1.myPx(2).$}>/</span>}
-      <Link
-        {...tids.navLink}
-        to={bc.href}
-        css={{ ...Css.smSb.gray700.addIn("&:hover", Css.gray800.$).$, ...linkXss }}
-        className="navLink"
-      >
-        {bc.label}
-      </Link>
-      {bc.right}
-    </Fragment>
-  );
+  function renderBreadcrumb(bc: HeaderBreadcrumb, index: number, hideDivisor?: boolean) {
+    return (
+      // Adding index to key to prevent rendering issues when multiple items have the same label
+      <Fragment key={`${bc.label}-${index}`}>
+        {index > 0 && !hideDivisor && <span css={Css.smSb.gray700.mx1.myPx(2).$}>/</span>}
+        <Link to={bc.href} css={Css.smSb.gray700.onHover.gray900.$} className="navLink" {...tids.navLink}>
+          {bc.label}
+        </Link>
+        {bc.right}
+      </Fragment>
+    );
+  }
 
   return (
     <div ref={containerRef} css={Css.df.aic.mbPx(4).$}>
