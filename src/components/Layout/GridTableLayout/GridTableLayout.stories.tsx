@@ -242,55 +242,50 @@ function makeNestedRows(repeat: number = 1): GridDataRow<Row>[] {
   });
 }
 
-// Sample cards for card view stories
 const sampleCards: CardItem[] = [
   {
     id: "1",
-    image: "https://placehold.co/228x184/e2e2e2/666?text=Product+1",
-    title: "Badger 5 Garbage Disposal",
-    description: "Insinkerator 1/2 HP with Power Cord - Kitchen essential for modern homes",
-  },
-  {
-    id: "2",
-    image: "https://placehold.co/228x184/e2e2e2/666?text=Product+2",
-    title: "The Conroy Plan",
+    image: "plan-exterior.png",
+    title: "The Cora Plan",
     description: "SFH-001 - 4,000-5,000sf, 5-6bd - Luxury single family home with premium finishes",
   },
   {
+    id: "2",
+    image: "plan-exterior.png",
+    title: "The Conroy Plan",
+    description: "SFH-002 - 4,000-5,000sf, 4-5bd - Traditional style with modern amenities",
+  },
+  {
     id: "3",
-    image: "https://placehold.co/228x184/e2e2e2/666?text=Product+3",
+    image: "plan-exterior.png",
     title: "Kitchen Faucet",
-    description: "Delta Premium Series with Pull-down Sprayer and TouchClean technology",
+    description: "SFH-003 - 2,800-3,200sf, 3-4bd - Contemporary design with open floor plan",
   },
   {
     id: "4",
-    image: "https://placehold.co/228x184/e2e2e2/666?text=Product+4",
+    image: "plan-exterior.png",
     title: "The Madison Plan",
-    description: "SFH-002 - 3,500-4,000sf, 4-5bd - Contemporary design with open floor plan",
+    description: "SFH-004 - 3,500-4,000sf, 5-6bd - Luxury single family home with premium finishes",
   },
   {
     id: "5",
-    image: "https://placehold.co/228x184/e2e2e2/666?text=Product+5",
-    title: "Bathroom Vanity",
-    description: "36-inch Modern Double Sink with soft-close drawers and premium countertop",
+    image: "plan-exterior.png",
+    title: "The Emerson Plan",
+    description: "SFH-005 - 2,800-3,200sf, 4-5bd - Traditional style with modern amenities",
   },
   {
     id: "6",
-    image: "https://placehold.co/228x184/e2e2e2/666?text=Product+6",
+    image: "plan-exterior.png",
     title: "The Hamilton Plan",
-    description: "SFH-003 - 2,800-3,200sf, 3-4bd - Traditional style with modern amenities",
+    description: "SFH-006 - 2,800-3,200sf, 3-4bd - Contemporary design with open floor plan",
   },
 ];
 
 export function GridTableLayoutWithCardView() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
   const columns = useMemo(() => getColumns(), []);
-
   const layoutState = useGridTableLayoutState({
-    persistedFilter: {
-      filterDefs,
-      storageKey: "grid-table-layout-card",
-    },
+    persistedFilter: { filterDefs, storageKey: "grid-table-layout-card" },
     search: "client",
   });
 
@@ -317,23 +312,22 @@ export function GridTableLayoutWithCardView() {
 
 export function CardsViewWithSidePanel() {
   const columns = useMemo(() => getColumns(), []);
-  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [selectedCard, setSelectedCard] = useState<CardItem | null>(null);
   const layoutState = useGridTableLayoutState({ search: "client" });
   const clickableCards: CardItem[] = sampleCards.map((card) => ({
     ...card,
-    onClick: () => setSelectedCard(card.id!),
+    onClick: () => setSelectedCard(card),
   }));
-  const selectedCardData = sampleCards.find((c) => c.id === selectedCard);
 
   const sidePanel = selectedCard ? (
-    <div css={Css.h100.bgWhite.br8.p3.df.fdc.gap2.bshBasic.$}>
-      <h2 css={Css.lg.gray900.$}>{selectedCardData?.title}</h2>
-      <img src={selectedCardData?.image} alt={selectedCardData?.title} css={Css.w100.br8.$} />
-      <p css={Css.sm.gray700.$}>{selectedCardData?.description}</p>
+    <div css={Css.bgWhite.br8.m2.p3.df.fdc.gap2.bshBasic.$}>
+      <h2 css={Css.lg.gray900.$}>{selectedCard?.title}</h2>
+      <img src={selectedCard.image} alt={selectedCard.title} css={Css.w100.br8.$} />
+      <p css={Css.sm.gray700.$}>{selectedCard.description}</p>
       <div css={Css.ba.bcGray200.br8.p3.mt2.$}>
         <div css={Css.smSb.gray900.$}>Details</div>
         <div css={Css.sm.gray700.mt2.$}>
-          <p>ID: {selectedCard}</p>
+          <p>ID: {selectedCard.id}</p>
           <p>Status: Active</p>
           <p>Last Updated: Today</p>
         </div>

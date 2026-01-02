@@ -1,5 +1,4 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
-import { useHover } from "react-aria";
 import { Button, ButtonProps } from "src/components/Button";
 import { ButtonGroup } from "src/components/ButtonGroup";
 import { Filters } from "src/components/Filters/Filters";
@@ -35,11 +34,11 @@ export type GridTableLayoutViewType = "table" | "card";
 
 /** Individual card item for the card view */
 export interface CardItem {
+  id: string;
   /** URL for the card image */
   image: string;
   title: string;
   description: string | ReactNode;
-  id?: string;
   onClick?: () => void;
 }
 
@@ -139,7 +138,7 @@ function GridTableLayoutComponent<
   const tid = useTestIds(props);
   const columns = tableProps.columns;
 
-  // Card view state - only relevant when cardView is provided
+  // Card view state, only relevant when cardView is provided
   const [viewType, setViewType] = useState<GridTableLayoutViewType>("table");
   const isCardViewEnabled = !!cardView;
   const isShowingCardView = isCardViewEnabled && viewType === "card";
@@ -382,43 +381,23 @@ interface LayoutCardProps {
 }
 
 function LayoutCard({ item }: LayoutCardProps) {
-  const { image, title, description, id, onClick } = item;
-  const { hoverProps, isHovered } = useHover({ isDisabled: !onClick });
-  const tid = useTestIds({}, id ? `layoutCard_${id}` : "layoutCard");
+  const { id, image, title, description, onClick } = item;
+  const tid = useTestIds({}, `layoutCard_${id}`);
 
   return (
     <div
-      css={{
-        ...Css.wPx(276).hPx(396).bgWhite.df.fdc.gap2.p3.br8.bshBasic.$,
-        ...(onClick && Css.cursorPointer.$),
-        ...(isHovered && Css.bshHover.$),
-      }}
-      onClick={onClick}
-      {...hoverProps}
       {...tid}
+      css={Css.wPx(276).hPx(396).bgWhite.df.fdc.gap2.p3.br8.bshBasic.onHover.bshHover.if(!!onClick).cursorPointer.$}
+      onClick={onClick}
     >
-      <div css={Css.wPx(228).hPx(184).br8.oh.bgGray100.df.aic.jcc.$}>
-        <img src={image} alt={title} css={Css.maxw100.maxh100.add("objectFit", "contain").$} {...tid.image} />
+      <div css={Css.wPx(228).hPx(184).oh.df.aic.jcc.$}>
+        <img {...tid.image} src={image} alt={title} css={Css.maxw100.maxh100.objectContain.$} />
       </div>
       <div css={Css.df.fdc.gap1.fg1.$}>
-        <div
-          css={
-            Css.smSb.gray900
-              .add("WebkitLineClamp", "2")
-              .add("display", "-webkit-box")
-              .add("WebkitBoxOrient", "vertical").oh.$
-          }
-          {...tid.title}
-        >
+        <div {...tid.title} css={Css.xl.gray900.lineClamp2.$}>
           {title}
         </div>
-        <div
-          css={
-            Css.sm.gray700.add("WebkitLineClamp", "4").add("display", "-webkit-box").add("WebkitBoxOrient", "vertical")
-              .oh.$
-          }
-          {...tid.description}
-        >
+        <div {...tid.description} css={Css.sm.gray700.lineClamp4.$}>
           {description}
         </div>
       </div>
@@ -435,18 +414,13 @@ function CardGridView({ cards, sidePanel }: CardGridViewProps) {
   const tid = useTestIds({}, "cardGridView");
   return (
     <div css={Css.df.h100.$}>
-      <div
-        css={{
-          ...Css.fg1.df.flexWrap("wrap").gap2.p2.oa.add("alignContent", "flex-start").$,
-          ...(sidePanel && Css.maxw("50%").$),
-        }}
-      >
+      <div css={Css.fg1.df.fww.gap2.p2.oa.aifs.if(!!sidePanel).maxw50.$}>
         {cards.map((card, index) => (
           <LayoutCard key={card.id ?? index} item={card} />
         ))}
       </div>
       {sidePanel && (
-        <div {...tid.sidePanel} css={Css.w("50%").h100.pl3.oa.$}>
+        <div {...tid.sidePanel} css={Css.w50.h100.pl3.oa.$}>
           {sidePanel}
         </div>
       )}
