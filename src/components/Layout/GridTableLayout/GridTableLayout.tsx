@@ -216,7 +216,7 @@ function GridTableLayoutComponent<
       )}
       <ScrollableContent virtualized={isVirtualized && !isShowingCardView}>
         {cardView && isShowingCardView ? (
-          <CardGridView cards={cardView.cards} sidePanel={cardView.sidePanel} />
+          <CardGridView config={cardView} />
         ) : isGridTableProps(tableProps) ? (
           <GridTable
             {...tableProps}
@@ -354,12 +354,12 @@ function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
 }
 
 interface CardGridViewProps {
-  cards: CardItem[];
-  sidePanel?: ReactNode;
+  config: CardViewConfig;
 }
 
-function CardGridView({ cards, sidePanel }: CardGridViewProps) {
+function CardGridView({ config }: CardGridViewProps) {
   const tid = useTestIds({}, "cardGridView");
+  const { cards, sidePanel } = config;
   return (
     <div css={Css.df.h100.$}>
       <div css={Css.fg1.df.fww.gap2.p2.oa.aifs.if(!!sidePanel).maxw50.$}>
