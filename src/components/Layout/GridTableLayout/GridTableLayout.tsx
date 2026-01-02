@@ -432,6 +432,7 @@ interface CardGridViewProps {
 }
 
 function CardGridView({ cards, sidePanel }: CardGridViewProps) {
+  const tid = useTestIds({}, "cardGridView");
   return (
     <div css={Css.df.h100.$}>
       <div
@@ -444,7 +445,11 @@ function CardGridView({ cards, sidePanel }: CardGridViewProps) {
           <LayoutCard key={card.id ?? index} item={card} />
         ))}
       </div>
-      {sidePanel && <div css={Css.w("50%").h100.pl3.oa.$}>{sidePanel}</div>}
+      {sidePanel && (
+        <div {...tid.sidePanel} css={Css.w("50%").h100.pl3.oa.$}>
+          {sidePanel}
+        </div>
+      )}
     </div>
   );
 }

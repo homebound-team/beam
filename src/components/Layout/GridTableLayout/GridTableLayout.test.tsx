@@ -312,7 +312,7 @@ describe("GridTableLayout", () => {
     });
 
     it("renders side panel only in card view", async () => {
-      // Given a GridTableLayout with cardView and sidePanel
+      // Given a GridTableLayout with cardView and a side panel
       const r = await render(
         <QueryParamProvider>
           <TestWrapper
@@ -320,19 +320,19 @@ describe("GridTableLayout", () => {
             pageTitle="Test"
             tableProps={{ columns, rows: [simpleHeader, ...rows] }}
             cardView={{ cards: sampleCards }}
-            sidePanel={<div data-testid="sidePanel">Side Panel Content</div>}
+            sidePanel={<div>Side Panel Content</div>}
           />
         </QueryParamProvider>,
         withRouter(),
       );
-      // Then side panel is not visible in table view
+      // Then the side panel is not visible in table view
       expect(r.query.sidePanel).not.toBeInTheDocument();
-      // When switching to card view
+      // And when switching to card view
       click(r.viewToggle);
       click(r.viewToggle_card);
-      // Then side panel is visible
-      expect(r.sidePanel).toBeInTheDocument();
-      expect(r.sidePanel).toHaveTextContent("Side Panel Content");
+      // Then the side panel is visible
+      expect(r.cardGridView_sidePanel).toBeInTheDocument();
+      expect(r.cardGridView_sidePanel).toHaveTextContent("Side Panel Content");
     });
   });
 });
