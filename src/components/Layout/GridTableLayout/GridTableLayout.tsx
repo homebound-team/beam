@@ -29,23 +29,22 @@ import { QueryResult, QueryTable, QueryTableProps } from "./QueryTable";
 
 type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
 
-/** View type for toggling between table and card views */
 export type GridTableLayoutViewType = "table" | "card";
 
-export interface CardItem {
+export type CardItem = {
   id: string;
   /** URL for the card image */
   image: string;
   title: string;
   description: string | ReactNode;
   onClick?: () => void;
-}
+};
 
-export interface CardViewConfig {
+type CardViewConfig = {
   cards: CardItem[];
   /** Optional content that will be displayed on the right side of the cards */
   sidePanel?: ReactNode;
-}
+};
 
 type OmittedTableProps = "filter" | "stickyHeader" | "style" | "rows";
 
@@ -84,7 +83,7 @@ export type GridTableLayoutProps<
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
-  /** Card view configuration. When provided, enables view toggle */
+  /** When provided, enables List/Cards view toggle */
   cardView?: CardViewConfig;
 };
 
@@ -134,16 +133,14 @@ function GridTableLayoutComponent<
 
   const tid = useTestIds(props);
   const columns = tableProps.columns;
-
-  // Card view state, only relevant when cardView is provided
-  const [viewType, setViewType] = useState<GridTableLayoutViewType>("table");
-  const isShowingCardView = viewType === "card";
-
   const hasHideableColumns = useMemo(() => {
     if (hideEditColumns) return false;
     validateColumns(columns);
     return columns.some((c) => c.canHide);
   }, [columns, hideEditColumns]);
+  // Render table view by default, toggle to card view when cardView is provided
+  const [viewType, setViewType] = useState<GridTableLayoutViewType>("table");
+  const isShowingCardView = viewType === "card";
 
   // Use user-provided API if available, otherwise create our own
   const api = useMemo<GridTableApiImpl<R>>(
@@ -190,7 +187,21 @@ function GridTableLayoutComponent<
             )}
           </div>
           <div css={Css.df.gap1.$}>
-            {cardView && <ViewToggleButton viewType={viewType} onViewTypeChange={setViewType} {...tid.viewToggle} />}
+            {cardView && (
+              <ButtonGroup
+                {...tid.viewToggle}
+                size="sm"
+                buttons={[
+                  { icon: "cards", active: viewType === "card", onClick: () => setViewType("card"), tooltip: "Cards" },
+                  {
+                    icon: "projects",
+                    active: viewType === "table",
+                    onClick: () => setViewType("table"),
+                    tooltip: "List",
+                  },
+                ]}
+              />
+            )}
             {hasHideableColumns && !isShowingCardView && (
               <EditColumnsButton
                 columns={columns}
@@ -342,63 +353,6 @@ function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
   );
 }
 
-interface ViewToggleButtonProps {
-  viewType: GridTableLayoutViewType;
-  onViewTypeChange: (viewType: GridTableLayoutViewType) => void;
-}
-
-function ViewToggleButton({ viewType, onViewTypeChange, ...props }: ViewToggleButtonProps) {
-  return (
-    <ButtonGroup
-      size="sm"
-      buttons={[
-        {
-          icon: "cards",
-          active: viewType === "card",
-          onClick: () => onViewTypeChange("card"),
-          tooltip: "Cards",
-        },
-        {
-          icon: "projects",
-          active: viewType === "table",
-          onClick: () => onViewTypeChange("table"),
-          tooltip: "List",
-        },
-      ]}
-      {...props}
-    />
-  );
-}
-
-interface LayoutCardProps {
-  item: CardItem;
-}
-
-function LayoutCard({ item }: LayoutCardProps) {
-  const { id, image, title, description, onClick } = item;
-  const tid = useTestIds({}, `layoutCard_${id}`);
-
-  return (
-    <div
-      {...tid}
-      css={Css.wPx(276).hPx(396).bgWhite.df.fdc.gap2.p3.br8.bshBasic.onHover.bshHover.if(!!onClick).cursorPointer.$}
-      onClick={onClick}
-    >
-      <div css={Css.wPx(228).hPx(184).oh.df.aic.jcc.$}>
-        <img {...tid.image} src={image} alt={title} css={Css.maxw100.maxh100.objectContain.$} />
-      </div>
-      <div css={Css.df.fdc.gap1.fg1.$}>
-        <div {...tid.title} css={Css.xl.gray900.lineClamp2.$}>
-          {title}
-        </div>
-        <div {...tid.description} css={Css.sm.gray700.lineClamp4.$}>
-          {description}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 interface CardGridViewProps {
   cards: CardItem[];
   sidePanel?: ReactNode;
@@ -409,8 +363,27 @@ function CardGridView({ cards, sidePanel }: CardGridViewProps) {
   return (
     <div css={Css.df.h100.$}>
       <div css={Css.fg1.df.fww.gap2.p2.oa.aifs.if(!!sidePanel).maxw50.$}>
-        {cards.map((card, index) => (
-          <LayoutCard key={card.id ?? index} item={card} />
+        {cards.map(({ id, image, title, description, onClick }) => (
+          <div
+            key={id}
+            {...tid.card}
+            css={
+              Css.wPx(276).hPx(396).bgWhite.df.fdc.gap2.p3.br8.bshBasic.onHover.bshHover.if(!!onClick).cursorPointer.$
+            }
+            onClick={onClick}
+          >
+            <div css={Css.wPx(228).hPx(184).oh.df.aic.jcc.$}>
+              <img {...tid.cardImage} src={image} alt={title} css={Css.maxw100.maxh100.objectContain.$} />
+            </div>
+            <div css={Css.df.fdc.gap1.fg1.$}>
+              <div {...tid.cardTitle} css={Css.xl.gray900.lineClamp2.$}>
+                {title}
+              </div>
+              <div {...tid.cardDescription} css={Css.sm.gray700.lineClamp4.$}>
+                {description}
+              </div>
+            </div>
+          </div>
         ))}
       </div>
       {sidePanel && (

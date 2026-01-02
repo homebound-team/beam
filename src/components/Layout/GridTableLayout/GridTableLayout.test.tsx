@@ -249,7 +249,8 @@ describe("GridTableLayout", () => {
     ];
 
     it("does not show view toggle when cardView is not provided", async () => {
-      // Given a GridTableLayout without cardView prop
+      // Given a GridTableLayout without cardView set
+      // When the component is rendered
       const r = await render(
         <QueryParamProvider>
           <TestWrapper
@@ -265,7 +266,7 @@ describe("GridTableLayout", () => {
     });
 
     it("switches to card view when toggle is clicked", async () => {
-      // Given a GridTableLayout with cardView prop
+      // Given a GridTableLayout with cardView set
       const r = await render(
         <QueryParamProvider>
           <TestWrapper
@@ -280,11 +281,11 @@ describe("GridTableLayout", () => {
       // When clicking the card view button
       click(r.viewToggle_cards);
       // Then cards are rendered
-      expect(r.layoutCardCard1).toBeInTheDocument();
-      expect(r.layoutCardCard2).toBeInTheDocument();
+      expect(r.cardGridView_card_0).toBeInTheDocument();
+      expect(r.cardGridView_card_1).toBeInTheDocument();
       // And the card content is visible
-      expect(r.layoutCardCard1_title).toHaveTextContent("Card 1");
-      expect(r.layoutCardCard1_description).toHaveTextContent("Description 1");
+      expect(r.cardGridView_cardTitle_0).toHaveTextContent("Card 1");
+      expect(r.cardGridView_cardDescription_0).toHaveTextContent("Description 1");
     });
 
     it("hides EditColumnsButton in card view", async () => {

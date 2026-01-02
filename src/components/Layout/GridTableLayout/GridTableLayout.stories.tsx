@@ -258,7 +258,7 @@ const sampleCards: CardItem[] = [
   {
     id: "3",
     image: "plan-exterior.png",
-    title: "Kitchen Faucet",
+    title: "The Rayburn Plan",
     description: "SFH-003 - 2,800-3,200sf, 3-4bd - Contemporary design with open floor plan",
   },
   {
