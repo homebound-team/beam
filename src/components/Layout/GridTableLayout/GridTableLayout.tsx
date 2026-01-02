@@ -33,16 +33,16 @@ export type GridTableLayoutViewType = "table" | "card";
 
 export type CardItem = {
   id: string;
-  /** URL for the card image */
-  image: string;
   title: string;
   description: string | ReactNode;
+  /** URL for the card image */
+  image: string;
   onClick?: () => void;
 };
 
 type CardViewConfig = {
   cards: CardItem[];
-  /** Optional content that will be displayed on the right side of the cards */
+  /** Optional content to be displayed on the right side of the cards */
   sidePanel?: ReactNode;
 };
 
@@ -83,7 +83,6 @@ export type GridTableLayoutProps<
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
-  /** When provided, enables List/Cards view toggle */
   cardView?: CardViewConfig;
 };
 
@@ -138,7 +137,7 @@ function GridTableLayoutComponent<
     validateColumns(columns);
     return columns.some((c) => c.canHide);
   }, [columns, hideEditColumns]);
-  // Render table view by default, toggle to card view when cardView is provided
+  // Render table view by default, enable view toggle when cardView is provided
   const [viewType, setViewType] = useState<GridTableLayoutViewType>("table");
   const isShowingCardView = viewType === "card";
 
