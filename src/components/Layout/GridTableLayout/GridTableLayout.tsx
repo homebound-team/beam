@@ -32,7 +32,6 @@ type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "t
 /** View type for toggling between table and card views */
 export type GridTableLayoutViewType = "table" | "card";
 
-/** Individual card item for the card view */
 export interface CardItem {
   id: string;
   /** URL for the card image */
@@ -42,9 +41,10 @@ export interface CardItem {
   onClick?: () => void;
 }
 
-/** Card view configuration */
 export interface CardViewConfig {
   cards: CardItem[];
+  /** Optional content that will be displayed on the right side of the cards */
+  sidePanel?: ReactNode;
 }
 
 type OmittedTableProps = "filter" | "stickyHeader" | "style" | "rows";
@@ -86,8 +86,6 @@ export type GridTableLayoutProps<
   hideEditColumns?: boolean;
   /** Card view configuration. When provided, enables view toggle */
   cardView?: CardViewConfig;
-  /** Optional side panel content only shown in card view */
-  sidePanel?: ReactNode;
 };
 
 /**
@@ -132,7 +130,6 @@ function GridTableLayoutComponent<
     tertiaryAction,
     hideEditColumns = false,
     cardView,
-    sidePanel,
   } = props;
 
   const tid = useTestIds(props);
@@ -140,8 +137,7 @@ function GridTableLayoutComponent<
 
   // Card view state, only relevant when cardView is provided
   const [viewType, setViewType] = useState<GridTableLayoutViewType>("table");
-  const isCardViewEnabled = !!cardView;
-  const isShowingCardView = isCardViewEnabled && viewType === "card";
+  const isShowingCardView = viewType === "card";
 
   const hasHideableColumns = useMemo(() => {
     if (hideEditColumns) return false;
@@ -155,7 +151,7 @@ function GridTableLayoutComponent<
     [tableProps.api],
   );
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
-  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns || isCardViewEnabled;
+  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns || !!cardView;
   const isVirtualized = tableProps.as === "virtual";
 
   const breakpoints = useBreakpoint();
@@ -180,7 +176,7 @@ function GridTableLayoutComponent<
         tertiaryAction={tertiaryAction}
       />
       {showTableActions && (
-        <TableActions onlyRight={!layoutState?.search && (hasHideableColumns || isCardViewEnabled)}>
+        <TableActions onlyRight={!layoutState?.search && (hasHideableColumns || !!cardView)}>
           <div css={Css.df.gap1.$}>
             {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
             {layoutState?.filterDefs && (
@@ -194,9 +190,7 @@ function GridTableLayoutComponent<
             )}
           </div>
           <div css={Css.df.gap1.$}>
-            {isCardViewEnabled && (
-              <ViewToggleButton viewType={viewType} onViewTypeChange={setViewType} {...tid.viewToggle} />
-            )}
+            {cardView && <ViewToggleButton viewType={viewType} onViewTypeChange={setViewType} {...tid.viewToggle} />}
             {hasHideableColumns && !isShowingCardView && (
               <EditColumnsButton
                 columns={columns}
@@ -210,8 +204,8 @@ function GridTableLayoutComponent<
         </TableActions>
       )}
       <ScrollableContent virtualized={isVirtualized && !isShowingCardView}>
-        {isShowingCardView ? (
-          <CardGridView cards={cardView!.cards} sidePanel={sidePanel} />
+        {cardView && isShowingCardView ? (
+          <CardGridView cards={cardView.cards} sidePanel={cardView.sidePanel} />
         ) : isGridTableProps(tableProps) ? (
           <GridTable
             {...tableProps}

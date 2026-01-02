@@ -277,9 +277,8 @@ describe("GridTableLayout", () => {
         </QueryParamProvider>,
         withRouter(),
       );
-      // When clicking the view toggle dropdown and selecting card view
-      click(r.viewToggle);
-      click(r.viewToggle_card);
+      // When clicking the card view button
+      click(r.viewToggle_cards);
       // Then cards are rendered
       expect(r.layoutCardCard1).toBeInTheDocument();
       expect(r.layoutCardCard2).toBeInTheDocument();
@@ -305,8 +304,7 @@ describe("GridTableLayout", () => {
       // Then EditColumnsButton is visible in table view
       expect(r.editColumnsButton).toBeInTheDocument();
       // When switching to card view
-      click(r.viewToggle);
-      click(r.viewToggle_card);
+      click(r.viewToggle_cards);
       // Then EditColumnsButton is hidden
       expect(r.query.editColumnsButton).not.toBeInTheDocument();
     });
@@ -319,17 +317,15 @@ describe("GridTableLayout", () => {
             layoutStateProps={{}}
             pageTitle="Test"
             tableProps={{ columns, rows: [simpleHeader, ...rows] }}
-            cardView={{ cards: sampleCards }}
-            sidePanel={<div>Side Panel Content</div>}
+            cardView={{ cards: sampleCards, sidePanel: <div>Side Panel Content</div> }}
           />
         </QueryParamProvider>,
         withRouter(),
       );
       // Then the side panel is not visible in table view
-      expect(r.query.sidePanel).not.toBeInTheDocument();
+      expect(r.query.cardGridView_sidePanel).not.toBeInTheDocument();
       // And when switching to card view
-      click(r.viewToggle);
-      click(r.viewToggle_card);
+      click(r.viewToggle_cards);
       // Then the side panel is visible
       expect(r.cardGridView_sidePanel).toBeInTheDocument();
       expect(r.cardGridView_sidePanel).toHaveTextContent("Side Panel Content");

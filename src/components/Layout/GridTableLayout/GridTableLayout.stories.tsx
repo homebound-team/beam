@@ -349,8 +349,7 @@ export function CardsViewWithSidePanel() {
           columns,
           rows: [simpleHeader, ...makeNestedRows(1)],
         }}
-        cardView={{ cards: clickableCards }}
-        sidePanel={sidePanel}
+        cardView={{ cards: clickableCards, sidePanel }}
       />
     </TestProjectLayout>
   );
