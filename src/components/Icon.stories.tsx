@@ -177,6 +177,7 @@ export const Icon = (props: IconProps) => {
     "menu",
     "tile",
     "list",
+    "cards",
   ];
   const weatherIcons: IconProps["icon"][] = [
     "fog",

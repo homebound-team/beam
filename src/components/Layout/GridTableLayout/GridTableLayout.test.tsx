@@ -2,9 +2,10 @@ import { checkboxFilter } from "src/components/Filters";
 import { actionColumn, column, numericColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { noop } from "src/utils";
-import { render, tableSnapshot, withRouter } from "src/utils/rtl";
+import { click, render, tableSnapshot, withRouter } from "src/utils/rtl";
 import { QueryParamProvider } from "use-query-params";
 import {
+  CardItem,
   GridTableLayout as GridTableLayoutComponent,
   GridTableLayoutProps,
   useGridTableLayoutState,
@@ -238,6 +239,100 @@ describe("GridTableLayout", () => {
       );
 
       expect(r.pageTitle).toBeInTheDocument();
+    });
+  });
+
+  describe("Card View", () => {
+    const sampleCards: CardItem[] = [
+      { id: "card1", image: "image1.png", title: "Card 1", description: "Description 1" },
+      { id: "card2", image: "image2.png", title: "Card 2", description: "Description 2" },
+    ];
+
+    it("does not show view toggle when cardView is not provided", async () => {
+      // Given a GridTableLayout without cardView prop
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{ search: "client" }}
+            pageTitle="Test"
+            tableProps={{ columns, rows: [simpleHeader, ...rows] }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+      // Then the view toggle is not rendered
+      expect(r.query.viewToggle).not.toBeInTheDocument();
+    });
+
+    it("switches to card view when toggle is clicked", async () => {
+      // Given a GridTableLayout with cardView prop
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{}}
+            pageTitle="Test"
+            tableProps={{ columns, rows: [simpleHeader, ...rows] }}
+            cardView={{ cards: sampleCards }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+      // When clicking the view toggle dropdown and selecting card view
+      click(r.viewToggle);
+      click(r.viewToggle_card);
+      // Then cards are rendered
+      expect(r.layoutCardCard1).toBeInTheDocument();
+      expect(r.layoutCardCard2).toBeInTheDocument();
+      // And the card content is visible
+      expect(r.layoutCardCard1_title).toHaveTextContent("Card 1");
+      expect(r.layoutCardCard1_description).toHaveTextContent("Description 1");
+    });
+
+    it("hides EditColumnsButton in card view", async () => {
+      // Given a GridTableLayout with cardView and hideable columns
+      const hideableColumns = columns.map((c) => ({ ...c, canHide: true }));
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{}}
+            pageTitle="Test"
+            tableProps={{ columns: hideableColumns, rows: [simpleHeader, ...rows] }}
+            cardView={{ cards: sampleCards }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+      // Then EditColumnsButton is visible in table view
+      expect(r.editColumnsButton).toBeInTheDocument();
+      // When switching to card view
+      click(r.viewToggle);
+      click(r.viewToggle_card);
+      // Then EditColumnsButton is hidden
+      expect(r.query.editColumnsButton).not.toBeInTheDocument();
+    });
+
+    it("renders side panel only in card view", async () => {
+      // Given a GridTableLayout with cardView and sidePanel
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{}}
+            pageTitle="Test"
+            tableProps={{ columns, rows: [simpleHeader, ...rows] }}
+            cardView={{ cards: sampleCards }}
+            sidePanel={<div data-testid="sidePanel">Side Panel Content</div>}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+      // Then side panel is not visible in table view
+      expect(r.query.sidePanel).not.toBeInTheDocument();
+      // When switching to card view
+      click(r.viewToggle);
+      click(r.viewToggle_card);
+      // Then side panel is visible
+      expect(r.sidePanel).toBeInTheDocument();
+      expect(r.sidePanel).toHaveTextContent("Side Panel Content");
     });
   });
 });
