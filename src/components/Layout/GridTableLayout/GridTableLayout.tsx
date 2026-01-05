@@ -66,7 +66,7 @@ export type GridTableLayoutProps<
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
-  totalCount: number;
+  totalCount?: number;
 };
 
 /**
@@ -95,7 +95,7 @@ export type GridTableLayoutProps<
  * />
  * ```
  *
- * Pagination is always enabled - use `layoutState.page` for query variables.
+ * Pagination is rendered when `totalCount` is provided. Use `layoutState.page` for server query variables.
  */
 function GridTableLayoutComponent<
   F extends Record<string, unknown>,
@@ -199,11 +199,11 @@ function GridTableLayoutComponent<
             visibleColumnsStorageKey={visibleColumnsStorageKey}
           />
         )}
-        {layoutState && (
+        {layoutState && totalCount !== undefined && (
           <Pagination
-            page={[layoutState.page, layoutState.setPage]}
+            page={[layoutState.page, layoutState._pagination.setPage]}
             totalCount={totalCount}
-            pageSizes={layoutState.pageSizes}
+            pageSizes={layoutState._pagination.pageSizes}
             {...tid.pagination}
           />
         )}
@@ -235,7 +235,7 @@ export type PaginationConfig = {
  * A wrapper around standard filter, grouping, search, and pagination state hooks.
  * * `client` search will use the built-in grid table search functionality.
  * * `server` search will return `searchString` as a debounced search string to query the server.
- * * Pagination is always enabled by default. Use `pagination` config to customize page sizes or storage key.
+ * * Use `pagination` config to customize page sizes or storage key. Use `page` for server query variables.
  */
 export function useGridTableLayoutState<F extends Record<string, unknown>>({
   persistedFilter,
@@ -248,7 +248,7 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
   persistedColumns?: { storageKey: string };
   search?: "client" | "server";
   groupBy?: Record<string, string>;
-  /** Customize pagination page sizes or storage key. Pagination is always enabled. */
+  /** Customize pagination page sizes or storage key */
   pagination?: PaginationConfig;
 }) {
   // Because we can't conditionally render a hook, we still call it with a fallback value.
@@ -264,8 +264,9 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     undefined,
   );
 
-  // Pagination state management - always enabled by default
+  // Pagination state
   const paginationFallbackKey = "unset-pagination";
+  const pageSizes = pagination?.pageSizes ?? [100, 500, 1000];
   const [persistedPageSize, setPersistedPageSize] = useSessionStorage<number>(
     pagination?.storageKey ?? paginationFallbackKey,
     100, // default page size
@@ -277,11 +278,10 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
   });
 
   // Persist page size and reset to first page when filters/search change
-  const filterString = JSON.stringify(filter);
   useEffect(() => {
     if (page.limit !== persistedPageSize) setPersistedPageSize(page.limit);
     setPage((prev) => ({ ...prev, offset: 0 }));
-  }, [page.limit, persistedPageSize, setPersistedPageSize, filterString, searchString]);
+  }, [page.limit, persistedPageSize, setPersistedPageSize, filter, searchString]);
 
   return {
     filter,
@@ -294,9 +294,10 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     visibleColumnIds: persistedColumns ? visibleColumnIds : undefined,
     setVisibleColumnIds: persistedColumns ? setVisibleColumnIds : undefined,
     persistedColumnsStorageKey: persistedColumns?.storageKey,
+    /** Current page offset/limit - use this for server query variables */
     page,
-    setPage,
-    pageSizes: pagination?.pageSizes,
+    /** @internal Used by GridTableLayout component */
+    _pagination: { setPage, pageSizes },
   };
 }
 
