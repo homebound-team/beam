@@ -330,45 +330,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     api.resetColumnWidthsFn = !disableColumnResizing ? resetColumnWidths : undefined;
   }, [api, resetColumnWidths, disableColumnResizing]);
 
-  // Track previous table width to detect container resize
-  const prevTableWidthRef = useRef<number | undefined>(tableWidth);
-
   // Track whether columns have been locked to pixel widths in this session.
   // Separate from resizedWidths.length because persisted widths don't trigger locking.
   // TODO: Could add a "Reset Column Widths" button to clear resizedWidths and unlock.
   const hasLockedColumnsRef = useRef<boolean>(false);
-
-  // Scale resized column widths when container width changes
-  useEffect(() => {
-    if (!prevTableWidthRef.current) {
-      prevTableWidthRef.current = tableWidth;
-      return;
-    }
-
-    if (!tableWidth) return;
-
-    const prevWidth = prevTableWidthRef.current;
-    const widthChanged = Math.abs(tableWidth - prevWidth) > 1; // Allow 1px tolerance for subpixel rounding
-
-    if (widthChanged) {
-      const scale = tableWidth / prevWidth;
-
-      setResizedWidths((currentResizedWidths: ResizedWidths): ResizedWidths => {
-        if (!currentResizedWidths || Object.keys(currentResizedWidths).length === 0) {
-          return currentResizedWidths;
-        }
-
-        const scaledWidths: ResizedWidths = {};
-        Object.entries(currentResizedWidths).forEach(([id, width]) => {
-          scaledWidths[id] = Math.round(width * scale);
-        });
-
-        return scaledWidths;
-      });
-
-      prevTableWidthRef.current = tableWidth;
-    }
-  }, [tableWidth, setResizedWidths]);
 
   // ---------resizable column helpers------
   // Helper to distribute adjustment proportionally among right columns

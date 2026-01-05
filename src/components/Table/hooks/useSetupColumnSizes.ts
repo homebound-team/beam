@@ -50,6 +50,8 @@ export function useSetupColumnSizes<R extends Kinded>(
   // which is used internally by `useDebounce`, so the frozen clock means the callback is never called.
   const calculateImmediately = useRef<boolean>(true);
   const [tableWidth, setTableWidth] = useState<number | undefined>();
+  // Track previous table width to detect container resize
+  const prevTableWidthRef = useRef<number | undefined>(tableWidth);
 
   // Calc our initial/first render sizes where we won't have a width yet
   const [columnSizes, setColumnSizes] = useState<string[]>(
@@ -63,6 +65,38 @@ export function useSetupColumnSizes<R extends Kinded>(
     },
     [setTableWidth, setColumnSizes, columns, style, expandedColumnIds, resizedWidths],
   );
+
+  // Scale resized column widths when container width changes
+  useEffect(() => {
+    if (!prevTableWidthRef.current) {
+      prevTableWidthRef.current = tableWidth;
+      return;
+    }
+
+    if (!tableWidth) return;
+
+    const prevWidth = prevTableWidthRef.current;
+    const widthChanged = Math.abs(tableWidth - prevWidth) > 1; // Allow 1px tolerance for subpixel rounding
+
+    if (widthChanged) {
+      const scale = tableWidth / prevWidth;
+
+      setResizedWidths((currentResizedWidths: ResizedWidths): ResizedWidths => {
+        if (!currentResizedWidths || Object.keys(currentResizedWidths).length === 0) {
+          return currentResizedWidths;
+        }
+
+        const scaledWidths: ResizedWidths = {};
+        Object.entries(currentResizedWidths).forEach(([id, width]) => {
+          scaledWidths[id] = Math.round(width * scale);
+        });
+
+        return scaledWidths;
+      });
+
+      prevTableWidthRef.current = tableWidth;
+    }
+  }, [tableWidth, setResizedWidths]);
 
   // Used to recalculate our columns sizes when columns or resized widths change
   useEffect(
