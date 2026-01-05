@@ -50,8 +50,12 @@ export function GridTableLayout() {
         primaryAction={{ label: "Primary Action", onClick: noop }}
         secondaryAction={{ label: "Secondary Action", onClick: noop }}
         tertiaryAction={{
-          label: "Action Menu",
-          tooltip: "If I'm a ButtonMenu or a plain Button I will enforce this variant",
+          label: "Tertiary Action",
+          tooltip: "I am tertiary",
+          onClick: noop,
+        }}
+        actionMenu={{
+          tooltip: "I am the actionMenu",
           items: [
             { label: "First Action", onClick: noop },
             { label: "Second Action", onClick: noop },

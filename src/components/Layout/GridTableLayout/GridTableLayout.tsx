@@ -27,9 +27,9 @@ import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumb
 import { ScrollableContent } from "../ScrollableContent";
 import { QueryResult, QueryTable, QueryTableProps } from "./QueryTable";
 
-type ActionButtonMenuProps = { label: string } & Pick<ButtonMenuProps, "items" | "disabled" | "tooltip">;
+type ActionButtonMenuProps = Pick<ButtonMenuProps, "items" | "disabled" | "tooltip">;
 
-type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip"> | ActionButtonMenuProps;
+type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
 
 type OmittedTableProps = "filter" | "stickyHeader" | "style" | "rows";
 
@@ -64,6 +64,8 @@ export type GridTableLayoutProps<
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
   breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
+  /** Renders a ButtonMenu with "verticalDots" icon as trigger */
+  actionMenu?: ActionButtonMenuProps;
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
@@ -110,6 +112,7 @@ function GridTableLayoutComponent<
     primaryAction,
     secondaryAction,
     tertiaryAction,
+    actionMenu,
     hideEditColumns = false,
   } = props;
 
@@ -151,6 +154,7 @@ function GridTableLayoutComponent<
         primaryAction={primaryAction}
         secondaryAction={secondaryAction}
         tertiaryAction={tertiaryAction}
+        actionMenu={actionMenu}
       />
       {showTableActions && (
         <TableActions onlyRight={!layoutState?.search && hasHideableColumns}>
@@ -262,10 +266,11 @@ type HeaderProps = {
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
+  actionMenu?: ActionButtonMenuProps;
 };
 
 function Header(props: HeaderProps) {
-  const { pageTitle, breadcrumb, primaryAction, secondaryAction, tertiaryAction } = props;
+  const { pageTitle, breadcrumb, primaryAction, secondaryAction, tertiaryAction, actionMenu } = props;
   const tids = useTestIds(props);
 
   return (
@@ -279,32 +284,14 @@ function Header(props: HeaderProps) {
         </div>
         {/* Flex wrap reverse and justify flex end allows the buttons to wrap naturally/responsively on smaller screens */}
         <div css={Css.df.fwr.jcfe.gap1.$}>
-          {tertiaryAction &&
-            (isButtonMenuProps(tertiaryAction) ? (
-              <ButtonMenu {...tertiaryAction} trigger={{ label: tertiaryAction.label, variant: "tertiary" }} />
-            ) : (
-              <Button {...tertiaryAction} variant="tertiary" />
-            ))}
-          {secondaryAction &&
-            (isButtonMenuProps(secondaryAction) ? (
-              <ButtonMenu {...secondaryAction} trigger={{ label: secondaryAction.label, variant: "secondary" }} />
-            ) : (
-              <Button {...secondaryAction} variant="secondary" />
-            ))}
-          {primaryAction &&
-            (isButtonMenuProps(primaryAction) ? (
-              <ButtonMenu {...primaryAction} trigger={{ label: primaryAction.label, variant: "primary" }} />
-            ) : (
-              <Button {...primaryAction} />
-            ))}
+          {tertiaryAction && <Button {...tertiaryAction} variant="tertiary" />}
+          {secondaryAction && <Button {...secondaryAction} variant="secondary" />}
+          {primaryAction && <Button {...primaryAction} />}
+          {actionMenu && <ButtonMenu {...actionMenu} trigger={{ icon: "verticalDots" }} />}
         </div>
       </header>
     </FullBleed>
   );
-}
-
-function isButtonMenuProps(action: ActionButtonProps): action is ActionButtonMenuProps {
-  return "items" in action;
 }
 
 function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
