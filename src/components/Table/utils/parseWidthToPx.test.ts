@@ -1,6 +1,11 @@
 import { parseWidthToPx } from "./columns";
 
 describe("parseWidthToPx", () => {
+  it("returns null for undefined or empty values", () => {
+    expect(parseWidthToPx(undefined, 1000)).toBe(null);
+    expect(parseWidthToPx("", 1000)).toBe(null);
+  });
+
   it("parses valid pixel values", () => {
     expect(parseWidthToPx("200px", 1000)).toBe(200);
   });

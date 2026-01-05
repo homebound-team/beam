@@ -95,7 +95,9 @@ function nonKindDefaults() {
   return Object.fromEntries(nonKindGridColumnKeys.map((key) => [key, undefined]));
 }
 
-export function parseWidthToPx(widthStr: string, tableWidth: number | undefined): number | null {
+export function parseWidthToPx(widthStr: string | undefined, tableWidth: number | undefined): number | null {
+  if (!widthStr) return null;
+
   if (widthStr.endsWith("px")) {
     const parsed = parseInt(widthStr.replace("px", ""), 10);
     return isNaN(parsed) ? null : parsed;
