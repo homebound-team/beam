@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 export type ResizedWidths = Record<string, number>;
@@ -25,14 +25,11 @@ export function useColumnResizing(storageKey: string | undefined): {
     }
   });
 
-  const storageKeyRef = useRef(storageKey);
-  storageKeyRef.current = storageKey;
-
   // Debounced persistence to session storage - prevents blocking main thread during fast dragging
   const persistToStorage = useDebouncedCallback((widths: ResizedWidths) => {
-    if (!storageKeyRef.current) return;
+    if (!storageKey) return;
 
-    const key = `columnWidths_${storageKeyRef.current}`;
+    const key = `columnWidths_${storageKey}`;
     try {
       sessionStorage.setItem(key, JSON.stringify(widths));
     } catch {
