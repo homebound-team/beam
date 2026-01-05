@@ -81,7 +81,7 @@ describe("GridTableLayout", () => {
 
     // And the table actions to be rendered
     expect(r.search).toHaveValue("");
-    expect(r.filter_needsRevision).not.toBeChecked();
+    expect(r.filter_button).toBeInTheDocument();
 
     // And the table content to be rendered
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
@@ -139,8 +139,8 @@ describe("GridTableLayout", () => {
 
     // And the search to not be rended
     expect(r.query.search).not.toBeInTheDocument();
-    // But the filter still is
-    expect(r.filter_needsRevision).not.toBeChecked();
+    // But the filter button still is
+    expect(r.filter_button).toBeInTheDocument();
 
     // And the table content to be rendered
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
