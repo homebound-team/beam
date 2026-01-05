@@ -6,13 +6,17 @@ type TableActionsXss = Xss<Margin>;
 interface TableActionsProps<X> {
   xss?: X;
   children: ReactNode;
-  onlyLeft?: boolean;
-  onlyRight?: boolean;
+  /** Content pinned to the right (e.g., column picker). */
+  right?: ReactNode;
 }
 
-/** Provides default spacing for Actions sitting above a table (Filters, Search, etc...) */
+/** Provides layout and spacing for actions above a table (Filters, Search, EditColumns, etc.) */
 export function TableActions<X extends Only<TableActionsXss, X>>(props: TableActionsProps<X>) {
-  const { xss, children, onlyLeft, onlyRight } = props;
-  const alignmentStyles = onlyLeft ? Css.jcfs.$ : onlyRight ? Css.jcfe.$ : Css.jcsb.$;
-  return <div css={{ ...Css.df.aic.pb2.gap1.$, ...xss, ...alignmentStyles }}>{children}</div>;
+  const { xss, children, right } = props;
+  return (
+    <div css={{ ...Css.df.gap1.aic.jcsb.aifs.pb2.$, ...xss }}>
+      <div css={Css.df.gap1.aic.fww.$}>{children}</div>
+      {right}
+    </div>
+  );
 }
