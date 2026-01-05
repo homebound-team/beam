@@ -5,7 +5,6 @@ import { Icon } from "src/components/Icon";
 import { OffsetAndLimit, Pagination } from "src/components/Pagination";
 import { GridDataRow } from "src/components/Table";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
-import { EditColumnsButton, GridDataRow } from "src/components/Table";
 import { GridTable, GridTableProps } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
