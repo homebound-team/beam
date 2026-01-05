@@ -1,12 +1,12 @@
 import memoizeOne from "memoize-one";
 import { runInAction } from "mobx";
-import React, { MutableRefObject, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { Components, ListRange, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { getTableRefWidthStyles, Loader } from "src/components";
 import { DiscriminateUnion, GridRowKind } from "src/components/index";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
-import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
+import { useColumnResizeHandlers } from "src/components/Table/hooks/useColumnResizeHandlers";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
 import { defaultStyle, GridStyle, GridStyleDef, resolveStyles, RowStyles } from "src/components/Table/TableStyles";
 import {
@@ -18,7 +18,7 @@ import {
   Kinded,
   RenderAs,
 } from "src/components/Table/types";
-import { assignDefaultColumnIds, parseWidthToPx } from "src/components/Table/utils/columns";
+import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { EXPANDABLE_HEADER, isCursorBelowMidpoint, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
@@ -28,17 +28,6 @@ import { useRenderCount } from "src/hooks/useRenderCount";
 import { isPromise } from "src/utils";
 import { GridDataRow, Row } from "./components/Row";
 import { DraggedOver } from "./utils/RowState";
-
-type ColumnWidthInfo = {
-  id: string;
-  currentWidth: number;
-  minWidth: number;
-};
-
-type DistributionResult = {
-  updates: ResizedWidths;
-  actualAdjustment: number;
-};
 
 let runningInJest = false;
 
@@ -330,157 +319,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     api.resetColumnWidthsFn = !disableColumnResizing ? resetColumnWidths : undefined;
   }, [api, resetColumnWidths, disableColumnResizing]);
 
-  // Track whether columns have been locked to pixel widths in this session.
-  // Separate from resizedWidths.length because persisted widths don't trigger locking.
-  // TODO: Could add a "Reset Column Widths" button to clear resizedWidths and unlock.
-  const hasLockedColumnsRef = useRef<boolean>(false);
-
-  // ---------resizable column helpers------
-  // Helper to distribute adjustment proportionally among right columns
-  const distributeAdjustment = useCallback(
-    (rightColumns: Array<ColumnWidthInfo>, totalRightWidth: number, adjustment: number): DistributionResult => {
-      const updates: ResizedWidths = {};
-      let remainingAdjustment = adjustment;
-
-      // Distribute the adjustment across all right columns proportionally
-      rightColumns.forEach((col) => {
-        const proportion = totalRightWidth > 0 ? col.currentWidth / totalRightWidth : 1 / rightColumns.length;
-        const colAdjustment = adjustment * proportion;
-        const newColWidth = Math.max(col.minWidth, col.currentWidth + colAdjustment);
-
-        updates[col.id] = newColWidth;
-        remainingAdjustment -= newColWidth - col.currentWidth;
-      });
-
-      return { updates, actualAdjustment: adjustment - remainingAdjustment };
-    },
-    [],
-  );
-
-  const calculateResizeUpdates = useCallback(
-    (
-      columnId: string,
-      newWidth: number,
-      columnIndex: number,
-    ): { updates: ResizedWidths; hasRightColumns: boolean } | null => {
-      if (!tableWidth || !columnSizes || columnSizes.length === 0) {
-        return null;
-      }
-
-      const currentSizeStr = columnSizes[columnIndex];
-      const currentWidth = parseWidthToPx(currentSizeStr, tableWidth) ?? 0;
-      const resizedColumn = columns[columnIndex];
-      const resizedColumnMinWidth = resizedColumn.mw ? parseInt(resizedColumn.mw.replace("px", ""), 10) : 0;
-      const clampedNewWidth = Math.max(resizedColumnMinWidth, newWidth);
-      const delta = clampedNewWidth - currentWidth;
-
-      if (delta === 0) {
-        return { updates: {}, hasRightColumns: false };
-      }
-
-      // Find right columns and calculate how much they can shrink
-      const rightColumns: Array<ColumnWidthInfo> = [];
-      let totalRightWidth = 0;
-
-      for (let i = columnIndex + 1; i < columns.length; i++) {
-        const col = columns[i];
-        // Skip action columns
-        if (col.isAction) {
-          continue;
-        }
-
-        const sizeStr = columnSizes[i];
-        const width = parseWidthToPx(sizeStr, tableWidth) ?? 0;
-        const minWidth = col.mw ? parseInt(col.mw.replace("px", ""), 10) : 0;
-
-        rightColumns.push({
-          id: col.id,
-          currentWidth: width,
-          minWidth,
-        });
-        totalRightWidth += width;
-      }
-
-      // If no resizable columns to the right, just update this column
-      if (rightColumns.length === 0) {
-        return { updates: { [columnId]: clampedNewWidth }, hasRightColumns: false };
-      }
-
-      // Distribute the opposite of the delta to right columns to keep table width constant
-      // If we shrink by 30, right columns grow by 30. If we grow by 30, right columns shrink by 30.
-      const distributionResult = distributeAdjustment(rightColumns, totalRightWidth, -delta);
-
-      // Always use the actual distributed amount to ensure table width stays constant
-      // actualAdjustment is the amount that was successfully distributed to right columns
-      // We adjust the resized column by the opposite of this to maintain constant table width
-      const actualAdjustment = distributionResult.actualAdjustment;
-      const finalResizedWidth = currentWidth - actualAdjustment;
-
-      // Enforce minWidth on the final resized width as well
-      // This ensures we never shrink below the column's minimum width
-      const clampedFinalWidth = Math.max(resizedColumnMinWidth, finalResizedWidth);
-
-      const updates: ResizedWidths = {
-        [columnId]: clampedFinalWidth,
-        ...distributionResult.updates,
-      };
-
-      return { updates, hasRightColumns: true };
-    },
-    [tableWidth, columnSizes, columns, distributeAdjustment],
-  );
-
-  // Calculate the preview width for a column resize (without applying it) so our guide line is accurate
-  const calculatePreviewWidth = useCallback(
-    (columnId: string, newWidth: number, columnIndex: number): number => {
-      const result = calculateResizeUpdates(columnId, newWidth, columnIndex);
-      if (!result) {
-        return newWidth;
-      }
-      return result.updates[columnId] ?? newWidth;
-    },
-    [calculateResizeUpdates],
-  );
-
-  const handleColumnResize = useCallback(
-    (columnId: string, newWidth: number, columnIndex: number) => {
-      const result = calculateResizeUpdates(columnId, newWidth, columnIndex);
-
-      if (!result) {
-        setResizedWidth(columnId, newWidth);
-        return;
-      }
-
-      if (Object.keys(result.updates).length === 0) {
-        return;
-      }
-
-      // On first manual resize, lock all columns to pixel widths to prevent fr unit shifting.
-      // We check hasLockedColumnsRef instead of resizedWidths.length because persisted widths
-      // from sessionStorage don't count as manual resizes in this session.
-      if (!hasLockedColumnsRef.current) {
-        const lockedWidths: ResizedWidths = {};
-        columnSizes.forEach((sizeStr, idx) => {
-          const col = columns[idx];
-
-          // Don't resize action col
-          if (col.isAction) return;
-          const currentWidth = parseWidthToPx(sizeStr, tableWidth) ?? 0;
-          lockedWidths[col.id] = currentWidth;
-        });
-
-        setResizedWidths((prev) => ({
-          ...prev,
-          ...lockedWidths,
-          ...result.updates,
-        }));
-        hasLockedColumnsRef.current = true;
-        return;
-      }
-
-      setResizedWidths(result.updates);
-    },
-    [calculateResizeUpdates, setResizedWidths, columnSizes, columns, setResizedWidth, tableWidth],
+  // Handle column resize logic with proportional distribution
+  const { handleColumnResize, calculatePreviewWidth } = useColumnResizeHandlers(
+    columns,
+    columnSizes,
+    tableWidth,
+    setResizedWidth,
+    setResizedWidths,
   );
 
   // allows us to unset children and grandchildren, etc.
