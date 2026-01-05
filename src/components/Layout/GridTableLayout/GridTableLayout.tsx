@@ -283,7 +283,7 @@ function Header(props: HeaderProps) {
           </h1>
         </div>
         {/* Flex wrap reverse and justify flex end allows the buttons to wrap naturally/responsively on smaller screens */}
-        <div css={Css.df.fwr.jcfe.gap1.$}>
+        <div css={Css.df.fwr.jcfe.gap1.aic.$}>
           {tertiaryAction && <Button {...tertiaryAction} variant="tertiary" />}
           {secondaryAction && <Button {...secondaryAction} variant="secondary" />}
           {primaryAction && <Button {...primaryAction} />}
