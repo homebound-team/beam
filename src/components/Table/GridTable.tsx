@@ -180,7 +180,7 @@ export interface GridTableProps<R extends Kinded, X> {
   csvPrefixRows?: string[][];
   /** Drag & drop Callback. */
   onRowDrop?: (draggedRow: GridDataRow<R>, droppedRow: GridDataRow<R>, indexOffset: number) => void;
-  /** Disable column resizing functionality. */
+  /** Disable column resizing functionality. Defaults to false. */
   disableColumnResizing?: boolean;
 }
 
@@ -228,7 +228,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     onRowSelect,
     onRowDrop: droppedCallback,
     csvPrefixRows,
-    disableColumnResizing = true,
+    disableColumnResizing = false,
   } = props;
 
   const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
