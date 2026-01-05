@@ -100,7 +100,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
 
       {/* When open, show all filter controls in a new row below */}
       {isOpen && (
-        <div ref={filterContentRef} {...overlayProps} css={Css.df.aic.fww.gap1.order(1).w100.$}>
+        <div ref={filterContentRef} {...overlayProps} css={Css.df.aic.fww.gap1.order(1).$}>
           {groupBy && (
             <SelectField
               label="Group by"

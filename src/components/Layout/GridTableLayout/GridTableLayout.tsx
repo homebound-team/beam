@@ -140,18 +140,19 @@ function GridTableLayoutComponent<
         tertiaryAction={tertiaryAction}
       />
       {showTableActions && (
-        <TableActions onlyLeft={!hasHideableColumns}>
-          <div css={Css.df.gap1.aic.fww.$}>
-            {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
-            {layoutState?.filterDefs && (
-              <FilterDropdownMenu
-                filterDefs={layoutState.filterDefs}
-                filter={layoutState.filter}
-                onChange={layoutState.setFilter}
-                groupBy={layoutState.groupBy}
-              />
-            )}
-
+        <TableActions>
+          <div css={Css.df.gap1.aic.jcsb.w100.aifs.$}>
+            <div css={Css.df.gap1.aic.fww.$}>
+              {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
+              {layoutState?.filterDefs && (
+                <FilterDropdownMenu
+                  filterDefs={layoutState.filterDefs}
+                  filter={layoutState.filter}
+                  onChange={layoutState.setFilter}
+                  groupBy={layoutState.groupBy}
+                />
+              )}
+            </div>
             {hasHideableColumns && (
               <EditColumnsButton
                 columns={columns}
