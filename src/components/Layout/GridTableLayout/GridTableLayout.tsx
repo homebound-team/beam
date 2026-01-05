@@ -140,20 +140,9 @@ function GridTableLayoutComponent<
         tertiaryAction={tertiaryAction}
       />
       {showTableActions && (
-        <TableActions>
-          <div css={Css.df.gap1.aic.jcsb.w100.aifs.$}>
-            <div css={Css.df.gap1.aic.fww.$}>
-              {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
-              {layoutState?.filterDefs && (
-                <FilterDropdownMenu
-                  filterDefs={layoutState.filterDefs}
-                  filter={layoutState.filter}
-                  onChange={layoutState.setFilter}
-                  groupBy={layoutState.groupBy}
-                />
-              )}
-            </div>
-            {hasHideableColumns && (
+        <TableActions
+          right={
+            hasHideableColumns && (
               <EditColumnsButton
                 columns={columns}
                 api={api}
@@ -161,8 +150,18 @@ function GridTableLayoutComponent<
                 trigger={{ icon: "kanban", label: "", variant: "secondaryBlack" }}
                 {...tid.editColumnsButton}
               />
-            )}
-          </div>
+            )
+          }
+        >
+          {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
+          {layoutState?.filterDefs && (
+            <FilterDropdownMenu
+              filterDefs={layoutState.filterDefs}
+              filter={layoutState.filter}
+              onChange={layoutState.setFilter}
+              groupBy={layoutState.groupBy}
+            />
+          )}
         </TableActions>
       )}
       <ScrollableContent virtualized={isVirtualized}>
