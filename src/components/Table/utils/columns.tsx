@@ -95,7 +95,6 @@ function nonKindDefaults() {
   return Object.fromEntries(nonKindGridColumnKeys.map((key) => [key, undefined]));
 }
 
-// TODO: can we get rid of the `undefinded` tableWidth.
 export function parseWidthToPx(widthStr: string, tableWidth: number | undefined): number | null {
   if (widthStr.endsWith("px")) {
     const parsed = parseInt(widthStr.replace("px", ""), 10);
