@@ -66,3 +66,7 @@ Our proposal for solving this tension is to adopt a radically different model th
 "Adopters" of Beam should of course contribute back bug fixes and feature improvements; but they should also feel free (and encouraged) to run their own company-specific forks, and "customize by changing the source".
 
 In this way, Beam should be seen as a place to "copy & paste" start from, rather than a project that will have 1,000s of npm downloads, and 100s of companies all collaborating on getting this _one_ `TextField` implementation to behave in the 101 different ways that they each want.
+
+## Alpha release
+
+Beam does support [semantic releases](https://semantic-release.gitbook.io/semantic-release/recipes/release-workflow/pre-releases). Homebound most common use case is pushing to the `alpha` branch.
