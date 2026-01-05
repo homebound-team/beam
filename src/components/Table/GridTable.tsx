@@ -6,7 +6,7 @@ import { getTableRefWidthStyles, Loader } from "src/components";
 import { DiscriminateUnion, GridRowKind } from "src/components/index";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
-import { ResizedWidths, useColumnResizing } from "src/components/Table/hooks/useColumnResizing";
+import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
 import { defaultStyle, GridStyle, GridStyleDef, resolveStyles, RowStyles } from "src/components/Table/TableStyles";
 import {
@@ -315,22 +315,20 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // Our column sizes use either `w` or `expandedWidth`, so see which columns are currently expanded
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
-  const { resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths } = useColumnResizing(
-    disableColumnResizing ? undefined : visibleColumnsStorageKey,
-  );
+  const { columnSizes, tableWidth, resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths } =
+    useSetupColumnSizes(
+      style,
+      columns,
+      resizeTarget ?? resizeRef,
+      expandedColumnIds,
+      visibleColumnsStorageKey,
+      disableColumnResizing,
+    );
 
   // Store resetColumnWidths on the API instance so it can be called from EditColumnsButton
   useEffect(() => {
     api.resetColumnWidthsFn = !disableColumnResizing ? resetColumnWidths : undefined;
   }, [api, resetColumnWidths, disableColumnResizing]);
-
-  const { columnSizes, tableWidth } = useSetupColumnSizes(
-    style,
-    columns,
-    resizeTarget ?? resizeRef,
-    expandedColumnIds,
-    resizedWidths,
-  );
 
   // Track previous table width to detect container resize
   const prevTableWidthRef = useRef<number | undefined>(tableWidth);

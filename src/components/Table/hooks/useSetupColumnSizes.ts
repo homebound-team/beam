@@ -1,7 +1,7 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { GridStyle } from "src/components/Table/TableStyles";
-import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
+import { ResizedWidths, useColumnResizing } from "src/components/Table/hooks/useColumnResizing";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { calcColumnSizes } from "src/components/Table/utils/columns";
 import { useDebouncedCallback } from "use-debounce";
@@ -30,8 +30,21 @@ export function useSetupColumnSizes<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   resizeRef: MutableRefObject<HTMLElement | null>,
   expandedColumnIds: string[],
-  resizedWidths?: ResizedWidths,
-): { columnSizes: string[]; tableWidth: number | undefined } {
+  visibleColumnsStorageKey: string | undefined,
+  disableColumnResizing: boolean,
+): {
+  columnSizes: string[];
+  tableWidth: number | undefined;
+  resizedWidths: ResizedWidths;
+  setResizedWidth: (columnId: string, width: number) => void;
+  setResizedWidths: (widths: ResizedWidths | ((prev: ResizedWidths) => ResizedWidths)) => void;
+  resetColumnWidths: () => void;
+} {
+  // Call useColumnResizing to manage column width state and persistence
+  const { resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths } = useColumnResizing(
+    disableColumnResizing ? undefined : visibleColumnsStorageKey,
+  );
+
   // Calculate the column sizes immediately rather than via the `debounce` method.
   // We do this for Storybook integrations that may use MockDate. MockDate changes the behavior of `new Date()`,
   // which is used internally by `useDebounce`, so the frozen clock means the callback is never called.
@@ -85,5 +98,5 @@ export function useSetupColumnSizes<R extends Kinded>(
 
   useResizeObserver({ ref: resizeRef, onResize });
 
-  return { columnSizes, tableWidth };
+  return { columnSizes, tableWidth, resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths };
 }
