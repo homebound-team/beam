@@ -384,14 +384,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           ) {
             // Parse current width - if not in pixels, use a fallback or skip resize handle
             const currentSizeStr = columnSizes[columnIndex];
+            const minWidthPx = column.mw ? parseInt(column.mw.replace("px", ""), 10) : 100;
             // This fallback shouldn't happen in practice: columns are locked to pixel widths on first resize,
             // and resizedWidths should always contain the current width after that point. However, we handle
             // the edge case of initial render with percentage/calc() columns before any resize has occurred.
             const currentWidthPx =
-              parseWidthToPx(currentSizeStr, undefined) ??
-              resizedWidths?.[column.id] ??
-              (column.mw ? parseInt(column.mw.replace("px", ""), 10) : 100);
-            const minWidthPx = column.mw ? parseInt(column.mw.replace("px", ""), 10) : 0;
+              parseWidthToPx(currentSizeStr, undefined) ?? resizedWidths?.[column.id] ?? minWidthPx;
 
             // Add resize handle to header cells by cloning the cell element and adding relative positioning
             const cellElementWithHandle = React.cloneElement(cellElement as React.ReactElement, {
