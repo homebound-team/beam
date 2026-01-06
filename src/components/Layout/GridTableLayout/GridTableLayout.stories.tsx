@@ -43,7 +43,7 @@ export function GridTableLayout() {
         ]}
         layoutState={layoutState}
         tableProps={{
-          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
+          columns,
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
         }}
@@ -62,6 +62,70 @@ export function GridTableLayout() {
             { label: "Third Action", onClick: noop },
           ],
         }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+export function ManyFilters() {
+  const filterDefs = useMemo(() => getManyFilterDefs(), []);
+  const columns = useMemo(() => getColumns(), []);
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey: "grid-table-layout-many-filters",
+    },
+    search: "client",
+  });
+
+  return (
+    <TestProjectLayout>
+      <GridTableLayoutComponent
+        pageTitle="Grid Table Layout with Many Filters"
+        breadcrumb={[
+          { href: "/", label: "Home" },
+          { href: "/", label: "Sub Page" },
+        ]}
+        layoutState={layoutState}
+        tableProps={{
+          columns,
+          rows: [simpleHeader, ...makeNestedRows(3)],
+          sorting: { on: "client", initial: [columns[3].id!, "ASC"] },
+        }}
+        primaryAction={{ label: "Primary Action", onClick: noop }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+export function WithCheckboxFilter() {
+  const filterDefs = useMemo(() => getCheckboxFilterDefs(), []);
+  const columns = useMemo(() => getColumns(), []);
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey: "grid-table-layout-checkbox",
+    },
+    search: "client",
+  });
+
+  return (
+    <TestProjectLayout>
+      <GridTableLayoutComponent
+        pageTitle="Grid Table Layout with Checkbox Filter"
+        breadcrumb={[
+          { href: "/", label: "Home" },
+          { href: "/", label: "Sub Page" },
+        ]}
+        layoutState={layoutState}
+        tableProps={{
+          columns,
+          rows: [simpleHeader, ...makeNestedRows(3)],
+          sorting: { on: "client", initial: [columns[3].id!, "ASC"] },
+        }}
+        primaryAction={{ label: "Primary Action", onClick: noop }}
       />
     </TestProjectLayout>
   );
@@ -93,7 +157,7 @@ export function QueryTableLayout() {
         ]}
         layoutState={layoutState}
         tableProps={{
-          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
+          columns,
           query,
           createRows: (data) => [
             simpleHeader,
@@ -160,6 +224,144 @@ function getFilterDefs() {
   };
 }
 
+function getCheckboxFilterDefs() {
+  return {
+    primary: multiFilter({
+      options: [
+        { value: "primary", label: "Primary" },
+        { value: "secondary", label: "Secondary" },
+      ],
+      getOptionLabel: (tp) => tp.label,
+      getOptionValue: (tp) => tp.value,
+      label: "Preference",
+    }),
+    status: multiFilter({
+      options: [
+        { label: "Active", value: "active" },
+        { label: "Inactive", value: "inactive" },
+      ],
+      getOptionLabel: (cs) => cs.label,
+      getOptionValue: (cs) => cs.value,
+      label: "Status",
+    }),
+    isUrgent: checkboxFilter({
+      label: "Urgent",
+    }),
+    priority: multiFilter({
+      options: [
+        { label: "High", value: "high" },
+        { label: "Medium", value: "medium" },
+        { label: "Low", value: "low" },
+      ],
+      getOptionLabel: (p) => p.label,
+      getOptionValue: (p) => p.value,
+      label: "Priority",
+    }),
+    needsRevision: checkboxFilter({
+      label: "Needs Revision",
+    }),
+  };
+}
+
+function getManyFilterDefs() {
+  return {
+    primary: multiFilter({
+      options: [
+        { value: "primary", label: "Primary" },
+        { value: "secondary", label: "Secondary" },
+      ],
+      getOptionLabel: (tp) => tp.label,
+      getOptionValue: (tp) => tp.value,
+      label: "Preference",
+    }),
+    status: multiFilter({
+      options: [
+        { label: "Active", value: "active" },
+        { label: "Inactive", value: "inactive" },
+        { label: "Pending", value: "pending" },
+      ],
+      getOptionLabel: (cs) => cs.label,
+      getOptionValue: (cs) => cs.value,
+      label: "Status",
+    }),
+    priority: multiFilter({
+      options: [
+        { label: "High", value: "high" },
+        { label: "Medium", value: "medium" },
+        { label: "Low", value: "low" },
+      ],
+      getOptionLabel: (p) => p.label,
+      getOptionValue: (p) => p.value,
+      label: "Priority",
+    }),
+    category: multiFilter({
+      options: [
+        { label: "TypeA", value: "typeA" },
+        { label: "TypeB", value: "typeB" },
+        { label: "TypeC", value: "typeC" },
+      ],
+      getOptionLabel: (c) => c.label,
+      getOptionValue: (c) => c.value,
+      label: "Category",
+    }),
+    region: multiFilter({
+      options: [
+        { label: "North", value: "north" },
+        { label: "South", value: "south" },
+        { label: "East", value: "east" },
+        { label: "West", value: "west" },
+      ],
+      getOptionLabel: (r) => r.label,
+      getOptionValue: (r) => r.value,
+      label: "Region",
+    }),
+    department: multiFilter({
+      options: [
+        { label: "Engineering", value: "engineering" },
+        { label: "Sales", value: "sales" },
+        { label: "Marketing", value: "marketing" },
+      ],
+      getOptionLabel: (d) => d.label,
+      getOptionValue: (d) => d.value,
+      label: "Department",
+    }),
+    source: multiFilter({
+      options: [
+        { label: "Web", value: "web" },
+        { label: "Mobile", value: "mobile" },
+        { label: "API", value: "api" },
+        { label: "Import", value: "import" },
+      ],
+      getOptionLabel: (s) => s.label,
+      getOptionValue: (s) => s.value,
+      label: "Source",
+    }),
+    assignee: multiFilter({
+      options: [
+        { label: "John Doe", value: "john doe" },
+        { label: "Jane Smith", value: "jane smith" },
+        { label: "Bob Johnson", value: "bob johnson" },
+      ],
+      getOptionLabel: (a) => a.label,
+      getOptionValue: (a) => a.value,
+      label: "Assignee",
+    }),
+    projectType: multiFilter({
+      options: [
+        { label: "Internal", value: "internal" },
+        { label: "External", value: "external" },
+        { label: "Partner", value: "partner" },
+      ],
+      getOptionLabel: (pt) => pt.label,
+      getOptionValue: (pt) => pt.value,
+      label: "Project Type",
+    }),
+    needsRevision: checkboxFilter({
+      label: "Needs Revision",
+    }),
+  };
+}
+
 function getColumns() {
   const nameColumn = column<Row>({
     id: "name-col",
@@ -203,7 +405,15 @@ function getColumns() {
     w: "100px",
   });
 
-  return [nameColumn, valueColumn, statusColumn, priorityColumn, actionColumn];
+  return [
+    collapseColumn<Row>(),
+    selectColumn<Row>(),
+    nameColumn,
+    valueColumn,
+    statusColumn,
+    priorityColumn,
+    actionColumn,
+  ];
 }
 
 function makeNestedRows(repeat: number = 1): GridDataRow<Row>[] {

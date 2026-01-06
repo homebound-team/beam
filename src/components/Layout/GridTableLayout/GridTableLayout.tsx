@@ -1,23 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button, ButtonProps } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
-import { Filters } from "src/components/Filters/Filters";
+import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
 import { Icon } from "src/components/Icon";
-import { GridDataRow } from "src/components/Table";
-import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
+import { EditColumnsButton, GridDataRow } from "src/components/Table";
 import { GridTable, GridTableProps } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
-import {
-  useBreakpoint,
-  useComputed,
-  useGroupBy,
-  usePersistedFilter,
-  UsePersistedFilterProps,
-  useSessionStorage,
-} from "src/hooks";
+import { useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
 import { TextField } from "src/inputs/TextField";
 import { useTestIds } from "src/utils";
 import { useDebounce } from "use-debounce";
@@ -135,8 +127,6 @@ function GridTableLayoutComponent<
   const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns;
   const isVirtualized = tableProps.as === "virtual";
 
-  const breakpoints = useBreakpoint();
-
   // Sync API changes back to persisted state when persistedColumns is provided
   const visibleColumnIds = useComputed(() => api.getVisibleColumnIds(), [api]);
   useEffect(() => {
@@ -158,26 +148,26 @@ function GridTableLayoutComponent<
         actionMenu={actionMenu}
       />
       {showTableActions && (
-        <TableActions onlyRight={!layoutState?.search && hasHideableColumns}>
-          <div css={Css.df.gap1.$}>
-            {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
-            {layoutState?.filterDefs && (
-              <Filters
-                filterDefs={layoutState.filterDefs}
-                filter={layoutState.filter}
-                onChange={layoutState.setFilter}
-                groupBy={layoutState.groupBy}
-                numberOfInlineFilters={breakpoints.mdAndDown ? 2 : undefined}
+        <TableActions
+          right={
+            hasHideableColumns && (
+              <EditColumnsButton
+                columns={columns}
+                api={api}
+                tooltip="Display columns"
+                trigger={{ icon: "kanban", label: "", variant: "secondaryBlack" }}
+                {...tid.editColumnsButton}
               />
-            )}
-          </div>
-          {hasHideableColumns && (
-            <EditColumnsButton
-              columns={columns}
-              api={api}
-              tooltip="Display columns"
-              trigger={{ icon: "kanban", label: "", variant: "secondaryBlack" }}
-              {...tid.editColumnsButton}
+            )
+          }
+        >
+          {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
+          {layoutState?.filterDefs && (
+            <FilterDropdownMenu
+              filterDefs={layoutState.filterDefs}
+              filter={layoutState.filter}
+              onChange={layoutState.setFilter}
+              groupBy={layoutState.groupBy}
             />
           )}
         </TableActions>
