@@ -350,6 +350,7 @@ function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
   return (
     <div css={Css.wPx(244).$}>
       <TextField
+        compact
         label="Search"
         labelStyle="hidden"
         value={value}
