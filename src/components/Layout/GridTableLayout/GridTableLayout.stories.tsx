@@ -255,7 +255,7 @@ export function GridTableLayoutWithColor() {
         ]}
         layoutState={layoutState}
         tableProps={{
-          columns: [collapseColumn<Row>(), selectColumn<Row>(), ...columns],
+          columns,
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
           visibleColumnsStorageKey: storageKey,
