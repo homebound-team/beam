@@ -66,7 +66,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
   // Convert FilterDefs to FilterImpls
   const filterImpls = useMemo(() => buildFilterImpls(filterDefs), [filterDefs]);
 
-  // CSS overrides for filter inputs: 40px height and 8px border radius
+  // CSS overrides for filter inputs until filters component is updated everywhere in Blueprint
   // Using BorderHoverChild class as it's applied to all TextFieldBase input wrappers
   const filterInputStyles = Css.addIn("& .BorderHoverChild", Css.hPx(40).br8.$).$;
 
