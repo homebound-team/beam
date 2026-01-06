@@ -79,8 +79,10 @@ export function ColumnResizeHandle({
       // Store the original handle position
       const rect = handleRef.current?.getBoundingClientRect();
       if (rect) {
-        startHandleRightRef.current = rect.right;
-        setGuideLineX(rect.right);
+        // overlap guide line with handle
+        const handleCenter = rect.right - rect.width / 2;
+        startHandleRightRef.current = handleCenter;
+        setGuideLineX(handleCenter);
       }
 
       // Find the scrollable parent container
