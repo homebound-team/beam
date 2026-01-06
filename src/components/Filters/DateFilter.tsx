@@ -38,7 +38,7 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
         {vertical && <Label label={label} />}
         <CompoundField>
           <SelectField
-            compact
+            compact={false}
             sizeToContent
             options={[
               // Always show the 'Any' option
@@ -58,7 +58,7 @@ class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
             {...tid[`${defaultTestId(this.label)}_dateOperation`]}
           />
           <DateField
-            compact
+            compact={false}
             labelStyle="inline"
             value={value?.value ? new Date(value.value) : new Date()}
             label="Date"

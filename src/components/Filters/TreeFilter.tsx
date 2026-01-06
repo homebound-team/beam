@@ -33,7 +33,7 @@ class TreeFilter<O, V extends Value> extends BaseFilter<V[], TreeFilterProps<O, 
         {...props}
         label={this.label}
         values={value}
-        compact={!vertical}
+        compact={false}
         labelStyle={inModal ? "hidden" : !inModal && !vertical ? "inline" : "above"}
         sizeToContent={!inModal && !vertical}
         onSelect={(options) => {
