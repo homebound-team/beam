@@ -87,8 +87,6 @@ export function ColumnResizeHandle({
       // Prefer scrollableEl from ScrollableParent context (avoids expensive DOM traversal)
       // Note: scrollableEl is a portal element, so the actual scrollable container is its parent
       // Fall back to findScrollableParent for tables not wrapped in ScrollableParent
-      // This sounds bad but resizable columns was built with GridTableLayout in mind which always gets used
-      // within a ScrollableParent because it is wrapped in a ScrollableContent
       if (scrollableEl?.parentElement) {
         // scrollableEl is a portal element, its parent is the actual scrollable container
         scrollableParentRef.current = scrollableEl.parentElement;
@@ -114,10 +112,12 @@ export function ColumnResizeHandle({
           setGuideLineTop(tableRect.top);
           setGuideLineHeight(tableRect.height);
         }
-      } else {
-        // Fallback: use viewport
-        setGuideLineTop(0);
-        setGuideLineHeight(window.innerHeight);
+      } else if (rect) {
+        // Fallback: make our handle the guide line
+        // We'll see this happen in cases where we have a plain GridTable not GridTableLayout
+        // It won't extend the entire table but it will serve its purpose
+        setGuideLineTop(rect.top);
+        setGuideLineHeight(rect.height);
       }
 
       document.body.style.cursor = "col-resize";
