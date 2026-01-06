@@ -73,7 +73,7 @@ class NumberRangeFilter<DV extends NumberRangeFilterValue>
         {!vertical && (
           <CompoundField {...tid}>
             <NumberField
-              compact={false}
+              compact
               sizeToContent={!inModal}
               labelStyle="inline"
               clearable
@@ -89,7 +89,7 @@ class NumberRangeFilter<DV extends NumberRangeFilterValue>
               {...tid[`${defaultTestId(label)}_min`]}
             />
             <NumberField
-              compact={false}
+              compact
               sizeToContent={!inModal}
               labelStyle="inline"
               clearable

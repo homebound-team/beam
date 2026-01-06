@@ -64,7 +64,7 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
     return (
       <MultiSelectField<O, V>
         {...props}
-        compact={false}
+        compact={!vertical}
         label={this.label}
         values={value || []}
         labelStyle={inModal ? "hidden" : !inModal && !vertical ? "inline" : "above"}
