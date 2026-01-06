@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button, ButtonProps } from "src/components/Button";
+import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
 import { Icon } from "src/components/Icon";
 import { EditColumnsButton, GridDataRow } from "src/components/Table";
@@ -17,6 +18,9 @@ import { FullBleed } from "../FullBleed";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
 import { ScrollableContent } from "../ScrollableContent";
 import { QueryResult, QueryTable, QueryTableProps } from "./QueryTable";
+
+// Omit to force all action button menus to look the same
+type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
 
 type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
 
@@ -53,6 +57,8 @@ export type GridTableLayoutProps<
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
   breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
+  /** Renders a ButtonMenu with "verticalDots" icon as trigger */
+  actionMenu?: ActionButtonMenuProps;
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
@@ -99,6 +105,7 @@ function GridTableLayoutComponent<
     primaryAction,
     secondaryAction,
     tertiaryAction,
+    actionMenu,
     hideEditColumns = false,
   } = props;
 
@@ -138,6 +145,7 @@ function GridTableLayoutComponent<
         primaryAction={primaryAction}
         secondaryAction={secondaryAction}
         tertiaryAction={tertiaryAction}
+        actionMenu={actionMenu}
       />
       {showTableActions && (
         <TableActions
@@ -249,10 +257,11 @@ type HeaderProps = {
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
+  actionMenu?: ActionButtonMenuProps;
 };
 
 function Header(props: HeaderProps) {
-  const { pageTitle, breadcrumb, primaryAction, secondaryAction, tertiaryAction } = props;
+  const { pageTitle, breadcrumb, primaryAction, secondaryAction, tertiaryAction, actionMenu } = props;
   const tids = useTestIds(props);
 
   return (
@@ -265,10 +274,11 @@ function Header(props: HeaderProps) {
           </h1>
         </div>
         {/* Flex wrap reverse and justify flex end allows the buttons to wrap naturally/responsively on smaller screens */}
-        <div css={Css.df.fwr.jcfe.gap1.$}>
+        <div css={Css.df.fwr.jcfe.gap1.aic.$}>
           {tertiaryAction && <Button {...tertiaryAction} variant="tertiary" />}
           {secondaryAction && <Button {...secondaryAction} variant="secondary" />}
           {primaryAction && <Button {...primaryAction} />}
+          {actionMenu && <ButtonMenu {...actionMenu} trigger={{ icon: "verticalDots" }} />}
         </div>
       </header>
     </FullBleed>
