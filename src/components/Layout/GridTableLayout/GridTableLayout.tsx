@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button, ButtonProps } from "src/components/Button";
+import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
 import { Icon } from "src/components/Icon";
-import { EditColumnsButton, GridDataRow } from "src/components/Table";
+import { OffsetAndLimit, Pagination } from "src/components/Pagination";
+import { GridDataRow } from "src/components/Table";
+import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable, GridTableProps } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
@@ -17,6 +20,9 @@ import { FullBleed } from "../FullBleed";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
 import { ScrollableContent } from "../ScrollableContent";
 import { QueryResult, QueryTable, QueryTableProps } from "./QueryTable";
+
+// Omit to force all action button menus to look the same
+type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
 
 type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
 
@@ -53,14 +59,17 @@ export type GridTableLayoutProps<
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
   breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
+  /** Renders a ButtonMenu with "verticalDots" icon as trigger */
+  actionMenu?: ActionButtonMenuProps;
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
+  totalCount?: number;
 };
 
 /**
- * A layout component that combines a table with a header, actions buttons and filters.
+ * A layout component that combines a table with a header, actions buttons, filters, and pagination.
  *
  * This component can render either a `GridTable` or wrapped `QueryTable` based on the provided props:
  *
@@ -84,6 +93,8 @@ export type GridTableLayoutProps<
  *   }}
  * />
  * ```
+ *
+ * Pagination is rendered when `totalCount` is provided. Use `layoutState.page` for server query variables.
  */
 function GridTableLayoutComponent<
   F extends Record<string, unknown>,
@@ -99,7 +110,9 @@ function GridTableLayoutComponent<
     primaryAction,
     secondaryAction,
     tertiaryAction,
+    actionMenu,
     hideEditColumns = false,
+    totalCount,
   } = props;
 
   const tid = useTestIds(props);
@@ -138,6 +151,7 @@ function GridTableLayoutComponent<
         primaryAction={primaryAction}
         secondaryAction={secondaryAction}
         tertiaryAction={tertiaryAction}
+        actionMenu={actionMenu}
       />
       {showTableActions && (
         <TableActions
@@ -184,6 +198,14 @@ function GridTableLayoutComponent<
             visibleColumnsStorageKey={visibleColumnsStorageKey}
           />
         )}
+        {layoutState && totalCount !== undefined && (
+          <Pagination
+            page={[layoutState.page, layoutState._pagination.setPage]}
+            totalCount={totalCount}
+            pageSizes={layoutState._pagination.pageSizes}
+            {...tid.pagination}
+          />
+        )}
       </ScrollableContent>
     </>
   );
@@ -200,21 +222,33 @@ function validateColumns(columns: readonly { id?: string; name?: string }[]): vo
   }
 }
 
+/** Configuration for pagination in GridTableLayout */
+export type PaginationConfig = {
+  /** Available page size options */
+  pageSizes?: number[];
+  /** Storage key for persisting page size preference */
+  storageKey?: string;
+};
+
 /**
- * A wrapper around standard filter, grouping and search state hooks.
+ * A wrapper around standard filter, grouping, search, and pagination state hooks.
  * * `client` search will use the built-in grid table search functionality.
  * * `server` search will return `searchString` as a debounced search string to query the server.
+ * * Use `pagination` config to customize page sizes or storage key. Use `page` for server query variables.
  */
 export function useGridTableLayoutState<F extends Record<string, unknown>>({
   persistedFilter,
   persistedColumns,
   search,
   groupBy: maybeGroupBy,
+  pagination,
 }: {
   persistedFilter?: UsePersistedFilterProps<F>;
   persistedColumns?: { storageKey: string };
   search?: "client" | "server";
   groupBy?: Record<string, string>;
+  /** Customize pagination page sizes or storage key */
+  pagination?: PaginationConfig;
 }) {
   // Because we can't conditionally render a hook, we still call it with a fallback value.
   const filterFallback = { filterDefs: {}, storageKey: "unset-filter" } as UsePersistedFilterProps<F>;
@@ -229,6 +263,25 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     undefined,
   );
 
+  // Pagination state
+  const paginationFallbackKey = "unset-pagination";
+  const pageSizes = pagination?.pageSizes ?? [100, 500, 1000];
+  const [persistedPageSize, setPersistedPageSize] = useSessionStorage<number>(
+    pagination?.storageKey ?? paginationFallbackKey,
+    100, // default page size
+  );
+
+  const [page, setPage] = useState<OffsetAndLimit>({
+    offset: 0,
+    limit: persistedPageSize,
+  });
+
+  // Persist page size and reset to first page when filters/search change
+  useEffect(() => {
+    if (page.limit !== persistedPageSize) setPersistedPageSize(page.limit);
+    setPage((prev) => ({ ...prev, offset: 0 }));
+  }, [page.limit, persistedPageSize, setPersistedPageSize, filter, searchString]);
+
   return {
     filter,
     setFilter,
@@ -240,6 +293,10 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     visibleColumnIds: persistedColumns ? visibleColumnIds : undefined,
     setVisibleColumnIds: persistedColumns ? setVisibleColumnIds : undefined,
     persistedColumnsStorageKey: persistedColumns?.storageKey,
+    /** Current page offset/limit - use this for server query variables */
+    page,
+    /** @internal Used by GridTableLayout component */
+    _pagination: { setPage, pageSizes },
   };
 }
 
@@ -249,10 +306,11 @@ type HeaderProps = {
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
+  actionMenu?: ActionButtonMenuProps;
 };
 
 function Header(props: HeaderProps) {
-  const { pageTitle, breadcrumb, primaryAction, secondaryAction, tertiaryAction } = props;
+  const { pageTitle, breadcrumb, primaryAction, secondaryAction, tertiaryAction, actionMenu } = props;
   const tids = useTestIds(props);
 
   return (
@@ -265,10 +323,11 @@ function Header(props: HeaderProps) {
           </h1>
         </div>
         {/* Flex wrap reverse and justify flex end allows the buttons to wrap naturally/responsively on smaller screens */}
-        <div css={Css.df.fwr.jcfe.gap1.$}>
+        <div css={Css.df.fwr.jcfe.gap1.aic.$}>
           {tertiaryAction && <Button {...tertiaryAction} variant="tertiary" />}
           {secondaryAction && <Button {...secondaryAction} variant="secondary" />}
           {primaryAction && <Button {...primaryAction} />}
+          {actionMenu && <ButtonMenu {...actionMenu} trigger={{ icon: "verticalDots" }} />}
         </div>
       </header>
     </FullBleed>

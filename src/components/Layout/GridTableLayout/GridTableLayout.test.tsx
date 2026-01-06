@@ -2,7 +2,7 @@ import { checkboxFilter } from "src/components/Filters";
 import { actionColumn, column, numericColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { noop } from "src/utils";
-import { render, tableSnapshot, withRouter } from "src/utils/rtl";
+import { click, render, tableSnapshot, withRouter } from "src/utils/rtl";
 import { QueryParamProvider } from "use-query-params";
 import {
   GridTableLayout as GridTableLayoutComponent,
@@ -62,6 +62,7 @@ describe("GridTableLayout", () => {
             columns,
             rows: [simpleHeader, ...rows],
           }}
+          totalCount={100}
           primaryAction={{ label: "Primary Action", onClick: noop }}
           secondaryAction={{ label: "Secondary Action", onClick: noop }}
           tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
@@ -129,6 +130,7 @@ describe("GridTableLayout", () => {
               ...(data?.map((row: Data & { id: string }) => ({ kind: "data", id: row.id, data: row })) ?? []),
             ],
           }}
+          totalCount={100}
           primaryAction={{ label: "Primary Action", onClick: noop }}
         />
       </QueryParamProvider>,
@@ -160,6 +162,7 @@ describe("GridTableLayout", () => {
             layoutStateProps={{}}
             pageTitle="Test"
             hideEditColumns={true}
+            totalCount={100}
             tableProps={{
               columns,
               rows: [simpleHeader, ...rows],
@@ -184,6 +187,7 @@ describe("GridTableLayout", () => {
             <TestWrapper
               layoutStateProps={{}}
               pageTitle="Test"
+              totalCount={100}
               tableProps={{
                 columns: columnsWithoutId,
                 rows: [simpleHeader, ...rows],
@@ -206,6 +210,7 @@ describe("GridTableLayout", () => {
             <TestWrapper
               layoutStateProps={{}}
               pageTitle="Test"
+              totalCount={100}
               tableProps={{
                 columns: columnsWithoutName,
                 rows: [simpleHeader, ...rows],
@@ -228,6 +233,7 @@ describe("GridTableLayout", () => {
             layoutStateProps={{}}
             pageTitle="Test"
             hideEditColumns={true}
+            totalCount={100}
             tableProps={{
               columns: columnsWithoutId,
               rows: [simpleHeader, ...rows],
@@ -238,6 +244,100 @@ describe("GridTableLayout", () => {
       );
 
       expect(r.pageTitle).toBeInTheDocument();
+    });
+  });
+
+  describe("pagination", () => {
+    it("renders pagination when totalCount is provided", async () => {
+      // Given a GridTableLayout with totalCount
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{
+              pagination: {
+                pageSizes: [100, 500, 1000],
+              },
+            }}
+            pageTitle="Test With Pagination"
+            hideEditColumns
+            totalCount={500}
+            tableProps={{
+              columns,
+              rows: [simpleHeader, ...rows],
+            }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+
+      // Then the pagination component is rendered
+      expect(r.pagination).toBeInTheDocument();
+      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 100 of 500");
+    });
+
+    it("updates page state when clicking next", async () => {
+      // Given a GridTableLayout with pagination
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{
+              pagination: {
+                pageSizes: [100, 500, 1000],
+              },
+            }}
+            pageTitle="Test Pagination Navigation"
+            hideEditColumns
+            totalCount={500}
+            tableProps={{
+              columns,
+              rows: [simpleHeader, ...rows],
+            }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+
+      // Initially on page 1
+      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 100 of 500");
+
+      // When clicking next
+      click(r.pagination_nextIcon);
+
+      // Then page 2 is shown
+      expect(r.pagination_pageInfoLabel).toHaveTextContent("101 - 200 of 500");
+    });
+
+    it("updates page size when selecting a new size", async () => {
+      // Given a GridTableLayout with pagination
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{
+              pagination: {
+                pageSizes: [100, 500, 1000],
+              },
+            }}
+            pageTitle="Test Page Size"
+            hideEditColumns
+            totalCount={500}
+            tableProps={{
+              columns,
+              rows: [simpleHeader, ...rows],
+            }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+
+      // Initially page size is 100
+      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 100 of 500");
+
+      // When changing page size to 500
+      click(r.pagination_pageSize);
+      click(r.getByRole("option", { name: "500" }));
+
+      // Then the page info reflects new size
+      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 500 of 500");
     });
   });
 });

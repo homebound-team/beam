@@ -49,7 +49,19 @@ export function GridTableLayout() {
         }}
         primaryAction={{ label: "Primary Action", onClick: noop }}
         secondaryAction={{ label: "Secondary Action", onClick: noop }}
-        tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
+        tertiaryAction={{
+          label: "Tertiary Action",
+          tooltip: "I am tertiary",
+          onClick: noop,
+        }}
+        actionMenu={{
+          tooltip: "I am the actionMenu",
+          items: [
+            { label: "First Action", onClick: noop },
+            { label: "Second Action", onClick: noop },
+            { label: "Third Action", onClick: noop },
+          ],
+        }}
       />
     </TestProjectLayout>
   );
@@ -121,6 +133,7 @@ export function WithCheckboxFilter() {
 
 export function QueryTableLayout() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(), []);
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -128,12 +141,17 @@ export function QueryTableLayout() {
       storageKey: "grid-table-layout",
     },
     search: "server",
+    pagination: {
+      pageSizes: [25, 50, 100],
+      storageKey: "query-table-pagination",
+    },
   });
 
-  // In this example, we set up a server-side search that uses the `searchString` from the layout state.
+  // In this example, we set up server-side search and pagination using `searchString` and `page` from the layout state,
   // in combination with the "QueryTable" behavior for loading/error states.
-  const query = useExampleQuery({ filter: { ...layoutState.filter, search: layoutState.searchString } });
-  const columns = useMemo(() => getColumns(), []);
+  const query = useExampleQuery({
+    filter: { ...layoutState.filter, search: layoutState.searchString, page: layoutState.page },
+  });
 
   return (
     <TestProjectLayout>
@@ -154,6 +172,44 @@ export function QueryTableLayout() {
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
         }}
         primaryAction={{ label: "Primary Action", onClick: noop }}
+        totalCount={100}
+      />
+    </TestProjectLayout>
+  );
+}
+
+export function WithPagination() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(), []);
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey: "grid-table-layout",
+    },
+    search: "client",
+    pagination: {
+      pageSizes: [25, 50, 100, 500],
+      storageKey: "grid-table-pagination",
+    },
+  });
+
+  return (
+    <TestProjectLayout>
+      <GridTableLayoutComponent
+        pageTitle="Grid Table With Pagination"
+        breadcrumb={[
+          { href: "/", label: "Home" },
+          { href: "/", label: "Product Offerings" },
+        ]}
+        layoutState={layoutState}
+        totalCount={543}
+        tableProps={{
+          columns,
+          rows: [simpleHeader, ...makeNestedRows(10)],
+          sorting: { on: "client", initial: [columns[0].id!, "ASC"] },
+        }}
+        primaryAction={{ label: "Add Product", onClick: noop }}
       />
     </TestProjectLayout>
   );
