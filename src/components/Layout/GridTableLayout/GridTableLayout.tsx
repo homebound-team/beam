@@ -27,7 +27,8 @@ import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumb
 import { ScrollableContent } from "../ScrollableContent";
 import { QueryResult, QueryTable, QueryTableProps } from "./QueryTable";
 
-type ActionButtonMenuProps = Pick<ButtonMenuProps, "items" | "disabled" | "tooltip">;
+// Omit to force all action button menus to look the same
+type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
 
 type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
 
