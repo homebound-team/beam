@@ -28,7 +28,6 @@ class BooleanFilter extends BaseFilter<boolean, BooleanFilterProps> implements F
     return (
       <SelectField<BooleanOption, string>
         {...props}
-        compact={!vertical}
         label={this.label}
         // We use `String(value)` so that `undefined` becomes "undefined"
         value={String(value)}

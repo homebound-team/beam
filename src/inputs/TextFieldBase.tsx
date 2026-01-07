@@ -139,7 +139,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const fieldStyles = {
     container: Css.df.fdc.w100.maxw(fieldMaxWidth).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
     inputWrapper: {
-      ...Css[typeScale].df.aic.br4
+      ...Css[typeScale].df.aic.br8
         .pxPx(textFieldBasePadding)
         .w100.bgColor(bgColor)
         .gray900.if(contrast && !inputStylePalette)

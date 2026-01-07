@@ -66,10 +66,6 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
   // Convert FilterDefs to FilterImpls
   const filterImpls = useMemo(() => buildFilterImpls(filterDefs), [filterDefs]);
 
-  // CSS overrides for filter inputs until filters component is updated everywhere in Blueprint
-  // Using BorderHoverChild class as it's applied to all TextFieldBase input wrappers
-  const filterInputStyles = Css.addIn("& .BorderHoverChild", Css.hPx(40).br8.$).$;
-
   // Render all filters, with non-checkbox filters first, then checkbox filters
   const renderFilters = () => {
     const entries = safeEntries(filterImpls);
@@ -77,7 +73,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
     const checkbox = entries.filter(([_, f]) => f.hideLabelInModal);
 
     return [...nonCheckbox, ...checkbox].map(([key, f]: [keyof F, Filter<any>]) => (
-      <div key={key as string} css={filterInputStyles}>
+      <div key={key as string}>
         {f.render(filter[key], (value) => onChange(updateFilter(filter, key, value)), testId, false, false)}
       </div>
     ));
@@ -106,19 +102,16 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
       {isOpen && (
         <div ref={filterContentRef} {...overlayProps} css={Css.df.aic.fww.gap1.order(1).$}>
           {groupBy && (
-            <div css={filterInputStyles}>
-              <SelectField
-                label="Group by"
-                compact
-                labelStyle="inline"
-                sizeToContent
-                options={groupBy.options}
-                getOptionValue={(o) => o.id}
-                getOptionLabel={(o) => o.name}
-                value={groupBy.value}
-                onSelect={(g) => g && groupBy.setValue(g)}
-              />
-            </div>
+            <SelectField
+              label="Group by"
+              labelStyle="inline"
+              sizeToContent
+              options={groupBy.options}
+              getOptionValue={(o) => o.id}
+              getOptionLabel={(o) => o.name}
+              value={groupBy.value}
+              onSelect={(g) => g && groupBy.setValue(g)}
+            />
           )}
 
           {/* Render all filters (non-checkbox first, then checkbox) */}
