@@ -2,6 +2,7 @@ import { Icon } from "src";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
+import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
 import { DragData, emptyCell } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
@@ -94,6 +95,26 @@ function nonKindDefaults() {
   return Object.fromEntries(nonKindGridColumnKeys.map((key) => [key, undefined]));
 }
 
+export function parseWidthToPx(widthStr: string | undefined, tableWidth: number | undefined): number | null {
+  if (!widthStr) return null;
+
+  if (widthStr.endsWith("px")) {
+    const parsed = parseInt(widthStr.replace("px", ""), 10);
+    return isNaN(parsed) ? null : parsed;
+  }
+
+  if (widthStr.endsWith("%") && tableWidth) {
+    const percent = parseFloat(widthStr.replace("%", ""));
+    if (isNaN(percent)) return null;
+    return Math.round((percent / 100) * tableWidth);
+  }
+
+  // For calc() or other complex expressions, return null
+  // These should never happen since we've run calcColumnSizes already resolved to px
+  // by the time resizing happens
+  return null;
+}
+
 /**
  * Calculates column widths using a flexible `calc()` definition that allows for consistent column alignment without the use of `<table />`, CSS Grid, etc layouts.
  * Enforces only fixed-sized units (% and px)
@@ -103,6 +124,7 @@ export function calcColumnSizes<R extends Kinded>(
   tableWidth: number | undefined,
   tableMinWidthPx: number = 0,
   expandedColumnIds: string[],
+  resizedWidths?: ResizedWidths,
 ): string[] {
   // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
   // calc((100% - allOtherPercent - allOtherPx) * ((myFr / totalFr))`
@@ -114,7 +136,14 @@ export function calcColumnSizes<R extends Kinded>(
   // will resolve every slightly differently, where as this approach they will match exactly.
   const { claimedPercentages, claimedPixels, totalFr } = columns.reduce(
     (acc, { id, w: _w, expandedWidth }) => {
-      const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
+      // Use resized width if available, otherwise use expanded width or original width
+      const resizedWidth = resizedWidths?.[id];
+      const w =
+        resizedWidth !== undefined
+          ? `${resizedWidth}px`
+          : expandedColumnIds.includes(id) && expandedWidth !== undefined
+            ? expandedWidth
+            : _w;
 
       if (typeof w === "undefined") {
         return { ...acc, totalFr: acc.totalFr + 1 };
@@ -175,7 +204,14 @@ export function calcColumnSizes<R extends Kinded>(
       throw new Error("Beam Table column minWidth definition only supports pixel units");
     }
     const mw = _mw ? Number(_mw.replace("px", "")) : 0;
-    const w = expandedColumnIds.includes(id) && expandedWidth !== undefined ? expandedWidth : _w;
+    // Use resized width if available, otherwise use expanded width or original width
+    const resizedWidth = resizedWidths?.[id];
+    const w =
+      resizedWidth !== undefined
+        ? `${resizedWidth}px`
+        : expandedColumnIds.includes(id) && expandedWidth !== undefined
+          ? expandedWidth
+          : _w;
 
     if (typeof w === "undefined") {
       return fr(1, mw);

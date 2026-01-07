@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useMemo, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
+import { Button } from "src/components/Button";
 import {
   isIconButton,
   isNavLinkButton,
@@ -61,6 +62,11 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   const selectedValues = useComputed(() => api.getVisibleColumnIds(), [api]);
   const setSelectedValues = useCallback(
     (ids: string[]) => {
+      // Reset column widths before updating visible columns to ensure the table maintains
+      // its full width and distributes removed column widths among remaining columns
+      // We do this because trying to maintain the size of a removed column and redistribute it was very finnicky. But it
+      // should be possible
+      api.resetColumnWidths();
       // Doesn't `options` already filter us to non-hidden/valid-id columns? I.e. could we just do:
       // api.setVisibleColumns(ids);
       api.setVisibleColumns(
@@ -95,6 +101,9 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
             />
           </Fragment>
         ))}
+        <div css={Css.gc("1 / -1").df.jcc.$}>
+          <Button variant="tertiary" label="Reset Column Widths" onClick={() => api.resetColumnWidths()} />
+        </div>
       </div>
     </OverlayTrigger>
   );

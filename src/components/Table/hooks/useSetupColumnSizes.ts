@@ -1,6 +1,7 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { GridStyle } from "src/components/Table/TableStyles";
+import { ResizedWidths, useColumnResizing } from "src/components/Table/hooks/useColumnResizing";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { calcColumnSizes } from "src/components/Table/utils/columns";
 import { useDebouncedCallback } from "use-debounce";
@@ -29,27 +30,75 @@ export function useSetupColumnSizes<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   resizeRef: MutableRefObject<HTMLElement | null>,
   expandedColumnIds: string[],
-): string[] {
+  visibleColumnsStorageKey: string | undefined,
+  disableColumnResizing: boolean,
+): {
+  columnSizes: string[];
+  tableWidth: number | undefined;
+  resizedWidths: ResizedWidths;
+  setResizedWidth: (columnId: string, width: number) => void;
+  setResizedWidths: (widths: ResizedWidths | ((prev: ResizedWidths) => ResizedWidths)) => void;
+  resetColumnWidths: () => void;
+} {
+  // Call useColumnResizing to manage column width state and persistence
+  const { resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths } = useColumnResizing(
+    disableColumnResizing ? undefined : visibleColumnsStorageKey,
+  );
+
   // Calculate the column sizes immediately rather than via the `debounce` method.
   // We do this for Storybook integrations that may use MockDate. MockDate changes the behavior of `new Date()`,
   // which is used internally by `useDebounce`, so the frozen clock means the callback is never called.
   const calculateImmediately = useRef<boolean>(true);
   const [tableWidth, setTableWidth] = useState<number | undefined>();
+  // Track previous table width to detect container resize
+  const prevTableWidthRef = useRef<number | undefined>(tableWidth);
 
   // Calc our initial/first render sizes where we won't have a width yet
   const [columnSizes, setColumnSizes] = useState<string[]>(
-    calcColumnSizes(columns, tableWidth, style.minWidthPx, expandedColumnIds),
+    calcColumnSizes(columns, tableWidth, style.minWidthPx, expandedColumnIds, resizedWidths),
   );
 
   const setTableAndColumnWidths = useCallback(
     (width: number) => {
       setTableWidth(width);
-      setColumnSizes(calcColumnSizes(columns, width, style.minWidthPx, expandedColumnIds));
+      setColumnSizes(calcColumnSizes(columns, width, style.minWidthPx, expandedColumnIds, resizedWidths));
     },
-    [setTableWidth, setColumnSizes, columns, style, expandedColumnIds],
+    [setTableWidth, setColumnSizes, columns, style, expandedColumnIds, resizedWidths],
   );
 
-  // Used to recalculate our columns sizes when columns change
+  // Scale resized column widths when container width changes
+  useEffect(() => {
+    if (!prevTableWidthRef.current) {
+      prevTableWidthRef.current = tableWidth;
+      return;
+    }
+
+    if (!tableWidth) return;
+
+    const prevWidth = prevTableWidthRef.current;
+    const widthChanged = Math.abs(tableWidth - prevWidth) > 1; // Allow 1px tolerance for subpixel rounding
+
+    if (widthChanged) {
+      const scale = tableWidth / prevWidth;
+
+      setResizedWidths((currentResizedWidths: ResizedWidths): ResizedWidths => {
+        if (!currentResizedWidths || Object.keys(currentResizedWidths).length === 0) {
+          return currentResizedWidths;
+        }
+
+        const scaledWidths: ResizedWidths = {};
+        Object.entries(currentResizedWidths).forEach(([id, width]) => {
+          scaledWidths[id] = Math.round(width * scale);
+        });
+
+        return scaledWidths;
+      });
+
+      prevTableWidthRef.current = tableWidth;
+    }
+  }, [tableWidth, setResizedWidths]);
+
+  // Used to recalculate our columns sizes when columns or resized widths change
   useEffect(
     () => {
       if (!calculateImmediately.current) {
@@ -59,7 +108,7 @@ export function useSetupColumnSizes<R extends Kinded>(
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [columns, setTableAndColumnWidths],
+    [columns, resizedWidths, setTableAndColumnWidths],
   );
 
   const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
@@ -83,5 +132,5 @@ export function useSetupColumnSizes<R extends Kinded>(
 
   useResizeObserver({ ref: resizeRef, onResize });
 
-  return columnSizes;
+  return { columnSizes, tableWidth, resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths };
 }

@@ -4,6 +4,7 @@ import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { GridDataRow } from "src/components/Table";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "../Layout.stories";
@@ -23,7 +24,7 @@ type Row = HeaderRow | ParentRow | DataRow;
 
 export function GridTableLayout() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
-  const columns = useMemo(() => getColumns(), []);
+  const columns = useMemo(() => getColumns(false), []);
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -133,7 +134,7 @@ export function WithCheckboxFilter() {
 
 export function QueryTableLayout() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
-  const columns = useMemo(() => getColumns(), []);
+  const columns = useMemo(() => getColumns(false), []);
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -210,6 +211,58 @@ export function WithPagination() {
           sorting: { on: "client", initial: [columns[0].id!, "ASC"] },
         }}
         primaryAction={{ label: "Add Product", onClick: noop }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+export function GridTableLayoutWithColor() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(true), []);
+  const storageKey = "with-session-storage-test";
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey,
+    },
+    search: "client",
+  });
+
+  useEffect(() => {
+    const columnWidthsKey = `columnWidths_${storageKey}`;
+    if (!sessionStorage.getItem(columnWidthsKey)) {
+      sessionStorage.setItem(
+        columnWidthsKey,
+        JSON.stringify({
+          "name-col": 300,
+          "value-col": 150,
+          "status-col": 120,
+          "priority-col": 120,
+          "action-col": 100,
+        }),
+      );
+    }
+  }, [storageKey]);
+
+  return (
+    <TestProjectLayout>
+      <GridTableLayoutComponent
+        pageTitle="Grid Table Layout with Color for clearer column manipulation"
+        breadcrumb={[
+          { href: "/", label: "Home" },
+          { href: "/", label: "Sub Page" },
+        ]}
+        layoutState={layoutState}
+        tableProps={{
+          columns,
+          rows: [simpleHeader, ...makeNestedRows(3)],
+          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+          visibleColumnsStorageKey: storageKey,
+        }}
+        primaryAction={{ label: "Primary Action", onClick: noop }}
+        secondaryAction={{ label: "Secondary Action", onClick: noop }}
+        tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
       />
     </TestProjectLayout>
   );
@@ -406,47 +459,49 @@ function getManyFilterDefs() {
   };
 }
 
-function getColumns() {
+function getColumns(showColor: boolean = false) {
   const nameColumn = column<Row>({
     id: "name-col",
     name: "Name",
-    header: () => "Name",
-    parent: (row) => ({ content: row.name, value: row.name }),
-    data: (row) => row.name,
+    header: () => ({ content: "Name", css: Css.if(showColor).bgRed500.$ }),
+    parent: (row) => ({ content: row.name, value: row.name, css: Css.if(showColor).bgRed500.$ }),
+    data: (row) => ({ content: row.name, css: Css.if(showColor).bgRed500.$ }),
     mw: "200px",
   });
   const valueColumn = numericColumn<Row>({
     id: "value-col",
     name: "Value",
-    header: () => "Value",
-    parent: (row) => ({ content: row.value, value: row.value }),
-    data: (row) => row.value,
+    header: () => ({ content: "Value", css: Css.if(showColor).bgBlue500.$ }),
+    parent: (row) => ({ content: row.value, value: row.value, css: Css.if(showColor).bgBlue500.$ }),
+    data: (row) => ({ content: row.value, css: Css.if(showColor).bgBlue500.$ }),
     mw: "100px",
   });
   const statusColumn = column<Row>({
     id: "status-col",
     name: "Status",
-    header: () => "Status",
-    parent: (row) => ({ content: row.status, value: row.status }),
-    data: (row) => row.status,
+    header: () => ({ content: "Status", css: Css.if(showColor).bgGreen500.$ }),
+    parent: (row) => ({ content: row.status, value: row.status, css: Css.if(showColor).bgGreen500.$ }),
+    data: (row) => ({ content: row.status, css: Css.if(showColor).bgGreen500.$ }),
+    w: "20%",
     mw: "100px",
   });
   const priorityColumn = numericColumn<Row>({
     id: "priority-col",
     name: "Priority",
-    header: () => "Priority",
-    parent: (row) => ({ content: row.priority, value: row.priority }),
-    data: (row) => row.priority,
-    mw: "100px",
+    header: () => ({ content: "Priority", css: Css.if(showColor).bgYellow500.$ }),
+    parent: (row) => ({ content: row.priority, value: row.priority, css: Css.if(showColor).bgYellow500.$ }),
+    data: (row) => ({ content: row.priority, css: Css.if(showColor).bgYellow500.$ }),
+    mw: "80px",
   });
   const actionColumn = column<Row>({
     id: "action-col",
     name: "Action",
-    header: () => "Action",
-    parent: () => ({ content: <div>Actions</div>, value: "" }),
-    data: () => <div>Actions</div>,
+    header: () => ({ content: "Action", css: Css.if(showColor).bgPurple500.$ }),
+    parent: () => ({ content: <div>Actions</div>, value: "", css: Css.if(showColor).bgPurple500.$ }),
+    data: () => ({ content: <div>Actions</div>, css: Css.if(showColor).bgPurple500.$ }),
     clientSideSort: false,
     w: "100px",
+    mw: "80px",
   });
 
   return [
