@@ -85,7 +85,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
         <Button
           label="Filter"
           icon="filter"
-          size="sm"
+          size="md"
           endAdornment={
             <div css={Css.df.aic.gap1.$}>
               {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}

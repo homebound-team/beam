@@ -161,7 +161,7 @@ function GridTableLayoutComponent<
                 columns={columns}
                 api={api}
                 tooltip="Display columns"
-                trigger={{ icon: "kanban", label: "", variant: "secondaryBlack" }}
+                trigger={{ icon: "kanban", size: "md", label: "", variant: "secondaryBlack" }}
                 {...tid.editColumnsButton}
               />
             )
@@ -350,7 +350,6 @@ function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
   return (
     <div css={Css.wPx(244).$}>
       <TextField
-        compact
         label="Search"
         labelStyle="hidden"
         value={value}
