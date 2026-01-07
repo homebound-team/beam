@@ -121,7 +121,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
 
   const maybeSmaller = compound ? 2 : 0;
   const fieldHeight = 40;
-  const compactFieldHeight = 32;
+  // compact prop is kept for backwards compatibility but no longer affects height
+  const compactFieldHeight = 40;
 
   const [bgColor, hoverBgColor, disabledBgColor] = inputStylePalette
     ? getInputStylePalette(inputStylePalette)
