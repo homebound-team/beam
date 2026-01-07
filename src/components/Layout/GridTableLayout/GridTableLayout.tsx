@@ -161,7 +161,7 @@ function GridTableLayoutComponent<
                 columns={columns}
                 api={api}
                 tooltip="Display columns"
-                trigger={{ icon: "kanban", label: "", variant: "secondaryBlack" }}
+                trigger={{ icon: "kanban", size: "md", label: "", variant: "secondaryBlack" }}
                 {...tid.editColumnsButton}
               />
             )
@@ -186,6 +186,7 @@ function GridTableLayoutComponent<
             filter={clientSearch}
             style={{ allWhite: true }}
             stickyHeader
+            disableColumnResizing={false}
             visibleColumnsStorageKey={visibleColumnsStorageKey}
           />
         ) : (
@@ -195,6 +196,7 @@ function GridTableLayoutComponent<
             filter={clientSearch}
             style={{ allWhite: true }}
             stickyHeader
+            disableColumnResizing={false}
             visibleColumnsStorageKey={visibleColumnsStorageKey}
           />
         )}
