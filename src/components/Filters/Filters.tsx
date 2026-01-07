@@ -85,6 +85,7 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
       {Object.keys(modalFilters).length > 0 && (
         <Button
           label="More Filters"
+          size="md"
           endAdornment={<CountBadge count={numModalFilters} hideIfZero />}
           variant="secondary"
           onClick={() =>
@@ -98,7 +99,7 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
       )}
       {Object.keys(filter).length > 0 && (
         <div>
-          <Button label="Clear" variant="tertiary" onClick={() => onChange({} as F)} {...testId.clearBtn} />
+          <Button label="Clear" size="md" variant="tertiary" onClick={() => onChange({} as F)} {...testId.clearBtn} />
         </div>
       )}
     </div>

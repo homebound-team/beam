@@ -228,7 +228,7 @@ const variantStyles: (contrast: boolean) => Record<
 });
 
 const sizeStyles: Record<ButtonSize, Properties> = {
-  sm: Css.hPx(32).pxPx(12).$,
+  sm: Css.hPx(40).pxPx(12).$,
   md: Css.hPx(40).px1.$,
   lg: Css.hPx(48).px3.$,
 };

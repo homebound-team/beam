@@ -119,7 +119,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
 
           {/* Clear button at end of filter controls */}
           {activeFilterCount > 0 && (
-            <Button label="Clear" variant="tertiary" onClick={() => onChange({} as F)} {...testId.clearBtn} />
+            <Button label="Clear" size="md" variant="tertiary" onClick={() => onChange({} as F)} {...testId.clearBtn} />
           )}
         </div>
       )}
@@ -187,7 +187,7 @@ function FilterChips<F extends Record<string, unknown>>({
   return (
     <div css={Css.df.gap1.fww.aic.order(1).$}>
       {chips}
-      <Button label="Clear" variant="tertiary" onClick={onClear} {...testId.clearBtn} />
+      <Button label="Clear" size="md" variant="tertiary" onClick={onClear} {...testId.clearBtn} />
     </div>
   );
 }
